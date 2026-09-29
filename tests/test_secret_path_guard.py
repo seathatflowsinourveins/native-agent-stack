@@ -1645,9 +1645,12 @@ PATHOLOGICAL = {
     "distinct here-document delimiters": (lambda: "".join(f"cat <<E{n}\n" for n in range(12000)) + "printenv", "environment_dump"),
     "arithmetic shifts on many lines": (lambda: "echo $((1 << 2))\n" * 12000, None),
     "one delimiter, no terminator": (lambda: "cat <<X\n" * 6000, None),
-    # shlex's quote parity leaves the innermost `$(env)` unquoted one level down, so this one is blocked at any depth.
-    "double-quote nesting 20000 deep": (lambda: 'echo "' + '$(echo "' * 20000 + "$(env)" + '")' * 20000 + '"', "environment_dump"),
-    "nested systemd-run": (lambda: "systemd-run --user " * 60000 + "printenv", "environment_dump"),
+    # shlex's quote parity leaves the innermost `$(env)` unquoted one level down, so a smaller nesting is blocked at any depth (the rows of
+    # test_nested_substitutions_are_read_to_a_bounded_depth); this one, 160,000 characters read at every level, spends the character budget
+    # on the second level and is refused as `command_too_complex` (it was an environment_dump found at the first).
+    "double-quote nesting 20000 deep": (lambda: 'echo "' + '$(echo "' * 20000 + "$(env)" + '")' * 20000 + '"', "command_too_complex"),
+    "double-quote nesting 5000 deep": (lambda: 'echo "' + '$(echo "' * 5000 + "$(env)" + '")' * 5000 + '"', "environment_dump"),
+    "nested systemd-run": (lambda: "systemd-run --user " * 10000 + "printenv", "environment_dump"),
     "nested env": (lambda: "env " * 20000 + "printenv", "environment_dump"),
     "nested rtk proxy": (lambda: "rtk proxy " * 20000 + "printenv", "environment_dump"),
     "nested sudo": (lambda: "sudo " * 60000 + "printenv", "environment_dump"),
@@ -1661,12 +1664,38 @@ PATHOLOGICAL = {
     "ps cluster of 70,000 a and a letter that is no flag": (lambda: "ps " + "a" * 70000 + "q; printenv", "environment_dump"),
     "70,000 unclosed parentheses before a redirection": (lambda: "echo " + "(" * 70000 + "<", None),
     # Many double-quoted substitutions, each read as a command of its own, and one big body (the standard commit-message pattern, whose
-    # lines are commands): each body is a fixed cost, so the total stays linear in the command.
+    # lines are commands): each body is a fixed cost, so the total stays linear in the command. A body is read again for what it holds, so
+    # a text is tokenized once at every level and the work budget bounds the sum: 3,000 heads nest five levels, a body of 150,000
+    # characters is two readings of 170,000 (a newline is three characters to shlex).
     "4,000 here-document substitutions in one command": (lambda: ("git commit -m \"$(cat <<'EOF'\nline\nEOF\n)\" && ") * 4000 + "true", None),
-    "4,000 here-document substitutions behind bash -c": (lambda: ("bash -c \"$(cat <<'EOF'\nline\nEOF\n)\" && ") * 4000 + "true", None),
-    "9,000 here-document heads with distinct identifiers and no terminator":
-        (lambda: "".join(f"\"$(cat <<'E{n}'\n" for n in range(9000)) + "printenv", "environment_dump"),
-    "one here-document substitution with a 190,000-character body": (lambda: "git commit -m \"$(cat <<'EOF'\n" + "line of prose, it's (fine)\n" * 7000 + "EOF\n)\"", None),
+    "2,000 here-document substitutions behind bash -c": (lambda: ("bash -c \"$(cat <<'EOF'\nline\nEOF\n)\" && ") * 2000 + "true", None),
+    "3,000 here-document heads with distinct identifiers and no terminator":
+        (lambda: "".join(f"\"$(cat <<'E{n}'\n" for n in range(3000)) + "printenv", "environment_dump"),
+    "one here-document substitution with a 150,000-character body": (lambda: "git commit -m \"$(cat <<'EOF'\n" + "line of prose, it's (fine)\n" * 5500 + "EOF\n)\"", None),
+    # The second verification review's two timeouts (2026-09-29; the character cap of 200,000 does not bound the work). A keyring exec whose
+    # started command holds many interpreter words read every suffix of them again (base 2.8 s, the guard of 50ca6ca2 13 s, past a hook timeout
+    # that fails open), and a text of four-byte characters costs four times as much to tokenize and was read at every nesting level (over 25 s).
+    # check() now spends from one work budget per call (WORK_LIMITS) and raises WorkBudgetExceeded when it is gone: the rows below are refused as
+    # `command_too_complex` (the child maps the exception to that name, as main() does), and a shorter keyring row stays inside the budget.
+    "reviewer: keyring exec and 1,200 python3 words":
+        (lambda: "kernel_keyring.py exec n X -- echo " + "python3 " * 1200 + "; printenv", "command_too_complex"),
+    "keyring exec and 600 python3 words": (lambda: "kernel_keyring.py exec n X -- echo " + "python3 " * 600 + "; printenv", "command_too_complex"),
+    "keyring exec and 5,000 python3 words": (lambda: "kernel_keyring.py exec n X -- echo " + "python3 " * 5000 + "; printenv", "command_too_complex"),
+    "keyring exec and 60 python3 words": (lambda: "kernel_keyring.py exec n X -- echo " + "python3 " * 60 + "; printenv", "environment_dump"),
+    "reviewer: 195,000 emoji in five nested double-quoted substitutions":
+        (lambda: 'echo "$(' * 5 + "echo '" + "\U0001f600" * 195000 + "#'" + ')"' * 5 + "; printenv", "command_too_complex"),
+    "120,000 euro signs in five nested double-quoted substitutions":
+        (lambda: 'echo "$(' * 5 + "echo '" + "€" * 120000 + "#'" + ')"' * 5 + "; printenv", "command_too_complex"),
+    "90,000 euro signs and a comment": (lambda: "printenv; echo '" + "€" * 90000 + "' # x", "environment_dump"),
+    "keyring exec nested 6,000 deep": (lambda: "kernel_keyring.py exec n X -- " * 6000 + "printenv", "command_too_complex"),
+    "keyring exec, watch and 4,000 sh words": (lambda: "kernel_keyring.py exec n X -- watch " + "sh " * 4000 + "; printenv", "command_too_complex"),
+    "4,000 distinct keyring execs": (lambda: " ; ".join(f"kernel_keyring.py exec n{i} X{i} -- true" for i in range(4000)) + " ; printenv", "command_too_complex"),
+    "3,500 distinct keyring execs with interpreters":
+        (lambda: "".join(f"kernel_keyring.py exec n X -- python3 a{i} sh b{i} ; " for i in range(3500)) + "printenv", "command_too_complex"),
+    "keyring exec with a 100,000-character argument and launched programs":
+        (lambda: "kernel_keyring.py exec n X -- watch sh sh sh sh '" + "a b " * 25000 + "' ; printenv", "command_too_complex"),
+    "keyring exec with a 60,000-character argument and launched programs":
+        (lambda: "kernel_keyring.py exec n X -- watch sh sh sh sh '" + "a b " * 15000 + "' ; printenv", "environment_dump"),
 }
 PATHOLOGICAL_SECONDS = 3.0
 _TIMING_CHILD = (
@@ -1675,7 +1704,10 @@ _TIMING_CHILD = (
     "from tests import test_secret_path_guard as t\n"
     "text = t.PATHOLOGICAL[sys.argv[2]][0]()\n"
     "start = time.perf_counter()\n"
-    "verdict = t.guard.check(text)\n"
+    "try:\n"
+    "    verdict = t.guard.check(text)\n"
+    "except t.guard.WorkBudgetExceeded:\n"
+    "    verdict = 'command_too_complex'\n"
     "print(json.dumps([verdict, time.perf_counter() - start]))\n")
 
 # The four groups of the acceptance oracle for this work (kw/guard_oracle.py, phase base), kept here so a change to the guard is checked
@@ -2201,19 +2233,123 @@ class SecretPathGuardTests(unittest.TestCase):
                 with self.subTest(command=command):
                     self.assertEqual(guard.check(command) is not None, blocked)
 
+    def test_the_work_budget_is_spent_and_refused_deterministically(self):
+        # The character cap of main() does not bound the work of check(): a keyring exec whose started command holds many interpreter words
+        # re-read every suffix of them, and four-byte characters cost four times as much to tokenize and were read at every nesting level
+        # (the second verification review of 50ca6ca2: 13 s and over 25 s, past a hook timeout that fails open). One budget per call counts
+        # (a) the characters passed to shlex, each at its storage width, over every reading and every nesting level (400,000), (b) the texts read
+        # (each command, each double-quoted body, each `sh -c` or `eval` string), the words of the segments they emit and the launched-command
+        # reads of the keyring analysis, and raises WorkBudgetExceeded when one is gone. The rows below are inert strings; each names the counter
+        # that a budget test can only trip through it.
+        self.assertEqual(guard.WORK_LIMITS["characters"], 400_000)
+        self.assertEqual(sorted(guard.WORK_LIMITS), ["characters", "reads", "texts", "words"])
+        cases = [
+            ("characters", "echo '" + "x" * 205_000 + "' # x"),  # two readings of 205,000 characters
+            ("characters", "echo '" + "€" * 150_000 + "' # x"),  # two-byte characters count twice: 300,000 a reading
+            ("characters", 'echo "' + "\U0001f600" * 101_000 + '"'),  # four-byte characters count four times: 404,000 in one reading
+            ("texts", "sh -c a;" * 12_000),  # 12,000 inline strings, each one text
+            ("words", "kernel_keyring.py exec n X -- " * 6_000 + "printenv"),  # every hop emits the rest of the words again
+            ("reads", "".join(f"kernel_keyring.py exec n{i} X -- watch python3 a{i}; " for i in range(300))),  # 2 reads a segment: 600 of 500
+        ]
+        for kind, command in cases:
+            with self.subTest(kind=kind, characters=len(command)):
+                with self.assertRaises(guard.WorkBudgetExceeded) as caught:
+                    guard.check(command)
+                self.assertEqual(caught.exception.args, (kind,))
+        # the same shapes just inside the budget are read and get their verdict, and the budget is fresh on every call
+        for command, verdict in (("echo '" + "x" * 190_000 + "' # x", None), ("printenv; echo '" + "€" * 90_000 + "' # x", "environment_dump"),
+                                 ('echo "' + "\U0001f600" * 99_000 + '"; printenv', "environment_dump"),
+                                 ("sh -c a;" * 9_000 + "printenv", "environment_dump"),
+                                 ("kernel_keyring.py exec n X -- " * 50 + "printenv", "environment_dump_in_keyring_exec"),
+                                 ("".join(f"kernel_keyring.py exec n{i} X -- watch python3 a{i}; " for i in range(200)) + "printenv", "environment_dump")):
+            with self.subTest(command=command[:40], characters=len(command)):
+                self.assertEqual(guard.check(command), verdict)
+        self.assertIsNone(guard._work)  # nothing is left over between calls, and a direct call to lex() outside check() is not counted
+        guard.lex("x " * 300_000)
+
+    def test_storage_width_is_the_width_python_stores_a_text_in(self):
+        # shlex reads a text one character at a time and costs about 2 microseconds a character at one byte, 4 at two and 8 at four (measured
+        # here on 200,000 characters of one quoted word: 0.41, 0.85 and 1.70 s), so the budget counts each character at its storage width.
+        for text, width in (("", 1), ("abc", 1), ("café", 1), ("€", 2), ("abc€", 2), ("\U0001f600", 4), ("a" * 1000 + "\U0001f600", 4)):
+            with self.subTest(text=text[:8], width=width):
+                self.assertEqual(guard.storage_width(text), width)
+        spent = guard.start_work()
+        try:
+            guard.lex("café " * 3)  # 15 characters of one byte
+            self.assertEqual(spent["characters"], 15)
+            guard.lex("€ " * 3)  # 6 characters of two bytes
+            self.assertEqual(spent["characters"], 15 + 12)
+            guard.lex("\U0001f600" * 3)  # 3 characters of four bytes
+            self.assertEqual(spent["characters"], 15 + 12 + 12)
+        finally:
+            guard.stop_work()
+
+    def test_each_text_and_each_emitted_segment_is_counted_once(self):
+        spent = guard.start_work()
+        try:
+            guard.expand("echo one; echo two")
+            self.assertEqual((spent["texts"], spent["characters"], spent["words"]), (1, 18, 12))  # 2 segments, each emitted twice (as written, as walked) at 2 words + 1
+            guard.expand("sh -c 'echo x'")
+            self.assertEqual(spent["texts"], 3)  # the command and its inline string
+        finally:
+            guard.stop_work()
+
+    def test_expand_drops_identical_segments(self):
+        self.assertEqual(guard.expand("echo a; echo a; echo a"), [["echo", "a"]])
+        self.assertEqual(guard.expand("echo a; echo b; echo a"), [["echo", "a"], ["echo", "b"]])
+        self.assertEqual(guard.expand("sudo echo a; echo a"), [["sudo", "echo", "a"], ["echo", "a"]])
+
+    def test_a_spent_budget_is_refused_by_main_without_echoing_the_command(self):
+        # check() raises rather than return a reason, so no caller can take a command it could not read for one it allowed; main() turns the
+        # exception into exit 2 with one line that names no command text, as for `command_too_large`. The reviewer's second input runs through the
+        # real hook (195,000 four-byte characters below the 200,000 cap, which took over 25 s and no verdict before the budget).
+        self.assertIn("command_too_complex", guard.HINTS)
+        self.assertIn("split", guard.HINTS["command_too_complex"])
+        self.assertIn("Write tool", guard.HINTS["command_too_complex"])
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "echo SENTINEL-7d3c"}})
+        stderr = io.StringIO()
+        with mock.patch.object(guard, "check", side_effect=guard.WorkBudgetExceeded("words")), \
+                mock.patch.object(sys, "stdin", io.StringIO(payload)), mock.patch.object(sys, "stderr", stderr):
+            self.assertEqual(guard.main(), 2)
+        self.assertEqual(stderr.getvalue().count("\n"), 1)
+        self.assertIn("blocked (command_too_complex)", stderr.getvalue())
+        self.assertNotIn("SENTINEL-7d3c", stderr.getvalue())
+        emoji = 'echo "$(' * 5 + "echo '" + "\U0001f600" * 195_000 + "#'" + ')"' * 5 + "; printenv"
+        self.assertLess(len(emoji), guard.MAX_COMMAND_CHARACTERS)
+        started = time.perf_counter()
+        refused = run_hook({"tool_name": "Bash", "tool_input": {"command": emoji}})
+        self.assertLess(time.perf_counter() - started, 3.0)
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn("blocked (command_too_complex)", refused.stderr)
+        self.assertEqual(refused.stderr.count("\n"), 1)
+        self.assertEqual(refused.stdout, "")
+        keyring = "kernel_keyring.py exec n X -- echo " + "python3 " * 1200 + "; printenv"
+        started = time.perf_counter()
+        refused = run_hook({"tool_name": "Bash", "tool_input": {"command": keyring}})
+        self.assertLess(time.perf_counter() - started, 3.0)
+        self.assertEqual(refused.returncode, 2)
+        self.assertRegex(refused.stderr, r"blocked \((command_too_complex|environment_dump)")
+
     def test_check_never_raises(self):
         # main() blocks a command whose check() raised, but a table row that raises is a bug to fix, not to hide: every row of every table,
-        # the oracle groups and the pathological inputs must come back as a verdict.
+        # the oracle groups and the pathological inputs must come back as a verdict. A pathological input may spend its work budget, which is
+        # WorkBudgetExceeded and nothing else.
         rows = [*BLOCKED, *KEYRING_BLOCKED, *ALLOWED, *SAFE_CORPUS, *EXPECTED_PASS_THROUGH, *ORACLE_MUST_BLOCK, *ORACLE_MUST_ALLOW,
                 *ORACLE_MUST_STAY, *ORACLE_STAY_ALLOWED, *(text for text, _ in SUBSTITUTION_BODIES),
-                *("git commit -m \"$(cat <<'EOF'\n" + message + "\nEOF\n)\"" for message in REAL_COMMIT_MESSAGES),
-                *(build() for build, _ in PATHOLOGICAL.values())]
+                *("git commit -m \"$(cat <<'EOF'\n" + message + "\nEOF\n)\"" for message in REAL_COMMIT_MESSAGES)]
         self.assertGreaterEqual(len(rows), 700)
         for command in rows:
             try:
                 guard.check(command)
             except Exception as error:  # noqa: BLE001
                 self.fail(f"check() raised {type(error).__name__} on {command[:80]!r}")
+        for name, (build, verdict) in PATHOLOGICAL.items():
+            if verdict == "command_too_complex":
+                continue  # run for its exception by the timing test, in a child process with a time limit
+            try:
+                guard.check(build())
+            except Exception as error:  # noqa: BLE001
+                self.fail(f"check() raised {type(error).__name__} on the pathological input {name!r}")
 
     def test_an_internal_error_blocks_the_call_without_echoing_it(self):
         # Only exit 2 blocks a PreToolUse call; an uncaught exception exits 1 and the call goes through (Claude Code hooks, PreToolUse).

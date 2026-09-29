@@ -1132,10 +1132,45 @@ read is listed at the end of this subsection.
   characters as `command_too_large` (exit 2, one line that names no command text, with the hint to put the content in a
   file with the Write tool and pass the path): measured that day, one quoted word of 1,000,000 characters took 10.2 to
   13.0 s in `check()` (the base guard too), 600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took 0.6 s,
-  and a hook that times out blocks nothing. The limit is low enough that both readings of a command always run inside
-  the timeout, so no reading is skipped above some length; the slowest of seven shapes of about 199,000 characters (a
-  double-quoted or single-quoted text holding `#` throughout, ANSI-C strings, backquotes, subshells) took 1.0 s in
-  `check()`. `check()` itself has no size limit. A substitution nested beyond the caps above is still not read.
+  and a hook that times out blocks nothing.
+  **The size cap does not bound the work (2026-09-29).** The second verification review found a command of 9,645
+  characters that took 13 s (a keyring exec whose started command holds 1,200 `python3` words: the analysis reads every
+  suffix of them as a command, 5.8 million characters through shlex; the base guard took 2.1 to 2.8 s, the guard of
+  50ca6ca2 12 to 13 s, and 5,000 words ran past 45 s) and one of 195,068 characters that took over 25 s (four-byte
+  characters cost four times as much to tokenize, and five nested double-quoted substitutions read the text at every
+  level; the reviewer's run passed 25 s without a verdict, here the base guard took 1.6 s and the guard of 50ca6ca2 15.7 to
+  17.9 s). `check()` therefore reads a command inside one
+  work budget per call (`WORK_LIMITS`): (a) the characters passed to shlex over every reading and nesting level, each
+  counted at its storage width (1 byte for ASCII and Latin-1, 2 for the rest of the Basic Multilingual Plane, 4 beyond, as
+  shlex costs 0.41, 0.85 and 1.70 s on 200,000 characters of one quoted word), at most 400,000; (b) the texts read (the
+  command, each double-quoted substitution body, each `sh -c` or `eval` string, each keyring read), at most 10,000, the
+  words of the segments that reading emits (a segment counts its words and one), at most 1,000,000, and the
+  launched-command reads of the keyring analysis (the started command and each interpreter or launcher word inside it read
+  again as a command), at most 500. The keyring analysis also drops identical segments before it reads them, scans the
+  command once for each pattern instead of once for each started command, and tests the mentions of an injected variable
+  against the starts of the `exec` arguments instead of against every span (3,500 keyring execs of one variable, each
+  starting a distinct program, took 268 s before these changes, 4,000 distinct keyring execs 25 s).
+  When a counter passes its limit `check()` raises `WorkBudgetExceeded`, not a reason, so no caller can take a command it
+  could not read for one it allowed, and `main()` refuses it: exit 2, `blocked (command_too_complex)`, one line, no command
+  text, the hint to split the command or put the content in a file with the Write tool. The two reviewer inputs are refused
+  in 0.15 s and 0.04 s, as are their 600- and 5,000-word variants of the first (0.15 s each); a keyring exec with 60
+  interpreter words stays inside the budget and reports its dump. Measured just under each limit, one counter at a time
+  (the timing rows and `tests/test_secret_path_guard.py`): 398,000 characters of one quoted word and a `#` (two readings)
+  1.1 s, 390,000 units of two-byte characters 0.9 s, 396,000 of four-byte 0.5 s, 9,900 texts 0.3 s, 1,000,000 words 0.2 s
+  (40 keyring execs over a 20,000-word tail spend 1,005,859 in 0.18 s), 490 reads 0.03 s. 500 random mixes of 22
+  adversarial building blocks at 199,000 characters took at most 0.9 s, and 64 shape families at 25,000 to 199,000
+  characters (`r6_scaling`) at most 1.1 s (the shapes that grow faster than linearly are one long shlex token, which the
+  200,000-character cap bounds at 0.5 s). The largest real command of this repository, an 82,000-character script written
+  through a here-document, spends 35% of the characters, 1% of the words and under 1% of the texts and reads; the
+  largest commit message (27,600 characters, read twice as a body) 57% of the characters. Nothing in the repository's
+  fences, scripts or commit messages (1,877 distinct messages on all refs) comes near a limit. The friction is a command
+  that needs more than that, measured as the largest size that still passes: a text whose characters, counted at their
+  storage width and once for each reading (two when it holds a `#`), pass 400,000 (an ASCII script of 199,990 characters
+  with a `#`, a two-byte text of 199,993 characters without one, a four-byte text of 99,993), more than 9,999 `sh -c` strings or
+  substitution bodies, more than 445 keyring execs nested in one another (40 in front of a 1,000-word tail), more than 250
+  keyring execs that each launch a program, more than about 300 interpreter words in a row after a keyring exec, or more
+  than about 380 distinct injected variables in a 10,000-character command. Write such content with the Write tool and
+  pass the path. `check()` itself has no size limit, and a substitution nested beyond the caps above is still not read.
 - **Loosenings against the base guard (c26800f3), 2026-09-29: one.** Everything else this work changes tightens. The
   value after a clustered value-taking `ps` option is no BSD flag cluster. The base guard skipped the value after a
   stand-alone value option (`ps -u steve` passed) but read the word after a cluster that ends in one, as the shell

@@ -34,7 +34,9 @@ and whatever receives it, so a commit message written through
 refused: write the text with the Write tool and pass `git commit -F FILE`
 (docs/secret-storage.md). `ps -E` (macOS) and `systemctl show-environment` or a bare
 `systemctl show` (a service manager's whole environment block) dump the
-environment like `ps e` and `env`. For a key
+environment like `ps e` and `env`; `ps` is read as procps (Linux) and as macOS
+read it, and either reading that shows the environment blocks (`-C` takes a
+command name on one and is a flag on the other). For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
 unambiguous keyring, and a keyring read in inline interpreter code), checks
@@ -46,9 +48,11 @@ A backslash-newline is joined first and every raw-text rule also reads the
 command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
 are never taken for arguments. An internal error blocks the command (`guard_error`), because only exit 2
-blocks; a hook that outlasts its timeout does not, so every scan reads a text once and a command of more than
-200,000 characters is refused (`command_too_large`; see docs/secret-storage.md, "An internal error blocks; a
-timeout does not"). It is not a security boundary. A process
+blocks; a hook that outlasts its timeout does not, so every scan reads a text once, a command of more than
+200,000 characters is refused (`command_too_large`), and check() reads a command inside a work budget
+(WORK_LIMITS: characters passed to shlex at their storage width, texts read, words emitted, launched-command
+reads) and raises WorkBudgetExceeded when it is gone, which main() refuses (`command_too_complex`); see
+docs/secret-storage.md, "An internal error blocks; a timeout does not". It is not a security boundary. A process
 that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
@@ -284,6 +288,26 @@ SUBSTITUTION_BUDGET_FLOOR = 65536
 # substitution prints always run inside the timeout, so no reading is skipped above some length. Refusing what cannot be read in time
 # fails closed where reading it would fail open.
 MAX_COMMAND_CHARACTERS = 200_000
+# The cap above bounds the size of a command, not the work of reading it: the second verification review found a command of 9,645
+# characters that took 13 s (a keyring exec whose started command holds 1,200 interpreter words, every suffix of them read again, up to
+# 5.8 million characters through shlex) and one of 195,068 characters that took over 25 s (four-byte characters cost four times as much to
+# tokenize, and the text was read at each of five nesting levels, twice each). check() therefore spends from one budget per call, counted
+# in units that do not depend on the host, and raises WorkBudgetExceeded when one counter is gone, which main() turns into a refusal
+# (`command_too_complex`), the same way `command_too_large` refuses a long command: a command that cannot be read in time is refused, not
+# passed. Measured on this host (2026-09-29, docs/secret-storage.md): shlex costs 2 microseconds a unit inside one long quoted word and a
+# tenth of that in ordinary words, a text read 15 to 60, a word of an emitted segment 0.5 to 1, and a keyring read 50 to 100 beyond its
+# characters, so each counter alone holds its worst case near one second (400,000 characters: 1.1 s; 10,000 texts: 0.3 s; 1,000,000
+# words: 0.2 s; 500 reads: 0.03 s). The largest real command of this repository (an 82,000-character script written through a
+# here-document) spends 35% of `characters`, 1% of `words` and under 1% of `texts` and `reads`, so the limits leave ordinary work far
+# inside them, and 500 random mixes of the adversarial shapes at 199,000 characters took at most 0.9 s.
+WORK_LIMITS = {
+    "characters": 400_000,  # characters passed to shlex, each at its storage width (storage_width), over every reading and nesting level
+    "texts": 10_000,  # texts read: the command, each double-quoted substitution body, each `sh -c` or `eval` string, each keyring read
+    "words": 1_000_000,  # words in the segments that reading emits, each segment counted with one more (a list of words copied)
+    "reads": 500,  # commands read again from the words of a keyring exec (the started command, each launched program inside it)
+}
+# What check() has spent so far (None outside a check() call, where nothing is counted): start_work() and stop_work() bracket a call.
+_work: dict[str, int] | None = None
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
@@ -367,11 +391,52 @@ HINTS = {
     "command_too_large": f"the guard cannot read a command of more than {MAX_COMMAND_CHARACTERS:,} characters before its hook "
                          "timeout, and a hook that times out blocks nothing, so it blocks the command; put the content in a "
                          "file with the Write tool and pass the path",
+    "command_too_complex": "the guard cannot read this command within its work budget before its hook timeout (very long "
+                           "words, many nested substitutions or many launched commands), and a hook that times out blocks "
+                           "nothing, so it blocks the command; split it into smaller commands, or put the content in a file "
+                           "with the Write tool and pass the path",
 }
 
 
+class WorkBudgetExceeded(Exception):
+    """check() spent one of its work budgets (WORK_LIMITS): the command cannot be read inside the hook's timeout. args[0] names the counter.
+    It is raised, not returned as a reason, so that no caller can take a command the guard could not read for one it allowed; main() turns
+    it into `command_too_complex` and exit 2."""
+
+
+def start_work() -> dict[str, int]:
+    """Begin the work budget of one check() call: every counter at zero. Returns the counters (they are what check() has spent)."""
+    global _work
+    _work = dict.fromkeys(WORK_LIMITS, 0)
+    return _work
+
+
+def stop_work() -> None:
+    """End the budget: outside a check() call nothing is counted, so a direct call to lex() or expand() (a test, a tool) has no limit."""
+    global _work
+    _work = None
+
+
+def spend(kind: str, amount: int) -> None:
+    """Charge amount units to the counter `kind` of the current budget and raise WorkBudgetExceeded when it passes its limit."""
+    if _work is not None:
+        used = _work[kind] = _work[kind] + amount
+        if used > WORK_LIMITS[kind]:
+            raise WorkBudgetExceeded(kind)
+
+
+def storage_width(text: str) -> int:
+    """Bytes CPython stores each character of text in: 1 for ASCII and Latin-1, 2 for the rest of the Basic Multilingual Plane, 4 beyond.
+    shlex reads a text one character at a time and costs about 2 microseconds a character at one byte, 4 at two and 8 at four (measured
+    here on 200,000 characters of one quoted word: 0.41, 0.85 and 1.70 s), so the work budget counts each character at its width."""
+    if text.isascii():
+        return 1
+    top = ord(max(text))
+    return 1 if top <= 0xFF else 2 if top <= 0xFFFF else 4
+
+
 def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy: bool = False,
-             protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = (), strict: bool = False) -> list[str]:
+             protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = ()) -> list[str]:
     """The words of a command, punctuation apart. `comments` are the spans scan_shell() found to be comments and are
     removed first, and no `#` starts a comment for shlex: shlex read one anywhere (even in `$#` and `a#b`) and, since the
     lines are joined with `;` below, dropped the whole rest of the command. `protected` are the backquotes it found inside
@@ -379,8 +444,7 @@ def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy:
     backquotes instead of becoming `;` with the others. `ansi_c` are the `$'...'` strings it found: shlex knows no ANSI-C
     quoting (it reads `$'it\\'s #\\nprintenv'` as a word, a quote that opens and a comment), so each becomes one single-quoted
     word of the same text, its `\\'` written as a quote shlex reads. `legacy` is the reading without comments, protected
-    backquotes and ANSI-C words, kept because command_segments() reads both: whatever the guard read before it still reads. `strict`
-    raises the ValueError of a text shlex cannot read (an unbalanced quote) instead of splitting it by a regular expression."""
+    backquotes and ANSI-C words, kept because command_segments() reads both: whatever the guard read before it still reads."""
     if protected:
         marked = list(command)
         for at in protected:
@@ -397,15 +461,17 @@ def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy:
                 cursor = last
         pieces.append(command[cursor:])
         command = "".join(pieces)
-    tokens = lex(command, legacy, strict)
+    tokens = lex(command, legacy)
     return [token.replace(PROTECTED_BACKQUOTE, "`") for token in tokens] if protected else tokens
 
 
-def lex(text: str, legacy: bool = False, strict: bool = False) -> list[str]:
+def lex(text: str, legacy: bool = False) -> list[str]:
     """The words of text, punctuation apart, once tokenize() has cut its spans out: a backquote and a newline are `;` (the lines of a
     command are joined that way), shlex reads the rest, and a text it cannot read (an unbalanced quote) is split by a regular
-    expression that keeps the quotes. Without `legacy`, `#` starts no comment for shlex (scan_shell found the real ones)."""
+    expression that keeps the quotes. Without `legacy`, `#` starts no comment for shlex (scan_shell found the real ones). Every
+    character passed to shlex is charged to the work budget, at its storage width, before shlex reads it."""
     text = text.replace("`", " ; ").replace("\n", " ; ")
+    spend("characters", len(text) * storage_width(text))
     try:
         lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
         lexer.whitespace_split = True
@@ -413,8 +479,6 @@ def lex(text: str, legacy: bool = False, strict: bool = False) -> list[str]:
             lexer.commenters = ""
         return list(lexer)
     except ValueError:
-        if strict:
-            raise
         return re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
 
 
@@ -987,7 +1051,9 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
     """Command segments of the command, and of the command substitutions that the shell runs inside its double
     quotes (scan_shell: `echo "$(printenv)"` runs printenv), at any nesting up to MAX_SUBSTITUTION_NESTING and while
     the bodies read stay within SUBSTITUTION_BUDGET_FACTOR times the command's length (plus SUBSTITUTION_BUDGET_FLOOR):
-    every level is read again from the start, so quotes nested n deep would otherwise cost n times the command."""
+    every level is read again from the start, so quotes nested n deep would otherwise cost n times the command. A segment
+    that comes up more than once is returned once (identical segments get identical verdicts, and each copy would be
+    analysed again)."""
     result: list[list[str]] = []
     level = [command]
     budget = SUBSTITUTION_BUDGET_FACTOR * len(command) + SUBSTITUTION_BUDGET_FLOOR
@@ -1002,6 +1068,19 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
         if not following or spent > budget:
             break
         level = following
+    return unique_segments(result)
+
+
+def unique_segments(segments: list[list[str]]) -> list[list[str]]:
+    """The segments in order without a repeat: a segment that comes twice (the words as written and the words after a launcher walk, two
+    readings of one text, a command that stands twice in a script) gets the same verdict twice, so the second copy only adds work."""
+    seen: set[tuple[str, ...]] = set()
+    result = []
+    for words in segments:
+        key = tuple(words)
+        if key not in seen:
+            seen.add(key)
+            result.append(words)
     return result
 
 
@@ -1012,9 +1091,17 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
     `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options). Read twice
     when the command holds a `#` or an ANSI-C string: without its comments and with each `$'...'` one word (tokenize),
     and as shlex read it before, which dropped the rest of the command at the first `#`; the second reading adds only
-    the segments the first lacks. main() refuses a command long enough for two readings to outlast the hook's timeout."""
+    the segments the first lacks. Each text read counts one `texts` and each segment it emits its words plus one `words`
+    of the work budget, so a chain of keyring execs, each emitting the rest of the words again, cannot make the copying
+    quadratic. main() refuses a command long enough for two readings to outlast the hook's timeout."""
+    spend("texts", 1)
     result: list[list[str]] = []
     seen: set[tuple[str, ...]] = set()
+
+    def emit(segment: list[str]) -> None:
+        spend("words", len(segment) + 1)
+        result.append(segment)
+
     readings = [tokenize(command, comments, protected=protected, ansi_c=ansi_c)]
     if "#" in command or protected or comments or ansi_c:
         readings.append(tokenize(command, legacy=True))
@@ -1025,12 +1112,13 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                     continue
             else:
                 seen.add(tuple(raw))
-            result.append(raw)  # as written, before any launcher walk: a redirection is checked wherever the walk would put it
+            emit(raw)  # as written, before any launcher walk: a redirection is checked wherever the walk would put it
             skipped: list[str] = []
             words = raw[prefix_end(raw, 0, skipped):]
             while words:
                 entries, start, moved = launcher_chain(words)
-                result.extend(entries)
+                for entry in entries:
+                    emit(entry)
                 if start:
                     words = words[start:]
                     if words:
@@ -1041,8 +1129,9 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                     skipped = []
                 if not words:
                     break
-                result.append(words)
-                result.extend(input_redirection_segments(words))  # `$(< FILE)` is `$(cat FILE)`; zsh's `< FILE` alone reads it too
+                emit(words)
+                for redirected in input_redirection_segments(words):  # `$(< FILE)` is `$(cat FILE)`; zsh's `< FILE` alone reads it too
+                    emit(redirected)
                 program = program_of(words)
                 if program == "env":
                     break  # launcher_chain walked every env that starts a command: this one prints its environment
@@ -1281,7 +1370,9 @@ def keyctl_reads_payload(words: list[str]) -> bool:
 def launched_commands(words_list: list[list[str]]) -> list[list[str]]:
     """Commands among the arguments of each segment, read from every word that names a program in
     LAUNCHED_PROGRAMS or an interpreter onward and expanded like a command: how a launcher the guard
-    does not model (`watch -n 5 python3 -c ...`, `flock f sh -c ...`, `find -exec`) would run them."""
+    does not model (`watch -n 5 python3 -c ...`, `flock f sh -c ...`, `find -exec`) would run them. Each such read
+    is one `reads` of the work budget and its characters are counted as any other text's: 1,200 interpreter words in a row
+    are 1,200 suffixes, up to 5.8 million characters through shlex, which is what the budget refuses."""
     found = []
     for words in words_list:
         for position in range(1, len(words)):
@@ -1289,6 +1380,7 @@ def launched_commands(words_list: list[list[str]]) -> list[list[str]]:
                 continue  # a URL argument (`tvly extract https://.../env`) is never a program a launcher runs
             program = program_of(words[position:position + 1])
             if program in LAUNCHED_PROGRAMS or INTERPRETER.fullmatch(program):
+                spend("reads", 1)
                 found.extend(expand(shlex.join(words[position:])))
     return found
 
@@ -1303,22 +1395,32 @@ def unquoted(command: str) -> str:
 def mentions_injected_variable(text: str, variable: str) -> bool:
     """Whether unquoted command text names an injected variable anywhere but in the <ENV_VAR> argument
     of a `kernel_keyring.py exec <name> <ENV_VAR> --` (that argument is never a reference). Matching
-    the argument's own span, not subtracting a count, keeps any other mention, at any depth, visible."""
+    the argument's own span, not subtracting a count, keeps any other mention, at any depth, visible. A mention is that span
+    when it starts where the span does (the span is a mention of the name, and a mention cannot start inside another one:
+    the name is made of identifier characters and a mention has none of them before it), so the spans are kept as a set of
+    starts: testing each mention against every span was quadratic (12 million comparisons for 3,500 keyring execs of one
+    variable, which took 268 s all told). Two scans of text for each variable (about 25 nanoseconds a character each), so
+    1,000 distinct variables in a 42 KB command took 4 s: the work budget counts one unit for every 32 characters read."""
+    spend("characters", len(text) // 32)
     name = rf"(?<![A-Za-z0-9_]){re.escape(variable)}(?![A-Za-z0-9_])"
     # The written text may quote the script path and each argument (`"$SP/kernel_keyring.py" exec n "V" --`).
     q = "[\"']?"
-    arguments = [match.span(1) for match in re.finditer(
+    argument_starts = {match.start(1) for match in re.finditer(
         rf"(?<![^\s/\"']){re.escape(KEYRING_SCRIPT)}{q}\s+exec\s+{q}[^\s;&|()<>\"']+{q}\s+{q}({name}){q}\s+--(?=\s|$)",
-        text)]
-    return any(not any(start <= match.start() < end for start, end in arguments)
-               for match in re.finditer(name, text))
+        text)}
+    return any(match.start() not in argument_starts for match in re.finditer(name, text))
 
 
 def keyring_reason(texts: tuple[str, str], words_list: list[list[str]]) -> str | None:
     """Payload reads in inline code, and what a keyring exec's command does with the key it inherits.
-    `texts` is the command as written and unquoted(); every pattern reads both."""
+    `texts` is the command as written and unquoted(); every pattern reads both, once (the answer is kept: a scan of 200,000
+    characters for each of thousands of started commands was the same scan again)."""
+    answers: dict[re.Pattern[str], bool] = {}
+
     def found(pattern: re.Pattern[str]) -> bool:
-        return any(pattern.search(text) for text in texts)
+        if pattern not in answers:
+            answers[pattern] = any(pattern.search(text) for text in texts)
+        return answers[pattern]
 
     if any(INTERPRETER.fullmatch(program_of(words)) for words in words_list) and found(KEYRING_READ_CODE):
         return "keyring_payload_read"
@@ -1329,11 +1431,12 @@ def keyring_reason(texts: tuple[str, str], words_list: list[list[str]]) -> str |
     if any(mentions_injected_variable(text, variable)
            for text in texts for variable in {name for name, _ in started if name}):
         return "keyring_variable_reference"
-    for _variable, started_command in started:
+    for started_command in unique_segments([command for _variable, command in started]):
+        spend("reads", 1)
         inner = expand(shlex.join(started_command)) if started_command else []
         # The started command, and the commands among its arguments that a launcher the guard does not
         # model would run (launched_commands). The price: a one-word query `env` is blocked too.
-        inner += launched_commands(inner)
+        inner = unique_segments(inner + launched_commands(inner))
         if any(dumps_after_source(words) for words in inner):
             return "environment_dump_in_keyring_exec"
         if any(program_of(words) == "systemctl" and systemctl_reason(words) for words in inner):
@@ -1380,6 +1483,16 @@ def segment_reason(words: list[str]) -> str | None:
 
 
 def check(command: str) -> str | None:
+    """The reason the guard blocks command, or None. It reads a command inside one work budget (WORK_LIMITS) and raises
+    WorkBudgetExceeded, instead of returning a reason, when a command needs more than that to be read: main() refuses it."""
+    start_work()
+    try:
+        return read_command(command)
+    finally:
+        stop_work()
+
+
+def read_command(command: str) -> str | None:
     # The shell removes a backslash-newline before it splits words, so the rules read the joined command.
     # Each text pattern also reads it without quoting: `sh -c 'echo $GH_TO''KEN'` hands the inner shell
     # `echo $GH_TOKEN`. (Where quoting does end a name, as in `"$GH_TO"KEN`, that errs toward blocking.)
@@ -1430,6 +1543,12 @@ def main() -> int:
         return 2
     try:
         reason = check(command)
+    except WorkBudgetExceeded:
+        # The command needs more work than the hook can do inside its timeout, and a hook that times out blocks nothing: refuse it, with one
+        # line that names no command text (as command_too_large's), and the hint to split it or put the content in a file.
+        print(f"secret_path_guard: blocked (command_too_complex). {HINTS['command_too_complex'][0].upper()}"
+              f"{HINTS['command_too_complex'][1:]}.", file=sys.stderr)
+        return 2
     except Exception:  # noqa: BLE001 - RecursionError and MemoryError included
         # Only exit 2 blocks a PreToolUse call: an uncaught exception exits 1 and the command runs. A command the guard cannot read is
         # blocked, with one line that names no command text and no traceback.
