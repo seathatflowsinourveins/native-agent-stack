@@ -3649,7 +3649,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "f6b4442743b0693a60d897f5785da277d632d9117548f3f7bfe07cf45de8c2c7",
+      "sha256": "70a04d49fb5a8f8fe275ad4c3e711206b09948dd5a98b34c8d63f0dfccd29b38",
       "bytes": 22907
     },
     {
@@ -14775,8 +14775,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "d8a89b667b6cd4efa30e8b1953ba1401cd2f6a1cb77a6e758092c6cba5665ec5",
-      "bytes": 31666
+      "sha256": "4b19db70deef78ad11e7222f18d9795bbbed33b60b60a97f9b324ae0210480c5",
+      "bytes": 32060
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -40919,6 +40919,11 @@
       "bytes": 43255
     },
     {
+      "path": "evidence/receipts/gpt-tokenizer-400-qualification-20260929.json",
+      "sha256": "5c1c1e5e98882f76373825f057db81c50f1c7bc2ae0ca0be5f821cd039aa2bbf",
+      "bytes": 21687
+    },
+    {
       "path": "evidence/receipts/headroom-039-qualification-20260925.json",
       "sha256": "3a8e162765fa57f4aa6c06cb30b2a28e7ad7d32aaf0920f46720075e234b061d",
       "bytes": 9318
@@ -41665,8 +41670,8 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "cd8e1f6060c3d6cdecb2dbb5773a91ac263bcfa93414359571ace02d892fe0c8",
-      "bytes": 15297
+      "sha256": "c4fd4a7d69704bd51edf9e1eff5e14c96a5eb9938fdd55f18aaa99ec47b30d94",
+      "bytes": 15457
     },
     {
       "path": "observability/backends/README.md",
@@ -42075,7 +42080,7 @@
     },
     {
       "path": "scripts/recount-tokens.cjs",
-      "sha256": "8f5749fb447e508e0a9a6b52ce61fad195a4f9cdcc6407726a677622cb9f5837",
+      "sha256": "5c396fc10aaef5f8663ba78109ef1469f2bcc13d52243b7b6291b95da42dd8fc",
       "bytes": 1634
     },
     {
@@ -43420,8 +43425,8 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "78d24ac4c9ee810ba748e15ff90a65d5d88a70fa19ee356395d4542d60063aa8",
-      "bytes": 18650
+      "sha256": "1942bf501fadc335ea77ca893522da6c21957a3b063b09d711b44e1e0f2b42ef",
+      "bytes": 18688
     },
     {
       "path": "tools/token-report/config.example.json",
@@ -43440,12 +43445,12 @@
     },
     {
       "path": "tools/token-report/test_token_manifest.py",
-      "sha256": "cded5ff99724a76c1776aa380b88a2efc4c5ae9284007975718f9557d101e714",
-      "bytes": 51678
+      "sha256": "fb5a6e3c3ae3ba8841b62e4d656b741b3e78e454baea565d88bbfe8da54f6ff4",
+      "bytes": 56906
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",
-      "sha256": "c64f360872e47adec78be657f189711274bf0c6d4b6e3f675c1261fea70db71e",
+      "sha256": "36e21060fb0017037af7326fccc1522989e674579bff799772aff421d9575072",
       "bytes": 40062
     },
     {
@@ -43455,7 +43460,7 @@
     },
     {
       "path": "tools/token-report/token_manifest.py",
-      "sha256": "1363de9d62fe7286154a3705d1f9fb09232656223e3a6fb074c4589a48f1efb8",
+      "sha256": "b8751978434b515a61b2ec16746dfaff2d090968aa6a4179b9a614afe4cdcd6c",
       "bytes": 56978
     }
   ],
