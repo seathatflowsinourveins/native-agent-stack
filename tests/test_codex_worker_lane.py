@@ -1342,6 +1342,22 @@ class RoleStepTests(unittest.TestCase):
         for name in ROLE_NAMES:
             self.assertEqual(self.installed(name), self.sources[name])
 
+    def test_rollback_keeps_an_agents_directory_that_existed_before_the_run(self):
+        # The folder is the run's to remove only when the run made it: here it was there, empty, and the run only
+        # filled it, so after the rollback it is empty again and still there.
+        self.agents.mkdir(mode=0o750)
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        for name in ROLE_NAMES:
+            self.assertEqual(self.installed(name), self.sources[name])
+        code, out = self.host.run("--rollback", str(self.host.latest_run()))
+        self.assertEqual(code, 0, out)
+        for name in ROLE_NAMES:
+            self.assertFalse((self.agents / name).exists())
+        self.assertTrue(self.agents.is_dir(), "a folder this run did not make was removed")
+        self.assertEqual(self.agents.stat().st_mode & 0o777, 0o750)
+        self.assertIn("agents directory: not created by this run", out.splitlines())
+
     def test_rollback_leaves_an_agents_directory_that_gained_other_files(self):
         code, out = self.host.apply()
         self.assertEqual(code, 0, out)
