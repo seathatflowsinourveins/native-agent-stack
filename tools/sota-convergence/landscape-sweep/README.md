@@ -447,8 +447,19 @@ new run from the latest retained record, and say so when no record exists yet.
   slots.
 - **Usage limit.** A real Codex usage-limit error writes `<W>/LIMIT`. After that no job starts, and jobs still
   waiting for a slot end with exit 3. Stop the Workflow and tell the user the reset time, which the job's
-  `stderr.txt` or its `error` event gives. Do not sign in again (provider state is shared). Record the stopped run
-  as the recipe says. Remove `LIMIT` only after the reset. A failed job runs again at its next `start`; its failed
+  `stderr.txt` or its `error` event gives. An HTTP 429 with no usage-limit body counts as a limit too. Codex retries
+  no 429 (`retry_429` is false for every provider, `codex-rs/model-provider-info/src/lib.rs` at rust-v0.157.1), so it
+  prints `exceeded retry limit, last status: 429 Too Many Requests` for the first one, as an `error` or `turn.failed`
+  event (`RetryLimitReachedError`, built in `codex-rs/codex-api/src/api_bridge.rs`). A pooled gateway answers so when
+  its accounts are exhausted, and the report cannot tell that from a brief rate limit, so the first such job stops the
+  sweep: `LIMIT` then holds a reason and no reset time. Read the account pool (`scripts/codex_quota.py` for a native
+  login, the gateway for a pooled route) and remove `LIMIT` when it has capacity; after a usage limit, remove it only
+  after the reset. The 2026-09-29 run had no such stop: nine of its twelve follow-up GPT-6 jobs ended in 429 after one
+  or two seconds each, the Workflow finished its Claude follow-up stages (the round cost $88 at Claude list price, see
+  the recipe's cost class) and six layers stayed reopened
+  (`evidence/artifacts/landscape-sweep-20260929-attempts/gpt6-job-outcomes.json`). Watch for `LIMIT` while the
+  Workflow runs, and stop it when it appears. Do not sign in again (provider state is shared).
+  Record the stopped run as the recipe says. A failed job runs again at its next `start`; its failed
   attempt moves unchanged to `gpt6/<job>/attempts/<n>/` and stays in `result` and `gpt6_usage`. A finished job
   returns "already done" only for the same inputs (prompt and schema sha256, model, effort), so a resumed Workflow
   whose regenerated prompt differs gets a fresh GPT-6 vote, never a cached one for another claim.
