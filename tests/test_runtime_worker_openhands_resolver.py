@@ -2994,5 +2994,126 @@ class ResolverHostTests(unittest.TestCase):
         self.assertEqual(json.loads((result / "resolver-identity.json").read_text()), attempt.identity())
 
 
+class RecordingDriver:
+    """Stands in for resolver.ResolverAttempt.finish: records its inputs, returns an outcome."""
+
+    def __init__(self, outcome):
+        self.outcome, self.calls = outcome, []
+
+    def finish(self, result, *, patch_text, final_message):
+        self.calls.append({"result": result, "patch_text": patch_text, "final_message": final_message})
+        return dict(self.outcome)
+
+
+PR_OPENED = {"status": "pr_opened", "failure_stage": None, "reasons": [], "paths_changed": 2, "patch_sha256": "f" * 64,
+             "branch": "openhands/issue-12", "pr": 34, "head": "c" * 40, "sota_sources": {"kept": 1, "dropped": 0},
+             "writes": [{"op": "push", "exit_code": 0}, {"op": "pr_create", "exit_code": 0}]}
+FINAL_MESSAGE = "Changed docs/a.md as asked.\n\n## SOTA sources\n- docs/guide.md\n"
+
+
+class ResolverResultTests(unittest.TestCase):
+    """dispatch.finish_result in resolver mode, and the receipt's resolver section."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-result-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.dispatch = load_recipe("dispatch.py")
+        self.receipts = load_recipe("receipt.py")
+        self.result = self.tmp / "state/runs" / RUN_ID / "control"
+        workspace = self.result / "workspace"
+        workspace.mkdir(parents=True)
+        run_git(workspace, "init", "-q", "-b", "main")
+        for relative, data in {"AGENTS.md": "# Rules\n", "docs/a.md": "a\n", "docs/guide.md": "guide\n"}.items():
+            write_file(workspace, relative, data)
+        self.base = commit_all(workspace, "base")
+        (workspace / ".git/info").mkdir(exist_ok=True)
+        with (workspace / ".git/info/exclude").open("a") as stream:
+            stream.write("\n/.agents/\n/skills-lock.json\n")
+        # The model's edits, and the installer's files that the export must leave out.
+        write_file(workspace, "docs/a.md", "a\nnew line\n")
+        write_file(workspace, "docs/new.md", "new\n")
+        write_file(workspace, ".agents/skills/tdd/SKILL.md", "installed\n")
+        write_file(workspace, "skills-lock.json", "{}\n")
+        (self.result / "git-home").mkdir(mode=0o700)
+        (self.result / "resolver-identity.json").write_text(json.dumps(FakeAttempt(self.base).identity()))
+        (self.result / "final-response.json").write_text(json.dumps({"response": FINAL_MESSAGE}))
+        self.window = {"arm": "control", "run_id": RUN_ID, "mode": "resolver", "started_at": "2026-09-28T18:00:00Z",
+                       "finished_at": "2026-09-28T18:10:00Z", "stage_gates_sha256": "9" * 64}
+
+    def finish(self, execution, driver, *, removed=True):
+        with mock.patch.object(self.dispatch, "stop_server", return_value=removed), \
+                mock.patch.object(self.dispatch, "grade") as grade, \
+                mock.patch.object(self.dispatch, "create_receipt", side_effect=lambda result: self.receipts.create_receipt(
+                    result, database=result / "absent.sqlite")):
+            receipt = self.dispatch.finish_result(self.result, {"execution_status": execution}, dict(self.window),
+                                                  resolver=driver)
+        grade.assert_not_called()
+        return receipt
+
+    def test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver(self):
+        probe = {"passed": True, "mechanism": "internal-isolated+nginx-v1-allowlist"}
+        (self.result / "isolation-probe.json").write_text(json.dumps(probe))
+        driver = RecordingDriver(PR_OPENED)
+        receipt = self.finish("finished", driver)
+        self.assertEqual(len(driver.calls), 1)
+        patch = driver.calls[0]["patch_text"]
+        self.assertEqual(driver.calls[0]["final_message"], FINAL_MESSAGE)
+        self.assertEqual(driver.calls[0]["result"], self.result)
+        self.assertEqual(sorted(re.findall(r"^diff --git a/(\S+) ", patch, re.M)), ["docs/a.md", "docs/new.md"])
+        self.assertTrue(re.search(r"^index [0-9a-f]{40}\.\.[0-9a-f]{40} 100644$", patch, re.M))
+        self.assertNotIn(".agents", patch)
+        self.assertNotIn("skills-lock.json", patch)
+        self.assertEqual((self.result / "resolver-patch.diff").read_bytes(), patch.encode("utf-8"))
+        self.assertNotIn("upstream_grader", receipt)
+        self.assertIn("resolver attempt", receipt["evidence_class"])
+        self.assertEqual((receipt["failure_stage"], receipt["task_passed"], receipt["evidence_complete"]),
+                         (None, False, False))
+        section = receipt["resolver"]
+        self.assertEqual({key: section[key] for key in ("issue", "base_sha", "lane", "status", "branch", "pr", "head",
+                                                         "paths_changed", "patch_sha256", "writes", "sota_sources")},
+                         {"issue": 12, "base_sha": self.base, "lane": "lane:foundation", "status": "pr_opened",
+                          "branch": "openhands/issue-12", "pr": 34, "head": "c" * 40, "paths_changed": 2,
+                          "patch_sha256": "f" * 64, "writes": PR_OPENED["writes"],
+                          "sota_sources": {"kept": 1, "dropped": 0}})
+        self.assertEqual(section["gates"], {
+            "stage_gates_sha256": "9" * 64,
+            "isolation_probe_sha256": hashlib.sha256((self.result / "isolation-probe.json").read_bytes()).hexdigest()})
+        self.assertIsNone(section["review"])
+
+    def test_the_cli_result_without_the_driver_refuses_before_any_github_step(self):
+        receipt = self.finish("finished", None)
+        self.assertEqual(receipt["failure_stage"], "export")
+        self.assertIsNone(receipt["resolver"]["status"])
+        self.assertEqual(receipt["resolver"]["writes"], [])
+        self.assertFalse((self.result / "resolver-patch.diff").exists())
+
+    def test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver(self):
+        for execution, stage in (("stuck", None), ("error", "agent")):
+            with self.subTest(execution=execution):
+                driver = RecordingDriver(PR_OPENED)
+                receipt = self.finish(execution, driver)
+                self.assertEqual(driver.calls, [])
+                self.assertEqual(receipt["resolver"]["status"], "agent_not_finished")
+                self.assertEqual(receipt["failure_stage"], stage)
+        driver = RecordingDriver(PR_OPENED)
+        receipt = self.finish("finished", driver, removed=False)
+        self.assertEqual((driver.calls, receipt["failure_stage"]), ([], "export"))
+
+    def test_the_drivers_stage_and_codes_reach_the_receipt_as_fixed_fields_only(self):
+        planted = {**PR_OPENED, "status": "pr_opened_by_the_model", "failure_stage": "push",
+                   "reasons": ["push_failed", "Contains Upper", "/abs/path", "a" * 80],
+                   "branch": "main", "pr": "34", "head": "not-a-sha", "patch_sha256": "F" * 64,
+                   "writes": [{"op": "push", "exit_code": 1}, {"op": "merge", "exit_code": 0}, {"op": "pr_create"}],
+                   "sota_sources": {"kept": "1", "dropped": 0}, "extra": "dropped"}
+        receipt = self.finish("finished", RecordingDriver(planted))
+        section = receipt["resolver"]
+        self.assertEqual(receipt["failure_stage"], "push")
+        self.assertEqual((section["status"], section["reasons"], section["branch"], section["pr"], section["head"],
+                          section["patch_sha256"], section["sota_sources"]),
+                         (None, ["push_failed"], None, None, None, None, None))
+        self.assertEqual(section["writes"], [{"op": "push", "exit_code": 1}, {"op": "pr_create", "exit_code": None}])
+        self.assertNotIn("extra", section)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -222,6 +223,75 @@ def isolation_summary(result):
     return summary
 
 
+# Resolver mode (RESOLVER.md "Stage 2"). The outcomes resolver.ResolverAttempt.finish and
+# dispatch.finish_resolver write; the writes resolver/gh_harness.py journals; its branch
+# names (resolver/gh_harness.py BRANCH) and lane labels (docs/lanes.md).
+RESOLVER_OUTCOMES = frozenset({"pr_opened", "patch_empty", "patch_refused", "text_refused", "agent_not_finished"})
+RESOLVER_WRITES = frozenset({"push", "pr_create", "review", "pr_comment"})
+RESOLVER_BRANCH = re.compile(r"openhands/issue-[1-9][0-9]{0,8}(?:-(?:[2-9]|1[01]))?")
+RESOLVER_LANES = frozenset({"lane:foundation", "lane:trading", "lane:shared"})
+REASON_CODE = re.compile(r"[a-z][a-z0-9_]{0,63}")
+HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
+
+
+def _matching(value, pattern):
+    return value if isinstance(value, str) and pattern.fullmatch(value) else None
+
+
+def _count(value):
+    return value if type(value) is int and value >= 0 else None
+
+
+def resolver_summary(result, window):
+    """The resolver attempt's host-written identity and outcome, projected onto fixed fields.
+
+    Both files are written by host code outside every model mount; the projection
+    still keeps only codes, counts, hashes and names of the expected shapes, so no
+    free text (a path, a title, model output) reaches the receipt. `review` stays None
+    until resolver.py adds the review loop's outcome. None outside resolver mode.
+    """
+    try:
+        identity = json.loads(read_bounded(Path(result) / "resolver-identity.json", limit=64 * 1024))
+    except (OSError, ValueError):
+        return None
+    identity = identity if isinstance(identity, dict) else {}
+    try:
+        outcome = json.loads(read_bounded(Path(result) / "resolver-outcome.json", limit=1024 * 1024))
+    except (OSError, ValueError):
+        outcome = {}
+    outcome = outcome if isinstance(outcome, dict) else {}
+    sota = outcome.get("sota_sources")
+    try:
+        probe = hashlib.sha256(Path(result, "isolation-probe.json").read_bytes()).hexdigest()
+    except OSError:
+        probe = None
+    return {
+        "issue": identity.get("issue") if type(identity.get("issue")) is int and identity["issue"] > 0 else None,
+        "base_sha": _matching(identity.get("base_sha"), HEX40),
+        "lane": identity.get("lane") if identity.get("lane") in RESOLVER_LANES else None,
+        "instruction_sha256": _matching(identity.get("instruction_sha256"), HEX64),
+        "status": outcome.get("status") if outcome.get("status") in RESOLVER_OUTCOMES else None,
+        "reasons": sorted({reason for reason in outcome.get("reasons") or []
+                           if _matching(reason, REASON_CODE)}) if isinstance(outcome.get("reasons"), list) else [],
+        "paths_changed": _count(outcome.get("paths_changed")),
+        "patch_sha256": _matching(outcome.get("patch_sha256"), HEX64),
+        "branch": _matching(outcome.get("branch"), RESOLVER_BRANCH),
+        "pr": _count(outcome.get("pr")) or None,
+        "head": _matching(outcome.get("head"), HEX40),
+        "sota_sources": ({"kept": sota["kept"], "dropped": sota["dropped"]}
+                         if isinstance(sota, dict) and _count(sota.get("kept")) is not None
+                         and _count(sota.get("dropped")) is not None else None),
+        "writes": [{"op": write["op"], "exit_code": write.get("exit_code") if type(write.get("exit_code")) is int
+                    else None}
+                   for write in outcome.get("writes") or []
+                   if isinstance(write, dict) and write.get("op") in RESOLVER_WRITES]
+        if isinstance(outcome.get("writes"), list) else [],
+        "gates": {"stage_gates_sha256": _matching(window.get("stage_gates_sha256"), HEX64),
+                  "isolation_probe_sha256": probe},
+        "review": None,
+    }
+
+
 def create_receipt(result, database=None):
     result = Path(result)
     window = read_json(result / "window.json")
@@ -266,7 +336,7 @@ def create_receipt(result, database=None):
             except (OSError, ValueError, AttributeError):
                 found.append(False)
         return {"attempts": len(found), "confirmed_removed": sum(found), "complete": bool(found) and all(found)}
-    return {
+    receipt = {
         "schema_version": 6, "evidence_class": "SDK inference adapter with official SWE-bench grading",
         **{k: selection[k] for k in ("arm", "base_url", "gateway_upstream", "requested_model", "gateway_model",
                                      "gateway_path", "compression_combo")},
@@ -316,3 +386,11 @@ def create_receipt(result, database=None):
         "limits": ["Not unchanged benchmark inference or an upstream SDK test suite",
                    "No matched A/B or token-savings comparison", "No SDK cold-start/crash-resume acceptance"],
     }
+    summary = resolver_summary(result, window)
+    if summary is not None:
+        # No official grader runs in resolver mode; CI and the owner judge the change.
+        receipt.pop("upstream_grader")
+        receipt["evidence_class"] = ("OpenHands resolver attempt: host-validated patch and a draft pull request "
+                                     "through the gh harness; no task verdict")
+        receipt["resolver"] = summary
+    return receipt
