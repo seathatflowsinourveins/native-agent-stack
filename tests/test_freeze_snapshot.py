@@ -2835,7 +2835,8 @@ class CodexRoleHelperTests(unittest.TestCase):
         (root / "agents-other" / "z.toml").write_text("x", encoding="utf-8")
         self.assertEqual(names(folder), (["a.toml", "b.toml", "dangling.toml", "l.toml", "n/c.toml", "n/d/e.toml"], None))
         # Codex follows links (openai/codex rust-v0.157.1 exec-server/src/local_file_system.rs:710-735: read_directory takes a
-        # link's target's type; observed with codex-cli 0.157.1 through `codex doctor --json`), so it enters a linked folder and
+        # link's target's type; checked against codex-cli 0.157.1 by tests/test_codex_worker_lane.py CodexIntegrationTests.
+        # test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it), so it enters a linked folder and
         # loads a role from it. Not entering it would undercount, so a folder link at any depth is an error, whatever its name.
         for where in (folder, folder / "n", folder / "n" / "d"):
             for link_name in ("linked", "linked.toml"):

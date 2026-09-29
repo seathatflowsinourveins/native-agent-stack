@@ -15,6 +15,7 @@ Evidence classes (docs/acceptance-evidence-policy.md):
 
 from __future__ import annotations
 
+import concurrent.futures
 import contextlib
 import hashlib
 import importlib.util
@@ -1335,9 +1336,9 @@ class RoleStepTests(unittest.TestCase):
     def test_agents_toml_count_counts_recursively_and_is_unknown_behind_a_folder_link(self):
         # Codex follows links below agents/: LocalFileSystem::read_directory takes a link's target's type
         # (openai/codex rust-v0.157.1 codex-rs/exec-server/src/local_file_system.rs:710-735), so discovery.rs enters a linked
-        # folder, collects a link to a regular file by the link's own name and skips a dangling link. Observed with codex-cli
-        # 0.157.1 through `codex doctor --json`: a malformed role behind a linked folder is one role warning. A count that
-        # skipped the linked folder would report fewer role files than Codex loads, so it is unknown (None) there.
+        # folder, collects a link to a regular file by the link's own name and skips a dangling link. Checked against codex-cli
+        # 0.157.1 by CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it. A
+        # count that skipped the linked folder would report fewer role files than Codex loads, so it is unknown (None) there.
         count = need(self, lane, "agents_toml_count")
         root = self.host.tmp / "counted"
         self.assertEqual(count(root), 0)  # absent
@@ -2009,7 +2010,8 @@ class RolesRowTests(unittest.TestCase):
 
     def test_a_folder_link_below_agents_is_unknown_and_never_a_pass(self):
         # Codex enters a linked folder and loads what it finds there as roles (openai/codex rust-v0.157.1
-        # exec-server/src/local_file_system.rs:710-735; observed with codex-cli 0.157.1), so an extra role behind one must
+        # exec-server/src/local_file_system.rs:710-735; checked against codex-cli 0.157.1 by the integration test
+        # test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it), so an extra role behind one must
         # not leave the row green: the count is unknown, and unknown is not a pass.
         need(self, prove, "roles_row")
         self.install_roles()
@@ -2349,6 +2351,84 @@ class CodexIntegrationTests(unittest.TestCase):
         malformed = lane.doctor_role_state(reports["none"], reports["malformed"])
         self.assertEqual(malformed, {"state": "problem", "startup_warnings_before": 0, "startup_warnings_after": 1,
                                      "role_warnings": 1, "redacted": 0, "load_failed": False})
+
+    def test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it(self):
+        # Upstream behaviour, checked with the real binary and not assumed: LocalFileSystem::read_directory takes a link's
+        # target's type (openai/codex rust-v0.157.1 codex-rs/exec-server/src/local_file_system.rs:710-735), so
+        # agent-roles/src/discovery.rs enters a linked folder, collects a link to a regular file by the link's own name and
+        # skips a dangling one. `codex doctor --json` in a scratch home with the network off records one startup warning per
+        # malformed role file Codex collects, so the number of role warnings is how many files it loaded. Controls: the
+        # empty folder and a valid role give none, and a real subfolder gives one (a folder is entered). The invariant the
+        # tools rest on: agents_toml_count is None or at least what Codex collected, never less. This is a check of what
+        # Codex does, not a failing-first test of the tools: if a later pin stops following links, this is the test that says
+        # so and the rule can be revisited (docs/decisions/2026-09-26-codex-worker-lane.md, 2026-09-29 addendum).
+        good = 'name = "probe"\ndescription = "d"\ndeveloper_instructions = "x"\n'
+        bad = 'name = "bad"\ndescription = "d"\n'  # no developer_instructions: one role warning when Codex collects it
+
+        def elsewhere(root):
+            folder = root / "elsewhere"
+            folder.mkdir()
+            (folder / "bad.toml").write_text(bad)
+            (folder / "bad.txt").write_text(bad)
+            return folder
+
+        def empty_folder(agents, root):
+            pass
+
+        def valid_role(agents, root):
+            (agents / "ok.toml").write_text(good)
+
+        def real_subfolder(agents, root):
+            (agents / "sub").mkdir()
+            (agents / "sub" / "bad.toml").write_text(bad)
+
+        def link_to_folder(agents, root):
+            (agents / "linked").symlink_to(elsewhere(root))
+
+        def link_named_toml_to_folder(agents, root):
+            (agents / "dir.toml").symlink_to(elsewhere(root))
+
+        def link_named_toml_to_file(agents, root):
+            (agents / "file.toml").symlink_to(elsewhere(root) / "bad.txt")
+
+        def dangling_link_named_toml(agents, root):
+            (agents / "dangling.toml").symlink_to(root / "nowhere")
+
+        def toml_behind_a_txt_link(agents, root):
+            (agents / "renamed.txt").symlink_to(elsewhere(root) / "bad.toml")
+
+        scenarios = (  # label, setup, the role warnings Codex records, the *.toml files it collects
+            ("an empty folder (control)", empty_folder, 0, 0),
+            ("a valid role (control)", valid_role, 0, 1),
+            ("a malformed role in a real subfolder (control)", real_subfolder, 1, 1),
+            ("a link to a folder", link_to_folder, 1, 1),
+            ("a link named x.toml to a folder", link_named_toml_to_folder, 1, 1),
+            ("a link named x.toml to a file", link_named_toml_to_file, 1, 1),
+            ("a dangling link named x.toml", dangling_link_named_toml, 0, 0),
+            ("a malformed role behind a link named x.txt", toml_behind_a_txt_link, 0, 0),
+        )
+        codex = shutil.which("codex")
+
+        def observe(scenario):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                env = self.gateway_home(root, "")
+                agents = Path(env["CODEX_HOME"]) / "agents"
+                agents.mkdir(mode=0o700)
+                scenario[1](agents, root)
+                stdout = lane.run_doctor(codex, env, lane.bwrap_wrapper(root), root / "cwd")
+                return lane.doctor_config_load(stdout), lane.agents_toml_count(agents)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            observed = list(pool.map(observe, scenarios))
+        for (label, _setup, role_warnings, collected), (loaded, count) in zip(scenarios, observed):
+            with self.subTest(scenario=label):
+                self.assertIsNotNone(loaded, "no config.load in the report")
+                warnings = lane.codex_roles.startup_warnings(loaded[1])
+                self.assertEqual(sum(text.startswith(lane.codex_roles.ROLE_WARNING_PREFIX) for text in warnings),
+                                 role_warnings, "the role files Codex collected")
+                self.assertTrue(count is None or count >= collected,
+                                f"the count says {count}, but Codex collected {collected}: the count undercounts")
 
     def test_a_project_config_outranks_the_profile_but_not_the_pinned_flags(self):
         # The multi_agent_mode sentence tells the efforts apart: ultra delegates proactively, max does not.
