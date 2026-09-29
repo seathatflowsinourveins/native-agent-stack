@@ -2095,6 +2095,47 @@ function hookNameKey(name) {
   const folded = server && server !== '(other)' ? safeKey(event + ':mcp__' + server) : '(other)'
   return folded === '(other)' ? [key, false] : [folded, true]
 }
+// Usage iterations (binding decision B9; U2 correction 1). The beta Messages API reports usage.iterations[] (platform.claude.com/docs/en/api/
+// beta/messages/create, BetaIterationsUsage, fetched 2026-09-29): `message` entries are the executor's sampling iterations, and every top-level
+// counter is their sum; an `advisor_message` entry is an advisor sub-inference with its own model, billed at that model's rates and never in the
+// top-level counters (advisor tool doc, "Usage and billing"); a `compaction` entry is not in the top-level counters either; a `fallback_message`
+// entry ends a turn a fallback model served, whose top-level counters describe only the serving attempt, while a declined hop's `message` entry
+// is billed on conditions the transcript does not carry (refusals-and-fallback doc, "Billing and rate limits"). This reading reads `message` and
+// `advisor_message` entries. A message's usage is unreadable, and usage.complete false, when it carries any other entry, an entry that is not an
+// object or lacks a numeric counter, top-level counters unequal to the sum of its message entries (or fewer advisor entries than an earlier row
+// of the message), a successful advisor result without an advisor_message entry, or an advisor call without a result (the sub-inference may have
+// run); iteration_issues counts each reason. A window that ends between an advisor call and its result shows the earlier window a call without a
+// result: only an actor with a row at or after until can. Observed on this host (count-only scans, evidence/artifacts/pra-u2-differential-
+// 20260929): the top-level counters equal the sum of the message entries on every row with advisor entries (3,303 of 3,303); on a row with
+// several iterations the top-level cache_creation object holds the first iteration's 5m/1h split (3,706 of 3,706), while each entry's split
+// adds up to its own combined counter. A message's split is therefore the sum of its message entries' splits, and the top-level object's only
+// when the row carries no entries. speed, service_tier and inference_geo are the counted row's top-level values (an advisor entry carries none:
+// Priority Tier "applies to each model independently", advisor tool doc); each is null when absent, never 0.
+const ADVISOR_RESULTS = new Set(['advisor_result', 'advisor_redacted_result'])
+const ITERATION_ISSUES = ['inconsistent_messages', 'advisor_results_without_usage', 'advisor_calls_without_result']
+function readIterations(usage) {
+  const list = usage?.iterations
+  if (list === undefined || list === null) return { readable: true, entries: 0, unread: [], message: [], advisor: [] }
+  if (!Array.isArray(list)) return { readable: false, entries: 0, unread: ['(not_a_list)'], message: [], advisor: [] }
+  const out = { readable: true, entries: list.length, unread: [], message: [], advisor: [] }
+  for (const e of list) {
+    if (!e || typeof e !== 'object' || Array.isArray(e)) { out.unread.push('(not_an_object)'); continue }
+    const type = typeof e.type === 'string' && e.type ? e.type : null
+    if ((type === 'message' || type === 'advisor_message') && COUNTERS.every((k) => Number.isFinite(e[k]) && e[k] >= 0)) out[type === 'message' ? 'message' : 'advisor'].push(e)
+    else out.unread.push(type ? safeKey(type) : '(none)')
+  }
+  out.readable = !out.unread.length
+  return out
+}
+const splitOf = (cc) => [cc?.ephemeral_5m_input_tokens, cc?.ephemeral_1h_input_tokens].map((n) => Number.isFinite(n) && n >= 0 ? n : null)
+// [5m, 1h] of a row: its message entries' splits added up when it carries readable entries, its top-level cache_creation object when it carries
+// none, [null, null] when its entries are unreadable.
+function rowSplit(usage, read) {
+  if (!read.readable) return [null, null]
+  if (!read.entries) return splitOf(usage?.cache_creation)
+  return read.message.map((e) => splitOf(e.cache_creation)).reduce((a, b) => a.map((n, j) => n === null || b[j] === null ? null : n + b[j]), [0, 0])
+}
+const tierOf = (v) => typeof v === 'string' && v ? safeKey(v) : null
 // ccusage/ccusage v20.0.24 rust/adapters/claude/src/daily.rs:410-458,505-523;
 // #381 RUNBOOK mandates per-message deduplication. Keep absent counters unknown.
 export function transcriptUsage(transcript, window = null) {
@@ -2107,24 +2148,55 @@ export function transcriptUsage(transcript, window = null) {
     if (window && (at === null || at >= window.until)) continue
     const id = row.message.id || '(missing-' + i + ')'
     if (!row.message.id) unidentified++
-    const prev = messages.get(id) || { current: null, baseline: null }
+    const prev = messages.get(id) || { current: null, baseline: null, calls: new Set(), results: new Set(), succeeded: new Set() }
     if (!prev.current || total(row.message.usage) >= total(prev.current.message.usage)) prev.current = row
     if (window && at < window.since && (!prev.baseline || total(row.message.usage) >= total(prev.baseline.message.usage))) prev.baseline = row
+    // The advisor tool's blocks of the message, from every row read: a server_tool_use named advisor and its advisor_tool_result (advisor tool
+    // doc, "Result variants" and "Error results"; an error result reports no sub-inference usage).
+    for (const b of Array.isArray(row.message.content) ? row.message.content : []) {
+      if (b?.type === 'server_tool_use' && b.name === 'advisor') prev.calls.add(String(b.id))
+      else if (b?.type === 'advisor_tool_result') {
+        prev.results.add(String(b.tool_use_id))
+        if (ADVISOR_RESULTS.has(b.content?.type)) prev.succeeded.add(String(b.tool_use_id))
+      }
+    }
     messages.set(id, prev)
   }
-  const rows = []
-  for (const { current: row, baseline } of messages.values()) {
+  const rows = [], advisor = [], unread = counter(), issues = Object.fromEntries(ITERATION_ISSUES.map((k) => [k, 0]))
+  for (const m of messages.values()) {
+    const { current: row, baseline } = m
     if (row === baseline) continue
+    const top = row.message.usage, read = readIterations(top), before = baseline ? readIterations(baseline.message.usage) : null
     const usage = Object.fromEntries(COUNTERS.map((k) => {
-      const n = row.message.usage?.[k], before = baseline ? baseline.message.usage?.[k] : 0
-      return [k, Number.isFinite(n) && Number.isFinite(before) && n >= before ? n - before : null]
+      const n = top?.[k], was = baseline ? baseline.message.usage?.[k] : 0
+      return [k, Number.isFinite(n) && Number.isFinite(was) && n >= was ? n - was : null]
     }))
-    rows.push({ ordinal: rows.length + 1, model: safeKey(row.message.model || '(unresolved)'),
-      effort: EFFORTS.includes(row.effort) ? row.effort : null, usage })
+    const split = rowSplit(top, read), wasSplit = baseline ? rowSplit(baseline.message.usage, before) : [0, 0]
+    const [fiveMinutes, oneHour] = split.map((n, j) => n !== null && wasSplit[j] !== null && n >= wasSplit[j] ? n - wasSplit[j] : null)
+    const ordinal = rows.length + 1
+    rows.push({ ordinal, model: safeKey(row.message.model || '(unresolved)'), effort: EFFORTS.includes(row.effort) ? row.effort : null, usage,
+      cache_creation_5m: fiveMinutes, cache_creation_1h: oneHour, speed: tierOf(top?.speed), service_tier: tierOf(top?.service_tier), inference_geo: tierOf(top?.inference_geo) })
+    for (const type of read.unread) bump(unread, type)
+    if (read.readable && ((read.entries && COUNTERS.some((k) => top?.[k] !== read.message.reduce((n, e) => n + e[k], 0)))
+      || (before?.readable && before.advisor.length > read.advisor.length))) issues.inconsistent_messages++
+    issues.advisor_results_without_usage += Math.max(0, m.succeeded.size - read.advisor.length)
+    for (const call of m.calls) if (!m.results.has(call)) issues.advisor_calls_without_result++
+    // An advisor entry counts in the window of the first row that carries it: the counted row's entries beyond those of the baseline row.
+    for (const e of read.readable ? read.advisor.slice(before?.readable ? before.advisor.length : 0) : []) {
+      const [five, hour] = splitOf(e.cache_creation)
+      advisor.push({ message_ordinal: ordinal, model: typeof e.model === 'string' && e.model ? safeKey(e.model) : '(unresolved)',
+        usage: Object.fromEntries(COUNTERS.map((k) => [k, e[k]])), cache_creation_5m: five, cache_creation_1h: hour, speed: null, service_tier: null, inference_geo: null })
+    }
   }
   const totals = Object.fromEntries(COUNTERS.map((k) => [k, rows.length && rows.every((r) => r.usage[k] !== null) ? rows.reduce((n, r) => n + r.usage[k], 0) : null]))
+  const advisorTotals = Object.fromEntries(COUNTERS.map((k) => [k, advisor.reduce((n, a) => n + a.usage[k], 0)]))
+  const resolved = (model) => model !== '(other)' && model !== '(unresolved)'
   return { messages: rows, totals, unidentified_messages: unidentified,
-    complete: rows.length > 0 && !unidentified && Object.values(totals).every((n) => n !== null) && rows.every((r) => r.model !== '(other)' && r.model !== '(unresolved)') }
+    complete: rows.length > 0 && !unidentified && Object.values(totals).every((n) => n !== null) && rows.every((r) => resolved(r.model))
+      && !Object.keys(unread).length && ITERATION_ISSUES.every((k) => !issues[k]) && advisor.every((a) => resolved(a.model)),
+    advisor_iterations: advisor, advisor_totals: advisorTotals,
+    totals_including_advisor: Object.fromEntries(COUNTERS.map((k) => [k, totals[k] === null ? null : totals[k] + advisorTotals[k]])),
+    iteration_issues: { unread_entries: unread, ...issues } }
 }
 export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER } = {}) {
   const calls = new Map(), results = new Map(), rewrites = new Map()
@@ -2337,8 +2409,17 @@ export function aggregateMeasurements(items) {
     calls_without_result: items.reduce((n, m) => n + m.calls_without_result, 0),
     rtk_parts: { ...rtk, status: rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured',
       coverage: share(rtk.observed_covered_parts, rtk.eligible_parts), call_coverage: share(rtk.observed_all_covered_calls, rtk.eligible_calls) },
-    ...(items.every((m) => m.usage) ? { usage: { complete: items.length > 0 && items.every((m) => m.usage.complete),
-      totals: Object.fromEntries(COUNTERS.map((k) => [k, items.length && items.every((m) => m.usage.totals[k] !== null) ? items.reduce((n, m) => n + m.usage.totals[k], 0) : null])) } } : {}) }
+    ...(items.every((m) => m.usage) ? { usage: aggregateUsage(items.map((m) => m.usage)) } : {}) }
+}
+// Usage over actors (a measurement without usage, such as a Codex one whose provider_usage replaces it, leaves the aggregate without usage):
+// a counter is null when any actor's is unknown; advisor_iteration_count counts the actors' advisor_iterations; iteration_issues add up.
+function aggregateUsage(usages) {
+  const sum = (key) => Object.fromEntries(COUNTERS.map((k) => [k, usages.length && usages.every((u) => Number.isFinite(u[key]?.[k])) ? usages.reduce((n, u) => n + u[key][k], 0) : null]))
+  const unread = counter()
+  for (const u of usages) for (const [type, n] of Object.entries(u.iteration_issues?.unread_entries || {})) unread[type] = (unread[type] || 0) + n
+  return { complete: usages.length > 0 && usages.every((u) => u.complete), totals: sum('totals'), advisor_totals: sum('advisor_totals'),
+    totals_including_advisor: sum('totals_including_advisor'), advisor_iteration_count: usages.reduce((n, u) => n + (u.advisor_iterations || []).length, 0),
+    iteration_issues: { unread_entries: unread, ...Object.fromEntries(ITERATION_ISSUES.map((k) => [k, usages.reduce((n, u) => n + (u.iteration_issues?.[k] || 0), 0)])) } }
 }
 
 // Private adjudications are bound to exact transcript bytes; only the exception's
