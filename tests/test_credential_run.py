@@ -248,18 +248,45 @@ class InjectionTests(RunnerCase):
 
     def test_strips_other_inventory_names_from_the_child(self):
         value = self.tavily()
+        # The pointer variables of the other entries (paths of their store files, which the documented shell profile sets
+        # for the paper units and the research scripts) are stripped too: `tavily` declares none, and a command run under
+        # it must not load another entry's file through one.
+        pointers = {"PAPER_ENV_FILE": "/nonexistent/p.env", "ENV_FILE": "/nonexistent/e.env",
+                    "PIT_ALPACA_ENV_PATH": "/nonexistent/a.env", "PAPER_ENV_FILE_2": "/nonexistent/p2.env",
+                    "SEC_CONTACT_ENV": "/nonexistent/s.env", "PIT_SEC_ENV_PATH": "/nonexistent/t.env",
+                    "HF_TOKEN_PATH": "/nonexistent/hf"}
         stray = {"TAVILY_API_KEY": fake("tvly-"), "APCA_API_KEY_ID": fake("PK"), "APCA_API_SECRET_KEY": fake(),
                  "GF_SECURITY_ADMIN_PASSWORD": fake(), "GITHUB_TOKEN": fake("ghp_"), "OPENAI_API_KEY": fake("sk-"),
-                 "ALPACA_API_KEY": fake(), "UNRELATED_SETTING": "kept-as-is", "PAPER_ENV_FILE": "/nonexistent/p.env"}
-        self.values += [v for k, v in stray.items() if k not in ("UNRELATED_SETTING", "PAPER_ENV_FILE")]
+                 "ALPACA_API_KEY": fake(), "UNRELATED_SETTING": "kept-as-is", **pointers}
+        self.values += [v for k, v in stray.items() if k != "UNRELATED_SETTING" and k not in pointers]
         result = self.run_tool("tavily", *py(REPORT, json.dumps(sorted(stray))), env=stray)
         self.assertEqual(result.returncode, 0, result.stderr)
         seen = json.loads(result.stdout)
         self.assertEqual(seen.pop("TAVILY_API_KEY"), sha(value))  # the file's value, never the caller's
         self.assertEqual(seen.pop("UNRELATED_SETTING"), sha("kept-as-is"))
-        self.assertEqual(seen.pop("PAPER_ENV_FILE"), sha("/nonexistent/p.env"))  # a pointer is a path, not a value
-        self.assertEqual(seen, dict.fromkeys(seen))  # every other inventory and must_not_be_set name is gone
+        self.assertEqual(seen, dict.fromkeys(seen))  # every other inventory, pointer and must_not_be_set name is gone
+        self.assertTrue(set(pointers) <= set(seen))
         self.assert_never_echoed(result.stdout, result.stderr)
+
+    def test_only_the_selected_entrys_own_pointer_variables_stay_in_the_child(self):
+        # Inventory-driven: for every injectable id, with every pointer variable of the inventory set in the caller's
+        # environment, the command keeps exactly the pointers that entry declares (its own store file's path) and loses
+        # every other entry's.
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text(encoding="utf-8"))
+        everything = sorted({name for entry in inventory["entries"] for name in entry["pointer_variables"]})
+        caller = {name: f"/nonexistent/{name.lower()}" for name in everything}
+        injectable = [entry for entry in inventory["entries"] if run_mod.injectable(entry)]
+        self.assertGreaterEqual(len(everything), 7)
+        self.assertEqual({entry["id"] for entry in injectable}, INJECTABLE_IDS)
+        for entry in injectable:
+            with self.subTest(id=entry["id"]):
+                declared = entry["variables"] + entry["optional_variables"]
+                self.plant(entry["id"], "".join(f"export {name}={fake('v-')}\n" for name in declared))
+                result = self.run_tool(entry["id"], *py(REPORT, json.dumps(everything)), env=caller)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                expected = {name: sha(caller[name]) if name in entry["pointer_variables"] else None
+                            for name in everything}
+                self.assertEqual(json.loads(result.stdout), expected)
 
     def test_only_narrows_to_declared_names(self):
         key, _secret = self.alpaca()
@@ -446,6 +473,33 @@ class RefusalTests(RunnerCase):
         self.assertFalse(marker.exists(), "a refused run started its command")
         self.values.append(tail)
         self.assert_never_echoed(*outputs)
+
+    def test_a_planted_entry_declaring_a_reserved_name_is_refused(self):
+        # LD_*, DYLD_* and PYTHON* are read by the dynamic loader and the interpreter at start-up (and echoed on error,
+        # scripts/kernel_keyring.py): a stored value under one would run code in the command. The schema accepts such a
+        # name, so a planted inventory entry that declares one is refused by the runner, before it reads any store.
+        def planted(**changes) -> dict:
+            return {"id": "planted", "status": "required", "loaders": [], "store": {"kind": "private_env_file"},
+                    "variables": ["PLANTED_KEY"], "optional_variables": [], "public_variables": [], **changes}
+
+        def run_planted(entry: dict) -> tuple:
+            out, err = io.StringIO(), io.StringIO()
+            with mock.patch.object(run_mod, "load_inventory", return_value={"entries": [entry]}), \
+                    mock.patch.object(run_mod, "read_store", side_effect=AssertionError("the store was read")), \
+                    contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                code = run_mod.main(["planted", "--", "true"])
+            return code, out.getvalue(), err.getvalue()
+
+        for name in ("LD_PRELOAD", "LD_LIBRARY_PATH", "DYLD_INSERT_LIBRARIES", "PYTHONPATH", "PYTHONSTARTUP", "PYTHON_X"):
+            for where in ("variables", "optional_variables"):
+                with self.subTest(name=name, where=where):
+                    code, out, err = run_planted(planted(**{where: [name]}))
+                    self.assertEqual((code, out), (1, ""))
+                    self.assertIn(f"credential_run: planted: refused: reserved_variable: {name}", err)
+        # Only those prefixes: a name that merely starts alike is not reserved, and check_injectable lets it through.
+        for name in ("LDAP_BIND_KEY", "LDX_KEY", "DYLDX_KEY", "PYTHA_KEY", "MY_PYTHON_KEY"):
+            with self.subTest(name=name):
+                run_mod.check_injectable(planted(variables=[name]))
 
     def test_short_values_are_refused(self):
         # Buildkite's LengthMin: a masked value under 6 bytes would mask ordinary output, so it is refused.
@@ -1175,6 +1229,45 @@ class ConsumerTests(RunnerCase):
         self.addCleanup(lambda: (runner.kill(), runner.wait(timeout=30)))
         self.assertIn(b"blocking True", self.read_until(open(master, "rb", buffering=0, closefd=False), b"True", seconds=20))
         self.assertEqual(runner.wait(timeout=20), 0)
+
+    def test_a_socket_shared_by_stdin_stdout_and_stderr_is_left_blocking_for_the_command(self):
+        # One socketpair end is fds 0, 1 and 2 of the runner: the sinks share the command's stdin description, so the
+        # runner must not flip it non-blocking (the command's reads would fail with EAGAIN). The terminal test above
+        # cannot fail on this, because a terminal is never flipped; a socket is, unless the sink is compared with stdin
+        # (Sink's stdin_identity, wired in relay). The command looks after its output has passed through the relay.
+        self.tavily()
+        mine, theirs = socket.socketpair()
+        self.addCleanup(mine.close)
+        self.addCleanup(theirs.close)
+        runner = subprocess.Popen(
+            self.command("tavily", *py("import os, time\nprint('ready', flush=True)\ntime.sleep(0.5)\n"
+                                       "print('blocking', os.get_blocking(0), flush=True)\n")),
+            stdin=theirs, stdout=theirs, stderr=theirs, env=self.tool_environment())
+        self.addCleanup(lambda: (runner.kill(), runner.wait(timeout=30)))
+        mine.settimeout(20)
+        seen = b""
+        while b"blocking True\n" not in seen and b"blocking False\n" not in seen:
+            chunk = mine.recv(4096)
+            if not chunk:
+                break
+            seen += chunk
+        self.assertIn(b"blocking True\n", seen)
+        self.assertEqual(runner.wait(timeout=20), 0)
+        self.assertTrue(os.get_blocking(theirs.fileno()))  # and left as it was found
+
+    def test_a_signal_the_command_handles_does_not_start_the_no_wait_rule_of_a_shutdown(self):
+        # SIGUSR1 is forwarded, but only the shutdown signals stop the runner waiting for a slow consumer (what it has
+        # queued is dropped after them). A command that handles SIGUSR1 and goes on writing is still delivered every byte.
+        self.tavily()
+        size = 700_000
+        runner = self.start_tool("tavily", *py(
+            "import signal, sys, time\nsignal.signal(signal.SIGUSR1, lambda *_: None)\nprint('ready', flush=True)\n"
+            f"signal.pause()\ntime.sleep(0.5)\nsys.stdout.write('q' * {size})\n"))
+        ready = self.read_until(runner.stdout, b"ready\n")
+        runner.send_signal(signal.SIGUSR1)
+        time.sleep(1.5)  # the command writes and nobody reads: the pipes and the queue fill, and the command waits
+        rest, _ = runner.communicate(timeout=60)
+        self.assertEqual((runner.returncode, ready + rest), (0, b"ready\n" + b"q" * size))
 
     def test_a_consumer_that_closes_its_end_ends_the_command(self):
         self.tavily()

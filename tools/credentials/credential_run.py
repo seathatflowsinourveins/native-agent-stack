@@ -6,8 +6,9 @@
     python3 tools/credentials/credential_run.py --help
 
 The entry's 0600 file in the per-host store is read by inventory id (adoption/credential-inventory.json). The
-command gets the caller's environment minus every inventory variable and must_not_be_set name, plus only this
-entry's declared variables (narrowed by --only). No value goes into argv, a temporary file, a socket or a shell.
+command gets the caller's environment minus every inventory variable, must_not_be_set name and pointer variable
+(another entry's store-file path) but this entry's own pointers, plus only this entry's declared variables (narrowed by
+--only). No value goes into argv, a temporary file, a socket or a shell.
 The command's stdout and stderr are relayed through pipes with each injected value, raw or in a common encoding,
 replaced by [REDACTED:<NAME>]; names the entry lists in public_variables (a base URL) are injected unmasked.
 `--check` starts nothing and prints the names it would inject and the file state (ok, missing or unsafe). There is
@@ -297,11 +298,17 @@ def require(entry: dict, values: dict) -> None:
             raise Refused(f"value_too_short_to_mask: {name}", "unsafe")
 
 
-def child_environment(inventory: dict, injected: dict, env) -> dict:
-    """The caller's environment minus every inventory variable and must_not_be_set name, plus injected."""
+def child_environment(inventory: dict, entry: dict, injected: dict, env) -> dict:
+    """The caller's environment minus every inventory variable, must_not_be_set name and pointer variable, plus injected.
+
+    A pointer variable holds the path of an entry's store file (PAPER_ENV_FILE, SEC_CONTACT_ENV, ...), which a command
+    could load. Only the selected entry's own pointers stay, as the paper units' `--env-file` pointer does."""
     removed = set(inventory["must_not_be_set"])
-    for entry in inventory["entries"]:
-        removed.update(entry["variables"], entry["optional_variables"])
+    pointers = set()
+    for other in inventory["entries"]:
+        removed.update(other["variables"], other["optional_variables"])
+        pointers.update(other["pointer_variables"])
+    removed |= pointers - set(entry["pointer_variables"])
     child = {name: value for name, value in env.items() if name not in removed}
     child.update(injected)
     return child
@@ -946,7 +953,7 @@ def _main(argv: list, shown: list) -> int:
         print(f"{entry_id}: ok; would inject "
               + ", ".join(f"{name} ({'public' if name in public else 'masked'})" for name in names))
         return 0
-    environment = child_environment(inventory, {name: values[name] for name in names}, os.environ)
+    environment = child_environment(inventory, entry, {name: values[name] for name in names}, os.environ)
     return run_command(command, environment, needles_for(values, [n for n in names if n not in public]))
 
 
