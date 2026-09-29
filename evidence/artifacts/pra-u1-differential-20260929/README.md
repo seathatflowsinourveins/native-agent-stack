@@ -451,5 +451,8 @@ On 30,000 real commands read through both kernels the round-2 kernel took 1.03 t
   scanner is quadratic on them and takes minutes. The new reading's time on them is the subject of `test-child-usage.mjs`.
 - The unresolved-program and remote-lane counts have no oracle.
 - Round 2: the cutoff of the real corpus is reconstructed, not recorded (above). The overturn bound comes from the tree's own limits and a text screen, on one host's commands;
-  the margin is 2 commands. The scaling numbers are this host's (best of three, one machine) and vary by run; a continuous-integration runner was not measured, so the suite
-  checks the growth per doubling and an absolute bound of 1.5 s at 64,000 for shapes that take under 0.1 s here.
+  the margin is 2 commands. The scaling numbers are this host's (best of three, one machine) and vary by run. A continuous-integration runner was not measured. The headroom of the
+  absolute bounds of `test-child-usage.mjs` was measured ad hoc (one core shared with busy loops, best of five, not a committed producer): the 150 ms bound on
+  `executedText` of 64,000 unclosed `((` takes 38.5 ms alone, 75 ms at about twice the time and 158 ms at about four times, so it holds up to a slowdown of about 3.9;
+  the 1.5 s bounds on the lane reading (129 ms for the same text alone, 616 ms for a run of `if` at eight times the time) hold to about ten times. The growth per doubling
+  (at most 2.5 times, plus 5 ms) does not depend on the speed of the machine.
