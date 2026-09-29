@@ -219,6 +219,47 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertIn("store_variables_exported_in_environment", exported["warnings"])
         self.assert_no_values(json.dumps(exported_report), cs.render_text(exported_report))
 
+    def test_canary_row_is_test_only_and_informational_when_missing(self):
+        # 2026-09-29 (tools/credentials/canary_e2e.py, D1 PR-5): the canary proof's synthetic key, created and removed for
+        # each consumer of a run, is class test_canary and status test_only. A missing file is informational: no finding,
+        # no warning, result ok and exit 0.
+        row = next(e for e in self.inventory["entries"] if e["id"] == "canary-e2e")
+        self.assertEqual((row["class"], row["status"], row["variables"], row["optional_variables"],
+                          row["pointer_variables"], row["loaders"]),
+                         ("test_canary", "test_only", ["CANARY_E2E_KEY"], [], [], []))
+        self.assertEqual(row["store"], {"kind": "private_env_file",
+                                        "path_template": "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/canary-e2e.env"})
+        self.assertNotIn("public_variables", row)  # no optional variables, so nothing to classify
+        self.assertIn("tools/credentials/canary_e2e.py", row["rotation"])
+        report = self.report()
+        entry = self.entry(report, "canary-e2e")
+        self.assertEqual((entry["state"], entry["findings"], entry["warnings"]), ("missing", [], []))
+        self.assertEqual((report["result"], report["warnings"], report["unsafe_stored"]), ("ok", [], []))
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(result.stdout, r"(?m)^missing +canary-e2e +test_only ")
+        # While a run holds it, the file is an ordinary declared row of the store, checked like any other.
+        path = self.store / "canary-e2e.env"
+        path.write_text(f"export CANARY_E2E_KEY={self.fake_a}\n")
+        path.chmod(0o600)
+        report = self.report()
+        self.assertEqual(self.entry(report, "canary-e2e")["state"], "ok")
+        self.assertEqual(report["coverage"]["undeclared_store_files"], [])
+        path.chmod(0o644)
+        self.assertEqual(self.entry(self.report(), "canary-e2e")["findings"], ["mode_not_0600"])
+        self.assert_no_values(json.dumps(self.report()), cs.render_text(self.report()))
+
+    def test_test_only_status_goes_with_the_test_canary_class(self):
+        # Neither may label another key: a real key marked test_only would read as a disposable canary.
+        for status, klass, valid in (("test_only", "test_canary", True), ("test_only", "provider_api_key", False),
+                                     ("optional", "test_canary", False), ("test-only", "test_canary", False)):
+            with self.subTest(status=status, klass=klass):
+                broken = copy.deepcopy(self.inventory)
+                row = next(e for e in broken["entries"] if e["id"] == "tavily")
+                row["status"], row["class"] = status, klass
+                errors = cs.inventory_errors(broken, ROOT)
+                self.assertEqual(errors == [], valid, errors)
+
     def test_tavily_row_is_a_stored_file_entry(self):
         # 2026-09-29 (docs/decisions/2026-09-29-key-management.md): the key moved from the kernel keyring, which a
         # kernel restart erases, to its own 0600 file in the store. No real row is memory only any more.
