@@ -1100,8 +1100,8 @@ const addExpansion = (w, node) => { w.x = true; w.v += node.text; w.s += PLACEHO
 // Unquoted text (bash(1) QUOTING, EXPANSION): a backslash quotes the next character and a backslash-newline is removed; an unescaped * or ?
 // or a [ that a ] closes is a pathname pattern, and a ~ that starts the word a tilde prefix. A tilde prefix changes only the directory part of
 // a path (`~/.local/bin/qmd`): the value is unknown (g), but the last path segment, which names the program, is not, so the word stays a
-// known word (x false) for program identity, as /usr/local/bin/qmd is; the real corpus of this host holds ~30 lane invocations by such a
-// path in 136,361 distinct commands. `$HOME/...` is an expansion of another kind (D3): unresolved.
+// known word (x false) for program identity, as /usr/local/bin/qmd is (real Bash calls do run a lane by such a path).
+// `$HOME/...` is an expansion of another kind (D3): unresolved.
 function plainText(w, text, first) {
   if (first) { let k = 0; while (k < text.length && (text[k] === ' ' || text[k] === '\t' || text[k] === '\n')) k++; text = text.slice(k) } // the newline the grammar folded in
   if (first && text[0] === '~') w.g = true
@@ -1210,8 +1210,8 @@ function operatorArguments(r) {
 // delimiter (`cat <<EOF -n` is `cat -n <<EOF`). Assignment prefixes and redirections are not words.
 // tree-sitter-bash 0.25.1 sometimes reads what follows a command as more of its arguments: an ERROR node on `;`, `&&` or `|` after an
 // unquoted `==` or `=~` word (`echo ==; qmd get a`), the same inside the destinations of a redirection (`<<'EOF' 2>&1 | tail`), and, with
-// no error at all, a command that ends its line and whose next line then continues it (`head -20` and `echo ...` read as one command; 732
-// such commands, and 163 with an ERROR, among 136,361 real ones). The words of one command never span an unescaped newline (bash(1)
+// no error at all, a command that ends its line and whose next line then continues it (`head -20` and `echo ...` read as one command; real
+// Bash calls hold such shapes with and without an ERROR). The words of one command never span an unescaped newline (bash(1)
 // SHELL GRAMMAR: a newline ends a simple command; a backslash-newline continues it) and never hold a separator, so each is a boundary: the
 // words after it are a command of their own. Returns the commands as [{ pos, words }], the first being the node's own.
 const SEPARATOR_TOKENS = new Set([';', ';;', '&', '&&', '||', '|', '|&'])
@@ -1662,16 +1662,18 @@ function callAnalysis(call) {
 // reconciles attempted, decided, executed, failed and unfinished calls. With no result a persisted native status decides
 // (Codex CommandExecutionStatus, openai/codex rust-v0.157.1 protocol/src/items.rs), else the call is unfinished. is_error
 // true is failed, and not_executed as well when the call never ran. Where the Claude Code client records that (observed on this
-// host's transcripts, 122,648 Bash results; not a documented schema): a row-level toolDenialKind (permission-rule, user-rejected,
-// cancelled, automode-unavailable: every client denial, 798 rows, and no failed command); a result content that opens with
-// <tool_use_error> (a validation or blocked call; code.claude.com hooks, PostToolUseFailure), with "The user doesn't want to proceed"
-// (a rejection: 25 rows, whose toolUseResult reads "User rejected tool use") or with the classifier text "The server-side auto mode
-// classifier gave no verdict" (its own text: a failure of the check, not a judgment about the action, and the action may be tried again);
-// a toolUseResult string that names a PreToolUse hook denial, a permission denial or a user rejection; or an adapter marking it declined.
-// A host hook's own refusal text (209 rows opening "This agent is isolated") carries none of these and stays failed: its meaning is the
-// hook's, not the client's. is_error false is succeeded, unknown when an adapter could not read the outcome (native_state), or
-// interrupted when toolUseResult.interrupted is true (the command started and was cut short; none of 25,506 observed object results);
-// background marks a run that only started (run_in_background, or a toolUseResult backgroundTaskId).
+// host's transcripts; not a documented schema; the count-only recount that repeats it is states-count.mjs in
+// evidence/artifacts/pra-u1-differential-20260929, and the workflows README dates its figures): a row-level toolDenialKind
+// (permission-rule, user-rejected, cancelled, automode-unavailable: every client denial, and no failed command); a result content that
+// opens with <tool_use_error> (a validation or blocked call; code.claude.com hooks, PostToolUseFailure), with "The user doesn't want to
+// proceed" (a rejection, whose toolUseResult reads "User rejected tool use" in most rows) or with the classifier text "The server-side
+// auto mode classifier gave no verdict" (its own text: a failure of the check, not a judgment about the action, and the action may be
+// tried again); a toolUseResult string that names a PreToolUse hook denial, a permission denial or a user rejection; or an adapter
+// marking it declined. A host hook's own refusal text ("This agent is isolated") carries none of these and stays failed: its meaning is
+// the hook's, not the client's. is_error false is succeeded, unknown when an adapter could not read the outcome (native_state), or
+// interrupted when toolUseResult.interrupted is true (the command started and was cut short; the recount found none, so that state is
+// exercised by a synthetic fixture only); background marks a run that only started (run_in_background, or a toolUseResult
+// backgroundTaskId).
 const NOT_EXECUTED_RESULT = ['PreToolUse:', 'Permission for', 'User rejected tool use']
 const NOT_EXECUTED_CONTENT = ['<tool_use_error>', "The user doesn't want to proceed", 'The server-side auto mode classifier gave no verdict']
 function callState(call, result) {
@@ -2388,7 +2390,7 @@ export function findChildTranscripts(roots, unreadable = { count: 0 }, includeMa
 
 const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
 
-const CLI_LANES_LIMITS = 'cli_lanes counts lane executables in command position of the shell text a call runs, read with the pinned tree-sitter-bash install that loadShellParser verified (its versions and wasm sha256 values are in cli_lanes.parser; without it cli_lanes is only { status: parser_unavailable, reason } and measurement.proxy uses the prefix rule, rule prefix_fallback) (Bash commands, shell ctx code, ctx_batch_execute commands and sandbox-nested Codex commands), behind wrappers, package runners and rtk proxy, with rtk proxy calls in ctx code apart from measurement.proxy; it cannot see aliases, shell functions called by name (a function body counts where it is defined), programs a variable names or eval runs, scripts and Makefile or npm targets that call a lane, find -exec, parallel, watch or other unknown wrappers, subprocesses of non-shell code, or how often xargs runs its utility. A call state covers every command of the call (ambiguous marks more than one), and ssh-run lane invocations count only in remote_invocations.'
+const CLI_LANES_LIMITS = 'cli_lanes counts lane executables in command position of the shell text a call runs, read with the pinned tree-sitter-bash install that loadShellParser verified (its versions and wasm sha256 values are in cli_lanes.parser; without it cli_lanes is only { status: parser_unavailable, reason } and measurement.proxy uses the prefix rule, rule prefix_fallback) (Bash commands, shell ctx code, ctx_batch_execute commands and sandbox-nested Codex commands), behind wrappers, package runners and rtk proxy, with rtk proxy calls in ctx code apart from measurement.proxy; it cannot see aliases, shell functions called by name (a function body counts where it is defined), programs a variable names (an eval of literal words is read), scripts and Makefile or npm targets that call a lane, find -exec, parallel, watch or other unknown wrappers, subprocesses of non-shell code, or how often xargs runs its utility; text the grammar reports as an error is skipped and its calls are counted in parse_errors. A call state covers every command of the call (ambiguous marks more than one), and ssh-run lane invocations count only in remote_invocations.'
 
 // Lane use of every child transcript under the roots that has a row inside [since, until).
 export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [] } = {}) {
