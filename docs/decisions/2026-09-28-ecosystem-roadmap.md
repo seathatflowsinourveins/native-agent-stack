@@ -313,3 +313,26 @@ Decision rights stay as recorded:
   - Still the user's: the IBKR Gateway 2FA sign-in; Apple Container consent on the Mac (whose role is under discussion); purchases and off-host key custody; and the Mac account from trial C, which only a Mac session can check.
 - **The trading lane is still unowned.** `native-agent-stack-2d`, `native-agent-stack-d8` and `native-agent-stack-79` each said they hold no trading lane, so P-NOW-1, P-NOW-2 and P-NOW-3 have no owner. With both paper units inactive, #362's merge condition ("no active paper unit") is met. #362 still needs its Claude re-check and five body corrections.
 - **Post-merge corrections** from the skills-trial and integrity owner are in the #469 comment [5880981981](https://github.com/seathatflowsinourveins/native-agent-stack/pull/469#issuecomment-5880981981). They cover the actionlint swap (under F-LT-1), the betterleaks contract, M5b and M5c on Gates A and B, and F-2W-4 owned by the foundation coordinator.
+
+### 2026-09-29, later, main `16f3c7fe`
+
+- **The trading lane is owned again.** `ecosystem-roadmap-2026` holds it from about 00:45Z on the user's instruction. Merged since:
+  - #362 (`d0636239`): execution-order fill replay;
+  - #486 (`0617f516`): #215 part 1, per-symbol recovery exits and a whole-exit budget before submit. #215 part 2 and the trial C run-loop stall stay open;
+  - #480: the data-only overnight BOATS volume watcher;
+  - #463: the mover research record.
+- **Paper series frozen for 2026-09-29.** They run from a read-only clone of `b528bb55`; the offline gate ran 402 tests, all OK. Series:
+  - A: pre-market on account 2, 07:00 ET;
+  - B: regular hours on account 1, 10:00 ET;
+  - C: after-hours on account 2, 16:00 ET;
+  - the incentive monitor on account 2 from 03:55 ET.
+  Caps are 150 requests and 130 submits per minute, and any HTTP 429 stops a series. Receipts follow each series. This updates P-NOW-2, P-NOW-3 and P-WK-1 above. The paper keys are 0600 env files since 2026-09-29, the user's "store with env so no key is loss" (inventory entry via #481).
+- **R-NOW-1 (asof re-collection), #485.** The primary estimand E1 has not run; its three frozen private inputs live on another host. The secondary estimand E2 ran: 594 of 594 events pass on as-of data, and ticker reuse explains none of them. A repair round is paused on Claude capacity.
+- **The foundation half of F-LT-1 is authorized but deferred for capacity; it has not started.** Per `native-agent-stack-76`, the user lifted the landscape-sweep hold for the 20 foundation layers on 2026-09-29. That session stopped its one-layer smoke and holds the heavy stages until the Claude weekly reset (2026-09-30 18:00Z; 74-75% as peer 2d reported). It also holds the GPT-6 lane until a credit or the Codex weekly reset (2026-10-04 00:35Z; 94%). Preparation on `16f3c7fe`, staged and ready:
+  - the ledger check passes;
+  - the freshness manifest checked 483 repositories with 0 errors;
+  - 51 pins lag upstream across 33 components, none individually reviewed. Token-relevant ones are headroom 0.37.0 against v0.39.1 and socraticode 1.15.0 against v1.16.0. codex and dagu are deliberate holds.
+  - F-2W-3 (#471) is on main, so the absence-refuted candidates re-enter.
+  The 12 trading layers stay staged. The trading lane will schedule them after the paper series, depending on Claude weekly capacity.
+- **Durable memory: ai-memory is a candidate only.** The user restated that ai-memory is a candidate while the memory evals run, not an assured winner. That matches the recorded target above (S3 decides; ai-memory is the reference arm).
+- **Capacity.** The shared Claude weekly window read 71% at 05:07Z and about 75% later (resets 2026-09-30 18:00Z). Codex weekly is at 94% (resets 2026-10-04 00:35Z). Non-critical Claude fan-outs are paused across sessions, and GPT-6 reviews run through native Codex.

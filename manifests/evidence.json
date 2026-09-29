@@ -14427,8 +14427,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "595a9dbc924cb6c5747f270c50f2b1de716825e904c2da2933da76f284da7d23",
-      "bytes": 30495
+      "sha256": "9b3115f672526723e242d0d99bdcdd4fc9e536dc2529ecb54dfa64b61365204a",
+      "bytes": 33379
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
