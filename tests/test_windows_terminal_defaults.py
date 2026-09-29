@@ -6,7 +6,9 @@ only for a real needed action and quietly, and a profile that starts a client th
 """
 
 import copy
+import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -26,11 +28,18 @@ BASE_TEMPLATE = ROOT / "adoption/templates/claude.settings.template.json"
 FRAGMENT = ROOT / "examples/claude-native/windows-terminal.fragment.example.json"
 RECIPE = ROOT / "recipes/claude-native-profile.md"
 PLATFORM_PAGE = ROOT / "adoption/platforms/linux-wsl2.md"
-# The Notification types that mean Claude Code needs the person (permission and elicitation dialogs, a teammate or an
-# agent waiting, a quota event); the decision record lists where each comes from.
-NEEDED_TYPES = ("permission_prompt", "elicitation_dialog", "elicitation_url_dialog", "agent_needs_input",
-                "quota_auto_resume_stale", "quota_auto_resume_disabled", "worker_permission_prompt")
-QUIET_TYPES = ("idle_prompt", "auth_success", "elicitation_complete", "elicitation_response")
+# The decision each notification type carries lives in one table, DECISIONS in the scan that reads the installed client
+# (evidence/artifacts/notification-types-20260929/notification_types_scan.py); this test imports it, so the scan and the test cannot disagree.
+# `ring` types mean Claude Code needs the person (permission and elicitation dialogs, a teammate or an agent waiting, a quota event, the
+# model's own push notification); `quiet` ones are documented or undocumented types kept quiet, each with its reason.
+_SCAN_PATH = ROOT / "evidence/artifacts/notification-types-20260929/notification_types_scan.py"
+_spec = importlib.util.spec_from_file_location("notification_types_scan", _SCAN_PATH)
+SCAN = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(SCAN)
+DECISIONS = SCAN.DECISIONS
+NEEDED_TYPES = tuple(kind for kind, (decision, _doc, _why) in DECISIONS.items() if decision == "ring")
+QUIET_TYPES = tuple(kind for kind, (decision, _doc, _why) in DECISIONS.items() if decision == "quiet")
+INSTALLED_CLAUDE = Path.home() / ".local/bin/claude"
 BEL_HOOK = "jq -nc --arg s \"$(printf '\\a')\" '{terminalSequence:$s}'"
 # codex-rs/tui/src/chatwidget/notifications.rs type_name() at rust-v0.157.1; async-question does not exist at
 # rust-v0.155.1, where naming it is inert.
@@ -54,6 +63,29 @@ class OverlayTests(unittest.TestCase):
         self.assertEqual(set(self.overlay), {"$schema", "preferredNotifChannel", "hooks"})
         self.assertEqual(self.overlay["preferredNotifChannel"], "notifications_disabled")
         self.assertEqual(set(self.overlay["hooks"]), {"Notification"})
+
+    def test_every_type_carries_a_decision_with_a_reason_and_the_matcher_rings_for_exactly_the_ring_ones(self):
+        (group,) = self.overlay["hooks"]["Notification"]
+        self.assertEqual(sorted(group["matcher"].split("|")), sorted(NEEDED_TYPES))
+        self.assertEqual(len(DECISIONS), 17, "a notification type added to or removed from the table changes this count on purpose")
+        self.assertEqual(sum(1 for _d, documented, _w in DECISIONS.values() if documented), 12, "the hooks reference documents 12 types")
+        for kind, (decision, documented, reason) in DECISIONS.items():
+            self.assertIn(decision, ("ring", "quiet"), kind)
+            self.assertIsInstance(documented, bool, kind)
+            self.assertGreater(len(reason.strip()), 20, f"{kind} needs its reason")
+            self.assertEqual(re.fullmatch(f"(?:{group['matcher']})", kind) is not None, decision == "ring", kind)
+
+    @unittest.skipUnless(INSTALLED_CLAUDE.exists(), "needs the installed Claude Code binary")
+    def test_the_installed_client_knows_no_notification_type_without_a_decision(self):
+        # The one check that a later client release cannot slip past: it runs the scan's own reader on the installed binary and
+        # fails on a type the table does not carry (skipped where no client is installed, so CI without one does not run it). A reader that finds
+        # nothing must not pass: the base array and the catalog's extra values must both be found (the catalog's spread name is a minified
+        # identifier that can contain `$`, as `P$o` in 2.1.283; a pattern that misses it read 15 of the 17 matcher values without an error).
+        found = SCAN.scan(os.path.realpath(INSTALLED_CLAUDE))
+        self.assertGreaterEqual(found["base_array_size"], 10, "the base array of matcher values was not found")
+        self.assertTrue(found["catalog_found"], "the Notification matcher catalog was not found")
+        self.assertGreaterEqual(len(found["catalog_extra_values"]), 1, "the catalog's extra values were not read")
+        self.assertEqual(sorted(kind for kind in found["types"] if kind not in DECISIONS), [], "a type this client knows has no decision in DECISIONS")
 
     def test_one_hook_rings_the_bell_for_a_needed_action_only(self):
         (group,) = self.overlay["hooks"]["Notification"]
@@ -253,7 +285,48 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
                 self.check_ai({**copy.deepcopy(good), **change}, "claude")
 
 
+class ScanReaderTests(unittest.TestCase):
+    """The scan's reader on a synthetic binary: no installed client is needed, so these run wherever the tests run."""
+
+    BASE = ",".join(f'"{name}"' for name in ("permission_prompt", "idle_prompt", "auth_success", "elicitation_dialog"))
+
+    def blob(self, spread="Ojo", catalog=True):
+        text = f'a=[{self.BASE}];b={{notificationType:"push_notification"}};'
+        if catalog:
+            text += f'c={{fieldToMatch:"notification_type",values:[...{spread},"elicitation_complete","elicitation_response"]}};'
+        return text.encode()
+
+    def scan_of(self, blob):
+        with tempfile.TemporaryDirectory() as raw:
+            path = Path(raw) / "client"
+            path.write_bytes(blob)
+            return SCAN.scan(path), subprocess.run([sys.executable, "-B", str(_SCAN_PATH), str(path), str(ROOT)], capture_output=True, text=True, timeout=60)
+
+    def test_the_catalog_is_read_whatever_the_minified_spread_name_is(self):
+        for spread in ("Ojo", "P$o", "$a", "a_1"):
+            with self.subTest(spread):
+                found, _run = self.scan_of(self.blob(spread))
+                self.assertTrue(found["catalog_found"])
+                self.assertEqual(found["catalog_extra_values"], ["elicitation_complete", "elicitation_response"])
+                self.assertEqual(found["base_array_size"], 4)
+                self.assertTrue(found["types"]["elicitation_response"]["matcher_value"])
+                self.assertEqual(found["types"]["push_notification"]["notificationType_literals"], 1)
+
+    def test_a_reader_that_finds_nothing_exits_nonzero_instead_of_passing(self):
+        found, run = self.scan_of(self.blob(catalog=False))
+        self.assertFalse(found["catalog_found"])
+        self.assertEqual(run.returncode, 1, "a binary without the catalog must not pass")
+        self.assertIn('"catalog_found": false', run.stdout)
+        found, run = self.scan_of(b"nothing a reader could find")
+        self.assertEqual((found["base_array_size"], found["catalog_found"], run.returncode), (0, False, 1))
+
+
 class DocumentationTests(unittest.TestCase):
+    def test_the_matcher_quoted_in_the_recipe_and_the_decision_is_the_overlays(self):
+        matcher = json.loads(OVERLAY.read_text(encoding="utf-8"))["hooks"]["Notification"][0]["matcher"]
+        self.assertIn(f"`{matcher}`", RECIPE.read_text(encoding="utf-8"))
+        self.assertIn(f"`{matcher}`", (ROOT / "docs/decisions/2026-09-28-terminal-experience.md").read_text(encoding="utf-8"))
+
     def test_the_platform_page_names_every_shipped_default_and_the_recipe_anchor_exists(self):
         page = PLATFORM_PAGE.read_text(encoding="utf-8")
         self.assertIn("\n## Windows Terminal profiles and the login shell\n", page)
