@@ -119,9 +119,11 @@ the native test sends synthetic OTLP records through the committed logs
 processors and exporters to isolated loopback services. It checks workflow arm
 token sums, matching resource/event copies of the run key, whole-run prefix and
 single-arm queries, session/tool joins, string/numeric/zero costs, absent values,
-Codex argument removal and retained measurement metadata, and indexed series through
+Codex argument removal and retained measurement metadata, the Codex launch-tag and
+call-id joins ([below](#codex-launch-tag-and-call-id--2026-09-29)), and indexed series through
 Loki's [query and series APIs](https://grafana.com/docs/loki/latest/reference/loki-http-api/).
-Those native checks skip when their optional dependencies are absent.
+Those native checks skip when their optional dependencies are absent. A skip is
+not a pass: run them with an interpreter that has PyYAML and confirm zero skips.
 This is **local integration with synthetic fixtures**; it is not a new provider
 run, an unchanged upstream test suite or proof of deployment on the active host.
 
@@ -136,12 +138,27 @@ preregistration: RUNBOOK.md by hash, and the E2E README through its append-only
 amendment rule. So they stay unchanged here, and their correction belongs to a
 dated #381 amendment. Until that lands, this section supersedes their
 field-gap statements. Host delivery/flush proof and
-Codex `env`/`call_id` reconciliation remain outstanding.
+Codex `env`/`call_id` reconciliation remain outstanding. The Collector part of the
+latter is updated in [Codex launch tag and call id](#codex-launch-tag-and-call-id--2026-09-29).
 
-On a host already running the profile, `apply.sh` [leaves log_statements unchanged](../../evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py#L116);
-install the reviewed `collector.yaml` using the [installation recipe above](#native-collector-profile),
-validate it, then restart the user service with `systemctl --user restart ecosystem-otelcol.service`;
-prove delivery and flushes afterward.
+On a host already running the profile, `apply.sh` [leaves log_statements unchanged](../../evidence/artifacts/telemetry-writer-identity-20260926/host/merge_collector.py#L116),
+so a log-statement change needs its own host step. The
+[installation recipe above](#native-collector-profile) is for a new installation.
+Do not copy the repository `collector.yaml` over a host file that has its own
+receivers or ports. Do not assume the host's transform statements equal the
+repository's; diff them first, then:
+
+1. Print the host file's `transform/tool_names` and `transform/privacy` log
+   statements next to the repository's base revision, in order, from a YAML parser.
+2. Reconcile any other difference first, or record it. Then patch only the
+   statements the change touches, in place and in order.
+3. Run `otelcol-contrib validate` on the patched host file.
+4. Restart with `systemctl --user restart ecosystem-otelcol.service` outside
+   any measured window, and record the restart time.
+5. Read back that the host's statements now equal the repository's, in order.
+6. Prove delivery and flushes afterward.
+
+Records sent while the Collector restarts are unknown, not zero.
 
 Codex **rust-v0.157.1** logs full `arguments` in
 [`tool_result.rs:55-79`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/tool_result.rs#L55);
@@ -159,6 +176,109 @@ The existing guarded mapping of native `mcp_server` to `mcp_server.name` becomes
 context-mode invoke-rate queries, including calls with absent server metadata;
 the [direct/code-mode source paths](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/call_trace.rs#L38)
 are distinct. No live host privacy acceptance is inferred from fixture results.
+
+### Codex launch tag and call id — 2026-09-29
+
+The logs pipeline now keeps two Codex identities that it used to drop:
+
+- the resource attribute `env`, which is the per-launch tag;
+- the record attribute `call_id`.
+
+Both appear in Loki as structured metadata named `env` and `call_id`. Sources
+are openai/codex **rust-v0.157.1** (`36650394`) and the OTTL functions of
+opentelemetry-collector-contrib **v0.161.0**:
+
+| Native source | Retained attribute and meaning |
+| --- | --- |
+| `codex exec -c otel.environment=<tag>` ([`provider.rs:53,381`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/provider.rs#L371-L389); config key at [`types.rs:605-606`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/types.rs#L605-L606), default `dev`) | `env` is the launch tag, on every log record of that process: the resource value, which Loki [replicates onto each entry](https://grafana.com/docs/loki/v3.7.x/send-data/otel/). |
+| `codex.tool_result` ([`tool_result.rs:61`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/tool_result.rs#L54-L80)) and `codex.tool_decision` ([`session_telemetry.rs:1112,1121`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/events/session_telemetry.rs#L1098-L1125)) | `call_id` identifies the call and pairs a decision with its result. Model calls use `call_…` ids. A nested code-mode call gets `exec-<uuid v4>` ([`delegate.rs:323`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/code_mode/delegate.rs#L323)). |
+
+Changes in `collector.yaml`:
+
+- `transform/privacy`, resource context: a new
+  [`delete_key`](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/pkg/ottl/ottlfuncs/README.md#delete_key)
+  guard, then `env` added to the resource `keep_keys`.
+- `transform/tool_names`, last group: a new `delete_key` guard for `call_id`.
+- `transform/privacy`, log context: `call_id` added to `keep_keys`, right after
+  `tool_use_id`.
+
+That is four statements: two guards added and two allowlists extended. Apply them
+on a host with the diff-then-patch procedure above.
+
+Each guard deletes a value unless it matches `^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$`.
+This is the registry-name character class, at most 128 characters. It uses
+[`IsMatch`](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/pkg/ottl/ottlfuncs/README.md#ismatch),
+which converts any value type to a string and returns false for nil, so the
+guard cannot fail under `error_mode: propagate`.
+
+- The 24-character letter/digit rule for registry names does not apply here,
+  because call ids contain such runs by design.
+- A deleted value is an unknown identity, never a zero or a fabricated tag.
+  Launch tags must fit the pattern before launch.
+- `host.name`, which Codex adds to its logs resource, stays dropped.
+- The metric resource allowlist is unchanged. Codex also puts `env` on its
+  metrics resource ([`metrics/client.rs:46,345`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/otel/src/metrics/client.rs#L345)),
+  and neither key becomes a metric label.
+
+The Loki template indexes only `service.name`, and the native test checks that
+neither key becomes an index label. Queries use pipeline filters:
+
+```logql
+{service_name="codex_exec"} | env="<tag>" | event_name="codex.tool_result" | call_id="<call>"
+{service_name="codex_exec"} | env="<tag>" | event_name="codex.tool_decision" | call_id="<call>"
+```
+
+`codex.agent_communication` events carry no `conversation.id`
+([`agent_communication.rs:44-66`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent_communication.rs#L44-L66)).
+Because the tag is a resource attribute, these events still carry `env`.
+
+Validation: `tests.test_observability_run_correlation` and
+`tests.test_observability_tool_names`.
+
+- An always-on check requires the guards, both allowlist entries and their
+  absence from the metric statements.
+- The native test sends `codex_exec` records through the committed processors
+  on Collector 0.161.0 into Loki 3.7.8. Each valid id is returned exactly once
+  under its tag, and the decision pairs with its result. A 129-character id,
+  an id with spaces, a tag with spaces, `host.name` and all content are
+  dropped; a 128-character id is kept.
+
+This is local integration with synthetic fixtures.
+
+Limits:
+
+- **Host.** This repository change is not host application. Until the host
+  file is patched, validated, restarted and read back, the host Collector
+  still drops both keys.
+- **No real launch yet.** A real Codex launch with a tag has not been observed
+  through this profile. The end-to-end join of Codex rollout or JSON output
+  against Loki is still open for the token-adoption E2E, and belongs to its
+  next dated amendment.
+- **Some calls log no event.** Some dispatched Codex calls end with neither a
+  `codex.tool_result` nor a `codex.tool_decision`:
+  - a call blocked by a PreToolUse hook
+    ([`registry.rs:598-612`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/registry.rs#L598-L612));
+  - a call whose hook-rewritten input fails
+    ([`registry.rs:619-634`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/registry.rs#L619-L634));
+  - a nested code-mode payload error
+    ([`code_mode/mod.rs:363-379`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/code_mode/mod.rs#L363-L379));
+  - a nested call cancelled before dispatch
+    ([`delegate.rs:335-337`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/code_mode/delegate.rs#L335-L337)).
+
+  All four return before the registry logs a result
+  ([`registry.rs:667-682`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/registry.rs#L667-L682)).
+  So Loki's `codex.tool_result` count can be lower than the rollout's function
+  calls, and those calls are unknown in Loki rather than matched. A command the
+  exec policy forbids is also rejected without a `codex.tool_decision`
+  ([`orchestrator.rs:196-198`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/orchestrator.rs#L196-L198)).
+- **Other services.** Any other service that sets a resource `env` that fits
+  the pattern now keeps it too.
+- **Local display.** Retained identities stay private, as the session and
+  tool-invocation ids already do. The local Grafana logs panels show every
+  retained field in their log details, now including `env` and `call_id`:
+  the backend template's sanitized-events panel and the grand-dashboard and
+  native-data activity panels. They are served to loopback anonymous Viewer
+  access only. Publish counts only; never a tag value or an id.
 
 ## Writer identity and counter integrity
 
