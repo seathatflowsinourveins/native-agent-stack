@@ -509,38 +509,62 @@ class KeyOrderTests(IndexCase):
                           ("repo:example/zeta", 2, True), ("repo:example/card", 4, False)])
 
     def test_popularity_and_recency_never_reorder(self):  # 13
+        # Three tied pairs (two winners, two alternatives, two card-only candidates). Every never-sort field gets a
+        # distinct value in each pair, the "better" one on the entity that sorts later, so a tiebreak on any one of
+        # them, in either direction, unshares the pair (and a better-first tiebreak also swaps its display order).
+        # Repair round, review item 6: the values were identical across records before, which no tiebreak can split.
+        layer_ref = "layer:foundation/l1"
         self.tree.layer("l1", W("example/current", declared="conditional", derived="conditional", pin_current="true"),
                         W("example/behind", declared="conditional", derived="conditional", pin_current="false"),
-                        A("example/alt-one"), A("example/alt-two"), C("example/card"))
+                        A("example/alt-one"), A("example/alt-two"), C("example/card-one"), C("example/card-two"))
         document = self.build()
         before = self.ranks(document)
-        self.assertEqual(before[("layer:foundation/l1", "repo:example/current")][:2], (1, True))
-        self.assertEqual(before[("layer:foundation/l1", "repo:example/behind")][:2], (1, True))
+        order = [p["entity"] for p in self.layer(document, layer_ref)["placements"]]
+        pairs = (("example/behind", "example/current"), ("example/alt-one", "example/alt-two"),
+                 ("example/card-one", "example/card-two"))
+        self.assertEqual(order, ["repo:" + name for pair in pairs for name in pair])
+        for pair, position in zip(pairs, (1, 3, 5)):
+            for name in pair:
+                self.assertEqual(before[(layer_ref, "repo:" + name)][:2], (position, True))
+        worse = {"stars": 10, "review_status": "unreviewed", "votes": 1, "confidence": "low",
+                 "pin_behind_upstream": True, "priority": 2, "archived": True, "latest": "2020-01-01T00:00:00Z"}
+        better = {"stars": 10 ** 6, "review_status": "reviewed", "votes": 99, "confidence": "high",
+                  "pin_behind_upstream": False, "priority": 1, "archived": False, "latest": "2030-01-01T00:00:00Z"}
+        self.assertEqual(set(worse), set(better))
+        self.assertTrue(all(worse[field] != better[field] for field in worse))
+        planted = {_github(earlier): worse for earlier, _later in pairs}
+        planted.update({_github(later): better for _earlier, later in pairs})
 
-        def flip_pins(matrix):
+        def plant(record):
+            record.update(planted[record["repository"]])
+
+        def matrix_values(matrix):
             for row in matrix["rows"]:
                 for component in row["convergence"]["components"]:
                     component["pin_current"] = {"true": "false", "false": "true"}[component["pin_current"]]
                 for winner in row["winners"]:
+                    plant(winner)
                     winner["pin"] = "9.9.9-" + winner["component_id"]
-                    winner["platforms"][LINUX]["host_receipts"]["latest"] = "2030-01-01T00:00:00Z"
+                    winner["platforms"][LINUX]["host_receipts"]["latest"] = planted[winner["repository"]]["latest"]
+                for alternative in row["alternatives"]:
+                    plant(alternative)
 
-        def popular(ledger):
+        def ledger_values(ledger):
             for layer in ledger["layers"]:
                 for record in layer["winners"] + layer["alternatives"] + layer["candidates"]:
-                    record.update(stars=10 ** 6, review_status="reviewed", votes=99, confidence="high",
-                                  pin_behind_upstream=True, priority=1, archived=False)
+                    plant(record)
 
         def stars(coverage):
-            for index, entry in enumerate(coverage["stars"]):
-                entry["stars"] = 10 ** 6 - index
+            for entry in coverage["stars"]:
+                entry["stars"] = planted.get(_github(entry["repository"]), worse)["stars"]
 
-        self.edit(cm.OUTPUT_JSON, flip_pins)
-        self.edit(FOUNDATION_LEDGER, popular)
+        self.edit(cm.OUTPUT_JSON, matrix_values)
+        self.edit(FOUNDATION_LEDGER, ledger_values)
         self.edit("catalogs/us-equities/coverage.json", stars)
         after_document = self.rebuild()
         self.assertEqual(self.ranks(after_document), before)
-        self.assertEqual(self.placement(after_document, "layer:foundation/l1", "repo:example/behind")
+        self.assertEqual([p["entity"] for p in self.layer(after_document, layer_ref)["placements"]], order)
+        self.assertEqual(self.placement(after_document, layer_ref, "repo:example/behind")
                          ["freshness"]["pin_current"], "true")
 
 
