@@ -122,8 +122,9 @@ export const DEFAULT_MARKER = '<context_window_protection>'
 const FETCH_WORD = /(?:^|[;&|(`]|\$\()\s*(?:(?:do|then|else|elif|if|while|until|!|\{|rtk|sudo|env|command|exec|time|nice|nohup|timeout\s+\S+)\s+)*(?:curl|wget)(?=\s|$)/m
 const URL_HOST = /\bhttps?:\/\/(\[[^\]\s]*\]|[^\s/:'"`<>)?#\]]+)/gi
 const LOOPBACK = /^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\]|0\.0\.0\.0)$/i
-// A quoted string a shell runs: the argument of sh/bash/zsh/dash/ksh/su ... -c, of eval, or of ssh <host>.
-const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|eval|ssh(?:\s+-\S+)*\s+\S+)\s*$/
+// A quoted string a shell runs: the argument of sh/bash/zsh/dash/ksh/su ... -c, of eval, or of ssh <host>. The command name sits at the
+// text start, after a blank, ; & | ( or the opening backquote of a `...` substitution.
+const RUN_QUOTED = /(?:^|[\s;&|(`])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|eval|ssh(?:\s+-\S+)*\s+\S+)\s*$/
 // Inline interpreter code remains executable despite its shell quoting; all other
 // quoted arguments stay data. Extend context-mode v1.0.169 routing.mjs:787-797
 // with documented interpreter entrypoints: docs.python.org/3.14/using/cmdline.html,
@@ -131,7 +132,7 @@ const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s
 // and bun.sh/docs/runtime. HTTP operations remain unclassifiable under #381 M4.
 // An option word is -[\w-]+: the same words as --?[\w-]+, which splits '---' two ways and backtracks
 // exponentially on repeated option words (CodeQL js/redos).
-const RUN_HTTP_CODE = /(?:^|[\s;&|(])(?:python[\d.]*(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|node(?:js)?(?:\s+-[\w-]+)*\s+(?:-e|--eval|-p|--print)|bun(?:\s+-[\w-]+)*\s+(?:-e|--eval)|deno\s+eval(?:\s+-[\w-]+)*)\s*$/
+const RUN_HTTP_CODE = /(?:^|[\s;&|(`])(?:python[\d.]*(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|node(?:js)?(?:\s+-[\w-]+)*\s+(?:-e|--eval|-p|--print)|bun(?:\s+-[\w-]+)*\s+(?:-e|--eval)|deno\s+eval(?:\s+-[\w-]+)*)\s*$/
 const SHELL = /^(?:ba|z|da|k)?sh$/
 const INTERPRETER_WORD = /^(?:python[\d.]*|node(?:js)?|deno|bun|ruby|perl|php)$/
 // A here-document operator and its delimiter word at lastIndex (bash(1) Here Documents).
