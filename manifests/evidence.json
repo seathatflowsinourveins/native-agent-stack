@@ -3679,8 +3679,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "1b40c567365c23214847f7eab052dca9dc1925cf7bc65714de291a799586c382",
-      "bytes": 21269
+      "sha256": "cd1449c32dd2ae8e8b2ea5a91800c47801333966a0d73ef163df5beff62f4bdd",
+      "bytes": 22003
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -3734,8 +3734,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "4fdf0f1d62dfab721596c67d490454334339bcbf82335d959a201b8904bf6521",
-      "bytes": 32977
+      "sha256": "faea95f896624303c5d8d0254834eb7d2173275fb652e65c2023f2bfbdd50555",
+      "bytes": 33087
     },
     {
       "path": ".gitignore",
@@ -3984,8 +3984,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "b1527acccffb8602192ce51d8a3e48071e34b8ba6d950bc263e21303a2ac310b",
-      "bytes": 62249
+      "sha256": "de1085558942ee283c05997f416ef535eb44db014b0e65556bef5cb8d55728d8",
+      "bytes": 62587
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -4094,8 +4094,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "555afb2bff6a5661d5d8fb09f6f863836f4e04fd8621fd0a3d35b7a5794f1df8",
-      "bytes": 20960
+      "sha256": "83042836ba6090013a14838b37d64fe9fdf876e71aa0e1c6f81dec4d06779345",
+      "bytes": 21001
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -13785,8 +13785,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "dd7af6c37aeeb10ba4ca3030a7383a6f828e30e95073cc8465aefc171ac4822b",
-      "bytes": 2833
+      "sha256": "f5e000b36a9019f26bf64dc2ba8b35742117a1311174fcf0bdd7c59cb15b1e50",
+      "bytes": 3329
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -13932,6 +13932,11 @@
       "path": "catalogs/landscape/candidate-quality-review.json",
       "sha256": "dbb5de39e9f5af58c20e3b75b560386776a29a994207ebf73b499e22f7d46ed8",
       "bytes": 152069
+    },
+    {
+      "path": "catalogs/landscape/catalog-index.json",
+      "sha256": "8a099ddf61738f71c7d2ac109b8c8a53b396938a132af42b21e029db23e161b3",
+      "bytes": 1256834
     },
     {
       "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -14470,8 +14475,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "e03014e62d9eaceb179e50870b2e0b4882cf2d0da3ea3d4b52e7c7c62888d269",
-      "bytes": 32926
+      "sha256": "620df119bc8f8887d19c19dbede1124d7712d45a3a4319c319044d30710868b2",
+      "bytes": 33181
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -14659,6 +14664,11 @@
       "bytes": 15185
     },
     {
+      "path": "docs/decisions/2026-09-29-catalog-index-ranking.md",
+      "sha256": "3781dcd216af97138f5f1dc5be9aa0a3bcb54b2aa7f741b748d0de4317bf5328",
+      "bytes": 20055
+    },
+    {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
       "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
       "bytes": 28168
@@ -14710,8 +14720,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "b54245b21caa7eb86b97e83cb473daed085660ab42dc0270198afd64e253e2c2",
-      "bytes": 115792
+      "sha256": "1689e3d0e462fa8e74ce58fd549a1e49bb75dd3410a29b0a0b494198d51f47e7",
+      "bytes": 124852
     },
     {
       "path": "docs/evidence.md",
@@ -14785,8 +14795,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "2a935e2be416783beeb98f61dc2cb781a58fd18d83486e914921d446eade38b2",
-      "bytes": 90685
+      "sha256": "c918d183c8e6b277450ae26973ca6e08f5565c02f98715212af299024b61925f",
+      "bytes": 91419
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14840,8 +14850,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "c7bacc23aa75a860dc3a8a0957a4c74aac135d5a03bc1187e76a86cc630c0c84",
-      "bytes": 13335
+      "sha256": "5da24fb407f6ac9071af1ccf8931b155aa84c6237cfdcecaf555174c9c94c082",
+      "bytes": 13651
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -14925,8 +14935,8 @@
     },
     {
       "path": "docs/next-host-stages.md",
-      "sha256": "a1aecf488248fdf93da79f144a34340f64a13483c4bd698593596bc8a43eb003",
-      "bytes": 14441
+      "sha256": "fc5ff4fa73015856de01ebca1003c7f48e136d31ec7c56f2d14b447076110133",
+      "bytes": 14488
     },
     {
       "path": "docs/paper-lane-policy.md",
@@ -42870,13 +42880,13 @@
     },
     {
       "path": "recipes/saturation-sweep.md",
-      "sha256": "7a02df8416e87f4d872bac10dacec9872668311ec3b0bc206420e4c28d17ad78",
-      "bytes": 10508
+      "sha256": "ffbb268f2a76cae30d567a10d4ab95904c7bc66454f7a5fd5e8968ec5150958a",
+      "bytes": 10618
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "9542727e2b64ae38edd4222a86314008397150655fec84303faba44513b1e6c7",
-      "bytes": 25561
+      "sha256": "270f5c4406280a61c2c5d2ed4e3247a9d3dd417a769504349f39442008ea4bce",
+      "bytes": 25674
     },
     {
       "path": "recipes/tavily.md",
@@ -42890,8 +42900,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "f149113c39259e3139df66c844bfbffbde01a5d154a62f1c1e0cff440efecfce",
-      "bytes": 64697
+      "sha256": "eb22c5fb34d20e59aa780423d4f1252a24471fd9618b6d844b7a19e6d6960e1d",
+      "bytes": 70349
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -43370,8 +43380,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "241697711e74fa15c1763c2650e0a9ee8316ab442fb69003312a9aa4a923da58",
-      "bytes": 55352
+      "sha256": "dee499b87798c3d4e2ea4e2e58a6d8a93ea16ea719b0c8642d3aed615792ed11",
+      "bytes": 60558
     },
     {
       "path": "tests/test_catalogs.py",
@@ -43475,8 +43485,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "bd66847310779aa1e03510931a25ea55897543b4275148715dc9d9ab49e9f8c7",
-      "bytes": 99866
+      "sha256": "864d5a1020caa6851ee7c2b458b79b15bd7806bd3f7feffc12e6f2e3cb42f17e",
+      "bytes": 118100
     },
     {
       "path": "tests/test_effort_default_guard.py",
@@ -44210,8 +44220,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
-      "bytes": 55711
+      "sha256": "1df0e7b41a2644b85b3991c45dfe749245ab44993fc89a6ae332de8da4f2c2b7",
+      "bytes": 55885
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

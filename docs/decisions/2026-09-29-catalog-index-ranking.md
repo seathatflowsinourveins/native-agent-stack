@@ -160,8 +160,11 @@ bare 40-hex id (test 30).
 1. A layer records a structured, verified, comparable measurement: `measured_rank` activates with no rule change.
 2. `class_vs_verification_flipped_pairs` includes a winner pair or exceeds 4: reconsider verification-first order.
    **Met since the repair round: 5 pairs**, none of them a winner pair. The stack-pin rule moved llama.cpp to level 1,
-   behind otel-tui's level 0, while llama.cpp keeps tier A over otel-tui's tier C. The rule stays class-first until the
-   coordinator decides; this record does not move the threshold.
+   behind otel-tui's level 0, while llama.cpp keeps tier A over otel-tui's tier C. **Coordinator decision
+   (2026-09-29):** keep class-first order. The user asked for evidence strength first, the evidence class is its primary
+   term, and no winner pair flips. The condition is recorded as triggered, not waived. The next revision of this record
+   re-evaluates verification-first order, and one flipped winner pair, or more than 8 flipped pairs, moves the order to
+   verification-first without further review.
 3. The user chooses the `pin_current` tiebreak (winners only; true, then unknown, then false, as a fifth key): shared
    placements fall from 368 to 345 of 414 at this revision.
 4. A recorded ordering of `local_integration` against `synthetic` appears: split tier B.
@@ -212,8 +215,9 @@ Read 2026-09-29 during the design review; the quotations are the review's.
   regeneration. It already held two bare `register_file(...)` calls, which are Name-call sites of the Gate A oracle
   (`main` lines 598 and 649). They are left as they were (now lines 608 and 680), so the oracle's set of sites does not
   change, and no definition or bare call of the five symbols is added anywhere. The literal AST scan over the branch's
-  changed files therefore lists those two pre-existing sites. Converting them to attribute calls would remove two oracle
-  sites; that choice is left to the coordinator.
+  changed files therefore lists those two pre-existing sites. **Coordinator decision (2026-09-29):** keep them.
+  Converting them would remove two sites from the sealed Gate A (#381) oracle count before its run. The acceptance scan
+  is read as "no site added": it compares the changed files' site lists with main's (2 = 2, line numbers shifted only).
 - **No GPT-6 cross-family review ran** on this build or its repair round: Codex capacity is reserved for the Gate A
   (#381) reviews until 2026-10-04. The independent review and verification were Claude sessions.
 - `domain-card/default-never-winner` counts 8, a figure the review had not verified: the reuse-first design reported 5
