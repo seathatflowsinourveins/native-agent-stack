@@ -6,6 +6,8 @@ generated at test time; no real credential store is read.
 
 import builtins
 import copy
+import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -486,10 +488,76 @@ class CredentialStatusTests(unittest.TestCase):
                 "OTEL_LOG_TOOL_CONTENT": True, "OTEL_LOG_TOOL_DETAILS": False,
                 "OTEL_LOG_USER_PROMPTS": False, "OTEL_LOG_ASSISTANT_RESPONSES": False,
                 "OTEL_LOG_RAW_API_BODIES": True},
-            "codex_shell_environment_inherit_none": True})
+            "codex_shell_environment_inherit_none": True,
+            "claude_user_guard_matches_pin": False})  # the stand-in's bytes are not the pinned guard's
         self.assert_no_values(json.dumps(report))
         self.assert_no_values(cs.render_text(report))
         self.assertIn("claude telemetry logs content: true", cs.render_text(report))
+
+    def test_guard_pin_check_hashes_only_the_installed_guard(self):
+        # claude_user_guard_matches_pin (2026-09-29): the sha256 of the installed user-scope guard against the
+        # checkout's pin line in adoption/hooks/claude/SHA256SUMS, whose paths are relative to that file as
+        # tools/adoption/install_claude_profile.py reads them. One boolean; the guard is the only file it reads.
+        claude = self.home / ".claude"
+        installed = claude / "hooks" / "secret_path_guard.py"
+        installed.parent.mkdir(parents=True)
+        guard_bytes = (ROOT / "scripts/hooks/secret_path_guard.py").read_bytes()
+
+        def matches():
+            guards = self.report(with_client_guards=True)["client_guards"]
+            self.assertTrue(cs.only_booleans(guards))
+            return guards["claude_user_guard_matches_pin"]
+
+        self.assertIs(matches(), False)  # not installed
+        installed.write_bytes(guard_bytes)
+        self.assertIs(matches(), True)  # what the installer copies from this checkout
+        installed.write_bytes(guard_bytes + b"\n")
+        self.assertIs(matches(), False)  # one byte more
+        installed.unlink()
+        installed.symlink_to(ROOT / "scripts/hooks/secret_path_guard.py")
+        self.assertIs(matches(), False)  # a link is never followed, even to the pinned bytes
+        installed.unlink()
+        installed.mkdir()
+        self.assertIs(matches(), False)  # nor is a directory hashed
+        installed.rmdir()
+        # A link planted in the guard's place, pointing at a store file, never makes the check open that file.
+        installed.symlink_to(self.write_alpaca())
+        opened = []
+        real_open, real_io_open, real_os_open = builtins.open, io.open, os.open
+
+        def watch(real):
+            def opener(file, *args, **kwargs):
+                opened.append(str(file))
+                return real(file, *args, **kwargs)
+            return opener
+
+        with patch("builtins.open", watch(real_open)), patch("io.open", watch(real_io_open)), \
+                patch("os.open", watch(real_os_open)):
+            self.assertIs(matches(), False)
+        self.assertTrue(opened)  # the watch saw the guard path
+        self.assertFalse([p for p in opened if str(self.store) in p])
+        installed.unlink()
+        # A synthetic checkout: its pin line decides, and a checkout without one never matches.
+        checkout = self.home / "checkout"
+        pins = checkout / "adoption/hooks/claude/SHA256SUMS"
+        pins.parent.mkdir(parents=True)
+        body = b"# a synthetic guard\n"
+        installed.write_bytes(body)
+        digest = hashlib.sha256(body).hexdigest()
+        pins.write_text(f"{digest}  ../../../scripts/hooks/secret_path_guard.py\n")
+        self.assertIs(cs.guard_matches_pin(claude, checkout), True)
+        pins.write_text(f"{digest}  effort-default-guard.py\n")
+        self.assertIs(cs.guard_matches_pin(claude, checkout), False)
+        pins.unlink()
+        self.assertIs(cs.guard_matches_pin(claude, checkout), False)
+        # The CLI prints the boolean with the other client guards and never a digest.
+        installed.write_bytes(guard_bytes)
+        result = self.run_cli("--json", "--client-guards")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIs(json.loads(result.stdout)["client_guards"]["claude_user_guard_matches_pin"], True)
+        self.assertNotIn(hashlib.sha256(guard_bytes).hexdigest(), result.stdout)
+        text = self.run_cli("--client-guards").stdout
+        self.assertIn('"claude_user_guard_matches_pin": true', text)
 
     def write_client_settings(self):
         claude = self.home / ".claude"

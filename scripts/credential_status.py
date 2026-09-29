@@ -29,6 +29,7 @@ for an invalid inventory. Missing entries and warnings are informational.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -345,9 +346,12 @@ TELEMETRY_CONTENT_FLAGS = ("OTEL_LOG_TOOL_CONTENT", "OTEL_LOG_TOOL_DETAILS", "OT
 TELEMETRY_ENABLE_FLAG = "CLAUDE_CODE_ENABLE_TELEMETRY"
 FALSY = {"", "0", "false", "no", "off"}
 GUARD_HOOK_FILE = "secret_path_guard.py"
+# What tools/adoption/install_claude_profile.py copies to <claude dir>/hooks/, and the pin file it checks it against.
+GUARD_SOURCE = "scripts/hooks/secret_path_guard.py"
+GUARD_PINS = "adoption/hooks/claude/SHA256SUMS"
 CLIENT_GUARD_KEYS = ("claude_user_deny_rules", "claude_user_secret_guard_hook", "claude_sandbox_enabled",
                      "claude_telemetry_logs_content", "claude_telemetry_content_flags",
-                     "codex_shell_environment_inherit_none")
+                     "codex_shell_environment_inherit_none", "claude_user_guard_matches_pin")
 
 
 def truthy(value) -> bool:
@@ -395,6 +399,50 @@ def guard_hook_installed(settings, claude_dir: Path) -> bool:
     return registered and os.path.lexists(claude_dir / "hooks" / GUARD_HOOK_FILE)
 
 
+def guard_pin(root: Path) -> str | None:
+    """The guard's sha256 on its line of the checkout's pin file, or None when there is no such line.
+
+    Paths in the pin file are relative to its own directory, read as install_claude_profile.py's
+    sha256sums_entries() reads them."""
+    pins = root / GUARD_PINS
+    try:
+        lines = pins.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return None
+    source = (root / GUARD_SOURCE).resolve()
+    for line in lines:
+        parts = line.split()
+        if len(parts) == 2 and re.fullmatch(r"[0-9a-f]{64}", parts[0]) \
+                and (pins.parent / parts[1].lstrip("*")).resolve() == source:
+            return parts[0]
+    return None
+
+
+def guard_matches_pin(claude_dir: Path, root: Path) -> bool:
+    """Whether the installed user-scope guard's bytes hash to the checkout's pin. One boolean; no digest leaves here.
+
+    The guard is the only file read: it is opened without following a symbolic link and hashed only when it is a
+    regular file, so a link planted in its place never makes this read another file, a store file included."""
+    expected = guard_pin(root)
+    if expected is None:
+        return False
+    try:
+        handle = os.open(claude_dir / "hooks" / GUARD_HOOK_FILE, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except OSError:
+        return False
+    try:
+        if not stat.S_ISREG(os.fstat(handle).st_mode):
+            return False
+        digest = hashlib.sha256()
+        while chunk := os.read(handle, 1 << 16):
+            digest.update(chunk)
+    except OSError:
+        return False
+    finally:
+        os.close(handle)
+    return digest.hexdigest() == expected
+
+
 def claude_guard_booleans(claude_dir: Path) -> dict | None:
     """Booleans derived from the user Claude settings, or None when unreadable.
 
@@ -434,14 +482,20 @@ def only_booleans(value) -> bool:
         isinstance(value, dict) and all(isinstance(k, str) and only_booleans(v) for k, v in value.items()))
 
 
-def client_guards(env) -> dict:
+def claude_config_dir(env) -> Path:
+    home = env.get("HOME") or str(Path.home())
+    return Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude")
+
+
+def client_guards(env, root: Path = ROOT) -> dict:
     """Opt-in check of the user-level guard keys. Booleans only; no value is returned."""
     home = env.get("HOME") or str(Path.home())
-    claude_dir = Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude")
+    claude_dir = claude_config_dir(env)
     codex_dir = Path(env.get("CODEX_HOME") or f"{home}/.codex")
     result = dict.fromkeys(CLIENT_GUARD_KEYS)
     result.update(claude_guard_booleans(claude_dir) or {})
     result["codex_shell_environment_inherit_none"] = codex_inherit_none(codex_dir)
+    result["claude_user_guard_matches_pin"] = guard_matches_pin(claude_dir, root)
     if set(result) != set(CLIENT_GUARD_KEYS) or not only_booleans(result):
         raise AssertionError("client guards must be the fixed keys with boolean values")
     return result
@@ -476,7 +530,7 @@ def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
         "values_read": False,
     }
     if with_client_guards:
-        report["client_guards"] = client_guards(env)
+        report["client_guards"] = client_guards(env, root)
     unsafe_stored = [e["id"] for e in entries if e["state"] == "unsafe"]
     report["unsafe_required"] = [i for i in unsafe_stored
                                  if next(e for e in entries if e["id"] == i)["status"] == "required"]
@@ -532,8 +586,9 @@ def main(argv=None) -> int:
     parser.add_argument("--inventory", type=Path)
     parser.add_argument("--json", action="store_true", help="print the JSON report")
     parser.add_argument("--client-guards", action="store_true",
-                        help="also check user-level Claude/Codex settings for the guard keys and "
-                             "Claude telemetry content logging (booleans only)")
+                        help="also check user-level Claude/Codex settings for the guard keys, "
+                             "Claude telemetry content logging and whether the installed guard matches "
+                             "its pin (booleans only)")
     parser.add_argument("--proc-keys", type=Path, default=PROC_KEYS,
                         help="the kernel's key list to scan for undeclared native-agent-stack keys, names only "
                              f"(default {PROC_KEYS}; the tests pass a fixture)")
