@@ -856,8 +856,10 @@ CODEX_SHELL_TOOLS = ("exec_command", "shell_command", "shell")
 EXEC_HEADER_SECTIONS = 5
 EXEC_EXITED = "Process exited with code "
 EXEC_RUNNING = "Process running with session ID "
-# The exit code is an i32 written in decimal (at most 10 digits with its sign). A header with more digits is no native header;
-# it reads unknown, and int() never sees a digit string over CPython's conversion limit (4,300 digits, which raises ValueError).
+# The exit code is an i32 written in decimal (up to 10 digits with its sign for the full i32 range). The pivot brief (D6) fixed a
+# nine-digit bound: a header with more digits reads unknown, never succeeded, so a ten-digit crash status such as a Windows
+# NTSTATUS (-1073741819) reads unknown, not failed (the review's low finding; both count as not successful, and no Windows Codex
+# was available to check). int() never sees a digit string over CPython's conversion limit (4,300 digits, which raises ValueError).
 EXEC_CODE_DIGITS = 9
 
 

@@ -14659,6 +14659,11 @@
       "bytes": 15185
     },
     {
+      "path": "docs/decisions/2026-09-29-shell-command-parser.md",
+      "sha256": "ae31b360ec348e3d7f58948e06e1d82de2fc99b33fad44bb7d3e8fb20de0fb54",
+      "bytes": 17458
+    },
+    {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
       "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
       "bytes": 28168
@@ -44030,8 +44035,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "3fc5a11b0ccf4219872d268fc7aa6580094091860041f5ac093a49459767b3a3",
-      "bytes": 98671
+      "sha256": "905b4f537ffd409f26ead6f9f3634cea317a93bf6ecdbe691c4a9da0148f565e",
+      "bytes": 98779
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -44285,8 +44290,8 @@
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "af03ba206f951d221ffc282a6494b0cc3e6965bae224ec469e0e4878d2a7d6e1",
-      "bytes": 88338
+      "sha256": "957326c07d7f2bc79918f2b47d77668e601101a2a3183ad941746ca7937d1cea",
+      "bytes": 88597
     },
     {
       "path": "tools/sota-convergence/README.md",

@@ -1058,8 +1058,9 @@ class CodexLanes(unittest.TestCase):
 
     def test_exec_header_state_bounds_the_exit_code_digits(self):
         # D6 (GPT-6 #12): int() of a digit string over CPython's conversion limit (4,300 digits) raised ValueError, so one
-        # malformed header stopped the whole scan. The code is an i32 written in decimal (context.rs:534-540), at most 10
-        # digits with its sign; a header with more than 9 digits is not a native header and reads unknown, without raising.
+        # malformed header stopped the whole scan. The code is an i32 written in decimal (context.rs:534-540), up to 10
+        # digits with its sign; the brief's nine-digit bound (D6) makes a header with more than 9 digits read unknown,
+        # never succeeded and without raising (a valid ten-digit i32 code also reads unknown: a documented limit).
         unknown = (False, "unknown")
         self.assertEqual(S.exec_header_state("Wall time: 0.01 seconds\nProcess exited with code " + "9" * 5000 + "\nOutput:\n"),
                          unknown)  # GPT-6 #12, verbatim
