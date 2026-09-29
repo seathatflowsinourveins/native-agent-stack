@@ -41907,8 +41907,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "23fb608c6236c806d50e7df7e3bad007e0a2357bf86c712da02616948d9201ff",
-      "bytes": 9765
+      "sha256": "1523b156f0aa2f0b8524bfebe3b453806aedebfa997d18f07d5652bcc1a48c1c",
+      "bytes": 9834
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
