@@ -179,6 +179,49 @@ BLOCKED = {
     "sudo -iu root cat .env": "dotenv_read",
     "nice -n 5 cat .env": "dotenv_read",
     "stdbuf -o0 cat .env": "dotenv_read",
+    # systemd-run is a modelled launcher (2026-09-29; systemd 255 systemd-run(1) and src/run/run.c, getopt string
+    # "+hrH:M:E:p:tPqGdSu:"): its own options are skipped as getopt reads them, and the command it starts gets every rule,
+    # a nested shell string too. With --pipe or --wait the started command's output comes back to the caller. Found while
+    # adding the trading lane's loader path (both accounts) to ALLOWED: these two rows were recorded as a gap before.
+    "systemd-run --user --pipe --wait cat \"$PAPER_ENV_FILE\"": "credential_file_read",
+    "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'": "credential_file_read",
+    "systemd-run --user --pipe --wait printenv": "environment_dump",
+    "systemd-run --user --pipe --wait env": "environment_dump",
+    "systemd-run --user --pipe --wait /bin/sh -c 'echo $APCA_API_SECRET_KEY'": "secret_variable_reference",
+    # An option's value, given as the next word or glued, is never the command (a value option taken for a flag would
+    # make its value the command and hide the reader): --unit, --slice, -p, --uid, --nice, --description, -H, -M, the
+    # timer and service options, a short cluster (`-GP`, `-Gu NAME`) and `--`.
+    "systemd-run --user --unit demo --slice x.slice -p MemoryMax=1G --uid 1000 --nice 5 --pipe cat .env": "dotenv_read",
+    "systemd-run --user --unit=demo --description='a b' --collect --pipe -- cat .env": "dotenv_read",
+    "systemd-run --user -uNAME -GP cat .env": "dotenv_read",
+    "systemd-run --user -Gu NAME -P cat .env": "dotenv_read",
+    "systemd-run -M host --pipe cat .env": "dotenv_read",
+    "systemd-run --host user@host -P cat .env": "dotenv_read",
+    "systemd-run --user --on-calendar daily --working-directory /tmp --service-type oneshot --expand-environment no "
+    "--gid 1000 cat .env": "dotenv_read",
+    "systemd-run --user --timer-property AccuracySec=1s --path-property PathExists=/x --socket-property Backlog=1 "
+    "--on-active 30 --pipe cat .env": "dotenv_read",
+    # Whatever wraps it or follows it: a launcher before it, a path to it, another launcher after its options, a shell.
+    "sudo systemd-run --system --pipe printenv": "environment_dump",
+    "/usr/bin/systemd-run --user --pipe printenv": "environment_dump",
+    "env FOO=1 systemd-run --user --pipe printenv": "environment_dump",
+    "systemd-run --user --pipe stdbuf -o0 cat .env": "dotenv_read",
+    "systemd-run --user --pipe systemd-run --user --pipe printenv": "environment_dump",
+    "systemd-run --user --pipe rtk proxy cat .env": "dotenv_read",
+    "bash -c 'systemd-run --user --pipe printenv'": "environment_dump",
+    # A secret variable name on the command line, with or without a value, through -E/--setenv or -p/--property
+    # Environment=: systemd-run's command line lands in the journal (_CMDLINE) and its properties travel over the user bus.
+    "systemd-run --user --setenv=APCA_API_SECRET_KEY=abc /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user -E APCA_API_SECRET_KEY=abc /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user -E APCA_API_SECRET_KEY /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user --setenv APCA_API_SECRET_KEY /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user -EAPCA_API_SECRET_KEY=abc /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user -GE APCA_API_KEY_ID /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user -p Environment=APCA_API_SECRET_KEY=abc /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user --property=Environment=APCA_API_SECRET_KEY=abc /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user -p 'Environment=\"TZ=UTC\" APCA_API_KEY_ID=abc' /bin/true": "secret_variable_on_command_line",
+    "systemd-run --user --unit=x -p MemoryMax=1G -E PATH=/usr/bin -E HF_TOKEN /bin/true": "secret_variable_on_command_line",
+    "sudo systemd-run --system -E OPENAI_API_KEY=abc /bin/true": "secret_variable_on_command_line",
     # Home credential stores as a reader's operand (2026-09-27, synthesis PR-A row A1): an SSH private key (a glob
     # too), the AWS, Docker, kube, git-credential, netrc, npm and PyPI files, an option's `=` value, and Codex shell
     # snapshots, which record every exported value. The rest of each store follows further down.
@@ -486,6 +529,16 @@ ALLOWED = [
     "systemd-run --user --unit=paper-series-2 --collect /bin/bash -ic "
     "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE_2\"'",
     "systemd-run --user --unit=x --collect /bin/bash -ic \"exec python3 X --env-file \\\"$PAPER_ENV_FILE_2\\\" --output out.json\"",
+    # systemd-run as a modelled launcher (2026-09-29) reads what it starts, so an ordinary unit still passes: no options, non-secret
+    # -E/-p settings, a loader handed its pointer directly, and a variable that only carries a secret name as its VALUE (the rule
+    # reads the name being set, not text that happens to spell one).
+    "systemd-run --user --unit=demo --collect /bin/true",
+    "systemd-run --user --scope -p MemoryMax=1G -- python3 -m unittest discover",
+    "systemd-run --user -E PATH=/usr/bin -E HOME=/tmp -p MemoryMax=1G --collect /bin/true",
+    "systemd-run --user -p 'Environment=\"TZ=UTC\" LANG=C' --collect /bin/true",
+    "systemd-run --user -E HF_TOKEN_PATH_NAME=x --collect /bin/true",
+    "systemd-run --user -E CREDENTIAL_LABEL=APCA_API_KEY_ID --collect /bin/true",
+    "systemd-run --user --pipe --wait python3 runner.py preflight --env-file \"$PAPER_ENV_FILE_2\"",
     # Hugging Face: hf reads its own store, so checking the sign-in, the operator's interactive
     # login, revision-pinned downloads and checksum verification never expose the token.
     "hf auth whoami",
@@ -728,10 +781,6 @@ EXPECTED_PASS_THROUGH = [
     # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
     # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
     "cat \"$PAPER_ENV_FILE_B\"",
-    # systemd-run is not a modelled launcher: a reader it starts is not inspected, for either account (found 2026-09-29 while
-    # adding the loader-path rows above); with --pipe --wait its output returns to the caller.
-    "systemd-run --user --pipe --wait cat \"$PAPER_ENV_FILE\"",
-    "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.

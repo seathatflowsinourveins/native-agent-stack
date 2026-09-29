@@ -20,7 +20,10 @@ hook is how `cat` of them stays blocked after RTK rewrites it to `rtk read`),
 tracing a shell while it sources a credential file, and dumping the
 environment after sourcing one. Every rule
 also reads the command that an `rtk` invocation runs (`rtk proxy cat F`,
-`rtk read F`, `rtk run -c '...'`). For a key
+`rtk read F`, `rtk run -c '...'`) and the command that `systemd-run` starts
+(its own options are skipped as getopt reads them, and a secret variable set
+through its `-E`/`--setenv` or `-p Environment=` is blocked: its command line
+is recorded in the journal and its properties travel over the user bus). For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
 unambiguous keyring, and a keyring read in inline interpreter code), checks
@@ -141,8 +144,8 @@ WRAPPERS = {"sudo", "doas", "command", "builtin", "exec", "nohup", "time", "nice
 # `--output=L` is one word. From each tool's --help on 2026-09-26 (coreutils nice, stdbuf, timeout;
 # util-linux ionice; GNU time; GNU findutils 4.9.0 xargs, whose -e, -i, -l, --eof, --replace and
 # --max-lines take only a glued optional value, as `xargs --max-lines 1 echo` running `1` showed;
-# sudo, where a bare -h is --help; the doas(1) synopsis on man.openbsd.org; bash `help exec`).
-# Other options are boolean.
+# sudo, where a bare -h is --help; the doas(1) synopsis on man.openbsd.org; bash `help exec`) and, from
+# 2026-09-29, systemd-run (below). Other options are boolean.
 WRAPPER_VALUE_FLAGS = {
     "nice": {"-n", "--adjustment"},
     "ionice": {"-c", "-n", "-p", "-P", "-u", "--class", "--classdata", "--pid", "--pgid", "--uid"},
@@ -155,6 +158,19 @@ WRAPPER_VALUE_FLAGS = {
              "--prompt", "--chroot", "--role", "--command-timeout", "--type", "--other-user", "--user"},
     "doas": {"-a", "-C", "-u"},
     "exec": {"-a"},
+    # systemd-run(1), read 2026-09-29 from the option table of src/run/run.c at systemd v255 (getopt string
+    # "+hrH:M:E:p:tPqGdSu:": the leading `+` ends the options at the first word that is no option): -H, -M, -E, -p, -u
+    # and these long options take a value; --user --system --scope --no-block --wait --pty --pipe --quiet --collect
+    # --same-dir --shell --slice-inherit --send-sighup --remain-after-exit --no-ask-password and the two --on-*-change
+    # switches do not. The tail adds the value options that v256 to v258 gained (--capsule/-C, --background, --json,
+    # --job-mode, --output, --root-directory), so a newer host's `--background red cat F` still finds its command.
+    "systemd-run": {
+        "-u", "-p", "-E", "-H", "-M", "-C",
+        "--unit", "--property", "--setenv", "--host", "--machine", "--description", "--slice", "--uid", "--gid",
+        "--nice", "--working-directory", "--service-type", "--expand-environment", "--on-active", "--on-boot",
+        "--on-startup", "--on-unit-active", "--on-unit-inactive", "--on-calendar", "--timer-property",
+        "--path-property", "--socket-property",
+        "--capsule", "--background", "--json", "--job-mode", "--output", "--root-directory"},
 }
 SHELLS = {"sh", "bash", "zsh", "dash", "ksh"}
 SOURCERS = {".", "source"}
@@ -257,6 +273,8 @@ HINTS = {
                                   "environment; run a client that reads the variable itself, without naming it",
     "environment_dump_in_keyring_exec": "the command that kernel_keyring.py exec starts holds the key in "
                                         "its environment",
+    "secret_variable_on_command_line": "systemd-run records its command line in the journal and sends the "
+                                       "unit's environment settings over the user bus",
 }
 
 
@@ -312,27 +330,47 @@ def command_arguments(words: list[str]) -> list[str]:
     return result
 
 
-def skip_wrapper_options(words: list[str], index: int, wrapper: str) -> int:
-    """Index of the first word after a launcher's own options, as getopt reads them: `--` ends them;
-    in a cluster of short options (`-iu`) the first that takes a value takes the rest of the cluster
-    (`-o0`) or, when it ends the cluster, the next word (`-o 0`, `nice -n 10`, `sudo -u root`)."""
+def wrapper_options(words: list[str], index: int, wrapper: str) -> tuple[list[tuple[str, str | None]], int]:
+    """A launcher's own options from words[index:], as getopt reads them, and the index of the first word after
+    them: `--` ends them; in a cluster of short options (`-iu`) the first that takes a value takes the rest of the
+    cluster (`-o0`) or, when it ends the cluster, the next word (`-o 0`, `nice -n 10`, `sudo -u root`). Each option
+    comes back as (name, value): `--unit=x` and `--unit x` are ("--unit", "x"), `-EFOO` and `-E FOO` are ("-E", "FOO"),
+    a boolean option has the value None, and so does a value option with no word left."""
     value_flags = WRAPPER_VALUE_FLAGS.get(wrapper, set())
+    options: list[tuple[str, str | None]] = []
     while index < len(words):
         word = words[index]
         if word == "--":
-            return index + 1
+            return options, index + 1
         if not word.startswith("-") or word == "-":
-            return index
+            return options, index
         index += 1
         if word.startswith("--"):
-            takes_next = word in value_flags
+            name, glued, value = word.partition("=")
+            if glued:
+                options.append((name, value))
+            elif word in value_flags:
+                options.append((word, words[index] if index < len(words) else None))
+                index += 1
+            else:
+                options.append((word, None))
         else:
             letters = word[1:]
             first = next((at for at, letter in enumerate(letters) if f"-{letter}" in value_flags), None)
-            takes_next = first == len(letters) - 1
-        if takes_next:
-            index += 1
-    return index
+            options.extend((f"-{letter}", None) for letter in letters[:first])
+            if first is not None:
+                glued = letters[first + 1:]
+                if glued:
+                    options.append((f"-{letters[first]}", glued))
+                else:
+                    options.append((f"-{letters[first]}", words[index] if index < len(words) else None))
+                    index += 1
+    return options, index
+
+
+def skip_wrapper_options(words: list[str], index: int, wrapper: str) -> int:
+    """Index of the first word after a launcher's own options (wrapper_options)."""
+    return wrapper_options(words, index, wrapper)[1]
 
 
 def strip_prefix(words: list[str]) -> list[str]:
@@ -372,6 +410,34 @@ def env_command_start(words: list[str]) -> int | None:
         else:
             return index
     return None
+
+
+def environment_assignments(payload: str) -> list[str]:
+    """The `NAME=value` items of a systemd `Environment=` value: separated by whitespace, each optionally quoted."""
+    try:
+        return shlex.split(payload)
+    except ValueError:
+        return payload.split()
+
+
+def systemd_run_sets_secret(words: list[str]) -> bool:
+    """Whether a systemd-run command line names a secret variable (SECRET_NAMES) among the variables it sets for
+    the unit it starts, with or without a value: `-E NAME[=VALUE]`, `--setenv NAME[=VALUE]` (systemd-run(1) 255:
+    without a value, the caller's own value is used) or `-p`/`--property` `Environment=NAME=VALUE ...`. The command
+    line lands in the journal (`_CMDLINE`) and the unit's properties travel over the bus, so a value placed there is
+    recorded twice. The variable's NAME is read, not any text that spells one: `-E LABEL=APCA_API_KEY_ID` sets LABEL."""
+    for name, value in wrapper_options(words, 1, "systemd-run")[0]:
+        if value is None:
+            continue
+        if name in {"-E", "--setenv"}:
+            assignments = [value]
+        elif name in {"-p", "--property"} and value.lower().startswith("environment="):
+            assignments = environment_assignments(value.partition("=")[2])
+        else:
+            continue
+        if any(assignment.partition("=")[0] in SECRET_NAMES for assignment in assignments):
+            return True
+    return False
 
 
 def shell_parts(words: list[str]) -> tuple[bool, str | None]:
@@ -450,7 +516,8 @@ def rtk_command(words: list[str]) -> list[str]:
 
 def expand(command: str, depth: int = 0) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
-    command that a keyring exec starts and of the command an `rtk` invocation runs."""
+    command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
+    `systemd-run` starts (the segment of systemd-run itself stays in the result, for the rule on its options)."""
     result: list[list[str]] = []
     for raw in segments(tokenize(command)):
         words = strip_prefix(raw)
@@ -465,6 +532,9 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
                 continue
             if program == "rtk":
                 words = strip_prefix(rtk_command(words))
+                continue
+            if program == "systemd-run":
+                words = strip_prefix(words[skip_wrapper_options(words, 1, program):])
                 continue
             started = keyring_exec(words)
             if started is not None:
@@ -732,6 +802,8 @@ def segment_reason(words: list[str]) -> str | None:
     program = program_of(words)
     if is_environment_dump(words):
         return "environment_dump"
+    if program == "systemd-run" and systemd_run_sets_secret(words):
+        return "secret_variable_on_command_line"
     if prints_helper_credential(words) or tvly_prints_key(words):
         return "native_token_print"
     if program == "keyctl" and keyctl_reads_payload(words):
