@@ -4,8 +4,12 @@ import base64
 import copy
 import importlib.util
 import json
+import os
 from pathlib import Path
+import re
+import shutil
 import sqlite3
+import subprocess
 import tempfile
 import unittest
 
@@ -778,6 +782,91 @@ class LedgerContract(unittest.TestCase):
                 self.assertNotIn("client_visible",latest["metrics"])
                 self.assertTrue(any(i.startswith(expected) for i in issues),issues)
                 self.assertFalse(any(i.startswith("rtk-global:") for i in issues),issues)
+
+REPOSITORY=Path(__file__).resolve().parents[2]
+# The qualified gpt-tokenizer release (evidence/receipts/gpt-tokenizer-400-qualification-20260929.json)
+# and the release it replaced. A bump changes these, every site below and a new qualification.
+PINNED_TOKENIZER="4.0.0"
+PREVIOUS_TOKENIZER="3.4.0"
+VERSION=r"(\d+\.\d+\.\d+)"
+# Every site that names the pinned version. The two guards do not contain the package
+# name, so a bump found by searching for "gpt-tokenizer" alone misses them.
+PIN_SITES=(
+    ("tools/token-report/token_manifest.py","count_files error message",r"explicit gpt-tokenizer "+VERSION+r" o200k_base module path"),
+    ("tools/token-report/token_manifest.py","count_files guard",r"pkg\.version!=='"+VERSION+r"'"),
+    ("scripts/recount-tokens.cjs","install comment",r"Install upstream gpt-tokenizer@"+VERSION+r" into"),
+    ("scripts/recount-tokens.cjs","prefix error message",r"containing gpt-tokenizer@"+VERSION+r"\."),
+    ("scripts/recount-tokens.cjs","guard",r"if \(version !== '"+VERSION+r"'\)"),
+    ("scripts/recount-tokens.cjs","guard error message",r"Expected tokenizer"+VERSION+r", found"),
+    ("README.md","install line",r"npm install --prefix \.runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@"+VERSION+r"\n"),
+    ("tools/token-report/README.md","install line",r'npm install --prefix "\$REPORT_TOOLS/tokenizer" --ignore-scripts --no-audit --no-fund gpt-tokenizer@'+VERSION+r"\n"),
+    ("tools/token-report/token_manifest.full.html.in","report label",r"gpt-tokenizer "+VERSION+r" / o200k_base"),
+)
+
+def tokenizer_pin_sites(root):
+    """Each pinned-version site under root with every version its pattern finds there."""
+    return [(relative,site,re.findall(pattern,(Path(root)/relative).read_text(encoding="utf-8")))
+            for relative,site,pattern in PIN_SITES]
+
+class TokenizerPin(unittest.TestCase):
+    def node(self):
+        node=shutil.which("node")
+        self.assertIsNotNone(node,"Node is required to check the exact-count tokenizer guards")
+        return node
+
+    def fake_tokenizer(self,prefix,version):
+        """An npm prefix holding a stand-in gpt-tokenizer whose encode returns one token per code point."""
+        package=prefix/"node_modules"/"gpt-tokenizer"
+        (package/"cjs"/"encoding").mkdir(parents=True)
+        (package/"package.json").write_text(json.dumps({"name":"gpt-tokenizer","version":version,
+            "exports":{"./package.json":"./package.json","./*":{"require":"./cjs/*.js"}}}))
+        module=package/"cjs"/"encoding"/"o200k_base.js"
+        module.write_text("exports.encode=s=>Array.from(s);\n")
+        return module
+
+    def test_every_pinned_version_site_names_the_qualified_version(self):
+        sites=tokenizer_pin_sites(REPOSITORY)
+        summary={relative+" ("+site+")":versions for relative,site,versions in sites}
+        for relative,site,versions in sites:
+            with self.subTest(path=relative,site=site):
+                self.assertEqual(versions,[PINNED_TOKENIZER],summary)
+
+    def test_count_files_accepts_only_the_pinned_tokenizer_version(self):
+        node=self.node()
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            sample=root/"sample.txt"
+            text="héllo wörld \U0001f600\n"
+            sample.write_bytes(text.encode("utf-8"))
+            pinned=self.fake_tokenizer(root/"pinned",PINNED_TOKENIZER)
+            counted=m.count_files({"node":node,"tokenizer_module":str(pinned)},[sample])
+            self.assertEqual([(c["tokens"],c["bytes"]) for c in counted],[(len(text),len(text.encode("utf-8")))])
+            previous=self.fake_tokenizer(root/"previous",PREVIOUS_TOKENIZER)
+            with self.assertRaises(subprocess.CalledProcessError) as caught:
+                m.count_files({"node":node,"tokenizer_module":str(previous)},[sample])
+            self.assertIn("Pinned tokenizer version mismatch",caught.exception.stderr)
+
+    def test_recount_script_accepts_only_the_pinned_tokenizer_version(self):
+        node=self.node()
+        script=REPOSITORY/"scripts"/"recount-tokens.cjs"
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            self.fake_tokenizer(root/"pinned",PINNED_TOKENIZER)
+            self.fake_tokenizer(root/"previous",PREVIOUS_TOKENIZER)
+            def run(prefix):
+                return subprocess.run([node,str(script)],cwd=REPOSITORY,capture_output=True,text=True,timeout=60,
+                                      env={**os.environ,"TOKENIZER_PREFIX":str(prefix)})
+            accepted=run(root/"pinned")
+            self.assertEqual(accepted.returncode,0,accepted.stderr)
+            report=json.loads(accepted.stdout)
+            self.assertEqual(report["version"],PINNED_TOKENIZER)
+            self.assertEqual(len(report["counts"]),2)
+            for count in report["counts"]:
+                text=(REPOSITORY/count["file"]).read_bytes().decode("utf-8")
+                self.assertEqual(count["tokens"],len(text),count["file"])
+            rejected=run(root/"previous")
+            self.assertNotEqual(rejected.returncode,0)
+            self.assertIn("found "+PREVIOUS_TOKENIZER,rejected.stderr)
 
 if __name__=="__main__":
     unittest.main()

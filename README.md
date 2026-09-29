@@ -257,7 +257,7 @@ local embedding-backend steps on macOS remain unrun outside that hosted runner
 To reproduce the public text measurement with the same upstream tokenizer:
 
 ```bash
-npm install --prefix .runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@3.4.0
+npm install --prefix .runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@4.0.0
 TOKENIZER_PREFIX="$PWD/.runtime/tokenizer" node scripts/recount-tokens.cjs
 ```
 

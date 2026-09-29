@@ -203,7 +203,7 @@ hook metadata. Both default to false and are unnecessary for counters.
 Install the pinned tokenizer only if you need retained-text comparisons:
 
 ```sh
-npm install --prefix "$REPORT_TOOLS/tokenizer" gpt-tokenizer@3.4.0
+npm install --prefix "$REPORT_TOOLS/tokenizer" --ignore-scripts --no-audit --no-fund gpt-tokenizer@4.0.0
 ```
 
 Set `tokenizer_module` in the private configuration to the absolute path of

@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "id": "gpt-tokenizer-400-qualification-20260929",
+  "kind": "artifact_measurement",
+  "recorded_at_utc": "2026-09-29T03:38:28Z",
+  "catalog_revision": "b0fb65b425ce04996a1a516929858e151e908674",
+  "claim": "On host nativestack-5975wx-20260925, gpt-tokenizer 4.0.0 was qualified to replace the pinned 3.4.0 as the o200k_base counter behind this repository's exact-count instruments (tools/token-report/token_manifest.py count_files and compare, and scripts/recount-tokens.cjs). The Gate A condition was that o200k counts be identical on every retained artifact pair under both versions and that token_manifest.py compare output be unchanged; a scout passed it and an independent verifier reproduced every condition. All 47 distinct artifacts retained in the host's token-report ledger (25 comparison rows) counted identically under 3.4.0 and 4.0.0, with identical full token arrays, and equal to their recorded tokens (3,032,861 in total). Running token_manifest.py compare over all 25 retained pairs, once with the origin/main script on 3.4.0 and once with the same script changed only in its two version literals on 4.0.0, gave identical CLI output and ledger payloads for 25 of 25, and each comparison_id equalled its ledger row id. Special-token and edge-case probes behaved the same under both versions. The upstream suite at tag 4.0.0 exited 0: vp check found all 58 files formatted and no warnings, lint or type errors in 47, and vitest passed 6 of 6 test files and 1,376 of 1,376 tests. The pass covers default encode of encoding/o200k_base on UTF-8 text under Node v24.21.0.",
+  "limitations": [
+    "Scope: default encode of cjs/encoding/o200k_base.js, also reached as the gpt-tokenizer/encoding/o200k_base subpath, on UTF-8 text under Node v24.21.0. The allowedSpecial and disallowedSpecial modes were checked only on the 22 special-token literals. Model-name entry points (gpt-2 now maps to the new gpt2 encoding), o200k_harmony, gpt2 and the dist/ UMD bundles that 4.0.0 removed are not qualified.",
+    "The retained corpus contains no BOM, CRLF, special-token or non-UTF-8 text. Those cases rest on synthetic probes, 30,000 seeded random strings and 12,000 artifact-slice variants, which are randomized, not exhaustive.",
+    "Ledger comparison ids and payloads do not record the tokenizer version (the key is tool, the two sha256 values, encoding and boundary), so rows counted under 3.4.0 and 4.0.0 cannot be told apart. That is safe only because the counts are identical; every future bump must be re-qualified the same way.",
+    "The version guards at tools/token-report/token_manifest.py L162 and scripts/recount-tokens.cjs L14 do not contain the string 'gpt-tokenizer'. A bump found only by searching for the package name misses them and leaves the new version rejected with 'Pinned tokenizer version mismatch'.",
+    "The upstream suite ran the tag's source, not the published 4.0.0 tarball, because CI's 'vp run build' step was not run; its other deviations are in data.upstream_suite.deviations. The verifier's re-run reused the scout's yarn install. The published tarballs were covered by the differential checks instead.",
+    "Registry integrity (npm view dist.integrity against the package-lock) was checked by the scout only; the verifier re-read the scout's retained output and did not query the registry. Hashes, integrity values and commit ids in data are prefixes as the gate results recorded them: 16 hex characters for file sha256 values and the upstream clone head, 16 characters after 'sha512-' for integrity values, 12 for the task base, 8 for the scout's origin/main and 16 for the verifier's. catalog_revision is the full 40-character commit.",
+    "4.0.0 is a full toolchain rebuild: of 1,348 files in the 3.4.0 package, 1,145 changed, and 4.0.0 adds 380 files and drops 191, including the dist/ UMD bundles and the shipped test files. Behavior was equal on everything tested, but the changed surface is large.",
+    "Under both versions BPE slows sharply on long unspaced CJK or emoji text: a 60,000-character CJK chunk took about 7.6 s under 3.4.0 and 6.3 s under 4.0.0. count_files counts every path in one node call with a 30 s timeout, so inputs like that could time out under either version.",
+    "blueprints/us-equities/research-runtime/measure_packet.cjs was not exercised because it needs a LEAN results input; it keeps its 3.4.0 pin together with its dated receipt.",
+    "At qualification the host's private token-report configuration pointed at a 3.4.0 package. Once the 4.0.0 pin lands, count_files rejects that installation with 'Pinned tokenizer version mismatch' until the host installation is switched to 4.0.0; this receipt records no host installation change.",
+    "The host's token-report-refresh.service rewrote the real state directory during the verification (2026-09-29T03:09:02Z to 03:09:37Z per journalctl): new captures, ledger snapshots and native events, and one comparison's last_seen. The scout's own no-writes check for its session could not be repeated.",
+    "The upstream release notes and the 3.4.0...4.0.0 comparison were read over the network with gh because the scratch upstream clone was shallow and lacked tag 3.4.0; that part is source reading, not execution.",
+    "The scout's exact counts for its BOM, 200,000-character and CJK probes could not be checked because its probe strings were not retained; the verifier's own probes reproduced its same-result verdicts with different strings and counts.",
+    "gpt-tokenizer is not a manifests/stack.json component, so this receipt names no component_ids and has no manifests/evidence.json receipts[] entry; it is registered in files[] only."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the host's private token-report ledger opened read-only, scratch npm prefixes of both tokenizer versions and a scratch upstream clone"
+  },
+  "data": {
+    "observed": "The scout ran first and the verifier's run overlapped 2026-09-29T03:09Z (its journalctl reference); the gate results record no start times.",
+    "package": "gpt-tokenizer",
+    "repository": "https://github.com/niieani/gpt-tokenizer",
+    "previous_version": "3.4.0",
+    "version": "4.0.0",
+    "scope": "default encode of encoding/o200k_base on UTF-8 text, Node v24.21.0",
+    "host_tools": "node v24.21.0, npm 11.19.0, python 3.13.15",
+    "gate": {
+      "condition": "Land only if o200k counts are identical on every retained artifact pair under both versions and token_manifest.py compare output is unchanged.",
+      "scout": "pass",
+      "verifier": "pass; every condition reproduced independently, no scout claim refuted, two not checkable (the scout's exact probe counts and the registry integrity check)",
+      "source": "the Gate A owner's gate results (scout and verifier sections), kept in <scratch> and not committed; this receipt summarizes them"
+    },
+    "revisions": {
+      "task_base_prefix": "11648f9a9d90",
+      "scout_origin_main_prefix": "76183fc9",
+      "verifier_origin_main_prefix": "b0fb65b425ce0499",
+      "result": "11648f9a is an ancestor of origin/main (merge-base --is-ancestor exit 0). git diff --quiet on tools/token-report/token_manifest.py exited 0 for 11648f9a..origin/main, HEAD..origin/main and the worktree. git grep -n gpt-tokenizer outside evidence/ and catalogs/ gave the same 38 hits in 24 files at 11648f9a and at origin/main."
+    },
+    "installs": {
+      "evidence_class": "published npm package metadata and file hashes",
+      "command": "npm install --prefix <scratch>/tok340 (and <scratch>/tok400) --ignore-scripts --no-audit --no-fund gpt-tokenizer@VERSION through rtk proxy, with the npm cache redirected to scratch; exit 0 for both ('added 1 package')",
+      "3.4.0": {
+        "package_version": "3.4.0",
+        "integrity_prefix": "sha512-wxFLnhIXTDjYebd9",
+        "o200k_cjs_sha256_prefix": "6bf087e75b6334a7"
+      },
+      "4.0.0": {
+        "package_version": "4.0.0",
+        "integrity_prefix": "sha512-YAWIyzvuVUHEfW7t",
+        "o200k_cjs_sha256_prefix": "51ad895a49b5acb3"
+      },
+      "registry_check": "Scout: npm view dist.integrity (exit 0 each) equals the prefix package-lock integrity for both versions. Verifier: re-read the scout's retained output only (equal for both, empty stderr files); no registry query.",
+      "layout": "Neither package has dependencies. cjs/encoding/o200k_base.js exists in both and its ../../package.json is the package's own package.json. gpt-tokenizer/encoding/o200k_base resolves to cjs/encoding/o200k_base.js in both (7 export keys each, engines null). 4.0.0's cjs/encoding adds gpt2.js, gpt2.d.ts and gpt2.js.map (7 .js files versus 6)."
+    },
+    "retained_corpus": {
+      "evidence_class": "read-only inspection of the host's retained token-report ledger (sqlite mode=ro)",
+      "comparison_rows": 25,
+      "artifact_records": 50,
+      "distinct_artifacts": 47,
+      "encodings": {
+        "o200k_base": 25
+      },
+      "locations": "41 in the state directory's artifacts/ and 6 in its captures/; all 47 exist and verify sha256 and bytes; 0 unreferenced files in artifacts/",
+      "features": "BOM 0, CRLF 0, lone CR 0, special-token literal 0, '<|' 0, NUL 0, non-UTF-8 0; 18 contain non-ASCII text",
+      "size_bytes": {
+        "min": 801,
+        "max": 1506957
+      },
+      "recorded_token_values_per_artifact": 1
+    },
+    "recount": {
+      "evidence_class": "our differential check: this repository's instrument read path run on both published packages",
+      "scout": "Own node script on count_files' read path (TextDecoder('utf-8', {fatal: true}) decode, require(module).encode, length): 47 of 47 ok under both versions, 47 identical, 0 differences between versions and 0 mismatches against the recorded tokens; runs took 1.5 s and 1.6 s.",
+      "verifier_instrument": "count_files from the origin/main script on 3.4.0 and from the script with only its version literals changed on 4.0.0: tokens, sha256 and bytes equal to the recorded values for 47 of 47 under each, no mismatches (1.59 s and 1.53 s).",
+      "verifier_token_arrays": "Own tokdiff.cjs: full token arrays identical between versions for 47 of 47; counts equal to recorded for 47 under both; decode round-trip exact for 47 under both.",
+      "total_recorded_tokens": 3032861,
+      "total_4_0_0_tokens": 3032861,
+      "total_bytes": 11212035,
+      "differing_counts": 0
+    },
+    "compare_parity": {
+      "evidence_class": "our differential check: the instrument's compare CLI end to end",
+      "scripts": "tm_340.py is origin/main's tools/token-report/token_manifest.py (848 lines, sha256 prefix 1363de9d62fe7286). tm_400.py changes only the '3.4.0' literal on L161 (error message) and L162 (JS guard); native diff exited 1 with hunk 161,162c161,162. The verifier's independent rebuild is byte-identical (sha256 prefix b8751978434b515a).",
+      "method": "Each script ran against its own scratch state directory and scratch config (init-config, then tokenizer_module and node set). CLI output and scratch ledger payloads were compared field by field with timestamps ignored and path values reduced to basenames.",
+      "scout": "25 of 25 retained pairs run with identical fields. comparison_id equalled the ledger row id, and baseline and candidate tokens and tokens_removed equalled the recorded values, for 25 of 25 under both scripts. Both scratch ledgers held 29 identical rows (25 retained plus 4 successful synthetic pairs).",
+      "verifier": "Fresh init-config per script; compare exited 0 for 25 of 25 under each. CLI JSON was identical for 25 of 25, and per field for baseline, candidate, comparison_id, provider_tokens_saved, semantic_acceptance and tokens_removed (25 each). Scratch ledger payloads were identical for 25 of 25 and matched the real rows on tool, encoding, boundary, tokens_removed and sha256, bytes and tokens.",
+      "extremes": "largest pair 1,632,844 bytes (505,768 and 29,471 tokens) and smallest 9,800 bytes (1,642 and 907 tokens), equal under both",
+      "synthetic_pairs": "Scout only: BOM, LF versus CRLF, empty and CJK plus emoji pairs gave identical payloads; a pair containing special-token text failed identically under both scripts (rc 1, CalledProcessError). These are synthetic pairs, not retained ones."
+    },
+    "guard_controls": {
+      "evidence_class": "our differential check",
+      "result": "count_files with a matching script and package (3.4.0 with 3.4.0, 4.0.0 with 4.0.0) counted 204 tokens on the smallest artifact; the crossed pairs failed with rc 1 and 'Pinned tokenizer version mismatch'. Scout and verifier agree. The verifier also found that with no module set, each script's ValueError names its own version."
+    },
+    "other_instruments": {
+      "evidence_class": "our differential check",
+      "recount_tokens_cjs": "Verifier: copies of origin/main scripts/recount-tokens.cjs, one with the pin changed to 4.0.0, printed 'identical except version: True' in all three modes: default [2730, 491], --observability [188769, 500] and --catalog [6398, 490]. The unchanged 3.4.0 pin run against the 4.0.0 package failed with rc 1 and 'Expected tokenizer3.4.0, found 4.0.0'.",
+      "measure_packet_cjs": "not exercised; it needs a LEAN results input"
+    },
+    "tables": {
+      "evidence_class": "our differential check: tables loaded from both installed packages and hashed",
+      "in_memory_tables": "Hash-identical between versions: rank decoder n=199998, string encoder n=198427, non-UTF decoder and encoder n=1571, tokenSplitRegex, and 8 special tokens with ids 199999-200006. All 199998 tiktoken ranks decode the same and 198436 valid-UTF-8 token strings encode the same.",
+      "model_maps": "modelToEncodingMap: 59 unchanged common keys plus gpt2 and gpt-2; chatModelParams: 82 unchanged plus 36; DEFAULT_ENCODING unchanged."
+    },
+    "probes": {
+      "evidence_class": "synthetic probe",
+      "special_token_literals": "Scout: 770 (3.4.0) and 984 (4.0.0) .js/.cjs/.mjs/.json/.d.ts package files scanned; the same 22 <|...|> literals in both, none in only one version. Each was tested as 'a <tok> b' with default encode: 8 throw and 14 count under both, 0 differ. Verifier: the same, and also 22 of 22 the same with 0 throwing under allowedSpecial 'all' and under an empty disallowedSpecial. The 8 that throw under default encode are <|endofprompt|>, <|endoftext|>, <|fim_middle|>, <|fim_prefix|>, <|fim_suffix|>, <|im_end|>, <|im_sep|> and <|im_start|>.",
+      "named_probes_scout": [
+        {"probe": "text containing <|endoftext|>", "3.4.0": "Error: Disallowed special token found: <|endoftext|>", "4.0.0": "Error: Disallowed special token found: <|endoftext|>"},
+        {"probe": "text containing <|endofprompt|>", "3.4.0": "Error: Disallowed special token found: <|endofprompt|>", "4.0.0": "Error: Disallowed special token found: <|endofprompt|>"},
+        {"probe": "text containing <|im_start|>", "3.4.0": "Error: Disallowed special token found: <|im_start|>", "4.0.0": "Error: Disallowed special token found: <|im_start|>"},
+        {"probe": "text containing <|fim_prefix|>", "3.4.0": "Error: Disallowed special token found: <|fim_prefix|>", "4.0.0": "Error: Disallowed special token found: <|fim_prefix|>"},
+        {"probe": "text containing <|im_end|>", "3.4.0": "Error: Disallowed special token found: <|im_end|>", "4.0.0": "Error: Disallowed special token found: <|im_end|>"},
+        {"probe": "text containing <|fim_middle|>", "3.4.0": "Error: Disallowed special token found: <|fim_middle|>", "4.0.0": "Error: Disallowed special token found: <|fim_middle|>"},
+        {"probe": "text containing <|fim_suffix|>", "3.4.0": "Error: Disallowed special token found: <|fim_suffix|>", "4.0.0": "Error: Disallowed special token found: <|fim_suffix|>"},
+        {"probe": "unterminated '<|endoftext'", "3.4.0": "count=7", "4.0.0": "count=7"},
+        {"probe": "non-special '<|foo|>'", "3.4.0": "count=7", "4.0.0": "count=7"},
+        {"probe": "plain text", "3.4.0": "count=10", "4.0.0": "count=10"},
+        {"probe": "empty string", "3.4.0": "count=0", "4.0.0": "count=0"},
+        {"probe": "UTF-8 BOM as a U+FEFF character prefix", "3.4.0": "count=7", "4.0.0": "count=7"},
+        {"probe": "UTF-8 BOM bytes decoded by TextDecoder (count_files path, BOM stripped)", "3.4.0": "count=5", "4.0.0": "count=5"},
+        {"probe": "CRLF line endings", "3.4.0": "count=9", "4.0.0": "count=9"},
+        {"probe": "200000-character repetitive ASCII", "3.4.0": "count=46512", "4.0.0": "count=46512"},
+        {"probe": "long non-ASCII CJK plus emoji", "3.4.0": "count=98001", "4.0.0": "count=98001"}
+      ],
+      "named_probes_verifier": "32 of 32 identical token arrays, including byte-identical 'Disallowed special token found' errors. Counts: unterminated 7/7, <|foo|> 7/7, plain text 10/10, empty 0/0, CRLF 9/9, BOM kept 5/5, BOM stripped by a fatal TextDecoder 3/3, NFD 10/10, lone surrogate 3/3, 200,000-character ASCII 42,858/42,858, CJK plus emoji 161,973/161,973.",
+      "randomized": "Verifier: seeded fuzz, 30,000 cases identical (14,983,340 characters; both versions threw on the same 2). Artifact slices in plain, CRLF, BOM-prefixed and NFD variants: 12,000 cases identical (31,432,929 characters)."
+    },
+    "upstream_suite": {
+      "evidence_class": "unchanged upstream test",
+      "repository": "https://github.com/niieani/gpt-tokenizer",
+      "tag": "4.0.0 (git describe --tags --exact-match)",
+      "clone_head_prefix": "fb04ebca53f66220",
+      "package_manager": "yarn@4.18.0 (packageManager field) with yarn.lock (Yarn Berry, __metadata version 10), corepack 0.36.0",
+      "node": "v24.21.0",
+      "command": "corepack yarn install --immutable, then corepack yarn test (package.json scripts.test = 'vp check && vp test', unchanged); both exit 0",
+      "exit_code": 0,
+      "scout_result": "vp check: all 58 files correctly formatted; no warnings, lint errors or type errors in 47 files. vitest v4.1.10: Test Files 6 passed (6), Tests 1376 passed (1376), 0 failed; duration 10.56 s, wall 15 s.",
+      "verifier_result": "rtk proxy corepack yarn test on the same clone, reusing the scout's install (not re-run), with caches in scratch, COREPACK_ENABLE_NETWORK=0 and YARN_ENABLE_TELEMETRY=0: exit 0, wall 17 s; all 58 files correctly formatted; no warnings, lint errors or type errors in 47 files; Test Files 6 passed (6); Tests 1376 passed (1376); duration 12.06 s; 0 tracked changes after the run.",
+      "deviations": [
+        "Invoked as 'corepack yarn' because yarn is not on PATH; no 'corepack enable' and no global install was done.",
+        "Installed with 'yarn install --immutable', the Yarn 4 equivalent of --frozen-lockfile. The upstream AGENTS.md's 'vp install --frozen-lockfile' was not usable because vp is not on PATH before install, and installing it would be a host install.",
+        "Corepack, yarn and npm caches were redirected to scratch directories (COREPACK_HOME, YARN_GLOBAL_FOLDER, npm_config_cache, XDG_*). The install and the corepack yarn download used the network.",
+        "The upstream repository's .yarnrc.yml sets enableScripts: true, so dependency install scripts ran; the two tokenizer npm installs used --ignore-scripts.",
+        "Yarn emitted YN0086 (peer dependencies incorrectly met by dependencies) and finished 'Done with warnings'.",
+        "CI's 'vp run build' step was not run, so the suite exercised the tag's source, not the published 4.0.0 tarball.",
+        "The upstream AGENTS.md L10 says tests or internet commands need escalated permissions; the sandbox was not overridden, and no network-dependent test skipped or failed."
+      ]
+    },
+    "upstream_changes": {
+      "evidence_class": "upstream release-note and source review over the network with gh; no execution",
+      "commands": "gh release view 4.0.0 --repo niieani/gpt-tokenizer and gh api repos/niieani/gpt-tokenizer/compare/3.4.0...4.0.0, rc 0 each",
+      "commits_3_4_0_to_4_0_0": 14,
+      "release_notes": "'build!: migrate toolchain to Vite+' (BREAKING: UMD bundles and the unpkg global entry point are removed); a fix restoring Harmony submodule metadata; features: GPT-2 tokenizer support, gpt-5-nano price data and model-catalog automation.",
+      "source_diffs": "Only eslint comments were removed in BytePairEncodingCore.ts (-6), GptEncoding.ts (-6), utfUtil.ts (-4), encoding/o200k_base.ts (-2) and encodingParams/o200k_base.ts (-1). src/bpeRanks/o200k_base.js swaps 'prettier-ignore' for 'oxfmt-ignore'. mapping.ts adds gpt2.",
+      "conclusion": "No change was found that could alter default-encode counts for encoding/o200k_base. Only callers of the new model names (gpt-2 now maps to gpt2) or of the removed dist/ UMD bundles are affected, and none of this repository's instruments use them."
+    },
+    "runtime": {
+      "evidence_class": "our differential check: timing on this host",
+      "compare_25_pairs_wall_s": {
+        "scout": {"3.4.0": 8.9, "4.0.0": 9.1},
+        "verifier": {"3.4.0": 9.0, "4.0.0": 9.1}
+      },
+      "max_pair_s": "0.60 versus 0.57 (scout) and 0.56 each (verifier), against count_files' 30 s timeout",
+      "single_process_ms_3_4_0_versus_4_0_0": {
+        "all 47 artifacts": [1274, 1267],
+        "largest artifact": [188, 205],
+        "one CJK chunk of 20000 characters": [728, 720],
+        "one CJK chunk of 60000 characters": [7586, 6277],
+        "30000-letter [a-z] run": [235, 231],
+        "20000-emoji run": [2088, 2280]
+      },
+      "counts": "identical in every timing case"
+    }
+  }
+}

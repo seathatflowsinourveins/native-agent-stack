@@ -158,8 +158,8 @@ def capture(argv,cwd,root,label,timeout=60):
 
 def count_files(config,paths):
     if not config.get("tokenizer_module"):
-        raise ValueError("Exact comparisons require an explicit gpt-tokenizer 3.4.0 o200k_base module path")
-    code="const fs=require('fs'),path=require('path');const pkg=JSON.parse(fs.readFileSync(path.resolve(path.dirname(process.argv[1]),'../../package.json'),'utf8'));if(pkg.version!=='3.4.0')throw Error('Pinned tokenizer version mismatch');const {encode}=require(process.argv[1]);process.stdout.write(JSON.stringify(process.argv.slice(2).map(p=>encode(new TextDecoder('utf-8',{fatal:true}).decode(fs.readFileSync(p))).length)));"
+        raise ValueError("Exact comparisons require an explicit gpt-tokenizer 4.0.0 o200k_base module path")
+    code="const fs=require('fs'),path=require('path');const pkg=JSON.parse(fs.readFileSync(path.resolve(path.dirname(process.argv[1]),'../../package.json'),'utf8'));if(pkg.version!=='4.0.0')throw Error('Pinned tokenizer version mismatch');const {encode}=require(process.argv[1]);process.stdout.write(JSON.stringify(process.argv.slice(2).map(p=>encode(new TextDecoder('utf-8',{fatal:true}).decode(fs.readFileSync(p))).length)));"
     out=subprocess.run([config["node"],"-e",code,config["tokenizer_module"]]+[str(p) for p in paths],capture_output=True,text=True,timeout=30,check=True)
     values=json.loads(out.stdout)
     return [artifact(p,n) for p,n in zip(paths,values)]
