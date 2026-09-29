@@ -417,9 +417,10 @@ BLOCKED = {
     "systemd-run --user --pipe rtk proxy cat .env": "dotenv_read",
     "bash -c 'systemd-run --user --pipe printenv'": "environment_dump",
     # A secret variable name on the command line, with or without a value, through -E/--setenv or -p/--property
-    # Environment=: a transient unit's description defaults to its command line, which the manager logs once in the user journal
-    # (`Started <unit> - <command line>`, the MESSAGE field, measured on systemd 255.4 on 2026-09-29; not _CMDLINE), and the unit's
-    # properties travel over the user bus.
+    # Environment=. Such a value is in the process listing of the systemd-run process while it runs (/proc/PID/cmdline) and in the
+    # transient unit's Environment property on the user bus (`systemctl --user show -p Environment UNIT`); it is not in the journal, whose
+    # `Started <unit> - <description>` line holds the started command and its arguments after the options (systemd v255, src/run/run.c:
+    # `quote_command_line(arg_cmdline)`, read 2026-09-29).
     "systemd-run --user --setenv=APCA_API_SECRET_KEY=abc /bin/true": "secret_variable_on_command_line",
     "systemd-run --user -E APCA_API_SECRET_KEY=abc /bin/true": "secret_variable_on_command_line",
     "systemd-run --user -E APCA_API_SECRET_KEY /bin/true": "secret_variable_on_command_line",
@@ -863,6 +864,13 @@ ALLOWED = [
     "echo $'a\\nb' $'\\'' # x",
     "ps -fu Eve",
     "ps -fu Eve -o pid,command",
+    # A DELIBERATE LOOSENING against the base guard (c26800f3), one of the two this work makes: `-u` takes a value, so the user name after it
+    # is no BSD flag cluster. The base guard read the name in `ps -fu steve` and `ps -fu eve` (letters of the cluster alphabet with an
+    # `e`) as a dashless `ps eww` and refused both (`ps -u steve` it passed). `ps eww` and `ps auxe` stay refused.
+    "ps -fu steve",
+    "ps -fu eve",
+    "ps -u steve",
+    "ps -u eve -o pid,command",
     "git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
     "git commit -m \"$(cat <<'EOF'\nGuard: `printenv` and `env`, the (printenv) form, `cat .env`, `grep -r APCA_API_KEY_ID`; strace -f is no longer used\nEOF\n)\"",
     "gh pr create --title t --body \"$(cat <<'EOF'\n## Summary\n\nprintenv is refused by the guard\nEOF\n)\"",
@@ -1986,6 +1994,20 @@ class SecretPathGuardTests(unittest.TestCase):
                         'timeout -s KILL 5 ls > /tmp/out', 'nice -n 5 ls 2> /tmp/err', 'env FOO=1 ls < input.txt', 'sudo -u root sort < input.txt'):
             with self.subTest(command=command):
                 self.assertIsNone(guard.check(command))
+
+    def test_the_systemd_run_hint_says_where_a_value_on_the_command_line_goes(self):
+        # systemd v255, src/run/run.c (read 2026-09-29): the description that the manager logs as `Started <unit> - <description>` defaults to
+        # the started command and its arguments after the options (`quote_command_line(arg_cmdline)`), so a `-E NAME=value` is not in the
+        # journal. It is in the command line of the systemd-run process, which the process listing shows while it runs, and in the transient
+        # unit's Environment property on the user bus (`systemctl --user show -p Environment UNIT`). The hint said the journal.
+        hint = guard.HINTS["secret_variable_on_command_line"]
+        self.assertNotIn("journal", hint)
+        self.assertIn("process listing", hint)
+        self.assertIn("user bus", hint)
+        self.assertIn("systemctl --user show -p Environment", hint)
+        # the rule itself is unchanged: a secret name on a systemd-run line is refused, and a name that only labels a value is not
+        self.assertEqual(guard.check("systemd-run --user -E APCA_API_SECRET_KEY=abc /bin/true"), "secret_variable_on_command_line")
+        self.assertIsNone(guard.check("systemd-run --user -E LABEL=APCA_API_KEY_ID /bin/true"))
 
     def test_a_here_document_terminated_by_a_joined_line_is_not_an_idiom(self):
         # The guard joins backslash-newline pairs, which in a quoted here-document are text: joining `text\` and `EOF` made one line

@@ -978,11 +978,16 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `credential_file_read`, `... printenv` and `systemd-cat printenv` an `environment_dump`. The trading lane's loader path
   (`systemd-run --user --unit=X --collect /bin/bash -ic 'exec python3 runner.py run --env-file "$PAPER_ENV_FILE_2"'`)
   still passes for both accounts. A secret variable name (any name in the guard's list), with or without a value, set
-  through `systemd-run`'s `-E`/`--setenv` or `-p Environment=...` is a `secret_variable_on_command_line`. Measured on
-  this host (systemd 255.4): a transient unit's description defaults to its command line, so the manager writes the line
-  `Started <unit> - <command line>` once into the user journal (its MESSAGE field, not `_CMDLINE`), and the unit's
-  properties travel over the user bus; `-E NAME` without a value forwards the caller's own value (`systemd-run(1)` 255).
-  Only the variable's name is read (`-E LABEL=APCA_API_KEY_ID` sets `LABEL`).
+  through `systemd-run`'s `-E`/`--setenv` or `-p Environment=...` is a `secret_variable_on_command_line`. Where such a
+  value goes (systemd v255, `src/run/run.c`, read 2026-09-29): into the command line of the `systemd-run` process itself,
+  which the process listing (`/proc/PID/cmdline`) shows while it runs, and into the transient unit's `Environment`
+  property, appended to the start message over the user bus (`arg_environment`), which `systemctl --user show -p
+  Environment UNIT` and any bus client read. Not into the journal, as an earlier version of this page said: the unit's
+  description, which the manager logs as `Started <unit> - <description>`, defaults to the started command and its
+  arguments after the options (`quote_command_line(arg_cmdline)`), so `-E NAME=value` is not in it, while a value written
+  after the command is (`systemd-run --user /bin/true APCA_API_SECRET_KEY=abc`, a recorded gap). `-E NAME` without a value
+  forwards the caller's own value (`systemd-run(1)` 255). Only the variable's name is read (`-E LABEL=APCA_API_KEY_ID`
+  sets `LABEL`).
 - **Command substitution inside double quotes is read.** The shell runs `$(...)` and a backquote pair inside a
   double-quoted word (Bash Reference Manual, "Command Substitution": `$` and the backquote keep their meaning inside
   double quotes), so `echo "$(printenv)"` dumps the environment, yet only the unquoted form was read. The body is now
@@ -1066,8 +1071,12 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   before the first option that takes a value (`ps -Ewwp 123`, `ps -p 123 -E`, `ps -A -E`) and dashless clusters with a
   capital `E` (`ps Eww`, `ps auxE`). `ps -ef`, `ps -o pid,command -p N`, `ps aux` and an `E` that is only a value pass:
   the word after a stand-alone value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to
-  it (`ps -uEve`); a dashed `-e` is every process. `-C` is a flag on macOS and takes a command name on procps, so a dashed
-  word with an `E` right after it (`ps -C -E`, `ps -CE`) is refused whichever host runs it, and `ps -CEmacs` with it.
+  it (`ps -uEve`); a dashed `-e` is every process. `ps -fu steve` and `ps -fu eve` pass too, a deliberate loosening
+  against the base guard (see the list below): `-u` takes a value, and the base guard read the user name as a BSD flag
+  cluster with an `e` and refused them. `-C` is a flag on macOS and takes a command name on procps, so a dashed
+  word with an `E` right after it (`ps -C -E`, `ps -CE`) is refused whichever host runs it, and `ps -CEmacs` with it, which
+  is friction: on procps `-C` takes a command name, so write `ps -C emacs`. The dashless cluster test is a set-membership
+  test (see the timeout item).
 - **`systemctl show-environment` and a bare `systemctl show` are environment dumps.** `show-environment` prints a
   service manager's whole environment block, "the environment block that is passed to all processes the manager spawns"
   (`systemctl(1)` 255), and `show` with no unit prints the manager's own properties, `Environment=` among them, so
@@ -1119,6 +1128,12 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took 0.6 s, and a hook that times out blocks nothing. The
   limit is low enough that both readings of a command always run inside the timeout, so no reading is skipped above some
   length. `check()` itself has no size limit. A substitution nested beyond the caps above is still not read.
+- **Loosenings against the base guard (c26800f3), 2026-09-29: two.** Everything else this work changes tightens. (1) The
+  canonical idiom (see the here-document item) passes behind `git`, `gh`, `echo` and `printf`, where the base guard refused
+  a commit message whose quote parity it misread or whose lines it read as commands (4 of this repository's commit
+  messages). (2) `ps -fu steve` and `ps -fu eve` pass, since `-u` takes a value (`ps -u steve` and `ps -fu Eve` passed
+  before). Each has rows in `tests/test_secret_path_guard.py` (ALLOWED), and the probe of the review, base guard against
+  this one, reports `loosened rows: 0` apart from them.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)
