@@ -6990,6 +6990,131 @@ class F15_JudgeContract(GraderCase):
         self.assertIn("T20", route["calibration_failed_templates"])
 
 
+# ---- R2-06 (element contents) and M9 use: two design items stage 2 left unbuilt ---------------------------------------------
+
+class F41_ConversionContents(GraderCase):
+    """R2-06: the decided reading grades the answer as Markdown (the ten structure checks); the published alternative grades
+    the element contents wherever they sit, so a plain report of the fixture passes only the alternative."""
+
+    PLAIN = ("Headings: Release checklist, then Pinned tools, then Steps. Table: Tool, Version, Check; rtk 0.50.0 inline "
+             "filter tests; markitdown 0.1.8 structure oracle; ast-grep 0.45.3 call-site oracle. Ordered steps: Install into "
+             "a fresh prefix; Run each fixture; Keep only sanitized output. Nested list: Record every command (including "
+             "failures) and Never read account state. Quote: Evidence is not authority. Code: rtk git log -20 and markitdown "
+             "page.html. Tom & Jerry use --offline mode. Emphasis: pinned and scoped. Link: upgrade guide "
+             "(https://example.invalid/guide). Image alt text: Pipeline diagram.")
+
+    def key(self):
+        return keys_at_exec_rev()["seed-conversion"]["key"]
+
+    ALT = readings(R2_06="element_contents")
+
+    def test_the_conversion_key_carries_the_fixtures_element_contents_in_document_order(self):
+        fc = load("frozen_checks")
+        contents = self.key()["contents"]
+        self.assertEqual(sorted(contents), sorted(fc.markdown_elements("")))  # the same ten elements as the decided reading
+        self.assertEqual(contents["headings"], ["Release checklist", "Pinned tools", "Steps"])
+        self.assertEqual(contents["table"], ["Tool", "Version", "Check", "rtk", "0.50.0", "inline filter tests", "markitdown",
+                                             "0.1.8", "structure oracle", "ast-grep", "0.45.3", "call-site oracle"])
+        self.assertEqual(contents["ordered_list"], ["Install into a fresh prefix", "Run each fixture", "Keep only sanitized output"])
+        self.assertEqual(contents["nested_list"], ["Record every command", "including failures", "Never read account state"])
+        self.assertEqual(contents["link"], ["upgrade guide", "https://example.invalid/guide"])
+        self.assertEqual(contents["emphasis"], ["pinned", "scoped"])
+        self.assertEqual(contents["blockquote"], ["Evidence is not authority."])
+        self.assertEqual(contents["code_block"], ["rtk git log -20", "markitdown page.html"])
+        self.assertEqual(contents["inline_code_and_entity"], ["Tom & Jerry use --offline mode."])
+        self.assertEqual(contents["image"], ["Pipeline diagram"])
+        text = json.dumps(contents)
+        for hidden in ("NativeCiScriptBody", "NativeCiStyleBody", "NativeCiHtmlComment", "diagram.png"):
+            self.assertNotIn(hidden, text, "script, style, comment and attribute text are never element content")
+
+    def test_a_plain_report_passes_the_alternative_reading_and_fails_the_decided_one(self):
+        fc = load("frozen_checks")
+        oracle = fc.ORACLES["T38"]
+        self.result(oracle({}, self.key(), answer(fc, self.PLAIN), DECIDED)["A"], "fail", "elements_missing")
+        self.result(oracle({}, self.key(), answer(fc, self.PLAIN), self.ALT)["A"], "pass")
+
+    def test_a_report_that_leaves_out_an_element_fails_the_alternative_too(self):
+        fc = load("frozen_checks")
+        short = self.PLAIN.replace(" Image alt text: Pipeline diagram.", "")
+        res = fc.ORACLES["T38"]({}, self.key(), answer(fc, short), self.ALT)["A"]
+        self.result(res, "fail", "elements_missing")
+        self.assertEqual(res.detail["missing"], ["image"])
+
+    def test_a_content_string_counts_only_as_a_whole_word(self):
+        fc = load("frozen_checks")
+        res = fc.ORACLES["T38"]({}, self.key(), answer(fc, self.PLAIN.replace("Table: Tool, Version", "Table: Tools, Version")),
+                                self.ALT)["A"]
+        self.result(res, "fail", "elements_missing")
+        self.assertEqual(res.detail["missing"], ["table"])
+
+    def test_the_alternative_reads_the_same_bound_input_and_needs_the_contents_in_the_key(self):
+        fc = load("frozen_checks")
+        bare = {"fixture_sha256": "a" * 64, "input_sha256": "a" * 64}
+        self.result(fc.ORACLES["T38"]({}, bare, answer(fc, self.PLAIN), self.ALT)["A"], "unknown", "key_missing")
+        other = dict(self.key(), input_sha256="0" * 64)
+        self.result(fc.ORACLES["T38"]({}, other, answer(fc, self.PLAIN), self.ALT)["A"], "unknown", "input_hash")
+
+    def test_the_alternative_is_evaluated_and_published_not_a_copy_of_the_decided_result(self):
+        self.assertEqual(evm().ORACLE_READINGS["T38"], ("R2-06",))
+        fixture = (ROOT / "fixtures" / "markitdown-multi-element.html").read_bytes()
+        run = MiniRun(self, files={"fixtures/markitdown-multi-element.html": fixture})
+        run.workflow("B", "seed-conversion", answer_rows(self.PLAIN), {"answer": self.PLAIN, "evidence": []}, agent_id="fx1")
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["optional"]["seed-conversion"]["fail"], 1)  # the decided reading fails the plain report
+        self.assertEqual(aggregate["alternatives"]["R2-06"]["element_contents"]["tasks_changed"], 1)
+
+
+class F42_OptionalUse(GraderCase):
+    """M9 is reported, never gating (sealed: report use and correctness): for each seeded optional task, the arm-B attempts
+    and whether each used the task's lane tool. U4's join lanes are the eight required tool lanes, so the repomix and
+    markitdown lanes are read from the attempt's own calls, the call ledger's state deciding whether a call succeeded."""
+
+    TEXT = "Both files define greeting; the change adds an exclamation mark."
+
+    def attempt(self, run, task, number, command=None, *, failed=False, ledgered=True):
+        tid = f"toolu-fx-u{number}"
+        rows = [r_user("task", ts(0))]
+        if command:
+            rows += [r_use("Bash", {"command": command}, tid, ts(1), f"msg-u{number}"),
+                     r_result(tid, "error" if failed else "packed 2 files", ts(2), is_error=failed)]
+        rows += [r_use("StructuredOutput", {"answer": self.TEXT, "evidence": []}, "toolu-fx-so1", ts(3), "msg-1"),
+                 r_result("toolu-fx-so1", "Structured output provided", ts(4)), r_text("done", ts(5), "msg-2")]
+        run.workflow("B", task, rows, {"answer": self.TEXT, "evidence": []}, agent_id=f"fx{number}", attempt=number)
+        if command and not ledgered:  # a call U2's ledger has no record of has no state
+            run.ledger = [item for item in run.ledger if item["tool_use_id"] != tid]
+
+    def graded(self, run):
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        return json.loads(out.read_text(encoding="utf-8"))
+
+    def test_use_is_read_from_the_lane_calls_of_the_arm_b_attempts(self):
+        run = MiniRun(self)
+        self.attempt(run, "seed-overview", 1, "repomix --compress fixtures/before.py fixtures/after.py")
+        self.attempt(run, "seed-overview", 2)
+        self.attempt(run, "seed-overview", 3, "repomix fixtures", ledgered=False)
+        aggregate = self.graded(run)
+        block = aggregate["optional"]["seed-overview"]
+        self.assertEqual(block["use"], {"lane": "repomix", "attempts": 3, "adopted": 1, "not_adopted": 1, "unknown": 1})
+        self.assertEqual(sorted(block), ["fail", "pass", "unknown", "use"])  # correctness (the counts) stays beside use
+
+    def test_a_failed_call_or_a_look_alike_name_or_the_other_lanes_tool_is_not_use(self):
+        run = MiniRun(self)
+        self.attempt(run, "seed-overview", 1, "repomix fixtures", failed=True)
+        self.attempt(run, "seed-overview", 2, "cat repomix-output.xml")
+        self.attempt(run, "seed-conversion", 3, "repomix fixtures")  # the markitdown task, so not its lane's tool
+        self.attempt(run, "seed-conversion", 4, "markitdown page.html")
+        aggregate = self.graded(run)["optional"]
+        self.assertEqual(aggregate["seed-overview"]["use"],
+                         {"lane": "repomix", "attempts": 2, "adopted": 0, "not_adopted": 2, "unknown": 0})
+        self.assertEqual(aggregate["seed-conversion"]["use"],
+                         {"lane": "markitdown", "attempts": 2, "adopted": 1, "not_adopted": 1, "unknown": 0})
+
+
 # ---- rehearse: the real-route acceptance step (design e8), run here only against the scripted fake --------------------------
 
 class F35b_Rehearse(GraderCase):
