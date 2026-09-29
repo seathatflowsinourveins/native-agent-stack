@@ -181,12 +181,31 @@ until the branch merges. `~/.claude/CLAUDE.md` gains the portable file's Quality
 
 ## Unresolved
 
-- The Harbor run needs the user's credential route, sandbox and budget; none was started.
-- Hand-offs, not edited here: `evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md` line 222 launches `claude --effort
-  ultracode -p` with no `--model`, so under this host's `sonnet` default the sealed run's lead is Sonnet 5.5; the owner of Gate A
-  should pass `--model` and record the resolved model. `catalogs/us-equities/models.json` still defaults to `claude-opus-5[1m]`
-  (trading lane). `tools/sota-convergence/codex_lane.py` defaults its effort to `high` where the rule is max (open PR #216).
-- The main-session model (Sonnet 5.5, this host's default, or Opus 5.5) is the user's choice; this record supports either.
+Status after the merges of 2026-09-29. Nothing below blocks the routing rule; each item names who acts and what starts it. Deferrals
+depend on the shared accounts' usage windows, which are read live before a run and never from a recorded reset.
+
+- **Harbor Terminal-Bench 4.0 run, Sonnet 5.5 against Opus 5.5.** Not started. It needs the user's decisions: the credential route (a paid
+  API key or a subscription token; `ANTHROPIC_API_KEY` stays unset on hosts), the sandbox (local Docker or a cloud provider) and a budget.
+- **Sealed #381 run.** `evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md` line 222 launches `claude --effort ultracode -p` with no
+  `--model`. The Gate A owner (`native-agent-stack-2d`) accepted, for its Amendment 4, `--model` on every arm, the resolved `init.model`
+  recorded, and the launcher and settings hashes in the freeze.
+- **Trading catalog.** `catalogs/us-equities/models.json` names `claude-opus-5[1m]`, the model of a 2026-09-19 native research run. Naming
+  Opus 5.5 needs a native Opus 5.5 research-runtime run first: the trading lane's call. Its session (`ecosystem-roadmap-2026`) keeps the
+  row until that run exists and schedules the run after its paper series, listing it among the roadmap's trading moves.
+- **GPT-6 lane effort.** `tools/sota-convergence/codex_lane.py` defaults `--effort` to `high` (`DEFAULT_EFFORT`), and
+  `recipes/sota-convergence-practice.md` and `tools/sota-convergence/README.md` show `--effort high`, where the standing rule for GPT-6
+  lanes is `max`. Open PR #216 does not touch it. Setting the default to `max` fails 49 of the 76 tests in `tests/test_codex_lane.py`,
+  changes a file in the verdict review gate's `TRUST_PATHS` (a rules change is its own pull request) and the lane-code hash that
+  `tools/sota-convergence/lane-provenance.json` registers, and a lane return is reused only at the same `--effort`. `native-agent-stack-76`
+  took it as a standalone foundation rules pull request (default, recipe, README, fixtures and the provenance registry) and tells the
+  roadmap session when it merges; its own foundation sweep does not use `codex_lane.py` (it passes `--effort max` explicitly through
+  `tools/sota-convergence/landscape-sweep/codex_job.py`), so nothing there waits on the flip. The roadmap session checks that the flip
+  has merged before it starts the 12 trading layers.
+- **OmniRoute Claude route.** `docs/foundation-stack.md`, `docs/token-efficiency-stack.json` and `blueprints/us-equities/routing/README.md`
+  name `claude/claude-opus-5`, the route recorded as tested on 2026-09-18. An Opus 5.5 route needs its own native test through OmniRoute.
+- **Codex 0.158.0.** Released 2026-09-28; the host has 0.157.1. Its staged qualification needs GPT-6 runs and has not started.
+- **Landscape sweep.** The 32-layer wave stays behind Gate A and Gate B by the user's instruction; `native-agent-stack-2d` stages it.
+- **Main-session model.** The user saved Sonnet 5.5 as the session default with `/model` on 2026-09-28; this record supports either model.
 - The receipt observed each child kind once, and did not exercise long tool-heavy sessions.
 
 ## Limitations

@@ -14542,8 +14542,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
-      "sha256": "ce64799fa81b063a5f80308c9d27037571cf1639a0c42b61b387ff5a32a38b79",
-      "bytes": 25335
+      "sha256": "ff28b9f24dcb6f2d8cf3803d6f650b4fc96e6f1b3f344e386f113bfa1312ea40",
+      "bytes": 27666
     },
     {
       "path": "docs/direct-results.md",
@@ -41907,8 +41907,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "23fb608c6236c806d50e7df7e3bad007e0a2357bf86c712da02616948d9201ff",
-      "bytes": 9765
+      "sha256": "1523b156f0aa2f0b8524bfebe3b453806aedebfa997d18f07d5652bcc1a48c1c",
+      "bytes": 9834
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
