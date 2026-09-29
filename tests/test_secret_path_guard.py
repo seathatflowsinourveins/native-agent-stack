@@ -94,6 +94,15 @@ BLOCKED = {
     "ls ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack": "credential_store_path",
     "rg KEY \"$XDG_CONFIG_HOME/native-agent-stack/\"": "credential_store_path",
     "while read -r line; do :; done < \"$PAPER_ENV_FILE\"": "credential_file_read",
+    # A numbered pointer (PAPER_ENV_FILE_2 is the second paper account's, 2026-09-29): the word boundary after
+    # PAPER_ENV_FILE used to fail before `_2`, so each of these passed while the account-1 form was blocked.
+    "cat \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"${PAPER_ENV_FILE_2}\"": "credential_file_read",
+    "head -n 3 \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "while read -r l; do :; done < \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"$SEC_CONTACT_ENV_2\"": "credential_file_read",
+    "set -x; . \"$PAPER_ENV_FILE_2\"": "trace_while_sourcing",
+    "set -a; . \"$PAPER_ENV_FILE_2\"; set +a; env": "environment_dump_after_source",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -462,6 +471,11 @@ ALLOWED = [
     "wc -c \"$PAPER_ENV_FILE\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE\"",
     "( set -a; . \"$PAPER_ENV_FILE\"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py --once )",
+    # The second paper account (2026-09-29): its pointer handed to a loader or a size check, as account 1's is.
+    "python3 runner.py preflight --env-file \"$PAPER_ENV_FILE_2\" --output out.json",
+    "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_2\" --out rate-limit.json",
+    "wc -c \"$PAPER_ENV_FILE_2\"",
+    "stat -c '%a %U' \"$PAPER_ENV_FILE_2\"",
     # Hugging Face: hf reads its own store, so checking the sign-in, the operator's interactive
     # login, revision-pinned downloads and checksum verification never expose the token.
     "hf auth whoami",
