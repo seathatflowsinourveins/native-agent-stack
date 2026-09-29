@@ -235,8 +235,10 @@ Because the tag is a resource attribute, these events still carry `env`.
 Validation: `tests.test_observability_run_correlation` and
 `tests.test_observability_tool_names`.
 
-- An always-on check requires the guards, both allowlist entries and their
-  absence from the metric statements.
+- An always-on check, which needs no PyYAML, requires both guards, both
+  allowlist entries and their absence from the metric statements. The `env`
+  guard must come before the resource allowlist. The `call_id` guard must be
+  in the last `transform/tool_names` group, which has no conditions.
 - The native test sends `codex_exec` records through the committed processors
   on Collector 0.161.0 into Loki 3.7.8. Each valid id is returned exactly once
   under its tag, and the decision pairs with its result. A 129-character id,

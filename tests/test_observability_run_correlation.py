@@ -52,9 +52,11 @@ try:
 except ImportError:
     yaml = None
 
-# Codex launch-tag guard: the registry-name character class, at most 128 characters.
+# Codex launch-tag and call-id guards: the registry-name character class, at most 128 characters.
 ENV_GUARD = ('delete_key(attributes, "env") where attributes["env"] != nil and not IsMatch(attributes["env"], '
              '"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")')
+CALL_ID_GUARD = ('delete_key(attributes, "call_id") where attributes["call_id"] != nil and not IsMatch('
+                 'attributes["call_id"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")')
 
 
 def keep_list(section: str) -> list[str]:
@@ -86,7 +88,15 @@ class CollectorProfileTests(unittest.TestCase):
     def test_codex_launch_tag_and_call_id_are_kept(self):
         # Codex exports otel.environment as the logs resource attribute env (provider.rs:53,381) and call_id on
         # codex.tool_result and codex.tool_decision (tool_result.rs:61; session_telemetry.rs:1112,1121).
-        privacy = COLLECTOR.read_text().partition("  transform/privacy:\n")[2]
+        text = COLLECTOR.read_text()
+        # The call_id guard must sit in the last transform/tool_names group, which has no conditions, so it applies
+        # to every log record. A guard in a conditioned group would let call_id on other events pass unchecked.
+        tool_names = text.partition("  transform/tool_names:\n")[2].partition("  transform/privacy:\n")[0]
+        final = tool_names.rpartition("      - context: log\n")[2]
+        with self.subTest(check="call_id shape guard in the last, unconditioned transform/tool_names group"):
+            self.assertEqual([line for line in final.splitlines() if line.lstrip().startswith("conditions:")], [])
+            self.assertIn(CALL_ID_GUARD, statement_lines(final))
+        privacy = text.partition("  transform/privacy:\n")[2]
         logs, _, metrics = privacy.partition("    metric_statements:\n")
         metrics = metrics.partition("  delta_to_cumulative:\n")[0]
         resource = logs.partition("      - context: scope\n")[0]
