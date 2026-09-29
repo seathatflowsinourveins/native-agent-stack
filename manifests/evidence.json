@@ -3734,8 +3734,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "4fdf0f1d62dfab721596c67d490454334339bcbf82335d959a201b8904bf6521",
-      "bytes": 32977
+      "sha256": "b588f520edd8411fb01a3765e6d4d4dc26b2ea0d03b9810c2a76bc31ea49d879",
+      "bytes": 35633
     },
     {
       "path": ".gitignore",
@@ -15055,8 +15055,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "e2b37bcf0ffd7ba6f7ce02d0020ce1e976f620a644e4848678a030c2c149542b",
-      "bytes": 88739
+      "sha256": "853579e47b1afc507a45fd2003ecbfd615100db83ed366cbaf5c7b4781bd73fe",
+      "bytes": 90626
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -44047,6 +44047,11 @@
       "path": "tests/test_service_reboot.py",
       "sha256": "0ed22915bc1f80d3a3bdcf6a51810bafd8161dd94640584a9e5a9ac2882d20f9",
       "bytes": 14063
+    },
+    {
+      "path": "tests/test_shell_parser_ci.py",
+      "sha256": "7ac9da4a5e9ae0d4fa19a4b632c9466ba59ce750fb241bfa8cee8ea261f0a66a",
+      "bytes": 42808
     },
     {
       "path": "tests/test_sim_capacity.py",
