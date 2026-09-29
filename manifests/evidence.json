@@ -14540,8 +14540,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "8e949c6b612e5f7505cce4b1f197eb3ada255f4cdb4be88fb9a7010233b037ed",
-      "bytes": 74471
+      "sha256": "2c08d56019feb65ef865b737eef050b6f8365bf2abfb624ac105f3c268585c25",
+      "bytes": 74764
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15105,8 +15105,8 @@
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
-      "sha256": "c00e2bd1dc165cb31a9885a3bdc5eb859cd26b0243ee336238afedcde9c000fe",
-      "bytes": 12514
+      "sha256": "0a26fd2f65dee8a447972b5ee04df60ba778b9ab2f33b97b11a10154310bce98",
+      "bytes": 14618
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/native-checks.json",
@@ -15115,8 +15115,8 @@
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/qualification.json",
-      "sha256": "55b2670643c5693163a47bd8671f63366de496ea7dba47af2ed42a30ed76a870",
-      "bytes": 12827
+      "sha256": "6a154eb789c594d17786b56468973a7118b7a4a612afb1f14fd6e59ff39e1e59",
+      "bytes": 23605
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/returned-output.txt",
@@ -42430,8 +42430,8 @@
     },
     {
       "path": "tests/test_agentsview_qualification.py",
-      "sha256": "df6296e8e4e51f4d959f52686ecba2027d4dc804e407fa3952e06685729ea858",
-      "bytes": 11313
+      "sha256": "b6ea632079e619ff3a778540b183220d834f6029c852a0a98bb086b885be778c",
+      "bytes": 18631
     },
     {
       "path": "tests/test_alpaca_capabilities.py",
