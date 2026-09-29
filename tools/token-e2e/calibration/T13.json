@@ -1,0 +1,61 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T13",
+ "clauses": [
+  "The answer states local, project and user and agrees with retained original HTML",
+  "preserve conversion omissions and exit status"
+ ],
+ "sources": [
+  {
+   "label": "canonical page facts (frozen captures)",
+   "text": "scopes: ['local', 'project', 'user']"
+  },
+  {
+   "label": "recorded conversion facts",
+   "text": "conversion call state: succeeded; converted bytes: 4210; scope terms missing from the conversion output: user"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The original page lists three scopes: local, project and user. The conversion call succeeded, but its output lacked the word user, so the scope names come from the original HTML and I am reporting that omission.\n\nSource excerpt: scopes: ['local', 'project', 'user']",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "Servers can be configured at the local, project or user level according to the original page. The converter call itself succeeded yet returned text without the term user, and I am noting that gap.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The scopes are local, project and global. The conversion call succeeded and dropped the word user.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "The scopes are local, project and user. The conversion call succeeded and its output held every scope term.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}
