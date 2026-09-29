@@ -973,11 +973,12 @@ class LokiTests(CanaryCase):
             self.assertEqual(result["status"], "incomplete")  # a full page on one timestamp cannot be paged past
             judged = harness.judge(sink(url), result, set(), {})
             self.assertTrue(judged["fails"])
-        with mock.patch.object(harness, "LOKI_LIMIT", 1), mock.patch.object(harness, "LOKI_PAGES", 1):
-            url = self.serve([(base, "a"), (base + 1, "b")], {"queries": [], "pushes": []})
+        with mock.patch.object(harness, "LOKI_LIMIT", 2), mock.patch.object(harness, "LOKI_PAGES", 1):
+            url = self.serve([(base, "a"), (base + 1, "b"), (base + 2, "c"), (base + 3, "d")],
+                             {"queries": [], "pushes": []})
             result = harness.scan_sink(self.context(), self.run_dir(run), sink(url), sets, agent_pass=True,
                                        seen_git=set(), since_epoch=time.time() - 60)
-            self.assertEqual(result["status"], "incomplete")  # the page budget ran out
+            self.assertEqual((result["status"], result["reasons"]), ("incomplete", ["page budget spent"]))
 
 
 @unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
@@ -1417,6 +1418,26 @@ class EvidenceIntegrityTests(FullRun):
         self.assertEqual(receipt["result"], "incomplete")
         self.assertIn("after_restart_missing", receipt["reasons"])
         self.assertEqual(self.harness("cleanup", "--run", run)[0], 0)
+
+    def test_classify_accepts_only_evidence_of_the_latest_consumption(self):
+        # The second layer behind the move to results/stale/: a pass or a verification recorded for an earlier
+        # consumption never counts, even if its file were still in place.
+        passing = {"verdict": "clean (control passed)"}
+        evidence = {"latest": {c: 1 for c in probe.CONSUMERS},
+                    "consumers": {c: {"ran": True, "tag": "valid", "stream_canary_hits": 0, "cmdline_hits": 0,
+                                      "transient_unit_hits": 0} for c in probe.CONSUMERS},
+                    "verified_sequences": {c: 1 for c in probe.CONSUMERS},
+                    "leak_check": {"pattern_hits": 0, "printed_form_hits": 0, "masked": True}, "after_restart": None,
+                    "keep": False, "captures": {"x.jsonl": {"canary": 0, "control": "found"}},
+                    "controls": {"text": {"ok": True}}, "baseline": {"canary_hits": 0, "ok": True},
+                    "passes": {n: {"ok": True, "sinks": {"S": passing}, "sequences": {c: 1 for c in probe.CONSUMERS}}
+                               for n in ("1", "2")}, "user_run": None}
+        self.assertEqual(harness.classify(evidence), ("zero", []))
+        evidence["latest"] = {**evidence["latest"], "codex-exec": 2}
+        result, reasons = harness.classify(evidence)
+        self.assertEqual(result, "incomplete")
+        self.assertIn("pass1_predates_the_latest_consumption", reasons)
+        self.assertIn("tag_not_verified_for_the_latest_consumption:codex-exec", reasons)
 
     def test_a_re_consumed_consumer_invalidates_the_verification_and_scans_before_it(self):
         run, steps = self.full_run()
