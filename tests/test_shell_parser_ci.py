@@ -4,15 +4,16 @@ examples/claude-native/workflows/child-usage.mjs reads command position with tre
 without a verified install: cli_lanes is "parser_unavailable" and the lane tests skip. Nothing installed the
 parser on CI, so the required validate job passed while it exercised only that fail-closed gate. validate.yml now
 installs the parser with the command in examples/claude-native/workflows/shell-parser.pin.json. This module keeps
-that true. The validate job fails when the loader does not report the pinned, hash-verified install, and the suite
-fails when the provisioning step is dropped, moved after the suite, retyped away from the pin, no longer exports
-the directory, or can be skipped.
+that true. A GitHub Actions job (GITHUB_ACTIONS=true) fails when the loader does not report the pinned, hash-verified
+install, and the suite fails when the provisioning step is dropped, moved after the suite, retyped away from the pin,
+no longer exports the directory, or can be skipped.
 
-Only the validate job of validate.yml is held to the runtime tripwire. Two other jobs run the whole suite under
+Every Actions job is held to that runtime tripwire except the recorded gaps. Two other jobs run the whole suite under
 GITHUB_ACTIONS=true without installing the parser: adoption-bootstrap.yml validate-macos (a required check in
-.github/main-ruleset.json) and catalog-freshness.yml freshness. Keying the tripwire on GITHUB_ACTIONS alone would
-fail both, and those workflows are outside this unit's owned paths, so KNOWN_UNPROVISIONED records them as gaps.
-A whole-suite job that neither provisions nor is listed there fails the suite, so the list can only shrink.
+.github/main-ruleset.json) and catalog-freshness.yml freshness. Holding them to the tripwire would fail both, and
+those workflows are outside this unit's owned paths, so KNOWN_UNPROVISIONED records them and the tripwire skips there
+and says so. A job that is not listed fails closed, as does an Actions environment that names no job. A whole-suite
+job that neither provisions nor is listed there fails the suite, so the list can only shrink.
 
 Rules and their sources (read 2026-09-29):
 - GITHUB_ACTIONS is always "true" in Actions, GITHUB_JOB is the job id and GITHUB_WORKFLOW_REF is
@@ -54,13 +55,14 @@ HANDBOOK = ROOT / "docs/token-session-handbook.md"
 PIN_PATH = "examples/claude-native/workflows/shell-parser.pin.json"
 KERNEL = ROOT / "examples/claude-native/workflows/child-usage.mjs"
 ENV_NAME = "CHILD_USAGE_SHELL_PARSER"
-# The one job that provisions the parser today, and so the one job where a missing parser fails the suite.
+# The one job that provisions the parser today, and so the one job whose provisioning step this module inspects.
 PROVISIONING_WORKFLOW = "validate.yml"
 PROVISIONING_JOB = "validate"
 # Whole-suite jobs that do not provision the parser yet: adoption-bootstrap.yml runs the suite on macOS in its
 # validate-macos job (step "Run the full test suite (gating on macOS)"; the job is a required check in
 # .github/main-ruleset.json) and catalog-freshness.yml runs it weekly in its freshness job (step "Run project test
-# suite"). Their lane tests skip today. Provision the job in its own workflow, then delete its entry:
+# suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs and says so. Provision
+# the job in its own workflow, then delete its entry:
 # test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap fails while an entry is stale.
 KNOWN_UNPROVISIONED = {"adoption-bootstrap.yml:validate-macos", "catalog-freshness.yml:freshness"}
 # The read-only check the handbook gives a host, run from the repository root.
@@ -87,10 +89,20 @@ def workflow_file(ref):
     return tail.partition("@")[0] if found else ""
 
 
-def required_here(env):
-    """True in the job that provisions the parser: an Actions job named PROVISIONING_JOB of PROVISIONING_WORKFLOW."""
-    return (env.get("GITHUB_ACTIONS") == "true" and env.get("GITHUB_JOB") == PROVISIONING_JOB
-            and workflow_file(env.get("GITHUB_WORKFLOW_REF", "")) == PROVISIONING_WORKFLOW)
+def job_key(env):
+    """'<workflow file>:<job id>' of the Actions job that `env` describes (an empty part for an unset variable)."""
+    return f"{workflow_file(env.get('GITHUB_WORKFLOW_REF', ''))}:{env.get('GITHUB_JOB', '')}"
+
+
+def stand_down(env):
+    """None when the loader must report the pinned install in a process with `env`; otherwise why the tripwire does not
+    apply: outside GitHub Actions, or in a job recorded in KNOWN_UNPROVISIONED. Anything else fails closed, including an
+    Actions environment that names no job."""
+    if env.get("GITHUB_ACTIONS") != "true":
+        return "not in GitHub Actions (GITHUB_ACTIONS is not 'true')"
+    if job_key(env) in KNOWN_UNPROVISIONED:
+        return "a recorded gap: this job runs the whole suite without installing the parser (KNOWN_UNPROVISIONED)"
+    return None
 
 
 # The kernel's URL goes into the script text, not into argv: child-usage.mjs runs its command line when process.argv[1]
@@ -151,22 +163,24 @@ def host_install():
 
 
 class ShellParserInstalledInCI(unittest.TestCase):
-    """The runtime tripwire. It skips everywhere except the validate job of validate.yml."""
+    """The runtime tripwire. It skips outside GitHub Actions and in the recorded gaps, and fails everywhere else."""
 
-    def test_the_validate_job_has_the_verified_parser(self):
-        if not required_here(os.environ):
-            self.skipTest("not the validate job of validate.yml in GitHub Actions (GITHUB_ACTIONS, GITHUB_JOB and "
-                          "GITHUB_WORKFLOW_REF); the verified parser is required only where that job installs it")
+    def test_a_github_actions_job_has_the_verified_parser(self):
+        reason = stand_down(os.environ)
+        if reason is not None:
+            self.skipTest(reason)
         status = loader_status(dict(os.environ))
         if not verified(status):
-            self.fail(f"the validate job has no verified tree-sitter-bash install ({describe(status)}): the lane "
-                      "tests would skip; the provisioning step of validate.yml did not produce the pinned install")
+            self.fail(f"this GitHub Actions job has no verified tree-sitter-bash install ({describe(status)}): the lane "
+                      "tests would skip; a step that installs the pin must run before the suite, as validate.yml's "
+                      "does, or the job must be a recorded gap")
 
 
 class TripwireControls(unittest.TestCase):
-    """Mutation controls: the tripwire is run as the validate job runs it, over a clean host, and must fail on each
-    way the install can be missing or wrong (a control that always failed would prove nothing, so the verified
-    install, an unrelated job and a local run are also run)."""
+    """Mutation controls: the tripwire is run in each environment a job can present (the validate job's, GITHUB_ACTIONS
+    alone and an unlisted job over a clean host) and must fail on each way the install can be missing or wrong. A
+    control that always failed would prove nothing, so the verified install, the recorded gaps and a local run are also
+    run."""
 
     @classmethod
     def setUpClass(cls):
@@ -267,17 +281,13 @@ class TripwireControls(unittest.TestCase):
         self.assertTrue("OK" in done.stderr, "the tripwire run did not report OK")
         self.assertFalse("skipped" in done.stderr, "the tripwire run skipped instead of running")
 
-    def test_other_jobs_and_local_runs_skip_with_a_message(self):
-        other = {"another job": {"GITHUB_JOB": "validate-macos"},
-                 "another workflow": {"GITHUB_WORKFLOW_REF": "owner/repo/.github/workflows/adoption-bootstrap.yml@refs/heads/main"},
-                 "no workflow reference": {"GITHUB_WORKFLOW_REF": ""},
-                 "outside Actions": {"GITHUB_ACTIONS": "false"}}
-        for label, extra in other.items():
+    def test_runs_outside_actions_skip_with_a_message(self):
+        outside = {"GITHUB_ACTIONS is false": ((), {"GITHUB_ACTIONS": "false"}),
+                   "GITHUB_ACTIONS is not 'true'": ((), {"GITHUB_ACTIONS": "1"}),
+                   "GITHUB_ACTIONS is unset": (("GITHUB_ACTIONS",), {})}
+        for label, (drop, extra) in outside.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as home:
-                done = self.run_tripwire(home, **extra)
-                self.assertEqual(done.returncode, 0, f"exit {done.returncode}")
-                self.assertTrue("skipped" in done.stderr, "the tripwire run did not skip")
-                self.assertTrue("not the validate job of validate.yml" in done.stderr, "the tripwire run gave no reason for skipping")
+                self.assert_skipped(self.run_tripwire(home, drop, **extra), "not in GitHub Actions")
 
 
 def step_blocks(job_text):
@@ -394,7 +404,7 @@ class ProvisioningStepTests(unittest.TestCase):
         self.assertClean("enforced")
 
     def test_the_provisioning_job_is_the_job_that_runs_the_suite(self):
-        # The tripwire is keyed on this job name: renaming the job must not leave it skipping in CI.
+        # The structure checks inspect this job by name: renaming it must not leave them with nothing to inspect.
         job = jobs(self.text).get(PROVISIONING_JOB)
         self.assertTrue(job is not None, "validate.yml has no job named as the tripwire expects")
         self.assertTrue(any(runs_suite(step) for step in step_blocks(job)), "that job does not run the whole suite")
