@@ -14447,8 +14447,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
-      "sha256": "7177fb3cc1b557f3aa5173681f7502f20de5ab3cfcde01b9b9aba07a540b44a0",
-      "bytes": 63672
+      "sha256": "5f10fb47d297cc1795751a6cbb6d31e1b36f8ade1fb309d65f0bbc8e57cb9e67",
+      "bytes": 64027
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -43077,8 +43077,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "e39c991e1d3e09ec3d677438d52a814e9d079ddaef0369e59a3a412a7c577d14",
-      "bytes": 146796
+      "sha256": "57228b7ad1eb6890023c220dc975fc931e7ca7987a2ecb6a8ffa77f1aa8cf522",
+      "bytes": 151483
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -43162,8 +43162,8 @@
     },
     {
       "path": "tests/test_freeze_snapshot.py",
-      "sha256": "cc22318212545f1e5117ae65bc883f50ffd8b89d4c98694313ead5f1a10d639d",
-      "bytes": 211447
+      "sha256": "eab22a97340cc729882fc7c450d67507bea488de70366a91041caa46e088c131",
+      "bytes": 211565
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -43722,8 +43722,8 @@
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "ce628a847708a9660ca816f0ba5239a32e6b470759a8911cdb01d25e233602b3",
-      "bytes": 27024
+      "sha256": "b5815aefab0fd22eca39233207e4bdab199b0815f858c5a147e3994d133ffd6d",
+      "bytes": 27202
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
@@ -44002,13 +44002,13 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "da5d5f7e70556bcea2899964773ce831e60a42001b5681da94c92ff536ac1ffc",
-      "bytes": 33724
+      "sha256": "86227fabca32e7d7a19433c5ce3342021ee7dd19b5c35ec5560aecdf8e823ce7",
+      "bytes": 33946
     },
     {
       "path": "tools/token-e2e/freeze_snapshot.py",
-      "sha256": "460fed357dc2e4332d56f2ec41b9ec313742c4d806b7abf4279918a900522ec0",
-      "bytes": 126527
+      "sha256": "27e9c97f9e82b71deb27e04d933fe5752c045ac931bdc7e4432ecbc1b987acb7",
+      "bytes": 126664
     },
     {
       "path": "tools/token-report/README.md",
