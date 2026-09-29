@@ -2939,15 +2939,88 @@ def oracle_T32(params, key, ans, readings, ctx=None):
     return {"A": _finish(reasons, unparsed)}
 
 
+LEVEL_WORDS = ("WARN", "WARNING", "ERROR", "DEBUG")  # the levels the positive control's records do not have
+_NEGATORS = frozenset({"no", "not", "none", "nothing", "without", "zero", "never", "neither", "nor", "0"})
+_NEGATION_FILLERS = frozenset({"any", "a", "an", "the", "of", "at", "level", "levels", "entry", "entries", "row", "rows",
+                               "record", "records", "event", "events", "them", "these", "those", "is", "are", "was", "were",
+                               "be", "among", "such", "or", "and"})
+
+
+def level_is_negated(text, position):
+    """True when the level word at `position` is the object of a negation: "no ERROR among them", "No WARN, ERROR or DEBUG",
+    "without any ERROR", "nothing at WARN or ERROR level", "none of them is WARNING". Walking back from the word over
+    separators (spaces, commas, slashes), filler words and other level words must reach a negator; any other word or
+    punctuation stops the walk, so "the third is not INFO, it is ERROR" and "but the fourth is ERROR" are levels that are
+    really there. A linear scan."""
+    index = position
+    while True:
+        gap = index
+        while gap > 0 and text[gap - 1] in " \t,/":
+            gap -= 1
+        start = gap
+        while start > 0 and is_word_char(text[start - 1]):
+            start -= 1
+        if start == gap:
+            return False
+        word = text[start:gap]
+        low = word.lower()
+        if low in _NEGATORS or (low == "t" and start > 0 and text[start - 1] == "'"):  # ... or the n't of a contraction
+            return True
+        if low in _NEGATION_FILLERS or word in LEVEL_WORDS:
+            index = start
+            continue
+        return False
+
+
+def quoted_field_ints(text, name):
+    """The integers of every `"name": N` pair, in order (JSON object rows quoted in an answer, double or single quoted keys)."""
+    found, index, size = [], 0, len(text)
+    while index < size:
+        quote = text[index]
+        end_of_key = index + 1 + len(name)
+        if quote in "\"'" and text.startswith(name, index + 1) and text[end_of_key:end_of_key + 1] == quote:
+            scan = end_of_key + 1
+            while scan < size and text[scan] in " \t":
+                scan += 1
+            if scan < size and text[scan] == ":":
+                scan += 1
+                while scan < size and text[scan] in " \t":
+                    scan += 1
+                stop = scan
+                while stop < size and is_digit(text[stop]):
+                    stop += 1
+                fraction = stop + 1 < size and text[stop] == "." and is_digit(text[stop + 1])
+                if stop > scan and not fraction and not (stop < size and (text[stop].isalpha() or text[stop] == "_")):
+                    found.append(int(text[scan:stop]))
+        index += 1
+    return found
+
+
+def integer_lists(text):
+    """The integers of every `[...]` span that holds only integers, commas and spaces: [1, 2, 3, 4, 5]."""
+    lists, start = [], 0
+    while True:
+        open_at = text.find("[", start)
+        close = text.find("]", open_at) if open_at >= 0 else -1
+        if close < 0:
+            return lists
+        body = text[open_at + 1:close]
+        if body.strip() and all(char in "0123456789, \t" for char in body):
+            lists.append(int_values(int_tokens(text[open_at:close + 1])))
+        start = open_at + 1
+
+
 def oracle_T33(params, key, ans, readings, ctx=None):
+    """The positive control: events 1 to 5, each at level INFO. The events are read from quoted raw rows (`"event": N`), else
+    from the first bracketed list of integers, else from the lines that name events; a level word that a negation
+    disowns ("no ERROR among them") is not a level."""
     text = normalize(answer_text(ans))
     reasons, unparsed = set(), False
-    listed = None
-    open_at = text.find("[")
-    if open_at >= 0 and text.find("]", open_at) > open_at:
-        listed = int_values(int_tokens(text[open_at:text.find("]", open_at) + 1]))
-    if listed is None:
-        listed = []
+    listed = quoted_field_ints(text, "event")
+    if not listed:
+        lists = integer_lists(text)
+        listed = lists[0] if lists else []
+    if not listed:
         for line in text.split("\n"):
             if has_word(line, "event") or has_word(line, "events"):
                 listed.extend(int_values(_line_values(line)))
@@ -2955,7 +3028,8 @@ def oracle_T33(params, key, ans, readings, ctx=None):
         unparsed = True
     elif listed != key["events"]:
         reasons.add("events")
-    if any(has_word(text, level, ignore_case=False) for level in ("WARN", "WARNING", "ERROR", "DEBUG")):
+    if any(not level_is_negated(text, position) for level in LEVEL_WORDS
+           for position in word_positions(text, level, ignore_case=False)):
         reasons.add("levels")
     elif not has_word(text, "INFO", ignore_case=False):
         unparsed = True
