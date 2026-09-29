@@ -192,7 +192,7 @@ def outside_fences(text):
 
 
 def code_spans(text):
-    """Inline code spans of raw text outside fenced blocks: (line index, content)."""
+    """Inline code spans of raw text outside fenced blocks: (line index, content, column of the opening backtick)."""
     spans = []
     for index, line in outside_fences(text):
         pos, size = 0, len(line)
@@ -220,7 +220,7 @@ def code_spans(text):
             if found < 0:
                 pos = run
                 continue
-            spans.append((index, line[run:found]))
+            spans.append((index, line[run:found], pos))
             pos = found + width
     return spans
 
@@ -321,7 +321,7 @@ def int_tokens(text):
         digits, parts, grouped, stop = text[index:end], [int(text[index:end])], False, end
         if depth == 0 and end - index <= 3:
             scan = end
-            while scan + 3 < size + 0 and text[scan] == "," and all(is_digit(item) for item in text[scan + 1:scan + 4]) \
+            while scan + 3 < size and text[scan] == "," and all(is_digit(item) for item in text[scan + 1:scan + 4]) \
                     and not (scan + 4 < size and is_digit(text[scan + 4])):
                 digits += text[scan + 1:scan + 4]
                 parts.append(int(text[scan + 1:scan + 4]))
@@ -938,10 +938,8 @@ def task_params(name, task):
         return {"frozen_input": task["frozen_input"]}
     if name in ("T3", "T5", "T11"):
         return {"symbol": "register_file", "symbol_fixture": "scripts/host_receipts.py"}
-    if name in ("T29", "T30", "T31", "T37"):
-        return {"fixture_path": task.get("fixture_path")}
-    if name == "T38":
-        return {"fixture_path": task.get("fixture_path")}
+    if "fixture_path" in task:
+        return {"fixture_path": task["fixture_path"]}
     return {}
 
 
@@ -1173,4 +1171,1565 @@ def private_dir(path):
     os.makedirs(path, mode=0o700, exist_ok=True)
 
 
-# --- END OF PART 1 ---
+# ---- Key recipes (a4): keys computed from pinned Git content, never from an answer -------------------------------
+
+E2E_DIR = "evidence/artifacts/token-adoption-e2e-20260926"
+TABLE_PATH = f"{E2E_DIR}/fixtures/table.json"
+EVENTS_PATH = f"{E2E_DIR}/fixtures/events.jsonl"
+# The Amendment 3 seal rows for the two fixtures (README "Amendment 3 seal"); Amendment 4 leaves them unchanged.
+SEALED_FIXTURES = {TABLE_PATH: "fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448",
+                   EVENTS_PATH: "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e"}
+# T2 originals: `git log --stat -150` at each receipt's catalog revision (README pre-run record, 2026-09-28).
+RECORDED_T2 = {
+    "reuse-296-02": {"sha256": "82e9249222bafd5daee41ee74840a92d2a00feabd70f4e1149adb21a600d630b", "bytes": 891615},
+    "reuse-343-06": {"sha256": "5939b5451e55a3744b7a8f299733904979046974a5c2aea340ecb6b3b9149c2c", "bytes": 774521},
+}
+# The six recovered command identities, in order (README "Command identities"); the bare command is the identity.
+T0_IDENTITIES = (
+    ("git-log", ["git", "log", "-30"]),
+    ("git-status", ["git", "status"]),
+    ("git-diff", ["git", "diff", "HEAD~5", "--stat"]),
+    ("grep", ["grep", "-rn", "def register_file", "scripts"]),
+    ("ls", ["ls", "-la", "scripts"]),
+    ("unittest", ["python3", "-m", "unittest", "tests.test_host_requests"]),
+)
+TRUST_CONDITIONS = ["author_association", "user.type", "performed_via_github_app", "repository_owner"]
+ANTI_PATTERN_KEYWORDS = {"T21": "stdin", "T22": "filtered", "T23": "wait loop", "T24": "pipeline", "T25": "budget"}
+
+
+class KeyUnavailable(Exception):
+    def __init__(self, reason):
+        super().__init__(reason)
+        self.reason = reason
+
+
+def _need(data, reason="key_missing"):
+    if data is None:
+        raise KeyUnavailable(reason)
+    return data
+
+
+def _text(data):
+    return _need(data).decode("utf-8", errors="replace")
+
+
+def parse_py(data):
+    try:
+        text = data.decode("utf-8")
+        return text, ast.parse(text)
+    except (SyntaxError, ValueError, UnicodeDecodeError):
+        return None, None
+
+
+def _top_functions(tree):
+    return [node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
+
+
+def _line_count(text):
+    return len(text.splitlines())
+
+
+def _enclosing_names(tree):
+    """{call node: innermost enclosing function name} for every Call in the tree (module level is '<module>')."""
+    names, stack = {}, []
+
+    def visit(node):
+        pushed = isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        if pushed:
+            stack.append(node.name)
+        if isinstance(node, ast.Call):
+            names[node] = stack[-1] if stack else "<module>"
+        for child in ast.iter_child_nodes(node):
+            visit(child)
+        if pushed:
+            stack.pop()
+    visit(tree)
+    return names
+
+
+def _mention_lines(text, symbol):
+    """Lines of comment and string tokens that hold the symbol as a whole word."""
+    lines = []
+    kinds = {tokenize.COMMENT, tokenize.STRING}
+    middle = getattr(tokenize, "FSTRING_MIDDLE", None)
+    if middle is not None:
+        kinds.add(middle)
+    try:
+        for token in tokenize.generate_tokens(io.StringIO(text).readline):
+            if token.type in kinds and word_positions(token.string, symbol, ignore_case=False):
+                lines.append(token.start[0])
+    except (tokenize.TokenError, IndentationError, SyntaxError):
+        pass
+    return lines
+
+
+def symbol_sites(src, prefixes, symbol, with_functions=False):
+    """Definition-independent site analysis of one symbol over the tracked Python files under the prefixes."""
+    paths = [path for path in src.files(*prefixes) if path.endswith(".py")]
+    sources = src.read_many(paths)
+    name_calls, attr_calls, imports, mentions = [], [], [], []
+    for path in paths:
+        data = sources.get(path)
+        if data is None:
+            continue
+        text, tree = parse_py(data)
+        if tree is None:
+            continue
+        enclosing = _enclosing_names(tree) if with_functions else {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name) and node.func.id == symbol:
+                    entry = [path, node.lineno]
+                    if with_functions:
+                        entry.append(enclosing.get(node, "<module>"))
+                    name_calls.append(entry)
+                elif isinstance(node.func, ast.Attribute) and node.func.attr == symbol:
+                    attr_calls.append([path, node.lineno])
+            elif isinstance(node, ast.ImportFrom) and any(alias.name == symbol for alias in node.names):
+                imports.append([path, node.lineno])
+        mentions.extend([path, line] for line in _mention_lines(text, symbol))
+    for group in (name_calls, attr_calls, imports, mentions):
+        group.sort()
+    return {"name_calls": name_calls, "attr_calls": attr_calls, "imports": imports, "mentions": mentions}
+
+
+def _definition(src, path, symbol):
+    data = _need(src.read(path))
+    text, tree = parse_py(data)
+    if tree is None:
+        raise KeyUnavailable("key_missing")
+    for node in _top_functions(tree):
+        if node.name == symbol:
+            return [path, node.lineno, node.end_lineno], node, text
+    raise KeyUnavailable("key_missing")
+
+
+def token_line_counts(text):
+    """R2-09 (U9-D22): lines holding `token` as a substring, a whole word (grep -w: letters, digits and '_' are word
+    characters) and with an alphanumeric boundary only."""
+    counts = {"substring": 0, "whole_word": 0, "alnum_boundary": 0}
+    for line in text.split("\n"):
+        low = line.lower()
+        if "token" not in low:
+            continue
+        counts["substring"] += 1
+        whole = alnum = False
+        start = 0
+        while True:
+            index = low.find("token", start)
+            if index < 0:
+                break
+            before = low[index - 1] if index else ""
+            after = low[index + 5] if index + 5 < len(low) else ""
+            if not (before and is_word_char(before)) and not (after and is_word_char(after)):
+                whole = True
+            if not (before and before.isalnum()) and not (after and after.isalnum()):
+                alnum = True
+            start = index + 1
+        counts["whole_word"] += whole
+        counts["alnum_boundary"] += alnum
+    return counts
+
+
+def key_T1(src, params):
+    text = _text(src.read("docs/grand-catalog-handbook.md"))
+    headings = [line[3:].strip() for line in text.split("\n") if line.startswith("## ")]
+    return {"path": "docs/grand-catalog-handbook.md", "heading_count": len(headings), "first_ten": headings[:10],
+            "token_lines": token_line_counts(text)}
+
+
+def key_T3(src, params):
+    where, node, text = _definition(src, params["symbol_fixture"], params["symbol"])
+    segment = ast.get_source_segment(text, node) or ""
+    return {"path": where[0], "lineno": where[1], "end_lineno": where[2], "segment": segment,
+            "def_line": segment.split("\n", 1)[0]}
+
+
+def key_T4(src, params):
+    update = _text(src.read("adoption/update.md"))
+    bootstrap = _text(src.read("adoption/bootstrap.md")).split("\n")
+    pins = [line.strip() for line in update.split("\n")
+            if "source.release_tag" in line or "source.release_commit" in line]
+    start = next((index for index, line in enumerate(bootstrap) if line.startswith("**Step 0")), None)
+    excerpt = []
+    if start is not None:
+        for line in bootstrap[start:start + 60]:
+            if excerpt and line.startswith("**Step "):
+                break
+            excerpt.append(line)
+    return {"update_path": "adoption/update.md", "pin_lines": pins, "bootstrap_path": "adoption/bootstrap.md",
+            "bootstrap_excerpt": excerpt, "qmd_coverage": None}
+
+
+def key_T5(src, params):
+    where, _, _ = _definition(src, params["symbol_fixture"], params["symbol"])
+    sites = symbol_sites(src, ("scripts", "tests"), params["symbol"])
+    return dict({"symbol": params["symbol"], "def": where}, **sites)
+
+
+def key_T6(src, params):
+    where, node, text = _definition(src, "scripts/host_requests.py", "trust")
+    lines = {}
+    for path in ("scripts/host_requests.py", "recipes/host-request-lane.md"):
+        lines[path] = _text(src.read(path)).split("\n")
+    return {"function": "trust", "path": where[0], "lineno": where[1], "end_lineno": where[2],
+            "segment": ast.get_source_segment(text, node) or "", "conditions": list(TRUST_CONDITIONS), "files": lines}
+
+
+def key_T7(src, params):
+    recipe = _text(src.read("recipes/host-request-lane.md")).split("\n")
+    return {"recipe_path": "recipes/host-request-lane.md", "recipe_sha256": sha256_hex("\n".join(recipe)),
+            "trust_lines": [line.strip() for line in recipe if "trust" in line.lower()], "memory_records": None}
+
+
+def key_T8(src, params):
+    data = _need(src.read("scripts/host_requests.py"))
+    text, tree = parse_py(data)
+    if tree is None:
+        raise KeyUnavailable("key_missing")
+    names = [node.name for node in _top_functions(tree)]
+    methods = sorted({node.name for cls in ast.walk(tree) if isinstance(cls, ast.ClassDef)
+                      for node in ast.walk(cls) if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
+                     - set(names))
+    other = []
+    data2 = src.read("scripts/credential_status.py")
+    if data2 is not None:
+        _, tree2 = parse_py(data2)
+        if tree2 is not None:
+            other = sorted({node.name for node in _top_functions(tree2)} - set(names))
+    return {"path": "scripts/host_requests.py", "names": names, "distractors": sorted(set(methods) | set(other))}
+
+
+def key_T9(src, params, prereg_src):
+    frozen = params["frozen_input"]
+    data = _need(prereg_src.read(frozen["path"]))
+    try:
+        node = json.loads(data.decode("utf-8"))
+        for part in frozen["pointer"].lstrip("/").split("/"):
+            node = node[part]
+    except (ValueError, KeyError, TypeError):
+        raise KeyUnavailable("key_missing") from None
+    serialized = json.dumps(node, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    if sha256_hex(serialized) != frozen["sha256"] or len(serialized) != frozen["bytes"] \
+            or not isinstance(node, list) or len(node) != frozen["records"]:
+        raise KeyUnavailable("input_hash")
+    return {"sha256": frozen["sha256"], "bytes": frozen["bytes"], "record_count": frozen["records"],
+            "records": json.loads(serialized.decode("utf-8"))}
+
+
+def key_T10(src, params):
+    sites = []
+    for path in [item for item in src.files("scripts") if item.endswith(".py")]:
+        _, tree = parse_py(_need(src.read(path)))
+        if tree is None:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "run" \
+                    and isinstance(node.func.value, ast.Name) and node.func.value.id == "subprocess":
+                sites.append([path, node.lineno])
+    sites.sort()
+    return {"count": len(sites), "files": len({path for path, _ in sites}), "sites": sites}
+
+
+def key_T11(src, params):
+    sites = symbol_sites(src, (), params["symbol"], with_functions=True)
+    return {"symbol": params["symbol"], "sites": sites["name_calls"], "attr_calls": sites["attr_calls"],
+            "imports": sites["imports"], "mentions": sites["mentions"]}
+
+
+def _fixture(src, path):
+    data = _need(src.read(path))
+    if path in SEALED_FIXTURES and sha256_hex(data) != SEALED_FIXTURES[path]:
+        raise KeyUnavailable("input_hash")
+    return data
+
+
+def _table_records(src):
+    try:
+        return json.loads(_fixture(src, TABLE_PATH).decode("utf-8"))
+    except ValueError:
+        raise KeyUnavailable("input_hash") from None
+
+
+def _event_rows(data):
+    rows = []
+    for line in data.decode("utf-8").split("\n"):
+        if line.strip():
+            rows.append(json.loads(line))
+    return rows
+
+
+def key_web(src, params):
+    low, high = params["range"]
+    records = [record for record in _table_records(src) if low <= record["id"] <= high]
+    return {"records": records, "latency_sum": sum(record["latency_ms"] for record in records),
+            "range": [low, high], "urls": list(params["urls"])}
+
+
+def anti_pattern_row(history_lines, keyword):
+    """The first anti-pattern log row (a table row starting with a date) whose anti-pattern column holds the keyword."""
+    for line in history_lines:
+        if not line.startswith("| 20"):
+            continue
+        cells = line.split("|")
+        if len(cells) > 2 and keyword in cells[2].lower():
+            return line.strip()
+    return None
+
+
+def key_catalog(src, params, name):
+    catalog = _text(src.read(params["catalog"]))
+    history = _text(src.read(params["historical_fixture"])).split("\n")
+    row = anti_pattern_row(history, ANTI_PATTERN_KEYWORDS[name])
+    facts = {fact: fact.lower() in catalog.lower() for fact in TEMPLATES[name]["facts"]}
+    return {"catalog": params["catalog"], "catalog_sha256": sha256_hex(catalog), "facts_in_source": facts,
+            "anti_pattern_row": row, "memory_records": None}
+
+
+def key_T26(src, params, events_bytes):
+    where, _, _ = _definition(src, params["symbol_fixture"], params["symbol"])
+    sites = symbol_sites(src, ("scripts", "tests"), params["symbol"])
+    low, high = params["event_range"]
+    errors = [row for row in _event_rows(events_bytes) if row["level"] == "ERROR" and low <= row["event"] <= high]
+    return dict({"symbol": params["symbol"], "def": where, "range": [low, high],
+                 "error_events": [row["event"] for row in errors], "value_sum": sum(row["value"] for row in errors)},
+                **sites)
+
+
+def key_T27(src, params):
+    data = _fixture(src, EVENTS_PATH)
+    rows = _event_rows(data)
+    directory = EVENTS_PATH.rsplit("/", 1)[0] + "/"
+    listing = sorted({path[len(directory):].split("/", 1)[0] for path in src.files(directory) if path.startswith(directory)})
+    return {"partition": params["partition"], "fixture_bytes": len(data), "rows": len(rows),
+            "error_rows": sum(1 for row in rows if row["level"] == "ERROR"), "wc_l": data.count(b"\n"),
+            "ls": listing, "summary": f"PASS partition {params['partition']}", "fixture_sha256": sha256_hex(data),
+            "acceptance": None}
+
+
+def key_T28(src, params):
+    patch = _text(src.read(params["fixture_path"]))
+    lines = patch.split("\n")
+    files = [line[4:].strip() for line in lines if line.startswith("+++ ")]
+    hunk_starts = [index for index, line in enumerate(lines) if line.startswith("@@")]
+    opening = lines[hunk_starts[0]:hunk_starts[1]] if len(hunk_starts) > 1 else lines[hunk_starts[0]:] if hunk_starts \
+        else []
+    return {"bytes": len(patch.encode("utf-8")), "files": files, "hunks": len(hunk_starts),
+            "added": sum(1 for line in lines if line.startswith("+") and not line.startswith("+++")),
+            "deleted": sum(1 for line in lines if line.startswith("-") and not line.startswith("---")),
+            "opening_hunk": opening}
+
+
+def key_T29(src, params):
+    before = _text(src.read("fixtures/before.py"))
+    after = _text(src.read("fixtures/after.py"))
+    _, tree = parse_py(before.encode("utf-8"))
+    names = [node.name for node in _top_functions(tree)] if tree is not None else []
+    return {"function": names[0] if names else None, "before_lines": _line_count(before),
+            "after_lines": _line_count(after)}
+
+
+def key_T31(src, params):
+    after = _need(src.read("fixtures/after.py"))
+    before = _text(src.read("fixtures/before.py"))
+    return {"after_sha256": sha256_hex(after), "after_bytes": len(after), "before_lines": _line_count(before)}
+
+
+def key_T32(src, params):
+    record = next((item for item in _table_records(src) if item["id"] == params["record_id"]), None)
+    _need(record)
+    verdict = "yes" if record["status"] == "ok" and record["region"] == "us-east-1" else "no"
+    return {"record_id": record["id"], "verdict": verdict, "latency_ms": record["latency_ms"]}
+
+
+def key_T33(src, params):
+    data = _fixture(src, EVENTS_PATH)
+    first = _event_rows(data)[:5]
+    return {"events": [row["event"] for row in first], "levels": [row["level"] for row in first],
+            "file_bytes": len(data)}
+
+
+def key_T34(src, params):
+    return {"count": sum(1 for row in _event_rows(_fixture(src, EVENTS_PATH)) if row["level"] == "ERROR")}
+
+
+def key_T35(src, params):
+    errors = [row["event"] for row in _event_rows(_fixture(src, EVENTS_PATH)) if row["level"] == "ERROR"]
+    _need(errors or None)
+    return {"first": errors[0], "last": errors[-1]}
+
+
+def key_T36(src, params, task_id, bindings):
+    record = ((bindings or {}).get("sentinels") or {}).get(task_id)
+    _need(record, "input_missing")
+    names = sorted({path.split("/", 1)[1].split("/", 1)[0] for path in src.files("fixtures")} | {"sentinel.txt"})
+    before = _text(src.read("fixtures/before.py"))
+    return {"value": record["value"], "sha256": record["sha256"], "sibling_value": record.get("sibling_value"),
+            "inventory": names, "before_lines": _line_count(before)}
+
+
+def key_T37(src, params):
+    return key_T29(src, params)
+
+
+def key_T38(src, params, inputs):
+    data = _need(src.read(params["fixture_path"]))
+    bound = (inputs or {}).get("seed-conversion")
+    return {"fixture_sha256": sha256_hex(data), "input_sha256": bound.get("sha256") if bound else None}
+
+
+def key_T2(task_id, inputs):
+    recorded = RECORDED_T2[task_id]
+    bound = _need((inputs or {}).get(task_id), "input_missing")
+    if bound.get("sha256") != recorded["sha256"] or bound.get("bytes") != recorded["bytes"]:
+        raise KeyUnavailable("input_hash")
+    return dict(recorded)
+
+
+def compute_keys(tasks, exec_src, prereg_src, inputs=None, memory=None, qmd=None, bindings=None, captures=None):
+    """{task id: {template, status, reason, key, key_sha256}} for every graded task; a key that cannot be computed
+    is recorded as unknown with its reason, never guessed."""
+    inputs = inputs or {}
+    captures = captures or {}
+    events = {}
+
+    def events_bytes():
+        if "data" not in events:
+            events["data"] = _fixture(exec_src, EVENTS_PATH)
+        return events["data"]
+
+    cache = {}
+
+    def memo(name, build):
+        if name not in cache:
+            cache[name] = build()
+        return cache[name]
+
+    result = collections.OrderedDict()
+    for task in tasks:
+        name, params, task_id = task["template"], task["params"], task["id"]
+        try:
+            if name == "T0":
+                key = {"identities": [list(argv) for _, argv in T0_IDENTITIES], "source": "captures"}
+            elif name == "T1":
+                key = memo(name, lambda: key_T1(exec_src, params))
+            elif name == "T2":
+                key = key_T2(task_id, inputs)
+            elif name == "T3":
+                key = memo(name, lambda: key_T3(exec_src, params))
+            elif name == "T4":
+                key = memo(name, lambda: key_T4(exec_src, params))
+                key = dict(key, qmd_coverage=(qmd or {}).get("adoption/update.md"))
+            elif name == "T5":
+                key = memo(name, lambda: key_T5(exec_src, params))
+            elif name == "T6":
+                key = memo(name, lambda: key_T6(exec_src, params))
+            elif name == "T7":
+                key = dict(memo(name, lambda: key_T7(exec_src, params)),
+                           memory_records=(memory or {}).get(task_id))
+            elif name == "T8":
+                key = memo(name, lambda: key_T8(exec_src, params))
+            elif name == "T9":
+                key = memo(name, lambda: key_T9(exec_src, params, prereg_src))
+            elif name == "T10":
+                key = memo(name, lambda: key_T10(exec_src, params))
+            elif name == "T11":
+                key = {"symbol": params["symbol"], "source": "clone_post_arm"}
+            elif name in ("T12", "T13"):
+                key = {"pages": ["stripe"] if name == "T12" else ["mcp"], "source": "captures",
+                       "facts_required": ["idempotency_key_header", "retention_hours"] if name == "T12"
+                       else ["scopes"]}
+            elif name == "T14":
+                key = {"source": "identity_table_and_transcript"}
+            elif name in WEB_TEMPLATES:
+                key = key_web(exec_src, params)
+                key["pages"] = ["json", "pathlib"]
+            elif name in CATALOG_TEMPLATES:
+                key = dict(key_catalog(exec_src, params, name), memory_records=(memory or {}).get(task_id))
+            elif name == "T26":
+                key = key_T26(exec_src, params, events_bytes())
+            elif name == "T27":
+                key = key_T27(exec_src, params)
+                if captures.get("post_w"):
+                    key["acceptance"] = captures["post_w"].get("acceptance", {}).get(task_id)
+            elif name == "T28":
+                key = memo(name, lambda: key_T28(exec_src, params))
+            elif name == "T29":
+                key = memo(name, lambda: key_T29(exec_src, params))
+            elif name == "T30":
+                post = (captures.get("post_w") or {}).get("py_compile")
+                key = _need(post, "post_w_missing")
+            elif name == "T31":
+                key = memo(name, lambda: key_T31(exec_src, params))
+            elif name == "T32":
+                key = key_T32(exec_src, params)
+            elif name == "T33":
+                key = memo(name, lambda: key_T33(exec_src, params))
+            elif name == "T34":
+                key = memo(name, lambda: key_T34(exec_src, params))
+            elif name == "T35":
+                key = memo(name, lambda: key_T35(exec_src, params))
+            elif name == "T36":
+                key = key_T36(exec_src, params, task_id, bindings)
+            elif name == "T37":
+                key = memo(name, lambda: key_T37(exec_src, params))
+            elif name == "T38":
+                key = key_T38(exec_src, params, inputs)
+            else:
+                raise KeyUnavailable("key_missing")
+            result[task_id] = {"template": name, "status": "ok", "reason": None, "key": key,
+                               "key_sha256": sha256_hex(canonical(key))}
+        except KeyUnavailable as stop:
+            result[task_id] = {"template": name, "status": "unknown", "reason": stop.reason, "key": None,
+                               "key_sha256": None}
+    return result
+
+
+# ---- Strict decode and equality (R4) ---------------------------------------------------------------------------
+
+class DecodeError(Exception):
+    def __init__(self, reason):
+        super().__init__(reason)
+        self.reason = reason
+
+
+def _no_duplicates(pairs):
+    result = {}
+    for name, value in pairs:
+        if name in result:
+            raise ValueError("duplicate key")
+        result[name] = value
+    return result
+
+
+def _no_constant(name):
+    raise ValueError("non-finite constant")
+
+
+def json_decode(text):
+    try:
+        return json.loads(text, object_pairs_hook=_no_duplicates, parse_constant=_no_constant)
+    except (ValueError, RecursionError):
+        raise DecodeError("json_strict_decode") from None
+
+
+def toon_decode_argv():
+    """The TOON CLI 4.1.1 decode command; strict is the CLI default and `--no-strict` is never passed."""
+    return [shutil.which("toon") or "toon", "--decode"]
+
+
+def toon_decode(text):
+    try:
+        done = subprocess.run(toon_decode_argv(), input=text, capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.TimeoutExpired):
+        raise DecodeError("toon_strict_decode") from None
+    if done.returncode != 0:
+        raise DecodeError("toon_strict_decode")
+    try:
+        return json.loads(done.stdout)
+    except ValueError:
+        raise DecodeError("toon_strict_decode") from None
+
+
+def toon_header(line):
+    """True for a TOON array header line: `[N]:`, `[N]{fields}:` or `key[N]{fields}:` (optionally with inline values)."""
+    stripped = line.strip()
+    index = stripped.find("[")
+    if index < 0 or any(char in " \t:" for char in stripped[:index]):
+        return False
+    scan = index + 1
+    digits = 0
+    while scan < len(stripped) and is_digit(stripped[scan]):
+        scan += 1
+        digits += 1
+    if not digits:
+        return False
+    if scan < len(stripped) and stripped[scan] in "\t|":
+        scan += 1
+    if scan >= len(stripped) or stripped[scan] != "]":
+        return False
+    scan += 1
+    if scan < len(stripped) and stripped[scan] == "{":
+        close = stripped.find("}", scan)
+        if close < 0:
+            return False
+        scan = close + 1
+    return scan < len(stripped) and stripped[scan] == ":"
+
+
+def _json_block(lines, start):
+    """Consecutive lines from `start` that close the JSON array or object opened on the first line, or None."""
+    depth, in_string, escaped, collected = 0, False, False, []
+    for number in range(start, len(lines)):
+        collected.append(lines[number])
+        for char in lines[number]:
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif char == "\\":
+                    escaped = True
+                elif char == '"':
+                    in_string = False
+            elif char == '"':
+                in_string = True
+            elif char in "[{":
+                depth += 1
+            elif char in "]}":
+                depth -= 1
+        if depth <= 0 and not in_string:
+            return "\n".join(collected), number
+        if number - start > 5000:
+            break
+    return "\n".join(collected), len(lines) - 1
+
+
+def looks_like_payload(text):
+    first = next((line for line in text.split("\n") if line.strip()), "")
+    return first.lstrip()[:1] in ("[", "{") or toon_header(first)
+
+
+def payload_candidates(ans):
+    """Structural candidates (fenced blocks and contiguous line blocks that start like a TOON header or a JSON
+    array or object) and bare ones (each evidence string, then the whole answer), in that order, without repeats."""
+    raw = answer_text(ans)
+    found, seen = [], set()
+
+    def add(kind, text, structural):
+        key = text.strip()
+        if key and key not in seen:
+            seen.add(key)
+            found.append({"kind": kind, "text": text, "structural": structural})
+
+    for block in fenced_blocks(raw):
+        if block["lang"] in ("", "json", "toon"):
+            add("fence", block["body"], True)
+    lines = raw.split("\n")
+    outside = outside_fences(raw)
+    position = 0
+    while position < len(outside):
+        index, line = outside[position]
+        stripped = line.lstrip()
+        block, last = None, index
+        if toon_header(line) and not stripped.startswith("- "):
+            rows = [line]
+            follow = index + 1
+            while follow < len(lines) and lines[follow][:1] in (" ", "\t") and lines[follow].strip():
+                rows.append(lines[follow])
+                follow += 1
+            if "{" in stripped or len(rows) > 1:  # a tabular or indented array; `[1]: url` is prose
+                block, last = "\n".join(rows), follow - 1
+        elif stripped[:1] == "{" or stripped[:2] == "[{" or stripped.rstrip() == "[":
+            block, last = _json_block(lines, index)
+        if block is not None:
+            add("lines", block, True)
+            while position < len(outside) and outside[position][0] <= last:
+                position += 1
+            continue
+        position += 1
+    for text in answer_evidence(ans):
+        add("evidence", text, False)
+    add("whole", raw, False)
+    return found
+
+
+def decode_candidate(text):
+    stripped = text.strip()
+    if stripped[:1] in ("[", "{"):
+        try:
+            return json_decode(stripped)
+        except DecodeError:
+            first = next((line for line in stripped.split("\n") if line.strip()), "")
+            if toon_header(first):
+                return toon_decode(stripped)
+            raise
+    return toon_decode(stripped)
+
+
+def type_class(value):
+    if isinstance(value, bool):
+        return "bool"
+    if isinstance(value, (int, float)):
+        return "number"
+    if isinstance(value, str):
+        return "string"
+    if value is None:
+        return "null"
+    return "array" if isinstance(value, list) else "object"
+
+
+def scalar_equal(answer_value, key_value):
+    """TOON spec section 2 scalar equality plus JSON-type identity: numbers by mathematical value (-0 = 0,
+    17 = 17.0), strings by scalar sequence, and a boolean never equals a number nor a string a number."""
+    if type_class(answer_value) != type_class(key_value):
+        return False
+    return answer_value == key_value
+
+
+def _lenient_equal(answer_value, key_value):
+    try:
+        if isinstance(answer_value, str) and type_class(key_value) == "number":
+            return float(answer_value) == float(key_value)
+        if isinstance(key_value, str) and type_class(answer_value) == "number":
+            return float(key_value) == float(answer_value)
+    except ValueError:
+        return False
+    return answer_value == key_value
+
+
+def compare_values(answer_value, key_value, ordered):
+    """(reasons, key_order_differs) for one decoded value against the key, per R4."""
+    reasons, order_bad = set(), [False]
+
+    def walk(left, right):
+        kind_left, kind_right = type_class(left), type_class(right)
+        if kind_right == "object" and kind_left == "object":
+            if set(left) != set(right):
+                reasons.add("records")
+                return
+            if ordered and list(left) != list(right):
+                order_bad[0] = True
+            for name in right:
+                walk(left[name], right[name])
+        elif kind_right == "array" and kind_left == "array":
+            if len(left) != len(right):
+                reasons.add("records")
+                return
+            for one, other in zip(left, right):
+                walk(one, other)
+        elif kind_left in ("array", "object") or kind_right in ("array", "object"):
+            reasons.add("strict_types" if kind_left != kind_right else "records")
+        elif not scalar_equal(left, right):
+            reasons.add("strict_types" if kind_left != kind_right and _lenient_equal(left, right) else "records")
+
+    walk(answer_value, key_value)
+    return reasons, order_bad[0]
+
+
+def payload_records(value, reading):
+    """(records, extras) when the decoded value has an accepted shape under R2-01, else (None, None)."""
+    if isinstance(value, list) and all(isinstance(item, dict) for item in value):
+        return value, {}
+    if isinstance(value, dict) and reading in ("single_key_wrapper", "wrapper_with_extras"):
+        lists = [(name, item) for name, item in value.items()
+                 if isinstance(item, list) and item and all(isinstance(entry, dict) for entry in item)]
+        if len(lists) == 1:
+            others = {name: item for name, item in value.items() if name != lists[0][0]}
+            if not others:
+                return lists[0][1], {}
+            if reading == "wrapper_with_extras" and all(not isinstance(item, (list, dict))
+                                                       for item in others.values()):
+                return lists[0][1], others
+    return None, None
+
+
+def _stated_sum(ans, structural_texts):
+    """Integers in lines that name a sum or total, outside fenced blocks and payload line blocks."""
+    lines = [line for _, line in outside_fences(answer_text(ans))]
+    values = []
+    for text in list(answer_evidence(ans)):
+        lines.extend(text.split("\n"))
+    for line in lines:
+        if any(line.strip() and line in block for block in structural_texts):
+            continue
+        low = normalize(line).lower()
+        if "sum" in low or "total" in low:
+            values.extend(int_values(int_tokens(low)))
+    return values
+
+
+def grade_payload(ans, key, readings):
+    """R4: every payload candidate must strictly decode and equal the key; the requested latency sum is checked
+    when the key has one. No candidate at all is unknown(unparsed); a found candidate that does not decode fails."""
+    reading = readings["R2-01"]
+    ordered = readings["R2-02"] == "ordered"
+    decoded, structural_texts = [], []
+    for candidate in payload_candidates(ans):
+        if candidate["structural"]:
+            if not looks_like_payload(candidate["text"]):
+                continue
+            try:
+                value = decode_candidate(candidate["text"])
+            except DecodeError as stop:
+                return fail(stop.reason)
+            if payload_records(value, "wrapper_with_extras")[0] is not None:
+                structural_texts.append(candidate["text"])
+                decoded.append(value)
+        else:
+            try:
+                value = decode_candidate(candidate["text"]) if looks_like_payload(candidate["text"]) else None
+            except DecodeError:
+                value = None
+            if value is not None and (payload_records(value, "wrapper_with_extras")[0] is not None):
+                decoded.append(value)
+    if not decoded:
+        return unknown("unparsed")
+    reasons, extras_sum = set(), None
+    for value in decoded:
+        records, extras = payload_records(value, reading)
+        if records is None:
+            reasons.add("strict_shape")
+            continue
+        found, order_bad = compare_values(records, key["records"], ordered)
+        reasons |= found
+        if not found and order_bad:
+            reasons.add("key_order")
+        if extras.get("latency_sum") is not None:
+            extras_sum = extras["latency_sum"]
+    if "latency_sum" in key:
+        values = [extras_sum] if extras_sum is not None else _stated_sum(ans, structural_texts)
+        if values and key["latency_sum"] not in values:
+            reasons.add("latency_sum")
+        elif not values and not reasons:
+            return unknown("unparsed")
+    return fail(*reasons) if reasons else ok()
+
+
+# ---- Class A oracles: an answer against its frozen key (R3) -----------------------------------------------------
+
+def order_ok(positions):
+    return all(left < right for left, right in zip(positions, positions[1:]))
+
+
+def site_is_excluded(kind):
+    return kind in ("attr_call", "import", "mention")
+
+
+def _list_marker(line, token):
+    stripped = line.lstrip()
+    lead = len(line) - len(stripped)
+    return token["start"] == lead and token["end"] < len(line) and line[token["end"]] in ".)" \
+        and token["end"] + 1 < len(line) and line[token["end"] + 1] == " "
+
+
+def _line_values(line):
+    return [token for token in int_tokens(line) if not _list_marker(line, token)]
+
+
+def t1_token_lines_check(text, counts, reading):
+    expected = counts[reading]
+    values = []
+    for line in normalize(text).split("\n"):
+        if "token" in line.lower():
+            values.extend(int_values(_line_values(line)))
+    if not values:
+        return unknown("unparsed")
+    return ok() if expected in values else fail("token_lines")
+
+
+def _finish(reasons, unparsed, **detail):
+    if reasons:
+        return fail(*reasons, **detail)
+    if unparsed:
+        return unknown("unparsed", **detail)
+    return ok(**detail)
+
+
+def oracle_T1(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    lowered = " ".join(text.split()).lower()
+    reasons, unparsed = set(), False
+    positions, missing = [], False
+    for heading in key["first_ten"]:
+        index = lowered.find(" ".join(normalize(heading).split()).lower())
+        if index < 0:
+            missing = True
+        else:
+            positions.append(index)
+    if missing:
+        reasons.add("headings_missing")
+    elif not order_ok(positions):
+        reasons.add("headings_order")
+    counts = []
+    for line in text.split("\n"):
+        if "heading" in line.lower():
+            counts.extend(int_values(_line_values(line)))
+    if not counts:
+        unparsed = True
+    elif key["heading_count"] not in counts:
+        reasons.add("heading_count")
+    token = t1_token_lines_check(text, key["token_lines"], readings["R2-09"])
+    if token.status == "fail":
+        reasons.add("token_lines")
+    elif token.status != "pass":
+        unparsed = True
+    return {"A": _finish(reasons, unparsed)}
+
+
+def _is_hex64(word):
+    return len(word) == 64 and all(char in "0123456789abcdefABCDEF" for char in word)
+
+
+def oracle_T2(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons, unparsed = set(), False
+    digests = [word.lower() for _, _, word in iter_words(text) if _is_hex64(word)]
+    if not digests:
+        reasons.add("digest_missing")
+    elif key["sha256"] not in digests:
+        reasons.add("sha256")
+    tokens = int_tokens(text)
+    if not has_int(tokens, key["bytes"]):
+        reasons.add("bytes" if any(token["value"] >= 1000 for token in tokens) else "bytes_missing")
+    low = text.lower()
+    negative = any(has_word(low, word) for word in ("mismatch", "mismatched", "differ", "differs", "differed")) \
+        or "not match" in low or "n't match" in low or "no match" in low
+    positive = any(has_word(low, word) for word in ("match", "matches", "matched", "identical", "equal", "verified"))
+    if negative:
+        reasons.add("verdict")
+    elif not positive:
+        unparsed = True
+    return {"A": _finish(reasons, unparsed)}
+
+
+def _citation_matches(cite, path):
+    return cite["path"] == path or path.endswith("/" + cite["path"])
+
+
+def oracle_T3(params, key, ans, readings, ctx=None):
+    raw = answer_text(ans)
+    cites = citations(normalize(raw))
+    reading = readings["R2-03"]
+    located = False
+    for cite in cites:
+        if _citation_matches(cite, key["path"]) and cite["start"] == key["lineno"]:
+            if reading == "def_line_range":
+                located = located or cite["end"] == key["end_lineno"]
+            else:
+                located = located or cite["end"] in (cite["start"], key["end_lineno"])
+    reasons = set()
+    if not located:
+        reasons.add("definition_location")
+    wanted = key["def_line"] if reading == "def_line_range" else key["segment"]
+    if flat(wanted) not in flat(raw):
+        reasons.add("definition_text")
+    return {"A": _finish(reasons, False)}
+
+
+def oracle_T4(params, key, ans, readings, ctx=None):
+    text = flat(answer_text(ans))
+    if "adoption/update.md" not in text:
+        return {"A": fail("citation_missing")}
+    low = text.lower()
+    missing = [fact for fact in TEMPLATES["T4"]["facts"] if fact.lower() not in low]
+    return {"A": fail("fact_missing", missing=missing) if missing else ok()}
+
+
+_LABEL_WORDS = (("import", ("import", "imports", "imported")),
+                ("mention", ("mention", "mentions", "comment", "comments", "string", "strings", "docstring",
+                             "textual", "documentation", "excluded", "exclude")),
+                ("definition", ("definition", "defined", "def")))
+
+
+def claim_label(line):
+    words = {word.lower() for _, _, word in iter_words(line)}
+    for label, names in _LABEL_WORDS:
+        if words & set(names):
+            return label
+    return "invocation"
+
+
+def _resolve_path(path, known):
+    if path in known:
+        return path
+    matches = [item for item in known if item.endswith("/" + path)]
+    return matches[0] if len(matches) == 1 else None
+
+
+def claims_from_text(text, known):
+    """Every cited `path:line` claim with the label its own line carries (invocation unless it says otherwise)."""
+    claims = []
+    for line in normalize(text).split("\n"):
+        cites = citations(line)
+        if not cites:
+            continue
+        label = claim_label(line)
+        for cite in cites:
+            path = _resolve_path(cite["path"], known)
+            span = list(range(cite["start"], cite["end"] + 1)) if 0 <= cite["end"] - cite["start"] <= 500 \
+                else [cite["start"]]
+            claims.append({"path": path or cite["path"], "resolved": path is not None, "lines": span,
+                           "label": label, "line_text": line})
+    return claims
+
+
+def _kind_map(key):
+    kinds = collections.defaultdict(set)
+    for group, kind in (("name_calls", "name_call"), ("attr_calls", "attr_call"), ("imports", "import"),
+                        ("mentions", "mention")):
+        for entry in key.get(group, []):
+            kinds[(entry[0], entry[1])].add(kind)
+    return kinds
+
+
+def evaluate_sites(key, text, *, complete, once, names=None):
+    """Reasons and the claimed true sites for one answer against a symbol-site key (R2-04, R2-05)."""
+    sites = key["sites"] if "sites" in key else key["name_calls"]
+    true_sites = {(entry[0], entry[1]) for entry in sites}
+    known = {entry[0] for group in ("name_calls", "attr_calls", "imports", "mentions") for entry in key.get(group, [])}
+    known |= {entry[0] for entry in sites}
+    if "def" in key:
+        known.add(key["def"][0])
+    kinds = _kind_map(key)
+    for site in true_sites:
+        kinds[site].add("name_call")
+    definition = key.get("def")
+    reasons, claimed, defined, claim_lines = set(), [], definition is None, {}
+    for claim in claims_from_text(text, known):
+        if not claim["resolved"]:
+            continue
+        if definition and claim["path"] == definition[0] and any(definition[1] <= n <= definition[2]
+                                                                 for n in claim["lines"]):
+            defined = True
+        if claim["label"] != "invocation":
+            continue
+        for number in claim["lines"]:
+            position = (claim["path"], number)
+            found = kinds.get(position, set())
+            if "name_call" in found:
+                claimed.append(position)
+                claim_lines.setdefault(position, claim["line_text"])
+            elif any(kind in found and site_is_excluded(kind) for kind in ("attr_call", "import", "mention")):
+                reasons.add("site_excluded")
+            elif len(claim["lines"]) == 1 and not (definition and position[0] == definition[0]
+                                                    and definition[1] <= number <= definition[2]):
+                reasons.add("site_spurious")
+    if once and len(claimed) != len(set(claimed)):
+        reasons.add("site_duplicated")
+    if complete and true_sites - set(claimed):
+        reasons.add("sites_missing")
+    if not defined:
+        reasons.add("definition_missing")
+    return reasons, claimed, claim_lines
+
+
+def oracle_T5(params, key, ans, readings, ctx=None):
+    complete = readings["R2-04"] == "complete_and_precise"
+    reasons, _, _ = evaluate_sites(key, answer_text(ans), complete=complete, once=False)
+    return {"A": _finish(reasons, False)}
+
+
+def _events_and_sum(text, key):
+    reasons, unparsed = set(), False
+    low_lines = normalize(text).split("\n")
+    lo, hi = key["range"]
+    found_events = False
+    for line in low_lines:
+        if not has_word(line, "error"):
+            continue
+        cut = len(line)
+        for word in ("sum", "value", "total"):
+            positions = word_positions(line, word)
+            if positions:
+                cut = min(cut, positions[0])
+        values = int_values(_line_values(line[:cut]))
+        if not values:
+            continue
+        found_events = True
+        wanted = sorted(key["error_events"])
+        if sorted(values) != wanted:
+            trimmed = list(values)
+            for bound in (lo, hi):
+                if bound in trimmed and bound not in wanted:
+                    trimmed.remove(bound)
+            if sorted(trimmed) != wanted:
+                reasons.add("events")
+        break
+    if not found_events:
+        unparsed = True
+    sums = []
+    for line in low_lines:
+        for label in ("sum", "total"):
+            sums.extend(token["value"] for token in ints_by_label(line, label))
+    if not sums:
+        unparsed = True
+    elif key["value_sum"] not in sums:
+        reasons.add("value_sum")
+    return reasons, unparsed
+
+
+def oracle_T26(params, key, ans, readings, ctx=None):
+    text = answer_text(ans)
+    reasons, unparsed = _events_and_sum(text, key)
+    site_reasons, _, _ = evaluate_sites(key, text, complete=True, once=True)
+    return {"A": _finish(reasons | site_reasons, unparsed)}
+
+
+def _resolve_quote_lines(key, path, start, end):
+    lines = key["files"].get(path)
+    if lines is None:
+        return None
+    return " ".join(flat(item) for item in lines[max(start - 1, 0):max(end, start)])
+
+
+def oracle_T6(params, key, ans, readings, ctx=None):
+    raw = answer_text(ans)
+    reasons = set()
+    lines = raw.split("\n")
+    in_range = False
+    for line in lines:
+        for cite in citations(line):
+            if _citation_matches(cite, key["path"]) and key["lineno"] <= cite["start"] <= key["end_lineno"]:
+                in_range = True
+    for index, content, column in code_spans(raw):
+        line = lines[index]
+        earlier = [cite for cite in citations(line) if cite["pos"] < column]
+        if not earlier:
+            continue
+        cite = earlier[-1]
+        target = next((path for path in key["files"] if _citation_matches(cite, path)), None)
+        haystack = _resolve_quote_lines(key, target, cite["start"], cite["end"]) if target else None
+        if haystack is not None and flat(content) not in haystack:
+            reasons.add("citation_unresolved")
+    for block in fenced_blocks(raw):
+        before = lines[block["start"] - 1] if block["start"] > 0 else ""
+        cites = citations(before)
+        if not cites:
+            continue
+        cite = cites[-1]
+        target = next((path for path in key["files"] if _citation_matches(cite, path)), None)
+        if target is None:
+            continue
+        span = " ".join(flat(item) for item in key["files"][target][max(cite["start"] - 1, 0):
+                                                                    cite["start"] + len(block["body"].split("\n")) + 1])
+        for row in block["body"].split("\n"):
+            if row.strip() and flat(row) not in span:
+                reasons.add("citation_unresolved")
+    if not in_range:
+        reasons.add("citation_missing")
+    low = flat(raw).lower()
+    named = {"author_association": "author_association" in low,
+             "user.type": "user.type" in low or "user type" in low,
+             "performed_via_github_app": "performed_via_github_app" in low or "github app" in low,
+             "repository_owner": "repository_owner" in low or "repository owner" in low or "repo owner" in low}
+    missing = [name for name in key["conditions"] if not named[name]]
+    return {"A": _finish(reasons, False, conditions_missing=missing, d_packet_incomplete=bool(missing))}
+
+
+def oracle_T7(params, key, ans, readings, ctx=None):
+    if "recipes/host-request-lane.md" not in flat(answer_text(ans)):
+        return {"A": fail("citation_missing")}
+    return {"A": ok()}
+
+
+def _strip_list_marker(body):
+    body = body.strip()
+    if body[:1] in ("-", "*", "\u2022") and body[1:2] == " ":
+        return body[2:].strip()
+    end = 0
+    while end < len(body) and body[end].isdigit():
+        end += 1
+    if end and end < len(body) and body[end] in ".)" and body[end + 1:end + 2] == " ":
+        return body[end + 2:].strip()
+    return body
+
+
+def _identifier(item):
+    item = item.strip().strip("`'\"()[]")
+    return item if item and not item[0].isdigit() and all(is_word_char(char) for char in item) else None
+
+
+def listed_identifiers(raw):
+    """Bare identifiers written as list items, in code spans or in fenced blocks (dot-qualified names never count)."""
+    found = set()
+    for block in fenced_blocks(raw):
+        found.update(word for _, _, word in iter_words(block["body"]) if _identifier(word))
+    for _, content, _ in code_spans(raw):
+        if _identifier(content):
+            found.add(content.strip())
+    for _, line in outside_fences(raw):
+        body = _strip_list_marker(line)
+        if ":" in body and body.count(",") >= 2:
+            body = body.rsplit(":", 1)[1]
+        items = body.replace("`", "").split(",")
+        if len(items) >= 3:
+            named = [_identifier(piece) for piece in items]
+            if sum(1 for item in named if item) >= 0.7 * len(items):
+                found.update(item for item in named if item)
+        elif len(items) == 1 and _identifier(body):
+            found.add(_identifier(body))
+    return found
+
+
+def oracle_T8(params, key, ans, readings, ctx=None):
+    raw = answer_text(ans)
+    words = {word for _, _, word in iter_words(raw)}
+    reasons = set()
+    if [name for name in key["names"] if name not in words]:
+        reasons.add("names_missing")
+    listed = listed_identifiers(raw)
+    if [name for name in key["distractors"] if name in listed]:
+        reasons.add("name_excluded")
+    return {"A": _finish(reasons, False)}
+
+
+def oracle_T9(params, key, ans, readings, ctx=None):
+    return {"A": grade_payload(ans, key, readings)}
+
+
+def oracle_T10(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons, unparsed = set(), False
+    files = {path for path, _ in key["sites"]}
+    if [path for path in files if path not in text]:
+        reasons.add("files_missing")
+    counts = []
+    for line in text.split("\n"):
+        if any(has_word(line, word) for word in ("subprocess", "count", "total", "calls", "invocations", "occurrences")):
+            counts.extend(int_values(_line_values(line)))
+    if not counts:
+        unparsed = True
+    elif key["count"] not in counts:
+        reasons.add("count")
+    true_sites = {(path, line) for path, line in key["sites"]}
+    claimed = []
+    for claim in claims_from_text(text, files):
+        if not claim["resolved"] or claim["label"] != "invocation" or len(claim["lines"]) != 1:
+            continue
+        position = (claim["path"], claim["lines"][0])
+        if position in true_sites:
+            claimed.append(position)
+        else:
+            reasons.add("site_spurious")
+    if claimed and true_sites - set(claimed):
+        reasons.add("sites_missing")
+    return {"A": _finish(reasons, unparsed)}
+
+
+def oracle_T11(params, key, ans, readings, ctx=None):
+    reading = readings["R2-05"]
+    text = answer_text(ans)
+    sites = [(entry[0], entry[1], entry[2]) for entry in key["sites"]]
+    view = {"name_calls": [[p, n] for p, n, _ in sites], "attr_calls": key.get("attr_calls", []),
+            "imports": key.get("imports", []), "mentions": key.get("mentions", [])}
+    functions = sorted({name for _, _, name in sites if name != "<module>"})
+    reasons = set()
+    if reading == "functions_only":
+        words = {word for _, _, word in iter_words(text)}
+        if [name for name in functions if name not in words]:
+            reasons.add("functions_missing")
+        return {"A": _finish(reasons, False)}
+    found, claimed, lines = evaluate_sites(view, text, complete=True, once=False)
+    reasons |= {reason for reason in found if reason != "definition_missing"}
+    if reading == "sites_and_functions":
+        for path, number, name in sites:
+            line = lines.get((path, number))
+            if line is not None and name != "<module>" and not has_word(line, name, ignore_case=False):
+                reasons.add("functions_missing")
+    return {"A": _finish(reasons, False)}
+
+
+def oracle_T12(params, key, ans, readings, ctx=None):
+    facts = (ctx or {}).get("facts")
+    if not facts:
+        return {"A": unknown("key_missing")}
+    text = flat(answer_text(ans))
+    reasons, unparsed = set(), False
+    if "Idempotency-Key" not in text:
+        unparsed = True
+    hours = [token["value"] for token in ints_by_label(text, "hours")]
+    if not hours:
+        unparsed = True
+    elif facts["retention_hours"] not in hours:
+        reasons.add("retention")
+    return {"A": _finish(reasons, unparsed)}
+
+
+def oracle_T13(params, key, ans, readings, ctx=None):
+    scopes = ((ctx or {}).get("facts") or {}).get("scopes") or ["local", "project", "user"]
+    text = flat(answer_text(ans))
+    missing = [scope for scope in scopes if not has_word(text, scope)]
+    return {"A": fail("scopes_missing", missing=missing) if missing else ok()}
+
+
+def normalize_url(url):
+    """R2-18: lowercase scheme and host, no fragment, no default port, trailing punctuation removed."""
+    url = url.strip().rstrip(".,;:)>]}'\"")
+    if "#" in url:
+        url = url.split("#", 1)[0]
+    scheme, sep, rest = url.partition("://")
+    if not sep:
+        return url
+    host, slash, path = rest.partition("/")
+    host = host.lower()
+    for default in (":443", ":80"):
+        if host.endswith(default):
+            host = host[:-len(default)]
+    return scheme.lower() + "://" + host + (slash + path if slash else "")
+
+
+def extract_urls(text):
+    urls = []
+    for scheme in ("https://", "http://"):
+        start = 0
+        while True:
+            index = text.find(scheme, start)
+            if index < 0:
+                break
+            end = index
+            while end < len(text) and not text[end].isspace() and text[end] not in "<>\"'`":
+                end += 1
+            urls.append(normalize_url(text[index:end]))
+            start = end
+    return urls
+
+
+def url_matches(found, wanted, reading):
+    if reading == "host_and_path_suffix":
+        host, _, path = normalize_url(wanted).partition("://")[2].partition("/")
+        f_host, _, f_path = found.partition("://")[2].partition("/")
+        return f_host == host and (f_path.endswith(path.rsplit("/", 1)[-1]) if path else True)
+    return found == normalize_url(wanted)
+
+
+PATHLIB_URL = "https://docs.python.org/3/library/pathlib.html"
+
+
+def oracle_web(params, key, ans, readings, ctx=None):
+    payload = grade_payload(ans, key, readings)
+    raw = answer_text(ans)
+    reasons = set()
+    words = {word for _, _, word in iter_words(raw)}
+    urls = extract_urls(raw)
+    wanted = (params.get("urls") or [None, PATHLIB_URL])[-1]
+    if "read_text" not in words or "encoding" not in words \
+            or not any(url_matches(found, wanted, readings["R2-18"]) for found in urls):
+        reasons.add("citation_missing")
+    return {"A": combine({"payload": payload, "citation": fail(*reasons) if reasons else ok()})}
+
+
+def _oracle_catalog(name):
+    def oracle(params, key, ans, readings, ctx=None):
+        text = flat(answer_text(ans))
+        entry = TEMPLATES[name]
+        reasons = set()
+        if [item for item in entry["literals"] if item.startswith("catalogs/") and item not in text]:
+            reasons.add("citation_missing")
+        if "docs/harness-defaults.md" not in text:
+            reasons.add("anti_pattern_missing")
+        low = text.lower()
+        if [fact for fact in entry["facts"] if fact.lower() not in low]:
+            reasons.add("fact_missing")
+        return {"A": _finish(reasons, False)}
+    return oracle
+
+
+def _exit_values(text):
+    values = []
+    for label in ("exit", "exited", "returned"):
+        values.extend(token["value"] for token in ints_by_label(text, label, nouns=("code", "status", "with")))
+    return values
+
+
+def _has_summary(text, summary):
+    """The exact summary line text, not followed by another digit (PASS partition 2 is not PASS partition 20)."""
+    start = 0
+    while True:
+        index = text.find(summary, start)
+        if index < 0:
+            return False
+        after = text[index + len(summary):index + len(summary) + 1]
+        if not (after and is_digit(after)):
+            return True
+        start = index + 1
+
+
+def oracle_T27(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons, unparsed = set(), False
+    exits = _exit_values(text)
+    if not exits:
+        unparsed = True
+    elif 0 not in exits:
+        reasons.add("exit")
+    if not _has_summary(text, key["summary"]):
+        reasons.add("summary_literal")
+    if [name for name in key["ls"] if name not in text]:
+        reasons.add("inventory")
+    if not has_int(int_tokens(text), key["wc_l"]):
+        reasons.add("line_count")
+    components = {"A": _finish(reasons, unparsed)}
+    run = key.get("acceptance")
+    if run is None:
+        components["B"] = unknown("key_missing")
+    else:
+        components["B"] = ok() if run.get("exit") == 0 and run.get("last_line") == summary else fail("acceptance_run")
+    return components
+
+
+def _labelled(text, labels, expected, nouns, reason, reasons):
+    """True when no integer sits next to any of the labels (unparsed); records a wrong one as a failure reason."""
+    values = [token["value"] for label in labels for token in ints_by_label(text, label, nouns)]
+    if not values:
+        return True
+    if expected not in values:
+        reasons.add(reason)
+    return False
+
+
+def oracle_T28(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons, unparsed = set(), False
+    if [name for name in key["files"] if name not in text]:
+        reasons.add("files")
+    unparsed |= _labelled(text, ("hunks", "hunk"), key["hunks"], (), "hunks", reasons)
+    unparsed |= _labelled(text, ("added",), key["added"], ("lines", "line"), "added", reasons)
+    unparsed |= _labelled(text, ("deleted", "removed"), key["deleted"], ("lines", "line"), "deleted", reasons)
+    return {"A": _finish(reasons, unparsed)}
+
+
+def oracle_T29(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons, unparsed = set(), False
+    if not has_word(text, key["function"], ignore_case=False):
+        reasons.add("name_missing")
+    counts = count_before_noun(text, ("lines", "line"))
+    if not counts:
+        unparsed = True
+    elif any(value not in (key["before_lines"], key["after_lines"]) for value in counts) \
+            or (key["before_lines"] == key["after_lines"] and any(value != key["before_lines"] for value in counts)):
+        reasons.add("line_count")
+    return {"A": _finish(reasons, unparsed)}
+
+
+def oracle_T30(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    exits = _exit_values(text)
+    if not exits:
+        return {"A": unknown("unparsed")}
+    return {"A": ok() if exits and all(value == key["exit"] for value in exits) else fail("exit")}
+
+
+def oracle_T32(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons, unparsed = set(), False
+    verdicts = []
+    for position in word_positions(text, "verdict"):
+        scan = position + len("verdict")
+        while scan < len(text) and text[scan] in " \t:=-":
+            scan += 1
+        end = scan
+        while end < len(text) and is_word_char(text[end]):
+            end += 1
+        if text[scan:end].lower() in ("yes", "no"):
+            verdicts.append(text[scan:end].lower())
+    if not verdicts:
+        present = {word for word in ("yes", "no") if has_word(text, word)}
+        verdicts = list(present) if len(present) == 1 else []
+    if len(set(verdicts)) != 1:
+        unparsed = True
+    elif verdicts[0] != key["verdict"]:
+        reasons.add("verdict")
+    ids = [token["value"] for token in ints_by_label(text, "id")]
+    if not ids:
+        unparsed = True
+    elif key["record_id"] not in ids:
+        reasons.add("record_id")
+    latencies = [token["value"] for label in ("latency", "ms") for token in ints_by_label(text, label,
+                                                                                            ("ms", "milliseconds"))]
+    if not latencies:
+        unparsed = True
+    elif key["latency_ms"] not in latencies:
+        reasons.add("latency")
+    return {"A": _finish(reasons, unparsed)}
+
+
+def oracle_T33(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons, unparsed = set(), False
+    listed = None
+    open_at = text.find("[")
+    if open_at >= 0 and text.find("]", open_at) > open_at:
+        listed = int_values(int_tokens(text[open_at:text.find("]", open_at) + 1]))
+    if listed is None:
+        listed = []
+        for line in text.split("\n"):
+            if has_word(line, "event") or has_word(line, "events"):
+                listed.extend(int_values(_line_values(line)))
+    if not listed:
+        unparsed = True
+    elif listed != key["events"]:
+        reasons.add("events")
+    if any(has_word(text, level, ignore_case=False) for level in ("WARN", "WARNING", "ERROR", "DEBUG")):
+        reasons.add("levels")
+    elif not has_word(text, "INFO", ignore_case=False):
+        unparsed = True
+    return {"A": _finish(reasons, unparsed)}
+
+
+def oracle_T34(params, key, ans, readings, ctx=None):
+    values = int_values(int_tokens(normalize(answer_text(ans))))
+    if not values:
+        return {"A": unknown("unparsed")}
+    return {"A": ok() if key["count"] in values else fail("count")}
+
+
+def oracle_T35(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    firsts = [token["value"] for token in ints_by_label(text, "first")]
+    lasts = [token["value"] for token in ints_by_label(text, "last")]
+    if not firsts and not lasts:
+        values = int_values(int_tokens(text))
+        if len(values) == 2:
+            firsts, lasts = [values[0]], [values[1]]
+        else:
+            return {"A": unknown("unparsed")}
+    reasons = set()
+    if firsts and key["first"] not in firsts:
+        reasons.add("first")
+    if lasts and key["last"] not in lasts:
+        reasons.add("last")
+    return {"A": _finish(reasons, not firsts or not lasts)}
+
+
+def oracle_T37(params, key, ans, readings, ctx=None):
+    text = normalize(answer_text(ans))
+    reasons = set()
+    if not has_word(text, key["function"], ignore_case=False) or ("!" not in text and "exclamation" not in text.lower()):
+        reasons.add("names_missing")
+    return {"A": _finish(reasons, False)}
+
+
+_ELEMENTS = []
+
+
+def markdown_elements(text):
+    """scripts/native_token_ci.py markdown_elements, loaded once from this checkout (upstream code, unchanged)."""
+    if not _ELEMENTS:
+        import importlib.util
+        root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        spec = importlib.util.spec_from_file_location("native_token_ci_for_grader",
+                                                      os.path.join(root, "scripts", "native_token_ci.py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _ELEMENTS.append(module.markdown_elements)
+    return _ELEMENTS[0](text)
+
+
+def oracle_T38(params, key, ans, readings, ctx=None):
+    if key.get("input_sha256") is not None and key["input_sha256"] != key["fixture_sha256"]:
+        return {"A": unknown("input_hash")}
+    held = markdown_elements(answer_text(ans))
+    missing = sorted(name for name, present in held.items() if not present)
+    return {"A": fail("elements_missing", missing=missing) if missing else ok()}
+
+
+def oracle_pending(reason):
+    def oracle(params, key, ans, readings, ctx=None):
+        return {"A": pending(reason)}
+    return oracle
+
+
+ORACLES = {
+    "T1": oracle_T1, "T2": oracle_T2, "T3": oracle_T3, "T4": oracle_T4, "T5": oracle_T5, "T6": oracle_T6,
+    "T7": oracle_T7, "T8": oracle_T8, "T9": oracle_T9, "T10": oracle_T10, "T11": oracle_T11, "T12": oracle_T12,
+    "T13": oracle_T13, "T14": oracle_pending("needs_identity_table"),
+    "T26": oracle_T26, "T27": oracle_T27, "T28": oracle_T28, "T29": oracle_T29, "T30": oracle_T30,
+    "T32": oracle_T32, "T33": oracle_T33, "T34": oracle_T34, "T35": oracle_T35, "T37": oracle_T37, "T38": oracle_T38,
+}
+for _name in WEB_TEMPLATES:
+    ORACLES[_name] = oracle_web
+for _name in CATALOG_TEMPLATES:
+    ORACLES[_name] = _oracle_catalog(_name)
+
+
+# --- END OF PART 3 ---
