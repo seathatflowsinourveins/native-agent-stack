@@ -328,8 +328,8 @@ function agentOptionLiterals(src) {
   return found
 }
 // Static contract shared by every saved workflow: one worker packet text, and an
-// explicit task-matched model and effort on every agent() call (an omitted model
-// inherits the coordinator's model).
+// explicit task-matched model and effort on every agent() call (an omitted model runs the
+// definition's model, else CLAUDE_CODE_SUBAGENT_MODEL, else the lead's).
 {
   const sample = "// agent( in a comment\nconst s = 'agent( in a string {'\nawait agent('p {' + x, { label: 'a', schema: { type: 'object', properties: { model: { type: 'string' } } }, model: 'sonnet', effort: 'low' })\nawait agent(p, opts)\nawait agent(p, { label: 'b', schema: S, effort: 'high' })\n"
   const lits = agentOptionLiterals(sample)

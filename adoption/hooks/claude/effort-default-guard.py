@@ -18,7 +18,10 @@ claude-opus-5-5 at xhigh; effort read from the `effort` field of each assistant 
 transcript. `--model sonnet` (claude-sonnet-5-5) with no saved level ran at medium, the
 Ultracode reminder present; a per-model `effortLevel: "low"` passed with `--settings` ran at
 low on Sonnet 5.5 and on Opus 5.5 with ultracode still true; `--settings` with `ultracode: false`
-and Sonnet 5.5 at "xhigh" ran at xhigh. On Claude Code 2.1.281 it was different: the
+and Sonnet 5.5 at "xhigh" ran at xhigh. The documentation records the same change: from v2.1.284 the setting leaves the level
+unchanged and `--effort ultracode` sets xhigh; before v2.1.284 `ultracode: true` ran the session at xhigh
+(https://code.claude.com/docs/en/settings-reference#ultracode, read 2026-09-29). The guard's ultracode rule therefore holds
+from 2.1.284, and the floor raise to 2.1.284 is its own change. On Claude Code 2.1.281 it was different: the
 2026-09-23 record (docs/decisions/2026-09-23-max-effort-default.md, kept as history) found
 ultracode sessions at xhigh and cited the settings reference as saying ultracode "takes
 precedence over `effortLevel` and `modelSettings` entries".
@@ -184,7 +187,7 @@ def start_warning(name, cwd):
     why = (f"capped at {level} by maxEffortLevel ({capped})" if capped else
            f"set to {level} by {source}" if level else "without a saved level, so it runs at the model's own default")
     return (f"Effort default check: {name} is {why}; the ecosystem default is {WANT}. "
-            f"Run `/effort {WANT}` to save it for this model (user-settings top-level effortLevel does not apply to Opus 5.5 and later).")
+            f"Run `/effort {WANT}` to save it for this model (a user-settings top-level effortLevel applies only to Opus 5, Fable 5.1 and earlier models).")
 
 
 def leave_notice(msg):
