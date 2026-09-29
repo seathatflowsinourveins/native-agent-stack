@@ -429,7 +429,14 @@ pinned version or newer, `install_native` keeps that launcher, downloads and
 installs nothing, and logs `Kept installed claude-code <version>`; only a
 missing, older or unreadable launcher gets the verified install, so re-running
 the bootstrap never moves a native auto-updated Claude Code back to the pin
-(`adoption/bootstrap-linux.sh` runs the same `install_native`).
+(`adoption/bootstrap-linux.sh` runs the same `install_native`). The launcher
+`install_native` writes to `$eco/bin/claude` also starts an interactive
+terminal launch at effort max, adding `--effort max` only when nothing else
+chose an effort (stdin and stdout are a terminal; no `-p`, `--print` or
+`--effort`; `CLAUDE_CODE_EFFORT_LEVEL` unset; a client at 2.1.284 or newer); it is byte-identical on both
+platforms and is not written when the bin directory is `~/.local/bin`
+([decision](../../docs/decisions/2026-09-29-max-default-effort.md)). This Mac
+has not run it: a Mac session repeats the interactive check from that record.
 `adoption/bootstrap-linux.sh` changed after `v2026.09.26` too, in its rtk
 post-install reminder (the macOS script's own reminder, added with its rtk pin,
 is described in the RTK paragraph above): the Linux reminder now

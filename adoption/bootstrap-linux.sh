@@ -377,6 +377,41 @@ install_native() {
   {
     printf '#!/usr/bin/env bash\n'
     printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
+    if [[ "$bin_name" == claude ]]; then
+      # Interactive default effort max (docs/decisions/2026-09-29-max-default-effort.md): the client cannot save max, so the
+      # documented --effort flag is added, and only when nothing has chosen an effort. The quoted heredoc keeps $HOME and $@ literal.
+      cat <<'LAUNCHER_EFFORT'
+# Interactive default effort: max. Claude Code cannot save max in settings (effortLevel and modelSettings take low to
+# xhigh) and CLAUDE_CODE_EFFORT_LEVEL would override every --effort, /effort and child effort, so the documented --effort
+# flag is added here, and only when nothing has chosen an effort: stdin and stdout are a terminal, no -p/--print (also as
+# a short-flag cluster such as -pc), no --effort, no CLAUDE_CODE_EFFORT_LEVEL, nothing after a "--", and a client at
+# 2.1.284 or newer (on 2.1.281 a max session turned Ultracode's orchestration off). An operand that merely equals one of
+# these flags, such as the value of --system-prompt, also suppresses the default. To bypass, pass --effort <level> or run
+# ~/.local/bin/claude directly.
+if [ -t 0 ] && [ -t 1 ] && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]; then
+  for arg in "$@"; do
+    case "$arg" in
+      --) break ;;
+      -p* | -[!-]*p* | --print | --print=* | --effort | --effort=*) exec "$HOME/.local/bin/claude" "$@" ;;
+    esac
+  done
+  version="$("$HOME/.local/bin/claude" --version 2>/dev/null < /dev/null)"
+  version="${version%%[[:space:]]*}"
+  case "$version" in
+    [0-9]*.[0-9]*.[0-9]*)
+      major="${version%%.*}"; rest="${version#*.}"; minor="${rest%%.*}"; patch="${rest#*.}"; patch="${patch%%.*}"
+      case "$major$minor$patch" in
+        *[!0-9]*) ;;
+        *)
+          if [ "$((10#$major))" -gt 2 ] || { [ "$((10#$major))" -eq 2 ] && { [ "$((10#$minor))" -gt 1 ] ||
+            { [ "$((10#$minor))" -eq 1 ] && [ "$((10#$patch))" -ge 284 ]; }; }; }; then
+            exec "$HOME/.local/bin/claude" --effort max "$@"
+          fi ;;
+      esac ;;
+  esac
+fi
+LAUNCHER_EFFORT
+    fi
     # shellcheck disable=SC2016
     printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$bin_name"
   } > "$bin_dir/$bin_name"
