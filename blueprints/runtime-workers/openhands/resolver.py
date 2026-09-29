@@ -1168,7 +1168,6 @@ def _cmd_review(args, *, session_key=None):
 CLONE_URL = gh_harness.ORIGIN_URL  # the fresh host clone's source; tests use a local bare repository
 COMMIT_NAME, COMMIT_EMAIL = "OpenHands", "openhands@all-hands.dev"  # EXT main.py:65-66
 COMMIT_SUBJECT_LIMIT = 72  # EXT main.py:604
-DECISION_RECORD = "docs/decisions/2026-09-28-openhands-resolver-isolation.md"
 WORKER_CHECK = "python3 scripts/validate.py"
 GUARD_REASONS = frozenset({"not_text", "session_key", "private_content", "host_path", "host_user_name",
                            "scanner_error", "scanner_finding", "closing_keyword", "mention"})
@@ -1356,15 +1355,20 @@ class ResolverAttempt:
             outcome.update(branch=branch, head=head)
             stage = "pr"
             self.pr = open_pull_request(self.harness, self.guard, receipt, branch=branch)
+            outcome["pr"] = self.pr["number"]  # recorded even if the head check below stops
             if self.pr["head"] != head:
                 raise LoopStopped("pr_head_moved")
-            outcome.update(status="pr_opened", pr=self.pr["number"])
+            outcome["status"] = "pr_opened"
         except (LoopStopped, gh_harness.HarnessRefused, BranchLookupFailed, BranchesExhausted) as stopped:
             outcome.update(failure_stage=stage, reasons=[getattr(stopped, "reason", type(stopped).__name__.lower())])
         except outgoing_guard.GuardRefused as refused:
             outcome.update(failure_stage=stage, reasons=[refused.reason])
         except (OSError, subprocess.SubprocessError, ValueError, RuntimeError) as error:
             outcome.update(failure_stage=stage, reasons=[type(error).__name__.lower()])
+        except KeyboardInterrupt:
+            # SIGTERM arrives here as KeyboardInterrupt (resolver.py __main__). The containers are
+            # already removed, so record where it stopped, keep the write journal, open nothing more.
+            outcome.update(failure_stage=stage, reasons=["interrupted"])
         finally:
             if self.harness is not None:
                 outcome["writes"] = [dict(write) for write in self.harness.writes]
@@ -1402,6 +1406,8 @@ REASON_CODE = re.compile(r"[a-z][a-z0-9_]{0,63}")
 
 def review_summary(loop_outcome=None, *, status, reason=None):
     """The review loop's outcome in the receipt: codes, ids and counts only."""
+    if status not in REVIEW_STATUSES:
+        raise ValueError("unknown_review_status")
     summary = {"status": status, "reason": reason if isinstance(reason, str) and REASON_CODE.fullmatch(reason) else None,
                "id": None, "commit_id": None, "checks": None, "repair": None, "final": None}
     if loop_outcome:

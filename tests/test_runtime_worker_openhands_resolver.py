@@ -3332,6 +3332,35 @@ class ResolverAttemptTests(unittest.TestCase):
         self.assertEqual((outcome["writes"], github.pushes), ([], []))
         self.assertFalse(any(argv[:2] == ["pr", "create"] for argv in github.seen))
 
+    def test_a_head_that_moves_as_the_pr_opens_keeps_the_pr_number_and_stops(self):
+        class MovesOnCreate(ResolverGitHub):
+            def __call__(self, args, **kwargs):
+                answer = super().__call__(args, **kwargs)
+                if list(args[1:3]) == ["pr", "create"]:
+                    self.head = "d" * 40
+                return answer
+
+        patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
+        github = MovesOnCreate(base=self.base)
+        outcome = self.attempt(github).finish(self.result_for("moved"), patch_text=patch, final_message=FINAL_MESSAGE)
+        self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"], outcome["pr"]),
+                         (None, "pr", ["pr_head_moved"], 34))
+
+    def test_an_interrupt_inside_the_driver_is_recorded_with_its_writes(self):
+        patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
+        github = ResolverGitHub(base=self.base)
+
+        def runner(args, **kwargs):
+            if "push" in args:
+                raise KeyboardInterrupt
+            return github(args, **kwargs)
+
+        outcome = self.attempt(runner).finish(self.result_for("interrupt"), patch_text=patch,
+                                              final_message=FINAL_MESSAGE)
+        self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"]),
+                         (None, "push", ["interrupted"]))
+        self.assertEqual(outcome["writes"], [{"op": "push", "exit_code": None}])
+
     def test_a_failed_push_stops_before_the_pull_request(self):
         patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
         github = ResolverGitHub(base=self.base, push_code=1)
