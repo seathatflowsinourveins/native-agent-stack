@@ -1445,7 +1445,7 @@ class ResilienceTests(HostCase):
 
     def test_a_tool_that_exits_nonzero_or_prints_something_odd_is_an_error_status(self):
         self.host.fake_text("codex.exit", "1")
-        self.host.fake_text("node.version", "/home/x/bin/node is at ~/somewhere\n")
+        self.host.fake_text("node.version", "/opt/x/bin/node is at ~/somewhere\n")
         cap = self.capture("e")
         self.assertEqual(cap.status("codex.version"), "error")
         self.assertEqual(cap.status("tools.node.version"), "error")
@@ -1643,7 +1643,7 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(strip("\x1b[33mOrphaned:\x1b[0m 3"), "Orphaned: 3")
         self.assertEqual(strip("\x1b[1;31;40"), "", "an unterminated sequence is dropped, never a hang")
         self.assertTrue(plain("2.1.284 (Claude Code)"))
-        for text in ("/home/x", "a\\b", "~/x", "a\nb", "x" * 300, "http://x"):
+        for text in ("/opt/x", "a\\b", "~/x", "a\nb", "x" * 300, "http://x"):
             self.assertFalse(plain(text), repr(text))
 
     def test_scanners_are_linear_on_adversarial_input(self):
