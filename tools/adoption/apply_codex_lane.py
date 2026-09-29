@@ -57,6 +57,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import string
 import subprocess
 import sys
@@ -97,6 +98,25 @@ START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26
 HEADROOM_OFFLINE_KEYS = ("HEADROOM_OFFLINE", "HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "DO_NOT_TRACK")
 RECORD_SCHEMA = "native-agent-stack/codex-lane-apply/v1"
 REQUEST_TIMEOUT = 60.0
+# The two Codex role carriers (docs/decisions/2026-09-26-codex-worker-lane.md, addendum of 2026-09-29): custom-agent
+# files that Codex discovers under $CODEX_HOME/agents, with no [agents.<name>] table (codex-rs/agent-roles/src/
+# loader.rs and discovery.rs at rust-v0.157.1).
+ROLES_SOURCE = ROOT / "adoption" / "agents" / "codex"
+ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
+# SHA-256 of each carrier, as Markdown rows: a "name": "digest" pair reads as a keyed secret to gitleaks'
+# generic-api-key rule (the reason ROLE_BODY_ROWS in tests/test_token_e2e_preregistration.py is rows too).
+# tests/test_codex_agents.py and the examples README section of 2026-09-29 repeat these rows, and a test ties them.
+ROLE_ROWS = (
+    "| `stack-researcher.toml` | `ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00` |",
+    "| `stack-verifier.toml` | `281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd` |",
+)
+# The system config layer is always pushed (config/src/loader/mod.rs); its folder is /etc/codex (config/src/state.rs).
+SYSTEM_CODEX_DIR = Path("/etc/codex")
+DOCTOR_TIMEOUT = 120.0
+# The warning Codex records for a role file it cannot use (agent-roles/src/loader.rs push_agent_role_warning), and
+# the value its report shows when the text held a credential word (cli/src/doctor/output.rs redact_detail).
+ROLE_WARNING_PREFIX = "Ignoring malformed agent role definition"
+REDACTED = "<redacted>"
 
 
 class Refused(Exception):
@@ -215,6 +235,188 @@ def atomic_write(path: Path, data: bytes, mode: int, expect_sha: str | None, cre
         if tmp is not None:
             with contextlib.suppress(FileNotFoundError):
                 os.unlink(tmp)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# the role carriers (pure helpers; the tests, this installer and tools/adoption/prove_codex_lane.py share them)
+
+def path_kind(path: Path) -> str:
+    """absent | dir | file | link | other, by lstat: a link is reported, never followed."""
+    try:
+        mode = os.lstat(path).st_mode
+    except FileNotFoundError:
+        return "absent"
+    except OSError:
+        return "other"
+    if stat.S_ISLNK(mode):
+        return "link"
+    if stat.S_ISDIR(mode):
+        return "dir"
+    return "file" if stat.S_ISREG(mode) else "other"
+
+
+def role_pins() -> dict[str, str]:
+    """{file name: sha256} parsed from ROLE_ROWS."""
+    pins = {}
+    for row in ROLE_ROWS:
+        name, digest = (cell.strip().strip("`") for cell in row.strip().strip("|").split("|"))
+        pins[name] = digest
+    return pins
+
+
+def role_source_problems() -> dict[str, list[str]]:
+    """The rule ids each shipped carrier breaks; an empty list means it is exactly its pinned row. source_missing,
+    sha256_row (its bytes are not the row's), toml_parse and name_stem (the role name is not the file stem). The
+    digest already implies the last two for the pinned bytes: they make the refusal for a damaged copy readable."""
+    pins, found = role_pins(), {}
+    for name in ROLE_FILES:
+        path = ROLES_SOURCE / name
+        try:
+            data = path.read_bytes()
+        except OSError:
+            found[name] = ["source_missing"]
+            continue
+        problems = []
+        if sha256_bytes(data) != pins.get(name):
+            problems.append("sha256_row")
+        try:
+            parsed = tomllib.loads(data.decode("utf-8"))
+        except ValueError:  # TOMLDecodeError and UnicodeDecodeError both
+            problems.append("toml_parse")
+        else:
+            if parsed.get("name") != name[:-len(".toml")]:
+                problems.append("name_stem")
+        found[name] = sorted(problems)
+    return found
+
+
+def agents_toml_count(directory: Path) -> int | None:
+    """Files named *.toml (an extension: ".toml" alone is not one; exact case) under `directory`, recursively, the
+    way codex-rs/agent-roles/src/discovery.rs collects role files. Links are not followed: a link named *.toml is
+    counted and never read, a linked directory is not entered. 0 when `directory` is absent; None when it is not a
+    real directory or any part of it cannot be read."""
+    kind = path_kind(directory)
+    if kind == "absent":
+        return 0
+    if kind != "dir":
+        return None
+    unreadable, total = [], 0
+    for _, _, files in os.walk(directory, followlinks=False, onerror=unreadable.append):
+        total += sum(1 for name in files if name.endswith(".toml") and len(name) > len(".toml"))
+    return None if unreadable else total
+
+
+def role_table_count(config) -> int:
+    """[agents.<name>] tables in a parsed config: the tables under [agents], not its scalar keys."""
+    agents = config.get("agents") if isinstance(config, dict) else None
+    return sum(1 for value in agents.values() if isinstance(value, dict)) if isinstance(agents, dict) else 0
+
+
+def toml_role_tables(path: Path) -> int | None:
+    """Role tables of one TOML file: 0 when it is absent, None when it cannot be read as TOML."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return 0
+    except (OSError, ValueError):
+        return None
+    try:
+        return role_table_count(tomllib.loads(text))
+    except ValueError:
+        return None
+
+
+def live_role_tables(codex_home: Path) -> int | None:
+    """Role tables in a Codex home's config.toml and worker profile; None when either cannot be read."""
+    counts = [toml_role_tables(codex_home / "config.toml"),
+              toml_role_tables(codex_home / f"{PROFILE_NAME}.config.toml")]
+    return None if None in counts else sum(counts)
+
+
+def system_role_count(system_dir: Path | None = None) -> int | None:
+    """What the system config layer adds: *.toml under its agents folder plus its role tables (0 for an absent
+    folder; None when part of it cannot be read). It loads in every launch, N included."""
+    base = SYSTEM_CODEX_DIR if system_dir is None else Path(system_dir)
+    counts = [agents_toml_count(base / "agents"), toml_role_tables(base / "config.toml")]
+    return None if None in counts else sum(counts)
+
+
+def doctor_config_load(stdout: str | None) -> tuple[str, dict] | None:
+    """(status, details) of checks["config.load"] in a `codex doctor --json` report; None when there is no stdout
+    (a timeout), it is not a JSON report, or the check is missing. The exit code is not consulted: doctor prints the
+    report and then exits 1 whenever any check fails, and in a scratch home without a sign-in auth.credentials
+    always does (codex-rs/cli/src/doctor.rs). Details are strings, or lists of strings for a repeated label."""
+    if not isinstance(stdout, str):
+        return None
+    try:
+        report = json.loads(stdout)
+    except (ValueError, RecursionError):
+        return None
+    checks = report.get("checks") if isinstance(report, dict) else None
+    entry = checks.get("config.load") if isinstance(checks, dict) else None
+    if not isinstance(entry, dict):
+        return None
+    details = entry.get("details")
+    return str(entry.get("status")), details if isinstance(details, dict) else {}
+
+
+def startup_warnings(details: dict) -> list[str]:
+    """The `startup warning` values of a config.load check (a string, or a list when the warning repeats)."""
+    value = details.get("startup warning")
+    if isinstance(value, str):
+        return [value]
+    return [item for item in value if isinstance(item, str)] if isinstance(value, list) else []
+
+
+def startup_warning_count(details: dict) -> int:
+    """The `startup warnings` count, a string of digits that survives redaction; a clean check has no such key
+    (doctor.rs config_check adds it only with the first warning), so the count is then the values, i.e. 0."""
+    raw = details.get("startup warnings")
+    if isinstance(raw, str) and raw.isascii() and raw.isdigit():
+        return int(raw)
+    return len(startup_warnings(details))
+
+
+def doctor_role_state(stdout_before: str | None, stdout_after: str | None) -> dict:
+    """What `codex doctor --json` says about the role files, from two reports of one scratch home: before they were
+    copied in and after. Counts only, never text or a path (a role warning embeds the file's absolute path).
+    state: unknown when either report is unusable (no stdout, not JSON, no config.load) or config.load failed in
+    both; problem when config.load fails only with the role files, or the startup warnings rise, or a role warning
+    is new; ok otherwise. role_warnings and redacted count the rise, so a warning the scratch home has without the
+    role files (a malformed system-layer role, which the system-role count line reports) is not blamed on them."""
+    result = {"state": "unknown", "startup_warnings_before": None, "startup_warnings_after": None,
+              "role_warnings": 0, "redacted": 0, "load_failed": False}
+    before, after = doctor_config_load(stdout_before), doctor_config_load(stdout_after)
+    failed_before = before is not None and before[0] == "fail"
+    failed_after = after is not None and after[0] == "fail"
+    if before is not None and not failed_before:
+        result["startup_warnings_before"] = startup_warning_count(before[1])
+    if after is not None and not failed_after:
+        result["startup_warnings_after"] = startup_warning_count(after[1])
+    if before is None or after is None or failed_before:
+        return result
+    if failed_after:  # an unreadable agents folder fails the whole load (loader.rs propagates it with `?`)
+        return {**result, "state": "problem", "load_failed": True}
+    was, now = startup_warnings(before[1]), startup_warnings(after[1])
+    result["role_warnings"] = max(0, sum(text.startswith(ROLE_WARNING_PREFIX) for text in now)
+                                  - sum(text.startswith(ROLE_WARNING_PREFIX) for text in was))
+    result["redacted"] = max(0, now.count(REDACTED) - was.count(REDACTED))
+    rose = result["startup_warnings_after"] > result["startup_warnings_before"]
+    result["state"] = "problem" if rose or result["role_warnings"] else "ok"
+    return result
+
+
+def doctor_problem(state: dict) -> str | None:
+    """The rehearsal's PROBLEM text for a doctor_role_state; None unless it is a problem. Counts only."""
+    if state["state"] != "problem":
+        return None
+    if state["load_failed"]:
+        return "codex doctor could not load the config with the role files (config.load failed)"
+    before, after, roles = state["startup_warnings_before"], state["startup_warnings_after"], state["role_warnings"]
+    if after > before:
+        return (f"codex doctor startup warnings rose from {before} to {after} with the role files "
+                f"({roles} agent role warnings)")
+    return f"codex doctor reports {roles} agent role warnings with the role files ({before} before, {after} after)"
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -425,6 +627,26 @@ class Plan:
             self.new_agents = with_block(current_agents, self.block)
         except Refused:
             self.new_agents = None  # reported by preconditions()
+        # The role carriers. The agents folder is read only when it is a real directory: a link is never followed.
+        self.agents_dir = self.codex_home / "agents"
+        self.agents_dir_kind = path_kind(self.agents_dir)
+        self.role_sources = {}
+        for name in ROLE_FILES:
+            try:
+                self.role_sources[name] = (ROLES_SOURCE / name).read_bytes()
+            except OSError:
+                self.role_sources[name] = None  # reported by preconditions()
+        self.source_problems = role_source_problems()
+        self.role_kind, self.role_live = {}, {}
+        for name in ROLE_FILES:
+            kind = path_kind(self.agents_dir / name) if self.agents_dir_kind in ("absent", "dir") else "other"
+            live = None
+            if kind == "file":
+                try:
+                    live = (self.agents_dir / name).read_bytes()
+                except OSError:
+                    kind = "other"
+            self.role_kind[name], self.role_live[name] = kind, live
 
     # --- state of each part
     def config_changes(self) -> list[dict]:
@@ -450,6 +672,67 @@ class Plan:
     def omniroute_state(self) -> str | None:
         """create | same | differs for the gateway profile; None when --omniroute-profile was not given."""
         return file_state(self.omniroute_bytes, self.omniroute_template) if self.omniroute else None
+
+    def role_states(self) -> dict[str, str]:
+        """create | same | differs for each role carrier against its source. A role file that is not a regular file
+        (a link, a directory), or any file under an agents folder that is not a real directory, counts as differs:
+        it is never overwritten and never read through."""
+        states = {}
+        for name in ROLE_FILES:
+            kind = self.role_kind[name]
+            if kind == "absent":
+                states[name] = "create"
+            elif kind == "file":
+                states[name] = "same" if self.role_live[name] == self.role_sources[name] else "differs"
+            else:
+                states[name] = "differs"
+        return states
+
+    def nothing_to_do(self) -> bool:
+        """The lane is already fully in place: the config keys, the AGENTS.md block, the profiles and the roles."""
+        return (not any(change["changed"] for change in self.config_changes()) and not self.agents_changed()
+                and self.profile_state() == "same" and self.omniroute_state() in (None, "same")
+                and all(state == "same" for state in self.role_states().values()))
+
+    def role_preconditions(self) -> list[tuple[str, str, str]]:
+        """[(level, name, detail)] for the role carriers. Counts and file names of the two known carriers only: a
+        warning or an extra file never has its name or path printed."""
+        checks = []
+        for name in ROLE_FILES:
+            data = self.role_sources[name]
+            problems = self.source_problems[name] or (["source_missing"] if data is None else [])
+            checks.append(("fail", f"agent role source {name}", ", ".join(problems)) if problems else
+                          ("ok", f"agent role source {name}",
+                           f"sha256 {sha256_bytes(data)[:12]} equals its pinned row"))
+        kind = self.agents_dir_kind
+        if kind not in ("absent", "dir"):
+            checks.append(("fail", "agents directory", "exists and is not a real directory (a link or a file); "
+                           "move it aside privately first"))
+        else:
+            checks.append(("ok", "agents directory",
+                           "absent; will be created" if kind == "absent" else "a real directory"))
+            for name, state in self.role_states().items():
+                if state == "differs":
+                    checks.append(("fail", f"agent role {name}", "exists and differs from the source, or is not a "
+                                   "regular file; move it aside privately first"))
+            total = agents_toml_count(self.agents_dir)
+            extra = None if total is None else max(0, total - sum(k != "absent" for k in self.role_kind.values()))
+            checks.append(("warn" if extra is None or extra else "ok", "extra agent role files",
+                           "unreadable" if extra is None else str(extra)))
+        tables, unreadable = role_table_count(self.live), 0
+        for data in (self.profile_bytes, self.profile_template):
+            if data is None:
+                continue
+            try:
+                tables += role_table_count(tomllib.loads(data.decode("utf-8")))
+            except ValueError:
+                unreadable += 1
+        checks.append(("warn" if tables or unreadable else "ok", "agent role tables",
+                       f"{tables}" + (f" ({unreadable} file unreadable)" if unreadable else "")))
+        system = system_role_count()
+        checks.append(("warn" if system is None or system else "ok", "system agent roles",
+                       "unreadable" if system is None else str(system)))
+        return checks
 
     def base_provider_step(self) -> list[str]:
         """Report lines when config.toml still carries the gateway route the profile now holds (a host step): the
@@ -533,6 +816,7 @@ class Plan:
                            {"create": "absent; will be created", "same": "already the template",
                             "differs": f"{self.omniroute_path} exists and differs from the template; move it "
                                        "aside privately first"}[omniroute]))
+        checks += self.role_preconditions()
         running = codex_processes(self.args.codex_process_name)
         checks.append((("fail" if for_apply else "warn") if running else "ok", "codex processes",
                        f"{len(running)} running (pids {', '.join(running)})" if running else "none"))
@@ -673,6 +957,39 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
     return problems
 
 
+def run_doctor(codex: str, env: dict, wrapper: list[str] | None, cwd: Path) -> str | None:
+    """stdout of `codex doctor --json` in the scratch home, whatever its exit code (see doctor_config_load); None on a
+    timeout or when it cannot start. It runs update, network and provider checks too, hence the wrapper's network
+    namespace and DOCTOR_TIMEOUT."""
+    try:
+        return run_codex(codex, ["doctor", "--json"], env, cwd, timeout=DOCTOR_TIMEOUT, wrapper=wrapper).stdout
+    except (subprocess.SubprocessError, OSError):
+        return None
+
+
+def rehearse_roles(plan: Plan, codex: str, env: dict, wrapper: list[str] | None, codex_home: Path,
+                   cwd: Path) -> tuple[list[str], list[str]]:
+    """Codex's own view of the role files: `codex doctor --json` before and after the two carriers are copied into the
+    scratch home, compared through doctor_role_state. Counts only in the report; (lines, problems)."""
+    before = run_doctor(codex, env, wrapper, cwd)
+    agents = codex_home / "agents"
+    agents.mkdir(mode=0o700)
+    os.chmod(agents, 0o700)
+    for name in ROLE_FILES:
+        (agents / name).write_bytes(plan.role_sources[name])
+        os.chmod(agents / name, 0o600)
+    state = doctor_role_state(before, run_doctor(codex, env, wrapper, cwd))
+    if state["state"] == "unknown":
+        line = "  [warn] doctor config.load unknown: the role files' load warnings could not be read back"
+    elif state["load_failed"]:
+        line = "  codex doctor config.load: failed with the role files"
+    else:
+        line = (f"  codex doctor config.load: startup warnings {state['startup_warnings_before']} -> "
+                f"{state['startup_warnings_after']} with the role files ({state['role_warnings']} agent role warnings)")
+    problem = doctor_problem(state)
+    return [line], [problem] if problem else []
+
+
 def rehearse(plan: Plan, codex: str) -> tuple[list[str], list[str]]:
     """Run the batchWrite, the AGENTS.md block and the profile on copies in a scratch Codex home. Returns
     (report lines, problems)."""
@@ -726,6 +1043,9 @@ def rehearse(plan: Plan, codex: str) -> tuple[list[str], list[str]]:
             lines.append(f"  prompt input -p {OMNIROUTE_PROFILE}: {found.get('prompt_input_omniroute')}")
         lines.append(f"  -p {PROFILE_NAME} servers: {json.dumps(found.get('profile_servers'))}")
         problems += check_readbacks(found, plan.eco_root)
+        role_lines, role_problems = rehearse_roles(plan, codex, env, wrapper, codex_home, cwd)
+        lines += role_lines
+        problems += role_problems
     finally:
         if plan.args.keep_rehearsal:
             lines.append(f"  kept: {scratch}")
@@ -754,6 +1074,8 @@ def print_plan(plan: Plan, checks: list[tuple[str, str, str]]) -> None:
         print(f"AGENTS.md: {'writes the managed block' if plan.agents_changed() else 'block already in place'} "
               f"(sha256 {agents_sha} -> {sha256_bytes(plan.new_agents.encode('utf-8'))})")
     print(f"{PROFILE_NAME}.config.toml: {plan.profile_state()}")
+    for name, state in plan.role_states().items():
+        print(f"agents/{name}: {state}")
     if plan.omniroute:
         print(f"{OMNIROUTE_PROFILE}.config.toml: {plan.omniroute_state()}")
         for line in plan.base_provider_step():
