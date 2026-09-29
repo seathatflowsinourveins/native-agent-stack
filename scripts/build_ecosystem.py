@@ -455,6 +455,19 @@ def token_topic_card(card, edition_date, stack_version, root):
         require(isinstance(value, dict) and isinstance(value.get("evidence_class"), str)
                 and bool(value["evidence_class"].strip()),
                 "token topic card needs " + block + " with its evidence class")
+    # The page renders these upstream fields as links, so each passes the same public_url gate as every other
+    # external source link; a field without a URL renders as plain text.
+    upstream = card["upstream"]
+    install = upstream.get("recommended_install")
+    links = [("upstream.recommended_install.url", install.get("url") if isinstance(install, dict) else None)]
+    for field in ("recommended_wiring", "new_since_pin", "limitations"):
+        items = upstream.get(field) or []
+        require(isinstance(items, list), f"token topic card {source['path']}: upstream.{field} must be a list")
+        links.extend((f"upstream.{field}[{index}].url", item.get("url") if isinstance(item, dict) else None)
+                     for index, item in enumerate(items))
+    for field, url in links:
+        require(url is None or bool(public_url(url)),
+                f"token topic card {source['path']}: {field} must be a public HTTPS URL")
     comparisons = card["adapted_performance"].get("per_payload_and_lane", [])
     require(isinstance(comparisons, list), "token topic card comparisons must be a list")
     for entry in comparisons:

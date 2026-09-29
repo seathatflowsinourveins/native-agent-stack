@@ -823,6 +823,49 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn(message, result.stdout)
 
+    # docs/ecosystem/template.html topicCard renders these four upstream fields as links (sourcedLine), so they
+    # pass the build's public_url gate, the one card.source and every other external source link already uses.
+    TOPIC_CARD_LINK_FIELDS = {
+        "upstream.recommended_install.url": lambda upstream, url: upstream["recommended_install"].update(url=url),
+        "upstream.recommended_wiring[0].url": lambda upstream, url: upstream.update(
+            recommended_wiring=[{"client": "claude", "how": "Plugin marketplace", "url": url}]),
+        "upstream.new_since_pin[0].url": lambda upstream, url: upstream.update(
+            new_since_pin=[{"text": "Adds a JSON report", "url": url}]),
+        "upstream.limitations[0].url": lambda upstream, url: upstream.update(
+            limitations=[{"text": "Large files are skipped", "url": url}]),
+    }
+
+    def test_topic_card_links_outside_the_public_url_gate_fail_the_check(self):
+        planted = {"plain http": "http://github.com/example/search#install",
+                   "loopback address": "https://127.0.0.1/example/search",
+                   "script scheme": "javascript:alert(document.domain)"}
+        for field, plant in self.TOPIC_CARD_LINK_FIELDS.items():
+            for label, url in planted.items():
+                with self.subTest(field=field, url=label):
+                    card = self.topic_card()
+                    plant(card["upstream"], url)
+                    self.write_topic(card)
+                    result = self.run_generator("--check")
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(f"token topic card {self.TOPIC_CARD_SOURCE}: {field} must be a public HTTPS URL",
+                                  result.stdout)
+
+    def test_topic_card_public_https_links_pass_the_check_unchanged(self):
+        card = self.topic_card()
+        clean = {"upstream.recommended_install.url": "https://github.com/example/search#install",
+                 "upstream.recommended_wiring[0].url": "https://github.com/example/search#claude-code",
+                 "upstream.new_since_pin[0].url": "https://github.com/example/search/releases/tag/v1.1",
+                 "upstream.limitations[0].url": "https://github.com/example/search/issues/7"}
+        for field, url in clean.items():
+            self.TOPIC_CARD_LINK_FIELDS[field](card["upstream"], url)
+        self.write_topic(card)
+        self.check_report()
+        page, _ = self.build()
+        upstream = json.loads(page.data)["efficiency"]["topic"]["rows"][0]["card"]["upstream"]
+        self.assertEqual([upstream["recommended_install"]["url"], upstream["recommended_wiring"][0]["url"],
+                          upstream["new_since_pin"][0]["url"], upstream["limitations"][0]["url"]],
+                         list(clean.values()))
+
     def grand_catalog_fixture(self):
         self.config["grand_catalogs"] = {
             "foundation_manifest": "catalogs/foundation/manifest.json",
