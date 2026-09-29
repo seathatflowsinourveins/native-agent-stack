@@ -2025,11 +2025,12 @@ class F27b_CaptureCommand(GraderCase):
         self.assertEqual(record["exec_checkout"]["entries"], [])
         (self.exec_checkout / "scripts" / "stray.py").write_text("x = 1\n", encoding="utf-8")
         (self.exec_checkout / "tests" / "test_host_requests.py").write_text(self.TESTS + "# edit\n", encoding="utf-8")
+        (self.exec_checkout / "scripts" / "x.py").unlink()  # recheck ND-13: a deleted tracked file changes keys too
         self.out_dir = self.tmp / "captures-2"
         self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B")
         entries = self.read("arm-B-pre-arm.json")["exec_checkout"]["entries"]
         self.assertEqual(sorted((entry["status"], entry["path"]) for entry in entries),
-                         [("??", "scripts/stray.py"), ("M", "tests/test_host_requests.py")])
+                         [("??", "scripts/stray.py"), ("D", "scripts/x.py"), ("M", "tests/test_host_requests.py")])
 
     def test_the_run_token_must_match_the_bind(self):
         self.assertRefusal(self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B",
