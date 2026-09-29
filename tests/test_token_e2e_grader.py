@@ -3192,6 +3192,341 @@ class F14_M8(GraderCase):
         self.assertEqual((got["correct_lower"], got["status"], got["sensitive"]), (4, "pass", False))
 
 
+def ledger_for(rows, owner="main", states=None):
+    """U2 callLedger records of the stated shape ({session_id, owner, tool_use_id, tool, server, state, cause,
+    native_status, background}) for every tool_use in `rows`; the state follows the matching tool_result."""
+    results = {}
+    for row in rows:
+        content = (row.get("message") or {}).get("content")
+        for block in content if isinstance(content, list) else []:
+            if isinstance(block, dict) and block.get("type") == "tool_result":
+                results[block["tool_use_id"]] = block
+    records = []
+    for row in rows:
+        content = (row.get("message") or {}).get("content")
+        for block in content if isinstance(content, list) else []:
+            if not (isinstance(block, dict) and block.get("type") == "tool_use"):
+                continue
+            state = "unfinished"
+            if block["id"] in results:
+                state = "failed" if results[block["id"]].get("is_error") else "succeeded"
+            name = block["name"]
+            records.append({"session_id": SESSION_ID, "owner": owner, "tool_use_id": block["id"], "tool": name,
+                            "server": name.split("__")[1] if name.startswith("mcp__") else None,
+                            "state": (states or {}).get(block["id"], state), "cause": None, "native_status": None,
+                            "background": False})
+    return records
+
+
+CTX_FETCH = "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index"
+CTX_EXEC = "mcp__plugin_context-mode_context-mode__ctx_execute"
+MEMORY_QUERY = "mcp__ai-memory__memory_query"
+JSON_URL = "https://docs.python.org/3/library/json.html"
+PATHLIB_URL = "https://docs.python.org/3/library/pathlib.html"
+PACKET = "evidence/artifacts/token-adoption-e2e-20260926/fixtures/table.json"
+
+
+class F22_M12(GraderCase):
+    """R7: five tests per completed blind attempt (calls, injection, first prompt, memory and index, routing marker);
+    clean iff all five pass, contaminated iff any fails, unknown otherwise."""
+
+    def config(self):
+        checkout = self.tmp / "exec"
+        return {"marker": "<context_window_protection>", "attachment_allowlist": list(ATTACHMENT_ALLOWLIST),
+                "anchors": ["fixture anchor line one"], "packet_roots": [str(checkout / PACKET)],
+                "memory_roots": [str(self.tmp / "memory")], "cwd": str(checkout)}
+
+    def rows(self, *, prompt=None, attachments=("hook_success", "environment", "prompt_snapshot"), calls=None, later=()):
+        cfg = self.config()
+        packet = str(Path(cfg["cwd"]) / PACKET)
+        rows = [r_attach(kind, ts(0, number)) for number, kind in enumerate(attachments)]
+        rows.append(r_user(prompt or f"Read {PACKET} as the entire packet. Does record 1 have status ok?", ts(0, 30),
+                           cwd=cfg["cwd"]))
+        rows.extend(later)
+        calls = calls if calls is not None else [("Read", {"file_path": packet})]
+        for number, (name, tool_input) in enumerate(calls):
+            tid = f"toolu-fx-m{number}"
+            rows.append(r_use(name, tool_input, tid, ts(1, number), f"msg-m{number}"))
+            rows.append(r_result(tid, "ok", ts(1, 30 + number)))
+        rows.append(r_use("StructuredOutput", {"answer": "yes", "evidence": []}, "toolu-fx-so", ts(2), "msg-so"))
+        rows.append(r_result("toolu-fx-so", "ok", ts(2, 1)))
+        rows.append(r_text("done", ts(3)))
+        return rows
+
+    def judge(self, rows, *, hook_rows=0, config=None, **readings):
+        return evm().m12_attempt(rows, config or self.config(), readings=dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}),
+                                 hook_rows=hook_rows)
+
+    def statuses(self, got):
+        return {name: value for name, value in got["tests"].items()}
+
+    def test_a_clean_attempt_passes_all_five_tests(self):
+        got = self.judge(self.rows())
+        self.assertEqual(got["clean"], "clean")
+        self.assertEqual(self.statuses(got), {"calls": "pass", "injection": "pass", "first_prompt": "pass",
+                                              "memory_index": "pass", "marker": "pass"})
+
+    def test_a_bash_call_contaminates_under_both_readings(self):
+        rows = self.rows(calls=[("Bash", {"command": "ls"})])
+        self.assertEqual((self.judge(rows)["clean"], self.judge(rows)["tests"]["calls"]), ("contaminated", "fail"))
+        self.assertEqual(self.judge(rows, R2_11="mcp_skill_bash_only")["clean"], "contaminated")
+
+    def test_a_web_fetch_contaminates_the_decided_reading_and_not_the_alternative(self):
+        rows = self.rows(calls=[("WebFetch", {"url": JSON_URL, "prompt": "p"})])
+        self.assertEqual(self.judge(rows)["clean"], "contaminated")
+        alternative = self.judge(rows, R2_11="mcp_skill_bash_only")
+        self.assertEqual((alternative["tests"]["calls"], alternative["clean"]), ("pass", "clean"))
+
+    def test_a_hook_additional_context_row_contaminates(self):
+        got = self.judge(self.rows(), hook_rows=1)
+        self.assertEqual((got["clean"], got["tests"]["injection"]), ("contaminated", "fail"))
+
+    def test_an_instructions_attachment_contaminates_under_both_readings(self):
+        rows = self.rows(attachments=("hook_success", "instructions"))
+        self.assertEqual(self.judge(rows)["clean"], "contaminated")
+        self.assertEqual(self.judge(rows, R2_12="denylist")["clean"], "contaminated")
+
+    def test_an_unlisted_attachment_contaminates_only_the_decided_reading(self):
+        rows = self.rows(attachments=("hook_success", "foo_new"))
+        self.assertEqual((self.judge(rows)["clean"], self.judge(rows)["tests"]["first_prompt"]), ("contaminated", "fail"))
+        self.assertEqual(self.judge(rows, R2_12="denylist")["clean"], "clean")
+
+    def test_the_routing_marker_in_the_first_prompt_fails_two_tests(self):
+        rows = self.rows(prompt="<context_window_protection> Read the packet.")
+        got = self.judge(rows)
+        self.assertEqual(got["clean"], "contaminated")
+        self.assertEqual((got["tests"]["first_prompt"], got["tests"]["marker"]), ("fail", "fail"))
+
+    def test_an_instruction_file_anchor_line_in_the_first_prompt_contaminates(self):
+        rows = self.rows(prompt="Read the packet.\nfixture anchor line one\nThen answer.")
+        got = self.judge(rows)
+        self.assertEqual((got["clean"], got["tests"]["first_prompt"]), ("contaminated", "fail"))
+
+    def test_a_server_instructions_header_in_the_first_prompt_contaminates(self):
+        rows = self.rows(prompt="# MCP Server Instructions\n\nThe following MCP servers have provided instructions")
+        self.assertEqual(self.judge(rows)["tests"]["first_prompt"], "fail")
+
+    def test_a_read_under_the_memory_root_contaminates_under_both_readings(self):
+        rows = self.rows(calls=[("Read", {"file_path": str(self.tmp / "memory" / "page.md")})])
+        self.assertEqual((self.judge(rows)["clean"], self.judge(rows)["tests"]["memory_index"]), ("contaminated", "fail"))
+        self.assertEqual(self.judge(rows, R2_13="memory_index_roots")["tests"]["memory_index"], "fail")
+
+    def test_a_read_of_another_repository_file_contaminates_only_the_decided_reading(self):
+        rows = self.rows(calls=[("Read", {"file_path": str(Path(self.config()["cwd"]) / "README.md")})])
+        self.assertEqual(self.judge(rows)["tests"]["memory_index"], "fail")
+        self.assertEqual(self.judge(rows, R2_13="memory_index_roots")["tests"]["memory_index"], "pass")
+
+    def test_a_home_relative_read_is_unknown_never_clean(self):
+        rows = self.rows(calls=[("Read", {"file_path": "~/x"})])
+        got = self.judge(rows)
+        self.assertEqual((got["clean"], got["tests"]["memory_index"]), ("unknown", "unknown"))
+
+    def test_a_marker_in_a_later_user_row_contaminates_only_the_decided_reading(self):
+        later = [r_result("toolu-fx-l1", "<context_window_protection> more", ts(0, 40))]
+        rows = self.rows(later=later)
+        self.assertEqual((self.judge(rows)["clean"], self.judge(rows)["tests"]["marker"]), ("contaminated", "fail"))
+        self.assertEqual(self.judge(rows, R2_14="first_prompt_and_hook_context")["clean"], "clean")
+
+    def test_a_marker_in_an_attachment_row_counts_as_a_routing_marker(self):
+        rows = self.rows()
+        rows.insert(3, r_attach("environment", ts(0, 20), content="<context_window_protection>"))
+        self.assertEqual(self.judge(rows)["tests"]["marker"], "fail")
+
+    def test_unreadable_hook_source_leaves_the_attempt_unknown(self):
+        got = self.judge(self.rows(), hook_rows=None)
+        self.assertEqual((got["clean"], got["tests"]["injection"]), ("unknown", "unknown"))
+
+    def test_the_join_uses_the_run_mode_child_with_the_same_agent_id_and_label(self):
+        ev = evm()
+        child = {"agent_id": "fx1", "label": "L", "lanes": {"measurement": {"hook_context": {
+            "inserted": 1, "by_hook": {"PreToolUse:Read": 1}}}}}
+        ok = ev.m12_hook_source("fx1", "L", {"agent_id": "fx1", "identity": "L"}, [child])
+        self.assertEqual((ok["status"], ok["hook_rows"], ok["read_rows"]), ("ok", 1, 1))
+        clean = ev.m12_hook_source("fx1", "L", {"agent_id": "fx1", "identity": "L"},
+                                   [{"agent_id": "fx1", "label": "L", "lanes": {"measurement": {"hook_context": {
+                                       "inserted": 0, "by_hook": {}}}}}])
+        self.assertEqual((clean["hook_rows"], clean["read_rows"]), (0, 0))
+        moved = ev.m12_hook_source("fx1", "L", {"agent_id": "fx2", "identity": "L"}, [child])
+        self.assertEqual((moved["status"], moved["reason"]), ("unknown", "m12_join"))
+        relabelled = ev.m12_hook_source("fx1", "L", {"agent_id": "fx1", "identity": "L"}, [dict(child, label="other")])
+        self.assertEqual((relabelled["status"], relabelled["reason"]), ("unknown", "m12_join"))
+        absent = ev.m12_hook_source("fx1", "L", None, [child])
+        self.assertEqual((absent["status"], absent["reason"]), ("unknown", "m12_join"))
+
+    def test_a_strict_transcript_takes_its_hook_rows_from_the_kernel_through_the_bridge(self):
+        require_node()
+        ev = evm()
+        clean = self.tmp / "strict-clean.jsonl"
+        write_jsonl(clean, self.rows())
+        self.assertEqual(ev.kernel_hook_context(clean)["inserted"], 0)
+        dirty = self.tmp / "strict-dirty.jsonl"
+        write_jsonl(dirty, self.rows() + [r_attach("hook_additional_context", ts(2, 30), hookName="PreToolUse:Read",
+                                                     hookEvent="PreToolUse", content="advisory")])
+        got = ev.kernel_hook_context(dirty)
+        self.assertEqual((got["inserted"], got["by_hook"]), (1, {"PreToolUse:Read": 1}))
+
+    def test_the_summed_rows_must_equal_u4s_m12_inputs(self):
+        ev = evm()
+        mine = {"blind_workflow": {"rows": 5, "hook_rows": 0, "mcp_skill_bash_calls": 1},
+                "positive_control": {"rows": 1, "pretooluse_read_rows": 1},
+                "strict_process": {"rows": 5, "hook_rows": 0, "mcp_skill_bash_calls": 0}}
+        ev.m12_cross_check(mine, json.loads(json.dumps(mine)))
+        theirs = json.loads(json.dumps(mine))
+        theirs["blind_workflow"]["mcp_skill_bash_calls"] = 0
+        self.assertRefused(lambda: ev.m12_cross_check(mine, theirs), "E_M12_INPUTS", kind="blind_workflow",
+                           field="mcp_skill_bash_calls")
+
+    def test_m12_status_incomplete_fail_or_pass(self):
+        ev = evm()
+        blind = {"seed-blind-1": {"status": "pass"}, "seed-blind-2": {"status": "pass"}}
+        self.assertEqual(ev.m12_status(blind, positive_read_rows=1)["status"], "pass")
+        self.assertEqual(ev.m12_status(blind, positive_read_rows=0)["status"], "incomplete")
+        failing = dict(blind, **{"seed-blind-3": {"status": "unknown"}})
+        self.assertEqual(ev.m12_status(failing, positive_read_rows=2)["status"], "fail")
+
+
+class F24_Retrieval(GraderCase):
+    """R8: each frozen URL needs the child's own succeeded in-window retrieval; page captures are the key only."""
+
+    URLS = [JSON_URL, PATHLIB_URL]
+    WINDOW = {"since": "2026-10-01T00:00:00Z", "until": "2026-10-02T00:00:00Z"}
+
+    def calls(self, spec, *, states=None):
+        rows = [r_user("task", ts(0))]
+        for number, (name, tool_input, when) in enumerate(spec):
+            tid = f"toolu-fx-f{number}"
+            rows.append(r_use(name, tool_input, tid, when or ts(1, number), f"msg-f{number}"))
+            rows.append(r_result(tid, "page body", ts(1, 30 + number)))
+        return evm().claude_calls(rows, ledger_for(rows, states=states), "main")
+
+    def check(self, calls, urls=None, **readings):
+        return evm().retrieval_check(calls, urls or self.URLS, self.WINDOW, dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}))
+
+    def test_a_ctx_fetch_and_a_web_fetch_of_both_urls_pass(self):
+        calls = self.calls([(CTX_FETCH, {"url": JSON_URL, "source": "s"}, None), ("WebFetch", {"url": PATHLIB_URL, "prompt": "p"}, None)])
+        self.result(self.check(calls), "pass")
+
+    def test_one_url_only_fails_with_missing_source(self):
+        calls = self.calls([(CTX_FETCH, {"url": JSON_URL, "source": "s"}, None)])
+        self.result(self.check(calls), "fail", "missing_source")
+
+    def test_urls_that_are_cited_but_never_retrieved_fail(self):
+        self.result(self.check(self.calls([("Read", {"file_path": "x"}, None)])), "fail", "missing_source")
+
+    def test_a_failed_fetch_then_an_ok_retry_passes(self):
+        spec = [("WebFetch", {"url": JSON_URL, "prompt": "p"}, None), ("WebFetch", {"url": JSON_URL, "prompt": "p"}, None),
+                ("WebFetch", {"url": PATHLIB_URL, "prompt": "p"}, None)]
+        calls = self.calls(spec, states={"toolu-fx-f0": "failed"})
+        self.result(self.check(calls), "pass")
+        only_failed = self.calls(spec[:1] + spec[2:], states={"toolu-fx-f0": "failed"})
+        self.result(self.check(only_failed), "fail", "missing_source")
+
+    def test_a_fetch_before_since_is_not_counted(self):
+        early = "2026-09-30T23:00:00.000Z"
+        calls = self.calls([("WebFetch", {"url": JSON_URL, "prompt": "p"}, early), ("WebFetch", {"url": PATHLIB_URL, "prompt": "p"}, None)])
+        self.result(self.check(calls), "fail", "missing_source")
+
+    def test_a_fetch_after_until_is_not_counted(self):
+        late = "2026-10-02T00:00:00.000Z"
+        calls = self.calls([("WebFetch", {"url": JSON_URL, "prompt": "p"}, late), ("WebFetch", {"url": PATHLIB_URL, "prompt": "p"}, None)])
+        self.result(self.check(calls), "fail", "missing_source")
+
+    def test_a_shell_fetch_of_a_url_counts_when_its_kind_is_fetch(self):
+        calls = self.calls([("Bash", {"command": f"curl -sL {JSON_URL} | head -50"}, None),
+                            ("Bash", {"command": f"wget -qO- {PATHLIB_URL}"}, None)])
+        self.result(self.check(calls), "pass")
+        echoed = self.calls([("Bash", {"command": f"echo {JSON_URL}"}, None), ("Bash", {"command": f"curl -s {PATHLIB_URL}"}, None)])
+        self.result(self.check(echoed), "unknown", "retrieval_unconfirmed")
+
+    def test_ctx_execute_code_naming_a_url_is_unconfirmed_never_a_pass(self):
+        code = f"import urllib.request\nprint(urllib.request.urlopen('{JSON_URL}').status)"
+        calls = self.calls([(CTX_EXEC, {"language": "python", "code": code}, None), ("WebFetch", {"url": PATHLIB_URL, "prompt": "p"}, None)])
+        self.result(self.check(calls), "unknown", "retrieval_unconfirmed")
+
+    def test_a_ctx_fetch_with_a_request_list_names_each_url(self):
+        calls = self.calls([(CTX_FETCH, {"requests": [{"url": JSON_URL, "source": "a"}, {"url": PATHLIB_URL, "source": "b"}]}, None)])
+        self.result(self.check(calls), "pass")
+
+    def test_the_url_variant_fails_the_decided_reading_and_passes_the_alternative(self):
+        variant = "https://docs.python.org/3.14/library/pathlib.html"
+        calls = self.calls([(CTX_FETCH, {"url": JSON_URL, "source": "s"}, None), ("WebFetch", {"url": variant, "prompt": "p"}, None)])
+        self.result(self.check(calls), "fail", "missing_source")
+        self.result(self.check(calls, R2_18="host_and_path_suffix"), "pass")
+
+    def test_urls_are_normalised_before_the_comparison(self):
+        calls = self.calls([("WebFetch", {"url": "HTTPS://Docs.Python.org:443/3/library/json.html#top", "prompt": "p"}, None),
+                            ("WebFetch", {"url": PATHLIB_URL, "prompt": "p"}, None)])
+        self.result(self.check(calls), "pass")
+
+    def test_a_missing_ledger_record_leaves_the_state_unknown(self):
+        rows = [r_user("t", ts(0)), r_use("WebFetch", {"url": JSON_URL, "prompt": "p"}, "toolu-fx-q1", ts(1)),
+                r_result("toolu-fx-q1", "body", ts(2))]
+        calls = evm().claude_calls(rows, [], "main")
+        self.assertEqual(calls[0]["state"], None)
+        self.result(self.check(calls, urls=[JSON_URL]), "unknown", "retrieval_unconfirmed")
+
+    def codex(self, *items):
+        records = [{"type": "thread.started", "thread_id": "thread-fx1"}]
+        for number, item in enumerate(items):
+            records.append({"type": "item.completed", "item": dict({"id": f"item_{number}", "status": "completed"}, **item)})
+        return evm().codex_calls(records)
+
+    def test_codex_open_page_and_find_in_page_count_but_a_search_action_does_not(self):
+        opened = self.codex({"type": "web_search", "query": "q", "action": {"type": "open_page", "url": JSON_URL}},
+                            {"type": "web_search", "query": "q", "action": {"type": "find_in_page", "url": PATHLIB_URL, "pattern": "x"}})
+        self.result(self.check(opened), "pass")
+        searched = self.codex({"type": "web_search", "query": "q", "action": {"type": "search", "queries": ["json"]}},
+                              {"type": "web_search", "query": "q", "action": {"type": "open_page", "url": PATHLIB_URL}})
+        self.result(self.check(searched), "fail", "missing_source")
+
+    def test_codex_shell_and_mcp_fetches_count_with_their_own_status(self):
+        calls = self.codex({"type": "command_execution", "command": f"curl -sL {JSON_URL}", "aggregated_output": "x", "exit_code": 0},
+                           {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_fetch_and_index",
+                            "arguments": {"url": PATHLIB_URL, "source": "s"}})
+        self.result(self.check(calls), "pass")
+        failed = self.codex({"type": "command_execution", "command": f"curl -sL {JSON_URL}", "aggregated_output": "", "exit_code": 22},
+                            {"type": "mcp_tool_call", "server": "context-mode", "tool": "ctx_fetch_and_index",
+                             "arguments": {"url": PATHLIB_URL, "source": "s"}})
+        self.result(self.check(failed), "fail", "missing_source")
+
+
+class F25b_MemoryHits(GraderCase):
+    """R9 at grading: a hit counts only when a succeeded ai-memory call returns a frozen record."""
+
+    RECORDS = [{"path": "pages/mem-fx-1.md", "created_at": "2026-09-01T00:00:00Z", "content_sha256": "1" * 64}]
+
+    def calls(self, result_text, *, state="succeeded", name=MEMORY_QUERY, tool_input=None, is_error=False):
+        rows = [r_user("t", ts(0)), r_use(name, tool_input or {"query": "host request lane"}, "toolu-fx-a1", ts(1)),
+                r_result("toolu-fx-a1", result_text, ts(2), is_error=is_error)]
+        return evm().claude_calls(rows, ledger_for(rows, states={"toolu-fx-a1": state}), "main")
+
+    def check(self, calls, **readings):
+        return evm().memory_check(calls, self.RECORDS)
+
+    def test_a_result_that_names_a_frozen_record_is_a_hit(self):
+        self.result(self.check(self.calls("hits: pages/mem-fx-1.md (score 0.9)")), "pass")
+
+    def test_the_frozen_digest_or_the_bare_id_also_resolves_to_the_record(self):
+        self.result(self.check(self.calls("digest " + "1" * 64)), "pass")
+        self.result(self.check(self.calls("memory mem-fx-1 says")), "pass")
+
+    def test_only_a_later_session_page_is_not_a_hit(self):
+        self.result(self.check(self.calls("hits: pages/session-2026-10-01-fx.md")), "fail", "no_historical_hit")
+
+    def test_a_failed_call_is_no_hit(self):
+        self.result(self.check(self.calls("pages/mem-fx-1.md", state="failed", is_error=True)), "fail", "no_historical_hit")
+
+    def test_an_unobservable_result_is_unknown(self):
+        pointer = "<persisted-output>\nOutput too large (50KB). Full output saved to: /outside/x.txt\n\nPreview (first 2KB):\nx"
+        self.result(self.check(self.calls(pointer)), "unknown", "result_unobservable")
+
+    def test_a_cli_call_counts_like_an_mcp_call(self):
+        calls = self.calls("pages/mem-fx-1.md", name="Bash", tool_input={"command": "ai-memory search --json -n 5 -- host request lane"})
+        self.result(self.check(calls), "pass")
+        elsewhere = self.calls("pages/mem-fx-1.md", name="Bash", tool_input={"command": "cat notes.txt"})
+        self.result(self.check(elsewhere), "fail", "no_historical_hit")
+
+
 # ---- F19 (stage-1 subset): disarmed-guard mutants -------------------------------------------------------------------
 
 def failing_with(mutant_patches, names):
