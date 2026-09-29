@@ -405,19 +405,25 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
 // under 150 ms at 64,000, applies to that input (about 30 ms here); the other shapes below keep the ratio and take an absolute
 // bound of 1.5 s at 64,000, since each does real work per unit and a CI runner is slower than this host.
 {
+  const ratio = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5)
+  // Best of five per size; when the ratio fails, up to two more rounds and the elementwise minimum of all rounds, so one pause
+  // (a GC or a busy runner) cannot fail a linear scan, while a quadratic one fails every round.
   const doubling = (make, run) => {
     run(make(2000)); run(make(2000)) // warm-up
-    const ms = []
-    for (const n of [8000, 16000, 32000, 64000]) {
-      const input = make(n)
-      let best = Infinity
-      for (let i = 0; i < 5; i++) { best = Math.min(best, timed(() => run(input)).ms); if (best > 1500) break }
-      ms.push(best)
-      if (best > 1500) break
+    let best = []
+    for (let round = 0; round < 3 && !ratio(best); round++) {
+      const ms = []
+      for (const n of [8000, 16000, 32000, 64000]) {
+        const input = make(n)
+        let t = Infinity
+        for (let i = 0; i < 5; i++) { t = Math.min(t, timed(() => run(input)).ms); if (t > 1500) break }
+        ms.push(t)
+        if (t > 1500) break // far past the bound already
+      }
+      best = best.length ? ms.map((t, i) => Math.min(t, best[i] ?? Infinity)) : ms
     }
-    return ms
+    return best
   }
-  const ratio = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5)
   const linear = (ms) => ratio(ms) && ms[3] < 150 // the brief's bound, for '(('.repeat(n) + 'qmd'
   const linearWork = (ms) => ratio(ms) && ms[3] < 1500 // every other shape
   const shape = (label, make, reader, run, bound = linearWork) => {
