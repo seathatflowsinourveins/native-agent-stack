@@ -14265,8 +14265,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "6fe670c4745af10b26e02449500e572ae21b7d4f3f4e766f4dd783abf530d8ea",
-      "bytes": 126843
+      "sha256": "677c0609d88043e0f7ab8510bfca3d57ad3f6de608dabf721d520a093752a812",
+      "bytes": 129876
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -14585,8 +14585,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "6a8cb2c2de8bb262acc27cf347cda5bdf89ed29510bba41c15b8c752e4289f64",
-      "bytes": 10317
+      "sha256": "c5f8e434ef7bfb8c6aeec6733f3f39c0408fe66fc8348cdbd7a23d344dbb39e7",
+      "bytes": 12756
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
