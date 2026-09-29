@@ -3,7 +3,9 @@
 
 These checks, including --live, are local integration, not host acceptance. The JSON
 retains summaries only; native events, invocation arguments and returned output are
-not retained. See docs/acceptance-evidence-policy.md and the JSON evidence fields.
+not retained. Beside its rows it names no path: `codex_home_is_default` and a
+hash-labelled `codex_home_id` stand in for the Codex home. See
+docs/acceptance-evidence-policy.md and the JSON evidence fields.
 
 Static checks (no model call):
   marker        `env -C / codex debug prompt-input probe < /dev/null | grep -c 'native-agent-stack:top-rule'` is 1;
@@ -50,6 +52,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import json
 import os
 import re
@@ -595,7 +598,11 @@ def main(argv: list[str] | None = None) -> int:
     failed = [row["check"] for row in results.rows if not row["ok"]]
     print(f"result: {'PASS' if not failed else 'FAIL'} ({len(results.rows) - len(failed)} pass, {len(failed)} fail)")
     if args.json:
-        Path(args.json).write_text(json.dumps({**EVIDENCE, "started_utc": started, "codex_home": str(codex_home),
+        # No path beside the rows (corrections item 5): whether the home was the default one, and an identifier of it.
+        home_id = "sha256:" + hashlib.sha256(str(codex_home).encode("utf-8")).hexdigest()[:16]
+        Path(args.json).write_text(json.dumps({**EVIDENCE, "started_utc": started,
+                                               "codex_home_is_default": args.codex_home is None,
+                                               "codex_home_id": home_id,
                                                "checks": results.rows, "live_runs": runs}, indent=2) + "\n",
                                    encoding="utf-8")
     return 0 if not failed else 1
