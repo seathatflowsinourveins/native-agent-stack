@@ -160,8 +160,9 @@ class PraU1EvidenceTooling(unittest.TestCase):
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     @unittest.skipUnless((PARSER_DIR / "package-lock.json").is_file(), "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
     def test_update_round2_splices_the_new_sections_into_counts(self):
-        """update-round2.py re-runs only the shape scan, the whole-record identity check against a baseline kernel and the scaling
-        measurement, and writes them (with the corpus and its cutoff) into a copy of counts.json, leaving every other section alone."""
+        """update-round2.py re-runs only the shape scan, the whole-record identity check against a baseline kernel, the scaling
+        measurement and the totals of the differential, and writes them (with the corpus and its cutoff) into a copy of counts.json,
+        leaving every other section alone. A re-run differential is compared with round 1's record of the same corpus."""
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
             corpus = tmp / "real.json"
@@ -169,14 +170,18 @@ class PraU1EvidenceTooling(unittest.TestCase):
             scanner = tmp / "scanner.mjs"
             scanner.write_text("export const commandInvocations = () => [{ lane: 'qmd' }]\n")
             counts = tmp / "counts.json"
-            counts.write_text(json.dumps({"kernels": {"new_sha256": "earlier"}, "differential": {"real": {"differ": 113}}}))
+            same_as_before = {"inputs": 10, "bash_valid": None, "same": 2, "differ": 8, "old_throws": 0, "new_throws": 0, "new_program_outside_vocabulary": 0,
+                              "old_program_outside_vocabulary": 0, "differ_new_parse_error": 5, "differ_kinds": {"lanes": 8}}
+            recorded = {"real": {"differ": 113}, "synthetic": {**same_as_before, "distinct_witnesses": 5}, "changed": {**same_as_before, "same": 3}}
+            counts.write_text(json.dumps({"kernels": {"new_sha256": "earlier"}, "differential": recorded}))
             done = subprocess.run(["python3", str(EVIDENCE / "update-round2.py"), "--repo", str(ROOT), "--scanner", str(scanner), "--baseline", str(KERNEL),
                                    "--work", str(tmp / "work"), "--real", str(corpus), "--real-until", "2026-09-29T07:08:07Z", "--until-reconstructed",
                                    "--identity", f"synthetic={corpus}",
+                                   "--differential", f"synthetic={corpus}", f"changed={corpus}", f"unrecorded={corpus}",
                                    "--sizes", "50,100", "--counts", str(counts)], capture_output=True, text=True, timeout=300, check=False)
             self.assertEqual(done.returncode, 0, done.stderr[-2000:])
             out = json.loads(counts.read_text())
-        self.assertEqual(out["differential"], {"real": {"differ": 113}})  # every other section is left alone
+        self.assertEqual(out["differential"], recorded)  # every other section is left alone
         self.assertEqual(out["kernels"], {"new_sha256": "earlier"})
         self.assertEqual(out["corpus"], {"source": "real-commands.mjs", "until": "2026-09-29T07:08:07Z", "until_reconstructed": True, "distinct_shell_texts": 10})
         self.assertEqual(out["shapes"]["overturn_1"], EXPECTED_OVERTURN)
@@ -186,7 +191,12 @@ class PraU1EvidenceTooling(unittest.TestCase):
         self.assertEqual(identity["corpora"], {"synthetic": {"inputs": 10, "analysed": 10, "identical": 10, "different": 0, "a_throws": 0, "b_throws": 0}})
         self.assertEqual(sorted(out["scaling"]), ["baseline", "kernel"])
         self.assertEqual(out["scaling"]["kernel"]["sizes"], [50, 100])
-        self.assertEqual(out["round2"]["sections"], ["corpus", "shapes", "lanes_identity", "scaling"])
+        # the stub scanner reads a qmd in every text, so the differential of the ten texts is 2 the same and 8 different (5 with a parse error);
+        # it equals the round-1 record of "synthetic" (whose distinct_witnesses needs a reduction and is not compared), not that of "changed"
+        rerun = out["differential_rerun"]
+        self.assertEqual({k: v for k, v in rerun["synthetic"].items() if k != "equal_to_round1"}, same_as_before)
+        self.assertEqual([rerun[k]["equal_to_round1"] for k in ("synthetic", "changed", "unrecorded")], [True, False, None])
+        self.assertEqual(out["round2"]["sections"], ["corpus", "shapes", "lanes_identity", "scaling", "differential_rerun"])
 
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_real_commands_reproduces_a_corpus_as_of_a_timestamp(self):
