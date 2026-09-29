@@ -1011,6 +1011,32 @@ class F7_T0(GraderCase):
         self.assertEqual([argv for argv in calls if "unittest" in argv], [], "code must not run in a changed tree")
 
 
+USER_SITE_TESTS = ("import unittest\n\nclass T(unittest.TestCase):\n"
+                   "    def test_needs_a_user_package(self):\n"
+                   "        try:\n"
+                   "            import u9userpkg\n"
+                   "        except ImportError:\n"
+                   "            self.skipTest('not installed for this user')\n"
+                   "        self.assertEqual(u9userpkg.VALUE, 'user')\n")
+USER_SITE_FACTS = {"ran": 1, "status": "OK", "skipped": 0, "failures": 0, "errors": 0}
+
+
+def fake_user_base(tmp):
+    """A per-user package base holding one module, where the interpreter on PATH looks for it. A run that loses the
+    operator's user base skips the tests importing it, the way a missing PyYAML skips one in tests.test_host_requests
+    (recheck of the T0 conditions). Skips the calling test when that interpreter has no user site."""
+    base = Path(tmp) / "userbase"
+    probe = subprocess.run(["python3", "-c", "import site; print(site.ENABLE_USER_SITE); print(site.getusersitepackages())"],
+                           capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                           env=dict(os.environ, PYTHONUSERBASE=str(base)))
+    flag, _, directory = probe.stdout.strip().partition("\n")
+    if probe.returncode != 0 or flag != "True" or not directory:
+        raise unittest.SkipTest("the interpreter on PATH has no user site")
+    Path(directory).mkdir(parents=True)
+    (Path(directory) / "u9userpkg.py").write_text("VALUE = 'user'\n", encoding="utf-8")
+    return base
+
+
 class F7b_T0Rerun(GraderCase):
     """Correction 2: the re-run is the arm's own command in a temporary COPY of the tree; -I -S cannot import tests."""
 
@@ -1062,6 +1088,19 @@ class F7b_T0Rerun(GraderCase):
                            invalidation_mode=py_compile.PycInvalidationMode.UNCHECKED_HASH)
         run = fc.rerun_unittest_in_copy(repo, env=dict(os.environ))
         self.assertEqual(run["facts"], {"ran": 2, "status": "OK", "skipped": 0, "failures": 0, "errors": 0})
+
+    def test_a_user_site_package_stays_visible_under_the_allowlisted_environment(self):
+        """The allowlist swaps HOME for a throwaway directory, which also hides the operator's user site packages. The
+        child ran with them (a PyYAML there changes how many tests tests.test_host_requests skips), so the grader's run
+        keeps the same user base visible without re-admitting any other operator variable."""
+        fc = load("frozen_checks")
+        base = fake_user_base(self.tmp)
+        repo = self.tmp / "usersite"
+        make_repo(repo, {"scripts/__init__.py": "", "tests/__init__.py": "",
+                         "tests/test_host_requests.py": USER_SITE_TESTS})
+        with mock.patch.dict(os.environ, {"PYTHONUSERBASE": str(base)}):
+            env = fc.minimal_env(str(self.tmp / "fresh-home"))
+        self.assertEqual(fc.rerun_unittest_in_copy(repo, env=env)["facts"], USER_SITE_FACTS)
 
 
 def t14_row(timestamp, **tool_input):
@@ -1963,6 +2002,20 @@ class F27b_CaptureCommand(GraderCase):
         for condition in ("arm", "plain"):
             self.assertEqual(t0[condition]["runs"][5]["facts"]["status"], "OK", condition)
 
+    def test_both_t0_conditions_keep_the_operators_user_site_packages(self):
+        """The same rule through the command: a throwaway HOME must not turn a package the child had into a skip in
+        either the arm-conditions capture or the plain one (a skip-count difference would fail a correct answer)."""
+        base = fake_user_base(self.tmp)
+        (self.tree / "tests" / "test_host_requests.py").write_text(USER_SITE_TESTS, encoding="utf-8")
+        git(self.tree, "add", "-A")
+        git(self.tree, "commit", "-q", "-m", "user site probe")
+        proc = self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B",
+                            env={"PYTHONUSERBASE": str(base)})
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        t0 = self.read("arm-B-pre-arm.json")["t0"]["reuse-296-00"]
+        for condition in ("arm", "plain"):
+            self.assertEqual(t0[condition]["runs"][5]["facts"], USER_SITE_FACTS, condition)
+
     def test_a_structurally_broken_spec_is_an_internal_refusal_not_a_traceback(self):
         """Review K-1: an unexpected exception must not print a traceback with a host path and exit 1 (reserved for
         'graded and not passing')."""
@@ -2456,6 +2509,19 @@ class F19_Mutants(GraderCase):
                         ["F27b_CaptureCommand.test_the_t0_commands_never_see_the_operator_environment",
                          "F27b_CaptureCommand.test_pre_arm_captures_six_identities_twice_and_inventories_the_exec_checkout"],
                         ["F27b_CaptureCommand.test_the_t0_commands_never_see_the_operator_environment"])
+
+    def test_M31_user_base_dropped_from_the_allowlist(self):
+        """The allowlist before the recheck of the T0 conditions: PATH, LANG, TMPDIR and a throwaway HOME only."""
+        fc = load("frozen_checks")
+
+        def without_user_base(home=None):
+            source = os.environ
+            return {"PATH": source.get("PATH", "/usr/bin:/bin"), "LANG": source.get("LANG") or "C.UTF-8",
+                    "TMPDIR": source.get("TMPDIR", "/tmp"), "HOME": home or tempfile.gettempdir()}
+        flipped = ["F7b_T0Rerun.test_a_user_site_package_stays_visible_under_the_allowlisted_environment",
+                   "F27b_CaptureCommand.test_both_t0_conditions_keep_the_operators_user_site_packages"]
+        self.run_mutant([mock.patch.object(fc, "minimal_env", without_user_base)],
+                        flipped + ["F27b_CaptureCommand.test_the_t0_commands_never_see_the_operator_environment"], flipped)
 
     def test_M26_in_place_run(self):
         """The copy is what keeps the arm's tree untouched: a 'copy' that is a link back to the tree must flip the test."""
