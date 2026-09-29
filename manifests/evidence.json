@@ -3539,6 +3539,26 @@
         "Excluding idle_prompt also silences a question asked in prose and then left waiting."
       ],
       "path": "evidence/receipts/terminal-experience-20260928.json"
+    },
+    {
+      "id": "login-shell-contract-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag.",
+      "limitations": [
+        "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The Polaris distro's profiles (Librarium, Phoyo) were not measured. Another host collects its own evidence.",
+        "The incident's creator is established by timing, by the same-second leftovers in the probe's scratch working directory (present in its scrub arm, absent in its no-scrub arm), by the owning session's confirmation, and by the isolated reproduction plus public reports (anthropics/claude-code #76236, #78072). The peer probe itself was not re-run. The reproduction stops at the API-key check: it shows the files are created at startup, and says nothing about a full session or about exit. Upstream states the placeholders persist after exit and is considering cleaning them up; that was not measured here.",
+        "The observations of the incident (login probes before and after, the leftover list, the journal and unit checks) are the coordinator's own shell output of 2026-09-29, recorded here as values; no raw output is retained.",
+        "The hand-off file protects only the name ~/.bash_profile. A creator that truncates or replaces an existing file is not covered; the doctor check catches an empty ~/.bash_profile or ~/.bash_login and any missing command, but the doctor has no scheduler, so it finds a recurrence only when it is run.",
+        "The doctor code lives in a repository with no remote (practice repository commit 512c3e3); this receipt's artifact folder carries a copy of the function with the home made a parameter. The full doctor run predates the creation of the hand-off file; the check alone was re-run after it.",
+        "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.158.0 was not run. The candidate notifiers were compared by repository head and latest release only, not run.",
+        "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (for example 50 and 49 entries in the stock-home arm); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` result was measured in one throwaway home with the scrub-created file and without the sandbox feature enabled.",
+        "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session."
+      ],
+      "path": "evidence/receipts/login-shell-contract-20260929.json"
     }
   ],
   "files": [
@@ -14460,8 +14480,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "97896b69c558adc664b25b04bb95c00a693286344f61eab5b6da3414f4f39bd1",
-      "bytes": 25588
+      "sha256": "d317155036ffbca44aeabcfd156f0537d12ff33cb3cdb7033789555c592ea7e9",
+      "bytes": 38862
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -14605,8 +14625,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "ec1b57558568ed0350cbc6c3ee94b40aefe3b7002c5ed8550642ff05a431bee0",
-      "bytes": 75608
+      "sha256": "c9d239413bbcfdf4b0f437cd67bd951cacf25d2de45cdfe676993889fd361eaa",
+      "bytes": 78820
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -31679,6 +31699,36 @@
       "bytes": 4691
     },
     {
+      "path": "evidence/artifacts/login-shell-contract-20260929/README.md",
+      "sha256": "7eec0eea94f66f6c0f259db00c9e8d4fc6e99b6afb3130f1c01f169de790cfd5",
+      "bytes": 3568
+    },
+    {
+      "path": "evidence/artifacts/login-shell-contract-20260929/agents_json_probe.py",
+      "sha256": "914afe098321ac0ad0c5e36e0c910efe184b79f739ca32eca20e040999934a24",
+      "bytes": 1533
+    },
+    {
+      "path": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+      "sha256": "1729003cffe560d246fa06131bbb62679867f410df4e815eb792fbea1ee5fa4b",
+      "bytes": 8047
+    },
+    {
+      "path": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
+      "sha256": "c6106a9ac19976ab64befddf3be762690bcca27ede1a25be2b5ab4537d720af9",
+      "bytes": 1472
+    },
+    {
+      "path": "evidence/artifacts/login-shell-contract-20260929/login_shell_check_controls.py",
+      "sha256": "e7cdc7776a671c2654a5f2805977769120ff117df971f30e7bbef9f10b6910d4",
+      "bytes": 4458
+    },
+    {
+      "path": "evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py",
+      "sha256": "0eff1d26583879c0e74b79fbda23b134b66a3e7868fd593deab8c596dc2869f6",
+      "bytes": 8906
+    },
+    {
       "path": "evidence/artifacts/mac-stage1-client-layer-20260927/README.md",
       "sha256": "df6c3e4ad05911232fb6d4b027774f9d57730c1a5b59fe973ae382bff9e2a5b8",
       "bytes": 63328
@@ -41339,6 +41389,11 @@
       "bytes": 14360
     },
     {
+      "path": "evidence/receipts/login-shell-contract-20260929.json",
+      "sha256": "407e7935c155ae63c0418874075e911c2eef82a9bf5d2775d8b4e1934054a79b",
+      "bytes": 23717
+    },
+    {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
       "sha256": "b8d09fda1ad56976d57d938af0eb7076223c79e39b2261ef4521413b15d8a0f1",
       "bytes": 893
@@ -42360,8 +42415,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "25681d438f6595e18982034f30e57ead9bc94b75be7371899fcfdde1b5d56a37",
-      "bytes": 34154
+      "sha256": "e3971d3129b3a3fb23e8ddfc0fd926cb65a2b4df9814791187a450623ad4e314",
+      "bytes": 35251
     },
     {
       "path": "recipes/claude-native-ultracode.md",

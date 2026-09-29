@@ -90,6 +90,15 @@ limits in [the 2026-09-28 terminal decision](../docs/decisions/2026-09-28-termin
   Windows Terminal sets the key on the launched process and adds it to `WSLENV`, so the
   `--exec` command line above stays unchanged. Codex promotes truecolor itself when
   `WT_SESSION` is set.
+- If the profile starts a login shell (`bash -lc`), bash reads only the first of `~/.bash_profile`, `~/.bash_login` and
+  `~/.profile` (`bash(1)` INVOCATION), so a file created at one of the first two names hides the PATH and `~/.bashrc` that
+  `~/.profile` provides. `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` on Linux with bubblewrap does exactly that: it pre-creates empty
+  placeholder files for missing protected paths, `~/.bash_profile` among them, and leaves them (anthropics/claude-code #76236 and
+  #78072; reproduced on 2.1.284). Keep a real `~/.bash_profile` that hands off to `~/.profile`
+  (`if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi`), never an empty one, and probe the way the profile starts, with a clean
+  environment (`env -i HOME="$HOME" PATH=<distro default> /bin/bash -lc 'command -v claude'`): a probe from a shell that already has
+  PATH passes even when the login files are broken. Do not put a fixed `-n` or `--name` in a shared profile, because every tab would
+  carry the fixed name or a variant of it instead of its own generated title; use `/rename` in a tab.
 
 For the matching Codex entry, add a separate `Codex (Ubuntu)` profile using the
 same distro/project and the installed native `codex` executable. On this host,

@@ -147,7 +147,7 @@ git instruction and one with a `CLAUDE.md` line saying the user handles commits 
 `core.hooksPath` unchanged after each; edits only under `.claude/worktrees/<name>`; the marker hook fires inside the
 background session; nothing committed or pushed under the second dispatch; any push under the first reaches only the local
 remote (recorded as a default to neutralise with a private user-level instruction before real use). Passing adds a
-`NativeStack - Agents` profile (`claude agents`) beside the per-tab profiles; failing keeps one tab per session.
+`NativeStack - Agents` profile (`claude agents`) beside the per-tab profiles; failing keeps one tab per session. **Superseded 2026-09-29:** agent view is not adopted and the probe is not run (see the update below); this procedure remains the check to run if detached background dispatch is ever wanted.
 
 Validated but not adopted, tmux 3.4 (each line checked against the 3.4 tag's `options-table.c` and `tmux.1`):
 `default-terminal tmux-256color`; `terminal-features xterm*:RGB`; `terminal-features xterm*:extkeys` with `extended-keys on`
@@ -186,3 +186,79 @@ nothing, and tmux through 3.6 lacks synchronized output.
 Restore the backed-up fragment (or `git revert` in the host practice repository) and touch `settings.json` to reload;
 restore `~/.claude/settings.json` and `~/.codex/config.toml` from the backups taken before the change. Backups are private
 and outside every repository.
+
+## Update 2026-09-29: login shell contract, launch practice and landscape refresh
+
+The user asked for the open items of this record to be decided by research convergence and carried through. This update also adds the two anti-pattern rows
+of the earlier update, which that change left out so that its pull request could merge cleanly, and one for this incident. The evidence is in the
+[receipt](../../evidence/receipts/login-shell-contract-20260929.json) and its
+[scripts](../../evidence/artifacts/login-shell-contract-20260929/README.md). The Windows Terminal profiles of the Polaris distro
+(Librarium, Phoyo) are outside this record and were not measured.
+
+### What broke, and why
+
+New `NativeStack - Claude` tabs printed `/bin/bash: line 1: exec: claude: not found` (exit 127). Every profile starts `/bin/bash -lc`, and
+bash reads only the first of `~/.bash_profile`, `~/.bash_login` and `~/.profile` (`bash(1)` INVOCATION; the header of `/etc/skel/.profile`
+says the same). An empty `~/.bash_profile` had appeared, so `~/.profile`, which carries PATH on this host, was never read: a login probe
+through `wsl.exe --exec` found no `claude`, `codex` or `rtk`. Open sessions were unaffected, no user unit failed and the user journal
+held no exit-127 line. Claude Code's hooks, Bash tool and MCP servers take PATH from the `env` block of the user settings (the settings
+template sets it), so they did not depend on the login shell.
+
+The cause is a known upstream behaviour, not a local fault: it is reported upstream and acknowledged as intended by a maintainer, but not
+yet described in the environment-variable documentation. With `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` on Linux with bubblewrap, Claude Code pre-creates an
+empty regular file for each missing protected path (shell startup files, package-manager and git configuration, `.env*`) and does not remove
+it; the installed 2.1.284 startup code opens a fixed list of such paths in append mode, which creates a missing file and never truncates an
+existing one, and also touches `/tmp/inline-comments-buffer.jsonl`. anthropics/claude-code [#76236](https://github.com/anthropics/claude-code/issues/76236) reports exactly this empty `~/.bash_profile`
+(closed `not_planned` by the stale bot on 2026-09-01). [#78072](https://github.com/anthropics/claude-code/issues/78072) is open and
+labelled `reproduced`; a maintainer comment of 2026-08-17 calls the persistent files intended ("pre-created as an empty regular file so
+protected tools ... keep working") and says cleaning them up at exit is being considered. The 2.1.284 changelog has no such fix. Its
+sandbox-cleanup entries are 2.1.78 (stubs in the working directory's `git status`), 2.1.247 (an after-command cleanup deleting a symlinked
+settings file), 2.1.257 (a `/doctor` warning for stale sandbox mask files left by a killed session) and 2.1.271 (a stale
+`.git/config.lock`). The documented per-command placeholders are removed after each sandboxed command, and a killed session can leave them
+([sandboxing troubleshooting](https://code.claude.com/docs/en/sandboxing)); the scrub-mode startup placeholders persist by design, and the
+installed `claude doctor` did not flag the scrub-created `~/.bash_profile` (measured below). A headless `claude -p` probe of a peer session ran with
+the variable against the real home and created 14 empty entries there within about a second (and the empty `/tmp/inline-comments-buffer.jsonl`); its scratch working directory held empty `.env*`,
+`.gitmodules`, `.npmrc` and `.claude` from the same run, and its no-variable arm none. These reports were only read; nothing was filed or
+commented.
+
+### Evidence, 2026-09-29
+
+| Claim | Class | Result |
+| --- | --- | --- |
+| A login shell started as the profiles start it finds no `claude`, `codex` or `rtk` while the empty file exists, and finds them once that one file is removed | native, before and after | the probe printed nothing for the three names with the distro default PATH; after removing only `~/.bash_profile` (asserted regular, empty, that creation time, no `bwrap` or `srt` process) `claude`, `codex`, `nativestack`, `rtk` and `uv` resolved |
+| The variable creates the empty file and takes `~/.local/bin` out of the login PATH; without it no empty placeholder file is created; a real hand-off file is left alone | native Claude Code, isolated home, control arm | no variable: 0 empty files, PATH kept. Variable, stock home: 27 empty files and 12 empty directories (20 directories in all) including `~/.bash_profile`, `~/.local/bin` gone from the login PATH. Variable, real hand-off file: byte-identical, PATH kept (26 other empty files still created) |
+| The doctor's `login-shell-path` check fails the incident and passes a healthy home | fixtures and the real host | five temporary homes as expected (`~/.profile` only passes; an empty `~/.bash_profile`, an empty `~/.bash_login` and no startup file fail with all four names missing; a hand-off file passes); the real host passes |
+| The installed `claude doctor` does not flag the scrub-created empty `~/.bash_profile` | native Claude Code, isolated home | `claude doctor` in the stock-home arm's home printed 3 warnings and none named `~/.bash_profile` or a stale mask file, so the native warning does not replace the doctor check |
+| The reproduction touched nothing outside its throwaway homes except the client's own per-directory state and one shared temp file, both removed | native, the script checks it | the real home's placeholder names were unchanged before and after; the shared `/tmp/inline-comments-buffer.jsonl` was absent before, created by the run and removed by the script |
+| Creating the hand-off file changes nothing about the login PATH | native, digest | 13 entries and the same digest before and after (`login_path_digest.py`) |
+
+### Decisions
+
+| Decision | Chosen | Alternatives rejected | Overturned when |
+| --- | --- | --- | --- |
+| Login shell | Keep `bash -lc` in every profile. Keep a real `~/.bash_profile` that hands off to `~/.profile` (`if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi`), never an empty one. Keep the doctor check, because the doctor has no scheduler | Remove the stray file and rely on the doctor: any creator of missing files undoes it. An absolute `--exec` launcher with no login shell: it starts Claude, but the host's `codex` launcher (a local integration that sets the telemetry identity) execs the npm shim (`#!/usr/bin/env node`), which exits 127 under the default PATH (`/usr/bin/env: 'node': No such file or directory`); the package also bundles a native executable that starts under a clean PATH, but the launcher does not use it, its path is specific to the installed version, and starting it directly would bypass the shim and the telemetry-identity launcher. The Shell, Operations and Local Chat tabs need the login files either way. `--shell-type login` starts `-bash` and reads the same files in the same order. PATH through the profile `environment` key or `WSLENV`: no documented support for the Linux PATH. `. ~/.profile` spelled in the command line, or `env PATH=...` in the fragment: no upstream reference, and a third copy of PATH | A creator truncates or replaces an existing file (pin the launcher and supply PATH explicitly). The `codex` launcher execs the bundled native executable, or puts `node` on PATH itself (an absolute `--exec` then becomes viable for the Codex tab; the Shell, Operations and Local Chat tabs still need the login files). Upstream stops creating the placeholders or removes them at exit (the file stays harmless, the check stays) |
+| Session names | No `-n` or `--name` in the shared profiles; use `/rename` in a tab | A fixed name: a name set with `--name` replaces the generated tab title, and a second live session with the same name is renamed to a variant, so the tabs of a profile would carry the fixed name or a variant of it instead of their own titles | Separate per-lane profiles with unique names are wanted |
+| Resume | No resume profile; `/resume` in any tab, `claude --resume`, `codex resume` | Extra profiles for the picker: no measured gain for added fragment and check surface, and the practice repository resumes deliberately with the native picker | Repeated resume steps after restarts become a measured cost |
+| Agent view | Not adopted; the probe is not run. The scripted `claude agents --json` needs no adoption: it prints the active interactive and background sessions (`name`, `cwd`, `pid`, `sessionId`, `startedAt`, `status`; no token or cost field), and `--cwd` narrows it | The agent view screen lists only background sessions ("Interactive sessions you have open in other terminals don't appear until you background them"), documents no token or cost column, shows the workspace-trust dialog first when the directory is not yet trusted, and a background session "commits without asking, and pushes the branch when the repository has a remote" unless your git instructions say otherwise; adopting it would move the per-tab workflow to background sessions, which distinguishable interactive tabs with alerts do not call for | Detached background dispatch is wanted (then run the probe described above) |
+| Telemetry gaps | Unchanged here. The collector and the launcher belong to the owners of the token-efficiency measurement: no tab identity beyond `session_id`; per-skill, per-agent and per-MCP labels are dropped from the metrics (Loki keeps them); project agent names collapse to `custom`; traces are off; the dashboards have no per-session variable; Loki keeps 3 days and Prometheus 1 week | Changing the collector or the launcher while a measurement window is sealed. The design-supported route to a tab identity is a `service.instance.id` in `OTEL_RESOURCE_ATTRIBUTES` from the profile's `environment` key: the collector keeps a launcher-set id and appends `/<session.id>`, and the Codex launcher keeps an inherited id as a prefix ([collector README](../../observability/collector/README.md)); it changes the `session_id` values of those tabs, so their owners decide | The window closes and the owners accept the changed `session_id` values |
+
+Sources for these decisions: the GNU Bash Reference Manual, "Bash Startup Files", in the maintainer's copy
+([bashref](https://tiswww.case.edu/php/chet/bash/bashref.html#Bash-Startup-Files); `~/.bash_profile` conventionally hands off to another
+startup file) and `bash(1)` 5.2.21 INVOCATION for the read order; the Arch
+([`dot.bash_profile`](https://gitlab.archlinux.org/archlinux/packaging/packages/bash/-/raw/main/dot.bash_profile)) and Fedora
+([`dot-bash_profile`](https://src.fedoraproject.org/rpms/bash/raw/rawhide/f/dot-bash_profile)) bash package skeletons, which ship a
+`~/.bash_profile` that sources `~/.bashrc`; Ubuntu 24.04's `/etc/skel/.profile` (not read if `~/.bash_profile` or `~/.bash_login` exists;
+it sources `~/.bashrc`); `wsl.exe --help` (WSL 2.7.13.0: `--exec`, `--cd`, `--shell-type`); and the Claude Code documentation pages for agent
+view, cross-session messaging, the settings reference and the CLI reference.
+
+Visibility, as documented and observed: Claude tabs of one user in one distro see each other with `ListAgents` and `SendMessage`
+([cross-session messaging](https://code.claude.com/docs/en/cross-session-messaging), Claude Code 2.1.224 or later); with
+`crossSessionInbound: accept` and bypass mode no approval dialog holds a message. Codex tabs are not in that registry (observed), and tabs
+in another distro or on the Windows side are expected to be invisible (inferred). `claude agents --json` prints the active interactive and background sessions with their `status` (the cooperation recipe's sentence that it finds same-host Claude peers was checked against the installed CLI and stands); no tab or command shows another tab's token usage.
+
+### Landscape refresh, 2026-09-29
+
+- **Windows Terminal:** no release since 2026-07-16 (stable `v1.24.11911.0`, preview `v1.25.1912.0`). Both toast signals are unchanged: the `BellStyle` enum of neither tag carries `notification`, and both tags report `diverged`. No overturn condition of this record is met.
+- **Claude Code:** `2.1.284` is still the newest release (2026-09-28); the changelog has no placeholder cleanup.
+- **Codex:** `rust-v0.158.0` is stable (host: `rust-v0.157.1`). `chatwidget/notifications.rs`, `notifications/mod.rs` and `terminal_palette.rs` are identical between the two tags, the four notification kinds are unchanged, and the `Notifications` type and the `terminal_title`, `notification_method` and `notification_condition` settings are identical (the 70 changed lines of `config/src/types.rs` add copy-on-select and right-click paste settings, the `log_agent_responses` and `log_guardian_assessments` logging opt-ins (for the owners of the telemetry row) and an MCP startup re-export). The host check and `[tui] notifications` need no change when Codex is next upgraded; this record does not upgrade it.
+- **Candidates:** every pin in the table above is unchanged (repository heads equal the recorded pins; no archived repository).
