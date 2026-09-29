@@ -69,7 +69,8 @@ currency (`pin_current`), stars, releases, sweep review status, votes, confidenc
   `foundation/observation-inference`: otel-tui against grafana, alertmanager, ntfy and claude-hud); a `pin_current`
   tiebreak would unshare 17 placements (369 to 352 shared).
 - The file is 1,235,500 bytes, under the 1,500,000-byte warning and the 2,000,000-byte cap (gitleaks skips files over
-  2 MB). Every count above equals the design review's simulation at `5cfa2400`, and every ranked placement's role, tier,
+  2 MB). Every count above that the design review simulated at `5cfa2400` equals its simulation (it did not simulate the
+  614 source records, the file size or `domain-card/default-never-winner`), and every ranked placement's role, tier,
   verification level and pin currency equals that simulation's placement list.
 
 ## Deviations from the reviewed schema
