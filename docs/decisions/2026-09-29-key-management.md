@@ -309,12 +309,20 @@ name in the `undeclared_store_file` warning, and so in the receipt.
 
 ## Part 4: the id-based key runner (D1 PR-4, 2026-09-29)
 
-This section amends the record for the change that adds the key runner. The
-change also adds the runner's guard model in
-`scripts/hooks/secret_path_guard.py` in a second phase, and the runner does
-not ship without it.
+This section amends the record for the change that adds the key runner, in
+two phases of one pull request series. Phase 1, this change, ships the
+runner as **available**, with its limits stated. Phase 2, a later change by
+another builder after the guard tightening lands, adds the runner's guard
+model in `scripts/hooks/secret_path_guard.py` and only then makes the runner
+the default path in `AGENTS.md`, the recipes and the runbook. The reason is
+a check of 2026-09-29 against this checkout's guard: `check()` returned
+`native_token_print` for `tvly auth` and `None` for
+`python3 tools/credentials/credential_run.py tavily -- tvly auth`, and a
+plain `tvly auth` prints a key's first eight and last four characters, which
+masking cannot catch. Making the runner the default before the guard reads
+it would reopen shapes that are refused today.
 
-**Selection.** A stored key is used through
+**Selection.** A stored key may be used through
 [`tools/credentials/credential_run.py`](../../tools/credentials/credential_run.py):
 `python3 tools/credentials/credential_run.py <inventory-id> [--only NAME]... -- <command> [args...]`,
 or `--check`, which starts nothing. It is standard-library Python in the 3.9
@@ -330,16 +338,35 @@ grammar.
 - The command gets only the entry's declared variables. The caller's copies
   of every inventory and `must_not_be_set` name are removed first.
 - Each injected value is masked on both streams, raw and in its encoded
-  forms: base64 and base64url interiors at three byte alignments, percent,
-  JSON and hex.
+  forms: base64 and base64url interiors at three byte alignments; percent
+  as `quote()` and `quote_plus()` write it, with `/` kept or escaped and in
+  both hex cases; JSON plain, with `\/` and with `<`-style HTML
+  escapes; and hex. Nested encodings, wrapped base64 and other escapers stay
+  unmasked, and the runbook lists them.
+- The masker keeps at most the longest form minus one byte, so a long run
+  of overlapping matches comes out as several markers instead of being held
+  whole.
+- Output goes through non-blocking descriptors and a bounded queue in the
+  relay's own select loop, so a consumer that stops reading cannot hold the
+  runner past a shutdown signal or the 2 s drain deadline.
+- It refuses a host whose `core_pattern` begins with `|` or `@`, one it
+  cannot read, and a `RLIMIT_CORE` it cannot set to 0, with no override.
 - The inventory's new optional `public_variables` names the variables that
-  are injected unmasked, such as the Alpaca base URL.
-- The keyring stays a transport, units run their program through the
+  are injected unmasked, such as the Alpaca base URL. The schema rejects an
+  entry that lists a name twice, or as both required and optional, and the
+  masked set is computed from the validated schema, so a required variable
+  is never public.
+- The keyring stays a transport, units may run their program through the
   runner, and the paper units are unchanged. The Claude native mask and
   Codex proxy injection remain later layers.
 
 The design and its limits are in
-[Using a key](../secret-storage.md#using-a-key-default-path-2026-09-29).
+[Using a key](../secret-storage.md#using-a-key-available-2026-09-29).
+
+**Not yet.** The runner's model in the command guard, and the flip of the
+default path (`AGENTS.md`, the recipes, the runbook) that waits for it: both
+are phase 2. Until then the runner is documented as available, with its
+limits, and `recipes/tavily.md` keeps the keyring commands as its default.
 
 **Built from these references, each re-read at its pin on 2026-09-29:**
 - `scripts/kernel_keyring.py`'s env-only exec discipline;
@@ -354,6 +381,14 @@ The design and its limits are in
 - dmno-dev/varlock@1b880652 `redact-stream.ts` (the 100 ms idle flush);
 - Generalized-Labs/ironrun@b611c7ce `internal/redact/encodings.go` (hex,
   and percent forms in both cases).
+
+**Read for the review's repair round, 2026-09-29:**
+- torvalds/linux@v6.16 `fs/coredump.c`: a file pattern honours `RLIMIT_CORE`
+  (L705), a `|` pattern sets it aside (L795-820), and so does an `@` core
+  socket (L242-243 and L919);
+- systemd/systemd@v257 `src/coredump/coredump.c`: no core is stored when the
+  limit is below a page (L472-479), and the metadata still carries
+  `COREDUMP_ENVIRON`, the process environment (L1458-1459).
 
 **Alternatives, with pins and evidence class:**
 - **mise v2026.9.16** (commit `2184db81`). *Measured* in a scratch home
@@ -414,21 +449,64 @@ of the same command would also depend on whether it paused before exiting.
 The constant `SHORT_TAIL_MAX` restores the literal rule. A mutation of it is
 caught by `test_flushes_an_unterminated_tail_at_eof`.
 
+**Repair round (2026-09-29).** A read-only GPT-6 review at effort max of the
+first head (`e437a361`) returned seven findings. Each was reproduced with a
+synthetic value in a temporary store, or failed a new test first, and is
+fixed with its own test:
+1. *High.* The runner was documented as the default path before the guard
+   models it. It is now documented as available, with its limits (above).
+2. *High.* `RLIMIT_CORE` 0 does not stop a crash collector. The runner
+   refuses a `core_pattern` that begins with `|` or `@`, one it cannot read,
+   and a limit it cannot set, with no override. The `@` case goes beyond
+   the review's wording, on the kernel source above. The residual is a
+   same-uid debugger, `ptrace` or `/proc` read.
+3. *Medium.* The common percent and JSON encoders write forms the masker
+   did not register: `quote()` keeps `/`, `quote_plus()` writes `+`, PHP
+   writes `\/`, Go writes `<`. All are needles now. What stays unmasked
+   (nested encodings, wrapped base64, other escapers, fragments) is listed
+   in the runbook, and a test pins the list.
+4. *Medium.* Overlapping matches were held without a bound: 126,976 bytes
+   after 31 chunks of six identical characters. The masker keeps at most
+   the longest form minus one byte, and a long run comes out as several
+   markers. A scratch fuzz of 40,000 dense-overlap streams in four
+   chunkings (not committed) left the same unmasked bytes as the
+   whole-buffer masker.
+5. *Medium.* Blocking writes let a stalled consumer hold the runner past
+   `SIGTERM` (2.7 s, until it read). Output is now non-blocking behind a
+   256 KiB queue per stream. Measured in the tests: a stalled consumer
+   after `SIGTERM`, 0.1 s; after the command's exit, 2.1 s.
+6. *Medium.* The schema accepted a required variable that was also
+   optional and public. It now rejects an overlap and a repeated name, and
+   the masked set comes from the schema module.
+7. *Low.* A stdin closed at start was reopened on `/dev/null` and closed
+   again by the exec (`EBADF` in the command, not end of file). It is
+   inheritable now.
+
 **Evidence class.**
 - *Local integration*, synthetic values in temporary stores:
-  `tests/test_credential_run.py` (31 tests) and the `public_variables`
-  schema test in `tests/test_credential_status.py`. The runner tests were
-  written first and failed to import the missing tool; the schema test
-  failed on the missing field. In a scratch mutation run, each of 32
-  mutants of the runner (one rule removed or changed each time) failed its
-  intended test, and the tool was restored by sha256.
+  `tests/test_credential_run.py` (60 tests) and the schema tests in
+  `tests/test_credential_status.py`. The runner tests were written first
+  and failed to import the missing tool; the schema tests failed on the
+  missing field; each repair test failed before its fix. In a scratch
+  mutation run, each of 61 mutants (32 of the first round, 29 for the
+  repair round, one rule removed or changed each time) failed its intended
+  test, and the files were restored by sha256. The tests start the runner
+  through a test-only launcher on a host whose real `core_pattern` pipes
+  crash dumps, which CI runners commonly do; the two tests of the real
+  re-execution skip there, and one test checks the real tool against the
+  host's own pattern.
 - *Upstream source*, read at the pins above on 2026-09-29, and macOS ps(1)
   at apple-oss-distributions/adv_cmds@6bed8737.
 - *Measured once in a session scratch directory, no committed receipt*: the
-  mise, agentself and dotenvx spikes.
-- *Not yet observed*: the runner on macOS or under a 3.9 interpreter, a
-  real key through it (the canary harness is a later change), and the
-  runner's guard model, which is the second phase of this change.
+  mise, agentself and dotenvx spikes, the check of this checkout's guard on
+  `tvly auth` behind the runner, and one run of the 60 runner tests under a
+  uv-managed CPython 3.9.25 on Linux (all pass).
+- *Not yet observed*: the runner on macOS, including the Command Line Tools
+  `python3`, a
+  real key through it (the canary harness is a later change), a host that
+  pipes crash dumps (the refusal is tested with pattern files, not with a
+  real `systemd-coredump` crash), and the runner's guard model and the
+  default-path flip, which are the second phase of this change.
 
 **Overturn.**
 - A maintained upstream tool does all of the following, measured with the
@@ -443,5 +521,8 @@ caught by `test_flushes_an_unterminated_tail_at_eof`.
 - The Claude sandbox mask leaves experimental status: add it as a layer.
   The runner stays for Codex, OmniRoute lanes and units, which run no
   guard.
+- A kernel and collector pair that honours `RLIMIT_CORE` 0 for a piped or
+  socket `core_pattern` is shown on a real crash, with no environment in the
+  journal: drop the refusal for that pair.
 - Any part of a value is found in a transcript, log or tool output after a
   runner use: stop that use, rotate the key, and record how it leaked.

@@ -44,10 +44,20 @@ guard and the deny rules look. The checker lists it by name under
 
 <a id="using-a-key"></a>
 
-## Using a key (default path, 2026-09-29)
+## Using a key (available, 2026-09-29)
 
-An agent, a Codex or OmniRoute lane, a workflow step or a unit uses a stored
-key through one command that names only the inventory id:
+The key runner is available. It is not yet the default path: it becomes the
+default, and this section says so, after the command guard models it. Phase
+2 of the same pull request series adds that model to
+`scripts/hooks/secret_path_guard.py` and flips the default. Until then the
+guard does not read the runner's command: a synthetic check accepted
+`credential_run.py tavily -- tvly auth`, while the guard refuses a bare
+`tvly auth` today, and `tvly auth` prints a key's first eight and last four
+characters, which masking cannot catch. Use the runner with that limit in
+mind, and keep `--json` on `tvly auth`.
+
+An agent, a Codex or OmniRoute lane, a workflow step or a unit may use a
+stored key through one command that names only the inventory id:
 `python3 tools/credentials/credential_run.py <inventory-id> -- <command> [args...]`.
 For example:
 
@@ -63,7 +73,12 @@ caller's own copies of every inventory and `must_not_be_set` name are
 removed first. No value goes into the command line, a temporary file or a
 shell. The command's stdout and stderr are relayed with each injected value
 replaced by `[REDACTED:<NAME>]`, raw or encoded: base64 and base64url at
-every byte alignment, percent-encoding, JSON escaping and hex. A variable
+every byte alignment; percent-encoding as `quote()` and `quote_plus()`
+write it (with `/` kept or escaped, a space as `%20` or `+`, in both hex
+cases); JSON escaping as Python writes it, with `/` written `\/` (PHP's
+`json_encode`) and with `<`, `>` and `&` written `<`, `>` and
+`&` (Go's `encoding/json`, and the `<` form of PHP's
+`JSON_HEX_TAG`); and hex. A variable
 that the entry lists in `public_variables`, such as `APCA_API_BASE_URL`, is
 injected unmasked. The command's exit code, stdin, signals and non-UTF-8
 bytes pass through. `--check` starts nothing: it prints the names it would
@@ -80,7 +95,17 @@ number but never a value or a path:
   [`set_credential.py`](../tools/credentials/set_credential.py). A
   hand-edited `$`, backtick or backslash is refused, never expanded;
 - a masked value shorter than 6 bytes, which could not be masked without
-  masking ordinary output.
+  masking ordinary output;
+- a host whose `/proc/sys/kernel/core_pattern` begins with `|` (a program,
+  such as systemd-coredump or apport) or `@` (a core socket), reason
+  `core_pattern_pipe` or `core_pattern_socket`. `RLIMIT_CORE` 0 stops a core
+  file, but the kernel sets the limit aside for those two, and
+  systemd-coredump then journals the crashing process's environment, which
+  holds the key. There is no override. The message names that file, never
+  what it holds. A file that cannot be read is refused too (reason
+  `core_pattern_unreadable`); a host without the file, such as macOS, skips
+  the check. A `RLIMIT_CORE` that cannot be set to 0 is refused as well
+  (`core_limit_not_set`).
 
 **Adding a key** takes one step from the user. The agent runs
 `bash tools/credentials/open_credential_terminal.sh <inventory-id>`, and
@@ -91,27 +116,48 @@ worktree, together with the matching `SECRET_NAMES` line in
 `scripts/hooks/secret_path_guard.py` that `tests/test_secret_path_guard.py`
 requires. It then opens the window from that worktree.
 
+**Output and shutdown.** The runner writes to a pipe or socket without
+blocking, through a queue of at most 256 KiB per stream. A consumer that
+stops reading holds the command back, as in any pipeline, but not the
+runner. After a shutdown signal (`SIGINT`, `SIGTERM`, `SIGHUP`, which the
+runner forwards to the command's process group) it waits for no consumer:
+what is queued is dropped, and the runner exits with the command's status.
+Once the command has exited, the consumer has 2 seconds to take what is
+queued, and the rest is dropped. Dropping is safe, because only masked
+bytes are queued. A terminal, a regular file and `/dev/null` are written
+directly, and a descriptor that shares its open file description with the
+command's stdin is not made non-blocking, so an interactive terminal stays
+blocking for the command. A runner that is killed with `SIGKILL` leaves a
+shared pipe non-blocking.
+
 **What masking does not cover.** Masking guards against accidents; it is
 not a boundary.
 - Only the entry's injected variables are masked, and only whole values in
-  the forms above. A fragment (plain `tvly auth` prints a key's first eight
-  and last four characters), a reversed, encrypted or otherwise transformed
-  value, and a value split between stdout and stderr are printed as they
-  are.
+  the forms above. Printed as they are: a fragment (plain `tvly auth`
+  prints a key's first eight and last four characters); a reversed,
+  encrypted or otherwise transformed value; a nested encoding (an encoding
+  of an encoding); base64 wrapped across lines; another escaper (Gson's
+  `=` for `=`, or a percent-encoding with a safe set other than `/`
+  or none); and a value split between stdout and stderr.
 - Stdout and stderr are masked separately. What the command writes to a
   file, a log or the network never passes the masker.
 - Output that ends, or a command that is killed, part-way through a value
   shows `[REDACTED-PARTIAL:<NAME>]` for the unfinished part once it is 4
   bytes or longer. Up to 3 bytes of the start of a value's form can be
-  printed, after 100 ms without output or at the end.
+  printed, after 100 ms without output or at the end. The masker holds back
+  at most the longest form minus one byte, however long a run of repeated
+  matches is, so such a run can come out as several markers.
 - The value sits in the command's environment. While it runs, other
   processes of the same uid can read it through `/proc/<pid>/environ`, or
-  with `ps -E` on macOS.
-- The guard hook runs only for Claude's Bash tool. Codex, OmniRoute lanes
-  and units run no guard, so there the masking is the only layer.
+  with `ps -E` on macOS. So can a debugger of the same uid, and `ptrace`:
+  they are out of scope, as is a core dump that a collector takes despite
+  the limit on a host the runner does not refuse.
+- The guard hook runs only for Claude's Bash tool, and it does not read the
+  runner's command yet (phase 2). Codex, OmniRoute lanes and units run no
+  guard, so there the masking is the only layer.
 
 **Units and other clients.**
-- A systemd user unit runs its program through the runner:
+- A systemd user unit may run its program through the runner:
   `ExecStart=/usr/bin/python3 -I <checkout>/tools/credentials/credential_run.py <inventory-id> -- <program>`.
   It reads the file at start, with no unlock and nothing in the manager's
   environment. Never pass a value through `Environment=`, `SetCredential=`,
@@ -119,14 +165,14 @@ not a boundary.
   `EnvironmentFile=` stays only for the engines that already use it
   (Grafana, OmniRoute). The paper units keep their `--env-file` pointers
   until the trading lane decides otherwise.
-- A launchd agent on macOS does the same through `ProgramArguments`, with
+- A launchd agent on macOS may do the same through `ProgramArguments`, with
   `EnvironmentVariables` holding `PATH` only
   ([macOS page](../adoption/platforms/macos-arm64.md#keys-under-launchd-drafted-2026-09-29-not-run-on-a-mac)).
 - Never start Codex, or any other client, from a shell that exports a key:
   whatever the launcher exports can reach every command its model runs.
-  Keys reach those commands through the runner inside the command.
-- An MCP stdio server that needs a key is launched with the runner as its
-  command, never with a `${VAR}` in its configuration.
+  The runner is how a key can reach those commands inside the command.
+- An MCP stdio server that needs a key can be launched with the runner as
+  its command, never with a `${VAR}` in its configuration.
 
 ## Storage rules
 
@@ -188,20 +234,20 @@ Five consumers still read the Alpaca pair only from environment variables:
 `security-identity/probe.py`, `security-identity/quality.py` and
 `delisting-coverage/collect.py`. This is item A1 in
 [`decisions/2026-09-24-community-sweep.md`](decisions/2026-09-24-community-sweep.md).
-Run each through the key runner ([Using a key](#using-a-key-default-path-2026-09-29)), which puts the
-pair into that one command's environment and masks it in the command's
-output:
-
-```sh
-python3 tools/credentials/credential_run.py alpaca-paper -- python3 blueprints/us-equities/alpaca-paper/paper_runner.py ...
-```
-
-Deprecated since 2026-09-29, and still allowed until a later guard change
-retires it: a subshell that sources the file, so that the values exist only
-in that child's environment, with nothing masked:
+Until they are moved to `--env-file`, run them one invocation at a time in a
+subshell, so that the values exist only in that child's environment:
 
 ```sh
 ( set -a; . "$PAPER_ENV_FILE"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py ... )
+```
+
+The key runner ([Using a key](#using-a-key-available-2026-09-29)) is an
+available alternative that puts the pair into that one command's
+environment and masks it in the command's output. It is not yet the default
+path, because the command guard does not read its command:
+
+```sh
+python3 tools/credentials/credential_run.py alpaca-paper -- python3 blueprints/us-equities/alpaca-paper/paper_runner.py ...
 ```
 
 While either child runs, any process running under your uid can read its
@@ -599,10 +645,12 @@ succeed without `--replace`. The lock is a Linux abstract socket name for
 your uid, not a file. Names use lowercase letters, digits, `.`, `_` and `-`.
 
 **Use it** through `exec`, which reads the key and starts the command with
-one variable set, in that command's environment only. Since 2026-09-29 a
-stored key is used through the key runner instead
-([Using a key](#using-a-key-default-path-2026-09-29)), which reads the file and masks the output;
-`exec` serves only a per-boot spare, which ends at the next kernel restart:
+one variable set, in that command's environment only. A stored key can also
+be used through the key runner ([Using a key](#using-a-key-available-2026-09-29)),
+which reads the file and masks the output; it is available, and becomes the
+default path once the command guard models it. Until then `exec` stays the
+documented path for the per-boot spare, which ends at the next kernel
+restart:
 
 ```sh
 python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly search "<query>" --json
