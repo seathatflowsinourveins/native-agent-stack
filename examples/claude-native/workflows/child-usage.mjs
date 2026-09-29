@@ -167,6 +167,15 @@ function parenClose(s) {
   PAREN_MEMO.push([s, table])
   return table
 }
+// Whether s[k] is escaped: an odd number of backslashes end just before it (bash(1) QUOTING: a backslash escapes the next
+// character, and a backslash-newline is a line continuation). An escaped blank, metacharacter or newline does not end a word,
+// so a # after it starts no comment (R3: `x="$(echo a\ #b)"` is one word, and its ) and closing quote still count). Each run of
+// backslashes is read once, for the one # that follows its word break, so the scan stays linear.
+function escapedAt(s, k) {
+  let n = 0
+  for (let j = k - 1; j >= 0 && s[j] === '\\'; j--) n++
+  return n % 2 === 1
+}
 // One unit of shell text under a stack of open frames (POSIX.1-2024 XCU 2.2 Quoting and 2.6.3 Command Substitution;
 // bash(1) QUOTING, COMMENTS, ARITHMETIC EVALUATION and Here Documents). A frame is "'" (literal up to the next '), '"'
 // (a backslash escapes the next unit; "$(" not followed by "(" opens a $( frame, a backquote a ` frame), '`' (up to the
@@ -189,7 +198,7 @@ function step(s, i, stack, on) {
   }
   if (ch === '\\') return i + 2
   if (ch === "'" || ch === '"') { stack.push(ch); return i + 1 }
-  if (ch === '#' && (i === 0 || WORD_BREAK.has(s[i - 1]))) { const end = s.indexOf('\n', i); return end < 0 ? s.length : end }
+  if (ch === '#' && (i === 0 || (WORD_BREAK.has(s[i - 1]) && !escapedAt(s, i - 1)))) { const end = s.indexOf('\n', i); return end < 0 ? s.length : end }
   const arithmetic = ch === '$' && s.startsWith('((', i + 1) ? i + 1 : ch === '(' && s[i + 1] === '(' ? i : -1
   if (arithmetic >= 0) {
     const close = parenClose(s)[arithmetic]
