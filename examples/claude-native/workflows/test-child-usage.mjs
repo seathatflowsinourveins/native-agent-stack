@@ -586,6 +586,16 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     expect('cli lanes: long and deeply nested commands are read in linear time without exhausting the stack [' + real.ms.toFixed(0) + ' ms, threw: ' + (real.threw.join() || 'none') + ']', stressPasses(real))
     const partial = stress(throwing)
     expect('cli lanes: the same check fails on the real reader wrapped to throw for long input [threw ' + partial.threw.length + ']', !stressPasses(partial))
+    // D4(a): a string that a shell, eval or ssh runs is read again up to NESTING_LIMIT (32) levels; the text of a deeper level is one
+    // unresolved record and never a lane, and nothing throws or leaves a tree open (the stress inputs above never reach this guard).
+    const nested = (n) => {
+      const found = kernel.commandInvocations('eval '.repeat(n) + 'qmd status')
+      return { evals: found.filter((i) => i.program === 'eval').length, lanes: found.filter((i) => i.lane === 'qmd').length, unresolved: found.filter((i) => i.unresolved).length }
+    }
+    const depth = JSON.stringify([nested(31), nested(32), nested(33), nested(3000)])
+    expect('cli lanes: 32 levels of eval are read, the 33rd is one unresolved record and never a lane, and 3,000 levels neither throw nor leave a tree open [' + depth + ']',
+      depth === JSON.stringify([{ evals: 31, lanes: 1, unresolved: 0 }, { evals: 32, lanes: 1, unresolved: 0 }, { evals: 33, lanes: 0, unresolved: 1 }, { evals: 33, lanes: 0, unresolved: 1 }])
+      && kernel.openShellTrees() === 0)
   }
 }
 // D1 (U1 pivot brief): loadShellParser verifies the pinned tree-sitter-bash install (shell-parser.pin.json: the sha256 of every

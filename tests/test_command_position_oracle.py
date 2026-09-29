@@ -13,8 +13,14 @@ loop body that the run does not reach (`true || x`, the untaken side of if/else 
 a heredoc attached to a compound command, several heredocs on one command, and the shapes tree-sitter-bash 0.25.1 misparses
 (a heredoc operator followed by `;` or `&`, or by a redirection and a pipe on its line: see RECOVERY_PROBES for the ones the kernel
 reads anyway). A text that bash rejects (`bash -n`) is dropped, since nothing runs.
-The hand-written probes below hold every finding of the two U1 reviews that concerns command position; their expected
-values are the runs of real bash, not what this kernel says.
+The hand-written probes below hold every finding of the two U1 reviews that concerns command position, and the classes the
+generators found against the AST reading; their expected values are the runs of real bash, not what this kernel says.
+A second generator (GeneratorExt) adds the shapes Bash tool calls are usually written with (redirections around a lane, prefix
+assignments, `time`, a doubled negation, background jobs, process substitution, nested backquotes, comments, continuation lines) and
+leaves out what a run cannot show: `time` after a pipe (it is a reserved word only at the start of a pipeline, and no `time` executable
+exists here), a function defined on the right of a pipe (it lives in the pipeline's subshell), a comment inside a substitution (it ends
+the substitution's closing parenthesis), a here-document delimiter of one digit (tree-sitter-bash 0.25.1 ends a heredoc at a body line that
+only BEGINS with the delimiter, such as `2>&1 name`), and `xargs` that reads a here-document (its run count follows the input).
 """
 import collections
 import json
@@ -196,6 +202,50 @@ PROBES = [
     ("eval", 'eval "qmd status"'),
     ("eval words", "eval qmd status"),
     ("nested shells", "bash -c \"sh -c 'qmd status'\""),
+    # The classes the generators found against the AST reading over further seeds (U1 pivot, stage c); every expected value is the run of
+    # real bash, and each class also has a fixture in tests/test_token_measurement.py.
+    # 1. `!` is a reserved word wherever a pipeline may begin (bash(1) SHELL GRAMMAR: `[time [-p]] [!] command`, and bash accepts it twice;
+    # dash rejects that); the grammar reads the second one, or one after a line it joined, as the command's name. A quoted or escaped `!` is a name.
+    ("c1 double negation", "! ! qmd status"),
+    ("c1 triple negation", "! ! ! qmd status"),
+    ("c1 quoted bang is a name", "'!' qmd status"),
+    ("c1 escaped bang is a name", "\\! qmd status"),
+    ("c1 negation on a joined line", "nohup markitdown | bash -n -c 'qmd x' | a=( $(nice -n 5 markitdown) )\n! rtk proxy 'markitdown v1' || :"),
+    ("c1 time then negation", "time ! qmd status || :"),
+    ("c1 time -p then negation", "time -p ! qmd status || :"),
+    ("c1 negation then time", "! time qmd status || :"),
+    # 2. A backquoted substitution is unescaped before it is parsed (POSIX.1-2024 XCU 2.6.3, bash(1) Command Substitution): a backslash
+    # before $, ` or \ is removed, so an escaped backquote nests a substitution, an escaped $ starts one and an escaped backslash is data.
+    ("c2 nested backquotes", "echo `echo \\`qmd a\\``"),
+    ("c2 nested in double quotes", 'echo "`echo \\`qmd a\\``"'),
+    ("c2 three levels", "echo `echo \\`echo \\\\\\`qmd a\\\\\\`\\``"),
+    ("c2 escaped backslash", "echo `echo \\\\; qmd b`"),
+    ("c2 other backslash kept", "echo `echo \\a; qmd b`"),
+    ("c2 plain backquote", "echo `qmd a`"),
+    # 3. tree-sitter-bash 0.25.1 reads every word after a redirection's target as more targets (grammar.js file_redirect: repeat1 destination),
+    # but bash takes them as arguments of the command (redirections may appear anywhere among its words).
+    ("c3 time redirect", "time 2>&1 toon"),
+    ("c3 time output redirect", "time >/dev/null toon get"),
+    ("c3 nice", "nice 2>&1 qmd"),
+    ("c3 env", "env A=1 >/dev/null qmd get"),
+    ("c3 env before assignment", "env >/dev/null A=1 qmd get"),
+    ("c3 timeout", "timeout 5 2>/dev/null qmd status"),
+    ("c3 two redirects", "nohup 2>&1 >/dev/null qmd a"),
+    ("c3 input", "nice < /dev/null qmd status"),
+    ("c3 xargs", "echo a | xargs 2>/dev/null qmd get"),
+    ("c3 rtk proxy", "rtk proxy 2>&1 qmd get"),
+    ("c3 shell string", "sh 2>&1 -c 'qmd get'"),
+    ("c3 shell string after output", "bash >/dev/null -c 'qmd get'"),
+    ("c3 help after redirect", "qmd get > /dev/null --help"),
+    ("c3 version after redirect", "time > /dev/null qmd --version"),
+    ("c3 pipe", "time -p 2>&1 headroom | context-mode --help"),
+    ("c3 data words", "echo hi >/dev/null qmd get"),
+    ("c3 words before a list", "echo a > /dev/null b; qmd get"),
+    ("c3 words in a pipeline", "cat /dev/null > /dev/null qmd | toon x"),
+    # 4. `time` is a reserved word, so an assignment may follow it (bash(1) SHELL GRAMMAR, Pipelines: the pipeline begins with a simple command).
+    ("c4 time assignment", "time A=1 qmd get"),
+    ("c4 time -p assignments", "time -p A=1 B=2 qmd get"),
+    ("c4 time assignment substitution", "time A=$(toon x) qmd"),
 ]
 
 # Commands tree-sitter-bash 0.25.1 reads as one: it puts an ERROR on `;`, `&&` or `|` after an unquoted `==` or `=~` word and on the
@@ -221,6 +271,8 @@ RECOVERY_PROBES = [
     ("backslash first body line", "! timeout -k 1 5 bash <<'END-2'\n\\markitdown a.json\nEND-2\n:"),
     ("backslash first body line, shell", "bash <<'E'\n\\qmd status\nrtk proxy toon f\nE"),
     ("here-string then a backslash line", "for i in a; do bash <<< 'nice -n 5 codebase-memory-mcp'\n\\markitdown search; done"),
+    # An escaped $ inside backquotes starts a substitution (POSIX.1-2024 XCU 2.6.3), which the grammar reads as an ERROR; the kernel reads the unescaped body.
+    ("escaped dollar in backquotes", "echo `echo \\$(qmd a)`"),
     ("joined lines", 'echo "$M" | tr " " "\\n" | grep -c . \nstart=$(date +%s)\nTMPDIR=/x rtk proxy python3 -m unittest $M > run.txt 2>&1\nrc=$?'),
 ]
 
@@ -365,16 +417,150 @@ class Generator:
         return wrapper + shell + " " + flags + " " + quote(body)
 
 
+class GeneratorExt(Generator):
+    """More shapes than Generator, each one a way a Bash tool call is commonly written: redirections around a lane, prefix assignments,
+    declarations and default expansions that run a substitution, `time`, a doubled negation, background jobs, a process substitution as
+    a redirection source, an ANSI-C or split-quoted program name, the abbreviated wrapper options (nice -n5, timeout 5s, xargs -n1),
+    a command substitution that holds a heredoc, escaped nested backquotes, comments, continuation lines, and the loops and functions that
+    run their lane exactly once. What dash rejects (`!` twice, `time`, `function`, `|&`, `<( )`, `&>`, `$'...'`, here-strings) is only used
+    where bash reads the text."""
+
+    def __init__(self, seed):
+        super().__init__(seed)
+        self.posix_now = False
+        self.nesting = 0
+
+    def sub(self):
+        return "$(" + self.lane() + ")"
+
+    def delimiter(self):
+        # tree-sitter-bash 0.25.1 ends a heredoc at a body line that merely BEGINS with the delimiter, so a numeric delimiter such as 2 ends it
+        # at a body line `2>&1 name` (bash needs the whole line); delimiters here have three digits or a letter prefix.
+        self.serial = max(self.serial, 100)
+        return super().delimiter()
+
+    def lane(self):
+        r = self.rnd
+        self.nesting += 1
+        try:
+            if self.nesting > 2 or r.random() < 0.45:
+                return super().lane()
+            name = r.choice(LANES)
+            word = self.word
+            forms = [
+                lambda: name + " " + word() + " > /dev/null",
+                lambda: name + " " + word() + " 2>&1",
+                lambda: name + " >/dev/null 2>&1",
+                lambda: name + " < /dev/null",
+                lambda: ">/dev/null " + name + " " + word(),
+                lambda: "2>&1 " + name,
+                lambda: "A=1 " + name + " " + word(),
+                lambda: "A=" + self.sub() + " " + name,
+                lambda: name + " --flag=" + self.sub(),
+                lambda: name + ' "$(' + self.lane() + ')"',
+                lambda: "nice -n5 " + name,
+                lambda: "nice --adjustment=5 " + name + " " + word(),
+                lambda: "timeout -s KILL 5 " + name,
+                lambda: "timeout --signal=KILL --kill-after=2 5 " + name,
+                lambda: "timeout 5s " + name + " " + word(),
+                lambda: "echo a | xargs -n1 " + name,
+                lambda: "echo a | xargs -I{} " + name + " {}",
+                lambda: "echo a | xargs -r " + name + " " + word(),
+                lambda: "rtk proxy timeout 5 " + name,
+                lambda: "rtk proxy env A=1 " + name + " " + word(),
+                lambda: "env -i PATH=$PATH STUB_LOG=$STUB_LOG " + name,
+                lambda: name + " \\\n  " + word(),
+                lambda: "'" + name[:2] + "'\"" + name[2:] + "\" " + word(),
+            ]
+            if not self.posix_now:
+                forms += [
+                    lambda: "$'\\x%02x%s' %s" % (ord(name[0]), name[1:], word()),
+                    lambda: name + " &> /dev/null",
+                    lambda: name + " <<< 'text'",
+                ]
+            return r.choice(forms)()
+        finally:
+            self.nesting -= 1
+
+    def then(self, first, operator, second):
+        if operator == "|" and second.startswith("time "):
+            operator = ";"  # `time` is a reserved word only at the start of a pipeline: after `|` it is a command name, and none exists here
+        return super().then(first, operator, second)
+
+    def statement(self, depth, posix=False):
+        saved, self.posix_now = self.posix_now, posix
+        try:
+            if depth > 0 and self.rnd.random() < 0.4:
+                return self.extra(depth, posix)
+            return super().statement(depth, posix)
+        finally:
+            self.posix_now = saved
+
+    def extra(self, depth, posix):
+        r = self.rnd
+        inner = lambda: self.statement(depth - 1, posix)
+        lane = self.lane
+        heredoc_body = lambda: self.statement(depth - 1, True)
+        delimiter = self.delimiter
+
+        def substituted_heredoc():
+            d = delimiter()
+            return "x=$(bash <<'" + d + "'\n" + heredoc_body() + "\n" + d + "\n)"
+
+        def lane_heredoc():
+            d = delimiter()
+            return r.choice(LANES) + " " + self.word() + " <<'" + d + "'\nqmd status\n" + d
+
+        forms = [
+            lambda: "export A=$(" + lane() + ")",
+            lambda: "echo ${A:-$(" + lane() + ")}",
+            lambda: 'echo "${A:-$(' + lane() + ')}"',
+            lambda: ": ${A:=$(" + lane() + ")}",
+            lambda: "while " + lane() + "; do break; done",
+            lambda: "until " + lane() + "; do :; done",
+            lambda: "for i in $(" + lane() + "); do :; done",
+            lambda: "case $(" + lane() + ") in *) : ;; esac",
+            lambda: ": $(" + lane() + ")",
+            lambda: "{ " + lane() + "; } > /dev/null",
+            lambda: "( " + lane() + " ) 2>&1",
+            lambda: lane() + " & wait",
+            lambda: "{ " + self.end(inner()) + "} & wait",
+            lambda: "( " + self.end(inner()) + ") & wait",
+            lambda: "echo `echo \\`" + lane() + "\\``",
+            lambda: "{ f() ( " + self.end(inner()) + "); f; }",
+            lambda: "{ f() { " + lane() + " \"$1\"; }; f x; }",
+            substituted_heredoc,
+            lane_heredoc,
+            lambda: inner() + "\n# " + r.choice(LANES) + " toon\n" + inner(),
+            lambda: inner() + "\n\n" + inner(),
+            lambda: lane() + " # " + r.choice(LANES) + " toon\n" + inner(),
+            lambda: "printf '%s\\n' qmd > /dev/null; echo \"a $(echo b) toon\"",
+        ]
+        if not posix:
+            forms += [
+                lambda: "! ! " + lane(),
+                lambda: "time " + lane(),
+                lambda: "time -p " + lane() + " | " + lane(),
+                lambda: "declare -x A=$(" + lane() + ")",
+                lambda: lane() + " |& cat",
+                lambda: "cat < <(" + lane() + ")",
+                lambda: "while read -r l; do :; done < <(" + lane() + ")",
+                lambda: "{ function f { " + self.end(inner()) + "}; f; }",
+                lambda: "a=( $(" + lane() + ") ) | " + lane(),
+            ]
+        return r.choice(forms)()
+
+
 def valid(command):
     """Whether bash accepts the text (`bash -n`): a construct composed at random can be a syntax error (`x | ! y`), and then nothing runs."""
     return subprocess.run([shutil.which("bash"), "-n"], input=command, text=True, capture_output=True, check=False).returncode == 0
 
 
-def generate():
+def generate(generator_class=Generator, seeds=None, per_seed=PER_SEED):
     seen, commands = set(), []
-    for seed in SEEDS:
-        generator = Generator(seed)
-        for _ in range(PER_SEED):
+    for seed in seeds if seeds is not None else SEEDS:
+        generator = generator_class(seed)
+        for _ in range(per_seed):
             command = generator.statement(generator.rnd.choice([1, 2, 2, 3]))
             if command not in seen and valid(command):
                 seen.add(command)
@@ -474,6 +660,15 @@ class CommandPositionOracle(unittest.TestCase):
                          + "\n".join("%r ran %s, read %s (parse error: %s)" % w for w in wrong[:12]))
         self.assertGreater(ran, len(commands))  # the commands run lanes, so an empty reading cannot agree by accident
         print("oracle generated: %d of %d agree (%d lane runs)" % (agreed, len(commands), ran))
+
+    def test_extended_generated_commands_read_what_real_bash_runs(self):
+        commands = generate(GeneratorExt)
+        self.assertGreater(len(commands), 300)
+        agreed, ran, wrong = self.agree(commands)
+        self.assertEqual(wrong, [], "%d of %d differ; first:\n" % (len(wrong), len(commands))
+                         + "\n".join("%r ran %s, read %s (parse error: %s)" % w for w in wrong[:12]))
+        self.assertGreater(ran, len(commands))
+        print("oracle extended: %d of %d agree (%d lane runs)" % (agreed, len(commands), ran))
 
 
 if __name__ == "__main__":

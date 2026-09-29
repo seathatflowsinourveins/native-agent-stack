@@ -1221,12 +1221,48 @@ class TokenMeasurement(unittest.TestCase):
                  "! timeout -k 1 5 bash <<'END-2'\n\\markitdown a.json\nEND-2\n:": ({"markitdown": 1}, 0),
                  "bash <<'E'\n\\qmd status\nrtk proxy toon f\nE": ({"qmd": 1, "rtk_proxy": 1, "toon": 1}, 0),
                  "for i in a; do bash <<< 'nice -n 5 codebase-memory-mcp'\n\\markitdown search; done": ({"codebase-memory-mcp": 1, "markitdown": 1}, 0),
+                 # an escaped $ inside backquotes starts a substitution (POSIX.1-2024 XCU 2.6.3); the grammar reads it as an ERROR and the kernel
+                 # reads the unescaped body
+                 "echo `echo \\$(qmd a)`": ({"qmd": 1}, 1),
                  # an ordinary continuation and a comment are not boundaries
                  "qmd get a \\\n  b": ({"qmd": 1}, 0), "qmd get a # toon b\n": ({"qmd": 1}, 0)}
         for (command, (lanes, errors)), (got, _, cli) in zip(cases.items(), self.tally(list(cases))):
             with self.subTest(command=command):
                 self.assertEqual(got, lanes)
                 self.assertEqual(cli["parse_errors"], errors)
+
+    @NEEDS_PARSER
+    def test_the_classes_the_oracle_found_read_as_real_bash_runs_them(self):
+        # U1 pivot, stage c: four classes the oracle generators (tests/test_command_position_oracle.py, seeds beyond the committed ones)
+        # found against the AST reading, each measured on this host's real commands before it was fixed (136,361 distinct commands, count-only:
+        # a command named `!` 0; a backquoted body with a backslash before $, ` or \ 0; words folded into a redirection 500, one of them
+        # naming a lane; `time` before an assignment or `!` 12). Every expected value is the run of real bash 5.2 under stub executables
+        # (the same inputs are probes of the oracle); (lanes by call, excluded --version/--help by lane).
+        cases = {
+            # 1. `!` is a reserved word wherever a pipeline may begin, twice in bash (bash(1) SHELL GRAMMAR); the grammar reads the second as a
+            # command name, also after a line it joined to an array assignment. A quoted or escaped `!` is a program name.
+            "! ! qmd status": ({"qmd": 1}, {}), "! ! ! qmd status": ({"qmd": 1}, {}), "'!' qmd status": ({}, {}), "\\! qmd status": ({}, {}),
+            "nohup markitdown | bash -n -c 'qmd x' | a=( $(nice -n 5 markitdown) )\n! rtk proxy 'markitdown v1' || :": ({"markitdown": 1, "rtk_proxy": 1}, {}),
+            "time ! qmd status || :": ({"qmd": 1}, {}), "time -p ! qmd status || :": ({"qmd": 1}, {}), "! time qmd status || :": ({"qmd": 1}, {}),
+            # 2. A backquoted body is unescaped before it is parsed (POSIX.1-2024 XCU 2.6.3): \` nests a substitution, \$ starts one, \\ is data.
+            "echo `echo \\`qmd a\\``": ({"qmd": 1}, {}), 'echo "`echo \\`qmd a\\``"': ({"qmd": 1}, {}),
+            "echo `echo \\`echo \\\\\\`qmd a\\\\\\`\\``": ({"qmd": 1}, {}),
+            "echo `echo \\\\; qmd b`": ({}, {}), "echo `echo \\a; qmd b`": ({"qmd": 1}, {}), "echo `qmd a`": ({"qmd": 1}, {}),
+            # 3. Every word after a redirection's target is an argument of the command (tree-sitter-bash reads them as more targets).
+            "time 2>&1 toon": ({"toon": 1}, {}), "time >/dev/null toon get": ({"toon": 1}, {}), "nice 2>&1 qmd": ({"qmd": 1}, {}),
+            "env A=1 >/dev/null qmd get": ({"qmd": 1}, {}), "env >/dev/null A=1 qmd get": ({"qmd": 1}, {}), "timeout 5 2>/dev/null qmd status": ({"qmd": 1}, {}),
+            "nohup 2>&1 >/dev/null qmd a": ({"qmd": 1}, {}), "nice < /dev/null qmd status": ({"qmd": 1}, {}), "echo a | xargs 2>/dev/null qmd get": ({"qmd": 1}, {}),
+            "rtk proxy 2>&1 qmd get": ({"rtk_proxy": 1, "qmd": 1}, {}), "sh 2>&1 -c 'qmd get'": ({"qmd": 1}, {}), "bash >/dev/null -c 'qmd get'": ({"qmd": 1}, {}),
+            "qmd get > /dev/null --help": ({}, {"qmd": 1}), "time > /dev/null qmd --version": ({}, {"qmd": 1}),
+            "time -p 2>&1 headroom | context-mode --help": ({"headroom": 1}, {"context-mode": 1}),
+            "echo hi >/dev/null qmd get": ({}, {}), "echo a > /dev/null b; qmd get": ({"qmd": 1}, {}), "cat /dev/null > /dev/null qmd | toon x": ({"toon": 1}, {}),
+            # 4. `time` is a reserved word, so an assignment may follow it (bash(1) SHELL GRAMMAR, Pipelines).
+            "time A=1 qmd get": ({"qmd": 1}, {}), "time -p A=1 B=2 qmd get": ({"qmd": 1}, {}), "time A=$(toon x) qmd": ({"toon": 1, "qmd": 1}, {})}
+        for (command, (lanes, excluded)), (got, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(got, lanes)
+                self.assertEqual(cli["excluded_version_help"], excluded)
+                self.assertEqual(cli["parse_errors"], 0)
 
     @NEEDS_PARSER
     def test_a_name_is_emitted_only_from_the_closed_vocabulary(self):
