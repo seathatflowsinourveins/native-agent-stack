@@ -1395,7 +1395,7 @@ exits 2, because the checkout has `.git`):
 python3 tools/sota-convergence/blind_checkout.py \
   --source . --rev HEAD --dest /path/outside/repos/blind-checkout --export /path/outside/repos/blind-export
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort high
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort max   # max is the default
 python3 tools/sota-convergence/codex_lane.py \
   --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --layers native-clients,market-data-reference
 python3 tools/sota-convergence/codex_lane.py \
