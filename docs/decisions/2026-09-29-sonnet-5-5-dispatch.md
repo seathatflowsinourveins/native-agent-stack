@@ -102,6 +102,10 @@ for both ([models overview](https://platform.claude.com/docs/en/about-claude/mod
   `child-usage.mjs`; the effort guard no longer treats `ultracode: true` as xhigh; the native Claude Code floor moves to 2.1.284
   (below 2.1.284 the `sonnet` alias means Sonnet 5, so an older client silently routes the alias to the older model).
 - The receipt `claude-model-effort-probes-20260929`.
+- The "Still open" paragraph of the [2026-09-28 model-currency addendum](2026-09-27-model-currency.md#addendum-2026-09-28-claude-sonnet-55-launched-and-what-the-fallback-map-now-means)
+  is closed for two of its items: `ALIAS_RESOLUTION` now has `sonnet` and `fable` rows, and the template's `modelSettings` pins
+  `claude-sonnet-5-5`. Its third item, `LEGACY_EXACT` in the effort guard, is unchanged by this record: the guard no longer
+  consults `ultracode`, and a user-scope top-level `effortLevel` still applies only to the models it lists.
 
 **Host configuration**, applied by hand with a backup and a read-back (host files are not tracked): `~/.claude/settings.json` gains
 `modelSettings.claude-sonnet-5-5.effortLevel = xhigh` and `env.CLAUDE_CODE_SUBAGENT_MODEL = opus`; the user's `model` (the floating
