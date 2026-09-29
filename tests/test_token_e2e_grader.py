@@ -25,6 +25,7 @@ import importlib
 import io
 import json
 import os
+import shutil
 import stat
 import subprocess
 import sys
@@ -396,6 +397,13 @@ class F2_ExactTextRegistry(GraderCase):
         twin = edit_prereg(sealed_bytes(), lambda d: d["tasks"].append(
             dict(next(t for t in d["tasks"] if t["id"] == "seed-main-output"), id="seed-extra-task")))
         self.assertRefused(lambda: fc.build_inventory(twin, dropped_tasks=[]), "E_TEMPLATE_TASKS", template="T34")
+
+    def test_a_dropped_task_that_is_still_in_the_preregistration_is_refused(self):
+        """A dropped task is absent by definition (A1 removes it from the array); one that is still there would be
+        silently un-graded by a typo (review G-2)."""
+        fc = load("frozen_checks")
+        self.assertRefused(lambda: fc.build_inventory(sealed_bytes(), dropped_tasks=["reuse-296-15"]),
+                           "E_TEMPLATE_TASKS", reason="dropped_present", task="reuse-296-15")
 
     def test_dropped_task_must_be_listed(self):
         fc = load("frozen_checks")
@@ -803,6 +811,15 @@ class F6_StrictDecode(GraderCase):
         text = "Here are the records:\n" + toon_encode(web_key()["records"]) + "\nLatency sum: 124\n"
         self.result(self.grade(text), "pass")
 
+    def test_duplicate_keys_and_non_finite_constants_are_refused(self):
+        self.result(self.grade('```json\n[{"id": 1, "id": 2}]\n```' + self.sum_line()), "fail", "json_strict_decode")
+        self.result(self.grade('```json\n[{"id": NaN}]\n```' + self.sum_line()), "fail", "json_strict_decode")
+
+    def test_prose_that_looks_like_a_footnote_is_not_a_payload(self):
+        text = "See the docs.\n[1]: https://example.invalid/page\n[2] a note\n" \
+               + "```toon\n" + toon_encode(web_key()["records"]) + "\n```" + self.sum_line()
+        self.result(self.grade(text), "pass")
+
     def test_an_evidence_string_is_a_candidate(self):
         self.result(self.grade("Latency sum: 124", evidence=[toon_encode(web_key()["records"])]), "pass")
 
@@ -882,7 +899,9 @@ class F7_T0(GraderCase):
         text = T0_ANSWER.replace("OK.", "OK (skipped=2).")
         self.result(self.grade(text, captures), "unknown", "env_mismatch")
         self.result(self.grade(T0_ANSWER.replace("OK.", "OK (skipped=1)."), captures), "pass")
-        self.result(self.grade(T0_ANSWER.replace("OK.", "OK (skipped=0)."), captures), "pass")
+        # The arm's own capture is the key; the plain capture only says which fields are environment-dependent, so
+        # the plain value alone is not accepted (review F-3: the easier reading would raise the lower bound).
+        self.result(self.grade(T0_ANSWER.replace("OK.", "OK (skipped=0)."), captures), "unknown", "env_mismatch")
 
     def test_a_missing_capture_fails(self):
         captures = t0_captures(arm=t0_capture(missing=("ls",)))
@@ -908,6 +927,25 @@ class F7_T0(GraderCase):
         captures = t0_captures(arm=t0_capture(conditions=conditions), plain=t0_capture())
         self.result(self.grade(T0_ANSWER.replace("Ran 49", "Ran 48"), captures), "unknown", "env_mismatch")
         self.result(self.grade(T0_ANSWER.replace("feat: newest", "wrong subject"), captures), "fail", "subject_missing")
+
+    def test_bytecode_caches_are_not_a_tree_change(self):
+        """Review F-1: a child that ran the unittest leaves ignored __pycache__ directories; that must not make every
+        post capture a `tree_changed` discard."""
+        fc = load("frozen_checks")
+        repo = self.tmp / "cachetree"
+        make_repo(repo, {"scripts/x.py": "def register_file():\n    pass\n", "tests/__init__.py": "",
+                         "tests/test_host_requests.py": "import unittest\nclass T(unittest.TestCase):\n"
+                                                         "    def test_a(self):\n        pass\n"}, ignore="*.pyc\n")
+        pre = fc.capture_t0(repo, env=dict(os.environ), sandbox_prefix=())
+        (repo / "scripts" / "__pycache__").mkdir()
+        (repo / "scripts" / "__pycache__" / "x.cpython-313.pyc").write_bytes(b"\0\0\0\0")
+        self.assertEqual(fc.tree_state(repo), pre["tree"], "an ignored bytecode cache is not part of the tree state")
+        self.assertEqual([entry["path"] for entry in fc.porcelain_entries(repo)], [])
+        post = fc.post_capture_t0(repo, pre_tree=pre["tree"], env=dict(os.environ), sandbox_prefix=())
+        self.assertNotEqual(post, {"discarded": "tree_changed"})
+        (repo / "scripts" / "new.log").write_text("x\n", encoding="utf-8")
+        self.assertEqual(fc.post_capture_t0(repo, pre_tree=pre["tree"], env=dict(os.environ), sandbox_prefix=()),
+                         {"discarded": "tree_changed"}, "any other new file is still a change")
 
     def test_a_tree_changed_between_captures_discards_the_post_capture_and_never_reruns(self):
         fc = load("frozen_checks")
@@ -954,6 +992,34 @@ class F7b_T0Rerun(GraderCase):
         self.assertEqual(run["env"]["PYTHONDONTWRITEBYTECODE"], "1")
         self.assertEqual(fc.tree_state(repo), before, "the original tree is never touched")
         self.assertFalse((repo / "tests" / "__pycache__").exists())
+
+    def test_the_run_happens_in_a_copy_not_in_the_tree(self):
+        """Review F-2: with PYTHONDONTWRITEBYTECODE an in-place run also leaves bytecode alone, so prove the copy: a
+        test that writes into its working directory must not write into the original tree."""
+        fc = load("frozen_checks")
+        repo = self.tmp / "marker"
+        make_repo(repo, {"scripts/__init__.py": "", "tests/__init__.py": "",
+                         "tests/test_host_requests.py": "import unittest\n\nclass T(unittest.TestCase):\n"
+                                                         "    def test_marker(self):\n"
+                                                         "        open('marker.txt', 'w').write('x')\n"})
+        run = fc.rerun_unittest_in_copy(repo, env=dict(os.environ))
+        self.assertEqual(run["facts"]["ran"], 1)
+        self.assertFalse((repo / "marker.txt").exists(), "the original tree must never be the working directory")
+
+    def test_a_planted_bytecode_cache_is_never_executed(self):
+        """Review section 6: an unchecked-hash .pyc planted by a child runs even under python3 -I -S; the copy holds
+        source files only and the interpreter is given a fresh pycache prefix."""
+        import py_compile
+        fc = load("frozen_checks")
+        repo = self.tree()
+        evil = self.tmp / "evil.py"
+        evil.write_text("raise RuntimeError('planted')\n", encoding="utf-8")
+        cache = repo / "tests" / "__pycache__"
+        cache.mkdir()
+        py_compile.compile(str(evil), cfile=str(cache / f"test_host_requests.{sys.implementation.cache_tag}.pyc"),
+                           invalidation_mode=py_compile.PycInvalidationMode.UNCHECKED_HASH)
+        run = fc.rerun_unittest_in_copy(repo, env=dict(os.environ))
+        self.assertEqual(run["facts"], {"ran": 2, "status": "OK", "skipped": 0, "failures": 0, "errors": 0})
 
 
 def t14_row(timestamp, **tool_input):
@@ -1062,6 +1128,16 @@ class F9_Builder(GraderCase):
         self.result(res, "fail", "bytes_differ")
         self.assertEqual([argv for argv in calls if "-I" in argv], [], "no interpreter may run on mismatched bytes")
 
+    def test_bytecode_caches_are_not_extra_changes(self):
+        """Review F-1: a builder that tested another name by importing before.py leaves fixtures/__pycache__."""
+        repo, commit = self.tree()
+        cache = repo / "fixtures" / "__pycache__"
+        cache.mkdir()
+        (cache / "before.cpython-313.pyc").write_bytes(b"\0\0\0\0")
+        self.result(self.grade(repo, commit), "pass")
+        (repo / "scratch.log").write_text("x\n", encoding="utf-8")
+        self.result(self.grade(repo, commit), "fail", "extra_changes")
+
     def test_mutated_fixture_hash_makes_the_key_unknown(self):
         repo, commit = self.tree()
         self.result(self.grade(repo, commit, key={"after_sha256": "f" * 64, "after_bytes": len(self.AFTER)}),
@@ -1158,6 +1234,24 @@ class F20_GradingBlock(GraderCase):
         repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(surprise=1))
         proc, _ = self.spec(repo, commit)
         self.assertRefusal(proc, "E_GRADING_BLOCK", field="surprise")
+
+    def test_a_judge_that_is_not_pinned_to_max_effort_is_refused(self):
+        """The GPT-6 judge runs at max effort, never on codex_lane's default `high` (standing rule; review G-1)."""
+        for judge in ("claude_answers", "codex_answers"):
+            block = grading_block()
+            block["judges"][judge]["effort"] = "high"
+            repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=block, name=f"repo-{judge}")
+            proc, _ = self.spec(repo, commit, self.tmp / f"{judge}.json")
+            self.assertRefusal(proc, "E_GRADING_BLOCK", field=f"judges.{judge}.effort")
+
+    def test_malformed_hex_fields_are_refused(self):
+        for path, edit in (("tool.revision", lambda b: b["tool"].__setitem__("revision", "not-a-revision")),
+                           ("tool.sha256.grade.py", lambda b: b["tool"]["sha256"].__setitem__("grade.py", "abc"))):
+            block = grading_block()
+            edit(block)
+            repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=block, name="repo-" + path)
+            proc, _ = self.spec(repo, commit, self.tmp / (path + ".json"))
+            self.assertRefusal(proc, "E_GRADING_BLOCK", field=path)
 
     def test_a_stale_registry_hash_is_refused(self):
         repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(registry_sha256="0" * 64))
@@ -1585,6 +1679,52 @@ class F27a_KeysCommand(GraderCase):
         self.assertRefusal(self.keys(out), "E_PATH", reason="exists")
 
 
+def real_content_repo(tmp):
+    """A local clone of this repository (no checkout) plus one commit that adds a grading block to the sealed
+    preregistration and swaps in a fixture README seal table: real content for `keys` behind a valid spec."""
+    clone = tmp / "real-clone"
+    git(tmp, "clone", "-q", "--local", "--no-checkout", str(ROOT), str(clone))
+    git(clone, "read-tree", "HEAD")
+    document = json.loads(sealed_bytes())
+    document["grading"] = grading_block()
+    body = dump(document)
+    readme = README_FIXTURE.format(old=PREREG_SHA256, new=sha256(body), seal_n=4,
+                                   amendment4="## Amendment 4 (fixture)\n\n").encode("utf-8")
+    for path, data in ((PREREG_PATH, body), (README_PATH, readme)):
+        blob = subprocess.run(["git", "-C", str(clone), "hash-object", "-w", "--stdin"], input=data,
+                              capture_output=True, check=True).stdout.decode().strip()
+        git(clone, "update-index", "--add", "--cacheinfo", f"100644,{blob},{path}")
+    commit = git(clone, "commit-tree", git(clone, "write-tree"), "-p", "HEAD", "-m", "fixture amendment 4")
+    return clone, commit
+
+
+class F27c_KeysOnRealContent(GraderCase):
+    """`keys` over this repository's own content at the design's execution revision (review F-5)."""
+
+    UNKNOWN = {"reuse-296-02": "input_hash", "reuse-343-06": "input_missing", "seed-scout-acceptance": "post_w_missing",
+               "seed-binding-1": "input_missing", "seed-binding-2": "input_missing", "seed-binding-3": "input_missing",
+               "seed-binding-4": "input_missing", "seed-binding-5": "input_missing"}
+
+    def test_keys_at_the_pinned_revision(self):
+        require_commit(EXEC_REV)
+        clone, commit = real_content_repo(self.tmp)
+        spec = self.tmp / "spec.json"
+        proc = run_grade(["spec", "--repo", clone, "--preregistration-commit", commit, "--out", spec])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        bindings = make_bindings(self.tmp, exec_rev=exec_full())
+        outputs = [self.tmp / "keys-1.json", self.tmp / "keys-2.json"]
+        for out in outputs:
+            proc = run_grade(["keys", "--spec", spec, "--bindings", bindings, "--repo", clone, "--out", out])
+            self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(outputs[0].read_bytes(), outputs[1].read_bytes(), "byte-identical on real content")
+        keys = json.loads(outputs[0].read_bytes())["keys"]
+        self.assertEqual(len(keys), 75)
+        self.assertEqual({task: entry["reason"] for task, entry in keys.items() if entry["status"] == "unknown"},
+                         self.UNKNOWN)
+        self.assertEqual(keys["reuse-296-05"]["key"]["def"], ["scripts/host_receipts.py", 710, 727])
+        self.assertEqual(keys["seed-log-symbol-1"]["key"]["value_sum"], 22)
+
+
 def fake_curl(tmp):
     """A fake curl that serves canned HTML per URL and logs its argv (one JSON line per call)."""
     bin_dir = tmp / "fake-curl-bin"
@@ -1699,7 +1839,10 @@ class F27b_CaptureCommand(GraderCase):
 
     def test_post_arm_discards_a_changed_tree_and_lists_new_processes(self):
         self.assertEqual(self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B").returncode, 0)
-        sleeper = subprocess.Popen(["sleep", "30"])
+        name = "u9s" + os.urandom(4).hex()  # comm is the executed file name: unique, so other sleepers never count
+        link = self.tmp / name
+        link.symlink_to(shutil.which("sleep"))
+        sleeper = subprocess.Popen([str(link), "30"])
         try:
             (self.tree / "scripts" / "child.py").write_text("x = 1\n", encoding="utf-8")
             proc = self.capture("--phase", "post-arm", "--family", "claude", "--arm", "B")
@@ -1709,7 +1852,7 @@ class F27b_CaptureCommand(GraderCase):
             sleeper.kill()
             sleeper.wait()
         self.assertEqual(record["t0"]["reuse-296-00"], {"discarded": "tree_changed"})
-        started = [p for p in record["processes"] if p["comm"] == "sleep"]
+        started = [p for p in record["processes"] if p["comm"] == name]
         self.assertEqual(len(started), 1)
         self.assertRegex(started[0]["start"], r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 
@@ -1920,7 +2063,7 @@ def failing_with(mutant_patches, names):
             result = unittest.TextTestRunner(stream=stream, verbosity=0).run(suite)
     finally:
         INPROC[0] -= 1
-    return {test.id() for test, _ in result.failures + result.errors}
+    return {test.id().partition(" (")[0] for test, _ in result.failures + result.errors}
 
 
 def full(name):
@@ -1964,6 +2107,24 @@ class F19_Mutants(GraderCase):
                         ["F6_StrictDecode.test_decode_argv_never_carries_no_strict",
                          "F6_StrictDecode.test_toon_root_array_passes"],
                         ["F6_StrictDecode.test_decode_argv_never_carries_no_strict"])
+
+    def test_M25_duplicate_key_refusal_off(self):
+        fc = load("frozen_checks")
+        self.run_mutant([mock.patch.object(fc, "_no_duplicates", lambda pairs: dict(pairs))],
+                        ["F6_StrictDecode.test_duplicate_keys_and_non_finite_constants_are_refused",
+                         "F6_StrictDecode.test_json_root_array_passes"],
+                        ["F6_StrictDecode.test_duplicate_keys_and_non_finite_constants_are_refused"])
+
+    def test_M26_in_place_run(self):
+        """The copy is what keeps the arm's tree untouched: a 'copy' that is a link back to the tree must flip the test."""
+        fc = load("frozen_checks")
+
+        def in_place(tree, destination):
+            os.symlink(tree, destination)
+        self.run_mutant([mock.patch.object(fc, "_copy_tree", in_place)],
+                        ["F7b_T0Rerun.test_the_run_happens_in_a_copy_not_in_the_tree",
+                         "F7b_T0Rerun.test_the_command_imports_the_tests_package_in_the_copy"],
+                        ["F7b_T0Rerun.test_the_run_happens_in_a_copy_not_in_the_tree"])
 
     def test_M10_spec_regeneration_off(self):
         gr = load("grade")
