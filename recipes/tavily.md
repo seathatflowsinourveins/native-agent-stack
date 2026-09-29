@@ -8,10 +8,11 @@ WebFetch, Context Mode's `ctx_fetch_and_index`, and Codex with
 `-c web_search="live"` ([harness defaults](../docs/harness-defaults.md#use-skills-workers-and-tools-deliberately)).
 Run a `tvly` Search/Extract command only when the user asks for Tavily, or
 when a free lane cannot return the page the task needs, and record which
-lane failed. Since 2026-09-26 the key also stays out of files: on Linux and WSL2 run every `tvly` command through
-`scripts/kernel_keyring.py exec` or the installed `tvly-keyring` wrapper, as in
-[Memory-only key on Linux and WSL2](#memory-only-key-on-linux-and-wsl2-2026-09-26),
-and on macOS through `secret run`. For installation or a concrete
+lane failed. Since 2026-09-29 the key's store of record is the private file
+`<store>/tavily.env`, as in [Stored key](#stored-key-2026-09-29); until the
+next kernel restart, a Linux or WSL2 host still runs `tvly` with the kernel
+keyring copy through `scripts/kernel_keyring.py exec` or the installed
+`tvly-keyring` wrapper, and macOS through `secret run`. For installation or a concrete
 authentication failure, inspect `command -v tvly`, `tvly --version` and
 `tvly auth --json`, the last through `exec`. If the CLI is missing, the
 upstream installer is:
@@ -22,7 +23,7 @@ curl -fsSL https://cli.tavily.com/install.sh | bash
 
 The observed installer selected `uv tool install tavily-cli`; another host must record the version it actually resolves. For a deliberate reproduction of the accepted package pin, use `uv tool install 'tavily-cli==0.1.8'` in the intended tool environment. Inspect the current installer before execution and retain its hash. Do not change the default Python or Node to complete setup when a compatible installed runtime is available.
 
-Do not authenticate with `tvly login` or `tvly init`: both can write the credential to `~/.tavily/config.json`, which the operator's 2026-09-26 decision rules out. Keep the key in the kernel keyring or the login Keychain as in the dated section below. Never include the credential in public command receipts or shell history. The 2026-09-20 acceptance authenticated with native `tvly login`, into owner-only mode 0600 CLI storage. Install the actual requested clients' skills (the `tvly` lines below are that acceptance's commands; on a keyring host run each through `exec`):
+Do not authenticate with `tvly login` or `tvly init`: both can write the credential to `~/.tavily/config.json`, which the operator's 2026-09-26 decision rules out. Keep the key in its store file as in the dated section below. Never include the credential in public command receipts or shell history. The 2026-09-20 acceptance authenticated with native `tvly login`, into owner-only mode 0600 CLI storage. Install the actual requested clients' skills (the `tvly` lines below are that acceptance's commands; on a keyring host run each through `exec`):
 
 ```sh
 npx --yes skills add tavily-ai/skills --skill '*' --agent claude-code --agent codex --global --yes
@@ -48,17 +49,28 @@ provider-token savings total.
 
 When Tavily is selected under the rule above, use Search and Extract for the task at hand. Map, Crawl and Research remain separately selected capabilities; this receipt does not qualify them or a full research report. No lifetime token-saving counter is claimed. [Exact native evidence](../evidence/receipts/native-tavily-cli-20260920.json).
 
-## Memory-only key on Linux and WSL2 (2026-09-26)
+<a id="memory-only-key-on-linux-and-wsl2-2026-09-26"></a>
 
-On 2026-09-26 the operator chose to keep the Tavily API key in memory only,
-never in a file. On a Linux or WSL2 host it lives in the kernel user keyring
-under the name `tavily_api_key`. How to store it, how long it lasts and what
-it does not protect against are in
-[secret-storage.md](../docs/secret-storage.md#memory-only-option-linux-kernel-keyring-2026-09-26).
-tavily-cli 0.1.8 reads `TAVILY_API_KEY` before its own file (`get_api_key()`
-in `tavily_cli/config.py`: the environment, then `~/.tavily/config.json`,
-then OAuth), so each command gets the key through `exec`, run from the
-checkout root:
+## Stored key (2026-09-29)
+
+Since 2026-09-29 the Tavily API key's store of record is the private file
+`<store>/tavily.env` (inventory id `tavily`), as for every other provider
+key ([decision](../docs/decisions/2026-09-29-key-management.md)). From
+2026-09-26 it lived only in the kernel user keyring, under the name
+`tavily_api_key`, which a kernel restart erases. The file's first write
+comes from that keyring copy, once, through the create-only chain in
+[secret-storage.md](../docs/secret-storage.md#kernel-keyring-transport-and-per-boot-spare-2026-09-29),
+which also covers how long the copy lasts and what it does not protect
+against. To rotate, the operator types the new key once with
+`tools/credentials/open_credential_terminal.sh tavily` and types `replace`
+at the hidden prompt.
+
+No command in this repository reads the file yet. Until the next kernel
+restart the keyring copy still starts `tvly` with the key. tavily-cli 0.1.8
+reads `TAVILY_API_KEY` before its own file (`get_api_key()` in
+`tavily_cli/config.py`: the environment, then `~/.tavily/config.json`, then
+OAuth), so each command gets the key through `exec`, run from the checkout
+root:
 
 ```sh
 python3 scripts/kernel_keyring.py status tavily_api_key
@@ -85,6 +97,12 @@ tvly-keyring search "<query>" --depth basic --max-results 5 --json
 tvly-keyring research run "<question>" --model pro --json
 ```
 
+After the restart the keyring copy is gone: `status` prints `absent`,
+`tvly-keyring` exits 2 without starting `tvly`, and Tavily commands have no
+key until a later change adds a loader for the file (or the operator stores
+a per-boot spare again). Tavily is not the default web lane, so that gap is
+accepted.
+
 - `tvly auth --json` prints only `authenticated`, `method` and `source`;
   through `exec` it reports `"method": "env"`. Plain `tvly auth` also prints
   the first eight and last four characters of the key, so use `--json`.
@@ -105,8 +123,7 @@ tvly-keyring research run "<question>" --model pro --json
   rate-limit cap, while `map`, `crawl` and `research` stop and ask for a key.
   A missing key therefore shows up as capped searches rather than an error.
   The upstream skills call bare `tvly`, so route their commands through
-  `exec` too. Check `status` first, and store the key again after the kernel
-  restarts.
+  `exec` too. Check `status` first.
 - `research run` waits and polls until the report is ready (`--timeout`,
   default 600 seconds). `--no-wait` returns a request id for
   `research status` or `research poll`.
