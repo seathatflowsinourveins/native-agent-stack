@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "id": "mover-coverage-asof-20260929",
+  "kind": "asof_recollection_coverage_plan",
+  "frozen_before_first_fetch": true,
+  "base_commit": "cf3fb72e77eb462a353d81f7507a467ea7302d69",
+  "freeze_record": "The commit that adds this file, before any request is sent, is the freeze. No freeze time is written by hand (extreme-gainer-audit deviations.json D5). The runner records this file's sha256 in every output and refuses to fetch, classify or summarize under a file that differs from the one it started with.",
+  "question": "The mover-early-entry coverage gate counts 594 price-verified +20% events in 2021-01-04..2025-12-31, and the frozen candidate set holds 498 of them (0.83838384), under the gate's 95% bar. How many of the 96 missing events does a daily re-fetch recover when it is keyed by each event's own symbol with asof = the event date and judged by the frozen candidate rule? Why was each one missing, and does coverage then reach 95%?",
+  "sources_of_record": {
+    "research_record": "PR #463 at a09daf58, catalogs/us-equities/research-20260928-movers.md lines 51-57, 69-73 and 89-101",
+    "coverage_gate": "blueprints/us-equities/mover-early-entry/protocol.json: data_quality_gates.coverage (line 126), splits (lines 120-124), universe.known_gaps (lines 20-25)",
+    "coverage_code": "blueprints/us-equities/mover-early-entry/evaluate.py coverage(), lines 621-638, called with 2021-01-04 and 2025-12-31 as dev_val does (line 682)",
+    "committed_coverage": "blueprints/us-equities/mover-early-entry/evidence/summary-dev-val-run-v1.json, key coverage",
+    "candidate_rule": "blueprints/us-equities/mover-early-entry/candidates.py lines 39-50",
+    "identity_cause": "blueprints/us-equities/broad-universe/collect_daily.py lines 6-9 and mover-early-entry/deviations.json D2",
+    "price_rules": "blueprints/us-equities/extreme-gainer-audit/plan.json and audit.py: official_close_v2, event_gain with rules v2, split_factor",
+    "labels": "blueprints/us-equities/catalyst-experiment/README.md lines 56-66 and contract.py labels(), lines 103-128",
+    "request_shape": "blueprints/us-equities/mover-v3/study/core/plan.py screen_requests() and event_requests(), lines 89-125, read by reference only; no mover-v3 code is imported or run",
+    "provider_contract": "https://docs.alpaca.markets/us/reference/stockbars.md, stockbarsingle-1.md, stockauctionsingle-1.md and corporateactions-1.md, each updatedAt 2026-05-27T17:58:03Z"
+  },
+  "inputs": {
+    "location": "the private trial workspace, outside git. Each file is identified here by sha256 only, and a mismatch refuses the run.",
+    "audit_results": {"what": "extreme-gainer-audit run-20260924b per-event results (v2 rules with the D3 supplement)", "sha256": "7e8b6999f52bfbbf5e45d0bdcbdf681aa119dff5f88d22b9d00e2604c7ce8b82"},
+    "candidates_main": {"file": "candidates-provable-20260924.csv", "sha256": "afe2255291e57596e84e1183ef04e11043b329fe3d690d8bd3e2034a7d6917e4"},
+    "candidates_premarket": {"file": "candidates-premarket-20260924.csv", "sha256": "e8ea2dc37ec83a44cfb054ffe797e6faee8e65793ded3bc0c374abd3bf48066f"},
+    "package_zip": {"what": "the extreme-gainer research package; used by estimand E2 only", "sha256": "a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c"},
+    "session_calendar": {"path": "blueprints/us-equities/mover-v3/data/session-calendar.json", "sha256": "44f0ebf7c82ceee6a1fd2beceeca38c5a1e894c723bbc7c0ac677f452f592b5c", "use": "session offsets only: d-60, d-22, d-1 and d+5"}
+  },
+  "reproduction_gate": {
+    "rule": "Before any request, coverage(audit_results, [candidates_main, candidates_premarket], 2021-01-04, 2025-12-31) must equal the expected block exactly. Otherwise the run stops with coverage_not_reproduced and sends nothing.",
+    "expected": {"events": 594, "present": 498, "share": 0.83838384, "survivorship_limited": true, "by_tier": {"-0.30": {"events": 23, "present": 20}, "0.30-0.50": {"events": 64, "present": 56}, "0.50-1.00": {"events": 246, "present": 215}, "1.00-3.00": {"events": 214, "present": 176}, "3.00-10.00": {"events": 43, "present": 28}, "10.00-": {"events": 4, "present": 3}}},
+    "missed_events": "the 96 events that pass coverage()'s filter (verdict match or recovered_match, alpaca_gain_pct at least 20, date inside the window) while neither (symbol_used, date) nor (ticker, date) is in either candidate file. package_uncomputed_match rows stay out, as in coverage().",
+    "control_events": "the 498 present events, re-fetched with the same recipe as its control. Each is tagged by the candidate file that holds it. A control present only in the premarket supplement can fail the daily touch by design (mover-early-entry deviations.json D3), so those failures are reported separately."
+  },
+  "requests": {
+    "provider": "Alpaca Market Data API v2 at https://data.alpaca.markets with feed=sip. Market data only: no trading, account, order or position endpoint is called.",
+    "F1_event_leg": {
+      "symbol": "S = the audit row's symbol_used, else its ticker; d = the event date",
+      "bars": "GET /v2/stocks/{S}/bars with timeframe=1Day and adjustment=raw, then adjustment=split, then adjustment=all; asof=d; feed=sip; start = the session 60 sessions before d; end = the earlier of the session 5 sessions after d and 2025-12-31; limit=10000; page_token followed to the last page",
+      "auctions": "GET /v2/stocks/{S}/auctions with asof=d, feed=sip, start = the session 22 sessions before d, end = d; page_token followed",
+      "alpaca_py_equivalent": "StockBarsRequest(symbol_or_symbols, timeframe, start, end, limit, adjustment, feed, asof) in alpaca-py 0.44.0. alpaca-py 0.44.0 has no auctions request, so every leg uses REST."
+    },
+    "F2_today_symbol_leg": {
+      "bars": "GET /v2/stocks/{S}/bars with timeframe=1Day, adjustment=raw, asof=2026-09-21, feed=sip, start = the session before d, end = d",
+      "why": "2026-09-21 is the naming date of the frozen candidate list (mover-early-entry deviations.json D2). This leg shows which issuer the frozen collection's symbol resolved to on d."
+    },
+    "renames": "blueprints/us-equities/broad-universe/corporate_actions.py collect --start 2021-01-01 --end 2026-09-21 (GET /v1/corporate-actions in calendar-year windows, limit 1000, page_token). Only name_change records (old_symbol, new_symbol, process_date) are used. They are identity metadata, not prices.",
+    "positive_control": "KOD and LFCR on session 2026-09-28: the F1 bar and auction requests with asof=2026-09-28, start 2026-09-21 and end 2026-09-28, sent after 20:00 ET on 2026-09-28",
+    "pacing": "at most 20 requests per second (the extreme-gainer-audit audit.py Client), under the data API limit of 10,000 per minute measured on 2026-09-28",
+    "failures": "HTTP 429 is retried after 1, 2 and 4 s. A 400, 404 or 422 is kept as an error record without a retry, and any request that ends in an error is recorded as an error, never as no data (extreme-gainer-audit deviation D7). Empty responses (HTTP 200 without rows) are counted per leg, never dropped."
+  },
+  "candidate_rule": {
+    "touch": "on F1's adjustment=all rows: the high on d >= 1.2 x the low of S's latest earlier row, with that low > 0, evaluated in IEEE-754 double exactly as candidates.py line 43 does",
+    "derivative_exclusion": "the candidates.py line 47 pattern applied to S: five letters ending in W, U or R, or a .WS, .U, .R or .W suffix",
+    "reads_only": "the adjustment=all bars, S's lag row and the derivative pattern decide recovery; no other input does"
+  },
+  "labels": {
+    "ratios": ["3/2", "2", "3"],
+    "rule": "Each label is a price ratio with its own boolean at each ratio. A flag is Fraction(numerator) >= ratio x Fraction(denominator), computed on the responses' decimal text (parsed as Decimal, never float), as catalyst-experiment contract.py lines 121-128 do for ratio 3. Display rounding never decides a flag.",
+    "definitions": {
+      "close_to_close_1d": "official close on d / official close of the previous session, by the price audit's v2 official-close rule, split-corrected as audit event_gain does",
+      "open_to_high_1d": "daily-bar high on d / official open on d (the listing exchange's condition-O print, as in mover-early-entry protocol.json line 29, else the bar open, flagged); an ex-post excursion, never an attainable fill",
+      "prior_close_to_high_1d": "daily-bar high on d / official close of the previous session, split-corrected",
+      "close_to_close_5d": "split-adjusted bar close 5 sessions after d / split-adjusted bar close on d; censored when that session is after 2025-12-31 or has no bar",
+      "entry_to_exit": "declared exit midpoint / executable-entry midpoint; not computed in this run because it needs quotes, and recorded as not_computed"
+    },
+    "publication": "Per-event label values and flags stay private. Only the label file's sha256 is committed."
+  },
+  "tolerances": {
+    "vendor_agreement": "the recomputed close_to_close_1d gain agrees with the audit row's alpaca_gain_pct when |new - audit| <= max(0.5 percentage points, 0.005 x |audit|), the price audit's event_gain tolerance. A recomputed gain that is undefined or below 20% is counted as not_verified_in_new_vintage in these totals; the event stays among the 594 and is classed like any other.",
+    "split_between": "the raw-to-split close ratio differs by more than 1e-2 between d and the prior row (price audit deviation D2; mover-early-entry rules.py SPLIT_TOLERANCE)",
+    "same_issuer": "F1's and F2's raw o, h, l, c and v on d are all identical, the equality broad-universe coverage.dedupe_identity uses"
+  },
+  "reason_classes": {
+    "rule": "Each missed event, and each control event that fails, gets exactly one class: the first test below that holds, in this order. Classes starting with recovered_ are the recovered events; recovered_cause_unexplained is the terminal class.",
+    "order": [
+      {"id": "fetch_error", "test": "F1's adjustment=all bars request ended in an error after its retries"},
+      {"id": "no_asof_event_row", "test": "F1's adjustment=all bars have no row dated d"},
+      {"id": "derivative_pattern", "test": "S matches the candidates.py derivative pattern (excluded by the frozen rule)"},
+      {"id": "no_prior_row", "test": "F1's adjustment=all bars have no row for S before d inside the lookback"},
+      {"id": "below_touch_split_basis", "test": "the touch fails and split_between holds"},
+      {"id": "below_touch_auction_outside_bar_range", "test": "the touch fails and an official close lies outside its daily bar's high-low range (mover-early-entry deviations.json D3 remaining_gap)"},
+      {"id": "below_touch_other", "test": "the touch fails for another reason, including when the raw, split or auction legs needed for the two tests above failed"},
+      {"id": "recovered_rename_on_event_date", "test": "the touch passes and a name_change record with process_date d has new_symbol S (the frozen daily rows can split at d, leaving S without an earlier row)"},
+      {"id": "recovered_keyed_under_successor", "test": "the touch passes, name_change records chain S to a successor S* with process dates after d and up to 2026-09-21, and (S*, d) is in a frozen candidate file: coverage() keys an event by its historical symbols only (evaluate.py line 634)"},
+      {"id": "recovered_today_symbol_other_issuer", "test": "the touch passes and F2 returns a row on d that is not the same issuer's (a reused ticker)"},
+      {"id": "recovered_today_symbol_no_row", "test": "the touch passes and F2 returns no row on d"},
+      {"id": "recovered_today_symbol_same_issuer", "test": "the touch passes and F2's row on d is the same issuer's. The day was absent for a collection reason (asset-list enumeration, today's OTC exclusion, a CUSIP-style placeholder or identity dedup) that cannot be separated without the private daily dataset."},
+      {"id": "recovered_cause_unexplained", "test": "the touch passes and no test above holds, including an F2 error"}
+    ],
+    "flags": {
+      "otc_as_known": "F1's auctions for d hold no condition-O opening print (mover-v3's as-known OTC rule). A flag, not a class: the frozen rule never reads it.",
+      "leg_error": "an F1 raw, split or auction request, or F2, ended in an error",
+      "not_verified_in_new_vintage": "see tolerances.vendor_agreement",
+      "basis_uncertain": "split_between holds or a close came from bar_close_fallback (mover-early-entry deviations.json D6)",
+      "prior_row_not_previous_session": "S's lag row is not the calendar's previous session",
+      "gap_over_7_days": "more than 7 calendar days since the lag row; kept, as in candidates.py line 49"
+    }
+  },
+  "estimands": {
+    "E1_primary": {
+      "coverage_with_asof": "(498 + recovered) / 594, where recovered counts the missed events whose class starts with recovered_; no flag removes an event",
+      "bar": "95% needs at least 565 of 594 (565/594 = 0.9512; 564/594 = 0.9495), so at least 67 of the 96 must be recovered",
+      "overturn": "Fewer than 67 recovered means the free asof route fails the bar, and a paid source is the next step (research record line 73). Nothing here authorizes a purchase.",
+      "also_reported": [
+        "coverage_with_asof again with otc_as_known recovered events excluded (mover-v3's as-known OTC rule)",
+        "coverage_frozen_rekeyed = (498 + recovered_keyed_under_successor) / 594: what the frozen candidate set already held once a successor symbol is also accepted as the key",
+        "the asof recount over all 594: touch passes among the 498 control events (split by the candidate file that holds each) and among the 96, with the class of each control failure; F2 on the control events is the identity test's own control, where the same issuer is expected",
+        "each of the above by degree tier (mover-early-entry rules.py DEGREE_TIERS) and by close_to_close_1d ratio 3/2, 2 and 3",
+        "vendor agreement: agree, disagree and not_verified_in_new_vintage counts of the recomputed gain against the audit rows"
+      ]
+    },
+    "E2_rederived": {
+      "status": "Secondary. It runs without the three private coverage inputs, never substitutes for E1 and does not reproduce 594 or 498.",
+      "definition": "For every package event dated 2021-01-04..2025-12-31, resolve symbols in audit load_events order and fetch F1 and F2 as above. N2 = the events whose audit verdict_for (rules v2) is match or recovered_match with a gain of at least 20%. Report N2 and N2 - 594 by tier, the touch passes on F1 among the N2, and the F2 counts of other issuer, no row and same issuer by tier, beside the committed missed counts per tier (3, 8, 31, 38, 15 and 1)."
+    }
+  },
+  "positive_control": {
+    "events": "KOD and LFCR on 2026-09-28 (research record line 93)",
+    "pass": "Both fire the touch rule on their F1 rows. Only the touch decides, because no reference gain with a stated price basis is recorded for either.",
+    "on_failure": "E1 and E2 are reported with the label recipe_control_failed"
+  },
+  "validity": "E1 stands only when the gate reproduced, the positive control passed and a second classify on the same snapshots is byte-identical. Otherwise it is reported with the failed condition named.",
+  "guards": {
+    "holdout": "No price request reaches 2026-01-02..2026-09-18, mover-early-entry's reserved holdout (protocol.json splits). Event legs end on 2025-12-31 at the latest, and the control starts on 2026-09-21. A request plan that crosses the window is refused before anything is sent.",
+    "publication": "Until mover v3's freeze commit, only coverage and vendor-agreement totals and the sha256 of each private file are committed. Event lists, symbols, dates, prices and label or return columns stay in the private trial workspace (research record lines 95-98).",
+    "builder": "whoever runs this plan does not review mover v3",
+    "credentials": "A paper key pair is used for market data only, handed over as a temporary 0600 env file. Only the two key variables are read, the data host is fixed in audit.py, and no value is printed or written.",
+    "no_llm": "no model call in fetching, classification or counting",
+    "exposure_record": "The summary counts price rows read before 2021-01-04 (lookback rows in mover v3's 2020 validation year) and confirms zero rows in 2026-01-02..2026-09-18."
+  },
+  "outputs": {
+    "private": "the private trial workspace, run directory asof-20260929 (directories 0700, files 0600): the missed-event list, the F1, F2 and control snapshots, the corporate-action pages, the request log, and the per-event results and labels",
+    "committed_after_the_run": "one summary JSON: this plan's sha256, the code revision, each private file's sha256, request status counts, the gate result, the E1 counts and shares, the class and flag totals, vendor-agreement totals, the control's pass flags and the exposure record. It holds no symbol, date, price or return.",
+    "determinism": "Classify and summarize read only the sealed snapshots and give byte-identical output on a rerun. A later fetch can differ if the provider revises history, so two fetches are compared through their result tables."
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "numpy": "2.5.3",
+    "code": "the standard library plus extreme-gainer-audit/audit.py, mover-early-entry/evaluate.py (coverage only; check_inputs, which needs duckdb, is not called), mover-early-entry/rules.py and broad-universe/corporate_actions.py (requests)",
+    "tests": "synthetic only: no network, credential or private row"
+  },
+  "not_measured": [
+    "which collection step dropped a same-issuer day: asset-list enumeration, today's OTC flag, placeholders and identity dedup need the private daily dataset (sha256 f7584f24519367e03e0a4ac0fc57f9b410c047991b001bb0259ebdfc09b31105)",
+    "movers the package does not list: the denominator is the price audit's verified set, not the market",
+    "coverage before 2021, and delisted names without a retained corporate action (catalogs/us-equities/gates-20260922.json pre-2020-delisting)",
+    "intraday paths, quotes and the entry_to_exit label"
+  ]
+}
