@@ -59,6 +59,12 @@
 # tokenizer-count invocation used while comparing toon output; it does not
 # change what toon's own `env node` shebang above resolves at run time.
 #
+# `systemctl --user show-environment` (here and above) is for your own
+# terminal: the agent command guard refuses it, because it prints every
+# value the manager holds. From an agent session, check what this unit's
+# PATH resolves with
+#   systemd-run --user --pipe --wait --quiet /bin/sh -c 'command -v node && node --version'
+#
 # No HEADROOM_WORKSPACE_DIR redirect: this refresh only ever calls
 # `headroom savings --json` (no `--reset`), and the installed headroom-ai
 # 0.37.0 source shows that whole call path is read-only. `cli/savings.py`'s

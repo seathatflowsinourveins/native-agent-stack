@@ -20,14 +20,16 @@ hook is how `cat` of them stays blocked after RTK rewrites it to `rtk read`),
 tracing a shell while it sources a credential file, and dumping the
 environment after sourcing one. Every rule
 also reads the command that an `rtk` invocation runs (`rtk proxy cat F`,
-`rtk read F`, `rtk run -c '...'`) and the command that `systemd-run` starts
-(its own options are skipped as getopt reads them, and a secret variable set
-through its `-E`/`--setenv` or `-p Environment=` is blocked: its command line
-is recorded in the journal and its properties travel over the user bus), and
-the body of a command substitution inside double quotes (`echo "$(printenv)"`
-runs printenv; single quotes and a backslash-escaped `$(` stay data). `ps -E`
-(macOS) and `systemctl show-environment` (a service manager's whole environment
-block) dump the environment like `ps e` and `env`. For a key
+`rtk read F`, `rtk run -c '...'`) and the command that `systemd-run`, `run0`,
+`systemd-inhibit` or `systemd-cat` starts (their own options are skipped as
+getopt reads them, and a secret variable set through `systemd-run`'s
+`-E`/`--setenv` or `-p Environment=` is blocked: the manager logs its command
+line in the journal and its properties travel over the user bus), and the body
+of a command substitution inside double quotes (`echo "$(printenv)"` runs
+printenv; single quotes, an ANSI-C string, a quoted here-document and a `#`
+comment stay data). `ps -E` (macOS) and `systemctl show-environment` or a bare
+`systemctl show` (a service manager's whole environment block) dump the
+environment like `ps e` and `env`. For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
 unambiguous keyring, and a keyring read in inline interpreter code), checks
@@ -169,8 +171,9 @@ WRAPPER_VALUE_FLAGS = {
     # "+hrH:M:E:p:tPqGdSu:": the leading `+` ends the options at the first word that is no option): -H, -M, -E, -p, -u
     # and these long options take a value; --user --system --scope --no-block --wait --pty --pipe --quiet --collect
     # --same-dir --shell --slice-inherit --send-sighup --remain-after-exit --no-ask-password and the two --on-*-change
-    # switches do not. The tail adds the value options that v256 to v258 gained (--capsule/-C, --background, --json,
-    # --job-mode, --output, --root-directory), so a newer host's `--background red cat F` still finds its command.
+    # switches do not. The tail adds the value options of later releases, each read in run.c at the tag that first has it:
+    # --capsule/-C and --background (v256), --json (v257), --job-mode (v258), --root-directory (v259), --output (v261), so a
+    # newer host's `--background red cat F` still finds its command.
     "systemd-run": {
         "-u", "-p", "-E", "-H", "-M", "-C",
         "--unit", "--property", "--setenv", "--host", "--machine", "--description", "--slice", "--uid", "--gid",
@@ -178,10 +181,20 @@ WRAPPER_VALUE_FLAGS = {
         "--on-startup", "--on-unit-active", "--on-unit-inactive", "--on-calendar", "--timer-property",
         "--path-property", "--socket-property",
         "--capsule", "--background", "--json", "--job-mode", "--output", "--root-directory"},
+    # run0 (systemd 256 and later, src/run/run.c parse_argv_sudo_mode, getopt string "+hVu:g:D:" and "+hVu:g:D:i" from v258; the
+    # options at v256 to v262): -u, -g, -D and the long options below take a value, everything else (--pipe --pty --pty-late
+    # --via-shell --login --empower --same-root-dir --no-ask-password --slice-inherit -i -n -k -K -v) does not.
+    "run0": {
+        "-u", "-g", "-D",
+        "--user", "--group", "--chdir", "--unit", "--property", "--description", "--slice", "--nice", "--setenv", "--background",
+        "--machine", "--shell-prompt-prefix", "--lightweight", "--area"},
+    # systemd-inhibit (src/login/inhibit.c, getopt string "+h") and systemd-cat (src/journal/cat.c, "+ht:p:"), systemd 255 to 262.
+    "systemd-inhibit": {"--what", "--who", "--why", "--mode"},
+    "systemd-cat": {"-t", "-p", "--identifier", "--priority", "--stderr-priority", "--level-prefix", "--namespace"},
     # systemctl(1), read 2026-09-29 from src/systemctl/systemctl.c at systemd v255 (getopt string "ht:p:P:alqfs:H:M:n:o:iTr.::",
     # no leading `+`, so options and the verb may come in any order): -t, -p, -P, -s, -H, -M, -n and -o take a value, and so do
-    # these long options; the last line adds v256 to v258 (--capsule/-C, --kill-subgroup). It is not a launcher: the table
-    # only lets systemctl_verb() tell a verb from an option's value.
+    # these long options; the last line adds --capsule/-C (v256) and --kill-subgroup (v258). It is not a launcher: the table
+    # only lets systemctl_call() tell a verb and its arguments from an option's value.
     "systemctl": {
         "-t", "-p", "-P", "-s", "-H", "-M", "-n", "-o", "-C",
         "--type", "--property", "--signal", "--host", "--machine", "--lines", "--output", "--boot-loader-entry",
@@ -230,11 +243,15 @@ SCAN_CHARACTERS = {
     "param": re.compile(r"[\\'\"`$}]"),
     "dparam": re.compile(r"[\\\"`$}]"),
     "arith": re.compile(r"[\\'\"`$()]"),
+    "hd": re.compile(r"[\\`$]"),
 }
+MAX_HEREDOC_NESTING = 8  # here-document bodies read inside here-document bodies (each is a substring scan)
 BACKQUOTE_ESCAPE = re.compile(r"\\([$`\\\"])")
 ANSI_C_TAIL = re.compile(r"\\.|'", re.S)
 LINE_END = re.compile(r"\n")
 BACKQUOTE_COMMENT_END = re.compile(r"[\n`]")  # a comment in a backquote body ends with it (bash cuts the body out first)
+PAREN_INPUT = re.compile(r"[()]+<")  # shlex joins punctuation that touches: `$(<f)` gives the token `(<`
+PROTECTED_BACKQUOTE = "\ue000"  # stands for a backquote that tokenize() must not turn into `;`
 COMMENT_BREAK = " \t\n;&|()<>"  # what may precede a `#` that starts a word (blanks and the shell's metacharacters)
 # A comment in a here-document body, whose lines the tokenizer reads as command lines: it hides the rest of the body, as
 # shlex's `#` hid the rest of the command before, so a script written through a here-document (which begins with a
@@ -248,6 +265,7 @@ SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 PS_BSD_CLUSTER = re.compile(r"^[aAcfhjlmrsStTuvwxXLnE]*[eE][aAcefhjlmrsStTuvwxXLnE]*$")
 PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-s", "-k",
                   "--pid", "--format", "--sort", "--ppid", "--user"}
+PS_CLUSTER_VALUE_OPTIONS = PS_ARG_OPTIONS - {"-C"}  # inside a cluster `C` is read as a flag (see ps_shows_environment)
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 TRACE_OPTIONS = {"xtrace", "verbose"}
 MAX_DEPTH = 3
@@ -263,7 +281,7 @@ SUBSTITUTION_BUDGET_FLOOR = 65536
 # costs what it always did (a 840 KB message took 8.6 s once and 17.8 s twice, and the hook's timeout is 10 s).
 LEGACY_READING_LIMIT = 200_000
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
-SYSTEMD_LAUNCHERS = {"systemd-run"}
+SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
 # <name> <ENV_VAR> -- <command...>` puts a stored key into that command's environment only, and
 # adoption/tools/tvly-keyring runs `tvly` the same way with TAVILY_API_KEY. expand() unwraps both, so
@@ -319,7 +337,8 @@ ENVIRONMENT_PRINTERS = {"env", "printenv"}
 # from among its arguments, so a keyring exec's command is also read from each of them onward. The
 # shell builtins that print variables count, since watch hands its arguments to `sh -c`.
 LAUNCHED_PROGRAMS = SHELLS | AWKS | JQS | ENVIRONMENT_PRINTERS | {"ps", "set", "export", "declare", "typeset",
-                                                                  "readonly", "local"}
+                                                                  "readonly", "local", "systemctl"} | {
+    "systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 
 HINTS = {
     "secret_name_search": "search repository code with the Grep tool instead of a shell search for a "
@@ -332,24 +351,35 @@ HINTS = {
                                   "environment; run a client that reads the variable itself, without naming it",
     "environment_dump_in_keyring_exec": "the command that kernel_keyring.py exec starts holds the key in "
                                         "its environment",
-    "secret_variable_on_command_line": "systemd-run records its command line in the journal and sends the "
+    "secret_variable_on_command_line": "the manager logs systemd-run's command line in the journal and sends the "
                                        "unit's environment settings over the user bus",
-    "service_manager_environment": "systemctl show-environment prints the whole environment block that a service "
-                                   "manager hands to every unit; read one unit's settings with systemctl show -p "
-                                   "Environment UNIT",
+    "service_manager_environment": "this prints the whole environment block that a service manager hands to every "
+                                   "unit; for one unit use systemctl show -p Environment UNIT, and for the PATH a "
+                                   "unit sees run systemd-run --user --pipe --wait --collect /bin/sh -c 'command -v "
+                                   "node; echo \"$PATH\"'",
     "guard_error": "the guard could not read this command, so it blocks it; split it into smaller commands or "
                    "simplify its quoting, substitutions and launchers",
 }
 
 
-def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy: bool = False) -> list[str]:
+def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy: bool = False,
+             protected: list[int] | tuple = (), data: list[tuple[int, int]] | tuple = ()) -> list[str]:
     """The words of a command, punctuation apart. `comments` are the spans scan_shell() found to be comments and are
     removed first, and no `#` starts a comment for shlex: shlex read one anywhere (even in `$#` and `a#b`) and, since the
-    lines are joined with `;` below, dropped the whole rest of the command. `legacy` is that reading, kept because
+    lines are joined with `;` below, dropped the whole rest of the command. `protected` are the backquotes it found inside
+    single-quoted and ANSI-C strings: text for the shell that string is handed to (`bash -c 'echo "`x`"'`), so they stay
+    backquotes instead of becoming `;` with the others. `data` are quoted here-document bodies inside a double-quoted
+    substitution: data for the shell, removed in both readings, so prose in a commit message is no command line (whatever
+    its quotes do to shlex's parity). `legacy` is the reading without comments and protected backquotes, kept because
     command_segments() reads both: whatever the guard read before it still reads."""
-    if comments:
+    if protected:
+        marked = list(command)
+        for at in protected:
+            marked[at] = PROTECTED_BACKQUOTE
+        command = "".join(marked)
+    if comments or data:
         pieces, cursor = [], 0
-        for first, last in comments:
+        for first, last in sorted([*comments, *data]) if data else comments:
             pieces.append(command[cursor:first])
             cursor = last
         pieces.append(command[cursor:])
@@ -360,9 +390,10 @@ def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy:
         lexer.whitespace_split = True
         if not legacy:
             lexer.commenters = ""
-        return list(lexer)
+        tokens = list(lexer)
     except ValueError:
-        return re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
+        tokens = re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
+    return [token.replace(PROTECTED_BACKQUOTE, "`") for token in tokens] if protected else tokens
 
 
 def segments(tokens: list[str]) -> list[list[str]]:
@@ -438,8 +469,11 @@ def without_spans(text: str, start: int, end: int, spans: list[tuple[int, int]])
     return "".join(pieces)
 
 
-def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
-    """(bodies, comments) of a command text, read once the way bash reads it.
+def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[str], list[tuple[int, int]], list[int],
+                                                                          list[tuple[int, int]]]:
+    """(bodies, comments, protected, data) of a command text, read once the way bash reads it. `initial` is "hd" for the
+    body of a here-document with an unquoted delimiter, which is read as double-quoted text that has no closing quote;
+    `nesting` counts those.
 
     Bodies: those of the outermost command substitutions that the shell runs inside double quotes, `$(...)` and a
     backquote pair. Inside double quotes `$` and the backquote keep their meaning and a backslash escapes only
@@ -457,8 +491,11 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
     escape (`$'it\\'s'`); inside double quotes `$'` is nothing special. The body of a here-document is literal text
     for this scan: prose in it (an unbalanced parenthesis, an apostrophe, backquotes) opens nothing, and when its
     delimiter is quoted (`<<'EOF'`, `<<"EOF"`, `<<\\EOF`) the body is data to the shell, so a returned body loses it
-    (the operator line and the terminator stay): a commit message in `git commit -m "$(cat <<'EOF' ... EOF)"` is no
-    command. How the guard reads a top-level here-document as commands is a separate matter and this scan does not
+    (the operator line and the terminator stay), and so does the tokenizer's input once that substitution closes (the
+    fourth result): a commit message in `git commit -m "$(cat <<'EOF' ... EOF)"` is no command, whatever its quotes do
+    to shlex's parity. The body of a here-document with an unquoted delimiter is expanded by the shell, so it is scanned
+    as double-quoted text with no closing quote (`initial="hd"`) and each `$(...)` or backquote pair in it is a body of
+    its own. How the guard reads a top-level here-document as commands is a separate matter and this scan does not
     touch it.
 
     Comments: the spans, one per line, that bash ignores at the top level of text: from a `#` that starts a word,
@@ -472,6 +509,8 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
     character that matters to the next."""
     bodies: list[str] = []
     comments: list[tuple[int, int]] = []
+    protected: list[int] = []  # backquotes inside single-quoted or ANSI-C strings at the top level
+    kept: list[tuple[int, int]] = []  # quoted here-document bodies inside a reported body that closes: data for the tokenizer too
     data: list[tuple[int, int]] = []  # bodies of quoted here-documents inside the reported body that is open
     heredocs: list[tuple[str, bool, bool]] = []  # `<<` (delimiter, strips tabs, quoted) seen on the current line
     lines: dict[bool, dict[str, list[int]]] = {}
@@ -480,13 +519,14 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
     # `dq` says whether a substitution opened here sits inside double quotes (param and arith inherit it from their
     # parent). `reported` marks a body that starts inside double quotes and is returned; `hidden` counts those on the
     # stack, so a substitution inside one is left to the next reading of that body.
-    stack: list[list] = [["cmd", 0, 0, False, False, 0]]
+    stack: list[list] = [[initial, 0, 0, False, initial == "hd", 0]]
     hidden = 0
     end = len(text)
     index = 0
+    has_backquote = "`" in text
     construct_end = -1  # where the last quote, escape or substitution ended: a `#` right after it is inside a word
 
-    def close(at: int) -> None:
+    def close(at: int, closed: bool = True) -> None:
         nonlocal hidden
         kind, start, _, reported = stack.pop()[:4]
         if reported:
@@ -494,7 +534,15 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
             body = without_spans(text, start, at, data)
             bodies.append(BACKQUOTE_ESCAPE.sub(r"\1", body) if kind == "bt" else body)
             if not hidden:
+                if closed:  # a substitution that never closes is a syntax error: the tokenizer keeps reading it as before
+                    kept.extend(data)
                 data.clear()
+
+    def protect(first: int, last: int) -> None:
+        tick = text.find("`", first, last)
+        while tick >= 0:
+            protected.append(tick)
+            tick = text.find("`", tick + 1, last)
 
     def open_frame(kind: str, start: int, frame: list, quoted: bool = False) -> None:
         nonlocal hidden
@@ -523,6 +571,8 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
             index += 1
         elif char == "'":
             closing = text.find("'", index + 1)
+            if closing >= 0 and has_backquote and not hidden:
+                protect(index + 1, closing)
             index = closing + 1 if closing >= 0 else index + 1
             construct_end = index
         elif char == "`":
@@ -544,6 +594,8 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
                 stack.append(["dparam" if frame[4] else "param", index + 2, 0, False, frame[4], 0])
                 index += 2
             elif following == "'" and not frame[4] and (closing := ansi_c_end(text, index + 2)) >= 0:
+                if has_backquote and not hidden:
+                    protect(index + 2, closing - 1)
                 index = construct_end = closing
             else:
                 index += 1
@@ -582,7 +634,10 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
                         if hidden:
                             if quoted:
                                 data.append((first, last))
-                        elif comment := HEREDOC_COMMENT.search(text, first, last):
+                            continue
+                        if not quoted and nesting < MAX_HEREDOC_NESTING:  # the shell expands it: a `$(...)` in it runs
+                            bodies.extend(scan_shell(text[first:last], "hd", nesting + 1)[0])
+                        if comment := HEREDOC_COMMENT.search(text, first, last):
                             comments.append((comment.start(), last - 1))
         elif char == "(":
             frame[2] += 1
@@ -609,8 +664,21 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
         if stack[-1][0] == "arith":
             stack.pop()
         else:
-            close(end)
-    return bodies, comments
+            close(end, False)
+    return bodies, comments, protected, kept
+
+
+def input_redirection_segments(words: list[str]) -> list[list[str]]:
+    """Segments to read in addition to `words` for an input redirection that stands where a command starts. `< FILE` alone
+    (`<> FILE` too, with or without a descriptor before the operator) or after the parenthesis of `$(<FILE)` (the token
+    `(<`, see PAREN_INPUT) reads FILE like `cat FILE`; a leading `< FILE cmd args` puts FILE on cmd's input as the trailing
+    `cmd args < FILE` does, so the rules read it that way."""
+    width = redirection_width(words, 0) if words else 0
+    found = []
+    if width and words[width - 2] in {"<", "<>"}:
+        found.append(["cat", words[-1]] if width == len(words) else words[width:] + words[:width])
+    found += [["cat", words[at + 1]] for at, word in enumerate(words[:-1]) if PAREN_INPUT.fullmatch(word)]
+    return found
 
 
 def redirection_width(words: list[str], index: int) -> int:
@@ -653,6 +721,9 @@ def wrapper_options(words: list[str], index: int, wrapper: str) -> tuple[list[tu
         word = words[index]
         if word == "--":
             return options, index + 1
+        if wrapper in SYSTEMD_LAUNCHERS and (width := redirection_width(words, index)):
+            index += width  # a redirection is no option, and options may follow it (not for timeout: its duration `5` reads as `5>`)
+            continue
         if not word.startswith("-") or word == "-":
             return options, index
         index += 1
@@ -701,9 +772,9 @@ def prefix_end(words: list[str], index: int = 0) -> int:
             index += 1
         elif width and REDIRECT_OUT.match(words[index + width - 2]):
             index += width
-        elif word in WRAPPERS or word == "timeout":
-            index = skip_wrapper_options(words, index + 1, word)
-            if word == "timeout":
+        elif (name := word.rsplit("/", 1)[-1]) in WRAPPERS or name == "timeout":
+            index = skip_wrapper_options(words, index + 1, name)
+            if name == "timeout":
                 index += 1  # timeout's mandatory duration comes before the command
         else:
             break
@@ -728,11 +799,54 @@ def env_command_start(words: list[str], at: int = 0) -> int | None:
     return None
 
 
-def systemctl_verb(words: list[str]) -> str | None:
-    """systemctl's verb: the first word after its options, redirections aside (`systemctl --user 2>&1 status x`)."""
-    arguments = ["systemctl", *command_arguments(words)]
-    at = skip_wrapper_options(arguments, 1, "systemctl")
-    return arguments[at] if at < len(arguments) else None
+def systemctl_call(words: list[str]) -> tuple[list[str], list[str]]:
+    """(positional words, property names) of a systemctl command: the verb comes first among the positional words, then
+    what it acts on (unit names). Options may stand anywhere, as getopt permutes them (the table for value options is
+    WRAPPER_VALUE_FLAGS["systemctl"]); `--` ends them; -p, --property and -P name properties, comma separated."""
+    arguments = command_arguments(words)
+    positional: list[str] = []
+    properties: list[str] = []
+    value_flags = WRAPPER_VALUE_FLAGS["systemctl"]
+    index = 0
+    while index < len(arguments):
+        word = arguments[index]
+        index += 1
+        if word == "--":
+            positional.extend(arguments[index:])
+            break
+        if not word.startswith("-") or word == "-":
+            positional.append(word)
+            continue
+        if word.startswith("--"):
+            name, glued, value = word.partition("=")
+            if not glued and word in value_flags and index < len(arguments):
+                value = arguments[index]
+                index += 1
+            if name == "--property":
+                properties.extend(value.split(","))
+        else:
+            letters = word[1:]
+            first = next((at for at, letter in enumerate(letters) if f"-{letter}" in value_flags), None)
+            if first is not None:
+                value = letters[first + 1:]
+                if not value and index < len(arguments):
+                    value = arguments[index]
+                    index += 1
+                if letters[first] in "pP":
+                    properties.extend(value.split(","))
+    return positional, properties
+
+
+def systemctl_reason(words: list[str]) -> str | None:
+    """service_manager_environment for the two systemctl commands that print a manager's environment: `show-environment`,
+    and `show` with no unit (or job) named unless -p names other properties only, which prints the manager's own
+    properties, Environment among them (systemctl(1) 255)."""
+    positional, properties = systemctl_call(words)
+    if positional[:1] == ["show-environment"]:
+        return "service_manager_environment"
+    if positional[:1] == ["show"] and len(positional) == 1 and (not properties or "Environment" in properties):
+        return "service_manager_environment"
+    return None
 
 
 def environment_assignments(payload: str) -> list[str]:
@@ -746,9 +860,11 @@ def environment_assignments(payload: str) -> list[str]:
 def systemd_run_sets_secret(words: list[str]) -> bool:
     """Whether a systemd-run command line names a secret variable (SECRET_NAMES) among the variables it sets for
     the unit it starts, with or without a value: `-E NAME[=VALUE]`, `--setenv NAME[=VALUE]` (systemd-run(1) 255:
-    without a value, the caller's own value is used) or `-p`/`--property` `Environment=NAME=VALUE ...`. The command
-    line lands in the journal (`_CMDLINE`) and the unit's properties travel over the bus, so a value placed there is
-    recorded twice. The variable's NAME is read, not any text that spells one: `-E LABEL=APCA_API_KEY_ID` sets LABEL."""
+    without a value, the caller's own value is used) or `-p`/`--property` `Environment=NAME=VALUE ...`. A transient
+    unit's description defaults to its command line and the manager logs `Started <unit> - <command line>` in the user
+    journal (measured on systemd 255.4, 2026-09-29: once, in the MESSAGE field, not in `_CMDLINE`), and the unit's
+    properties travel over the user bus, so a value placed there is recorded twice. The variable's NAME is read, not any
+    text that spells one: `-E LABEL=APCA_API_KEY_ID` sets LABEL."""
     for name, value in wrapper_options(words, 1, "systemd-run")[0]:
         if value is None:
             continue
@@ -895,8 +1011,8 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
     for nesting in range(MAX_SUBSTITUTION_NESTING + 1):
         following: list[str] = []
         for text in level:
-            bodies, comments = scan_shell(text)
-            result.extend(command_segments(text, depth, comments))
+            bodies, comments, protected, data = scan_shell(text)
+            result.extend(command_segments(text, depth, comments, protected, data))
             following.extend(bodies)
         spent += sum(map(len, following))
         if not following or spent > budget:
@@ -905,7 +1021,8 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
     return result
 
 
-def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int]] | tuple = ()) -> list[list[str]]:
+def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int]] | tuple = (),
+                     protected: list[int] | tuple = (), data: list[tuple[int, int]] | tuple = ()) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
     command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
     `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options). Read twice
@@ -913,9 +1030,9 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
     the command at the first `#`; the second reading adds only the segments the first lacks."""
     result: list[list[str]] = []
     seen: set[tuple[str, ...]] = set()
-    readings = [tokenize(command, comments)]
-    if "#" in command and len(command) <= LEGACY_READING_LIMIT:
-        readings.append(tokenize(command, legacy=True))
+    readings = [tokenize(command, comments, protected=protected, data=data)]
+    if ("#" in command or protected or comments) and len(command) <= LEGACY_READING_LIMIT:
+        readings.append(tokenize(command, legacy=True, data=data))
     for reading, tokens in enumerate(readings):
         for raw in segments(tokens):
             if reading:
@@ -932,6 +1049,7 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                 if not words:
                     break
                 result.append(words)
+                result.extend(input_redirection_segments(words))  # `$(< FILE)` is `$(cat FILE)`; zsh's `< FILE` alone reads it too
                 program = program_of(words)
                 if program == "env":
                     break  # launcher_chain walked every env that starts a command: this one prints its environment
@@ -957,18 +1075,21 @@ def ps_shows_environment(words: list[str]) -> bool:
     """Whether ps prints each process's environment: a dashless BSD-style cluster with `e` or `E` (PS_BSD_CLUSTER), or
     macOS's dashed `-E`, alone or in a cluster before the first option that takes a value (`-Ewwp 123`, where the value
     starts at `p`). A dashed `-e` is every process and passes, as does an `E` that is a value: the word after a stand-alone
-    value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to it (`ps -uEve`)."""
+    value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to it (`ps -uEve`). `-C` is a
+    flag on macOS ("Change the way the CPU percentage is calculated") and takes a command name on procps, so a dashed
+    word with an `E` right after it (`ps -C -E`) or glued to it (`ps -CE`) is refused whichever host runs it."""
     skip = False
-    for word in words[1:]:
+    for position, word in enumerate(words[1:], 1):
         if skip:
             skip = False
             continue
         if word in PS_ARG_OPTIONS:
-            skip = True
+            following = words[position + 1] if position + 1 < len(words) else ""
+            skip = not (word == "-C" and following.startswith("-") and "E" in following)
             continue
         if word.startswith("-") and not word.startswith("--") and len(word) > 1:
             letters = word[1:]
-            value_at = next((at for at, letter in enumerate(letters) if f"-{letter}" in PS_ARG_OPTIONS), None)
+            value_at = next((at for at, letter in enumerate(letters) if f"-{letter}" in PS_CLUSTER_VALUE_OPTIONS), None)
             if "E" in (letters if value_at is None else letters[:value_at]):
                 return True
             skip = value_at == len(letters) - 1  # the cluster ends in an option that takes the next word
@@ -1201,6 +1322,8 @@ def keyring_reason(texts: tuple[str, str], words_list: list[list[str]]) -> str |
         inner += launched_commands(inner)
         if any(dumps_after_source(words) for words in inner):
             return "environment_dump_in_keyring_exec"
+        if any(program_of(words) == "systemctl" and systemctl_reason(words) for words in inner):
+            return "service_manager_environment"
         programs = {program_of(words) for words in inner}
         if (any(INTERPRETER.fullmatch(program) for program in programs) or programs & AWKS) \
                 and found(KEYRING_ENVIRONMENT_ACCESS):
@@ -1216,7 +1339,7 @@ def segment_reason(words: list[str]) -> str | None:
         return "environment_dump"
     if program == "systemd-run" and systemd_run_sets_secret(words):
         return "secret_variable_on_command_line"
-    if program == "systemctl" and systemctl_verb(words) == "show-environment":
+    if program == "systemctl" and systemctl_reason(words):
         return "service_manager_environment"
     if prints_helper_credential(words) or tvly_prints_key(words):
         return "native_token_print"
