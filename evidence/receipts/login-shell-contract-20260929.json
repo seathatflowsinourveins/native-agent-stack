@@ -1,0 +1,633 @@
+{
+  "schema_version": 1,
+  "id": "login-shell-contract-20260929",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex"
+  ],
+  "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag.",
+  "limitations": [
+    "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The Polaris distro's profiles (Librarium, Phoyo) were not measured. Another host collects its own evidence.",
+    "The incident's creator is established by timing, by the same-second leftovers in the probe's scratch working directory (present in its scrub arm, absent in its no-scrub arm), by the owning session's confirmation, and by the isolated reproduction plus public reports (anthropics/claude-code #76236, #78072). The peer probe itself was not re-run. The reproduction stops at the API-key check: it shows the files are created at startup, and says nothing about a full session or about exit. Upstream states the placeholders persist after exit and is considering cleaning them up; that was not measured here.",
+    "The observations of the incident (login probes before and after, the leftover list, the journal and unit checks) are the coordinator's own shell output of 2026-09-29, recorded here as values; no raw output is retained.",
+    "The hand-off file protects only the name ~/.bash_profile. A creator that truncates or replaces an existing file is not covered; the doctor check catches an empty ~/.bash_profile or ~/.bash_login and any missing command, but the doctor has no scheduler, so it finds a recurrence only when it is run.",
+    "The doctor code lives in a repository with no remote (practice repository commit 512c3e3); this receipt's artifact folder carries a copy of the function with the home made a parameter. The full doctor run predates the creation of the hand-off file; the check alone was re-run after it.",
+    "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.158.0 was not run. The candidate notifiers were compared by repository head and latest release only, not run.",
+    "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (for example 50 and 49 entries in the stock-home arm); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` result was measured in one throwaway home with the scrub-created file and without the sandbox feature enabled.",
+    "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session."
+  ],
+  "evidence_class": "independent observation: the native Claude Code binary and the Windows Terminal profile start-up command run on this host, with a no-variable control arm and five doctor-check controls; the reproduction arms and controls are isolated fixtures; the upstream issue states and release facts are source review",
+  "recorded_at_utc": "2026-09-29T05:47:08Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Ubuntu 24.04 on Windows 11 with Windows Terminal 1.24.11911.0",
+    "identity": "one workstation; the running user's login-shell startup files, Windows Terminal profiles and Claude Code binary"
+  },
+  "data": {
+    "incident_observation": {
+      "profile_command_shape": "wsl.exe -d <distro> -u <user> --exec /bin/bash -lc \"exec claude\"",
+      "tab_output": "/bin/bash: line 1: exec: claude: not found (process exit code 127)",
+      "login_probe_before_fix": {
+        "claude_found": false,
+        "codex_found": false,
+        "rtk_found": false,
+        "path_entries": 10,
+        "path_was_distro_default": true
+      },
+      "bash_profile_before_fix": {
+        "regular_file": true,
+        "size_bytes": 0,
+        "created_local_time": "2026-09-28 22:27:43.881 (UTC-4)",
+        "bash_login_present": false,
+        "profile_intact": true
+      },
+      "leftovers_created_within_one_second": {
+        "total": 15,
+        "in_home": 14,
+        "outside_home": [
+          "inline-comments-buffer.jsonl in the system temp directory (removed after asserting a regular empty file with that creation time)"
+        ],
+        "empty_files": [
+          ".bash_profile",
+          ".bash_aliases",
+          ".zshrc",
+          ".bunfig.toml",
+          ".netrc",
+          ".npmrc",
+          ".yarnrc",
+          ".yarnrc.yml"
+        ],
+        "empty_dirs": [
+          ".pip",
+          ".config/pip",
+          ".config/git",
+          ".config/glab-cli"
+        ],
+        "empty_dirs_one_second_later": [
+          ".config/anthropic",
+          ".claude/seed-admin"
+        ]
+      },
+      "probe_scratch_working_dir": {
+        "scrub_arm_empty_entries_seen": [
+          ".env*",
+          ".gitmodules",
+          ".npmrc",
+          ".claude"
+        ],
+        "no_scrub_arm_entries": 0
+      },
+      "fix": "removed only ~/.bash_profile after asserting regular file, size 0, the creation time and no bwrap or srt process",
+      "login_probe_after_fix": {
+        "claude_found": true,
+        "codex_found": true,
+        "nativestack_found": true,
+        "rtk_found": true,
+        "uv_found": true
+      },
+      "blast_radius": {
+        "failed_user_units": 0,
+        "journal_lines_with_exit_127_or_not_found_since_incident": 0
+      },
+      "owning_session_cleanup_reported_and_listing_confirmed": {
+        "other_leftovers_removed": 12,
+        "empty_zshrc_kept_because_permission_rules_protect_it": true
+      }
+    },
+    "hand_off_file": {
+      "created_2026_09_29": true,
+      "size_bytes": 301,
+      "content_shape": "comment lines and `if [ -r \"$HOME/.profile\" ]; then . \"$HOME/.profile\"; fi`",
+      "login_path_entries_before": 13,
+      "login_path_entries_after": 13,
+      "login_path_sha256_prefix_before": "2ba67e81743edc71",
+      "login_path_sha256_prefix_after": "2ba67e81743edc71",
+      "login_path_identical": true,
+      "digest_command": "login_path_digest.py (env -i with the distro default PATH, /bin/bash -lc, SHA-256 of the printed PATH); the before value was recorded by an equivalent inline command",
+      "commands_resolved_after": [
+        "claude",
+        "codex",
+        "nativestack",
+        "rtk",
+        "node",
+        "uv"
+      ],
+      "doctor_full_run_before_hand_off_file": {
+        "checks_passed": 17,
+        "login_shell_path_passed": true,
+        "catalog_revision_drift_unchanged_and_unrelated": true
+      },
+      "check_alone_after_hand_off_file_passed": true
+    },
+    "isolated_reproduction": {
+      "claude": "2.1.284 (Claude Code)",
+      "bubblewrap_installed": true,
+      "bubblewrap_version": "bubblewrap 0.9.0",
+      "scratch_removed": true,
+      "real_home_placeholder_names_unchanged": true,
+      "arms": [
+        {
+          "arm": "A_control_no_scrub",
+          "scrub_variable": false,
+          "real_bash_profile_present_before": false,
+          "client_exit": 1,
+          "entries_created": 10,
+          "empty_files_created": 0,
+          "directories_created": 7,
+          "empty_directories_created": 2,
+          "created_in_home_top_level": [
+            ".claude",
+            ".claude.json"
+          ],
+          "created_in_working_dir": [],
+          "bash_profile_exists_after": false,
+          "bash_profile_empty_after": false,
+          "real_bash_profile_untouched": null,
+          "login_path_had_local_bin_before": true,
+          "login_path_has_local_bin_after": true,
+          "client_state_entries_removed": 0
+        },
+        {
+          "arm": "B_scrub_stock_home",
+          "scrub_variable": true,
+          "real_bash_profile_present_before": false,
+          "client_exit": 1,
+          "entries_created": 50,
+          "empty_files_created": 27,
+          "directories_created": 20,
+          "empty_directories_created": 12,
+          "created_in_home_top_level": [
+            ".bash_aliases",
+            ".bash_profile",
+            ".bashrc",
+            ".bunfig.toml",
+            ".claude",
+            ".claude.json",
+            ".config",
+            ".gitconfig",
+            ".netrc",
+            ".npmrc",
+            ".pip",
+            ".yarnrc",
+            ".yarnrc.yml",
+            ".zshrc"
+          ],
+          "created_in_working_dir": [
+            ".claude",
+            ".claude/agents",
+            ".claude/commands",
+            ".env",
+            ".env.development",
+            ".env.development.local",
+            ".env.local",
+            ".env.production",
+            ".env.production.local",
+            ".env.test",
+            ".env.test.local",
+            ".gitmodules",
+            ".npmrc",
+            ".yarnrc",
+            ".yarnrc.yml",
+            "bunfig.toml",
+            "node_modules",
+            "node_modules/.bin",
+            "package-lock.json",
+            "package.json",
+            "pnpm-lock.yaml",
+            "yarn.lock"
+          ],
+          "bash_profile_exists_after": true,
+          "bash_profile_empty_after": true,
+          "real_bash_profile_untouched": null,
+          "login_path_had_local_bin_before": true,
+          "login_path_has_local_bin_after": false,
+          "native_doctor": {
+            "exit": 0,
+            "warnings_found": 3,
+            "mentions_bash_profile": false,
+            "mentions_mask_stale_or_placeholder": false
+          },
+          "client_state_entries_removed": 1
+        },
+        {
+          "arm": "C_scrub_real_bash_profile",
+          "scrub_variable": true,
+          "real_bash_profile_present_before": true,
+          "client_exit": 1,
+          "entries_created": 49,
+          "empty_files_created": 26,
+          "directories_created": 20,
+          "empty_directories_created": 12,
+          "created_in_home_top_level": [
+            ".bash_aliases",
+            ".bashrc",
+            ".bunfig.toml",
+            ".claude",
+            ".claude.json",
+            ".config",
+            ".gitconfig",
+            ".netrc",
+            ".npmrc",
+            ".pip",
+            ".yarnrc",
+            ".yarnrc.yml",
+            ".zshrc"
+          ],
+          "created_in_working_dir": [
+            ".claude",
+            ".claude/agents",
+            ".claude/commands",
+            ".env",
+            ".env.development",
+            ".env.development.local",
+            ".env.local",
+            ".env.production",
+            ".env.production.local",
+            ".env.test",
+            ".env.test.local",
+            ".gitmodules",
+            ".npmrc",
+            ".yarnrc",
+            ".yarnrc.yml",
+            "bunfig.toml",
+            "node_modules",
+            "node_modules/.bin",
+            "package-lock.json",
+            "package.json",
+            "pnpm-lock.yaml",
+            "yarn.lock"
+          ],
+          "bash_profile_exists_after": true,
+          "bash_profile_empty_after": false,
+          "real_bash_profile_untouched": true,
+          "login_path_had_local_bin_before": true,
+          "login_path_has_local_bin_after": true,
+          "client_state_entries_removed": 1
+        }
+      ],
+      "shared_temp_file": {
+        "name": "inline-comments-buffer.jsonl",
+        "present_before_run": false,
+        "created_by_run": true,
+        "removed_by_script": true,
+        "present_after_script": false
+      },
+      "client_startup_code_2_1_284": "opens a fixed list of paths in append mode (creates a missing file, never truncates an existing one) when the variable is set, including the home dotfiles and one absolute path in the system temp directory"
+    },
+    "doctor_check_controls": {
+      "cases": [
+        {
+          "case": "A profile only",
+          "as_expected": true,
+          "pass": true,
+          "missing_in_login_shell": [],
+          "empty_files_shadowing_profile": [],
+          "exit": 0
+        },
+        {
+          "case": "B empty .bash_profile (the incident)",
+          "as_expected": true,
+          "pass": false,
+          "missing_in_login_shell": [
+            "claude",
+            "codex",
+            "nativestack",
+            "rtk"
+          ],
+          "empty_files_shadowing_profile": [
+            ".bash_profile"
+          ],
+          "exit": 0
+        },
+        {
+          "case": "C real .bash_profile handing off to .profile",
+          "as_expected": true,
+          "pass": true,
+          "missing_in_login_shell": [],
+          "empty_files_shadowing_profile": [],
+          "exit": 0
+        },
+        {
+          "case": "D empty .bash_login",
+          "as_expected": true,
+          "pass": false,
+          "missing_in_login_shell": [
+            "claude",
+            "codex",
+            "nativestack",
+            "rtk"
+          ],
+          "empty_files_shadowing_profile": [
+            ".bash_login"
+          ],
+          "exit": 0
+        },
+        {
+          "case": "E no startup files",
+          "as_expected": true,
+          "pass": false,
+          "missing_in_login_shell": [
+            "claude",
+            "codex",
+            "nativestack",
+            "rtk"
+          ],
+          "empty_files_shadowing_profile": [],
+          "exit": 0
+        }
+      ],
+      "all_cases_as_expected": true,
+      "real_host": {
+        "pass": true,
+        "missing_in_login_shell": [],
+        "empty_files_shadowing_profile": [],
+        "exit": 0
+      }
+    },
+    "claude_agents_json_2_1_284_live_snapshot": {
+      "help_text_for_json_flag": "Print active sessions (interactive and background) as a JSON array and exit (for scripting; does not require a TTY)",
+      "default": {
+        "rows": 9,
+        "kinds": {
+          "interactive": 9
+        },
+        "statuses": {
+          "busy": 7,
+          "idle": 2
+        },
+        "fields": [
+          "cwd",
+          "kind",
+          "name",
+          "pid",
+          "sessionId",
+          "startedAt",
+          "status"
+        ]
+      },
+      "cwd_with_no_session": {
+        "rows": 0,
+        "kinds": {},
+        "statuses": {},
+        "fields": []
+      },
+      "all": {
+        "rows": 10,
+        "kinds": {
+          "background": 1,
+          "interactive": 9
+        },
+        "statuses": {
+          "null": 1,
+          "busy": 7,
+          "idle": 2
+        },
+        "fields": [
+          "cwd",
+          "id",
+          "kind",
+          "name",
+          "pid",
+          "sessionId",
+          "startedAt",
+          "state",
+          "status"
+        ]
+      }
+    },
+    "landscape_2026_09_29": {
+      "windows_terminal": {
+        "releases": [
+          [
+            "v1.25.1912.0",
+            true,
+            "2026-07-16"
+          ],
+          [
+            "v1.24.11911.0",
+            false,
+            "2026-07-16"
+          ],
+          [
+            "v1.25.1322.0",
+            true,
+            "2026-05-13"
+          ],
+          [
+            "v1.24.11321.0",
+            false,
+            "2026-05-13"
+          ],
+          [
+            "v1.25.1241.0",
+            true,
+            "2026-05-13"
+          ],
+          [
+            "v1.25.1171.0",
+            true,
+            "2026-04-29"
+          ]
+        ],
+        "toast_signals": {
+          "stable": {
+            "tag": "v1.24.11911.0",
+            "bellstyle_enum_has_notification": false,
+            "ancestry_status": "diverged"
+          },
+          "preview": {
+            "tag": "v1.25.1912.0",
+            "bellstyle_enum_has_notification": false,
+            "ancestry_status": "diverged"
+          }
+        }
+      },
+      "claude_code": [
+        [
+          "v2.1.284",
+          "2026-09-28T18:02"
+        ],
+        [
+          "v2.1.283",
+          "2026-09-25T21:50"
+        ],
+        [
+          "v2.1.282",
+          "2026-09-24T18:38"
+        ]
+      ],
+      "codex": {
+        "installed_tag": "rust-v0.157.1",
+        "newest_stable": [
+          "rust-v0.158.0",
+          "2026-09-28T05:07"
+        ],
+        "source_diff_changed_lines": {
+          "codex-rs/tui/src/chatwidget/notifications.rs": 0,
+          "codex-rs/tui/src/notifications/mod.rs": 0,
+          "codex-rs/tui/src/terminal_palette.rs": 0,
+          "codex-rs/config/src/types.rs": 70
+        },
+        "notification_definitions_identical": true,
+        "notification_kind_literals_at_newest": [
+          "agent-turn-complete",
+          "approval-requested",
+          "async-question",
+          "plan-mode-prompt"
+        ]
+      },
+      "candidates": {
+        "DevinoSolutions/anotifier-for-claude-codex-cursor": {
+          "head": "92c080a7",
+          "pin_unchanged": true,
+          "latest_release": "v1.2.6",
+          "archived": false
+        },
+        "777genius/agent-notifications": {
+          "head": "0376f9c9",
+          "pin_unchanged": true,
+          "latest_release": "v1.45.18",
+          "archived": false
+        },
+        "congmnguyen/claude-code-wsl2-setup": {
+          "head": "69620ec4",
+          "pin_unchanged": true,
+          "latest_release": "v1.0.0",
+          "archived": false
+        },
+        "shanselman/toasty": {
+          "head": "973eeb8d",
+          "pin_unchanged": true,
+          "latest_release": "v0.8.1",
+          "archived": false
+        },
+        "PeonPing/peon-ping": {
+          "head": "8ef37660",
+          "pin_unchanged": true,
+          "latest_release": "v2.37.0",
+          "archived": false
+        },
+        "mylee04/code-notify": {
+          "head": "dcfd4ae6",
+          "pin_unchanged": true,
+          "latest_release": "v1.13.1",
+          "archived": false
+        },
+        "asheshgoplani/agent-deck": {
+          "head": "035fd602",
+          "pin_unchanged": true,
+          "latest_release": "v1.16.22",
+          "archived": false
+        },
+        "kbwo/ccmanager": {
+          "head": "ee0af836",
+          "pin_unchanged": true,
+          "latest_release": "v4.4.4",
+          "archived": false
+        },
+        "zellij-org/zellij": {
+          "head": "a79e15e1",
+          "pin_unchanged": true,
+          "latest_release": "v0.45.1",
+          "archived": false
+        }
+      },
+      "claude_code_issues": {
+        "76236": {
+          "state": "closed",
+          "state_reason": "not_planned",
+          "created": "2026-07-10",
+          "closed": "2026-09-01",
+          "found_by_search": true
+        },
+        "78072": {
+          "state": "open",
+          "state_reason": null,
+          "created": "2026-07-16",
+          "closed": null,
+          "found_by_search": true
+        },
+        "94008": {
+          "state": "open",
+          "state_reason": null,
+          "created": "2026-09-13",
+          "closed": null,
+          "found_by_search": true
+        },
+        "81602": {
+          "state": "open",
+          "state_reason": null,
+          "created": "2026-07-27",
+          "closed": null,
+          "found_by_search": true
+        },
+        "83497": {
+          "state": "open",
+          "state_reason": null,
+          "created": "2026-08-03",
+          "closed": null,
+          "found_by_search": true
+        }
+      },
+      "claude_code_changelog_sandbox_stub_entries": [
+        [
+          "2.1.271",
+          "Fixed a stale `.git/config.lock` breaking `git checkout -b`, `git push -u` and `git config` for the rest of a session after a sandboxed command failed"
+        ],
+        [
+          "2.1.257",
+          "Added a `/doctor` warning for stale sandbox mask files left by a killed session"
+        ],
+        [
+          "2.1.247",
+          "Fixed the Bash sandbox's after-command cleanup deleting a dotfile-managed `~/.claude/settings.json` symlink (nix/home-manager, stow) when it is repoin"
+        ],
+        [
+          "2.1.78",
+          "Fixed `git log HEAD` failing with \"ambiguous argument\" inside sandboxed Bash on Linux, and stub files polluting `git status` in the working directory"
+        ]
+      ],
+      "claude_code_changelog_top_version": "2.1.284"
+    },
+    "upstream_reports_read_only": {
+      "anthropics/claude-code#76236": "empty ~/.bash_profile left behind by CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 breaks login-shell PATH; closed not_planned by the stale bot on 2026-09-01",
+      "anthropics/claude-code#78072": "open, labelled reproduced; a maintainer comment of 2026-08-17 calls the persistent empty placeholder files intended sandbox behaviour and says cleaning up placeholders at exit is being considered",
+      "related_open": [
+        "anthropics/claude-code#94008",
+        "anthropics/claude-code#81602",
+        "anthropics/claude-code#83497"
+      ],
+      "filed_or_commented_by_this_work": false
+    },
+    "decisions": {
+      "bash_login_shell_kept_in_profiles": true,
+      "real_hand_off_file_created": true,
+      "fixed_session_name_in_profiles": false,
+      "resume_profiles_added": false,
+      "agent_view_adopted": false,
+      "agent_view_probe_run": false,
+      "telemetry_tab_identity_changed": false
+    }
+  },
+  "provenance": {
+    "artifacts_dir": "evidence/artifacts/login-shell-contract-20260929",
+    "scripts_sha256": {
+      "agents_json_probe.py": "914afe098321ac0ad0c5e36e0c910efe184b79f739ca32eca20e040999934a24",
+      "landscape_refresh.py": "1729003cffe560d246fa06131bbb62679867f410df4e815eb792fbea1ee5fa4b",
+      "login_path_digest.py": "c6106a9ac19976ab64befddf3be762690bcca27ede1a25be2b5ab4537d720af9",
+      "login_shell_check_controls.py": "e7cdc7776a671c2654a5f2805977769120ff117df971f30e7bbef9f10b6910d4",
+      "scrub_placeholder_probe.py": "0eff1d26583879c0e74b79fbda23b134b66a3e7868fd593deab8c596dc2869f6"
+    },
+    "commands": [
+      "python3 -B scrub_placeholder_probe.py",
+      "python3 -B login_shell_check_controls.py --real-host",
+      "python3 -B login_path_digest.py",
+      "python3 -B agents_json_probe.py",
+      "python3 -B landscape_refresh.py",
+      "wsl.exe -d <distro> -u <user> --exec /bin/bash -lc 'command -v claude codex nativestack rtk node uv' (before removal, after removal, after the hand-off file)",
+      "nativestack doctor (practice repository commit 512c3e3)"
+    ],
+    "upstream_sources": "docs/decisions/2026-09-28-terminal-experience.md (Update 2026-09-29)"
+  }
+}
