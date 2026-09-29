@@ -176,7 +176,7 @@ per segment; choose Context Mode for large output needing processing.
 
 These commands assume the corresponding installation/configuration and deliberately selected input. Use the [24-row command manifest](token-efficiency-stack.json) and [native recipes](../recipes/README.md) for complete arguments, pins, checksums and installation of each row. The [lifecycle matrix](../blueprints/token-native-focus/saturation-audit.json) records accepted, partial and unestablished stages individually.
 
-Each tool's row in the [manifest](token-efficiency-stack.json), rendered by `scripts/build_ecosystem.py`, is its lane and adoption reference. Since the 2026-09-27 edition, rows with a card also carry upstream, adaptation, E2E, performance, invoke-rate and GPT-6 review blocks, each labelled with its evidence class ([card bundle](../evidence/artifacts/token-stack-cards-20260927/README.md)).
+Each tool's row in the [manifest](token-efficiency-stack.json), rendered by `scripts/build_ecosystem.py`, is its adoption reference; the current lane list is the SubagentStart carrier block ([`token-lanes-block.md`](../adoption/hooks/claude/token-lanes-block.md)). Since the 2026-09-27 edition, rows with a card also carry upstream, adaptation, E2E, performance, invoke-rate and GPT-6 review blocks, each a dated snapshot labelled with its evidence class ([card bundle](../evidence/artifacts/token-stack-cards-20260927/README.md)).
 
 ### Context Mode executor and session store
 
