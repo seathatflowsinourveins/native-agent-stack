@@ -766,6 +766,77 @@ def exec_response(status_line, body):
                       "Original token count: 9", "Output:", body])
 
 
+# PR-A U3, Codex-side measures (items 10a, 10b, 10g, 10e and the Codex normalization; design research-u3.design.md with its
+# review). Record shapes follow openai/codex rust-v0.157.1 (36650394c5b38c2990ccf2a3457165ca3e9d9726): SessionMeta
+# (codex-rs/protocol/src/protocol.rs:3116-3191) and SubAgentSource::ThreadSpawn (:2901-2916), whose agent_role also reads
+# agent_type; a hook's additionalContext as a developer message whose internal_chat_message_metadata_passthrough
+# .content_item_kinds is ["hooks.additional_context"] (core/src/context/hook_additional_context.rs:15-22,
+# context-fragments/src/fragment.rs:35-53, protocol/src/models.rs:958-993; a kind is a transparent string,
+# protocol/src/models/item_metadata.rs:5-7); TurnContextItem (protocol.rs:3293-3350); ThreadSettingsApplied (:1410,
+# :2192-2231); SubAgentActivityItem (protocol/src/items.rs:364-370, kind in snake_case at protocol.rs:4382-4390).
+HOOK_KIND = "hooks.additional_context"
+MARKER = S.DEFAULT_LANES_MARKER
+CATALOG = "<skills_instructions>\n- tdd (file: /home/example/.agents/skills/tdd/SKILL.md)\n</skills_instructions>"
+SPLIT = ("marker", "marker_inherited", "marker_injected", "marker_injected_kinds")
+NO_HOOKS = {"inserted": 0, "with_marker": 0, "inherited": 0, "inherited_with_marker": 0}
+TOKENS = {"type": "token_count", "info": {"last_token_usage": {"input_tokens": 100}}}
+
+
+def pending(commit):
+    """A U3 failing-first test that a later design commit makes pass; that commit removes the marker. unittest reports an
+    unexpected success as a failure, so a marker cannot outlive its fix. The assertions read through .get() so that a
+    missing field fails as an assertion, not as an error that expectedFailure would also absorb."""
+    del commit  # documentation only: the design commit that lifts the marker
+    return unittest.expectedFailure
+
+
+def u3_row(kind, payload, at="2026-10-20T02:00:00Z", ordinal=None):
+    row = {"timestamp": at, "type": kind, "payload": payload}
+    if ordinal is not None:
+        row["ordinal"] = ordinal
+    return row
+
+
+def developer(*texts, kinds=None):
+    """A developer message with one input_text item per text; kinds, when given, is its content_item_kinds metadata."""
+    payload = {"type": "message", "role": "developer",
+               "content": [{"type": "input_text", "text": text} for text in texts]}
+    if kinds is not None:
+        payload["internal_chat_message_metadata_passthrough"] = {"content_item_kinds": kinds}
+    return payload
+
+
+def write_rollouts(root: Path, rollouts: dict) -> Path:
+    """{file name: records} -> rollout files under root, each with an mtime after the lanes window, as
+    materialize_lanes_root sets it, so the scan's skip of files not modified since the window start keeps them."""
+    root.mkdir(parents=True, exist_ok=True)
+    written = S.parse_iso("2026-10-22T00:00:00Z").timestamp()
+    for name, records in rollouts.items():
+        path = root / name
+        path.write_text("".join(json.dumps(record) + "\n" for record in records))
+        os.utime(path, (written, written))
+    return root
+
+
+def published_keys(value):
+    """Every dict key of a published report, recursively."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from published_keys(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from published_keys(item)
+
+
+def assert_id_free_report(case, published, secrets):
+    """No private join key (a key starting with an underscore) and no secret value (a thread id, call id, nickname, agent
+    path, spawn or follow-up message, the fixture root) anywhere in a published report."""
+    case.assertEqual([key for key in published_keys(published) if str(key).startswith("_")], [])
+    text = json.dumps(published)
+    case.assertEqual([secret for secret in secrets if secret in text], [])
+
+
 class CodexLanes(unittest.TestCase):
     def test_measurement_uses_own_outputs_and_differences_cumulative_usage(self):
         def record(kind, payload, ordinal):
@@ -1197,6 +1268,9 @@ class CodexLanes(unittest.TestCase):
         session, _, _ = self.session("subagent")
         self.assertEqual(session["kind"], "subagent")
         self.assertTrue(session["marker"])  # inherited developer context is part of its prompt
+        # PR-A 10a: that marker is inherited (ordinal 2, below the start ordinal 4), never injected by this child.
+        self.assertEqual({key: session.get(key) for key in SPLIT},
+                         {"marker": True, "marker_inherited": True, "marker_injected": False, "marker_injected_kinds": {}})
         self.assertEqual(S.user_config_state(session), "applied")
         self.assertEqual(session["first_prompt_tokens"], 21000)
 
@@ -1567,6 +1641,804 @@ class CodexLanes(unittest.TestCase):
         finally:
             if refused.exists():
                 refused.unlink()
+
+
+def u3_forked_child(*own):
+    """A1: a spawned sub-agent (start ordinal 4) that inherited its parent's hook context at ordinal 2, then its own
+    records (kind, payload, time) from ordinal 4 on."""
+    rows = [u3_row("session_meta", {"id": "child-10a", "source": {"subagent": {"thread_spawn": {
+                "parent_thread_id": "parent-10a", "depth": 1}}}, "history_mode": "paginated",
+                "subagent_history_start_ordinal": 4}, "2026-10-20T02:00:00Z", 0),
+            u3_row("session_meta", {"id": "parent-10a", "source": "exec", "history_mode": "paginated"},
+                   "2026-10-20T02:00:00Z", 1),
+            u3_row("response_item", developer(MARKER + "inherited routing block", kinds=[HOOK_KIND]),
+                   "2026-10-20T02:00:01Z", 2),
+            u3_row("response_item", developer(CATALOG), "2026-10-20T02:00:02Z", 3)]
+    return rows + [u3_row(kind, payload, at, 4 + index) for index, (kind, payload, at) in enumerate(own)]
+
+
+def u3_root(*own):
+    """A root exec session with a catalog, then its own records (kind, payload, time)."""
+    rows = [u3_row("session_meta", {"id": "root-10a", "source": "exec", "history_mode": "paginated"},
+                   "2026-10-20T03:00:00Z", 0),
+            u3_row("response_item", developer(CATALOG), "2026-10-20T03:00:01Z", 1)]
+    return rows + [u3_row(kind, payload, at, 2 + index) for index, (kind, payload, at) in enumerate(own)]
+
+
+OWN_TOKENS = ("event_msg", TOKENS, "2026-10-20T02:00:05Z")
+OWN_HOOK = ("response_item", developer(MARKER + "own hook block", kinds=[HOOK_KIND]), "2026-10-20T02:00:06Z")
+OWN_HOOK_WITHOUT_MARKER = ("response_item", developer("hook text without the block", kinds=[HOOK_KIND]),
+                           "2026-10-20T02:03:00Z")
+OWN_COMMAND = ("event_msg", {"type": "item_completed", "item": {
+    "type": "CommandExecution", "id": "item_1", "command": ["bash", "-lc", "ls"], "source": "unified_exec_startup",
+    "status": "completed", "exit_code": 0}}, "2026-10-20T02:04:00Z")
+ROOT_HOOK = (("response_item", developer(MARKER + "routing block", kinds=[HOOK_KIND]), "2026-10-20T03:00:02Z"),
+             ("event_msg", TOKENS, "2026-10-20T03:00:05Z"))
+GROUP_MARKER_KEYS = ("marker_sessions", "marker_inherited_sessions", "marker_injected_sessions",
+                     "marker_inherited_only_sessions", "marker_injected_by_kind")
+
+
+class CodexMarkerSplit(unittest.TestCase):
+    """PR-A item 10a (design section 1, with the review's kinds and window findings). A developer message is inherited when
+    its record's ordinal is below session_meta.subagent_history_start_ordinal (protocol.rs:3180-3185) and the session's own
+    otherwise. A spawned sub-agent runs SubagentStart and a root SessionStart (core/src/hook_runtime.rs:128-154); both record
+    a hook's additionalContext as a developer fragment of kind hooks.additional_context (hook_runtime.rs:848-872). The legacy
+    `marker` keeps its meaning (the marker in any developer message before until); marker_inherited and marker_injected split
+    it by content item, and marker_injected_kinds counts the injected items by kind. measurement.codex_hook_context counts
+    developer content items of kind hooks.additional_context: own items in the window of their own record, inherited items
+    once, in the window of the child's first own record, so adjacent windows add up. A kinds list that does not align with
+    the content items, or a kind that is not a string, leaves the item's kind unknown: (none) in marker_injected_kinds and
+    no hook context. The kernel's measurement.hook_context stays Claude-attachment-only."""
+
+    def setUp(self):
+        self.manifest = load_fixture_manifest()
+        self.names = fixture_names()
+        self.codex_off = [s["name"] for s in self.manifest["skills"] if s["codex_enabled"] is False]
+        self.codex_on = [s["name"] for s in self.manifest["skills"] if s["codex_enabled"] is True]
+        self.since, self.until = S.parse_iso(LANES_SINCE), S.parse_iso(LANES_UNTIL)
+        self.tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+
+    def rollout(self, records) -> Path:
+        name = "rollout-2026-10-20T02-00-00-u3-marker.jsonl"
+        return write_rollouts(self.tmp / f"case-{len(list(self.tmp.iterdir()))}", {name: records}) / name
+
+    def lanes(self, path, since=None, until=None) -> dict:
+        return S.scan_lanes_file(path, self.names, since=self.since if since is None else since,
+                                 until=self.until if until is None else until, marker=MARKER,
+                                 codex_off=self.codex_off, codex_on=self.codex_on)[0]
+
+    def split_and_hooks(self, records):
+        session = self.lanes(self.rollout(records))
+        return {key: session.get(key) for key in SPLIT}, session.get("measurement", {}).get("codex_hook_context")
+
+    def scan(self, root) -> dict:
+        return S.scan_codex_lanes([root], self.manifest, since=self.since, until=self.until, marker=MARKER)
+
+    def test_an_inherited_hook_marker_is_inherited_not_injected(self):
+        # A1, whose inherited developer message carries content_item_kinds (the review's A1 finding).
+        split, hooks = self.split_and_hooks(u3_forked_child(OWN_TOKENS, OWN_COMMAND))
+        self.assertEqual(split, {"marker": True, "marker_inherited": True, "marker_injected": False,
+                                 "marker_injected_kinds": {}})
+        self.assertEqual(hooks, {"inserted": 0, "with_marker": 0, "inherited": 1, "inherited_with_marker": 1})
+
+    def test_an_own_hook_marker_is_injected_beside_the_inherited_one(self):
+        # A2: the child's own hook context (ordinal 5) carries the marker; a second own hook item has none.
+        split, hooks = self.split_and_hooks(u3_forked_child(OWN_TOKENS, OWN_HOOK, OWN_HOOK_WITHOUT_MARKER, OWN_COMMAND))
+        self.assertEqual(split, {"marker": True, "marker_inherited": True, "marker_injected": True,
+                                 "marker_injected_kinds": {HOOK_KIND: 1}})
+        self.assertEqual(hooks, {"inserted": 2, "with_marker": 1, "inherited": 1, "inherited_with_marker": 1})
+
+    def test_a_root_marker_is_injected(self):
+        split, hooks = self.split_and_hooks(u3_root(*ROOT_HOOK))
+        self.assertEqual(split, {"marker": True, "marker_inherited": False, "marker_injected": True,
+                                 "marker_injected_kinds": {HOOK_KIND: 1}})
+        self.assertEqual(hooks, {"inserted": 1, "with_marker": 1, "inherited": 0, "inherited_with_marker": 0})
+
+    def test_a_fresh_child_without_a_marker_has_neither(self):
+        # fork_turns none gives no start ordinal (spawn.rs:280-282), so nothing is inherited; its own hook item has no marker.
+        split, hooks = self.split_and_hooks([
+            u3_row("session_meta", {"id": "child-none", "source": {"subagent": {"thread_spawn": {
+                "parent_thread_id": "parent-none", "depth": 1}}}, "history_mode": "paginated"}, "2026-10-20T04:00:00Z", 0),
+            u3_row("response_item", developer(CATALOG), "2026-10-20T04:00:01Z", 1),
+            u3_row("response_item", developer("hook text without the block", kinds=[HOOK_KIND]),
+                   "2026-10-20T04:00:02Z", 2),
+            u3_row("event_msg", TOKENS, "2026-10-20T04:00:05Z", 3)])
+        self.assertEqual(split, {"marker": False, "marker_inherited": False, "marker_injected": False,
+                                 "marker_injected_kinds": {}})
+        self.assertEqual(hooks, {"inserted": 1, "with_marker": 0, "inherited": 0, "inherited_with_marker": 0})
+
+    def test_a_marker_outside_developer_messages_changes_nothing(self):
+        # The marker is looked for in developer messages only: a user message and a tool output do not count.
+        split, hooks = self.split_and_hooks(u3_root(
+            ("response_item", {"type": "message", "role": "user",
+                               "content": [{"type": "input_text", "text": MARKER}]}, "2026-10-20T03:00:02Z"),
+            ("response_item", {"type": "function_call", "call_id": "c", "name": "exec_command",
+                               "arguments": json.dumps({"cmd": "cat notes.md"})}, "2026-10-20T03:00:03Z"),
+            ("response_item", {"type": "function_call_output", "call_id": "c", "output": MARKER},
+             "2026-10-20T03:00:04Z"),
+            ("event_msg", TOKENS, "2026-10-20T03:00:05Z")))
+        self.assertEqual(split, {"marker": False, "marker_inherited": False, "marker_injected": False,
+                                 "marker_injected_kinds": {}})
+        self.assertEqual(hooks, NO_HOOKS)
+
+    def test_kinds_that_do_not_align_or_are_not_strings_read_as_none(self):
+        # content_item_kinds is aligned with the item's content entries (models.rs:968-973). A list of another length, a
+        # value that is not a list and a kind that is not a string leave the kind unknown; a kind that is not name-shaped
+        # is counted as (other) and never printed.
+        split, hooks = self.split_and_hooks(u3_root(
+            ("response_item", developer(MARKER + " a", "second item", kinds=[HOOK_KIND]), "2026-10-20T03:00:02Z"),
+            ("response_item", developer(MARKER + " b", kinds=[7]), "2026-10-20T03:00:03Z"),
+            ("response_item", developer(MARKER + " c", kinds=HOOK_KIND), "2026-10-20T03:00:04Z"),
+            ("response_item", developer(MARKER + " d", kinds=["/private/kind-path"]), "2026-10-20T03:00:05Z"),
+            ("response_item", developer("no marker here", MARKER + " e", kinds=["other.kind", HOOK_KIND]),
+             "2026-10-20T03:00:06Z"),
+            ("event_msg", TOKENS, "2026-10-20T03:00:07Z")))
+        self.assertEqual(split, {"marker": True, "marker_inherited": False, "marker_injected": True,
+                                 "marker_injected_kinds": {"(none)": 3, "(other)": 1, HOOK_KIND: 1}})
+        self.assertEqual(hooks, {"inserted": 1, "with_marker": 1, "inherited": 0, "inherited_with_marker": 0})
+        self.assertNotIn("/private/kind-path", json.dumps(split))
+
+    def test_the_retained_fixtures_carry_no_kinds(self):
+        # The review's A1 control: the retained sub-agent inherited its marker from a developer message without
+        # content_item_kinds, so its marker is inherited while no hook context is counted; the worker's own marker is
+        # injected with an unknown kind.
+        root = materialize_lanes_root(self.tmp)
+        subagent = self.lanes(next(root.glob("rollout-*-lanes-subagent.jsonl")))
+        worker = self.lanes(next(root.glob("rollout-*-lanes-worker.jsonl")))
+        self.assertEqual({key: subagent.get(key) for key in SPLIT},
+                         {"marker": True, "marker_inherited": True, "marker_injected": False, "marker_injected_kinds": {}})
+        self.assertEqual(subagent.get("measurement", {}).get("codex_hook_context"), NO_HOOKS)
+        self.assertEqual({key: worker.get(key) for key in SPLIT},
+                         {"marker": True, "marker_inherited": False, "marker_injected": True,
+                          "marker_injected_kinds": {"(none)": 1}})
+        self.assertEqual(worker.get("measurement", {}).get("codex_hook_context"), NO_HOOKS)
+
+    def test_groups_split_the_marker_sessions(self):
+        groups = self.scan(materialize_lanes_root(self.tmp))["groups"]
+        self.assertEqual({key: groups["workers"].get(key) for key in GROUP_MARKER_KEYS},
+                         {"marker_sessions": 2, "marker_inherited_sessions": 1, "marker_injected_sessions": 1,
+                          "marker_inherited_only_sessions": 1, "marker_injected_by_kind": {"(none)": 1}})
+        self.assertEqual({key: groups["negative_controls"].get(key) for key in GROUP_MARKER_KEYS},
+                         {"marker_sessions": 0, "marker_inherited_sessions": 0, "marker_injected_sessions": 0,
+                          "marker_inherited_only_sessions": 0, "marker_injected_by_kind": {}})
+        self.assertEqual(groups["workers"]["measurement"].get("codex_hook_context"), NO_HOOKS)
+
+    def test_a_group_sums_its_actors_hook_context(self):
+        root = write_rollouts(self.tmp / "sum", {
+            "rollout-2026-10-20T02-00-00-u3-child.jsonl": u3_forked_child(
+                OWN_TOKENS, OWN_HOOK, OWN_HOOK_WITHOUT_MARKER, OWN_COMMAND),
+            "rollout-2026-10-20T03-00-00-u3-root.jsonl": u3_root(*ROOT_HOOK)})
+        workers = self.scan(root)["groups"]["workers"]
+        self.assertEqual(workers["sessions"], 2)
+        self.assertEqual({key: workers.get(key) for key in GROUP_MARKER_KEYS},
+                         {"marker_sessions": 2, "marker_inherited_sessions": 1, "marker_injected_sessions": 2,
+                          "marker_inherited_only_sessions": 0, "marker_injected_by_kind": {HOOK_KIND: 2}})
+        self.assertEqual(workers["measurement"].get("codex_hook_context"),
+                         {"inserted": 3, "with_marker": 2, "inherited": 1, "inherited_with_marker": 1})
+
+    def test_hook_context_adds_up_across_adjacent_windows(self):
+        # The review's window finding: own items count in the window of their record and inherited items once, in the
+        # window of the child's first own record (ordinal 4, 02:00:05), so every split adds up to the whole window. A
+        # window that holds only inherited records measures nothing (scan_lanes_file measures a session with a counted
+        # record), which is why inherited items do not follow their own records.
+        records = u3_forked_child(OWN_TOKENS, OWN_HOOK, OWN_HOOK_WITHOUT_MARKER, OWN_COMMAND)
+        path = self.rollout(records)
+
+        def hooks(since, until):
+            session = self.lanes(path, since, until)
+            return collections.Counter(session.get("measurement", {}).get("codex_hook_context") or {})
+        whole = self.lanes(path).get("measurement", {}).get("codex_hook_context")
+        self.assertEqual(whole, {"inserted": 2, "with_marker": 1, "inherited": 1, "inherited_with_marker": 1})
+        times = sorted({S.parse_iso(record["timestamp"]) for record in records})
+        edges = [self.since, *(t for t in times if self.since < t < self.until), self.until]
+        for split in (a + (b - a) / 2 for a, b in zip(edges, edges[1:])):
+            with self.subTest(split=split.isoformat()):
+                self.assertEqual(hooks(self.since, split) + hooks(split, self.until), +collections.Counter(whole))
+
+
+ROLE_CASES = (  # (file stem, session_meta role fields, thread_spawn role fields or None for a root, actors[].role)
+    ("a-root", {}, None, "(root)"),
+    ("b-meta-role", {"agent_role": "stack-researcher"}, {}, "stack-researcher"),
+    ("c-meta-alias", {"agent_type": "stack-researcher"}, {}, "stack-researcher"),
+    ("d-spawn-role", {}, {"agent_role": "stack-researcher"}, "stack-researcher"),
+    ("e-spawn-alias", {}, {"agent_type": "stack-researcher"}, "stack-researcher"),
+    ("f-path", {"agent_role": "/home/example/.codex/agents/researcher.toml"}, {}, "(other)"),
+    ("g-blank", {"agent_role": " \t"}, {}, "(none)"),
+    ("h-trimmed", {"agent_role": " stack-researcher\n"}, {}, "stack-researcher"),
+    ("i-not-white-space", {"agent_role": "\x1cstack-researcher"}, {}, "(other)"),  # U+001C: Python strips, Rust keeps
+    ("j-not-a-string", {"agent_role": 7}, {}, "(none)"),
+    ("k-no-role", {}, {}, "(none)"),
+    ("l-meta-first", {"agent_role": "meta-role"}, {"agent_role": "spawn-role"}, "meta-role"),
+)
+
+
+def role_rollout(stem, meta_fields, spawn_fields):
+    source = "exec" if spawn_fields is None else {"subagent": {"thread_spawn": {
+        "parent_thread_id": "role-parent", "depth": 1, **spawn_fields}}}
+    return [u3_row("session_meta", {"id": f"role-{stem}", "source": source, "history_mode": "paginated", **meta_fields},
+                   "2026-10-20T05:00:00Z", 0),
+            u3_row("response_item", developer(CATALOG), "2026-10-20T05:00:01Z", 1),
+            u3_row("event_msg", TOKENS, "2026-10-20T05:00:05Z", 2)]
+
+
+class CodexRoleGroups(unittest.TestCase):
+    """PR-A item 10b (design section 2). A session's role is session_meta.agent_role, which also deserializes from
+    agent_type (protocol.rs:3153-3155), else source.subagent.thread_spawn.agent_role, also read from agent_type
+    (:2904-2913), from the session's first session_meta (a sub-agent rollout repeats its parent's meta second). As the spawn
+    handler does (core/src/tools/handlers/multi_agents_v2/spawn.rs:126-130), the role is trimmed of Unicode White_Space (Rust
+    str::trim) and an empty one is none; a value that is not a string is none; a role that is not name-shaped is (other). A
+    sub-agent without a role is (none) and every other session (root). actors[].role, sessions_by_role and
+    groups.workers_by_role publish it."""
+
+    def setUp(self):
+        self.manifest = load_fixture_manifest()
+        self.since, self.until = S.parse_iso(LANES_SINCE), S.parse_iso(LANES_UNTIL)
+        self.tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+
+    def scan(self, root) -> dict:
+        return S.scan_codex_lanes([root], self.manifest, since=self.since, until=self.until, marker=MARKER)
+
+    def test_the_role_comes_from_the_meta_then_the_spawn_source(self):
+        # B (a worker: its catalog lists an enabled manifest skill) and its controls.
+        root = write_rollouts(self.tmp / "roles", {
+            f"rollout-2026-10-20T05-00-00-u3-role-{stem}.jsonl": role_rollout(stem, meta, spawn)
+            for stem, meta, spawn, _ in ROLE_CASES})
+        scan = self.scan(root)
+        self.assertEqual([actor.get("role") for actor in scan["actors"]], [role for *_, role in ROLE_CASES])
+        expected = dict(collections.Counter(role for *_, role in ROLE_CASES))
+        self.assertEqual(scan.get("sessions_by_role"), expected)
+        self.assertEqual({role: group["sessions"] for role, group in scan["groups"].get("workers_by_role", {}).items()},
+                         expected)
+        self.assertNotIn("researcher.toml", json.dumps(scan))
+
+    def test_the_retained_fixtures_are_roots_and_one_child_without_a_role(self):
+        scan = self.scan(materialize_lanes_root(self.tmp))
+        self.assertEqual([(actor["kind"], actor.get("role")) for actor in scan["actors"]],
+                         [("exec", "(root)"), ("exec", "(root)"), ("subagent", "(none)"), ("exec", "(root)"),
+                          ("exec", "(root)")])
+        self.assertEqual(scan.get("sessions_by_role"), {"(none)": 1, "(root)": 4})
+        by_role = scan["groups"].get("workers_by_role", {})
+        self.assertEqual({role: group["sessions"] for role, group in by_role.items()}, {"(none)": 1, "(root)": 2})
+        # The role groups partition the workers group.
+        self.assertEqual(sum(group["tool_calls"] for group in by_role.values()), scan["groups"]["workers"]["tool_calls"])
+
+
+class CodexRouteValues(unittest.TestCase):
+    """PR-A item 10g, route values (design section 3, commit 4). provider_usage.attempts[] take configured_model and effort
+    from the turn's TurnContextItem (protocol.rs:3328, :3344-3345). ReasoningEffort at rust-v0.157.1 is none, minimal, low,
+    medium, high, xhigh, max, ultra, persistent or a custom string (protocol/src/openai_models.rs:59-72), so any name-shaped
+    effort is kept; a model keeps at most one provider segment (cx/gpt-6-astra); a path-shaped, '..' or multi-segment value
+    is (other), and a missing or non-string value is null."""
+
+    def routes(self, contexts):
+        rows, total = [], 0
+        for index, context in enumerate(contexts):
+            total += 10
+            rows += [u3_row("turn_context", context, f"2026-10-20T06:{index:02d}:00Z"),
+                     u3_row("event_msg", {"type": "task_started"}, f"2026-10-20T06:{index:02d}:01Z"),
+                     u3_row("event_msg", {"type": "token_count", "info": {
+                         "total_token_usage": dict.fromkeys(S.CODEX_COUNTERS, total)}}, f"2026-10-20T06:{index:02d}:02Z"),
+                     u3_row("event_msg", {"type": "task_complete"}, f"2026-10-20T06:{index:02d}:03Z")]
+        got = S.measure_codex_records(rows, since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL))
+        return [(a.get("configured_model"), a.get("effort")) for a in got["provider_usage"]["attempts"]], got
+
+    def test_configured_model_and_effort_come_from_the_turn_context(self):
+        # Must stay: the delivered per-attempt route had no test (scope.md, item 10g verifier); effort, else reasoning_effort.
+        routes, _ = self.routes([{"model": "gpt-6-astra", "effort": "max"},
+                                 {"model": "gpt-6-astra", "reasoning_effort": "high"},
+                                 {"model": "gpt-6-sol", "effort": "low"}])
+        self.assertEqual(routes, [("gpt-6-astra", "max"), ("gpt-6-astra", "high"), ("gpt-6-sol", "low")])
+
+    @pending("commit 4: route value fixes")
+    def test_route_values_keep_provider_models_and_every_effort(self):
+        # C and its controls.
+        routes, got = self.routes([{"model": "cx/gpt-6-astra", "effort": "ultra"}, {"model": "gpt-6-sol", "effort": "none"},
+                                   {"model": "gpt-6-sol", "effort": "minimal"}, {"model": "/home/example/m", "effort": ""},
+                                   {"model": "a/b/c", "effort": "/x"}, {"model": "cx/../m", "effort": 5},
+                                   {"model": "cx/", "effort": "custom-level"}, {"model": 7, "effort": "max"}])
+        self.assertEqual(routes, [("cx/gpt-6-astra", "ultra"), ("gpt-6-sol", "none"), ("gpt-6-sol", "minimal"),
+                                  ("(other)", None), ("(other)", "(other)"), ("(other)", None),
+                                  ("(other)", "custom-level"), (None, "max")])
+        self.assertNotIn("/home/example", json.dumps(got))
+
+
+SPAWN_ROUTE = ("gpt-6-astra", "max")
+
+
+def spawn_ids(case):
+    """The distinctive private values of one spawn case; none may appear in a published report."""
+    return {"parent": f"thread-parent-PRIV-{case}", "child": f"thread-child-PRIV-{case}", "call": f"call-spawn-PRIV-{case}",
+            "nested": f"call-nested-PRIV-{case}", "followup_call": f"call-followup-PRIV-{case}",
+            "path": f"/root/PRIV_task_{case}", "nick": f"PRIV-Nick-{case}", "message": f"PRIV spawn message {case}",
+            "followup": f"PRIV follow-up message {case}", "turn": f"turn-PRIV-{case}", "other": f"thread-other-PRIV-{case}"}
+
+
+def spawn_case(case, *, args=None, parent_route=SPAWN_ROUTE, child_routes=(SPAWN_ROUTE,), role=None, start=True,
+               parent=True, spawn_call=True, other_parent=False, followups=()):
+    """One parent rollout that spawns one child through a direct spawn_agent function_call (spawn.rs:253-263) and records
+    a SubAgentActivity started item whose id is that call_id (spawn.rs:216-226), then the child's rollout: its meta with the
+    ThreadSpawn source, the parent's records below subagent_history_start_ordinal when it is forked, its own
+    ThreadSettingsApplied (thread_id is its own id) and one turn per child route. followups are followup_task calls whose
+    target is the child's thread id or its task path (multi_agents_spec.rs:217-241)."""
+    ids, hour = spawn_ids(case), int(case[1:])
+
+    def at(minute, second):
+        return f"2026-10-20T{hour:02d}:{minute:02d}:{second:02d}Z"
+    parent_meta = {"id": ids["parent"], "source": "exec", "originator": "codex_exec", "cli_version": "0.157.1",
+                   "history_mode": "paginated"}
+    parent_rows = [("session_meta", parent_meta, at(0, 0)), ("response_item", developer(CATALOG), at(0, 1)),
+                   ("event_msg", {"type": "task_started", "turn_id": ids["turn"]}, at(0, 2)),
+                   ("turn_context", {"turn_id": ids["turn"], "model": parent_route[0], "effort": parent_route[1]},
+                    at(0, 3))]
+    if spawn_call:
+        arguments = {"message": ids["message"], "task_name": ids["path"].rsplit("/", 1)[-1], **(args or {})}
+        parent_rows.append(("response_item", {"type": "function_call", "name": "spawn_agent", "namespace": "collaboration",
+                                              "arguments": json.dumps(arguments), "call_id": ids["call"]}, at(0, 4)))
+    parent_rows.append(("event_msg", {"type": "item_completed", "item": {
+        "type": "SubAgentActivity", "id": ids["call"] if spawn_call else ids["nested"], "kind": "started",
+        "agent_thread_id": ids["child"], "agent_path": ids["path"]}}, at(0, 5)))
+    if spawn_call:
+        parent_rows.append(("response_item", {"type": "function_call_output", "call_id": ids["call"],
+                                              "output": json.dumps({"task_name": ids["path"], "nickname": ids["nick"]})},
+                            at(0, 6)))
+    for index, target in enumerate(followups):
+        key = f"{ids['followup_call']}-{index}"
+        parent_rows += [("response_item", {"type": "function_call", "name": "followup_task", "namespace": "collaboration",
+                                           "arguments": json.dumps({"target": ids["child"] if target == "thread" else ids["path"],
+                                                                    "message": ids["followup"]}),
+                                           "call_id": key}, at(0, 7 + 2 * index)),
+                        ("response_item", {"type": "function_call_output", "call_id": key, "output": "{}"},
+                         at(0, 8 + 2 * index))]
+    parent_rows.append(("event_msg", {"type": "task_complete", "turn_id": ids["turn"]}, at(0, 30)))
+    spawn_role = {"agent_role": role} if role else {}
+    child_meta = {"id": ids["child"], "source": {"subagent": {"thread_spawn": {
+                      "parent_thread_id": ids["other"] if other_parent else ids["parent"], "depth": 1,
+                      "agent_path": ids["path"], "agent_nickname": ids["nick"], **spawn_role}}},
+                  "agent_nickname": ids["nick"], "agent_path": ids["path"], **spawn_role, "originator": "codex_exec",
+                  "cli_version": "0.157.1", "history_mode": "paginated", "multi_agent_version": "v2",
+                  **({"subagent_history_start_ordinal": 3} if start else {})}
+    child_rows = [("session_meta", child_meta, at(1, 0))]
+    if start:  # the parent's history, copied below the start ordinal
+        child_rows.append(("session_meta", parent_meta, at(1, 0)))
+    child_rows.append(("response_item", developer(CATALOG), at(1, 1)))
+    child_rows.append(("event_msg", {"type": "thread_settings_applied", "thread_id": ids["child"], "thread_settings": {
+        "model": child_routes[0][0], "model_provider_id": "openai", "reasoning_effort": child_routes[0][1]}}, at(1, 2)))
+    for index, (model, effort) in enumerate(child_routes):
+        turn = f"{ids['turn']}-child-{index}"
+        child_rows += [("event_msg", {"type": "task_started", "turn_id": turn}, at(2 + index, 0)),
+                       ("turn_context", {"turn_id": turn, "model": model, "effort": effort}, at(2 + index, 1)),
+                       ("event_msg", {"type": "token_count", "info": {"total_token_usage": dict.fromkeys(
+                           S.CODEX_COUNTERS, 10 * (index + 1))}}, at(2 + index, 2)),
+                       ("event_msg", {"type": "task_complete", "turn_id": turn}, at(2 + index, 3))]
+    stem = f"rollout-2026-10-20T{hour:02d}-00-00-u3-spawn-{case}"
+    rollouts = {f"{stem}-child.jsonl": [u3_row(kind, payload, t, i) for i, (kind, payload, t) in enumerate(child_rows)]}
+    if parent:
+        rollouts[f"{stem}-parent.jsonl"] = [u3_row(kind, payload, t, i)
+                                            for i, (kind, payload, t) in enumerate(parent_rows)]
+    return rollouts
+
+
+class CodexSpawnJoin(unittest.TestCase):
+    """PR-A item 10g, spawn metadata and route states (design section 4, commit 5, with the review's fork_turns, route-basis,
+    resume and privacy findings). A sub-agent joins its spawn through its parent's SubAgentActivity started item, whose
+    agent_thread_id is the child's thread id and whose id is the spawn_agent call_id (spawn.rs:216-226; items.rs:364-370).
+    SpawnAgentArgs are {message, task_name, agent_type, model, reasoning_effort, fork_turns, fork_context}; fork_turns is
+    trimmed, absent or empty means all, none and all match ASCII case-insensitively, and otherwise it is a positive integer
+    (spawn.rs:253-299). fork_turns is a string at rust-v0.157.1, so a JSON integer fails the call there and yields no child;
+    the frozen launch matrix writes `fork_turns: 2` (preregistration.json seed-binding-2), so a positive integer reads as
+    last_n as well (the review). The child's route starts from the invoking step, then a spawn value or the [agents] default
+    applies, a model chosen without an effort takes that model's default effort, and a role file overrides both
+    (core/src/agent/child_config.rs:109-121, :196-253, :283-299): expected_route_basis is per field. Reroutes are not persisted
+    in rollouts (rollout/src/policy.rs:141-204). A resumed child is a followup_task whose target is the child's thread id or
+    task path (multi_agents_spec.rs:217-241). Join keys stay in memory; only states are published."""
+
+    CASES = {
+        "c01": {"args": {"fork_turns": "2"}},                                      # C1
+        "c02": {"args": {"fork_turns": 2}},                                        # the launch matrix's integer form
+        "c03": {},                                                                 # C2: no fork_turns, all by default
+        "c04": {"args": {"fork_turns": "none"}, "start": False},                   # C3
+        "c05": {"args": {"fork_turns": "none"}},                                   # C3b: a start ordinal despite none
+        "c06": {"args": {"fork_turns": " NONE "}, "start": False},                 # trimmed, ASCII case-insensitive
+        "c07": {"args": {"fork_turns": "0"}},                                      # invalid: not a positive integer
+        "c08": {"args": {"fork_turns": "resume"}},                                 # invalid: resume is no spawn argument
+        "c09": {"args": {"agent_type": "stack-researcher"}, "role": "stack-researcher"},                      # C4
+        "c10": {"args": {"model": "gpt-6-astra", "reasoning_effort": "high"}, "child_routes": (("gpt-6-astra", "high"),)},
+        "c11": {"args": {"model": "gpt-6-sol"}, "child_routes": (("gpt-6-sol", "medium"),)},  # a model-only override
+        "c12": {"parent_route": ("gpt-6-astra", "medium")},                        # C6
+        "c13": {"parent": False},                                                  # C7
+        "c14": {"spawn_call": False},                                              # C8: a nested code-mode spawn
+        "c15": {"args": {"model": "cx/gpt-6-astra"}, "child_routes": (("cx/gpt-6-sol", "max"),)},            # C9
+        "c16": {"child_routes": (SPAWN_ROUTE, SPAWN_ROUTE)},                       # C10
+        "c17": {"child_routes": (SPAWN_ROUTE, ("gpt-6-astra", "high"))},           # a route change within the child
+        "c18": {"child_routes": (SPAWN_ROUTE, SPAWN_ROUTE), "followups": ("thread", "path")},                 # a resume
+        "c19": {"other_parent": True},                                             # parent_mismatch
+        "c20": {"args": {"agent_type": "stack-researcher"}, "role": "other-role"},  # a role mismatch
+        "c21": {"role": "default"},                                                # a configured default role
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        tmp = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(tmp.cleanup)
+        cls.root = Path(tmp.name) / "spawn"
+        rollouts = {}
+        for case, options in cls.CASES.items():
+            rollouts.update(spawn_case(case, **options))
+        write_rollouts(cls.root, rollouts)
+        cls.since, cls.until = S.parse_iso(LANES_SINCE), S.parse_iso(LANES_UNTIL)
+        cls.scan = S.scan_codex_lanes([cls.root], load_fixture_manifest(), since=cls.since, until=cls.until, marker=MARKER)
+        cls.children = [actor for actor in cls.scan["actors"] if actor["kind"] == "subagent"]
+        cls.by_case = dict(zip(cls.CASES, cls.children))
+        cls.secrets = [str(cls.root)] + [value for case in cls.CASES for value in spawn_ids(case).values()]
+
+    def field(self, case, *path):
+        value = self.by_case[case].get("spawn")
+        for key in path:
+            value = value.get(key) if isinstance(value, dict) else None
+        return value
+
+    def report(self) -> dict:
+        return S.build_lanes_report(self.scan, since=self.since, until=self.until, marker=MARKER, now=S.parse_iso(NOW))
+
+    def test_every_spawn_case_is_an_actor(self):
+        # Must stay: one child per case (in file order) and one parent per case but C7's.
+        self.assertEqual(len(self.children), len(self.CASES))
+        self.assertEqual(sum(actor["kind"] == "exec" for actor in self.scan["actors"]), len(self.CASES) - 1)
+
+    def test_the_id_free_check_catches_a_leak(self):
+        # The review's privacy finding: the check passes on the published report, and fails when the report carries a private
+        # join key or a private value (negative controls), so a leak from the join would be caught.
+        report = self.report()
+        assert_id_free_report(self, report, self.secrets)
+        leaked = json.loads(json.dumps(report))
+        leaked["actors"][0]["_thread_id"] = "x"
+        with self.assertRaises(AssertionError):
+            assert_id_free_report(self, leaked, self.secrets)
+        leaked = json.loads(json.dumps(report))
+        leaked["actors"][0]["spawn_note"] = spawn_ids("c01")["child"]
+        with self.assertRaises(AssertionError):
+            assert_id_free_report(self, leaked, self.secrets)
+
+    @pending("commit 5: spawn join and subagent_spawns")
+    def test_the_join_publishes_states_only(self):
+        self.assertEqual([case for case in self.CASES if not self.field(case)], [])
+        assert_id_free_report(self, self.report(), self.secrets)
+
+    @pending("commit 5: spawn join and subagent_spawns")
+    def test_join_states(self):
+        expected = {**dict.fromkeys(self.CASES, "joined"), "c13": "parent_not_scanned",
+                    "c14": "activity_without_spawn_call", "c19": "parent_mismatch"}
+        self.assertEqual({case: self.field(case, "join") for case in self.CASES}, expected)
+        self.assertEqual({case: self.field(case, "reroute_evidence") for case in self.CASES},
+                         dict.fromkeys(self.CASES, "not_persisted_in_rollout"))
+        self.assertEqual(self.scan.get("subagent_spawns", {}).get("join"),
+                         {"joined": 18, "parent_not_scanned": 1, "activity_without_spawn_call": 1, "parent_mismatch": 1})
+
+    @pending("commit 5: spawn join and subagent_spawns")
+    def test_requested_fork_turns_and_fork_consistency(self):
+        got = {case: (self.field(case, "requested", "fork_turns"), self.field(case, "requested", "fork_n"),
+                      self.field(case, "effective", "history"), self.field(case, "fork_consistent"))
+               for case in ("c01", "c02", "c03", "c04", "c05", "c06", "c07", "c08", "c13")}
+        self.assertEqual(got, {"c01": ("last_n", 2, "forked", True), "c02": ("last_n", 2, "forked", True),
+                               "c03": ("default_all", None, "forked", True), "c04": ("none", None, "fresh", True),
+                               "c05": ("none", None, "forked", False), "c06": ("none", None, "fresh", True),
+                               "c07": ("invalid", None, "forked", None), "c08": ("invalid", None, "forked", None),
+                               "c13": ("unknown", None, "forked", None)})
+
+    @pending("commit 5: spawn join and subagent_spawns")
+    def test_role_state_and_route_basis(self):
+        parent_turn = {"model": "agents_default_or_parent_turn", "effort": "agents_default_or_parent_turn"}
+        role_file = {"model": "role_file", "effort": "role_file"}
+        got = {case: (self.field(case, "requested", "role"), self.field(case, "effective", "role"),
+                      self.field(case, "role_state"), self.field(case, "expected_route_basis"))
+               for case in ("c01", "c09", "c10", "c11", "c20", "c21")}
+        self.assertEqual(got, {
+            "c01": (None, "(none)", "not_requested", parent_turn),
+            "c09": ("stack-researcher", "stack-researcher", "match", role_file),
+            "c10": (None, "(none)", "not_requested", {"model": "spawn_request", "effort": "spawn_request"}),
+            "c11": (None, "(none)", "not_requested", {"model": "spawn_request", "effort": "model_default"}),
+            "c20": ("stack-researcher", "other-role", "mismatch", role_file),
+            "c21": (None, "default", "not_requested", role_file)})
+        self.assertEqual((self.field("c13", "requested", "role"), self.field("c13", "role_state")), ("unknown", "unknown"))
+
+    @pending("commit 5: spawn join and subagent_spawns")
+    def test_route_versus_request_and_parent_turn(self):
+        def states(model, effort):
+            return {"model": model, "effort": effort}
+        got = {case: (self.field(case, "requested", "model"), self.field(case, "requested", "effort"),
+                      self.field(case, "route_vs_request"), self.field(case, "route_vs_parent_turn"))
+               for case in ("c01", "c10", "c11", "c12", "c13", "c15")}
+        self.assertEqual(got, {
+            "c01": (None, None, states("not_requested", "not_requested"), states("match", "match")),
+            "c10": ("gpt-6-astra", "high", states("match", "match"), states("match", "mismatch")),
+            "c11": ("gpt-6-sol", None, states("match", "not_requested"), states("mismatch", "mismatch")),
+            "c12": (None, None, states("not_requested", "not_requested"), states("match", "mismatch")),
+            "c13": ("unknown", "unknown", states("unknown", "unknown"), states("unknown", "unknown")),
+            # C9: raw values differ (safe_key would have read both as (other) and matched them).
+            "c15": ("cx/gpt-6-astra", None, states("mismatch", "not_requested"), states("mismatch", "match"))})
+
+    @pending("commit 5: spawn join and subagent_spawns")
+    def test_effective_route_turns_and_followups(self):
+        self.assertEqual(self.field("c01", "effective"),
+                         {"role": "(none)", "history": "forked", "turns": 1, "models": ["gpt-6-astra"], "efforts": ["max"],
+                          "settings": {"model": "gpt-6-astra", "effort": "max"}})
+        self.assertEqual((self.field("c01", "route_changes_within_child"), self.field("c01", "followups")), (False, 0))
+        self.assertEqual(self.field("c15", "effective", "models"), ["cx/gpt-6-sol"])
+        got = {case: (self.field(case, "effective", "turns"), self.field(case, "route_changes_within_child"),
+                      sorted(self.field(case, "effective", "efforts") or []), self.field(case, "followups"))
+               for case in ("c16", "c17", "c18")}
+        self.assertEqual(got, {"c16": (2, False, ["max"], 0), "c17": (2, True, ["high", "max"], 0),
+                               "c18": (2, False, ["max"], 2)})
+
+
+PAGINATED_META = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "paginated"})
+LEGACY_META = u3_row("session_meta", {"id": "u3-session", "source": "exec"})  # legacy by default (protocol.rs:772-779)
+EXPLICIT_LEGACY_META = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "legacy"})
+EXEC_FETCH_JS = "const r = await tools.exec_command({cmd: 'curl https://example.org'}); text(r.output)"
+
+
+def sourced_command(key, argv, source, output="ok"):
+    """A CommandExecution item with its ExecCommandSource (protocol.rs:3534-3544)."""
+    return codex_row("event_msg", {"type": "item_completed", "item": {
+        "type": "CommandExecution", "id": key, "command": argv, "source": source, "status": "completed", "exit_code": 0,
+        "aggregated_output": output}})
+
+
+def exec_call(key, code):
+    return codex_row("response_item", {"type": "custom_tool_call", "call_id": key, "name": "exec", "input": code})
+
+
+def exec_output(key, output="done"):
+    return codex_row("response_item", {"type": "custom_tool_call_output", "call_id": key, "output": output})
+
+
+def shell_function_call(key, arguments, output):
+    return [codex_row("response_item", {"type": "function_call", "call_id": key, "name": "exec_command",
+                                        "arguments": json.dumps(arguments)}),
+            codex_row("response_item", {"type": "function_call_output", "call_id": key, "output": output})]
+
+
+def u3_measure(*rows):
+    return S.measure_codex_records(list(rows), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL))
+
+
+class CodexCommandNormalization(unittest.TestCase):
+    """The Codex normalization for U1's commandInvocations (design section 6, commit 6, with the review's shell_script
+    finding: shell_script keeps returning the text and use() gets a separate resolver). exec_command takes cmd and an
+    optional shell (core/src/tools/handlers/shell_spec.rs:15-110): a shell that is not a POSIX shell leaves the command
+    unresolved, counted in codex_commands.non_posix_shell, with no lane and M4 incomplete (the review: its fetches cannot be
+    seen). A CommandExecution's source is agent, user_shell, unified_exec_startup or unified_exec_interaction
+    (protocol.rs:3534-3544). A user_shell command is the user's own (core/src/tasks/user_shell.rs:199) and its output is
+    recorded as a conversation item, not a tool result (:453-480), so it is no model call (codex_commands.user_shell); an
+    interaction item is not an invocation (codex_commands.exec_interactions; no core code sets that source at
+    rust-v0.157.1, so this is conservative). The legacy lane counters keep counting every CommandExecution."""
+
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    @pending("commit 6: normalization")
+    def test_non_posix_shells_are_unresolved(self):
+        got = u3_measure(PAGINATED_META,
+                         *shell_function_call("call_priv_n1", {"cmd": "qmd search x", "shell": "/usr/bin/pwsh"},
+                                              exec_response("Process exited with code 0", "ok")),
+                         sourced_command("item_n2", ["pwsh", "-Command", "qmd search x"], "unified_exec_startup"),
+                         sourced_command("item_n3", ["cmd.exe", "/c", "qmd search x"], "unified_exec_startup"))
+        self.assertEqual(got["cli_lanes"].get("lanes"), {})
+        self.assertEqual(got.get("codex_commands", {}).get("non_posix_shell"), 3)
+        self.assertEqual(got["m4"]["status"], "incomplete")
+
+    @pending("commit 6: normalization")
+    def test_user_shell_commands_are_not_model_calls(self):
+        # E3.
+        got = u3_measure(PAGINATED_META,
+                         sourced_command("item_u1", ["bash", "-lc", "curl https://example.org"], "user_shell"))
+        self.assertEqual((got["m4"]["remote_fetches"], got["m3"]["results"], got["sandbox_operations"]), (0, 0, 0))
+        self.assertEqual(got.get("codex_commands", {}).get("user_shell"), 1)
+
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    @pending("commit 6: normalization")
+    def test_exec_interactions_are_not_invocations(self):
+        got = u3_measure(PAGINATED_META,
+                         sourced_command("item_i1", ["bash", "-lc", "qmd search x"], "unified_exec_interaction"))
+        self.assertEqual(got["cli_lanes"].get("lanes"), {})
+        self.assertEqual(got.get("codex_commands", {}).get("exec_interactions"), 1)
+
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    def test_posix_shells_and_argv_arrays_keep_their_lanes(self):
+        # Must stay: a POSIX shell argument changes nothing, and E1 (an mcporter argv array) already reads as one command
+        # after U1's per-element quoting (pivot D6), so its downstream is (stdio).
+        for shell in ("/bin/zsh", "bash"):
+            with self.subTest(shell=shell):
+                got = u3_measure(PAGINATED_META, *shell_function_call(
+                    "call_priv_z1", {"cmd": "qmd search x", "shell": shell}, exec_response("Process exited with code 0", "ok")))
+                self.assertEqual(got["cli_lanes"]["lanes"].get("qmd", {}).get("calls"), 1)
+        argv = ["mcporter", "call", "npx -y chrome-devtools-mcp@latest", "list_pages"]
+        self.assertEqual(S.shell_script(argv), "mcporter call 'npx -y chrome-devtools-mcp@latest' list_pages")
+        got = u3_measure(PAGINATED_META, *code_mode_command("call_priv_e1", argv, "completed", 0, "[]"))
+        self.assertEqual(got["cli_lanes"]["mcporter_downstream"].get("(stdio)", {}).get("calls"), 1)
+
+    def test_a_python_c_body_is_a_possible_fetch_not_a_command(self):
+        # Must stay: E4 at the rebased parent fe9f511b (the review asked for its unconfirmed count and status). The quoted
+        # body is interpreter code, so a `curl = 2` line is no command, only a raw possible fetch.
+        got = u3_measure(PAGINATED_META,
+                         codex_row("response_item", {"type": "local_shell_call", "call_id": "call_priv_e4", "status": "completed",
+                                                     "action": {"type": "exec",
+                                                                "command": ["python3", "-c", "import os\ncurl = 2\nprint(curl)"]}}),
+                         codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_e4", "output": "2"}))
+        self.assertEqual({key: got["m4"][key] for key in ("remote_fetches", "unclassifiable", "fetch_mentions_unconfirmed", "status")},
+                         {"remote_fetches": 0, "unclassifiable": 0, "fetch_mentions_unconfirmed": 1, "status": "incomplete"})
+
+    def test_legacy_lane_counters_keep_every_command_execution(self):
+        # Must stay (the review's shell_script finding): the legacy shell, rtk-prefix and fetch counters are historical
+        # comparison fields, so user_shell, interaction and non-POSIX commands keep counting there.
+        manifest = load_fixture_manifest()
+        root = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            "rollout-2026-10-20T02-00-00-u3-legacy-lanes.jsonl": [
+                PAGINATED_META, codex_row("response_item", developer(CATALOG)),
+                sourced_command("item_l1", ["bash", "-lc", "curl https://example.org"], "user_shell"),
+                sourced_command("item_l2", ["bash", "-lc", "rtk ls"], "unified_exec_interaction"),
+                sourced_command("item_l3", ["pwsh", "-Command", "qmd search x"], "unified_exec_startup")]})
+        session = S.scan_lanes_file(next(root.glob("rollout-*.jsonl")), fixture_names(), since=S.parse_iso(LANES_SINCE),
+                                    until=S.parse_iso(LANES_UNTIL), marker=MARKER,
+                                    codex_off=[s["name"] for s in manifest["skills"] if s["codex_enabled"] is False],
+                                    codex_on=[s["name"] for s in manifest["skills"] if s["codex_enabled"] is True])[0]
+        self.assertEqual((session["shell_calls"], session["rtk_prefixed"], session["fetch"]["shell_curl_wget"]), (3, 1, 1))
+
+
+class CodexCodeModeAttribution(unittest.TestCase):
+    """PR-A item 10e (design section 7, commits 7 and 8, with the review's position, per-exec, item-kind and outer-JS
+    findings). Code mode runs raw JavaScript in a V8 isolate with "no Node, no file system, no network access, no console"
+    (code-mode-protocol/src/description.rs:19-24) whose only globals are tools, ALL_TOOLS, clearTimeout, setTimeout, text,
+    image, audio, generatedImage, store, load, notify, yield_control and exit (code-mode-runtime/src/runtime/globals.rs:36-48),
+    so a network operation is a nested tool call and the outer JavaScript is never scanned for fetches. A cell can outlive
+    its exec return through the code-mode `wait` tool (code-mode-protocol/src/lib.rs:51-52; the multi-agent wait is
+    wait_agent, core/src/tools/handlers/multi_agents_v2/wait.rs:23-24). Commit 7: an emitted item (CommandExecution,
+    McpToolCall or a web.search Extension) whose id is no model call id is nested when it follows an exec call of the same
+    turn; otherwise it is direct and counted in code_mode.unattributed_items; a `wait` call without a namespace after an exec
+    is code mode. Commit 8: a paginated rollout persists every ItemCompleted and a legacy one none of these items
+    (rollout/src/policy.rs:94-112), and a meta without history_mode is legacy (protocol.rs:772-779); a legacy exec with a
+    static fetch-capable site (tools.exec_command, tools.web__run, tools.mcp__*__ctx_execute, ctx_execute_file,
+    ctx_batch_execute or ctx_fetch_and_index) and no item of its own (after it and before the next exec call or turn
+    boundary) is an unobservable span that makes M4 incomplete."""
+
+    def retained_rows(self, stem):
+        root = materialize_lanes_root(Path(self.enterContext(tempfile.TemporaryDirectory())))
+        rows = []
+        for line in next(root.glob(f"rollout-*-lanes-{stem}.jsonl")).read_text().splitlines():
+            try:
+                rows.append(json.loads(line))
+            except ValueError:
+                pass  # the worker fixture includes one malformed row
+        return rows
+
+    @pending("commit 7: nested attribution and the wait carrier")
+    def test_items_after_the_exec_return_and_wait_outputs_are_code_mode(self):
+        # D: a nested curl that completes after the exec returned, and a code-mode wait with its output.
+        got = u3_measure(PAGINATED_META, exec_call("call_priv_x", EXEC_FETCH_JS), exec_output("call_priv_x", "started"),
+                         sourced_command("item_y", ["bash", "-lc", "curl https://example.org"], "unified_exec_startup",
+                                         "z" * 6000),
+                         codex_row("response_item", {"type": "function_call", "call_id": "call_priv_w", "name": "wait",
+                                                     "arguments": json.dumps({"cell_id": "1"})}),
+                         codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_w",
+                                                     "output": "w" * 100}))
+        self.assertEqual({key: got["m4"][key] for key in ("shell_fetch", "ctx_sandbox_fetch")},
+                         {"shell_fetch": 0, "ctx_sandbox_fetch": 1})
+        self.assertEqual((got["m3"]["results"], got["m3"]["large_results"]), (2, 0))
+        self.assertEqual({carrier: sizes["results"] for carrier, sizes in got["by_carrier"].items()}, {"code_mode": 2})
+        self.assertEqual(got["sandbox_operations"], 1)
+        self.assertEqual({key: got.get("code_mode", {}).get(key)
+                          for key in ("exec_calls", "wait_calls", "nested_items", "unattributed_items")},
+                         {"exec_calls": 1, "wait_calls": 1, "nested_items": 1, "unattributed_items": 0})
+
+    @pending("commit 7: nested attribution and the wait carrier")
+    def test_nesting_is_bounded_by_the_exec_position_and_the_turn(self):
+        # The review's position finding: an item before the turn's first exec, or in a later turn without one, is direct.
+        got = u3_measure(PAGINATED_META, codex_row("event_msg", {"type": "task_started"}),
+                         sourced_command("item_before", ["bash", "-lc", "curl https://example.org/a"], "unified_exec_startup"),
+                         exec_call("call_priv_x", EXEC_FETCH_JS), exec_output("call_priv_x"),
+                         sourced_command("item_after", ["bash", "-lc", "curl https://example.org/b"], "unified_exec_startup"),
+                         codex_row("event_msg", {"type": "task_complete"}), codex_row("event_msg", {"type": "task_started"}),
+                         sourced_command("item_next", ["bash", "-lc", "curl https://example.org/c"], "unified_exec_startup"),
+                         codex_row("event_msg", {"type": "task_complete"}))
+        self.assertEqual(got["sandbox_operations"], 1)
+        self.assertEqual({key: got["m4"][key] for key in ("shell_fetch", "ctx_sandbox_fetch")},
+                         {"shell_fetch": 2, "ctx_sandbox_fetch": 1})
+        self.assertEqual({key: got.get("code_mode", {}).get(key) for key in ("nested_items", "unattributed_items")},
+                         {"nested_items": 1, "unattributed_items": 2})
+
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    @pending("commit 7: nested attribution and the wait carrier")
+    def test_a_nested_rtk_proxy_after_the_exec_return_counts_as_nested(self):
+        # U1's nested counters move with the attribution (the design's list of changed meanings).
+        got = u3_measure(PAGINATED_META, exec_call("call_priv_x", "await tools.exec_command({cmd: 'rtk proxy pytest -q'})"),
+                         exec_output("call_priv_x"),
+                         sourced_command("item_p", ["bash", "-lc", "rtk proxy pytest -q"], "unified_exec_startup", "4 passed"))
+        self.assertEqual(got["proxy"]["nested"], 1)
+        self.assertEqual(got["cli_lanes"]["lanes"].get("rtk_proxy", {}).get("by_carrier", {}).get("nested"), 1)
+
+    def test_model_calls_after_an_exec_stay_direct(self):
+        # Must stay: the model-call-id test comes first (the review), so a direct exec_command after an exec is direct.
+        got = u3_measure(PAGINATED_META, exec_call("call_priv_x", EXEC_FETCH_JS),
+                         codex_row("response_item", {"type": "function_call", "call_id": "call_priv_z", "name": "exec_command",
+                                                     "arguments": json.dumps({"cmd": "curl https://example.org"})}),
+                         sourced_command("call_priv_z", ["bash", "-lc", "curl https://example.org"], "unified_exec_startup"),
+                         codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_z",
+                                                     "output": exec_response("Process exited with code 0", "ok")}))
+        self.assertEqual((got["sandbox_operations"], got["m4"]["shell_fetch"]), (0, 1))
+
+    def test_a_wait_without_an_exec_and_wait_agent_are_not_code_mode(self):
+        # Must stay: only a code-mode wait after an exec continues a cell; wait_agent is the multi-agent wait.
+        def wait(name, **extra):
+            return [codex_row("response_item", {"type": "function_call", "call_id": "call_priv_" + name, "name": name,
+                                                "arguments": "{}", **extra}),
+                    codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_" + name,
+                                                "output": "w" * 50})]
+        got = u3_measure(PAGINATED_META, *wait("wait"))
+        self.assertEqual({carrier: sizes["results"] for carrier, sizes in got["by_carrier"].items()}, {"other": 1})
+        got = u3_measure(PAGINATED_META, exec_call("call_priv_x", "text('hi')"), exec_output("call_priv_x"),
+                         *wait("wait_agent", namespace="collaboration"))
+        self.assertEqual({carrier: sizes["results"] for carrier, sizes in got["by_carrier"].items()},
+                         {"code_mode": 1, "other": 1})
+
+    def test_the_outer_exec_code_is_never_scanned(self):
+        # Must stay (F2): a fetch() in the outer JavaScript cannot reach the network in the pinned isolate (above), so it is
+        # neither a fetch nor a possible fetch, in either history mode; this rebuts the review's outer-JS finding.
+        for meta in (PAGINATED_META, LEGACY_META):
+            with self.subTest(history_mode=meta["payload"].get("history_mode", "(none)")):
+                got = u3_measure(meta, exec_call("call_priv_f2", "const r = await fetch('https://example.org/api'); "
+                                                 "text(await r.text())"), exec_output("call_priv_f2"))
+                self.assertEqual({key: got["m4"][key]
+                                  for key in ("remote_fetches", "unclassifiable", "fetch_mentions_unconfirmed", "status")},
+                                 {"remote_fetches": 0, "unclassifiable": 0, "fetch_mentions_unconfirmed": 0,
+                                  "status": "not_applicable"})
+
+    def test_the_retained_isolated_fixture_keeps_its_direct_items(self):
+        # Must stay (the review's position finding): its three items come before its exec, so they stay direct.
+        got = S.measure_codex_records(self.retained_rows("isolated"), since=S.parse_iso(LANES_SINCE),
+                                      until=S.parse_iso(LANES_UNTIL))
+        self.assertEqual((got["sandbox_operations"], got["calls_without_result"]), (0, 4))
+
+    @pending("commit 8: legacy-mode spans")
+    def test_a_legacy_exec_with_fetch_sites_and_no_items_is_unobservable(self):
+        # F1 and its controls.
+        four_sites = ("await tools.exec_command({cmd: 'a'}); await tools.exec_command({cmd: 'b'}); "
+                      "await tools.mcp__context_mode__ctx_execute({language: 'shell', code: 'c'}); await tools.web__run({})")
+        cases = {"no history_mode": (LEGACY_META, EXEC_FETCH_JS, (1, 1), "incomplete"),
+                 "history_mode legacy": (EXPLICIT_LEGACY_META, EXEC_FETCH_JS, (1, 1), "incomplete"),
+                 "four sites": (LEGACY_META, four_sites, (1, 4), "incomplete"),
+                 "paginated": (PAGINATED_META, EXEC_FETCH_JS, (0, 0), "not_applicable"),
+                 "no fetch-capable site": (LEGACY_META, "text('hello')", (0, 0), "not_applicable")}
+        for name, (meta, code, spans, status) in cases.items():
+            with self.subTest(case=name):
+                got = u3_measure(meta, exec_call("call_priv_f", code), exec_output("call_priv_f"))
+                code_mode = got.get("code_mode", {})
+                self.assertEqual((code_mode.get("legacy_unobservable_exec_calls"), code_mode.get("legacy_unobservable_sites")),
+                                 spans)
+                self.assertEqual((got["m4"]["status"], got["m4"]["remote_fetches"], got["m4"]["fetch_mentions_unconfirmed"]),
+                                 (status, 0, 0))
+        # A legacy exec with a persisted item of its own is observable.
+        got = u3_measure(LEGACY_META, exec_call("call_priv_g", EXEC_FETCH_JS),
+                         sourced_command("item_g", ["bash", "-lc", "curl https://example.org"], "unified_exec_startup"),
+                         exec_output("call_priv_g"))
+        self.assertEqual((got.get("code_mode", {}).get("legacy_unobservable_exec_calls"), got["m4"]["status"]), (0, "measured"))
+
+    @pending("commit 8: legacy-mode spans")
+    def test_legacy_spans_make_the_actor_and_group_incomplete(self):
+        # The retained isolated fixture is legacy (no history_mode) and its exec, with a tools.exec_command site, has no item
+        # of its own; the retained worker's exec has twelve. The kernel's aggregate recomputes M4 status from counts, so the
+        # group's status is forced as well.
+        isolated = S.measure_codex_records(self.retained_rows("isolated"), since=S.parse_iso(LANES_SINCE),
+                                           until=S.parse_iso(LANES_UNTIL))
+        worker = S.measure_codex_records(self.retained_rows("worker"), since=S.parse_iso(LANES_SINCE),
+                                         until=S.parse_iso(LANES_UNTIL))
+        self.assertEqual((isolated.get("code_mode", {}).get("legacy_unobservable_exec_calls"),
+                          isolated.get("code_mode", {}).get("legacy_unobservable_sites"), isolated["m4"]["status"]),
+                         (1, 1, "incomplete"))
+        self.assertEqual(worker.get("code_mode", {}).get("legacy_unobservable_exec_calls"), 0)
+        scan = S.scan_codex_lanes([materialize_lanes_root(Path(self.enterContext(tempfile.TemporaryDirectory())))],
+                                  load_fixture_manifest(), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL),
+                                  marker=MARKER)
+        controls = scan["groups"]["negative_controls"]["measurement"]
+        self.assertEqual((controls["m4"]["status"], controls.get("code_mode", {}).get("legacy_unobservable_exec_calls")),
+                         ("incomplete", 1))
 
 
 if __name__ == "__main__":
