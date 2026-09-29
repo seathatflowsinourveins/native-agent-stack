@@ -107,14 +107,23 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   `[agents.<name>]` table and neither `config.toml` nor the `stack-worker` profile changes; a test checks the repository templates for role
   tables, and [`config.agents.toml.example`](config.agents.toml.example) still registers only the two older roles. Do not copy these two into
   a project `.codex/agents/`: a project copy would load in every trusted session of that checkout, not only in the E2E's. On a host the files
-  live at `$CODEX_HOME/agents/<name>.toml`, mode 0600 in a 0700 directory, placed by the role step of
-  [`tools/adoption/apply_codex_lane.py`](../../tools/adoption/apply_codex_lane.py) that ships with these files.
-- **Effect and limits.** Where a Codex home holds them, the `spawn_agent` tool of a session that loads that home's user configuration lists
-  both roles and accepts `agent_type`, whichever profile it runs
-  ([`spec_plan.rs:1271`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/spec_plan.rs#L1271): exposed when user
-  roles exist). A role file cannot set the sandbox, an MCP allowlist, tools or web search (`role.rs:36-48`, as in the 2026-09-27 correction
-  above), so read-only access is a prompt rule that only the parent's `-s read-only` enforces, and the verifier's no-web rule is a prompt rule
-  too. The child starts from a clone of the parent's configuration, as above.
+  belong at `$CODEX_HOME/agents/<name>.toml`, mode 0600 in a 0700 directory.
+- **Registration modes considered.** A per-launch `-c agents.<role>.config_file=<absolute path>` also works by source reading:
+  `load_agent_roles` reads `[agents.<name>]` tables from every enabled layer, session flags included, and a declared `config_file` must be an
+  absolute path ([`loader.rs:35-73,192-206`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs#L35-L206);
+  the session-flags layer has no config folder,
+  [`state.rs:218-231`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/state.rs#L218-L231)). It is not used: the
+  E2E's sub-agent launches would then differ from the RUNBOOK's launch command, and the roles would exist only for the proof, not as installed
+  practice. A project `.codex/agents/` copy is not used either (above). Neither alternative was run in a session.
+- **Effect and limits.** The user layer's config folder is `$CODEX_HOME`, so a session that loads that home's user configuration discovers the
+  two roles, with or without `-p stack-worker`, and its `spawn_agent` tool then lists both and accepts `agent_type`
+  ([`spec_plan.rs:1271`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/spec_plan.rs#L1271): `expose_agent_type`
+  when the configured roles are not empty). Read from source, `--ignore-user-config` still keeps that layer's file and therefore its folder
+  ([`loader/mod.rs:503-519`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs#L503-L519)), so a session
+  started that way is predicted to discover the roles too; that prediction has not been run. A role file cannot set the sandbox, an MCP
+  allowlist, tools or web search (`role.rs:36-48`, as in the 2026-09-27 correction above), so read-only access is a prompt rule that only the
+  parent's `-s read-only` enforces, and the verifier's no-web rule is a prompt rule too. The child starts from a clone of the parent's
+  configuration, as above.
 - **Evidence class.** Structural validation only: the stem set, byte-identical mirrors, the digests below, the closed key set, the pins
   against the frozen Codex tasks, description lane-neutrality, the F4 block, the kept sentences, the Claude-only names and a mutation control
   for every rule. No Codex session has spawned either role, and nothing here measures a token saving.

@@ -8,7 +8,8 @@ The two stack role carriers (`stack-researcher` and `stack-verifier`, 2026-09-29
 and structure only. Each rule id in RULES names its source; the tests never start a Codex session.
 The denylist and name scans are linear character scanners (no backtracking regular expressions), and
 a control compares them with the frozen tool_name_pattern of tests/test_token_e2e_preregistration.py.
-Every test asserts that its inputs exist first, so a missing file fails by assertion, not by error.
+A test that reads a role file or the README asserts first that the file exists, so a missing file fails by
+assertion, not by error.
 """
 
 import functools
@@ -304,7 +305,7 @@ RULES = (
      "the discovered file and its role cannot disagree",
      _rule_name_stem),
     ("builtin_name", STACK_ROLES,
-     "role.rs:33 and :337-372 (built_in::configs: default, explorer, worker); a user role of that name shadows a "
+     "role.rs:33 and :337-380 (built_in::configs: default, explorer, worker); a user role of that name shadows a "
      "built-in",
      _rule_builtin_name),
     ("description_shape", STACK_ROLES,
