@@ -13637,8 +13637,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1091fc250065d7756a0a27174ee44d2884ea56cbfb79a7bafdcab0d180f8f8aa",
-      "bytes": 25179
+      "sha256": "69df9b7a431a119ec95e94ff20d8703d7795dd6eca496238fcdbc884e47d81d5",
+      "bytes": 25269
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -36437,8 +36437,8 @@
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
-      "sha256": "598a2a4598c9bef43fbc08ad59c505d552fb8fbf2048075a8c9adcc0d1428b5b",
-      "bytes": 10827
+      "sha256": "a7523d02e8e6269f7135eaa7aab9f8858926f8f61f1c1922cb695da17a8de969",
+      "bytes": 12139
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/control-no-allowance.json",
@@ -42037,8 +42037,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "adf89cd8d0846c273164201f06bb7a6ea4b80b6bea6158048a060b28eb559246",
-      "bytes": 25989
+      "sha256": "1f062021ef0cc8f406ea1d24bbcdc97cee72f6c39c2b13c02fdf5cf4f25a2681",
+      "bytes": 26923
     },
     {
       "path": "scripts/trading_gates.py",
@@ -42627,8 +42627,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "4b11b20693ec7f2d4ee03ffe76dff4a1418df1fcd52b41890fda41899054e5df",
-      "bytes": 76944
+      "sha256": "627ccc696915e05e616cc910e33be665e99233ab9a2ac5e54a43940e711040ed",
+      "bytes": 85459
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -42967,8 +42967,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "8fae4657d770bdf6788025d3c8078372209d329e7791c57ce31409c12cb86585",
-      "bytes": 39455
+      "sha256": "4de0a51c1f2f37cc35ffb4067bb42ecad5dd3be2d355b4e89b14cc5f14f350f3",
+      "bytes": 41135
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -43102,8 +43102,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "aa6827ec0b7c16d8539ed204f7e47fe70371d7eb4ae675e30054575a769069d5",
-      "bytes": 36401
+      "sha256": "4a4e7302e75624b73a4798baf82347ddbdf11e22362a76e5a4078c579647eaf7",
+      "bytes": 37615
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
