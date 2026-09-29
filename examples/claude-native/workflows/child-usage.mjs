@@ -2149,15 +2149,18 @@ const finishFetches = (f, carriers = null) => {
 // inside their part. The text is read unit by unit with U1's frame machine (step() above: quotes, escapes, comments, $(( )) and (( )),
 // "$( )" and backquote frames, and bash(1) DEFINITIONS' rule that the & of >& <& &> and the | of >| are redirections), with a ( or a
 // backquote at the top level opening a frame of its own. A here-document is data (bash(1) Here Documents; POSIX.1-2024 XCU 2.7.4): its body
-// begins after the first newline that no quote holds and ends at the line that equals its delimiter (after leading tabs for <<-), or at the
-// end of the text, which bash reads as the delimiter; its delimiter is any word, quotes removed (heredocWord, U1's reading of the operator's
-// word). A top-level body lies between two parts and belongs to neither part's text; a body inside a part (in a "$( )", say) stays in its
-// text. Each part also has a syntax view in which quoted and escaped characters, comments, arithmetic and here-document bodies are the data
+// begins after the first newline that no quote holds at the frame depth of its operator or shallower, and ends at the line that equals its
+// delimiter (after leading tabs for <<-), or at the end of the text, which bash reads as the delimiter; its delimiter is any word, quotes
+// removed (heredocWord, U1's reading of the operator's word). A top-level body lies between two parts and belongs to neither part's text; a
+// body inside a part (in a "$( )", say) stays in its text. Each part also has a syntax view in which quoted and escaped characters, comments, arithmetic and here-document bodies are the data
 // character _, so a > there is no redirection. null when the text cannot be read so (an open quote, frame or group, a ) or } that closes
 // nothing, a << with no word): M-R1 then counts the call as unknown. rtk v0.50.0 rewrites no command that holds a here-document or $((
 // (src/discover/registry.rs rewrite_command_precompiled, tag commit 1d87b8e7), so the eligible parts of such a call are observed uncovered.
 const QUOTE_FRAMES = new Set(["'", '"', '`'])
 const HEREDOC_WORD_END = new Set([...' \t\n;&|()<>'])
+// At most this many here-documents wait for their bodies at once (a command with more is unknown), so each newline checks a bounded list
+// and the scan stays linear; real commands hold a few.
+const HEREDOC_PENDING_LIMIT = 64, NO_HEREDOCS = []
 // The here-document operator << or <<- at s[i] with its word: { end, delimiter, strip }, or null when no word follows (a syntax error).
 function heredocOperator(s, i) {
   let j = i + 2
@@ -2200,9 +2203,12 @@ export function shellParts(command) {
   for (let i = 0; i < s.length;) {
     const top = stack[stack.length - 1], ch = s[i]
     if (!QUOTE_FRAMES.has(top)) {
-      if (ch === '\n' && heredocs.length) {
-        const after = heredocs.reduce((at, h) => heredocEnd(s, at, h), i + 1)
-        heredocs.length = 0
+      // The bodies this newline begins: those of the operators read at its frame depth or deeper (a "$( )" reads its own here-documents at
+      // its own newlines, and one it leaves open is read after the enclosing line; GNU bash 5.2.21 and dash, 2026-09-29).
+      const ready = ch === '\n' && heredocs.length ? heredocs.filter((h) => h.depth >= stack.length) : NO_HEREDOCS
+      if (ready.length) {
+        const after = ready.reduce((at, h) => heredocEnd(s, at, h), i + 1)
+        heredocs.splice(0, heredocs.length, ...heredocs.filter((h) => h.depth < stack.length))
         mask(i + 1, after)
         if (!stack.length && !braces) { parts.push(part(i, '\n')); start = after }
         i = after
@@ -2210,8 +2216,8 @@ export function shellParts(command) {
       }
       if (ch === '<' && s[i + 1] === '<' && s[i + 2] !== '<') {
         const h = heredocOperator(s, i)
-        if (!h) return null
-        heredocs.push(h)
+        if (!h || heredocs.length >= HEREDOC_PENDING_LIMIT) return null
+        heredocs.push({ ...h, depth: stack.length })
         i = h.end
         continue
       }

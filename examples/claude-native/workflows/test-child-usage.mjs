@@ -544,6 +544,12 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
   shape('a run of run strings', (n) => 'bash -c "x" '.repeat(n), 'executedText', (c) => executedText(c))
   shape('a run of words with # inside', (n) => 'a#'.repeat(n), 'executedText', (c) => executedText(c))
   shape('a long script of echo, substitution and pipe lines', (n) => Array.from({ length: Math.ceil(n / 8) }, (_, i) => 'echo "step ' + i + ': $(date +%s)" >> log.txt; qmd search "term ' + i + '" -n 2 | head -5').join('\n'), 'fetchKind', (c) => fetchKind(c))
+  // Binding decision B8's part splitter reads the same frames plus here-document bodies: a script of heredocs, lists and quoted
+  // substitutions, and here-documents left open inside substitutions with newlines in deeper frames (the pending list is bounded).
+  if (typeof kernel.shellParts === 'function') {
+    shape('a script of heredocs, lists and quoted substitutions', (n) => Array.from({ length: Math.ceil(n / 40) }, (_, i) => "cat <<'E' && git log -" + i + ' | head\nx; y "$(z)"\nE').join('\n'), 'shellParts', (c) => kernel.shellParts(c))
+    shape('here-documents left open in substitutions, then newlines in frames', (n) => '$(cat <<A) '.repeat(Math.ceil(n / 22)) + '$(\n'.repeat(Math.ceil(n / 6)), 'shellParts', (c) => kernel.shellParts(c))
+  }
   // D8 for the command-position layer (GPT-6 #9; Claude review R9). The parser reads these texts in linear time, but the walk over a node's
   // children with child(i) and fieldNameForChild(i) cost O(i) per call in web-tree-sitter 0.27.0, so a flat run of unclosed constructs
   // (one wide ERROR node) or of comments (one wide program node) took four times as long for twice the text: '(('.repeat(n) + 'qmd'

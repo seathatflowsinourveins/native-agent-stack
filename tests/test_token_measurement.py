@@ -2406,6 +2406,11 @@ class TokenMeasurement(unittest.TestCase):
         "cat <<EOF | grep x && git status\nbody\nEOF\nls": [["cat <<EOF", "|"], ["grep x", "&&"], ["git status", "\n"], ["ls", ""]],
         "sleep 1 & git status": [["sleep 1", "&"], ["git status", ""]],
         "echo \"a\\\"b\" ; git status": [["echo \"a\\\"b\"", ";"], ["git status", ""]],
+        # A body begins at a newline of its operator's frame depth or shallower. Run under GNU bash 5.2.21 and dash on 2026-09-29: the first
+        # printed body-line (a newline inside "$( )" does not begin the outer body), the second x=[echo visible] with bash's warning
+        # "command substitution: 1 unterminated here-document" (a body the substitution leaves open is read after the enclosing line).
+        "cat <<'EOF' && x=$(echo a\necho b)\nbody-line\nEOF\necho after": [["cat <<'EOF'", "&&"], ["x=$(echo a\necho b)", "\n"], ["echo after", ""]],
+        "x=$(cat <<EOF)\necho visible\nEOF\necho after": [["x=$(cat <<EOF)", "\n"], ["echo after", ""]],
     }
     # Text these rules cannot read: an open quote, a ) with no ( before it, an open $( and a << with no delimiter word.
     B8_UNPARSED = ["git status && echo \"unterminated", "git status )", "echo $(git status", "cat <<\ngit status", "git status && cat <<"]
