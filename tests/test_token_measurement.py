@@ -470,6 +470,73 @@ class TokenMeasurement(unittest.TestCase):
         rows = [call(str(i), "Bash", command=c) for i, c in enumerate(executing + ignored)]
         self.assertEqual(self.exports("cu.childLanes(x).fetch.bash_curl_wget", rows), len(executing))
 
+    # N1, the #432 fixup3 residual: openers() did not track "$(" inside double quotes, and a quoted
+    # string that a shell runs was added without its own heredoc resolution. POSIX.1-2024 XCU 2.6.3
+    # (Command Substitution): inside double quotes the text between "$(" and the matching ")" is
+    # tokenized recursively, so its heredoc is the inner command's data unless that command reads
+    # stdin as source. GNU bash 5.2.21 and dash print these bodies as data. The probe bytes are
+    # reconstructions of the verifier's shapes, which were not retained.
+    def test_m4_n1_heredoc_in_double_quoted_substitution_or_run_string_is_data(self):
+        body = "\n\ncurl -s https://example.org\nEOF\n)\""
+        curl = ["git commit -m \"$(cat <<'EOF'\nSubject line" + body,  # p1
+                "git commit -m \"$(cat <<'EOF'\nfix: don't retry" + body,
+                "git commit -m \"$(cat <<'EOF'\nfix: handle \"quoted\" input" + body,
+                "git commit -m \"$(cat <<'EOF'\nfix(scope): keep (a) and (b)" + body,
+                "git commit -m \"$(cat <<'EOF'\nfix(ui): don't \"break\" it" + body,
+                "bash -c 'cat <<EOF > x.sh\ncurl https://example.org\nEOF'",  # p3
+                "bash -c \"cat <<EOF > x.sh\ncurl https://example.org\nEOF\""]
+        for command, name, _, key, m4 in self.carrier_m4(curl):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["remote_fetches"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+                self.assertEqual(m4["status"], "incomplete")
+        gh = "gh pr create --title t --body \"$(cat <<'EOF'\n## Summary\ngh api repos/example/repo\nEOF\n)\""  # p2
+        for command, name, _, _, m4 in self.carrier_m4([gh]):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4["unclassifiable"], 0)
+                self.assertEqual(m4["remote_fetches"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+        for command, kind in zip(curl + [gh], self.exports("x.map(cu.fetchKind)", curl + [gh])):
+            with self.subTest(command=command):
+                self.assertIsNone(kind)
+
+    def test_m4_n1_executed_substitutions_and_run_strings_stay_confirmed(self):
+        # Must-stay controls: a curl the substitution runs, a shell heredoc inside "$( )", an escaped
+        # substitution in a double-quoted run string, and the command after a heredoc inside "$( )",
+        # which resolving one heredoc twice would swallow as body. In the last case the outer shell
+        # resolves the heredoc before `bash -c` reads the string (bash 5.2.21 and dash probe).
+        executed = ["x=\"$(curl -s https://example.org)\"",
+                    "echo \"$(bash <<'EOF'\ncurl https://example.org\nEOF\n)\"",
+                    "bash -c \"echo \\\"\\$(curl https://example.org)\\\"\"",
+                    "x=\"$(cat <<'EOF'\nbody\nEOF\ncurl https://example.org)\"",
+                    "bash -c \"x=$(cat <<'EOF'\nbody\nEOF\n)\ncurl https://example.org\""]
+        for command, name, _, key, m4 in self.carrier_m4(executed):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        data = ["x=$(cat <<'EOF'\ncurl -s https://example.org\nEOF\n)",
+                "git commit -m \"$(cat <<'EOF'\nSubject (scope)\n\ncurl -s https://example.org\nEOF\n)\""]
+        for command, name, _, key, m4 in self.carrier_m4(data):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["remote_fetches"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", executed + data),
+                         ["fetch"] * len(executed) + [None] * len(data))
+
+    def test_m4_n1_quotes_inside_double_quoted_substitution_do_not_end_it(self):
+        # POSIX.1-2024 XCU 2.6.3: quotes inside "$( )" belong to the substitution, so the commands after
+        # them still run (bash 5.2.21 and dash print both words of "$(echo "a" && echo b)").
+        command = "echo \"$(echo \"a\" && curl https://example.org)\""
+        for _, name, _, key, m4 in self.carrier_m4([command]):
+            with self.subTest(carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", [command]), ["fetch"])
+
     def test_hook_context_is_inserted_only_by_additional_context_rows(self):
         def hook(kind, name, **rest):
             return {"type": "attachment", "timestamp": "2026-09-26T01:00:00Z", "attachment": {
