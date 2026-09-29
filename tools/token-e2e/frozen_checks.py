@@ -33,6 +33,7 @@ import io
 import json
 import os
 import shutil
+import site
 import subprocess
 import sys
 import tempfile
@@ -2910,11 +2911,18 @@ _T0_REASONS = {"ran": "test_count", "status": "test_status", "skipped": "test_sk
 
 
 def minimal_env(home=None):
-    """The allowlisted environment of every grader subprocess: PATH, LANG, TMPDIR and a HOME that is not the
-    operator's. No operator secret and not RUN_TOKEN reaches a command that runs a tree's code (review J-5, K-3)."""
+    """The allowlisted environment of every grader subprocess: PATH, LANG, TMPDIR, a HOME that is not the operator's
+    and the operator's per-user Python base. No operator secret and not RUN_TOKEN reaches a command that runs a tree's
+    code (review J-5, K-3). The throwaway HOME would also hide the user site packages the child ran with (a PyYAML
+    there changes how many tests tests.test_host_requests skips), so PYTHONUSERBASE names the base the operator's own
+    interpreter uses; a path to a package directory carries no secret."""
     source = os.environ
-    return {"PATH": source.get("PATH", "/usr/bin:/bin"), "LANG": source.get("LANG") or "C.UTF-8",
-            "TMPDIR": source.get("TMPDIR", "/tmp"), "HOME": home or tempfile.gettempdir()}
+    env = {"PATH": source.get("PATH", "/usr/bin:/bin"), "LANG": source.get("LANG") or "C.UTF-8",
+           "TMPDIR": source.get("TMPDIR", "/tmp"), "HOME": home or tempfile.gettempdir()}
+    base = source.get("PYTHONUSERBASE") or site.getuserbase()
+    if base:
+        env["PYTHONUSERBASE"] = base
+    return env
 
 
 def _git_env(env):
