@@ -1937,7 +1937,9 @@ const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
 //   exit whose output the server indexed (:1887, :1897, :2167, :2177, labels execute:<language>:error and file:<path>:error);
 // - anything else is unmatched, and a ctx_execute(_file) text without its echo is echo_mismatch. Echoed code is never matched.
 // Every template is anchored at the start of the text or of its first line, and read with linear scans.
-const M15_THRESHOLD = 0.01 // preregistration.json thresholds.M15.criteria.per_server_infrastructure_error_rate_lte
+// preregistration.json thresholds.M15.criteria.per_server_infrastructure_error_rate_lte, 0.01: one error in 100 calls. A rate is rounded to
+// four places, so a comparison with the threshold uses the counts (errors * 100 > attempted), never the rounded rate.
+const M15_THRESHOLD = 0.01, M15_THRESHOLD_CALLS_PER_ERROR = 100
 const INFRASTRUCTURE_CLASSES = ['approval', 'boundary', 'binding', 'timeout', 'module', 'connection']
 const NEW_CLASSES = ['server_error', 'storage_directory', 'usage_error', 'invalid_arguments', 'unmatched']
 const UNKNOWN_CLASSES = ['outcome_unknown', 'invoked_command_exit_indexed', 'echo_mismatch']
@@ -2027,11 +2029,11 @@ export function mcpErrorClass(call, result, s = callState(call, result)) {
 function finishM15Row(row) {
   const sum = (keys) => keys.reduce((n, k) => n + (row.classes[k] || 0), 0)
   const infrastructure = sum(INFRASTRUCTURE_CLASSES), newClass = sum(NEW_CLASSES), unknowns = sum(UNKNOWN_CLASSES)
-  const rate = share(infrastructure + newClass + unknowns, row.attempted), lower = share(infrastructure + newClass, row.attempted)
+  const over = (errors) => errors * M15_THRESHOLD_CALLS_PER_ERROR > row.attempted
   return { attempted: row.attempted, succeeded: row.succeeded, ctx: row.ctx, classes: row.classes, infrastructure_errors: infrastructure,
-    new_class_errors: newClass, unknowns, rate, rate_lower_bound: lower,
+    new_class_errors: newClass, unknowns, rate: share(infrastructure + newClass + unknowns, row.attempted), rate_lower_bound: share(infrastructure + newClass, row.attempted),
     rate_upper_bound: share(row.attempted - row.succeeded - (row.classes.invoked_command_exit || 0), row.attempted),
-    threshold_sensitive: rate !== null && rate > M15_THRESHOLD && lower <= M15_THRESHOLD, every_error_classified: !row.classes.unmatched && !row.classes.echo_mismatch }
+    threshold_sensitive: over(infrastructure + newClass + unknowns) && !over(infrastructure + newClass), every_error_classified: !row.classes.unmatched && !row.classes.echo_mismatch }
 }
 const finishM15 = (servers) => ({ threshold: M15_THRESHOLD, by_server: Object.fromEntries(Object.entries(servers).map(([s, row]) => [s, finishM15Row(row)])) })
 function addM15(servers, server, ctx, cls) {
