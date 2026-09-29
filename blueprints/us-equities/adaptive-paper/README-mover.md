@@ -145,9 +145,12 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   for three exit timeouts (30 s in the example) since the latch or the last fill. That
   covers exits resting unfilled, refused, waiting on a halt, or impossible without fresh
   quotes, so a stuck position is not left unmanaged until the sell window ends. Before a
-  force, a blocked leg keeps retrying and the other legs keep their rules: recovery stops
-  at its first failed symbol, so an early hand-off could leave sellable legs unsold. The
-  receipt's `handoff_to_recovery` records the reason and the seconds after the force.
+  force, a blocked leg keeps retrying and the other legs keep their rules: recovery
+  defers a symbol without a fresh quote (#215) but stops at its first other failed
+  symbol (an unfilled exit, a quantity it cannot represent) and once a whole exit no
+  longer fits before its deadline, so an early hand-off could leave sellable legs
+  unsold. The receipt's `handoff_to_recovery` records the reason and the seconds after
+  the force.
 - **Gross guard.** When marked gross exposure reaches `gross_guard_fraction` of the
   ledger cap, the largest position exits (`gross_cap_guard`). The ledger halts
   permanently above its cap, and a rising mover would otherwise trip it.
@@ -162,7 +165,11 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
 
 A residual after the native loop, and the `recover` command, go through
 `recovery.recover` (sell-only, no strategy restart) on a fresh transport that subscribes
-the residual's symbols (or the benchmarks when flat). The mover ledger keeps every
+the residual's symbols (or the benchmarks when flat). Its readiness waits on the
+benchmark quotes only, and each exit on its own symbol's fresh quote (#215). Readiness
+therefore no longer shows that the port subscribes every held symbol, so
+`recover_mover` refuses with `held_symbol_not_subscribed` before the port starts when a
+held or unresolved symbol is not subscribed. The mover ledger keeps every
 session's intents and each scan trades other symbols, while a transport can only adopt
 an intent for a symbol it subscribes (at most 30). So a mover recovery port adopts every
 unresolved intent and only those terminal intents whose symbol it subscribes. A skipped

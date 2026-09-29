@@ -200,10 +200,17 @@ def unsellable_positions(controller):
 async def recover_mover(controller, metadata, config):
     """recovery.recover on the controller's fresh, unstarted port with the mover's
     adoption scope and reconciliation (mover_reconcile). Sell-only, as the engine's.
-    ``unsellable_positions`` lists any residual one share of which exceeds the ledger's
-    per-order cap."""
+    The port's readiness waits on the benchmark quotes only (#215), so the transport no
+    longer shows that the port subscribes every held symbol: a held or unresolved symbol
+    it does not subscribe fails closed (held_symbol_not_subscribed) before recovery
+    starts the port. ``unsellable_positions`` lists any residual one share of which
+    exceeds the ledger's per-order cap."""
     from recovery import recover
-    port = scope_recovery_adoption(controller.port, controller.ledger)
+    ledger = controller.ledger
+    owned = set(ledger.positions()) | {i.symbol for i in ledger.unresolved()}
+    if not owned <= set(controller.port.symbols):
+        raise SafetyError("held_symbol_not_subscribed")
+    port = scope_recovery_adoption(controller.port, ledger)
     result = await recover(controller, metadata, config, reconcile_fn=mover_reconcile)
     result["adoption_scope"] = getattr(port, "adoption_scope", None)
     result["unsellable_positions"] = unsellable_positions(controller)
@@ -738,15 +745,16 @@ def command_paper(args):
                      "stop_file": str(safety.DEFAULT_STOP)}) + "\n")
             prefixes = (f"mvr-{args.trial}-", f"rec-{args.trial}-")
 
-            def fresh_port(recovering=False):
-                needed = sorted(set(ledger.positions()) | {i.symbol for i in ledger.unresolved()})
+            def fresh_port():
+                # #215: the forced recovery's port requires only the benchmark quotes, as the
+                # trial's does; each held symbol gates its own exit (recovery.recover).
                 return controller.bind(AlpacaPaperTransport(
                     key, secret, trial_config["symbols"], before_request=controller.before_request,
                     before_submit=controller.before_submit, sink_observation=controller.observe,
                     sink_status=controller.trading_status,
                     request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
                     feed=config["feed"],
-                    required_quote_symbols=needed if recovering and needed else list(settings.benchmarks),
+                    required_quote_symbols=list(settings.benchmarks),
                     # As runner.main: from the lane's first trial, so reconcile sees every owned intent.
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                     extended_hours_allowed=session_policy["extended_hours"],
@@ -774,7 +782,7 @@ def command_paper(args):
                                "error_type": type(exc).__name__, "error_reason": _bounded_reason(exc)}
                 if ledger.positions() or ledger.unresolved():
                     controller.stop = True
-                    controller.port = fresh_port(True)
+                    controller.port = fresh_port()
                     outcome = _apply_forced_recovery_outcome(outcome, await recover_mover(
                         controller, metadata, trial_config))
                 return outcome
@@ -842,13 +850,14 @@ def command_recover(args):
             controller_close, market_open = _controller_session(close, time.time(), session_policy)
             controller = MoverController(ledger, controller_close, market_open=market_open,
                                          max_entry_notional_usd=settings.max_entry_notional_usd)
-            recovering = sorted(owned) or list(settings.benchmarks)
+            # #215: only the benchmark quotes gate the recovery transport; each owned
+            # symbol's freshness gates its own exit (recovery.recover).
             controller.port = controller.bind(AlpacaPaperTransport(
                 key, secret, trial_config["symbols"], before_request=controller.before_request,
                 before_submit=controller.before_submit, sink_observation=controller.observe,
                 sink_status=controller.trading_status,
                 request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
-                feed=config["feed"], required_quote_symbols=recovering,
+                feed=config["feed"], required_quote_symbols=list(settings.benchmarks),
                 history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                 extended_hours_allowed=session_policy["extended_hours"], include_margin=include_margin))
             result = asyncio.run(recover_mover(controller, metadata, trial_config))

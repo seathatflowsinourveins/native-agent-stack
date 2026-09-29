@@ -1165,6 +1165,62 @@ class RecoveryAdoptionScope(unittest.TestCase):
                 ledger.close()
 
 
+class RecoveryPortSubscription(unittest.TestCase):
+    """#215: a mover recovery port's readiness waits on the benchmark quotes only, so the
+    transport no longer shows that the port subscribes every held symbol. recover_mover
+    fails closed (held_symbol_not_subscribed) before recovery starts the port."""
+
+    def test_a_held_or_unresolved_symbol_the_port_does_not_subscribe_fails_closed(self):
+        import asyncio
+        import recovery
+        _, limits, settings = mover.load_mover_config(CONFIG)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "ledger.sqlite3", limits)
+            try:
+                now, close = SCAN_TIME + 30, SCAN_TIME + 36000
+                ledger.begin_next_trial(now, "s1")
+                for cid, symbol, status, filled, price in (("mvr-s1-0000001", "BBB", "filled", "10", "8.01"),
+                                                           ("mvr-s1-0000002", "CCC", "new", "0", None)):
+                    ledger.reserve_intent(cid, symbol, "buy", "10", "8.05", quote=Quote(symbol, "8.00", "8.01", now),
+                                          now=now, market_open=True, session_close=close)
+                    ledger.record_order(cid, "b-" + cid, status, filled, price, timestamp=now)
+                self.assertEqual((sorted(ledger.positions()), [i.symbol for i in ledger.unresolved()]),
+                                 (["BBB"], ["CCC"]))                  # BBB is held; CCC has an open buy only
+                controller = mover_runner.MoverController(ledger, close, market_open=True, clock=lambda: now,
+                                                          max_entry_notional_usd=settings.max_entry_notional_usd)
+                calls = []
+
+                class Port:
+                    def __init__(self, symbols):
+                        self.symbols = symbols
+
+                    def adopt_intents(self, intents):
+                        calls.append("adopt_intents")
+
+                    async def start(self, on_quote, on_order):
+                        calls.append("start")
+
+                async def recover(controller, metadata, config, *, reconcile_fn=None):
+                    calls.append("recover")
+                    return {"status": "passed", "flat": True, "errors": []}
+
+                metadata = {"trial_id": "s1", "baseline_cash": "100000"}
+                with patch.object(recovery, "recover", recover):
+                    for symbols in (("CCC", "SPY"), ("BBB", "SPY")):
+                        with self.subTest(symbols=symbols):
+                            controller.port = Port(symbols)
+                            with self.assertRaises(SafetyError) as refused:
+                                asyncio.run(mover_runner.recover_mover(controller, metadata, {}))
+                            self.assertEqual(str(refused.exception), "held_symbol_not_subscribed")
+                            self.assertEqual(calls, [])       # refused before recovery or any port call
+                    controller.port = Port(("BBB", "CCC", "SPY"))
+                    result = asyncio.run(mover_runner.recover_mover(controller, metadata, {}))
+                self.assertEqual(calls, ["recover"])
+                self.assertEqual((result["status"], result["unsellable_positions"]), ("passed", []))
+            finally:
+                ledger.close()
+
+
 class ForeignOrdersOnASharedAccount(unittest.TestCase):
     """The account's order history can hold another lane's finished orders; only those
     are tolerated. A foreign open order still freezes, and a foreign fill still shows

@@ -1273,6 +1273,47 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
                 await self.port.submit(intent())
         request.assert_not_called()
 
+    async def test_owned_exit_with_a_fresh_quote_reaches_the_wire_under_an_admission_freeze(self):
+        # #215 guard: an admission freeze (stale benchmark, reconnect) blocks entries only; an
+        # owned sell whose own quote is fresh still reaches the wire (README-recovery.md: an
+        # admission freeze alone does not forbid a confirmed owned exit).
+        self.port.freeze_health("quote_stale")
+        self.assertFalse(self.port.ready)
+        with patch.object(self.port._client._session._session, "request",
+                          return_value=response(order(side="sell", limit_price="99.99"))) as request:
+            result = await self.port.submit(intent(side="sell", limit_price="99.99"))
+        self.assertEqual(request.call_args.args[0], "POST")
+        self.assertEqual((result["side"], result["client_order_id"]), ("sell", "trial-1"))
+
+    async def test_an_exit_without_its_own_fresh_quote_is_refused_before_the_wire_as_not_sent(self):
+        # #215 guard: exit freshness is per symbol at the wire, with the not_sent guarantee
+        # that lets the caller retire the reservation (README-safety.md, mark_not_sent).
+        self.port._quote_values["SPY"]["ts_ns"] = time.time_ns() - int((self.port.quote_timeout + 1) * 1e9)
+        with patch.object(self.port._client._session._session, "request") as request:
+            with self.assertRaises(t.SubmissionNotSent) as refused:
+                await self.port.submit(intent(side="sell", limit_price="99.99"))
+        request.assert_not_called()
+        self.assertTrue(refused.exception.not_sent)
+
+    async def test_start_waits_on_the_required_basket_only(self):
+        # #215 guard: a subscribed symbol that never quotes (FakeStream publishes SPY only)
+        # gates start() only when it is required, as a recovery port's held symbols were.
+        await self.port.stop()
+        for required, ready in ((["SPY"], True), (["SPY", "QQQ"], False)):
+            with self.subTest(required=required):
+                with patch.object(t, "_stream_classes", return_value=(FakeStream, FakeStream)):
+                    self.port = t.AlpacaPaperTransport("fixture-key", "fixture-secret", ["SPY", "QQQ"],
+                            before_request=lambda *a, **k: None, before_submit=lambda x: None,
+                            sink_observation=lambda x: None, start_timeout=0.5, required_quote_symbols=required)
+                if ready:
+                    await self.port.start(lambda quote: None, lambda order: None)
+                    self.assertTrue(self.port.ready)
+                    await self.port.stop()
+                else:
+                    with self.assertRaisesRegex(t.TransportError, "readiness failed"):
+                        await self.port.start(lambda quote: None, lambda order: None)
+                    self.assertIn("start_not_ready", self.port.health["reasons"])
+
     async def test_snapshot_paginates_and_rejects_nonadvancing_page(self):
         page = [order(id=f"00000000-0000-0000-0000-{i:012d}", client_order_id=f"fixture-{i}") for i in range(500)]
         with patch.object(self.port._client, "get", side_effect=[page, [order(id=str(__import__("uuid").UUID(int=0x500)))]]) as get:
