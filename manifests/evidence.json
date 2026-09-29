@@ -42420,8 +42420,8 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "67096264fce0519476e7c20c4932b9d81efc4031dbbb78f368c8fdd1bdfb832a",
-      "bytes": 23466
+      "sha256": "38c67deeb7539d7e941117405b4bd9ed80b08686c96684aa44d00401b38011f2",
+      "bytes": 23679
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
@@ -43440,7 +43440,7 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "4cfec75f40a31ae1700d8c64e11541cf9594385a4e356e5b7a2d9b87afbb2c6a",
+      "sha256": "d40fc76be4ff84d73800c0a1c63f391c87e7ef55083c85d8806e0c4e1890fec6",
       "bytes": 37676
     },
     {
@@ -43455,8 +43455,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "57228b7ad1eb6890023c220dc975fc931e7ca7987a2ecb6a8ffa77f1aa8cf522",
-      "bytes": 151483
+      "sha256": "d0def42e8b4df1e9bd613847864dcb00382dff56d8aa812abc2d94634c881028",
+      "bytes": 151321
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -44130,8 +44130,8 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "80bf17335813ac07c27863a9ad6f38948245f1d8109fc86a6c4bb861fa2fa554",
-      "bytes": 35185
+      "sha256": "6bf68149a6619a866fcf7a55368137ecd61970b3b02b9b0f9c59003384ae0448",
+      "bytes": 35137
     },
     {
       "path": "tools/adoption/render_config.py",
