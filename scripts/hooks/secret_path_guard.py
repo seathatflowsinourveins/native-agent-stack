@@ -215,20 +215,31 @@ REDIRECT_OUT = re.compile(r"^\d*(?:>|>>|>\||&>|&>>|>&)$")
 # Every redirection operator as shlex (punctuation_chars) splits it: `2>&1` is `2`, `>&`, `1`, and
 # `<<-EOF` is `<<`, `-EOF`. The word after one is its file, descriptor or here-document delimiter.
 REDIRECTION = re.compile(r"^\d*(?:>>?|>\||&>>?|<<<?|<>|<&|>&|<)$")
-# The start of a here-document in raw command text: `<<` or `<<-`, then its delimiter as a single-quoted, double-quoted or
-# bare word (a backslash also quotes it). Group 1 is the `-`, groups 2 to 4 the delimiter.
-HEREDOC_START = re.compile(r"<<(-?)[ \t]*(?:'([^'\n]*)'|\"([^\"\n]*)\"|((?:\\.|[^\s;&|()<>\\'\"])+))")
-# What substitution_bodies() jumps to in each kind of frame (a regular expression finds the next such character).
+# The start of a here-document in raw command text: `<<` or `<<-`, then its delimiter word, which may be made of unquoted
+# text, single quotes, double quotes and backslash escapes together (`<<'E'OF`). Group 1 is the `-`, group 2 the word;
+# heredoc_delimiter() reads the delimiter and whether it was quoted (then the body is data) from the word.
+HEREDOC_START = re.compile(r"<<(-?)[ \t]*((?:'[^'\n]*'|\"(?:[^\"\\\n]|\\.)*\"|\\.|[^\s;&|()<>\\'\"])+)")
+HEREDOC_QUOTING = re.compile(r"\\(.)|'([^']*)'|\"([^\"]*)\"", re.S)
+# What scan_shell() jumps to in each kind of frame (a regular expression finds the next such character). A `#` matters
+# in command text only (cmd, sub, bt), a `<` for a here-document, a newline for the body of one.
 SCAN_CHARACTERS = {
-    "cmd": re.compile(r"[\\'\"`$<\n]"),
-    "bt": re.compile(r"[\\'\"`$<\n]"),
-    "sub": re.compile(r"[\\'\"`$<\n()]"),
+    "cmd": re.compile(r"[\\'\"`$<#\n]"),
+    "bt": re.compile(r"[\\'\"`$<#\n]"),
+    "sub": re.compile(r"[\\'\"`$<#\n()]"),
     "dq": re.compile(r"[\\\"`$]"),
     "param": re.compile(r"[\\'\"`$}]"),
     "dparam": re.compile(r"[\\\"`$}]"),
     "arith": re.compile(r"[\\'\"`$()]"),
 }
 BACKQUOTE_ESCAPE = re.compile(r"\\([$`\\\"])")
+ANSI_C_TAIL = re.compile(r"\\.|'", re.S)
+LINE_END = re.compile(r"\n")
+BACKQUOTE_COMMENT_END = re.compile(r"[\n`]")  # a comment in a backquote body ends with it (bash cuts the body out first)
+COMMENT_BREAK = " \t\n;&|()<>"  # what may precede a `#` that starts a word (blanks and the shell's metacharacters)
+# A comment in a here-document body, whose lines the tokenizer reads as command lines: it hides the rest of the body, as
+# shlex's `#` hid the rest of the command before, so a script written through a here-document (which begins with a
+# `#!` line) stays as unread as it was. How the guard reads here-documents is a separate, later change.
+HEREDOC_COMMENT = re.compile(r"(?:^|(?<=[ \t;&|()<>]))#", re.M)
 GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 # A dashless BSD-style ps cluster that shows the environment: it holds `e` (procps and BSD: "Show the environment after the
@@ -247,6 +258,10 @@ MAX_DEPTH = 3
 MAX_SUBSTITUTION_NESTING = 32
 SUBSTITUTION_BUDGET_FACTOR = 4
 SUBSTITUTION_BUDGET_FLOOR = 65536
+# A command that holds a `#` is tokenized twice, comment-aware and as shlex read it before (command_segments), and shlex costs
+# about 9 microseconds a character inside quotes; above this length only the first reading is made, so a very large command
+# costs what it always did (a 840 KB message took 8.6 s once and 17.8 s twice, and the hook's timeout is 10 s).
+LEGACY_READING_LIMIT = 200_000
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
@@ -327,11 +342,24 @@ HINTS = {
 }
 
 
-def tokenize(command: str) -> list[str]:
+def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy: bool = False) -> list[str]:
+    """The words of a command, punctuation apart. `comments` are the spans scan_shell() found to be comments and are
+    removed first, and no `#` starts a comment for shlex: shlex read one anywhere (even in `$#` and `a#b`) and, since the
+    lines are joined with `;` below, dropped the whole rest of the command. `legacy` is that reading, kept because
+    command_segments() reads both: whatever the guard read before it still reads."""
+    if comments:
+        pieces, cursor = [], 0
+        for first, last in comments:
+            pieces.append(command[cursor:first])
+            cursor = last
+        pieces.append(command[cursor:])
+        command = "".join(pieces)
     text = command.replace("`", " ; ").replace("\n", " ; ")
     try:
         lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
         lexer.whitespace_split = True
+        if not legacy:
+            lexer.commenters = ""
         return list(lexer)
     except ValueError:
         return re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
@@ -351,14 +379,32 @@ def segments(tokens: list[str]) -> list[list[str]]:
     return result
 
 
-def heredoc_end(text: str, position: int, heredocs: list[tuple[str, bool]],
-                lines: dict[bool, dict[str, list[int]]]) -> int | None:
-    """Index just past the terminator line of the last of `heredocs` (each a delimiter and whether `<<-` strips
-    leading tabs), whose bodies start at text[position]; None when one has no terminator line, which means the `<<`
-    was no here-document (`(( x = 1 << 2 ))`, say). `lines` maps each line's text to the offsets where it starts and
-    is filled here, once per text and only when a here-document is looked up: finding a terminator is then a binary
-    search, so no line is read twice however many `<<` the text holds (a rescan per `<<` made 12,000 of them take 10 s)."""
-    for delimiter, strip_tabs in heredocs:
+def heredoc_delimiter(word: str) -> tuple[str, bool]:
+    """(delimiter, quoted) for the word after `<<`: the word without its quotes and backslashes, and whether it had any,
+    which makes the body data (bash(1), Here Documents: no expansion when any part of the word is quoted)."""
+    quoted = any(mark in word for mark in "'\"\\")
+    return HEREDOC_QUOTING.sub(lambda part: part.group(1) or part.group(2) or part.group(3) or "", word), quoted
+
+
+def ansi_c_end(text: str, position: int) -> int:
+    """Index just past the `'` that ends the ANSI-C string whose contents start at text[position], or -1."""
+    while found := ANSI_C_TAIL.search(text, position):
+        if found.group() == "'":
+            return found.end()
+        position = found.end()
+    return -1
+
+
+def heredoc_end(text: str, position: int, heredocs: list[tuple[str, bool, bool]],
+                lines: dict[bool, dict[str, list[int]]]) -> tuple[int, list[tuple[int, int, bool]]] | None:
+    """(index just past the terminator line of the last of `heredocs`, the body of each as (start, end, quoted)), for
+    heredocs given as (delimiter, whether `<<-` strips leading tabs, quoted) whose bodies start at text[position]; None
+    when one has no terminator line, which means the `<<` was no here-document (`(( x = 1 << 2 ))`, say). `lines`
+    maps each line's text to the offsets where it starts and is filled here, once per text and only when a
+    here-document is looked up: finding a terminator is then a binary search, so no line is read twice however many
+    `<<` the text holds (a rescan per `<<` made 12,000 of them take 10 s)."""
+    regions = []
+    for delimiter, strip_tabs, quoted in heredocs:
         if strip_tabs not in lines:
             index: dict[str, list[int]] = {}
             offset = 0
@@ -370,13 +416,32 @@ def heredoc_end(text: str, position: int, heredocs: list[tuple[str, bool]],
         at = bisect.bisect_left(starts, position) if starts else 0
         if not starts or at == len(starts):
             return None
+        regions.append((position, starts[at], quoted))
         end = text.find("\n", starts[at])
         position = len(text) if end < 0 else end + 1
-    return position
+    return position, regions
 
 
 def substitution_bodies(text: str) -> list[str]:
-    """Bodies of the outermost command substitutions that the shell runs inside double quotes: `$(...)` and a
+    """The bodies scan_shell() returns for text (see there)."""
+    return scan_shell(text)[0]
+
+
+def without_spans(text: str, start: int, end: int, spans: list[tuple[int, int]]) -> str:
+    """text[start:end] without the (increasing, non-overlapping) spans that lie inside it."""
+    pieces, cursor = [], start
+    for first, last in spans:
+        if first >= cursor:
+            pieces.append(text[cursor:first])
+            cursor = last
+    pieces.append(text[cursor:end])
+    return "".join(pieces)
+
+
+def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]]]:
+    """(bodies, comments) of a command text, read once the way bash reads it.
+
+    Bodies: those of the outermost command substitutions that the shell runs inside double quotes, `$(...)` and a
     backquote pair. Inside double quotes `$` and the backquote keep their meaning and a backslash escapes only
     `$`, the backquote, `"` and `\\` (Bash Reference Manual, "Double Quotes" and "Command Substitution"); single
     quotes are data everywhere but inside double quotes, where they are ordinary characters. A `$(` body ends at its
@@ -385,16 +450,30 @@ def substitution_bodies(text: str) -> list[str]:
     `$`, a backquote, `\\` or `"` is removed. An unterminated substitution runs to the end of the text, as the
     tokenizer treats a lone apostrophe as an ordinary character. Substitutions inside a returned body are not
     returned: expand() reads that body again. One inside an unquoted `$(...)` is: the tokenizer already splits that
-    body's commands, but not the double-quoted words in it. The body of a here-document is literal text for this
-    scan, as it is for the shell's parser when it looks for the `)` that ends a `$(`: prose in it (an unbalanced
-    parenthesis, an apostrophe, backquotes) opens nothing. How the guard reads those bodies as commands is a separate
-    matter and this scan does not touch it. `$((` opens an arithmetic expansion, which is no command (`$((env))` reads
-    the variable env, a `<<` in it is a shift) but may hold real substitutions; it is one only when a `))` that touches
-    closes it, and `$((printenv) )` is a substitution holding a subshell (bash tries arithmetic first and falls back to
-    that). One pass, each character read once: a stack of frames replaces recursion, and a regular expression jumps
-    from one character that matters to the next."""
+    body's commands, but not the double-quoted words in it. `$((` opens an arithmetic expansion, which is no command
+    (`$((env))` reads the variable env, a `<<` in it is a shift) but may hold real substitutions; it is one only when a
+    `))` that touches closes it, and `$((printenv) )` is a substitution holding a subshell (bash tries arithmetic
+    first and falls back to that). `$'...'` is an ANSI-C string, data up to the first `'` that a backslash does not
+    escape (`$'it\\'s'`); inside double quotes `$'` is nothing special. The body of a here-document is literal text
+    for this scan: prose in it (an unbalanced parenthesis, an apostrophe, backquotes) opens nothing, and when its
+    delimiter is quoted (`<<'EOF'`, `<<"EOF"`, `<<\\EOF`) the body is data to the shell, so a returned body loses it
+    (the operator line and the terminator stay): a commit message in `git commit -m "$(cat <<'EOF' ... EOF)"` is no
+    command. How the guard reads a top-level here-document as commands is a separate matter and this scan does not
+    touch it.
+
+    Comments: the spans, one per line, that bash ignores at the top level of text: from a `#` that starts a word,
+    outside quotes and outside any double-quoted substitution, to the end of the line (`$#`, `${#x}` and `a#b` hold none;
+    inside a `$(...)` body a comment also runs to the end of its line, so a `)` in it closes nothing). tokenize()
+    removes them. A comment in a here-document body, whose lines the tokenizer reads as command lines, hides the rest of
+    that body (not the text after its terminator), as shlex's `#` hid the rest of the command before: a script written
+    through a here-document, which begins with a `#!` line, stays as unread as it was.
+
+    One pass, each character read once: a stack of frames replaces recursion, and a regular expression jumps from one
+    character that matters to the next."""
     bodies: list[str] = []
-    heredocs: list[tuple[str, bool]] = []  # `<<` delimiters seen on the current line, their bodies start at its end
+    comments: list[tuple[int, int]] = []
+    data: list[tuple[int, int]] = []  # bodies of quoted here-documents inside the reported body that is open
+    heredocs: list[tuple[str, bool, bool]] = []  # `<<` (delimiter, strips tabs, quoted) seen on the current line
     lines: dict[bool, dict[str, list[int]]] = {}
     # Frames, innermost last: [kind, start, parentheses, reported, dq, bodies_at_open]. Kinds: cmd (unquoted text),
     # sub (`$(`), bt (backquotes), dq (double quotes), param (`${`), dparam (`${` inside double quotes), arith (`$((`).
@@ -405,14 +484,17 @@ def substitution_bodies(text: str) -> list[str]:
     hidden = 0
     end = len(text)
     index = 0
+    construct_end = -1  # where the last quote, escape or substitution ended: a `#` right after it is inside a word
 
     def close(at: int) -> None:
         nonlocal hidden
         kind, start, _, reported = stack.pop()[:4]
         if reported:
             hidden -= 1
-            body = text[start:at]
+            body = without_spans(text, start, at, data)
             bodies.append(BACKQUOTE_ESCAPE.sub(r"\1", body) if kind == "bt" else body)
+            if not hidden:
+                data.clear()
 
     def open_frame(kind: str, start: int, frame: list, quoted: bool = False) -> None:
         nonlocal hidden
@@ -431,18 +513,22 @@ def substitution_bodies(text: str) -> list[str]:
         char = text[index]
         if char == "\\":
             index += 2
+            construct_end = index
         elif char == '"':
             if kind == "dq":
                 stack.pop()
+                construct_end = index + 1
             else:
                 stack.append(["dq", 0, 0, False, True, 0])
             index += 1
         elif char == "'":
             closing = text.find("'", index + 1)
             index = closing + 1 if closing >= 0 else index + 1
+            construct_end = index
         elif char == "`":
             if kind == "bt":
                 close(index)
+                construct_end = index + 1
             else:
                 open_frame("bt", index + 1, frame)
             index += 1
@@ -457,30 +543,47 @@ def substitution_bodies(text: str) -> list[str]:
             elif following == "{":
                 stack.append(["dparam" if frame[4] else "param", index + 2, 0, False, frame[4], 0])
                 index += 2
+            elif following == "'" and not frame[4] and (closing := ansi_c_end(text, index + 2)) >= 0:
+                index = construct_end = closing
             else:
                 index += 1
         elif char == "}":
             stack.pop()
             index += 1
+            construct_end = index
+        elif char == "#":
+            # a comment starts at a word's first character and runs to the end of the line
+            if index == 0 or (index != construct_end and text[index - 1] in COMMENT_BREAK):
+                closing = (BACKQUOTE_COMMENT_END if kind == "bt" else LINE_END).search(text, index)
+                closing = closing.start() if closing else end
+                if not hidden:
+                    comments.append((index, closing))
+                index = closing
+            else:
+                index += 1
         elif char == "<":
             if text.startswith("<<<", index):  # a here-string: its word is read as usual
                 index += 3
             elif match := HEREDOC_START.match(text, index):
-                single, double, bare = match.group(2, 3, 4)
-                delimiter = single if single is not None else double if double is not None \
-                    else re.sub(r"[\\'\"]", "", bare)
+                delimiter, quoted = heredoc_delimiter(match.group(2))
                 if delimiter:
-                    heredocs.append((delimiter, bool(match.group(1))))
+                    heredocs.append((delimiter, bool(match.group(1)), quoted))
                 index = match.end()
             else:
                 index += 1
         elif char == "\n":
             index += 1
             if heredocs:
-                after = heredoc_end(text, index, heredocs, lines)
+                found_end = heredoc_end(text, index, heredocs, lines)
                 heredocs.clear()
-                if after is not None:
-                    index = after
+                if found_end is not None:
+                    index, regions = found_end
+                    for first, last, quoted in regions:
+                        if hidden:
+                            if quoted:
+                                data.append((first, last))
+                        elif comment := HEREDOC_COMMENT.search(text, first, last):
+                            comments.append((comment.start(), last - 1))
         elif char == "(":
             frame[2] += 1
             index += 1
@@ -489,11 +592,13 @@ def substitution_bodies(text: str) -> list[str]:
                 frame[2] -= 1
                 if not frame[2]:
                     close(index)
+                    construct_end = index + 1
             elif frame[2]:
                 frame[2] -= 1
             elif text.startswith(")", index + 1):  # arithmetic expansion ends at a `))` that touches
                 stack.pop()
                 index += 1
+                construct_end = index + 1
             else:  # no `))`: this was `$(` and a subshell, so read it as a substitution
                 frame[0], frame[1], frame[2] = "sub", frame[1] - 1, 1
                 if frame[3]:
@@ -505,7 +610,7 @@ def substitution_bodies(text: str) -> list[str]:
             stack.pop()
         else:
             close(end)
-    return bodies
+    return bodies, comments
 
 
 def redirection_width(words: list[str], index: int) -> int:
@@ -780,64 +885,79 @@ def launcher_chain(words: list[str]) -> tuple[list[list[str]], int]:
 
 def expand(command: str, depth: int = 0) -> list[list[str]]:
     """Command segments of the command, and of the command substitutions that the shell runs inside its double
-    quotes (substitution_bodies: `echo "$(printenv)"` runs printenv), at any nesting up to
-    MAX_SUBSTITUTION_NESTING and while the bodies read stay within SUBSTITUTION_BUDGET_FACTOR times the command's
-    length (plus SUBSTITUTION_BUDGET_FLOOR): every level is read again from the start, so quotes nested n deep would
-    otherwise cost n times the command."""
-    result = command_segments(command, depth)
+    quotes (scan_shell: `echo "$(printenv)"` runs printenv), at any nesting up to MAX_SUBSTITUTION_NESTING and while
+    the bodies read stay within SUBSTITUTION_BUDGET_FACTOR times the command's length (plus SUBSTITUTION_BUDGET_FLOOR):
+    every level is read again from the start, so quotes nested n deep would otherwise cost n times the command."""
+    result: list[list[str]] = []
     level = [command]
     budget = SUBSTITUTION_BUDGET_FACTOR * len(command) + SUBSTITUTION_BUDGET_FLOOR
     spent = 0
-    for _ in range(MAX_SUBSTITUTION_NESTING):
-        level = [body for text in level for body in substitution_bodies(text)]
-        spent += sum(map(len, level))
-        if not level or spent > budget:
+    for nesting in range(MAX_SUBSTITUTION_NESTING + 1):
+        following: list[str] = []
+        for text in level:
+            bodies, comments = scan_shell(text)
+            result.extend(command_segments(text, depth, comments))
+            following.extend(bodies)
+        spent += sum(map(len, following))
+        if not following or spent > budget:
             break
-        for body in level:
-            result.extend(command_segments(body, depth))
+        level = following
     return result
 
 
-def command_segments(command: str, depth: int = 0) -> list[list[str]]:
+def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int]] | tuple = ()) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
     command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
-    `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options)."""
+    `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options). Read twice
+    when the command holds a `#`: without its comments (tokenize) and as shlex read it before, which dropped the rest of
+    the command at the first `#`; the second reading adds only the segments the first lacks."""
     result: list[list[str]] = []
-    for raw in segments(tokenize(command)):
-        words = raw[prefix_end(raw):]
-        while words:
-            entries, start = launcher_chain(words)
-            result.extend(entries)
-            if start:
-                words = words[start:]
-            if not words:
+    seen: set[tuple[str, ...]] = set()
+    readings = [tokenize(command, comments)]
+    if "#" in command and len(command) <= LEGACY_READING_LIMIT:
+        readings.append(tokenize(command, legacy=True))
+    for reading, tokens in enumerate(readings):
+        for raw in segments(tokens):
+            if reading:
+                if tuple(raw) in seen:
+                    continue
+            else:
+                seen.add(tuple(raw))
+            words = raw[prefix_end(raw):]
+            while words:
+                entries, start = launcher_chain(words)
+                result.extend(entries)
+                if start:
+                    words = words[start:]
+                if not words:
+                    break
+                result.append(words)
+                program = program_of(words)
+                if program == "env":
+                    break  # launcher_chain walked every env that starts a command: this one prints its environment
+                if program == "rtk":
+                    words = strip_prefix(rtk_command(words))  # `rtk run` and the file readers
+                    continue
+                started = keyring_exec(words)
+                if started is not None:
+                    words = strip_prefix(started[1])
+                    continue
+                if depth < MAX_DEPTH:
+                    if program in SHELLS:
+                        inline = shell_parts(words)[1]
+                        if inline is not None:
+                            result.extend(expand(inline, depth + 1))
+                    elif program == "eval" and len(words) > 1:
+                        result.extend(expand(" ".join(words[1:]), depth + 1))
                 break
-            result.append(words)
-            program = program_of(words)
-            if program == "env":
-                break  # launcher_chain walked every env that starts a command: this one prints its environment
-            if program == "rtk":
-                words = strip_prefix(rtk_command(words))  # `rtk run` and the file readers
-                continue
-            started = keyring_exec(words)
-            if started is not None:
-                words = strip_prefix(started[1])
-                continue
-            if depth < MAX_DEPTH:
-                if program in SHELLS:
-                    inline = shell_parts(words)[1]
-                    if inline is not None:
-                        result.extend(expand(inline, depth + 1))
-                elif program == "eval" and len(words) > 1:
-                    result.extend(expand(" ".join(words[1:]), depth + 1))
-            break
     return result
 
 
 def ps_shows_environment(words: list[str]) -> bool:
     """Whether ps prints each process's environment: a dashless BSD-style cluster with `e` or `E` (PS_BSD_CLUSTER), or
     macOS's dashed `-E`, alone or in a cluster before the first option that takes a value (`-Ewwp 123`, where the value
-    starts at `p`). A dashed `-e` is every process and passes, as does an `E` that is a value (`ps -u Eve`)."""
+    starts at `p`). A dashed `-e` is every process and passes, as does an `E` that is a value: the word after a stand-alone
+    value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to it (`ps -uEve`)."""
     skip = False
     for word in words[1:]:
         if skip:
@@ -848,9 +968,10 @@ def ps_shows_environment(words: list[str]) -> bool:
             continue
         if word.startswith("-") and not word.startswith("--") and len(word) > 1:
             letters = word[1:]
-            value_at = next((at for at, letter in enumerate(letters) if f"-{letter}" in PS_ARG_OPTIONS), len(letters))
-            if "E" in letters[:value_at]:
+            value_at = next((at for at, letter in enumerate(letters) if f"-{letter}" in PS_ARG_OPTIONS), None)
+            if "E" in (letters if value_at is None else letters[:value_at]):
                 return True
+            skip = value_at == len(letters) - 1  # the cluster ends in an option that takes the next word
         elif not word.startswith("-") and PS_BSD_CLUSTER.match(word):
             return True
     return False

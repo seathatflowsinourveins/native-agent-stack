@@ -980,15 +980,40 @@ could be shown or forwarded by mistake. Each now gets the verdict of its plain e
   read as a command, to 32 levels of nesting, so every rule applies to it: `echo "$(printenv)"`,
   `x="$(printenv)"; echo "$x"` and `git commit -m "$(cat "$PAPER_ENV_FILE")"` are blocked as their unquoted forms are.
   Single-quoted text and a backslash-escaped `\$(` or backquote stay data (`echo '$(printenv)'` and
-  `echo "\$(printenv)"` pass). A here-document inside such a body is read like any other here-document, so in the
-  `git commit -m "$(cat <<'EOF' ... EOF)"` pattern a prose line that starts with `set` or `printenv` can trip it, as it
-  already does for `git commit -F - <<'EOF'`. How here-document bodies are read is a separate change.
+  `echo "\$(printenv)"` pass). Two things in that reading were repaired the same day. A here-document with a quoted
+  delimiter (`<<'EOF'`, `<<"EOF"`, `<<\EOF`) inside such a substitution holds data, so the body a scan returns loses it
+  and `git commit -m "$(cat <<'EOF' ... EOF)"` passes whatever its prose says: five real commit messages of this
+  repository that mention `set`, `ps -E`, a `cat` of a credential file or a keyring name in prose, and had made the
+  pattern fail, are ALLOWED rows in `tests/test_secret_path_guard.py`. A shell that reads such a body as code
+  (`echo "$(bash <<'EOF' ... EOF)"`) is therefore not read (it passed before too). An unquoted delimiter keeps its
+  body, which the shell expands and the guard reads as command lines, as it does for a top-level here-document, so
+  prose in it that looks like a command (a line that starts with `printenv`, or `(ps -E, ...)`) trips the guard; how
+  here-document bodies are read as commands is a separate, later change. And a `)` in a `#` comment inside the body
+  no longer ends it.
+- **A `#` comment hides only its own line, and only where a word starts (2026-09-29, repair round).** The tokenizer
+  joins the lines of a command with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a
+  comment, so a `#` dropped the whole rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv`
+  and `gh api repos/o/r/issues/1#c; cat "$PAPER_ENV_FILE"` all passed, as did every command after a `## Summary`
+  heading. A comment is now removed only from a `#` that starts a word, outside quotes and double-quoted
+  substitutions, to the end of its line (Bash Reference Manual, "Comments"), and the guard keeps its earlier reading of
+  the same command besides, so nothing it read before is dropped (up to 200,000 characters: tokenizing costs about 9
+  microseconds a character inside quotes, and two readings of an 840 KB message took 17.8 s against a 10 s hook
+  timeout, one reading 8.9 s). Inside a `$(...)` body a comment also runs to the end
+  of its line (`echo "$(date # )` newline `printenv` newline `)"` runs printenv). In a here-document body, whose lines
+  the guard reads as commands, a comment hides the rest of that body, as before, so a script written through a
+  here-document (its first line is `#!`) stays as unread as it was; the text after the terminator is read. What this
+  newly blocks, measured on this repository: no fenced block, no fenced line and no script written through a
+  here-document (5,324 items), and only when a whole script is passed as one command string, the array literals
+  `x=(env -i ...)` and a python `set(...)`, which the guard has always read as commands (4 of 201 scripts).
+- **ANSI-C strings are data (2026-09-29).** `$'...'` runs to the first `'` that a backslash does not escape, so
+  `printf '%s' $'it\'s "$("printenv")"'` holds no substitution and passes; inside double quotes `$'` is no such string.
 - **`ps -E` is an environment display.** macOS `ps` documents `-E` as "Display the environment as well" and lists the
   BSD-style `e` as "Same as -E" (Apple `adv_cmds` `ps.1`, read 2026-09-29). The guard blocked dashless clusters with a
   lower-case `e` (`ps eww`, `ps auxe`) but not these. It now blocks, as an `environment_dump`, `-E` alone or in a cluster
   before the first option that takes a value (`ps -Ewwp 123`, `ps -p 123 -E`, `ps -A -E`) and dashless clusters with a
-  capital `E` (`ps Eww`, `ps auxE`). `ps -ef`, `ps -o pid,command -p N`, `ps aux` and an `E` that is only a value
-  (`ps -u Eve`) pass; a dashed `-e` is every process.
+  capital `E` (`ps Eww`, `ps auxE`). `ps -ef`, `ps -o pid,command -p N`, `ps aux` and an `E` that is only a value pass:
+  the word after a stand-alone value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to
+  it (`ps -uEve`); a dashed `-e` is every process.
 - **`systemctl show-environment` is an environment dump.** It prints a service manager's whole environment block, "the
   environment block that is passed to all processes the manager spawns" (`systemctl(1)` 255), so every variable the
   session imported into that manager, a credential included, lands in the output. It is now blocked as a
