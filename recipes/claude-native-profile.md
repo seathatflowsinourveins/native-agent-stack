@@ -226,6 +226,20 @@ covers child roles only; the
 [2026-09-27 review](../docs/decisions/2026-09-28-community-sweep.md#amendments-to-the-2026-09-24-rows)
 adds a session-level arm with Ultracode off for these pins.
 
+**2026-09-29 correction: on Claude Code 2.1.284 the per-model key applies under
+Ultracode, and Ultracode sets nothing.** Native probes
+([receipt](../evidence/receipts/claude-model-effort-probes-20260929.json)) found that a
+Sonnet 5.5 session with no saved level ran at `medium` under `ultracode: true`; that a
+saved per-model level (`low`, in the probe) won over `ultracode: true` for both Sonnet 5.5
+and Opus 5.5; and that a project settings file's top-level `effortLevel` or a
+`modelSettings` entry of `xhigh` raised the Sonnet 5.5 session to `xhigh`. The statement
+above that an Ultracode session already runs its coordinator at `xhigh` held for 2.1.281
+only. Save the pin for every model the agents bind (`claude-opus-5-5` and
+`claude-sonnet-5-5`), or commit `effortLevel: xhigh` in the project file; the guard now
+follows the measurement (an unsaved model warns at `SessionStart` and heals at
+`SessionEnd`, `ultracode` or not). The
+[dispatch record](../docs/decisions/2026-09-29-sonnet-5-5-dispatch.md) has the rest.
+
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
