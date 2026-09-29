@@ -16,6 +16,13 @@ Static checks (no model call):
                 RTK_TELEMETRY_DISABLED, no forwarded variables; `codex mcp list --json` names context-mode once
   profile       `codex -p stack-worker debug prompt-input` carries max effort's "do not spawn sub-agents unless
                 asked" and the markers; `codex -p stack-worker mcp get` shows the template's tool lists
+  roles         the two role carriers under $CODEX_HOME/agents equal their pinned rows (lane.ROLE_ROWS), the
+                agents folder holds exactly two *.toml files, and the live config.toml, the worker profile and the
+                system layer (/etc/codex) declare no other role: counts and booleans only, no model call. There is no
+                live role check here: the --live workers below run with --ephemeral, which persists no rollout, and
+                the exec JSONL item of a spawn_agent call (CollabToolCallItem, codex-rs/exec/src/exec_events.rs at
+                rust-v0.157.1) carries neither the child's role nor its developer text, so such a check could not
+                show that a role applied. Only the child's own rollout, from a non-ephemeral run, can.
   rtk-exactness in a scratch repository whose committed big.txt is over 8 KiB: `rtk git status` exits 0,
                 native `git show HEAD:big.txt` is byte-exact, and `rtk git show HEAD:big.txt` is not (the
                 reason it is an exception)
@@ -133,6 +140,30 @@ def make_repo(path: Path) -> bytes:
 # ---------------------------------------------------------------------------------------------------------------
 # static checks
 
+def roles_row(codex_home: Path, system_dir: Path | None = None) -> tuple[bool, str]:
+    """The `roles` row: how many of the two installed role carriers equal their pinned rows (lane.ROLE_ROWS), the
+    *.toml files under $CODEX_HOME/agents, the [agents.<name>] tables of the live config.toml and worker profile,
+    and the roles of the system layer (/etc/codex). It passes only with 2/2, 2, 0 and 0: exactly the two carriers,
+    installed by discovery, with nothing else that Codex would load as a role in any arm. Counts and booleans only;
+    no name, path or content."""
+    pins, agents = lane.role_pins(), codex_home / "agents"
+    equal = 0
+    if lane.path_kind(agents) == "dir":
+        for name in lane.ROLE_FILES:
+            try:
+                equal += lane.path_kind(agents / name) == "file" and lane.sha256_file(agents / name) == pins[name]
+            except OSError:
+                pass
+    count = lane.agents_toml_count(agents)
+    tables = lane.live_role_tables(codex_home)
+    system = lane.system_role_count(system_dir)
+    expected = len(lane.ROLE_FILES)
+    shown = ["unreadable" if value is None else value for value in (count, tables, system)]
+    ok = equal == expected and count == expected and tables == 0 and system == 0
+    return ok, (f"installed {equal}/{expected} equal to the pinned rows; *.toml under agents {shown[0]}; "
+                f"role tables {shown[1]}; system roles {shown[2]}")
+
+
 def static_checks(codex: str, codex_home: Path, eco_root: str, checkout: Path, repo: Path, blob: bytes,
                   results: Results) -> None:
     env = lane.codex_env(codex_home)
@@ -173,6 +204,8 @@ def static_checks(codex: str, codex_home: Path, eco_root: str, checkout: Path, r
     problems = lane.check_readbacks(found, eco_root)
     results.add("profile", not problems, "; ".join(problems) or
                 f"-p {lane.PROFILE_NAME}: {found['prompt_input_profile']}; servers {found['profile_servers']}")
+    ok, detail = roles_row(codex_home)
+    results.add("roles", ok, detail)
 
     rtk = shutil.which("rtk")
     if not rtk:
