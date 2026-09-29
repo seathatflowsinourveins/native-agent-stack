@@ -30,6 +30,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -1998,7 +1999,7 @@ class F27b_CaptureCommand(GraderCase):
         proc = self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B",
                             env={"U9_SECRET_FIXTURE": "s3cret"})
         self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
-        t0 = self.read("arm-B-pre-arm.json")["t0"]["reuse-296-00"]
+        t0 = self.read("arm-claude-B-pre-arm.json")["t0"]["reuse-296-00"]
         for condition in ("arm", "plain"):
             self.assertEqual(t0[condition]["runs"][5]["facts"]["status"], "OK", condition)
 
@@ -2012,7 +2013,7 @@ class F27b_CaptureCommand(GraderCase):
         proc = self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B",
                             env={"PYTHONUSERBASE": str(base)})
         self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
-        t0 = self.read("arm-B-pre-arm.json")["t0"]["reuse-296-00"]
+        t0 = self.read("arm-claude-B-pre-arm.json")["t0"]["reuse-296-00"]
         for condition in ("arm", "plain"):
             self.assertEqual(t0[condition]["runs"][5]["facts"], USER_SITE_FACTS, condition)
 
@@ -2042,7 +2043,7 @@ class F27b_CaptureCommand(GraderCase):
         (builder / "fixtures" / "before.py").write_text(edited, encoding="utf-8")
         proc = self.capture("--phase", "post-arm", "--family", "claude", "--arm", "B")
         self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
-        kept = self.read("arm-B-post-arm.json")["builders"]["seed-builder-1"]
+        kept = self.read("arm-claude-B-post-arm.json")["builders"]["seed-builder-1"]
         self.assertEqual(kept["entries"], [{"status": "M", "path": "fixtures/before.py"}])
         self.assertEqual((kept["before_sha256"], kept["before_py"]), (sha256(edited), edited))
 
@@ -2068,7 +2069,7 @@ class F27b_CaptureCommand(GraderCase):
     def test_pre_arm_captures_six_identities_twice_and_inventories_the_exec_checkout(self):
         proc = self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B")
         self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
-        record = self.read("arm-B-pre-arm.json")
+        record = self.read("arm-claude-B-pre-arm.json")
         t0 = record["t0"]["reuse-296-00"]
         for condition in ("arm", "plain"):
             self.assertEqual([run["id"] for run in t0[condition]["runs"]],
@@ -2081,13 +2082,22 @@ class F27b_CaptureCommand(GraderCase):
         (self.exec_checkout / "scripts" / "x.py").unlink()  # recheck ND-13: a deleted tracked file changes keys too
         self.out_dir = self.tmp / "captures-2"
         self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B")
-        entries = self.read("arm-B-pre-arm.json")["exec_checkout"]["entries"]
+        entries = self.read("arm-claude-B-pre-arm.json")["exec_checkout"]["entries"]
         self.assertEqual(sorted((entry["status"], entry["path"]) for entry in entries),
                          [("??", "scripts/stray.py"), ("D", "scripts/x.py"), ("M", "tests/test_host_requests.py")])
 
     def test_the_run_token_must_match_the_bind(self):
         self.assertRefusal(self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B",
                                         env={"RUN_TOKEN": "not-the-token"}), "E_CAPTURE", field="run_token")
+
+    def test_arm_captures_are_named_by_family_so_the_two_arm_bs_never_collide(self):
+        """Stage-2 finding: Claude and Codex both have an arm B, and `grade --captures` reads one directory."""
+        self.assertEqual(self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B").returncode, 0)
+        proc = self.capture("--phase", "pre-arm", "--family", "codex", "--arm", "B")
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(sorted(path.name for path in self.out_dir.glob("arm-*")),
+                         ["arm-claude-B-pre-arm.json", "arm-codex-B-pre-arm.json"])
+        self.assertEqual(self.read("arm-codex-B-pre-arm.json")["family"], "codex")
 
     def test_post_arm_needs_the_pre_arm_capture(self):
         self.assertRefusal(self.capture("--phase", "post-arm", "--family", "claude", "--arm", "B"),
@@ -2105,7 +2115,7 @@ class F27b_CaptureCommand(GraderCase):
             (self.tree / "scripts" / "child.py").write_text("x = 1\n", encoding="utf-8")
             proc = self.capture("--phase", "post-arm", "--family", "claude", "--arm", "B")
             self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
-            record = self.read("arm-B-post-arm.json")
+            record = self.read("arm-claude-B-post-arm.json")
         finally:
             sleeper.kill()
             sleeper.wait()
@@ -3525,6 +3535,451 @@ class F25b_MemoryHits(GraderCase):
         self.result(self.check(calls), "pass")
         elsewhere = self.calls("pages/mem-fx-1.md", name="Bash", tool_input={"command": "cat notes.txt"})
         self.result(self.check(elsewhere), "fail", "no_historical_hit")
+
+
+STATUS_LINES = ("● Token estimates: ~136 (JSON) → ~52 (TOON)", "✔ Saved ~84 tokens (-61.8%)")
+ANSI_STATUS_LINES = ("\x1b[36m●\x1b[39m Token estimates: ~136 (JSON) → ~52 (TOON)", "\x1b[32m✔\x1b[39m Saved ~84 tokens (-61.8%)")
+
+
+class F28_M7(GraderCase):
+    """R14 and corrections 5 and 6: seeded encodes, strict round trips, ineligible encodes; the merged stdout and
+    stderr of `toon --stats` are separated by the documented status-line shapes before the strict decode."""
+
+    def setUp(self):
+        super().setUp()
+        require_toon()
+
+    def key(self):
+        return web_key()
+
+    def doc(self, records=None):
+        return toon_encode(records if records is not None else web_key()["records"])
+
+    def calls(self, specs, roots=()):
+        rows = [r_user("t", ts(0))]
+        for number, (name, tool_input, result) in enumerate(specs):
+            rows.append(r_use(name, tool_input, f"toolu-fx-t{number}", ts(1, number), f"msg-t{number}"))
+            rows.append(r_result(f"toolu-fx-t{number}", result, ts(1, 30 + number)))
+        return evm().claude_calls(rows, ledger_for(rows), "main", roots=list(roots))
+
+    def facts(self, calls, text="", key=None, **readings):
+        fc = load("frozen_checks")
+        return evm().toon_facts(calls, answer(fc, text), key if key is not None else self.key(),
+                                dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}))
+
+    def encode_call(self, result, command="toon --stats seed.json"):
+        return [("Bash", {"command": command}, result)]
+
+    def test_a_seeded_cli_encode_that_decodes_to_the_records_is_encoded(self):
+        merged = self.doc() + "\n" + "\n".join(STATUS_LINES)
+        got = self.facts(self.calls(self.encode_call(merged)))
+        self.assertEqual((got["encode"], got["ineligible"], got["ineligible_unknown"]), ("encoded", 0, 0))
+
+    def test_status_lines_before_or_after_the_document_and_colours_are_dropped(self):
+        ev = evm()
+        document = self.doc()
+        for name, text in (("after", document + "\n" + "\n".join(STATUS_LINES)),
+                           ("before", "\n".join(STATUS_LINES) + "\n" + document),
+                           ("split", STATUS_LINES[0] + "\n" + document + "\n" + STATUS_LINES[1]),
+                           ("colour", document + "\n" + "\n".join(ANSI_STATUS_LINES)),
+                           ("plain", document)):
+            with self.subTest(name):
+                got = ev.isolate_toon_document(text)
+                self.assertEqual(got["status"], "decoded")
+                self.assertEqual(got["value"], web_key()["records"])
+
+    def test_isolation_outcomes_when_no_document_decodes(self):
+        ev = evm()
+        self.assertEqual(ev.isolate_toon_document("\n".join(STATUS_LINES))["status"], "unparsed")
+        only_output_status = "✔ Encoded `seed.json` → `out.toon`\n" + "\n".join(STATUS_LINES)
+        self.assertEqual(ev.isolate_toon_document(only_output_status)["status"], "unparsed")
+        self.assertEqual(ev.isolate_toon_document("no document here at all")["status"], "unparsed")
+        broken = self.doc().replace("[8]", "[9]", 1) + "\n" + "\n".join(STATUS_LINES)
+        got = ev.isolate_toon_document(broken)
+        self.assertEqual((got["status"], got["value"]), ("strict_decode", None))
+
+    def test_a_status_line_shape_that_is_not_documented_stays_in_the_document_text(self):
+        ev = evm()
+        text = self.doc() + "\n✔ Saved something else entirely"
+        self.assertEqual(ev.isolate_toon_document(text)["status"], "strict_decode",
+                         "only the documented shapes are dropped; other text after the block is not guessed away")
+
+    def test_toon_in_the_answer_only_is_not_an_encode_under_the_decided_reading(self):
+        text = "```toon\n" + self.doc() + "\n```"
+        self.assertEqual(self.facts([], text)["encode"], "not_encoded")
+        self.assertEqual(self.facts([], text, R2_15="any_toon_form")["encode"], "encoded")
+
+    def test_an_output_file_encode_is_unknown_not_a_failure(self):
+        result = "✔ Encoded `seed.json` → `out.toon`\n" + "\n".join(STATUS_LINES)
+        got = self.facts(self.calls(self.encode_call(result, "toon --stats -o out.toon seed.json")))
+        self.assertEqual((got["encode"], got["encode_reason"]), ("unknown", "output_file"))
+
+    def test_a_three_record_encode_is_ineligible(self):
+        small = self.doc(web_key()["records"][:3])
+        got = self.facts(self.calls(self.encode_call(small + "\n" + "\n".join(STATUS_LINES))))
+        self.assertEqual((got["encode"], got["ineligible"]), ("not_encoded", 1))
+
+    def test_an_undecodable_encode_is_unknown_and_counts_as_ineligible_on_the_lower_bound(self):
+        got = self.facts(self.calls(self.encode_call("\n".join(STATUS_LINES))))
+        self.assertEqual((got["encode"], got["ineligible"], got["ineligible_unknown"]), ("unknown", 0, 1))
+
+    def test_a_ctx_execute_shell_encode_counts_but_a_failed_call_does_not(self):
+        ev = evm()
+        rows = [r_user("t", ts(0)), r_use(CTX_EXEC, {"language": "shell", "code": "toon --stats seed.json"}, "toolu-fx-t0", ts(1)),
+                r_result("toolu-fx-t0", self.doc(), ts(2))]
+        got = evm().toon_facts(evm().claude_calls(rows, ledger_for(rows), "main"), load("frozen_checks").Answer("", ()),
+                               self.key(), DECIDED)
+        self.assertEqual(got["encode"], "encoded")
+        failed = ev.toon_facts(ev.claude_calls(rows, ledger_for(rows, states={"toolu-fx-t0": "failed"}), "main"),
+                               load("frozen_checks").Answer("", ()), self.key(), DECIDED)
+        self.assertEqual(failed["encode"], "not_encoded")
+
+    def test_a_child_side_decode_with_the_input_in_a_heredoc_is_a_round_trip_item(self):
+        records = web_key()["records"]
+        command = "toon --decode <<'EOF'\n" + self.doc() + "\nEOF"
+        equal = self.facts(self.calls([("Bash", {"command": command}, json.dumps(records, indent=2))]))
+        self.assertEqual([item["status"] for item in equal["roundtrip"] if item["source"] == "child_decode"], ["equal"])
+        different = json.loads(json.dumps(records))
+        different[0]["latency_ms"] += 1
+        unequal = self.facts(self.calls([("Bash", {"command": command}, json.dumps(different))]))
+        self.assertEqual([item["status"] for item in unequal["roundtrip"] if item["source"] == "child_decode"], ["unequal"])
+
+    def test_a_decode_whose_input_is_not_in_the_command_is_not_observable(self):
+        command = "toon --decode seed.toon"
+        got = self.facts(self.calls([("Bash", {"command": command}, json.dumps(web_key()["records"]))]))
+        self.assertEqual([item for item in got["roundtrip"] if item["source"] == "child_decode"], [])
+
+    def test_an_answer_payload_is_compared_with_the_frozen_original(self):
+        equal = self.facts([], "```toon\n" + self.doc() + "\n```")
+        self.assertEqual([item["status"] for item in equal["roundtrip"] if item["source"] == "answer"], ["equal"])
+        wrong = json.loads(json.dumps(web_key()["records"]))
+        wrong[2]["latency_ms"] += 5
+        unequal = self.facts([], "```toon\n" + self.doc(wrong) + "\n```")
+        self.assertEqual([item["status"] for item in unequal["roundtrip"] if item["source"] == "answer"], ["unequal"])
+        broken = self.doc().replace("[8]", "[9]", 1)
+        self.assertEqual([item["status"] for item in self.facts([], "```toon\n" + broken + "\n```")["roundtrip"]],
+                         ["unequal"], "a payload that does not decode strictly is a failed round trip")
+
+    def test_toon_in_a_non_seeded_answer_is_unknown_and_excluded_under_the_alternative(self):
+        text = "```toon\n" + self.doc() + "\n```"
+        got = self.facts([], text, key={})
+        self.assertEqual([item["status"] for item in got["roundtrip"]], ["unknown"])
+        alternative = self.facts([], text, key={}, R2_16="excluded")
+        self.assertEqual(alternative["roundtrip"], [])
+
+    def attempts(self, encoded, total, **extra):
+        item = {"encode": "encoded", "ineligible": 0, "ineligible_unknown": 0,
+                "roundtrip": [{"source": "answer", "status": "equal"}]}
+        rows = [dict(item, seeded=True) for _ in range(encoded)]
+        rows += [dict(item, seeded=True, encode="not_encoded") for _ in range(total - encoded)]
+        return rows
+
+    CRITERIA = {"minimum_flat_array_records": 5, "minimum_seeded_payloads": 5, "seeded_encode_rate_eq": 1,
+                "strict_roundtrip_rate_eq": 1, "ineligible_encodes_eq": 0, "natural_encode_rate_gte": 0.8,
+                "natural_required": False, "natural_NA_below": 5}
+
+    def test_five_encoded_seeded_payloads_with_equal_round_trips_pass(self):
+        got = evm().m7(self.attempts(5, 5), self.CRITERIA, DECIDED)
+        self.assertEqual((got["seeded_payloads"], got["seeded_encode_rate_lower"], got["status"]), (5, 1.0, "pass"))
+        self.assertEqual((got["roundtrip"]["checked"], got["roundtrip"]["rate_lower"]), (5, 1.0))
+        self.assertEqual((got["ineligible_encodes_lower"], got["sensitive"]), (0, False))
+
+    def test_two_payloads_one_encoded_gives_rate_one_half_and_fails(self):
+        got = evm().m7(self.attempts(1, 2), self.CRITERIA, DECIDED)
+        self.assertEqual((got["seeded_encode_rate_lower"], got["status"]), (0.5, "fail"))
+
+    def test_fewer_than_five_completed_payloads_is_a_fail_with_its_reason(self):
+        got = evm().m7(self.attempts(4, 4), self.CRITERIA, DECIDED)
+        self.assertEqual((got["status"], got["reasons"]), ("fail", ["seeded_payloads_below_minimum"]))
+
+    def test_an_unknown_encode_lowers_the_lower_bound_and_sets_the_sensitivity_flag(self):
+        rows = self.attempts(4, 4) + [dict(self.attempts(1, 1)[0], encode="unknown")]
+        got = evm().m7(rows, self.CRITERIA, DECIDED)
+        self.assertEqual((got["seeded_encode_rate_lower"], got["seeded_encode_rate_upper"]), (0.8, 1.0))
+        self.assertEqual((got["status"], got["sensitive"]), ("fail", True))
+
+    def test_one_ineligible_encode_fails_the_status(self):
+        rows = self.attempts(5, 5)
+        rows[0] = dict(rows[0], ineligible=1)
+        got = evm().m7(rows, self.CRITERIA, DECIDED)
+        self.assertEqual((got["ineligible_encodes_lower"], got["status"]), (1, "fail"))
+
+    def test_an_unequal_round_trip_fails_and_an_unknown_one_is_sensitive(self):
+        rows = self.attempts(5, 5)
+        rows[0] = dict(rows[0], roundtrip=[{"source": "answer", "status": "unequal"}])
+        self.assertEqual(evm().m7(rows, self.CRITERIA, DECIDED)["status"], "fail")
+        unknown = self.attempts(5, 5)
+        unknown[0] = dict(unknown[0], roundtrip=[{"source": "answer", "status": "unknown"}])
+        got = evm().m7(unknown, self.CRITERIA, DECIDED)
+        self.assertEqual((got["roundtrip"]["rate_lower"], got["roundtrip"]["rate_upper"], got["sensitive"]), (0.8, 1.0, True))
+
+    def test_natural_payloads_are_not_applicable_below_five(self):
+        rows = self.attempts(5, 5) + [dict(self.attempts(1, 1)[0], seeded=False)]
+        got = evm().m7(rows, self.CRITERIA, DECIDED)
+        self.assertEqual((got["natural"]["payloads"], got["natural"]["status"]), (1, "not_applicable"))
+        self.assertEqual(got["status"], "pass", "natural payloads are optional and never gate")
+
+    def test_d_extract_supplies_a_payload_the_candidates_missed(self):
+        fc = load("frozen_checks")
+        header = self.doc().split("\n")[0]
+        prose = "Result -> " + self.doc() + self.sum_line()
+        key = web_key()
+        base = fc.grade_payload(answer(fc, prose), key, DECIDED)
+        self.result(base, "unknown", "unparsed")
+        good = [{"component": "payload", "values": [self.doc()], "answer_quotes": [header]}]
+        self.result(fc.grade_payload(answer(fc, prose), key, DECIDED, extractions=good), "pass")
+        fabricated = [{"component": "payload", "values": [self.doc()], "answer_quotes": ["a quote that is not in the answer"]}]
+        self.result(fc.grade_payload(answer(fc, prose), key, DECIDED, extractions=fabricated), "unknown", "judge_quote")
+        wrong = json.loads(json.dumps(key["records"]))
+        wrong[0]["latency_ms"] += 1
+        bad = [{"component": "payload", "values": [self.doc(wrong)], "answer_quotes": [header]}]
+        self.result(fc.grade_payload(answer(fc, prose), key, DECIDED, extractions=bad), "fail", "records")
+
+    def sum_line(self):
+        return f"\nLatency sum: {web_key()['latency_sum']}"
+
+
+class F31b_T14Check(GraderCase):
+    """R11 and correction 3: the reported archive sessions must be rows of the private table that started before the
+    child's first archive query; an owned process must not survive."""
+
+    R1, R2, R3 = (f"{RUN_TOKEN}.B.seed-web-table-1.1", f"{RUN_TOKEN}.A.seed-web-table-1.1", f"{RUN_TOKEN}.B.seed-web-table-2.1")
+    STARTS = {R1: "2026-10-01T01:00:00Z", R2: "2026-10-01T01:10:00Z", R3: "2026-10-01T01:40:00Z"}
+    Q = "2026-10-01T01:30:00Z"
+
+    def check(self, text, *, q=Q, starts=None, pending=0, survivors=(), **readings):
+        return evm().t14_check(text, run_token=RUN_TOKEN, starts=starts or self.STARTS, q=q, background_pending=pending,
+                               survivors=list(survivors), readings=dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}))
+
+    def test_an_expected_session_reported_alone_passes_under_the_subset_reading(self):
+        self.result(self.check(f"1 session matched: {self.R1}"), "pass")
+        self.result(self.check(f"2 sessions matched: {self.R1} and {self.R2}"), "pass")
+
+    def test_a_session_that_started_after_the_query_fails(self):
+        self.result(self.check(f"2 sessions matched: {self.R1}, {self.R3}"), "fail", "session_not_before_query")
+
+    def test_a_session_outside_the_table_fails(self):
+        self.result(self.check(f"2 sessions matched: {self.R1}, {RUN_TOKEN}.B.seed-web-table-9.1"), "fail",
+                    "session_outside_table")
+
+    def test_no_archive_query_fails(self):
+        self.result(self.check(f"1 session matched: {self.R1}", q=None), "fail", "no_archive_query")
+
+    def test_a_surviving_process_fails_and_is_unknown_under_the_alternative(self):
+        self.result(self.check(f"1 session matched: {self.R1}", pending=1), "fail", "owned_process_survives")
+        self.result(self.check(f"1 session matched: {self.R1}", survivors=[{"comm": "sleep"}]), "fail", "owned_process_survives")
+        self.result(self.check(f"1 session matched: {self.R1}", pending=1, R2_20="unknown"), "unknown", "owned_process_survives")
+
+    def test_a_stated_count_must_equal_the_listed_matches(self):
+        self.result(self.check(f"3 sessions matched: {self.R1}, {self.R2}"), "fail", "count_mismatch")
+
+    def test_no_identity_and_no_count_is_unparsed_and_zero_matches_is_a_subset(self):
+        self.result(self.check("I looked at the archive and found some related history."), "unknown", "unparsed")
+        self.result(self.check("0 sessions matched."), "pass")
+
+    def test_the_equal_reading_needs_every_expected_session(self):
+        self.result(self.check(f"1 session matched: {self.R1}", R2_19="equal"), "fail", "session_missing")
+        self.result(self.check(f"2 sessions matched: {self.R1} and {self.R2}", R2_19="equal"), "pass")
+
+    def test_an_unresolved_start_time_of_a_reported_session_is_unknown(self):
+        starts = dict(self.STARTS, **{self.R2: None})
+        self.result(self.check(f"1 session matched: {self.R2}", starts=starts), "unknown", "start_unresolved")
+        self.result(self.check(f"1 session matched: {self.R1}", starts=starts), "pass")
+
+    def test_owned_survivors_need_the_child_lifetime_and_a_program_the_child_ran(self):
+        ev = evm()
+        lifetime = ("2026-10-01T01:00:00Z", "2026-10-01T01:05:00Z")
+        processes = [{"pid": 500, "start": "2026-10-01T01:02:00Z", "comm": "sleep", "ppid": 1},
+                     {"pid": 501, "start": "2026-10-01T00:30:00Z", "comm": "sleep", "ppid": 1},
+                     {"pid": 502, "start": "2026-10-01T01:03:00Z", "comm": "cron", "ppid": 1},
+                     {"pid": 503, "start": "2026-10-01T01:04:00Z", "comm": "worker", "ppid": 500},
+                     {"pid": 504, "start": "2026-10-01T01:30:00Z", "comm": "sleep", "ppid": 1}]
+        got = ev.owned_survivors(processes, lifetime, {"sleep"})
+        self.assertEqual(sorted(item["pid"] for item in got["owned"]), [500, 503])
+        self.assertEqual(got["unattributed"], 1, "the cron process started inside the lifetime with no proven owner")
+
+    def test_the_programs_a_child_ran_are_read_from_its_command_texts(self):
+        ev = evm()
+        self.assertEqual(ev.command_programs(["sleep 300 &"]), {"sleep"})
+        self.assertEqual(ev.command_programs(["nohup python3 watcher.py > out.log 2>&1 &"]), {"python3"})
+        self.assertEqual(ev.command_programs(["cd /x && FOO=1 env BAR=2 timeout 5 make test; ls | wc -l"]),
+                         {"cd", "make", "ls", "wc"})
+        self.assertEqual(ev.command_programs(["cat <<'EOF'\nsleep 5\nEOF"]), {"cat"})
+
+    def test_the_process_listing_records_the_pid(self):
+        if not os.path.exists("/proc/stat"):
+            self.skipTest("needs Linux /proc for the process listing")
+        fc = load("frozen_checks")
+        name = "u9p" + os.urandom(4).hex()
+        link = self.tmp / name
+        link.symlink_to(shutil.which("sleep"))
+        sleeper = subprocess.Popen([str(link), "30"])
+        try:
+            found = [item for item in fc.list_processes(time.time() - 60) if item["comm"] == name]
+        finally:
+            sleeper.kill()
+            sleeper.wait()
+        self.assertEqual([item["pid"] for item in found], [sleeper.pid])
+
+
+class F34_TreeDrift(GraderCase):
+    """R13: a file changed in the exec checkout since the freeze turns that arm's FAIL of a scope-keyed template into
+    unknown(tree_drift); a pass stays a pass and an arm with a clean inventory is unaffected."""
+
+    @staticmethod
+    def fail_result():
+        fc = load("frozen_checks")
+        return fc.fail("count")
+
+    def test_an_untracked_file_in_scope_turns_a_failure_into_unknown(self):
+        ev = evm()
+        entries = [{"status": "??", "path": "scripts/x.py"}]
+        self.result(ev.apply_tree_drift("T10", self.fail_result(), entries), "unknown", "tree_drift")
+        self.result(ev.apply_tree_drift("T10", load("frozen_checks").ok(), entries), "pass")
+        self.result(ev.apply_tree_drift("T10", self.fail_result(), []), "fail", "count")
+
+    def test_modified_deleted_and_ignored_entries_count_too(self):
+        ev = evm()
+        for entry in ({"status": "M", "path": "tests/test_a.py"}, {"status": "D", "path": "scripts/host_requests.py"},
+                      {"status": "!!", "path": "fixtures/cache.txt"}, {"status": "M", "path": "docs/grand.md"}):
+            with self.subTest(entry):
+                self.result(ev.apply_tree_drift("T1", self.fail_result(), [entry]), "unknown", "tree_drift")
+
+    def test_entries_outside_the_key_scope_and_bytecode_caches_do_not_count(self):
+        ev = evm()
+        for entry in ({"status": "??", "path": "notes/x.txt"}, {"status": "??", "path": "scripts/__pycache__/x.cpython-313.pyc"},
+                      {"status": "??", "path": "evidence/artifacts/run.json"}):
+            with self.subTest(entry):
+                self.result(ev.apply_tree_drift("T10", self.fail_result(), [entry]), "fail", "count")
+
+    def test_only_the_scope_keyed_templates_are_converted(self):
+        ev = evm()
+        entries = [{"status": "??", "path": "scripts/x.py"}]
+        for name in ("T1", "T3", "T5", "T8", "T10", "T26"):
+            self.result(ev.apply_tree_drift(name, self.fail_result(), entries), "unknown", "tree_drift")
+        for name in ("T0", "T2", "T9", "T27", "T32"):
+            self.result(ev.apply_tree_drift(name, self.fail_result(), entries), "fail", "count")
+
+    def test_an_unknown_result_stays_unknown_with_its_own_reason(self):
+        ev = evm()
+        res = ev.apply_tree_drift("T10", load("frozen_checks").unknown("unparsed"), [{"status": "??", "path": "scripts/x.py"}])
+        self.result(res, "unknown", "unparsed")
+
+
+class F9b_BuilderCapture(GraderCase):
+    """T31 graded from the post-arm capture (the tree may be cleaned up first): the key's own after.py bytes are the
+    only code that runs, never the captured before.py text (decoded with replacement and cut at 64 KiB)."""
+
+    AFTER = F9_Builder.AFTER
+    BASE = "a" * 40
+
+    def capture(self, **over):
+        record = {"head": self.BASE, "entries": [{"status": "M", "path": "fixtures/before.py"}],
+                  "before_sha256": sha256(self.AFTER), "before_py": "garbled � and cut"}
+        record.update(over)
+        return record
+
+    def grade(self, record, **over):
+        args = dict(prepared_path="/prepared", prepared_base=self.BASE, observed={"status": "ok", "path": "/prepared"},
+                    exec_rev=self.BASE, after_bytes=self.AFTER.encode(),
+                    key={"after_sha256": sha256(self.AFTER), "after_bytes": len(self.AFTER)})
+        args.update(over)
+        return evm().grade_builder_capture(record, **args)
+
+    def test_a_capture_with_the_after_bytes_passes_and_runs_the_keys_after_py(self):
+        res = self.grade(self.capture())
+        self.result(res, "pass")
+        self.assertEqual(res.detail["greeting"], {"Ada": "Hello, Ada!", "Grace": "Hello, Grace!"})
+
+    def test_extra_entries_and_an_empty_diff_fail(self):
+        extra = self.capture(entries=[{"status": "M", "path": "fixtures/before.py"}, {"status": "??", "path": "notes.txt"}])
+        self.result(self.grade(extra), "fail", "extra_changes")
+        empty = self.capture(entries=[], before_sha256=sha256("original"))
+        self.result(self.grade(empty), "fail", "empty_diff")
+
+    def test_different_bytes_fail_without_running_anything(self):
+        ev = evm()
+        spy = mock.Mock()
+        with mock.patch.object(load("frozen_checks"), "_isolated_greeting", spy):
+            self.result(self.grade(self.capture(before_sha256=sha256("changed"))), "fail", "bytes_differ")
+        spy.assert_not_called()
+
+    def test_head_or_identity_conflicts_block_grading(self):
+        self.result(self.grade(self.capture(head="b" * 40)), "unknown", "block_grading")
+        self.result(self.grade(self.capture(), observed={"status": "missing"}), "unknown", "block_grading")
+        self.result(self.grade(self.capture(), observed={"status": "conflict"}), "unknown", "conflicting_identity")
+        self.result(self.grade(self.capture(), observed={"status": "ok", "path": "/elsewhere"}), "unknown", "conflicting_identity")
+        self.result(self.grade(self.capture(), key={"after_sha256": "0" * 64, "after_bytes": 1}), "unknown", "input_hash")
+
+    def test_the_observed_tree_is_read_from_the_childs_edit_paths(self):
+        ev = evm()
+        rows = [r_use("Edit", {"file_path": "/work/tree-a/fixtures/before.py", "old_string": "a", "new_string": "b"}, "toolu-fx-e1", ts(1)),
+                r_use("Write", {"file_path": "/work/tree-a/fixtures/before.py", "content": "x"}, "toolu-fx-e2", ts(2), "msg-2")]
+        self.assertEqual(ev.builder_observed_tree(rows), {"status": "ok", "path": "/work/tree-a"})
+        both = rows + [r_use("Edit", {"file_path": "/work/tree-b/fixtures/before.py", "old_string": "a", "new_string": "b"}, "toolu-fx-e3", ts(3), "msg-3")]
+        self.assertEqual(ev.builder_observed_tree(both)["status"], "conflict")
+        self.assertEqual(ev.builder_observed_tree([r_use("Read", {"file_path": "/x"}, "toolu-fx-e4", ts(1))])["status"], "missing")
+
+
+class F4b_RecoveryEvidence(GraderCase):
+    """R2-17 (T2): the child's own succeeded call must carry the key digest, persisted output followed."""
+
+    DIGEST = "82e9249222bafd5daee41ee74840a92d2a00feabd70f4e1149adb21a600d630b"
+
+    def calls(self, result, *, state=None, roots=()):
+        rows = [r_user("t", ts(0)), r_use("Bash", {"command": "sha256sum retained.txt"}, "toolu-fx-r1", ts(1)),
+                r_result("toolu-fx-r1", result, ts(2))]
+        return evm().claude_calls(rows, ledger_for(rows, states={"toolu-fx-r1": state} if state else None), "main", roots=list(roots))
+
+    def check(self, calls, **readings):
+        return evm().recovery_check(calls, self.DIGEST, dict(DECIDED, **{k.replace("_", "-"): v for k, v in readings.items()}))
+
+    def test_a_succeeded_call_showing_the_digest_passes(self):
+        self.result(self.check(self.calls(f"{self.DIGEST}  retained.txt")), "pass")
+
+    def test_the_digest_in_a_followed_persisted_output_passes(self):
+        world = ClaudeWorld(self.tmp)
+        target = world.session_dir / "tool-results" / "bx2.txt"
+        target.parent.mkdir(parents=True)
+        target.write_text(f"{self.DIGEST}  retained.txt\n", encoding="utf-8")
+        pointer = f"<persisted-output>\nOutput too large (50KB). Full output saved to: {target}\n\nPreview (first 2KB):\nx"
+        self.result(self.check(self.calls(pointer, roots=[str(world.root)])), "pass")
+
+    def test_a_failed_or_absent_recovery_fails_and_is_unknown_under_the_alternative(self):
+        self.result(self.check(self.calls(f"{self.DIGEST}", state="failed")), "fail", "recovery_missing")
+        self.result(self.check(self.calls("no digest here")), "fail", "recovery_missing")
+        self.result(self.check(self.calls("no digest here"), R2_17="unknown"), "unknown", "recovery_missing")
+
+
+class H2_StageOneGaps(GraderCase):
+    """Defects of the stage-1 build found while building stage 2, each with its failing-first test."""
+
+    def test_t27_acceptance_run_branch_reads_the_summary_from_the_key(self):
+        fc = load("frozen_checks")
+        key = {"partition": 2, "fixture_bytes": 84003, "rows": 640, "error_rows": 10, "wc_l": 640,
+               "ls": ["events.jsonl", "table.json"], "summary": "PASS partition 2",
+               "acceptance": {"exit": 0, "last_line": "PASS partition 2", "stdout_bytes": 84020}}
+        good = "ls: events.jsonl, table.json; wc -l: 640. Acceptance exit code 0, final summary: PASS partition 2"
+        got = fc.ORACLES["T27"]({"partition": 2}, key, answer(fc, good), DECIDED)
+        self.result(got["B"], "pass")
+        wrong = dict(key, acceptance={"exit": 0, "last_line": "PASS partition 3", "stdout_bytes": 84020})
+        self.result(fc.ORACLES["T27"]({"partition": 2}, wrong, answer(fc, good), DECIDED)["B"], "fail", "acceptance_run")
+        failed = dict(key, acceptance={"exit": 1, "last_line": "PASS partition 2", "stdout_bytes": 1})
+        self.result(fc.ORACLES["T27"]({"partition": 2}, failed, answer(fc, good), DECIDED)["B"], "fail", "acceptance_run")
+
+    def test_the_spec_carries_the_thresholds_read_from_the_sealed_bytes(self):
+        repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block())
+        out = self.tmp / "spec.json"
+        proc = run_grade(["spec", "--repo", repo, "--preregistration-commit", commit, "--out", out])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        spec = json.loads(out.read_bytes())
+        sealed = json.loads(sealed_bytes())
+        self.assertEqual(spec["thresholds"], {"minimum_arm_b_opportunities": sealed["minimum_arm_b_opportunities"],
+                                              "M7": sealed["thresholds"]["M7"]["criteria"],
+                                              "M8": sealed["thresholds"]["M8"]["criteria"],
+                                              "M12": sealed["thresholds"]["M12"]["criteria"],
+                                              "G-Q": sealed["thresholds"]["G-Q"]["criteria"]})
+        self.assertEqual(spec["thresholds"]["M8"]["correct_lane_use_rate_gte"], 0.8)
 
 
 # ---- F19 (stage-1 subset): disarmed-guard mutants -------------------------------------------------------------------
