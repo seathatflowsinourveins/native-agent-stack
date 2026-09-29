@@ -324,8 +324,9 @@ stays the 2026-09-27 state; this section records what changed the next day and w
   and the [model-config](https://code.claude.com/docs/en/model-config) alias table lists `sonnet` resolving to
   Sonnet 5.5 from v2.1.284 (Sonnet 5 from v2.1.197).
 - **Observed on this host.** One `stack-researcher` child that named the alias `sonnet` under Claude Code 2.1.284
-  resolved to `claude-sonnet-5-5` at effort `max` in 82 of its 82 assistant messages, read from its own subagent
-  transcript, which stays on the host and is not retained here. The `source-scout` and Codex-wrapper stages of the
+  resolved to `claude-sonnet-5-5` at effort `max` in 38 of its 38 assistant messages, read from its own subagent
+  transcript, which stays on the host and is not retained here (corrected 2026-09-29: this record first counted the
+  transcript's 82 rows, one per content block, as messages). The `source-scout` and Codex-wrapper stages of the
   table above name the same alias, so they should resolve the same way with no byte changed in this repository;
   their own transcripts were not read, and a provider other than the Anthropic API or an
   `ANTHROPIC_DEFAULT_SONNET_MODEL` pin would change the result

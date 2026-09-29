@@ -226,6 +226,28 @@ covers child roles only; the
 [2026-09-27 review](../docs/decisions/2026-09-28-community-sweep.md#amendments-to-the-2026-09-24-rows)
 adds a session-level arm with Ultracode off for these pins.
 
+**2026-09-29 correction: on Claude Code 2.1.284 the per-model key applies under
+Ultracode, and Ultracode sets nothing.** Native probes
+([receipt](../evidence/receipts/claude-model-effort-probes-20260929.json)) found that a
+Sonnet 5.5 session with no saved level ran at `medium` under `ultracode: true`; that a
+per-model level (`low`, passed with `--settings` in the probe) won over `ultracode: true` for both Sonnet 5.5
+and Opus 5.5; and that a project settings file's top-level `effortLevel` or a
+`modelSettings` entry of `xhigh` raised the Sonnet 5.5 session to `xhigh`. The statement
+above that an Ultracode session already runs its coordinator at `xhigh` held before
+2.1.284 (it was measured on 2.1.281), and so did "a `max` session turns Ultracode orchestration off": on 2.1.284 the reminder stayed
+present at `max` (an indicator, not proof of workflow behaviour). Save the pin for every model the agents bind (`claude-opus-5-5` and
+`claude-sonnet-5-5`), or commit `effortLevel: xhigh` in the project file; the guard now
+follows the measurement (an unsaved model warns at `SessionStart` and heals at
+`SessionEnd`, `ultracode` or not). The
+[dispatch record](../docs/decisions/2026-09-29-sonnet-5-5-dispatch.md) has the rest.
+
+**2026-09-29, later: the terminal default is `max`, through the ecosystem launcher.** The user asked for `max` as the default. A saved
+`max` is still not accepted, and `CLAUDE_CODE_EFFORT_LEVEL` would override every child's own effort, so the launcher that `install_native`
+writes adds `--effort max` only when nothing chose an effort (a terminal, no `-p`, no `--effort`, no `CLAUDE_CODE_EFFORT_LEVEL`, a client
+at 2.1.284 or newer). `claude --effort xhigh` opts out, and the saved per-model `xhigh` above stays the fallback for launches that skip
+the launcher (IDE, desktop, web). The choice rests on the user's requirement, not on a measured gain here
+([decision record](../docs/decisions/2026-09-29-max-default-effort.md), [receipt](../evidence/receipts/claude-max-default-effort-20260929.json)).
+
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
@@ -240,20 +262,20 @@ silently dropped. With `--settings '{"ultracode":false,"effortLevel":"max"}'`
 the session ran at `xhigh`, while the same key at `high` ran at `high` (probes
 Q1 and Q2); for `modelSettings.<model>.effortLevel` the installed schema and
 the docs reject `max` as well. A session started with `--effort max` or
-`CLAUDE_CODE_EFFORT_LEVEL=max` ran at `max` with Ultracode orchestration off.
+`CLAUDE_CODE_EFFORT_LEVEL=max` ran at `max` with Ultracode orchestration off (2.1.281; on 2.1.284 the reminder stayed present).
 `/effort max` was not probed; the docs say Claude Code applies `max` to the
 current session only
 ([model configuration](https://code.claude.com/docs/en/model-config), fetched
 2026-09-23). Never set `CLAUDE_CODE_EFFORT_LEVEL`: any value overrides every
-child's frontmatter and workflow-stage effort, and any value other than `xhigh`
-also turns Ultracode off. The shipped [agent definitions](../adoption/agents/claude/)
+child's frontmatter and workflow-stage effort, and on 2.1.281 any value other than
+`xhigh` also turned Ultracode off (from 2.1.284 it stays on). The shipped [agent definitions](../adoption/agents/claude/)
 therefore declare `effort: max` beside their task-matched models (Sonnet for
 `source-scout` and Opus for every other shipped role; `isolated-builder` and
 `stack-verifier` declare Opus since 2026-09-27, per item 1 of the
 [settings decision](../docs/decisions/2026-09-27-claude-harness-settings.md);
 Haiku is not routed), and workflow stages pass
-`effort: 'max'` explicitly: a stage without its own effort inherits the
-coordinator's `xhigh` unless its agent's frontmatter sets one, and a stage's
+`effort: 'max'` explicitly: a stage without its own effort inherited the
+coordinator's `xhigh` on 2.1.281 unless its agent's frontmatter sets one, and a stage's
 effort overrides the frontmatter (probe Q3). Verify each child's resolved
 effort in its transcript rather than inferring it from a definition. The
 [Ultracode recipe](claude-native-ultracode.md#child-effort-max-under-an-ultracode-coordinator)
