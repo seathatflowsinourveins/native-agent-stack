@@ -1036,17 +1036,18 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   FILE`). Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: a git or gh option that runs its value
   (`git rebase --exec "$(cat <<'EOF' ... EOF)"`, `gh alias set`), an echo whose output is piped into a shell or written
   into a script that runs later, and an unquoted here-document that expands `$(...)` between single quotes
-  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29 at commit
-  660e6812: of the 1,960 commit messages reachable there, in the `git commit -m` and `gh pr create --body` patterns, the
-  guard refuses 10 (each names a secret variable, a store path or a token command in prose, which the raw-text rules
-  read) and the base guard 14, and 5 messages that the base guard refused (its quote parity read prose as commands)
-  pass; a matrix of 40 consumers, 18 launcher prefixes, 5 here-document forms, 8 payloads and 4 substitution forms
-  (115,200 commands) loosens no row against the base guard; a differential over 62,365 derived commands loosens 102,
-  every one a `ps -fu steve` or `ps -fu eve` (the second loosening, below); a grammar fuzz of launcher chains with
-  redirections and idiom placements (10 seeds of 60,000 commands) loosens none; and mutation fuzz of 25,140 mutants of
-  419 blocked strings loosens 33 to 44 per seed, 29 to 38 of them variants of those two `ps` rows and 4 to 6 of them
-  mutants whose broken terminator leaves a real quoted body that bash prints and does not run (`echo "$(cat <<'EOF'`,
-  `text\`, `E`, `# c`, `OF`, `echo "$(printenv)"` ... `EOF`).
+  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29 with the guard of
+  commit 660e6812: of the 1,960 distinct commit messages on all refs of this repository (`git log --all`, a count that
+  grows), in the `git commit -m` and `gh pr create --body` patterns, the guard refuses 10 (each names a secret variable,
+  a store path or a token command in prose, which the raw-text rules read) and the base guard 14, and 5 messages that
+  the base guard refused (its quote parity read prose as commands) pass; a matrix of 40 consumers, 18 launcher
+  prefixes, 5 here-document forms, 8 payloads and 4 substitution forms (115,200 commands) loosens no row against the
+  base guard; a differential over 62,365 derived commands loosens 102, every one a `ps -fu steve` or `ps -fu eve` (the
+  second loosening, below); a grammar fuzz of launcher chains with redirections and idiom placements (10 seeds of
+  60,000 commands) loosens none; and mutation fuzz of 25,140 mutants of 419 blocked strings loosens 33 to 44 per seed,
+  29 to 38 of them variants of those two `ps` rows and 4 to 6 of them mutants whose broken terminator leaves a real
+  quoted body that bash prints and does not run (`echo "$(cat <<'EOF'`, `text\`, `E`, `# c`, `OF`, `echo "$(printenv)"`
+  ... `EOF`).
 - **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
   with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
   rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and
@@ -1123,28 +1124,30 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   the rules take is part of the guard's safety and no timer inside the hook can replace it. That is why each text is
   scanned in one pass (a stack of frames and a regular expression that jumps between the characters that matter, not
   a rescan per arithmetic shift or per nesting level), the terminator of the canonical idiom is found by a binary search
-  in a line index built once and the text after it is matched once per terminator, a chain of `env`, `rtk` or `systemd-run` launchers is walked by index instead
-  of copying the rest of the command at every hop, and the bodies read behind double-quoted substitutions are capped at
-  32 levels and at four times the command's length plus 64 KiB. Measured on this host with the inputs of
-  `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the substitution scan took 10 s on 12,000
-  here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on 60,000 nested `systemd-run`; the launcher
-  walk that predates this work took 29 s on 20,000 nested `env` and 56 s on 20,000 nested `rtk proxy`. Each input now
-  takes under a second (the test bounds it at 3 s). The dashless `ps` cluster test is a set-membership test since
-  2026-09-29: the regular expression before it had two overlapping quantifiers and took 13 to 15 s on `ps` followed by
-  70,000 `E` and a letter that is no flag (a hook past its timeout fails open), and a test now times every compiled pattern
-  of the guard on 70,000-character repeats. Tokenizing is shlex's, about 9 microseconds a character inside quotes,
-  so from 2026-09-29 `main()` also refuses a command of more than 200,000 characters as `command_too_large` (exit 2, one
-  line that names no command text, with the hint to put the content in a file with the Write tool and pass the path):
-  measured that day, one quoted word of 1,000,000 characters took 10.2 to 13.0 s in `check()` (the base guard too),
-  600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took 0.6 s, and a hook that times out blocks nothing. The
-  limit is low enough that both readings of a command always run inside the timeout, so no reading is skipped above some
-  length. `check()` itself has no size limit. A substitution nested beyond the caps above is still not read.
+  in a line index built once and the text after it is matched once per terminator, a chain of `env`, `rtk` or
+  `systemd-run` launchers is walked by index instead of copying the rest of the command at every hop, and the bodies
+  read behind double-quoted substitutions are capped at 32 levels and at four times the command's length plus 64 KiB.
+  Measured on this host with the inputs of `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the
+  substitution scan took 10 s on 12,000 here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on
+  60,000 nested `systemd-run`; the launcher walk that predates this work took 29 s on 20,000 nested `env` and 56 s on
+  20,000 nested `rtk proxy`. Each input now takes under a second (the test bounds it at 3 s). The dashless `ps` cluster
+  test is a set-membership test since 2026-09-29: the regular expression before it had two overlapping quantifiers and
+  took 13 to 15 s on `ps` followed by 70,000 `E` and a letter that is no flag (a hook past its timeout fails open), and a
+  test now times every compiled pattern of the guard on 70,000-character repeats. Tokenizing is shlex's, about 9
+  microseconds a character inside quotes, so from 2026-09-29 `main()` also refuses a command of more than 200,000
+  characters as `command_too_large` (exit 2, one line that names no command text, with the hint to put the content in a
+  file with the Write tool and pass the path): measured that day, one quoted word of 1,000,000 characters took 10.2 to
+  13.0 s in `check()` (the base guard too), 600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took 0.6 s,
+  and a hook that times out blocks nothing. The limit is low enough that both readings of a command always run inside
+  the timeout, so no reading is skipped above some length; the slowest input of about 199,000 characters found (a
+  double-quoted text holding `#` throughout, plus one canonical idiom) took 3.3 s in `check()`. `check()` itself has no
+  size limit. A substitution nested beyond the caps above is still not read.
 - **Loosenings against the base guard (c26800f3), 2026-09-29: two.** Everything else this work changes tightens. (1) The
-  canonical idiom (see the here-document item) passes behind `git`, `gh`, `echo` and `printf`, where the base guard refused
-  a commit message whose quote parity it misread or whose lines it read as commands (5 of this repository's commit
-  messages at 660e6812). (2) `ps -fu steve` and `ps -fu eve` pass, since `-u` takes a value (`ps -u steve` and `ps -fu Eve` passed
-  before). Each has rows in `tests/test_secret_path_guard.py` (ALLOWED), and the probe of the review, base guard against
-  this one, reports `loosened rows: 0` apart from them.
+  canonical idiom (see the here-document item) passes behind `git`, `gh`, `echo` and `printf`, where the base guard
+  refused a commit message whose quote parity it misread or whose lines it read as commands (5 of this repository's
+  commit messages, measured in that item). (2) `ps -fu steve` and `ps -fu eve` pass, since `-u` takes a value
+  (`ps -u steve` and `ps -fu Eve` passed before). Each has rows in `tests/test_secret_path_guard.py` (ALLOWED), and the
+  probe of the review, base guard against this one, reports `loosened rows: 0` apart from them.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)
