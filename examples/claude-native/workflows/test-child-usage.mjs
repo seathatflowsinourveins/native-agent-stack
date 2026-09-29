@@ -436,12 +436,16 @@ expect('git options: any reading of the option words reaches the subcommand, as 
 // proxy`, and names lane executables by exact basename; data, lookups and registrations run none. Each invocation is shown
 // as lane/program[:op][@server] plus its flags, with '-' for no lane or no program.
 {
+  // The lane reading needs the verified tree-sitter-bash install (loadShellParser; CHILD_USAGE_SHELL_PARSER or the default directory).
+  const laneParser = await kernel.loadShellParser()
+  if (!laneParser.ok) console.log('SKIP cli lanes: no verified tree-sitter-bash install (' + laneParser.reason + '); see shell-parser.pin.json for the install command')
   const show = (i) => (i.lane ?? '-') + '/' + (i.program ?? '-') + (i.op ? ':' + i.op : '') + (i.server ? '@' + i.server : '')
     + (i.excluded ? ' excluded' : '') + (i.remote ? ' remote' : '') + (i.unresolved ? ' unresolved' : '')
   const read = (c) => {
     try { return typeof kernel.commandInvocations === 'function' ? kernel.commandInvocations(c).map(show) : ['(not exported)'] } catch (e) { return ['(threw ' + e.name + ')'] }
   }
   const check = (name, cases) => {
+    if (!laneParser.ok) return
     const bad = cases.filter(([c, want]) => JSON.stringify(read(c)) !== JSON.stringify(want)).map(([c]) => JSON.stringify(c) + ' => ' + JSON.stringify(read(c)))
     expect(name + (bad.length ? ' [' + bad.join('; ') + ']' : ''), bad.length === 0)
   }
@@ -531,12 +535,17 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     return { ms: run.ms, threw, lengths: run.r }
   }
   const stressPasses = (s) => s.ms < 1000 && s.threw.length === 0 && s.lengths.every((n) => Number.isInteger(n) && n >= 0)
-  const real = stress(kernel.commandInvocations)
-  expect('cli lanes: long and deeply nested commands are read in linear time without exhausting the stack [' + real.ms.toFixed(0) + ' ms, threw: ' + (real.threw.join() || 'none') + ']', stressPasses(real))
   const throwing = (c) => { if (c.length > 5000) throw new RangeError('mutation control'); return kernel.commandInvocations(c) }
-  const mutated = stress(throwing)
+  // The mutation control needs no parser: the reader below throws for every long input, and the check must fail for it.
+  const mutated = stress((c) => { if (c.length > 5000) throw new RangeError('mutation control'); return [] })
   expect('cli lanes: the stress check fails when every long input throws (mutation control) [threw ' + mutated.threw.length + ' of ' + stressInputs.length + ']',
     mutated.threw.length === stressInputs.filter((c) => c.length > 5000).length && !stressPasses(mutated))
+  if (laneParser.ok) {
+    const real = stress(kernel.commandInvocations)
+    expect('cli lanes: long and deeply nested commands are read in linear time without exhausting the stack [' + real.ms.toFixed(0) + ' ms, threw: ' + (real.threw.join() || 'none') + ']', stressPasses(real))
+    const partial = stress(throwing)
+    expect('cli lanes: the same check fails on the real reader wrapped to throw for long input [threw ' + partial.threw.length + ']', !stressPasses(partial))
+  }
 }
 // D1 (U1 pivot brief): loadShellParser verifies the pinned tree-sitter-bash install (shell-parser.pin.json: the sha256 of every
 // pinned file and both npm integrity values of the install's package-lock.json) before anything loads, and never falls back to the
@@ -632,6 +641,12 @@ expect('git options: any reading of the option words reaches the subcommand, as 
         expect('parser: ' + what + ' is hash_mismatch, and the parser stays unavailable [' + JSON.stringify(r) + ']',
           same(r, { ok: false, reason: 'hash_mismatch' }) && status().ok === false && kernel.commandInvocations('qmd') === null && globalThis.__shellParserPwned === undefined)
       }
+      if (typeof process.getuid === 'function' && process.getuid() !== 0) {
+        const locked = copy('locked', (dest) => chmodSync(join(dest, 'node_modules/tree-sitter-bash/tree-sitter-bash.wasm'), 0o000))
+        const denied = await load(locked)
+        chmodSync(join(locked, 'node_modules/tree-sitter-bash/tree-sitter-bash.wasm'), 0o600)
+        expect('parser: a pinned file that cannot be read is load_error, not a hash mismatch [' + JSON.stringify(denied) + ']', same(denied, { ok: false, reason: 'load_error' }) && kernel.commandInvocations('qmd') === null)
+      } else console.log('SKIP parser: the unreadable-file check needs a non-root user')
       const partial = await load(copy('partial', (dest) => rmSync(join(dest, 'node_modules/web-tree-sitter/web-tree-sitter.wasm'))))
       expect('parser: an install with a pinned file missing is not_installed [' + JSON.stringify(partial) + ']', same(partial, { ok: false, reason: 'not_installed' }))
       const noLock = await load(copy('no-lock', (dest) => rmSync(join(dest, 'package-lock.json'))))

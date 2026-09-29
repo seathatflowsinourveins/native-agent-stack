@@ -30,6 +30,15 @@ def rtk_replay_supported():
 
 
 RTK_REPLAY_SUPPORTED = rtk_replay_supported()
+# The tree-sitter-bash install the kernel's lane reading needs (child-usage.mjs loadShellParser): CHILD_USAGE_SHELL_PARSER, else the
+# ecosystem tools directory that shell-parser.pin.json names. Tests of lane counts skip, with this message, on a host without it.
+PARSER_DIR = Path(os.environ.get("CHILD_USAGE_SHELL_PARSER") or Path.home() / ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1")
+PARSER_INSTALLED = (PARSER_DIR / "package-lock.json").is_file()
+NEEDS_PARSER = unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+# What a measured cli_lanes records about the parser (versions and the two wasm sha256 values, no path): shell-parser.pin.json.
+PARSER_RECORD = {"versions": {"tree_sitter_bash": "0.25.1", "web_tree_sitter": "0.27.0"},
+                 "wasm_sha256": {"tree_sitter_bash": "8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a",
+                                 "web_tree_sitter": "c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3"}}
 
 
 def call(key, name, **inputs):
@@ -170,8 +179,8 @@ STACK_MCPORTER_CALLS = {
                      " --output text --no-oauth", "context-mode"),
 }
 CLI_CARRIERS = ("bash", "rtk_proxy", "ctx", "nested")
-EMPTY_CLI = {"lanes": {}, "mcporter_downstream": {}, "excluded_version_help": {}, "calls_with_lane_invocation": 0,
-             "unresolved_programs": 0, "remote_invocations": 0}
+EMPTY_CLI = {"status": "measured", "parser": PARSER_RECORD, "lanes": {}, "mcporter_downstream": {}, "excluded_version_help": {},
+             "calls_with_lane_invocation": 0, "unresolved_programs": 0, "remote_invocations": 0}
 
 
 def lane_row(calls=1, carrier="bash", **counts):
@@ -193,30 +202,35 @@ def downstream_row(calls=1, **counts):
 def proxy_row(calls=1, prefix_rule_calls=0, **counts):
     """measurement.proxy for `calls` unreviewed rtk proxy calls with one invocation each."""
     row = {"calls": calls, "acceptance": 0, "exception": 0, "unclassified": calls, "invocations": calls, "nested": 0,
-           "in_ctx_code": 0, "prefix_rule_calls": prefix_rule_calls, "acceptance_or_exception_share": 0 if calls else None}
+           "in_ctx_code": 0, "prefix_rule_calls": prefix_rule_calls, "rule": "command_position",
+           "acceptance_or_exception_share": 0 if calls else None}
     row.update(counts)
     return row
 
 
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
 class TokenMeasurement(unittest.TestCase):
-    def measure(self, rows, *, env=None, **options):
-        script = ("import {readFileSync} from 'node:fs'; import {measureTranscript} from "
+    def measure(self, rows, *, env=None, parser=True, **options):
+        """measureTranscript over `rows`. With parser=True (the default) the kernel's loadShellParser() is awaited first, as its CLI and
+        the Codex bridge do; on a host with no install, or with CHILD_USAGE_SHELL_PARSER in `env` naming none, cli_lanes says so."""
+        script = ("import {readFileSync} from 'node:fs'; import {measureTranscript, loadShellParser} from "
                   + json.dumps(MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); "
-                  "process.stdout.write(JSON.stringify(measureTranscript(x.rows,x.options))); ")
+                  + ("await loadShellParser(); " if parser else "")
+                  + "process.stdout.write(JSON.stringify(measureTranscript(x.rows,x.options))); ")
         p = subprocess.run(["node", "--input-type=module", "-e", script],
                            input=json.dumps({"rows": rows, "options": options}),
                            text=True, capture_output=True, check=False, env=env)
         self.assertEqual(p.returncode, 0, p.stderr)
         return json.loads(p.stdout)
 
-    def exports(self, expression, value):
-        """Evaluate `expression` (awaited) over the module's exports (`cu`) and the JSON input (`x`)."""
+    def exports(self, expression, value, *, env=None, parser=True):
+        """Evaluate `expression` (awaited) over the module's exports (`cu`) and the JSON input (`x`), after awaiting loadShellParser()
+        unless parser=False."""
         script = ("import {readFileSync} from 'node:fs'; import * as cu from " + json.dumps(MODULE.as_uri())
-                  + "; const x=JSON.parse(readFileSync(0,'utf8')); process.stdout.write(JSON.stringify(await ("
-                  + expression + ")));")
+                  + "; const x=JSON.parse(readFileSync(0,'utf8')); " + ("await cu.loadShellParser(); " if parser else "")
+                  + "process.stdout.write(JSON.stringify(await (" + expression + ")));")
         p = subprocess.run(["node", "--input-type=module", "-e", script], input=json.dumps(value),
-                           text=True, capture_output=True, check=False)
+                           text=True, capture_output=True, check=False, env=env)
         self.assertEqual(p.returncode, 0, p.stderr)
         return json.loads(p.stdout)
 
@@ -720,6 +734,7 @@ class TokenMeasurement(unittest.TestCase):
         self.assertEqual(self.exports("x.map(cu.fetchKind)", commands),
                          ["fetch"] * (len(commands) - len(D7_DATA)) + [None] * len(D7_DATA))
 
+    @NEEDS_PARSER
     def test_cli_lanes_count_a_lane_the_outer_shell_runs_through_a_double_quoted_run_string(self):
         # D7 with qmd in place of curl (GPT-6 #8): the outer shell runs the substitution, so it is one qmd call.
         got = self.lanes_of(["bash -c \"cat <<'EOF'\n$(qmd search x)\nEOF\""])
@@ -759,6 +774,7 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
                 self.assertEqual(m4["status"], "incomplete")
 
+    @NEEDS_PARSER
     def test_cli_lanes_read_the_heredoc_a_shell_reads_after_a_closed_double_quoted_substitution(self):
         got = self.lanes_of(["FOO=\"$(pwd)\" bash <<'EOF'\nqmd search x\nEOF"])
         self.assertEqual((got[0][0]["lanes"].get("qmd") or {}).get("calls"), 1)
@@ -812,6 +828,7 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
         self.assertEqual(self.exports("x.map(cu.fetchKind)", R3_EXECUTED), ["fetch"] * len(R3_EXECUTED))
 
+    @NEEDS_PARSER
     def test_cli_lanes_count_stack_commands_in_command_position(self):
         # #381 AA-PLAN PR-A item 3: a lane executable in command position is a lane call. An mcporter list counts for
         # mcporter; an mcporter call counts for its downstream server and reaches a lane only through the alias map.
@@ -829,6 +846,7 @@ class TokenMeasurement(unittest.TestCase):
                                        "mcporter_downstream": {server: downstream_row(succeeded=1)},
                                        "calls_with_lane_invocation": 1})
 
+    @NEEDS_PARSER
     def test_cli_lanes_follow_wrappers_compound_commands_and_substitutions(self):
         # POSIX.1-2024 XCU 2.9.1 (Rule 7 assignments), 2.9.2-2.9.4 (pipelines, lists, compound commands), 2.6.3 (command
         # substitution) and the timeout, env, nice, command, time and xargs synopses; GNU coreutils 9.4 stdbuf; sudo
@@ -849,6 +867,7 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli, {**EMPTY_CLI, "lanes": {lane: lane_row(succeeded=1, ambiguous=ambiguous)},
                                        "calls_with_lane_invocation": 1})
 
+    @NEEDS_PARSER
     def test_cli_lanes_runners_and_direct_calls(self):
         # Executables: toon, repomix, @tobilu/qmd, mcporter and context-mode package bins; markitdown, headroom,
         # jcodemunch-mcp and serena console scripts; the codebase-memory-mcp and ai-memory binaries (U1 sources S5-S16).
@@ -863,6 +882,7 @@ class TokenMeasurement(unittest.TestCase):
             with self.subTest(command=command):
                 self.assertEqual(cli, {**EMPTY_CLI, "lanes": {lane: lane_row(succeeded=1)}, "calls_with_lane_invocation": 1})
 
+    @NEEDS_PARSER
     def test_cli_lanes_mcporter_calls_count_for_the_downstream_server(self):
         # openclaw/mcporter@93e0916c (v0.14.1): global flags (cli-factory.ts:19), command inference
         # (command-inference.ts:10-95), call parsing (call-arguments.ts:79-233), target resolution (call-command.ts:114-173,
@@ -884,6 +904,7 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli, {**EMPTY_CLI, "mcporter_downstream": {server: downstream_row(succeeded=1)}})
                 self.assertNotIn("context7.com", json.dumps(cli))
 
+    @NEEDS_PARSER
     def test_cli_lanes_ignore_data_lookups_registrations_and_near_names(self):
         negatives = ["command -v qmd", "type qmd", "which qmd", "hash qmd", "grep -n qmd notes.md",
                      'git commit -m "use toon"', "echo 'rtk proxy ls'", 'echo "rtk proxy pytest"',
@@ -898,6 +919,7 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli, EMPTY_CLI)
                 self.assertEqual(proxy.get("calls"), 0)
 
+    @NEEDS_PARSER
     def test_cli_lanes_version_help_remote_and_unresolved_programs(self):
         # --version and --help among a lane's own words (before `--`; for rtk proxy, rtk's words before the proxied
         # program) are counted apart, per lane; mcporter's pinned help/version tokens and clap's rtk -V/-h as well.
@@ -916,6 +938,7 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli, {**EMPTY_CLI, **fields})
                 self.assertEqual(proxy.get("calls"), 1 if command.startswith("rtk proxy") else 0)
 
+    @NEEDS_PARSER
     def test_cli_lane_states_follow_the_call_result(self):
         # AA-PLAN: "Successful" means the tool_result is not an error (Messages API is_error). An error that never ran
         # is also not_executed: content "<tool_use_error>", or a toolUseResult naming a PreToolUse hook denial, a
@@ -960,6 +983,7 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual((cli or {}).get("lanes"), {"qmd": row})
                 self.assertNotIn("b1", json.dumps(cli))
 
+    @NEEDS_PARSER
     def test_rtk_proxy_population_follows_command_position(self):
         # rtk-ai/rtk@1d87b8e7 src/main.rs:68-90 (-v/--verbose, --ultra-compact, --skip-env before the subcommand) and
         # :3008-3042 (proxy's arguments; one spaced argument is shell-split, and no shell runs it). The prefix rule is
@@ -997,9 +1021,10 @@ class TokenMeasurement(unittest.TestCase):
         both["by_carrier"] = {"bash": 0, "rtk_proxy": 0, "ctx": 1, "nested": 1}
         self.assertEqual((got.get("cli_lanes") or {}).get("lanes"), {"rtk_proxy": both})
 
+    @NEEDS_PARSER
     def test_cli_lanes_aggregate_sums_counters_and_counts_actors_with_success(self):
-        script = ("import {readFileSync} from 'node:fs'; import {measureTranscript, aggregateMeasurements} from "
-                  + json.dumps(MODULE.as_uri()) + "; const rows=JSON.parse(readFileSync(0,'utf8')); "
+        script = ("import {readFileSync} from 'node:fs'; import {measureTranscript, aggregateMeasurements, loadShellParser} from "
+                  + json.dumps(MODULE.as_uri()) + "; const rows=JSON.parse(readFileSync(0,'utf8')); await loadShellParser(); "
                   "process.stdout.write(JSON.stringify([aggregateMeasurements(rows.map(r=>measureTranscript(r))), "
                   "aggregateMeasurements([])]));")
         actors = [[call("a", "Bash", command="qmd search x"), result("a", "ok"),
@@ -1017,8 +1042,9 @@ class TokenMeasurement(unittest.TestCase):
                       "rtk_proxy": {**lane_row(carrier="ctx", succeeded=1), "actors_with_success": 1}},
             "mcporter_downstream": {"linear": downstream_row(succeeded=1)}})
         self.assertEqual(got["proxy"], proxy_row(calls=0, in_ctx_code=1))
-        self.assertEqual(empty.get("cli_lanes"), EMPTY_CLI)
+        self.assertEqual(empty.get("cli_lanes"), {"status": "not_measured"})  # an aggregate of no measurements has no lane counts
 
+    @NEEDS_PARSER
     def test_sweep_cli_lanes_and_proxy_are_id_free(self):
         # Output is names and counts: no directory, tool_use_id, host, URL, path or command text from the fixture.
         with tempfile.TemporaryDirectory() as directory:

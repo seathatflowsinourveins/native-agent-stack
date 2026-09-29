@@ -732,7 +732,7 @@ def cli_lane_row(carrier="bash", **counts):
 def cli_proxy_row(nested=0):
     """measurement.proxy for one unreviewed rtk proxy call with one invocation (no prefix-rule match)."""
     return {"calls": 1, "acceptance": 0, "exception": 0, "unclassified": 1, "invocations": 1, "nested": nested,
-            "in_ctx_code": 0, "prefix_rule_calls": 0, "acceptance_or_exception_share": 0}
+            "in_ctx_code": 0, "prefix_rule_calls": 0, "rule": "command_position", "acceptance_or_exception_share": 0}
 
 
 def codex_row(kind, payload):
@@ -944,6 +944,7 @@ class CodexLanes(unittest.TestCase):
         for secret in ("call_priv", DECLINED_TEXT, "pytest", "search_graph", "GRAPH_QUERY_ARGS", "notes.md"):
             self.assertNotIn(secret, text)
 
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
     def test_codex_shell_call_states_reach_cli_lanes(self):
         # U1 design 6 (i)-(vii). A call's state comes from its persisted CommandExecution status when there is one:
         # declined is failed and not executed (events.rs:562-573). With no item state, a Bash-mapped call's output
@@ -996,6 +997,7 @@ class CodexLanes(unittest.TestCase):
                     self.assertEqual(got["proxy"], proxy)
                 self.assert_id_free(got)
 
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
     def test_codex_shell_state_controls(self):
         # Must-stay controls: an exit 0 header succeeds; only the header before `Output:` is read, never the output;
         # a persisted item state wins over the output text, as a paginated item arrives when the command ends.
@@ -1087,6 +1089,7 @@ class CodexLanes(unittest.TestCase):
         self.assertEqual(S.shell_script("qmd search x"), "qmd search x")
         self.assertEqual(S.shell_script([]), "")
 
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
     def test_argv_metacharacters_stay_data_in_the_codex_bridge(self):
         # D6 (GPT-6 #11, verbatim first case): the bridge flattened argv with spaces, so ["echo", "qmd; rtk proxy qmd status"]
         # read as two commands and counted one qmd call and one rtk proxy call that never ran.
@@ -1131,6 +1134,7 @@ class CodexLanes(unittest.TestCase):
         self.assertEqual(got["m4"]["shell_fetch"], 1)
         self.assert_id_free(got)
 
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
     def test_codex_aggregate_passes_cli_lanes_and_proxy_through(self):
         # aggregate_codex_lanes hands the per-actor measurements to the kernel's aggregateMeasurements, which sums
         # cli_lanes and proxy and adds actors_with_success per lane.

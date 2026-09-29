@@ -906,9 +906,14 @@ def exec_header_state(output) -> tuple[bool, str | None]:
 
 
 def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
+    """Run one export of the measurement kernel in Node. A measurement (not an aggregate or a review check) first awaits the kernel's
+    loadShellParser(), as the kernel's own CLI does: the CLI-lane reading needs a verified tree-sitter-bash install (the directory
+    order is CHILD_USAGE_SHELL_PARSER, then the ecosystem tools directory that shell-parser.pin.json names), and without one the
+    measurement reports cli_lanes as parser_unavailable and counts no lane."""
     export = "validateExceptions" if validate_reviews else "aggregateMeasurements" if aggregate else "measureTranscript"
-    script = ("import {readFileSync} from 'node:fs'; import {" + export + "} from "
-              + json.dumps(MEASUREMENT_MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); "
+    load = "" if aggregate or validate_reviews else "await loadShellParser(); "
+    script = ("import {readFileSync} from 'node:fs'; import {" + export + ("" if aggregate or validate_reviews else ", loadShellParser")
+              + "} from " + json.dumps(MEASUREMENT_MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); " + load
               + "process.stdout.write(JSON.stringify(" + export
               + ("(x)" if aggregate or validate_reviews else "(x.rows,x.options)") + ")); ")
     try:

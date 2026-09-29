@@ -38,7 +38,7 @@
 import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { homedir, tmpdir } from 'node:os'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 
@@ -592,6 +592,86 @@ const timeOf = (row) => { const t = Date.parse(row && row.timestamp); return Num
 const counter = () => Object.create(null)
 const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1 }
 
+// ------------------------------------------------------------------ shell parser
+// The CLI-lane reading parses shell text with tree-sitter-bash (tree-sitter/tree-sitter-bash v0.25.1 through web-tree-sitter
+// 0.27.0), the grammar OpenAI Codex uses for the same job (openai/codex rust-v0.157.1 codex-rs/shell-command/src/bash.rs,
+// tree-sitter-bash = "0.25" at codex-rs/Cargo.toml:522). The install is not vendored: shell-parser.pin.json names the two npm
+// packages with their integrity values, the sha256 of every file read, and the install command. loadShellParser() reads each
+// pinned file once, checks its sha256 and the integrity values of the install's package-lock.json, and executes only those
+// verified bytes (the runtime module is imported from a private copy of them, the runtime and grammar wasm are handed over as
+// bytes), so the code that is hashed is the code that runs. Without a verified install nothing is parsed: commandInvocations()
+// returns null and measurement reports cli_lanes as parser_unavailable; the old text scanners never count lanes.
+// { ok: true, versions, wasm_sha256 } or { ok: false, reason }: not_installed (the directory, a pinned file or the lockfile is
+// missing), hash_mismatch (a byte or an integrity value differs from the pin), load_error (anything else, the pin file included),
+// or not_loaded (this process never awaited the loader). Results carry no path.
+let shellParser = null // the one module-level Parser, or null
+let shellRuntime = null // { Parser, language } once initialized: every successful load verifies the same pinned bytes, so it is reused
+let shellParserResult = { ok: false, reason: 'not_loaded' }
+let openShellTreeCount = 0
+const sha256Hex = (bytes) => createHash('sha256').update(bytes).digest('hex')
+const missingFile = (e) => e && (e.code === 'ENOENT' || e.code === 'ENOTDIR')
+function readShellParserPin() {
+  try {
+    const pin = JSON.parse(readFileSync(new URL('./shell-parser.pin.json', import.meta.url), 'utf8'))
+    const ok = pin && typeof pin === 'object' && pin.packages?.['web-tree-sitter']?.version && pin.packages['tree-sitter-bash']?.version
+      && pin.files && typeof pin.files === 'object' && typeof pin.install?.default_directory === 'string'
+      && ['web-tree-sitter', 'tree-sitter-bash'].every((n) => typeof pin.packages[n].integrity === 'string')
+    return ok ? pin : null
+  } catch { return null }
+}
+async function verifiedShellParser(dir) {
+  const pin = readShellParserPin()
+  if (!pin) return { ok: false, reason: 'load_error' }
+  const root = dir || process.env.CHILD_USAGE_SHELL_PARSER || join(homedir(), pin.install.default_directory)
+  const bytes = {}
+  let lock
+  try {
+    for (const rel of Object.keys(pin.files)) bytes[rel] = readFileSync(join(root, rel))
+    lock = readFileSync(join(root, pin.install.lockfile || 'package-lock.json'))
+  } catch (e) { return { ok: false, reason: missingFile(e) ? 'not_installed' : 'load_error' } }
+  if (Object.entries(pin.files).some(([rel, want]) => sha256Hex(bytes[rel]) !== want)) return { ok: false, reason: 'hash_mismatch' }
+  let packages
+  try { packages = JSON.parse(lock.toString('utf8')).packages } catch { return { ok: false, reason: 'hash_mismatch' } }
+  for (const name of ['web-tree-sitter', 'tree-sitter-bash']) {
+    const entry = packages?.['node_modules/' + name]
+    if (!entry || entry.version !== pin.packages[name].version || entry.integrity !== pin.packages[name].integrity) return { ok: false, reason: 'hash_mismatch' }
+  }
+  const runtime = 'node_modules/web-tree-sitter/web-tree-sitter', grammar = 'node_modules/tree-sitter-bash/tree-sitter-bash.wasm'
+  if (!shellRuntime) {
+    const scratch = mkdtempSync(join(tmpdir(), 'shell-parser-'))
+    try {
+      const file = join(scratch, 'web-tree-sitter.js')
+      writeFileSync(file, bytes[runtime + '.js'], { mode: 0o600 })
+      const { Parser, Language } = await import(pathToFileURL(file).href)
+      await Parser.init({ wasmBinary: bytes[runtime + '.wasm'], locateFile: (name) => name })
+      shellRuntime = { Parser, language: await Language.load(new Uint8Array(bytes[grammar])) }
+    } finally { rmSync(scratch, { recursive: true, force: true }) }
+  }
+  shellParser = new shellRuntime.Parser()
+  shellParser.setLanguage(shellRuntime.language)
+  return { ok: true, versions: { tree_sitter_bash: pin.packages['tree-sitter-bash'].version, web_tree_sitter: pin.packages['web-tree-sitter'].version },
+    wasm_sha256: { tree_sitter_bash: sha256Hex(bytes[grammar]), web_tree_sitter: sha256Hex(bytes[runtime + '.wasm']) } }
+}
+// Directory order: the argument (the --shell-parser flag of the CLI), then CHILD_USAGE_SHELL_PARSER, then the ecosystem tools
+// directory under HOME that the pin names. A failed load leaves no parser loaded, whatever an earlier call did.
+export async function loadShellParser(dir) {
+  if (shellParser) { shellParser.delete(); shellParser = null }
+  try { shellParserResult = await verifiedShellParser(dir) } catch { shellParser = null; shellParserResult = { ok: false, reason: 'load_error' } }
+  return shellParserResult
+}
+// The result of the last loadShellParser() call (not_loaded before the first).
+export const shellParserStatus = () => shellParserResult
+// Runs `visit` on the root node of the parse tree of `command` and frees the tree when it returns or throws; null when no parser
+// is loaded. The visitor must not keep a node or return one: nodes end with their tree.
+export function withShellTree(command, visit) {
+  if (!shellParser) return null
+  const tree = shellParser.parse(String(command ?? ''))
+  if (!tree) throw new Error('shell parser returned no tree')
+  openShellTreeCount++
+  try { return visit(tree.rootNode) } finally { tree.delete(); openShellTreeCount-- }
+}
+export const openShellTrees = () => openShellTreeCount
+
 // ------------------------------------------------------------------ CLI lanes
 // #381 AA-PLAN PR-A item 3 (private Gate A spec): count the CLI lanes toon, repomix, markitdown, qmd, headroom, jcodemunch-mcp,
 // codebase-memory-mcp, ai-memory, serena, context-mode, `rtk proxy` and mcporter in command position, leaving --version and
@@ -1097,8 +1177,9 @@ function analyzeScript(command) {
 // name-shaped basename, or null when unresolved), op (proxy, or an mcporter operation), server (an mcporter call's
 // downstream key), excluded (a --version or --help call), remote (run on another host by ssh), unresolved (a program
 // named by an expansion, or behind an option this reading does not know), via (the package runner) }. No raw text, no ids.
+// null when no verified tree-sitter-bash install is loaded (loadShellParser): no lane is ever counted without it.
 export function commandInvocations(command) {
-  return analyzeScript(command).invocations
+  return shellParser ? analyzeScript(command).invocations : null
 }
 // The shell scripts of a call, as countFetches selects them: the Bash command (also a sandbox-nested Codex command),
 // ctx_batch_execute commands and shell ctx_execute(_file) code. Python, JavaScript and Codex code-mode source are not read.
@@ -1200,6 +1281,8 @@ const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s
 const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
 // A Bash call is carried by rtk proxy when its command invokes `rtk proxy` in command position (commandInvocations, through
 // the caller's per-call memo `proxied`); the earlier prefix rule survives only as measurement.proxy.prefix_rule_calls.
+// The rule before the command-position reading, kept as the fallback without a parser and as measurement.proxy.prefix_rule_calls.
+const rtkProxyPrefix = (call) => call?.name === 'Bash' && /^\s*rtk\s+proxy\b/.test(call.input?.command || '')
 const carrierOf = (call, proxied = () => false) => call?.code_mode ? 'code_mode' : call?.name === 'Bash' ? (proxied(call) ? 'rtk_proxy' : 'bash')
   : call?.name === 'WebFetch' ? 'webfetch' : call?.name === 'Read' ? 'read'
     : ['Grep', 'Glob'].includes(call?.name) ? 'grep_glob' : isCtx(call?.name) ? 'ctx'
@@ -1489,17 +1572,21 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       try { if (JSON.parse(a.stdout).hookSpecificOutput?.additionalContext) hookContext.claimed++ } catch { /* no claim */ }
     }
   }
-  // One command-position reading per call (U1 design 2.6): carrierOf, measurement.proxy and cli_lanes all read it.
+  // One command-position reading per call (U1 design 2.6): carrierOf, measurement.proxy and cli_lanes all read it. It needs a verified
+  // tree-sitter-bash install (loadShellParser); without one nothing is read, cli_lanes says why, and the carrier of an rtk proxy call is
+  // the prefix rule of the measurements before this reading (measurement.proxy.rule).
+  const parserState = shellParserStatus(), lanesOn = parserState.ok
   const analyses = new Map()
   const analysisOf = (c) => { let a = analyses.get(c); if (!a) analyses.set(c, a = callAnalysis(c)); return a }
-  const proxied = (c) => analysisOf(c).proxy > 0
+  const proxied = lanesOn ? (c) => analysisOf(c).proxy > 0 : rtkProxyPrefix
   for (const c of calls.values()) if (inside(c.row)) countFetches(c, fetchCarriers[carrierOf(c, proxied)] ||= emptyFetches())
   for (const f of Object.values(fetchCarriers)) for (const k of Object.keys(m4)) m4[k] += f[k]
   const mcpStates = counter(), loaded = counter(), cli = emptyCliLanes()
   // measurement.proxy: the M6 population is the Bash calls carried by rtk proxy (sandbox-nested Codex calls included, as
   // before), with its invocations; rtk proxy in ctx shell code is reported apart and left out of M6, and the prefix rule's
   // count is kept for comparison with earlier receipts.
-  const proxy = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
+  const proxy = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: lanesOn ? 0 : null, nested: 0, in_ctx_code: lanesOn ? 0 : null, prefix_rule_calls: 0,
+    rule: lanesOn ? 'command_position' : 'prefix_fallback' }
   for (const c of calls.values()) {
     if (!inside(c.row)) continue
     const server = mcpServer(c.name), r = results.get(c.id)
@@ -1511,17 +1598,17 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
         : c.native_status === 'completed' ? 'succeeded' : c.native_status === 'failed' ? 'failed' : 'unfinished'
       state.attempted++; state[status]++
     }
-    const analysis = analysisOf(c), carrier = carrierOf(c, proxied)
-    if (c.name === 'Bash' && /^\s*rtk\s+proxy\b/.test(c.input?.command || '')) proxy.prefix_rule_calls++
+    const analysis = lanesOn ? analysisOf(c) : null, carrier = carrierOf(c, proxied)
+    if (rtkProxyPrefix(c)) proxy.prefix_rule_calls++
     if (carrier === 'rtk_proxy') {
       proxy.calls++
-      proxy.invocations += analysis.proxy
+      if (lanesOn) proxy.invocations += analysis.proxy
       if (c.sandbox) proxy.nested++
       const review = exceptions[c.id]
       proxy[validReview(review) && review.proxy_purpose === 'acceptance' ? 'acceptance'
         : validReview(review) && EXCEPTIONS.includes(review.exception) ? 'exception' : 'unclassified']++
-    } else if (isCtx(c.name) && analysis.proxy) proxy.in_ctx_code++
-    if (analysis.invocations.length) countLanes(cli, analysis, callState(c, r), c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
+    } else if (lanesOn && isCtx(c.name) && analysis.proxy) proxy.in_ctx_code++
+    if (lanesOn && analysis.invocations.length) countLanes(cli, analysis, callState(c, r), c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
   }
   for (const [id, r] of results) if (inside(r.row) && calls.get(id)?.name === 'ToolSearch' && Array.isArray(r.content)) {
     for (const ref of r.content) if (ref?.type === 'tool_reference') {
@@ -1560,7 +1647,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     hook_context: hookContext,
     mcp_states: mcpStates, loaded_not_called: loaded,
     proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
-    cli_lanes: cli,
+    cli_lanes: lanesOn ? { status: 'measured', parser: { versions: parserState.versions, wasm_sha256: parserState.wasm_sha256 }, ...cli } : { status: 'parser_unavailable', reason: parserState.reason },
     invalid_exceptions: invalidExceptions, orphan_results: orphanResults,
     sandbox_operations: [...calls.values()].filter((c) => inside(c.row) && c.sandbox).length,
     unknown_result_bytes: unknownResultBytes, bytes_complete: !unknownResultBytes && !orphanResults && !unfinished,
@@ -1583,16 +1670,21 @@ export function aggregateMeasurements(items) {
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
   const hooks = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }, states = counter(), loaded = counter()
   const proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
-  // CLI lanes sum their counters; actors_with_success counts the actors with at least one succeeded call of the lane.
-  const cli = emptyCliLanes()
+  // CLI lanes sum their counters over the actors whose lanes were measured; actors_with_success counts the actors with at least one
+  // succeeded call of the lane. An actor measured without a parser has no lane counts (cli_lanes.status parser_unavailable), so the
+  // sums of a mixed set are lower bounds and say so; a measurement from before the status existed reads as measured.
+  const cli = emptyCliLanes(), statusOf = (m) => m.cli_lanes ? (m.cli_lanes.status ?? 'measured') : null
+  const measured = items.filter((m) => statusOf(m) === 'measured'), unavailable = items.filter((m) => statusOf(m) === 'parser_unavailable')
+  const records = new Set(measured.map((m) => JSON.stringify(m.cli_lanes.parser ?? null)))
+  const rules = new Set(items.map((m) => m.proxy.rule ?? 'command_position'))
   for (const m of items) {
     for (const k of ['inserted', 'claimed', 'with_marker']) hooks[k] += m.hook_context[k]
     for (const k of ['by_hook', 'by_event']) for (const [s, n] of Object.entries(m.hook_context[k])) hooks[k][s] = (hooks[k][s] || 0) + n
     for (const [s, row] of Object.entries(m.mcp_states)) for (const [k, n] of Object.entries(row)) { states[s] ||= counter(); states[s][k] = (states[s][k] || 0) + n }
     for (const [s, n] of Object.entries(m.loaded_not_called)) loaded[s] = (loaded[s] || 0) + n
-    for (const k of Object.keys(proxies)) proxies[k] += m.proxy[k] || 0
+    for (const k of Object.keys(proxies)) proxies[k] = proxies[k] === null || m.proxy[k] === null ? null : proxies[k] + (m.proxy[k] || 0)
     const part = m.cli_lanes
-    if (!part) continue
+    if (!part || statusOf(m) !== 'measured') continue
     for (const [lane, row] of Object.entries(part.lanes)) {
       const total = cli.lanes[lane] ||= { ...emptyLane(), actors_with_success: 0 }
       for (const k of LANE_COUNTERS) total[k] += row[k] || 0
@@ -1608,8 +1700,11 @@ export function aggregateMeasurements(items) {
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
     hook_context: hooks, mcp_states: states, loaded_not_called: loaded,
-    proxy: { ...proxies, acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
-    cli_lanes: cli,
+    proxy: { ...proxies, rule: rules.size === 1 ? [...rules][0] : 'mixed', acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
+    cli_lanes: !items.length ? { status: 'not_measured' }
+      : unavailable.length === items.length ? { status: 'parser_unavailable', reason: unavailable[0].cli_lanes.reason }
+        : { status: measured.length === items.length && records.size === 1 ? 'measured' : 'incomplete', ...(records.size === 1 ? { parser: JSON.parse([...records][0]) } : {}),
+          ...(measured.length === items.length ? {} : { actors_measured: measured.length, actors_unmeasured: items.length - measured.length }), ...cli },
     m3_large_results_per_actor: tokenStats(items.map((m) => m.m3.large_results)),
     by_carrier: groups('by_carrier'), exceptions: groups('exceptions'),
     orphan_results: items.reduce((n, m) => n + m.orphan_results, 0),
@@ -1823,7 +1918,7 @@ export function findChildTranscripts(roots, unreadable = { count: 0 }, includeMa
 
 const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
 
-const CLI_LANES_LIMITS = 'cli_lanes counts lane executables in command position of the shell text a call runs (Bash commands, shell ctx code, ctx_batch_execute commands and sandbox-nested Codex commands), behind wrappers, package runners and rtk proxy, with rtk proxy calls in ctx code apart from measurement.proxy; it cannot see aliases, shell functions called by name (a function body counts where it is defined), programs a variable names or eval runs, scripts and Makefile or npm targets that call a lane, find -exec, parallel, watch or other unknown wrappers, subprocesses of non-shell code, or how often xargs runs its utility. A call state covers every command of the call (ambiguous marks more than one), and ssh-run lane invocations count only in remote_invocations.'
+const CLI_LANES_LIMITS = 'cli_lanes counts lane executables in command position of the shell text a call runs, read with the pinned tree-sitter-bash install that loadShellParser verified (its versions and wasm sha256 values are in cli_lanes.parser; without it cli_lanes is only { status: parser_unavailable, reason } and measurement.proxy uses the prefix rule, rule prefix_fallback) (Bash commands, shell ctx code, ctx_batch_execute commands and sandbox-nested Codex commands), behind wrappers, package runners and rtk proxy, with rtk proxy calls in ctx code apart from measurement.proxy; it cannot see aliases, shell functions called by name (a function body counts where it is defined), programs a variable names or eval runs, scripts and Makefile or npm targets that call a lane, find -exec, parallel, watch or other unknown wrappers, subprocesses of non-shell code, or how often xargs runs its utility. A call state covers every command of the call (ambiguous marks more than one), and ssh-run lane invocations count only in remote_invocations.'
 
 // Lane use of every child transcript under the roots that has a row inside [since, until).
 export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [] } = {}) {
@@ -2053,11 +2148,11 @@ export function latestRunDir(cwd, configDir) {
 
 const USAGE = 'usage: child-usage.mjs <workflow transcript dir> | --latest [--require-effort <level>] [--rtk-db <history.db>] [--marker <text>]\n' +
   '       child-usage.mjs --lanes-sweep --root <dir> [--root <dir> ...] [--since <ISO>] [--until <ISO>] [--rtk-db <history.db>] [--marker <text>]\n' +
-  '       both modes: [--rtk-check] [--exceptions <private-json>]'
+  '       both modes: [--rtk-check] [--exceptions <private-json>] [--shell-parser <tree-sitter-bash install dir>]'
 // { error } or the parsed options. An option value may not start with "--"; each option but --root is given once.
 export function parseArgs(argv) {
   const o = { positional: [], roots: [], sweep: false }
-  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until', '--exceptions': 'exceptionsPath' }
+  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until', '--exceptions': 'exceptionsPath', '--shell-parser': 'shellParser' }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--root' || Object.hasOwn(valued, a)) {
@@ -2103,6 +2198,11 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   if (o.exceptionsPath) {
     try { exceptionRecords = loadExceptions(o.exceptionsPath) } catch { console.error('--exceptions: invalid or unreadable sidecar'); process.exit(2) }
   }
+  // The verified tree-sitter-bash install that cli_lanes needs (loadShellParser: --shell-parser, CHILD_USAGE_SHELL_PARSER, then the
+  // default directory). An install named on the command line that cannot be honored is an error, like --rtk-db; one that is missing
+  // by default or by the environment leaves cli_lanes as parser_unavailable, and the rest of the report is unchanged.
+  const parserLoad = await loadShellParser(o.shellParser)
+  if (o.shellParser !== undefined && !parserLoad.ok) { console.error('--shell-parser: ' + parserLoad.reason); process.exit(2) }
   // Output goes out through stdout.write and process.exitCode, never process.exit(): process.exit() drops stdout
   // writes still pending, and a pipe takes 64 KiB at once. Only the short error messages above exit directly.
   if (o.sweep) {
