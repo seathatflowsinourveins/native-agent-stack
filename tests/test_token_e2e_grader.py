@@ -1655,8 +1655,10 @@ class F25c_QmdCoverage(GraderCase):
 
 
 def make_bindings(tmp, *, exec_rev, run_token="tok7fixture", sentinel_value="sentinel-a-1", worktree_paths=None,
-                  worktree_bases=None, exec_checkout=None, env_extra=None, out_name="run-bindings.json", codex=None):
-    """Write the four bind input files and run `bind`; returns the bindings path. `codex` adds U10's bindings file."""
+                  worktree_bases=None, exec_checkout=None, env_extra=None, out_name="run-bindings.json", codex=None,
+                  windows=None):
+    """Write the four bind input files and run `bind`; returns the bindings path. `codex` adds U10's bindings file;
+    `windows` replaces the default run windows (the stage-3 judge tests need closed and open ones)."""
     inputs = tmp / "bind-inputs"
     inputs.mkdir(exist_ok=True)
     retained = inputs / "retained-history.txt"
@@ -1670,8 +1672,8 @@ def make_bindings(tmp, *, exec_rev, run_token="tok7fixture", sentinel_value="sen
         "launch-b.json": args_b,
         "sentinels.json": {"sentinels": {"seed-builder-1": {"value": sentinel_value, "sha256": sha256(sentinel_value),
                                                             "sibling_value": "sentinel-b-2"}}},
-        "windows.json": {"W_C": {"since": "2026-10-01T00:00:00Z", "until": "2026-10-02T00:00:00Z"},
-                         "W_X": {"since": "2026-10-05T00:00:00Z", "until": "2026-10-06T00:00:00Z"}},
+        "windows.json": windows or {"W_C": {"since": "2026-10-01T00:00:00Z", "until": "2026-10-02T00:00:00Z"},
+                                    "W_X": {"since": "2026-10-05T00:00:00Z", "until": "2026-10-06T00:00:00Z"}},
         "roots.json": {"exec_rev": exec_rev, "exec_checkout": str(exec_checkout or tmp / "exec-checkout"),
                        "CLAUDE_ROOT": str(tmp / "claude-root"), "CODEX_SESSIONS": str(tmp / "codex-sessions"),
                        "E2E_DIR": str(tmp / "e2e"), "judge_export_root": str(tmp / "export"),
@@ -4512,10 +4514,11 @@ class MiniRun:
     keys commands over a tiny repository, a Claude projects tree (one Workflow run, a main session, an Agent-tool
     harness, a strict process), Codex events, launch records, and the sibling ledgers in their stated shapes."""
 
-    def __init__(self, case, *, token=RUN_TOKEN, roles=False):
+    def __init__(self, case, *, token=RUN_TOKEN, roles=False, windows=None, files=None):
         self.case, self.tmp, self.token = case, case.tmp, token
-        files = {f"{E2E}/fixtures/table.json": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/table.json"),
-                 f"{E2E}/fixtures/events.jsonl": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/events.jsonl")}
+        files = dict({f"{E2E}/fixtures/table.json": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/table.json"),
+                      f"{E2E}/fixtures/events.jsonl": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/events.jsonl")},
+                     **(files or {}))
         codex = None
         if roles:  # the Codex role file at exec_rev and the parent's effective server set (U13's inputs to M11)
             files["adoption/agents/codex/stack-researcher.toml"] = ROLE_TOML
@@ -4523,7 +4526,8 @@ class MiniRun:
         self.repo, self.commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(), files=files)
         self.spec = self.tmp / "spec.json"
         self.ok(["spec", "--repo", self.repo, "--preregistration-commit", self.commit, "--out", self.spec])
-        self.bindings = make_bindings(self.tmp, exec_rev=self.commit, exec_checkout=self.repo, run_token=token, codex=codex)
+        self.bindings = make_bindings(self.tmp, exec_rev=self.commit, exec_checkout=self.repo, run_token=token, codex=codex,
+                                      windows=windows)
         self.keys = self.tmp / "keys.json"
         self.ok(["keys", "--spec", self.spec, "--bindings", self.bindings, "--repo", self.repo, "--out", self.keys])
         self.world = ClaudeWorld(self.tmp)
@@ -5914,6 +5918,1534 @@ class F19_Mutants(GraderCase):
                         ["F7_T0.test_environment_dependent_skip_count_is_unknown",
                          "F7_T0.test_test_count_mismatch_when_not_environment_dependent"],
                         ["F7_T0.test_environment_dependent_skip_count_is_unknown"])
+
+
+# =====================================================================================================================
+# Stage 3: judges, controls, differential, export and check-html (design R21, R22; F15, F19, F23, F29, F30, F35) and
+# the binding corrections 7 and 10. Rules are named by design id. Local integration checks on synthetic inputs and a
+# scripted fake `codex`: no model is ever called (the unit has no network), so the two real judge routes stay
+# unobserved here (acceptance e8 waits for Codex capacity). Modules are imported inside each test on purpose, so
+# with no implementation each test fails on its own reason (ModuleNotFoundError or the missing refusal line).
+# =====================================================================================================================
+
+FAKE_CODEX = r'''#!/usr/bin/env python3
+"""Fake codex for the judge tests (written by the test): it never talks to a model. It records its argv, environment
+and working directory, then answers from the JSON script named by CODEX_FAKE_SCRIPT."""
+import json
+import os
+import sys
+
+USAGE_LIMIT = "You've hit your usage limit. Try again later."
+
+
+def load(path):
+    if path and os.path.exists(path):
+        with open(path, encoding="utf-8") as stream:
+            return json.load(stream)
+    return {}
+
+
+def judgment(script, packet):
+    pid = packet.get("id", "?")
+    expect = (script.get("expect") or {}).get(pid) or {}
+    default = script.get("default", "expect")
+    clauses = []
+    for clause in packet.get("clauses") or []:
+        if default == "true":
+            holds = True
+        elif default == "false":
+            holds = False
+        else:
+            holds = bool((expect.get("clauses") or {}).get(clause["id"], True))
+        answer, sources = packet.get("answer") or "", packet.get("sources") or []
+        clauses.append({"id": clause["id"], "holds": holds, "answer_quote": answer[:15],
+                        "source_quote": sources[0]["text"][:15] if sources else ""})
+    if pid in (script.get("bad_quote") or []):
+        for clause in clauses:
+            clause["answer_quote"] = "THIS TEXT IS NOT IN THE PACKET"
+    extractions = (script.get("extract") or {}).get(pid) or expect.get("extractions") or []
+    leak = pid in (script.get("leak") or [])
+    return {"clauses": clauses, "extractions": extractions, "leak": leak,
+            "leak_text": "the packet names its origin" if leak else ""}
+
+
+def main():
+    args = sys.argv[1:]
+    if args[:1] == ["app-server"]:
+        return 2  # the quota probe finds no snapshot: a reading that never gates
+    script = load(os.environ.get("CODEX_FAKE_SCRIPT"))
+    state_path = os.environ.get("CODEX_FAKE_STATE")
+    state = load(state_path)
+    prompt = args[-1]
+
+    def option(name):
+        return args[args.index(name) + 1] if name in args else None
+    out_path, schema = option("-o"), load(option("--output-schema"))
+    if option("-C"):
+        os.chdir(option("-C"))  # codex works from -C: the per-item directory the judge left empty
+    stage = "refute" if "refuted" in (schema.get("properties") or {}) else "judge"
+    packet = {}
+    at = prompt.find("Packet (JSON):")
+    if at >= 0:
+        packet, _ = json.JSONDecoder().raw_decode(prompt[prompt.find("{", at):])
+    pid = packet.get("id", "?")
+    key = pid + "." + stage
+    state[key] = state.get(key, 0) + 1
+    if state_path:
+        with open(state_path, "w", encoding="utf-8") as stream:
+            json.dump(state, stream)
+    home = os.environ.get("HOME") or ""
+    entry = {"argv": args[:-1], "prompt_bytes": len(prompt), "packet": pid, "stage": stage, "attempt": state[key],
+             "home": home, "home_entries": sorted(os.listdir(home)) if home and os.path.isdir(home) else None,
+             "path": os.environ.get("PATH"), "codex_home": os.environ.get("CODEX_HOME"),
+             "cwd_entries": sorted(os.listdir(os.getcwd()))}
+    with open(os.environ["CODEX_FAKE_LOG"], "a", encoding="utf-8") as stream:
+        stream.write(json.dumps(entry) + "\n")
+    plan = (script.get("fail") or {}).get(key) or []
+    action = plan[state[key] - 1] if state[key] - 1 < len(plan) else "ok"
+    if action == "exit":
+        return 1
+    if action == "usage_limit":
+        print(json.dumps({"type": "turn.failed", "error": {"message": USAGE_LIMIT}}))
+        return 1
+    events = [{"type": "thread.started", "thread_id": "thread-fx-judge"}]
+    if action == "tools":
+        events.append({"type": "item.completed", "item": {"id": "item_0", "type": "command_execution", "command": "ls",
+                                                           "aggregated_output": "", "exit_code": 0,
+                                                           "status": "completed"}})
+    if stage == "refute":
+        response = dict({"refuted": False, "reason": "", "quote": "", "leak": False, "leak_text": ""},
+                        **((script.get("refute") or {}).get(pid) or {}))
+    else:
+        response = judgment(script, packet)
+    text = "{not json" if action == "bad_json" else json.dumps(response)
+    events.append({"type": "item.completed", "item": {"id": "item_1", "type": "agent_message", "text": text}})
+    events.append({"type": "turn.completed", "usage": {"input_tokens": 100, "cached_input_tokens": 10,
+                                                        "output_tokens": 20, "reasoning_output_tokens": 5}})
+    for event in events:
+        print(json.dumps(event))
+    if out_path:
+        with open(out_path, "w", encoding="utf-8") as stream:
+            stream.write(text)
+    return 0
+
+
+sys.exit(main())
+'''
+
+
+def jdm():
+    return load("judge")
+
+
+class FakeCodex:
+    """A scripted `codex` first on PATH, a fixture native Codex home with a dummy credential file, and run-scoped homes
+    under the fixture (never the developer's credential or state)."""
+
+    def __init__(self, tmp):
+        self.tmp = Path(tmp)
+        self.bin = self.tmp / "fake-bin"
+        self.bin.mkdir()
+        (self.bin / "codex").write_text(FAKE_CODEX, encoding="utf-8")
+        (self.bin / "codex").chmod(0o755)
+        self.native = self.tmp / "native-codex"
+        self.native.mkdir()
+        (self.native / "auth.json").write_text("{}", encoding="utf-8")
+        self.homes = self.tmp / "codex-homes"
+        self.script, self.log, self.state = self.tmp / "fake-script.json", self.tmp / "fake-log.jsonl", self.tmp / "fake-state.json"
+        self.write_script()
+
+    def write_script(self, **script):
+        self.script.write_text(json.dumps(script), encoding="utf-8")
+
+    def env(self):
+        return {"PATH": str(self.bin) + os.pathsep + os.environ.get("PATH", ""), "CODEX_HOME": str(self.native),
+                "NAS_CODEX_HOME_DIR": str(self.homes), "CODEX_FAKE_SCRIPT": str(self.script),
+                "CODEX_FAKE_LOG": str(self.log), "CODEX_FAKE_STATE": str(self.state)}
+
+    def calls(self, stage=None):
+        if not self.log.exists():
+            return []
+        rows = [json.loads(line) for line in self.log.read_text(encoding="utf-8").splitlines() if line.strip()]
+        return [row for row in rows if stage is None or row["stage"] == stage]
+
+
+CLOSED = "2026-10-10T00:00:00Z"  # after both default run windows (W_C ends 2026-10-02, W_X ends 2026-10-06)
+
+
+@contextlib.contextmanager
+def judge_context(*, now=CLOSED, blind_issue=None, extra=()):
+    """The CLI in this process (mock patches apply): the fake codex's variables reach the child, the login-shell PATH
+    probe answers `blind_issue` (None: clean) and the clock reads `now`."""
+    jd = jdm()
+    fc = load("frozen_checks")
+    INPROC[0] += 1
+    try:
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(jd.cl, "CHILD_ENV_EXTRA_PREFIXES", ("CODEX_FAKE_",)))
+            stack.enter_context(mock.patch.object(jd.cl, "blind_path_issue", lambda path=None: blind_issue))
+            stack.enter_context(mock.patch.object(jd, "now_seconds", lambda: fc.parse_utc(now)))
+            for patcher in extra:
+                stack.enter_context(patcher)
+            yield
+    finally:
+        INPROC[0] -= 1
+
+
+def parse_counts(proc):
+    return json.loads(proc.stdout)
+
+
+class JudgeWorld:
+    """A graded synthetic run with class D work on both routes: a Claude Workflow child and a Codex exec attempt that
+    answer a web-table task (clause 1 pending), plus a Claude attempt whose payload sum is wrong (a deterministic
+    failure that must get no packet)."""
+
+    def __init__(self, case, *, files=None, answer_suffix="", embedded=False):
+        self.case, self.tmp = case, case.tmp
+        self.run = MiniRun(case, files=files)
+        self.fake = FakeCodex(self.tmp)
+        self.out = self.tmp / "judge-out"
+        self.export = self.tmp / "export"
+        self.home = self.tmp / "home-fixture"
+        self.answer_suffix = answer_suffix
+        self.embedded = embedded
+
+    def claude_web(self, arm, task, text, agent_id):
+        run, tag = self.run, f"toolu-fx-{agent_id}"
+        rows = [r_user("task", ts(0)),
+                r_use("WebFetch", {"url": JSON_URL, "prompt": "p"}, tag + "a", ts(1), f"msg-{agent_id}a"),
+                r_result(tag + "a", "page text", ts(1, 5)),
+                r_use("WebFetch", {"url": PATHLIB_URL, "prompt": "p"}, tag + "b", ts(2), f"msg-{agent_id}b"),
+                r_result(tag + "b", "page text", ts(2, 5)),
+                r_use("StructuredOutput", {"answer": text, "evidence": []}, tag + "s", ts(3), f"msg-{agent_id}s"),
+                r_result(tag + "s", "ok", ts(3, 5)), r_text("done", ts(4))]
+        return run.workflow(arm, task, rows, {"answer": text, "evidence": []}, agent_id=agent_id)
+
+    def web_text(self, first, last, *, embedded=False):
+        """A web-table answer for records first..last: the fenced payload, the sum and both citations (or, embedded, the
+        payload in the middle of a sentence, which no deterministic candidate detects)."""
+        key = web_key(first, last)
+        citation = f"Source: pathlib.Path.read_text(encoding=...) at {PATHLIB_URL} and the json module at {JSON_URL}"
+        if embedded:
+            return f"Here you go: {json.dumps(key['records'])} and the latency sum is {key['latency_sum']}.\n{citation}"
+        return "```json\n" + json.dumps(key["records"]) + f"\n```\nLatency sum: {key['latency_sum']}\n{citation}"
+
+    def build(self):
+        run = self.run
+        run.default_run()
+        right = run.web_answer() + self.answer_suffix
+        self.claude_label = self.claude_web("B", "seed-web-table-1", right, "fx7")
+        self.failing_label = self.claude_web("A", "seed-web-table-1", right.replace("Latency sum: 124", "Latency sum: 125"), "fx8")
+        self.t18_label = self.claude_web("B", "seed-web-table-3", self.web_text(9, 16), "fx6")
+        if self.embedded:
+            self.embedded_text = self.web_text(17, 24, embedded=True)
+            self.embedded_label = self.claude_web("B", "seed-web-table-5", self.embedded_text, "fx5")
+        self.codex_label = run.ident("B", "seed-codex-web-table-1")
+        assert run.identity().returncode == 0
+        proc, self.private, self.aggregate = run.grade("g1")
+        assert proc.returncode in (0, 1), sanitize(proc.stderr)
+        return self
+
+    def judge(self, args, *, now=CLOSED, blind_issue=None, env=None, patches=()):
+        with judge_context(now=now, blind_issue=blind_issue, extra=patches):
+            return run_grade(["judge", *[str(a) for a in args]], env=dict(self.fake.env(), **(env or {})))
+
+    def packets(self, **kw):
+        proc = self.judge(["packets", "--from", self.private, "--repo", self.run.repo, "--out-dir", self.out], **kw)
+        return proc
+
+    def index(self):
+        return json.loads((self.out / "index.json").read_text(encoding="utf-8"))
+
+    def role_home(self, *, same=True, present=True):
+        target = self.home / ".claude" / "agents"
+        target.mkdir(parents=True, exist_ok=True)
+        if present:
+            data = (ROOT / ".claude" / "agents" / "blind-lane-reviewer.md").read_bytes()
+            (target / "blind-lane-reviewer.md").write_bytes(data if same else data + b"\nextra line\n")
+        return {"HOME": str(self.home)}
+
+    def script_for(self, index, *, real_holds=True, **extra):
+        """The faithful judge: every control answered as its planted expectation says, every real packet as `real_holds`."""
+        expect = {}
+        for item in index["packets"]:
+            if item["kind"] == "control":
+                expect[item["id"]] = {"clauses": dict(item["control"]["expected"]),
+                                      "extractions": item["control"].get("expected_extractions") or []}
+            else:
+                expect[item["id"]] = {"clauses": {clause: real_holds for clause in item["clauses"]}}
+        return dict({"default": "expect", "expect": expect}, **extra)
+
+    def real(self, index, identity):
+        return next(item for item in index["packets"] if item.get("identity") == identity)
+
+
+def read_rows(path):
+    return [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+# ---- F30: judge builders (R21, U9-D18) ------------------------------------------------------------------------------
+
+class F30_JudgeBuilders(GraderCase):
+    def test_the_judgment_schema_is_a_strict_mode_fixed_point_with_every_field_typed(self):
+        jd = jdm()
+        schema = json.loads((TOOLS / "judgment.schema.json").read_text(encoding="utf-8"))
+        self.assertEqual(jd.cl.strict_output_schema(schema), schema, "Codex strict mode would rewrite this schema")
+        self.assertEqual(jd.strict_issues(schema), [])
+        self.assertEqual(jd.strict_issues(jd.REFUTATION_SCHEMA), [])
+        self.assertEqual(set(schema["properties"]), {"clauses", "extractions", "leak", "leak_text"})
+        item = schema["properties"]["clauses"]["items"]
+        self.assertEqual({name: sub["type"] for name, sub in item["properties"].items()},
+                         {"id": "string", "holds": "boolean", "answer_quote": "string", "source_quote": "string"})
+        extraction = schema["properties"]["extractions"]["items"]
+        self.assertEqual({name: sub["type"] for name, sub in extraction["properties"].items()},
+                         {"component": "string", "values": "array", "answer_quotes": "array"})
+        self.assertEqual({name: sub["type"] for name, sub in jd.REFUTATION_SCHEMA["properties"].items()},
+                         {"refuted": "boolean", "reason": "string", "quote": "string", "leak": "boolean",
+                          "leak_text": "string"})
+
+    def test_the_strict_check_flags_an_open_untyped_or_described_schema(self):
+        jd = jdm()
+        open_schema = {"type": "object", "properties": {"a": {"type": "string"}}, "required": [],
+                       "additionalProperties": True}
+        issues = jd.strict_issues(open_schema)
+        self.assertTrue(any("additionalProperties" in issue for issue in issues), issues)
+        self.assertTrue(any("required" in issue for issue in issues), issues)
+        untyped = {"type": "object", "properties": {"a": {}}, "required": ["a"], "additionalProperties": False}
+        self.assertTrue(any("type" in issue for issue in jd.strict_issues(untyped)), jd.strict_issues(untyped))
+        described = {"type": "object", "properties": {"a": {"type": "string", "description": "x"}}, "required": ["a"],
+                     "additionalProperties": False}
+        self.assertTrue(any("description" in issue for issue in jd.strict_issues(described)))
+
+    def test_the_workflow_script_passes_the_syntax_check(self):
+        require_node()
+        script = TOOLS / "frozen-check-judge.js"
+        done = subprocess.run(["node", str(ROOT / "examples" / "claude-native" / "workflows" / "check-syntax.mjs"),
+                               str(script)], capture_output=True, text=True, timeout=60)
+        self.assertEqual((done.returncode, done.stdout.split(" ", 1)[0]), (0, "SYNTAX_OK"), sanitize(done.stderr))
+
+    def test_the_workflow_binds_the_blind_role_model_and_effort_on_every_agent_call(self):
+        source = (TOOLS / "frozen-check-judge.js").read_text(encoding="utf-8")
+        calls = source.count("await agent(")
+        self.assertEqual(calls, 2, "one judge call and one refuter call")
+        self.assertEqual(source.count("agentType: 'blind-lane-reviewer'"), calls)
+        self.assertEqual(source.count("model: 'opus'"), calls)
+        self.assertEqual(source.count("effort: 'max'"), calls)
+        self.assertNotIn("evidence-reviewer", source)
+
+    def test_the_prompt_template_has_two_sections_and_their_placeholders(self):
+        parts = (TOOLS / "judge-template.md").read_text(encoding="utf-8").split("<!-- refuter -->")
+        self.assertEqual(len(parts), 2)
+        for section in parts:
+            self.assertEqual(section.count("{PACKET_BLOCK}"), 1)
+        self.assertEqual((parts[0].count("{JUDGMENT}"), parts[1].count("{JUDGMENT}")), (0, 1))
+
+    def test_claude_args_validate_and_name_the_export_files(self):
+        world = JudgeWorld(self).build()
+        self.assertEqual(world.packets().returncode, 0)
+        proc = world.judge(["claude-args", "--index", world.out], env=world.role_home())
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        args = json.loads((world.out / "claude" / "args.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(args), ["args", "coordinator_request", "scriptPath"])
+        self.assertEqual(args["scriptPath"], str(TOOLS / "frozen-check-judge.js"))
+        inner = args["args"]
+        self.assertEqual(inner["repo"], str(world.export))
+        self.assertEqual(len(inner["snapshot_id"]), 64)
+        self.assertIn("<!-- refuter -->", inner["prompt"])
+        index = world.index()
+        claude_items = [item for item in index["packets"] if item["route"] == "claude"]
+        jd = jdm()
+        self.assertEqual(len(inner["items"]), len(claude_items))
+        self.assertEqual(len(claude_items), 1 + len(jd.load_calibration("T16")["controls"]))
+        for item in inner["items"]:
+            path = Path(item["path"])
+            self.assertEqual(sorted(item), ["name", "packet_sha256", "path"])
+            self.assertEqual(path.parent, world.export / "packets")
+            self.assertEqual(sha256_file(path), item["packet_sha256"])
+        self.assertEqual(json.loads(proc.stdout), {"items": len(claude_items)})
+        request = args["coordinator_request"]
+        self.assertIn("Read", request)
+        self.assertIn("Grep", request)
+        self.assertIn("scriptPath", request)
+
+    # -- collect ------------------------------------------------------------------------------------------------------
+
+    def claude_run(self, world, *, hook=(), stray=(), refute=None, tamper=None):
+        """A Workflow run of the claude-args items: the result the script returns, the run record and one transcript per
+        judge or refuter agent, in the layout transcript_audit reads. `hook` and `stray` are packet ids whose transcript
+        holds a hook row or reads outside the export; `refute` maps a packet id to its refuter answer."""
+        args = json.loads((world.out / "claude" / "args.json").read_text(encoding="utf-8"))
+        inner, index = args["args"], world.index()
+        by_name = {item["id"]: item for item in index["packets"]}
+        base = self.tmp / "judge-claude-root" / "proj-judge" / "sess-judge-1"
+        directory = base / "subagents" / "workflows" / "wf_judge1"
+        progress, items, number = [], [], 0
+
+        def transcript(path, agent_id, *, hooked, stray_path, role):
+            rows = [r_user(f"{role} the packet.\nPacket file: {path}\nRepository root: {world.export}", ts(0), cwd=str(world.export))]
+            if hooked:
+                rows.insert(0, r_attach("hook_additional_context", ts(0, 1), hookName="PreToolUse:Read",
+                                        hookEvent="PreToolUse", content="advisory"))
+            reads = [path] + ([stray_path] if stray_path else [])
+            for step, target in enumerate(reads):
+                rows.append(r_use("Read", {"file_path": str(target)}, f"toolu-fx-{agent_id}-{step}", ts(1, step), f"msg-{agent_id}-{step}"))
+                rows.append(r_result(f"toolu-fx-{agent_id}-{step}", "packet text", ts(1, step, 2)))
+            rows.append(r_use("StructuredOutput", {"ok": True}, f"toolu-fx-{agent_id}-so", ts(2), f"msg-{agent_id}-so"))
+            rows.append(r_result(f"toolu-fx-{agent_id}-so", "ok", ts(2, 1)))
+            rows.append(r_text("done", ts(3)))
+            write_jsonl(directory / f"agent-{agent_id}.jsonl", rows)
+            progress.append({"type": "workflow_agent", "agentId": agent_id, "attempt": 1})
+
+        for item in inner["items"]:
+            packet = json.loads(Path(item["path"]).read_text(encoding="utf-8"))
+            entry = by_name[item["name"]]
+            expected = entry["control"]["expected"] if entry["kind"] == "control" else {c: True for c in entry["clauses"]}
+            judge = {"clauses": [{"id": clause["id"], "holds": bool(expected[clause["id"]]),
+                                  "answer_quote": packet["answer"][:15],
+                                  "source_quote": packet["sources"][0]["text"][:15] if packet["sources"] else ""}
+                                 for clause in packet["clauses"]],
+                     "extractions": entry["control"].get("expected_extractions") or [] if entry["kind"] == "control" else [],
+                     "leak": False, "leak_text": ""}
+            passed = all(expected.values())
+            refuter = dict({"refuted": False, "reason": "", "quote": "", "leak": False, "leak_text": ""},
+                           **((refute or {}).get(item["name"]) or {})) if passed else None
+            number += 1
+            transcript(item["path"], f"jd{number}", hooked=item["name"] in hook,
+                       stray_path=(world.tmp / "elsewhere.txt") if item["name"] in stray else None, role="judge")
+            if passed:
+                number += 1
+                transcript(item["path"], f"jd{number}", hooked=False, stray_path=None, role="refute")
+            items.append({"name": item["name"], "packet_sha256": item["packet_sha256"], "path": item["path"],
+                          "judge": judge, "refuter": refuter})
+        result = {"family": "anthropic", "model": {"name": "opus", "effort": "max"}, "repo": inner["repo"],
+                  "prompt": inner["prompt"], "snapshot_id": inner["snapshot_id"], "items": items}
+        if tamper:
+            tamper(result)
+        write_json(base / "workflows" / "wf_judge1.json",
+                   {"status": "completed", "workflowProgress": progress, "result": result})
+        result_path = self.tmp / "workflow-result.json"
+        write_json(result_path, result)
+        return result_path, directory
+
+    def collected(self, **kw):
+        world = JudgeWorld(self).build()
+        self.assertEqual(world.packets().returncode, 0)
+        env = world.role_home()
+        self.assertEqual(world.judge(["claude-args", "--index", world.out], env=env).returncode, 0)
+        result_path, directory = self.claude_run(world, **kw)
+        proc = world.judge(["collect", "--index", world.out, "--result", result_path, "--transcripts", directory], env=env)
+        return world, proc
+
+    def rows_by_packet(self, world):
+        rows = read_rows(world.out / "judgments-claude.jsonl")
+        index = {item["id"]: item for item in world.index()["packets"]}
+        return {index[row["packet"]]["id"]: row for row in rows if row.get("kind") == "judgment"}, rows
+
+    def test_collect_accepts_a_clean_run_and_writes_the_judgments_of_the_codex_answers(self):
+        world, proc = self.collected()
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        judgments, rows = self.rows_by_packet(world)
+        real = next(item for item in world.index()["packets"] if item["route"] == "claude" and item["kind"] == "real")
+        row = judgments[real["id"]]
+        self.assertEqual((row["identity"], row["actor"], row["status"], row["reason"]),
+                         (world.codex_label, "codex_exec", "ok", None))
+        self.assertEqual([(c["id"], c["holds"]) for c in row["clauses"]], [("c1", True)])
+        route = next(item for item in rows if item.get("kind") == "route")
+        self.assertEqual((route["route"], route["calibration_failed_templates"], route["leaks"]), ("claude", [], 0))
+
+    def test_collect_rejects_a_judgment_whose_transcript_has_a_hook_row(self):
+        world = JudgeWorld(self).build()
+        self.assertEqual(world.packets().returncode, 0)
+        env = world.role_home()
+        self.assertEqual(world.judge(["claude-args", "--index", world.out], env=env).returncode, 0)
+        real = next(item for item in world.index()["packets"] if item["route"] == "claude" and item["kind"] == "real")
+        result_path, directory = self.claude_run(world, hook={real["id"]})
+        proc = world.judge(["collect", "--index", world.out, "--result", result_path, "--transcripts", directory], env=env)
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        judgments, _ = self.rows_by_packet(world)
+        self.assertEqual((judgments[real["id"]]["status"], judgments[real["id"]]["reason"]), ("unknown", "judge_hook_rows"))
+
+    def test_collect_rejects_a_read_outside_the_export(self):
+        world = JudgeWorld(self).build()
+        self.assertEqual(world.packets().returncode, 0)
+        env = world.role_home()
+        self.assertEqual(world.judge(["claude-args", "--index", world.out], env=env).returncode, 0)
+        real = next(item for item in world.index()["packets"] if item["route"] == "claude" and item["kind"] == "real")
+        result_path, directory = self.claude_run(world, stray={real["id"]})
+        proc = world.judge(["collect", "--index", world.out, "--result", result_path, "--transcripts", directory], env=env)
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        judgments, _ = self.rows_by_packet(world)
+        self.assertEqual((judgments[real["id"]]["status"], judgments[real["id"]]["reason"]), ("unknown", "judge_audit"))
+
+    def test_collect_refuses_a_result_from_another_snapshot(self):
+        world = JudgeWorld(self).build()
+        self.assertEqual(world.packets().returncode, 0)
+        env = world.role_home()
+        self.assertEqual(world.judge(["claude-args", "--index", world.out], env=env).returncode, 0)
+        result_path, directory = self.claude_run(world, tamper=lambda result: result.__setitem__("snapshot_id", "0" * 64))
+        proc = world.judge(["collect", "--index", world.out, "--result", result_path, "--transcripts", directory], env=env)
+        self.assertRefusal(proc, "E_JUDGE_RESULT", reason="snapshot")
+        self.assertFalse((world.out / "judgments-claude.jsonl").exists())
+
+    def refused_result(self, tamper):
+        world = JudgeWorld(self).build()
+        self.assertEqual(world.packets().returncode, 0)
+        env = world.role_home()
+        self.assertEqual(world.judge(["claude-args", "--index", world.out], env=env).returncode, 0)
+        result_path, directory = self.claude_run(world, tamper=tamper)
+        proc = world.judge(["collect", "--index", world.out, "--result", result_path, "--transcripts", directory], env=env)
+        self.assertFalse((world.out / "judgments-claude.jsonl").exists())
+        return proc
+
+    def test_collect_refuses_a_result_that_returns_an_item_twice(self):
+        proc = self.refused_result(lambda result: result["items"].append(dict(result["items"][0])))
+        self.assertRefusal(proc, "E_JUDGE_RESULT", reason="items")
+
+    def test_collect_refuses_a_result_that_returns_an_item_claude_args_never_gave(self):
+        proc = self.refused_result(lambda result: result["items"][0].__setitem__("name", "p9999"))
+        self.assertRefusal(proc, "E_JUDGE_RESULT", reason="items")
+
+    def test_collect_refuses_a_result_that_consumed_another_prompt_or_packet_hash(self):
+        proc = self.refused_result(lambda result: result.__setitem__("prompt", result["prompt"] + " edited"))
+        self.assertRefusal(proc, "E_JUDGE_RESULT", reason="prompt")
+        proc = self.refused_result(lambda result: result["items"][0].__setitem__("packet_sha256", "0" * 64))
+        self.assertRefusal(proc, "E_JUDGE_RESULT", reason="items")
+
+
+# ---- F23: web-table clause judges and the calibration files (U9-D10, R21) -------------------------------------------
+
+class F23_WebTableJudges(GraderCase):
+    CONTRADICTIONS = {"T16": "ensure_ascii defaults to False", "T17": "allow_nan=false emits NaN",
+                      "T18": "sort_keys sorts arrays", "T19": "raises TypeError", "T20": "loads accepts only str"}
+
+    def d_templates(self):
+        fc = load("frozen_checks")
+        return sorted((name for name, entry in fc.TEMPLATES.items() if "D" in entry["classes"]), key=fc.template_order)
+
+    def test_the_first_clause_of_every_web_table_check_is_class_d(self):
+        fc = load("frozen_checks")
+        for template in fc.WEB_TEMPLATES:
+            entry = fc.TEMPLATES[template]
+            self.assertIn("D", entry["classes"], template)
+            self.assertEqual(len(entry["clauses"]), 1, template)
+
+    def test_the_calibration_of_each_web_template_holds_its_frozen_contradiction(self):
+        jd = jdm()
+        for template, contradiction in self.CONTRADICTIONS.items():
+            wrong = [control["answer"].lower() for control in jd.load_calibration(template)["controls"]
+                     if control["kind"] == "wrong"]
+            self.assertTrue(any(contradiction.lower() in answer for answer in wrong), template)
+
+    def test_every_class_d_template_has_a_calibration_file_that_matches_the_registry_and_the_block_minimums(self):
+        fc, jd = load("frozen_checks"), jdm()
+        minimum = grading_block()["judges"]["calibration"]
+        d_templates = self.d_templates()
+        self.assertEqual(len(d_templates), 19)
+        self.assertEqual(jd.calibrated_templates(), sorted(set(d_templates) | {"T0", "T9"}, key=fc.template_order))
+        for template in d_templates:
+            calibration = jd.load_calibration(template)
+            self.assertEqual(calibration["template"], template)
+            self.assertEqual(calibration["clauses"], fc.TEMPLATES[template]["clauses"], template)
+            counts = {kind: sum(1 for c in calibration["controls"] if c["kind"] == kind)
+                      for kind in ("reference", "paraphrased", "wrong")}
+            self.assertGreaterEqual(counts["reference"], minimum["correct"], template)
+            self.assertGreaterEqual(counts["paraphrased"], minimum["paraphrased"], template)
+            self.assertGreaterEqual(counts["wrong"], minimum["wrong"], template)
+            clause_ids = [f"c{number}" for number in range(1, len(calibration["clauses"]) + 1)]
+            for control in calibration["controls"]:
+                self.assertEqual(sorted(control["expected"]), clause_ids, (template, control["id"]))
+                verdicts = set(control["expected"].values())
+                self.assertEqual(verdicts == {True}, control["kind"] != "wrong", (template, control["id"]))
+
+    def test_the_reference_control_quotes_its_source_excerpt(self):
+        jd = jdm()
+        for template in self.d_templates():
+            calibration = jd.load_calibration(template)
+            texts = [source["text"] for source in calibration["sources"]]
+            for control in calibration["controls"]:
+                if control["kind"] == "reference":
+                    self.assertTrue(any(text in control["answer"] for text in texts), (template, control["id"]))
+
+    def test_extraction_controls_exist_for_the_extractable_templates(self):
+        fc, jd = load("frozen_checks"), jdm()
+        for template in ("T0", "T9") + fc.WEB_TEMPLATES:
+            calibration = jd.load_calibration(template)
+            controls = calibration.get("extraction_controls") or []
+            self.assertGreaterEqual(len(controls), 2, template)
+            for control in controls:
+                self.assertIn(control["component"], ("payload", "unittest"))
+                for quote in control["expected"]["answer_quotes"]:
+                    self.assertIn(quote, control["answer"], "an expected quote is verbatim in the control's answer")
+                for value in control["expected"]["values"]:
+                    self.assertTrue(any(value in quote for quote in control["expected"]["answer_quotes"]))
+
+    def test_calibration_files_hold_no_uuid_or_home_path_shapes(self):
+        ev = evm()
+        files = sorted((TOOLS / "calibration").glob("*.json"))
+        self.assertGreaterEqual(len(files), 22, "one file per class D template, T0 and T9, and the oracle controls")
+        for path in files:
+            text = path.read_text(encoding="utf-8")
+            self.assertFalse(ev._has_uuid(text), path.name)
+            for marker in ("/home/", "/Users/", "toolu_"):
+                self.assertNotIn(marker, text, path.name)
+
+    def test_calibration_verdicts_flag_the_misjudged_controls(self):
+        jd = jdm()
+        calibration = jd.load_calibration("T16")
+        faithful = {c["id"]: {"clauses": dict(c["expected"]), "extractions": []} for c in calibration["controls"]}
+        self.assertEqual(jd.calibration_failures(calibration, faithful), [])
+        stub = {c["id"]: {"clauses": {"c1": True}, "extractions": []} for c in calibration["controls"]}
+        wrong_ids = sorted(c["id"] for c in calibration["controls"] if c["kind"] == "wrong")
+        self.assertEqual(jd.calibration_failures(calibration, stub), wrong_ids)
+        paraphrased = next(c["id"] for c in calibration["controls"] if c["kind"] == "paraphrased")
+        harsh = dict(faithful, **{paraphrased: {"clauses": {"c1": False}, "extractions": []}})
+        self.assertEqual(jd.calibration_failures(calibration, harsh), [paraphrased])
+        missing = {key: value for key, value in faithful.items() if key != paraphrased}
+        self.assertEqual(jd.calibration_failures(calibration, missing), [paraphrased])
+
+
+# ---- F35: judge packets, routes, isolation, timing and privacy (R21, RV-26, RV-27, RV-31; correction 10) -------------
+
+class F35_JudgeRoutes(GraderCase):
+    def world(self, **kw):
+        return JudgeWorld(self, **kw).build()
+
+    def test_the_scrubber_removes_paths_ids_and_tool_names_and_maps_quotes_back(self):
+        jd = jdm()
+        uuid = "-".join(["3f2b8c1e", "0000", "4000", "8000", "000000000000"])
+        toolu = "toolu" + "_" + "01ABCDEFGHIJKLMN"
+        scrubber = jd.Scrubber(values=["tok7fixture", "sess-fixture-1"], denylist=["rtk", "ctx_execute", "ai-memory"])
+        raw = (f"Ran rtk on /home/someone/work/file.py with tok7fixture; sess-fixture-1 used ctx_execute and ai-memory in "
+               f"arm B by Claude (opus) at {uuid} ({toolu}). Keep scripts/host_requests.py:227 and "
+               "https://docs.python.org/3/library/json.html.")
+        scrubbed = scrubber.scrub(raw)
+        self.assertEqual(scrubbed.text, "Ran <tool> on <path> with <id>; <id> used <tool> and <tool> in <tool> by <tool> "
+                                        "(<tool>) at <id> (<id>). Keep scripts/host_requests.py:227 and "
+                                        "https://docs.python.org/3/library/json.html.")
+        quote = "Keep scripts/host_requests.py:227"
+        self.assertEqual(scrubbed.to_raw(quote), quote)
+        self.assertEqual(scrubbed.to_raw("on <path> with"), "on /home/someone/work/file.py with")
+        self.assertIsNone(scrubbed.to_raw("<pa"), "a quote that cuts through a replaced span has no raw text")
+        self.assertIsNone(scrubbed.to_raw("text that is not there"))
+
+    def test_the_scrubber_matches_denylist_names_on_alphanumeric_boundaries_case_insensitively(self):
+        jd = jdm()
+        scrubber = jd.Scrubber(values=[], denylist=["rtk", "ai-memory", "context mode"])
+        self.assertEqual(scrubber.scrub("RTK, rtk-343, artkey and Context Mode; ai_memory ai-memory").text,
+                         "<tool>, <tool>-343, artkey and <tool>; ai_memory <tool>")
+
+    def test_packets_are_scrubbed_bounded_and_route_each_answer_to_the_other_family(self):
+        world = self.world()
+        proc = world.packets()
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        jd, fc = jdm(), load("frozen_checks")
+        index = world.index()
+        c16, c18 = (len(jd.load_calibration(name)["controls"]) for name in ("T16", "T18"))
+        self.assertEqual(parse_counts(proc), {"codex": {"real": 2, "control": c16 + c18},
+                                              "claude": {"real": 1, "control": c16}})
+        self.assertEqual(world.real(index, world.claude_label)["route"], "codex")
+        self.assertEqual(world.real(index, world.codex_label)["route"], "claude")
+        self.assertNotIn(world.failing_label, [item.get("identity") for item in index["packets"]],
+                         "a deterministic failure gets no packet")
+        forbidden = [RUN_TOKEN, SESSION_ID, "fx7", "thread-fx1", str(self.tmp)]
+        for item in index["packets"]:
+            data = (world.out / "packets" / f"{item['id']}.json").read_bytes()
+            self.assertLess(len(data), 50000)
+            self.assertEqual(sha256(data), item["packet_sha256"])
+            packet = json.loads(data)
+            self.assertEqual(sorted(packet), ["answer", "clauses", "evidence", "extractions", "id", "schema", "sources",
+                                              "task"])
+            self.assertEqual((packet["schema"], packet["id"]), ("token-e2e-judge-packet/1", item["id"]))
+            for text in all_strings(packet):
+                for value in forbidden:
+                    self.assertNotIn(value, text)
+        real = world.real(index, world.claude_label)
+        packet = json.loads((world.out / "packets" / f"{real['id']}.json").read_text(encoding="utf-8"))
+        task = next(t for t in json.loads(sealed_bytes())["tasks"] if t["id"] == "seed-web-table-1")
+        self.assertEqual(packet["task"], task["task_text"])
+        self.assertEqual([c["text"] for c in packet["clauses"]], fc.TEMPLATES["T16"]["clauses"])
+        self.assertEqual([c["id"] for c in packet["clauses"]], ["c1"])
+        self.assertEqual(packet["answer"], world.run.web_answer())
+        for item in index["packets"]:
+            if item["route"] == "claude":
+                self.assertEqual((world.export / "packets" / f"{item['id']}.json").read_bytes(),
+                                 (world.out / "packets" / f"{item['id']}.json").read_bytes())
+        self.assertEqual(stat.S_IMODE((world.out / "index.json").stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(world.out.stat().st_mode), 0o700)
+
+    def test_controls_are_mixed_by_content_hash_and_only_the_index_says_which_are_which(self):
+        world = self.world()
+        self.assertEqual(world.packets().returncode, 0)
+        index = world.index()
+        sealed = {t["task_text"] for t in json.loads(sealed_bytes())["tasks"]}
+        for route in ("codex", "claude"):
+            items = [item for item in index["packets"] if item["route"] == route]
+            self.assertEqual([item["id"] for item in items], sorted(item["id"] for item in items))
+            hashes = [item["content_sha256"] for item in items]
+            self.assertEqual(hashes, sorted(hashes), "ids follow the content hash, never the kind")
+        for item in index["packets"]:
+            packet = json.loads((world.out / "packets" / f"{item['id']}.json").read_text(encoding="utf-8"))
+            for text in all_strings(packet):
+                for word in ("control", "calibration", "expected", "reference-correct"):
+                    self.assertNotIn(word, text.lower(), "a packet never says what it is")
+            if item["kind"] == "control":
+                self.assertIsNone(item.get("identity"))
+                self.assertEqual(sorted(item["control"]), ["expected", "expected_extractions", "id", "kind"])
+                self.assertIn(packet["task"], sealed, "a control carries a real task text of its template")
+
+    def test_a_memory_packet_holds_the_frozen_record_digest_and_never_hit_text(self):
+        jd = jdm()
+        digest = "d" * 64
+        key = {"catalog": "catalogs/us-equities/README.md", "catalog_sha256": "c" * 64,
+               "facts_in_source": {"NautilusTrader": True},
+               "anti_pattern_row": "| 2026-09-20 | stdin left open in unattended workers | Close stdin for unattended launches |",
+               "memory_records": [{"path": "sessions/private-page-path.md", "created_at": "2026-09-01T00:00:00Z",
+                                   "content_sha256": digest}]}
+        text = "\n".join(section["text"] for section in jd.source_sections("T21", key, exec_src=None, captures={}))
+        self.assertIn(digest[:16], text)
+        self.assertIn(key["anti_pattern_row"], text)
+        self.assertNotIn("private-page-path", text)
+        self.assertNotIn("memory_records", text)
+
+    def test_a_judge_command_before_until_is_refused_naming_the_open_window(self):
+        world = self.world()
+        self.assertEqual(world.packets().returncode, 0)
+        world.fake.write_script(**world.script_for(world.index()))
+        self.assertRefusal(world.judge(["codex", "--index", world.out], now="2026-10-01T12:00:00Z"),
+                           "E_WINDOW_OPEN", window="W_C")
+        self.assertRefusal(world.judge(["codex", "--index", world.out], now="2026-10-03T00:00:00Z"),
+                           "E_WINDOW_OPEN", window="W_X")
+        self.assertRefusal(world.judge(["claude-args", "--index", world.out], now="2026-10-01T12:00:00Z",
+                                       env=world.role_home()), "E_WINDOW_OPEN", window="W_C")
+        self.assertEqual(world.fake.calls(), [])
+
+    def test_the_codex_route_runs_with_the_isolated_argv_and_environment(self):
+        world = self.world()
+        self.assertEqual(world.packets().returncode, 0)
+        index = world.index()
+        world.fake.write_script(**world.script_for(index))
+        proc = world.judge(["codex", "--index", world.out])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        jd = jdm()
+        calls = world.fake.calls()
+        self.assertTrue(calls)
+        for call in calls:
+            argv = call["argv"]
+            self.assertEqual(argv[0], "exec")
+            self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-astra")
+            self.assertEqual(argv[argv.index("--sandbox") + 1], "read-only")
+            for flag in ("--ephemeral", "--output-schema", "--skip-git-repo-check", "--json"):
+                self.assertIn(flag, argv)
+            self.assertEqual(argv[-(len(jd.cl.ISOLATION_ARGS) + 2):],
+                             ["-c", "model_reasoning_effort=max", *jd.cl.ISOLATION_ARGS])
+            self.assertEqual(call["path"], jd.cl.BLIND_CHILD_PATH)
+            self.assertEqual(call["home_entries"], [])
+            self.assertEqual(Path(call["home"]).name, "home")
+            self.assertTrue(call["codex_home"].startswith(str(world.fake.homes)))
+            self.assertEqual(call["cwd_entries"], [])
+        self.assertEqual({call["packet"] for call in calls},
+                         {item["id"] for item in index["packets"] if item["route"] == "codex"},
+                         "only the codex route's packets are dispatched, each inline in its prompt")
+
+    def test_the_effort_is_passed_explicitly_and_the_lane_default_is_never_referenced(self):
+        jd = jdm()
+        source = (TOOLS / "judge.py").read_text(encoding="utf-8")
+        self.assertNotIn("DEFAULT_EFFORT", source)
+        self.assertEqual((jd.JUDGE_EFFORT, jd.JUDGE_MODEL), ("max", "gpt-6-astra"))
+        argv = jd.codex_argv(Path("empty-dir"), Path("schema.json"), Path("out.json"), "prompt")
+        self.assertIn("model_reasoning_effort=max", argv)
+        self.assertEqual(sum(1 for item in argv if item.startswith("model_reasoning_effort=")), 1)
+        self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-astra")
+
+    def test_a_blind_path_issue_or_a_missing_native_credential_is_an_isolation_refusal(self):
+        world = self.world()
+        self.assertEqual(world.packets().returncode, 0)
+        world.fake.write_script(**world.script_for(world.index()))
+        proc = world.judge(["codex", "--index", world.out], blind_issue="a blind child's PATH resolves qmd")
+        self.assertRefusal(proc, "E_JUDGE_ISOLATION", check="blind_path")
+        (world.fake.native / "auth.json").unlink()
+        self.assertRefusal(world.judge(["codex", "--index", world.out]), "E_JUDGE_ISOLATION", check="codex_home")
+        self.assertEqual(world.fake.calls(), [])
+        self.assertFalse((world.out / "judgments-codex.jsonl").exists())
+
+    def test_a_user_scope_role_copy_that_is_missing_or_differs_is_refused(self):
+        world = self.world()
+        self.assertEqual(world.packets().returncode, 0)
+        self.assertRefusal(world.judge(["claude-args", "--index", world.out], env=world.role_home(same=False)),
+                           "E_JUDGE_ROLE", reason="user_copy_differs")
+        shutil.rmtree(world.home)
+        self.assertRefusal(world.judge(["claude-args", "--index", world.out], env=world.role_home(present=False)),
+                           "E_JUDGE_ROLE", reason="user_copy_missing")
+        self.assertFalse((world.out / "claude" / "args.json").exists())
+
+    def test_a_planted_user_name_stops_packets_with_E_PRIVACY_and_creates_nothing(self):
+        world = JudgeWorld(self, answer_suffix="\nAuthor: fixtureuser99").build()
+        home = self.tmp / "fixtureuser99"
+        home.mkdir()
+        proc = world.judge(["packets", "--from", world.private, "--repo", world.run.repo, "--out-dir", world.out],
+                           env={"HOME": str(home)})
+        self.assertRefusal(proc, "E_PRIVACY")
+        self.assertFalse(world.out.exists())
+        self.assertFalse(world.export.exists())
+        self.assertEqual(world.fake.calls(), [])
+
+    def test_a_packet_changed_after_packets_is_refused_before_any_dispatch(self):
+        world = self.world()
+        self.assertEqual(world.packets().returncode, 0)
+        index = world.index()
+        world.fake.write_script(**world.script_for(index))
+        target = next(item for item in index["packets"] if item["route"] == "codex")
+        path = world.out / "packets" / f"{target['id']}.json"
+        path.write_bytes(path.read_bytes() + b" ")
+        self.assertRefusal(world.judge(["codex", "--index", world.out]), "E_JUDGE_PACKET", reason="changed")
+        self.assertEqual(world.fake.calls(), [])
+
+    def test_the_export_root_must_be_absent_or_empty_and_outside_a_work_tree(self):
+        world = self.world()
+        world.export.mkdir()
+        (world.export / "leftover.txt").write_text("x", encoding="utf-8")
+        self.assertRefusal(world.packets(), "E_EXPORT_DIR", reason="exists")
+        self.assertFalse(world.out.exists())
+        (world.export / "leftover.txt").unlink()
+        (self.tmp / ".git").mkdir()
+        with tempfile.TemporaryDirectory() as other:
+            proc = world.judge(["packets", "--from", world.private, "--repo", world.run.repo, "--out-dir",
+                                Path(other) / "judge-out"])
+        self.assertRefusal(proc, "E_EXPORT_DIR", reason="work_tree")
+
+
+# ---- F15: the judge contract (R21) ------------------------------------------------------------------------------------
+
+class F15_JudgeContract(GraderCase):
+    def ready(self, world=None, **script):
+        world = world or JudgeWorld(self).build()
+        self.assertEqual(world.packets().returncode, 0)
+        index = world.index()
+        world.fake.write_script(**world.script_for(index, **script))
+        return world, index
+
+    def codex(self, world, *extra):
+        return world.judge(["codex", "--index", world.out, *extra])
+
+    def rows(self, world):
+        rows = read_rows(world.out / "judgments-codex.jsonl")
+        return ({row["identity"]: row for row in rows if row.get("kind") == "judgment"},
+                next(row for row in rows if row.get("kind") == "route"))
+
+    def packet_of(self, world, packet_id):
+        return json.loads((world.out / "packets" / f"{packet_id}.json").read_text(encoding="utf-8"))
+
+    def d_status(self, private, label, actor="workflow_child"):
+        rows = {(row["identity"], row["actor"]): row for row in read_rows(private / "grades.jsonl")}
+        row = rows[(label, actor)]
+        return {part["id"]: part["status"] for part in row["components"]}["D"], row
+
+    def test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments(self):
+        world, index = self.ready()
+        proc = self.codex(world)
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        judgments, route = self.rows(world)
+        self.assertEqual(sorted(judgments), sorted([world.claude_label, world.t18_label]))
+        row = judgments[world.claude_label]
+        self.assertEqual((row["actor"], row["template"], row["route"], row["status"], row["reason"]),
+                         ("workflow_child", "T16", "codex", "ok", None))
+        self.assertEqual([(c["id"], c["holds"]) for c in row["clauses"]], [("c1", True)])
+        codex = [item for item in index["packets"] if item["route"] == "codex"]
+        passes = sum(1 for item in codex if item["kind"] == "real" or all(item["control"]["expected"].values()))
+        calls = len(codex) + passes
+        self.assertEqual(sorted(route), ["calibration_failed_templates", "calls", "judgments", "kind", "leaks", "refuted",
+                                         "route", "unavailable", "usage", "usage_recorded"])
+        self.assertEqual((route["calls"], route["judgments"], route["refuted"], route["leaks"], route["unavailable"],
+                          route["calibration_failed_templates"], route["usage_recorded"]), (calls, 2, 0, 0, 0, [], True))
+        self.assertEqual(route["usage"], {"input_tokens": 100 * calls, "cached_input_tokens": 10 * calls,
+                                          "output_tokens": 20 * calls, "reasoning_output_tokens": 5 * calls})
+        refuter_ids = {call["packet"] for call in world.fake.calls("refute")}
+        self.assertEqual(refuter_ids, {item["id"] for item in codex
+                                       if item["kind"] == "real" or all(item["control"]["expected"].values())},
+                         "one same-family refuter per pass, controls included")
+        proc2, private2, out2 = world.run.grade("g2", extra=("--judgments", world.out))
+        self.assertIn(proc2.returncode, (0, 1), sanitize(proc2.stderr))
+        status, _ = self.d_status(private2, world.claude_label)
+        self.assertEqual(status, "pass")
+        aggregate = json.loads(out2.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["judges"]["judgments_supplied"], 2)
+        self.assertEqual(aggregate["judges"]["routes"]["codex"],
+                         {"calls": calls, "judgments": 2, "refuted": 0, "leaks": 0, "calibration_failed_templates": [],
+                          "unavailable": 0, "usage_recorded": True})
+
+    def test_a_quote_that_is_not_in_the_packet_is_judge_quote(self):
+        world, index = self.ready()
+        real = world.real(index, world.claude_label)["id"]
+        world.fake.write_script(**world.script_for(index, bad_quote=[real]))
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, _ = self.rows(world)
+        row = judgments[world.claude_label]
+        self.assertEqual((row["status"], row["reason"], row["clauses"]), ("unknown", "judge_quote", []))
+        self.assertEqual(judgments[world.t18_label]["status"], "ok", "another packet's verdict is untouched")
+        proc2, private2, _ = world.run.grade("g2", extra=("--judgments", world.out))
+        status, graded = self.d_status(private2, world.claude_label)
+        self.assertEqual(status, "unknown")
+        self.assertIn("judge_quote", graded["reasons"])
+
+    def test_a_leak_is_judge_leak(self):
+        world, index = self.ready()
+        real = world.real(index, world.claude_label)["id"]
+        world.fake.write_script(**world.script_for(index, leak=[real]))
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, route = self.rows(world)
+        self.assertEqual((judgments[world.claude_label]["status"], judgments[world.claude_label]["reason"]),
+                         ("unknown", "judge_leak"))
+        self.assertEqual(route["leaks"], 1)
+
+    def test_a_stub_judge_that_holds_every_clause_makes_every_template_unknown_on_that_route(self):
+        world, index = self.ready()
+        world.fake.write_script(default="true")
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, route = self.rows(world)
+        for label in (world.claude_label, world.t18_label):
+            self.assertEqual((judgments[label]["status"], judgments[label]["reason"]), ("unknown", "judge_calibration"))
+        self.assertEqual(route["calibration_failed_templates"], ["T16", "T18"])
+        proc2, private2, _ = world.run.grade("g2", extra=("--judgments", world.out))
+        status, graded = self.d_status(private2, world.claude_label)
+        self.assertEqual(status, "unknown")
+        self.assertIn("judge_calibration", graded["reasons"])
+
+    def test_a_misjudged_paraphrased_control_fails_calibration_for_that_template_only(self):
+        world, index = self.ready()
+        jd = jdm()
+        calibration = jd.load_calibration("T16")
+        paraphrased = next(c["id"] for c in calibration["controls"] if c["kind"] == "paraphrased")
+        target = next(item for item in index["packets"] if item["route"] == "codex" and item["kind"] == "control"
+                      and item["template"] == "T16" and item["control"]["id"] == paraphrased)
+        script = world.script_for(index)
+        script["expect"][target["id"]]["clauses"] = {"c1": False}
+        world.fake.write_script(**script)
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, route = self.rows(world)
+        self.assertEqual((judgments[world.claude_label]["status"], judgments[world.claude_label]["reason"]),
+                         ("unknown", "judge_calibration"))
+        self.assertEqual(judgments[world.t18_label]["status"], "ok", "the other template's calibration held")
+        self.assertEqual(route["calibration_failed_templates"], ["T16"])
+
+    def test_a_quoted_refutation_is_judge_refuted_and_only_passes_are_refuted(self):
+        world, index = self.ready()
+        real = world.real(index, world.claude_label)["id"]
+        quote = self.packet_of(world, real)["answer"][:12]
+        world.fake.write_script(**world.script_for(index, refute={real: {"refuted": True, "reason": "unsupported",
+                                                                         "quote": quote}}))
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, route = self.rows(world)
+        self.assertEqual((judgments[world.claude_label]["status"], judgments[world.claude_label]["reason"]),
+                         ("unknown", "judge_refuted"))
+        self.assertEqual(route["refuted"], 1)
+        wrong_controls = {item["id"] for item in index["packets"] if item["kind"] == "control"
+                          and not all(item["control"]["expected"].values())}
+        self.assertFalse({call["packet"] for call in world.fake.calls("refute")} & wrong_controls,
+                         "a judged failure is never sent to the refuter")
+
+    def test_a_refutation_whose_quote_is_not_in_the_packet_is_judge_quote(self):
+        world, index = self.ready()
+        real = world.real(index, world.claude_label)["id"]
+        world.fake.write_script(**world.script_for(index, refute={real: {"refuted": True, "reason": "x",
+                                                                         "quote": "NOT IN THE PACKET"}}))
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, _ = self.rows(world)
+        self.assertEqual((judgments[world.claude_label]["status"], judgments[world.claude_label]["reason"]),
+                         ("unknown", "judge_quote"))
+
+    def test_a_first_infrastructure_failure_is_retried_once(self):
+        world, index = self.ready()
+        real = world.real(index, world.claude_label)["id"]
+        world.fake.write_script(**world.script_for(index, fail={f"{real}.judge": ["exit"]}))
+        self.assertEqual(self.codex(world).returncode, 0)
+        self.assertEqual([c["attempt"] for c in world.fake.calls("judge") if c["packet"] == real], [1, 2])
+        judgments, route = self.rows(world)
+        self.assertEqual(judgments[world.claude_label]["status"], "ok")
+        self.assertTrue((world.out / "events" / f"{real}.judge.1.jsonl").exists(), "the failed attempt is retained")
+
+    def test_a_second_infrastructure_failure_gets_no_third_try(self):
+        world, index = self.ready()
+        real = world.real(index, world.claude_label)["id"]
+        world.fake.write_script(**world.script_for(index, fail={f"{real}.judge": ["exit", "bad_json", "exit"]}))
+        self.assertEqual(self.codex(world).returncode, 0)
+        self.assertEqual([c["attempt"] for c in world.fake.calls("judge") if c["packet"] == real], [1, 2])
+        judgments, route = self.rows(world)
+        self.assertEqual((judgments[world.claude_label]["status"], judgments[world.claude_label]["reason"]),
+                         ("unknown", "judge_unavailable"))
+        self.assertEqual(route["unavailable"], 1)
+
+    def test_a_judgment_whose_events_show_a_command_is_judge_audit_and_is_not_retried(self):
+        world, index = self.ready()
+        real = world.real(index, world.claude_label)["id"]
+        world.fake.write_script(**world.script_for(index, fail={f"{real}.judge": ["tools"]}))
+        self.assertEqual(self.codex(world).returncode, 0)
+        self.assertEqual([c["attempt"] for c in world.fake.calls("judge") if c["packet"] == real], [1])
+        judgments, _ = self.rows(world)
+        self.assertEqual((judgments[world.claude_label]["status"], judgments[world.claude_label]["reason"]),
+                         ("unknown", "judge_audit"))
+
+    def test_a_usage_limit_pauses_the_run_and_a_resume_finishes_it_without_repeating_finished_packets(self):
+        world, index = self.ready()
+        codex_ids = sorted(item["id"] for item in index["packets"] if item["route"] == "codex")
+        stop = codex_ids[len(codex_ids) // 2]
+        world.fake.write_script(**world.script_for(index, fail={f"{stop}.judge": ["usage_limit"]}))
+        proc = self.codex(world)
+        self.assertEqual(proc.returncode, 75, sanitize(proc.stderr))
+        self.assertFalse((world.out / "judgments-codex.jsonl").exists())
+        self.assertTrue((world.out / "events" / f"{stop}.judge.1.jsonl").exists(), "the failed attempt is retained")
+        first = world.fake.calls()
+        world.fake.state.unlink()
+        world.fake.write_script(**world.script_for(index))
+        self.assertEqual(self.codex(world).returncode, 0)
+        again = {call["packet"] for call in world.fake.calls()[len(first):] if call["stage"] == "judge"}
+        finished = {call["packet"] for call in first if call["stage"] == "judge"} - {stop}
+        self.assertFalse(again & finished, "packets finished before the limit are not judged again")
+        judgments, route = self.rows(world)
+        self.assertEqual(route["unavailable"], 0)
+        self.assertEqual(sorted(judgments), sorted([world.claude_label, world.t18_label]))
+
+    def test_accepting_the_unavailable_packets_finishes_with_unknown_never_a_pass(self):
+        world, index = self.ready()
+        codex_ids = sorted(item["id"] for item in index["packets"] if item["route"] == "codex")
+        stop = codex_ids[0]
+        world.fake.write_script(**world.script_for(index, fail={f"{stop}.judge": ["usage_limit", "usage_limit"]}))
+        self.assertEqual(self.codex(world).returncode, 75)
+        proc = self.codex(world, "--accept-unavailable")
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        judgments, route = self.rows(world)
+        self.assertEqual(sorted(judgments), sorted([world.claude_label, world.t18_label]))
+        for row in judgments.values():
+            self.assertEqual((row["status"], row["reason"], row["clauses"]), ("unknown", "judge_unavailable", []),
+                             "an unrun packet is never a silent pass")
+        self.assertEqual(route["unavailable"], 2)
+
+    def test_an_extraction_is_verified_against_the_answer_and_settles_an_unparsed_payload(self):
+        world = JudgeWorld(self, embedded=True).build()
+        world, index = self.ready(world)
+        embedded = world.real(index, world.embedded_label)
+        self.assertEqual(embedded["extract"], ["payload"])
+        text = world.embedded_text
+        blob = text[text.index("["):text.index("]") + 1]
+        world.fake.write_script(**world.script_for(index, extract={embedded["id"]: [
+            {"component": "payload", "values": [blob], "answer_quotes": [blob]}]}))
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, route = self.rows(world)
+        row = judgments[world.embedded_label]
+        self.assertEqual(row["status"], "ok")
+        self.assertEqual(row["extractions"], [{"component": "payload", "values": [blob], "answer_quotes": [blob]}])
+        proc2, private2, _ = world.run.grade("g2", extra=("--judgments", world.out))
+        self.assertIn(proc2.returncode, (0, 1), sanitize(proc2.stderr))
+        graded = {(r["identity"], r["actor"]): r for r in read_rows(private2 / "grades.jsonl")}[(world.embedded_label, "workflow_child")]
+        self.assertEqual({part["id"]: part["status"] for part in graded["components"]}["A"], "pass")
+        self.assertEqual(graded["status"], "pass")
+
+    def extraction_row(self, build):
+        world = JudgeWorld(self, embedded=True).build()
+        world, index = self.ready(world)
+        embedded = world.real(index, world.embedded_label)
+        text = world.embedded_text
+        blob = text[text.index("["):text.index("]") + 1]
+        world.fake.write_script(**world.script_for(index, extract={embedded["id"]: build(blob)}))
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, _ = self.rows(world)
+        return judgments[world.embedded_label]
+
+    def test_an_extraction_quote_that_is_not_in_the_answer_is_judge_quote(self):
+        row = self.extraction_row(lambda blob: [{"component": "payload", "values": [blob],
+                                                 "answer_quotes": ["NOT IN THE ANSWER"]}])
+        self.assertEqual((row["status"], row["reason"]), ("unknown", "judge_quote"))
+
+    def test_an_extracted_value_that_is_not_inside_its_quotes_is_judge_quote(self):
+        row = self.extraction_row(lambda blob: [{"component": "payload", "values": ["NOT A SUBSTRING OF THE QUOTE"],
+                                                 "answer_quotes": [blob]}])
+        self.assertEqual((row["status"], row["reason"]), ("unknown", "judge_quote"))
+
+    def test_a_misjudged_extraction_control_drops_the_extraction_and_keeps_the_clause_verdict(self):
+        world = JudgeWorld(self, embedded=True).build()
+        world, index = self.ready(world)
+        embedded = world.real(index, world.embedded_label)
+        text = world.embedded_text
+        blob = text[text.index("["):text.index("]") + 1]
+        script = world.script_for(index, extract={embedded["id"]: [{"component": "payload", "values": [blob],
+                                                                    "answer_quotes": [blob]}]})
+        controls = [item for item in index["packets"] if item["route"] == "codex" and item["kind"] == "control"
+                    and item["template"] == "T20" and item["extract"]]
+        self.assertGreaterEqual(len(controls), 2)
+        script["expect"][controls[0]["id"]]["extractions"] = []
+        world.fake.write_script(**script)
+        self.assertEqual(self.codex(world).returncode, 0)
+        judgments, route = self.rows(world)
+        row = judgments[world.embedded_label]
+        self.assertEqual((row["status"], row["extractions"], row["extraction_reason"]), ("ok", [], "judge_calibration"))
+        self.assertEqual([(c["id"], c["holds"]) for c in row["clauses"]], [("c1", True)])
+        self.assertIn("T20", route["calibration_failed_templates"])
+
+
+# ---- F29: export and check-html (U9-D17, R22; recheck RV-14 and its low findings) --------------------------------------
+
+def load_token_manifest():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("u9_test_token_manifest", ROOT / "tools" / "token-report" / "token_manifest.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class F29_Export(GraderCase):
+    def graded(self):
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        return run, private, out
+
+    def export(self, private, out, directory, env=None):
+        return run_grade(["export", "--from", private, "--aggregate", out, "--export-dir", directory], env=env)
+
+    def test_the_manifest_holds_only_placeholders_and_attaches_the_aggregate_by_a_relative_path(self):
+        run, private, out = self.graded()
+        target = self.tmp / "neutral-export"
+        proc = self.export(private, out, target)
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        manifest = json.loads((target / "returned-results.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(manifest), ["captured_at", "records", "schema_version", "scope"],
+                         "the token-report importer requires captured_at and scope beside the records")
+        self.assertEqual(manifest["schema_version"], 1)
+        self.assertTrue(manifest["captured_at"].strip() and manifest["scope"].strip())
+        (record,) = manifest["records"]
+        self.assertEqual((record["id"], record["runtime"], record["kind"], record["component_ids"]),
+                         ("token-e2e-frozen-check-grades", "python3", "frozen_check_grading", []))
+        self.assertIn(record["status"], ("pass", "fail", "pending"))
+        self.assertIn("not upstream acceptance", record["boundary"])
+        argv = record["command"]["argv"]
+        self.assertEqual(argv[:3], ["python3", "tools/token-e2e/grade.py", "grade"])
+        for token in argv[3:]:
+            self.assertTrue(token.startswith("-") or token.startswith("<") or "=<" in token, token)
+        text = json.dumps(manifest)
+        for value in (str(self.tmp), RUN_TOKEN, SESSION_ID):
+            self.assertNotIn(value, text)
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(record["observation"], {"g_q": aggregate["g_q"]["status"], "m7": aggregate["m7"]["status"],
+                                                 "m8": {lane: item["status"] for lane, item in sorted(aggregate["m8"].items())},
+                                                 "m12": aggregate["m12"]["status"]})
+        (attachment,) = record["attachments"]
+        self.assertEqual(sorted(attachment), ["bytes", "label", "mime_type", "path", "sha256"])
+        self.assertEqual((attachment["label"], attachment["path"], attachment["mime_type"]),
+                         ("grades-aggregate", "grades-aggregate.json", "application/json"))
+        data = (target / "grades-aggregate.json").read_bytes()
+        self.assertEqual(data, out.read_bytes())
+        self.assertEqual((attachment["bytes"], attachment["sha256"]), (len(data), sha256(data)))
+        for name in ("returned-results.json", "grades-aggregate.json"):
+            self.assertEqual(stat.S_IMODE((target / name).stat().st_mode), 0o600, name)
+
+    def test_the_token_report_importer_accepts_the_manifest(self):
+        run, private, out = self.graded()
+        target = self.tmp / "neutral-export"
+        self.assertEqual(self.export(private, out, target).returncode, 0)
+        manager = load_token_manifest()
+        run_dir = self.tmp / "tm-run"
+        run_dir.mkdir()
+        captured = manager.capture_returned_results(target / "returned-results.json", run_dir, "returned-results")
+        (attachment,) = captured["result"]["records"][0]["attachments"]
+        self.assertEqual(attachment["sha256"], sha256(out.read_bytes()))
+
+    def test_an_export_dir_under_the_home_directory_or_named_with_the_run_token_is_refused(self):
+        run, private, out = self.graded()
+        home = self.tmp / "fixtureuser99"
+        home.mkdir()
+        self.assertRefusal(self.export(private, out, home / "out", env={"HOME": str(home)}), "E_EXPORT_DIR", reason="canary")
+        self.assertFalse((home / "out").exists())
+        self.assertRefusal(self.export(private, out, self.tmp / f"{RUN_TOKEN}-out"), "E_EXPORT_DIR", reason="canary")
+
+    def test_an_existing_export_dir_or_one_inside_a_work_tree_is_refused(self):
+        run, private, out = self.graded()
+        existing = self.tmp / "neutral-export"
+        existing.mkdir()
+        self.assertRefusal(self.export(private, out, existing), "E_EXPORT_DIR", reason="exists")
+        (self.tmp / ".git").mkdir()
+        other = self.tmp / "other-export"
+        self.assertRefusal(self.export(private, out, other), "E_EXPORT_DIR", reason="work_tree")
+        self.assertFalse(other.exists())
+
+    def test_the_canary_runs_over_the_whole_manifest(self):
+        run, private, out = self.graded()
+        path = private / "context.json"
+        document = json.loads(path.read_text(encoding="utf-8"))
+        document["command"] = ["python3", "tools/token-e2e/grade.py", "grade", "--phase", RUN_TOKEN]
+        path.write_text(json.dumps(document), encoding="utf-8")
+        target = self.tmp / "neutral-export"
+        self.assertRefusal(self.export(private, out, target), "E_PRIVACY")
+        self.assertFalse(target.exists(), "nothing is created when the canary refuses")
+
+    def test_grade_records_a_sanitized_command_and_regrade_records_its_own(self):
+        run, private, out = self.graded()
+        context = json.loads((private / "context.json").read_text(encoding="utf-8"))
+        argv = context["command"]
+        self.assertEqual(argv[:3], ["python3", "tools/token-e2e/grade.py", "grade"])
+        self.assertNotIn(str(self.tmp), json.dumps(argv))
+        again, out2 = self.tmp / "private-regraded", self.tmp / "aggregate-regraded.json"
+        self.assertIn(run_grade(["regrade", "--from", private, "--out-private", again, "--out", out2]).returncode, (0, 1))
+        self.assertEqual(json.loads((again / "context.json").read_text(encoding="utf-8"))["command"][2], "regrade")
+
+
+class F29b_CheckHtml(GraderCase):
+    TEMPLATE = ('<html><body><script id="data" type="application/json">__DATA__</script>'
+                '<a href="https://docs.python.org/3/library/json.html">json</a> call_id toolu_use /home</body></html>')
+
+    def graded(self):
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        return run, private, out
+
+    def rendered(self, data):
+        template = self.tmp / "template.html.in"
+        template.write_text(self.TEMPLATE, encoding="utf-8")
+        config = {"html_template": str(template), "output_json": str(self.tmp / "report.json"),
+                  "output_html": str(self.tmp / "report.html")}
+        load_token_manifest().render_reports(config, data)
+        return Path(config["output_html"])
+
+    def test_check_html_accepts_the_render_reports_output_of_a_relativized_capture(self):
+        run, private, out = self.graded()
+        target = self.tmp / "neutral-export"
+        self.assertEqual(run_grade(["export", "--from", private, "--aggregate", out, "--export-dir", target]).returncode, 0)
+        manager = load_token_manifest()
+        run_dir = self.tmp / "tm-run"
+        run_dir.mkdir()
+        captured = manager.capture_returned_results(target / "returned-results.json", run_dir, "returned-results")
+        # What the assembler (U11) must do: the capture stores absolute origin and saved paths, so it strips them.
+        captured["origin"], captured["artifact"]["path"] = "<export>/returned-results.json", "<run>/returned-results.json"
+        for item in captured["result"]["records"][0]["attachments"]:
+            item["origin"], item["path"] = "<export>/" + item["label"], "<run>/" + item["label"]
+        html = self.rendered({"additional_evidence": {"returned_results": captured}})
+        proc = run_grade(["check-html", html, "--from", private])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(sorted(json.loads(proc.stdout)), ["canary_values_checked"])
+
+    def test_check_html_refuses_a_raw_capture_whose_paths_sit_under_the_home_directory(self):
+        run, private, out = self.graded()
+        home = self.tmp / "fixtureuser99"
+        home.mkdir()
+        html = self.rendered({"origin": str(home / "export" / "returned-results.json")})
+        self.assertRefusal(run_grade(["check-html", html, "--from", private], env={"HOME": str(home)}), "E_PRIVACY")
+
+    def test_check_html_refuses_each_planted_value_and_shape(self):
+        run, private, out = self.graded()
+        home = self.tmp / "fixtureuser99"
+        home.mkdir()
+        uuid = "-".join(["3f2b8c1e", "0000", "4000", "8000", "000000000000"])
+        cases = {"run token": RUN_TOKEN, "identity": run.ident("B", "seed-main-output"), "uuid": uuid,
+                 "tool_use id": "toolu" + "_" + "01ABCDEFGHIJKL", "call id": "call" + "_" + "abcdefghijkl1234",
+                 "user name": "fixtureuser99", "home slug": "-home-fixtureuser99-project"}
+        for label, planted in cases.items():
+            with self.subTest(label):
+                html = self.rendered({"note": f"x {planted} y"})
+                self.assertRefusal(run_grade(["check-html", html, "--from", private], env={"HOME": str(home)}), "E_PRIVACY")
+
+    def test_check_html_needs_from_for_the_run_specific_values(self):
+        run, private, out = self.graded()
+        html = self.rendered({"note": f"x {RUN_TOKEN} y"})
+        self.assertRefusal(run_grade(["check-html", html, "--from", private]), "E_PRIVACY")
+        without = run_grade(["check-html", html])
+        self.assertEqual(without.returncode, 0, "no run values are known without --from: only shapes, home and user name")
+
+    def test_check_html_lets_urls_and_id_words_through(self):
+        run, private, out = self.graded()
+        html = self.rendered({"note": "https://docs.python.org/3/library/json.html call_id toolu_use"})
+        proc = run_grade(["check-html", html, "--from", private])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+
+
+# ---- controls (e5) and differential (e6): the grader's own instruments -------------------------------------------------
+
+class F36_Controls(GraderCase):
+    def spec_file(self):
+        repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(), name="controls-specrepo")
+        spec = self.tmp / "controls-spec.json"
+        proc = run_grade(["spec", "--repo", repo, "--preregistration-commit", commit, "--out", spec])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        return spec
+
+    def test_every_planted_control_lands_at_its_expected_status_with_counts_only(self):
+        require_commit(E1_REV)
+        proc = run_grade(["controls", "--spec", self.spec_file(), "--repo", ROOT])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        counts = json.loads(proc.stdout)
+        self.assertEqual(sorted(counts), ["A", "B", "C", "D", "E1"])
+        for name, entry in counts.items():
+            self.assertEqual(sorted(entry), ["expected", "observed"], name)
+            self.assertEqual(entry["expected"], entry["observed"], name)
+        self.assertGreaterEqual(counts["A"]["expected"], 40)
+        self.assertGreaterEqual(counts["B"]["expected"], 8)
+        self.assertGreaterEqual(counts["C"]["expected"], 8)
+        self.assertEqual(counts["D"], {"expected": 21, "observed": 21}, "19 class D templates plus T0 and T9 extraction files")
+        self.assertEqual(counts["E1"], {"expected": 2, "observed": 2})
+        self.assertNotIn(str(ROOT), proc.stdout)
+
+    def test_the_catalog_gives_every_oracle_template_a_passing_and_a_failing_control(self):
+        catalog = json.loads((TOOLS / "calibration" / "oracle-controls.json").read_text(encoding="utf-8"))
+        required = {"T1", "T3", "T4", "T5", "T6", "T8", "T9", "T10", "T16", "T17", "T18", "T19", "T20", "T21", "T22", "T23",
+                    "T24", "T25", "T26", "T27", "T28", "T29", "T32", "T33", "T34", "T35", "T36", "T37", "T38"}
+        statuses = {}
+        for control in catalog["controls"]:
+            if control["class"] == "A":
+                statuses.setdefault(control["template"], set()).add(control["expect"]["status"])
+        self.assertEqual(required - set(statuses), set())
+        for template in required:
+            self.assertTrue({"pass", "fail"} <= statuses[template], template)
+
+    def test_a_control_that_lands_elsewhere_exits_1_and_names_its_class(self):
+        require_commit(E1_REV)
+        fc, spec = load("frozen_checks"), self.spec_file()
+        INPROC[0] += 1
+        try:
+            with mock.patch.dict(fc.ORACLES, {"T34": lambda params, key, ans, readings, ctx=None: {"A": fc.ok()}}):
+                proc = run_grade(["controls", "--spec", spec, "--repo", ROOT])
+        finally:
+            INPROC[0] -= 1
+        self.assertEqual(proc.returncode, 1, sanitize(proc.stderr))
+        counts = json.loads(proc.stdout)
+        self.assertLess(counts["A"]["observed"], counts["A"]["expected"])
+        for name in ("B", "C", "D", "E1"):
+            self.assertEqual(counts[name]["observed"], counts[name]["expected"], name)
+
+    def test_grade_embeds_the_controls_report_when_it_is_supplied(self):
+        require_commit(E1_REV)
+        report = self.tmp / "controls-report.json"
+        proc = run_grade(["controls", "--spec", self.spec_file(), "--repo", ROOT, "--out", report])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(stat.S_IMODE(report.stat().st_mode), 0o600)
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        without = run.grade("plain")
+        self.assertEqual(json.loads(without[2].read_text(encoding="utf-8"))["controls"], {"run": False})
+        proc2, private2, out2 = run.grade("with", extra=("--controls", report))
+        self.assertIn(proc2.returncode, (0, 1), sanitize(proc2.stderr))
+        controls = json.loads(out2.read_text(encoding="utf-8"))["controls"]
+        self.assertEqual(controls["run"], True)
+        self.assertEqual(controls["classes"], json.loads(report.read_text(encoding="utf-8")))
+        again, out3 = self.tmp / "private-regraded", self.tmp / "aggregate-regraded.json"
+        self.assertIn(run_grade(["regrade", "--from", private2, "--out-private", again, "--out", out3]).returncode, (0, 1))
+        self.assertEqual(sha256_file(out3), sha256_file(out2), "regrade repeats the controls block from the private copy")
+
+
+CHECK_296 = '''import sys
+
+BASE = "/nonexistent/base.txt"
+EXPECTED_HASH = "1111111"
+EXPECTED_SUBJECT = "Subject of the newest fixture commit (#1)"
+EXPECTED_TEST_COUNT = "Ran 49 tests"
+EXPECTED_RESULT = "OK (skipped=1)"
+
+with open(BASE, "r", encoding="utf-8", errors="replace") as f:
+    base = f.read()
+try:
+    sec_log = base.split("=== [1] git log -30 ===", 1)[1].split("=== [2] git status ===", 1)[0]
+    sec_test = base.split("=== [6] python3 -m unittest tests.test_host_requests ===", 1)[1]
+except IndexError:
+    print("FAIL (section markers not found in base.txt)")
+    sys.exit(1)
+commit_ok = (EXPECTED_HASH in sec_log) and (EXPECTED_SUBJECT in sec_log)
+test_ok = (EXPECTED_TEST_COUNT in sec_test) and (EXPECTED_RESULT in sec_test)
+print("PASS" if commit_ok and test_ok else "FAIL")
+'''
+
+CHECK_343 = '''import json
+import re
+import sys
+from pathlib import Path
+
+
+def verify():
+    work = Path(__file__).resolve().parent
+    answer = json.loads((work / "answer.json").read_text(encoding="utf-8"))
+    baseline = (work / "base.txt").read_text(encoding="utf-8")
+    commit = re.match(r"commit ([0-9a-f]{40,64})\\n", baseline)
+    assert commit is not None
+    first = baseline.split("\\ncommit ", 1)[0]
+    subject = re.search(r"(?m)^    (\\S.*)$", first)
+    assert subject is not None
+    assert answer["newest_commit_subject"] == subject.group(1)
+    result = baseline.rstrip().splitlines()[-1]
+    assert result == answer["unittest_result"]
+    counts = re.findall(r"(?m)^Ran (\\d+) tests? in [0-9.]+s$", baseline)
+    assert len(counts) == 1 and int(counts[0]) == answer["tests_run"]
+
+
+try:
+    verify()
+except (AssertionError, OSError, ValueError, KeyError, IndexError, TypeError):
+    print("FAIL")
+    sys.exit(1)
+print("PASS")
+'''
+
+DIFF_LOG = ("commit {h1}\nAuthor: Fixture <fixture@example.invalid>\nDate:   Fri Sep 25 16:20:50 2026 -0400\n\n"
+            "    Subject of the newest fixture commit (#1)\n\ncommit {h2}\nAuthor: Fixture <fixture@example.invalid>\n"
+            "Date:   Thu Sep 24 16:20:50 2026 -0400\n\n    Subject of an older fixture commit (#0)\n\n")
+DIFF_TESTS = ("................s................................\n" + "-" * 70 +
+              "\nRan 49 tests in 2.703s\n\nOK (skipped=1)\n")
+
+
+def write_differential_inputs(root, *, check_296=CHECK_296):
+    """Synthetic inputs in the layout of the retained runs: rtk-296 keeps base.txt in six marked sections, tool.txt and a
+    check.py that reads a hard-coded BASE path; rtk-343 keeps base.txt as raw outputs, tool.txt, answer.json and a check.py
+    that reads its own directory."""
+    log = DIFF_LOG.format(h1="1" * 40, h2="2" * 40)
+    sections = ["=== [1] git log -30 ===\n" + log, "=== [2] git status ===\nOn branch main\n\n",
+                "=== [3] git diff HEAD~5 --stat ===\n a.py | 1 +\n\n", '=== [4] grep -rn "def register_file" scripts ===\n\n',
+                "=== [5] ls -la scripts ===\ntotal 0\n", "=== [6] python3 -m unittest tests.test_host_requests ===\n" + DIFF_TESTS]
+    first = Path(root) / "rtk-296"
+    first.mkdir(parents=True)
+    (first / "base.txt").write_text("".join(sections), encoding="utf-8")
+    (first / "tool.txt").write_text("".join(sections), encoding="utf-8")
+    (first / "check.py").write_text(check_296, encoding="utf-8")
+    second = Path(root) / "rtk-343"
+    second.mkdir(parents=True)
+    (second / "base.txt").write_text(log + "total 0\n" + DIFF_TESTS, encoding="utf-8")
+    (second / "tool.txt").write_text("1111111 Subject of the newest fixture commit (#1) (27 min ago)\n" + DIFF_TESTS,
+                                     encoding="utf-8")
+    (second / "answer.json").write_text(json.dumps({
+        "newest_commit_subject": "Subject of the newest fixture commit (#1)", "unittest_result": "OK (skipped=1)",
+        "tests_run": 49, "answer": "Newest commit: Subject of the newest fixture commit (#1)\n"
+                                   "Unittest: OK (skipped=1); 49 tests ran."}), encoding="utf-8")
+    (second / "check.py").write_text(CHECK_343, encoding="utf-8")
+    return Path(root)
+
+
+class F8_Differential(GraderCase):
+    def test_the_grader_agrees_with_the_retained_checks_on_the_original_and_three_mutations_each(self):
+        inputs = write_differential_inputs(self.tmp / "gate-inputs")
+        before = {path.name: path.read_bytes() for path in sorted(inputs.rglob("*")) if path.is_file()}
+        proc = run_grade(["differential", "--inputs", inputs])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(proc.stdout.strip(), "rtk-296 agree 4/4; rtk-343 agree 4/4")
+        after = {path.name: path.read_bytes() for path in sorted(inputs.rglob("*")) if path.is_file()}
+        self.assertEqual(after, before, "the retained inputs are never modified; the checks run from temporary copies")
+
+    def test_a_retained_check_that_disagrees_with_the_grader_is_reported(self):
+        inputs = write_differential_inputs(self.tmp / "gate-inputs", check_296='print("PASS")\n')
+        proc = run_grade(["differential", "--inputs", inputs])
+        self.assertEqual(proc.returncode, 1, sanitize(proc.stderr))
+        self.assertEqual(proc.stdout.strip(), "rtk-296 agree 1/4; rtk-343 agree 4/4")
+
+    def test_missing_inputs_are_a_refusal_not_a_pass(self):
+        proc = run_grade(["differential", "--inputs", self.tmp / "absent"])
+        self.assertRefusal(proc, "E_DIFFERENTIAL", field="inputs")
+
+
+# ---- F19 (stage-3 subset): disarmed-guard mutants ---------------------------------------------------------------------
+
+def stage3_mutant(case, patches, candidates, expected):
+    case.assertEqual(failing_with(patches, candidates), {full(name) for name in expected})
+
+
+class F19c_Stage3Mutants(GraderCase):
+    def test_M7_quote_verification_off(self):
+        jd = jdm()
+        base = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments"]
+        flipped = ["F15_JudgeContract.test_a_quote_that_is_not_in_the_packet_is_judge_quote",
+                   "F15_JudgeContract.test_a_refutation_whose_quote_is_not_in_the_packet_is_judge_quote",
+                   "F15_JudgeContract.test_an_extraction_quote_that_is_not_in_the_answer_is_judge_quote",
+                   "F15_JudgeContract.test_an_extracted_value_that_is_not_inside_its_quotes_is_judge_quote"]
+        stage3_mutant(self, [mock.patch.object(jd, "verbatim", lambda needle, haystack: True)], base + flipped, flipped)
+
+    def test_M40_calibration_off(self):
+        jd = jdm()
+        base = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments"]
+        flipped = ["F15_JudgeContract.test_a_stub_judge_that_holds_every_clause_makes_every_template_unknown_on_that_route",
+                   "F15_JudgeContract.test_a_misjudged_paraphrased_control_fails_calibration_for_that_template_only",
+                   "F15_JudgeContract.test_a_misjudged_extraction_control_drops_the_extraction_and_keeps_the_clause_verdict",
+                   "F23_WebTableJudges.test_calibration_verdicts_flag_the_misjudged_controls"]
+        stage3_mutant(self, [mock.patch.object(jd, "calibration_failures", lambda calibration, verdicts: [])],
+                      base + flipped, flipped)
+
+    def test_M41_leak_ignored(self):
+        jd = jdm()
+        base = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments"]
+        flipped = ["F15_JudgeContract.test_a_leak_is_judge_leak"]
+        stage3_mutant(self, [mock.patch.object(jd, "is_leak", lambda value: False)], base + flipped, flipped)
+
+    def test_M42_refuter_off(self):
+        jd = jdm()
+        base = ["F15_JudgeContract.test_a_quote_that_is_not_in_the_packet_is_judge_quote"]
+        flipped = ["F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments",
+                   "F15_JudgeContract.test_a_quoted_refutation_is_judge_refuted_and_only_passes_are_refuted",
+                   "F15_JudgeContract.test_a_refutation_whose_quote_is_not_in_the_packet_is_judge_quote"]
+        stage3_mutant(self, [mock.patch.object(jd, "needs_refuter", lambda judged: False)], base + flipped, flipped)
+
+    def test_M43_window_check_off(self):
+        jd = jdm()
+        base = ["F35_JudgeRoutes.test_the_codex_route_runs_with_the_isolated_argv_and_environment"]
+        flipped = ["F35_JudgeRoutes.test_a_judge_command_before_until_is_refused_naming_the_open_window"]
+        stage3_mutant(self, [mock.patch.object(jd, "window_issue", lambda windows, now: None)], base + flipped, flipped)
+
+    def test_M44_isolation_check_off(self):
+        jd = jdm()
+        base = ["F35_JudgeRoutes.test_the_codex_route_runs_with_the_isolated_argv_and_environment"]
+        flipped = ["F35_JudgeRoutes.test_a_blind_path_issue_or_a_missing_native_credential_is_an_isolation_refusal"]
+        stage3_mutant(self, [mock.patch.object(jd, "isolation_issue", lambda work_dir, export: None)], base + flipped, flipped)
+
+    def test_M45_role_check_off(self):
+        jd = jdm()
+        base = ["F30_JudgeBuilders.test_claude_args_validate_and_name_the_export_files"]
+        flipped = ["F35_JudgeRoutes.test_a_user_scope_role_copy_that_is_missing_or_differs_is_refused"]
+        stage3_mutant(self, [mock.patch.object(jd, "role_issue", lambda: None)], base + flipped, flipped)
+
+    def test_M46_the_effort_is_not_max(self):
+        """Correction 10: a judge that passes any effort other than the literal max, or the lane's default, must fail the
+        exact argv element. `high` is codex_lane's default at this base; after the default moves to max the second mutant
+        is equivalent and the expected set is empty."""
+        jd = jdm()
+        flipped = ["F35_JudgeRoutes.test_the_effort_is_passed_explicitly_and_the_lane_default_is_never_referenced",
+                   "F35_JudgeRoutes.test_the_codex_route_runs_with_the_isolated_argv_and_environment"]
+        stage3_mutant(self, [mock.patch.object(jd, "JUDGE_EFFORT", "high")], flipped, flipped)
+        default = getattr(jd.cl, "DEFAULT_EFFORT")
+        stage3_mutant(self, [mock.patch.object(jd, "JUDGE_EFFORT", default)], flipped, flipped if default != "max" else [])
+
+    def test_M47_retry_cap_off(self):
+        jd = jdm()
+        base = ["F15_JudgeContract.test_a_first_infrastructure_failure_is_retried_once"]
+        flipped = ["F15_JudgeContract.test_a_second_infrastructure_failure_gets_no_third_try"]
+        stage3_mutant(self, [mock.patch.object(jd, "MAX_ATTEMPTS", 3)], base + flipped, flipped)
+
+    def test_M48_packet_canary_off(self):
+        jd = jdm()
+        base = ["F35_JudgeRoutes.test_packets_are_scrubbed_bounded_and_route_each_answer_to_the_other_family"]
+        flipped = ["F35_JudgeRoutes.test_a_planted_user_name_stops_packets_with_E_PRIVACY_and_creates_nothing"]
+        stage3_mutant(self, [mock.patch.object(jd, "assert_clean", lambda packet, values: 0)], base + flipped, flipped)
+
+    def test_M49_export_dir_canary_off(self):
+        gr = load("grade")
+        original = gr.export_dir_issue
+        base = ["F29_Export.test_an_existing_export_dir_or_one_inside_a_work_tree_is_refused"]
+        flipped = ["F29_Export.test_an_export_dir_under_the_home_directory_or_named_with_the_run_token_is_refused"]
+        stage3_mutant(self, [mock.patch.object(gr, "export_dir_issue", lambda path, values: original(path, []))],
+                      base + flipped, flipped)
+
+    def test_M17c_manifest_canary_off(self):
+        ev = evm()
+        base = ["F29_Export.test_the_manifest_holds_only_placeholders_and_attaches_the_aggregate_by_a_relative_path"]
+        flipped = ["F29_Export.test_the_canary_runs_over_the_whole_manifest"]
+        stage3_mutant(self, [mock.patch.object(ev, "assert_no_private", lambda document, values: 0)], base + flipped, flipped)
+
+    def test_M50_check_html_run_values_off(self):
+        gr = load("grade")
+        base = ["F29b_CheckHtml.test_check_html_lets_urls_and_id_words_through"]
+        flipped = ["F29b_CheckHtml.test_check_html_refuses_each_planted_value_and_shape",
+                   "F29b_CheckHtml.test_check_html_needs_from_for_the_run_specific_values"]
+        stage3_mutant(self, [mock.patch.object(gr, "html_values", lambda private_dir: [])], base + flipped, flipped)
+
+    def test_M51_a_disarmed_oracle_leaves_a_control_unmet(self):
+        require_commit(E1_REV)
+        base = ["F36_Controls.test_every_planted_control_lands_at_its_expected_status_with_counts_only"]
+        fc = load("frozen_checks")
+        self.assertEqual(failing_with([], base), set(), "the unmutated controls run must pass before a mutant can flip it")
+        patches = [mock.patch.dict(fc.ORACLES, {"T34": lambda params, key, ans, readings, ctx=None: {"A": fc.ok()}})]
+        stage3_mutant(self, patches, base, base)
 
 
 if __name__ == "__main__":
