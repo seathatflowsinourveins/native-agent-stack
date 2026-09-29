@@ -68,6 +68,47 @@ IGNORED_OPENERS = [
     "ssh host cat <<'EOF'", "ssh host 'cat > remote.sh' <<'EOF'", "cat <<'EOF' > run.sh",
 ]
 
+# D7 (GPT-6 #8), R1 and R3 of the U1 pivot. Every command below was run on 2026-09-29 under GNU bash 5.2.21 and dash, with `env`
+# cleared and PATH holding a stub curl that logs its calls (and a stub ssh that logs, then runs `sh` on its stdin: the remote
+# login shell of OpenSSH ssh(1)); the comment on each list says how often the stub curl ran. Both shells agreed on every command.
+# The outer shell expands a double-quoted string before the shell it starts sees it: a command substitution or backquote
+# inside it runs there, whatever the inner shell then makes of the text (POSIX.1-2024 XCU 2.2.3 and 2.6.3).
+D7_EXECUTED = [  # the outer shell runs the substitution: curl ran once
+    "bash -c \"cat <<'EOF'\n$(curl https://example.org)\nEOF\"",  # GPT-6 #8, verbatim
+    "bash -c \"cat <<'EOF'\nline\n$(curl https://example.org)\nEOF\"",
+    "bash -c \"cat <<EOF\n$(curl https://example.org)\nEOF\"",  # an unquoted delimiter: still once, not once per view
+    "bash -c \"echo '$(curl https://example.org)'\"", "bash -c \"# $(curl https://example.org)\"",
+    "bash -c \"cat <<'EOF'\n`curl https://example.org`\nEOF\"", "sh -c \"cat <<'EOF'\n$(curl https://example.org)\nEOF\"",
+    "eval \"echo '$(curl https://example.org)'\"", "ssh host \"cat <<'EOF'\n$(curl https://example.org)\nEOF\"",
+    "bash -c \"echo ${UNSET_X:-$(curl https://example.org)}\"", "bash -c \"echo $(( $(curl https://example.org >/dev/null; echo 1) + 1 ))\"",
+    "bash -c \"echo '$(curl \"https://example.org\")'\"", "bash -c \"echo \\\"$(curl https://example.org)\\\"\"",
+]
+D7_INNER = [  # the inner shell runs it (an escaped $ or backquote, or a single-quoted string that is not expanded): curl ran once
+    "bash -c \"echo \\$(curl https://example.org)\"", "bash -c \"echo \\\"\\$(curl https://example.org)\\\"\"",
+    "bash -c 'cat <<EOF\n$(curl https://example.org)\nEOF'", "bash -c 'echo \"$(curl https://example.org)\"'",
+    "bash -c \"echo \\`curl https://example.org\\`\"",
+]
+D7_TWICE = [  # the outer shell runs one substitution and the inner shell another command or substitution: curl ran twice
+    "bash -c \"x=$(curl https://example.org/a); curl https://example.org/b\"",
+    "bash -c \"cat <<EOF\n$(curl https://example.org/a) \\$(curl https://example.org/b)\nEOF\"",
+]
+D7_DATA = [  # nothing runs curl: an escaped $ is data in a quoted heredoc, and a single-quoted string is not expanded
+    "bash -c \"cat <<'EOF'\n\\$(curl https://example.org)\nEOF\"", "bash -c 'cat <<\"EOF\"\n$(curl https://example.org)\nEOF'",
+]
+# R1: a heredoc operator after a closed "$( )" in the same simple command still belongs to that command (curl ran once, except cat).
+R1_EXECUTED = [
+    "FOO=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF", "bash -s -- \"$(pwd)\" <<'EOF'\ncurl https://example.org\nEOF",
+    "ssh \"$(echo host)\" <<'EOF'\ncurl https://example.org\nEOF", "x=\"$(cat <<'A'\nbody\nA\n)\" bash <<'B'\ncurl https://example.org\nB",
+    "echo \"$(FOO=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF\n)\"", "FOO=$(pwd) bash <<'EOF'\ncurl https://example.org\nEOF",
+]
+R1_DATA = ["FOO=\"$(pwd)\" cat <<'EOF'\ncurl https://example.org\nEOF"]  # cat reads the body as data: curl never ran
+# R3: an escaped blank, `;` or newline before a # is not a comment start, so the ) and the closing quote are found (curl ran once).
+R3_EXECUTED = [
+    'x="$(echo a\\ #b)"; curl https://example.org', 'x="$(echo a\\;#b)"; curl https://example.org',
+    'x="$(echo a\\\n#b)"; curl https://example.org', 'x="$(echo a\\\\ #b\n)"; curl https://example.org',
+    'x="$(echo a #b\n)"; curl https://example.org', 'echo a\\ #b; curl https://example.org',
+]
+
 # CLI lanes (#381 AA-PLAN PR-A item 3; U1 design sections 2-5 and 7). The stack commands are the literal entries of
 # manifests/stack.json at cf3fb72e: :1003 toon, :797 repomix, :579 markitdown, :762 qmd, :519 headroom, :629 an
 # mcporter list, and :280 and :407 mcporter calls, the two seeds of the downstream alias map.
@@ -127,10 +168,10 @@ class TokenMeasurement(unittest.TestCase):
         return json.loads(p.stdout)
 
     def exports(self, expression, value):
-        """Evaluate `expression` over the module's exports (`cu`) and the JSON input (`x`)."""
+        """Evaluate `expression` (awaited) over the module's exports (`cu`) and the JSON input (`x`)."""
         script = ("import {readFileSync} from 'node:fs'; import * as cu from " + json.dumps(MODULE.as_uri())
-                  + "; const x=JSON.parse(readFileSync(0,'utf8')); process.stdout.write(JSON.stringify("
-                  + expression + "));")
+                  + "; const x=JSON.parse(readFileSync(0,'utf8')); process.stdout.write(JSON.stringify(await ("
+                  + expression + ")));")
         p = subprocess.run(["node", "--input-type=module", "-e", script], input=json.dumps(value),
                            text=True, capture_output=True, check=False)
         self.assertEqual(p.returncode, 0, p.stderr)
@@ -609,6 +650,76 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(m4["remote_fetches"], 1)
                 self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
         self.assertEqual(self.exports("x.map(cu.fetchKind)", [quoted, nested]), [None, "fetch"])
+
+    def test_m4_d7_outer_shell_substitutions_in_a_double_quoted_run_string_are_executed(self):
+        # D7 (GPT-6 #8): N1 read a double-quoted run string only as the inner shell's input, so a substitution the outer
+        # shell runs was lost whenever the inner shell read it as data (a quoted heredoc, single quotes, a comment). Two views:
+        # the substitutions the outer shell runs, and the inner shell's parse of the string it receives. The count is the
+        # number of times the stub curl ran, so a substitution both views could see counts once.
+        for command, name, _, key, m4 in self.carrier_m4(D7_EXECUTED + D7_INNER):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+                self.assertEqual(m4["status"], "measured")
+        for command, name, _, key, m4 in self.carrier_m4(D7_TWICE):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 2)
+                self.assertEqual(m4["remote_fetches"], 2)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        for command, name, _, key, m4 in self.carrier_m4(D7_DATA):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["remote_fetches"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+                self.assertEqual(m4["status"], "incomplete")
+        commands = D7_EXECUTED + D7_INNER + D7_TWICE + D7_DATA
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", commands),
+                         ["fetch"] * (len(commands) - len(D7_DATA)) + [None] * len(D7_DATA))
+
+    def test_cli_lanes_count_a_lane_the_outer_shell_runs_through_a_double_quoted_run_string(self):
+        # D7 with qmd in place of curl (GPT-6 #8): the outer shell runs the substitution, so it is one qmd call.
+        got = self.lanes_of(["bash -c \"cat <<'EOF'\n$(qmd search x)\nEOF\""])
+        cli = got[0][0]
+        self.assertEqual((cli["lanes"].get("qmd") or {}).get("calls"), 1)
+        self.assertEqual((cli["lanes"].get("qmd") or {}).get("invocations"), 1)
+
+    def test_m4_r1_a_heredoc_after_a_closed_double_quoted_substitution_keeps_its_reader(self):
+        # R1 (Claude review of 3cb7c4f6): the cuts a "$( )" inside double quotes added bounded every heredoc of the line,
+        # so the opener's command started at the closing quote, its reader read as empty and a shell-read body became data.
+        # Each opener is bounded by the cuts of its own command level (M4 as at cf3fb72e: curl ran once).
+        for command, name, _, key, m4 in self.carrier_m4(R1_EXECUTED):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        for command, name, _, key, m4 in self.carrier_m4(R1_DATA):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", R1_EXECUTED + R1_DATA),
+                         ["fetch"] * len(R1_EXECUTED) + [None] * len(R1_DATA))
+        # An interpreter that reads the heredoc keeps its confirmed HTTP operation behind the same "$( )" (inlineHttp mode).
+        interpreters = ["python3 - \"$(pwd)\" <<'EOF'\nfetch(u)\nEOF", "FOO=\"$(pwd)\" node <<'EOF'\nfetch(u)\nEOF"]
+        for command, name, _, _, m4 in self.carrier_m4(interpreters):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4["unclassifiable"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+
+    def test_cli_lanes_read_the_heredoc_a_shell_reads_after_a_closed_double_quoted_substitution(self):
+        got = self.lanes_of(["FOO=\"$(pwd)\" bash <<'EOF'\nqmd search x\nEOF"])
+        self.assertEqual((got[0][0]["lanes"].get("qmd") or {}).get("calls"), 1)
+
+    def test_m4_r3_an_escaped_metacharacter_before_a_hash_is_not_a_comment_start(self):
+        # R3 (Claude review): in a $( ) frame a # after an escaped blank, `;` or newline was read as a comment, so the ) and
+        # the closing quote ran on to the end of the command and the `; curl` after them fell inside double-quoted data.
+        # bash(1) COMMENTS: only a word beginning with # (after an unquoted blank or metacharacter) starts a comment.
+        for command, name, _, key, m4 in self.carrier_m4(R3_EXECUTED):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", R3_EXECUTED), ["fetch"] * len(R3_EXECUTED))
 
     def test_cli_lanes_count_stack_commands_in_command_position(self):
         # #381 AA-PLAN PR-A item 3: a lane executable in command position is a lane call. An mcporter list counts for

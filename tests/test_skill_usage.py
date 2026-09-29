@@ -23,6 +23,10 @@ import skill_usage as S  # noqa: E402
 
 FIXTURES = ROOT / "tests" / "fixtures" / "skill_usage"
 NOW = "2026-10-30T00:00:00Z"
+# The tree-sitter-bash install the kernel's lane layer loads (child-usage.mjs loadShellParser): CHILD_USAGE_SHELL_PARSER,
+# else the ecosystem tools directory. Tests that count lanes skip, with this message, on a host without it.
+PARSER_DIR = Path(os.environ.get("CHILD_USAGE_SHELL_PARSER") or Path.home() / ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1")
+PARSER_INSTALLED = (PARSER_DIR / "package-lock.json").is_file()
 
 
 def load_fixture_manifest() -> dict:
@@ -1049,6 +1053,83 @@ class CodexLanes(unittest.TestCase):
         for name, (output, expected) in cases.items():
             with self.subTest(case=name):
                 self.assertEqual(S.exec_header_state(output), expected)
+
+    def test_exec_header_state_bounds_the_exit_code_digits(self):
+        # D6 (GPT-6 #12): int() of a digit string over CPython's conversion limit (4,300 digits) raised ValueError, so one
+        # malformed header stopped the whole scan. The code is an i32 written in decimal (context.rs:534-540), at most 10
+        # digits with its sign; a header with more than 9 digits is not a native header and reads unknown, without raising.
+        unknown = (False, "unknown")
+        self.assertEqual(S.exec_header_state("Wall time: 0.01 seconds\nProcess exited with code " + "9" * 5000 + "\nOutput:\n"),
+                         unknown)  # GPT-6 #12, verbatim
+        cases = {
+            "9 digits": (exec_response("Process exited with code 999999999", "x"), (True, None)),
+            "negative, 9 digits": (exec_response("Process exited with code -999999999", "x"), (True, None)),
+            "10 digits": (exec_response("Process exited with code 1000000000", "x"), unknown),
+            "negative, 10 digits": (exec_response("Process exited with code -1000000000", "x"), unknown),
+            "zero padded to 10 digits": (exec_response("Process exited with code 0000000000", "x"), unknown),
+            "4,301 digits": (exec_response("Process exited with code " + "1" * 4301, "x"), unknown),
+            "5,000 digits, negative": (exec_response("Process exited with code -" + "1" * 5000, "x"), unknown),
+        }
+        for name, (output, expected) in cases.items():
+            with self.subTest(case=name):
+                self.assertEqual(S.exec_header_state(output), expected)
+
+    def test_shell_script_quotes_argv_elements(self):
+        # D6 (GPT-6 #11): an argv array is one command, so each element is quoted (shlex.join) and a metacharacter inside
+        # one element stays data. Only a shell's `-c`/`-lc` script argument is shell text (openai/codex rust-v0.157.1
+        # codex-rs/core/src/shell.rs: [shell, -lc, script]); `-c` of any other program is one of its arguments.
+        self.assertEqual(S.shell_script(["echo", "qmd; rtk proxy qmd status"]), "echo 'qmd; rtk proxy qmd status'")
+        self.assertEqual(S.shell_script(["echo", "-c", "qmd; rtk proxy qmd status"]), "echo -c 'qmd; rtk proxy qmd status'")
+        self.assertEqual(S.shell_script(["grep", "-n", "a b", "notes.md"]), "grep -n 'a b' notes.md")
+        self.assertEqual(S.shell_script(["ls", "-la"]), "ls -la")
+        self.assertEqual(S.shell_script(["bash", "-lc", "qmd search x; ls"]), "qmd search x; ls")
+        self.assertEqual(S.shell_script(["/usr/bin/zsh", "-c", "rtk proxy pytest"]), "rtk proxy pytest")
+        self.assertEqual(S.shell_script("qmd search x"), "qmd search x")
+        self.assertEqual(S.shell_script([]), "")
+
+    def test_argv_metacharacters_stay_data_in_the_codex_bridge(self):
+        # D6 (GPT-6 #11, verbatim first case): the bridge flattened argv with spaces, so ["echo", "qmd; rtk proxy qmd status"]
+        # read as two commands and counted one qmd call and one rtk proxy call that never ran.
+        cases = {
+            "local shell call": [
+                codex_row("response_item", {"type": "local_shell_call", "call_id": "call_priv_argv", "status": "completed",
+                                            "action": {"type": "exec", "command": ["echo", "qmd; rtk proxy qmd status"]}}),
+                codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_argv", "output": "ok"})],
+            "code mode item": code_mode_command("call_priv_argv2", ["echo", "qmd; rtk proxy qmd status"], "completed", 0, "ok"),
+            "-c of a program that is not a shell": code_mode_command(
+                "call_priv_argv3", ["echo", "-c", "qmd; rtk proxy qmd status"], "completed", 0, "ok"),
+        }
+        for name, rows in cases.items():
+            with self.subTest(case=name):
+                got = S.measure_codex_records(rows, since=self.since, until=self.until)
+                self.assertEqual(got["proxy"]["calls"], 0)
+                self.assertEqual(got["cli_lanes"]["lanes"], {})
+
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    def test_bridge_loads_the_shell_parser_and_records_it(self):
+        # D1: the Node bridge awaits loadShellParser, as the kernel's CLI does, so its measurement counts lanes and records
+        # the parser (versions and the two wasm sha256 values, no path).
+        got = S.measure_codex_records(code_mode_command("call_priv_p", ["bash", "-lc", "qmd search x"], "completed", 0, "ok"),
+                                      since=self.since, until=self.until)
+        self.assertEqual(got["cli_lanes"]["status"], "measured")
+        self.assertEqual(got["cli_lanes"]["parser"]["versions"], {"tree_sitter_bash": "0.25.1", "web_tree_sitter": "0.27.0"})
+        self.assertEqual(sorted(got["cli_lanes"]["parser"]["wasm_sha256"]), ["tree_sitter_bash", "web_tree_sitter"])
+        self.assertEqual(got["proxy"]["rule"], "command_position")
+        self.assertEqual(got["cli_lanes"]["lanes"]["qmd"]["calls"], 1)
+        self.assertNotIn(str(PARSER_DIR), json.dumps(got))
+
+    def test_bridge_fails_closed_when_the_shell_parser_is_not_installed(self):
+        # D1: with no parser the bridge's measurement says so and keeps the prefix rule for rtk proxy; it never falls back to
+        # the text scanners for lane counting (M4 stays text-based and unchanged).
+        rows = (code_mode_command("call_priv_q", ["bash", "-lc", "qmd search x"], "completed", 0, "ok")
+                + exec_command_call("call_priv_r", "rtk proxy pytest", exec_response("Process exited with code 0", "ok"))
+                + exec_command_call("call_priv_s", "curl https://example.org", exec_response("Process exited with code 0", "ok")))
+        with mock.patch.dict(os.environ, {"CHILD_USAGE_SHELL_PARSER": str(self.root / "no-such-install")}):
+            got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["cli_lanes"], {"status": "parser_unavailable", "reason": "not_installed"})
+        self.assertEqual((got["proxy"]["rule"], got["proxy"]["calls"], got["proxy"]["invocations"]), ("prefix_fallback", 1, None))
+        self.assertEqual(got["m4"]["shell_fetch"], 1)
+        self.assert_id_free(got)
 
     def test_codex_aggregate_passes_cli_lanes_and_proxy_through(self):
         # aggregate_codex_lanes hands the per-actor measurements to the kernel's aggregateMeasurements, which sums
