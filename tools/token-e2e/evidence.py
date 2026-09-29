@@ -1467,6 +1467,23 @@ def heredoc_bodies(command):
     return bodies
 
 
+def toon_invocations(text):
+    """[{decode, output, heredoc}] for each simple command of a shell text that runs the toon CLI, with its options read from
+    that command's own words: `curl -d` is not `toon -d` and `sort -o` is not `toon -o`, and one call may hold an encode and
+    a decode (`toon --stats seed.json && toon -d out.toon`). `heredoc` says the command itself carries a heredoc (`<<TAG`),
+    the only way its input is in the command text. [] when no simple command starts toon, as when a script runs through
+    `bash -c '...'` and keeps its inner command in one quoted word; the caller then reads the whole text's words."""
+    found = []
+    for words in _shell_commands(text):
+        if _program_of(words) != "toon":
+            continue
+        options = words[next(index for index, word in enumerate(words) if word.rsplit("/", 1)[-1] == "toon") + 1:]
+        found.append({"decode": any(word in ("-d", "--decode") for word in options),
+                      "output": any(word in ("-o", "--output") or word.startswith("--output=") for word in options),
+                      "heredoc": any(word.startswith("<<") and not word.startswith("<<<") for word in options)})
+    return found
+
+
 def _records_equal(value, records, readings):
     reasons, order_bad = fc.compare_values(value, records, readings["R2-02"] == "ordered")
     return not reasons and not order_bad
@@ -1479,19 +1496,25 @@ def _document_records(value, readings):
 
 
 def _answer_toon_items(ans, records, readings):
+    """One round-trip item per TOON payload of the answer. A structural candidate (a fence, a line block) that starts like a
+    TOON header and does not decode strictly is a failed trip. A bare candidate (the whole answer, an evidence string) that
+    does not decode is no trip at all: TOON CLI 4.1.1 refuses content after a root array in strict mode, so an answer that
+    follows its payload with the requested latency sum can never decode as a whole, and the payload itself is already a
+    structural candidate (frozen_checks.grade_payload ignores a bare candidate that does not decode for the same reason)."""
     items = []
     for candidate in fc.payload_candidates(ans):
         first = next((line for line in candidate["text"].split("\n") if line.strip()), "")
         if not fc.toon_header(first) or first.lstrip().startswith("- "):
             continue
-        if records is None:
-            if readings["R2-16"] == "unknown_in_denominator":
-                items.append({"source": "answer", "status": "unknown"})
-            continue
         try:
             value = fc.decode_candidate(candidate["text"])
         except fc.DecodeError:
-            items.append({"source": "answer", "status": "unequal"})
+            if candidate["structural"]:
+                items.append({"source": "answer", "status": "unequal" if records is not None else "unknown"})
+            continue
+        if records is None:
+            if readings["R2-16"] == "unknown_in_denominator":
+                items.append({"source": "answer", "status": "unknown"})
             continue
         shaped = _document_records(value, readings)
         items.append({"source": "answer",
@@ -1532,28 +1555,33 @@ def toon_facts(calls, ans, key, readings, seeded=True):
         if text is None or call["state"] not in ("succeeded", None) or not has_program_word(text, "toon"):
             continue
         stateless = call["state"] is None
-        words = set(text.split())
-        if words & {"-d", "--decode"}:
-            bodies = heredoc_bodies(text)
-            if not bodies:
-                continue
-            item = {"source": "child_decode", "status": "unknown"}
-            try:
-                expected = fc.toon_decode(bodies[0].strip())
-            except fc.DecodeError:
-                item["status"] = "unknown" if stateless else "unequal"
-            else:
+        invocations = toon_invocations(text)
+        if not invocations:  # a wrapper keeps its script in one quoted word: read the words of the whole text
+            words = set(text.split())
+            invocations = [{"decode": bool(words & {"-d", "--decode"}), "heredoc": True,
+                            "output": any(word in ("-o", "--output") or word.startswith("--output=") for word in words)}]
+        if any(item["decode"] for item in invocations):  # a call may decode and encode: the decode never hides the encode
+            bodies = heredoc_bodies(text) if any(item["decode"] and item["heredoc"] for item in invocations) else []
+            if bodies:
+                item = {"source": "child_decode", "status": "unknown"}
                 try:
-                    observed = fc.json_decode((call["result_text"] or "").strip())
+                    expected = fc.toon_decode(bodies[0].strip())
                 except fc.DecodeError:
-                    observed = None
-                if observed is not None and not stateless:
-                    reasons, order_bad = fc.compare_values(observed, expected, readings["R2-02"] == "ordered")
-                    item["status"] = "equal" if not reasons and not order_bad else "unequal"
-            facts["roundtrip"].append(item)
+                    item["status"] = "unknown" if stateless else "unequal"
+                else:
+                    try:
+                        observed = fc.json_decode((call["result_text"] or "").strip())
+                    except fc.DecodeError:
+                        observed = None
+                    if observed is not None and not stateless:
+                        reasons, order_bad = fc.compare_values(observed, expected, readings["R2-02"] == "ordered")
+                        item["status"] = "equal" if not reasons and not order_bad else "unequal"
+                facts["roundtrip"].append(item)
+        encodes = [item for item in invocations if not item["decode"]]
+        if not encodes:
             continue
         facts["cli_encodes"] += 1
-        if any(word in ("-o", "--output") or word.startswith("--output=") for word in words):
+        if any(item["output"] for item in encodes):
             unknown = unknown or "output_file"
             continue
         isolated = isolate_toon_document(call["result_text"] or "")
