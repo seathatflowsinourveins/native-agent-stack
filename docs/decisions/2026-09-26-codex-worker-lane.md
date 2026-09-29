@@ -729,7 +729,9 @@ verifier is qualified as capability evidence only.
 - **Carriers.** `adoption/agents/codex/stack-{researcher,verifier}.toml`, with byte-identical
   mirrors under `examples/codex-native/agents/`. Each file carries exactly `name`, `description`,
   `model = "gpt-6-astra"`, `model_reasoning_effort = "max"` and `developer_instructions`: an adapted
-  role text, then the F4 block verbatim. The pins equal the route of every Codex task in the
+  role text, then the F4 block verbatim. The two digests are also
+  `adoption/agents/codex/SHA256SUMS`, and the rules the tests and the installer share are
+  `tools/adoption/codex_roles.py`. The pins equal the route of every Codex task in the
   preregistration (26 tasks, all `gpt-6-astra` at `max`). The descriptions name no tool, because the
   `spawn_agent` tool text shows every role's description to every parent
   ([`role.rs:294-334`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L294-L334)).
@@ -784,5 +786,5 @@ spawned either role, and nothing here measures a token saving.
 **Overturn conditions.** A Codex release whose role files can set a sandbox or an MCP allowlist would let
 these restrictions be enforced instead of instructed. A run in which a spawned role does not receive its
 developer text exactly once, or does not run at the pinned model and effort, would reopen the carriers.
-A later change to either file's bytes needs a new dated section and new digest rows in the test and the
-examples README.
+A later change to either file's bytes needs a new dated section and new digest rows in `SHA256SUMS`, the
+test and the examples README.

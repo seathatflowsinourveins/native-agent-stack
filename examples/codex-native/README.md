@@ -85,7 +85,7 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 - **Files.** The sources are
   [`adoption/agents/codex/stack-researcher.toml`](../../adoption/agents/codex/stack-researcher.toml) and
   [`stack-verifier.toml`](../../adoption/agents/codex/stack-verifier.toml) in the same directory; the copies in [`agents/`](agents/) are
-  byte-identical mirrors. [`tests/test_codex_agents.py`](../../tests/test_codex_agents.py) compares them and pins the digests below.
+  byte-identical mirrors. [`tests/test_codex_agents.py`](../../tests/test_codex_agents.py) compares them and pins the digests below. The same two digests are in [`adoption/agents/codex/SHA256SUMS`](../../adoption/agents/codex/SHA256SUMS) (`sha256sum` format; `sha256sum --check --strict SHA256SUMS` from that directory passes), which the installer reads before it copies a file, and the rules the tests and the installer share are in [`tools/adoption/codex_roles.py`](../../tools/adoption/codex_roles.py).
 - **Keys and pins.** Each file carries exactly `name`, `description`, `model`, `model_reasoning_effort` and `developer_instructions`.
   The pins, `gpt-6-astra` at `max`, equal the route of every Codex task in the frozen preregistration (the test derives that set from the
   file). Codex shows them in the `spawn_agent` tool text as the role's locked settings
@@ -136,4 +136,4 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 | `stack-researcher.toml` | `ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00` |
 | `stack-verifier.toml` | `281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd` |
 
-The adoption source and its mirror hold these bytes; a later change to either needs a new dated section here and new rows in the test.
+The adoption source and its mirror hold these bytes; a later change to either needs a new dated section here, new rows in `SHA256SUMS` and new rows in the test.
