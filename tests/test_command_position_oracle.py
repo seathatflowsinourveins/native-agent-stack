@@ -274,6 +274,19 @@ RECOVERY_PROBES = [
     ("backslash first body line", "! timeout -k 1 5 bash <<'END-2'\n\\markitdown a.json\nEND-2\n:"),
     ("backslash first body line, shell", "bash <<'E'\n\\qmd status\nrtk proxy toon f\nE"),
     ("here-string then a backslash line", "for i in a; do bash <<< 'nice -n 5 codebase-memory-mcp'\n\\markitdown search; done"),
+    # A here-document with no delimiter line is closed by the end of the text (bash warns "here-document delimited by end-of-file" and runs
+    # it): its body is everything after the operator's line. tree-sitter-bash 0.25.1 reads that body as ERROR and its words as commands of
+    # the operator's line (or nothing at all when the text ends with a newline), so the kernel appends the missing delimiter line.
+    ("unterminated shell heredoc", "bash <<EOF\nqmd status"),
+    ("unterminated shell heredoc, quoted", "bash <<'EOF'\nqmd status\nrtk proxy toon f"),
+    ("unterminated shell heredoc, final newline", "bash <<'EOF'\nqmd status\n"),
+    ("unterminated shell heredoc, tabs", "bash <<-EOF\n\tqmd status"),
+    ("unterminated data heredoc", "cat <<EOF\nqmd status"),
+    ("unterminated data heredoc, substitution", "cat <<EOF\n$(toon a)"),
+    ("unterminated quoted data heredoc", "cat <<'EOF'\n$(toon a)"),
+    ("unterminated heredoc without an owner", "<<EOF\nmcporter call serena.x "),
+    ("unterminated heredoc, operator line continues", "bash <<EOF && toon x\nqmd status"),
+    ("unterminated heredoc, wrapper", "env -u X bash <<'END-1'\nqmd status"),
     # An escaped $ inside backquotes starts a substitution (POSIX.1-2024 XCU 2.6.3), which the grammar reads as an ERROR; the kernel reads the unescaped body.
     ("escaped dollar in backquotes", "echo `echo \\$(qmd a)`"),
     ("joined lines", 'echo "$M" | tr " " "\\n" | grep -c . \nstart=$(date +%s)\nTMPDIR=/x rtk proxy python3 -m unittest $M > run.txt 2>&1\nrc=$?'),

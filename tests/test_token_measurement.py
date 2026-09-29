@@ -1266,6 +1266,21 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli["parse_errors"], 0)
 
     @NEEDS_PARSER
+    def test_a_heredoc_with_no_delimiter_line_is_closed_by_the_end_of_the_text(self):
+        # bash runs a here-document whose delimiter line is missing, with a warning, and its body is everything after the operator's line;
+        # tree-sitter-bash 0.25.1 puts that body in an ERROR and its words among the commands of the operator's line, or drops it when the
+        # text ends with a newline. The kernel appends the missing delimiter line before it reads (none of 15,128 real commands with a
+        # here-document lacks one; the oracle's fuzz inputs do). Expected lanes are the runs of real bash 5.2 under stub executables.
+        cases = {"bash <<EOF\nqmd status": {"qmd": 1}, "bash <<'EOF'\nqmd status\nrtk proxy toon f": {"qmd": 1, "rtk_proxy": 1, "toon": 1},
+                 "bash <<'EOF'\nqmd status\n": {"qmd": 1}, "bash <<-EOF\n\tqmd status": {"qmd": 1}, "cat <<EOF\nqmd status": {},
+                 "cat <<EOF\n$(toon a)": {"toon": 1}, "cat <<'EOF'\n$(toon a)": {}, "<<EOF\nmcporter call serena.x ": {},
+                 "bash <<EOF && toon x\nqmd status": {"qmd": 1, "toon": 1}, "env -u X bash <<'END-1'\nqmd status": {"qmd": 1}}
+        for (command, want), (lanes, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+                self.assertEqual(cli["parse_errors"], 0)
+
+    @NEEDS_PARSER
     def test_a_name_is_emitted_only_from_the_closed_vocabulary(self):
         # GPT-6 #10 and U1 pivot D5: a mcporter server key is one of the stack's own servers or (other), (http), (stdio) or
         # (unresolved); a string that only looks like a name (an id, a host) never reaches the output.
