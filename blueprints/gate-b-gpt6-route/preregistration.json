@@ -320,6 +320,7 @@
       "rule": "sha256 of canonical JSON (sorted keys, compact separators), captured before exec because the SDK deletes its temporary file"
     },
     "records": "promptfoo's stored raw (completed items and usage) and sessionId, then the Codex rollout named by that sessionId; the launcher never copies the event stream",
+    "records_nv": "that promptfoo's stored eval output keeps raw is [nv] until the pilot; if not, the pre-seal amendment names the rollout as the record for items and usage, or takes alternative 4",
     "local_code": [
       {
         "component": "launcher",
@@ -748,6 +749,7 @@
         "arm A's mean score",
         "usage and wall time per run",
         "argv and environment read-backs",
+        "whether promptfoo's stored output keeps raw",
         "rollout presence and fields",
         "results on web_search items",
         "the CODEX_HOME placeholder",
