@@ -255,6 +255,18 @@ def flat(text):
     return " ".join(normalize(text).split())
 
 
+def spaced_identifiers(text):
+    """`latency_ms` read as `latency ms`: an underscore between two letters becomes a space, so a fact named by its field name
+    (latency_sum: 124, total_latency_ms = 124) is read through its label words. Only the label scans that accept a field name
+    use it: is_word_char keeps '_' a word character everywhere else (T1's whole-word reading, `token_manifest` is not the word
+    token, depends on it). An underscore beside a digit, another underscore or a space stays."""
+    out = list(text)
+    for index in range(1, len(text) - 1):
+        if text[index] == "_" and text[index - 1].isalpha() and text[index + 1].isalpha():
+            out[index] = " "
+    return "".join(out)
+
+
 def word_positions(text, word, ignore_case=True):
     """Start offsets where `word` occurs as a whole word (word characters are letters, digits and '_')."""
     haystack = text.lower() if ignore_case else text
@@ -383,19 +395,25 @@ def count_before_noun(text, nouns):
 
 
 _LINKING = {"is", "are", "was", "were", "of", "equals", "equal", "to", "at", "about", "totals", "total"}
+_LABEL_GAP = " \t:=-(\"'"  # between a label and its integer: separators, and the closing quote of a quoted field name
 
 
 def ints_by_label(text, label, nouns=(), link_or=True):
     """Integers written next to a label word: 'N label', 'N noun label', 'label: N', 'label noun: N', and, unless
-    `link_or` is off, the alternatives joined to them by 'or' ("9 or 10", "exit code 1 or exit code 0")."""
+    `link_or` is off, the alternatives joined to them by 'or' ("9 or 10", "exit code 1 or exit code 0"). A label that is a
+    field name (it holds an underscore: record_id, latency_ms) takes its value after it only: `id=1 latency_ms=17` does not
+    read the 1 as a latency."""
     tokens = int_tokens(text)
     ends = {token["end"]: token for token in tokens}
     starts = {token["start"]: token for token in tokens}
     noun_set = {noun.lower() for noun in nouns}
+    field_name = "_" in label
     found = []
     for position in word_positions(text, label):
         stop = _skip_back(text, position)
-        if stop in ends:
+        if field_name:
+            pass
+        elif stop in ends:
             found.append(ends[stop])
         else:
             first = stop
@@ -406,7 +424,7 @@ def ints_by_label(text, label, nouns=(), link_or=True):
                 if back in ends:
                     found.append(ends[back])
         scan = position + len(label)
-        while scan < len(text) and text[scan] in " \t:=-(":
+        while scan < len(text) and text[scan] in _LABEL_GAP:
             scan += 1
         while True:
             word = ""
@@ -416,7 +434,7 @@ def ints_by_label(text, label, nouns=(), link_or=True):
             word = text[scan:probe].lower()
             if word and (word in noun_set or word in _LINKING) and not is_digit(word[0]):
                 scan = probe
-                while scan < len(text) and text[scan] in " \t:=-(":
+                while scan < len(text) and text[scan] in _LABEL_GAP:
                     scan += 1
                 continue
             break
@@ -2187,8 +2205,13 @@ def payload_records(value, reading):
     return None, None
 
 
+_SUM_NOUNS = ("latency", "latencies", "ms", "milliseconds")  # "sum of latency_ms: 124", "the total latency is 124 ms"
+
+
 def _stated_sum(ans, structural_texts):
-    """Integers in lines that name a sum or total, outside fenced blocks and payload line blocks."""
+    """Integers in lines that name a sum or total, outside fenced blocks and payload line blocks. A sum named by its field
+    name (latency_sum, total_latency_ms) is read through its words (spaced_identifiers); the label may be followed by the
+    latency nouns and the linking words ("sum of latency_ms: 124")."""
     lines = [line for _, line in outside_fences(answer_text(ans))]
     values = []
     for text in list(answer_evidence(ans)):
@@ -2196,9 +2219,9 @@ def _stated_sum(ans, structural_texts):
     for line in lines:
         if any(line.strip() and line in block for block in structural_texts):
             continue
-        low = normalize(line).lower()
+        low = spaced_identifiers(normalize(line).lower())
         for label in ("sum", "total"):
-            values.extend(token["value"] for token in ints_by_label(low, label))
+            values.extend(token["value"] for token in ints_by_label(low, label, _SUM_NOUNS))
     return values
 
 
@@ -2906,9 +2929,12 @@ def oracle_T32(params, key, ans, readings, ctx=None):
         unparsed = True  # none, or both ("yes or no"): a hedge is not a verdict
     elif verdicts[0] != key["verdict"]:
         reasons.add("verdict")
-    unparsed |= decide([token["value"] for token in ints_by_label(text, "id")], key["record_id"], "record_id", reasons)
-    latencies = [token["value"] for label in ("latency", "ms") for token in ints_by_label(text, label,
-                                                                                            ("ms", "milliseconds"))]
+    # A fact may be named by its field name as well (record_id, latency_ms): `_` is a word character, so the label is the
+    # whole field name, exactly as the frozen key spells it.
+    ids = [token["value"] for label in ("id", "record_id") for token in ints_by_label(text, label)]
+    unparsed |= decide(ids, key["record_id"], "record_id", reasons)
+    latencies = [token["value"] for label in ("latency", "ms", "latency_ms")
+                 for token in ints_by_label(text, label, ("ms", "milliseconds"))]
     unparsed |= decide(latencies, key["latency_ms"], "latency", reasons)
     return {"A": _finish(reasons, unparsed)}
 
