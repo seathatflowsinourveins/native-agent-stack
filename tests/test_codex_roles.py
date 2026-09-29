@@ -91,21 +91,31 @@ class Sha256SumsTests(unittest.TestCase):
                 self.assertNotIn("stack-researcher", str(caught.exception))
                 self.assertNotIn(row[:16], str(caught.exception))
 
-    def test_the_reader_accepts_what_sha256sum_check_strict_accepts(self):
-        # Control against the coreutils oracle: every case above the reader refuses is also refused by
-        # `sha256sum --check --strict`, and the shipped file is accepted by both.
+    def test_the_reader_is_no_looser_than_sha256sum_check_strict(self):
+        # Control against the coreutils oracle: what the reader accepts, `sha256sum --check --strict` accepts, and
+        # a line that is no checksum at all is refused by both. The reader is stricter, not equal: GNU sha256sum
+        # also accepts one space before the name (measured with the coreutils on this host), the reader refuses it
+        # so that the pinned file has the one form `sha256sum` writes.
         import subprocess
         module = roles(self)
         if not shutil.which("sha256sum"):
             self.skipTest("sha256sum is not on PATH")
+
+        def check():
+            return subprocess.run(["sha256sum", "--check", "--strict", "SHA256SUMS"], cwd=self.tmp,
+                                  capture_output=True, text=True, check=False).returncode
+
         shutil.copy(SOURCE / NAMES[0], self.tmp / NAMES[0])
         good = self.write(f"{GOOD_ROWS[NAMES[0]]}  {NAMES[0]}\n")
         self.assertEqual(module.sha256sums(good), {NAMES[0]: GOOD_ROWS[NAMES[0]]})
-        for text in (f"{GOOD_ROWS[NAMES[0]]} {NAMES[0]}\n", "not a checksum line\n"):
-            self.write(text)
-            got = subprocess.run(["sha256sum", "--check", "--strict", "SHA256SUMS"], cwd=self.tmp,
-                                 capture_output=True, text=True, check=False)
-            self.assertNotEqual(got.returncode, 0, text)
+        self.assertEqual(check(), 0)
+        self.write("not a checksum line\n")
+        self.assertNotEqual(check(), 0)
+        with self.assertRaises(ValueError):
+            module.sha256sums(self.tmp / "SHA256SUMS")
+        self.write(f"{'0' * 64}  {NAMES[0]}\n")  # well formed, wrong digest: both parse it, only the check fails
+        self.assertEqual(module.sha256sums(self.tmp / "SHA256SUMS"), {NAMES[0]: "0" * 64})
+        self.assertNotEqual(check(), 0)
 
 
 class SourceProblemsTests(unittest.TestCase):
