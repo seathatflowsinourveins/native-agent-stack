@@ -23,9 +23,10 @@ by the frozen candidate rule, why each one was missing, and whether coverage the
 | `fetch --env-file ENV --out-dir RUN` | market data | E1. Collects name changes first, then F1 (daily bars raw, split and all, and auctions, `asof` = d) and F2 (raw bars, `asof` = 2026-09-21) for the 594 events, plus the KOD/LFCR positive control. |
 | `e2 --package-zip ZIP --env-file ENV --out-dir RUN` | market data | E2, the secondary estimand. It covers the package events dated 2021-01-04..2025-12-31, tries symbols in the audit's `load_events` order, and fetches F1, F2 and the control. |
 | `classify --out-dir RUN [--verify]` | none | Applies the touch rule, reason classes, flags and labels. It writes private results and labels, and a totals-only `summary.json`. `--verify` recomputes all three and compares bytes. |
-| `publish --run-dir RUN [--e2-dir DIR] --to FILE` | none | Writes the committed summary after a structural scan for paths, dates, symbol-like values and non-share numbers. |
+| `publish --run-dir RUN [--e2-dir DIR] --to FILE` | none | Writes the committed summary after checking it against an explicit totals-only schema and scanning it for paths, dates, symbol-like values and non-share numbers. The second classify counts only from a `verify.json` that matches this plan, this estimand and the files on disk. |
 
-Every request goes to the audit's fixed data host, on a `/v2/stocks/{symbol}/bars` or `/auctions` path. The whole
+Every price request goes to the audit's fixed data host, on a `/v2/stocks/{symbol}/bars` or `/auctions` path. E1's
+name changes come from `GET /v1/corporate-actions` through `broad-universe/corporate_actions.py`. The whole price
 request plan is checked against the reserved holdout 2026-01-02..2026-09-18 before anything is sent. The control is
 not sent before 20:00 ET on 2026-09-28. Pacing, the 429 retries after 1, 2 and 4 s, and the 400/404/422 handling are
 the audit client's. Any request that ends in an error is recorded as an error, never as no data. No model is called.
@@ -69,23 +70,37 @@ These choices are made in the code and tested. They do not edit the frozen plan.
 - **`split_between`.** In the touch-failure branch it compares d with S's lag row, the touch's own prior row. For
   labels and `basis_uncertain` it is the one `audit.event_gain` computes against its previous close.
 - **New-vintage gain.** The gain is computed only when the raw, split and auction legs all succeed. Otherwise it is
-  undefined, and the event is flagged `leg_error` and `not_verified_in_new_vintage`.
+  undefined, and the event is flagged `leg_error` and `not_verified_in_new_vintage`. E1 and E2 share this check
+  (`new_vintage_gain`).
 - **Same issuer.** This means exact equality of the parsed raw `o`, `h`, `l`, `c` and `v` on d. A missing field
   counts as a difference.
 - **Successor chain.** Each hop's process date comes after the previous hop's, the first after d, and none after
   2026-09-21.
 - **E2.** Symbols are tried until one has a raw bar or an auction on d (audit `fetch`), and F2 is requested for that
-  symbol only. The gain and verdict follow audit `compare`. Tiers come from the new-vintage gain. E2 collects no
+  symbol only. The gain and verdict follow audit `compare`, with E1's leg check. A tried symbol whose raw, split or
+  auction leg failed ends the walk, and the event's verdict is `fetch_error`, because whether that symbol held the
+  event is unknown (audit D7). So a partial failure never enters N2. Such an event, like every event without a symbol
+  used, counts as `no_event_data` in the post-hoc identity total. Tiers come from the new-vintage gain. E2 collects no
   corporate actions, because none of its outputs uses them, so every E2 request stays outside the holdout window.
+- **Verification.** `publish` counts the second classify only from a `verify.json` whose kind, plan sha256 and
+  estimand match. It must also report `byte_identical`, and the sha256 it recorded for `results.json`, `labels.json`
+  and `summary.json` must match the files on disk, while `summary.json`'s snapshot hashes match the snapshots. The
+  plan sha256 stands for the plan's identity, because `verify.json` records no plan id. Any change after the verify
+  therefore voids the condition. A `summary.json` from another plan or estimand is refused.
+- **Publication schema.** `publish` checks the summary against an explicit schema. Every key is named there or drawn
+  from the runner's tiers, ratios, classes, flags, identity outcomes, verdicts, leg groups, request status codes and
+  lowercase private file names. Every value is a count, a share, a boolean, a hash, a revision, a timestamp or a short
+  text. A key outside the schema, or a symbol-like key other than KOD and LFCR, refuses the publish.
 - **Symbol quoting.** Symbols are quoted with `safe=""`, so every symbol stays in one path segment.
 - **Code revision.** `fetch` and `e2` refuse to run unless every file the run reads is tracked and unmodified, and
   they record HEAD.
 
 ## Tests
 
-`TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 <pinned python> -m unittest tests.test_mover_coverage_asof`. The 33 tests
-are synthetic: made-up tickers, dates and prices, with no network, credential or private row. Five need numpy for the
-degree tiers and are skipped without it.
+`TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 <pinned python> -m unittest tests.test_mover_coverage_asof`. The 51 tests
+are synthetic: made-up tickers, dates and prices, with no network, credential or private row. One of them also checks
+the committed totals-only summary against the publication schema. Six need numpy for the degree tiers and are
+skipped without it.
 
 ## Run 2026-09-29 (`asof-20260929`)
 
@@ -137,3 +152,22 @@ tier by tier, but E2 cannot show that it is the same set of events. Three explan
 - a collection step: asset-list enumeration, today's OTC exclusion, placeholder symbols or identity dedup.
 
 Separating them needs E1 and, for the collection steps, the private daily dataset (plan `not_measured`).
+
+## Review repair
+
+A review of `7e749b63` found three defects. The repair fixes each one, with tests that fail on that commit:
+- E2's classify computed the gain before it checked leg status, so an auction 503 with valid bars could enter N2 as
+  `match`.
+- `publish` accepted `verify.json` without checking its plan, its estimand or the hashes it recorded.
+- The publication scan had no key schema.
+
+The same review asked for E1 refusal tests and for the request scope stated above. The new tests cover mismatched
+candidate files and an unreproduced coverage, and show that each stops before any credential read or request.
+
+E2 was then recomputed offline from the retained snapshots with the repaired code:
+- None of the 716 tried symbols (715 events) has a failed raw, split or auction leg, and no F2 leg failed.
+- `results.json`, `labels.json` and `summary.json` came out byte-identical to the retained files.
+- A re-publish to a scratch file was byte-identical to `evidence/summary-asof-20260929.json`, and validity still
+  stands.
+
+The committed totals are unchanged.

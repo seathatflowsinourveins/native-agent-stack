@@ -16,8 +16,9 @@ audit load_events order. classify (no network) applies the frozen touch rule, th
 flags and labels, and writes per-event results (private) and totals; --verify recomputes the files
 and compares their bytes. publish writes the totals-only summary for git.
 
-Market data only: every request goes to extreme-gainer-audit audit.py DATA_URL on a
-/v2/stocks/{symbol}/bars or /auctions path. Nothing here calls a model.
+Market data only: every price request goes to extreme-gainer-audit audit.py DATA_URL on a
+/v2/stocks/{symbol}/bars or /auctions path, and E1's name changes come from GET /v1/corporate-actions
+through broad-universe corporate_actions.py. Nothing here calls a model.
 """
 from __future__ import annotations
 
@@ -85,12 +86,15 @@ FLAG_NAMES = ("basis_uncertain", "gap_over_7_days", "leg_error", "not_verified_i
               "prior_row_not_previous_session")
 F1_LEGS = ("bars_raw", "bars_split", "bars_all", "auctions")
 F2_LEG = "f2_bars_raw"
+GAIN_LEGS = ("bars_raw", "bars_split", "auctions")  # the legs audit.event_gain reads
 PRICE_PATH = re.compile(r"/v2/stocks/[^/?]+/(bars|auctions)")
 NAME_CHANGE_KINDS = ("name_change", "name_changes")  # singular today, plural in older envelopes (coverage.py:135-138)
 CALENDAR = PLAN["inputs"]["session_calendar"]
 COMMITTED_SUMMARY = US / "mover-early-entry" / "evidence" / "summary-dev-val-run-v1.json"
 INPUT_KEYS = ("audit_results", "candidates_main", "candidates_premarket")
 TIMESTAMP_KEYS = ("fetched_at_utc", "control_sent_at_utc", "finished_at_utc")
+SNAPSHOT_FILES = ("snapshot-f1.json", "snapshot-f2.json", "control.json", "request-log.json")
+CLASSIFY_OUTPUTS = ("results.json", "labels.json", "summary.json")
 CODE_FILES = tuple(str(p.relative_to(ROOT)) for p in (
     HERE / "refetch.py", PLAN_PATH, US / "extreme-gainer-audit" / "audit.py", US / "extreme-gainer-audit" / "plan.json",
     US / "mover-early-entry" / "evaluate.py", US / "mover-early-entry" / "rules.py",
@@ -547,14 +551,20 @@ def labels(day, raw_d, split_d, auc_d, gain, cal) -> dict:
     return out
 
 
+def new_vintage_gain(day, status, by) -> dict:
+    """audit.event_gain (rules v2) on the float view of one symbol's legs, computed only when the raw, split and
+    auction legs all succeeded; otherwise undefined with reason leg_error. assess() and classify_e2() both use it,
+    so E1 and E2 apply the same leg check before a gain counts."""
+    if any(status[k] != "ok" for k in GAIN_LEGS):
+        return {"reason": "leg_error"}
+    return audit.event_gain(day, as_float(by["auctions"]), as_float(by["bars_raw"]), as_float(by["bars_split"]), "v2")
+
+
 def assess(symbol, day, legs, f2, cal, renames=None, candidate_keys=None) -> dict:
     """The frozen candidate rule, reason classes (reason_classes.order), flags and labels for one symbol-day."""
     status, by = parse_legs(legs, f2)
     all_d, raw_d, split_d, auc_d, f2_d = (by[k] for k in ("bars_all", "bars_raw", "bars_split", "auctions", F2_LEG))
-    if all(status[k] == "ok" for k in ("bars_raw", "bars_split", "auctions")):
-        gain = audit.event_gain(day, as_float(auc_d), as_float(raw_d), as_float(split_d), "v2")
-    else:
-        gain = {"reason": "leg_error"}
+    gain = new_vintage_gain(day, status, by)
     lag = touched = None
     if status["bars_all"] == "ok" and day in all_d:
         earlier = [d for d in all_d if d < day]
@@ -1013,8 +1023,7 @@ def run_facts(out: Path, f1doc, f2doc, ctrl, cal) -> dict:
     return {"positive_control": positive, "exposure": exposure(f1doc, f2doc, ctrl),
             "requests": {"total": reqlog["requests"], "status_counts": reqlog["status_counts"]},
             "responses": leg_outcomes(f1doc, f2doc, ctrl),
-            "snapshots_sha256": {n: sha256_file(out / n) for n in ("snapshot-f1.json", "snapshot-f2.json",
-                                                                   "control.json", "request-log.json")},
+            "snapshots_sha256": {n: sha256_file(out / n) for n in SNAPSHOT_FILES},
             "fetched_at_utc": f1doc.get("fetched_at_utc"), "control_sent_at_utc": f1doc.get("control_sent_at_utc"),
             "finished_at_utc": f1doc.get("finished_at_utc"), "code_revision": f1doc.get("code_revision")}
 
@@ -1087,29 +1096,38 @@ def classify_e1(out: Path, inputs: Path, f1doc, f2doc, ctrl, cal, rules):
     return results, label_doc, {"E1": e1}
 
 
+def e2_source(day, tried) -> tuple:
+    """audit compare's walk over the tried symbols (audit.py:406-411), with new_vintage_gain as each symbol's gain:
+    the first symbol whose gain is defined, or lacks only a previous close, is used. A symbol with a failed raw,
+    split or auction leg ends the walk with no symbol used. Its gain is unknown, and so is whether it held the
+    event, because a failed request is never read as no data (audit deviation D7)."""
+    for t in tried:
+        status, by = parse_legs(t["legs"])
+        gain = new_vintage_gain(day, status, by)
+        if gain.get("reason") == "leg_error":
+            return None, gain
+        if "reason" not in gain or gain["reason"] == "no_prev_close":
+            return t, gain
+    return None, {"reason": "no_source_data"}
+
+
 def classify_e2(out: Path, f1doc, f2doc, cal, rules):
     events = load_package_events(out / "inputs" / "package")
     rows, label_doc = [], {}
     for ev in events:
         snap = f1doc["events"].get(ev["id"])
         tried = snap["tried"] if snap else []
-        used, gain = None, {"reason": "no_source_data"}
-        for t in tried:  # audit compare (audit.py:406-411)
-            _, by = parse_legs(t["legs"])
-            r = audit.event_gain(ev["date"], as_float(by["auctions"]), as_float(by["bars_raw"]),
-                                 as_float(by["bars_split"]), "v2")
-            if "reason" not in r or r["reason"] == "no_prev_close":
-                used, gain = t, r
-                break
-        errors = any("error" in (t["legs"].get(k) or {}) for t in tried for k in ("auctions", "bars_raw", "bars_split"))
+        used, gain = e2_source(ev["date"], tried)
         verdict = audit.verdict_for(ev, gain, "v2")[0] if snap else "not_fetched"
-        if verdict == "no_source_data" and errors:
-            verdict = "fetch_error"  # audit deviation D7 (audit.py:413-414)
+        if verdict == "leg_error":
+            verdict = "fetch_error"  # audit deviation D7 (audit.py:413-414): a failed request, never no data
         in_n2 = (verdict in ("match", "recovered_match") and gain.get("gain_pct") is not None
                  and gain["gain_pct"] >= MIN_GAIN_PCT)
         f2 = f2doc["events"].get(ev["id"]) or {}
         f2_leg = f2.get("leg") if used and f2.get("symbol") == used["symbol"] else None
         a = assess(used["symbol"], ev["date"], used["legs"], f2_leg, cal) if used else None
+        if in_n2 and a["gain"]["gain_pct"] != gain["gain_pct"]:
+            raise AssertionError("an N2 event's gain is not the one assess() computed on the same legs")
         rows.append({"id": ev["id"], "date": ev["date"], "ticker": ev["ticker"],
                      "symbol_used": used["symbol"] if used else None, "verdict": verdict,
                      "gain_pct": gain.get("gain_pct"), "in_n2": in_n2,
@@ -1155,8 +1173,9 @@ def classify_e2(out: Path, f1doc, f2doc, cal, rules):
     return rows, label_doc, {"E2": e2}
 
 
-def classify(args) -> int:
-    out = Path(args.out_dir)
+def classify_outputs(out: Path, inputs=None) -> tuple:
+    """(estimand, {name: bytes}) for CLASSIFY_OUTPUTS, computed from the sealed snapshots alone. Nothing is
+    written, so a retained run can be recomputed without touching it."""
     plan_guard()
     f1doc, f2doc, ctrl = (read_doc(out / n) for n in ("snapshot-f1.json", "snapshot-f2.json", "control.json"))
     if any(d.get("plan_sha256") != PLAN_SHA256 for d in (f1doc, f2doc, ctrl)):
@@ -1165,7 +1184,7 @@ def classify(args) -> int:
     cal = Calendar.load()
     _, rules = mover_modules()
     if estimand == "E1":
-        results, label_doc, body = classify_e1(out, Path(args.inputs) if args.inputs else out / "inputs",
+        results, label_doc, body = classify_e1(out, Path(inputs) if inputs else out / "inputs",
                                                f1doc, f2doc, ctrl, cal, rules)
     else:
         results, label_doc, body = classify_e2(out, f1doc, f2doc, cal, rules)
@@ -1174,7 +1193,13 @@ def classify(args) -> int:
             "labels.json": dict(head, kind="mover_coverage_asof_labels", labels=label_doc),
             "summary.json": dict(head, kind="mover_coverage_asof_private_summary", **body,
                                  **run_facts(out, f1doc, f2doc, ctrl, cal))}
-    blobs = {name: dumps(doc) for name, doc in docs.items()}
+    return estimand, {name: dumps(doc) for name, doc in docs.items()}
+
+
+def classify(args) -> int:
+    out = Path(args.out_dir)
+    estimand, blobs = classify_outputs(out, args.inputs)
+    head = {"plan_sha256": PLAN_SHA256, "estimand": estimand}
     plan_guard()
     if args.verify:
         same = {name: (out / name).exists() and (out / name).read_bytes() == blob for name, blob in blobs.items()}
@@ -1197,18 +1222,131 @@ PATHLIKE = re.compile(r"(/home/|/tmp/|/mnt/|/run/user|/var/|\.local/|~/)")
 DATELIKE = re.compile(r"\d{4}-\d{2}-\d{2}")
 SYMBOLLIKE = re.compile(r"[A-Z]{1,5}(\.[A-Z]{1,2})?")
 
+# guards.publication as an explicit schema of the committed summary. Every key is named here or drawn from the
+# runner's own vocabularies (tiers, ratios, classes, flags, identity outcomes, verdicts, leg groups, request status
+# codes and lowercase private file names). Every leaf is a count, a share in [0, 1], a boolean, a sha256, a git
+# revision, a fetch timestamp or a short text. None stands for an absent value anywhere.
+TIER_LABELS = tuple(PLAN["reproduction_gate"]["expected"]["by_tier"])
+RATIO_NAMES = tuple(name for name, _ in RATIOS)
+VERDICTS = ("fetch_error", "match", "mismatch", "no_package_reference", "no_prev_close", "no_source_data", "not_fetched",
+            "package_uncomputed_match", "package_uncomputed_mismatch", "recovered_match", "recovered_mismatch")
+HELD_BY = ("main", "premarket", "both")
+AGREEMENT = ("agree", "disagree", "not_verified_in_new_vintage")
+LEG_GROUPS = tuple(f"f1_{leg}" for leg in F1_LEGS) + (F2_LEG,) + tuple(f"control_{leg}" for leg in F1_LEGS)
+STATUS_KEY = re.compile(r"\d{3}|network:[A-Za-z]+|pagination_not_terminated|invalid_json|not_a_session")
+PRIVATE_FILE_KEY = re.compile(r"[a-z0-9][a-z0-9._-]*(/[a-z0-9][a-z0-9._-]*)*")
+LEAVES = {
+    "int": ("an integer", lambda v: isinstance(v, int) and not isinstance(v, bool)),
+    "share": ("a share", lambda v: isinstance(v, (int, float)) and not isinstance(v, bool) and 0 <= v <= 1),
+    "bool": ("a boolean", lambda v: isinstance(v, bool)),
+    "text": ("text", lambda v: isinstance(v, str)),
+    "sha256": ("a sha256", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v) is not None),
+    "revision": ("a revision", lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{40}", v) is not None),
+    "timestamp": ("a timestamp", lambda v: isinstance(v, str)
+                  and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", v) is not None),
+}
+
+
+class Keys:
+    """A schema map whose keys fullmatch `pattern` and whose values all follow `value`."""
+
+    def __init__(self, pattern, value):
+        self.pattern, self.value = pattern, value
+
+
+def counts(names) -> dict:
+    return dict.fromkeys(names, "int")
+
+
+def public_schema() -> dict:
+    """The E1 and E2 blocks as estimand_block and publish write them: classify_e1's or classify_e2's totals, the
+    run facts, validity and private file hashes; E1 also as the gate-only block of a run that was not classified."""
+    identity, flags = counts(IDENTITY_OUTCOMES), {name: counts(("true", "false", "unknown")) for name in FLAG_NAMES}
+    share = {"present": "int", "events": "int", "share": "share", "meets_95_percent": "bool"}
+    group = {"missed": "int", "recovered": "int", "classes": counts(CLASS_ORDER), "controls": "int",
+             "control_touch_passes": "int"}
+    n2 = {"N2": "int", "touch_passes": "int", "candidate_rule_passes": "int", "f2_identity": identity}
+    common = {"status": "text",
+              "positive_control": {**{s: {"touch": "bool"} for s in CONTROL_SYMBOLS}, "passed": "bool"},
+              "exposure": counts(("price_rows_total", "price_rows_before_2021_01_04", "price_rows_in_holdout")),
+              "requests": {"total": "int", "status_counts": Keys(STATUS_KEY, "int")},
+              "responses": {"legs": {g: counts(("ok_with_rows", "ok_empty", "error")) for g in LEG_GROUPS},
+                            "error_codes": Keys(STATUS_KEY, "int")},
+              **dict.fromkeys(TIMESTAMP_KEYS, "timestamp"),
+              "code_revision": {"head": "revision", "clean": "bool"},
+              "classify_code_revision": {"head": "revision", "clean": "bool"},
+              "validity": {**dict.fromkeys(("positive_control_passed", "classify_rerun_byte_identical",
+                                            "no_holdout_rows", "gate_reproduced", "stands"), "bool"), "label": "text"},
+              "private_files_sha256": Keys(PRIVATE_FILE_KEY, "sha256")}
+    e1 = {**common, "missed": "int", "controls": "int", "recovered": "int", "recovered_needed_for_95_percent": "int",
+          "coverage_with_asof": share, "coverage_with_asof_without_otc_as_known": share,
+          "coverage_frozen_rekeyed": share, "classes_of_missed": counts(CLASS_ORDER),
+          "asof_recount": {"touch_passes_among_missed": "int",
+                           "controls_by_candidate_file": {h: {"events": "int", "touch_passes": "int",
+                                                              "failure_classes": counts(CLASS_ORDER[:7])}
+                                                          for h in HELD_BY},
+                           "control_f2_identity": identity, "missed_f2_identity": identity},
+          "by_tier": dict.fromkeys(TIER_LABELS, group), "by_close_to_close_1d_ratio": dict.fromkeys(RATIO_NAMES, group),
+          "flags": {"missed": flags, "controls": flags},
+          "vendor_agreement": {"missed": counts(AGREEMENT), "controls": counts(AGREEMENT)},
+          "renames": {"name_change_records": "int"},
+          "gate": {"coverage": {"events": "int", "present": "int", "share": "share", "survivorship_limited": "bool",
+                                "by_tier": dict.fromkeys(TIER_LABELS, {"events": "int", "present": "int"})},
+                   "missed": "int", "controls": "int", "controls_held_by": counts(HELD_BY), "status": "text",
+                   "reason": "text", "requests_sent": "int", "missing_inputs_sha256": dict.fromkeys(INPUT_KEYS, "sha256")}}
+    e2 = {**common, "package_events_in_window": "int", "N2": "int", "N2_minus_committed_events": "int",
+          "touch_passes_among_N2": "int", "candidate_rule_passes_among_N2": "int", "touch_share_among_N2": "share",
+          "candidate_rule_share_among_N2": "share", "f2_identity_among_N2": identity,
+          "f2_identity_outside_N2_post_hoc": counts(IDENTITY_OUTCOMES + ("no_event_data",)),
+          "failure_classes_among_N2": counts(CLASS_ORDER[:7]), "verdicts": counts(VERDICTS), "flags_among_N2": flags,
+          "by_tier": dict.fromkeys(TIER_LABELS, {**n2, "committed_events": "int", "committed_missed": "int",
+                                                 "N2_minus_committed_events": "int"}),
+          "by_close_to_close_1d_ratio": dict.fromkeys(RATIO_NAMES, n2),
+          "committed_reference": {"events": "int", "present": "int", "missed_by_tier": counts(TIER_LABELS)}}
+    return {"kind": "text", "schema_version": "int", "privacy": "text",
+            "plan": {"path": "text", "sha256": "sha256", "bytes": "int"}, "E1": e1, "E2": e2}
+
+
+PUBLIC_SCHEMA = public_schema()
+
+
+def schema_problems(node, schema, where="$") -> list:
+    """Each key the schema does not name and each leaf of the wrong kind."""
+    if node is None:
+        return []
+    if isinstance(schema, str):
+        what, test = LEAVES[schema]
+        return [] if test(node) else [f"{where}: expected {what}"]
+    if not isinstance(node, dict):
+        return [f"{where}: expected an object"]
+    problems = []
+    for key, value in node.items():
+        if isinstance(schema, Keys):
+            sub = schema.value if schema.pattern.fullmatch(str(key)) else None
+        else:
+            sub = schema.get(key)
+        if sub is None:
+            problems.append(f"{where}.{key}: unexpected key")
+        else:
+            problems += schema_problems(value, sub, f"{where}.{key}")
+    return problems
+
 
 def scan_public(doc, private_roots=()) -> list:
-    """guards.publication, checked on the document itself: no host path, no date outside a fetch timestamp, no
-    symbol-like value other than the named control, and every non-integer number is a share in [0, 1]."""
-    problems = []
+    """guards.publication, checked on the document itself: it follows PUBLIC_SCHEMA, so a key the schema does not
+    name is refused; no key is symbol-like other than the named control; and no host path, no date outside a
+    fetch timestamp, no symbol-like value, and no non-integer number other than a share in [0, 1] appears."""
+    problems = schema_problems(doc, PUBLIC_SCHEMA)
 
     def walk(node, where):
         if isinstance(node, dict):
             for k, v in node.items():
+                here = f"{where}.{k}"
                 if DATELIKE.search(str(k)) or PATHLIKE.search(str(k)):
-                    problems.append(f"{where}: key")
-                walk(v, f"{where}.{k}")
+                    problems.append(f"{here}: date or path in key")
+                if SYMBOLLIKE.fullmatch(str(k)) and k not in CONTROL_SYMBOLS:
+                    problems.append(f"{here}: symbol-like key")
+                walk(v, here)
         elif isinstance(node, list):
             for i, v in enumerate(node):
                 walk(v, f"{where}[{i}]")
@@ -1229,16 +1367,41 @@ def private_files(folder: Path) -> dict:
     return {str(p.relative_to(folder)): sha256_file(p) for p in sorted(folder.rglob("*")) if p.is_file()}
 
 
+def same_run(doc, kind: str, name: str) -> bool:
+    """doc is a `kind` output of this plan (its sha256, the plan's identity) for estimand `name`."""
+    return isinstance(doc, dict) and (doc.get("kind"), doc.get("plan_sha256"), doc.get("estimand")) == (
+        kind, PLAN_SHA256, name)
+
+
+def rerun_verified(folder: Path, name: str, summary: dict, verify) -> bool:
+    """validity's "a second classify on the same snapshots is byte-identical", taken from verify.json only when it
+    is this plan's verify for this estimand, found the rerun byte-identical and recorded the sha256 of the classify
+    outputs now on disk, while summary.json names the snapshots now on disk. A stale or unrelated verify.json, or
+    any classify output or snapshot changed after it, leaves the condition false."""
+    if not same_run(verify, "mover_coverage_asof_verify", name) or verify.get("byte_identical") is not True:
+        return False
+    outputs, snapshots = verify.get("sha256"), summary.get("snapshots_sha256")
+    if not (isinstance(outputs, dict) and sorted(outputs) == sorted(CLASSIFY_OUTPUTS)
+            and isinstance(snapshots, dict) and sorted(snapshots) == sorted(SNAPSHOT_FILES)):
+        return False
+    return all((folder / n).is_file() and sha256_file(folder / n) == want
+               for n, want in [*outputs.items(), *snapshots.items()])
+
+
 def estimand_block(folder: Path, name: str, gate_ok: bool) -> dict:
     summary = read_doc(folder / "summary.json")
+    if not same_run(summary, "mover_coverage_asof_private_summary", name):
+        raise Refused("summary_not_this_plan_or_estimand", estimand=name)
     verify = read_doc(folder / "verify.json") if (folder / "verify.json").exists() else {}
     block = dict(summary[name])
     for key in ("positive_control", "exposure", "requests", "responses", "fetched_at_utc", "control_sent_at_utc",
                 "finished_at_utc", "code_revision"):
         block[key] = summary.get(key)
-    block["classify_code_revision"] = verify.get("classify_code_revision")
+    # the verify's revision is carried only from this plan's verify of this estimand
+    block["classify_code_revision"] = (verify.get("classify_code_revision")
+                                       if same_run(verify, "mover_coverage_asof_verify", name) else None)
     conditions = {"positive_control_passed": summary["positive_control"]["passed"],
-                  "classify_rerun_byte_identical": verify.get("byte_identical") is True,
+                  "classify_rerun_byte_identical": rerun_verified(folder, name, summary, verify),
                   "no_holdout_rows": summary["exposure"]["price_rows_in_holdout"] == 0}
     if name == "E1":
         conditions["gate_reproduced"] = gate_ok

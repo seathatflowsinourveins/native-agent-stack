@@ -3,6 +3,7 @@
 Made-up tickers, dates and prices only: no network, credentials or private rows. Tests that need the
 tiering in mover-early-entry rules.py (numpy) are skipped without numpy, like the other mover tests.
 """
+import contextlib
 import csv
 import gzip
 import hashlib
@@ -11,6 +12,7 @@ import json
 import os
 import stat
 import tempfile
+import types
 import unittest
 import urllib.error
 import urllib.parse
@@ -99,6 +101,14 @@ class FakeHTTP:
 
 def forbid_network(*args, **kwargs):
     raise AssertionError("a request was sent")
+
+
+def forbid_subprocess(*args, **kwargs):
+    raise AssertionError("a child process was started")
+
+
+class CredentialRead(Exception):
+    """Raised by the patched audit.credentials: a credential file was about to be read."""
 
 
 class PlanFreeze(unittest.TestCase):
@@ -702,6 +712,313 @@ class E1Flow(unittest.TestCase):
         self.assertEqual(published["E1"]["validity"]["stands"], True)
         self.assertTrue(published["E1"]["validity"]["gate_reproduced"])
         self.assertNotIn("ZZQ", text)
+
+
+TIER_KEYS = tuple(M.PLAN["reproduction_gate"]["expected"]["by_tier"])
+DEGREE_TIERS = ((None, 0.30), (0.30, 0.50), (0.50, 1.00), (1.00, 3.00), (3.00, 10.00), (10.00, None))
+
+
+def tier_label(i):
+    lo, hi = DEGREE_TIERS[i]
+    return f"{'' if lo is None else f'{lo:.2f}'}-{'' if hi is None else f'{hi:.2f}'}"
+
+
+def degree_tier(gain):
+    return next(tier_label(i) for i, (lo, hi) in enumerate(DEGREE_TIERS)
+                if (lo is None or gain >= lo) and (hi is None or gain < hi))
+
+
+# mover-early-entry rules.py's tier interface (rules.py:27 and 60-73), restated so these tests run without numpy
+STUB_RULES = types.SimpleNamespace(DEGREE_TIERS=DEGREE_TIERS, tier_label=tier_label, degree_tier=degree_tier)
+
+
+class StubRules(unittest.TestCase):
+    def test_labels_are_the_plans_tiers(self):
+        self.assertEqual(tuple(tier_label(i) for i in range(len(DEGREE_TIERS))), TIER_KEYS)
+
+    @unittest.skipUnless(HAS_NUMPY, "requires the pinned numpy runtime (mover-early-entry rules.py)")
+    def test_stub_restates_rules_py(self):
+        _, rules = M.mover_modules()
+        self.assertEqual(DEGREE_TIERS, rules.DEGREE_TIERS)
+        for gain in (0.2, 0.3, 0.75, 1.0, 2.5, 3.0, 12.0):
+            self.assertEqual(degree_tier(gain), rules.degree_tier(gain))
+
+
+class E2LegCheck(unittest.TestCase):
+    """Review finding 1: classify_e2 computes a gain only when the raw, split and auction legs all succeeded, as
+    assess() does, so a partial failure never becomes a verdict inside N2."""
+
+    BARS = [bar(L, 10, 10.2, 9.8, 10), bar(D, 11, 16, 10.9, 15)]  # +50% close to close; the touch passes
+    CLOSES = [auction(L, closes=[{"c": "6", "p": 10, "x": "Q", "s": 100}]),
+              auction(D, closes=[{"c": "6", "p": 15, "x": "Q", "s": 100}])]
+
+    def setUp(self):
+        self.cal = M.Calendar.load()
+
+    def classify(self, tried):
+        ev = package_event(0, D, "ZZQA", gain=50.0)
+        f1doc = {"events": {ev["id"]: {"day": D, "tried": [{"symbol": s, "legs": got} for s, got in tried]}}}
+        f2doc = {"events": {ev["id"]: {"symbol": "ZZQA", "leg": ok("bars", self.BARS)}}}
+        with mock.patch.object(M, "load_package_events", return_value=[ev]):
+            rows, _, body = M.classify_e2(Path("unused"), f1doc, f2doc, self.cal, STUB_RULES)
+        return rows[0], body["E2"]
+
+    def test_all_legs_ok_is_a_match_inside_n2(self):
+        row, e2 = self.classify([("ZZQA", legs(self.BARS, auctions=self.CLOSES))])
+        self.assertEqual((row["verdict"], row["in_n2"], row["symbol_used"], row["gain_pct"]), ("match", True, "ZZQA", 50.0))
+        self.assertEqual((e2["N2"], e2["verdicts"]), (1, {"match": 1}))
+        self.assertFalse(row["flags"]["not_verified_in_new_vintage"])
+        self.assertFalse(row["flags"]["leg_error"])
+
+    def test_a_failed_gain_leg_is_a_fetch_error_outside_n2(self):
+        cases = {"auction 503 with valid bars": dict(legs(self.BARS), auctions={"error": 503}),
+                 "split 503": legs(self.BARS, auctions=self.CLOSES, bars_split=503),
+                 "raw 503 while the auctions hold both closes": legs(self.BARS, auctions=self.CLOSES, bars_raw=503)}
+        for label, got in cases.items():
+            with self.subTest(label):
+                row, e2 = self.classify([("ZZQA", got)])
+                self.assertEqual((row["verdict"], row["in_n2"], row["symbol_used"]), ("fetch_error", False, None))
+                self.assertEqual((e2["N2"], e2["verdicts"]), (0, {"fetch_error": 1}))
+                self.assertEqual(e2["flags_among_N2"]["not_verified_in_new_vintage"], {"true": 0, "false": 0, "unknown": 0})
+
+    def test_a_failed_request_on_an_earlier_symbol_ends_the_walk(self):
+        # The first symbol's raw bars failed, so whether it had a bar on d is unknown: a failed request is never
+        # read as no data (audit deviation D7), and the walk does not move on to the next symbol.
+        row, e2 = self.classify([("ZZQN", legs([], bars_raw=503)), ("ZZQA", legs(self.BARS, auctions=self.CLOSES))])
+        self.assertEqual((row["verdict"], row["in_n2"], row["symbol_used"], e2["N2"]), ("fetch_error", False, None, 0))
+
+
+class VerifyProvenance(unittest.TestCase):
+    """Review finding 2: publish counts the second classify only from a verify.json of this plan and estimand that
+    recorded the sha256 of the classify outputs now on disk, next to a summary.json that names the snapshots now
+    on disk."""
+
+    OUTPUTS = ("results.json", "labels.json", "summary.json")
+    SNAPSHOTS = ("snapshot-f1.json", "snapshot-f2.json", "control.json", "request-log.json")
+
+    def folder(self, tmp):
+        out = M.private_dir(Path(tmp) / "e2")
+        for name in self.SNAPSHOTS + ("results.json", "labels.json"):
+            M.write_doc(out / name, {"kind": "synthetic", "name": name})
+        M.write_doc(out / "summary.json", {
+            "kind": "mover_coverage_asof_private_summary", "plan_sha256": M.PLAN_SHA256, "estimand": "E2",
+            "E2": {"N2": 2, "package_events_in_window": 3},
+            "positive_control": {"KOD": {"touch": True}, "LFCR": {"touch": True}, "passed": True},
+            "exposure": {"price_rows_total": 9, "price_rows_before_2021_01_04": 0, "price_rows_in_holdout": 0},
+            "requests": {"total": 12, "status_counts": {"200": 12}}, "responses": {"legs": {}, "error_codes": {}},
+            "snapshots_sha256": {n: M.sha256_file(out / n) for n in self.SNAPSHOTS},
+            "fetched_at_utc": "2026-09-29T01:00:00Z", "control_sent_at_utc": "2026-09-29T01:00:00Z",
+            "finished_at_utc": "2026-09-29T01:05:00Z", "code_revision": {"head": "1" * 40, "clean": True}})
+        self.write_verify(out)
+        return out
+
+    def write_verify(self, out, **changes):
+        verify = {"kind": "mover_coverage_asof_verify", "plan_sha256": M.PLAN_SHA256, "estimand": "E2",
+                  "byte_identical": True, "sha256": {n: M.sha256_file(out / n) for n in self.OUTPUTS},
+                  "classify_code_revision": {"head": "2" * 40, "clean": True}}
+        M.write_doc(out / "verify.json", dict(verify, **changes))
+
+    def test_a_matching_verify_stands(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            block = M.estimand_block(self.folder(tmp), "E2", False)
+        self.assertEqual((block["validity"]["classify_rerun_byte_identical"], block["validity"]["stands"]), (True, True))
+        self.assertEqual(block["classify_code_revision"], {"head": "2" * 40, "clean": True})
+
+    def test_a_stale_or_unrelated_verify_does_not_stand(self):
+        cases = {
+            "another plan": lambda out: self.write_verify(out, plan_sha256="0" * 64),
+            "another estimand": lambda out: self.write_verify(out, estimand="E1"),
+            "another kind": lambda out: self.write_verify(out, kind="mover_coverage_asof_results"),
+            "not byte-identical": lambda out: self.write_verify(out, byte_identical=False),
+            "hashes of other outputs": lambda out: self.write_verify(out, sha256={n: "a" * 64 for n in self.OUTPUTS}),
+            "no recorded hashes": lambda out: self.write_verify(out, sha256=None),
+            "a classify output changed after the verify": lambda out: M.write_doc(out / "results.json", {"changed": 1}),
+            "a snapshot changed after the classify": lambda out: M.write_doc(out / "snapshot-f1.json", {"changed": 1}),
+            "the review probe: other plan and estimand, stale hashes": lambda out: (
+                self.write_verify(out, plan_sha256="0" * 64, estimand="E1"), M.write_doc(out / "labels.json", {"stale": 1})),
+            "no verify.json": lambda out: (out / "verify.json").unlink(),
+        }
+        for label, spoil in cases.items():
+            with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
+                out = self.folder(tmp)
+                spoil(out)
+                validity = M.estimand_block(out, "E2", False)["validity"]
+                self.assertEqual((validity["classify_rerun_byte_identical"], validity["stands"]), (False, False))
+
+    def test_a_revision_is_carried_only_from_this_plan_and_estimand(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.folder(tmp)
+            self.write_verify(out, plan_sha256="0" * 64)
+            self.assertIsNone(M.estimand_block(out, "E2", False)["classify_code_revision"])
+
+    def test_a_summary_of_another_plan_or_estimand_is_refused(self):
+        for field, value in (("plan_sha256", "0" * 64), ("estimand", "E1"), ("kind", "mover_coverage_asof_results")):
+            with self.subTest(field), tempfile.TemporaryDirectory() as tmp:
+                out = self.folder(tmp)
+                summary = json.loads((out / "summary.json").read_text())
+                M.write_doc(out / "summary.json", dict(summary, **{field: value}))
+                self.write_verify(out)  # a fresh verify of that summary: only the summary's own provenance is wrong
+                with self.assertRaises(M.Refused) as caught:
+                    M.estimand_block(out, "E2", False)
+                self.assertEqual(caught.exception.reason, "summary_not_this_plan_or_estimand")
+
+    def publish(self, tmp, out):
+        run = Path(tmp) / "e1"
+        run.mkdir()
+        (run / "gate.json").write_text(json.dumps({"status": "refused", "reason": "inputs_missing", "requests_sent": 0,
+                                                   "plan_sha256": M.PLAN_SHA256}))
+        dest = Path(tmp) / "published.json"
+        code = M.main(["publish", "--run-dir", str(run), "--e2-dir", str(out), "--to", str(dest)])
+        return code, (json.loads(dest.read_text()) if dest.exists() else None)
+
+    def test_publish_records_a_stale_verify_as_a_failed_condition(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.folder(tmp)
+            M.write_doc(out / "summary.json", dict(json.loads((out / "summary.json").read_text()), E2={"N2": 3}))
+            code, doc = self.publish(tmp, out)
+        self.assertEqual(code, 0)
+        self.assertEqual(doc["E2"]["N2"], 3)
+        self.assertEqual((doc["E2"]["validity"]["classify_rerun_byte_identical"], doc["E2"]["validity"]["stands"]),
+                         (False, False))
+
+    def test_publish_refuses_a_summary_of_another_plan(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = self.folder(tmp)
+            M.write_doc(out / "summary.json", dict(json.loads((out / "summary.json").read_text()), plan_sha256="0" * 64))
+            self.write_verify(out)
+            code, doc = self.publish(tmp, out)
+        self.assertEqual((code, doc), (2, None))
+
+
+class PublicSchema(unittest.TestCase):
+    """Review finding 3: publish's scan enforces an explicit totals-only schema, so a key it does not name, including
+    a symbol-like key, is refused."""
+
+    COMMITTED = HERE / "evidence" / "summary-asof-20260929.json"
+
+    def committed(self):
+        return json.loads(self.COMMITTED.read_text())
+
+    def test_the_committed_summary_fits_the_schema(self):
+        self.assertEqual(M.scan_public(self.committed()), [])
+
+    def test_the_review_probe_is_refused(self):
+        problems = M.scan_public({"labels": {"ZZQA": {"return": 0.5, "price": 10}}})
+        self.assertIn("$.labels: unexpected key", problems)
+        self.assertIn("$.labels.ZZQA: symbol-like key", problems)
+
+    def test_keys_and_values_outside_the_schema_are_refused(self):
+        cases = {
+            ("$.E2.by_tier.ZZQA: unexpected key", "$.E2.by_tier.ZZQA: symbol-like key"):
+                lambda d: d["E2"]["by_tier"].update(ZZQA={"N2": 1}),
+            ("$.E2.events: unexpected key",): lambda d: d["E2"].update(events={"n": 1}),
+            ("$.events: unexpected key",): lambda d: d.update(events=[{"return": 0.5}]),
+            ("$.E2.verdicts.match: expected an integer",): lambda d: d["E2"]["verdicts"].update(match=[1, 2]),
+            ("$.E2.private_files_sha256.ZZQA.json: unexpected key",):
+                lambda d: d["E2"]["private_files_sha256"].update({"ZZQA.json": "a" * 64}),
+            ("$.E2.requests.status_counts.ZZQA: unexpected key", "$.E2.requests.status_counts.ZZQA: symbol-like key"):
+                lambda d: d["E2"]["requests"]["status_counts"].update(ZZQA=1),
+            ("$.E2.validity.per_event: unexpected key",): lambda d: d["E2"]["validity"].update(per_event=True),
+            ("$.E2.N2: expected an integer",): lambda d: d["E2"].update(N2=10.5),
+            ("$.E2.N2: expected an integer", "$.E2.N2.ZZQA: symbol-like key"): lambda d: d["E2"].update(N2={"ZZQA": 1}),
+            ("$.E2.touch_share_among_N2: expected a share",): lambda d: d["E2"].update(touch_share_among_N2=1.5),
+            ("$.plan.sha256: expected a sha256",): lambda d: d["plan"].update(sha256="not-a-hash"),
+            ("$.E2.fetched_at_utc: expected a timestamp",): lambda d: d["E2"].update(fetched_at_utc="soon"),
+        }
+        for wants, spoil in cases.items():
+            doc = self.committed()
+            spoil(doc)
+            problems = M.scan_public(doc)
+            for want in wants:
+                with self.subTest(want):
+                    self.assertIn(want, problems)
+
+
+INPUT_NAMES = {"audit_results": "audit-results.json", "candidates_main": M.PLAN["inputs"]["candidates_main"]["file"],
+               "candidates_premarket": M.PLAN["inputs"]["candidates_premarket"]["file"]}
+
+
+class E1Refusals(unittest.TestCase):
+    """Review finding 4: E1 stops at mismatched candidate files or an unreproduced coverage before any credential
+    read, corporate-action collection or request. The real inputs are private, so the plan's sha256 is pointed at
+    synthetic files for the inputs a case needs to pass."""
+
+    def inputs(self, tmp):
+        inputs = Path(tmp) / "inputs"
+        inputs.mkdir()
+        (inputs / INPUT_NAMES["audit_results"]).write_text(json.dumps({"events": GateSplit.ROWS}))
+        for key, keys in (("candidates_main", GateSplit.MAIN), ("candidates_premarket", GateSplit.PREM)):
+            with (inputs / INPUT_NAMES[key]).open("w", newline="") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(["symbol", "session_date", "prev_date"])
+                for sym, day in sorted(keys):
+                    writer.writerow([sym, day, day])
+        return inputs
+
+    def forbid_leaving_the_host(self, stack):
+        credentials = mock.Mock(side_effect=CredentialRead)
+        stack.enter_context(mock.patch("urllib.request.urlopen", forbid_network))
+        stack.enter_context(mock.patch("subprocess.run", forbid_subprocess))
+        stack.enter_context(mock.patch.object(M.audit, "credentials", credentials))
+        stack.enter_context(mock.patch.object(M, "code_revision", return_value={"head": "0" * 40, "clean": True}))
+        stack.enter_context(mock.patch.object(M, "control_time_ok", return_value=True))
+        return credentials
+
+    def gate_then_fetch(self, tmp, pinned, coverage=None):
+        inputs, out = self.inputs(tmp), Path(tmp) / "run"
+        with contextlib.ExitStack() as stack:
+            for key in pinned:
+                stack.enter_context(mock.patch.dict(M.PLAN["inputs"][key], {"sha256": M.sha256_file(inputs / INPUT_NAMES[key])}))
+            if coverage is not None:
+                evaluate = types.SimpleNamespace(coverage=lambda *args: coverage)
+                stack.enter_context(mock.patch.object(M, "mover_modules", return_value=(evaluate, STUB_RULES)))
+            credentials = self.forbid_leaving_the_host(stack)
+            gate_code = M.main(["gate", "--inputs", str(inputs), "--out-dir", str(out)])
+            fetch_code = M.main(["fetch", "--env-file", str(Path(tmp) / "paper.env"), "--out-dir", str(out)])
+        return {"gate_code": gate_code, "gate": json.loads((out / "gate.json").read_text()), "fetch_code": fetch_code,
+                "fetch": json.loads((out / "fetch-status.json").read_text()), "credentials": credentials,
+                "events_written": (out / "missed-events.json").exists(),
+                "renames_collected": (out / "corporate-actions").exists()}
+
+    def assert_stopped_before_leaving_the_host(self, got, reason):
+        self.assertEqual((got["gate_code"], got["gate"]["status"], got["gate"]["reason"], got["gate"]["requests_sent"]),
+                         (2, "refused", reason, 0))
+        self.assertFalse(got["events_written"])
+        self.assertEqual((got["fetch_code"], got["fetch"]["status"], got["fetch"]["reason"], got["fetch"]["requests_sent"]),
+                         (2, "refused", "gate_not_passed", 0))
+        got["credentials"].assert_not_called()
+        self.assertFalse(got["renames_collected"])
+
+    def test_mismatched_candidate_files_stop_e1_before_credentials_and_requests(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            got = self.gate_then_fetch(tmp, pinned=("audit_results",))  # found by sha256; the candidates differ
+        self.assert_stopped_before_leaving_the_host(got, "input_sha256_mismatch")
+        self.assertEqual(got["gate"]["mismatched"], ["candidates_main", "candidates_premarket"])
+
+    def test_an_unreproduced_coverage_stops_e1_before_credentials_and_requests(self):
+        wrong = dict(M.PLAN["reproduction_gate"]["expected"], present=497)
+        with tempfile.TemporaryDirectory() as tmp:
+            got = self.gate_then_fetch(tmp, pinned=tuple(INPUT_NAMES), coverage=wrong)
+        self.assert_stopped_before_leaving_the_host(got, "coverage_not_reproduced")
+        self.assertEqual(got["gate"]["coverage"]["present"], 497)
+
+    def test_harness_control_a_passed_gate_does_reach_the_credentials(self):
+        # Without a refusal, fetch reaches audit.credentials, so the not-called assertions above are not vacuous.
+        with tempfile.TemporaryDirectory() as tmp, contextlib.ExitStack() as stack:
+            out = M.private_dir(Path(tmp) / "run")
+            sha = M.write_doc(out / "missed-events.json", {"plan_sha256": M.PLAN_SHA256, "events": []})
+            M.write_doc(out / "gate.json", {"status": "passed", "plan_sha256": M.PLAN_SHA256, "events_sha256": sha})
+            credentials = self.forbid_leaving_the_host(stack)
+            with self.assertRaises(CredentialRead):
+                M.main(["fetch", "--env-file", str(Path(tmp) / "paper.env"), "--out-dir", str(out)])
+        credentials.assert_called_once()
+
+    def test_candidate_files_are_checked_again_at_classify(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            inputs = self.inputs(tmp)
+            with self.assertRaises(M.Refused) as caught:
+                M.load_candidate_keys(inputs)
+        self.assertEqual((caught.exception.reason, caught.exception.detail), ("candidate_file_changed", {"file": "candidates_main"}))
 
 
 if __name__ == "__main__":
