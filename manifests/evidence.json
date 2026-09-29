@@ -3735,8 +3735,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "5e20ce0d08dd203b5b9d86ee2375cd03131a4c1f3c18b096bb48f66371bb6e1a",
-      "bytes": 17862
+      "sha256": "2404df6c8d17b8dea544f162d439ddf8a03a5f12f0c2799a63707c9f88e98e35",
+      "bytes": 20076
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -3745,7 +3745,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "b611e824165ab4465bed6729054a1c1eaed75a7c0044506f508e4c6adacd62d4",
+      "sha256": "06385c800b70072e9163096f06e73874cfed63040cd9db87ae221d1cbd2aed62",
       "bytes": 861
     },
     {
@@ -14721,8 +14721,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "6d7a9d5e33efc186c2876daa5990713be7cc8e3f7491190de2022b4d952624f2",
-      "bytes": 82026
+      "sha256": "b02073ef9f01bd52a51886e2cac24ef555b23d7e7b4279a467199f91bd138ec7",
+      "bytes": 82401
     },
     {
       "path": "docs/stack.md",
@@ -42061,8 +42061,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "abf269ba41a126400e084b4f03828eb4f0e6fc2375633c0e788136158a3054b1",
-      "bytes": 43178
+      "sha256": "f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244",
+      "bytes": 43564
     },
     {
       "path": "scripts/host_receipts.py",
@@ -42571,8 +42571,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "f1f3a7e431ebf092db8ed1ca121b80462aac950ec4280fb71c1b9a7ea0ccfca5",
-      "bytes": 27639
+      "sha256": "a2b96d0c75ffc67950544632562ff83f23d3d248c2800c34efd64f928e51b426",
+      "bytes": 28598
     },
     {
       "path": "tests/test_credential_tools.py",
@@ -43001,8 +43001,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "a46943e13beaf956f6c96c4623451f6d398e4d9f416d41be6d50507260b63ff8",
-      "bytes": 62922
+      "sha256": "767d26f16a70a9eb20a907fbe762126b9e2c132c8256e2ba19a6373cdb585e6c",
+      "bytes": 65660
     },
     {
       "path": "tests/test_security_identity.py",
