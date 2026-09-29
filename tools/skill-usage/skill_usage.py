@@ -761,16 +761,71 @@ def _role_of(fields) -> str | None:
     return (value.strip(RUST_WHITE_SPACE) or None) if isinstance(value, str) else None
 
 
-def session_role(meta: dict, kind: str | None) -> str:
-    """PR-A 10b: the session's role from its first session_meta, SessionMeta.agent_role (rust-v0.157.1
-    protocol/src/protocol.rs:3153-3155), else the ThreadSpawn source's agent_role (:2904-2913), as a name-shaped key; a
-    sub-agent without a role is (none), and every other session (root)."""
+def thread_spawn_source(meta: dict) -> dict:
+    """The SubAgentSource::ThreadSpawn of a session_meta ({parent_thread_id, depth, agent_path, agent_nickname, agent_role};
+    rust-v0.157.1 protocol/src/protocol.rs:2901-2916), or {}."""
     source = meta.get("source")
     subagent = source.get("subagent") if isinstance(source, dict) else None
-    role = _role_of(meta) or _role_of(subagent.get("thread_spawn") if isinstance(subagent, dict) else None)
+    spawn = subagent.get("thread_spawn") if isinstance(subagent, dict) else None
+    return spawn if isinstance(spawn, dict) else {}
+
+
+def session_role_raw(meta: dict) -> str | None:
+    """The session's trimmed role from its first session_meta: SessionMeta.agent_role (rust-v0.157.1
+    protocol/src/protocol.rs:3153-3155), else the ThreadSpawn source's agent_role (:2904-2913); None without one."""
+    return _role_of(meta) or _role_of(thread_spawn_source(meta))
+
+
+def session_role(meta: dict, kind: str | None) -> str:
+    """PR-A 10b: the session's role (session_role_raw) as a name-shaped key; a sub-agent without a role is (none), and every
+    other session (root)."""
+    role = session_role_raw(meta)
     if role is not None:
         return safe_key(role)
     return "(none)" if kind == "subagent" else "(root)"
+
+
+def _call_arguments(value) -> dict:
+    """A function call's arguments as an object (a JSON object string, or an object), else {}."""
+    if isinstance(value, dict):
+        return value
+    try:
+        parsed = json.loads(value)
+    except (ValueError, TypeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+# usize::MAX of the 64-bit targets Codex ships for; a larger fork_turns fails usize::from_str.
+USIZE_MAX = 2 ** 64 - 1
+
+
+def requested_fork_turns(value) -> tuple[str, int | None]:
+    """PR-A 10g: a V2 spawn_agent fork_turns as (state, n), as SpawnAgentArgs::fork_mode reads it (openai/codex rust-v0.157.1
+    core/src/tools/handlers/multi_agents_v2/spawn.rs:265-299): trimmed with str::trim (RUST_WHITE_SPACE), absent, null or
+    empty is all by default (default_all), `none` and `all` match ASCII case-insensitively, and anything else must parse as a
+    usize (an optional '+' then ASCII digits, within USIZE_MAX) and be nonzero (last_n), or the call fails (invalid).
+    fork_turns is an Option<String>, so upstream rejects a JSON integer; the frozen launch matrix writes `fork_turns: 2`
+    (preregistration.json seed-binding-2), so a positive integer reads as the string of its digits would (the U3 review).
+    A bool, a float or any other JSON type is invalid. A linear check, no regular expression."""
+    if value is None:
+        return "default_all", None
+    if isinstance(value, bool) or not isinstance(value, (int, str)):
+        return "invalid", None
+    if isinstance(value, int):
+        return ("last_n", value) if 0 < value <= USIZE_MAX else ("invalid", None)
+    text = value.strip(RUST_WHITE_SPACE)
+    if not text:
+        return "default_all", None
+    if text.isascii() and text.lower() in ("none", "all"):
+        return text.lower(), None
+    digits = text[1:] if text.startswith("+") else text
+    if not (digits and digits.isascii() and digits.isdigit()):
+        return "invalid", None
+    # Leading zeros of any length parse in Rust; int() refuses over 4,300 digits, and USIZE_MAX has 20.
+    significant = digits.lstrip("0")
+    number = int(significant) if 0 < len(significant) <= 20 else 0 if not significant else USIZE_MAX + 1
+    return ("last_n", number) if 0 < number <= USIZE_MAX else ("invalid", None)
 
 
 def _program_of(prefix: str) -> str:
@@ -1237,11 +1292,62 @@ def _new_lanes_session() -> dict:
             "ran_past_window_end": False, "tool_calls": 0, "mcp_calls": {}, "mcp_failed": {},
             "shell_calls": 0, "rtk_prefixed": 0, "fetch": dict.fromkeys(FETCH_KEYS, 0),
             "skill_md_reads": {}, "function_calls": {}, "file_changes": 0,
-            "first_prompt_tokens": None, "own_model_calls": 0, "own_tool_items": 0}
+            "first_prompt_tokens": None, "own_model_calls": 0, "own_tool_items": 0,
+            # PR-A 10g private join facts (never published; scan_codex_lanes publishes states only): ids, the task path and the
+            # raw role of the first session_meta, whether history was forked, own turns, own spawn_agent calls, started items,
+            # turn routes, the first own settings snapshot and follow-up targets.
+            "_thread_id": None, "_parent_thread_id": None, "_agent_path": None, "_role_raw": None,
+            "_history_start": False, "_turns": 0, "_spawns": {}, "_activity": {}, "_routes": [], "_settings": None,
+            "_followups": []}
 
 
 def _bump(counts: dict, key: str, by: int = 1) -> None:
     counts[key] = counts.get(key, 0) + by
+
+
+# The spawn_agent arguments the join reads (SpawnAgentArgs, spawn.rs:253-263; V1's fork_context, multi_agents_spec.rs:607-613);
+# the message and task name are never kept.
+SPAWN_ARGUMENTS = ("fork_turns", "fork_context", "agent_type", "model", "reasoning_effort")
+
+
+def _collect_spawn_facts(session: dict, kind, payload: dict, route):
+    """PR-A 10g: one own record's private spawn facts, whatever its time before until (a spawn made before since still joins
+    a child inside the window); returns the route of the latest own turn context. Records a forked child copied from its
+    parent never reach here: they are the parent's. Sources, openai/codex rust-v0.157.1: TurnContextItem model and effort
+    (protocol/src/protocol.rs:3328, :3344-3345); a spawn_agent call (spawn.rs:253-263) and the SubAgentActivity started item
+    whose id is its call_id (spawn.rs:216-226, protocol/src/items.rs:364-370, kind snake_case at protocol.rs:4382-4390);
+    ThreadSettingsApplied, whose copied snapshots keep their owner's thread_id (protocol.rs:2192-2231); followup_task's
+    target (an agent id or canonical task name) and V1 resume_agent's id (multi_agents_spec.rs:217-266); task_started, also
+    read as turn_started (protocol.rs:1403-1406)."""
+    def text(value):  # ids, targets and route values are strings; any other JSON value is unknown
+        return value if isinstance(value, str) else None
+    if kind == "turn_context":
+        route = (text(payload.get("model")), text(payload.get("effort", payload.get("reasoning_effort"))))
+        session["_routes"].append(route)
+    elif kind == "response_item" and payload.get("type") == "function_call":
+        name = codex_call_name(payload)
+        if name == "spawn_agent" and text(payload.get("call_id")) is not None:
+            arguments = _call_arguments(payload.get("arguments"))
+            session["_spawns"].setdefault(payload["call_id"], {
+                "arguments": {key: arguments[key] for key in SPAWN_ARGUMENTS if key in arguments},
+                "namespace": payload.get("namespace"), "route": route})
+        elif name in ("followup_task", "resume_agent"):
+            target = text(_call_arguments(payload.get("arguments")).get("target" if name == "followup_task" else "id"))
+            if target is not None:
+                session["_followups"].append(target)
+    elif kind == "event_msg":
+        event = payload.get("type")
+        item = payload.get("item") if isinstance(payload.get("item"), dict) else {}
+        if event in ("task_started", "turn_started"):
+            session["_turns"] += 1
+        elif event == "item_completed" and item.get("type") == "SubAgentActivity" and item.get("kind") == "started":
+            if text(item.get("agent_thread_id")) is not None and text(item.get("id")) is not None:
+                session["_activity"].setdefault(item["agent_thread_id"], {"id": item["id"], "route": route})
+        elif (event == "thread_settings_applied" and session["_settings"] is None and session["_thread_id"] is not None
+              and payload.get("thread_id") == session["_thread_id"]):
+            settings = payload.get("thread_settings") if isinstance(payload.get("thread_settings"), dict) else {}
+            session["_settings"] = (settings.get("model"), settings.get("reasoning_effort"))
+    return route
 
 
 def scan_lanes_file(path: Path, names, *, since, until, marker: str,
@@ -1262,6 +1368,7 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
     history_start = None
     call_ids: set = set()
     metric_records = []
+    route = (None, None)  # the latest own turn context's (model, effort), raw
 
     def first_record(call_id) -> bool:
         """Whether a record is its call's first (a record without an id is a call of its own)."""
@@ -1322,6 +1429,14 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                     session["started_before_window"] = since is not None and when < since
                     start = payload.get("subagent_history_start_ordinal")
                     history_start = start if isinstance(start, int) and not isinstance(start, bool) else None
+                    spawn_source = thread_spawn_source(payload)
+                    session["_thread_id"] = payload.get("id") if isinstance(payload.get("id"), str) else None
+                    parent_id = spawn_source.get("parent_thread_id")
+                    session["_parent_thread_id"] = parent_id if isinstance(parent_id, str) else None
+                    agent_path = payload.get("agent_path") or spawn_source.get("agent_path")
+                    session["_agent_path"] = agent_path if isinstance(agent_path, str) else None
+                    session["_role_raw"] = session_role_raw(payload)
+                    session["_history_start"] = history_start is not None
             elif kind == "response_item":
                 payload_type = payload.get("type")
                 if payload_type in CALL_PAYLOAD_TYPES and not inherited:
@@ -1361,6 +1476,8 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                             session["first_prompt_tokens"] = last["input_tokens"]
                 elif payload_type == "item_completed" and counted:
                     _score_lane_item(session, item, new_call)
+            if not inherited:
+                route = _collect_spawn_facts(session, kind, payload, route)
     if session["in_window"]:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         # Only counts leave the public report. Binding is per sidecar record,
@@ -1477,6 +1594,107 @@ def user_config_state(session: dict) -> str:
     return "ignored" if session["catalog_off"] else "applied" if session["catalog_on"] else "unknown"
 
 
+def _route_state(reference, values) -> str:
+    """match when every known value equals the reference (raw strings), mismatch when one differs, unknown without both."""
+    known = [value for value in values if value is not None]
+    if reference is None or not known:
+        return "unknown"
+    return "match" if all(value == reference for value in known) else "mismatch"
+
+
+# The spawn fields subagent_spawns counts, by value (a string state, or the JSON text of a number, bool or null).
+SPAWN_STATE_FIELDS = ("join", "requested.fork_turns", "requested.fork_n", "requested.role", "requested.model", "requested.effort",
+                      "effective.role", "effective.history", "effective.turns", "fork_consistent", "role_state",
+                      "route_vs_request.model", "route_vs_request.effort", "route_vs_parent_turn.model",
+                      "route_vs_parent_turn.effort", "route_changes_within_child", "expected_route_basis.model",
+                      "expected_route_basis.effort", "reroute_evidence", "followups")
+
+
+def spawn_state(child: dict, owners: dict, activity: dict) -> dict:
+    """PR-A 10g: a sub-agent's spawn, as states only (design section 4 with the U3 review). The join runs in memory over every
+    scanned rollout: the child's thread id names a SubAgentActivity started item in some rollout (its owner), whose id is the
+    spawn_agent call_id (openai/codex rust-v0.157.1 core/src/tools/handlers/multi_agents_v2/spawn.rs:216-226). join is joined
+    (the owner is the child's ThreadSpawn parent_thread_id and holds that call), activity_without_spawn_call (it holds no such
+    call: a spawn made inside code-mode exec, whose arguments are not persisted), parent_mismatch (another thread owns the
+    item), parent_without_started_item (the parent was scanned but holds no started item for the child: a legacy rollout
+    persists only completed ones, rollout/src/policy.rs:94-112) or parent_not_scanned. What was requested is read from a
+    joined call only, else unknown. The child's route is client-side: its own turn contexts and its first own
+    ThreadSettingsApplied; a provider reroute is not persisted in rollouts (policy.rs:141-204), so reroute_evidence is always
+    not_persisted_in_rollout, and a mismatch is a state, not an error. Route precedence (core/src/agent/child_config.rs:62-99,
+    :109-121, :196-253, :283-299): the invoking step's route, then a requested model or effort, else the [agents] defaults
+    (:204-206), a model without an effort taking the [agents] default effort, else the model's (:229-238), and a role file
+    last; a recorded role means its file was applied (:70-98), so its basis is role_file for both fields."""
+    thread, parent_id = child["_thread_id"], child["_parent_thread_id"]
+    entries = activity.get(thread, []) if thread is not None else []
+    owner, item = next(((o, e) for o, e in entries if o == parent_id), entries[0] if entries else (None, None))
+    parent = owners.get(parent_id) if parent_id is not None else None
+    call = None
+    if owner is None:
+        join = "parent_without_started_item" if parent is not None else "parent_not_scanned"
+    elif owner != parent_id:
+        join = "parent_mismatch"
+    else:
+        call = owners[owner]["_spawns"].get(item["id"])
+        join = "joined" if call is not None else "activity_without_spawn_call"
+    if call is not None:
+        arguments = call["arguments"]
+        if call["namespace"] == "multi_agent_v1":  # V1: fork_context true forks, false or omitted starts fresh (spec :607-613)
+            fork_turns, fork_n = ("all" if arguments.get("fork_context") is True else "none"), None
+        else:
+            fork_turns, fork_n = requested_fork_turns(arguments.get("fork_turns"))
+        role = arguments.get("agent_type")
+        role = (role.strip(RUST_WHITE_SPACE) or None) if isinstance(role, str) else None
+        model = arguments.get("model") if isinstance(arguments.get("model"), str) and arguments.get("model") else None
+        effort = (arguments.get("reasoning_effort") if isinstance(arguments.get("reasoning_effort"), str)
+                  and arguments.get("reasoning_effort") else None)
+        requested = {"fork_turns": fork_turns, "fork_n": fork_n, "role": safe_key(role) if role is not None else None,
+                     "model": model_key(model), "effort": effort_key(effort)}
+    else:
+        role = model = effort = None
+        requested = {"fork_turns": "unknown", "fork_n": None, "role": "unknown", "model": "unknown", "effort": "unknown"}
+    routes, settings = child["_routes"], child["_settings"]
+    effective = {"role": child["role"], "history": "forked" if child["_history_start"] else "fresh", "turns": child["_turns"],
+                 "models": sorted({key for key in (model_key(m) for m, _ in routes) if key is not None}),
+                 "efforts": sorted({key for key in (effort_key(e) for _, e in routes) if key is not None}),
+                 "settings": {"model": model_key(settings[0]), "effort": effort_key(settings[1])} if settings else None}
+    expected_history = {"none": "fresh", "all": "forked", "default_all": "forked", "last_n": "forked"}.get(requested["fork_turns"])
+    models, efforts = [m for m, _ in routes], [e for _, e in routes]
+    parent_route = call["route"] if call is not None else item["route"] if join == "activity_without_spawn_call" else (None, None)
+    if child["_role_raw"] is not None:
+        basis = {"model": "role_file", "effort": "role_file"}
+    elif call is None:
+        basis = {"model": "unknown", "effort": "unknown"}
+    else:
+        basis = {"model": "spawn_request" if model else "agents_default_or_parent_turn",
+                 "effort": "spawn_request" if effort else "agents_default_or_model_default" if model else
+                 "agents_default_or_parent_turn"}
+    targets = {thread, child["_agent_path"]} - {None}
+    return {"join": join, "requested": requested, "effective": effective,
+            "fork_consistent": None if expected_history is None else expected_history == effective["history"],
+            "role_state": "unknown" if call is None else "not_requested" if role is None else
+            "match" if role == child["_role_raw"] else "mismatch",
+            "route_vs_request": {"model": "unknown" if call is None else "not_requested" if model is None else
+                                 _route_state(model, models),
+                                 "effort": "unknown" if call is None else "not_requested" if effort is None else
+                                 _route_state(effort, efforts)},
+            "route_vs_parent_turn": {"model": _route_state(parent_route[0], models), "effort": _route_state(parent_route[1], efforts)},
+            "route_changes_within_child": len(set(routes)) > 1, "expected_route_basis": basis,
+            "reroute_evidence": "not_persisted_in_rollout",
+            "followups": None if parent is None else sum(target in targets for target in parent["_followups"])}
+
+
+def count_spawn_states(spawns: list[dict]) -> dict:
+    """subagent_spawns: each SPAWN_STATE_FIELDS field of the sub-agents' spawn states, counted by value."""
+    counts: dict = {}
+    for spawn in spawns:
+        for field in SPAWN_STATE_FIELDS:
+            value = spawn
+            for key in field.split("."):
+                value = value.get(key) if isinstance(value, dict) else None
+            _bump(counts.setdefault(field, {}), value if isinstance(value, str) else json.dumps(value))
+    return {field: dict(sorted(values.items())) for field, values in counts.items()}
+
+
 def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_check=False, exception_records=()) -> dict:
     """The Codex lane report over rollout-*.jsonl under exactly the given roots."""
     skills = [skill for skill in manifest["skills"] if isinstance(skill, dict) and "name" in skill]
@@ -1485,6 +1703,10 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_ch
     codex_on = [skill["name"] for skill in skills if skill.get("codex_enabled") is True]
     files = iter_rollout_files(roots)
     sessions, parse_errors, untimed, skipped, scanned = [], 0, 0, 0, 0
+    # PR-A 10g: the in-memory spawn join index over every scanned rollout, inside the window or not: the session of each
+    # thread id, and each child thread's started items as (owner thread id, item). Never published.
+    owners: dict = {}
+    activity: dict = {}
     for path in files:
         if since is not None:
             try:
@@ -1500,9 +1722,16 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_ch
                                                    rtk_check=rtk_check, exception_records=exception_records)
         parse_errors += errors
         untimed += no_time
+        if session["_thread_id"] is not None:
+            owners.setdefault(session["_thread_id"], session)
+            for child, item in session["_activity"].items():
+                activity.setdefault(child, []).append((session["_thread_id"], item))
         if session["in_window"]:
             session["user_config"] = user_config_state(session)
             sessions.append(session)
+    for session in sessions:
+        if session["kind"] == "subagent":
+            session["spawn"] = spawn_state(session, owners, activity)
 
     def count_by(key: str) -> dict:
         counts: dict = {}
@@ -1526,8 +1755,10 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_ch
             1 for s in sessions if s["own_model_calls"] and not s["own_tool_items"]),
         "user_config": {**{state: sum(s["user_config"] == state for s in sessions)
                            for state in ("applied", "ignored", "unknown")}, "method": USER_CONFIG_METHOD},
+        "subagent_spawns": count_spawn_states([s["spawn"] for s in sessions if "spawn" in s]),
         "actors": [{"ordinal": i + 1, "kind": s["kind"], "role": s["role"], "user_config": s["user_config"],
-                    "measurement": s["measurement"]} for i, s in enumerate(sessions)],
+                    **({"spawn": s["spawn"]} if "spawn" in s else {}), "measurement": s["measurement"]}
+                   for i, s in enumerate(sessions)],
         "groups": {
             "workers": aggregate_codex_lanes(workers),
             "workers_by_kind": {kind: aggregate_codex_lanes([s for s in workers if s["kind"] == kind])
@@ -1545,7 +1776,10 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
             "window": {"since": since.isoformat() if since else None,
                        "until": until.isoformat() if until else None},
             "marker": marker, **scan, "limits": "Legacy lane fields: " + LANES_LIMITS
-            + " PR-A measurement fields use the shared child-usage.mjs kernel and own persisted response_item outputs, with item_completed fallback. Native cumulative provider_usage is separate from Claude per-message counters and from byte measurements. --rtk-check enables fixed-config eligibility replay. Missing usage, output and dynamic fetch evidence cannot establish acceptance; see README.md."}
+            + " PR-A measurement fields use the shared child-usage.mjs kernel and own persisted response_item outputs, with item_completed fallback. Native cumulative provider_usage is separate from Claude per-message counters and from byte measurements. --rtk-check enables fixed-config eligibility replay. Missing usage, output and dynamic fetch evidence cannot establish acceptance; see README.md."
+            + " actors[].spawn and subagent_spawns publish sub-agent spawn states only: the join of a child to its parent's"
+            " SubAgentActivity started item and spawn_agent call runs in memory, the route is client-side (turn contexts and"
+            " ThreadSettingsApplied), and provider reroutes are not persisted in rollouts."}
 
 
 def render_lanes_text(report: dict) -> str:

@@ -378,9 +378,65 @@ that is not name-shaped is `(other)`, a sub-agent without a role is `(none)` and
 file is configured
 ([child_config.rs:86-98](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/child_config.rs#L86-L98)).
 
-The lane report keeps the same privacy boundary: server, tool-kind, skill and role names, counts and
-token figures only, with sessions never named by id or path; a server, function, originator, role
-or content-kind name that is not name-shaped is counted as `(other)`. Rollout files not modified since
+Each sub-agent actor carries `spawn`, and `subagent_spawns` counts every state of it across the
+sub-agents. The join runs in memory over every scanned rollout, inside the window or not, and
+publishes states only. A child's thread id names a `SubAgentActivity` started item in its parent's
+rollout, and that item's id is the `spawn_agent` call id
+([spawn.rs:216-226](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L216-L226)).
+Only the parent's own records count. A forked child's copies of them, below its start ordinal, are the parent's.
+`join` takes one of these values:
+
+- `joined`: the owner is the child's `parent_thread_id` and holds the call.
+- `activity_without_spawn_call`: the owner holds no such call, as for a spawn made inside code-mode `exec`, whose
+  arguments are not persisted.
+- `parent_mismatch`: another thread owns the item.
+- `parent_without_started_item`: the parent was scanned but holds no started item for the child. A legacy
+  rollout persists only completed ones
+  ([policy.rs:94-112](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L94-L112)).
+- `parent_not_scanned`.
+
+`requested` (`fork_turns`, `fork_n`, `role`, `model`, `effort`) comes from a joined call only and is
+otherwise `unknown`. `fork_turns` is read as the spawn handler reads it
+([spawn.rs:265-299](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L265-L299)):
+
+- The value is trimmed, and an absent or empty one is `default_all`.
+- `none` and `all` match case-insensitively.
+- A positive integer string is `last_n` with `fork_n`, and anything else is `invalid`.
+- The frozen launch matrix writes `fork_turns: 2`, so a positive JSON integer reads as `last_n` too. At
+  rust-v0.157.1 such a call fails, because the field is a string.
+- A V1 spawn (namespace `multi_agent_v1`) reads its `fork_context`: `true` is `all`, and otherwise the value is `none`.
+
+`effective` holds the child's role, its `history`, its `turns`, the model and effort keys of its own
+turn contexts, and `settings`, its first own `ThreadSettingsApplied`. `history` is `forked` when a start
+ordinal exists, else `fresh`. The remaining fields compare what was requested with what ran:
+
+- `fork_consistent` compares the requested fork with the history.
+- `role_state` compares the requested role with the recorded one.
+- `route_vs_request` and `route_vs_parent_turn` give, per field, `match`, `mismatch`, `not_requested` or
+  `unknown`. They compare the raw strings of every own turn with the request, or with the parent's latest
+  turn context before the call.
+- `route_changes_within_child` says whether the child's route changed between its turns.
+- `followups` counts the parent's `followup_task` calls whose target is the child's id or task path, and
+  V1 `resume_agent` calls with its id
+  ([multi_agents_spec.rs:217-266](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L217-L266)).
+  It is `null` when the parent was not scanned.
+
+`expected_route_basis` is per field and follows
+[child_config.rs:62-99 and :196-253](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/child_config.rs#L196-L253):
+
+- `role_file` applies to a child with a recorded role, whose role file applies last.
+- `spawn_request` applies to a requested value.
+- A model without an effort takes `agents_default_or_model_default` for the effort.
+- Otherwise the basis is `agents_default_or_parent_turn`.
+
+The route is client-side. A provider reroute is not persisted in rollouts, so `reroute_evidence` is always
+`not_persisted_in_rollout`, and a mismatch is a state, not an error. For a child with a role, the expected
+route is its role TOML, which the rollout does not hold.
+
+The lane report keeps the same privacy boundary: server, tool-kind, skill and role names, model and
+effort keys, spawn states, counts and token figures only, with sessions never named by id or path (the
+spawn join's thread ids, call ids, task paths and follow-up targets stay in memory); a server, function,
+originator, role or content-kind name that is not name-shaped is counted as `(other)`. Rollout files not modified since
 `--since` are skipped unread (counted as `files_skipped_unmodified`). Evidence from it is a
 `local_integration` measurement of native transcripts, not a model run.
 

@@ -2195,12 +2195,10 @@ class CodexSpawnJoin(unittest.TestCase):
         with self.assertRaises(AssertionError):
             assert_id_free_report(self, leaked, self.secrets)
 
-    @pending("commit 5: spawn join and subagent_spawns")
     def test_the_join_publishes_states_only(self):
         self.assertEqual([case for case in self.CASES if not self.field(case)], [])
         assert_id_free_report(self, self.report(), self.secrets)
 
-    @pending("commit 5: spawn join and subagent_spawns")
     def test_join_states(self):
         expected = {**dict.fromkeys(self.CASES, "joined"), "c13": "parent_not_scanned",
                     "c14": "activity_without_spawn_call", "c19": "parent_mismatch", "c22": "parent_without_started_item"}
@@ -2211,7 +2209,6 @@ class CodexSpawnJoin(unittest.TestCase):
                          {"joined": 19, "parent_not_scanned": 1, "activity_without_spawn_call": 1, "parent_mismatch": 1,
                           "parent_without_started_item": 1})
 
-    @pending("commit 5: spawn join and subagent_spawns")
     def test_requested_fork_turns_and_fork_consistency(self):
         got = {case: (self.field(case, "requested", "fork_turns"), self.field(case, "requested", "fork_n"),
                       self.field(case, "effective", "history"), self.field(case, "fork_consistent"))
@@ -2222,7 +2219,6 @@ class CodexSpawnJoin(unittest.TestCase):
                                "c07": ("invalid", None, "forked", None), "c08": ("invalid", None, "forked", None),
                                "c13": ("unknown", None, "forked", None)})
 
-    @pending("commit 5: spawn join and subagent_spawns")
     def test_role_state_and_route_basis(self):
         parent_turn = {"model": "agents_default_or_parent_turn", "effort": "agents_default_or_parent_turn"}
         role_file = {"model": "role_file", "effort": "role_file"}
@@ -2239,7 +2235,6 @@ class CodexSpawnJoin(unittest.TestCase):
             "c21": (None, "default", "not_requested", role_file)})
         self.assertEqual((self.field("c13", "requested", "role"), self.field("c13", "role_state")), ("unknown", "unknown"))
 
-    @pending("commit 5: spawn join and subagent_spawns")
     def test_route_versus_request_and_parent_turn(self):
         def states(model, effort):
             return {"model": model, "effort": effort}
@@ -2255,7 +2250,6 @@ class CodexSpawnJoin(unittest.TestCase):
             # C9: raw values differ (safe_key would have read both as (other) and matched them).
             "c15": ("cx/gpt-6-astra", None, states("mismatch", "not_requested"), states("mismatch", "match"))})
 
-    @pending("commit 5: spawn join and subagent_spawns")
     def test_effective_route_turns_and_followups(self):
         self.assertEqual(self.field("c01", "effective"),
                          {"role": "(none)", "history": "forked", "turns": 1, "models": ["gpt-6-astra"], "efforts": ["max"],
