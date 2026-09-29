@@ -4170,6 +4170,40 @@ class F31c_T14Facts(GraderCase):
         self.assertEqual((got["q"], got["q_status"], got["survival_observed"]), (self.QUERY, "observed", True))
         self.assertEqual(got["survivors"], [{"comm": "sleep", "start": ts(20)}], "only the process inside the rollout's lifetime")
 
+    def test_the_session_list_of_u10_is_the_survival_evidence_of_a_codex_child(self):
+        """count > 0 in survivors.json is an owned survivor; a missing record is unobserved even beside a clean post-arm
+        capture; count 0 is observed with or without a post-arm capture, and a post-arm process still adds to it (only that
+        capture can see a process that left the session)."""
+        rollout = {"status": "ok", "records": self.rollout(self.CARRIERS["command_item"])}
+        alive = {"count": 1, "processes": [{"pid": 700, "pgid": 700, "start_time": ts(10), "command": "/usr/bin/sleep 300"}]}
+        got = self.facts(family="codex", rollout=rollout, attempt={"start": None, "end": None}, post={"processes": []},
+                         survivors_record=alive)
+        self.assertEqual((got["survivors"], got["survival_observed"]), ([{"comm": "sleep", "start": ts(10)}], True))
+        missing = self.facts(family="codex", rollout=rollout, attempt={"start": None, "end": None}, post={"processes": []},
+                             survivors_record=None)
+        self.assertEqual((missing["survivors"], missing["survival_observed"]), ([], False))
+        clean = self.facts(family="codex", rollout=rollout, attempt={"start": None, "end": None}, post={"processes": []},
+                           survivors_record=self.NO_SURVIVORS)
+        self.assertEqual((clean["survivors"], clean["survival_observed"]), ([], True))
+        no_capture = self.facts(family="codex", rollout=rollout, attempt={"start": None, "end": None}, post={},
+                                survivors_record=self.NO_SURVIVORS)
+        self.assertEqual((no_capture["survivors"], no_capture["survival_observed"]), ([], True))
+        calls = evm().codex_calls([{"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": "sleep 300 &", "aggregated_output": "", "exit_code": 0,
+            "status": "completed"}}])
+        escaped = self.facts(family="codex", rollout=rollout, calls=calls, attempt={"start": None, "end": None},
+                             post={"processes": [{"pid": 800, "start": ts(20), "comm": "sleep", "ppid": 1}]},
+                             survivors_record=self.NO_SURVIVORS)
+        self.assertEqual(escaped["survivors"], [{"comm": "sleep", "start": ts(20)}])
+
+    def test_an_archive_query_row_without_a_timestamp_is_unobserved_not_absent(self):
+        """fc.archive_query_time returns ok(q=None) for a matching row that has no timestamp; that is a query whose time is
+        unknown, and must not read as fail(no_archive_query)."""
+        rows = [r_user("t", ts(0)), dict(r_use("Bash", {"command": "agentsview stats"}, "toolu-fx-q1", ts(30)), timestamp=None),
+                r_text("done", ts(40))]
+        got = self.facts(rows=rows)
+        self.assertEqual((got["q"], got["q_status"]), (None, "unobserved"))
+
     def test_a_codex_process_started_through_the_bash_lc_wrapper_is_owned(self):
         """The programs a Codex child ran are those of the script inside `/bin/bash -lc "..."`, not `bash`."""
         rollout = {"status": "ok", "records": self.rollout(self.CARRIERS["command_item"])}
@@ -4194,11 +4228,12 @@ class F31c_T14Facts(GraderCase):
         self.assertEqual(self.facts(family="codex", calls=lookalike, attempt={"start": None, "end": None}, rollout=missing)["q_status"],
                          "none")
 
-    def codex_t14_run(self, *, with_rollout):
+    def codex_t14_run(self, *, with_rollout, survivors=None):
         run = MiniRun(self)
         blind = run.blind("seed-blind-1", "Verdict: yes. id 1, latency 17 ms.", agent_id="fx1", strict=False)
         label = run.codex_exec("reuse-343-00", f"1 session matched: {blind}", shell=[("agentsview session list", "ok")],
-                               rollout=self.rollout(self.CARRIERS["custom_tool_call"]) if with_rollout else None)
+                               rollout=self.rollout(self.CARRIERS["custom_tool_call"]) if with_rollout else None,
+                               survivors=survivors)
         write_json(run.captures / "arm-codex-B-post-arm.json", {"schema": "token-e2e-capture/1", "phase": "post-arm", "family": "codex",
                                                               "arm": "B", "completed_at": "2026-10-01T01:59:00Z", "t0": {},
                                                               "builders": {}, "processes": [], "clones": {}})
@@ -4208,11 +4243,26 @@ class F31c_T14Facts(GraderCase):
         rows = [json.loads(line) for line in (private / "grades.jsonl").read_text(encoding="utf-8").splitlines()]
         return next(row for row in rows if row["identity"] == label)
 
+    NO_SURVIVORS = {"count": 0, "processes": []}
+
     def test_a_codex_t14_attempt_is_graded_from_the_rollout_copy_end_to_end(self):
-        row = self.codex_t14_run(with_rollout=True)
+        row = self.codex_t14_run(with_rollout=True, survivors=self.NO_SURVIVORS)
         component = next(part for part in row["components"] if part["id"] == "B")
         self.assertEqual((component["status"], component["reason"]), ("pass", None))
         self.assertEqual(row["recorded"]["t14"], {"reported": 1, "expected": 1})
+
+    def test_a_codex_session_process_that_outlived_the_child_fails_the_survival_clause(self):
+        """U10 lists the processes of the attempt's session as `attempts/<identity>/survivors.json` and ends them before any
+        post-arm capture, so that record is the only evidence of an owned Codex process that survived (design 2.8 step 6)."""
+        record = {"count": 1, "processes": [{"pid": 700, "pgid": 700, "start_time": ts(10), "command": "/usr/bin/sleep 300"}]}
+        row = self.codex_t14_run(with_rollout=True, survivors=record)
+        component = next(part for part in row["components"] if part["id"] == "B")
+        self.assertEqual((component["status"], component["reason"]), ("fail", "owned_process_survives"))
+
+    def test_a_codex_attempt_without_its_survivors_record_is_unknown_never_a_pass(self):
+        row = self.codex_t14_run(with_rollout=True, survivors=None)
+        component = next(part for part in row["components"] if part["id"] == "B")
+        self.assertEqual((component["status"], component["reason"]), ("unknown", "survival_unobserved"))
 
     def test_a_codex_t14_attempt_without_a_rollout_copy_is_unknown_not_a_failure(self):
         row = self.codex_t14_run(with_rollout=False)
@@ -4512,9 +4562,10 @@ class MiniRun:
         self.launches.append({"identity": label, "actor": "agent_child", "session_id": session})
         return label
 
-    def codex_exec(self, task, text, *, arm="B", attempt=1, fetch=(), shell=(), rollout=None):
-        """A Codex exec launch: the events file, U10's row (with the thread id) and, when given, the rollout copy that U10
-        retains under attempts/<identity>/rollouts/. `shell` is [(command, output)] of succeeded command items."""
+    def codex_exec(self, task, text, *, arm="B", attempt=1, fetch=(), shell=(), rollout=None, survivors=None):
+        """A Codex exec launch: the events file, U10's row (with the thread id) and, when given, the rollout copy and the
+        survivors record that U10 retains under attempts/<identity>/ (rollouts/ and survivors.json: {count, processes}).
+        `shell` is [(command, output)] of succeeded command items."""
         label = self.ident(arm, task, attempt)
         path = self.e2e / f"{label}.events.jsonl"
         records = [{"type": "thread.started", "thread_id": "thread-fx1"}]
@@ -4531,6 +4582,8 @@ class MiniRun:
         if rollout is not None:
             write_jsonl(self.e2e / "codex-driver" / "attempts" / label / "rollouts" / "rollout-2026-10-05T01-00-00-thread-fx1.jsonl",
                         rollout)
+        if survivors is not None:
+            write_json(self.e2e / "codex-driver" / "attempts" / label / "survivors.json", survivors)
         self.codex_rows.append({"identity": label, "actor": "codex_exec", "events_file": str(path), "thread_id": "thread-fx1"})
         return label
 
@@ -5085,6 +5138,45 @@ class F16_GradeCommand(GraderCase):
         qmd = json.loads(out.read_text(encoding="utf-8"))["m8"]["qmd"]
         self.assertEqual((qmd["O"], qmd["R"]), (5, 0), "five planned tasks, none launched")
         self.assertFalse((private / "join-claude.jsonl").exists())
+
+    def m8_without_ledgers(self, run):
+        private, out = run.tmp / "private-nojoin", run.tmp / "aggregate-nojoin.json"
+        args = run.grade_args(private, out)
+        stripped = [item for index, item in enumerate(args) if item != "--join-ledger" and args[index - 1] != "--join-ledger"]
+        self.assertIn(run_grade(stripped).returncode, (0, 1))
+        return json.loads(out.read_text(encoding="utf-8"))["m8"]
+
+    def test_empty_ledgers_count_the_same_opportunities_as_no_ledgers(self):
+        """Review of the ledger path: O may not shrink because a ledger lacks the not_launched row of a planned task (a fail
+        could become a pass). A planned task with no row and no record is a not_launched opportunity on both paths."""
+        run = MiniRun(self)
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        with_ledgers = json.loads(out.read_text(encoding="utf-8"))["m8"]
+        without = self.m8_without_ledgers(run)
+        self.assertEqual(with_ledgers, without)
+        self.assertEqual({lane: item["O"] for lane, item in without.items()}, {"symbol-references": 9, "qmd": 5, "ai-memory": 7})
+
+    def test_a_graded_attempt_the_ledger_does_not_list_is_still_an_opportunity(self):
+        run = MiniRun(self)
+        run.workflow("B", "seed-catalog-history-1", answer_rows("x"), {"answer": "x", "evidence": []}, agent_id="fxq1")
+        run.join_rows = [row for row in run.join_rows if row["task"] != "seed-catalog-history-1"]
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        qmd = json.loads(out.read_text(encoding="utf-8"))["m8"]["qmd"]
+        self.assertEqual((qmd["O"], qmd["R"]), (5, 1), "the recorded attempt plus four tasks never launched")
+
+    def test_a_ledger_row_of_a_task_outside_the_lane_population_is_ignored(self):
+        run = MiniRun(self)
+        base = self.unlisted_qmd_rows(run)[0]
+        run.join_rows.append(dict(base, identity=run.ident("B", "reuse-296-01", 1), task="reuse-296-01"))
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        qmd = json.loads(out.read_text(encoding="utf-8"))["m8"]["qmd"]
+        self.assertEqual((qmd["O"], qmd["R"]), (5, 0), "reuse-296-01 does not carry the qmd tag")
 
     def test_regrade_keeps_the_join_ledger_in_the_private_directory(self):
         run = MiniRun(self)
