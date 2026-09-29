@@ -150,6 +150,56 @@ BLOCKED = {
     "cat <<EOF\nvalue: '$(printenv)' and \\$HOME\nEOF": "environment_dump",
     "cat <<A <<'B'\n\"$(printenv)\"\nA\nquoted\nB": "environment_dump",
     "echo \"$(cat <<EOF\nvalue: \"$(printenv)\"\nEOF\n)\"": "environment_dump",
+    # A quoted here-document inside a double-quoted substitution is data only where the command that receives the substitution as an
+    # argument stores or prints it (git, gh, echo, printf, cat, tee, behind any launcher: DATA_CONSUMERS, 2026-09-29 repair round). The
+    # output of the substitution is CODE for a shell (`-c`), eval, an interpreter, source, xargs, watch, ssh or any other program, and
+    # the shell runs it, so those keep the old reading, the body read as command lines. The first nine rows are the forms the round's
+    # side-by-side probes found the guard letting through while the base guard (main c26800f3) refused them: bash re-reads what a
+    # substitution prints, so the words of a `-c` string or of eval are read as commands. Each is an inert string.
+    "eval \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "sh -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "zsh -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "env bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "timeout 5 bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "nohup sh -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "xargs sh -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "echo \"$(eval \"$(cat <<'EOF'\nprintenv\nEOF\n)\")\"": "environment_dump",  # a code consumer nested inside a data consumer's substitution
+    # cat and tee take their operands as file names, so a substitution that is their operand is no data even though they are data consumers
+    # for a here-string: the base guard refused these through the reader rules, and the first repair round let them through.
+    "cat -- \"$(cat <<'EOF'\n/home/example/.aws/credentials\nEOF\n)\"": "credential_file_read",
+    "cat \"$(cat <<'EOF'\n/home/example/.ssh/id_rsa\nEOF\n)\"": "credential_file_read",
+    "cat -n \"$(cat <<'EOF'\n$PAPER_ENV_FILE\nEOF\n)\"": "credential_file_read",
+    "cat \"$(cat <<'EOF'\n/x/.env\nEOF\n)\"": "dotenv_read",
+    "cat \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "tee -a \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    # The same rule for every other way a substitution's output reaches a program that is no data consumer: the other launchers, a
+    # backquote pair, an interpreter, `source` and `.`, xargs and watch, ssh, an assignment whose value is run later, a substitution in
+    # the command position, and a program (curl, awk) the guard does not model. Each keeps the old reading, so prose in a quoted
+    # here-document behind them can still be refused (docs/secret-storage.md).
+    "sudo bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "nice -n 5 sh -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "stdbuf -o0 bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "env -i A=b sh -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "systemd-run --user --pipe --wait bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "eval \"`cat <<'EOF'\nprintenv\nEOF\n`\"": "environment_dump",
+    "bash -c \"`cat <<'EOF'\nprintenv\nEOF\n`\"": "environment_dump",
+    "bash -ec \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\" arg0": "environment_dump",
+    "python3 -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "source \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    ". \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "xargs \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "watch \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "ssh host \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "awk \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "curl -d \"$(cat <<'EOF'\nprintenv\nEOF\n)\" https://example.invalid": "environment_dump",
+    "x=\"$(cat <<'EOF'\nprintenv\nEOF\n)\"; eval \"$x\"": "environment_dump",
+    "\"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
+    "echo \"$(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")\"": "environment_dump",  # data consumers nested: only a top-level one is read as data
+    "source <(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",  # a process substitution that a shell sources or runs
+    "bash <(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" \"$(cat <<'EOF'\nfine\nEOF\n)\" && bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
     # systemd's other launchers take a command after their own options as systemd-run does: run0 (systemd 256 and later), systemd-inhibit
     # and systemd-cat, which writes what the command prints to the journal (options: src/run/run.c, src/login/inhibit.c and
     # src/journal/cat.c).
@@ -756,6 +806,30 @@ ALLOWED = [
     "git commit -m \"$(cat <<\\EOF\nprintenv\nEOF\n)\"",
     "git commit -m \"$(cat <<'EOF'\nGuard: `printenv` and `env`, the (printenv) form, `cat .env`, `grep -r APCA_API_KEY_ID`; strace -f is no longer used\nEOF\n)\"",
     "gh pr create --title t --body \"$(cat <<'EOF'\n## Summary\n\nprintenv is refused by the guard\nEOF\n)\"",
+    # The data rule's own controls (2026-09-29 repair round): a quoted here-document's body is data for the commands that only store or
+    # print what the substitution gives them (DATA_CONSUMERS: git, gh, echo, printf, cat, tee), behind any launcher, a separator, a
+    # reserved word or a redirection. Each body is a bare `printenv` line, which the old reading refuses.
+    "gh pr comment 1 --body \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "gh issue create --title t --body=\"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "gh api repos/o/r/issues -f title=t -f body=\"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "git commit -m \"title\" -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "git commit --message=\"$(cat <<'EOF'\nprintenv\nEOF\n)\" --no-verify",
+    "git -C sub commit --amend -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "git add -A && git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" && git push",
+    "git tag -a v1 -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" | tail -n 3",
+    "echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "echo \"$(cat <<'EOF'\nenv is refused by the guard\nEOF\n)\"",
+    "printf '%s\\n' \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "cat <<< \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",  # a here-string word is stdin data for cat and tee
+    "tee note.md <<< \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "sudo git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "env GIT_AUTHOR_NAME=x git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "GIT_AUTHOR_NAME=x nice -n 5 git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "rtk proxy git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "/usr/bin/git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "if git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"; then echo done; fi",
+    "( cd sub && git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" )",
+    "git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" \"$(cat <<'EOF'\nenv\nEOF\n)\"",
     # Repair round, coverage: the commands the guard's own hints and the docs offer instead of the refused ones, `$(< FILE)` of an ordinary
     # file, a quoted here-document (no substitution in it runs), a path-qualified launcher of an ordinary command, the systemd launchers on
     # ordinary work, `systemctl show` naming a unit or other properties, and `ps -C` with a command name.
@@ -1033,6 +1107,13 @@ EXPECTED_PASS_THROUGH = [
     # A shell that runs a quoted here-document as code, inside a double-quoted substitution, passes: the body of a quoted here-document is
     # data for the scan of substitution bodies, and how the guard reads here-documents as code is a later change.
     "echo \"$(bash <<'EOF'\nprintenv\nEOF\n)\"",
+    # The data rule reads the command that receives the substitution, not where that command's own output goes or what one of its
+    # arguments means to it: an echo piped into a shell, an echo whose output is a script run later, and a git option whose value git
+    # runs (`git -c core.pager=...`; the same for `gh alias set`) pass. The base guard read no double-quoted substitution at all and
+    # passed each of them too, so the repair round loosened none of them.
+    "echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\" | sh",
+    "echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\" > run.sh && sh run.sh",
+    "git -c core.pager=\"$(cat <<'EOF'\nprintenv\nEOF\n)\" log",
     # Further known gaps of this repair round, each checked by running it: a case pattern's `)` closes a `$(`; a long option abbreviated
     # to a unique prefix is read as a flag (getopt_long accepts `--mach host`, `--uni demo`); machinectl and busctl reach the
     # manager's environment; a value forwarded through run0 or systemd-run's properties other than Environment=; bash 5.3's
@@ -1165,6 +1246,32 @@ SUBSTITUTION_BODIES = [
     ('echo "$(cat <<\\EOF\nq ) "x"\nEOF\n)"', ["cat <<\\EOF\nEOF\n"]),
     ("echo \"$(cat <<'A' <<B\none\nA\n$(x)\nB\n)\"", ["cat <<'A' <<B\nA\n$(x)\nB\n"]),  # one quoted, one not: only the first is data
     ("echo \"$(cat <<'E'OF\nprintenv\nEOF\n)\"", ["cat <<'E'OF\nEOF\n"]),  # a delimiter quoted in part is quoted
+    # The data rule reaches a body only when the command that receives the substitution is a data consumer (DATA_CONSUMERS: git, gh,
+    # echo, printf, cat, tee, behind launchers and reserved words). For a shell, eval, an interpreter, source, xargs, watch, ssh, any
+    # other program, an assignment, the command position or a substitution nested in another, the body keeps its here-document.
+    ("git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nEOF\n"]),
+    ("git add -A && git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nEOF\n"]),
+    ("sudo -u x env A=b nice -n 5 gh pr create --body \"$(cat <<'EOF'\nx\nEOF\n)\"", ["cat <<'EOF'\nEOF\n"]),
+    ("rtk proxy git commit -m \"$(cat <<'EOF'\nx\nEOF\n)\"", ["cat <<'EOF'\nEOF\n"]),
+    ("if git commit -m \"$(cat <<'EOF'\nx\nEOF\n)\"; then :; fi", ["cat <<'EOF'\nEOF\n"]),
+    ("tee f <<< \"$(cat <<'EOF'\nx\nEOF\n)\"", ["cat <<'EOF'\nEOF\n"]),
+    ("eval \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    ("bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    ("env bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    ("timeout 5 bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    ("xargs sh -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    ("python3 -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    ("curl -d \"$(cat <<'EOF'\nprintenv\nEOF\n)\" x", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    ("x=\"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),  # an assignment: its value may be run later
+    ("\"$(cat <<'EOF'\nprintenv\nEOF\n)\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),  # the command position: its output is the command
+    ("eval \"`cat <<'EOF'\nprintenv\nEOF\n`\"", ["cat <<'EOF'\nprintenv\nEOF\n"]),
+    # A substitution nested in another is read at its own level: the outer echo does not make the eval's here-document data, and an
+    # echo inside a code consumer's substitution keeps its here-document as well (the flag `allowed` of scan_shell reaches every level).
+    ("echo \"$(eval \"$(cat <<'EOF'\nprintenv\nEOF\n)\")\"", ["eval \"$(cat <<'EOF'\nprintenv\nEOF\n)\""]),
+    ("sh -c \"$(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")\"", ["echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\""]),
+    # One consumer per substitution: the first is data for git, the second is code for bash.
+    ("git commit -m \"$(cat <<'EOF'\nx\nEOF\n)\" && bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+     ["cat <<'EOF'\nEOF\n", "cat <<'EOF'\nprintenv\nEOF\n"]),
     # The body of a here-document with an unquoted delimiter is expanded by the shell: a `$(...)` in it is a body of its own, found while
     # the surrounding text is read as it was (a top-level here-document keeps its reading as command lines), quotes in it being text.
     ("cat <<EOF\nvalue: \"$(printenv)\" 'x' $(date)\nEOF", ["printenv", "date"]),
@@ -1458,6 +1565,10 @@ ORACLE_MUST_STAY = [
     'sh -c "$(cat)" <<\'EOF\'\nprintenv\nEOF',
     "bash /dev/stdin <<'EOF'\nprintenv\nEOF",
     "while read -r l; do eval \"$l\"; done <<'EOF'\nprintenv\nEOF",
+    # The top-level idioms whose consumer runs what the substitution prints (the base guard refused both; the first repair round let
+    # them through by treating every quoted here-document in a double-quoted substitution as data).
+    "eval \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+    "bash -c \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
 ]
 ORACLE_STAY_ALLOWED = [
     "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic 'exec python3 blueprints/us-equities/adaptive-paper/"
@@ -1670,6 +1781,133 @@ class SecretPathGuardTests(unittest.TestCase):
                             "gh pr create --title t --body \"$(cat <<'EOF'\n" + message + "\nEOF\n)\""):
                 with self.subTest(message=message.splitlines()[0], command=command[:20]):
                     self.assertIsNone(guard.check(command))
+
+    def test_the_data_rule_reaches_only_the_substitutions_of_data_consumers(self):
+        # A quoted here-document inside a double-quoted substitution is data when the command that receives the substitution stores or
+        # prints it. What it prints is CODE for a shell, eval, an interpreter, source, xargs, watch, ssh and any program the guard does
+        # not know, so those, an assignment and the command position keep the old reading (the body read as command lines). The base
+        # guard refused every `-c` and eval form through its re-reading of the words; the first repair round hid their bodies.
+        self.assertEqual(guard.DATA_CONSUMERS, {"git", "gh", "echo", "printf", "cat", "tee"})
+        self.assertEqual(guard.FILE_OPERAND_CONSUMERS, {"cat", "tee"})
+        body = "cat <<'EOF'\nprintenv\nEOF\n"
+        for program in sorted(guard.DATA_CONSUMERS - guard.FILE_OPERAND_CONSUMERS):
+            with self.subTest(program=program):
+                self.assertEqual(guard.substitution_bodies(f'{program} "$({body})"'), ["cat <<'EOF'\nEOF\n"])
+        # cat and tee take their operands as file names: the substitution is data for them as a here-string word only.
+        for program in sorted(guard.FILE_OPERAND_CONSUMERS):
+            with self.subTest(program=program, form="here-string"):
+                self.assertEqual(guard.substitution_bodies(f'{program} <<< "$({body})"'), ["cat <<'EOF'\nEOF\n"])
+            for operand in (f'{program} "$({body})"', f'{program} -- "$({body})"', f'{program} -n x "$({body})"'):
+                with self.subTest(command=operand):
+                    self.assertEqual(guard.substitution_bodies(operand), [body])
+        for program in ("sh -c", "bash -c", "zsh -c", "dash -c", "ksh -c", "eval", "source", ".", "python3 -c", "perl -e", "node -e",
+                        "ruby -e", "uv run python -c", "xargs", "watch", "ssh host", "awk", "sed", "jq", "curl -d", "true",
+                        "sudo bash -c", "env bash -c", "nohup sh -c", "timeout 5 bash -c", "xargs sh -c", "rtk proxy bash -c",
+                        f"{EXEC} bash -c", "git-lfs", "ggit", "gitx", "echo2"):
+            with self.subTest(program=program):
+                self.assertEqual(guard.substitution_bodies(f'{program} "$({body})"'), [body])
+
+    def test_only_a_here_document_at_the_command_level_of_a_body_is_data(self):
+        # The data rule reaches a quoted here-document that stands at the command level of the returned body, not one inside a substitution
+        # nested in it, and never one in the expanded body of another here-document: those keep the old reading, read as command lines,
+        # which is the strict direction. The nested forms that pass are the ones whose prose holds no command line.
+        cut = "cat <<'EOF'\nEOF\n"
+        whole = "cat <<'EOF'\nprintenv\nEOF\n"
+        self.assertEqual(guard.substitution_bodies(f'echo "$({whole})"'), [cut])
+        self.assertEqual(guard.substitution_bodies(f'echo "$(echo "$({whole})")"'), [f'echo "$({whole})"'])
+        self.assertEqual(guard.substitution_bodies(f'echo "$(echo $({whole}))"'), [f"echo $({whole})"])
+        self.assertEqual(guard.substitution_bodies(f'cat <<OUTER\n"$({whole})"\nOUTER'), [whole])
+        # The tokenizer's input follows: data removed only for a substitution whose here-document was data.
+        self.assertEqual(guard.scan_shell(f'git commit -m "$({whole})"')[3], [(len('git commit -m "$(cat <<\'EOF\'\n'),
+                                                                               len('git commit -m "$(cat <<\'EOF\'\nprintenv\n'))])
+        self.assertEqual(guard.scan_shell(f'bash -c "$({whole})"')[3], [])
+        self.assertEqual(guard.scan_shell(f'echo "$(echo "$({whole})")"')[3], [])
+
+    def test_the_consumer_of_a_substitution_is_read_from_its_own_command(self):
+        # A double-quoted substitution whose here-document is data is True: the program that receives it as an argument is a data
+        # consumer, after the reserved words, assignments, wrappers and launchers the guard skips. The scan shows it as a body that lost its
+        # here-document (and as a span in `kept`, which the tokenizer drops too).
+        hole = "$(cat <<'EOF'\nprintenv\nEOF\n)"
+        for command, expected in (
+                (f'git commit -m "{hole}"', [True]),
+                (f'git commit -m "{hole}" "{hole}"', [True, True]),
+                (f'git commit -m"{hole}"', [True]),
+                (f'git commit --message="{hole}"', [True]),
+                (f'if git commit -m "{hole}"; then :; fi', [True]),
+                (f'true && ! git commit -m "{hole}"', [True]),
+                (f'GIT_X=1 git commit -m "{hole}"', [True]),
+                (f'sudo -u root nice -n 5 env A=b git commit -m "{hole}"', [True]),
+                (f'xargs -n 1 git commit -m "{hole}"', [True]),
+                (f'rtk proxy git commit -m "{hole}"', [True]),
+                (f'rtk -v git commit -m "{hole}"', [True]),
+                (f'systemd-run --user --pipe git commit -m "{hole}"', [True]),
+                (f'{EXEC} git commit -m "{hole}"', [True]),
+                (f'echo "{hole}" > out.txt', [True]),
+                (f'cat <<< "{hole}"', [True]),
+                (f'gh pr create --title t --body "{hole}"', [True]),
+                (f'tee f <<< "{hole}"', [True]),
+                (f'printf %s "{hole}"', [True]),
+                (f'cat <<< "{hole}" "{hole}"', [True, False]),  # a here-string word is stdin data; the operand after it is a file name
+                (f'cat 0<<< "{hole}"', [True]),
+                (f'cat > out.txt <<< "{hole}"', [True]),
+                (f'tee -a f <<< "{hole}"', [True]),
+                (f'( cd sub && git commit -m "{hole}" )', [True]),
+                (f'x=$(git commit -m "{hole}")', [True]),
+                (f'git add -A; git commit -m "{hole}" # it\'s done', [True]),
+                (f'cat > f <<\'E\'\ndon\'t\nE\ngit commit -m "{hole}"', [True]),
+                # No data consumer receives it as an argument (cat and tee read an operand as a file name):
+                (f'cat -- "{hole}"', [False]),
+                (f'cat "{hole}"', [False]),
+                (f'tee -a "{hole}"', [False]),
+                (f'tee f "{hole}" <<< x', [False]),
+                (f'eval "{hole}"', [False]),
+                (f'bash -c "{hole}"', [False]),
+                (f'env bash -c "{hole}"', [False]),
+                (f'xargs "{hole}"', [False]),
+                (f'xargs sh -c "{hole}"', [False]),
+                (f'watch "{hole}"', [False]),
+                (f'"{hole}"', [False]),
+                (f'x="{hole}"', [False]),
+                (f'x="{hole}" y=2', [False]),
+                (f'X="{hole}" git commit -m x', [False]),
+                (f'timeout "{hole}" git commit', [False]),
+                (f'curl -d "{hole}" x', [False]),
+                (f'git-lfs "{hole}"', [False]),
+                (f'ggit commit -m "{hole}"', [False]),
+                (f'git"{hole}"', [False]),
+                (f'rtk run "{hole}"', [False]),
+                (f'rtk read "{hole}"', [False]),
+                (f'python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- bash -c "{hole}"', [False]),
+                (f'true; bash -c "{hole}"; git commit -m x', [False]),
+                # One text, two consumers:
+                (f'git commit -m "{hole}" && bash -c "{hole}"', [True, False]),
+                (f'bash -c "{hole}" && git commit -m "{hole}"', [False, True]),
+                (f'echo "{hole}" | sh', [True]),  # its own command is echo; where its output goes is not read (a recorded gap)
+                # A text that cannot be read as a whole, or holds the markers themselves:
+                (f'git commit -m "{hole}" \ue0010\ue002', None),
+                ):
+            with self.subTest(command=command):
+                bodies, comments, _protected, kept = guard.scan_shell(command)
+                if expected is None:
+                    self.assertEqual(kept, [])
+                    continue
+                # a body lost its here-document exactly where its consumer takes data
+                stripped = [body for body in bodies if body == "cat <<'EOF'\nEOF\n"]
+                self.assertEqual(len(stripped), sum(expected))
+                self.assertEqual(len(kept), sum(expected))
+
+    def test_a_text_too_long_to_read_for_its_consumer_keeps_the_strict_reading(self):
+        # Beyond DATA_CONSUMER_TEXT_LIMIT characters left after the cuts data_consumers() does not tokenize once more (that would cost
+        # about a second) and answers False everywhere, so the body of the substitution stays what it was before the data rule.
+        hole = "$(cat <<'EOF'\nprintenv\nEOF\n)"
+        short = f'git commit -m "{hole}"'
+        long = 'echo "' + "a" * (guard.DATA_CONSUMER_TEXT_LIMIT + 10) + f'"; {short}'
+        self.assertEqual(guard.scan_shell(short)[0], ["cat <<'EOF'\nEOF\n"])
+        self.assertEqual(guard.scan_shell(long)[0], ["cat <<'EOF'\nprintenv\nEOF\n"])
+        self.assertEqual(guard.check(short), None)
+        self.assertEqual(guard.check(long), "environment_dump")
+        # The markers are private-use characters: a text that holds one is read strictly, whatever stands around it.
+        self.assertEqual(guard.scan_shell(f'git commit -m "{hole}" \ue0010\ue002')[0], ["cat <<'EOF'\nprintenv\nEOF\n"])
 
     def test_oracle_groups_keep_their_verdicts(self):
         for rows, blocked in ((ORACLE_MUST_BLOCK, True), (ORACLE_MUST_STAY, True), (ORACLE_MUST_ALLOW, False),

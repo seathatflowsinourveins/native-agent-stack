@@ -280,6 +280,27 @@ SUBSTITUTION_BUDGET_FLOOR = 65536
 # about 9 microseconds a character inside quotes; above this length only the first reading is made, so a very large command
 # costs what it always did (a 840 KB message took 8.6 s once and 17.8 s twice, and the hook's timeout is 10 s).
 LEGACY_READING_LIMIT = 200_000
+# Programs that only store or print what a command substitution gives them as an argument: `git commit -m "$(cat <<'EOF' ... EOF)"`, `gh pr
+# create --body "$(...)"`, `echo`, `printf`, `cat`, `tee`. The body of a quoted here-document inside a double-quoted substitution is data
+# for them, so prose in a commit message or a pull request body is no command line (scan_shell). What a substitution prints is CODE for a
+# shell (`bash -c "$(...)"`), eval, an interpreter, `source` or `.`, xargs, watch, ssh and every program not listed here, and bash runs it;
+# for those, for an assignment whose value is run later, for a substitution in the command position and for one nested in another, the
+# body keeps the old reading, read as command lines. data_consumers() names the command; where it cannot tell, the answer is no.
+DATA_CONSUMERS = {"git", "gh", "echo", "printf", "cat", "tee"}
+# `cat` and `tee` take their positional operands as file names, not as data (`cat "$(...)"` reads the file the substitution names, and the
+# reader rules read that word for a credential path), so a substitution is data for them only as the word of a here-string
+# (`cat <<< "$(...)"`, `tee f <<< "$(...)"`): found by the 2026-09-29 matrix of consumers, where the plain allowlist loosened a `cat` of an
+# ssh, aws or pointer-variable path that the base guard refused.
+FILE_OPERAND_CONSUMERS = {"cat", "tee"}
+# Reserved words that may stand before a command without being one (`if git commit -m ...; then`, `! cmd`, `{ cmd; }`), skipped when the
+# command that receives a substitution is looked up.
+RESERVED_STARTERS = {"!", "{", "}", "if", "then", "elif", "else", "while", "until", "do"}
+# What data_consumers() puts in place of each substitution: private-use characters around the substitution's number.
+SUBSTITUTION_MARKER = re.compile("\ue001([0-9]+)\ue002")
+# The longest text data_consumers() reads, and the launcher hops it follows (`rtk run`, a keyring exec): beyond them the answer is no,
+# which is the old, stricter reading. The text is the command without its comments and without the substitutions it is looking up.
+DATA_CONSUMER_TEXT_LIMIT = 100_000
+MAX_LAUNCH_HOPS = 16
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
@@ -384,16 +405,23 @@ def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy:
             cursor = last
         pieces.append(command[cursor:])
         command = "".join(pieces)
-    text = command.replace("`", " ; ").replace("\n", " ; ")
+    tokens = lex(command, legacy)
+    return [token.replace(PROTECTED_BACKQUOTE, "`") for token in tokens] if protected else tokens
+
+
+def lex(text: str, legacy: bool = False) -> list[str]:
+    """The words of text, punctuation apart, once tokenize() has cut its spans out: a backquote and a newline are `;` (the lines of a
+    command are joined that way), shlex reads the rest, and a text it cannot read (an unbalanced quote) is split by a regular
+    expression that keeps the quotes. Without `legacy`, `#` starts no comment for shlex (scan_shell found the real ones)."""
+    text = text.replace("`", " ; ").replace("\n", " ; ")
     try:
         lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
         lexer.whitespace_split = True
         if not legacy:
             lexer.commenters = ""
-        tokens = list(lexer)
+        return list(lexer)
     except ValueError:
-        tokens = re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
-    return [token.replace(PROTECTED_BACKQUOTE, "`") for token in tokens] if protected else tokens
+        return re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
 
 
 def segments(tokens: list[str]) -> list[list[str]]:
@@ -493,9 +521,14 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
     delimiter is quoted (`<<'EOF'`, `<<"EOF"`, `<<\\EOF`) the body is data to the shell, so a returned body loses it
     (the operator line and the terminator stay), and so does the tokenizer's input once that substitution closes (the
     fourth result): a commit message in `git commit -m "$(cat <<'EOF' ... EOF)"` is no command, whatever its quotes do
-    to shlex's parity. The body of a here-document with an unquoted delimiter is expanded by the shell, so it is scanned
-    as double-quoted text with no closing quote (`initial="hd"`) and each `$(...)` or backquote pair in it is a body of
-    its own. How the guard reads a top-level here-document as commands is a separate matter and this scan does not
+    to shlex's parity. That holds only for a quoted here-document that stands at the command level of a returned body
+    (not inside a substitution nested in it) and only where the command that receives the substitution as an argument
+    stores or prints it (DATA_CONSUMERS, decided by data_consumers() once the whole text is scanned): what a substitution
+    prints is code for `bash -c "$(...)"`, `eval "$(...)"` and every program the guard does not know, and there the body
+    keeps its here-document, read as command lines. The body of a here-document with an unquoted delimiter is expanded by
+    the shell, so it is scanned as double-quoted text with no closing quote (`initial="hd"`) and each `$(...)` or
+    backquote pair in it is a body of its own (its here-documents are never data: the command that receives it is not
+    read there). How the guard reads a top-level here-document as commands is a separate matter and this scan does not
     touch it.
 
     Comments: the spans, one per line, that bash ignores at the top level of text: from a `#` that starts a word,
@@ -510,10 +543,16 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
     bodies: list[str] = []
     comments: list[tuple[int, int]] = []
     protected: list[int] = []  # backquotes inside single-quoted or ANSI-C strings at the top level
-    kept: list[tuple[int, int]] = []  # quoted here-document bodies inside a reported body that closes: data for the tokenizer too
-    data: list[tuple[int, int]] = []  # bodies of quoted here-documents inside the reported body that is open
+    kept: list[tuple[int, int]] = []  # quoted here-document bodies inside a returned body whose consumer takes data: data for the tokenizer too
+    data: list[tuple[int, int]] = []  # bodies of quoted here-documents at the command level of the returned body that is open
     heredocs: list[tuple[str, bool, bool]] = []  # `<<` (delimiter, strips tabs, quoted) seen on the current line
     lines: dict[bool, dict[str, list[int]]] = {}
+    # What data_consumers() needs, kept only for a text that has a quoted here-document to decide on: where each returned
+    # substitution lies (with the index of its body), the bodies cut out of here-documents at the top level, and the
+    # substitutions whose here-documents wait for that decision: (body index, start, end, kind, closed, here-document bodies).
+    spans: list[tuple[int, int, int]] = []
+    cuts: list[tuple[int, int]] = []
+    pending: list[tuple[int, int, int, str, bool, tuple[tuple[int, int], ...]]] = []
     # Frames, innermost last: [kind, start, parentheses, reported, dq, bodies_at_open]. Kinds: cmd (unquoted text),
     # sub (`$(`), bt (backquotes), dq (double quotes), param (`${`), dparam (`${` inside double quotes), arith (`$((`).
     # `dq` says whether a substitution opened here sits inside double quotes (param and arith inherit it from their
@@ -531,11 +570,12 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
         kind, start, _, reported = stack.pop()[:4]
         if reported:
             hidden -= 1
-            body = without_spans(text, start, at, data)
+            body = text[start:at]
+            spans.append((start - (2 if kind == "sub" else 1), at + 1 if closed else at, len(bodies)))
+            if data:  # its here-documents are data only if the command that receives the substitution takes data: decided below
+                pending.append((len(bodies), start, at, kind, closed, tuple(data)))
             bodies.append(BACKQUOTE_ESCAPE.sub(r"\1", body) if kind == "bt" else body)
             if not hidden:
-                if closed:  # a substitution that never closes is a syntax error: the tokenizer keeps reading it as before
-                    kept.extend(data)
                 data.clear()
 
     def protect(first: int, last: int) -> None:
@@ -632,9 +672,10 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
                     index, regions = found_end
                     for first, last, quoted in regions:
                         if hidden:
-                            if quoted:
+                            if quoted and frame[3] and initial != "hd":  # at the command level of the returned body itself
                                 data.append((first, last))
                             continue
+                        cuts.append((first, last))
                         if not quoted and nesting < MAX_HEREDOC_NESTING:  # the shell expands it: a `$(...)` in it runs
                             bodies.extend(scan_shell(text[first:last], "hd", nesting + 1)[0])
                         if comment := HEREDOC_COMMENT.search(text, first, last):
@@ -659,12 +700,25 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
                 if frame[3]:
                     hidden += 1
                     del bodies[frame[5]:]
+                    while spans and spans[-1][2] >= frame[5]:
+                        spans.pop()
+                    while pending and pending[-1][0] >= frame[5]:
+                        pending.pop()
             index += 1
     while len(stack) > 1:  # unterminated: what is left of the text
         if stack[-1][0] == "arith":
             stack.pop()
         else:
             close(end, False)
+    if pending:
+        answers = data_consumers(text, comments, cuts, spans)
+        numbers = {body: number for number, (_, _, body) in enumerate(spans)}
+        for body_index, start, at, kind, closed, holes in pending:
+            if answers[numbers[body_index]]:
+                body = without_spans(text, start, at, list(holes))
+                bodies[body_index] = BACKQUOTE_ESCAPE.sub(r"\1", body) if kind == "bt" else body
+                if closed:  # a substitution that never closes is a syntax error: the tokenizer keeps reading it as before
+                    kept.extend(holes)
     return bodies, comments, protected, kept
 
 
@@ -997,6 +1051,72 @@ def launcher_chain(words: list[str]) -> tuple[list[list[str]], int]:
             break
         at = prefix_end(words, start)
     return entries, at
+
+
+def receiving_command(words: list[str]) -> tuple[str, int] | None:
+    """(program, index of its word in words) of the command that receives the words after it as its arguments, as
+    command_segments() finds it: after leading reserved words (`if git commit ...`), assignments and output redirections,
+    wrappers, `env`, an rtk runner, the systemd launchers and a keyring exec. None when there is none (only assignments, or
+    an `rtk run` and the file readers, whose command rtk_command() builds), or after MAX_LAUNCH_HOPS launchers."""
+    shift = 0
+    for _ in range(MAX_LAUNCH_HOPS):
+        start = 0
+        while start < len(words) and words[start] in RESERVED_STARTERS:
+            start += 1
+        start = prefix_end(words, start)
+        if start >= len(words):
+            return None
+        start += launcher_chain(words[start:])[1]
+        if start >= len(words):
+            return None
+        shift += start
+        words = words[start:]
+        if program_of(words) == "rtk":
+            return None
+        started = keyring_exec(words)
+        if started is None:
+            return program_of(words), shift
+        shift += len(words) - len(started[1])
+        words = started[1]
+    return None
+
+
+def data_consumers(text: str, comments: list[tuple[int, int]], cuts: list[tuple[int, int]],
+                   spans: list[tuple[int, int, int]]) -> list[bool]:
+    """For each substitution of `spans` (first, end, body index; the double-quoted ones scan_shell returns bodies for), whether
+    the command that receives it as an argument is one of DATA_CONSUMERS (for `cat` and `tee`, as a here-string word only:
+    FILE_OPERAND_CONSUMERS), so that a quoted here-document at its command level is data. The text is read once more for that,
+    with its comments and top-level here-document bodies cut out and each substitution in place of a marker (private-use
+    characters around its number): the words of the segment that holds a marker say which command it belongs to. A marker
+    before the program word (an assignment's value, a wrapper's option value, the command position itself) is no argument, so
+    a substitution there, or one whose command is anything else (a shell with `-c`, eval, an interpreter, source, xargs, watch,
+    ssh ...), is no data: the answer is False wherever it cannot be told (a text with those characters, an unreadable
+    command, more than DATA_CONSUMER_TEXT_LIMIT characters left after the cuts)."""
+    answers = [False] * len(spans)
+    if "\ue001" in text or "\ue002" in text:
+        return answers
+    edits = [(first, last, "") for first, last in comments] + [(first, last, "") for first, last in cuts]
+    edits += [(first, last, f"\ue001{number}\ue002") for number, (first, last, _) in enumerate(spans)]
+    pieces, cursor = [], 0
+    for first, last, marker in sorted(edits, key=lambda edit: edit[:2]):
+        if first >= cursor:
+            pieces.append(text[cursor:first])
+            pieces.append(marker)
+            cursor = last
+    pieces.append(text[cursor:])
+    marked = "".join(pieces)
+    if len(marked) > DATA_CONSUMER_TEXT_LIMIT:
+        return answers
+    for words in segments(lex(marked)):
+        found = [(position, SUBSTITUTION_MARKER.findall(word)) for position, word in enumerate(words) if "\ue001" in word]
+        command = receiving_command(words) if found else None
+        if command is None or command[0] not in DATA_CONSUMERS:
+            continue
+        for position, numbers in found:
+            if position > command[1] and (command[0] not in FILE_OPERAND_CONSUMERS or words[position - 1] == "<<<"):
+                for number in numbers:
+                    answers[int(number)] = True
+    return answers
 
 
 def expand(command: str, depth: int = 0) -> list[list[str]]:
