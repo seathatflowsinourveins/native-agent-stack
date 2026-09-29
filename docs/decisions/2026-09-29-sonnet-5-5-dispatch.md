@@ -196,9 +196,11 @@ depend on the shared accounts' usage windows, which are read live before a run a
   `recipes/sota-convergence-practice.md` and `tools/sota-convergence/README.md` show `--effort high`, where the standing rule for GPT-6
   lanes is `max`. Open PR #216 does not touch it. Setting the default to `max` fails 49 of the 76 tests in `tests/test_codex_lane.py`,
   changes a file in the verdict review gate's `TRUST_PATHS` (a rules change is its own pull request) and the lane-code hash that
-  `tools/sota-convergence/lane-provenance.json` registers, and a lane return is reused only at the same `--effort`. The owner of the
-  first Codex stage of each wave flips it as a standalone rules pull request before that stage: `native-agent-stack-76` for the 20
-  foundation layers, and the roadmap session for the 12 trading layers, which checks that the flip has merged before it starts them.
+  `tools/sota-convergence/lane-provenance.json` registers, and a lane return is reused only at the same `--effort`. `native-agent-stack-76`
+  took it as a standalone foundation rules pull request (default, recipe, README, fixtures and the provenance registry) and tells the
+  roadmap session when it merges; its own foundation sweep does not use `codex_lane.py` (it passes `--effort max` explicitly through
+  `tools/sota-convergence/landscape-sweep/codex_job.py`), so nothing there waits on the flip. The roadmap session checks that the flip
+  has merged before it starts the 12 trading layers.
 - **OmniRoute Claude route.** `docs/foundation-stack.md`, `docs/token-efficiency-stack.json` and `blueprints/us-equities/routing/README.md`
   name `claude/claude-opus-5`, the route recorded as tested on 2026-09-18. An Opus 5.5 route needs its own native test through OmniRoute.
 - **Codex 0.158.0.** Released 2026-09-28; the host has 0.157.1. Its staged qualification needs GPT-6 runs and has not started.
