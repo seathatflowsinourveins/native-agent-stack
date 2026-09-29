@@ -909,6 +909,11 @@ def repair_once(harness, *, pr, head, findings, failing, repairer):
         raise LoopStopped("repairer_failed") from None
     if not isinstance(outcome, dict) or not isinstance(outcome.get("report", ""), str):
         raise LoopStopped("repairer_output_invalid")
+    if outcome.get("attempted") is False:
+        # No repair attempt ran (stage 2's _no_repair): no report, and nothing can have been pushed.
+        if outcome.get("pushed") or outcome.get("report"):
+            raise LoopStopped("repairer_output_invalid")
+        return {"status": "not_attempted", "head": head, "report": ""}
     report = outgoing_guard.normalize_text(outcome.get("report", "")).strip("\n")
     if not outcome.get("pushed"):
         return {"status": "not_pushed", "head": head, "report": report}
@@ -930,22 +935,40 @@ def repair_once(harness, *, pr, head, findings, failing, repairer):
             "ahead_by": comparison.get("ahead_by"), "report": report}
 
 
-def residuals_body(*, repair, checks, guard):
-    """Plan step 12: unaddressed findings with reasons and the final check states."""
-    span = outgoing_guard.code_span
+def residuals_body(*, findings, repair, checks, guard):
+    """Plan step 12: the review's findings, which of them stay open and why, and the final
+    check states (review item D2).
+
+    Model text (the findings and a repair report) appears only inside fences, after the
+    guard; every sentence outside a fence is the driver's. With no repair attempt, every
+    finding stays open, and the driver says so in its own words. The checks ran this pull
+    request's code, which the agent wrote, on runners with network access, so the comment
+    labels their results model-controlled rather than evidence (review item F2).
+    """
+    span, fence = outgoing_guard.code_span, outgoing_guard.fence
+    findings = outgoing_guard.normalize_text(findings or "").strip("\n")
     report = repair["report"]
-    if report.strip():
-        guard.check(report, model_authored=True)
+    for text in (findings, report):
+        if text.strip():
+            guard.check(text, model_authored=True)
     lines = ["Residual findings after the one repair round.", ""]
-    if repair["status"] == "pushed":
-        lines.append(f"Repair: pushed {span(repair['head'])}, a fast-forward of {span(repair['previous_head'])}.")
+    lines += (["Findings from the review (model output, shown as text):", "", fence(findings), ""]
+              if findings.strip() else ["The reviewer reported no findings.", ""])
+    if repair["status"] == "not_attempted":
+        lines.append("No repair attempt ran: this driver has no repair attempt yet (RESOLVER.md, stage 2)"
+                     + (", so every finding above is unaddressed." if findings.strip() else "."))
     else:
-        lines.append("No repair was pushed.")
-    lines += [""]
-    lines += (["Report from the repair attempt (model output, shown as text):", "", outgoing_guard.fence(report)]
-              if report.strip() else ["The repair attempt gave no report."])
+        lines.append(f"Repair: pushed {span(repair['head'])}, a fast-forward of {span(repair['previous_head'])}. "
+                     "The report below says which findings it addressed; the driver does not judge that."
+                     if repair["status"] == "pushed" else
+                     "No repair was pushed, so the findings above stay unaddressed.")
+        lines += [""]
+        lines += (["Report from the repair attempt (model output, shown as text):", "", fence(report)]
+                  if report.strip() else ["The repair attempt gave no report."])
     lines += ["", "Final required checks" + (" (incomplete at the 60-minute bound):" if checks["status"] == "incomplete"
-                                              else ":"), ""]
+                                              else ":"), "",
+              "These checks ran this pull request's code, which the agent wrote, on runners with network access. "
+              "Their results are model-controlled, not evidence that the change is correct.", ""]
     rows = [(str(check.get("name") or "unnamed"), check["bucket"]) for check in checks["checks"]]
     rows += [(context, "not reported") for context in checks["missing"]]
     if rows:
@@ -996,7 +1019,7 @@ class ReviewLoop:
         if repair["status"] == "pushed":
             checks = self._checks(repair["head"])
         self._view(repair["head"])
-        body = residuals_body(repair=repair, checks=checks, guard=self.guard)
+        body = residuals_body(findings=review["findings"], repair=repair, checks=checks, guard=self.guard)
         commented = self.harness.run(gh_harness.op_pr_comment(self.pr["number"],
                                                               self.guard.register(body, name="residuals")))
         if commented.returncode != 0:
@@ -1438,9 +1461,10 @@ def command_reviewer(argv, *, workdir, env, timeout=REVIEWER_TIMEOUT):
 
 
 def _no_repair(*, head, findings, failing):
-    """Stage 2's one repair round pushes nothing: the plan's repair attempt S' (section 2 step 11)
-    is not wired yet, so the residuals comment lists the findings and the final checks."""
-    return {"pushed": False, "report": "No repair attempt ran: stage 2 wires the review and residuals only."}
+    """Stage 2 has no repair attempt: the plan's attempt S' (section 2 step 11) is not wired, so
+    the round reports that none ran and carries no report (review item D2). residuals_body then
+    lists the review's findings as unaddressed, in the driver's words, not as model output."""
+    return {"attempted": False, "pushed": False, "report": ""}
 
 
 REVIEW_STATUSES = frozenset({"completed", "stopped", "not_run"})

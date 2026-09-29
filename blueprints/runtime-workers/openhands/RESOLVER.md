@@ -361,10 +361,13 @@ It runs only after the attempt's `result` action has released the serial
 reservation, because its checks wait is bounded at 60 minutes. The reviewer is the
 coordinator's `--reviewer-command`, run from an empty private directory with the
 reviewed diff on stdin and an allowlisted environment. Its output is model text,
-guarded before the one COMMENT review. The one repair round pushes nothing: the
-plan's repair attempt S' (section 2 step 11) is not wired, so the residuals comment
-lists the findings and the final checks. The loop never marks the PR ready, merges
-it or enables auto-merge.
+guarded before the one COMMENT review. No repair attempt runs, because the plan's
+repair attempt S' (section 2 step 11) is not wired. The residuals comment lists the
+review's findings as model text in a fence. Outside the fence, the driver states in
+its own words that no finding was addressed because no repair attempt ran. The
+comment then gives the final required checks. Those checks ran the PR's own code,
+which the agent wrote, so the comment labels their results model-controlled, not
+evidence. The loop never marks the PR ready, merges it or enables auto-merge.
 
 ### Receipt and exit status
 

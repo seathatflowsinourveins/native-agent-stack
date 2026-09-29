@@ -2190,7 +2190,43 @@ class PullRequestLoopTests(unittest.TestCase):
         self.assertEqual(len(github.reviews), 1)
         self.assertIn("The reviewer reported no findings.", github.reviews[0]["body"])
         self.assertIn("The findings need a human.", github.comments[0])
-        self.assertIn("No repair was pushed.", github.comments[0])
+        self.assertIn("No repair was pushed", github.comments[0])
+
+    def test_the_residuals_comment_lists_the_findings_and_says_in_host_words_why_they_stay_open(self):
+        # Review item D2: plan step 12's comment lists the unaddressed findings with their reason.
+        # Stage 2 has no repair attempt, so the reason is the driver's own sentence, outside every
+        # model-output fence, and nothing host-written is labelled as model output. Review item F2:
+        # the checks ran the PR's own code, so their results are labelled model-controlled.
+        findings = "high docs/a.md:1 the new line lacks a source; add one\nlow docs/a.md:2 wording"
+        github = ScriptedGitHub(head=self.head, checks=[(0, check_list("pass"), "")])
+        harness, record = self.opened(github, base_sha=self.base)
+        outcome = self.loop(harness, record, reviewer=lambda diff: findings, repairer=self.r._no_repair).run()
+        comment = github.comments[0]
+        self.assertIn("Findings from the review (model output, shown as text):\n\n```text\n" + findings + "\n```",
+                      comment)
+        fenced = "".join(re.findall(r"```text\n.*?\n```", comment, re.S))
+        self.assertIn("No repair attempt ran", comment)
+        self.assertIn("so every finding above is unaddressed", comment)
+        self.assertNotIn("No repair attempt ran", fenced)
+        self.assertNotIn("Report from the repair attempt", comment)
+        self.assertIn("model-controlled", comment)
+        self.assertIn("| `check-0` | `pass` |", comment)
+        self.assertEqual(outcome["repair"]["status"], "not_attempted")
+        # A reviewer with no findings: no fence at all, and still no model label on host text. A new
+        # guard, because a guard approves each body file name once.
+        self.guard = self.g.OutgoingGuard(directory=self.g.private_directory(self.tmp),
+                                          session_key=self.g.SessionKey(self.key_value),
+                                          host_paths=[str(self.tmp)], user_name="fixtureuser")
+        github = ScriptedGitHub(head=self.head, checks=[(0, check_list("pass"), "")])
+        harness, record = self.opened(github, base_sha=self.base)
+        self.loop(harness, record, reviewer=lambda diff: "", repairer=self.r._no_repair).run()
+        self.assertIn("The reviewer reported no findings.", github.comments[0])
+        self.assertNotIn("```", github.comments[0])
+        # Findings reach the comment through the guard as model text.
+        with self.assertRaises(self.g.GuardRefused) as caught:
+            self.r.residuals_body(findings=f"leaked {self.key_value}", repair={"status": "not_attempted", "report": ""},
+                                  checks={"status": "settled", "checks": [], "missing": []}, guard=self.guard)
+        self.assertEqual(caught.exception.reason, "session_key")
 
 
 class CommandLineTests(unittest.TestCase):
@@ -3712,7 +3748,9 @@ class ResolverRunTests(unittest.TestCase):
         self.assertEqual({key: section["review"][key] for key in ("status", "reason", "id", "commit_id")},
                          {"status": "completed", "reason": None, "id": 901, "commit_id": head})
         self.assertEqual(section["review"]["checks"]["status"], "settled")
-        self.assertEqual(section["review"]["repair"], "not_pushed")
+        self.assertEqual(section["review"]["repair"], "not_attempted")
+        self.assertIn("a heading would help", github.comments[0])
+        self.assertIn("so every finding above is unaddressed", github.comments[0])
         self.assertEqual(section["review"]["final"], {"isDraft": True, "state": "OPEN"})
         self.assertEqual((receipt["failure_stage"], receipt["task_passed"], receipt["evidence_complete"]),
                          (None, False, False))
