@@ -624,7 +624,7 @@ class CatalogueTests(HostCase):
         self.assertEqual(cap.value("repo.head"), self.host.git("rev-parse", "HEAD").strip())
         self.assertIs(cap.value("repo.tree_clean"), True)
         self.assertEqual(cap.value("repo.sealed.RUNBOOK.md"), sha256_path(self.host.repo / SEALED / "RUNBOOK.md"))
-        self.assertEqual(cap.value("repo.sealed.fixtures.table.json"), sha256_path(self.host.repo / SEALED / "fixtures" / "table.json"))
+        self.assertEqual(cap.value("repo.sealed.fixtures:table.json"), sha256_path(self.host.repo / SEALED / "fixtures" / "table.json"))
         self.assertEqual(cap.value("repo.carrier.token-lanes-block.builder.md"),
                          sha256_path(self.host.repo / "adoption" / "hooks" / "claude" / "token-lanes-block.builder.md"))
         self.assertEqual(cap.value("repo.capability_gate.briefs:m13.md"),
@@ -636,6 +636,7 @@ class CatalogueTests(HostCase):
         self.assertEqual(cap.value("claude.launcher.size"), launcher.stat().st_size)
         self.assertEqual(cap.value("claude.binary.version_name"), "2.1.284")
         self.assertEqual(cap.value("claude.binary.size"), len(b"fake claude binary bytes"))
+        self.assertEqual(cap.value("claude.binary.sha256"), sha256_bytes(b"fake claude binary bytes"))
         self.assertEqual(cap.value("claude.user_claude_md.sha256"), sha256_path(self.host.home / ".claude" / "CLAUDE.md"))
         self.assertEqual(cap.value("codex.version"), "codex-cli 0.157.1")
         self.assertIs(cap.value("codex.stack_worker_profile.present"), True)
@@ -658,7 +659,7 @@ class CatalogueTests(HostCase):
         self.assertEqual(stat.S_IMODE(cap.full.stat().st_mode), 0o600)
         full = json.loads(cap.full.read_text(encoding="utf-8"))
         clean = json.loads(cap.sanitized.read_text(encoding="utf-8"))
-        self.assertEqual((full["schema"], clean["schema"]), ("freeze-snapshot/1", "freeze-snapshot/1"))
+        self.assertEqual((full["schema"], clean["schema"]), ("freeze-snapshot-v1", "freeze-snapshot-v1"))
         self.assertEqual((full["sanitized"], clean["sanitized"]), (False, True))
         self.assertEqual(full["label"], "perm")
         self.assertEqual([i["id"] for i in full["items"]], [i["id"] for i in clean["items"]])
@@ -787,7 +788,6 @@ class CompareTests(HostCase):
         kinds = self.kinds(proc)
         self.assertEqual(proc.returncode, 0, proc.stdout)
         self.assertIn("capacity.claude.five_hour_utilization_fraction", kinds.get("INFO", []), proc.stdout)
-        self.assertIn("time.capture_start_utc", kinds.get("INFO", []), proc.stdout)
         self.assertFalse({"DRIFT", "MISSING", "ERROR"} & set(kinds), proc.stdout)
         third = self.capture("c", probe=False)  # the informational items become missing on one side: listed, never a failure
         skipped = self.compare(second, third)
@@ -828,7 +828,7 @@ class CompareTests(HostCase):
     def test_unreadable_or_foreign_input_is_a_usage_error(self):
         first = self.capture("a")
         junk = self.host.write(self.host.root / "junk.json", "{not json")
-        foreign = self.host.write(self.host.root / "foreign.json", json.dumps({"schema": "other/1", "items": []}))
+        foreign = self.host.write(self.host.root / "foreign.json", json.dumps({"schema": "other-v1", "items": []}))
         for other in (junk, foreign, self.host.root / "absent.json"):
             proc = self.host.run(self.tool, "compare", str(first.sanitized), str(other))
             self.assertEqual(proc.returncode, 2, f"{other.name}: {proc.stdout}{proc.stderr}")
@@ -985,7 +985,7 @@ class CheckTests(HostCase):
         proc = self.check(self.capture("open"), seal.sanitized, "--quiet")
         self.assertEqual(proc.returncode, 0)
         self.assertNotIn("PASS", proc.stdout)
-        bad = self.host.write(self.host.root / "bad.json", json.dumps({"schema": "freeze-snapshot/1", "items": "x"}))
+        bad = self.host.write(self.host.root / "bad.json", json.dumps({"schema": "freeze-snapshot-v1", "items": "x"}))
         self.assertEqual(self.check(seal, bad).returncode, 2)
         self.assertEqual(self.check(seal, self.host.root / "absent.json").returncode, 2)
 
@@ -1047,9 +1047,20 @@ class ConfigTests(HostCase):
         moved = self.host.home / "moved-parser"
         shutil.copytree(self.host.parser_dir, moved)
         shutil.rmtree(self.host.parser_dir)
-        self.assertEqual(self.capture("p-a").status("tools.parser.all_match_pin"), "missing")
+        before = self.capture("p-a")
+        self.assertIs(before.value("tools.parser.all_match_pin"), False, "nothing installed cannot match the pin")
+        self.assertEqual(before.status("tools.parser.file.tree-sitter-bash:package.json"), "missing")
         cap = self.capture("p-b", "--config", str(self.config({"parser_dir": "~/moved-parser"})))
         self.assertIs(cap.value("tools.parser.all_match_pin"), True)
+
+    def test_tokenizer_location_can_be_overridden(self):
+        moved = self.host.home / "moved-tokenizer"
+        shutil.copytree(self.host.home / ".local" / "share" / "native-token-report" / "tokenizer", moved)
+        shutil.rmtree(self.host.home / ".local" / "share" / "native-token-report")
+        self.assertEqual(self.capture("k-a").status("tools.tokenizer.version"), "missing")
+        cap = self.capture("k-b", "--config", str(self.config({"tokenizer_prefix": "~/moved-tokenizer"})))
+        self.assertEqual(cap.value("tools.tokenizer.version"), "3.4.0")
+        self.assertEqual(cap.status("tools.tokenizer.o200k_base.sha256"), "ok")
 
 
 class GatewayTests(HostCase):
@@ -1141,8 +1152,9 @@ class CapacityTests(HostCase):
         self.capture("q", env=self.host.env(OTEL_RESOURCE_ATTRIBUTES="ecosystem.task.id=run", RTK_DB_PATH="/x/rtk.db"))
         argv = (self.host.data / "claude.p.argv").read_text(encoding="utf-8").split()
         self.assertEqual(argv[:3], ["-p", "OK", "--model"])
-        for flag in ("haiku", "--output-format", "json", "--verbose", "--no-session-persistence"):
+        for flag in ("haiku", "--output-format", "json", "--verbose", "--no-session-persistence", "--setting-sources", "project"):
             self.assertIn(flag, argv)
+        self.assertEqual(argv[argv.index("--setting-sources") + 1], "project", "the probe loads no user settings, hooks or MCP servers")
         self.assertEqual(argv[argv.index("--output-format") + 1], "json")
         self.assertEqual((self.host.data / "claude.p.env").read_text(encoding="utf-8").split(), ["otel_unset", "rtk_unset"])
         cwd = Path((self.host.data / "claude.p.cwd").read_text(encoding="utf-8").strip()).resolve()
@@ -1579,6 +1591,7 @@ class MutationControlTests(unittest.TestCase):
                 for anchor, replacement in patches:
                     self.assertEqual(mutated.count(anchor), 1, f"{name}: anchor not found exactly once: {anchor!r}")
                     mutated = mutated.replace(anchor, replacement)
+                compile(mutated, name, "exec")  # a mutant that does not compile would fail every test for the wrong reason
                 path = folder / name / "freeze_snapshot.py"
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(mutated, encoding="utf-8")
