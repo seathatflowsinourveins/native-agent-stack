@@ -33,7 +33,7 @@
     },
     "measurements": 0,
     "overturn_metrics": {
-      "class_vs_verification_flipped_pairs": 4,
+      "class_vs_verification_flipped_pairs": 5,
       "class_vs_verification_flipped_winner_pairs": 0,
       "pin_current_tiebreak_would_unshare": 23
     },
@@ -52,14 +52,14 @@
         "candidate": 184,
         "winner": 66
       },
-      "shared": 369,
+      "shared": 368,
       "source_records": 614,
       "unresolved_records": 0
     },
     "status_items": {
       "coverage/not-reached": 52,
       "domain-card/default-never-winner": 8,
-      "evidence/class-verification-inversion": 4,
+      "evidence/class-verification-inversion": 5,
       "evidence/mixed-kind": 25,
       "evidence/unmapped-kind": 4,
       "evidence/winner-tier-below-alternative": 6,
@@ -74,12 +74,16 @@
       "role/winner-card-not-selected": 4,
       "source/sweep-manifest-divergence": 1,
       "status/declared-above-derived": 4,
+      "verification/alternative-receipt-off-platform": 0,
+      "verification/alternative-receipt-version-mismatch": 1,
+      "verification/alternative-receipt-version-unknown": 0,
       "verification/host-fail-recorded": 2,
       "verification/joined-by-repository": 28
     },
     "verification": {
       "alternative": {
-        "host_verified": 7,
+        "host_verified": 1,
+        "host_verified_at_stack_pin": 6,
         "not_run": 136,
         "receipts_recorded": 21
       },
@@ -18272,12 +18276,20 @@
   "id": "catalog-index",
   "inputs": [
     {
+      "path": "adoption/host-receipt.schema.json",
+      "scope": "the receipt shape host_receipts.build_summary validates each receipt against"
+    },
+    {
+      "path": "adoption/manifest.json",
+      "scope": "platform_profiles[] os and architecture, which host_receipts.build_summary checks each receipt's host against"
+    },
+    {
       "path": "catalogs/**/*.json + manifests/*.json",
       "scope": "sorted filesystem listing without this file's own path (coverage.catalog_files); each listed file is parsed only for a top-level non_repository_decisions array (coverage.unmodeled_collections), and component_matrix.newest_sweep_manifest reads the sweep manifests' checked_at to classify the matrix's inputs"
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "scope": "rows[]: catalog, layer_id, title, verdict_status, independent_review, open_gaps; winners[] component_id, repository, pin, evidence_class and per-platform catalog_status, derived_status, e2e_state, host_receipts; alternatives[] name, repository, disposition, evidence_class, e2e_state; convergence layer_state, verdict_checked_at, reopened_by and components[] winner_ids, pin_current; summary.convergence.newest_manifest"
+      "scope": "rows[]: catalog, layer_id, title, verdict_status, independent_review, open_gaps; winners[] component_id, repository, pin, evidence_class and per-platform catalog_status, derived_status, e2e_state, host_receipts; alternatives[] name, repository, disposition, evidence_class, e2e_state (which component_matrix.build_alternative must reproduce from the host receipts, F2); convergence layer_state, verdict_checked_at, reopened_by and components[] winner_ids, pin_current; summary.convergence.newest_manifest"
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -18300,12 +18312,16 @@
       "scope": "records[]: repository (the entity universe), aliases and references[] kind and decision; sources[].path"
     },
     {
+      "path": "evidence/hosts/*/*.json",
+      "scope": "through host_receipts.build_summary (its generated_at_utc dropped): per receipt component_id, host platform_id, os, architecture and second_physical_machine, stage, result, evidence_class, tool_versions[component_id], reviews, supersedes and layer_refs; component_matrix.build_alternative decides which receipt verifies an alternative"
+    },
+    {
       "path": "manifests/evidence.json",
       "scope": "receipts[]: id, kind, component_ids; convergence_records[]; never files[], which host_receipts.register_file rewrites"
     },
     {
       "path": "manifests/stack.json",
-      "scope": "components[]: id, repository, profile"
+      "scope": "components[]: id, repository, profile, and version (the stack pin an alternative's host receipt must record)"
     }
   ],
   "layers": [
@@ -18489,6 +18505,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -18543,6 +18561,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -18597,6 +18617,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -18886,6 +18908,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -18945,6 +18969,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -19005,6 +19031,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "gitleaks",
             "state": "receipts_recorded"
           }
         },
@@ -19064,6 +19092,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -19118,6 +19148,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -19287,7 +19319,13 @@
             "host_receipts": null,
             "level": 0,
             "macos": null,
-            "state": "host_verified"
+            "receipt_versions": {
+              "at_stack_pin": 1,
+              "other_version": 0,
+              "unknown_version": 0
+            },
+            "stack_component_id": "ast-grep",
+            "state": "host_verified_at_stack_pin"
           }
         },
         {
@@ -19347,7 +19385,13 @@
             "host_receipts": null,
             "level": 0,
             "macos": null,
-            "state": "host_verified"
+            "receipt_versions": {
+              "at_stack_pin": 1,
+              "other_version": 0,
+              "unknown_version": 0
+            },
+            "stack_component_id": "jcodemunch-mcp",
+            "state": "host_verified_at_stack_pin"
           }
         },
         {
@@ -19407,6 +19451,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "codebase-memory-mcp",
             "state": "receipts_recorded"
           }
         },
@@ -19461,6 +19507,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -19748,7 +19796,13 @@
             "host_receipts": null,
             "level": 0,
             "macos": null,
-            "state": "host_verified"
+            "receipt_versions": {
+              "at_stack_pin": 1,
+              "other_version": 0,
+              "unknown_version": 0
+            },
+            "stack_component_id": "context-hub",
+            "state": "host_verified_at_stack_pin"
           }
         },
         {
@@ -19802,6 +19856,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -19856,6 +19912,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -20019,6 +20077,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20073,6 +20133,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20127,6 +20189,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20181,6 +20245,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20235,6 +20301,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20289,6 +20357,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20343,6 +20413,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20397,6 +20469,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -20451,6 +20525,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -20737,6 +20813,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "codex-for-claude",
             "state": "not_run"
           }
         }
@@ -21080,6 +21158,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "react",
             "state": "receipts_recorded"
           }
         },
@@ -21134,6 +21214,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -21188,6 +21270,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -21242,6 +21326,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -21296,6 +21382,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -21350,6 +21438,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -21640,6 +21730,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "skills-ref",
             "state": "not_run"
           }
         },
@@ -21694,6 +21786,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -21748,6 +21842,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "davila7/claude-code-templates",
             "state": "not_run"
           }
         },
@@ -21802,6 +21898,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "shanraisshan/claude-code-best-practice",
             "state": "not_run"
           }
         },
@@ -21856,6 +21954,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -21910,6 +22010,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -21964,6 +22066,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -22216,6 +22320,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "apple-container",
             "state": "not_run"
           }
         },
@@ -22270,6 +22376,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -22324,6 +22432,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -22378,6 +22488,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -22846,6 +22958,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -22900,6 +23014,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -22954,6 +23070,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -23191,65 +23309,6 @@
         },
         {
           "component_id": null,
-          "entity": "repo:ggml-org/llama.cpp",
-          "evidence": {
-            "field": "evidence_class",
-            "policy_rows": [
-              "Upstream test",
-              "Upstream example or native operation"
-            ],
-            "recorded": "native_proven",
-            "retained_local_result": null,
-            "tier": "A"
-          },
-          "flags": [
-            "verification/joined-by-repository"
-          ],
-          "freshness": {
-            "pin_current": null
-          },
-          "matrix_record": {
-            "path": "catalogs/landscape/component-evidence-matrix.json",
-            "pointer": "/rows/11/alternatives/3"
-          },
-          "measured": {
-            "basis": "no comparable measurement recorded",
-            "group": null,
-            "rank": 0
-          },
-          "position": 4,
-          "role": "alternative",
-          "role_records": [
-            {
-              "disposition": "conditional",
-              "path": "catalogs/landscape/foundation.json",
-              "pointer": "/layers/15/alternatives/3",
-              "role": "alternative"
-            },
-            {
-              "disposition": "conditional",
-              "path": "catalogs/landscape/foundation.json",
-              "pointer": "/layers/15/candidates/12",
-              "role": "candidate"
-            }
-          ],
-          "shared": true,
-          "sort_key": [
-            1,
-            0,
-            0,
-            0
-          ],
-          "verification": {
-            "declared": null,
-            "host_receipts": null,
-            "level": 0,
-            "macos": null,
-            "state": "host_verified"
-          }
-        },
-        {
-          "component_id": null,
           "entity": "repo:kenn-io/agentsview",
           "evidence": {
             "field": "evidence_class",
@@ -23293,7 +23352,7 @@
               "role": "candidate"
             }
           ],
-          "shared": true,
+          "shared": false,
           "sort_key": [
             1,
             0,
@@ -23305,7 +23364,13 @@
             "host_receipts": null,
             "level": 0,
             "macos": null,
-            "state": "host_verified"
+            "receipt_versions": {
+              "at_stack_pin": 1,
+              "other_version": 0,
+              "unknown_version": 0
+            },
+            "stack_component_id": "agentsview",
+            "state": "host_verified_at_stack_pin"
           }
         },
         {
@@ -23337,7 +23402,7 @@
             "group": null,
             "rank": 0
           },
-          "position": 6,
+          "position": 5,
           "role": "alternative",
           "role_records": [
             {
@@ -23365,7 +23430,76 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "ntfy",
             "state": "not_run"
+          }
+        },
+        {
+          "component_id": null,
+          "entity": "repo:ggml-org/llama.cpp",
+          "evidence": {
+            "field": "evidence_class",
+            "policy_rows": [
+              "Upstream test",
+              "Upstream example or native operation"
+            ],
+            "recorded": "native_proven",
+            "retained_local_result": null,
+            "tier": "A"
+          },
+          "flags": [
+            "evidence/class-verification-inversion",
+            "verification/alternative-receipt-version-mismatch",
+            "verification/joined-by-repository"
+          ],
+          "freshness": {
+            "pin_current": null
+          },
+          "matrix_record": {
+            "path": "catalogs/landscape/component-evidence-matrix.json",
+            "pointer": "/rows/11/alternatives/3"
+          },
+          "measured": {
+            "basis": "no comparable measurement recorded",
+            "group": null,
+            "rank": 0
+          },
+          "position": 5,
+          "role": "alternative",
+          "role_records": [
+            {
+              "disposition": "conditional",
+              "path": "catalogs/landscape/foundation.json",
+              "pointer": "/layers/15/alternatives/3",
+              "role": "alternative"
+            },
+            {
+              "disposition": "conditional",
+              "path": "catalogs/landscape/foundation.json",
+              "pointer": "/layers/15/candidates/12",
+              "role": "candidate"
+            }
+          ],
+          "shared": true,
+          "sort_key": [
+            1,
+            0,
+            1,
+            0
+          ],
+          "verification": {
+            "declared": null,
+            "host_receipts": null,
+            "level": 1,
+            "macos": null,
+            "receipt_versions": {
+              "at_stack_pin": 0,
+              "other_version": 1,
+              "unknown_version": 0
+            },
+            "stack_component_id": "llama-cpp",
+            "state": "host_verified"
           }
         },
         {
@@ -23397,7 +23531,7 @@
             "group": null,
             "rank": 0
           },
-          "position": 6,
+          "position": 5,
           "role": "alternative",
           "role_records": [
             {
@@ -23425,6 +23559,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "grafana",
             "state": "not_run"
           }
         },
@@ -23457,7 +23593,7 @@
             "group": null,
             "rank": 0
           },
-          "position": 6,
+          "position": 5,
           "role": "alternative",
           "role_records": [
             {
@@ -23485,6 +23621,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "claude-hud",
             "state": "not_run"
           }
         },
@@ -23517,7 +23655,7 @@
             "group": null,
             "rank": 0
           },
-          "position": 6,
+          "position": 5,
           "role": "alternative",
           "role_records": [
             {
@@ -23545,6 +23683,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "alertmanager",
             "state": "not_run"
           }
         },
@@ -23605,7 +23745,13 @@
             "host_receipts": null,
             "level": 0,
             "macos": null,
-            "state": "host_verified"
+            "receipt_versions": {
+              "at_stack_pin": 1,
+              "other_version": 0,
+              "unknown_version": 0
+            },
+            "stack_component_id": "otel-tui",
+            "state": "host_verified_at_stack_pin"
           }
         },
         {
@@ -23659,6 +23805,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -23713,6 +23861,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -23767,6 +23917,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -24022,6 +24174,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "shellcheck",
             "state": "receipts_recorded"
           }
         },
@@ -24082,6 +24236,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "mcp-inspector",
             "state": "receipts_recorded"
           }
         },
@@ -24141,6 +24297,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -24201,6 +24359,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "difftastic",
             "state": "receipts_recorded"
           }
         },
@@ -24257,6 +24417,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -24311,6 +24473,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -24582,6 +24746,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -24636,6 +24802,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -24690,6 +24858,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -24915,6 +25085,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -24969,6 +25141,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -25023,6 +25197,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -25077,6 +25253,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -25237,6 +25415,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -25552,6 +25732,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "huggingface-hub-native",
             "state": "not_run"
           }
         },
@@ -25606,6 +25788,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -25660,6 +25844,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -25714,6 +25900,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -26008,7 +26196,13 @@
             "host_receipts": null,
             "level": 0,
             "macos": null,
-            "state": "host_verified"
+            "receipt_versions": {
+              "at_stack_pin": 1,
+              "other_version": 0,
+              "unknown_version": 0
+            },
+            "stack_component_id": "context-mode",
+            "state": "host_verified_at_stack_pin"
           }
         },
         {
@@ -26067,6 +26261,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "toon",
             "state": "receipts_recorded"
           }
         },
@@ -26126,6 +26322,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "repomix",
             "state": "receipts_recorded"
           }
         },
@@ -26180,6 +26378,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -26494,6 +26694,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "playwright-cli",
             "state": "receipts_recorded"
           }
         },
@@ -26548,6 +26750,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -26602,6 +26806,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -26656,6 +26862,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -26909,6 +27117,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -26966,6 +27176,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "beads",
             "state": "not_run"
           }
         },
@@ -27026,6 +27238,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "codex",
             "state": "receipts_recorded"
           }
         },
@@ -27083,6 +27297,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "codex-for-claude",
             "state": "not_run"
           }
         },
@@ -27137,6 +27353,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -27191,6 +27409,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -27245,6 +27465,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -27299,6 +27521,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -27353,6 +27577,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         }
@@ -27664,6 +27890,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -27715,6 +27943,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -27768,6 +27998,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "codebase-memory-mcp",
             "state": "receipts_recorded"
           }
         },
@@ -27819,6 +28051,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "omniroute",
             "state": "not_run"
           }
         },
@@ -27879,6 +28113,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "context-mode",
             "state": "receipts_recorded"
           }
         },
@@ -27939,6 +28175,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "serena",
             "state": "receipts_recorded"
           }
         },
@@ -27999,6 +28237,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "qdrant",
             "state": "receipts_recorded"
           }
         },
@@ -28059,6 +28299,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "rtk",
             "state": "receipts_recorded"
           }
         },
@@ -28112,6 +28354,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "vllm",
             "state": "receipts_recorded"
           }
         },
@@ -28165,6 +28409,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "repomix",
             "state": "receipts_recorded"
           }
         },
@@ -28213,6 +28459,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -28261,6 +28509,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "beads",
             "state": "not_run"
           }
         },
@@ -28315,6 +28565,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -28363,6 +28615,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -28411,6 +28665,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -28459,6 +28715,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -28507,6 +28765,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -29398,6 +29658,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -29452,6 +29714,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -29500,6 +29764,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -30264,6 +30530,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -30318,6 +30586,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -31485,6 +31755,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "promptfoo",
             "state": "receipts_recorded"
           }
         },
@@ -31533,6 +31805,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -31581,6 +31855,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -31629,6 +31905,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -33587,6 +33865,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -33635,6 +33915,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -33683,6 +33965,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -33731,6 +34015,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -33779,6 +34065,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -34729,6 +35017,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -34777,6 +35067,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -34825,6 +35117,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -34879,6 +35173,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -34927,6 +35223,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -34975,6 +35273,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -35029,6 +35329,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -35077,6 +35379,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -35131,6 +35435,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -36754,6 +37060,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -36802,6 +37110,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -36850,6 +37160,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -37736,6 +38048,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -37789,6 +38103,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "markitdown",
             "state": "receipts_recorded"
           }
         },
@@ -37842,6 +38158,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "qmd",
             "state": "receipts_recorded"
           }
         },
@@ -37895,6 +38213,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": "vllm",
             "state": "receipts_recorded"
           }
         },
@@ -37943,6 +38263,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -37991,6 +38313,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38039,6 +38363,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38087,6 +38413,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38135,6 +38463,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38183,6 +38513,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38231,6 +38563,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38279,6 +38613,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38333,6 +38669,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38381,6 +38719,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38429,6 +38769,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38477,6 +38819,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38525,6 +38869,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38573,6 +38919,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38621,6 +38969,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -38669,6 +39019,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -39537,6 +39889,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -39585,6 +39939,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -40783,6 +41139,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -40831,6 +41189,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -40879,6 +41239,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -40927,6 +41289,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -40981,6 +41345,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -41029,6 +41395,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -41077,6 +41445,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -41131,6 +41501,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -41179,6 +41551,8 @@
             "host_receipts": null,
             "level": 1,
             "macos": null,
+            "receipt_versions": null,
+            "stack_component_id": null,
             "state": "not_run"
           }
         },
@@ -41725,8 +42099,12 @@
         "term": "retained_local_result"
       },
       {
-        "definition": "K3, on linux-wsl2-x86_64, from the generated component evidence matrix. Winners: 0 host_verified (derived accepted on an independently reviewed native_proven use-stage host receipt bound to the current pin and not superseded), 1 derived accepted by another route, 2 derived conditional, 3 derived not_established or untested. Level 1 includes the registered-evidence route of scripts/platform_status.py (a native_proven or measured_comparison winner citing a registered evidence/ file), which is not bound to the current pin; only level 0 is. The declared catalog_status never enters. Alternatives: 0 host_verified, 1 otherwise; receipts_recorded (a receipt of the stack component sharing the repository, possibly install-only or from another layer) is an annotation, not a level. Card-only candidates: the constant 0. Levels compare only within one role.",
-        "term": "verification_at_current_pin"
+        "definition": "K3, on linux-wsl2-x86_64 only. Level 0 needs an independently reviewed native_proven use-stage host receipt on that platform that records the pinned version, is current (not superseded at its version, not on a forked supersede chain) and is in the layer's scope. Winners: 0 is the matrix's host_verified, derived accepted on such a receipt, which scripts/platform_status.py binds to the winner's verdict pin; 1 derived accepted by another route, including the registered-evidence route of scripts/platform_status.py (a native_proven or measured_comparison winner citing a registered evidence/ file), which is bound to no pin; 2 derived conditional; 3 derived not_established or untested. The declared catalog_status never enters. Alternatives: 0 host_verified_at_stack_pin, a receipt of the manifests/stack.json component that shares the alternative's repository, which component_matrix.build_alternative alone accepts, on linux-wsl2-x86_64, whose tool_versions entry for that component equals the component's stack version (host_receipts.pin_matches); 1 otherwise: host_verified (the matrix's join by repository, on any platform and at any version) without such a receipt, flagged by what its qualifying linux-wsl2-x86_64 receipts record (see receipt_versions); receipts_recorded (a receipt of that component, possibly install-only or from another layer), an annotation; and not_run. Card-only candidates: the constant 0. Levels compare only within one role.",
+        "term": "host_verification_at_pin"
+      },
+      {
+        "definition": "For an alternative whose matrix e2e_state is host_verified: its linux-wsl2-x86_64 receipts that component_matrix.build_alternative alone accepts, counted by recorded version against the stack pin: at_stack_pin (host_receipts.pin_matches), other_version (both comparable and different; flagged verification/alternative-receipt-version-mismatch when none is at_stack_pin) and unknown_version (the receipt records no comparable version of the component, or the stack records none; flagged verification/alternative-receipt-version-unknown when none is at_stack_pin). All three at 0 means only another platform's receipt verifies it (verification/alternative-receipt-off-platform). stack_component_id names the stack component; the index repeats no version or pin.",
+        "term": "receipt_versions"
       },
       {
         "definition": "K4. 0 unless every member of a K1-K3 tie class has a verified result in one comparability group: layer, the metric equal to the layer's overturn_protocol metric, benchmark or harness id and major version, fixture sha256 set, host profile, pins and direction. Inside the group: the approximate rank from non-overlapping intervals (the number of members whose interval lies entirely better); without intervals, an exact pass before an exact fail on the same frozen fixture; otherwise a tie. Unverified results never order anything. No layer records structured measurements in this version, so the key is 0 everywhere.",
@@ -41789,7 +42167,7 @@
     "keys": [
       "recorded_role",
       "evidence_tier",
-      "verification_at_current_pin",
+      "host_verification_at_pin",
       "measured_rank"
     ],
     "measured": {
@@ -41866,7 +42244,8 @@
     },
     "verification_levels": {
       "alternative": {
-        "host_verified": 0,
+        "host_verified": 1,
+        "host_verified_at_stack_pin": 0,
         "not_run": 1,
         "receipts_recorded": 1
       },
@@ -42377,7 +42756,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/observation-inference: repo:binwiederhier/ntfy precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on verification at the current pin; evidence tier orders first",
+      "message": "layer:foundation/observation-inference: repo:binwiederhier/ntfy precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on host verification at the pin; evidence tier orders first",
       "refs": [
         "layer:foundation/observation-inference",
         "repo:binwiederhier/ntfy",
@@ -42387,7 +42766,17 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/observation-inference: repo:grafana/grafana precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on verification at the current pin; evidence tier orders first",
+      "message": "layer:foundation/observation-inference: repo:ggml-org/llama.cpp precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on host verification at the pin; evidence tier orders first",
+      "refs": [
+        "layer:foundation/observation-inference",
+        "repo:ggml-org/llama.cpp",
+        "repo:ymtdzzz/otel-tui"
+      ],
+      "type": "evidence/class-verification-inversion"
+    },
+    {
+      "level": "info",
+      "message": "layer:foundation/observation-inference: repo:grafana/grafana precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on host verification at the pin; evidence tier orders first",
       "refs": [
         "layer:foundation/observation-inference",
         "repo:grafana/grafana",
@@ -42397,7 +42786,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/observation-inference: repo:jarrodwatts/claude-hud precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on verification at the current pin; evidence tier orders first",
+      "message": "layer:foundation/observation-inference: repo:jarrodwatts/claude-hud precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on host verification at the pin; evidence tier orders first",
       "refs": [
         "layer:foundation/observation-inference",
         "repo:jarrodwatts/claude-hud",
@@ -42407,7 +42796,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/observation-inference: repo:prometheus/alertmanager precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on verification at the current pin; evidence tier orders first",
+      "message": "layer:foundation/observation-inference: repo:prometheus/alertmanager precedes repo:ymtdzzz/otel-tui on evidence tier, while repo:ymtdzzz/otel-tui precedes it on host verification at the pin; evidence tier orders first",
       "refs": [
         "layer:foundation/observation-inference",
         "repo:prometheus/alertmanager",
@@ -44205,6 +44594,15 @@
       "type": "status/declared-above-derived"
     },
     {
+      "level": "warning",
+      "message": "repo:ggml-org/llama.cpp: 1 linux-wsl2-x86_64 host receipt(s) of stack component llama-cpp verify this alternative but record a version other than its manifests/stack.json pin, and none records the pin; K3 level 1 (the matrix's host_verified joins by repository on any platform and version)",
+      "refs": [
+        "layer:foundation/observation-inference",
+        "repo:ggml-org/llama.cpp"
+      ],
+      "type": "verification/alternative-receipt-version-mismatch"
+    },
+    {
       "level": "info",
       "message": "repo:wilfred/difftastic: 1 failing linux-wsl2-x86_64 host receipt(s) recorded for component difftastic",
       "refs": [
@@ -44224,7 +44622,7 @@
     },
     {
       "level": "info",
-      "message": "repo:gitleaks/gitleaks: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:gitleaks/gitleaks: alternative verification state receipts_recorded comes from stack component gitleaks, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/ci-supply-chain",
         "repo:gitleaks/gitleaks"
@@ -44233,7 +44631,7 @@
     },
     {
       "level": "info",
-      "message": "repo:ast-grep/ast-grep: alternative e2e_state host_verified comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:ast-grep/ast-grep: alternative verification state host_verified_at_stack_pin comes from stack component ast-grep, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/code-navigation",
         "repo:ast-grep/ast-grep"
@@ -44242,7 +44640,7 @@
     },
     {
       "level": "info",
-      "message": "repo:deusdata/codebase-memory-mcp: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:deusdata/codebase-memory-mcp: alternative verification state receipts_recorded comes from stack component codebase-memory-mcp, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/code-navigation",
         "repo:deusdata/codebase-memory-mcp"
@@ -44251,7 +44649,7 @@
     },
     {
       "level": "info",
-      "message": "repo:jgravelle/jcodemunch-mcp: alternative e2e_state host_verified comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:jgravelle/jcodemunch-mcp: alternative verification state host_verified_at_stack_pin comes from stack component jcodemunch-mcp, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/code-navigation",
         "repo:jgravelle/jcodemunch-mcp"
@@ -44260,7 +44658,7 @@
     },
     {
       "level": "info",
-      "message": "repo:andrewyng/context-hub: alternative e2e_state host_verified comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:andrewyng/context-hub: alternative verification state host_verified_at_stack_pin comes from stack component context-hub, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/document-retrieval",
         "repo:andrewyng/context-hub"
@@ -44269,7 +44667,7 @@
     },
     {
       "level": "info",
-      "message": "repo:react/react: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:react/react: alternative verification state receipts_recorded comes from stack component react, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/hosting-services",
         "repo:react/react"
@@ -44278,7 +44676,7 @@
     },
     {
       "level": "info",
-      "message": "repo:ggml-org/llama.cpp: alternative e2e_state host_verified comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:ggml-org/llama.cpp: alternative verification state host_verified comes from stack component llama-cpp, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/observation-inference",
         "repo:ggml-org/llama.cpp"
@@ -44287,7 +44685,7 @@
     },
     {
       "level": "info",
-      "message": "repo:kenn-io/agentsview: alternative e2e_state host_verified comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:kenn-io/agentsview: alternative verification state host_verified_at_stack_pin comes from stack component agentsview, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/observation-inference",
         "repo:kenn-io/agentsview"
@@ -44296,7 +44694,7 @@
     },
     {
       "level": "info",
-      "message": "repo:ymtdzzz/otel-tui: alternative e2e_state host_verified comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:ymtdzzz/otel-tui: alternative verification state host_verified_at_stack_pin comes from stack component otel-tui, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/observation-inference",
         "repo:ymtdzzz/otel-tui"
@@ -44305,7 +44703,7 @@
     },
     {
       "level": "info",
-      "message": "repo:koalaman/shellcheck: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:koalaman/shellcheck: alternative verification state receipts_recorded comes from stack component shellcheck, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/quality-evaluation",
         "repo:koalaman/shellcheck"
@@ -44314,7 +44712,7 @@
     },
     {
       "level": "info",
-      "message": "repo:modelcontextprotocol/inspector: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:modelcontextprotocol/inspector: alternative verification state receipts_recorded comes from stack component mcp-inspector, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/quality-evaluation",
         "repo:modelcontextprotocol/inspector"
@@ -44323,7 +44721,7 @@
     },
     {
       "level": "info",
-      "message": "repo:wilfred/difftastic: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:wilfred/difftastic: alternative verification state receipts_recorded comes from stack component difftastic, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/quality-evaluation",
         "repo:wilfred/difftastic"
@@ -44332,7 +44730,7 @@
     },
     {
       "level": "info",
-      "message": "repo:mksglu/context-mode: alternative e2e_state host_verified comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:mksglu/context-mode: alternative verification state host_verified_at_stack_pin comes from stack component context-mode, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/token-efficiency",
         "repo:mksglu/context-mode"
@@ -44341,7 +44739,7 @@
     },
     {
       "level": "info",
-      "message": "repo:toon-format/toon: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:toon-format/toon: alternative verification state receipts_recorded comes from stack component toon, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/token-efficiency",
         "repo:toon-format/toon"
@@ -44350,7 +44748,7 @@
     },
     {
       "level": "info",
-      "message": "repo:yamadashy/repomix: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:yamadashy/repomix: alternative verification state receipts_recorded comes from stack component repomix, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/token-efficiency",
         "repo:yamadashy/repomix"
@@ -44359,7 +44757,7 @@
     },
     {
       "level": "info",
-      "message": "repo:microsoft/playwright-cli: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:microsoft/playwright-cli: alternative verification state receipts_recorded comes from stack component playwright-cli, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/web-research",
         "repo:microsoft/playwright-cli"
@@ -44368,7 +44766,7 @@
     },
     {
       "level": "info",
-      "message": "repo:openai/codex: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:openai/codex: alternative verification state receipts_recorded comes from stack component codex, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:foundation/workers",
         "repo:openai/codex"
@@ -44377,7 +44775,7 @@
     },
     {
       "level": "info",
-      "message": "repo:deusdata/codebase-memory-mcp: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:deusdata/codebase-memory-mcp: alternative verification state receipts_recorded comes from stack component codebase-memory-mcp, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/agents-models-workers",
         "repo:deusdata/codebase-memory-mcp"
@@ -44386,7 +44784,7 @@
     },
     {
       "level": "info",
-      "message": "repo:mksglu/context-mode: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:mksglu/context-mode: alternative verification state receipts_recorded comes from stack component context-mode, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/agents-models-workers",
         "repo:mksglu/context-mode"
@@ -44395,7 +44793,7 @@
     },
     {
       "level": "info",
-      "message": "repo:oraios/serena: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:oraios/serena: alternative verification state receipts_recorded comes from stack component serena, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/agents-models-workers",
         "repo:oraios/serena"
@@ -44404,7 +44802,7 @@
     },
     {
       "level": "info",
-      "message": "repo:qdrant/qdrant: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:qdrant/qdrant: alternative verification state receipts_recorded comes from stack component qdrant, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/agents-models-workers",
         "repo:qdrant/qdrant"
@@ -44413,7 +44811,7 @@
     },
     {
       "level": "info",
-      "message": "repo:rtk-ai/rtk: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:rtk-ai/rtk: alternative verification state receipts_recorded comes from stack component rtk, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/agents-models-workers",
         "repo:rtk-ai/rtk"
@@ -44422,7 +44820,7 @@
     },
     {
       "level": "info",
-      "message": "repo:vllm-project/vllm: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:vllm-project/vllm: alternative verification state receipts_recorded comes from stack component vllm, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/agents-models-workers",
         "repo:vllm-project/vllm"
@@ -44431,7 +44829,7 @@
     },
     {
       "level": "info",
-      "message": "repo:yamadashy/repomix: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:yamadashy/repomix: alternative verification state receipts_recorded comes from stack component repomix, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/agents-models-workers",
         "repo:yamadashy/repomix"
@@ -44440,7 +44838,7 @@
     },
     {
       "level": "info",
-      "message": "repo:promptfoo/promptfoo: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:promptfoo/promptfoo: alternative verification state receipts_recorded comes from stack component promptfoo, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/evaluation-experiments",
         "repo:promptfoo/promptfoo"
@@ -44449,7 +44847,7 @@
     },
     {
       "level": "info",
-      "message": "repo:microsoft/markitdown: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:microsoft/markitdown: alternative verification state receipts_recorded comes from stack component markitdown, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/research-factors-ml",
         "repo:microsoft/markitdown"
@@ -44458,7 +44856,7 @@
     },
     {
       "level": "info",
-      "message": "repo:tobi/qmd: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:tobi/qmd: alternative verification state receipts_recorded comes from stack component qmd, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/research-factors-ml",
         "repo:tobi/qmd"
@@ -44467,7 +44865,7 @@
     },
     {
       "level": "info",
-      "message": "repo:vllm-project/vllm: alternative e2e_state receipts_recorded comes from the stack component that shares its repository, not from a record of this layer",
+      "message": "repo:vllm-project/vllm: alternative verification state receipts_recorded comes from stack component vllm, which shares its repository, not from a record of this layer",
       "refs": [
         "layer:us-equities/research-factors-ml",
         "repo:vllm-project/vllm"

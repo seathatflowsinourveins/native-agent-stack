@@ -13,7 +13,7 @@ or download it from a `publish-catalog.yml` workflow artifact (7-day retention, 
 [trading gate ladder](us-equities/gates-20260922.json) tracks the sim → paper →
 live gates.
 
-For each layer's winners, alternatives and candidate cards in evidence order (recorded role, then evidence tier, independent verification at the current pin and comparable measurement; no blended score, and tied entries share a position), use the generated [ranked catalog index](landscape/catalog-index.json), which `python3 scripts/catalog_index.py --write` regenerates and the explorer's `#ranking` tab renders.
+For each layer's winners, alternatives and candidate cards in evidence order (recorded role, then evidence tier, host verification at the pin on linux-wsl2-x86_64 (a winner's verdict pin, an alternative's `manifests/stack.json` version) and comparable measurement; no blended score, and tied entries share a position), use the generated [ranked catalog index](landscape/catalog-index.json), which `python3 scripts/catalog_index.py --write` regenerates and the explorer's `#ranking` tab renders.
 
 | Catalog | Purpose | Start here |
 | --- | --- | --- |

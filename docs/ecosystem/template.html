@@ -91,7 +91,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <details class="catalog-card convergence-detail" open><summary>Definitions, unresolved rows and join gaps</summary><div id="convergence-definitions"></div></details>
 </section>
 <section id="ranking" role="tabpanel" aria-labelledby="tab-ranking" hidden>
-<div class="page-heading"><div><div class="eyebrow">Evidence order / within each layer</div><h2>Ranked by evidence</h2><p>Order within each layer uses, in turn, recorded role, evidence tier, independent verification at the current pin on linux-wsl2-x86_64, then comparable measurement (none recorded yet). Nothing is blended into a score; tied entries share a position. Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.</p></div></div>
+<div class="page-heading"><div><div class="eyebrow">Evidence order / within each layer</div><h2>Ranked by evidence</h2><p>Order within each layer uses, in turn, recorded role, evidence tier, host verification at the pin on linux-wsl2-x86_64, then comparable measurement (none recorded yet). Host verification at the pin means an independently reviewed use-stage host receipt on that platform that records the winner's verdict pin or, for an alternative, the manifests/stack.json version of the component sharing its repository; below it, winners order by their derived status. Nothing is blended into a score; tied entries share a position. Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.</p></div></div>
 <div id="ranking-summary" class="scope-note landscape-summary"></div>
 <div id="ranking-actions" class="landscape-actions"></div>
 <div class="controls ranking-controls"><div class="control"><label for="ranking-layer">Layer</label><select id="ranking-layer"><option value="">All layers</option></select></div><div class="control"><label for="ranking-catalog">Catalog</label><select id="ranking-catalog"><option value="">Both catalogs</option><option value="foundation">Foundation</option><option value="us-equities">US equities</option></select></div><div class="control"><label for="ranking-role">Role</label><select id="ranking-role"><option value="">All roles</option><option value="winner">Recorded winner</option><option value="alternative">Verdict alternative</option><option value="candidate">Candidate card only</option></select></div><div class="control"><label for="ranking-tier">Evidence tier</label><select id="ranking-tier"><option value="">All tiers</option><option value="A">A · native execution or measured</option><option value="B">B · local integration or synthetic</option><option value="C">C · source review</option><option value="U">U · no policy row</option></select></div></div>
@@ -527,12 +527,18 @@ function renderConvergence() {
   });
 }
 renderConvergence();
+function rankingVerification(row) {
+  const verification = row.verification, counts = verification.receipt_versions;
+  if(verification.state === "not_applicable") return "not applicable";
+  if(row.role === "winner") return verification.state + " (Linux)" + (verification.macos ? " · macOS " + verification.macos : "");
+  if(verification.state === "host_verified_at_stack_pin") return "host_verified_at_stack_pin (Linux)";
+  if(verification.state === "host_verified") return "host_verified by repository, not at the stack pin on Linux"
+    + (counts ? " (Linux receipts: " + counts.other_version + " other version, " + counts.unknown_version + " unknown version)" : "");
+  return verification.state === "not_run" ? "not_run" : verification.state + " (by repository)";
+}
 function rankingCells(row) {
-  const verification = row.verification;
-  const state = verification.state === "not_applicable" ? "not applicable"
-    : verification.state + " (Linux)" + (verification.macos ? " · macOS " + verification.macos : "");
   return [(row.shared ? "=" : "") + row.position, row.entity.replace(/^repo:/, ""), row.role,
-    row.evidence.recorded + " · tier " + row.evidence.tier, state, row.freshness.pin_current || "-", row.measured.basis,
+    row.evidence.recorded + " · tier " + row.evidence.tier, rankingVerification(row), row.freshness.pin_current || "-", row.measured.basis,
     row.flags.join(", ") || "-"];
 }
 function rankingSummaryLines(ranking) {

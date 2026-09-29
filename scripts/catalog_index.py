@@ -5,16 +5,21 @@ the evidence manifest, with the placements of every layer in evidence order unde
 
 It never selects a winner, changes a verdict, records a receipt or infers a benchmark win. Order within a layer is
 evidence order under the stated rule, not quality or superiority, and there is no order across layers. The rule
-compares ordered keys -- recorded role, evidence tier, independent verification at the current pin on
-linux-wsl2-x86_64, comparable measured rank -- lexicographically; nothing is blended into a score, and tied
-placements share a position (competition ranking). Conflicts and stale entries become Backstage-style status items;
-none is resolved. Decision record: ``docs/decisions/2026-09-29-catalog-index-ranking.md``.
+compares ordered keys -- recorded role, evidence tier, host verification at the pin on linux-wsl2-x86_64 (an
+independently reviewed use-stage host receipt on that platform recording the winner's verdict pin or, for an
+alternative, the manifests/stack.json version of the component sharing its repository), comparable measured rank --
+lexicographically; nothing is blended into a score, and tied placements share a position (competition ranking).
+Conflicts and stale entries become Backstage-style status items; none is resolved. Decision record:
+``docs/decisions/2026-09-29-catalog-index-ranking.md``.
 
 Inputs are the committed files ``INPUTS`` names: the matrix is read as committed, as
 ``scripts/new_host_grand_list.py`` reads it, and from ``manifests/evidence.json`` only ``receipts[]`` and
-``convergence_records[]`` are read, never ``files[]``, which ``host_receipts.register_file`` rewrites. A sorted
-filesystem listing of ``catalogs/**/*.json`` and ``manifests/*.json`` (without this file's own path) gives the
-coverage account, with no git call.
+``convergence_records[]`` are read, never ``files[]``, which ``host_receipts.register_file`` rewrites. The host
+receipts under ``evidence/hosts/`` are read through ``host_receipts.build_summary`` (its clock-stamped
+``generated_at_utc`` is dropped) to bind an alternative's verification to its stack pin, with the matrix's own
+``component_matrix.build_alternative`` deciding which receipt verifies. A sorted filesystem listing of
+``catalogs/**/*.json`` and ``manifests/*.json`` (without this file's own path) gives the coverage account, with no
+git call.
 
 Modes: ``--check`` (default) rebuilds in memory, runs the fatal checks F2-F16 and byte-compares with the committed
 file (F1); ``--write`` runs the same checks, writes the file and re-registers its hash in manifests/evidence.json.
@@ -59,6 +64,12 @@ EVIDENCE_FILE = "manifests/evidence.json"
 LANDSCAPE_MANIFEST_FILE = landscape.MANIFEST
 LISTING_INPUT = "catalogs/**/*.json + manifests/*.json"
 LISTING_GLOBS = (("catalogs", "**/*.json"), ("manifests", "*.json"))
+# Read by host_receipts.build_summary, not through Reader: the receipts, the schema it validates each receipt's shape
+# against, and the platform profiles it checks each receipt's host against.
+HOST_RECEIPTS_INPUT = "evidence/hosts/*/*.json"
+HOST_RECEIPT_SCHEMA_FILE = host_receipts.SCHEMA_RELATIVE_PATH
+PLATFORM_PROFILES_FILE = "adoption/manifest.json"
+HOST_RECEIPT_INPUTS = frozenset({HOST_RECEIPTS_INPUT, HOST_RECEIPT_SCHEMA_FILE, PLATFORM_PROFILES_FILE})
 PLATFORM = component_matrix.CONVERGENCE_PLATFORM
 MACOS_PLATFORM = "macos-arm64"
 # F2: the user asked for each of the 32 layers; a layer added to or removed from a ledger updates this constant and
@@ -74,7 +85,8 @@ INPUTS = (
     (MATRIX_FILE,
      "rows[]: catalog, layer_id, title, verdict_status, independent_review, open_gaps; winners[] component_id, "
      "repository, pin, evidence_class and per-platform catalog_status, derived_status, e2e_state, host_receipts; "
-     "alternatives[] name, repository, disposition, evidence_class, e2e_state; convergence layer_state, "
+     "alternatives[] name, repository, disposition, evidence_class, e2e_state (which "
+     "component_matrix.build_alternative must reproduce from the host receipts, F2); convergence layer_state, "
      "verdict_checked_at, reopened_by and components[] winner_ids, pin_current; summary.convergence.newest_manifest"),
     (LEDGER_FILES["foundation"],
      "layers[]: layer_id, decision, verdict_status, overturn_protocol.metric; winners[], alternatives[] and "
@@ -87,10 +99,19 @@ INPUTS = (
     (DECISION_INDEX_FILE,
      "records[]: repository (the entity universe), aliases and references[] kind and decision; sources[].path"),
     (ALIASES_FILE, "/aliases, through catalog_decisions.aliases_for"),
-    (STACK_FILE, "components[]: id, repository, profile"),
+    (STACK_FILE, "components[]: id, repository, profile, and version (the stack pin an alternative's host receipt must "
+                 "record)"),
     (EVIDENCE_FILE,
      "receipts[]: id, kind, component_ids; convergence_records[]; never files[], which host_receipts.register_file "
      "rewrites"),
+    (HOST_RECEIPTS_INPUT,
+     "through host_receipts.build_summary (its generated_at_utc dropped): per receipt component_id, host platform_id, "
+     "os, architecture and second_physical_machine, stage, result, evidence_class, tool_versions[component_id], "
+     "reviews, supersedes and layer_refs; component_matrix.build_alternative decides which receipt verifies an "
+     "alternative"),
+    (HOST_RECEIPT_SCHEMA_FILE, "the receipt shape host_receipts.build_summary validates each receipt against"),
+    (PLATFORM_PROFILES_FILE, "platform_profiles[] os and architecture, which host_receipts.build_summary checks each "
+                             "receipt's host against"),
     (LANDSCAPE_MANIFEST_FILE, "/universal_superiority and /sources/trading_taxonomy"),
     (LISTING_INPUT,
      "sorted filesystem listing without this file's own path (coverage.catalog_files); each listed file is parsed "
@@ -114,10 +135,17 @@ POLICY_ROWS = {"A": ["Upstream test", "Upstream example or native operation"],
                "local_integration": ["Local integration check"], "synthetic": ["Synthetic fixture"]}
 VERIFICATION_LEVELS = {
     "winner": {"host_verified": 0, "accepted": 1, "conditional": 2, "not_established": 3, "untested": 3},
-    "alternative": {"host_verified": 0, "receipts_recorded": 1, "not_run": 1},
+    # An alternative's host_verified is the matrix's repository join (any platform, any version); only
+    # host_verified_at_stack_pin, a linux-wsl2-x86_64 receipt at the stack pin, reaches level 0.
+    "alternative": {"host_verified_at_stack_pin": 0, "host_verified": 1, "receipts_recorded": 1, "not_run": 1},
     "candidate": {"not_applicable": 0},
 }
+# The matrix's alternative e2e_state vocabulary (component_matrix.build_alternative).
 ALTERNATIVE_E2E_STATES = ("host_verified", "not_run", "receipts_recorded")
+ALTERNATIVE_AT_PIN = "host_verified_at_stack_pin"
+ALTERNATIVE_HOST_VERIFIED = frozenset({"host_verified", ALTERNATIVE_AT_PIN})
+# An alternative's qualifying linux-wsl2-x86_64 receipts by recorded version against its stack pin.
+RECEIPT_VERSION_CLASSES = ("at_stack_pin", "other_version", "unknown_version")
 PIN_CURRENT_VALUES = tuple(component_matrix.CONVERGENCE_FACTOR_VALUES)
 # Only for counts.overturn_metrics: what a pin_current tiebreak (winners only, as K5) would change; never a sort key.
 PIN_TIEBREAK = {"true": 0, "unknown": 1, "false": 2}
@@ -165,6 +193,9 @@ STATUS_TYPES = {
     "role/winner-card-not-selected": "warning",
     "source/sweep-manifest-divergence": "info",
     "status/declared-above-derived": "warning",
+    "verification/alternative-receipt-off-platform": "info",
+    "verification/alternative-receipt-version-mismatch": "warning",
+    "verification/alternative-receipt-version-unknown": "info",
     "verification/host-fail-recorded": "info",
     "verification/joined-by-repository": "info",
 }
@@ -186,16 +217,30 @@ DEFINITIONS = (
     ("retained_local_result",
      "An evidence_refs item that does not start with https:// and ends with .json, .txt or .log: the predicate "
      "scripts/landscape.py applies to an observed_failure card."),
-    ("verification_at_current_pin",
-     "K3, on linux-wsl2-x86_64, from the generated component evidence matrix. Winners: 0 host_verified (derived "
-     "accepted on an independently reviewed native_proven use-stage host receipt bound to the current pin and not "
-     "superseded), 1 derived accepted by another route, 2 derived conditional, 3 derived not_established or "
-     "untested. Level 1 includes the registered-evidence route of scripts/platform_status.py (a native_proven or "
-     "measured_comparison winner citing a registered evidence/ file), which is not bound to the current pin; only "
-     "level 0 is. The declared catalog_status never enters. Alternatives: 0 host_verified, 1 otherwise; "
-     "receipts_recorded (a receipt of the stack component sharing the repository, possibly install-only or from "
-     "another layer) is an annotation, not a level. Card-only candidates: the constant 0. Levels compare only "
-     "within one role."),
+    ("host_verification_at_pin",
+     "K3, on linux-wsl2-x86_64 only. Level 0 needs an independently reviewed native_proven use-stage host receipt "
+     "on that platform that records the pinned version, is current (not superseded at its version, not on a forked "
+     "supersede chain) and is in the layer's scope. Winners: 0 is the matrix's host_verified, derived accepted on "
+     "such a receipt, which scripts/platform_status.py binds to the winner's verdict pin; 1 derived accepted by "
+     "another route, including the registered-evidence route of scripts/platform_status.py (a native_proven or "
+     "measured_comparison winner citing a registered evidence/ file), which is bound to no pin; 2 derived "
+     "conditional; 3 derived not_established or untested. The declared catalog_status never enters. Alternatives: "
+     "0 host_verified_at_stack_pin, a receipt of the manifests/stack.json component that shares the alternative's "
+     "repository, which component_matrix.build_alternative alone accepts, on linux-wsl2-x86_64, whose "
+     "tool_versions entry for that component equals the component's stack version (host_receipts.pin_matches); 1 "
+     "otherwise: host_verified (the matrix's join by repository, on any platform and at any version) without such "
+     "a receipt, flagged by what its qualifying linux-wsl2-x86_64 receipts record (see receipt_versions); "
+     "receipts_recorded (a receipt of that component, possibly install-only or from another layer), an annotation; "
+     "and not_run. Card-only candidates: the constant 0. Levels compare only within one role."),
+    ("receipt_versions",
+     "For an alternative whose matrix e2e_state is host_verified: its linux-wsl2-x86_64 receipts that "
+     "component_matrix.build_alternative alone accepts, counted by recorded version against the stack pin: "
+     "at_stack_pin (host_receipts.pin_matches), other_version (both comparable and different; flagged "
+     "verification/alternative-receipt-version-mismatch when none is at_stack_pin) and unknown_version (the receipt "
+     "records no comparable version of the component, or the stack records none; flagged "
+     "verification/alternative-receipt-version-unknown when none is at_stack_pin). All three at 0 means only "
+     "another platform's receipt verifies it (verification/alternative-receipt-off-platform). stack_component_id "
+     "names the stack component; the index repeats no version or pin."),
     ("measured_rank",
      "K4. 0 unless every member of a K1-K3 tie class has a verified result in one comparability group: layer, the "
      "metric equal to the layer's overturn_protocol metric, benchmark or harness id and major version, fixture "
@@ -255,7 +300,7 @@ DEFINITIONS = (
 RULE = {
     "version": 1,
     "frozen_at": FROZEN_AT,
-    "keys": ["recorded_role", "evidence_tier", "verification_at_current_pin", "measured_rank"],
+    "keys": ["recorded_role", "evidence_tier", "host_verification_at_pin", "measured_rank"],
     "blended_score": False,
     "tie": "competition",
     "verification_platform": PLATFORM,
@@ -326,6 +371,21 @@ def verification_level(role, state) -> int:
     return levels[state]
 
 
+def check_receipt_versions(entity, verification: dict) -> None:
+    """An alternative's receipt_versions are present exactly when its state is host_verified or
+    host_verified_at_stack_pin, count RECEIPT_VERSION_CLASSES (F13 otherwise), and hold a receipt at the stack pin
+    exactly for host_verified_at_stack_pin (F5 otherwise), so a stored level 0 always rests on such a receipt."""
+    state, counts = verification.get("state"), verification.get("receipt_versions")
+    if state not in ALTERNATIVE_HOST_VERIFIED:
+        require(counts is None, "F5", f"{entity}: receipt_versions belong to a host_verified alternative only")
+        return
+    require(isinstance(counts, dict) and sorted(counts) == sorted(RECEIPT_VERSION_CLASSES)
+            and all(type(value) is int and value >= 0 for value in counts.values()), "F13",
+            f"{entity}: receipt_versions must count {', '.join(RECEIPT_VERSION_CLASSES)}")
+    require((counts["at_stack_pin"] > 0) == (state == ALTERNATIVE_AT_PIN), "F5",
+            f"{entity}: {ALTERNATIVE_AT_PIN} needs a receipt at the stack pin, and only it has one")
+
+
 def sort_key(placement: dict) -> list[int]:
     """[K1, K2, K3, K4], recomputed from the placement's recorded role, evidence and verification state. A stored
     tier or level that differs from the recomputed one fails (F5), so a reader re-derives the order itself."""
@@ -342,6 +402,8 @@ def sort_key(placement: dict) -> list[int]:
     level = verification_level(role, verification.get("state"))
     require(verification.get("level", level) == level, "F5",
             f"{entity}: stored verification level {verification.get('level')!r} differs from the rule's {level}")
+    if role == "alternative":
+        check_receipt_versions(entity, verification)
     measured = placement.get("measured") if isinstance(placement.get("measured"), dict) else {}
     rank = measured.get("rank", 0)
     require(type(rank) is int and rank >= 0, "F8", f"{entity}: measured rank must be a nonnegative integer")
@@ -558,6 +620,13 @@ class _Build:
         self.items: list[dict] = []
         self.unresolved: list[dict] = []
         self.flags: dict[tuple[str, str], set[str]] = {}
+        # What an alternative's verification reads, as component_matrix.build_document builds it: the host receipt
+        # summary (components only), the stack id per normalized repository, the stack versions, and the layer keys
+        # that catalogue each repository. build_document fills them.
+        self.receipts_summary: dict = {"components": {}}
+        self.repo_to_component: dict[str, str] = {}
+        self.stack_versions: dict[str, object] = {}
+        self.repository_layers: dict[str, set[str]] = {}
 
     def resolve(self, value):
         """(entity reference, None), or (None, the reason it does not resolve)."""
@@ -629,6 +698,57 @@ class _Build:
                             "disposition": card.get("disposition"), "matrix": None, "ledger": card,
                             "matrix_pointer": None})
         return records
+
+    def alternative_verification(self, entity: str, alternative: dict, layer_ref: str) -> dict:
+        """K3 of an alternative from its matrix entry. component_matrix.build_alternative, rerun on the host receipts,
+        must reproduce the committed e2e_state (F2 otherwise: the matrix is stale). A host_verified alternative
+        becomes host_verified_at_stack_pin (level 0) only when a linux-wsl2-x86_64 receipt that build_alternative
+        alone accepts records the stack pin of the component sharing its repository (host_receipts.pin_matches);
+        receipt_versions counts those receipts by recorded version. Every other state is level 1."""
+        state = alternative.get("e2e_state")
+        require(state in ALTERNATIVE_E2E_STATES, "F13", f"{entity}: unknown alternative e2e_state {state!r}")
+        layer_key = layer_ref.split(":", 1)[1]
+        repository = host_receipts.normalize_repository(alternative.get("repository"))
+        catalogued = tuple(sorted(self.repository_layers.get(repository, ()))) if repository else ()
+
+        def e2e_state(summary: dict):
+            return component_matrix.build_alternative(alternative, self.repo_to_component, summary, layer_key,
+                                                      catalogued).get("e2e_state")
+
+        recomputed = e2e_state(self.receipts_summary)
+        require(recomputed == state, "F2",
+                f"{layer_ref} {entity}: the matrix records alternative e2e_state {state}, but "
+                f"component_matrix.build_alternative gives {recomputed} from the host receipts; run python3 "
+                "scripts/component_matrix.py --write")
+        component_id = self.repo_to_component.get(repository) if repository else None
+        verification = {"state": state, "level": None, "declared": None, "macos": None, "host_receipts": None,
+                        "stack_component_id": component_id if isinstance(component_id, str) else None,
+                        "receipt_versions": None}
+        if state == "host_verified":
+            pin = self.stack_versions.get(component_id)
+            # Receipts the full summary retires stay retired; build_alternative then judges each one alone.
+            retired = platform_status.non_current_paths(self.receipts_summary, component_id)
+            component = self.receipts_summary["components"].get(component_id)
+            bucket = ((component.get("platforms") if isinstance(component, dict) else None) or {}).get(PLATFORM)
+            counts = dict.fromkeys(RECEIPT_VERSION_CLASSES, 0)
+            for receipt in (bucket.get("receipts") if isinstance(bucket, dict) else None) or []:
+                if not isinstance(receipt, dict) or receipt.get("path") in retired:
+                    continue
+                alone = {"components": {component_id: {"platforms": {PLATFORM: {"receipts": [receipt]}}}}}
+                if e2e_state(alone) != "host_verified":
+                    continue
+                version = receipt.get("component_version")
+                if host_receipts.pin_matches(version, pin):
+                    counts["at_stack_pin"] += 1
+                elif host_receipts.normalize_pin(version) is None or host_receipts.normalize_pin(pin) is None:
+                    counts["unknown_version"] += 1
+                else:
+                    counts["other_version"] += 1
+            verification["receipt_versions"] = counts
+            if counts["at_stack_pin"]:
+                verification["state"] = ALTERNATIVE_AT_PIN
+        verification["level"] = verification_level("alternative", verification["state"])
+        return verification
 
     def winner_pin_current(self, component_id, components: list[dict]):
         values = [component["pin_current"] for component in components if component_id in component["winner_ids"]]
@@ -716,10 +836,7 @@ class _Build:
             entry["component_id"] = winner.get("component_id")
             entry["freshness"]["pin_current"] = self.winner_pin_current(winner.get("component_id"), components)
         elif role == "alternative":
-            state = governing["matrix"].get("e2e_state")
-            require(state in ALTERNATIVE_E2E_STATES, "F13", f"{entity}: unknown alternative e2e_state {state!r}")
-            entry["verification"] = {"state": state, "level": verification_level(role, state), "declared": None,
-                                     "macos": None, "host_receipts": None}
+            entry["verification"] = self.alternative_verification(entity, governing["matrix"], layer_ref)
         else:
             entry["verification"] = {"state": "not_applicable", "level": 0, "declared": None, "macos": None,
                                      "host_receipts": None}
@@ -758,8 +875,29 @@ class _Build:
                               flagged)
             if placement["role"] == "alternative" and verification["state"] != "not_run":
                 self.item("verification/joined-by-repository",
-                          f"{entity}: alternative e2e_state {verification['state']} comes from the stack component "
-                          "that shares its repository, not from a record of this layer", [layer_ref, entity], flagged)
+                          f"{entity}: alternative verification state {verification['state']} comes from stack "
+                          f"component {verification['stack_component_id']}, which shares its repository, not from a "
+                          "record of this layer", [layer_ref, entity], flagged)
+            if placement["role"] == "alternative" and verification["state"] == "host_verified":
+                counts, component = verification["receipt_versions"], verification["stack_component_id"]
+                if counts["other_version"]:
+                    self.item("verification/alternative-receipt-version-mismatch",
+                              f"{entity}: {counts['other_version']} {PLATFORM} host receipt(s) of stack component "
+                              f"{component} verify this alternative but record a version other than its "
+                              "manifests/stack.json pin, and none records the pin; K3 level 1 (the matrix's "
+                              "host_verified joins by repository on any platform and version)", [layer_ref, entity],
+                              flagged)
+                if counts["unknown_version"]:
+                    self.item("verification/alternative-receipt-version-unknown",
+                              f"{entity}: {counts['unknown_version']} {PLATFORM} host receipt(s) of stack component "
+                              f"{component} verify this alternative but record no version comparable with its "
+                              "manifests/stack.json pin (or the stack records none), and none records the pin; K3 "
+                              "level 1", [layer_ref, entity], flagged)
+                if not any(counts.values()):
+                    self.item("verification/alternative-receipt-off-platform",
+                              f"{entity}: only receipts on a platform other than {PLATFORM} verify this alternative "
+                              f"(stack component {component}); K3 level 1 on {PLATFORM}", [layer_ref, entity],
+                              flagged)
         winners = [placement for placement in placements if placement["role"] == "winner"]
         alternatives = [placement for placement in placements if placement["role"] == "alternative"]
         pairs = [(winner, alternative) for winner in winners for alternative in alternatives
@@ -792,7 +930,7 @@ class _Build:
                 winner_pairs += "winner" in (first["role"], second["role"])
                 self.item("evidence/class-verification-inversion",
                           f"{layer_ref}: {ahead['entity']} precedes {behind['entity']} on evidence tier, while "
-                          f"{behind['entity']} precedes it on verification at the current pin; evidence tier "
+                          f"{behind['entity']} precedes it on host verification at the pin; evidence tier "
                           "orders first", [layer_ref, *sorted((ahead["entity"], behind["entity"]))],
                           [(layer_ref, ahead["entity"]), (layer_ref, behind["entity"])])
         if layer_state == "recorded_reopened":
@@ -936,6 +1074,14 @@ def build_document(root) -> dict:
     stack = reader.input(STACK_FILE)
     evidence = reader.input(EVIDENCE_FILE)
     landscape_manifest = reader.input(LANDSCAPE_MANIFEST_FILE)
+    reader.inputs.update(HOST_RECEIPT_INPUTS)  # read by host_receipts.build_summary, as the matrix reads them
+    try:
+        receipts_summary = host_receipts.build_summary(root)
+    except (catalog_decisions.InvalidDecisionIndex, OSError, ValueError) as error:
+        fail("F12", f"{HOST_RECEIPTS_INPUT}: host_receipts.build_summary failed ({error})")
+    receipt_components = receipts_summary.get("components") if isinstance(receipts_summary, dict) else None
+    require(isinstance(receipt_components, dict), "F12",
+            f"{HOST_RECEIPTS_INPUT}: host_receipts.build_summary returned no components object")
     listing = catalog_listing(root)
     for relative in listing:
         reader.scan(relative)
@@ -949,6 +1095,15 @@ def build_document(root) -> dict:
 
     ledger_layers = keyed_ledger_layers(ledgers)
     matrix_rows = keyed_matrix_rows(matrix)
+    # The context component_matrix.build_document gives build_alternative, from the same files; the summary's
+    # clock-stamped generated_at_utc is dropped.
+    build.receipts_summary = {"components": receipt_components}
+    build.repo_to_component = component_matrix.repository_to_component_id(stack if isinstance(stack, dict) else None)
+    build.stack_versions = {component["id"]: component.get("version")
+                            for component in ((stack.get("components") if isinstance(stack, dict) else None) or [])
+                            if isinstance(component, dict) and isinstance(component.get("id"), str)}
+    build.repository_layers = host_receipts.repository_layers(
+        {f"{catalog}/{layer_id}": layer for (catalog, layer_id), (_path, _index, layer) in ledger_layers.items()})
     require(set(ledger_layers) == set(matrix_rows), "F2",
             "the matrix layer set differs from the ledger layer set; run python3 scripts/component_matrix.py --write")
     require(len(matrix_rows) == EXPECTED_LAYER_COUNT, "F2",

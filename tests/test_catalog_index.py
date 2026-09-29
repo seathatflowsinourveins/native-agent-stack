@@ -63,10 +63,16 @@ def W(name, component_id=None, *, repository=None, evidence_class="native_proven
             "pin_current": pin_current, "latest": latest, "evidence_refs": list(evidence_refs)}
 
 
-def A(name, *, repository=None, disposition="conditional", evidence_class="source_review", e2e_state="not_run"):
-    """A verdict alternative as the matrix states it."""
+def A(name, *, repository=None, disposition="conditional", evidence_class="source_review", e2e_state="not_run",
+      stack_version="1.0.0", receipt_version="1.0.0", receipt_platform=LINUX):
+    """A verdict alternative as the matrix states it. For e2e_state host_verified or receipts_recorded the fixture also
+    writes what makes component_matrix.build_alternative reproduce that state: a manifests/stack.json component with
+    the alternative's repository at ``stack_version``, and one shape-valid, independently reviewed native_proven pass on
+    ``receipt_platform`` recording ``receipt_version`` (None: no tool_versions entry for the component), at stage use
+    for host_verified or install for receipts_recorded (an install pass never verifies an alternative)."""
     return {"role": "alternative", "name": name, "repository": repository or _github(name),
-            "disposition": disposition, "evidence_class": evidence_class, "e2e_state": e2e_state}
+            "disposition": disposition, "evidence_class": evidence_class, "e2e_state": e2e_state,
+            "stack_version": stack_version, "receipt_version": receipt_version, "receipt_platform": receipt_platform}
 
 
 def C(name, *, repository=None, disposition="unqualified", evidence_kind="source_review",
@@ -79,6 +85,32 @@ def C(name, *, repository=None, disposition="unqualified", evidence_kind="source
 def _receipts(passes, fails, reviewed, latest):
     return {"pass": passes, "fail": fails, "independently_reviewed_pass": reviewed,
             "independently_reviewed_fail": 0, "dissented": 0, "latest": latest}
+
+
+FIXTURE_HOST = "fixture-host-20260922"
+
+
+def _host_receipt(component_id, platform_id, *, stage="use", version="1.0.0"):
+    """A receipt that adoption/host-receipt.schema.json accepts and host_receipts.build_summary counts as an
+    independently reviewed native_proven pass from a declared second physical machine (the shape of
+    tests/test_component_matrix.py's _receipt). ``version`` None records no tool_versions entry for the component."""
+    at = "2026-09-22T01:00:00Z"
+    linux = platform_id == LINUX
+    recorder = {"identity_sha256": hr.identity_digest("recorder-session")}
+    return {
+        "schema_version": 1, "id": f"{FIXTURE_HOST}--{component_id}--{stage}--20260922", "kind": "host_acceptance",
+        "host": {"host_id": FIXTURE_HOST, "platform_id": platform_id, "os": "linux" if linux else "macos",
+                 "architecture": "x86_64" if linux else "arm64", "second_physical_machine": True},
+        "catalog_revision": "0" * 40, "recorded_by": recorder, "component_id": component_id, "stage": stage,
+        "commands": [{"cmd": "echo hi", "exit": 0, "duration_s": 0.01,
+                      "output_sha256": hashlib.sha256(b"hi\n").hexdigest(), "output_excerpt": "hi"}],
+        "tool_versions": {} if version is None else {component_id: version},
+        "observed_at_utc": at, "result": "pass", "claim": "fixture claim", "limitations": ["fixture limitation"],
+        "evidence_class": "native_proven",
+        "reviews": [{"kind": "self", "ref": "record", "verdict": "agree", "at_utc": at, "reviewer": recorder},
+                    {"kind": "independent_session", "ref": "fixture", "verdict": "agree", "at_utc": at,
+                     "reviewer": {"identity_sha256": hr.identity_digest("reviewer-session")}}],
+    }
 
 
 class Tree:
@@ -190,9 +222,28 @@ class Tree:
         _write_json(root / "adoption/research.json", {"schema_version": 1, "candidates": []})
         if not (root / "catalogs/us-equities/manifest.json").exists():
             _write_json(root / "catalogs/us-equities/manifest.json", {"schema_version": 1})
+        # What component_matrix.build_alternative needs to reproduce each alternative's stated e2e_state: a stack
+        # component sharing its repository, and a host receipt (use stage: host_verified; install: receipts_recorded).
+        stack, receipts = list(self.stack), []
+        for layer in self.layers:
+            for r in layer["records"]:
+                if r["role"] != "alternative" or r["e2e_state"] == "not_run":
+                    continue
+                name = cd.identity(r["repository"])
+                component_id = name.split("/")[1]
+                if not any(c["repository"] == name for c in stack):
+                    stack.append({"id": component_id, "repository": name, "version": r["stack_version"]})
+                stage = "use" if r["e2e_state"] == "host_verified" else "install"
+                receipts.append(_host_receipt(component_id, r["receipt_platform"], stage=stage,
+                                              version=r["receipt_version"]))
         _write_json(root / "manifests/stack.json", {"schema_version": 1, "components": [
             {"id": c["id"], "repository": _github(c["repository"]), "profile": c.get("profile", "core"),
-             "version": "1.0.0"} for c in self.stack], "profiles": [], "models": []})
+             "version": c.get("version", "1.0.0")} for c in stack], "profiles": [], "models": []})
+        schema = hr.SCHEMA_RELATIVE_PATH
+        (root / schema).parent.mkdir(parents=True, exist_ok=True)
+        (root / schema).write_text((REPO_ROOT / schema).read_text(encoding="utf-8"), encoding="utf-8")
+        for receipt in receipts:
+            _write_json(root / "evidence" / "hosts" / FIXTURE_HOST / f"{receipt['id']}.json", receipt)
         with contextlib.redirect_stdout(io.StringIO()) as printed:
             code = cd.main(["--root", str(root), "--write"])
         if code != 0:
@@ -568,6 +619,115 @@ class KeyOrderTests(IndexCase):
                          ["freshness"]["pin_current"], "true")
 
 
+class AlternativeStackPinTests(IndexCase):
+    """Repair round, review item 3: an alternative's host_verified (the matrix's join by repository, any platform and
+    any version) reaches K3 level 0 only with a linux-wsl2-x86_64 receipt at the manifests/stack.json pin."""
+
+    LAYER = "layer:foundation/l1"
+
+    def state(self, document, name):
+        verification = self.placement(document, self.LAYER, "repo:example/" + name)["verification"]
+        return verification["state"], verification["level"], verification.get("receipt_versions")
+
+    def test_alternative_level_zero_needs_a_platform_receipt_at_the_stack_pin(self):  # 39
+        # example/llama mirrors ggml-org/llama.cpp in foundation/observation-inference: a reviewed use receipt at
+        # b11146 against the stack pin b11057.
+        self.tree.layer("l1", W("example/win"),
+                        A("example/llama", evidence_class="native_proven", e2e_state="host_verified",
+                          stack_version="b11057 (0.4.1-dev)", receipt_version="b11146 (0.5.0-dev)"),
+                        A("example/at-pin", evidence_class="native_proven", e2e_state="host_verified",
+                          stack_version="v2.3.0", receipt_version="2.3.0"),
+                        A("example/unrecorded", evidence_class="native_proven", e2e_state="host_verified",
+                          receipt_version=None),
+                        A("example/mac-only", evidence_class="native_proven", e2e_state="host_verified",
+                          receipt_platform=MACOS),
+                        A("example/none", evidence_class="native_proven"))
+        document = self.build()
+        mismatch = "verification/alternative-receipt-version-mismatch"
+        unknown = "verification/alternative-receipt-version-unknown"
+        off_platform = "verification/alternative-receipt-off-platform"
+        self.assertEqual(self.state(document, "llama"),
+                         ("host_verified", 1, {"at_stack_pin": 0, "other_version": 1, "unknown_version": 0}))
+        llama = self.placement(document, self.LAYER, "repo:example/llama")
+        self.assertIn(mismatch, llama["flags"])
+        self.assertEqual(self.state(document, "at-pin"),
+                         ("host_verified_at_stack_pin", 0, {"at_stack_pin": 1, "other_version": 0, "unknown_version": 0}))
+        self.assertEqual(self.state(document, "unrecorded"),
+                         ("host_verified", 1, {"at_stack_pin": 0, "other_version": 0, "unknown_version": 1}))
+        self.assertEqual(self.state(document, "mac-only"),
+                         ("host_verified", 1, {"at_stack_pin": 0, "other_version": 0, "unknown_version": 0}))
+        self.assertEqual(self.state(document, "none"), ("not_run", 1, None))
+        expected_flags = {"llama": {mismatch}, "at-pin": set(), "unrecorded": {unknown}, "mac-only": {off_platform},
+                          "none": set()}
+        for name, flags in expected_flags.items():
+            with self.subTest(name=name):
+                placement = self.placement(document, self.LAYER, "repo:example/" + name)
+                self.assertEqual({flag for flag in placement["flags"] if "alternative-receipt" in flag}, flags)
+                self.assertEqual(placement["verification"]["stack_component_id"],
+                                 None if name == "none" else name)
+        self.assertEqual([(p["entity"], p["position"], p["shared"])
+                          for p in self.layer(document, self.LAYER)["placements"]],
+                         [("repo:example/win", 1, False), ("repo:example/at-pin", 2, False),
+                          ("repo:example/llama", 3, True), ("repo:example/mac-only", 3, True),
+                          ("repo:example/none", 3, True), ("repo:example/unrecorded", 3, True)])
+        self.assertEqual({item_type: (len(self.items(document, item_type)),
+                                      {item["level"] for item in self.items(document, item_type)})
+                          for item_type in (mismatch, unknown, off_platform)},
+                         {mismatch: (1, {"warning"}), unknown: (1, {"info"}), off_platform: (1, {"info"})})
+        self.assertEqual(document["counts"]["verification"]["alternative"],
+                         {"host_verified": 3, "host_verified_at_stack_pin": 1, "not_run": 1, "receipts_recorded": 0})
+        self.assertEqual(document["rule"]["verification_levels"]["alternative"],
+                         {"host_verified": 1, "host_verified_at_stack_pin": 0, "not_run": 1, "receipts_recorded": 1})
+        self.assertIn("host_verification_at_pin", document["rule"]["keys"])
+        text = ci.serialize(document)
+        for version in ("b11057", "b11146", "2.3.0"):
+            self.assertNotIn(version, text)  # the index repeats no pin or recorded version
+
+    def test_matrix_alternative_state_must_match_the_host_receipts(self):  # 40
+        self.tree.layer("l1", W("example/win"), A("example/alt", evidence_class="native_proven",
+                                                  e2e_state="host_verified"))
+        self.tree.write()
+        receipt = next((self.root / "evidence" / "hosts" / FIXTURE_HOST).glob("*.json"))
+        receipt.unlink()  # the matrix still says host_verified; the receipts no longer do
+        with self.assertRaisesRegex(ci.InvalidIndex, "F2.*component_matrix.py --write"):
+            self.rebuild()
+        self.tree.layers[0]["records"][1]["e2e_state"] = "not_run"
+        self.tree.stack.append({"id": "alt", "repository": "example/alt"})
+        self.tree.write()  # no receipt is written for a not_run alternative
+        _write_json(receipt, _host_receipt("alt", LINUX))  # a verifying receipt the matrix does not reflect
+        with self.assertRaisesRegex(ci.InvalidIndex, "F2.*component_matrix.py --write"):
+            self.rebuild()
+
+    def test_stored_alternative_state_and_receipt_counts_must_agree(self):  # 41
+        self.tree.layer("l1", W("example/win"),
+                        A("example/pinned", evidence_class="native_proven", e2e_state="host_verified"),
+                        A("example/plain"))
+        document = self.build()
+        self.assertEqual(self.state(document, "pinned"),
+                         ("host_verified_at_stack_pin", 0, {"at_stack_pin": 1, "other_version": 0, "unknown_version": 0}))
+        self.assertEqual(self.state(document, "plain"), ("not_run", 1, None))
+        ci.check_document(copy.deepcopy(document))
+
+        def tampered(name, change):
+            copied = copy.deepcopy(document)
+            placement = next(p for p in copied["layers"][0]["placements"] if p["entity"] == "repo:example/" + name)
+            change(placement["verification"])
+            return copied
+
+        cases = {
+            "level 0 without a receipt at the pin": ("F5", tampered("pinned", lambda v: v["receipt_versions"].update(
+                at_stack_pin=0, other_version=1))),
+            "a receipt at the pin under plain host_verified": ("F5", tampered("pinned", lambda v: v.update(
+                state="host_verified", level=1))),
+            "receipt counts on a not_run alternative": ("F5", tampered("plain", lambda v: v.update(
+                receipt_versions={"at_stack_pin": 0, "other_version": 0, "unknown_version": 0}))),
+            "a malformed count": ("F13", tampered("pinned", lambda v: v["receipt_versions"].update(at_stack_pin=-1))),
+        }
+        for name, (check, tampered_document) in cases.items():
+            with self.subTest(case=name), self.assertRaisesRegex(ci.InvalidIndex, check):
+                ci.check_document(tampered_document)
+
+
 class MeasurementTests(IndexCase):
     LAYER, METRIC = "layer:foundation/l1", "task success on the frozen fixture"
 
@@ -634,7 +794,8 @@ class MeasurementTests(IndexCase):
     def test_order_is_a_total_preorder(self):  # 15
         rng = random.Random(20260929)
         states = {"winner": ["host_verified", "accepted", "conditional", "not_established", "untested"],
-                  "alternative": ["host_verified", "receipts_recorded", "not_run"], "candidate": ["not_applicable"]}
+                  "alternative": ["host_verified_at_stack_pin", "host_verified", "receipts_recorded", "not_run"],
+                  "candidate": ["not_applicable"]}
         values = {"evidence_class": ["native_proven", "measured_comparison", "local_integration", "synthetic",
                                      "source_review"],
                   "evidence_kind": ["native_execution", "measured_comparison", "source_review", "requirement_fit",
@@ -644,10 +805,15 @@ class MeasurementTests(IndexCase):
             for number in range(rng.randint(2, 9)):
                 role = rng.choice(["winner", "alternative", "candidate"])
                 field = "evidence_kind" if role == "candidate" else "evidence_class"
+                verification = {"state": rng.choice(states[role])}
+                if role == "alternative" and verification["state"] in ci.ALTERNATIVE_HOST_VERIFIED:
+                    verification["receipt_versions"] = {
+                        "at_stack_pin": rng.randint(1, 2) if verification["state"] == ci.ALTERNATIVE_AT_PIN else 0,
+                        "other_version": rng.randint(0, 2), "unknown_version": rng.randint(0, 1)}
                 placements.append({"entity": f"repo:fixture/p{number}", "role": role,
                                    "evidence": {"field": field, "recorded": rng.choice(values[field]),
                                                 "retained_local_result": rng.random() < 0.5},
-                                   "verification": {"state": rng.choice(states[role])}})
+                                   "verification": verification})
             measurements = []
             for placement in placements:
                 if rng.random() < 0.7:
@@ -851,8 +1017,10 @@ class ConservationTests(IndexCase):
             loaded.append(relative)
             return original(root, relative)
 
-        with mock.patch.object(cd, "load", recording):
+        with mock.patch.object(cd, "load", recording), \
+                mock.patch.object(hr, "build_summary", wraps=hr.build_summary) as summary:
             document = self.rebuild()
+        summary.assert_called_once_with(self.root)
         aliases = cd.aliases_for(self.root)
         checked = 0
         for layer in document["layers"]:
@@ -874,7 +1042,10 @@ class ConservationTests(IndexCase):
         declared = {item["path"] for item in document["inputs"]}
         listing = {item["path"] for item in document["coverage"]["catalog_files"]}
         self.assertIn(ci.LISTING_INPUT, declared)
-        self.assertEqual(set(loaded), (declared - {ci.LISTING_INPUT}) | listing)
+        # The host receipts, their schema and the platform profiles are read by host_receipts.build_summary (asserted
+        # above), not through catalog_decisions.load; every other declared input is.
+        self.assertLessEqual(ci.HOST_RECEIPT_INPUTS, declared)
+        self.assertEqual(set(loaded), (declared - {ci.LISTING_INPUT} - ci.HOST_RECEIPT_INPUTS) | listing)
         self.assertTrue(all(path.startswith(("catalogs/", "manifests/")) for path in loaded), loaded)
 
     def test_only_receipts_and_convergence_records_are_read_from_evidence(self):  # 21

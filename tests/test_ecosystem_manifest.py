@@ -1633,15 +1633,19 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         """A two-layer ranked index in the shape scripts/catalog_index.py writes, with sort keys and positions that
         follow its rule: recorded role, evidence tier, verification level, measured rank; competition positions."""
         def placement(entity, role, key, position, shared, field, recorded, state, *, retained=None, flags=(),
-                      macos=None, receipts=None, pin_current=None, component_id=None):
+                      macos=None, receipts=None, pin_current=None, component_id=None, receipt_versions=None):
+            verification = {"level": key[2], "state": state, "declared": None, "macos": macos,
+                            "host_receipts": receipts}
+            if role == "alternative":
+                verification.update(stack_component_id=entity.split("/")[1] if receipt_versions else None,
+                                    receipt_versions=receipt_versions)
             return {"entity": entity, "role": role, "component_id": component_id,
                     "role_records": [{"path": "catalogs/landscape/foundation.json", "pointer": "/layers/0/winners/0",
                                       "role": role, "disposition": None}],
                     "matrix_record": None,
                     "evidence": {"field": field, "recorded": recorded, "tier": "ABCU"[key[1]],
                                  "retained_local_result": retained, "policy_rows": []},
-                    "verification": {"level": key[2], "state": state, "declared": None, "macos": macos,
-                                     "host_receipts": receipts},
+                    "verification": verification,
                     "freshness": {"pin_current": pin_current},
                     "measured": {"group": None, "rank": key[3], "basis": cls.NO_MEASUREMENT},
                     "sort_key": list(key), "position": position, "shared": shared, "flags": list(flags)}
@@ -1677,13 +1681,35 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                 placement("repo:example/search", "candidate", (2, 0, 0, 0), 1, True, "evidence_kind",
                           "native_execution", "not_applicable", retained=False)],
             "outside_ranking": [], "caution": []}
+        # An alternative's verification (scripts/catalog_index.py K3): level 0 only at the stack pin on Linux.
+        tools = {
+            "ref": "layer:foundation/tools", "catalog": "foundation", "layer_id": "tools", "title": "Tools",
+            "source": {"path": "catalogs/landscape/foundation.json", "pointer": "/layers/1"},
+            "banner": banner("confirmed_current", ""),
+            "placements": [
+                placement("repo:example/tool-win", "winner", (0, 0, 0, 0), 1, False, "evidence_class", "native_proven",
+                          "host_verified", macos="untested", pin_current="true", component_id="tool-win",
+                          receipts={"pass": 1, "fail": 0, "independently_reviewed_pass": 1}),
+                placement("repo:example/pinned", "alternative", (1, 0, 0, 0), 2, False, "evidence_class",
+                          "native_proven", "host_verified_at_stack_pin",
+                          receipt_versions={"at_stack_pin": 1, "other_version": 0, "unknown_version": 0}),
+                placement("repo:example/drifted", "alternative", (1, 0, 1, 0), 3, True, "evidence_class",
+                          "native_proven", "host_verified",
+                          receipt_versions={"at_stack_pin": 0, "other_version": 1, "unknown_version": 0},
+                          flags=("verification/alternative-receipt-version-mismatch",)),
+                placement("repo:example/unrun", "alternative", (1, 0, 1, 0), 3, True, "evidence_class",
+                          "native_proven", "not_run")],
+            "outside_ranking": [], "caution": []}
         items = [
             {"type": "coverage/not-reached", "level": "info", "message": "catalogs/review.json is not reached",
              "refs": ["catalogs/review.json"]},
             {"type": "freshness/pin-behind-upstream", "level": "info", "message": "pin_current is false",
              "refs": ["layer:foundation/retrieval", "repo:example/search"]},
             {"type": "role/selected-card-not-winner", "level": "warning", "message": "a selected card, not a winner",
-             "refs": ["layer:foundation/retrieval", "repo:example/idea"]}]
+             "refs": ["layer:foundation/retrieval", "repo:example/idea"]},
+            {"type": "verification/alternative-receipt-version-mismatch", "level": "warning",
+             "message": "a receipt at another version than the stack pin",
+             "refs": ["layer:foundation/tools", "repo:example/drifted"]}]
         def entity(ref):
             return {"ref": ref, "aliases": [], "component_ids": [], "stack_profiles": [],
                     "decision_index": {"repository": ref[5:], "reference_kinds": {}}, "placements": [],
@@ -1695,18 +1721,20 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                      "benchmark win.",
             "universal_superiority": "not_established",
             "rule": {"version": 1, "frozen_at": "2026-09-29", "tie": "competition", "blended_score": False,
-                     "keys": ["recorded_role", "evidence_tier", "verification_at_current_pin", "measured_rank"],
+                     "keys": ["recorded_role", "evidence_tier", "host_verification_at_pin", "measured_rank"],
                      "verification_platform": "linux-wsl2-x86_64",
                      "definitions": [{"term": "recorded_role", "definition": "Winner, then alternative, then card."},
                                      {"term": "position", "definition": "Competition ranking within one layer."}]},
             "inputs": [], "unresolved": [], "measurements": [],
-            "counts": {"placements": {"layers": 2, "ranked": 4, "outside_ranking": 1, "caution": 0},
+            "counts": {"placements": {"layers": 3, "ranked": 8, "outside_ranking": 1, "caution": 0},
                        "status_items": {"coverage/not-reached": 1, "freshness/pin-behind-upstream": 1,
-                                        "role/selected-card-not-winner": 1},
+                                        "role/selected-card-not-winner": 1,
+                                        "verification/alternative-receipt-version-mismatch": 1},
                        "coverage": {"index_input": 2, "matrix_input": 0, "decision_index_source": 1,
                                     "not_reached": 1}},
-            "layers": [retrieval, pending],
-            "entities": [entity("repo:example/idea"), entity("repo:example/other"), entity("repo:example/search")],
+            "layers": [retrieval, pending, tools],
+            "entities": [entity("repo:example/" + name)
+                         for name in ("drifted", "idea", "other", "pinned", "search", "tool-win", "unrun")],
             "status_items": items,
             "evidence": {"receipts_unattached": [], "experiments": []},
             "coverage": {"catalog_files": [], "unmodeled_collections": []}}
@@ -1732,7 +1760,7 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         ranking = data["ranking"]
         self.assertIsNotNone(ranking)
         self.assertEqual([layer["ref"] for layer in ranking["layers"]],
-                         ["layer:foundation/retrieval", "layer:us-equities/pending"])
+                         ["layer:foundation/retrieval", "layer:us-equities/pending", "layer:foundation/tools"])
         for key in ("banner", "placements", "outside_ranking", "caution", "title"):
             with self.subTest(key=key):
                 self.assertEqual([layer[key] for layer in ranking["layers"]],
@@ -1821,11 +1849,20 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         self.assertEqual(rows, [
             ["1", "example/search", "winner", "native_proven · tier A", "host_verified (Linux) · macOS untested",
              "false", self.NO_MEASUREMENT, "freshness/pin-behind-upstream"],
-            ["2", "example/idea", "alternative", "source_review · tier C", "not_run (Linux)", "-",
+            ["2", "example/idea", "alternative", "source_review · tier C", "not_run", "-",
              self.NO_MEASUREMENT, "role/selected-card-not-winner"],
             ["=1", "example/idea", "candidate", "mixed · tier A", "not applicable", "-", self.NO_MEASUREMENT, "-"],
             ["=1", "example/search", "candidate", "native_execution · tier A", "not applicable", "-",
-             self.NO_MEASUREMENT, "-"]])
+             self.NO_MEASUREMENT, "-"],
+            ["1", "example/tool-win", "winner", "native_proven · tier A", "host_verified (Linux) · macOS untested",
+             "true", self.NO_MEASUREMENT, "-"],
+            ["2", "example/pinned", "alternative", "native_proven · tier A", "host_verified_at_stack_pin (Linux)", "-",
+             self.NO_MEASUREMENT, "-"],
+            ["=3", "example/drifted", "alternative", "native_proven · tier A",
+             "host_verified by repository, not at the stack pin on Linux (Linux receipts: 1 other version, "
+             "0 unknown version)", "-", self.NO_MEASUREMENT, "verification/alternative-receipt-version-mismatch"],
+            ["=3", "example/unrun", "alternative", "native_proven · tier A", "not_run", "-", self.NO_MEASUREMENT,
+             "-"]])
         for expected in ("Outside this ranking: example/other (out_of_scope)",
                          "No recorded verdict: every entry is a historical candidate card"):
             self.assertIn(expected, observed["ranking_layers"])

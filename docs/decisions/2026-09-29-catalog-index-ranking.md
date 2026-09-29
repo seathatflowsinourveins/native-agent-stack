@@ -4,7 +4,9 @@
 judged 25 to 19 of 30 on correctness, reuse, rule clarity, honesty, validation and change size), built by a Claude Code
 worker on branch `claude/catalog-index-ranking-20260929`, based on `origin/main@df412368`. The review cited its evidence at
 `5cfa2400`; between the two revisions no input the index reads changed (only `files[]` of `manifests/evidence.json`, which
-the index never reads).
+the index never reads). After an independent review and verification of that build, one repair round rebased the branch
+onto `origin/main@ed293987` and made the changes this record now states (the stack-pin rule for alternatives, duplicate
+role records, the bot's index regeneration and the procedures that refresh the matrix).
 
 **The request.** One validated index over the scattered catalog files, with every one of the 32 layers' winners,
 alternatives and candidate cards ranked by evidence, and the order readable in the offline explorer.
@@ -13,9 +15,10 @@ alternatives and candidate cards ranked by evidence, and the order readable in t
 
 `scripts/catalog_index.py --write` generates `catalogs/landscape/catalog-index.json`, a read-only join of the committed
 component evidence matrix, both layer ledgers, the repository decision index (with its coverage aliases),
-`manifests/stack.json`, `receipts[]` and `convergence_records[]` of `manifests/evidence.json`, and the landscape manifest.
-It never selects a winner, changes a verdict, records a receipt or infers a benchmark win. `--check` (a new CI step after
-the grand-list check) rebuilds it in memory, runs the fatal checks F2-F16 and byte-compares it (F1).
+`manifests/stack.json`, `receipts[]` and `convergence_records[]` of `manifests/evidence.json`, the landscape manifest, and
+the host receipts under `evidence/hosts/` (through `host_receipts.build_summary`, with the receipt schema and the platform
+profiles it reads). It never selects a winner, changes a verdict, records a receipt or infers a benchmark win. `--check` (a
+new CI step after the grand-list check) rebuilds it in memory, runs the fatal checks F2-F16 and byte-compares it (F1).
 `scripts/build_ecosystem.py` embeds it as the explorer's hidden-unless-present **Ranked by evidence** tab and re-derives every
 position with the index module's own functions. `tools/sota-convergence/blind_checkout.py` removes it from blind exports,
 because it names every layer's winner by value. No catalog is merged or retired.
@@ -33,10 +36,27 @@ arithmetic across keys:
    or `mixed` with a retained local result, the `scripts/landscape.py` observed-failure predicate); B for
    `local_integration`/`synthetic` (tied); C for `source_review` or `mixed` without a retained result; U for
    `requirement_fit` (no policy row), flagged.
-3. **verification_at_current_pin** on linux-wsl2-x86_64, from the matrix's derived status, never the declared one: winners
-   0 `host_verified`, 1 derived `accepted` (this includes the registered-evidence route, which is not pin-bound), 2
-   `conditional`, 3 `not_established`/`untested`; alternatives 0 `host_verified`, 1 otherwise (`receipts_recorded` is an
-   annotation); card-only candidates a constant.
+3. **host_verification_at_pin**, on linux-wsl2-x86_64 only, from the matrix's derived status and the host receipts, never
+   the declared status. Level 0 needs an independently reviewed `native_proven` use-stage host receipt on that platform
+   that records the pinned version, is current (not superseded at its version, not on a forked chain) and is in the
+   layer's scope.
+   - Winners: 0 `host_verified` (derived `accepted` on such a receipt, which `scripts/platform_status.py` binds to the
+     winner's verdict pin), 1 derived `accepted` by another route (this includes the registered-evidence route, which is
+     bound to no pin), 2 `conditional`, 3 `not_established`/`untested`.
+   - Alternatives: 0 `host_verified_at_stack_pin`: a receipt of the `manifests/stack.json` component that shares the
+     alternative's repository, which `component_matrix.build_alternative` alone accepts, on linux-wsl2-x86_64, whose
+     `tool_versions` entry equals that component's stack version (`host_receipts.pin_matches`). 1 otherwise. That
+     includes the matrix's `host_verified`, a join by repository on any platform and at any version, when no such
+     receipt exists; the placement is then flagged `verification/alternative-receipt-version-mismatch` (a receipt at
+     another version), `verification/alternative-receipt-version-unknown` (no comparable version recorded, or no stack
+     version) or `verification/alternative-receipt-off-platform` (only another platform's receipt verifies it).
+     `receipts_recorded` is an annotation.
+   - Card-only candidates: a constant.
+
+   The index reruns `component_matrix.build_alternative` on the host receipts and fails (F2) when that does not
+   reproduce the matrix's alternative `e2e_state`. It repeats no version or pin: `receipt_versions` counts an
+   alternative's qualifying linux-wsl2-x86_64 receipts as `at_stack_pin`, `other_version` or `unknown_version`, and
+   `stack_component_id` names the component.
 4. **measured_rank**: 0 unless every member of a K1-K3 tie class has a verified result in one comparability group (layer,
    the layer's overturn metric, benchmark id and major version, fixture sha256 set, host profile, pins, direction); then the
    approximate rank from non-overlapping intervals, or an exact pass before an exact fail on the same frozen fixture. Empty in
@@ -47,34 +67,45 @@ currency (`pin_current`), stars, releases, sweep review status, votes, confidenc
 `catalog_status`, dispositions within a role and priorities are never sort keys. Conflicts become status items
 (`status_items`, Backstage style); none is resolved.
 
-## Counts recomputed by the generator at df412368
+## Counts recomputed by the generator on `origin/main@ed293987` plus this branch
 
 - 32 layers (30 recorded, 2 `pending_lanes`), 614 source records, 0 unresolved; 440 placements: 414 ranked (66 winners, 164
   alternatives, 184 card-only candidates), 26 outside the ranking, 0 under caution. 36 of the ranked placements are in the
   two pending layers.
-- 369 of 414 ranked placements share a position; 120 distinct positions; the largest tie holds 16.
-- Winners by K3: 44 `host_verified`, 5 `accepted`, 13 `conditional`, 4 `not_established`. Alternatives: 7
-  `host_verified`, 157 not (21 `receipts_recorded`, 136 `not_run`). Winner `pin_current`: 32 true, 15 false, 19 unknown.
-- Entities: 875 (the decision-index records); receipts: 171 listed, 171 attached; experiments: 25 convergence records, none
+- 368 of 414 ranked placements share a position; 120 distinct positions; the largest tie holds 16.
+- Winners by K3: 44 `host_verified`, 5 `accepted`, 13 `conditional`, 4 `not_established`. Alternatives: 6
+  `host_verified_at_stack_pin` (level 0) and 158 at level 1: 1 `host_verified` off the stack pin, 21
+  `receipts_recorded`, 136 `not_run`. The one off the pin is ggml-org/llama.cpp in `foundation/observation-inference`:
+  its reviewed use receipt records `b11146 (0.5.0-dev)` against the stack pin `b11057 (0.4.1-dev)`, so it moves from =4
+  (level 0, beside agentsview) to =5 (level 1, beside ntfy, grafana, claude-hud and alertmanager). Winner `pin_current`:
+  33 true, 14 false, 19 unknown.
+- Entities: 875 (the decision-index records); receipts: 172 listed, 172 attached; experiments: 25 convergence records, none
   joined (a record path carries no layer or component key).
-- Coverage of 93 listed catalog and manifest files: 8 index inputs, 4 matrix inputs, 30 decision-index sources, 51 not
+- Coverage of 94 listed catalog and manifest files: 8 index inputs, 4 matrix inputs, 30 decision-index sources, 52 not
   reached; 5 unmodeled collections (three `non_repository_decisions` arrays, `manifests/stack.json#/models` and
   `catalogs/us-equities/models.json#/entries`).
-- Status items: 72 `role/selected-card-not-winner` (30 verdict alternatives, 42 card-only), 11
-  `role/selected-card-no-verdict`, 4 `role/winner-card-not-selected`, 4 `status/declared-above-derived`, 6
-  `evidence/winner-tier-below-alternative` (layers), 4 `evidence/class-verification-inversion` (pairs), 25
-  `evidence/mixed-kind`, 4 `evidence/unmapped-kind`, 28 `verification/joined-by-repository`, 2
-  `verification/host-fail-recorded`, 34 `freshness/pin-behind-upstream` (15 false, 19 unknown), 30
-  `freshness/layer-reopened`, 8 `identity/multiple-component-ids`, 0 `identity/component-id-conflict`, 0
-  `identity/unresolved`, 8 `domain-card/default-never-winner`, 1 `source/sweep-manifest-divergence` (manifests 0922, 0923
-  and 0926 in use), 51 `coverage/not-reached`.
-- Overturn metrics: 4 pairs flip between class-first and verification-first order, 0 of them winner pairs (all four in
-  `foundation/observation-inference`: otel-tui against grafana, alertmanager, ntfy and claude-hud); a `pin_current`
-  tiebreak would unshare 17 placements (369 to 352 shared).
-- The file is 1,235,500 bytes, under the 1,500,000-byte warning and the 2,000,000-byte cap (gitleaks skips files over
-  2 MB). Every count above that the design review simulated at `5cfa2400` equals its simulation (it did not simulate the
-  614 source records, the file size or `domain-card/default-never-winner`), and every ranked placement's role, tier,
-  verification level and pin currency equals that simulation's placement list.
+- Status items (22 types):
+  - role: 72 `role/selected-card-not-winner` (30 verdict alternatives, 42 card-only), 11 `role/selected-card-no-verdict`,
+    4 `role/winner-card-not-selected`, 0 `role/duplicate-role-record`;
+  - status and evidence: 4 `status/declared-above-derived`, 6 `evidence/winner-tier-below-alternative` (layers), 5
+    `evidence/class-verification-inversion` (pairs), 25 `evidence/mixed-kind`, 4 `evidence/unmapped-kind`;
+  - verification: 28 `verification/joined-by-repository`, 1 `verification/alternative-receipt-version-mismatch`, 0
+    `verification/alternative-receipt-version-unknown`, 0 `verification/alternative-receipt-off-platform`, 2
+    `verification/host-fail-recorded`;
+  - freshness: 33 `freshness/pin-behind-upstream` (14 false, 19 unknown), 30 `freshness/layer-reopened`;
+  - identity: 8 `identity/multiple-component-ids`, 0 `identity/component-id-conflict`, 0 `identity/unresolved`;
+  - other: 8 `domain-card/default-never-winner`, 1 `source/sweep-manifest-divergence` (manifests 0922, 0923 and 0929 in
+    use), 52 `coverage/not-reached`.
+- Overturn metrics: 5 pairs flip between class-first and verification-first order, 0 of them winner pairs (all five in
+  `foundation/observation-inference`: otel-tui against grafana, alertmanager, ntfy, claude-hud and, since the stack-pin
+  rule, llama.cpp); a `pin_current` tiebreak would unshare 23 placements (368 to 345 shared).
+- The file is 1,256,834 bytes, under the 1,500,000-byte warning and the 2,000,000-byte cap (gitleaks skips files over
+  2 MB).
+- At `df412368`, before the rebase and the repair round, every count the design review simulated at `5cfa2400` equalled
+  its simulation (it did not simulate the 614 source records, the file size or `domain-card/default-never-winner`), and
+  every ranked placement's role, tier, verification level and pin currency equalled that simulation's placement list.
+  Since then `origin/main` changed the matrix (the 2026-09-29 landscape sweep: `pin_current`, the 0929 manifest), added
+  one receipt and one catalog file, and the repair round moved llama.cpp and added four status types.
 
 ## Deviations from the reviewed schema
 
@@ -97,7 +128,11 @@ first generated file with 48 findings, all false positives, so two fields of the
   doing", and `scripts/component_matrix.py` already refuses a blended convergence score.
 - **Evidence before role**: a recorded winner would sort below a stronger-evidence alternative in 6 layers, so the index
   would select winners.
-- **Verification before class**: it departs from the user's listed order and moves the 4 pairs above.
+- **Verification before class**: it departs from the user's listed order and moves the 5 pairs above.
+- **An alternative's repository-joined `host_verified` at level 0, disclosed as bound to no pin or platform** (the
+  review's first option): the order would still put a receipt at another version, or on another platform only, ahead of
+  unverified alternatives. The repair round took the review's second option, binding level 0 to a linux-wsl2-x86_64
+  receipt at the stack pin, as the coordinator directed.
 - **The `pin_current` tiebreak**: it is upstream currency, and "a current release or repository activity check does not
   supersede an accepted pin" (`catalogs/landscape/manifest.json` rules); the newest sweep rows are not individually reviewed.
 - **Unranked pending layers**: the request covers each of the 32 layers; they rank on evidence only, under a banner.
@@ -114,8 +149,11 @@ first generated file with 48 findings, all false positives, so two fields of the
 
 1. A layer records a structured, verified, comparable measurement: `measured_rank` activates with no rule change.
 2. `class_vs_verification_flipped_pairs` includes a winner pair or exceeds 4: reconsider verification-first order.
+   **Met since the repair round: 5 pairs**, none of them a winner pair. The stack-pin rule moved llama.cpp to level 1,
+   behind otel-tui's level 0, while llama.cpp keeps tier A over otel-tui's tier C. The rule stays class-first until the
+   coordinator decides; this record does not move the threshold.
 3. The user chooses the `pin_current` tiebreak (winners only; true, then unknown, then false, as a fifth key): shared
-   placements fall from 369 to 352 of 414 at this revision.
+   placements fall from 368 to 345 of 414 at this revision.
 4. A recorded ordering of `local_integration` against `synthetic` appears: split tier B.
 5. macOS gets accepted receipts for most winners: add a second, per-platform ordering.
 
