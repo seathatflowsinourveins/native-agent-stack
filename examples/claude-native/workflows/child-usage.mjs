@@ -1098,6 +1098,7 @@ const addExpansion = (w, node) => { w.x = true; w.v += node.text; w.s += PLACEHO
 // known word (x false) for program identity, as /usr/local/bin/qmd is; the real corpus of this host holds ~30 lane invocations by such a
 // path in 136,361 distinct commands. `$HOME/...` is an expansion of another kind (D3): unresolved.
 function plainText(w, text, first) {
+  if (first) { let k = 0; while (k < text.length && (text[k] === ' ' || text[k] === '\t' || text[k] === '\n')) k++; text = text.slice(k) } // the newline the grammar folded in
   if (first && text[0] === '~') w.g = true
   for (let i = 0; i < text.length; i++) {
     const c = text[i]
@@ -1186,6 +1187,20 @@ const SHELLS = new Set(['sh', 'bash', 'dash', 'zsh', 'ksh'])
 // the shells, eval, ssh and rtk. Any other program (a host, an id, a package, a script) reads null however name-shaped it is.
 const PROGRAM_NAMES = new Set([...LANE_EXECUTABLES.keys(), ...WRAPPER_OPTIONS.keys(), 'env', 'rtk', 'eval', 'ssh', ...SHELLS])
 const programName = (name) => PROGRAM_NAMES.has(name) ? name : null
+// The arguments a here-document operator carries after its delimiter, without the words of its body that tree-sitter-bash 0.25.1 puts among
+// them when the first body line begins with a backslash: that line starts with the newline (a word that starts on a new line, and every
+// argument after it, is body text).
+function operatorArguments(r) {
+  const words = []
+  let body = false
+  for (let i = 0; i < r.childCount; i++) {
+    if (r.fieldNameForChild(i) !== 'argument') continue
+    const child = r.child(i)
+    body ||= startsLine(child.text)
+    if (!body) words.push(child)
+  }
+  return { words, misplaced: body }
+}
 // A `command` node's words in source order: its name, then its arguments, then any argument a here-document operator carries after its
 // delimiter (`cat <<EOF -n` is `cat -n <<EOF`). Assignment prefixes and redirections are not words.
 // tree-sitter-bash 0.25.1 sometimes reads what follows a command as more of its arguments: an ERROR node on `;`, `&&` or `|` after an
@@ -1195,15 +1210,18 @@ const programName = (name) => PROGRAM_NAMES.has(name) ? name : null
 // SHELL GRAMMAR: a newline ends a simple command; a backslash-newline continues it) and never hold a separator, so each is a boundary: the
 // words after it are a command of their own. Returns the commands as [{ pos, words }], the first being the node's own.
 const SEPARATOR_TOKENS = new Set([';', ';;', '&', '&&', '||', '|', '|&'])
+// A line that begins with a backslash (`\ls`, the alias bypass) reaches the grammar as a word that begins with the newline (bash(1) QUOTING).
+const startsLine = (text) => { for (let i = 0; i < text.length && (text[i] === ' ' || text[i] === '\t' || text[i] === '\n'); i++) if (text[i] === '\n') return true; return false }
 const continues = (gap) => { for (let i = 0; i < gap.length; i++) { if (gap[i] === '\\' && gap[i + 1] === '\n') i++; else if (gap[i] === '\n') return false } return true }
 function commandSegments(node, src, fields, extra = []) {
-  const segments = [{ pos: node.startIndex, words: [] }]
+  const segments = [{ pos: node.startIndex, words: [], herestrings: [] }]
   let prev = null
   for (let i = 0; i < node.childCount; i++) {
     const child = node.child(i)
-    if (child.type === 'ERROR') { if (SEPARATOR_TOKENS.has(child.text.trim())) segments.push({ pos: child.endIndex, words: [] }); prev = null; continue }
-    if (prev && !continues(src.slice(prev.endIndex, child.startIndex))) segments.push({ pos: child.startIndex, words: [] })
+    if (child.type === 'ERROR') { if (SEPARATOR_TOKENS.has(child.text.trim())) segments.push({ pos: child.endIndex, words: [], herestrings: [] }); prev = null; continue }
+    if (prev && (!continues(src.slice(prev.endIndex, child.startIndex)) || startsLine(child.text))) segments.push({ pos: child.startIndex, words: [], herestrings: [] })
     prev = child
+    if (child.type === 'herestring_redirect') segments[segments.length - 1].herestrings.push(child) // a here-string belongs to the command it follows
     const field = node.fieldNameForChild(i)
     if (field === 'name') { const inner = child.namedChild(0); segments[segments.length - 1].words.push(inner ? { ...wordOf(inner), assignment: false } : { v: '', s: null, x: true }) }
     else if (fields.includes(field)) segments[segments.length - 1].words.push({ ...wordOf(child), assignment: (child.type === 'word' || child.type === 'concatenation') && isAssignment(child.text) })
@@ -1212,7 +1230,7 @@ function commandSegments(node, src, fields, extra = []) {
   // (bash(1) PARAMETERS: NAME=value words before the command name are assignments).
   for (let k = 1; k < segments.length; k++) { const words = segments[k].words; while (words.length && words[0].assignment) words.shift() }
   const last = segments[segments.length - 1].words
-  for (const r of extra) for (let i = 0; i < r.childCount; i++) if (r.fieldNameForChild(i) === 'argument') last.push(wordOf(r.child(i)))
+  for (const r of extra) for (const child of operatorArguments(r).words) last.push(wordOf(child))
   return segments
 }
 // How a shell uses its arguments (bash(1) OPTIONS and ARGUMENTS; dash(1) and POSIX.1-2024 sh OPTIONS agree on -c, -n, -s): options are the words up
@@ -1383,7 +1401,7 @@ const stripTabs = (text) => { let out = '', start = true; for (const ch of text)
 // line begins with a backslash).
 function heredocRaw(r, start, end, src) {
   const body = r.children.find((c) => c.type === 'heredoc_body')
-  if (body && body.endIndex > body.startIndex) return src.slice(body.startIndex, body.endIndex)
+  if (body && body.endIndex > body.startIndex && !operatorArguments(r).misplaced) return src.slice(body.startIndex, body.endIndex)
   const line = src.indexOf('\n', start.endIndex)
   return line < 0 || line + 1 > end.startIndex ? '' : src.slice(line + 1, end.startIndex)
 }
@@ -1450,22 +1468,19 @@ function walkTree(root, src, cx) {
   const command = (node) => {
     const owned = pending.get(node.id) ?? []
     const segments = commandSegments(node, src, ['argument'], owned.filter((r) => r.type === 'heredoc_redirect')).filter((sg) => sg.words.length)
-    if (!segments.length) return
-    let terminal = null, records = null
     segments.forEach((sg, k) => {
       if (k) cx.acc.simple++ // a command the grammar had joined to the previous one
-      records = []
-      terminal = resolveWords(sg.words, records, cx, false)
+      const records = []
+      const terminal = resolveWords(sg.words, records, cx, false)
       if (terminal?.reads) readers++
-      if (k < segments.length - 1) entries.push({ pos: sg.pos, records })
+      // Only the last redirection of standard input feeds the command; an earlier one is data. The heredocs and here-strings written after the last
+      // word of the node belong to its last command.
+      const redirects = k === segments.length - 1 ? [...sg.herestrings, ...owned] : sg.herestrings
+      const feeds = redirects.filter((r) => { const d = r.childForFieldName('descriptor'); return !d || d.text === '0' }).sort((a, b) => a.startIndex - b.startIndex)
+      const last = feeds[feeds.length - 1]
+      for (const r of redirects) feed(r, terminal, records, r === last)
+      entries.push({ pos: sg.pos, records })
     })
-    const redirects = [...owned]
-    for (const c of node.children) if (c.type === 'herestring_redirect') redirects.push(c)
-    // Only the last redirection of standard input feeds the command (the last of the node's words, when it held several); an earlier one is data.
-    const feeds = redirects.filter((r) => { const d = r.childForFieldName('descriptor'); return !d || d.text === '0' }).sort((a, b) => a.startIndex - b.startIndex)
-    const last = feeds[feeds.length - 1]
-    for (const r of redirects) feed(r, terminal, records, r === last)
-    entries.push({ pos: segments[segments.length - 1].pos, records })
   }
   // The destinations of a redirection that the grammar ran on into the next command (`2>&1 | tail -n 5`): the words after a boundary.
   const redirectTail = (node) => {
@@ -1496,11 +1511,10 @@ function walkTree(root, src, cx) {
     } else if (type === 'heredoc_redirect') {
       // The operator line's own children are walked; the body is handled with its owner (here: none, so its substitutions only).
       if (!claimed.has(node.id)) { const records = []; feed(node, null, records, false); entries.push({ pos: node.startIndex, records }) }
-      let operatorLine = -1
-      for (let i = 0; i < node.childCount; i++) if (node.child(i).type === 'heredoc_start') operatorLine = src.indexOf('\n', node.child(i).endIndex)
+      const kept = new Set(operatorArguments(node).words.map((w) => w.id))
       for (let i = node.childCount - 1; i >= 0; i--) {
         const child = node.child(i)
-        if (node.fieldNameForChild(i) === 'argument' && operatorLine >= 0 && child.startIndex > operatorLine) continue // body text the grammar put here
+        if (node.fieldNameForChild(i) === 'argument' && !kept.has(child.id)) continue // body text the grammar put here
         stack.push(child)
       }
       continue
