@@ -970,6 +970,32 @@ class EndToEndStubTests(CanaryCase):
         self.assertEqual(sorted(p.name for p in directory.iterdir() if p.suffix == ".json"), [receipt_path.name])
 
 
+@unittest.skipUnless(HAS_RG and HAS_GIT, "the scanners need rg and git")
+class RestartVariantTests(CanaryCase):
+    def test_kept_canary_serves_the_unit_again_after_a_restart(self):
+        run = self.prepare("--keep-across-restart")
+        directory = self.run_dir(run)
+        self.assertEqual(directory, self.state / "native-agent-stack" / "canary" / "keep" / run)  # not the tmpfs
+        self.assertEqual(stat.S_IMODE(directory.stat().st_mode), 0o700)
+        for step in (("controls", "--run", run), ("baseline", "--run", run)):
+            self.assertEqual(self.harness(*step)[0], 0)
+        self.assertEqual(self.harness("consume", "systemd-user-unit", "--after-restart", "--run", run)[0], 1)
+        code, out, err = self.harness("consume", "systemd-user-unit", "--run", run)
+        self.assertEqual(code, 0, out + err)
+        self.assertTrue(self.store_file().exists())  # kept for the restart check
+        self.assertIn("consume systemd-user-unit --after-restart --run " + run, out)
+        with self.assertRaises(harness.Refused):  # nothing else may arm while the kept file is there
+            harness.arm(self.context(), directory, "codex-exec")
+        code, out, err = self.harness("consume", "systemd-user-unit", "--after-restart", "--run", run)
+        self.assertEqual(code, 0, out + err)
+        self.assertFalse(self.store_file().exists())
+        after = json.loads((directory / "results" / "consume-systemd-user-unit-after-restart.json").read_text())
+        self.assertEqual((after["leak_check"]["masked"], after["boot_changed"]), (True, False))  # same boot here
+        self.assertEqual(self.harness("verify", "--run", run, "--consumer", "systemd-user-unit")[0], 0)
+        self.assertEqual(self.harness("consume", "codex-exec", "--after-restart", "--run", run)[0], 2)
+        self.assert_value_free(self.forbidden(run), self.all_output())
+
+
 class DocumentedCommandTests(unittest.TestCase):
     """Amendment 15: every command documented for an agent or an operator passes today's guard.check."""
 
