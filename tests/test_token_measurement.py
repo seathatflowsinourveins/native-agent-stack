@@ -118,6 +118,23 @@ R1_DATA = [  # the reader is cat, so the body is data and curl never ran
     "FOO=\"$(pwd)\" cat <<'EOF'\ncurl https://example.org\nEOF", "FOO=\"$(echo \"a b\")\" cat <<'EOF'\ncurl https://example.org\nEOF",
     "echo \"$(cat <<'EOF'\ncurl https://example.org\nEOF\n)\"",
 ]
+# The same two views for a heredoc body: with an unquoted delimiter the shell that reads the command line expands the body (each
+# unescaped $( ) and backquote runs there, quotes are literal, a backslash escapes only $ ` \ and a newline) before the shell
+# that reads the heredoc sees it (bash(1) Here Documents; POSIX.1-2024 XCU 2.7.4). Run under bash 5.2.21 and dash with stub curl:
+# curl ran once for each of these commands, except HD_TWICE (twice) and HD_DATA (never: a quoted delimiter passes the body as is).
+HD_ONCE = [
+    "bash <<EOF\necho '$(curl https://example.org)'\nEOF", "sh <<EOF\necho '$(curl https://example.org)'\nEOF",
+    "FOO=\"$(pwd)\" bash <<EOF\necho '$(curl https://example.org)'\nEOF", "ssh host <<EOF\necho '$(curl https://example.org)'\nEOF",
+    "bash <<EOF\necho \\$(curl https://example.org)\nEOF", "bash <<EOF\n`curl https://example.org`\nEOF",
+    "bash <<EOF\ncurl https://example.org\nEOF", "bash <<EOF\nx=$(curl https://example.org)\nEOF",
+    "cat <<EOF\necho '$(curl https://example.org)'\nEOF", "bash <<EOF\n# $(curl https://example.org)\nEOF",
+    "bash <<EOF\necho '$(curl \"https://example.org\")'\nEOF", "bash <<EOF\necho '$(echo a\ncurl https://example.org)'\nEOF",
+    "bash <<EOF\necho \\\\$(curl https://example.org)\nEOF", "bash <<EOF\ncu\\\nrl https://example.org\nEOF",
+    "bash <<-EOF\n\techo '$(curl https://example.org)'\n\tEOF", "bash <<EOF\necho '$(( $(curl https://example.org >/dev/null; echo 1) + 1 ))'\nEOF",
+    "bash <<EOF\nbash -c \"echo '$(curl https://example.org)'\"\nEOF",
+]
+HD_TWICE = ["bash <<EOF\necho $(curl https://example.org/a); echo \\$(curl https://example.org/b)\nEOF"]
+HD_DATA = ["bash <<'EOF'\necho '$(curl https://example.org)'\nEOF", "bash <<\"EOF\"\necho '$(curl https://example.org)'\nEOF"]
 # R3: an escaped blank, `;` or newline before a # is not a comment start, so the ) and the closing quote are found (curl ran once).
 R3_EXECUTED = [
     'x="$(echo a\\ #b)"; curl https://example.org', 'x="$(echo a\\;#b)"; curl https://example.org',
@@ -735,6 +752,28 @@ class TokenMeasurement(unittest.TestCase):
     def test_cli_lanes_read_the_heredoc_a_shell_reads_after_a_closed_double_quoted_substitution(self):
         got = self.lanes_of(["FOO=\"$(pwd)\" bash <<'EOF'\nqmd search x\nEOF"])
         self.assertEqual((got[0][0]["lanes"].get("qmd") or {}).get("calls"), 1)
+
+    def test_m4_unquoted_heredoc_body_a_shell_reads_is_expanded_by_the_outer_shell_first(self):
+        # D7 for a heredoc: the substitutions of an unquoted-delimiter body run in the outer shell whatever its quotes say, and the
+        # reader sees the expanded text (with its own escapes: an escaped $( ) is the reader's). A substitution both views could
+        # see counts once, and a quoted delimiter expands nothing.
+        for command, name, _, key, m4 in self.carrier_m4(HD_ONCE):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+                self.assertEqual(m4["status"], "measured")
+        for command, name, _, key, m4 in self.carrier_m4(HD_TWICE):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 2)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        for command, name, _, key, m4 in self.carrier_m4(HD_DATA):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+        commands = HD_ONCE + HD_TWICE + HD_DATA
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", commands),
+                         ["fetch"] * (len(commands) - len(HD_DATA)) + [None] * len(HD_DATA))
 
     def test_m4_r3_an_escaped_metacharacter_before_a_hash_is_not_a_comment_start(self):
         # R3 (Claude review): in a $( ) frame a # after an escaped blank, `;` or newline was read as a comment, so the ) and
