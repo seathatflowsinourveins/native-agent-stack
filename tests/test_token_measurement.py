@@ -1892,6 +1892,23 @@ class TokenMeasurement(unittest.TestCase):
         per_call = self.exports("cu.callLedger(x.rows).filter((r) => r.server).map((r) => r.m15_class)", {"rows": rows})
         self.assertEqual(per_call[:4], ["boundary", "boundary", "timeout", "timeout"])
 
+    def test_m15_threshold_comparison_uses_counts_not_the_rounded_rate(self):
+        """rate is rounded to four places, as every kernel share is, so a server just over the 0.01 threshold can print as 0.01: 202 of
+        20,100 calls is 1.005%. threshold_sensitive (binding decision B2) therefore compares the counts: errors * 100 > attempted."""
+        rows = [call("q", "mcp__qmd__search", query="x"), result("q", "[]")]
+        cases = {  # classes of one server with 20,100 attempts: (rate, rate_lower_bound, threshold_sensitive)
+            "over by counts, 0.01 when rounded; lower bound under": ({"connection": 190, "outcome_unknown": 12}, (0.01, 0.0095, True)),
+            "exactly at the threshold is not over it": ({"connection": 190, "outcome_unknown": 11}, (0.01, 0.0095, False)),
+            "both bounds over": ({"connection": 202}, (0.01, 0.01, False)),
+        }
+        got = self.exports("x.cases.map((classes) => { const m = cu.measureTranscript(x.rows); m.m15.by_server = { qmd: { attempted: 20100,"
+                           " succeeded: 20100 - Object.values(classes).reduce((a, b) => a + b, 0), ctx: false, classes } };"
+                           " const r = cu.aggregateMeasurements([m]).m15.by_server.qmd; return [r.rate, r.rate_lower_bound, r.threshold_sensitive] })",
+                           {"rows": rows, "cases": [classes for classes, _ in cases.values()]})
+        for (name, (_, want)), row in zip(cases.items(), got):
+            with self.subTest(case=name):
+                self.assertEqual(tuple(row), want)
+
     def test_m15_aggregate_recomputes_rates_and_sweep_output_is_id_free(self):
         """aggregateMeasurements sums each server's attempts and classes over actors and computes the rates again; the sweep prints class
         names and counts only: no path, URL, module name, server-side text or id from the results."""
