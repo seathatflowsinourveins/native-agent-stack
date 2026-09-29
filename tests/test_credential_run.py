@@ -18,6 +18,7 @@ import re
 import select
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -863,6 +864,177 @@ class ProcessTests(RunnerCase):
             "import json, os, resource\n"
             "print(json.dumps([resource.getrlimit(resource.RLIMIT_CORE), os.getsid(0) == os.getpid()]))\n"))
         self.assertEqual(json.loads(result.stdout), [[0, 0], True])
+
+
+class ConsumerTests(RunnerCase):
+    """Review of 2026-09-29, finding 5: blocking writes let a consumer that stopped reading hold the runner, and its
+    shutdown and drain deadlines, hostage (it stayed alive 2.7 s after SIGTERM and exited 143 only when the consumer
+    resumed). Output now goes through non-blocking descriptors and a bounded queue in the relay's own select loop."""
+
+    FLOOD = "import sys\nchunk = 'x' * 65535 + '\\n'\nwhile True:\n    sys.stdout.write(chunk)\n    sys.stderr.write(chunk)\n"
+
+    def test_a_consumer_that_never_reads_cannot_hold_the_runner_after_a_signal(self):
+        self.tavily()
+        runner = self.start_tool("tavily", *py(self.FLOOD))  # its output pipes are never read
+        time.sleep(1.5)  # both pipes and both queues fill, and the flooding command blocks on its own pipes
+        self.assertIsNone(runner.poll())
+        sent = time.monotonic()
+        runner.send_signal(signal.SIGTERM)
+        self.assertEqual(runner.wait(timeout=20), 128 + signal.SIGTERM)  # was: blocked in write until the consumer read
+        self.assertLess(time.monotonic() - sent, 10)
+
+    def test_output_that_nobody_reads_is_dropped_after_the_drain_deadline(self):
+        self.tavily()
+        code = "import sys\nsys.stdout.write('y' * 150000)\nsys.stderr.write('z' * 150000)\nraise SystemExit(7)\n"
+        runner = self.start_tool("tavily", *py(code))  # more than a pipe holds, less than the queues do
+        started = time.monotonic()
+        self.assertEqual(runner.wait(timeout=20), 7)  # the command's own status, DRAIN_SECONDS after it exited
+        elapsed = time.monotonic() - started
+        self.assertGreaterEqual(elapsed, run_mod.DRAIN_SECONDS - 0.5)
+        self.assertLess(elapsed, run_mod.DRAIN_SECONDS + 8)
+
+    def test_a_slow_consumer_gets_every_byte_while_the_command_runs(self):
+        self.tavily()
+        size = 700_000
+        runner = self.start_tool("tavily", *py(
+            f"import sys\nsys.stdout.write('q' * {size})\nsys.stdout.flush()\nsys.stderr.write('e' * {size})\n"))
+        time.sleep(1.0)  # nobody reads yet: the pipes and the queue fill, and the command waits for the runner
+        out, err = runner.communicate(timeout=60)
+        self.assertEqual((runner.returncode, out, err), (0, b"q" * size, b"e" * size))
+
+    def test_stdout_and_stderr_on_one_pipe_are_relayed_and_shut_down_together(self):
+        self.tavily()
+        merged = subprocess.run(self.command("tavily", *py("import sys\nprint('out', flush=True)\nprint('err', file=sys.stderr)")),
+                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                env=self.tool_environment(), timeout=60)  # 2>&1: one open file description
+        self.assertEqual((merged.returncode, sorted(merged.stdout.split())), (0, [b"err", b"out"]))
+        runner = subprocess.Popen(self.command("tavily", *py(self.FLOOD)), stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=self.tool_environment())
+        self.addCleanup(lambda: (runner.kill(), runner.communicate(timeout=30)))
+        time.sleep(1.5)
+        runner.send_signal(signal.SIGTERM)
+        self.assertEqual(runner.wait(timeout=20), 128 + signal.SIGTERM)
+
+    def test_output_to_a_file_or_a_terminal_is_written_directly_and_a_terminal_is_left_blocking(self):
+        self.tavily()
+        target = self.base / "relayed.out"
+        with open(target, "wb") as handle:
+            done = subprocess.run(self.command("tavily", *py("print('to a file')\n")), stdin=subprocess.DEVNULL,
+                                  stdout=handle, stderr=subprocess.PIPE, env=self.tool_environment(), timeout=60)
+        self.assertEqual((done.returncode, target.read_bytes(), done.stderr), (0, b"to a file\n", b""))
+        # stdin, stdout and stderr are one terminal: the command's stdin must still be blocking (the runner never
+        # flips a terminal, whose description the command shares).
+        master, slave = os.openpty()
+        self.addCleanup(os.close, master)
+        runner = subprocess.Popen(self.command("tavily", *py("import os\nprint('blocking', os.get_blocking(0))")),
+                                  stdin=slave, stdout=slave, stderr=slave, env=self.tool_environment())
+        os.close(slave)
+        self.addCleanup(lambda: (runner.kill(), runner.wait(timeout=30)))
+        self.assertIn(b"blocking True", self.read_until(open(master, "rb", buffering=0, closefd=False), b"True", seconds=20))
+        self.assertEqual(runner.wait(timeout=20), 0)
+
+    def test_a_consumer_that_closes_its_end_ends_the_command(self):
+        self.tavily()
+        runner = self.start_tool("tavily", *py(
+            "import sys\nwhile True:\n    sys.stdout.write('line\\n')\n    sys.stdout.flush()\n"))
+        self.assertIn(b"line\n", self.read_until(runner.stdout, b"line\n", seconds=10))
+        runner.stdout.close()  # the reader goes away: the runner closes the command's pipe and the command gets EPIPE
+        self.assertIsNotNone(runner.wait(timeout=20))
+
+
+class SinkTests(unittest.TestCase):
+    """The runner's own output descriptors, on real pipes, sockets and files."""
+
+    def tearDown(self):
+        for fd in getattr(self, "fds", []):
+            with contextlib.suppress(OSError):
+                os.close(fd)
+
+    def pipe(self):
+        read, write = os.pipe()
+        self.fds = getattr(self, "fds", []) + [read, write]
+        return read, write
+
+    def test_only_pipes_and_sockets_are_made_non_blocking_and_are_put_back(self):
+        read, write = self.pipe()
+        sink = run_mod.Sink(write)
+        self.assertTrue(sink.polled)
+        self.assertFalse(os.get_blocking(write))
+        sink.restore()
+        self.assertTrue(os.get_blocking(write))
+        left, right = socket.socketpair()
+        self.addCleanup(left.close)
+        self.addCleanup(right.close)
+        pair = run_mod.Sink(left.fileno())
+        self.assertTrue(pair.polled)
+        self.assertFalse(os.get_blocking(left.fileno()))
+        pair.restore()
+        self.assertTrue(os.get_blocking(left.fileno()))
+        # A regular file and /dev/null cannot wait on a reader; a descriptor already non-blocking is left as found.
+        with tempfile.TemporaryFile() as handle, open(os.devnull, "wb") as null:
+            for descriptor in (handle.fileno(), null.fileno()):
+                plain = run_mod.Sink(descriptor)
+                self.assertFalse(plain.polled)
+                self.assertTrue(os.get_blocking(descriptor))
+                plain.restore()
+        os.set_blocking(write, False)
+        already = run_mod.Sink(write)
+        self.assertTrue(already.polled)
+        already.restore()
+        self.assertFalse(os.get_blocking(write))
+
+    def test_a_descriptor_shared_with_stdin_is_never_flipped(self):
+        # A pipe or socket that is also the command's stdin shares its open file description with it: flipping the
+        # flag would make the command's reads fail with EAGAIN.
+        _read, write = self.pipe()
+        info = os.fstat(write)
+        shared = run_mod.Sink(write, (info.st_dev, info.st_ino))
+        self.assertFalse(shared.polled)
+        self.assertTrue(os.get_blocking(write))
+
+    def test_the_queue_is_bounded_ordered_lossless_and_dropped_on_abandon(self):
+        read, write = self.pipe()
+        os.set_blocking(read, False)
+        sink = run_mod.Sink(write)
+        blocks = [bytes([65 + number]) * 40000 for number in range(6)]
+        for block in blocks:
+            sink.put(block)  # never blocks, although nobody reads yet
+        self.assertGreater(len(sink.queue), 0)
+        self.assertEqual(sink.size, sum(len(chunk) for chunk in sink.queue))
+        self.assertFalse(sink.full())
+        while not sink.full():
+            sink.put(b"z" * 65536)
+        self.assertTrue(sink.full())
+        received, queued = b"", sink.size
+        while sink.queue:
+            try:
+                received += os.read(read, 1 << 20)
+            except BlockingIOError:
+                pass
+            sink.flush()
+        while True:
+            try:
+                received += os.read(read, 1 << 20)
+            except BlockingIOError:
+                break
+        self.assertTrue(received.startswith(b"".join(blocks)))  # in order, nothing lost before the first drop
+        self.assertGreater(len(received), queued)
+        sink.put(b"w" * 200000)
+        sink.abandon()
+        self.assertEqual((len(sink.queue), sink.size), (0, 0))
+        sink.put(b"more")  # after a shutdown, at most what the consumer takes at once
+        self.assertEqual(sink.size, 0)
+
+    def test_a_consumer_that_went_away_marks_the_sink_dead(self):
+        read, write = self.pipe()
+        sink = run_mod.Sink(write)
+        os.close(read)
+        self.fds.remove(read)
+        sink.put(b"nobody is listening")
+        self.assertTrue(sink.dead)
+        self.assertEqual((len(sink.queue), sink.size), (0, 0))
+        sink.put(b"ignored")
+        self.assertEqual(sink.size, 0)
 
 
 class CheckAndIsolationTests(RunnerCase):
