@@ -31194,6 +31194,16 @@
       "bytes": 14467
     },
     {
+      "path": "evidence/artifacts/landscape-sweep-20260929-attempts/gpt6-job-outcomes.json",
+      "sha256": "5b51b69cc372e71bb316768b9733ef067051f1db8a97c438b24e0d9d366b8973",
+      "bytes": 4138
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929-attempts/spend-scan-wf_08a5b367-311.json",
+      "sha256": "d2b92169bfc9271e6158b755e52826743f8b085125682ce545cd98921e408bc5",
+      "bytes": 12543
+    },
+    {
       "path": "evidence/artifacts/landscape-sweep-20260929/abhigyanpatwari-gitnexus.json",
       "sha256": "3d511c2784e38f98b0fcc1d49474f2caf66a2e74bfd1d81080443f8b7f3abe1f",
       "bytes": 1661
@@ -42860,8 +42870,8 @@
     },
     {
       "path": "recipes/saturation-sweep.md",
-      "sha256": "c809f36527203a2db6b73984c9292db8d19352cdcef3850966ce39a956897714",
-      "bytes": 9187
+      "sha256": "7a02df8416e87f4d872bac10dacec9872668311ec3b0bc206420e4c28d17ad78",
+      "bytes": 10508
     },
     {
       "path": "recipes/sota-convergence-practice.md",
@@ -43610,8 +43620,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "8411ec4681bf7560902e23681254610fc2408e5e4931697f32b394c2fe91b1a0",
-      "bytes": 187354
+      "sha256": "2faaced0dec9e563861191b7f2cc90a2c8ebca6097df2d3b22c1b803f8fbd595",
+      "bytes": 191791
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -44235,8 +44245,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "514a18a973f41fc04392ff47718ba311c8bfd481d349f5726c702a2e361dd601",
-      "bytes": 54934
+      "sha256": "0c668f920c41b1d52b0e36952222decb172a776be7c1b23ed92ceb984c09beef",
+      "bytes": 56132
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -44255,8 +44265,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "8c39915bee5fc1f8aceafff5c3b2df31ca48255c3f6cf8020942345954a3c62e",
-      "bytes": 41752
+      "sha256": "be17e859001d85cd426225d58f59f9866fed786c8b410b8dd6b6ebbd79713b4a",
+      "bytes": 44130
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
