@@ -192,6 +192,11 @@ def lane_row(calls=1, carrier="bash", **counts):
     return row
 
 
+def lane_calls(cli):
+    """{lane: calls} of a measured cli_lanes (an unmeasured one has none)."""
+    return {lane: row["calls"] for lane, row in (cli or {}).get("lanes", {}).items()}
+
+
 def downstream_row(calls=1, **counts):
     """One cli_lanes.mcporter_downstream entry."""
     row = {"calls": calls, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0, "unknown": 0}
@@ -1048,6 +1053,213 @@ class TokenMeasurement(unittest.TestCase):
         both = lane_row(calls=2, succeeded=2)
         both["by_carrier"] = {"bash": 0, "rtk_proxy": 0, "ctx": 1, "nested": 1}
         self.assertEqual((got.get("cli_lanes") or {}).get("lanes"), {"rtk_proxy": both})
+
+    # ---- U1 pivot D11: the findings of the two reviews of the scanner-based reading (3cb7c4f6) that concern command position. Inputs of the
+    # GPT-6 review are verbatim (a `\n` there is a real newline). Every expected value below is what real bash 5.2 (and dash where the
+    # syntax is POSIX) does with the same text under stub executables: tests/test_command_position_oracle.py runs these inputs against them.
+    def tally(self, commands, **kwargs):
+        """[({lane: calls}, measurement.proxy, cli_lanes)] of each command as one successful call."""
+        return [(lane_calls(cli), proxy, cli) for cli, proxy in self.lanes_of(commands, **kwargs)]
+
+    @NEEDS_PARSER
+    def test_a_shell_string_is_a_script_only_where_a_shell_reads_it(self):
+        # GPT-6 #1. bash(1) OPTIONS and ARGUMENTS: the script of -c is the first operand after the options (an option may follow -c);
+        # everything after it is $0 and the positional parameters; -n and -D read without running; `--` and `-` end the options,
+        # so a -c after them names a file; a shell string an echo prints is data.
+        cases = {"echo bash -c 'qmd search x'": {}, "bash -c ':' qmd search x": {}, "bash -n -c 'qmd search x'": {},
+                 "bash -nc 'qmd search x'": {}, "bash -cn 'qmd search x'": {}, "bash -D -c 'qmd search x'": {}, "sh -n -c 'qmd search x'": {},
+                 "bash -- -c 'qmd search x'": {}, "bash - -c 'qmd search x'": {},
+                 "bash -ec 'qmd search x'": {"qmd": 1}, "bash -c -e 'qmd search x'": {"qmd": 1}, "bash -o pipefail -c 'qmd search x'": {"qmd": 1},
+                 "bash -O extglob -c 'qmd search x'": {"qmd": 1}, "bash +e -c 'qmd search x'": {"qmd": 1},
+                 "bash --norc -c 'qmd search x'": {"qmd": 1}, "bash --rcfile /dev/null -c 'qmd search x'": {"qmd": 1},
+                 "bash -c 'qmd status \"$0\"' toon": {"qmd": 1}, "sh -c 'qmd search x'": {"qmd": 1}, "dash -c 'qmd search x'": {"qmd": 1},
+                 # a string with an expansion is still a script: the shell that expands it runs the substitution and reads the rest
+                 'bash -c "qmd get $HOME"': {"qmd": 1}, 'bash -c "cd $(pwd) && qmd get x"': {"qmd": 1}, 'bash -c "qmd get \\$HOME"': {"qmd": 1}}
+        for (command, want), (lanes, _, _) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+
+    @NEEDS_PARSER
+    def test_array_elements_are_words_not_commands(self):
+        # GPT-6 #2 (verbatim `a=( qmd )`): an array assignment runs nothing, but a substitution inside it does.
+        cases = {"a=( qmd )": {}, "tools=(qmd toon)": {}, "declare -a x=(qmd toon)": {}, "a=( $(qmd list) )": {"qmd": 1}}
+        for (command, want), (lanes, _, _) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+
+    @NEEDS_PARSER
+    def test_double_quotes_keep_a_backslash_unless_it_precedes_a_special_character(self):
+        # GPT-6 #3. bash(1) QUOTING: inside double quotes a backslash keeps its meaning except before $, `, ", \ or newline, so
+        # "--he\lp" is not --help, "q\md" is not qmd and "pro\xy" is not proxy; unquoted, a backslash quotes the next character (q\md is qmd).
+        cases = {'qmd "--he\\lp"': ({"qmd": 1}, {}), 'qmd "--help"': ({}, {"qmd": 1}), '"q\\md" status': ({}, {}), "q\\md status": ({"qmd": 1}, {}),
+                 '"qmd" status': ({"qmd": 1}, {}), 'q""md status': ({"qmd": 1}, {}), 'rtk "pro\\xy" echo ok': ({}, {}),
+                 'rtk "proxy" qmd status': ({"rtk_proxy": 1, "qmd": 1}, {})}
+        for (command, (lanes, excluded)), (got, proxy, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(got, lanes)
+                self.assertEqual(cli["excluded_version_help"], excluded)
+                self.assertEqual(proxy["calls"], int("rtk_proxy" in lanes))
+
+    @NEEDS_PARSER
+    def test_any_word_is_a_heredoc_delimiter(self):
+        # GPT-6 #4 (verbatim). bash(1) Here Documents: the delimiter is any word (a hyphen or digits included); the body of a heredoc
+        # that a non-shell reads is data, and one a shell reads is its script.
+        cases = {"cat <<'END-JSON'\nrtk proxy qmd status\nEND-JSON": {}, "cat <<123\nqmd status\n123": {},
+                 "bash <<'END-X'\nqmd status\nEND-X": {"qmd": 1}, "bash <<123\nqmd status\n123": {"qmd": 1},
+                 "bash <<-EOF\n\tqmd status\n\tEOF": {"qmd": 1}, "cat <<\\EOF\n$(qmd a)\nEOF": {}, 'cat <<"EOF"\n$(qmd a)\nEOF': {},
+                 "cat <<EOF\n$(qmd a)\nEOF": {"qmd": 1}, "cat <<EOF\nx \\$(qmd a)\nEOF": {}}
+        for (command, want), (lanes, proxy, _) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+                self.assertEqual(proxy["calls"], 0)
+
+    @NEEDS_PARSER
+    def test_the_shell_that_reads_a_heredoc_is_found_through_wrappers_and_lists(self):
+        # GPT-6 #5 (verbatim first two). The heredoc is the standard input of the command it follows: past env, timeout, nice, nohup,
+        # stdbuf and rtk proxy (rtk-ai/rtk@1d87b8e7 src/main.rs:3060-3066 spawns the child without touching its stdin), the last
+        # command of a list, pipeline or negation. A file operand (unless -s) or -c gives the shell its script elsewhere, and a
+        # descriptor other than 0 is not standard input.
+        body = "\nqmd status\nEOF"
+        cases = {"env -u UNUSED bash <<'EOF'" + body: {"qmd": 1}, "timeout -k 1 5 bash <<'EOF'" + body: {"qmd": 1},
+                 "nice -n 5 bash <<'EOF'" + body: {"qmd": 1}, "nohup bash <<'EOF'" + body: {"qmd": 1}, "stdbuf -oL bash <<'EOF'" + body: {"qmd": 1},
+                 "rtk proxy bash <<'EOF'" + body: {"rtk_proxy": 1, "qmd": 1},
+                 "true && bash <<'EOF'" + body: {"qmd": 1}, "echo x | bash <<'EOF'" + body: {"qmd": 1}, "! bash <<'EOF'" + body: {"qmd": 1},
+                 "bash -s <<'EOF'" + body: {"qmd": 1}, "bash - <<'EOF'" + body: {"qmd": 1}, "bash -s /dev/null <<'EOF'" + body: {"qmd": 1},
+                 "bash /dev/null <<'EOF'" + body: {}, "bash -c 'cat' <<'EOF'" + body: {}, "bash 3<<'EOF'" + body: {},
+                 "bash > /dev/null <<'EOF'" + body: {"qmd": 1}, "bash <<'EOF' > /dev/null" + body: {"qmd": 1},
+                 "bash <<'EOF' && toon after" + body: {"qmd": 1, "toon": 1}, "bash <<< 'qmd status'": {"qmd": 1}, "cat <<< 'qmd status'": {},
+                 "bash -c 'cat' <<< 'qmd status'": {}}
+        for (command, want), (lanes, _, _) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+
+    @NEEDS_PARSER
+    def test_a_substitution_inside_an_arithmetic_expansion_runs(self):
+        # GPT-6 #6 (verbatim `echo $(( $(qmd count) + 1 ))`): bash runs the substitution before it evaluates the expression.
+        cases = {"echo $(( $(qmd count) + 1 ))": {"qmd": 1}, 'echo "$(( $(qmd count) + 1 ))"': {"qmd": 1},
+                 "x=$(( $(qmd a) + $(toon b) ))": {"qmd": 1, "toon": 1}, "echo $(( 1 + 2 ))": {}}
+        for (command, want), (lanes, _, _) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+
+    @NEEDS_PARSER
+    def test_rtk_proxy_runs_its_argument_without_a_shell(self):
+        # GPT-6 #7 (verbatim `rtk proxy command qmd status`): rtk resolves the program on PATH and spawns it (src/main.rs:3060-3066,
+        # src/core/utils.rs:615-632): `command` and `exec` are shell builtins, so nothing runs after them (installed rtk 0.50.0:
+        # `rtk proxy command true` fails with "Failed to execute command"). env is an executable, so it runs its utility.
+        cases = {"rtk proxy command qmd status": {"rtk_proxy": 1}, "rtk proxy exec qmd status": {"rtk_proxy": 1},
+                 "rtk proxy env qmd status": {"rtk_proxy": 1, "qmd": 1}, "rtk proxy qmd status": {"rtk_proxy": 1, "qmd": 1},
+                 "rtk proxy 'qmd status'": {"rtk_proxy": 1, "qmd": 1}, "rtk proxy bash -c 'qmd status'": {"rtk_proxy": 1, "qmd": 1},
+                 "rtk --ultra-compact proxy qmd status": {"rtk_proxy": 1, "qmd": 1}, "rtk proxy": {"rtk_proxy": 1}}
+        for (command, want), (lanes, proxy, _) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+                self.assertEqual(proxy["calls"], 1)
+
+    @NEEDS_PARSER
+    def test_a_proxied_program_named_by_an_expansion_is_unresolved(self):
+        # Claude review R5: rtk splits one argument only after the shell has expanded it, so `rtk proxy "$QMD search x"` runs a
+        # program this reading cannot name: an unresolved program, never a lane.
+        cases = {'rtk proxy "$QMD search x"': 1, 'rtk proxy "$(which qmd) search x"': 1, "rtk proxy '$QMD search x'": 0, "rtk proxy qmd search $X": 0}
+        for (command, unresolved), (lanes, proxy, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(cli["unresolved_programs"], unresolved)
+                self.assertEqual(proxy["calls"], 1)
+                if unresolved:
+                    self.assertNotIn("qmd", lanes)
+
+    @NEEDS_PARSER
+    def test_function_bodies_are_commands_and_parentheses_outside_command_position_are_not(self):
+        # Claude review R4: a function body counts where it is defined (documented), whatever the header syntax; a function name, an
+        # array, a case pattern and the regular expression of [[ =~ ]] are words.
+        cases = {"function f { qmd get a; }": {"qmd": 1}, "f() ( qmd get a )": {"qmd": 1}, "f() { qmd get a; }": {"qmd": 1},
+                 "qmd() { :; }": {}, "[[ $t =~ ^(qmd|toon)$ ]]": {}, "case x in qmd) : ;; toon|repomix) : ;; esac": {},
+                 "case x in x) qmd get a ;; esac": {"qmd": 1}, "if qmd status; then toon a; fi": {"qmd": 1, "toon": 1},
+                 "while qmd status; do :; done": {"qmd": 1}, "for f in qmd toon; do echo $f; done": {}}
+        for (command, want), (lanes, _, _) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+
+    @NEEDS_PARSER
+    def test_parse_errors_are_counted_by_call_and_the_valid_parts_still_count(self):
+        # U1 pivot D2: a tree with an error still yields the invocations of its valid parts; the error is counted once per call (not
+        # per node), and nodes under an ERROR node are skipped.
+        cases = {"qmd get a; echo \"unterminated": ({"qmd": 1}, 1), "qmd get a; ; toon b": ({"qmd": 1, "toon": 1}, 1),
+                 "if then fi; qmd get": ({}, 1), "qmd get a": ({"qmd": 1}, 0), "qmd get a; ; ; toon b": ({"qmd": 1, "toon": 1}, 1)}
+        for (command, (lanes, errors)), (got, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(got, lanes)
+                self.assertEqual(cli["parse_errors"], errors)
+
+    @NEEDS_PARSER
+    def test_a_name_is_emitted_only_from_the_closed_vocabulary(self):
+        # GPT-6 #10 and U1 pivot D5: a mcporter server key is one of the stack's own servers or (other), (http), (stdio) or
+        # (unresolved); a string that only looks like a name (an id, a host) never reaches the output.
+        vocabulary = ["codebase-memory", "context-mode", "jcodemunch", "serena", "socraticode", "qmd", "headroom", "ai-memory"]
+        cases = {"mcporter call call_PRIVATE.search": "(other)", "mcporter call --server private-host tool": "(other)",
+                 "mcporter call my-private-host.example.search": "(other)", "mcporter call linear.create_comment": "(other)",
+                 "mcporter call --server 'toolu_01AbCdEf' tool": "(other)"}
+        cases.update({"mcporter call %s.tool" % name: name for name in vocabulary})
+        for (command, key), (_, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(sorted(cli["mcporter_downstream"]), [key])
+                for text in ("call_PRIVATE", "private-host", "toolu_01AbCdEf"):
+                    self.assertNotIn(text, json.dumps(cli))
+
+    @NEEDS_PARSER
+    def test_mcporter_reads_a_version_token_as_the_command_and_a_help_token_anywhere(self):
+        # Claude review R6, checked against openclaw/mcporter@93e0916c (v0.14.1): runCli takes the first word after the global flags
+        # as the command and answers isHelpToken (--help, -h, help) or isVersionToken (--version, -v, -V) only for it (src/cli.ts
+        # 137-145); each command then calls consumeHelpTokens on its whole argument list, and consumeMatchingTokens (src/cli/flag-utils.ts
+        # 34-41) neither stops at `--` nor looks at anything but the token, so --help anywhere prints help. A version token after
+        # the command is an ordinary (unknown) call flag: a call.
+        call = "mcporter call codebase-memory.search_graph"
+        cases = {"mcporter --version": ("excluded", "mcporter"), "mcporter -V": ("excluded", "mcporter"), "mcporter -v": ("excluded", "mcporter"),
+                 call + " --version": ("call", "codebase-memory"), call + " -V": ("call", "codebase-memory"),
+                 call + " --help": ("excluded", "mcporter"), call + " -h": ("excluded", "mcporter"), call + " -- --help": ("excluded", "mcporter"),
+                 "mcporter help": ("excluded", "mcporter"), "mcporter list --help": ("excluded", "mcporter")}
+        for (command, (kind, name)), (_, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                if kind == "excluded":
+                    self.assertEqual((cli["excluded_version_help"], cli["mcporter_downstream"]), ({name: 1}, {}))
+                else:
+                    self.assertEqual((cli["excluded_version_help"], sorted(cli["mcporter_downstream"])), ({}, [name]))
+
+    @NEEDS_PARSER
+    def test_not_executed_calls_are_read_where_the_client_records_them(self):
+        # Claude review R7, observed on this host's Claude Code transcripts (122,648 Bash results, count-only): the user's rejection
+        # opens the result CONTENT ("The user doesn't want to proceed with this tool use", 25 rows, whose toolUseResult is
+        # "User rejected tool use"), and every client denial (permission-rule 750, user-rejected 46, cancelled 1, automode-unavailable 1)
+        # carries a row-level toolDenialKind. A host hook's own refusal text (209 rows opening "This agent is isolated") carries none
+        # and is left as a failed call (open: its meaning is the hook's, not the client's). No result of the shapes below was an
+        # interrupted run: toolUseResult.interrupted was false in all 25,506 object results, so that state is a synthetic fixture.
+        def answer(content, **row):
+            return {**result("a", content, True), **row}
+
+        classifier = ("The server-side auto mode classifier gave no verdict (error), so auto mode cannot determine the safety of Bash. "
+                      "This is a transient failure of the check, not a judgment about the action.")
+        rejected = "The user doesn't want to proceed with this tool use. The tool use was rejected."
+        cases = {"rejection in the content": (answer(rejected, toolUseResult="Error: something else"), {"failed": 1, "not_executed": 1}),
+                 "toolDenialKind permission-rule": (answer("blocked by a rule", toolDenialKind="permission-rule", toolUseResult="Error: blocked"),
+                                                    {"failed": 1, "not_executed": 1}),
+                 "toolDenialKind user-rejected": (answer("no", toolDenialKind="user-rejected"), {"failed": 1, "not_executed": 1}),
+                 "toolDenialKind cancelled": (answer("no", toolDenialKind="cancelled"), {"failed": 1, "not_executed": 1}),
+                 "classifier without a verdict": (answer(classifier, toolDenialKind="automode-unavailable", toolUseResult="Error: " + classifier),
+                                                  {"failed": 1, "not_executed": 1}),
+                 "classifier text alone": (answer(classifier), {"failed": 1, "not_executed": 1}),
+                 "host hook text": (answer("This agent is isolated in the worktree /w, but this command runs rtk with a git command",
+                                           toolUseResult="Error: This agent is isolated in the worktree /w"), {"failed": 1}),
+                 "a failed command": (answer("Exit code 1\nboom", toolUseResult="Error: Exit code 1\nboom"), {"failed": 1}),
+                 "interrupted": ({**result("a", "partial"), "toolUseResult": {"stdout": "partial", "stderr": "", "interrupted": True}},
+                                 {"interrupted": 1}),
+                 "not interrupted": ({**result("a", "ok"), "toolUseResult": {"stdout": "ok", "stderr": "", "interrupted": False}}, {"succeeded": 1})}
+        got = self.exports("x.map((rows) => cu.measureTranscript(rows).cli_lanes ?? null)",
+                           [[call("a", "Bash", command="qmd search x"), row] for row, _ in cases.values()])
+        counters = ["succeeded", "failed", "not_executed", "unfinished", "unknown", "background", "interrupted"]
+        for (name, (_, want)), cli in zip(cases.items(), got):
+            with self.subTest(state=name):
+                row = (cli or {}).get("lanes", {}).get("qmd", {})
+                self.assertEqual({k: row.get(k, 0) for k in counters}, {k: want.get(k, 0) for k in counters})
 
     @NEEDS_PARSER
     def test_cli_lanes_aggregate_sums_counters_and_counts_actors_with_success(self):

@@ -540,6 +540,17 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['qmd --version', ['qmd/qmd excluded']], ['qmd search x --help', ['qmd/qmd excluded']], ['qmd search -- --help', qmd], ['qmd -h', qmd],
     ['toon --help', ['toon/toon excluded']], ['ai-memory --version', ['ai-memory/ai-memory excluded']],
   ])
+  // GPT-6 #10 (U1 pivot D5): `program` is a fixed name, never text from the command: it is set only for a lane executable or a name
+  // this reading interprets itself (a wrapper, a shell, eval, ssh, rtk); any other program reads null, however name-shaped it is.
+  if (laneParser.ok) {
+    const programs = (c) => { try { return kernel.commandInvocations(c).map((i) => i.program) } catch (e) { return ['(threw ' + e.name + ')'] } }
+    const want = [['my-private-host.example', [null]], ['call_PRIVATE.search x', [null]], ['git status', [null]], ['./deploy-secret-name --now', [null]],
+      ['qmd search x', ['qmd']], ['/usr/local/bin/toon f.json', ['toon']], ['rtk git status', ['rtk']], ["bash -c 'x'", ['bash', null]],
+      ['env FOO=1 my-private-host.example', [null]], ['npx some-private-package', [null]], ['npx repomix', ['repomix']], ['uvx private-pkg', [null]],
+      ['xargs my-private-host.example', [null]], ['echo $(my-private-host.example)', [null, null]], ["ssh host 'qmd get a'", ['ssh', 'qmd']]]
+    const bad = want.filter(([c, p]) => JSON.stringify(programs(c)) !== JSON.stringify(p)).map(([c]) => JSON.stringify(c) + ' => ' + JSON.stringify(programs(c)))
+    expect('cli lanes: a program name is emitted only for a lane executable or a name the reading interprets' + (bad.length ? ' [' + bad.join('; ') + ']' : ''), bad.length === 0)
+  }
   // D9 (GPT-6 #13, Claude review R2): the earlier assertion read every input through read(), which turns an exception into an
   // array whose length is an integer, so it passed when every stress input threw. The stress reader below lets an exception
   // fail the check, and a mutation control shows that it does. '$('.repeat(3000) is the unquoted nesting that walks past
