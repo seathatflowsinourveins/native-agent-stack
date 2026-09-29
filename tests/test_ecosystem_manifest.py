@@ -1633,8 +1633,8 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         """A two-layer ranked index in the shape scripts/catalog_index.py writes, with sort keys and positions that
         follow its rule: recorded role, evidence tier, verification level, measured rank; competition positions."""
         def placement(entity, role, key, position, shared, field, recorded, state, *, retained=None, flags=(),
-                      macos=None, receipts=None, pin_current=None, component_id=None, pin=None):
-            return {"entity": entity, "role": role, "component_id": component_id, "pin": pin,
+                      macos=None, receipts=None, pin_current=None, component_id=None):
+            return {"entity": entity, "role": role, "component_id": component_id,
                     "role_records": [{"path": "catalogs/landscape/foundation.json", "pointer": "/layers/0/winners/0",
                                       "role": role, "disposition": None}],
                     "matrix_record": None,
@@ -1657,7 +1657,7 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
             "banner": banner("confirmed_current", ""),
             "placements": [
                 placement("repo:example/search", "winner", (0, 0, 0, 0), 1, False, "evidence_class", "native_proven",
-                          "host_verified", macos="untested", pin_current="false", component_id="search", pin="1.0",
+                          "host_verified", macos="untested", pin_current="false", component_id="search",
                           receipts={"pass": 2, "fail": 0, "independently_reviewed_pass": 1},
                           flags=("freshness/pin-behind-upstream",)),
                 placement("repo:example/idea", "alternative", (1, 2, 1, 0), 2, False, "evidence_class",
@@ -1686,7 +1686,7 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
              "refs": ["layer:foundation/retrieval", "repo:example/idea"]}]
         def entity(ref):
             return {"ref": ref, "aliases": [], "component_ids": [], "stack_profiles": [],
-                    "decision_index": {"key": ref[5:], "reference_kinds": {}}, "placements": [],
+                    "decision_index": {"repository": ref[5:], "reference_kinds": {}}, "placements": [],
                     "receipts": {"ids": [], "kinds": {}}}
 
         return {

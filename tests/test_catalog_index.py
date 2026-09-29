@@ -17,6 +17,7 @@ import io
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 import tempfile
@@ -946,7 +947,8 @@ class CheckAndWriteTests(IndexCase):
         self.assertEqual(ci.RULE["frozen_at"], ci.FROZEN_AT)
 
     def test_output_over_the_secret_scan_cap_is_refused(self):  # 26
-        self.tree.layer("l1", W("example/win", pin="v" + "9" * 2_100_000), A("example/alt"))
+        # The layer title is copied into the index once, so it inflates the output directly.
+        self.tree.layer("l1", W("example/win"), A("example/alt"), title="Layer " + "x" * 2_100_000)
         self.tree.write()
         evidence = (self.root / "manifests/evidence.json").read_bytes()
         code, _, err = self.run_main("--write")
@@ -954,7 +956,7 @@ class CheckAndWriteTests(IndexCase):
         self.assertIn("F10", err)
         self.assertFalse((self.root / ci.OUTPUT_JSON).exists())
         self.assertEqual((self.root / "manifests/evidence.json").read_bytes(), evidence)
-        self.tree.layers[0]["records"][0]["pin"] = "v" + "9" * 1_600_000
+        self.tree.layers[0]["title"] = "Layer " + "x" * 1_600_000
         self.tree.write()
         code, _, err = self.run_main("--write")
         self.assertEqual(code, 0, err)
@@ -1064,10 +1066,13 @@ class RepositoryIndexTests(unittest.TestCase):
             code = ci.main(["--root", str(REPO_ROOT), "--check"])
         self.assertEqual(code, 0, stderr.getvalue())
         self.assertTrue((REPO_ROOT / ci.OUTPUT_JSON).is_file(), "no committed index")
-        document = json.loads((REPO_ROOT / ci.OUTPUT_JSON).read_text(encoding="utf-8"))
+        text = (REPO_ROOT / ci.OUTPUT_JSON).read_text(encoding="utf-8")
+        document = json.loads(text)
         self.assertEqual(len(document["layers"]), 32)
         self.assertEqual(document["rule"], ci.RULE)
         self.assertEqual(document["universal_superiority"], "not_established")
+        # The index names Sourcegraph repositories, so the secret scan would read a bare 40-hex commit id as a leak.
+        self.assertIsNone(re.search(r"\b[0-9a-f]{40}\b", text))
 
 
 if __name__ == "__main__":

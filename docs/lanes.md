@@ -32,9 +32,10 @@ Every path below was verified against `main` at `6d9a7a5`.
   `catalogs/landscape/foundation.json` and `adoption/platforms/linux-wsl2.md`.
 - `catalogs/landscape/component-evidence-matrix.json`,
   `docs/component-evidence-matrix.md`,
-  `catalogs/landscape/new-host-grand-list.json` and
-  `docs/new-host-grand-list.md` are generated foundation reports. Either lane
-  rewrites them, but only with their `--write` commands (see the
+  `catalogs/landscape/new-host-grand-list.json`,
+  `docs/new-host-grand-list.md` and
+  `catalogs/landscape/catalog-index.json` are generated foundation reports.
+  Either lane rewrites them, but only with their `--write` commands (see the
   [hot-file protocol](#hot-file-protocol)).
 
 ### Trading tests
@@ -107,18 +108,22 @@ python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, "scripts");
 for p in sys.argv[1:]: host_receipts.register_file(Path("."), p)' <files to register>
 python3 scripts/component_matrix.py --write
 python3 scripts/new_host_grand_list.py --write
+python3 scripts/catalog_index.py --write
 python3 scripts/validate.py
 ```
 
 - Take both listings before the rebase. The checkout drops everything your
   branch added to `manifests/evidence.json`, so re-add your own `receipts[]`
   and `convergence_records[]` entries from the second listing.
+- Re-add those entries before running the `--write` commands:
+  `scripts/catalog_index.py` reads `receipts[]` and `convergence_records[]`,
+  so running it earlier writes a stale index that `--check` rejects.
 - `<files to register>` means each file in the first listing that `main`'s
   manifest already lists, each new file under `evidence/` and any other new
   file your branch registered. Every tracked evidence file is listed today;
   `scripts/validate.py` enforces it for `evidence/receipts/` and
   `evidence/artifacts/`, and `scripts/host_receipts.py validate` for
-  `evidence/hosts/`. Never pass `manifests/evidence.json` itself or the four
+  `evidence/hosts/`. Never pass `manifests/evidence.json` itself or the five
   generated reports above; their `--write` commands re-register them. Remove
   the entry of a file your branch deleted; `scripts/validate.py` reports it as
   `file missing`.

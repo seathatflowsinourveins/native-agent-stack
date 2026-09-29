@@ -20,7 +20,7 @@ What is stripped, and how each strip is recorded in
   ``docs/grand-catalog-handbook.md``, ``docs/ecosystem/index.html``,
   ``docs/ecosystem/manifest.json``, and the files that name each layer's
   current winners throughout: ``catalogs/landscape/{component-evidence-matrix,
-  new-host-grand-list,blind-convergence}.json`` and their rendered twins
+  new-host-grand-list,blind-convergence,catalog-index}.json`` and their rendered twins
   ``docs/{component-evidence-matrix,new-host-grand-list}.md``,
   ``catalogs/sota-convergence/manifest-*.json`` and
   ``catalogs/sota-convergence/sdk-runtime-coverage-*``.
@@ -177,6 +177,8 @@ REMOVE_GLOBS = (
     "catalogs/landscape/component-evidence-matrix.json",
     "catalogs/landscape/new-host-grand-list.json",
     "catalogs/landscape/blind-convergence.json",
+    # The ranked catalog index (scripts/catalog_index.py) names every layer's winner by value (placements[].role).
+    "catalogs/landscape/catalog-index.json",
     # Their rendered Markdown twins name the same winners in every row.
     "docs/component-evidence-matrix.md",
     "docs/new-host-grand-list.md",
