@@ -1087,11 +1087,12 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on 60,000 nested `systemd-run`; the launcher
   walk that predates this work took 29 s on 20,000 nested `env` and 56 s on 20,000 nested `rtk proxy`. Each input now
   takes under a second (the test bounds it at 3 s). Tokenizing is shlex's, about 9 microseconds a character inside quotes,
-  so from 2026-09-29 `main()` also refuses a command of more than 600,000 characters as `command_too_large` (exit 2, one
+  so from 2026-09-29 `main()` also refuses a command of more than 200,000 characters as `command_too_large` (exit 2, one
   line that names no command text, with the hint to put the content in a file with the Write tool and pass the path):
   measured that day, one quoted word of 1,000,000 characters took 10.2 to 13.0 s in `check()` (the base guard too),
-  600,000 took 3.8 to 4.4 s and 500,000 took 2.9 to 3.3 s, and a hook that times out blocks nothing. `check()` itself has
-  no size limit. A substitution nested beyond the caps above is still not read.
+  600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took 0.6 s, and a hook that times out blocks nothing. The
+  limit is low enough that both readings of a command always run inside the timeout, so no reading is skipped above some
+  length. `check()` itself has no size limit. A substitution nested beyond the caps above is still not read.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)

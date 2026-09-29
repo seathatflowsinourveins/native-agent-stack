@@ -1916,12 +1916,14 @@ class SecretPathGuardTests(unittest.TestCase):
     def test_a_command_over_the_size_limit_is_refused_without_echoing_it(self):
         # A PreToolUse command hook that runs past its timeout does not block the call (hooks documentation, "Timeouts", read 2026-09-29),
         # the guard's timeout is 10 s and tokenizing one 1 MB quoted word took about 10 s, so main() refuses what it cannot read in time:
-        # more than MAX_COMMAND_CHARACTERS characters, whatever they say. check() itself is unchanged for size.
-        self.assertEqual(guard.MAX_COMMAND_CHARACTERS, 600_000)
+        # more than MAX_COMMAND_CHARACTERS characters, whatever they say. check() itself is unchanged for size. The limit is low enough
+        # (200,000: one quoted word costs about 0.6 s, both readings of the command about 1.5 s) that the tokenizer's two readings always
+        # both run, so no reading is skipped above some length.
+        self.assertEqual(guard.MAX_COMMAND_CHARACTERS, 200_000)
         self.assertIn("command_too_large", guard.HINTS)
         prefix = "echo SENTINEL-2b7e "
-        command = prefix + "x" * (700_000 - len(prefix))
-        self.assertEqual(len(command), 700_000)
+        command = prefix + "x" * (250_000 - len(prefix))
+        self.assertEqual(len(command), 250_000)
         started = time.perf_counter()
         refused = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
         self.assertLess(time.perf_counter() - started, 5.0)
@@ -1934,13 +1936,13 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(refused.stdout, "")
 
     def test_a_large_ordinary_command_is_read_within_the_hook_timeout(self):
-        # 500,000 characters of ordinary shell (quoted words, redirections, separators) is under the limit: not refused for its size,
-        # read in well under the 10 s the hook is given (measured on this host: about a second), and blocked all the same when it holds a
-        # dump at its end.
+        # 150,000 characters of ordinary shell (quoted words, redirections, separators) is under the limit: not refused for its size,
+        # read in well under the 10 s the hook is given (measured on this host: a fraction of a second), and blocked all the same when it
+        # holds a dump at its end.
         line = "printf '%s\\n' \"line $((n + 1))\" >> out.txt; "
-        text = line * (500_000 // len(line))
-        self.assertGreater(len(text), 490_000)
-        self.assertLessEqual(len(text), 500_000)
+        text = line * (150_000 // len(line))
+        self.assertGreater(len(text), 145_000)
+        self.assertLessEqual(len(text), 150_000)
         started = time.perf_counter()
         allowed = run_hook({"tool_name": "Bash", "tool_input": {"command": text}})
         self.assertLess(time.perf_counter() - started, 5.0)
@@ -1949,8 +1951,8 @@ class SecretPathGuardTests(unittest.TestCase):
         self.assertEqual(blocked.returncode, 2)
         self.assertIn("blocked (environment_dump)", blocked.stderr)
 
-    def test_the_size_limit_is_at_600000_characters(self):
-        # The boundary, without reading the text: the length counts characters, 600,000 pass to check() and one more do not.
+    def test_the_size_limit_is_at_200000_characters(self):
+        # The boundary, without reading the text: the length counts characters, 200,000 pass to check() and one more do not.
         for length, expected, called in ((guard.MAX_COMMAND_CHARACTERS, 0, True), (guard.MAX_COMMAND_CHARACTERS + 1, 2, False)):
             with self.subTest(length=length):
                 payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "x" * length}})
@@ -1959,8 +1961,8 @@ class SecretPathGuardTests(unittest.TestCase):
                         mock.patch.object(sys, "stdin", io.StringIO(payload)), mock.patch.object(sys, "stderr", stderr):
                     status = guard.main()
                 self.assertEqual((status, check.called), (expected, called))
-        # Characters, not bytes: 300,000 four-byte characters are 1.2 MB of UTF-8 and pass.
-        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "\U0001f600" * 300_000}})
+        # Characters, not bytes: 150,000 four-byte characters are 600 KB of UTF-8 and pass.
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "\U0001f600" * 150_000}})
         with mock.patch.object(guard, "check", return_value=None), mock.patch.object(sys, "stdin", io.StringIO(payload)):
             self.assertEqual(guard.main(), 0)
 

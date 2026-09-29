@@ -45,7 +45,7 @@ command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
 are never taken for arguments. An internal error blocks the command (`guard_error`), because only exit 2
 blocks; a hook that outlasts its timeout does not, so every scan reads a text once and a command of more than
-600,000 characters is refused (`command_too_large`; see docs/secret-storage.md, "An internal error blocks; a
+200,000 characters is refused (`command_too_large`; see docs/secret-storage.md, "An internal error blocks; a
 timeout does not"). It is not a security boundary. A process
 that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
@@ -291,9 +291,11 @@ LEGACY_READING_LIMIT = 200_000
 # command hook that runs past its timeout does not block the call (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A
 # timed-out `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), this hook's timeout is 10 s, and the tokenizer costs
 # about 9 microseconds a character inside quotes: measured on this host on 2026-09-29, one quoted word of 1,000,000 characters took 10.2 to
-# 13.0 s (base c26800f3 and this version alike, over several runs), 600,000 took 3.8 to 4.4 s and 500,000 took 2.9 to 3.3 s. Refusing
-# what cannot be read in time fails closed where reading it would fail open.
-MAX_COMMAND_CHARACTERS = 600_000
+# 13.0 s (base c26800f3 and this version alike, over several runs), 600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took
+# 0.6 s. The limit is set where both tokenizer readings of a command (with and without shlex's comments) and the reading of what a
+# substitution prints always run inside the timeout, so no reading is skipped above some length. Refusing what cannot be read in time
+# fails closed where reading it would fail open.
+MAX_COMMAND_CHARACTERS = 200_000
 # Programs that only store or print what a command substitution gives them as an argument: `git commit -m "$(cat <<'EOF' ... EOF)"`, `gh pr
 # create --body "$(...)"`, `echo`, `printf`, `cat`, `tee`. The body of a quoted here-document inside a double-quoted substitution is data
 # for them, so prose in a commit message or a pull request body is no command line (scan_shell). What a substitution prints is CODE for a
