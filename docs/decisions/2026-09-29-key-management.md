@@ -306,3 +306,142 @@ name in the `undeclared_store_file` warning, and so in the receipt.
 - A store that keeps keys through a restart without a same-uid plaintext
   file (the overturn above) replaces the file rows whose fingerprints this
   receipt compares.
+
+## Part 4: the id-based key runner (D1 PR-4, 2026-09-29)
+
+This section amends the record for the change that adds the key runner. The
+change also adds the runner's guard model in
+`scripts/hooks/secret_path_guard.py` in a second phase, and the runner does
+not ship without it.
+
+**Selection.** A stored key is used through
+[`tools/credentials/credential_run.py`](../../tools/credentials/credential_run.py):
+`python3 tools/credentials/credential_run.py <inventory-id> [--only NAME]... -- <command> [args...]`,
+or `--check`, which starts nothing. It is standard-library Python in the 3.9
+grammar.
+- It re-executes under `-I -S` before it reads anything.
+- It resolves the entry through `scripts/credential_status.py`, and refuses
+  engine-held, native, interactive and CI entries.
+- It reads the `0600` file through a no-follow handle on the `0700` store
+  directory, outside every Git worktree.
+- It parses the file with `measure.py`'s `load_env_file` grammar, held to
+  `set_credential.py`'s value grammar, so the writer and the reader share
+  one grammar.
+- The command gets only the entry's declared variables. The caller's copies
+  of every inventory and `must_not_be_set` name are removed first.
+- Each injected value is masked on both streams, raw and in its encoded
+  forms: base64 and base64url interiors at three byte alignments, percent,
+  JSON and hex.
+- The inventory's new optional `public_variables` names the variables that
+  are injected unmasked, such as the Alpaca base URL.
+- The keyring stays a transport, units run their program through the
+  runner, and the paper units are unchanged. The Claude native mask and
+  Codex proxy injection remain later layers.
+
+The design and its limits are in
+[Using a key](../secret-storage.md#using-a-key-default-path-2026-09-29).
+
+**Built from these references, each re-read at its pin on 2026-09-29:**
+- `scripts/kernel_keyring.py`'s env-only exec discipline;
+- `blueprints/us-equities/pit-availability/measure.py:51-67`;
+- dotenvx/dotenvx@278101db `src/lib/helpers/redactOutput.js`: longest
+  first, the held partial tail, and never cutting a match;
+- actions/runner@15231bed `ValueEncoders.cs` (base64 at shifted
+  alignments, JSON and URI escapes) and `SecretMasker.cs` (overlapping
+  matches merged);
+- buildkite/agent@3345ee60 `internal/redact/redact.go` (`LengthMin` 6) and
+  `internal/replacer/replacer.go`;
+- dmno-dev/varlock@1b880652 `redact-stream.ts` (the 100 ms idle flush);
+- Generalized-Labs/ironrun@b611c7ce `internal/redact/encodings.go` (hex,
+  and percent forms in both cases).
+
+**Alternatives, with pins and evidence class:**
+- **mise v2026.9.16** (commit `2184db81`). *Measured* in a scratch home
+  with synthetic canaries (the coordinator's session notes
+  `spike2/spike-mise-agentself.md`, not in this repository). Rejected:
+  - it masks only under `mise run`, and a masked run passes no stdin (the
+    child read 0 bytes);
+  - a non-UTF-8 line drops the rest of stdout;
+  - it injects a decodable copy of the injected environment as
+    `__MISE_DIFF`, and it expands `$` in values;
+  - on a malformed line it prints the store path and the raw line with its
+    value;
+  - it has no id concept and no minimum value length.
+- **agentself v0.2.4** (commit `418e7d79`; PyPI wheel sha256 `eea1f722…`).
+  *Measured* the same way. Rejected:
+  - it exits 0 when the command exits 7;
+  - it returns output only after the command exits, inside one JSON object;
+  - it imports a store file as a single value;
+  - it has no release asset, only a 24-package Python wheel stack.
+- **dotenvx v2.31.1**. *Measured* (part 1 above). Still the closest
+  reference, and its streaming redactor is the masker's model. Not adopted,
+  for part 1's reasons: redaction is opt-in and covers raw values only,
+  its banner shows the store path, `run` executed a `$(...)` in a value,
+  and it would still need a shim and pinned per-platform binaries.
+- **ironrun v0.4.0** (published 2026-07-16; `main` at `b611c7ce`).
+  *Observed* with the GitHub API. The closest agent-native design, but its
+  default vault needs `secret-tool` on Linux, which this host lacks. Its
+  policy runs fixed command ids with fixed argv, and whether its `envfile:`
+  provider accepts `export ` lines is unverified. Its encodings table is a
+  reference.
+- **varlock 1.21.0**. It redacts by default, but `@import` needs file names
+  that begin with `.env.`, it needs a schema file, and it injects a
+  `__VARLOCK_ENV` blob. Its flush timer is a reference.
+- **op 2.39.0, bws-v2.1.0, infisical v0.43.137, doppler 3.76.6, OpenBao
+  v2.7.0, Vault v2.1.1, sops v3.13.3 with age v1.3.2, secretspec v0.21.1,
+  fnox v1.36.0 and `pulumi env run`.** *Upstream documentation*, as the
+  design's research recorded it; not re-read here. Each needs a token or an
+  unlock on disk and a re-import, most do not mask, and sops cannot parse
+  `export `.
+- **`systemd-run --user` with `LoadCredential=`.** It delivers a file, not
+  a variable, names the store path in the unit, does not mask, and does not
+  exist on macOS.
+- **The Claude sandbox credentials mask** (Claude Code 2.1.221 or later) and
+  **Codex's network-proxy `inject_request_headers`**. Later layers only. The
+  first covers sandboxed Bash in Claude and needs experimental settings; the
+  second is undocumented and untested.
+
+**One deviation from the build contract.** Amendment 4 of the contract says
+that at EOF, or when the command is killed, a held tail becomes a
+partial-redaction marker. The runner applies the amendment's own idle
+threshold there as well: a held tail of 4 bytes or more is never printed
+(on the idle timer, at EOF, on kill or at the drain bound), and one of up to
+3 bytes is printed after 100 ms without output or at the end. The reason is
+the first test run. Replacing every held tail turned the last `d` of any
+output without a final newline into a marker, because every Tavily key
+starts `tvly-` and its base64 starts `d`. With the literal rule, the output
+of the same command would also depend on whether it paused before exiting.
+The constant `SHORT_TAIL_MAX` restores the literal rule. A mutation of it is
+caught by `test_flushes_an_unterminated_tail_at_eof`.
+
+**Evidence class.**
+- *Local integration*, synthetic values in temporary stores:
+  `tests/test_credential_run.py` (31 tests) and the `public_variables`
+  schema test in `tests/test_credential_status.py`. The runner tests were
+  written first and failed to import the missing tool; the schema test
+  failed on the missing field. In a scratch mutation run, each of 32
+  mutants of the runner (one rule removed or changed each time) failed its
+  intended test, and the tool was restored by sha256.
+- *Upstream source*, read at the pins above on 2026-09-29, and macOS ps(1)
+  at apple-oss-distributions/adv_cmds@6bed8737.
+- *Measured once in a session scratch directory, no committed receipt*: the
+  mise, agentself and dotenvx spikes.
+- *Not yet observed*: the runner on macOS or under a 3.9 interpreter, a
+  real key through it (the canary harness is a later change), and the
+  runner's guard model, which is the second phase of this change.
+
+**Overturn.**
+- A maintained upstream tool does all of the following, measured with the
+  same probes (split write, EOF tail, kill, non-UTF-8 output, stdin, exit
+  code, malformed line): it runs one command with one id's declared
+  variables, masks raw and encoded forms on both streams while streaming
+  with a held tail, reads this store format by id without an unlock, and
+  passes stdin, the exit code and non-UTF-8 bytes through. Then adopt it and
+  retire the runner.
+- ironrun's `envfile:` provider is shown to read `export ` lines and run
+  ad-hoc argv with masking on both streams: compare it head to head.
+- The Claude sandbox mask leaves experimental status: add it as a layer.
+  The runner stays for Codex, OmniRoute lanes and units, which run no
+  guard.
+- Any part of a value is found in a transcript, log or tool output after a
+  runner use: stop that use, rotate the key, and record how it leaked.

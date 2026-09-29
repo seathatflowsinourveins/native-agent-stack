@@ -9,13 +9,14 @@ WebFetch, Context Mode's `ctx_fetch_and_index`, and Codex with
 Run a `tvly` Search/Extract command only when the user asks for Tavily, or
 when a free lane cannot return the page the task needs, and record which
 lane failed. Since 2026-09-29 the key's store of record is the private file
-`<store>/tavily.env`, as in [Stored key](#stored-key-2026-09-29); until the
-next kernel restart, a Linux or WSL2 host still runs `tvly` with the kernel
-keyring copy through `scripts/kernel_keyring.py exec` or the installed
-`tvly-keyring` wrapper, and macOS through `secret run`. For installation or a concrete
-authentication failure, inspect `command -v tvly`, `tvly --version` and
-`tvly auth --json`, the last through `exec`. If the CLI is missing, the
-upstream installer is:
+`<store>/tavily.env`, and every `tvly` command gets it through the key
+runner: `python3 tools/credentials/credential_run.py tavily -- tvly <args>`
+([Stored key](#stored-key-2026-09-29)). The kernel keyring copy, used
+through `scripts/kernel_keyring.py exec` or the installed `tvly-keyring`
+wrapper, works only until the next kernel restart. For installation or a
+concrete authentication failure, inspect `command -v tvly`, `tvly --version`
+and `tvly auth --json`, the last through the runner. If the CLI is missing,
+the upstream installer is:
 
 ```sh
 curl -fsSL https://cli.tavily.com/install.sh | bash
@@ -23,7 +24,7 @@ curl -fsSL https://cli.tavily.com/install.sh | bash
 
 The observed installer selected `uv tool install tavily-cli`; another host must record the version it actually resolves. For a deliberate reproduction of the accepted package pin, use `uv tool install 'tavily-cli==0.1.8'` in the intended tool environment. Inspect the current installer before execution and retain its hash. Do not change the default Python or Node to complete setup when a compatible installed runtime is available.
 
-Do not authenticate with `tvly login` or `tvly init`: both can write the credential to `~/.tavily/config.json`, which the operator's 2026-09-26 decision rules out. Keep the key in its store file as in the dated section below. Never include the credential in public command receipts or shell history. The 2026-09-20 acceptance authenticated with native `tvly login`, into owner-only mode 0600 CLI storage. Install the actual requested clients' skills (the `tvly` lines below are that acceptance's commands; on a keyring host run each through `exec`):
+Do not authenticate with `tvly login` or `tvly init`: both can write the credential to `~/.tavily/config.json`, which the operator's 2026-09-26 decision rules out. Keep the key in its store file as in the dated section below. Never include the credential in public command receipts or shell history. The 2026-09-20 acceptance authenticated with native `tvly login`, into owner-only mode 0600 CLI storage. Install the actual requested clients' skills (the `tvly` lines below are that acceptance's commands; run each through the key runner):
 
 ```sh
 npx --yes skills add tavily-ai/skills --skill '*' --agent claude-code --agent codex --global --yes
@@ -63,7 +64,8 @@ comes from that keyring copy, once, through the create-only chain in
 which also covers how long the copy lasts and what it does not protect
 against. To rotate, the operator types the new key once with
 `tools/credentials/open_credential_terminal.sh tavily` and types `replace`
-at the hidden prompt.
+at the hidden prompt. A host without the keyring copy, macOS included, has
+the key typed into its file the same way.
 
 Interim step (2026-09-29, until the id-based runner lands): the `exec` and
 `tvly-keyring` commands below read the keyring copy, not the file, so after
@@ -105,15 +107,14 @@ tvly-keyring search "<query>" --depth basic --max-results 5 --json
 tvly-keyring research run "<question>" --model pro --json
 ```
 
-After the restart the keyring copy is gone: `status` prints `absent`,
-`tvly-keyring` exits 2 without starting `tvly`, and Tavily commands have no
-key until a later change adds a loader for the file (or the operator stores
-a per-boot spare again). Tavily is not the default web lane, so that gap is
-accepted.
+After the restart the keyring copy is gone: `status` prints `absent` and
+`tvly-keyring` exits 2 without starting `tvly`. The runner keeps working
+from the file.
 
 - `tvly auth --json` prints only `authenticated`, `method` and `source`;
-  through `exec` it reports `"method": "env"`. Plain `tvly auth` also prints
-  the first eight and last four characters of the key, so use `--json`.
+  through the runner or `exec` it reports `"method": "env"`. Plain
+  `tvly auth` also prints the first eight and last four characters of the
+  key, fragments that the runner does not mask, so use `--json`.
 - Do not run `tvly login`, or `tvly init` without `--skip-auth`, on such a
   host. `tvly login --api-key` and `tvly init --api-key` write the key to
   `~/.tavily/config.json` and put it on a command line, and without a key
@@ -121,22 +122,26 @@ accepted.
   (`save_api_key()` and `save_oauth_session()` in `tavily_cli/config.py`).
   The CLI's own hints (`tvly login --api-key tvly-YOUR_KEY`,
   `export TAVILY_API_KEY=...`) do not apply here.
-- Never give `exec` a command that prints the environment or the key, such
-  as `env`, `printenv`, an `echo` of the variable or a plain `tvly auth`.
-  Since a later change on 2026-09-26 the guard hook blocks these through
-  `exec` and `tvly-keyring` too, once a host's user-level copy of the hook is
-  replaced. It is a text heuristic with recorded gaps
+- Never give the runner or `exec` a command that prints the environment or
+  the key, such as `env`, `printenv`, an `echo` of the variable or a plain
+  `tvly auth`. The runner masks whole values in what the command prints,
+  but not fragments or transformed copies, and `exec` masks nothing. Since a
+  later change on 2026-09-26 the guard hook blocks these through `exec` and
+  `tvly-keyring` too, once a host's user-level copy of the hook is replaced.
+  It is a text heuristic with recorded gaps
   ([secret-storage.md](../docs/secret-storage.md#guard-coverage-2026-09-26)).
-- Without `exec`, `search` and `extract` still run, in keyless mode with a
-  rate-limit cap, while `map`, `crawl` and `research` stop and ask for a key.
-  A missing key therefore shows up as capped searches rather than an error.
-  The upstream skills call bare `tvly`, so route their commands through
-  `exec` too. Check `status` first.
+- Without the runner, `search` and `extract` still run, in keyless mode with
+  a rate-limit cap, while `map`, `crawl` and `research` stop and ask for a
+  key. A missing key therefore shows up as capped searches rather than an
+  error. The upstream skills call bare `tvly`, so route their commands
+  through the runner too. Check with `--check` first.
 - `research run` waits and polls until the report is ready (`--timeout`,
   default 600 seconds). `--no-wait` returns a request id for
   `research status` or `research poll`.
-- On macOS use the login Keychain instead:
-  `secret run TAVILY_API_KEY -- tvly ...` (see secret-storage.md).
+- macOS has no kernel keyring (`kernel_keyring.py` refuses it), so the key
+  is typed into its file once with
+  `tools/credentials/open_credential_terminal.sh tavily`, and the runner is
+  the same command there.
 
 The Research endpoint (`tvly research run --model pro`) was first used on
 2026-09-26, for the Alpaca platform landscape, and then for one report per

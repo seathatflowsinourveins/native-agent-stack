@@ -42,6 +42,92 @@ too: it moves the Hugging Face token files away from where the checker, the
 guard and the deny rules look. The checker lists it by name under
 `native store path overrides`.
 
+<a id="using-a-key"></a>
+
+## Using a key (default path, 2026-09-29)
+
+An agent, a Codex or OmniRoute lane, a workflow step or a unit uses a stored
+key through one command that names only the inventory id:
+`python3 tools/credentials/credential_run.py <inventory-id> -- <command> [args...]`.
+For example:
+
+```sh
+python3 tools/credentials/credential_run.py tavily -- tvly search "<query>" --depth basic --json
+python3 tools/credentials/credential_run.py alpaca-paper --check
+```
+
+[`tools/credentials/credential_run.py`](../tools/credentials/credential_run.py)
+reads the entry's `0600` file and starts the command with that entry's
+declared variables added to its environment. `--only NAME` narrows them. The
+caller's own copies of every inventory and `must_not_be_set` name are
+removed first. No value goes into the command line, a temporary file or a
+shell. The command's stdout and stderr are relayed with each injected value
+replaced by `[REDACTED:<NAME>]`, raw or encoded: base64 and base64url at
+every byte alignment, percent-encoding, JSON escaping and hex. A variable
+that the entry lists in `public_variables`, such as `APCA_API_BASE_URL`, is
+injected unmasked. The command's exit code, stdin, signals and non-UTF-8
+bytes pass through. `--check` starts nothing: it prints the names it would
+inject and the file state (`ok`, `missing` or `unsafe`). No subcommand
+prints or returns a value.
+
+The runner refuses the following, naming the id, a variable or a line
+number but never a value or a path:
+- an unknown id, or an id whose key an engine, a native client or CI holds;
+- a missing file, a file whose mode is not exactly `0600`, a symbolic or
+  hard link, a file over 64 KiB, or a store directory that is not a private
+  `0700` directory outside every Git worktree;
+- a line that is not `export NAME=value`, or a value outside the grammar of
+  [`set_credential.py`](../tools/credentials/set_credential.py). A
+  hand-edited `$`, backtick or backslash is refused, never expanded;
+- a masked value shorter than 6 bytes, which could not be masked without
+  masking ordinary output.
+
+**Adding a key** takes one step from the user. The agent runs
+`bash tools/credentials/open_credential_terminal.sh <inventory-id>`, and
+the user types the key once at the hidden prompt in the window it opens
+([Adding or rotating a key](#adding-or-rotating-a-key-without-pasting-it-anywhere)).
+For a new provider, the agent first adds the inventory entry in its own
+worktree, together with the matching `SECRET_NAMES` line in
+`scripts/hooks/secret_path_guard.py` that `tests/test_secret_path_guard.py`
+requires. It then opens the window from that worktree.
+
+**What masking does not cover.** Masking guards against accidents; it is
+not a boundary.
+- Only the entry's injected variables are masked, and only whole values in
+  the forms above. A fragment (plain `tvly auth` prints a key's first eight
+  and last four characters), a reversed, encrypted or otherwise transformed
+  value, and a value split between stdout and stderr are printed as they
+  are.
+- Stdout and stderr are masked separately. What the command writes to a
+  file, a log or the network never passes the masker.
+- Output that ends, or a command that is killed, part-way through a value
+  shows `[REDACTED-PARTIAL:<NAME>]` for the unfinished part once it is 4
+  bytes or longer. Up to 3 bytes of the start of a value's form can be
+  printed, after 100 ms without output or at the end.
+- The value sits in the command's environment. While it runs, other
+  processes of the same uid can read it through `/proc/<pid>/environ`, or
+  with `ps -E` on macOS.
+- The guard hook runs only for Claude's Bash tool. Codex, OmniRoute lanes
+  and units run no guard, so there the masking is the only layer.
+
+**Units and other clients.**
+- A systemd user unit runs its program through the runner:
+  `ExecStart=/usr/bin/python3 -I <checkout>/tools/credentials/credential_run.py <inventory-id> -- <program>`.
+  It reads the file at start, with no unlock and nothing in the manager's
+  environment. Never pass a value through `Environment=`, `SetCredential=`,
+  `systemctl --user set-environment` or `import-environment`.
+  `EnvironmentFile=` stays only for the engines that already use it
+  (Grafana, OmniRoute). The paper units keep their `--env-file` pointers
+  until the trading lane decides otherwise.
+- A launchd agent on macOS does the same through `ProgramArguments`, with
+  `EnvironmentVariables` holding `PATH` only
+  ([macOS page](../adoption/platforms/macos-arm64.md#keys-under-launchd-drafted-2026-09-29-not-run-on-a-mac)).
+- Never start Codex, or any other client, from a shell that exports a key:
+  whatever the launcher exports can reach every command its model runs.
+  Keys reach those commands through the runner inside the command.
+- An MCP stdio server that needs a key is launched with the runner as its
+  command, never with a `${VAR}` in its configuration.
+
 ## Storage rules
 
 - Use one file per provider, under the store directory. The directory is mode
@@ -102,14 +188,23 @@ Five consumers still read the Alpaca pair only from environment variables:
 `security-identity/probe.py`, `security-identity/quality.py` and
 `delisting-coverage/collect.py`. This is item A1 in
 [`decisions/2026-09-24-community-sweep.md`](decisions/2026-09-24-community-sweep.md).
-Until they are moved to `--env-file`, run them one invocation at a time in a
-subshell, so that the values exist only in that child's environment:
+Run each through the key runner ([Using a key](#using-a-key-default-path-2026-09-29)), which puts the
+pair into that one command's environment and masks it in the command's
+output:
+
+```sh
+python3 tools/credentials/credential_run.py alpaca-paper -- python3 blueprints/us-equities/alpaca-paper/paper_runner.py ...
+```
+
+Deprecated since 2026-09-29, and still allowed until a later guard change
+retires it: a subshell that sources the file, so that the values exist only
+in that child's environment, with nothing masked:
 
 ```sh
 ( set -a; . "$PAPER_ENV_FILE"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py ... )
 ```
 
-While that child runs, any process running under your uid can read its
+While either child runs, any process running under your uid can read its
 environment through `/proc/<pid>/environ` or `ps e`. Prefer the `--env-file`
 consumers.
 
@@ -504,7 +599,10 @@ succeed without `--replace`. The lock is a Linux abstract socket name for
 your uid, not a file. Names use lowercase letters, digits, `.`, `_` and `-`.
 
 **Use it** through `exec`, which reads the key and starts the command with
-one variable set, in that command's environment only:
+one variable set, in that command's environment only. Since 2026-09-29 a
+stored key is used through the key runner instead
+([Using a key](#using-a-key-default-path-2026-09-29)), which reads the file and masks the output;
+`exec` serves only a per-boot spare, which ends at the next kernel restart:
 
 ```sh
 python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- tvly search "<query>" --json
