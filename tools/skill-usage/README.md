@@ -171,6 +171,21 @@ also records whether a developer message carries the injected block's marker (de
 `<context_window_protection>`, the opening tag of Context Mode's routing block; `--marker` for
 another). A spawned sub-agent's rollout begins with records copied from its parent (ordinals below
 `subagent_history_start_ordinal`); they count toward its marker and catalog, never as its calls.
+`marker` keeps that meaning. `marker_inherited` and `marker_injected` split it by content item: the marker
+in a record copied from the parent, or in the session's own. `marker_injected_kinds` counts the injected items
+by content kind. Codex records a hook's `additionalContext` as a developer message whose
+`internal_chat_message_metadata_passthrough.content_item_kinds` is `hooks.additional_context`, for a root's
+SessionStart and a spawned sub-agent's SubagentStart alike
+([hook_additional_context.rs:15-22](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/context/hook_additional_context.rs#L15-L22),
+[hook_runtime.rs:128-154](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/hook_runtime.rs#L128-L154)
+and [:848-872](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/hook_runtime.rs#L848-L872)).
+A kinds list that does not align with the content items, or a kind that is not a string, reads `(none)`.
+Groups add `marker_inherited_sessions`, `marker_injected_sessions`, `marker_inherited_only_sessions` and
+`marker_injected_by_kind` (content items). `measurement.codex_hook_context` counts developer content items of
+that kind: `inserted` and `with_marker` for the session's own, in the window of their record, and `inherited`
+and `inherited_with_marker` for copied ones, once, in the window of the child's first own record, so adjacent
+windows add up. The kernel's `measurement.hook_context` counts Claude `hook_additional_context` attachments
+only, so it reads zero for Codex.
 A tool call counts once per id (a `function_call`'s `call_id` is its item's id), in the window of
 its first record, as `child-usage.mjs` counts `tool_use` ids: a call requested before `--since`
 and completed inside is not counted again, so adjacent windows add up. Its shell, MCP and fetch

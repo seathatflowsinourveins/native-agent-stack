@@ -701,7 +701,10 @@ LANES_LIMITS = (
     "Session properties (kind, originator, history mode, user_config, marker) use every record "
     "before until. Records a spawned sub-agent's rollout copied from its parent (ordinal below "
     "subagent_history_start_ordinal) count toward those properties only, never as the child's "
-    "calls. The marker is looked for in developer messages only. The rtk prefix is the first word "
+    "calls. The marker is looked for in developer messages only; marker_inherited and marker_injected split it by "
+    "content item (in a record copied from the parent, or in the session's own), and marker_injected_kinds counts the "
+    "injected items by content kind (content_item_kinds, (none) when the kinds do not align with the items). The rtk "
+    "prefix is the first word "
     "of the shell script; curl/wget counts only in command position of the text a shell runs "
     "(quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, "
     "ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted "
@@ -826,6 +829,35 @@ def message_text(payload: dict) -> str:
                      if isinstance(item, dict) and isinstance(item.get("text"), str))
 
 
+# The content kind of a hook's additionalContext: Codex records it as a developer message fragment of this kind, for a root
+# session's SessionStart and a spawned sub-agent's SubagentStart alike (openai/codex rust-v0.157.1 36650394
+# core/src/context/hook_additional_context.rs:15-22, core/src/hook_runtime.rs:128-154, :848-872).
+HOOK_CONTEXT_KIND = "hooks.additional_context"
+HOOK_CONTEXT_COUNTERS = ("inserted", "with_marker", "inherited", "inherited_with_marker")
+
+
+def message_items(payload: dict) -> list[tuple[str, str | None]]:
+    """A message's text content items as (text, kind). Codex aligns internal_chat_message_metadata_passthrough
+    .content_item_kinds with the message's content entries (rust-v0.157.1 protocol/src/models.rs:958-993, a fragment writes
+    one kind per item at context-fragments/src/fragment.rs:35-53; a kind is a transparent string,
+    protocol/src/models/item_metadata.rs:5-7). A kinds value that is not a list as long as the content, or a kind that is not
+    a string, leaves the kind None."""
+    content = payload.get("content")
+    if isinstance(content, str):
+        return [(content, None)]
+    if not isinstance(content, list):
+        return []
+    metadata = payload.get("internal_chat_message_metadata_passthrough")
+    kinds = metadata.get("content_item_kinds") if isinstance(metadata, dict) else None
+    aligned = isinstance(kinds, list) and len(kinds) == len(content)
+    items = []
+    for index, item in enumerate(content):
+        if isinstance(item, dict) and isinstance(item.get("text"), str):
+            kind = kinds[index] if aligned else None
+            items.append((item["text"], kind if isinstance(kind, str) else None))
+    return items
+
+
 def catalog_texts(record: dict) -> list[str]:
     """The skill-catalog texts one rollout record carries: a developer message holding the
     <skills_instructions> block, or world_state's host_skills body (codex-cli 0.157.1)."""
@@ -930,12 +962,18 @@ def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
     return json.loads(result.stdout)
 
 
-def measure_codex_records(records, *, since=None, until=None, rtk_check=False, exceptions=None):
+def measure_codex_records(records, *, since=None, until=None, rtk_check=False, exceptions=None,
+                          marker=DEFAULT_LANES_MARKER):
     """Local transcript measurement, not a provider run. Parent copies establish the
     cumulative usage baseline but never contribute calls/results. Preserve unknowns.
 
     Source: ccusage/ccusage v20.0.24 rust/adapters/codex/src/parser.rs:153-246,318-346.
     Difference cumulative totals, never sum turn.completed thread totals or subsets.
+
+    codex_hook_context counts developer content items of kind hooks.additional_context (PR-A 10a): own items
+    (inserted, with_marker) in the window of their own record, and items copied from the parent (inherited,
+    inherited_with_marker) once, in the window of the child's first own record, so adjacent windows add up (a window
+    that holds only copied records is not measured at all). The kernel's hook_context counts Claude hook attachments only.
     """
     start = next((r.get("payload", {}).get("subagent_history_start_ordinal") for r in records
                   if r.get("type") == "session_meta"), None)
@@ -946,6 +984,8 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     snapshots = duplicates = gaps = 0
     attempts, active = [], None
     model = effort = None
+    hooks = dict.fromkeys(HOOK_CONTEXT_COUNTERS, 0)
+    first_own_at = None
 
     def attempt():
         nonlocal active
@@ -969,6 +1009,14 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         counted = not inherited and (since is None or at >= since)
         if not inherited:
             visible.append(record)
+            if first_own_at is None:
+                first_own_at = at
+        if (record.get("type") == "response_item" and isinstance(p, dict) and p.get("type") == "message"
+                and p.get("role") == "developer" and (inherited or counted)):
+            for text, kind in message_items(p):
+                if kind == HOOK_CONTEXT_KIND:
+                    hooks["inherited" if inherited else "inserted"] += 1
+                    hooks["inherited_with_marker" if inherited else "with_marker"] += marker in text
         if record.get("type") == "turn_context":
             model = safe_key(p.get("model")) if p.get("model") else None
             effort = p.get("effort", p.get("reasoning_effort"))
@@ -1115,6 +1163,9 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}}})
     # Claude per-message fields are inapplicable to Codex cumulative native counters.
     measured.pop("usage", None)
+    if first_own_at is None or (since is not None and first_own_at < since):
+        hooks["inherited"] = hooks["inherited_with_marker"] = 0  # copied items count in the window of the first own record
+    measured["codex_hook_context"] = hooks
     measured["provider_usage"] = {"totals": totals if snapshots else dict.fromkeys(CODEX_COUNTERS),
         "attempts": attempts, "snapshots": snapshots, "duplicate_snapshots": duplicates, "gaps": gaps,
         "complete": bool(snapshots) and not gaps and all(a["state"] == "completed" and a["snapshots"] for a in attempts)}
@@ -1122,7 +1173,8 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
 
 
 def _new_lanes_session() -> dict:
-    return {"kind": None, "originator": None, "history_mode": None, "marker": False, "catalog_off": False,
+    return {"kind": None, "originator": None, "history_mode": None, "marker": False, "marker_inherited": False,
+            "marker_injected": False, "marker_injected_kinds": {}, "catalog_off": False,
             "catalog_on": False, "in_window": False, "started_before_window": False,
             "ran_past_window_end": False, "tool_calls": 0, "mcp_calls": {}, "mcp_failed": {},
             "shell_calls": 0, "rtk_prefixed": 0, "fetch": dict.fromkeys(FETCH_KEYS, 0),
@@ -1218,6 +1270,16 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                 new_call = payload_type == "function_call" and not inherited and first_record(payload.get("call_id"))
                 if payload_type == "message" and payload.get("role") == "developer":
                     session["marker"] |= marker in message_text(payload)
+                    # PR-A 10a: split by content item, inherited (a record copied from the parent) or injected (the
+                    # session's own), with the injected item's content kind.
+                    for text, kind in message_items(payload):
+                        if marker not in text:
+                            continue
+                        if inherited:
+                            session["marker_inherited"] = True
+                        else:
+                            session["marker_injected"] = True
+                            _bump(session["marker_injected_kinds"], "(none)" if kind is None else safe_key(kind))
                 elif counted and payload_type in CALL_PAYLOAD_TYPES:
                     for name in skillmd_hits(payload, names):
                         _bump(session["skill_md_reads"], name)
@@ -1248,7 +1310,7 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                                                if r["transcript_sha256"] == digest]
         exceptions = {r["tool_use_id"]: r for r in exception_records if r["transcript_sha256"] == digest}
         session["measurement"] = measure_codex_records(metric_records, since=since, until=until,
-                                                       rtk_check=rtk_check, exceptions=exceptions)
+                                                       rtk_check=rtk_check, exceptions=exceptions, marker=marker)
         session["measurement"]["parse_errors"] = parse_errors
         if parse_errors or untimed:
             session["measurement"]["provider_usage"]["complete"] = False
@@ -1308,7 +1370,8 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
            "sessions_using_mcp_server": {}, "shell_calls": 0, "rtk_prefixed_shell_calls": 0,
            "rtk_prefix_share": None, "fetch": {**dict.fromkeys(FETCH_KEYS, 0), "ctx_fetch_and_index_share": None},
            "skill_md_reads": {}, "sessions_with_skill_md_read": 0, "function_calls": {},
-           "file_changes": 0, "marker_sessions": 0, "first_prompt_tokens": None}
+           "file_changes": 0, "marker_sessions": 0, "marker_inherited_sessions": 0, "marker_injected_sessions": 0,
+           "marker_inherited_only_sessions": 0, "marker_injected_by_kind": {}, "first_prompt_tokens": None}
     for session in sessions:
         out["tool_calls"] += session["tool_calls"]
         for server, count in session["mcp_calls"].items():
@@ -1327,6 +1390,11 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
             _bump(out["function_calls"], name, count)
         out["file_changes"] += session["file_changes"]
         out["marker_sessions"] += session["marker"]
+        out["marker_inherited_sessions"] += session["marker_inherited"]
+        out["marker_injected_sessions"] += session["marker_injected"]
+        out["marker_inherited_only_sessions"] += session["marker_inherited"] and not session["marker_injected"]
+        for kind, count in session["marker_injected_kinds"].items():  # content items, not sessions
+            _bump(out["marker_injected_by_kind"], kind, count)
     fetch = out["fetch"]
     out["rtk_prefix_share"] = _share(out["rtk_prefixed_shell_calls"], out["shell_calls"])
     fetch["ctx_fetch_and_index_share"] = _share(
@@ -1341,6 +1409,8 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
             "totals": {key: (sum(m["provider_usage"]["totals"][key] for m in measurements)
                               if all(m["provider_usage"]["totals"][key] is not None for m in measurements) else None)
                        for key in CODEX_COUNTERS}}
+        out["measurement"]["codex_hook_context"] = {key: sum(m["codex_hook_context"][key] for m in measurements)
+                                                    for key in HOOK_CONTEXT_COUNTERS}
     return out
 
 
