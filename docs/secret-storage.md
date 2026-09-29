@@ -244,15 +244,30 @@ status `test_only`) is missing between runs, which is informational.
 - Controls come first. Each scanner class must find a planted decoy and then
   lose it: a text file, a gzip file, SQLite in WAL mode with an open
   connection, a git object, and a journal line. Each consumer run also
-  carries its own decoy, echoed by a command that fails on purpose. A sink
-  whose decoy was planted but not found is reported as "not a sink, or
-  scanned wrongly", and the scan exits 1.
+  carries its own decoy, echoed by a command that fails on purpose. The
+  Claude run also runs `rtk err` with over 500 bytes of decoy lines, because
+  RTK keeps only the output of a failed command of 500 bytes or more; the
+  recall control counts only in RTK's decoded recall blobs. Every capture of
+  a client's streams is scanned too, each with a control line the harness
+  writes into it. A sink whose decoy was planted but not found is reported
+  as "not a sink, or scanned wrongly", and the scan exits 1.
+- A sink is INCOMPLETE, and the scan exits 1, when a path is unreadable, a
+  scanner fails, a compressed value is over its limit or truncated, a Loki
+  dump cannot finish or its deadline expires. File names are matched too,
+  and no discovered name is put in a scanner's argv. The baseline must be
+  clean and complete before any consumer runs.
 - Every `CODEX_HOME` that the Codex consumers use must set
   `features.shell_snapshot = false`. The harness reads `config.toml` and the
   profile file, and refuses otherwise.
-- The OmniRoute data directories, Codex `shell_snapshots` and
-  `~/.docker/config.json` hold real tokens and are Read-denied to agents.
-  Only `scan --sink omniroute`, run in your own terminal, scans them.
+- An agent-run process never reads a real value. The OmniRoute data
+  directories, Codex `shell_snapshots`, `~/.docker/config.json`,
+  the user manager's environment and the container configurations
+  (Docker's `config.v2.json` and `hostconfig.json`) are scanned only by
+  `scan --sink omniroute`, run in your own terminal.
+- Consuming again invalidates the verification and the scans made before it.
+  An interrupted consume ends its client, removes the store file and marks
+  the run, which `report` then refuses. Only the run that armed the store
+  can remove its file.
 - `settle` measures when the decoys reach ai-memory, the agentsview archive
   and Loki, and sets when scan passes 1 and 2 are due. `--with-sudo` on a
   pass adds the system journal, syslog and crash dumps.
@@ -295,12 +310,13 @@ scan times, for the cooperative, id-only path of the six consumers. The
 listed forms are the ones the runner masks. Five consumers print only a
 tag, so end-to-end masking is shown only by the unit's `--leak-check` run,
 whose output returns through a pipe to the harness and never reaches a
-client sink.
+client sink. The receipt lists each user-run sink whose scan did not run,
+and its claim names them.
 
 **What is not covered.** Remote sinks (provider retention, and GitHub
 beyond `gh api` reads), Windows-side stores, transformed forms, process
 memory and swap, adversarial or careless agents, sinks without a passed
-control, OmniRoute unless its user-run scan ran, and future client
+control, user-run sinks unless their scan ran, and future client
 versions. The guard does not list `CANARY_E2E_KEY` in `SECRET_NAMES` until
 the command guard change adds it. Until then, a search for the name or an
 expansion of it passes the guard.

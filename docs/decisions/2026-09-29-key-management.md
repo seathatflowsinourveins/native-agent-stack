@@ -724,7 +724,10 @@ meaning, and only a planted decoy shows that a sink is read at all.
   known hang comes from a stdin left open.
 - Codex `shell_snapshots` and `~/.docker/config.json` join OmniRoute in the
   user-run group, for the design's own reason: they hold real tokens and are
-  Read-denied to agents.
+  Read-denied to agents. By the coordinator's decision of the repair round,
+  so do the user manager's environment and the container configurations
+  (Docker's `config.v2.json` and `hostconfig.json`): an agent-run process
+  never reads a real value, even to count.
 - Receipts are named by `write_receipt`
   (`<sequence>-<UTC stamp>-<boot id prefix>.json` under
   `<state>/native-agent-stack/canary/`), with the run id inside, not as
@@ -736,6 +739,54 @@ meaning, and only a planted decoy shows that a sink is read at all.
   positive controls. "Never prints a pattern" is read as a canary's
   patterns.
 
+**Repair round (2026-09-29).** A read-only GPT-6 review at effort max
+returned 14 findings, five of them HIGH false-zero paths. Each was
+reproduced with a synthetic fixture that passed the old harness wrongly and
+failed first, and each fix has its test:
+1. *High.* A client's stderr capture was never scanned. Every capture of
+   every consumer, and every tag file, is scanned for every canary, each
+   capture with a control line the harness writes into it.
+2. *High.* A user-run scan that found a canary still gave `zero`. Every
+   executed check now enters the verdict; a kept run needs its after-restart
+   check; a user-run scan that did not run is listed in the receipt and
+   named in the claim.
+3. *High.* Evidence from before a re-run was accepted. Each consumption
+   gets a sequence number, a new one moves the older verification, settle
+   and scans aside, and `report` accepts only the latest.
+4. *High.* An unreadable path or a failed scanner read as clean. Either
+   makes the sink INCOMPLETE and fails the scan, and `consume` needs a clean
+   and complete baseline.
+5. *High.* The members of a multi-member gzip after the first were dropped.
+   Every member is decoded, and a limit or an incomplete stream makes the
+   value unreadable.
+6. *Medium.* Discovered file names reached `rg`'s argv. Only configured
+   roots do now, with globs derived from the table, and names are matched
+   here.
+7. *Medium.* A newline in a file name hid a canary. Paths come from rg's
+   JSON output and from the walk's own names.
+8. *Medium.* Loki pagination skipped entries that shared a boundary
+   timestamp. Boundary entries are kept, and an unfinished dump is
+   INCOMPLETE.
+9. *Medium.* The RTK control rested on a 40-byte echo that RTK never keeps.
+   The Claude run's `rtk err` command now prints about 840 bytes of decoy
+   lines, over RTK v0.50.0's 500-byte recall gate
+   (`src/core/retriever.rs:18`, `src/core/tee.rs:61-66`), and the recall
+   control counts only in the decoded blobs.
+10. *Medium.* Only `RLIMIT_CORE` guarded against crash collectors. The
+    runner's `check_core_pattern` now runs before any canary exists.
+11. *Medium.* A FIFO handed to `rg` blocked the scan. Special files are never
+    opened or handed to a scanner, and each sink has a deadline.
+12. *Medium.* An interruption left the client running and the store armed.
+    SIGTERM and SIGHUP are handled, and the runner's `end_group` and
+    watchdog end the client. An interrupted consume leaves a record that
+    `report` refuses.
+13. *Medium.* Cleanup of one run removed another run's armed file. The
+    arming run is recorded under a lock of the store directory, and the
+    other runs' steps refuse.
+14. *Medium.* The scrub assertion passed without the scrub. The fixture now
+    carries a sentinel under every inventory, `must_not_be_set` and pointer
+    name, and every environment the harness builds is checked for them.
+
 **Evidence class.**
 - *Local integration*, with synthetic values in temporary directories:
   `tests/test_canary_e2e.py`, and the status tests in
@@ -745,8 +796,12 @@ meaning, and only a planted decoy shows that a sink is read at all.
   runs all six consumers through stub clients that execute the real runner
   and probe against a temporary store, and ends in a receipt with
   `result: zero`.
-- *Scratch mutation run*, not committed: each of 14 mutants removed one rule
-  and failed its test, and the files were restored and checked by sha256.
+- *Scratch mutation runs*, not committed. For the build, each of 14 mutants
+  removed one rule and failed its test. For the repair round there were 42
+  mutants, the earlier rules and one per new rule; 41 failed their tests.
+  The survivor is the Loki one-timestamp early exit on its own: the rule
+  that a page adding nothing new is INCOMPLETE stops the same fixture one
+  page later. The files were restored and checked by sha256 each time.
 - *Not yet observed*: the live window with real clients. Until then there is
   no receipt, the sink table's rows remain unverified sink facts, and the
   client flags in the harness (`claude -p --output-format stream-json`,
@@ -760,6 +815,11 @@ meaning, and only a planted decoy shows that a sink is read at all.
 - Until the command guard lists `CANARY_E2E_KEY` in `SECRET_NAMES`, the
   guard does not treat the canary's variable name as it treats a real
   key's name.
+- Any unreadable path makes its sink INCOMPLETE. A `/tmp` that holds other
+  users' unreadable files, a `gh` without network or sign-in, or a zstd
+  value on a Python without a zstd decoder therefore fails the pass until
+  the sink table's exclusions are triaged or the tool is available. The
+  table excludes only root's PrivateTmp and snap directories by name.
 
 **Overturn.**
 - A sink whose control fails in the live window: correct its row, then
