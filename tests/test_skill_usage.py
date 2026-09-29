@@ -2384,9 +2384,13 @@ class CodexSpawnJoin(unittest.TestCase):
         self.assertEqual([spawn.get("join") for spawn in scan(False)], ["parent_not_scanned", "parent_not_scanned"])
 
 
-PAGINATED_META = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "paginated"})
-LEGACY_META = u3_row("session_meta", {"id": "u3-session", "source": "exec"})  # legacy by default (protocol.rs:772-779)
-EXPLICIT_LEGACY_META = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "legacy"})
+# The client version is one whose code-mode isolate was read (the 10e outer-JS decision, commit 8).
+PAGINATED_META = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "paginated",
+                                         "cli_version": "0.157.1"})
+LEGACY_META = u3_row("session_meta", {"id": "u3-session", "source": "exec",  # legacy by default (protocol.rs:772-779)
+                                      "cli_version": "0.157.1"})
+EXPLICIT_LEGACY_META = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "legacy",
+                                               "cli_version": "0.157.1"})
 EXEC_FETCH_JS = "const r = await tools.exec_command({cmd: 'curl https://example.org'}); text(r.output)"
 
 
@@ -2861,6 +2865,84 @@ class CodexCodeModeAttribution(unittest.TestCase):
                                   marker=MARKER)
         controls = scan["groups"]["negative_controls"]["measurement"]
         self.assertEqual((controls["m4"]["status"], controls.get("code_mode", {}).get("legacy_unobservable_exec_calls")),
+                         ("incomplete", 1))
+
+    def test_a_rollout_without_a_paginated_meta_reads_as_legacy(self):
+        # The no-meta rule, pinned: a SessionMeta without history_mode deserializes as legacy (protocol.rs:772-779), and only
+        # a paginated rollout is known to persist every ItemCompleted (rollout/src/policy.rs:94-112), so rows with no
+        # session_meta at all, and a history_mode other than paginated, get the legacy-span reading.
+        other = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "archived",
+                                        "cli_version": "0.157.1"})
+        for name, rows in {"no session_meta": [], "history_mode legacy": [EXPLICIT_LEGACY_META],
+                           "unknown history_mode": [other]}.items():
+            with self.subTest(case=name):
+                got = u3_measure(*rows, exec_call("call_priv_f", EXEC_FETCH_JS), exec_output("call_priv_f"))
+                code_mode = got.get("code_mode", {})
+                self.assertEqual((code_mode.get("legacy_unobservable_exec_calls"), code_mode.get("legacy_unobservable_sites"),
+                                  got["m4"]["status"]), (1, 1, "incomplete"))
+
+    def test_static_sites_include_bracket_access_and_skip_other_names(self):
+        # A site is the global `tools` (not part of a longer name, not a property such as x.tools) with a fetch-capable name
+        # after a dot (blanks and ?. allowed): exec_command, web__run and mcp__<server>__ctx_execute, ctx_execute_file,
+        # ctx_batch_execute or ctx_fetch_and_index; any bracket access tools[...] can name any tool, so it counts as well
+        # (conservative). ALL_TOOLS, other nested tools and longer names are no sites.
+        code = ("await tools['exec_command']({cmd: 'a'}); await tools[name]('b'); await tools . exec_command ({cmd: 'c'}); "
+                "await tools?.web__run({}); await tools.mcp__context_mode__ctx_fetch_and_index({url: 'u'}); "
+                "await mytools.exec_command({}); await x.tools.exec_command({}); await tools.exec_commander({}); "
+                "await tools.mcp__context_mode__ctx_search({}); const all = ALL_TOOLS; await tools_list.exec_command({})")
+        got = u3_measure(LEGACY_META, exec_call("call_priv_s", code), exec_output("call_priv_s"))
+        code_mode = got.get("code_mode", {})
+        self.assertEqual((code_mode.get("legacy_unobservable_exec_calls"), code_mode.get("legacy_unobservable_sites")), (1, 5))
+
+    def test_legacy_spans_count_once_in_the_window_of_the_exec(self):
+        # As the other code_mode counters: an unobservable exec counts in the window of its call record, so adjacent
+        # windows add up.
+        def at(hour, row):
+            return {**row, "timestamp": f"2026-10-20T{hour:02d}:00:00Z"}
+        rows = [at(0, LEGACY_META), at(1, exec_call("call_priv_a", EXEC_FETCH_JS)), at(1, exec_output("call_priv_a")),
+                at(3, exec_call("call_priv_b", EXEC_FETCH_JS)), at(3, exec_output("call_priv_b"))]
+
+        def spans(since, until):
+            got = S.measure_codex_records(rows, since=S.parse_iso(f"2026-10-20T{since:02d}:00:00Z"),
+                                          until=S.parse_iso(f"2026-10-20T{until:02d}:00:00Z"))
+            return got.get("code_mode", {}).get("legacy_unobservable_exec_calls"), got["m4"]["status"]
+        self.assertEqual([spans(0, 4), spans(0, 2), spans(2, 4)], [(2, "incomplete"), (1, "incomplete"), (1, "incomplete")])
+
+    def test_outer_http_mentions_are_scoped_to_verified_isolates(self):
+        # The 10e outer-JS decision (2026-09-29, tools/skill-usage/README.md): the code-mode isolate of the clients read at
+        # their tags has no network access (code-mode-protocol/src/description.rs:24 at rust-v0.157.1 and :20 at rust-v0.155.1,
+        # and globals.rs:36-48, byte-identical at both, installs no fetch), so an HTTP-shaped mention (the kernel's HTTP_SCRIPT
+        # pattern) in the outer code is no fetch there: it is only counted, in code_mode.outer_http_mentions. A client whose
+        # isolate was not read, or a rollout naming none, is the decision's overturn trigger: its exec with a mention counts
+        # in outer_http_unverified_exec_calls and M4 is incomplete; the fetch counts keep their meaning.
+        code = ("const r = await fetch('https://example.org/api'); const s = await axios . get('https://example.org/b'); "
+                "text(await r.text())")
+        cases = {"0.157.1": (2, 0, "not_applicable"), "0.155.1": (2, 0, "not_applicable"),
+                 "0.158.0": (2, 1, "incomplete"), None: (2, 1, "incomplete")}
+        for version, expected in cases.items():
+            with self.subTest(cli_version=version):
+                meta = {"id": "u3-session", "source": "exec", "history_mode": "paginated",
+                        **({"cli_version": version} if version else {})}
+                got = u3_measure(u3_row("session_meta", meta), exec_call("call_priv_h", code), exec_output("call_priv_h"))
+                code_mode = got.get("code_mode", {})
+                self.assertEqual((code_mode.get("outer_http_mentions"), code_mode.get("outer_http_unverified_exec_calls"),
+                                  got["m4"]["status"]), expected)
+                self.assertEqual((got["m4"]["remote_fetches"], got["m4"]["unclassifiable"],
+                                  got["m4"]["fetch_mentions_unconfirmed"]), (0, 0, 0))
+        unverified = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "paginated",
+                                             "cli_version": "0.158.0"})
+        got = u3_measure(unverified, exec_call("call_priv_t", "text('hi')"), exec_output("call_priv_t"))
+        self.assertEqual((got.get("code_mode", {}).get("outer_http_unverified_exec_calls"), got["m4"]["status"]),
+                         (0, "not_applicable"))
+        # Groups force it as well, since the kernel's aggregate recomputes M4 status from the counts.
+        root = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            "rollout-2026-10-20T02-00-00-u3-unverified.jsonl": [
+                unverified, codex_row("response_item", developer(CATALOG)), exec_call("call_priv_g", code),
+                exec_output("call_priv_g")]})
+        scan = S.scan_codex_lanes([root], load_fixture_manifest(), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL),
+                                  marker=MARKER)
+        group = scan["groups"]["workers"]["measurement"]
+        self.assertEqual((group["m4"]["status"], group.get("code_mode", {}).get("outer_http_unverified_exec_calls")),
                          ("incomplete", 1))
 
 
