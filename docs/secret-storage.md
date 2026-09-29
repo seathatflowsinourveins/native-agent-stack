@@ -997,6 +997,27 @@ could be shown or forwarded by mistake. Each now gets the verdict of its plain e
   launcher and inside a substitution. `systemctl --user show -p Environment UNIT`, `cat`, `status` and `list-units`
   still pass. Not read: `systemctl show` with no unit, which prints the manager's own properties, `Environment=`
   among them.
+- **Arithmetic expansion is no command (2026-09-29, repair round).** `$((` opens an arithmetic expansion only when a
+  `))` that touches closes it: `env=2; echo "$((env))"` reads the variable `env` and a `<<` in it is a shift, so both
+  pass, while a real substitution inside it (`$(( $(printenv | wc -l) + 1 ))`) is still read and `$((printenv) )`, whose
+  parentheses do not touch, is a substitution holding a subshell, as bash reads it.
+- **An internal error blocks; a timeout does not (2026-09-29).** Only exit 2 blocks a PreToolUse call. `main()` now
+  catches any exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
+  `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is
+  cancelled and the call goes ahead (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A timed-out
+  command, http, or mcp_tool hook doesn't block the tool call"), and the guard's hook timeout is 10 s, so the time the
+  rules take is part of the guard's safety and no timer inside the hook can replace it. That is why each text is
+  scanned in one pass (a stack of frames and a regular expression that jumps between the characters that matter, not
+  a rescan per here-document, per arithmetic shift or per nesting level), a here-document's terminator is found by a
+  binary search in a line index built once, a chain of `env`, `rtk` or `systemd-run` launchers is walked by index
+  instead of copying the rest of the command at every hop, and the bodies read behind double-quoted substitutions are
+  capped at 32 levels and at four times the command's length plus 64 KiB. Measured on this host with the nine inputs of
+  `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the substitution scan took 10 s on 12,000
+  here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on 60,000 nested `systemd-run`; the launcher
+  walk that predates this work took 29 s on 20,000 nested `env` and 56 s on 20,000 nested `rtk proxy`. Each input now
+  takes under a second (the test bounds it at 3 s). Not fixed: tokenizing is shlex's, about 9 microseconds a character
+  inside quotes, so a single command of about a megabyte of quoted text still takes most of the 10 s (the same before
+  this work), and a substitution nested beyond the caps above is not read.
 
 ## Threat model and what each guard stops
 

@@ -5,6 +5,7 @@ pass-through cases below record known bypasses so no reader mistakes the
 hook for a security boundary.
 """
 
+import io
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,7 @@ import re
 import subprocess
 import sys
 import unittest
+from unittest import mock
 
 from scripts.hooks import secret_path_guard as guard
 
@@ -112,6 +114,7 @@ BLOCKED = {
     "echo \"explicit non-secret `set` entries keep working\"": "environment_dump",
     "echo \"$( printenv )\"": "environment_dump",
     "echo \"prefix $(printenv | wc -l) suffix\"": "environment_dump",
+    "echo \"$((printenv) )\"": "environment_dump",  # the two parentheses do not touch: a substitution holding a subshell
     "echo \"$(export -p)\"": "environment_dump",
     "echo \"$(ps eww 1)\"": "environment_dump",
     "echo \"$(sh -c 'printenv')\"": "environment_dump",
@@ -639,6 +642,10 @@ ALLOWED = [
     "echo \"$(basename \"$PWD\")\"",
     "git commit -m \"$(cat commit-message.txt)\"",
     "echo \"$((1 + 2))\"",
+    # Arithmetic expansion: a variable that happens to be named env or set is read as a variable, and a shift is a shift.
+    "env=2; echo \"$((env))\"",
+    "echo \"$((set + 1))\" \"$(( 1 << 2 ))\"",
+    "n=$((n + 1)); echo \"$(( (n * 2) % 3 ))\"",
     "echo \"printenv and env print the environment\"",
     "git commit -m \"docs: printenv and env are blocked\"",
     "echo \"\\$(printenv) is escaped text\"",
@@ -968,7 +975,17 @@ SUBSTITUTION_BODIES = [
     ('echo $(echo "$(printenv)")', ["printenv"]),  # a double-quoted one inside an unquoted one
     ("echo \"$(echo ')')\"", ["echo ')'"]),  # a single-quoted parenthesis does not close the body
     ('echo "$(echo "(")"', ['echo "("']),  # neither does one in double quotes
-    ('echo "$((1 + 2))"', ["(1 + 2)"]),  # arithmetic expansion reads as a parenthesised body
+    # Arithmetic expansion is no command: `$((env))` reads the variable env, and a `<<` in it is a shift. A real substitution inside it
+    # still runs, and `$((printenv) )` (the two parentheses do not touch) is a substitution holding a subshell (bash reads `$((` as
+    # arithmetic only when a `))` closes it).
+    ('echo "$((1 + 2))"', []),
+    ('echo "$((env))"', []),
+    ('echo "$(( 1 + (2 * 3) ))"', []),
+    ('echo "$(( (1 + 2) ))"', []),
+    ('echo "$((x))" "$(date)"', ["date"]),
+    ('echo "$(( $(printenv | wc -l) + 1 ))"', ["printenv | wc -l"]),
+    ('echo "$((printenv) )"', ["(printenv) "]),
+    ('echo "$((1 + 2"', []),  # unterminated: bash refuses it, nothing runs
     ('echo "`echo \\`x\\``"', ["echo `x`"]),  # a backquote body loses the backslash before a backquote
     ('echo "$(printenv', ["printenv"]),  # unterminated: the rest of the text
     ('echo "$(a) and $(b)"', ["a", "b"]),
@@ -990,7 +1007,90 @@ SUBSTITUTION_BODIES = [
     ('echo "$(cat <<A <<B\none )\nA\ntwo )\nB\n)"', ["cat <<A <<B\none )\nA\ntwo )\nB\n"]),
     ('echo "$(cat <<"EOF"\nq ) "x"\nEOF\n)"', ['cat <<"EOF"\nq ) "x"\nEOF\n']),
     ("echo \"$(cat <<< 'a)b')\"", ["cat <<< 'a)b'"]),  # a here-string is no here-document
-    ('echo "$(( 1 << 2 ))" "$(date)"', ["( 1 << 2 )", "date"]),  # nor is an arithmetic shift
+    ('echo "$(( 1 << 2 ))" "$(date)"', ["date"]),  # nor is an arithmetic shift
+]
+
+# Inert inputs that made an earlier scan or walk superlinear (a quadratic scan is a security problem here: Claude Code does not block a
+# tool call whose PreToolUse command hook timed out, hooks documentation "Timeouts", read 2026-09-29). Each maps to a builder and the
+# verdict the guard gave the same input before the linear rewrite (nested launchers: the verdict of the shortest chain). The base
+# guard took 10 s and more on all but the last three; the hook's own timeout is 10 s.
+PATHOLOGICAL = {
+    "here-document starts": (lambda: "cat <<EOF\n" * 12000 + "printenv", "environment_dump"),
+    "distinct here-document delimiters": (lambda: "".join(f"cat <<E{n}\n" for n in range(12000)) + "printenv", "environment_dump"),
+    "arithmetic shifts on many lines": (lambda: "echo $((1 << 2))\n" * 12000, None),
+    "one delimiter, no terminator": (lambda: "cat <<X\n" * 6000, None),
+    # shlex's quote parity leaves the innermost `$(env)` unquoted one level down, so this one is blocked at any depth.
+    "double-quote nesting 20000 deep": (lambda: 'echo "' + '$(echo "' * 20000 + "$(env)" + '")' * 20000 + '"', "environment_dump"),
+    "nested systemd-run": (lambda: "systemd-run --user " * 60000 + "printenv", "environment_dump"),
+    "nested env": (lambda: "env " * 20000 + "printenv", "environment_dump"),
+    "nested rtk proxy": (lambda: "rtk proxy " * 20000 + "printenv", "environment_dump"),
+    "nested sudo": (lambda: "sudo " * 60000 + "printenv", "environment_dump"),
+}
+PATHOLOGICAL_SECONDS = 3.0
+_TIMING_CHILD = (
+    "import json, sys, time\n"
+    "sys.path.insert(0, sys.argv[1])\n"
+    "from tests import test_secret_path_guard as t\n"
+    "text = t.PATHOLOGICAL[sys.argv[2]][0]()\n"
+    "start = time.perf_counter()\n"
+    "verdict = t.guard.check(text)\n"
+    "print(json.dumps([verdict, time.perf_counter() - start]))\n")
+
+# The four groups of the acceptance oracle for this work (kw/guard_oracle.py, phase base), kept here so a change to the guard is checked
+# against them without that file: forms that passed before and must be blocked, ordinary work that must pass, controls that were blocked
+# and must stay blocked, and controls that passed and must keep passing (the trading lane's loader path, the id-based credential tools).
+ORACLE_MUST_BLOCK = [
+    'systemd-run --user --pipe --wait cat "$PAPER_ENV_FILE"',
+    "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'",
+    "systemd-run --user --pipe --wait printenv",
+    "systemd-run --user --pipe --wait env",
+    "systemd-run --user --pipe --wait /bin/sh -c 'echo $APCA_API_SECRET_KEY'",
+    "systemd-run --user --setenv=APCA_API_SECRET_KEY=abc /bin/true",
+    "systemd-run --user -E APCA_API_SECRET_KEY=abc /bin/true",
+    "systemd-run --user -E APCA_API_SECRET_KEY /bin/true",
+    "systemd-run --user -p Environment=APCA_API_SECRET_KEY=abc /bin/true",
+    'echo "$(printenv)"', 'echo "`printenv`"', 'echo "$(env)"', 'x="$(printenv)"; echo "$x"', 'git commit -m "$(printenv)"',
+    'echo "explicit non-secret `set` entries keep working"',
+    "ps -E", "ps -Ewwp 123", "ps -p 123 -E", "ps -A -E", "ps Eww 123", "ps auxE",
+    "systemctl --user show-environment", "systemctl show-environment",
+]
+ORACLE_MUST_ALLOW = [
+    "git commit -m 'docs: printenv and env are blocked'",
+    "echo 'explicit non-secret `set` entries keep working'",
+    "echo '$(printenv) is only text here'",
+    'echo "printenv and env print the environment"',
+    'git commit -m "docs: printenv and env are blocked"',
+    'echo "\\$(printenv) is escaped text"',
+]
+ORACLE_MUST_STAY = [
+    "printenv", "env",
+    "cat <<EOF > out.txt\n$(printenv)\nEOF",
+    "bash -s <<'EOF'\nset\nEOF", "bash -s <<'EOF'\nprintenv\nEOF",
+    "echo `set` > out.txt", 'cat "$PAPER_ENV_FILE"', 'cat "$PAPER_ENV_FILE_2"', "echo $APCA_API_SECRET_KEY",
+    'set -x; . "$PAPER_ENV_FILE"', "ps eww 123", "ps auxe",
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- printenv",
+    "cat <<'EOF' | sh\nprintenv\nEOF",
+    'sh -c "$(cat)" <<\'EOF\'\nprintenv\nEOF',
+    "bash /dev/stdin <<'EOF'\nprintenv\nEOF",
+    "while read -r l; do eval \"$l\"; done <<'EOF'\nprintenv\nEOF",
+]
+ORACLE_STAY_ALLOWED = [
+    "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic 'exec python3 blueprints/us-equities/adaptive-paper/"
+    "runner.py run --env-file \"$PAPER_ENV_FILE\"'",
+    "systemd-run --user --unit=paper-series-2 --collect /bin/bash -ic 'exec python3 blueprints/us-equities/adaptive-paper/"
+    "runner.py run --env-file \"$PAPER_ENV_FILE_2\"'",
+    'python3 runner.py preflight --env-file "$PAPER_ENV_FILE_2" --output out.json',
+    'wc -c "$PAPER_ENV_FILE_2"',
+    "python3 tools/credentials/set_credential.py alpaca-paper",
+    "bash tools/credentials/open_credential_terminal.sh alpaca-paper-2",
+    "python3 scripts/credential_status.py --json",
+    "python3 scripts/kernel_keyring.py status tavily_api_key",
+    "systemctl --user show -p Environment omniroute.service",
+    "systemctl --user cat omniroute.service", "systemctl --user status omniroute.service",
+    "systemctl --user list-units --no-pager",
+    "systemd-run --user --unit=demo --collect /bin/true",
+    "ps -ef | grep runner", "ps -o pid,command -p 123", "ps aux", "git status && git diff --stat", "cat docs/env.md",
+    "grep -rn env_key docs/",
 ]
 
 
@@ -1132,6 +1232,58 @@ class SecretPathGuardTests(unittest.TestCase):
         for command in ('echo "' + "$(" * 5000, 'echo "' + '$(echo "' * 2000 + "$(env)" + '")' * 2000 + '"', "`" * 5000):
             with self.subTest(command=command[:20]):
                 guard.check(command)
+
+    def test_pathological_inputs_finish_well_inside_the_hook_timeout(self):
+        # A guard that runs past its 10 s hook timeout fails open, so time is part of its safety. Each input runs in a child process with a
+        # generous wall-clock limit (a regression then fails here instead of hanging the suite), and check() itself is timed inside it.
+        for name, (_, verdict) in PATHOLOGICAL.items():
+            with self.subTest(name=name):
+                try:
+                    done = subprocess.run([sys.executable, "-c", _TIMING_CHILD, str(ROOT), name],
+                                          capture_output=True, text=True, timeout=45)
+                except subprocess.TimeoutExpired:
+                    self.fail("check() took more than 45 s")
+                self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                got, seconds = json.loads(done.stdout)
+                self.assertEqual(got, verdict)
+                self.assertLess(seconds, PATHOLOGICAL_SECONDS)
+
+    def test_oracle_groups_keep_their_verdicts(self):
+        for rows, blocked in ((ORACLE_MUST_BLOCK, True), (ORACLE_MUST_STAY, True), (ORACLE_MUST_ALLOW, False),
+                              (ORACLE_STAY_ALLOWED, False)):
+            for command in rows:
+                with self.subTest(command=command):
+                    self.assertEqual(guard.check(command) is not None, blocked)
+
+    def test_check_never_raises(self):
+        # main() blocks a command whose check() raised, but a table row that raises is a bug to fix, not to hide: every row of every table,
+        # the oracle groups and the pathological inputs must come back as a verdict.
+        rows = [*BLOCKED, *KEYRING_BLOCKED, *ALLOWED, *SAFE_CORPUS, *EXPECTED_PASS_THROUGH, *ORACLE_MUST_BLOCK, *ORACLE_MUST_ALLOW,
+                *ORACLE_MUST_STAY, *ORACLE_STAY_ALLOWED, *(text for text, _ in SUBSTITUTION_BODIES),
+                *(build() for build, _ in PATHOLOGICAL.values())]
+        self.assertGreaterEqual(len(rows), 700)
+        for command in rows:
+            try:
+                guard.check(command)
+            except Exception as error:  # noqa: BLE001
+                self.fail(f"check() raised {type(error).__name__} on {command[:80]!r}")
+
+    def test_an_internal_error_blocks_the_call_without_echoing_it(self):
+        # Only exit 2 blocks a PreToolUse call; an uncaught exception exits 1 and the call goes through (Claude Code hooks, PreToolUse).
+        # An error inside check() therefore ends in a block with one line on stderr: no command text, no traceback.
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "echo SENTINEL-5e3a"}})
+        for error in (RuntimeError("boom SENTINEL-5e3a"), RecursionError("SENTINEL-5e3a"), MemoryError()):
+            with self.subTest(error=type(error).__name__):
+                stderr = io.StringIO()
+                with mock.patch.object(guard, "check", side_effect=error), mock.patch.object(sys, "stdin", io.StringIO(payload)), \
+                        mock.patch.object(sys, "stderr", stderr):
+                    status = guard.main()
+                self.assertEqual(status, 2)
+                self.assertEqual(stderr.getvalue().count("\n"), 1)
+                self.assertIn("blocked (guard_error)", stderr.getvalue())
+                self.assertNotIn("SENTINEL-5e3a", stderr.getvalue())
+                self.assertNotIn("Traceback", stderr.getvalue())
+        self.assertIn("guard_error", guard.HINTS)
 
     def test_hook_protocol_exit_codes_and_no_echo(self):
         command = "cat ~/.config/native-agent-stack/alpaca-paper.env # SENTINEL-4f1d"

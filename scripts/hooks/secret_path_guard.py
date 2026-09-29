@@ -38,7 +38,9 @@ dumps the environment it inherits, also behind a launcher's options
 A backslash-newline is joined first and every raw-text rule also reads the
 command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
-are never taken for arguments. It is not a security boundary. A process
+are never taken for arguments. An internal error blocks the command (`guard_error`), because only exit 2
+blocks; a hook that outlasts its timeout does not, so every scan reads a text once (see docs/secret-storage.md,
+"An internal error blocks; a timeout does not"). It is not a security boundary. A process
 that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
@@ -50,6 +52,7 @@ The same file is installed for every session on a host as
 
 from __future__ import annotations
 
+import bisect
 import json
 import re
 import shlex
@@ -215,6 +218,17 @@ REDIRECTION = re.compile(r"^\d*(?:>>?|>\||&>>?|<<<?|<>|<&|>&|<)$")
 # The start of a here-document in raw command text: `<<` or `<<-`, then its delimiter as a single-quoted, double-quoted or
 # bare word (a backslash also quotes it). Group 1 is the `-`, groups 2 to 4 the delimiter.
 HEREDOC_START = re.compile(r"<<(-?)[ \t]*(?:'([^'\n]*)'|\"([^\"\n]*)\"|((?:\\.|[^\s;&|()<>\\'\"])+))")
+# What substitution_bodies() jumps to in each kind of frame (a regular expression finds the next such character).
+SCAN_CHARACTERS = {
+    "cmd": re.compile(r"[\\'\"`$<\n]"),
+    "bt": re.compile(r"[\\'\"`$<\n]"),
+    "sub": re.compile(r"[\\'\"`$<\n()]"),
+    "dq": re.compile(r"[\\\"`$]"),
+    "param": re.compile(r"[\\'\"`$}]"),
+    "dparam": re.compile(r"[\\\"`$}]"),
+    "arith": re.compile(r"[\\'\"`$()]"),
+}
+BACKQUOTE_ESCAPE = re.compile(r"\\([$`\\\"])")
 GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 # A dashless BSD-style ps cluster that shows the environment: it holds `e` (procps and BSD: "Show the environment after the
@@ -226,9 +240,15 @@ PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 TRACE_OPTIONS = {"xtrace", "verbose"}
 MAX_DEPTH = 3
-# Levels of command substitution inside double quotes that expand() reads (substitution_bodies); each level is one
-# linear scan, so the cap only bounds the work on pathological nesting.
+# Levels of command substitution inside double quotes that expand() reads (substitution_bodies), and the work it
+# spends on them: the characters of all the bodies it reads may total SUBSTITUTION_BUDGET_FACTOR times the command's
+# length plus SUBSTITUTION_BUDGET_FLOOR, so pathological nesting cannot make the guard outlast its hook timeout (a hook
+# that times out does not block the call). An ordinary command nests two or three levels of bodies far shorter than it.
 MAX_SUBSTITUTION_NESTING = 32
+SUBSTITUTION_BUDGET_FACTOR = 4
+SUBSTITUTION_BUDGET_FLOOR = 65536
+# Launchers of the systemd family that start the command after their own options (systemd-run(1)).
+SYSTEMD_LAUNCHERS = {"systemd-run"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
 # <name> <ENV_VAR> -- <command...>` puts a stored key into that command's environment only, and
 # adoption/tools/tvly-keyring runs `tvly` the same way with TAVILY_API_KEY. expand() unwraps both, so
@@ -302,6 +322,8 @@ HINTS = {
     "service_manager_environment": "systemctl show-environment prints the whole environment block that a service "
                                    "manager hands to every unit; read one unit's settings with systemctl show -p "
                                    "Environment UNIT",
+    "guard_error": "the guard could not read this command, so it blocks it; split it into smaller commands or "
+                   "simplify its quoting, substitutions and launchers",
 }
 
 
@@ -329,19 +351,27 @@ def segments(tokens: list[str]) -> list[list[str]]:
     return result
 
 
-def heredoc_end(text: str, position: int, heredocs: list[tuple[str, bool]]) -> int | None:
+def heredoc_end(text: str, position: int, heredocs: list[tuple[str, bool]],
+                lines: dict[bool, dict[str, list[int]]]) -> int | None:
     """Index just past the terminator line of the last of `heredocs` (each a delimiter and whether `<<-` strips
     leading tabs), whose bodies start at text[position]; None when one has no terminator line, which means the `<<`
-    was no here-document (an arithmetic shift, say)."""
+    was no here-document (`(( x = 1 << 2 ))`, say). `lines` maps each line's text to the offsets where it starts and
+    is filled here, once per text and only when a here-document is looked up: finding a terminator is then a binary
+    search, so no line is read twice however many `<<` the text holds (a rescan per `<<` made 12,000 of them take 10 s)."""
     for delimiter, strip_tabs in heredocs:
-        while True:
-            if position > len(text):
-                return None
-            end = text.find("\n", position)
-            line = text[position:] if end < 0 else text[position:end]
-            position = len(text) + 1 if end < 0 else end + 1
-            if (line.lstrip("\t") if strip_tabs else line) == delimiter:
-                break
+        if strip_tabs not in lines:
+            index: dict[str, list[int]] = {}
+            offset = 0
+            for line in text.split("\n"):
+                index.setdefault(line.lstrip("\t") if strip_tabs else line, []).append(offset)
+                offset += len(line) + 1
+            lines[strip_tabs] = index
+        starts = lines[strip_tabs].get(delimiter)
+        at = bisect.bisect_left(starts, position) if starts else 0
+        if not starts or at == len(starts):
+            return None
+        end = text.find("\n", starts[at])
+        position = len(text) if end < 0 else end + 1
     return position
 
 
@@ -358,75 +388,123 @@ def substitution_bodies(text: str) -> list[str]:
     body's commands, but not the double-quoted words in it. The body of a here-document is literal text for this
     scan, as it is for the shell's parser when it looks for the `)` that ends a `$(`: prose in it (an unbalanced
     parenthesis, an apostrophe, backquotes) opens nothing. How the guard reads those bodies as commands is a separate
-    matter and this scan does not touch it."""
+    matter and this scan does not touch it. `$((` opens an arithmetic expansion, which is no command (`$((env))` reads
+    the variable env, a `<<` in it is a shift) but may hold real substitutions; it is one only when a `))` that touches
+    closes it, and `$((printenv) )` is a substitution holding a subshell (bash tries arithmetic first and falls back to
+    that). One pass, each character read once: a stack of frames replaces recursion, and a regular expression jumps
+    from one character that matters to the next."""
     bodies: list[str] = []
     heredocs: list[tuple[str, bool]] = []  # `<<` delimiters seen on the current line, their bodies start at its end
-    # The frames, innermost last, as [kind, start, open parentheses, reported]: "cmd" is unquoted text, "dq" a
-    # double-quoted word, "sub" and "bt" the body of a `$(` or a backquote pair. `reported` marks a body that starts
-    # inside double quotes and is returned; `hidden` counts those on the stack, so a substitution inside one is left
-    # to the next reading of that body.
-    stack: list[list] = [["cmd", 0, 0, False]]
+    lines: dict[bool, dict[str, list[int]]] = {}
+    # Frames, innermost last: [kind, start, parentheses, reported, dq, bodies_at_open]. Kinds: cmd (unquoted text),
+    # sub (`$(`), bt (backquotes), dq (double quotes), param (`${`), dparam (`${` inside double quotes), arith (`$((`).
+    # `dq` says whether a substitution opened here sits inside double quotes (param and arith inherit it from their
+    # parent). `reported` marks a body that starts inside double quotes and is returned; `hidden` counts those on the
+    # stack, so a substitution inside one is left to the next reading of that body.
+    stack: list[list] = [["cmd", 0, 0, False, False, 0]]
     hidden = 0
+    end = len(text)
+    index = 0
 
-    def open_frame(kind: str, start: int = 0) -> None:
+    def close(at: int) -> None:
         nonlocal hidden
-        reported = kind in {"sub", "bt"} and stack[-1][0] == "dq" and not hidden
-        stack.append([kind, start, 1, reported])
-        hidden += reported
-
-    def close_frame(end: int) -> None:
-        nonlocal hidden
-        kind, start, _, reported = stack.pop()
+        kind, start, _, reported = stack.pop()[:4]
         if reported:
             hidden -= 1
-            body = text[start:end]
-            bodies.append(re.sub(r"\\([$`\\\"])", r"\1", body) if kind == "bt" else body)
+            body = text[start:at]
+            bodies.append(BACKQUOTE_ESCAPE.sub(r"\1", body) if kind == "bt" else body)
 
-    index = 0
-    while index < len(text):
-        char, kind = text[index], stack[-1][0]
+    def open_frame(kind: str, start: int, frame: list, quoted: bool = False) -> None:
+        nonlocal hidden
+        reported = frame[4] and not hidden and kind in {"sub", "bt", "arith"}
+        stack.append([kind, start, 1 if kind in {"sub", "bt"} else 0, reported, quoted, len(bodies)])
+        if reported and kind != "arith":
+            hidden += 1
+
+    while index < end:
+        frame = stack[-1]
+        kind = frame[0]
+        found = SCAN_CHARACTERS[kind].search(text, index)
+        if found is None:
+            break
+        index = found.start()
+        char = text[index]
         if char == "\\":
             index += 2
-            continue
-        if char == '"':
+        elif char == '"':
             if kind == "dq":
-                close_frame(index)
+                stack.pop()
             else:
-                open_frame("dq")
-        elif char == "'" and kind != "dq":
-            end = text.find("'", index + 1)
-            if end >= 0:
-                index = end
+                stack.append(["dq", 0, 0, False, True, 0])
+            index += 1
+        elif char == "'":
+            closing = text.find("'", index + 1)
+            index = closing + 1 if closing >= 0 else index + 1
         elif char == "`":
             if kind == "bt":
-                close_frame(index)
+                close(index)
             else:
-                open_frame("bt", index + 1)
-        elif char == "$" and text.startswith("(", index + 1):
-            open_frame("sub", index + 2)
+                open_frame("bt", index + 1, frame)
             index += 1
-        elif kind == "sub" and char in "()":
-            stack[-1][2] += 1 if char == "(" else -1
-            if not stack[-1][2]:
-                close_frame(index)
-        elif char == "<" and kind != "dq" and text.startswith("<<", index):
-            if text.startswith("<<<", index):  # a here-string: its word is read as usual
+        elif char == "$":
+            following = text[index + 1:index + 2]
+            if following == "(" and text.startswith("((", index + 1):
+                open_frame("arith", index + 3, frame, frame[4])
+                index += 3
+            elif following == "(":
+                open_frame("sub", index + 2, frame)
                 index += 2
+            elif following == "{":
+                stack.append(["dparam" if frame[4] else "param", index + 2, 0, False, frame[4], 0])
+                index += 2
+            else:
+                index += 1
+        elif char == "}":
+            stack.pop()
+            index += 1
+        elif char == "<":
+            if text.startswith("<<<", index):  # a here-string: its word is read as usual
+                index += 3
             elif match := HEREDOC_START.match(text, index):
                 single, double, bare = match.group(2, 3, 4)
                 delimiter = single if single is not None else double if double is not None \
                     else re.sub(r"[\\'\"]", "", bare)
                 if delimiter:
                     heredocs.append((delimiter, bool(match.group(1))))
-                index = match.end() - 1
-        elif char == "\n" and kind != "dq" and heredocs:
-            end = heredoc_end(text, index + 1, heredocs)
-            heredocs.clear()
-            if end is not None:
-                index = end - 1
-        index += 1
+                index = match.end()
+            else:
+                index += 1
+        elif char == "\n":
+            index += 1
+            if heredocs:
+                after = heredoc_end(text, index, heredocs, lines)
+                heredocs.clear()
+                if after is not None:
+                    index = after
+        elif char == "(":
+            frame[2] += 1
+            index += 1
+        else:  # ")"
+            if kind == "sub":
+                frame[2] -= 1
+                if not frame[2]:
+                    close(index)
+            elif frame[2]:
+                frame[2] -= 1
+            elif text.startswith(")", index + 1):  # arithmetic expansion ends at a `))` that touches
+                stack.pop()
+                index += 1
+            else:  # no `))`: this was `$(` and a subshell, so read it as a substitution
+                frame[0], frame[1], frame[2] = "sub", frame[1] - 1, 1
+                if frame[3]:
+                    hidden += 1
+                    del bodies[frame[5]:]
+            index += 1
     while len(stack) > 1:  # unterminated: what is left of the text
-        close_frame(len(text))
+        if stack[-1][0] == "arith":
+            stack.pop()
+        else:
+            close(end)
     return bodies
 
 
@@ -505,7 +583,12 @@ def strip_prefix(words: list[str]) -> list[str]:
     """The command itself: without assignments, output redirections before it (`> out cmd`), and
     launchers with their options (timeout also with its duration). A leading input redirection stays,
     for segment_reason's check of what is redirected in."""
-    index = 0
+    return words[prefix_end(words):]
+
+
+def prefix_end(words: list[str], index: int = 0) -> int:
+    """Index of the command in words[index:], past what strip_prefix drops. It returns an index and copies
+    nothing, so a chain of launchers is walked once, not once per hop."""
     while index < len(words):
         word = words[index]
         width = redirection_width(words, index)
@@ -519,16 +602,16 @@ def strip_prefix(words: list[str]) -> list[str]:
                 index += 1  # timeout's mandatory duration comes before the command
         else:
             break
-    return words[index:]
+    return index
 
 
 def program_of(words: list[str]) -> str:
     return words[0].rsplit("/", 1)[-1] if words else ""
 
 
-def env_command_start(words: list[str]) -> int | None:
-    """Index of the command `env [options] [NAME=value ...] command` runs, or None for a dump."""
-    index = 1
+def env_command_start(words: list[str], at: int = 0) -> int | None:
+    """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump."""
+    index = at + 1
     while index < len(words):
         word = words[index]
         if word in ENV_ARG_OPTIONS:
@@ -649,42 +732,92 @@ def rtk_command(words: list[str]) -> list[str]:
     return [subcommand, *rest]
 
 
+def rtk_command_start(words: list[str], at: int) -> int | None:
+    """Index in words of the command that the rtk at words[at] starts, when that command is a tail of words: after a
+    runner's flags (see RTK_RUNNERS) or, for the other subcommands, the subcommand itself (`rtk grep x` runs `grep x`).
+    None when it names none, or for `rtk run` and the file readers, whose command rtk_command builds."""
+    index = at + 1
+    while index < len(words) and words[index].startswith("-"):
+        index += 1
+    if index >= len(words):
+        return None
+    subcommand = words[index]
+    if subcommand in RTK_RUNNERS:
+        start = index + 1
+        while start < len(words) and words[start].startswith("-") and words[start] != "--":
+            start += 1
+        return start + 1 if words[start:start + 1] == ["--"] else start
+    if subcommand == "run" or subcommand in RTK_FILE_READERS:
+        return None
+    return index
+
+
+def launcher_chain(words: list[str]) -> tuple[list[list[str]], int]:
+    """The env, rtk and systemd-run launchers that start words, and the index of the command they start. A
+    systemd-run comes back as its own words (the rule on its options reads them); an env or rtk that starts a command
+    needs no segment of its own, because that command is the next one. It walks the chain with an index: copying the
+    rest of the words at every hop made a chain of n launchers cost n squared, 29 s for 20,000 `env`."""
+    entries: list[list[str]] = []
+    at = 0
+    while at < len(words):
+        program = program_of(words[at:at + 1])
+        if program == "env":
+            start = env_command_start(words, at)
+            if start is None:
+                break
+        elif program in SYSTEMD_LAUNCHERS:
+            start = skip_wrapper_options(words, at + 1, program)
+            entries.append(words[at:start])
+        elif program == "rtk":
+            start = rtk_command_start(words, at)
+            if start is None:
+                break
+        else:
+            break
+        at = prefix_end(words, start)
+    return entries, at
+
+
 def expand(command: str, depth: int = 0) -> list[list[str]]:
     """Command segments of the command, and of the command substitutions that the shell runs inside its double
     quotes (substitution_bodies: `echo "$(printenv)"` runs printenv), at any nesting up to
-    MAX_SUBSTITUTION_NESTING."""
+    MAX_SUBSTITUTION_NESTING and while the bodies read stay within SUBSTITUTION_BUDGET_FACTOR times the command's
+    length (plus SUBSTITUTION_BUDGET_FLOOR): every level is read again from the start, so quotes nested n deep would
+    otherwise cost n times the command."""
     result = command_segments(command, depth)
     level = [command]
+    budget = SUBSTITUTION_BUDGET_FACTOR * len(command) + SUBSTITUTION_BUDGET_FLOOR
+    spent = 0
     for _ in range(MAX_SUBSTITUTION_NESTING):
         level = [body for text in level for body in substitution_bodies(text)]
+        spent += sum(map(len, level))
+        if not level or spent > budget:
+            break
         for body in level:
             result.extend(command_segments(body, depth))
-        if not level:
-            break
     return result
 
 
 def command_segments(command: str, depth: int = 0) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
     command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
-    `systemd-run` starts (the segment of systemd-run itself stays in the result, for the rule on its options)."""
+    `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options)."""
     result: list[list[str]] = []
     for raw in segments(tokenize(command)):
-        words = strip_prefix(raw)
+        words = raw[prefix_end(raw):]
         while words:
+            entries, start = launcher_chain(words)
+            result.extend(entries)
+            if start:
+                words = words[start:]
+            if not words:
+                break
             result.append(words)
             program = program_of(words)
             if program == "env":
-                start = env_command_start(words)
-                if start is None:
-                    break
-                words = strip_prefix(words[start:])
-                continue
+                break  # launcher_chain walked every env that starts a command: this one prints its environment
             if program == "rtk":
-                words = strip_prefix(rtk_command(words))
-                continue
-            if program == "systemd-run":
-                words = strip_prefix(words[skip_wrapper_options(words, 1, program):])
+                words = strip_prefix(rtk_command(words))  # `rtk run` and the file readers
                 continue
             started = keyring_exec(words)
             if started is not None:
@@ -1031,7 +1164,14 @@ def main() -> int:
     command = (payload.get("tool_input") or {}).get("command")
     if not isinstance(command, str):
         return 0
-    reason = check(command)
+    try:
+        reason = check(command)
+    except Exception:  # noqa: BLE001 - RecursionError and MemoryError included
+        # Only exit 2 blocks a PreToolUse call: an uncaught exception exits 1 and the command runs. A command the guard cannot read is
+        # blocked, with one line that names no command text and no traceback.
+        print(f"secret_path_guard: blocked (guard_error). {HINTS['guard_error'][0].upper()}{HINTS['guard_error'][1:]}.",
+              file=sys.stderr)
+        return 2
     if reason is None:
         return 0
     hint = HINTS.get(reason)
