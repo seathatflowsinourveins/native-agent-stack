@@ -6,6 +6,7 @@ hook for a security boundary.
 """
 
 import io
+import itertools
 import json
 import os
 from pathlib import Path
@@ -1521,6 +1522,15 @@ PATHOLOGICAL = {
     "nested env": (lambda: "env " * 20000 + "printenv", "environment_dump"),
     "nested rtk proxy": (lambda: "rtk proxy " * 20000 + "printenv", "environment_dump"),
     "nested sudo": (lambda: "sudo " * 60000 + "printenv", "environment_dump"),
+    # The dashless ps cluster was matched by a regular expression with two overlapping quantifiers (`[..E]*[eE][..E]*$`): 70,000 `E` and
+    # a letter that is no flag failed it in quadratic time, 13 s against a hook timeout of 10 s that fails open (found by the independent
+    # verification review); it is a set-membership test now. Each row below ends in a dump (or is one) so that the verdict is checked too.
+    "ps cluster of 70,000 E and a letter that is no flag": (lambda: "ps " + "E" * 70000 + "q; printenv", "environment_dump"),
+    "ps cluster of 70,000 e and a letter that is no flag": (lambda: "ps -" + "e" * 70000 + "q; printenv", "environment_dump"),
+    "ps cluster of 70,000 E": (lambda: "ps " + "E" * 70000, "environment_dump"),
+    "ps cluster of 70,000 a and a trailing E": (lambda: "ps " + "a" * 70000 + "E", "environment_dump"),
+    "ps cluster of 70,000 a and a letter that is no flag": (lambda: "ps " + "a" * 70000 + "q; printenv", "environment_dump"),
+    "70,000 unclosed parentheses before a redirection": (lambda: "echo " + "(" * 70000 + "<", None),
 }
 PATHOLOGICAL_SECONDS = 3.0
 _TIMING_CHILD = (
@@ -1775,6 +1785,38 @@ class SecretPathGuardTests(unittest.TestCase):
                 got, seconds = json.loads(done.stdout)
                 self.assertEqual(got, verdict)
                 self.assertLess(seconds, PATHOLOGICAL_SECONDS)
+
+    def test_no_regular_expression_of_the_guard_backtracks_on_long_repeats(self):
+        # Every compiled pattern of the guard (module level, the scan and store tables) on 70,000 repeats of one character, each with a lead
+        # and a tail that make a match fail late: none may take a quarter of a second, since a hook past its 10 s timeout fails open. The
+        # ps cluster regular expression took 15 s here. PAREN_INPUT is only ever called as fullmatch, which is linear, so it is timed so.
+        patterns = {name: value for name, value in vars(guard).items() if isinstance(value, re.Pattern)}
+        patterns.update({f"SCAN_CHARACTERS[{name}]": value for name, value in guard.SCAN_CHARACTERS.items()})
+        patterns.update({f"STORE_PATHS[{at}]": entry[0] for at, entry in enumerate(guard.STORE_PATHS)})
+        self.assertGreaterEqual(len(patterns), 45)
+        slow = []
+        for name, pattern in patterns.items():
+            methods = ("fullmatch",) if name == "PAREN_INPUT" else ("search", "match")
+            for character in "aeE xX-=/'\"\\($<;#\n":
+                body = character * 70000
+                for text in (body, "x" + body, body + "!", "ps " + body + "q", "-" + body + "q"):
+                    for method in methods:
+                        started = time.perf_counter()
+                        getattr(pattern, method)(text)
+                        elapsed = time.perf_counter() - started
+                        if elapsed > 0.25:
+                            slow.append((name, method, repr(character), round(elapsed, 2)))
+        self.assertEqual(slow, [])
+
+    def test_the_ps_cluster_test_is_the_language_of_the_old_regular_expression(self):
+        # ps_shows_environment used `^[aAcfhjlmrsStTuvwxXLnE]*[eE][aAcefhjlmrsStTuvwxXLnE]*$`; the set-membership test that replaced it (no
+        # backtracking) must accept the same words: every word of up to 5 letters over the cluster alphabet plus three letters outside it.
+        old = re.compile(r"^[aAcfhjlmrsStTuvwxXLnE]*[eE][aAcefhjlmrsStTuvwxXLnE]*$")
+        alphabet = "aeEqxzSTn"
+        words = ["".join(letters) for length in range(0, 6) for letters in itertools.product(alphabet, repeat=length)]
+        words += ["", "eww", "auxe", "auxE", "aux", "ef", "-e", "steve", "eve", "Eve", "ps", "ax", "E"]
+        self.assertGreater(len(words), 60000)
+        self.assertEqual([word for word in words if guard.is_ps_bsd_cluster(word) != bool(old.match(word))], [])
 
     def test_real_commit_messages_pass_in_the_standard_pattern(self):
         # A quoted here-document holds data, so a message that mentions `printenv`, a credential path or a secret name in prose passes

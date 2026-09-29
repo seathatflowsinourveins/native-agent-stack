@@ -266,10 +266,8 @@ COMMENT_BREAK = " \t\n;&|()<>"  # what may precede a `#` that starts a word (bla
 HEREDOC_COMMENT = re.compile(r"(?:^|(?<=[ \t;&|()<>]))#", re.M)
 GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
-# A dashless BSD-style ps cluster that shows the environment: it holds `e` (procps and BSD: "Show the environment after the
-# command") or, from 2026-09-29, `E` (macOS: "-E Display the environment as well", Apple adv_cmds ps.1, which lists the BSD-style
-# `e` as "Same as -E"). `ps eww` and `ps auxE` match; `ps aux` does not.
-PS_BSD_CLUSTER = re.compile(r"^[aAcfhjlmrsStTuvwxXLnE]*[eE][aAcefhjlmrsStTuvwxXLnE]*$")
+# The letters of a dashless BSD-style ps cluster (is_ps_bsd_cluster): the flags that the guard reads, `e` and `E` among them.
+PS_BSD_LETTERS = frozenset("aAcefhjlmrsStTuvwxXLnE")
 PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-s", "-k",
                   "--pid", "--format", "--sort", "--ppid", "--user"}
 PS_CLUSTER_VALUE_OPTIONS = PS_ARG_OPTIONS - {"-C"}  # inside a cluster `C` is read as a flag (see ps_shows_environment)
@@ -1211,8 +1209,17 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
     return result
 
 
+def is_ps_bsd_cluster(word: str) -> bool:
+    """Whether word is a dashless BSD-style ps cluster that shows the environment: made only of the letters of PS_BSD_LETTERS and holding
+    `e` (procps and BSD: "Show the environment after the command") or, from 2026-09-29, `E` (macOS: "-E Display the environment as
+    well", Apple adv_cmds ps.1, which lists the BSD-style `e` as "Same as -E"). `ps eww` and `ps auxE` match; `ps aux` does not. A set
+    test, where the regular expression `^[aAcfhjlmrsStTuvwxXLnE]*[eE][aAcefhjlmrsStTuvwxXLnE]*$` backtracked quadratically: 70,000 `E` and a
+    letter that is no flag took 13 s, past a hook timeout that fails open."""
+    return PS_BSD_LETTERS.issuperset(word) and ("e" in word or "E" in word)
+
+
 def ps_shows_environment(words: list[str]) -> bool:
-    """Whether ps prints each process's environment: a dashless BSD-style cluster with `e` or `E` (PS_BSD_CLUSTER), or
+    """Whether ps prints each process's environment: a dashless BSD-style cluster with `e` or `E` (is_ps_bsd_cluster), or
     macOS's dashed `-E`, alone or in a cluster before the first option that takes a value (`-Ewwp 123`, where the value
     starts at `p`). A dashed `-e` is every process and passes, as does an `E` that is a value: the word after a stand-alone
     value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to it (`ps -uEve`). `-C` is a
@@ -1233,7 +1240,7 @@ def ps_shows_environment(words: list[str]) -> bool:
             if "E" in (letters if value_at is None else letters[:value_at]):
                 return True
             skip = value_at == len(letters) - 1  # the cluster ends in an option that takes the next word
-        elif not word.startswith("-") and PS_BSD_CLUSTER.match(word):
+        elif not word.startswith("-") and is_ps_bsd_cluster(word):
             return True
     return False
 

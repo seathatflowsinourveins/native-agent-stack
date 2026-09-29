@@ -1086,7 +1086,10 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the substitution scan took 10 s on 12,000
   here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on 60,000 nested `systemd-run`; the launcher
   walk that predates this work took 29 s on 20,000 nested `env` and 56 s on 20,000 nested `rtk proxy`. Each input now
-  takes under a second (the test bounds it at 3 s). Tokenizing is shlex's, about 9 microseconds a character inside quotes,
+  takes under a second (the test bounds it at 3 s). The dashless `ps` cluster test is a set-membership test since
+  2026-09-29: the regular expression before it had two overlapping quantifiers and took 13 to 15 s on `ps` followed by
+  70,000 `E` and a letter that is no flag (a hook past its timeout fails open), and a test now times every compiled pattern
+  of the guard on 70,000-character repeats. Tokenizing is shlex's, about 9 microseconds a character inside quotes,
   so from 2026-09-29 `main()` also refuses a command of more than 200,000 characters as `command_too_large` (exit 2, one
   line that names no command text, with the hint to put the content in a file with the Write tool and pass the path):
   measured that day, one quoted word of 1,000,000 characters took 10.2 to 13.0 s in `check()` (the base guard too),
