@@ -34,6 +34,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import tokenize
 import unicodedata
@@ -2732,4 +2733,669 @@ for _name in CATALOG_TEMPLATES:
     ORACLES[_name] = _oracle_catalog(_name)
 
 
-# --- END OF PART 3 ---
+# ---- T0: six captures per arm, pre and post, under the arm's conditions and plain (R10, U9-D11) -----------------
+
+T0_FIELDS = ("ran", "status", "skipped", "failures", "errors")
+_T0_REASONS = {"ran": "test_count", "status": "test_status", "skipped": "test_skipped", "failures": "test_failures",
+               "errors": "test_errors"}
+
+
+def _git_env(env):
+    merged = dict(os.environ if env is None else env)
+    merged["GIT_OPTIONAL_LOCKS"] = "0"  # `git status` must not refresh (write) the index of a tree we only observe
+    merged["GIT_PAGER"] = "cat"
+    return merged
+
+
+def _git(tree, *args, env=None):
+    return subprocess.run(["git", "-C", str(tree), *args], capture_output=True, stdin=subprocess.DEVNULL,
+                          env=_git_env(env))
+
+
+def porcelain_entries(tree):
+    """git status --porcelain=v1 -z --untracked-files=all --ignored=matching as sorted {status, path} entries (R13)."""
+    done = _git(tree, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--ignored=matching")
+    fields = done.stdout.decode("utf-8", errors="replace").split("\0")
+    entries, index = [], 0
+    while index < len(fields):
+        item = fields[index]
+        index += 1
+        if len(item) < 4:
+            continue
+        code, path = item[:2], item[3:]
+        if code[0] in "RC":
+            index += 1
+        entries.append({"status": code.replace(" ", "") or code, "path": path})
+    return sorted(entries, key=lambda entry: entry["path"])
+
+
+def tree_state(tree):
+    """HEAD plus the digest of the porcelain status (ignored files included): the identity of a tree's contents."""
+    head = _git(tree, "rev-parse", "HEAD").stdout.decode("utf-8", errors="replace").strip()
+    status = _git(tree, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--ignored=matching").stdout
+    return {"head": head, "status_sha256": sha256_hex(status)}
+
+
+def parse_git_log_subjects(text):
+    subjects, in_block, taken = [], False, False
+    for line in text.split("\n"):
+        if line.startswith("commit ") and is_hex(line[7:47], 40):
+            in_block, taken = True, False
+        elif in_block and not taken and line.startswith("    ") and line.strip():
+            subjects.append(line.strip())
+            taken = True
+    return subjects
+
+
+def _parse_paren_counts(text):
+    counts = {}
+    if "(" in text and ")" in text:
+        inner = text[text.index("(") + 1:text.rindex(")")]
+        for part in inner.split(","):
+            name, sep, number = part.strip().partition("=")
+            if sep and number.strip().isdigit():
+                counts[name.strip()] = int(number)
+    return counts
+
+
+def parse_unittest_facts(text):
+    """{ran, status, skipped, failures, errors} from unittest's own summary lines (structural, not free text)."""
+    facts = {"ran": None, "status": None, "skipped": 0, "failures": 0, "errors": 0}
+    for line in text.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("Ran ") and " test" in stripped:
+            number = stripped[4:].split(" ", 1)[0]
+            if number.isdigit():
+                facts["ran"] = int(number)
+        elif stripped == "OK" or stripped.startswith("OK ("):
+            facts["status"] = "OK"
+            facts["skipped"] = _parse_paren_counts(stripped).get("skipped", 0)
+        elif stripped == "FAILED" or stripped.startswith("FAILED ("):
+            facts["status"] = "FAILED"
+            counts = _parse_paren_counts(stripped)
+            facts["skipped"] = counts.get("skipped", 0)
+            facts["failures"] = counts.get("failures", 0)
+            facts["errors"] = counts.get("errors", 0)
+    return facts
+
+
+def _prefix(sandbox_prefix, cwd):
+    return list(sandbox_prefix(cwd)) if callable(sandbox_prefix) else list(sandbox_prefix)
+
+
+def _run_capture(identity, argv, cwd, env, sandbox_prefix, timeout):
+    start = utc_now()
+    try:
+        done = subprocess.run(_prefix(sandbox_prefix, cwd) + list(argv), cwd=cwd, env=_git_env(env),
+                              capture_output=True, stdin=subprocess.DEVNULL, timeout=timeout)
+        code, out, err, error = done.returncode, done.stdout, done.stderr, None
+    except subprocess.TimeoutExpired:
+        code, out, err, error = None, b"", b"", "timeout"
+    except OSError:
+        code, out, err, error = None, b"", b"", "spawn_failed"
+    run = {"id": identity, "argv": list(argv), "exit": code, "stdout_sha256": sha256_hex(out),
+           "stderr_sha256": sha256_hex(err), "start": start, "end": utc_now(), "facts": {}}
+    if error:
+        run["error"] = error
+    return run, out.decode("utf-8", errors="replace"), err.decode("utf-8", errors="replace")
+
+
+def _copy_tree(tree, destination):
+    listing = _git(tree, "ls-files", "-z", "--cached", "--others", "--exclude-standard")
+    os.makedirs(destination, exist_ok=True)
+    if listing.returncode != 0:
+        shutil.copytree(tree, destination, ignore=shutil.ignore_patterns(".git", "__pycache__"), dirs_exist_ok=True,
+                        symlinks=True)
+        return
+    for name in sorted(item for item in listing.stdout.decode("utf-8", errors="replace").split("\0") if item):
+        source = os.path.join(tree, name)
+        if not os.path.lexists(source):
+            continue
+        target = os.path.join(destination, name)
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        shutil.copy2(source, target, follow_symlinks=False)
+
+
+def rerun_unittest_in_copy(tree, env, sandbox_prefix=(), timeout=900):
+    """Correction 2: the arm's own command in a temporary COPY of the tree (isolate the tree, not the interpreter),
+    with PYTHONDONTWRITEBYTECODE=1. The command imports the tests package because the copy is its working directory."""
+    argv = list(dict(T0_IDENTITIES)["unittest"])
+    with tempfile.TemporaryDirectory(prefix="u9-copy-") as scratch:
+        copy = os.path.join(scratch, "tree")
+        _copy_tree(str(tree), copy)
+        run_env = dict(os.environ if env is None else env)
+        run_env["PYTHONDONTWRITEBYTECODE"] = "1"
+        run, out, err = _run_capture("unittest", argv, copy, run_env, sandbox_prefix, timeout)
+    run["facts"] = parse_unittest_facts(err + "\n" + out)
+    run["env"] = {"PYTHONDONTWRITEBYTECODE": "1"}
+    return run
+
+
+def capture_t0(tree, env, sandbox_prefix=(), timeout=300):
+    """The six recovered identities in one tree under one set of conditions; the unittest runs in a copy."""
+    before = tree_state(tree)
+    started = utc_now()
+    runs = []
+    for identity, argv in T0_IDENTITIES:
+        if identity == "unittest":
+            runs.append(rerun_unittest_in_copy(tree, env, sandbox_prefix))
+            continue
+        run, out, _ = _run_capture(identity, argv, str(tree), env, sandbox_prefix, timeout)
+        if identity == "git-log":
+            run["facts"] = {"subjects": parse_git_log_subjects(out)}
+        runs.append(run)
+    after = tree_state(tree)
+    return {"tree": before, "tree_after": after, "tree_changed_during_capture": before != after, "runs": runs,
+            "started_at": started, "completed_at": utc_now(), "sandboxed": bool(callable(sandbox_prefix)
+                                                                                  or sandbox_prefix)}
+
+
+def post_capture_t0(tree, pre_tree, env, sandbox_prefix=(), timeout=300):
+    """A tree that changed since the pre-arm capture is not re-run: the post capture is discarded (R10, R13)."""
+    if tree_state(tree) != pre_tree:
+        return {"discarded": "tree_changed"}
+    return capture_t0(tree, env, sandbox_prefix, timeout)
+
+
+def mismatch_outcome(env_dependent):
+    """An answer that disagrees with an environment-dependent field is unknown(env_mismatch), otherwise a failure."""
+    return "unknown" if env_dependent else "fail"
+
+
+def _t0_runs(capture):
+    return {run["id"]: run for run in capture["runs"]}
+
+
+def _t0_key_facts(capture):
+    runs = _t0_runs(capture)
+    subjects = (runs.get("git-log") or {}).get("facts", {}).get("subjects") or [None]
+    unit = (runs.get("unittest") or {}).get("facts", {})
+    return subjects[0], tuple(unit.get(name) for name in T0_FIELDS)
+
+
+def _t0_capture_status(pre, post):
+    ids = [name for name, _ in T0_IDENTITIES]
+    captures = [pre["arm"], pre["plain"]]
+    complete_post = bool(post) and "discarded" not in post
+    if complete_post:
+        captures += [post["arm"], post["plain"]]
+    for capture in captures:
+        if [name for name in ids if name not in _t0_runs(capture)]:
+            return fail("capture_missing")
+    if complete_post:
+        for condition in ("arm", "plain"):
+            if _t0_key_facts(pre[condition]) != _t0_key_facts(post[condition]):
+                return unknown("capture_conflict")
+    return ok()
+
+
+def _answer_unittest(text):
+    """Structural unittest facts in an answer: counts before 'tests', OK or FAILED, skipped/failures/errors numbers."""
+    facts = {"ran": count_before_noun(text, ("tests", "test")), "status": [], "skipped": [], "failures": [],
+             "errors": []}
+    for word, status in (("OK", "OK"), ("FAILED", "FAILED")):
+        if has_word(text, word, ignore_case=False):
+            facts["status"].append(status)
+    if not facts["status"]:
+        if has_word(text, "passed"):
+            facts["status"].append("OK")
+        elif has_word(text, "failed"):
+            facts["status"].append("FAILED")
+    for name in ("skipped", "failures", "errors"):
+        facts[name] = [token["value"] for token in ints_by_label(text, name)]
+    return facts
+
+
+def _apply_extraction(facts, extractions, raw):
+    """A D-extract fallback: quotes must be verbatim in the answer; the values are parsed by the same grammar."""
+    for item in extractions or []:
+        if item.get("component") != "unittest":
+            continue
+        if any(quote not in raw for quote in item.get("answer_quotes", [])) or not item.get("answer_quotes"):
+            return None
+        extracted = _answer_unittest(" ".join(item.get("values", [])))
+        for name in ("ran", "status"):
+            if not facts[name] and extracted[name]:
+                facts[name] = extracted[name]
+        for name in ("skipped", "failures", "errors"):
+            if not facts[name] and extracted[name]:
+                facts[name] = extracted[name]
+        return facts
+    return facts
+
+
+def oracle_T0(params, key, ans, readings, ctx=None):
+    ctx = ctx or {}
+    captures = ctx.get("captures")
+    if not captures or not captures.get("pre"):
+        return {"B": unknown("key_missing"), "A": unknown("key_missing")}
+    pre, post = captures["pre"], captures.get("post")
+    components = {"B": _t0_capture_status(pre, post)}
+    if components["B"].status == "fail":
+        return dict(components, A=unknown("capture_missing"))
+    arm_runs, plain_runs = _t0_runs(pre["arm"]), _t0_runs(pre["plain"])
+    subjects = arm_runs["git-log"]["facts"].get("subjects") or []
+    if not subjects:
+        return dict(components, A=unknown("key_missing"))
+    unit_arm, unit_plain = arm_runs["unittest"]["facts"], plain_runs["unittest"]["facts"]
+    verified = (pre["arm"].get("conditions") or {}).get("verified", True)
+    dependent = {name for name in T0_FIELDS if unit_arm.get(name) != unit_plain.get(name)}
+    if not verified:
+        dependent = set(T0_FIELDS)
+    raw = answer_text(ans)
+    text = flat(raw)
+    reasons, soft, unparsed = set(), set(), False
+    if flat(subjects[0]) not in text:
+        reasons.add("subject_not_newest" if any(flat(older) in text for older in subjects[1:]) else "subject_missing")
+    stated = _answer_unittest(normalize(raw))
+    if not stated["ran"] or not stated["status"]:
+        extracted = _apply_extraction(stated, ctx.get("extractions"), raw)
+        if extracted is None:
+            return dict(components, A=unknown("judge_quote"))
+        stated = extracted
+    for name in T0_FIELDS:
+        values = stated[name]
+        if not values:
+            if name in ("ran", "status"):
+                unparsed = True
+            continue
+        acceptable = {unit_arm.get(name), unit_plain.get(name)}
+        if not (set(values) & acceptable):
+            if mismatch_outcome(name in dependent) == "unknown":
+                soft.add("env_mismatch")
+            else:
+                reasons.add(_T0_REASONS[name])
+    if reasons:
+        components["A"] = fail(*reasons)
+    elif soft:
+        components["A"] = unknown(*soft)
+    elif unparsed:
+        components["A"] = unknown("unparsed")
+    else:
+        components["A"] = ok()
+    return components
+
+
+ORACLES["T0"] = oracle_T0
+
+
+# ---- T31 builder and T36 binding (R13, F9, F10) -----------------------------------------------------------------
+
+GREETINGS = {"Ada": "Hello, Ada!", "Grace": "Hello, Grace!"}
+
+
+def _isolated_greeting(path):
+    """greeting('Ada') and greeting('Grace') in an isolated interpreter (-I -S) on a temporary copy of the file."""
+    code = ("import runpy, sys\nmodule = runpy.run_path(sys.argv[1])\n"
+            "print(module['greeting']('Ada'))\nprint(module['greeting']('Grace'))\n")
+    with tempfile.TemporaryDirectory(prefix="u9-greet-") as scratch:
+        copy = os.path.join(scratch, "before.py")
+        shutil.copyfile(path, copy)
+        env = {"PYTHONDONTWRITEBYTECODE": "1", "PATH": os.environ.get("PATH", "")}
+        done = subprocess.run([sys.executable, "-I", "-S", "-c", code, copy], capture_output=True, text=True,
+                              stdin=subprocess.DEVNULL, timeout=60, env=env, cwd=scratch)
+    lines = done.stdout.split("\n")
+    return {"Ada": lines[0] if len(lines) > 0 else None, "Grace": lines[1] if len(lines) > 1 else None}
+
+
+def grade_builder(prepared_path, prepared_base, observed_path, observed_base, exec_rev, after_bytes, key):
+    """T31: the observed child tree is diffed against its recorded base; the code runs only after the bytes match."""
+    if sha256_hex(after_bytes) != key["after_sha256"]:
+        return unknown("input_hash")
+    if os.path.realpath(observed_path) != os.path.realpath(prepared_path):
+        return unknown("conflicting_identity")
+    if not (is_hex(exec_rev, 40) and observed_base == exec_rev and prepared_base == exec_rev):
+        return unknown("block_grading")
+    head = _git(observed_path, "rev-parse", "HEAD").stdout.decode("utf-8", errors="replace").strip()
+    if head != observed_base:
+        return unknown("block_grading")
+    entries = porcelain_entries(observed_path)
+    reasons = set()
+    if [entry for entry in entries if entry["path"] != "fixtures/before.py"]:
+        reasons.add("extra_changes")
+    if not any(entry["path"] == "fixtures/before.py" for entry in entries):
+        reasons.add("empty_diff")
+    if reasons:
+        return fail(*reasons)
+    target = os.path.join(observed_path, "fixtures", "before.py")
+    try:
+        with open(target, "rb") as stream:
+            final = stream.read()
+    except OSError:
+        return fail("empty_diff")
+    if final != after_bytes:
+        return fail("bytes_differ")
+    greeting = _isolated_greeting(target)
+    if greeting != GREETINGS:
+        return fail("greeting", greeting=greeting)
+    return ok(greeting=greeting)
+
+
+def grade_binding(record, ans, parent_texts=()):
+    """T36: the tree's own sentinel is returned, no sibling value appears anywhere, a path alone is insufficient."""
+    if record is None:
+        return unknown("input_missing")
+    text = answer_text(ans)
+    reasons = set()
+    sibling = record.get("sibling_value")
+    if sibling and any(sibling in item for item in (text, *parent_texts)):
+        reasons.add("sibling_value")
+    if record["value"] not in text:
+        has_path = any(token.startswith("/") and len(token) > 3 for token in text.split())
+        reasons.add("path_only" if has_path else "sentinel_missing")
+        return fail(*reasons)
+    if [name for name in record["inventory"] if name not in text]:
+        reasons.add("inventory_missing")
+    counts = count_before_noun(normalize(text), ("lines", "line"))
+    if counts and record["before_lines"] not in counts:
+        reasons.add("before_lines")
+    return _finish(reasons, not counts)
+
+
+def binding_conflicts(record, arm, run_args):
+    """Tasks whose recorded worktree path, base or input path differs from a run record's args (F26)."""
+    bound = record["arms"][arm]
+    conflicts = set()
+    for group in ("worktree_paths", "worktree_bases"):
+        left, right = bound.get(group, {}), run_args.get(group, {})
+        conflicts |= {task for task in set(left) | set(right) if left.get(task) != right.get(task)}
+    left = {task: entry["path"] for task, entry in bound.get("input_paths", {}).items()}
+    right = run_args.get("input_paths", {})
+    conflicts |= {task for task in set(left) | set(right) if left.get(task) != right.get(task)}
+    return sorted(conflicts)
+
+
+# ---- T14 archive query time (correction 3) ---------------------------------------------------------------------
+
+def _has_agentsview(text):
+    """The whole word agentsview, case-sensitive: a letter, digit or '_' on either side makes it a different word."""
+    start = 0
+    while True:
+        index = text.find("agentsview", start)
+        if index < 0:
+            return False
+        before = text[index - 1] if index else ""
+        after = text[index + 10] if index + 10 < len(text) else ""
+        if not (before and is_word_char(before)) and not (after and is_word_char(after)):
+            return True
+        start = index + 1
+
+
+def _tool_use_texts(block):
+    payload = block.get("input") or {}
+    texts = []
+    for name in ("command", "code"):
+        if isinstance(payload.get(name), str):
+            texts.append(payload[name])
+    for item in payload.get("commands") or []:
+        if isinstance(item, dict) and isinstance(item.get("command"), str):
+            texts.append(item["command"])
+    return texts
+
+
+def archive_query_time(rows):
+    """q: the timestamp of the child's first tool_use whose command or code holds the whole word agentsview (also in
+    ctx_execute shell code) or that calls the agentsview MCP server. U1's program vocabulary cannot see it."""
+    for row in rows:
+        if row.get("type") != "assistant":
+            continue
+        content = (row.get("message") or {}).get("content")
+        for block in content if isinstance(content, list) else []:
+            if not isinstance(block, dict) or block.get("type") != "tool_use":
+                continue
+            if "agentsview" in str(block.get("name", "")).split("__") \
+                    or any(_has_agentsview(text) for text in _tool_use_texts(block)):
+                return ok(q=row.get("timestamp"))
+    return unknown("no_query")
+
+
+# ---- Pages (R12), memory (R9) and process captures --------------------------------------------------------------
+
+_BLOCK_TAGS = {"p", "div", "br", "li", "ul", "ol", "dt", "dd", "dl", "h1", "h2", "h3", "h4", "h5", "h6", "tr", "td",
+               "th", "pre", "section", "nav", "article", "table"}
+
+
+class _PageText(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts, self.skip = [], 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style"):
+            self.skip += 1
+        elif tag in _BLOCK_TAGS:
+            self.parts.append(" ")
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style"):
+            self.skip = max(0, self.skip - 1)
+        elif tag in _BLOCK_TAGS:
+            self.parts.append(" ")
+
+    def handle_data(self, data):
+        if not self.skip:
+            self.parts.append(data)
+
+
+def page_text(html_bytes):
+    parser = _PageText()
+    parser.feed(html_bytes.decode("utf-8", errors="replace"))
+    parser.close()
+    return " ".join("".join(parser.parts).split())
+
+
+def _window_after(text, marker, size):
+    index = text.find(marker)
+    return text[index:index + size] if index >= 0 else ""
+
+
+def extract_page_facts(kind, html_bytes):
+    """Deterministic facts over html.parser text (R12): the frozen facts of each page, never bytes."""
+    text = page_text(html_bytes)
+    low = text.lower()
+    if kind == "stripe":
+        hours = None
+        start = 0
+        while hours is None:
+            index = low.find("at least ", start)
+            if index < 0:
+                break
+            tokens = int_tokens(low[index + 9:index + 20])
+            if tokens and tokens[0]["start"] == 0 and low[index + 9 + tokens[0]["end"]:].lstrip().startswith("hour"):
+                hours = tokens[0]["value"]
+            start = index + 1
+        return {"idempotency_key_header": "Idempotency-Key" in text, "retention_hours": hours}
+    if kind == "mcp":
+        both = "local, project, or user scope" in low or "local, project and user scope" in low
+        return {"scopes": [scope for scope in ("local", "project", "user") if both or f"{scope} scope" in low]}
+    if kind == "pathlib":
+        window = _window_after(text, "Path.read_text(", 200)
+        signature = window[len("Path.read_text("):window.find(")")] if window and ")" in window else None
+        return {"read_text_signature": signature}
+    if kind == "json":
+        ascii_window = _window_after(text, "If ensure_ascii is true", 300)
+        nan_window = _window_after(text, "If allow_nan is", 500)
+        decode_window = _window_after(text, "JSONDecodeError", 200)
+        return {
+            "ensure_ascii_default_true": "ensure_ascii is true (the default)" in text,
+            "ensure_ascii_escapes_non_ascii": "non-ASCII" in ascii_window and "escaped" in ascii_window,
+            "allow_nan_false_valueerror": "ValueError" in nan_window,
+            "sort_keys_sorts_dicts": "If sort_keys is true" in text and "sorted by key" in _window_after(
+                text, "If sort_keys is true", 300),
+            "jsondecodeerror_invalid_document": "not a valid JSON document" in decode_window,
+            "loads_bytes_bytearray": "str, bytes or bytearray" in text,
+        }
+    return {}
+
+
+def page_key(first, second, required):
+    """Key drift compares facts, not bytes, between the window's open and close captures (F33)."""
+    facts_a, facts_b = first.get("facts"), second.get("facts")
+    if not facts_a or not facts_b:
+        return "unknown", "key_missing"
+
+    def present(value):
+        return value not in (None, False, [], "")
+
+    if any(not present(facts_a.get(name)) or not present(facts_b.get(name)) for name in required):
+        return "unknown", "key_missing"
+    if any(facts_a.get(name) != facts_b.get(name) for name in required):
+        return "unknown", "key_drift"
+    return "ok", {name: facts_a[name] for name in required}
+
+
+def capture_page(kind, url):
+    """One frozen page through `curl --fail -sSL`: status, effective URL, bytes, sha256 and the extracted facts."""
+    failed = {"kind": kind, "status": None, "effective_url": None, "bytes": None, "sha256": None, "facts": None,
+              "error": "download_failed"}
+    with tempfile.TemporaryDirectory(prefix="u9-page-") as scratch:
+        target = os.path.join(scratch, "page")
+        try:
+            done = subprocess.run(["curl", "--fail", "-sSL", "-o", target, "-w", "%{http_code} %{url_effective}", url],
+                                  capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=180)
+        except (OSError, subprocess.TimeoutExpired):
+            return failed
+        if done.returncode != 0 or not os.path.exists(target):
+            return failed
+        with open(target, "rb") as stream:
+            body = stream.read()
+    code, _, effective = done.stdout.strip().partition(" ")
+    if not code.isdigit():
+        return failed
+    return {"kind": kind, "status": int(code), "effective_url": effective, "bytes": len(body),
+            "sha256": sha256_hex(body), "facts": extract_page_facts(kind, body)}
+
+
+def _ai_memory_json(arguments, task):
+    try:
+        done = subprocess.run(["ai-memory", *arguments], capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                              timeout=180)
+        if done.returncode != 0:
+            raise ValueError("exit")
+        return json.loads(done.stdout)
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        raise Refusal("E_MEMORY_KEY", task=task, reason="query") from None
+
+
+def memory_keys(topics, scope, since):
+    """R9 at freeze: the qualifying historical records per topic, created before SINCE, holding the anchor terms.
+    A topic with no such record refuses (`E_MEMORY_KEY task=<id>`), in sorted task order, before anything launches."""
+    cutoff = parse_utc(since)
+    where = ["--workspace", scope["workspace"], "--project", scope["project"]]
+    frozen = {}
+    for task in sorted(topics):
+        config = topics[task]
+        rows = _ai_memory_json(["search", "--json", "-n", "50", *where, config["query"]], task)
+        records = []
+        for row in rows if isinstance(rows, list) else []:
+            page = _ai_memory_json(["read-page", "--json", "--path", row["path"], *where], task)
+            created = ((page.get("frontmatter") or {}).get("generated") or {}).get("at")
+            stamp = parse_utc(created)
+            body = page.get("body") or ""
+            haystack = (body + " " + (page.get("title") or "")).lower()
+            if stamp is None or cutoff is None or stamp >= cutoff:
+                continue
+            if not all(anchor.lower() in haystack for anchor in config["anchors"]):
+                continue
+            records.append({"path": row["path"], "created_at": created, "content_sha256": sha256_hex(body)})
+        records.sort(key=lambda record: record["path"])
+        if not records:
+            raise Refusal("E_MEMORY_KEY", task=task)
+        frozen[task] = records
+    return frozen
+
+
+def qmd_coverage(config, documents):
+    """Whether each repository document appears in the frozen qmd collections (read-only `qmd ls`)."""
+    coverage = {}
+    listings = {}
+    for collection in config["collections"]:
+        try:
+            done = subprocess.run(["qmd", "--index", config["index"], "ls", collection], capture_output=True,
+                                  text=True, stdin=subprocess.DEVNULL, timeout=120)
+        except (OSError, subprocess.TimeoutExpired):
+            done = None
+        listings[collection] = done.stdout if done is not None and done.returncode == 0 else None
+    for document in documents:
+        base = document.rsplit("/", 1)[-1]
+        found = [name for name, text in listings.items()
+                 if text and any(line.strip().endswith("/" + base) for line in text.split("\n"))]
+        coverage[document] = {"covered": bool(found), "collection": found[0] if found else None,
+                              "queried": all(text is not None for text in listings.values())}
+    return coverage
+
+
+def list_processes(since_epoch):
+    """Processes that started at or after `since_epoch` (Linux /proc): start (UTC), comm and parent pid."""
+    try:
+        with open("/proc/stat", "rb") as stream:
+            boot = next(int(line.split()[1]) for line in stream.read().decode().split("\n") if line.startswith("btime "))
+        ticks = os.sysconf("SC_CLK_TCK")
+    except (OSError, StopIteration, ValueError):
+        return None
+    found = []
+    for name in os.listdir("/proc"):
+        if not name.isdigit():
+            continue
+        try:
+            with open(f"/proc/{name}/stat", "rb") as stream:
+                stat = stream.read().decode("utf-8", errors="replace")
+            fields = stat[stat.rindex(")") + 2:].split()
+            started = boot + int(fields[19]) / ticks
+            with open(f"/proc/{name}/comm", "rb") as stream:
+                comm = stream.read().decode("utf-8", errors="replace").strip()
+        except (OSError, ValueError, IndexError):
+            continue
+        if started >= since_epoch:
+            found.append({"start": datetime.datetime.fromtimestamp(started, datetime.timezone.utc)
+                          .strftime("%Y-%m-%dT%H:%M:%SZ"), "comm": comm, "ppid": int(fields[1])})
+    return sorted(found, key=lambda entry: (entry["start"], entry["comm"], entry["ppid"]))
+
+
+def _export_paths(repo, rev, paths, destination):
+    """Extract the named paths of a commit with `git archive` (regular files and directories only)."""
+    import tarfile
+    done = subprocess.run(["git", "-C", str(repo), "archive", "--format=tar", rev, *paths], capture_output=True,
+                          stdin=subprocess.DEVNULL)
+    if done.returncode != 0:
+        raise Refusal("E_CAPTURE", field="exec_rev")
+    with tarfile.open(fileobj=io.BytesIO(done.stdout)) as archive:
+        for member in archive:
+            name = os.path.normpath(member.name)
+            if name.startswith("..") or os.path.isabs(name):
+                continue
+            target = os.path.join(destination, name)
+            if member.isdir():
+                os.makedirs(target, exist_ok=True)
+            elif member.isreg():
+                os.makedirs(os.path.dirname(target), exist_ok=True)
+                with archive.extractfile(member) as source, open(target, "wb") as sink:
+                    sink.write(source.read())
+                os.chmod(target, member.mode & 0o755 or 0o644)
+
+
+def capture_post_w(repo, exec_rev, acceptance):
+    """T27 and T30: the acceptance commands and py_compile in an exported (git archive) tree at exec_rev, with a
+    private PYTHONPYCACHEPREFIX, so the exec checkout is never written (design deviation D-08)."""
+    result = {"acceptance": {}, "py_compile": None}
+    with tempfile.TemporaryDirectory(prefix="u9-postw-") as scratch:
+        tree = os.path.join(scratch, "tree")
+        cache = os.path.join(scratch, "pycache")
+        os.makedirs(tree)
+        os.makedirs(cache)
+        _export_paths(repo, exec_rev, [E2E_DIR + "/fixtures", "fixtures"], tree)
+        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", PYTHONPYCACHEPREFIX=cache)
+        for task_id in sorted(acceptance):
+            done = subprocess.run(list(acceptance[task_id]), cwd=tree, env=env, capture_output=True,
+                                  stdin=subprocess.DEVNULL, timeout=300)
+            lines = [line for line in done.stdout.decode("utf-8", errors="replace").split("\n") if line.strip()]
+            result["acceptance"][task_id] = {"exit": done.returncode, "last_line": lines[-1] if lines else "",
+                                             "stdout_bytes": len(done.stdout), "stdout_sha256": sha256_hex(done.stdout)}
+        done = subprocess.run(["python3", "-m", "py_compile", "fixtures/before.py", "fixtures/after.py"], cwd=tree,
+                              env=env, capture_output=True, stdin=subprocess.DEVNULL, timeout=120)
+        result["py_compile"] = {"exit": done.returncode, "stdout_bytes": len(done.stdout),
+                                "stderr_bytes": len(done.stderr)}
+    return result
+
+
+# --- END OF PART 4 ---
