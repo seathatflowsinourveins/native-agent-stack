@@ -45,7 +45,7 @@ upstream tracked source was unchanged.
 | Local integration, port control | With an owned listener occupying 17384, baseline succeeds on 17385; candidate exits 1. The candidate gives an explicit choose-another-port diagnostic. | Only the owned scratch listeners and daemons were used. |
 | Local measurement | One full sync over the same two copied logs: 0.407672 seconds on baseline; 0.358587 seconds on candidate. | Too small and unreplicated for an efficiency or throughput conclusion. |
 | Provider execution / review | The only GPT-6 review activity is two Codex launches, each exit 1 before provider execution; both JSONL captures are empty and neither final-message target exists. The build session stopped the stalled Claude review with SIGINT, exit 130; usage is unknown. | Four fresh native lanes and both independent reviews remain unaccepted. |
-| Structural validation | Repository unittests check receipt consistency and sanitization, including planted home-path, UUID and forbidden-key violations through the same publication checks. Since 2026-09-28 they also classify every tracked line that names the pinned version and reject a location list with any entry removed. | These checks establish no upstream or provider execution. |
+| Structural validation | Repository unittests check receipt consistency and sanitization, including planted home-path, UUID and forbidden-key violations through the same publication checks. Since 2026-09-28 they also classify every tracked file outside the dated evidence paths that names the pinned version and reject a location list with any entry removed. | These checks establish no upstream or provider execution. |
 
 The initial upstream test attempts failed to build because the generated pricing
 snapshot was absent. The supported
@@ -122,7 +122,7 @@ change, all still at 0.43.0:
 - three mirrors that existing checks compare with it:
   `blueprints/token-native-focus/saturation-audit.json`
   (`tests/test_stack_lifecycle.py:28-32`),
-  `catalogs/landscape/upstream-snapshot.json` (`scripts/landscape.py:1373-1380`,
+  `catalogs/landscape/upstream-snapshot.json` (`scripts/landscape.py:1373-1381`,
   which CI runs) and the `scripts/native_token_ci.py` pin (its run-time check at
   lines 1740–1742);
 - the install references in `recipes/README.md` and
@@ -135,9 +135,13 @@ change, all still at 0.43.0:
 The remaining 20 are dated records or an unrelated package and keep their
 values. `docs/stack.md` is one of them: its header dates it September 19, 2026,
 and no earlier re-pin changed it. Measured on 2026-09-28, 14 of its 47 rows
-already differ from the manifest. [qualification.json](qualification.json)
+already differ from the manifest by version (15 when the repository URL is compared). [qualification.json](qualification.json)
 records each location and the basis for each classification. The test fails
-when a matching line is unclassified or a recorded location no longer matches.
+when a matching file is unclassified or a recorded location no longer matches,
+and only while the pin holds: once `manifests/stack.json` is re-pinned it skips,
+because the list describes the hold. Until then, a new tracked file outside the
+dated evidence paths that mentions `0.43.0` for another tool fails it until that
+file is classified as `unrelated_package` or `dated_record` in `qualification.json`.
 The upstream ccusage source is
 [ccusage/ccusage at ecb676cc](https://github.com/ccusage/ccusage/tree/ecb676cce27cb5dd0090c7804a5cecc35e8ba805/rust/adapters/codex),
 whose maintained adapter is Rust. The guessed older TypeScript path was a 404,
@@ -177,8 +181,6 @@ the version-specific guidance, and it wrongly included `docs/stack.md`. The
 classification above replaces it. The 2026-09-27 erratum reason no longer calls
 its evidence review independent: no retained record names that reviewer, and
 its returned report is not retained. The same holds for this repair's review.
-The branch's last commit registers the changed files in `manifests/evidence.json`
-under the `docs/lanes.md` hot-file protocol.
 
 Requalification needs four fresh native lanes, both completed independent
 reviews, execution of the unchanged full-save E2E runner and the final recipe

@@ -63,7 +63,8 @@ def location_mismatches(registry, hits):
         paired = len(texts) == len(matches) and any(
             all(match in text for match, text in zip(order, texts)) for order in itertools.permutations(matches))
         if not paired:
-            problems.append(f"{entry['path']}: {len(texts)} matching lines, {len(matches)} recorded locations")
+            detail = " that do not pair by text" if len(texts) == len(matches) else ""
+            problems.append(f"{entry['path']}: {len(texts)} matching lines, {len(matches)} recorded locations{detail}")
     return problems
 
 
@@ -125,7 +126,7 @@ class AgentsviewQualificationTests(unittest.TestCase):
         self.assertTrue(targets["blueprints/token-native-focus/saturation-audit.json"]["enforced_by"]
                         .startswith("tests/test_stack_lifecycle.py:28-32"))
         self.assertTrue(targets["catalogs/landscape/upstream-snapshot.json"]["enforced_by"]
-                        .startswith("scripts/landscape.py:1373-1380"))
+                        .startswith("scripts/landscape.py:1373-1381"))
         self.assertEqual([location["kind"] for location in targets["recipes/README.md"]["locations"]],
                          ["install_reference", "version_specific_guidance"])
         kept = {entry["path"]: entry for entry in locations["not_repin_targets"]}
@@ -260,7 +261,8 @@ class AgentsviewQualificationTests(unittest.TestCase):
 
 
 class RepinLocationRegistryTests(unittest.TestCase):
-    """Every tracked line naming the pinned version is a recorded re-pin location or a classified record."""
+    """While the pin holds, every tracked file outside the dated evidence paths that names the pinned version
+    is a recorded re-pin file or a classified record."""
 
     @classmethod
     def setUpClass(cls):
@@ -279,6 +281,7 @@ class RepinLocationRegistryTests(unittest.TestCase):
             self.skipTest("manifests/stack.json was re-pinned; this dated list describes the hold")
 
     def test_every_matching_file_outside_dated_prefixes_is_classified(self):
+        self.require_pin_held()
         search = self.registry["search"]
         self.assertIn(search["pattern"], search["command"])
         self.assertRegex(self.registry["current_version"], search["pattern"])

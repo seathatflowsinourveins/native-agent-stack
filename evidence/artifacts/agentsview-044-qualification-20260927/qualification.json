@@ -63,7 +63,7 @@
       },
       {
         "path": "catalogs/landscape/upstream-snapshot.json",
-        "enforced_by": "scripts/landscape.py:1373-1380 requires selected_version and the selected repository to equal manifests/stack.json; .github/workflows/validate.yml:107 runs it.",
+        "enforced_by": "scripts/landscape.py:1373-1381 requires selected_version and the selected repository to equal manifests/stack.json; .github/workflows/validate.yml:107 runs it.",
         "locations": [
           {"line_at_record": 200, "kind": "checked_mirror", "match": "\"selected_repository_url\": \"https://github.com/kenn-io/agentsview/releases/tag/v0.43.0\""},
           {"line_at_record": 201, "kind": "checked_mirror", "match": "\"selected_version\": \"0.43.0\""}
@@ -73,7 +73,7 @@
         "path": "scripts/native_token_ci.py",
         "enforced_by": "scripts/native_token_ci.py:1740-1742 stops a run with 'Manifest pin changed' when PINS differs from manifests/stack.json.",
         "locations": [
-          {"line_at_record": 64, "kind": "checked_mirror", "match": "\"agentsview\": \"0.43.0\"}"},
+          {"line_at_record": 64, "kind": "checked_mirror", "match": "\"agentsview\": \"0.43.0\""},
           {"line_at_record": 635, "kind": "version_specific_guidance", "match": "(internal/telemetry/telemetry.go at v0.43.0)", "change": "Re-verify the telemetry opt-out at the new tag and update the citation."}
         ]
       },
@@ -126,7 +126,7 @@
       {"path": "docs/grand-catalog-handbook.md", "class": "dated_record", "basis": "frozen on **September 22, 2026**", "reason": "Handbook of the frozen 2026-09-22 catalog; it repeats the verdict-wave text."},
       {"path": "docs/landscape-freshness-notes.md", "class": "dated_record", "basis": "The observation ended at **2026-09-21 22:40:29 UTC**.", "reason": "Dated 2026-09-21 freshness observation."},
       {"path": "docs/native-dashboard-operations-resolution.md", "class": "dated_record", "basis": "Observed on 2026-09-21.", "reason": "Dated operational recovery record."},
-      {"path": "docs/stack.md", "class": "dated_record", "basis": "Snapshot: September 19, 2026.", "reason": "Dated inventory snapshot. Measured 2026-09-28: its last change is 2026-09-19, no earlier re-pin changed it, and 14 of its 47 rows differ from manifests/stack.json."},
+      {"path": "docs/stack.md", "class": "dated_record", "basis": "Snapshot: September 19, 2026.", "reason": "Dated inventory snapshot. Measured 2026-09-28: its last change is 2026-09-19, no earlier re-pin changed it, and 14 of its 47 rows differ from manifests/stack.json by version (15 when the repository URL is compared)."},
       {"path": "evidence/receipts/component-history.json", "class": "dated_record", "basis": "\"kind\": \"historical_inventory\"", "reason": "Historical inventory recorded 2026-09-19."},
       {"path": "evidence/receipts/current-session-observation-20260920.json", "class": "dated_record", "basis": "20260920", "reason": "Dated receipt."},
       {"path": "evidence/receipts/native-dashboard-access-20260921.json", "class": "dated_record", "basis": "20260921", "reason": "Dated receipt."},
@@ -166,7 +166,7 @@
   "required_future_recipe_rewire": {
     "files": {
       "recipes/README.md": {
-        "current_location": "recipes/README.md component table row `agentsview` (install; line 82 on 2026-09-28) and recipes/README.md#history-and-usage (AgentsView block; line 813 on 2026-09-28); line numbers move as other changes land",
+        "current_location": "recipes/README.md component table row `agentsview` (install; line 82 on 2026-09-28) and recipes/README.md#history-and-usage (AgentsView block, which starts at line 796; its version sentence is line 813 on 2026-09-28); line numbers move as other changes land",
         "changes": "Version, worker inclusion flags, explicit-port failure handling and accounting boundary."
       },
       "docs/token-efficiency-stack.json": {
@@ -318,9 +318,9 @@
     },
     {
       "date": "2026-09-28",
-      "reason": "Evidence-review repair (reviewer identity and returned report not retained); the 2026-09-27 errata and dated records are preserved.",
+      "reason": "Evidence-review repair (reviewer identity and returned report not retained); dated records and the 2026-09-27 erratum text are preserved except the reason wording corrected below.",
       "corrections": [
-        "Replace the five-file re-pin list with a classification of every matching line of the recorded git grep outside the dated evidence/artifacts, evidence/hosts and docs/decisions prefixes: 18 locations in nine re-pin files and 20 dated or unrelated files, each with its basis.",
+        "Replace the five-file re-pin list with a classification of every file matching the recorded git grep outside the dated evidence/artifacts, evidence/hosts and docs/decisions prefixes: 18 locations in nine re-pin files and 20 dated or unrelated files, each with its basis.",
         "Add the mirrors that existing checks compare with manifests/stack.json (blueprints/token-native-focus/saturation-audit.json and catalogs/landscape/upstream-snapshot.json), the recipes/README.md install row, and version-specific guidance in recipes/README.md, docs/native-dashboards.md, docs/native-dashboard-data.md, scripts/native_token_ci.py and tests/test_native_token_ci.py.",
         "Withdraw the 2026-09-27 instruction to update docs/stack.md: it is a dated 2026-09-19 snapshot that earlier re-pins left unchanged.",
         "Remove the word independent from the 2026-09-27 erratum reason, because no retained record names that reviewer."
