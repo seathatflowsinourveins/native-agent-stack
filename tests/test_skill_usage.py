@@ -705,6 +705,63 @@ def materialize_lanes_root(dest: Path) -> Path:
     return root
 
 
+# Codex shell calls in the kernel's measurement.cli_lanes and measurement.proxy (U1 design 6). The record shapes
+# follow openai/codex rust-v0.157.1 (36650394): CommandExecutionItem with its snake_case status and exit_code
+# (codex-rs/protocol/src/items.rs:199-285), exec end states (core/src/tools/events.rs:529-573: exit 0 is completed,
+# any other exit failed, a rejection declined with exit -1) and the unified exec response text, a header of
+# sections up to the line `Output:` and then the output (core/src/tools/context.rs:524-575).
+CLI_CARRIERS = ("bash", "rtk_proxy", "ctx", "nested")
+DECLINED_TEXT = "exec command rejected by user"  # core/src/tools/events.rs:456-458
+STACK_280 = ('mcporter --config "${MCPORTER_CONFIG}" call codebase-memory.search_graph'
+             ' --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth')  # manifests/stack.json:280
+
+
+def cli_lane_row(carrier="bash", **counts):
+    """One cli_lanes.lanes entry: one call with one invocation on `carrier`, other counters zero."""
+    row = {"calls": 1, "invocations": 1, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
+           "unknown": 0, "background": 0, "ambiguous": 0, "via_mcporter": 0,
+           "by_carrier": {c: int(c == carrier) for c in CLI_CARRIERS}}
+    row.update(counts)
+    return row
+
+
+def cli_proxy_row(nested=0):
+    """measurement.proxy for one unreviewed rtk proxy call with one invocation (no prefix-rule match)."""
+    return {"calls": 1, "acceptance": 0, "exception": 0, "unclassified": 1, "invocations": 1, "nested": nested,
+            "in_ctx_code": 0, "prefix_rule_calls": 0, "acceptance_or_exception_share": 0}
+
+
+def codex_row(kind, payload):
+    return {"type": kind, "timestamp": "2026-10-20T02:00:00Z", "payload": payload}
+
+
+def command_item(key, argv, status, exit_code, output):
+    return codex_row("event_msg", {"type": "item_completed", "item": {
+        "type": "CommandExecution", "id": key, "command": argv, "source": "unified_exec_startup",
+        "status": status, "exit_code": exit_code, "aggregated_output": output}})
+
+
+def code_mode_command(key, argv, status, exit_code, output):
+    """A paginated code-mode `exec` call and the CommandExecution item its JavaScript ran (sandbox-nested)."""
+    return [codex_row("response_item", {"type": "custom_tool_call", "call_id": key + "_exec", "name": "exec",
+                                        "input": "const r = await tools.exec_command({cmd}); text(r.output)"}),
+            command_item(key, argv, status, exit_code, output),
+            codex_row("response_item", {"type": "custom_tool_call_output", "call_id": key + "_exec", "output": "done"})]
+
+
+def exec_command_call(key, cmd, output):
+    """A direct exec_command call and its model-visible output; legacy history mode persists no item for it."""
+    return [codex_row("response_item", {"type": "function_call", "call_id": key, "name": "exec_command",
+                                        "arguments": json.dumps({"cmd": cmd})}),
+            codex_row("response_item", {"type": "function_call_output", "call_id": key, "output": output})]
+
+
+def exec_response(status_line, body):
+    """A unified exec response text (context.rs:524-575) with one status section, or none."""
+    return "\n".join(["Chunk ID: 4f2a1c", "Wall time: 1.2034 seconds", *([status_line] if status_line else []),
+                      "Original token count: 9", "Output:", body])
+
+
 class CodexLanes(unittest.TestCase):
     def test_measurement_uses_own_outputs_and_differences_cumulative_usage(self):
         def record(kind, payload, ordinal):
@@ -877,6 +934,110 @@ class CodexLanes(unittest.TestCase):
         self.assertEqual(got["unknown_result_bytes"], 0)
         self.assertEqual(got["calls_without_result"], 3)
         self.assertFalse(got["bytes_complete"])
+
+    def assert_id_free(self, measured):
+        text = json.dumps(measured)
+        for secret in ("call_priv", DECLINED_TEXT, "pytest", "search_graph", "GRAPH_QUERY_ARGS", "notes.md"):
+            self.assertNotIn(secret, text)
+
+    def test_codex_shell_call_states_reach_cli_lanes(self):
+        # U1 design 6 (i)-(vii). A call's state comes from its persisted CommandExecution status when there is one:
+        # declined is failed and not executed (events.rs:562-573). With no item state, a Bash-mapped call's output
+        # is read by its unified exec header (context.rs:534-540): an exit code of 0 is success, another failure,
+        # and a running process or a missing header leaves the state unknown, since a rollout output never
+        # carries the success flag (protocol/src/models.rs:2173-2182).
+        declined_direct = exec_command_call("call_priv_iii_direct", "qmd search x", DECLINED_TEXT)
+        declined_direct.insert(1, command_item("call_priv_iii_direct", ["bash", "-lc", "qmd search x"],
+                                               "declined", -1, DECLINED_TEXT))
+        local_shell = [codex_row("response_item", {"type": "local_shell_call", "call_id": "call_priv_vii",
+                                                   "status": "completed", "action": {
+                                                       "type": "exec", "command": ["bash", "-lc", STACK_280]}}),
+                       codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_vii",
+                                                   "output": "[]"})]
+        cases = {
+            "(i) code mode, completed": (
+                code_mode_command("call_priv_i", ["bash", "-lc", "cd repo && rtk proxy pytest -q"], "completed", 0,
+                                  "4 passed"),
+                {"rtk_proxy": cli_lane_row("nested", succeeded=1, ambiguous=1)}, {}, cli_proxy_row(nested=1)),
+            "(ii) code mode, failed": (
+                code_mode_command("call_priv_ii", ["bash", "-c", "qmd search x"], "failed", 1, "no index"),
+                {"qmd": cli_lane_row("nested", failed=1)}, {}, None),
+            "(iii) code mode, declined": (
+                code_mode_command("call_priv_iii", ["bash", "-lc", "qmd search x"], "declined", -1, DECLINED_TEXT),
+                {"qmd": cli_lane_row("nested", failed=1, not_executed=1)}, {}, None),
+            "(iii) direct call, declined item": (
+                declined_direct, {"qmd": cli_lane_row(failed=1, not_executed=1)}, {}, None),
+            "(iv) legacy exec_command, exit header": (
+                exec_command_call("call_priv_iv", "FOO=1 rtk proxy pytest",
+                                  exec_response("Process exited with code 1", "1 failed, 3 passed")),
+                {"rtk_proxy": cli_lane_row("rtk_proxy", failed=1)}, {}, cli_proxy_row()),
+            "(v) legacy exec_command, running header": (
+                exec_command_call("call_priv_v", "qmd search x",
+                                  exec_response("Process running with session ID 3", "searching")),
+                {"qmd": cli_lane_row(unknown=1)}, {}, None),
+            "(vi) no header and no item": (
+                exec_command_call("call_priv_vi", "qmd search x", "notes.md:3: qmd search x"),
+                {"qmd": cli_lane_row(unknown=1)}, {}, None),
+            "(vii) local shell call, stack.json:280": (
+                local_shell, {"codebase-memory-mcp": cli_lane_row(unknown=1, via_mcporter=1)},
+                {"codebase-memory": {"calls": 1, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
+                                     "unknown": 1}}, None),
+        }
+        for name, (rows, lanes, downstream, proxy) in cases.items():
+            with self.subTest(case=name):
+                got = S.measure_codex_records(rows, since=self.since, until=self.until)
+                self.assertEqual(got["cli_lanes"]["lanes"], lanes)
+                self.assertEqual(got["cli_lanes"]["mcporter_downstream"], downstream)
+                if proxy:
+                    self.assertEqual(got["proxy"], proxy)
+                self.assert_id_free(got)
+
+    def test_codex_shell_state_controls(self):
+        # Must-stay controls: an exit 0 header succeeds; only the header before `Output:` is read, never the output;
+        # a persisted item state wins over the output text, as a paginated item arrives when the command ends.
+        cases = {
+            "exit 0 header": (
+                exec_command_call("call_priv_c1", "qmd search x",
+                                  exec_response("Process exited with code 0", "notes.md")),
+                cli_lane_row(succeeded=1)),
+            "exit line in the output": (
+                exec_command_call("call_priv_c2", "qmd search x",
+                                  exec_response("Process exited with code 0", "Process exited with code 1")),
+                cli_lane_row(succeeded=1)),
+            "completed item beats a running header": (
+                exec_command_call("call_priv_c3", "qmd search x",
+                                  exec_response("Process running with session ID 3", "searching"))
+                + [command_item("call_priv_c3", ["bash", "-lc", "qmd search x"], "completed", 0, "notes.md")],
+                cli_lane_row(succeeded=1)),
+            "failed item with its exit header": (
+                exec_command_call("call_priv_c4", "qmd search x",
+                                  exec_response("Process exited with code 1", "no index"))
+                + [command_item("call_priv_c4", ["bash", "-lc", "qmd search x"], "failed", 1, "no index")],
+                cli_lane_row(failed=1)),
+        }
+        for name, (rows, row) in cases.items():
+            with self.subTest(case=name):
+                got = S.measure_codex_records(rows, since=self.since, until=self.until)
+                self.assertEqual(got["cli_lanes"]["lanes"], {"qmd": row})
+                self.assert_id_free(got)
+
+    def test_codex_aggregate_passes_cli_lanes_and_proxy_through(self):
+        # aggregate_codex_lanes hands the per-actor measurements to the kernel's aggregateMeasurements, which sums
+        # cli_lanes and proxy and adds actors_with_success per lane.
+        sessions = []
+        for rows in (code_mode_command("call_priv_a", ["bash", "-lc", "cd repo && rtk proxy pytest -q"],
+                                       "completed", 0, "4 passed"),
+                     code_mode_command("call_priv_b", ["bash", "-c", "qmd search x"], "failed", 1, "no index")):
+            session = S._new_lanes_session()
+            session["measurement"] = S.measure_codex_records(rows, since=self.since, until=self.until)
+            sessions.append(session)
+        got = S.aggregate_codex_lanes(sessions)["measurement"]
+        self.assertEqual(got["cli_lanes"]["lanes"], {
+            "rtk_proxy": {**cli_lane_row("nested", succeeded=1, ambiguous=1), "actors_with_success": 1},
+            "qmd": {**cli_lane_row("nested", failed=1), "actors_with_success": 0}})
+        self.assertEqual(got["proxy"], cli_proxy_row(nested=1))
+        self.assertIn("provider_usage", got)
+        self.assert_id_free(got)
 
     def setUp(self):
         self.manifest = load_fixture_manifest()
