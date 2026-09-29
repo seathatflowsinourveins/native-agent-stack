@@ -59,7 +59,8 @@ controls: eight mutations of the code under test, each of which fails its test.
 [evidence/stage2-repair-fail-first.txt](evidence/stage2-repair-fail-first.txt) does
 the same for the repair round after the independent reviews. It holds one failing run
 per review item, the documentation check for the text-only items F2 and D3, and nine
-mutations, each of which fails its test.
+mutations, each of which fails its test. It also keeps the observations behind the
+cited CI facts and the Docker template, and the text of both helper scripts.
 
 ## Issue selection
 
@@ -378,21 +379,27 @@ executes nothing the model wrote.
 **The push runs the model's code in CI.** The claim above holds for the host only.
 The driver pushes the agent's commit to a branch of this repository and opens a PR.
 main's `pull_request` workflows then run repository code from the PR's merge commit
-on GitHub-hosted runners. validate.yml, token-report.yml, security-scan.yml and
-dependency-review.yml run on `pull_request`, so an owned path under `tools/`,
-`tests/` or `examples/` puts model-written code into the jobs behind the required
-checks. The bounds, read at origin/main b0fb65b4:
+on GitHub-hosted runners. At origin/main b0fb65b4, 11 of the 20 workflows run on
+`pull_request`: action-compatibility, adoption-bootstrap (including the required
+validate-macos), dependency-review, hardware-profile-smoke, native-foundation-e2e,
+native-token-e2e, receipt-staleness, security-scan, supply-chain, token-report and
+validate. Some of them filter by path. So an owned path under `tools/`, `tests/` or
+`examples/` puts model-written code into jobs behind the required checks. The bounds,
+read at b0fb65b4 by parsing every workflow file (the repair round's evidence file,
+"observations"):
 
 - **Egress is open.** Every workflow's harden-runner step uses
   `egress-policy: audit`, and none uses `block`.
-- **The token is read-only.** Each of those workflows sets `contents: read`.
-- **No secret is reachable.** `secrets.` appears only in native-offhost-app-state.yml
-  and native-offhost-restore.yml, which run on `workflow_dispatch` only. No workflow
-  uses `pull_request_target` or `workflow_run`.
-- **No write scope runs on a PR.** security-scan's two SARIF upload jobs hold
-  `security-events: write` but skip `pull_request`
-  (`if: github.event_name != 'pull_request'`). The other write-scoped workflows run
-  on a schedule, a dispatch, a tag or a push to main.
+- **The token is read-only.** Each of the 11 sets `permissions: contents: read` at
+  the workflow level, so no job falls back to the repository's default token scope.
+- **No secret is reachable.** None of the 11 uses a secret other than
+  `GITHUB_TOKEN`. `secrets.` appears only in native-offhost-app-state.yml and
+  native-offhost-restore.yml, which run on `workflow_dispatch` only. No workflow uses
+  `pull_request_target` or `workflow_run`.
+- **No write scope runs on a PR.** The only jobs among the 11 that widen the token
+  are security-scan's two SARIF upload jobs (`security-events: write`), and both
+  skip `pull_request` (`if: ... github.event_name != 'pull_request'`). The other
+  write-scoped workflows run on a schedule, a dispatch, a tag or a push to main.
 
 So the check results on `openhands/*` are model-controlled: the model can make a
 required check report what it wants. The residuals comment says so, and the driver

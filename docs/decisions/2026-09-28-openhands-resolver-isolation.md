@@ -217,10 +217,12 @@ code in CI"):
 - **Condition 3.** Besides the validated patch, the PR body publishes up to 6000 characters of the
   agent's final message, fenced and guarded, and its resolvable SOTA lines.
 
-The bounds, read at origin/main b0fb65b4, are these. Those jobs get a `contents: read` token and
-no repository secret. No workflow uses `pull_request_target` or `workflow_run`, and every job
-with a write scope skips `pull_request`. Check results on `openhands/*` are model-controlled and
-are not evidence.
+The bounds were read at origin/main b0fb65b4 by parsing every workflow file
+(`blueprints/runtime-workers/openhands/evidence/stage2-repair-fail-first.txt`, "observations").
+11 of the 20 workflows run on `pull_request`. Each sets `contents: read` at the workflow level,
+and none uses a secret other than `GITHUB_TOKEN`. No workflow uses `pull_request_target` or
+`workflow_run`, and the only jobs with a write scope among the 11 skip `pull_request`. Check
+results on `openhands/*` are model-controlled and are not evidence.
 
 The owner decides between two options:
 1. **Accept CI execution** for resolver mode within those bounds, re-checked whenever a workflow
