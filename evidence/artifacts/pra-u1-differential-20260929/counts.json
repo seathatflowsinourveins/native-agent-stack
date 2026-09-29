@@ -1,0 +1,573 @@
+{
+ "kernels": {
+  "old_sha256": "acc7bb51a9fbfeeb2ece6820cbe1e8ba718abcdf96c3513914e072fc429163bf",
+  "pre_ast_sha256": "1dcf6ff9eaa8182b753fb62dced199199f1edb75f4b11bdb537b923320a2b6fb",
+  "new_sha256": "a9126a77fd7f2908570d680bb79784905eab4876ade4b3ff794befc893542716"
+ },
+ "inputs": {
+  "soup": {
+   "profile": "soup",
+   "seed": 432,
+   "inputs": 40000,
+   "bash_valid": 4397
+  },
+  "heredoc": {
+   "profile": "heredoc",
+   "seed": 434,
+   "inputs": 20000,
+   "bash_valid": 4656
+  },
+  "lanes": {
+   "profile": "lanes",
+   "seed": 435,
+   "inputs": 20000,
+   "bash_valid": 4740
+  }
+ },
+ "differential": {
+  "soup": {
+   "inputs": 40000,
+   "bash_valid": 4397,
+   "same": 4104,
+   "differ": 293,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 2739,
+   "differ_new_parse_error": 273,
+   "differ_kinds": {
+    "unresolved": 268,
+    "remote": 5,
+    "lanes+unresolved": 13,
+    "lanes": 7
+   },
+   "distinct_witnesses": 105
+  },
+  "heredoc": {
+   "inputs": 20000,
+   "bash_valid": 4656,
+   "same": 4119,
+   "differ": 537,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 3433,
+   "differ_new_parse_error": 520,
+   "differ_kinds": {
+    "unresolved": 465,
+    "lanes": 45,
+    "remote": 3,
+    "lanes+unresolved": 22,
+    "lanes+remote": 1,
+    "lanes+remote+unresolved": 1
+   },
+   "distinct_witnesses": 233
+  },
+  "lanes": {
+   "inputs": 20000,
+   "bash_valid": 4740,
+   "same": 4098,
+   "differ": 642,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 1916,
+   "differ_new_parse_error": 532,
+   "differ_kinds": {
+    "lanes": 326,
+    "unresolved": 201,
+    "lanes+unresolved": 75,
+    "remote": 35,
+    "remote+unresolved": 2,
+    "lanes+remote+unresolved": 3
+   },
+   "distinct_witnesses": 374
+  },
+  "covering_current_tests": {
+   "inputs": 728,
+   "bash_valid": null,
+   "same": 661,
+   "differ": 67,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 405,
+   "differ_new_parse_error": 2,
+   "differ_kinds": {
+    "lanes": 58,
+    "lanes+unresolved": 4,
+    "unresolved": 4,
+    "remote": 1
+   },
+   "distinct_witnesses": 61
+  },
+  "covering_stage_a_339": {
+   "inputs": 339,
+   "bash_valid": null,
+   "same": 338,
+   "differ": 1,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 241,
+   "differ_new_parse_error": 1,
+   "differ_kinds": {
+    "unresolved": 1
+   },
+   "distinct_witnesses": 1
+  },
+  "real": {
+   "inputs": 136361,
+   "bash_valid": null,
+   "same": 136248,
+   "differ": 113,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 135707,
+   "differ_new_parse_error": 7,
+   "differ_kinds": {
+    "unresolved": 105,
+    "lanes": 7,
+    "lanes+unresolved": 1
+   },
+   "distinct_witnesses": 112
+  },
+  "real_vs_pre_ast": {
+   "inputs": 136361,
+   "bash_valid": null,
+   "same": 136197,
+   "differ": 164,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 135707,
+   "differ_new_parse_error": 7,
+   "differ_kinds": {
+    "unresolved": 156,
+    "lanes": 7,
+    "lanes+unresolved": 1
+   },
+   "distinct_witnesses": 154
+  }
+ },
+ "classes": {
+  "fuzz_and_covering": {
+   "soup": {
+    "unresolved programs: ill-formed text is skipped (pivot D2, parse_errors)": 252,
+    "old defect: oracle class 2: escaped nested backquotes": 9,
+    "unresolved programs: eval words are read (pivot D4(c))": 7,
+    "remote lanes: unquoted ssh words are read (pivot D4(d))": 5,
+    "unresolved programs: a shell string operand is read (pivot D3/D4(a))": 5,
+    "mechanism not isolated: the unresolved count differs in backquoted text with no lane involved": 3,
+    "new limit: text the grammar reports as an error (its subtree is skipped)": 3,
+    "static reading: the valid part of a script that bash rejects as a whole is read (pivot D2)": 3,
+    "old defect: GPT-6 1: a shell string that is not read by a shell (options before -c, -n)": 2,
+    "old defect: eval words were not read (pivot D4(c))": 2,
+    "old defect: oracle class 3: words after a redirection's target": 1,
+    "unresolved programs: a proxied program named by an expansion (Claude R5)": 1
+   },
+   "heredoc": {
+    "unresolved programs: ill-formed text is skipped (pivot D2, parse_errors)": 444,
+    "old defect: GPT-6 4/5: here-document delimiter or owner": 36,
+    "new limit: a here-document operator that begins a statement (grammar)": 9,
+    "new limit: a here-document the grammar ends at a line bash does not read as its delimiter": 8,
+    "unresolved programs: an unquoted heredoc's escaped $ reaches the shell that reads it as an expansion (pivot D7)": 8,
+    "unresolved programs: eval words are read (pivot D4(c))": 7,
+    "mechanism not isolated: the unresolved count differs in backquoted text with no lane involved": 5,
+    "new limit: text the grammar reports as an error (its subtree is skipped)": 3,
+    "old defect: eval words were not read (pivot D4(c))": 3,
+    "old defect: oracle class 2: escaped nested backquotes": 3,
+    "remote lanes: unquoted ssh words are read (pivot D4(d))": 3,
+    "static reading: the body of an unquoted heredoc holds an unterminated backquote, which bash rejects at run time": 3,
+    "static reading: the valid part of a script that bash rejects as a whole is read (pivot D2)": 2,
+    "neither reading equals the full run; static reading: the valid part of a script that bash rejects as a whole is read (pivot D2)": 1,
+    "old defect: GPT-6 1: a shell string that is not read by a shell (options before -c, -n)": 1,
+    "unresolved programs: a shell string operand is read (pivot D3/D4(a))": 1
+   },
+   "lanes": {
+    "new limit: a here-document operator that begins a statement (grammar)": 176,
+    "unresolved programs: ill-formed text is skipped (pivot D2, parse_errors)": 165,
+    "old defect: GPT-6 4/5: here-document delimiter or owner": 58,
+    "remote lanes: unquoted ssh words are read (pivot D4(d))": 37,
+    "old defect: GPT-6 1: a shell string that is not read by a shell (options before -c, -n)": 36,
+    "old defect: eval words were not read (pivot D4(c))": 21,
+    "the new reading equals the run of the minimal witness; the full input's run does not reach that lane": 21,
+    "unresolved programs: `time` after a wrapper that is an executable is unresolved (exec semantics)": 18,
+    "static reading: the valid part of a script that bash rejects as a whole is read (pivot D2)": 13,
+    "old defect: GPT-6 2: array elements read as commands": 12,
+    "static reading: the body of an unquoted heredoc holds an unterminated backquote, which bash rejects at run time": 11,
+    "neither reading equals the full run; static reading: the valid part of a script that bash rejects as a whole is read (pivot D2)": 10,
+    "new limit: text the grammar reports as an error (its subtree is skipped)": 9,
+    "neither reading equals the full run; new limit: a here-document operator that begins a statement (grammar)": 8,
+    "old defect: oracle class 5: a builtin after a wrapper that is an executable read as a wrapper": 8,
+    "neither reading equals the full run; new limit: text the grammar reports as an error (its subtree is skipped)": 5,
+    "neither reading equals the full run; the new reading equals the run of the minimal witness; the full input's run does not reach that lane": 4,
+    "old defect: oracle class 2: escaped nested backquotes": 4,
+    "unresolved programs: a shell string operand is read (pivot D3/D4(a))": 4,
+    "old defect: GPT-6 3: double-quote backslashes": 3,
+    "unresolved programs: `rtk proxy time` is unresolved (pivot D4(e))": 3,
+    "unresolved programs: a builtin after a wrapper that is an executable names no program (exec semantics)": 3,
+    "unresolved programs: an unquoted heredoc's escaped $ reaches the shell that reads it as an expansion (pivot D7)": 3,
+    "unresolved programs: eval words are read (pivot D4(c))": 3,
+    "mechanism not isolated: the unresolved count differs in backquoted text with no lane involved": 1,
+    "neither reading equals the full run; new limit: a word joined to a redirection target by a line continuation": 1,
+    "new limit: a word joined to a redirection target by a line continuation": 1,
+    "old defect: Claude R4: parentheses outside command position": 1,
+    "old defect: GPT-6 7: rtk proxy runs no shell": 1,
+    "old defect: a `{` glued to a word is a word, not the start of a group": 1,
+    "unresolved programs: a $ that ends a word expands nothing and is literal (old reading: an expansion)": 1
+   },
+   "covering_current_tests": {
+    "old defect: GPT-6 1: a shell string that is not read by a shell (options before -c, -n)": 15,
+    "old defect: GPT-6 4/5: here-document delimiter or owner": 12,
+    "old defect: oracle class 4: time before an assignment or a negation": 5,
+    "old defect: oracle class 5: a builtin after a wrapper that is an executable read as a wrapper": 5,
+    "old defect: eval words were not read (pivot D4(c))": 4,
+    "old defect: GPT-6 2: array elements read as commands": 3,
+    "old defect: GPT-6 3: double-quote backslashes": 3,
+    "old defect: oracle class 2: escaped nested backquotes": 3,
+    "old defect: Claude R4: parentheses outside command position": 2,
+    "old defect: GPT-6 6: arithmetic substitutions": 2,
+    "old defect: GPT-6 7: rtk proxy runs no shell": 2,
+    "old defect: oracle class 3: words after a redirection's target": 2,
+    "unresolved programs: a proxied program named by an expansion (Claude R5)": 2,
+    "old defect: a case pattern read as a command": 1,
+    "old defect: a reserved word after a redirection or in a word position read as syntax": 1,
+    "old defect: other old-code defect": 1,
+    "remote lanes: unquoted ssh words are read (pivot D4(d))": 1,
+    "static reading: a function body counts where it is defined, called or not (documented)": 1,
+    "unresolved programs: array elements and subscripted assignments are not commands (GPT-6 2)": 1,
+    "unresolved programs: eval words are read (pivot D4(c))": 1
+   },
+   "covering_stage_a_339": {
+    "unresolved programs: ill-formed text is skipped (pivot D2, parse_errors)": 1
+   },
+   "mechanism_not_isolated": 9,
+   "other_old_code_defect": 1,
+   "classified_by_argument_not_by_run": {},
+   "reduced_again_against_the_run": {
+    "heredoc": 1,
+    "lanes": 1
+   },
+   "unexplained": 0
+  },
+  "real": {
+   "real": {
+    "unresolved programs: process substitution words (Claude R4 family)": 38,
+    "unresolved programs: ill-formed text is skipped (pivot D2, parse_errors)": 29,
+    "unresolved programs: a shell string operand is read (pivot D3/D4(a))": 18,
+    "unresolved programs: the old reading read a shell string that no shell runs (GPT-6 1)": 10,
+    "unresolved programs: array elements and subscripted assignments are not commands (GPT-6 2)": 6,
+    "old defect: GPT-6 1: a shell string that is not read by a shell": 4,
+    "unresolved programs: `time` then an assignment (oracle class 4)": 2,
+    "new limit: an unknown wrapper or launcher runs the lane": 1,
+    "old defect: a case pattern read as a command": 1,
+    "old defect: a process substitution's neighbours read as commands": 1,
+    "old defect: a shell string with nested quoting was not read by the old reading (its lanes count; every side of && and || counts)": 1,
+    "unresolved programs: a case pattern is not a command (the old reading counted it)": 1,
+    "unresolved programs: eval words are read (pivot D4(c))": 1
+   },
+   "mechanism_not_isolated": 0,
+   "other_old_code_defect": 0,
+   "classified_by_argument_not_by_run": {
+    "real": 8
+   },
+   "reduced_again_against_the_run": {},
+   "unexplained": 0
+  },
+  "real_vs_pre_ast": {
+   "real_pre_ast": {
+    "unresolved programs: a shell string operand is read (pivot D3/D4(a))": 63,
+    "unresolved programs: process substitution words (Claude R4 family)": 38,
+    "unresolved programs: ill-formed text is skipped (pivot D2, parse_errors)": 30,
+    "unresolved programs: eval words are read (pivot D4(c))": 9,
+    "unresolved programs: the old reading read a shell string that no shell runs (GPT-6 1)": 7,
+    "unresolved programs: array elements and subscripted assignments are not commands (GPT-6 2)": 6,
+    "old defect: GPT-6 1: a shell string that is not read by a shell": 4,
+    "unresolved programs: `time` then an assignment (oracle class 4)": 2,
+    "new limit: an unknown wrapper or launcher runs the lane": 1,
+    "old defect: a case pattern read as a command": 1,
+    "old defect: a process substitution's neighbours read as commands": 1,
+    "old defect: a shell string with nested quoting was not read by the old reading (its lanes count; every side of && and || counts)": 1,
+    "unresolved programs: a case pattern is not a command (the old reading counted it)": 1
+   },
+   "mechanism_not_isolated": 0,
+   "other_old_code_defect": 0,
+   "classified_by_argument_not_by_run": {
+    "real_pre_ast": 8
+   },
+   "reduced_again_against_the_run": {},
+   "unexplained": 0
+  }
+ },
+ "m4_identity": {
+  "soup-432": {
+   "inputs": 40000,
+   "analysed": 4397,
+   "identical": 4397,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "heredoc-434": {
+   "inputs": 20000,
+   "analysed": 4656,
+   "identical": 4656,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "lanes-435": {
+   "inputs": 20000,
+   "analysed": 4740,
+   "identical": 4740,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "covering_current_tests": {
+   "inputs": 728,
+   "analysed": 728,
+   "identical": 728,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "covering_stage_a_339": {
+   "inputs": 339,
+   "analysed": 339,
+   "identical": 339,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "real": {
+   "inputs": 136361,
+   "analysed": 136361,
+   "identical": 136361,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  }
+ },
+ "marks_commit_text_identity": {
+  "soup-432": {
+   "inputs": 40000,
+   "analysed": 4397,
+   "identical": 4397,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "heredoc-434": {
+   "inputs": 20000,
+   "analysed": 4656,
+   "identical": 4656,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "lanes-435": {
+   "inputs": 20000,
+   "analysed": 4740,
+   "identical": 4740,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "covering_current_tests": {
+   "inputs": 728,
+   "analysed": 728,
+   "identical": 728,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "covering_stage_a_339": {
+   "inputs": 339,
+   "analysed": 339,
+   "identical": 339,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  },
+  "real": {
+   "inputs": 136361,
+   "analysed": 136361,
+   "identical": 136361,
+   "different": 0,
+   "a_throws": 0,
+   "b_throws": 0
+  }
+ },
+ "oracle_fresh_seeds": {
+  "base": {
+   "profile": "base",
+   "seeds": [
+    7000,
+    7480
+   ],
+   "chunks": 12,
+   "commands": 23894,
+   "lane_runs": 32399,
+   "timeouts": 0,
+   "first_run_differences": 1,
+   "pipe_races": 0,
+   "lane_differences": 0,
+   "parse_error_lanes_agree": 1
+  },
+  "ext": {
+   "profile": "ext",
+   "seeds": [
+    8000,
+    8480
+   ],
+   "chunks": 12,
+   "commands": 26767,
+   "lane_runs": 36765,
+   "timeouts": 0,
+   "first_run_differences": 2,
+   "pipe_races": 1,
+   "lane_differences": 0,
+   "parse_error_lanes_agree": 1
+  },
+  "ext_before_the_repairs": {
+   "profile": "ext",
+   "seeds": [
+    100,
+    580
+   ],
+   "chunks": 12,
+   "commands": 26864,
+   "lane_runs": 36801,
+   "timeouts": 0,
+   "first_run_differences": 2527,
+   "pipe_races": 0,
+   "lane_differences": 2527,
+   "parse_error_lanes_agree": 0
+  }
+ },
+ "oracle_committed": {
+  "probes": [
+   163,
+   163,
+   140
+  ],
+  "recovery": [
+   28,
+   28,
+   21
+  ],
+  "generated": [
+   456,
+   456,
+   578
+  ],
+  "extended": [
+   463,
+   463,
+   642
+  ],
+  "unittest_exit": 0
+ },
+ "shapes": {
+  "commands": 136361,
+  "with_a_parse_error": 247,
+  "with_a_lane_invocation": 6527,
+  "with_an_unresolved_program": 4574,
+  "unresolved_and_a_lane_word": 562,
+  "named_bang": 0,
+  "escaped_backquote_body": 0,
+  "folded_redirect_words": 500,
+  "folded_redirect_words_lane_word": 1,
+  "time_then_assignment_or_bang": 12,
+  "with_a_heredoc_operator": 15128,
+  "heredoc_ended_early": 2,
+  "heredoc_unterminated": 0,
+  "heredoc_operator_begins_a_statement": 0,
+  "two_heredoc_operators_with_a_tree_error": 2,
+  "word_cut_after_an_assignment": 4837,
+  "word_cut_after_an_assignment_lane_word": 37,
+  "shell_c_of_a_cat_heredoc_substitution": 5
+ },
+ "timing": [
+  {
+   "name": "executedText plain",
+   "calls": 136361,
+   "total_s": 9.7,
+   "mean_ms": 0.071,
+   "p50_ms": 0.055,
+   "p99_ms": 0.29,
+   "max_ms": 2.2
+  },
+  {
+   "name": "executedText inlineHttp",
+   "calls": 136361,
+   "total_s": 12.66,
+   "mean_ms": 0.093,
+   "p50_ms": 0.064,
+   "p99_ms": 0.5,
+   "max_ms": 6.3
+  },
+  {
+   "name": "fetchKind",
+   "calls": 136361,
+   "total_s": 11.06,
+   "mean_ms": 0.081,
+   "p50_ms": 0.063,
+   "p99_ms": 0.32,
+   "max_ms": 2.6
+  },
+  {
+   "name": "commandInvocations",
+   "calls": 136361,
+   "total_s": 17.36,
+   "mean_ms": 0.127,
+   "p50_ms": 0.1,
+   "p99_ms": 0.51,
+   "max_ms": 12.3
+  },
+  {
+   "name": "measureTranscript (one Bash call)",
+   "calls": 136361,
+   "total_s": 43.91,
+   "mean_ms": 0.322,
+   "p50_ms": 0.261,
+   "p99_ms": 1.21,
+   "max_ms": 10.9
+  }
+ ],
+ "states": {
+  "files": 5074,
+  "files_scanned_deeply": 603,
+  "denial_kind": {
+   "permission-rule": 817,
+   "user-rejected": 50,
+   "cancelled": 1,
+   "automode-unavailable": 1
+  },
+  "isolated": {
+   "rows": 209,
+   "with_denial_kind": 0,
+   "is_error_true": 209,
+   "tools": {
+    "Bash": 209
+   }
+  },
+  "wont_proceed": {
+   "rows": 43,
+   "with_denial_kind": 43,
+   "toolUseResult": {
+    "User rejected tool use": 41,
+    "(other string)": 2
+   }
+  },
+  "classifier": {
+   "rows": 1,
+   "with_denial_kind": 1
+  },
+  "bash_interrupted_true": 0,
+  "marked_bash_rows": 1073
+ }
+}

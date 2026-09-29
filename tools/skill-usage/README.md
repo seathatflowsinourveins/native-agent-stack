@@ -188,10 +188,15 @@ as zero. The legacy `ctx_fetch_and_index_share` compares three lanes only (hoste
 `until`, `!` and `{` and behind `rtk`, `sudo`, `env`, `command`, `exec`, `time`, `nice`, `nohup`
 or `timeout N`. Escaped characters and comments are data, and `$(...)` or backticks inside double
 quotes or in the body of a heredoc with an unquoted delimiter still run (bash(1) QUOTING, COMMENTS
-and Here Documents). This legacy counter keeps its own Python rule (`executed_text`), which predates
-the kernel's reading of heredocs inside `"$( )"` and of strings a shell runs, so on those shapes it
-can disagree with `measurement.m4` and with the Claude lane's `bash_curl_wget`: a `curl` line in the
-heredoc of `bash -c 'cat <<EOF > x.sh ...'` counts here as a fetch and there as data.
+and Here Documents). This legacy counter keeps its own Python rule (`executed_text`, `fetch_kind`),
+which predates the kernel's reading of heredocs inside `"$( )"` and of strings a shell runs, so it
+disagrees with `measurement.m4` and with the Claude lane's `bash_curl_wget` in both directions.
+Observed with the two readings side by side: the `curl` line in the heredoc of `bash -c 'cat <<EOF >
+x.sh ...'` and the inner text of `bash -c "echo \"a; curl u\""` count here as a fetch and there as
+data, while `echo "$(echo "a" && curl u)"` (a `"$( )"` whose inner quotes the Python scan cannot
+follow) counts there as a fetch and here as none. A plain `curl` and `bash <<'EOF'` with a `curl`
+line agree. The gate and every PR-A field read the kernel; the legacy counter is a historical
+comparison field.
 
 PR-A adds `actors[].measurement` and group `measurement` fields. They reuse
 the existing [child-usage.mjs measurement kernel](../../examples/claude-native/workflows/README.md#pr-a-measurement-fields-2026-09-27)
@@ -231,7 +236,18 @@ not contribute M5 bytes unless represented by a direct model-visible ctx call.
 ([CLI lanes by command position](../../examples/claude-native/workflows/README.md#cli-lanes-by-command-position-2026-09-28)).
 Shell commands of `exec_command`, `shell_command`, `shell` and local-shell
 calls and of `CommandExecution` items are read in command position; those
-nested in a code-mode `exec` count under carrier `nested`. A call's state comes
+nested in a code-mode `exec` count under carrier `nested`. A Codex argv array is one command, not
+shell text (U1 pivot D6, GPT-6 finding 11): a shell's `-c` or `-lc` script argument is the script
+itself (`[shell, -lc, script]` as `codex-rs/core/src/shell.rs` runs it), and any other argv is
+joined with each element quoted (`shlex.join`), so a metacharacter inside one element stays data and
+`["echo", "qmd; rtk proxy qmd status"]` counts no lane. A measurement (not an aggregate) awaits the
+kernel's `loadShellParser()` before it reads, as the kernel's own CLI does: the CLI-lane reading
+needs the verified tree-sitter-bash install (`CHILD_USAGE_SHELL_PARSER`, then the ecosystem tools
+directory that `shell-parser.pin.json` names), and without one `measurement.cli_lanes` is `{status:
+'parser_unavailable', reason}` and no lane is counted. The unified exec header's exit code is read
+up to nine digits; a longer one leaves the state `unknown` instead of raising (finding 12).
+
+A call's state comes
 from its persisted item status when there is one: `failed` is failed, and
 `declined` (a rejected command, exit -1 in
 [events.rs:562-573](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/events.rs#L562-L573))
