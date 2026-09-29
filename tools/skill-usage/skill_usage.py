@@ -40,6 +40,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -799,13 +800,19 @@ def fetch_kind(command: str) -> str | None:
     return "loopback" if hosts and all(LOOPBACK.match(host) for host in hosts) else "fetch"
 
 
+SCRIPT_SHELLS = ("sh", "bash", "zsh", "dash", "ksh")
+
+
 def shell_script(command) -> str:
-    """The script a CommandExecution item ran: argv ['bash', '-lc', script] -> script."""
+    """The shell text a command ran. A string is that text. An argv array is one command: a shell's `-c` or
+    `-lc` script argument (openai/codex rust-v0.157.1 codex-rs/core/src/shell.rs runs [shell, -lc, script]) is the
+    script itself; any other argv is joined with each element quoted (shlex.join), so a metacharacter inside one
+    element stays data and `-c` of a program that is not a shell is one of its arguments (U1 pivot D6, GPT-6 #11)."""
     if isinstance(command, list):
         parts = [str(part) for part in command]
-        if len(parts) >= 3 and parts[1] in ("-lc", "-c"):
+        if len(parts) >= 3 and parts[1] in ("-lc", "-c") and os.path.basename(parts[0]) in SCRIPT_SHELLS:
             return parts[2]
-        return " ".join(parts)
+        return shlex.join(parts)
     return command if isinstance(command, str) else ""
 
 
@@ -849,6 +856,9 @@ CODEX_SHELL_TOOLS = ("exec_command", "shell_command", "shell")
 EXEC_HEADER_SECTIONS = 5
 EXEC_EXITED = "Process exited with code "
 EXEC_RUNNING = "Process running with session ID "
+# The exit code is an i32 written in decimal (at most 10 digits with its sign). A header with more digits is no native header;
+# it reads unknown, and int() never sees a digit string over CPython's conversion limit (4,300 digits, which raises ValueError).
+EXEC_CODE_DIGITS = 9
 
 
 def codex_call_name(payload: dict) -> str:
@@ -866,8 +876,9 @@ def exec_header_state(output) -> tuple[bool, str | None]:
     2173-2182) and legacy history mode persists no CommandExecution item (rollout/src/policy.rs:94-112).
     An exit code of 0 is success and any other exit a failure. A running process (write_stdin can report a
     live process with an exit code, core/src/unified_exec/process_manager.rs:1066-1071), a header without
-    either line, or text without the header leaves the state unknown. Only the lines before "Output:" are
-    read, with a linear line scan and no regular expression."""
+    either line, an exit code of more than EXEC_CODE_DIGITS digits, or text without the header leaves the
+    state unknown. Only the lines before "Output:" are read, with a linear line scan and no regular
+    expression."""
     if isinstance(output, list):
         first = output[0] if output else None
         output = first.get("text") if isinstance(first, dict) else None
@@ -886,7 +897,7 @@ def exec_header_state(output) -> tuple[bool, str | None]:
         elif line.startswith(EXEC_EXITED):
             digits = line[len(EXEC_EXITED):]
             digits = digits[1:] if digits.startswith("-") else digits
-            if digits.isascii() and digits.isdigit():
+            if digits.isascii() and digits.isdigit() and len(digits) <= EXEC_CODE_DIGITS:
                 code = int(line[len(EXEC_EXITED):])
         if end < 0:
             break
