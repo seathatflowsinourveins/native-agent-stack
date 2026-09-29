@@ -36437,8 +36437,8 @@
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/README.md",
-      "sha256": "a7523d02e8e6269f7135eaa7aab9f8858926f8f61f1c1922cb695da17a8de969",
-      "bytes": 12139
+      "sha256": "3fd5da75fd0e9ab4d94bf59b9751911717377026d9789480c6801b895ce9dee7",
+      "bytes": 12529
     },
     {
       "path": "evidence/artifacts/skills-listing-restore-20260928/control-no-allowance.json",
@@ -42037,8 +42037,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "1f062021ef0cc8f406ea1d24bbcdc97cee72f6c39c2b13c02fdf5cf4f25a2681",
-      "bytes": 26923
+      "sha256": "cf4661668c5299a3160fe6369c1365534466bb726a5dc1d490c9031f8e98639a",
+      "bytes": 30559
     },
     {
       "path": "scripts/trading_gates.py",
@@ -42627,8 +42627,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "627ccc696915e05e616cc910e33be665e99233ab9a2ac5e54a43940e711040ed",
-      "bytes": 85459
+      "sha256": "92bdc33349f868dcc49f8f5d0c0c27212632e1fa6e4107c566617bab442a383e",
+      "bytes": 88411
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -42957,8 +42957,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "9b57474988bb213ec212504524599bd90865f071501ecb94ba1c0facf16f01d0",
-      "bytes": 76186
+      "sha256": "fbc0e085ed8867b187c2b22d9a251732e492270b10cb3c94ac49e0f5400b88e6",
+      "bytes": 78579
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -42967,8 +42967,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "4de0a51c1f2f37cc35ffb4067bb42ecad5dd3be2d355b4e89b14cc5f14f350f3",
-      "bytes": 41135
+      "sha256": "fe4b919e0756ba6b3f7fc93200804a6522765c6b50e0a7d31175d5fbde9bbcc8",
+      "bytes": 50494
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -43102,8 +43102,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "4a4e7302e75624b73a4798baf82347ddbdf11e22362a76e5a4078c579647eaf7",
-      "bytes": 37615
+      "sha256": "ecbe9fc92cae18922f87f617fb075fdfb7620fce39180e4fb905dbb9d1235121",
+      "bytes": 37886
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -43197,13 +43197,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "08c549f84a852ebb19987f36a8c69aa677cfc8ab635eac635b8ef7263c21de5c",
-      "bytes": 22119
+      "sha256": "c48c4cd8dd860a448927cef7ece87688cc9b9c2980e3da9f6858b82842429fbb",
+      "bytes": 22215
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "1a787dbb70892a9194ddf058533d11d7ad7d488b1358a17382ffbd0e1272b84c",
-      "bytes": 81906
+      "sha256": "78db8b063d193fdd7077af44bc9f25f1c1ea1543f6725b9789d6032cf459c613",
+      "bytes": 82602
     },
     {
       "path": "tools/sota-convergence/README.md",
