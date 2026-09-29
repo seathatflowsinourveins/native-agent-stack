@@ -18,7 +18,8 @@ ctime differs between the two changed while the checker looked, so its row is ch
 `compare` prints the states of the latest two receipts and the names of changed fingerprint fields, never their
 values: the size a local receipt keeps gives a one-variable file's value length, so no printed or published form
 carries it. It exits 1 when a required or optional file row that was ok is no longer ok or is gone, 2 when there is
-no receipt or one cannot be read, and 0 otherwise; with a single receipt it reports that baseline.
+no receipt or one it reads is unreadable or malformed (one line naming the receipt file, no traceback), and 0
+otherwise; with a single receipt it reports that baseline.
 """
 
 from __future__ import annotations
@@ -300,13 +301,57 @@ def record(root: Path = ROOT, env=None, *, proc_keys: Path | None = cs.PROC_KEYS
     return path, receipt, summary_line(receipt, path.name)
 
 
+def string_list(value, nullable: bool = False) -> bool:
+    return (nullable and value is None) or (isinstance(value, list) and all(isinstance(item, str) for item in value))
+
+
+def receipt_problem(receipt: dict) -> str | None:
+    """The first field compare reads that is missing or of the wrong type, as a path such as rows[3].state; None when
+    every one is present."""
+    rows = receipt.get("rows")
+    if not isinstance(rows, list):
+        return "rows"
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            return f"rows[{index}]"
+        for key in ("id", "status", "store_kind", "state"):
+            if not isinstance(row.get(key), str):
+                return f"rows[{index}].{key}"
+        for key in ("findings", "warnings"):
+            if not string_list(row.get(key)):
+                return f"rows[{index}].{key}"
+        mark = row.get("fingerprint")
+        if mark is not None and not (isinstance(mark, dict) and set(mark) == set(FINGERPRINT_FIELDS)):
+            return f"rows[{index}].fingerprint"
+    if len({row["id"] for row in rows}) != len(rows):
+        return "rows (an id twice)"
+    for key in ("boot", "checkout"):
+        if not isinstance(receipt.get(key), dict):
+            return key
+    coverage = receipt.get("coverage")
+    if not isinstance(coverage, dict) or not all(key in coverage and string_list(coverage[key], nullable=True)
+                                                 for key in ("undeclared_store_files", "undeclared_keyring_keys")):
+        return "coverage"
+    if "keyring_names" not in receipt or not string_list(receipt["keyring_names"], nullable=True):
+        return "keyring_names"
+    if not isinstance(receipt.get("claude_user_guard_matches_pin"), bool):
+        return "claude_user_guard_matches_pin"
+    if not isinstance(receipt.get("result"), str):
+        return "result"
+    return None
+
+
 def load_receipt(directory: Path, name: str) -> dict:
+    """A receipt with every field compare reads; any other is refused with its file name only."""
     try:
         receipt = json.loads((directory / name).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         raise Refused(f"cannot read receipt {name}") from None
     if not isinstance(receipt, dict) or receipt.get("kind") != KIND or receipt.get("schema_version") != SCHEMA_VERSION:
         raise Refused(f"receipt {name} is not a schema {SCHEMA_VERSION} {KIND}")
+    problem = receipt_problem(receipt)
+    if problem is not None:
+        raise Refused(f"receipt {name} is malformed: {problem} is missing or has the wrong type")
     return receipt
 
 
@@ -384,13 +429,17 @@ def compare(env=None) -> tuple[list[str], int]:
         raise Refused("no receipt yet; run: python3 -I scripts/credential_boot_receipt.py record")
     if len(found) == 1:
         baseline = load_receipt(directory, found[0])
-        return [f"baseline: {found[0]} (one receipt; nothing to compare yet)", summary_line(baseline, found[0])], 0
+        try:
+            line = summary_line(baseline, found[0])
+        except (KeyError, TypeError, AttributeError, ValueError):  # a backstop: load_receipt checked every field
+            raise Refused(f"receipt {found[0]} is malformed") from None
+        return [f"baseline: {found[0]} (one receipt; nothing to compare yet)", line], 0
     older_name, newer_name = found[-2:]
     older, newer = load_receipt(directory, older_name), load_receipt(directory, newer_name)
     try:
         lines, regressions = compare_receipts(older, newer)
-    except (KeyError, TypeError, AttributeError):
-        raise Refused(f"cannot read receipt {older_name} or {newer_name}: a field is missing") from None
+    except (KeyError, TypeError, AttributeError, ValueError):  # a backstop: load_receipt checked every field
+        raise Refused(f"receipt {older_name} or {newer_name} is malformed") from None
     return [f"compare: {older_name} -> {newer_name}", *lines], 1 if regressions else 0
 
 

@@ -624,6 +624,50 @@ class BootReceiptTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stdout)
         self.assertIn("cannot read", result.stderr)
 
+    def test_a_malformed_receipt_stops_compare_with_its_name_only(self):
+        # A receipt that lacks a field compare reads, or holds one of the wrong type, stops compare with exit 2 and one
+        # line naming the receipt file only (no traceback, no absolute path): as the baseline and as the newer of two.
+        absolute = re.compile(r"(?<![\w.~-])/(?:tmp|var|home|usr|opt|root|mnt|proc)\b")
+
+        def refused(name, detail):
+            result = self.run_cli("compare")
+            self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+            self.assertEqual(result.stdout, "")
+            self.assertEqual(result.stderr, f"credential_boot_receipt: receipt {name} {detail}\n")
+            self.assertIsNone(absolute.search(result.stderr), result.stderr)
+
+        self.receipts.mkdir(parents=True, mode=0o700)
+        only = self.receipts / f"00000001-{cbr.receipt_label(self.clock, BOOT_A)}.json"
+        only.write_text(json.dumps({"schema_version": 1, "kind": "credential_boot_receipt"}))
+        refused(only.name, "is malformed: rows is missing or has the wrong type")
+        only.unlink()
+        self.plant("tavily.env", "TAVILY_API_KEY")
+        _, receipt, _ = self.record(BOOT_A, 0)
+        tavily = next(index for index, row in enumerate(receipt["rows"]) if row["id"] == "tavily")
+        newer = self.receipts / f"00000002-{cbr.receipt_label(self.clock + timedelta(seconds=1), BOOT_B)}.json"
+
+        def broken(change):
+            copied = json.loads(json.dumps(receipt))
+            change(copied)
+            return copied
+
+        for content, detail in (
+                (broken(lambda r: r["rows"][0].pop("state")), "is malformed: rows[0].state is missing or has the wrong type"),
+                (broken(lambda r: r["rows"][tavily]["fingerprint"].update(sha256="0" * 64)),
+                 f"is malformed: rows[{tavily}].fingerprint is missing or has the wrong type"),
+                (broken(lambda r: r.update(keyring_names="tavily_api_key")),
+                 "is malformed: keyring_names is missing or has the wrong type"),
+                (broken(lambda r: r.pop("claude_user_guard_matches_pin")),
+                 "is malformed: claude_user_guard_matches_pin is missing or has the wrong type"),
+                (broken(lambda r: r["coverage"].pop("undeclared_store_files")),
+                 "is malformed: coverage is missing or has the wrong type"),
+                ([receipt], "is not a schema 1 credential_boot_receipt")):
+            with self.subTest(detail=detail):
+                newer.write_text(json.dumps(content))
+                refused(newer.name, detail)
+        newer.unlink()
+        self.assertEqual(self.run_cli("compare").returncode, 0)  # the good receipt alone is the baseline again
+
     def test_a_plain_start_reruns_isolated(self):
         # Started without -I, the tool re-executes itself with -I (as tools/credentials/set_credential.py does), so a
         # module planted on PYTHONPATH is never imported by it.

@@ -236,8 +236,11 @@ The second restart safeguard of the same design (D1 PR-3), built on branch
    stamped 60 s earlier had reversed the order and read a deleted file as
    `missing -> ok`). Receipts named before sequence numbers sort before
    every sequenced one. It exits 1 when a required or optional file row
-   that was `ok` is no longer `ok` or has no row, 2 without a readable
-   receipt, and 0 otherwise; a single receipt is reported as the baseline.
+   that was `ok` is no longer `ok` or has no row, and 0 otherwise; a single
+   receipt is reported as the baseline. It exits 2 without a readable
+   receipt or when a receipt it reads lacks a field or holds one of the
+   wrong type, as the baseline or the newer of two, with one line naming
+   the receipt file only and no traceback (review finding, 2026-09-29).
 3. `adoption/templates/systemd/credential-boot-receipt.service` runs `record`
    as a `Type=oneshot` wanted by `default.target`, from `@REPOSITORY@`, which
    the workstation renders to its live clone as it does for its other units:

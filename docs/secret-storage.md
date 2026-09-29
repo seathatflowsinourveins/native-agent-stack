@@ -1364,7 +1364,8 @@ After the restart:
    `kernel keyring names: <names> -> none (memory only: a kernel restart erases
    them)`; `claude_user_guard_matches_pin: true -> true`; `result: ok`. Exit 1
    ends with `result: regression: <ids>`, naming each required or optional file
-   row that was `ok` and is not; exit 2 means no receipt could be read.
+   row that was `ok` and is not; exit 2 means no receipt could be read or one
+   is malformed, and its one line names the receipt file.
 6. If a canary was kept, consume, verify and clean it up with that harness: it
    shows a stored key injected by id after a restart with no person involved.
 7. Publish sanitized, value-free output with host paths stripped, in a
