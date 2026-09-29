@@ -21,9 +21,12 @@ position with the index module's own functions. `tools/sota-convergence/blind_ch
 because it names every layer's winner by value. No catalog is merged or retired.
 
 **The rule** (frozen 2026-09-29, `RULE` in the script; order within a layer only, no order across layers). Placements are
-one per (layer, entity), keeping every source record; `out_of_scope` goes to `outside_ranking`, `observed_failure` to
-`caution`, and everything else is ranked, in the two `pending_lanes` layers too. Keys compare lexicographically, smaller
-first, with no arithmetic across keys:
+one per (layer, entity), keeping every source record; when an entity has more than one record of its governing role in
+a layer (two winner component ids of one repository, or two alternatives of one repository, which the validators allow),
+the first record by path and pointer governs the placement and a `role/duplicate-role-record` status item lists every
+such record, so none is merged silently. `out_of_scope` goes to `outside_ranking`, `observed_failure` to `caution`, and
+everything else is ranked, in the two `pending_lanes` layers too. Keys compare lexicographically, smaller first, with no
+arithmetic across keys:
 
 1. **recorded_role**: verdict winner 0, verdict alternative 1, card-only candidate 2. A card never raises a role.
 2. **evidence_tier**: A for `native_proven`/`measured_comparison` (and card kinds `native_execution`/`measured_comparison`,

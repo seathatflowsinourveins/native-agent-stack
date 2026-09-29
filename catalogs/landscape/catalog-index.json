@@ -2,8 +2,8 @@
   "counts": {
     "conservation": {
       "coverage": {
-        "classified": 93,
-        "listed": 93
+        "classified": 94,
+        "listed": 94
       },
       "decision_index_records": 875,
       "entities": 875,
@@ -12,8 +12,8 @@
         "listed": 25
       },
       "receipts": {
-        "attached": 171,
-        "listed": 171,
+        "attached": 172,
+        "listed": 172,
         "unattached": 0
       }
     },
@@ -21,13 +21,13 @@
       "decision_index_source": 30,
       "index_input": 8,
       "matrix_input": 4,
-      "not_reached": 51,
+      "not_reached": 52,
       "unmodeled_collections": 5
     },
     "freshness": {
       "winner_pin_current": {
-        "false": 15,
-        "true": 32,
+        "false": 14,
+        "true": 33,
         "unknown": 19
       }
     },
@@ -35,7 +35,7 @@
     "overturn_metrics": {
       "class_vs_verification_flipped_pairs": 4,
       "class_vs_verification_flipped_winner_pairs": 0,
-      "pin_current_tiebreak_would_unshare": 17
+      "pin_current_tiebreak_would_unshare": 23
     },
     "placements": {
       "caution": 0,
@@ -57,17 +57,18 @@
       "unresolved_records": 0
     },
     "status_items": {
-      "coverage/not-reached": 51,
+      "coverage/not-reached": 52,
       "domain-card/default-never-winner": 8,
       "evidence/class-verification-inversion": 4,
       "evidence/mixed-kind": 25,
       "evidence/unmapped-kind": 4,
       "evidence/winner-tier-below-alternative": 6,
       "freshness/layer-reopened": 30,
-      "freshness/pin-behind-upstream": 34,
+      "freshness/pin-behind-upstream": 33,
       "identity/component-id-conflict": 0,
       "identity/multiple-component-ids": 8,
       "identity/unresolved": 0,
+      "role/duplicate-role-record": 0,
       "role/selected-card-no-verdict": 11,
       "role/selected-card-not-winner": 72,
       "role/winner-card-not-selected": 4,
@@ -283,6 +284,10 @@
       },
       {
         "path": "catalogs/sota-convergence/manifest-20260926.json",
+        "reached_as": "not_reached"
+      },
+      {
+        "path": "catalogs/sota-convergence/manifest-20260929.json",
         "reached_as": "matrix_input"
       },
       {
@@ -2224,12 +2229,13 @@
           "terminal-experience-20260928",
           "token-practice-coverage-20260920",
           "token-practice-native-pairs-20260920",
-          "ultracode-token-routing-20260921"
+          "ultracode-token-routing-20260921",
+          "wsl-terminal-defaults-20260929"
         ],
         "kinds": {
           "artifact_measurement": 3,
           "historical_inventory": 3,
-          "native_cli_e2e": 36,
+          "native_cli_e2e": 37,
           "native_model_e2e": 21,
           "upstream_provenance": 1
         }
@@ -11583,12 +11589,13 @@
           "token-practice-coverage-20260920",
           "token-practice-gap-followup-20260920",
           "token-practice-native-pairs-20260920",
-          "ultracode-token-routing-20260921"
+          "ultracode-token-routing-20260921",
+          "wsl-terminal-defaults-20260929"
         ],
         "kinds": {
           "artifact_measurement": 1,
           "historical_inventory": 3,
-          "native_cli_e2e": 32,
+          "native_cli_e2e": 33,
           "native_model_e2e": 17,
           "upstream_provenance": 1
         }
@@ -18318,6 +18325,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -18613,6 +18624,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -19130,6 +19145,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -19469,6 +19488,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -19860,6 +19883,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -19891,11 +19918,9 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [
-            "freshness/pin-behind-upstream"
-          ],
+          "flags": [],
           "freshness": {
-            "pin_current": "false"
+            "pin_current": "true"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -20453,6 +20478,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -20482,10 +20511,11 @@
             "tier": "C"
           },
           "flags": [
-            "evidence/winner-tier-below-alternative"
+            "evidence/winner-tier-below-alternative",
+            "freshness/pin-behind-upstream"
           ],
           "freshness": {
-            "pin_current": "true"
+            "pin_current": "false"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -20734,6 +20764,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -21343,6 +21377,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -21953,6 +21991,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -22070,9 +22112,11 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [],
+          "flags": [
+            "freshness/pin-behind-upstream"
+          ],
           "freshness": {
-            "pin_current": "true"
+            "pin_current": "false"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -22361,6 +22405,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -22417,11 +22465,9 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [
-            "freshness/pin-behind-upstream"
-          ],
+          "flags": [],
           "freshness": {
-            "pin_current": "false"
+            "pin_current": "true"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -22480,11 +22526,9 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [
-            "freshness/pin-behind-upstream"
-          ],
+          "flags": [],
           "freshness": {
-            "pin_current": "false"
+            "pin_current": "true"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -22554,6 +22598,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -22699,11 +22747,9 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [
-            "freshness/pin-behind-upstream"
-          ],
+          "flags": [],
           "freshness": {
-            "pin_current": "false"
+            "pin_current": "true"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -22935,6 +22981,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -23090,11 +23140,10 @@
             "tier": "B"
           },
           "flags": [
-            "evidence/winner-tier-below-alternative",
-            "freshness/pin-behind-upstream"
+            "evidence/winner-tier-below-alternative"
           ],
           "freshness": {
-            "pin_current": "false"
+            "pin_current": "true"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -23745,6 +23794,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -24285,6 +24338,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -24660,6 +24717,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -25043,6 +25104,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -25199,6 +25264,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -25672,6 +25741,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -26134,6 +26207,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -26606,6 +26683,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "verdict_checked_at": "2026-09-22",
@@ -26662,10 +26743,11 @@
             "tier": "B"
           },
           "flags": [
-            "evidence/winner-tier-below-alternative"
+            "evidence/winner-tier-below-alternative",
+            "freshness/pin-behind-upstream"
           ],
           "freshness": {
-            "pin_current": "true"
+            "pin_current": "false"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -26724,11 +26806,10 @@
             "tier": "B"
           },
           "flags": [
-            "evidence/winner-tier-below-alternative",
-            "freshness/pin-behind-upstream"
+            "evidence/winner-tier-below-alternative"
           ],
           "freshness": {
-            "pin_current": "false"
+            "pin_current": "true"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -27367,11 +27448,9 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [
-            "freshness/pin-behind-upstream"
-          ],
+          "flags": [],
           "freshness": {
-            "pin_current": "false"
+            "pin_current": "true"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -34431,9 +34510,11 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [],
+          "flags": [
+            "freshness/pin-behind-upstream"
+          ],
           "freshness": {
-            "pin_current": "true"
+            "pin_current": "false"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -37499,9 +37580,11 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [],
+          "flags": [
+            "freshness/pin-behind-upstream"
+          ],
           "freshness": {
-            "pin_current": "true"
+            "pin_current": "false"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -40597,9 +40680,11 @@
             "retained_local_result": null,
             "tier": "A"
           },
-          "flags": [],
+          "flags": [
+            "freshness/pin-behind-upstream"
+          ],
           "freshness": {
-            "pin_current": "true"
+            "pin_current": "false"
           },
           "matrix_record": {
             "path": "catalogs/landscape/component-evidence-matrix.json",
@@ -41672,7 +41757,7 @@
         "term": "entity"
       },
       {
-        "definition": "One per (layer, entity), with every source record kept in role_records; role precedence winner, then alternative, then candidate. One entity can hold a different placement in each layer.",
+        "definition": "One per (layer, entity), with every source record kept in role_records; role precedence winner, then alternative, then candidate. One entity can hold a different placement in each layer. When an entity has more than one record of its governing role in a layer, the first by path and pointer governs the placement's component, evidence and verification, and a role/duplicate-role-record status item lists every such record.",
         "term": "placement"
       },
       {
@@ -42039,6 +42124,14 @@
       "message": "catalogs/sota-convergence/manifest-20260923.json: listed, but no record of it is joined into the index",
       "refs": [
         "catalogs/sota-convergence/manifest-20260923.json"
+      ],
+      "type": "coverage/not-reached"
+    },
+    {
+      "level": "info",
+      "message": "catalogs/sota-convergence/manifest-20260926.json: listed, but no record of it is joined into the index",
+      "refs": [
+        "catalogs/sota-convergence/manifest-20260926.json"
       ],
       "type": "coverage/not-reached"
     },
@@ -42667,7 +42760,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/agent-sdks: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/agent-sdks: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/agent-sdks"
       ],
@@ -42675,7 +42768,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/ci-supply-chain: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/ci-supply-chain: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/ci-supply-chain"
       ],
@@ -42683,7 +42776,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/code-navigation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/code-navigation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/code-navigation"
       ],
@@ -42691,7 +42784,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/document-retrieval: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/document-retrieval: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/document-retrieval"
       ],
@@ -42699,7 +42792,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/durable-memory: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/durable-memory: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/durable-memory"
       ],
@@ -42707,7 +42800,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/git-github-automation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/git-github-automation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/git-github-automation"
       ],
@@ -42715,7 +42808,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/hosting-services: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/hosting-services: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/hosting-services"
       ],
@@ -42723,7 +42816,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/instructions-skills: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/instructions-skills: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/instructions-skills"
       ],
@@ -42731,7 +42824,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/isolation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/isolation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/isolation"
       ],
@@ -42739,7 +42832,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/mcp-surfaces: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/mcp-surfaces: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/mcp-surfaces"
       ],
@@ -42747,7 +42840,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/native-clients: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/native-clients: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/native-clients"
       ],
@@ -42755,7 +42848,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/observation-inference: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/observation-inference: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/observation-inference"
       ],
@@ -42763,7 +42856,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/quality-evaluation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/quality-evaluation: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/quality-evaluation"
       ],
@@ -42771,7 +42864,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/recovery-portability: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/recovery-portability: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/recovery-portability"
       ],
@@ -42779,7 +42872,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/scheduling-supervision: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/scheduling-supervision: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/scheduling-supervision"
       ],
@@ -42787,7 +42880,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/secrets-credentials: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/secrets-credentials: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/secrets-credentials"
       ],
@@ -42795,7 +42888,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/semantic-rag: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/semantic-rag: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/semantic-rag"
       ],
@@ -42803,7 +42896,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/token-efficiency: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/token-efficiency: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/token-efficiency"
       ],
@@ -42811,7 +42904,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/web-research: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/web-research: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/web-research"
       ],
@@ -42819,7 +42912,7 @@
     },
     {
       "level": "info",
-      "message": "layer:foundation/workers: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926) covers this layer; the recorded roles stand until the verdict is re-recorded",
+      "message": "layer:foundation/workers: a completed sweep dated after the verdict (landscape-sweep-20260923, landscape-sweep-20260926, landscape-sweep-20260929) covers this layer; the recorded roles stand until the verdict is re-recorded",
       "refs": [
         "layer:foundation/workers"
       ],
@@ -42943,19 +43036,19 @@
     },
     {
       "level": "info",
-      "message": "repo:akitaonrails/ai-memory: pin_current is false for component ai-memory (display only, never a sort key)",
+      "message": "repo:cli/cli: pin_current is unknown for component candidate:cli-cli (display only, never a sort key)",
       "refs": [
-        "layer:foundation/durable-memory",
-        "repo:akitaonrails/ai-memory"
+        "layer:foundation/git-github-automation",
+        "repo:cli/cli"
       ],
       "type": "freshness/pin-behind-upstream"
     },
     {
       "level": "info",
-      "message": "repo:cli/cli: pin_current is unknown for component candidate:cli-cli (display only, never a sort key)",
+      "message": "repo:max-sixty/worktrunk: pin_current is false for component worktrunk (display only, never a sort key)",
       "refs": [
         "layer:foundation/git-github-automation",
-        "repo:cli/cli"
+        "repo:max-sixty/worktrunk"
       ],
       "type": "freshness/pin-behind-upstream"
     },
@@ -42997,28 +43090,10 @@
     },
     {
       "level": "info",
-      "message": "repo:modelcontextprotocol/inspector: pin_current is false for component mcp-inspector (display only, never a sort key)",
+      "message": "repo:max-sixty/worktrunk: pin_current is false for component worktrunk (display only, never a sort key)",
       "refs": [
-        "layer:foundation/mcp-surfaces",
-        "repo:modelcontextprotocol/inspector"
-      ],
-      "type": "freshness/pin-behind-upstream"
-    },
-    {
-      "level": "info",
-      "message": "repo:openclaw/mcporter: pin_current is false for component mcporter (display only, never a sort key)",
-      "refs": [
-        "layer:foundation/mcp-surfaces",
-        "repo:openclaw/mcporter"
-      ],
-      "type": "freshness/pin-behind-upstream"
-    },
-    {
-      "level": "info",
-      "message": "repo:anthropics/claude-code: pin_current is false for component claude-code (display only, never a sort key)",
-      "refs": [
-        "layer:foundation/native-clients",
-        "repo:anthropics/claude-code"
+        "layer:foundation/isolation",
+        "repo:max-sixty/worktrunk"
       ],
       "type": "freshness/pin-behind-upstream"
     },
@@ -43028,15 +43103,6 @@
       "refs": [
         "layer:foundation/native-clients",
         "repo:openai/codex"
-      ],
-      "type": "freshness/pin-behind-upstream"
-    },
-    {
-      "level": "info",
-      "message": "repo:prometheus/prometheus: pin_current is false for component prometheus (display only, never a sort key)",
-      "refs": [
-        "layer:foundation/observation-inference",
-        "repo:prometheus/prometheus"
       ],
       "type": "freshness/pin-behind-upstream"
     },
@@ -43105,19 +43171,10 @@
     },
     {
       "level": "info",
-      "message": "repo:anthropics/claude-code: pin_current is false for component claude-code (display only, never a sort key)",
+      "message": "repo:max-sixty/worktrunk: pin_current is false for component worktrunk (display only, never a sort key)",
       "refs": [
         "layer:foundation/workers",
-        "repo:anthropics/claude-code"
-      ],
-      "type": "freshness/pin-behind-upstream"
-    },
-    {
-      "level": "info",
-      "message": "repo:akitaonrails/ai-memory: pin_current is false for component foundation-ai-memory (display only, never a sort key)",
-      "refs": [
-        "layer:us-equities/agents-models-workers",
-        "repo:akitaonrails/ai-memory"
+        "repo:max-sixty/worktrunk"
       ],
       "type": "freshness/pin-behind-upstream"
     },
@@ -43186,10 +43243,28 @@
     },
     {
       "level": "info",
+      "message": "repo:dgunning/edgartools: pin_current is false for component data-edgartools (display only, never a sort key)",
+      "refs": [
+        "layer:us-equities/market-data-reference",
+        "repo:dgunning/edgartools"
+      ],
+      "type": "freshness/pin-behind-upstream"
+    },
+    {
+      "level": "info",
       "message": "repo:skfolio/skfolio: pin_current is unknown for component skfolio (display only, never a sort key)",
       "refs": [
         "layer:us-equities/portfolio-risk",
         "repo:skfolio/skfolio"
+      ],
+      "type": "freshness/pin-behind-upstream"
+    },
+    {
+      "level": "info",
+      "message": "repo:dgunning/edgartools: pin_current is false for component data-edgartools (display only, never a sort key)",
+      "refs": [
+        "layer:us-equities/research-factors-ml",
+        "repo:dgunning/edgartools"
       ],
       "type": "freshness/pin-behind-upstream"
     },
@@ -43208,6 +43283,15 @@
       "refs": [
         "layer:us-equities/security-supply-chain",
         "repo:anchore/grype"
+      ],
+      "type": "freshness/pin-behind-upstream"
+    },
+    {
+      "level": "info",
+      "message": "repo:duckdb/duckdb: pin_current is false for component data-duckdb (display only, never a sort key)",
+      "refs": [
+        "layer:us-equities/storage-compute",
+        "repo:duckdb/duckdb"
       ],
       "type": "freshness/pin-behind-upstream"
     },
@@ -44076,11 +44160,11 @@
     },
     {
       "level": "info",
-      "message": "sweep manifests in use differ: catalogs/landscape/manifest.json sources.trading_taxonomy: catalogs/sota-convergence/manifest-20260922.json; scripts/new_host_grand_list.py MANIFEST: catalogs/sota-convergence/manifest-20260923.json; the component evidence matrix summary.convergence.newest_manifest: catalogs/sota-convergence/manifest-20260926.json; the index follows the matrix",
+      "message": "sweep manifests in use differ: catalogs/landscape/manifest.json sources.trading_taxonomy: catalogs/sota-convergence/manifest-20260922.json; scripts/new_host_grand_list.py MANIFEST: catalogs/sota-convergence/manifest-20260923.json; the component evidence matrix summary.convergence.newest_manifest: catalogs/sota-convergence/manifest-20260929.json; the index follows the matrix",
       "refs": [
         "catalogs/sota-convergence/manifest-20260922.json",
         "catalogs/sota-convergence/manifest-20260923.json",
-        "catalogs/sota-convergence/manifest-20260926.json"
+        "catalogs/sota-convergence/manifest-20260929.json"
       ],
       "type": "source/sweep-manifest-divergence"
     },

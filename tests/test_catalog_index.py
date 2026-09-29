@@ -678,6 +678,38 @@ class ConflictAndShapeTests(IndexCase):
         win = self.placement(document, layer_ref, "repo:example/win")
         self.assertIn(("candidate", "unqualified"), [(r["role"], r["disposition"]) for r in win["role_records"]])
 
+    def test_duplicate_role_records_are_flagged_never_merged_silently(self):  # 38 (repair round, review item 5)
+        # Two winner component ids of one repository in one layer (scripts/landscape.py forbids only a duplicate
+        # component_id), and two alternatives of one repository (no uniqueness check there): the first record by
+        # path and pointer governs the placement, and each duplicate is a status item, never dropped.
+        self.tree.layer("l1", W("example/tool", "tool"), W("example/tool", "tool-sdk", declared="conditional",
+                                                         derived="conditional"),
+                        A("example/alt", disposition="conditional"), A("example/alt", disposition="overlap"),
+                        C("example/card"))
+        document = self.build()
+        layer_ref = "layer:foundation/l1"
+        duplicates = self.items(document, "role/duplicate-role-record")
+        self.assertEqual(
+            [item["refs"] for item in duplicates],
+            [[layer_ref, "repo:example/alt", FOUNDATION_LEDGER + "#/layers/0/alternatives/0",
+              FOUNDATION_LEDGER + "#/layers/0/alternatives/1"],
+             [layer_ref, "repo:example/tool", FOUNDATION_LEDGER + "#/layers/0/winners/0",
+              FOUNDATION_LEDGER + "#/layers/0/winners/1"]])
+        self.assertEqual({item["level"] for item in duplicates}, {"warning"})
+        tool = self.placement(document, layer_ref, "repo:example/tool")
+        self.assertEqual((tool["role"], tool["component_id"]), ("winner", "tool"))
+        self.assertEqual(sorted((r["role"], r["pointer"]) for r in tool["role_records"]),
+                         [("winner", "/layers/0/winners/0"), ("winner", "/layers/0/winners/1")])
+        self.assertIn("role/duplicate-role-record", tool["flags"])
+        self.assertIn("tool-sdk", duplicates[1]["message"])
+        alt = self.placement(document, layer_ref, "repo:example/alt")
+        self.assertEqual(sorted((r["pointer"], r["disposition"]) for r in alt["role_records"]),
+                         [("/layers/0/alternatives/0", "conditional"), ("/layers/0/alternatives/1", "overlap")])
+        self.assertIn("role/duplicate-role-record", alt["flags"])
+        self.assertNotIn("role/duplicate-role-record", self.placement(document, layer_ref, "repo:example/card")["flags"])
+        self.assertEqual(self.entity(document, "repo:example/tool")["component_ids"], ["tool", "tool-sdk"])
+        self.assertEqual(document["counts"]["status_items"]["role/duplicate-role-record"], 2)
+
     def test_no_blended_or_weighted_field_is_emitted(self):  # 17
         self.tree.layer("l1", W("example/win"), A("example/alt"), C("example/card"))
         document = self.build()

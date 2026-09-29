@@ -159,6 +159,7 @@ STATUS_TYPES = {
     "identity/component-id-conflict": "error",
     "identity/multiple-component-ids": "info",
     "identity/unresolved": "warning",
+    "role/duplicate-role-record": "warning",
     "role/selected-card-no-verdict": "info",
     "role/selected-card-not-winner": "warning",
     "role/winner-card-not-selected": "warning",
@@ -226,7 +227,9 @@ DEFINITIONS = (
      "does not resolve is listed in unresolved with its reason."),
     ("placement",
      "One per (layer, entity), with every source record kept in role_records; role precedence winner, then "
-     "alternative, then candidate. One entity can hold a different placement in each layer."),
+     "alternative, then candidate. One entity can hold a different placement in each layer. When an entity has more "
+     "than one record of its governing role in a layer, the first by path and pointer governs the placement's "
+     "component, evidence and verification, and a role/duplicate-role-record status item lists every such record."),
     ("matrix_record",
      "For a winner or alternative, the pointer to its entry in the generated component evidence matrix, which keeps "
      "the winner's pin verbatim. The index does not repeat pins, so no bare 40-hex commit id appears in it: this "
@@ -640,6 +643,17 @@ class _Build:
         role = governing["role"]
         require(not pending or role == "candidate", "F4",
                 f"{layer_ref}: a pending_lanes layer has a {role} role for {entity}")
+        same_role = [record for record in records if record["role"] == role]
+        if len(same_role) > 1:
+            # The validators allow it (scripts/landscape.py forbids only a duplicate winner component_id), and one
+            # placement per (layer, entity) can carry one record's fields: the first governs, none is dropped.
+            sources = [f"{record['path']}#{record['pointer']}" for record in same_role]
+            names = [str((record["matrix"] or record["ledger"]).get("component_id" if role == "winner" else "name"))
+                     for record in same_role]
+            self.item("role/duplicate-role-record",
+                      f"{entity}: {len(same_role)} {role} records in {layer_ref} ({', '.join(names)}); the first, "
+                      f"{sources[0]}, governs this placement's component, evidence and verification, and every "
+                      "record stays in role_records", [layer_ref, entity, *sources], [(layer_ref, entity)])
         entry = {
             "entity": entity, "role": role,
             "role_records": [{"path": record["path"], "pointer": record["pointer"], "role": record["role"],
