@@ -280,6 +280,13 @@ SUBSTITUTION_BUDGET_FLOOR = 65536
 # about 9 microseconds a character inside quotes; above this length only the first reading is made, so a very large command
 # costs what it always did (a 840 KB message took 8.6 s once and 17.8 s twice, and the hook's timeout is 10 s).
 LEGACY_READING_LIMIT = 200_000
+# The most characters main() reads (a longer command is refused as `command_too_large`, check() itself has no such limit). A PreToolUse
+# command hook that runs past its timeout does not block the call (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A
+# timed-out `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), this hook's timeout is 10 s, and the tokenizer costs
+# about 9 microseconds a character inside quotes: measured on this host on 2026-09-29, one quoted word of 1,000,000 characters took 10.2 to
+# 13.0 s (base c26800f3 and this version alike, over several runs), 600,000 took 3.8 to 4.4 s and 500,000 took 2.9 to 3.3 s. Refusing
+# what cannot be read in time fails closed where reading it would fail open.
+MAX_COMMAND_CHARACTERS = 600_000
 # Programs that only store or print what a command substitution gives them as an argument: `git commit -m "$(cat <<'EOF' ... EOF)"`, `gh pr
 # create --body "$(...)"`, `echo`, `printf`, `cat`, `tee`. The body of a quoted here-document inside a double-quoted substitution is data
 # for them, so prose in a commit message or a pull request body is no command line (scan_shell). What a substitution prints is CODE for a
@@ -380,6 +387,9 @@ HINTS = {
                                    "node; echo \"$PATH\"'",
     "guard_error": "the guard could not read this command, so it blocks it; split it into smaller commands or "
                    "simplify its quoting, substitutions and launchers",
+    "command_too_large": f"the guard cannot read a command of more than {MAX_COMMAND_CHARACTERS:,} characters before its hook "
+                         "timeout, and a hook that times out blocks nothing, so it blocks the command; put the content in a "
+                         "file with the Write tool and pass the path",
 }
 
 
@@ -1528,6 +1538,12 @@ def main() -> int:
     command = (payload.get("tool_input") or {}).get("command")
     if not isinstance(command, str):
         return 0
+    if len(command) > MAX_COMMAND_CHARACTERS:
+        # A hook that times out blocks nothing (see MAX_COMMAND_CHARACTERS), so what the guard cannot read in time is refused, before any
+        # rule reads it. The line names no command text, as guard_error's.
+        print(f"secret_path_guard: blocked (command_too_large). {HINTS['command_too_large'][0].upper()}"
+              f"{HINTS['command_too_large'][1:]}.", file=sys.stderr)
+        return 2
     try:
         reason = check(command)
     except Exception:  # noqa: BLE001 - RecursionError and MemoryError included
