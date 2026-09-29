@@ -750,9 +750,12 @@ verifier is qualified as capability evidence only.
   (`LocalFileSystem::read_directory` classifies a link by its target,
   [`codex-rs/exec-server/src/local_file_system.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec-server/src/local_file_system.rs#L710-L735)
   at `rust-v0.157.1`) and loads what it finds behind one as roles, which a walk that skipped the link
-  would miss. Observed with `codex-cli 0.157.1` through `codex doctor --json` in a scratch home: a
-  malformed role behind a linked folder, or behind a link named `x.toml` to a file, is one role
-  warning; behind a dangling link, or a link whose own name is not `*.toml`, none.
+  would miss. Checked against `codex-cli 0.157.1` through `codex doctor --json` in a scratch home with
+  the network off, by `CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it`
+  in `tests/test_codex_worker_lane.py` (local integration, `NAS_CODEX_INTEGRATION=1`): a malformed role
+  behind a linked folder, or behind a link named `x.toml` to a file, is one role warning; behind a
+  dangling link, or a link whose own name is not `*.toml`, none; and the count is never below what
+  Codex collected. If a later pin stops following links, that test fails and the rule can be revisited.
 - **Role text.** Adapted sentence by sentence from the Claude carriers (17 sentences of the researcher
   and 16 of the verifier are kept byte for byte and pinned by a test), with a one-agent rule, a
   working-directory rule and `jq` output among the exact command shapes added. The working-directory

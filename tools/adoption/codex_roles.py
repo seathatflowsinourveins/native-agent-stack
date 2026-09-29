@@ -392,8 +392,9 @@ def agents_toml_count(directory: Path) -> int | None:
     way codex-rs/agent-roles/src/discovery.rs collects role files.
 
     Codex follows links there: LocalFileSystem::read_directory takes a link's target's type (codex-rs/exec-server/src/
-    local_file_system.rs:710-735 at rust-v0.157.1; observed with codex-cli 0.157.1 through `codex doctor --json`), so it
-    enters a linked folder and collects a link to a regular file by the link's own name. This count never enters a link,
+    local_file_system.rs:710-735 at rust-v0.157.1; checked against codex-cli 0.157.1 through `codex doctor --json` by
+    tests/test_codex_worker_lane.py CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it, which
+    needs NAS_CODEX_INTEGRATION=1), so it enters a linked folder and collects a link to a regular file by the link's own name. This count never enters a link,
     so a link to a folder anywhere below `directory`, whatever its name, makes it unknown (None): what lies behind the
     link is not attested here, and a count that skipped it would report fewer role files than Codex loads. A link to a
     file named *.toml is counted and never read; so is a dangling one, which Codex skips (an overcount, the safe side).

@@ -1167,8 +1167,8 @@ def toml_names(folder: Path) -> tuple[Optional[list[str]], Optional[str]]:
     """(the sorted relative names of the *.toml files below `folder`, reason), the way codex-rs/agent-roles/src/discovery.rs
     collects role files at rust-v0.157.1 and tools/adoption/codex_roles.py agents_toml_count counts them: recursively, by the
     exact extension. A link to a file named *.toml is listed and never read. Codex follows links (LocalFileSystem::read_directory
-    takes a link's target's type, codex-rs/exec-server/src/local_file_system.rs:710-735; observed with codex-cli 0.157.1
-    through `codex doctor --json`), so it enters a linked folder; this never does, and a set that skipped one would undercount:
+    takes a link's target's type, codex-rs/exec-server/src/local_file_system.rs:710-735; checked against codex-cli 0.157.1
+    through `codex doctor --json` by tests/test_codex_worker_lane.py CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it), so it enters a linked folder; this never does, and a set that skipped one would undercount:
     a link to a folder anywhere below, whatever its name, is (None, "linked_folder"). No names for an absent folder ([]), and
     (None, reason) when `folder` is not a real folder, a folder link is below it, or any part of it cannot be read."""
     kind = path_kind(folder)
