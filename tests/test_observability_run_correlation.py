@@ -446,8 +446,10 @@ class NativeRunCorrelationTests(unittest.TestCase):
         nested_call = f"exec-{uuid.UUID(int=0xAAAAAAAA_BBBB_4CCC_8DDD_EEEEEEEEEEEE)}"
         longest_call = "call_" + "b" * 123  # 128 characters: the guard's upper bound
         untagged_call = "call_" + "SecondResourceIdentifier"
+        receipt_call = "call_" + "SdkReceiptIdentifier1"  # an SDK receipt file must never export a call id
         dropped = {"129-character id": "call_" + "d" * 124, "id with spaces": "call id with spaces",
-                   "tag with spaces": "synthetic run B", "host name": "synthetic-host-name", "content": self.SECRET}
+                   "tag with spaces": "synthetic run B", "host name": "synthetic-host-name", "content": self.SECRET,
+                   "SDK receipt call id": receipt_call}
         result = {"event.name": "codex.tool_result", "conversation.id": "synthetic-conversation",
                   "tool_name": "exec_command", "tool_namespace": "functions", "duration_ms": "3", "success": "true",
                   "arguments": json.dumps({"cmd": self.SECRET}), "output": self.SECRET}
@@ -470,6 +472,8 @@ class NativeRunCorrelationTests(unittest.TestCase):
               "host.name": dropped["host name"]}, tagged),
             ({"service.name": "codex_exec", "service.version": "0.157.1", "env": dropped["tag with spaces"]},
              [{**result, "call_id": untagged_call}]),
+            ({"service.name": "codex-sdk-receipt", "ecosystem.client.scope": "sdk-receipt"},
+             [{"event.name": "ecosystem.sdk_receipt", "receipt_id": "synthetic-sdk", "call_id": receipt_call}]),
         ]
         body = {"resourceLogs": [
             {"resource": {"attributes": otlp_attributes(attributes)},
@@ -484,7 +488,8 @@ class NativeRunCorrelationTests(unittest.TestCase):
 
         selector = '{service_name="codex_exec"}'
         deadline = time.monotonic() + 30
-        while len(self.query_rows(selector)) < 8 and time.monotonic() < deadline:
+        receipts = '{service_name="codex-sdk-receipt"}'
+        while (len(self.query_rows(selector)) < 8 or len(self.query_rows(receipts)) < 1) and time.monotonic() < deadline:
             time.sleep(0.2)
         launch = selector + f' | env="{tag}"'
         results = launch + ' | event_name="codex.tool_result"'
@@ -500,6 +505,8 @@ class NativeRunCorrelationTests(unittest.TestCase):
             "tagged results whose call_id was dropped": results + ' | call_id=""',
             "records without a launch tag": selector + ' | env=""',
             "untagged result keeping its call_id": selector + f' | env="" | call_id="{untagged_call}"',
+            "SDK receipts": receipts,
+            "SDK receipts without a call id": receipts + ' | call_id=""',
         }
         observed = {name: len(self.query_rows(query)) for name, query in queries.items()}
         self.assertEqual(observed, {
@@ -507,9 +514,10 @@ class NativeRunCorrelationTests(unittest.TestCase):
             "tagged decision for the model call": 1, "tagged result for the model call": 1,
             "tagged result for the nested call": 1, "tagged result for the 128-character id": 1,
             "tagged results whose call_id was dropped": 2, "records without a launch tag": 1,
-            "untagged result keeping its call_id": 1,
+            "untagged result keeping its call_id": 1, "SDK receipts": 1, "SDK receipts without a call id": 1,
         })
-        loki = json.dumps(self.api("query_range", query=selector, start=str(self.start), end=str(time.time_ns()),
+        loki = json.dumps(self.api("query_range", query='{service_name=~"codex_exec|codex-sdk-receipt"}',
+                                   start=str(self.start), end=str(time.time_ns()),
                                    direction="forward", limit="100"))
         for name, value in dropped.items():
             with self.subTest(dropped=name, sink="Loki"):
@@ -526,10 +534,10 @@ class NativeRunCorrelationTests(unittest.TestCase):
                 exported = []  # The file exporter may still be finishing a line.
             exported_records = [(group["resource"], record) for batch in exported for group in batch["resourceLogs"]
                                 for scope in group["scopeLogs"] for record in scope["logRecords"]]
-            if len(exported_records) >= 8 or time.monotonic() >= deadline:
+            if len(exported_records) >= 9 or time.monotonic() >= deadline:
                 break
             time.sleep(0.1)
-        self.assertEqual(len(exported_records), 8)
+        self.assertEqual(len(exported_records), 9)
         for name, value in dropped.items():
             with self.subTest(dropped=name, sink="event file"):
                 self.assertFalse(value in contents, f"{name} reached the event file")
@@ -551,6 +559,7 @@ class NativeRunCorrelationTests(unittest.TestCase):
             ("launch tag", "codex.tool_result", None): 2,
             ("launch tag", "codex.agent_communication", None): 1,
             (None, "codex.tool_result", "untagged call"): 1,
+            (None, "ecosystem.sdk_receipt", None): 1,
         })
 
 
