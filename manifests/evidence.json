@@ -3634,8 +3634,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "21682e5a4c91f1945f2ac766b735099ad7057d4a92dac1e8919cc78391a6c880",
-      "bytes": 12578
+      "sha256": "38d9b173ac5478c00f11a78aa2523a6b838fdba4c2c6b878af22ea77fe438b34",
+      "bytes": 12705
     },
     {
       "path": "CLAUDE.md",
@@ -14780,8 +14780,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "5042ab1baa2db6a9c6b421be7b032ada3802cf6aee23c06aff75ff144a13a112",
-      "bytes": 88475
+      "sha256": "bb936e1921b19769528c48b5d341f75f9c4e1daa9d35f8f6f13c8cc011630406",
+      "bytes": 88615
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -39350,8 +39350,8 @@
     },
     {
       "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
-      "sha256": "e398078e1df9504e30ccc50860203182740714d752cb062238a4e7c8fdf0d9ce",
-      "bytes": 8440
+      "sha256": "6d6ed141f0faff460944c8f42830a4c485e947e9b1a424696ee09cb09423adab",
+      "bytes": 13177
     },
     {
       "path": "evidence/artifacts/token-stack-cards-20260927/cards/agentsview.json",
@@ -39449,6 +39449,11 @@
       "bytes": 39711
     },
     {
+      "path": "evidence/artifacts/token-stack-cards-20260927/counter-readings.json",
+      "sha256": "866dafac99d1b0b43e7c38bea99f8b7e9f53defb9075d96a0c909eb0e7eb96fc",
+      "bytes": 2824
+    },
+    {
       "path": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json",
       "sha256": "7f0129cfa30f9d00f7e470116d5b66ee13c7b97205ae619423d11f66c303e29a",
       "bytes": 66154
@@ -39465,13 +39470,18 @@
     },
     {
       "path": "evidence/artifacts/token-stack-cards-20260927/tools/bundle.py",
-      "sha256": "37e2069ea2348b99f9065d735ea5ddf728ebc86bc80ae5aa8890e73620ef3157",
-      "bytes": 11161
+      "sha256": "363cdd4f856da199f1a876a5393ad84b61d41d144dfd3b82098bed691f967f9d",
+      "bytes": 11244
     },
     {
       "path": "evidence/artifacts/token-stack-cards-20260927/tools/condense.py",
       "sha256": "ce4fa401294397d5d86e9daa38805e3fb39ab29fadb0326d247bdf0277a50db5",
       "bytes": 19478
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/tools/counter_readings.py",
+      "sha256": "cb14cfb9297c8c5cfd83ae1a2b6b05755fe14b5dfbebb8035c1240fa67b06ad0",
+      "bytes": 7562
     },
     {
       "path": "evidence/artifacts/token-workflow-hardening-20260926/README.md",
@@ -42115,8 +42125,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "93a954fa6efdf011e38fca0b1269901fac368191affd783ee0aeadb261981666",
-      "bytes": 63757
+      "sha256": "3f619a9e433e497e690606867a08b46a64ebfd5f905e0e0c57e317dacb5ee4e1",
+      "bytes": 64699
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -42690,8 +42700,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "a3bd9a5b49b80b5be89139bf1ac6b6872c457c68f97c924a2f044a2c460b07b8",
-      "bytes": 96178
+      "sha256": "1be784cb0add9b413ab60da140d46d85d69dda41b7b44d9cece2d242c0370942",
+      "bytes": 99018
     },
     {
       "path": "tests/test_effort_default_guard.py",

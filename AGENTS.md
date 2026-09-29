@@ -23,7 +23,7 @@ Read `docs/token-practice.md` on demand for the selected context lane, native co
 
 - Load only the layer, capability, recipe or guide the current task needs; never preload the full catalog or the generated HTML guide into the startup instructions, a session or every worker.
 - Choose the cheapest measured representation that meets the task's information contract. Known-source reads, compact JSON and full-original reads remain valid defaults when an extra retrieval or compression step is larger or inadequate.
-- For one tool's lanes and adoption, read its row (by `component_id`) in `docs/token-efficiency-stack.json`, which `scripts/build_ecosystem.py` renders.
+- For one tool's adoption, read its row (by `component_id`) in `docs/token-efficiency-stack.json`, which `scripts/build_ecosystem.py` renders; its card is a dated snapshot, and the current lane list is the SubagentStart carrier block `adoption/hooks/claude/token-lanes-block.md`.
 - Delegate a step when only its conclusion is needed, and return concise findings with source or artifact locations.
 - Keep client accounts, model routes, native caching, tool discovery and compaction intact. Do not rerun the full audit or model trials at startup.
 - Count once: never sum cumulative snapshots, overlapping artifact reductions or provider/cache subset counters, and keep native counter snapshots, exact artifact comparisons, cache reuse and complete provider usage separate.
