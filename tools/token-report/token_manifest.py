@@ -534,6 +534,12 @@ def validate_report_sources(entries):
         # subprocess raises ValueError ("embedded null byte") for such an argument; reject it before any refresh.
         if any("\0" in a for a in entry["argv"]):
             raise ValueError("report_sources argv elements must not contain a NUL character")
+        # JSON can carry a lone surrogate ("\ud800"); the UTF-8 manifest write would raise for it and abort the refresh.
+        for text in [entry["name"]]+entry["argv"]:
+            try:
+                text.encode("utf-8")
+            except UnicodeEncodeError:
+                raise ValueError("report_sources name and argv elements must be encodable as UTF-8 (no lone surrogates)") from None
         if entry.get("format","json") not in ("json","text"):
             raise ValueError("report_sources format must be json or text")
         if "timeout" in entry and (type(entry["timeout"]) is not int or not 1<=entry["timeout"]<=600):
@@ -564,9 +570,10 @@ def validate_reserved_report_scopes(config):
                              ", the scope prefix reserved for report_sources")
 
 def stack_component_ids(config):
-    """Component ids in the stack manifest, or None when it is missing or unreadable, so the caller skips its check."""
+    """Component ids in the stack manifest, or None when it is missing, unreadable or lists no component, so the caller
+    skips its check."""
     try:
-        return {c["id"] for c in json.loads(Path(config["stack_manifest"]).read_text())["components"]}
+        return {c["id"] for c in json.loads(Path(config["stack_manifest"]).read_text())["components"]} or None
     except (KeyError,TypeError,OSError,ValueError):
         return None
 
