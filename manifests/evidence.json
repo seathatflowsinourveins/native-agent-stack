@@ -3649,8 +3649,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "0fa15cb11872242abf543d15a496d78b022a9db0179d6a96572bfd27afe4220c",
-      "bytes": 7718
+      "sha256": "3ca2064627ca1dfc068e61a17f30c47ebfb4752cfc2a07c05a42aed398a43f7f",
+      "bytes": 7748
     },
     {
       "path": ".github/pull_request_template.md",
