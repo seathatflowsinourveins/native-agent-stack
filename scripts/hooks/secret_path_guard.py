@@ -23,7 +23,9 @@ also reads the command that an `rtk` invocation runs (`rtk proxy cat F`,
 `rtk read F`, `rtk run -c '...'`) and the command that `systemd-run` starts
 (its own options are skipped as getopt reads them, and a secret variable set
 through its `-E`/`--setenv` or `-p Environment=` is blocked: its command line
-is recorded in the journal and its properties travel over the user bus). For a key
+is recorded in the journal and its properties travel over the user bus), and
+the body of a command substitution inside double quotes (`echo "$(printenv)"`
+runs printenv; single quotes and a backslash-escaped `$(` stay data). For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
 unambiguous keyring, and a keyring read in inline interpreter code), checks
@@ -197,6 +199,9 @@ REDIRECT_OUT = re.compile(r"^\d*(?:>|>>|>\||&>|&>>|>&)$")
 # Every redirection operator as shlex (punctuation_chars) splits it: `2>&1` is `2`, `>&`, `1`, and
 # `<<-EOF` is `<<`, `-EOF`. The word after one is its file, descriptor or here-document delimiter.
 REDIRECTION = re.compile(r"^\d*(?:>>?|>\||&>>?|<<<?|<>|<&|>&|<)$")
+# The start of a here-document in raw command text: `<<` or `<<-`, then its delimiter as a single-quoted, double-quoted or
+# bare word (a backslash also quotes it). Group 1 is the `-`, groups 2 to 4 the delimiter.
+HEREDOC_START = re.compile(r"<<(-?)[ \t]*(?:'([^'\n]*)'|\"([^\"\n]*)\"|((?:\\.|[^\s;&|()<>\\'\"])+))")
 GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 PS_BSD_CLUSTER = re.compile(r"^[aAcfhjlmrsStTuvwxXLn]*e[aAcefhjlmrsStTuvwxXLn]*$")
@@ -205,6 +210,9 @@ PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 TRACE_OPTIONS = {"xtrace", "verbose"}
 MAX_DEPTH = 3
+# Levels of command substitution inside double quotes that expand() reads (substitution_bodies); each level is one
+# linear scan, so the cap only bounds the work on pathological nesting.
+MAX_SUBSTITUTION_NESTING = 32
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
 # <name> <ENV_VAR> -- <command...>` puts a stored key into that command's environment only, and
 # adoption/tools/tvly-keyring runs `tvly` the same way with TAVILY_API_KEY. expand() unwraps both, so
@@ -300,6 +308,107 @@ def segments(tokens: list[str]) -> list[list[str]]:
     if current:
         result.append(current)
     return result
+
+
+def heredoc_end(text: str, position: int, heredocs: list[tuple[str, bool]]) -> int | None:
+    """Index just past the terminator line of the last of `heredocs` (each a delimiter and whether `<<-` strips
+    leading tabs), whose bodies start at text[position]; None when one has no terminator line, which means the `<<`
+    was no here-document (an arithmetic shift, say)."""
+    for delimiter, strip_tabs in heredocs:
+        while True:
+            if position > len(text):
+                return None
+            end = text.find("\n", position)
+            line = text[position:] if end < 0 else text[position:end]
+            position = len(text) + 1 if end < 0 else end + 1
+            if (line.lstrip("\t") if strip_tabs else line) == delimiter:
+                break
+    return position
+
+
+def substitution_bodies(text: str) -> list[str]:
+    """Bodies of the outermost command substitutions that the shell runs inside double quotes: `$(...)` and a
+    backquote pair. Inside double quotes `$` and the backquote keep their meaning and a backslash escapes only
+    `$`, the backquote, `"` and `\\` (Bash Reference Manual, "Double Quotes" and "Command Substitution"); single
+    quotes are data everywhere but inside double quotes, where they are ordinary characters. A `$(` body ends at its
+    matching `)`, read with its own quotes and nesting ("all characters between the parentheses make up the
+    command"); a backquote body ends at the first backquote not preceded by a backslash, and there a backslash before
+    `$`, a backquote, `\\` or `"` is removed. An unterminated substitution runs to the end of the text, as the
+    tokenizer treats a lone apostrophe as an ordinary character. Substitutions inside a returned body are not
+    returned: expand() reads that body again. One inside an unquoted `$(...)` is: the tokenizer already splits that
+    body's commands, but not the double-quoted words in it. The body of a here-document is literal text for this
+    scan, as it is for the shell's parser when it looks for the `)` that ends a `$(`: prose in it (an unbalanced
+    parenthesis, an apostrophe, backquotes) opens nothing. How the guard reads those bodies as commands is a separate
+    matter and this scan does not touch it."""
+    bodies: list[str] = []
+    heredocs: list[tuple[str, bool]] = []  # `<<` delimiters seen on the current line, their bodies start at its end
+    # The frames, innermost last, as [kind, start, open parentheses, reported]: "cmd" is unquoted text, "dq" a
+    # double-quoted word, "sub" and "bt" the body of a `$(` or a backquote pair. `reported` marks a body that starts
+    # inside double quotes and is returned; `hidden` counts those on the stack, so a substitution inside one is left
+    # to the next reading of that body.
+    stack: list[list] = [["cmd", 0, 0, False]]
+    hidden = 0
+
+    def open_frame(kind: str, start: int = 0) -> None:
+        nonlocal hidden
+        reported = kind in {"sub", "bt"} and stack[-1][0] == "dq" and not hidden
+        stack.append([kind, start, 1, reported])
+        hidden += reported
+
+    def close_frame(end: int) -> None:
+        nonlocal hidden
+        kind, start, _, reported = stack.pop()
+        if reported:
+            hidden -= 1
+            body = text[start:end]
+            bodies.append(re.sub(r"\\([$`\\\"])", r"\1", body) if kind == "bt" else body)
+
+    index = 0
+    while index < len(text):
+        char, kind = text[index], stack[-1][0]
+        if char == "\\":
+            index += 2
+            continue
+        if char == '"':
+            if kind == "dq":
+                close_frame(index)
+            else:
+                open_frame("dq")
+        elif char == "'" and kind != "dq":
+            end = text.find("'", index + 1)
+            if end >= 0:
+                index = end
+        elif char == "`":
+            if kind == "bt":
+                close_frame(index)
+            else:
+                open_frame("bt", index + 1)
+        elif char == "$" and text.startswith("(", index + 1):
+            open_frame("sub", index + 2)
+            index += 1
+        elif kind == "sub" and char in "()":
+            stack[-1][2] += 1 if char == "(" else -1
+            if not stack[-1][2]:
+                close_frame(index)
+        elif char == "<" and kind != "dq" and text.startswith("<<", index):
+            if text.startswith("<<<", index):  # a here-string: its word is read as usual
+                index += 2
+            elif match := HEREDOC_START.match(text, index):
+                single, double, bare = match.group(2, 3, 4)
+                delimiter = single if single is not None else double if double is not None \
+                    else re.sub(r"[\\'\"]", "", bare)
+                if delimiter:
+                    heredocs.append((delimiter, bool(match.group(1))))
+                index = match.end() - 1
+        elif char == "\n" and kind != "dq" and heredocs:
+            end = heredoc_end(text, index + 1, heredocs)
+            heredocs.clear()
+            if end is not None:
+                index = end - 1
+        index += 1
+    while len(stack) > 1:  # unterminated: what is left of the text
+        close_frame(len(text))
+    return bodies
 
 
 def redirection_width(words: list[str], index: int) -> int:
@@ -515,6 +624,21 @@ def rtk_command(words: list[str]) -> list[str]:
 
 
 def expand(command: str, depth: int = 0) -> list[list[str]]:
+    """Command segments of the command, and of the command substitutions that the shell runs inside its double
+    quotes (substitution_bodies: `echo "$(printenv)"` runs printenv), at any nesting up to
+    MAX_SUBSTITUTION_NESTING."""
+    result = command_segments(command, depth)
+    level = [command]
+    for _ in range(MAX_SUBSTITUTION_NESTING):
+        level = [body for text in level for body in substitution_bodies(text)]
+        for body in level:
+            result.extend(command_segments(body, depth))
+        if not level:
+            break
+    return result
+
+
+def command_segments(command: str, depth: int = 0) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
     command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
     `systemd-run` starts (the segment of systemd-run itself stays in the result, for the rule on its options)."""
