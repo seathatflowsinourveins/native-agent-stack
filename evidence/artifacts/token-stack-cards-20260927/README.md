@@ -23,6 +23,7 @@ an unchanged upstream test suite or a new provider run.
 | Invoke-rate window | 2026-09-25T11:37:28Z to 2026-09-26T23:37:28Z |
 | GPT-6 final-verdict verification receipts | 2026-09-26 to 2026-09-27T03:20:30Z |
 | Bundle sanitized and topic edition written | 2026-09-27 |
+| Counter readings copied read-only from the private ledger (`counter-readings.json`) | 2026-09-29T03:24:34Z |
 
 ## Files and evidence classes
 
@@ -32,7 +33,8 @@ an unchanged upstream test suite or a new provider run.
 | `returned-results-subset.json` | The 206 records the cards cite (each card's `records_shown` plus any record id named in its text), out of 711 | Local integration: upstream commands and checks run on the source host, with returned data retained |
 | `invoke-by-tool.json` | Per-tool invoke counts by population | Local integration: transcript counts over the dated window |
 | `gpt6-reviews.json` | Per-tool review and final verdicts, finding and resolution counts, run models, and the three verification receipts | Model review: judgment over retained sources, not execution |
-| `tools/bundle.py`, `tools/condense.py` | The generators for this directory and for the topic edition | Local tooling |
+| `counter-readings.json` | The five ledger readings behind the cards' `native_snapshot` figures: ledger snapshot id, tool, scope, observation time, success flag, saved figure, kind and, for context-mode, the session estimate | Upstream estimate: tool-retained snapshots that the token-report collector recorded, copied read-only |
+| `tools/bundle.py`, `tools/condense.py`, `tools/counter_readings.py` | The generators for this directory, for the topic edition and for the counter readings | Local tooling |
 
 In `returned-results-subset.json`, each record keeps its command, `exit`, status
 and a summary of at most 600 characters. The full observation is omitted. It is
@@ -45,6 +47,39 @@ still carries the outcome.
 Figures are never summed across evidence classes, lanes or scopes. For example,
 RTK's project snapshot is already included in its global snapshot, and exact
 `o200k_base` comparisons and tool-reported counters use different units.
+
+## Claims with retained readings and claims resting on private inputs
+
+[`counter-readings.json`](counter-readings.json) backs the cards' five
+`native_snapshot` figures. Each reading is a sanitized copy of one row of the
+source host's private token-report ledger (table `snapshots`). The row matches
+the card entry's tool, scope (home directory written as `$HOME`), observation
+time and saved figure, and its kind and session estimate equal the ones the
+entry's basis quotes. `tools/counter_readings.py` copied the rows read-only at
+2026-09-29T03:24:34Z. They are the collector's readings from 2026-09-26, upstream
+estimates in each tool's own unit, and the copy measures nothing anew.
+
+| Card figure | Scope | Ledger snapshot | Observed (UTC) |
+| --- | --- | --- | --- |
+| rtk: 42,367,855 tokens saved | Native / all retained projects | 67 | 2026-09-26T22:54:08Z |
+| rtk: 26,531,271 tokens saved | Native / project `$HOME/code/native-agent-stack` | 68 | 2026-09-26T22:54:08Z |
+| headroom: 579,411 tokens saved | Native / last 30 days | 69 | 2026-09-26T22:54:08Z |
+| context-mode: 3,244,032 tokens saved; session estimate 27,109,948 | Claude Code (Context Mode plugin) | 71 | 2026-09-26T22:54:09Z |
+| context-mode: 6,311,424 tokens saved; session estimate 157,255 | Codex (Context Mode plugin) | 72 | 2026-09-26T22:54:09Z |
+
+The rtk project scope is already inside its global scope, so these rows are
+never added. The jcodemunch-mcp card has no `native_snapshot` entry, so no
+reading is published for it.
+
+Two figures in the rtk card's `shortfall_cause` rest only on the private
+assembly input `rtk.json` (sha256
+`5350af07e98d186c2db62aecd2214104090d8e4d57480af522472376097ca9f0` in the
+Reproduce table). The card names no reading for them, `counter-readings.json`
+does not back them, and this artifact does not verify them:
+
+- `39.2%` "over the host's lifetime".
+- `16,493` supported commands that `rtk discover` counted as run without RTK in
+  2 days.
 
 ## Corrections carried by the topic rows
 
@@ -128,7 +163,16 @@ python3 evidence/artifacts/token-stack-cards-20260927/tools/condense.py --repo-r
 ```
 
 Both commands are deterministic for fixed inputs, and rerunning `condense.py` on
-its own output reproduces the same bytes. Pins are not copied into the rows:
+its own output reproduces the same bytes.
+
+`counter-readings.json` is copied from the source host's private ledger, which
+is not published. The copy stops unless every `native_snapshot` entry has
+exactly one matching ledger row, so another host's ledger does not reproduce it:
+
+```sh
+python3 evidence/artifacts/token-stack-cards-20260927/tools/counter_readings.py \
+  --state-dir "${XDG_STATE_HOME:-$HOME/.local/state}/native-token-report"
+``` Pins are not copied into the rows:
 `scripts/build_ecosystem.py` joins `manifests/stack.json` when the page is
 built. `card.recorded_pin` records the pin a card describes, and a different
 stack pin renders a drift note instead of editing the card.
