@@ -479,6 +479,13 @@ ALLOWED = [
     "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_2\" --out rate-limit.json",
     "wc -c \"$PAPER_ENV_FILE_2\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE_2\"",
+    # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
+    # loader as --env-file. It must keep passing for both accounts, so closing the numbered-pointer hole never blocks a unit.
+    "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE\"'",
+    "systemd-run --user --unit=paper-series-2 --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE_2\"'",
+    "systemd-run --user --unit=x --collect /bin/bash -ic \"exec python3 X --env-file \\\"$PAPER_ENV_FILE_2\\\" --output out.json\"",
     # Hugging Face: hf reads its own store, so checking the sign-in, the operator's interactive
     # login, revision-pinned downloads and checksum verification never expose the token.
     "hf auth whoami",
@@ -717,6 +724,10 @@ EXPECTED_PASS_THROUGH = [
     # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
     # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
     "cat \"$PAPER_ENV_FILE_B\"",
+    # systemd-run is not a modelled launcher: a reader it starts is not inspected, for either account (found 2026-09-29 while
+    # adding the loader-path rows above); with --pipe --wait its output returns to the caller.
+    "systemd-run --user --pipe --wait cat \"$PAPER_ENV_FILE\"",
+    "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
