@@ -3021,6 +3021,7 @@ def oracle_T32(params, key, ans, readings, ctx=None):
 
 
 LEVEL_WORDS = ("WARN", "WARNING", "ERROR", "DEBUG")  # the levels the positive control's records do not have
+_NEGATION_WALK = 8  # words: a negator further back than this is no longer in the same clause
 _NEGATORS = frozenset({"no", "not", "none", "nothing", "without", "zero", "never", "neither", "nor", "0"})
 _NEGATION_FILLERS = frozenset({"any", "a", "an", "the", "of", "at", "level", "levels", "entry", "entries", "row", "rows",
                                "record", "records", "event", "events", "them", "these", "those", "is", "are", "was", "were",
@@ -3032,9 +3033,9 @@ def level_is_negated(text, position):
     "without any ERROR", "nothing at WARN or ERROR level", "none of them is WARNING". Walking back from the word over
     separators (spaces, commas, slashes), filler words and other level words must reach a negator; any other word or
     punctuation stops the walk, so "the third is not INFO, it is ERROR" and "but the fourth is ERROR" are levels that are
-    really there. A linear scan."""
+    really there. The walk is bounded to one clause (`_NEGATION_WALK` words), so it costs a constant per level word."""
     index = position
-    while True:
+    for _ in range(_NEGATION_WALK):
         gap = index
         while gap > 0 and text[gap - 1] in " \t,/":
             gap -= 1
@@ -3051,6 +3052,7 @@ def level_is_negated(text, position):
             index = start
             continue
         return False
+    return False
 
 
 def quoted_field_ints(text, name):
@@ -3078,17 +3080,18 @@ def quoted_field_ints(text, name):
 
 
 def integer_lists(text):
-    """The integers of every `[...]` span that holds only integers, commas and spaces: [1, 2, 3, 4, 5]."""
-    lists, start = [], 0
-    while True:
-        open_at = text.find("[", start)
-        close = text.find("]", open_at) if open_at >= 0 else -1
-        if close < 0:
-            return lists
-        body = text[open_at + 1:close]
-        if body.strip() and all(char in "0123456789, \t" for char in body):
-            lists.append(int_values(int_tokens(text[open_at:close + 1])))
-        start = open_at + 1
+    """The integers of every `[...]` span that holds only integers, commas and spaces: [1, 2, 3, 4, 5]. One pass: each `]`
+    closes the innermost `[` still open, so a run of open brackets costs nothing more than its length."""
+    lists, opened = [], None
+    for index, char in enumerate(text):
+        if char == "[":
+            opened = index
+        elif char == "]" and opened is not None:
+            body = text[opened + 1:index]
+            if body.strip() and all(item in "0123456789, \t" for item in body):
+                lists.append(int_values(int_tokens(text[opened:index + 1])))
+            opened = None
+    return lists
 
 
 def oracle_T33(params, key, ans, readings, ctx=None):

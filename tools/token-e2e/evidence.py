@@ -1495,6 +1495,14 @@ def _document_records(value, readings):
     return fc.payload_records(value, readings["R2-01"])[0]
 
 
+def _decodes(text):
+    try:
+        fc.decode_candidate(text)
+    except fc.DecodeError:
+        return False
+    return True
+
+
 def _answer_toon_items(ans, records, readings):
     """One round-trip item per TOON payload of the answer. A structural candidate (a fence, a line block) that starts like a
     TOON header and does not decode strictly is a failed trip. A bare candidate (the whole answer, an evidence string) that
@@ -1506,15 +1514,15 @@ def _answer_toon_items(ans, records, readings):
         first = next((line for line in candidate["text"].split("\n") if line.strip()), "")
         if not fc.toon_header(first) or first.lstrip().startswith("- "):
             continue
+        if records is None:  # R2-16: no frozen original, so the payload is unknown (decided) or excluded (alternative), once
+            if readings["R2-16"] == "unknown_in_denominator" and (candidate["structural"] or _decodes(candidate["text"])):
+                items.append({"source": "answer", "status": "unknown"})
+            continue
         try:
             value = fc.decode_candidate(candidate["text"])
         except fc.DecodeError:
             if candidate["structural"]:
-                items.append({"source": "answer", "status": "unequal" if records is not None else "unknown"})
-            continue
-        if records is None:
-            if readings["R2-16"] == "unknown_in_denominator":
-                items.append({"source": "answer", "status": "unknown"})
+                items.append({"source": "answer", "status": "unequal"})
             continue
         shaped = _document_records(value, readings)
         items.append({"source": "answer",
