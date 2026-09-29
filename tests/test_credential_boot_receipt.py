@@ -121,6 +121,21 @@ def with_exec_start(text: str, replacement: str) -> str:
     return "\n".join(replacement if line.startswith("ExecStart=") else line for line in text.splitlines()) + "\n"
 
 
+# The runbook: docs/secret-storage.md, "Restart check (2026-09-29)", and the fenced commands it gives.
+JOURNAL_SELECTOR = re.compile(r"journalctl --user -u credential-boot-receipt\.service -n (\d+) -o cat --grep='([^']+)'")
+
+
+def restart_check_section() -> str | None:
+    text = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8")
+    match = re.search(r"^## Restart check \(2026-09-29\)\n(.*?)(?=^## )", text, re.M | re.S)
+    return match.group(1) if match else None
+
+
+def runbook_commands() -> list[str]:
+    blocks = re.findall(r"^[ \t]*```sh\n(.*?)^[ \t]*```", restart_check_section() or "", re.M | re.S)
+    return [line.strip() for block in blocks for line in block.splitlines() if line.strip()]
+
+
 def key_paths(value, prefix: str = "") -> set[str]:
     """Every dict key in value as a dotted path; the items of a list share one "[]" path segment."""
     paths = set()
@@ -668,6 +683,36 @@ class BootReceiptTests(unittest.TestCase):
         newer.unlink()
         self.assertEqual(self.run_cli("compare").returncode, 0)  # the good receipt alone is the baseline again
 
+    def test_the_documented_journal_selector_finds_the_printed_line_and_no_systemd_message(self):
+        # journalctl -u also shows systemd's own messages about the unit (journalctl(1), systemd 255: "additional
+        # matches for messages from systemd"), and a finished oneshot logs one after the tool's line, so the runbook
+        # selects the receipt's line with --grep. journalctl reads that pattern as PCRE2, case-insensitively when it
+        # is all lowercase; the pattern stays within what PCRE2 and Python's re read alike, so it is run here as is
+        # against the line the tool really prints, and against systemd's messages for this unit.
+        selectors = [command for command in runbook_commands() if command.startswith("journalctl ")]
+        self.assertEqual(len(selectors), 1, selectors)
+        match = JOURNAL_SELECTOR.fullmatch(selectors[0])
+        self.assertIsNotNone(match, f"the runbook's journal selector is not the --grep form: {selectors[0]}")
+        pattern = match.group(2)
+        self.assertIsNotNone(re.fullmatch(r"\^[a-z :]+", pattern), pattern)
+        grep = re.compile(pattern, re.IGNORECASE if pattern == pattern.lower() else 0)
+        self.plant("tavily.env", "TAVILY_API_KEY")
+        result = self.run_cli("record")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        printed = result.stdout.splitlines()
+        self.assertEqual(len(printed), 1, result.stdout)
+        self.assertIsNotNone(grep.search(printed[0]), printed[0])
+        unit = "credential-boot-receipt.service"
+        description = next(line for line in directives(UNIT.read_text(encoding="utf-8"))
+                           if line.startswith("Description="))[len("Description="):]
+        for message in (f"Starting {unit} - {description}...", f"Finished {unit} - {description}.",
+                        f"{unit}: Deactivated successfully.", f"{unit}: Consumed 412ms CPU time.",
+                        f"{unit}: Main process exited, code=exited, status=2/INVALIDARGUMENT",
+                        f"{unit}: Failed with result 'exit-code'.", f"Failed to start {unit} - {description}.",
+                        "credential_boot_receipt: refused: the receipt directory is not a real directory"):
+            with self.subTest(message=message):
+                self.assertIsNone(grep.search(message))
+
     def test_a_plain_start_reruns_isolated(self):
         # Started without -I, the tool re-executes itself with -I (as tools/credentials/set_credential.py does), so a
         # module planted on PYTHONPATH is never imported by it.
@@ -747,14 +792,13 @@ class RestartCheckRunbookTests(unittest.TestCase):
     secret-path guard (scripts/hooks/secret_path_guard.py), and they install exactly the pinned render of the unit."""
 
     def section(self) -> str:
-        text = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8")
-        match = re.search(r"^## Restart check \(2026-09-29\)\n(.*?)(?=^## )", text, re.M | re.S)
-        self.assertIsNotNone(match, "docs/secret-storage.md has no Restart check section")
-        return match.group(1)
+        section = restart_check_section()
+        self.assertIsNotNone(section, "docs/secret-storage.md has no Restart check section")
+        return section
 
     def commands(self) -> list[str]:
-        blocks = re.findall(r"^[ \t]*```sh\n(.*?)^[ \t]*```", self.section(), re.M | re.S)
-        return [line.strip() for block in blocks for line in block.splitlines() if line.strip()]
+        self.section()
+        return runbook_commands()
 
     def test_every_runbook_command_passes_the_guard(self):
         commands = self.commands()

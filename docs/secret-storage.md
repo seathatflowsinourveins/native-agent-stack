@@ -1337,13 +1337,16 @@ host writes, announced to the peers first:
 
    ```sh
    systemctl --user start credential-boot-receipt.service
-   journalctl --user -u credential-boot-receipt.service -n 1 -o cat
+   journalctl --user -u credential-boot-receipt.service -n 20 -o cat --grep='^credential boot receipt:'
    python3 -I scripts/credential_boot_receipt.py compare
    ```
 
-   `start` exits 0. The journal line reads `credential boot receipt: rows=<n>
-   ok=<n> ... guard_matches_pin=true result=ok receipt=<name>.json`. `compare`
-   prints `baseline: <name> (one receipt; nothing to compare yet)` and exits 0.
+   `start` exits 0. `-u` also shows systemd's own messages about the unit,
+   such as `Finished credential-boot-receipt.service - ...`, so `--grep`
+   selects the tool's lines; with `-n` it implies `--reverse`, so the first
+   line is the newest and reads `credential boot receipt: rows=<n> ok=<n> ...
+   guard_matches_pin=true result=ok receipt=<name>.json`. `compare` prints
+   `baseline: <name> (one receipt; nothing to compare yet)` and exits 0.
 3. If a canary harness from a later change of this design has landed, keep its
    canary across the restart as that change documents.
 4. Checkpoint the peers (the grand-dashboard checkpoint). The restart is the

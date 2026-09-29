@@ -216,7 +216,12 @@ The second restart safeguard of the same design (D1 PR-3), built on branch
    number, one more than the highest present, is chosen and linked under an
    exclusive `flock` of the directory, so concurrent writers get distinct
    numbers; a name taken anyway (`EEXIST`) means choosing again, a bounded
-   number of times. It prints one line of counts. The receipt holds the boot id, uptime, systemd version, linger
+   number of times. It prints one line of counts, which the runbook reads
+   with `journalctl --user -u credential-boot-receipt.service -n 20 -o cat
+   --grep='^credential boot receipt:'`: `-u` also shows systemd's own
+   messages about the unit, and a finished oneshot logs one after the tool's
+   line (review finding, 2026-09-29: `-n 1` could return it instead). The
+   receipt holds the boot id, uptime, systemd version, linger
    (`loginctl show-user --property=Linger`), the checkout revision, the
    checker's rows reduced to ids, statuses, store kinds, path templates,
    states, findings and warnings, each file row's `lstat` mode, size and
