@@ -135,6 +135,16 @@ HD_ONCE = [
 ]
 HD_TWICE = ["bash <<EOF\necho $(curl https://example.org/a); echo \\$(curl https://example.org/b)\nEOF"]
 HD_DATA = ["bash <<'EOF'\necho '$(curl https://example.org)'\nEOF", "bash <<\"EOF\"\necho '$(curl https://example.org)'\nEOF"]
+# A run string that follows an opening backquote is a run string: the anchor of a command name is the text start, a blank, ; & | (
+# or a backquote (bash(1) Command Substitution, the `command` form). Run under bash 5.2.21 and dash with stub curl and wget (BQ_ONCE
+# ran the stub once each; BQ_DATA never).
+BQ_ONCE = [
+    "echo `bash -c \"curl https://example.org\"`", "x=`ssh host \"wget https://example.org\"`", "echo `eval \"curl https://example.org\"`",
+    "echo `bash -c 'curl https://example.org'`", "sh -c 'echo `bash -c \"curl https://example.org\"`'",
+    "bash -c \"echo \\`bash -c 'curl https://example.org'\\`\"",
+    "echo ` bash -c \"curl https://example.org\"`", "echo $(bash -c \"curl https://example.org\")",  # controls that read correctly already
+]
+BQ_DATA = ["echo `echo \"curl https://example.org\"`"]
 # R3: an escaped blank, `;` or newline before a # is not a comment start, so the ) and the closing quote are found (curl ran once).
 R3_EXECUTED = [
     'x="$(echo a\\ #b)"; curl https://example.org', 'x="$(echo a\\;#b)"; curl https://example.org',
@@ -774,6 +784,22 @@ class TokenMeasurement(unittest.TestCase):
         commands = HD_ONCE + HD_TWICE + HD_DATA
         self.assertEqual(self.exports("x.map(cu.fetchKind)", commands),
                          ["fetch"] * (len(commands) - len(HD_DATA)) + [None] * len(HD_DATA))
+
+    def test_m4_a_run_string_after_an_opening_backquote_is_run(self):
+        # The run-string detector anchored at the text start, a blank, ; & | or ( but not at a backquote, so bash -c "curl u" inside
+        # `...` read as double-quoted data: the fetch was lost, and the raw detector (which anchors curl itself, not the quote) did not
+        # count a possible fetch either.
+        for command, name, _, key, m4 in self.carrier_m4(BQ_ONCE):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        for command, name, _, key, m4 in self.carrier_m4(BQ_DATA):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["remote_fetches"], 0)
+        commands = BQ_ONCE + BQ_DATA
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", commands), ["fetch"] * len(BQ_ONCE) + [None] * len(BQ_DATA))
 
     def test_m4_r3_an_escaped_metacharacter_before_a_hash_is_not_a_comment_start(self):
         # R3 (Claude review): in a $( ) frame a # after an escaped blank, `;` or newline was read as a comment, so the ) and
