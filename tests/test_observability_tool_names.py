@@ -143,7 +143,8 @@ class CollectorProfileTests(unittest.TestCase):
         pattern = re.search(r'"\^\((.*)\)\$"', receipts["statements"][0]).group(1)
         deleted = {name.replace("\\\\.", ".") for name in pattern.split("|")}
         u6_keys = set(log_allowlist(self.config)[log_allowlist(self.config).index("tool_family"):])
-        self.assertEqual(deleted | set(DERIVED_KEYS), u6_keys)
+        # call_id sits before the tail (Codex call identity for the launch join); a receipt file must not add it either.
+        self.assertEqual(deleted | set(DERIVED_KEYS), u6_keys | {"call_id"})
 
     def test_model_typed_values_are_not_exported(self):
         allow = set(log_allowlist(self.config))

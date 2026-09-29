@@ -91,8 +91,8 @@ processors:
         conditions:
           - attributes["event.name"] == "ecosystem.sdk_receipt"
         statements:
-          # SDK receipts carry none of these names; the shared allowlist must not let a receipt file add them.
-          - delete_matching_keys(attributes, "^(mcp_server\\.name|mcp_tool\\.name|skill\\.name|invocation_trigger|subagent_type|agent\\.name|agent_type|total_tool_uses|workflow\\.run_id|originator|kind|state|sender_thread_id|receiver_thread_id)$")
+          # SDK receipts carry none of these names, nor a Codex call id; the shared allowlist must not let a receipt file add them.
+          - delete_matching_keys(attributes, "^(mcp_server\\.name|mcp_tool\\.name|skill\\.name|invocation_trigger|subagent_type|agent\\.name|agent_type|total_tool_uses|workflow\\.run_id|originator|kind|state|sender_thread_id|receiver_thread_id|call_id)$")
       - context: log
         statements:
           # First-party Codex desktop clients are named "Codex <App>" (codex-rs login default_client.rs

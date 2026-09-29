@@ -497,7 +497,7 @@ metric allowlist, so the writer identity above is untouched.
   ids must match their enumeration or pattern, or they are deleted.
 - **Derived keys come only from this processor.** It first deletes any incoming `tool_family`, `actor`,
   `shell_rtk`, `tool_details` or `client`. SDK receipts share the allowlist, so for them the processor
-  deletes every invoke-rate key.
+  deletes every invoke-rate key and the Codex `call_id`.
 - **Derived values are bounded.** `tool_family` is one of shell, read, edit, mcp, skill, toolsearch, web,
   agent, code_mode or other. `actor` is `main` or `subagent` for Codex (from `agent_name`). For Claude
   tool events it is `workflow` when the event has `workflow.run_id`, else `main_or_subagent`; Claude API
