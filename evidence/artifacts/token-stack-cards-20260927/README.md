@@ -19,7 +19,7 @@ an unchanged upstream test suite or a new provider run.
 | --- | --- |
 | E2E upstream-command runs behind the cards | 2026-09-26 |
 | Returned results captured (host `nativestack-5975wx-20260925`, NativeStack WSL2, fixture commit `803bc351`) | 2026-09-26T22:53:19Z |
-| Upstream latest-release reads (GitHub `releases/latest` API) | 2026-09-26 |
+| Upstream latest-release reads (GitHub `releases/latest` API) | 2026-09-26 for the reads without a time; the stamped live rechecks are socraticode 2026-09-27T01:11:26Z, qmd 2026-09-27T01:17:41Z and ai-memory 2026-09-27T01:24:04Z (2026-09-26 in the host's local time) |
 | Invoke-rate window | 2026-09-25T11:37:28Z to 2026-09-26T23:37:28Z |
 | GPT-6 final-verdict verification receipts | 2026-09-26 to 2026-09-27T03:20:30Z |
 | Bundle sanitized and topic edition written | 2026-09-27 |
@@ -37,12 +37,20 @@ an unchanged upstream test suite or a new provider run.
 | `tools/bundle.py`, `tools/condense.py`, `tools/counter_readings.py` | The generators for this directory, for the topic edition and for the counter readings | Local tooling |
 
 In `returned-results-subset.json`, each record keeps its command, `exit`, status
-and a summary of at most 600 characters. The full observation is omitted. It is
+and a summary of at most 606 characters: an observation longer than 600
+characters is cut at its last space before character 600, or at character 600,
+and ends with the 6-character marker ` [...]`. 138 of the 206 summaries are
+cut, and 60 of them are longer than 600 characters. The subset's own `method`
+field keeps the generator's wording, "at most 600 characters", which leaves out
+the marker; the file stays as generated. The full observation is omitted. It is
 identified by its UTF-8 byte count and sha256: over the text for a string
 observation, and over compact sorted JSON for an object observation. Attachment
 bodies are identified by the sha256 the source recorded. `exit` is `null` where
-the observation states no exit code (38 records, mostly MCP calls); `status`
-still carries the outcome.
+the observation states no exit code (38 records). 12 are MCP requests: seven
+tool calls from Claude Code (six socraticode, one qmd) and five mcporter
+requests to the repomix MCP server (a tool listing and four tool calls). The
+other 26 are shell plumbing, upstream CLI runs, a capture harness and local
+checks. `status` still carries the outcome.
 
 Figures are never summed across evidence classes, lanes or scopes. For example,
 RTK's project snapshot is already included in its global snapshot, and exact
@@ -56,8 +64,8 @@ source host's private token-report ledger (table `snapshots`). The row matches
 the card entry's tool, scope (home directory written as `$HOME`), observation
 time and saved figure, and its kind and session estimate equal the ones the
 entry's basis quotes. `tools/counter_readings.py` copied the rows read-only at
-2026-09-29T03:24:34Z. They are the collector's readings from 2026-09-26, upstream
-estimates in each tool's own unit, and the copy measures nothing anew.
+2026-09-29T03:24:34Z. They are the collector's readings from 2026-09-26,
+upstream estimates in each tool's own unit, and the copy measures nothing anew.
 
 | Card figure | Scope | Ledger snapshot | Observed (UTC) |
 | --- | --- | --- | --- |
@@ -159,11 +167,34 @@ python3 evidence/artifacts/token-stack-cards-20260927/tools/bundle.py \
   --verification verdict-evidence.json --verification final-verdict-evidence.json \
   --verification g5-g6-verification.json --repo-root . \
   --out evidence/artifacts/token-stack-cards-20260927
-python3 evidence/artifacts/token-stack-cards-20260927/tools/condense.py --repo-root .
 ```
 
-Both commands are deterministic for fixed inputs, and rerunning `condense.py` on
-its own output reproduces the same bytes.
+`condense.py` reads `manifests/stack.json` and stops at the first card whose pin
+text does not start with the stack version. The cards assume the stack manifest
+at `34c56340` (#372), the revision the rtk and toon cards cite for their pins.
+This PR's original merge base, `55fc8d17` (#433), has the same pins for the 17
+row components. #446 (`3058b237`) later pinned socraticode 1.15.0 and ccusage
+20.0.26, so `condense.py --repo-root .` on a later tree stops at socraticode.
+Run it in a temporary root that holds the stack manifest the cards assume:
+
+```sh
+root=$(mktemp -d)
+mkdir -p "$root/docs" "$root/manifests" "$root/evidence/artifacts"
+cp docs/token-efficiency-stack.json "$root/docs/"
+git show 34c56340:manifests/stack.json > "$root/manifests/stack.json"
+cp -r evidence/artifacts/token-stack-cards-20260927 "$root/evidence/artifacts/"
+python3 evidence/artifacts/token-stack-cards-20260927/tools/condense.py --repo-root "$root"
+cmp "$root/docs/token-efficiency-stack.json" docs/token-efficiency-stack.json
+```
+
+At 2026-09-29T03:28Z this block exited 0 with identical bytes, and so did the
+same block with `55fc8d17` in place of `34c56340`.
+
+Both generators are deterministic for fixed inputs, and rerunning `condense.py`
+on its own output reproduces the same bytes. Pins are not copied into the rows:
+`scripts/build_ecosystem.py` joins `manifests/stack.json` when the page is
+built. `card.recorded_pin` records the pin a card describes, and a different
+stack pin renders a drift note instead of editing the card.
 
 `counter-readings.json` is copied from the source host's private ledger, which
 is not published. The copy stops unless every `native_snapshot` entry has
@@ -172,7 +203,4 @@ exactly one matching ledger row, so another host's ledger does not reproduce it:
 ```sh
 python3 evidence/artifacts/token-stack-cards-20260927/tools/counter_readings.py \
   --state-dir "${XDG_STATE_HOME:-$HOME/.local/state}/native-token-report"
-``` Pins are not copied into the rows:
-`scripts/build_ecosystem.py` joins `manifests/stack.json` when the page is
-built. `card.recorded_pin` records the pin a card describes, and a different
-stack pin renders a drift note instead of editing the card.
+```

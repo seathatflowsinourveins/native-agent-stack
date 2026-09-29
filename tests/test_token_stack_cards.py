@@ -133,6 +133,68 @@ class CounterReadingTests(unittest.TestCase):
         self.assertIn(rtk_input.group(1), section)
 
 
+class ReadmeClaimTests(unittest.TestCase):
+    """The README's checkable statements agree with the bundle's own data."""
+
+    WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine"}
+
+    @classmethod
+    def setUpClass(cls):
+        cls.lines = README.read_text(encoding="utf-8").splitlines()
+        cls.text = " ".join(" ".join(cls.lines).split())  # prose statements, independent of line wrapping
+        cls.records = json.loads((BUNDLE / "returned-results-subset.json").read_text(encoding="utf-8"))["records"]
+
+    def test_the_summary_bound_is_the_measured_one(self):
+        longest = max(len(record["summary"]) for record in self.records)
+        cut = sum(1 for record in self.records if record["observation"]["summary_truncated"])
+        over = sum(1 for record in self.records if len(record["summary"]) > 600)
+        self.assertEqual((longest, cut, over, len(self.records)), (606, 138, 60, 206))
+        self.assertIn(f"a summary of at most {longest} characters", self.text)
+        self.assertIn(f"{cut} of the {len(self.records)} summaries are cut, and {over} of them are longer than 600",
+                      self.text)
+        self.assertNotIn("a summary of at most 600 characters", self.text)
+
+    def test_the_exit_null_records_are_counted_by_kind(self):
+        nulls = [record for record in self.records if record["exit"] is None]
+        claude = [record for record in nulls if record["command"].startswith('{"tool": "mcp__')]
+        socraticode = [record for record in claude if record["command"].startswith('{"tool": "mcp__socraticode__')]
+        qmd = [record for record in claude if record["command"].startswith('{"tool": "mcp__qmd__')]
+        # mcporter is the executed command (behind the capture's timeout wrapper), not a word in a description.
+        mcporter = [record for record in nulls
+                    if re.match(r"(?:timeout\s+(?:-k\s+\d+\s+)?\d+\s+)?mcporter\s", record["command"])]
+        self.assertEqual(len(claude), len(socraticode) + len(qmd))
+        mcp = len(claude) + len(mcporter)
+        self.assertIn(f"`exit` is `null` where the observation states no exit code ({len(nulls)} records)", self.text)
+        self.assertIn(f"{mcp} are MCP requests: {self.WORDS[len(claude)]} tool calls from Claude Code "
+                      f"({self.WORDS[len(socraticode)]} socraticode, {self.WORDS[len(qmd)]} qmd) and "
+                      f"{self.WORDS[len(mcporter)]} mcporter requests to the repomix MCP server", self.text)
+        self.assertIn(f"The other {len(nulls) - mcp} are shell plumbing", self.text)
+        self.assertNotIn("mostly MCP calls", self.text)
+
+    def test_the_release_read_dates_include_the_stamped_rechecks(self):
+        stamps = {}
+        for path in sorted((BUNDLE / "cards").glob("*.json")):
+            if path.name != "index.json":
+                release = json.loads(path.read_text(encoding="utf-8"))["upstream"]["latest_release"]
+                found = re.search(r"live rechecked\D*?(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)", release)
+                if found:
+                    stamps[path.stem] = found.group(1)
+        self.assertEqual(sorted(stamps), ["ai-memory", "qmd", "socraticode"])
+        row = next(line for line in self.lines if line.startswith("| Upstream latest-release reads"))
+        for tool, stamp in stamps.items():
+            with self.subTest(tool=tool):
+                self.assertIn(f"{tool} {stamp}", row)
+
+    def test_the_reproduce_steps_use_the_stack_revision_the_cards_cite(self):
+        cited = set()
+        for path in (BUNDLE / "cards").glob("*.json"):
+            cited.update(re.findall(r"/blob/([0-9a-f]{40})/manifests/stack\.json", path.read_text(encoding="utf-8")))
+        self.assertEqual(len(cited), 1, cited)
+        reproduce = readme_section("## Reproduce")
+        self.assertIn(f"git show {next(iter(cited))[:8]}:manifests/stack.json", reproduce)
+        self.assertNotIn("condense.py --repo-root .\n", reproduce)
+
+
 class BundleInputNameTests(unittest.TestCase):
     """tools/bundle.py keys every input by the basename it was given."""
 
