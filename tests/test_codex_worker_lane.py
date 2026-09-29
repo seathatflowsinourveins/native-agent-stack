@@ -1327,6 +1327,7 @@ class RoleStepTests(unittest.TestCase):
             (self.agents / name).chmod(0o600)
         code, out = self.host.apply()
         self.assertEqual(code, 0, out)
+        self.assertIn("[ok] extra agent role files: 0", out)  # the two carriers themselves are not extras
         for name in ROLE_NAMES:
             self.assertIn(f"agents/{name}: in place", out.splitlines())
         self.assertEqual(self.agents.stat().st_mode & 0o777, 0o750)  # not ours to change
