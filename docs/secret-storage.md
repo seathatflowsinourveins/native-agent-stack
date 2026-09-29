@@ -1024,8 +1024,10 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `/bin/cat`), text on the operator line (`| sh`), text after the terminator (if a body line equals IDENT, the first such
   line is the terminator and only `)"` may follow it), an unterminated body, a word glued to what precedes or follows it
   (`--body="$(...)"`), the same idiom behind any other program (a shell with `-c`, `eval`, an interpreter, `source`,
-  `xargs`, `watch`, `ssh`, `cat`, `tee`, an assignment, the command position) or inside another substitution's body, and a
-  text the guard cannot read (an unbalanced quote, for instance an apostrophe in an earlier here-document's prose; the
+  `xargs`, `watch`, `ssh`, `cat`, `tee`, an assignment, the command position) or inside the text of any command
+  substitution, quoted or not (`eval $(echo "$(cat <<'EOF' ... EOF)")` runs what the substitution prints, and the tokenizer
+  splits an unquoted `$(echo ...)` into a segment of its own whose command is `echo`; a subshell `( ... )` or a brace group is
+  no substitution), and a text the guard cannot read (an unbalanced quote, for instance an apostrophe in an earlier here-document's prose; the
   private-use characters U+E001 and U+E002): its words are a guess, and a guess is no reason to hide a body. The cost is
   friction, in the strict direction: a body line that starts with `printenv` or `env`, or holds `$(printenv)`, is refused
   outside the idiom, and an unquoted here-document in a substitution (`echo "$(cat <<EOF`, `printenv`, `EOF`) is an
@@ -1033,13 +1035,15 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   FILE`). Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: a git or gh option that runs its value
   (`git rebase --exec "$(cat <<'EOF' ... EOF)"`, `gh alias set`), an echo whose output is piped into a shell or written
   into a script that runs later, and an unquoted here-document that expands `$(...)` between single quotes
-  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29: of the 1,942 commit
+  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29: of the 1,956 commit
   messages of this repository, in the `git commit -m` and `gh pr create --body` patterns, the guard refuses 10 (each names
-  a secret variable or a store path in prose, which the raw-text rules read) and the base guard 13, and 4 messages that the
-  base guard refused (its quote parity read prose as commands) pass; a matrix of 39 consumers, 18 launcher prefixes, 5
-  here-document forms, 8 payloads and 4 substitution forms (112,320 commands) loosens no row against the base guard; and
-  mutation fuzz of 24,720 mutants of 412 blocked strings loosens 2 or 3 per seed, each a mutant whose broken terminator
-  leaves a real quoted body that bash prints and does not run.
+  a secret variable, a store path or a token command in prose, which the raw-text rules read) and the base guard 13, and 4
+  messages that the base guard refused (its quote parity read prose as commands) pass; a matrix of 40 consumers, 18
+  launcher prefixes, 5 here-document forms, 8 payloads and 4 substitution forms (115,200 commands) loosens no row against
+  the base guard; a differential over 60,493 derived commands loosens 102, every one a `ps -fu steve` or `ps -fu eve` (the
+  second loosening, below); and mutation fuzz of 24,840 mutants of 414 blocked strings loosens 38 to 44 per seed, 36 to 41
+  of them variants of those two `ps` rows and 2 or 3 of them mutants whose broken terminator leaves a real quoted body that
+  bash prints and does not run (`echo "$(cat <<'EOF'`, `text\`, `E`, `# c`, `OF`, `echo "$(printenv)"` ... `EOF`).
 - **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
   with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
   rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and

@@ -589,6 +589,22 @@ BLOCKED = {
     "cat <<'EOF' > note.md\nvalue: \"$(printenv)\"\nEOF": "environment_dump",  # a top-level here-document's lines are command lines
     "nice > /tmp/out -n 5 cat .env": "dotenv_read",  # a redirection operator between the options no longer ends them (172596ed passed it)
     "git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" && x=\"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",  # the second idiom is an assignment
+    # An idiom inside an UNQUOTED command substitution is not exempt either: the tokenizer splits `$(echo IDENT)` into a segment of its own,
+    # whose command is echo, while eval runs what the substitution prints. The base guard passed each of these (it read no such body).
+    "eval $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "bash -c $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "bash <<< $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "x=$(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\"); eval $x": "environment_dump",
+    "eval $(git log -1 --format=%B \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "eval $(printf %s \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "xargs sh -c $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "python3 -c $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "$(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
+    "(eval $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\"))": "environment_dump",
+    "{ eval $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\"); }": "environment_dump",
+    "if eval $(echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\"); then :; fi": "environment_dump",
+    "eval `echo \"$(cat <<'EOF'\nprintenv\nEOF\n)\"`": "environment_dump",
+    "echo $(git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\")": "environment_dump",
     "echo \"a $(git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\")\"": "environment_dump",  # inside another substitution's body
     # The raw-text rules read the whole command as they always did, the exempt body included: a store path, a secret name or expansion and
     # /proc are refused wherever they stand.
@@ -2040,7 +2056,26 @@ class SecretPathGuardTests(unittest.TestCase):
             (f"systemd-run --user --pipe git commit -m {hole}", [True]),
             (f"{EXEC} git commit -m {hole}", [True]),
             (f"( cd sub && git commit -m {hole} )", [True]),
-            (f"x=$(git commit -m {hole})", [True]),
+            # the body of a command substitution, quoted or not, is another command whose output is used elsewhere (`eval $(echo IDENT)` runs
+            # it), so an idiom there is never exempt, whatever its own command is
+            (f"x=$(git commit -m {hole})", [False]),
+            (f"echo $(git commit -m {hole})", [False]),
+            (f"eval $(echo {hole})", [False]),
+            (f"eval $(git log -1 --format=%B {hole})", [False]),
+            (f"eval $(printf %s {hole})", [False]),
+            (f"bash -c $(echo {hole})", [False]),
+            (f"bash <<< $(echo {hole})", [False]),
+            (f"xargs sh -c $(echo {hole})", [False]),
+            (f"python3 -c $(echo {hole})", [False]),
+            (f"$(echo {hole})", [False]),
+            (f"(eval $(echo {hole}))", [False]),
+            (f"{{ eval $(echo {hole}); }}", [False]),
+            (f"if eval $(echo {hole}); then :; fi", [False]),
+            (f"x=$(echo {hole}); eval $x", [False]),
+            (f"echo $(echo $(echo {hole}))", [False]),
+            # a subshell or a brace group is no substitution: what runs in it runs as written
+            (f"( git commit -m {hole} )", [True]),
+            (f"{{ git commit -m {hole}; }}", [True]),
             (f"git add -A; git commit -m {hole} # it's done", [True]),
             (f"cat > f <<'E'\ndo not\nE\ngit commit -m {hole}", [True]),
             # not exempt: the command is code or a file name to the shell, or the guard cannot tell which
@@ -2105,6 +2140,25 @@ class SecretPathGuardTests(unittest.TestCase):
         # a backslash-newline pair outside the idiom is still there for check() to join afterwards
         self.assertEqual(guard.neutral_reading(f"git commit \\\n -m {hole}"), "git commit \\\n -m \"x\"")
 
+    def test_scan_shell_reports_the_outermost_command_substitutions(self):
+        # The fifth result: (start, end) of the text inside each outermost `$(...)` or backquote pair, quoted or not, which exempt_idioms() uses
+        # to keep an idiom inside a substitution's body strict.
+        cases = [
+            ("echo $(date)", [(7, 11)]),
+            ('echo "$(date)"', [(8, 12)]),
+            ("echo `date`", [(6, 10)]),
+            ("echo $(echo $(date)) $(id)", [(7, 19), (23, 25)]),
+            ("echo $((1 + 2)) $(date)", [(18, 22)]),  # arithmetic is no substitution
+            ("echo ${x:-$(date)}", [(12, 16)]),
+            ("echo '$(date)' \\$(date)", []),
+            ("echo $(date", [(7, 11)]),  # unterminated: to the end of the text
+            ("echo $((date) )", [(7, 14)]),  # `$((` that no `))` closes is a substitution holding a subshell
+            ("x=1", []),
+        ]
+        for command, spans in cases:
+            with self.subTest(command=command):
+                self.assertEqual(guard.scan_shell(command)[4], spans)
+
     def test_an_ansi_c_string_is_one_word(self):
         # shlex knows no `$'...'` quoting: it read `$'it\'s #\nprintenv\n'` as a word, a quote that opens and a comment, and the harmless text
         # was refused (found by the verification review). scan_shell() finds the strings and tokenize() keeps each as one word.
@@ -2118,7 +2172,7 @@ class SecretPathGuardTests(unittest.TestCase):
         ]
         for command, words in cases:
             with self.subTest(command=command):
-                _bodies, comments, protected, ansi_c = guard.scan_shell(command)
+                _bodies, comments, protected, ansi_c, _substitutions = guard.scan_shell(command)
                 self.assertEqual(guard.tokenize(command, comments, protected=protected, ansi_c=ansi_c), words)
         self.assertEqual(guard.check("printf '%s' $'it\\'s #\\nprintenv\\n'"), None)
         self.assertEqual(guard.check("bash -c $'printenv'"), "environment_dump")

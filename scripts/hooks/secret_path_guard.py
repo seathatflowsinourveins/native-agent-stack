@@ -460,8 +460,8 @@ def substitution_bodies(text: str) -> list[str]:
     return scan_shell(text)[0]
 
 
-def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], list[tuple[int, int]]]:
-    """(bodies, comments, protected, ansi_c) of a command text, read once the way bash reads it.
+def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], list[tuple[int, int]], list[tuple[int, int]]]:
+    """(bodies, comments, protected, ansi_c, substitutions) of a command text, read once the way bash reads it.
 
     Bodies: those of the outermost command substitutions that the shell runs inside double quotes, `$(...)` and a
     backquote pair. Inside double quotes `$` and the backquote keep their meaning and a backslash escapes only
@@ -488,12 +488,18 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
 
     ANSI-C strings: the top-level `$'...'` spans (the `$` to the closing quote), which tokenize() keeps as one word.
 
+    Substitutions: the (start, end) of the text inside each outermost command substitution, `$(...)` or a backquote pair, quoted or
+    not (the bodies above are those inside double quotes). exempt_idioms() uses them: the body of a substitution is another command,
+    whose output is used elsewhere, and the tokenizer splits an unquoted `$(echo IDENT)` into a segment of its own.
+
     One pass, each character read once: a stack of frames replaces recursion, and a regular expression jumps from one
     character that matters to the next."""
     bodies: list[str] = []
     comments: list[tuple[int, int]] = []
     protected: list[int] = []  # backquotes inside single-quoted or ANSI-C strings at the top level
     ansi_c: list[tuple[int, int]] = []
+    substitutions: list[tuple[int, int]] = []
+    open_substitutions = 0  # `$(` and backquote frames on the stack
     # Frames, innermost last: [kind, start, parentheses, reported, dq, bodies_at_open]. Kinds: cmd (unquoted text),
     # sub (`$(`), bt (backquotes), dq (double quotes), param (`${`), dparam (`${` inside double quotes), arith (`$((`).
     # `dq` says whether a substitution opened here sits inside double quotes (param and arith inherit it from their
@@ -507,8 +513,12 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
     construct_end = -1  # where the last quote, escape or substitution ended: a `#` right after it is inside a word
 
     def close(at: int) -> None:
-        nonlocal hidden
+        nonlocal hidden, open_substitutions
         kind, start, _, reported = stack.pop()[:4]
+        if kind in {"sub", "bt"}:
+            open_substitutions -= 1
+            if not open_substitutions:
+                substitutions.append((start, at))
         if reported:
             hidden -= 1
             body = text[start:at]
@@ -521,9 +531,11 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
             tick = text.find("`", tick + 1, last)
 
     def open_frame(kind: str, start: int, frame: list, quoted: bool = False) -> None:
-        nonlocal hidden
+        nonlocal hidden, open_substitutions
         reported = frame[4] and not hidden and kind in {"sub", "bt", "arith"}
         stack.append([kind, start, 1 if kind in {"sub", "bt"} else 0, reported, quoted, len(bodies)])
+        if kind in {"sub", "bt"}:
+            open_substitutions += 1
         if reported and kind != "arith":
             hidden += 1
 
@@ -608,6 +620,7 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
                 construct_end = index + 1
             else:  # no `))`: this was `$(` and a subshell, so read it as a substitution
                 frame[0], frame[1], frame[2] = "sub", frame[1] - 1, 1
+                open_substitutions += 1
                 if frame[3]:
                     hidden += 1
                     del bodies[frame[5]:]
@@ -617,7 +630,7 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
             stack.pop()
         else:
             close(end)
-    return bodies, comments, protected, ansi_c
+    return bodies, comments, protected, ansi_c, substitutions
 
 
 def idiom_spans(text: str) -> list[tuple[int, int]]:
@@ -1074,9 +1087,10 @@ def exempt_idioms(text: str, spans: list[tuple[int, int]]) -> list[bool]:
     check() joins them: the words of the segment that holds a marker say which command it belongs to. A marker before the program word
     (an assignment's value, a wrapper's option value, the command position itself) is no argument, so an idiom there, or one whose command
     is anything else (a shell with `-c`, eval, an interpreter, source, xargs, watch, ssh, cat, tee ...), is not exempt; nor is one that is
-    not a word of its own (glued to other text), nor one inside the body of a double-quoted substitution (its command is another one, and
-    shlex's reading of nested quotes can show it as a word of its own). The answer is False wherever it cannot be told (a text that holds
-    the marker characters, one shlex cannot read, no program found)."""
+    not a word of its own (glued to other text), nor one inside the text of a command substitution, quoted or not (its command is another
+    one whose output is used elsewhere, `eval $(echo IDENT)` runs it, and shlex's reading of nested quotes can show it as a word of its
+    own). The answer is False wherever it cannot be told (a text that holds the marker characters, one shlex cannot read, no program
+    found)."""
     answers = [False] * len(spans)
     if not spans or "\ue001" in text or "\ue002" in text:
         return answers
@@ -1087,12 +1101,14 @@ def exempt_idioms(text: str, spans: list[tuple[int, int]]) -> list[bool]:
         cursor = last
     pieces.append(text[cursor:])
     marked = "".join(pieces).replace("\\\n", "")
-    bodies, comments, protected, ansi_c = scan_shell(marked)
+    _bodies, comments, protected, ansi_c, substitutions = scan_shell(marked)
     try:
         tokens = tokenize(marked, comments, protected=protected, ansi_c=ansi_c, strict=True)
     except ValueError:
         return answers  # an unbalanced quote: the words are a guess, and a guess is no reason to hide a body
-    inside = {int(number) for body in bodies for number in SUBSTITUTION_MARKER.findall(body)}
+    # a marker inside the text of a command substitution, quoted or not, is not exempt: that text is another command, whose output is
+    # used elsewhere (`eval $(echo IDENT)` runs it), and shlex splits an unquoted `$(echo IDENT)` into a segment of its own
+    inside = {int(match.group(1)) for start, end in substitutions for match in SUBSTITUTION_MARKER.finditer(marked, start, end)}
     for words in segments(tokens):
         found = [(position, SUBSTITUTION_MARKER.findall(word)) for position, word in enumerate(words) if "\ue001" in word]
         command = receiving_command(words) if found else None
@@ -1119,7 +1135,7 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
     for nesting in range(MAX_SUBSTITUTION_NESTING + 1):
         following: list[str] = []
         for text in level:
-            bodies, comments, protected, ansi_c = scan_shell(text)
+            bodies, comments, protected, ansi_c, _substitutions = scan_shell(text)
             result.extend(command_segments(text, depth, comments, protected, ansi_c))
             following.extend(bodies)
         spent += sum(map(len, following))
