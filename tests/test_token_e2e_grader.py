@@ -7115,6 +7115,68 @@ class F42_OptionalUse(GraderCase):
                          {"lane": "markitdown", "attempts": 2, "adopted": 1, "not_adopted": 1, "unknown": 0})
 
 
+class F43_AggregateFields(GraderCase):
+    """Design c4 traceability: aggregate fields the design promises that no earlier test asserted by name. They describe
+    behaviour that was already built, so these are guards and pass on their first run."""
+
+    def graded(self, run):
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        return json.loads(out.read_text(encoding="utf-8"))
+
+    def test_blind_verdict_parity_compares_the_workflow_and_strict_verdicts_of_each_task(self):
+        run = MiniRun(self).default_run()
+        label = run.blind("seed-blind-2", "Verdict: yes. id 2, latency 11 ms.", agent_id="fx6", strict=False)
+        disagreeing = "Verdict: no. id 2, latency 11 ms."
+        write_jsonl(run.root / "proj-fixture" / "sess-strict-2.jsonl", strict_transcript(run.repo, disagreeing))
+        (run.e2e / f"{label}.strict.out").write_text(disagreeing + "\n", encoding="utf-8")
+        run.launches.append({"identity": label, "actor": "strict_process", "session_id": "sess-strict-2", "exit": 0})
+        parity = self.graded(run)["blind"]["verdict_parity"]
+        self.assertEqual(parity["seed-blind-1"], {"workflow": "yes", "strict": "yes", "parity": True})
+        self.assertEqual(parity["seed-blind-2"], {"workflow": "yes", "strict": "no", "parity": False})
+        self.assertEqual(parity["seed-blind-3"], {"workflow": None, "strict": None, "parity": None})
+
+    def test_team_rows_are_counted_apart_and_an_unmapped_teammate_is_published(self):
+        run = MiniRun(self).default_run()
+        subagents = run.root / "proj-fixture" / SESSION_ID / "subagents"
+        write_jsonl(subagents / "agent-fx8.jsonl", [r_user("t", ts(0))])
+        write_json(subagents / "agent-fx8.meta.json", {"agentType": "stack-researcher", "taskKind": "in_process_teammate"})
+        run.launches.append({"identity": run.ident("T", "reuse-296-01"), "actor": "team_teammate", "session_id": SESSION_ID,
+                             "agent_id": "fx8"})
+        self.assertEqual(run.identity().returncode, 0)
+        (subagents / "agent-fx8.jsonl").unlink()  # the teammate's transcript is gone by grading time: it cannot be mapped
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["team_T"], {"tasks": 1, "pass": 0, "fail": 0, "unknown": 1, "inadmissible": 0,
+                                               "unmapped_teammates": 1})
+        self.assertEqual(aggregate["g_q"]["clause1"]["population"], 75, "arm T is outside every denominator")
+
+    def test_a_superseded_run_is_counted_beside_the_final_attempt(self):
+        run = MiniRun(self)
+        run.world.child(run.ident("B", "seed-overview"), "fx1", rows=[r_user("t", ts(0)), r_apierror(ts(1))], state="progress")
+        run.workflow("B", "seed-overview", answer_rows("x"), {"answer": "x", "evidence": []}, agent_id="fx2")
+        attempts = self.graded(run)["attempts"]["claude"]["B"]
+        self.assertEqual(attempts, {"recorded": 2, "completed": 1, "unresolved": 0, "no_answer_causes": {}, "superseded_runs": 1,
+                                    "inadmissible": {"usage_limit": 1, "interrupted_driver": 0, "startup_error": 0}})
+
+    def test_the_payload_representation_sizes_and_the_optional_use_shape_are_published(self):
+        aggregate = self.graded(MiniRun(self).default_run())
+        size = len(json.dumps(web_key()["records"]).encode("utf-8"))
+        self.assertEqual(aggregate["representation_sizes"]["payload_bytes"], {"min": size, "median": size, "max": size, "n": 1})
+        self.assertEqual(aggregate["optional"]["seed-overview"]["use"],
+                         {"lane": "repomix", "attempts": 0, "adopted": 0, "not_adopted": 0, "unknown": 0})
+
+    def test_the_organic_binding_block_is_empty_without_a_binding_child(self):
+        self.assertEqual(self.graded(MiniRun(self).default_run())["m13_organic"], {"own": 0, "sibling": 0, "unknown": 0})
+
+    def test_the_organic_binding_block_counts_a_child_without_a_sentinel_record_as_unknown(self):
+        run = MiniRun(self)
+        run.codex_subagent("seed-binding-1", arm="B")
+        self.assertEqual(self.graded(run)["m13_organic"], {"own": 0, "sibling": 0, "unknown": 1})
+
+
 # ---- rehearse: the real-route acceptance step (design e8), run here only against the scripted fake --------------------------
 
 class F35b_Rehearse(GraderCase):
