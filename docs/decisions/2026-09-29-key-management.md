@@ -351,8 +351,10 @@ grammar.
 - Output goes through non-blocking descriptors and a bounded queue in the
   relay's own select loop, so a consumer that stops reading cannot hold the
   runner past a shutdown signal or the 2 s drain deadline.
-- The command's process group is ended (`SIGTERM`, 2 s, `SIGKILL`) on every
-  way out of the runner. On Linux a killed runner is answered by
+- What is left of the command's process group is ended (`SIGTERM`, 2 s,
+  `SIGKILL`) on every way out of the runner, while the command is still an
+  unreaped zombie that holds the group's number; the watchdog is stood down
+  and the command reaped after that. On Linux a killed runner is answered by
   `PR_SET_PDEATHSIG` for the command and by a watchdog process for its
   whole group.
 - It refuses a host whose `core_pattern` begins with `|` or `@`, one it
@@ -415,7 +417,25 @@ limits, and `recipes/tavily.md` keeps the keyring commands as its default.
   kernel sets for a core-dump helper (L630) and the check that aborts a
   piped dump at that limit (L801-819).
 
-**Alternatives, with pins and evidence class:**
+**Read for the third repair round, 2026-09-29:**
+- man7.org `wait(2)`: `waitid` with `WNOWAIT` leaves "the child in a waitable
+  state; a later wait call can be used to again retrieve the child status
+  information";
+- torvalds/linux@v6.16 `kernel/pid.c` `__change_pid` (L349-369): a pid is
+  released only when no task holds it under any of its four kinds (process,
+  thread group, process group, session), so an unreaped command, a zombie,
+  keeps its pid and its group's number;
+- apple-oss-distributions/xnu@xnu-12377.121.6 `bsd/kern/kern_fork.c`
+  (L972-974): a new pid skips one that is in use as a process, a process
+  group or a session id; `bsd/kern/kern_exit.c` (L2969): a process leaves its
+  group when it is reaped, so a zombie is still a member, as on Linux;
+  `bsd/sys/proc_internal.h` (L767): `PID_MAX` is 99999;
+- python/cpython `Modules/posixmodule.c`: `os.waitid` is compiled under
+  `HAVE_WAITID && !defined(__APPLE__)` in v3.9.25 (L954), v3.10.0, v3.11.0
+  and v3.12.0, and under `HAVE_WAITID` from v3.13.0; the 3.13
+  `Doc/library/os.rst` adds "This function is now available on macOS as
+  well".
+
 - **mise v2026.9.16** (commit `2184db81`). *Measured* in a scratch home
   with synthetic canaries (the coordinator's session notes
   `spike2/spike-mise-agentself.md`, not in this repository). Rejected:
@@ -575,6 +595,58 @@ items below. Each code item failed a new test first.
    stays, it is a verified false positive for the coordinator to dismiss
    with a dated comment.
 
+**Third repair round (2026-09-29).** A targeted read-only GPT-6 review of the
+watchdog and the group kill returned two findings. Each was fixed with a test
+that failed first.
+1. *High.* The runner's final `killpg` and the watchdog kept only the number
+   of the command's process group and acted after the command had been
+   reaped. Nothing holds a number once its last process is reaped, the kernel
+   may give it to a stranger, and a signal to it then reaches the stranger's
+   group. The runner now learns that the command exited without reaping it
+   (`os.waitid` with `WNOWAIT`), signals the group only while the command is
+   still a zombie, whose pid, and with it the group's number, nobody else can
+   take, then tells the watchdog to stand down, and reaps the command last.
+   The watchdog therefore acts only when the runner died without telling it.
+   Signalling is refused once the command is reaped, and the signals the
+   runner forwards are blocked while it reaps, so that no handler runs
+   between the reap and its record. A default `SIGCHLD` is set first: an
+   inherited ignored one makes the kernel reap the command at once, with no
+   zombie and no status. `kill(-pgid, 0)` cannot tell that a group is empty
+   while the command's zombie is in it (a zombie is a member until it is
+   reaped, on Linux and in XNU), so the group's live members are counted from
+   `/proc`, and a command that left nothing behind is not signalled at all.
+   Failing first (the previous head, with only the new constant declared):
+   the recorded events showed `killpg` on a reaped command, in the runner's
+   final cleanup and in the probes after it. What remains is stated in the
+   runbook and below: if the runner dies before it stands the watchdog down
+   and init reaps the command before the watchdog acts, a recycled number is
+   theoretically possible on a host with a small pid space, and the
+   watchdog's prompt reaction bounds the window.
+   *Platform correction.* The brief took `os.waitid` for available on macOS.
+   It is only from CPython 3.13 (sources above), and macOS has no `/proc`, so
+   the pinned cleanup is Linux-only. Where it is not available the runner
+   sees the exit by reaping the command and never signals the group after
+   that: on macOS the descendants of a command that has already exited are
+   left running, which the second round's fix had ended (with the hazard this
+   round closes). A failure inside the runner, while the command is
+   unreaped, still ends the group there. That is a recorded loss on macOS.
+   None of this was run on macOS.
+2. *Medium.* The command's pre-exec code ran with a copy of the runner's
+   handlers. `forward()` only records a signal, so a parent-death `SIGTERM`
+   that reached the command between the parent-pid check and the exec was
+   queued in the copy instead of ending the command, which then ran (the
+   reviewer's probe: pause after the check, kill the runner, resume: exit
+   42). The hook now puts every signal the runner handles back to its default
+   and clears the inherited signal mask before it arms the signal, and keeps
+   the parent-pid check after arming. The tests hold the forked command at
+   the two stages through a module function that their launcher replaces (no
+   environment switch): killed while held after the check, the command is
+   gone at once and never runs; killed while held before arming, it ends by
+   the parent-pid check and never runs; started with a signal blocked, it
+   sees default handlers and an empty mask. Failing first, with the hold in
+   place and the reset absent: the command outlived its runner, and its
+   handlers were the runner's.
+
 **Limits recorded on 2026-09-29**, once each here and once in the runbook:
 - *The non-blocking flag* is set on the open file description of an
   inherited pipe or socket, so other writers on that description (`xargs -P`
@@ -597,11 +669,19 @@ items below. Each code item failed a new test first.
   stdin, which never passes through the relay. The rule: a value is masked
   only where a whole form of it appears unbroken in one stream.
 - *The command's lifetime.* A `SIGKILL` of the runner before the watchdog
-  has started leaves only the parent-death signal. A descendant that leaves
-  the process group (`setsid`, `setpgid`) is out of reach of the group kill
-  and of the watchdog, and so is a set-user-ID command. Only Linux has been
-  run; the watchdog has not been run on macOS. A same-user debugger or
-  `ptrace` is out of scope.
+  has started leaves only the parent-death signal. If the runner dies
+  before it stands the watchdog down and init reaps the command before the
+  watchdog acts, a recycled group number is theoretically possible on a host
+  with a small pid space (macOS numbers stop at 99,999); the watchdog's
+  prompt reaction bounds the window. The pinned cleanup, which signals the
+  group only while the unreaped command holds its number, is Linux-only (no
+  `os.waitid` on macOS before Python 3.13, and no `/proc` there); elsewhere
+  the runner never signals after the reap, and a descendant of a command that
+  already exited is left running. A descendant that leaves the process group
+  (`setsid`, `setpgid`) is out of reach of the group kill and of the
+  watchdog, and so is a set-user-ID command. Only Linux has been run; the
+  watchdog has not been run on macOS. A same-user debugger or `ptrace` is
+  out of scope.
 
 **Unverified lead, not a claim (2026-09-29).** At an `RLIMIT_CORE` of exactly
 1 the kernel aborts a piped core dump: in torvalds/linux@v6.16
@@ -614,17 +694,22 @@ is.
 
 **Evidence class.**
 - *Local integration*, synthetic values in temporary stores:
-  `tests/test_credential_run.py` (77 tests) and the schema tests in
+  `tests/test_credential_run.py` (92 tests) and the schema tests in
   `tests/test_credential_status.py`. The runner tests were written first
   and failed to import the missing tool; the schema tests failed on the
   missing field; each test of a code repair failed before its fix (the
-  second round's items 1 and 2 on the previous head). The pinning tests of
-  the second round's item 3 passed at once, so a mutant of each rule was
-  run against a copy of the previous test module first, and survived it. In
-  a scratch mutation run, each of 80 mutants (32 of the first round, 29 for
-  the first repair round, 19 for the second, one rule removed or changed
-  each time) failed its intended test, and the files were restored by
-  sha256. The tests start the runner
+  second round's items 1 and 2 and the third round's findings 1 and 2, each
+  on the head before it). The pinning tests of the second round's item 3
+  passed at once, so a mutant of each rule was run against a copy of the
+  previous test module first, and survived it; the third round's test of
+  the parent-pid check passed at once too, and its mutant is caught. In a
+  scratch mutation run, each of 96 mutants (32 of the first round, 29 for
+  the first repair round, 19 for the second, 16 for the third, one rule
+  removed or changed each time) failed its intended test, and the files were
+  restored by sha256; the script clears the cached bytecode around each
+  mutant, because a same-size mutant written in the same second as an
+  earlier compile is otherwise served the earlier code (one such run reported
+  a survivor that a rerun caught). The tests start the runner
   through a test-only launcher on a host whose real `core_pattern` pipes
   crash dumps, which CI runners commonly do; the two tests of the real
   re-execution skip there, and one test checks the real tool against the
@@ -633,20 +718,27 @@ is.
   at apple-oss-distributions/adv_cmds@6bed8737.
 - *Measured once in a session scratch directory, no committed receipt*: the
   mise, agentself and dotenvx spikes, the check of this checkout's guard on
-  `tvly auth` behind the runner, one run of the 77 runner tests under
+  `tvly auth` behind the runner, one run of the 92 runner tests under
   uv-managed CPython 3.9.25 and 3.14.7 on Linux (all pass, with
-  `DeprecationWarning` an error in the test process), and one run of
-  coreutils `timeout -k` against the runner with a command and a descendant
-  that both ignore `SIGTERM`, in a synthetic store: `timeout` killed the
-  runner, and both were gone about 3 s after it returned.
+  `DeprecationWarning` an error in the test process), a run of the whole
+  runner module with `PINNED` forced off in the test process and in every
+  runner start, which is how a platform without `os.waitid` and `/proc`
+  (macOS before Python 3.13) would run it (92 tests, 11 skipped: the 9 that
+  need the pinned cleanup and the 2 of the real re-execution, as on a host
+  that pipes crash dumps; the rest pass), and one run of coreutils
+  `timeout -k` against the runner with a command and a descendant that both
+  ignore `SIGTERM`, in a synthetic store: `timeout` killed the runner, and
+  both were gone about 3 s after it returned.
 - *Not yet observed*: the runner on macOS, including the Command Line Tools
   `python3` and the watchdog, a
   real key through it (the canary harness is a later change), a host that
   pipes crash dumps (the refusal is tested with pattern files, not with a
-  real `systemd-coredump` crash), a harness escalation such as `timeout -k`
-  (the tests send `SIGKILL` to the runner directly), and the runner's guard
-  model and the default-path flip, which are the second phase of this
-  change.
+  real `systemd-coredump` crash), a harness escalation other than the
+  `timeout -k` run above (the tests send `SIGKILL` to the runner directly),
+  a process-id wrap-around that recycles a group's number (the residual
+  above is reasoned from the kernel sources, not reproduced), and the
+  runner's guard model and the default-path flip, which are the second phase
+  of this change.
 
 **Overturn.**
 - A maintained upstream tool does all of the following, measured with the

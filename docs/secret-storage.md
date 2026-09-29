@@ -140,14 +140,19 @@ path are in the list below.
 
 **The command's lifetime.** The command leads its own session and process
 group. Once it has exited and its output is drained, and on every way out of
-the runner, the runner sends that group `SIGTERM` and, after 2 seconds,
-`SIGKILL`, so no descendant that stayed in the group is left running with
-the key in its environment. If the runner itself is killed without a chance
-to do that (`SIGKILL`, the out-of-memory killer, `timeout -k`), the command
-asks the kernel for `SIGTERM` (Linux `PR_SET_PDEATHSIG`), and a small
-watchdog process, started with the command in its own session and with an
-empty environment, ends the command's whole group the same way when the
-pipe it shares with the runner closes. The limits are in the list below.
+the runner, the runner sends what is left of that group `SIGTERM` and, after 2
+seconds, `SIGKILL`, so no descendant that stayed in the group is left running
+with the key in its environment. It does this while the command is still a
+zombie, whose pid holds the group's number, so that a stranger cannot have been
+given that number and hit by a late signal. Then it tells the watchdog to stand
+down, and only then reaps the command. If the runner itself is killed without a
+chance to do that (`SIGKILL`, the out-of-memory killer, `timeout -k`), the
+command asks the kernel for `SIGTERM` (Linux `PR_SET_PDEATHSIG`, armed after
+the runner's signal handlers have been put back to their defaults in the
+forked command, so that nothing there swallows it), and a small watchdog
+process, started with the command in its own session and with an empty
+environment, ends the command's whole group the same way when the pipe it
+shares with the runner closes. The limits are in the list below.
 
 **What masking does not cover.** Masking guards against accidents; it is
 not a boundary.
@@ -199,13 +204,26 @@ not a boundary.
 - The command's lifetime (2026-09-29). A `SIGKILL` of the runner before its
   watchdog has started (a few milliseconds after the command's start) leaves
   only the parent-death signal, which reaches the command and not its
-  children. A descendant that leaves the command's process group (`setsid`,
-  `setpgid`, a double fork with `setsid`) is out of reach of the group kill
-  and of the watchdog, and so is a set-user-ID command (the kernel clears
-  the parent-death signal for such a binary, and its process cannot be
-  signalled). Only Linux has been run: `PR_SET_PDEATHSIG` is Linux-only, and
-  the watchdog has not been run on macOS. A same-user debugger or `ptrace`
-  is out of scope.
+  children. If the runner dies after the command has exited but before it has
+  stood the watchdog down, and init reaps the command before the watchdog
+  acts, the group's number is nobody's for a moment: on a host with a small
+  process-id space (macOS numbers stop at 99,999) it could in theory have
+  been given to a stranger, whose group the watchdog would then signal. The
+  watchdog reacts within milliseconds, which bounds that window. The runner
+  itself never signals a group after it has reaped the command, but it can
+  see the exit without reaping the command, and count the group's live
+  members, only on Linux: macOS has no `/proc`, and its Python has no
+  `os.waitid` before 3.13. Elsewhere the runner sees the exit by reaping the
+  command and signals nothing after that, so a descendant of a command that
+  has already exited is left running; only a failure inside the runner, while
+  the command is unreaped, ends the group. A descendant that leaves the
+  command's process group (`setsid`, `setpgid`, a double fork with `setsid`)
+  is out of reach of the group kill and of the watchdog, and so is a
+  set-user-ID command (the kernel clears the parent-death signal for such a
+  binary, and its process cannot be signalled). Only Linux has been run: the
+  watchdog has not been run on macOS. A same-user debugger or `ptrace` is out
+  of scope.
+
 **Units and other clients.**
 - A systemd user unit may run its program through the runner:
   `ExecStart=/usr/bin/python3 -I <checkout>/tools/credentials/credential_run.py <inventory-id> -- <program>`.
