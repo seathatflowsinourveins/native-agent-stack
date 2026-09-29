@@ -330,8 +330,8 @@ def encoded_forms(value: bytes) -> list:
             upper = quote(text, safe=safe).encode("ascii")
             forms += [upper, re.sub(rb"%[0-9A-F]{2}", lambda match: match.group(0).lower(), upper)]
     # JSON string forms: Python's json.dumps escapes only quotes, backslashes and controls; PHP's json_encode also
-    # writes "/" as "\/"; Go's encoding/json writes < > & as < > & (PHP's JSON_HEX_TAG writes
-    # < >). Every combination is a needle; a value without those characters collapses to one.
+    # writes "/" as "\/"; Go's encoding/json writes < > & as \u003c \u003e \u0026 (PHP's JSON_HEX_TAG writes
+    # \u003C \u003E). Every combination is a needle; a value without those characters collapses to one.
     plain = json.dumps(text)[1:-1]
     for base in (plain, plain.replace("/", "\\/")):
         for hex_case in (str.lower, str.upper, None):

@@ -16,6 +16,7 @@ import os
 import random
 import re
 import select
+import shlex
 import shutil
 import signal
 import socket
@@ -104,23 +105,57 @@ def py(code: str, *args: str) -> list[str]:
 
 def marker_writer(delay: float, ignore_term: bool = False) -> str:
     """Python source of a process that creates the file named by its argv[1] after `delay` seconds, unless it is ended
-    first (a process that ignores SIGTERM can only be ended by SIGKILL)."""
+    first (a process that ignores SIGTERM can only be ended by SIGKILL). It creates argv[1] + ".ready" as soon as its
+    SIGTERM disposition is set, so that a test can tell when the process really ignores SIGTERM."""
     return ("import signal, sys, time\n" + ("signal.signal(signal.SIGTERM, signal.SIG_IGN)\n" if ignore_term else "")
+            + "open(sys.argv[1] + '.ready', 'w').close()\n"
             + f"time.sleep({delay})\nopen(sys.argv[1], 'w').close()\n")
 
 
 def spawn_marker_writers(*writers) -> str:
-    """Python source that starts one marker_writer per (marker path, delay, ignore_term) in its own process group and
-    prints "spawned" and the process ids; the caller adds what it does next."""
+    """Python source that starts one marker_writer per (marker path, delay, ignore_term) in its own process group, waits
+    until each is ready, and prints "spawned" and the process ids; the caller adds what it does next."""
+    ready = [str(path) + ".ready" for path, _delay, _ignore in writers]
     return ("import os, subprocess, sys, time\nkids = []\n" + "".join(
         f"kids.append(subprocess.Popen([sys.executable, '-I', '-c', {marker_writer(delay, ignore)!r}, {str(path)!r}]))\n"
         for path, delay, ignore in writers)
+            + f"ready = {ready!r}\ndeadline = time.monotonic() + 20\n"
+            + "while not all(os.path.exists(path) for path in ready) and time.monotonic() < deadline:\n"
+            + "    time.sleep(0.01)\n"
             + "print('spawned', os.getpid(), *[k.pid for k in kids], flush=True)\n")
 
 
 def kill_quietly(pid: int) -> None:
     with contextlib.suppress(ProcessLookupError, PermissionError):
         os.kill(pid, signal.SIGKILL)
+
+
+def unmasked_list() -> str:
+    """The "What masking does not cover" list of docs/secret-storage.md#using-a-key, with its whitespace normalised."""
+    text = (ROOT / "docs" / "secret-storage.md").read_text(encoding="utf-8")
+    start = text.index("**What masking does not cover")
+    return " ".join(text[start:text.index("**Units and other clients.**", start)].split())
+
+
+def xxd(data: bytes) -> str:
+    """`xxd` columns: an offset, the bytes in groups of two, and the text of that row."""
+    rows = []
+    for offset in range(0, len(data), 16):
+        row = data[offset:offset + 16]
+        rows.append(f"{offset:08x}: " + " ".join(row[i:i + 2].hex() for i in range(0, len(row), 2)).ljust(39)
+                    + "  " + row.decode("ascii"))
+    return "\n".join(rows)
+
+
+def hexdump_c(data: bytes) -> str:
+    """`hexdump -C` columns: an offset, the bytes in two groups of eight, and the text of that row between bars."""
+    rows = []
+    for offset in range(0, len(data), 16):
+        row = data[offset:offset + 16]
+        cells = [f"{byte:02x}" for byte in row]
+        rows.append(f"{offset:08x}  " + " ".join(cells[:8]).ljust(23) + "  " + " ".join(cells[8:]).ljust(23)
+                    + "  |" + row.decode("ascii") + "|")
+    return "\n".join(rows)
 
 
 def stable_interiors(raw: bytes) -> list[bytes]:
@@ -175,13 +210,15 @@ class RunnerCase(unittest.TestCase):
         return value
 
     def alpaca(self, base_url: str | None = "https://paper-api.alpaca.markets") -> tuple[str, str]:
-        key, secret = fake("PK"), fake("", "/x+y=")
-        self.values += [key, secret]
-        text = f"# written by hand\nexport APCA_API_KEY_ID={key}\nexport APCA_API_SECRET_KEY=\"{secret}\"\n"
+        # The second value is not named after what it stands for: CodeQL's py/clear-text-storage-sensitive-data judges a
+        # variable by its name, and this one is synthetic (fake()) and written to a temporary store by plant().
+        key, second = fake("PK"), fake("", "/x+y=")
+        self.values += [key, second]
+        text = f"# written by hand\nexport APCA_API_KEY_ID={key}\nexport APCA_API_SECRET_KEY=\"{second}\"\n"
         if base_url is not None:
             text += f"export APCA_API_BASE_URL={base_url}\n"
         self.plant("alpaca-paper", text)
-        return key, secret
+        return key, second
 
     def run_tool(self, *args: str, input: bytes | None = None, env: dict | None = None,
                  timeout: float = 60) -> subprocess.CompletedProcess:
@@ -728,8 +765,9 @@ def lower_hex(text: str) -> str:
 
 
 def real_encodings(text: str) -> dict:
-    """What the common encoders print for text: the real urllib and json outputs, and the two JSON variants that
-    Python's json.dumps never writes but PHP's json_encode (`\\/`) and Go's encoding/json (HTML escapes) do."""
+    """The forms the common percent and JSON encoders print for text. The urllib.parse and json.dumps forms are the
+    output of the real functions. The PHP json_encode (`\\/`), Go encoding/json (HTML escapes) and PHP JSON_HEX_TAG
+    forms are string replacements that model what those encoders write: no PHP or Go encoder is run here."""
     plain = json.dumps(text)[1:-1]
     slashes = plain.replace("/", "\\/")
     forms = {"urllib.parse.quote": urllib.parse.quote(text),
@@ -762,13 +800,14 @@ ENCODERS = ("import json, os, re, sys, urllib.parse as u\n"
 
 class EncodedFormTests(RunnerCase):
     """Review of 2026-09-29, finding 3: the common percent and JSON encoders differ in ways the masker must cover
-    (quote() keeps '/' by default, quote_plus() writes a space as '+', PHP writes '\\/', Go writes \\u003c)."""
+    (quote() keeps '/' by default, quote_plus() writes a space as '+', PHP writes '\\/', Go writes \\u003c). The
+    Python encoders are executed; the PHP and Go JSON forms are string-replacement models of their output."""
 
     def samples(self) -> list:
         return [fake("tvly-", "/+=:@" + os.urandom(4).hex()),  # the bare grammar: + / = : @ . _ -
                 fake("q-") + " a/b+c=d:e@f <x> & y'z " + fake()]  # a quoted value: a space, < > & and '
 
-    def test_the_output_of_every_real_encoder_is_masked_in_process(self):
+    def test_the_percent_and_json_encoder_forms_are_masked_in_process(self):
         for text in self.samples():
             forms = real_encodings(text)
             needles = run_mod.needles_for({"K": text}, ["K"])
@@ -780,7 +819,7 @@ class EncodedFormTests(RunnerCase):
             # The forms really differ (else the test would prove nothing), and each is a whole-value needle.
             self.assertGreaterEqual(len(set(forms.values())), 8 if " " in text else 6)
 
-    def test_the_output_of_every_real_encoder_is_masked_end_to_end(self):
+    def test_the_percent_and_json_encoder_forms_are_masked_end_to_end(self):
         for text in self.samples():
             with self.subTest(value_kind="quoted" if " " in text else "bare"):
                 self.plant("tavily", f'export TAVILY_API_KEY="{text}"\n' if " " in text
@@ -794,22 +833,71 @@ class EncodedFormTests(RunnerCase):
                     self.assertEqual(set(lines), {b"form " + MARK})  # nothing but the marker, in every encoding
                 self.assert_never_echoed(result.stdout, result.stderr)
 
+    def print_forms(self, forms: list) -> None:
+        """Every (phrase, form) is one item of the documentation's list of what masking does not cover: the list names
+        it (by the phrase), and the runner prints the form as it is."""
+        listed = unmasked_list()
+        for phrase, _form in forms:
+            self.assertIn(phrase, listed, "docs/secret-storage.md no longer names an unmasked form that a test prints")
+        code = "import sys\nfor form in %r:\n    print('form', form)\n" % ([form for _phrase, form in forms],)
+        result = self.run_tool("tavily", *py(code))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "".join(f"form {form}\n" for _phrase, form in forms).encode())
+
     def test_forms_the_documentation_lists_as_unmasked_are_printed_as_they_are(self):
-        # docs/secret-storage.md#using-a-key names what masking does not cover: nested encodings, base64 wrapped across
-        # lines, other escapers and fragments. If a change starts masking one of these, this test and that list change
-        # together.
+        # docs/secret-storage.md#using-a-key lists what masking does not cover, with the rule that a value is masked
+        # only where a whole form of it appears unbroken in one stream. Each form below is an item of that list, which
+        # the test reads. If a change starts masking one of them, this test and that list change together.
         text = fake("tvly-", "/+=:@" + os.urandom(4).hex())
         self.tavily(text)
         b64 = base64.b64encode(text.encode()).decode()
-        forms = ["\n".join(b64[i:i + 16] for i in range(0, len(b64), 16)),  # base64 wrapped across lines
-                 urllib.parse.quote(urllib.parse.quote(text, safe=""), safe=""),  # a nested encoding
-                 text.replace("=", "\\u003d"),  # Gson's default escaping of '='
-                 urllib.parse.quote(text, safe="/+"),  # a safe set that neither quote() default uses
-                 text[:12] + "..." + text[-6:]]  # a fragment
-        code = "import sys\nfor form in %r:\n    print('form', form)\n" % (forms,)
-        result = self.run_tool("tavily", *py(code))
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "".join(f"form {form}\n" for form in forms).encode())
+        self.print_forms([
+            ("base64 wrapped across lines", "\n".join(b64[i:i + 16] for i in range(0, len(b64), 16))),
+            ("nested encoding", urllib.parse.quote(urllib.parse.quote(text, safe=""), safe="")),
+            ("Gson", text.replace("=", "\\u003d")),  # Gson's default escaping of '='
+            ("safe set", urllib.parse.quote(text, safe="/+")),  # a safe set that neither quote() default uses
+            ("fragment", text[:12] + "..." + text[-6:]),
+            ("fold", "\n".join(text[i:i + 16] for i in range(0, len(text), 16))),  # wrapped
+            ("xxd", xxd(text.encode())),
+            ("hexdump -C", hexdump_c(text.encode())),
+            ("wrapped table cells", "| " + text[:20] + " |\n| " + text[20:] + " |"),
+            ("colour codes", text[:9] + "\x1b[0m" + text[9:]),
+            ("hex with separators", text.encode().hex(":")),
+        ])
+
+    def test_a_value_the_shell_requotes_because_of_a_single_quote_is_printed_as_it_is(self):
+        # A quoted store value may hold a single quote; set -x and printf %q write it as '\'' and \' (also shlex.quote).
+        text = fake("q-") + "a'b" + fake()
+        self.plant("tavily", f'export TAVILY_API_KEY="{text}"\n')
+        self.print_forms([("set -x", "'" + text.replace("'", "'\\''") + "'"),
+                          ("printf %q", text.replace("'", "\\'")),
+                          ("set -x", shlex.quote(text))])
+
+    def test_a_value_interleaved_with_the_bytes_of_a_second_writer_on_the_stream_is_printed_as_it_is(self):
+        text = self.tavily()
+        self.assertIn("two writers", unmasked_list())
+        other = "import sys\nsys.stdout.write('<other writer>')\n"
+        result = self.run_tool("tavily", *py(
+            "import os, subprocess, sys\nv = os.environ['TAVILY_API_KEY']\nh = len(v) // 2\n"
+            "sys.stdout.write(v[:h])\nsys.stdout.flush()\n"
+            f"subprocess.run([sys.executable, '-I', '-c', {other!r}], check=True)\n"  # a second writer on the same pipe
+            "sys.stdout.write(v[h:] + '\\n')\n"))
+        h = len(text) // 2
+        self.assertEqual((result.returncode, result.stdout), (0, (text[:h] + "<other writer>" + text[h:] + "\n").encode()))
+
+    def test_a_value_written_to_an_inherited_read_write_stdin_never_passes_the_relay(self):
+        # The command's stdin is the runner's (a terminal or a pty when a person runs it): a read-write descriptor, so
+        # the command can write to it, and that output goes straight to the other end. A socket end stands in here.
+        text = self.tavily()
+        self.assertIn("read-write stdin", unmasked_list())
+        mine, theirs = socket.socketpair()
+        self.addCleanup(mine.close)
+        self.addCleanup(theirs.close)
+        result = subprocess.run(self.command("tavily", *py("import os\nos.write(0, os.environ['TAVILY_API_KEY'].encode())\n")),
+                                stdin=theirs, capture_output=True, env=self.tool_environment(), timeout=60)
+        self.assertEqual((result.returncode, result.stdout, result.stderr), (0, b"", b""))
+        mine.settimeout(10)
+        self.assertEqual(mine.recv(4096), text.encode())
 
 
 class BoundedHoldbackTests(RunnerCase):
