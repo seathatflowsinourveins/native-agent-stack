@@ -1,0 +1,30 @@
+{
+ "id": "overnight-volume-watch-v1",
+ "status": "monitoring thresholds, not a trading rule; commit before the first sweep; any change is a new id; no order, cancel or position call",
+ "session": {"trade_date": "2026-09-29", "overnight_start_et": "2026-09-28T20:00-04:00", "stop_et": "04:00", "backstop_et": "04:05"},
+ "sources": {"overnight_feed": "boats", "reference_feed": "sip", "snapshot_symbols_per_call": 500, "bars_symbols_per_call": 200, "sweep_seconds": 120, "max_data_fraction_per_min": 0.05},
+ "universe": {"status": "active", "asset_class": "us_equity", "tradable": true, "attribute_required": "overnight_tradable", "attribute_excluded": "overnight_halted", "symbol_excludes": ["/", " "]},
+ "measures": {
+  "overnight_shares": "BOATS snapshot dailyBar.v, only when the UTC date of dailyBar.t equals trade_date; prevDailyBar (the previous overnight session) is never used",
+  "overnight_dollar_volume": "dailyBar.v * dailyBar.vw (approximate: vw excludes trades that do not update high/low, e.g. odd lots)",
+  "adv20_shares": "mean SIP 1Day v over the last 20 regular sessions before trade_date, split-adjusted (monitor.AdvLoader formula)",
+  "adv_fraction": "overnight_shares / adv20_shares",
+  "ref_close": "SIP 1Day c of the prior regular session (2026-09-28)",
+  "change": "BOATS dailyBar.c / ref_close - 1",
+  "relvol_boats20": "overnight_shares / (sum of BOATS 1Day v over the 20 SIP trade dates before trade_date / 20); a date without a BOATS bar counts as 0",
+  "prior_sessions": "number of those 20 trade dates with a BOATS 1Day bar"
+ },
+ "significant": {"min_dollar_volume_usd": 250000, "any_of": {"min_adv_fraction": 0.02, "min_abs_change": 0.05, "min_relvol_boats20": 5.0}, "relvol_min_prior_sessions": 10},
+ "notify": {"min_dollar_volume_usd": 1000000, "any_of": {"min_adv_fraction": 0.05, "min_abs_change": 0.10, "min_relvol_boats20": 10.0}, "relvol_min_prior_sessions": 10, "exclude_fund_names": true, "once_per_symbol": true, "max_per_sweep": 5, "max_per_session": 40},
+ "top_n": [
+  {"n": 25, "by": "relvol_boats20", "min_dollar_volume_usd": 250000, "min_prior_sessions": 10},
+  {"n": 25, "by": "adv_fraction", "min_dollar_volume_usd": 250000, "min_prior_sessions": 0}
+ ],
+ "alerts": {"jsonl": "alerts.jsonl and top.jsonl in --out, always written", "ntfy_url": "http://127.0.0.1:18080/overnight-volume", "ntfy": "best effort; a failed post is recorded and never stops a sweep"},
+ "calibration": {
+  "note": "full-session totals on the five nights before tonight (BOATS trade dates 2026-09-22, 09-23, 09-24, 09-25, 09-28), read 2026-09-28 about 21:20 ET from BOATS and SIP 1Day bars for 9,683 overnight_tradable names; relvol baseline approximated by the last 20 BOATS bars; fund tag from monitor.FUND_NAME on asset names (misses some ETFs, e.g. QLD)",
+  "significant_counts": [113, 75, 56, 57, 132],
+  "notify_counts_all": [28, 20, 9, 14, 30],
+  "notify_counts_non_fund_names": [9, 3, 7, 2, 8]
+ }
+}

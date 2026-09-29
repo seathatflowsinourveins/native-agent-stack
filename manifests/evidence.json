@@ -3500,6 +3500,22 @@
         "Nothing here compares answer quality across effort levels; the vendor and third-party effort comparisons are cited in docs/decisions/2026-09-29-max-default-effort.md, not measured here."
       ],
       "path": "evidence/receipts/claude-max-default-effort-20260929.json"
+    },
+    {
+      "id": "claude-project-effort-flag-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "Three native headless probes on Claude Code 2.1.284, run on 2026-09-29 in a scratch directory whose only project file was a settings file holding a top-level effortLevel of xhigh (the shape of this repository's committed .claude/settings.json) and each read from the model and effort recorded in the session's own transcript, found that an explicit --effort max ran a Sonnet 5.5 session and an Opus 5.5 session at max, so the flag defeats the project file's xhigh and the host's saved xhigh, with the Ultracode reminder present in both; the same project file without the flag ran Sonnet 5.5 at xhigh.",
+      "limitations": [
+        "Local observation of one workstation and one client version (2.1.284); the recorded effort field is the client's own per-message record, not an API-side confirmation.",
+        "The three sessions are headless one-turn runs in fresh scratch directories that also read the host's user settings (ultracode true, a top-level effortLevel of xhigh and saved per-model xhigh levels for claude-sonnet-5-5 and claude-opus-5-5, after the host change of 2026-09-29). The no-flag baseline P3 therefore does not isolate the project file, since a saved xhigh applies from the user settings too; cases A13 and A14 of receipt claude-model-effort-probes-20260929 isolated a project file before that change.",
+        "The launcher that adds --effort max, an interactive session and this repository's own committed settings file were not exercised here; the project file in each case had one key. Each case was run once.",
+        "The Ultracode reminder is an indicator, not proof of workflow orchestration.",
+        "The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every row given the results file run6.sh writes."
+      ],
+      "path": "evidence/receipts/claude-project-effort-flag-20260929.json"
     }
   ],
   "files": [
@@ -3655,8 +3671,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "28c0849bc53ef449d8bedf65e52bbd69c7b41c432125e8cb5e7b3533b443fd95",
-      "bytes": 12572
+      "sha256": "f541fa4fd0207cc102d67020a950643b0035272eba646ba62ce6762fbd74ddde",
+      "bytes": 13582
     },
     {
       "path": "CLAUDE.md",
@@ -14286,8 +14302,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "2d58d5f170a0cab236b542062637e1ab3f28148c66afc4b618c70443e64c0609",
-      "bytes": 125984
+      "sha256": "830049dd742c5715403070b833bf5631abd979d236eec7ff38b06901dc4637d7",
+      "bytes": 131021
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -14426,8 +14442,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
-      "sha256": "62b890b2057b7306e9203e910d7f25491841dbb4b376f12471827e4e52e18837",
-      "bytes": 23258
+      "sha256": "ce64799fa81b063a5f80308c9d27037571cf1639a0c42b61b387ff5a32a38b79",
+      "bytes": 25335
     },
     {
       "path": "docs/direct-results.md",
@@ -14561,8 +14577,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2abbb9310b1983a456c1892fea59f6599d7467bcfdfd1ba1ffdd1830ffa89ed6",
-      "bytes": 72231
+      "sha256": "413d880aac9ed3b933fc3bff4b950870391324d0027e86271e64ca16db60c23e",
+      "bytes": 72228
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14606,8 +14622,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "3530be892dbffb678c1895180ca3e4bc610457afe88f60c4082147a464173866",
-      "bytes": 9668
+      "sha256": "821fb700919417eb6697a3757e7dad5d4a32aee26344378bd95fe5f00cb2bc46",
+      "bytes": 12551
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -40835,6 +40851,11 @@
       "bytes": 27658
     },
     {
+      "path": "evidence/receipts/claude-project-effort-flag-20260929.json",
+      "sha256": "7ed938be32f8b40f3abb3d9825f61ecc6d8adc0435a3292a40b611bb8618eee9",
+      "bytes": 8512
+    },
+    {
       "path": "evidence/receipts/claude-repository-evidence-20260921.json",
       "sha256": "6182eeccec5643f70292eba5525eb70f59e47f3e52dcdda0f59393a94932f9f9",
       "bytes": 6669
@@ -41411,8 +41432,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "5a625cdf85688e109dc50666e1352b65815e721d896b6f7de0e12d042d674070",
-      "bytes": 9577
+      "sha256": "08799d84ca0b1c71dd36ced142b21de575502656ddcabf312b39e4ee0c9f0f66",
+      "bytes": 9800
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -41461,12 +41482,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "2f587774f7a864113279fcb51702004a9d17937d0cd42b1212af0353d8566ad7",
-      "bytes": 58347
+      "sha256": "45d3115d2f869cef8566fb97a7208993c6f6a2aa4c8d1f812aa3fa526b84eb98",
+      "bytes": 59308
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "ba76654eb565be620c989ff19c9537c701d117b8fdf9bde8aa6b1966241d585d",
+      "sha256": "633a5d511261b5df04ef74bdc8c873cd5b2a1f7cc6cceacb755b9b50a2d4da20",
       "bytes": 1129
     },
     {
@@ -41511,13 +41532,13 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "02fec283113e012d6174a168d792784b7c814b8cb32b2684c37e6dfc948d70ff",
-      "bytes": 21925
+      "sha256": "cfc4908cea1f53da4e269a10cb5ebb6a4311f9bc477e61c62e245452719eede3",
+      "bytes": 22049
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "3efa54fb02c98b3adf2779096a12363bdf6f56b1edf48b122e7426de014bd1da",
-      "bytes": 57092
+      "sha256": "6a71109f5021e65d5be6cf1ca9d7b765eda6a5d175cbde3cff662a996f99825d",
+      "bytes": 57315
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -41981,13 +42002,13 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "6c24078474ce81a6eb9c7dff8ce69cbd609de5cd4eb2e1f764eb70b91aede192",
-      "bytes": 30534
+      "sha256": "ca67178bfe3d2c7d84e20504e8ef5471928b48459456f7ea9cd0c06b5aa2b4d8",
+      "bytes": 31347
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "580918b582aaa839bc7760064ccc58480a3e5a8e3c8b4ae04d0aea2235c89eef",
-      "bytes": 38651
+      "sha256": "27f43c56d1f1a70f065a5d313b9273a8b55709362b15ed4a56b83da1e3c37437",
+      "bytes": 39979
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -43336,8 +43357,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "197c20edf52fbbce5bbee323d145e3f7e8928e24cc0142d9eb0325bca776b1a7",
-      "bytes": 54935
+      "sha256": "514a18a973f41fc04392ff47718ba311c8bfd481d349f5726c702a2e361dd601",
+      "bytes": 54934
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
