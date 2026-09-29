@@ -3896,8 +3896,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "17346322600c5b169fa3be449336c053ecfc5a556feda746e9fd3ea290ec8ba8",
-      "bytes": 58408
+      "sha256": "9fb031dac84e9ba9993c2fc460cfde14b7b2f421e44293d07406d3a360875d5d",
+      "bytes": 59148
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -14737,8 +14737,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "77f73e86da6cae133178b44710b7b9d7ab64235982a65a8181b98c40bfe8ba2f",
-      "bytes": 87501
+      "sha256": "ad9bc7f315f558eeeffb58d162bc1c51b9d0af9316d9fa6f66a642e705dba873",
+      "bytes": 91952
     },
     {
       "path": "docs/stack.md",
@@ -42207,8 +42207,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "6269418e23241091a1007eb4e61f8b5de52c0bf1c7a79778921ec25578269f17",
-      "bytes": 28960
+      "sha256": "a45cecea83d5849c8da1fe0a7fa1bcb3549d63e1723d3cfb12823f877bc42285",
+      "bytes": 31235
     },
     {
       "path": "scripts/env_freshness.py",
@@ -42747,8 +42747,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "c321aea763333552e199180f8262e379ddc8086b1b2b56aa362e038640cf8276",
-      "bytes": 43282
+      "sha256": "fa62540c62e6b8d034bebf5053f200131d1de1b6a5b5df0686df199dfb161b55",
+      "bytes": 46998
     },
     {
       "path": "tests/test_credential_tools.py",
