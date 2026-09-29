@@ -2537,6 +2537,49 @@ class CodexCommandNormalization(unittest.TestCase):
         rtk = got["rtk_parts"]
         self.assertEqual((rtk["calls"], rtk["unknown_calls"], rtk["eligible_parts"], rtk["status"]), (2, 1, 1, "incomplete"))
 
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    def test_argv_programs_and_shell_values_are_typed_by_their_stems(self):
+        # An argv runs its program directly, so the program's file stem types it, with / and \ as separators: a Windows Git
+        # Bash path is a POSIX shell, and CMD.EXE is cmd (Windows resolves program names ASCII case-insensitively).
+        # exec_command's shell goes through detect_shell_type (shell-command/src/shell_detect.rs:39-59): the file stem again
+        # and again (pwsh.exe.bak is pwsh), case-sensitively (PWSH is no name Codex knows, so the unrecorded fallback shell
+        # ran). A shell that is not a string fails ExecCommandArgs (Option<String>, core/src/tools/handlers/unified_exec.rs:
+        # 27-33), so what ran is unknown; null reads as None, the session shell (:117-121).
+        ok = exec_response("Process exited with code 0", "ok")
+        got = u3_measure(PAGINATED_META,
+                         sourced_command("item_t1", ["C:\\Program Files\\Git\\bin\\bash.exe", "-lc", "qmd search x"], "agent"),
+                         sourced_command("item_t2", ["CMD.EXE", "/c", "qmd search x"], "agent"),
+                         *shell_function_call("call_priv_t3", {"cmd": "qmd search x", "shell": "pwsh.exe.bak"}, ok),
+                         *shell_function_call("call_priv_t4", {"cmd": "qmd search x", "shell": "PWSH"}, ok),
+                         *shell_function_call("call_priv_t5", {"cmd": "qmd search x", "shell": 7}, ok),
+                         *shell_function_call("call_priv_t6", {"cmd": "qmd search x", "shell": None}, ok))
+        self.assertEqual(got.get("codex_commands"), {"non_posix_shell": 2, "unknown_shell": 2, "user_shell": 0,
+                                                     "exec_interactions": 0})
+        self.assertEqual({lane: row["calls"] for lane, row in got["cli_lanes"]["lanes"].items()}, {"qmd": 2})
+
+    def test_a_c_option_among_short_options_names_the_script(self):
+        # bash(1) INVOCATION: with -c among the options, commands are read from the first non-option argument, so -cl and
+        # -e -c name the script as -lc does, and -o takes the next word (pipefail) as its option name. The PR-A reading took
+        # only -lc and -c and joined any other argv, and the kernel then read a -cl script, or one after -o pipefail, as data
+        # and missed its fetch. The legacy counters keep shell_script's reading (must stay).
+        self.assertEqual(S.shell_script(["bash", "-cl", "curl https://example.org"]), "bash -cl 'curl https://example.org'")
+        got = u3_measure(PAGINATED_META,
+                         sourced_command("item_c1", ["bash", "-cl", "curl https://example.org"], "agent"),
+                         sourced_command("item_c2", ["bash", "-o", "pipefail", "-c", "curl https://example.net"], "agent"),
+                         sourced_command("item_c3", ["zsh", "-e", "-c", "curl https://example.com"], "agent"))
+        self.assertEqual((got["m4"]["shell_fetch"], got["m4"]["status"]), (3, "measured"))
+        self.assertEqual(got.get("codex_commands"), {"non_posix_shell": 0, "unknown_shell": 0, "user_shell": 0,
+                                                     "exec_interactions": 0})
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_rtk_replay_reads_the_script_of_a_c_option_cluster(self):
+        # -ec runs its script as -lc does, so replay reads `git status` (one eligible part), not the joined argv, which rtk
+        # 0.50.0 does not rewrite (one ineligible part).
+        got = S.measure_codex_records([PAGINATED_META, sourced_command("item_r3", ["bash", "-ec", "git status"], "agent")],
+                                      since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), rtk_check=True)
+        rtk = got["rtk_parts"]
+        self.assertEqual((rtk["calls"], rtk["eligible_parts"], rtk["ineligible_parts"], rtk["unknown_calls"]), (1, 1, 0, 0))
+
 
 class CodexCodeModeAttribution(unittest.TestCase):
     """PR-A item 10e (design section 7, commits 7 and 8, with the review's position, per-exec, item-kind and outer-JS
