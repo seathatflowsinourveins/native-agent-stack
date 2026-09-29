@@ -109,6 +109,36 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertEqual(second["pointer_variables"], ["PAPER_ENV_FILE_2"])
         self.assertFalse(set(second["pointer_variables"]) & set(first["pointer_variables"]))
 
+    def test_public_variables_classify_every_optional_stored_variable(self):
+        # 2026-09-29 (tools/credentials/credential_run.py): the key runner masks every variable it injects except the
+        # names in the entry's optional public_variables, which may name only optional variables that are not secret,
+        # such as a base URL. An env-file entry with optional variables must classify them, even as [] (all masked).
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        self.assertEqual(rows["alpaca-paper"]["public_variables"], ["APCA_API_BASE_URL"])
+        self.assertEqual(rows["alpaca-paper-2"]["public_variables"], ["APCA_API_BASE_URL"])
+        self.assertEqual(rows["sec-contact"]["public_variables"], [])  # EDGAR_IDENTITY is private contact data
+        self.assertEqual(rows["grafana-admin"]["public_variables"], [])
+        self.assertEqual([i for i, e in rows.items() if "public_variables" in e and not e["optional_variables"]], [])
+        cases = [
+            (lambda row: row.__setitem__("public_variables", "APCA_API_BASE_URL"), "uppercase variable names"),
+            (lambda row: row.__setitem__("public_variables", ["APCA_API_KEY_ID"]), "optional_variables"),
+            (lambda row: row.__setitem__("public_variables", ["TAVILY_API_KEY"]), "optional_variables"),
+            (lambda row: row.__setitem__("public_variables", ["APCA_API_BASE_URL"] * 2), "optional_variables"),
+            (lambda row: row.pop("public_variables"), "must classify"),
+        ]
+        for mutate, message in cases:
+            broken = copy.deepcopy(self.inventory)
+            mutate(next(e for e in broken["entries"] if e["id"] == "alpaca-paper"))
+            with self.subTest(message=message):
+                errors = cs.inventory_errors(broken, ROOT)
+                self.assertEqual(len(errors), 1, errors)
+                self.assertIn("entries[0]: ", errors[0])
+                self.assertIn(message, errors[0])
+        # A row without optional variables needs no classification; the field stays optional.
+        tavily = copy.deepcopy(self.inventory)
+        self.assertNotIn("public_variables", next(e for e in tavily["entries"] if e["id"] == "tavily"))
+        self.assertEqual(cs.inventory_errors(tavily, ROOT), [])
+
     def test_inventory_rejects_non_home_template_and_bad_names(self):
         broken = copy.deepcopy(self.inventory)
         broken["entries"][0]["store"]["path_template"] = "/srv/shared/alpaca.env"

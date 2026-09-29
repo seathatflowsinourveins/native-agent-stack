@@ -138,6 +138,20 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
             names = entry[key]
             if not isinstance(names, list) or not all(isinstance(n, str) and NAME.match(n) for n in names):
                 errors.append(f"{label}: {key} must be uppercase variable names")
+        # Optional key: the optional variables that tools/credentials/credential_run.py injects unmasked (not secret,
+        # such as a base URL); it masks every other variable it injects. An env-file entry with optional variables
+        # classifies them explicitly, [] masking them all.
+        optional = [n for n in entry["optional_variables"] if isinstance(n, str)] \
+            if isinstance(entry["optional_variables"], list) else []
+        if "public_variables" in entry:
+            public = entry["public_variables"]
+            if not isinstance(public, list) or not all(isinstance(n, str) and NAME.match(n) for n in public):
+                errors.append(f"{label}: public_variables must be uppercase variable names")
+            elif len(set(public)) != len(public) or not set(public) <= set(optional):
+                errors.append(f"{label}: public_variables must name distinct optional_variables of the entry")
+        elif isinstance(store, dict) and store.get("kind") == "private_env_file" and optional:
+            errors.append(f"{label}: an env-file entry with optional_variables must classify them in "
+                          "public_variables (the names injected unmasked; [] masks them all)")
         for key in ("loaders", "environment_only_consumers"):
             refs = entry[key]
             if not isinstance(refs, list) or not all(isinstance(r, str) for r in refs):
