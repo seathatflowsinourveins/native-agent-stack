@@ -1,0 +1,639 @@
+{
+ "tool": "rtk",
+ "group": "g1-shell-output",
+ "repo": "https://github.com/rtk-ai/rtk",
+ "pin": "0.50.0 (manifests/stack.json; adoption/pins-linux-x86_64.json tarball rtk-x86_64-unknown-linux-musl, sha256 bc2b8902...)",
+ "installed_version": "rtk 0.50.0 (native `rtk --version`; matches pin per adoption_status --pinned-versions)",
+ "role": "Compacts supported command output and keeps raw recovery (`rtk proxy`). Lanes: Claude main and subagents through the PreToolUse Bash hook `rtk hook claude` (4-entry exclude_commands); Codex workers through standing instructions only ($HOME/.codex/AGENTS.md -> RTK.md, explicit rtk commands; no hook); plain CLI anywhere. Upstream counter: rtk gain. Landscape: token-efficiency winner.",
+ "lanes": [
+  "CLI: rtk <cmd>, rtk proxy <cmd>",
+  "Claude Code PreToolUse Bash hook (rtk hook claude)",
+  "Codex standing instructions (RTK.md)",
+  "counter: rtk gain --format json [--project]"
+ ],
+ "upstream": {
+  "latest_release": "v0.50.0",
+  "latest_date": "2026-09-24",
+  "our_pin": "0.50.0 (manifests/stack.json; https://github.com/seathatflowsinourveins/native-agent-stack/blob/34c56340e636ad3d3daeb8482d48d1d8f0b135ae/manifests/stack.json)",
+  "behind_by": "No stable release behind, verified live on 2026-09-26. Latest prerelease is dev-0.51.0-rc.468, published 2026-09-26T21:33:24Z, superseding the supplied research's rc.467; this is not a stable upgrade. Sources: https://api.github.com/repos/rtk-ai/rtk/releases/latest and https://github.com/rtk-ai/rtk/releases/tag/dev-0.51.0-rc.468",
+  "recommended_install": {
+   "command": "cargo install --git https://github.com/rtk-ai/rtk",
+   "url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#installation"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "Run rtk init -g, restart Claude Code, and verify with rtk init --show. The Bash PreToolUse integration invokes rtk hook claude; explicit rtk commands remain available.",
+    "url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#auto-rewrite-hook"
+   },
+   "codex": {
+    "how": "Upstream v0.50.0 recommends rtk init --global --codex, or rtk init --codex for a project. It installs rtk hook codex in hooks.json with a Bash matcher plus AGENTS.md/RTK.md; restart and review/trust the exact hook through /hooks. The instruction-file reference has the separate compatibility defect documented below. Hook trust source: https://developers.openai.com/codex/hooks#review-and-trust-hooks",
+    "url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/codex/README.md"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Live GitHub latest-stable metadata identifies latest_release v0.50.0 and publication 2026-09-24T10:02:31Z, establishing latest_date 2026-09-24.",
+    "url": "https://api.github.com/repos/rtk-ai/rtk/releases/latest"
+   },
+   {
+    "claim": "Upstream advertises up to 90% less Bash output, explicitly distinguishing that output reduction from a 90% reduction in the overall bill.",
+    "url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#how-savings-work"
+   },
+   {
+    "claim": "--ultra-compact changes output formatting to ASCII icons and an inline format; it is documented as further output reduction, not increased hook eligibility.",
+    "url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#global-options"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "The installed Codex CLI v0.157.1 loads AGENTS.md bytes as instruction text and does not implement an @file import in that loader. An agent may choose to read a referenced path, but automatic expansion is not provided by this code. Discovery documentation: https://developers.openai.com/codex/guides/agents-md; original source: agents_md.rs:150-176,314-322.",
+    "url": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agents_md.rs#L150-L176"
+   },
+   {
+    "text": "RTK's own installer writes the problematic reference: src/hooks/init.rs:3040-3061 constructs an absolute @path globally or @RTK.md locally, then patches AGENTS.md and hooks.json; :4161-4163 formats the @path. Its comment incorrectly assumes Codex resolves such imports. Combined with Codex's loader, this is an inferred upstream RTK instruction-integration defect, not a locally invented reference format.",
+    "url": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/init.rs#L3040-L3061"
+   },
+   {
+    "text": "The inherited instructions-only form already existed in v0.49.0: run_codex_mode_with_paths wrote RTK.md and its @ reference without a Codex hook. Source: src/hooks/init.rs:2647-2681.",
+    "url": "https://github.com/rtk-ai/rtk/blob/v0.49.0/src/hooks/init.rs#L2647-L2681"
+   },
+   {
+    "text": "The authoritative shared hook gate is src/hooks/decision.rs:38-56,76-96, not a blanket simple-command restriction in hook_cmd.rs. It deliberately refuses rewriting when contains_unattestable_construct is true; all hook integrations share this gate. This is an upstream permission-preserving design limitation.",
+    "url": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/decision.rs#L38-L96"
+   },
+   {
+    "text": "src/discover/lexer.rs:363-414 rejects executable backticks, $(...) and process substitution, plus file-target redirection. Single-quoted literal substitution text is exempt; fd duplication/closing and /dev/null redirects have exceptions. Subshell grouping and separators are handled separately, not universally rejected here.",
+    "url": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/lexer.rs#L359-L439"
+   },
+   {
+    "text": "src/discover/registry.rs:703-735 rejects heredocs and arithmetic substitution, but dispatches multiline commands to a rewriter; :951-1018 permits safe multiline blocks and refuses unsafe constructs. :1226-1244 handles &&, ||, ; and pipelines, while rejecting pipelines with opaque grouping; :1087-1153 and :1753-1766 apply pipeline safety rules. Therefore pipes, chains and multiple lines are not universal bypass conditions. Neither another hook mode nor --ultra-compact removes these shared gates.",
+    "url": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs#L703-L735"
+   },
+   {
+    "text": "Codex rewriting requires protocol permissionDecision=allow for updatedInput. Native approval and sandbox checks still apply to the rewritten command, but upstream warns that Codex's command classifier does not unwrap rtk, affecting prompts and classification signals. Source: src/hooks/hook_cmd.rs:900-912.",
+    "url": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/hook_cmd.rs#L900-L912"
+   },
+   {
+    "text": "RTK processes selected CLI output, not every context source; proxy deliberately returns unfiltered output. Reductions of command output do not establish provider-token savings or byte-for-byte fidelity.",
+    "url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "No newer stable release was found in the live latest-release check.",
+    "url": "https://api.github.com/repos/rtk-ai/rtk/releases/latest"
+   },
+   {
+    "text": "Development prerelease dev-0.51.0-rc.468 is available. Its comparison with v0.50.0 is a diverged development comparison, not proof of a linear stable upgrade; the following changes are in that prerelease comparison.",
+    "url": "https://github.com/rtk-ai/rtk/compare/v0.50.0...dev-0.51.0-rc.468"
+   },
+   {
+    "text": "Development change folds shared directory prefixes in file-list output; a related change preserves raw grep/rg producers before head/tail.",
+    "url": "https://github.com/rtk-ai/rtk/commit/dadcfde0573fa721cdd92bf9de5365200f7c28cd"
+   },
+   {
+    "text": "Development change distinguishes diff read failures from ordinary file differences.",
+    "url": "https://github.com/rtk-ai/rtk/commit/bdee7f2046c6a65477c2bf390a12b31a827d28ce"
+   },
+   {
+    "text": "Development change fixes global initialization when the Claude configuration directory is missing.",
+    "url": "https://github.com/rtk-ai/rtk/commit/143f503b346f5a8a8b0122fd93b54c0fe99e1415"
+   },
+   {
+    "text": "Development change exempts RTK-injected Ruff formatting from the never-worse guard, retaining useful clean-run feedback.",
+    "url": "https://github.com/rtk-ai/rtk/commit/bff334ca84ae7d563d52abb6a2e9ced3936e37f9"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "rtk",
+   "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+   "version": "0.50.0",
+   "license": "Apache-2.0",
+   "profile": "core",
+   "role": "Compact supported command outputs, retain failure/raw recovery",
+   "freshness": "0.50.0 runs the Claude Code hook on the NativeStack WSL2 host since 2026-09-25 after qualification against 0.49.0 (hash-pinned hook acceptance, independent review); that host excludes `git show <rev>:<path>` and `diff` from rewriting through $HOME/.config/rtk/config.toml, which the bootstrap does not render. 0.49.0 is kept for rollback. The landscape winner pin stays 0.49.0 until a new verdict wave."
+  },
+  "how_we_install": "The reference checkout is $HOME/code/native-agent-stack at 34c56340e636ad3d3daeb8482d48d1d8f0b135ae. manifests/stack.json pins 0.50.0; adoption/pins-linux-x86_64.json and adoption/bootstrap-linux.sh install the checksum-pinned upstream Linux musl release archive into a versioned tools prefix and expose rtk through the stack bin directory. recipes/README.md documents archive/checksum verification and rollback.",
+  "claude_wiring": "adoption/templates/claude.settings.template.json:61-68 registers rtk hook claude for PreToolUse/Bash. recipes/README.md:134-159 documents global awareness setup and host exclude_commands for blob git show, diff, global-option blob git show and git branch; bootstrap checks/reminds rather than rendering that host config. examples/claude-native/agents/source-scout.md and isolated-builder.md explicitly mention RTK and raw recovery; no brief in that directory explicitly names TOON.",
+  "codex_wiring": "adoption/templates/codex.config.template.toml and repo .codex/config.toml have no RTK-specific entry. docs/token-session-handbook.md:128,207 and recipes/README.md:143 deliberately select explicit commands and avoid the unqualified v0.50.0 Codex hook. This host's $HOME/.codex/AGENTS.md is the bare absolute @ reference to $HOME/.codex/RTK.md; its global hooks.json contains no RTK hook. The reference format is inherited from upstream, while retaining instruction-only operation is a local choice. A task envelope that carries the actual RTK guidance avoids reliance on automatic imports.",
+  "lane_rule": "Use RTK for suitable supported shell output, with original-output recovery; choose one useful context method per artifact and do not stack compression (docs/token-session-handbook.md:106-137). Follow recipes/README.md:143-159 exactness exceptions: native or rtk proxy for blob git show, git branch, complete git log, diff when exit codes matter, and missing-directory find. Explicitly prefix supported external commands; do not prefix shell builtins merely because the old awareness text says every command is safe.",
+  "deviations_from_upstream": [
+   {
+    "what": "Codex retains instructions-only operation although upstream v0.50.0 supplies a native PreToolUse hook.",
+    "why": "recipes/README.md:143 deliberately leaves that hook unqualified because rewritten argv affect Codex's native classification boundary.",
+    "fix": "Keep the actual supported-command guidance in AGENTS.md or the worker task envelope; qualify the upstream hook and its trust/permission behavior separately before changing the adopted recipe.",
+    "pr": null
+   },
+   {
+    "what": "The host's inherited bare @ reference is not an automatic Codex import; the upstream installer itself creates this incompatible form.",
+    "why": "RTK v0.49.0 and v0.50.0 src/hooks/init.rs assume an @ import that Codex's agents_md.rs does not implement. The original installer invocation on this host is not independently established by its present file contents.",
+    "fix": "Replace reliance on the bare reference with concise actual instructions, or an explicit instruction to read RTK.md; report the initializer assumption upstream. File provenance and absence of a native import are distinct from whether a particular agent chose to read the reference.",
+    "pr": null
+   },
+   {
+    "what": "The recipe excludes exactness-sensitive commands from otherwise supported filtering.",
+    "why": "Pinned behavior can window blob output, alter diff failure classification, and misrepresent git branch output; recipes/README.md:145-159 retains the evidence and recovery contract.",
+    "fix": "Keep the adopted exclusions and bootstrap's behavioral checks. The widening is already merged as #318: https://github.com/seathatflowsinourveins/native-agent-stack/pull/318.",
+    "pr": "#318"
+   },
+   {
+    "what": "The card's universal command-shape explanation is broader than the upstream eligibility rules, and the current $HOME/.codex/RTK.md does not contain the claimed shape-restriction text.",
+    "why": "The checked awareness file says to prefix every command. Upstream decision.rs and lexer.rs reject substitutions/file sinks, whereas registry.rs can rewrite safe chains, pipelines and multiline blocks; analytics/discovery segmentation also differs from actual hook eligibility.",
+    "fix": "Describe skips by the actual gate and retained command shape. When fidelity permits, split a supported read into a standalone command or request RTK explicitly; leave substitutions, file-producing commands and exact-byte pipelines raw. Do not claim --ultra-compact or another hook mode fixes eligibility.",
+    "pr": null
+   },
+   {
+    "what": "The assembler attributes the native Codex comparison to unloaded guidance, but the retained record actually shows explicit RTK execution and lossy output.",
+    "why": "<scratch>/rr/returned-results.json contains codex-34-o200k-compare and its linked codex-18-codex-exec record. These compare outputs of rtk git log and rtk grep with plain outputs; commit subjects were truncated. The root-cause text in <scratch>/html-report/render_page.py is an assertion, not a causal control.",
+    "fix": "Have the card owner correct the causal interpretation and preserve the lossiness qualification; this audit leaves cards and the assembler untouched.",
+    "pr": null
+   },
+   {
+    "what": "F2/F3/F4 and PR-R/PR-B/PR-D could not be reliably mapped to the claimed pending fixes.",
+    "why": "No relevant mapping was found in docs/decisions or the issue search. Open PR #375 mentions #318/PR-R in its test-fixture discussion, while #376 uses PR-B for a different role/skill change; neither establishes the complete F-label mapping.",
+    "fix": "pending_fixes remains UNVERIFIED. A real related open test/RTK-empty-output fix is https://github.com/seathatflowsinourveins/native-agent-stack/pull/375; it must not be relabeled as F2, F3 or F4 without evidence.",
+    "pr": "#375"
+   }
+  ],
+  "pending_fixes": [
+   "UNVERIFIED"
+  ],
+  "assessment": "The installed stable RTK and Claude Bash-hook adaptation align with upstream, with justified exactness exclusions; Codex combines an inherited upstream @-reference defect with a deliberate local decision to omit the newer hook. <scratch>/token-cards/cards/rtk.json adapted_performance.exact_comparisons reports -87.4% for the Claude subagent, -83.1% for the instructed Codex worker, and -4.2% for native Codex execution. These are different output workloads and instruction paths: the retained codex-34-o200k-compare in <scratch>/rr/returned-results.json actually used RTK and was lossy, so its smaller reduction cannot establish the bare reference as the cause or refute the verified larger-fixture results. The host lifetime shortfall is not a universal compression ceiling, and upstream shape gates explain possible bypasses without proving the card's aggregate causal attribution."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T17:47:07.803Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " answer verified against raw (PASS); verifier: agree, 0 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 120 rtk gain --format json",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 rtk gain --project --format json",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 rtk proxy git log --stat -30",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 rtk proxy git status",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 rtk proxy grep -rn subprocess.run( scripts",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 rtk proxy ls -la docs",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 57,
+  "records_shown": [
+   {
+    "id": "rtk-01-before-gain",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk gain --format json",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"summary\": {\"total_commands\": 0, \"total_input\": 0, \"total_output\": 0, \"total_saved\": 0, \"avg_savings_pct\": 0.0, \"total_time_ms\": 0, \"avg_time_ms\": 0}, \"expected\": \"total_commands 0\"}}",
+    "attachments": 3
+   },
+   {
+    "id": "rtk-02-before-gain-project",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk gain --project --format json",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"summary\": \"same as rtk-01-before-gain\", \"expected\": \"total_commands 0\"}, \"same_bytes_attached_at\": {\"stdout\": \"rtk-01-before-gain\"}}",
+    "attachments": 0
+   },
+   {
+    "id": "rtk-03-base-git-log",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk proxy git log --stat -30",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stdout_raw\": {\"bytes\": 176300, \"sha256\": \"fa06ed800ee977b608ee7abbd26b6745afd5d1c6b4a57781a0007c9b7a885bb8\"}, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 48821, \"rtk_ledger_est\": {\"in\": 44075, \"out\": 44075, \"saved\": 0}, \"pair\": \"rtk-L02-compare-primary\"}, \"sanitized\": {\"stdout\": {\"personal_email\": 30}}}",
+    "attachments": 1
+   },
+   {
+    "id": "rtk-04-base-git-status",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk proxy git status",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 14, \"rtk_ledger_est\": {\"in\": 17, \"out\": 17, \"saved\": 0}, \"pair\": \"rtk-L02-compare-primary\"}}",
+    "attachments": 1
+   },
+   {
+    "id": "rtk-05-base-grep",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk proxy grep -rn subprocess.run( scripts",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 459, \"rtk_ledger_est\": {\"in\": 461, \"out\": 461, \"saved\": 0}, \"pair\": \"rtk-L02-compare-primary\"}}",
+    "attachments": 1
+   },
+   {
+    "id": "rtk-06-base-ls",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk proxy ls -la docs",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stdout_raw\": {\"bytes\": 6420, \"sha256\": \"606353c14875f9e8d7ec8d0f2d69b668b8d88beda1e12c06192fb6a958af142e\"}, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 2715, \"rtk_ledger_est\": {\"in\": 1605, \"out\": 1605, \"saved\": 0}, \"pair\": \"rtk-L02-compare-primary\"}, \"sanitized\": {\"stdout\": {\"user_name\": 174}}}",
+    "attachments": 1
+   },
+   {
+    "id": "rtk-07-tool-git-log",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk git log --stat -30",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stdout_raw\": {\"bytes\": 176300, \"sha256\": \"fa06ed800ee977b608ee7abbd26b6745afd5d1c6b4a57781a0007c9b7a885bb8\"}, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 48821, \"rtk_ledger_est\": {\"in\": 0, \"out\": 0, \"saved\": 0}, \"check\": {\"byte_identical\": true, \"commits_in_baseline\": 30, \"hashes_found\": 30, \"subjects_exact\": 30, \"body_lines_baseline\": 1313, \"body_lines_kept\": 1313}, \"pair\"",
+    "attachments": 0
+   },
+   {
+    "id": "rtk-08-tool-git-status",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk git status",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 12, \"rtk_ledger_est\": {\"in\": 17, \"out\": 12, \"saved\": 5}, \"check\": {\"path_sets_equal\": true}, \"pair\": \"rtk-L02-compare-primary\"}}",
+    "attachments": 1
+   },
+   {
+    "id": "rtk-09-tool-grep",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk grep -rn subprocess.run( scripts",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 459, \"rtk_ledger_est\": {\"in\": 461, \"out\": 461, \"saved\": 0}, \"check\": {\"byte_identical\": true, \"baseline_locations\": 20, \"shown_locations\": 20, \"location_sets_equal_after_recall\": true, \"location_sets_equal_without_recall\": true, \"content_fidelity_shown_plus_recalled\": {\"exact\": 20}, \"baseline_lines_over_80_chars_content\": 5}, \"pair",
+    "attachments": 0
+   },
+   {
+    "id": "rtk-10-tool-ls",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 rtk ls -la docs",
+    "observation": "{\"class\": \"native execution\", \"exit\": 0, \"stderr\": \"empty\", \"result\": {\"o200k_tokens\": 771, \"rtk_ledger_est\": {\"in\": 1605, \"out\": 507, \"saved\": 1098}, \"check\": {\"baseline_entries\": 85, \"shown_entries\": 50, \"recalled_entries\": 35, \"missing_without_recall\": 35, \"names_equal_after_recall\": true, \"permission_bits_consistent\": true, \"recall_default_equals_full\": true, \"not_returned\": \"symbolic mode (octal kept), links, ow",
+    "attachments": 1
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Same 6 git/grep/ls/unittest commands in one subagent: rtk proxy raw vs RTK hook output; answer verified against raw (PASS)",
+    "before_tokens": 29986,
+    "after_tokens": 3786,
+    "change_pct": -87.4,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:07:54.382924+00:00",
+    "last_seen": "2026-09-25T21:07:54.382924+00:00"
+   },
+   {
+    "lane": "codex_worker",
+    "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's rtk task; answer verified against the baseline (PASS)",
+    "before_tokens": 25386,
+    "after_tokens": 4278,
+    "change_pct": -83.1,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-26T13:51:51.515471+00:00",
+    "last_seen": "2026-09-26T13:51:51.515471+00:00"
+   },
+   {
+    "lane": "codex_native_exec",
+    "payload": "Two rtk command outputs Codex received vs plain outputs (upstream-command run, record codex-34-o200k-compare); Codex ran rtk explicitly here",
+    "before_tokens": 356,
+    "after_tokens": 341,
+    "change_pct": -4.2,
+    "encoding": "o200k_base",
+    "eligibility": "lossy pair: its fidelity check matched 7 of 10 commit subjects; not a measure of the AGENTS.md channel",
+    "evidence_class": "exact artifact comparison"
+   }
+  ],
+  "native_counter": {
+   "command": "rtk hook/proxy ledger over the isolated 8-command fixture (rr/rtk/check.json counters.primary)",
+   "before": 0,
+   "after": 1103,
+   "delta": 1103,
+   "unit": "tokens"
+  },
+  "native_snapshot": [
+   {
+    "tool": "rtk",
+    "scope": "Native / all retained projects",
+    "saved": 42367855,
+    "unit": "tokens",
+    "observed_utc": "2026-09-26T22:54:08.316208+00:00",
+    "basis": "Native retained-history estimate. Global includes project counters; retention depends on the selected installation. | kind: upstream estimate"
+   },
+   {
+    "tool": "rtk",
+    "scope": "Native / project $HOME/code/native-agent-stack",
+    "saved": 26531271,
+    "unit": "tokens",
+    "observed_utc": "2026-09-26T22:54:08.432955+00:00",
+    "basis": "Native estimates for this working directory only; already included in global. | kind: upstream estimate"
+   }
+  ],
+  "shortfall_cause": "-87.4% on eligible commands; 39.2% over the host's lifetime. rtk discover counts 16,493 supported commands that ran without RTK in 2 days, not classified by cause. At 0.50.0 the hook refuses only $(...), backticks, <(...), file redirects and heredocs; pipes, && chains and multi-line blocks are rewritten (rtk hook check). On Codex, `rtk init` writes an @RTK.md reference that Codex never expands; the fix is inline text (PR-D).",
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 0,
+    "cli_calls": 1454,
+    "agents_using": 192,
+    "agents": 1010,
+    "pct_agents_using": 0.1901
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 47,
+    "agents_using": 10,
+    "agents": 22,
+    "pct_agents_using": 0.4545
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 1407,
+    "agents_using": 182,
+    "agents": 988,
+    "pct_agents_using": 0.1842
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 85,
+    "agents_using": 14,
+    "agents": 71,
+    "pct_agents_using": 0.1972
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 84,
+    "agents_using": 7,
+    "agents": 15,
+    "pct_agents_using": 0.4667
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 0,
+    "cli_calls": 1129,
+    "agents_using": 150,
+    "agents": 301,
+    "pct_agents_using": 0.4983
+   }
+  },
+  "live_otel": null,
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "defects",
+  "findings": [
+   {
+    "severity": "medium",
+    "field": "adapted_performance.exact_comparisons",
+    "issue": "The codex_native_exec entry cites 'record codex-34', but an exact ID search across all 711 records in returned-results.json found 0 matches. The distinct record codex-34-o200k-compare exists and reports the cited 356 -> 341 counts.",
+    "fix": "Needs an ASSEMBLER-side correction in <scratch>/token-cards/assemble.py, comparisons(): cite codex-34-o200k-compare and validate the referenced record ID. This field cannot be repaired through rtk.upstream.json.",
+    "source": "<scratch>/rr/returned-results.json"
+   },
+   {
+    "severity": "medium",
+    "field": "adapted_performance.exact_comparisons[2]",
+    "issue": "The payload and eligibility characterize the native Codex result as a guidance-loading problem without preserving the retained lossy qualification. codex-18-codex-exec explicitly ran rtk git log and rtk grep; codex-33-analyze failed because only 7/10 commit subjects matched, and codex-34-o200k-compare is marked lossy. The correct size counts do not demonstrate that unloaded guidance caused this result or that semantic fidelity passed.",
+    "fix": "Needs an ASSEMBLER-side correction in comparisons(): retain 356, 341 and -4.2 exactly, identify the explicit RTK commands and failed subject-fidelity check, and remove the unsupported guidance-based eligibility attribution. Keep this count comparison separate from the larger passing fixtures; do not edit upstream.json to repair this field.",
+    "source": "<scratch>/rr/returned-results.json (codex-18-codex-exec, codex-33-analyze, codex-34-o200k-compare)"
+   },
+   {
+    "severity": "medium",
+    "field": "adapted_performance.shortfall_cause",
+    "issue": "The hardcoded explanation presents workload differences as established causes: it attributes the native 4.2% result to the bare instruction reference, and all 16,493 discovered skips to command shape. The native run actually used RTK; the card provides no matched causal control or per-skip classification. Upstream permits safe chains, pipelines and multiline commands while rejecting specific unsafe constructs. The same text states F2/F3/F4 and PR-R/PR-B/PR-D are fixes in flight even though native_adaptation correctly leaves that mapping UNVERIFIED.",
+    "fix": "Needs an ASSEMBLER-side correction to CAUSE['rtk'] in <scratch>/html-report/render_page.py. Separate fixture reductions from retained-history estimates, remove or qualify the unsupported causal attributions, and replace the pending-fix labels only with verified mappings. Changes to rtk.upstream.json cannot update this field.",
+    "source": "<scratch>/html-report/render_page.py:140; <scratch>/rr/returned-results.json"
+   }
+  ],
+  "checked": [
+   "Opened <scratch>/token-cards/cards/rtk.json and <scratch>/token-cards/groups/g1-shell-output/rtk.upstream.json directly. The card's upstream object equals the upstream.json object; native_adaptation differs only by the assembler-added stack_entry.",
+   "All six invoke_rates.populations entries equal the corresponding rtk entries in <scratch>/token-cards/invoke_by_tool.json, including every count and the stored pct_agents_using value. native_adaptation makes no numerical invoke-rate claim.",
+   "Exact invoke population workflow_children: {\"mcp_calls\":0,\"cli_calls\":1454,\"agents_using\":192,\"agents\":1010,\"pct_agents_using\":0.1901}",
+   "Exact invoke population workflow_children_with_lanes_block: {\"mcp_calls\":0,\"cli_calls\":47,\"agents_using\":10,\"agents\":22,\"pct_agents_using\":0.4545}",
+   "Exact invoke population workflow_children_without_lanes_block: {\"mcp_calls\":0,\"cli_calls\":1407,\"agents_using\":182,\"agents\":988,\"pct_agents_using\":0.1842}",
+   "Exact invoke population agent_subagents: {\"mcp_calls\":0,\"cli_calls\":85,\"agents_using\":14,\"agents\":71,\"pct_agents_using\":0.1972}",
+   "Exact invoke population main_sessions: {\"mcp_calls\":0,\"cli_calls\":84,\"agents_using\":7,\"agents\":15,\"pct_agents_using\":0.4667}",
+   "Exact invoke population codex_exec_workers: {\"mcp_calls\":0,\"cli_calls\":1129,\"agents_using\":150,\"agents\":301,\"pct_agents_using\":0.4983}",
+   "Checked the separate exact artifact comparison, local integration, upstream estimate/native_snapshot and native_counter fixture-ledger classes. No amounts were added across classes; invoke frequency was not treated as compression or provider savings.",
+   "Historical <scratch>/wt-rr at commit 803bc351 is absent. Original-file byte/hash assertions requiring that checkout could not be reverified today. Existing retained attachments were checked; the missing historical checkout is not a defect.",
+   "Path-hygiene scan of rtk.upstream.json found no literal personal home/scratch path, local username or session UUID. Review paths use ~ or <scratch>.",
+   "Fresh release checks confirmed v0.50.0 published 2026-09-24T10:02:31Z, and dev-0.51.0-rc.468 published 2026-09-26T21:33:24Z as the latest listed prerelease. The stable pin is current. The prerelease comparison is diverged (56 ahead, 3 behind), not a linear stable upgrade.",
+   "Fresh README/install/hook source reads confirm the output-only 'up to 90%' claim, bytes/4 estimates, unfiltered proxy, ASCII/inline ultra-compact formatting, Claude initialization and Codex PreToolUse/updatedInput integration. These do not establish provider savings or exact fidelity.",
+   "Fresh original-source reads verified Codex agents_md.rs:150-176,314-322 loads instruction text without @file expansion; RTK init.rs:3040-3061,4161-4163 creates the @ reference, and v0.49.0 init.rs:2647-2681 used the earlier instructions-only form. The claimed RTK integration defect is correctly marked as an inference.",
+   "Fresh decision.rs:38-96, lexer.rs:359-439, registry.rs:703-735,951-1018,1226-1244,1753-1766 and hook_cmd.rs:900-912 support the documented permission gates, substitution/redirection exceptions, safe compound-command support and Codex classifier limitation.",
+   "Read all four cited development commits and their live patches: shared-prefix file-list handling/producer protection, diff read-error classification, missing Claude config directory initialization, and the RTK-injected Ruff-format exception are supported.",
+   "Read the pinned local recipe, handbook, manifest and client templates at 34c56340e636ad3d3daeb8482d48d1d8f0b135ae. Confirmed RTK 0.50.0, the Claude hook and local exactness exclusions. Current $HOME/.codex/AGENTS.md is a bare absolute reference to $HOME/.codex/RTK.md and current $HOME/.codex/hooks.json contains no RTK hook. The original initializer invocation is not established by present files.",
+   "The assembler's <=2-component selection gives records_total=57 and the exact ten displayed records. Read the broader 65 RTK-tagged retained records and validated all 106 attachment references covering 96 distinct files against recorded byte lengths and SHA-256 values.",
+   "Plain result: returned-results.json contains no record whose id is codex-34 (0 exact matches); codex-34-o200k-compare exists. Read its retained comparison stdout, baseline/candidate files and native-execution/fidelity records. A fresh gpt-tokenizer 3.4.0 o200k_base recount reproduced 356 and 341.",
+   "native_adaptation.assessment copies -87.4%, -83.1% and -4.2% exactly from the card, without recomputing them. The 29986 -> 3786 and 25386 -> 4278 rows match the respective rtk and codex:rtk entries in <scratch>/html-report/savings.json; they are distinct workloads from the lossy native pair.",
+   "Read <scratch>/rr/rtk/check.json counters.primary: the isolated eight-command fixture has before total_saved=0, after total_saved=1103 and delta_saved=1103. It is a native fixture estimate, not the exact o200k comparison or the host history. The separate primary exact comparison is 52009 -> 50063 in rtk-L02-compare-primary.",
+   "native_snapshot copies saved=42367855 (global) and saved=26531271 (project) from savings.json, both explicitly labeled upstream estimate; the project amount is already included in global. native_counter, native_snapshot and prior_evidence match their assembler input values.",
+   "Freshly fetched every cited upstream URL below, bypassing the fetch cache. Fragment citations sharing a document were checked against that document; raw source/patch views supplemented GitHub pages whose HTML omitted code.",
+   "https://api.github.com/repos/rtk-ai/rtk/releases/latest",
+   "https://developers.openai.com/codex/guides/agents-md",
+   "https://developers.openai.com/codex/hooks",
+   "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agents_md.rs",
+   "https://github.com/rtk-ai/rtk",
+   "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/lexer.rs",
+   "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/discover/registry.rs",
+   "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/decision.rs",
+   "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/hook_cmd.rs",
+   "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/src/hooks/init.rs",
+   "https://github.com/rtk-ai/rtk/blob/v0.49.0/src/hooks/init.rs",
+   "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
+   "https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/codex/README.md",
+   "https://github.com/rtk-ai/rtk/commit/143f503b346f5a8a8b0122fd93b54c0fe99e1415",
+   "https://github.com/rtk-ai/rtk/commit/bdee7f2046c6a65477c2bf390a12b31a827d28ce",
+   "https://github.com/rtk-ai/rtk/commit/bff334ca84ae7d563d52abb6a2e9ced3936e37f9",
+   "https://github.com/rtk-ai/rtk/commit/dadcfde0573fa721cdd92bf9de5365200f7c28cd",
+   "https://github.com/rtk-ai/rtk/compare/v0.50.0...dev-0.51.0-rc.468",
+   "https://github.com/rtk-ai/rtk/releases/tag/dev-0.51.0-rc.468",
+   "https://github.com/seathatflowsinourveins/native-agent-stack/blob/34c56340e636ad3d3daeb8482d48d1d8f0b135ae/manifests/stack.json",
+   "https://github.com/seathatflowsinourveins/native-agent-stack/pull/318",
+   "https://github.com/seathatflowsinourveins/native-agent-stack/pull/375",
+   "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
+  ],
+  "resolutions": [],
+  "final_verdict": {
+   "tool": "rtk",
+   "verdict": "adapted-with-gaps",
+   "summary": "Installed RTK 0.50.0 matches latest stable; Claude's hook with exactness exclusions and deliberate manual Codex use are supported adaptations, but upstream 0.50.0 also offers a Codex hook that this stack has not qualified (recipes/README.md:143; https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/codex/README.md). Historical answer-checked fixtures reduce Claude output 29986→3786 tokens (87.4%) and Codex output 25386→4278 (83.1%), eligible only for their selected information contracts (../html-report/savings.json#report_comparisons). The newer primary pair is 52009→50063 (3.7%) with recall needed for complete filenames and metadata still absent, while supplementary 44522→7130 (84.0%) excludes recall and truncates content; the separate native Codex pair 356→341 (4.2%) is explicitly lossy at 7/10 commit subjects (../rr/returned-results.json#rtk-L02-compare-primary; #rtk-L03-compare-supplementary; #codex-34-o200k-compare). The retained scan labels 192/1010 Ultracode workflow children (19.01%, 1454 CLI matches), 150/301 eligible Codex workers (49.83%, 1129 CLI matches), and 10/22 workflow_children_with_lanes_block (45.45%) as users (invoke_by_tool.json). Next, make exactness-aware guidance explicit, preserve raw recovery, qualify the Codex hook locally if selected, and remove unsupported causal explanations rather than treating fixture reductions or native counters as provider savings.",
+   "gaps": [
+    {
+     "gap": "Codex uses manual instructions while the newer native hook remains unqualified; the inherited bare awareness reference is insufficient evidence that guidance was loaded.",
+     "evidence": "recipes/README.md:143; docs/token-session-handbook.md:207; groups/g1-shell-output/rtk.upstream.json; https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/codex/README.md",
+     "action": "Put the actual supported-command and exactness guidance in the native instructions or worker envelope; separately qualify upstream hook rewriting and native permission behavior before changing this choice.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Filtered output is not generally equivalent to raw output, and some attractive reductions exclude recovery cost.",
+     "evidence": "../rr/returned-results.json#rtk-L02-compare-primary; ../rr/returned-results.json#rtk-L03-compare-supplementary; ../rr/codex/derived/check.json",
+     "action": "Keep the adopted exactness exceptions, require task-specific fidelity checks, and include recall or original-output reads when comparing complete workflow cost.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The retained card still names PR-D in its shortfall text without a verified owner mapping; skipped-command counts and the 4.2% pair do not identify a causal guidance failure.",
+     "evidence": "cards/rtk.json#adapted_performance/shortfall_cause; groups/g1-shell-output/rtk.review.json; ../rr/returned-results.json#codex-33-analyze",
+     "action": "Remove the unverified pending-fix label and collect classified bypass evidence or a matched control before attributing the shortfall to guidance or command shape.",
+     "owner_pr": null
+    },
+    {
+     "gap": "Observed invocation rates do not establish eligible-command coverage or successful useful use.",
+     "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+     "action": "Retain population denominators and distinguish requested prefixes, hook rewrites, exactness bypasses and successful eligible uses.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Latest stable and the installed executable are 0.50.0.",
+     "evidence": "https://api.github.com/repos/rtk-ai/rtk/releases/latest; https://github.com/rtk-ai/rtk/releases/tag/v0.50.0; groups/verdict-evidence.json",
+     "result": "holds"
+    },
+    {
+     "claim": "Upstream 0.50.0 Codex initialization only installs awareness instructions.",
+     "evidence": "https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/codex/README.md; https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/init.rs#L3040",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The two historical fixture counts are 29986→3786 and 25386→4278; their recorded eligibility is selected-answer verification rather than universal fidelity.",
+     "evidence": "../html-report/savings.json#report_comparisons; groups/verdict-evidence.json#historical_comparison_recount",
+     "result": "holds"
+    },
+    {
+     "claim": "The newer primary pair measures 52009→50063 and does not preserve all ls metadata; complete filenames require recall.",
+     "evidence": "../rr/rtk/out/L02-compare-primary.stdout; ../rr/returned-results.json#rtk-L02-compare-primary",
+     "result": "holds"
+    },
+    {
+     "claim": "The 44522→7130 supplementary pair establishes complete, recovery-inclusive fidelity.",
+     "evidence": "../rr/rtk/out/L03-compare-supplementary.stdout; ../rr/returned-results.json#rtk-L03-compare-supplementary",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The native Codex pair used RTK explicitly, measured 356→341, and retained only 7/10 exact commit subjects.",
+     "evidence": "../rr/returned-results.json#codex-34-o200k-compare; ../rr/codex/derived/check.json",
+     "result": "holds"
+    },
+    {
+     "claim": "The 4.2% result or all 16493 discovered bypasses were caused by missing awareness guidance or disallowed command shapes.",
+     "evidence": "cards/rtk.json#adapted_performance/shortfall_cause; groups/g1-shell-output/rtk.review.json; ../rr/returned-results.json#codex-33-analyze",
+     "result": "unverified"
+    },
+    {
+     "claim": "Scan-labelled use is 192/1010 workflow children and 150/301 eligible Codex workers; the 10/22 lane-block subset is not an additional population to sum.",
+     "evidence": "invoke_by_tool.json; groups/verdict-evidence.json#invoke_check",
+     "result": "holds"
+    },
+    {
+     "claim": "The retained 42367855 global and 26531271 project saved-token snapshots are native estimates, with project already included in global.",
+     "evidence": "../html-report/savings.json#native_snapshot; cards/rtk.json#adapted_performance/native_snapshot",
+     "result": "holds"
+    },
+    {
+     "claim": "These artifact reductions establish causal provider-token or billing savings for native workers.",
+     "evidence": "../rr/rtk/out/L02-compare-primary.stdout; cards/rtk.json#invoke_rates/arm_b_native",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "qmd",
+    "gpt-tokenizer"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 37
+    },
+    "shell_commands": 7,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-a.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 47,
+     "qmd": 3
+    },
+    "shell_commands": 1,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 37,
+     "ai-memory": 1,
+     "serena": 2,
+     "socraticode": 1
+    },
+    "shell_commands": 11,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: 29,986->3,786 (87.4%); rtk gain --project +56,527 over 89 commands. #316 (laptop): size reduction reproduced, but the verifier refuted 'no fact lost' (branch -a misclassification, git -C show e…"
+}

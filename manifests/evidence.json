@@ -3616,8 +3616,8 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "f8b5a1e0abdabdd2569bf8c655d70514aa31a6e9148a02b3bf2bd699126047a3",
-      "bytes": 2529
+      "sha256": "b9bb4c6ccdc1811028b499ad08e208114afe34007daceb10c15de116bef66b69",
+      "bytes": 2896
     },
     {
       "path": ".github/workflows/practice-references-freshness.yml",
@@ -3671,8 +3671,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "f541fa4fd0207cc102d67020a950643b0035272eba646ba62ce6762fbd74ddde",
-      "bytes": 13582
+      "sha256": "8dae8a73dc67de0f51c04763e79909b0ec9b18c776952674700431a34e6f69df",
+      "bytes": 13862
     },
     {
       "path": "CLAUDE.md",
@@ -14492,8 +14492,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "a3f712c8aaf10b69659145558dd469251fdf8c6ed82dd7f393dd9ee07e20b489",
-      "bytes": 108918
+      "sha256": "b54245b21caa7eb86b97e83cb473daed085660ab42dc0270198afd64e253e2c2",
+      "bytes": 115792
     },
     {
       "path": "docs/evidence.md",
@@ -14797,8 +14797,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "74972fbdd1b96313845ffca5ea3f6108847c43ae33b10456b998d85f43cdb32d",
-      "bytes": 158732
+      "sha256": "b43af443e3ec7dd81efe16f7adc6ead8fe99a4748bc59a541f8ca8696799b80e",
+      "bytes": 587560
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -14817,8 +14817,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "2a1ac226d31dce76c0ee1fbfaed283759ab68fdb77fcd6d54e152c0bb88078f9",
-      "bytes": 88082
+      "sha256": "bb936e1921b19769528c48b5d341f75f9c4e1daa9d35f8f6f13c8cc011630406",
+      "bytes": 88615
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -15142,8 +15142,8 @@
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
-      "sha256": "cb8c828407a9d519fa504a549d818c962dde9197be5f84f8c1effd83faf44d5a",
-      "bytes": 14903
+      "sha256": "5e22e9fe1b880e0770179a3b2d96766d7e44b7740b816fdbd2659899ac217d64",
+      "bytes": 15075
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/native-checks.json",
@@ -15152,8 +15152,8 @@
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/qualification.json",
-      "sha256": "add77449e90b5b59993fcbb7cdd273c12fdf217d1c91c4b3a9df4b3894c7f729",
-      "bytes": 23751
+      "sha256": "8057164d90f668830fd845c80dd3d7f8e2b5094f19b8a23d5c317a6ffa2de571",
+      "bytes": 24105
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/returned-output.txt",
@@ -39436,6 +39436,141 @@
       "bytes": 24371
     },
     {
+      "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
+      "sha256": "7c04fec29e4fbbf5be5fcce0d65469bf6b3f873af41e3a840edbba32b086b1f6",
+      "bytes": 13531
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/agentsview.json",
+      "sha256": "e5a086ce4eb86999596fc7c34f8dfb114ce8531180da52a0dcbc6dc43dc3f355",
+      "bytes": 41427
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ai-memory.json",
+      "sha256": "210554d29261af3dff7954ec22e372c103529bf1bbd3c4e0f662732fc9c80112",
+      "bytes": 52622
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ast-grep.json",
+      "sha256": "70a2abcc2d7e6836e72e50948abf9a14d9324ed1bd38d69317540f7b1c63451e",
+      "bytes": 36591
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/ccusage.json",
+      "sha256": "9bc826ea5b13362943a344503d896dcdcd1f56ac8a25060ec6b6675c6ec49ce4",
+      "bytes": 37986
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/codebase-memory-mcp.json",
+      "sha256": "1f1b16c74ff984d09e92775a02e01fd8efcc2699d5aff97229b6237684ca5d93",
+      "bytes": 51103
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/context-hub.json",
+      "sha256": "cc9d9a64b1d9f32d9a1fffd3302165976199e42dccf2ed1345f17a5f52eb1a36",
+      "bytes": 33737
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/context-mode.json",
+      "sha256": "c156b4dda1438e52188ca24fcf2ee49aef31f5a2b9f38e55d8f66666f5fef4b3",
+      "bytes": 43370
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/gpt-tokenizer.json",
+      "sha256": "a95272983585938906537f90ae2d7df920af15e5de49b1b411963f31d5dee185",
+      "bytes": 41783
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/headroom.json",
+      "sha256": "545ff024e263ed54613e93111d7f35d1fb97935f3c7104fe98cfdf0dcbaed835",
+      "bytes": 45944
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/index.json",
+      "sha256": "11f374c1d817bdf2643d22bf0d573adb7c13a58cd66bd314b5d817ea38d68992",
+      "bytes": 2701
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/jcodemunch-mcp.json",
+      "sha256": "97c8300c11f588ab2fe01b78faddca8feb96e8178576f1e00d82aa6071bcc009",
+      "bytes": 44180
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/markitdown.json",
+      "sha256": "60374d95dfd98d9896945535f66786af3c2ae93cb75b8fde61771c6a735f056f",
+      "bytes": 36860
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/mcporter.json",
+      "sha256": "afdae44659982db5443d4fd4654cf86ea3edbd4931e587f116024e119d67f8c3",
+      "bytes": 39754
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/qmd.json",
+      "sha256": "1cda607a121d19f93e8cc7ac9bdf1460ef118c35562106385b864783bc82e494",
+      "bytes": 49621
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/repomix.json",
+      "sha256": "2c60441a2ea7b8df269f8194365a61de26bc041bec07ad9cab53353737296a37",
+      "bytes": 37808
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/rtk.json",
+      "sha256": "ade07f80c2ecef5113863ae93674d923efb14b137f97fc8aeb4f4860a2e758bc",
+      "bytes": 45952
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/serena.json",
+      "sha256": "4903157e74e112e3bc2ef3a6000d921f022a0600573679da7ff51eab8862df70",
+      "bytes": 39301
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/socraticode.json",
+      "sha256": "54f2ed198ab274f1452dcdb1590d60a40b01b1b16545142927ad1f63cfb98738",
+      "bytes": 47271
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/cards/toon.json",
+      "sha256": "72eb878a8b97d51c296a99c78348327bbcf602eaee348448b9984ae3944a6f3e",
+      "bytes": 39711
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/counter-readings.json",
+      "sha256": "866dafac99d1b0b43e7c38bea99f8b7e9f53defb9075d96a0c909eb0e7eb96fc",
+      "bytes": 2824
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json",
+      "sha256": "7f0129cfa30f9d00f7e470116d5b66ee13c7b97205ae619423d11f66c303e29a",
+      "bytes": 66154
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/invoke-by-tool.json",
+      "sha256": "7580d47a1efa88ebf9fbad036ad50e055a875c019c13be3bf1dba55242c3a045",
+      "bytes": 16453
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/returned-results-subset.json",
+      "sha256": "0931950169dcedb6a95cd67be29a86b808221a16a433c83fdcc4b80ff01505cb",
+      "bytes": 466480
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/tools/bundle.py",
+      "sha256": "363cdd4f856da199f1a876a5393ad84b61d41d144dfd3b82098bed691f967f9d",
+      "bytes": 11244
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/tools/condense.py",
+      "sha256": "ce4fa401294397d5d86e9daa38805e3fb39ab29fadb0326d247bdf0277a50db5",
+      "bytes": 19478
+    },
+    {
+      "path": "evidence/artifacts/token-stack-cards-20260927/tools/counter_readings.py",
+      "sha256": "cb14cfb9297c8c5cfd83ae1a2b6b05755fe14b5dfbebb8035c1240fa67b06ad0",
+      "bytes": 7562
+    },
+    {
       "path": "evidence/artifacts/token-tool-currency-20260927/METHOD.md",
       "sha256": "16d8b2e78deffeabc6e2900cb00514087a0a1746ee083924f6d0af659e1e89b1",
       "bytes": 10339
@@ -42187,8 +42322,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "b6770b3f7b0d41781c38576fca7706d104deab31d68e65acc0375dd9260e75e2",
-      "bytes": 57915
+      "sha256": "f149113c39259e3139df66c844bfbffbde01a5d154a62f1c1e0cff440efecfce",
+      "bytes": 64697
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -42602,8 +42737,8 @@
     },
     {
       "path": "tests/test_agentsview_qualification.py",
-      "sha256": "7978d7cd6617e20dd61e5f8e660180579adc6905b4f169d377a7364d53fdb254",
-      "bytes": 18816
+      "sha256": "348b5c7b4ee654df9a0a83d1ec1f3ced48101881de82130d6efd664c36213b1e",
+      "bytes": 20136
     },
     {
       "path": "tests/test_alpaca_capabilities.py",
@@ -42767,8 +42902,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "ba90841894437a10f56f7f5632e1bf44c39a79fbf835718d534397423067ff86",
-      "bytes": 84133
+      "sha256": "bd66847310779aa1e03510931a25ea55897543b4275148715dc9d9ab49e9f8c7",
+      "bytes": 99866
     },
     {
       "path": "tests/test_effort_default_guard.py",
