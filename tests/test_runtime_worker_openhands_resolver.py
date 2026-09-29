@@ -3548,6 +3548,36 @@ class ResolverRunTests(unittest.TestCase):
         self.assertFalse((self.state / "runs").exists())
         self.assertEqual(github.pushes, [])
 
+    def test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone(self):
+        github = ResolverGitHub(base=self.base, checks=[(0, check_list("pass"), "")] * 2)
+        code, printed, _ = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"})
+        self.assertEqual(code, 0, printed)
+        first = Path(printed["receipt"]).read_bytes()
+        for dry_run in (True, False):
+            with self.subTest(dry_run=dry_run):
+                again = ResolverGitHub(base=self.base)
+                code, refused, mocks = self.run_cli(again, dry_run=dry_run)
+                self.assertEqual(code, 3)
+                self.assertEqual({key: refused[key] for key in ("status", "stage", "reason")},
+                                 {"status": "refused", "stage": "preflight", "reason": "run_id_arm_already_exists"})
+                mocks["run"].assert_not_called()
+                self.assertEqual(Path(printed["receipt"]).read_bytes(), first)
+                self.assertEqual(again.pushes, [])
+
+    def test_a_review_loop_that_raises_still_records_the_stop(self):
+        github = ResolverGitHub(base=self.base, checks=[(0, check_list("pass"), "")] * 2)
+        self.reviewer = f"{shlex.quote(sys.executable)} -c {shlex.quote('import sys; sys.exit(7)')}"
+        code, printed, _ = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"})
+        self.assertEqual(code, 5, printed)
+        review = self.receipt(printed)["resolver"]["review"]
+        self.assertEqual((review["status"], review["reason"]), ("stopped", "reviewer_failed"))
+        with mock.patch.object(self.r.ReviewLoop, "run", side_effect=subprocess.TimeoutExpired(["gh"], 600)):
+            shutil.rmtree(self.state / "runs")
+            code, printed, _ = self.run_cli(ResolverGitHub(base=self.base), edits={"docs/a.md": "a\nnew line\n"})
+        self.assertEqual(code, 5, printed)
+        review = self.receipt(printed)["resolver"]["review"]
+        self.assertEqual((review["status"], review["reason"]), ("stopped", "timeoutexpired"))
+
     def test_issue_refusal_exits_4_before_any_attempt(self):
         github = ResolverGitHub(base=self.base, issue=issue_fixture(author_association="CONTRIBUTOR"))
         code, printed, mocks = self.run_cli(github)

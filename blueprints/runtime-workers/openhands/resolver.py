@@ -1473,6 +1473,11 @@ def plan_run(args, *, runner, now):
     gh = _absolute_executable(args.gh, "gh_path_required")
     git = _absolute_executable(args.git, "git_path_required")
     gitleaks = _absolute_executable(args.gitleaks, "gitleaks_path_required")
+    run_id = run_id_for(args.issue, now)
+    if os.path.lexists(Path(args.state) / "runs" / run_id / args.arm):
+        # One attempt per issue, arm and UTC day (host.begin_attempt refuses the same way);
+        # failed attempts are retained, so a retry waits for the next UTC day.
+        raise RunRefused("preflight", "run_id_arm_already_exists")
     try:
         # The host preflight host.run repeats: locks, owned paths, the host file, rootless Docker.
         _, host_file, _ = host.preflight(args.prefix, args.state, resolver=True)
@@ -1520,7 +1525,6 @@ def plan_run(args, *, runner, now):
     finally:
         shutil.rmtree(workroot, ignore_errors=True)
     instruction = resolver_instruction(selected, task=task, owned_paths=owned)
-    run_id = run_id_for(args.issue, now)
     plan = {"status": "planned", "run_id": run_id, "issue": args.issue, "base_sha": base, "branch": branch,
             "branch_rules": rules, "owned_paths": owned, "lane": args.lane, "arm": args.arm, "port": args.port,
             "kept_comments": selected["kept_comments"], "dropped_comments": selected["dropped_comments"],
@@ -1533,11 +1537,6 @@ def plan_run(args, *, runner, now):
         gitleaks_config=str(HERE.parents[2] / ".gitleaks.toml"), host_paths=_host_paths(args.state, args.prefix),
         user_name=pwd.getpwuid(os.getuid()).pw_name, base_env=base_env, runner=runner)
     return plan, attempt
-
-
-def _write_final_receipt(receipt_path, receipt):
-    host = _recipe("host")
-    host.write_json(receipt_path, receipt)
 
 
 def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sleep, now=None, **_):
@@ -1563,10 +1562,19 @@ def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sl
         print(json.dumps(plan, sort_keys=True))
         return 0
     host = _recipe("host")
-    with contextlib.redirect_stdout(io.StringIO()):
+    captured = io.StringIO()
+    with contextlib.redirect_stdout(captured):
         host.run(args.prefix, args.state, run_id=plan["run_id"], arm=args.arm, port=args.port, resolver=attempt)
     result = args.state / "runs" / plan["run_id"] / args.arm
     receipt_path = result / "receipt.json"
+    try:
+        reported = json.loads(captured.getvalue().strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        reported = {}
+    if reported.get("receipt") != str(receipt_path):
+        # host.run wrote no receipt for this attempt (begin_attempt refused): never touch another one.
+        print(json.dumps({"status": "refused", "stage": "preflight", "reason": "attempt_not_started"}, sort_keys=True))
+        return 3
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     review = review_summary(status="not_run")
     if isinstance(receipt.get("resolver"), dict) and receipt["resolver"].get("status") == "pr_opened" and attempt.pr:
@@ -1580,10 +1588,13 @@ def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sl
             review = review_summary(loop.run(), status="completed")
         except STOPPED as stopped:
             review = review_summary(status="stopped", reason=stopped.reason)
+        except (Exception, KeyboardInterrupt) as error:
+            # A timeout, an OS error or an interrupt: the stop is still recorded, never a pass.
+            review = review_summary(status="stopped", reason=type(error).__name__.lower())
         receipt["resolver"]["writes"] = [dict(write) for write in attempt.harness.writes]
     if isinstance(receipt.get("resolver"), dict):
         receipt["resolver"]["review"] = review
-    _write_final_receipt(receipt_path, receipt)
+    host.write_json(receipt_path, receipt)
     section = receipt.get("resolver") or {}
     code = resolver_exit(receipt)
     print(json.dumps({"run_id": plan["run_id"], "receipt": str(receipt_path), "status": section.get("status"),
