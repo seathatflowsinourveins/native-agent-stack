@@ -8,8 +8,11 @@ versions, counts, booleans, unit states), compares two captures and checks a cap
 Amendment 4 publishes, so any session can test its own change against the frozen set without a run.
 
 It is glue over existing commands and file hashes, not a measurement instrument, and it decides nothing: it reports.
-Written for Python 3.9 or newer (the tests ran on 3.12.3 and 3.13.15), standard library only, Linux first. It writes only the two capture files, edits no host state, opens
-no credential store, and never prints or stores an environment value, a token, a host name or a user name.
+Standard library only, Linux first; the tests ran on Python 3.12.3 and 3.13.15, and no older version is verified. The tool
+itself writes only the two capture files (and the temporary directory of the usage probe, which it removes), changes no host
+state of its own, opens no credential store, and never prints or stores an environment value, a token, a host name or a user
+name. The commands it runs (`claude mcp list`, which starts each configured MCP server, and one `claude -p` call) are the
+client's own, and whether they update the client's bookkeeping files is not verified here.
 
 ## Commands
 
@@ -37,7 +40,8 @@ python3 -B $T list-frozen [--config freeze.json] [--repo <checkout>] [--all] [--
   capture is absent too.
 - `list-frozen` prints `<id><TAB><how to check>` for every frozen item and family (`--all` adds the informational ones,
   `--json` prints id, class, family, owner and how). It runs no capture and needs no checkout; without `--repo` it checks
-  the paths of a configuration against the home directory only.
+  the paths of a configuration against the home directory only. It prints no path a configuration names: a configured file
+  is listed by its id with a path-free line, because only the private capture records where it lives.
 
 Exit status: `0` done (compare: no frozen drift; check: all pass), `1` a frozen item drifted or failed, `2` a usage, input
 or configuration error, `3` the privacy guard refused the output (nothing was written).
@@ -88,12 +92,12 @@ a slash. `<unit>` is one of `ecosystem-otelcol`, `ecosystem-loki`, `ecosystem-pr
 | `tools.tokenizer.{version, o200k_base.sha256, o200k_bpe_ranks.sha256}` | frozen | `gpt-tokenizer` package version and the sha256 of `cjs/encoding/o200k_base.js` and `cjs/bpeRanks/o200k_base.js` under the tokenizer prefix. |
 | `tools.token_manifest.sha256`, `tools.token_manifest_test.sha256`, `tools.token_manifest_template.sha256`, `tools.token_manifest_full_template.sha256` | frozen | sha256 of `tools/token-report/token_manifest.py`, its test file and its two HTML templates. |
 | `tools.qmd.{documents,vectors,pending,orphaned}` | frozen | Counts from the `Documents` block of `qmd --index native-agent-stack-catalog status`; the Orphaned and Pending lines are absent when zero. |
-| `tools.parser.file.*`, `tools.parser.all_match_pin` | frozen | sha256 of each file `examples/claude-native/workflows/shell-parser.pin.json` names, read from the installed parser directory (the pin's `install.default_directory` under the home directory, or the configured `parser_dir`); true when every one equals the pinned value. Without the pin file (it ships with U1) the flag is `missing`. |
+| `tools.parser.file.*`, `tools.parser.all_match_pin` | frozen | sha256 of each file `examples/claude-native/workflows/shell-parser.pin.json` names (its `files`, and the lockfile it names at `install.lockfile`, `package-lock.json` by default), read from the installed parser directory in the order `child-usage.mjs` resolves it: the configured `parser_dir`, then the absolute path in `CHILD_USAGE_SHELL_PARSER` (it must meet the path policy, a relative value or `~` is an `error` with reason `refused_path`, and its location is not stored), then the pin's `install.default_directory` under the home directory. `all_match_pin` is true when every file equals its pinned sha256 and the lockfile lists both pinned packages with the pinned version and integrity (compared in process, never stored): the check `child-usage.mjs` makes before it loads the parser. A pin the kernel would refuse (a package, its version or its integrity absent) is an `error` with reason `unrecognized_pin`; without the pin file (it ships with U1) the flag is `missing`. |
 | `services.<unit>.{load_state, active_state, main_pid, n_restarts, config_sha256}` | frozen | One `systemctl --user show <unit> -p LoadState -p ActiveState -p MainPID -p NRestarts -p ExecStart` per unit. A unit that is not loaded reports `load_state` and `missing` for the rest. `config_sha256` is the sha256 of the file named by `--config`, `--config.file` or `-config.file` in `ExecStart` (a `file:` scheme is dropped), `not_applicable` when the unit names none. The unit's environment is never requested. |
 | `gateways.<gateway>.route.<route>`, `gateways.<gateway>.build_id` | frozen | Only with a configured gateway: see below. |
 | `extra.<id>` | frozen or informational | Only with a configured file: its sha256. |
 | `capacity.codex.weekly_{used_percent,resets_at_utc}` | informational | The weekly (10080 minute) window of `scripts/codex_quota.py --json`. |
-| `capacity.claude.{five_hour,seven_day}_{utilization_fraction,resets_at_utc}` | informational | `unifiedWindows` of the `rate_limit_event` returned by one headless Haiku call. A call rejected at the session limit exits `1` and still returns the event, so its numbers are read (a utilization above `1` means the window is over its limit); a failed call without the event is `error`. |
+| `capacity.claude.{five_hour,seven_day}_{utilization_fraction,resets_at_utc}` | informational | `unifiedWindows` of the `rate_limit_event` returned by one headless Haiku call. A call rejected at the session limit exits nonzero (HTTP 429) and still returns the event, so its numbers are read (a utilization above `1` means the window is over its limit); a failed call without the event is `error`. |
 | `capacity.host.{load_average,memory_available_mib}` | informational | `os.getloadavg()` and `MemAvailable` from `/proc/meminfo` (`not_applicable` off Linux). |
 | `time.{capture_start_utc,capture_end_utc,tool_version,tool_revision,tool_sha256}` | informational | The capture's UTC start and end, the tool's version, the git revision of the checkout holding the tool, and the sha256 of the tool file. |
 
@@ -112,7 +116,8 @@ four items as `missing` with reason `skipped`.
   "files": [
     {"id": "token-report-config", "path": "~/.local/state/native-token-report/config.json"},
     {"id": "token-report-timer", "path": "~/.config/systemd/user/token-report-refresh.timer", "class": "informational"},
-    {"id": "socraticode-package", "path": "~/.local/share/codex-ecosystem/tools/socraticode-1.15.0/lib/node_modules/socraticode/package.json"}
+    {"id": "socraticode-package", "path": "~/.local/share/codex-ecosystem/tools/socraticode-1.15.0/lib/node_modules/socraticode/package.json"},
+    {"id": "returned-results-script", "path": "tools/token-report/returned_results.js"}
   ],
   "units": ["token-report-refresh", {"name": "paper-rth-20260929", "class": "informational"}],
   "qmd_index": "native-agent-stack-catalog",
@@ -131,7 +136,13 @@ four items as `missing` with reason `skipped`.
 - `files`: extra files by id and path (`~/...`, absolute, or relative to the checkout); `class` defaults to `frozen`. Use
   it for what the catalogue does not hash: the token-report configuration, service and timer, and the installed package of a
   component that `scripts/adoption_status.py --pinned-versions` reports as unchecked (on the workstation host `context-mode`
-  and `socraticode`, whose probes are not run).
+  and `socraticode`, whose probes are not run), and the report renderer's script, which `tools/token-report/token_manifest.py`
+  inlines into the rendered HTML but the catalogue does not hash. `list-frozen` names a configured file by its id only, so
+  give each id a name that says which file it is.
+- `parser_dir` and `tokenizer_prefix`: where the installed shell parser (tree-sitter-bash) and the `gpt-tokenizer` package
+  live when they are not at their defaults. `parser_dir` plays the `--shell-parser` argument of `child-usage.mjs`, which the
+  kernel tries before `CHILD_USAGE_SHELL_PARSER`; without either, the pin's default directory under the home directory is
+  read. The capture reads `CHILD_USAGE_SHELL_PARSER` from its own process, so capture in the environment the run will use.
 - `units`: extra systemd user units, added to the nine defaults. An entry is a unit name (frozen) or
   `{"name", "class"}`; `informational` records a unit that may run inside a run window, such as a paper-trading unit, without
   failing `compare`. A default unit is always frozen: naming one as informational is an error.
@@ -152,7 +163,8 @@ four items as `missing` with reason `skipped`.
   anything else is the class `other`. Settings and unit files are read whole and in process; their other values are never
   copied. A permission rule is counted and never kept, and its text is also on the guard's list below.
 - The private capture stores paths as `~/...` or `<repo>/...`, never as an absolute path. The sanitized capture has no path
-  field, no path character and no user name.
+  field, no path character and no user name. A location that came from an environment variable (the parser directory that
+  `CHILD_USAGE_SHELL_PARSER` names) is not stored at all, and `list-frozen` prints no path a configuration names.
 - A last guard refuses the whole capture (exit 3, nothing written) if any string carries an environment value of eight
   characters or more (except the model alias of `CLAUDE_CODE_SUBAGENT_MODEL`), a permission rule of eight characters or more,
   the home or checkout path, or the user or host name. A value or name that the tool's own catalogue text already contains
@@ -181,7 +193,19 @@ four items as `missing` with reason `skipped`.
 - A gateway's build identifier is read from its HTTP answer (a JSON field or a header), because the tool never requests a
   unit's `Environment`; a build id kept only in a unit's environment is not captured.
 - `shell-parser.pin.json` ships with U1, so `tools.parser.*` are `missing` on a checkout that predates it, and the seal
-  then freezes that absence.
+  then freezes that absence. `tools.parser.*` mirrors `verifiedShellParser` in U1's `child-usage.mjs`, which is not merged at
+  this unit's base (the function is byte-identical on the two U1 branches read); when U1 merges, read it again, because a
+  change to its directory order, its lockfile rule or its pin keys makes the mirror stale. A run started with another
+  `--shell-parser` argument or another `CHILD_USAGE_SHELL_PARSER` than the capture's loads a directory this tool did not
+  hash: name it in `parser_dir` or capture in the run's environment.
+- The report freeze hashes `token_manifest.py`, its test and its two templates. `tools/token-report/returned_results.js`, which
+  `token_manifest.py` inlines into the rendered HTML, and every `gpt-tokenizer` module except the two encoder files are not
+  in the default catalogue; name them under `files` (see Configuration).
+- The tool records hashes and whether the copies of a role body are identical, and `check` compares them with the sealed
+  expectations; it does not know which hashes are right. The RUNBOOK requires each of the five role bodies to equal the
+  SHA256 recorded in the sealed README (the `d022295a` table, and the Amendment 3 row for `isolated-builder`), so the seal
+  owner verifies the seal capture's `roles.<role>.*` values against those before publishing it. The RUNBOOK names three
+  copies (adoption, project, user); the tool hashes a fourth (`examples/claude-native/agents`), which is stricter.
 - `unifiedWindows` in the `rate_limit_event` (the five-hour and seven-day windows) is observed on claude 2.1.284, not
   documented: a client update may drop it, and the four Claude capacity items then read `missing`. The Agent SDK reference
   documents only the single-window fields `status`, `resets_at`, `rate_limit_type` and `utilization`.
@@ -203,10 +227,13 @@ The suite builds a temporary host (a git checkout, a home directory, fake `claud
 copy the shapes read from the real commands on 2026-09-29. `MutationControlTests` writes a mutant of the tool for each
 property (an environment leak with and without the guard, a variant that prints `os.environ`, a collector blind to each
 item class, informational drift that fails, a check that always passes, credential refusal off, a missing tool that
-raises, a collector blind to `permissions.defaultMode` or to `crossSessionInbound`, and permission rules printed with and
-without the guard) and requires the test for that property to fail on it; the last four also require the failing assertion
-to name the item or the refusal, so a mutant cannot fail for another reason. `FREEZE_SNAPSHOT_TOOL` points the suite at another copy of the tool and `FREEZE_MUTANT_DIR` keeps
-the mutants and each one's exit code and failing assertion.
+raises, a collector blind to `permissions.defaultMode` or to `crossSessionInbound`, permission rules printed with and
+without the guard, `list-frozen` printing the configured path, the parser variable ignored, its location stored or a relative
+or `~` value accepted, the configured parser directory ranked below the variable, the lockfile ignored, and the
+`tokenizer_prefix` override ignored) and requires the test for that property to fail on it; the last eleven also require the
+failing assertion to name the item, the refusal or the value, so a mutant cannot fail for another reason.
+`FREEZE_SNAPSHOT_TOOL` points the suite at another copy of the tool and `FREEZE_MUTANT_DIR` keeps the mutants and each
+one's exit code and failing assertion.
 
 ## Sources
 
@@ -231,9 +258,16 @@ carries the redaction rules above. Each rule follows its own source:
   `--verbose` and `--model`.
 - [proc_meminfo(5)](https://man7.org/linux/man-pages/man5/proc_meminfo.5.html): `MemAvailable` ("An estimate of how much
   memory is available for starting new applications, without swapping").
+- `examples/claude-native/workflows/child-usage.mjs` `verifiedShellParser` (U1, unmerged at this unit's base; the function is
+  byte-identical on branch `claude/pra-u1d-parser-ci-2d-20260929` at `967561cc`, lines 656, 661 and 663-668, and on
+  `claude/pra-u1-cmdpos-2d-20260928` at `2bad7320`, lines 643-655): the directory order (argument,
+  `CHILD_USAGE_SHELL_PARSER`, the pin's default under the home directory), the pinned files and the lockfile rule that
+  `tools.parser.*` mirrors.
 - Output shapes read on 2026-09-29 and kept as fixtures in `tests/test_freeze_snapshot.py`: `claude mcp list` and
   `claude -p ... --output-format json` (claude 2.1.284), `qmd status` (qmd 2.8.3, whose `Documents` block prints the
   Orphaned and Pending lines only above zero), `scripts/adoption_status.py --client-wiring --json`,
   `--pinned-versions --json` and `scripts/codex_quota.py --json` (this repository), and the tools' `--version` lines.
   `claude mcp list` has no documented machine-readable form, and the Agent SDK reference documents `RateLimitInfo` without
-  `unifiedWindows`, so both shapes are observed, not specified.
+  `unifiedWindows`, so both shapes are observed, not specified. A call rejected at the session limit was observed to
+  return the `rate_limit_event` with `status` `rejected` and both windows, then a result with `is_error` true and
+  `api_error_status` 429.
