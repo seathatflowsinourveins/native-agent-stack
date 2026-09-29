@@ -227,7 +227,10 @@ def code_spans(text):
 
 
 def normalize(text):
-    """Grammar g1: NFKC, dash variants to '-', emphasis and backticks stripped outside fenced blocks, spaces collapsed."""
+    """Grammar g1: NFKC, dash variants to '-', emphasis and backticks stripped outside fenced blocks, spaces collapsed.
+
+    Every '*' outside a fenced block is removed (emphasis markers, but also varargs and globs in inline code), so any
+    comparison between an answer and a key string must send BOTH sides through normalize or flat; the oracles do."""
     text = unicodedata.normalize("NFKC", text).translate(_DASH_TABLE)
     out, fence = [], None
     for line in text.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
@@ -572,9 +575,12 @@ def grading_block_schema():
             "memory_scope": _object({"workspace": _string(), "project": _string()}),
             "qmd": _object({"index": _string(), "collections": {"type": "array", "items": _string(), "minItems": 1}}),
             "pages": _object({kind: _string() for kind in PAGE_KINDS}),
+            # The GPT-6 judge runs at max effort, never on codex_lane's default `high` (standing rule); the route is
+            # frozen as design f2 lists it, so a block cannot name another model, role or effort.
             "judges": _object({
-                "claude_answers": _object({"model": _string(), "effort": _string()}),
-                "codex_answers": _object({"agent_type": _string(), "model": _string(), "effort": _string()}),
+                "claude_answers": _object({"model": {"const": "gpt-6-astra"}, "effort": {"const": "max"}}),
+                "codex_answers": _object({"agent_type": {"const": "blind-lane-reviewer"}, "model": {"const": "opus"},
+                                          "effort": {"const": "max"}}),
                 "refute": {"enum": ["passes_only"]},
                 "calibration": _object({"correct": {"type": "integer"}, "paraphrased": {"type": "integer"},
                                         "wrong": {"type": "integer"}}),
@@ -647,6 +653,18 @@ def validate_schema(instance, schema, path=""):
         if "items" in schema:
             for number, value in enumerate(instance):
                 validate_schema(value, schema["items"], f"{path}.{number}" if path else str(number))
+
+
+def validate_grading_block(block):
+    """The schema, then the hex fields the schema cannot express: E_GRADING_BLOCK field=<dotted path> either way."""
+    validate_schema(block, grading_block_schema())
+    if not is_hex(block["tool"]["revision"], 40):
+        raise Refusal("E_GRADING_BLOCK", field="tool.revision")
+    for name, digest in block["tool"]["sha256"].items():
+        if not is_hex(digest, 64):
+            raise Refusal("E_GRADING_BLOCK", field=f"tool.sha256.{name}")
+    if not is_hex(block["registry_sha256"], 64):
+        raise Refusal("E_GRADING_BLOCK", field="registry_sha256")
 
 
 # ---- Registry (52 exact-text keys, 40 templates) and template classes (a3, a4) ----------------------------------
@@ -887,7 +905,7 @@ def _map_tasks(document, dropped_tasks, templates):
     live = []
     for task in document["tasks"]:
         if task["id"] in dropped:
-            continue
+            raise Refusal("E_TEMPLATE_TASKS", reason="dropped_present", task=task["id"])
         key = check_key(task["pass_fail_check"])
         if key not in REGISTRY:
             raise Refusal("E_CHECK_UNMAPPED", task=task["id"])
@@ -1034,7 +1052,11 @@ class GitSources:
         self._listing = {}
 
     def _git(self, *args, check=False):
-        done = subprocess.run(["git", "-C", self.repo, *args], capture_output=True, stdin=subprocess.DEVNULL)
+        try:
+            done = subprocess.run(["git", "-C", self.repo, *args], capture_output=True, stdin=subprocess.DEVNULL,
+                                  timeout=120)
+        except subprocess.TimeoutExpired:
+            raise Refusal("E_GIT", reason="timeout") from None
         if check and done.returncode != 0:
             raise Refusal("E_GIT", reason="failed")
         return done
@@ -1060,18 +1082,27 @@ class GitSources:
         if not wanted:
             return {}
         request = "".join(f"{self.rev}:{path}\n" for path in wanted).encode("utf-8")
-        done = subprocess.run(["git", "-C", self.repo, "cat-file", "--batch"], input=request, capture_output=True)
+        try:
+            done = subprocess.run(["git", "-C", self.repo, "cat-file", "--batch"], input=request, capture_output=True,
+                                  timeout=300)
+        except subprocess.TimeoutExpired:
+            raise Refusal("E_GIT", reason="timeout") from None
+        if done.returncode != 0:
+            raise Refusal("E_GIT", reason="failed")
         data, result, offset = done.stdout, {}, 0
-        for path in wanted:
-            end = data.index(b"\n", offset)
-            header = data[offset:end].split()
-            offset = end + 1
-            if len(header) == 3 and header[1] == b"blob":
-                size = int(header[2])
-                result[path] = data[offset:offset + size]
-                offset += size + 1
-            else:
-                result[path] = None
+        try:
+            for path in wanted:
+                end = data.index(b"\n", offset)
+                header = data[offset:end].split()
+                offset = end + 1
+                if len(header) == 3 and header[1] == b"blob":
+                    size = int(header[2])
+                    result[path] = data[offset:offset + size]
+                    offset += size + 1
+                else:
+                    result[path] = None
+        except ValueError:
+            raise Refusal("E_GIT", reason="malformed") from None
         return result
 
 
@@ -1089,8 +1120,11 @@ class DirSources:
             return None
 
     def files(self, *prefixes):
-        done = subprocess.run(["git", "-C", self.root, "ls-files", "-z"], capture_output=True,
-                              stdin=subprocess.DEVNULL)
+        try:
+            done = subprocess.run(["git", "-C", self.root, "ls-files", "-z"], capture_output=True,
+                                  stdin=subprocess.DEVNULL, timeout=120)
+        except subprocess.TimeoutExpired:
+            raise Refusal("E_GIT", reason="timeout") from None
         if done.returncode != 0:
             raise Refusal("E_GIT", reason="failed")
         paths = sorted(item for item in done.stdout.decode("utf-8").split("\0") if item)
@@ -2752,8 +2786,16 @@ def _git(tree, *args, env=None):
                           env=_git_env(env))
 
 
+def is_bytecode_path(path):
+    """A bytecode cache: a `__pycache__` path component or a .pyc/.pyo file. A child that ran Python leaves these, and
+    they are neither a change to the tree nor ever copied into a grader run (a planted one would execute)."""
+    return "__pycache__" in path.split("/") or path.endswith((".pyc", ".pyo"))
+
+
 def porcelain_entries(tree):
-    """git status --porcelain=v1 -z --untracked-files=all --ignored=matching as sorted {status, path} entries (R13)."""
+    """git status --porcelain=v1 -z --untracked-files=all --ignored=matching as sorted {status, path} entries (R13),
+    without bytecode caches (review F-1: they would make every post capture `tree_changed` and every builder tree
+    carry an extra file); every other ignored file stays."""
     done = _git(tree, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--ignored=matching")
     fields = done.stdout.decode("utf-8", errors="replace").split("\0")
     entries, index = [], 0
@@ -2765,15 +2807,15 @@ def porcelain_entries(tree):
         code, path = item[:2], item[3:]
         if code[0] in "RC":
             index += 1
-        entries.append({"status": code.replace(" ", "") or code, "path": path})
+        if not is_bytecode_path(path.rstrip("/")):
+            entries.append({"status": code.replace(" ", "") or code, "path": path})
     return sorted(entries, key=lambda entry: entry["path"])
 
 
 def tree_state(tree):
     """HEAD plus the digest of the porcelain status (ignored files included): the identity of a tree's contents."""
     head = _git(tree, "rev-parse", "HEAD").stdout.decode("utf-8", errors="replace").strip()
-    status = _git(tree, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--ignored=matching").stdout
-    return {"head": head, "status_sha256": sha256_hex(status)}
+    return {"head": head, "status_sha256": sha256_hex(canonical(porcelain_entries(tree)))}
 
 
 def parse_git_log_subjects(text):
@@ -2844,12 +2886,12 @@ def _copy_tree(tree, destination):
     listing = _git(tree, "ls-files", "-z", "--cached", "--others", "--exclude-standard")
     os.makedirs(destination, exist_ok=True)
     if listing.returncode != 0:
-        shutil.copytree(tree, destination, ignore=shutil.ignore_patterns(".git", "__pycache__"), dirs_exist_ok=True,
-                        symlinks=True)
+        shutil.copytree(tree, destination, ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", "*.pyo"),
+                        dirs_exist_ok=True, symlinks=True)
         return
     for name in sorted(item for item in listing.stdout.decode("utf-8", errors="replace").split("\0") if item):
         source = os.path.join(tree, name)
-        if not os.path.lexists(source):
+        if is_bytecode_path(name) or not os.path.lexists(source):
             continue
         target = os.path.join(destination, name)
         os.makedirs(os.path.dirname(target), exist_ok=True)
@@ -2862,12 +2904,17 @@ def rerun_unittest_in_copy(tree, env, sandbox_prefix=(), timeout=900):
     argv = list(dict(T0_IDENTITIES)["unittest"])
     with tempfile.TemporaryDirectory(prefix="u9-copy-") as scratch:
         copy = os.path.join(scratch, "tree")
+        cache = os.path.join(scratch, "pycache")
+        os.makedirs(cache)
         _copy_tree(str(tree), copy)
         run_env = dict(os.environ if env is None else env)
+        # A fresh, empty pycache prefix makes the interpreter ignore any cached bytecode next to the sources, so a
+        # planted .pyc cannot run (it would even under -I -S); DONTWRITEBYTECODE keeps the copy source-only.
         run_env["PYTHONDONTWRITEBYTECODE"] = "1"
+        run_env["PYTHONPYCACHEPREFIX"] = cache
         run, out, err = _run_capture("unittest", argv, copy, run_env, sandbox_prefix, timeout)
     run["facts"] = parse_unittest_facts(err + "\n" + out)
-    run["env"] = {"PYTHONDONTWRITEBYTECODE": "1"}
+    run["env"] = {"PYTHONDONTWRITEBYTECODE": "1", "PYTHONPYCACHEPREFIX": "<fresh-empty-dir>"}
     return run
 
 
@@ -2999,8 +3046,7 @@ def oracle_T0(params, key, ans, readings, ctx=None):
             if name in ("ran", "status"):
                 unparsed = True
             continue
-        acceptable = {unit_arm.get(name), unit_plain.get(name)}
-        if not (set(values) & acceptable):
+        if unit_arm.get(name) not in values:  # the arm's own capture is the key; the plain one only marks the fields
             if mismatch_outcome(name in dependent) == "unknown":
                 soft.add("env_mismatch")
             else:
@@ -3024,17 +3070,15 @@ ORACLES["T0"] = oracle_T0
 GREETINGS = {"Ada": "Hello, Ada!", "Grace": "Hello, Grace!"}
 
 
-def _isolated_greeting(path):
-    """greeting('Ada') and greeting('Grace') in an isolated interpreter (-I -S) on a temporary copy of the file."""
-    code = ("import runpy, sys\nmodule = runpy.run_path(sys.argv[1])\n"
-            "print(module['greeting']('Ada'))\nprint(module['greeting']('Grace'))\n")
+def _isolated_greeting(source):
+    """greeting('Ada') and greeting('Grace') from the verified bytes, compiled and run in an isolated interpreter
+    (-I -S -B): nothing is imported from a file, so no planted bytecode or module next to it can run."""
+    code = ("import sys\nnamespace = {}\nexec(compile(sys.stdin.buffer.read(), 'before.py', 'exec'), namespace)\n"
+            "print(namespace['greeting']('Ada'))\nprint(namespace['greeting']('Grace'))\n")
     with tempfile.TemporaryDirectory(prefix="u9-greet-") as scratch:
-        copy = os.path.join(scratch, "before.py")
-        shutil.copyfile(path, copy)
-        env = {"PYTHONDONTWRITEBYTECODE": "1", "PATH": os.environ.get("PATH", "")}
-        done = subprocess.run([sys.executable, "-I", "-S", "-c", code, copy], capture_output=True, text=True,
-                              stdin=subprocess.DEVNULL, timeout=60, env=env, cwd=scratch)
-    lines = done.stdout.split("\n")
+        done = subprocess.run([sys.executable, "-I", "-S", "-B", "-c", code], input=source, capture_output=True,
+                              timeout=60, env={"PATH": os.environ.get("PATH", "")}, cwd=scratch)
+    lines = done.stdout.decode("utf-8", errors="replace").split("\n")
     return {"Ada": lines[0] if len(lines) > 0 else None, "Grace": lines[1] if len(lines) > 1 else None}
 
 
@@ -3065,7 +3109,7 @@ def grade_builder(prepared_path, prepared_base, observed_path, observed_base, ex
         return fail("empty_diff")
     if final != after_bytes:
         return fail("bytes_differ")
-    greeting = _isolated_greeting(target)
+    greeting = _isolated_greeting(final)
     if greeting != GREETINGS:
         return fail("greeting", greeting=greeting)
     return ok(greeting=greeting)

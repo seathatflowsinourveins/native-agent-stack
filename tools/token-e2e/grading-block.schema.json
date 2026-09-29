@@ -446,10 +446,10 @@
           "type": "object",
           "properties": {
             "model": {
-              "type": "string"
+              "const": "gpt-6-astra"
             },
             "effort": {
-              "type": "string"
+              "const": "max"
             }
           },
           "required": [
@@ -462,13 +462,13 @@
           "type": "object",
           "properties": {
             "agent_type": {
-              "type": "string"
+              "const": "blind-lane-reviewer"
             },
             "model": {
-              "type": "string"
+              "const": "opus"
             },
             "effort": {
-              "type": "string"
+              "const": "max"
             }
           },
           "required": [
