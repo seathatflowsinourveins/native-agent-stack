@@ -1266,6 +1266,21 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli["parse_errors"], 0)
 
     @NEEDS_PARSER
+    def test_a_word_the_grammar_cut_after_an_assignment_is_one_word(self):
+        # tree-sitter-bash 0.25.1 cuts the value of an assignment at the second `$` of `a=$x/$y-$z` and reads the tail, glued to the
+        # assignment with no blank, as the command's name (its arguments become the name's arguments), so `a=$x/$y-$z qmd get` lost the
+        # lane and counted an unresolved program (93 of 136,361 real commands hold such a cut word, none with a lane word after it; count-only).
+        # A name with no blank before it belongs to the assignment's word. Expected lanes are the runs of real bash 5.2 under stubs.
+        cases = {"a=$HOME/$X-$Y qmd get": {"qmd": 1}, "a=$HOME/$X.$Y toon f.json": {"toon": 1}, "A=$HOME/$X-$Y rtk proxy toon f": {"rtk_proxy": 1, "toon": 1},
+                 "A=1 B=$HOME/$X-$Y markitdown a.json": {"markitdown": 1}, "a=$HOME/$X-$Y": {}, "for i in a; do out=$HOME/$X-$Y; done": {},
+                 "for i in a; do out=$HOME/$X-$Y; done; qmd get": {"qmd": 1}, "a=$HOME/$X-z qmd get": {"qmd": 1}, "a=$HOME/$Xz qmd get": {"qmd": 1}}
+        for (command, want), (lanes, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(lanes, want)
+                self.assertEqual(cli["parse_errors"], 0)
+                self.assertEqual(cli["unresolved_programs"], 0)
+
+    @NEEDS_PARSER
     def test_a_heredoc_with_no_delimiter_line_is_closed_by_the_end_of_the_text(self):
         # bash runs a here-document whose delimiter line is missing, with a warning, and its body is everything after the operator's line;
         # tree-sitter-bash 0.25.1 puts that body in an ERROR and its words among the commands of the operator's line, or drops it when the

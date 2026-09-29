@@ -197,6 +197,13 @@ PROBES = [
     ("mcporter call", "mcporter call codebase-memory.search_graph --args '{}'"),
     ("mcporter list", "mcporter list socraticode --brief"),
     ("mcporter version", "mcporter --version"),
+    # tree-sitter-bash 0.25.1 cuts an assignment's word at the second `$` of `a=$x/$y-$z` and reads the tail as the command's name (and the
+    # words after it as its arguments), so a lane behind such an assignment was lost and the tail counted as an unresolved program.
+    ("word cut after an assignment", "a=$HOME/$X-$Y qmd get"),
+    ("word cut after an assignment, dot", "a=$HOME/$X.$Y toon f.json"),
+    ("word cut after an assignment, wrapper", "A=$HOME/$X-$Y rtk proxy toon f"),
+    ("word cut after two assignments", "A=1 B=$HOME/$X-$Y markitdown a.json"),
+    ("word cut in a loop body", "for i in a; do out=$HOME/$X-$Y; done; qmd get"),
     ("mcporter bare", "mcporter"),
     ("mcporter bare in a shell string", "sh -c mcporter list"),
     ("substitution", "x=$(qmd get a); echo \"$(toon b)\" `repomix`"),
@@ -473,6 +480,7 @@ class GeneratorExt(Generator):
                 lambda: ">/dev/null " + name + " " + word(),
                 lambda: "2>&1 " + name,
                 lambda: "A=1 " + name + " " + word(),
+                lambda: "A=$HOME/$X-$Y " + name + " " + word(),
                 lambda: "A=" + self.sub() + " " + name,
                 lambda: name + " --flag=" + self.sub(),
                 lambda: name + ' "$(' + self.lane() + ')"',
