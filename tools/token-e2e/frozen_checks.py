@@ -3337,6 +3337,8 @@ def capture_page(kind, url):
     """One frozen page through `curl --fail -sSL`: status, effective URL, bytes, sha256 and the extracted facts."""
     failed = {"kind": kind, "status": None, "effective_url": None, "bytes": None, "sha256": None, "facts": None,
               "error": "download_failed"}
+    if not url.startswith(("https://", "http://")):
+        return dict(failed, error="bad_url")  # never hand curl something that could parse as an option
     with tempfile.TemporaryDirectory(prefix="u9-page-") as scratch:
         target = os.path.join(scratch, "page")
         try:

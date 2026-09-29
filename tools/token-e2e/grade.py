@@ -217,6 +217,8 @@ def _abs_path(value, field):
 def _launch_arm(arm, args_document):
     if set(args_document) - LAUNCH_KEYS:
         raise fc.Refusal("E_BIND", field="schema")
+    if "arm" in args_document and args_document["arm"] != arm:
+        raise fc.Refusal("E_BIND", field="arm")
     if not isinstance(args_document.get("run"), str) or not args_document["run"]:
         raise fc.Refusal("E_BIND", field="run")
     attempt = args_document.get("attempt")

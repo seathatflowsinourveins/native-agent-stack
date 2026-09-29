@@ -1594,6 +1594,11 @@ class F26_Bind(GraderCase):
                                lambda d: d.__setitem__("input_sha256", {"reuse-296-02": "0" * 64}))
         self.assertRefusal(self.run_bind(inputs, launch=changed), "E_BIND", field="input_paths")
 
+    def test_launch_args_that_name_another_arm_are_refused(self):
+        inputs = self.files()
+        changed = self.rewrite(inputs, "launch-b.json", lambda d: d.__setitem__("arm", "A"))
+        self.assertRefusal(self.run_bind(inputs, launch=changed), "E_BIND", field="arm")
+
     def test_a_missing_root_value_is_refused(self):
         inputs = self.files()
         changed = self.rewrite(inputs, "roots.json", lambda d: d.pop("CLAUDE_ROOT"))
@@ -1817,6 +1822,14 @@ class F27b_CaptureCommand(GraderCase):
 
     def test_a_window_capture_needs_a_family(self):
         self.assertRefusal(self.capture("--phase", "w-open", env=fake_curl(self.tmp)), "E_ARGS", field="family")
+
+    def test_a_url_that_is_not_http_is_never_handed_to_curl(self):
+        fc = load("frozen_checks")
+        env = fake_curl(self.tmp)
+        with mock.patch.dict(os.environ, env):
+            record = fc.capture_page("json", "--config=/etc/hostname")
+        self.assertEqual((record["status"], record["error"]), (None, "bad_url"))
+        self.assertFalse((self.tmp / "fake-curl.log").exists(), "curl must not have been run")
 
     def test_a_failed_download_is_recorded_not_hidden(self):
         env = fake_curl(self.tmp)
