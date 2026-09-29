@@ -28,11 +28,11 @@ process listing while it runs and the unit's Environment property can be read
 over the user bus), and the body
 of a command substitution inside double quotes (`echo "$(printenv)"` runs
 printenv; single quotes, an ANSI-C string and a `#` comment stay data). A
-here-document's lines are command lines like any other; the one exemption is a
-strict canonical idiom, a double-quoted word of exactly the shape
-`"$(cat <<'EOF'` newline, body, `EOF` newline, `)"` (idiom_spans), behind git,
-gh, echo or printf: its body is data for the command reading, while the
-raw-text rules still read it. `ps -E` (macOS) and `systemctl show-environment` or a bare
+here-document's lines are command lines like any other, whatever its delimiter
+and whatever receives it, so a commit message written through
+`"$(cat <<'EOF' ... EOF)"` whose prose has a line that reads as a dump is
+refused: write the text with the Write tool and pass `git commit -F FILE`
+(docs/secret-storage.md). `ps -E` (macOS) and `systemctl show-environment` or a bare
 `systemctl show` (a service manager's whole environment block) dump the
 environment like `ps e` and `env`. For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
@@ -42,9 +42,8 @@ the command that `kernel_keyring.py exec` or `tvly-keyring` starts with every
 rule above, and blocks that command when it names the injected variable or
 dumps the environment it inherits, also behind a launcher's options
 (`stdbuf -o0`) or a launcher the guard does not model (`watch`, `flock`).
-A backslash-newline is joined first (the canonical idiom is looked for before
-that) and every raw-text rule also reads the command after the shell's quote
-removal, so a name split by quotes, a
+A backslash-newline is joined first and every raw-text rule also reads the
+command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
 are never taken for arguments. An internal error blocks the command (`guard_error`), because only exit 2
 blocks; a hook that outlasts its timeout does not, so every scan reads a text once and a command of more than
@@ -61,7 +60,6 @@ The same file is installed for every session on a host as
 
 from __future__ import annotations
 
-import bisect
 import json
 import re
 import shlex
@@ -282,24 +280,6 @@ SUBSTITUTION_BUDGET_FLOOR = 65536
 # substitution prints always run inside the timeout, so no reading is skipped above some length. Refusing what cannot be read in time
 # fails closed where reading it would fail open.
 MAX_COMMAND_CHARACTERS = 200_000
-# The canonical idiom of a commit message or a pull-request body (idiom_spans): a double-quoted word that is exactly
-# `"$(cat <<'IDENT'` newline, the body lines, the first line that is exactly IDENT and `)"`. Its body is data for the shell, so where the
-# command that receives the word is git, gh, echo or printf (exempt_idioms), which only store or print it, the command reading sees a
-# neutral word in its place; for everything else (a shell with `-c`, eval, an interpreter, source, xargs, watch, ssh, cat, tee, an
-# assignment whose value is run later, the command position, any program the guard does not know) what a substitution prints is code or a
-# file name, and the reading stays the one before the idiom existed: the body lines are command lines. The raw-text rules (store
-# paths, secret names and expansions, /proc) read the whole text as they always did.
-IDIOM_HEAD = re.compile(r"(?<![^ \t\n])\"\$\([ \t]*cat[ \t]+<<(-?)[ \t]*'([A-Za-z_][A-Za-z0-9_]*)'[ \t]*\n")
-IDIOM_TAIL = re.compile(r"[ \t\n]*\)\"")
-IDIOM_FOLLOWERS = " \t\n;&|)<>"  # what may follow the closing quote of the word (or the end of the text)
-IDIOM_CONSUMERS = {"git", "gh", "echo", "printf"}
-# Reserved words that may stand before a command without being one (`if git commit -m ...; then`, `! cmd`, `{ cmd; }`), skipped when the
-# command that receives an idiom is looked up.
-RESERVED_STARTERS = {"!", "{", "}", "if", "then", "elif", "else", "while", "until", "do"}
-# What exempt_idioms() puts in place of each idiom: private-use characters around its number (a text that holds one is read strictly).
-SUBSTITUTION_MARKER = re.compile("\ue001([0-9]+)\ue002")
-# The keyring execs nested in one another that receiving_command() follows: beyond them the answer is no, which is the stricter reading.
-MAX_LAUNCH_HOPS = 16
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
@@ -462,8 +442,8 @@ def substitution_bodies(text: str) -> list[str]:
     return scan_shell(text)[0]
 
 
-def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], list[tuple[int, int]], list[tuple[int, int]]]:
-    """(bodies, comments, protected, ansi_c, substitutions) of a command text, read once the way bash reads it.
+def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], list[tuple[int, int]]]:
+    """(bodies, comments, protected, ansi_c) of a command text, read once the way bash reads it.
 
     Bodies: those of the outermost command substitutions that the shell runs inside double quotes, `$(...)` and a
     backquote pair. Inside double quotes `$` and the backquote keep their meaning and a backslash escapes only
@@ -481,7 +461,8 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
     escape (`$'it\\'s'`); inside double quotes `$'` is nothing special. Here-documents are not read as such: their
     lines are command text like any other, as the tokenizer has always read them at the top level, because bash's rules
     for where a body ends (quoted, ANSI-C and backslash forms of the delimiter, arithmetic commands that look like `<<`,
-    continuation lines) are too fine to track and each slip hid executable text; the one exemption is idiom_spans().
+    continuation lines) are too fine to track and each slip hid executable text (two reviews found five and six of them),
+    so no here-document body is data and no form of one is exempt.
 
     Comments: the spans, one per line, that bash ignores at the top level of text: from a `#` that starts a word,
     outside quotes and outside any double-quoted substitution, to the end of the line (`$#`, `${#x}` and `a#b` hold none;
@@ -490,18 +471,12 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
 
     ANSI-C strings: the top-level `$'...'` spans (the `$` to the closing quote), which tokenize() keeps as one word.
 
-    Substitutions: the (start, end) of the text inside each outermost command substitution, `$(...)` or a backquote pair, quoted or
-    not (the bodies above are those inside double quotes). exempt_idioms() uses them: the body of a substitution is another command,
-    whose output is used elsewhere, and the tokenizer splits an unquoted `$(echo IDENT)` into a segment of its own.
-
     One pass, each character read once: a stack of frames replaces recursion, and a regular expression jumps from one
     character that matters to the next."""
     bodies: list[str] = []
     comments: list[tuple[int, int]] = []
     protected: list[int] = []  # backquotes inside single-quoted or ANSI-C strings at the top level
     ansi_c: list[tuple[int, int]] = []
-    substitutions: list[tuple[int, int]] = []
-    open_substitutions = 0  # `$(` and backquote frames on the stack
     # Frames, innermost last: [kind, start, parentheses, reported, dq, bodies_at_open]. Kinds: cmd (unquoted text),
     # sub (`$(`), bt (backquotes), dq (double quotes), param (`${`), dparam (`${` inside double quotes), arith (`$((`).
     # `dq` says whether a substitution opened here sits inside double quotes (param and arith inherit it from their
@@ -515,12 +490,8 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
     construct_end = -1  # where the last quote, escape or substitution ended: a `#` right after it is inside a word
 
     def close(at: int) -> None:
-        nonlocal hidden, open_substitutions
+        nonlocal hidden
         kind, start, _, reported = stack.pop()[:4]
-        if kind in {"sub", "bt"}:
-            open_substitutions -= 1
-            if not open_substitutions:
-                substitutions.append((start, at))
         if reported:
             hidden -= 1
             body = text[start:at]
@@ -533,11 +504,9 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
             tick = text.find("`", tick + 1, last)
 
     def open_frame(kind: str, start: int, frame: list, quoted: bool = False) -> None:
-        nonlocal hidden, open_substitutions
+        nonlocal hidden
         reported = frame[4] and not hidden and kind in {"sub", "bt", "arith"}
         stack.append([kind, start, 1 if kind in {"sub", "bt"} else 0, reported, quoted, len(bodies)])
-        if kind in {"sub", "bt"}:
-            open_substitutions += 1
         if reported and kind != "arith":
             hidden += 1
 
@@ -622,7 +591,6 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
                 construct_end = index + 1
             else:  # no `))`: this was `$(` and a subshell, so read it as a substitution
                 frame[0], frame[1], frame[2] = "sub", frame[1] - 1, 1
-                open_substitutions += 1
                 if frame[3]:
                     hidden += 1
                     del bodies[frame[5]:]
@@ -632,50 +600,7 @@ def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], 
             stack.pop()
         else:
             close(end)
-    return bodies, comments, protected, ansi_c, substitutions
-
-
-def idiom_spans(text: str) -> list[tuple[int, int]]:
-    """The spans (from the opening quote to the closing one) in text, as written, of the double-quoted words that are exactly the
-    canonical idiom of a commit message or a pull-request body: `"$(`, optional blanks, `cat`, blanks, `<<`, an optional `-`,
-    optional blanks, `'IDENT'` (single quotes, IDENT of letters, digits and `_`, not starting with a digit), nothing else but
-    blanks on that line, a newline, the body lines, the first line that is exactly IDENT (for `<<-` after its leading tabs, no
-    other trimming, no carriage return), and then only blanks and newlines before the `)"`. The word must stand alone: after a
-    blank or at the start, and before a blank, the end or one of `;&|)<>`. Anything else is not the idiom: a `\\EOF`, `"EOF"`
-    or `$'EOF'` delimiter, another first command, text on the operator line (`| sh`), text after the terminator, a body that
-    is never terminated. It is looked for in the text as written, before the guard joins backslash-newline pairs: in a quoted
-    here-document those are text, and joining them made a line `text\\` swallow the terminator behind it."""
-    spans: list[tuple[int, int]] = []
-    if '"$(' not in text:
-        return spans
-    lines: dict[bool, dict[str, list[int]]] = {}  # per `<<`/`<<-`: the offsets where each distinct line starts, built once
-    tails: dict[int, int] = {}  # per terminator line: where the blanks and the `)"` after it end, or -1 (many heads may share one)
-    position = 0
-    while head := IDIOM_HEAD.search(text, position):
-        position = head.end()
-        strip_tabs = bool(head.group(1))
-        if strip_tabs not in lines:
-            index: dict[str, list[int]] = {}
-            offset = 0
-            for line in text.split("\n"):
-                index.setdefault(line.lstrip("\t") if strip_tabs else line, []).append(offset)
-                offset += len(line) + 1
-            lines[strip_tabs] = index
-        starts = lines[strip_tabs].get(head.group(2), ())
-        at = bisect.bisect_left(starts, head.end())
-        if at == len(starts):
-            continue
-        newline = text.find("\n", starts[at])  # the terminator is a whole line, so a newline ends it
-        if newline < 0:
-            continue
-        if newline not in tails:
-            tail = IDIOM_TAIL.match(text, newline + 1)
-            tails[newline] = tail.end() if tail else -1
-        end = tails[newline]
-        if end >= 0 and (end == len(text) or text[end] in IDIOM_FOLLOWERS):
-            spans.append((head.start(), end))
-            position = end
-    return spans
+    return bodies, comments, protected, ansi_c
 
 
 def input_redirection_segments(words: list[str]) -> list[list[str]]:
@@ -1054,77 +979,6 @@ def launcher_chain(words: list[str]) -> tuple[list[list[str]], int, list[str]]:
     return entries, at, moved
 
 
-def receiving_command(words: list[str]) -> tuple[str, int] | None:
-    """(program, index of its word in words) of the command that receives the words after it as its arguments, as
-    command_segments() finds it: after leading reserved words (`if git commit ...`), assignments and output redirections,
-    wrappers, `env`, an rtk runner, the systemd launchers and a keyring exec. None when there is none (only assignments, or
-    an `rtk run` and the file readers, whose command rtk_command() builds), or after MAX_LAUNCH_HOPS launchers."""
-    shift = 0
-    for _ in range(MAX_LAUNCH_HOPS):
-        start = 0
-        while start < len(words) and words[start] in RESERVED_STARTERS:
-            start += 1
-        start = prefix_end(words, start)
-        if start >= len(words):
-            return None
-        start += launcher_chain(words[start:])[1]
-        if start >= len(words):
-            return None
-        shift += start
-        words = words[start:]
-        if program_of(words) == "rtk":
-            return None
-        started = keyring_exec(words)
-        if started is None:
-            return program_of(words), shift
-        shift += len(words) - len(started[1])
-        words = started[1]
-    return None
-
-
-def exempt_idioms(text: str, spans: list[tuple[int, int]]) -> list[bool]:
-    """For each idiom span of text (idiom_spans), whether the command that receives it only stores or prints it: the program, after the reserved
-    words, assignments, wrappers and launchers the guard models (receiving_command), is one of IDIOM_CONSUMERS and the idiom is one of its
-    arguments. The text is read once more for that, with each idiom in place of a marker, its comments cut out and its lines joined as
-    check() joins them: the words of the segment that holds a marker say which command it belongs to. A marker before the program word
-    (an assignment's value, a wrapper's option value, the command position itself) is no argument, so an idiom there, or one whose command
-    is anything else (a shell with `-c`, eval, an interpreter, source, xargs, watch, ssh, cat, tee ...), is not exempt; nor is one that is
-    not a word of its own (glued to other text), nor one inside the text of a command substitution, quoted or not (its command is another
-    one whose output is used elsewhere, `eval $(echo IDENT)` runs it, and shlex's reading of nested quotes can show it as a word of its
-    own). The answer is False wherever it cannot be told (a text that holds the marker characters, one shlex cannot read, no program
-    found)."""
-    answers = [False] * len(spans)
-    if not spans or "\ue001" in text or "\ue002" in text:
-        return answers
-    pieces, cursor = [], 0
-    for number, (first, last) in enumerate(spans):
-        pieces.append(text[cursor:first])
-        pieces.append(f"\ue001{number}\ue002")
-        cursor = last
-    pieces.append(text[cursor:])
-    marked = "".join(pieces).replace("\\\n", "")
-    _bodies, comments, protected, ansi_c, substitutions = scan_shell(marked)
-    try:
-        tokens = tokenize(marked, comments, protected=protected, ansi_c=ansi_c, strict=True)
-    except ValueError:
-        return answers  # an unbalanced quote: the words are a guess, and a guess is no reason to hide a body
-    # a marker inside the text of a command substitution, quoted or not, is not exempt: that text is another command, whose output is
-    # used elsewhere (`eval $(echo IDENT)` runs it), and shlex splits an unquoted `$(echo IDENT)` into a segment of its own
-    inside = {int(match.group(1)) for start, end in substitutions for match in SUBSTITUTION_MARKER.finditer(marked, start, end)}
-    for words in segments(tokens):
-        found = [(position, SUBSTITUTION_MARKER.findall(word)) for position, word in enumerate(words) if "\ue001" in word]
-        command = receiving_command(words) if found else None
-        if command is None or command[0] not in IDIOM_CONSUMERS:
-            continue
-        for position, numbers in found:
-            # a word of its own, after the program: inside another word (a substitution's body, `--message=`, a quoted string with other
-            # text) the command that receives it is not the one this segment names
-            if position > command[1] and len(numbers) == 1 and words[position] == f"\ue001{numbers[0]}\ue002" \
-                    and int(numbers[0]) not in inside:
-                answers[int(numbers[0])] = True
-    return answers
-
-
 def expand(command: str, depth: int = 0) -> list[list[str]]:
     """Command segments of the command, and of the command substitutions that the shell runs inside its double
     quotes (scan_shell: `echo "$(printenv)"` runs printenv), at any nesting up to MAX_SUBSTITUTION_NESTING and while
@@ -1137,7 +991,7 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
     for nesting in range(MAX_SUBSTITUTION_NESTING + 1):
         following: list[str] = []
         for text in level:
-            bodies, comments, protected, ansi_c, _substitutions = scan_shell(text)
+            bodies, comments, protected, ansi_c = scan_shell(text)
             result.extend(command_segments(text, depth, comments, protected, ansi_c))
             following.extend(bodies)
         spent += sum(map(len, following))
@@ -1512,27 +1366,7 @@ def segment_reason(words: list[str]) -> str | None:
     return None
 
 
-def neutral_reading(command: str) -> str:
-    """The command as written with each exempt idiom (idiom_spans, exempt_idioms) replaced by a neutral quoted word: what the command
-    reading sees, so that the prose of a commit message or a pull-request body behind git, gh, echo or printf is no command line. It
-    is looked for in the text as written, before the guard joins backslash-newline pairs (in a quoted here-document they are text).
-    The raw-text rules never read this: they read the whole command."""
-    spans = idiom_spans(command)
-    exempt = exempt_idioms(command, spans)
-    if not any(exempt):
-        return command
-    pieces, cursor = [], 0
-    for (first, last), yes in zip(spans, exempt):
-        if yes:
-            pieces.append(command[cursor:first])
-            pieces.append('"x"')
-            cursor = last
-    pieces.append(command[cursor:])
-    return "".join(pieces)
-
-
 def check(command: str) -> str | None:
-    reading = neutral_reading(command)
     # The shell removes a backslash-newline before it splits words, so the rules read the joined command.
     # Each text pattern also reads it without quoting: `sh -c 'echo $GH_TO''KEN'` hands the inner shell
     # `echo $GH_TOKEN`. (Where quoting does end a name, as in `"$GH_TO"KEN`, that errs toward blocking.)
@@ -1546,7 +1380,7 @@ def check(command: str) -> str | None:
             return "process_environment"
         if SECRET_EXPANSION.search(text) or SECRET_LOOKUP.search(text):
             return "secret_variable_reference"
-    words_list = expand(reading.replace("\\\n", ""))
+    words_list = expand(command)
     reason = keyring_reason(texts, words_list)
     if reason:
         return reason
