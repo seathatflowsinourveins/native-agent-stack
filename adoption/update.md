@@ -209,9 +209,13 @@ On a host that already adopted the named index:
 
 ```sh
 qmd --index native-agent-stack-catalog update
+qmd --index native-agent-stack-catalog status   # read "Vectors: N embedded"
+qmd --index native-agent-stack-catalog embed    # only when N is above 0
 qmd --index native-agent-stack-catalog search "native worker" \
   -c us-equities-foundation -n 3 --format json
 ```
+
+`update` re-indexes changed files and computes no vectors. Where the index carries embeddings (`status` reports `Vectors:` above 0), `embed` then embeds only the documents still lacking current vectors, such as new or changed ones (`embed -f` would re-embed everything); without it, the `vec` and `hyde` arms of `query` miss those documents. The lexical profile of [native catalog setup](../catalogs/us-equities/native-workflows.md) carries no vectors and skips `embed`; it also avoids a plain `query`, which expands the text with one model and reranks with another, both downloaded on first use. A `query` made of typed lexical searches with `rerank` off is model-free ([recipes](../recipes/README.md)). `update`'s closing "Run 'qmd embed'" notice prints on any index with unembedded documents, lexical ones included, so it is not the signal. Sources, qmd `v2.8.3`: README [L556](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L556), [L644-L651](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L644-L651) and [L1016-L1018](https://github.com/tobi/qmd/blob/v2.8.3/README.md?plain=1#L1016-L1018); `src/cli/qmd.ts` [L561](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L561) and [L994-L1002](https://github.com/tobi/qmd/blob/v2.8.3/src/cli/qmd.ts#L994-L1002); `src/store.ts` [L1974-L1978](https://github.com/tobi/qmd/blob/v2.8.3/src/store.ts#L1974-L1978).
 
 Use `qmd get` on the exact returned document URI with a bounded range. [Native catalog setup](../catalogs/us-equities/native-workflows.md) records explicit collections; do not index the whole home or authentication directories. A host that adopted the index before 2026-09-27 adds the two foundation collections, `foundation-adoption` and `foundation-docs`, once with the commands there; the carrier names all four collections in every `query`. The frozen retrieval evaluation retains its original corpus and queries even when the live index grows. A generation-model upgrade does not automatically change embeddings or retrieval quality.
 
