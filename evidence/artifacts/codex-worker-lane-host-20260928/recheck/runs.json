@@ -1,0 +1,26 @@
+[
+ {
+  "check": "dry-run",
+  "argv": [
+   "python3",
+   "tools/adoption/apply_codex_lane.py"
+  ],
+  "cwd": "<repository root>",
+  "revision": "0779e91aebd476d8f1c53b3cac705357c66aa657",
+  "start": "2026-09-28T13:30:57Z",
+  "end": "2026-09-28T13:31:14Z",
+  "exit": 0
+ },
+ {
+  "check": "prove",
+  "argv": [
+   "python3",
+   "tools/adoption/prove_codex_lane.py"
+  ],
+  "cwd": "<repository root>",
+  "revision": "0779e91aebd476d8f1c53b3cac705357c66aa657",
+  "start": "2026-09-28T13:31:14Z",
+  "end": "2026-09-28T13:31:22Z",
+  "exit": 0
+ }
+]

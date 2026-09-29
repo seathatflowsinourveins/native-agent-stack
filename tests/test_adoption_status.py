@@ -604,7 +604,7 @@ class PinnedVersionProbeTests(unittest.TestCase):
 
     def test_minimum_match_is_a_floor_not_a_ceiling(self):
         self.script("claude", "printf 'claude-code 2.1.290\\n'")
-        entry = {"version": "2.1.281",
+        entry = {"version": "2.1.284",
                  "version_probe": {"method": "exec", "command": "claude", "match": "minimum", "args": ["--version"]}}
         self.assertTrue(probe_pinned_version(entry)["matches_pin"])
         self.script("claude", "printf 'claude-code 2.1.100\\n'")
@@ -692,10 +692,10 @@ class PinnedVersionProbeTests(unittest.TestCase):
     def test_version_output_matches_rules(self):
         self.assertTrue(version_output_matches("2.101.0", "exact", "gh version 2.101.0 (2026-09-22)\n"))
         self.assertFalse(version_output_matches("2.101.0", "exact", "gh version 2.100.0\n"))
-        self.assertTrue(version_output_matches("2.1.281", "minimum", "claude-code 2.1.281\n"))
-        self.assertTrue(version_output_matches("2.1.281", "minimum", "claude-code 2.2.0\n"))
-        self.assertFalse(version_output_matches("2.1.281", "minimum", "claude-code 2.1.100\n"))
-        self.assertFalse(version_output_matches("2.1.281", "minimum", "no version here\n"))
+        self.assertTrue(version_output_matches("2.1.284", "minimum", "claude-code 2.1.284\n"))
+        self.assertTrue(version_output_matches("2.1.284", "minimum", "claude-code 2.2.0\n"))
+        self.assertFalse(version_output_matches("2.1.284", "minimum", "claude-code 2.1.100\n"))
+        self.assertFalse(version_output_matches("2.1.284", "minimum", "no version here\n"))
 
     def test_exact_is_bounded_by_non_version_characters_like_the_bootstrap(self):
         # bootstrap-linux.sh anchors "exact" with (^|[^0-9.])...([^0-9.]|$); a bare substring would match these.

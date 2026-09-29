@@ -1,0 +1,4 @@
+round 3 at the earlier base: CLAUDE.md at f508ffba (#447); tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+CLAUDE.md bytes 123 tokens 30 words 18 lines 4 sha256 1a55ee0b21f83c543529caf5e020af65dc53298223b15cac8b6f22c6614d0f64
+round 3 at the earlier base: CLAUDE.md with X9's lines 3-8 on f508ffba; tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+CLAUDE.md bytes 457 tokens 96 words 65 lines 8 sha256 bb155b03e7e90dccea42de00a5febd8c7979c817f26988a856f07d5dd72695d6

@@ -1,0 +1,899 @@
+{
+ "schema_version": 1,
+ "id": "skills-listing-restore-20260928",
+ "kind": "native_cli_e2e",
+ "component_ids": [
+  "claude-code"
+ ],
+ "claim": "A value-free record, on this host, of the 2026-09-28 restore of 14 skills' Claude listing in the user settings' skillOverrides, read before and after with scripts/skills_status.py --json and with Claude Code's native /skill-doctor through tools/skill-usage/skill_usage.py --run-skill-doctor --json. Before the edit (captured 2026-09-28T15:08:39Z; /skill-doctor report generated 15:08:27Z), skills_status.py exited 1 with result fail: 14 of 29 skills failed, each only on claude_listing (actual name-only where the manifest says on), and /skill-doctor listed those 14 at 20 context tokens each, 280 in all. The edit ran at 2026-09-28T15:09:02Z after a backup labelled settings.json.20260928T150902Z.pre-listing-restore and left 29 skillOverrides keys, one more than that backup held. After it (/skill-doctor report generated 15:09:02Z; captured 15:09:12Z), skills_status.py exited 0 with result ok and 0 mismatches, and /skill-doctor listed the 14 at 30 to 250 context tokens, 1,750 in all (+1,470); writing-for-agents read on at 40 tokens in both runs. Both /skill-doctor runs exited 0 with 0 model turns at $0, and the 14 had 0 lifetime uses in both. The lock, the Codex disable entries, the manifest's 7,409-character on-description sum and every other required check were ok in both runs, and supply-chain-risk-auditor's informational folder_tree drift appeared in both. Read with skills_status.py's own load_skill_overrides, the settings backups hold the 14 effectively on at 2026-09-26T20:00:20Z (13 set on, variant-analysis absent), off at 2026-09-26T20:12:39Z together with agent-browser, grill-me and improve-codebase-architecture (17), and name-only at 2026-09-27T05:31:10Z and in the pre-restore backup. Two Codex backup labels, from 2026-09-26T20:01:18Z and 20:12:39Z, exist.",
+ "limitations": [
+  "One host only. Another host collects its own read-back; this receipt says nothing about any other host's listing.",
+  "Value-free by construction: the four skillOverrides state strings, 'absent', counts, digests, UTC stamps and backup labels only. No other settings value, no path and no session identifier is retained. The Codex backups are listed by label; their content was not opened.",
+  "The coordinator ran the capture commands and the edit. This receipt summarizes the retained capture files, whose sha256 digests are in data.capture_files, with the embedded script, and it reads the settings backups itself. The capture files are not published.",
+  "/skill-doctor context tokens are Claude Code's listing-cost estimates (docs/decisions/2026-09-25-skills-trial-and-usage.md, Mechanics), not provider-counted tokens. No child-usage.mjs first-request measurement was run, so the restored listing's per-request cost is unmeasured.",
+  "The edit script prints its apply line only after its three assertions (the top-level key list, every non-target skillOverrides entry and all 15 targets at on), and that line was retained, so the assertions held. That the unchanged content round-tripped byte for byte is the coordinator's account: the script's roundtrip_exact output was not retained.",
+  "The backup stamps bound the listing segments. The edit times are inferred from the labels, each backup being named for the edit that followed it. Who made the 2026-09-26 edits and why is recorded only in a coordinator memory note, which is untrusted history and not evidence here.",
+  "Lifetime /skill-doctor use counts are observational: preloads, templates and instructions also drive uses, so they do not show that a listing state causes or prevents use. Codex was not measured (codex measured false in both usage runs), and nothing here changes Codex.",
+  "skills_status.py reads only the user settings file. /skill-doctor reports on the skills in the session (Claude Code skills page, 'Find unused skills'), and its report shows the same change.",
+  "The two command -v checks in provenance.local_checks ran later, in the recorder's own shell on the same host; they show only that neither executable was on that shell's PATH at that time.",
+  "The embedded edit script (provenance.edit_script_redacted) is the coordinator's file with the right-hand side of its one backup-directory line replaced by a placeholder, so this receipt names no backup location. provenance.edit_script_sha256 is the original file's digest and provenance.edit_script_redacted_sha256 the embedded text's. The generator takes the backup directory as an argument and records none."
+ ],
+ "evidence_class": "native-measurement (acceptance-evidence policy class 'upstream example or native operation'): Claude Code 2.1.283's /skill-doctor through skill_usage.py --run-skill-doctor, before and after the edit, and the two command -v checks, which cover one shell's PATH at one time. our-integration (policy class 'local integration check'): scripts/skills_status.py before and after, the failing pre-edit run being the discriminating control for the passing post-edit run, and the edit script's assertions. our-integration (policy class 'independent observation'): the settings-backup states, read with skills_status.py's own reader. The account of who made the 2026-09-26 edits is untrusted-history, not evidence.",
+ "recorded_at_utc": "2026-09-28T15:55:27Z",
+ "catalog_revision": "3058b2379086677871d092cc6197e907445a03a9",
+ "host_scope": {
+  "host": "nativestack-5975wx-20260925",
+  "platform": "NativeStack workstation, WSL2 Linux x86_64",
+  "identity": "one workstation; the running user's own Claude Code user settings, their backups and the global skills lock"
+ },
+ "data": {
+  "client_version_at_recording": "2.1.283 (Claude Code)",
+  "pre_edit": {
+   "capture_utc": "2026-09-28T15:08:39Z",
+   "skills_status": {
+    "command": "python3 scripts/skills_status.py --json",
+    "exit": 1,
+    "result": "fail",
+    "skills_checked": 29,
+    "failing_skills": 14,
+    "claude_listing_mismatches": 14,
+    "other_required_checks_not_ok": {
+     "canonical": 0,
+     "claude_link": 0,
+     "lock": 0,
+     "codex_disable": 0
+    },
+    "targets": {
+     "agentic-actions-auditor": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "codeql": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "diagnosing-bugs": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "frontend-design": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "gh-address-comments": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "gh-fix-ci": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "modern-python": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "resolving-merge-conflicts": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "sarif-parsing": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "security-best-practices": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "security-threat-model": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "semgrep": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "tdd": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "variant-analysis": {
+      "actual": "name-only",
+      "state": "mismatch"
+     },
+     "writing-for-agents": {
+      "actual": "on",
+      "state": "ok"
+     }
+    },
+    "folder_trees": {
+     "drift": [
+      "supply-chain-risk-auditor"
+     ],
+     "missing": [],
+     "ok": 28,
+     "runtime_artifacts": [],
+     "unreadable": []
+    },
+    "claude_settings_state": "ok",
+    "codex_config_state": "ok",
+    "lock": {
+     "source": "default",
+     "state": "ok",
+     "version": 3,
+     "version_matches": true
+    },
+    "budget": {
+     "claude_on_description_chars": 7409,
+     "matches_manifest": true,
+     "claude_on_cap": 8000,
+     "claude_within_cap": true
+    }
+   },
+   "skill_usage": {
+    "command": "python3 tools/skill-usage/skill_usage.py --run-skill-doctor --json",
+    "exit": 0,
+    "stderr_bytes": 0,
+    "generated_at": "2026-09-28T15:08:27.124766+00:00",
+    "claude": {
+     "measured": true,
+     "origin": "run",
+     "num_turns": 0,
+     "total_cost_usd": 0
+    },
+    "codex_measured": false,
+    "targets": {
+     "agentic-actions-auditor": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "codeql": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "diagnosing-bugs": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "frontend-design": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "gh-address-comments": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "gh-fix-ci": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "modern-python": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "resolving-merge-conflicts": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "sarif-parsing": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "security-best-practices": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "security-threat-model": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "semgrep": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "tdd": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "variant-analysis": {
+      "context_tokens": 20,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "writing-for-agents": {
+      "context_tokens": 40,
+      "uses": 2,
+      "last_used": "today"
+     }
+    },
+    "context_tokens_the_14": 280,
+    "context_tokens_all_15": 320,
+    "uses_the_14": 0,
+    "prune_candidates": 0,
+    "verdict_recheck": 0
+   }
+  },
+  "apply": {
+   "applied_utc": "2026-09-28T15:09:02Z",
+   "backup_label": "settings.json.20260928T150902Z.pre-listing-restore",
+   "skillOverrides_keys_after": 29,
+   "edit_script_sha256": "039eda13d9423f2e35df8ae3caa2d7c9e7dd85b0c6192eabb0df03687a19d724"
+  },
+  "post_edit": {
+   "capture_utc": "2026-09-28T15:09:12Z",
+   "skills_status": {
+    "command": "python3 scripts/skills_status.py --json",
+    "exit": 0,
+    "result": "ok",
+    "skills_checked": 29,
+    "failing_skills": 0,
+    "claude_listing_mismatches": 0,
+    "other_required_checks_not_ok": {
+     "canonical": 0,
+     "claude_link": 0,
+     "lock": 0,
+     "codex_disable": 0
+    },
+    "targets": {
+     "agentic-actions-auditor": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "codeql": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "diagnosing-bugs": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "frontend-design": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "gh-address-comments": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "gh-fix-ci": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "modern-python": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "resolving-merge-conflicts": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "sarif-parsing": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "security-best-practices": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "security-threat-model": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "semgrep": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "tdd": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "variant-analysis": {
+      "actual": "on",
+      "state": "ok"
+     },
+     "writing-for-agents": {
+      "actual": "on",
+      "state": "ok"
+     }
+    },
+    "folder_trees": {
+     "drift": [
+      "supply-chain-risk-auditor"
+     ],
+     "missing": [],
+     "ok": 28,
+     "runtime_artifacts": [],
+     "unreadable": []
+    },
+    "claude_settings_state": "ok",
+    "codex_config_state": "ok",
+    "lock": {
+     "source": "default",
+     "state": "ok",
+     "version": 3,
+     "version_matches": true
+    },
+    "budget": {
+     "claude_on_description_chars": 7409,
+     "matches_manifest": true,
+     "claude_on_cap": 8000,
+     "claude_within_cap": true
+    }
+   },
+   "skill_usage": {
+    "command": "python3 tools/skill-usage/skill_usage.py --run-skill-doctor --json",
+    "exit": 0,
+    "stderr_bytes": 0,
+    "generated_at": "2026-09-28T15:09:02.895008+00:00",
+    "claude": {
+     "measured": true,
+     "origin": "run",
+     "num_turns": 0,
+     "total_cost_usd": 0
+    },
+    "codex_measured": false,
+    "targets": {
+     "agentic-actions-auditor": {
+      "context_tokens": 200,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "codeql": {
+      "context_tokens": 250,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "diagnosing-bugs": {
+      "context_tokens": 60,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "frontend-design": {
+      "context_tokens": 70,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "gh-address-comments": {
+      "context_tokens": 60,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "gh-fix-ci": {
+      "context_tokens": 110,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "modern-python": {
+      "context_tokens": 60,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "resolving-merge-conflicts": {
+      "context_tokens": 30,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "sarif-parsing": {
+      "context_tokens": 130,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "security-best-practices": {
+      "context_tokens": 140,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "security-threat-model": {
+      "context_tokens": 150,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "semgrep": {
+      "context_tokens": 240,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "tdd": {
+      "context_tokens": 50,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "variant-analysis": {
+      "context_tokens": 200,
+      "uses": 0,
+      "last_used": "never"
+     },
+     "writing-for-agents": {
+      "context_tokens": 40,
+      "uses": 2,
+      "last_used": "today"
+     }
+    },
+    "context_tokens_the_14": 1750,
+    "context_tokens_all_15": 1790,
+    "uses_the_14": 0,
+    "prune_candidates": 0,
+    "verdict_recheck": 0
+   }
+  },
+  "host_backups": {
+   "settings": [
+    {
+     "label": "settings.json.20260926T200020Z.pre-skills-off",
+     "utc": "2026-09-26T20:00:20Z",
+     "read_state": "ok",
+     "skillOverrides_keys": 26,
+     "manifest_skills_by_state": {
+      "on": [
+       "gh-fix-ci",
+       "security-best-practices",
+       "diagnosing-bugs",
+       "tdd",
+       "codebase-design",
+       "resolving-merge-conflicts",
+       "verification-before-completion",
+       "security-threat-model",
+       "gh-address-comments",
+       "semgrep",
+       "codeql",
+       "supply-chain-risk-auditor",
+       "agentic-actions-auditor",
+       "property-based-testing",
+       "modern-python",
+       "sarif-parsing",
+       "fp-check",
+       "mcp-builder",
+       "frontend-design"
+      ],
+      "name-only": [
+       "typesafe-ai",
+       "iterative-retrieval",
+       "search-first",
+       "agent-browser"
+      ],
+      "user-invocable-only": [
+       "grill-me",
+       "improve-codebase-architecture",
+       "find-skills"
+      ],
+      "absent": [
+       "variant-analysis",
+       "writing-for-agents",
+       "security-audit"
+      ]
+     },
+     "the_14_effective": {
+      "on": 14,
+      "name-only": 0,
+      "user-invocable-only": 0,
+      "off": 0
+     },
+     "the_14_absent": [
+      "variant-analysis"
+     ],
+     "writing_for_agents": "absent",
+     "effective_mismatches_with_manifest": [
+      "security-audit"
+     ]
+    },
+    {
+     "label": "settings.json.20260926T201239Z.pre-skills-nameonly",
+     "utc": "2026-09-26T20:12:39Z",
+     "read_state": "ok",
+     "skillOverrides_keys": 27,
+     "manifest_skills_by_state": {
+      "on": [
+       "codebase-design",
+       "verification-before-completion",
+       "supply-chain-risk-auditor",
+       "property-based-testing",
+       "fp-check",
+       "mcp-builder"
+      ],
+      "name-only": [
+       "typesafe-ai",
+       "iterative-retrieval",
+       "search-first"
+      ],
+      "user-invocable-only": [
+       "find-skills"
+      ],
+      "off": [
+       "gh-fix-ci",
+       "security-best-practices",
+       "diagnosing-bugs",
+       "tdd",
+       "resolving-merge-conflicts",
+       "grill-me",
+       "improve-codebase-architecture",
+       "security-threat-model",
+       "gh-address-comments",
+       "semgrep",
+       "codeql",
+       "agentic-actions-auditor",
+       "modern-python",
+       "sarif-parsing",
+       "frontend-design",
+       "agent-browser",
+       "variant-analysis"
+      ],
+      "absent": [
+       "writing-for-agents",
+       "security-audit"
+      ]
+     },
+     "the_14_effective": {
+      "on": 0,
+      "name-only": 0,
+      "user-invocable-only": 0,
+      "off": 14
+     },
+     "the_14_absent": [],
+     "writing_for_agents": "absent",
+     "effective_mismatches_with_manifest": [
+      "agent-browser",
+      "agentic-actions-auditor",
+      "codeql",
+      "diagnosing-bugs",
+      "frontend-design",
+      "gh-address-comments",
+      "gh-fix-ci",
+      "grill-me",
+      "improve-codebase-architecture",
+      "modern-python",
+      "resolving-merge-conflicts",
+      "sarif-parsing",
+      "security-audit",
+      "security-best-practices",
+      "security-threat-model",
+      "semgrep",
+      "tdd",
+      "variant-analysis"
+     ]
+    },
+    {
+     "label": "settings.json.bak.20260927T053110Z.agent-teams",
+     "utc": "2026-09-27T05:31:10Z",
+     "read_state": "ok",
+     "skillOverrides_keys": 27,
+     "manifest_skills_by_state": {
+      "on": [
+       "codebase-design",
+       "verification-before-completion",
+       "supply-chain-risk-auditor",
+       "property-based-testing",
+       "fp-check",
+       "mcp-builder"
+      ],
+      "name-only": [
+       "typesafe-ai",
+       "gh-fix-ci",
+       "security-best-practices",
+       "iterative-retrieval",
+       "search-first",
+       "diagnosing-bugs",
+       "tdd",
+       "resolving-merge-conflicts",
+       "security-threat-model",
+       "gh-address-comments",
+       "semgrep",
+       "codeql",
+       "agentic-actions-auditor",
+       "modern-python",
+       "sarif-parsing",
+       "frontend-design",
+       "agent-browser",
+       "variant-analysis"
+      ],
+      "user-invocable-only": [
+       "grill-me",
+       "improve-codebase-architecture",
+       "find-skills"
+      ],
+      "absent": [
+       "writing-for-agents",
+       "security-audit"
+      ]
+     },
+     "the_14_effective": {
+      "on": 0,
+      "name-only": 14,
+      "user-invocable-only": 0,
+      "off": 0
+     },
+     "the_14_absent": [],
+     "writing_for_agents": "absent",
+     "effective_mismatches_with_manifest": [
+      "agentic-actions-auditor",
+      "codeql",
+      "diagnosing-bugs",
+      "frontend-design",
+      "gh-address-comments",
+      "gh-fix-ci",
+      "modern-python",
+      "resolving-merge-conflicts",
+      "sarif-parsing",
+      "security-audit",
+      "security-best-practices",
+      "security-threat-model",
+      "semgrep",
+      "tdd",
+      "variant-analysis"
+     ]
+    },
+    {
+     "label": "settings.json.20260928T150902Z.pre-listing-restore",
+     "utc": "2026-09-28T15:09:02Z",
+     "read_state": "ok",
+     "skillOverrides_keys": 28,
+     "manifest_skills_by_state": {
+      "on": [
+       "codebase-design",
+       "verification-before-completion",
+       "supply-chain-risk-auditor",
+       "property-based-testing",
+       "fp-check",
+       "mcp-builder"
+      ],
+      "name-only": [
+       "typesafe-ai",
+       "gh-fix-ci",
+       "security-best-practices",
+       "iterative-retrieval",
+       "search-first",
+       "diagnosing-bugs",
+       "tdd",
+       "resolving-merge-conflicts",
+       "security-threat-model",
+       "gh-address-comments",
+       "semgrep",
+       "codeql",
+       "agentic-actions-auditor",
+       "modern-python",
+       "sarif-parsing",
+       "frontend-design",
+       "agent-browser",
+       "variant-analysis",
+       "security-audit"
+      ],
+      "user-invocable-only": [
+       "grill-me",
+       "improve-codebase-architecture",
+       "find-skills"
+      ],
+      "absent": [
+       "writing-for-agents"
+      ]
+     },
+     "the_14_effective": {
+      "on": 0,
+      "name-only": 14,
+      "user-invocable-only": 0,
+      "off": 0
+     },
+     "the_14_absent": [],
+     "writing_for_agents": "absent",
+     "effective_mismatches_with_manifest": [
+      "agentic-actions-auditor",
+      "codeql",
+      "diagnosing-bugs",
+      "frontend-design",
+      "gh-address-comments",
+      "gh-fix-ci",
+      "modern-python",
+      "resolving-merge-conflicts",
+      "sarif-parsing",
+      "security-best-practices",
+      "security-threat-model",
+      "semgrep",
+      "tdd",
+      "variant-analysis"
+     ]
+    }
+   ],
+   "codex_labels": [
+    {
+     "label": "codex-config.toml.20260926T200118Z.pre-skills-off",
+     "utc": "2026-09-26T20:01:18Z",
+     "present": true
+    },
+    {
+     "label": "codex-config.toml.20260926T201239Z.pre-skills-reenable",
+     "utc": "2026-09-26T20:12:39Z",
+     "present": true
+    }
+   ]
+  },
+  "segments": {
+   "all_14_effectively_on_at": "2026-09-26T20:00:20Z",
+   "the_14_off_at": "2026-09-26T20:12:39Z",
+   "off_bounded_minutes": 12.3,
+   "the_14_name_only_at": [
+    "2026-09-27T05:31:10Z",
+    "2026-09-28T15:09:02Z"
+   ],
+   "restored_utc": "2026-09-28T15:09:02Z",
+   "variant_analysis_installed_at": "2026-09-26T09:33:36.261Z",
+   "variant_analysis_hours_on_before_backup": 10.45,
+   "name_only_hours_at_most": 42.94,
+   "restored_window_ends": "2026-10-28T15:09:02Z"
+  },
+  "skill_usage_30_day_age_reached": {
+   "trial_11_installed_2026_09_25": [
+    "2026-10-25T22:50:51Z",
+    "2026-10-25T22:51:17Z"
+   ],
+   "variant_analysis": "2026-10-26T09:33:36Z",
+   "kept_pair": [
+    "2026-10-25T04:15:04Z"
+   ]
+  },
+  "observational_lifetime_uses_post_edit": {
+   "listed_on_with_uses": {
+    "codebase-design": 5,
+    "verification-before-completion": 153,
+    "supply-chain-risk-auditor": 135,
+    "property-based-testing": 3,
+    "fp-check": 89,
+    "mcp-builder": 1,
+    "writing-for-agents": 2
+   },
+   "name_only_with_uses": {
+    "iterative-retrieval": 58,
+    "search-first": 66
+   },
+   "the_14": {
+    "agentic-actions-auditor": 0,
+    "codeql": 0,
+    "diagnosing-bugs": 0,
+    "frontend-design": 0,
+    "gh-address-comments": 0,
+    "gh-fix-ci": 0,
+    "modern-python": 0,
+    "resolving-merge-conflicts": 0,
+    "sarif-parsing": 0,
+    "security-best-practices": 0,
+    "security-threat-model": 0,
+    "semgrep": 0,
+    "tdd": 0,
+    "variant-analysis": 0
+   }
+  },
+  "capture_files": [
+   {
+    "name": "pre-status.json",
+    "bytes": 14988,
+    "sha256": "4a8dd7263414924610e17b5b9e683f9c193e0a08f3e0a9924dfe18bb8010df22"
+   },
+   {
+    "name": "pre-usage.json",
+    "bytes": 20612,
+    "sha256": "42b4bb0830584abaf664d1115136ae399b24ab59cf421651f7d015094ab3510c"
+   },
+   {
+    "name": "pre-usage.err",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   {
+    "name": "pre-time.txt",
+    "bytes": 21,
+    "sha256": "98798f30211221245c54342e94b6bf7846b4339d88f58b49a430310708888c0d"
+   },
+   {
+    "name": "pre-exit.txt",
+    "bytes": 35,
+    "sha256": "bbd9c5d00a0fc456ed9c5d78a0da9e29d21a503432cccbc87ee9c3dd8c264617"
+   },
+   {
+    "name": "apply.txt",
+    "bytes": 116,
+    "sha256": "eea1f7cd7e28c29e3f25195bd3bb4a3c7ede8fae50a96087f342a50ecddf2667"
+   },
+   {
+    "name": "post-status.json",
+    "bytes": 14790,
+    "sha256": "62a39b0dc3936a70e752b3e87b26e32a86e975b299ebf3ea8bfa40c226efbb6d"
+   },
+   {
+    "name": "post-usage.json",
+    "bytes": 20628,
+    "sha256": "1ae09887e38a9567962bb262a1d2bbd7750ff2e9919b346a82ebaf38678de7f5"
+   },
+   {
+    "name": "post-usage.err",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   {
+    "name": "post-time.txt",
+    "bytes": 21,
+    "sha256": "6a6570025720af504fcfea8638610e97057dc7a5d40486f4c52ba224feedb95c"
+   },
+   {
+    "name": "post-exit.txt",
+    "bytes": 37,
+    "sha256": "3f4092299c768fb801db157eb87297b3b2a82d1113fa8c50270305ff86bf9f2d"
+   },
+   {
+    "name": "restore_listing.py",
+    "bytes": 2213,
+    "sha256": "039eda13d9423f2e35df8ae3caa2d7c9e7dd85b0c6192eabb0df03687a19d724"
+   }
+  ]
+ },
+ "provenance": {
+  "capture_commands": [
+   {
+    "step": "pre-edit",
+    "cwd": "<checkout>",
+    "argv": "python3 scripts/skills_status.py --json",
+    "exit": 1
+   },
+   {
+    "step": "pre-edit",
+    "cwd": "<checkout>",
+    "argv": "python3 tools/skill-usage/skill_usage.py --run-skill-doctor --json",
+    "exit": 0
+   },
+   {
+    "step": "edit",
+    "cwd": "not recorded",
+    "argv": "python3 restore_listing.py apply",
+    "exit": "not retained; its apply line, printed after its assertions, was retained"
+   },
+   {
+    "step": "post-edit",
+    "cwd": "<checkout>",
+    "argv": "python3 scripts/skills_status.py --json",
+    "exit": 0
+   },
+   {
+    "step": "post-edit",
+    "cwd": "<checkout>",
+    "argv": "python3 tools/skill-usage/skill_usage.py --run-skill-doctor --json",
+    "exit": 0
+   }
+  ],
+  "local_checks": [
+   {
+    "utc": "2026-09-28T15:42:00Z",
+    "argv": "bash -c 'command -v semgrep'",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 0
+   },
+   {
+    "utc": "2026-09-28T15:42:00Z",
+    "argv": "bash -c 'command -v codeql'",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr_bytes": 0
+   }
+  ],
+  "references": [
+   "docs/decisions/2026-09-25-skills-trial-and-usage.md, Addendum 2026-09-28: host listing drift restored",
+   "evidence/artifacts/skills-listing-restore-20260928/ (the supply-chain-risk-auditor per-blob tree check, exit 0 pass, and its five controls: no allowance and a planted blob, exit 1 fail; a symlinked scripts directory, a FIFO with a .git file, and an upstream gitlink, exit 2 refused. Each output records the check's sha256, 17cc1c3e0211ffddbeb21fbb002e90b9a25b79ffbdf2bb3f588504dd05cb104b; the README gives each argument vector and exit)",
+   "adoption/skills/manifest.json claude_listing and adoption/templates/claude.settings.template.json skillOverrides (both on for the 15, unchanged)",
+   "https://code.claude.com/docs/en/skills, read 2026-09-28T15:16:44Z: 'A skill that is absent from `skillOverrides` is treated as \"on\".'"
+  ],
+  "command": "TMPDIR=/var/tmp python3 listing_receipt.py receipt --checkout <checkout> --captures <coordinator capture directory> --skeleton <skeleton> --backups <settings backup directory>",
+  "script_sha256": "e707ec21404c68a10fcbdd462300c5d41809f59c9c6b5e6e92987999c92ee1db",
+  "script": "#!/usr/bin/env python3\n\"\"\"Value-free receipt data for the 2026-09-28 restore of this host's Claude skill listing.\n\nUsage:\n  python3 listing_receipt.py data --checkout <checkout> --captures <coordinator capture directory>\n      --backups <settings backup directory>\n  python3 listing_receipt.py receipt --checkout <checkout> --captures <dir> --skeleton <skeleton.json>\n      --backups <settings backup directory>\n\nReads, and never writes:\n  * the coordinator's captures: pre-/post-status.json (scripts/skills_status.py --json),\n    pre-/post-usage.json (tools/skill-usage/skill_usage.py --run-skill-doctor --json), their\n    exit-code, time and apply files, and restore_listing.py (the edit script);\n  * the settings backups named below, through scripts/skills_status.py's own\n    load_skill_overrides (only the skillOverrides object leaves it), keeping only the fixed\n    state strings or \"absent\" per manifest skill;\n  * the Codex backup labels, for existence only (their content is not opened).\nOutput holds labels, UTC stamps, state strings, counts, digests and the manifest's public skill\nnames: no settings value other than the four state strings, no path, no session identifier.\n\"\"\"\nfrom __future__ import annotations\n\nimport argparse\nimport hashlib\nimport json\nimport re\nimport subprocess\nimport sys\nfrom datetime import datetime, timedelta, timezone\nfrom pathlib import Path\n\nTARGETS_14 = [\"agentic-actions-auditor\", \"codeql\", \"diagnosing-bugs\", \"frontend-design\", \"gh-address-comments\",\n              \"gh-fix-ci\", \"modern-python\", \"resolving-merge-conflicts\", \"sarif-parsing\", \"security-best-practices\",\n              \"security-threat-model\", \"semgrep\", \"tdd\", \"variant-analysis\"]\nTARGETS_15 = TARGETS_14 + [\"writing-for-agents\"]\nSETTINGS_LABELS = [\"settings.json.20260926T200020Z.pre-skills-off\",\n                   \"settings.json.20260926T201239Z.pre-skills-nameonly\",\n                   \"settings.json.bak.20260927T053110Z.agent-teams\",\n                   \"settings.json.20260928T150902Z.pre-listing-restore\"]\nCODEX_LABELS = [\"codex-config.toml.20260926T200118Z.pre-skills-off\",\n                \"codex-config.toml.20260926T201239Z.pre-skills-reenable\"]\nCAPTURES = [\"pre-status.json\", \"pre-usage.json\", \"pre-usage.err\", \"pre-time.txt\", \"pre-exit.txt\", \"apply.txt\",\n            \"post-status.json\", \"post-usage.json\", \"post-usage.err\", \"post-time.txt\", \"post-exit.txt\",\n            \"restore_listing.py\"]\nSTATES = [\"on\", \"name-only\", \"user-invocable-only\", \"off\"]\n\n\ndef stamp_of(label: str) -> str:\n    token = next(part for part in label.split(\".\") if len(part) == 16 and part[8] == \"T\" and part.endswith(\"Z\"))\n    return datetime.strptime(token, \"%Y%m%dT%H%M%SZ\").strftime(\"%Y-%m-%dT%H:%M:%SZ\")\n\n\ndef parse_utc(text: str) -> datetime:\n    return datetime.fromisoformat(text.replace(\"Z\", \"+00:00\"))\n\n\ndef hours(start: str, end: str) -> float:\n    return round((parse_utc(end) - parse_utc(start)).total_seconds() / 3600, 2)\n\n\ndef status_summary(report: dict, exit_code: int) -> dict:\n    skills = {skill[\"name\"]: skill for skill in report[\"skills\"]}\n    checks = (\"canonical\", \"claude_link\", \"lock\", \"codex_disable\")\n    return {\n        \"command\": \"python3 scripts/skills_status.py --json\",\n        \"exit\": exit_code,\n        \"result\": report[\"result\"],\n        \"skills_checked\": len(skills),\n        \"failing_skills\": sum(not skill[\"pass\"] for skill in skills.values()),\n        \"claude_listing_mismatches\": sum(skill[\"claude_listing\"][\"state\"] != \"ok\" for skill in skills.values()),\n        \"other_required_checks_not_ok\": {name: sum(skill[name][\"state\"] != \"ok\" for skill in skills.values())\n                                         for name in checks},\n        \"targets\": {name: {\"actual\": skills[name][\"claude_listing\"][\"actual\"],\n                           \"state\": skills[name][\"claude_listing\"][\"state\"]} for name in TARGETS_15},\n        \"folder_trees\": report[\"folder_trees\"],\n        \"claude_settings_state\": report[\"claude_settings\"][\"state\"],\n        \"codex_config_state\": report[\"codex_config\"][\"state\"],\n        \"lock\": report[\"lock\"],\n        \"budget\": {\"claude_on_description_chars\": report[\"budget\"][\"claude_on_description_chars\"][\"computed\"],\n                   \"matches_manifest\": report[\"budget\"][\"claude_on_description_chars\"][\"matches_manifest\"],\n                   \"claude_on_cap\": report[\"budget\"][\"claude_on_cap\"],\n                   \"claude_within_cap\": report[\"budget\"][\"claude_within_cap\"]},\n    }\n\n\ndef usage_summary(report: dict, exit_code: int, stderr_bytes: int) -> dict:\n    skills = {skill[\"name\"]: skill for skill in report[\"skills\"]}\n    targets = {name: {key: skills[name][\"claude\"][key] for key in (\"context_tokens\", \"uses\", \"last_used\")}\n               for name in TARGETS_15}\n    return {\n        \"command\": \"python3 tools/skill-usage/skill_usage.py --run-skill-doctor --json\",\n        \"exit\": exit_code,\n        \"stderr_bytes\": stderr_bytes,\n        \"generated_at\": report[\"generated_at\"],\n        \"claude\": {key: report[\"claude\"][key] for key in (\"measured\", \"origin\", \"num_turns\", \"total_cost_usd\")},\n        \"codex_measured\": report[\"codex\"][\"measured\"],\n        \"targets\": targets,\n        \"context_tokens_the_14\": sum(targets[name][\"context_tokens\"] for name in TARGETS_14),\n        \"context_tokens_all_15\": sum(targets[name][\"context_tokens\"] for name in TARGETS_15),\n        \"uses_the_14\": sum(targets[name][\"uses\"] for name in TARGETS_14),\n        \"prune_candidates\": len(report[\"prune_candidates\"]),\n        \"verdict_recheck\": len(report[\"verdict_recheck\"]),\n    }\n\n\ndef exits(text: str) -> dict:\n    return {line.split(\" exit=\")[0].strip(): int(line.split(\" exit=\")[1]) for line in text.splitlines() if \" exit=\" in line}\n\n\ndef build(checkout: Path, captures: Path, backups_dir: Path) -> dict:\n    sys.path.insert(0, str(checkout / \"scripts\"))\n    import skills_status\n\n    manifest = skills_status.load_manifest(checkout / \"adoption/skills/manifest.json\")\n    expected = {skill[\"name\"]: skill[\"claude_listing\"] for skill in manifest[\"skills\"]}\n    read = {name: (captures / name).read_bytes() for name in CAPTURES}\n    pre_exit, post_exit = exits(read[\"pre-exit.txt\"].decode()), exits(read[\"post-exit.txt\"].decode())\n    pre_status, post_status = json.loads(read[\"pre-status.json\"]), json.loads(read[\"post-status.json\"])\n    pre_usage, post_usage = json.loads(read[\"pre-usage.json\"]), json.loads(read[\"post-usage.json\"])\n    apply_fields = read[\"apply.txt\"].decode().split()\n    apply = dict(zip(apply_fields[0::2], apply_fields[1::2]))\n    applied_utc = datetime.strptime(apply[\"applied_utc\"], \"%Y%m%dT%H%M%SZ\").strftime(\"%Y-%m-%dT%H:%M:%SZ\")\n\n    backups = []\n    for label in SETTINGS_LABELS:\n        overrides, state = skills_status.load_skill_overrides(backups_dir / label)\n        groups: dict[str, list[str]] = {key: [] for key in STATES + [\"absent\", \"invalid_value\"]}\n        for name in expected:\n            value = overrides.get(name, \"absent\")\n            groups[value if value in STATES or value == \"absent\" else \"invalid_value\"].append(name)\n        effective = {name: (overrides.get(name, \"on\") if overrides.get(name, \"on\") in STATES else \"invalid_value\")\n                     for name in expected}\n        backups.append({\n            \"label\": label, \"utc\": stamp_of(label), \"read_state\": state,\n            \"skillOverrides_keys\": len(overrides),\n            \"manifest_skills_by_state\": {key: value for key, value in groups.items() if value},\n            \"the_14_effective\": {key: sum(effective[name] == key for name in TARGETS_14) for key in STATES},\n            \"the_14_absent\": [name for name in TARGETS_14 if name not in overrides],\n            \"writing_for_agents\": overrides.get(\"writing-for-agents\", \"absent\"),\n            \"effective_mismatches_with_manifest\": sorted(name for name in expected if effective[name] != expected[name]),\n        })\n    codex = [{\"label\": label, \"utc\": stamp_of(label), \"present\": (backups_dir / label).is_file()}\n             for label in CODEX_LABELS]\n\n    installed = {skill[\"name\"]: skill[\"installed_at\"] for skill in post_usage[\"skills\"]}\n    trial_11 = [name for name in TARGETS_14 if name not in (\"gh-fix-ci\", \"security-best-practices\", \"variant-analysis\")]\n    plus30 = lambda text: (parse_utc(text) + timedelta(days=30)).strftime(\"%Y-%m-%dT%H:%M:%SZ\")\n    uses = {skill[\"name\"]: (skill[\"claude\"][\"listing\"], skill[\"claude\"][\"uses\"]) for skill in post_usage[\"skills\"]}\n    version = subprocess.run([\"claude\", \"--version\"], capture_output=True, text=True, stdin=subprocess.DEVNULL,\n                             timeout=60, check=False).stdout.strip()\n    return {\n        \"client_version_at_recording\": version,\n        \"pre_edit\": {\"capture_utc\": read[\"pre-time.txt\"].decode().strip(),\n                     \"skills_status\": status_summary(pre_status, pre_exit[\"pre-status\"]),\n                     \"skill_usage\": usage_summary(pre_usage, pre_exit[\"pre-usage\"], len(read[\"pre-usage.err\"]))},\n        \"apply\": {\"applied_utc\": applied_utc, \"backup_label\": apply[\"backup_label\"],\n                  \"skillOverrides_keys_after\": int(apply[\"skillOverrides_keys\"]),\n                  \"edit_script_sha256\": hashlib.sha256(read[\"restore_listing.py\"]).hexdigest()},\n        \"post_edit\": {\"capture_utc\": read[\"post-time.txt\"].decode().strip(),\n                      \"skills_status\": status_summary(post_status, post_exit[\"post-status\"]),\n                      \"skill_usage\": usage_summary(post_usage, post_exit[\"post-usage\"], len(read[\"post-usage.err\"]))},\n        \"host_backups\": {\"settings\": backups, \"codex_labels\": codex},\n        \"segments\": {\n            \"all_14_effectively_on_at\": stamp_of(SETTINGS_LABELS[0]),\n            \"the_14_off_at\": stamp_of(SETTINGS_LABELS[1]),\n            \"off_bounded_minutes\": round((parse_utc(stamp_of(SETTINGS_LABELS[1]))\n                                          - parse_utc(stamp_of(SETTINGS_LABELS[0]))).total_seconds() / 60, 1),\n            \"the_14_name_only_at\": [stamp_of(SETTINGS_LABELS[2]), stamp_of(SETTINGS_LABELS[3])],\n            \"restored_utc\": applied_utc,\n            \"variant_analysis_installed_at\": installed[\"variant-analysis\"],\n            \"variant_analysis_hours_on_before_backup\": hours(installed[\"variant-analysis\"], stamp_of(SETTINGS_LABELS[0])),\n            \"name_only_hours_at_most\": hours(stamp_of(SETTINGS_LABELS[1]), applied_utc),\n            \"restored_window_ends\": plus30(applied_utc),\n        },\n        \"skill_usage_30_day_age_reached\": {\n            \"trial_11_installed_2026_09_25\": [min(plus30(installed[name]) for name in trial_11),\n                                              max(plus30(installed[name]) for name in trial_11)],\n            \"variant_analysis\": plus30(installed[\"variant-analysis\"]),\n            \"kept_pair\": sorted({plus30(installed[name]) for name in (\"gh-fix-ci\", \"security-best-practices\")}),\n        },\n        \"observational_lifetime_uses_post_edit\": {\n            \"listed_on_with_uses\": {name: count for name, (listing, count) in uses.items() if listing == \"on\" and count},\n            \"name_only_with_uses\": {name: count for name, (listing, count) in uses.items() if listing == \"name-only\" and count},\n            \"the_14\": {name: uses[name][1] for name in TARGETS_14},\n        },\n        \"capture_files\": [{\"name\": name, \"bytes\": len(read[name]), \"sha256\": hashlib.sha256(read[name]).hexdigest()}\n                          for name in CAPTURES],\n    }\n\n\ndef main() -> int:\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"mode\", choices=[\"data\", \"receipt\"])\n    parser.add_argument(\"--checkout\", required=True)\n    parser.add_argument(\"--captures\", required=True)\n    parser.add_argument(\"--skeleton\")\n    parser.add_argument(\"--backups\", required=True, help=\"the host's settings backup directory (never recorded)\")\n    args = parser.parse_args()\n    checkout, captures = Path(args.checkout).resolve(), Path(args.captures).resolve()\n    data = build(checkout, captures, Path(args.backups).expanduser().resolve())\n    if args.mode == \"data\":\n        print(json.dumps(data, indent=1))\n        return 0\n    receipt = json.loads(Path(args.skeleton).read_text(encoding=\"utf-8\"))\n    receipt[\"recorded_at_utc\"] = datetime.now(timezone.utc).strftime(\"%Y-%m-%dT%H:%M:%SZ\")\n    receipt[\"data\"] = data\n    own = Path(__file__).read_bytes()\n    edit = (captures / \"restore_listing.py\").read_bytes()\n    # The edit script names the host's backup directory on one line; the receipt embeds it with that line's\n    # right-hand side replaced, and records the original file's digest beside the embedded text's digest.\n    redacted, count = re.subn(r\"(?m)^backups = Path\\.home\\(\\).*$\",\n                              'backups = Path(\"<settings backup directory>\")  # redacted in this receipt',\n                              edit.decode(\"utf-8\"))\n    if count != 1:\n        raise SystemExit(f\"expected one backup-directory line in the edit script, found {count}\")\n    receipt[\"provenance\"][\"command\"] = (\"TMPDIR=/var/tmp python3 listing_receipt.py receipt --checkout <checkout> \"\n                                        \"--captures <coordinator capture directory> --skeleton <skeleton> \"\n                                        \"--backups <settings backup directory>\")\n    receipt[\"provenance\"][\"script_sha256\"] = hashlib.sha256(own).hexdigest()\n    receipt[\"provenance\"][\"script\"] = own.decode(\"utf-8\")\n    receipt[\"provenance\"][\"edit_script_sha256\"] = hashlib.sha256(edit).hexdigest()\n    receipt[\"provenance\"][\"edit_script_redacted_sha256\"] = hashlib.sha256(redacted.encode(\"utf-8\")).hexdigest()\n    receipt[\"provenance\"][\"edit_script_redacted\"] = redacted\n    ordered = {key: value for key, value in receipt.items() if key not in (\"data\", \"provenance\")}\n    ordered[\"data\"], ordered[\"provenance\"] = receipt[\"data\"], receipt[\"provenance\"]\n    print(json.dumps(ordered, indent=1))\n    return 0\n\n\nif __name__ == \"__main__\":\n    sys.exit(main())\n",
+  "edit_script_sha256": "039eda13d9423f2e35df8ae3caa2d7c9e7dd85b0c6192eabb0df03687a19d724",
+  "edit_script_redacted_sha256": "5fa539be0ae7c74c1f1ff0146d98acdccef991ba304e10468f3597159f719977",
+  "edit_script_redacted": "\"\"\"Restore the Claude listing of the 14 drifted skills to the manifest's \"on\", and add an explicit\nwriting-for-agents \"on\". Touches only the skillOverrides key of ~/.claude/settings.json; prints\nlisting states and counts, never any other key. Usage: restore_listing.py check|apply\"\"\"\nimport json\nimport os\nimport shutil\nimport sys\nimport tempfile\nfrom datetime import datetime, timezone\nfrom pathlib import Path\n\nTARGETS = [\"agentic-actions-auditor\", \"codeql\", \"diagnosing-bugs\", \"frontend-design\",\n           \"gh-address-comments\", \"gh-fix-ci\", \"modern-python\", \"resolving-merge-conflicts\",\n           \"sarif-parsing\", \"security-best-practices\", \"security-threat-model\", \"semgrep\", \"tdd\",\n           \"variant-analysis\", \"writing-for-agents\"]\nassert len(TARGETS) == 15 and len(set(TARGETS)) == 15\n\npath = Path.home() / \".claude\" / \"settings.json\"\nbackups = Path(\"<settings backup directory>\")  # redacted in this receipt\ntext = path.read_text()\ndata = json.loads(text)\noverrides = data[\"skillOverrides\"]\nprint({name: overrides.get(name, \"<absent>\") for name in TARGETS})\nprint(\"roundtrip_exact\", json.dumps(data, indent=2, ensure_ascii=False) + \"\\n\" == text)\n\nif sys.argv[1] == \"apply\":\n    others_before = {k: v for k, v in overrides.items() if k not in TARGETS}\n    keys_before = list(data)\n    stamp = datetime.now(timezone.utc).strftime(\"%Y%m%dT%H%M%SZ\")\n    backup = backups / f\"settings.json.{stamp}.pre-listing-restore\"\n    shutil.copy2(path, backup)\n    os.chmod(backup, 0o600)\n    for name in TARGETS:\n        overrides[name] = \"on\"\n    out = json.dumps(data, indent=2, ensure_ascii=False) + \"\\n\"\n    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=\".settings.\", suffix=\".tmp\")\n    with os.fdopen(fd, \"w\") as handle:\n        handle.write(out)\n    os.chmod(tmp, os.stat(path).st_mode & 0o777)\n    os.replace(tmp, path)\n    after = json.loads(path.read_text())\n    assert list(after) == keys_before\n    assert {k: v for k, v in after[\"skillOverrides\"].items() if k not in TARGETS} == others_before\n    assert all(after[\"skillOverrides\"][n] == \"on\" for n in TARGETS)\n    print(\"backup_label\", backup.name, \"applied_utc\", stamp,\n          \"skillOverrides_keys\", len(after[\"skillOverrides\"]))\n"
+ }
+}

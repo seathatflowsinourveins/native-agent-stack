@@ -11,6 +11,13 @@ The follow-up [native memory/RAG lifecycle guide](native-memory-rag-lifecycle.md
 records fresh cross-client retrieval, stored Claude outcome and consolidation,
 current stable-release checks, and the active monitoring contract.
 
+The [September 27 lifecycle follow-up](native-memory-rag-lifecycle.md#september-27-scheduled-follow-up)
+supersedes the historical runtime settings below: the current host uses the
+prefix-enabled ai-memory build with Nemotron embeddings and vLLM 0.30.0, native
+Codex gpt-6-sol at medium effort, and an intentionally paused hourly learning
+scheduler. These are observed configuration and previously qualified selections,
+not a new quality benchmark. Do not apply the September 21 TOML as current defaults.
+
 The adopted project's pinned `decisions/native-memory-learning-maintenance.md`
 records this setup. The older consolidation decision is marked superseded while
 its historical body is preserved; both writes were read back through native MCP.

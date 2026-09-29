@@ -11,15 +11,20 @@ trust entries and hook trusted-hash state, is preserved byte-for-byte inside
 the template text (escaped as ``$$`` where the source already used a literal
 ``$`` for shell syntax such as ``$HOME`` inside a status-line script).
 
-One placeholder is derived when neither the host value file nor ``--set``
-supplies it: ``AI_MEMORY_BIN``, the ai-memory executable that the Claude
+Two placeholders are derived when neither the host value file nor ``--set``
+supplies them. ``AI_MEMORY_BIN`` is the ai-memory executable that the Claude
 hook commands run. It defaults to the selected platform's pinned install,
 ``${ECO_ROOT}/tools/ai-memory-<version>/ai-memory`` with ``<version>`` read
 from ``adoption/pins-<os>-<arch>.json`` (``--platform``, default: this
 machine, spelled as ``scripts/adoption_status.py`` does), because upstream's
 native hook commands invoke the installed binary directly and the Linux and
 macOS pins differ. A host whose running ai-memory lives elsewhere passes its
-path with ``--set AI_MEMORY_BIN=...``.
+path with ``--set AI_MEMORY_BIN=...``. ``SOCRATICODE_VERSION`` is derived the
+same way: the Codex user template's SocratiCode server runs
+``${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/``, the prefix
+``adoption/bootstrap-<os>.sh`` installs from the selected platform's pin
+(1.15.0 on linux-x86_64 and 1.14.0 on macos-arm64 since 2026-09-27); ``--set
+SOCRATICODE_VERSION=...`` names another installed version.
 
 One placeholder is an explicit opt-in instead of a host value:
 ``AI_MEMORY_CAPTURE_ASSISTANT`` renders nothing unless the host value file or
@@ -116,6 +121,7 @@ def parse_set_values(pairs: list[str]) -> dict[str, str]:
 
 CAPTURE_ASSISTANT = "AI_MEMORY_CAPTURE_ASSISTANT"
 AI_MEMORY_BIN = "AI_MEMORY_BIN"
+SOCRATICODE_VERSION = "SOCRATICODE_VERSION"
 # This catalog's pins-<os>-<arch>.json spelling of platform.system().lower() (as PIN_OS_ALIASES in
 # scripts/adoption_status.py).
 PIN_OS_ALIASES = {"darwin": "macos"}
@@ -126,14 +132,14 @@ def current_platform() -> str:
     return f"{PIN_OS_ALIASES.get(osname, osname)}-{platform.machine().lower()}"
 
 
-def pinned_version(tool_id: str, platform_id: str) -> str:
-    """The version adoption/pins-<platform_id>.json pins for one tool."""
+def pinned_version(tool_id: str, platform_id: str, placeholder: str = AI_MEMORY_BIN) -> str:
+    """The version adoption/pins-<platform_id>.json pins for one tool; placeholder names the derived value."""
     if not re.fullmatch(r"[a-z0-9_]+-[a-z0-9_]+", platform_id):
         raise RenderError(f"--platform must look like linux-x86_64 or macos-arm64, got {platform_id!r}")
     path = ROOT / "adoption" / f"pins-{platform_id}.json"
     if not path.is_file():
         raise RenderError(f"no pins file for platform {platform_id!r} ({path}); "
-                          f"pass --platform or --set {AI_MEMORY_BIN}=<ai-memory executable>")
+                          f"pass --platform or --set {placeholder}=<value for the {tool_id} install>")
     try:
         tools = json.loads(path.read_text(encoding="utf-8"))["tools"]
         return next(tool["version"] for tool in tools if tool.get("id") == tool_id)
@@ -149,6 +155,14 @@ def resolve_derived(values: dict[str, str], platform_id: str | None = None) -> d
     return {**values, AI_MEMORY_BIN: f"{values['ECO_ROOT']}/tools/ai-memory-{version}/ai-memory"}
 
 
+def resolve_socraticode_version(values: dict[str, str], platform_id: str | None = None) -> dict[str, str]:
+    """Supply SOCRATICODE_VERSION from the platform pin when the caller did not (see the module docstring)."""
+    if values.get(SOCRATICODE_VERSION):
+        return values
+    version = pinned_version("socraticode", platform_id or current_platform(), SOCRATICODE_VERSION)
+    return {**values, SOCRATICODE_VERSION: version}
+
+
 def resolve_opt_ins(values: dict[str, str]) -> dict[str, str]:
     """Replace the explicit opt-in's setting with the text it renders (see the module docstring)."""
     setting = values.get(CAPTURE_ASSISTANT, "")
@@ -161,6 +175,8 @@ def render_one(template_path: Path, values: dict[str, str], platform_id: str | N
     text = template_path.read_text(encoding="utf-8")
     if "${" + AI_MEMORY_BIN + "}" in text:
         values = resolve_derived(values, platform_id)
+    if "${" + SOCRATICODE_VERSION + "}" in text:
+        values = resolve_socraticode_version(values, platform_id)
     resolved = resolve_opt_ins(values)
     try:
         return string.Template(text).substitute(resolved)
@@ -287,8 +303,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--set", action="append", metavar="KEY=VALUE",
                          help="Override or supply a template value; repeatable")
     parser.add_argument("--platform", metavar="OS-ARCH",
-                         help="Pins file (adoption/pins-<OS-ARCH>.json) whose ai-memory version the default "
-                              "AI_MEMORY_BIN names, e.g. linux-x86_64 or macos-arm64 (default: this machine)")
+                         help="Pins file (adoption/pins-<OS-ARCH>.json) whose ai-memory and socraticode versions "
+                              "the default AI_MEMORY_BIN and SOCRATICODE_VERSION name, e.g. linux-x86_64 or "
+                              "macos-arm64 (default: this machine)")
     parser.add_argument("--out", metavar="DIR",
                          help="Write settings.json, codex.config.toml, project.codex.config.toml here")
     parser.add_argument("--check", action="store_true",

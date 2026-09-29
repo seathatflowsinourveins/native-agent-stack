@@ -58,6 +58,20 @@ metadata is linked separately; release recency does not establish superiority.
 The [landscape manifest](../../catalogs/landscape/manifest.json) drives this view,
 and `python3 scripts/landscape.py` checks coverage and reference integrity.
 
+**Convergence by layer** appears when the generated
+[component evidence matrix](../../catalogs/landscape/component-evidence-matrix.json)
+is present. For every layer it shows the layer state, the in-use and converged
+counts, the true/false/unknown counts of its three factors, the comparability
+columns and any unresolved manifest rows, with the frozen definitions and their
+source dates. The counts are layer-component rows: a component in several layers
+counts once per layer, so the catalog and overall sums are not distinct
+components. Next to the unresolved rows it lists both sides of the
+verdict-to-manifest join: recorded winners without a row in the newest sweep
+manifest, layers missing from that manifest and manifest layers without a
+matrix row. The page types no number of its own: the build rejects a matrix
+whose summary disagrees with its layer rows, and
+`python3 scripts/component_matrix.py --write` regenerates it.
+
 **Selected stack & setup** includes every component in `manifests/stack.json`,
 with layer and adoption-profile filters, the selected version, native command
 examples and a button that opens its complete recipe inside the HTML. Recipe

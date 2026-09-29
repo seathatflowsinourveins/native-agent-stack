@@ -1,0 +1,54 @@
+{
+ "schema": "tree_drift_check/2",
+ "argv": [
+  "evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py",
+  "--checkout",
+  ".",
+  "--skill",
+  "supply-chain-risk-auditor",
+  "--allow",
+  "scripts/uv.lock",
+  "--folder",
+  "/var/tmp/tdc-controls.wfFZOC/symlink/supply-chain-risk-auditor"
+ ],
+ "started_utc": "2026-09-28T16:46:27Z",
+ "runs": [],
+ "method": {
+  "script": "tree_drift_check.py",
+  "script_sha256": "17cc1c3e0211ffddbeb21fbb002e90b9a25b79ffbdf2bb3f588504dd05cb104b",
+  "module": "scripts/skills_status.py",
+  "module_sha256": "adf89cd8d0846c273164201f06bb7a6ea4b80b6bea6158048a060b28eb559246",
+  "functions": [
+   "_git_blob_sha",
+   "git_tree_sha",
+   "load_manifest",
+   "check_folder_tree",
+   "check_canonical",
+   "check_lock_entry"
+  ],
+  "runtime_artifact_dirs": [
+   ".mypy_cache",
+   ".pytest_cache",
+   ".ruff_cache",
+   ".venv",
+   "__pycache__",
+   "node_modules"
+  ],
+  "python": "3.13.15"
+ },
+ "local": {
+  "folder": "/var/tmp/tdc-controls.wfFZOC/symlink/supply-chain-risk-auditor",
+  "left_out_runtime_artifacts": [],
+  "refused": [
+   {
+    "path": "scripts",
+    "type": "symlink",
+    "reason": "not a regular file or directory"
+   }
+  ]
+ },
+ "result": "refused",
+ "error": "Refused: the installed folder holds 1 unsupported entry(ies)",
+ "finished_utc": "2026-09-28T16:46:27Z",
+ "exit": 2
+}

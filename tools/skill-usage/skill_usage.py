@@ -36,6 +36,7 @@ kept apart as negative controls:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -137,7 +138,18 @@ def evaluate_cost(total_cost_usd, num_turns) -> bool:
 
 
 def parse_claude_output(raw: str) -> dict:
-    """Parse either a captured stream-json event array or a plain-text /skill-doctor table.
+    """Parse a captured `--output-format json` result object or stream-json event array, or a
+    plain-text /skill-doctor table.
+
+    `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json"
+    (single result)) or, when verbose is on, the whole message array (a read of the 2.1.283
+    binary's headless print path, not a live reproduction; retained captures of both shapes are
+    cited at tools/sota-convergence/transcript_audit.py result_message). An object is read as a
+    one-element array, so find_result_event makes the same selection in both shapes, the last
+    element of type 'result' (a message of that type is what
+    anthropics/claude-agent-sdk-python@36f95486ee9f src/claude_agent_sdk/_internal/message_parser.py:308
+    parses as the ResultMessage), and an object that is no result event is refused, as is a
+    result whose subtype is not "success" or whose is_error is not false.
 
     Returns {"format", "rows", "total_cost_usd", "num_turns"} and, when the capture is refused
     or malformed, an "error" key with rows left empty. total_cost_usd/num_turns are None for a
@@ -148,15 +160,24 @@ def parse_claude_output(raw: str) -> dict:
     except json.JSONDecodeError:
         return {"format": "text", "rows": parse_skill_doctor_text(raw),
                 "total_cost_usd": None, "num_turns": None}
+    if isinstance(events, dict):
+        events = [events]
     if not isinstance(events, list):
         return {"format": "json", "rows": {}, "total_cost_usd": None, "num_turns": None,
-                "error": "expected a JSON array of stream-json events"}
+                "error": "expected a result object or a JSON array of stream-json events"}
     result_event = find_result_event(events)
     if result_event is None:
         return {"format": "json", "rows": {}, "total_cost_usd": None, "num_turns": None,
-                "error": "no result event in the JSON array"}
+                "error": "no result event in the JSON output"}
     total_cost_usd = result_event.get("total_cost_usd")
     num_turns = result_event.get("num_turns")
+    # subtype and is_error are required fields of the SDK's ResultMessage (types.py:1343,1346 at the
+    # pin above), and is_error can be true while subtype is "success" (an API error, types.py:1358-1360),
+    # so only a result that is both "success" and not is_error carries a /skill-doctor table.
+    if result_event.get("subtype") != "success" or result_event.get("is_error") is not False:
+        return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
+                "error": f"refusing an error result (subtype={result_event.get('subtype')!r}, "
+                         f"is_error={result_event.get('is_error')!r})"}
     if not evaluate_cost(total_cost_usd, num_turns):
         return {"format": "json", "rows": {}, "total_cost_usd": total_cost_usd, "num_turns": num_turns,
                 "error": f"refusing a nonzero-cost result (total_cost_usd={total_cost_usd!r}, "
@@ -376,15 +397,28 @@ def load_manifest(path: Path) -> dict:
 
 
 def skill_lock_path(home: str | None = None, environment=None) -> Path:
-    """skills CLI 1.7.0 global lock: $XDG_STATE_HOME/skills/.skill-lock.json when
-    XDG_STATE_HOME is set to an absolute path (the XDG Base Directory spec ignores a relative
-    value), else <home>/.agents/.skill-lock.json. --home overrides the fallback base only."""
+    """skills CLI 1.7.0 global lock (npm dist/cli.mjs L3746-3750): path.join($XDG_STATE_HOME, "skills",
+    ".skill-lock.json") for any non-empty XDG_STATE_HOME, untrimmed and relative or not (the CLI does not apply
+    the XDG Base Directory spec's absolute-path rule), else path.join(<home>, ".agents", ".skill-lock.json").
+    --home overrides the fallback base only. The join is install_skills.py's node_path_join, so a ".." or a
+    leading // collapses as in Node; a relative value resolves against this process's working directory."""
     environment = os.environ if environment is None else environment
-    xdg_state = environment.get("XDG_STATE_HOME") or ""
-    if os.path.isabs(xdg_state):
-        return Path(xdg_state) / "skills" / ".skill-lock.json"
+    xdg_state = environment.get("XDG_STATE_HOME")
+    if xdg_state:
+        return node_path_join(xdg_state, "skills", ".skill-lock.json")
     base = home or environment.get("HOME") or os.path.expanduser("~")
-    return Path(base) / ".agents" / ".skill-lock.json"
+    return node_path_join(str(base), ".agents", ".skill-lock.json")
+
+
+def node_path_join(*parts: str) -> Path:
+    """tools/adoption/install_skills.py's node_path_join, the pinned CLI's path.join, imported from this checkout
+    so that one copy serves both tools."""
+    sys.path.insert(0, str(ROOT / "tools" / "adoption"))
+    try:
+        import install_skills  # noqa: E402  (the checkout's installer)
+    finally:
+        sys.path.pop(0)
+    return install_skills.node_path_join(*parts)
 
 
 def load_lock_installed_at(lock_path: Path) -> dict[str, str]:
@@ -800,6 +834,202 @@ def catalog_texts(record: dict) -> list[str]:
     return []
 
 
+# PR-A reuses child-usage.mjs's measurement kernel rather than maintaining a second
+# M3/M4/M5/M-R1 implementation. Native formats: openai/codex rust-v0.157.1,
+# codex-rs/protocol/src/protocol.rs:2234-2310 and rollout/src/policy.rs.
+CODEX_COUNTERS = ("input_tokens", "cached_input_tokens", "output_tokens",
+                  "reasoning_output_tokens", "total_tokens")
+MEASUREMENT_MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
+
+
+def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
+    export = "validateExceptions" if validate_reviews else "aggregateMeasurements" if aggregate else "measureTranscript"
+    script = ("import {readFileSync} from 'node:fs'; import {" + export + "} from "
+              + json.dumps(MEASUREMENT_MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); "
+              + "process.stdout.write(JSON.stringify(" + export
+              + ("(x)" if aggregate or validate_reviews else "(x.rows,x.options)") + ")); ")
+    try:
+        result = subprocess.run(["node", "--input-type=module", "-e", script],
+                                input=json.dumps(payload), capture_output=True, text=True,
+                                timeout=300, check=False)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise ValueError("PR-A measurement requires the repository Node module") from error
+    if result.returncode:
+        # Never echo stderr: it could contain private transcript input.
+        raise ValueError("PR-A Node measurement failed")
+    return json.loads(result.stdout)
+
+
+def measure_codex_records(records, *, since=None, until=None, rtk_check=False, exceptions=None):
+    """Local transcript measurement, not a provider run. Parent copies establish the
+    cumulative usage baseline but never contribute calls/results. Preserve unknowns.
+
+    Source: ccusage/ccusage v20.0.24 rust/adapters/codex/src/parser.rs:153-246,318-346.
+    Difference cumulative totals, never sum turn.completed thread totals or subsets.
+    """
+    start = next((r.get("payload", {}).get("subagent_history_start_ordinal") for r in records
+                  if r.get("type") == "session_meta"), None)
+    child = isinstance(start, int) and not isinstance(start, bool)
+    normalized, visible = [], []
+    previous = None if child else dict.fromkeys(CODEX_COUNTERS, 0)
+    totals = dict.fromkeys(CODEX_COUNTERS, 0)
+    snapshots = duplicates = gaps = 0
+    attempts, active = [], None
+    model = effort = None
+
+    def attempt():
+        nonlocal active
+        if active is None:
+            active = {"ordinal": len(attempts) + 1, "state": "unfinished", "snapshots": 0,
+                      "configured_model": model, "effort": effort,
+                      "usage": dict.fromkeys(CODEX_COUNTERS, 0)}
+            attempts.append(active)
+        return active
+
+    for record in records:
+        try:
+            at = parse_iso(record.get("timestamp"))
+        except (ValueError, TypeError, AttributeError):
+            gaps += 1
+            continue
+        if until is not None and at >= until:
+            continue
+        p = record.get("payload") or {}
+        inherited = child and isinstance(record.get("ordinal"), int) and record["ordinal"] < start
+        counted = not inherited and (since is None or at >= since)
+        if not inherited:
+            visible.append(record)
+        if record.get("type") == "turn_context":
+            model = safe_key(p.get("model")) if p.get("model") else None
+            effort = p.get("effort", p.get("reasoning_effort"))
+            effort = effort if effort in ("low", "medium", "high", "xhigh", "max") else None
+            if counted and active is not None and not active["snapshots"]:
+                active["configured_model"], active["effort"] = model, effort
+        if record.get("type") != "event_msg":
+            continue
+        event = p.get("type")
+        if counted and event == "task_started":
+            active = None
+            attempt()
+        elif counted and event in ("task_complete", "task_completed", "turn_completed", "turn_failed", "turn_aborted"):
+            attempt()["state"] = "failed" if event == "turn_failed" or p.get("error") is not None else "interrupted" if event == "turn_aborted" else "completed"
+            active = None
+        elif event == "token_count":
+            current = (p.get("info") or {}).get("total_token_usage")
+            if not isinstance(current, dict):
+                if counted:
+                    gaps += 1
+                continue
+            if current == previous:
+                if counted:
+                    duplicates += 1
+                continue
+            if counted:
+                a = attempt()
+                a["snapshots"] += 1
+                snapshots += 1
+                for key in CODEX_COUNTERS:
+                    n, before = current.get(key), previous.get(key) if previous else None
+                    delta = (n - before if type(n) is int and type(before) is int and n >= before else None)
+                    for target in (totals, a["usage"]):
+                        target[key] = target[key] + delta if target[key] is not None and delta is not None else None
+                if any(v is None for v in a["usage"].values()):
+                    gaps += 1
+            previous = current
+
+    # Prefer returned response_item bytes over the UI item's aggregate if both persist.
+    output_ids = {r.get("payload", {}).get("call_id") for r in visible if r.get("type") == "response_item"
+                  and r.get("payload", {}).get("type") in ("function_call_output", "custom_tool_call_output")}
+    failed_ids = {r.get("payload", {}).get("item", {}).get("id") for r in visible
+                  if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
+                  and r.get("payload", {}).get("item", {}).get("status") == "failed"}
+    item_states = {r["payload"]["item"].get("id"): r["payload"]["item"].get("status") for r in visible
+                   if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
+                   and isinstance(r.get("payload", {}).get("item"), dict)}
+    model_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
+                      if r.get("type") == "response_item" and r.get("payload", {}).get("type") in CALL_PAYLOAD_TYPES}
+
+    def arguments(value):
+        if isinstance(value, dict):
+            return value
+        try:
+            parsed = json.loads(value)
+            return parsed if isinstance(parsed, dict) else {}
+        except (ValueError, TypeError):
+            return {}
+
+    def emit(r, block, role):
+        normalized.append({"type": role, "timestamp": r["timestamp"], "message": {"content": [block]}})
+
+    def use(r, key, name, inputs, *, sandbox=False, code_mode=False):
+        if name.rsplit(".", 1)[-1] in ("exec_command", "shell_command", "shell"):
+            name, inputs = "Bash", {"command": shell_script(inputs.get("cmd", inputs.get("command", "")))}
+        emit(r, {"type": "tool_use", "id": key, "name": name, "input": inputs,
+                 "sandbox": sandbox, "code_mode": code_mode, "native_status": item_states.get(key)}, "assistant")
+
+    # openai/codex rust-v0.157.1 models.rs:1060-1165,1938-1949;
+    # core/tests/suite/code_mode.rs:721-760,3436-3752: nested returns go to JS;
+    # only the outer custom output is model-visible. UI item IDs can differ.
+    # With no explicit parent field, bound the sandbox span by the exec return
+    # or the next direct model call/turn boundary; direct response IDs win.
+    active_exec = set()
+    for index, r in enumerate(visible):
+        p = r.get("payload") or {}
+        if r.get("type") == "response_item":
+            kind, key = p.get("type"), p.get("call_id") or p.get("id") or f"missing-{index}"
+            if kind in ("function_call", "custom_tool_call"):
+                # Native FunctionCall keeps namespace separate (models.rs:1073-1088).
+                name, namespace = p.get("name", "unknown"), p.get("namespace") or ""
+                if namespace.startswith("mcp__") and not name.startswith("mcp__"):
+                    name = namespace.rstrip("_") + "__" + name
+                code_mode = kind == "custom_tool_call" and name.rsplit(".", 1)[-1] == "exec"
+                if code_mode:
+                    active_exec.add(key)
+                else:
+                    active_exec.clear()
+                inputs = arguments(p.get("arguments")) if kind == "function_call" else {"code": p.get("input", "")}
+                use(r, key, name, inputs, code_mode=code_mode)
+            elif kind == "local_shell_call":
+                active_exec.clear()
+                use(r, key, "Bash", {"command": shell_script((p.get("action") or {}).get("command"))})
+            elif kind in ("function_call_output", "custom_tool_call_output"):
+                emit(r, {"type": "tool_result", "tool_use_id": key, "content": p.get("output"), "is_error": key in failed_ids}, "user")
+                active_exec.discard(key)
+        elif r.get("type") == "event_msg" and p.get("type") == "item_completed":
+            item = p.get("item") or {}
+            key = item.get("id", f"missing-{index}")
+            kind = item.get("type")
+            sandbox = bool(active_exec) and key not in model_call_ids
+            output, has_output = None, False
+            if kind == "CommandExecution":
+                use(r, key, "Bash", {"command": shell_script(item.get("command"))}, sandbox=sandbox)
+                output = item.get("aggregated_output")
+                has_output = output is not None
+            elif kind == "McpToolCall":
+                use(r, key, "mcp__" + str(item.get("server", "unknown")) + "__" + str(item.get("tool", "unknown")), arguments(item.get("arguments")), sandbox=sandbox)
+                value = item.get("result")
+                output = value.get("content", value) if isinstance(value, dict) else value
+                has_output = output is not None
+            elif kind == "Extension" and item.get("kind") == "web.search":
+                action = item.get("action") or {}
+                use(r, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
+            if has_output and key not in output_ids:
+                emit(r, {"type": "tool_result", "tool_use_id": key, "content": output,
+                         "is_error": item.get("status") == "failed"}, "user")
+        elif r.get("type") == "event_msg" and p.get("type") in ("task_started", "task_complete", "turn_aborted"):
+            active_exec.clear()
+    window = {"since": since.timestamp() * 1000 if since else -8640000000000000,
+              "until": until.timestamp() * 1000 if until else 8640000000000000}
+    measured = _measurement_bridge({"rows": normalized, "options": {
+        "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}}})
+    # Claude per-message fields are inapplicable to Codex cumulative native counters.
+    measured.pop("usage", None)
+    measured["provider_usage"] = {"totals": totals if snapshots else dict.fromkeys(CODEX_COUNTERS),
+        "attempts": attempts, "snapshots": snapshots, "duplicate_snapshots": duplicates, "gaps": gaps,
+        "complete": bool(snapshots) and not gaps and all(a["state"] == "completed" and a["snapshots"] for a in attempts)}
+    return measured
+
+
 def _new_lanes_session() -> dict:
     return {"kind": None, "originator": None, "history_mode": None, "marker": False, "catalog_off": False,
             "catalog_on": False, "in_window": False, "started_before_window": False,
@@ -814,7 +1044,7 @@ def _bump(counts: dict, key: str, by: int = 1) -> None:
 
 
 def scan_lanes_file(path: Path, names, *, since, until, marker: str,
-                    codex_off, codex_on) -> tuple[dict, int, int]:
+                    codex_off, codex_on, rtk_check=False, exception_records=()) -> tuple[dict, int, int]:
     """One rollout file -> (session lanes, parse errors, records without a timestamp).
 
     A spawned sub-agent's rollout starts with records copied from its parent: those whose ordinal
@@ -830,6 +1060,7 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
     first_usage_seen = False
     history_start = None
     call_ids: set = set()
+    metric_records = []
 
     def first_record(call_id) -> bool:
         """Whether a record is its call's first (a record without an id is a call of its own)."""
@@ -859,6 +1090,7 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
             except ValueError:
                 parse_errors += 1
                 continue
+            metric_records.append(record)
             try:
                 when = parse_iso(record["timestamp"]) if isinstance(record.get("timestamp"), str) else None
             except ValueError:
@@ -917,6 +1149,19 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                             session["first_prompt_tokens"] = last["input_tokens"]
                 elif payload_type == "item_completed" and counted:
                     _score_lane_item(session, item, new_call)
+    if session["in_window"]:
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        # Only counts leave the public report. Binding is per sidecar record,
+        # once across all measured rollouts, not once per matching actor.
+        session["_sidecar_record_indices"] = [i for i, r in enumerate(exception_records)
+                                               if r["transcript_sha256"] == digest]
+        exceptions = {r["tool_use_id"]: r for r in exception_records if r["transcript_sha256"] == digest}
+        session["measurement"] = measure_codex_records(metric_records, since=since, until=until,
+                                                       rtk_check=rtk_check, exceptions=exceptions)
+        session["measurement"]["parse_errors"] = parse_errors
+        if parse_errors or untimed:
+            session["measurement"]["provider_usage"]["complete"] = False
+            session["measurement"]["bytes_complete"] = False
     return session, parse_errors, untimed
 
 
@@ -996,6 +1241,15 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
     fetch["ctx_fetch_and_index_share"] = _share(
         fetch["ctx_fetch_and_index"], fetch["web_open_page"] + fetch["ctx_fetch_and_index"] + fetch["shell_curl_wget"])
     out["first_prompt_tokens"] = token_stats(session["first_prompt_tokens"] for session in sessions)
+    measurements = [session["measurement"] for session in sessions if "measurement" in session]
+    if measurements:
+        out["measurement"] = _measurement_bridge(measurements, aggregate=True)
+        out["measurement"].pop("usage", None)
+        out["measurement"]["provider_usage"] = {
+            "complete": all(m["provider_usage"]["complete"] for m in measurements),
+            "totals": {key: (sum(m["provider_usage"]["totals"][key] for m in measurements)
+                              if all(m["provider_usage"]["totals"][key] is not None for m in measurements) else None)
+                       for key in CODEX_COUNTERS}}
     return out
 
 
@@ -1003,7 +1257,7 @@ def user_config_state(session: dict) -> str:
     return "ignored" if session["catalog_off"] else "applied" if session["catalog_on"] else "unknown"
 
 
-def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str) -> dict:
+def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_check=False, exception_records=()) -> dict:
     """The Codex lane report over rollout-*.jsonl under exactly the given roots."""
     skills = [skill for skill in manifest["skills"] if isinstance(skill, dict) and "name" in skill]
     names = [skill["name"] for skill in skills]
@@ -1022,7 +1276,8 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str) -> dic
                 continue
         scanned += 1
         session, errors, no_time = scan_lanes_file(path, names, since=since, until=until, marker=marker,
-                                                   codex_off=codex_off, codex_on=codex_on)
+                                                   codex_off=codex_off, codex_on=codex_on,
+                                                   rtk_check=rtk_check, exception_records=exception_records)
         parse_errors += errors
         untimed += no_time
         if session["in_window"]:
@@ -1036,8 +1291,10 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str) -> dic
         return dict(sorted(counts.items()))
 
     workers = [s for s in sessions if s["user_config"] == "applied"]
+    bound = len({i for s in sessions for i in s.get("_sidecar_record_indices", ())})
     return {
         "roots_count": len(roots or []), "files_scanned": scanned,
+        "sidecar_records": {"bound": bound, "unbound": len(exception_records) - bound},
         "files_skipped_unmodified": skipped, "parse_errors": parse_errors,
         "records_without_timestamp": untimed, "sessions_in_window": len(sessions),
         "sessions_started_before_window": sum(s["started_before_window"] for s in sessions),
@@ -1048,6 +1305,8 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str) -> dic
             1 for s in sessions if s["own_model_calls"] and not s["own_tool_items"]),
         "user_config": {**{state: sum(s["user_config"] == state for s in sessions)
                            for state in ("applied", "ignored", "unknown")}, "method": USER_CONFIG_METHOD},
+        "actors": [{"ordinal": i + 1, "kind": s["kind"], "user_config": s["user_config"],
+                    "measurement": s["measurement"]} for i, s in enumerate(sessions)],
         "groups": {
             "workers": aggregate_codex_lanes(workers),
             "workers_by_kind": {kind: aggregate_codex_lanes([s for s in workers if s["kind"] == kind])
@@ -1062,7 +1321,8 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
     return {"schema_version": 1, "kind": "codex_lane_usage_report", "generated_at": now.isoformat(),
             "window": {"since": since.isoformat() if since else None,
                        "until": until.isoformat() if until else None},
-            "marker": marker, **scan, "limits": LANES_LIMITS}
+            "marker": marker, **scan, "limits": "Legacy lane fields: " + LANES_LIMITS
+            + " PR-A measurement fields use the shared child-usage.mjs kernel and own persisted response_item outputs, with item_completed fallback. Native cumulative provider_usage is separate from Claude per-message counters and from byte measurements. --rtk-check enables fixed-config eligibility replay. Missing usage, output and dynamic fetch evidence cannot establish acceptance; see README.md."}
 
 
 def render_lanes_text(report: dict) -> str:
@@ -1094,8 +1354,9 @@ def main(argv=None) -> int:
     claude_source = parser.add_mutually_exclusive_group()
     claude_source.add_argument("--claude-skill-doctor", type=Path, metavar="FILE",
                                 help="Parse a captured 'claude -p \"/skill-doctor\" --output-format "
-                                     "json' JSON array (its result event's 'result' text), or a "
-                                     "plain-text /skill-doctor table, from this file")
+                                     "json' result object or JSON array (its result event's "
+                                     "'result' text), or a plain-text /skill-doctor table, from "
+                                     "this file")
     claude_source.add_argument("--run-skill-doctor", action="store_true",
                                 help="Run 'claude -p \"/skill-doctor\" --output-format json' now "
                                      "(stdin from /dev/null); refused unless total_cost_usd == 0 "
@@ -1127,6 +1388,10 @@ def main(argv=None) -> int:
     lanes.add_argument("--marker", default=None, metavar="TEXT",
                        help=f"Injected-block marker to look for in developer messages (--lanes; "
                             f"default {DEFAULT_LANES_MARKER})")
+    lanes.add_argument("--rtk-check", action="store_true",
+                       help="Replay native RTK v0.50.0 eligibility under isolated five-exclusion config (--lanes)")
+    lanes.add_argument("--exceptions", type=Path,
+                       help="Private transcript-SHA256-bound M3 adjudications (--lanes)")
     args = parser.parse_args(argv)
 
     try:
@@ -1144,7 +1409,7 @@ def main(argv=None) -> int:
 
     if args.lanes:
         return lanes_main(args, manifest, now)
-    if args.since is not None or args.until is not None or args.marker is not None:
+    if args.since is not None or args.until is not None or args.marker is not None or args.rtk_check or args.exceptions:
         print("skill_usage: --since, --until and --marker need --lanes", file=sys.stderr)
         return 2
 
@@ -1218,7 +1483,15 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     if not marker.strip():
         print("skill_usage: --marker needs non-blank text", file=sys.stderr)
         return 2
-    scan = scan_codex_lanes(args.codex_root, manifest, since=since, until=until, marker=marker)
+    try:
+        reviews = []
+        if args.exceptions:
+            reviews = _measurement_bridge(json.loads(args.exceptions.read_text()), validate_reviews=True)
+        scan = scan_codex_lanes(args.codex_root, manifest, since=since, until=until, marker=marker,
+                               rtk_check=args.rtk_check, exception_records=reviews)
+    except (OSError, ValueError):
+        print("skill_usage: measurement failed; check Node availability and exception sidecar", file=sys.stderr)
+        return 2
     report = build_lanes_report(scan, since=since, until=until, marker=marker, now=now)
     if not write_out(args.out, report):
         return 2

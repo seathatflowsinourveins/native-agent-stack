@@ -1253,12 +1253,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.281"
+              "bootstrap_version": "2.1.284"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.281"
+              "bootstrap_version": "2.1.284"
             }
           },
           "why_selected": "Claude Code (c7) and Codex (c3) are the only candidates with retained native execution against this requirement: coding and bounded research using existing native accounts, client tools, model choices and resumable sessions. I checked this against the underlying artifacts as well as the prose.\n\n(1) The bounded research task. evidence/artifacts/full-stack-convergence-20260921/native-client-results.json records both clients running the same prompt (prompt_sha256 d24422fd...) with exit_code 0, model_override null and permission_override null. So each client used its own native default model and account home, and the file's limitations state that credential stores were not read or copied. For Claude the observed model was claude-fable-5-1, with tool_count 11, every tool result is_error false and provider_total_tokens 250492. The tools were ToolSearch, Skill, RTK git log, QMD search/get, Serena find_symbol/find_referencing_symbols, the ai-memory query and Context Mode ctx_execute_file/ctx_stats. For Codex the observed model was gpt-6-astra, with tool_count 11, every tool result status completed and provider_total_tokens 255335. This matches docs/full-stack-convergence.md lines 25-35. The 'ultra' effort for that Codex run is stated only in that document, not in the artifact.\n\n(2) Resumable sessions, which I observed in the receipts. blueprints/convergence-practice/native-recovery/claude/receipt.json records status passed on Linux WSL2 with native_version 2.1.278 (Claude Code). The model requested was claude-opus-5 with effort ultracode. The checks same_native_session_id, first_cli_sigint_exit, resumed_cli_exit_zero, checkpoint_unchanged and checkpoint_executed_once are all true. blueprints/convergence-practice/native-recovery/receipt.json records status passed with same_thread_id, same_session_id, model_and_effort_preserved (gpt-6-astra/ultra) and checkpoint_executed_once all true. That Codex run was on macOS with codex-cli 0.155.0-alpha.9.2.\n\n(3) Readiness only. evidence/artifacts/claude-upstream-checks-20260921/results.json shows claude --version returning 2.1.278, codex --version returning codex-cli 0.155.1 and codex login status reporting a ChatGPT login.\n\nThe two clients serve independent accounts and model families, so both are retained and neither replaces the other. The winner class is native_proven because both the task run and the resume run are native client executions with retained stream hashes.\n\nThis is my own source review. No TypeSafe inference results were supplied. The token figures are retained provider accounting, not my measurement.",
@@ -1747,7 +1747,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "1.14.0"
+              "bootstrap_version": "1.15.0"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -1925,12 +1925,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "20.0.24"
+              "bootstrap_version": "20.0.26"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "20.0.24"
+              "bootstrap_version": "20.0.26"
             }
           },
           "why_selected": "The requirement has two parts: supply useful context with recoverable originals, and measure artifact reductions separately from provider usage. Three candidates cover it. (1) RTK (c4) formats supported command output. Evidence: docs/token-practice.md lines 105-107 record one retained RTK Git log artifact pair, measured with o200k_base, of 537 -> 178 tokens at a fixed six-commit input. catalogs/foundation/decisions.json lines 1472-1502 (clean-token-tool-ci) records that local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks on local fixtures. docs/full-stack-convergence.md lines 132-137 says that run was a hosted clean install of RTK, QMD, Repomix and TOON on local fixtures. docs/token-native-saturation.md line 109 lists RTK as core with an accepted use stage only. docs/token-practice.md lines 191-193 says native Claude's Bash rewrite is configured. (2) Headroom (c5) is the only adopted candidate whose decision is specifically compression with exact-source recovery. catalogs/foundation/decisions.json lines 1195-1223 records that owned synthetic MCP compression/retrieval and isolated install/restart/uninstall passed. docs/token-native-saturation.md lines 3-8 says Headroom restored identical original content after restart, and line 82 lists accepted install, use, persistence, restart, cleanup and recovery stages with 11 retained pairs. docs/token-practice.md lines 215-217 and 233-234 retain both reductions and growth cases: 2,732 vs 5,105 tokens, or 18,777 when the full original is also fetched; 19,714 vs 36,625; and 191 vs 26,529 on a guarded log fixture. (3) ccusage (c1) covers the provider-usage half. catalogs/foundation/decisions.json lines 1309-1336 (native-usage-reading) records offline native usage parsing and scoped current-session observations with retained outputs, and keeps provider consumption, estimated savings, billing and cache subsets separate. docs/token-practice.md lines 291-296 confirms offline ccusage parsing within its stated gate. docs/full-stack-convergence.md lines 124-128 records the 20.0.24 upgrade with captured upstream test subsets. How the evidence was observed: RTK by native CLI execution on fixtures plus one artifact pair; Headroom by synthetic owned fixtures with isolated lifecycle; ccusage by offline local parsing. None of it is a matched provider-savings measurement. This is my own source review. The packet withheld the provider selections. When I opened decisions.json, every one of these decisions reads \"selection\": \"conditional\", and I did not use that as authority.",
@@ -2095,12 +2095,12 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.281"
+              "bootstrap_version": "2.1.284"
             },
             "macos-arm64": {
               "e2e_state": "untested",
               "bootstrap_pinned": true,
-              "bootstrap_version": "2.1.281"
+              "bootstrap_version": "2.1.284"
             }
           },
           "why_selected": "This verdict comes from my own source review of retained receipts. No head-to-head comparison was run. The requirement has three parts: delegate bounded work, keep owned edits and failed results, and integrate only after review.\n\nc12 (Claude native workers) is the only adopted candidate with retained executed evidence of an owned writing child that also keeps its failed results. c7 (Worktrunk) was qualified separately as the owned-worktree lifecycle tool. It did not provide the isolation used by the delegated child.\n\n(1) Bounded delegation, native execution (c12). On Claude Code 2.1.278, one foreground native Opus child ran with the role's native `isolation: worktree`, not a Worktrunk worktree. It changed only planner.py in that worktree. The seed failed 8 of 12 visible tests. Afterwards all 12 unchanged tests passed. An independent oracle checked all 65,536 four-node graphs, and the primary checkout stayed clean (blueprints/convergence-practice/native-worker/README.md lines 3-26 and 42-44; catalogs/foundation/decisions.json owned-native-child, lines 338-376). The oracle was author-written and visible to the worker (README lines 35-37).\n\n(2) Failed results kept, local integration fixture (c12). native-workflow-graceful-recovery (decisions.json lines 2600-2650) records a selected reviewer stop that kept a failed child and a null result. Replay reused the completed implementation. A same-session resume integrated the repair and kept later user edits. 29 visible and seven hidden checks passed. The record calls this \"a local integration fixture, not an unchanged upstream product test\".\n\n(3) Interruption recovery, native execution on one synthetic same-host task (c12). The sequence was cancellation, continuation of the same child, parent SIGKILL, systemd cgroup cleanup and finalization of the same child. It produced one effect (decisions.json lines 2324-2383; blueprints/convergence-practice/worker-recovery/README.md lines 1-17).\n\n(4) Owned edits, native execution (c7), on a synthetic repository with no model child.\n- Worktrunk 0.78.0 created and listed owned worktrees, then removed them.\n- It refused a dirty removal without loss (blueprints/convergence-practice/wsl-native-tools/receipt.json line 10 and lines 27-30).\n- decisions.json owned-worktrees (lines 478-521) marks it selection \"default\", accepted_within_scope.\n- Only a native old/new comparison of the corrected child working directory covers the packet pin 0.79.0. Its Rust suite was not run (docs/full-stack-convergence.md lines 124-130).\n- docs/token-native-saturation.md line 121 rates worktrunk only \"optional | use, cleanup | supporting workflow / 0\".\n\n(5) Review before integration: decisions.json lines 2672 and 2676 record eight native review-changes runs. The gate was fix-and-commit after independent review; the strict accepted status was never returned. c8/c11 also have executed review evidence: a native Claude-to-Codex foreground review returned (recipes/claude-codex-foreground-review.md lines 20-29). That covers only the review part, not delegation of owned edits.\n\ndocs/foundation-convergence-20260921.md line 20 records the project's decision to retain this setup. That is a claim, not extra evidence. The weakest winner evidence class is local_integration, because (2) is only a local fixture.",
@@ -2248,7 +2248,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "accepted",
               "bootstrap_pinned": true,
-              "bootstrap_version": "1.14.0"
+              "bootstrap_version": "1.15.0"
             },
             "macos-arm64": {
               "e2e_state": "untested",

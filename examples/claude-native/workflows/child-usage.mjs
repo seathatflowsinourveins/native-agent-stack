@@ -5,8 +5,9 @@
 //   node .claude/workflows/child-usage.mjs <transcriptDir>   (the "Transcript dir" the Workflow tool prints)
 //   node .claude/workflows/child-usage.mjs --latest          (newest run recorded for this working directory)
 //   add --require-effort max to also fail (exit 1) when any child ran at another effort
-//   (docs/tasks/2026-09-23-max-effort-default.md: a stage without effort inherits the
-//   coordinator's xhigh, and CLAUDE_CODE_EFFORT_LEVEL overrides every stage).
+//   (docs/decisions/2026-09-23-max-effort-default.md and its 2026-09-29 addendum: a stage without effort runs at its
+//   agent's frontmatter effort, else at its model's saved level or default in a headless session, or at the
+//   coordinator's xhigh on 2.1.281; CLAUDE_CODE_EFFORT_LEVEL overrides every stage).
 //   add --rtk-db <RTK history.db> to join each child Bash call to RTK's hook_decisions row by
 //   tool_use_id (opened read-only through node:sqlite), and --marker <text> to look for another
 //   injected block than Context Mode's routing block (DEFAULT_MARKER below).
@@ -34,10 +35,12 @@
 // most CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls (default 200), counted across the main
 // conversation and every subagent, and a capped call returns a notice instead of results (tools-reference,
 // "Session search limit"). A capped call changes no usage and no exit code; callers decide what it means.
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { homedir } from 'node:os'
+import { homedir, tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
+import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 
 const COUNTERS = ['input_tokens', 'output_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens']
 const PROMPT_COUNTERS = ['input_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens']
@@ -45,11 +48,12 @@ const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max']
 const readRows = (file) => {
   let errors = 0
   const rows = []
-  for (const l of readFileSync(file, 'utf8').split('\n')) {
+  const bytes = readFileSync(file)
+  for (const l of bytes.toString('utf8').split('\n')) {
     if (!l.trim()) continue
     try { rows.push(JSON.parse(l)) } catch { errors++ }
   }
-  return { rows, errors }
+  return { rows, errors, digest: createHash('sha256').update(bytes).digest('hex') }
 }
 const lines = (file) => readRows(file).rows.filter(Boolean)
 // Client-written rows (an API error such as a usage-limit notice) carry this model; the
@@ -57,10 +61,13 @@ const lines = (file) => readRows(file).rows.filter(Boolean)
 const SYNTHETIC = '<synthetic>'
 // Documented resolution of an alias on the Anthropic API by the client version that wrote the
 // transcript entry, as [first client version, model] rows in ascending order (model-config doc,
-// fetched 2026-09-24: opus is Opus 5.5 from v2.1.280, Opus 5 from v2.1.219, Opus 4.8 from v2.1.154).
-// An entry older than the first row, and an alias without rows (sonnet, haiku, fable), has no
-// expectation. An ANTHROPIC_DEFAULT_OPUS_MODEL pin to an older model would be flagged; none is set here.
-export const ALIAS_RESOLUTION = { opus: [['2.1.154', 'claude-opus-4-8'], ['2.1.219', 'claude-opus-5'], ['2.1.280', 'claude-opus-5-5']] }
+// "version history" table, fetched 2026-09-29: opus is Opus 5.5 from v2.1.280, Opus 5 from v2.1.219, Opus 4.8
+// from v2.1.154; sonnet is Sonnet 5.5 from v2.1.284, Sonnet 5 from v2.1.197; fable is Fable 5.1 from v2.1.257).
+// An entry older than the first row, and an alias without rows (haiku, or any alias not listed here),
+// has no expectation. An ANTHROPIC_DEFAULT_OPUS_MODEL pin to an older model would be flagged; none is set here. The sub-agents
+// doc ("Choose a model") adds one exception: a family alias resolves to the lead's exact model when the lead belongs to that
+// family, so a `sonnet` child under a lead pinned to an older Sonnet is flagged here although the client did as documented.
+export const ALIAS_RESOLUTION = { opus: [['2.1.154', 'claude-opus-4-8'], ['2.1.219', 'claude-opus-5'], ['2.1.280', 'claude-opus-5-5']], sonnet: [['2.1.197', 'claude-sonnet-5'], ['2.1.284', 'claude-sonnet-5-5']], fable: [['2.1.257', 'claude-fable-5-1']] }
 const semver = (v) => { const m = /^(\d+)\.(\d+)\.(\d+)/.exec(typeof v === 'string' ? v : ''); return m ? m.slice(1).map(Number) : null }
 const compareParts = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++) { const d = (a[i] || 0) - (b[i] || 0); if (d) return d < 0 ? -1 : 1 } return 0 }
 // claude-opus-5-5 -> { family: 'opus', version: [5, 5] }; a date suffix and a [1m] suffix are ignored; other shapes -> null.
@@ -117,9 +124,20 @@ const URL_HOST = /\bhttps?:\/\/(\[[^\]\s]*\]|[^\s/:'"`<>)?#\]]+)/gi
 const LOOPBACK = /^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\]|0\.0\.0\.0)$/i
 // A quoted string a shell runs: the argument of sh/bash/zsh/dash/ksh/su ... -c, of eval, or of ssh <host>.
 const RUN_QUOTED = /(?:^|[\s;&|(])(?:(?:(?:ba|z|da|k)?sh|su)(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|eval|ssh(?:\s+-\S+)*\s+\S+)\s*$/
-const SHELL_WORD = /^(?:(?:ba|z|da|k)?sh|ssh)$/
-const HEREDOC = /(?<!<)<<(?!<)-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/
+// Inline interpreter code remains executable despite its shell quoting; all other
+// quoted arguments stay data. Extend context-mode v1.0.169 routing.mjs:787-797
+// with documented interpreter entrypoints: docs.python.org/3.14/using/cmdline.html,
+// nodejs.org/docs/latest-v24.x/api/cli.html, docs.deno.com/runtime/reference/cli/eval/,
+// and bun.sh/docs/runtime. HTTP operations remain unclassifiable under #381 M4.
+// An option word is -[\w-]+: the same words as --?[\w-]+, which splits '---' two ways and backtracks
+// exponentially on repeated option words (CodeQL js/redos).
+const RUN_HTTP_CODE = /(?:^|[\s;&|(])(?:python[\d.]*(?:\s+-[A-Za-z]+)*\s+-[A-Za-z]*c|node(?:js)?(?:\s+-[\w-]+)*\s+(?:-e|--eval|-p|--print)|bun(?:\s+-[\w-]+)*\s+(?:-e|--eval)|deno\s+eval(?:\s+-[\w-]+)*)\s*$/
+const SHELL = /^(?:ba|z|da|k)?sh$/
+const INTERPRETER_WORD = /^(?:python[\d.]*|node(?:js)?|deno|bun|ruby|perl|php)$/
+// A here-document operator and its delimiter word at lastIndex (bash(1) Here Documents).
+const HEREDOC = /<<(-?)\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\2/y
 const WRAPPERS = new Set(['sudo', 'env', 'command', 'exec', 'nice', 'nohup', 'time', 'rtk'])
+const RESERVED = new Set(['!', '{', 'do', 'then', 'else', 'elif', 'if', 'while', 'until']) // bash(1) RESERVED WORDS
 // Shell text is read by bash(1) (GNU bash 5.2) QUOTING, COMMENTS and Here Documents: an escaped character is literal and
 // \<newline> is a line continuation; a word beginning with # ends the line as a comment; inside double quotes, and in the
 // body of a heredoc whose delimiter is unquoted, $(...) and `...` still run, while \$ and \` are literal.
@@ -127,56 +145,203 @@ const DOUBLE_QUOTED_DATA = /\\[\s\S]|\$\([^()]*\)|`[^`]*`|[;&|()`\n]/g
 const SUBSTITUTION = /\\[\s\S]|\$\([^()]*\)|`[^`]*`/g
 const ESCAPED_DATA = new Set([...' \t;&|()<>`$\'"\\#{}!']) // escaped, these become the data character _
 const WORD_BREAK = new Set([...' \t\n;&|()<>']) // bash metacharacters: a # after one begins a comment
-// The program of the last simple command in `prefix`: assignments, options, wrappers and a timeout duration skipped.
-const programOf = (prefix) => {
-  const words = prefix.split(/[;&|(]/).pop().trim().split(/\s+/).filter(Boolean)
-  for (let i = 0; i < words.length; i++) {
-    if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[i]) || words[i].startsWith('-') || WRAPPERS.has(words[i])) continue
-    if (words[i] === 'timeout') { i++; continue }
-    return words[i].split('/').pop()
+// Here-document openers in one kept line outside quotes, comments and $(( )) (bash(1) QUOTING, COMMENTS, ARITHMETIC
+// EVALUATION), each with the bounds of the simple command that contains it: the text between the nearest control
+// operators (bash(1) DEFINITIONS: || & && ; ;; ( ) | |& and newline; the & and | of the redirections >& <& &> >| are
+// not). `quote` is a quote an earlier kept line left open: a << inside it stays with the quoted-string analysis.
+function openers(line, quote) {
+  const found = [], cuts = [-1]
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (quote) { if (ch === '\\' && quote === '"') i++; else if (ch === quote) quote = null; continue }
+    if (ch === '\\') { i++; continue }
+    if (ch === "'" || ch === '"') { quote = ch; continue }
+    if (ch === '#' && (i === 0 || WORD_BREAK.has(line[i - 1]))) break
+    const arithmetic = ch === '$' && line.startsWith('((', i + 1) ? i + 1 : ch === '(' && line[i + 1] === '(' ? i : -1
+    if (arithmetic >= 0) {
+      let depth = 0, k = arithmetic
+      for (; k < line.length; k++) if (line[k] === '(') depth++; else if (line[k] === ')' && --depth === 0) break
+      if (k < line.length) { i = k; continue }
+    }
+    if (line.startsWith('<<<', i)) { i += 2; continue }
+    let h = null
+    if (ch === '<') { HEREDOC.lastIndex = i; h = HEREDOC.exec(line) }
+    if (h) { found.push({ start: i, end: i + h[0].length, strip: h[1] === '-', quoted: h[2] !== '', delimiter: h[3] }); i += h[0].length - 1; continue }
+    const prev = line[i - 1], next = line[i + 1]
+    if ('|&;()`'.includes(ch) && !(ch === '&' && (prev === '>' || prev === '<' || next === '>')) && !(ch === '|' && prev === '>')) cuts.push(i)
   }
-  return ''
+  cuts.push(line.length) // ascending, so the bounds are the last cut before and the first cut after the opener
+  return { quote, found: found.map((h) => ({ ...h, from: cuts.filter((c) => c < h.start).pop() + 1, to: cuts.find((c) => c >= h.end) })) }
 }
-// The command text a shell would run: a heredoc body is data unless the heredoc feeds a shell, though with an
-// unquoted delimiter its command substitutions still run; a quoted string is data unless a shell runs it (RUN_QUOTED),
-// though inside double quotes $(...) and `...` still run; an escaped character and a comment are data, and
-// \<newline> joins lines. Data keeps its words (so URL arguments stay) but loses the separators that would put a
-// word in command position.
-export function executedText(command) {
-  const lines = String(command || '').split('\n'), kept = []
-  for (let i = 0; i < lines.length; i++) {
-    kept.push(lines[i])
-    const m = HEREDOC.exec(lines[i])
-    if (!m || SHELL_WORD.test(programOf(lines[i].slice(0, m.index)))) continue
-    while (i + 1 < lines.length && lines[i + 1].replace(/^\t+/, '') !== m[2]) {
-      i++
-      kept.push(m[1] ? '' : (lines[i].match(SUBSTITUTION) || []).filter((s) => s[0] !== '\\').join(' '))
+// The words of one simple command with quotes removed and every redirection and its target dropped (bash(1)
+// REDIRECTION: [n]< [n]> [n]>| [n]>> &> &>> [n]<< [n]<<- [n]<<< [n]<& [n]>& [n]<>).
+const REDIRECTION = /(?:\d*(?:<<-|<<<|<<|<>|<&|>&|>>|>\||<|>)|&>>?)/y
+function commandWords(text) {
+  const words = []
+  let target = false
+  for (let i = 0; i < text.length;) {
+    if (/\s/.test(text[i])) { i++; continue }
+    REDIRECTION.lastIndex = i
+    const r = REDIRECTION.exec(text)
+    if (r) { i += r[0].length; target = true; continue }
+    let word = ''
+    while (i < text.length && !/[\s<>]/.test(text[i])) {
+      const ch = text[i]
+      if (ch === "'") { const end = text.indexOf("'", i + 1) < 0 ? text.length : text.indexOf("'", i + 1); word += text.slice(i + 1, end); i = end + 1 }
+      else if (ch === '"') { for (i++; i < text.length && text[i] !== '"'; i++) { if (text[i] === '\\' && i + 1 < text.length) i++; word += text[i] } i++ }
+      else if (ch === '\\') { word += text[i + 1] ?? ''; i += 2 }
+      else { word += ch; i++ }
+    }
+    if (target) target = false
+    else words.push(word)
+  }
+  return words
+}
+// The invoked program and its arguments: assignments, options before it, wrappers, reserved words and a timeout
+// duration skipped.
+const invocationOf = (words) => {
+  for (let i = 0; i < words.length; i++) {
+    if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[i]) || words[i].startsWith('-') || WRAPPERS.has(words[i]) || RESERVED.has(words[i])) continue
+    if (words[i] === 'timeout') { i++; continue }
+    return { program: words[i].split('/').pop(), args: words.slice(i + 1) }
+  }
+  return { program: '', args: [] }
+}
+// The program that runs a heredoc (its stdin) as source, or '' when stdin stays data.
+// Shells, POSIX.1-2024 utilities/sh.html OPTIONS/STDIN and bash(1) 5.2 OPTIONS/ARGUMENTS: stdin is the script unless -c
+// supplies a command string or an operand names a script file; -s keeps stdin, a shell's `-` equals `--`, -o/+o/-O/+O
+// take a name, --rcfile/--init-file take a file, and -n/-D read commands without executing them.
+// ssh, OpenSSH ssh(1) 9.6p1: without a remote command the remote login shell reads stdin; otherwise the command
+// (its arguments joined by spaces) must read stdin as source. -n and -f (which implies -n) keep stdin unread, and
+// -N, -s, -W, -O, -G, -V and -Q run no remote command. Options may follow the destination (ssh.c parses them again).
+// Interpreters, Python 3.13 using/cmdline.html#interface-options and Node v24.21.0 api/cli.html#-: no script operand
+// or `-`. Any other invocation keeps the body as data; the raw scan in countFetches still counts the body's
+// HTTP_SCRIPT, command-position curl/wget and gh api matches as possible fetches.
+const SSH_VALUE = new Set([...'BbcDEeFIiJLlmOoPpQRSWw']), SSH_NO_STDIN = new Set([...'fGNnOQsVW'])
+function stdinProgram({ program, args }) {
+  if (SHELL.test(program)) {
+    let stdin = false
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i]
+      if (arg === '--' || arg === '-') return stdin || i + 1 === args.length ? program : ''
+      if (arg === '--rcfile' || arg === '--init-file') { i++; continue }
+      if (arg.startsWith('--')) continue
+      if (!/^[-+][A-Za-z]+$/.test(arg)) return stdin ? program : ''
+      if (arg[0] === '-' && /[cnD]/.test(arg)) return ''
+      stdin ||= arg[0] === '-' && arg.includes('s')
+      i += (arg.match(/[oO]/g) || []).length
+    }
+    return program
+  }
+  if (program === 'ssh') {
+    let destination = null, i = 0
+    for (; i < args.length; i++) {
+      const arg = args[i]
+      if (arg === '--') { if (destination === null) destination = args[++i] ?? null; i++; break }
+      if (/^-./.test(arg)) {
+        for (let k = 1; k < arg.length; k++) {
+          if (SSH_NO_STDIN.has(arg[k])) return ''
+          if (SSH_VALUE.has(arg[k])) { if (k === arg.length - 1) i++; break }
+        }
+        continue
+      }
+      if (destination !== null) break
+      destination = arg
+    }
+    if (destination === null) return ''
+    const remote = args.slice(i).join(' ')
+    if (!remote.trim()) return 'sh'
+    for (const part of remote.split(/&&|\|\||[;&|()]/)) { const reader = stdinProgram(invocationOf(commandWords(part))); if (reader) return reader }
+    return ''
+  }
+  if (program === 'deno' || program === 'bun') return args.length === 2 && args[0] === 'run' && args[1] === '-' ? program : ''
+  if (!INTERPRETER_WORD.test(program)) return ''
+  const python = /^python[\d.]*$/.test(program)
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (arg === '--') return i + 1 === args.length || args[i + 1] === '-' ? program : ''
+    if (arg === '-') return program
+    if (python && /^-[bBdEiIOPqRsSuvx]+$/.test(arg)) continue
+    return ''
+  }
+  return program
+}
+// Traced text keeps, for every UTF-16 unit, its offset in the raw command (-1 for a separator the analysis inserts),
+// so a detector match in executed text can be traced back to the raw match it confirms (countFetches).
+const traced = (s) => ({ s, p: Array.from({ length: s.length }, (_, i) => i) })
+const slice = (t, a, b) => ({ s: t.s.slice(a, b), p: t.p.slice(a, b) })
+const append = (out, t) => { out.s += t.s; for (const n of t.p) out.p.push(n) }
+const insert = (out, s) => { out.s += s; for (let i = 0; i < s.length; i++) out.p.push(-1) }
+const joined = (parts, separator) => { const out = { s: '', p: [] }; parts.forEach((t, k) => { if (k) insert(out, separator); append(out, t) }); return out }
+// The command text a shell would run: a heredoc body is data unless the heredoc's simple command runs its stdin as a
+// shell script (or as interpreter source in inlineHttp mode), though with an unquoted delimiter its command
+// substitutions still run; a quoted string is data unless a shell runs it (RUN_QUOTED), though inside double quotes
+// $(...) and `...` still run; an escaped character and a comment are data, and \<newline> joins lines. Data keeps its
+// words (so URL arguments stay) but loses the separators that would put a word in command position.
+export function executedText(command, { inlineHttp = false } = {}) {
+  return executedTrace(traced(String(command || '')), inlineHttp).s
+}
+function executedTrace(src, inlineHttp) {
+  const lines = [], kept = [], sources = []
+  for (let at = 0; ;) { const end = src.s.indexOf('\n', at); lines.push([at, end < 0 ? src.s.length : end]); if (end < 0) break; at = end + 1 }
+  const lineText = (n) => src.s.slice(lines[n][0], lines[n][1])
+  let quote = null
+  for (let n = 0; n < lines.length; n++) {
+    const line = lineText(n), scan = openers(line, quote)
+    kept.push(slice(src, lines[n][0], lines[n][1]))
+    quote = scan.quote
+    for (const h of scan.found) { // bodies follow the opener line in order (bash(1) Here Documents)
+      const reader = stdinProgram(invocationOf(commandWords(line.slice(h.from, h.to))))
+      const source = SHELL.test(reader) || inlineHttp && INTERPRETER_WORD.test(reader)
+      const first = n + 1
+      while (n + 1 < lines.length && (h.strip ? lineText(n + 1).replace(/^\t+/, '') : lineText(n + 1)) !== h.delimiter) {
+        n++
+        if (source) continue
+        const data = { s: '', p: [] }
+        if (!h.quoted) for (const m of lineText(n).matchAll(SUBSTITUTION)) if (m[0][0] !== '\\') { if (data.s) insert(data, ' '); append(data, slice(src, lines[n][0] + m.index, lines[n][0] + m.index + m[0].length)) }
+        kept.push(data)
+      }
+      // Keep source boundaries: interpreter quotes/shift syntax must not consume later shell commands or data
+      // heredocs. Each source is analyzed independently; missed matches stay possible M4 fetches.
+      if (source) sources.push(n >= first ? executedTrace(slice(src, lines[first][0], lines[n][1]), inlineHttp) : { s: '', p: [] })
+      if (n + 1 < lines.length) n++ // closing delimiter
     }
   }
-  const text = kept.join('\n')
-  let out = ''
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i]
+  const text = joined(kept, '\n'), out = { s: '', p: [] }
+  for (let i = 0; i < text.s.length; i++) {
+    const ch = text.s[i]
     if (ch === '\\') {
-      const next = text[i + 1]
-      if (next !== undefined && next !== '\n') out += ESCAPED_DATA.has(next) ? '_' : next
+      const next = text.s[i + 1]
+      if (next !== undefined && next !== '\n') { out.s += ESCAPED_DATA.has(next) ? '_' : next; out.p.push(text.p[i + 1]) }
       i++
       continue
     }
-    if (ch === '#' && (out === '' || WORD_BREAK.has(out[out.length - 1]))) {
-      while (i + 1 < text.length && text[i + 1] !== '\n') i++
+    if (ch === '#' && (out.s === '' || WORD_BREAK.has(out.s[out.s.length - 1]))) {
+      while (i + 1 < text.s.length && text.s[i + 1] !== '\n') i++
       continue
     }
-    if (ch !== "'" && ch !== '"') { out += ch; continue }
+    if (ch !== "'" && ch !== '"') { out.s += ch; out.p.push(text.p[i]); continue }
     let j = i + 1
-    while (j < text.length && text[j] !== ch) j += ch === '"' && text[j] === '\\' ? 2 : 1
-    const inner = text.slice(i + 1, j)
-    if (RUN_QUOTED.test(out)) out += ';' + inner + ';'
-    else if (ch === '"') out += '"' + inner.replace(DOUBLE_QUOTED_DATA, (s) => s[0] === '\\' ? '_' : s.length > 1 ? s : ' ') + '"'
-    else out += "'" + inner.replace(/[;&|()`$\n]/g, ' ') + "'"
+    while (j < text.s.length && text.s[j] !== ch) j += ch === '"' && text.s[j] === '\\' ? 2 : 1
+    const inner = slice(text, i + 1, j)
+    if (RUN_QUOTED.test(out.s)) { insert(out, ';'); append(out, inlineHttp ? executedTrace(inner, inlineHttp) : inner); insert(out, ';') }
+    else if (inlineHttp && RUN_HTTP_CODE.test(out.s)) { insert(out, ';'); append(out, inner); insert(out, ';') }
+    else if (ch === '"') {
+      insert(out, '"')
+      let last = 0
+      for (const m of inner.s.matchAll(DOUBLE_QUOTED_DATA)) {
+        append(out, slice(inner, last, m.index))
+        if (m[0][0] === '\\') { out.s += '_'; out.p.push(inner.p[m.index + 1]) }
+        else if (m[0].length > 1) append(out, slice(inner, m.index, m.index + m[0].length))
+        else { out.s += ' '; out.p.push(inner.p[m.index]) }
+        last = m.index + m[0].length
+      }
+      append(out, slice(inner, last, inner.s.length))
+      insert(out, '"')
+    } else { insert(out, "'"); append(out, { s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); insert(out, "'") }
     i = j
   }
-  return out
+  return joined([out, ...sources], '\n')
 }
 // 'loopback' when every literal URL in an executed curl/wget command is a loopback host, 'fetch' for any
 // other executed curl/wget command (a remote URL, or no literal URL), null when the command runs neither.
@@ -199,6 +364,425 @@ const timeOf = (row) => { const t = Date.parse(row && row.timestamp); return Num
 const counter = () => Object.create(null)
 const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1 }
 
+// PR-A result accounting. Source: #381 preregistration.json M3/M5,
+// mksglu/context-mode v1.0.169 src/session/extract.ts:1060-1069 (UTF-8
+// accounting only), and
+// https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use
+// (`tool_use.id` -> `tool_result.tool_use_id`). Local rule: sum UTF-8 text block
+// payloads without wrappers/separators; compact JSON for non-text blocks only.
+// This is not hook tool_response serialization or tokenizer/provider usage.
+const RESULT_LIMIT = 5120
+const contentBytes = (content) => typeof content === 'string' ? Buffer.byteLength(content, 'utf8')
+  : Array.isArray(content) ? content.reduce((n, b) => n + contentBytes(b?.type === 'text' && typeof b.text === 'string' ? b.text : b), 0)
+    : Buffer.byteLength(JSON.stringify(content), 'utf8')
+const emptySizes = () => ({ results: 0, bytes: 0, large_results: 0, large_bytes: 0, max_bytes: 0 })
+const addSize = (s, n) => { s.results++; s.bytes += n; if (n > RESULT_LIMIT) { s.large_results++; s.large_bytes += n } s.max_bytes = Math.max(s.max_bytes, n) }
+const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s.results), large_byte_share: share(s.large_bytes, s.bytes) })
+const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
+const carrierOf = (call) => call?.code_mode ? 'code_mode' : call?.name === 'Bash' ? (/^\s*rtk\s+proxy\b/.test(call.input?.command || '') ? 'rtk_proxy' : 'bash')
+  : call?.name === 'WebFetch' ? 'webfetch' : call?.name === 'Read' ? 'read'
+    : ['Grep', 'Glob'].includes(call?.name) ? 'grep_glob' : isCtx(call?.name) ? 'ctx'
+      : mcpServer(call?.name) ? 'other_mcp' : 'other'
+const blocksOf = (row) => Array.isArray(row?.message?.content) ? row.message.content.filter((b) => b && typeof b === 'object') : []
+const EXCEPTIONS = ['read_of_subsequently_edited_file', 'original_source_quoted_or_line_cited', 'exact_bytes_required_by_frozen_check']
+const validLogFindReview = (r) => Array.isArray(r?.rtk_log_find) && r.rtk_log_find.length > 0
+  && r.rtk_log_find.every((p) => Number.isInteger(p?.part) && p.part > 0 && ['permitted', 'requires_raw'].includes(p.disposition))
+  && new Set(r.rtk_log_find.map((p) => p.part)).size === r.rtk_log_find.length
+// #381 digest-bound review contract: every supplied class must be valid, including
+// null values (Object.hasOwn: developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/hasOwn).
+const validReview = (r) => typeof r?.witness === 'string' && !!r.witness.trim()
+  && ['exception', 'proxy_purpose', 'rtk_log_find'].some((key) => Object.hasOwn(r, key))
+  && (!Object.hasOwn(r, 'exception') || EXCEPTIONS.includes(r.exception))
+  && (!Object.hasOwn(r, 'proxy_purpose') || r.proxy_purpose === 'acceptance')
+  && (!Object.hasOwn(r, 'rtk_log_find') || validLogFindReview(r))
+// M4 sources: evidence/artifacts/token-adoption-e2e-20260926/preregistration.json
+// thresholds.M4; context-mode v1.0.169 hooks/core/routing.mjs:788-795 and
+// src/server.ts tool schemas (`commands`, `code`, `requests`). Confirmed script
+// HTTP operations stay unclassifiable; raw matches missed by executed-text
+// analysis are possible fetches, kept separately for the gate's lower bound.
+// These are statically visible operations, not observed network requests: loops,
+// dynamically imported scripts and runtime URL resolution cannot be reconstructed.
+const emptyFetches = () => ({ ctx_fetch_and_index: 0, webfetch: 0, shell_fetch: 0, ctx_sandbox_fetch: 0, loopback: 0, unclassifiable: 0, fetch_mentions_unconfirmed: 0 })
+const remoteUrl = (url) => { try { return !LOOPBACK.test(new URL(url).hostname) } catch { return null } }
+const HTTP_SCRIPT = /\b(?:fetch\s*\(|(?:requests|httpx|urllib\.request|https?|axios)\s*\.\s*(?:get|post|put|request|urlopen)\s*\()/g
+const GH_API = /(?:^|[;\n|&])\s*(?:rtk\s+(?:proxy\s+)?)?gh\s+api\b/g
+const LITERAL = /\b(?:execSync|exec|execFileSync|run|Popen|check_output)\(\s*(?:(["'])(.*?)\1|\[([^\]]*)\])/dgs
+// Possible fetches (#381 M4 lower bound): raw detector matches that no executed-text match traces back to. A match is
+// anchored at its operative word (the call name, the four-unit curl/wget word, or gh); an executed match confirms only
+// the raw match at its own raw offset, so matches the analysis creates (backslash-newline joins, unescaping, quoted
+// strings a shell runs) confirm nothing and cannot offset a raw miss.
+const unconfirmed = (code, pattern, confirmed, trace, anchor) => {
+  const seen = new Set(confirmed.map((m) => trace.p[anchor(m)]))
+  return [...code.matchAll(pattern)].filter((m) => !seen.has(anchor(m))).length
+}
+const callAnchor = (m) => m.index, wordAnchor = (m) => m.index + m[0].length - 4, ghAnchor = (m) => m.index + m[0].lastIndexOf('gh')
+function countFetches(call, counts) {
+  const input = call.input || {}, name = call.name || ''
+  const url = (u, key) => { const remote = remoteUrl(u); counts[remote === null ? 'unclassifiable' : remote ? key : 'loopback']++ }
+  if (name.endsWith('__ctx_fetch_and_index')) {
+    if (Array.isArray(input.requests)) for (const r of input.requests) url(r?.url, 'ctx_fetch_and_index')
+    else url(input.url, 'ctx_fetch_and_index')
+    return
+  }
+  if (name === 'WebFetch') { url(input.url, 'webfetch'); return }
+  const scripts = name === 'Bash' ? [String(input.command || '')]
+    : name.endsWith('__ctx_batch_execute') ? (input.commands || []).map((c) => String(c.command || ''))
+      : /__ctx_execute(?:_file)?$/.test(name) ? [String(input.code || '')] : []
+  for (const code of scripts) {
+    const shell = name === 'Bash' || name.endsWith('__ctx_batch_execute') || input.language === 'shell'
+    // Supported inline subprocess literals (context-mode routing.mjs:727-804).
+    // Inspect literal commands, never execute the code. Arbitrary dynamic code is
+    // outside this static detector and cannot be certified as having no fetches.
+    const raw = traced(code)
+    const literals = shell ? [] : [...code.matchAll(LITERAL)].map((m) => m[2] !== undefined ? slice(raw, ...m.indices[2])
+      : joined([...m[3].matchAll(/(["'])(.*?)\1/g)].map((s) => slice(raw, m.indices[3][0] + s.index + 1, m.indices[3][0] + s.index + 1 + s[2].length)), ' '))
+    const exec = shell ? executedTrace(raw, false) : joined(literals.map((t) => executedTrace(t, false)), '\n'), text = exec.s
+    const word = new RegExp(FETCH_WORD.source.replace('rtk|', 'rtk|proxy|'), 'gm')
+    const matches = [...text.matchAll(word)]
+    for (let i = 0; i < matches.length; i++) {
+      // Delimiters inside quoted data have already been neutralized by executedText.
+      const segment = text.slice(matches[i].index + matches[i][0].length, matches[i + 1]?.index).split(/[;\n|&]/)[0]
+      const hosts = [...segment.matchAll(URL_HOST)].map((m) => m[1])
+      const key = hosts.length && hosts.every((h) => LOOPBACK.test(h)) ? 'loopback'
+        : hosts.length ? (name === 'Bash' && !call.sandbox ? 'shell_fetch' : 'ctx_sandbox_fetch') : 'unclassifiable'
+      counts[key]++
+    }
+    // routing.mjs:228-229,787-797 strips all heredocs before inline-HTTP matching.
+    // Retain interpreter-fed bodies for #381 M4, even though upstream cannot route them.
+    // Reuse our bash quoting/comment state as well. Only interpreter code (or
+    // ctx JS/Python) gets raw scanning; quoted grep patterns are not operations.
+    const http = shell ? executedTrace(raw, true) : raw
+    const confirmedHttp = [...http.s.matchAll(HTTP_SCRIPT)]
+    // GitHub API calls are remote operations even when their endpoint is relative.
+    const gh = [...text.matchAll(GH_API)]
+    counts.unclassifiable += confirmedHttp.length + gh.length
+    counts.fetch_mentions_unconfirmed += unconfirmed(code, HTTP_SCRIPT, confirmedHttp, http, callAnchor)
+      + unconfirmed(code, word, matches, exec, wordAnchor) + unconfirmed(code, GH_API, gh, exec, ghAnchor)
+  }
+}
+const finishFetches = (f, carriers = null) => {
+  const remote = f.ctx_fetch_and_index + f.webfetch + f.shell_fetch + f.ctx_sandbox_fetch + f.unclassifiable
+  return { ...f, remote_fetches: remote, routed_share: share(f.ctx_fetch_and_index, remote),
+    routed_share_lower_bound: share(f.ctx_fetch_and_index, remote + f.fetch_mentions_unconfirmed),
+    unclassifiable_share: share(f.unclassifiable, remote), status: f.fetch_mentions_unconfirmed ? 'incomplete' : !remote ? 'not_applicable' : f.unclassifiable / remote > .1 ? 'incomplete' : 'measured',
+    ...(carriers ? { by_carrier: Object.fromEntries(Object.entries(carriers).map(([k, v]) => [k, finishFetches(v)])) } : {}) }
+}
+// Reference implementation: rtk-ai/rtk v0.50.0 src/main.rs:2940-2952,
+// src/discover/lexer.rs:119-135,488-526; registry.rs:1087-1345,1451-1494.
+// Replay accepts a Linux binary on PATH self-reporting rtk 0.50.0 and passing
+// the five-exclusion probe; this does not identify its build or binary hash.
+// Keep every part (upstream discover stops at its first pipe). Complex shell
+// constructs are unknown, never guessed or executed. This is a local adapter.
+function shellParts(command) {
+  if (/<<|\$\(\(/.test(command)) return null
+  const parts = [], syntax = command.split('')
+  const part = (end, op) => ({ text: command.slice(start, end).trim(), syntax: syntax.slice(start, end).join('').trim(), op })
+  let start = 0, quote = null, depth = 0
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i]
+    if (ch === '\\' && quote !== "'") { syntax[i] = '_'; if (i + 1 < command.length) syntax[++i] = '_'; continue }
+    if (quote) { syntax[i] = '_'; if (ch === quote) quote = null; continue }
+    if (ch === "'" || ch === '"' || ch === '`') { syntax[i] = '_'; quote = ch; continue }
+    if (ch === '(' || ch === '{') { depth++; continue }
+    if (ch === ')' || ch === '}') { depth--; if (depth < 0) return null; continue }
+    if (depth) continue
+    if (ch === '#' && (i === 0 || /\s/.test(command[i - 1]))) return null
+    if (';&|\n'.includes(ch)) {
+      const op = command[i + 1] === ch && '&|'.includes(ch) ? ch + ch : ch
+      // & in 2>&1 is a redirection, not an asynchronous command boundary.
+      if (ch === '&' && command[i - 1] === '>') continue
+      parts.push(part(i, op))
+      i += op.length - 1; start = i + 1
+    }
+  }
+  if (quote || depth) return null
+  parts.push(part(command.length, ''))
+  return parts.filter((p) => p.text)
+}
+// git(1) global options before the subcommand: -C, -c, --git-dir or --work-tree with the next word, or one --option.
+const GIT_OPTIONS = String.raw`^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*`
+const FIVE_EXCLUSIONS = [String.raw`^git show [^ ]*:`, 'diff',
+  GIT_OPTIONS + String.raw`show\s+(?:[^\n]*\s)?[^\s]*:`,
+  GIT_OPTIONS + String.raw`branch(?:\s|$)`, 'jq']
+// Where GIT_OPTIONS can end. RTK evaluates the patterns with Rust's linear-time regex; in JavaScript the nested
+// quantifier backtracks exponentially on repeated '--git-dir --x ' (CodeQL js/redos), so every reading of the
+// option words is walked here instead and the rest of the pattern is tried at each word it can reach.
+function gitSubcommandStarts(text) {
+  if (!/^git\s/.test(text)) return []
+  const words = [...text.matchAll(/\S+/g)], reach = new Set([1]), starts = []
+  for (let i = 1; i < words.length; i++) {
+    if (!reach.has(i)) continue
+    starts.push(words[i].index)
+    if (/^(?:-C|-c|--git-dir|--work-tree)$/.test(words[i][0]) && i + 2 < words.length) reach.add(i + 2)
+    if (/^--\S/.test(words[i][0]) && i + 1 < words.length) reach.add(i + 1)
+  }
+  return starts
+}
+const afterGitOptions = (rest, text) => {
+  const pattern = new RegExp(rest, 'y')
+  return gitSubcommandStarts(text).some((at) => { pattern.lastIndex = at; return pattern.test(text) })
+}
+let nativeCheck = null
+function rtkChecker() {
+  if (nativeCheck) return nativeCheck
+  const version = spawnSync('rtk', ['--version'], { encoding: 'utf8' })
+  if (process.platform !== 'linux' || version.status !== 0 || !/^rtk 0\.50\.0\s*$/.test(version.stdout)) return null
+  const dir = mkdtempSync(join(tmpdir(), 'rtk-measure-'))
+  mkdirSync(join(dir, 'rtk'))
+  writeFileSync(join(dir, 'rtk', 'config.toml'), '[hooks]\nexclude_commands = [\n' + FIVE_EXCLUSIONS.map((p) => "'" + p + "'").join(',\n') + '\n]\n', { mode: 0o600 })
+  process.once('exit', () => rmSync(dir, { recursive: true, force: true }))
+  const cache = new Map()
+  nativeCheck = (command) => {
+    if (!cache.has(command)) {
+      const p = spawnSync('rtk', ['hook', 'check', '--agent', 'claude', command], {
+        encoding: 'utf8', timeout: 10000, maxBuffer: 1024 * 1024,
+        env: { ...process.env, XDG_CONFIG_HOME: dir, RTK_DB_PATH: join(dir, 'history.db') },
+      })
+      cache.set(command, p.status === 0 ? { rewrite: p.stdout.trim() }
+        : p.status === 1 && p.stderr.startsWith('No rewrite for:') ? { rewrite: null } : { error: true })
+    }
+    return cache.get(command)
+  }
+  // A native behavior probe catches the upstream silent invalid-config fallback.
+  if (['jq . f', 'diff a b', 'git branch -a', 'git show HEAD:a', 'git -C . show HEAD:a'].some((c) => nativeCheck(c).rewrite !== null)) { nativeCheck = null; return null }
+  return nativeCheck
+}
+export function sensitivePart(text) {
+  if (FIVE_EXCLUSIONS.some((p) => p.startsWith(GIT_OPTIONS) ? afterGitOptions(p.slice(GIT_OPTIONS.length), text)
+    : new RegExp(p.startsWith('^') ? p : '^' + p + '(?:\\s|$)').test(text))) return true
+  // Deterministic refusals only. Conditional log/find exceptions need a witness
+  // (adoption/templates/codex.AGENTS.template.md, RTK exceptions).
+  return /^(?:cd|export|source)\b/.test(text)
+    || /^gh\s/.test(text) && /(?:^|\s)--(?:json|jq|template)(?:[=\s]|$)/.test(text)
+    || /^(?:head|tail)\s/.test(text) && /(?:^|\s)-c|["'$*?\[]/.test(text)
+    || /^\S*\/\S*(?:\s|$)/.test(text)
+}
+export const logFindPart = (text) => /^find\b/.test(text) || afterGitOptions(String.raw`log\b`, text)
+const safeConsumer = (part) => /^(?:cat|head)(?:\s|$)/.test(part) || /^tail(?:\s|$)/.test(part) && !/(?:^|\s)(?:-[^-\s]*[fF]|--follow)(?:\S*)/.test(part)
+const emptyRtk = () => ({ calls: 0, eligible_parts: 0, eligible_calls: 0, observed_covered_parts: 0, observed_all_covered_calls: 0,
+  replayed_covered_parts: 0, replayed_all_covered_calls: 0, explicit_rtk_on_excluded_or_sensitive: 0,
+  explicit_rtk_log_find_advisory: 0, log_find_permitted_parts: 0, log_find_requires_raw_parts: 0, log_find_unresolved_parts: 0,
+  proxy_parts: 0, ineligible_parts: 0, unknown_calls: 0 })
+function rtkParts(calls, rewrites, enabled, exceptions) {
+  const out = emptyRtk(), check = enabled ? rtkChecker() : null
+  if (!check) return { ...out, status: enabled ? 'unavailable' : 'not_measured', coverage: null, call_coverage: null }
+  for (const c of calls) {
+    if (c.name !== 'Bash') continue
+    out.calls++
+    const command = String(c.input?.command || ''), parts = shellParts(command), replay = check(command)
+    const executed = shellParts(rewrites.get(c.id) ?? command), predicted = shellParts(replay.rewrite ?? command)
+    if (!parts || !executed || !predicted || replay.error || parts.length !== executed.length || parts.length !== predicted.length) { out.unknown_calls++; continue }
+    let eligible = 0, observed = 0, covered = 0
+    for (const [i, part] of parts.entries()) {
+      const explicit = /^rtk\s+/.test(part.text), proxy = /^rtk\s+proxy\s+/.test(part.text)
+      const raw = part.text.replace(/^rtk\s+(?:proxy\s+)?/, '')
+      // #381 preregistration: acceptance/raw-proxy runs are a separate population.
+      // Unclassified proxies still fail the separate M6 adjudication requirement.
+      if (proxy) { out.proxy_parts++; continue }
+      const downstream = []
+      for (let j = i; parts[j]?.op === '|'; j++) downstream.push(parts[j + 1]?.text || '')
+      // Native pipeline mode rewrites only supported grep/rg filter stages;
+      // stdin consumers such as wc are not standalone command opportunities.
+      const pipelineConsumer = i > 0 && parts[i - 1].op === '|' && !/^(?:grep|rg)\b/.test(raw)
+      const rawPipeline = downstream.some((s) => !safeConsumer(s))
+      // Same quote state as the splitter; quoted/escaped > is argument data.
+      // RTK lexer redirect_has_file_target exempts fd duplication and /dev/null.
+      const redirected = [...part.syntax.matchAll(/>+\s*([^\s]+)/g)].some((m) => m[1] !== '/dev/null' && !/^&(?:\d+|-)$/.test(m[1]))
+      if (explicit && !proxy && (sensitivePart(raw) || redirected || rawPipeline)) out.explicit_rtk_on_excluded_or_sensitive++
+      if (explicit && logFindPart(raw)) {
+        out.explicit_rtk_log_find_advisory++
+        const review = exceptions[c.id]
+        const disposition = validReview(review) && validLogFindReview(review)
+          ? review.rtk_log_find.find((p) => p.part === i + 1)?.disposition : null
+        out[disposition === 'permitted' ? 'log_find_permitted_parts' : disposition === 'requires_raw' ? 'log_find_requires_raw_parts' : 'log_find_unresolved_parts']++
+      }
+      // Query EVERY standalone part, even exclusions; the native hook decides eligibility.
+      const alone = check(raw)
+      if (alone.error) { out.unknown_calls++; continue }
+      if (rawPipeline || pipelineConsumer || !alone.rewrite) { out.ineligible_parts++; continue }
+      eligible++
+      if (/^rtk\s+(?!proxy\b)/.test(executed[i].text)) observed++
+      if (/^rtk\s+(?!proxy\b)/.test(predicted[i].text)) covered++
+    }
+    out.eligible_parts += eligible; out.observed_covered_parts += observed; out.replayed_covered_parts += covered
+    if (eligible) { out.eligible_calls++; out.observed_all_covered_calls += observed === eligible ? 1 : 0; out.replayed_all_covered_calls += covered === eligible ? 1 : 0 }
+  }
+  return { ...out, status: out.unknown_calls ? 'incomplete' : 'measured', coverage: share(out.observed_covered_parts, out.eligible_parts), call_coverage: share(out.observed_all_covered_calls, out.eligible_calls) }
+}
+// ccusage/ccusage v20.0.24 rust/adapters/claude/src/daily.rs:410-458,505-523;
+// #381 RUNBOOK mandates per-message deduplication. Keep absent counters unknown.
+export function transcriptUsage(transcript, window = null) {
+  const messages = new Map()
+  const total = (u) => COUNTERS.reduce((n, k) => n + (Number.isFinite(u?.[k]) ? u[k] : 0), 0)
+  let unidentified = 0
+  for (const [i, row] of transcript.entries()) {
+    if (row?.type !== 'assistant' || !row.message || row.message.model === SYNTHETIC) continue
+    const at = timeOf(row)
+    if (window && (at === null || at >= window.until)) continue
+    const id = row.message.id || '(missing-' + i + ')'
+    if (!row.message.id) unidentified++
+    const prev = messages.get(id) || { current: null, baseline: null }
+    if (!prev.current || total(row.message.usage) >= total(prev.current.message.usage)) prev.current = row
+    if (window && at < window.since && (!prev.baseline || total(row.message.usage) >= total(prev.baseline.message.usage))) prev.baseline = row
+    messages.set(id, prev)
+  }
+  const rows = []
+  for (const { current: row, baseline } of messages.values()) {
+    if (row === baseline) continue
+    const usage = Object.fromEntries(COUNTERS.map((k) => {
+      const n = row.message.usage?.[k], before = baseline ? baseline.message.usage?.[k] : 0
+      return [k, Number.isFinite(n) && Number.isFinite(before) && n >= before ? n - before : null]
+    }))
+    rows.push({ ordinal: rows.length + 1, model: safeKey(row.message.model || '(unresolved)'),
+      effort: EFFORTS.includes(row.effort) ? row.effort : null, usage })
+  }
+  const totals = Object.fromEntries(COUNTERS.map((k) => [k, rows.length && rows.every((r) => r.usage[k] !== null) ? rows.reduce((n, r) => n + r.usage[k], 0) : null]))
+  return { messages: rows, totals, unidentified_messages: unidentified,
+    complete: rows.length > 0 && !unidentified && Object.values(totals).every((n) => n !== null) && rows.every((r) => r.model !== '(other)' && r.model !== '(unresolved)') }
+}
+export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER } = {}) {
+  const calls = new Map(), results = new Map(), rewrites = new Map()
+  const inside = (row) => !window || (timeOf(row) !== null && timeOf(row) >= window.since && timeOf(row) < window.until)
+  for (const [index, row] of transcript.entries()) {
+    if (window && (timeOf(row) === null || timeOf(row) >= window.until)) continue
+    const a = row?.attachment
+    if (a?.type === 'hook_success' && a.hookName === 'PreToolUse:Bash' && /\brtk\s+hook\b/.test(a.command || '')) {
+      try { const command = JSON.parse(a.stdout).hookSpecificOutput?.updatedInput?.command; if (typeof command === 'string') rewrites.set(a.toolUseID, command) } catch { /* not a rewrite */ }
+    }
+    for (const b of blocksOf(row)) {
+      if (row.type === 'assistant' && b.type === 'tool_use' && !calls.has(b.id)) calls.set(b.id, { ...b, row, index })
+      if (row.type === 'user' && b.type === 'tool_result' && !results.has(b.tool_use_id)) results.set(b.tool_use_id, { ...b, row, index })
+    }
+  }
+  const m3 = emptySizes(), m5 = emptySizes(), carriers = counter(), excluded = counter(), m4 = emptyFetches(), fetchCarriers = counter()
+  const hookContext = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }
+  for (const row of transcript) {
+    if (!inside(row)) continue
+    const a = row?.attachment
+    if (a?.type === 'hook_additional_context') {
+      hookContext.inserted++
+      bump(hookContext.by_hook, safeKey(a.hookName || '(none)'))
+      bump(hookContext.by_event, safeKey(a.hookEvent || '(none)'))
+      if (textOf(a.content).includes(marker)) hookContext.with_marker++
+    } else if (a?.type === 'hook_success') {
+      try { if (JSON.parse(a.stdout).hookSpecificOutput?.additionalContext) hookContext.claimed++ } catch { /* no claim */ }
+    }
+  }
+  for (const c of calls.values()) if (inside(c.row)) countFetches(c, fetchCarriers[carrierOf(c)] ||= emptyFetches())
+  for (const f of Object.values(fetchCarriers)) for (const k of Object.keys(m4)) m4[k] += f[k]
+  const mcpStates = counter(), loaded = counter(), proxy = { calls: 0, acceptance: 0, exception: 0, unclassified: 0 }
+  for (const c of calls.values()) {
+    if (!inside(c.row)) continue
+    const server = mcpServer(c.name), r = results.get(c.id)
+    if (server) {
+      const state = mcpStates[server] ||= { attempted: 0, succeeded: 0, failed: 0, unfinished: 0 }
+      // Codex UI items can retain status without a model-visible result payload
+      // (rust-v0.157.1 app-server-protocol/src/protocol/v2/item.rs McpToolCall).
+      const status = r ? (r.is_error ? 'failed' : 'succeeded')
+        : c.native_status === 'completed' ? 'succeeded' : c.native_status === 'failed' ? 'failed' : 'unfinished'
+      state.attempted++; state[status]++
+    }
+    if (carrierOf(c) === 'rtk_proxy') {
+      proxy.calls++
+      const review = exceptions[c.id]
+      proxy[validReview(review) && review.proxy_purpose === 'acceptance' ? 'acceptance'
+        : validReview(review) && EXCEPTIONS.includes(review.exception) ? 'exception' : 'unclassified']++
+    }
+  }
+  for (const [id, r] of results) if (inside(r.row) && calls.get(id)?.name === 'ToolSearch' && Array.isArray(r.content)) {
+    for (const ref of r.content) if (ref?.type === 'tool_reference') {
+      const server = mcpServer(ref.tool_name); if (server && !mcpStates[server]) bump(loaded, server)
+    }
+  }
+  let orphanResults = 0, invalidExceptions = 0, unknownResultBytes = 0
+  // Only a later, successful edit of this exact path in this actor's transcript is automatic.
+  // Source/line-citation and frozen-check requirements are semantic: a reviewed, digest-bound
+  // sidecar supplies them. A command description is never proof of an exception.
+  const edits = [...calls.values()].filter((c) => ['Edit', 'Write'].includes(c.name) && c.input?.file_path && results.has(c.id) && !results.get(c.id).is_error)
+  for (const [id, r] of results) {
+    if (!inside(r.row)) continue
+    const c = calls.get(id), carrier = carrierOf(c)
+    if (c?.sandbox) continue // Nested results return to code, not model context.
+    if (!c) orphanResults++
+    if (r.content === undefined || r.content === null) { unknownResultBytes++; continue }
+    const n = contentBytes(r.content)
+    addSize(carriers[carrier] ||= emptySizes(), n)
+    let exception = null
+    if (!r.is_error && c?.name === 'Read' && c.input?.file_path && edits.some((e) => e.index > r.index && e.input.file_path === c.input.file_path && e.row.cwd === c.row.cwd)) exception = EXCEPTIONS[0]
+    if (Object.hasOwn(exceptions, id)) {
+      const review = exceptions[id]
+      if (validReview(review)) exception = EXCEPTIONS.includes(review.exception) ? review.exception : exception
+      else invalidExceptions++
+    }
+    if (exception) addSize(excluded[exception] ||= emptySizes(), n)
+    else addSize(m3, n)
+    if (carrier === 'ctx') addSize(m5, n)
+  }
+  const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
+  const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
+  return { m3: finishSizes(m3), m4: finishFetches(m4, fetchCarriers), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
+    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
+    usage: transcriptUsage(transcript, window),
+    hook_context: hookContext,
+    mcp_states: mcpStates, loaded_not_called: loaded,
+    proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
+    invalid_exceptions: invalidExceptions, orphan_results: orphanResults,
+    sandbox_operations: [...calls.values()].filter((c) => inside(c.row) && c.sandbox).length,
+    unknown_result_bytes: unknownResultBytes, bytes_complete: !unknownResultBytes && !orphanResults && !unfinished,
+    calls_without_result: unfinished }
+}
+
+export function aggregateMeasurements(items) {
+  const sizes = (rows) => finishSizes(rows.reduce((a, b) => ({ results: a.results + b.results, bytes: a.bytes + b.bytes,
+    large_results: a.large_results + b.large_results, large_bytes: a.large_bytes + b.large_bytes, max_bytes: Math.max(a.max_bytes, b.max_bytes) }), emptySizes()))
+  const groups = (key) => Object.fromEntries([...new Set(items.flatMap((m) => Object.keys(m[key])))].sort().map((k) => [k, sizes(items.map((m) => m[key][k]).filter(Boolean))]))
+  const f = emptyFetches(), fetchCarriers = counter(), rtk = emptyRtk()
+  for (const m of items) {
+    for (const k of Object.keys(f)) f[k] += m.m4[k]
+    for (const [carrier, counts] of Object.entries(m.m4.by_carrier)) {
+      const target = fetchCarriers[carrier] ||= emptyFetches()
+      for (const k of Object.keys(target)) target[k] += counts[k]
+    }
+    for (const k of Object.keys(rtk)) rtk[k] += m.rtk_parts[k]
+  }
+  const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
+  const hooks = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }, states = counter(), loaded = counter(), proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0 }
+  for (const m of items) {
+    for (const k of ['inserted', 'claimed', 'with_marker']) hooks[k] += m.hook_context[k]
+    for (const k of ['by_hook', 'by_event']) for (const [s, n] of Object.entries(m.hook_context[k])) hooks[k][s] = (hooks[k][s] || 0) + n
+    for (const [s, row] of Object.entries(m.mcp_states)) for (const [k, n] of Object.entries(row)) { states[s] ||= counter(); states[s][k] = (states[s][k] || 0) + n }
+    for (const [s, n] of Object.entries(m.loaded_not_called)) loaded[s] = (loaded[s] || 0) + n
+    for (const k of Object.keys(proxies)) proxies[k] += m.proxy[k]
+  }
+  return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
+    hook_context: hooks, mcp_states: states, loaded_not_called: loaded,
+    proxy: { ...proxies, acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
+    m3_large_results_per_actor: tokenStats(items.map((m) => m.m3.large_results)),
+    by_carrier: groups('by_carrier'), exceptions: groups('exceptions'),
+    orphan_results: items.reduce((n, m) => n + m.orphan_results, 0),
+    sandbox_operations: items.reduce((n, m) => n + m.sandbox_operations, 0),
+    unknown_result_bytes: items.reduce((n, m) => n + m.unknown_result_bytes, 0),
+    bytes_complete: items.length > 0 && items.every((m) => m.bytes_complete && !m.parse_errors),
+    invalid_exceptions: items.reduce((n, m) => n + m.invalid_exceptions, 0),
+    calls_without_result: items.reduce((n, m) => n + m.calls_without_result, 0),
+    rtk_parts: { ...rtk, status: rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured',
+      coverage: share(rtk.observed_covered_parts, rtk.eligible_parts), call_coverage: share(rtk.observed_all_covered_calls, rtk.eligible_calls) },
+    ...(items.every((m) => m.usage) ? { usage: { complete: items.length > 0 && items.every((m) => m.usage.complete),
+      totals: Object.fromEntries(COUNTERS.map((k) => [k, items.length && items.every((m) => m.usage.totals[k] !== null) ? items.reduce((n, m) => n + m.usage.totals[k], 0) : null])) } } : {}) }
+}
+
+// Private adjudications are bound to exact transcript bytes; only the exception's
+// enum and counts are published. They are reviewer input, not machine proof of a citation.
+export function exceptionsFor(records, digest) {
+  return Object.fromEntries(records.filter((r) => r.transcript_sha256 === digest).map((r) => [r.tool_use_id, r]))
+}
+export function validateExceptions(records) {
+  if (!Array.isArray(records) || records.some((r) => !/^[a-f0-9]{64}$/.test(r?.transcript_sha256) || typeof r.tool_use_id !== 'string' || !validReview(r))) throw new Error('invalid exception sidecar')
+  if (new Set(records.map((r) => r.transcript_sha256 + ':' + r.tool_use_id)).size !== records.length) throw new Error('duplicate exception sidecar key')
+  return records
+}
+export const loadExceptions = (path) => validateExceptions(JSON.parse(readFileSync(path, 'utf8')))
+
 // One child's lane use. Counted: tool_use blocks (deduplicated by id), the tool_reference blocks a
 // ToolSearch result returned, and PreToolUse:Bash hook rows from `rtk hook` whose stdout carries
 // hookSpecificOutput.updatedInput (a rewrite). Properties: the marker in the first prompt or in
@@ -210,7 +794,7 @@ const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1 }
 // windows add up); first_prompt_tokens is null unless the first request is inside. rtkDecisions maps
 // tool_use_id -> hook_decisions.decision and is joined to the Bash calls counted in the window;
 // covered = allow + ask (rtk v0.50.0 src/core/tracking.rs HookOutcome::is_covered).
-export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions = null, window = null } = {}) {
+export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions = null, window = null, exceptions = {}, rtkCheck = false } = {}) {
   const lanes = {
     tool_calls: 0, bash_calls: 0, mcp_calls: counter(), skill_calls: counter(),
     tool_search: { calls: 0, loaded: counter() },
@@ -278,9 +862,6 @@ export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions =
         if (hookName.includes(':')) types.add(safeKey(hookName.slice(hookName.indexOf(':') + 1)))
         let context = ''
         if (a.type === 'hook_additional_context') context = textOf(a.content)
-        else if (a.type === 'hook_success') {
-          try { const out = JSON.parse(a.stdout || ''); const c = out && out.hookSpecificOutput && out.hookSpecificOutput.additionalContext; context = typeof c === 'string' ? c : '' } catch { context = '' }
-        }
         if (context.trim()) lanes.subagent_start.additional_context = true
         if (context.includes(marker)) lanes.injected_block.in_subagent_start_context = true
       } else if (a.type === 'hook_success' && hookName === 'PreToolUse:Bash' && /\brtk\s+hook\b/.test(String(a.command || ''))) {
@@ -296,6 +877,8 @@ export function childLanes(transcript, { marker = DEFAULT_MARKER, rtkDecisions =
     }
   }
   lanes.subagent_start.types = [...types].sort()
+  lanes.measurement = measureTranscript(transcript, { window, exceptions, rtkCheck, marker })
+  if (lanes.rtk.decisions) lanes.rtk.not_logged_share = share(lanes.rtk.decisions.not_logged, lanes.bash_calls)
   return lanes
 }
 
@@ -344,8 +927,10 @@ export function aggregateLanes(children) {
   }
   out.rtk.hook_rewrite_share_of_bash = share(out.rtk.hook_rewrites, out.bash_calls)
   if (out.rtk.decisions) out.rtk.covered_share_of_bash = share((out.rtk.decisions.allow || 0) + (out.rtk.decisions.ask || 0), out.bash_calls)
+  out.rtk.not_logged_share = out.rtk.decisions ? share(out.rtk.decisions.not_logged || 0, out.bash_calls) : null
   out.fetch.ctx_fetch_and_index_share = share(out.fetch.ctx_fetch_and_index, out.fetch.webfetch + out.fetch.ctx_fetch_and_index + out.fetch.bash_curl_wget)
   out.first_prompt_tokens = tokenStats(children.map((c) => c.lanes.first_prompt_tokens))
+  out.measurement = aggregateMeasurements(children.map((c) => c.lanes.measurement).filter(Boolean))
   return out
 }
 
@@ -366,7 +951,7 @@ export async function loadRtkDecisions(path) {
 // Every child transcript (agent-<id>.jsonl under a subagents/ directory) below the roots, with its spawn
 // path: a workflow child sits in subagents/workflows/wf_<run>/, an Agent-tool child directly in subagents/.
 // Symbolic links are not followed; each directory that cannot be read adds one to unreadable.count.
-export function findChildTranscripts(roots, unreadable = { count: 0 }) {
+export function findChildTranscripts(roots, unreadable = { count: 0 }, includeMain = false) {
   const found = new Map()
   const walk = (dir) => {
     let entries
@@ -376,6 +961,7 @@ export function findChildTranscripts(roots, unreadable = { count: 0 }) {
       if (entry.isDirectory()) { walk(full); continue }
       const m = entry.isFile() && /\/subagents\/(workflows\/wf_[^/]+\/)?agent-[^/]+\.jsonl$/.exec(full.split('\\').join('/'))
       if (m && !found.has(full)) found.set(full, m[1] ? 'workflow' : 'agent_tool')
+      else if (includeMain && entry.isFile() && entry.name.endsWith('.jsonl') && !full.split('\\').join('/').includes('/subagents/') && !['journal.jsonl'].includes(entry.name)) found.set(full, 'main')
     }
   }
   for (const root of roots) walk(resolve(root))
@@ -385,18 +971,21 @@ export function findChildTranscripts(roots, unreadable = { count: 0 }) {
 const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
 
 // Lane use of every child transcript under the roots that has a row inside [since, until).
-export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null } = {}) {
+export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [] } = {}) {
   const window = { since: since ?? -Infinity, until: until ?? Infinity }
   const unreadable = { count: 0 }
-  const files = findChildTranscripts(roots, unreadable)
+  const files = findChildTranscripts(roots, unreadable, true)
   const children = []
-  let parseErrors = 0, skipped = 0
+  const main = []
+  let parseErrors = 0, skipped = 0, mainParseErrors = 0, mainSkipped = 0
+  const measuredDigests = new Set()
   for (const file of files) {
     if (Number.isFinite(window.since)) {
-      try { if (statSync(file.path).mtimeMs < window.since) { skipped++; continue } } catch { continue }
+      try { if (statSync(file.path).mtimeMs < window.since) { if (file.spawn === 'main') mainSkipped++; else skipped++; continue } } catch { continue }
     }
-    const { rows, errors } = readRows(file.path)
-    parseErrors += errors
+    const { rows, errors, digest } = readRows(file.path)
+    if (file.spawn === 'main') mainParseErrors += errors
+    else parseErrors += errors
     let first = Infinity, last = -Infinity, inside = false
     for (const row of rows) {
       const t = timeOf(row)
@@ -408,12 +997,17 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     if (!inside) continue
     let meta = null
     try { meta = JSON.parse(readFileSync(file.path.replace(/\.jsonl$/, '.meta.json'), 'utf8')) } catch { meta = null }
-    children.push({
+    if (file.spawn === 'main' && !rows.some((r) => ['assistant', 'user'].includes(r?.type))) continue
+    measuredDigests.add(digest)
+    const actor = {
       spawn: file.spawn, session: file.path.split('\\').join('/').replace(/\/subagents\/.*$/, ''), first,
       agent_type: meta && typeof meta.agentType === 'string' && meta.agentType ? safeKey(meta.agentType) : '(none)',
       started_before_window: first < window.since, ran_past_window_end: last >= window.until,
-      lanes: childLanes(rows, { marker, rtkDecisions: rtk ? rtk.map : null, window }),
-    })
+      lanes: childLanes(rows, { marker, rtkDecisions: rtk ? rtk.map : null, window, rtkCheck, exceptions: exceptionsFor(exceptionRecords, digest) }),
+    }
+    actor.lanes.measurement.parse_errors = errors
+    if (errors) { actor.lanes.measurement.bytes_complete = false; actor.lanes.measurement.usage.complete = false }
+    ;(file.spawn === 'main' ? main : children).push(actor)
   }
   // Sessions are reported as session-01, session-02 ... in order of their earliest child row, never by id.
   const firstBySession = new Map()
@@ -427,12 +1021,16 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
   const bySpawnAndType = Object.fromEntries([...new Set(children.map((c) => c.spawn))].sort().map((s) => [s, byKey('agent_type', children.filter((c) => c.spawn === s))]))
   const blind = (c) => c.agent_type.startsWith('blind-')
   const iso = (t) => Number.isFinite(t) ? new Date(t).toISOString() : null
+  const bound = exceptionRecords.filter((r) => measuredDigests.has(r.transcript_sha256)).length
   return {
     kind: 'claude_child_lane_usage', schema_version: 1,
     window: { since: iso(window.since), until: iso(window.until) }, marker,
     roots_count: roots.length, unreadable_directories: unreadable.count,
-    transcripts_found: files.length, transcripts_skipped_unmodified: skipped,
+    transcripts_found: files.filter((f) => f.spawn !== 'main').length, all_transcripts_found: files.length, transcripts_skipped_unmodified: skipped,
+    main_transcripts_found: files.filter((f) => f.spawn === 'main').length,
+    main_transcripts_skipped_unmodified: mainSkipped, main_parse_errors: mainParseErrors,
     children_in_window: children.length, sessions_in_window: ordinal.size, parse_errors: parseErrors,
+    sidecar_records: { bound, unbound: exceptionRecords.length - bound },
     children_started_before_window: children.filter((c) => c.started_before_window).length,
     children_ran_past_window_end: children.filter((c) => c.ran_past_window_end).length,
     rtk_db: rtk ? { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates } : { joined: false },
@@ -440,7 +1038,10 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
       all: group(() => true), workers: group((c) => !blind(c)), negative_controls: group(blind),
       by_spawn: byKey('spawn'), by_agent_type: byKey('agent_type'), by_spawn_and_agent_type: bySpawnAndType, by_session: byKey('session_ordinal'),
     },
-    limits: LANES_LIMITS,
+    main_sessions_in_window: main.length, main: aggregateLanes(main),
+    actors: [...children, ...main].map((c, i) => ({ ordinal: i + 1, actor: c.spawn === 'main' ? 'main' : 'child',
+      spawn: c.spawn, agent_type: c.agent_type, session_ordinal: c.session_ordinal ?? null, measurement: c.lanes.measurement })),
+    limits: 'Legacy lane fields: ' + LANES_LIMITS + ' PR-A measurement fields supersede the legacy fetch share and hook-context interpretation: UTF-8 text payloads and individually serialized non-text blocks across every carrier; nested static fetch operations; all-hook insertions separate from stdout claims. Main actors and file counters are separate from children. Sidecar binding reports counts only. rtk_parts needs --rtk-check and keeps observed command coverage separate from native replay. Unknown usage and missing results cannot establish acceptance; see workflows/README.md.',
   }
 }
 
@@ -481,7 +1082,7 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   if (unresolved) usageIssues.push(unresolved + ' assistant message(s) without a resolved model')
   if (!messages.length) issues.push('no assistant usage in transcript')
   issues.push(...usageIssues)
-  if (!requested) issues.push('model not requested explicitly (inherits the coordinator model)')
+  if (!requested) issues.push("model not requested explicitly (the child ran its definition's model, CLAUDE_CODE_SUBAGENT_MODEL or the coordinator's model)")
   else if (!resolved.length || resolved.some((m) => !m.toLowerCase().includes(requested.toLowerCase()))) issues.push('resolved model outside requested family: ' + (resolved.join(',') || '(none resolved)'))
   // Classifier fallback (model-config doc, "Automatic model fallback"): after a flagged request the
   // child continues on the fallback model, so a change of resolved model within the child, or a model
@@ -536,7 +1137,9 @@ export function summarizeRun(dir, lanesOptions = {}) {
     let meta = null
     try { meta = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf8')) : null } catch { meta = null }
     const found = existsSync(logPath)
-    const child = summarizeChild(s, results.get(s.agentId) || null, meta, found ? lines(logPath) : [], found, lanesOptions)
+    const data = found ? readRows(logPath) : { rows: [], errors: 0, digest: '' }
+    const child = summarizeChild(s, results.get(s.agentId) || null, meta, data.rows, found,
+      { ...lanesOptions, exceptions: exceptionsFor(lanesOptions.exceptionRecords || [], data.digest) })
     return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
   })
   const children = attempts.filter((c) => !c.superseded_by)
@@ -594,11 +1197,12 @@ export function latestRunDir(cwd, configDir) {
 }
 
 const USAGE = 'usage: child-usage.mjs <workflow transcript dir> | --latest [--require-effort <level>] [--rtk-db <history.db>] [--marker <text>]\n' +
-  '       child-usage.mjs --lanes-sweep --root <dir> [--root <dir> ...] [--since <ISO>] [--until <ISO>] [--rtk-db <history.db>] [--marker <text>]'
+  '       child-usage.mjs --lanes-sweep --root <dir> [--root <dir> ...] [--since <ISO>] [--until <ISO>] [--rtk-db <history.db>] [--marker <text>]\n' +
+  '       both modes: [--rtk-check] [--exceptions <private-json>]'
 // { error } or the parsed options. An option value may not start with "--"; each option but --root is given once.
 export function parseArgs(argv) {
   const o = { positional: [], roots: [], sweep: false }
-  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until' }
+  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until', '--exceptions': 'exceptionsPath' }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--root' || Object.hasOwn(valued, a)) {
@@ -608,6 +1212,9 @@ export function parseArgs(argv) {
       else if (o[valued[a]] !== undefined) return { error: a + ' may be given once' }
       else o[valued[a]] = v
       i++
+    } else if (a === '--rtk-check') {
+      if (o.rtkCheck) return { error: '--rtk-check may be given once' }
+      o.rtkCheck = true
     } else if (a === '--lanes-sweep') {
       if (o.sweep) return { error: '--lanes-sweep may be given once' }
       o.sweep = true
@@ -637,19 +1244,23 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
     try { rtk = await loadRtkDecisions(o.rtkDb) } catch (e) { console.error('--rtk-db: cannot read the hook_decisions table read-only (' + (e.code || e.message) + ')'); process.exit(2) }
   }
   const marker = o.marker ?? DEFAULT_MARKER
+  let exceptionRecords = []
+  if (o.exceptionsPath) {
+    try { exceptionRecords = loadExceptions(o.exceptionsPath) } catch { console.error('--exceptions: invalid or unreadable sidecar'); process.exit(2) }
+  }
   // Output goes out through stdout.write and process.exitCode, never process.exit(): process.exit() drops stdout
   // writes still pending, and a pipe takes 64 KiB at once. Only the short error messages above exit directly.
   if (o.sweep) {
     const notDirs = o.roots.filter((r) => { try { return !statSync(r).isDirectory() } catch { return true } })
     if (notDirs.length) { console.error('--root is not a readable directory: ' + notDirs.join(', ')); process.exit(2) }
-    process.stdout.write(sortedJson(sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk })) + '\n')
+    process.stdout.write(sortedJson(sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk, rtkCheck: o.rtkCheck, exceptionRecords })) + '\n')
     process.exitCode = 0
   } else {
     const target = o.positional[0]
     const required = o.required ?? null
     const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
     if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
-    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null }) }
+    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null, rtkCheck: o.rtkCheck, exceptionRecords }) }
     if (rtk) out.rtk_db = { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates }
     if (required) out.effort_mismatches = effortMismatches(out, required)
     process.stdout.write(JSON.stringify(out, null, 2) + '\n')

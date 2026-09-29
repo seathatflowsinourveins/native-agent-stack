@@ -1,4 +1,9 @@
-df3248659c191d8800dfd64a8c7d415fc13652cebee08c9437bf579862c2e561  effort-default-guard.py
-f2ae894eddeed3583d87da7382b897f1a8b492c160547f99bb7aa91ec0b4b2a7  ../../../scripts/hooks/secret_path_guard.py
-8b9a60fa425900930c610ba7e3e0f8a0fa1457048a39c79e3136fb5073e7269f  token-lanes-block.md
-7a9228e41235771336189287944d81d998795b025a9a038d022beb21a19ce870  token-lanes-subagent-start.py
+2a5f087f2c10437bab302e19469ae6b2e715828083a8bae07a7b177540b63e0e  effort-default-guard.py
+abf269ba41a126400e084b4f03828eb4f0e6fc2375633c0e788136158a3054b1  ../../../scripts/hooks/secret_path_guard.py
+d6c3c19d6e94d3f48d2788963c8c9be45ec57e6bb81cab92b2c30d9fd5c8e8d6  token-lanes-block.md
+c81a91c4ffb2fa906feb403d5a11bd294b6cf2db45795d80f9acd662c5004973  token-lanes-block.builder.md
+47cc80b262468557b8cfe5c243598030757270674bc7bf286fba8c0c573abc28  token-lanes-block.researcher.md
+19857a44a201948aa1d1fc9be3e24d5f3f7cc385f333ab3893411889258af4ed  token-lanes-block.reviewer.md
+81784c2edc0cc95c0c0eb3b443b5b228dd41e970236239553c66af90ddfc7eae  token-lanes-block.scout.md
+a2eb3298126efd82622150e5717f10eb700f4aa3076d027c86ae1fe653f29eb0  token-lanes-block.verifier.md
+81e28a7c2f5429301d3306dc5ee0ecf809c67ccded62a43a98281baa8f92fedd  token-lanes-subagent-start.py

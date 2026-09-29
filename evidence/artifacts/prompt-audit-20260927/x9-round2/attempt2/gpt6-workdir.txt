@@ -1,0 +1,13 @@
+live checkout HEAD: c8362c02; attempt-2 root: plain export of ba1700ad; run 2026-09-28T03:26:06Z
+AB lines only in the root rerun found in the recorded output: 0/0; lines only in the live rerun found: 0/0
+AB files named differ in output between dirs: False | recorded == root: False | recorded == live: False | "rtk rg -n -e '"'^'"' CLAUDE.md -e 'Carry authorized' -e 'loaded' -e 'Workfl
+AB lines only in the root rerun found in the recorded output: 80/80; lines only in the live rerun found: 1/47
+AB files named differ in output between dirs: True | recorded == root: False | recorded == live: False | "rtk rg -n -C 3 -e 'Upstream verification' -e 'headless' -e 'plugin' -e 'MCP
+AB lines only in the root rerun found in the recorded output: 0/0; lines only in the live rerun found: 0/0
+AB files named differ in output between dirs: False | recorded == root: True | recorded == live: True | "rtk rg -n -A 11 '"'^## Upstream verification'"' docs/harness-defaults.md"
+AB lines only in the root rerun found in the recorded output: 0/0; lines only in the live rerun found: 0/0
+AB files named differ in output between dirs: False | recorded == root: False | recorded == live: False | "rtk rg -n -e 'Carry authorized' -e 'Keep historical' -e 'native loaded' -e 
+BA lines only in the root rerun found in the recorded output: 177/177; lines only in the live rerun found: 1/102
+BA files named differ in output between dirs: True | recorded == root: True | recorded == live: False | "rtk rg -n -C 4 'Upstream verification|incumb|licens|headless|unconfirmed|pl
+BA lines only in the root rerun found in the recorded output: 0/0; lines only in the live rerun found: 0/0
+BA files named differ in output between dirs: False | recorded == root: True | recorded == live: True | "rtk rg -n -A 24 '"'^## Upstream verification'"' docs/harness-defaults.md"

@@ -1,0 +1,137 @@
+# Capability gate M13 (adoption-audit plan, M13 row): with two Codex sessions running at once in two worktrees, does
+# each tool class, called with no explicit cwd, read the file of its OWN worktree? promptfoo 0.123.1's openai:codex-sdk
+# drives `codex exec --profile stack-worker` through codex-profile-exec, with --cd set to each worktree by working_dir
+# (the bundled @openai/codex-sdk 0.153.4 passes `--cd`, the same flag as `-C`). m13_tests.js interleaves the rows
+# (a, b, a, b, ...), and promptfoo runs steps in that order with at most maxConcurrency in flight
+# (async.forEachOfLimit, src/evaluator.ts:4102), so the two trees' sessions overlap. m13_hooks.js writes each row's
+# fresh token just before its session. run_gate.py creates both worktrees at HEAD, sets the env templates below and
+# reconciles every row with Loki.
+# Classes: the shell tool; context-mode ctx_execute without a cwd; ctx_execute_file with a relative path; ctx_index then
+# ctx_search; serena find_symbol. Gate rows must return their own token in every class. Each control must fail: a
+# disabled context-mode server, and context-mode bound to the other worktree (CONTEXT_MODE_PROJECT_DIR).
+description: capability gate, M13 binding
+tracing:
+  enabled: true
+evaluateOptions:
+  maxConcurrency: 2
+  cache: false
+extensions:
+  - file://m13_hooks.js:beforeEach
+prompts:
+  - file://briefs/m13.md
+providers:
+  - id: openai:codex-sdk
+    label: gate-a
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_WT_A }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+  - id: openai:codex-sdk
+    label: gate-b
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_WT_B }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+  - id: openai:codex-sdk
+    label: ctrl-disabled-a
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_WT_A }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          context-mode:
+            enabled: false
+  - id: openai:codex-sdk
+    label: ctrl-disabled-b
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_WT_B }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          context-mode:
+            enabled: false
+  - id: openai:codex-sdk
+    label: ctrl-wrongroot-a
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_WT_A }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          context-mode:
+            env:
+              CONTEXT_MODE_PROJECT_DIR: '{{ env.CAPABILITY_GATE_WT_B }}'
+  - id: openai:codex-sdk
+    label: ctrl-wrongroot-b
+    config:
+      codex_path_override: '{{ env.CAPABILITY_GATE_LAUNCHER }}'
+      inherit_process_env: true
+      cli_env:
+        CODEX_PROFILE: stack-worker
+      working_dir: '{{ env.CAPABILITY_GATE_WT_B }}'
+      sandbox_mode: read-only
+      approval_policy: never
+      enable_streaming: true
+      cli_config:
+        mcp_servers:
+          context-mode:
+            env:
+              CONTEXT_MODE_PROJECT_DIR: '{{ env.CAPABILITY_GATE_WT_A }}'
+defaultTest:
+  assert:
+    # The four MCP classes were called (trajectory spans, site/docs/configuration/expected-outputs/deterministic.md).
+    - type: trajectory:tool-used
+      value:
+        - mcp context-mode/ctx_execute
+        - mcp context-mode/ctx_execute_file
+        - mcp context-mode/ctx_search
+        - mcp serena/find_symbol
+    # Each class returned this row's own token and no other (assertions.js m13Class).
+    - type: javascript
+      value: file://assertions.js:m13Class
+      config:
+        cls: shell
+    - type: javascript
+      value: file://assertions.js:m13Class
+      config:
+        cls: ctx_execute
+    - type: javascript
+      value: file://assertions.js:m13Class
+      config:
+        cls: ctx_execute_file
+    - type: javascript
+      value: file://assertions.js:m13Class
+      config:
+        cls: ctx_index_search
+    - type: javascript
+      value: file://assertions.js:m13Class
+      config:
+        cls: serena
+tests: file://m13_tests.js

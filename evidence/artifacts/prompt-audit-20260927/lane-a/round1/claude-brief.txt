@@ -1,0 +1,299 @@
+Task: judge the 4 items in the packet below and return only the required JSON (schema at <lane-a>/schema.json), one entry per item id.
+- The repository is checked out read-only at <base> (PR #444's head, 46184751). Read the original files there
+  (for example sed -n, rg, git -C <base> log/blame/show). Do not write, install or change anything.
+- You may search the web for current official documentation and maintained upstream repositories; cite them.
+- Packet sha256: 993930d089fe90de8dfc625fe38cc0696ca46ae107c65c4369edd25a8443f9c2.
+
+# Judgment packet: prompt-audit round 3, lane items S1 and X5a-c (frozen at 46184751)
+
+You are an independent reviewer. Four proposed edits to this repository's instruction files are below. Judge each on
+its merits: verify the evidence against the original files (the repository is checked out read-only at the base path
+in your task), check the primary sources provided, research further where a claim depends on current official
+documentation, and decide whether the proposed text is right.
+
+Rules:
+- Verify, do not trust: excerpts below are copies; the files at the base path are the original source.
+- A proposal that another file, test or fixture would contradict or break is wrong; say which, with file:line.
+- Licenses and incumbency are never selection criteria.
+- Judge wording on whether the target models (Claude Code and Codex sessions that load these files) will follow it as
+  intended, not on style.
+- X5a-c carry the operator's own 2026-09-28 wording of the top rule into the repository's three copies of it. The
+  operator's rule itself is not under review. Judge whether each proposed text carries that wording correctly and
+  keeps the file's tested obligations and its existing meaning.
+- Every `sources` entry names a file:line or URL and quotes the text that supports your verdict.
+
+Verdicts per item: `agree` = apply the proposed text exactly; `amend` = apply your `resolution_text` instead (the exact
+replacement for the proposal's `old` text); `reject` = keep the current text. `resolution_text` is empty unless you
+amend. `confidence` is 0..1.
+
+Convergence rule, fixed before either lane runs: an item is applied when both families agree, or when both give the
+same amendment. Both reject: the current text stays. Anything else goes to one blind adjudication in both
+presentation orders, and a text is applied only when all four adjudications choose it.
+
+---
+## S1: a PR-description sentence in AGENTS.md
+
+Location: AGENTS.md:37 at 46184751. Proposed by another session of this repository on
+2026-09-28, from its practice sweep.
+
+Current text (end of line 37): and requires one `lane:*` label per PR. Hand off to a live session that owns an area instead of editing it.
+
+Proposed text: and requires one `lane:*` label per PR. Build each PR description from `.github/pull_request_template.md`: the required `sota-sources` check fails a PR whose description lacks a non-empty `## SOTA sources` or `### SOTA sources` section (exact, case-sensitive heading). Hand off to a live session that owns an area instead of editing it.
+
+### Evidence
+`AGENTS.md:35-38`
+```
+  35: - This repository commits `.claude/settings.json` with Ultracode on. The Claude coordinator stays at `xhigh` under Ultracode, because a `max` session turns its workflow orchestration off, and never sets `CLAUDE_CODE_EFFORT_LEVEL` (any value overrides every child's effort). Pass `effort: 'max'` with an explicit task-matched `model` on every ad-hoc workflow `agent()` call: a stage without its own `effort` inherits the coordinator's `xhigh` unless its agent's frontmatter sets one. Probes and overturn conditions: `docs/decisions/2026-09-23-max-effort-default.md`.
+  36: - Dispatch each new or ad-hoc workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call. The saved scripts vendored in that directory keep their reviewed routing, byte-identical to agent-lab.
+  37: - Until the trading lane moves to its own repository, `docs/lanes.md` assigns foundation, trading and shared paths, gives the protocol for shared hot files such as `manifests/evidence.json`, and requires one `lane:*` label per PR. Hand off to a live session that owns an area instead of editing it.
+  38: 
+```
+
+`.github/workflows/validate.yml:316-341`
+```
+ 316:   sota-sources:
+ 317:     # Top rule (AGENTS.md): every change names the maintained repository or published reference it
+ 318:     # installs or follows. This job fails a PR whose description lacks a non-empty "SOTA sources" section
+ 319:     # (## or ###). It reads the body from the pull_request payload through the official
+ 320:     # actions/github-script (github.com/actions/github-script, v9.0.0; payload fields per
+ 321:     # docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request); no body text reaches a shell.
+ 322:     if: github.event_name == 'pull_request'
+ 323:     runs-on: ubuntu-24.04
+ 324:     timeout-minutes: 2
+ 325:     steps:
+ 326:       - name: Harden the runner (audit-only network egress)
+ 327:         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+ 328:         with:
+ 329:           egress-policy: audit
+ 330:       - name: Require a non-empty "SOTA sources" section in the PR description
+ 331:         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+ 332:         with:
+ 333:           script: |
+ 334:             const body = (context.payload.pull_request && context.payload.pull_request.body) || '';
+ 335:             const match = body.match(/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m);
+ 336:             const content = match ? match[1].replace(/<!--[\s\S]*?-->/g, '').trim() : '';
+ 337:             if (!content) {
+ 338:               core.setFailed('The PR description needs a non-empty "SOTA sources" section: the repository, pin and file, or the published reference, behind each change (AGENTS.md top rule).');
+ 339:             } else {
+ 340:               core.info(`SOTA sources section present (${content.length} characters).`);
+ 341:             }
+```
+
+`.github/pull_request_template.md:5-14`
+```
+   5: 
+   6: - What this PR changes, in one or two sentences:
+   7: - Base commit: `<sha>`
+   8: - Lane: exactly one of `lane:foundation`, `lane:trading` or `lane:shared`, matching the PR label; a `lane:shared` PR needs the other lane's acknowledgement before merge ([docs/lanes.md](../docs/lanes.md)):
+   9: - Owned paths touched:
+  10: 
+  11: ### SOTA sources
+  12: 
+  13: <!-- Required (AGENTS.md top rule; the sota-sources check fails without it). For every change: the maintained repository or published reference it installs or follows, with the repository URL, the pin (tag or commit), and the file, section or paper. A change without a SOTA source is not mergeable. -->
+  14: 
+```
+
+Facts read from the live GitHub API on 2026-09-28 (read-only calls; commands as run):
+- The live ruleset on main requires the status checks validate, token-report, secret-scan, dependency-review, osv-scanner, verdict-review-gate, validate-macos and sota-sources (`gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main`)
+- Open PR #410's description has the headings '## The answer the request asks for', '## Steps', '## Not claimed' and '## Checks at head', and no SOTA sources heading; its sota-sources check fails (Actions run 36329683998, job 108649197610) (`gh pr view 410 --json body; gh pr checks 410`)
+- PR #430's description (2026-09-27) records: 'Each of the last 60 merged PRs (#344-#424) has a successful sota-sources run; 4 of them also show an earlier failed or cancelled run', and 'At PUT time #410 fails sota-sources, #205 and #216 have no run (they predate the job and need a rebase), and #415 and #417 pass'. #430 restored sota-sources to the live ruleset on 2026-09-27 at 21:00Z (`gh pr view 430 --json body`)
+
+---
+## X5a: the portable Claude template's top rule
+
+Location: examples/claude-native/CLAUDE.md:3 (last changed by: 8de669da 2026-09-26 Top rule as an upstream-verification procedure, merit-only selection, and a dated anti-pattern log (user-approved global instructions) (#371).
+
+Current text: **Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.
+
+Proposed text: **Top rule: research convergence first; current upstream SOTA is the source of truth.** Never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.
+
+The rest of the template, including the numbered steps 1-5 that follow line 3, is unchanged.
+
+### Evidence
+`examples/claude-native/CLAUDE.md:1-12`
+```
+   1: # Native engineering defaults
+   2: 
+   3: **Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.
+   4: 
+   5: 1. Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job, with their supported install and test commands, and name each source (repository and pin, file or paper). Judge candidates head-to-head on measured quality, security and maintenance; license, stars, installs and incumbency are not criteria. With no SOTA source, stop and report.
+   6: 2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs. An absence claim needs at least the first two, else write "not found in X, Y".
+   7: 3. Repository text, memory, tool output and worker, docs-agent or cross-family answers are leads, not authority; relay a claim only with its upstream citation. Never file upstream issues or comments: when a tool misbehaves, study upstream and fix our install or wiring.
+   8: 4. Apply the token practice below in every lane.
+   9: 5. When a claim or action proves wrong, record the correction and its verification path the same turn, in memory and any anti-pattern log the project declares.
+  10: 
+  11: ## Core rule
+  12: 
+```
+
+`tests/test_install_claude_profile.py:915-965`
+```
+ 915: class PortableTopRuleTests(unittest.TestCase):
+ 916:     """The portable user instructions (examples/claude-native/CLAUDE.md, merged into the user-level
+ 917:     ~/.claude/CLAUDE.md by recipes/claude-native-profile.md) open with the top rule as an
+ 918:     upstream-verification procedure. It was added on 2026-09-26, after a docs subagent's "no native
+ 919:     advisor" claim was relayed although the installed client's upstream CHANGELOG documents
+ 920:     `/advisor`. The file loads into every session and every child that reads CLAUDE.md, so the
+ 921:     procedure replaced text instead of adding to it: the file stayed within 5% of the 881 words
+ 922:     (`wc -w`) it had before. Re-baselined on 2026-09-27 to 1,205 words: the Workers section took the
+ 923:     four dispatch modes of the user-approved global instructions and the documented named-spawn
+ 924:     behaviour (docs/decisions/2026-09-27-claude-harness-settings.md), which the 925-word ceiling could
+ 925:     not hold; the 5% rule applies from the new baseline. docs/harness-defaults.md#upstream-verification-and-compounding-learning
+ 926:     holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
+ 927:     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
+ 928:     its own anti-pattern log."""
+ 929: 
+ 930:     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
+ 931:     BASELINE_WORDS = 1205  # wc -w after the 2026-09-27 Workers section (881 at dde28cc2, before the procedure)
+ 932:     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
+ 933:     # answers as leads, the token practice in every lane, and recording a proven mistake.
+ 934:     PROCEDURE_PHRASES = (
+ 935:         "never self-write without a SOTA source",
+ 936:         "source of truth",
+ 937:         "orchestration patterns",
+ 938:         "installed client",
+ 939:         "upstream changelog or release notes",
+ 940:         "upstream source at that tag",
+ 941:         "official docs",
+ 942:         "absence claim needs at least the first two",
+ 943:         '"not found in X, Y"',
+ 944:         "leads, not authority",
+ 945:         "upstream citation",
+ 946:         "token practice below in every lane",
+ 947:         "same turn",
+ 948:         "anti-pattern log",
+ 949:     )
+ 950:     # A relative path such as docs/harness-defaults.md; one that exists here is absent from other projects.
+ 951:     RELATIVE_PATH = re.compile(r"[\w.-]+(?:/[\w.-]+)+")
+ 952: 
+ 953:     @staticmethod
+ 954:     def top_rule(text: str) -> str:
+ 955:         """The text from the bold top rule to the first section heading."""
+ 956:         start = text.find("**Top rule:")
+ 957:         end = text.find("\n## ", start)
+ 958:         return text[start:end] if 0 <= start < end else ""
+ 959: 
+ 960:     @classmethod
+ 961:     def ceiling(cls) -> int:
+ 962:         return int(cls.BASELINE_WORDS * 1.05)
+ 963: 
+ 964:     @classmethod
+ 965:     def errors(cls, text: str) -> list[str]:
+```
+
+`recipes/claude-native-profile.md:79-84`
+```
+  79: ## Small persistent contract; selected upstream skills
+  80: 
+  81: Merge the [short instruction example](../examples/claude-native/CLAUDE.md) into
+  82: the user's existing `~/.claude/CLAUDE.md`, preserving independent preferences and
+  83: managed imports. Since the [2026-09-26 cleanup](../docs/decisions/2026-09-26-harness-rules-cleanup.md)
+  84: the example states each rule once under section headings, so replace an earlier
+```
+
+The operator's own user-level instruction file (`~/.claude/CLAUDE.md`, not in this repository; last modified
+2026-09-28 07:34Z) opens with this top rule, verbatim:
+
+```text
+**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report instead of writing one. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one. Stars, installs and popularity guide discovery; they are not evidence.
+```
+
+The operator's direction for this pass (2026-09-28, verbatim): "please resolute cleanly with the sota repos
+convergence,resolute all in your end and state the jobs that only beable to run by end,decide with your evidances and
+sota repos evidances convergence".
+
+Round 1 of this audit (docs/decisions/2026-09-27-prompt-audit-resolution.md, item X5) recorded that the template's top
+rule differs from the host's user-level file and left it to the operator.
+
+---
+## X5b: AGENTS.md's top rule
+
+Location: AGENTS.md:3 (last changed by: 7bbb021e 2026-09-25 Top rule (research first, never self-write without a SOTA source) and a required sota-sources check (#294)).
+
+Current text: **Top rule: research first, and never self-write without a SOTA source.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. Stars, installs and popularity guide discovery; they are not evidence. With no SOTA source, stop and report instead of writing one.
+
+Proposed text: **Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report instead of writing one. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one. Stars, installs and popularity guide discovery; they are not evidence.
+
+The proposed text is the user-level top rule quoted under X5a, verbatim.
+
+### Evidence
+`AGENTS.md:1-4`
+```
+   1: # Repository work
+   2: 
+   3: **Top rule: research first, and never self-write without a SOTA source.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. Stars, installs and popularity guide discovery; they are not evidence. With no SOTA source, stop and report instead of writing one.
+   4: 
+```
+
+Round 1 of this audit (item X5, both lanes agree) left `AGENTS.md:3` unedited, because it and the template's rule
+overlap and "the broader rule covers the narrower one"; that judgment did not concern the operator's later wording.
+`AGENTS.md` is read by Codex and Claude Code sessions in this repository, and `CLAUDE.md` imports it (`@AGENTS.md`).
+
+---
+## X5c: the Codex user-instructions template's top rule
+
+Location: adoption/templates/codex.AGENTS.template.md:3 (last changed by: 50b9579f 2026-09-27 PR-D: Codex worker lane: Codex's own config writer, RTK text inline with exceptions, max-effort stack-worker profile (#389)).
+
+Current text: Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.
+
+Proposed text: Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.
+
+### Evidence
+`adoption/templates/codex.AGENTS.template.md:1-9`
+```
+   1: <!-- native-agent-stack:codex-user-instructions:begin (adoption/templates/codex.AGENTS.template.md) -->
+   2: <!-- native-agent-stack:top-rule -->
+   3: Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.
+   4: Reuse maintained upstream tools, runtimes and orchestration patterns through their supported install and test commands, naming each source (repository and pin, file or paper); with none, stop and report.
+   5: Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs. Absence claims need the first two, else say "not found in X, Y".
+   6: Worker, docs-agent and cross-family answers are leads; relay claims only with upstream citations.
+   7: Process large output outside the model.
+   8: When a claim proves wrong, record the correction and its verification path that turn.
+   9: 
+```
+
+`tools/adoption/apply_codex_lane.py:12-15`
+```
+  12:                 timeout option, so a server it registered has none). No other key is sent.
+  13:   AGENTS.md     the managed block of adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk
+  14:                 v0.50.0's awareness text verbatim, this catalog's exceptions), inserted or replaced between its
+  15:                 begin and end markers; every other line is kept. Hash-guarded atomic write.
+```
+
+`tests/test_codex_worker_lane.py:194-205`
+```
+ 194: class TemplateTests(unittest.TestCase):
+ 195:     def test_agents_template_is_one_managed_block(self):
+ 196:         text = (TEMPLATES / "codex.AGENTS.template.md").read_text(encoding="utf-8")
+ 197:         self.assertTrue(text.startswith(lane.BLOCK_BEGIN))
+ 198:         self.assertTrue(text.endswith(lane.BLOCK_END + "\n"))
+ 199:         self.assertEqual(text.count(lane.BLOCK_BEGIN), 1)
+ 200:         self.assertEqual(text.count(lane.TOP_RULE_MARKER), 1)
+ 201:         self.assertEqual(text.count(lane.EXCEPTIONS_MARKER), 1)
+ 202:         self.assertEqual(lane.agents_block(), text)
+ 203:         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
+ 204:         self.assertFalse([line for line in text.splitlines() if line.startswith("@")])
+ 205:         self.assertLess(len(text.encode("utf-8")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes
+```
+
+---
+
+## Primary sources gathered for round 3
+
+Each entry: source, date retrieved, verbatim quote, and the claim it supports.
+
+### S1: PR-description and PR-check rules in AGENTS.md
+- https://agents.md/ (sample file) (2026-09-28): "## PR instructions- Title format: [<project_name>] <Title>- Always run `pnpm lint` and `pnpm test` before committing. ... Commit messages or pull request guidelines, security gotchas, large datasets, deployment steps: anything you'd tell a new teammate belongs here too." Supports: the AGENTS.md format puts PR instructions in the file [doc]
+- https://learn.chatgpt.com/docs/agent-configuration/agents-md L58-60, L140-141 (redirect from https://developers.openai.com/codex/guides/agents-md) (2026-09-28): "## Repository expectations … - Run `npm run lint` before opening a pull request. ... Keep rules concise, explain the behavior to flag and any safe path or exception, and reserve formatting and lint checks for CI." Supports: Codex's AGENTS.md guidance includes pre-PR expectations and concise rules [doc]
+- https://code.claude.com/docs/en/best-practices.md L181 (2026-09-28): "| Repository etiquette (branch naming, PR conventions) |" Supports: Claude Code's CLAUDE.md guidance lists PR conventions under what to include [doc]
+- https://code.claude.com/docs/en/memory.md L11 (2026-09-28): "Claude can also read a repository's `AGENTS.md` files, on their own or alongside CLAUDE.md" Supports: AGENTS.md reaches Claude sessions [doc]
+- https://code.claude.com/docs/en/github-actions.md L287 (2026-09-28): "Create a `CLAUDE.md` file in your repository root to define code style guidelines, review criteria, project-specific rules, and preferred patterns. Claude follows these guidelines when creating PRs and responding to requests." Supports: instruction files govern PR creation by agents [doc]
+- NVIDIA/warp@e477c3ba2d84a5aa843f029821e071f06b7dea72 AGENTS.md L26-28 (pushed 2026-09-28T07:42:00Z) (2026-09-28): "## PR Instructions … If opening a pull request on GitHub, use the template in `.github/PULL_REQUEST_TEMPLATE.md`." Supports: a maintained repository tells agents to build PRs from the template [obs]
+- newton-physics/newton@3b7c3c848b9ff012ab28273d09dc00523dcd961b AGENTS.md L32-34 (pushed 2026-09-25T13:07:29Z) (2026-09-28): "If opening a pull request on GitHub, use the template in `.github/PULL_REQUEST_TEMPLATE.md`." Supports: the same template rule in a second maintained repository [obs]
+- WordPress/gutenberg@ff0659d6eb3e76207aeb63fc97c0c6cdd1fe5e20 AGENTS.md L99-102 (pushed 2026-09-28T07:45:41Z) (2026-09-28): "## PR instructions … Fix all formatting/linting issues; these are enforced through CI in PRs." Supports: a maintained repository names CI enforcement in its PR instructions [obs]
+- terramate-io/terramate@dc22e8df3365a6558d01e4c03e3e26652b0a3ee5 AGENTS.md L444-469 (pushed 2026-09-08T12:20:05Z) (2026-09-28): "## PR Instructions … ### PR Description Should Include - **What** … **Why** … **Testing**" Supports: a maintained repository states required PR-description content [obs]
+- gh pr create --help (gh 2.101.0) L14-15; https://cli.github.com/manual/gh_pr_create (2026-09-28): "A prompt will also ask for the title and the body of the pull request. Use `--title` and `--body` to skip this, or use `--fill` to autofill these values from git commits." Supports: a non-interactive gh run supplies the body itself [obs/doc]
+- cli/cli v2.101.0 pkg/cmd/pr/create/create.go L345-346, L350, L619-641 (2026-09-28): "`--template` is not supported when using `--body` or `--body-file` ... must provide `--title` and `--body` (or `--fill`…) when not running interactively ... [a template is loaded only] if !opts.BodyProvided" Supports: gh pr create --body, --body-file and --fill skip the repository's PR template [obs]
+- https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/about-issue-and-pull-request-templates (2026-09-28): "When you add a pull request template to your repository, project contributors will automatically see the template's contents in the pull request body." Supports: the template reaches the body in the web flow [doc]
+- Not found: a sampled AGENTS.md that documents a CI check on PR-description content (sample: gh search code "PR instructions" --filename AGENTS.md; eight maintained repositories)
+- Not found: a docs.github.com statement about templates for PRs created through the CLI or API

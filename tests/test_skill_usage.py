@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import collections
 import contextlib
+import importlib.util
 import io
 import json
 import os
@@ -14,6 +15,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "skill-usage"))
@@ -135,9 +137,44 @@ class SkillDoctorParsing(unittest.TestCase):
         self.assertEqual(parsed["total_cost_usd"], 0.004)
         self.assertEqual(parsed["num_turns"], 1)
 
-    def test_refuses_json_that_is_not_an_event_array(self):
-        parsed = S.parse_claude_output(json.dumps({"not": "a list"}))
-        self.assertIn("error", parsed)
+    def test_refuses_a_nonzero_cost_result_object(self):
+        # The zero-cost check holds for the single result object `claude -p --output-format json` prints
+        # (`claude --help` 2.1.283: "json" (single result)) as it does for the message array printed when verbose is
+        # on (a 2.1.283 binary read, not a live reproduction; see S.parse_claude_output).
+        messages = json.loads((FIXTURES / "skill-doctor-nonzero-cost.json").read_text())
+        parsed = S.parse_claude_output(json.dumps(S.find_result_event(messages)))
+        self.assertIn("refusing a nonzero-cost result", parsed.get("error", ""))
+        self.assertEqual(parsed["rows"], {})
+        self.assertEqual((parsed["total_cost_usd"], parsed["num_turns"]), (0.004, 1))
+
+    def test_refuses_json_that_is_neither_a_result_object_nor_an_event_array(self):
+        # An object that is no result message, even one carrying zero-cost fields and a table, and a JSON scalar.
+        row = "  gh-fix-ci                       userSettings       ~110         340    6×  2 days ago"
+        for raw in (json.dumps({"not": "a list"}),
+                    json.dumps({"type": "assistant", "total_cost_usd": 0, "num_turns": 0, "result": row}),
+                    "42", "null", json.dumps(row)):
+            with self.subTest(raw=raw):
+                parsed = S.parse_claude_output(raw)
+                self.assertIn("error", parsed)
+                self.assertEqual(parsed["rows"], {})
+
+    def test_refuses_an_error_result_in_either_shape(self):
+        # is_error can be true with subtype "success" (an API error; claude-agent-sdk-python types.py:1358-1360),
+        # and a zero-cost error result must not be read as a measured /skill-doctor table.
+        messages = json.loads((FIXTURES / "skill-doctor-sample.json").read_text())
+        result = S.find_result_event(messages)
+        for change in ({"is_error": True}, {"subtype": "error_during_execution", "is_error": True},
+                       {"subtype": "error_max_turns"}, {"is_error": None}):
+            for shape in ("object", "array"):
+                with self.subTest(change=change, shape=shape):
+                    event = {**result, **change}
+                    raw = json.dumps(event if shape == "object" else
+                                     [m if m is not result else event for m in messages])
+                    parsed = S.parse_claude_output(raw)
+                    self.assertIn("refusing an error result", parsed.get("error", ""))
+                    self.assertEqual(parsed["rows"], {})
+        missing = {k: v for k, v in result.items() if k != "is_error"}
+        self.assertIn("refusing an error result", S.parse_claude_output(json.dumps(missing)).get("error", ""))
 
     def test_refuses_array_with_no_result_event(self):
         parsed = S.parse_claude_output(json.dumps([{"type": "system"}, {"type": "assistant"}]))
@@ -166,6 +203,23 @@ class RunSkillDoctor(unittest.TestCase):
         result = S.run_skill_doctor(runner=runner)
         self.assertNotIn("error", result)
         self.assertEqual(result["rows"]["gh-fix-ci"]["uses"], 6)
+
+    def test_run_reads_either_json_output_shape(self):
+        # `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json" (single result))
+        # or, when verbose is on, the message array (a 2.1.283 binary read, not a live reproduction; see
+        # S.parse_claude_output). find_result_event takes the last element of type "result" from either, this
+        # repository's selection; anthropics/claude-agent-sdk-python@36f95486ee9f
+        # src/claude_agent_sdk/_internal/message_parser.py:308 parses a message of that type as the ResultMessage.
+        sample = (FIXTURES / "skill-doctor-sample.json").read_text()
+        stdouts = {"array": sample, "object": json.dumps(S.find_result_event(json.loads(sample)))}
+        results = {}
+        for shape, stdout in stdouts.items():
+            with self.subTest(shape=shape):
+                runner = lambda argv, stdout=stdout, **kw: subprocess.CompletedProcess(argv, 0, stdout, "")
+                results[shape] = S.run_skill_doctor(runner=runner)
+                self.assertNotIn("error", results[shape])
+                self.assertEqual(results[shape]["rows"]["gh-fix-ci"]["uses"], 6)
+        self.assertEqual(results["object"], results["array"])
 
     def test_refuses_nonzero_cost_from_a_run(self):
         sample = (FIXTURES / "skill-doctor-nonzero-cost.json").read_text()
@@ -301,9 +355,40 @@ class ManifestAndLock(unittest.TestCase):
         path = S.skill_lock_path(home="/home/example", environment={"XDG_STATE_HOME": "/xdg-state"})
         self.assertEqual(path, Path("/xdg-state/skills/.skill-lock.json"))
 
-    def test_skill_lock_path_relative_xdg_state_home_is_ignored(self):
-        path = S.skill_lock_path(home="/home/example", environment={"XDG_STATE_HOME": "relative/dir"})
-        self.assertEqual(path, Path("/home/example/.agents/.skill-lock.json"))
+    def test_skill_lock_path_takes_any_non_empty_xdg_state_home_as_the_cli_does(self):
+        # skills 1.7.0 (npm dist/cli.mjs L3746-3750) uses any non-empty XDG_STATE_HOME, untrimmed, relative or not,
+        # through path.join; it does not apply the XDG Base Directory spec's absolute-path rule. Empty is unset.
+        for value, expected in (("relative/dir", "relative/dir/skills/.skill-lock.json"),
+                                (" ", " /skills/.skill-lock.json"),
+                                ("", "/users/example/.agents/.skill-lock.json")):
+            with self.subTest(xdg_state_home=value):
+                path = S.skill_lock_path(home="/users/example", environment={"XDG_STATE_HOME": value})
+                self.assertEqual(path, Path(expected))
+
+    def test_skill_lock_path_is_joined_as_the_cli_path_join_joins_it(self):
+        # path.join collapses "." and ".." lexically and a leading // to /; pathlib keeps the "..", which through a
+        # missing or symlinked folder names another file than the one the CLI wrote.
+        cases = (({"XDG_STATE_HOME": "/x/missing/../state"}, None, "/x/state/skills/.skill-lock.json"),
+                 ({"XDG_STATE_HOME": "//x/./state"}, None, "/x/state/skills/.skill-lock.json"),
+                 ({}, "/users/missing/../example", "/users/example/.agents/.skill-lock.json"),
+                 ({"HOME": "//users/missing/../example"}, None, "/users/example/.agents/.skill-lock.json"))
+        for environment, home, expected in cases:
+            with self.subTest(environment=environment, home=home):
+                self.assertEqual(S.skill_lock_path(home=home, environment=environment), Path(expected))
+
+    def test_skill_lock_path_agrees_with_install_skills(self):
+        # One join serves both tools: skill_usage.node_path_join is install_skills.py's.
+        spec = importlib.util.spec_from_file_location("install_skills_for_usage_tests",
+                                                      ROOT / "tools" / "adoption" / "install_skills.py")
+        installer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(installer)
+        home = "/users/missing/../example"
+        for environment in ({}, {"XDG_STATE_HOME": "rel/../state"}, {"XDG_STATE_HOME": "//x/missing/../state"}):
+            with self.subTest(environment=environment), mock.patch.dict(os.environ, environment):
+                if not environment:
+                    os.environ.pop("XDG_STATE_HOME", None)
+                self.assertEqual(S.skill_lock_path(home=home, environment=environment),
+                                 installer.lock_file_path(Path(home)))
 
     def test_skill_lock_path_home_fallback(self):
         path = S.skill_lock_path(home="/home/example", environment={})
@@ -486,9 +571,9 @@ class RenderTextAndCli(unittest.TestCase):
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self.roots = [str(root) for root in materialize_codex_roots(tmp)]
 
-    def run_main(self, extra_args, out=None):
+    def run_main(self, extra_args, out=None, claude_file=None):
         args = ["--manifest", str(self.manifest_path), "--now", NOW, "--home", str(self.home),
-                "--claude-skill-doctor", str(self.claude_file)]
+                "--claude-skill-doctor", str(claude_file or self.claude_file)]
         for root in self.roots:
             args += ["--codex-root", root]
         if out is not None:
@@ -506,6 +591,24 @@ class RenderTextAndCli(unittest.TestCase):
         self.assertEqual(report["kind"], "skill_invoke_rate_report")
         self.assertIn("tdd", {c["name"] for c in report["prune_candidates"]})
 
+    def test_main_measures_either_json_output_shape(self):
+        # A capture of `claude -p "/skill-doctor" --output-format json` is one result object (`claude --help` 2.1.283:
+        # "json" (single result)) or, when verbose is on, the message array (a 2.1.283 binary read, not a live
+        # reproduction; see S.parse_claude_output); both yield the same report.
+        messages = json.loads(self.claude_file.read_text())
+        object_file = Path(self.enterContext(tempfile.TemporaryDirectory())) / "skill-doctor-object.json"
+        object_file.write_text(json.dumps(S.find_result_event(messages)), encoding="utf-8")
+        reports = {}
+        for shape, claude_file in (("array", self.claude_file), ("object", object_file)):
+            with self.subTest(shape=shape):
+                code, output = self.run_main(["--json"], claude_file=claude_file)
+                self.assertEqual(code, 0)
+                reports[shape] = json.loads(output)
+                self.assertEqual({key: reports[shape]["claude"].get(key) for key in
+                                  ("measured", "format", "total_cost_usd", "num_turns")},
+                                 {"measured": True, "format": "json", "total_cost_usd": 0, "num_turns": 0})
+        self.assertEqual(reports["object"], reports["array"])
+
     def test_render_text_default_output(self):
         code, output = self.run_main([])
         self.assertEqual(code, 0)
@@ -517,7 +620,12 @@ class RenderTextAndCli(unittest.TestCase):
     def test_out_writes_report_outside_the_repository(self):
         with tempfile.TemporaryDirectory() as tmp:
             out_path = Path(tmp) / "nested" / "report.json"
-            code, _ = self.run_main(["--json"], out=out_path)
+            # Keep the checkout and output as siblings even when TMPDIR is inside
+            # the real worktree. Source: docs.python.org/3/library/unittest.mock.html#patch-object.
+            checkout = Path(tmp) / "checkout"
+            checkout.mkdir()
+            with mock.patch.object(S, "ROOT", checkout):
+                code, _ = self.run_main(["--json"], out=out_path)
             self.assertEqual(code, 0)
             written = json.loads(out_path.read_text())
             self.assertEqual(written["kind"], "skill_invoke_rate_report")
@@ -598,6 +706,178 @@ def materialize_lanes_root(dest: Path) -> Path:
 
 
 class CodexLanes(unittest.TestCase):
+    def test_measurement_uses_own_outputs_and_differences_cumulative_usage(self):
+        def record(kind, payload, ordinal):
+            return {"type": kind, "timestamp": "2026-10-20T02:01:00Z", "payload": payload, "ordinal": ordinal}
+        def tokens(total, out=0):
+            return {"type": "token_count", "info": {"total_token_usage": {
+                "input_tokens": total, "cached_input_tokens": 20, "output_tokens": out,
+                "reasoning_output_tokens": 0, "total_tokens": total + out}}}
+        rows = [record("session_meta", {"source": {"subagent": {}}, "subagent_history_start_ordinal": 5}, 0),
+                record("event_msg", tokens(100), 2),
+                record("response_item", {"type": "function_call", "call_id": "parent", "name": "exec_command", "arguments": '{"cmd":"ls"}'}, 3),
+                record("response_item", {"type": "function_call_output", "call_id": "parent", "output": "p" * 9000}, 4),
+                record("event_msg", {"type": "task_started", "turn_id": "turn"}, 5),
+                record("response_item", {"type": "function_call", "call_id": "child", "name": "exec_command", "arguments": '{"cmd":"rtk proxy cat a"}'}, 6),
+                record("response_item", {"type": "function_call_output", "call_id": "child", "output": "c" * 6000}, 7),
+                record("event_msg", tokens(110, 3), 8), record("event_msg", tokens(110, 3), 9),
+                record("event_msg", {"type": "turn_aborted"}, 10)]
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m3"]["results"], 1)
+        self.assertEqual(got["by_carrier"]["rtk_proxy"]["bytes"], 6000)
+        self.assertEqual(got["provider_usage"]["totals"]["input_tokens"], 10)
+        self.assertEqual(got["provider_usage"]["totals"]["output_tokens"], 3)
+        self.assertEqual(got["provider_usage"]["attempts"][0]["state"], "interrupted")
+        self.assertFalse(got["provider_usage"]["complete"])
+        self.assertEqual(got["provider_usage"]["duplicate_snapshots"], 1)
+        self.assertNotIn("turn_id", json.dumps(got))
+
+    def test_measurement_includes_ctx_nested_fetches_from_item_arguments(self):
+        rows = []
+        for i in range(20):
+            tool = "ctx_fetch_and_index" if i == 0 else "ctx_execute"
+            args = {"url": "https://example.org"} if i == 0 else {"language": "shell", "code": "curl https://example.org"}
+            rows.append({"type": "event_msg", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                "type": "item_completed", "item": {"id": str(i), "type": "McpToolCall", "server": "context-mode",
+                    "tool": tool, "arguments": args, "result": {"content": [{"type": "text", "text": "ok"}]}}}})
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m4"]["remote_fetches"], 20)
+        self.assertEqual(got["m4"]["routed_share"], .05)
+        self.assertEqual(got["m5"]["results"], 20)
+
+    def test_lane_report_exposes_sanitized_per_actor_metrics(self):
+        report = self.scan()
+        self.assertEqual(len(report["actors"]), report["sessions_in_window"])
+        self.assertIn("m3", report["actors"][0]["measurement"])
+        self.assertIn("provider_usage", report["groups"]["workers"]["measurement"])
+        for actor in report["actors"]:
+            self.assertNotIn("usage", actor["measurement"])
+        self.assertNotIn(str(self.root), json.dumps(report))
+
+    def test_code_mode_fixture_keeps_nested_operations_out_of_context_bytes(self):
+        path = next(self.root.glob("rollout-*-lanes-worker.jsonl"))
+        rows = []
+        for line in path.read_text().splitlines():
+            try:
+                rows.append(json.loads(line))
+            except ValueError:
+                pass  # Fixture intentionally includes one malformed row.
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["orphan_results"], 0)
+        self.assertEqual(got["mcp_states"]["context-mode"],
+                         {"attempted": 3, "succeeded": 2, "failed": 1, "unfinished": 0})
+        self.assertEqual(got["mcp_states"]["qmd"]["succeeded"], 1)
+        self.assertEqual(got["calls_without_result"], 3)  # exec, spawn_agent, direct shell
+        self.assertEqual(got["sandbox_operations"], 10)
+        self.assertEqual(got["m4"]["ctx_sandbox_fetch"], 1)
+        # The retained fixture has no exec output; add one synthetic model-visible
+        # return and large sandbox results to exercise the actual byte boundary.
+        exec_key = next(r["payload"]["call_id"] for r in rows
+                        if r.get("payload", {}).get("type") == "custom_tool_call")
+        boundary = next(i for i, r in enumerate(rows)
+                        if r.get("payload", {}).get("name") == "spawn_agent")
+        rows.insert(boundary, {"type": "response_item", "timestamp": "2026-10-20T01:05:10Z",
+                               "payload": {"type": "custom_tool_call_output", "call_id": exec_key,
+                                           "output": "visible summary"}})
+        for row in rows[:boundary]:
+            item = row.get("payload", {}).get("item", {})
+            if item.get("type") == "CommandExecution":
+                item["aggregated_output"] = "x" * 6000
+            if item.get("type") == "McpToolCall":
+                item["result"] = {"content": [{"type": "text", "text": "x" * 6000}]}
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["orphan_results"], 0)
+        self.assertEqual(got["m3"]["bytes"], len("visible summary"))
+        self.assertEqual(got["m3"]["results"], 1)
+        self.assertEqual(got["m5"]["results"], 0)
+        self.assertEqual(got["calls_without_result"], 2)
+
+    def test_local_shell_and_custom_calls_pair_with_native_outputs(self):
+        def row(payload):
+            return {"type": "response_item", "timestamp": "2026-10-20T02:00:00Z", "payload": payload}
+        rows = [row({"type": "local_shell_call", "call_id": "shell", "action": {
+                    "type": "exec", "command": ["bash", "-lc", "curl https://example.org"]}}),
+                row({"type": "function_call_output", "call_id": "shell", "output": "done"}),
+                row({"type": "custom_tool_call", "call_id": "custom", "name": "apply_patch", "input": "patch"}),
+                row({"type": "custom_tool_call_output", "call_id": "custom", "output": "ok"})]
+        got = S.measure_codex_records(rows)
+        self.assertEqual(got["orphan_results"], 0)
+        self.assertEqual(got["calls_without_result"], 0)
+        self.assertTrue(got["bytes_complete"])
+        self.assertEqual(got["m3"]["bytes"], 6)
+        self.assertEqual(got["by_carrier"]["bash"]["bytes"], 4)
+        self.assertEqual(got["m4"]["shell_fetch"], 1)
+
+    def test_sidecar_binding_counts_distinguish_changed_rollouts(self):
+        import hashlib
+        path = next(self.root.glob("rollout-*-lanes-worker.jsonl"))
+        records = [{"transcript_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                    "tool_use_id": "reviewed", "proxy_purpose": "acceptance", "witness": "check"},
+                   {"transcript_sha256": "0" * 64, "tool_use_id": "stale",
+                    "proxy_purpose": "acceptance", "witness": "check"}]
+        def scan():
+            return S.scan_codex_lanes([self.root], self.manifest, since=self.since, until=self.until,
+                                     marker=S.DEFAULT_LANES_MARKER, exception_records=records)
+        self.assertEqual(scan()["sidecar_records"], {"bound": 1, "unbound": 1})
+        path.write_text(path.read_text() + "\n")
+        self.assertEqual(scan()["sidecar_records"], {"bound": 0, "unbound": 2})
+
+    def test_measurement_namespace_and_failed_terminal_event(self):
+        def row(kind, payload):
+            return {"type": kind, "timestamp": "2026-10-20T02:00:00Z", "payload": payload}
+        rows = [row("response_item", {"type": "function_call", "call_id": "c", "namespace": "mcp__context_mode",
+                "name": "ctx_execute", "arguments": json.dumps({"language": "shell", "code": "curl https://example.org"})}),
+                row("response_item", {"type": "function_call_output", "call_id": "c", "output": "x" * 6000}),
+                row("event_msg", {"type": "item_completed", "item": {"type": "McpToolCall", "id": "c",
+                    "server": "context_mode", "tool": "ctx_execute", "arguments": {"language": "shell", "code": "curl https://example.org"}}}),
+                row("event_msg", {"type": "task_started"}),
+                row("event_msg", {"type": "token_count", "info": {"total_token_usage": dict.fromkeys(S.CODEX_COUNTERS, 10)}}),
+                row("event_msg", {"type": "task_complete", "error": {"message": "failed"}})]
+        got = S.measure_codex_records(rows, since=self.since, until=self.until)
+        self.assertEqual(got["m5"]["large_results"], 1)
+        self.assertEqual(got["m4"]["ctx_sandbox_fetch"], 1)
+        self.assertFalse(got["provider_usage"]["complete"])
+        self.assertEqual(got["provider_usage"]["attempts"][0]["state"], "failed")
+
+    def test_usage_missing_parent_baseline_and_counter_regression_stay_unknown(self):
+        def row(kind, payload, ordinal=10):
+            return {"type": kind, "timestamp": "2026-10-20T02:00:00Z", "payload": payload, "ordinal": ordinal}
+        def snapshot(value):
+            return row("event_msg", {"type": "token_count", "info": {"total_token_usage": dict.fromkeys(S.CODEX_COUNTERS, value)}})
+        rows = [row("session_meta", {"subagent_history_start_ordinal": 5}, 0),
+                row("event_msg", {"type": "task_started"}), snapshot(100),
+                row("event_msg", {"type": "task_complete"})]
+        got = S.measure_codex_records(rows)["provider_usage"]
+        self.assertIsNone(got["totals"]["input_tokens"])
+        self.assertFalse(got["complete"])
+        regressed = S.measure_codex_records([row("event_msg", {"type": "task_started"}), snapshot(100), snapshot(90),
+                                            row("event_msg", {"type": "task_complete"})])["provider_usage"]
+        self.assertIsNone(regressed["totals"]["input_tokens"])
+        self.assertFalse(regressed["complete"])
+
+    def test_codex_mcp_failure_uses_native_item_state_with_response_bytes(self):
+        rows = [{"type": "response_item", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                    "type": "function_call", "call_id": "c", "namespace": "mcp__qmd", "name": "search", "arguments": "{}"}},
+                {"type": "response_item", "timestamp": "2026-10-20T02:00:01Z", "payload": {
+                    "type": "function_call_output", "call_id": "c", "output": "failed"}},
+                {"type": "event_msg", "timestamp": "2026-10-20T02:00:01Z", "payload": {
+                    "type": "item_completed", "item": {"id": "c", "type": "McpToolCall", "server": "qmd", "tool": "search", "status": "failed"}}}]
+        got = S.measure_codex_records(rows)
+        self.assertEqual(got["mcp_states"]["qmd"]["failed"], 1)
+        self.assertEqual(got["m3"]["bytes"], 6)
+
+    def test_native_mcp_status_without_result_payload(self):
+        rows = [{"type": "event_msg", "timestamp": "2026-10-20T02:00:00Z", "payload": {
+                    "type": "item_completed", "item": {"type": "McpToolCall", "id": str(i),
+                        "server": "qmd", "tool": "query", "status": state, "result": None}}}
+                for i, state in enumerate(["completed", "failed", "inProgress"])]
+        got = S.measure_codex_records(rows)
+        self.assertEqual(got["mcp_states"]["qmd"],
+                         {"attempted": 3, "succeeded": 1, "failed": 1, "unfinished": 1})
+        self.assertEqual(got["unknown_result_bytes"], 0)
+        self.assertEqual(got["calls_without_result"], 3)
+        self.assertFalse(got["bytes_complete"])
+
     def setUp(self):
         self.manifest = load_fixture_manifest()
         self.names = fixture_names()
@@ -948,6 +1228,48 @@ class CodexLanes(unittest.TestCase):
         code, out, _ = self.run_main(["--lanes", "--codex-root", str(self.root), *window])
         self.assertEqual(code, 0)
         self.assertIn("user_config: applied=3 ignored=1 unknown=1", out)
+
+    def test_both_cli_sidecars_accept_and_validate_log_find_review(self):
+        review = self.root / "review.json"
+        record = {"transcript_sha256": "0" * 64, "tool_use_id": "c", "witness": "independent check",
+                  "rtk_log_find": [{"part": 1, "disposition": "permitted"}]}
+        for adjudications, expected in [([{ "part": 1, "disposition": "permitted"}], 0),
+                                       ([{ "part": 0, "disposition": "permitted"}], 2),
+                                       ([{ "part": 1, "disposition": "guess"}], 2),
+                                       ([{ "part": 1, "disposition": "permitted"}] * 2, 2)]:
+            with self.subTest(adjudications=adjudications):
+                record["rtk_log_find"] = adjudications
+                review.write_text(json.dumps([record]))
+                code, _, _ = self.run_main(["--lanes", "--codex-root", str(self.root),
+                                             "--exceptions", str(review), "--json"])
+                self.assertEqual(code, expected)
+                p = subprocess.run(["node", str(S.MEASUREMENT_MODULE), "--lanes-sweep",
+                                    "--root", str(self.root), "--exceptions", str(review)],
+                                   capture_output=True, text=True)
+                self.assertEqual(p.returncode == 0, expected == 0)
+
+    def test_both_cli_sidecars_reject_malformed_classes_in_mixed_records(self):
+        review = self.root / "mixed-review.json"
+        good = {"transcript_sha256": "0" * 64, "tool_use_id": "c", "witness": "independent check",
+                "exception": "exact_bytes_required_by_frozen_check", "proxy_purpose": "acceptance",
+                "rtk_log_find": [{"part": 1, "disposition": "permitted"}]}
+        variants = [({}, True), ({"exception": "typo"}, False), ({"exception": None}, False),
+                    ({"proxy_purpose": "acceptence"}, False), ({"proxy_purpose": None}, False),
+                    ({"rtk_log_find": None}, False), ({"rtk_log_find": []}, False),
+                    ({"rtk_log_find": [{"part": 0, "disposition": "permitted"}]}, False),
+                    ({"rtk_log_find": [{"part": 1, "disposition": "guess"}]}, False),
+                    ({"rtk_log_find": good["rtk_log_find"] * 2}, False)]
+        for override, valid in variants:
+            review.write_text(json.dumps([{**good, **override}]))
+            with self.subTest(override=override, cli="skill_usage"):
+                code, _, _ = self.run_main(["--lanes", "--codex-root", str(self.root),
+                                           "--exceptions", str(review), "--json"])
+                self.assertEqual(code, 0 if valid else 2)
+            with self.subTest(override=override, cli="child_usage"):
+                p = subprocess.run(["node", str(S.MEASUREMENT_MODULE), "--lanes-sweep",
+                                    "--root", str(self.root), "--exceptions", str(review)],
+                                   capture_output=True, text=True)
+                self.assertEqual(p.returncode == 0, valid)
 
     def test_cli_lanes_refusals(self):
         root = ["--codex-root", str(self.root)]

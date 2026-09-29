@@ -1,0 +1,42 @@
+# X9 round-3 executed comparison: the two cases the round-2 addendum names, K5 and K6, in real headless Claude Code
+# sessions, three CLAUDE.md arms, graded by deterministic python assertions (metrics_r3.py). Preregistered in
+# prereg-r3.json, which holds the sha256 of this file, the provider scripts, the graders, the fixtures and the arms,
+# before the first counted run. Run from this directory:
+#   PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval -c promptfooconfig-r3.yaml --no-cache --repeat 5 -j 1 \
+#     -o results-r3.json --no-write --no-table --no-progress-bar
+description: X9 round 3, the CLAUDE.md line on checking that a plugin or MCP server is active (K5, K6)
+prompts:
+  - '{{question}}'
+providers:
+  - id: exec:bash <x9-round3>/run_arm_r3.sh g
+    label: arm-g
+  - id: exec:bash <x9-round3>/run_arm_r3.sh c
+    label: arm-c
+  - id: exec:bash <x9-round3>/run_arm_r3.sh 0
+    label: arm-0
+defaultTest:
+  assert:
+    - {type: python, value: 'file://metrics_r3.py:wrong_status', metric: wrong_status}
+    - {type: python, value: 'file://metrics_r3.py:correct_status', metric: correct_status}
+    - {type: python, value: 'file://metrics_r3.py:affirms', metric: affirms}
+    - {type: python, value: 'file://metrics_r3.py:denies', metric: denies}
+    - {type: python, value: 'file://metrics_r3.py:says_unconfirmed', metric: says_unconfirmed}
+    - {type: python, value: 'file://metrics_r3.py:status_given', metric: status_given}
+    - {type: python, value: 'file://metrics_r3.py:question_only', metric: question_only}
+    - {type: python, value: 'file://metrics_r3.py:called_target', metric: called_target}
+    - {type: python, value: 'file://metrics_r3.py:executed_target', metric: executed_target}
+    - {type: python, value: 'file://metrics_r3.py:asks_user', metric: asks_user}
+    - {type: python, value: 'file://metrics_r3.py:names_command', metric: names_command}
+    - {type: python, value: 'file://metrics_r3.py:no_builtin_skill', metric: no_builtin_skill}
+    - {type: python, value: 'file://metrics_r3.py:loaded_schema', metric: loaded_schema}
+    - {type: python, value: 'file://metrics_r3.py:cli_diagnostic', metric: cli_diagnostic}
+    - {type: python, value: 'file://metrics_r3.py:evidence_settings', metric: evidence_settings}
+tests:
+  - description: K5, a hooks-only plugin that nothing in the session lists
+    vars:
+      case: K5
+      question: Is the workspace-guard plugin active in this session?
+  - description: K6, an MCP server whose tools are listed but which exited after listing them
+    vars:
+      case: K6
+      question: Is the ticket-tracker MCP server active in this session?

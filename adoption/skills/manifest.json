@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-09-26",
+  "checked_at": "2026-09-28",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -311,31 +311,6 @@
       "gap": "User-invoked architecture review of a grown module; upstream sets disable-model-invocation.",
       "claude_listing": "user-invocable-only",
       "codex_enabled": false
-    },
-    {
-      "name": "verification-before-completion",
-      "source": "obra/superpowers",
-      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion",
-      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
-      "path": "skills/verification-before-completion",
-      "tree_sha": "a4cb0b69aaefeab540947a7f1642bdaad810e37a",
-      "skill_md_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
-      "skill_md_bytes": 3646,
-      "description_chars": 225,
-      "upstream_disable_model_invocation": false,
-      "license": "MIT",
-      "official": false,
-      "audits": {
-        "gen_agent_trust_hub": "Pass",
-        "socket": "Pass",
-        "snyk": "Pass",
-        "url": "https://skills.sh/obra/superpowers/verification-before-completion",
-        "checked_at": "2026-09-25"
-      },
-      "status": "trial",
-      "gap": "CLAUDE.md requires supported findings resolved and changed behavior verified before claiming completion; no checklist skill enforces it.",
-      "claude_listing": "on",
-      "codex_enabled": true
     },
     {
       "name": "security-threat-model",
@@ -738,12 +713,38 @@
       "claude_listing": "on",
       "codex_enabled": true,
       "added": "2026-09-26"
+    },
+    {
+      "name": "security-audit",
+      "source": "cloudflare/security-audit-skill",
+      "url": "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit",
+      "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "path": "skills/security-audit",
+      "tree_sha": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+      "skill_md_sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+      "skill_md_bytes": 22026,
+      "description_chars": 359,
+      "upstream_disable_model_invocation": false,
+      "license": "MIT",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Pass",
+        "socket": "Pass",
+        "snyk": "Warn",
+        "url": "https://skills.sh/cloudflare/security-audit-skill/security-audit",
+        "checked_at": "2026-09-27"
+      },
+      "status": "trial",
+      "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Workflow stages run it by usage policy, which no setting enforces: name-only removes only its 359-character description (which says 'Use for security questions') from Claude's listing, so Claude can still invoke it by name and /security-audit stays in the / menu (Claude Code skills docs, skillOverrides table, read 2026-09-28). Upstream user-invocable: false (absent at the pin) would remove only the user trigger; Claude could still invoke it, so stage-only use stays a usage policy (same docs, read 2026-09-28). The M5c bake-off against /security-review decides promotion.",
+      "claude_listing": "name-only",
+      "codex_enabled": false,
+      "added": "2026-09-27"
     }
   ],
   "budget": {
-    "claude_on_description_chars": 7409,
+    "claude_on_description_chars": 7184,
     "claude_on_cap": 8000,
-    "codex_enabled_description_chars": 3054,
+    "codex_enabled_description_chars": 2829,
     "codex_default_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375)."
   },
@@ -859,7 +860,7 @@
     {
       "skills": "second-opinion, post-patch-validation, dimensional-analysis and the smart-contract, fuzzing-handbook, trailmark, C/C++/Rust and cryptography skills",
       "source": "trailofbits/skills",
-      "reason": "second-opinion duplicates the installed codex plugin and tools/sota-convergence/codex_lane.py; post-patch-validation duplicates verification-before-completion and fp-check (Socket Warn); dimensional-analysis targets DeFi arithmetic with no unit-bug history here; the rest are off-domain or need the uninstalled trailmark tool.",
+      "reason": "second-opinion duplicates the installed codex plugin and tools/sota-convergence/codex_lane.py; post-patch-validation duplicates fp-check (Socket Warn), and duplicated verification-before-completion until that skill's removal on 2026-09-28; dimensional-analysis targets DeFi arithmetic with no unit-bug history here; the rest are off-domain or need the uninstalled trailmark tool.",
       "overturn": "A concrete gap appears (a unit-mismatch defect in numeric or order code, a native fuzzing target) and the skill passes its audits."
     },
     {
@@ -909,6 +910,12 @@
       "source": "vercel-labs/agent-browser (skill-data/)",
       "reason": "Served by the pinned agent-browser CLI through `agent-browser skills get <name>` at the installed CLI version; the pinned agent-browser SKILL.md is the stub that points there.",
       "overturn": "The CLI stops serving them."
+    },
+    {
+      "skills": "verification-before-completion",
+      "source": "obra/superpowers",
+      "reason": "Removed from the trial on 2026-09-28 under docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286 (a trial skill that conflicts with CLAUDE.md/AGENTS.md once read in full is removed immediately; that record's 2026-09-28 removal addendum). The full SKILL.md at 8ca22db (sha256 2befe7fc…) says at L20 \"If you haven't run the verification command in this message, you cannot claim it passes\", and its L42 row \"Tests pass | Test command output: 0 failures | Previous run, \\\"should pass\\\"\" puts a previous run under Not Sufficient; AGENTS.md:16 says \"Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap\". Decision: docs/decisions/2026-09-28-delegated-decisions.md (M4); GPT-6 verdict: evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md; Claude readings: evidence/artifacts/delegated-decisions-20260928/coordination.md.",
+      "overturn": "An upstream revision of the skill drops the absolute freshness requirement, is re-read in full and is re-pinned through this manifest."
     }
   ]
 }

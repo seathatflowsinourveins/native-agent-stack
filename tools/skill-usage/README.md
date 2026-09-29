@@ -68,7 +68,8 @@ Common options: `--manifest PATH` (default `adoption/skills/manifest.json`), `--
 (repeatable; default 7 and 30 — the manifest's own `trial.window_days` is always included even if
 omitted, since the prune rule is defined at that window), `--now ISO8601` (fixes the reference
 time; mainly for tests), `--home DIR` (resolves the skills lock's `installedAt`, still XDG-aware:
-`$XDG_STATE_HOME/skills/.skill-lock.json` wins when set to an absolute path), and `--json` (print
+`$XDG_STATE_HOME/skills/.skill-lock.json` wins when that variable is set to any non-empty value, as
+in the skills 1.7.0 CLI, which joins both paths with Node's `path.join`), and `--json` (print
 the full JSON report instead of the text table).
 
 Nothing is written to disk unless `--out PATH` is given, and `--out` **inside this checkout is
@@ -180,7 +181,7 @@ on the rollout's history mode (`codex-rs/rollout/src/policy.rs`); `response_item
 persisted in every mode. The report therefore gives `sessions_by_history_mode`
 (`session_meta.history_mode`) and `sessions_with_tool_calls_but_no_item_events`, the sessions
 whose own records hold model tool calls but no such event: their shell, MCP and fetch lanes read
-as zero. `ctx_fetch_and_index_share` compares three lanes only (hosted page opens,
+as zero. The legacy `ctx_fetch_and_index_share` compares three lanes only (hosted page opens,
 `ctx_fetch_and_index` and remote `curl`/`wget`); a fetch run inside a Context Mode sandbox
 (`ctx_execute` code), a `gh api` call and `fetch()` or an HTTP library in a script are in no lane.
 `curl`/`wget` also counts behind the shell keywords `do`, `then`, `else`, `elif`, `if`, `while`,
@@ -188,6 +189,92 @@ as zero. `ctx_fetch_and_index_share` compares three lanes only (hosted page open
 or `timeout N`. Escaped characters and comments are data, and `$(...)` or backticks inside double
 quotes or in the body of a heredoc with an unquoted delimiter still run (bash(1) QUOTING, COMMENTS
 and Here Documents).
+
+PR-A adds `actors[].measurement` and group `measurement` fields. They reuse
+the existing [child-usage.mjs measurement kernel](../../examples/claude-native/workflows/README.md#pr-a-measurement-fields-2026-09-27)
+through Node; lane reports now require Node as well as Python, with no extra
+package install. The legacy fields above remain historical comparison fields.
+`measurement.m4.routed_share` uses confirmed fetches, including nested ctx
+fetches. `fetch_mentions_unconfirmed` counts possible fetches from raw
+`HTTP_SCRIPT`, command-position `curl`/`wget` and `gh api` matches that no
+executed-text match traces back to (the workflows README defines the rule).
+`routed_share_lower_bound` adds those possible fetches to the denominator as
+unrouted. **The #381 M4 >= 0.9 gate must use `routed_share_lower_bound`.**
+Both shares and the separate possible-fetch count also appear under
+`measurement.m4.by_carrier`; aggregation sums counts before recomputing shares.
+Any possible fetch leaves M4 status `incomplete`. The source contract is
+[#381 M4](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json#L2921-L2930)
+and the detector reference is
+[context-mode v1.0.169 routing.mjs:788–795](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L788-L795).
+Ignored interpreter stdin, comments and written scripts can supply possible
+fetches while contributing zero confirmed operations. The bound covers visible
+detector matches; it does not certify arbitrary dynamic code.
+M3/M5 use own persisted `function_call_output` and
+`custom_tool_call_output` content, paired with function, custom or local-shell
+calls; native `item_completed` content is the fallback. A missing context
+result stays visible instead of being supplied as an empty result.
+Function namespaces and legacy local-shell IDs are preserved. Strings and text
+block payloads use their UTF-8 bytes; only non-text blocks use compact JSON.
+Response-item output takes priority when both representations exist. Other
+function results remain in M3's `other` carrier and orphan results are counted.
+
+Nested operations inside code-mode `exec` are sandbox operations: they supply
+M4 fetches, RTK command parts and MCP state observations, while only the outer
+exec return contributes M3 bytes (`code_mode` carrier). Nested ctx returns do
+not contribute M5 bytes unless represented by a direct model-visible ctx call.
+`sandbox_operations` counts the normalized nested operations.
+
+Nested Codex code-mode shell curl/wget commands share M4's existing
+`ctx_sandbox_fetch` bucket with context-mode sandbox curl/wget commands. Both
+are remote-denominator operations; this bucket does not identify exclusive
+context-mode use. This mapping follows the adapter's sandbox normalization and
+the [context-mode v1.0.169 subprocess detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L727-L804).
+Native MCP `status` supplies completion/failure state when result bytes were not persisted.
+The adapter uses direct response call IDs first; other items in an open exec
+span are sandbox operations until its return, the next direct model call or a
+turn boundary. This local span rule covers the retained fixture. Interleaved or
+resumed cells without a persisted parent association need independent review.
+
+`--rtk-check` uses the same Linux gate as the Claude tool: a binary on PATH
+self-reporting `rtk 0.50.0` that passes the isolated five-exclusion probe.
+This checks behavior, not build identity or the qualification receipt's hash.
+`--exceptions` shares the private digest-bound adjudication contract, including
+validation of every supplied review class.
+For Codex, observed coverage comes from explicit prefixes; the replay fields
+are hypothetical Claude-hook routing, never evidence a Codex hook ran.
+Add these flags to the existing `--lanes` command when measuring M6c.
+M6c reads the deterministic `explicit_rtk_on_excluded_or_sensitive` zero counter;
+conditional log/find forms stay in the separate advisory counters and require
+the shared per-part `rtk_log_find` sidecar review described in the kernel docs.
+Proxy parts stay outside the coverage denominator. `sidecar_records` reports
+bound/unbound digest counts across measured rollouts without publishing records.
+
+`measurement.provider_usage` differences cumulative `token_count` counters
+per rollout and attempt, using inherited/pre-window snapshots only as a
+baseline. Repeated totals contribute nothing. Input, cached input, output,
+reasoning output and total tokens remain separate; cached/reasoning values
+are subsets, never additive cost buckets. Missing baselines, absent counters,
+counter regression and missing terminal evidence leave accounting incomplete.
+Known usage remains counted for failed/interrupted turns. A native
+`task_complete` with `error` is failed. Each attempt reports a configured
+model/effort when available; it does not claim provider-resolved routing.
+Supply one rollout per thread; this tool does not reconcile copied files of
+the same thread from multiple archives. Interrupted terminal usage that the
+client never persisted cannot be reconstructed. Codex actor and group
+measurements omit the inapplicable Claude `usage` object entirely.
+
+Sources: [Codex rust-v0.157.1 native usage protocol](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2234-L2310),
+[native function namespace](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L1073-L1088),
+[custom/local-shell calls and outputs](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L1060-L1165),
+[code-mode emission test](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/tests/suite/code_mode.rs#L721-L760),
+[nested and outer byte limits](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/tests/suite/code_mode.rs#L3436-L3752),
+[MCP item state and optional result](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/app-server-protocol/src/protocol/v2/item.rs#L333-L352),
+[terminal error](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2146-L2152),
+and [ccusage v20.0.24 baseline/delta parsing](https://github.com/ccusage/ccusage/blob/v20.0.24/rust/adapters/codex/src/parser.rs#L153-L350).
+The project-specific measurement contract is
+[#381 preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json).
+Tests use synthetic transcripts (`python3 -m unittest tests.test_skill_usage`);
+they are not live provider acceptance or unchanged upstream tests.
 
 Sessions that did not load the user config are negative controls, never workers. Rollouts do not
 record `--ignore-user-config` itself, so the report classifies each session by its skill catalog:

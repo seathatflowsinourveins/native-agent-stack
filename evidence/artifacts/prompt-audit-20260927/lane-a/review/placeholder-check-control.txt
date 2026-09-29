@@ -1,0 +1,9 @@
+$ python3 -B placeholder_check.py <a copy of lane-a with one line appended to final/prompts/gpt6-prompt.txt> | grep -v "differs only by"
+final/adjudication/frozen-final.sha256
+final/frozen-a2.sha256
+    differs beyond the replacements prompts/gpt6-prompt.txt
+adjudication/attempt2/sent-sha256.json
+final/adjudication/sent-sha256.json
+final/sent-sha256.json
+    differs beyond the replacements prompts/gpt6-prompt.txt
+exit 1

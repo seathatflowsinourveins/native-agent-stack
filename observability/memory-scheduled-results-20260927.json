@@ -1,0 +1,430 @@
+{
+  "schema_version": 1,
+  "capture_started_at_utc": "2026-09-27T13:01:57Z",
+  "recorded_at_utc": "2026-09-27T13:17:57Z",
+  "classification": "Actual returned native CLI/MCP output; identifiers and host paths sanitized; no model test invoked",
+  "commands": [
+    {
+      "operation": "read-only scoped SQLite lookup of the returned session's consolidation job",
+      "exit_code": 0,
+      "returned": {
+        "operation": "read-only consolidation-job lookup for the MCP returned session using matching scoped end timestamp",
+        "workspace": "agent-lab",
+        "project": "agent-lab",
+        "matched_rows": 1,
+        "results": [
+          {
+            "agent_kind": "claude-code",
+            "started_at": "2026-09-26T00:03:19.422179+00:00",
+            "ended_at": "2026-09-26T00:03:25.983864+00:00",
+            "ended_observation_count": 2,
+            "job_present": 0,
+            "generation": null,
+            "state": null,
+            "attempts": null
+          }
+        ]
+      }
+    },
+    {
+      "command": "ai-memory auto-improve-report --workspace agent-lab --project agent-lab --json",
+      "exit_code": 0,
+      "returned": {
+        "workspace": "agent-lab",
+        "project": "agent-lab",
+        "generated_at": "2026-09-27T13:01:57.119541853Z",
+        "since_created_at": 1787922117119541,
+        "summary": "83 run(s), 19 terminal learning proposal(s), 100.0% approved in the last 30 day(s).",
+        "params": {
+          "since_days": 30,
+          "top_limit": 10
+        },
+        "aggregate": {
+          "run_count": 83,
+          "runs_with_learning_proposals": 7,
+          "proposals_by_status": [
+            {
+              "key": "approved",
+              "count": 19
+            }
+          ],
+          "proposals_by_operation": [
+            {
+              "key": "create",
+              "count": 19
+            }
+          ],
+          "proposals_by_edit_mode": [
+            {
+              "key": "full_page",
+              "count": 19
+            }
+          ],
+          "proposals_by_kind": [
+            {
+              "key": "gotcha",
+              "count": 13
+            },
+            {
+              "key": "procedure",
+              "count": 4
+            },
+            {
+              "key": "concept",
+              "count": 1
+            },
+            {
+              "key": "decision",
+              "count": 1
+            }
+          ],
+          "maintenance_proposals_by_kind": [],
+          "top_targets": [
+            {
+              "key": "concepts/evidence-receipt-qualification.md",
+              "count": 1
+            },
+            {
+              "key": "decisions/catalog-publication-provenance-boundary.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/disabling-forget-sweep-does-not-disable-all-retention-cleanup.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/focused-tests-are-not-upstream-acceptance.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/frozen-experiment-source-hashes-are-contracts.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/generated-manifest-hashes-must-be-regenerated.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/injected-routing-must-match-worker-tool-contract.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/instruction-file-size-is-not-provider-token-usage.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/path-based-missing-tool-results-do-not-prove-tools-are-uninstalled.md",
+              "count": 1
+            },
+            {
+              "key": "gotchas/present-day-data-is-not-historical-evidence.md",
+              "count": 1
+            }
+          ],
+          "rejections_by_reason": [
+            {
+              "key": "too_few_observations",
+              "count": 43
+            },
+            {
+              "key": "session_too_short",
+              "count": 25
+            },
+            {
+              "key": "insufficient_durable_evidence",
+              "count": 8
+            },
+            {
+              "key": "input_budget_sampled",
+              "count": 3
+            },
+            {
+              "key": "instruction_like_text_is_not_project_knowledge",
+              "count": 3
+            },
+            {
+              "key": "broad_catalog_activity_is_not_a_durable_lesson",
+              "count": 1
+            },
+            {
+              "key": "broad_research_objective_is_not_a_durable_lesson",
+              "count": 1
+            },
+            {
+              "key": "credentials_and_account_setup_are_sensitive_and_transient",
+              "count": 1
+            },
+            {
+              "key": "dashboard_and_login_activity_is_not_a_reusable_lesson",
+              "count": 1
+            },
+            {
+              "key": "duplicate_or_not_new",
+              "count": 1
+            }
+          ],
+          "repeated_rejection_fingerprints": [
+            {
+              "key": "ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db",
+              "count": 17
+            },
+            {
+              "key": "20d12bd285ea6bd2d67a2fa02a3880d58390fbc17b4fedc2d9862f7db89e9088",
+              "count": 8
+            },
+            {
+              "key": "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0",
+              "count": 8
+            },
+            {
+              "key": "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1",
+              "count": 6
+            },
+            {
+              "key": "a29791aae4200620764263b4e3fd1b4a383746fda9e82c30c7cb9ee59ed1a6e8",
+              "count": 4
+            },
+            {
+              "key": "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9",
+              "count": 2
+            },
+            {
+              "key": "d1349458a0797550dfac40c438d35e067f8d5277deabbba283695786c20d0555",
+              "count": 2
+            }
+          ],
+          "rejected_targets": [
+            {
+              "key": "3 observations below configured minimum 8",
+              "count": 17
+            },
+            {
+              "key": "2 observations below configured minimum 8",
+              "count": 8
+            },
+            {
+              "key": "4 observations below configured minimum 8",
+              "count": 8
+            },
+            {
+              "key": "6 observations below configured minimum 8",
+              "count": 6
+            },
+            {
+              "key": "5 observations below configured minimum 8",
+              "count": 4
+            },
+            {
+              "key": "24s below configured minimum 120s",
+              "count": 2
+            },
+            {
+              "key": "9s below configured minimum 120s",
+              "count": 2
+            },
+            {
+              "key": "102s below configured minimum 120s",
+              "count": 1
+            },
+            {
+              "key": "12s below configured minimum 120s",
+              "count": 1
+            },
+            {
+              "key": "14s below configured minimum 120s",
+              "count": 1
+            }
+          ]
+        },
+        "terminal_rates": {
+          "denominator": 19,
+          "approved_rate": 1,
+          "rejected_rate": 0,
+          "conflict_rate": 0,
+          "failed_rate": 0
+        },
+        "findings": [
+          {
+            "kind": "repeated_rejection_fingerprint",
+            "severity": "warning",
+            "message": "Rejection fingerprint ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db appeared 17 times.",
+            "detail": {
+              "fingerprint": "ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db",
+              "count": 17
+            }
+          },
+          {
+            "kind": "repeated_rejection_fingerprint",
+            "severity": "warning",
+            "message": "Rejection fingerprint 20d12bd285ea6bd2d67a2fa02a3880d58390fbc17b4fedc2d9862f7db89e9088 appeared 8 times.",
+            "detail": {
+              "fingerprint": "20d12bd285ea6bd2d67a2fa02a3880d58390fbc17b4fedc2d9862f7db89e9088",
+              "count": 8
+            }
+          },
+          {
+            "kind": "repeated_rejection_fingerprint",
+            "severity": "warning",
+            "message": "Rejection fingerprint ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0 appeared 8 times.",
+            "detail": {
+              "fingerprint": "ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0",
+              "count": 8
+            }
+          },
+          {
+            "kind": "repeated_rejection_fingerprint",
+            "severity": "warning",
+            "message": "Rejection fingerprint 125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1 appeared 6 times.",
+            "detail": {
+              "fingerprint": "125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1",
+              "count": 6
+            }
+          },
+          {
+            "kind": "repeated_rejection_fingerprint",
+            "severity": "warning",
+            "message": "Rejection fingerprint a29791aae4200620764263b4e3fd1b4a383746fda9e82c30c7cb9ee59ed1a6e8 appeared 4 times.",
+            "detail": {
+              "fingerprint": "a29791aae4200620764263b4e3fd1b4a383746fda9e82c30c7cb9ee59ed1a6e8",
+              "count": 4
+            }
+          },
+          {
+            "kind": "repeated_rejection_fingerprint",
+            "severity": "warning",
+            "message": "Rejection fingerprint 683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9 appeared 2 times.",
+            "detail": {
+              "fingerprint": "683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9",
+              "count": 2
+            }
+          },
+          {
+            "kind": "repeated_rejection_fingerprint",
+            "severity": "warning",
+            "message": "Rejection fingerprint d1349458a0797550dfac40c438d35e067f8d5277deabbba283695786c20d0555 appeared 2 times.",
+            "detail": {
+              "fingerprint": "d1349458a0797550dfac40c438d35e067f8d5277deabbba283695786c20d0555",
+              "count": 2
+            }
+          }
+        ],
+        "blind_spots": [
+          "Provider/LLM errors before a run is staged may not appear in proposal or rejection counts.",
+          "Eval-gate rejection reasons are counted, but eval success rates and score deltas are not persisted in this schema.",
+          "Terminal rates use learning proposals only; pending and maintenance/report proposals are excluded from the denominator."
+        ]
+      }
+    },
+    {
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "agent-lab",
+        "project": "agent-lab",
+        "path": "decisions/native-memory-learning-maintenance.md"
+      },
+      "returned": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"path\": \"decisions/native-memory-learning-maintenance.md\",\n  \"title\": \"Native memory learning and bounded outcome capture\",\n  \"body\": \"# Native memory learning and bounded outcome capture\\n\\n**Status:** accepted (updated 2026-09-26; see the Update section)\\n\\n## Context\\nThe earlier [[decisions/native-codex-memory-consolidation]] qualified local embeddings and native Codex consolidation but kept scheduled learning disabled. The September 21, 2026 source review and native qualification now support activating the existing upstream maintenance path.\\n\\n## Decision\\nRetain ai-memory 2.3.2 as the shared agent-lab/agent-lab memory of record, with the existing local 384-dimensional MiniLM embeddings, native Codex gpt-5.6-luna provider and medium effort. Preserve repository-allowlisted capture and disabled historical backfill. Enable the upstream hourly learning scheduler with one eligible session per project per tick and a ten-minute age minimum. The scheduler includes every database project; this deployment currently has one adopted scope.\\n\\nEnable sanitized assistant Stop excerpts in native Claude, native Codex and the Desktop WSL hook profile. Both server and client opt-ins are configured. Native Codex trust was applied through the normal hooks interface. Claude's pre-existing prompt-capture opt-out remains unchanged. Excerpts are capped at 2,000 bytes; oversized final messages above 64 KiB are dropped.\\n\\nUse daily rule-based lint and hourly local embedding backfill. Scheduled page/observation forgetting is disabled; upstream hollow-project cleanup still runs. Retain session-end consolidation.\\n\\n## Consequences\\nActual Codex and Claude answers were captured and independently read back; native consolidation completed. Two accelerated scheduler ticks each skipped an ineligible historical session without a model call. A separate manual review rejected insufficient durable evidence and applied no proposal. This establishes working capture and maintenance paths, not improved future answer quality or measured token savings. Final hourly cadence is configured; a later hourly tick, physical reboot and hot reload of an already-running Desktop task remain unproved. Learning claims are once per native session, including admission skips.\\n\\nBasic Memory, Graphiti, Mem0, Hindsight, Claude-mem, Letta/Letta Code and Supermemory remain workload-specific alternatives, not additional automatic capture stores. The portable selection, source pins, commands and returned evidence are in https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-landscape-maintenance.md.\\n\\n## Update 2026-09-26: consolidation model and build\\n- **Model:** the consolidation LLM is now `codex/gpt-6-sol` at medium effort. This follows the user's standing GPT-6-family preference ([[_rules/openai-models-gpt6-family]] in global scope).\\n  - It is keep_but_compare. The restored-store evaluation had only n=2 sessions and shows no superiority over gpt-6-astra.\\n  - The comparison that would overturn it: more sessions with repeats, blind page-quality judging, per-call usage, and logged rejection reasons.\\n  - The model rollback is gpt-6-astra while gpt-5.6-luna is usage-capped.\\n- **Build:** 2.3.2 plus the backports of upstream #859 (prefixes) and #852 (omit `temperature` for gpt-6 models). The build is `2.3.2-prefix-gpt6-f24f7181`, sha256 f24f7181…, from branch deploy-candidate-v232-gpt6 at 62e73148. Without #852, every gpt-6 call failed with `400 Unsupported parameter: temperature`.\\n  - Two independent reviews passed it, each finding the three files byte-identical to upstream f7ec2eda: a Claude evidence-reviewer and a Codex gpt-6-astra/ultra cross-review (SAFE_TO_DEPLOY).\\n- **Other changes since 2026-09-21:**\\n  - Embeddings are Nemotron-3-Embed-1B through openai-compat with query/passage prefixes (identity +dp1-707ad539), not MiniLM. That embedder runs on vLLM 0.30.0 since 2026-09-26.\\n  - The hourly auto-improve scheduler has been paused since 2026-09-25.\\n  - The Codex login was replaced with a new account on 2026-09-26.\",\n  \"frontmatter\": {\n    \"tags\": [\n      \"memory\",\n      \"native-maintenance\"\n    ],\n    \"pinned\": true,\n    \"tier\": \"semantic\",\n    \"type\": \"Decision\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-26T02:19:54Z\"\n    }\n  }\n}"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "tool": "codebase_status",
+      "arguments": {
+        "projectPath": "${PROJECT_ROOT}"
+      },
+      "returned": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Project: ${PROJECT_ROOT}\nCollection: codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 1974\n\nLast operation: Incremental update — completed\n  Files: 0, Chunks: 0\n  86447s ago (took 0.5s)\n\nFile watcher: active (watched by another process)\n\nCode graph: 145 files, 89 edges\n  Last built: 133589s ago"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "codebase_search",
+      "arguments": {
+        "projectPath": "${PROJECT_ROOT}",
+        "query": "collect native Linux and Desktop usage separately",
+        "limit": 1
+      },
+      "returned": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Search results for \"collect native Linux and Desktop usage separately\" (1 matches):\n\n--- tools/ecosystem/linux-usage-report.test.cjs (lines 76-83) [javascript] score: 0.8333 ---\n\ntest('default collect scope stays native even under a Desktop caller',t=>{\n  const f=fixture(t),calls=[];\n  const r=collect({...f,installed,run:(exe,args,options)=>{calls.push(options.env);return response(args[2]);}});\n  assert.equal(r.scope,'native');\n  assert.equal(r.coverage.length,2);\n  assert.equal(calls.some(env=>env.CODEX_HOME.includes(f.desktopHome)),false);\n});\n"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "memory_read_session_observations",
+      "arguments": {
+        "workspace": "agent-lab",
+        "project": "agent-lab",
+        "kinds": [
+          "session-end",
+          "stop"
+        ],
+        "limit": 2,
+        "body_max_chars": 200,
+        "order": "desc"
+      },
+      "returned": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"session\": {\n    \"session_id\": \"local-identifier-01\",\n    \"cwd\": \"${PROJECT_ROOT}\",\n    \"agent_kind\": \"claude-code\",\n    \"started_at\": \"2026-09-26T00:03:19.422179Z\",\n    \"ended_at\": \"2026-09-26T00:03:25.983864Z\",\n    \"observation_count\": 2,\n    \"actor_user\": null\n  },\n  \"observations\": [\n    {\n      \"id\": \"local-identifier-02\",\n      \"session_id\": \"local-identifier-01\",\n      \"kind\": \"session-end\",\n      \"title\": \"session-end\",\n      \"body\": \"\",\n      \"importance\": 7,\n      \"created_at\": \"2026-09-26T00:03:25.982287Z\",\n      \"extension\": null,\n      \"source_event\": null\n    }\n  ],\n  \"total\": 1,\n  \"offset\": 0,\n  \"limit\": 2,\n  \"order\": \"desc\",\n  \"elided_other_scope\": 0,\n  \"body_max_chars\": 200\n}"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "command": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "get",
+        "qmd://agent-lab-docs/tasks/2026-09-25-quality-optimization.md:493:22",
+        "--no-line-numbers"
+      ],
+      "exit_code": 0,
+      "returned": "qmd://agent-lab-docs/tasks/2026-09-25-quality-optimization.md  #1eace1\n---\n\n  - **User decision.** The consolidation model moves to the workstation that hosts the latest models, `nativestack-5975wx-20260925` (RTX 4090 24 GB, 102 GiB RAM). Codex, the Claude plan and the laptop GPU are not fallbacks.\n  - **What fits** (Hugging Face API, 2026-09-25; the MiMo-V2.6 family was released 2026-09-21, MIT):\n    - MiMo-V2.6-Pro-RL (1,024B parameters) does not fit that workstation, even at 4-bit;\n    - MiMo-V2.6-Flash-RL (310.8B, about 155 GB at 4-bit) does not fit either;\n    - MiMo-V2.6-Distill-Qwen-9B (9.4B) fits.\n  - **Candidates**, under the catalog memory-stack protocol's memory-LLM family: the MiMo 9B distill (new, to be added through that protocol's amendment rule), Qwen3.6-35B-A3B (catalog trial) and Qwen3.5-9B (the catalog's retained control).\n  - **Until the endpoint is qualified:**\n    - Session-end consolidation stays on. It still calls the capped Codex model: the service log for 2026-09-25 shows a 429 `usage_limit_reached` at 15:13Z, after the restart, and the job queued for retry, with 540 such lines that day. It falls back to heuristic pages until the workstation endpoint or the 2026-10-01 Codex reset. Capture is never lost, and the fallback pages are re-consolidated later.\n    - The hourly auto-improve scheduler is paused: `[auto_improve.scheduler] enabled = false` in `~/.local/share/ai-memory/config.toml`, with a dated comment. The backup is `codex-ecosystem/state/settings-audit-20260923/ai-memory-config.toml.before-autoimprove-pause-20260925`.\n    - The daily lint stays on: upstream v2.3.2 documents it as rule-based, so it calls no model.\n    - The service restarted on the same patched build (`ai-memory-builds/2.3.2-prefix-a11c26f0`), and \"last write\" kept advancing.\n  - **Acceptance for the switch:**\n    - `ai-memory llm-test --structured` passes against the workstation endpoint;\n    - 20 session-end consolidations succeed within the latency limit;\n    - memory-lane acceptance holds (scoped retrieval, 0 cross-scope hits);\n    - 7 days with no 429s.\n- **QMD freshness.**\n  - **Units.** `qmd-agent-lab-docs-update.service` runs `bin/qmd --index agent-lab-docs update` with `QMD_FORCE_CPU=1`, Nice 19, idle I/O, `CPUQuota=50%`, `MemoryMax=1G` and no `--pull`. `qmd-agent-lab-docs-update.timer` runs it every 20 minutes. Both are in `~/.config/systemd/user`.\n  - **Coverage.** The first run indexed 167 of 167 `docs/**/*.md`, with 0 files newer than the index.\n  - **Known-decision queries**, top 3:\n    - the advisor verdict, the jCodeMunch scope and the max-versus-ultracode rule each returned the governing record first;\n    - \"Concurrent worker cap\" returned related records, but not the cap table in `native-token-workflow.md`.\n",
+      "stderr": ""
+    },
+    {
+      "operation": "read-only scoped SQLite latest completed consolidation metadata",
+      "exit_code": 0,
+      "returned": {
+        "operation": "latest completed consolidation; read-only scoped store metadata",
+        "workspace": "agent-lab",
+        "project": "agent-lab",
+        "result": {
+          "agent_kind": "claude-code",
+          "started_at": "2026-09-22T19:49:04.048902+00:00",
+          "ended_at": "2026-09-25T22:42:35.853111+00:00",
+          "ended_observation_count": 20743,
+          "summary_page_present": 1,
+          "generation": 13452,
+          "state": "completed",
+          "requested_at": "2026-09-24T19:29:16.470451+00:00",
+          "job_started_at": "2026-09-24T19:30:13.394123+00:00",
+          "completed_at": "2026-09-24T19:30:36.717316+00:00",
+          "attempts": 1,
+          "last_error": null
+        }
+      }
+    },
+    {
+      "command": "gh release view --repo akitaonrails/ai-memory --json tagName,publishedAt,url; ai-memory --version",
+      "exit_code": 0,
+      "returned": "{\"publishedAt\":\"2026-09-25T21:46:32Z\",\"tagName\":\"v2.4.1\",\"url\":\"https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1\"}\nai-memory 2.3.2\n"
+    }
+  ]
+}

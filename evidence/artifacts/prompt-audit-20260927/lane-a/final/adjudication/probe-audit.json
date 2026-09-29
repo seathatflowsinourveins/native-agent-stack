@@ -1,0 +1,15 @@
+{
+ "patterns_sha256": "e638e7ab554736806040451009bc3966d7b227291d467fd7ec2911f59194e273",
+ "judgments": {
+  "probe": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 2,
+    "command_execution": 2,
+    "web_search": 2
+   }
+  }
+ }
+}
