@@ -530,12 +530,14 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['mcporter', ['mcporter/mcporter:help excluded']], ['mcporter help', ['mcporter/mcporter:help excluded']], ['mcporter -h', ['mcporter/mcporter:help excluded']],
     ['mcporter call linear.create_comment --help', ['mcporter/mcporter:call excluded']], ['mcporter serve --help', ['mcporter/mcporter:serve excluded']],
   ])
+  // ssh(1) (OpenSSH 9.6p1): the words after the destination are the command the remote host runs, so `ssh host bash -s` runs bash there
+  // (a remote invocation of its own) and the heredoc it reads is its script.
   check('cli lanes: data, lookups, registrations, remote strings, version and help, and programs a variable names', [
     ['type qmd', ['-/type']], ['which qmd', ['-/which']], ['hash qmd', ['-/hash']], ['grep -n qmd notes.md', ['-/grep']], ['git commit -m "use toon"', ['-/git']],
     ["echo 'rtk proxy ls'", ['-/echo']], ['echo "rtk proxy pytest"', ['-/echo']], ['git log --grep="rtk proxy"', ['-/git']], ['# qmd search x', []],
     ['cat ~/.qmd/index.sqlite', ['-/cat']], ['ls toon/', ['-/ls']], ["git commit -m \"$(cat <<'EOF'\nqmd search x\nEOF\n)\"", ['-/git', '-/cat']],
     ['cat <<EOF > run.sh\nrtk proxy pytest\nEOF', ['-/cat']], ['claude mcp add context-mode -- npx -y context-mode', ['-/claude']], ['codex mcp add qmd -- qmd mcp', ['-/codex']],
-    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['echo `ssh host "qmd get a"`', ['-/echo', '-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', 'qmd/qmd remote']],
+    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['echo `ssh host "qmd get a"`', ['-/echo', '-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', '-/bash remote', 'qmd/qmd remote']],
     ['$QMD search x', ['-/- unresolved']], ['"$QMD" search x', ['-/- unresolved']], ["'$QMD' search x", ['-/(other)']],
     ['qmd --version', ['qmd/qmd excluded']], ['qmd search x --help', ['qmd/qmd excluded']], ['qmd search -- --help', qmd], ['qmd -h', qmd],
     ['toon --help', ['toon/toon excluded']], ['ai-memory --version', ['ai-memory/ai-memory excluded']],

@@ -694,9 +694,10 @@ export async function loadShellParser(dir) {
 export const shellParserStatus = () => shellParserResult
 // Runs `visit` on the root node of the parse tree of `command` and frees the tree when it returns or throws; null when no parser
 // is loaded. The visitor must not keep a node or return one: nodes end with their tree.
+const parseShell = (text) => { try { return shellParser ? shellParser.parse(text) : null } catch { return null } }
 export function withShellTree(command, visit) {
   if (!shellParser) return null
-  const tree = shellParser.parse(String(command ?? ''))
+  const tree = parseShell(String(command ?? ''))
   if (!tree) throw new Error('shell parser returned no tree')
   openShellTreeCount++
   try { return visit(tree.rootNode) } finally { tree.delete(); openShellTreeCount-- }
@@ -728,11 +729,6 @@ const MODULE_LANES = new Map([['markitdown', 'markitdown']])
 // An mcporter call reaches a lane only through these config server names, seeded from manifests/stack.json:280
 // (codebase-memory) and :407 (context-mode); every other server is counted in mcporter_downstream only.
 const MCPORTER_ALIASES = new Map([['codebase-memory', 'codebase-memory-mcp'], ['context-mode', 'context-mode']])
-// Reserved words (POSIX.1-2024 XCU 2.4; bash(1) RESERVED WORDS): the first set precedes a command name, the second closes a
-// compound command, and a command that starts with the third (or with `((`, an arithmetic command) invokes nothing.
-const OPENERS = new Set(['!', '{', 'do', 'then', 'else', 'elif', 'if', 'while', 'until'])
-const CLOSERS = new Set(['}', 'done', 'fi', 'esac'])
-const HEADERS = new Set(['for', 'case', 'select', 'in', 'function'])
 const nameStart = (c) => c === '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
 // NAME=value or NAME+=value before the command name (XCU 2.9.1 Rule 7; bash(1) PARAMETERS), unquoted up to the =.
 function isAssignment(e) {
@@ -745,84 +741,6 @@ function isAssignment(e) {
 }
 const basename = (v) => v.slice(v.lastIndexOf('/') + 1)
 const hasBlank = (v) => v.includes(' ') || v.includes('\t') || v.includes('\n')
-// The simple commands of executed text (executedTrace; POSIX.1-2024 XCU 2.9.1-2.9.4 and 2.6.3; bash(1) SHELL GRAMMAR and
-// REDIRECTION), in source order: split at the text start and at ; & && | || |& newline ( ) and around each command
-// substitution ($( ) or backquotes, also inside double quotes, whose bodies are commands of their own), never inside a
-// quoted span; the & or | of >& <& &> &>> >| belongs to its redirection, and a redirection operator and its target word
-// are dropped. Words split at unquoted blanks. A word's value maps each executed character back to its raw character and
-// drops the quotes the analysis inserted (p = -1), so data the analysis blanked (a quoted selector's parentheses, `rtk
-// proxy '<one string>'`) keeps its exact bytes; x marks an expansion ($ or a backquote outside single quotes). An
-// arithmetic $(( )) or (( )) is one unit up to its matching )) in its line; after one that does not close there, the rest
-// of that line reads parentheses as separators, which keeps the scan linear. Text nested deeper than NESTING_LIMIT reads
-// as words. `async` records a lone & (a command run in the background).
-function simpleCommands(t, raw) {
-  const commands = []
-  let async = false
-  const wordOf = (from, to) => {
-    let v = '', x = false, at = -1
-    for (let k = from; k < to; k++) {
-      const c = t.s[k], p = t.p[k]
-      if (p < 0 && (c === '"' || c === "'")) continue
-      if (c === '$' || c === '`') x = true
-      v += p >= 0 ? raw[p] : c
-      if (at < 0 && p >= 0) at = p
-    }
-    return { v, x, e: t.s.slice(from, to), i: from, at }
-  }
-  // Command substitutions inside a double-quoted span [from, to).
-  const inDouble = (from, to, depth) => {
-    for (let i = from; i < to;) {
-      const c = t.s[i]
-      if (c === '\\') i += 2
-      else if (c === '`') { const k = Math.min(closeQuote(t.s, i), to); walk(i + 1, k, depth + 1); i = k + 1 }
-      else if (c === '$' && t.s[i + 1] === '(' && t.s[i + 2] !== '(') { const k = Math.min(matchParen(t.s, i + 2), to); walk(i + 2, k, depth + 1); i = k + 1 }
-      else i++
-    }
-  }
-  const walk = (from, to, depth) => {
-    let words = [], start = -1, target = false, plainUntil = -1
-    const endWord = (end) => { if (start < 0) return; if (target) target = false; else words.push(wordOf(start, end)); start = -1 }
-    const endCommand = (end) => { endWord(end); target = false; if (words.length) commands.push(words); words = [] }
-    const nested = depth < NESTING_LIMIT
-    for (let i = from; i < to;) {
-      const c = t.s[i]
-      if (c === ' ' || c === '\t') { endWord(i); i++; continue }
-      if (c === '<' || c === '>' || (c === '&' && t.s[i + 1] === '>')) {
-        let digits = start >= 0 // an all-digit word before the operator is its file descriptor
-        for (let k = start; digits && k < i; k++) digits = t.s[k] >= '0' && t.s[k] <= '9'
-        if (digits) start = -1
-        else endWord(i)
-        REDIRECTION.lastIndex = i
-        const r = REDIRECTION.exec(t.s)
-        i += r ? r[0].length : 1
-        target = true
-        continue
-      }
-      const arithmetic = c === '$' && t.s[i + 1] === '(' && t.s[i + 2] === '(' ? i + 1 : c === '(' && t.s[i + 1] === '(' && start < 0 ? i : -1
-      if (arithmetic >= 0 && i >= plainUntil) {
-        let depthOf = 0, k = arithmetic
-        for (; k < to && t.s[k] !== '\n'; k++) if (t.s[k] === '(') depthOf++; else if (t.s[k] === ')' && --depthOf === 0) break
-        if (k < to && t.s[k] === ')') { if (start < 0) start = i; i = k + 1; continue }
-        plainUntil = k
-      }
-      if (c === '\n' || c === ';' || c === '(' || c === ')') {
-        endCommand(i)
-        i += c !== ';' ? 1 : t.s[i + 1] === ';' ? (t.s[i + 2] === '&' ? 3 : 2) : t.s[i + 1] === '&' ? 2 : 1
-        continue
-      }
-      if (c === '|') { endCommand(i); i += t.s[i + 1] === '|' || t.s[i + 1] === '&' ? 2 : 1; continue }
-      if (c === '&') { endCommand(i); if (t.s[i + 1] === '&') i += 2; else { async = true; i++ } continue }
-      if (start < 0) start = i
-      if (nested && c === '`') { const k = Math.min(closeQuote(t.s, i), to); walk(i + 1, k, depth + 1); i = k + 1 }
-      else if (nested && c === '$' && t.s[i + 1] === '(' && t.s[i + 2] !== '(') { const k = Math.min(matchParen(t.s, i + 2), to); walk(i + 2, k, depth + 1); i = k + 1 }
-      else if (c === '"' || c === "'") { const k = Math.min(closeQuote(t.s, i), to); if (nested && c === '"') inDouble(i + 1, k, depth); i = k + 1 }
-      else i++
-    }
-    endCommand(to)
-  }
-  walk(0, t.s.length, 0)
-  return { commands: commands.sort((a, b) => a[0].i - b[0].i), async }
-}
 // Words of one string split with shell quoting and no expansion: blanks separate words, '...' and "..." group, and a
 // backslash escapes the next character (inside double quotes only $ ` " \). Used for `rtk proxy '<one string>'` (rtk
 // src/main.rs:3023-3033, discover/lexer.rs:590-595 shell_split) and env -S (GNU env(1), which also expands ${NAME}).
@@ -918,7 +836,7 @@ function wrapped(name, words, i) {
       if (n === 0) break
       i += n
     }
-    while (i < words.length && isAssignment(words[i].e)) i++
+    while (i < words.length && isAssignment(words[i].v)) i++
     return i < words.length ? [words, i] : null
   }
   // exec: the POSIX form only. Any word starting with - is unresolved, `--` included: bash 5.2.21 runs the command after
@@ -927,7 +845,7 @@ function wrapped(name, words, i) {
   let k = afterOptions(words, i, WRAPPER_OPTIONS.get(name))
   if (k === null || k < 0) return k
   if (name === 'timeout') k++
-  if (name === 'sudo') while (k < words.length && isAssignment(words[k].e)) k++
+  if (name === 'sudo') while (k < words.length && isAssignment(words[k].v)) k++
   if (name === 'xargs' && k >= words.length) return [[{ v: 'echo', x: false, e: 'echo' }], 0]
   return k < words.length ? [words, k] : null
 }
@@ -1128,32 +1046,267 @@ function mcporterServer(words) {
   }
   return serverKey(selector === undefined ? undefined : selector.includes('.') ? selector.slice(0, selector.indexOf('.')) : selector)
 }
-// The invocations of one simple command: past reserved words and assignments, each wrapper, runner and `rtk proxy` to the
-// program it runs. A program word with an expansion is unresolved. For rtk proxy its own record comes first, then the
-// proxied command, which rtk runs without a shell. --version and --help among a lane's own words (before `--`) exclude it.
-function resolveInvocation(words, remote, out) {
-  let i = 0
-  for (; i < words.length; i++) {
-    const w = words[i], bare = w.e === w.v
-    if (bare && (OPENERS.has(w.v) || CLOSERS.has(w.v))) continue
-    if ((bare && HEADERS.has(w.v)) || w.e.startsWith('((')) return
-    if (!isAssignment(w.e)) break
+// ------------------------------------------------------------------ the AST reading
+// The commands of a shell text are the `command` nodes of its tree-sitter-bash tree (grammar node types: node-types.json of
+// tree-sitter-bash 0.25.1; the reference for reading them is openai/codex rust-v0.157.1 codex-rs/shell-command/src/bash.rs:
+// parse_shell_lc_literal_commands walks every `command` node, and parse_plain_command_from_node reads a word only from a `word`, `number`,
+// `string`, `raw_string` or `concatenation` node, so a word with an expansion is unknown). This reading differs from Codex's in what
+// it does with the words: it resolves wrappers, runners and shells to the program they run. Handled node kinds: command (the words of
+// its name and arguments; assignment prefixes and redirections are not words), redirected_statement, heredoc_redirect and
+// herestring_redirect (the owner of standard input), and every node that holds statements or words (list, pipeline, subshell,
+// compound_statement, negated_command, if, while, for, c-style for, case, function_definition, command_substitution,
+// process_substitution, string, concatenation, expansion, arithmetic_expansion, array, subscript, test_command,
+// declaration_command, unset_command, variable_assignment(s), do_group, elif and else clauses), all found by descent, so a `command`
+// inside any of them counts. A word that is not a `command` never counts: array elements, case patterns, [[ ]] operands, function
+// names, for-loop values and the words of any program that is not a lane. Not resolved: an ERROR node and everything under it
+// (skipped; the call counts once in parse_errors), the body of a heredoc whose owner is a compound command, and a heredoc that a pipe
+// (rather than a redirection) feeds to a shell.
+const PLACEHOLDER = '$_U1' // stands for the unknown text of an expansion in a script that is read again
+// A word node as { v, x, s }: v its value with the quotes removed (an expansion keeps its own source text), x whether this reading cannot
+// know the value (an expansion, a glob, a brace or a tilde expansion), and s the text a shell hands on when the word is a script: v with each
+// expansion replaced by PLACEHOLDER, or null when a glob, brace or tilde could stand anywhere in it.
+function wordOf(node) {
+  const w = { v: '', s: '', x: false, g: false }
+  addPart(w, node, true)
+  if (!w.x && node.text.includes('{') && braceExpands(node.text)) w.x = w.g = true
+  return { v: w.v, x: w.x, s: w.g ? null : w.s }
+}
+// The value of a word node, or null when it is unknown (D3): a `word` after the unquoted escape rules, a `raw_string`, a `string` under
+// the double-quote rule (a backslash goes only before $ ` " \ and a newline), an `ansi_c_string` decoded as bash does, a concatenation of
+// known parts, a `number`; any expansion, brace expansion, glob or tilde expansion is unknown.
+export function wordValue(node) {
+  const w = wordOf(node)
+  return w.x || w.s === null ? null : w.v
+}
+function addPart(w, node, first) {
+  switch (node.type) {
+    case 'word': case 'number':
+      if (node.namedChildCount) return addExpansion(w, node)
+      return plainText(w, node.text, first)
+    case 'raw_string': { const t = node.text; return addLiteral(w, t.length > 1 && t.endsWith("'") ? t.slice(1, -1) : t.slice(1)) }
+    case 'string': return doubleQuoted(w, node)
+    case 'ansi_c_string': {
+      const t = node.text, decoded = ansiC(t.length > 2 && t.endsWith("'") ? t.slice(2, -1) : t.slice(2))
+      if (decoded === null) { w.x = w.g = true; w.v += t; return }
+      return addLiteral(w, decoded)
+    }
+    case 'concatenation': {
+      const parts = node.children
+      for (let i = 0; i < parts.length; i++) addPart(w, parts[i], first && i === 0)
+      return
+    }
+    case 'brace_expression': case 'translated_string': w.x = w.g = true; w.v += node.text; return
+    default:
+      if (!node.isNamed) return addLiteral(w, node.text) // `$`, `==` and `=~` are argument tokens of their own
+      return addExpansion(w, node)
   }
-  const push = (fields) => { out.push({ lane: null, program: null, op: null, server: null, excluded: false, remote, unresolved: false, via: null, ...fields }) }
+}
+const addLiteral = (w, text) => { w.v += text; w.s += text }
+const addExpansion = (w, node) => { w.x = true; w.v += node.text; w.s += PLACEHOLDER }
+// Unquoted text (bash(1) QUOTING, EXPANSION): a backslash quotes the next character and a backslash-newline is removed; an unescaped * or ?
+// or a [ that a ] closes is a pathname pattern, and a ~ that starts the word a tilde prefix. A tilde prefix changes only the directory part of
+// a path (`~/.local/bin/qmd`): the value is unknown (g), but the last path segment, which names the program, is not, so the word stays a
+// known word (x false) for program identity, as /usr/local/bin/qmd is; the real corpus of this host holds ~30 lane invocations by such a
+// path in 136,361 distinct commands. `$HOME/...` is an expansion of another kind (D3): unresolved.
+function plainText(w, text, first) {
+  if (first && text[0] === '~') w.g = true
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (c === '\\') {
+      if (i + 1 >= text.length) { addLiteral(w, c); break }
+      i++
+      if (text[i] !== '\n') addLiteral(w, text[i])
+    } else {
+      if (c === '*' || c === '?' || (c === '[' && text.indexOf(']', i + 1) > i)) w.x = w.g = true
+      addLiteral(w, c)
+    }
+  }
+}
+// Double-quoted text keeps every backslash except one before $ ` " \ or a newline (bash(1) QUOTING; POSIX.1-2024 XCU 2.2.3).
+function doubleText(w, text) {
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (c === '\\' && i + 1 < text.length && '$`"\\\n'.includes(text[i + 1])) { i++; if (text[i] !== '\n') addLiteral(w, text[i]) } else addLiteral(w, c)
+  }
+}
+// The text between the quotes is literal except for the expansion nodes inside it; it is cut at their ranges, not read from string_content
+// nodes, because the grammar's content nodes leave out the blank or newline next to an expansion.
+function doubleQuoted(w, node) {
+  const t = node.text, base = node.startIndex, end = t.length > 1 && t.endsWith('"') ? t.length - 1 : t.length
+  let at = t.startsWith('"') ? 1 : 0
+  for (const child of node.namedChildren) {
+    if (child.type === 'string_content') continue
+    doubleText(w, t.slice(at, child.startIndex - base))
+    addExpansion(w, child)
+    at = child.endIndex - base
+  }
+  doubleText(w, t.slice(at, end))
+}
+// The bytes of $'...' (bash(1) QUOTING): \a \b \e \E \f \n \r \t \v \\ \' \" \? \nnn \xHH \uHHHH \UHHHHHHHH \cx; an unknown escape keeps its
+// backslash; null for a NUL or an invalid code point (the value is then unknown).
+function ansiC(body) {
+  const hex = (s, from, max) => { let k = from; while (k < s.length && k - from < max && /[0-9A-Fa-f]/.test(s[k])) k++; return k }
+  let out = ''
+  for (let i = 0; i < body.length; i++) {
+    const c = body[i]
+    if (c !== '\\') { out += c; continue }
+    const n = body[++i]
+    const simple = { a: '\x07', b: '\b', e: '\x1b', E: '\x1b', f: '\f', n: '\n', r: '\r', t: '\t', v: '\v', '\\': '\\', "'": "'", '"': '"', '?': '?' }[n]
+    if (simple !== undefined) out += simple
+    else if (n === undefined) out += '\\'
+    else if (n >= '0' && n <= '7') {
+      let k = i; while (k < body.length && k - i < 3 && body[k] >= '0' && body[k] <= '7') k++
+      const code = parseInt(body.slice(i, k), 8) & 255
+      if (code === 0) return null
+      out += String.fromCharCode(code); i = k - 1
+    } else if (n === 'x' || n === 'u' || n === 'U') {
+      const k = hex(body, i + 1, n === 'x' ? 2 : n === 'u' ? 4 : 8)
+      if (k === i + 1) out += '\\' + n
+      else {
+        const code = parseInt(body.slice(i + 1, k), 16)
+        if (code === 0 || code > 0x10ffff || (code >= 0xd800 && code <= 0xdfff)) return null
+        out += String.fromCodePoint(code); i = k - 1
+      }
+    } else if (n === 'c') { const d = body[i + 1]; if (d === undefined) out += '\\c'; else { out += String.fromCharCode(d.charCodeAt(0) & 31); i++ } }
+    else out += '\\' + n
+  }
+  return out
+}
+// Whether the text of a word holds a brace expansion (bash(1) Brace Expansion): an unquoted { ... } with an unquoted comma or `..` at its own
+// level. One pass with a stack of open braces, skipping quoted text and the ${ }, $( ) and backquoted spans, so it stays linear.
+function braceExpands(raw) {
+  const open = []
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i]
+    if (c === '\\') i++
+    else if (c === "'") { const k = raw.indexOf("'", i + 1); if (k < 0) return false; i = k }
+    else if (c === '"') { for (i++; i < raw.length && raw[i] !== '"'; i++) if (raw[i] === '\\') i++ }
+    else if (c === '`') { const k = raw.indexOf('`', i + 1); if (k < 0) return false; i = k }
+    else if (c === '$' && (raw[i + 1] === '{' || raw[i + 1] === '(')) {
+      let depth = 0
+      for (i++; i < raw.length; i++) { if (raw[i] === '{' || raw[i] === '(') depth++; else if (raw[i] === '}' || raw[i] === ')') { if (--depth === 0) break } else if (raw[i] === '\\') i++ }
+    } else if (c === '{') open.push(false)
+    else if (c === ',' && open.length) open[open.length - 1] = true
+    else if (c === '.' && raw[i + 1] === '.' && open.length) { open[open.length - 1] = true; i++ }
+    else if (c === '}' && open.length && open.pop()) return true
+  }
+  return false
+}
+const SHELLS = new Set(['sh', 'bash', 'dash', 'zsh', 'ksh'])
+// A `command` node's words in source order: its name, then its arguments, then any argument a here-document operator carries after its
+// delimiter (`cat <<EOF -n` is `cat -n <<EOF`). Assignment prefixes and redirections are not words.
+// tree-sitter-bash 0.25.1 sometimes reads what follows a command as more of its arguments: an ERROR node on `;`, `&&` or `|` after an
+// unquoted `==` or `=~` word (`echo ==; qmd get a`), the same inside the destinations of a redirection (`<<'EOF' 2>&1 | tail`), and, with
+// no error at all, a command that ends its line and whose next line then continues it (`head -20` and `echo ...` read as one command; 732
+// such commands, and 163 with an ERROR, among 136,361 real ones). The words of one command never span an unescaped newline (bash(1)
+// SHELL GRAMMAR: a newline ends a simple command; a backslash-newline continues it) and never hold a separator, so each is a boundary: the
+// words after it are a command of their own. Returns the commands as [{ pos, words }], the first being the node's own.
+const SEPARATOR_TOKENS = new Set([';', ';;', '&', '&&', '||', '|', '|&'])
+const continues = (gap) => { for (let i = 0; i < gap.length; i++) { if (gap[i] === '\\' && gap[i + 1] === '\n') i++; else if (gap[i] === '\n') return false } return true }
+function commandSegments(node, src, fields, extra = []) {
+  const segments = [{ pos: node.startIndex, words: [] }]
+  let prev = null
+  for (let i = 0; i < node.childCount; i++) {
+    const child = node.child(i)
+    if (child.type === 'ERROR') { if (SEPARATOR_TOKENS.has(child.text.trim())) segments.push({ pos: child.endIndex, words: [] }); prev = null; continue }
+    if (prev && !continues(src.slice(prev.endIndex, child.startIndex))) segments.push({ pos: child.startIndex, words: [] })
+    prev = child
+    const field = node.fieldNameForChild(i)
+    if (field === 'name') { const inner = child.namedChild(0); segments[segments.length - 1].words.push(inner ? { ...wordOf(inner), assignment: false } : { v: '', s: null, x: true }) }
+    else if (fields.includes(field)) segments[segments.length - 1].words.push({ ...wordOf(child), assignment: (child.type === 'word' || child.type === 'concatenation') && isAssignment(child.text) })
+  }
+  // The first command's assignment prefixes are already nodes of their own; in a command the grammar had joined they are still words
+  // (bash(1) PARAMETERS: NAME=value words before the command name are assignments).
+  for (let k = 1; k < segments.length; k++) { const words = segments[k].words; while (words.length && words[0].assignment) words.shift() }
+  const last = segments[segments.length - 1].words
+  for (const r of extra) for (let i = 0; i < r.childCount; i++) if (r.fieldNameForChild(i) === 'argument') last.push(wordOf(r.child(i)))
+  return segments
+}
+// How a shell uses its arguments (bash(1) OPTIONS and ARGUMENTS; dash(1) and POSIX.1-2024 sh OPTIONS agree on -c, -n, -s): options are the words up
+// to the first operand, `--` or `-`; -o, +o, -O and +O take the next word; --rcfile and --init-file take a file; a -c option makes the first operand
+// the script, which is read even when options follow -c, and every operand after it data; -n and -D (and -o noexec, --help, --version) read
+// without running; with no -c the shell reads its script from standard input when no operand names a file, or with -s. An expansion among the
+// options leaves the mode unknown.
+const NOEXEC_LONG = new Set(['--help', '--version', '--dump-strings', '--dump-po-strings', '--pretty-print'])
+function shellMode(args) {
+  let c = false, noexec = false, s = false, i = 0
+  for (; i < args.length; i++) {
+    const w = args[i], v = w.v
+    if (v === '--' || v === '-') { i++; break }
+    if (v.length < 2 || (v[0] !== '-' && v[0] !== '+')) break // an operand, an expansion included ("$script", `-c "$cmd"`)
+    if (w.x) return { unknown: true } // an option with an expansion in it: which options it holds is unknown
+    if (v === '--rcfile' || v === '--init-file') { i++; continue }
+    if (v.startsWith('--')) { if (NOEXEC_LONG.has(v)) noexec = true; continue }
+    let takes = 0, cluster = true
+    for (let k = 1; k < v.length && cluster; k++) {
+      const ch = v[k]
+      if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))) cluster = false
+      else if (ch === 'o' || ch === 'O') takes++
+      else if (v[0] === '-') { if (ch === 'c') c = true; else if (ch === 'n' || ch === 'D') noexec = true; else if (ch === 's') s = true }
+    }
+    if (!cluster) break
+    for (let t = 1; t <= takes; t++) { const next = args[i + t]; if (next?.x) return { unknown: true }; if (v[0] === '-' && next?.v === 'noexec') noexec = true }
+    i += takes
+  }
+  const operands = args.slice(i)
+  return { c, noexec, script: operands[0], reads: !c && (operands.length === 0 || s) }
+}
+// ssh [options] destination [command [argument ...]] (OpenSSH ssh(1) 9.6p1): the words after the destination are joined by blanks and run by the
+// remote login shell, which reads its standard input when there is no command. Options may follow the destination (ssh.c parses them again).
+// -N -W -O -G -V -Q and -s run no remote command, and -n and -f keep standard input unread.
+const SSH_OPTION_VALUE = new Set([...'BbcDEeFIiJLlmOoPpQRSWw']), SSH_OPTION_NO_COMMAND = new Set([...'NWOGVQs']), SSH_OPTION_NO_STDIN = new Set([...'nf'])
+function sshWords(args) {
+  let destination = false, noCommand = false, noStdin = false, i = 0
+  for (; i < args.length; i++) {
+    const w = args[i], v = w.v
+    if (v === '--') { i++; if (!destination) { destination = true; i++ } break }
+    if (v.length > 1 && v[0] === '-') {
+      if (w.x) return { unknown: true }
+      for (let k = 1; k < v.length; k++) {
+        if (SSH_OPTION_NO_COMMAND.has(v[k])) noCommand = true
+        if (SSH_OPTION_NO_STDIN.has(v[k])) noStdin = true
+        if (SSH_OPTION_VALUE.has(v[k])) { if (k === v.length - 1) i++; break }
+      }
+      continue
+    }
+    if (destination) break
+    destination = true
+  }
+  return { destination, noCommand, noStdin, command: args.slice(i) }
+}
+const unresolvedRecord = (remote) => ({ lane: null, program: null, op: null, server: null, excluded: false, remote, unresolved: true, via: null })
+// The invocations of one command's words, appended to `out`: each wrapper, runner and `rtk proxy` is followed to the program it runs (an
+// expansion in program position is unresolved; a program is unresolved behind an option this reading does not know). --version and --help
+// among a lane's own words (before `--`) exclude it. `exec` is true after rtk proxy, which resolves its program on PATH and spawns it with no
+// shell (rtk-ai/rtk@1d87b8e7 src/main.rs:3060-3066, src/core/utils.rs:615-632): a shell builtin (command, exec) runs nothing there, and time,
+// which is a builtin only in a shell, is an executable on hosts that have GNU time, so it is unresolved. A shell with -c, eval and ssh read a
+// script: the words are joined as the callee joins them and read again (nested depth <= NESTING_LIMIT). Returns { reads, remote } for a
+// shell or ssh that would run its standard input as a script (a here-document or here-string then feeds it), else null.
+function resolveWords(words, out, cx, exec) {
+  const push = (fields) => { out.push({ lane: null, program: null, op: null, server: null, excluded: false, remote: cx.remote, unresolved: false, via: null, ...fields }) }
   const finish = (lane, program, args, via) => {
     if (lane === 'mcporter') { const m = mcporterOp(args.map((w) => w.v)); return push({ lane, program: safeKey(program), op: m.op, server: m.server ?? null, excluded: m.excluded, via }) }
     const end = args.findIndex((w) => w.v === '--'), own = end < 0 ? args : args.slice(0, end)
     push({ lane, program: safeKey(program), excluded: lane !== null && own.some((w) => w.v === '--version' || w.v === '--help'), via })
   }
+  const script = (text, remote) => {
+    if (text === null) return push({ unresolved: true })
+    const a = readScript(text, remote, cx.depth + 1, cx.acc)
+    for (const r of a.records) out.push(r)
+    return a
+  }
+  let i = 0, stdin = true
   for (let hop = 0; hop < 64; hop++) {
     const w = words[i]
-    if (!w) return
-    if (w.x) return push({ unresolved: true })
+    if (!w) return null
+    if (w.x) { push({ unresolved: true }); return null }
     const name = basename(w.v)
-    if (name === 'env' || WRAPPER_OPTIONS.has(name)) {
+    if (exec && name === 'time') { push({ unresolved: true }); return null }
+    if (name === 'env' || (WRAPPER_OPTIONS.has(name) && !(exec && (name === 'command' || name === 'exec')))) {
       const next = wrapped(name, words, i + 1)
-      if (next === null) return
-      if (next === -1) return push({ unresolved: true })
+      if (next === null) return null
+      if (next === -1) { push({ unresolved: true }); return null }
+      if (name === 'xargs') stdin = false // xargs reads its standard input for arguments, so a here-document is its data
       ;[words, i] = next
       continue
     }
@@ -1166,43 +1319,211 @@ function resolveInvocation(words, remote, out) {
         if (v === '--version' || v === '-V' || v === '--help' || v === '-h') help = true
         else if (v !== '--ultra-compact' && v !== '--skip-env' && v !== '--verbose' && !(v.length > 1 && v[0] === '-' && [...v.slice(1)].every((c) => c === 'v'))) break
       }
-      if (help) return push({ lane: 'rtk_proxy', program: 'rtk', excluded: true })
-      if (words[k]?.v !== 'proxy') return push({ program: 'rtk' })
+      if (help) { push({ lane: 'rtk_proxy', program: 'rtk', excluded: true }); return null }
+      if (words[k]?.v !== 'proxy') { push({ program: 'rtk' }); return null }
       // proxy (src/main.rs:708-713, 3008-3042): --ultra-compact, --skip-env and -h/--help still bind before the first argument
       // and one `--` is consumed (observed on rtk 0.50.0); -v or any other word there is already the program. One argument
-      // with a blank is shell-split (#388); the program runs with no shell (src/core/utils.rs:615-632, resolved_command).
+      // with a blank is shell-split (#388) after the shell has expanded it, so an expansion there names an unknown program.
       for (k++; k < words.length; k++) {
         const v = words[k].v
         if (v === '-h' || v === '--help') help = true
         else if (v !== '--ultra-compact' && v !== '--skip-env') { if (v === '--') k++; break }
       }
       push({ lane: 'rtk_proxy', program: 'rtk', op: 'proxy', excluded: help })
-      if (help || k >= words.length) return
-      words = words.length - k === 1 && hasBlank(words[k].v) ? shellWords(words[k].v, false) : words.slice(k)
+      if (help || k >= words.length) return null
+      if (words.length - k === 1) {
+        if (words[k].x) { push({ unresolved: true }); return null }
+        words = hasBlank(words[k].v) ? shellWords(words[k].v, false) : [words[k]]
+      } else words = words.slice(k)
       i = 0
+      exec = true
       continue
     }
+    if (!exec && name === 'eval') {
+      push({ program: 'eval' })
+      const rest = words.slice(i + 1)
+      if (rest.length) script(rest.some((r) => r.s === null) ? null : rest.map((r) => r.s).join(' '), cx.remote)
+      return null
+    }
+    if (SHELLS.has(name)) {
+      push({ program: name })
+      const mode = shellMode(words.slice(i + 1))
+      if (mode.unknown) { push({ unresolved: true }); return null }
+      if (mode.noexec) return null
+      if (mode.c) { if (mode.script) script(mode.script.s, cx.remote); return null }
+      return stdin && mode.reads ? { reads: true, remote: false } : null
+    }
+    if (name === 'ssh') {
+      push({ program: 'ssh' })
+      const ssh = sshWords(words.slice(i + 1))
+      if (ssh.unknown) { push({ unresolved: true }); return null }
+      if (ssh.noCommand || !ssh.destination) return null
+      if (!ssh.command.length) return stdin && !ssh.noStdin ? { reads: true, remote: true } : null
+      const a = script(ssh.command.some((r) => r.s === null) ? null : ssh.command.map((r) => r.s).join(' '), true)
+      return stdin && !ssh.noStdin && a?.readers > 0 ? { reads: true, remote: true } : null
+    }
     const runner = runnerTarget(name, words, i + 1)
-    if (runner === -1) return push({ unresolved: true })
-    if (runner) return finish(runner.lane, runner.program, words.slice(runner.k), runner.via)
-    return finish(LANE_EXECUTABLES.get(name) ?? null, name, words.slice(i + 1), null)
+    if (runner === -1) { push({ unresolved: true }); return null }
+    if (runner) { finish(runner.lane, runner.program, words.slice(runner.k), runner.via); return null }
+    finish(LANE_EXECUTABLES.get(name) ?? null, name, words.slice(i + 1), null)
+    return null
   }
   push({ unresolved: true })
+  return null
 }
-// Every simple command of a shell script and its invocations. A data heredoc line (marks.data) is not a command; its
-// substitutions are. `simple` counts commands (a lone closing reserved word is none) and `async` a background &.
-function analyzeScript(command) {
-  const raw = String(command || ''), marks = { remote: [], data: new Set() }
-  const { commands, async } = simpleCommands(executedTrace(traced(raw), false, new Set(), 0, marks), raw)
-  const invocations = []
-  let simple = 0
-  for (const words of commands) {
-    const at = words[0].at
-    if (at >= 0 && marks.data.has(at)) continue
-    if (words.some((w) => w.e !== w.v || !CLOSERS.has(w.v))) simple++
-    resolveInvocation(words, at >= 0 && marks.remote.some(([a, b]) => at >= a && at <= b), invocations)
+// The scripts a here-document or here-string body becomes. The shell that expands an unquoted-delimiter body runs each $( ) and backquoted span
+// itself (POSIX.1-2024 XCU 2.7.4, bash(1) Here Documents), whatever its quotes say; the shell that reads the body sees the text with each span
+// replaced by its unknown output, a backslash before $ ` \ or a newline removed. A quoted delimiter expands nothing.
+const withPlaceholders = (raw, spans) => {
+  let out = '', at = 0
+  for (const span of spans) { out += raw.slice(at, span.from) + PLACEHOLDER; at = span.to }
+  return out + raw.slice(at)
+}
+const backquoted = (body) => {
+  let out = ''
+  for (let i = 0; i < body.length; i++) { if (body[i] === '\\' && i + 1 < body.length && '$`\\'.includes(body[i + 1])) i++; out += body[i] }
+  return out
+}
+const stripTabs = (text) => { let out = '', start = true; for (const ch of text) { if (start && ch === '\t') continue; start = ch === '\n'; out += ch } return out }
+// The text of a here-document body: the body node's own range when the tree is sound, else the lines between the operator line and the
+// delimiter (tree-sitter-bash 0.25.1 leaves an empty body node, and puts the body's words among the operator's arguments, when the first body
+// line begins with a backslash).
+function heredocRaw(r, start, end, src) {
+  const body = r.children.find((c) => c.type === 'heredoc_body')
+  if (body && body.endIndex > body.startIndex) return src.slice(body.startIndex, body.endIndex)
+  const line = src.indexOf('\n', start.endIndex)
+  return line < 0 || line + 1 > end.startIndex ? '' : src.slice(line + 1, end.startIndex)
+}
+const quotedDelimiter = (text) => { for (const ch of text) if (ch === "'" || ch === '"' || ch === '\\') return true; return false }
+// Every command of a script, as { records, readers } (readers: how many of its commands would run their standard input as a script).
+function readScript(text, remote, depth, acc) {
+  const records = []
+  if (depth > NESTING_LIMIT) { records.push(unresolvedRecord(remote)); return { records, readers: 0 } }
+  const tree = parseShell(text)
+  if (!tree) { acc.errors = true; return { records, readers: 0 } }
+  openShellTreeCount++
+  try { return { records, readers: walkTree(tree.rootNode, text, { remote, depth, acc, records }) } } finally { tree.delete(); openShellTreeCount-- }
+}
+const STATEMENT_PARENTS = new Set(['program', 'list', 'pipeline', 'compound_statement', 'subshell', 'do_group', 'if_statement', 'elif_clause', 'else_clause',
+  'while_statement', 'case_item', 'command_substitution', 'process_substitution', 'negated_command', 'redirected_statement', 'function_definition', 'heredoc_redirect'])
+// What counts toward "more than one simple command" (POSIX.1-2024 XCU 2.9.1 simple commands, 2.9.4 compound commands, XCU 2.9.2 pipelines): each
+// command, each assignment-only statement, declaration, unset, test and arithmetic command, and each loop, if and case (its body runs zero or more
+// times), since the call's one status then does not describe one command.
+const COUNTED = new Set(['command', 'declaration_command', 'unset_command', 'test_command', 'variable_assignments', 'for_statement', 'while_statement',
+  'if_statement', 'case_statement', 'c_style_for_statement'])
+// The last command of a body that a redirection follows: the redirection belongs to it (bash(1) SHELL GRAMMAR: a redirection applies to the
+// simple command it is written after). A compound command owns its redirection as a whole, which this reading does not follow.
+function lastCommand(node) {
+  for (let n = node; n;) {
+    if (n.type === 'command') return n
+    if (n.type === 'list' || n.type === 'pipeline') n = n.lastNamedChild
+    else if (n.type === 'negated_command') n = n.namedChild(0)
+    else if (n.type === 'redirected_statement') n = n.childForFieldName('body')
+    else return null
   }
-  return { invocations, simple, async }
+  return null
+}
+// Walks a tree without recursion (a 3,000-deep $( must not throw) and returns how many commands read a script from standard input.
+function walkTree(root, src, cx) {
+  const entries = [], pending = new Map(), claimed = new Set()
+  let readers = 0
+  if (root.hasError) cx.acc.errors = true
+  // The scripts a here-document or here-string feeds: `terminal` is the owner's { reads, remote } or null.
+  const feed = (r, terminal, records, asOwner) => {
+    const descriptor = r.childForFieldName('descriptor')
+    const stdin = !descriptor || descriptor.text === '0', reads = asOwner && stdin && terminal?.reads, remote = terminal?.remote ?? cx.remote
+    if (r.type === 'herestring_redirect') {
+      // The word's substitutions run once, in the owner's own tree; a shell owner also reads the word's value.
+      if (!reads) return
+      const word = r.namedChildren.find((c) => c.type !== 'file_descriptor')
+      if (!word) return
+      const s = wordOf(word).s
+      if (s === null) records.push(unresolvedRecord(remote)); else for (const x of readScript(s, remote, cx.depth + 1, cx.acc).records) records.push(x)
+      return
+    }
+    let start = null, end = null
+    for (const c of r.children) { if (c.type === 'heredoc_start') start = c; else if (c.type === 'heredoc_end') end = c }
+    if (!start || !end) return
+    let raw = heredocRaw(r, start, end, src)
+    if (r.children.some((c) => c.type === '<<-')) raw = stripTabs(raw)
+    if (quotedDelimiter(start.text)) { if (reads) for (const x of readScript(raw, remote, cx.depth + 1, cx.acc).records) records.push(x); return }
+    const spans = outerSpans(raw, cx.depth)
+    for (const span of spans) {
+      const body = span.kind === '`' ? backquoted(raw.slice(span.body[0], span.body[1])) : raw.slice(span.body[0], span.body[1])
+      for (const x of readScript(body, cx.remote, cx.depth + 1, cx.acc).records) records.push(x)
+    }
+    if (reads) for (const x of readScript(heredocText(traced(withPlaceholders(raw, spans))).s, remote, cx.depth + 1, cx.acc).records) records.push(x)
+  }
+  const command = (node) => {
+    const owned = pending.get(node.id) ?? []
+    const segments = commandSegments(node, src, ['argument'], owned.filter((r) => r.type === 'heredoc_redirect')).filter((sg) => sg.words.length)
+    if (!segments.length) return
+    let terminal = null, records = null
+    segments.forEach((sg, k) => {
+      if (k) cx.acc.simple++ // a command the grammar had joined to the previous one
+      records = []
+      terminal = resolveWords(sg.words, records, cx, false)
+      if (terminal?.reads) readers++
+      if (k < segments.length - 1) entries.push({ pos: sg.pos, records })
+    })
+    const redirects = [...owned]
+    for (const c of node.children) if (c.type === 'herestring_redirect') redirects.push(c)
+    // Only the last redirection of standard input feeds the command (the last of the node's words, when it held several); an earlier one is data.
+    const feeds = redirects.filter((r) => { const d = r.childForFieldName('descriptor'); return !d || d.text === '0' }).sort((a, b) => a.startIndex - b.startIndex)
+    const last = feeds[feeds.length - 1]
+    for (const r of redirects) feed(r, terminal, records, r === last)
+    entries.push({ pos: segments[segments.length - 1].pos, records })
+  }
+  // The destinations of a redirection that the grammar ran on into the next command (`2>&1 | tail -n 5`): the words after a boundary.
+  const redirectTail = (node) => {
+    const segments = commandSegments(node, src, ['destination'])
+    for (let k = 1; k < segments.length; k++) {
+      if (!segments[k].words.length) continue
+      cx.acc.simple++
+      const records = []
+      const terminal = resolveWords(segments[k].words, records, cx, false)
+      if (terminal?.reads) readers++
+      entries.push({ pos: segments[k].pos, records })
+    }
+  }
+  const stack = [root]
+  while (stack.length) {
+    const node = stack.pop(), type = node.type
+    if (type === 'ERROR' || type === 'comment' || type === 'heredoc_body' || type === 'heredoc_start' || type === 'heredoc_end') continue
+    if (type === '&') { cx.acc.async = true; continue }
+    if (COUNTED.has(type)) cx.acc.simple++
+    else if (type === 'variable_assignment' && STATEMENT_PARENTS.has(node.parent?.type)) cx.acc.simple++
+    else if (type === 'compound_statement' && node.child(0)?.type === '((') cx.acc.simple++
+    if (type === 'command') command(node)
+    else if (type === 'file_redirect') redirectTail(node)
+    else if (type === 'redirected_statement') {
+      const body = node.childForFieldName('body'), owner = body ? lastCommand(body) : null
+      const owned = node.childrenForFieldName('redirect').filter((r) => r.type === 'heredoc_redirect' || r.type === 'herestring_redirect')
+      if (owned.length && owner) { pending.set(owner.id, owned); for (const r of owned) claimed.add(r.id) }
+    } else if (type === 'heredoc_redirect') {
+      // The operator line's own children are walked; the body is handled with its owner (here: none, so its substitutions only).
+      if (!claimed.has(node.id)) { const records = []; feed(node, null, records, false); entries.push({ pos: node.startIndex, records }) }
+      let operatorLine = -1
+      for (let i = 0; i < node.childCount; i++) if (node.child(i).type === 'heredoc_start') operatorLine = src.indexOf('\n', node.child(i).endIndex)
+      for (let i = node.childCount - 1; i >= 0; i--) {
+        const child = node.child(i)
+        if (node.fieldNameForChild(i) === 'argument' && operatorLine >= 0 && child.startIndex > operatorLine) continue // body text the grammar put here
+        stack.push(child)
+      }
+      continue
+    }
+    for (let i = node.childCount - 1; i >= 0; i--) stack.push(node.child(i))
+  }
+  entries.sort((a, b) => a.pos - b.pos)
+  for (const e of entries) for (const r of e.records) cx.records.push(r)
+  return readers
+}
+// Every command of a shell script and its invocations, in tree order. `simple` counts commands (see COUNTED), `async` a background &, and
+// `errors` whether any script read has a syntax error (ERROR nodes and everything under them are not read).
+function analyzeScript(command) {
+  const acc = { simple: 0, async: false, errors: false }
+  const { records } = readScript(String(command || ''), false, 0, acc)
+  return { invocations: records, simple: acc.simple, async: acc.async, errors: acc.errors }
 }
 // U1 design 2.6: the invocations of one shell command, in source order, as { lane (a lane name or null), program (the
 // name-shaped basename, or null when unresolved), op (proxy, or an mcporter operation), server (an mcporter call's
@@ -1221,12 +1542,13 @@ function shellScripts(call) {
   return /__ctx_execute(?:_file)?$/.test(name) && input.language === 'shell' ? [String(input.code || '')] : []
 }
 function callAnalysis(call) {
-  const out = { invocations: [], simple: 0, async: false, proxy: 0 }
+  const out = { invocations: [], simple: 0, async: false, proxy: 0, errors: false }
   for (const script of shellScripts(call)) {
     const a = analyzeScript(script)
     for (const invocation of a.invocations) out.invocations.push(invocation)
     out.simple += a.simple
     out.async ||= a.async
+    out.errors ||= a.errors
   }
   for (const invocation of out.invocations) if (invocation.lane === 'rtk_proxy' && !invocation.excluded && !invocation.remote) out.proxy++
   return out
@@ -1258,7 +1580,7 @@ const LANE_COUNTERS = ['calls', 'invocations', 'succeeded', 'failed', 'not_execu
 const CLI_CARRIERS = ['bash', 'rtk_proxy', 'ctx', 'nested']
 const DOWNSTREAM_COUNTERS = ['calls', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown']
 const emptyLane = () => ({ ...Object.fromEntries(LANE_COUNTERS.map((k) => [k, 0])), by_carrier: Object.fromEntries(CLI_CARRIERS.map((k) => [k, 0])) })
-const emptyCliLanes = () => ({ lanes: counter(), mcporter_downstream: counter(), excluded_version_help: counter(), calls_with_lane_invocation: 0, unresolved_programs: 0, remote_invocations: 0 })
+const emptyCliLanes = () => ({ lanes: counter(), mcporter_downstream: counter(), excluded_version_help: counter(), calls_with_lane_invocation: 0, unresolved_programs: 0, remote_invocations: 0, parse_errors: 0 })
 // One call's lane counts (U1 design 5): each lane it invokes locally counts the call once, with its invocations, its state
 // and its carrier; a call with more than one simple command or a background & is ambiguous, since its one state covers
 // every command. An mcporter call counts for its downstream server, and for a lane only through MCPORTER_ALIASES.
@@ -1641,6 +1963,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       proxy[validReview(review) && review.proxy_purpose === 'acceptance' ? 'acceptance'
         : validReview(review) && EXCEPTIONS.includes(review.exception) ? 'exception' : 'unclassified']++
     } else if (lanesOn && isCtx(c.name) && analysis.proxy) proxy.in_ctx_code++
+    if (lanesOn && analysis.errors) cli.parse_errors++ // calls whose shell text has a syntax error, not nodes
     if (lanesOn && analysis.invocations.length) countLanes(cli, analysis, callState(c, r), c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
   }
   for (const [id, r] of results) if (inside(r.row) && calls.get(id)?.name === 'ToolSearch' && Array.isArray(r.content)) {
@@ -1729,7 +2052,7 @@ export function aggregateMeasurements(items) {
       for (const k of DOWNSTREAM_COUNTERS) total[k] += row[k] || 0
     }
     for (const [lane, n] of Object.entries(part.excluded_version_help)) cli.excluded_version_help[lane] = (cli.excluded_version_help[lane] || 0) + n
-    for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations']) cli[k] += part[k] || 0
+    for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations', 'parse_errors']) cli[k] += part[k] || 0
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
     hook_context: hooks, mcp_states: states, loaded_not_called: loaded,

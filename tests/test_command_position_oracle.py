@@ -40,17 +40,19 @@ def sq(text):
     return "'" + text.replace("'", "'\\''") + "'"
 
 
-# A token per lane executable run: its name, `!` after it when an argument is --version or --help, and for mcporter its operation
-# (and the server before the first dot of a call). rtk logs `rtk_proxy` when it is asked to proxy, then runs its argv with execvp
+# A token per lane executable run: its name, `!` after it when an argument before `--` is --version or --help (mcporter: a version
+# token only as the command, a help token anywhere: openclaw/mcporter@93e0916c src/cli.ts:137-145, src/cli/flag-utils.ts:34-41), and
+# for mcporter its operation (and the server before the first dot of a call). A plain `rtk` is not a lane and is not counted. rtk logs `rtk_proxy` when it is asked to proxy, then runs its argv with execvp
 # (rtk-ai/rtk@1d87b8e7 src/main.rs:68-90 global flags before the subcommand, :3008-3066 proxy: no shell, stdin inherited; one argument
 # with blanks is split first).
 STUB = """#!/bin/sh
 t={name}
-for a in "$@"; do case "$a" in --version|--help) t="$t!";; esac; done
+for a in "$@"; do case "$a" in --) break;; --version|--help) t="$t!";; esac; done
 printf '%s\\n' "$t" >> "$STUB_LOG"
 """
 MCPORTER = """#!/bin/sh
-for a in "$@"; do case "$a" in --version|--help) printf 'mcporter!\\n' >> "$STUB_LOG"; exit 0;; esac; done
+case "$1" in --version|-v|-V|help|-h|--help) printf 'mcporter!\\n' >> "$STUB_LOG"; exit 0;; esac
+for a in "$@"; do case "$a" in --help|-h|help) printf 'mcporter!\\n' >> "$STUB_LOG"; exit 0;; esac; done
 case "$1" in call) s=${2%%.*}; printf 'mcporter:call@%s\\n' "$s" >> "$STUB_LOG";; *) printf 'mcporter:%s\\n' "$1" >> "$STUB_LOG";; esac
 """
 RTK = """#!/bin/sh
@@ -360,7 +362,9 @@ def run_real(commands, bin_dir, home):
         except subprocess.TimeoutExpired:
             runs.append(None)
             continue
-        runs.append(collections.Counter(log.read_text().split()))
+        ran = collections.Counter(log.read_text().split())
+        del ran["rtk"]  # an rtk that is not proxying is no lane
+        runs.append(ran)
     return runs
 
 

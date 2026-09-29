@@ -180,7 +180,7 @@ STACK_MCPORTER_CALLS = {
 }
 CLI_CARRIERS = ("bash", "rtk_proxy", "ctx", "nested")
 EMPTY_CLI = {"status": "measured", "parser": PARSER_RECORD, "lanes": {}, "mcporter_downstream": {}, "excluded_version_help": {},
-             "calls_with_lane_invocation": 0, "unresolved_programs": 0, "remote_invocations": 0}
+             "calls_with_lane_invocation": 0, "unresolved_programs": 0, "remote_invocations": 0, "parse_errors": 0}
 
 
 def lane_row(calls=1, carrier="bash", **counts):
