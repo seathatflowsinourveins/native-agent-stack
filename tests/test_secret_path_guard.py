@@ -76,6 +76,28 @@ BLOCKED = {
     "ps Eww 123": "environment_dump",
     "ps auxE": "environment_dump",
     "ps E": "environment_dump",
+    # `systemctl show-environment` prints a service manager's whole environment block, "the environment block that is passed to
+    # all processes the manager spawns" (systemctl(1) 255), so it is an environment dump of its own kind (2026-09-29), with or
+    # without --user. systemctl finds its verb as the first word that is no option or option value (src/systemctl/systemctl.c,
+    # v255, getopt string "ht:p:P:alqfs:H:M:n:o:iTr.::", which permutes: options may follow the verb).
+    "systemctl --user show-environment": "service_manager_environment",
+    "systemctl show-environment": "service_manager_environment",
+    "systemctl --no-pager --user show-environment": "service_manager_environment",
+    "systemctl show-environment --user": "service_manager_environment",
+    "systemctl -M host show-environment": "service_manager_environment",
+    "systemctl -H user@host show-environment": "service_manager_environment",
+    "systemctl --machine=host show-environment": "service_manager_environment",
+    "systemctl --host user@host --user show-environment": "service_manager_environment",
+    "systemctl -t service -p Id --no-legend show-environment": "service_manager_environment",
+    "systemctl --user -- show-environment": "service_manager_environment",
+    "systemctl --user 2>&1 show-environment": "service_manager_environment",
+    "sudo systemctl show-environment": "service_manager_environment",
+    "/usr/bin/systemctl --user show-environment": "service_manager_environment",
+    "timeout 5 systemctl --user show-environment": "service_manager_environment",
+    "systemctl --user show-environment | cut -d= -f1": "service_manager_environment",
+    "bash -c 'systemctl --user show-environment'": "service_manager_environment",
+    "systemd-run --user --pipe --wait systemctl --user show-environment": "service_manager_environment",
+    "echo \"$(systemctl --user show-environment)\"": "service_manager_environment",
     "echo `printenv`": "environment_dump",
     "echo $(env)": "environment_dump",
     # Command substitution inside double quotes is executed by the shell (bash(1) "Command Substitution", the backtick
@@ -563,6 +585,17 @@ ALLOWED = [
     "ps -o pid,command -p 123",
     # ps without an environment display: every process, an elapsed-time column (a capital E that is a format word or an option's
     # value, not a flag), a user or command name that starts with E, a sort, and the BSD-style `aux`.
+    # systemctl without the manager's environment block: one unit's settings, its unit file, its status, listings, and a unit
+    # whose name merely spells the verb.
+    "systemctl --user show -p Environment omniroute.service",
+    "systemctl --user cat omniroute.service",
+    "systemctl --user status omniroute.service",
+    "systemctl --user list-units --no-pager",
+    "systemctl --user status show-environment.service",
+    "systemctl --user is-active omniroute.service",
+    "systemctl --user show -p MainPID --value omniroute.service",
+    "systemctl -H user@host status omniroute.service",
+    "systemctl --user restart omniroute.service",
     "ps aux",
     "ps -ef --sort=-pcpu",
     "ps -eo pid,etime,args",

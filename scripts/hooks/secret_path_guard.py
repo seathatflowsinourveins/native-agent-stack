@@ -25,7 +25,9 @@ also reads the command that an `rtk` invocation runs (`rtk proxy cat F`,
 through its `-E`/`--setenv` or `-p Environment=` is blocked: its command line
 is recorded in the journal and its properties travel over the user bus), and
 the body of a command substitution inside double quotes (`echo "$(printenv)"`
-runs printenv; single quotes and a backslash-escaped `$(` stay data). For a key
+runs printenv; single quotes and a backslash-escaped `$(` stay data). `ps -E`
+(macOS) and `systemctl show-environment` (a service manager's whole environment
+block) dump the environment like `ps e` and `env`. For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
 `pipe`, `read` and `dh_compute`, `keyctl list` or `rlist` on anything but an
 unambiguous keyring, and a keyring read in inline interpreter code), checks
@@ -173,6 +175,17 @@ WRAPPER_VALUE_FLAGS = {
         "--on-startup", "--on-unit-active", "--on-unit-inactive", "--on-calendar", "--timer-property",
         "--path-property", "--socket-property",
         "--capsule", "--background", "--json", "--job-mode", "--output", "--root-directory"},
+    # systemctl(1), read 2026-09-29 from src/systemctl/systemctl.c at systemd v255 (getopt string "ht:p:P:alqfs:H:M:n:o:iTr.::",
+    # no leading `+`, so options and the verb may come in any order): -t, -p, -P, -s, -H, -M, -n and -o take a value, and so do
+    # these long options; the last line adds v256 to v258 (--capsule/-C, --kill-subgroup). It is not a launcher: the table
+    # only lets systemctl_verb() tell a verb from an option's value.
+    "systemctl": {
+        "-t", "-p", "-P", "-s", "-H", "-M", "-n", "-o", "-C",
+        "--type", "--property", "--signal", "--host", "--machine", "--lines", "--output", "--boot-loader-entry",
+        "--boot-loader-menu", "--check-inhibitors", "--drop-in", "--image", "--image-policy", "--job-mode", "--kill-value",
+        "--kill-who", "--kill-whom", "--legend", "--message", "--preset-mode", "--reboot-argument", "--root", "--state",
+        "--timestamp", "--what", "--when",
+        "--capsule", "--kill-subgroup"},
 }
 SHELLS = {"sh", "bash", "zsh", "dash", "ksh"}
 SOURCERS = {".", "source"}
@@ -286,6 +299,9 @@ HINTS = {
                                         "its environment",
     "secret_variable_on_command_line": "systemd-run records its command line in the journal and sends the "
                                        "unit's environment settings over the user bus",
+    "service_manager_environment": "systemctl show-environment prints the whole environment block that a service "
+                                   "manager hands to every unit; read one unit's settings with systemctl show -p "
+                                   "Environment UNIT",
 }
 
 
@@ -522,6 +538,13 @@ def env_command_start(words: list[str]) -> int | None:
         else:
             return index
     return None
+
+
+def systemctl_verb(words: list[str]) -> str | None:
+    """systemctl's verb: the first word after its options, redirections aside (`systemctl --user 2>&1 status x`)."""
+    arguments = ["systemctl", *command_arguments(words)]
+    at = skip_wrapper_options(arguments, 1, "systemctl")
+    return arguments[at] if at < len(arguments) else None
 
 
 def environment_assignments(payload: str) -> list[str]:
@@ -939,6 +962,8 @@ def segment_reason(words: list[str]) -> str | None:
         return "environment_dump"
     if program == "systemd-run" and systemd_run_sets_secret(words):
         return "secret_variable_on_command_line"
+    if program == "systemctl" and systemctl_verb(words) == "show-environment":
+        return "service_manager_environment"
     if prints_helper_credential(words) or tvly_prints_key(words):
         return "native_token_print"
     if program == "keyctl" and keyctl_reads_payload(words):
