@@ -284,6 +284,36 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertIn("undeclared kernel keyring keys (names only): not checked", cs.render_text(absent))
         self.assertEqual(cs.PROC_KEYS, Path("/proc/keys"))  # the CLI's default
 
+    def test_proc_keys_descriptions_are_compared_whole_and_reported_in_full(self):
+        # user_describe() prints a user key's whole description, which may hold "/", ":" and spaces, then
+        # ": <payload length>" for a positive key. Only that last suffix is stripped; a kernel_keyring row's key_name
+        # must equal the rest after "native-agent-stack:" exactly, and every other such key is reported by its full
+        # name, never cut at a "/" or ":" (2026-09-29 cross-family review: both were dropped or hidden).
+        uid = os.getuid()
+
+        def line(serial, description, kind="user"):
+            return f"{serial:08x} I--Q--- {1:5d} perm 3f0b0000 {uid:5d} {uid:5d} {kind:<9.9} {description}\n"
+
+        self.proc_keys.write_text("".join([
+            line(0x2a000001, "native-agent-stack:paper/backup: 41"),
+            line(0x2a000002, "native-agent-stack:tavily_api_key:backup: 41"),
+            line(0x2a000003, "native-agent-stack:tavily_api_key2: 41"),
+            line(0x2a000004, "native-agent-stack:tavily_api_key: 41"),
+            line(0x2a000005, "native-agent-stack:note: 12: 7"),  # a description that itself ends in ": 12"
+            line(0x2a000006, "native-agent-stack:with space: 9"),
+            line(0x2a000007, "native-agent-stack:logon-key: 9", kind="logon"),  # only user keys are listed
+        ]))
+        full_names = ["note: 12", "paper/backup", "tavily_api_key2", "tavily_api_key:backup", "with space"]
+        declared = cs.inspect(ROOT, self.keyring_inventory(), self.env, proc_keys=self.proc_keys)
+        self.assertEqual(declared["coverage"]["undeclared_keyring_keys"], full_names)  # the declared key is not listed
+        text = cs.render_text(declared)
+        for name in ("paper/backup", "tavily_api_key:backup", "tavily_api_key2"):
+            self.assertIn(name, text)
+        # With no kernel_keyring row, as in the real inventory, tavily_api_key itself is undeclared as well.
+        self.assertEqual(self.report()["coverage"]["undeclared_keyring_keys"],
+                         ["note: 12", "paper/backup", "tavily_api_key", "tavily_api_key2", "tavily_api_key:backup",
+                          "with space"])
+
     def test_inventory_rejects_a_keyring_row_with_a_path_or_bad_key_name(self):
         index = next(i for i, e in enumerate(self.inventory["entries"]) if e["id"] == "tavily")
         for store, message in (

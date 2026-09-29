@@ -16,10 +16,10 @@ required key must survive a restart, so a required kernel keyring entry is an
 inventory error.
 
 Two coverage lists account for keys that no entry declares, by name only: the
-store root's own names (one scandir; no file is opened) and the kernel's list
-of keys named native-agent-stack:<name> (/proc/keys, which shows descriptions
-and payload lengths, never payloads; Linux only). Each nonempty list is a
-warning.
+store root's own names (one scandir; no file is opened) and the kernel's live
+user keys described native-agent-stack:<name>, by the whole <name> (/proc/keys,
+which shows descriptions and payload lengths, never payloads; Linux only). Each
+nonempty list is a warning.
 
 Exit status is 1 when any credential file that exists is unsafe (whatever the
 entry's status, since a stored optional or paid key leaks just as badly), and 2
@@ -55,12 +55,14 @@ KEYRING_KEY_NAME = re.compile(r"[a-z0-9][a-z0-9_.-]{0,63}")  # the names scripts
 # The kernel's list of the keys this process may view (keys(7)). Each line is formatted by proc_keys_show() in
 # linux v6.18 security/keys/proc.c: serial, the seven flags I R D Q U N i (instantiated, revoked, dead, in quota,
 # under construction, negative, invalidated), usage, expiry ("perm", "expd" or a time left), permissions, uid,
-# gid, type (%-9.9s), then the type's description; for a "user" key, user_describe() in
-# security/keys/user_defined.c prints "<description>: <payload length>". Only the name is kept.
+# gid, then "%-9.9s " for the type and the type's describe output. For a "user" key, user_describe() in
+# security/keys/user_defined.c prints the whole description, which may hold "/", ":" or spaces, and then, for a
+# positive key, ": <payload length>". Only that last suffix is removed; the description is kept whole.
 PROC_KEYS = Path("/proc/keys")
 PROC_KEYS_LINE = re.compile(
-    r"^[0-9a-f]+ (?P<flags>\S{7}) +\d+ +(?P<expiry>\S+) +[0-9a-f]+ +(?P<uid>\d+) +\d+ +\S+ +"
-    r"native-agent-stack:(?P<name>[a-z0-9][a-z0-9_.-]{0,63})(?::|$)")  # the prefix scripts/kernel_keyring.py uses
+    r"[0-9a-f]+ (?P<flags>\S{7}) +\d+ +(?P<expiry>\S+) +[0-9a-f]+ +(?P<uid>\d+) +\d+ (?P<type>.{9}) (?P<describe>.*)")
+USER_DESCRIBE = re.compile(r"(?P<description>.*): \d+")  # greedy: only the final ": <payload length>" is removed
+KEYRING_PREFIX = "native-agent-stack:"  # scripts/kernel_keyring.py PREFIX
 STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native",
             "interactive_only", "ci_only"}
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
@@ -294,26 +296,31 @@ def undeclared_store_files(entries, env) -> list[str] | None:
 
 
 def undeclared_keyring_keys(entries, uid: int, proc_keys: Path | None) -> list[str] | None:
-    """Names of this uid's live native-agent-stack:<name> kernel keys that no kernel_keyring entry claims.
+    """Full names of this uid's live "user" keys described native-agent-stack:<name> that no entry declares.
 
-    Read from the kernel's key list, which holds descriptions and payload lengths, never payloads. Revoked,
-    dead, negative, invalidated and expired keys hold no usable value and are skipped. None when there is no
-    list to read (not Linux, or proc_keys is None)."""
+    Read from the kernel's key list, which holds descriptions and payload lengths, never payloads. <name> is the
+    whole rest of the description, "/" and ":" included, and a kernel_keyring entry declares a key only when its
+    key_name equals that rest exactly. Revoked, dead, negative, invalidated and expired keys hold no usable value
+    and are skipped. None when there is no list to read (not Linux, or proc_keys is None)."""
     if proc_keys is None:
         return None
     try:
-        with open(proc_keys, encoding="utf-8", errors="replace") as handle:
+        with open(proc_keys, encoding="utf-8", errors="backslashreplace") as handle:
             text = handle.read()
     except OSError:
         return None
-    claimed = {entry["store"]["key_name"] for entry in entries if entry["store"]["kind"] in MEMORY_KINDS}
+    declared = {entry["store"]["key_name"] for entry in entries if entry["store"]["kind"] in MEMORY_KINDS}
     live = set()
     for line in text.splitlines():
-        match = PROC_KEYS_LINE.match(line)
-        if (match and int(match["uid"]) == uid and match["flags"][0] == "I"
-                and not set(match["flags"]) & set("RDNi") and match["expiry"] != "expd"):
-            live.add(match["name"])
-    return sorted(live - claimed)
+        match = PROC_KEYS_LINE.fullmatch(line)
+        if (not match or match["type"].rstrip() != "user" or int(match["uid"]) != uid
+                or match["flags"][0] != "I" or set(match["flags"]) & set("RDNi") or match["expiry"] == "expd"):
+            continue
+        positive = USER_DESCRIBE.fullmatch(match["describe"])
+        description = positive["description"] if positive else match["describe"]
+        if description.startswith(KEYRING_PREFIX):
+            live.add(description[len(KEYRING_PREFIX):])
+    return sorted(live - declared)
 
 
 def tracked_sensitive_names(root: Path) -> list[str] | None:

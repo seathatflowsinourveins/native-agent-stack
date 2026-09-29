@@ -524,9 +524,9 @@ give `exec` only commands that use the key without printing it.
 A `kernel_keyring` row, of which none remains since 2026-09-29, is listed as
 `unchecked` with persistence `memory_only` and the warning
 `memory_only_lost_on_restart`, and a required one is an inventory error.
-Keys named `native-agent-stack:<name>` that no row claims, such as the
-Alpaca spares and, until the restart, `tavily_api_key`, are listed by name
-under `undeclared_keyring_key`. `status` is still the presence check for one
+Keys named `native-agent-stack:<name>` that no row declares, such as the
+Alpaca spares and, until the restart, `tavily_api_key`, are listed by their
+full name under `undeclared_keyring_key`. `status` is still the presence check for one
 key. The Tavily commands are in [`recipes/tavily.md`](../recipes/tavily.md).
 
 **Lifetime.** The key stays until it is revoked or the kernel stops. The
@@ -1262,10 +1262,12 @@ reports:
   such as a stray file or the temporary file of an interrupted write. This
   is one directory listing: no file is opened, and a symlinked store
   directory is not listed through;
-- keys of your uid named `native-agent-stack:<name>` in `/proc/keys` that no
-  `kernel_keyring` row claims (`undeclared_keyring_key`, Linux only). That
-  file shows each key's description and payload length, never its value, and
-  revoked, invalidated or expired keys are skipped.
+- live `user` keys of your uid described `native-agent-stack:<name>` in
+  `/proc/keys` whose `<name>` no `kernel_keyring` row declares
+  (`undeclared_keyring_key`, Linux only). `<name>` is the whole rest of the
+  description, `/` and `:` included, and only a `key_name` equal to it
+  declares a key. That file shows each key's description and payload length,
+  never its value; revoked, invalidated or expired keys are skipped.
 
 Both coverage lists are names only and are warnings, never a failure.
 Together with the rows they account for every file directly in the store
