@@ -2361,6 +2361,38 @@ class F19_Mutants(GraderCase):
                          "F6_StrictDecode.test_json_root_array_passes"],
                         ["F6_StrictDecode.test_duplicate_keys_and_non_finite_constants_are_refused"])
 
+    def test_M27_a_hedge_that_contains_the_key_passes(self):
+        """The pre-review rule ("the key is among the recognised values") is the mutant: every hedge test must flip."""
+        fc = load("frozen_checks")
+
+        def among(values, expected):
+            return "none" if not values else ("pass" if expected in values else "wrong")
+        self.run_mutant([mock.patch.object(fc, "single", among)],
+                        ["H_OracleReviewFindings.test_t34_count", "H_OracleReviewFindings.test_t35_first_and_last",
+                         "H_OracleReviewFindings.test_t1_token_lines", "H_OracleReviewFindings.test_a_hedged_payload_sum",
+                         "H_OracleReviewFindings.test_t28_numbers", "H_OracleReviewFindings.test_t32_verdict_and_latency",
+                         "H_OracleReviewFindings.test_t27_exit_code", "F7_T0.test_a_hedged_skip_count_is_unparsed",
+                         "H_OracleReviewFindings.test_t8_a_stated_count_must_equal_the_number_of_names"],
+                        ["H_OracleReviewFindings.test_t34_count", "H_OracleReviewFindings.test_t35_first_and_last",
+                         "H_OracleReviewFindings.test_t1_token_lines", "H_OracleReviewFindings.test_a_hedged_payload_sum",
+                         "H_OracleReviewFindings.test_t28_numbers", "H_OracleReviewFindings.test_t32_verdict_and_latency",
+                         "H_OracleReviewFindings.test_t27_exit_code", "F7_T0.test_a_hedged_skip_count_is_unparsed"])
+
+    def test_M28_toon_version_pin_off(self):
+        require_toon()
+        fc = load("frozen_checks")
+        self.run_mutant([mock.patch.object(fc, "toon_version", lambda: fc.TOON_PINNED)],
+                        ["F6_StrictDecode.test_a_toon_cli_that_is_not_4_1_1_is_refused",
+                         "F6_StrictDecode.test_toon_root_array_passes"],
+                        ["F6_StrictDecode.test_a_toon_cli_that_is_not_4_1_1_is_refused"])
+
+    def test_M29_operator_environment_reaches_the_commands(self):
+        fc = load("frozen_checks")
+        self.run_mutant([mock.patch.object(fc, "minimal_env", lambda home=None: dict(os.environ))],
+                        ["F27b_CaptureCommand.test_the_t0_commands_never_see_the_operator_environment",
+                         "F27b_CaptureCommand.test_pre_arm_captures_six_identities_twice_and_inventories_the_exec_checkout"],
+                        ["F27b_CaptureCommand.test_the_t0_commands_never_see_the_operator_environment"])
+
     def test_M26_in_place_run(self):
         """The copy is what keeps the arm's tree untouched: a 'copy' that is a link back to the tree must flip the test."""
         fc = load("frozen_checks")

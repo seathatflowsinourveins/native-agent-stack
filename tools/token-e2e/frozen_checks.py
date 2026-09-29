@@ -383,8 +383,9 @@ def count_before_noun(text, nouns):
 _LINKING = {"is", "are", "was", "were", "of", "equals", "equal", "to", "at", "about", "totals", "total"}
 
 
-def ints_by_label(text, label, nouns=()):
-    """Integers written next to a label word: 'N label', 'N noun label', 'label: N', 'label noun: N'."""
+def ints_by_label(text, label, nouns=(), link_or=True):
+    """Integers written next to a label word: 'N label', 'N noun label', 'label: N', 'label noun: N', and, unless
+    `link_or` is off, the alternatives joined to them by 'or' ("9 or 10", "exit code 1 or exit code 0")."""
     tokens = int_tokens(text)
     ends = {token["end"]: token for token in tokens}
     starts = {token["start"]: token for token in tokens}
@@ -419,7 +420,73 @@ def ints_by_label(text, label, nouns=()):
             break
         if scan in starts:
             found.append(starts[scan])
-    return found
+    return _or_links(text, tokens, found) if link_or else found
+
+
+def _delimited(text, low, high):
+    """True when a clause boundary (newline, ';' or a sentence end) lies between two offsets."""
+    span = text[low:high]
+    return "\n" in span or ";" in span or ". " in span
+
+
+_OR_WORDS = ("or", "vs", "versus")
+
+
+def _or_links(text, tokens, chosen):
+    """Integers joined to a chosen one by 'or' (either direction, within one clause): the alternatives of a hedge."""
+    ordered = sorted(tokens, key=lambda token: token["start"])
+    extra = []
+    for token in chosen:
+        pos = token["end"]
+        while pos < len(text) and text[pos] in " \t)(":
+            pos += 1
+        word_end = pos
+        while word_end < len(text) and text[word_end].isalpha():
+            word_end += 1
+        connector = text[pos:word_end].lower()
+        if connector in _OR_WORDS or text[pos:pos + 1] == "/":
+            after = word_end if connector in _OR_WORDS else pos + 1
+            for other in ordered:
+                if after <= other["start"] <= after + 40 and not _delimited(text, after, other["start"]):
+                    extra.append(other)
+                    break
+        back = token["start"]
+        while back > 0 and text[back - 1] in " \t(":
+            back -= 1
+        head = text[:back].rstrip(" \t").lower()
+        if head.endswith(" or") or head.endswith("(or") or head in _OR_WORDS:
+            cut = len(text[:back].rstrip(" \t")) - 2
+            for other in reversed(ordered):
+                if other["end"] <= cut and cut - 40 <= other["end"] and not _delimited(text, other["end"], cut):
+                    extra.append(other)
+                    break
+    seen, merged = set(), []
+    for token in list(chosen) + extra:
+        if token["start"] not in seen:
+            seen.add(token["start"])
+            merged.append(token)
+    return merged
+
+
+def single(values, expected):
+    """Single-valued fact: pass when every recognised value equals the key, hedge when they disagree and one equals it,
+    wrong when none does, none when nothing was recognised (review H-1: a hedge never raises the lower bound)."""
+    if not values:
+        return "none"
+    if all(value == expected for value in values):
+        return "pass"
+    if any(value == expected for value in values):
+        return "hedge"
+    return "wrong"
+
+
+def decide(values, expected, reason, reasons):
+    """Record a wrong single-valued fact as a failure reason; True when the fact is unparsed (absent or hedged)."""
+    verdict = single(values, expected)
+    if verdict == "wrong":
+        reasons.add(reason)
+        return False
+    return verdict in ("none", "hedge")
 
 
 def path_like(token):
@@ -665,6 +732,12 @@ def validate_grading_block(block):
             raise Refusal("E_GRADING_BLOCK", field=f"tool.sha256.{name}")
     if not is_hex(block["registry_sha256"], 64):
         raise Refusal("E_GRADING_BLOCK", field="registry_sha256")
+    for kind, url in block["pages"].items():
+        if not url.startswith(("https://", "http://")):  # curl also reads file:// and other schemes
+            raise Refusal("E_GRADING_BLOCK", field=f"pages.{kind}")
+    for task, topic in block["memory"].items():
+        if topic["query"].startswith("-"):  # a query is a positional argument and must not parse as an option
+            raise Refusal("E_GRADING_BLOCK", field=f"memory.{task}.query")
 
 
 # ---- Registry (52 exact-text keys, 40 templates) and template classes (a3, a4) ----------------------------------
@@ -1793,12 +1866,34 @@ def json_decode(text):
         raise DecodeError("json_strict_decode") from None
 
 
+TOON_PINNED = "4.1.1"
+_TOON_VERSIONS = {}
+
+
+def toon_version():
+    """The version line of the `toon` on PATH, read once per binary; None when it cannot be read."""
+    path = shutil.which("toon")
+    if path is None:
+        return None
+    if path not in _TOON_VERSIONS:
+        try:
+            done = subprocess.run([path, "--version"], capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                                  timeout=30)
+            _TOON_VERSIONS[path] = done.stdout.strip() if done.returncode == 0 else None
+        except (OSError, subprocess.TimeoutExpired):
+            _TOON_VERSIONS[path] = None
+    return _TOON_VERSIONS[path]
+
+
 def toon_decode_argv():
-    """The TOON CLI 4.1.1 decode command; strict is the CLI default and `--no-strict` is never passed."""
-    return [shutil.which("toon") or "toon", "--decode"]
+    """The TOON CLI decode command by bare name (no host path reaches a recorded argv); strict is the CLI default
+    and `--no-strict` is never passed."""
+    return ["toon", "--decode"]
 
 
 def toon_decode(text):
+    if toon_version() != TOON_PINNED:
+        raise Refusal("E_TOOL", tool="toon", reason="version")
     try:
         done = subprocess.run(toon_decode_argv(), input=text, capture_output=True, text=True, timeout=60)
     except (OSError, subprocess.TimeoutExpired):
@@ -2012,8 +2107,8 @@ def _stated_sum(ans, structural_texts):
         if any(line.strip() and line in block for block in structural_texts):
             continue
         low = normalize(line).lower()
-        if "sum" in low or "total" in low:
-            values.extend(int_values(int_tokens(low)))
+        for label in ("sum", "total"):
+            values.extend(token["value"] for token in ints_by_label(low, label))
     return values
 
 
@@ -2043,7 +2138,7 @@ def grade_payload(ans, key, readings):
                 decoded.append(value)
     if not decoded:
         return unknown("unparsed")
-    reasons, extras_sum = set(), None
+    reasons, extras_sum, soft = set(), None, False
     for value in decoded:
         records, extras = payload_records(value, reading)
         if records is None:
@@ -2057,11 +2152,10 @@ def grade_payload(ans, key, readings):
             extras_sum = extras["latency_sum"]
     if "latency_sum" in key:
         values = [extras_sum] if extras_sum is not None else _stated_sum(ans, structural_texts)
-        if values and key["latency_sum"] not in values:
-            reasons.add("latency_sum")
-        elif not values and not reasons:
-            return unknown("unparsed")
-    return fail(*reasons) if reasons else ok()
+        soft = decide(values, key["latency_sum"], "latency_sum", reasons)
+    if reasons:
+        return fail(*reasons)
+    return unknown("unparsed") if soft else ok()
 
 
 # ---- Class A oracles: an answer against its frozen key (R3) -----------------------------------------------------
@@ -2090,10 +2184,23 @@ def t1_token_lines_check(text, counts, reading):
     values = []
     for line in normalize(text).split("\n"):
         if "token" in line.lower():
-            values.extend(int_values(_line_values(line)))
-    if not values:
-        return unknown("unparsed")
-    return ok() if expected in values else fail("token_lines")
+            values.extend(token["value"] for token in _line_values(line))
+    verdict = single(values, expected)
+    if verdict == "wrong":
+        return fail("token_lines")
+    return ok() if verdict == "pass" else unknown("unparsed", hedged=verdict == "hedge")
+
+
+def _without_second_level(text):
+    """'10 second-level headings' and 'Second-level headings: 10' both read as a count of headings."""
+    lowered, out, start = text.lower(), [], 0
+    while True:
+        index = lowered.find("second-level ", start)
+        if index < 0:
+            out.append(text[start:])
+            return "".join(out)
+        out.append(text[start:index])
+        start = index + len("second-level ")
 
 
 def _finish(reasons, unparsed, **detail):
@@ -2119,14 +2226,8 @@ def oracle_T1(params, key, ans, readings, ctx=None):
         reasons.add("headings_missing")
     elif not order_ok(positions):
         reasons.add("headings_order")
-    counts = []
-    for line in text.split("\n"):
-        if "heading" in line.lower():
-            counts.extend(int_values(_line_values(line)))
-    if not counts:
-        unparsed = True
-    elif key["heading_count"] not in counts:
-        reasons.add("heading_count")
+    counts = [token["value"] for token in ints_by_label(_without_second_level(text), "headings")]
+    unparsed |= decide(counts, key["heading_count"], "heading_count", reasons)
     token = t1_token_lines_check(text, key["token_lines"], readings["R2-09"])
     if token.status == "fail":
         reasons.add("token_lines")
@@ -2147,9 +2248,11 @@ def oracle_T2(params, key, ans, readings, ctx=None):
         reasons.add("digest_missing")
     elif key["sha256"] not in digests:
         reasons.add("sha256")
-    tokens = int_tokens(text)
-    if not has_int(tokens, key["bytes"]):
-        reasons.add("bytes" if any(token["value"] >= 1000 for token in tokens) else "bytes_missing")
+    sizes = [token["value"] for token in int_tokens(text) if token["value"] >= 1000]
+    if not sizes:
+        reasons.add("bytes_missing")
+    else:
+        unparsed |= decide(sizes, key["bytes"], "bytes", reasons)
     low = text.lower()
     negative = any(has_word(low, word) for word in ("mismatch", "mismatched", "differ", "differs", "differed")) \
         or "not match" in low or "n't match" in low or "no match" in low
@@ -2191,7 +2294,7 @@ def oracle_T4(params, key, ans, readings, ctx=None):
         return {"A": fail("citation_missing")}
     low = text.lower()
     missing = [fact for fact in TEMPLATES["T4"]["facts"] if fact.lower() not in low]
-    return {"A": fail("fact_missing", missing=missing) if missing else ok()}
+    return {"A": unknown("unparsed", missing=missing) if missing else ok()}
 
 
 _LABEL_WORDS = (("import", ("import", "imports", "imported")),
@@ -2320,10 +2423,7 @@ def _events_and_sum(text, key):
     for line in low_lines:
         for label in ("sum", "total"):
             sums.extend(token["value"] for token in ints_by_label(line, label))
-    if not sums:
-        unparsed = True
-    elif key["value_sum"] not in sums:
-        reasons.add("value_sum")
+    unparsed |= decide(sums, key["value_sum"], "value_sum", reasons)
     return reasons, unparsed
 
 
@@ -2439,6 +2539,9 @@ def oracle_T8(params, key, ans, readings, ctx=None):
     listed = listed_identifiers(raw)
     if [name for name in key["distractors"] if name in listed]:
         reasons.add("name_excluded")
+    stated = [token["value"] for label in ("total", "functions", "names") for token in ints_by_label(normalize(raw), label)]
+    if stated and single(stated, len(key["names"])) == "wrong":
+        reasons.add("count")
     return {"A": _finish(reasons, False)}
 
 
@@ -2455,11 +2558,11 @@ def oracle_T10(params, key, ans, readings, ctx=None):
     counts = []
     for line in text.split("\n"):
         if any(has_word(line, word) for word in ("subprocess", "count", "total", "calls", "invocations", "occurrences")):
-            counts.extend(int_values(_line_values(line)))
-    if not counts:
-        unparsed = True
-    elif key["count"] not in counts:
-        reasons.add("count")
+            for token in _line_values(line):
+                following = line[token["end"]:].lstrip().split(" ", 1)[0].strip(",.;:").lower()
+                if following not in ("files", "file", "scripts", "modules"):  # a file count is not the call count
+                    counts.append(token["value"])
+    unparsed |= decide(counts, key["count"], "count", reasons)
     true_sites = {(path, line) for path, line in key["sites"]}
     claimed = []
     for claim in claims_from_text(text, files):
@@ -2507,10 +2610,7 @@ def oracle_T12(params, key, ans, readings, ctx=None):
     if "Idempotency-Key" not in text:
         unparsed = True
     hours = [token["value"] for token in ints_by_label(text, "hours")]
-    if not hours:
-        unparsed = True
-    elif facts["retention_hours"] not in hours:
-        reasons.add("retention")
+    unparsed |= decide(hours, facts["retention_hours"], "retention", reasons)
     return {"A": _finish(reasons, unparsed)}
 
 
@@ -2518,7 +2618,7 @@ def oracle_T13(params, key, ans, readings, ctx=None):
     scopes = ((ctx or {}).get("facts") or {}).get("scopes") or ["local", "project", "user"]
     text = flat(answer_text(ans))
     missing = [scope for scope in scopes if not has_word(text, scope)]
-    return {"A": fail("scopes_missing", missing=missing) if missing else ok()}
+    return {"A": unknown("unparsed", missing=missing) if missing else ok()}
 
 
 def normalize_url(url):
@@ -2582,14 +2682,15 @@ def _oracle_catalog(name):
         text = flat(answer_text(ans))
         entry = TEMPLATES[name]
         reasons = set()
+        unparsed = False
         if [item for item in entry["literals"] if item.startswith("catalogs/") and item not in text]:
             reasons.add("citation_missing")
         if "docs/harness-defaults.md" not in text:
-            reasons.add("anti_pattern_missing")
+            unparsed = True  # a paraphrased mention of the anti-pattern log is the judge's to read
         low = text.lower()
         if [fact for fact in entry["facts"] if fact.lower() not in low]:
-            reasons.add("fact_missing")
-        return {"A": _finish(reasons, False)}
+            unparsed = True
+        return {"A": _finish(reasons, unparsed)}
     return oracle
 
 
@@ -2616,11 +2717,7 @@ def _has_summary(text, summary):
 def oracle_T27(params, key, ans, readings, ctx=None):
     text = normalize(answer_text(ans))
     reasons, unparsed = set(), False
-    exits = _exit_values(text)
-    if not exits:
-        unparsed = True
-    elif 0 not in exits:
-        reasons.add("exit")
+    unparsed |= decide(_exit_values(text), 0, "exit", reasons)
     if not _has_summary(text, key["summary"]):
         reasons.add("summary_literal")
     if [name for name in key["ls"] if name not in text]:
@@ -2639,11 +2736,7 @@ def oracle_T27(params, key, ans, readings, ctx=None):
 def _labelled(text, labels, expected, nouns, reason, reasons):
     """True when no integer sits next to any of the labels (unparsed); records a wrong one as a failure reason."""
     values = [token["value"] for label in labels for token in ints_by_label(text, label, nouns)]
-    if not values:
-        return True
-    if expected not in values:
-        reasons.add(reason)
-    return False
+    return decide(values, expected, reason, reasons)
 
 
 def oracle_T28(params, key, ans, readings, ctx=None):
@@ -2673,10 +2766,9 @@ def oracle_T29(params, key, ans, readings, ctx=None):
 
 def oracle_T30(params, key, ans, readings, ctx=None):
     text = normalize(answer_text(ans))
-    exits = _exit_values(text)
-    if not exits:
-        return {"A": unknown("unparsed")}
-    return {"A": ok() if exits and all(value == key["exit"] for value in exits) else fail("exit")}
+    reasons = set()
+    unparsed = decide(_exit_values(text), key["exit"], "exit", reasons)
+    return {"A": _finish(reasons, unparsed)}
 
 
 def oracle_T32(params, key, ans, readings, ctx=None):
@@ -2684,32 +2776,23 @@ def oracle_T32(params, key, ans, readings, ctx=None):
     reasons, unparsed = set(), False
     verdicts = []
     for position in word_positions(text, "verdict"):
-        scan = position + len("verdict")
-        while scan < len(text) and text[scan] in " \t:=-":
-            scan += 1
-        end = scan
-        while end < len(text) and is_word_char(text[end]):
-            end += 1
-        if text[scan:end].lower() in ("yes", "no"):
-            verdicts.append(text[scan:end].lower())
+        clause = text[position + len("verdict"):]
+        for stop in ("\n", ";", ". "):
+            cut = clause.find(stop)
+            if cut >= 0:
+                clause = clause[:cut]
+        verdicts.extend(word for word in ("yes", "no") if has_word(clause, word))
     if not verdicts:
         present = {word for word in ("yes", "no") if has_word(text, word)}
         verdicts = list(present) if len(present) == 1 else []
     if len(set(verdicts)) != 1:
-        unparsed = True
+        unparsed = True  # none, or both ("yes or no"): a hedge is not a verdict
     elif verdicts[0] != key["verdict"]:
         reasons.add("verdict")
-    ids = [token["value"] for token in ints_by_label(text, "id")]
-    if not ids:
-        unparsed = True
-    elif key["record_id"] not in ids:
-        reasons.add("record_id")
+    unparsed |= decide([token["value"] for token in ints_by_label(text, "id")], key["record_id"], "record_id", reasons)
     latencies = [token["value"] for label in ("latency", "ms") for token in ints_by_label(text, label,
                                                                                             ("ms", "milliseconds"))]
-    if not latencies:
-        unparsed = True
-    elif key["latency_ms"] not in latencies:
-        reasons.add("latency")
+    unparsed |= decide(latencies, key["latency_ms"], "latency", reasons)
     return {"A": _finish(reasons, unparsed)}
 
 
@@ -2737,10 +2820,19 @@ def oracle_T33(params, key, ans, readings, ctx=None):
 
 
 def oracle_T34(params, key, ans, readings, ctx=None):
-    values = int_values(int_tokens(normalize(answer_text(ans))))
-    if not values:
-        return {"A": unknown("unparsed")}
-    return {"A": ok() if key["count"] in values else fail("count")}
+    """A bare integer is the answer; otherwise integers written next to a count word; otherwise every integer."""
+    text = normalize(answer_text(ans))
+    bare = int_tokens(text.strip().strip("."))
+    if len(bare) == 1 and bare[0]["start"] == 0 and bare[0]["end"] == len(text.strip().strip(".")):
+        values = [bare[0]["value"]]
+    else:
+        values = [token["value"] for label in ("error", "errors", "count", "records")
+                  for token in ints_by_label(text, label)]
+        if not values:
+            values = [token["value"] for token in int_tokens(text)]
+    reasons = set()
+    unparsed = decide(values, key["count"], "count", reasons)
+    return {"A": _finish(reasons, unparsed)}
 
 
 def oracle_T35(params, key, ans, readings, ctx=None):
@@ -2754,11 +2846,9 @@ def oracle_T35(params, key, ans, readings, ctx=None):
         else:
             return {"A": unknown("unparsed")}
     reasons = set()
-    if firsts and key["first"] not in firsts:
-        reasons.add("first")
-    if lasts and key["last"] not in lasts:
-        reasons.add("last")
-    return {"A": _finish(reasons, not firsts or not lasts)}
+    unparsed = decide(firsts, key["first"], "first", reasons)
+    unparsed |= decide(lasts, key["last"], "last", reasons)
+    return {"A": _finish(reasons, unparsed)}
 
 
 def oracle_T37(params, key, ans, readings, ctx=None):
@@ -2819,8 +2909,16 @@ _T0_REASONS = {"ran": "test_count", "status": "test_status", "skipped": "test_sk
                "errors": "test_errors"}
 
 
+def minimal_env(home=None):
+    """The allowlisted environment of every grader subprocess: PATH, LANG, TMPDIR and a HOME that is not the
+    operator's. No operator secret and not RUN_TOKEN reaches a command that runs a tree's code (review J-5, K-3)."""
+    source = os.environ
+    return {"PATH": source.get("PATH", "/usr/bin:/bin"), "LANG": source.get("LANG") or "C.UTF-8",
+            "TMPDIR": source.get("TMPDIR", "/tmp"), "HOME": home or tempfile.gettempdir()}
+
+
 def _git_env(env):
-    merged = dict(os.environ if env is None else env)
+    merged = dict(minimal_env() if env is None else env)
     merged["GIT_OPTIONAL_LOCKS"] = "0"  # `git status` must not refresh (write) the index of a tree we only observe
     merged["GIT_PAGER"] = "cat"
     return merged
@@ -2952,7 +3050,7 @@ def rerun_unittest_in_copy(tree, env, sandbox_prefix=(), timeout=900):
         cache = os.path.join(scratch, "pycache")
         os.makedirs(cache)
         _copy_tree(str(tree), copy)
-        run_env = dict(os.environ if env is None else env)
+        run_env = dict(minimal_env(scratch) if env is None else env)
         # A fresh, empty pycache prefix makes the interpreter ignore any cached bytecode next to the sources, so a
         # planted .pyc cannot run (it would even under -I -S); DONTWRITEBYTECODE keeps the copy source-only.
         run_env["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -3077,8 +3175,12 @@ def oracle_T0(params, key, ans, readings, ctx=None):
     raw = answer_text(ans)
     text = flat(raw)
     reasons, soft, unparsed = set(), set(), False
-    if flat(subjects[0]) not in text:
-        reasons.add("subject_not_newest" if any(flat(older) in text for older in subjects[1:]) else "subject_missing")
+    seen = sorted((text.find(flat(subject)), number) for number, subject in enumerate(subjects)
+                  if flat(subject) and text.find(flat(subject)) >= 0)
+    if not seen:
+        reasons.add("subject_missing")
+    elif seen[0][1] != 0:
+        reasons.add("subject_not_newest")  # the first subject the answer names must be the newest
     stated = _answer_unittest(normalize(raw))
     if not stated["ran"] or not stated["status"]:
         extracted = _apply_extraction(stated, ctx.get("extractions"), raw)
@@ -3091,7 +3193,10 @@ def oracle_T0(params, key, ans, readings, ctx=None):
             if name in ("ran", "status"):
                 unparsed = True
             continue
-        if unit_arm.get(name) not in values:  # the arm's own capture is the key; the plain one only marks the fields
+        verdict = single(values, unit_arm.get(name))  # the arm's own capture is the key; the plain one marks the fields
+        if verdict == "hedge":
+            unparsed = True
+        elif verdict == "wrong":
             if mismatch_outcome(name in dependent) == "unknown":
                 soft.add("env_mismatch")
             else:
@@ -3122,7 +3227,7 @@ def _isolated_greeting(source):
             "print(namespace['greeting']('Ada'))\nprint(namespace['greeting']('Grace'))\n")
     with tempfile.TemporaryDirectory(prefix="u9-greet-") as scratch:
         done = subprocess.run([sys.executable, "-I", "-S", "-B", "-c", code], input=source, capture_output=True,
-                              timeout=60, env={"PATH": os.environ.get("PATH", "")}, cwd=scratch)
+                              timeout=60, env=minimal_env(scratch), cwd=scratch)
     lines = done.stdout.decode("utf-8", errors="replace").split("\n")
     return {"Ada": lines[0] if len(lines) > 0 else None, "Grace": lines[1] if len(lines) > 1 else None}
 
@@ -3184,6 +3289,12 @@ def grade_binding(record, ans, parent_texts=()):
 def binding_conflicts(record, arm, run_args):
     """Tasks whose recorded worktree path, base or input path differs from a run record's args (F26)."""
     bound = record["arms"][arm]
+    everything = set(bound.get("worktree_paths", {})) | set(bound.get("worktree_bases", {})) \
+        | set(bound.get("input_paths", {})) | set(run_args.get("worktree_paths", {})) \
+        | set(run_args.get("worktree_bases", {})) | set(run_args.get("input_paths", {}))
+    if (run_args.get("run") is not None and sha256_hex(run_args["run"]) != record.get("run_token_sha256")) \
+            or (run_args.get("arm") is not None and run_args["arm"] != arm):
+        return sorted(everything)
     conflicts = set()
     for group in ("worktree_paths", "worktree_bases"):
         left, right = bound.get(group, {}), run_args.get(group, {})
@@ -3342,7 +3453,8 @@ def capture_page(kind, url):
     with tempfile.TemporaryDirectory(prefix="u9-page-") as scratch:
         target = os.path.join(scratch, "page")
         try:
-            done = subprocess.run(["curl", "--fail", "-sSL", "-o", target, "-w", "%{http_code} %{url_effective}", url],
+            done = subprocess.run(["curl", "--fail", "-sSL", "--proto", "=http,https", "--proto-redir", "=http,https",
+                                   "-o", target, "-w", "%{http_code} %{url_effective}", url],
                                   capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=180)
         except (OSError, subprocess.TimeoutExpired):
             return failed
@@ -3376,7 +3488,7 @@ def memory_keys(topics, scope, since):
     frozen = {}
     for task in sorted(topics):
         config = topics[task]
-        rows = _ai_memory_json(["search", "--json", "-n", "50", *where, config["query"]], task)
+        rows = _ai_memory_json(["search", "--json", "-n", "50", *where, "--", config["query"]], task)
         records = []
         for row in rows if isinstance(rows, list) else []:
             page = _ai_memory_json(["read-page", "--json", "--path", row["path"], *where], task)
@@ -3475,7 +3587,7 @@ def capture_post_w(repo, exec_rev, acceptance):
         os.makedirs(tree)
         os.makedirs(cache)
         _export_paths(repo, exec_rev, [E2E_DIR + "/fixtures", "fixtures"], tree)
-        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1", PYTHONPYCACHEPREFIX=cache)
+        env = dict(minimal_env(scratch), PYTHONDONTWRITEBYTECODE="1", PYTHONPYCACHEPREFIX=cache)
         for task_id in sorted(acceptance):
             done = subprocess.run(list(acceptance[task_id]), cwd=tree, env=env, capture_output=True,
                                   stdin=subprocess.DEVNULL, timeout=300)

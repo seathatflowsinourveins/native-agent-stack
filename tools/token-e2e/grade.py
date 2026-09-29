@@ -16,8 +16,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
+import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import frozen_checks as fc  # noqa: E402
@@ -306,7 +309,7 @@ def _codex_bindings(document, exec_rev):
     for tree in document.get("trees", []):
         if not isinstance(tree, dict) or not fc.is_hex(tree.get("base"), 40):
             raise fc.Refusal("E_BIND", field="codex_bindings")
-        entry = {"task": tree.get("task"), "slot": tree.get("slot"), "kind": tree.get("kind"),
+        entry = {"task": tree.get("task"), "slot": tree.get("slot"), "arm": tree.get("arm"), "kind": tree.get("kind"),
                  "path": _abs_path(tree.get("path"), "codex_bindings"), "base": tree["base"]}
         sentinel = tree.get("sentinel")
         if sentinel:
@@ -404,16 +407,21 @@ def _run_token(bindings):
 def _tree_for(bindings, family, arm, task_id):
     if family == "claude":
         return bindings["arms"].get(arm, {}).get("worktree_paths", {}).get(task_id)
-    for tree in (bindings.get("codex") or {}).get("trees", []):
-        if tree.get("task") == task_id:
-            return tree["path"]
-    return None
+    trees = [tree for tree in (bindings.get("codex") or {}).get("trees", []) if tree.get("task") == task_id]
+    if not trees:
+        return None
+    named = [tree for tree in trees if tree.get("arm") == arm]
+    if named:
+        return named[0]["path"]
+    if len(trees) == 1 and trees[0].get("arm") is None:
+        return trees[0]["path"]
+    raise fc.Refusal("E_CAPTURE", field="codex_tree")  # several trees and none names this arm
 
 
-def _conditions(bindings, family, arm, token):
-    """(environment, sandbox prefix, conditions record) of the arm and the plain environment (R10)."""
-    plain = {key: value for key, value in os.environ.items()
-             if key not in ("RTK_DB_PATH", "OTEL_RESOURCE_ATTRIBUTES", "CLAUDE_CODE_EFFORT_LEVEL")}
+def _conditions(bindings, family, arm, token, home):
+    """(environment, plain environment, sandbox prefix, conditions record) of the arm (R10). Every environment is an
+    allowlist (PATH, LANG, TMPDIR, a HOME that is not the operator's) plus the frozen names, never the operator's own."""
+    plain = fc.minimal_env(home)
     if family == "claude":
         arm_env = dict(plain, RTK_DB_PATH=os.path.join(bindings["roots"]["E2E_DIR"], "rtk.db"),
                        OTEL_RESOURCE_ATTRIBUTES=f"ecosystem.task.id={token}")
@@ -421,6 +429,8 @@ def _conditions(bindings, family, arm, token):
     conditions = (bindings.get("codex") or {}).get("conditions")
     if not conditions:
         return plain, plain, (), {"kind": "codex_sandbox", "verified": False, "reason": "conditions_unfrozen"}
+    plain_home = plain
+    plain = dict(plain_home, **{str(name): str(value) for name, value in (conditions.get("env") or {}).items()})
 
     def prefix(cwd):
         argv = [conditions.get("launcher") or "codex", "sandbox", "-C", str(cwd)]
@@ -429,7 +439,7 @@ def _conditions(bindings, family, arm, token):
         for item in conditions.get("config", []):
             argv += ["-c", item]
         return argv + ["--"]
-    return plain, plain, prefix, {"kind": "codex_sandbox", "verified": None}
+    return plain, plain_home, prefix, {"kind": "codex_sandbox", "verified": None}
 
 
 def _verify_sandbox(prefix, tree, conditions):
@@ -452,7 +462,15 @@ def capture_arm(args, spec, bindings):
     if args.family == "claude" and args.arm not in bindings["arms"]:
         raise fc.Refusal("E_ARGS", field="arm")
     token = _run_token(bindings)
-    arm_env, plain_env, prefix, conditions = _conditions(bindings, args.family, args.arm, token)
+    home = tempfile.mkdtemp(prefix="u9-home-")
+    try:
+        return _capture_arm(args, spec, bindings, token, home)
+    finally:
+        shutil.rmtree(home, ignore_errors=True)
+
+
+def _capture_arm(args, spec, bindings, token, home):
+    arm_env, plain_env, prefix, conditions = _conditions(bindings, args.family, args.arm, token, home)
     name = f"arm-{args.arm}-{args.phase}.json"
     pre_name = f"arm-{args.arm}-pre-arm.json"
     pre = None
@@ -499,6 +517,16 @@ def capture_arm(args, spec, bindings):
     else:
         record["exec_checkout"] = {"error": "missing"}
     if args.phase == "post-arm":
+        record["builders"] = {}
+        for task in _arm_tasks(spec, "T31", args.family, args.arm):
+            tree = _tree_for(bindings, args.family, args.arm, task["id"])
+            if tree and os.path.isdir(tree):
+                target = os.path.join(tree, "fixtures", "before.py")
+                data = fc.DirSources(tree).read("fixtures/before.py") if os.path.exists(target) else None
+                record["builders"][task["id"]] = {
+                    "head": fc.tree_state(tree)["head"], "entries": fc.porcelain_entries(tree),
+                    "before_sha256": fc.sha256_hex(data) if data is not None else None,
+                    "before_py": data.decode("utf-8", errors="replace")[:65536] if data is not None else None}
         since = fc.parse_utc(pre.get("completed_at")) or 0
         record["processes"] = fc.list_processes(since - 1)
         record["clones"] = {}
@@ -556,11 +584,18 @@ HANDLERS = {"spec": cmd_spec, "bind": cmd_bind, "keys": cmd_keys, "capture": cmd
 
 
 def main(argv=None):
+    command = "usage"
     try:
         args = build_parser().parse_args(argv)
-        return HANDLERS[args.command](args) or 0
+        command = args.command
+        return HANDLERS[command](args) or 0
     except fc.Refusal as stop:
         sys.stderr.write(str(stop) + "\n")
+        return 2
+    except Exception:  # noqa: BLE001 - a crash is a refusal (exit 2), never "graded and not passing" (exit 1)
+        sys.stderr.write(f"E_INTERNAL stage={command}\n")
+        if os.environ.get("GRADE_DEBUG") == "1":
+            traceback.print_exc()
         return 2
 
 
