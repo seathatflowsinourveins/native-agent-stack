@@ -275,6 +275,7 @@ mcp) [ "$2" = "list" ] && cat "$d/claude.mcp" ;;
   *) cat "$d/claude.p.plain.json" ;;
   esac ;;
 esac
+if [ "$1" = "-p" ] && [ -f "$d/claude.p.exit" ]; then exit "$(cat "$d/claude.p.exit")"; fi
 exit 0
 """
 FAKE_VERSION_TOOL = """#!/bin/sh
@@ -1337,6 +1338,28 @@ class CapacityTests(HostCase):
         self.assertNotEqual(cwd, self.host.repo.resolve())
         self.assertNotIn(self.host.repo.resolve(), cwd.parents)
         self.assertFalse(cwd.exists(), "the temporary working directory is removed")
+
+    def test_a_probe_that_exits_nonzero_still_reports_the_windows_it_returned(self):
+        """At the session limit the call is rejected (exit 1, HTTP 429), but its rate_limit_event still carries the numbers, and
+        they are the numbers the opening rule of a run window reads."""
+        rejected = json.loads(json.dumps(CLAUDE_P_ARRAY))
+        rejected[2]["rate_limit_info"]["status"] = "rejected"
+        rejected[2]["rate_limit_info"]["unifiedWindows"]["five_hour"]["utilization"] = 1.06
+        rejected[3] = {"type": "result", "subtype": "success", "is_error": True, "api_error_status": 429, "result": "limit reached"}
+        self.host.fake_text("claude.p.verbose.json", json.dumps(rejected))
+        self.host.fake_text("claude.p.exit", "1")
+        cap = self.capture("r")
+        self.assertEqual(cap.status("capacity.claude.five_hour_utilization_fraction"), "ok")
+        self.assertEqual(cap.value("capacity.claude.five_hour_utilization_fraction"), 1.06)
+        self.assertEqual(cap.value("capacity.claude.seven_day_utilization_fraction"), 0.78)
+        self.host.fake_text("claude.p.verbose.json", "not json at all")
+        failed = self.capture("s")  # a failed call that returned no event is an error and never a value
+        self.assertEqual(failed.status("capacity.claude.five_hour_utilization_fraction"), "error")
+        self.assertEqual(failed.item("capacity.claude.five_hour_utilization_fraction")["reason"], "exit")
+        self.host.fake_text("claude.p.verbose.json", json.dumps([e for e in CLAUDE_P_ARRAY if e["type"] != "rate_limit_event"]))
+        again = self.capture("t")
+        self.assertEqual(again.status("capacity.claude.seven_day_resets_at_utc"), "error")
+        self.assertEqual(again.item("capacity.claude.seven_day_resets_at_utc")["reason"], "exit")
 
     def test_no_usage_probe_skips_the_model_call(self):
         cap = self.capture("q", probe=False)
