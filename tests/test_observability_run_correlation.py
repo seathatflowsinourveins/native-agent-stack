@@ -10,6 +10,17 @@ Sources (reviewed 2026-09-27):
 - openai/codex rust-v0.157.1, codex-rs/otel/src/tool_result.rs:25-110,
   codex-rs/otel/src/events/shared.rs and codex-rs/core/src/tools/call_trace.rs
 
+Codex launch tag and call ids (reviewed 2026-09-29, openai/codex rust-v0.157.1 = 36650394):
+- codex-rs/otel/src/provider.rs:53,360-389: otel.environment becomes the resource
+  attribute env (codex-rs/config/src/types.rs:52,605-606; codex-rs/core/src/otel_init.rs:88)
+- codex-rs/otel/src/tool_result.rs:61 and codex-rs/otel/src/events/session_telemetry.rs:1112,1121:
+  call_id on codex.tool_result and codex.tool_decision
+- codex-rs/core/src/tools/code_mode/delegate.rs:323 with codex-rs/code-mode-protocol/src/lib.rs:51:
+  nested code-mode calls get exec-<uuid v4> ids
+- codex-rs/core/src/agent_communication.rs:44-66: spawn events carry no conversation.id
+- open-telemetry/opentelemetry-collector-contrib v0.161.0, pkg/ottl/ottlfuncs/README.md
+  (delete_key; IsMatch uses regexp.MatchString and returns false for nil)
+
 The subprocess/OTLP pattern follows test_observability_tool_names.py. Native
 tests use the documented installed pins and synthetic records only; they skip
 when the binaries or PyYAML are absent. This is local integration evidence,
@@ -26,6 +37,7 @@ import time
 import unittest
 import urllib.parse
 import urllib.request
+import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +51,21 @@ try:
     import yaml
 except ImportError:
     yaml = None
+
+# Codex launch-tag guard: the registry-name character class, at most 128 characters.
+ENV_GUARD = ('delete_key(attributes, "env") where attributes["env"] != nil and not IsMatch(attributes["env"], '
+             '"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")')
+
+
+def keep_list(section: str) -> list[str]:
+    """The first keep_keys(attributes, [...]) list in a section, located with str.index (a linear scan)."""
+    start = section.index("keep_keys(attributes, [") + len("keep_keys(attributes, ")
+    return json.loads(section[start:section.index("]", start) + 1])
+
+
+def statement_lines(section: str) -> list[str]:
+    """Statement-depth YAML list items of one transform group, without comments (line scan, no regex)."""
+    return [line[len("          - "):] for line in section.splitlines() if line.startswith("          - ")]
 
 
 class CollectorProfileTests(unittest.TestCase):
@@ -55,6 +82,29 @@ class CollectorProfileTests(unittest.TestCase):
                 self.assertIn(key, log_keys)
         for key in ("ecosystem.task.id", "workflow.run_id", "tool_use_id", "cost_usd"):
             self.assertNotIn(f'"{key}"', metrics)
+
+    def test_codex_launch_tag_and_call_id_are_kept(self):
+        # Codex exports otel.environment as the logs resource attribute env (provider.rs:53,381) and call_id on
+        # codex.tool_result and codex.tool_decision (tool_result.rs:61; session_telemetry.rs:1112,1121).
+        privacy = COLLECTOR.read_text().partition("  transform/privacy:\n")[2]
+        logs, _, metrics = privacy.partition("    metric_statements:\n")
+        metrics = metrics.partition("  delta_to_cumulative:\n")[0]
+        resource = logs.partition("      - context: scope\n")[0]
+        records = logs.partition("      - context: log\n")[2]
+        statements = statement_lines(resource)
+        keep = next(i for i, s in enumerate(statements) if s.startswith("keep_keys(attributes, ["))
+        with self.subTest(check="env shape guard before the resource allowlist"):
+            self.assertIn(ENV_GUARD, statements[:keep])
+        resource_keys = keep_list(resource)
+        with self.subTest(check="resource allowlist keeps env but not host.name"):
+            self.assertIn("env", resource_keys)
+            self.assertNotIn("host.name", resource_keys)
+        log_keys = keep_list(records)
+        with self.subTest(check="log allowlist keeps call_id right after tool_use_id"):
+            self.assertEqual(log_keys[log_keys.index("tool_use_id") + 1], "call_id")
+        for key in ("env", "call_id"):
+            with self.subTest(check="metric statements never keep it", key=key):
+                self.assertNotIn(f'"{key}"', metrics)
 
     @unittest.skipUnless(yaml, "optional PyYAML structural check")
     def test_loki_indexes_only_service_name(self):
@@ -374,6 +424,124 @@ class NativeRunCorrelationTests(unittest.TestCase):
         self.assertEqual(len(self.query_rows(selector + ' | tool_namespace="mcp__context_mode"')), 2)
         series = self.api("series", **{"match[]": selector, "start": str(self.start), "end": str(time.time_ns())})
         self.assertEqual(series, [{"service_name": "codex_exec"}])
+
+    def test_codex_launch_tag_and_call_id_reach_loki(self):
+        """The launch tag (resource env) and call ids join Codex records in Loki; malformed values are dropped."""
+        self.maxDiff = None  # Report every observed count on failure.
+        self.start = time.time_ns() - 1_000_000_000
+        tag = "synthetic-run.B.task.1"
+        # call_ plus 24 letters/digits for model calls; exec-<uuid v4> for nested code-mode calls. UUIDs are
+        # assembled at runtime: the publication scan (scripts/validate.py) rejects UUID literals.
+        model_call = "call_" + "SyntheticCallIdentifier1"
+        nested_call = f"exec-{uuid.UUID(int=0xAAAAAAAA_BBBB_4CCC_8DDD_EEEEEEEEEEEE)}"
+        longest_call = "call_" + "b" * 123  # 128 characters: the guard's upper bound
+        untagged_call = "call_" + "SecondResourceIdentifier"
+        dropped = {"129-character id": "call_" + "d" * 124, "id with spaces": "call id with spaces",
+                   "tag with spaces": "synthetic run B", "host name": "synthetic-host-name", "content": self.SECRET}
+        result = {"event.name": "codex.tool_result", "conversation.id": "synthetic-conversation",
+                  "tool_name": "exec_command", "tool_namespace": "functions", "duration_ms": "3", "success": "true",
+                  "arguments": json.dumps({"cmd": self.SECRET}), "output": self.SECRET}
+        tagged = [
+            {"event.name": "codex.tool_decision", "conversation.id": "synthetic-conversation",
+             "tool_name": "exec_command", "tool_namespace": "functions", "call_id": model_call,
+             "decision": "approved", "source": "config"},
+            {**result, "call_id": model_call},
+            {**result, "call_id": nested_call},
+            {**result, "call_id": longest_call},
+            {**result, "call_id": dropped["129-character id"]},
+            {**result, "call_id": dropped["id with spaces"]},
+            {"event.name": "codex.agent_communication", "kind": "spawn", "state": "send", "content": self.SECRET,
+             "sender_thread_id": str(uuid.UUID(int=0x11111111_2222_4333_8444_555555555555)),
+             "receiver_thread_id": str(uuid.UUID(int=0x66666666_7777_4888_8999_AAAAAAAAAAAA))},
+        ]
+        # Codex's logs resource: service.name, service.version, env and host.name (provider.rs:360-389).
+        resources = [
+            ({"service.name": "codex_exec", "service.version": "0.157.1", "env": tag,
+              "host.name": dropped["host name"]}, tagged),
+            ({"service.name": "codex_exec", "service.version": "0.157.1", "env": dropped["tag with spaces"]},
+             [{**result, "call_id": untagged_call}]),
+        ]
+        body = {"resourceLogs": [
+            {"resource": {"attributes": otlp_attributes(attributes)},
+             "scopeLogs": [{"scope": {"name": "synthetic"}, "logRecords": [
+                 {"timeUnixNano": str(time.time_ns() + i), "body": {"stringValue": self.SECRET},
+                  "attributes": otlp_attributes(record)} for i, record in enumerate(records)]}]}
+            for attributes, records in resources]}
+        request = urllib.request.Request(f"http://127.0.0.1:{self.otlp}/v1/logs", data=json.dumps(body).encode(),
+                                         headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(request, timeout=10) as response:
+            self.assertFalse(json.load(response).get("partialSuccess"))
+
+        selector = '{service_name="codex_exec"}'
+        deadline = time.monotonic() + 30
+        while len(self.query_rows(selector)) < 8 and time.monotonic() < deadline:
+            time.sleep(0.2)
+        launch = selector + f' | env="{tag}"'
+        results = launch + ' | event_name="codex.tool_result"'
+        queries = {
+            "all records": selector,
+            "records with the launch tag": launch,
+            "tagged spawn event without conversation_id":
+                launch + ' | event_name="codex.agent_communication" | conversation_id=""',
+            "tagged decision for the model call": launch + f' | event_name="codex.tool_decision" | call_id="{model_call}"',
+            "tagged result for the model call": results + f' | call_id="{model_call}"',
+            "tagged result for the nested call": results + f' | call_id="{nested_call}"',
+            "tagged result for the 128-character id": results + f' | call_id="{longest_call}"',
+            "tagged results whose call_id was dropped": results + ' | call_id=""',
+            "records without a launch tag": selector + ' | env=""',
+            "untagged result keeping its call_id": selector + f' | env="" | call_id="{untagged_call}"',
+        }
+        observed = {name: len(self.query_rows(query)) for name, query in queries.items()}
+        self.assertEqual(observed, {
+            "all records": 8, "records with the launch tag": 7, "tagged spawn event without conversation_id": 1,
+            "tagged decision for the model call": 1, "tagged result for the model call": 1,
+            "tagged result for the nested call": 1, "tagged result for the 128-character id": 1,
+            "tagged results whose call_id was dropped": 2, "records without a launch tag": 1,
+            "untagged result keeping its call_id": 1,
+        })
+        loki = json.dumps(self.api("query_range", query=selector, start=str(self.start), end=str(time.time_ns()),
+                                   direction="forward", limit="100"))
+        for name, value in dropped.items():
+            with self.subTest(dropped=name, sink="Loki"):
+                self.assertFalse(value in loki, f"{name} reached Loki")
+        series = self.api("series", **{"match[]": selector, "start": str(self.start), "end": str(time.time_ns())})
+        self.assertEqual(series, [{"service_name": "codex_exec"}], "the tag and call ids must not become index labels")
+
+        deadline = time.monotonic() + 10
+        while True:
+            contents = self.output.read_text() if self.output.exists() else ""
+            try:
+                exported = [json.loads(line) for line in contents.splitlines()]
+            except json.JSONDecodeError:
+                exported = []  # The file exporter may still be finishing a line.
+            exported_records = [(group["resource"], record) for batch in exported for group in batch["resourceLogs"]
+                                for scope in group["scopeLogs"] for record in scope["logRecords"]]
+            if len(exported_records) >= 8 or time.monotonic() >= deadline:
+                break
+            time.sleep(0.1)
+        self.assertEqual(len(exported_records), 8)
+        for name, value in dropped.items():
+            with self.subTest(dropped=name, sink="event file"):
+                self.assertFalse(value in contents, f"{name} reached the event file")
+        # Name the kept values so a failure prints no fixture identifier.
+        names = {tag: "launch tag", model_call: "model call", nested_call: "nested call",
+                 longest_call: "128-character id", untagged_call: "untagged call"}
+        kept = {}
+        for resource, record in exported_records:
+            env = {a["key"]: next(iter(a["value"].values())) for a in resource["attributes"]}.get("env")
+            attrs = {a["key"]: next(iter(a["value"].values())) for a in record["attributes"]}
+            key = (names.get(env, env and "unexpected"), attrs.get("event.name"),
+                   names.get(attrs.get("call_id"), attrs.get("call_id") and "unexpected"))
+            kept[key] = kept.get(key, 0) + 1
+        self.assertEqual(kept, {
+            ("launch tag", "codex.tool_decision", "model call"): 1,
+            ("launch tag", "codex.tool_result", "model call"): 1,
+            ("launch tag", "codex.tool_result", "nested call"): 1,
+            ("launch tag", "codex.tool_result", "128-character id"): 1,
+            ("launch tag", "codex.tool_result", None): 2,
+            ("launch tag", "codex.agent_communication", None): 1,
+            (None, "codex.tool_result", "untagged call"): 1,
+        })
 
 
 if __name__ == "__main__":
