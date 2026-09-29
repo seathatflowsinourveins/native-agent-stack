@@ -132,6 +132,55 @@ class PraU1EvidenceTooling(unittest.TestCase):
         self.assertEqual(totals, {"inputs": 10, "analysed": 10, "identical": 10, "different": 0, "a_throws": 0, "b_throws": 0})
 
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_scaling_times_commandinvocations_by_size_and_shape(self):
+        """scaling.mjs prints, per shape, the length of the text and the best time at each size, and the largest growth from one size to the
+        next where the earlier time is measurable; a run over the limit ends the shape."""
+        with tempfile.TemporaryDirectory() as tmp:
+            stub = Path(tmp) / "kernel.mjs"
+            stub.write_text("export const commandInvocations = (text) => [{ lane: null, length: text.length }]\n")
+            out = self.run_node("scaling.mjs", "--kernel", stub, "--sizes", "50,100,200", "--shapes", "words,comments", "--runs", "2")
+        self.assertEqual(out["sizes"], [50, 100, 200])
+        self.assertEqual(sorted(out["shapes"]), ["comments", "words"])
+        for name, shape in out["shapes"].items():
+            self.assertEqual(len(shape["chars"]), 3, name)
+            self.assertEqual(len(shape["ms"]), 3, name)
+            self.assertTrue(all(isinstance(t, (int, float)) and t >= 0 for t in shape["ms"]), name)
+            self.assertIn("max_ratio", shape)
+        self.assertEqual(out["shapes"]["comments"]["chars"], [100, 200, 400])  # '# c\n' x ceil(2n / 4)... = about 2n characters
+        self.assertRegex(out["kernel_sha256"], r"^[0-9a-f]{12}$")
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    @unittest.skipUnless((PARSER_DIR / "package-lock.json").is_file(), "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    def test_update_round2_splices_the_new_sections_into_counts(self):
+        """update-round2.py re-runs only the shape scan, the whole-record identity check against a baseline kernel and the scaling
+        measurement, and writes them (with the corpus and its cutoff) into a copy of counts.json, leaving every other section alone."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            corpus = tmp / "real.json"
+            corpus.write_text(json.dumps(SHAPE_TEXTS))
+            scanner = tmp / "scanner.mjs"
+            scanner.write_text("export const commandInvocations = () => [{ lane: 'qmd' }]\n")
+            counts = tmp / "counts.json"
+            counts.write_text(json.dumps({"kernels": {"new_sha256": "earlier"}, "differential": {"real": {"differ": 113}}}))
+            done = subprocess.run(["python3", str(EVIDENCE / "update-round2.py"), "--repo", str(ROOT), "--scanner", str(scanner), "--baseline", str(KERNEL),
+                                   "--work", str(tmp / "work"), "--real", str(corpus), "--real-until", "2026-09-29T07:08:07Z", "--until-reconstructed",
+                                   "--identity", f"synthetic={corpus}",
+                                   "--sizes", "50,100", "--counts", str(counts)], capture_output=True, text=True, timeout=300, check=False)
+            self.assertEqual(done.returncode, 0, done.stderr[-2000:])
+            out = json.loads(counts.read_text())
+        self.assertEqual(out["differential"], {"real": {"differ": 113}})  # every other section is left alone
+        self.assertEqual(out["kernels"], {"new_sha256": "earlier"})
+        self.assertEqual(out["corpus"], {"source": "real-commands.mjs", "until": "2026-09-29T07:08:07Z", "until_reconstructed": True, "distinct_shell_texts": 10})
+        self.assertEqual(out["shapes"]["overturn_1"], EXPECTED_OVERTURN)
+        self.assertEqual(out["shapes"]["grammar_limit_scanner_reads_more"], 6)
+        identity = out["lanes_identity"]
+        self.assertEqual(identity["baseline_sha256"], identity["kernel_sha256"])  # the baseline here is the kernel itself
+        self.assertEqual(identity["corpora"], {"synthetic": {"inputs": 10, "analysed": 10, "identical": 10, "different": 0, "a_throws": 0, "b_throws": 0}})
+        self.assertEqual(sorted(out["scaling"]), ["baseline", "kernel"])
+        self.assertEqual(out["scaling"]["kernel"]["sizes"], [50, 100])
+        self.assertEqual(out["round2"]["sections"], ["corpus", "shapes", "lanes_identity", "scaling"])
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_real_commands_reproduces_a_corpus_as_of_a_timestamp(self):
         """--until keeps the shell texts first seen at or before the instant, so a later run rebuilds the corpus of an earlier one."""
         rows = [transcript_row("echo first", "2026-09-29T07:00:00.000Z"), transcript_row("echo second", "2026-09-29T07:08:06.392Z"),
