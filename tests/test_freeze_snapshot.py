@@ -35,6 +35,7 @@ import time
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 import tests
 
@@ -113,6 +114,32 @@ ADOPTION_PINS = {
         {"id": "claude-code", "pinned_version": "2.1.284", "checked": True, "matches_pin": True},
         {"id": "context-mode", "pinned_version": "1.0.169", "checked": False, "matches_pin": None}]}],
     "pinned_versions_match": True}
+BEHAVIOUR_KEYS = (  # (id suffix, the settings key as the upstream settings reference writes it)
+    ("permissions_default_mode", "permissions.defaultMode"), ("permissions_allow_count", "permissions.allow"),
+    ("permissions_deny_count", "permissions.deny"), ("permissions_ask_count", "permissions.ask"),
+    ("skip_dangerous_mode_permission_prompt", "skipDangerousModePermissionPrompt"),
+    ("cross_session_inbound", "crossSessionInbound"), ("auto_continue_at_usage_limit", "autoContinueAtUsageLimit"),
+    ("auto_updates_channel", "autoUpdatesChannel"), ("ultracode", "ultracode"), ("enable_workflows", "enableWorkflows"),
+    ("workflow_size_guideline", "workflowSizeGuideline"), ("switch_models_on_flag", "switchModelsOnFlag"),
+    ("model", "model"), ("effort_level", "effortLevel"))
+USER_SETTINGS_BEHAVIOUR = {  # merged into the fixture's user settings (which already hold model, effortLevel, advisorModel)
+    "permissions": {"defaultMode": "bypassPermissions", "deny": ["Read(~/.ssh/**)", "Bash(rm -rf /:*)", "WebFetch"],
+                    "ask": ["Bash(git push:*)", "Edit"]},
+    "skipDangerousModePermissionPrompt": True, "crossSessionInbound": "accept", "autoContinueAtUsageLimit": True,
+    "autoUpdatesChannel": "latest", "ultracode": True, "enableWorkflows": True, "workflowSizeGuideline": "unrestricted",
+    "switchModelsOnFlag": False}
+PROJECT_SETTINGS_BEHAVIOUR = {  # the fixture's project settings; the values differ from the user file wherever a key exists in both
+    "permissions": {"deny": ["Read(./.env)", "Bash(curl:*)"], "allow": ["Bash(git status)"]},
+    "crossSessionInbound": "hold", "autoContinueAtUsageLimit": False, "autoUpdatesChannel": "stable", "ultracode": False,
+    "enableWorkflows": False, "workflowSizeGuideline": "small", "switchModelsOnFlag": True, "model": "opus[1m]",
+    "effortLevel": "high"}
+EXPECTED_BEHAVIOUR = {  # (user, project) by id suffix; a boolean is compared by type too, and an absent key is `unset` (a count: 0)
+    "permissions_default_mode": ("bypassPermissions", "unset"), "permissions_allow_count": (0, 1),
+    "permissions_deny_count": (3, 2), "permissions_ask_count": (2, 0),
+    "skip_dangerous_mode_permission_prompt": (True, "unset"), "cross_session_inbound": ("accept", "hold"),
+    "auto_continue_at_usage_limit": (True, False), "auto_updates_channel": ("latest", "stable"), "ultracode": (True, False),
+    "enable_workflows": (True, False), "workflow_size_guideline": ("unrestricted", "small"),
+    "switch_models_on_flag": (False, True), "model": ("sonnet", "opus[1m]"), "effort_level": ("xhigh", "high")}
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -328,7 +355,7 @@ class FakeHost:
 
     def _build_home(self) -> None:
         home = self.home
-        settings = {"advisorModel": "opus", "effortLevel": "xhigh", "model": "sonnet",
+        settings = {"advisorModel": "opus", "effortLevel": "xhigh", "model": "sonnet", **USER_SETTINGS_BEHAVIOUR,
                     "modelSettings": {"opus": {"effort": "xhigh"}},
                     "env": {"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1", "CLAUDE_CODE_SUBAGENT_MODEL": "opus",
                             "PATH": "/fake/bin:/fake/other", "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:4318",
@@ -378,7 +405,7 @@ class FakeHost:
         for role in ROLES:
             for folder in ("adoption/agents/claude", "examples/claude-native/agents", ".claude/agents"):
                 self.write(repo / folder / f"{role}.md", f"role body {role}\n")
-        self.write(repo / ".claude" / "settings.json", json.dumps({"effortLevel": "xhigh", "env": {
+        self.write(repo / ".claude" / "settings.json", json.dumps({**PROJECT_SETTINGS_BEHAVIOUR, "env": {
             "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}}, indent=2))
         for name in ("README.md", "run_gate.py", "assertions.js", "codex-profile-exec", "briefs/m13.md"):
             self.write(repo / "tools" / "capability-gate" / name, f"gate {name} v1\n")
@@ -627,6 +654,23 @@ class CatalogueTests(HostCase):
             for copy in (*COPIES, "identical_across_copies"):
                 self.assertIn(f"roles.{role}.{copy}", ids)
 
+    def test_list_frozen_names_every_behaviour_setting_of_each_settings_file(self):
+        rows = {row["id"]: row for row in json.loads(self.list_frozen("--all", "--json").stdout)}
+        listed = {line.split("\t")[0] for line in self.list_frozen().stdout.splitlines() if line.strip()}
+        for kind, where in (("user", "~/.claude/settings.json"), ("project", ".claude/settings.json"),
+                            ("local", ".claude/settings.local.json")):
+            for suffix, key in BEHAVIOUR_KEYS + (("advisor_model", "advisorModel"),):
+                item_id = f"claude.settings.{kind}.{suffix}"
+                with self.subTest(item=item_id):
+                    self.assertIn(item_id, rows)
+                    self.assertEqual(rows[item_id]["class"], "frozen")
+                    self.assertFalse(rows[item_id]["family"])
+                    self.assertIn(key, rows[item_id]["how"])
+                    self.assertIn(where, rows[item_id]["how"])
+                    self.assertIn(item_id, listed, "listed without --all")
+        for suffix in ("permissions_allow_count", "permissions_deny_count", "permissions_ask_count"):
+            self.assertIn("never a rule", rows[f"claude.settings.user.{suffix}"]["how"])
+
     def test_the_readme_table_covers_every_catalogue_id_and_names_no_other_one(self):
         """Every backticked id pattern of the README (`a.{b,c}.<d>.*`) is matched against list-frozen, both ways."""
         readme = (DEFAULT_TOOL.parent / "README.md").read_text(encoding="utf-8")
@@ -806,6 +850,20 @@ class PrivacyTests(HostCase):
         self.assertEqual(paths["claude.settings.user.sha256"], "~/.claude/settings.json")
         self.assertEqual(paths["repo.sealed.RUNBOOK.md"], f"<repo>/{SEALED}/RUNBOOK.md")
         self.assertEqual(paths["services.ecosystem-otelcol.config_sha256"], "~/.config/ecosystem-observability/collector.yaml")
+
+    def test_an_environment_value_equal_to_a_printed_setting_value_does_not_refuse_the_capture(self):
+        """A documented mode or a model alias that the tool prints from a settings file may equal an environment value."""
+        document = {"permissions": {"defaultMode": "bypassPermissions"}, "workflowSizeGuideline": "unrestricted",
+                    "model": "claude-opus-4-5-20251101", "advisorModel": "claude-sonnet-5-5-20260101"}
+        self.host.write(self.host.home / ".claude" / "settings.json", json.dumps(document))
+        env = self.host.env(FREEZE_LOOKALIKE_MODE="bypassPermissions", FREEZE_LOOKALIKE_SIZE="unrestricted",
+                            FREEZE_LOOKALIKE_MODEL="claude-opus-4-5-20251101", FREEZE_LOOKALIKE_ADVISOR="claude-sonnet-5-5-20260101")
+        cap = self.host.capture(self.tool, "lookalike", env=env)
+        self.assertEqual(cap.proc.returncode, 0, cap.proc.stdout + cap.proc.stderr)
+        self.assertEqual(cap.value("claude.settings.user.permissions_default_mode"), "bypassPermissions")
+        self.assertEqual(cap.value("claude.settings.user.workflow_size_guideline"), "unrestricted")
+        self.assertEqual(cap.value("claude.settings.user.model"), "claude-opus-4-5-20251101")
+        self.assertEqual(cap.value("claude.settings.user.advisor_model"), "claude-sonnet-5-5-20260101")
 
     def test_capture_refuses_when_an_environment_value_would_be_written(self):
         """A value of the environment that the output would contain (here the claude version line) stops the capture."""
@@ -1354,6 +1412,164 @@ class SettingsTests(HostCase):
         self.settings("user", {"env": {"CLAUDE_CODE_EFFORT_LEVEL": ""}})
         self.assertIs(self.capture("t").value(prefix + "effort_level_env_unset"), False, "set but empty is set")
 
+    def user_document(self) -> dict:
+        return json.loads((self.host.home / ".claude" / "settings.json").read_text(encoding="utf-8"))
+
+    def test_behaviour_settings_of_the_user_and_project_files(self):
+        """Each requested key in each file. The values differ between the two files, so a read of the wrong file shows."""
+        cap = self.capture("b")
+        for suffix, (user_value, project_value) in EXPECTED_BEHAVIOUR.items():
+            for kind, expected in (("user", user_value), ("project", project_value)):
+                item_id = f"claude.settings.{kind}.{suffix}"
+                with self.subTest(item=item_id):
+                    self.assertEqual(cap.status(item_id), "ok")
+                    self.assertEqual(cap.value(item_id), expected)
+                    self.assertIs(type(cap.value(item_id)), type(expected), "a boolean stays a boolean and a count an integer")
+        for suffix, _ in BEHAVIOUR_KEYS:  # the fixture's local file is `{"env": {}}`: nothing is set there
+            with self.subTest(item=f"claude.settings.local.{suffix}"):
+                self.assertEqual(cap.value(f"claude.settings.local.{suffix}"), 0 if suffix.endswith("_count") else "unset")
+        self.assertEqual(cap.value("claude.settings.user.advisor_model"), "opus")
+        self.assertEqual(cap.value("claude.settings.project.advisor_model"), "unset", "the key is absent")
+
+    def test_absent_and_undocumented_behaviour_settings_are_classes_never_values(self):
+        self.settings("user", {})
+        cap = self.capture("a")
+        for suffix, _ in BEHAVIOUR_KEYS:
+            with self.subTest(item=suffix):
+                self.assertEqual(cap.value(f"claude.settings.user.{suffix}"), 0 if suffix.endswith("_count") else "unset")
+        marker = "zz-undocumented-value-8d2c4e"
+        self.settings("user", {"permissions": {"defaultMode": marker, "allow": marker, "deny": {"a": 1}, "ask": None},
+                               "crossSessionInbound": "ACCEPT", "autoUpdatesChannel": 5,
+                               "skipDangerousModePermissionPrompt": "yes", "autoContinueAtUsageLimit": {"x": marker},
+                               "ultracode": 1, "enableWorkflows": None, "workflowSizeGuideline": marker,
+                               "switchModelsOnFlag": [], "model": marker.upper(), "effortLevel": "max"})
+        result = self.host.capture(self.tool, "w")
+        self.assertEqual(result.proc.returncode, 0, result.proc.stdout + result.proc.stderr)
+        for suffix in ("permissions_default_mode", "cross_session_inbound", "auto_updates_channel",
+                       "skip_dangerous_mode_permission_prompt", "auto_continue_at_usage_limit", "ultracode", "enable_workflows",
+                       "workflow_size_guideline", "switch_models_on_flag", "model", "effort_level"):
+            with self.subTest(item=suffix):
+                self.assertEqual(result.value(f"claude.settings.user.{suffix}"), "other")
+        for suffix in ("permissions_allow_count", "permissions_deny_count", "permissions_ask_count"):
+            with self.subTest(item=suffix):
+                self.assertEqual(result.status(f"claude.settings.user.{suffix}"), "error")
+                self.assertEqual(result.item(f"claude.settings.user.{suffix}")["reason"], "unrecognized_value")
+                self.assertIsNone(result.value(f"claude.settings.user.{suffix}"))
+        outputs = "\n".join([result.proc.stdout, result.proc.stderr, result.sanitized.read_text(encoding="utf-8"),
+                             result.full.read_text(encoding="utf-8")])
+        self.assertNotIn(marker, outputs.lower(), "an undocumented value is never printed")
+        self.settings("user", {"permissions": "not-an-object", "model": 7})
+        broken = self.capture("x")
+        self.assertEqual(broken.value("claude.settings.user.permissions_default_mode"), "other")
+        self.assertEqual(broken.status("claude.settings.user.permissions_deny_count"), "error")
+        self.assertEqual(broken.value("claude.settings.user.model"), "other")
+
+    def test_missing_and_unparsable_settings_files_give_missing_and_error_for_every_behaviour_key(self):
+        (self.host.repo / ".claude" / "settings.local.json").unlink()
+        self.settings("project", "{ not json")
+        cap = self.capture("f")
+        for suffix, _ in BEHAVIOUR_KEYS:
+            with self.subTest(item=suffix):
+                self.assertEqual(cap.status(f"claude.settings.local.{suffix}"), "missing")
+                self.assertEqual(cap.status(f"claude.settings.project.{suffix}"), "error")
+                self.assertEqual(cap.status(f"claude.settings.user.{suffix}"), "ok")
+
+    def test_permission_rules_are_counted_never_printed(self):
+        allow = ["Bash(zz-rule-allow-one-marker)", "Bash(zz-rule-allow-two-marker)"]
+        deny = ["Bash(zz-rule-deny-marker-that-looks-like-a-secret-value)"]
+        self.settings("user", {"permissions": {"defaultMode": "plan", "allow": allow, "deny": deny, "ask": []}})
+        self.settings("project", {"permissions": {"deny": ["WebFetch(zz-project-rule-marker)"]}})
+        result = self.host.capture(self.tool, "rules")
+        self.assertEqual(result.proc.returncode, 0, result.proc.stdout + result.proc.stderr)
+        outputs = "\n".join([result.proc.stdout, result.proc.stderr, result.sanitized.read_text(encoding="utf-8"),
+                             result.full.read_text(encoding="utf-8")])
+        self.assertNotIn("zz-rule", outputs)  # the privacy property first, so a leak is reported as a leak
+        self.assertNotIn("zz-project-rule", outputs)
+        self.assertEqual([result.value(f"claude.settings.user.permissions_{kind}_count") for kind in ("allow", "deny", "ask")], [2, 1, 0])
+        self.assertEqual([result.value(f"claude.settings.project.permissions_{kind}_count") for kind in ("allow", "deny", "ask")], [0, 1, 0])
+
+    def test_permissions_default_mode_drift(self):
+        """The permission mode defines what every sealed arm may do, so a change is drift on its own item and on the hash."""
+        first = self.capture("m-a")
+        document = self.user_document()
+        document["permissions"]["defaultMode"] = "plan"
+        self.settings("user", document)
+        second = self.capture("m-b")
+        self.assert_drift(first, second, ["claude.settings.user.permissions_default_mode", "claude.settings.user.sha256"])
+        self.assertIn('"bypassPermissions" -> "plan"', self.compare(first, second).stdout)
+        del document["permissions"]["defaultMode"]  # removing the key is a change too: the built-in default applies
+        self.settings("user", document)
+        third = self.capture("m-c")
+        self.assert_drift(first, third, ["claude.settings.user.permissions_default_mode", "claude.settings.user.sha256"])
+        self.assertEqual(third.value("claude.settings.user.permissions_default_mode"), "unset")
+        project = json.loads((self.host.repo / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        project["permissions"]["defaultMode"] = "acceptEdits"
+        self.settings("project", project)
+        self.assertEqual(self.capture("m-d").value("claude.settings.project.permissions_default_mode"), "acceptEdits")
+
+    def test_cross_session_inbound_drift(self):
+        """A peer session can message a run's lead unless this says otherwise, so a change is drift."""
+        first = self.capture("c-a")
+        document = self.user_document()
+        document["crossSessionInbound"] = "refuse"
+        self.settings("user", document)
+        second = self.capture("c-b")
+        self.assert_drift(first, second, ["claude.settings.user.cross_session_inbound", "claude.settings.user.sha256"])
+        self.assertIn('"accept" -> "refuse"', self.compare(first, second).stdout)
+        del document["crossSessionInbound"]
+        self.settings("user", document)
+        third = self.capture("c-c")
+        self.assert_drift(first, third, ["claude.settings.user.cross_session_inbound", "claude.settings.user.sha256"])
+        self.assertEqual(third.value("claude.settings.user.cross_session_inbound"), "unset")
+
+    def test_every_behaviour_setting_drifts_when_it_changes(self):
+        """The drift class of these keys is the class of the other settings items: a change between two captures is drift on
+        that item and on the file hash, and on nothing else."""
+        changes = {
+            "permissions_default_mode": (("permissions", "defaultMode"), "acceptEdits"),
+            "permissions_allow_count": (("permissions", "allow"), ["Bash(zz-added-rule)"]),
+            "permissions_deny_count": (("permissions", "deny"), ["WebFetch"]),
+            "permissions_ask_count": (("permissions", "ask"), []),
+            "skip_dangerous_mode_permission_prompt": (("skipDangerousModePermissionPrompt",), False),
+            "cross_session_inbound": (("crossSessionInbound",), "refuse"),
+            "auto_continue_at_usage_limit": (("autoContinueAtUsageLimit",), False),
+            "auto_updates_channel": (("autoUpdatesChannel",), "stable"),
+            "ultracode": (("ultracode",), False),
+            "enable_workflows": (("enableWorkflows",), False),
+            "workflow_size_guideline": (("workflowSizeGuideline",), "large"),
+            "switch_models_on_flag": (("switchModelsOnFlag",), True),
+            "model": (("model",), "opus"),
+            "effort_level": (("effortLevel",), "medium"),
+        }
+        self.assertEqual(sorted(changes), sorted(suffix for suffix, _ in BEHAVIOUR_KEYS), "one change for every key")
+        baseline = self.user_document()
+        first = self.capture("d-base")
+        for index, (suffix, (key_path, new_value)) in enumerate(changes.items()):
+            with self.subTest(item=suffix):
+                document = json.loads(json.dumps(baseline))
+                node = document
+                for key in key_path[:-1]:
+                    node = node.setdefault(key, {})
+                node[key_path[-1]] = new_value
+                self.settings("user", document)
+                second = self.capture(f"d-{index}")
+                self.assert_drift(first, second, [f"claude.settings.user.{suffix}", "claude.settings.user.sha256"])
+                self.assertEqual(second.value(f"claude.settings.user.{suffix}"),
+                                 len(new_value) if suffix.endswith("_count") else new_value)
+
+    def test_check_fails_on_a_changed_permission_mode_or_cross_session_rule(self):
+        seal = self.capture("seal")
+        document = self.user_document()
+        document["permissions"]["defaultMode"] = "dontAsk"
+        document["crossSessionInbound"] = "refuse"
+        self.settings("user", document)
+        proc = self.check(self.capture("open"), seal.sanitized)
+        self.assertEqual(proc.returncode, 1, proc.stdout)
+        self.assertEqual(sorted(self.kinds(proc)["FAIL"]), ["claude.settings.user.cross_session_inbound",
+                                                            "claude.settings.user.permissions_default_mode",
+                                                            "claude.settings.user.sha256"], proc.stdout)
+        self.assertIn('expected "bypassPermissions" got "dontAsk"', proc.stdout)
+
     def test_process_environment_classes(self):
         cap = self.capture("p", env=self.host.env(CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS="1", CLAUDE_CODE_SUBAGENT_MODEL="opus"))
         self.assertIs(cap.value("claude.process.effort_level_unset"), True)
@@ -1607,6 +1823,49 @@ class ParserTests(unittest.TestCase):
         self.assertIsNone(parse([{"type": "rate_limit_event", "rate_limit_info": {"status": "allowed"}}]))
         self.assertIsNone(parse([{"type": "rate_limit_event", "rate_limit_info": {"unifiedWindows": {"five_hour": {"utilization": "x"}}}}]))
 
+    def test_classify_setting_covers_every_rule(self):
+        classify, modes = self.api("classify_setting"), self.api("PERMISSION_MODES")
+        self.assertEqual(modes, ("default", "acceptEdits", "plan", "auto", "dontAsk", "bypassPermissions", "manual"))
+        document = {"permissions": {"defaultMode": "plan", "deny": ["a", "b"]}, "ultracode": True, "model": "opus",
+                    "crossSessionInbound": "hold"}
+        self.assertEqual(classify(document, ("permissions", "defaultMode"), "enum", modes), ("ok", "plan", None))
+        self.assertEqual(classify(document, ("permissions", "deny"), "count", ()), ("ok", 2, None))
+        self.assertEqual(classify(document, ("permissions", "allow"), "count", ()), ("ok", 0, None))
+        self.assertEqual(classify(document, ("ultracode",), "flag", ()), ("ok", True, None))
+        self.assertEqual(classify(document, ("model",), "alias", ()), ("ok", "opus", None))
+        self.assertEqual(classify(document, ("crossSessionInbound",), "enum", ("accept", "hold", "refuse")), ("ok", "hold", None))
+        self.assertEqual(classify(document, ("switchModelsOnFlag",), "flag", ()), ("ok", "unset", None))
+        self.assertEqual(classify({"permissions": "x"}, ("permissions", "defaultMode"), "enum", modes), ("ok", "other", None))
+        self.assertEqual(classify({"permissions": "x"}, ("permissions", "deny"), "count", ()), ("error", None, "unrecognized_value"))
+        self.assertEqual(classify({"permissions": {"deny": "abc"}}, ("permissions", "deny"), "count", ()),
+                         ("error", None, "unrecognized_value"), "a string is not a rule list")
+        self.assertEqual(classify({"ultracode": "true"}, ("ultracode",), "flag", ()), ("ok", "other", None))
+        self.assertEqual(classify({"ultracode": 0}, ("ultracode",), "flag", ()), ("ok", "other", None), "0 is not false")
+        self.assertEqual(classify({"model": "Opus"}, ("model",), "alias", ()), ("ok", "other", None))
+        self.assertEqual(classify({"crossSessionInbound": "ACCEPT"}, ("crossSessionInbound",), "enum", ("accept",)), ("ok", "other", None))
+
+    def test_permission_rules_lists_only_string_rules_of_eight_characters_or_more(self):
+        rules = self.api("permission_rules")
+        found = rules({"permissions": {"allow": ["Bash(zz-long-rule)", "Read", 7, None], "deny": ["WebFetch(x)"], "ask": "no"}})
+        self.assertEqual(sorted(found), ["Bash(zz-long-rule)", "WebFetch(x)"])
+        self.assertEqual(rules({}), [])
+        self.assertEqual(rules({"permissions": "x"}), [])
+
+    def test_forbidden_values_lists_rules_and_spares_the_values_the_tool_prints_on_purpose(self):
+        module = self.module
+        context = module.Ctx.for_tests(Path("/fake/home"), Path("/fake/repo"), {})
+        context.private_values.update({"Bash(zz-private-rule-value)", "short"})
+        context.public_values.add("claude-opus-4-5-20251101")
+        environment = {"FREEZE_X_ALIAS": "claude-opus-4-5-20251101", "FREEZE_X_SECRET": "zz-secret-value-1234",
+                       "FREEZE_X_MODE": "bypassPermissions", "FREEZE_X_SHORT": "tiny"}
+        with mock.patch.dict(os.environ, environment):
+            listed = module.forbidden_values(context)
+        self.assertIn("Bash(zz-private-rule-value)", listed)
+        self.assertNotIn("short", listed, "under eight characters")
+        self.assertIn("zz-secret-value-1234", listed)
+        self.assertNotIn("claude-opus-4-5-20251101", listed, "a printed model alias may equal an environment value")
+        self.assertNotIn("bypassPermissions", listed, "a documented setting value is public")
+
     def test_alias_or_other_prints_only_model_alias_shaped_values(self):
         alias = self.api("alias_or_other")
         for value in ("opus", "sonnet", "haiku", "opus[1m]", "claude-opus-4-5-20251101", "gpt-6-astra"):
@@ -1681,6 +1940,7 @@ class MutationControlTests(unittest.TestCase):
     DUMP = ('        "items": items,\n', '        "items": items,\n        "debug_environment": dict(os.environ),\n')
     GUARD_OFF = ("def guard_output(record: dict, text: str, forbidden: list[str], sanitized: bool) -> None:\n",
                  "def guard_output(record: dict, text: str, forbidden: list[str], sanitized: bool) -> None:\n    return\n")
+    RULES_LEAK = ('            return OK, len(value), None\n', '            return OK, list(value), None\n')
     MUTANTS = (
         ("leak_environment_unguarded", (DUMP, GUARD_OFF), "PrivacyTests.test_outputs_contain_no_environment_value_user_host_or_path"),
         ("leak_environment_guarded", (DUMP,), "PrivacyTests.test_outputs_contain_no_environment_value_user_host_or_path"),
@@ -1705,6 +1965,19 @@ class MutationControlTests(unittest.TestCase):
          "ConfigTests.test_credential_store_paths_are_refused"),
         ("missing_tool_raises", (('            return RunResult("missing", None, "", "")\n', "            raise FileNotFoundError(argv[0])\n"),),
          "ResilienceTests.test_missing_tool_is_status_missing_and_capture_continues"),
+        # The last element names what the failing assertion must mention, so a mutant cannot fail for another reason.
+        ("permissions_default_mode_blind",
+         (('    ("permissions_default_mode", ("permissions", "defaultMode"), ENUM, PERMISSION_MODES),\n',
+           '    ("permissions_default_mode", ("permissions", "defaultModeX"), ENUM, PERMISSION_MODES),\n'),),
+         "SettingsTests.test_permissions_default_mode_drift", "permissions_default_mode"),
+        ("cross_session_inbound_blind",
+         (('    ("cross_session_inbound", ("crossSessionInbound",), ENUM, CROSS_SESSION_VALUES),\n',
+           '    ("cross_session_inbound", ("crossSessionInboundX",), ENUM, CROSS_SESSION_VALUES),\n'),),
+         "SettingsTests.test_cross_session_inbound_drift", "cross_session_inbound"),
+        ("permission_rules_printed_unguarded", (RULES_LEAK, GUARD_OFF),
+         "SettingsTests.test_permission_rules_are_counted_never_printed", "unexpectedly found"),
+        ("permission_rules_printed_guarded", (RULES_LEAK,),
+         "SettingsTests.test_permission_rules_are_counted_never_printed", "refused: output strings carry"),
     )
 
     def mutant_dir(self) -> Path:
@@ -1730,7 +2003,7 @@ class MutationControlTests(unittest.TestCase):
         source = DEFAULT_TOOL.read_text(encoding="utf-8")
         folder = self.mutant_dir()
         prepared = []
-        for name, patches, target in self.MUTANTS:
+        for name, patches, target, *expected in self.MUTANTS:
             mutated = source
             for anchor, replacement in patches:
                 self.assertEqual(mutated.count(anchor), 1, f"{name}: anchor not found exactly once: {anchor!r}")
@@ -1739,10 +2012,10 @@ class MutationControlTests(unittest.TestCase):
             path = folder / name / "freeze_snapshot.py"
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(mutated, encoding="utf-8")
-            prepared.append((name, path, target))
+            prepared.append((name, path, target, expected))
         with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, os.cpu_count() or 2)) as pool:
             results = list(pool.map(lambda entry: self.nested(entry[1], entry[2]), prepared))
-        for (name, path, target), proc in zip(prepared, results):
+        for (name, path, target, expected), proc in zip(prepared, results):
             with self.subTest(mutant=name):
                 lines = proc.stderr.splitlines()
                 shown = [line for line in lines if line.startswith(("AssertionError", "FAILED"))][:4]
@@ -1750,6 +2023,8 @@ class MutationControlTests(unittest.TestCase):
                                                           encoding="utf-8")
                 self.assertNotEqual(proc.returncode, 0, f"{name}: {target} still passes against the mutant")
                 self.assertIn("FAILED", proc.stderr, f"{name}: the nested run did not fail on an assertion\n" + "\n".join(lines[-14:]))
+                for wanted in expected:
+                    self.assertIn(wanted, proc.stderr, f"{name}: the nested run failed, but not on {wanted!r}\n" + "\n".join(lines[-14:]))
 
 
 if __name__ == "__main__":
