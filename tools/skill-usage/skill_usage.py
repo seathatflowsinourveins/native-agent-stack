@@ -397,15 +397,28 @@ def load_manifest(path: Path) -> dict:
 
 
 def skill_lock_path(home: str | None = None, environment=None) -> Path:
-    """skills CLI 1.7.0 global lock: $XDG_STATE_HOME/skills/.skill-lock.json when
-    XDG_STATE_HOME is set to an absolute path (the XDG Base Directory spec ignores a relative
-    value), else <home>/.agents/.skill-lock.json. --home overrides the fallback base only."""
+    """skills CLI 1.7.0 global lock (npm dist/cli.mjs L3746-3750): path.join($XDG_STATE_HOME, "skills",
+    ".skill-lock.json") for any non-empty XDG_STATE_HOME, untrimmed and relative or not (the CLI does not apply
+    the XDG Base Directory spec's absolute-path rule), else path.join(<home>, ".agents", ".skill-lock.json").
+    --home overrides the fallback base only. The join is install_skills.py's node_path_join, so a ".." or a
+    leading // collapses as in Node; a relative value resolves against this process's working directory."""
     environment = os.environ if environment is None else environment
-    xdg_state = environment.get("XDG_STATE_HOME") or ""
-    if os.path.isabs(xdg_state):
-        return Path(xdg_state) / "skills" / ".skill-lock.json"
+    xdg_state = environment.get("XDG_STATE_HOME")
+    if xdg_state:
+        return node_path_join(xdg_state, "skills", ".skill-lock.json")
     base = home or environment.get("HOME") or os.path.expanduser("~")
-    return Path(base) / ".agents" / ".skill-lock.json"
+    return node_path_join(str(base), ".agents", ".skill-lock.json")
+
+
+def node_path_join(*parts: str) -> Path:
+    """tools/adoption/install_skills.py's node_path_join, the pinned CLI's path.join, imported from this checkout
+    so that one copy serves both tools."""
+    sys.path.insert(0, str(ROOT / "tools" / "adoption"))
+    try:
+        import install_skills  # noqa: E402  (the checkout's installer)
+    finally:
+        sys.path.pop(0)
+    return install_skills.node_path_join(*parts)
 
 
 def load_lock_installed_at(lock_path: Path) -> dict[str, str]:
