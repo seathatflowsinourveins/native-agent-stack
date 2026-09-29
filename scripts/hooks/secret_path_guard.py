@@ -258,9 +258,13 @@ GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 # The letters of a dashless BSD-style ps cluster (is_ps_bsd_cluster): the flags that the guard reads, `e` and `E` among them.
 PS_BSD_LETTERS = frozenset("aAcefhjlmrsStTuvwxXLnE")
+# The options that take a value, alone (`-u steve`, `--sort pcpu`) or as the last letter of a cluster (`-fu steve`), on procps-ng: ps(1) 4.0.4
+# lists `-C cmdlist`, `-G`, `-g`, `-O`, `-o`, `-p`, `-q`, `-s`, `-t`, `-U` and `-u` (and `k` for the BSD form). macOS's ps has no `-q`, `-s`
+# or `-k`, and `-C` is a flag there ("Change the way the CPU percentage is calculated"): Apple adv_cmds ps/ps.c at 60bc9ebf, PS_ARGS
+# `aACcdeEfg:G:hjLlMmO:o:p:rSTt:U:u:vwx` and `case 'C': rawcpu = 1`. ps_shows_environment reads a command line with each host's table.
 PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-s", "-k",
                   "--pid", "--format", "--sort", "--ppid", "--user"}
-PS_CLUSTER_VALUE_OPTIONS = PS_ARG_OPTIONS - {"-C"}  # inside a cluster `C` is read as a flag (see ps_shows_environment)
+PS_MACOS_ARG_OPTIONS = PS_ARG_OPTIONS - {"-C"}
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
 TRACE_OPTIONS = {"xtrace", "verbose"}
 MAX_DEPTH = 3
@@ -1069,31 +1073,40 @@ def is_ps_bsd_cluster(word: str) -> bool:
     return PS_BSD_LETTERS.issuperset(word) and ("e" in word or "E" in word)
 
 
-def ps_shows_environment(words: list[str]) -> bool:
-    """Whether ps prints each process's environment: a dashless BSD-style cluster with `e` or `E` (is_ps_bsd_cluster), or
-    macOS's dashed `-E`, alone or in a cluster before the first option that takes a value (`-Ewwp 123`, where the value
-    starts at `p`). A dashed `-e` is every process and passes, as does an `E` that is a value: the word after a stand-alone
-    value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to it (`ps -uEve`). `-C` is a
-    flag on macOS ("Change the way the CPU percentage is calculated") and takes a command name on procps, so a dashed
-    word with an `E` right after it (`ps -C -E`) or glued to it (`ps -CE`) is refused whichever host runs it."""
+def ps_reading_shows_environment(words: list[str], procps: bool) -> bool:
+    """Whether one host's ps prints each process's environment for this command line. Both hosts read a dashed word as a cluster of
+    options, and a letter that takes a value takes the rest of the word or, when it ends the cluster, the next word, so that word is
+    a value and not an option or a cluster (`ps -u Eve`, `ps -fu Eve`, `ps -uEve`, `ps -fo user`, `ps -ft e`). They differ in three
+    things. procps (`procps=True`) has `-C cmdlist`, which takes a value, has no `-E`, and reads a dashless BSD cluster wherever it
+    stands (`ps -C cat e`, `ps -Ccat e`: `cat` is the command name and `e` shows the environment). macOS has `-E` (and `-e` in its
+    legacy mode, see the docs), reads `-C` as a flag, and honours a dashless option string only as the first argument
+    (`kludge_oldps_options(..., argv[1], ...)` in Apple adv_cmds ps/ps.c), so `ps -Ccat e` is `-C -c -a -t e`: `t` takes `e`, a tty."""
+    value_options = PS_ARG_OPTIONS if procps else PS_MACOS_ARG_OPTIONS
     skip = False
     for position, word in enumerate(words[1:], 1):
         if skip:
             skip = False
-            continue
-        if word in PS_ARG_OPTIONS:
-            following = words[position + 1] if position + 1 < len(words) else ""
-            skip = not (word == "-C" and following.startswith("-") and "E" in following)
-            continue
-        if word.startswith("-") and not word.startswith("--") and len(word) > 1:
+        elif word in value_options:
+            skip = True  # a stand-alone option that takes the next word
+        elif word.startswith("-") and not word.startswith("--") and len(word) > 1:
             letters = word[1:]
-            value_at = next((at for at, letter in enumerate(letters) if f"-{letter}" in PS_CLUSTER_VALUE_OPTIONS), None)
-            if "E" in (letters if value_at is None else letters[:value_at]):
+            value_at = next((at for at, letter in enumerate(letters) if f"-{letter}" in value_options), None)
+            if not procps and "E" in (letters if value_at is None else letters[:value_at]):
                 return True
             skip = value_at == len(letters) - 1  # the cluster ends in an option that takes the next word
-        elif not word.startswith("-") and is_ps_bsd_cluster(word):
+        elif not word.startswith("-") and is_ps_bsd_cluster(word) and (procps or position == 1):
             return True
     return False
+
+
+def ps_shows_environment(words: list[str]) -> bool:
+    """Whether ps prints each process's environment on either host that could run the command line (ps_reading_shows_environment):
+    a dashless BSD-style cluster with `e` or `E` (is_ps_bsd_cluster), or macOS's dashed `-E`, alone or in a cluster before the first
+    option that takes a value (`-Ewwp 123`, where the value starts at `p`). A dashed `-e` is every process and passes, as does an `E`
+    that is a value. `-C` is a flag on macOS and takes a command name on procps, so a dashed word with a `C` is read both ways and
+    refused when either shows the environment: `ps -CE` and `ps -C -E` (macOS), `ps -Ccat e` and `ps -fCcat e` (procps), and
+    `ps -CEmacs` too, which is friction on procps (there `Emacs` is the command name; write `ps -C emacs`)."""
+    return ps_reading_shows_environment(words, True) or ps_reading_shows_environment(words, False)
 
 
 def git_subcommand_args(words: list[str]) -> tuple[str | None, list[str]]:

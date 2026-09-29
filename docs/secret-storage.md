@@ -1058,18 +1058,28 @@ read is listed at the end of this subsection.
   `env=2; echo "$((env))"` reads the variable `env` and a `<<` in it is a shift, so both pass, while a real substitution
   inside it (`$(( $(printenv | wc -l) + 1 ))`) is still read and `$((printenv) )`, whose parentheses do not touch, is a
   substitution holding a subshell, as bash reads it.
-- **`ps -E` is an environment display.** macOS `ps` documents `-E` as "Display the environment as well" and lists the
-  BSD-style `e` as "Same as -E" (Apple `adv_cmds` `ps.1`, read 2026-09-29). The guard blocked dashless clusters with a
-  lower-case `e` (`ps eww`, `ps auxe`) but not these. It now blocks, as an `environment_dump`, `-E` alone or in a cluster
-  before the first option that takes a value (`ps -Ewwp 123`, `ps -p 123 -E`, `ps -A -E`) and dashless clusters with a
-  capital `E` (`ps Eww`, `ps auxE`). `ps -ef`, `ps -o pid,command -p N`, `ps aux` and an `E` that is only a value pass:
-  the word after a stand-alone value option (`ps -u Eve`), after a cluster that ends in one (`ps -fu Eve`) or glued to
-  it (`ps -uEve`); a dashed `-e` is every process. `ps -fu steve` and `ps -fu eve` pass too, a deliberate loosening
-  against the base guard (see the list below): `-u` takes a value, and the base guard read the user name as a BSD flag
-  cluster with an `e` and refused them. `-C` is a flag on macOS and takes a command name on procps, so a dashed
-  word with an `E` right after it (`ps -C -E`, `ps -CE`) is refused whichever host runs it, and `ps -CEmacs` with it, which
-  is friction: on procps `-C` takes a command name, so write `ps -C emacs`. The dashless cluster test is a set-membership
-  test (see the timeout item).
+- **`ps` prints the environment on two hosts, and the guard reads a command line as both (2026-09-29).** macOS `ps`
+  documents `-E` as "Display the environment as well" and lists the BSD-style `e` as "Same as -E" (Apple `adv_cmds`
+  `ps.1`, read 2026-09-29), and procps-ng `ps` (Linux, 4.0.4 here) documents the BSD-style `e` as "Show the environment
+  after the command" and has no `-E`. The guard blocks, as an `environment_dump`, a dashless cluster with `e` or `E`
+  (`ps eww`, `ps auxe`, `ps Eww`, `ps auxE`) and `-E` alone or in a cluster before the first letter that takes a value
+  (`ps -Ewwp 123`, `ps -p 123 -E`, `ps -A -E`). Both hosts read a dashed word as a cluster of option letters, and a letter
+  that takes a value takes the rest of the word or, when it ends the cluster, the next word: `-o`, `-O`, `-p`, `-u`,
+  `-U`, `-g`, `-G`, `-t` on both, `-C`, `-q` and `-s` on procps. So that next word is a value and no cluster of flags: `ps
+  -u Eve`, `ps -fu Eve` and `ps -uEve` pass, and so do `ps -fu steve`, `ps -fu eve`, `ps -fo user`, `ps -ft e`, `ps -fU
+  steve` and `ps -fC e` (a command name). `ps -ef`, `ps -o pid,command -p N` and `ps aux` pass, and a dashed `-e` is
+  every process. The two hosts differ where the guard has to read both. `-C` takes a command name on procps (`ps -C
+  cmdlist`) and is a flag on macOS ("Change the way the CPU percentage is calculated": Apple `adv_cmds` `ps/ps.c` at
+  60bc9ebf, `PS_ARGS` `aACcdeEfg:G:hjLlMmO:o:p:rSTt:U:u:vwx` and `case 'C': rawcpu = 1`). procps reads a dashless
+  BSD-style word wherever it stands, macOS only as the first argument (`kludge_oldps_options` is applied to `argv[1]`
+  only; a later word is a process id or an "illegal argument"). A command line is refused when either reading shows the
+  environment: `ps -CE` and `ps -C -E` (macOS: `-E` is a flag), `ps -Ccat e` and `ps -fCcat e` (procps: `cat` is the
+  command name and the BSD `e` shows the environment; on macOS `t` takes `e` as a tty), and `ps -CEmacs`, which is
+  friction on procps (there `Emacs` is the command name; write `ps -C emacs`). Checked on this host (procps-ng 4.0.4):
+  `ps -Cbash u` honours the BSD `u` after the glued command name, and `ps -fC bash u` reports conflicting format options
+  (the `u` is a BSD option after `-C bash`). The guard reads no macOS legacy mode, where `-e` is read as `-E` (in
+  `ps.c`, `case 'e'` falls through to `case 'E'` when `u03`, its `unix2003` compatibility flag, is off): it would refuse
+  every `ps -ef`, so it stays a recorded gap. The dashless cluster test is a set-membership test (see the timeout item).
 - **`systemctl show-environment` and a bare `systemctl show` are environment dumps.** `show-environment` prints a
   service manager's whole environment block, "the environment block that is passed to all processes the manager spawns"
   (`systemctl(1)` 255), and `show` with no unit prints the manager's own properties, `Environment=` among them, so
@@ -1127,11 +1137,13 @@ read is listed at the end of this subsection.
   double-quoted or single-quoted text holding `#` throughout, ANSI-C strings, backquotes, subshells) took 1.0 s in
   `check()`. `check()` itself has no size limit. A substitution nested beyond the caps above is still not read.
 - **Loosenings against the base guard (c26800f3), 2026-09-29: one.** Everything else this work changes tightens. The
-  value of a clustered value-taking `ps` option is no BSD flag cluster: `ps -fu steve` and `ps -fu eve` pass, since `-u`
-  takes a value (`ps -u steve` and `ps -fu Eve` passed before), and so do `ps -fo user` and `ps -ft e`; the base guard
-  read the word after such a cluster as a dashless `ps eww` and refused it. Each has rows in
-  `tests/test_secret_path_guard.py` (ALLOWED), and the probe of the review, base guard against this one, reports
-  `loosened rows: 0` apart from them.
+  value after a clustered value-taking `ps` option is no BSD flag cluster. The base guard skipped the value after a
+  stand-alone value option (`ps -u steve` passed) but read the word after a cluster that ends in one, as the shell
+  writes it (`ps -fu steve`), as a dashless `ps eww` and refused it. Now `-o`, `-O`, `-p`, `-u`, `-U`, `-g`, `-G`, `-t`,
+  `-q`, `-s`, `-k` and procps's `-C` take the next word as their value in a cluster too: `ps -fu steve`, `ps -fu eve`,
+  `ps -fo user`, `ps -ft e`, `ps -fU steve` and `ps -fC e` pass. Each has rows in `tests/test_secret_path_guard.py`
+  (ALLOWED), and a differential against the base guard over every `ps` command line of up to three words from a
+  vocabulary of 65 finds no other loosening (the review's probe, `loosened rows: 0`, holds none of these forms).
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)

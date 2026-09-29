@@ -265,11 +265,23 @@ BLOCKED = {
     "/usr/bin/timeout 5 printenv": "environment_dump",
     "/usr/bin/nice -n 5 cat .env": "dotenv_read",
     "/usr/bin/sudo -u root /usr/bin/env": "environment_dump",
-    # macOS's `-C` is a flag, procps's takes a command name: an E-flag word right after it is refused whichever host runs it.
+    # macOS's `-C` is a flag, procps's takes a command name, so a dashed word with a `C` has two readings and is refused when either shows
+    # the environment. An E-flag word right after `-C` is refused whichever host runs it (the macOS reading), and so is a BSD `e` after the
+    # command name that the procps reading gives `-Ccat` (ps(1) procps-ng 4.0.4: "-C cmdlist Select by command name"): the macOS reading
+    # alone lets `ps -Ccat e` through, where `t` takes the next word `e` as its value, and on procps that `e` is the flag that shows the
+    # environment. The second verification review of 50ca6ca2 found the two strings of the third and fourth rows; the base guard refused them.
     "ps -CE": "environment_dump",
     "ps -C -E": "environment_dump",
     "ps -CEww": "environment_dump",
     "ps -C -Eww": "environment_dump",
+    "ps -Ccat e": "environment_dump",
+    "ps -fCcat e": "environment_dump",
+    "ps -Ccat eww": "environment_dump",
+    "ps -Cnginx e": "environment_dump",
+    "ps -fCnginx auxe": "environment_dump",
+    "ps -Ccat E": "environment_dump",
+    "ps -C cat e": "environment_dump",  # stand-alone: the value is the next word on procps, and it was refused before
+    "ps -CEmacs": "environment_dump",  # friction: on macOS `E` is a flag here, on procps part of a command name; refused for the macOS reading
     "echo `printenv`": "environment_dump",
     "echo $(env)": "environment_dump",
     # Command substitution inside double quotes is executed by the shell (bash(1) "Command Substitution", the backtick
@@ -948,11 +960,29 @@ ALLOWED = [
     "echo $'a\\nb' $'\\'' # x",
     "ps -fu Eve",
     "ps -fu Eve -o pid,command",
-    # A DELIBERATE LOOSENING against the base guard (c26800f3), one of the two this work makes: `-u` takes a value, so the user name after it
+    # A DELIBERATE LOOSENING against the base guard (c26800f3), the one this work makes: `-u` takes a value, so the user name after it
     # is no BSD flag cluster. The base guard read the name in `ps -fu steve` and `ps -fu eve` (letters of the cluster alphabet with an
     # `e`) as a dashless `ps eww` and refused both (`ps -u steve` it passed). `ps eww` and `ps auxe` stay refused.
     "ps -fu steve",
     "ps -fu eve",
+    # The same holds for every clustered option that takes a value (the second verification review found `ps -fo user` and `ps -ft e`): a
+    # value after `-u`, `-o`, `-O`, `-t`, `-U`, `-G`, `-g` or `-p` in a cluster is no BSD flag cluster, and the base guard refused each
+    # because its letters are in the cluster alphabet and one is an `e`. `-C` takes a command name on procps, so `-Cnginx` and `-fCnginx`
+    # pass on both readings.
+    "ps -fo user",
+    "ps -ft e",
+    "ps -fO user",
+    "ps -fU steve",
+    "ps -fG eve",
+    "ps -fg steve",
+    "ps -fp 123 -o user",
+    "ps -fC e",  # procps: the command name `e`; macOS: no option follows, so `e` is an operand that ps refuses
+    "ps -fC eww",
+    "ps -fq 123 -o user",
+    "ps -C emacs",  # the workaround for `ps -CEmacs`
+    "ps -Cnginx -o pid,cmd",
+    "ps -fCnginx -o pid",
+    "ps -Ccat -o pid",
     "set -e > /dev/null",  # a redirection beside a real argument: it sets an option, it prints nothing
     "set -euo pipefail 2> /dev/null",
     "export FOO=1 > /dev/null",
@@ -1924,6 +1954,59 @@ class SecretPathGuardTests(unittest.TestCase):
         words += ["", "eww", "auxe", "auxE", "aux", "ef", "-e", "steve", "eve", "Eve", "ps", "ax", "E"]
         self.assertGreater(len(words), 60000)
         self.assertEqual([word for word in words if guard.is_ps_bsd_cluster(word) != bool(old.match(word))], [])
+
+    def test_ps_is_read_as_both_hosts_read_it(self):
+        # procps-ng ps(1) 4.0.4 (Linux) and Apple adv_cmds ps/ps.c at 60bc9ebf (macOS) parse a dashed word as a cluster of letters, and a letter
+        # that takes a value takes the rest of the word or the next word. They differ in `-C` (a command name on procps, a flag on macOS), in
+        # `-E` (macOS only) and in where a dashless BSD word counts (anywhere on procps, the first argument only on macOS: ps.c applies
+        # kludge_oldps_options to argv[1]). ps_shows_environment() must equal "either host shows the environment" for every command line of
+        # up to three words from a vocabulary of clusters and words, so a change to one reading (the second review found `ps -Ccat e` lost
+        # when `-C` left the value options) fails here. The reference below is a per-letter state machine, written apart from the guard's.
+        procps_valued, macos_valued, long_valued = set("oOpuUCgGtqsk"), set("oOpuUgGtqsk"), {"--pid", "--format", "--sort", "--ppid", "--user"}
+        bsd = set("aAcefhjlmrsStTuvwxXLnE")
+
+        def shows_environment(words, procps):
+            valued, at = (procps_valued if procps else macos_valued), 1
+            while at < len(words):
+                word = words[at]
+                if word.startswith("--"):
+                    at += 2 if word in long_valued else 1
+                elif word.startswith("-") and len(word) > 1:
+                    taken = False
+                    for index, letter in enumerate(word[1:], 1):
+                        if letter in valued:
+                            taken = index == len(word) - 1
+                            break
+                        if letter == "E" and not procps:
+                            return True
+                    at += 2 if taken else 1
+                else:
+                    if set(word) <= bsd and ("e" in word or "E" in word) and (procps or at == 1):
+                        return True
+                    at += 1
+            return False
+
+        vocabulary = ["-f", "-e", "-ef", "-C", "-Ccat", "-fCcat", "-fC", "-c", "-E", "-Ew", "-u", "-fu", "-o", "-fo", "-t", "-ft", "-p", "-fp",
+                      "-q", "-s", "-g", "-U", "-O", "-k", "-a", "-Cnginx", "-CE", "-CEmacs", "-uE", "-Eu", "-tE", "-oE", "-eE", "-CcE", "-Ct",
+                      "-tC", "--sort", "--pid", "--user", "--sort=x", "-", "e", "E", "eww", "auxe", "aux", "auxE", "cat", "emacs", "steve", "Eve",
+                      "user", "123", "x"]
+        checked = 0
+        for length in range(1, 4):
+            for sequence in itertools.product(vocabulary, repeat=length):
+                words = ["ps", *sequence]
+                expected = shows_environment(words, True) or shows_environment(words, False)
+                if guard.ps_shows_environment(words) != expected:
+                    self.fail(f"{' '.join(words)}: guard {not expected}, hosts {expected}")
+                checked += 1
+        self.assertGreater(checked, 100000)
+        # the readings themselves, one row per difference between the hosts
+        for words, procps, macos in ((["ps", "-Ccat", "e"], True, False), (["ps", "-CE"], False, True), (["ps", "-C", "-E"], False, True),
+                                     (["ps", "-CEmacs"], False, True), (["ps", "-C", "emacs"], False, False), (["ps", "-fC", "e"], False, False),
+                                     (["ps", "-Ccat", "-E"], False, False), (["ps", "eww"], True, True), (["ps", "-f", "eww"], True, False),
+                                     (["ps", "-Ccat", "-o", "pid"], False, False)):
+            with self.subTest(words=words):
+                self.assertEqual((guard.ps_reading_shows_environment(words, True), guard.ps_reading_shows_environment(words, False)),
+                                 (procps, macos))
 
     def test_real_commit_messages_in_the_standard_pattern_are_the_documented_friction(self):
         # A here-document's lines are command lines, so a message whose prose starts a line with a command is refused behind
