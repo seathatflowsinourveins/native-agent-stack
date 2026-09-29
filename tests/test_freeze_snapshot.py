@@ -2443,10 +2443,7 @@ class CodexRoleRowTests(HostCase):
         first = self.capture("t-a")
         self.host.write(agents / f"{self.host.user}-notes.toml", "x = 1\n")  # a name that holds the user name
         self.host.write(agents / "nested" / "deeper" / "stack-researcher.toml", "x = 1\n")  # a carrier's name, not at the top
-        (agents / "link.toml").symlink_to(agents / "stack-verifier.toml")  # a link named *.toml is counted, never read
-        (self.host.home / "other-agents").mkdir()
-        self.host.write(self.host.home / "other-agents" / "elsewhere.toml", "x = 1\n")
-        (agents / "linked-folder").symlink_to(self.host.home / "other-agents")  # a linked folder is not entered
+        (agents / "link.toml").symlink_to(agents / "stack-verifier.toml")  # a link to a file, named *.toml: counted, never read
         for name in ("notes.toml.bak", ".toml", "UPPER.TOML", "README.md"):  # not *.toml by Codex's exact extension rule
             self.host.write(agents / name, "x\n")
         (agents / "folder.toml").mkdir()  # a folder is not a role file
@@ -2460,6 +2457,32 @@ class CodexRoleRowTests(HostCase):
                 text = (second.sanitized if which == "sanitized" else second.full).read_text(encoding="utf-8")
                 self.assertNotIn(self.host.user, text, f"a host-chosen file name is published in the {which} capture")
                 self.assertNotIn("nested", text)
+
+    def test_a_folder_link_below_agents_is_an_error_and_never_an_undercount(self):
+        # Codex enters a linked folder and loads what it finds there as roles (rust-v0.157.1 exec-server/src/
+        # local_file_system.rs:710-735), so a set that skipped one would read `other: 0` beside a role Codex loads. The set,
+        # and the count of a layer's agents folder, are `error` (reason linked_folder): unknown, and unknown is not the frozen
+        # state. The carriers' own hash rows do not depend on the folder link.
+        first = self.capture("k-a")
+        (self.host.home / "other-agents").mkdir()
+        self.host.write(self.host.home / "other-agents" / "elsewhere.toml", "x = 1\n")
+        (self.agents() / "linked-folder").symlink_to(self.host.home / "other-agents")
+        project = self.host.repo / ".codex" / "agents"
+        self.host.write(project / "one.toml", "x = 1\n")
+        (project / "linked-folder").symlink_to(self.host.home / "other-agents")
+        second = self.capture("k-b")
+        for item_id in ("codex.agents.toml_set", "codex.project.agents_toml_count"):
+            with self.subTest(item=item_id):
+                self.assertEqual((second.status(item_id), second.item(item_id).get("reason")), ("error", "linked_folder"),
+                                 f"{item_id}: a folder link below the agents folder was skipped")
+                self.assertIsNone(second.item(item_id).get("value"), f"{item_id} published a count beside an unknown")
+        for name in CODEX_ROLE_FILES:
+            self.assertEqual(second.status(f"codex.agents.{name[:-5]}.sha256"), "ok")
+        (self.agents() / "linked-folder").unlink()
+        (project / "linked-folder").unlink()
+        third = self.capture("k-c")  # control: without the links the same folders are counted again
+        self.assertEqual(third.value("codex.agents.toml_set"), first.value("codex.agents.toml_set"))
+        self.assertEqual(third.value("codex.project.agents_toml_count"), 1)
 
     def test_a_missing_carrier_an_absent_folder_a_linked_folder_and_a_linked_carrier(self):
         first = self.capture("m-a")
@@ -2808,10 +2831,19 @@ class CodexRoleHelperTests(unittest.TestCase):
         (folder / "dir.toml").mkdir()
         (folder / "l.toml").symlink_to(folder / "a.toml")
         (folder / "dangling.toml").symlink_to(folder / "nowhere")
-        (folder / "linked").symlink_to(root / "agents-other")
         (root / "agents-other").mkdir()
         (root / "agents-other" / "z.toml").write_text("x", encoding="utf-8")
         self.assertEqual(names(folder), (["a.toml", "b.toml", "dangling.toml", "l.toml", "n/c.toml", "n/d/e.toml"], None))
+        # Codex follows links (openai/codex rust-v0.157.1 exec-server/src/local_file_system.rs:710-735: read_directory takes a
+        # link's target's type; observed with codex-cli 0.157.1 through `codex doctor --json`), so it enters a linked folder and
+        # loads a role from it. Not entering it would undercount, so a folder link at any depth is an error, whatever its name.
+        for where in (folder, folder / "n", folder / "n" / "d"):
+            for link_name in ("linked", "linked.toml"):
+                with self.subTest(link_in=where.name, link=link_name):
+                    (where / link_name).symlink_to(root / "agents-other")
+                    self.assertEqual(names(folder), (None, "linked_folder"), "a folder link below the folder was skipped")
+                    (where / link_name).unlink()
+                    self.assertEqual(names(folder), (["a.toml", "b.toml", "dangling.toml", "l.toml", "n/c.toml", "n/d/e.toml"], None))
 
     @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a folder whatever its mode")
     def test_toml_names_reports_a_folder_it_cannot_read(self):
@@ -2922,6 +2954,7 @@ class CodexRoleMutationControlTests(unittest.TestCase):
     TOML_SET_NAMES = ('    value["other"] = sum(1 for name in names if name not in CODEX_ROLE_FILES)\n',
                       '    value["other"] = [name for name in names if name not in CODEX_ROLE_FILES]\n')
     SERVERS_KEEP_ENTRY = ("        servers[name] = enabled\n", "        servers[name] = entry\n")
+    LINK_CHECK = 'if any(path_kind(Path(current) / name) == "link" for name in directories):'
     MUTANTS = (
         ("blind_codex_roles", (blind_patch("codex_roles"),), ROLE + "test_a_changed_carrier_drifts_only_its_own_item", "codex.agents"),
         ("researcher_row_reads_the_verifier", (RESEARCHER,), ROLE + "test_a_changed_carrier_drifts_only_its_own_item",
@@ -2940,9 +2973,16 @@ class CodexRoleMutationControlTests(unittest.TestCase):
         ("toml_set_publishes_the_names_unguarded", (TOML_SET_NAMES, MutationControlTests.GUARD_OFF),
          ROLE + "test_the_toml_set_counts_every_other_file_below_the_folder_and_publishes_no_name",
          "a host-chosen file name is published"),
-        ("toml_set_enters_linked_folders",
-         (("os.walk(folder, followlinks=False, onerror=failed.append)", "os.walk(folder, followlinks=True, onerror=failed.append)"),),
-         ROLE + "test_the_toml_set_counts_every_other_file_below_the_folder_and_publishes_no_name", "'other': 3"),
+        # Codex enters a linked folder, so a folder link below agents must make the set an error, never a smaller count: the
+        # mutant that skips the link (the walker never enters it) and the one that follows it (and counts what lies behind).
+        ("linked_folder_is_skipped", ((LINK_CHECK, "if False:"),),
+         ROLE + "test_a_folder_link_below_agents_is_an_error_and_never_an_undercount",
+         "a folder link below the agents folder was skipped"),
+        ("linked_folder_is_followed",
+         ((LINK_CHECK, "if False:"),
+          ("os.walk(folder, followlinks=False, onerror=failed.append)", "os.walk(folder, followlinks=True, onerror=failed.append)")),
+         ROLE + "test_a_folder_link_below_agents_is_an_error_and_never_an_undercount",
+         "a folder link below the agents folder was skipped"),
         ("role_tables_skip_the_profile",
          (('[home / "config.toml", home / f"{CODEX_PROFILE}.config.toml"]', '[home / "config.toml"]'),),
          ROLE + "test_role_tables_are_counted_in_both_home_files_and_the_scalar_keys_are_not", "codex.agents.role_tables: config.toml and the profile"),

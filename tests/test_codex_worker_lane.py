@@ -1058,6 +1058,20 @@ class RoleStepTests(unittest.TestCase):
         self.assertIn("[warn] extra agent role files: 1", out)
         self.assertNotIn("extra-role-name", out)
 
+    def test_e_a_linked_folder_below_agents_is_an_unknown_count_warning(self):
+        # Codex enters a linked folder (see test_agents_toml_count_counts_recursively_and_is_unknown_behind_a_folder_link),
+        # so the extra-role count can be neither 0 nor N there: it is unknown, in words that hold no name.
+        other = self.host.tmp / "roles-elsewhere"
+        other.mkdir()
+        (other / "elsewhere-role-name.toml").write_text('name = "extra"\n')
+        self.agents.mkdir(parents=True)
+        (self.agents / "shared-folder-name").symlink_to(other)
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)  # a warning, like an extra file: the carriers can still be installed
+        self.assertIn("[warn] extra agent role files: unknown", out)
+        self.assertNotIn("elsewhere-role-name", out)
+        self.assertNotIn("shared-folder-name", out)
+
     # --- f: a created role edited afterwards is a conflict, not a deletion
     def test_f_a_role_edited_after_apply_is_a_rollback_conflict(self):
         code, out = self.host.apply()
@@ -1318,7 +1332,12 @@ class RoleStepTests(unittest.TestCase):
         self.assertEqual(code, 2, out)  # a profile that differs from the template is refused anyway
         self.assertIn("[warn] agent role tables: 1", out)
 
-    def test_agents_toml_count_counts_recursively_and_never_follows_links(self):
+    def test_agents_toml_count_counts_recursively_and_is_unknown_behind_a_folder_link(self):
+        # Codex follows links below agents/: LocalFileSystem::read_directory takes a link's target's type
+        # (openai/codex rust-v0.157.1 codex-rs/exec-server/src/local_file_system.rs:710-735), so discovery.rs enters a linked
+        # folder, collects a link to a regular file by the link's own name and skips a dangling link. Observed with codex-cli
+        # 0.157.1 through `codex doctor --json`: a malformed role behind a linked folder is one role warning. A count that
+        # skipped the linked folder would report fewer role files than Codex loads, so it is unknown (None) there.
         count = need(self, lane, "agents_toml_count")
         root = self.host.tmp / "counted"
         self.assertEqual(count(root), 0)  # absent
@@ -1328,10 +1347,22 @@ class RoleStepTests(unittest.TestCase):
         elsewhere = self.host.tmp / "linked"
         elsewhere.mkdir()
         (elsewhere / "z.toml").write_text("")
-        (root / "linked-dir").symlink_to(elsewhere)  # not descended into
-        (root / "link.toml").symlink_to(elsewhere / "z.toml")  # counted, never dereferenced
-        self.assertEqual(count(root), 3)
-        self.assertIsNone(count(root / "linked-dir"))  # a link is not a directory it may read
+        (root / "link.toml").symlink_to(elsewhere / "z.toml")  # a link to a file, named *.toml: counted, never read
+        (root / "dangling.toml").symlink_to(elsewhere / "absent.toml")  # Codex skips it; counting it errs on the safe side
+        (root / "renamed.txt").symlink_to(elsewhere / "z.toml")  # the link's own name has no .toml extension
+        self.assertEqual(count(root), 4)
+        for where in (root, root / "deep", root / "deep" / "er"):  # a link to a folder, at any depth
+            with self.subTest(link_in=where.name):
+                (where / "linked-dir").symlink_to(elsewhere)
+                self.assertIsNone(count(root), "a folder link below the root was skipped: the count undercounts")
+                (where / "linked-dir").unlink()
+                self.assertEqual(count(root), 4)
+        (root / "dir.toml").symlink_to(elsewhere)  # a link named *.toml to a folder is a folder link
+        self.assertIsNone(count(root), "a folder link named *.toml was skipped")
+        (root / "dir.toml").unlink()
+        (root / "linked-top").symlink_to(elsewhere)
+        self.assertIsNone(count(root / "linked-top"))  # the top folder itself is a link: not a directory it may read
+        (root / "linked-top").unlink()
         self.assertIsNone(count(root / "a.toml"))
         if os.geteuid() != 0:
             (root / "deep").chmod(0)
@@ -1974,7 +2005,24 @@ class RolesRowTests(unittest.TestCase):
         (self.host.codex_home / "config.toml").write_text("not = [valid toml\n")
         ok, detail = self.row()
         self.assertFalse(ok)
-        self.assertIn("role tables unreadable", detail)
+        self.assertIn("role tables unknown", detail)
+
+    def test_a_folder_link_below_agents_is_unknown_and_never_a_pass(self):
+        # Codex enters a linked folder and loads what it finds there as roles (openai/codex rust-v0.157.1
+        # exec-server/src/local_file_system.rs:710-735; observed with codex-cli 0.157.1), so an extra role behind one must
+        # not leave the row green: the count is unknown, and unknown is not a pass.
+        need(self, prove, "roles_row")
+        self.install_roles()
+        other = self.host.tmp / "roles-elsewhere"
+        other.mkdir()
+        (other / "extra.toml").write_text('name = "extra"\n')
+        (self.agents / "shared").symlink_to(other)
+        ok, detail = self.row()
+        self.assertFalse(ok, "the row passed with a role that Codex would load behind a linked folder")
+        self.assertEqual(detail, self.expected(count="unknown"))
+        self.assertNotIn(str(self.host.tmp), detail)
+        (self.agents / "shared").unlink()  # control: without the link the same folder passes again
+        self.assertEqual(self.row(), (True, self.expected()))
 
     def test_the_row_is_part_of_the_static_checks_and_carries_no_paths(self):
         need(self, prove, "roles_row")
