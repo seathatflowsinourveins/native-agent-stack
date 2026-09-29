@@ -530,6 +530,19 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['mcporter', ['mcporter/mcporter:help excluded']], ['mcporter help', ['mcporter/mcporter:help excluded']], ['mcporter -h', ['mcporter/mcporter:help excluded']],
     ['mcporter call linear.create_comment --help', ['mcporter/mcporter:call excluded']], ['mcporter serve --help', ['mcporter/mcporter:serve excluded']],
   ])
+  // openclaw/mcporter@93e0916c (v0.14.1; the installed 0.14.1 binary reads every case below the same way): a global flag is removed only as the
+  // exact word --config, --root, --log-level or --oauth-timeout with its value in the next word (src/cli/cli-factory.ts:19; extractFlags matches a
+  // token by equality, src/cli/flag-utils.ts:12), and the call and ad-hoc flags are matched by equality too (src/cli/call-arguments.ts:63,115;
+  // src/cli/ephemeral-flags.ts:30), so a flag written with = is not one of them: on a call it is the generic --key=value named argument
+  // (call-arguments.ts:120-121, :333), and before the command it is the command word itself. `mcporter --config=c.json list x` therefore
+  // reads as the implicit call `list.x` (a command word with a dot), and `mcporter call --server=qmd x.y` calls the server x, not qmd.
+  check('cli lanes: mcporter takes a flag written with = as a named argument or a command word, never as a global, server or ad-hoc server flag', [
+    ['mcporter --config=c.json list x', ['mcporter/mcporter:call@(other)']], ['mcporter --root=. list x', ['mcporter/mcporter:call@(other)']],
+    ['mcporter --log-level=debug list', ['mcporter/mcporter:list']], ['mcporter --config c.json list x', ['mcporter/mcporter:list']],
+    ['mcporter call --server=qmd x.y', ['mcporter/mcporter:call@(other)']], ['mcporter call --server qmd x.y', ['mcporter/mcporter:call@qmd']],
+    ['mcporter call --mcp=qmd x.y', ['mcporter/mcporter:call@(other)']], ['mcporter call --http-url=https://mcp.example.org/mcp x.y', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --http-url https://mcp.example.org/mcp x.y', ['mcporter/mcporter:call@(http)']],
+  ])
   // ssh(1) (OpenSSH 9.6p1): the words after the destination are the command the remote host runs, so `ssh host bash -s` runs bash there
   // (a remote invocation of its own) and the heredoc it reads is its script.
   // U1 pivot D5: a server of the stack (manifests/stack.json:280, :407, :629 and :966, and the coordinator's closed set) is emitted by name in
