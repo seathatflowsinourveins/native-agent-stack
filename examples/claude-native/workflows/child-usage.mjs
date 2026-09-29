@@ -978,11 +978,13 @@ function httpToolSelector(input) {
 // An ad-hoc stdio selector (src/cli/call-argument-values.ts:68-83): a blank, or a path start (./ ../ ~/ / C:\ \\).
 const stdioSelector = (s) => hasBlank(s) || s.startsWith('./') || s.startsWith('../') || s.startsWith('~/') || s.startsWith('/')
   || s.startsWith('\\\\') || (s.length > 2 && alnum(s[0]) && !digit(s[0]) && s[1] === ':' && s[2] === '\\')
-// A config server name as a report key: an HTTP URL or ad-hoc stdio command never reaches here; an expansion is
-// (unresolved), and a name with a dot, colon, slash or @ (a host, host:port, path or address) counts as (other), so no host
-// is ever emitted.
-const serverKey = (name) => !name ? '(unresolved)' : name.includes('$') || name.includes('`') ? '(unresolved)'
-  : ['.', ':', '/', '@'].some((c) => name.includes(c)) ? '(other)' : safeKey(name)
+// A config server name as a report key (U1 pivot D5, GPT-6 #10): only the stack's own MCP servers are emitted by name, so a string that merely
+// looks like a name (an id, a host, a person's server) never reaches the output. The closed set is the servers this stack wires:
+// manifests/stack.json:280 (codebase-memory), :407 (context-mode), :629 and :966 (socraticode), and jcodemunch, serena, qmd, headroom and
+// ai-memory from the coordinator's list in the pivot brief. An HTTP URL or ad-hoc stdio command never reaches here; an expansion is
+// (unresolved); any other name is (other).
+const MCPORTER_SERVERS = new Set(['codebase-memory', 'context-mode', 'jcodemunch', 'serena', 'socraticode', 'qmd', 'headroom', 'ai-memory'])
+const serverKey = (name) => !name || name.includes('$') || name.includes('`') ? '(unresolved)' : MCPORTER_SERVERS.has(name) ? name : '(other)'
 // The server an mcporter call reaches. Ephemeral flags anywhere (src/cli/ephemeral-flags.ts:9-128, which does not stop at
 // `--`) and --output/--raw (src/cli/output-format.ts:10-59) are removed first; then words up to `--` are read with the call
 // flags' arities and the generic --key value rule (src/cli/call-arguments.ts:63-128,249-359). A leading call expression
@@ -1193,6 +1195,10 @@ function braceExpands(raw) {
   return false
 }
 const SHELLS = new Set(['sh', 'bash', 'dash', 'zsh', 'ksh'])
+// The names a record's `program` may hold (U1 pivot D5, GPT-6 #10): a lane executable, or a name this reading interprets itself: the wrappers,
+// the shells, eval, ssh and rtk. Any other program (a host, an id, a package, a script) reads null however name-shaped it is.
+const PROGRAM_NAMES = new Set([...LANE_EXECUTABLES.keys(), ...WRAPPER_OPTIONS.keys(), 'env', 'rtk', 'eval', 'ssh', ...SHELLS])
+const programName = (name) => PROGRAM_NAMES.has(name) ? name : null
 // A `command` node's words in source order: its name, then its arguments, then any argument a here-document operator carries after its
 // delimiter (`cat <<EOF -n` is `cat -n <<EOF`). Assignment prefixes and redirections are not words.
 // tree-sitter-bash 0.25.1 sometimes reads what follows a command as more of its arguments: an ERROR node on `;`, `&&` or `|` after an
@@ -1285,9 +1291,9 @@ const unresolvedRecord = (remote) => ({ lane: null, program: null, op: null, ser
 function resolveWords(words, out, cx, exec) {
   const push = (fields) => { out.push({ lane: null, program: null, op: null, server: null, excluded: false, remote: cx.remote, unresolved: false, via: null, ...fields }) }
   const finish = (lane, program, args, via) => {
-    if (lane === 'mcporter') { const m = mcporterOp(args.map((w) => w.v)); return push({ lane, program: safeKey(program), op: m.op, server: m.server ?? null, excluded: m.excluded, via }) }
+    if (lane === 'mcporter') { const m = mcporterOp(args.map((w) => w.v)); return push({ lane, program: programName(program), op: m.op, server: m.server ?? null, excluded: m.excluded, via }) }
     const end = args.findIndex((w) => w.v === '--'), own = end < 0 ? args : args.slice(0, end)
-    push({ lane, program: safeKey(program), excluded: lane !== null && own.some((w) => w.v === '--version' || w.v === '--help'), via })
+    push({ lane, program: programName(program), excluded: lane !== null && own.some((w) => w.v === '--version' || w.v === '--help'), via })
   }
   const script = (text, remote) => {
     if (text === null) return push({ unresolved: true })
