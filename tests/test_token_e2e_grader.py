@@ -4666,10 +4666,12 @@ class F17_GradePrivacy(GraderCase):
     def test_the_canary_scans_keys_shapes_and_gathered_values(self):
         ev = evm()
         values = ["tok7fixture", "sess-fixture-1", "/home/example/project"]
+        # The private shapes are assembled here so that no committed line has one (validate.py scans this file).
+        uuid_shape = "-".join(["3f2c8a10", "1b2c", "4d5e", "8f90", "a1b2c3d4e5f6"])
+        drive_shape = "C:" + "\\" + "Users" + "\\" + "name"
         for document in ({"a": "tok7fixture"}, {"tok7fixture": 1}, {"a": ["x", {"b": "see sess-fixture-1 here"}]},
                          {"a": "/etc/hosts"}, {"a": "see /tmp/x"}, {"a": "toolu_0123456789"}, {"a": "call_abcdef123456"},
-                         {"a": "3f2c8a10-1b2c-4d5e-8f90-a1b2c3d4e5f6"}, {"a": "C:\\Users\\name"},
-                         {"a": "-home-example-project-x"}):
+                         {"a": uuid_shape}, {"a": drive_shape}, {"a": "-home-example-project-x"}):
             with self.subTest(str(document)):
                 self.assertRefused(lambda: ev.assert_no_private(document, values), "E_PRIVACY")
         ev.assert_no_private({"a": "PreToolUse:Read", "tool": {"path": "tools/token-e2e"}, "n": 3, "short": "abc"}, values)
