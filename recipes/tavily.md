@@ -65,6 +65,14 @@ against. To rotate, the operator types the new key once with
 `tools/credentials/open_credential_terminal.sh tavily` and types `replace`
 at the hidden prompt.
 
+Interim step (2026-09-29, until the id-based runner lands): the `exec` and
+`tvly-keyring` commands below read the keyring copy, not the file, so after
+rotating with `tools/credentials/open_credential_terminal.sh tavily` also
+refresh that copy in your own terminal with
+`python3 scripts/kernel_keyring.py store --replace tavily_api_key`, or accept
+that they keep the old key, which fails once it is revoked at Tavily, until
+the next kernel restart drops the copy.
+
 No command in this repository reads the file yet. Until the next kernel
 restart the keyring copy still starts `tvly` with the key. tavily-cli 0.1.8
 reads `TAVILY_API_KEY` before its own file (`get_api_key()` in

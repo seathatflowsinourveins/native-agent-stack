@@ -166,6 +166,23 @@ class CredentialStatusTests(unittest.TestCase):
         path.chmod(0o644)
         self.assertIn("mode_not_0600", self.entry(self.report(), "tavily")["findings"])
 
+    def test_interim_tavily_rotation_step_is_stated_once_in_each_place(self):
+        # Until the id-based runner lands, tvly-keyring and kernel_keyring.py exec read the keyring copy, not the file,
+        # so renewing only the file would leave them on the old key. The step is stated once, dated, in the inventory
+        # notes and in both pages that tell how to rotate; the runner's change deletes it and this test.
+        marker = "Interim step (2026-09-29, until the id-based runner lands)"
+        row = next(e for e in self.inventory["entries"] if e["id"] == "tavily")
+        places = {"inventory notes": row["notes"],
+                  "docs/secret-storage.md": (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8"),
+                  "recipes/tavily.md": (ROOT / "recipes/tavily.md").read_text(encoding="utf-8")}
+        for place, text in places.items():
+            with self.subTest(place=place):
+                self.assertEqual(text.count(marker), 1)
+                step = text.split(marker, 1)[1].split("\n\n", 1)[0]  # the step's own paragraph
+                for words in ("open_credential_terminal.sh tavily", "kernel_keyring.py store --replace tavily_api_key",
+                              "next kernel restart"):
+                    self.assertIn(words, step)
+
     def test_keyring_row_reports_memory_only_lost_on_restart(self):
         inventory = self.keyring_inventory()
         report = cs.inspect(ROOT, inventory, self.env, proc_keys=self.proc_keys)

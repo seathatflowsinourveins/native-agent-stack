@@ -466,6 +466,14 @@ already lists the file: the writer reads the inventory beside it.
 New keys never go through the keyring: the operator types each one once with
 `tools/credentials/open_credential_terminal.sh <inventory-id>`.
 
+**Interim step (2026-09-29, until the id-based runner lands).** `tvly-keyring`
+and the `exec` lines below read the keyring copy, not the file. After
+rotating the Tavily key with `tools/credentials/open_credential_terminal.sh tavily`,
+also refresh that copy in your own terminal with
+`python3 scripts/kernel_keyring.py store --replace tavily_api_key`, or accept
+that they keep the old key, which fails once it is revoked at Tavily, until
+the next kernel restart drops the copy.
+
 **Store a key in the keyring** in your own terminal, never through an agent.
 Run `store` without a pipe: it turns echo off, prompts, and reads one pasted
 line, so the value never passes through your shell, its history or a command
