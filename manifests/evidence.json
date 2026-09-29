@@ -3714,8 +3714,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "8dae8a73dc67de0f51c04763e79909b0ec9b18c776952674700431a34e6f69df",
-      "bytes": 13862
+      "sha256": "c188d822fdca21e256696cee1c9fb4d34b4974d73aafe71077170fb6b322170c",
+      "bytes": 11450
     },
     {
       "path": "CLAUDE.md",
@@ -10369,6 +10369,16 @@
       "bytes": 2124
     },
     {
+      "path": "blueprints/us-equities/AGENTS.md",
+      "sha256": "6771f177d28f29a120d464e56797fef71e96e2be99c5117e47c445db5cce018a",
+      "bytes": 2814
+    },
+    {
+      "path": "blueprints/us-equities/CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "bytes": 11
+    },
+    {
       "path": "blueprints/us-equities/README.md",
       "sha256": "c96eac4c51466043a7091d464262afa96f6cda1dffda754b22d1545f13cb7314",
       "bytes": 9946
@@ -14405,8 +14415,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
-      "sha256": "41379440049b939dfc06d06538fb9d122c81b460178af14b69ae3c8ac8eb27c1",
-      "bytes": 22281
+      "sha256": "28068c23be98ef10bb31c9404ad928826ffa52329353e5b5ba96594dac066f2d",
+      "bytes": 24429
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
@@ -41865,8 +41875,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "08799d84ca0b1c71dd36ced142b21de575502656ddcabf312b39e4ee0c9f0f66",
-      "bytes": 9800
+      "sha256": "23fb608c6236c806d50e7df7e3bad007e0a2357bf86c712da02616948d9201ff",
+      "bytes": 9765
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",

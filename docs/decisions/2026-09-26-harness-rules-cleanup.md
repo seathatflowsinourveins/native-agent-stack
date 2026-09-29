@@ -199,3 +199,23 @@ workflow run IDs). Item AN-02 of the [2026-09-27 review](2026-09-28-community-sw
 - **Check and overturn.** In a session started after the edit, `/memory` or `/context` lists the section, and after
   one `/compact` the summary keeps the listed items. Remove the section if a recorded compaction pair shows it adds
   nothing.
+
+## Addendum (2026-09-29): the trading wave rules move to `blueprints/us-equities/AGENTS.md`
+
+This amends the scope sentence under **Decision** ("`AGENTS.md` keeps trading-only rules under **Trading north star**") without reversing
+it. The root `AGENTS.md` keeps the Trading north star paragraph with the paper-lane authorization, and gains one pointer line. The
+wave-specific paragraphs (architecture and research waves, the simulation-research wave, data readiness, authenticated data and the
+catalyst-convergence wave; 2,647 bytes) moved unchanged to `blueprints/us-equities/AGENTS.md`, whose sibling `CLAUDE.md` imports it, the same
+pattern as `blueprints/convergence-practice/application-delivery/`. The reason is the size tax the `claude-api` prompt-audit guide names in its
+Group 2: the block loaded into every session and every child that reads the project `AGENTS.md`, whether or not the work touched the trading lane.
+
+- **Loading.** Claude Code loads a nested `CLAUDE.md` when it reads files in that directory
+  ([memory](https://code.claude.com/docs/en/memory)). Codex reads the Codex-home file and the root-to-working-directory chain (line 42 above),
+  so a Codex session started at the repository root sees the pointer line, not the moved text. The pointer says to read the file before a
+  trading research wave, experiment, data acquisition, strategy-gate change or decision-array registration.
+- **Acknowledgement.** The trading lane (`ecosystem-roadmap-2026`, which holds it per
+  [the roadmap record](2026-09-28-ecosystem-roadmap.md)) acknowledged the move on PR #499 at head `715e043c`. The later pointer wording and the
+  restored scope of one sentence in `examples/claude-native/CLAUDE.md` follow an independent review of that head.
+- **Check and overturn.** A trading session, review or receipt that shows a moved rule was missed at the point of use moves the paragraph back
+  to the root; so does a Claude Code or Codex release that changes how nested instruction files load. Agents that set `omitClaudeMd` never
+  loaded the root `AGENTS.md`, and whether that setting also suppresses a nested load was not established here.
