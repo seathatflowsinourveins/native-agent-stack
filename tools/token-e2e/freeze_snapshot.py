@@ -18,9 +18,10 @@ Two layers keep that true: collectors derive only booleans, counts, hashes, vers
 values (a permission rule is counted, never kept), and a final guard refuses (exit 3, nothing written) any output string
 that carries an environment value of eight characters or more (except the model alias in CLAUDE_CODE_SUBAGENT_MODEL), a
 permission rule, the home or checkout path, or the user or host name. Paths named
-in the configuration or read from a unit file must lie inside the checkout or the home directory, and the three
-credential stores (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json) are refused by name, by symlink and
-by inode. Scanners are linear character scans; no regular expression is used.
+in the configuration, read from a unit file or named by CHILD_USAGE_SHELL_PARSER must lie inside the checkout or the home
+directory, and the three credential stores (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json) are refused by
+name, by symlink and by inode. list-frozen prints no path a configuration names, and a location that came from an
+environment value is not stored. Scanners are linear character scans; no regular expression is used.
 
 Exit status: 0 done (drift, if any, is informational) or all checked items pass, 1 a frozen item drifted or failed,
 2 usage, input or configuration error, 3 the privacy guard refused the output.
@@ -33,7 +34,12 @@ Sources for the rules implemented here (no upstream implementation of this glue 
   https://code.claude.com/docs/en/settings-reference (fetched 2026-09-29): the behaviour settings this tool reads from each
   settings file and their documented values (permissions.defaultMode, permissions.allow|deny|ask, crossSessionInbound, ...);
   the tools' own --version outputs and the command outputs observed on 2026-09-29 (claude 2.1.284 mcp list and
-  -p --output-format json, qmd 2.8.3 status, adoption_status.py and codex_quota.py --json), recorded in tests/.
+  -p --output-format json, qmd 2.8.3 status, adoption_status.py and codex_quota.py --json), recorded in tests/;
+  examples/claude-native/workflows/child-usage.mjs verifiedShellParser (unmerged at this base; the function is byte-identical
+  on branch claude/pra-u1d-parser-ci-2d-20260929 at 967561cc, lines 656, 661 and 663-668, and on claude/pra-u1-cmdpos-2d-
+  20260928 at 2bad7320, lines 643-655): the directory order (argument, CHILD_USAGE_SHELL_PARSER, the pin's default under the
+  home directory), the pinned files, and the lockfile that must list both pinned packages with the pinned version and
+  integrity. tools.parser.* mirrors that load check; re-read it when U1 merges.
 """
 
 from __future__ import annotations
@@ -74,6 +80,9 @@ CAPABILITY_DIR = "tools/capability-gate"
 WORKFLOW_DIR = "examples/claude-native/workflows"
 WORKFLOW_FILES = ("child-usage.mjs", "shell-parser.pin.json", "SHA256SUMS")
 PARSER_PIN = f"{WORKFLOW_DIR}/shell-parser.pin.json"
+PARSER_ENV = "CHILD_USAGE_SHELL_PARSER"  # the variable child-usage.mjs reads for the installed parser directory
+PARSER_PACKAGES = ("web-tree-sitter", "tree-sitter-bash")  # the two packages the kernel checks in the lockfile, by name
+DEFAULT_LOCKFILE = "package-lock.json"
 TOOL_FILES = (("repo.tool.skill_usage.py", "tools/skill-usage/skill_usage.py"),)
 ROLES = ("stack-verifier", "isolated-builder", "source-scout", "stack-researcher", "evidence-reviewer")
 ROLE_COPIES = (("adoption", "adoption/agents/claude"), ("examples", "examples/claude-native/agents"),
@@ -768,10 +777,14 @@ def build_specs(config: dict) -> list[Spec]:
     for name, label in (("documents", "Total"), ("vectors", "Vectors"), ("pending", "Pending"), ("orphaned", "Orphaned")):
         add(f"tools.qmd.{name}", "tools", "qmd status count",
             f"the {label} count of the Documents block of `qmd --index {config.get('qmd_index') or QMD_INDEX} status`")
-    add("tools.parser.all_match_pin", "tools", "installed parser files equal the pin",
-        f"true when every file named in {PARSER_PIN} has the pinned sha256 in the installed parser directory")
+    add("tools.parser.all_match_pin", "tools", "installed parser equals the pin",
+        f"true when every file named in {PARSER_PIN} has the pinned sha256 in the installed parser directory and its lockfile "
+        "lists both pinned packages with the pinned version and integrity, which is what child-usage.mjs requires before it "
+        "loads the parser")
     add("tools.parser.file.*", "tools", "sha256 of file",
-        f"sha256 of each file named in {PARSER_PIN} read from the installed parser directory (config key parser_dir)")
+        f"sha256 of each file named in {PARSER_PIN} (its files, and the lockfile it names at install.lockfile) read from the "
+        f"installed parser directory: config key parser_dir, else the absolute path in the {PARSER_ENV} variable, else the "
+        "pin's default directory under the home directory")
 
     for unit, unit_class in service_units(config):
         base = f"services.{unit}."
@@ -794,8 +807,10 @@ def build_specs(config: dict) -> list[Spec]:
             add(f"gateways.{gateway['id']}.build_id", "gateways", "build identifier the gateway reports",
                 f"the build identifier of gateway {gateway['id']} from its response")
 
-    for entry in config.get("files", []):
-        add(f"extra.{entry['id']}", "extra", "sha256 of file", f"sha256 of {entry['path']}", entry["class"])
+    for entry in config.get("files", []):  # the configured path is never printed: it may carry the home path or the user name
+        add(f"extra.{entry['id']}", "extra", "sha256 of file",
+            "sha256 of the file the configuration names for this id (only the private capture records where it lives)",
+            entry["class"])
 
     add("capacity.codex.weekly_used_percent", "capacity", "codex_quota.py --json",
         "used percent of the weekly window from scripts/codex_quota.py --json", INFORMATIONAL)
@@ -1115,33 +1130,100 @@ def parser_key(relative: str) -> str:
     return (relative[len("node_modules/"):] if relative.startswith("node_modules/") else relative).replace("/", ":")
 
 
+def parse_parser_pin(data: bytes) -> tuple[dict, str, dict, str]:
+    """(files, lockfile name, packages, default directory) of a shell-parser.pin.json that child-usage.mjs readShellParserPin()
+    accepts (both package names with a version and an integrity, a files map, a default directory) and that is safe to read
+    from: every relative path stays inside the installed directory. The lockfile name defaults to package-lock.json when the
+    pin gives none, as `pin.install.lockfile || 'package-lock.json'` does. Anything else raises ValueError, KeyError or TypeError."""
+    pin = json.loads(data.decode("utf-8"))
+    files, install, packages = pin["files"], pin["install"], pin["packages"]
+    default = install["default_directory"]  # relative to the home directory (shell-parser.pin.json)
+    lockfile = install.get("lockfile")
+    if lockfile is None or lockfile == "":
+        lockfile = DEFAULT_LOCKFILE
+    if (not isinstance(files, dict) or not files or not isinstance(packages, dict) or not isinstance(default, str)
+            or default.startswith(("/", "~")) or ".." in default.split("/")):
+        raise ValueError("shape")
+    for relative in (*files, lockfile):
+        if not (isinstance(relative, str) and not relative.startswith("/") and ".." not in relative.split("/")
+                and plain_name(parser_key(relative), "._:-+", 120)):
+            raise ValueError("entry")
+    if not all(isinstance(expected, str) and is_hex(expected, 64) for expected in files.values()):
+        raise ValueError("entry")
+    for name in PARSER_PACKAGES:
+        entry = packages[name]
+        if not (isinstance(entry, dict) and isinstance(entry.get("version"), str) and entry["version"]
+                and isinstance(entry.get("integrity"), str) and entry["integrity"]):
+            raise ValueError("package")
+    return files, lockfile, {name: packages[name] for name in PARSER_PACKAGES}, default
+
+
+def lock_matches_pin(data: bytes, packages: dict) -> bool:
+    """The lockfile half of verifiedShellParser: packages["node_modules/<name>"] of each of the two pinned packages carries the
+    pinned version and integrity. Text that cannot be read as that is no match. The integrity values are compared here and
+    never stored (base64 holds slashes, which the sanitized capture refuses)."""
+    try:
+        document = json.loads(data.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError, RecursionError):
+        return False
+    entries = document.get("packages") if isinstance(document, dict) else None
+    if not isinstance(entries, dict):
+        return False
+    for name in PARSER_PACKAGES:
+        entry = entries.get("node_modules/" + name)
+        if not (isinstance(entry, dict) and entry.get("version") == packages[name]["version"]
+                and entry.get("integrity") == packages[name]["integrity"]):
+            return False
+    return True
+
+
+def parser_directory(ctx: Ctx, default: str) -> tuple[Optional[Path], bool]:
+    """(directory, whether its location may be stored) in the order verifiedShellParser resolves it: the configured parser_dir
+    (the kernel's --shell-parser argument), then the CHILD_USAGE_SHELL_PARSER variable (an empty one is skipped, as `a || b`
+    does), then the pin's default directory under the home directory. The variable names a path the kernel reads, so it meets
+    the path policy; it must be absolute, because the kernel resolves a relative one against a working directory this tool
+    does not know and never expands `~`. A location that came from the environment is not stored. None when it is refused."""
+    configured = ctx.config.get("parser_dir")
+    if configured:
+        return ctx.expand(configured), True
+    value = ctx.env.get(PARSER_ENV)
+    if value:
+        try:
+            if not os.path.isabs(value):
+                raise PathRefused("invalid")
+            return check_path_policy(value, ctx.home, ctx.repo), False
+        except PathRefused:
+            return None, False
+    return ctx.home / default, True
+
+
 def parser_items(ctx: Ctx) -> list[dict]:
-    """Each file the parser pin names, hashed in the installed parser directory; the pin itself is never trusted for a value."""
+    """The install child-usage.mjs would load, checked the way it checks it: each file the pin names is hashed in the installed
+    parser directory, and so is the lockfile, which must list both pinned packages with the pinned version and integrity.
+    all_match_pin is true exactly when the kernel would accept the install; the pin itself is never trusted for a value."""
     status, data, reason = ctx.read(ctx.repo / PARSER_PIN, 1 << 20)
     if status != OK:
         return [ctx.item("tools.parser.all_match_pin", status, None, "no_pin_file" if status == MISSING else reason)]
     try:
-        pin = json.loads(data.decode("utf-8"))
-        files = pin["files"]
-        default = pin["install"]["default_directory"]  # relative to the home directory (shell-parser.pin.json)
-        if (not isinstance(files, dict) or not files or not isinstance(default, str) or default.startswith(("/", "~"))
-                or ".." in default.split("/")):
-            raise ValueError("shape")
-        for relative, expected in files.items():
-            valid = (isinstance(relative, str) and not relative.startswith("/") and ".." not in relative.split("/")
-                     and plain_name(parser_key(relative), "._:-+", 120) and isinstance(expected, str) and is_hex(expected, 64))
-            if not valid:
-                raise ValueError("entry")
-        configured = ctx.config.get("parser_dir")
-        root = ctx.expand(configured) if configured else ctx.home / default
-    except (ValueError, KeyError, TypeError, UnicodeDecodeError, RecursionError):
+        files, lockfile, packages, default = parse_parser_pin(data)
+    except (ValueError, KeyError, TypeError, AttributeError, UnicodeDecodeError, RecursionError):
         return [ctx.item("tools.parser.all_match_pin", ERROR, None, "unrecognized_pin")]
+    root, stored = parser_directory(ctx, default)
+    if root is None:
+        return [ctx.item("tools.parser.all_match_pin", ERROR, None, "refused_path")]
     items = []
     matches = True
     for relative, expected in sorted(files.items()):
         item_status, digest, item_reason = ctx.hash_file(root / relative)
-        items.append(ctx.item("tools.parser.file." + parser_key(relative), item_status, digest, item_reason, root / relative))
+        items.append(ctx.item("tools.parser.file." + parser_key(relative), item_status, digest, item_reason,
+                              root / relative if stored else None))
         matches = matches and item_status == OK and digest == expected
+    lock_status, lock_data, lock_reason = ctx.read(root / lockfile, 1 << 22)
+    if lockfile not in files:  # a lockfile the pin also lists under files is hashed once, above
+        items.append(ctx.item("tools.parser.file." + parser_key(lockfile), lock_status,
+                              hashlib.sha256(lock_data).hexdigest() if lock_data is not None else None, lock_reason,
+                              root / lockfile if stored else None))
+    matches = matches and lock_status == OK and lock_matches_pin(lock_data or b"", packages)
     items.append(ctx.item("tools.parser.all_match_pin", OK, matches))
     return items
 

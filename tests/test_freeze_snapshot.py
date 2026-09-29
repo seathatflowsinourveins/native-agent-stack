@@ -1414,7 +1414,7 @@ class ParserPinTests(HostCase):
         for index, (label, value) in enumerate(refused.items()):
             with self.subTest(value=label):
                 cap = self.state(f"refused-{index}", env=self.with_env(value))
-                self.assertEqual((cap.status(self.ALL), cap.item(self.ALL)["reason"]), ("error", "refused_path"))
+                self.assertEqual((cap.status(self.ALL), cap.item(self.ALL).get("reason")), ("error", "refused_path"))
                 self.assertFalse([item for item in cap.items() if item.startswith("tools.parser.file.")])
                 self.assertEqual((cap.status("tools.rtk.version"), cap.status("tools.qmd.documents")), ("ok", "ok"),
                                  "the rest of the tools collector survives the refusal")
@@ -1441,7 +1441,7 @@ class ParserPinTests(HostCase):
                 mutate(pin)
                 self.host.write(self.pin_path(), json.dumps(pin, indent=2))
                 cap = self.state(f"pin-{index}")
-                self.assertEqual((cap.status(self.ALL), cap.item(self.ALL)["reason"]), ("error", "unrecognized_pin"))
+                self.assertEqual((cap.status(self.ALL), cap.item(self.ALL).get("reason")), ("error", "unrecognized_pin"))
                 self.assertFalse([item for item in cap.items() if item.startswith("tools.parser.file.")])
         for index, (label, mutate) in enumerate((("lockfile key absent", lambda p: p["install"].pop("lockfile")),
                                                  ("lockfile key empty", lambda p: p["install"].update(lockfile="")))):
@@ -2239,6 +2239,36 @@ class MutationControlTests(unittest.TestCase):
          "SettingsTests.test_permission_rules_are_counted_never_printed", "unexpectedly found"),
         ("permission_rules_printed_guarded", (RULES_LEAK,),
          "SettingsTests.test_permission_rules_are_counted_never_printed", "refused: output strings carry"),
+        # Repair round: list-frozen path and the parser mirror (child-usage.mjs verifiedShellParser).
+        ("list_frozen_prints_the_configured_path",
+         (('            "sha256 of the file the configuration names for this id (only the private capture records where it lives)",\n',
+           "            f\"sha256 of {entry['path']}\",\n"),),
+         "ConfigTests.test_list_frozen_prints_no_configured_path_home_path_or_user_name", "configured text"),
+        ("parser_ignores_the_environment_variable", (("    value = ctx.env.get(PARSER_ENV)\n", "    value = None\n"),),
+         "ParserPinTests.test_the_environment_variable_selects_the_directory_the_kernel_loads",
+         "the directory the variable names is hashed"),
+        ("parser_stores_the_environment_location",
+         (("            return check_path_policy(value, ctx.home, ctx.repo), False\n",
+           "            return check_path_policy(value, ctx.home, ctx.repo), True\n"),),
+         "ParserPinTests.test_the_environment_variable_selects_the_directory_the_kernel_loads",
+         "a location that came from the environment is not stored"),
+        ("parser_accepts_a_relative_or_tilde_environment_value",
+         (('            if not os.path.isabs(value):\n                raise PathRefused("invalid")\n', "            pass\n"),),
+         "ParserPinTests.test_an_environment_directory_the_path_policy_refuses_is_a_parser_error_and_nothing_else_is_lost",
+         "refused_path"),
+        ("parser_configured_directory_below_the_environment",
+         (("    if configured:\n        return ctx.expand(configured), True\n",
+           "    if configured and not ctx.env.get(PARSER_ENV):\n        return ctx.expand(configured), True\n"),),
+         "ParserPinTests.test_the_configured_directory_outranks_the_variable_and_an_empty_variable_is_ignored",
+         "which the kernel tries first"),
+        ("parser_ignores_the_lockfile",
+         (('    matches = matches and lock_status == OK and lock_matches_pin(lock_data or b"", packages)\n', "    matches = matches\n"),),
+         "ParserPinTests.test_a_missing_or_edited_lockfile_breaks_the_pin_the_way_the_kernel_refuses_it", "True is not False"),
+        # A test the review found had never failed against an earlier tool: the override of the tokenizer location.
+        ("tokenizer_prefix_ignored",
+         (('    package = ctx.expand(ctx.config.get("tokenizer_prefix") or TOKENIZER_PREFIX) / "node_modules" / "gpt-tokenizer"\n',
+           '    package = ctx.expand(TOKENIZER_PREFIX) / "node_modules" / "gpt-tokenizer"\n'),),
+         "ConfigTests.test_tokenizer_location_can_be_overridden", "3.4.0"),
     )
 
     def mutant_dir(self) -> Path:
