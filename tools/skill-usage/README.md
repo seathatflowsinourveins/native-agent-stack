@@ -349,9 +349,24 @@ rendered disable list in the host's user config; a host without it reports every
 `applied` or `unknown`. `groups.workers` covers `applied` sessions (also split into top-level `exec`
 sessions and spawned `subagent` sessions), `groups.negative_controls` the `ignored` ones.
 
-The lane report keeps the same privacy boundary: server, tool-kind and skill names, counts and
-token figures only, with sessions never named by id or path; a server, function or originator
-name that is not name-shaped is counted as `(other)`. Rollout files not modified since
+`groups.workers_by_role` splits the workers by custom-agent role, and `actors[].role` and
+`sessions_by_role` report it for every session. The role is `session_meta.agent_role`, which also reads
+from `agent_type`
+([protocol.rs:3153-3155](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L3153-L3155)),
+else the `agent_role` (or `agent_type`) of the `source.subagent.thread_spawn` source
+([:2904-2913](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L2904-L2913)),
+taken from the session's first `session_meta` (a sub-agent rollout repeats its parent's meta second).
+It is trimmed as the spawn handler trims it
+([spawn.rs:126-130](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L126-L130),
+Rust `str::trim`, Unicode White_Space); an empty value or one that is not a string is no role. A role
+that is not name-shaped is `(other)`, a sub-agent without a role is `(none)` and every other session is
+`(root)`. A V2 spawn that is not a full-history fork can carry the role `default` when a default role
+file is configured
+([child_config.rs:86-98](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/child_config.rs#L86-L98)).
+
+The lane report keeps the same privacy boundary: server, tool-kind, skill and role names, counts and
+token figures only, with sessions never named by id or path; a server, function, originator, role
+or content-kind name that is not name-shaped is counted as `(other)`. Rollout files not modified since
 `--since` are skipped unread (counted as `files_skipped_unmodified`). Evidence from it is a
 `local_integration` measurement of native transcripts, not a model run.
 

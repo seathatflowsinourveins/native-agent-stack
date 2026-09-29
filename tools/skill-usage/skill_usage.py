@@ -716,12 +716,41 @@ LANES_LIMITS = (
     "inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and "
     "fetch() or an HTTP library in a script are in no lane. Server, function, originator and "
     "history-mode names that are not name-shaped are counted under (other). Sessions whose user "
-    "config was ignored are negative controls, never workers. Rollout files not modified since the "
+    "config was ignored are negative controls, never workers. A session's role (actors[].role, sessions_by_role, "
+    "groups.workers_by_role) is session_meta.agent_role (or agent_type), else its thread_spawn source's, trimmed; a "
+    "sub-agent without one is (none) and every other session (root). Rollout files not modified since the "
     "window start are skipped unread.")
 
 
 def safe_key(value) -> str:
     return str(value) if SAFE_KEY.match(str(value)) else "(other)"
+
+
+# Rust's str::trim removes the Unicode White_Space characters (Unicode PropList.txt White_Space), not Python's str.strip
+# set, which also removes U+001C to U+001F.
+RUST_WHITE_SPACE = ("\t\n\x0b\x0c\r \x85\xa0            "
+                    "    　")
+
+
+def _role_of(fields) -> str | None:
+    """A custom-agent role as Codex keeps it: agent_role, which also deserializes from agent_type, trimmed, and none when
+    empty (openai/codex rust-v0.157.1 core/src/tools/handlers/multi_agents_v2/spawn.rs:126-130) or not a string."""
+    if not isinstance(fields, dict):
+        return None
+    value = fields["agent_role"] if "agent_role" in fields else fields.get("agent_type")
+    return (value.strip(RUST_WHITE_SPACE) or None) if isinstance(value, str) else None
+
+
+def session_role(meta: dict, kind: str | None) -> str:
+    """PR-A 10b: the session's role from its first session_meta, SessionMeta.agent_role (rust-v0.157.1
+    protocol/src/protocol.rs:3153-3155), else the ThreadSpawn source's agent_role (:2904-2913), as a name-shaped key; a
+    sub-agent without a role is (none), and every other session (root)."""
+    source = meta.get("source")
+    subagent = source.get("subagent") if isinstance(source, dict) else None
+    role = _role_of(meta) or _role_of(subagent.get("thread_spawn") if isinstance(subagent, dict) else None)
+    if role is not None:
+        return safe_key(role)
+    return "(none)" if kind == "subagent" else "(root)"
 
 
 def _program_of(prefix: str) -> str:
@@ -1173,7 +1202,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
 
 
 def _new_lanes_session() -> dict:
-    return {"kind": None, "originator": None, "history_mode": None, "marker": False, "marker_inherited": False,
+    return {"kind": None, "role": "(root)", "originator": None, "history_mode": None, "marker": False, "marker_inherited": False,
             "marker_injected": False, "marker_injected_kinds": {}, "catalog_off": False,
             "catalog_on": False, "in_window": False, "started_before_window": False,
             "ran_past_window_end": False, "tool_calls": 0, "mcp_calls": {}, "mcp_failed": {},
@@ -1257,6 +1286,7 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                     source = payload.get("source")
                     session["kind"] = ("subagent" if isinstance(source, dict) and "subagent" in source
                                        else "exec" if source == "exec" else "other")
+                    session["role"] = session_role(payload, session["kind"])
                     session["originator"] = safe_key(payload["originator"]) if payload.get("originator") else "(none)"
                     session["history_mode"] = (safe_key(payload["history_mode"]) if payload.get("history_mode")
                                                else "(none)")
@@ -1460,18 +1490,21 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_ch
         "records_without_timestamp": untimed, "sessions_in_window": len(sessions),
         "sessions_started_before_window": sum(s["started_before_window"] for s in sessions),
         "sessions_ran_past_window_end": sum(s["ran_past_window_end"] for s in sessions),
-        "sessions_by_kind": count_by("kind"), "sessions_by_originator": count_by("originator"),
+        "sessions_by_kind": count_by("kind"), "sessions_by_role": count_by("role"),
+        "sessions_by_originator": count_by("originator"),
         "sessions_by_history_mode": count_by("history_mode"),
         "sessions_with_tool_calls_but_no_item_events": sum(
             1 for s in sessions if s["own_model_calls"] and not s["own_tool_items"]),
         "user_config": {**{state: sum(s["user_config"] == state for s in sessions)
                            for state in ("applied", "ignored", "unknown")}, "method": USER_CONFIG_METHOD},
-        "actors": [{"ordinal": i + 1, "kind": s["kind"], "user_config": s["user_config"],
+        "actors": [{"ordinal": i + 1, "kind": s["kind"], "role": s["role"], "user_config": s["user_config"],
                     "measurement": s["measurement"]} for i, s in enumerate(sessions)],
         "groups": {
             "workers": aggregate_codex_lanes(workers),
             "workers_by_kind": {kind: aggregate_codex_lanes([s for s in workers if s["kind"] == kind])
                                 for kind in sorted({str(s["kind"]) for s in workers})},
+            "workers_by_role": {role: aggregate_codex_lanes([s for s in workers if s["role"] == role])
+                                for role in sorted({s["role"] for s in workers})},
             "negative_controls": aggregate_codex_lanes([s for s in sessions if s["user_config"] == "ignored"]),
             "unclassified": aggregate_codex_lanes([s for s in sessions if s["user_config"] == "unknown"]),
         },
