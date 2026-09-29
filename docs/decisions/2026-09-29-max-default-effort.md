@@ -5,9 +5,11 @@
 up the default effort to max quality, all setting tuned to latest sota converged highest quality of our claude code
 setting") and 2026-09-29 ("please resolute our max quality setting, finalize e2e with sota repos upstream"). Checked
 against Claude Code 2.1.284, the latest release when this was written (binary sha256 in the receipt); branch
-`claude/max-default-effort-20260929`, based on `origin/main@11648f9a`. It acts on the third overturn condition of the
+`claude/max-default-effort-20260929`, rebased onto `origin/main@ba31dcd0`. It acts on the third overturn condition of the
 [2026-09-23 max-effort record](2026-09-23-max-effort-default.md), which 2.1.284 meets, and leaves that record as history
-for 2.1.281.
+for 2.1.281. That record's 2026-09-29 addendum (#479, the Sonnet 5.5 dispatch change) found the same condition met by the
+Ultracode-reminder indicator but "not adopted: the coordinator stays at xhigh, and moving it to `max` is left to the user"; this
+record is that move, made on the user's 2026-09-29 request and limited to interactive launches through the launcher.
 
 **Scope:**
 
@@ -18,8 +20,15 @@ for 2.1.281.
 - one host file, applied by hand with a backup and a read-back: `~/.local/share/codex-ecosystem/bin/claude`.
 
 The wording of the coordinator rule in `AGENTS.md`, the portable and host `CLAUDE.md`, the recipes and the workflows README
-belongs to the session that owns the Sonnet 5.5 and Opus 5.5 dispatch change; this record gives it the rule to state. The
-effort guard, the settings files and every agent definition are unchanged.
+belongs to the session that owns the Sonnet 5.5 and Opus 5.5 dispatch change (its `lane:shared` follow-up waits for this record's
+merge); this record gives it the rule to state. The effort guard, the settings files and every agent definition are unchanged by
+this branch. The saved `xhigh` levels that #479 added stay as they are: they are the fallback in point 2 below.
+
+**How the effort guard sees a launcher session.** `adoption/hooks/claude/effort-default-guard.py` resolves the level from the
+settings files, so it cannot see a `--effort` flag. Its SessionEnd branch returns at once when the transcript's effort is `xhigh` or
+higher, so a session at `max` never triggers a save. Its SessionStart warning fires when a model resolves to no level or to one below `xhigh` in the
+settings files; on a host or model with no saved level it would warn even though the launcher runs the session at `max`. That
+warning is advisory and this branch leaves the guard alone; the host's user settings hold saved levels for both current models.
 
 ## Decision
 
@@ -108,30 +117,39 @@ suites (288 tests, 33 skipped, exit 0).
 re-fetched by an independent verifier: 30 of 40 confirmed, 10 corrected as written here, none unsupported). The default rests on the
 user's requirement, not on a measured gain on this repository's work; these are the numbers behind the caution.
 
-- **Guidance.** No Anthropic source recommends `max` as a default. The Claude Code model-configuration page says `max` "may show
-  diminishing returns and is prone to overthinking, so test before adopting it broadly"; the platform effort page says, for Sonnet 5.5,
-  "Use `xhigh` or `max` only where your evals show a quality gain" and, for Opus 5.5, "Run an effort sweep on your own evals". The Opus 5.5
-  system card says that on GDPval-AA and AA-Briefcase `xhigh` matches `max` with 41 to 51 percent fewer output tokens.
+- **Guidance.** The Anthropic guidance cited here does not recommend `max` as the general default for Sonnet 5.5 or Opus 5.5. The Claude
+  Code model-configuration page says `max` "may show diminishing returns and is prone to overthinking, so test before adopting it
+  broadly"; the platform effort page says, for Sonnet 5.5, "Use `xhigh` or `max` only where your evals show a quality gain" and, for
+  Opus 5.5, "Run an effort sweep on your own evals". The Opus 5.5 system card (§§8.14.3 to 8.14.4, pp. 209 to 210) says `xhigh` achieves
+  similar performance to `max` (GDPval-AA 1820 against 1846, AA-Briefcase 1780 against 1822) using about 51% fewer output tokens on
+  GDPval-AA and 41% fewer on AA-Briefcase.
 - **Sonnet 5.5 (this host's session model), `max` against `xhigh`.** Higher: Terminal-Bench 4.0 run by Anthropic in `--bare` mode
-  70.6% against 61.5% ($12.54 against $5.30 per attempt); the same benchmark in a third-party harness 63.6% against 57.1%
+  (which skips automatic discovery of skills, subagents, plugins, MCP servers, hooks and `CLAUDE.md`) 70.6% against 61.5% ($12.54
+  against $5.30 per attempt); the same benchmark in a third-party harness 63.6% against 57.1%
   (Artificial Analysis, on a pre-release deployment it says it will re-run); CursorBench 55.5 against 53.1 (the vendor's page: "small
   differences in scores may not be statistically meaningful"); GDPval-AA +119 Elo and AA-Briefcase +65 Elo, the latter with 95%
   intervals that do not overlap. **Lower:** FrontierCode v1.1 (Cognition, full Claude Code harness): Main 46.2% against 52.1% and
-  Extended 59.1% against 64.4%, below `high` on both subsets, at about 12.6 times the tokens per task (595,651 against 47,385), $20.78
-  against $1.59 and 62 against 13 minutes; 4.65% of the `max` Main runs and 3.37% of the Extended runs were flagged for unfair
-  internet use and scored zero, against none at `xhigh`. Anthropic attributes the loss to `max` more often running Claude Code's
-  code-review skill across many subagents (two cases examined). Artificial Analysis calls `high` the most competitive Sonnet 5.5
-  setting on cost.
-- **Opus 5.5, `max` against `xhigh`.** Small or no gain where it exists: Terminal-Bench 4.0 64.8% against 66.4% ("within noise" per
+  Extended 59.1% against 64.4%, below `high` on both subsets. On Main `max` used about 12.6 times the tokens per task (the leaderboard
+  data's `tokens` field: 595,651 against 47,385), $20.78 against $1.59 and 62 against 13 minutes; on Extended 474,549 against 37,536
+  tokens, $16.29 against $1.24 and 51.7 against 10.4 minutes. 4.65% of the `max` Main runs and 3.37% of the Extended runs were flagged
+  for unfair internet use and scored zero, against none at `xhigh`. Anthropic's launch page (footnote 2) reports that at `max`
+  Sonnet 5.5 more often ran Claude Code's code-review skill, which splits the review across many subagents, and that in two cases
+  Cognition examined this led to a timeout or to extra edits beyond the task's scope, and so to a lower score; it does not say how
+  much of the aggregate loss those cases explain. Artificial Analysis calls `high` the most competitive Sonnet 5.5 setting on cost.
+- **Opus 5.5, `max` against `xhigh`.** Gains vary by benchmark: Terminal-Bench 4.0 64.8% against 66.4% ("within noise" per
   Anthropic) and identical in the third-party harness; CursorBench 57.8 against 56.0; FrontierCode Main 54.4 against 51.4 (its best level
-  is `medium`, 54.6) and a tie on Extended; Zapier AutomationBench 42.5 against 35.8; AA-Briefcase +42 Elo. Cost per task 1.5 to 2.8
-  times. The card also reports that Opus 5.5 acted on instructions hidden in text a user pasted in about 2% of attempts at its default
-  reasoning effort and about 7.4% at `max`, all blocked by product mitigations.
-- **Reading (inference, not a measurement here).** The two Claude Code sweeps for Sonnet 5.5 disagree: in `--bare` mode (no skills,
-  subagents, plugins, MCP servers, hooks or `CLAUDE.md`) `max` wins; in Cognition's full Claude Code runs, where `max` fanned out to
-  more skills and subagents, it loses. This host runs Sonnet 5.5 with skills, subagents, plugins and MCP servers loaded, which
-  resembles the second condition. For Opus 5.5 `max` is at best a small gain at higher cost. The launcher makes the user's requirement the
-  default and keeps `--effort xhigh` as the one-word opt-out until the sweep below reports.
+  is `medium`, 54.6) and an effective tie on Extended (63.58% against 63.53%, with `medium` and `high` above both); Zapier
+  AutomationBench, with default fallbacks (refused tasks rerun through Anthropic's fallback routing), 42.47% against 35.77%, a gain of
+  6.7 points or about 18.7% relative; AA-Briefcase +42 Elo. Cost per task 1.5 to 2.8 times. The card also reports that Opus 5.5 acted on
+  instructions hidden in text a user pasted in about 2% of attempts at its default reasoning effort and about 7.4% at `max`, all
+  blocked by product mitigations.
+- **Reading (inference, not a measurement here).** For Sonnet 5.5 the direction of the effort effect differs between Terminal-Bench
+  (Anthropic, `--bare`) and FrontierCode (Cognition, full Claude Code): `max` wins the first and loses the second. The two differ in
+  benchmark, tasks and evaluation conditions, so these results do not isolate the effect of skills or subagents; Anthropic's own
+  explanation for the second is the two-case footnote above. This host runs Sonnet 5.5 with skills, subagents, plugins and MCP servers
+  loaded, which is closer to the full-client condition than to `--bare`. For Opus 5.5 the gains vary by benchmark and come at higher
+  cost; their value for this repository remains unmeasured. The launcher makes the user's requirement the default and keeps
+  `--effort xhigh` as the one-word opt-out until the sweep below reports.
 
 ## Other quality settings audited (2026-09-29)
 
@@ -181,7 +199,8 @@ Revisit this record when any of these happens:
   [2026-09-28 sweep record](2026-09-28-community-sweep.md#amendments-to-the-2026-09-24-rows)) shows that `max` gives no gain, or a
   loss, for a model or role at higher cost: the result goes to the user as a recommendation, and this launcher then gains a
   per-model rule or is removed (it lowers no role by itself). That sweep should include Sonnet 5.5 at `xhigh` against `max` on
-  this repository's change-and-review tasks in the full client, because the only two Claude Code sweeps for that model disagree;
+  this repository's change-and-review tasks in the full client, because the two Claude Code results for that model point in opposite
+  directions (Terminal-Bench in `--bare` mode, FrontierCode in the full client);
 - usage limits block work at `max`;
 - `max` overthinking, or the extra subagent and skill activity the vendor reports at `max`, is observed to regress a gated result;
 - a release changes how `--effort` interacts with Ultracode or with children's effort: repeat the probes in the receipt after
@@ -217,6 +236,15 @@ Revisit this record when any of these happens:
   One repair round followed; the reviewer's own suggestion (respect value-taking options) was not adopted because the launcher
   cannot know a client's option table. The probes and the receipt were regenerated on the repaired launcher, and the host file was
   replaced by the repaired version (the first version stays beside it as `claude.bak-20260929-max-default-v1`).
+- **Cross-family fact-check of the vendor section (2026-09-29).** A second read-only GPT-6 run with live search (same flags) checked
+  the section above against its sources and returned nine wording corrections (five low, four medium): a claim about "no Anthropic
+  source", the `xhigh` token saving stated without the similar-performance context, the FrontierCode token, cost and time figures
+  given for Main only, Anthropic's two-case footnote read as an aggregate explanation, "a tie" on Extended, the Zapier figures
+  without their "default fallbacks" label, `--bare` described as loading nothing, "the two sweeps disagree" read as a controlled
+  comparison, and "at best a small gain" for Opus 5.5. The coordinator re-fetched Cognition's `data.json`, Anthropic's Sonnet 5.5
+  launch page and Zapier's leaderboard (version 1.0.6) for the figures and applied all nine. One suggestion, naming Cognition's
+  `tokens` field as output tokens, could not be confirmed from the fetched sources, so the section says "the leaderboard data's
+  `tokens` field".
 - **Independent verification.** The vendor evidence (40 claims) and the settings audit (36 rows) were each re-checked by a second
   research agent that re-fetched every source: 30 and 31 confirmed, 10 and 5 corrected as written above, none unsupported. The
   seventeen headless probe rows were re-derived from the raw transcripts by a verifier with its own extraction code (17 of 17
