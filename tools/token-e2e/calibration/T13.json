@@ -1,0 +1,57 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T13",
+ "clauses": [
+  "The answer states local, project and user and agrees with retained original HTML",
+  "preserve conversion omissions and exit status"
+ ],
+ "sources": [
+  {
+   "label": "original page and conversion record",
+   "text": "scopes on the original page: local, project, user; the conversion exited 0 and its output omitted the scope table"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The page defines three scopes: local, project and user. The conversion exited 0, but its output omitted the scope table, so the scope names come from the original HTML.\n\nSource excerpt: scopes on the original page: local, project, user; the conversion exited 0 and its output omitted the scope table",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "Servers can live in the local, project or user scope according to the original page. The converter reported success (exit 0) yet dropped the scope table from its text, and I am reporting that gap.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The scopes are local, project and global. The conversion exited 0 and omitted the scope table.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "The scopes are local, project and user. The conversion succeeded and nothing was missing from its output.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

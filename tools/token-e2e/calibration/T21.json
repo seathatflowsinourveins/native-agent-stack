@@ -1,0 +1,65 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T21",
+ "clauses": [
+  "NautilusTrader 2.0.0rc5; IBKR; separate Alpaca boundary.",
+  "Historical retrieval must contain a scoped result for stdin left open in unattended workers; compare with docs/harness-defaults.md, Anti-pattern log: Close stdin for unattended launches; the retained failure was waiting for input until timeout."
+ ],
+ "sources": [
+  {
+   "label": "catalogs/us-equities/README.md",
+   "text": "The current selected destination is **NautilusTrader 2.0.0rc5 with IBKR**, plus a\nseparately validated **Alpaca** data/paper-execution boundary."
+  },
+  {
+   "label": "anti-pattern log row",
+   "text": "| 2026-09-24 | Leaving stdin open for a non-interactive CLI | Backgrounded `codex exec \"<prompt>\"` runs printed \"Reading additional input from stdin...\" and waited until their timeout killed them |"
+  },
+  {
+   "label": "frozen historical record digests",
+   "text": "record 1: 3fa9c2d41b7e0a55"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The catalog's selected destination is NautilusTrader 2.0.0rc5 with IBKR, with a separately validated Alpaca boundary. The earlier decision about stdin left open in unattended workers (record 3fa9c2d41b7e0a55) matches the log row: runs waited on stdin until their timeout killed them.\n\nSource excerpt: The current selected destination is **NautilusTrader 2.0.0rc5 with IBKR**, plus a\nseparately validated **Alpaca** data/paper-execution boundary.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "The chosen engine is NautilusTrader at 2.0.0rc5 paired with the IBKR broker, and Alpaca is kept apart as its own validated data and paper boundary. I retrieved the stored decision on an unattended worker holding stdin open (record 3fa9c2d41b7e0a55); the log confirms such runs just waited for input until the timeout.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The catalog selects LEAN with Alpaca as the destination, and IBKR is the separate adapter. The stdin decision matches the log.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "The destination is NautilusTrader 2.0.0rc5 with IBKR and a separate Alpaca boundary. I found no earlier decision about stdin, and nothing in the log covers it.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

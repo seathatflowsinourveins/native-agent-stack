@@ -1,0 +1,57 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T5",
+ "clauses": [
+  "Definition and each listed call site agree with original source",
+  "comments and string literals do not count as invocations"
+ ],
+ "sources": [
+  {
+   "label": "sites at the pinned revision",
+   "text": "definition: scripts/host_receipts.py:710 def register_file(path)\ndirect calls: scripts/a.py:12; scripts/b.py:30\nattribute calls such as receipts.register_file(path), imports, and mentions in comments or string literals are not direct invocations"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "register_file is defined at scripts/host_receipts.py:710. Its direct calls are scripts/a.py:12 and scripts/b.py:30. Attribute calls, imports and mentions in comments or string literals are not invocations.\n\nSource excerpt: definition: scripts/host_receipts.py:710 def register_file(path)\ndirect calls: scripts/a.py:12; scripts/b.py:30\nattribute calls such as receipts.register_file(path), imports, and mentions in comments or string literals are not direct invocations",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "The definition sits at line 710 of scripts/host_receipts.py, and the only direct invocations are in scripts/a.py (line 12) and scripts/b.py (line 30); I left out attribute calls, imports, comments and strings that merely name the function.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "register_file is defined at scripts/host_receipts.py:42 and called from scripts/a.py:12, scripts/b.py:30 and scripts/c.py:5. Comments and strings are not counted.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "Defined at scripts/host_receipts.py:710; direct calls at scripts/a.py:12 and scripts/b.py:30. The docstring in scripts/d.py:8 also invokes register_file(path), so I count it as a third invocation.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

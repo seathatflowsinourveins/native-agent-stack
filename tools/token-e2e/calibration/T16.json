@@ -1,0 +1,81 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T16",
+ "clauses": [
+  "ensure_ascii defaults to true; non-ASCII characters are escaped when true."
+ ],
+ "sources": [
+  {
+   "label": "json.dumps documentation",
+   "text": "If ensure_ascii is true (the default), the output is guaranteed to have all incoming non-ASCII and non-printable characters escaped."
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "According to the documentation: If ensure_ascii is true (the default), the output is guaranteed to have all incoming non-ASCII and non-printable characters escaped.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "By default ensure_ascii is on: every character outside ASCII is written as a \\uXXXX escape sequence instead of the raw character.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "ensure_ascii defaults to False, so non-ASCII characters are written to the output as they are.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "The default of ensure_ascii is true, and setting it changes the indentation of the output.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  }
+ ],
+ "extraction_controls": [
+  {
+   "id": "x-inline",
+   "component": "payload",
+   "answer": "Here is the table as JSON: [{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}] which keeps every field.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ],
+    "answer_quotes": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ]
+   }
+  },
+  {
+   "id": "x-toon",
+   "component": "payload",
+   "answer": "The compact form of the rows is:\n[2]{id,name}:\n  1,a\n  2,b\nThat is all of them.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ],
+    "answer_quotes": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ]
+   }
+  }
+ ]
+}

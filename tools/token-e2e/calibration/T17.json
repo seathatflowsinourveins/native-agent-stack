@@ -1,0 +1,81 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T17",
+ "clauses": [
+  "allow_nan=false raises ValueError for NaN or infinity instead of emitting nonstandard values."
+ ],
+ "sources": [
+  {
+   "label": "json.dumps documentation",
+   "text": "If allow_nan is false (default: True), then it will be a ValueError to serialize out of range float values (nan, inf, -inf) in strict compliance of the JSON specification. If allow_nan is true, their JavaScript equivalents (NaN, Infinity, -Infinity) will be used."
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "According to the documentation: If allow_nan is false (default: True), then it will be a ValueError to serialize out of range float values (nan, inf, -inf) in strict compliance of the JSON specification. If allow_nan is true, their JavaScript equivalents (NaN, Infinity, -Infinity) will be used.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "Passing allow_nan=False makes the encoder raise a ValueError when it meets NaN or an infinity, rather than writing NaN or Infinity tokens that strict JSON does not allow.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "allow_nan=false emits NaN as the JavaScript token, so nothing is raised.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "With allow_nan=False the encoder silently replaces NaN and the infinities with null.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  }
+ ],
+ "extraction_controls": [
+  {
+   "id": "x-inline",
+   "component": "payload",
+   "answer": "Here is the table as JSON: [{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}] which keeps every field.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ],
+    "answer_quotes": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ]
+   }
+  },
+  {
+   "id": "x-toon",
+   "component": "payload",
+   "answer": "The compact form of the rows is:\n[2]{id,name}:\n  1,a\n  2,b\nThat is all of them.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ],
+    "answer_quotes": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ]
+   }
+  }
+ ]
+}

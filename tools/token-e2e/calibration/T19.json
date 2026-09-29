@@ -1,0 +1,81 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T19",
+ "clauses": [
+  "JSONDecodeError identifies invalid JSON decoding."
+ ],
+ "sources": [
+  {
+   "label": "json documentation",
+   "text": "Raises JSONDecodeError if the data being deserialized is not a valid JSON document."
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "According to the documentation: Raises JSONDecodeError if the data being deserialized is not a valid JSON document.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "Loading malformed JSON gives a JSONDecodeError, the exception that signals that the input is not a valid JSON document.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "Invalid JSON raises TypeError.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "Invalid JSON makes the loader return None instead of raising anything.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  }
+ ],
+ "extraction_controls": [
+  {
+   "id": "x-inline",
+   "component": "payload",
+   "answer": "Here is the table as JSON: [{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}] which keeps every field.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ],
+    "answer_quotes": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ]
+   }
+  },
+  {
+   "id": "x-toon",
+   "component": "payload",
+   "answer": "The compact form of the rows is:\n[2]{id,name}:\n  1,a\n  2,b\nThat is all of them.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ],
+    "answer_quotes": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ]
+   }
+  }
+ ]
+}

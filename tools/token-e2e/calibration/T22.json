@@ -1,0 +1,65 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T22",
+ "clauses": [
+  "Default is preferred design/adoption, not installed; native_proven is only the cited bounded behavior.",
+  "Historical retrieval must contain a scoped result for filtered output mistaken for complete originals; compare with docs/harness-defaults.md, Anti-pattern log: Exact originals and exit statuses require raw recovery; a filtered window is not the full source."
+ ],
+ "sources": [
+  {
+   "label": "catalogs/us-equities/agents-operations.md",
+   "text": "`default` means the preferred design or adoption lane; it does **not** mean installed."
+  },
+  {
+   "label": "anti-pattern log row",
+   "text": "| 2026-09-25 | Reading a filtered command's output as the raw output | A large git show blob is windowed to about 8 KiB, so a following tail reads the window rather than the file end |"
+  },
+  {
+   "label": "frozen historical record digests",
+   "text": "record 1: 3fa9c2d41b7e0a55"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "In the catalog a default is the preferred design or adoption lane, not something installed, and native_proven covers only the bounded behavior the row cites. The earlier decision (record 3fa9c2d41b7e0a55) matches the log row: a filtered window is not the full source, so exact originals need raw recovery.\n\nSource excerpt: `default` means the preferred design or adoption lane; it does **not** mean installed.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "A default marks what we would prefer to adopt; it does not say the component is installed, and native_proven vouches only for the specific behavior it cites. From the stored decision (record 3fa9c2d41b7e0a55) and the log: output that went through a filter is just a window, so the complete original has to be recovered raw.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "A default in the catalog means the component is installed, and native_proven means the whole tool is proven. The earlier decision agrees that a filtered window is not the full source.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "A default is the preferred design and not installed, and native_proven is only the cited behavior. The earlier decision says filtered output is a complete original as long as the exit status is shown.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

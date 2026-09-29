@@ -1,0 +1,65 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T24",
+ "clauses": [
+  "catalogs/us-equities -> us-equities-catalog; blueprints/us-equities -> us-equities-foundation; unrelated folders are excluded.",
+  "Historical retrieval must contain a scoped result for a pipeline masking the producing command's failure; compare with docs/harness-defaults.md, Anti-pattern log: Retain stdout/stderr and the command's own exit status; a downstream success is insufficient."
+ ],
+ "sources": [
+  {
+   "label": "catalogs/us-equities/native-workflows.md",
+   "text": "\"$STACK_REPO/catalogs/us-equities\" --name us-equities-catalog --mask '**/*.md'\n\"$STACK_REPO/blueprints/us-equities\" --name us-equities-foundation --mask '**/*.md'"
+  },
+  {
+   "label": "anti-pattern log row",
+   "text": "| 2026-09-25 | Taking a pipeline's exit code as the command's result | A unittest run piped into tail returned tail's exit 0 and dropped the summary printed on stderr |"
+  },
+  {
+   "label": "frozen historical record digests",
+   "text": "record 1: 3fa9c2d41b7e0a55"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "catalogs/us-equities is indexed as us-equities-catalog and blueprints/us-equities as us-equities-foundation; unrelated folders are left out. The earlier decision (record 3fa9c2d41b7e0a55) matches the log row: a pipeline's exit code is the last command's, so a downstream success proves nothing.\n\nSource excerpt: \"$STACK_REPO/catalogs/us-equities\" --name us-equities-catalog --mask '**/*.md'\n\"$STACK_REPO/blueprints/us-equities\" --name us-equities-foundation --mask '**/*.md'",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "Two collections are registered: the catalogs folder under us-equities becomes us-equities-catalog and the blueprints folder becomes us-equities-foundation, with nothing else indexed. The stored decision (record 3fa9c2d41b7e0a55) and the log say that piping into tail reports tail's status, not the command's.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "Both folders are indexed as one collection called us-equities-catalog, and every other folder of the repository is included as well. The pipeline decision matches the log.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "catalogs/us-equities is us-equities-catalog and blueprints/us-equities is us-equities-foundation, unrelated folders excluded. The earlier decision says a pipeline's exit code is always the producing command's.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}
