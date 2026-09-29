@@ -467,6 +467,24 @@ Name the role's `agentType` on each stage beside an explicit `model` and `effort
 
 The researcher, verifier and security rows, and the builder's new preload, are unmeasured: their first-prompt size, lane use, correctness and billed cost against `general-purpose` stages are preregistered, with the result that would overturn this table, in [the decision record](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md).
 
+### Sonnet 5.5 fan-out units and the default child model (2026-09-29)
+
+Since Claude Code 2.1.284 the `sonnet` alias is Sonnet 5.5 and the `opus` alias is Opus 5.5 ([decision record](../../../docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); native probes: receipt `claude-model-effort-probes-20260929`). The role table keeps each role's default model. A stage may override it with `model: 'sonnet'` at effort `max`, only for a fan-out unit whose output an executable oracle or a later Opus stage checks:
+
+- shell, test, build and lint runs, and the acceptance commands a task names;
+- exact extraction, inventories, counts and log analysis, each finding with a file:line locator that the consumer re-reads;
+- migrations, refactors and scaffolds from a written contract in an owned checkout, gated by the contract's tests and followed by an Opus review;
+- first-pass breadth research whose claims an Opus stage then checks (the [multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) is an Opus lead over Sonnet subagents).
+
+Design, adversarial review, verification of claims against source, security review, adjudication and synthesis stay `opus` at `max`: Anthropic's [Sonnet 5.5 system card](https://www.anthropic.com/claude-sonnet-5-5-system-card) puts Opus 5.5 ahead on the honesty and reckless-tool-use audits and as the less self-preferring grader (sections 6.2.2, 6.2.3 and 6.3.1).
+
+- **Evidence for the split.** Terminal-Bench 4.0 gives Sonnet 5.5 70.6% and Opus 5.5 66.4% in Anthropic's runs (Claude Code `--bare`, 5 trials per task; card section 8.5), 63.6% against 59.6% at Artificial Analysis (mini-swe-agent), and 53.03% against 61.62% at Vals AI (Terminus 2). The leader depends on the harness, so the split rests on the terminal and app-building results together with the checks above, not on one score.
+- **Bulk only.** Anthropic's [cost guide](https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence) found a second model pays off only to cap the cost tail on routine work and for input larger than one context; on work one model can do alone, that model at lower effort was cheaper every time. A fan-out is for bulk or over-context work, and the first run of a new fan-out class sweeps effort before adding the second model.
+- **Every stage names its model.** A stage that names none runs the lead's model, Sonnet 5.5 under a Sonnet 5.5 lead. The template and the portable settings file set `CLAUDE_CODE_SUBAGENT_MODEL=opus`, the default for a subagent, teammate or workflow agent that no per-call model or definition names, and `child-usage.mjs` exits 1 for a child that inherited its model or ran an older model than its alias documents.
+- **Effort.** Ultracode does not set effort on 2.1.284: a Sonnet 5.5 session with no saved level ran at medium, and a child on another model runs at that model's saved level or default. Every stage names `effort: 'max'`, and the settings pin each current model at xhigh for the sessions and unnamed children that name none.
+- **Teammates.** Name the model at spawn: `sonnet` for an execution or exploration teammate, `opus` for a judgment teammate. An unnamed teammate takes its definition's model, then `CLAUDE_CODE_SUBAGENT_MODEL`, then the lead's.
+- **Siblings.** Keep the workers of one `parallel()` or `pipeline()` group on one model, effort, agent type and tool set so they share one prompt-cache prefix, and put the Opus verifiers in the next stage.
+
 ### Role routing and child prompt size (2026-09-21)
 
 Spawning a child has a fixed prompt cost before any work. Run ids, the extraction command and saved `child-usage.mjs` outputs are in `docs/ultracode-token-routing-20260921.md`. Measured on this host with one identical one-command task, Sonnet 5/low, provider-returned first-request tokens (`input + cache_read + cache_creation`); these are exact artifact comparisons for that task, not a lifetime or per-task savings rate:
