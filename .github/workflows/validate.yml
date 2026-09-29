@@ -170,12 +170,13 @@ jobs:
         # 3.12.3 and npm 10.9.8 (actions/runner-images, Ubuntu2404-Readme.md).
         run: |
           python3 - <<'PYEOF'
-          import json, os, re, shlex, subprocess
+          import json, os, shlex, string, subprocess
 
           with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
               pin = json.load(handle)
           name = os.path.basename(pin["install"]["default_directory"])
-          if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
               raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
           words = shlex.split(pin["install"]["command"])
           if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
