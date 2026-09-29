@@ -3879,6 +3879,18 @@ class F28_M7(GraderCase):
     def test_an_unfenced_toon_answer_alone_is_still_one_equal_round_trip(self):
         self.assertEqual(self.answer_items(self.doc()), ["equal"], "one payload, counted once")
 
+    def test_a_payload_with_no_frozen_original_is_one_unknown_trip_or_none_by_the_reading(self):
+        """R2-16: with no frozen original the payload is unknown in the denominator (decided) or excluded (alternative), once,
+        whether it decodes or not: a structural block that fails to decode is no exception, and the whole-answer candidate of
+        a payload followed by a sum line is not a second payload."""
+        broken = self.doc().replace("[8]", "[9]", 1)
+        for name, text in (("unfenced broken block", broken + "\nlatency sum: 124"),
+                           ("unfenced block", self.doc() + "\nlatency sum: 124"),
+                           ("fenced broken block", "```toon\n" + broken + "\n```")):
+            with self.subTest(name):
+                self.assertEqual(self.answer_items(text, key={}, seeded=False), ["unknown"])
+                self.assertEqual(self.answer_items(text, key={}, seeded=False, R2_16="excluded"), [])
+
     def test_the_round_trip_rate_of_an_unfenced_answer_with_a_sum_line_is_one_on_both_bounds(self):
         facts = self.facts([], self.doc() + "\nlatency sum: 124")
         trips = evm().m7([dict(facts, seeded=True)], {}, DECIDED)["roundtrip"]
@@ -8032,6 +8044,40 @@ class H3_PositiveControlOracle(GraderCase):
         self.result(self.t33("[" + ", ".join(json.dumps(row) for row in wrong_event) + "]"), "fail", "events")
         wrong_level = [dict(row, level="ERROR") if row["event"] == 3 else row for row in self.ROWS]
         self.result(self.t33("[" + ", ".join(json.dumps(row) for row in wrong_level) + "]"), "fail", "levels")
+
+    def test_the_integer_list_scan_is_one_pass(self):
+        """Answer text is data from a model: no scanner may search again from every open bracket (quadratic on `[[[[...]`)."""
+        fc = load("frozen_checks")
+        calls = [0]
+
+        class Counting(str):
+            def find(self, *args):
+                calls[0] += 1
+                return super().find(*args)
+        self.assertEqual(fc.integer_lists(Counting("[" * 3000 + "7, 8]")), [[7, 8]])
+        self.assertLess(calls[0], 50, "the scan searches once per call, not once per bracket")
+        self.assertEqual(fc.integer_lists("levels [INFO, INFO] events [1, 2, 3] and [4, 5]"), [[1, 2, 3], [4, 5]])
+        self.assertEqual(fc.integer_lists("[[1, 2]]"), [[1, 2]])
+        self.assertEqual(fc.integer_lists("no close [1, 2"), [])
+        self.assertEqual(fc.integer_lists("[1, x] [] [ ]"), [])
+
+    def test_the_negation_walk_is_bounded_to_one_clause(self):
+        """A walk back over more than eight words is no longer one clause, and no walk may cost time in every earlier level
+        word (quadratic on `no ERROR ERROR ERROR ...`)."""
+        fc = load("frozen_checks")
+        for words, negated in ((8, True), (9, False)):
+            text = "no " + ", ".join(["ERROR"] * words)
+            self.assertEqual(fc.level_is_negated(text, text.rindex("ERROR")), negated, words)
+        long = "no " + " ".join(["ERROR"] * 4000)
+        seen = [0]
+        real = fc.is_word_char
+
+        def counting(char):
+            seen[0] += 1
+            return real(char)
+        with mock.patch.object(fc, "is_word_char", counting):
+            self.assertFalse(fc.level_is_negated(long, long.rindex("ERROR")))
+        self.assertLess(seen[0], 500)
 
     def test_a_list_of_event_numbers_is_still_read_and_a_wrong_one_still_fails(self):
         self.result(self.t33("Events [1, 2, 3, 4, 5], all INFO."), "pass")
