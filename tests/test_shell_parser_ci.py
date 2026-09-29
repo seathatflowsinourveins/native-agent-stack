@@ -462,6 +462,107 @@ class ProvisioningControls(unittest.TestCase):
         self.assertEqual({category for category, _ in problems}, set(CATEGORIES))
 
 
+SUITE_STEP = "      - name: Run the suite\n        run: python3 -m unittest\n"
+PIN_STEP = f"      - name: Install the parser\n        run: cat {PIN_PATH}\n"
+OTHER_STEP = "      - name: Something else\n        run: echo done\n"
+
+
+def synthetic_workflow(**steps_by_job):
+    """A minimal workflow with one job per keyword, each holding the given step text."""
+    return "name: synthetic\n\njobs:\n" + "".join(
+        f"  {job}:\n    runs-on: ubuntu-24.04\n    steps:\n{steps}" for job, steps in steps_by_job.items())
+
+
+def with_step(text, job_id, step_lines):
+    """`text` with the given step inserted before the first step of job `job_id` that runs the whole suite."""
+    lines = text.split("\n")
+    for index in range(next(i for i, line in enumerate(lines) if line == f"  {job_id}:"), len(lines)):
+        if lines[index].startswith("      - "):
+            start, end = step_span(lines, index)
+            if runs_suite("\n".join(lines[start:end])):
+                return "\n".join(lines[:start] + step_lines + lines[start:])
+    raise AssertionError("the job has no step that runs the whole suite")
+
+
+class RatchetControls(unittest.TestCase):
+    """The ratchet over whole-suite jobs on synthetic workflows: each way a job can lack the parser is reported in its
+    own category, and deleting a recorded gap that now provisions is all it takes to clear it."""
+
+    PROVISIONED = {PROVISIONING_WORKFLOW: synthetic_workflow(**{PROVISIONING_JOB: PIN_STEP + SUITE_STEP})}
+
+    def categories(self, texts, gaps):
+        return [category for category, _ in ratchet_problems(texts, gaps)]
+
+    def test_a_provisioned_job_and_a_recorded_gap_pass(self):
+        texts = {**self.PROVISIONED, "gap.yml": synthetic_workflow(build=SUITE_STEP)}
+        self.assertEqual(ratchet_problems(texts, {"gap.yml:build"}), [])
+
+    def test_an_unlisted_whole_suite_job_without_the_parser_is_reported_by_name(self):
+        texts = {**self.PROVISIONED, "new.yml": synthetic_workflow(build=SUITE_STEP)}
+        problems = ratchet_problems(texts, set())
+        self.assertEqual([category for category, _ in problems], ["unlisted"])
+        self.assertTrue("new.yml:build" in problems[0][1], "the report does not name the job")
+
+    def test_a_recorded_gap_that_now_provisions_is_stale_and_deleting_it_clears_the_ratchet(self):
+        texts = {**self.PROVISIONED, "gap.yml": synthetic_workflow(build=PIN_STEP + SUITE_STEP)}
+        problems = ratchet_problems(texts, {"gap.yml:build"})
+        self.assertEqual([category for category, _ in problems], ["stale"])
+        self.assertTrue("gap.yml:build" in problems[0][1], "the report does not name the entry")
+        self.assertEqual(ratchet_problems(texts, set()), [])
+
+    def test_a_recorded_gap_that_no_longer_runs_the_suite_or_is_gone_is_stale(self):
+        quiet = {**self.PROVISIONED, "gap.yml": synthetic_workflow(build=OTHER_STEP)}
+        self.assertEqual(self.categories(quiet, {"gap.yml:build"}), ["stale"])
+        self.assertEqual(self.categories(self.PROVISIONED, {"gone.yml:build"}), ["stale"])
+
+    def test_the_validate_job_must_provision_and_cannot_be_listed_as_a_gap(self):
+        bare = {PROVISIONING_WORKFLOW: synthetic_workflow(**{PROVISIONING_JOB: SUITE_STEP})}
+        self.assertEqual(self.categories(bare, set()), ["unlisted", "required"])
+        self.assertEqual(self.categories(bare, {PROVISIONING_KEY}), ["required"])
+        self.assertEqual(self.categories({}, set()), ["required"])
+
+
+class RealRatchetControls(unittest.TestCase):
+    """The same ratchet on this repository's workflows with one defect each, including the remediation the comment above
+    KNOWN_UNPROVISIONED gives: provision a recorded-gap job, then delete its entry."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.texts = workflow_texts()
+        lines = cls.texts[PROVISIONING_WORKFLOW].split("\n")
+        start, end = provisioning_span(lines)
+        cls.step = lines[start:end]
+
+    def test_the_real_workflows_pass(self):
+        self.assertEqual(ratchet_problems(self.texts), [])
+
+    def test_a_new_whole_suite_job_in_a_real_workflow_is_reported(self):
+        gap_files = {key.partition(":")[0] for key in KNOWN_UNPROVISIONED}
+        name = next(file for file in sorted(self.texts) if file != PROVISIONING_WORKFLOW and file not in gap_files)
+        added = self.texts[name].rstrip("\n") + "\n\n  extra-suite:\n    runs-on: ubuntu-24.04\n    steps:\n" + SUITE_STEP
+        self.assertEqual([category for category, _ in ratchet_problems({**self.texts, name: added})], ["unlisted"])
+
+    def test_provisioning_a_recorded_gap_job_is_cleared_by_deleting_its_entry(self):
+        self.assertTrue(KNOWN_UNPROVISIONED, "no recorded gap is left to provision")
+        for key in sorted(KNOWN_UNPROVISIONED):
+            name, _, job = key.partition(":")
+            with self.subTest(key):
+                mutant = {**self.texts, name: with_step(self.texts[name], job, self.step)}
+                self.assertEqual([category for category, _ in ratchet_problems(mutant)], ["stale"])
+                self.assertEqual(ratchet_problems(mutant, KNOWN_UNPROVISIONED - {key}), [])
+                self.assertEqual(provisioning_problems(mutant[name], job), [], "the transplanted step is judged like validate.yml's")
+                self.assertTrue(key in provisioning_targets(mutant), "the structure checks do not inspect the newly provisioned job")
+
+    def test_a_step_that_only_names_the_pin_file_is_judged_by_the_structure_checks(self):
+        fake = ["      - name: Pretend to provision", f"        run: echo {PIN_PATH}"]
+        for key in sorted(KNOWN_UNPROVISIONED):
+            name, _, job = key.partition(":")
+            with self.subTest(key):
+                mutant = {**self.texts, name: with_step(self.texts[name], job, fake)}
+                self.assertEqual(ratchet_problems(mutant, KNOWN_UNPROVISIONED - {key}), [])
+                self.assertTrue({"derived", "export"} <= categories(mutant[name], job), "the structure checks accept a step that installs nothing")
+
+
 @unittest.skipUnless(shutil.which("bash") and shutil.which("python3"), "the step runs under bash and calls python3, as on the runner")
 class ProvisioningStepRuns(unittest.TestCase):
     """Runs the step's script as the runner does (bash -e over the script file) in a scratch workspace, with a
