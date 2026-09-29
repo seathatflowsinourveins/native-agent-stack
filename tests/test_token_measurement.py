@@ -186,7 +186,7 @@ EMPTY_CLI = {"status": "measured", "parser": PARSER_RECORD, "lanes": {}, "mcport
 def lane_row(calls=1, carrier="bash", **counts):
     """One cli_lanes.lanes entry: `calls` calls with one invocation each, all on `carrier`, other counters zero."""
     row = {"calls": calls, "invocations": calls, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
-           "unknown": 0, "background": 0, "ambiguous": 0, "via_mcporter": 0,
+           "unknown": 0, "interrupted": 0, "background": 0, "ambiguous": 0, "via_mcporter": 0,
            "by_carrier": {c: calls if c == carrier else 0 for c in CLI_CARRIERS}}
     row.update(counts)
     return row
@@ -199,7 +199,7 @@ def lane_calls(cli):
 
 def downstream_row(calls=1, **counts):
     """One cli_lanes.mcporter_downstream entry."""
-    row = {"calls": calls, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0, "unknown": 0}
+    row = {"calls": calls, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0, "unknown": 0, "interrupted": 0}
     row.update(counts)
     return row
 

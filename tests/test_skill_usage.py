@@ -723,7 +723,7 @@ STACK_280 = ('mcporter --config "${MCPORTER_CONFIG}" call codebase-memory.search
 def cli_lane_row(carrier="bash", **counts):
     """One cli_lanes.lanes entry: one call with one invocation on `carrier`, other counters zero."""
     row = {"calls": 1, "invocations": 1, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
-           "unknown": 0, "background": 0, "ambiguous": 0, "via_mcporter": 0,
+           "unknown": 0, "interrupted": 0, "background": 0, "ambiguous": 0, "via_mcporter": 0,
            "by_carrier": {c: int(c == carrier) for c in CLI_CARRIERS}}
     row.update(counts)
     return row
@@ -986,7 +986,7 @@ class CodexLanes(unittest.TestCase):
             "(vii) local shell call, stack.json:280": (
                 local_shell, {"codebase-memory-mcp": cli_lane_row(unknown=1, via_mcporter=1)},
                 {"codebase-memory": {"calls": 1, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
-                                     "unknown": 1}}, None),
+                                     "unknown": 1, "interrupted": 0}}, None),
         }
         for name, (rows, lanes, downstream, proxy) in cases.items():
             with self.subTest(case=name):
