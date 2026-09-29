@@ -389,16 +389,26 @@ def path_kind(path: Path) -> str:
 
 def agents_toml_count(directory: Path) -> int | None:
     """Files named *.toml (an extension: ".toml" alone is not one; exact case) under `directory`, recursively, the
-    way codex-rs/agent-roles/src/discovery.rs collects role files. Links are not followed: a link named *.toml is
-    counted and never read, a linked directory is not entered. 0 when `directory` is absent; None when it is not a
-    real directory or any part of it cannot be read."""
+    way codex-rs/agent-roles/src/discovery.rs collects role files.
+
+    Codex follows links there: LocalFileSystem::read_directory takes a link's target's type (codex-rs/exec-server/src/
+    local_file_system.rs:710-735 at rust-v0.157.1; observed with codex-cli 0.157.1 through `codex doctor --json`), so it
+    enters a linked folder and collects a link to a regular file by the link's own name. This count never enters a link,
+    so a link to a folder anywhere below `directory`, whatever its name, makes it unknown (None): what lies behind the
+    link is not attested here, and a count that skipped it would report fewer role files than Codex loads. A link to a
+    file named *.toml is counted and never read; so is a dangling one, which Codex skips (an overcount, the safe side).
+    0 when `directory` is absent; None when it is not a real directory, a folder link is below it, or any part of it
+    cannot be read."""
     kind = path_kind(directory)
     if kind == "absent":
         return 0
     if kind != "dir":
         return None
     unreadable, total = [], 0
-    for _, _, files in os.walk(directory, followlinks=False, onerror=unreadable.append):
+    for current, folders, files in os.walk(directory, followlinks=False, onerror=unreadable.append):
+        # os.walk lists a link to a folder with the folders and does not enter it: unknown, never skipped.
+        if any(path_kind(Path(current) / name) == "link" for name in folders):
+            return None
         total += sum(1 for name in files if name.endswith(".toml") and len(name) > len(".toml"))
     return None if unreadable else total
 

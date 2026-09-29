@@ -41,7 +41,9 @@ Sources for the rules implemented here (no upstream implementation of this glue 
   home directory), the pinned files, and the lockfile that must list both pinned packages with the pinned version and
   integrity. tools.parser.* mirrors that load check; re-read it when U1 merges.
   openai/codex rust-v0.157.1 (36650394): codex-rs/agent-roles/src/discovery.rs and loader.rs (a role comes from every *.toml
-  below <config folder>/agents and from every [agents.<name>] table of an enabled layer), codex-rs/config/src/state.rs
+  below <config folder>/agents and from every [agents.<name>] table of an enabled layer), codex-rs/exec-server/src/
+  local_file_system.rs:710-735 (read_directory classifies a link by its target, so Codex enters a linked folder: a folder link
+  below agents makes a role count an error here, never a smaller count), codex-rs/config/src/state.rs
   config_folder (the user layer's folder is $CODEX_HOME, the system layer's /etc/codex, a project layer's its .codex) and
   `codex mcp list --json` (a JSON array of objects, of which only `name` and `enabled` are read). The codex.* role rows are
   the U13 rows of the Codex role carriers (adoption/agents/codex, tools/adoption/codex_roles.py); this tool stays
@@ -764,17 +766,20 @@ def build_specs(config: dict) -> list[Spec]:
             "absent, error when it is a link or the folder is a link")
     add("codex.agents.toml_set", "codex_roles", "*.toml files below agents",
         "which of stack-researcher.toml and stack-verifier.toml the agents folder of the Codex home holds at its top, and `other`, "
-        "the number of every other *.toml file below it (nested files and links named *.toml count; a name is never published): "
-        "both true and 0 other is the frozen state")
+        "the number of every other *.toml file below it (nested files and links to files named *.toml count; a name is never "
+        "published): both true and 0 other is the frozen state. A link to a folder anywhere below makes it an error "
+        "(linked_folder): Codex enters a linked folder, and a set that skipped one would undercount")
     add("codex.agents.role_tables", "codex_roles", "[agents.<name>] tables",
         "the number of [agents.<name>] tables in config.toml and stack-worker.config.toml of the Codex home (0 when a file is "
         "absent; error when one does not parse)")
     add("codex.system.agents_toml_count", "codex_roles", "*.toml files below agents",
-        "the number of *.toml files below /etc/codex/agents, the system layer's role folder (0 when absent)")
+        "the number of *.toml files below /etc/codex/agents, the system layer's role folder (0 when absent; error when a link to "
+        "a folder is below it)")
     add("codex.system.role_tables", "codex_roles", "[agents.<name>] tables",
         "the number of [agents.<name>] tables in /etc/codex/config.toml (0 when absent)")
     add("codex.project.agents_toml_count", "codex_roles", "*.toml files below agents",
-        "the number of *.toml files below .codex/agents of the checkout under freeze, its project layer's role folder (0 when absent)")
+        "the number of *.toml files below .codex/agents of the checkout under freeze, its project layer's role folder (0 when "
+        "absent; error when a link to a folder is below it)")
     add("codex.project.role_tables", "codex_roles", "[agents.<name>] tables",
         "the number of [agents.<name>] tables in .codex/config.toml of the checkout under freeze (0 when absent)")
     add("codex.launcher.sha256", "codex_roles", "sha256 of file",
@@ -1161,8 +1166,11 @@ def path_kind(path: Path) -> str:
 def toml_names(folder: Path) -> tuple[Optional[list[str]], Optional[str]]:
     """(the sorted relative names of the *.toml files below `folder`, reason), the way codex-rs/agent-roles/src/discovery.rs
     collects role files at rust-v0.157.1 and tools/adoption/codex_roles.py agents_toml_count counts them: recursively, by the
-    exact extension. A link named *.toml is listed and never read, a linked folder is not entered. No names for an absent
-    folder ([]), and (None, reason) when `folder` is not a real folder or any part of it cannot be read."""
+    exact extension. A link to a file named *.toml is listed and never read. Codex follows links (LocalFileSystem::read_directory
+    takes a link's target's type, codex-rs/exec-server/src/local_file_system.rs:710-735; observed with codex-cli 0.157.1
+    through `codex doctor --json`), so it enters a linked folder; this never does, and a set that skipped one would undercount:
+    a link to a folder anywhere below, whatever its name, is (None, "linked_folder"). No names for an absent folder ([]), and
+    (None, reason) when `folder` is not a real folder, a folder link is below it, or any part of it cannot be read."""
     kind = path_kind(folder)
     if kind == "absent":
         return [], None
@@ -1170,7 +1178,10 @@ def toml_names(folder: Path) -> tuple[Optional[list[str]], Optional[str]]:
         return None, "unreadable" if kind == "error" else "not_a_directory"
     failed: list[OSError] = []
     names: list[str] = []
-    for current, _directories, files in os.walk(folder, followlinks=False, onerror=failed.append):
+    for current, directories, files in os.walk(folder, followlinks=False, onerror=failed.append):
+        # os.walk lists a link to a folder with the directories and does not enter it: unknown, never skipped.
+        if any(path_kind(Path(current) / name) == "link" for name in directories):
+            return None, "linked_folder"
         for name in files:
             if name.endswith(".toml") and len(name) > len(".toml"):
                 names.append((Path(current) / name).relative_to(folder).as_posix())

@@ -555,7 +555,8 @@ class Plan:
             total = agents_toml_count(self.agents_dir)
             extra = None if total is None else max(0, total - sum(k != "absent" for k in self.role_kind.values()))
             checks.append(("warn" if extra is None or extra else "ok", "extra agent role files",
-                           "unreadable" if extra is None else str(extra)))
+                           "unknown (a link to a folder below agents, which Codex enters, or a part that cannot be read)"
+                           if extra is None else str(extra)))
         tables, unreadable = role_table_count(self.live), 0
         for data in (self.profile_bytes, self.profile_template):
             if data is None:
@@ -568,7 +569,8 @@ class Plan:
                        f"{tables}" + (f" ({unreadable} file unreadable)" if unreadable else "")))
         system = system_role_count(SYSTEM_CODEX_DIR)
         checks.append(("warn" if system is None or system else "ok", "system agent roles",
-                       "unreadable" if system is None else str(system)))
+                       "unknown (a link to a folder below its agents folder, or a part that cannot be read)"
+                       if system is None else str(system)))
         return checks
 
     def base_provider_step(self) -> list[str]:

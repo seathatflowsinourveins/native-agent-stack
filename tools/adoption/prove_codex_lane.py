@@ -151,8 +151,10 @@ def roles_row(codex_home: Path, system_dir: Path | None = None) -> tuple[bool, s
     """The `roles` row: how many of the two installed role carriers equal their rows in adoption/agents/codex/
     SHA256SUMS, the *.toml files under $CODEX_HOME/agents, the [agents.<name>] tables of the live config.toml and
     worker profile, and the roles of the system layer (/etc/codex). It passes only with 2/2, 2, 0 and 0: exactly
-    the two carriers, installed by discovery, with nothing else that Codex would load as a role in any arm. Counts
-    and booleans only; no name, path or content."""
+    the two carriers, installed by discovery, with nothing else that Codex would load as a role in any arm. A count
+    that is unknown is shown as "unknown" and never passes: a link to a folder below agents (Codex enters it, so what
+    lies behind it is not attested here) or a part that cannot be read. Counts and booleans only; no name, path or
+    content."""
     try:
         pins = codex_roles.sha256sums(lane.ROLES_SOURCE / codex_roles.SHA256SUMS_NAME)
     except (OSError, ValueError):
@@ -170,7 +172,7 @@ def roles_row(codex_home: Path, system_dir: Path | None = None) -> tuple[bool, s
     tables = codex_roles.live_role_tables(codex_home)
     system = codex_roles.system_role_count(lane.SYSTEM_CODEX_DIR if system_dir is None else system_dir)
     expected = len(codex_roles.ROLE_FILES)
-    shown = ["unreadable" if value is None else value for value in (count, tables, system)]
+    shown = ["unknown" if value is None else value for value in (count, tables, system)]
     ok = equal == expected and count == expected and tables == 0 and system == 0
     return ok, (f"installed {equal}/{expected} equal to SHA256SUMS; *.toml under agents {shown[0]}; "
                 f"role tables {shown[1]}; system roles {shown[2]}")
