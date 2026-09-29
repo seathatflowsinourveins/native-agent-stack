@@ -64,4 +64,4 @@ paper readiness and measured acceptance without repeated human approval. Missing
 live credentials or live configuration do not gate paper; live trading and paid
 hosting remain separate scopes.
 
-Trading-lane rules for research waves, data readiness and experiments live in `blueprints/us-equities/AGENTS.md`; read it before any trading experiment or data acquisition.
+Trading-lane rules for research waves, data readiness and experiments live in `blueprints/us-equities/AGENTS.md`; read it before any trading research wave, experiment, data acquisition, strategy-gate change or registration of a decision array under `catalogs/us-equities/`.

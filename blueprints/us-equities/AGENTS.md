@@ -1,6 +1,6 @@
 # Trading lane rules
 
-Moved verbatim from the root `AGENTS.md`; the north star and paper-lane authorization stay there.
+Rules for trading research waves, data readiness and experiments. The north star and the paper-lane authorization are in the root `AGENTS.md`.
 
 For architecture or research waves, read `blueprints/us-equities/architecture/README.md`
 and the matching source-review supplement. `catalogs/us-equities/decision-index.json`
