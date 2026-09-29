@@ -93,7 +93,7 @@ a slash. `<unit>` is one of `ecosystem-otelcol`, `ecosystem-loki`, `ecosystem-pr
 | `gateways.<gateway>.route.<route>`, `gateways.<gateway>.build_id` | frozen | Only with a configured gateway: see below. |
 | `extra.<id>` | frozen or informational | Only with a configured file: its sha256. |
 | `capacity.codex.weekly_{used_percent,resets_at_utc}` | informational | The weekly (10080 minute) window of `scripts/codex_quota.py --json`. |
-| `capacity.claude.{five_hour,seven_day}_{utilization_fraction,resets_at_utc}` | informational | `unifiedWindows` of the `rate_limit_event` returned by one headless Haiku call. |
+| `capacity.claude.{five_hour,seven_day}_{utilization_fraction,resets_at_utc}` | informational | `unifiedWindows` of the `rate_limit_event` returned by one headless Haiku call. A call rejected at the session limit exits `1` and still returns the event, so its numbers are read (a utilization above `1` means the window is over its limit); a failed call without the event is `error`. |
 | `capacity.host.{load_average,memory_available_mib}` | informational | `os.getloadavg()` and `MemAvailable` from `/proc/meminfo` (`not_applicable` off Linux). |
 | `time.{capture_start_utc,capture_end_utc,tool_version,tool_revision,tool_sha256}` | informational | The capture's UTC start and end, the tool's version, the git revision of the checkout holding the tool, and the sha256 of the tool file. |
 

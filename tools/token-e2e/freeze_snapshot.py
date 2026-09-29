@@ -1397,15 +1397,19 @@ def claude_capacity(ctx: Ctx) -> list[dict]:
         shutil.rmtree(folder, ignore_errors=True)
     if result.state == "missing":
         return [ctx.item(item_id, MISSING, None, "tool_absent") for item_id in ids]
-    if result.state != "ok":
+    if result.state not in ("ok", "exit"):
         return [ctx.item(item_id, ERROR, None, result.state) for item_id in ids]
+    # A call rejected at the session limit exits 1 (HTTP 429) and still returns the rate_limit_event, whose numbers are what
+    # matters then; a failed call without the event is an error.
+    failed = result.state == "exit"
     try:
         events = json.loads(result.out)
     except (ValueError, RecursionError):
-        return [ctx.item(item_id, ERROR, None, "invalid_json") for item_id in ids]
+        return [ctx.item(item_id, ERROR, None, "exit" if failed else "invalid_json") for item_id in ids]
     windows = parse_unified_windows(events)
     if windows is None:
-        return [ctx.item(item_id, MISSING, None, "no_rate_limit_event") for item_id in ids]
+        return [ctx.item(item_id, ERROR if failed else MISSING, None, "exit" if failed else "no_rate_limit_event")
+                for item_id in ids]
     items = []
     for window in ("five_hour", "seven_day"):
         found = windows.get(window)
