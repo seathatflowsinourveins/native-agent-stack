@@ -133,20 +133,22 @@ scratch reviews and their private environment are not independently reproducible
 from this publication. Nothing here is acceptance for a new host or evidence of
 complete capability absence.
 
-2026-09-29 limitation: five batch-a records state main-branch distances with no
-retained main-branch observation (no `unreleased_main` block and no returned
-head of `main`). context-mode's `main_commits_ahead_of_reviewed_revision`
-(10 → 12) and its finding on changes up to current main, and ccusage's
-`main_commits_ahead` (183 → 198), rest on the compares each record names; those
-retain their end commits (`5d13dc45`, `db400ad4`), but no retained observation
-shows either was main's head. qmd, repomix and toon mark
-`latest_stable_and_main_distance` `unchanged` against a compare of the mutable
-`main` ref whose returned head and count were not retained, so their only
-retained distances are the 2026-09-26 `scratch_record` figures (24, 28 and 11
-commits at the `main_head` commits named there), which qmd's and toon's
-`behind_by` basis repeats. Treat these figures as fixed-revision or 2026-09-26
-observations, not current main distances, and re-query each named compare
-before use.
+2026-09-29 limitation: five batch-a records (context-mode, ccusage, qmd, repomix and
+toon) state main-branch distances from the 2026-09-27 refresh with no `unreleased_main`
+block, so that refresh retained no returned head of `main`. Each keeps only the
+2026-09-26 `scratch_record` observation of a `main` head (context-mode `6c8dbf22`,
+ccusage prefix `ffa39de8`, qmd `04e4dbd8`, repomix `75f9f860`, toon `f151a5d8`).
+context-mode's `main_commits_ahead_of_reviewed_revision` (12 in the 2026-09-27 refresh;
+10 in the scratch record) and its finding on changes up to current main, and ccusage's
+`main_commits_ahead` (198; 183 in the scratch record), rest on the compares each record
+names; those retain their end commits (`5d13dc45`, `db400ad4`), but no retained
+observation shows either was main's head on 2026-09-27. qmd, repomix and toon mark
+`latest_stable_and_main_distance` `unchanged` against a compare of the mutable `main`
+ref whose returned head and count were not retained, so their only retained distances
+are the 2026-09-26 `scratch_record` figures (24, 28 and 11 commits at the `main_head`
+commits named there), which qmd's and toon's `behind_by` basis repeats. Treat all of
+these figures as fixed-revision or 2026-09-26 observations, not current main distances,
+and re-query each named compare before use.
 
 ## Sources
 

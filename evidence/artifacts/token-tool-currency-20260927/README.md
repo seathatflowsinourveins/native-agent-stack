@@ -63,8 +63,12 @@ The scratch observations are preserved; these are additions dated **2026-09-27**
 - Unreleased source advanced: context-mode 10 → 12 commits after the reviewed
   revision, ccusage 183 → 198 after the pin, jcodemunch-mcp 79 → 86 after stable,
   codebase-memory-mcp 135 → 150 after stable, and agentsview 39 → 40 after stable.
-  The records retain the observed heads and comparison sources; none of these
-  counts changes a stable release verdict.
+  The jcodemunch-mcp, codebase-memory-mcp and agentsview records retain the observed
+  `unreleased_main` heads and comparison sources. The context-mode and ccusage records
+  retain only the end commit of the compare they name (`5d13dc45`, `db400ad4`), not an
+  observation of main's head; the METHOD limitation of 2026-09-29 covers them and the
+  qmd, repomix and toon `unchanged` statements. None of these counts changes a stable
+  release verdict.
 - Context-hub's language-selection change is verified at
   [commit a59508b717bf](https://github.com/andrewyng/context-hub/commit/a59508b717bf3149f6d341b2b6f147724df9043f).
   [PR #182](https://api.github.com/repos/andrewyng/context-hub/pulls/182) is closed
