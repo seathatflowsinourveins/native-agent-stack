@@ -2146,11 +2146,17 @@ class SecretPathGuardTests(unittest.TestCase):
         # the started command and its arguments after the options (`quote_command_line(arg_cmdline)`), so a `-E NAME=value` is not in the
         # journal. It is in the command line of the systemd-run process, which the process listing shows while it runs, and in the transient
         # unit's Environment property on the user bus (`systemctl --user show -p Environment UNIT`). The hint said the journal.
+        # The second review's note: `-E NAME=value` puts the value in the systemd-run argv, while `-E NAME` puts only the name there and
+        # systemd-run takes the caller's own value from its environment (`strv_env_replace_strdup_passthrough`, src/basic/env-util.c:417,
+        # for `case 'E'`, src/run/run.c:348); both end in the unit's Environment property, which any bus client reads. The hint says both.
         hint = guard.HINTS["secret_variable_on_command_line"]
         self.assertNotIn("journal", hint)
+        self.assertIn("-E NAME=value puts the value in the systemd-run command line", hint)
         self.assertIn("process listing", hint)
-        self.assertIn("user bus", hint)
+        self.assertIn("-E NAME forwards the caller's value", hint)
+        self.assertIn("Environment property on the user bus", hint)
         self.assertIn("systemctl --user show -p Environment", hint)
+        self.assertEqual(guard.check("systemd-run --user -E GH_TOKEN true"), "secret_variable_on_command_line")  # the review's value-less form
         # the rule itself is unchanged: a secret name on a systemd-run line is refused, and a name that only labels a value is not
         self.assertEqual(guard.check("systemd-run --user -E APCA_API_SECRET_KEY=abc /bin/true"), "secret_variable_on_command_line")
         self.assertIsNone(guard.check("systemd-run --user -E LABEL=APCA_API_KEY_ID /bin/true"))

@@ -980,16 +980,18 @@ read is listed at the end of this subsection.
   `credential_file_read`, `... printenv` and `systemd-cat printenv` an `environment_dump`. The trading lane's loader path
   (`systemd-run --user --unit=X --collect /bin/bash -ic 'exec python3 runner.py run --env-file "$PAPER_ENV_FILE_2"'`)
   still passes for both accounts. A secret variable name (any name in the guard's list), with or without a value, set
-  through `systemd-run`'s `-E`/`--setenv` or `-p Environment=...` is a `secret_variable_on_command_line`. Where such a
-  value goes (systemd v255, `src/run/run.c`, read 2026-09-29): into the command line of the `systemd-run` process itself,
-  which the process listing (`/proc/PID/cmdline`) shows while it runs, and into the transient unit's `Environment`
-  property, appended to the start message over the user bus (`arg_environment`), which `systemctl --user show -p
-  Environment UNIT` and any bus client read. Not into the journal, as an earlier version of this page said: the unit's
+  through `systemd-run`'s `-E`/`--setenv` or `-p Environment=...` is a `secret_variable_on_command_line`. Where the value
+  goes differs by form (systemd v255, read 2026-09-29). `-E NAME=value` puts the value in the command line of the
+  `systemd-run` process itself (its argv: `/proc/PID/cmdline` and the process listing show it while `systemd-run` runs) and
+  in the transient unit's `Environment` property. `-E NAME` puts only the name in argv, and `systemd-run` takes the
+  caller's own value from its environment (`strv_env_replace_strdup_passthrough`, `src/basic/env-util.c:417`, called for
+  `case 'E'`, `src/run/run.c:348`): that value reaches the unit's `Environment` property and no argv. The property is
+  appended to the start message over the user bus (`arg_environment`, `run.c:853-866`), which `systemctl --user show -p
+  Environment UNIT` and any bus client read. Not the journal, as an earlier version of this page said: the unit's
   description, which the manager logs as `Started <unit> - <description>`, defaults to the started command and its
-  arguments after the options (`quote_command_line(arg_cmdline)`), so `-E NAME=value` is not in it, while a value written
-  after the command is (`systemd-run --user /bin/true APCA_API_SECRET_KEY=abc`, a recorded gap). `-E NAME` without a value
-  forwards the caller's own value (`systemd-run(1)` 255). Only the variable's name is read (`-E LABEL=APCA_API_KEY_ID`
-  sets `LABEL`).
+  arguments after the options (`quote_command_line(arg_cmdline)`, `run.c:1940-1951`), so `-E NAME=value` and `-E NAME`
+  are not in it, while a value written after the command is (`systemd-run --user /bin/true APCA_API_SECRET_KEY=abc`, a
+  recorded gap). Only the variable's name is read (`-E LABEL=APCA_API_KEY_ID` sets `LABEL`).
 - **Command substitution inside double quotes is read.** The shell runs `$(...)` and a backquote pair inside a
   double-quoted word (Bash Reference Manual, "Command Substitution": `$` and the backquote keep their meaning inside
   double quotes), so `echo "$(printenv)"` dumps the environment, yet only the unquoted form was read. The body is now

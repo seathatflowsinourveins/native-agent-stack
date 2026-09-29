@@ -23,9 +23,10 @@ also reads the command that an `rtk` invocation runs (`rtk proxy cat F`,
 `rtk read F`, `rtk run -c '...'`) and the command that `systemd-run`, `run0`,
 `systemd-inhibit` or `systemd-cat` starts (their own options are skipped as
 getopt reads them, and a secret variable set through `systemd-run`'s
-`-E`/`--setenv` or `-p Environment=` is blocked: its command line is in the
-process listing while it runs and the unit's Environment property can be read
-over the user bus), and the body
+`-E`/`--setenv` or `-p Environment=` is blocked: `-E NAME=value` is in the
+process listing while it runs, `-E NAME` forwards the caller's value, and either
+ends in the unit's Environment property, which any bus client can read over the
+user bus), and the body
 of a command substitution inside double quotes (`echo "$(printenv)"` runs
 printenv; single quotes, an ANSI-C string and a `#` comment stay data). A
 here-document's lines are command lines like any other, whatever its delimiter
@@ -379,9 +380,10 @@ HINTS = {
                                   "environment; run a client that reads the variable itself, without naming it",
     "environment_dump_in_keyring_exec": "the command that kernel_keyring.py exec starts holds the key in "
                                         "its environment",
-    "secret_variable_on_command_line": "the systemd-run command line is in the process listing while it runs, and the "
-                                       "unit's environment settings are a property on the user bus that any bus client "
-                                       "reads (systemctl --user show -p Environment UNIT)",
+    "secret_variable_on_command_line": "-E NAME=value puts the value in the systemd-run command line, which the process "
+                                       "listing shows while it runs, and -E NAME forwards the caller's value; either way it "
+                                       "lands in the unit's Environment property on the user bus, which any bus client reads "
+                                       "(systemctl --user show -p Environment UNIT)",
     "service_manager_environment": "this prints the whole environment block that a service manager hands to every "
                                    "unit; for one unit use systemctl show -p Environment UNIT, and for the PATH a "
                                    "unit sees run systemd-run --user --pipe --wait --collect /bin/sh -c 'command -v "
@@ -896,15 +898,17 @@ def environment_assignments(payload: str) -> list[str]:
 
 def systemd_run_sets_secret(words: list[str]) -> bool:
     """Whether a systemd-run command line names a secret variable (SECRET_NAMES) among the variables it sets for
-    the unit it starts, with or without a value: `-E NAME[=VALUE]`, `--setenv NAME[=VALUE]` (systemd-run(1) 255:
-    without a value, the caller's own value is used) or `-p`/`--property` `Environment=NAME=VALUE ...`. Where such a value
-    goes (systemd v255, src/run/run.c, read 2026-09-29): into the command line of the systemd-run process itself, which the
-    process listing (/proc/PID/cmdline) shows while it runs, and into the transient unit's Environment property on the user bus
-    (`arg_environment`, appended to the start message), which `systemctl --user show -p Environment UNIT` and any bus client
-    read. Not into the journal: the unit's description, which the manager logs as `Started <unit> - <description>`, defaults to
-    the started command and its arguments after the options (`quote_command_line(arg_cmdline)`), so a value written after the
-    command does reach it (a recorded gap). The variable's NAME is read, not any text that spells one: `-E LABEL=APCA_API_KEY_ID`
-    sets LABEL."""
+    the unit it starts, with or without a value: `-E NAME[=VALUE]`, `--setenv NAME[=VALUE]` or `-p`/`--property`
+    `Environment=NAME=VALUE ...`. Where the value goes differs by form (systemd v255, read 2026-09-29). `-E NAME=VALUE` puts
+    it in the command line of the systemd-run process itself (argv, which /proc/PID/cmdline and the process listing show while
+    it runs) and in the transient unit's Environment property. `-E NAME` puts only the name in argv, and systemd-run takes the
+    caller's own value from its environment (`strv_env_replace_strdup_passthrough`, src/basic/env-util.c:417, called for
+    `case 'E'`, src/run/run.c:348): that value reaches the unit's Environment property and no argv. Both lines end in the property,
+    appended to the start message over the user bus (`arg_environment`, run.c:853-866), which `systemctl --user show -p
+    Environment UNIT` and any bus client read. Not the journal: the unit's description, which the manager logs as `Started
+    <unit> - <description>`, defaults to the started command and its arguments after the options (`quote_command_line(arg_cmdline)`,
+    run.c:1940-1951), so `-E` is not in it, while a value written after the command is (a recorded gap). The variable's NAME
+    is read, not any text that spells one: `-E LABEL=APCA_API_KEY_ID` sets LABEL."""
     for name, value in wrapper_options(words, 1, "systemd-run")[0]:
         if value is None:
             continue
