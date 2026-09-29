@@ -424,7 +424,7 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['find . -print0 | xargs -0 -n1 markitdown', ['-/find', 'markitdown/markitdown']], ['xargs', ['-/echo']],
   ])
   check('cli lanes: an option a wrapper does not document leaves the program unresolved, and a lookup or non-run mode runs none', [
-    ['command -v qmd', []], ['command -V qmd', []], ['sudo -l qmd', []], ['exec -a name qmd mcp', ['-/- unresolved']], ['xargs -P 4 qmd get', ['-/- unresolved']],
+    ['command -v qmd', []], ['command -V qmd', []], ['sudo -l qmd', []], ['exec -a name qmd mcp', ['-/- unresolved']], ['exec -- qmd mcp', ['-/- unresolved']], ['xargs -P 4 qmd get', ['-/- unresolved']],
     ['nice -10 qmd update', ['-/- unresolved']], ['env --bogus qmd', ['-/- unresolved']], ['timeout 60', []],
   ])
   check('cli lanes: compound commands, substitutions, shell strings and shell heredocs', [
