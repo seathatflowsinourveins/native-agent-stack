@@ -1524,10 +1524,13 @@ def plan_run(args, *, runner, now):
             raise RunRefused("preflight", refused.reason) from None
         except (BranchLookupFailed, BranchesExhausted, ValueError):
             raise RunRefused("preflight", "branch_lookup_failed") from None
+        stack_root = Path(os.environ.get("OPENHANDS_STACK_ROOT", str(HERE.parents[2]))).resolve()
         try:
-            skill = host.resolver_skill_pin(Path(os.environ.get("OPENHANDS_STACK_ROOT", str(HERE.parents[2]))))
-        except ValueError as error:
-            raise RunRefused("preflight", str(error)) from None
+            skill = host.resolver_skill_pin(stack_root)
+            skill_check = host.check_resolver_skills(stack_root, skill, workroot)
+        except (ValueError, OSError, subprocess.SubprocessError) as error:
+            raise RunRefused("preflight", str(error) if isinstance(error, ValueError)
+                             else type(error).__name__.lower()) from None
     finally:
         shutil.rmtree(workroot, ignore_errors=True)
     instruction = resolver_instruction(selected, task=task, owned_paths=owned)
@@ -1535,7 +1538,8 @@ def plan_run(args, *, runner, now):
             "branch_rules": rules, "owned_paths": owned, "lane": args.lane, "arm": args.arm, "port": args.port,
             "kept_comments": selected["kept_comments"], "dropped_comments": selected["dropped_comments"],
             "dropped_reasons": selected["dropped_reasons"], "preflight": identity, "repository": repository,
-            "gates": "passed", "resolver_skill": skill, "instruction_chars": len(instruction),
+            "gates": "passed", "resolver_skill": skill, "resolver_skills": skill_check,
+            "instruction_chars": len(instruction),
             "instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest()}
     attempt = ResolverAttempt(
         number=args.issue, title=selected["title"], base_sha=base, branch=branch, owned_paths=owned, lane=args.lane,

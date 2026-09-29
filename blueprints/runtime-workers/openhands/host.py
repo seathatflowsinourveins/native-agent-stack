@@ -549,6 +549,33 @@ def resolver_workspace_skills(workspace, manifest_path):
     return {"names": names, "manifest_sha256": digest(manifest_path)}
 
 
+def check_resolver_skills(stack_root, pin, workdir):
+    """install_skills.py --dry-run with the resolver manifest against an empty project directory.
+
+    tools/adoption/install_skills.py main: --dry-run still checks the pinned skills
+    binary (verify_skills_bin) and looks up every selected source tree through
+    `gh api` before any add, and it adds nothing. resolver.plan_run calls this before
+    the attempt exists, so a missing binary or an unpublished pin refuses before the
+    run id is spent. Returns the installer's per-skill statuses.
+    """
+    workdir = Path(workdir)
+    manifest, project = workdir / "resolver-skills.json", workdir / "project"
+    project.mkdir(mode=0o700)
+    write_json(manifest, resolver_skills_manifest(stack_root, pin))
+    checked = subprocess.run([sys.executable, str(Path(stack_root) / "tools/adoption/install_skills.py"),
+                              "--manifest", str(manifest), "--project-dir", str(project), "--agent", "universal",
+                              "--dry-run", "--json"], cwd=stack_root, capture_output=True, text=True, timeout=600,
+                             check=False)
+    try:
+        summary = json.loads(checked.stdout.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        summary = {}
+    if (checked.returncode != 0 or not isinstance(summary, dict) or summary.get("ok") is not True
+            or summary.get("dry_run") is not True or not isinstance(summary.get("skills"), dict)):
+        raise ValueError("resolver_skills_unverified")
+    return summary["skills"]
+
+
 def install_resolver_skills(stack_root, workspace, result):
     """tdd, search-first and the resolver skill through install_skills.py in project mode.
 

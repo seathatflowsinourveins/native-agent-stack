@@ -2510,6 +2510,51 @@ def load_recipe(filename):
     return module
 
 
+class GitleaksLockTests(unittest.TestCase):
+    """The guard's gitleaks scanner and the per-user scan lock of adoption/tools/gitleaks-guarded."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.g = load_resolver().outgoing_guard
+
+    def scanner(self, codes, sleeps):
+        calls = []
+
+        def runner(argv, **kwargs):
+            calls.append(argv)
+            return completed(argv, "", codes.pop(0) if codes else 0)
+
+        scan = self.g.gitleaks_scanner("/fixture/gitleaks", config="/fixture/.gitleaks.toml", workdir="/fixture/cwd",
+                                       home="/fixture/home", runner=runner, sleep=sleeps.append)
+        return scan, calls
+
+    def test_a_busy_lock_is_retried_within_a_bound_and_never_read_as_clean(self):
+        # gitleaks-guarded:22-32 exits 75 ("another scan holds the per-user lock; retry after it
+        # finishes") before any scan starts; 75 is EX_TEMPFAIL in sysexits.h.
+        self.assertEqual(self.g.GITLEAKS_LOCK_BUSY, 75)
+        sleeps = []
+        scan, calls = self.scanner([75, 75, 0], sleeps)
+        self.assertEqual(scan("clean text"), [])
+        self.assertEqual((len(calls), sleeps), (3, [self.g.LOCK_WAIT_SECONDS] * 2))
+        sleeps = []
+        scan, calls = self.scanner([75, self.g.LEAK_EXIT], sleeps)
+        self.assertEqual(scan("text"), ["gitleaks"])
+        sleeps = []
+        scan, calls = self.scanner([75] * (self.g.LOCK_RETRIES + 5), sleeps)
+        with self.assertRaises(RuntimeError) as caught:
+            scan("text")
+        self.assertEqual(str(caught.exception), "gitleaks_lock_busy")
+        self.assertEqual((len(calls), len(sleeps)), (self.g.LOCK_RETRIES + 1, self.g.LOCK_RETRIES))
+        # Only the lock's code is retried: any other failure stays one call and an error.
+        for code in (1, 78, 2):
+            with self.subTest(code=code):
+                sleeps = []
+                scan, calls = self.scanner([code], sleeps)
+                with self.assertRaises(RuntimeError) as caught:
+                    scan("text")
+                self.assertEqual((str(caught.exception), len(calls), sleeps), ("gitleaks_failed", 1, []))
+
+
 class ResolverWorkerTests(unittest.TestCase):
     """worker.py in resolver mode: the request container's agent, with SDK stand-ins only."""
 
@@ -2867,6 +2912,38 @@ class ResolverHostTests(unittest.TestCase):
         self.assertNotIn("malformed pinned project skill", errors.getvalue())
         self.assertIn("not found", errors.getvalue())
 
+    def test_the_plan_checks_the_resolver_skills_with_the_installers_dry_run(self):
+        # tools/adoption/install_skills.py --dry-run checks the pinned skills binary and looks
+        # up every selected source tree before any add, so the plan finds those failures
+        # before the run id is spent.
+        pin = {"ref": "1" * 40, "tree_sha": "2" * 40, "skill_md_sha256": "3" * 64}
+        workdir = self.tmp / "plan"
+        workdir.mkdir()
+        summary = {"dry_run": True, "ok": True, "skills": {"tdd": "planned", "search-first": "planned",
+                                                            "resolver": "planned"}}
+        with mock.patch.object(self.host.subprocess, "run", return_value=subprocess.CompletedProcess(
+                [], 0, json.dumps(summary) + "\n", "")) as run:
+            self.assertEqual(self.host.check_resolver_skills(ROOT, pin, workdir), summary["skills"])
+        argv, options = run.call_args.args[0], run.call_args.kwargs
+        self.assertEqual(argv, [sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
+                                "--manifest", str(workdir / "resolver-skills.json"),
+                                "--project-dir", str(workdir / "project"), "--agent", "universal", "--dry-run",
+                                "--json"])
+        self.assertEqual(options["cwd"], ROOT)
+        self.assertEqual(json.loads((workdir / "resolver-skills.json").read_text()),
+                         self.host.resolver_skills_manifest(ROOT, pin))
+        self.assertEqual(list((workdir / "project").iterdir()), [])
+        for index, (code, stdout) in enumerate(((1, ""), (0, json.dumps({**summary, "ok": False})), (0, "not json"),
+                                                (0, json.dumps({**summary, "dry_run": False})))):
+            with self.subTest(code=code, stdout=stdout):
+                again = self.tmp / f"plan-{index}"
+                again.mkdir()
+                with mock.patch.object(self.host.subprocess, "run", return_value=subprocess.CompletedProcess(
+                        [], code, stdout, "install-skills failed: skills not found\n")):
+                    with self.assertRaises(ValueError) as caught:
+                        self.host.check_resolver_skills(ROOT, pin, again)
+                    self.assertEqual(str(caught.exception), "resolver_skills_unverified")
+
     def test_installed_resolver_skills_must_be_exactly_the_pinned_three(self):
         workspace = self.tmp / "workspace"
         texts = {name: f"---\nname: {name}\n---\n{name} body\n" for name in ("tdd", "search-first", "resolver")}
@@ -3155,6 +3232,7 @@ class ResolverResultTests(unittest.TestCase):
 REAL_GIT = shutil.which("git")
 ORIGIN_FILES = {**BASE_FILES, "AGENTS.md": "# Rules\n"}
 SKILL_PIN = {"ref": "1" * 40, "tree_sha": "2" * 40, "skill_md_sha256": "3" * 64}
+SKILL_CHECK = {"resolver": "planned", "search-first": "planned", "tdd": "planned"}
 # Built at runtime, as tests/test_runtime_worker_openhands.py builds its fixture id, so the
 # file passes `validate.py --scan-file` (no literal session identifier).
 CONVERSATION = str(uuid.UUID(int=5))
@@ -3483,6 +3561,7 @@ class ResolverRunTests(unittest.TestCase):
                     (host, "RESOLVER_ORIGIN", str(self.bare)),
                     (host, "install_resolver_skills", mock.Mock(side_effect=install)),
                     (host, "resolver_skill_pin", mock.Mock(return_value=SKILL_PIN)),
+                    (host, "check_resolver_skills", mock.Mock(return_value=SKILL_CHECK)),
                     (host, "prepare_native_dispatch", mock.Mock(side_effect=prepare)),
                     (host, "run_probe", mock.Mock(return_value=True)),
                     (host, "execute_container", mock.Mock(return_value=0)),
@@ -3510,10 +3589,14 @@ class ResolverRunTests(unittest.TestCase):
         self.assertEqual(plan["status"], "planned")
         self.assertRegex(plan["run_id"], r"^rw-openhands-res-12-[0-9]{8}$")
         self.assertEqual({key: plan[key] for key in ("issue", "base_sha", "branch", "owned_paths", "lane", "arm", "port",
-                                                      "kept_comments", "dropped_comments", "gates", "resolver_skill")},
+                                                      "kept_comments", "dropped_comments", "gates", "resolver_skill",
+                                                      "resolver_skills")},
                          {"issue": 12, "base_sha": self.base, "branch": "openhands/issue-12", "owned_paths": ["docs"],
                           "lane": "lane:foundation", "arm": "control", "port": 3740, "kept_comments": 0,
-                          "dropped_comments": 0, "gates": "passed", "resolver_skill": SKILL_PIN})
+                          "dropped_comments": 0, "gates": "passed", "resolver_skill": SKILL_PIN,
+                          "resolver_skills": SKILL_CHECK})
+        check = mocks["check_resolver_skills"]
+        self.assertEqual(check.call_args.args[:2], (ROOT, SKILL_PIN))
         self.assertIn("non_fast_forward", plan["branch_rules"])
         self.assertEqual(plan["preflight"]["gh_version"], "2.101.0")
         self.assertEqual(plan["repository"], {"full_name": REPOSITORY_JSON["full_name"], "default_branch": "main"})

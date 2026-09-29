@@ -33,6 +33,7 @@ import re
 import stat
 import subprocess
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[4]
 
@@ -222,9 +223,15 @@ class OutgoingGuard:
 
 
 LEAK_EXIT = 99
+# The host's gitleaks is adoption/tools/gitleaks-guarded, which allows one scan per user: on a
+# held lock it exits 75 before any scan starts, asking to "retry after it finishes" (:22-32;
+# 75 is EX_TEMPFAIL in sysexits.h). Only that code is retried, within a bound.
+GITLEAKS_LOCK_BUSY = 75
+LOCK_RETRIES = 60
+LOCK_WAIT_SECONDS = 5
 
 
-def gitleaks_scanner(gitleaks, *, config, workdir, home=None, runner=subprocess.run):
+def gitleaks_scanner(gitleaks, *, config, workdir, home=None, runner=subprocess.run, sleep=time.sleep):
     """A guard scanner running `gitleaks stdin` with the repository's configuration.
 
     gitleaks 8.30.1 `stdin --help`: --config, --redact, --no-banner, --exit-code
@@ -232,6 +239,8 @@ def gitleaks_scanner(gitleaks, *, config, workdir, home=None, runner=subprocess.
     comment in model text must not suppress a finding, so that option is always on.
     gitleaks and host launchers also exit 1 on errors, so a leak gets its own exit
     code and every other non-zero status raises (the guard counts that as a finding).
+    A busy per-user lock (GITLEAKS_LOCK_BUSY) is retried up to LOCK_RETRIES times,
+    LOCK_WAIT_SECONDS apart, then raises; it is never read as a clean result.
     The child gets PATH and HOME only, so GITLEAKS_CONFIG cannot replace --config,
     and runs in an empty private directory, so no .gitleaksignore there applies.
     """
@@ -240,8 +249,15 @@ def gitleaks_scanner(gitleaks, *, config, workdir, home=None, runner=subprocess.
     env = {"PATH": "/usr/bin:/bin", "HOME": home or pwd.getpwuid(os.getuid()).pw_dir}
 
     def scan(text):
-        result = runner(argv, input=text, cwd=workdir, env=dict(env), capture_output=True,
-                        encoding="utf-8", errors="replace", timeout=120, check=False)
+        for attempt in range(LOCK_RETRIES + 1):
+            result = runner(argv, input=text, cwd=workdir, env=dict(env), capture_output=True,
+                            encoding="utf-8", errors="replace", timeout=120, check=False)
+            if result.returncode != GITLEAKS_LOCK_BUSY:
+                break
+            if attempt < LOCK_RETRIES:
+                sleep(LOCK_WAIT_SECONDS)
+        else:
+            raise RuntimeError("gitleaks_lock_busy")
         if result.returncode == 0:
             return []
         if result.returncode == LEAK_EXIT:
