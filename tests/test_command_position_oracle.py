@@ -49,7 +49,7 @@ def sq(text):
 
 # A token per lane executable run: its name, `!` after it when an argument before `--` is --version or --help (mcporter: a version
 # token only as the command, a help token anywhere: openclaw/mcporter@93e0916c src/cli.ts:137-145, src/cli/flag-utils.ts:34-41), and
-# for mcporter its operation (and the server before the first dot of a call). A plain `rtk` is not a lane and is not counted. rtk logs `rtk_proxy` when it is asked to proxy, then runs its argv with execvp
+# for mcporter its operation (and the server before the first dot of a call); a bare mcporter prints its help (src/cli.ts:137-145). A plain `rtk` is not a lane and is not counted. rtk logs `rtk_proxy` when it is asked to proxy, then runs its argv with execvp
 # (rtk-ai/rtk@1d87b8e7 src/main.rs:68-90 global flags before the subcommand, :3008-3066 proxy: no shell, stdin inherited; one argument
 # with blanks is split first).
 STUB = """#!/bin/sh
@@ -58,7 +58,7 @@ for a in "$@"; do case "$a" in --) break;; --version|--help) t="$t!";; esac; don
 printf '%s\\n' "$t" >> "$STUB_LOG"
 """
 MCPORTER = """#!/bin/sh
-case "$1" in --version|-v|-V|help|-h|--help) printf 'mcporter!\\n' >> "$STUB_LOG"; exit 0;; esac
+case "$1" in ''|--version|-v|-V|help|-h|--help) printf 'mcporter!\\n' >> "$STUB_LOG"; exit 0;; esac
 for a in "$@"; do case "$a" in --help|-h|help) printf 'mcporter!\\n' >> "$STUB_LOG"; exit 0;; esac; done
 case "$1" in call) s=${2%%.*}; printf 'mcporter:call@%s\\n' "$s" >> "$STUB_LOG";; *) printf 'mcporter:%s\\n' "$1" >> "$STUB_LOG";; esac
 """
@@ -197,6 +197,8 @@ PROBES = [
     ("mcporter call", "mcporter call codebase-memory.search_graph --args '{}'"),
     ("mcporter list", "mcporter list socraticode --brief"),
     ("mcporter version", "mcporter --version"),
+    ("mcporter bare", "mcporter"),
+    ("mcporter bare in a shell string", "sh -c mcporter list"),
     ("substitution", "x=$(qmd get a); echo \"$(toon b)\" `repomix`"),
     ("data words", "echo qmd 'toon status' \"repomix\"; grep qmd /dev/null; : qmd"),
     ("eval", 'eval "qmd status"'),
@@ -286,6 +288,7 @@ RECOVERY_PROBES = [
     ("unterminated quoted data heredoc", "cat <<'EOF'\n$(toon a)"),
     ("unterminated heredoc, operator line continues", "bash <<EOF && toon x\nqmd status"),
     ("unterminated heredoc, wrapper", "env -u X bash <<'END-1'\nqmd status"),
+    ("unterminated heredoc, first body line looks like an operator", "cat <<EOF\n<<-EOF\\$cat"),
     # An escaped $ inside backquotes starts a substitution (POSIX.1-2024 XCU 2.6.3), which the grammar reads as an ERROR; the kernel reads the unescaped body.
     ("escaped dollar in backquotes", "echo `echo \\$(qmd a)`"),
     ("joined lines", 'echo "$M" | tr " " "\\n" | grep -c . \nstart=$(date +%s)\nTMPDIR=/x rtk proxy python3 -m unittest $M > run.txt 2>&1\nrc=$?'),

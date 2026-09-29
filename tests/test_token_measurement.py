@@ -1274,11 +1274,14 @@ class TokenMeasurement(unittest.TestCase):
         cases = {"bash <<EOF\nqmd status": {"qmd": 1}, "bash <<'EOF'\nqmd status\nrtk proxy toon f": {"qmd": 1, "rtk_proxy": 1, "toon": 1},
                  "bash <<'EOF'\nqmd status\n": {"qmd": 1}, "bash <<-EOF\n\tqmd status": {"qmd": 1}, "cat <<EOF\nqmd status": {},
                  "cat <<EOF\n$(toon a)": {"toon": 1}, "cat <<'EOF'\n$(toon a)": {},
+                 # the first body line reads as a second operator until the first heredoc is closed: one delimiter is appended at a time
+                 "cat <<EOF\n<<-EOF\\$cat": {},
                  "bash <<EOF && toon x\nqmd status": {"qmd": 1, "toon": 1}, "env -u X bash <<'END-1'\nqmd status": {"qmd": 1}}
         for (command, want), (lanes, _, cli) in zip(cases.items(), self.tally(list(cases))):
             with self.subTest(command=command):
                 self.assertEqual(lanes, want)
                 self.assertEqual(cli["parse_errors"], 0)
+                self.assertEqual(cli["unresolved_programs"], 0)
 
     @NEEDS_PARSER
     def test_a_name_is_emitted_only_from_the_closed_vocabulary(self):
