@@ -356,12 +356,11 @@ class Masker:
         return longest, owner
 
     def _boundary(self, ranges: list, held: int) -> int:
-        boundary, moved = len(self.buf) - held, True
-        while moved:  # never cut through a complete match: hold it with the tail
-            moved = False
-            for start, end, _name in ranges:
-                if start < boundary < end:
-                    boundary, moved = start, True
+        """Where writing may stop: where the held tail starts, or the end of a complete match that runs into it."""
+        boundary = len(self.buf) - held
+        for start, end, _name in ranges:  # sorted, and touching ranges are merged: one pass is enough
+            if start < boundary < end:
+                boundary = end  # a match is written whole; its bytes past the tail's start stay in buf, as written
         return boundary
 
     def _render(self, stop: int, ranges: list) -> bytes:
@@ -376,14 +375,18 @@ class Masker:
         return b"".join(out)
 
     def feed(self, data: bytes, now: float) -> bytes:
+        """Write everything that no later byte can change and keep only the tail that could still begin a needle: at
+        most the longest needle minus one byte, however long a run of overlapping matches is (a match that runs into
+        that tail is written whole, so a long run may come out as several markers, and the bytes of it that stay
+        in buf count as written). Anything longer than the tail is never re-scanned."""
         self.buf += data
         self.last = now
         ranges = self._ranges()
-        stop = self._boundary(ranges, self._held()[0])
-        if stop <= self.emitted:
-            return b""
-        out = self._render(stop, ranges)
-        self.buf, self.emitted = self.buf[stop:], 0
+        held = self._held()[0]
+        stop = self._boundary(ranges, held)
+        out = self._render(stop, ranges) if stop > self.emitted else b""
+        keep = len(self.buf) - held
+        self.buf, self.emitted = self.buf[keep:], max(stop, self.emitted) - keep
         return out
 
     def idle_due(self):
@@ -406,7 +409,7 @@ class Masker:
         out = self._render(stop, ranges) if stop > self.emitted else b""
         start = max(stop, self.emitted)
         if start < len(self.buf):
-            if len(self.buf) - stop <= SHORT_TAIL_MAX:
+            if held <= SHORT_TAIL_MAX:
                 out += self.buf[start:]
             else:
                 out += b"[REDACTED-PARTIAL:" + (owner or "VALUE").encode("ascii") + b"]"

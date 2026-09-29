@@ -13,6 +13,7 @@ import hashlib
 import io
 import json
 import os
+import random
 import re
 import select
 import shutil
@@ -603,6 +604,44 @@ class MaskingTests(RunnerCase):
                          + continued.close(), b"abc[REDACTED-PARTIAL:K]")
 
 
+MARKER = re.compile(rb"\[REDACTED(?:-PARTIAL)?:[A-Z0-9_]+\]")
+
+
+def naive_mask(needles: list, data: bytes) -> bytes:
+    """The whole-buffer masker, written again here: every occurrence of every needle, overlapping and touching ones
+    merged into one range named after its earliest longest match, replaced by a marker."""
+    found = []
+    for needle, name in needles:
+        at = data.find(needle)
+        while at != -1:
+            found.append((at, at + len(needle), name))
+            at = data.find(needle, at + 1)
+    merged = []
+    for start, end, name in sorted(found, key=lambda item: (item[0], item[0] - item[1])):
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end, name])
+    out, at = [], 0
+    for start, end, name in merged:
+        out += [data[at:start], b"[REDACTED:" + name.encode() + b"]"]
+        at = end
+    return b"".join(out) + data[at:]
+
+
+def stream_through(needles: list, data: bytes, rng, biggest: int) -> tuple:
+    """(output, largest retained size): data fed in random chunks, then closed."""
+    masker = run_mod.Masker(needles)
+    out, retained, at = [], 0, 0
+    while at < len(data):
+        size = rng.randint(1, biggest)
+        out.append(masker.feed(data[at:at + size], 0.0))
+        retained = max(retained, len(masker.buf))
+        at += size
+    out.append(masker.close())
+    return b"".join(out), retained
+
+
 def lower_hex(text: str) -> str:
     return re.sub(r"%[0-9A-F]{2}", lambda match: match.group().lower(), text)
 
@@ -690,6 +729,93 @@ class EncodedFormTests(RunnerCase):
         result = self.run_tool("tavily", *py(code))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "".join(f"form {form}\n" for form in forms).encode())
+
+
+class BoundedHoldbackTests(RunnerCase):
+    """Review of 2026-09-29, finding 4: overlapping matches kept moving the hold-back boundary to zero, so a run of
+    them was never written, stayed in memory whole and was scanned again at every chunk. The masker now writes a
+    complete match at once and keeps only the tail that could still begin a longer needle (at most the longest
+    needle minus one byte); a long run of matches may therefore produce several markers."""
+
+    def test_a_run_of_overlapping_matches_keeps_at_most_the_longest_needle_minus_one(self):
+        masker = run_mod.Masker([(b"aaaaaa", "K")])  # the review's value: six identical characters
+        pieces = []
+        for _ in range(31):
+            pieces.append(masker.feed(b"a" * 4096, 0.0))
+            self.assertLessEqual(len(masker.buf), 5)  # was 126,976 bytes after the 31st chunk
+        self.assertTrue(all(pieces), "a chunk of matching bytes wrote nothing")  # progress at every chunk
+        out = b"".join(pieces) + masker.close()
+        self.assertEqual(MARKER.sub(b"", out), b"")  # nothing of the run is ever printed
+        self.assertEqual(set(MARKER.findall(out)), {b"[REDACTED:K]"})
+
+    def test_the_bound_follows_the_longest_needle(self):
+        needles = [(b"abcabcabcabc", "LONG"), (b"abcabc", "SHORT")]
+        masker = run_mod.Masker(needles)
+        for _ in range(40):
+            masker.feed(b"abc" * 500 + b"ab", 0.0)
+            self.assertLessEqual(len(masker.buf), 11)
+        self.assertLessEqual(len(masker.buf), 11)
+
+    def test_a_straddling_match_is_written_whole_and_its_tail_is_never_printed_raw(self):
+        # A is complete while B is still a proper prefix that starts inside it (the case that used to hold everything).
+        masker = run_mod.Masker([(b"abcdef", "A"), (b"defghijk", "B")])
+        first = masker.feed(b"abcdefgh", 0.0)
+        self.assertEqual(first, b"[REDACTED:A]")
+        self.assertLessEqual(len(masker.buf), 7)
+        # B completes: what B adds is masked, and the bytes of A that B reuses are not printed again.
+        self.assertEqual(MARKER.sub(b"", first + masker.feed(b"ijkX\n", 0.0) + masker.close()), b"X\n")
+        # B fails: only the bytes after A are printed, as before.
+        other = run_mod.Masker([(b"abcdef", "A"), (b"defghijk", "B")])
+        self.assertEqual(other.feed(b"abcdefgh", 0.0) + other.feed(b"Y\n", 0.0) + other.close(), b"[REDACTED:A]ghY\n")
+
+    def test_random_outputs_that_are_not_pathological_match_the_whole_buffer_masker(self):
+        rng = random.Random(20260929)
+        alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-_./+=:@ \n"
+        for round_number in range(250):
+            values = {"K1": "".join(rng.choice(alphabet[:-2]) for _ in range(rng.randint(6, 24))),
+                      "K2": "".join(rng.choice(alphabet[:-2]) for _ in range(rng.randint(6, 24)))}
+            needles = sorted(run_mod.needles_for(values, ["K1", "K2"]), key=lambda item: len(item[0]), reverse=True)
+            pieces = []
+            for _ in range(rng.randint(3, 14)):
+                pieces.append("".join(rng.choice(alphabet) for _ in range(rng.randint(1, 30))).encode())
+                choice = rng.random()
+                if choice < 0.5:
+                    pieces.append(rng.choice(needles)[0])
+                elif choice < 0.8:  # a proper prefix of a needle that does not complete: it is held, then released
+                    needle = rng.choice(needles)[0]
+                    pieces.append(needle[:rng.randint(1, len(needle) - 1)] + b"\n")
+                pieces.append(b" ")  # a separator: a needle never touches the next, which the whole-buffer masker merges
+            data = b"".join(pieces) + b"\n"
+            expected = naive_mask(needles, data)
+            longest = max(len(needle) for needle, _name in needles)
+            out, retained = stream_through(needles, data, rng, rng.choice((1, 3, 17, 300)))
+            with self.subTest(round=round_number):
+                self.assertEqual(out, expected)
+                self.assertLessEqual(retained, longest - 1)
+
+    def test_random_pathological_runs_hold_the_bound_and_print_no_masked_byte(self):
+        rng = random.Random(20260930)
+        for round_number in range(80):
+            unit = "".join(rng.choice("abc") for _ in range(rng.randint(1, 3)))
+            value = (unit * 12)[:rng.randint(6, 12)]
+            needles = sorted(run_mod.needles_for({"K": value}, ["K"]), key=lambda item: len(item[0]), reverse=True)
+            data = b""
+            for _ in range(rng.randint(1, 6)):
+                data += (unit * rng.randint(1, 300)).encode() + rng.choice((b"-", b" Z ", b"\n", b"xyz"))
+            data += b"\n"
+            out, retained = stream_through(needles, data, rng, rng.choice((1, 7, 4096)))
+            longest = max(len(needle) for needle, _name in needles)
+            with self.subTest(round=round_number):
+                self.assertLessEqual(retained, longest - 1)
+                # Only the number of markers may differ from the whole-buffer masker: the bytes left unmasked are the same.
+                self.assertEqual(MARKER.sub(b"", out), MARKER.sub(b"", naive_mask(needles, data)))
+
+    def test_a_long_run_of_a_repeated_value_reaches_the_reader_masked_and_bounded(self):
+        self.plant("tavily", "export TAVILY_API_KEY=aaaaaa\n")
+        result = self.run_tool("tavily", *py("import sys\nsys.stdout.write('a' * 126976 + '\\n')\n"), timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(MARKER.sub(b"", result.stdout), b"\n")
+        self.assertIn(b"[REDACTED:TAVILY_API_KEY]", result.stdout)
 
 
 class ProcessTests(RunnerCase):
