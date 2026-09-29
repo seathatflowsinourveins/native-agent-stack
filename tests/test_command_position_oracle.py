@@ -204,6 +204,13 @@ PROBES = [
     ("word cut after an assignment, wrapper", "A=$HOME/$X-$Y rtk proxy toon f"),
     ("word cut after two assignments", "A=1 B=$HOME/$X-$Y markitdown a.json"),
     ("word cut in a loop body", "for i in a; do out=$HOME/$X-$Y; done; qmd get"),
+    # The same cut inside a command's own words: two argument nodes with no blank between them are one word (an assignment word of env, a
+    # duration of timeout).
+    ("word cut in an env assignment", "env A=$HOME/$X-$Y qmd get"),
+    ("word cut in a wrapped env assignment", "nohup env A=$HOME/$X-$Y toon f"),
+    ("word cut in a timeout duration", "timeout $HOME/$X-$Y qmd get"),
+    ("word cut before a help flag", "qmd get --out=$HOME/$X-$Y --help"),
+    ("word cut in a proxied word", "rtk proxy env A=$HOME/$X.$Y qmd get"),
     ("mcporter bare", "mcporter"),
     ("mcporter bare in a shell string", "sh -c mcporter list"),
     ("substitution", "x=$(qmd get a); echo \"$(toon b)\" `repomix`"),
@@ -481,6 +488,8 @@ class GeneratorExt(Generator):
                 lambda: "2>&1 " + name,
                 lambda: "A=1 " + name + " " + word(),
                 lambda: "A=$HOME/$X-$Y " + name + " " + word(),
+                lambda: "env A=$HOME/$X-$Y " + name,
+                lambda: name + " " + word() + " --out=$HOME/$X.$Y",
                 lambda: "A=" + self.sub() + " " + name,
                 lambda: name + " --flag=" + self.sub(),
                 lambda: name + ' "$(' + self.lane() + ')"',

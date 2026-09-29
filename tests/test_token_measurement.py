@@ -1273,12 +1273,24 @@ class TokenMeasurement(unittest.TestCase):
         # A name with no blank before it belongs to the assignment's word. Expected lanes are the runs of real bash 5.2 under stubs.
         cases = {"a=$HOME/$X-$Y qmd get": {"qmd": 1}, "a=$HOME/$X.$Y toon f.json": {"toon": 1}, "A=$HOME/$X-$Y rtk proxy toon f": {"rtk_proxy": 1, "toon": 1},
                  "A=1 B=$HOME/$X-$Y markitdown a.json": {"markitdown": 1}, "a=$HOME/$X-$Y": {}, "for i in a; do out=$HOME/$X-$Y; done": {},
-                 "for i in a; do out=$HOME/$X-$Y; done; qmd get": {"qmd": 1}, "a=$HOME/$X-z qmd get": {"qmd": 1}, "a=$HOME/$Xz qmd get": {"qmd": 1}}
+                 "for i in a; do out=$HOME/$X-$Y; done; qmd get": {"qmd": 1}, "a=$HOME/$X-z qmd get": {"qmd": 1}, "a=$HOME/$Xz qmd get": {"qmd": 1},
+                 # inside the command's own words two argument nodes with no blank between them are one word
+                 "env A=$HOME/$X-$Y qmd get": {"qmd": 1}, "nohup env A=$HOME/$X-$Y toon f": {"toon": 1}, "timeout $HOME/$X-$Y qmd get": {"qmd": 1},
+                 "rtk proxy env A=$HOME/$X.$Y qmd get": {"rtk_proxy": 1, "qmd": 1}, "echo x=$HOME/$X-$Y; qmd get": {"qmd": 1}}
         for (command, want), (lanes, _, cli) in zip(cases.items(), self.tally(list(cases))):
             with self.subTest(command=command):
                 self.assertEqual(lanes, want)
                 self.assertEqual(cli["parse_errors"], 0)
                 self.assertEqual(cli["unresolved_programs"], 0)
+
+    @NEEDS_PARSER
+    def test_a_cut_word_does_not_hide_an_exclusion_flag(self):
+        # The word after a cut is still a word: `--help` after `--out=$x/$y-$z` excludes the call (the flags are the lane's own words).
+        cases = {"qmd get --out=$HOME/$X-$Y --help": ({}, {"qmd": 1}), "qmd get --out=$HOME/$X-$Y": ({"qmd": 1}, {})}
+        for (command, (lanes, excluded)), (got, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(got, lanes)
+                self.assertEqual(cli["excluded_version_help"], excluded)
 
     @NEEDS_PARSER
     def test_a_heredoc_with_no_delimiter_line_is_closed_by_the_end_of_the_text(self):
