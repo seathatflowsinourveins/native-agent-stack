@@ -86,11 +86,15 @@ itself evidence the WSL UVA gap closed.
    `adoption/bootstrap-linux.sh` and its `claude-code` pin
    changed after `v2026.09.24.1`: at that tag the pin is 2.1.280 and the
    script reinstalls it even over a newer Claude Code, so a re-run
-   downgrades a native auto-updated install. On main the pin is 2.1.281 and a floor: the script
-   keeps a `~/.local/bin/claude` whose `--version` reports 2.1.281 or newer
+   downgrades a native auto-updated install. On main the pin is 2.1.284 and a floor: the script
+   keeps a `~/.local/bin/claude` whose `--version` reports 2.1.284 or newer
    (logging `Kept installed claude-code <version>`, with nothing downloaded
    or installed) and runs the checksum-verified install only when that
-   launcher is missing, older or unreadable.
+   launcher is missing, older or unreadable. The pin also changed after `v2026.09.26.2`,
+   where it is 2.1.281: 2.1.284 is the first Claude Code release whose
+   `sonnet` alias resolves to Sonnet 5.5 (on the Anthropic API; an older client routes it to Sonnet 5; [model-config](https://code.claude.com/docs/en/model-config)),
+   so a launcher reporting 2.1.281 to 2.1.283 now takes the
+   checksum-verified install.
    Its version report changed after `v2026.09.24.1`: that release, and
    every earlier one, runs `--version` on every file in
    `$ECO_INSTALL_ROOT/bin` and blocks on `context-mode`, which serves MCP on
@@ -100,7 +104,7 @@ itself evidence the WSL UVA gap closed.
    The script and its rtk and markitdown pins changed after `v2026.09.25.2` (#291): at that tag rtk was pinned at 0.49.0 and the script printed no such reminder at all; after that tag the pin became 0.50.0 and, after installing rtk, the script started printing a reminder unless `~/.config/rtk/config.toml` already has the Claude-hook `exclude_commands` key. It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here the reminder fires unless the key appears exactly once with all five entries from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) are present, exactly once, and, since #314, unless the installed `rtk hook check` also leaves the recipe's probes unrewritten (rtk can ignore a TOML-valid file, for example one with a `[tracking]` table that lacks `history_days`). The script never writes that file. Its pins file's rtk `install_note` also changed after `v2026.09.26` (`pins-linux-x86_64.json`, text only).
    The script's socraticode and headroom installs changed after `v2026.09.26` too (as did headroom's `install_note`): it now passes `--ignore-scripts` for socraticode's `ignore_scripts: true` pin, a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree, and it now downloads headroom's pinned wheel, verifies its `sha256` and installs that file, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index without reading the wheel or its hash (step 2 of [`adoption/bootstrap.md`](../bootstrap.md)).
    Its pins file also changed after `v2026.09.25.2` in a second way:
-   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch).
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step).
    `pins-linux-x86_64.json` now pins `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode` too, completing the
    `token-efficiency` profile's Linux coverage (step 2 of
