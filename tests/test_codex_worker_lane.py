@@ -1365,6 +1365,26 @@ class RoleStepTests(unittest.TestCase):
         for name in ROLE_NAMES:
             self.assertEqual(self.installed(name), self.sources[name])
 
+    def test_a_role_file_that_appears_after_the_plan_is_left_alone(self):
+        # The write is create-only (os.link refuses an existing name), so a file made between the plan and the write
+        # is never replaced. Simulated by a plan that still says create for a file that exists.
+        self.agents.mkdir(mode=0o700)
+        (self.agents / ROLE_NAMES[0]).write_text("someone else's\n")
+        with mock.patch.object(lane.Plan, "role_states", lambda self: {name: "create" for name in ROLE_NAMES}):
+            code, out = self.host.apply()
+        self.assertEqual(code, 3, out)
+        self.assertIn(f"agents/{ROLE_NAMES[0]} appeared since it was read; left as it is", out)
+        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), "someone else's\n")
+        self.assertFalse((self.agents / ROLE_NAMES[1]).exists())
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertEqual(record["status"], "failed")
+        self.assertIs(record["agent_roles"]["files"][ROLE_NAMES[0]]["creating"], False)  # it is not ours
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), "someone else's\n")
+        self.assertTrue(self.agents.is_dir())  # the folder was there before the run
+
     # --- controls (design 4.5): each load-bearing check, disabled, lets the case it guards through
     def test_control_the_role_precondition_is_what_refuses_a_differing_role(self):
         need(self, lane.Plan, "role_preconditions")
@@ -1373,7 +1393,7 @@ class RoleStepTests(unittest.TestCase):
         with mock.patch.object(lane.Plan, "role_preconditions", lambda self: []):
             code, out = self.host.apply()
         self.assertNotEqual(code, 2, out)  # without it nothing refuses before the writes
-        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), "differs\n")  # and create-only still spares it
+        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), "differs\n")  # the state check still spares it
 
     def test_control_the_doctor_verdict_is_what_fails_the_rehearsal(self):
         need(self, lane, "doctor_role_state")
