@@ -4576,8 +4576,15 @@ def mcp_call(server, number=0):
                                                  "call_id": f"call_{number}", "arguments": "{}"}}
 
 
+def mcp_item(server, number=0):
+    """An MCP call as this client's rollouts record it (observed on real rollouts): an item_completed McpToolCall item."""
+    return {"type": "event_msg", "payload": {"type": "item_completed", "item": {
+        "type": "McpToolCall", "id": f"item_{number}", "server": server, "tool": "memory_query", "arguments": {},
+        "status": "completed"}}}
+
+
 def child_rollout(*, agent_role="stack-researcher", texts=(ROLE["developer_instructions"],), context=None, servers=("ai-memory",),
-                  inherited=()):
+                  inherited=(), item_servers=()):
     records = [{"type": "session_meta", "payload": {"id": "thread-fx2", "agent_role": agent_role, "parent_thread_id": "thread-fx1",
                                                      "source": {"subagent": {}},
                                                      "subagent_history_start_ordinal": len(inherited) + 1}}]
@@ -4585,6 +4592,7 @@ def child_rollout(*, agent_role="stack-researcher", texts=(ROLE["developer_instr
     records += [dev_message(text) for text in texts]
     records += [context or turn_context()]
     records += [mcp_call(server, number) for number, server in enumerate(servers)]
+    records += [mcp_item(server, number) for number, server in enumerate(item_servers)]
     return rollout(*records)
 
 
@@ -4625,6 +4633,14 @@ class F36_RoleChildState(GraderCase):
     def test_an_mcp_server_outside_the_parents_effective_set_fails_the_bindings(self):
         got = self.state(child_rollout(servers=("ai-memory", "jcodemunch")))
         self.assertEqual((got["tools_equal_parent_set"], got["status"], got["reasons"]), (False, "fail", ["bindings"]))
+
+    def test_an_mcp_item_in_the_rollout_shape_is_read_too(self):
+        """Real rollouts record MCP calls as item_completed McpToolCall items with a `server` field, not as function
+        calls named mcp__<server>__<tool> (observed on this host's rollouts)."""
+        outside = self.state(child_rollout(servers=(), item_servers=("ai-memory", "jcodemunch")))
+        self.assertEqual((outside["tools_equal_parent_set"], outside["reasons"]), (False, ["bindings"]))
+        inside = self.state(child_rollout(servers=(), item_servers=("ai-memory", "qmd")))
+        self.assertEqual((inside["tools_equal_parent_set"], inside["status"]), (True, "pass"))
 
     def test_a_sandbox_or_working_directory_that_differs_from_the_parent_fails_the_bindings(self):
         for name, context in (("sandbox", turn_context(sandbox={"type": "workspace-write"})), ("cwd", turn_context(cwd="/trees/b"))):
