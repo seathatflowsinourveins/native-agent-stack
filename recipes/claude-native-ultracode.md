@@ -348,7 +348,7 @@ levels ([model configuration](https://code.claude.com/docs/en/model-config#adjus
 first bullet below is 2.1.281 history: on 2.1.284 the `--effort max` and
 `CLAUDE_CODE_EFFORT_LEVEL=max` sessions kept the Ultracode reminder (receipt cases A3, A4 and
 A8), and a stage or child that names no effort ran at its own model's saved level or default
-in a headless session (B2, B3, D2) and, in the interactive one, at the session's level for every child that named no effort (C1, C3 to C6; the project agents of C2 and C8 declare `effort: max`). The user asked for `max` as the terminal default on 2026-09-29; a saved `max` is not accepted and `CLAUDE_CODE_EFFORT_LEVEL` would flatten every child's own effort, so the ecosystem launcher adds `--effort max` when nothing chose an effort ([decision record](../docs/decisions/2026-09-29-max-default-effort.md); its receipt `claude-max-default-effort-20260929`, cases E2 and E4 for the variable). The per-stage rule below is unchanged and still load-bearing.
+in a headless session with no explicit effort (B2, B3, D2) and at the explicit effort otherwise: in the interactive session at the session's level for every child that named no effort (C1, C3 to C6; the project agents of C2 and C8 declare `effort: max`), and in a headless `--effort max` session an unnamed subagent and a stage that named none ran at `max` while a frontmatter `medium` stayed `medium` (max-default receipt, cases F5 to F7). The user asked for `max` as the terminal default on 2026-09-29; a saved `max` is not accepted and `CLAUDE_CODE_EFFORT_LEVEL` would flatten every child's own effort, so the ecosystem launcher adds `--effort max` when nothing chose an effort ([decision record](../docs/decisions/2026-09-29-max-default-effort.md); its receipt `claude-max-default-effort-20260929`, cases E2 and E4 for the variable). The per-stage rule below is unchanged and still load-bearing.
 
 - **On 2.1.281 `max` disabled Ultracode orchestration.** Ultracode sent `xhigh` to the
   model and additionally had Claude orchestrate dynamic workflows; any other
@@ -391,9 +391,9 @@ wherever a child is defined:
   and the [examples](../examples/claude-native/agents/) do);
 - every saved workflow stage and every ad-hoc `agent()` call in a workflow
   script passes `effort: 'max'` together with an explicit `model`: a stage
-  without its own `effort` runs at its agent's frontmatter effort, else at its model's saved
-  level or default in a headless session (2.1.284 probes; on 2.1.281 it inherited the
-  coordinator's `xhigh`) and at the session's level in an interactive one, and the stage's
+  without its own `effort` runs at its agent's frontmatter effort, else at the effort the session was given explicitly (`--effort`, `/effort` or the model picker) (max-default receipt, cases F5 to F7; dispatch receipt, cases C1 to C6), else at its model's saved
+  level or default (2.1.284 probes B1 to B3 and D2; on 2.1.281 it inherited the
+  coordinator's `xhigh`), and the stage's
   effort also overrides a lower frontmatter;
 - a teammate runs at the lead's session effort, whatever its definition says ([agent teams](https://code.claude.com/docs/en/agent-teams),
   read 2026-09-27); spawn a child that needs `max` unnamed or as a workflow stage;

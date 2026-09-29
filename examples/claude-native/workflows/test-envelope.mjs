@@ -22,8 +22,8 @@ const WF = { review: 'workflows/review-changes.js', readiness: 'workflows/readin
 // docs/decisions/2026-09-23-max-effort-default.md in the catalog). The coordinator runs at max in a terminal
 // session started through the ecosystem launcher and at xhigh, saved per model, elsewhere (Ultracode set xhigh on 2.1.281
 // and does not on 2.1.284). A stage with no effort of its own and no agent
-// frontmatter effort runs at its model's saved level or default in a headless 2.1.284 session and at the session's
-// level in an interactive one (the coordinator's xhigh on 2.1.281), and CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
+// frontmatter effort runs at the effort the session was given explicitly (--effort, /effort or the model picker), else at
+// its model's saved level or default (the coordinator's xhigh on 2.1.281), and CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
 // settings leave that variable unset.
 const STAGE_EFFORT = 'max'
 function load(file, stubs) {

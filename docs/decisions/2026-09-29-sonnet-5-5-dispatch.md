@@ -203,6 +203,10 @@ The [max-default record](2026-09-29-max-default-effort.md) and its receipt `clau
 `native-agent-stack-03`, #483) start interactive terminal launches through the ecosystem launcher at `max`, with the saved per-model
 `xhigh` above as the fallback elsewhere. The text follow-up that carries this addendum replaces the three clauses listed under "Not changed,
 and why" in `AGENTS.md` line 35 and states the rule in the portable and host `CLAUDE.md`, the workflows README, the recipes and the
-2026-09-23 addendum. Nothing in this record's routing changed: every stage still names its model and `effort: 'max'`, judgment stays on
+2026-09-23 addendum. The open item under "Measured on this host" (whether an explicit `--effort` in a headless session reaches its children) is answered by that
+receipt's cases F5 to F7: under `--effort max` an unnamed subagent and a Workflow stage that named no effort ran at `max`, a stage that named
+`low` ran at `low`, and a project agent whose frontmatter says `medium` ran at `medium`. Together with this record's cases the rule is: a child
+that names no effort runs at its frontmatter effort, else at the effort the session was given explicitly, else at its model's saved level or
+default. Nothing in this record's routing changed: every stage still names its model and `effort: 'max'`, judgment stays on
 Opus 5.5, and the committed project `effortLevel: xhigh` does not defeat the launcher's `--effort max` (receipt
 `claude-project-effort-flag-20260929`).

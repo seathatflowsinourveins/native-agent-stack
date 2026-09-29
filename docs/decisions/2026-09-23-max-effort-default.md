@@ -290,7 +290,7 @@ Sonnet 5.5. The 2.1.281 findings above stay as history for that release. On 2.1.
   [2026-09-29 max-default record](2026-09-29-max-default-effort.md) starts interactive terminal launches at `max` through the launcher,
   with the saved xhigh as the fallback where the launcher is not used.
 - **The stage rule stands and is load-bearing.** In the headless probes a stage or child that names no effort ran at its own model's
-  saved level or default (medium for an unsaved Sonnet 5.5); in the interactive session, whose effort a model picker had set to max, every child that named no effort ran at max (two project agents ran at max from their own frontmatter). So `effort: 'max'` on every stage stays explicit.
+  saved level or default (medium for an unsaved Sonnet 5.5); in the interactive session, whose effort a model picker had set to max, every child that named no effort ran at max (two project agents ran at max from their own frontmatter), and a headless session given an explicit `--effort max` passed it to a stage that named none (the [max-default receipt](../../evidence/receipts/claude-max-default-effort-20260929.json), cases F5 to F7). So `effort: 'max'` on every stage stays explicit.
 - **The limitation "no unconfounded probe covered the per-model key or a project settings file" is closed for Sonnet 5.5** on 2.1.284:
   A13 and A14 (a project file's `effortLevel` and a `modelSettings` entry) and A10 to A12 (per-model and top-level levels passed with
   `--settings`) cover both. For Opus 5.5 the project-file effect rests on the documentation, since A15 is confounded by the user's saved
