@@ -1,0 +1,138 @@
+{
+  "config_sha256": "768957da790acabee02ee92331a8184e40a6fcd7b3026b5da0f609e87d0da597",
+  "evidence_class": "PAPER",
+  "kind": "mover_trial_receipt",
+  "orders_submitted": 0,
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 6,
+    "capital_available": true,
+    "clock": {
+      "is_open": false,
+      "next_close_ns": 1790712000000000000,
+      "next_open_ns": 1790688600000000000,
+      "received_at_ns": 1790630883852488189,
+      "timestamp_ns": 1790630883846226968
+    },
+    "config_sha256": "768957da790acabee02ee92331a8184e40a6fcd7b3026b5da0f609e87d0da597",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790630884"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "1000",
+          "x-ratelimit-remaining": "999",
+          "x-ratelimit-reset": "1790630883"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790630884"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790630884"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790630885"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790630885"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790630885"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790630886"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790630886"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790630886"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790630884"
+        },
+        "kind": "data_read",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-28T21:28:04.071119+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "promotion_gate": "not_supplied",
+    "quote_count": 6,
+    "quote_errors": {},
+    "scan_sha256": "d81cbe78f841c588ddc4e9a519cadee114c704020bce04f94b4f7fc885b02787",
+    "untradable_scan_symbols": []
+  },
+  "protocol": "mover-early-entry-v1-20260924",
+  "reason": "benchmark_quotes_not_ready",
+  "scan_sha256": "d81cbe78f841c588ddc4e9a519cadee114c704020bce04f94b4f7fc885b02787",
+  "schema_version": 1,
+  "section": "paper_e2e",
+  "stage": "preflight",
+  "status": "not_started"
+}
