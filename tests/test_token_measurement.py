@@ -1462,6 +1462,214 @@ class TokenMeasurement(unittest.TestCase):
         self.assertEqual(got["with_marker"], 1)
         self.assertEqual(got["by_hook"]["PreToolUse:Read"], 1)
 
+    # Item 1 (PR-A): injected context from every hook event. Rows in the shapes this host's 2.1.283/2.1.284 transcripts carry (count-only scan,
+    # evidence/artifacts/pra-u2-differential-20260929): a PreToolUse insertion is named PreToolUse:<tool> and follows the hook_success row of
+    # the same (toolUseID, hookName); SessionStart and SubagentStart insertions carry a plain hookName and one or two content entries.
+    HOOK_MARKER = "<context_window_protection>"
+
+    @staticmethod
+    def hook(kind, name, event=None, **rest):
+        return {"type": "attachment", "timestamp": "2026-09-26T01:00:00Z", "attachment": {
+            "type": kind, "hookName": name, "hookEvent": event or name.split(":")[0], **rest}}
+
+    @classmethod
+    def hook_rows(cls):
+        hook, marker = cls.hook, cls.HOOK_MARKER
+        def claim(text, event):
+            return json.dumps({"hookSpecificOutput": {"hookEventName": event, "additionalContext": text}})
+        return {
+            "A": hook("hook_success", "SessionStart:startup", toolUseID="s1", stdout=claim("a", "SessionStart")),
+            "B": hook("hook_success", "SessionStart:startup", toolUseID="s2", stdout=claim("b " + marker, "SessionStart")),
+            "C": hook("hook_additional_context", "SessionStart", toolUseID="SessionStart", content=["a", "b " + marker]),
+            "D": hook("hook_success", "PreToolUse:Read", toolUseID="toolu_r", stdout=claim("tip", "PreToolUse")),
+            "E": hook("hook_additional_context", "PreToolUse:Read", toolUseID="toolu_r", content=["tip"]),
+            "F": hook("hook_success", "SubagentStart:general-purpose", toolUseID="start", stdout=claim("lanes", "SubagentStart")),
+            "G": hook("hook_additional_context", "SubagentStart", toolUseID="rnd", content=["lanes"]),
+            "H": hook("hook_additional_context", "PostToolUse:Bash", toolUseID="toolu_b", content=["post"]),
+            "I": hook("hook_additional_context", "UserPromptSubmit", content=["ups"]),
+            "J": hook("hook_success", "PreToolUse:Grep", toolUseID="toolu_g", stdout=claim("claimed only", "PreToolUse")),
+            # Plain stdout reaches context only on UserPromptSubmit, UserPromptExpansion, SessionStart and PostModelSwitch; stdout that does not
+            # both start with { and end with } is plain text, a JSON array included (code.claude.com/docs/en/hooks, "Exit code 0").
+            "K": hook("hook_success", "UserPromptSubmit", stdout="plain text context"),
+            "K2": hook("hook_success", "PreToolUse:Bash", toolUseID="toolu_p", stdout="plain on a tool event goes to the debug log"),
+            "K3": hook("hook_success", "SessionStart:resume", stdout="[1, 2]"),
+            "K4": hook("hook_success", "UserPromptSubmit", stdout='{"unterminated": 1'),
+            "K5": hook("hook_success", "UserPromptSubmit", stdout=json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit"}})),
+            "K6": hook("hook_success", "UserPromptSubmit", stdout="{not json}"),
+            "L": hook("hook_non_blocking_error", "PostToolUse:Bash", toolUseID="toolu_b"),
+            "L2": hook("hook_system_message", "PostToolUse:Bash", toolUseID="toolu_b"),
+            "M": hook("hook_additional_context", "PreToolUse:mcp__srv__" + "y" * 70, toolUseID="toolu_m", content=["t"]),
+        }
+
+    def test_hook_context_rows_blocks_and_claims_by_event(self):
+        """inserted counts hook_additional_context rows (the unit of M12: README.md M12 row), inserted_blocks their content entries, both
+        per hookEvent; a hook_success claim is never an insertion; other hook_* rows are counted apart, descriptively."""
+        rows = self.hook_rows()
+        got = self.measure([rows[k] for k in "A B C D E F G H I J K K2 K3 K4 K5 K6 L L2 M".split()])["hook_context"]
+        # must-stay controls: the #432 counters, the same at the base
+        self.assertEqual((got["inserted"], got["claimed"], got["with_marker"]), (6, 5, 1))
+        self.assertEqual(got["by_event"], {"SessionStart": 1, "PreToolUse": 2, "SubagentStart": 1, "PostToolUse": 1, "UserPromptSubmit": 1})
+        # a hook name SAFE_KEY drops (over 80 characters) keeps its event and MCP server; the base counts it under (other)
+        self.assertEqual(got["by_hook"], {"SessionStart": 1, "PreToolUse:Read": 1, "SubagentStart": 1, "PostToolUse:Bash": 1,
+                                          "UserPromptSubmit": 1, "PreToolUse:mcp__srv": 1})
+        self.assertEqual(got.get("hook_names_folded"), 1)
+        self.assertEqual(got.get("inserted_blocks"), 7)
+        self.assertEqual(got.get("blocks_by_event"), {"SessionStart": 2, "PreToolUse": 2, "SubagentStart": 1, "PostToolUse": 1, "UserPromptSubmit": 1})
+        self.assertEqual(got.get("claimed_by_event"), {"SessionStart": 2, "PreToolUse": 2, "SubagentStart": 1})
+        self.assertEqual(got.get("claimed_plain_stdout"), {"UserPromptSubmit": 2, "SessionStart": 1})
+        self.assertEqual(got.get("other_hook_rows"), {"hook_non_blocking_error": 1, "hook_system_message": 1})
+
+    def test_hook_context_negatives_and_the_m12_positive_control(self):
+        rows = self.hook_rows()
+        def measured(keys):
+            return self.measure([rows[k] for k in keys.split()])["hook_context"]
+        for keys, want in [
+                ("J", {"inserted": 0, "inserted_blocks": 0, "claimed": 1}),  # stdout only: a claim, never an insertion
+                ("D E", {"inserted": 1, "inserted_blocks": 1, "claimed": 1}),  # sibling rows: the hook_success row beside an insertion adds none
+                ("E G H", {"inserted": 3, "inserted_blocks": 3, "with_marker": 0})]:  # absent marker: rows still count
+            with self.subTest(rows=keys):
+                got = measured(keys)
+                self.assertEqual({k: got.get(k) for k in want}, want)
+        # M12's positive control reads this key (README.md M12 row): it must stay exactly as it is
+        self.assertEqual(measured("E")["by_hook"], {"PreToolUse:Read": 1})
+        # only an over-long <Event>:mcp__<server>__<tool> name with a hook-event-shaped prefix and a name-shaped server folds; the rest stay (other)
+        hook = self.hook
+        long_rows = [rows["M"], hook("hook_additional_context", "PreToolUse:" + "z" * 90, content=["t"]),
+                     hook("hook_additional_context", "pre tool use:mcp__srv__" + "y" * 70, event="PreToolUse", content=["t"]),
+                     hook("hook_additional_context", "PostToolUse:mcp__bad server__" + "y" * 70, content=["t"])]
+        got = self.measure(long_rows)["hook_context"]
+        self.assertEqual((got["by_hook"], got.get("hook_names_folded")), ({"PreToolUse:mcp__srv": 1, "(other)": 3}, 1))
+
+    def test_hook_context_of_a_sibling_child_counts_only_in_its_own_actor(self):
+        rows = self.hook_rows()
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory) / "session/subagents"
+            base.mkdir(parents=True)
+            (base / "agent-inserted.jsonl").write_text(json.dumps(rows["E"]) + "\n")
+            (base / "agent-claimed.jsonl").write_text(json.dumps(rows["D"]) + "\n")
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", directory], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            got = json.loads(p.stdout)
+        hooks = got["groups"]["all"]["measurement"]["hook_context"]
+        self.assertEqual((hooks["inserted"], hooks["claimed"]), (1, 1))  # control
+        self.assertEqual(hooks.get("actors_with_insertion"), 1)
+        self.assertEqual(sorted(a["measurement"]["hook_context"]["inserted"] for a in got["actors"]), [0, 1])  # control
+
+    def test_loaded_not_called_counts_references_and_actors(self):
+        """Item 5: measurement.loaded counts the tool references of ToolSearch results per MCP server whether or not the actor called it;
+        loaded_not_called keeps the #432 unit (references of servers the actor attempted no call on inside the window); the aggregate adds
+        the historical baseline row's unit, actors per server (RUNBOOK.md 'Loaded, never called': children loading each named server)."""
+        def ref(tool):
+            return {"type": "tool_reference", "tool_name": tool}
+        a = [call("s", "ToolSearch", query="select:x"), result("s", [ref("mcp__serena__find_symbol"), ref("mcp__serena__find_referencing_symbols"),
+                                                                     ref("mcp__qmd__query"), ref("Read")]),
+             call("q", "mcp__qmd__query"), result("q", "ok")]
+        c = [call("s", "ToolSearch", query="select:y"), result("s", [ref("mcp__serena__find_symbol")]),
+             call("f", "mcp__serena__find_symbol"), result("f", "ok")]
+        each, agg = self.exports("(() => { const ms = x.map((r) => cu.measureTranscript(r)); return [ms, cu.aggregateMeasurements(ms)] })()", [a, a, c])
+        self.assertEqual(each[0]["loaded_not_called"], {"serena": 2})  # control: references, as at #432
+        self.assertEqual(each[0].get("loaded"), {"serena": 2, "qmd": 1})  # a built-in tool reference (Read) is no server
+        self.assertEqual(each[2].get("loaded"), {"serena": 1})
+        self.assertEqual(agg["loaded_not_called"], {"serena": 4})  # control
+        self.assertEqual(agg.get("loaded"), {"serena": 5, "qmd": 2})
+        self.assertEqual(agg.get("loaded_actors"), {"serena": 3, "qmd": 2})
+        self.assertEqual(agg.get("loaded_not_called_actors"), {"serena": 2})
+        # the window: a call before since does not make a load inside it a call, and a result at or after until adds nothing
+        from datetime import datetime
+        def ms(clock):
+            return datetime.fromisoformat("2026-09-26T" + clock + "+00:00").timestamp() * 1000
+        def at(row, clock):
+            return {**row, "timestamp": "2026-09-26T" + clock + "Z"}
+        rows = [at(call("f", "mcp__serena__find_symbol"), "01:00:00"), result("f", "ok", timestamp="2026-09-26T01:00:01Z"),
+                at(call("s", "ToolSearch"), "02:00:00"), result("s", [ref("mcp__serena__find_symbol")], timestamp="2026-09-26T02:00:01Z"),
+                at(call("t", "ToolSearch"), "02:40:00"), result("t", [ref("mcp__qmd__query")], timestamp="2026-09-26T02:40:01Z")]
+        got = self.measure(rows, window={"since": ms("01:30:00"), "until": ms("02:30:00")})
+        self.assertEqual(got["loaded_not_called"], {"serena": 1})  # control
+        self.assertEqual(got.get("loaded"), {"serena": 1})
+
+    # Item 4: JSON and uniform-tabular shapes of results over 5,120 B. P is a JSON array of 200 flat records.
+    P = [{"id": i, "name": "n%d" % i, "ok": True} for i in range(200)]
+
+    @staticmethod
+    def ctx_echo(language, code, path=None):
+        """context-mode v1.0.169 src/server.ts:1511-1527 (buildExecuteEcho): the code clipped at 2,000 characters, fenced, before stdout."""
+        clip = code if len(code) <= 2000 else code[:2000] + "\n… (truncated)"
+        return ("path=" + path + "\n" if path else "") + "```" + language + "\n" + clip + "\n```\n\n"
+
+    @staticmethod
+    def cat_n(text):
+        """The Read tool's cat -n form: a right-aligned line number and a tab before every line."""
+        return "\n".join("%6d\t%s" % (i, line) for i, line in enumerate(text.split("\n"), 1))
+
+    def test_large_json_and_uniform_tabular_by_carrier(self):
+        """A result over RESULT_LIMIT is JSON when its payload, trimmed, opens with [ or { and parses; uniform_keys when it (or the one value of
+        a one-key object) is an array of at least five objects with the same non-empty key set; uniform_flat when every value is also null,
+        a boolean, a number or a string (TOON v4.1.1 packages/toon/README.md:199, 'identical fields with primitive values'). The payload is
+        the text after the carrier's own wrapper: the ctx_execute(_file) code echo, or the Read tool's cat -n line numbers. A result this
+        reading cannot inspect (a non-text block, an echo or a line number it cannot find) counts in large_shape_unknown, never as 0."""
+        p = json.dumps(self.P)
+        nested = json.dumps([{"id": i, "meta": {"x": 1}} for i in range(200)])
+        padded = json.dumps([{"id": i, "pad": "x" * 1500} for i in range(4)])
+        ragged = json.dumps([{"id": i, "name": "n%d" % i, ("a" if i % 2 else "b"): 1} for i in range(200)])
+        small = json.dumps(self.P[:6])
+        long_code = "echo " + "x" * 2500
+        half = len(self.ctx_echo("shell", "cat a.json") + p) // 2
+        echoed = self.ctx_echo("shell", "cat a.json") + p
+        specs = [
+            ("r1", "Bash", {"command": "cat a.json"}, p),
+            ("r2", "Bash", {"command": "cat b.json"}, json.dumps({"items": self.P})),
+            ("r3", "Bash", {"command": "cat c.json"}, nested),
+            ("r4", "Bash", {"command": "cat d.json"}, padded),
+            ("r5", "Bash", {"command": "cat e.json"}, ragged),
+            ("r6", "Bash", {"command": "cat f.txt"}, "not json " * 700),
+            ("r7", "Bash", {"command": "cat g.json"}, small),
+            ("r8", "Bash", {"command": "rtk proxy cat a.json"}, p),
+            ("r9", "mcp__ctx__ctx_execute", {"language": "shell", "code": "cat a.json"},
+             [{"type": "text", "text": echoed[:half]}, {"type": "text", "text": echoed[half:]}]),
+            ("r10", "mcp__ctx__ctx_execute", {"language": "shell", "code": "cat a.json"},
+             [{"type": "text", "text": self.ctx_echo("shell", "cat a.json") + p}, {"type": "image", "source": {"type": "base64", "data": "AAAA"}}]),
+            ("r11", "mcp__ctx__ctx_execute", {"language": "shell", "code": "cat a.json"}, self.ctx_echo("shell", "cat b.json") + p),
+            ("r12", "Read", {"file_path": "a.json"}, self.cat_n(json.dumps(self.P, indent=1))),
+            ("r13", "Read", {"file_path": "b.json"}, self.cat_n(json.dumps(self.P, indent=1)) + "\n(more lines not shown)"),
+            ("r14", "mcp__ctx__ctx_execute_file", {"path": "a.json", "language": "python", "code": "print(open(FILE).read())"},
+             [{"type": "text", "text": self.ctx_echo("python", "print(open(FILE).read())", "a.json") + p}]),
+            ("r15", "mcp__ctx__ctx_execute", {"language": "shell", "code": long_code}, [{"type": "text", "text": self.ctx_echo("shell", long_code) + p}]),
+            ("r16", "mcp__qmd__query", {}, [{"type": "text", "text": p}]),
+        ]
+        rows = []
+        for key, name, inputs, content in specs:
+            rows += [call(key, name, **inputs), result(key, content)]
+        got = self.measure(rows)
+        shape = lambda sizes: tuple(sizes.get(k) for k in ("large_json", "large_uniform_keys", "large_uniform_flat", "large_shape_unknown"))
+        self.assertEqual(got["m3"]["large_results"], 15)  # control: r7 alone is under the limit
+        self.assertEqual(shape(got["by_carrier"]["bash"]), (5, 3, 2, 0))
+        self.assertEqual(shape(got["by_carrier"]["rtk_proxy"]), (1, 1, 1, 0))
+        self.assertEqual(shape(got["by_carrier"]["ctx"]), (3, 3, 3, 2))
+        self.assertEqual(shape(got["by_carrier"]["read"]), (1, 1, 1, 1))
+        self.assertEqual(shape(got["by_carrier"]["other_mcp"]), (1, 1, 1, 0))
+        self.assertEqual(shape(got["m3"]), (11, 9, 8, 3))
+        self.assertEqual(shape(got["m5"]), (3, 3, 3, 2))
+        # the aggregate sums the counters of every sizes object
+        agg = self.exports("cu.aggregateMeasurements([cu.measureTranscript(x), cu.measureTranscript(x)])", rows)
+        self.assertEqual(shape(agg["m3"]), (22, 18, 16, 6))
+        self.assertEqual(shape(agg["by_carrier"]["ctx"]), (6, 6, 6, 4))
+
+    def test_section_one_per_actor_figures_survive_aggregation(self):
+        """The AA §1 figures that exist only per actor (scope extract, baseline derivation order): children with any MCP call, children with
+        an MCP call that is not a ctx_ tool, per-server loaded-never-called children (test above), and the per-child distribution of shell/web
+        results over 5 KB (bash, rtk_proxy and webfetch carriers; tokenStats nearest rank). actors_with_ctx_results is M5's population
+        ('All B children using ctx', README.md M5 row)."""
+        big = "x" * 6000
+        x = [call("b1", "Bash", command="cat a"), result("b1", big), call("b2", "Bash", command="cat b"), result("b2", big),
+             call("b3", "Bash", command="rtk proxy cat c"), result("b3", big), call("w", "WebFetch", url="https://example.org"), result("w", big),
+             call("q", "mcp__qmd__query"), result("q", "ok"), call("e", "mcp__ctx__ctx_execute", language="shell", code="ls"), result("e", "ok")]
+        y = [call("e", "mcp__ctx__ctx_execute", language="shell", code="ls"), result("e", "ok")]
+        z = [call("l", "Bash", command="ls"), result("l", "a")]
+        agg = self.exports("cu.aggregateMeasurements(x.map((r) => cu.measureTranscript(r)))", [x, y, z])
+        self.assertEqual(agg["m3_large_results_per_actor"], {"n": 3, "min": 0, "p10": 0, "median": 0, "p90": 4, "max": 4})  # control
+        self.assertEqual(agg.get("shell_web_large_results_per_actor"), {"n": 3, "min": 0, "p10": 0, "median": 0, "p90": 4, "max": 4})
+        self.assertEqual((agg.get("actors_with_mcp_call"), agg.get("actors_with_non_ctx_mcp_call"), agg.get("actors_with_ctx_results")), (2, 1, 2))
+
     def test_mcp_attempt_result_states_and_unclassified_proxy_are_explicit(self):
         rows = [call("ok", "mcp__qmd__search"), result("ok", "[]"),
                 call("error", "mcp__qmd__get"), result("error", "failed", True),
