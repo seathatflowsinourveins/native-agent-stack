@@ -41461,12 +41461,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "2f587774f7a864113279fcb51702004a9d17937d0cd42b1212af0353d8566ad7",
-      "bytes": 58347
+      "sha256": "83e4358324824f08d3c58c91eb534a1d449a377de3e569f4e8057b695ba458f1",
+      "bytes": 70551
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "ba76654eb565be620c989ff19c9537c701d117b8fdf9bde8aa6b1966241d585d",
+      "sha256": "befc800d177c123a80959696c5ee580429bd82e79304ad69be02be210a8ccab9",
       "bytes": 1129
     },
     {
@@ -41476,8 +41476,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "eb7df29b1ee0b9d5f722001cdb841ac9e102313806209938d650cf2fac745519",
-      "bytes": 90829
+      "sha256": "e3c58ed12e56b7313129cbd2374115a43c3eed09f746a45055b0d5d2e4f152ea",
+      "bytes": 140216
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -41501,8 +41501,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "a73b0fcd32184138b479251acee3bc3eb73198901c6b7aab8aa82825469a3152",
-      "bytes": 53671
+      "sha256": "971e5c60420b4dcefb60f08f4f61f7ab90b29fd60c7dcdc286928549001038a7",
+      "bytes": 66147
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -43036,8 +43036,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "fbc0e085ed8867b187c2b22d9a251732e492270b10cb3c94ac49e0f5400b88e6",
-      "bytes": 78579
+      "sha256": "81f6dc2c443c1e4d015ebbf8a228948974413b800358afde11500d4645243234",
+      "bytes": 91358
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -43086,8 +43086,8 @@
     },
     {
       "path": "tests/test_token_measurement.py",
-      "sha256": "314c86151c3fab9236b0c20fa9682491b9191d7ae5ec5bc1774e9bd21c8c9699",
-      "bytes": 45198
+      "sha256": "54f2435d8c6d6f58a254a1d789470aa32a67e33b68e6c8ae8b113040bcf42b72",
+      "bytes": 73984
     },
     {
       "path": "tests/test_trading_gates.py",
@@ -43276,13 +43276,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "c48c4cd8dd860a448927cef7ece87688cc9b9c2980e3da9f6858b82842429fbb",
-      "bytes": 22215
+      "sha256": "bec4d7f25c9b738d1b90ea5506355b0fb888cc61ab2098286d37d571439acb97",
+      "bytes": 24242
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "78db8b063d193fdd7077af44bc9f25f1c1ea1543f6725b9789d6032cf459c613",
-      "bytes": 82602
+      "sha256": "c80a25d2e6f8a3cf877a5747336a4c10310eef92c31db5ab4da8c13ec5def484",
+      "bytes": 86863
     },
     {
       "path": "tools/sota-convergence/README.md",
