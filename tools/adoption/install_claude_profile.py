@@ -6,7 +6,8 @@
              scripts/hooks/secret_path_guard.py (PreToolUse Bash secret guard;
              the same file the project .claude/settings.json runs), plus
              token-lanes-subagent-start.py and its sibling token-lanes-block.md
-             from adoption/hooks/claude/ (non-blind child context)
+             plus the five role blocks token-lanes-block.<role>.md from
+             adoption/hooks/claude/ (role-matched non-blind child context)
   agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/
   mcp     -- `claude mcp add --scope user` for each server named in
              adoption/mcp/claude-user.json after rendering its ${HOME} and
@@ -44,11 +45,16 @@ SECRET_GUARD_SRC = ROOT / "scripts" / "hooks" / "secret_path_guard.py"
 TOKEN_LANES_BLOCK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
 TOKEN_LANES_HOOK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-subagent-start.py"
 SHA256SUMS = ROOT / "adoption" / "hooks" / "claude" / "SHA256SUMS"
-# Installed name under ~/.claude/hooks/ -> checked-in source; includes the carrier's sibling block.
+# Installed name under ~/.claude/hooks/ -> checked-in source; includes the carrier's sibling blocks.
 HOOKS = {
     "effort-default-guard.py": GUARD_SRC,
     "secret_path_guard.py": SECRET_GUARD_SRC,
     "token-lanes-block.md": TOKEN_LANES_BLOCK_SRC,
+    "token-lanes-block.builder.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.builder.md"),
+    "token-lanes-block.researcher.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.researcher.md"),
+    "token-lanes-block.reviewer.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.reviewer.md"),
+    "token-lanes-block.scout.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.scout.md"),
+    "token-lanes-block.verifier.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.verifier.md"),
     "token-lanes-subagent-start.py": TOKEN_LANES_HOOK_SRC,
 }
 AGENTS_SRC_DIR = ROOT / "adoption" / "agents" / "claude"

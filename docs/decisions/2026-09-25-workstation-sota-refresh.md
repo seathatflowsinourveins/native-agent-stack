@@ -32,7 +32,7 @@ installed version and reviewed independently. A release being newer is not evide
 | markitdown | Qualified and switched | 0.1.8 | [`markitdown-018-qualification-20260925.json`](../../evidence/receipts/markitdown-018-qualification-20260925.json) (#291) |
 | mcporter | Qualified and switched | 0.14.1 | [`mcporter-0141-qualification-20260925.json`](../../evidence/receipts/mcporter-0141-qualification-20260925.json) |
 | ai-memory | Qualified and switched to 2.4.0 (cold-copy cutover, 2026-09-25), then to 2.4.1 after its own rehearsal and cutover (2026-09-26) | 2.4.1 | [`ai-memory-241-qualification-20260925.json`](../../evidence/receipts/ai-memory-241-qualification-20260925.json); 2.4.0: [`ai-memory-240-qualification-20260925.json`](../../evidence/receipts/ai-memory-240-qualification-20260925.json) |
-| socraticode | Qualified; cutover deferred to no earlier than 2026-10-01 | 1.14.0 | none published yet |
+| socraticode | Qualified; cutover deferred to no earlier than 2026-10-01, then cut over on 2026-09-27 after the user waived the cooldown (see the cutover update) | 1.15.0 (macOS 1.14.0) | [`socraticode-1150-qualification-20260927.json`](../../evidence/receipts/socraticode-1150-qualification-20260927.json) |
 | dagu | Compared on this host with no candidate-specific failure; held by the trading lane | 2.16.6 | none published yet |
 | headroom | Retained. 0.38.0 has a blocking regression; 0.39.0 fixes it and was qualified, but is not switched | 0.37.0 | [`headroom-039-qualification-20260925.json`](../../evidence/receipts/headroom-039-qualification-20260925.json) |
 | qmd, qdrant, ccusage, worktrunk, vllm | Retained; already the latest stable release | unchanged | research only |
@@ -315,6 +315,8 @@ Claude Code and two by the mcporter daemon. That daemon was a leftover
 Cutover procedure, for use no earlier than 2026-10-01T11:01Z:
 1. Point every launcher at the 1.15.0 prefix with the same environment and no `TMPDIR`
    override: the Claude Code MCP entry, `config/mcporter.json` and the Codex config.
+   (Corrected 2026-09-27: these three are not every launcher; the complete inventory is in
+   the cutover update below.)
 2. Close the 1.14.0 client sessions normally, and restart the mcporter daemon with
    `mcporter daemon stop`. A normal exit releases locks. Avoid `kill -9`: it leaves the lock
    directory in place, and that directory is only removed as stale when some later
@@ -330,6 +332,107 @@ Cutover procedure, for use no earlier than 2026-10-01T11:01Z:
 5. Start one 1.15.0 session. Check that the watch-lock PID runs from the 1.15.0 prefix and
    that `codebase_graph_status` reports "Built by: v1.15.0".
 6. Start further sessions one at a time, and not while a graph lock is held.
+
+**Update (2026-09-27, cutover).** The user waived the cooldown. Asked about the recorded 7-day
+cooldown (earliest cutover 2026-10-01T11:01Z), the user chose "Waive, cut over tonight", at
+about 21:20Z. The Linux x86_64 pin moves to 1.15.0: `manifests/stack.json` (source pin
+`f6191f07`), `adoption/pins-linux-x86_64.json`, the recipe, the Codex config template and the
+examples. As Scope requires, `adoption/pins-macos-arm64.json` keeps 1.14.0, and so does the
+landscape winner pin in `catalogs/landscape/foundation.json`. A host receipt recorded at
+1.15.0 therefore binds to no winner: `scripts/host_receipts.py record` needs
+`--allow-unbound-version` for it. Evidence:
+[`socraticode-1150-qualification-20260927.json`](../../evidence/receipts/socraticode-1150-qualification-20260927.json).
+
+The upstream suite passed at the tag on this host, in a clean clone at `f6191f07` on
+Node 24.21.0:
+- `npm run test:unit`: 2,475 of 2,475 tests passed.
+- `check:release-versions`, `biome check` and `tsc --noEmit` all exited 0.
+- ci.yml's Qdrant-backed regressions with `REQUIRE_QDRANT=1` passed 12 of 12, against a
+  disposable Qdrant 1.19.1.
+
+Deviations from upstream CI, and the jobs not run, are listed in the receipt.
+
+The pre-cutover native checks ran from the staged 1.15.0 prefix with the production launcher
+environment:
+- mcporter 0.14.1 `call --output text`: `codebase_health`, `codebase_search`,
+  `codebase_status` and `codebase_graph_status` all exited 0.
+- The search output was byte-identical to the 1.14.0 launcher's for the same query.
+- None of the four stdout captures held a `notifications/message` line. No capture shows that
+  check failing with such a line present, so the receipt records it as untested.
+- A headless Claude Code session (`--strict-mcp-config`) reported the server connected and
+  completed `codebase_status`.
+- `codex exec` 0.157.1 first refused the call ("MCP tool call requires approval, but approval
+  policy is never", the behaviour recorded in decisions 4 and 5 of the
+  [Codex worker lane record](2026-09-26-codex-worker-lane.md)). It completed with
+  `default_tools_approval_mode = "approve"`.
+
+For these single calls, the first overturn condition above (a native call erroring on the log
+stream) did not occur.
+
+The same run observed the graph flip-flop natively for the first time. The 1.15.0 server
+rebuilt the production graph ("Built by: v1.15.0" at 21:34:21Z), and a 1.14.0 server rebuilt it
+again at 21:35:09Z.
+
+The install keeps `--ignore-scripts --before=2026-09-24T12:00:00Z`. The package ships no
+shrinkwrap, and undici 6.29.0 and @lumis-sh/wasm-eex 0.26.2 were published inside its ranges
+after the tag. The bootstrap's `install_npm` passes no `--before`.
+
+The coordinator repointed the seven launcher configs and the `bin/socraticode` symlink
+together at 21:42:49Z, and restarted the mcporter daemon at 21:42:50Z. At the read-back:
+- `claude mcp get` and `codex mcp get` showed the 1.15.0 args.
+- mcporter `codebase_status` was green at 89,567 chunks.
+- `codebase_graph_status` still read "Built by: v1.14.0 — STALE": a 1.14.0 server had built the
+  stored graph at 21:35:09Z, before the cutover, and no 1.15.0 rebuild happened until
+  21:43:08Z. 12 already-running 1.14.0 servers remained in live sessions, and each can restart
+  the flip-flop until it reconnects.
+
+The time every session runs 1.15.0 is still open in the receipt. At 2026-09-28T02:03Z two
+1.14.0 processes remained, and at about 02:07Z the stored graph still read "Built by: v1.15.0".
+
+Step 1 named three launchers; the complete inventory on this host is:
+1. The Claude Code local-scope `socraticode` entry in `~/.claude.json` for this checkout.
+2. The Codex user config `~/.codex/config.toml` (keep its `startup_timeout_sec`).
+3. This checkout's untracked project `.codex/config.toml` (excluded through
+   `.git/info/exclude`).
+4. mcporter's `config/mcporter.json` under the ecosystem root, followed by
+   `mcporter daemon stop` so that the next call starts a daemon with the new path.
+5. The `bin/socraticode` symlink under the ecosystem root, repointed to
+   `tools/socraticode-1.15.0/bin/socraticode`.
+6. The b1-runtime-workers Codex home,
+   `~/.local/state/native-agent-stack/b1-runtime-workers-20260927/codex-home/config.toml`.
+7. The agent-lab configs `~/.local/state/native-agent-stack/agent-lab/.mcp.json` and
+   `.../agent-lab/.codex/config.toml`. The second names another account's home and cannot
+   run here; repoint it anyway so that no config names 1.14.0.
+8. Ephemeral scratch `CODEX_HOME`s under session scratchpads. The coordinator counted 16 at
+   the cutover, for example envprobe, gpt6-lane, landscape-sweep and parity attempts,
+   skillprobe and trial-stage. They are not repointed, and they are live launchers rather than
+   history: the PR #446 review found a peer session's scratch Codex review home created at
+   22:37:21Z, 54 min after the cutover, from main's pre-merge template and naming
+   `tools/socraticode-1.14.0`. Such homes keep launching 1.14.0, and can restart the flip-flop,
+   until this change merges and they are re-rendered.
+
+Two mixed-session hazards apply during the handover, both from the source review above and
+neither reproduced:
+- **Symbol-graph staging cleanup.** It is coordinated only inside one process. A server that
+  starts while another builds may delete that build's staging generation. So start sessions
+  one at a time, never while a `<projectId>-graph.lock` directory exists (step 6), and run
+  `codebase_graph_build` if a build is lost.
+- **`codebase_stop`.** It can SIGTERM another session's indexer, so don't use it to force the
+  handover (step 2).
+
+**Rollback.** 1.14.0 stays installed in `tools/socraticode-1.14.0`. Restore the pre-cutover
+launcher configs, or repoint each launcher's `args` and the `bin/socraticode` symlink back to
+that prefix. Then close the 1.15.0 sessions normally, run `mcporter daemon stop` and run
+`codebase_graph_build` once; the version change rebuilds the graph as 1.14.0. No vector
+reindex is needed, because the index format and profile are unchanged.
+
+**Overturn when.**
+- A Claude Code, Codex or mcporter session errors on the log stream, or is flooded by it.
+  First try `SOCRATICODE_LOG_LEVEL=warn` and record the deviation; otherwise roll back.
+- `codebase_status` reports pending settings after the cutover.
+- The upstream suite at v1.15.0 fails on this host.
+- Search, symbol or impact output diverges from 1.14.0 on the same query.
+- Upstream reports a 1.15.0 regression.
 
 ## Held by the trading lane
 
@@ -448,6 +551,7 @@ the five, and added three follow-ups that are not pin changes:
 `bin/vllm` on this host still points at the 0.25.0 prefix (rollback there reopens
 advisories patched in 0.30.0); ccusage has a `v20.0.25` tag whose release run failed, so it
 is unpublished; and `manifests/landscape.json` still lists stale latest-release identities.
+Update 2026-09-27: closed on this host. `bin/vllm` now points at the 0.30.0 prefix (repointed 2026-09-27T19:21:18Z); the 0.25.0 prefix is retained and no systemd unit uses the symlink. Source: the coordinator's host observation of 2026-09-27.
 
 **Alternatives.** None: no newer stable release exists.
 

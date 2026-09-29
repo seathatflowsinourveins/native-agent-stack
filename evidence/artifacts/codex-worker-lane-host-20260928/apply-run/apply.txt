@@ -1,0 +1,30 @@
+Codex worker lane for CODEX_HOME=~/.codex
+preconditions:
+  [ok] codex version: codex-cli 0.157.1 (pin 0.157.1)
+  [ok] context-mode start.mjs: ~/.local/share/codex-ecosystem/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs: sha256 0324441841b2 (expected 0324441841b2)
+  [ok] node: ~/.local/share/codex-ecosystem/bin/node
+  [ok] HOST_PATH: ~/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib
+  [ok] config.toml: ~/.codex/config.toml present
+  [ok] features.daemon_auto_start: false
+  [ok] AGENTS.override.md: none with text
+  [ok] AGENTS.md block: markers intact or absent
+  [ok] stack-worker profile: already the template
+  [ok] codex processes: none
+config.toml, through codex app-server config/batchWrite (expectedVersion from config/read):
+  keep mcp_servers.context-mode: {args, command, default_tools_approval_mode, env, startup_timeout_sec}
+  keep plugins."context-mode@context-mode".mcp_servers.context-mode.enabled: false
+  keep mcp_servers.headroom.env.HEADROOM_OFFLINE: "1"
+  keep mcp_servers.headroom.env.HF_HUB_OFFLINE: "1"
+  keep mcp_servers.headroom.env.TRANSFORMERS_OFFLINE: "1"
+  keep mcp_servers.headroom.env.DO_NOT_TRACK: "1"
+  keep mcp_servers.serena.startup_timeout_sec: 60
+  keep mcp_servers.socraticode.startup_timeout_sec: 120
+AGENTS.md: writes the managed block (sha256 <private-file-sha256> -> <private-file-sha256>)
+stack-worker.config.toml: same
+run record: ~/.local/state/native-agent-stack/codex-lane/<private-run>/record.json
+to undo: python3 tools/adoption/apply_codex_lane.py --rollback ~/.local/state/native-agent-stack/codex-lane/<private-run>
+config.toml: written and read back
+AGENTS.md: written and read back
+stack-worker.config.toml: in place
+applied. Prove it: python3 tools/adoption/prove_codex_lane.py (add --live for the worker runs)
+workers start with: codex exec -p stack-worker -m gpt-6-astra -c 'model_reasoning_effort="max"' -c 'web_search="live"' -s <sandbox> ... < /dev/null

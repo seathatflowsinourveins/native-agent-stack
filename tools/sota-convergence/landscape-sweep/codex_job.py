@@ -22,7 +22,13 @@ profile layered over it), so the command becomes `codex exec -p stack-worker --s
 -m cx/gpt-6-astra ...`. The provider key comes from the variable codex.api_key_env (OMNIROUTE_API_KEY) in the
 operator's environment. For a keyless loopback gateway, codex.api_key_placeholder ("local-loopback") fills an
 unset variable, because Codex's env_key only needs it to exist. Without either, a job ends with exit 6 before codex
-starts. The quota gate reads the native login only, so it is refused for a gateway lane.
+starts. The quota gate reads the native login only, so it is refused for a gateway lane. A lane staged on a chained
+OmniRoute instance, such as the framework instance at http://127.0.0.1:20129/v1, names its model with a node alias in
+front (`-m sharedgw/gpt-6-astra-max`), and its static provider headers (codex.http_headers, OmniRoute's per-request
+switches only, for example x-omniroute-compression = allow-lossy; build_args.py --omniroute-header) sit in the lane
+home's [model_providers.omniroute] http_headers. The runner refuses to start when that table differs from
+codex.http_headers, and records the headers in each job's inputs.json. The comparison needs tomllib (Python 3.11+):
+older interpreters refuse a lane with staged headers and skip it for a header-less lane.
 
 --ignore-user-config keeps the host's Codex config out of the lane, the sandbox is read-only, stdin is /dev/null
 (background `codex exec` otherwise waits on stdin), and the effort is max. Never ultra: ultra lets Codex delegate to
@@ -92,8 +98,17 @@ STDERR_ERROR_LINE = re.compile(r"^(?:\S+\s+)?(?:ERROR|Error)\b")
 # The prompt is one argv string, as in the 2026-09-26 runner; Linux caps one argument at 131072 bytes.
 MAX_PROMPT_BYTES = 120_000
 JOB_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
-# An optional provider prefix is allowed for gateway routes, e.g. OmniRoute's "cx/gpt-6-astra".
-MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9._-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+# Kept equal to build_args.MODEL_NAME: at most one provider segment, e.g. "cx/gpt-6-astra" or the framework
+# instance's "sharedgw/gpt-6-astra-max". Codex strips one namespace for metadata lookup, and only one of letters,
+# digits, '_' and '-'; another slug gets fallback metadata (openai/codex rust-v0.157.1,
+# codex-rs/models-manager/src/manager.rs L763-780).
+MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9_-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+# Kept equal to build_args.py, which cites their sources: a gateway lane's static provider headers (staged.json
+# codex.http_headers, rendered as model_providers.<provider>.http_headers in the lane home) are OmniRoute's per-request
+# switches only, since other x-omniroute-* headers carry secrets, with printable ASCII values.
+OMNIROUTE_REQUEST_HEADERS = ("x-omniroute-compression", "x-omniroute-no-cache", "x-omniroute-no-memory",
+                             "x-omniroute-strip-reasoning")
+HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
 PROVIDERS = ("native", "omniroute")
 ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]{0,63}")
 PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
@@ -161,6 +176,11 @@ def settings(base: Path) -> dict:
     lock_dir = Path(staged.get("lock_dir") or "locks").expanduser()
     out["lock_dir"] = lock_dir if lock_dir.is_absolute() else base / lock_dir
     out["model"] = str(staged.get("model") or DEFAULT_MODEL)
+    namespace, slash, rest = out["model"].partition("/")
+    if slash and ("/" in rest or not re.fullmatch(r"[A-Za-z0-9_-]+", namespace)):
+        raise UsageError("codex.model may have one provider segment, of letters, digits, '_' and '-' only: Codex "
+                         "strips only such a namespace, and any other slug gets fallback metadata "
+                         "(openai/codex rust-v0.157.1, codex-rs/models-manager/src/manager.rs L763-780)")
     if not MODEL_NAME.fullmatch(out["model"]):
         raise UsageError(f"codex.model {out['model']!r} is not a model name")
     stop = staged.get("quota_stop_percent")
@@ -180,13 +200,28 @@ def lane_settings(base: Path, staged: dict) -> dict:
     """The GPT-6 lane's provider. native (the default) runs Codex with --ignore-user-config against the caller's
     login. A gateway provider (omniroute) runs Codex with CODEX_HOME set to the staged lane-local home
     <work-dir>/<codex_home>: its config.toml (the provider block and the token MCP servers) and its profile file are
-    the lane's whole configuration, and the provider's API key comes from the named environment variable."""
+    the lane's whole configuration, and the provider's API key comes from the named environment variable. Its static
+    provider headers (codex.http_headers) must be the ones that config.toml carries."""
     provider = str(staged.get("provider") or "native")
     if provider not in PROVIDERS:
         raise UsageError(f"codex.provider {provider!r} must be one of {', '.join(PROVIDERS)}")
+    headers = staged.get("http_headers")
+    if headers is not None and not isinstance(headers, dict):
+        raise UsageError("codex.http_headers must be a table of header names and values; restage with build_args.py")
+    for name, value in (headers or {}).items():
+        if name not in OMNIROUTE_REQUEST_HEADERS:  # never echoed: a refused name may be anything
+            raise UsageError(f"codex.http_headers may hold only OmniRoute's per-request switches "
+                             f"({', '.join(OMNIROUTE_REQUEST_HEADERS)}): other headers can carry a secret; restage "
+                             "with build_args.py")
+        if not (isinstance(value, str) and HEADER_VALUE.fullmatch(value)):
+            raise UsageError(f"codex.http_headers {name}: the value must be 1-128 printable ASCII characters without "
+                             "'\"' or '\\' and without a space at either end; restage with build_args.py")
+    headers = dict(sorted((headers or {}).items()))
     lane = {"provider": provider, "codex_home": None, "profile": None, "api_key_env": None,
-            "api_key_placeholder": None}
+            "api_key_placeholder": None, "http_headers": headers}
     if provider == "native":
+        if headers:
+            raise UsageError("codex.http_headers needs a gateway provider: the native lane has no provider block")
         return lane
     home = staged.get("codex_home")
     if not isinstance(home, str) or not home or Path(home).is_absolute() or ".." in Path(home).parts:
@@ -204,8 +239,33 @@ def lane_settings(base: Path, staged: dict) -> dict:
     placeholder = staged.get("api_key_placeholder")
     if placeholder is not None and not (isinstance(placeholder, str) and PROFILE_NAME.fullmatch(placeholder)):
         raise UsageError("codex.api_key_placeholder must be a short plain token (a keyless loopback gateway's value)")
+    carried = lane_home_headers(base / home / "config.toml", provider)
+    if carried is None and headers:
+        raise UsageError("comparing codex.http_headers with the lane home config.toml needs Python 3.11+ (tomllib); "
+                         "run the harness with a newer python3, or restage without --omniroute-header")
+    if carried is not None and carried != headers:
+        raise UsageError(f"the lane home config.toml does not carry the staged provider headers (codex.http_headers "
+                         f"{sorted(headers)}, model_providers.{provider}.http_headers "
+                         f"{sorted(carried) if isinstance(carried, dict) else carried!r}); restage with build_args.py")
     lane.update(codex_home=base / home, profile=profile, api_key_env=key, api_key_placeholder=placeholder)
     return lane
+
+
+def lane_home_headers(config: Path, provider: str):
+    """model_providers.<provider>.http_headers in the lane home's config.toml, {} when absent. None without tomllib
+    (Python 3.9 and 3.10): lane_settings then refuses staged headers and skips the check for a header-less lane."""
+    try:
+        import tomllib
+    except ImportError:
+        return None
+    try:
+        parsed = tomllib.loads(config.read_text(encoding="utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+        raise UsageError(f"the lane home config.toml is not valid TOML ({error}); restage with build_args.py") from None
+    providers = parsed.get("model_providers")
+    table = providers.get(provider) if isinstance(providers, dict) else None
+    headers = table.get("http_headers") if isinstance(table, dict) else None
+    return {} if headers is None else headers
 
 
 def job_dir(base: Path, job: str) -> Path:
@@ -328,11 +388,14 @@ def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def job_inputs(prompt: bytes, schema: bytes, model: str, provider: str = "native") -> dict:
+def job_inputs(prompt: bytes, schema: bytes, model: str, provider: str = "native",
+               http_headers: dict | None = None) -> dict:
     inputs = {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
               "effort": EFFORT}
     if provider != "native":  # a gateway run never reuses a native job's result, or the other way round
         inputs["provider"] = provider
+    if http_headers:  # other provider headers (another compression plan, say) make another run
+        inputs["http_headers"] = dict(sorted(http_headers.items()))
     return inputs
 
 
@@ -389,7 +452,7 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
     prompt_bytes = Path(prompt_file).read_bytes()
     schema_bytes = Path(schema_file).read_bytes()
     config = settings(base)  # also refuses a broken staged.json
-    inputs = job_inputs(prompt_bytes, schema_bytes, config["model"], config["provider"])
+    inputs = job_inputs(prompt_bytes, schema_bytes, config["model"], config["provider"], config["http_headers"])
     changed = False
     if (directory / "done").exists() and exit_code(directory) == 0:
         if read_json(directory / "inputs.json") == inputs:

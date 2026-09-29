@@ -1,0 +1,14 @@
+{
+ "note": "sha256 of each file as the judges received it. The published copies replace the host path of the judges' directory and repository root with <judges> and <root>; the packets and prompts were built with the answer heads of runs that read client settings files already withheld (make_x9_round3.py).",
+ "files": {
+  "adjudication-inputs/x9.AB.json": "08ed85d9bdc211b54f954f5a74acc02e74213d4f27efb66475650d7f01539c83",
+  "adjudication-inputs/x9.BA.json": "30359dfdbd1bf02e829eb7a38b9d9be5d5e6d3a2e3b652400ecd0844282eef7c",
+  "packets/x9.AB.json": "8b50c667f618b98a9a3ea72641428831a6dc7b06f68c794952cf40fd2a167dad",
+  "packets/x9.BA.json": "9412e1143b8c06d30c02236ee626449e0cfd53478709ba004351a9b8c69a7947",
+  "prompts/claude-task-AB.txt": "4ab7247bece9663ba4efaba879a520698fd4332fcd9bddbe759723d68691e9c4",
+  "prompts/claude-task-BA.txt": "3c83b222d6bc98fd0feacffedd0492b1f0f3dcbbc5260806091f13d6072e14fe",
+  "prompts/judge-AB.txt": "d5b789b7816a42ad90f97cc34bdfacae133e1526793cd940607d01ddf46ef5f9",
+  "prompts/judge-BA.txt": "55e8547669f0bf81c3a2992acaac2b2e63c314a2215dd80486cbbe03429eaa0b",
+  "schemas/judge.json": "e14c990be245743bb700a882bcb7280781318ea8f6638071d616ca1090c216ad"
+ }
+}

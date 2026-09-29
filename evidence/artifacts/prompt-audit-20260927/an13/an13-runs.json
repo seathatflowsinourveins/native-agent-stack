@@ -1,0 +1,150 @@
+{
+ "note": "Facts of the two AN-13 runs, from each run's stream-json init and result events, its stderr and the wrapper's time and exit files. 'usage' and 'model_usage' are the result event's two usage blocks as the client reports them; they overlap and are never added. total_cost_usd is the client's own figure at list prices (costBasis), not a bill.",
+ "first_run": {
+  "started": "2026-09-28T09:38:42Z",
+  "finished": "2026-09-28T10:05:59Z",
+  "exit": 0,
+  "stderr": "Background tasks still running after 600s; terminating. Set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 to wait indefinitely.",
+  "client": "2.1.283",
+  "model": "claude-opus-5-5",
+  "permission_mode": "plan",
+  "result": {
+   "subtype": "success",
+   "is_error": false,
+   "stop_reason": "end_turn",
+   "terminal_reason": "completed",
+   "duration_ms": 1033804,
+   "duration_api_ms": 4343332,
+   "num_turns": 37,
+   "total_cost_usd": 22.736209399999996
+  },
+  "result_chars": 1537,
+  "usage": {
+   "input_tokens": 58,
+   "cache_creation_input_tokens": 271563,
+   "cache_read_input_tokens": 5317314,
+   "output_tokens": 96926,
+   "thinking_tokens": 77799
+  },
+  "model_usage": {
+   "claude-opus-5-5": {
+    "inputTokens": 596615,
+    "cacheCreationInputTokens": 1606175,
+    "cacheReadInputTokens": 12891067,
+    "outputTokens": 446598,
+    "thinkingTokens": 358246,
+    "costUSD": 22.736209399999996,
+    "costBasis": "list"
+   }
+  },
+  "subagent_stats": {
+   "spawned": 4,
+   "requested": {
+    "background": 4,
+    "foreground": 0,
+    "unset": 0
+   },
+   "started_in_background": 4,
+   "max_depth": 1,
+   "spawned_by_subagents": 0,
+   "completed": 0,
+   "failed": 0,
+   "killed": {
+    "parent": 0,
+    "user": 0,
+    "system": 4
+   },
+   "refused": {
+    "depth_limit": 0,
+    "concurrency_limit": 0,
+    "budget": 0
+   },
+   "by_type": {
+    "Explore": 4
+   }
+  },
+  "permission_denials": [],
+  "events": {
+   "task_started": 5,
+   "task_updated": 4,
+   "task_notification": 5,
+   "background_tasks_changed": 8,
+   "permission_denied": 0
+  }
+ },
+ "rerun": {
+  "started": "2026-09-28T10:39:16Z",
+  "finished": "2026-09-28T11:06:30Z",
+  "exit": 0,
+  "stderr": "",
+  "client": "2.1.283",
+  "model": "claude-opus-5-5",
+  "permission_mode": "plan",
+  "result": {
+   "subtype": "success",
+   "is_error": false,
+   "stop_reason": "end_turn",
+   "terminal_reason": "completed",
+   "duration_ms": 1631386,
+   "duration_api_ms": 2059427,
+   "num_turns": 60,
+   "total_cost_usd": 13.972599799999998
+  },
+  "result_chars": 20827,
+  "usage": {
+   "input_tokens": 84,
+   "cache_creation_input_tokens": 336745,
+   "cache_read_input_tokens": 9775774,
+   "output_tokens": 153481,
+   "thinking_tokens": 116453
+  },
+  "model_usage": {
+   "claude-opus-5-5": {
+    "inputTokens": 897464,
+    "cacheCreationInputTokens": 578836,
+    "cacheReadInputTokens": 10859374,
+    "outputTokens": 215782,
+    "thinkingTokens": 144695,
+    "costUSD": 13.972599799999998,
+    "costBasis": "list"
+   }
+  },
+  "subagent_stats": {
+   "spawned": 1,
+   "requested": {
+    "background": 1,
+    "foreground": 0,
+    "unset": 0
+   },
+   "started_in_background": 1,
+   "max_depth": 1,
+   "spawned_by_subagents": 0,
+   "completed": 1,
+   "failed": 0,
+   "killed": {
+    "parent": 0,
+    "user": 0,
+    "system": 0
+   },
+   "refused": {
+    "depth_limit": 0,
+    "concurrency_limit": 0,
+    "budget": 0
+   },
+   "by_type": {
+    "Explore": 1
+   }
+  },
+  "permission_denials": [
+   "mcp__plugin_context-mode_context-mode__ctx_execute",
+   "Bash"
+  ],
+  "events": {
+   "task_started": 1,
+   "task_updated": 1,
+   "task_notification": 1,
+   "background_tasks_changed": 2,
+   "permission_denied": 2
+  }
+ }
+}

@@ -1,0 +1,144 @@
+{
+ "note": "Run by the coordinator on 2026-09-28 in one worktree of main 8315274f (<worktree>), in the order listed; test runs set TMPDIR to a private directory. Output lines are the ones each check printed that match its summary pattern, with host paths replaced.",
+ "controls": [
+  {
+   "stage": "X5c: proposed line 3, test at the base (no re-pin)",
+   "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+   "exit": 1,
+   "output_lines": [
+    "FAIL: test_top_rule_and_upstream_text_are_verbatim (tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim)",
+    "AssertionError: '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f' != '476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311'",
+    "Ran 1 test in 0.001s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "stage": "X5c: proposed line 3 with the re-pinned test",
+   "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+   "exit": 0,
+   "output_lines": [
+    "Ran 1 test in 0.000s",
+    "OK"
+   ]
+  },
+  {
+   "stage": "X5c: the four X5c test modules on the trial",
+   "command": "python3 -m unittest tests.test_codex_worker_lane tests.test_codex_agents tests.test_codex_lane tests.test_landscape_sweep_harness",
+   "exit": 0,
+   "output_lines": [
+    "Ran 258 tests in 48.494s",
+    "OK (skipped=11)"
+   ]
+  },
+  {
+   "stage": "registration: X5c files edited, manifest not re-registered",
+   "command": "python3 scripts/validate.py",
+   "exit": 1,
+   "output_lines": [
+    "Publication validation failed:",
+    "adoption/templates/codex.AGENTS.template.md: SHA-256 mismatch",
+    "adoption/templates/codex.AGENTS.template.md: byte count mismatch",
+    "tests/test_codex_worker_lane.py: SHA-256 mismatch"
+   ]
+  },
+  {
+   "stage": "X5a: round-1 proposed text (capital 'Never')",
+   "command": "python3 -B -m unittest tests.test_install_claude_profile.PortableTopRuleTests",
+   "exit": 1,
+   "output_lines": [
+    "FAIL: test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template (tests.test_install_claude_profile.PortableTopRuleTests.test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template)",
+    "AssertionError: 2 != 1",
+    "FAIL: test_the_template_states_the_procedure_within_the_word_budget (tests.test_install_claude_profile.PortableTopRuleTests.test_the_template_states_the_procedure_within_the_word_budget)",
+    "AssertionError: Lists differ: [\"the top rule lacks 'never self-write without a SOTA source'\"] != []",
+    "Ran 2 tests in 0.001s",
+    "FAILED (failures=2)"
+   ]
+  },
+  {
+   "stage": "X5a: proposed text",
+   "command": "python3 -B -m unittest tests.test_install_claude_profile.PortableTopRuleTests",
+   "exit": 0,
+   "output_lines": [
+    "Ran 2 tests in 0.001s",
+    "OK"
+   ]
+  },
+  {
+   "stage": "registration: X5c files registered, X5a template edited, not re-registered",
+   "command": "python3 scripts/validate.py",
+   "exit": 1,
+   "output_lines": [
+    "Publication validation failed:",
+    "examples/claude-native/CLAUDE.md: SHA-256 mismatch",
+    "examples/claude-native/CLAUDE.md: byte count mismatch"
+   ]
+  },
+  {
+   "stage": "registration: all three changed files registered",
+   "command": "python3 scripts/validate.py",
+   "exit": 0,
+   "output_lines": [
+    "{\"components\": 69, \"hashed_files\": 7478, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}",
+    "Integrity and scope checks only; no live provider or GPU execution."
+   ]
+  },
+  {
+   "stage": "the complete proposal: every test module that reads either template or the pin",
+   "command": "python3 -B -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_codex_agents tests.test_codex_lane tests.test_landscape_sweep_harness tests.test_adoption_docs_consistency",
+   "exit": 0,
+   "output_lines": [
+    "Ran 353 tests in 55.314s",
+    "OK (skipped=15)"
+   ]
+  },
+  {
+   "stage": "X5c amendment: its line 3, test at the proposal's pin (no re-pin)",
+   "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+   "exit": 1,
+   "output_lines": [
+    "FAIL: test_top_rule_and_upstream_text_are_verbatim (tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim)",
+    "AssertionError: 'ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d' != '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f'",
+    "Ran 1 test in 0.001s",
+    "FAILED (failures=1)"
+   ]
+  },
+  {
+   "stage": "X5c amendment: its line 3 with the re-pinned test",
+   "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+   "exit": 0,
+   "output_lines": [
+    "Ran 1 test in 0.000s",
+    "OK"
+   ]
+  },
+  {
+   "stage": "registration: amendment's template and test edited, not re-registered",
+   "command": "python3 scripts/validate.py",
+   "exit": 1,
+   "output_lines": [
+    "Publication validation failed:",
+    "adoption/templates/codex.AGENTS.template.md: SHA-256 mismatch",
+    "adoption/templates/codex.AGENTS.template.md: byte count mismatch",
+    "tests/test_codex_worker_lane.py: SHA-256 mismatch"
+   ]
+  },
+  {
+   "stage": "registration: amendment's template and test registered",
+   "command": "python3 scripts/validate.py",
+   "exit": 0,
+   "output_lines": [
+    "{\"components\": 69, \"hashed_files\": 7478, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}",
+    "Integrity and scope checks only; no live provider or GPU execution."
+   ]
+  },
+  {
+   "stage": "the complete amendment: every test module that reads either template or the pin",
+   "command": "python3 -B -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_codex_agents tests.test_codex_lane tests.test_landscape_sweep_harness tests.test_adoption_docs_consistency",
+   "exit": 0,
+   "output_lines": [
+    "Ran 353 tests in 55.195s",
+    "OK (skipped=15)"
+   ]
+  }
+ ]
+}

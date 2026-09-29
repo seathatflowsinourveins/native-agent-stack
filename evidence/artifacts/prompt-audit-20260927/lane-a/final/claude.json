@@ -1,0 +1,137 @@
+{
+ "usage": {
+  "note": "Per-call provider usage of these Claude subagents, read from their transcripts and deduplicated by API message id. Anthropic usage fields are disjoint (input_tokens excludes cache reads and cache writes), so they are listed side by side, never added. advisor_calls counts server-side advisor calls, whose own model usage is not in these fields. harness_counters are the completion notification's own counters. The coordinator session is not included.",
+  "final-claude": {
+   "agent_type": "blind-lane-reviewer",
+   "models": [
+    "claude-opus-5-5"
+   ],
+   "api_calls": 52,
+   "advisor_calls": 1,
+   "provider_usage": {
+    "input_tokens": 106,
+    "cache_creation_input_tokens": 177773,
+    "cache_read_input_tokens": 6393681,
+    "output_tokens": 72777
+   }
+  }
+ },
+ "return": {
+  "items": [
+   {
+    "id": "X5a",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The text carries the operator's wording correctly: the bold heading and the compounds sentence match packet.md:39 byte for byte. The tested obligations hold. PROCEDURE_PHRASES is a case-sensitive substring check (test_install_claude_profile.py:967), and line 3 keeps 'never self-write without a SOTA source' in lowercase, together with 'source of truth' and 'installed client'. top_rule() still finds '**Top rule:' (:956), and line 3 contains no slash path that the RELATIVE_PATH check (:951) would flag. I recounted the word budget by hand without running anything. The base template is 1205 words, which equals BASELINE_WORDS (:931). Line 3 grows from 21 to 51 words, so the file becomes 1235 words against a ceiling of int(1205*1.05) = 1265 (:962). Line 3 grows from 132 to 332 bytes (+200), which matches the manifest change from 8480 to 8680 (proposal.diff:45,47). The existing meaning is kept. The installed client is still a source of truth, as in the long form at docs/harness-defaults.md:58. Steps 1-5 are unchanged, and 'research convergence' is already the template's own Core rule term (CLAUDE.md:13). The co-changes are complete. The only other readers of this file check lines 42-43, which do not change (workflows/test-envelope.mjs:457,478; test-contract-mutations.mjs:93). build_ecosystem.py embeds the text only at build time, and index.html is not committed (:866-867). The old sha bd9cd167 appears only in the manifest entry. The coordinator's results (PortableTopRuleTests OK, validate.py passed after registration) agree with these recounts. One non-blocking drift: docs/harness-defaults.md:7 still calls AGENTS.md's older heading 'that top rule'. AGENTS.md:3 is outside this packet's two templates, so nothing breaks. Hosts that merged the earlier example re-merge it as a whole, as recipes/claude-native-profile.md:84-89 already says.",
+    "sources": [
+     {
+      "locator": "<root>/proposed/examples/claude-native/CLAUDE.md:3",
+      "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
+     },
+     {
+      "locator": "<k2>/packets/packet.md:39",
+      "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.**"
+     },
+     {
+      "locator": "<root>/base/tests/test_install_claude_profile.py:967",
+      "quote": "errors = [f\"the top rule lacks {phrase!r}\" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]"
+     },
+     {
+      "locator": "<root>/base/tests/test_install_claude_profile.py:931",
+      "quote": "BASELINE_WORDS = 1205  # wc -w after the 2026-09-27 Workers section (881 at dde28cc2, before the procedure)"
+     },
+     {
+      "locator": "<root>/base/tests/test_install_claude_profile.py:962",
+      "quote": "return int(cls.BASELINE_WORDS * 1.05)"
+     },
+     {
+      "locator": "<root>/proposal.diff:47",
+      "quote": "+      \"bytes\": 8680"
+     },
+     {
+      "locator": "<root>/base/docs/harness-defaults.md:58",
+      "quote": "Upstream repositories, their changelogs and release notes, and the installed client are the source of truth."
+     },
+     {
+      "locator": "<root>/base/examples/claude-native/CLAUDE.md:13",
+      "quote": "Decide by evidence and research convergence:"
+     },
+     {
+      "locator": "<root>/base/scripts/build_ecosystem.py:866-867",
+      "quote": "docs/ecosystem/index.html is no longer committed,"
+     },
+     {
+      "locator": "<root>/base/docs/harness-defaults.md:7",
+      "quote": "The defaults below apply this rule under the top rule in [`AGENTS.md`](../AGENTS.md): research first, and never self-write without a SOTA source."
+     }
+    ],
+    "confidence": 0.85
+   },
+   {
+    "id": "X5c",
+    "verdict": "amend",
+    "resolution_text": "Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.",
+    "reasons": "The mechanics of the proposal are right. Line 3 grows from 18 to 42 words, so the block grows from 120 to 144 words (test :210). Line 3 grows from 108 to 280 bytes (+172), which matches the manifest change from 3151 to 3323. The new pin equals the actual hash printed by the failing control (packet.md:362). No fixture or other maintained file copies the line; outside the two templates, the only copy is in a dated evidence artifact. with_block() replaces everything between the block markers (apply_codex_lane.py:291-292), so the host step of re-running the installer is correct. The text itself fails the packet's 'keeps its existing meaning' test. It drops the base clause that makes the installed client a source of truth (base :3). The proposer kept that same clause in X5a because of docs/harness-defaults.md:58 (packet.md:61). That long form covers Codex too: harness-defaults.md:62 lists `codex --version` and `codex debug prompt-input` under Installed client. The check order in line 5 softens the loss but does not restate that status. Next to a heading that makes current upstream SOTA the source of truth, a Codex worker could trust upstream over what its installed version actually does. The two templates of the same rule would also disagree. The counterargument is that the operator's paragraph does not mention the installed client. The packet, however, asks for both: carry the operator's wording and keep the file's meaning. A separate sentence restores the clause without altering the operator's text. The amendment mirrors X5a without the bold. It keeps the operator's heading sentence with its own period, in line with harness-rules-cleanup.md:15 ('Decided wording stays verbatim wherever it appears'). It keeps the compounds sentence verbatim and keeps 'never self-write without a SOTA source'. It also makes line 3 identical in both templates apart from markup. Co-changes, recomputed by the same procedure: line 3 becomes 51 words and 328 bytes, so the block becomes 153 words (set test :210 and the :45 comment to 153). The template becomes 3371 bytes, still under the 8192-byte assertion at :205. TOP_RULE_SHA256 must be recomputed with template_segments(). I cannot hash here, so the value stays unknown until the coordinator runs the same failing-then-passing control. Re-register the template and the test file (docs/lanes.md:96-128). The 'Top rule:' replacement at :404 still matches exactly once. The host step is unchanged: a dry run of apply_codex_lane.py, then --apply. Two non-blocking notes: the 'staged' wording in the :45 comment and the '120 words' in docs/decisions/2026-09-26-codex-worker-lane.md:59 are a comment and a dated record.",
+    "sources": [
+     {
+      "locator": "<root>/base/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth."
+     },
+     {
+      "locator": "<root>/proposed/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "<root>/base/docs/harness-defaults.md:58",
+      "quote": "Upstream repositories, their changelogs and release notes, and the installed client are the source of truth."
+     },
+     {
+      "locator": "<root>/base/docs/harness-defaults.md:62",
+      "quote": "1. **Installed client.** Its version, commands, `--help` and the settings it reads: `claude --version`, `codex --version`, `/help` and `/config` in a session."
+     },
+     {
+      "locator": "<root>/base/adoption/templates/codex.AGENTS.template.md:5",
+      "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "<k2>/packets/packet.md:61",
+      "quote": "It also keeps the installed client as a source of"
+     },
+     {
+      "locator": "<root>/proposed/examples/claude-native/CLAUDE.md:3",
+      "quote": "The installed client is also a source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "<root>/base/docs/decisions/2026-09-26-harness-rules-cleanup.md:15",
+      "quote": "- Decided wording stays verbatim wherever it appears: the top rule"
+     },
+     {
+      "locator": "<root>/base/tests/test_codex_worker_lane.py:210",
+      "quote": "self.assertEqual(len(top.split()), 120)"
+     },
+     {
+      "locator": "<root>/base/tests/test_codex_worker_lane.py:205",
+      "quote": "self.assertLess(len(text.encode(\"utf-8\")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes"
+     },
+     {
+      "locator": "<root>/base/tests/test_codex_worker_lane.py:404",
+      "quote": "old = block.replace(\"Top rule:\", \"Old rule:\")"
+     },
+     {
+      "locator": "<root>/base/tools/adoption/apply_codex_lane.py:291-292",
+      "quote": "return text[:span[0]] + block + text[span[1]:]"
+     },
+     {
+      "locator": "<k2>/packets/packet.md:362",
+      "quote": "AssertionError: '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f' != '476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311'"
+     },
+     {
+      "locator": "<root>/base/docs/decisions/2026-09-26-codex-worker-lane.md:59",
+      "quote": "- the top rule (120 words, marker `native-agent-stack:top-rule`);"
+     }
+    ],
+    "confidence": 0.6
+   }
+  ]
+ }
+}

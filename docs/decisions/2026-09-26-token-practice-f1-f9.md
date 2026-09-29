@@ -154,3 +154,19 @@ returned [v20.0.24](https://github.com/ccusage/ccusage/releases/tag/v20.0.24), p
 [The release identity](../../manifests/landscape.json) includes the
 [tag-resolved commit](https://api.github.com/repos/ccusage/ccusage/commits/v20.0.24),
 `ecb676cce27cb5dd0090c7804a5cecc35e8ba805`; a tag alone is not publication.
+
+**Update (2026-09-27): the trigger fired and 20.0.26 qualified.**
+[v20.0.26](https://github.com/ccusage/ccusage/releases/tag/v20.0.26) was published
+2026-09-27T16:26:00Z at `d9821088b98aa536c7a385aa1a4579d6fa02269b`; v20.0.25 exists only as
+a tag and was never published to npm. The
+[qualification receipt](../../evidence/receipts/ccusage-20026-qualification-20260927.json)
+records the tarball digests, the unchanged upstream Rust suite (944 passed, 0 failed,
+3 ignored) and the Node tests (34 of 34, identical files at both tags), the unchanged
+native_token_ci fixture on both versions, and identical daily, weekly and monthly token
+totals on this host's native histories. 20.0.26 also prices `claude-opus-5-5` and
+`gpt-6-luna`, which 20.0.24 left unpriced. The coordinator switched the workstation launcher
+at 2026-09-27T22:01:01Z and kept the 20.0.24 prefix for rollback; the Linux and macOS pins
+move to 20.0.26, the macOS one on registry evidence only.
+**Next trigger: any version newer than 20.0.26 is published.** Changed token totals on the
+same native range, a failed fixture, or a failing upstream suite at the new tag would
+overturn a move; a cost figure still needs qualified prices for every model it covers.

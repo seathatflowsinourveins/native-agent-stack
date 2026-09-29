@@ -4,6 +4,8 @@ The September 21 qualification separates durable memory, documentation search,
 code retrieval and their upstream interfaces. Installed ai-memory 2.3.2,
 SocratiCode 1.14.0, QMD 2.8.3 and Qdrant 1.19.1 matched their published releases
 at review time. This is a dated, tested selection, not a universal ranking.
+SocratiCode has since moved to 1.15.0 on Linux (2026-09-27,
+[receipt](../evidence/receipts/socraticode-1150-qualification-20260927.json)).
 
 The [current Hugging Face model qualification](hf-memory-model-qualification.md)
 distinguishes the July 2026 Nemotron code-RAG model from MiniLM's compatibility

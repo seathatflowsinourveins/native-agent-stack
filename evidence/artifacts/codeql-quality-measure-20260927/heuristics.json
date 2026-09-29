@@ -1,0 +1,79 @@
+{
+ "wrong_argument_calls": {
+  "results": 54,
+  "callee_location": {
+   "other_project": 54
+  },
+  "same_named_module_in_caller_project": {
+   "no_same_named_module_in_caller_project": 2,
+   "caller_project_has_same_named_module": 52
+  },
+  "project_prefix": "first three path components"
+ },
+ "uninitialized_local_variable": {
+  "results": 30,
+  "never_returning_call_in_prior_8_lines": 22
+ },
+ "implicit_string_concatenation": {
+  "span": {
+   "spans_lines": 145
+  },
+  "boundaries": {
+   "whitespace_at_every_boundary": 139,
+   "boundary_without_whitespace": 6
+  },
+  "boundary_without_whitespace_sites": [
+   "blueprints/memory-lifecycle-v2/assemble_results.py:356",
+   "blueprints/us-equities/pit-availability/measure.py:808",
+   "tests/test_adoption_bootstrap_macos.py:2334",
+   "tests/test_adoption_bootstrap_macos.py:2415",
+   "tests/test_adoption_bootstrap_macos.py:2677",
+   "tests/test_adoption_bootstrap_macos.py:2807"
+  ]
+ },
+ "file_not_closed": {
+  "results": 248,
+  "chained_open_call_one_liners": 109,
+  "by_top_directory": {
+   "blueprints": 126,
+   "evidence": 114,
+   "tests": 4,
+   "tools": 2,
+   "adoption": 1,
+   "scripts": 1
+  }
+ },
+ "overly_permissive_file": {
+  "results": 33,
+  "by_top_directory": {
+   "tests": 17,
+   "blueprints": 8,
+   "evidence": 5,
+   "tools": 2,
+   "scripts": 1
+  }
+ },
+ "code_quality_result_locations": {
+  "python": {
+   "results": 979,
+   "under_evidence": 170,
+   "in_hash_listed_files": 639,
+   "evidence_files": 54
+  },
+  "javascript-typescript": {
+   "results": 188,
+   "under_evidence": 188,
+   "in_hash_listed_files": 188,
+   "evidence_files": 7
+  }
+ },
+ "javascript_code_quality_files": {
+  "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/6-nyse-hours-calendars.html": 93,
+  "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20240111002222.html": 69,
+  "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20170301172132.html": 11,
+  "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-accessing-edgar-data-wb20260821.html": 6,
+  "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-privacy-information-wb20260919.html": 6,
+  "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-quantconnect-terms.html": 2,
+  "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/14-wayback-nyse-20220706011712.html": 1
+ }
+}

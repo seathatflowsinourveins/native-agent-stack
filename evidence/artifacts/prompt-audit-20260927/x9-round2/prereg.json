@@ -1,0 +1,106 @@
+{
+ "id": "x9-round2-executed-comparison",
+ "date": "2026-09-27",
+ "status": "preregistered before the first counted run; the two probes below were run earlier and are not counted",
+ "evidence_class": "local integration on this host: real headless Claude Code sessions graded by deterministic code. Not an upstream test, not interactive use and not another host's result.",
+ "question": "Which line should CLAUDE.md carry for checking that a plugin or MCP server is active: the first lane's text (arm g), the second lane's text (arm c), or the current line (arm 0)?",
+ "base": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "setup": "three worktrees detached at the base; each differs from it only in CLAUDE.md, which is '@AGENTS.md', a blank line and the arm's text. Every other instruction, hook, plugin, MCP server and setting is the host's own and the same for all arms.",
+ "client": {
+  "claude_code": "2.1.283",
+  "model": "claude-opus-5-5[1m] (host default, read from each run's init)",
+  "permission_mode": "bypassPermissions (host default)",
+  "max_turns": 10,
+  "timeout_s": 300
+ },
+ "harness": {
+  "promptfoo": "0.123.1",
+  "command": "PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval -c promptfooconfig.yaml --no-cache --repeat 3 -j 1 -o results.json --no-write --no-table --no-progress-bar",
+  "provider": "exec: run_arm.sh <arm>, a thin local integration (contract in its header); it keeps each full stream-json transcript under runs/<arm>/ and returns summarize.py's facts"
+ },
+ "arms": {
+  "g": "first lane's text (arms/gpt6.txt)",
+  "c": "second lane's text (arms/claude.txt, new)",
+  "0": "current line at the base (control)"
+ },
+ "cases": [
+  {
+   "id": "K1",
+   "question": "Is the socraticode MCP server active in this session? Start your answer with yes or no, then give the evidence.",
+   "truth": "yes when the run's init lists socraticode as connected"
+  },
+  {
+   "id": "K2",
+   "question": "Is the github MCP server active in this session? Start your answer with yes or no, then give the evidence.",
+   "truth": "yes only when the run's init lists github as connected; this host configures no github server"
+  },
+  {
+   "id": "K3",
+   "question": "Run /mcp and tell me which MCP servers are connected in this session.",
+   "truth": "the set of servers the run's init lists as connected"
+  }
+ ],
+ "n": "3 cases x 3 arms x 3 repetitions = 27 runs, one at a time in promptfoo's fixed order",
+ "metrics": {
+  "primary": "correct",
+  "secondary": [
+   "answered",
+   "no_builtin_skill"
+  ],
+  "descriptive": [
+   "loaded_schema",
+   "executed_target",
+   "cli_diagnostic",
+   "asks_user",
+   "names_command",
+   "turns",
+   "duration",
+   "cost_usd",
+   "tool calls in order"
+  ],
+  "definitions": "metrics.py docstring; graders are deterministic code, no model grading",
+  "not_used": "promptfoo's overall per-test pass, which combines descriptive metrics"
+ },
+ "exclusions": "a run is excluded, listed with its reason and not rerun when its summary cannot be parsed, its exit code is non-zero, its result subtype is not success, or its init lists no MCP servers. If more than 3 of 27 runs are excluded, the comparison is reported as incomplete.",
+ "analysis": "analyze.py under 'uv run --no-project --with scipy==1.18.1': recompute every grader from the retained summaries and require zero disagreements with promptfoo's per-assertion results; per-arm and per-case counts; median turns and duration; summed cost; two-sided Fisher exact tests between arm pairs on correct and no_builtin_skill, reported as description only.",
+ "decision_rule": "The comparison chooses no text. Its per-arm table, with arm names replaced by the candidate labels of each packet, joins the round-2 judgment: each family judges twice, once in each presentation order, choosing among the two lanes' texts and no change without being told which lane wrote which. A text is applied only when all four judgments choose it; otherwise X9 stays pending with this comparison named, per tools/sota-convergence/README.md, 'Two-family adjudication'.",
+ "untested": [
+  "interactive sessions, where a user can answer a request to run a command",
+  "other session models (Sonnet, Haiku, Fable) and other effort levels",
+  "claims the session cannot settle from its own tools, such as a plugin with no tools or skills; not exercised because answering them invites reading client settings files",
+  "long sessions where the line competes with more context",
+  "other hosts' MCP server sets"
+ ],
+ "uncounted_probes": {
+  "probe/probe-0.jsonl": "arm 0 worktree, prompt 'reply ok': init lists 8 connected MCP servers and 5 plugins",
+  "probe/probe-skill-builtins.jsonl": "arm 0 worktree, the model told to call Skill('context') and Skill('mcp'): both return tool errors; the client text says each is a built-in or UI command, not a skill, and to ask the user to run it"
+ },
+ "sha256": {
+  "promptfooconfig.yaml": "66bc428a1fabf5f8236545d94b79ecdd8309860c91fd17fed1cb80dcc9ce5c24",
+  "run_arm.sh": "def4e95d9bfe76ce8198ed60270ec270ce458c6f818824eaeb25e49de7df36fb",
+  "summarize.py": "6026ee0ff61d65e9b3cd20ea6e8feffc7663b01fc07afc0d744e825b232cd0ad",
+  "metrics.py": "f4127bc3cb50a4f769a0fc9f83a9143733b57df8026de625a317cc3adad23c3b",
+  "analyze.py": "6fa4ecb2dc25cb1124e6c0d7eadd06c579a638fa63598ca2ed0fe10ebf39aac9",
+  "arms/CLAUDE.g.md": "bb155b03e7e90dccea42de00a5febd8c7979c817f26988a856f07d5dd72695d6",
+  "arms/CLAUDE.c.md": "db6cdc6f456fa88dc0f22c41d59268582624e8b33a1c48097bd6f048bdc09aa5",
+  "arms/CLAUDE.0.md": "1a55ee0b21f83c543529caf5e020af65dc53298223b15cac8b6f22c6614d0f64",
+  "arms/gpt6.txt": "c8e74e1f21f5b9519578a332c099c1f07f347dc7424e8e6bef1fa02a02bb200f",
+  "arms/claude.txt": "ec8a98d69be54609334d8f7f2080ef02876d5f2c31b64a346191110b6dcbdc5e",
+  "probe/probe-0.jsonl": "6d1a26cc9a546749c59616b8cc9c25ffb422403644d5c7a13afff113b76b02fa",
+  "probe/probe-skill-builtins.jsonl": "71ffb9e84cc535f7db97926180163c6e485178d558bde9a7ee301c9ac5aebf32"
+ },
+ "revision": {
+  "number": 1,
+  "previous_sha256": "96616df4a6bbc1936e9c8bd77218c8389e9c1de9864b3e73d0ff1d8ec945c7f1",
+  "made": "before the first counted run, after a review of revision 0",
+  "changes": [
+   "'verified' counted any evidence-seeking call and so rewarded more calls; it is replaced by three descriptive counters: loaded_schema, executed_target and cli_diagnostic",
+   "median duration and cost now leave out each arm's first run, and neither is an arm comparison",
+   "the expected ceiling on 'correct' is stated before the run"
+  ]
+ },
+ "expectations": [
+  "All three cases can be settled from the session's own tool list, so 'correct' is expected near the ceiling in every arm; a Fisher p of 1.0 on it is then not a finding.",
+  "Runs go in a fixed order and share one system and tool prefix, so the earliest runs pay the cache writes: duration and cost are descriptive and are not compared between arms."
+ ]
+}

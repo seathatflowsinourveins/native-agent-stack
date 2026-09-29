@@ -1,0 +1,21 @@
+Date: 2026-09-28 (UTC). You are an independent researcher. Answer ONE frozen question from primary sources you open yourself.
+
+QUESTION (frozen, verbatim):
+For a single-host local LLM gateway pooling several ChatGPT/Codex and Claude subscription accounts behind one endpoint, serving agentic CLI lanes (Codex CLI /v1/responses, long multi-turn sessions, ~90% of input tokens are upstream prompt-cache reads), with the hard constraint of no quality loss (never downgrade model or reasoning effort; no lossy rewriting without a passed quality gate): what is current SOTA routing practice?
+
+TASK: identify the current SOTA routing practices for this setting. For each practice give:
+- the practice and what it does for this setting;
+- the maintained upstream implementation(s): canonical repository https://github.com/<owner>/<repo> (follow renames), the release tag, the full 40-character commit that tag resolves to (say whether you confirmed the tag resolves to that commit), and file:line permalinks in the form https://github.com/<owner>/<repo>/blob/<40-char sha>/<path>#L<a>-L<b> to the code that implements it; set line_verified true only when you actually opened those lines at that commit;
+- applicability to this exact setting (single host, pooled subscription accounts, Codex CLI /v1/responses lanes, long multi-turn sessions, cache-read-dominated input);
+- quality risk under the hard no-quality-loss constraint (model or reasoning-effort downgrade, lossy rewriting, cache invalidation, context loss, anything else), with a level;
+- a verification metric: a measurable check that shows the practice works without quality loss.
+Also list practices you considered and rejected (for example because they violate the no-quality-loss constraint or have no maintained upstream), each with the decisive reason and its source.
+If a practice has no maintained upstream implementation, say so (no_maintained_upstream true, upstreams empty); never invent a repository, tag, commit or line citation.
+
+MAINTENANCE RULE (verify every upstream; derived from the OpenSSF Scorecard Maintained check, https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained): a repository is stale, and excluded whatever its stars, when it is archived or has no commit on its default branch in the last 90 days (establish this with gh api repos/<owner>/<repo>/commits?since=<date 90 days ago>&per_page=1 or the same https://api.github.com REST URL, not from pushed_at, which counts any branch; a lane that cannot reach either source, such as a web-only lane, records the commit fact as unknown and never excludes or refutes a repository on unknown maintenance, because a missing result is pending, never refuted); this rule excludes only the zero-activity end, so record lower activity as a maintenance fact without excluding. A repository created less than 90 days ago is too new to assess: set maintenance.status "too_new" and say so. An old release tag on an actively committed branch is not stale (pin the commit when a needed fix exists only on the branch). Popularity is not evidence: evidence over popularity (stars and install counts are never evidence of fit).
+
+TOOLS: your shell has no network (read-only sandbox). Use your web search/open tool for everything, including GitHub REST URLs such as https://api.github.com/repos/<owner>/<repo>/commits?since=<date 90 days ago>&per_page=1, https://api.github.com/repos/<owner>/<repo>/git/ref/tags/<tag>, and github.com or raw.githubusercontent.com pages at a commit. When neither source answers, record maintenance as "unknown" (pending, never stale). Read-only: never install or execute candidate code; never read or print credentials. Cite the URL for every fact in evidence.
+Skills: if the installed skills search-first or iterative-retrieval fit, use them and list every skill you actually used in skills_used; otherwise leave it empty.
+
+BUDGET (hard): at most 12 web searches and 40 page opens/API calls in total; at most 10 practices. Stop researching when the budget is spent and answer with what you verified. Record your counts in calls.
+Answer only in the required JSON.

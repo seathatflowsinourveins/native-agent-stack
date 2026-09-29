@@ -1,0 +1,73 @@
+{
+ "recorded": "2026-09-28T02:47:28Z",
+ "attempt": 1,
+ "status": "void for all four judgments",
+ "recorded_before": "the Claude judgments' choices were seen. Afterwards: the Claude AB judgment's completion notification arrived (its last transcript event 2026-09-28T02:47:26.417Z), so its choice was seen after the void was recorded; the Claude BA judgment was stopped before it returned",
+ "reason": "The judgments were not blind. Their repository root was main at ed3cd96c, which already holds the round-1 decision record (docs/decisions/2026-09-27-prompt-audit-resolution.md) naming which lane wrote each X9 text, and nothing kept a judge out of the coordinator's private work directory. Observed: the GPT-6 AB judgment searched that record and read the private prereg.json, analysis.json and metrics.py (prereg.json names the arm files gpt6.txt and claude.txt); the Claude BA judgment read the record.",
+ "attempt_1_gpt6_choices_seen": {
+  "AB": "B (lane g)",
+  "BA": "A (lane g)"
+ },
+ "fix_for_attempt_2": [
+  "repository root at ba1700ad, the comparison's base, which predates the round-1 record and evidence",
+  "comparison worktrees and the ed3cd96c root removed before the run",
+  "every brief and prompt forbids reading outside the judgment directory and the root, and forbids web searches about this repository",
+  "the judgment directory is self-contained (the graders' source is copied in), so verifying the comparison needs no other file",
+  "after the run, every judge's file and command log is scanned; a judgment that read outside the allowed paths is void"
+ ],
+ "tally_rule": "attempt 2's four judgments decide under the same unanimity rule; attempt 1 is retained, not counted",
+ "attempt_1_claude_choices_seen": {
+  "AB": "A (lane c), confidence 0.65, seen after the void was recorded",
+  "BA": "none: stopped before returning; it had read the round-1 record"
+ },
+ "claude_AB_reads": "its tool inputs name neither the round-1 record nor the private work directory, but that scan covered inputs only: a search over the ed3cd96c root can return the record's lines without naming its path, so its blindness is not established. The same holds for the GPT-6 BA judgment. Attempt 1 stays void for all four judgments, as recorded before any Claude return was seen",
+ "attempt_2_rules": {
+  "recorded": "2026-09-28T02:53:08Z",
+  "recorded_before": "any attempt-2 judge started",
+  "final": "Attempt 2 is final: its four judgments decide under the same unanimity rule, and there is no attempt 3.",
+  "void_judgment": "An attempt-2 judgment is void when any of these holds, and one void judgment means no unanimity, so X9 stays pending as a split:",
+  "void_when": [
+   "a command it ran, a file it read, or a command output or tool result it received names or contains the round-1 decision record (docs/decisions/2026-09-27-prompt-audit-resolution.md), the directory evidence/artifacts/prompt-audit-20260927, the strings 'gpt6', 'claude.txt' or 'own lane', or the coordinator's private work directory",
+   "a web search or opened URL names this repository, its owner, pull request #443 or #444",
+   "a Claude judgment makes any mcp__ call (memory and code-index services see the live checkout)",
+   "context injected into a judge's transcript before its first tool call (hook output) names a lane"
+  ],
+  "k4": "attempt 2's packet adds K4, a preregistered case the session cannot settle from its own tools, added after attempt 1's returns named the untested fallback as the deciding difference; the packet discloses this",
+  "amended": {
+   "recorded": "2026-09-28T02:56:38Z",
+   "recorded_before": "any attempt-2 judge started",
+   "why": "The bare string 'gpt6' matches unrelated files in the ba1700ad root (for example tests/test_gpt6_family_tiering_20260926.py) and the host memory index that the client injects into subagents, none of which says which lane wrote an X9 text. The rule now names only sources that hold the mapping.",
+   "void_when": [
+    "a judge's command, file path, search, command output or tool result contains any of: '2026-09-27-prompt-audit-resolution', 'prompt-audit-20260927', 'convergence-prompt-audit', 'prompt-audit-x9-round2', 'prompt-audit-adjudication', '/.hold', 'gpt6.txt', 'claude.txt', 'gpt6-round1', 'claude-round1', 'judgment-mapping', 'adjudication-mapping', 'own lane', '/.claude/projects', 'code/native-agent-stack', or a git log, show, blame, diff or grep command (the root is an export without history, so any git history lies outside the allowed paths)",
+    "a web search or opened URL contains 'native-agent-stack', 'seathatflowsinourveins', 'pull/443', 'pull/444', '#443' or '#444'",
+    "a Claude judgment makes any mcp__ call",
+    "context injected before a judge's first tool call contains any string above, or a distinctive phrase of either text ('name the command that would', 'Distinguish listed availability from successful execution')"
+   ],
+   "claude_judge": "blind-adjudicator (Read, Glob and Grep only; Opus, max; project instructions omitted), the role table's adjudicator, instead of round 1's evidence-reviewer, whose MCP memory and index tools see the live checkout"
+  },
+  "amended_2": {
+   "recorded": "2026-09-28T02:58:23Z",
+   "recorded_before": "any attempt-2 judge started",
+   "why": "'own lane' matched 'unknown lane' and 'claude.txt' matched 'run2_claude.txt' in 20 unrelated root files, the git-command pattern matched repository prose, and the path strings 'code/native-agent-stack' and '/.claude/projects' occur in 117 unrelated root files. The patterns are now bounded and split: mapping strings apply to everything a judge sees; path strings and git history commands apply only to what a judge runs or opens. With the mapping patterns the ba1700ad root export has no match.",
+   "patterns": "void_patterns.py (sha256 below)",
+   "void_patterns_sha256": "d16e99d67d8ee5d0b809782d8d2035fccb36c5d290acc367cc90d846499ec3c4",
+   "correction": "2026-09-28T02:59:00Z: this entry's first version (02:58:23Z) said the root had no match while its path strings still matched 117 files; corrected before any attempt-2 judge started",
+   "supersedes": {
+    "recorded": "2026-09-28T03:05:10Z",
+    "recorded_before": "any attempt-2 judge started",
+    "note": "void_patterns.py is the rule applied to attempt 2. It replaces the string lists in 'void_when' and 'amended'; the four kinds of evidence they name (mapping sources, private paths and git history, web searches about the repository, injected context) map to its MAPPING, ACCESS, WEB and PHRASES patterns, and an mcp__ call by a Claude judge still voids its judgment."
+   }
+  },
+  "audit": {
+   "recorded": "2026-09-28T03:12:01Z",
+   "recorded_before": "any attempt-2 return was read; the GPT-6 jobs started at 03:09:15Z (runner 'started' files) and the Claude judges at 03:09:20Z and 03:09:24Z (first transcript entries)",
+   "audit_attempt2_py_sha256": "09c8b7c917a56041c630abf1fab50d28a0fef45b6b8a8e2867774d2560f0caed",
+   "tally_attempt2_py_sha256": "fd590230c0958f029852728122530166c84a97cc37de94a49f6e0a811a9c32b0",
+   "void_patterns_sha256": "d16e99d67d8ee5d0b809782d8d2035fccb36c5d290acc367cc90d846499ec3c4",
+   "self_test": "audit_attempt2.py on attempt 1's four transcripts marks all four void (audit-selftest-attempt1.json)",
+   "inputs": {
+    "make_x9_attempt2_py_sha256": "de4c7a12a77c2e20997f5ec8b78cb280634d47c1c30bddd6d61232e0126da630"
+   }
+  }
+ }
+}

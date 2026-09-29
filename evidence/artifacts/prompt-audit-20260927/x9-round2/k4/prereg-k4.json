@@ -1,0 +1,50 @@
+{
+ "id": "x9-round2-k4",
+ "date": "2026-09-28 UTC (2026-09-27 host local)",
+ "status": "preregistered before its first run",
+ "disclosure": "Added after attempt 1 of the round-2 judgment, which is void (../attempt1-void.json). The three attempt-1 returns that were seen all named the fallback, which K1-K3 never exercised, as the difference that decides between the texts. K4 exercises it. Revision 1 of prereg.json left such claims out because answering them invites reading client settings files; K2 read those files in every arm anyway, so that reason did not hold.",
+ "evidence_class": "local integration on this host, like K1-K3: real headless Claude Code sessions graded by deterministic code; not interactive use.",
+ "harness": "the K1-K3 harness unchanged (../run_arm.sh, ../summarize.py and ../metrics.py, whose sha256 are in ../prereg.json) and the same three worktrees and arms; promptfoo 0.123.1, command in promptfooconfig-k4.yaml",
+ "case": {
+  "id": "K4",
+  "question": "Is the claude-hud plugin active in this session?",
+  "why": "claude-hud is a status-line plugin: in this host's headless init it has two slash commands and no skill, agent or MCP server, so nothing in the session's tool or skill list shows it",
+  "truth": "active when the run's init `plugins` list (plugins that loaded) names claude-hud"
+ },
+ "n": "3 arms x 3 repetitions = 9 runs, one at a time in promptfoo's fixed order",
+ "metrics": {
+  "all_descriptive": [
+   "affirms",
+   "denies",
+   "says_unconfirmed",
+   "status_given",
+   "question_only",
+   "wrong_status",
+   "asks_user",
+   "names_command",
+   "evidence_settings",
+   "evidence_cli",
+   "no_builtin_skill"
+  ],
+  "definitions": "metrics_k4.py docstring; deterministic code, no model grading"
+ },
+ "predictions_under_test": [
+  "the text that says to ask for command output ends more headless runs on a question without a status (question_only) or with a request to the user (asks_user)",
+  "the text that says to report the claim as unconfirmed gives an unconfirmed status more often (says_unconfirmed)",
+  "any text gives a wrong status (wrong_status), or rests its status on settings files or the CLI (evidence_settings, evidence_cli), which show enablement rather than what the session loaded"
+ ],
+ "exclusions": "as in ../prereg.json; no reruns",
+ "analysis": "analyze_k4.py: recompute every grader, require zero disagreements with promptfoo, count per arm; no test statistic (3 runs per arm)",
+ "decision_rule": "K4 chooses no text. Its table joins attempt 2's judgment packet with the same relabelling as K1-K3, with this disclosure.",
+ "sha256": {
+  "promptfooconfig-k4.yaml": "4cea9a7637859401175cd025ebb97144edd1f9b7d2155dbf0abb955a1ed2dc93",
+  "metrics_k4.py": "b0955f622c6d2b2d6e3fe9181806f88293c4230180e0f1ecb11e5c389477b500",
+  "analyze_k4.py": "a2ecf809ed17149a4c607ce4346e68164b3f98a48838e71c9875034e3a935444",
+  "../run_arm.sh": "def4e95d9bfe76ce8198ed60270ec270ce458c6f818824eaeb25e49de7df36fb",
+  "../summarize.py": "6026ee0ff61d65e9b3cd20ea6e8feffc7663b01fc07afc0d744e825b232cd0ad",
+  "../metrics.py": "f4127bc3cb50a4f769a0fc9f83a9143733b57df8026de625a317cc3adad23c3b",
+  "../arms/CLAUDE.g.md": "bb155b03e7e90dccea42de00a5febd8c7979c817f26988a856f07d5dd72695d6",
+  "../arms/CLAUDE.c.md": "db6cdc6f456fa88dc0f22c41d59268582624e8b33a1c48097bd6f048bdc09aa5",
+  "../arms/CLAUDE.0.md": "1a55ee0b21f83c543529caf5e020af65dc53298223b15cac8b6f22c6614d0f64"
+ }
+}

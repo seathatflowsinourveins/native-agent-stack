@@ -1,0 +1,74 @@
+{
+ "items": [
+  {
+   "id": "M4",
+   "verdict": "reject",
+   "resolution_text": "",
+   "reasons": "Reject D1–D3 in this unit. I verified that the installed skill and U1 match the manifest’s hash. Editing either shared installed path would violate the upstream pin. Current upstream retains the targeted gates; U2 removed other persuasion passages and explicitly treated that change as evaluation-dependent. The over-verification concern is credible: Opus 5 guidance warns against redundant verification, and Opus 5.5 treats those prompting patterns as a reasonable starting point. However, D1 itself retains fresh full-command verification, and these sources do not establish the proposed rewrite’s benefit across both clients. Removing the preload instead requires a coherent adoption change: the builder body, mirrored definitions, test-envelope.mjs:505 and test-contract-mutations.mjs:70–73 currently require it. Those contracts do not establish behavioral superiority; trial efficacy remains unmeasured. An upstream revision addressing these triggers, or target-model comparisons showing fewer redundant checks without more unsupported completion claims, would justify revisiting this decision.",
+   "sources": [
+    {
+     "locator": "adoption/skills/manifest.json:319-338",
+     "quote": "\"ref\": \"8ca22dba9a94f28898bbce59f2537ff4d87c747d\",\n...\n\"skill_md_sha256\": \"2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3\",\n...\n\"status\": \"trial\",\n...\n\"codex_enabled\": true"
+    },
+    {
+     "locator": "[Current upstream skill](https://raw.githubusercontent.com/obra/superpowers/main/skills/verification-before-completion/SKILL.md)",
+     "quote": "BEFORE claiming any status or expressing satisfaction:\n...\n- Moving to next task\n- Delegating to agents"
+    },
+    {
+     "locator": "[Upstream commit 3be5aad3dd24](https://github.com/obra/superpowers/commit/3be5aad3dd24)",
+     "quote": "the Iron Law, gate function, and rationalization table already enforce. This is the eval-gated class"
+    },
+    {
+     "locator": "[Opus 5: Task scope and over-verification](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5#task-scope-and-over-verification)",
+     "quote": "instructions like these cause over-verification on Claude Opus 5, and removing them reduces wasted tokens with no loss in quality."
+    },
+    {
+     "locator": "[Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5)",
+     "quote": "the patterns in Prompting Claude Opus 5 remain a reasonable starting point."
+    },
+    {
+     "locator": ".claude/agents/isolated-builder.md:12",
+     "quote": "Use the preloaded verification-before-completion skill before claiming success"
+    },
+    {
+     "locator": "examples/claude-native/workflows/test-envelope.mjs:505",
+     "quote": "expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode', 'verification-before-completion']))"
+    },
+    {
+     "locator": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md:49-51",
+     "quote": "First-prompt size for all three preloaded configurations remains unmeasured; source review\nis not preload acceptance."
+    }
+   ],
+   "confidence": 0.91
+  },
+  {
+   "id": "M5",
+   "verdict": "amend",
+   "resolution_text": "Keep this application's reviewable contract in this directory for the coordinator\nto integrate. Leave the enclosing repository's native actions unchanged.\n",
+   "reasons": "A direct instruction makes the intended boundary explicit. Hunk E incorrectly attributes project-readiness’s installer to the enclosing repository, and “leave those to the coordinator” weakens the explicit requirement to preserve native actions. This amendment preserves contract location, coordinator integration and that boundary. Re-register the changed file in manifests/evidence.json:3905–3907 as 918 bytes with SHA-256 ffd65a9a257f25c6f0eb7039da829c8cabc8a450a723035c4b64e42901117240; otherwise validation fails. These values were calculated in memory without editing files. Behavioral improvement is unmeasured; increased enclosing-action edits or missed coordinator handoffs in matched tasks would falsify the expected benefit.",
+   "sources": [
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/AGENTS.md:15-18",
+     "quote": "Project-readiness inspected the enclosing public worktree. Its installer writes\n...\nfor the coordinator to integrate without modifying\nthe enclosing repository's native actions."
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/README.md:88-90",
+     "quote": "The enclosing\nrepository's global actions were not modified by this bounded contribution."
+    },
+    {
+     "locator": "manifests/evidence.json:3905-3907",
+     "quote": "\"path\": \"blueprints/convergence-practice/application-delivery/AGENTS.md\",\n\"sha256\": \"12ec72f9a905c105ee44e6daa6c0767bbb9978ad0b51e1ec570372afb54d8bd2\",\n\"bytes\": 1040"
+    },
+    {
+     "locator": "scripts/validate.py:384-387",
+     "quote": "if hashlib.sha256(content).hexdigest() != digest:\n    self.error(f\"{path_value}: SHA-256 mismatch\")\nif len(content) != size:\n    self.error(f\"{path_value}: byte count mismatch\")"
+    },
+    {
+     "locator": "[Anthropic prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#be-clear-and-direct)",
+     "quote": "Claude responds well to clear, explicit instructions. Being specific about your desired output can help enhance results."
+    }
+   ],
+   "confidence": 0.97
+  }
+ ]
+}

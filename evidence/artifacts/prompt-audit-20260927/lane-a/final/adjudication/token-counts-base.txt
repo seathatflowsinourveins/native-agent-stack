@@ -1,0 +1,3 @@
+base 8315274f (unchanged at 4a8b729a); tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+examples/claude-native/CLAUDE.md bytes 8480 tokens 1719 words 1205 lines 48 sha256 bd9cd167681b637aed3ea4d70c07e561ea64a30862c07a6bc3a06565f9426dd0
+adoption/templates/codex.AGENTS.template.md bytes 3151 tokens 786 words 502 lines 49 sha256 7ce4fbc38f1994746c21d7dc5b9d9367d6c7c3b02ee4d725ea859e54ab93f313

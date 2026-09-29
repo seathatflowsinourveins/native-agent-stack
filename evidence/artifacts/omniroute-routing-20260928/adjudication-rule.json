@@ -1,0 +1,80 @@
+{
+ "kind": "adjudication_rule",
+ "source": "The ADJ_SCHEMA constant, the GROUPS constant, the shared INPUTS text and the Adjudicate stage prompt of the workflow script omniroute-routing-convergence-record, a private file under ~/.claude. Copied after the stages ran; this copy does not show that the rule was frozen before them, only what the script held. Script paths are masked: $SCRATCH is the session scratch directory.",
+ "stage": {
+  "agent_type": "stack-researcher",
+  "model": "opus",
+  "effort": "max",
+  "dispatch": "one agent per group, run through the workflow's pipeline(); each returns JSON under item_schema"
+ },
+ "groups": [
+  {"key": "affinity-cache", "ids": "P1 P2 P3 P4 P5 P6 P7 P8"},
+  {"key": "resilience-retry", "ids": "P9 P10 P11 P12 P13 P14 P15 P16"},
+  {"key": "chain-stream-extra", "ids": "P17 P18 P19 P20 P21 P22 P23, the ADD-P1P7/ADD-LIVE items, R1-R8, E1-E9, U1-U4, and the missed practices from JOB 1 and JOB 2 (sub2api owner-aware previous_response_id routing; previous_response_id removal on failover; configuration_update effort validation; keepalive and forward-compatible fields; quota scoping by metered limit)"}
+ ],
+ "prompt": [
+  "Adjudicate the routing practices <group ids> for the GPT-6 Codex account-pool lane behind OmniRoute (20128 shared, 20129 full-compression lane chained to it).",
+  "For each id:",
+  "- Compare the Claude catalog entry, the GPT-6 JOB 2 verdict on it, and whether GPT-6 JOB 1's independent answer reached the same practice.",
+  "- Apply every GPT-6 amendment you can check against its cited source; open the cited source in the pinned clones under $SCRATCH/src when a claim is contested.",
+  "- Record convergence honestly:",
+  "  - \"converged\" means both families agree with checked sources;",
+  "  - \"disagreement\" means one refutes and the conflict is unresolved;",
+  "  - \"single_family\" means only one family has it;",
+  "  - \"not_checked\" means GPT-6 did not check it.",
+  "- Map the item to OmniRoute's current state from route-mapper-final.json (file:line), and decide the action. Actions already taken:",
+  "  - the 20129 limiter lift: applied;",
+  "  - (d) expiry-first: not applied;",
+  "  - the occupancy patch (P1/P7/P19/P18 exposure): approved_pending, to apply after R02;",
+  "  - everything the C- and K-series verdicts hold: kept_as_is.",
+  "- Give a verify metric and an overturn condition for each.",
+  "- Numbers only from the input files; name the file for each number. Do not invent measurements."
+ ],
+ "shared_inputs": {
+  "note": "input_files_with_receipts names each input the stages read (path masked, description shortened from the script) and the receipt that now holds it. live_state_facts is verbatim.",
+  "input_files_with_receipts": [
+   "$SCRATCH/omni-full/route-landscape-catalog.json: the Claude research catalog P1-P22, plus addendum_2026_09_28 (P23 client disconnect / 499; the P1/P7 clarification; the withdrawn 8.4% finding, replaced by route-mapper's 10.3%). Receipt: route-landscape-catalog.json.",
+   "$SCRATCH/omni-full/route-gpt6/gpt6/route-job1/last.json: GPT-6 (gpt-6-astra, effort max, exit 0) independent answer; it never saw the catalog. Receipt: route-job1.last.json.",
+   "$SCRATCH/omni-full/route-gpt6/gpt6/route-job2/last.json: GPT-6 (same model and effort, exit 0) refutation of the catalog. Receipt: route-job2.last.json; runner metadata and usage in route-gpt6-runs.json.",
+   "$SCRATCH/omni-full/route-mapper-final.json: OmniRoute dd6e9607e mechanism inventory, 24 h live metrics on 20128 and 20129, and the P1-P23 mapping. Receipt: route-mapper-final.json.",
+   "$SCRATCH/omni-full/route-mapper-resume-parts.md: check 1, check 2, part 1 (interim) and part 3. Receipt: route-mapper-resume-parts.md.",
+   "$SCRATCH/omni-full/route-landscape-occupancy-research.md: the cited minimal fix and the user decision. Receipt: route-landscape-occupancy-research.md.",
+   "$SCRATCH/omni-full/maintenance-gh-20260928.tsv: gh api default-branch last-commit dates. Receipt: maintenance-gh-20260928.tsv.",
+   "$SCRATCH/omni-full/limiter/apply.json: the 20129 limiter PATCH with its read-back. Receipt: limiter-apply-20129.json (reduced).",
+   "$SCRATCH/omni-full/TRACKER.md: the coordinator's decision log. Not published; its decision facts are in decisions.json."
+  ],
+  "live_state_facts": [
+   "20128: build dd6e9607e; sessionAffinityTtlMs 14400000; providerStrategies.codex round-robin/stickyRoundRobinLimit 1 (unchanged).",
+   "20129: chained to 20128 via provider node sharedgw; its limiter is now disabled (enabled true -> false).",
+   "The occupancy patch is being built in a separate workflow (upstream tests, new prefix). It will be applied only after R02, so its status here is \"approved; acceptance pending; apply after R02\"."
+  ]
+ },
+ "item_schema": {
+  "type": "object",
+  "properties": {
+   "group": {"type": "string"},
+   "items": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "id": {"type": "string"},
+      "practice": {"type": "string"},
+      "claude_position": {"type": "string"},
+      "gpt6_position": {"type": "string", "description": "JOB 2 verdict plus JOB 1 agreement or absence"},
+      "converged": {"type": "string", "enum": ["converged", "converged_with_amendment", "disagreement", "single_family", "not_checked"]},
+      "adopted_rule": {"type": "string", "description": "the final practice text after applying amendments"},
+      "upstream_sources": {"type": "array", "items": {"type": "string"}, "description": "repo@commit:file:lines or URLs; maintained per the tsv"},
+      "omniroute_state": {"type": "string", "description": "20128 and 20129 state from route-mapper, with file:line"},
+      "action": {"type": "string", "enum": ["applied", "approved_pending", "kept_as_is", "not_applicable", "rejected", "deferred_to_ab", "open_unknown"]},
+      "action_detail": {"type": "string"},
+      "verify_metric": {"type": "string"},
+      "overturn_condition": {"type": "string"}
+     },
+     "required": ["id", "converged", "adopted_rule", "action", "overturn_condition"]
+    }
+   }
+  },
+  "required": ["group", "items"]
+ }
+}

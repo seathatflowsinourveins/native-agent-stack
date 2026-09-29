@@ -1,0 +1,22 @@
+{
+ "note": "Per-call provider usage of these Claude subagents, read from their transcripts and deduplicated by API message id. Anthropic usage fields are disjoint (input_tokens excludes cache reads and cache writes), so they are listed side by side, never added. advisor_calls counts server-side advisor calls, whose own model usage is not in these fields. harness_counters are the completion notification's own counters. The coordinator session is not included.",
+ "review-x5": {
+  "agent_type": "evidence-reviewer",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 50,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 102,
+   "cache_creation_input_tokens": 250018,
+   "cache_read_input_tokens": 7945170,
+   "output_tokens": 104323
+  },
+  "harness_counters": {
+   "subagent_tokens": 261345,
+   "tool_uses": 53,
+   "duration_ms": 1039384
+  }
+ }
+}

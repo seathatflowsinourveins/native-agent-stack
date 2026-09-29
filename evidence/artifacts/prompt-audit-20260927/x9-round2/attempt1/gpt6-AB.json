@@ -1,0 +1,40 @@
+{
+ "items": [
+  {
+   "id": "X9",
+   "choice": "B",
+   "reasons": "B better prevents unsupported activity claims: discovery-cached tools can be listed before connection, and plugins can contain agents alone. A's presence check misses these distinctions. The documented interactive /plugin command is not contradicted by C4's headless-only list, and B's Skill restriction matches the installed client's refusals. A is shorter and has the better unattended fallback; B's request for output remains a real headless-session weakness. Nevertheless, B requires available read-only diagnostics first, and its execution distinction and component coverage outweigh that weakness. The comparison provides no empirical winner: all texts scored 9/9, unresolved fallbacks were untested, and timing/cost were descriptive.",
+   "sources": [
+    {
+     "locator": "R27 — [Anthropic MCP documentation](https://code.claude.com/docs/en/mcp#server-status-detail)",
+     "quote": "Claude Code loaded the server's tool list from its discovery cache, saved in a previous session, instead of connecting at startup"
+    },
+    {
+     "locator": "T1 — [Anthropic plugins documentation](https://code.claude.com/docs/en/plugins)",
+     "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components that Claude Code installs and loads as one unit."
+    },
+    {
+     "locator": "R10 — [Anthropic plugin troubleshooting](https://code.claude.com/docs/en/plugins/troubleshooting)",
+     "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel."
+    },
+    {
+     "locator": "C2",
+     "quote": "mcp is a UI command, not a skill. Ask the user to run /mcp themselves — it cannot be invoked via the Skill tool."
+    },
+    {
+     "locator": "../convergence-prompt-audit/x9-round2/prereg.json:70",
+     "quote": "claims the session cannot settle from its own tools, such as a plugin with no tools or skills; not exercised because answering them invites reading client settings files"
+    },
+    {
+     "locator": "../prompt-audit-x9-round2-judgment/input.AB.md:141",
+     "quote": "| Return A's text | 3 | 3 | 3 |\n| Return B's text | 3 | 3 | 3 |\n| current line (neither) | 3 | 3 | 3 |"
+    },
+    {
+     "locator": "../convergence-prompt-audit/x9-round2/prereg.json:104",
+     "quote": "Runs go in a fixed order and share one system and tool prefix, so the earliest runs pay the cache writes: duration and cost are descriptive and are not compared between arms."
+    }
+   ],
+   "confidence": 0.89
+  }
+ ]
+}
