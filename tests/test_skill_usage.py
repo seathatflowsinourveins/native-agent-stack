@@ -2721,6 +2721,107 @@ class CodexCodeModeAttribution(unittest.TestCase):
                                       until=S.parse_iso(LANES_UNTIL))
         self.assertEqual((got["sandbox_operations"], got["calls_without_result"]), (0, 4))
 
+    def test_a_web_search_call_id_is_a_model_call_id(self):
+        # The review's web_search_call finding: a hosted web search is a model call (ResponseItem::WebSearchCall, protocol/src/
+        # models.rs:1182-1203, persisted by rollout/src/policy.rs:56), so an item carrying its id is direct, even inside an
+        # open exec span. The hosted search's own item is TurnItem::WebSearch (protocol/src/items.rs:57-61), which the adapter
+        # does not emit at all, as the Claude kernel counts no server tool; this host's store holds no web_search_call record
+        # (the U3 census, evidence/artifacts/pra-u3-differential-20260929). The item here is the review's Extension shape.
+        got = u3_measure(PAGINATED_META, exec_call("call_priv_x", EXEC_FETCH_JS),
+                         codex_row("response_item", {"type": "web_search_call", "id": "ws_priv_1", "status": "completed",
+                                                     "action": {"type": "open_page", "url": "https://example.org/w"}}),
+                         codex_row("event_msg", {"type": "item_completed", "item": {
+                             "type": "Extension", "id": "ws_priv_1", "kind": "web.search",
+                             "action": {"type": "openPage", "url": "https://example.org/w"}}}),
+                         exec_output("call_priv_x"))
+        self.assertEqual(got["sandbox_operations"], 0)
+        self.assertEqual({key: got.get("code_mode", {}).get(key) for key in ("exec_calls", "nested_items", "unattributed_items")},
+                         {"exec_calls": 1, "nested_items": 0, "unattributed_items": 0})
+
+    def test_only_emitted_items_count_as_nested_or_unattributed(self):
+        # The review's item-kind finding: item_completed also carries Reasoning, AgentMessage, a clock.sleep Extension and
+        # FileChange items, and a user_shell command is no call at all (commit 6); the adapter emits none of them as a tool
+        # call, so none is a nested or an unattributed item, before the exec or after it.
+        def item(key, item_type, **extra):
+            return codex_row("event_msg", {"type": "item_completed", "item": {"type": item_type, "id": key, **extra}})
+        got = u3_measure(PAGINATED_META, item("item_r0", "Reasoning"), exec_call("call_priv_x", "text('hi')"),
+                         item("item_r1", "Reasoning"), item("item_a1", "AgentMessage"),
+                         item("item_s1", "Extension", kind="clock.sleep"), item("item_f1", "FileChange", status="completed"),
+                         sourced_command("item_u1", ["bash", "-lc", "ls"], "user_shell"), exec_output("call_priv_x"))
+        self.assertEqual({key: got.get("code_mode", {}).get(key) for key in ("exec_calls", "nested_items", "unattributed_items")},
+                         {"exec_calls": 1, "nested_items": 0, "unattributed_items": 0})
+        self.assertEqual(got["sandbox_operations"], 0)
+
+    def test_turn_aliases_end_nesting_and_other_direct_calls_do_not(self):
+        # A cell keeps running after exec returns (description.rs: yield_control, and the wait tool resumes it), so another
+        # direct call between an exec and an item no longer ends the exec's nesting; only the turn bounds it. The turn events
+        # are every name this module reads: task_started (alias turn_started) and task_complete (alias turn_complete)
+        # (protocol.rs:1403-1415), turn_aborted, and the attempt ends task_completed, turn_completed and turn_failed.
+        def curl(key, path):
+            return sourced_command(key, ["bash", "-lc", "curl https://example.org/" + path], "unified_exec_startup")
+        got = u3_measure(PAGINATED_META, exec_call("call_priv_x", EXEC_FETCH_JS),
+                         codex_row("response_item", {"type": "function_call", "call_id": "call_priv_p", "name": "update_plan",
+                                                     "arguments": "{}"}),
+                         codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_p", "output": "ok"}),
+                         curl("item_n1", "a"), curl("item_n2", "b"), codex_row("event_msg", {"type": "turn_complete"}),
+                         curl("item_d1", "c"), codex_row("event_msg", {"type": "turn_started"}),
+                         exec_call("call_priv_y", EXEC_FETCH_JS), codex_row("event_msg", {"type": "turn_failed"}),
+                         curl("item_d2", "d"))
+        self.assertEqual(got["sandbox_operations"], 2)
+        self.assertEqual({key: got["m4"][key] for key in ("shell_fetch", "ctx_sandbox_fetch")},
+                         {"shell_fetch": 2, "ctx_sandbox_fetch": 2})
+        self.assertEqual({key: got.get("code_mode", {}).get(key) for key in ("exec_calls", "nested_items", "unattributed_items")},
+                         {"exec_calls": 2, "nested_items": 2, "unattributed_items": 2})
+
+    def test_code_mode_counters_count_once_in_the_window_of_their_first_record(self):
+        # As codex_commands (commit 6): an exec or wait call, and a nested or unattributed item, counts once, in the window of
+        # its first record, so adjacent windows add up; nesting reads every own record before until, so an item after since
+        # whose exec came before it is still nested, and a wait in that window is still the exec's.
+        def at(hour, minute, row):
+            return {**row, "timestamp": f"2026-10-20T{hour:02d}:{minute:02d}:00Z"}
+        rows = [at(0, 30, PAGINATED_META), at(0, 40, codex_row("event_msg", {"type": "task_started"})),
+                at(1, 0, exec_call("call_priv_x", EXEC_FETCH_JS)),
+                at(1, 1, exec_output("call_priv_x", "Script running with cell ID 1")),
+                at(1, 30, sourced_command("item_n1", ["bash", "-lc", "ls"], "unified_exec_startup")),
+                at(2, 30, sourced_command("item_n2", ["bash", "-lc", "ls"], "unified_exec_startup")),
+                at(2, 40, codex_row("response_item", {"type": "function_call", "call_id": "call_priv_w", "name": "wait",
+                                                      "arguments": json.dumps({"cell_id": "1"})})),
+                at(2, 41, codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_w",
+                                                      "output": "w" * 100})),
+                at(3, 0, codex_row("event_msg", {"type": "task_complete"})),
+                at(3, 10, codex_row("event_msg", {"type": "task_started"})),
+                at(3, 20, sourced_command("item_d1", ["bash", "-lc", "ls"], "unified_exec_startup")),
+                at(3, 30, codex_row("event_msg", {"type": "task_complete"}))]
+        keys = ("exec_calls", "wait_calls", "nested_items", "unattributed_items")
+
+        def measure(since, until):
+            return S.measure_codex_records(rows, since=S.parse_iso(f"2026-10-20T{since:02d}:00:00Z"),
+                                           until=S.parse_iso(f"2026-10-20T{until:02d}:00:00Z"))
+        whole, first, second = measure(0, 4), measure(0, 2), measure(2, 4)
+        counts = [{key: got.get("code_mode", {}).get(key) for key in keys} for got in (whole, first, second)]
+        self.assertEqual(counts[0], {"exec_calls": 1, "wait_calls": 1, "nested_items": 2, "unattributed_items": 1})
+        self.assertEqual(counts[2], {"exec_calls": 0, "wait_calls": 1, "nested_items": 1, "unattributed_items": 1})
+        self.assertEqual({key: (counts[1][key] or 0) + (counts[2][key] or 0) for key in keys}, counts[0])
+        # The window's wait output is code mode; the unattributed item's own output is a direct Bash result.
+        self.assertEqual({carrier: sizes["results"] for carrier, sizes in second["by_carrier"].items()},
+                         {"code_mode": 1, "bash": 1})
+        self.assertEqual(second["sandbox_operations"], 1)
+
+    def test_groups_sum_the_code_mode_counters(self):
+        # aggregate_codex_lanes sums measurement.code_mode over the group's actors, as it sums codex_commands.
+        def rollout(key):
+            return [{**PAGINATED_META, "payload": {**PAGINATED_META["payload"], "id": "u3-session-" + key}},
+                    codex_row("response_item", developer(CATALOG)), exec_call("call_priv_" + key, EXEC_FETCH_JS),
+                    sourced_command("item_" + key, ["bash", "-lc", "ls"], "unified_exec_startup"),
+                    exec_output("call_priv_" + key)]
+        root = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            "rollout-2026-10-20T02-00-00-u3-cm-a.jsonl": rollout("a"), "rollout-2026-10-20T02-10-00-u3-cm-b.jsonl": rollout("b")})
+        scan = S.scan_codex_lanes([root], load_fixture_manifest(), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL),
+                                  marker=MARKER)
+        group = scan["groups"]["workers"]["measurement"].get("code_mode", {})
+        self.assertEqual({key: group.get(key) for key in ("exec_calls", "wait_calls", "nested_items", "unattributed_items")},
+                         {"exec_calls": 2, "wait_calls": 0, "nested_items": 2, "unattributed_items": 0})
+
     @pending("commit 8: legacy-mode spans")
     def test_a_legacy_exec_with_fetch_sites_and_no_items_is_unobservable(self):
         # F1 and its controls.
