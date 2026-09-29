@@ -1560,6 +1560,8 @@ def t14_check(text, *, run_token, starts, q, background_pending, survivors, read
     reported = reported_identities(text, run_token)
     q_seconds = iso_seconds(q)
     reasons, soft = set(), set()
+    expected = [name for name, start in starts.items() if start is not None and iso_seconds(start) is not None
+                and iso_seconds(start) < q_seconds]
     for identity in reported:
         if identity not in starts:
             reasons.add("session_outside_table")
@@ -1567,11 +1569,9 @@ def t14_check(text, *, run_token, starts, q, background_pending, survivors, read
             soft.add("start_unresolved")
         elif iso_seconds(starts[identity]) >= q_seconds:
             reasons.add("session_not_before_query")
-    if readings["R2-19"] == "equal":
-        expected = [name for name, start in starts.items() if start is not None and iso_seconds(start) is not None
-                    and iso_seconds(start) < q_seconds]
-        if [name for name in expected if name not in reported]:
-            reasons.add("session_missing")
+    if readings["R2-19"] == "equal" and [name for name in expected if name not in reported]:
+        reasons.add("session_missing")
+    detail = {"reported": len(reported), "expected": len(expected)}  # the descriptive ratio (R11)
     plain = text
     for identity in reported:
         plain = plain.replace(identity, "ID")
@@ -1583,8 +1583,8 @@ def t14_check(text, *, run_token, starts, q, background_pending, survivors, read
     if background_pending or survivors:
         (reasons if readings["R2-20"] == "fail" else soft).add("owned_process_survives")
     if reasons:
-        return fc.fail(*reasons)
-    return fc.unknown(*soft) if soft else fc.ok()
+        return fc.fail(*reasons, **detail)
+    return fc.unknown(*soft, **detail) if soft else fc.ok(**detail)
 
 
 _WRAPPER_WORDS = frozenset({"nohup", "setsid", "env", "command", "exec", "time", "nice", "sudo", "stdbuf", "ionice", "rtk",
@@ -2054,7 +2054,8 @@ def role_child_state(child, parent, role, parent_servers):
         if record.get("type") == "response_item" and payload.get("type") == "function_call" and _mcp_server(payload.get("name")):
             servers.add(_mcp_server(payload["name"]))
         item = payload.get("item") if isinstance(payload.get("item"), dict) else {}
-        if record.get("type") == "event_msg" and item.get("type") == "mcp_tool_call" and item.get("server"):
+        # A rollout records an MCP call as an item_completed McpToolCall item (exec events spell it mcp_tool_call).
+        if record.get("type") == "event_msg" and item.get("type") in ("McpToolCall", "mcp_tool_call") and item.get("server"):
             servers.add(str(item["server"]))
     parent_contexts = [_payload(record) for record in parent or [] if record.get("type") == "turn_context"]
     parent_context = parent_contexts[-1] if parent_contexts else None
@@ -2333,6 +2334,17 @@ def _record_facts(attempt, rows, events, row, task, keys, spec, bindings, source
         facts["toon"] = _variants(lambda r: toon_facts(calls, ans, key, r), readings, ["R2-02", "R2-15", "R2-16"])
     if attempt["actor"] == "codex_subagent":
         facts["role_child"] = _role_child(rows or [], row, attempt, bindings, sources)
+    if template == "T34" and isinstance(row.get("transcript"), str) and os.path.exists(row["transcript"]):
+        facts["main_transcript_bytes"] = os.path.getsize(row["transcript"])  # measured separately (RV-30)
+    if template == "T13":
+        page = spec["block"]["pages"]["mcp"]
+        named = [call for call in calls if any(fc.url_matches(found, page, "exact_url") for found in call_urls(call))]
+        first = named[0] if named else None
+        text = (first or {}).get("result_text")
+        facts["conversion"] = {"tool": first["tool"] if first else None, "state": first["state"] if first else None,
+                               "bytes": len(text.encode("utf-8")) if isinstance(text, str) else None,
+                               "missing_scopes": [scope for scope in ("local", "project", "user")
+                                                  if isinstance(text, str) and not fc.has_word(text, scope)] if text else None}
     if template in ("T32", "T33"):
         hooks = _hook_source(attempt, row, sources, arm)
         config = _m12_config(bindings, task, spec)
@@ -2484,6 +2496,23 @@ def _attempt_view(record, row, task, readings, decided):
     return view
 
 
+def _recorded(record, task, components):
+    """Descriptive fields of the private row (c1): payload bytes, main-transcript bytes, conversion state and the T14
+    reported/expected ratio. They decide nothing."""
+    facts = record.get("facts") or {}
+    recorded = {}
+    if task["template"] in ("T9",) + fc.WEB_TEMPLATES and record["answer"]:
+        found = fc.payload_candidates(fc.Answer(record["answer"]["text"], ()))
+        if found:
+            recorded["payload_bytes"] = len(found[0]["text"].encode("utf-8"))
+    for name in ("main_transcript_bytes", "conversion"):
+        if name in facts:
+            recorded[name] = facts[name]
+    if task["template"] == "T14" and "B" in components:
+        recorded["t14"] = dict(components["B"].detail)
+    return recorded
+
+
 def _judgment_key(record):
     return (record["identity"], record["actor"], record["run_index"])
 
@@ -2530,7 +2559,7 @@ def _evaluate(spec, keys, bindings, records, captures, judgments, *, readings=No
                "components": [{"id": name, "class": name, "status": part.status, "reason": ",".join(part.reasons) or None}
                               for name, part in sorted(components.items())],
                "answer_sha256": fc.sha256_hex(record["answer"]["text"]) if record["answer"] else None,
-               "cleanliness": None, "m12_tests": None}
+               "cleanliness": None, "m12_tests": None, "recorded": _recorded(record, task, components)}
         if task["template"] == "T32" and record["class"] == "completed" and "m12" in (record.get("facts") or {}):
             picked = pick(record["facts"]["m12"], readings, decided)
             row["cleanliness"], row["m12_tests"] = picked["clean"], picked["tests"]
