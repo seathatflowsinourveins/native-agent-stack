@@ -14447,8 +14447,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
-      "sha256": "0f1169428c74c10134462db55c0bc095cece95d0aff3f2b1152e42b0caffb4b0",
-      "bytes": 62962
+      "sha256": "7177fb3cc1b557f3aa5173681f7502f20de5ab3cfcde01b9b9aba07a540b44a0",
+      "bytes": 63672
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -43077,8 +43077,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "7868c6ea2816d0873f6d4a04677a67a163945f65bc53ae10a293b4c359c42696",
-      "bytes": 143309
+      "sha256": "e39c991e1d3e09ec3d677438d52a814e9d079ddaef0369e59a3a412a7c577d14",
+      "bytes": 146796
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -43162,8 +43162,8 @@
     },
     {
       "path": "tests/test_freeze_snapshot.py",
-      "sha256": "4ca8149e98cd83c1740da5db1bc48374cfb22dd57cea6247c0201c13d1052d0a",
-      "bytes": 208185
+      "sha256": "cc22318212545f1e5117ae65bc883f50ffd8b89d4c98694313ead5f1a10d639d",
+      "bytes": 211447
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -43717,13 +43717,13 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "3f5ec4ad7d36f21d0555264658af2758e32f7334e0054071b348c0e7d637e9e9",
-      "bytes": 76231
+      "sha256": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0",
+      "bytes": 76436
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "125646e7574c2eb20ca63d4d114096cd9a63ee5a47fc47113e03f2328ad84e49",
-      "bytes": 26160
+      "sha256": "ce628a847708a9660ca816f0ba5239a32e6b470759a8911cdb01d25e233602b3",
+      "bytes": 27024
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
@@ -43742,8 +43742,8 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "77aa58e8a3a996ac5b26bccf8255d83d552c4cd608e05cced3b71713e5ee3fbe",
-      "bytes": 34990
+      "sha256": "80bf17335813ac07c27863a9ad6f38948245f1d8109fc86a6c4bb861fa2fa554",
+      "bytes": 35185
     },
     {
       "path": "tools/adoption/render_config.py",
@@ -44002,13 +44002,13 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "833c8f47df386b13d8dddec608a6c52547cb2765b7993866a5e243b2f5406a7a",
-      "bytes": 33257
+      "sha256": "da5d5f7e70556bcea2899964773ce831e60a42001b5681da94c92ff536ac1ffc",
+      "bytes": 33724
     },
     {
       "path": "tools/token-e2e/freeze_snapshot.py",
-      "sha256": "ad491a1384840237b17028eebba131e699e88a74d1985807f12e956c9a1487a1",
-      "bytes": 125401
+      "sha256": "460fed357dc2e4332d56f2ec41b9ec313742c4d806b7abf4279918a900522ec0",
+      "bytes": 126527
     },
     {
       "path": "tools/token-report/README.md",
