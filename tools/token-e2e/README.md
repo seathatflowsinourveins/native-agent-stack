@@ -36,7 +36,8 @@ python3 -B $T list-frozen [--config freeze.json] [--repo <checkout>] [--all] [--
   added hook or block is a failure, and so is an item that is in error. A sealed absence (`missing`) passes while the
   capture is absent too.
 - `list-frozen` prints `<id><TAB><how to check>` for every frozen item and family (`--all` adds the informational ones,
-  `--json` prints id, class, family, owner and how). It runs no capture and needs no checkout.
+  `--json` prints id, class, family, owner and how). It runs no capture and needs no checkout; without `--repo` it checks
+  the paths of a configuration against the home directory only.
 
 Exit status: `0` done (compare: no frozen drift; check: all pass), `1` a frozen item drifted or failed, `2` a usage, input
 or configuration error, `3` the privacy guard refused the output (nothing was written).
@@ -168,6 +169,15 @@ four items as `missing` with reason `skipped`.
 - `tools.qmd.*` counts move when anything updates the index. On the workstation host the index changed on its own between
   the amendment notes and this unit's captures (285 files and no pending in the notes, 288 files and 15 pending later), so
   the seal is only meaningful when no update, embed or cleanup runs, as the freeze already requires.
+- `claude mcp list` starts each configured server to test it, so a `claude.mcp.<name>` flag can flip between W-start and
+  W-end without any file changing (a slow start, a server that needs a network). Read such a drift before treating it as a
+  change of configuration; `claude.mcp_count` and the file hashes tell the two apart.
+- `ai-memory` and `cognee-live` are not systemd user units on the workstation host (`load_state` is `not-found`), so the
+  seal freezes their absence. Name the real unit in `units` if a host runs them as units.
+- A gateway's build identifier is read from its HTTP answer (a JSON field or a header), because the tool never requests a
+  unit's `Environment`; a build id kept only in a unit's environment is not captured.
+- `shell-parser.pin.json` ships with U1, so `tools.parser.*` are `missing` on a checkout that predates it, and the seal
+  then freezes that absence.
 - Only the first configuration flag of a unit's `ExecStart` is hashed. A unit that reads its configuration from an
   environment variable or from arguments the flags above do not name reports `not_applicable`.
 - macOS: `services.*` and the memory item report `not_applicable`; the other items are unverified there because no macOS

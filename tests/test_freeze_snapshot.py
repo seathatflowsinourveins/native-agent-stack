@@ -15,6 +15,7 @@ mutant files and each one's exit code and failing assertion.
 
 from __future__ import annotations
 
+import concurrent.futures
 import contextlib
 import hashlib
 import http.server
@@ -1083,6 +1084,16 @@ class ConfigTests(HostCase):
             result = self.host.capture(self.tool, "c", "--config", str(self.config({"files": [{"id": "x", "path": path}]})))
             self.expect_refused(result, "outside the repository and the home directory")
 
+    def test_list_frozen_applies_the_path_policy_without_a_checkout(self):
+        """list-frozen runs from any directory; with no --repo the home directory is the only root."""
+        for path in ("/etc/hosts", "~/../outside.txt", "../outside.txt", "~/.codex/auth.json"):
+            proc = self.host.run(self.tool, "list-frozen", "--config", str(self.config({"files": [{"id": "x", "path": path}]})))
+            self.assertEqual(proc.returncode, 2, f"{path}: {proc.stdout}{proc.stderr}")
+        for path in ("tools/skill-usage/skill_usage.py", "~/.local/state/x.json", str(self.host.home / "y.txt")):
+            proc = self.host.run(self.tool, "list-frozen", "--config", str(self.config({"files": [{"id": "x", "path": path}]})))
+            self.assertEqual(proc.returncode, 0, f"{path}: {proc.stdout}{proc.stderr}")
+            self.assertIn("extra.x", proc.stdout)
+
     def test_extra_files_units_and_overrides_are_captured(self):
         self.host.write(self.host.home / ".local" / "state" / "report" / "config.json", "{}\n")
         self.host.set_unit("extra-unit", main_pid=9, exec_start="/usr/bin/x --port 1")
@@ -1548,6 +1559,8 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(parse(mixed), {"qmd": False, "serena": False, "ai-memory": True})
         other = "Checking MCP server health\u2026\n\na: x - \u2718 Disconnected\nb: x - Connecting...\nc: x - \u2714 Connected\n"
         self.assertEqual(parse(other), {"a": False, "b": False, "c": True})
+        detail = "Checking MCP server health\u2026\n\nd: x - \u2714 Connected (12 tools)\ne: x - \u2718 Failed to connect (Connected earlier)\n"
+        self.assertEqual(parse(detail), {"d": True, "e": False}, "a Connected status may carry a suffix; the word must lead")
         self.assertEqual(parse("Checking MCP server health…\n\n"), {})
         self.assertEqual(parse("No MCP servers configured\n"), {})
         self.assertIsNone(parse(""))
@@ -1668,6 +1681,8 @@ class MutationControlTests(unittest.TestCase):
     MUTANTS = (
         ("leak_environment_unguarded", (DUMP, GUARD_OFF), "PrivacyTests.test_outputs_contain_no_environment_value_user_host_or_path"),
         ("leak_environment_guarded", (DUMP,), "PrivacyTests.test_outputs_contain_no_environment_value_user_host_or_path"),
+        ("print_environment", (("    items = run_collectors(ctx)\n", "    items = run_collectors(ctx)\n    print(dict(os.environ))\n"),),
+         "PrivacyTests.test_outputs_contain_no_environment_value_user_host_or_path"),
         ("guard_disabled", (GUARD_OFF,), "PrivacyTests.test_capture_refuses_when_an_environment_value_would_be_written"),
         ("blind_repo", (blind_patch("repo"),), "DriftTests.test_repo_class_drift"),
         ("blind_roles", (blind_patch("roles"),), "DriftTests.test_roles_class_drift"),
@@ -1711,21 +1726,27 @@ class MutationControlTests(unittest.TestCase):
     def test_each_mutant_fails_the_test_for_its_property(self):
         source = DEFAULT_TOOL.read_text(encoding="utf-8")
         folder = self.mutant_dir()
+        prepared = []
         for name, patches, target in self.MUTANTS:
+            mutated = source
+            for anchor, replacement in patches:
+                self.assertEqual(mutated.count(anchor), 1, f"{name}: anchor not found exactly once: {anchor!r}")
+                mutated = mutated.replace(anchor, replacement)
+            compile(mutated, name, "exec")  # a mutant that does not compile would fail every test for the wrong reason
+            path = folder / name / "freeze_snapshot.py"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(mutated, encoding="utf-8")
+            prepared.append((name, path, target))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, os.cpu_count() or 2)) as pool:
+            results = list(pool.map(lambda entry: self.nested(entry[1], entry[2]), prepared))
+        for (name, path, target), proc in zip(prepared, results):
             with self.subTest(mutant=name):
-                mutated = source
-                for anchor, replacement in patches:
-                    self.assertEqual(mutated.count(anchor), 1, f"{name}: anchor not found exactly once: {anchor!r}")
-                    mutated = mutated.replace(anchor, replacement)
-                compile(mutated, name, "exec")  # a mutant that does not compile would fail every test for the wrong reason
-                path = folder / name / "freeze_snapshot.py"
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text(mutated, encoding="utf-8")
-                proc = self.nested(path, target)
-                tail = "\n".join(proc.stderr.splitlines()[-14:])
-                (folder / name / "result.txt").write_text(f"target: {target}\nexit: {proc.returncode}\n{tail}\n", encoding="utf-8")
+                lines = proc.stderr.splitlines()
+                shown = [line for line in lines if line.startswith(("AssertionError", "FAILED"))][:4]
+                (folder / name / "result.txt").write_text(f"target: {target}\nexit: {proc.returncode}\n" + "\n".join(shown) + "\n",
+                                                          encoding="utf-8")
                 self.assertNotEqual(proc.returncode, 0, f"{name}: {target} still passes against the mutant")
-                self.assertIn("FAILED", proc.stderr, f"{name}: the nested run did not fail on an assertion\n{tail}")
+                self.assertIn("FAILED", proc.stderr, f"{name}: the nested run did not fail on an assertion\n" + "\n".join(lines[-14:]))
 
 
 if __name__ == "__main__":

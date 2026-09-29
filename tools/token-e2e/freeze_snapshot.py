@@ -382,9 +382,9 @@ def is_credential_store(path: str, home: Path) -> bool:
 
 
 def check_path_policy(text: str, home: Path, repo: Optional[Path], allow_relative: bool = True) -> Path:
-    """The absolute path for a configuration or unit-file path, or PathRefused. A relative path is relative to the
-    checkout, and a unit file's own relative path is refused (allow_relative=False) because its base is unknown. With no
-    checkout only the credential rule applies (list-frozen without --repo)."""
+    """The path for a configuration or unit-file path, or PathRefused. A relative path is relative to the checkout, and a
+    unit file's own relative path is refused (allow_relative=False) because its base is unknown. The path must lie inside
+    the checkout or the home directory (symlinks resolved); with no checkout, inside the home directory."""
     if not isinstance(text, str) or not text or "\x00" in text:
         raise PathRefused("invalid")
     if is_credential_store(text, home):
@@ -402,13 +402,17 @@ def check_path_policy(text: str, home: Path, repo: Optional[Path], allow_relativ
     path = Path(os.path.normpath(path))
     if is_credential_store(str(path), home):
         raise PathRefused("credential_store")
-    if repo is not None:
-        roots = (home, repo)
+    # With no checkout (list-frozen without --repo) the home directory is the only known root, and a relative path may
+    # not climb out of the checkout it will later be read from.
+    roots = (home, repo) if repo is not None else (home,)
+    if path.is_absolute():
         if not any(under(path, root) for root in roots):
             raise PathRefused("outside_roots")
         real = Path(os.path.realpath(path))
         if not any(under(real, Path(os.path.realpath(root))) for root in roots):
             raise PathRefused("outside_roots")
+    elif path.parts[:1] == ("..",):
+        raise PathRefused("outside_roots")
     return path
 
 
