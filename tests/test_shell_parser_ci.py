@@ -58,12 +58,14 @@ ENV_NAME = "CHILD_USAGE_SHELL_PARSER"
 # The one job that provisions the parser today, and so the one job whose provisioning step this module inspects.
 PROVISIONING_WORKFLOW = "validate.yml"
 PROVISIONING_JOB = "validate"
+PROVISIONING_KEY = f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"
 # Whole-suite jobs that do not provision the parser yet: adoption-bootstrap.yml runs the suite on macOS in its
 # validate-macos job (step "Run the full test suite (gating on macOS)"; the job is a required check in
 # .github/main-ruleset.json) and catalog-freshness.yml runs it weekly in its freshness job (step "Run project test
-# suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs and says so. Provision
-# the job in its own workflow, then delete its entry:
-# test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap fails while an entry is stale.
+# suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs and says so. To close a
+# gap, add a provisioning step to that job in its own workflow and delete its entry here, nothing else: until the entry
+# is deleted the ratchet reports it as stale (test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap),
+# and once it is deleted the runtime tripwire and the structure checks hold that job like validate.yml's.
 KNOWN_UNPROVISIONED = {"adoption-bootstrap.yml:validate-macos", "catalog-freshness.yml:freshness"}
 # The read-only check the handbook gives a host, run from the repository root.
 CHECK_PREFIX = "node --input-type=module -e "
@@ -317,13 +319,14 @@ def mentions(step, key):
 CATEGORIES = ("missing", "order", "derived", "export", "enforced")
 
 
-def provisioning_problems(text):
-    """(category, message) for each way the validate job's provisioning departs from what this module requires. With
-    no single provisioning step to inspect, every category is reported: nothing passes by having nothing to check."""
-    job = jobs(text).get(PROVISIONING_JOB)
+def provisioning_problems(text, job_id=PROVISIONING_JOB):
+    """(category, message) for each way the provisioning of job `job_id` in the workflow `text` departs from what this
+    module requires. With no single provisioning step to inspect, every category is reported: nothing passes by having
+    nothing to check."""
+    job = jobs(text).get(job_id)
     found = provisioning_indexes(step_blocks(job)) if job is not None else []
     if len(found) != 1:
-        reason = f"no {PROVISIONING_JOB} job" if job is None else f"expected one step that reads the pin file, found {len(found)}"
+        reason = "no such job" if job is None else f"expected one step that reads the pin file, found {len(found)}"
         return [(category, reason) for category in CATEGORIES]
     steps = step_blocks(job)
     step = uncommented(steps[found[0]])
@@ -352,8 +355,57 @@ def provisioning_problems(text):
     return problems
 
 
-def categories(text):
-    return {category for category, _ in provisioning_problems(text)}
+def categories(text, job_id=PROVISIONING_JOB):
+    return {category for category, _ in provisioning_problems(text, job_id)}
+
+
+def workflow_texts():
+    """{file name: text} of every workflow of this repository."""
+    return {path.name: path.read_text(encoding="utf-8") for path in sorted(WORKFLOWS.glob("*.yml"))}
+
+
+def suite_jobs(texts):
+    """{'<workflow file>:<job id>': job text} for each job of `texts` ({workflow file: text}) that runs the whole suite."""
+    found = {}
+    for name, text in sorted(texts.items()):
+        for job_id, job_text in jobs(text).items():
+            if any(runs_whole_suite(args) for args in unittest_invocations(job_text)):
+                found[f"{name}:{job_id}"] = job_text
+    return found
+
+
+def provisioning_jobs(found):
+    """The keys of `found` (see suite_jobs) that have a step reading the pin file."""
+    return {key for key, job_text in found.items() if provisioning_indexes(step_blocks(job_text))}
+
+
+def provisioning_targets(texts):
+    """{'<workflow file>:<job id>': (workflow text, job id)} for the jobs whose provisioning step the structure checks
+    inspect: validate.yml's job always, so that a dropped step leaves something to fail, and every other whole-suite job
+    that reads the pin (a recorded gap that is provisioned later is checked with no edit here)."""
+    targets = {}
+    for key in sorted({PROVISIONING_KEY} | provisioning_jobs(suite_jobs(texts))):
+        name, _, job_id = key.partition(":")
+        targets[key] = (texts[name], job_id)
+    return targets
+
+
+def ratchet_problems(texts, gaps=KNOWN_UNPROVISIONED):
+    """(category, message) for each way the whole-suite jobs of `texts` ({workflow file: text}) depart from the
+    ratchet. 'unlisted': a job runs the suite without a step that reads the pin and is not in `gaps`. 'stale': an entry
+    of `gaps` names a job that provisions, no longer runs the suite or is gone. 'required': validate.yml's job does not
+    provision, or is listed as a gap."""
+    found = suite_jobs(texts)
+    installing = provisioning_jobs(found)
+    without = set(found) - installing
+    problems = [("unlisted", f"{key} runs the whole suite without installing the parser and is not a recorded gap: "
+                             "add the provisioning step to its workflow") for key in sorted(without - gaps)]
+    problems += [("stale", f"{key} is a recorded gap but does not run the whole suite without the parser: "
+                           "delete its entry from KNOWN_UNPROVISIONED") for key in sorted(gaps - without)]
+    if PROVISIONING_KEY not in installing or PROVISIONING_KEY in gaps:
+        problems.append(("required", f"{PROVISIONING_KEY} must run the whole suite with the provisioning step "
+                                     "and cannot be a recorded gap"))
+    return problems
 
 
 def step_span(lines, index):
@@ -383,10 +435,16 @@ def run_script(step):
 
 
 class ProvisioningStepTests(unittest.TestCase):
-    text = VALIDATE_YML.read_text(encoding="utf-8")
+    """The structure checks on validate.yml's provisioning step and on that of any other whole-suite job that reads the
+    pin, and the ratchet over the whole-suite jobs."""
+
+    texts = workflow_texts()
+    text = texts[PROVISIONING_WORKFLOW]
 
     def assertClean(self, category):
-        self.assertEqual([message for found, message in provisioning_problems(self.text) if found == category], [])
+        for key, (text, job_id) in provisioning_targets(self.texts).items():
+            with self.subTest(key):
+                self.assertEqual([message for found, message in provisioning_problems(text, job_id) if found == category], [])
 
     def test_provisioning_step_exists_in_the_validate_job(self):
         self.assertClean("missing")
@@ -410,16 +468,7 @@ class ProvisioningStepTests(unittest.TestCase):
         self.assertTrue(any(runs_suite(step) for step in step_blocks(job)), "that job does not run the whole suite")
 
     def test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap(self):
-        provisioning, without = set(), set()
-        for path in sorted(WORKFLOWS.glob("*.yml")):
-            for job_id, job_text in jobs(path.read_text(encoding="utf-8")).items():
-                if any(runs_whole_suite(args) for args in unittest_invocations(job_text)):
-                    steps = step_blocks(job_text)
-                    (provisioning if provisioning_indexes(steps) else without).add(f"{path.name}:{job_id}")
-        self.assertEqual(provisioning, {f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"},
-                         "the jobs that provision the parser: a job renamed or a second one added needs the tripwire's keys updated")
-        self.assertEqual(without, KNOWN_UNPROVISIONED,
-                         "whole-suite jobs without the parser: provision a new one, or delete the entry of a job that now does")
+        self.assertEqual(ratchet_problems(self.texts), [])
 
 
 class ProvisioningControls(unittest.TestCase):
