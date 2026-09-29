@@ -551,6 +551,7 @@ the five, and added three follow-ups that are not pin changes:
 `bin/vllm` on this host still points at the 0.25.0 prefix (rollback there reopens
 advisories patched in 0.30.0); ccusage has a `v20.0.25` tag whose release run failed, so it
 is unpublished; and `manifests/landscape.json` still lists stale latest-release identities.
+Update 2026-09-27: closed on this host. `bin/vllm` now points at the 0.30.0 prefix (repointed 2026-09-27T19:21:18Z); the 0.25.0 prefix is retained and no systemd unit uses the symlink. Source: the coordinator's host observation of 2026-09-27.
 
 **Alternatives.** None: no newer stable release exists.
 
