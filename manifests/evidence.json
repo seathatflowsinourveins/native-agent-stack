@@ -12746,6 +12746,26 @@
       "bytes": 3775
     },
     {
+      "path": "blueprints/us-equities/mover-coverage-asof/README.md",
+      "sha256": "89e8ef369aa8b5dcfd70f92ea9daa2a690d2d828c2a917210003f5dd8b0f4cdc",
+      "bytes": 11026
+    },
+    {
+      "path": "blueprints/us-equities/mover-coverage-asof/evidence/summary-asof-20260929.json",
+      "sha256": "1258bd04252ad100acc9f81b821f739d77e49b6348fa8efad7b97084f34aacde",
+      "bytes": 8414
+    },
+    {
+      "path": "blueprints/us-equities/mover-coverage-asof/plan.json",
+      "sha256": "5a5937e16f33c69e08034eb9f9bfb02acad05d2f8a929148e4d1c8bb3f2d9951",
+      "bytes": 18173
+    },
+    {
+      "path": "blueprints/us-equities/mover-coverage-asof/refetch.py",
+      "sha256": "fc6d5415550198601d1089f92d722026622e41ff2b12758e3a2c0b9e1f99d3e4",
+      "bytes": 66245
+    },
+    {
       "path": "blueprints/us-equities/mover-early-entry/README.md",
       "sha256": "8c37692847b59a0b5bb28cd933a4ca59f0bd6b12528314dae72b57e670035ea7",
       "bytes": 5900
@@ -42694,6 +42714,11 @@
       "path": "tests/test_memory_lifecycle_v2.py",
       "sha256": "56d285d7cb593c576239478d889aa53209d02804cc2e2df5ce380d79c275d3a0",
       "bytes": 55929
+    },
+    {
+      "path": "tests/test_mover_coverage_asof.py",
+      "sha256": "486a7cb95c29f581a0a83e5eb4a3cd5996905ce340148e18bfba6cba715b7e13",
+      "bytes": 40947
     },
     {
       "path": "tests/test_mover_early_entry_pipeline.py",

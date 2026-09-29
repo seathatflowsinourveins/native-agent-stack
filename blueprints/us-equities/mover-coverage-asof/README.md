@@ -86,3 +86,54 @@ These choices are made in the code and tested. They do not edit the frozen plan.
 `TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 <pinned python> -m unittest tests.test_mover_coverage_asof`. The 33 tests
 are synthetic: made-up tickers, dates and prices, with no network, credential or private row. Five need numpy for the
 degree tiers and are skipped without it.
+
+## Run 2026-09-29 (`asof-20260929`)
+
+The committed record is `evidence/summary-asof-20260929.json` (totals only; each private file by sha256).
+
+**E1, the primary estimand, did not run.** The gate refused with `inputs_missing` and sent no request, because the
+three pinned private inputs (audit results `7e8b6999…`, main candidates `afe22552…`, pre-market supplement
+`e8ea2dc3…`) are not on this host. This run therefore reports no `(498 + recovered) / 594` figure, and no reason
+class for any of the 96 missed events. E1 needs those three files copied into the run's `inputs/` with their sha256
+checked. After that it needs one `gate`, `fetch`, `classify` and `classify --verify` run.
+
+**E2, the secondary estimand, ran.** The run used the transient user unit `asof-20260929-e2` (CPUWeight=20, Nice=10,
+MemoryMax=8G, paper key pair 1, market data only).
+- The unit finished with result success and exit status 0, in 4 min 21.8 s and 18.4 s of CPU. systemd printed a
+  memory peak of 1016.0K, which is implausibly low for this workload and is not treated as a measurement. A probe
+  unit showed that the unit cgroup's `memory.max` and `cpu.weight` do apply.
+- It sent 3,585 requests, all HTTP 200, and no leg ended in an error. The control was sent at 02:11:45Z (22:11 ET on
+  2026-09-28).
+- A second classify on the same snapshots was byte-identical.
+- The fetch ran at code revision `291c9909`, from a clean tree. After the first classify, the post-hoc
+  outside-N2 total was added in `2f32494f`. In `99dfec7c` the classify revision moved from `summary.json` to
+  `verify.json`, so the classify outputs depend on the snapshots alone. Classify and verify were then rerun offline at
+  `99dfec7c` on the unchanged snapshots: `results.json` and `labels.json` came out byte for byte as the unit's own
+  classify, and only `summary.json` gained the new total.
+
+| Measure (E2) | Result |
+|---|---|
+| Package events dated 2021-01-04..2025-12-31 | 715 |
+| N2: new-vintage v2 `match` or `recovered_match` with a gain of at least 20% | 594. By tier: 23, 64, 246, 214, 43 and 4, the committed counts exactly (N2 - 594 = 0 in every tier) |
+| Frozen candidate rule on the as-of F1 bars, among N2 | 594 touch passes, with no derivative, missing-row or below-touch case |
+| F2 (the event's own symbol, as of 2026-09-21) on d, among N2 | same issuer 594, other issuer 0, no row 0 |
+| F2 outside N2 (post hoc, the other-issuer side of the same test) | same issuer 115, other issuer 4, no event data 2 |
+| Package verdicts in the new vintage | 395 match, 202 recovered_match, 67 mismatch, 43 recovered_mismatch, 6 no_prev_close, 2 no_source_data |
+| Flags among N2 | 14 basis-uncertain, 3 OTC as known, no gap over 7 days |
+| Positive control | KOD and LFCR both fire the touch rule: passed |
+| Exposure | 979 of 155,642 price rows fall before 2021-01-04 (lookback into 2020); none falls in 2026-01-02..2026-09-18 |
+
+What E2 shows: on the rederived set, a daily re-fetch keyed by each event's own symbol with `asof` = the event date
+places every N2 event in the frozen candidate superset. The event's own symbol, queried as of 2026-09-21, still
+returns the same issuer's bar on d for every N2 event. So neither the touch rule on as-of data nor a reused ticker
+accounts for any N2 event. The identity test can also report the other side: outside N2 it returned another issuer
+for 4 events.
+
+What E2 does not show: it cannot identify the 96 missed events or measure E1's coverage. N2 matches the committed 594
+tier by tier, but E2 cannot show that it is the same set of events. Three explanations for the 96 remain open:
+- a rename, where the frozen daily rows sit under a successor symbol that `coverage()` never keys
+  (`recovered_keyed_under_successor`);
+- a rename that splits the rows on the event date;
+- a collection step: asset-list enumeration, today's OTC exclusion, placeholder symbols or identity dedup.
+
+Separating them needs E1 and, for the collection steps, the private daily dataset (plan `not_measured`).
