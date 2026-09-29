@@ -7,6 +7,7 @@ Credential-shaped values, home paths and identifiers are built at runtime so thi
 file passes `python3 scripts/validate.py --scan-file`.
 """
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -2632,6 +2633,365 @@ class ResolverWorkerTests(unittest.TestCase):
                 self.assertEqual(self.worker.main(), 0)
             start.assert_called_once_with("task text", "rw-openhands-res-12-20260928", "control", resolver=resolver)
             write.assert_called_once()
+
+
+RUN_ID = "rw-openhands-res-12-20260928"
+SKILL_PATH = "blueprints/runtime-workers/openhands/skills/resolver"
+GATE_PROVIDERS = {"control": ["codex"], "engines-on": ["openai-compatible-responses-*"]}
+
+
+def origin_fixture(root, files, *, later=None):
+    """A bare "origin" with main at a base commit and, optionally, one later commit on main."""
+    work = Path(root) / "origin-work"
+    work.mkdir()
+    run_git(work, "init", "-q", "-b", "main")
+    for relative, data in files.items():
+        write_file(work, relative, data)
+    base = commit_all(work, "base")
+    newer = None
+    if later:
+        for relative, data in later.items():
+            write_file(work, relative, data)
+        newer = commit_all(work, "later")
+    bare = Path(root) / "origin.git"
+    subprocess.run(["git", "clone", "-q", "--bare", str(work), str(bare)], check=True, capture_output=True,
+                   env=hermetic_git_environment())
+    return bare, base, newer
+
+
+class FakeAttempt:
+    """What host.run and dispatch.finish_result read from resolver.ResolverAttempt."""
+
+    def __init__(self, base_sha="e" * 40):
+        self.base_sha, self.instruction, self.keys = base_sha, "Resolve issue 12 within scope.\n", []
+
+    def identity(self):
+        return {"issue": 12, "base_sha": self.base_sha, "owned_paths": ["docs"], "lane": "lane:foundation",
+                "run_id": RUN_ID, "instruction_sha256": "0" * 64}
+
+    def session_sink(self, value):
+        self.keys.append(value)
+
+
+class ResolverHostTests(unittest.TestCase):
+    """host.py in resolver mode: preflight, gates, workspace, skills, mounts and the request."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-host-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.host = load_recipe("host.py")
+        self.pins = json.loads((RECIPE / "pins.json").read_text(encoding="utf-8"))
+
+    def owned_paths(self):
+        prefix = self.tmp / ".local/share/codex-ecosystem/tools" / ("openhands-" + self.pins["version"])
+        state = self.tmp / ".local/state/native-agent-stack/runtime-workers/openhands"
+        return prefix, state
+
+    def test_resolver_preflight_skips_memory_embedding_and_qmd_checks(self):
+        prefix, state = self.owned_paths()
+        resolver_host = {"variables": {"HOST_PATH": "/usr/bin:/bin"}, "gateway_providers": GATE_PROVIDERS}
+        with mock.patch.object(self.host.Path, "home", return_value=self.tmp), \
+                mock.patch.object(self.host, "read_host_file", return_value=resolver_host), \
+                mock.patch.object(self.host, "check_rootless") as rootless, \
+                mock.patch.object(self.host, "render_mcp") as render, \
+                mock.patch.object(self.host, "checked_mount") as checked:
+            pins, host_file, mcp = self.host.preflight(prefix, state, resolver=True)
+            self.assertEqual((pins, host_file, mcp), (self.pins, resolver_host, {}))
+            rootless.assert_called_once_with()
+            render.assert_not_called()
+            checked.assert_not_called()
+            # SWE-bench mode still requires the memory, embedding and QMD entries.
+            with self.assertRaises((KeyError, ValueError)):
+                self.host.preflight(prefix, state)
+            # HOST_PATH stays required: the request and server containers' PATH uses it.
+            resolver_host["variables"] = {}
+            with self.assertRaises(ValueError) as caught:
+                self.host.preflight(prefix, state, resolver=True)
+            self.assertEqual(str(caught.exception), "host_path_required")
+
+    def test_session_key_reaches_the_sink_in_memory_only(self):
+        received = []
+        paths = self.host.generate_session_files(self.tmp, RUN_ID, "control", sink=received.append)
+        self.assertEqual(paths, self.host.session_files(self.tmp, RUN_ID, "control"))
+        value = paths[0].read_text().split("=", 1)[1].strip()
+        self.assertEqual(received, [value])
+        self.assertEqual(paths[1].read_text(), f"X-Session-API-Key: {value}\n")
+        # Without a sink nothing else changes.
+        other = self.host.generate_session_files(self.tmp, RUN_ID, "engines-on")
+        self.assertTrue(all(path.is_file() for path in other))
+
+    def test_resolver_request_is_rendered_with_the_resolver_flag_and_the_sink(self):
+        dispatch = load_recipe("dispatch.py")
+        recipe = load_recipe("recipe.py")
+        result = self.tmp / "runs" / RUN_ID / "control"
+        (result / "worker").mkdir(parents=True)
+        rendered, commands, received = [], [], []
+
+        def render(args, name, log, timeout):
+            rendered.append(args)
+            (result / "worker/start.json").write_text(json.dumps({"agent": {}, "workspace": {}}))
+            return 0
+
+        topology = {kind: {"name": f"{RUN_ID}-control-{kind}", "id": kind * 32} for kind in ("int", "gw")}
+        with mock.patch.dict(sys.modules, {"dispatch": dispatch}), \
+                mock.patch.object(self.host, "execute_container", side_effect=render), \
+                mock.patch.object(self.host, "create_topology", return_value=topology), \
+                mock.patch.object(self.host, "logged_command", side_effect=lambda argv, *a, **k: commands.append(argv) or 0), \
+                mock.patch.object(dispatch, "check_server", return_value=None):
+            self.host.prepare_native_dispatch(self.tmp, RUN_ID, recipe.arm_config("control"), self.tmp / "prefix",
+                                              self.pins, [], {"variables": {"HOST_PATH": "/usr/bin"}}, port=3740,
+                                              resolver=True, session_sink=received.append)
+        self.assertEqual(rendered[0][-3:], ["/recipe/worker.py", "--request", "--resolver"])
+        value = self.host.session_files(self.tmp, RUN_ID, "control")[0].read_text().split("=", 1)[1].strip()
+        self.assertEqual(received, [value])
+        for argv in rendered + commands:
+            self.assertNotIn(value, " ".join(map(str, argv)))
+
+    def test_resolver_workspace_is_an_anonymous_clone_pinned_to_the_base_without_its_remote(self):
+        bare, base, later = origin_fixture(self.tmp, {"AGENTS.md": "# Rules\n", "docs/a.md": "a\n"},
+                                           later={"docs/a.md": "a moved on\n"})
+        result = self.tmp / "runs" / RUN_ID / "control"
+        (result / "input").mkdir(parents=True)
+        environments, real = [], self.host.logged_command
+
+        def recorded(argv, logfile, **kwargs):
+            environments.append((list(argv), kwargs.get("env")))
+            return real(argv, logfile, **kwargs)
+
+        with mock.patch.object(self.host, "RESOLVER_ORIGIN", str(bare)), \
+                mock.patch.object(self.host, "logged_command", side_effect=recorded):
+            workspace = self.host.resolver_clone(result, base)
+        self.assertEqual(workspace, result / "workspace")
+        git = lambda *args: run_git(workspace, *args).stdout.decode().strip()
+        self.assertEqual(git("rev-parse", "HEAD"), base)
+        self.assertEqual(git("for-each-ref", "--format=%(objectname) %(refname)"), f"{base} refs/heads/main")
+        self.assertEqual(git("remote"), "")
+        self.assertFalse((workspace / ".git/hooks").exists())
+        # The later commit on main is gone: reflog expired and pruned.
+        missing = subprocess.run(["git", "-C", str(workspace), "cat-file", "-e", later], capture_output=True,
+                                 env=hermetic_git_environment())
+        self.assertNotEqual(missing.returncode, 0)
+        clone_argv = environments[0][0]
+        for word in ("--template=", "--no-tags", "--single-branch", "credential.helper="):
+            self.assertIn(word, clone_argv)
+        home = result / "git-home"
+        self.assertEqual(stat.S_IMODE(home.stat().st_mode), 0o700)
+        self.assertEqual(list(home.iterdir()), [])
+        for argv, environment in environments:
+            self.assertEqual({key: environment.get(key) for key in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM",
+                                                                  "GIT_TERMINAL_PROMPT", "HOME")},
+                             {"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1",
+                              "GIT_TERMINAL_PROMPT": "0", "HOME": str(home)})
+            self.assertFalse({"GH_TOKEN", "GITHUB_TOKEN", "SSH_AUTH_SOCK", "GIT_ASKPASS"} & set(environment))
+        target = result / "input/agents.md"
+        self.host.write_agents_md(workspace, base, target)
+        self.assertEqual(target.read_text(encoding="utf-8"), "# Rules\n")
+        # A base without AGENTS.md refuses.
+        (self.tmp / "second").mkdir()
+        bare_without, base_without, _ = origin_fixture(self.tmp / "second", {"docs/a.md": "a\n"})
+        other = self.tmp / "runs" / RUN_ID / "engines-on"
+        (other / "input").mkdir(parents=True)
+        with mock.patch.object(self.host, "RESOLVER_ORIGIN", str(bare_without)):
+            workspace = self.host.resolver_clone(other, base_without)
+        with self.assertRaises(ValueError) as caught:
+            self.host.write_agents_md(workspace, base_without, other / "input/agents.md")
+        self.assertEqual(str(caught.exception), "agents_md_unreadable")
+        self.assertFalse((other / "input/agents.md").exists())
+        with self.assertRaises(ValueError):
+            self.host.resolver_clone(self.tmp / "unused", "not-a-sha")
+
+    def test_resolver_skill_is_pinned_to_the_driver_checkouts_committed_bytes(self):
+        repo = self.tmp / "stack"
+        repo.mkdir()
+        run_git(repo, "init", "-q", "-b", "main")
+        write_file(repo, SKILL_PATH + "/SKILL.md", "---\nname: resolver\n---\ncommitted\n")
+        ref = commit_all(repo, "skill")
+        write_file(repo, SKILL_PATH + "/SKILL.md", "---\nname: resolver\n---\nuncommitted edit\n")
+        pin = self.host.resolver_skill_pin(repo)
+        tree = run_git(repo, "rev-parse", f"{ref}:{SKILL_PATH}").stdout.decode().strip()
+        committed = b"---\nname: resolver\n---\ncommitted\n"
+        self.assertEqual(pin, {"ref": ref, "tree_sha": tree,
+                               "skill_md_sha256": hashlib.sha256(committed).hexdigest()})
+        empty = self.tmp / "empty-stack"
+        empty.mkdir()
+        run_git(empty, "init", "-q", "-b", "main")
+        write_file(empty, "README.md", "x\n")
+        commit_all(empty, "no skill")
+        with self.assertRaises(ValueError) as caught:
+            self.host.resolver_skill_pin(empty)
+        self.assertEqual(str(caught.exception), "resolver_skill_pin_unavailable")
+
+    def test_resolver_manifest_reuses_the_runtime_pins_and_passes_the_installer_schema(self):
+        pin = {"ref": "1" * 40, "tree_sha": "2" * 40, "skill_md_sha256": "3" * 64}
+        manifest = self.host.resolver_skills_manifest(ROOT, pin)
+        runtime = json.loads((ROOT / "blueprints/runtime-workers/skills/manifest.json").read_text(encoding="utf-8"))
+        entries = {entry["name"]: entry for entry in runtime["skills"]}
+        self.assertEqual([entry["name"] for entry in manifest["skills"]], ["tdd", "search-first", "resolver"])
+        self.assertEqual(manifest["skills"][:2], [entries["tdd"], entries["search-first"]])
+        self.assertEqual(manifest["skills"][2], {
+            "name": "resolver", "source": "seathatflowsinourveins/native-agent-stack",
+            "url": f"https://github.com/seathatflowsinourveins/native-agent-stack/tree/{'1' * 40}/{SKILL_PATH}",
+            "ref": "1" * 40, "path": SKILL_PATH, "tree_sha": "2" * 40, "skill_md_sha256": "3" * 64,
+            "status": "trial"})
+        self.assertEqual((manifest["scope"], manifest["cli"], manifest["kind"]),
+                         ("project", runtime["cli"], runtime["kind"]))
+        path = self.tmp / "resolver-skills.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        spec = importlib.util.spec_from_file_location("resolver_s2_install_skills", ROOT / "tools/adoption/install_skills.py")
+        installer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(installer)
+        self.assertEqual([skill["name"] for skill in installer.load_manifest(path)["skills"]],
+                         ["tdd", "search-first", "resolver"])
+        # The installer's project schema check passes; the run then stops at the missing
+        # executable, before any gh lookup or add.
+        project = self.tmp / "project"
+        project.mkdir()
+        import contextlib
+        import io
+        errors = io.StringIO()
+        with contextlib.redirect_stderr(errors), contextlib.redirect_stdout(io.StringIO()):
+            code = installer.main(["--manifest", str(path), "--project-dir", str(project), "--agent", "universal",
+                                   "--home", str(self.tmp / "home"), "--skills-bin", str(self.tmp / "no-skills-bin"),
+                                   "--dry-run"])
+        self.assertEqual(code, 1)
+        self.assertNotIn("malformed pinned project skill", errors.getvalue())
+        self.assertIn("not found", errors.getvalue())
+
+    def test_installed_resolver_skills_must_be_exactly_the_pinned_three(self):
+        workspace = self.tmp / "workspace"
+        texts = {name: f"---\nname: {name}\n---\n{name} body\n" for name in ("tdd", "search-first", "resolver")}
+        for name, text in texts.items():
+            write_file(workspace, f".agents/skills/{name}/SKILL.md", text)
+        manifest = {"skills": [{"name": name, "skill_md_sha256": hashlib.sha256(text.encode()).hexdigest()}
+                               for name, text in texts.items()]}
+        path = self.tmp / "resolver-skills.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.assertEqual(self.host.resolver_workspace_skills(workspace, path),
+                         {"names": ["resolver", "search-first", "tdd"],
+                          "manifest_sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+        extra = workspace / ".agents/skills/systematic-debugging"
+        extra.mkdir()
+        with self.assertRaises(ValueError) as caught:
+            self.host.resolver_workspace_skills(workspace, path)
+        self.assertEqual(str(caught.exception), "resolver_installed_skills_mismatch")
+        extra.rmdir()
+        write_file(workspace, ".agents/skills/tdd/SKILL.md", "changed\n")
+        with self.assertRaises(ValueError) as caught:
+            self.host.resolver_workspace_skills(workspace, path)
+        self.assertEqual(str(caught.exception), "installed_project_skill_pin_mismatch")
+        write_file(workspace, ".agents/skills/tdd/SKILL.md", texts["tdd"])
+        (workspace / ".agents/skills/tdd/SKILL.md").unlink()
+        outside = self.tmp / "outside.md"
+        outside.write_text(texts["tdd"], encoding="utf-8")
+        (workspace / ".agents/skills/tdd/SKILL.md").symlink_to(outside)
+        with self.assertRaises(ValueError) as caught:
+            self.host.resolver_workspace_skills(workspace, path)
+        self.assertEqual(str(caught.exception), "skills_must_be_project_local")
+        manifest["skills"].append({"name": "systematic-debugging", "skill_md_sha256": "0" * 64})
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaises(ValueError) as caught:
+            self.host.resolver_workspace_skills(workspace, path)
+        self.assertEqual(str(caught.exception), "resolver_skill_set_mismatch")
+
+    def test_skill_installer_takes_the_resolver_manifest_through_the_same_path(self):
+        workspace = self.tmp / "workspace"
+        (workspace / ".git/info").mkdir(parents=True)
+        with mock.patch.object(self.host.subprocess, "run",
+                               return_value=subprocess.CompletedProcess([], 0)) as run:
+            self.host.install_workspace_skills(ROOT, workspace, manifest=str(self.tmp / "resolver-skills.json"))
+        self.assertEqual(run.call_args.args[0], [
+            sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
+            "--manifest", str(self.tmp / "resolver-skills.json"),
+            "--project-dir", str(workspace), "--agent", "universal"])
+        self.assertEqual((workspace / ".git/info/exclude").read_text(), "\n/.agents/\n/skills-lock.json\n")
+
+    def run_resolver(self, attempt, **patches):
+        """host.run in resolver mode with Docker and every network step replaced."""
+        import contextlib
+        import io
+        prefix, state = self.tmp / "prefix", self.tmp / "state"
+        (prefix / "venv/bin").mkdir(parents=True)
+        (prefix / "venv/bin/python").write_text("")
+        state.mkdir()
+        (state / "installation.json").write_text(json.dumps({"exit_code": 0,
+                                                             "requirements_sha256": self.pins["requirements_sha256"]}))
+        receipts = load_recipe("receipt.py")
+        host_file = {"variables": {"HOST_PATH": "/usr/bin"}, "gateway_providers": GATE_PROVIDERS}
+        mocks = {}
+        with contextlib.ExitStack() as stack:
+            enter = stack.enter_context
+            enter(mock.patch.dict(os.environ, {"OPENHANDS_STACK_ROOT": str(ROOT)}))
+            for name in ("OPENHANDS_ARM", "OPENHANDS_MODEL", "OPENHANDS_BASE_URL", "OPENHANDS_COMPRESSION"):
+                os.environ.pop(name, None)
+            defaults = {"preflight": mock.Mock(return_value=(self.pins, host_file, {})),
+                        "verify_stage_gates": mock.Mock(return_value={}),
+                        "verify_gateway_providers": mock.Mock(return_value=None),
+                        "pinned_image_identity": mock.Mock(return_value="containerd"),
+                        "resolver_clone": mock.Mock(side_effect=lambda result, base: result / "workspace"),
+                        "write_agents_md": mock.Mock(),
+                        "install_resolver_skills": mock.Mock(return_value={"names": ["resolver", "search-first", "tdd"],
+                                                                          "manifest_sha256": "0" * 64}),
+                        "model_visible": mock.Mock(), "execute_container": mock.Mock(return_value=0),
+                        "logged_command": mock.Mock(return_value=0),
+                        "prepare_native_dispatch": mock.Mock(), "run_probe": mock.Mock(return_value=True),
+                        "teardown_attempt": mock.Mock(return_value=True),
+                        "create_receipt": mock.Mock(side_effect=lambda result: receipts.create_receipt(
+                            result, database=result / "absent.sqlite"))}
+            defaults.update(patches)
+            for name, replacement in defaults.items():
+                mocks[name] = enter(mock.patch.object(self.host, name, replacement))
+            enter(contextlib.redirect_stdout(io.StringIO()))
+            code = self.host.run(prefix, state, run_id=RUN_ID, arm="control", prepare_only=True, port=3740,
+                                 resolver=attempt)
+        return code, mocks, state / "runs" / RUN_ID / "control"
+
+    def test_gate_refusal_stops_resolver_mode_before_any_clone_or_container(self):
+        for gate, reason in (("verify_stage_gates", "stage_gate_g2_not_recorded"),
+                             ("verify_gateway_providers", "gateway_provider_outside_allowlist")):
+            with self.subTest(gate=gate):
+                shutil.rmtree(self.tmp / "state", ignore_errors=True)
+                shutil.rmtree(self.tmp / "prefix", ignore_errors=True)
+                attempt = FakeAttempt()
+                code, mocks, result = self.run_resolver(attempt, **{gate: mock.Mock(side_effect=ValueError(reason))})
+                self.assertEqual(code, 3)
+                receipt = json.loads((result / "receipt.json").read_text())
+                self.assertEqual(receipt["failure_stage"], "gates")
+                for name in ("resolver_clone", "install_resolver_skills", "execute_container", "logged_command",
+                             "prepare_native_dispatch", "run_probe", "pinned_image_identity"):
+                    mocks[name].assert_not_called()
+                self.assertFalse((result / "workspace").exists())
+                self.assertEqual(json.loads((result / "resolver-identity.json").read_text()), attempt.identity())
+        stage_gates = mocks["verify_stage_gates"]
+        self.assertEqual(stage_gates.call_args.args, (self.tmp / "state", "control"))
+        self.assertIn("now", stage_gates.call_args.kwargs)
+
+    def test_resolver_attempt_prepares_without_mcp_qmd_or_runtime_mounts(self):
+        attempt = FakeAttempt()
+        code, mocks, result = self.run_resolver(attempt)
+        self.assertEqual(code, 0)
+        mocks["resolver_clone"].assert_called_once_with(result, attempt.base_sha)
+        mocks["write_agents_md"].assert_called_once_with(result / "workspace", attempt.base_sha,
+                                                         result / "input/agents.md")
+        mocks["install_resolver_skills"].assert_called_once_with(ROOT, result / "workspace", result)
+        mocks["execute_container"].assert_not_called()  # no QMD setup container
+        self.assertEqual((result / "input/task.txt").read_text(), attempt.instruction)
+        self.assertEqual(json.loads((result / "input/skills.json").read_text())["names"],
+                         ["resolver", "search-first", "tdd"])
+        self.assertFalse((result / "input/mcp.json").exists())
+        self.assertFalse((result / "mcp").exists())
+        prepare = mocks["prepare_native_dispatch"]
+        base = " ".join(prepare.call_args.args[5])
+        for absent in ("/state/mcp", "/documents/", "serena"):
+            self.assertNotIn(absent, base)
+        for present in (f"src={result}/input,dst=/run-input,readonly", f"src={result}/workspace,dst=/workspace",
+                        "dst=/workspace/.git,readonly", "dst=/workspace/.agents,readonly"):
+            self.assertIn(present, base)
+        self.assertIn(f"src={result}/workspace,dst=/workspace ", base + " ")
+        self.assertEqual(prepare.call_args.kwargs["port"], 3740)
+        self.assertIs(prepare.call_args.kwargs["resolver"], True)
+        self.assertEqual(prepare.call_args.kwargs["session_sink"], attempt.session_sink)
+        self.assertEqual(json.loads((result / "window.json").read_text())["mode"], "resolver")
+        self.assertEqual(json.loads((result / "resolver-identity.json").read_text()), attempt.identity())
 
 
 if __name__ == "__main__":

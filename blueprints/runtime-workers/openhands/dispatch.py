@@ -171,7 +171,7 @@ def stop_server(result, status=None):
         return False
 
 
-def finish_result(result, status, window):
+def finish_result(result, status, window, resolver=None):
     removed = stop_server(result, status)
     execution = status.get("execution_status")
     termination = status.get("agent_termination") or execution
@@ -218,8 +218,12 @@ def finish_result(result, status, window):
     return create_receipt(result)
 
 
-def execute(action, state, run_id, arm):
-    """Exactly one native POST, bounded polling, deterministic host receipt."""
+def execute(action, state, run_id, arm, *, resolver=None):
+    """Exactly one native POST, bounded polling, deterministic host receipt.
+
+    `resolver` is the in-process resolver.ResolverAttempt that host.run passes in
+    resolver mode; the CLI never has one (finish_result).
+    """
     if not re.fullmatch(r"rw-openhands-[a-z0-9-]{1,64}", run_id) or arm not in {"control", "engines-on"}:
         print(json.dumps({"run_id": run_id, "arm": arm, "receipt": None, "failure_stage": "preflight",
                           "task_passed": False, "evidence_complete": False}))
@@ -310,7 +314,7 @@ def execute(action, state, run_id, arm):
                 raise ValueError("native_final_response_contract")
             write_json(result / "final-response.json", response)
             status["agent_termination"] = agent_termination(conversation_id, status.get("execution_status"), port, headers)
-            receipt = finish_result(result, status, window)
+            receipt = finish_result(result, status, window, resolver=resolver)
             write_json(receipt_path, receipt)
             code = result_exit(receipt)
             status.update(status="collected")

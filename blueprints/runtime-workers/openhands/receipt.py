@@ -38,6 +38,11 @@ COLUMNS = (
 )
 EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max", "auto"}
 AGENT_TERMINATIONS = {"finished", "error", "stuck", "max_iterations_reached"}
+# Any other recorded stage reads as None. Resolver mode adds "gates" (host.run) and the
+# driver's host-side stages after the export (resolver.ResolverAttempt.finish).
+FAILURE_STAGES = frozenset({"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start",
+                            "probe", "wait", "result", "deadline",
+                            "gates", "clone", "apply", "commit", "push", "pr"})
 NOT_COLLECTED = "not_collected"
 NOT_COLLECTED_REASON = (
     "The model terminal runs under the agent-server's UID, which can write both /run-output "
@@ -274,7 +279,7 @@ def create_receipt(result, database=None):
         "agent_termination": termination if termination in AGENT_TERMINATIONS else None,
         "agent_termination_basis": ("agent-server REST status and latest ConversationErrorEvent; the server shares "
                                     "the model terminal's UID and store, so this selects exit 1 or 3 only"),
-        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in {"preflight", "prepare", "skills", "qmd_setup", "agent", "export", "grader", "start", "probe", "wait", "result", "deadline"} else None,
+        "failure_stage": window.get("failure_stage") if window.get("failure_stage") in FAILURE_STAGES else None,
         "task_passed": task_passed,
         # The terminal shares the SDK's UID and writable persistence. Source:
         # SDK@fcc102a tools/terminal/terminal/subprocess_terminal.py:157-170.
