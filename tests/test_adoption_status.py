@@ -57,6 +57,15 @@ url = "http://{PRIVATE}/mcp"
 """
 CODEX_CONFIG = CODEX_BASE + "\n[features]\nhooks = true\n"  # as the recipe's `codex features enable hooks` writes it
 SERVERS = ("serena", "socraticode", "ai-memory")
+# The two Codex role carriers (adoption/agents/codex/SHA256SUMS names exactly these two files). The fixtures give each
+# a text that holds PRIVATE, so a test proves the check compares bytes and lets no file text into its report.
+ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
+
+
+def role_bytes(name: str) -> bytes:
+    return f"# {name}\n# {PRIVATE}\nname = \"{name[:-len('.toml')]}\"\n".encode("utf-8")
+
+
 WIRED = {
     "claude": {"rtk_hook": True, "ai_memory_hook_events": 8, "context_mode_plugin_enabled": True,
                "subagent_spawn_depth_1": True, "workflow_concurrency_set": True,
@@ -64,7 +73,7 @@ WIRED = {
     "project": {"settings_depth_and_concurrency": True, "codex_mcp_servers_present": dict.fromkeys(SERVERS, True)},
     "codex": {"rtk_instructions": True, "context_mode_plugin_enabled": True,
               "mcp_servers_present": dict.fromkeys(SERVERS, True), "hooks_feature_enabled": True,
-              "ai_memory_hook_events": 7, "ai_memory_hook_events_trusted": 7},
+              "ai_memory_hook_events": 7, "ai_memory_hook_events_trusted": 7, "stack_roles_matching": 2},
     "complete": True,
 }
 # The RTK.md that `rtk init -g --codex` (rtk 0.50.0) writes: RTK's ownership line, then the instructions.
@@ -1489,6 +1498,8 @@ class ClientWiringTests(unittest.TestCase):
         self.home.mkdir()
         self.root.mkdir()
         self.env = {"HOME": str(self.home)}
+        for name in ROLE_FILES:  # the checkout's copies of the two Codex role carriers, which the count compares with
+            self.write(f"adoption/agents/codex/{name}", role_bytes(name), self.root)
 
     def write(self, relative: str, content, base: Path | None = None) -> Path:
         path = (base or self.home) / relative
@@ -1518,6 +1529,8 @@ class ClientWiringTests(unittest.TestCase):
         self.write(".codex/config.toml", CODEX_CONFIG + self.trust())
         self.write(".codex/plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/plugin.json",
                    {"name": PRIVATE})
+        for name in ROLE_FILES:  # the role carriers the Codex worker lane installs under the Codex home
+            self.write(f".codex/agents/{name}", role_bytes(name))
         self.write(".claude/settings.json", {"env": {"CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
                                                      "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"}}, self.root)
         self.write(".codex/config.toml", CODEX_CONFIG, self.root)
@@ -1557,7 +1570,7 @@ class ClientWiringTests(unittest.TestCase):
             # Without a config.toml Codex keeps its default: hooks on.
             "codex": {"rtk_instructions": False, "context_mode_plugin_enabled": False,
                       "mcp_servers_present": dict.fromkeys(SERVERS, False), "hooks_feature_enabled": True,
-                      "ai_memory_hook_events": 0, "ai_memory_hook_events_trusted": 0},
+                      "ai_memory_hook_events": 0, "ai_memory_hook_events_trusted": 0, "stack_roles_matching": 0},
             "complete": False})
 
     def test_malformed_files_report_null_without_raising(self):
@@ -1573,7 +1586,8 @@ class ClientWiringTests(unittest.TestCase):
             "project": {"settings_depth_and_concurrency": None, "codex_mcp_servers_present": dict.fromkeys(SERVERS)},
             "codex": {"rtk_instructions": None, "context_mode_plugin_enabled": None,
                       "mcp_servers_present": dict.fromkeys(SERVERS), "hooks_feature_enabled": None,
-                      "ai_memory_hook_events": None, "ai_memory_hook_events_trusted": None},
+                      "ai_memory_hook_events": None, "ai_memory_hook_events_trusted": None,
+                      "stack_roles_matching": 2},  # its own folder is not one of the malformed files
             "complete": False})
 
     def test_directories_oversized_files_and_dangling_links_are_unreadable(self):
@@ -1614,7 +1628,7 @@ class ClientWiringTests(unittest.TestCase):
         self.assertEqual(result["codex"], {"rtk_instructions": False, "context_mode_plugin_enabled": False,
                                            "mcp_servers_present": dict.fromkeys(SERVERS, False),
                                            "hooks_feature_enabled": False, "ai_memory_hook_events": 0,
-                                           "ai_memory_hook_events_trusted": 0})
+                                           "ai_memory_hook_events_trusted": 0, "stack_roles_matching": 0})
         self.assertIs(result["complete"], False)
 
     def test_the_rtk_hook_needs_a_bash_matcher_and_the_claude_hook_subcommand(self):
@@ -1945,6 +1959,123 @@ class ClientWiringTests(unittest.TestCase):
         (self.home / "link").symlink_to(moved)
         self.assertEqual(self.wiring({**env, "CODEX_HOME": str(self.home / "link/codex")}), WIRED)
         self.assertFalse(self.wiring()["claude"]["rtk_hook"])
+
+    # -- stack_roles_matching: how many of the two Codex role carriers under <Codex home>/agents equal the checkout's copies
+    # (U13 design 3.4; the count is a number, never the file's text, its name or a path).
+
+    def roles(self, env=None):
+        """codex.stack_roles_matching of the fake home. The key is asserted first, so a base without it fails on that."""
+        codex = self.wiring(env)["codex"]
+        self.assertIn("stack_roles_matching", codex)
+        return codex["stack_roles_matching"]
+
+    def test_the_role_key_is_the_last_codex_key_and_a_count(self):
+        self.assertEqual(CLIENT_WIRING_KEYS["codex"][-1], "stack_roles_matching")
+        self.assertEqual(len(CLIENT_WIRING_KEYS["codex"]), 7)
+        self.wire()
+        value = self.wiring()["codex"]["stack_roles_matching"]
+        self.assertIs(type(value), int)  # a number: a boolean would not say how many
+
+    def test_stack_roles_matching_counts_the_carriers_equal_to_the_checkout_copies(self):
+        self.assertEqual(self.roles(), 0)  # no agents folder: nothing installed
+        self.wire()
+        agents = self.home / ".codex/agents"
+        self.assertEqual(self.roles(), 2)  # both installed, byte for byte
+        researcher, verifier = agents / ROLE_FILES[0], agents / ROLE_FILES[1]
+        researcher.write_bytes(researcher.read_bytes() + b"\n")  # one byte more
+        self.assertEqual(self.roles(), 1)
+        flipped = bytearray(verifier.read_bytes())
+        flipped[0] ^= 1  # the same size, one bit different: equal length is not equal bytes
+        verifier.write_bytes(bytes(flipped))
+        self.assertEqual(self.roles(), 0)
+        researcher.write_bytes(role_bytes(ROLE_FILES[0]))
+        self.assertEqual(self.roles(), 1)
+        verifier.unlink()  # absent
+        self.assertEqual(self.roles(), 1)
+        # Other files never count: an extra file, and a copy of a carrier's name in a nested folder.
+        self.write(".codex/agents/extra.toml", role_bytes(ROLE_FILES[1]))
+        self.write(".codex/agents/nested/" + ROLE_FILES[1], role_bytes(ROLE_FILES[1]))
+        self.assertEqual(self.roles(), 1)
+        self.write(".codex/agents/" + ROLE_FILES[1], role_bytes(ROLE_FILES[1]))
+        self.assertEqual(self.roles(), 2)
+
+    def test_a_link_or_a_folder_in_place_of_a_carrier_is_not_a_match(self):
+        self.wire()
+        agents = self.home / ".codex/agents"
+        identical = self.write("identical-copy.toml", role_bytes(ROLE_FILES[0]))
+        (agents / ROLE_FILES[0]).unlink()
+        (agents / ROLE_FILES[0]).symlink_to(identical)  # the bytes are equal, but Codex's file is a link
+        self.assertEqual(self.roles(), 1)
+        (agents / ROLE_FILES[1]).unlink()
+        (agents / ROLE_FILES[1]).mkdir()  # a folder where a file belongs
+        self.assertEqual(self.roles(), 0)
+
+    def test_the_role_count_follows_codex_home(self):
+        self.wire()
+        moved = self.home / "elsewhere"
+        (self.home / ".codex").rename(moved)
+        self.assertEqual(self.roles(), 0)  # the default home has no agents folder any more
+        self.assertEqual(self.roles({**self.env, "CODEX_HOME": str(moved)}), 2)
+
+    def test_the_role_count_is_null_when_a_carrier_source_or_the_folder_cannot_be_compared(self):
+        self.wire()
+        agents = self.home / ".codex/agents"
+        source = self.root / "adoption/agents/codex" / ROLE_FILES[0]
+        kept = source.read_bytes()
+        source.unlink()  # a checkout without a source copy: nothing to compare with, even where the roles are absent
+        self.assertIsNone(self.roles())
+        shutil.rmtree(agents)
+        self.assertIsNone(self.roles())
+        source.write_bytes(kept)
+        self.assertEqual(self.roles(), 0)
+        agents.write_text("a file where the folder belongs", encoding="utf-8")
+        self.assertIsNone(self.roles())
+        agents.unlink()
+        (self.home / "linked-agents").mkdir()
+        agents.symlink_to(self.home / "linked-agents")  # a linked folder: what Codex loads through it is not known here
+        self.assertIsNone(self.roles())
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a file whatever its mode")
+    def test_the_role_count_is_null_for_an_unreadable_folder_or_file(self):
+        self.wire()
+        agents = self.home / ".codex/agents"
+        carrier = agents / ROLE_FILES[0]
+        carrier.chmod(0)
+        try:
+            self.assertIsNone(self.roles())
+        finally:
+            carrier.chmod(0o644)
+        agents.chmod(0)
+        try:
+            self.assertIsNone(self.roles())
+        finally:
+            agents.chmod(0o755)
+        self.assertEqual(self.roles(), 2)
+
+    def test_complete_ignores_a_role_count_but_a_null_count_makes_it_false(self):
+        self.wire()
+        self.assertEqual((self.roles(), self.wiring()["complete"]), (2, True))
+        shutil.rmtree(self.home / ".codex/agents")
+        self.assertEqual((self.roles(), self.wiring()["complete"]), (0, True))  # a count never blocks completeness
+        (self.home / ".codex/agents").write_text("a file", encoding="utf-8")
+        result = self.wiring()
+        self.assertEqual((result["codex"]["stack_roles_matching"], result["complete"]), (None, False))
+        # every other flag is still true: the null alone is what turned completeness off
+        others = {key: value for key, value in result["codex"].items() if key != "stack_roles_matching"}
+        self.assertEqual(others, {key: value for key, value in WIRED["codex"].items() if key != "stack_roles_matching"})
+
+    def test_the_two_argument_form_of_codex_wiring_still_reports_the_count(self):
+        # Retained evidence scripts (evidence/artifacts/adoption-status-truth-20260926) call codex_wiring(dir, key_root).
+        codex_dir = self.home / ".codex"
+        codex_dir.mkdir()
+        report = adoption_status.codex_wiring(codex_dir, str(codex_dir))
+        self.assertIn("stack_roles_matching", report)
+        self.assertEqual(report["stack_roles_matching"], 0)  # this repository's own copies are the default source
+
+    def test_the_limitations_name_the_role_files_the_check_compares(self):
+        text = CLIENT_WIRING_LIMITATIONS[0]
+        for needle in ("agents/", "adoption/agents/codex", "byte for byte"):
+            self.assertIn(needle, text)
 
     def test_a_text_value_can_never_leave_the_check(self):
         leaked = {**dict.fromkeys(CLIENT_WIRING_KEYS["claude"], True), "rtk_hook": PRIVATE}

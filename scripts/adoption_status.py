@@ -8,7 +8,9 @@ service/process state, network endpoint or model API. Client configuration is re
 only with the opt-in --client-wiring, which parses fixed native client files whole and
 in-process and emits no value from them: fixed booleans and hook-event counts only,
 never a value, command, path or environment value (Codex hook trust is compared as a
-SHA-256 inside this process, as Codex computes it). The opt-in --pinned-versions execs
+SHA-256 inside this process, as Codex computes it; the two Codex role files under the
+Codex home's agents/ are compared byte for byte with this checkout's adoption/agents/codex
+copies and only how many are equal is reported). The opt-in --pinned-versions execs
 a profile's PATH-resolved commands with their platform pin's declared "exec"
 version_probe only (never one declared "npm-metadata" or another method, since that
 method exists exactly because running the tool starts a server or a UI), each in its
@@ -60,7 +62,9 @@ LIMITATIONS = [
 CLIENT_WIRING_LIMITATIONS = [
     "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json, "
     "AGENTS.override.md, AGENTS.md and RTK.md, and this checkout's .claude/settings.json and .codex/config.toml whole "
-    "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It opens no credential "
+    "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It also compares the two "
+    "Codex role files under the Codex home's agents/ with this checkout's adoption/agents/codex copies byte for byte "
+    "and reports how many are equal, a count and never a name or text. It opens no credential "
     "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
     "environment variables only locate the client homes, and two opt-ins are checked by name.",
     "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
@@ -183,8 +187,13 @@ CLIENT_WIRING_KEYS = {
                "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in"),
     "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
     "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
-              "ai_memory_hook_events", "ai_memory_hook_events_trusted"),
+              "ai_memory_hook_events", "ai_memory_hook_events_trusted", "stack_roles_matching"),
 }
+# The two Codex role carriers the worker lane installs under <Codex home>/agents (tools/adoption/apply_codex_lane.py) and
+# this checkout ships in adoption/agents/codex, whose SHA256SUMS names exactly these two files.
+STACK_ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
+STACK_ROLES_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "codex"
+ABSENT, NOT_A_FILE = "absent", "not_a_file"
 
 
 class InvalidManifest(ValueError):
@@ -825,8 +834,64 @@ def codex_ai_memory_hook_counts(events: dict, config, key_root: str) -> tuple[in
                             and states.get(key, {}).get("trusted_hash") == digest})
 
 
-def codex_wiring(codex_dir: Path, key_root: str | None = None) -> dict:
-    """``key_root`` is the Codex home as Codex spells it in hook keys (client_wiring passes it)."""
+def read_regular_bytes(path: Path, limit: int = CLIENT_FILE_LIMIT):
+    """The bytes of a regular file, never read through a link: ABSENT when there is none, NOT_A_FILE for a link, a folder or
+    another kind of file, None when it cannot be read (a folder that cannot be searched, a path through a file, no
+    permission) or is over ``limit``."""
+    try:
+        mode = os.lstat(path).st_mode
+    except FileNotFoundError:
+        return ABSENT
+    except OSError:
+        return None
+    if not stat.S_ISREG(mode):
+        return NOT_A_FILE
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read(limit + 1)
+    except OSError:
+        return None
+    return data if len(data) <= limit else None
+
+
+def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
+    """How many of the two Codex role carriers under ``codex_dir``/agents are byte for byte the copies in ``roles_source``
+    (this checkout's adoption/agents/codex): a count, never a file's text or name.
+
+    0 when the agents folder is absent. A carrier that is absent, a link, a folder or another kind of file, or that differs,
+    does not count. None when the comparison cannot be made: a source copy is unreadable (also where the folder is absent),
+    the agents path is a link or not a folder (what Codex would load through it is not known here), or the folder or an
+    installed carrier cannot be read. Codex discovers a role from every *.toml below agents/ (codex-rs/agent-roles/src/
+    discovery.rs at rust-v0.157.1), so an extra file is another role: tools/adoption/apply_codex_lane.py and
+    tools/token-e2e/freeze_snapshot.py count those, and this count does not."""
+    sources = []
+    for name in STACK_ROLE_FILES:
+        data = read_regular_bytes(roles_source / name)
+        if not isinstance(data, bytes):
+            return None
+        sources.append(data)
+    agents = codex_dir / "agents"
+    try:
+        mode = os.lstat(agents).st_mode
+    except FileNotFoundError:
+        return 0
+    except OSError:
+        return None
+    if not stat.S_ISDIR(mode):  # lstat does not follow a link, so a linked folder is not a folder here
+        return None
+    matching = 0
+    for name, expected in zip(STACK_ROLE_FILES, sources):
+        found = read_regular_bytes(agents / name)
+        if found is None:
+            return None
+        matching += isinstance(found, bytes) and found == expected
+    return matching
+
+
+def codex_wiring(codex_dir: Path, key_root: str | None = None, *, roles_source: Path | None = None) -> dict:
+    """``key_root`` is the Codex home as Codex spells it in hook keys (client_wiring passes it); ``roles_source`` is the
+    directory holding the two role carriers to compare with (client_wiring passes the checkout's, and a caller that passes
+    none gets this repository's own)."""
     config = read_client_file(codex_dir / "config.toml", "toml")
     engine = codex_hooks_enabled(config)
     hooks_path = codex_dir / "hooks.json"
@@ -853,6 +918,8 @@ def codex_wiring(codex_dir: Path, key_root: str | None = None) -> dict:
         "hooks_feature_enabled": engine,
         "ai_memory_hook_events": configured,
         "ai_memory_hook_events_trusted": trusted,
+        "stack_roles_matching": stack_roles_matching(codex_dir, STACK_ROLES_SOURCE if roles_source is None
+                                                     else roles_source),
     }
 
 
@@ -888,7 +955,9 @@ def leaves(value) -> list:
 def wiring_complete(groups: dict) -> bool:
     """The documented rule (docs/token-efficiency-stack.md, "Coverage check"): every file parsed, every boolean
     true with each Codex server named in the user or the project config.toml, both hook counts above zero, and
-    every Codex event that runs ai-memory trusted, so Codex actually runs its hook."""
+    every Codex event that runs ai-memory trusted, so Codex actually runs its hook. The count of matching role files
+    (stack_roles_matching) is information: a number, 0 included, never blocks completeness, but its None (a file, the folder
+    or a source copy that cannot be read) does, like every other null."""
     if None in leaves(groups):
         return False
     claude, project, codex = groups["claude"], groups["project"], groups["codex"]
@@ -913,7 +982,8 @@ def client_wiring(root: Path, env=None) -> dict:
     key_root = os.path.realpath(codex_home) if codex_home else os.path.normpath(f"{home}/.codex")
     groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
               "project": project_wiring(root),
-              "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root)}
+              "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root,
+                                    roles_source=root / "adoption" / "agents" / "codex")}
     if not fixed_wiring(groups):
         raise AssertionError("client wiring must be the fixed keys with boolean or count values")
     return {**groups, "complete": wiring_complete(groups)}

@@ -15,6 +15,7 @@ Evidence classes (docs/acceptance-evidence-policy.md):
 
 from __future__ import annotations
 
+import concurrent.futures
 import contextlib
 import hashlib
 import importlib.util
@@ -82,6 +83,62 @@ _EMIT_NAMESPACE: dict = {}
 exec("import json, re\n" + EMITTER, _EMIT_NAMESPACE)
 emit_toml = _EMIT_NAMESPACE["emit"]
 
+# The fake's `codex doctor --json`, in the shape codex-cli 0.157.1 printed in a scratch home (observed 2026-09-29:
+# exit 1, because auth.credentials fails without a sign-in; 21 checks keyed by id; stdout is only the JSON). A clean
+# config.load has no `startup warning*` detail at all. A warning adds `startup warnings` (a count, as a string), one
+# count per area, and `startup warning` (a string, or a list when it repeats). The value text embeds the role file's
+# absolute path, which the installer must never echo. Sources: openai/codex rust-v0.157.1 codex-rs/cli/src/doctor.rs
+# (JsonDoctorReport, config_check, push_startup_warning_counts, structured_json_details).
+DOCTOR = r'''
+ROLE_WARNING = "Ignoring malformed agent role definition"
+CANARY = "/canary-host-path/agents/stack-researcher.toml"
+
+
+def role_warnings(mode, has_roles):
+    if mode == "preexisting":  # a warning the scratch home has with or without the role files
+        return [f"{ROLE_WARNING}: failed to parse {CANARY}: preexisting"]
+    if not has_roles:
+        return []
+    if mode == "role_string":
+        return [f"{ROLE_WARNING}: failed to parse {CANARY}: missing field `developer_instructions`"]
+    if mode == "role_list":
+        return [f"{ROLE_WARNING}: failed to parse {CANARY}: first", f"{ROLE_WARNING}: failed to parse {CANARY}: second"]
+    if mode == "redacted_rise":  # redact_detail replaced the value (it held a credential word)
+        return ["<redacted>"]
+    return []
+
+
+def doctor_output(mode, has_roles, home):
+    if mode == "not_json":
+        return "doctor: this is not a JSON report\n"
+    checks = {"auth.credentials": {"id": "auth.credentials", "category": "auth", "status": "fail",
+                                   "summary": "not signed in", "details": {}, "remediation": None, "durationMs": 2}}
+    if mode != "no_config_load":
+        warnings = role_warnings(mode, has_roles)
+        details = {"CODEX_HOME": str(home), "mcp servers": "0", "model": "<default>"}
+        status, summary = "ok", "config loaded"
+        if mode == "load_fail" and has_roles:  # an unreadable agents folder fails the whole load (loader.rs `?`)
+            status, summary, details = "fail", "config could not be loaded", {}
+        elif warnings:
+            status = "warning"
+            details.update({"startup warnings": str(len(warnings)), "startup warning skills": "0",
+                            "startup warning hooks": "0", "startup warning plugins": "0",
+                            "startup warning MCP": "0", "startup warning deprecated": "0"})
+            details["startup warning"] = warnings[0] if len(warnings) == 1 else warnings
+        checks["config.load"] = {"id": "config.load", "category": "config", "status": status, "summary": summary,
+                                 "details": details, "remediation": None, "durationMs": 3}
+    return json.dumps({"schemaVersion": 1, "generatedAt": "2026-09-29T00:00:00Z", "overallStatus": "fail",
+                       "codexVersion": "0.157.1", "checks": checks}) + "\n"
+'''
+_DOCTOR_NAMESPACE: dict = {}
+exec("import json\n" + DOCTOR, _DOCTOR_NAMESPACE)
+doctor_output = _DOCTOR_NAMESPACE["doctor_output"]
+DOCTOR_CANARY = _DOCTOR_NAMESPACE["CANARY"]
+
+# The two Codex role carriers (adoption/agents/codex/), by file name; the installer step copies them.
+ROLES_SOURCE_DIR = ROOT / "adoption" / "agents" / "codex"
+ROLE_NAMES = ("stack-researcher.toml", "stack-verifier.toml")
+
 FAKE_CODEX = r'''#!{python}
 """Fake codex 0.157.1 for tests/test_codex_worker_lane.py (see its docstring)."""
 import hashlib, json, os, re, sys, tomllib
@@ -106,6 +163,8 @@ def effective():
     return merge(config, load(HOME / f"{profile}.config.toml")) if profile else config
 
 {emitter}
+
+{doctor}
 
 def version(config):
     return "sha256:" + hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()
@@ -178,6 +237,17 @@ if argv[:2] == ["debug", "prompt-input"]:
         items.append({"type": "message", "role": "user", "content": [{"type": "input_text",
                       "text": "# AGENTS.md instructions\n\n<INSTRUCTIONS>\n" + text + "</INSTRUCTIONS>"}]})
     print(json.dumps(items, indent=2)); sys.exit(0)
+if argv[:2] == ["doctor", "--json"]:
+    # Like the real binary in a scratch home this always exits 1. The mode comes from a file beside this script, not
+    # from the environment (the installer's rehearsal passes a closed environment); the role files decide "after".
+    import time
+    mode_file = Path(__file__).with_name("doctor-mode")
+    mode = mode_file.read_text().strip() if mode_file.is_file() else "clean"
+    if mode == "hang":
+        time.sleep(5)
+    agents = HOME / "agents"
+    has_roles = agents.is_dir() and any(agents.rglob("*.toml"))
+    sys.stdout.write(doctor_output(mode, has_roles, HOME)); sys.exit(1)
 print("fake codex: unsupported " + " ".join(argv), file=sys.stderr); sys.exit(64)
 '''
 
@@ -429,7 +499,8 @@ class FakeHost:
         start.write_text("// stand-in for start.mjs\n")
         self.codex = self.tmp / "bin" / "codex"
         self.codex.parent.mkdir()
-        self.codex.write_text(FAKE_CODEX.replace("{python}", sys.executable).replace("{emitter}", EMITTER))
+        self.codex.write_text(FAKE_CODEX.replace("{python}", sys.executable).replace("{emitter}", EMITTER)
+                              .replace("{doctor}", DOCTOR))
         self.codex.chmod(0o755)
         self.state = self.tmp / "state"
         eco = str(self.eco)
@@ -452,6 +523,11 @@ class FakeHost:
         lane.START_MJS_SHA256 = hashlib.sha256(start.read_bytes()).hexdigest()
         self.base_args = ["--codex", str(self.codex), "--codex-home", str(self.codex_home), "--eco-root", eco,
                           "--state-dir", str(self.state), "--codex-process-name", "nas-no-such-process-x"]
+
+    def set_doctor(self, mode: str) -> None:
+        """Choose what the fake `codex doctor --json` prints (see DOCTOR): a file beside the fake binary, because the
+        rehearsal's environment is closed."""
+        (self.codex.parent / "doctor-mode").write_text(mode + "\n")
 
     def write_config(self, config: dict) -> None:
         (self.codex_home / "config.toml").write_text(emit_toml(config))
@@ -832,6 +908,628 @@ class ApplyFlowTests(unittest.TestCase):
         self.assertIn("Model provider `omniroute` not found", step)
 
 
+def snapshot(root: Path) -> dict:
+    """{relative path: file bytes, link target, or None for a directory} of everything under root, links not followed."""
+    found = {}
+    for directory, dirs, files in os.walk(root):
+        for name in dirs + files:
+            path = Path(directory, name)
+            key = path.relative_to(root).as_posix()
+            if path.is_symlink():
+                found[key] = os.readlink(path)
+            else:
+                found[key] = None if path.is_dir() else path.read_bytes()
+    return found
+
+
+def need(test: unittest.TestCase, owner, name: str):
+    """owner.name, or a failure by assertion when the change under test has not added it yet."""
+    value = getattr(owner, name, None)
+    if value is None:
+        test.fail(f"{getattr(owner, '__name__', type(owner).__name__)}.{name} is missing")
+    return value
+
+
+def digest(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+class RoleStepTests(unittest.TestCase):
+    """The installer's role step: the two Codex role carriers of adoption/agents/codex/, installed user-wide under
+    $CODEX_HOME/agents by discovery only (no [agents.<name>] table). Synthetic: the fake codex answers `doctor --json`
+    in the shape the real 0.157.1 binary printed in a scratch home (always exit 1; see DOCTOR). Case letters follow
+    section 4.3 of the U13 design; the controls at the end are its section 4.5."""
+
+    def setUp(self):
+        self.host = FakeHost(self)
+        # /etc/codex is a config layer of every launch: the tests never read the host's.
+        self.system = self.host.tmp / "etc-codex"
+        self.system.mkdir()
+        patcher = mock.patch.object(lane, "SYSTEM_CODEX_DIR", self.system, create=True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        self.agents = self.host.codex_home / "agents"
+        self.sources = {name: (ROLES_SOURCE_DIR / name).read_bytes() for name in ROLE_NAMES}
+
+    def installed(self, name: str) -> bytes:
+        path = self.agents / name
+        self.assertTrue(path.is_file(), f"agents/{name} was not installed")
+        return path.read_bytes()
+
+    def alternate_sources(self, change=None, drop=None, sums=True) -> Path:
+        """A fresh copy of the shipped carriers with `change(name, bytes)` applied; `drop` names one to leave out.
+        `sums` is the SHA256SUMS beside them: True copies the shipped file, False leaves it out, a string is its text."""
+        alt = self.host.tmp / "sources"
+        shutil.rmtree(alt, ignore_errors=True)
+        alt.mkdir()
+        for name, data in self.sources.items():
+            if name != drop:
+                (alt / name).write_bytes(change(name, data) if change else data)
+        if sums is True:
+            shutil.copyfile(ROLES_SOURCE_DIR / "SHA256SUMS", alt / "SHA256SUMS")
+        elif sums:
+            (alt / "SHA256SUMS").write_text(sums, encoding="utf-8")
+        return alt
+
+    # --- a: the dry run
+    def test_a_dry_run_plans_both_roles_writes_nothing_and_reads_the_doctor(self):
+        before = snapshot(self.host.codex_home)
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        for name in ROLE_NAMES:
+            self.assertIn(f"agents/{name}: create", out.splitlines())
+            self.assertIn(f"[ok] agent role source {name}: sha256 ", out)
+        for line in ("[ok] agents directory: absent; will be created", "[ok] extra agent role files: 0",
+                     "[ok] agent role tables: 0", "[ok] system agent roles: 0"):
+            self.assertIn(line, out)
+        self.assertIn("codex doctor config.load: startup warnings 0 -> 0 with the role files "
+                      "(0 agent role warnings)", out)
+        self.assertIn("result: rehearsal passed", out)
+        self.assertEqual(snapshot(self.host.codex_home), before)
+        self.assertFalse(self.host.state.exists())
+
+    # --- b: apply, second apply, rollback
+    def test_b_apply_creates_the_roles_read_back_and_rollback_removes_them(self):
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self.agents.is_dir(), "the agents directory was not created")
+        self.assertEqual(self.agents.stat().st_mode & 0o777, 0o700)
+        for name in ROLE_NAMES:
+            self.assertEqual(self.installed(name), self.sources[name])
+            self.assertEqual((self.agents / name).stat().st_mode & 0o777, 0o600)
+            self.assertIn(f"agents/{name}: in place", out.splitlines())
+        self.assertEqual(sorted(p.name for p in self.agents.iterdir()), sorted(ROLE_NAMES))  # no temporary file left
+        self.assertNotIn("agents", self.host.read_config())  # discovery only: no [agents.<name>] table is written
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertIn("agent_roles", record)
+        roles = record["agent_roles"]
+        self.assertIs(roles["created_dir"], True)
+        for name in ROLE_NAMES:
+            entry = roles["files"][name]
+            self.assertEqual((entry["state"], entry["existed"], entry["created"]), ("done", False, True))
+            self.assertEqual(entry["sha256_after"], digest(self.sources[name]))
+
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertIn("already in place: nothing to do", out)
+        self.assertEqual(self.host.latest_run(), run)
+
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        for name in ROLE_NAMES:
+            self.assertIn(f"agents/{name}: removed", out.splitlines())
+        self.assertIn("agents directory: removed (the run created it)", out.splitlines())
+        self.assertFalse(self.agents.exists())
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertIn("agents/stack-researcher.toml: already absent", out.splitlines())
+
+    # --- c: the short-circuit needs the roles too
+    def test_c_a_host_with_the_rest_of_the_lane_in_place_still_gets_the_roles(self):
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        shutil.rmtree(self.agents, ignore_errors=True)  # a host set up before the roles existed
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("already in place: nothing to do", out)
+        for name in ROLE_NAMES:
+            self.assertEqual(self.installed(name), self.sources[name])
+
+    # --- d: a differing installed role is never overwritten
+    def test_d_a_differing_installed_role_is_refused_and_left_alone(self):
+        self.agents.mkdir(mode=0o700)
+        (self.agents / ROLE_NAMES[0]).write_text('name = "stack-researcher"\n')
+        code, out = self.host.apply()
+        self.assertEqual(code, 2, out)
+        self.assertIn(f"[fail] agent role {ROLE_NAMES[0]}", out)
+        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), 'name = "stack-researcher"\n')
+        self.assertFalse((self.agents / ROLE_NAMES[1]).exists())
+        self.assertFalse(self.host.state.exists())
+        code, out = self.host.run()
+        self.assertEqual(code, 2, out)
+        self.assertIn("apply would refuse", out)
+
+    # --- e: an extra role file is reported as a count only
+    def test_e_an_extra_nested_toml_is_a_count_only_warning(self):
+        (self.agents / "nested").mkdir(parents=True)
+        (self.agents / "nested" / "extra-role-name.toml").write_text('name = "extra"\n')
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("[warn] extra agent role files: 1", out)
+        self.assertNotIn("extra-role-name", out)
+
+    def test_e_a_linked_folder_below_agents_is_an_unknown_count_warning(self):
+        # Codex enters a linked folder (see test_agents_toml_count_counts_recursively_and_is_unknown_behind_a_folder_link),
+        # so the extra-role count can be neither 0 nor N there: it is unknown, in words that hold no name.
+        other = self.host.tmp / "roles-elsewhere"
+        other.mkdir()
+        (other / "elsewhere-role-name.toml").write_text('name = "extra"\n')
+        self.agents.mkdir(parents=True)
+        (self.agents / "shared-folder-name").symlink_to(other)
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)  # a warning, like an extra file: the carriers can still be installed
+        self.assertIn("[warn] extra agent role files: unknown", out)
+        self.assertNotIn("elsewhere-role-name", out)
+        self.assertNotIn("shared-folder-name", out)
+
+    # --- f: a created role edited afterwards is a conflict, not a deletion
+    def test_f_a_role_edited_after_apply_is_a_rollback_conflict(self):
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        run = self.host.latest_run()
+        edited = self.installed(ROLE_NAMES[1]) + b"# edited after the run\n"
+        (self.agents / ROLE_NAMES[1]).write_bytes(edited)
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 3, out)
+        self.assertIn(f"CONFLICT: agents/{ROLE_NAMES[1]} changed since the run; left in place", out.splitlines())
+        self.assertEqual((self.agents / ROLE_NAMES[1]).read_bytes(), edited)
+        self.assertFalse((self.agents / ROLE_NAMES[0]).exists())  # the untouched one is removed
+        self.assertIn("agents directory: left in place (not empty)", out.splitlines())
+        self.assertEqual(json.loads((run / "record.json").read_text())["status"], "rollback-conflict")
+
+    # --- g, h, i: the doctor's startup warnings rise with the role files
+    def test_g_a_role_warning_string_fails_the_rehearsal(self):
+        self.host.set_doctor("role_string")
+        code, out = self.host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("PROBLEM: codex doctor startup warnings rose from 0 to 1 with the role files "
+                      "(1 agent role warnings)", out)
+        self.assertIn("result: the rehearsal failed; do not apply", out)
+        self.assertNotIn("rehearsal passed", out)
+
+    def test_h_a_role_warning_list_counts_each_warning(self):
+        self.host.set_doctor("role_list")
+        code, out = self.host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("PROBLEM: codex doctor startup warnings rose from 0 to 2 with the role files "
+                      "(2 agent role warnings)", out)
+
+    def test_i_a_redacted_rise_still_fails_the_rehearsal(self):
+        # redact_detail hides the text (a credential word in it); the count key survives the redaction.
+        self.host.set_doctor("redacted_rise")
+        code, out = self.host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("PROBLEM: codex doctor startup warnings rose from 0 to 1 with the role files "
+                      "(0 agent role warnings)", out)
+
+    def test_a_config_that_no_longer_loads_with_the_roles_fails_the_rehearsal(self):
+        # loader.rs propagates a directory-read error with `?`, so doctor reports config.load as failed, not warned.
+        self.host.set_doctor("load_fail")
+        code, out = self.host.run()
+        self.assertEqual(code, 3, out)
+        self.assertIn("PROBLEM: codex doctor could not load the config with the role files", out)
+
+    def test_a_warning_the_scratch_home_has_without_the_roles_is_not_blamed_on_them(self):
+        # A malformed system-layer role warns in both passes: no rise, so the rehearsal passes. The system-role
+        # count line is what reports that layer.
+        self.host.set_doctor("preexisting")
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("codex doctor config.load: startup warnings 1 -> 1 with the role files "
+                      "(0 agent role warnings)", out)
+        self.assertIn("result: rehearsal passed", out)
+
+    # --- j: no readable config.load is unknown, and the dry run can still pass
+    def test_j_an_unreadable_doctor_report_is_a_warning_not_a_failure(self):
+        for mode in ("no_config_load", "not_json"):
+            with self.subTest(mode=mode):
+                self.host.set_doctor(mode)
+                code, out = self.host.run()
+                self.assertEqual(code, 0, out)
+                self.assertIn("[warn] doctor config.load unknown", out)
+                self.assertIn("result: rehearsal passed", out)
+
+    def test_a_doctor_that_hangs_is_unknown_after_its_timeout(self):
+        self.host.set_doctor("hang")
+        with mock.patch.object(lane, "DOCTOR_TIMEOUT", 1.0, create=True):
+            code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("[warn] doctor config.load unknown", out)
+        self.assertIn("result: rehearsal passed", out)
+
+    # --- k: literal targets only
+    def test_k_an_agents_directory_that_is_a_link_or_a_file_is_refused(self):
+        elsewhere = self.host.tmp / "elsewhere"
+        elsewhere.mkdir()
+        self.agents.symlink_to(elsewhere)
+        code, out = self.host.apply()
+        self.assertEqual(code, 2, out)
+        self.assertIn("[fail] agents directory", out)
+        self.assertEqual(list(elsewhere.iterdir()), [])  # nothing was written through the link
+        self.assertFalse(self.host.state.exists())
+        self.agents.unlink()
+        self.agents.write_text("not a directory\n")
+        code, out = self.host.run()
+        self.assertEqual(code, 2, out)
+        self.assertIn("[fail] agents directory", out)
+        self.assertEqual(self.agents.read_text(), "not a directory\n")
+
+    # --- l: the source is checked against its pinned row before anything is copied
+    def test_l_a_carrier_with_one_byte_changed_is_refused(self):
+        def flip(name, data):
+            changed = data.replace(b"your output", b"your Output", 1)
+            self.assertNotEqual(changed, data)
+            return changed if name == ROLE_NAMES[1] else data
+
+        with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(flip), create=True):
+            code, out = self.host.apply()
+        self.assertEqual(code, 2, out)
+        self.assertIn(f"[fail] agent role source {ROLE_NAMES[1]}: sha256_row", out)
+        self.assertNotIn(f"[fail] agent role source {ROLE_NAMES[0]}", out)
+        self.assertFalse(self.agents.exists())
+        self.assertFalse(self.host.state.exists())
+
+    def test_l_a_sums_row_that_is_not_the_sources_digest_is_refused(self):
+        rows = {name: digest(data) for name, data in self.sources.items()}
+        rows[ROLE_NAMES[1]] = "0" * 64
+        text = "".join(f"{value}  {name}\n" for name, value in rows.items())
+        with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(sums=text)):
+            code, out = self.host.apply()
+        self.assertEqual(code, 2, out)
+        self.assertIn(f"[fail] agent role source {ROLE_NAMES[1]}: sha256_row", out)
+        self.assertNotIn(f"[fail] agent role source {ROLE_NAMES[0]}", out)
+        self.assertFalse(self.agents.exists())
+        self.assertFalse(self.host.state.exists())
+
+    def test_l_a_missing_or_malformed_sums_file_refuses_both_carriers(self):
+        for label, sums in (("missing", False), ("malformed", "not a checksum line\n")):
+            with self.subTest(sums=label):
+                with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(sums=sums)):
+                    code, out = self.host.run()
+                self.assertEqual(code, 2, out)
+                for name in ROLE_NAMES:
+                    self.assertIn(f"[fail] agent role source {name}: sha256_row, sha256sums_names", out)
+
+    def test_l_a_third_name_in_the_sums_file_refuses_both_carriers(self):
+        text = (ROLES_SOURCE_DIR / "SHA256SUMS").read_text(encoding="utf-8") + f"{'1' * 64}  stack-x.toml\n"
+        with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(sums=text)):
+            code, out = self.host.run()
+        self.assertEqual(code, 2, out)
+        for name in ROLE_NAMES:
+            self.assertIn(f"[fail] agent role source {name}: sha256sums_names", out)
+
+    def test_l_a_consistent_edit_that_breaks_a_structural_rule_is_refused(self):
+        # The carrier was edited together with its row, so its digest agrees with SHA256SUMS: the structural rules
+        # of design 3.3 are what refuse it, and the line names the rule id, not the text.
+        anchor = b"You do not spawn, message or follow up with other agents."
+        edited = {name: (data.replace(anchor, anchor + b" Use ToolSearch.", 1) if name == ROLE_NAMES[0] else data)
+                  for name, data in self.sources.items()}
+        self.assertNotEqual(edited[ROLE_NAMES[0]], self.sources[ROLE_NAMES[0]])
+        text = "".join(f"{digest(data)}  {name}\n" for name, data in edited.items())
+        with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(change=lambda name, data: edited[name],
+                                                                             sums=text)):
+            code, out = self.host.apply()
+        self.assertEqual(code, 2, out)
+        self.assertIn(f"[fail] agent role source {ROLE_NAMES[0]}: claude_only_name", out)
+        self.assertNotIn("ToolSearch", out)
+        self.assertNotIn(f"[fail] agent role source {ROLE_NAMES[1]}", out)
+        self.assertFalse(self.agents.exists())
+
+    def test_role_source_problems_name_each_rule(self):
+        problems = need(self, lane, "role_source_problems")
+        stem = ROLE_NAMES[0][:-len(".toml")].encode()
+        cases = (("intact", lambda data: data, []),
+                 ("missing", None, ["source_missing"]),
+                 ("one byte", lambda data: data.replace(b"your output", b"your Output", 1), ["sha256_row"]),
+                 ("not toml", lambda data: data + b"\n[[[\n", ["sha256_row", "toml_parse"]),
+                 ("renamed", lambda data: data.replace(b'name = "' + stem + b'"', b'name = "' + stem + b'-x"', 1),
+                  ["name_stem", "sha256_row"]))
+        for label, change, expected in cases:
+            with self.subTest(case=label):
+                alt = self.alternate_sources(lambda name, data: change(data) if name == ROLE_NAMES[0] else data,
+                                             drop=ROLE_NAMES[0] if change is None else None)
+                with mock.patch.object(lane, "ROLES_SOURCE", alt, create=True):
+                    found = problems()
+                self.assertEqual(found, {ROLE_NAMES[0]: expected, ROLE_NAMES[1]: []})
+
+    def test_the_pinned_rows_are_shipped_in_sha256sums_and_the_installer_holds_no_second_copy(self):
+        # design 3.1: the rows the installer checks against are adoption/agents/codex/SHA256SUMS, the same ones that
+        # tests/test_codex_agents.py pins as independent literals.
+        from tests.test_codex_agents import STACK_ROLE_ROWS
+        import codex_roles
+        expected = {}
+        for row in STACK_ROLE_ROWS:
+            name, value = (cell.strip().strip("`") for cell in row.strip().strip("|").split("|"))
+            expected[name] = value
+        rows = codex_roles.sha256sums(ROLES_SOURCE_DIR / "SHA256SUMS")
+        self.assertEqual(rows, expected)
+        self.assertEqual(rows, {name: digest(self.sources[name]) for name in ROLE_NAMES})
+        self.assertFalse(hasattr(lane, "ROLE_ROWS"), "the installer carries a second copy of the rows")
+        self.assertFalse(hasattr(lane, "role_pins"), "the installer carries a second reader of the rows")
+        self.assertEqual(tuple(need(self, lane, "ROLE_FILES")), ROLE_NAMES)
+        self.assertEqual(Path(need(self, lane, "ROLES_SOURCE")), ROLES_SOURCE_DIR)
+        self.assertEqual(need(self, lane, "role_source_problems")(), {name: [] for name in ROLE_NAMES})
+        # the helpers are the shared module's, not copies
+        for helper in ("agents_toml_count", "role_table_count", "doctor_role_state", "path_kind"):
+            with self.subTest(helper=helper):
+                self.assertIs(getattr(lane, helper, None), getattr(codex_roles, helper))
+
+    # --- m: the doctor parser, on fixture pairs
+    def test_m_doctor_role_state_on_the_fixture_pairs(self):
+        state = need(self, lane, "doctor_role_state")
+        home = "/home/example/.codex"
+        clean = doctor_output("clean", False, home)
+        failed = doctor_output("load_fail", True, home)  # config.load status fail
+
+        def result(kind, before, after, roles=0, redacted=0, load_failed=False):
+            return {"state": kind, "startup_warnings_before": before, "startup_warnings_after": after,
+                    "role_warnings": roles, "redacted": redacted, "load_failed": load_failed}
+
+        cases = (
+            ("clean, clean", clean, doctor_output("clean", True, home), result("ok", 0, 0)),
+            ("string", clean, doctor_output("role_string", True, home), result("problem", 0, 1, roles=1)),
+            ("list", clean, doctor_output("role_list", True, home), result("problem", 0, 2, roles=2)),
+            ("redacted", clean, doctor_output("redacted_rise", True, home), result("problem", 0, 1, redacted=1)),
+            ("no config.load", doctor_output("no_config_load", False, home), doctor_output("no_config_load", True, home),
+             result("unknown", None, None)),
+            ("not JSON", doctor_output("not_json", False, home), doctor_output("not_json", True, home),
+             result("unknown", None, None)),
+            ("timeout before", None, doctor_output("clean", True, home), result("unknown", None, 0)),
+            ("timeout after", clean, None, result("unknown", 0, None)),
+            ("pre-existing", doctor_output("preexisting", False, home), doctor_output("preexisting", True, home),
+             result("ok", 1, 1)),
+            ("rise counted", doctor_output("role_string", True, home), doctor_output("role_list", True, home),
+             result("problem", 1, 2, roles=1)),
+            ("load fails with the roles", clean, failed, result("problem", 0, None, load_failed=True)),
+            ("load fails without them", failed, failed, result("unknown", None, None)),
+            ("warnings fall", doctor_output("role_list", True, home), clean, result("ok", 2, 0)),
+        )
+        for label, before, after, expected in cases:
+            with self.subTest(case=label):
+                self.assertEqual(state(before, after), expected)
+
+    def test_the_doctor_report_never_reaches_the_output(self):
+        # The real warning embeds the role file's absolute path; only counts may be printed.
+        self.host.set_doctor("role_string")
+        code, out = self.host.run()
+        self.assertEqual(code, 3, out)
+        self.assertNotIn(DOCTOR_CANARY, out)
+        self.assertNotIn("canary", out)
+        self.assertNotIn("developer_instructions", out)
+        for line in out.splitlines():
+            if "doctor" in line or "agent role" in line or "agents" in line:
+                self.assertNotIn(str(self.host.tmp), line, line)
+
+    # --- what the plan counts
+    def test_role_tables_and_system_roles_are_counts_only_warnings(self):
+        config = self.host.config
+        config["agents"] = {"enabled": True, "max_concurrent_threads_per_session": 4,
+                            "one": {"description": "first"}, "two": {"description": "second"}}
+        self.host.write_config(config)
+        (self.system / "agents").mkdir()
+        (self.system / "agents" / "system-role-name.toml").write_text('name = "s"\n')
+        (self.system / "config.toml").write_text('[agents.declared]\ndescription = "x"\n')
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("[warn] agent role tables: 2", out)  # the scalar keys under [agents] are not roles
+        self.assertIn("[warn] system agent roles: 2", out)
+        self.assertNotIn("system-role-name", out)
+
+    def test_a_role_table_in_the_live_profile_is_counted(self):
+        (self.host.codex_home / "stack-worker.config.toml").write_text(
+            (TEMPLATES / "codex.stack-worker.config.toml").read_text() + '\n[agents.extra]\ndescription = "x"\n')
+        code, out = self.host.run()
+        self.assertEqual(code, 2, out)  # a profile that differs from the template is refused anyway
+        self.assertIn("[warn] agent role tables: 1", out)
+
+    def test_agents_toml_count_counts_recursively_and_is_unknown_behind_a_folder_link(self):
+        # Codex follows links below agents/: LocalFileSystem::read_directory takes a link's target's type
+        # (openai/codex rust-v0.157.1 codex-rs/exec-server/src/local_file_system.rs:710-735), so discovery.rs enters a linked
+        # folder, collects a link to a regular file by the link's own name and skips a dangling link. Checked against codex-cli
+        # 0.157.1 by CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it. A
+        # count that skipped the linked folder would report fewer role files than Codex loads, so it is unknown (None) there.
+        count = need(self, lane, "agents_toml_count")
+        root = self.host.tmp / "counted"
+        self.assertEqual(count(root), 0)  # absent
+        (root / "deep" / "er").mkdir(parents=True)
+        for name in ("a.toml", "deep/er/b.toml", "A.TOML", ".toml", "c.toml.bak", "deep/d.txt"):
+            (root / name).write_text("")
+        elsewhere = self.host.tmp / "linked"
+        elsewhere.mkdir()
+        (elsewhere / "z.toml").write_text("")
+        (root / "link.toml").symlink_to(elsewhere / "z.toml")  # a link to a file, named *.toml: counted, never read
+        (root / "dangling.toml").symlink_to(elsewhere / "absent.toml")  # Codex skips it; counting it errs on the safe side
+        (root / "renamed.txt").symlink_to(elsewhere / "z.toml")  # the link's own name has no .toml extension
+        self.assertEqual(count(root), 4)
+        for where in (root, root / "deep", root / "deep" / "er"):  # a link to a folder, at any depth
+            with self.subTest(link_in=where.name):
+                (where / "linked-dir").symlink_to(elsewhere)
+                self.assertIsNone(count(root), "a folder link below the root was skipped: the count undercounts")
+                (where / "linked-dir").unlink()
+                self.assertEqual(count(root), 4)
+        (root / "dir.toml").symlink_to(elsewhere)  # a link named *.toml to a folder is a folder link
+        self.assertIsNone(count(root), "a folder link named *.toml was skipped")
+        (root / "dir.toml").unlink()
+        (root / "linked-top").symlink_to(elsewhere)
+        self.assertIsNone(count(root / "linked-top"))  # the top folder itself is a link: not a directory it may read
+        (root / "linked-top").unlink()
+        self.assertIsNone(count(root / "a.toml"))
+        if os.geteuid() != 0:
+            (root / "deep").chmod(0)
+            self.addCleanup((root / "deep").chmod, 0o700)
+            self.assertIsNone(count(root))  # unreadable
+
+    def test_role_table_count_ignores_the_scalar_keys(self):
+        table_count = need(self, lane, "role_table_count")
+        self.assertEqual(table_count({}), 0)
+        self.assertEqual(table_count({"agents": {"enabled": True, "max_depth": 2}}), 0)
+        self.assertEqual(table_count({"agents": {"enabled": True, "a": {}, "b": {"description": "x"}}}), 2)
+        self.assertEqual(table_count({"agents": "not a table"}), 0)
+
+    # --- journal, rollback
+    def test_an_interrupted_role_write_is_journaled_and_rolled_back(self):
+        real = lane.atomic_write
+
+        def fail_on_the_second(path, data, mode, expect_sha, create_only=False):
+            if path.name == ROLE_NAMES[1]:
+                raise lane.Failed("synthetic write failure")
+            return real(path, data, mode, expect_sha, create_only)
+
+        with mock.patch.object(lane, "atomic_write", fail_on_the_second):
+            code, out = self.host.apply()
+        self.assertEqual(code, 3, out)
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertEqual(record["status"], "failed")
+        self.assertIn("agent_roles", record)
+        first, second = (record["agent_roles"]["files"][name] for name in ROLE_NAMES)
+        self.assertIs(first["created"], True)
+        self.assertIs(second["creating"], True)  # journaled before the write
+        self.assertIsNot(second.get("created"), True)
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertFalse(self.agents.exists())
+
+    def test_rollback_trusts_a_creation_that_was_only_journaled(self):
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertIn("agent_roles", record)
+        roles = record["agent_roles"]
+        roles.update(created_dir=False, creating_dir=True)
+        for entry in roles["files"].values():
+            entry.update(created=False, creating=True)  # the run stopped between the link and its note
+        (run / "record.json").write_text(json.dumps(record))
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertFalse(self.agents.exists())
+
+    def test_an_existing_agents_directory_and_identical_roles_are_not_the_runs_to_remove(self):
+        self.agents.mkdir(mode=0o750)
+        for name in ROLE_NAMES:
+            (self.agents / name).write_bytes(self.sources[name])
+            (self.agents / name).chmod(0o600)
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertIn("[ok] extra agent role files: 0", out)  # the two carriers themselves are not extras
+        for name in ROLE_NAMES:
+            self.assertIn(f"agents/{name}: in place", out.splitlines())
+        self.assertEqual(self.agents.stat().st_mode & 0o777, 0o750)  # not ours to change
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertIn("agent_roles", record)
+        self.assertIs(record["agent_roles"]["created_dir"], False)
+        self.assertEqual([record["agent_roles"]["files"][n]["created"] for n in ROLE_NAMES], [False, False])
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertIn(f"agents/{ROLE_NAMES[0]}: not created by this run", out.splitlines())
+        for name in ROLE_NAMES:
+            self.assertEqual(self.installed(name), self.sources[name])
+
+    def test_rollback_keeps_an_agents_directory_that_existed_before_the_run(self):
+        # The folder is the run's to remove only when the run made it: here it was there, empty, and the run only
+        # filled it, so after the rollback it is empty again and still there.
+        self.agents.mkdir(mode=0o750)
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        for name in ROLE_NAMES:
+            self.assertEqual(self.installed(name), self.sources[name])
+        code, out = self.host.run("--rollback", str(self.host.latest_run()))
+        self.assertEqual(code, 0, out)
+        for name in ROLE_NAMES:
+            self.assertFalse((self.agents / name).exists())
+        self.assertTrue(self.agents.is_dir(), "a folder this run did not make was removed")
+        self.assertEqual(self.agents.stat().st_mode & 0o777, 0o750)
+        self.assertIn("agents directory: not created by this run", out.splitlines())
+
+    def test_rollback_leaves_an_agents_directory_that_gained_other_files(self):
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self.agents.is_dir(), "the agents directory was not created")
+        (self.agents / "somebody-elses.txt").write_text("keep\n")
+        code, out = self.host.run("--rollback", str(self.host.latest_run()))
+        self.assertEqual(code, 0, out)
+        self.assertFalse((self.agents / ROLE_NAMES[0]).exists())
+        self.assertEqual((self.agents / "somebody-elses.txt").read_text(), "keep\n")
+        self.assertIn("agents directory: left in place (not empty)", out.splitlines())
+
+    def test_a_record_without_agent_roles_leaves_the_role_files_alone(self):
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        record.pop("agent_roles", None)  # what a run of an older tool recorded
+        (run / "record.json").write_text(json.dumps(record))
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("agents/", out)
+        for name in ROLE_NAMES:
+            self.assertEqual(self.installed(name), self.sources[name])
+
+    def test_a_role_file_that_appears_after_the_plan_is_left_alone(self):
+        # The write is create-only (os.link refuses an existing name), so a file made between the plan and the write
+        # is never replaced. Simulated by a plan that still says create for a file that exists.
+        self.agents.mkdir(mode=0o700)
+        (self.agents / ROLE_NAMES[0]).write_text("someone else's\n")
+        with mock.patch.object(lane.Plan, "role_states", lambda self: {name: "create" for name in ROLE_NAMES}):
+            code, out = self.host.apply()
+        self.assertEqual(code, 3, out)
+        self.assertIn(f"agents/{ROLE_NAMES[0]} appeared since it was read; left as it is", out)
+        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), "someone else's\n")
+        self.assertFalse((self.agents / ROLE_NAMES[1]).exists())
+        run = self.host.latest_run()
+        record = json.loads((run / "record.json").read_text())
+        self.assertEqual(record["status"], "failed")
+        self.assertIs(record["agent_roles"]["files"][ROLE_NAMES[0]]["creating"], False)  # it is not ours
+        code, out = self.host.run("--rollback", str(run))
+        self.assertEqual(code, 0, out)
+        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), "someone else's\n")
+        self.assertTrue(self.agents.is_dir())  # the folder was there before the run
+
+    # --- controls (design 4.5): each load-bearing check, disabled, lets the case it guards through
+    def test_control_the_role_precondition_is_what_refuses_a_differing_role(self):
+        need(self, lane.Plan, "role_preconditions")
+        self.agents.mkdir(mode=0o700)
+        (self.agents / ROLE_NAMES[0]).write_text("differs\n")
+        with mock.patch.object(lane.Plan, "role_preconditions", lambda self: []):
+            code, out = self.host.apply()
+        self.assertNotEqual(code, 2, out)  # without it nothing refuses before the writes
+        self.assertEqual((self.agents / ROLE_NAMES[0]).read_text(), "differs\n")  # the state check still spares it
+
+    def test_control_the_doctor_verdict_is_what_fails_the_rehearsal(self):
+        need(self, lane, "doctor_role_state")
+        self.host.set_doctor("role_string")
+        with mock.patch.object(lane, "doctor_role_state", return_value={
+                "state": "ok", "startup_warnings_before": 0, "startup_warnings_after": 1, "role_warnings": 1,
+                "redacted": 0, "load_failed": False}):
+            code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("PROBLEM", out)
+
+    def test_control_the_short_circuit_needs_its_role_term(self):
+        need(self, lane.Plan, "role_states")
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self.agents.is_dir(), "the agents directory was not created")
+        shutil.rmtree(self.agents)
+        with mock.patch.object(lane.Plan, "role_states", lambda self: {name: "same" for name in ROLE_NAMES}):
+            code, out = self.host.apply()
+        self.assertIn("already in place: nothing to do", out)  # what test c refuses to see with the real term
+        self.assertFalse(self.agents.exists())
+
+
 def fixture_events(name: str) -> list[dict]:
     """A run's `codex exec --json` events, one JSON array per run (`*.jsonl` is git-ignored here)."""
     return json.loads((FIXTURES / name).read_text())
@@ -984,6 +1682,57 @@ class ProveVerdictTests(unittest.TestCase):
             self.assertIn("TimeoutExpired", run["cleanup_error"])
             self.assertEqual(run["usage"], {"input_tokens": 7})
             self.assertNotIn("events", run)
+
+    def test_prove_json_names_no_codex_home_path_beside_its_rows(self):
+        # corrections item 5 (recheck L4): the JSON keeps its rows but no longer says where the Codex home is. A
+        # boolean says whether the home was the default one, and a hash-labelled identifier lets two reports of one
+        # home be compared without publishing the path. Scanned outside the rows, which keep their own privacy note.
+        def worker_runs(specs, timeout):
+            return [{"name": spec["name"], "exit": 0, "timed_out": False, "seconds": 1, "cleanup_error": None,
+                     "events": [{"type": "turn.completed", "usage": {"input_tokens": 7}}]} for spec in specs]
+
+        def strings(value):
+            if isinstance(value, str):
+                yield value
+            elif isinstance(value, dict):
+                for key, item in value.items():
+                    yield key
+                    yield from strings(item)
+            elif isinstance(value, list):
+                for item in value:
+                    yield from strings(item)
+
+        def absolute_paths(value):
+            """Whitespace-separated tokens that start with a slash and name something (a linear scan)."""
+            return [token for text in strings(value) for token in text.split()
+                    if token.startswith("/") and len(token) > 1]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            report_path = Path(tmp) / "report.json"
+            skill_path = Path(tmp) / "SKILL.md"
+            skill_path.write_text("# Synthetic installed skill\n", encoding="utf-8")
+            with mock.patch.object(prove, "make_repo", return_value=b"synthetic blob"), \
+                 mock.patch.object(prove, "static_checks"), \
+                 mock.patch.object(prove, "quota_gate", return_value=(True, "synthetic open gate")), \
+                 mock.patch.object(prove, "run_workers", side_effect=worker_runs), \
+                 contextlib.redirect_stdout(io.StringIO()):
+                prove.main(["--codex", "/synthetic/codex", "--codex-home", tmp, "--live", "--skill-file",
+                            str(skill_path), "--json", str(report_path)])
+                default_path = Path(tmp) / "default.json"
+                with mock.patch.dict(os.environ, {"CODEX_HOME": tmp}):
+                    prove.main(["--codex", "/synthetic/codex", "--json", str(default_path)])
+            report = json.loads(report_path.read_text())
+            default = json.loads(default_path.read_text())
+            planted = dict(report, elsewhere={"note": f"see {tmp}"})
+        self.assertNotIn("codex_home", report)
+        self.assertIs(report.get("codex_home_is_default"), False)  # a scratch home is not ~/.codex
+        self.assertIs(default.get("codex_home_is_default"), False)  # nor is a non-default $CODEX_HOME
+        self.assertNotIn("codex_home_id", report)  # no identifier of the home: an unsalted digest confirms a guessed user name
+        self.assertNotIn("codex_home_id", default)
+        self.assertNotIn(tmp, json.dumps({key: value for key, value in report.items() if key != "checks"}))
+        self.assertEqual(absolute_paths({key: value for key, value in report.items() if key != "checks"}), [])
+        self.assertEqual(absolute_paths({key: value for key, value in planted.items() if key != "checks"}), [tmp])  # control
+        self.assertIn("checks", report)  # the rows are kept
 
     def test_rtk_verdict_rejects_a_synthetic_failed_status_command(self):
         # Synthetic fault injected into the captured item shape; no command is executed here.
@@ -1193,6 +1942,110 @@ while True:
                     if pids.exists():
                         with contextlib.suppress(ProcessLookupError):
                             os.killpg(json.loads(pids.read_text())["group"], signal.SIGKILL)
+
+
+class RolesRowTests(unittest.TestCase):
+    """prove_codex_lane's static `roles` row (design 4.3 case o): the installed carriers against their pinned rows,
+    the *.toml files under agents, the role tables of the live config and profile, and the system layer. Counts
+    and booleans only; no model call. Live role checks are deliberately not part of this tool: its --live workers
+    run with --ephemeral, which persists no rollout, and at rust-v0.157.1 with multi-agent V2 the exec JSONL stream
+    carries no item for a spawn_agent call (a successful one emits a SubAgentActivity item that exec's mapping
+    drops, a failed one none, and wait_agent's item has empty receiver_thread_ids), so a live check here could not
+    tell a found role from an unknown one."""
+
+    ROW = "installed {equal}/2 equal to SHA256SUMS; *.toml under agents {count}; role tables {tables}; system roles {system}"
+
+    def setUp(self):
+        self.host = FakeHost(self)
+        self.system = self.host.tmp / "etc-codex"
+        self.system.mkdir()
+        self.agents = self.host.codex_home / "agents"
+
+    def install_roles(self) -> None:
+        self.agents.mkdir(mode=0o700, exist_ok=True)
+        for name in ROLE_NAMES:
+            (self.agents / name).write_bytes((ROLES_SOURCE_DIR / name).read_bytes())
+            (self.agents / name).chmod(0o600)
+
+    def row(self) -> tuple[bool, str]:
+        return need(self, prove, "roles_row")(self.host.codex_home, self.system)
+
+    def expected(self, equal=2, count=2, tables=0, system=0) -> str:
+        return self.ROW.format(equal=equal, count=count, tables=tables, system=system)
+
+    def test_two_matching_roles_and_nothing_else_pass(self):
+        self.install_roles()
+        self.assertEqual(self.row(), (True, self.expected()))
+
+    def test_each_departure_fails_with_its_own_count(self):
+        need(self, prove, "roles_row")
+        self.install_roles()
+        (self.agents / "extra.toml").write_text('name = "extra"\n')
+        self.assertEqual(self.row(), (False, self.expected(count=3)))
+        (self.agents / "extra.toml").unlink()
+        (self.agents / ROLE_NAMES[0]).write_bytes(b'name = "stack-researcher"\n')
+        self.assertEqual(self.row(), (False, self.expected(equal=1)))
+        self.install_roles()
+        config = self.host.read_config()
+        config["agents"] = {"enabled": True, "stray": {"description": "x"}}
+        self.host.write_config(config)
+        self.assertEqual(self.row(), (False, self.expected(tables=1)))
+        self.host.write_config(self.host.config)
+        (self.host.codex_home / "stack-worker.config.toml").write_text('[agents.stray]\ndescription = "x"\n')
+        self.assertEqual(self.row(), (False, self.expected(tables=1)))
+        (self.host.codex_home / "stack-worker.config.toml").unlink()
+        (self.system / "agents").mkdir()
+        (self.system / "agents" / "system.toml").write_text('name = "s"\n')
+        self.assertEqual(self.row(), (False, self.expected(system=1)))
+
+    def test_absent_roles_and_an_unreadable_config_fail(self):
+        self.assertEqual(self.row(), (False, self.expected(equal=0, count=0)))
+        self.install_roles()
+        (self.host.codex_home / "config.toml").write_text("not = [valid toml\n")
+        ok, detail = self.row()
+        self.assertFalse(ok)
+        self.assertIn("role tables unknown", detail)
+
+    def test_a_folder_link_below_agents_is_unknown_and_never_a_pass(self):
+        # Codex enters a linked folder and loads what it finds there as roles (openai/codex rust-v0.157.1
+        # exec-server/src/local_file_system.rs:710-735; checked against codex-cli 0.157.1 by the integration test
+        # test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it), so an extra role behind one must
+        # not leave the row green: the count is unknown, and unknown is not a pass.
+        need(self, prove, "roles_row")
+        self.install_roles()
+        other = self.host.tmp / "roles-elsewhere"
+        other.mkdir()
+        (other / "extra.toml").write_text('name = "extra"\n')
+        (self.agents / "shared").symlink_to(other)
+        ok, detail = self.row()
+        self.assertFalse(ok, "the row passed with a role that Codex would load behind a linked folder")
+        self.assertEqual(detail, self.expected(count="unknown"))
+        self.assertNotIn(str(self.host.tmp), detail)
+        (self.agents / "shared").unlink()  # control: without the link the same folder passes again
+        self.assertEqual(self.row(), (True, self.expected()))
+
+    def test_the_row_is_part_of_the_static_checks_and_carries_no_paths(self):
+        need(self, prove, "roles_row")
+        code, out = self.host.apply()
+        self.assertEqual(code, 0, out)
+        with mock.patch.object(lane, "SYSTEM_CODEX_DIR", self.system, create=True):
+            rows = {}
+            for planted in (False, True):
+                if planted:
+                    (self.agents / "extra.toml").write_text('name = "extra"\n')
+                results = prove.Results()
+                repo = self.host.tmp / f"repo-{planted}"
+                blob = prove.make_repo(repo)
+                with mock.patch.object(prove.shutil, "which", return_value=None), \
+                     contextlib.redirect_stdout(io.StringIO()):
+                    prove.static_checks(str(self.host.codex), self.host.codex_home, str(self.host.eco), ROOT, repo,
+                                        blob, results)
+                rows[planted] = {row["check"]: row for row in results.rows}.get("roles")
+        self.assertIsNotNone(rows[False], "static_checks adds no roles row")
+        self.assertEqual((rows[False]["ok"], rows[False]["detail"]), (True, self.expected()))
+        self.assertEqual((rows[True]["ok"], rows[True]["detail"]), (False, self.expected(count=3)))
+        for row in rows.values():
+            self.assertNotIn(str(self.host.tmp), row["detail"])
 
 
 class SandboxProbeControlTests(unittest.TestCase):
@@ -1469,6 +2322,111 @@ class CodexIntegrationTests(unittest.TestCase):
         for name, data in before.items():
             self.assertEqual((host.codex_home / name).read_bytes(), data, name)
         self.assertFalse((host.codex_home / "stack-worker.config.toml").exists())
+
+    def test_the_doctor_reader_accepts_the_shipped_roles_and_flags_a_malformed_one(self):
+        # The parser of the installer's rehearsal against the real binary: `codex doctor --json` in a scratch home
+        # exits 1 (auth.credentials fails without a sign-in) and still prints config.load. The two shipped carriers
+        # add no startup warning; a role file without developer_instructions adds exactly one, "Ignoring malformed
+        # agent role definition", so the same reader gives ok for the first and problem for the second.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            env = self.gateway_home(root, "")
+            codex_home, cwd = Path(env["CODEX_HOME"]), root / "cwd"
+            wrapper = lane.bwrap_wrapper(root)
+            reports = {"none": lane.run_doctor(shutil.which("codex"), env, wrapper, cwd)}
+            agents = codex_home / "agents"
+            agents.mkdir(mode=0o700)
+            for name in ROLE_NAMES:
+                shutil.copy(ROLES_SOURCE_DIR / name, agents / name)
+            reports["shipped"] = lane.run_doctor(shutil.which("codex"), env, wrapper, cwd)
+            (agents / ROLE_NAMES[1]).write_text('name = "stack-verifier"\ndescription = "no developer_instructions"\n')
+            reports["malformed"] = lane.run_doctor(shutil.which("codex"), env, wrapper, cwd)
+        for label, stdout in reports.items():
+            self.assertIsNotNone(lane.doctor_config_load(stdout), f"{label}: no config.load in the report")
+        shipped = lane.doctor_role_state(reports["none"], reports["shipped"])
+        self.assertEqual(shipped, {"state": "ok", "startup_warnings_before": 0, "startup_warnings_after": 0,
+                                   "role_warnings": 0, "redacted": 0, "load_failed": False})
+        malformed = lane.doctor_role_state(reports["none"], reports["malformed"])
+        self.assertEqual(malformed, {"state": "problem", "startup_warnings_before": 0, "startup_warnings_after": 1,
+                                     "role_warnings": 1, "redacted": 0, "load_failed": False})
+
+    def test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it(self):
+        # Upstream behaviour, checked with the real binary and not assumed: LocalFileSystem::read_directory takes a link's
+        # target's type (openai/codex rust-v0.157.1 codex-rs/exec-server/src/local_file_system.rs:710-735), so
+        # agent-roles/src/discovery.rs enters a linked folder, collects a link to a regular file by the link's own name and
+        # skips a dangling one. `codex doctor --json` in a scratch home with the network off records one startup warning per
+        # malformed role file Codex collects, so the number of role warnings is how many files it loaded. Controls: the
+        # empty folder and a valid role give none, and a real subfolder gives one (a folder is entered). The invariant the
+        # tools rest on: agents_toml_count is None or at least what Codex collected, never less. This is a check of what
+        # Codex does, not a failing-first test of the tools: if a later pin stops following links, this is the test that says
+        # so and the rule can be revisited (docs/decisions/2026-09-26-codex-worker-lane.md, 2026-09-29 addendum).
+        good = 'name = "probe"\ndescription = "d"\ndeveloper_instructions = "x"\n'
+        bad = 'name = "bad"\ndescription = "d"\n'  # no developer_instructions: one role warning when Codex collects it
+
+        def elsewhere(root):
+            folder = root / "elsewhere"
+            folder.mkdir()
+            (folder / "bad.toml").write_text(bad)
+            (folder / "bad.txt").write_text(bad)
+            return folder
+
+        def empty_folder(agents, root):
+            pass
+
+        def valid_role(agents, root):
+            (agents / "ok.toml").write_text(good)
+
+        def real_subfolder(agents, root):
+            (agents / "sub").mkdir()
+            (agents / "sub" / "bad.toml").write_text(bad)
+
+        def link_to_folder(agents, root):
+            (agents / "linked").symlink_to(elsewhere(root))
+
+        def link_named_toml_to_folder(agents, root):
+            (agents / "dir.toml").symlink_to(elsewhere(root))
+
+        def link_named_toml_to_file(agents, root):
+            (agents / "file.toml").symlink_to(elsewhere(root) / "bad.txt")
+
+        def dangling_link_named_toml(agents, root):
+            (agents / "dangling.toml").symlink_to(root / "nowhere")
+
+        def toml_behind_a_txt_link(agents, root):
+            (agents / "renamed.txt").symlink_to(elsewhere(root) / "bad.toml")
+
+        scenarios = (  # label, setup, the role warnings Codex records, the *.toml files it collects
+            ("an empty folder (control)", empty_folder, 0, 0),
+            ("a valid role (control)", valid_role, 0, 1),
+            ("a malformed role in a real subfolder (control)", real_subfolder, 1, 1),
+            ("a link to a folder", link_to_folder, 1, 1),
+            ("a link named x.toml to a folder", link_named_toml_to_folder, 1, 1),
+            ("a link named x.toml to a file", link_named_toml_to_file, 1, 1),
+            ("a dangling link named x.toml", dangling_link_named_toml, 0, 0),
+            ("a malformed role behind a link named x.txt", toml_behind_a_txt_link, 0, 0),
+        )
+        codex = shutil.which("codex")
+
+        def observe(scenario):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                env = self.gateway_home(root, "")
+                agents = Path(env["CODEX_HOME"]) / "agents"
+                agents.mkdir(mode=0o700)
+                scenario[1](agents, root)
+                stdout = lane.run_doctor(codex, env, lane.bwrap_wrapper(root), root / "cwd")
+                return lane.doctor_config_load(stdout), lane.agents_toml_count(agents)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            observed = list(pool.map(observe, scenarios))
+        for (label, _setup, role_warnings, collected), (loaded, count) in zip(scenarios, observed):
+            with self.subTest(scenario=label):
+                self.assertIsNotNone(loaded, "no config.load in the report")
+                warnings = lane.codex_roles.startup_warnings(loaded[1])
+                self.assertEqual(sum(text.startswith(lane.codex_roles.ROLE_WARNING_PREFIX) for text in warnings),
+                                 role_warnings, "the role files Codex collected")
+                self.assertTrue(count is None or count >= collected,
+                                f"the count says {count}, but Codex collected {collected}: the count undercounts")
 
     def test_a_project_config_outranks_the_profile_but_not_the_pinned_flags(self):
         # The multi_agent_mode sentence tells the efforts apart: ultra delegates proactively, max does not.

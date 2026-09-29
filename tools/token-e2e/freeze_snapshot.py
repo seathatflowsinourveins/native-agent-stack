@@ -40,6 +40,17 @@ Sources for the rules implemented here (no upstream implementation of this glue 
   20260928 at 2bad7320, lines 643-655): the directory order (argument, CHILD_USAGE_SHELL_PARSER, the pin's default under the
   home directory), the pinned files, and the lockfile that must list both pinned packages with the pinned version and
   integrity. tools.parser.* mirrors that load check; re-read it when U1 merges.
+  openai/codex rust-v0.157.1 (36650394): codex-rs/agent-roles/src/discovery.rs and loader.rs (a role comes from every *.toml
+  below <config folder>/agents and from every [agents.<name>] table of an enabled layer), codex-rs/exec-server/src/
+  local_file_system.rs:710-735 (read_directory classifies a link by its target, so Codex enters a linked folder: a folder link
+  below agents makes a role count an error here, never a smaller count), codex-rs/config/src/state.rs
+  config_folder (the user layer's folder is $CODEX_HOME, the system layer's /etc/codex, a project layer's its .codex) and
+  `codex mcp list --json` (a JSON array of objects, of which only `name` and `enabled` are read). The codex.* role rows are
+  the U13 rows of the Codex role carriers (adoption/agents/codex, tools/adoption/codex_roles.py); this tool stays
+  self-contained and repeats their counting rules. observability/collector/codex-identity-launcher.sh.example ends with
+  `exec '<absolute path>' "$@"`, the shape codex.binary.sha256 follows one hop: it hashes the file that line names, read
+  through links. On the reference host that file is a link to the npm package's Node entry (@openai/codex bin/codex.js), which
+  resolves and starts the native executable; the native executable itself is not hashed, and codex.version names the release.
 """
 
 from __future__ import annotations
@@ -94,6 +105,10 @@ TOKENIZER_PREFIX = "~/.local/share/native-token-report/tokenizer"
 CREDENTIAL_STORES = (".claude.json", ".claude/.credentials.json", ".codex/auth.json")
 LAUNCHER = "~/.local/share/codex-ecosystem/bin/claude"
 CLAUDE_BINARY = "~/.local/bin/claude"
+CODEX_ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")  # adoption/agents/codex/SHA256SUMS names exactly these two
+CODEX_SYSTEM_DIR = Path("/etc/codex")  # the system layer's config folder; that layer is always pushed (config/src/loader/mod.rs)
+CODEX_HOME_VARIABLE = "CODEX_HOME"
+CODEX_PROFILE = "stack-worker"
 SETTINGS_DERIVED = ("effort_level_env_unset", "agent_teams_env", "subagent_model_env", "has_model_settings",
                     "has_effort_level", "advisor_model")
 UNSET, OTHER = "unset", "other"
@@ -743,6 +758,43 @@ def build_specs(config: dict) -> list[Spec]:
     add("codex.stack_worker_profile.present", "codex", "file exists", "true when ~/.codex/stack-worker.config.toml exists")
     add("codex.agents_md.sha256", "codex", "sha256 of file", "sha256 of ~/.codex/AGENTS.md")
     add("codex.rtk_md.sha256", "codex", "sha256 of file", "sha256 of ~/.codex/RTK.md")
+    # The Codex role carriers and everything else that can add a role (U13). They read the Codex home as scripts/
+    # adoption_status.py does ($CODEX_HOME when set and not empty, else ~/.codex); the codex.* items above read ~/.codex.
+    for role in ("stack-researcher", "stack-verifier"):
+        add(f"codex.agents.{role}.sha256", "codex_roles", "sha256 of file",
+            f"sha256 of {role}.toml in the agents folder of the Codex home ($CODEX_HOME when set, else ~/.codex); missing when "
+            "absent, error when it is a link or the folder is a link")
+    add("codex.agents.toml_set", "codex_roles", "*.toml files below agents",
+        "which of stack-researcher.toml and stack-verifier.toml the agents folder of the Codex home holds at its top, and `other`, "
+        "the number of every other *.toml file below it (nested files and links to files named *.toml count; a name is never "
+        "published): both true and 0 other is the frozen state. A link to a folder anywhere below makes it an error "
+        "(linked_folder): Codex enters a linked folder, and a set that skipped one would undercount")
+    add("codex.agents.role_tables", "codex_roles", "[agents.<name>] tables",
+        "the number of [agents.<name>] tables in config.toml and stack-worker.config.toml of the Codex home (0 when a file is "
+        "absent; error when one does not parse)")
+    add("codex.system.agents_toml_count", "codex_roles", "*.toml files below agents",
+        "the number of *.toml files below /etc/codex/agents, the system layer's role folder (0 when absent; error when a link to "
+        "a folder is below it)")
+    add("codex.system.role_tables", "codex_roles", "[agents.<name>] tables",
+        "the number of [agents.<name>] tables in /etc/codex/config.toml (0 when absent)")
+    add("codex.project.agents_toml_count", "codex_roles", "*.toml files below agents",
+        "the number of *.toml files below .codex/agents of the checkout under freeze, its project layer's role folder (0 when "
+        "absent; error when a link to a folder is below it)")
+    add("codex.project.role_tables", "codex_roles", "[agents.<name>] tables",
+        "the number of [agents.<name>] tables in .codex/config.toml of the checkout under freeze (0 when absent)")
+    add("codex.launcher.sha256", "codex_roles", "sha256 of file",
+        "sha256 of the file the `codex` on PATH names (the launcher when one is installed); missing when there is no codex on PATH")
+    add("codex.binary.sha256", "codex_roles", "sha256 of the file the launcher executes",
+        "sha256 of the file the launcher script on PATH ends by executing (its last line `exec '<absolute path>' \"$@\"`, one hop, "
+        "read through links; the path must meet the path policy and is not stored), else of the file the `codex` on PATH resolves "
+        "to. That file is the npm package's Node entry on the reference host, which starts the native executable: the row pins the "
+        "entry point and codex.version names the release")
+    add("codex.mcp.servers.default", "codex_roles", "codex mcp list --json names and enabled flags",
+        "server name and enabled flag from `codex mcp list --json` run in an empty temporary directory, so no project layer "
+        "adds a server: the parent's effective set; transport, environment, arguments and URLs are never read")
+    add("codex.mcp.servers.stack_worker", "codex_roles", "codex mcp list --json names and enabled flags",
+        "server name and enabled flag from `codex -p stack-worker mcp list --json` run in an empty temporary directory: "
+        "the effective set of the sealed arm B parent")
 
     add("wiring.complete", "adoption", "adoption_status client wiring",
         "client_wiring.complete from scripts/adoption_status.py --client-wiring --json in the checkout")
@@ -1076,6 +1128,255 @@ def collect_codex(ctx: Ctx) -> list[dict]:
             ctx.item("codex.stack_worker_profile.present", OK, profile.is_file(), None, profile),
             ctx.file_item("codex.agents_md.sha256", home / "AGENTS.md"),
             ctx.file_item("codex.rtk_md.sha256", home / "RTK.md")]
+
+
+# ------------------------------------------------------------------- the Codex role carriers, their layers, codex itself
+
+
+def codex_home(ctx: Ctx) -> tuple[Optional[Path], bool]:
+    """(the Codex home, whether its location may be stored), located as scripts/adoption_status.py client_wiring does:
+    $CODEX_HOME when it is set and not empty, else ~/.codex. The variable names a path this tool reads, so it must be
+    absolute and meet the path policy, and a location that came from it is not stored; None when it is refused."""
+    value = ctx.env.get(CODEX_HOME_VARIABLE)
+    if not value:
+        return ctx.home / ".codex", True
+    if os.path.isabs(value):  # a relative value or `~` names a folder this tool cannot know: Codex resolves neither here
+        try:
+            return check_path_policy(value, ctx.home, ctx.repo, allow_relative=False), False
+        except PathRefused:
+            pass
+    return None, False
+
+
+def path_kind(path: Path) -> str:
+    """absent | dir | link | file | other | error, by lstat: a link is reported and never followed."""
+    try:
+        mode = os.lstat(path).st_mode
+    except FileNotFoundError:
+        return "absent"
+    except OSError:
+        return "error"
+    if stat.S_ISLNK(mode):
+        return "link"
+    if stat.S_ISDIR(mode):
+        return "dir"
+    return "file" if stat.S_ISREG(mode) else "other"
+
+
+def toml_names(folder: Path) -> tuple[Optional[list[str]], Optional[str]]:
+    """(the sorted relative names of the *.toml files below `folder`, reason), the way codex-rs/agent-roles/src/discovery.rs
+    collects role files at rust-v0.157.1 and tools/adoption/codex_roles.py agents_toml_count counts them: recursively, by the
+    exact extension. A link to a file named *.toml is listed and never read. Codex follows links (LocalFileSystem::read_directory
+    takes a link's target's type, codex-rs/exec-server/src/local_file_system.rs:710-735; checked against codex-cli 0.157.1
+    through `codex doctor --json` by tests/test_codex_worker_lane.py CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it), so it enters a linked folder; this never does, and a set that skipped one would undercount:
+    a link to a folder anywhere below, whatever its name, is (None, "linked_folder"). No names for an absent folder ([]), and
+    (None, reason) when `folder` is not a real folder, a folder link is below it, or any part of it cannot be read."""
+    kind = path_kind(folder)
+    if kind == "absent":
+        return [], None
+    if kind != "dir":
+        return None, "unreadable" if kind == "error" else "not_a_directory"
+    failed: list[OSError] = []
+    names: list[str] = []
+    for current, directories, files in os.walk(folder, followlinks=False, onerror=failed.append):
+        # os.walk lists a link to a folder with the directories and does not enter it: unknown, never skipped.
+        if any(path_kind(Path(current) / name) == "link" for name in directories):
+            return None, "linked_folder"
+        for name in files:
+            if name.endswith(".toml") and len(name) > len(".toml"):
+                names.append((Path(current) / name).relative_to(folder).as_posix())
+    return (None, "unreadable") if failed else (sorted(names), None)
+
+
+def role_tables_in(ctx: Ctx, path: Path) -> tuple[Optional[int], Optional[str]]:
+    """(the number of [agents.<name>] tables in one TOML file, reason): 0 for an absent file. The scalar keys of [agents]
+    (enabled, max_concurrent_threads_per_session, ...) are not roles; agent-roles/src/loader.rs reads each table under it."""
+    status, data, reason = ctx.read(path, 1 << 20)
+    if status == MISSING:
+        return 0, None
+    if status != OK:
+        return None, reason
+    try:
+        import tomllib  # standard library from Python 3.11
+    except ImportError:
+        return None, "no_toml_parser"
+    try:
+        agents = tomllib.loads(data.decode("utf-8")).get("agents")
+    except (ValueError, UnicodeDecodeError, RecursionError):  # TOMLDecodeError is a ValueError
+        return None, "unparsable"
+    return sum(1 for value in agents.values() if isinstance(value, dict)) if isinstance(agents, dict) else 0, None
+
+
+def count_item(ctx: Ctx, item_id: str, folder: Path) -> dict:
+    names, reason = toml_names(folder)
+    return ctx.item(item_id, OK, len(names)) if names is not None else ctx.item(item_id, ERROR, None, reason)
+
+
+def tables_item(ctx: Ctx, item_id: str, files: list[Path]) -> dict:
+    total = 0
+    for path in files:
+        tables, reason = role_tables_in(ctx, path)
+        if tables is None:
+            return ctx.item(item_id, ERROR, None, reason)
+        total += tables
+    return ctx.item(item_id, OK, total)
+
+
+def role_file_item(ctx: Ctx, item_id: str, path: Path, shown: Optional[Path]) -> dict:
+    """sha256 of one role carrier. A link is an error: the installer writes regular files, and what Codex loads through a
+    link is not known here."""
+    kind = path_kind(path)
+    if kind == "absent":
+        return ctx.item(item_id, MISSING, None, "file_absent", shown)
+    if kind == "link":
+        return ctx.item(item_id, ERROR, None, "link", shown)
+    status, digest, reason = ctx.hash_file(path)
+    return ctx.item(item_id, status, digest, reason, shown)
+
+
+def toml_set_item(ctx: Ctx, item_id: str, folder: Path, shown: Optional[Path]) -> dict:
+    """Which carriers the folder holds at its top and how many other *.toml files are below it. A name that is not a
+    carrier's is never published, so the value carries no name a host chose."""
+    names, reason = toml_names(folder)
+    if names is None:
+        return ctx.item(item_id, ERROR, None, reason, shown)
+    value: dict[str, Any] = {name: name in names for name in CODEX_ROLE_FILES}
+    value["other"] = sum(1 for name in names if name not in CODEX_ROLE_FILES)
+    return ctx.item(item_id, OK, value, None, shown)
+
+
+def home_role_items(ctx: Ctx) -> list[dict]:
+    ids = ("codex.agents.stack-researcher.sha256", "codex.agents.stack-verifier.sha256", "codex.agents.toml_set",
+           "codex.agents.role_tables")
+    home, stored = codex_home(ctx)
+    if home is None:
+        return [ctx.item(item_id, ERROR, None, "refused_path") for item_id in ids]
+    agents = home / "agents"
+    kind = path_kind(agents)  # a linked or non-folder agents path is refused whole: nothing below it can be attested
+    if kind in ("link", "file", "other", "error"):
+        items = [ctx.item(item_id, ERROR, None, "unreadable" if kind == "error" else "not_a_directory")
+                 for item_id in ids[:3]]
+    else:
+        items = [role_file_item(ctx, ids[0], agents / CODEX_ROLE_FILES[0], agents / CODEX_ROLE_FILES[0] if stored else None),
+                 role_file_item(ctx, ids[1], agents / CODEX_ROLE_FILES[1], agents / CODEX_ROLE_FILES[1] if stored else None),
+                 toml_set_item(ctx, ids[2], agents, agents if stored else None)]
+    items.append(tables_item(ctx, ids[3], [home / "config.toml", home / f"{CODEX_PROFILE}.config.toml"]))
+    return items
+
+
+def launcher_target(text: str) -> Optional[str]:
+    """The absolute path a launcher script ends by executing: its last non-blank line must be exactly
+    `exec '<absolute path>' "$@"`, the last line of observability/collector/codex-identity-launcher.sh.example and of the
+    older render still installed on the reference host. None for any other shape."""
+    last = ""
+    for line in reversed(text.splitlines()):
+        last = line.strip()
+        if last:
+            break
+    head, tail = "exec '", "' \"$@\""
+    if len(last) <= len(head) + len(tail) or not last.startswith(head) or not last.endswith(tail):
+        return None
+    target = last[len(head):len(last) - len(tail)]
+    if "'" in target or "\x00" in target or not os.path.isabs(target):
+        return None
+    return target
+
+
+def script_text(ctx: Ctx, path: Path) -> Optional[str]:
+    """The text of a script, a file that starts with `#!` and is at most 1 MiB; None for anything else, a binary included
+    (only its first two bytes are read)."""
+    try:
+        if is_credential_store(str(path), ctx.home) or regular_file_problem(path):
+            return None
+        with open(path, "rb") as handle:
+            head = handle.read(2)
+            if head != b"#!":
+                return None
+            rest = handle.read((1 << 20) + 1)
+    except OSError:
+        return None
+    return (head + rest).decode("utf-8", "replace") if len(rest) <= 1 << 20 else None
+
+
+def binary_item(ctx: Ctx, item_id: str, entry: Path) -> dict:
+    """sha256 of the file the codex on PATH executes. On a host with the identity launcher the entry is a script that ends by
+    executing another file, and that file is hashed (one hop, read through links; its path meets the path policy and is not
+    stored). It is the entry point of the codex install, not necessarily the native executable: the npm package's Node entry
+    starts that one, and is what this hashes on the reference host. Otherwise it is the file the entry resolves to, the same
+    file as codex.launcher.sha256."""
+    text = script_text(ctx, entry)
+    target = launcher_target(text) if text is not None else None
+    if target is None:
+        status, digest, reason = ctx.hash_file(Path(os.path.realpath(entry)))
+        return ctx.item(item_id, status, digest, reason)
+    try:
+        path = check_path_policy(target, ctx.home, ctx.repo, allow_relative=False)
+    except PathRefused:
+        return ctx.item(item_id, ERROR, None, "refused_path")
+    status, digest, reason = ctx.hash_file(path)
+    return ctx.item(item_id, status, digest, reason)
+
+
+def launcher_items(ctx: Ctx) -> list[dict]:
+    ids = ("codex.launcher.sha256", "codex.binary.sha256")
+    found = shutil.which("codex", path=ctx.env.get("PATH"))
+    if found is None:
+        return [ctx.item(item_id, MISSING, None, "tool_absent") for item_id in ids]
+    entry = Path(os.path.abspath(found))
+    status, digest, reason = ctx.hash_file(entry)
+    return [ctx.item(ids[0], status, digest, reason), binary_item(ctx, ids[1], entry)]
+
+
+def parse_codex_mcp_list(text: str) -> Optional[dict]:
+    """`codex mcp list --json` (0.157.1): a JSON array with one object per server. Only `name` and `enabled` are read, so no
+    transport, environment value, argument or URL can reach a capture. {name: enabled} in name order, or None when the text
+    is not that array, a name is not plain, an enabled flag is not a boolean or a name repeats."""
+    try:
+        entries = json.loads(text)
+    except (ValueError, RecursionError):
+        return None
+    if not isinstance(entries, list):
+        return None
+    servers: dict[str, bool] = {}
+    for entry in entries:
+        name, enabled = (entry.get("name"), entry.get("enabled")) if isinstance(entry, dict) else (None, None)
+        if not plain_name(name, "._:@+-", 80) or not isinstance(enabled, bool) or name in servers:
+            return None
+        servers[name] = enabled
+    return dict(sorted(servers.items()))
+
+
+def mcp_server_item(ctx: Ctx, item_id: str, argv: list[str]) -> dict:
+    """One effective server set. The command runs in an empty temporary directory, because a checkout's project layer adds
+    servers that a launch in another tree never sees."""
+    try:
+        folder = tempfile.mkdtemp(prefix="freeze-mcp-")
+    except OSError:
+        return ctx.item(item_id, ERROR, None, "no_scratch_directory")
+    try:
+        result = ctx.run(argv, timeout=60.0, cwd=Path(folder))
+    finally:
+        shutil.rmtree(folder, ignore_errors=True)
+    if result.state == "missing":
+        return ctx.item(item_id, MISSING, None, "tool_absent")
+    if result.state != "ok":
+        return ctx.item(item_id, ERROR, None, result.state)
+    servers = parse_codex_mcp_list(result.out)
+    if servers is None:
+        return ctx.item(item_id, ERROR, None, "unrecognized_output")
+    return ctx.item(item_id, OK, servers)
+
+
+def collect_codex_roles(ctx: Ctx) -> list[dict]:
+    items = home_role_items(ctx)
+    items += [count_item(ctx, "codex.system.agents_toml_count", CODEX_SYSTEM_DIR / "agents"),
+              tables_item(ctx, "codex.system.role_tables", [CODEX_SYSTEM_DIR / "config.toml"]),
+              count_item(ctx, "codex.project.agents_toml_count", ctx.repo / ".codex" / "agents"),
+              tables_item(ctx, "codex.project.role_tables", [ctx.repo / ".codex" / "config.toml"])]
+    items += launcher_items(ctx)
+    items.append(mcp_server_item(ctx, "codex.mcp.servers.default", ["codex", "mcp", "list", "--json"]))
+    items.append(mcp_server_item(ctx, "codex.mcp.servers.stack_worker", ["codex", "-p", CODEX_PROFILE, "mcp", "list", "--json"]))
+    return items
 
 
 def collect_tools(ctx: Ctx) -> list[dict]:
@@ -1522,6 +1823,7 @@ COLLECTORS: tuple[tuple[str, Callable[[Ctx], list[dict]]], ...] = (
     ("hooks", collect_hooks),
     ("claude", collect_claude),
     ("codex", collect_codex),
+    ("codex_roles", collect_codex_roles),
     ("tools", collect_tools),
     ("adoption", collect_adoption),
     ("services", collect_services),

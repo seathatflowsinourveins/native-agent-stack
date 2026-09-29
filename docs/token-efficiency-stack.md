@@ -142,7 +142,8 @@ from a later release or a default-branch clone. The command runs none of the
 selected tools. It parses the client files named below whole and in-process, emits no
 value from them, and opens no credential store (`~/.claude.json`,
 `~/.claude/.credentials.json`, `~/.codex/auth.json`). It prints command presence plus
-`client_wiring`: booleans, three hook-event counts, `null` for a file it could not read
+`client_wiring`: booleans, four counts (three hook-event counts and the number of Codex
+role files that match this checkout's, below), `null` for a file it could not read
 or parse (the Codex hook counts also for a `hooks.json` that Codex's own parse rejects,
 and the trusted count for an ai-memory hook whose matcher it cannot evaluate; see
 below), and the computed `complete`.
@@ -191,7 +192,16 @@ clients. `client_wiring` checks three places:
   Context Mode is enabled and installed; `config.toml` names the same three servers;
   hooks are on (`hooks_feature_enabled`); the number of `hooks.json` events that run
   ai-memory; and how many of those events have an ai-memory hook Codex actually runs
-  (`ai_memory_hook_events_trusted`). Codex reads `AGENTS.override.md` when it has
+  (`ai_memory_hook_events_trusted`); and how many of the two Codex role carriers
+  (`stack-researcher.toml`, `stack-verifier.toml`) under the Codex home's `agents/` equal
+  this checkout's `adoption/agents/codex` copies byte for byte (`stack_roles_matching`, 0 to 2).
+  That count is information, not part of the wiring rule: 0 does not make `complete` false,
+  but a `null` does, like every other `null`. It is `null` when a source copy, a role file
+  or the folder cannot be read, and when the `agents` path is a link or not a folder; a
+  carrier that is absent, a link or different does not count. The count says nothing about
+  other `*.toml` files under `agents/`, which Codex also loads as roles: the
+  [installer](../recipes/README.md#codex-worker-lane) and the freeze snapshot
+  ([`tools/token-e2e`](../tools/token-e2e/README.md)) count those. Codex reads `AGENTS.override.md` when it has
   text, else `AGENTS.md`, and passes the file to the model verbatim: it expands no
   `@RTK.md` reference
   ([`codex-rs/codex-home/src/instructions/mod.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-home/src/instructions/mod.rs),
@@ -238,7 +248,8 @@ The practice is applied on a host when all of these hold:
   every `claude`, `project` and `codex` boolean is `true` (each Codex server named in
   the user or the project `config.toml`), both hook counts are above zero, and every
   Codex event that runs ai-memory runs it trusted (`ai_memory_hook_events_trusted`
-  equals `ai_memory_hook_events`). The rule changed after `v2026.09.26.2`: that
+  equals `ai_memory_hook_events`); `stack_roles_matching` adds nothing to the rule but its `null`,
+  since every `null` leaf makes `complete` false. The rule changed after `v2026.09.26.2`: that
   release's check accepts a bare `@RTK.md` reference and counts hooks whatever their
   trust, so it reports `complete: true` for a Codex that sees no RTK instructions and
   runs no ai-memory hook;
