@@ -170,6 +170,7 @@ def main(argv=None) -> int:
     outputs["invoke-by-tool.json"] = dump(invoke)
 
     returned = json.loads(source(args.returned_results))
+    returned_name = clean_text(args.returned_results.name)  # the key source() recorded for this input
     records = {record["id"]: record for record in returned["records"]}
     cited: dict[str, list[str]] = {}
     for tool, card in sorted(cards.items()):
@@ -186,8 +187,8 @@ def main(argv=None) -> int:
     outputs["returned-results-subset.json"] = dump({
         "schema_version": 1, "kind": "returned_results_cited_subset", "edition": EDITION,
         "evidence_class": "local integration (upstream commands and checks run on the source host; returned data retained)",
-        "source": {"name": "returned-results.json", "captured_at": returned.get("captured_at"),
-                   **inputs["returned-results.json"], "records": len(returned["records"])},
+        "source": {"name": returned_name, "captured_at": returned.get("captured_at"),
+                   **inputs[returned_name], "records": len(returned["records"])},
         "scope": clean_text(returned.get("scope", "")),
         "method": ("Every record a committed card cites (its records_shown plus any record id named in its text). "
                    "Each keeps its command, exit and a summary of at most 600 characters; the full observation "
