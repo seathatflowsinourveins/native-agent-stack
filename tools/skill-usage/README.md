@@ -252,10 +252,48 @@ not contribute M5 bytes unless represented by a direct model-visible ctx call.
 Shell commands of `exec_command`, `shell_command`, `shell` and local-shell
 calls and of `CommandExecution` items are read in command position; those
 nested in a code-mode `exec` count under carrier `nested`. A Codex argv array is one command, not
-shell text (U1 pivot D6, GPT-6 finding 11): a shell's `-c` or `-lc` script argument is the script
-itself (`[shell, -lc, script]` as `codex-rs/core/src/shell.rs` runs it), and any other argv is
+shell text (U1 pivot D6, GPT-6 finding 11): a POSIX shell's script argument is the script itself
+(`[shell, -lc, script]` as `codex-rs/core/src/shell.rs` runs it), and any other argv is
 joined with each element quoted (`shlex.join`), so a metacharacter inside one element stays data and
-`["echo", "qmd; rtk proxy qmd status"]` counts no lane. A measurement (not an aggregate) awaits the
+`["echo", "qmd; rtk proxy qmd status"]` counts no lane.
+
+The PR-A measurement reads each shell call by the shell that ran it (U3 design section 6, with the
+review's finding that `shell_script` keeps its reading for the legacy lane counters):
+
+- An argv (a `CommandExecution`'s `command`, a local-shell or `shell` call's `command`) runs its
+  program directly. The program is typed by its file stem, with `/` and `\` as separators: `sh`,
+  `bash`, `zsh`, `dash` and `ksh` are POSIX shells, and with `-c` among their short options the first
+  non-option argument is the script (bash(1) INVOCATION: `-lc`, `-cl`, `-e -c`, and `-o pipefail -c`,
+  where each `o` or `O` takes the next word); `pwsh`, `powershell` and `cmd`, matched ASCII
+  case-insensitively as Windows resolves program names, are not.
+- `exec_command`'s `cmd` runs in the shell its `shell` argument names, typed as Codex types it
+  ([shell_detect.rs:39-59](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/shell-command/src/shell_detect.rs#L39-L59)):
+  the value, else its file stem again and again, case-sensitively. `zsh`, `bash` and `sh` are POSIX
+  shells, `pwsh`, `powershell` and `cmd` are not, and any other value (or one that is not a string,
+  which fails `ExecCommandArgs`) runs the OS fallback shell, `/bin/sh` on Unix and `cmd.exe` on
+  Windows (`:315-334`), which the rollout does not record. Without a `shell` (absent or null) the
+  session's shell runs `cmd`, read as a POSIX shell.
+- A command whose text is not a POSIX script, or whose shell is not known, is unresolved and counted
+  in `measurement.codex_commands` (`non_posix_shell`, `unknown_shell`). It stays a Bash call, with
+  no text: its result bytes count in M3, it counts in no CLI lane, `m4.status` reads `incomplete`
+  because its fetches cannot be read (the per-carrier M4 statuses count what was read), and with
+  `--rtk-check` it is an explicit `rtk_parts.unknown_calls` entry (its empty text is still replayed,
+  which rtk 0.50.0 answers with `No rewrite for:` and no parts). Groups force the same `m4.status`,
+  since the kernel's aggregate recomputes it from the counts.
+- A `CommandExecution` whose `source`
+  ([protocol.rs:3534-3544](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L3534-L3544))
+  is `user_shell` is the user's own command, whose output Codex records as a conversation item and
+  not as a tool result (`codex-rs/core/src/tasks/user_shell.rs:190-205`, `:453-481`), and one whose
+  source is `unified_exec_interaction` is an interaction with a running process (no core code sets
+  that source at rust-v0.157.1, so this reading is conservative). Neither is a model tool call: no
+  tool use and no result, counted only in `codex_commands.user_shell` and
+  `codex_commands.exec_interactions`.
+- `codex_commands` counts a call once, at its first record inside `[since, until)`, as the kernel
+  keeps a call's first tool use, so adjacent windows add up. The legacy `shell_calls`,
+  `rtk_prefixed_shell_calls` and `fetch` counters keep counting every `CommandExecution` with
+  `shell_script`'s reading, as the historical comparison fields they are.
+
+A measurement (not an aggregate) awaits the
 kernel's `loadShellParser()` before it reads, as the kernel's own CLI does: the CLI-lane reading
 needs the verified tree-sitter-bash install (`CHILD_USAGE_SHELL_PARSER`, then the ecosystem tools
 directory that `shell-parser.pin.json` names), and without one `measurement.cli_lanes` is `{status:

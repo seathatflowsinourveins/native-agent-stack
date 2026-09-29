@@ -2397,7 +2397,6 @@ class CodexCommandNormalization(unittest.TestCase):
     rust-v0.157.1, so this is conservative). The legacy lane counters keep counting every CommandExecution."""
 
     @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
-    @pending("commit 6: normalization")
     def test_non_posix_shells_are_unresolved(self):
         got = u3_measure(PAGINATED_META,
                          *shell_function_call("call_priv_n1", {"cmd": "qmd search x", "shell": "/usr/bin/pwsh"},
@@ -2408,7 +2407,6 @@ class CodexCommandNormalization(unittest.TestCase):
         self.assertEqual(got.get("codex_commands", {}).get("non_posix_shell"), 3)
         self.assertEqual(got["m4"]["status"], "incomplete")
 
-    @pending("commit 6: normalization")
     def test_user_shell_commands_are_not_model_calls(self):
         # E3.
         got = u3_measure(PAGINATED_META,
@@ -2417,7 +2415,6 @@ class CodexCommandNormalization(unittest.TestCase):
         self.assertEqual(got.get("codex_commands", {}).get("user_shell"), 1)
 
     @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
-    @pending("commit 6: normalization")
     def test_exec_interactions_are_not_invocations(self):
         got = u3_measure(PAGINATED_META,
                          sourced_command("item_i1", ["bash", "-lc", "qmd search x"], "unified_exec_interaction"))

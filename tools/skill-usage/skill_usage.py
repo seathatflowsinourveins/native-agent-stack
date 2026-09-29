@@ -923,6 +923,96 @@ def shell_script(command) -> str:
     return command if isinstance(command, str) else ""
 
 
+# PR-A U3 normalization (design section 6, with the review's shell_script finding): the PR-A measurement reads a shell call
+# through resolve_command or resolve_shell_call, which also say when its text is no POSIX shell script; shell_script keeps
+# the legacy lane counters' reading. exec_command's model-provided shell is typed as openai/codex rust-v0.157.1 types it
+# (shell-command/src/shell_detect.rs:39-59): zsh, bash and sh run a -c script, pwsh and powershell run PowerShell text and
+# cmd runs cmd text (core/src/shell.rs:22-49); any other value runs the OS fallback shell, /bin/sh on Unix and cmd.exe on
+# Windows (shell_detect.rs:315-334), which the rollout does not record.
+CODEX_SHELL_TYPES = {"zsh": "posix", "bash": "posix", "sh": "posix", "pwsh": "non_posix", "powershell": "non_posix",
+                     "cmd": "non_posix"}
+NON_POSIX_PROGRAMS = ("pwsh", "powershell", "cmd")
+# measurement.codex_commands: calls whose text is no POSIX shell script (non_posix_shell) or whose shell is not known
+# (unknown_shell), both unresolved, and CommandExecution items that are no model tool call: a user's own shell command
+# (user_shell) and an interaction with a running process (exec_interactions). ExecCommandSource at rust-v0.157.1 is agent,
+# user_shell, unified_exec_startup or unified_exec_interaction (protocol/src/protocol.rs:3534-3544).
+CODEX_COMMAND_STATES = ("non_posix_shell", "unknown_shell", "user_shell", "exec_interactions")
+SKIPPED_COMMAND_SOURCES = {"user_shell": "user_shell", "unified_exec_interaction": "exec_interactions"}
+
+
+def _program_stem(path: str) -> str:
+    """A program path's file name up to its first '.' after the first character, with '/' and, as on Windows, '\\' as
+    separators and trailing separators ignored: the name Codex's detect_shell_type reaches by taking the file stem again and
+    again (Rust Path::file_stem, shell_detect.rs:48-55). A linear scan."""
+    end = len(path)
+    while end and path[end - 1] in "/\\":
+        end -= 1
+    start = end
+    while start and path[start - 1] not in "/\\":
+        start -= 1
+    name = path[start:end]
+    if name in (".", ".."):
+        return ""
+    dot = name.find(".", 1)
+    return name if dot < 0 else name[:dot]
+
+
+def codex_shell_type(shell) -> str | None:
+    """exec_command's shell as Codex types it: 'posix', 'non_posix' or None when the shell that ran is not known. The value
+    itself, else its file stem again and again, case-sensitively (shell_detect.rs:39-59). A value that is not a string fails
+    ExecCommandArgs (shell: Option<String>, core/src/tools/handlers/unified_exec.rs:27-33), so it is not known either."""
+    if not isinstance(shell, str):
+        return None
+    return CODEX_SHELL_TYPES.get(shell) or CODEX_SHELL_TYPES.get(_program_stem(shell))
+
+
+def _posix_script(parts: list) -> str | None:
+    """The script of a POSIX shell's argv: with -c among its options, the shell reads commands from the first non-option
+    argument (bash(1) INVOCATION and OPTIONS; the sh -c synopsis of POSIX.1-2024 XCU sh). An option word is '-' or '+'
+    followed by ASCII letters, and each o or O in it takes the next word as its option name (-o option, -O shopt_option);
+    any other word ends the options, so a long option such as --login, or --, leaves no script. A linear scan."""
+    index, run = 1, False
+    while index < len(parts):
+        word = parts[index]
+        letters = word[1:]
+        if not (word[:1] in ("-", "+") and letters and letters.isascii() and letters.isalpha()):
+            break
+        run |= word[0] == "-" and "c" in letters
+        index += 1 + letters.count("o") + letters.count("O")
+    return parts[index] if run and index < len(parts) else None
+
+
+def resolve_command(command) -> tuple[str, str | None]:
+    """(text, unresolved state) of a command as the PR-A measurement reads it. An argv (a CommandExecution's command,
+    protocol/src/items.rs:259; a local_shell_call's or the shell tool's command) runs its program directly, typed by its file
+    stem: pwsh, powershell and cmd, matched ASCII case-insensitively as Windows resolves program names, run text this reader
+    does not parse, so the command is unresolved ('', 'non_posix_shell'); a POSIX shell (SCRIPT_SHELLS) with -c runs its
+    script (_posix_script); any other argv is one command, joined with each element quoted (shlex.join, U1 pivot D6). A
+    string is the text a POSIX shell ran, and any other value no text."""
+    if not isinstance(command, list):
+        return (command if isinstance(command, str) else ""), None
+    parts = [str(part) for part in command]
+    stem = _program_stem(parts[0]) if parts else ""
+    if stem.isascii() and stem.lower() in NON_POSIX_PROGRAMS:
+        return "", "non_posix_shell"
+    script = _posix_script(parts) if stem in SCRIPT_SHELLS else None
+    return (shlex.join(parts) if script is None else script), None
+
+
+def resolve_shell_call(arguments: dict) -> tuple[str, str | None]:
+    """(text, unresolved state) of a shell tool's function call. exec_command's cmd runs in the shell its shell argument
+    names, typed by codex_shell_type, and without one (absent or null) in the session's shell (core/src/tools/handlers/
+    unified_exec.rs:99-126), read as a POSIX shell; so does shell_command's command, and the shell tool's command is an argv
+    (resolve_command). An unresolved call's text is ''."""
+    command = arguments.get("cmd", arguments.get("command", ""))
+    if isinstance(command, list) or arguments.get("shell") is None:
+        return resolve_command(command)
+    kind = codex_shell_type(arguments["shell"])
+    if kind == "posix":
+        return resolve_command(command)
+    return "", "non_posix_shell" if kind == "non_posix" else "unknown_shell"
+
+
 def message_text(payload: dict) -> str:
     content = payload.get("content")
     if isinstance(content, str):
@@ -1085,7 +1175,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     start = next((r.get("payload", {}).get("subagent_history_start_ordinal") for r in records
                   if r.get("type") == "session_meta"), None)
     child = isinstance(start, int) and not isinstance(start, bool)
-    normalized, visible = [], []
+    normalized, visible, visible_at = [], [], []
     previous = None if child else dict.fromkeys(CODEX_COUNTERS, 0)
     totals = dict.fromkeys(CODEX_COUNTERS, 0)
     snapshots = duplicates = gaps = 0
@@ -1116,6 +1206,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         counted = not inherited and (since is None or at >= since)
         if not inherited:
             visible.append(record)
+            visible_at.append(at)
             if first_own_at is None:
                 first_own_at = at
         if (record.get("type") == "response_item" and isinstance(p, dict) and p.get("type") == "message"
@@ -1213,9 +1304,25 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     def emit(r, block, role):
         normalized.append({"type": role, "timestamp": r["timestamp"], "message": {"content": [block]}})
 
-    def use(r, key, name, inputs, *, sandbox=False, code_mode=False):
-        if name.rsplit(".", 1)[-1] in CODEX_SHELL_TOOLS:
-            name, inputs = "Bash", {"command": shell_script(inputs.get("cmd", inputs.get("command", "")))}
+    # PR-A U3 normalization: codex_commands counts a call once, at its first record, inside [since, until), as the kernel
+    # keeps a call's first tool_use; an emitted call's record decides before a skipped item with the same id.
+    commands = dict.fromkeys(CODEX_COMMAND_STATES, 0)
+    emitted, skipped = set(), set()
+
+    def count_command(at, state):
+        if state is not None and (since is None or at >= since):
+            commands[state] += 1
+
+    def use(r, at, key, name, inputs, *, sandbox=False, code_mode=False, command=None):
+        """Emit a tool_use. A shell call (a CODEX_SHELL_TOOLS function call, or command, the (text, state) of
+        resolve_command) becomes a Bash call whose command is its text, '' when unresolved."""
+        if command is None and name.rsplit(".", 1)[-1] in CODEX_SHELL_TOOLS:
+            command = resolve_shell_call(inputs)
+        if command is not None:
+            name, inputs = "Bash", {"command": command[0]}
+            if key not in emitted:
+                count_command(at, command[1])
+        emitted.add(key)
         emit(r, {"type": "tool_use", "id": key, "name": name, "input": inputs,
                  "sandbox": sandbox, "code_mode": code_mode, "native_status": item_states.get(key)}, "assistant")
 
@@ -1227,6 +1334,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     active_exec = set()
     for index, r in enumerate(visible):
         p = r.get("payload") or {}
+        at = visible_at[index]
         if r.get("type") == "response_item":
             kind, key = p.get("type"), p.get("call_id") or p.get("id") or f"missing-{index}"
             if kind in ("function_call", "custom_tool_call"):
@@ -1237,10 +1345,10 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                 else:
                     active_exec.clear()
                 inputs = arguments(p.get("arguments")) if kind == "function_call" else {"code": p.get("input", "")}
-                use(r, key, name, inputs, code_mode=code_mode)
+                use(r, at, key, name, inputs, code_mode=code_mode)
             elif kind == "local_shell_call":
                 active_exec.clear()
-                use(r, key, "Bash", {"command": shell_script((p.get("action") or {}).get("command"))})
+                use(r, at, key, "Bash", {}, command=resolve_command((p.get("action") or {}).get("command")))
             elif kind in ("function_call_output", "custom_tool_call_output"):
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": p.get("output"),
                          **result_state(key, p.get("output"))}, "user")
@@ -1252,17 +1360,27 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
             sandbox = bool(active_exec) and key not in model_call_ids
             output, has_output = None, False
             if kind == "CommandExecution":
-                use(r, key, "Bash", {"command": shell_script(item.get("command"))}, sandbox=sandbox)
+                source = item.get("source")
+                skip = SKIPPED_COMMAND_SOURCES.get(source) if isinstance(source, str) else None
+                if skip is not None:
+                    # A user's own shell command (core/src/tasks/user_shell.rs:190-205), whose output is recorded as a
+                    # conversation item, not a tool result (:453-481), and an interaction item (no core code sets that source
+                    # at rust-v0.157.1, so this is conservative) are no model tool calls: neither a tool_use nor a result.
+                    if key not in emitted and key not in skipped:
+                        count_command(at, skip)
+                    skipped.add(key)
+                    continue
+                use(r, at, key, "Bash", {}, sandbox=sandbox, command=resolve_command(item.get("command")))
                 output = item.get("aggregated_output")
                 has_output = output is not None
             elif kind == "McpToolCall":
-                use(r, key, "mcp__" + str(item.get("server", "unknown")) + "__" + str(item.get("tool", "unknown")), arguments(item.get("arguments")), sandbox=sandbox)
+                use(r, at, key, "mcp__" + str(item.get("server", "unknown")) + "__" + str(item.get("tool", "unknown")), arguments(item.get("arguments")), sandbox=sandbox)
                 value = item.get("result")
                 output = value.get("content", value) if isinstance(value, dict) else value
                 has_output = output is not None
             elif kind == "Extension" and item.get("kind") == "web.search":
                 action = item.get("action") or {}
-                use(r, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
+                use(r, at, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
             if has_output and key not in output_ids:
                 status = item.get("status")
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": output,
@@ -1276,6 +1394,15 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}}})
     # Claude per-message fields are inapplicable to Codex cumulative native counters.
     measured.pop("usage", None)
+    unresolved = commands["non_posix_shell"] + commands["unknown_shell"]
+    if unresolved:
+        # An unresolved command's fetches cannot be read, so M4 cannot be measured or not_applicable (the U3 review), and
+        # replay read its text '' (rtk 0.50.0 answers "No rewrite for:": no parts), so each is an explicit unknown call.
+        measured["m4"]["status"] = "incomplete"
+        if measured["rtk_parts"]["status"] in ("measured", "incomplete"):
+            measured["rtk_parts"]["unknown_calls"] += unresolved
+            measured["rtk_parts"]["status"] = "incomplete"
+    measured["codex_commands"] = commands
     if first_own_at is None or (since is not None and first_own_at < since):
         hooks["inherited"] = hooks["inherited_with_marker"] = 0  # copied items count in the window of the first own record
     measured["codex_hook_context"] = hooks
@@ -1587,6 +1714,10 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
                        for key in CODEX_COUNTERS}}
         out["measurement"]["codex_hook_context"] = {key: sum(m["codex_hook_context"][key] for m in measurements)
                                                     for key in HOOK_CONTEXT_COUNTERS}
+        commands = {key: sum(m["codex_commands"][key] for m in measurements) for key in CODEX_COMMAND_STATES}
+        out["measurement"]["codex_commands"] = commands
+        if commands["non_posix_shell"] + commands["unknown_shell"]:
+            out["measurement"]["m4"]["status"] = "incomplete"  # aggregateMeasurements recomputes it from the counts
     return out
 
 
@@ -1777,6 +1908,12 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
                        "until": until.isoformat() if until else None},
             "marker": marker, **scan, "limits": "Legacy lane fields: " + LANES_LIMITS
             + " PR-A measurement fields use the shared child-usage.mjs kernel and own persisted response_item outputs, with item_completed fallback. Native cumulative provider_usage is separate from Claude per-message counters and from byte measurements. --rtk-check enables fixed-config eligibility replay. Missing usage, output and dynamic fetch evidence cannot establish acceptance; see README.md."
+            + " The PR-A measurement reads a Codex shell call by the shell that ran it: an argv's program (a POSIX shell's -c"
+            " script, any other program's argv as one command) and exec_command's cmd in the shell its shell argument names, as"
+            " Codex types it. A command run by pwsh, powershell or cmd, or by a shell the rollout does not name, is unresolved"
+            " (measurement.codex_commands non_posix_shell, unknown_shell): a Bash call with no text, an unknown rtk replay call,"
+            " and M4 incomplete. user_shell and unified_exec_interaction CommandExecution items are no model tool calls"
+            " (codex_commands user_shell, exec_interactions); the legacy lane counters keep counting every CommandExecution."
             + " actors[].spawn and subagent_spawns publish sub-agent spawn states only: the join of a child to its parent's"
             " SubAgentActivity started item and spawn_agent call runs in memory, the route is client-side (turn contexts and"
             " ThreadSettingsApplied), and provider reroutes are not persisted in rollouts."}
