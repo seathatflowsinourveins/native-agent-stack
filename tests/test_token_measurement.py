@@ -68,6 +68,51 @@ IGNORED_OPENERS = [
     "ssh host cat <<'EOF'", "ssh host 'cat > remote.sh' <<'EOF'", "cat <<'EOF' > run.sh",
 ]
 
+# CLI lanes (#381 AA-PLAN PR-A item 3; U1 design sections 2-5 and 7). The stack commands are the literal entries of
+# manifests/stack.json at cf3fb72e: :1003 toon, :797 repomix, :579 markitdown, :762 qmd, :519 headroom, :629 an
+# mcporter list, and :280 and :407 mcporter calls, the two seeds of the downstream alias map.
+STACK_LANE_COMMANDS = {
+    "toon": 'toon fixtures/records.json --stats -o "${OUTPUT_DIR}/records.toon"',
+    "repomix": 'repomix --include fixtures/records.json,fixtures/example.sh --output "${OUTPUT_DIR}/repomix.xml"',
+    "markitdown": "markitdown fixtures/greeting.html",
+    "qmd": 'qmd --index "${QMD_INDEX}" search "automatic local code RAG Nemotron" -c "${QMD_COLLECTION}" -n 2 --json',
+    "headroom": "headroom mcp serve --proxy-url http://127.0.0.1:1",
+}
+STACK_MCPORTER_LIST = 'mcporter --config "${MCPORTER_CONFIG}" list socraticode --brief --no-oauth'
+STACK_MCPORTER_CALLS = {
+    "codebase-memory": ('mcporter --config "${MCPORTER_CONFIG}" call codebase-memory.search_graph'
+                        ' --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth', "codebase-memory-mcp"),
+    "context-mode": ("mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}'"
+                     " --output text --no-oauth", "context-mode"),
+}
+CLI_CARRIERS = ("bash", "rtk_proxy", "ctx", "nested")
+EMPTY_CLI = {"lanes": {}, "mcporter_downstream": {}, "excluded_version_help": {}, "calls_with_lane_invocation": 0,
+             "unresolved_programs": 0, "remote_invocations": 0}
+
+
+def lane_row(calls=1, carrier="bash", **counts):
+    """One cli_lanes.lanes entry: `calls` calls with one invocation each, all on `carrier`, other counters zero."""
+    row = {"calls": calls, "invocations": calls, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
+           "unknown": 0, "background": 0, "ambiguous": 0, "via_mcporter": 0,
+           "by_carrier": {c: calls if c == carrier else 0 for c in CLI_CARRIERS}}
+    row.update(counts)
+    return row
+
+
+def downstream_row(calls=1, **counts):
+    """One cli_lanes.mcporter_downstream entry."""
+    row = {"calls": calls, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0, "unknown": 0}
+    row.update(counts)
+    return row
+
+
+def proxy_row(calls=1, prefix_rule_calls=0, **counts):
+    """measurement.proxy for `calls` unreviewed rtk proxy calls with one invocation each."""
+    row = {"calls": calls, "acceptance": 0, "exception": 0, "unclassified": calls, "invocations": calls, "nested": 0,
+           "in_ctx_code": 0, "prefix_rule_calls": prefix_rule_calls, "acceptance_or_exception_share": 0 if calls else None}
+    row.update(counts)
+    return row
+
 
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
 class TokenMeasurement(unittest.TestCase):
@@ -90,6 +135,14 @@ class TokenMeasurement(unittest.TestCase):
                            text=True, capture_output=True, check=False)
         self.assertEqual(p.returncode, 0, p.stderr)
         return json.loads(p.stdout)
+
+    def lanes_of(self, commands, *, name="Bash"):
+        """[measurement.cli_lanes, measurement.proxy] of each command as one successful call, in one node process."""
+        runs = []
+        for command in commands:
+            inputs = {"command": command} if name == "Bash" else {"language": "shell", "code": command}
+            runs.append([call("c", name, **inputs), result("c", "ok")])
+        return self.exports("x.map((rows) => { const m = cu.measureTranscript(rows); return [m.cli_lanes ?? null, m.proxy] })", runs)
 
     def carrier_m4(self, commands, routed=False):
         """M4 for each command on each shell carrier, optionally beside one routed fetch."""
@@ -556,6 +609,239 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(m4["remote_fetches"], 1)
                 self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
         self.assertEqual(self.exports("x.map(cu.fetchKind)", [quoted, nested]), [None, "fetch"])
+
+    def test_cli_lanes_count_stack_commands_in_command_position(self):
+        # #381 AA-PLAN PR-A item 3: a lane executable in command position is a lane call. An mcporter list counts for
+        # mcporter; an mcporter call counts for its downstream server and reaches a lane only through the alias map.
+        lanes = list(STACK_LANE_COMMANDS.items())
+        calls = list(STACK_MCPORTER_CALLS.items())
+        got = self.lanes_of([c for _, c in lanes] + [STACK_MCPORTER_LIST] + [c for _, (c, _) in calls])
+        for (lane, command), (cli, _) in zip(lanes, got):
+            with self.subTest(command=command):
+                self.assertEqual(cli, {**EMPTY_CLI, "lanes": {lane: lane_row(succeeded=1)}, "calls_with_lane_invocation": 1})
+        self.assertEqual(got[len(lanes)][0], {**EMPTY_CLI, "lanes": {"mcporter": lane_row(succeeded=1)},
+                                              "calls_with_lane_invocation": 1})
+        for (server, (command, alias)), (cli, _) in zip(calls, got[len(lanes) + 1:]):
+            with self.subTest(command=command):
+                self.assertEqual(cli, {**EMPTY_CLI, "lanes": {alias: lane_row(succeeded=1, via_mcporter=1)},
+                                       "mcporter_downstream": {server: downstream_row(succeeded=1)},
+                                       "calls_with_lane_invocation": 1})
+
+    def test_cli_lanes_follow_wrappers_compound_commands_and_substitutions(self):
+        # POSIX.1-2024 XCU 2.9.1 (Rule 7 assignments), 2.9.2-2.9.4 (pipelines, lists, compound commands), 2.6.3 (command
+        # substitution) and the timeout, env, nice, command, time and xargs synopses; GNU coreutils 9.4 stdbuf; sudo
+        # 1.9.15p5. More than one simple command makes the call ambiguous: its one state covers every command.
+        cases = {"timeout -k 5 60 qmd search x": ("qmd", 0), "env -u X markitdown f.pdf": ("markitdown", 0),
+                 "env -C d repomix": ("repomix", 0), "nice -n 10 repomix": ("repomix", 0),
+                 "sudo -u u ai-memory status": ("ai-memory", 0), "command qmd status": ("qmd", 0),
+                 "time -p toon f.json": ("toon", 0), "stdbuf -oL qmd search x": ("qmd", 0),
+                 "find . -print0 | xargs -0 -n1 markitdown": ("markitdown", 1),
+                 'for f in *.pdf; do markitdown "$f"; done': ("markitdown", 1),
+                 "if qmd status; then :; fi": ("qmd", 1), "(cd d && qmd status)": ("qmd", 1),
+                 "{ qmd get a; }": ("qmd", 0), "! qmd search x": ("qmd", 0), "x=$(qmd get a)": ("qmd", 1),
+                 'echo "$(qmd get a)"': ("qmd", 1), "echo `qmd get a`": ("qmd", 1),
+                 "bash -c 'qmd search x'": ("qmd", 1), "bash <<'EOF'\nqmd search x\nEOF": ("qmd", 1),
+                 "cat <<EOF\n$(qmd get a)\nEOF": ("qmd", 1)}
+        for (command, (lane, ambiguous)), (cli, _) in zip(cases.items(), self.lanes_of(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(cli, {**EMPTY_CLI, "lanes": {lane: lane_row(succeeded=1, ambiguous=ambiguous)},
+                                       "calls_with_lane_invocation": 1})
+
+    def test_cli_lanes_runners_and_direct_calls(self):
+        # Executables: toon, repomix, @tobilu/qmd, mcporter and context-mode package bins; markitdown, headroom,
+        # jcodemunch-mcp and serena console scripts; the codebase-memory-mcp and ai-memory binaries (U1 sources S5-S16).
+        # Runners map their npm or PyPI package to the lane; `--from` names the executable itself.
+        cases = {"npx -y repomix --mcp": "repomix", "npx repomix@latest": "repomix", "npx @toon-format/cli f.json": "toon",
+                 "bunx @tobilu/qmd search x": "qmd", "uvx jcodemunch-mcp": "jcodemunch-mcp", "serena init": "serena",
+                 "context-mode doctor": "context-mode", "codebase-memory-mcp cli search_graph '{}'": "codebase-memory-mcp",
+                 "/usr/local/bin/qmd search x": "qmd", "ai-memory status": "ai-memory",
+                 "uvx --from serena-agent serena start-mcp-server": "serena", "pipx run headroom-ai": "headroom",
+                 "python3 -m markitdown f.pdf": "markitdown", "serena-agent start": "serena"}
+        for (command, lane), (cli, _) in zip(cases.items(), self.lanes_of(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(cli, {**EMPTY_CLI, "lanes": {lane: lane_row(succeeded=1)}, "calls_with_lane_invocation": 1})
+
+    def test_cli_lanes_mcporter_calls_count_for_the_downstream_server(self):
+        # openclaw/mcporter@93e0916c (v0.14.1): global flags (cli-factory.ts:19), command inference
+        # (command-inference.ts:10-95), call parsing (call-arguments.ts:79-233), target resolution (call-command.ts:114-173,
+        # 309-348). An HTTP selector or ad-hoc stdio command has no config name: it reads (http) or (stdio), never a host.
+        cases = {"mcporter call linear.create_comment --issue-id X": "linear",
+                 "mcporter call 'linear.create_comment(issueId: \"LNR-123\", body: \"Hi\")'": "linear",
+                 "mcporter 'context7.resolve-library-id(\"React hooks docs\", \"react\")'": "context7",
+                 "mcporter call --server linear --tool create_comment": "linear",
+                 "mcporter call linear create_comment": "linear",
+                 "mcporter call create_comment server=linear": "linear",
+                 # The first positional is the selector even with '=' (call-arguments.ts:170-172), so this names a
+                 # server "server=linear", which is not name-shaped.
+                 "mcporter call server=linear tool=create_comment": "(other)",
+                 "npx mcporter call https://mcp.context7.com/mcp.resolve-library-id": "(http)",
+                 "mcporter call \"npx -y chrome-devtools-mcp@latest\" list_pages": "(stdio)",
+                 "mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal": "x"}
+        for (command, server), (cli, _) in zip(cases.items(), self.lanes_of(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(cli, {**EMPTY_CLI, "mcporter_downstream": {server: downstream_row(succeeded=1)}})
+                self.assertNotIn("context7.com", json.dumps(cli))
+
+    def test_cli_lanes_ignore_data_lookups_registrations_and_near_names(self):
+        negatives = ["command -v qmd", "type qmd", "which qmd", "hash qmd", "grep -n qmd notes.md",
+                     'git commit -m "use toon"', "echo 'rtk proxy ls'", 'echo "rtk proxy pytest"',
+                     'git log --grep="rtk proxy"', "# qmd search x", "cat ~/.qmd/index.sqlite", "ls toon/", "qmdx",
+                     "my-repomix", "git commit -m \"$(cat <<'EOF'\nqmd search x\nEOF\n)\"",
+                     "cat <<EOF > run.sh\nrtk proxy pytest\nEOF",
+                     "claude mcp add context-mode -- npx -y context-mode",  # context-mode README:117 registers only
+                     "codex mcp add qmd -- qmd mcp", "rtk git status",  # stack.json:826, an rtk filter
+                     "gcm chat", "serena-hooks pre-tool"]  # lane-membership decisions: not lane executables
+        for command, (cli, proxy) in zip(negatives, self.lanes_of(negatives)):
+            with self.subTest(command=command):
+                self.assertEqual(cli, EMPTY_CLI)
+                self.assertEqual(proxy.get("calls"), 0)
+
+    def test_cli_lanes_version_help_remote_and_unresolved_programs(self):
+        # --version and --help among a lane's own words (before `--`; for rtk proxy, rtk's words before the proxied
+        # program) are counted apart, per lane; mcporter's pinned help/version tokens and clap's rtk -V/-h as well.
+        cases = {"qmd --version": {"excluded_version_help": {"qmd": 1}},
+                 "toon --help": {"excluded_version_help": {"toon": 1}},
+                 "ai-memory --version": {"excluded_version_help": {"ai-memory": 1}},  # stack.json:101
+                 "mcporter --version": {"excluded_version_help": {"mcporter": 1}},
+                 "rtk --version": {"excluded_version_help": {"rtk_proxy": 1}},
+                 "ssh host 'qmd search x'": {"remote_invocations": 1},
+                 "$QMD search x": {"unresolved_programs": 1},
+                 "qmd search -- --help": {"lanes": {"qmd": lane_row(succeeded=1)}, "calls_with_lane_invocation": 1},
+                 "rtk proxy qmd --version": {"lanes": {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1)},
+                                             "excluded_version_help": {"qmd": 1}, "calls_with_lane_invocation": 1}}
+        for (command, fields), (cli, proxy) in zip(cases.items(), self.lanes_of(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(cli, {**EMPTY_CLI, **fields})
+                self.assertEqual(proxy.get("calls"), 1 if command.startswith("rtk proxy") else 0)
+
+    def test_cli_lane_states_follow_the_call_result(self):
+        # AA-PLAN: "Successful" means the tool_result is not an error (Messages API is_error). An error that never ran
+        # is also not_executed: content "<tool_use_error>", or a toolUseResult naming a PreToolUse hook denial, a
+        # permission denial or a user rejection (strings observed on clients 2.1.282-2.1.283, not a documented schema).
+        def bash(key, command="qmd search x", **inputs):
+            return call(key, "Bash", command=command, **inputs)
+
+        def answer(key, content="ok", error=False, **row):
+            return {**result(key, content, error), **row}
+
+        declined = bash("a")
+        declined["message"]["content"][0]["native_status"] = "declined"
+        unknown = answer("a", "Chunk ID: 1\nOutput:\nx")
+        unknown["message"]["content"][0]["native_state"] = "unknown"
+        ctx = answer("a")
+        del ctx["message"]["content"][0]["is_error"]
+        cases = {"exit": ([bash("a"), answer("a", "Exit code 1\nboom", True, toolUseResult="Error: Exit code 1\nboom")],
+                          lane_row(failed=1)),
+                 "tool_use_error": ([bash("a"), answer("a", "<tool_use_error>Error: blocked</tool_use_error>", True,
+                                                       toolUseResult="Error: blocked")], lane_row(failed=1, not_executed=1)),
+                 "hook": ([bash("a"), answer("a", "PreToolUse:Bash hook error: denied", True,
+                                             toolUseResult="Error: PreToolUse:Bash hook error: denied")],
+                          lane_row(failed=1, not_executed=1)),
+                 "permission": ([bash("a"), answer("a", "Permission for this command was denied", True,
+                                                   toolUseResult="Error: Permission for this command was denied")],
+                                lane_row(failed=1, not_executed=1)),
+                 "rejected": ([bash("a"), answer("a", "The user doesn't want to proceed with this tool use.", True,
+                                                 toolUseResult="User rejected tool use")], lane_row(failed=1, not_executed=1)),
+                 "no result": ([bash("a")], lane_row(unfinished=1)),
+                 "declined": ([declined], lane_row(failed=1, not_executed=1)),
+                 "succeeded": ([bash("a"), answer("a", toolUseResult={"stdout": "ok", "stderr": "", "interrupted": False})],
+                               lane_row(succeeded=1)),
+                 "background": ([bash("a", run_in_background=True), answer("a", "started", toolUseResult={"backgroundTaskId": "b1"})],
+                                lane_row(succeeded=1, background=1)),
+                 "ambiguous": ([bash("a", "qmd search x || true"), answer("a")], lane_row(succeeded=1, ambiguous=1)),
+                 "unknown": ([bash("a"), unknown], lane_row(unknown=1)),
+                 "ctx": ([call("a", "mcp__ctx__ctx_execute", language="shell", code="qmd search x"), ctx],
+                         lane_row(carrier="ctx", succeeded=1))}
+        got = self.exports("x.map((rows) => cu.measureTranscript(rows).cli_lanes ?? null)", [rows for rows, _ in cases.values()])
+        for (name, (_, row)), cli in zip(cases.items(), got):
+            with self.subTest(state=name):
+                self.assertEqual((cli or {}).get("lanes"), {"qmd": row})
+                self.assertNotIn("b1", json.dumps(cli))
+
+    def test_rtk_proxy_population_follows_command_position(self):
+        # rtk-ai/rtk@1d87b8e7 src/main.rs:68-90 (-v/--verbose, --ultra-compact, --skip-env before the subcommand) and
+        # :3008-3042 (proxy's arguments; one spaced argument is shell-split, and no shell runs it). The prefix rule is
+        # kept as prefix_rule_calls for comparison with earlier receipts.
+        proxied = {"cd repo && rtk proxy pytest -q": (0, {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1, ambiguous=1)}),
+                   "FOO=1 rtk proxy pytest": (0, {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1)}),
+                   "rtk proxy qmd search x": (1, {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1),
+                                                  "qmd": lane_row(carrier="rtk_proxy", succeeded=1)}),
+                   "rtk proxy 'qmd search x'": (1, {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1),
+                                                    "qmd": lane_row(carrier="rtk_proxy", succeeded=1)}),
+                   "rtk --ultra-compact proxy pytest": (0, {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1)}),
+                   "rtk -v proxy pytest": (0, {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1)}),
+                   'sh -c "rtk proxy pytest"': (0, {"rtk_proxy": lane_row(carrier="rtk_proxy", succeeded=1, ambiguous=1)})}
+        for (command, (prefix, lanes)), (cli, proxy) in zip(proxied.items(), self.lanes_of(list(proxied))):
+            with self.subTest(command=command):
+                self.assertEqual(proxy, proxy_row(prefix_rule_calls=prefix))
+                self.assertEqual((cli or {}).get("lanes"), lanes)
+        # Newly counted calls stay unclassified until a digest-bound review classifies them (M6).
+        reviewed = self.measure([call("c", "Bash", command="cd repo && rtk proxy pytest -q"), result("c", "ok")],
+                                exceptions={"c": {"proxy_purpose": "acceptance", "witness": "frozen check"}})
+        self.assertEqual(reviewed["proxy"], proxy_row(acceptance=1, unclassified=0, acceptance_or_exception_share=1))
+        # M3 by_carrier.rtk_proxy and m4.by_carrier follow the same rule.
+        got = self.measure([call("m3", "Bash", command="cd repo && rtk proxy pytest -q"), result("m3", "x" * 6000),
+                            call("m4", "Bash", command="cd repo && rtk proxy curl -s https://example.org")])
+        self.assertEqual(got["by_carrier"].get("rtk_proxy", {}).get("large_results"), 1)
+        self.assertEqual(got["m4"]["by_carrier"].get("rtk_proxy", {}).get("shell_fetch"), 1)
+        self.assertEqual(sorted(got["m4"]["by_carrier"]), ["rtk_proxy"])
+        # rtk proxy in ctx shell code is reported apart and stays outside M6; a sandbox-nested Codex call stays inside.
+        nested = call("n", "Bash", command="rtk proxy pytest")
+        nested["message"]["content"][0]["sandbox"] = True
+        got = self.measure([call("x", "mcp__ctx__ctx_execute", language="shell", code="rtk proxy pytest"), result("x", "ok"),
+                            nested, result("n", "ok")])
+        self.assertEqual(got["proxy"], proxy_row(prefix_rule_calls=1, nested=1, in_ctx_code=1))
+        both = lane_row(calls=2, succeeded=2)
+        both["by_carrier"] = {"bash": 0, "rtk_proxy": 0, "ctx": 1, "nested": 1}
+        self.assertEqual((got.get("cli_lanes") or {}).get("lanes"), {"rtk_proxy": both})
+
+    def test_cli_lanes_aggregate_sums_counters_and_counts_actors_with_success(self):
+        script = ("import {readFileSync} from 'node:fs'; import {measureTranscript, aggregateMeasurements} from "
+                  + json.dumps(MODULE.as_uri()) + "; const rows=JSON.parse(readFileSync(0,'utf8')); "
+                  "process.stdout.write(JSON.stringify([aggregateMeasurements(rows.map(r=>measureTranscript(r))), "
+                  "aggregateMeasurements([])]));")
+        actors = [[call("a", "Bash", command="qmd search x"), result("a", "ok"),
+                   call("b", "Bash", command="mcporter call linear.create_comment --issue-id X"), result("b", "ok")],
+                  [call("c", "Bash", command="qmd get a"), result("c", "Exit code 1", True),
+                   call("d", "mcp__ctx__ctx_execute", language="shell", code="rtk proxy pytest"), result("d", "ok"),
+                   call("e", "Bash", command="qmd --version"), result("e", "2.8.3")]]
+        p = subprocess.run(["node", "--input-type=module", "-e", script],
+                           input=json.dumps(actors), text=True, capture_output=True, check=False)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        got, empty = json.loads(p.stdout)
+        self.assertEqual(got.get("cli_lanes"), {
+            **EMPTY_CLI, "calls_with_lane_invocation": 3, "excluded_version_help": {"qmd": 1},
+            "lanes": {"qmd": {**lane_row(calls=2, succeeded=1, failed=1), "actors_with_success": 1},
+                      "rtk_proxy": {**lane_row(carrier="ctx", succeeded=1), "actors_with_success": 1}},
+            "mcporter_downstream": {"linear": downstream_row(succeeded=1)}})
+        self.assertEqual(got["proxy"], proxy_row(calls=0, in_ctx_code=1))
+        self.assertEqual(empty.get("cli_lanes"), EMPTY_CLI)
+
+    def test_sweep_cli_lanes_and_proxy_are_id_free(self):
+        # Output is names and counts: no directory, tool_use_id, host, URL, path or command text from the fixture.
+        with tempfile.TemporaryDirectory() as directory:
+            child = Path(directory) / "session/subagents/agent-child.jsonl"
+            child.parent.mkdir(parents=True)
+            commands = ["npx mcporter call https://mcp.context7.com/mcp.resolve-library-id",
+                        "ssh buildhost.example.net 'qmd search \"private query\"'", 'qmd search "private query"',
+                        "cd /srv/private-repo && rtk proxy pytest -q", "mcporter call --server linear --tool create_comment"]
+            rows = []
+            for i, command in enumerate(commands):
+                rows += [call("toolu_private_%d" % i, "Bash", command=command), result("toolu_private_%d" % i, "ok")]
+            child.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", directory], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            got = json.loads(p.stdout)
+            cli = got["groups"]["all"]["measurement"].get("cli_lanes") or {}
+            self.assertEqual(sorted(cli.get("lanes", {})), ["qmd", "rtk_proxy"])
+            self.assertEqual(sorted(cli.get("mcporter_downstream", {})), ["(http)", "linear"])
+            self.assertEqual(cli.get("remote_invocations"), 1)
+            self.assertEqual(got["actors"][0]["measurement"]["proxy"].get("invocations"), 1)
+            for secret in [directory, "toolu_private", "context7", "buildhost", "example.net", "private query",
+                           "private-repo", "/srv"]:
+                self.assertNotIn(secret, p.stdout)
+            self.assertNotIn("tool_use_id", p.stdout.split('"limits"')[0])
+            self.assertIn("cli_lanes", got["limits"])
 
     def test_hook_context_is_inserted_only_by_additional_context_rows(self):
         def hook(kind, name, **rest):

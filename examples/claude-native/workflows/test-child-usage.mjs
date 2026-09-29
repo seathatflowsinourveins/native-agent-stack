@@ -3,6 +3,7 @@
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
 import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch, childLanes, aggregateLanes, sweepLanes, fetchKind, mcpServer, safeKey, tokenStats, parseArgs, loadRtkDecisions, DEFAULT_MARKER, executedText, logFindPart, sensitivePart } from './child-usage.mjs'
+import * as kernel from './child-usage.mjs'
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync, readFileSync, chmodSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -400,5 +401,96 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
 expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
   logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')
   && !logFindPart('git status') && sensitivePart('git -C repo branch -a') && sensitivePart('git --git-dir=.g show HEAD:a') && !sensitivePart('git -C repo status'))
+// CLI lanes (#381 AA-PLAN PR-A item 3; U1 design sections 2 and 7). commandInvocations reads every simple command of the text
+// a shell runs (POSIX.1-2024 XCU 2.9.1-2.9.4 and 2.6.3) past assignments, reserved words, wrappers, package runners and `rtk
+// proxy`, and names lane executables by exact basename; data, lookups and registrations run none. Each invocation is shown
+// as lane/program[:op][@server] plus its flags, with '-' for no lane or no program.
+{
+  const show = (i) => (i.lane ?? '-') + '/' + (i.program ?? '-') + (i.op ? ':' + i.op : '') + (i.server ? '@' + i.server : '')
+    + (i.excluded ? ' excluded' : '') + (i.remote ? ' remote' : '') + (i.unresolved ? ' unresolved' : '')
+  const read = (c) => {
+    try { return typeof kernel.commandInvocations === 'function' ? kernel.commandInvocations(c).map(show) : ['(not exported)'] } catch (e) { return ['(threw ' + e.name + ')'] }
+  }
+  const check = (name, cases) => {
+    const bad = cases.filter(([c, want]) => JSON.stringify(read(c)) !== JSON.stringify(want)).map(([c]) => JSON.stringify(c) + ' => ' + JSON.stringify(read(c)))
+    expect(name + (bad.length ? ' [' + bad.join('; ') + ']' : ''), bad.length === 0)
+  }
+  const qmd = ['qmd/qmd'], proxy = 'rtk_proxy/rtk:proxy'
+  check('cli lanes: POSIX, GNU and sudo wrappers are read to the utility they run', [
+    ['timeout -k 5 60 qmd search x', qmd], ['timeout --signal=KILL -v 60 qmd search x', qmd], ['env -u X markitdown f.pdf', ['markitdown/markitdown']],
+    ['env -C d repomix', ['repomix/repomix']], ['env -i -- FOO=1 qmd status', qmd], ['env -S "qmd search x"', qmd], ['nice -n 10 repomix', ['repomix/repomix']],
+    ['sudo -u u ai-memory status', ['ai-memory/ai-memory']], ['sudo -E VAR=1 qmd status', qmd], ['command qmd status', qmd], ['command -p qmd status', qmd],
+    ['time -p toon f.json', ['toon/toon']], ['stdbuf -oL qmd search x', qmd], ['nohup qmd update &', qmd], ['exec qmd mcp', qmd], ['FOO=1 BAR=2 qmd status', qmd],
+    ['find . -print0 | xargs -0 -n1 markitdown', ['-/find', 'markitdown/markitdown']], ['xargs', ['-/echo']],
+  ])
+  check('cli lanes: an option a wrapper does not document leaves the program unresolved, and a lookup or non-run mode runs none', [
+    ['command -v qmd', []], ['command -V qmd', []], ['sudo -l qmd', []], ['exec -a name qmd mcp', ['-/- unresolved']], ['xargs -P 4 qmd get', ['-/- unresolved']],
+    ['nice -10 qmd update', ['-/- unresolved']], ['env --bogus qmd', ['-/- unresolved']], ['timeout 60', []],
+  ])
+  check('cli lanes: compound commands, substitutions, shell strings and shell heredocs', [
+    ['for f in *.pdf; do markitdown "$f"; done', ['markitdown/markitdown']], ['if qmd status; then :; fi', ['qmd/qmd', '-/(other)']],
+    ['(cd d && qmd status)', ['-/cd', 'qmd/qmd']], ['{ qmd get a; }', qmd], ['! qmd search x', qmd], ['x=$(qmd get a)', qmd],
+    ['echo "$(qmd get a)"', ['-/echo', 'qmd/qmd']], ['echo `qmd get a`', ['-/echo', 'qmd/qmd']], ["bash -c 'qmd search x'", ['-/bash', 'qmd/qmd']],
+    ['sh -c "rtk proxy pytest"', ['-/sh', proxy, '-/pytest']], ["bash <<'EOF'\nqmd search x\nEOF", ['-/bash', 'qmd/qmd']],
+    ['cat <<EOF\n$(qmd get a)\nEOF', ['-/cat', 'qmd/qmd']], ['qmd search x 2>&1 >/dev/null | head -n 5', ['qmd/qmd', '-/head']],
+    ['echo $(date) qmd', ['-/echo', '-/date']], ['cat <(qmd get a)', ['-/cat', 'qmd/qmd']],
+  ])
+  check('cli lanes: rtk proxy after global options, its own options and an optional --; one spaced argument is split and no shell runs it', [
+    ['rtk proxy qmd search x', [proxy, 'qmd/qmd']], ["rtk proxy 'qmd search x'", [proxy, 'qmd/qmd']], ['rtk --ultra-compact proxy pytest', [proxy, '-/pytest']],
+    ['rtk -v proxy pytest', [proxy, '-/pytest']], ['rtk -vv --skip-env proxy pytest', [proxy, '-/pytest']], ['rtk proxy -- qmd status', [proxy, 'qmd/qmd']],
+    ['rtk proxy --skip-env qmd status', [proxy, 'qmd/qmd']], ['rtk proxy -v qmd', [proxy, '-/(other)']], ['rtk proxy', [proxy]],
+    ["rtk proxy 'cd repo && qmd x'", [proxy, '-/cd']], ['cd repo && rtk proxy pytest -q', ['-/cd', proxy, '-/pytest']], ['FOO=1 rtk proxy pytest', [proxy, '-/pytest']],
+    ['rtk proxy --help', [proxy + ' excluded']], ['rtk --version', ['rtk_proxy/rtk excluded']], ['rtk -V', ['rtk_proxy/rtk excluded']],
+    ['rtk proxy qmd --version', [proxy, 'qmd/qmd excluded']], ['rtk git status', ['-/rtk']], ['rtk proxy npx repomix', [proxy, 'repomix/repomix']],
+  ])
+  check('cli lanes: npm and PyPI runners map their package to the lane; --package and --from name the executable', [
+    ['npx -y repomix --mcp', ['repomix/repomix']], ['npx repomix@latest', ['repomix/repomix']], ['npx @toon-format/cli f.json', ['toon/toon']],
+    ['npx @tobilu/qmd@2.8.3 search x', qmd], ['npx --package=@tobilu/qmd -- qmd search x', qmd], ['bunx @tobilu/qmd search x', qmd],
+    ['bun x repomix', ['repomix/repomix']], ['pnpm dlx repomix', ['repomix/repomix']], ['yarn dlx @toon-format/cli f.json', ['toon/toon']],
+    ['uvx jcodemunch-mcp', ['jcodemunch-mcp/jcodemunch-mcp']], ['uvx --from serena-agent serena start-mcp-server', ['serena/serena']],
+    ['uvx markitdown==0.1.8 f.pdf', ['markitdown/markitdown']], ['uv tool run markitdown f.pdf', ['markitdown/markitdown']], ['pipx run headroom-ai', ['headroom/headroom']],
+    ['python3 -m markitdown f.pdf', ['markitdown/markitdown']], ['npx markitdown f.pdf', ['-/markitdown']], ['npx -c "qmd search x"', ['-/- unresolved']],
+    ['uvx --bogus qmd', ['-/- unresolved']], ['npx repomix --version', ['repomix/repomix excluded']],
+  ])
+  check('cli lanes: lane executables by exact basename; gcm and serena-hooks are not lane executables', [
+    ['serena init', ['serena/serena']], ['serena-agent start', ['serena/serena-agent']], ['context-mode doctor', ['context-mode/context-mode']],
+    ["codebase-memory-mcp cli search_graph '{}'", ['codebase-memory-mcp/codebase-memory-mcp']], ['/usr/local/bin/qmd search x', qmd],
+    ['headroom mcp serve --proxy-url http://127.0.0.1:1', ['headroom/headroom']], ['jcodemunch-mcp', ['jcodemunch-mcp/jcodemunch-mcp']],
+    ['gcm chat', ['-/gcm']], ['serena-hooks pre-tool', ['-/serena-hooks']], ['qmdx', ['-/qmdx']], ['my-repomix', ['-/my-repomix']],
+  ])
+  check('cli lanes: mcporter operations, and the downstream server of a call (never a host)', [
+    ['mcporter call linear.create_comment --issue-id X', ['mcporter/mcporter:call@linear']],
+    [`mcporter call 'linear.create_comment(issueId: "LNR-123", body: "Hi")'`, ['mcporter/mcporter:call@linear']],
+    [`mcporter 'context7.resolve-library-id("React hooks docs", "react")'`, ['mcporter/mcporter:call@context7']],
+    ['mcporter call --server linear --tool create_comment', ['mcporter/mcporter:call@linear']], ['mcporter call linear create_comment', ['mcporter/mcporter:call@linear']],
+    ['mcporter call create_comment server=linear', ['mcporter/mcporter:call@linear']], ['mcporter call server=linear tool=create_comment', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --server other linear.create_comment', ['mcporter/mcporter:call@other']],
+    ['npx mcporter call https://mcp.context7.com/mcp.resolve-library-id', ['mcporter/mcporter:call@(http)']],
+    ['mcporter call mcp.context7.com/mcp.resolve-library-id', ['mcporter/mcporter:call@(http)']],
+    ['mcporter call --http-url https://mcp.example.org/mcp --server linear create_comment', ['mcporter/mcporter:call@(http)']],
+    ['mcporter call --stdio "qmd mcp" query', ['mcporter/mcporter:call@(stdio)']], ['mcporter call "npx -y chrome-devtools-mcp@latest" list_pages', ['mcporter/mcporter:call@(stdio)']],
+    ['mcporter call ./server.js tool', ['mcporter/mcporter:call@(stdio)']], ['mcporter call --server mcp.example.org tool', ['mcporter/mcporter:call@(other)']],
+    ['mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@x']],
+    ['mcporter call', ['mcporter/mcporter:call@(unresolved)']], ['mcporter list socraticode --brief --no-oauth', ['mcporter/mcporter:list']],
+    ['mcporter socraticode', ['mcporter/mcporter:list']], ['mcporter https://mcp.context7.com/mcp', ['mcporter/mcporter:list']], ['mcporter describe linear', ['mcporter/mcporter:list']],
+    ['mcporter auth linear', ['mcporter/mcporter:auth']], ['mcporter daemon start', ['mcporter/mcporter:daemon']],
+    ['mcporter --version', ['mcporter/mcporter:version excluded']], ['mcporter -v', ['mcporter/mcporter:version excluded']], ['mcporter -V', ['mcporter/mcporter:version excluded']],
+    ['mcporter', ['mcporter/mcporter:help excluded']], ['mcporter help', ['mcporter/mcporter:help excluded']], ['mcporter -h', ['mcporter/mcporter:help excluded']],
+    ['mcporter call linear.create_comment --help', ['mcporter/mcporter:call excluded']], ['mcporter serve --help', ['mcporter/mcporter:serve excluded']],
+  ])
+  check('cli lanes: data, lookups, registrations, remote strings, version and help, and programs a variable names', [
+    ['type qmd', ['-/type']], ['which qmd', ['-/which']], ['hash qmd', ['-/hash']], ['grep -n qmd notes.md', ['-/grep']], ['git commit -m "use toon"', ['-/git']],
+    ["echo 'rtk proxy ls'", ['-/echo']], ['echo "rtk proxy pytest"', ['-/echo']], ['git log --grep="rtk proxy"', ['-/git']], ['# qmd search x', []],
+    ['cat ~/.qmd/index.sqlite', ['-/cat']], ['ls toon/', ['-/ls']], ["git commit -m \"$(cat <<'EOF'\nqmd search x\nEOF\n)\"", ['-/git', '-/cat']],
+    ['cat <<EOF > run.sh\nrtk proxy pytest\nEOF', ['-/cat']], ['claude mcp add context-mode -- npx -y context-mode', ['-/claude']], ['codex mcp add qmd -- qmd mcp', ['-/codex']],
+    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', 'qmd/qmd remote']],
+    ['$QMD search x', ['-/- unresolved']], ['"$QMD" search x', ['-/- unresolved']], ["'$QMD' search x", ['-/(other)']],
+    ['qmd --version', ['qmd/qmd excluded']], ['qmd search x --help', ['qmd/qmd excluded']], ['qmd search -- --help', qmd], ['qmd -h', qmd],
+    ['toon --help', ['toon/toon excluded']], ['ai-memory --version', ['ai-memory/ai-memory excluded']],
+  ])
+  const scan = timed(() => ['env -u X '.repeat(4000) + 'qmd', 'rtk -v '.repeat(4000) + 'proxy qmd', 'timeout -k 1 '.repeat(3000) + '5 qmd', '"$('.repeat(3000),
+    'mcporter call --x '.repeat(4000) + 'a.b', '(('.repeat(4000) + 'qmd', "'".repeat(8001)].map((c) => read(c).length))
+  expect('cli lanes: long and deeply nested commands are read in linear time without exhausting the stack', scan.ms < 1000 && scan.r.every((n) => Number.isInteger(n)))
+}
 console.log('SUMMARY passed=' + passed + ' failed=' + failed + ' total=' + (passed + failed))
 process.exit(failed ? 1 : 0)
