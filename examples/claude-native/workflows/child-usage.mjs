@@ -2143,30 +2143,103 @@ const finishFetches = (f, carriers = null) => {
 // the five-exclusion probe; this does not identify its build or binary hash.
 // Keep every part (upstream discover stops at its first pipe). Complex shell
 // constructs are unknown, never guessed or executed. This is a local adapter.
-function shellParts(command) {
-  if (/<<|\$\(\(/.test(command)) return null
-  const parts = [], syntax = command.split('')
-  const part = (end, op) => ({ text: command.slice(start, end).trim(), syntax: syntax.slice(start, end).join('').trim(), op })
-  let start = 0, quote = null, depth = 0
-  for (let i = 0; i < command.length; i++) {
-    const ch = command[i]
-    if (ch === '\\' && quote !== "'") { syntax[i] = '_'; if (i + 1 < command.length) syntax[++i] = '_'; continue }
-    if (quote) { syntax[i] = '_'; if (ch === quote) quote = null; continue }
-    if (ch === "'" || ch === '"' || ch === '`') { syntax[i] = '_'; quote = ch; continue }
-    if (ch === '(' || ch === '{') { depth++; continue }
-    if (ch === ')' || ch === '}') { depth--; if (depth < 0) return null; continue }
-    if (depth) continue
-    if (ch === '#' && (i === 0 || /\s/.test(command[i - 1]))) return null
-    if (';&|\n'.includes(ch)) {
-      const op = command[i + 1] === ch && '&|'.includes(ch) ? ch + ch : ch
-      // & in 2>&1 is a redirection, not an asynchronous command boundary.
-      if (ch === '&' && command[i - 1] === '>') continue
-      parts.push(part(i, op))
-      i += op.length - 1; start = i + 1
-    }
+//
+// The parts of a shell command for M-R1 (binding decision B8): its top-level simple commands and pipeline stages, each with the control
+// operator after it (; ;; & && || | and newline; |& is read as |), outside quotes, "$( )", subshells, backquotes and { } groups, which stay
+// inside their part. The text is read unit by unit with U1's frame machine (step() above: quotes, escapes, comments, $(( )) and (( )),
+// "$( )" and backquote frames, and bash(1) DEFINITIONS' rule that the & of >& <& &> and the | of >| are redirections), with a ( or a
+// backquote at the top level opening a frame of its own. A here-document is data (bash(1) Here Documents; POSIX.1-2024 XCU 2.7.4): its body
+// begins after the first newline that no quote holds and ends at the line that equals its delimiter (after leading tabs for <<-), or at the
+// end of the text, which bash reads as the delimiter; its delimiter is any word, quotes removed (heredocWord, U1's reading of the operator's
+// word). A top-level body lies between two parts and belongs to neither part's text; a body inside a part (in a "$( )", say) stays in its
+// text. Each part also has a syntax view in which quoted and escaped characters, comments, arithmetic and here-document bodies are the data
+// character _, so a > there is no redirection. null when the text cannot be read so (an open quote, frame or group, a ) or } that closes
+// nothing, a << with no word): M-R1 then counts the call as unknown. rtk v0.50.0 rewrites no command that holds a here-document or $((
+// (src/discover/registry.rs rewrite_command_precompiled, tag commit 1d87b8e7), so the eligible parts of such a call are observed uncovered.
+const QUOTE_FRAMES = new Set(["'", '"', '`'])
+const HEREDOC_WORD_END = new Set([...' \t\n;&|()<>'])
+// The here-document operator << or <<- at s[i] with its word: { end, delimiter, strip }, or null when no word follows (a syntax error).
+function heredocOperator(s, i) {
+  let j = i + 2
+  const strip = s[j] === '-'
+  if (strip) j++
+  while (s[j] === ' ' || s[j] === '\t') j++
+  const from = j
+  while (j < s.length && !HEREDOC_WORD_END.has(s[j])) {
+    if (s[j] === "'") { const k = s.indexOf("'", j + 1); if (k < 0) return null; j = k + 1 }
+    else if (s[j] === '"') { let k = j + 1; while (k < s.length && s[k] !== '"') k += s[k] === '\\' ? 2 : 1; if (k >= s.length) return null; j = k + 1 }
+    else j += s[j] === '\\' ? 2 : 1
   }
-  if (quote || depth) return null
-  parts.push(part(command.length, ''))
+  return j === from ? null : { end: Math.min(j, s.length), delimiter: heredocWord(s.slice(from, Math.min(j, s.length))), strip }
+}
+// The index after the delimiter line of a here-document whose body starts at `at`, or s.length when no line closes it.
+function heredocEnd(s, at, h) {
+  while (at < s.length) {
+    const nl = s.indexOf('\n', at), end = nl < 0 ? s.length : nl
+    let k = at
+    if (h.strip) while (k < end && s[k] === '\t') k++
+    if (s.slice(k, end) === h.delimiter) return nl < 0 ? s.length : nl + 1
+    at = end + 1
+  }
+  return s.length
+}
+export function shellParts(command) {
+  const s = String(command ?? ''), syntax = s.split(''), parts = [], stack = [], heredocs = []
+  let start = 0, braces = 0, quoted = 0, broken = false // quoted: the quote frames (' " `) on the stack
+  const part = (end, op) => ({ text: s.slice(start, end).trim(), syntax: syntax.slice(start, end).join('').trim(), op })
+  const mask = (a, b) => { for (let k = a; k < b && k < s.length; k++) syntax[k] = '_' }
+  const on = {
+    cut: (i, frame) => { // a cut of the top level: its ( and backquote open a frame here, and a ) there closes nothing
+      if (frame !== undefined) return
+      if (s[i] === '(') stack.push({ depth: 0 })
+      else if (s[i] === '`') stack.push('`')
+      else if (s[i] === ')') broken = true
+    },
+    heredoc: () => {}, // never reached: every << outside a quote is read below before step() sees it
+  }
+  for (let i = 0; i < s.length;) {
+    const top = stack[stack.length - 1], ch = s[i]
+    if (!QUOTE_FRAMES.has(top)) {
+      if (ch === '\n' && heredocs.length) {
+        const after = heredocs.reduce((at, h) => heredocEnd(s, at, h), i + 1)
+        heredocs.length = 0
+        mask(i + 1, after)
+        if (!stack.length && !braces) { parts.push(part(i, '\n')); start = after }
+        i = after
+        continue
+      }
+      if (ch === '<' && s[i + 1] === '<' && s[i + 2] !== '<') {
+        const h = heredocOperator(s, i)
+        if (!h) return null
+        heredocs.push(h)
+        i = h.end
+        continue
+      }
+      if (!stack.length) {
+        if (ch === '{') braces++
+        else if (ch === '}' && --braces < 0) return null
+        else if (!braces && (ch === ';' || ch === '&' || ch === '|' || ch === '\n')) {
+          const prev = s[i - 1], next = s[i + 1]
+          if (!(ch === '&' && (prev === '>' || prev === '<' || next === '>')) && !(ch === '|' && prev === '>')) {
+            const pipeBoth = ch === '|' && next === '&', op = pipeBoth ? '|' : ch !== '\n' && next === ch ? ch + ch : ch
+            parts.push(part(i, op))
+            i += pipeBoth ? 2 : op.length
+            start = i
+            continue
+          }
+        }
+      }
+    }
+    const depth = stack.length, before = quoted
+    const next = step(s, i, stack, on)
+    if (broken) return null
+    if (stack.length > depth && QUOTE_FRAMES.has(stack[stack.length - 1])) quoted++
+    else if (stack.length < depth && QUOTE_FRAMES.has(top)) quoted--
+    if (before || quoted || next - i > 1) mask(i, next)
+    i = next
+  }
+  if (stack.length || braces) return null
+  parts.push(part(s.length, ''))
   return parts.filter((p) => p.text)
 }
 // git(1) global options before the subcommand: -C, -c, --git-dir or --work-tree with the next word, or one --option.
@@ -2229,26 +2302,38 @@ export function sensitivePart(text) {
 }
 export const logFindPart = (text) => /^find\b/.test(text) || afterGitOptions(String.raw`log\b`, text)
 const safeConsumer = (part) => /^(?:cat|head)(?:\s|$)/.test(part) || /^tail(?:\s|$)/.test(part) && !/(?:^|\s)(?:-[^-\s]*[fF]|--follow)(?:\S*)/.test(part)
-const emptyRtk = () => ({ calls: 0, eligible_parts: 0, eligible_calls: 0, observed_covered_parts: 0, observed_all_covered_calls: 0,
-  replayed_covered_parts: 0, replayed_all_covered_calls: 0, explicit_rtk_on_excluded_or_sensitive: 0,
-  explicit_rtk_log_find_advisory: 0, log_find_permitted_parts: 0, log_find_requires_raw_parts: 0, log_find_unresolved_parts: 0,
-  proxy_parts: 0, ineligible_parts: 0, unknown_calls: 0 })
-function rtkParts(calls, rewrites, enabled, exceptions) {
+// The counters rtk_parts sums over actors. eligible_call_states holds, per M14 state (the call_states.by_server key set), the Bash calls with
+// at least one eligible part, and observed_covered_succeeded_calls those with an eligible part observed covered whose state is succeeded:
+// the per-child-task success signal of M1's rtk-claude lane (binding decision B5; U2 design 7.3; RUNBOOK.md: an actual non-error call).
+const RTK_COUNTERS = ['calls', 'eligible_parts', 'eligible_calls', 'observed_covered_parts', 'observed_all_covered_calls', 'replayed_covered_parts',
+  'replayed_all_covered_calls', 'explicit_rtk_on_excluded_or_sensitive', 'explicit_rtk_log_find_advisory', 'log_find_permitted_parts',
+  'log_find_requires_raw_parts', 'log_find_unresolved_parts', 'proxy_parts', 'ineligible_parts', 'unknown_calls', 'observed_covered_succeeded_calls']
+const emptyRtk = () => ({ ...Object.fromEntries(RTK_COUNTERS.map((k) => [k, 0])), eligible_call_states: emptyServerStates() })
+// Binding decision B8: M-R1 is not evaluable (status incomplete) when unknown calls exceed 5% of the Bash calls, compared on the counts, and
+// is evaluated on the parsed parts otherwise. unavailable and not_measured (no check ran) keep their meaning and have no shares.
+const RTK_UNKNOWN_PERCENT_LIMIT = 5
+const rtkStatus = (out) => out.unknown_calls * 100 > out.calls * RTK_UNKNOWN_PERCENT_LIMIT ? 'incomplete' : 'measured'
+const finishRtk = (out, status = rtkStatus(out)) => {
+  const checked = status === 'measured' || status === 'incomplete'
+  return { ...out, status, unknown_call_share: checked ? share(out.unknown_calls, out.calls) : null,
+    coverage: checked ? share(out.observed_covered_parts, out.eligible_parts) : null, call_coverage: checked ? share(out.observed_all_covered_calls, out.eligible_calls) : null }
+}
+function rtkParts(calls, rewrites, enabled, exceptions, results = new Map()) {
   const out = emptyRtk(), check = enabled ? rtkChecker() : null
-  if (!check) return { ...out, status: enabled ? 'unavailable' : 'not_measured', coverage: null, call_coverage: null }
+  if (!check) return finishRtk(out, enabled ? 'unavailable' : 'not_measured')
   for (const c of calls) {
     if (c.name !== 'Bash') continue
     out.calls++
-    const command = String(c.input?.command || ''), parts = shellParts(command), replay = check(command)
-    const executed = shellParts(rewrites.get(c.id) ?? command), predicted = shellParts(replay.rewrite ?? command)
-    if (!parts || !executed || !predicted || replay.error || parts.length !== executed.length || parts.length !== predicted.length) { out.unknown_calls++; continue }
-    let eligible = 0, observed = 0, covered = 0
-    for (const [i, part] of parts.entries()) {
+    const command = String(c.input?.command || ''), parts = shellParts(command)
+    if (!parts) { out.unknown_calls++; continue }
+    // What a part says about explicit rtk use needs only the command's own parts, so it counts for every call whose parts parse, including one
+    // M-R1 cannot classify below: M-R3 and M6c's zero counter must not lose a violation to a replay that could not be read.
+    const views = parts.map((part, i) => {
       const explicit = /^rtk\s+/.test(part.text), proxy = /^rtk\s+proxy\s+/.test(part.text)
       const raw = part.text.replace(/^rtk\s+(?:proxy\s+)?/, '')
       // #381 preregistration: acceptance/raw-proxy runs are a separate population.
       // Unclassified proxies still fail the separate M6 adjudication requirement.
-      if (proxy) { out.proxy_parts++; continue }
+      if (proxy) { out.proxy_parts++; return null }
       const downstream = []
       for (let j = i; parts[j]?.op === '|'; j++) downstream.push(parts[j + 1]?.text || '')
       // Native pipeline mode rewrites only supported grep/rg filter stages;
@@ -2258,7 +2343,7 @@ function rtkParts(calls, rewrites, enabled, exceptions) {
       // Same quote state as the splitter; quoted/escaped > is argument data.
       // RTK lexer redirect_has_file_target exempts fd duplication and /dev/null.
       const redirected = [...part.syntax.matchAll(/>+\s*([^\s]+)/g)].some((m) => m[1] !== '/dev/null' && !/^&(?:\d+|-)$/.test(m[1]))
-      if (explicit && !proxy && (sensitivePart(raw) || redirected || rawPipeline)) out.explicit_rtk_on_excluded_or_sensitive++
+      if (explicit && (sensitivePart(raw) || redirected || rawPipeline)) out.explicit_rtk_on_excluded_or_sensitive++
       if (explicit && logFindPart(raw)) {
         out.explicit_rtk_log_find_advisory++
         const review = exceptions[c.id]
@@ -2266,18 +2351,33 @@ function rtkParts(calls, rewrites, enabled, exceptions) {
           ? review.rtk_log_find.find((p) => p.part === i + 1)?.disposition : null
         out[disposition === 'permitted' ? 'log_find_permitted_parts' : disposition === 'requires_raw' ? 'log_find_requires_raw_parts' : 'log_find_unresolved_parts']++
       }
+      return { raw, rawPipeline, pipelineConsumer }
+    })
+    // M-R1 reads a call whole: its native replay, the command the hook ran and every part's standalone check. A call any of them fails for is
+    // one unknown call, whatever its number of parts, and adds nothing to the part counters (B8: out of the eligible-part denominators).
+    const replay = check(command), executed = shellParts(rewrites.get(c.id) ?? command), predicted = shellParts(replay.rewrite ?? command)
+    if (!executed || !predicted || replay.error || parts.length !== executed.length || parts.length !== predicted.length) { out.unknown_calls++; continue }
+    let eligible = 0, ineligible = 0, observed = 0, covered = 0, unknown = false
+    for (const [i, view] of views.entries()) {
+      if (!view) continue
       // Query EVERY standalone part, even exclusions; the native hook decides eligibility.
-      const alone = check(raw)
-      if (alone.error) { out.unknown_calls++; continue }
-      if (rawPipeline || pipelineConsumer || !alone.rewrite) { out.ineligible_parts++; continue }
+      const alone = check(view.raw)
+      if (alone.error) { unknown = true; break }
+      if (view.rawPipeline || view.pipelineConsumer || !alone.rewrite) { ineligible++; continue }
       eligible++
       if (/^rtk\s+(?!proxy\b)/.test(executed[i].text)) observed++
       if (/^rtk\s+(?!proxy\b)/.test(predicted[i].text)) covered++
     }
-    out.eligible_parts += eligible; out.observed_covered_parts += observed; out.replayed_covered_parts += covered
-    if (eligible) { out.eligible_calls++; out.observed_all_covered_calls += observed === eligible ? 1 : 0; out.replayed_all_covered_calls += covered === eligible ? 1 : 0 }
+    if (unknown) { out.unknown_calls++; continue }
+    out.eligible_parts += eligible; out.ineligible_parts += ineligible; out.observed_covered_parts += observed; out.replayed_covered_parts += covered
+    if (!eligible) continue
+    out.eligible_calls++; out.observed_all_covered_calls += observed === eligible ? 1 : 0; out.replayed_all_covered_calls += covered === eligible ? 1 : 0
+    const m = m14State(c, results.get(c.id) ?? null), states = out.eligible_call_states
+    states.attempted++; states[m.state]++
+    if (m.executed) states.executed++
+    if (observed && m.state === 'succeeded') out.observed_covered_succeeded_calls++
   }
-  return { ...out, status: out.unknown_calls ? 'incomplete' : 'measured', coverage: share(out.observed_covered_parts, out.eligible_parts), call_coverage: share(out.observed_all_covered_calls, out.eligible_calls) }
+  return finishRtk(out)
 }
 // Hook context (PR-A item 1). An insertion is a hook_additional_context row, the row M12 counts (E2E README.md M12 row: blind evidence
 // needs 0 hook_additional_context rows from any hook event); its content array holds one entry per hook whose context Claude Code delivered
@@ -2671,7 +2771,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
   const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
   return { m3: finishSizes(m3), m4: finishFetches(m4, fetchCarriers), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
-    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
+    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions, results),
     usage: transcriptUsage(transcript, window), final_return: finalReturn(transcript, window),
     hook_context: hookContext,
     call_states: callStates, m15: finishM15(m15),
@@ -2751,9 +2851,13 @@ export function aggregateMeasurements(items) {
       const target = fetchCarriers[carrier] ||= emptyFetches()
       for (const k of Object.keys(target)) target[k] += counts[k]
     }
-    for (const k of Object.keys(rtk)) rtk[k] += m.rtk_parts[k]
+    for (const k of RTK_COUNTERS) rtk[k] += m.rtk_parts[k] || 0
+    for (const k of M14_SERVER_KEYS) rtk.eligible_call_states[k] += m.rtk_parts.eligible_call_states?.[k] || 0
   }
+  // rtk_parts.status: B8's rule on the summed counts when every actor's parts were checked (measured or incomplete), never a vote of the
+  // actors' statuses; otherwise the one status every actor has (unavailable or not_measured), or incomplete for a mix.
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
+  const rtkChecked = rtkStates.length > 0 && rtkStates.every((s) => s === 'measured' || s === 'incomplete')
   // actors_with_insertion counts the actors with at least one insertion row; loaded_actors and loaded_not_called_actors count, per server,
   // the actors with at least one such reference: the unit of the historical 'Loaded, never called' baseline row (children per server).
   const hooks = { ...Object.fromEntries(HOOK_SCALARS.map((k) => [k, 0])), actors_with_insertion: 0, ...Object.fromEntries(HOOK_MAPS.map((k) => [k, counter()])) }
@@ -2826,8 +2930,7 @@ export function aggregateMeasurements(items) {
     bytes_complete: items.length > 0 && items.every((m) => m.bytes_complete && !m.parse_errors),
     invalid_exceptions: items.reduce((n, m) => n + m.invalid_exceptions, 0),
     calls_without_result: items.reduce((n, m) => n + m.calls_without_result, 0),
-    rtk_parts: { ...rtk, status: rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured',
-      coverage: share(rtk.observed_covered_parts, rtk.eligible_parts), call_coverage: share(rtk.observed_all_covered_calls, rtk.eligible_calls) },
+    rtk_parts: finishRtk(rtk, rtkChecked ? rtkStatus(rtk) : rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured'),
     ...(items.every((m) => m.usage) ? { usage: aggregateUsage(items.map((m) => m.usage)) } : {}) }
 }
 // Usage over actors (a measurement without usage, such as a Codex one whose provider_usage replaces it, leaves the aggregate without usage):
