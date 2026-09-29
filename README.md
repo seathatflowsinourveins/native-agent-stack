@@ -254,10 +254,10 @@ local embedding-backend steps on macOS remain unrun outside that hosted runner
 — see
 [`adoption/platforms/macos-arm64.md`](adoption/platforms/macos-arm64.md).
 
-To reproduce the public text measurement with the same upstream tokenizer:
+To reproduce the public text measurement with the pinned upstream tokenizer (the pair was first counted with 3.4.0; 4.0.0 returns the same counts):
 
 ```bash
-npm install --prefix .runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@3.4.0
+npm install --prefix .runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@4.0.0
 TOKENIZER_PREFIX="$PWD/.runtime/tokenizer" node scripts/recount-tokens.cjs
 ```
 

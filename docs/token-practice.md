@@ -270,12 +270,17 @@ E1 and E2 subagent receipts.
   to more tokens than the original. Include recall or original reads and the response
   envelope when comparing workflow cost; the clean-prefix Headroom figures below show
   the same growth.
-- **Measurement infrastructure saves nothing itself.** gpt-tokenizer 3.4.0
-  (`o200k_base`) is the counter behind the exact comparisons, not a reducer. Its
-  counting contract covers ordinary UTF-8 text under the default special-token
-  policy, which disallows every special token and throws on an input that contains
-  one ([3.4.0 README](https://github.com/niieani/gpt-tokenizer/blob/3.4.0/README.md#special-tokens));
-  allowed-special modes are not qualified here, and neither is 4.0.0. ccusage totals
+- **Measurement infrastructure saves nothing itself.** gpt-tokenizer 4.0.0
+  (`o200k_base`) is the pinned counter behind the exact comparisons, not a reducer;
+  the [ten dated comparisons](#ten-exact-retained-artifact-comparisons) were counted
+  with 3.4.0. Its counting contract covers ordinary UTF-8 text under the default
+  special-token policy, which disallows every special token and throws on an input
+  that contains one ([4.0.0 README](https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#special-tokens)).
+  The [4.0.0 qualification](../evidence/receipts/gpt-tokenizer-400-qualification-20260929.json)
+  covers only default `encode` of `encoding/o200k_base` on UTF-8 text under Node
+  v24.21.0, where 3.4.0 and 4.0.0 counted all 47 artifacts retained in the host's
+  token-report ledger identically; allowed-special modes and other entry points are
+  not qualified. ccusage totals
   are consumption, reported token-only while any model is unpriced
   ([recipe row](../recipes/README.md#component-catalog-install-and-check)). An
   agentsview answer observes retained history, and MCPorter is transport.
