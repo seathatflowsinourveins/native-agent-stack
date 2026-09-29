@@ -16,26 +16,30 @@ Live broker keys are deliberately not a stored entry (docs/secret-storage.md).
 variable from this process's environment, where `scripts/kernel_keyring.py exec` puts a key that
 lives only in the kernel keyring, so the value never passes through an agent, a prompt or a command
 line. It is create-only (it never replaces a file), refuses unless the interpreter was started with
--I, and prints only `<id>: stored`:
+-I -S, and prints only `<id>: stored`:
 
-    python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- python3 -I tools/credentials/set_credential.py tavily --from-env
+    python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- python3 -I -S tools/credentials/set_credential.py tavily --from-env
 """
 from __future__ import annotations
 
 import os
 import sys
 
-if __name__ == "__main__" and not sys.flags.isolated:
+FROM_ENV_START = "python3 -I -S tools/credentials/set_credential.py <id> --from-env"
+
+if __name__ == "__main__":
     if "--from-env" in sys.argv[1:]:
-        # The value is already in this interpreter's environment, and a start without -I has already honoured
-        # PYTHONPATH and the user site directory: a sitecustomize or usercustomize module or a .pth file there
-        # ran beside the value. Re-running isolated cannot undo that, so this mode refuses and never re-executes.
-        sys.stderr.write("refused: --from-env needs an interpreter started isolated: "
-                         "python3 -I tools/credentials/set_credential.py <id> --from-env\n")
-        raise SystemExit(2)
-    # Re-run isolated (-I): ignore PYTHONPATH, PYTHONSTARTUP and user site-packages, so a
-    # poisoned environment cannot shadow getpass or any other module this tool imports.
-    os.execv(sys.executable, [sys.executable, "-I", os.path.abspath(__file__), *sys.argv[1:]])
+        # The value is already in this interpreter's environment, so whatever ran at start-up ran beside it. Only
+        # -I -S starts no such code: -I ignores PYTHONPATH, PYTHON* variables and the user site directory, and -S
+        # skips site, whose .pth lines of the interpreter's own site-packages run even under -I. Re-running cannot
+        # undo a start that already ran such code, so this mode refuses and never re-executes.
+        if not (sys.flags.isolated and sys.flags.no_site):
+            sys.stderr.write(f"refused: --from-env needs an interpreter started with -I -S: {FROM_ENV_START}\n")
+            raise SystemExit(2)
+    elif not sys.flags.isolated:
+        # Re-run isolated (-I): ignore PYTHONPATH, PYTHONSTARTUP and user site-packages, so a
+        # poisoned environment cannot shadow getpass or any other module this tool imports.
+        os.execv(sys.executable, [sys.executable, "-I", os.path.abspath(__file__), *sys.argv[1:]])
 
 import argparse  # noqa: E402
 import getpass  # noqa: E402
@@ -201,19 +205,20 @@ def run(entry_id: str, *, env=None, uid=None, prompt=getpass.getpass, out=sys.st
 
 
 def run_from_env(entry_id: str, *, env=None, uid=None, out=sys.stdout, root: Path = ROOT,
-                 isolated: bool | None = None) -> int:
+                 isolated_start: bool | None = None) -> int:
     """Store the entry's one variable from env (os.environ by default) in a new file; create-only.
 
-    Refused unless the interpreter was started isolated, for an entry that does not declare exactly one
-    variable (a pair's provenance cannot be proven from an inherited environment), and for an absent, empty
-    or out-of-grammar value. The value is popped from env first, so no child of this process inherits it
-    (Linux still shows the start-up environment in /proc/<pid>/environ while this short process runs).
-    The only output is `<id>: stored`; no message holds the value or any part of it."""
+    Refused unless the interpreter was started with -I -S (isolated_start defaults to sys.flags.isolated and
+    sys.flags.no_site), for an entry that does not declare exactly one variable (a pair's provenance cannot be
+    proven from an inherited environment), for an absent, empty or out-of-grammar value, and when the file
+    exists. The value is popped from env first, so no child of this process inherits it (Linux still shows the
+    start-up environment in /proc/<pid>/environ while this short process runs). The only output is
+    `<id>: stored`; no message holds the value or any part of it."""
     env = os.environ if env is None else env
-    isolated = bool(sys.flags.isolated) if isolated is None else isolated
-    if not isolated:
-        raise Refused("--from-env needs an interpreter started isolated: "
-                      "python3 -I tools/credentials/set_credential.py <id> --from-env")
+    if isolated_start is None:
+        isolated_start = bool(sys.flags.isolated and sys.flags.no_site)
+    if not isolated_start:
+        raise Refused(f"--from-env needs an interpreter started with -I -S: {FROM_ENV_START}")
     uid = os.getuid() if uid is None else uid
     entry = load_entry(entry_id, root, env)
     declared = entry["variables"] + entry["optional_variables"]
@@ -227,15 +232,18 @@ def run_from_env(entry_id: str, *, env=None, uid=None, out=sys.stdout, root: Pat
         raise Refused(f"{name}: not set in this process's environment; nothing written")
     line = encode(name, value)  # refuses an empty, padded or out-of-grammar value without quoting it
     path = cs.expand_template(entry["store"]["path_template"], env)
+    exists = Refused(f"{path.name} already exists; --from-env never replaces a stored file "
+                     f"(rotate with tools/credentials/open_credential_terminal.sh {entry_id})")
+    if os.path.lexists(path):  # every refusal comes before the first write, even open_store's mkdir or chmod
+        raise exists
     dfd = open_store(path.parent, uid)
     try:
         try:
             os.stat(path.name, dir_fd=dfd, follow_symlinks=False)
         except FileNotFoundError:
             pass
-        else:  # checked before the temporary file is written; create_exclusively's link settles a race
-            raise Refused(f"{path.name} already exists; --from-env never replaces a stored file "
-                          f"(rotate with tools/credentials/open_credential_terminal.sh {entry_id})")
+        else:  # again through the checked directory handle; create_exclusively's link settles any later race
+            raise exists
         create_exclusively(dfd, path.name, line)
     finally:
         os.close(dfd)
@@ -249,7 +257,7 @@ def main(argv=None) -> int:
     parser.add_argument("entry_id", help="an operator-supplied id from adoption/credential-inventory.json")
     parser.add_argument("--from-env", action="store_true",
                         help="store the entry's one variable from this process's environment in a new file "
-                             "(create-only, no terminal; needs python3 -I)")
+                             "(create-only, no terminal; needs python3 -I -S)")
     args = parser.parse_args(argv)
     if args.from_env:
         try:
