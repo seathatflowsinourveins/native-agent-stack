@@ -70,7 +70,8 @@ retained evidence offline (`regrade`) with byte-identical results.
 - Measured here: the unittest module (synthetic hosts, a scripted `codex`, recorded Workflow results, planted controls and mutants of
   the tool) and the T0 differential against the retained checks of two earlier runs. These are our integration checks.
 - Not run: the real `gpt-6-astra` and Opus judge routes. The rehearsal commands (`grade.py judge rehearse --route codex|claude`) are the
-  acceptance step and need network and provider access this build did not have. A real `spec` and `keys` run waits for Amendment 4.
+  acceptance step and need real judge model calls, which the build's brief did not allow (read-only document fetches only). A real
+  `spec` and `keys` run waits for Amendment 4.
 - Recorded residual: a judged answer is screened for identifiers and the canary, not for hit text it quotes from a retrieval.
 
 ## Sources

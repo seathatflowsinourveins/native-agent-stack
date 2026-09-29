@@ -5923,8 +5923,8 @@ class F19_Mutants(GraderCase):
 # =====================================================================================================================
 # Stage 3: judges, controls, differential, export and check-html (design R21, R22; F15, F19, F23, F29, F30, F35) and
 # the binding corrections 7 and 10. Rules are named by design id. Local integration checks on synthetic inputs and a
-# scripted fake `codex`: no model is ever called (the unit has no network), so the two real judge routes stay
-# unobserved here (acceptance e8 waits for Codex capacity). Modules are imported inside each test on purpose, so
+# scripted fake `codex`: no model is ever called (the unit's brief allows read-only document fetches only), so the two
+# real judge routes stay unobserved here (acceptance e8 needs real judge calls). Modules are imported inside each test on purpose, so
 # with no implementation each test fails on its own reason (ModuleNotFoundError or the missing refusal line).
 # =====================================================================================================================
 

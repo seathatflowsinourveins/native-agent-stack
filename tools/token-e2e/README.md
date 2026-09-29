@@ -334,9 +334,9 @@ integration check, not upstream acceptance, and its judge calls are separate mod
 
 Limits:
 
-- The real judge routes have not run in this build (no network in the unit that built it): the suite drives `judge codex`
-  with a scripted `codex` on `PATH` and `judge collect` with a recorded Workflow result. The rehearsal commands above are the
-  acceptance step that needs the real routes and is still open.
+- The real judge routes have not run in this build (its brief allowed read-only document fetches only, so no judge model
+  call was in scope): the suite drives `judge codex` with a scripted `codex` on `PATH` and `judge collect` with a recorded
+  Workflow result. The rehearsal commands above are the acceptance step that needs the real routes and is still open.
 - `spec` and `keys` run against the real preregistration only after Amendment 4 exists; until then the suite uses a fixture
   repository whose grading block names the decided readings. Calibration keys are self-contained synthetic keys; only the E1
   group of `controls` uses real receipts.
