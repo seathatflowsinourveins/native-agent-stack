@@ -881,7 +881,22 @@ class ConsumerTests(RunnerCase):
         sent = time.monotonic()
         runner.send_signal(signal.SIGTERM)
         self.assertEqual(runner.wait(timeout=20), 128 + signal.SIGTERM)  # was: blocked in write until the consumer read
-        self.assertLess(time.monotonic() - sent, 10)
+        # After a shutdown signal nothing waits for the consumer, not even the drain deadline that follows an exit.
+        self.assertLess(time.monotonic() - sent, run_mod.DRAIN_SECONDS - 0.5)
+
+    def test_a_consumer_that_never_reads_holds_the_command_back_not_the_runners_memory(self):
+        self.tavily()
+        progress = self.base / "progress"
+        code = ("import sys\nprogress = sys.argv[1]\nchunk = 'x' * 65535 + '\\n'\ni = 0\nwhile True:\n"
+                "    sys.stdout.write(chunk)\n    sys.stdout.flush()\n    i += 1\n    open(progress, 'w').write(str(i))\n")
+        runner = self.start_tool("tavily", *py(code, str(progress)))  # stdout is never read
+        time.sleep(2.0)
+        written = int(progress.read_text() or 0)
+        # A pipe on each side of the runner and a 256 KiB queue hold about 7 chunks; without the read-side backpressure
+        # the runner would keep reading and queue the command's whole output, and this count would run into the thousands.
+        self.assertTrue(1 <= written <= 24, f"the command wrote {written} chunks of 64 KiB to a consumer that never reads")
+        runner.send_signal(signal.SIGTERM)
+        self.assertEqual(runner.wait(timeout=20), 128 + signal.SIGTERM)
 
     def test_output_that_nobody_reads_is_dropped_after_the_drain_deadline(self):
         self.tavily()
