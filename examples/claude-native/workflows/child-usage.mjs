@@ -832,7 +832,10 @@ function wrapped(name, words, i) {
   let k = afterOptions(words, i, WRAPPER_OPTIONS.get(name))
   if (k === null || k < 0) return k
   if (name === 'timeout') k++
-  if (name === 'sudo') while (k < words.length && isAssignment(words[k].v)) k++
+  // `time` is a reserved word in bash: `time [-p] [!] pipeline` (bash(1) SHELL GRAMMAR, Pipelines), so a `!` and the assignment words of the
+  // simple command may follow its options (`time A=1 qmd get`, `time ! qmd get`); the `time` executable of other hosts takes neither.
+  if (name === 'time') while (words[k]?.bang) k++
+  if (name === 'sudo' || name === 'time') while (k < words.length && isAssignment(words[k].v)) k++
   if (name === 'xargs' && k >= words.length) return [[{ v: 'echo', x: false, e: 'echo' }], 0]
   return k < words.length ? [words, k] : null
 }
@@ -1041,7 +1044,8 @@ function mcporterServer(words) {
 // parse_shell_lc_literal_commands walks every `command` node, and parse_plain_command_from_node reads a word only from a `word`, `number`,
 // `string`, `raw_string` or `concatenation` node, so a word with an expansion is unknown). This reading differs from Codex's in what
 // it does with the words: it resolves wrappers, runners and shells to the program they run. Handled node kinds: command (the words of
-// its name and arguments; assignment prefixes and redirections are not words), redirected_statement, heredoc_redirect and
+// its name and arguments; assignment prefixes and redirections are not words, but the words the grammar folds into a redirection's
+// targets are its arguments), redirected_statement, heredoc_redirect and
 // herestring_redirect (the owner of standard input), and every node that holds statements or words (list, pipeline, subshell,
 // compound_statement, negated_command, if, while, for, c-style for, case, function_definition, command_substitution,
 // process_substitution, string, concatenation, expansion, arithmetic_expansion, array, subscript, test_command,
@@ -1051,14 +1055,15 @@ function mcporterServer(words) {
 // (skipped; the call counts once in parse_errors), the body of a heredoc whose owner is a compound command, and a heredoc that a pipe
 // (rather than a redirection) feeds to a shell.
 const PLACEHOLDER = '$_U1' // stands for the unknown text of an expansion in a script that is read again
-// A word node as { v, x, s }: v its value with the quotes removed (an expansion keeps its own source text), x whether this reading cannot
-// know the value (an expansion, a glob, a brace or a tilde expansion), and s the text a shell hands on when the word is a script: v with each
-// expansion replaced by PLACEHOLDER, or null when a glob, brace or tilde could stand anywhere in it.
+// A word node as { v, x, s, bang }: v its value with the quotes removed (an expansion keeps its own source text), x whether this reading cannot
+// know the value (an expansion, a glob, a brace or a tilde expansion), s the text a shell hands on when the word is a script: v with each
+// expansion replaced by PLACEHOLDER, or null when a glob, brace or tilde could stand anywhere in it, and bang whether the node is a bare `!`
+// (a quoted or escaped one is a program name; an unquoted one is the reserved word wherever a pipeline may begin).
 function wordOf(node) {
   const w = { v: '', s: '', x: false, g: false }
   addPart(w, node, true)
   if (!w.x && node.text.includes('{') && braceExpands(node.text)) w.x = w.g = true
-  return { v: w.v, x: w.x, s: w.g ? null : w.s }
+  return { v: w.v, x: w.x, s: w.g ? null : w.s, bang: node.text === '!' }
 }
 // The value of a word node, or null when it is unknown (D3): a `word` after the unquoted escape rules, a `raw_string`, a `string` under
 // the double-quote rule (a backslash goes only before $ ` " \ and a newline), an `ansi_c_string` decoded as bash does, a concatenation of
@@ -1213,7 +1218,7 @@ const SEPARATOR_TOKENS = new Set([';', ';;', '&', '&&', '||', '|', '|&'])
 // A line that begins with a backslash (`\ls`, the alias bypass) reaches the grammar as a word that begins with the newline (bash(1) QUOTING).
 const startsLine = (text) => { for (let i = 0; i < text.length && (text[i] === ' ' || text[i] === '\t' || text[i] === '\n'); i++) if (text[i] === '\n') return true; return false }
 const continues = (gap) => { for (let i = 0; i < gap.length; i++) { if (gap[i] === '\\' && gap[i + 1] === '\n') i++; else if (gap[i] === '\n') return false } return true }
-function commandSegments(node, src, fields, extra = []) {
+function commandSegments(node, src, fields, extra = [], folded = []) {
   const segments = [{ pos: node.startIndex, words: [], herestrings: [] }]
   let prev = null
   for (let i = 0; i < node.childCount; i++) {
@@ -1231,7 +1236,19 @@ function commandSegments(node, src, fields, extra = []) {
   for (let k = 1; k < segments.length; k++) { const words = segments[k].words; while (words.length && words[0].assignment) words.shift() }
   const last = segments[segments.length - 1].words
   for (const r of extra) for (const child of operatorArguments(r).words) last.push(wordOf(child))
+  for (const w of folded) last.push(w)
   return segments
+}
+// tree-sitter-bash 0.25.1 gives a redirection every word after its target as further targets (grammar.js file_redirect: `repeat1` of
+// destination), but bash takes the target from the first word only: the rest are ordinary words of the command the redirection belongs to
+// (bash(1) REDIRECTION: a redirection may appear anywhere in a simple command, and the words are read left to right, so `nice 2>&1 qmd`
+// runs qmd and `bash >/dev/null -c 'x'` gives -c to bash). A closing redirection (`<&-`, `>&-`) takes no target, so every word after it is
+// the command's. Only the words before a boundary (a separator, an unescaped newline) count here; the commands after one are read by
+// redirectTail.
+function foldedWords(redirect, src) {
+  const words = commandSegments(redirect, src, ['destination'])[0].words
+  const closing = redirect.children.some((c) => c.type === '<&-' || c.type === '>&-')
+  return words.slice(closing ? 0 : 1).map((w) => ({ ...w, assignment: false }))
 }
 // How a shell uses its arguments (bash(1) OPTIONS and ARGUMENTS; dash(1) and POSIX.1-2024 sh OPTIONS agree on -c, -n, -s): options are the words up
 // to the first operand, `--` or `-`; -o, +o, -O and +O take the next word; --rcfile and --init-file take a file; a -c option makes the first operand
@@ -1305,6 +1322,15 @@ function resolveWords(words, out, cx, exec) {
     const a = readScript(text, remote, cx.depth + 1, cx.acc)
     for (const r of a.records) out.push(r)
     return a
+  }
+  // `!` negates a pipeline (bash(1) SHELL GRAMMAR; bash accepts it twice, `! ! cmd`), and the grammar reads a `!` that is not the first word
+  // of its statement as the command's name: a doubled negation, or the line after an array assignment it joined to. An unquoted `!` at the
+  // start is never a program, and the assignment words after it (`! ! A=1 qmd`) are the simple command's prefix; after `rtk proxy` a `!`
+  // names a program for execvp, so only a shell's reading strips it.
+  if (!exec) {
+    let k = 0
+    while (words[k]?.bang) k++
+    if (k) { while (k < words.length && isAssignment(words[k].v)) k++; words = words.slice(k) }
   }
   let i = 0, stdin = true
   for (let hop = 0; hop < 64; hop++) {
@@ -1395,6 +1421,16 @@ const backquoted = (body) => {
   for (let i = 0; i < body.length; i++) { if (body[i] === '\\' && i + 1 < body.length && '$`\\'.includes(body[i + 1])) i++; out += body[i] }
   return out
 }
+// The unescaped body of a backquoted substitution when the escaping changes it (a backslash before $, ` or \), else null.
+function backquoteScript(text) {
+  const body = text.length > 1 && text.endsWith('`') ? text.slice(1, -1) : text.slice(1)
+  for (let i = 0; i + 1 < body.length; i++) {
+    if (body[i] !== '\\') continue
+    if ('$`\\'.includes(body[i + 1])) return backquoted(body)
+    i++
+  }
+  return null
+}
 const stripTabs = (text) => { let out = '', start = true; for (const ch of text) { if (start && ch === '\t') continue; start = ch === '\n'; out += ch } return out }
 // The text of a here-document body: the body node's own range when the tree is sound, else the lines between the operator line and the
 // delimiter (tree-sitter-bash 0.25.1 leaves an empty body node, and puts the body's words among the operator's arguments, when the first body
@@ -1436,7 +1472,7 @@ function lastCommand(node) {
 }
 // Walks a tree without recursion (a 3,000-deep $( must not throw) and returns how many commands read a script from standard input.
 function walkTree(root, src, cx) {
-  const entries = [], pending = new Map(), claimed = new Set()
+  const entries = [], pending = new Map(), claimed = new Set(), folds = new Map()
   let readers = 0
   if (root.hasError) cx.acc.errors = true
   // The scripts a here-document or here-string feeds: `terminal` is the owner's { reads, remote } or null.
@@ -1467,7 +1503,7 @@ function walkTree(root, src, cx) {
   }
   const command = (node) => {
     const owned = pending.get(node.id) ?? []
-    const segments = commandSegments(node, src, ['argument'], owned.filter((r) => r.type === 'heredoc_redirect')).filter((sg) => sg.words.length)
+    const segments = commandSegments(node, src, ['argument'], owned.filter((r) => r.type === 'heredoc_redirect'), folds.get(node.id) ?? []).filter((sg) => sg.words.length)
     segments.forEach((sg, k) => {
       if (k) cx.acc.simple++ // a command the grammar had joined to the previous one
       const records = []
@@ -1502,12 +1538,23 @@ function walkTree(root, src, cx) {
     if (COUNTED.has(type)) cx.acc.simple++
     else if (type === 'variable_assignment' && STATEMENT_PARENTS.has(node.parent?.type)) cx.acc.simple++
     else if (type === 'compound_statement' && node.child(0)?.type === '((') cx.acc.simple++
+    if (type === 'command_substitution' && node.child(0)?.type === '`') {
+      // A backquoted body is unescaped before the shell parses it (POSIX.1-2024 XCU 2.6.3, bash(1) Command Substitution): a backslash before
+      // $, ` or \ is removed, so an escaped backquote nests a substitution the grammar reads as data. Such a body is read again from its
+      // unescaped text (a body with no such backslash is the text the tree already holds).
+      const script = backquoteScript(node.text)
+      if (script !== null) { entries.push({ pos: node.startIndex, records: readScript(script, cx.remote, cx.depth + 1, cx.acc).records }); continue }
+    }
     if (type === 'command') command(node)
     else if (type === 'file_redirect') redirectTail(node)
     else if (type === 'redirected_statement') {
       const body = node.childForFieldName('body'), owner = body ? lastCommand(body) : null
-      const owned = node.childrenForFieldName('redirect').filter((r) => r.type === 'heredoc_redirect' || r.type === 'herestring_redirect')
+      const redirects = node.childrenForFieldName('redirect')
+      const owned = redirects.filter((r) => r.type === 'heredoc_redirect' || r.type === 'herestring_redirect')
       if (owned.length && owner) { pending.set(owner.id, owned); for (const r of owned) claimed.add(r.id) }
+      // The words the grammar folded into its file redirections are arguments of the command they follow.
+      const folded = owner ? redirects.filter((r) => r.type === 'file_redirect').flatMap((r) => foldedWords(r, src)) : []
+      if (folded.length) folds.set(owner.id, [...(folds.get(owner.id) ?? []), ...folded])
     } else if (type === 'heredoc_redirect') {
       // The operator line's own children are walked; the body is handled with its owner (here: none, so its substitutions only).
       if (!claimed.has(node.id)) { const records = []; feed(node, null, records, false); entries.push({ pos: node.startIndex, records }) }
