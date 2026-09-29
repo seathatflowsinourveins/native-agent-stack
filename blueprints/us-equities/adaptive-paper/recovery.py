@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_DOWN
+import inspect
 import re
 import time
 
@@ -48,8 +49,16 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     sequence = max((int(i.client_id[len(prefix):]) for i in ledger.intents()
                     if i.client_id.startswith(prefix) and i.client_id[len(prefix):].isdigit()), default=0)
     errors, cancelled, submitted = [], [], []
+    # Held symbols without a fresh quote at the last exit turn (#215). The result's
+    # stale_symbols is meaningful only together with recovery_quote_not_fresh; after any
+    # other error (one before the exit loop included) it says nothing about quote freshness.
+    stale = set()
     last_snapshot = None
     proof = None
+    whole_exit = 2 * float(config["order_timeout_seconds"])
+    held = []
+    budget_error = None
+    before_request = getattr(port, "before_request", None)
 
     def quote(row):
         controller.quote(row)
@@ -118,6 +127,29 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                       "snapshot_incomplete", "replay_unresolved"}:
             raise SafetyError("recovery_observation_integrity_lost")
 
+    def guard_exit_budget():
+        nonlocal budget_error
+        if deadline - time.monotonic() < whole_exit:
+            unquoted = [s for s in held if not fresh(s)]
+            stale.difference_update(held)
+            stale.update(unquoted)
+            budget_error = "recovery_quote_not_fresh" if unquoted else "recovery_deadline_reached"
+            raise SafetyError(budget_error)
+
+    async def recovery_request(kind, *args, **kwargs):
+        # The native transport invokes this hook immediately before its HTTP
+        # guard. Authorization (including durable budget writes) can take time.
+        if kind == "submit":
+            guard_exit_budget()
+        result = before_request(kind, *args, **kwargs)
+        if inspect.isawaitable(result):
+            result = await result
+        if kind == "submit":
+            guard_exit_budget()
+        return result
+
+    if before_request is not None:
+        port.before_request = recovery_request
     try:
         ledger.begin_recovery(controller.clock())
         for intent in ledger.intents():
@@ -142,16 +174,38 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         if ledger.unresolved():
             raise SafetyError("unresolved_orders_block_exit")
         # Sequential closes prevent overselling and leave capacity for cancels and
-        # reconciliation. A terminal partial cancel must be snapshotted again.
+        # reconciliation. A terminal partial cancel must be snapshotted again. Each exit
+        # takes the alphabetically first held symbol whose own quote is fresh at that turn,
+        # not the freshest (#215). A held symbol without a fresh quote is skipped rather than
+        # ending recovery, and is exited once it quotes. No exit starts unless a whole exit
+        # (its fill wait and a cancel's wait) still fits before the deadline. Every failed
+        # exit still ends recovery, including the transport's pre-wire refusal (not_sent) of
+        # a quote that went stale before the POST.
         while ledger.positions():
             guard_observation_integrity()
             if len(submitted) >= 100:
                 raise SafetyError("recovery_order_bound_reached")
-            symbol, position = sorted(ledger.positions().items())[0]
+            held = sorted(ledger.positions())
             if not controller.market_open or controller.close - controller.clock() <= 1:
                 raise SafetyError("outside_allowed_session")
-            if not await wait_for(lambda: fresh(symbol), float(config["quote_max_age_seconds"])):
-                raise SafetyError("recovery_quote_not_fresh")
+            # Wait for a quote only while a whole exit still fits before the deadline.
+            patience = deadline - time.monotonic() - whole_exit
+            await wait_for(lambda: any(fresh(s) for s in held),
+                           max(0.0, min(float(config["quote_max_age_seconds"]), patience)))
+            quoted = [s for s in held if fresh(s)]
+            unquoted = [s for s in held if s not in quoted]
+            stale.difference_update(quoted)
+            stale.update(unquoted)
+            # Checked after every wait (this quote wait, or the previous exit's fill and cancel
+            # waits) and before every exit, a symbol quoted all along included: bounded() could
+            # cut an exit started with less than a whole exit left after its POST. With a held
+            # symbol still unquoted this ends recovery as recovery_quote_not_fresh (named in
+            # stale_symbols), and otherwise as recovery_deadline_reached.
+            guard_exit_budget()
+            if not quoted:
+                continue
+            symbol = quoted[0]
+            position = ledger.positions()[symbol]
             bid = controller.quotes[symbol].bid
             price = (bid - Decimal("0.02")).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
             if price <= 0:
@@ -173,9 +227,12 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                        "qty": format(quantity, "f"), "limit_price": format(price, "f"),
                        "type": "limit", "time_in_force": "day", "extended_hours": exit_extended_hours,
                        "strategy": "recovery", "reason": "owned_residual_exit"}
-            submitted.append(client_id)
             try:
                 guard_observation_integrity()
+                # Position reads and payload preparation may consume the budget
+                # checked above. Recheck at the submission boundary.
+                guard_exit_budget()
+                submitted.append(client_id)
                 confirmation = await bounded(port.submit(payload))
                 order(confirmation)
             except Exception as exc:
@@ -186,6 +243,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                     intent = next((i for i in ledger.intents() if i.client_id == client_id), None)
                     if intent and intent.status == "reserved" and not intent.filled_qty and intent.broker_id is None:
                         ledger.mark_not_sent(client_id, "recovery_definitive_refusal")
+                    # The transport sanitizes hook failures into SubmissionNotSent.
+                    # Retain the recovery decision after its pre-wire guarantee.
+                    if budget_error is not None:
+                        raise SafetyError(budget_error) from None
                 raise
             if not await wait_for(lambda: terminal({client_id}), float(config["order_timeout_seconds"])):
                 await cancel(client_id)
@@ -208,6 +269,9 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             await asyncio.wait_for(port.stop(), 10)
         except Exception as exc:
             errors.append("stop_" + _code(exc))
+        finally:
+            if before_request is not None:
+                port.before_request = before_request
     positions = [{"symbol": p.symbol, "qty": format(p.qty, "f")} for p in ledger.positions().values()]
     unresolved = [{"client_id": i.client_id, "symbol": i.symbol, "side": i.side,
                    "status": i.status, "qty": format(i.qty, "f"), "filled_qty": format(i.filled_qty, "f"),
@@ -217,6 +281,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     return {"mode": "official_sdk_recovery", "native_engine_resumed": False,
             "status": "passed" if flat else "needs_attention", "flat": flat,
             "errors": errors, "positions": positions, "unresolved_orders": unresolved,
+            "stale_symbols": sorted(stale & set(ledger.positions())),
             "broker_positions_last_observed": None if last_snapshot is None else
                 [{"symbol": p["symbol"], "qty": str(p["qty"])} for p in last_snapshot["positions"]],
             "reconciliation": proof, "cancel_attempt_client_ids": cancelled,

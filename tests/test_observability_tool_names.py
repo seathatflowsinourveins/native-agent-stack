@@ -40,8 +40,9 @@ BUILTIN_AGENTS = ["general-purpose", "Explore", "Plan", "claude", "statusline-se
 # Typed by the model (Skill input, workflow script name, Codex task name): never exported.
 NOT_EXPORTED = ["workflow.name", "agent_name"]
 WRITTEN_KEYS = set(DERIVED_KEYS) | set(REGISTRY_NAME_KEYS) | set(AGENT_TYPE_KEYS)
+# env is the Codex launch tag (otel.environment), which carries a private run token.
 ID_LABELS = ("session_id", "conversation_id", "thread_id", "turn_id", "workflow_run_id", "sender_thread_id",
-             "receiver_thread_id", "receipt_id", "event_sequence", "event_timestamp", "tool_use_id", "call_id")
+             "receiver_thread_id", "receipt_id", "event_sequence", "event_timestamp", "tool_use_id", "call_id", "env")
 
 try:
     import yaml
@@ -126,7 +127,7 @@ class CollectorProfileTests(unittest.TestCase):
             self.assertIn(f'set(attributes["{key}"], "custom") where attributes["{key}"] != nil'
                           f' and not ContainsValue({vocabulary}, attributes["{key}"])', final)
         for key in ("tool_family", "actor", "shell_rtk", "invocation_trigger", "kind", "state", "workflow.run_id",
-                    "sender_thread_id", "receiver_thread_id", "total_tool_uses"):
+                    "sender_thread_id", "receiver_thread_id", "total_tool_uses", "call_id"):
             self.assertIn(key, allow)
             self.assertTrue(any(s.startswith(f'delete_key(attributes, "{key}") where attributes["{key}"] != nil and not IsMatch(')
                                 for s in final), key)
@@ -142,7 +143,8 @@ class CollectorProfileTests(unittest.TestCase):
         pattern = re.search(r'"\^\((.*)\)\$"', receipts["statements"][0]).group(1)
         deleted = {name.replace("\\\\.", ".") for name in pattern.split("|")}
         u6_keys = set(log_allowlist(self.config)[log_allowlist(self.config).index("tool_family"):])
-        self.assertEqual(deleted | set(DERIVED_KEYS), u6_keys)
+        # call_id sits before the tail (Codex call identity for the launch join); a receipt file must not add it either.
+        self.assertEqual(deleted | set(DERIVED_KEYS), u6_keys | {"call_id"})
 
     def test_model_typed_values_are_not_exported(self):
         allow = set(log_allowlist(self.config))

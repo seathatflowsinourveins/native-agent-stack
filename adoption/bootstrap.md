@@ -205,6 +205,21 @@ GitHub-hosted macOS runner; see
    so on main a launcher reporting 2.1.281 to 2.1.283 no longer counts as at
    or above the pin and takes the checksum-verified install.
 
+   Both scripts also write the ecosystem `claude` launcher (`$eco/bin/claude`;
+   none is written when that directory is `~/.local/bin`, where the native
+   installer's own launcher serves). On main that launcher starts an
+   interactive terminal launch at effort max: it adds `--effort max` only when
+   stdin and stdout are a terminal, none of `-p`/`--print` (also as a cluster
+   such as `-pc`), `--effort` or `CLAUDE_CODE_EFFORT_LEVEL` has chosen an
+   effort, nothing follows a `--`, and the client reports 2.1.284 or newer (on
+   2.1.281 a `max` session turned Ultracode's orchestration off). Claude Code
+   cannot save max in settings, and the variable would override every child's
+   effort, so the documented flag is the mechanism
+   ([decision](../docs/decisions/2026-09-29-max-default-effort.md)). Headless
+   runs, an explicit `--effort`, the IDE extensions, the desktop app and the
+   web keep the saved per-model level; bypass with `--effort <level>` or by
+   running `~/.local/bin/claude` directly.
+
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
    Use each client's own device flow:

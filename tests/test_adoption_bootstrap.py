@@ -20,12 +20,15 @@ import json
 import os
 from pathlib import Path
 import platform
+import pty
 import re
+import select
 import shutil
 import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import tomllib
 import shlex
 import unittest
@@ -573,7 +576,7 @@ class InstallNativeLauncherTests(unittest.TestCase):
         "ln -sfn \"$HOME/.local/share/claude/versions/$2\" \"$HOME/.local/bin/claude\"\n"
     )
 
-    def run_install_native(self, script: Path, home: Path, bin_dir: Path):
+    def run_install_native(self, script: Path, home: Path, bin_dir: Path, bin_name: str = "claude"):
         text = script.read_text()
         match = re.search(r"(?ms)^install_native\(\) \{.*?^\}$", text)
         self.assertIsNotNone(match, f"install_native not found in {script}")
@@ -584,7 +587,7 @@ class InstallNativeLauncherTests(unittest.TestCase):
             f"bin_dir={shlex.quote(str(bin_dir))}\nmkdir -p \"$cache_dir\" \"$bin_dir\"\n"
             f"fetch() {{ cp {shlex.quote(str(stub))} \"$3\"; }}\n"
             + match.group(0)
-            + "\ninstall_native claude-code 2.1.280 https://example.invalid/claude 0 claude\n"
+            + f"\ninstall_native claude-code 2.1.280 https://example.invalid/claude 0 {shlex.quote(bin_name)}\n"
         )
         env = dict(os.environ, HOME=str(home))
         return subprocess.run(["bash", "-c", harness], capture_output=True, text=True, env=env, timeout=30)
@@ -615,6 +618,165 @@ class InstallNativeLauncherTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertTrue((home / ".local/bin/claude").is_symlink())
                 self.assertEqual((home / ".local/bin/claude").read_text(), "REAL-BINARY\n")
+
+
+class InteractiveEffortLauncherTests(unittest.TestCase):
+    """The claude launcher that install_native writes adds `--effort max` to an interactive terminal launch and to nothing else
+    (docs/decisions/2026-09-29-max-default-effort.md). Each case runs the generated launcher against a stub client that reports
+    a version and records the exact arguments it receives (as JSON, so empty and multi-line arguments survive), on real
+    pseudo-terminals where the case needs a terminal. The last tests break the launcher nine ways and require the case table to
+    notice each one (a negative control for the table itself)."""
+
+    STUB_INSTALLER = InstallNativeLauncherTests.STUB_INSTALLER
+    STUB_CLIENT = (
+        "#!/usr/bin/env python3\n"
+        "import json, os, sys\n"
+        "if sys.argv[1:] == ['--version']:\n"
+        "    print(os.environ.get('STUB_VERSION', '2.1.284') + ' (Claude Code)')\n"
+        "else:\n"
+        "    print('RAN')\n"
+        "    print(json.dumps(sys.argv[1:]))\n"
+    )
+    # name: (arguments, stdin is a terminal, stdout is a terminal, extra environment, arguments the client must receive)
+    CASES = {
+        "terminal, no arguments": ([], True, True, {}, ["--effort", "max"]),
+        "terminal, --model opus": (["--model", "opus"], True, True, {}, ["--effort", "max", "--model", "opus"]),
+        "terminal, --resume": (["--resume", "abc"], True, True, {}, ["--effort", "max", "--resume", "abc"]),
+        "terminal, a subcommand": (["mcp", "list"], True, True, {}, ["--effort", "max", "mcp", "list"]),
+        "terminal, -c (no p in the cluster)": (["-c"], True, True, {}, ["--effort", "max", "-c"]),
+        "explicit --effort ultracode": (["--effort", "ultracode"], True, True, {}, ["--effort", "ultracode"]),
+        "explicit --effort=low": (["--effort=low"], True, True, {}, ["--effort=low"]),
+        "explicit --effort after other flags": (["--model", "opus", "--effort", "xhigh"], True, True, {},
+                                                ["--model", "opus", "--effort", "xhigh"]),
+        "headless -p": (["-p", "hi"], True, True, {}, ["-p", "hi"]),
+        "headless --print": (["--print", "hi"], True, True, {}, ["--print", "hi"]),
+        "headless -pc cluster": (["-pc", "hi"], True, True, {}, ["-pc", "hi"]),
+        "headless -cp cluster": (["-cp", "hi"], True, True, {}, ["-cp", "hi"]),
+        "-- ends the scan": (["--", "-p"], True, True, {}, ["--effort", "max", "--", "-p"]),
+        "empty argument kept": (["--model", "opus", ""], True, True, {}, ["--effort", "max", "--model", "opus", ""]),
+        "multi-line argument kept": (["fix\nthe bug"], True, True, {}, ["--effort", "max", "fix\nthe bug"]),
+        # documented limit: the scan does not know which options take a value, so an operand equal to an option name
+        # suppresses the default (the safe direction: nothing is added)
+        "operand equal to --effort (limit)": (["--system-prompt", "--effort", "hello"], True, True, {},
+                                              ["--system-prompt", "--effort", "hello"]),
+        "effort variable set": (["--model", "opus"], True, True, {"CLAUDE_CODE_EFFORT_LEVEL": "xhigh"}, ["--model", "opus"]),
+        "no terminal at all": (["--model", "opus"], False, False, {}, ["--model", "opus"]),
+        "stdout is a pipe": (["--model", "opus"], True, False, {}, ["--model", "opus"]),
+        "stdin is a pipe": (["--model", "opus"], False, True, {}, ["--model", "opus"]),
+        "client 2.1.281 (orchestration off at max)": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.281"}, ["--model", "opus"]),
+        "client 2.1.283": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.283"}, ["--model", "opus"]),
+        "client 2.1.99 (numeric, not text, order)": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.99"}, ["--model", "opus"]),
+        "client 2.1.284": (["--model", "opus"], True, True, {"STUB_VERSION": "2.1.284"}, ["--effort", "max", "--model", "opus"]),
+        "client 2.2.0": (["--model", "opus"], True, True, {"STUB_VERSION": "2.2.0"}, ["--effort", "max", "--model", "opus"]),
+        "client 3.0.1": (["--model", "opus"], True, True, {"STUB_VERSION": "3.0.1"}, ["--effort", "max", "--model", "opus"]),
+        "client version unreadable": (["--model", "opus"], True, True, {"STUB_VERSION": "weird"}, ["--model", "opus"]),
+    }
+
+    def install(self, script: Path, home: Path, bin_name: str = "claude") -> Path:
+        bin_dir = home / "eco" / "bin"
+        bin_dir.mkdir(parents=True)
+        result = InstallNativeLauncherTests.run_install_native(self, script, home, bin_dir, bin_name)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        native = home / ".local/share/claude/versions/2.1.280"
+        native.write_text(self.STUB_CLIENT)
+        native.chmod(0o755)
+        return bin_dir / bin_name
+
+    def run_launcher(self, launcher: Path, home: Path, argv, stdin_tty: bool, stdout_tty: bool, extra_env) -> list:
+        env = {k: v for k, v in os.environ.items() if k not in ("CLAUDE_CODE_EFFORT_LEVEL", "STUB_VERSION")}
+        env.update(HOME=str(home), **extra_env)
+        master, slave = pty.openpty()
+        opened = [master, slave]
+        proc = None
+        text = stderr = ""
+        try:
+            proc = subprocess.Popen(
+                [str(launcher), *argv],
+                stdin=slave if stdin_tty else subprocess.DEVNULL,
+                stdout=slave if stdout_tty else subprocess.PIPE,
+                stderr=subprocess.PIPE, env=env, close_fds=True)
+            # The parent keeps its own slave descriptor until the child is gone and the master is read: macOS discards a
+            # terminal's unread output when the last slave descriptor closes (apple-oss-distributions/xnu, bsd/kern/tty_dev.c
+            # ptsclose calls ttyclose, whose ttyflush(tp, FREAD | FWRITE) empties both queues), so closing it early lost the
+            # stub's lines on the macOS runner while Linux keeps them. With the slave held open the master never reports end
+            # of file, so the read stops once the stub's two lines are in, or once the child has exited and nothing more arrives.
+            if stdout_tty:
+                deadline = time.monotonic() + 30
+                quiet = 0
+                while text.count("\n") < 2 and quiet < 2:
+                    if select.select([master], [], [], 0.05)[0]:
+                        try:
+                            chunk = os.read(master, 65536)
+                        except OSError:
+                            break
+                        if not chunk:
+                            break
+                        text += chunk.decode()
+                        quiet = 0
+                    elif proc.poll() is not None:
+                        quiet += 1
+                    elif time.monotonic() > deadline:
+                        self.fail("the launcher did not finish within 30 seconds")
+                _, err = proc.communicate(timeout=30)
+            else:
+                out, err = proc.communicate(timeout=30)
+                text = out.decode()
+            stderr = err.decode(errors="replace")
+        finally:
+            if proc is not None and proc.poll() is None:
+                proc.kill()
+                proc.wait()
+            for fd in opened:
+                os.close(fd)
+        lines = [line.rstrip("\r") for line in text.splitlines()]
+        self.assertIn("RAN", lines, f"the stub client did not run: {text!r} (stderr {stderr[:300]!r})")
+        return json.loads(lines[lines.index("RAN") + 1])
+
+    def outcomes(self, launcher: Path, home: Path) -> dict:
+        return {name: self.run_launcher(launcher, home, argv, stdin_tty, stdout_tty, extra_env)
+                for name, (argv, stdin_tty, stdout_tty, extra_env, _) in self.CASES.items()}
+
+    def expected(self) -> dict:
+        return {name: case[4] for name, case in self.CASES.items()}
+
+    def test_only_an_interactive_launch_with_no_effort_choice_gets_max(self):
+        for script in (SCRIPT_PATH, ROOT / "adoption/bootstrap-macos.sh"):
+            with self.subTest(script=script.name), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                self.assertEqual(self.outcomes(self.install(script, home), home), self.expected())
+
+    def test_the_case_table_fails_on_each_broken_launcher(self):
+        flag_line = "-p* | -[!-]*p* | --print | --print=* | --effort | --effort=*"
+        mutants = {
+            "always adds the flag": ('if [ -t 0 ] && [ -t 1 ] && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]; then', "if true; then"),
+            "ignores a missing terminal": ("[ -t 0 ] && [ -t 1 ] && ", ""),
+            "ignores the effort variable": (' && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]', ""),
+            "adds xhigh instead": ('--effort max "$@"', '--effort xhigh "$@"'),
+            "ignores an explicit effort": (flag_line, "-p* | -[!-]*p* | --print | --print=*"),
+            "ignores -p": (flag_line, "-[!-]*p* | --print | --print=* | --effort | --effort=*"),
+            "ignores a short-flag cluster": (flag_line, "-p* | --print | --print=* | --effort | --effort=*"),
+            "scans past --": ("      --) break ;;\n", ""),
+            "ignores the client version": ('"$((10#$patch))" -ge 284', '"$((10#$patch))" -ge 1'),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            launcher = self.install(SCRIPT_PATH, home)
+            original = launcher.read_text()
+            self.assertEqual(self.outcomes(launcher, home), self.expected())
+            for name, (old, new) in mutants.items():
+                with self.subTest(mutant=name):
+                    self.assertIn(old, original)
+                    launcher.write_text(original.replace(old, new, 1))
+                    launcher.chmod(0o755)
+                    self.assertNotEqual(self.outcomes(launcher, home), self.expected(), f"the case table missed: {name}")
+
+    def test_another_command_gets_the_plain_launcher(self):
+        for script in (SCRIPT_PATH, ROOT / "adoption/bootstrap-macos.sh"):
+            with self.subTest(script=script.name), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                text = self.install(script, home, "othertool").read_text()
+                self.assertNotIn("--effort", text)
+                self.assertIn('exec "$HOME/.local/bin/othertool" "$@"', text)
 
 
 def shell_functions(text: str, *names: str) -> str:
