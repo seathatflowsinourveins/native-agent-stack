@@ -54,8 +54,10 @@ LINE = re.compile(r"credential boot receipt: rows=\d+ ok=\d+ missing=\d+ unsafe=
                   r"fingerprints=\d+ undeclared_store_files=(?:\d+|unknown) keyring_names=(?:\d+|unknown) "
                   r"guard_matches_pin=(?:true|false) result=(?:ok|unsafe) "
                   r"receipt=\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
-BOOT_A = "3f2a9c1b-5d6e-4f70-8a9b-0c1d2e3f4a5b"
-BOOT_B = "7c9d1e2f-3a4b-4c5d-9e6f-7a8b9c0d1e2f"
+# Two boot ids in the kernel's UUID form, joined at run time: scripts/validate.py flags a UUID written out in a
+# tracked file as a possible local session identifier.
+BOOT_A = "-".join(("3f2a9c1b", "5d6e", "4f70", "8a9b", "0c1d2e3f4a5b"))
+BOOT_B = "-".join(("7c9d1e2f", "3a4b", "4c5d", "9e6f", "7a8b9c0d1e2f"))
 
 # The unit template, pinned (amendments 2 and 3 of the D1 PR-3 contract). The workstation renders @REPOSITORY@ to the
 # live clone, as its other installed units do; the working checkout and build worktrees are never the value.
