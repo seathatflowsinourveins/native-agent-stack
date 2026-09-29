@@ -69,6 +69,18 @@ class StoreTests(unittest.TestCase):
         self.assertIn("does not start with PK", output)
         self.assertNotIn(key_value, output)
 
+    def test_second_paper_account_gets_the_same_prefix_hint(self):
+        # alpaca-paper-2 is a paper account too, so a live-shaped key id (AK) is flagged the same way.
+        key_value = fake_token("AK")
+        code, output = self.run_store("alpaca-paper-2", [key_value, fake_token(), ""])
+        self.assertEqual(code, 0)
+        self.assertIn("does not start with PK", output)
+        self.assertNotIn(key_value, output)
+        self.assertTrue((self.store / "alpaca-paper-2.env").is_file())
+        code, output = self.run_store("alpaca-paper-2", ["replace", fake_token("PK"), fake_token(), ""])
+        self.assertEqual(code, 0)
+        self.assertNotIn("warning", output)
+
     def test_replacing_needs_the_hidden_word_replace(self):
         self.run_store("alpaca-paper", [fake_token("PK"), fake_token(), ""])
         path = self.store / "alpaca-paper.env"
@@ -131,6 +143,171 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("interactive terminal", result.stderr)
         self.assertFalse(self.store.exists())
+
+
+class StoreFromEnvTests(unittest.TestCase):
+    """--from-env: an entry's one variable, from this process's environment, into a new 0600 file. It exists for a
+    key that already lives only in memory, which `kernel_keyring.py exec` hands over (docs/secret-storage.md).
+    Every value is a synthetic fake and the store is a temporary XDG_CONFIG_HOME."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.base = Path(tmp.name)
+        self.store = self.base / "cfg" / "native-agent-stack"
+        self.value = fake_token("tvly-") + fake_token()
+        self.env = {"HOME": str(self.base / "home"), "XDG_CONFIG_HOME": str(self.base / "cfg"),
+                    "TAVILY_API_KEY": self.value}
+
+    def store_from_env(self, entry="tavily", env=None):
+        out = io.StringIO()
+        code = store_mod.run_from_env(entry, env=self.env if env is None else env, out=out, isolated=True)
+        return code, out.getvalue()
+
+    def cli(self, *args, isolated=True, **extra_env):
+        env = {"PATH": os.environ.get("PATH", ""), **self.env, **extra_env}
+        command = [sys.executable, *(["-I"] if isolated else []), str(TOOLS / "set_credential.py"), *args]
+        return subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=60, env=env)
+
+    def assert_never_echoed(self, *texts, value=None):
+        # Neither the value nor any six-character piece of it (`tvly auth`, for one, prints a key's first eight
+        # and last four characters).
+        value = self.value if value is None else value
+        pieces = {value[i:i + 6] for i in range(len(value) - 5)}
+        for text in texts:
+            self.assertNotIn(value, text)
+            self.assertEqual(sorted(piece for piece in pieces if piece in text), [])
+
+    def test_stores_the_one_variable_in_a_new_private_file(self):
+        with mock.patch.object(store_mod.os, "replace", side_effect=AssertionError("os.replace overwrites")):
+            code, output = self.store_from_env()
+        self.assertEqual((code, output), (0, "tavily: stored\n"))
+        path = self.store / "tavily.env"
+        self.assertEqual(path.read_text(encoding="ascii"), f"export TAVILY_API_KEY={self.value}\n")
+        info = os.lstat(path)
+        self.assertEqual((stat.S_IMODE(info.st_mode), info.st_nlink), (0o600, 1))  # the temporary name is gone
+        self.assertEqual(stat.S_IMODE(os.lstat(self.store).st_mode), 0o700)
+        self.assertEqual([p.name for p in self.store.iterdir()], ["tavily.env"])
+        self.assertNotIn("TAVILY_API_KEY", self.env)  # popped, so no child of the writer inherits it
+        self.assert_never_echoed(output)
+
+    def test_refuses_unless_the_first_interpreter_was_started_isolated(self):
+        with self.assertRaisesRegex(store_mod.Refused, r"python3 -I") as caught:
+            store_mod.run_from_env("tavily", env=self.env, out=io.StringIO(), isolated=False)
+        self.assert_never_echoed(str(caught.exception))
+        if not sys.flags.isolated:  # the default reads sys.flags.isolated, and this test process is not isolated
+            with self.assertRaisesRegex(store_mod.Refused, r"python3 -I"):
+                store_mod.run_from_env("tavily", env=self.env, out=io.StringIO())
+        self.assertFalse(self.store.exists())
+        self.assertEqual(self.env["TAVILY_API_KEY"], self.value)  # refused before the value was taken
+
+    def test_refuses_an_entry_without_exactly_one_variable(self):
+        # A pair's provenance cannot be proven from an inherited environment, so pairs never take this path; an
+        # optional variable counts too (sec-contact declares SEC_USER_AGENT and EDGAR_IDENTITY).
+        self.env.update({"APCA_API_KEY_ID": fake_token("PK"), "APCA_API_SECRET_KEY": fake_token(),
+                         "SEC_USER_AGENT": "name a@b.example"})
+        for entry in ("alpaca-paper", "alpaca-paper-2", "sec-contact"):
+            with self.subTest(entry=entry), self.assertRaisesRegex(store_mod.Refused, "exactly one variable"):
+                self.store_from_env(entry)
+        self.assertFalse(self.store.exists())
+        # Entries that are not operator-supplied files keep the interactive path's refusal.
+        for entry in ("grafana-admin", "claude-native", "no-such-entry"):
+            with self.subTest(entry=entry), self.assertRaises(store_mod.Refused):
+                self.store_from_env(entry)
+        self.assertFalse(self.store.exists())
+
+    def test_refuses_an_absent_empty_or_out_of_grammar_value(self):
+        cases = {"absent": None, "empty": "", "padded": f" {self.value}", "newline": f"{self.value}\nx",
+                 "quote": f'{self.value}"', "dollar": f"{self.value}$HOME", "backtick": f"{self.value}`id`",
+                 "backslash": f"{self.value}\\", "non-ASCII": f"{self.value}\u00e9"}
+        for label, value in cases.items():
+            env = {name: text for name, text in self.env.items() if name != "TAVILY_API_KEY"}
+            if value is not None:
+                env["TAVILY_API_KEY"] = value
+            with self.subTest(label), self.assertRaises(store_mod.Refused) as caught:
+                self.store_from_env(env=env)
+            self.assert_never_echoed(str(caught.exception))
+            self.assertIn("TAVILY_API_KEY", str(caught.exception))  # the refusal names the variable only
+        self.assertFalse(self.store.exists())  # refused before the store was even created
+
+    def test_never_replaces_an_existing_file(self):
+        self.store.mkdir(parents=True, mode=0o700)
+        path = self.store / "tavily.env"
+        path.write_text("export TAVILY_API_KEY=kept\n")
+        path.chmod(0o600)
+        with self.assertRaisesRegex(store_mod.Refused, "exists") as caught:
+            self.store_from_env()
+        self.assert_never_echoed(str(caught.exception))
+        self.assertEqual(path.read_text(), "export TAVILY_API_KEY=kept\n")
+        self.assertEqual([p.name for p in self.store.iterdir()], ["tavily.env"])
+        # A symbolic link at the name is refused the same way, and neither it nor its target changes.
+        path.unlink()
+        target = self.base / "elsewhere.env"
+        target.write_text("untouched\n")
+        path.symlink_to(target)
+        self.env["TAVILY_API_KEY"] = self.value
+        with self.assertRaisesRegex(store_mod.Refused, "exists"):
+            self.store_from_env()
+        self.assertTrue(path.is_symlink())
+        self.assertEqual(target.read_text(), "untouched\n")
+        self.assertEqual([p.name for p in self.store.iterdir()], ["tavily.env"])
+
+    def test_the_final_link_is_create_only(self):
+        # The existence check before writing can race with another writer; os.link cannot: it fails with EEXIST
+        # rather than replace, so a file that appears after the check is kept and the temporary name is removed.
+        dfd = store_mod.open_store(self.store, os.getuid())
+        self.addCleanup(os.close, dfd)
+        path = self.store / "tavily.env"
+        path.write_text("appeared after the check\n")
+        with self.assertRaisesRegex(store_mod.Refused, "exists") as caught:
+            store_mod.create_exclusively(dfd, "tavily.env", f"export TAVILY_API_KEY={self.value}\n")
+        self.assert_never_echoed(str(caught.exception))
+        self.assertEqual(path.read_text(), "appeared after the check\n")
+        self.assertEqual([p.name for p in self.store.iterdir()], ["tavily.env"])
+
+    def test_cli_stores_once_without_a_terminal_and_prints_only_the_id(self):
+        first = self.cli("tavily", "--from-env")
+        self.assertEqual((first.returncode, first.stdout, first.stderr), (0, "tavily: stored\n", ""))
+        path = self.store / "tavily.env"
+        self.assertEqual(path.read_text(), f"export TAVILY_API_KEY={self.value}\n")
+        self.assertEqual(stat.S_IMODE(os.lstat(path).st_mode), 0o600)
+        other = fake_token("tvly-") + fake_token()
+        second = self.cli("tavily", "--from-env", TAVILY_API_KEY=other)
+        self.assertEqual(second.returncode, 2)
+        self.assertIn("exists", second.stderr)
+        self.assertEqual(path.read_text(), f"export TAVILY_API_KEY={self.value}\n")
+        for result in (first, second):
+            self.assert_never_echoed(result.stdout + result.stderr)
+            self.assert_never_echoed(result.stdout + result.stderr, value=other)
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_cli_refuses_a_non_isolated_start_and_never_reexecutes(self):
+        # Without -I, site-time code has already run beside the value: a sitecustomize module on PYTHONPATH records
+        # that it saw TAVILY_API_KEY (the control). Re-running isolated could not undo that, so the tool refuses and
+        # writes nothing, where a re-run would have stored the file; with -I the module never runs.
+        poison, marker = self.base / "poison", self.base / "site-ran"
+        poison.mkdir()
+        (poison / "sitecustomize.py").write_text(
+            f"import os\nwith open({str(marker)!r}, 'a') as h:\n    h.write(str('TAVILY_API_KEY' in os.environ))\n")
+        plain = self.cli("tavily", "--from-env", isolated=False, PYTHONPATH=str(poison))
+        self.assertEqual(plain.returncode, 2, plain.stderr)
+        self.assertIn("python3 -I", plain.stderr)
+        self.assertEqual(marker.read_text(), "True")
+        self.assertFalse(self.store.exists())
+        isolated = self.cli("tavily", "--from-env", PYTHONPATH=str(poison))
+        self.assertEqual((isolated.returncode, isolated.stdout), (0, "tavily: stored\n"), isolated.stderr)
+        self.assertEqual(marker.read_text(), "True")  # unchanged: -I ignored PYTHONPATH
+        for result in (plain, isolated):
+            self.assert_never_echoed(result.stdout + result.stderr)
+
+    def test_cli_takes_no_abbreviation_of_from_env(self):
+        # argparse would read --from as --from-env, which the non-isolated start check does not look for.
+        for isolated in (True, False):
+            with self.subTest(isolated=isolated):
+                result = self.cli("tavily", "--from", isolated=isolated)
+                self.assertEqual(result.returncode, 2)
+                self.assertFalse(self.store.exists())
+                self.assert_never_echoed(result.stdout + result.stderr)
 
 
 class _Response:

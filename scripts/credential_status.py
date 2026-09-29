@@ -494,7 +494,8 @@ def render_text(report: dict) -> str:
                      f"{extra} findings={detail}{warn}{env_note}")
     stored, keys = report["coverage"]["undeclared_store_files"], report["coverage"]["undeclared_keyring_keys"]
     lines.append("undeclared store files (names only): "
-                 + ("unknown (the store root is not a real directory)" if stored is None else ",".join(stored) or "none"))
+                 + ("unknown (the store root is not a real directory)" if stored is None
+                    else ",".join(stored) or "none"))
     lines.append("undeclared kernel keyring keys (names only): "
                  + ("not checked (no readable /proc/keys)" if keys is None
                     else (",".join(keys) + " (memory only; lost at the next kernel restart)" if keys else "none")))
