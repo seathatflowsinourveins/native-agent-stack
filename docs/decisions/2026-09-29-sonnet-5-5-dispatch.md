@@ -205,7 +205,10 @@ depend on the shared accounts' usage windows, which are read live before a run a
 An earlier version of this section said that the flip fails 49 of the 76 tests in `tests/test_codex_lane.py`. That count was wrong: it came
 from one scratch run with no unmodified control and did not reproduce. Two clean runs on the tree before #505 (`59cbfc41`), with the
 constant alone flipped, fail 5 tests (with `TMPDIR` under `/tmp` and outside it), and the unmodified tree passes 76 of 76. The session
-that owns the tool attributes the earlier count to an empty `/tmp/.git` that was on the host then; this record did not establish the cause.
+that owns the tool reports that its own unmodified control, run in a clean worktree with the default `TMPDIR` while an empty
+`/tmp/.git` existed on the host (present then, gone since), failed the same 49 tests, each with the error `--export ... is inside the git
+repository /tmp`. The equal count suggests that the earlier scratch run measured that environment, not the flip; this record did not
+reproduce it and did not keep the error text of its own run.
 
 ## Limitations
 
