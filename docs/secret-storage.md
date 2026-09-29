@@ -224,6 +224,87 @@ not a boundary.
 - An MCP stdio server that needs a key can be launched with the runner as
   its command, never with a `${VAR}` in its configuration.
 
+## Proof run (canary)
+
+[`tools/credentials/canary_e2e.py`](../tools/credentials/canary_e2e.py)
+checks the id-only path end to end with synthetic keys. Six consumers each
+get their own random canary through `credential_run.py canary-e2e`: a fresh
+`claude -p` session, its subagent, a workflow child, `codex exec`, a Codex
+lane through the keyless OmniRoute profile, and a `systemd-run --user` unit.
+Each consumer types only
+`python3 -I tools/credentials/credential_run.py canary-e2e -- python3 -I tools/credentials/canary_probe.py --run <id> --consumer <consumer>`,
+and the probe prints only an HMAC tag bound to the run, the consumer and a
+fresh nonce. The harness then scans the places where a key could be
+recorded by mistake. The inventory row `canary-e2e` (class `test_canary`,
+status `test_only`) is missing between runs, which is informational.
+
+- A canary exists only in the store file while its consumer runs, and in
+  `0600` pattern files on the runtime tmpfs. No argv, printed line, log or
+  receipt holds a canary, a pattern or a tag.
+- Controls come first. Each scanner class must find a planted decoy and then
+  lose it: a text file, a gzip file, SQLite in WAL mode with an open
+  connection, a git object, and a journal line. Each consumer run also
+  carries its own decoy, echoed by a command that fails on purpose. A sink
+  whose decoy was planted but not found is reported as "not a sink, or
+  scanned wrongly", and the scan exits 1.
+- Every `CODEX_HOME` that the Codex consumers use must set
+  `features.shell_snapshot = false`. The harness reads `config.toml` and the
+  profile file, and refuses otherwise.
+- The OmniRoute data directories, Codex `shell_snapshots` and
+  `~/.docker/config.json` hold real tokens and are Read-denied to agents.
+  Only `scan --sink omniroute`, run in your own terminal, scans them.
+- `settle` measures when the decoys reach ai-memory, the agentsview archive
+  and Loki, and sets when scan passes 1 and 2 are due. `--with-sudo` on a
+  pass adds the system journal, syslog and crash dumps.
+
+The window, in order. The coordinator runs these; the user runs the
+user-run scan. While `consume workflow-child` waits, run the Workflow tool
+with script `tools/credentials/canary_workflow.js` and args
+`{"run": "<id>"}`.
+
+```sh
+python3 tools/credentials/canary_e2e.py prepare  # prints the run id
+python3 tools/credentials/canary_e2e.py controls --run <id>
+python3 tools/credentials/canary_e2e.py baseline --run <id>
+python3 tools/credentials/canary_e2e.py consume fresh-claude-session --run <id>  # and its subagent
+python3 tools/credentials/canary_e2e.py consume workflow-child --run <id>  # in the background
+python3 tools/credentials/canary_e2e.py consume codex-exec --run <id>
+python3 tools/credentials/canary_e2e.py consume omniroute-lane --run <id>
+python3 tools/credentials/canary_e2e.py consume systemd-user-unit --run <id>
+python3 tools/credentials/canary_e2e.py verify --run <id>
+python3 tools/credentials/canary_e2e.py settle --run <id>  # in the background, up to 30 minutes
+python3 tools/credentials/canary_e2e.py scan --pass 1 --run <id>
+python3 tools/credentials/canary_e2e.py scan --pass 2 --run <id>
+python3 tools/credentials/canary_e2e.py scan --sink omniroute --run <id>  # user-run, in your own terminal
+node .claude/workflows/child-usage.mjs --latest  # the workflow child's model id
+python3 tools/credentials/canary_e2e.py report --run <id> --model workflow-child=<model id>
+python3 tools/credentials/canary_e2e.py cleanup --run <id>
+```
+
+For the restart check, prepare with `--keep-across-restart` and run
+`consume systemd-user-unit` last. The unit's canary file then stays in the
+store. After `wsl --shutdown` and a new session, run:
+
+```sh
+python3 tools/credentials/canary_e2e.py consume systemd-user-unit --after-restart --run <id>
+```
+
+**What a zero proves.** No raw or listed-encoded copy of this run's
+canaries is in the scanned sinks whose positive control passed, at the two
+scan times, for the cooperative, id-only path of the six consumers. The
+listed forms are the ones the runner masks. Five consumers print only a
+tag, so end-to-end masking is shown only by the unit's `--leak-check` run,
+whose output returns through a pipe to the harness and never reaches a
+client sink.
+
+**What is not covered.** Remote sinks (provider retention, and GitHub
+beyond `gh api` reads), Windows-side stores, transformed forms, process
+memory and swap, adversarial or careless agents, sinks without a passed
+control, OmniRoute unless its user-run scan ran, and future client
+versions. The guard does not list `CANARY_E2E_KEY` in `SECRET_NAMES` until
+the command guard change adds it. Until then, a search for the name or an
+expansion of it passes the guard.
+
 ## Storage rules
 
 - Use one file per provider, under the store directory. The directory is mode

@@ -666,3 +666,105 @@ is.
   journal: drop the refusal for that pair.
 - Any part of a value is found in a transcript, log or tool output after a
   runner use: stop that use, rotate the key, and record how it leaked.
+
+## Part 5: the canary proof (D1 PR-5, 2026-09-29)
+
+This section amends the record for the change that adds the proof harness
+for the key runner. The harness is
+[`tools/credentials/canary_e2e.py`](../../tools/credentials/canary_e2e.py),
+with its probe, its sink table and a workflow for the workflow-child
+consumer. The runbook is
+[Proof run (canary)](../secret-storage.md#proof-run-canary).
+
+**Selection.** A synthetic canary is handed to six consumers by inventory
+id: a fresh `claude -p` session, its subagent, a workflow child,
+`codex exec`, a Codex lane through OmniRoute, and a `systemd-run --user`
+unit. The harness then scans the places where a key could be recorded by
+mistake.
+- Each consumer gets its own canary and nonce, and runs alone: write its
+  canary, run it, remove the file. A hit therefore names the consumer's
+  path.
+- The probe's tag binds the run, the consumer and the nonce, so a stale or
+  copied tag fails `verify`.
+- The scanned forms are the forms the runner masks (`encoded_forms`), so the
+  two lists cannot drift apart.
+- Positive controls come first, for each scanner class and for each sink. A
+  sink whose planted decoy is missing is "not a sink, or scanned wrongly",
+  never clean, and fails the scan.
+- The receipt keeps counts, ids, versions, model ids and times, and a test
+  holds its key allowlist.
+
+The new inventory row `canary-e2e` has class `test_canary` and status
+`test_only`, and `scripts/credential_status.py` accepts the pair only
+together.
+
+**Built from.** No upstream harness was found, so the harness follows the
+design's research_sinks scan plan and its verification of 2026-09-29 (49
+sinks: 37 confirmed, 12 corrected, 13 missed items; design notes, not in
+this repository). It reuses code rather than copying it:
+- `set_credential.py`'s value grammar, store checks and create-only writer;
+- `credential_run.py`'s `encoded_forms` and `child_environment`;
+- `credential_status.py`'s schema and store paths;
+- `credential_boot_receipt.py`'s `write_receipt` (a dot-file, `os.link`, and
+  sequence numbers under a directory lock).
+
+**Alternatives.** Maintained secret scanners, such as kingfisher v2.7.0,
+trufflehog v3.97.9 and betterleaks v1.8.1 (versions as the verification
+listed them), look for key shapes. They complement a canary scan but
+cannot replace it: only a synthetic pattern of known origin gives a zero a
+meaning, and only a planted decoy shows that a sink is read at all.
+
+**Deviations from the build contract, with reasons.**
+- The subagent and the workflow child fetch their own decoy with
+  `canary_e2e.py decoy`, instead of receiving it in the parent's prompt.
+  Otherwise the parent's or the coordinator's transcript would satisfy
+  their controls in their place.
+- Codex reads its prompt from stdin, which the harness closes, instead of
+  from argv with stdin on `/dev/null`. This keeps decoys out of argv; the
+  known hang comes from a stdin left open.
+- Codex `shell_snapshots` and `~/.docker/config.json` join OmniRoute in the
+  user-run group, for the design's own reason: they hold real tokens and are
+  Read-denied to agents.
+- Receipts are named by `write_receipt`
+  (`<sequence>-<UTC stamp>-<boot id prefix>.json` under
+  `<state>/native-agent-stack/canary/`), with the run id inside, not as
+  `<run>.json`.
+- The Loki dump is matched in memory and never written. The receipt keeps
+  whether each tag was valid, not the tags (amendment 11). RTK recall blobs
+  are decompressed by their magic bytes, not by the unverified codec column.
+- Decoys are printed and put in prompts on purpose, because they are the
+  positive controls. "Never prints a pattern" is read as a canary's
+  patterns.
+
+**Evidence class.**
+- *Local integration*, with synthetic values in temporary directories:
+  `tests/test_canary_e2e.py`, and the status tests in
+  `tests/test_credential_status.py`. The tests were written first and failed
+  to import the harness; the status tests failed on the unknown status and
+  class; the docs tests failed until the runbook section existed. One test
+  runs all six consumers through stub clients that execute the real runner
+  and probe against a temporary store, and ends in a receipt with
+  `result: zero`.
+- *Scratch mutation run*, not committed: each of 14 mutants removed one rule
+  and failed its test, and the files were restored and checked by sha256.
+- *Not yet observed*: the live window with real clients. Until then there is
+  no receipt, the sink table's rows remain unverified sink facts, and the
+  client flags in the harness (`claude -p --output-format stream-json`,
+  `codex exec --json -s read-only`) come from native `--help` output on this
+  host, not from a run.
+
+**Known limits.** The proof covers the cooperative, id-only path.
+- It says nothing about adversarial or careless agents, transformed forms,
+  process memory and swap, remote retention, Windows-side stores or future
+  client versions.
+- Until the command guard lists `CANARY_E2E_KEY` in `SECRET_NAMES`, the
+  guard does not treat the canary's variable name as it treats a real
+  key's name.
+
+**Overturn.**
+- A sink whose control fails in the live window: correct its row, then
+  rerun.
+- A canary found anywhere: stop, record the path, and fix it before any
+  real key takes that path.
+- A maintained tool that runs positive-controlled canary scans over these
+  sinks with value-free output: compare it head to head.
