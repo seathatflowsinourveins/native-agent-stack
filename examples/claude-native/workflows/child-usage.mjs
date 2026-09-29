@@ -666,6 +666,9 @@ function wrapped(name, words, i) {
     while (i < words.length && isAssignment(words[i].e)) i++
     return i < words.length ? [words, i] : null
   }
+  // exec: the POSIX form only. Any word starting with - is unresolved, `--` included: bash 5.2.21 runs the command after
+  // it, while dash executes "--" itself.
+  if (name === 'exec' && words[i]?.v.startsWith('-')) return -1
   let k = afterOptions(words, i, WRAPPER_OPTIONS.get(name))
   if (k === null || k < 0) return k
   if (name === 'timeout') k++

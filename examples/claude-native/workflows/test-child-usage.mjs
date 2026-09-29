@@ -470,6 +470,7 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['mcporter call --http-url https://mcp.example.org/mcp --server linear create_comment', ['mcporter/mcporter:call@(http)']],
     ['mcporter call --stdio "qmd mcp" query', ['mcporter/mcporter:call@(stdio)']], ['mcporter call "npx -y chrome-devtools-mcp@latest" list_pages', ['mcporter/mcporter:call@(stdio)']],
     ['mcporter call ./server.js tool', ['mcporter/mcporter:call@(stdio)']], ['mcporter call --server mcp.example.org tool', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --server "npx -y some-mcp" tool', ['mcporter/mcporter:call@(stdio)']], ['mcporter call --server "my server" tool', ['mcporter/mcporter:call@(other)']],
     ['mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@x']],
     ['mcporter call', ['mcporter/mcporter:call@(unresolved)']], ['mcporter list socraticode --brief --no-oauth', ['mcporter/mcporter:list']],
     ['mcporter socraticode', ['mcporter/mcporter:list']], ['mcporter https://mcp.context7.com/mcp', ['mcporter/mcporter:list']], ['mcporter describe linear', ['mcporter/mcporter:list']],
