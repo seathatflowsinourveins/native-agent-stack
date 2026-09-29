@@ -1652,6 +1652,96 @@ class SanitizeUserNameTests(unittest.TestCase):
                          "embedded model cached (used 2 GB)\nowner: <user>\n")
 
 
+class OutputDigestBasisTests(unittest.TestCase):
+    """output_sha256 binds the published bytes only: the digest of output_excerpt (the sanitized output
+    cut at 400 characters), never of the raw output and never of unpublished text. A raw digest let
+    anyone confirm a guessed home directory offline whenever the output fit in output_excerpt: put the
+    guess back in place of "~", hash, compare with output_sha256. A digest of the unpublished rest of a
+    long output is no better, because a reader who knows that text can tell which name was sanitized in
+    it. Each case records with a temporary HOME and a fixed user name, and the expected
+    values are literals rather than sanitize() calls. No home path is spelled literally, so this
+    file passes the repository's own home-path scan (scripts/validate.py)."""
+
+    USER = "probe-account"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name) / "tree"
+        _init_support_tree(self.root)
+        # The exact string the recorder sees as $HOME (never a resolved variant, which differs on
+        # macOS where the temporary directory sits under a /var symlink).
+        self.home = str(Path(self.tmp.name) / "probe-home" / self.USER)
+        Path(self.home).mkdir(parents=True)
+
+    def _record(self, cmd: str, user: str | None = None, root: Path | None = None) -> dict:
+        user = user or self.USER
+        root = root or self.root
+        home = self.home if user == self.USER else str(Path(self.tmp.name) / "probe-home" / user)
+        Path(home).mkdir(parents=True, exist_ok=True)
+        buffer = io.StringIO()
+        with mock.patch.dict(os.environ, {"HOME": home, "USER": user, "LOGNAME": user}), \
+                contextlib.redirect_stdout(buffer):
+            exit_code = _run_cli([
+                "record", "--root", str(root), "--host-id", "test-host-20260101",
+                "--platform-id", "linux-wsl2-x86_64", "--os", "linux", "--architecture", "x86_64",
+                "--component-id", "widget", "--stage", "install", "--evidence-class", "synthetic",
+                "--cmd", cmd])
+        self.assertEqual(exit_code, 0, buffer.getvalue())
+        receipt = json.loads((root / buffer.getvalue().strip()).read_text(encoding="utf-8"))
+        self.assertEqual(len(receipt["commands"]), 1)
+        return receipt["commands"][0]
+
+    @staticmethod
+    def _sha256(text: str) -> str:
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+    def test_a_home_path_output_is_digested_sanitized_so_the_offline_probe_fails(self):
+        command = self._record("printf '%s\\n' \"$HOME\"")
+        raw = self.home + "\n"
+        self.assertEqual(command["output_excerpt"], "~\n")
+        probe = command["output_excerpt"].replace("~", self.home)
+        self.assertEqual(probe, raw)  # the probe rebuilds the raw output exactly, so (c) is not vacuous
+        with self.subTest("(a) output_sha256 is the sha256 of the sanitized output"):
+            self.assertEqual(command["output_sha256"], self._sha256("~\n"))
+        with self.subTest("(b) output_sha256 is not the sha256 of the raw output"):
+            self.assertNotEqual(command["output_sha256"], self._sha256(raw))
+        with self.subTest("(c) the excerpt with the real home put back does not hash to output_sha256"):
+            self.assertNotEqual(self._sha256(probe), command["output_sha256"])
+
+    def test_a_long_output_is_digested_as_its_published_excerpt_only(self):
+        # The home path sits after the 400-character excerpt cap. The digest must not cover that
+        # unpublished text, sanitized or raw: it is the sha256 of the excerpt the receipt publishes.
+        command = self._record("printf '%0500d %s\\n' 0 \"$HOME\"")
+        raw = "0" * 500 + " " + self.home + "\n"
+        self.assertEqual(command["output_excerpt"], "0" * 400)
+        with self.subTest("the sha256 of the published excerpt"):
+            self.assertEqual(command["output_sha256"], self._sha256(command["output_excerpt"]))
+        with self.subTest("not the sha256 of the whole sanitized output"):
+            self.assertNotEqual(command["output_sha256"], self._sha256("0" * 500 + " ~\n"))
+        with self.subTest("not the sha256 of the raw output"):
+            self.assertNotEqual(command["output_sha256"], self._sha256(raw))
+
+    def test_the_digest_does_not_reveal_which_name_the_unpublished_text_sanitized(self):
+        # Reviewer probe: a command prints fixed text after the 400-character cap. Both users see
+        # identical public excerpts. A digest of the unpublished rest would differ by user (the name
+        # that equals the account becomes <user>), so hashing a guess of that text would tell the
+        # accounts apart. The digest must be identical for both.
+        cmd = "printf '%0500d\\nalpha-account beta-account\\n' 0"
+        second_root = Path(self.tmp.name) / "tree-second"
+        _init_support_tree(second_root)
+        first = self._record(cmd, user="alpha-account")
+        second = self._record(cmd, user="beta-account", root=second_root)
+        self.assertEqual(first["output_excerpt"], second["output_excerpt"])
+        self.assertEqual(first["output_sha256"], second["output_sha256"])
+
+    def test_an_output_without_a_home_path_keeps_its_plain_digest(self):
+        # sanitize() is the identity here, so the digest is the plain output's, as before the change.
+        command = self._record("printf 'hi\\n'")
+        self.assertEqual(command["output_excerpt"], "hi\n")
+        self.assertEqual(command["output_sha256"], hashlib.sha256(b"hi\n").hexdigest())
+
+
 class RegisterFileSortTests(unittest.TestCase):
     """register_file() keeps manifests/evidence.json files[] sorted by path
     (bisect insert) instead of always appending, so record/review stay

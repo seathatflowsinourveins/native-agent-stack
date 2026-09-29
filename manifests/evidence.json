@@ -3785,8 +3785,8 @@
     },
     {
       "path": "adoption/host-receipt.schema.json",
-      "sha256": "cbbe8ca3296f5b2c56c9027b646fd9bf52761ca65d9b95cdfc3beeceb1844981",
-      "bytes": 9761
+      "sha256": "c7628d2143b2798ab88d221431c00a013fd5bcb70cd02ca2fbcc1369b5e6be1a",
+      "bytes": 10237
     },
     {
       "path": "adoption/host-state.example.json",
@@ -42066,8 +42066,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "87dc207b029aba8497bb08a1ca4fce25b050f4275a59d7e97cb1158100ac43e6",
-      "bytes": 110200
+      "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f",
+      "bytes": 111077
     },
     {
       "path": "scripts/kernel_keyring.py",
@@ -42686,8 +42686,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "57a2f7ff54df70f90257ee47626d21cb9f7e36b5a9dac3c8a24b1b530b657fea",
-      "bytes": 139197
+      "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
+      "bytes": 144843
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
