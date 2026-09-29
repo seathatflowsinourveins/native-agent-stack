@@ -746,6 +746,13 @@ verifier is qualified as capability evidence only.
   journals the run so that rollback removes only what it created, and its dry run reads a scratch copy
   back through `codex doctor --json`. `tools/adoption/prove_codex_lane.py` has a static `roles` row.
   Both report other role files, role tables and doctor warnings as counts, never as a name, path or text.
+  A link to a folder below `agents/` makes those counts unknown, never smaller: Codex follows links
+  (`LocalFileSystem::read_directory` classifies a link by its target,
+  [`codex-rs/exec-server/src/local_file_system.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec-server/src/local_file_system.rs#L710-L735)
+  at `rust-v0.157.1`) and loads what it finds behind one as roles, which a walk that skipped the link
+  would miss. Observed with `codex-cli 0.157.1` through `codex doctor --json` in a scratch home: a
+  malformed role behind a linked folder, or behind a link named `x.toml` to a file, is one role
+  warning; behind a dangling link, or a link whose own name is not `*.toml`, none.
 - **Role text.** Adapted sentence by sentence from the Claude carriers (17 sentences of the researcher
   and 16 of the verifier are kept byte for byte and pinned by a test), with a one-agent rule, a
   working-directory rule and `jq` output among the exact command shapes added. The working-directory
