@@ -603,6 +603,95 @@ class MaskingTests(RunnerCase):
                          + continued.close(), b"abc[REDACTED-PARTIAL:K]")
 
 
+def lower_hex(text: str) -> str:
+    return re.sub(r"%[0-9A-F]{2}", lambda match: match.group().lower(), text)
+
+
+def real_encodings(text: str) -> dict:
+    """What the common encoders print for text: the real urllib and json outputs, and the two JSON variants that
+    Python's json.dumps never writes but PHP's json_encode (`\\/`) and Go's encoding/json (HTML escapes) do."""
+    plain = json.dumps(text)[1:-1]
+    slashes = plain.replace("/", "\\/")
+    forms = {"urllib.parse.quote": urllib.parse.quote(text),
+             "quote safe=''": urllib.parse.quote(text, safe=""),
+             "quote_plus": urllib.parse.quote_plus(text),
+             "quote_plus safe='/'": urllib.parse.quote_plus(text, safe="/"),
+             "json.dumps": plain,
+             "PHP json_encode": slashes}
+    for label in ("urllib.parse.quote", "quote safe=''", "quote_plus", "quote_plus safe='/'"):
+        forms[label + " lower"] = lower_hex(forms[label])
+    for label, base in (("Go json.Marshal", plain), ("PHP json_encode + Go escapes", slashes)):
+        forms[label] = base.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    forms["PHP JSON_HEX_TAG|JSON_HEX_AMP"] = plain.replace("<", "\\u003C").replace(">", "\\u003E").replace("&", "\\u0026")
+    return forms
+
+
+# The same encoders inside a child, which prints each form of its own key after "form ".
+ENCODERS = ("import json, os, re, sys, urllib.parse as u\n"
+            "v = os.environ['TAVILY_API_KEY']\n"
+            "low = lambda s: re.sub('%[0-9A-F]{2}', lambda m: m.group().lower(), s)\n"
+            "j = json.dumps(v)[1:-1]\n"
+            "s = j.replace('/', '\\\\/')\n"
+            "go = lambda t: t.replace('<', '\\\\u003c').replace('>', '\\\\u003e').replace('&', '\\\\u0026')\n"
+            "forms = [u.quote(v), u.quote(v, safe=''), u.quote_plus(v), u.quote_plus(v, safe='/'), j, s, go(j), go(s)]\n"
+            "forms += [low(f) for f in forms[:4]]\n"
+            "for stream in (sys.stdout, sys.stderr):\n"
+            "    for f in forms:\n"
+            "        stream.write('form ' + f + '\\n')\n")
+
+
+class EncodedFormTests(RunnerCase):
+    """Review of 2026-09-29, finding 3: the common percent and JSON encoders differ in ways the masker must cover
+    (quote() keeps '/' by default, quote_plus() writes a space as '+', PHP writes '\\/', Go writes \\u003c)."""
+
+    def samples(self) -> list:
+        return [fake("tvly-", "/+=:@" + os.urandom(4).hex()),  # the bare grammar: + / = : @ . _ -
+                fake("q-") + " a/b+c=d:e@f <x> & y'z " + fake()]  # a quoted value: a space, < > & and '
+
+    def test_the_output_of_every_real_encoder_is_masked_in_process(self):
+        for text in self.samples():
+            forms = real_encodings(text)
+            needles = run_mod.needles_for({"K": text}, ["K"])
+            for label, form in forms.items():
+                with self.subTest(form=label, value_kind="quoted" if " " in text else "bare"):
+                    masker = run_mod.Masker(needles)
+                    out = masker.feed(b"form " + form.encode("ascii") + b"\n", 0.0) + masker.close()
+                    self.assertEqual(out, b"form [REDACTED:K]\n")
+            # The forms really differ (else the test would prove nothing), and each is a whole-value needle.
+            self.assertGreaterEqual(len(set(forms.values())), 8 if " " in text else 6)
+
+    def test_the_output_of_every_real_encoder_is_masked_end_to_end(self):
+        for text in self.samples():
+            with self.subTest(value_kind="quoted" if " " in text else "bare"):
+                self.plant("tavily", f'export TAVILY_API_KEY="{text}"\n' if " " in text
+                           else f"export TAVILY_API_KEY={text}\n")
+                self.values.append(text)
+                result = self.run_tool("tavily", *py(ENCODERS))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                for stream in (result.stdout, result.stderr):
+                    lines = stream.splitlines()
+                    self.assertEqual(len(lines), 12)
+                    self.assertEqual(set(lines), {b"form " + MARK})  # nothing but the marker, in every encoding
+                self.assert_never_echoed(result.stdout, result.stderr)
+
+    def test_forms_the_documentation_lists_as_unmasked_are_printed_as_they_are(self):
+        # docs/secret-storage.md#using-a-key names what masking does not cover: nested encodings, base64 wrapped across
+        # lines, other escapers and fragments. If a change starts masking one of these, this test and that list change
+        # together.
+        text = fake("tvly-", "/+=:@" + os.urandom(4).hex())
+        self.tavily(text)
+        b64 = base64.b64encode(text.encode()).decode()
+        forms = ["\n".join(b64[i:i + 16] for i in range(0, len(b64), 16)),  # base64 wrapped across lines
+                 urllib.parse.quote(urllib.parse.quote(text, safe=""), safe=""),  # a nested encoding
+                 text.replace("=", "\\u003d"),  # Gson's default escaping of '='
+                 urllib.parse.quote(text, safe="/+"),  # a safe set that neither quote() default uses
+                 text[:12] + "..." + text[-6:]]  # a fragment
+        code = "import sys\nfor form in %r:\n    print('form', form)\n" % (forms,)
+        result = self.run_tool("tavily", *py(code))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "".join(f"form {form}\n" for form in forms).encode())
+
+
 class ProcessTests(RunnerCase):
     def test_exit_code_and_signal_propagate(self):
         self.tavily()

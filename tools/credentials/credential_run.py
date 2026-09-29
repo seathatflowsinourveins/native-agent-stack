@@ -289,10 +289,21 @@ def encoded_forms(value: bytes) -> list:
             encoded = base64.b64encode(b"\0" * align + value, altchars=altchars)
             # Only the stable interior: the characters that depend on value alone at this byte alignment.
             forms.append(encoded[(0, 2, 3)[align]:(8 * (align + len(value))) // 6])
-    for quote in (urllib.parse.quote, urllib.parse.quote_plus):  # no safe characters; %XX in both cases
-        upper = quote(text, safe="").encode("ascii")
-        forms += [upper, re.sub(rb"%[0-9A-F]{2}", lambda match: match.group(0).lower(), upper)]
-    forms.append(json.dumps(text)[1:-1].encode("ascii"))
+    # Percent forms, %XX in both cases: quote() keeps "/" unless told otherwise (its default safe="/") and writes a
+    # space as %20, quote_plus() escapes "/" (safe="") and writes a space as "+"; both safe sets, both functions.
+    for quote in (urllib.parse.quote, urllib.parse.quote_plus):
+        for safe in ("", "/"):
+            upper = quote(text, safe=safe).encode("ascii")
+            forms += [upper, re.sub(rb"%[0-9A-F]{2}", lambda match: match.group(0).lower(), upper)]
+    # JSON string forms: Python's json.dumps escapes only quotes, backslashes and controls; PHP's json_encode also
+    # writes "/" as "\/"; Go's encoding/json writes < > & as < > & (PHP's JSON_HEX_TAG writes
+    # < >). Every combination is a needle; a value without those characters collapses to one.
+    plain = json.dumps(text)[1:-1]
+    for base in (plain, plain.replace("/", "\\/")):
+        for hex_case in (str.lower, str.upper, None):
+            escaped = base if hex_case is None else (base.replace("<", "\\u003" + hex_case("c"))
+                                                      .replace(">", "\\u003" + hex_case("e")).replace("&", "\\u0026"))
+            forms.append(escaped.encode("ascii"))
     forms += [value.hex().encode("ascii"), value.hex().upper().encode("ascii")]
     return forms
 
