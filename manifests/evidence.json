@@ -3466,8 +3466,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "e433126c44fcb687ec6fec7d6c2a6a568af645f7a99331a048cc7208333be28e",
-      "bytes": 2778
+      "sha256": "6a6aebbd563c3e012077a0adafa6f711813b2cedfd5d31bc8a7f742256ffb867",
+      "bytes": 2858
     },
     {
       "path": ".gitattributes",
@@ -3536,8 +3536,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "ce7e7b16e3ef36c2880d59d17950fa77cefa1c71bc48146100d65779acd6f0ce",
-      "bytes": 21136
+      "sha256": "1b40c567365c23214847f7eab052dca9dc1925cf7bc65714de291a799586c382",
+      "bytes": 21269
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -3591,8 +3591,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "44486711225483ec7ca0ab904c36697a0d53249c2d5439eb40d728f5604bd697",
-      "bytes": 33869
+      "sha256": "a3f160fa747ba093e8d1b3f3e80fe9cbfdcb394e71293a3ee2532b2a446dbf31",
+      "bytes": 32590
     },
     {
       "path": ".gitignore",
@@ -3681,18 +3681,18 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "815b857efb2726eb791e3998c5259f1a7106e9fd4138eaa8b7267d9a86d7c8de",
+      "sha256": "11c74fb8738e560ede5065ae3df0b4bf6f3aa62c323b1b1930616cab1abfd6cc",
       "bytes": 39077
     },
     {
       "path": "adoption/bootstrap-macos.sh",
-      "sha256": "3f55707ab349100fffa834ad8f90a0bd4bf031d86ac43eaf3c478318c33c7598",
+      "sha256": "d33068939ea2c95cab3a14781c54e289a9d46a86d38ecc93b938c475f786151a",
       "bytes": 79792
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "8e1cefa9cfc92c33eb09167a93857578a0a6930f295eaff7812bc0046a9b4b78",
-      "bytes": 44635
+      "sha256": "19ecc5ca1a8ea6504037705daf8cde3c7c26c97c86867f7bc9154089f7b7c788",
+      "bytes": 45426
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3826,23 +3826,23 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "d23ca533bd2b9e80a5e3ecfd0e004180f486ecfbe60f7592cec46241300ef27a",
-      "bytes": 30182
+      "sha256": "88f727fbd2c8e9ca5ab7d6c70d5a6b7215860faecef065df6a31282591eabfb0",
+      "bytes": 31905
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "b2b139271b52fceffc1cb92960a0a8542b89506d660b8d145bdbe6656f61418a",
-      "bytes": 41774
+      "sha256": "1d693b66002e8931af2370fc9da919f667bfbf3a1a22ddd54bdd2c1d81cf19e4",
+      "bytes": 43700
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "65a149797352745444c168e23453156c32fad303735d27c2379b76d6d0ff7659",
-      "bytes": 15412
+      "sha256": "6fff01fecf2f77e7257442c3cf128cfbe57d8d9f37b781e9d21ff59fda600f78",
+      "bytes": 15867
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "68c0a967e9978ba0b047386aca4a7f460b578feee5cd116a565b5442286d4592",
-      "bytes": 57036
+      "sha256": "77603033445bd6d685cc60e240e25bc16eeca893fa40f19f977b8d89df63b46f",
+      "bytes": 57843
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -3886,8 +3886,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "25568fe9a02fbebd8618bd5d353f04a511d24856565ca83602c4d9f0d3fa06c2",
-      "bytes": 11012
+      "sha256": "e3f5dce49a83d93f07f13370dc35cd8245d2c629155cb511ba4875ff5cd9b6e7",
+      "bytes": 11039
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -8897,7 +8897,7 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a7236b40f4e14dc9e552072d1d8fa76236912837707e7a3cf361c8a25f08460a",
+      "sha256": "c36a161c3ee8a0db2773179b38df6754dd38de67f68b80fb043c4625dda44c6e",
       "bytes": 482575
     },
     {
@@ -10577,8 +10577,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
-      "sha256": "fe544c95ea2ee066052e1009e2f75a90e00ac5aaa34304f0264a00e5bc313b75",
-      "bytes": 53661
+      "sha256": "fbf530884c2ad3b9e0c2b1f989eda399531647cc1db3c56dc9bcac10174fea47",
+      "bytes": 54033
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
@@ -10617,8 +10617,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "dd4ef862d9f8658a786db7f5df0fb0918ed177f01bad88db0e5029d535127626",
-      "bytes": 75461
+      "sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357",
+      "bytes": 83006
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -10637,7 +10637,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "9f5e65c472a214a85dd5657260e9a7aaca3075bd5c0161a95a7ded2658759f2d",
+      "sha256": "f2832e37855426ff7e296cb085d60b640fb20375e2e1527a715ac734c5fdbf98",
       "bytes": 6969
     },
     {
@@ -10652,8 +10652,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
-      "sha256": "76c8a83d327545b2dd88a0bed416d857066d5389debaeddfce4137cc8ed5e484",
-      "bytes": 82686
+      "sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9",
+      "bytes": 83300
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md",
@@ -13622,8 +13622,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "fed211eeaac99fc58f328fa8a86bb911f6f285552aac3352122011dedd0f58a6",
-      "bytes": 32788
+      "sha256": "395ed048db1394e89258ed3019a0ee57329c686ae54782675200d684bfdeeec8",
+      "bytes": 33464
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -13632,8 +13632,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "0daad888d852dc86b479e8253dcd7bcde6bad937542607860eddc7420be08661",
-      "bytes": 139755
+      "sha256": "755e9d1e85f8abca24355a8a3cc31421e00f434f140157ced62d12a435394db7",
+      "bytes": 139753
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -13732,7 +13732,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "52c4d091e788297f33a4f6f390063d387062b2e7b0c3ff1fb6d4f3d0b1610871",
+      "sha256": "743317e890be424484789e8a87826b19d7cd2d64bbb19ca9f599cb24d48ccbb5",
       "bytes": 287241
     },
     {
@@ -13742,8 +13742,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "29b654414d30ac80cbc9659c2fd6316b044c30834706b3f5a129d8f492e70c15",
-      "bytes": 249282
+      "sha256": "2ebd9157605dd694ded3bc79506680161cc1f461383f02517488160f1a700440",
+      "bytes": 248908
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -13797,8 +13797,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "6c94bd6d4eaefeab854b76f715dba5b7efdb13678a950ebf740a4e66a1e13312",
-      "bytes": 16994
+      "sha256": "057ff7c549fcaf527d86e4131e97babbc243179b383c1b96b125454fbf6bfa41",
+      "bytes": 17353
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -14041,6 +14041,11 @@
       "bytes": 86033
     },
     {
+      "path": "catalogs/us-equities/research-20260928-movers.md",
+      "sha256": "d97b17683f4d061958d9da306898212511f5889a0e6d52d2af5a500f11a5dcab",
+      "bytes": 14870
+    },
+    {
       "path": "catalogs/us-equities/research-receipt.json",
       "sha256": "c3db6928bdcea3d57eefd859d01cabfd6e30a4f7f5096c076b929418b9624c00",
       "bytes": 11827
@@ -14272,8 +14277,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "fc8fcb14204d10b459d0cbbeafcb7c89a3e07e5b89b1e3a9ebbeead982c1d3e8",
-      "bytes": 46043
+      "sha256": "b939e5ab75888ead18804c529841e106ee10ae22b31af2d7229643a02f052985",
+      "bytes": 46286
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
@@ -14331,6 +14336,11 @@
       "bytes": 7782
     },
     {
+      "path": "docs/decisions/2026-09-27-model-currency.md",
+      "sha256": "087cf368a4d97719a63433ddcbc87e7f24d7b5bba3b51df92c0d4b8438ab19d7",
+      "bytes": 40927
+    },
+    {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
       "sha256": "0614dd48d7d90bf7ea10036f77913ab903664cbac5cebe732283397787a3b9ad",
       "bytes": 41432
@@ -14362,8 +14372,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "6cf9d24e64af05bce2d5f035a0359cf75f5df86289fe69f805a4be203592c5b1",
-      "bytes": 27597
+      "sha256": "595a9dbc924cb6c5747f270c50f2b1de716825e904c2da2933da76f284da7d23",
+      "bytes": 30495
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -14497,8 +14507,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "a186902f149b723de3f707e10b5635cb0fd831e5e6b84fbe2e053b5230c5c7f4",
-      "bytes": 90132
+      "sha256": "2a935e2be416783beeb98f61dc2cb781a58fd18d83486e914921d446eade38b2",
+      "bytes": 90685
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14627,7 +14637,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "fafd15a46b0da092b2f6651751223cdab804aaf46e9a44d63601a25c9dc34e2e",
+      "sha256": "861f3db2d2083f21fbdfc4be2c7655126966f99851acbb6147b2da181d6e7d46",
       "bytes": 18181
     },
     {
@@ -14839,6 +14849,21 @@
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json",
       "sha256": "43546a8ab52b3453920b5c2c35aa6bce996cdfed5d0fc959c22cf83687619c99",
       "bytes": 39050
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/README.md",
+      "sha256": "81ac764bdc84ec13dff2bb303f7ddc3a0486965f9591c396818d6968293eebbe",
+      "bytes": 14859
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/fixtures/nc.yml.txt",
+      "sha256": "39e955c94cbea88dc5a1342f46d2b2a96d47c9a0cb76f37649ec5a1eeb857a57",
+      "bytes": 837
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/receipt.json",
+      "sha256": "a722aabd25d7d46f1779563ec67c012c36d4e983985014f0d913841923141b56",
+      "bytes": 40237
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",
@@ -41377,8 +41402,8 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "42e3087a50fc464be293f3ec7695b4780fa45ede696037819ea335cfa196d2a3",
-      "bytes": 284
+      "sha256": "437c91a3ce30fb83918466e4e097aa4a0068b0d3562fb34c2e7eb62d9186ad43",
+      "bytes": 364
     },
     {
       "path": "examples/claude-native/workflows/README.md",
@@ -41607,8 +41632,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "d6254ed9aee6b586283bdd41fa5e2187ebfe1e461a70ff32bb900e4317a3d5c8",
-      "bytes": 95619
+      "sha256": "ec451a769bc1fd3c64ff18695a9306d8656d7d6a6441105af2c9f4ffeaa1f1ac",
+      "bytes": 96080
     },
     {
       "path": "observability/README.md",
@@ -41907,8 +41932,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "d3e458a09a609111d8278ee9e5e49840c357385a5ee7e4f915b27a7556824a9f",
-      "bytes": 34253
+      "sha256": "59b3bda2003bab3320d26c049c7b6ea45ea77b3f53d8f5028ab0dcfd6b24688d",
+      "bytes": 34964
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -42272,8 +42297,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_native.py",
-      "sha256": "0713d85e034cc337b07d8bb889f18b32179420d843c264158901e260045191d6",
-      "bytes": 83385
+      "sha256": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
+      "bytes": 85779
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -42287,8 +42312,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "a9287c503faf44cc9d6a5d824fb8cf39c545ff499221bde25d276a4af1aceae0",
-      "bytes": 75302
+      "sha256": "68449ba3b2d4164c3c2c45c4c08cf7c51b171fce43e1ce0a0cedf08f32149235",
+      "bytes": 94507
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
@@ -42302,8 +42327,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",
-      "sha256": "6a9a17afa9aaee7ffab1625133655c9916e341a45f21e5a020ef3a027e9860ae",
-      "bytes": 94796
+      "sha256": "5899a2498819d66db937e90e4a7fcec862f57fe8c551d8a5ca1f3dbc9e6e3a64",
+      "bytes": 103152
     },
     {
       "path": "tests/test_adjudicate.py",
@@ -42312,13 +42337,13 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "34f2a9db4f37344e3f55a5363fbd479010e6bc124c91ddfcd23b11c97a6ae609",
-      "bytes": 94323
+      "sha256": "880ba1e218738bc8f7dc26dc5f7a4d81b95231f290175605c15f652974b617c8",
+      "bytes": 94981
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "e567ae3cad54a41dc328d5290bc0d501cbcb78f6eff0d7c2a21f87d48b67a572",
-      "bytes": 227418
+      "sha256": "3e2183308263227f71ed4513ab3d5c194a3b2e30fa459dc85045726580e65341",
+      "bytes": 228076
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -42342,7 +42367,7 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "d9604e2da6afd6528cb481f28f4148f147aefebabc38658f1e57ab8abbc773ba",
+      "sha256": "27ec4454bbe1c871c96d9653ecb1695d07efc949820f962cb62036c89c88dd8f",
       "bytes": 108593
     },
     {
@@ -42412,8 +42437,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "f8b2828f3024757b3320f11e946b9e6fbd11db76280b90394e1668cbc394a60a",
-      "bytes": 55311
+      "sha256": "241697711e74fa15c1763c2650e0a9ee8316ab442fb69003312a9aa4a923da58",
+      "bytes": 55352
     },
     {
       "path": "tests/test_catalogs.py",
@@ -42542,8 +42567,8 @@
     },
     {
       "path": "tests/test_foundation_catalog.py",
-      "sha256": "e89631495b52c7ee0c3a1387c4dac315a4d1d75f26850f4951b3c632fb26a6be",
-      "bytes": 11791
+      "sha256": "4a099466241a5d124c814c59fc018c487a4f5714cc87b10231062c5f4f11c5af",
+      "bytes": 13781
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -42622,8 +42647,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "e4fff38dd980eee8c2ae969cf74a51d7f9f696246e31b298b2d352ec34cc8bfa",
-      "bytes": 58381
+      "sha256": "073d333816c0595219eaa37965eeb4e4fbd23fe4a789a8302387fa8940cb7ea0",
+      "bytes": 62207
     },
     {
       "path": "tests/test_install_skills.py",
@@ -42657,8 +42682,8 @@
     },
     {
       "path": "tests/test_lane_packets.py",
-      "sha256": "940485c85045360783b344debc7bc92caf74ea203c739108a3b0a2800174011b",
-      "bytes": 98784
+      "sha256": "f1e74add4e93c382c46e9df426d40a084fa327ebdbbda6873bb03740a42ce4cf",
+      "bytes": 111632
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -43207,8 +43232,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "44c3a359f42f42e9a790e9f900185a9f3475a7a295d86c3416b426f9131781f6",
-      "bytes": 177541
+      "sha256": "4c2829824cf704311f850963852f78faadd6a4aba4d40c073990b0f1607502cc",
+      "bytes": 178260
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",

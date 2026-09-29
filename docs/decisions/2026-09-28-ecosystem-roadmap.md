@@ -296,3 +296,20 @@ Decision rights stay as recorded:
 
   Nothing else was claimed.
 - **Snapshot age.** The PR, gate and systemd states are a 2026-09-28 22:00Z snapshot. Paper-unit and PR states change within hours.
+
+## Updates
+
+### 2026-09-29, main `cf3fb72e`
+
+- **Gate A owner.** `native-agent-stack-2d` takes Gate A (#381) as F-NOW-1 and F-NOW-2, from 2026-09-29. Its message says this was "on the user's direct instruction". It is quoted as the peer stated it and not independently verified. This fills the "Gate A owner" cells above.
+  - `docs/decisions/2026-09-28-delegated-decisions.md` still records `native-agent-stack-a9`, which was not live; this update does not edit that record.
+  - The same peer relays the user's order: stage the 32-layer wave and prove the token stack end to end first, then run the full waves. It stages Phase C only after the E2E work is moving.
+- **F-2W-3 is done.** #471 merged as `cf3fb72e`. `lane_packets --manifest-newcomers` now carries the 23 candidates that were refuted only by a missing vote. That review was one GPT-6 round, with both findings repaired.
+- **Paper accounts: measured, not user-gated.** Two Alpaca paper pairs are held in the kernel keyring (`scripts/kernel_keyring.py`). A read-only check through the keyring wrapper at 2026-09-29T00:3xZ returned HTTP 200 on both accounts, with 0 positions, 0 open orders, status `ACTIVE` and `trading_blocked` false. Both `paper-ext-20260928-chain4` and `incentive-monitor-20260928` were inactive by then (the monitor's result was `success`). Several items in "User-only actions" above change as a result:
+  - The credential route is the keyring. What remains is the `docs/secret-storage.md` amendment, which is work, not a user action.
+  - The incentive study needs one of the two accounts assigned to it (item 2 above). That is an assignment decision for the trading lane, not a new account.
+  - The ladder ruling (item 3) and the Gate B criterion (item 5) are owner decisions made with evidence under the user's delegation (`2026-09-28-delegated-decisions.md:3`), and recorded.
+  - The 32-layer wave (item 9) waits only on Gate A and Gate B, per the user's order relayed above.
+  - Still the user's: the IBKR Gateway 2FA sign-in; Apple Container consent on the Mac (whose role is under discussion); purchases and off-host key custody; and the Mac account from trial C, which only a Mac session can check.
+- **The trading lane is still unowned.** `native-agent-stack-2d`, `native-agent-stack-d8` and `native-agent-stack-79` each said they hold no trading lane, so P-NOW-1, P-NOW-2 and P-NOW-3 have no owner. With both paper units inactive, #362's merge condition ("no active paper unit") is met. #362 still needs its Claude re-check and five body corrections.
+- **Post-merge corrections** from the skills-trial and integrity owner are in the #469 comment [5880981981](https://github.com/seathatflowsinourveins/native-agent-stack/pull/469#issuecomment-5880981981). They cover the actionlint swap (under F-LT-1), the betterleaks contract, M5b and M5c on Gates A and B, and F-2W-4 owned by the foundation coordinator.

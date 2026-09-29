@@ -23,9 +23,11 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
   "enableWorkflows": true,
   "ultracode": true,
   "workflowSizeGuideline": "unrestricted",
+  "switchModelsOnFlag": false,
   "env": {
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
-    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
+    "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1"
   }
 }
 ```
@@ -43,8 +45,16 @@ provider or search-quota errors; no run has saturated eight. A new host starts a
 raises only after `child-usage.mjs --latest` shows a full run with no rate-limit errors
 or empty results), and `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`
 so workflow and Agent children cannot fan out a second layer (the client default is
-three layers; official sub-agents doc, fetched 2026-09-22). It does not select a model,
-account or permission mode. To adopt it as a project default, merge only those
+three layers; official sub-agents doc, fetched 2026-09-22). It also carries the two
+model-fallback guards, `switchModelsOnFlag: false` and
+`CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`, so a request that the safeguards of Opus 5.5
+or a Fable model flag ends in a refusal instead of re-running on Opus 4.8 or Opus 5. The
+setting is documented for any settings file; the variable is undocumented and is the one
+that also stops a subagent's or workflow child's fallback in Claude Code 2.1.283, so
+re-check it after each client update (the
+[model-currency record](../docs/decisions/2026-09-27-model-currency.md) and the
+[fallback-guard record](../docs/decisions/2026-09-25-model-fallback-guard.md)). It does
+not select a model, account or permission mode. To adopt it as a project default, merge only those
 keys into the existing `.claude/settings.json`; preserve all unrelated settings.
 Project environment settings require workspace trust, and organizational policy
 or feature availability can still restrict the profile. The dated rules set behind

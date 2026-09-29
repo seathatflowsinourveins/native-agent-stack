@@ -484,11 +484,11 @@ class NativeClaudeCodePinTests(unittest.TestCase):
     def test_claude_code_is_a_native_pin(self):
         tool = self.by_id["claude-code"]
         self.assertEqual(tool["kind"], "native")
-        self.assertEqual(tool["version"], "2.1.281")
+        self.assertEqual(tool["version"], "2.1.284")
         self.assertEqual(tool["version"], self.linux_by_id["claude-code"]["version"])
         self.assertRegex(tool["sha256"], SHA256_HEX)
         self.assertIn("darwin-arm64", tool["url"])
-        self.assertIn("2.1.281", tool["url"])
+        self.assertIn("2.1.284", tool["url"])
         self.assertNotIn("platform_dependency", tool)
 
     def test_claude_code_sha256_differs_from_linux_binary(self):
@@ -1677,13 +1677,16 @@ class NativeInstallFloorTests(unittest.TestCase):
     no download and no install; anything else takes the unchanged
     checksum-verified install."""
 
-    PIN = "2.1.281"
+    PIN = "2.1.284"
     URL = f"https://downloads.claude.ai/claude-code-releases/{PIN}/darwin-arm64/claude"
-    KEPT = ("2.1.281 (Claude Code)", "2.1.290 (Claude Code)", "2.2.0 (Claude Code)",
-            "10.0.0 (Claude Code)", "2.1.281")
-    # 2.1.99 sorts after 2.1.281 as text but is older; a pre-release suffix,
-    # a non-version first word and empty output are not trusted as a version.
-    INSTALLED = ("2.1.280 (Claude Code)", "2.1.99 (Claude Code)", "1.99.999 (Claude Code)",
+    KEPT = ("2.1.284 (Claude Code)", "2.1.290 (Claude Code)", "2.2.0 (Claude Code)",
+            "10.0.0 (Claude Code)", "2.1.284")
+    # 2.1.283 is one below the pin; 2.1.281 was the floor before 2026-09-29 and 2.1.280 the one
+    # before it, so a launcher on either now takes the install (2.1.284 is the first release whose
+    # `sonnet` alias resolves to Sonnet 5.5). 2.1.99 sorts after 2.1.284 as text but is older; a
+    # pre-release suffix, a non-version first word and empty output are not trusted as a version.
+    INSTALLED = ("2.1.283 (Claude Code)", "2.1.281 (Claude Code)", "2.1.280 (Claude Code)",
+                 "2.1.99 (Claude Code)", "1.99.999 (Claude Code)",
                  "2.1.290-dev (Claude Code)", "Claude Code", "")
 
     def _run(self, tmp_path: Path, version_line=None, launcher_exit=0, sha256=None, bash="bash"):
@@ -1771,9 +1774,14 @@ class NativeInstallFloorTests(unittest.TestCase):
     def test_a_failing_version_probe_takes_the_verified_install(self):
         self.assert_installed("2.1.290 (Claude Code)", launcher_exit=1)
 
+    def test_the_fixture_pin_is_the_repositorys_real_claude_code_floor(self):
+        # The fixture pins one version so the floor logic can be exercised; a floor raise must move it with the real pin.
+        real = next(t for t in json.loads(PINS_PATH.read_text())["tools"] if t["id"] == "claude-code")
+        self.assertEqual(self.PIN, real["version"])
+
     def test_the_install_path_still_fails_closed_on_a_checksum_mismatch(self):
         with tempfile.TemporaryDirectory() as tmp:
-            result, installs, downloads, _, _ = self._run(Path(tmp), "2.1.280 (Claude Code)", sha256="0" * 64)
+            result, installs, downloads, _, _ = self._run(Path(tmp), "2.1.283 (Claude Code)", sha256="0" * 64)
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("Checksum mismatch", result.stderr)
             self.assertEqual(downloads.splitlines(), [self.URL])
