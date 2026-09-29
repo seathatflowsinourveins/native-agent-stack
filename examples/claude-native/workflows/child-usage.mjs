@@ -184,7 +184,10 @@ function escapedAt(s, k) {
 // <<< is a here-string and << or <<- a here-document operator; in a $( frame "(" adds one to depth and ")" at depth 0
 // closes the frame. step() updates `stack` and returns the index after the unit. `on` receives each here-document
 // operator and each cut: a control operator (bash(1) DEFINITIONS: || & && ; ;; ( ) | |& and newline; the & and | of
-// the redirections >& <& &> >| are not), the ( of a "$(" inside double quotes and the ) that closes it.
+// the redirections >& <& &> >| are not), the ( of a "$(" inside double quotes and the ) that closes it. A cut is made at the
+// level of the frame it belongs to (on.cut(i, frame): the $( frame the unit sits in, undefined for the top level; for the ( and
+// ) of a "$( )" the frame that ( opens and ) closes), so the cuts of a substitution bound the commands inside it and never the
+// command that contains the substitution (U1 pivot R1).
 function step(s, i, stack, on) {
   const top = stack[stack.length - 1], ch = s[i]
   if (top === "'") { if (ch === "'") stack.pop(); return i + 1 }
@@ -193,7 +196,7 @@ function step(s, i, stack, on) {
     if (ch === '\\') return i + 2
     if (ch === '"') stack.pop()
     else if (ch === '`') stack.push('`')
-    else if (ch === '$' && s[i + 1] === '(' && s[i + 2] !== '(') { stack.push({ depth: 0 }); on?.cut(i + 1); return i + 2 }
+    else if (ch === '$' && s[i + 1] === '(' && s[i + 2] !== '(') { const frame = { depth: 0 }; stack.push(frame); on?.cut(i + 1, frame); return i + 2 }
     return i + 1
   }
   if (ch === '\\') return i + 2
@@ -209,19 +212,28 @@ function step(s, i, stack, on) {
   if (top && ch === '(') top.depth++
   else if (top && ch === ')' && top.depth-- === 0) stack.pop()
   const prev = s[i - 1], next = s[i + 1]
-  if ('|&;()`'.includes(ch) && !(ch === '&' && (prev === '>' || prev === '<' || next === '>')) && !(ch === '|' && prev === '>')) on?.cut(i)
+  if ('|&;()`'.includes(ch) && !(ch === '&' && (prev === '>' || prev === '<' || next === '>')) && !(ch === '|' && prev === '>')) on?.cut(i, top)
   return i + 1
 }
 // Here-document openers in one kept line outside quotes, comments and $(( )), each with the bounds of the simple command
-// that contains it: the text between the nearest cuts (step). `stack` holds the frames earlier kept lines left open and
-// is updated in place: a << inside a quote stays with the quoted-string analysis, while a << inside a "$( )" that a
-// double-quoted word opens is found here, as in an unquoted $( ) (POSIX.1-2024 XCU 2.6.3: tokenized recursively).
+// that contains it: the text between the nearest cuts of its own level (step), the line start and end bounding every level.
+// `stack` holds the frames earlier kept lines left open and is updated in place: a << inside a quote stays with the
+// quoted-string analysis, while a << inside a "$( )" that a double-quoted word opens is found here, as in an unquoted $( )
+// (POSIX.1-2024 XCU 2.6.3: tokenized recursively). Limit: a command that a quote, backquote or "$( )" carries over lines
+// (`x="$(cat <<'A' ... \n)" bash <<'B'`) begins on an earlier line, and this line alone gives the operator no reader, so its
+// body reads as data: a possible fetch in the lower bound, never a lost one (measured: reading the tail alone names the wrong
+// owner as often as the right one, e.g. `ssh host cat "a\nb" bash <<EOF`).
 function openers(line, stack) {
-  const found = [], cuts = [-1]
-  const on = { cut: (i) => { cuts.push(i) }, heredoc: (i, h) => { found.push({ start: i, end: i + h[0].length, strip: h[1] === '-', quoted: h[2] !== '', delimiter: h[3] }) } }
+  const found = [], cuts = new Map()
+  const on = {
+    cut: (i, frame) => { const level = frame ?? null, list = cuts.get(level); if (list) list.push(i); else cuts.set(level, [-1, i]) },
+    heredoc: (i, h) => { found.push({ start: i, end: i + h[0].length, strip: h[1] === '-', quoted: h[2] !== '', delimiter: h[3], level: stack[stack.length - 1] ?? null }) },
+  }
   for (let i = 0; i < line.length;) i = step(line, i, stack, on)
-  cuts.push(line.length) // ascending, so the bounds are the last cut before and the first cut after the opener
-  return found.map((h) => ({ ...h, from: cuts[firstFrom(cuts, h.start) - 1] + 1, to: cuts[firstFrom(cuts, h.end)] }))
+  return found.map(({ level, ...h }) => {
+    const list = cuts.get(level) ?? [-1], before = firstFrom(list, h.start), after = firstFrom(list, h.end) // ascending lists
+    return { ...h, from: list[before - 1] + 1, to: after < list.length ? list[after] : line.length }
+  })
 }
 // The index of the first element of the ascending `list` that is at least `x` (binary search), so a line of many cuts and many
 // openers is bounded in O(n log n), not once per opener over every cut.
@@ -239,7 +251,8 @@ function frameEnd(s, i, stack) {
 const closeQuote = (s, i) => frameEnd(s, i + 1, [s[i]]) // s[i] is ', " or `
 const matchParen = (s, i) => frameEnd(s, i, [{ depth: 0 }]) // s[i] follows the "$("
 // The words of one simple command with quotes removed and every redirection and its target dropped (bash(1)
-// REDIRECTION: [n]< [n]> [n]>| [n]>> &> &>> [n]<< [n]<<- [n]<<< [n]<& [n]>& [n]<>).
+// REDIRECTION: [n]< [n]> [n]>| [n]>> &> &>> [n]<< [n]<<- [n]<<< [n]<& [n]>& [n]<>). A "$( )" or backquoted span inside double
+// quotes is one unit of its word, whatever quotes and blanks it holds (POSIX.1-2024 XCU 2.6.3: its text is tokenized on its own).
 const REDIRECTION = /(?:\d*(?:<<-|<<<|<<|<>|<&|>&|>>|>\||<|>)|&>>?)/y
 function commandWords(text) {
   const words = []
@@ -253,7 +266,16 @@ function commandWords(text) {
     while (i < text.length && !/[\s<>]/.test(text[i])) {
       const ch = text[i]
       if (ch === "'") { const end = text.indexOf("'", i + 1) < 0 ? text.length : text.indexOf("'", i + 1); word += text.slice(i + 1, end); i = end + 1 }
-      else if (ch === '"') { for (i++; i < text.length && text[i] !== '"'; i++) { if (text[i] === '\\' && i + 1 < text.length) i++; word += text[i] } i++ }
+      else if (ch === '"') {
+        for (i++; i < text.length && text[i] !== '"';) {
+          const c = text[i]
+          if (c === '\\' && i + 1 < text.length) { word += text[i + 1]; i += 2 }
+          else if (c === '$' && text[i + 1] === '(' && text[i + 2] !== '(') { const k = Math.min(matchParen(text, i + 2) + 1, text.length); word += text.slice(i, k); i = k }
+          else if (c === '`') { const k = Math.min(closeQuote(text, i) + 1, text.length); word += text.slice(i, k); i = k }
+          else { word += c; i++ }
+        }
+        i++
+      }
       else if (ch === '\\') { word += text[i + 1] ?? ''; i += 2 }
       else { word += ch; i++ }
     }

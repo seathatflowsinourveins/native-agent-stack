@@ -98,14 +98,21 @@ D7_DATA = [  # nothing runs curl: an escaped $ is data in a quoted heredoc, and 
 # R1: a heredoc operator after a closed "$( )" in the same simple command still belongs to that command (curl ran once, except cat).
 R1_EXECUTED = [
     "FOO=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF", "bash -s -- \"$(pwd)\" <<'EOF'\ncurl https://example.org\nEOF",
-    "ssh \"$(echo host)\" <<'EOF'\ncurl https://example.org\nEOF", "x=\"$(cat <<'A'\nbody\nA\n)\" bash <<'B'\ncurl https://example.org\nB",
-    "echo \"$(FOO=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF\n)\"", "FOO=$(pwd) bash <<'EOF'\ncurl https://example.org\nEOF",
-    # A quote inside the substitution, a string that runs over lines, two substitutions, text after the closing ) in the string.
+    "ssh \"$(echo host)\" <<'EOF'\ncurl https://example.org\nEOF", "FOO=$(pwd) bash <<'EOF'\ncurl https://example.org\nEOF",
+    "echo \"$(FOO=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF\n)\"",
+    # A quote inside the substitution, two substitutions, and controls that already read correctly at f83f8367 (a backquote span,
+    # a separator before the operator, a nested "$( )" that has its own heredoc).
     "FOO=\"$(echo \"a b\")\" bash <<'EOF'\ncurl https://example.org\nEOF", "ssh \"$(echo \"h o\")\" <<'EOF'\ncurl https://example.org\nEOF",
-    "x=\"a\nb\" bash <<'EOF'\ncurl https://example.org\nEOF", "x='a\nb' bash <<'EOF'\ncurl https://example.org\nEOF",
-    "x=\"$(cat <<'A'\nbody\nA\n) tail\" bash <<'B'\ncurl https://example.org\nB", "A=\"$(pwd)\" B=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF",
-    "FOO=\"`pwd`\" bash <<'EOF'\ncurl https://example.org\nEOF", "x=\"$(cat <<'A'\nbody\nA\n)\" && bash <<'B'\ncurl https://example.org\nB",
+    "A=\"$(pwd)\" B=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF", "FOO=\"`pwd`\" bash <<'EOF'\ncurl https://example.org\nEOF",
+    "x=\"$(cat <<'A'\nbody\nA\n)\" && bash <<'B'\ncurl https://example.org\nB",
     "echo \"$(echo \"$(pwd)\" | bash <<'EOF'\ncurl https://example.org\nEOF\n)\"",
+]
+# Limit (not a defect of the per-level cuts): a construct that runs over lines carries its command's head on an earlier line, so
+# the heredoc operator after it has no reader on its own line. Real shells run curl once for each of these; the kernel reads the
+# body as data, a possible fetch (fetch_mentions_unconfirmed 1, status incomplete), never a lost one.
+R1_MULTILINE = [
+    "x=\"$(cat <<'A'\nbody\nA\n)\" bash <<'B'\ncurl https://example.org\nB", "x=\"a\nb\" bash <<'EOF'\ncurl https://example.org\nEOF",
+    "x='a\nb' bash <<'EOF'\ncurl https://example.org\nEOF", "x=\"$(cat <<'A'\nbody\nA\n) tail\" bash <<'B'\ncurl https://example.org\nB",
 ]
 R1_DATA = [  # the reader is cat, so the body is data and curl never ran
     "FOO=\"$(pwd)\" cat <<'EOF'\ncurl https://example.org\nEOF", "FOO=\"$(echo \"a b\")\" cat <<'EOF'\ncurl https://example.org\nEOF",
@@ -714,6 +721,16 @@ class TokenMeasurement(unittest.TestCase):
             with self.subTest(command=command, carrier=name):
                 self.assertEqual(m4["unclassifiable"], 1)
                 self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+
+    def test_m4_r1_limit_a_heredoc_after_a_construct_that_runs_over_lines_is_a_possible_fetch(self):
+        # Pinned limit: the reader of an operator is read from its own line, so a command that begins on an earlier line (inside a
+        # quote or "$( )" that runs over lines) leaves its heredoc without one. Real shells run curl once for each command.
+        for command, name, _, key, m4 in self.carrier_m4(R1_MULTILINE):
+            with self.subTest(command=command, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["remote_fetches"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+                self.assertEqual(m4["status"], "incomplete")
 
     def test_cli_lanes_read_the_heredoc_a_shell_reads_after_a_closed_double_quoted_substitution(self):
         got = self.lanes_of(["FOO=\"$(pwd)\" bash <<'EOF'\nqmd search x\nEOF"])
