@@ -8,11 +8,13 @@ rtk-ai/rtk v0.50.0 src/discover/mod.rs and src/hooks/decision.rs.
 
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
 import unittest
 from datetime import datetime
+from unittest import mock
 from urllib.parse import urlparse
 
 
@@ -37,6 +39,32 @@ IDENTIFIER_PATTERNS = {
     "credential-shaped value": r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})",
     "account or connection value": r'"(?:account|connection|request|session)[_-]?id"\s*:\s*"[^"<>]+"',
 }
+
+
+def metadata_lines(root, revision, filename):
+    """Return filename's lines at revision. Only an absent revision may skip, and only outside CI.
+
+    Follows tests/test_release_pin_contents.py:24,32-35 (probe `git cat-file -e <rev>^{commit}`; fail
+    in CI, skip locally), but reads GITHUB_ACTIONS per call so the controls below can patch os.environ.
+    GitHub sets GITHUB_ACTIONS to "true" in every workflow run
+    (https://docs.github.com/en/actions/reference/workflows-and-actions/variables), and
+    .github/workflows/validate.yml checks out full history (fetch-depth: 0) before `python3 -m unittest`,
+    so an absent revision there is a defect. Skip and failure use unittest.SkipTest and AssertionError,
+    TestCase.failureException's initial value (https://docs.python.org/3/library/unittest.html).
+    """
+    probe = subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{revision}^{{commit}}"],
+                           capture_output=True, text=True)
+    if probe.returncode != 0:
+        absent = f"metadata_revision {revision} is not a commit in this clone"
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            raise AssertionError(f"{absent}; validate.yml checks out full history, so this is a defect")
+        raise unittest.SkipTest(absent)
+    shown = subprocess.run(["git", "-C", str(root), "show", f"{revision}:{filename}"],
+                           capture_output=True, text=True)
+    if shown.returncode != 0:
+        first = next(iter(shown.stderr.strip().splitlines()), "git printed no error line")
+        raise AssertionError(f"git show {revision}:{filename} failed: {first}")
+    return shown.stdout.splitlines()
 
 
 class TokenFullSaveEvidenceTests(unittest.TestCase):
@@ -93,14 +121,8 @@ class TokenFullSaveEvidenceTests(unittest.TestCase):
 
     def test_pin_metadata_lines_contain_the_component_version(self):
         # The records cite coordinates at their recorded metadata_revision, so read that revision, not the live tree
-        # (whose lines move as later changes land). CI checks out full history (validate.yml, fetch-depth: 0).
-        def lines_at(revision, filename):
-            shown = subprocess.run(["git", "-C", str(ROOT), "show", f"{revision}:{filename}"],
-                                   capture_output=True, text=True)
-            if shown.returncode != 0:
-                self.skipTest(f"{revision[:8]}:{filename} is not in this clone's history")
-            return shown.stdout.splitlines()
-
+        # (whose lines move as later changes land). metadata_lines fails on a bad path or, in CI, an absent
+        # revision; only a revision absent from a local clone skips.
         for tool in sorted(TOOLS):
             pin = json.loads((CURRENCY / "records" / f"{tool}.json").read_text())["pin"]
             entries = [(pin["version"], source) for source in pin["metadata_sources"]]
@@ -110,7 +132,7 @@ class TokenFullSaveEvidenceTests(unittest.TestCase):
                 with self.subTest(tool=tool, source=source):
                     self.assertRegex(source, r"^[^:]+:[1-9][0-9]*$")
                     filename, number = source.rsplit(":", 1)
-                    lines = lines_at(pin["metadata_revision"], filename)
+                    lines = metadata_lines(ROOT, pin["metadata_revision"], filename)
                     index = int(number) - 1
                     self.assertLess(index, len(lines))
                     self.assertIn(version, lines[index])
@@ -197,6 +219,62 @@ class TokenFullSaveEvidenceTests(unittest.TestCase):
                 with self.assertRaisesRegex(AssertionError, re.escape(kind)):
                     self.assert_no_identifiers(sample)
         self.assert_no_identifiers("Public release v0.50.0; fixture path src/pkg/f1.txt")
+
+
+class MetadataLinesControlTests(unittest.TestCase):
+    """Discriminating controls: a bad metadata coordinate must fail, never skip.
+
+    Sources: docs/acceptance-evidence-policy.md, Discriminating controls; os.environ is patched with
+    https://docs.python.org/3/library/unittest.mock.html#unittest.mock.patch.dict, which restores it.
+    """
+
+    def git(self, *args):
+        return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True)
+
+    def outcome(self, revision, filename):
+        # Classify here: a SkipTest escaping into this control would skip the control instead of failing it.
+        try:
+            return "lines", metadata_lines(ROOT, revision, filename)
+        except unittest.SkipTest as skipped:
+            return "skip", str(skipped)
+        except AssertionError as failed:
+            return "fail", str(failed)
+
+    def test_bogus_path_at_an_existing_revision_fails_instead_of_skipping(self):
+        head = self.git("rev-parse", "--verify", "HEAD^{commit}").stdout.strip()
+        self.assertTrue(head)  # precondition: HEAD resolves, so this revision exists
+        real = Path(__file__).resolve().relative_to(ROOT).as_posix()
+        bogus = "no-such-directory/no-such-metadata.json"
+        native = self.git("show", f"{head}:{bogus}")
+        self.assertNotEqual(native.returncode, 0)  # precondition: the path is absent at HEAD
+        git_error = native.stderr.strip().splitlines()[0]  # git's own wording, whatever the locale
+        for ci in ("unset", "true"):
+            with self.subTest(GITHUB_ACTIONS=ci), mock.patch.dict(os.environ):
+                os.environ.pop("GITHUB_ACTIONS", None)
+                if ci == "true":
+                    os.environ["GITHUB_ACTIONS"] = "true"
+                kind, lines = self.outcome(head, real)
+                self.assertEqual(kind, "lines", lines)
+                self.assertTrue(lines)
+                kind, message = self.outcome(head, bogus)
+                self.assertEqual(kind, "fail", message)
+                for part in (head, bogus, git_error):
+                    self.assertIn(part, message)
+
+    def test_missing_revision_skips_locally_but_fails_under_github_actions(self):
+        # git's all-zeroes object name denotes no object (githooks(5), pre-push:
+        # https://git-scm.com/docs/githooks#_pre_push).
+        missing = "0" * 40
+        self.assertNotEqual(self.git("cat-file", "-e", f"{missing}^{{commit}}").returncode, 0)
+        for ci, expected in (("unset", "skip"), ("true", "fail")):
+            with self.subTest(GITHUB_ACTIONS=ci), mock.patch.dict(os.environ):
+                os.environ.pop("GITHUB_ACTIONS", None)
+                if ci == "true":
+                    os.environ["GITHUB_ACTIONS"] = "true"
+                kind, message = self.outcome(missing, "manifests/stack.json")
+                self.assertEqual(kind, expected, message)
+                if expected == "fail":
+                    self.assertIn(missing, message)
 
 
 if __name__ == "__main__":
