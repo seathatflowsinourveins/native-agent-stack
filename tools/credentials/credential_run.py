@@ -18,10 +18,14 @@ fragment such as its first eight characters) or writes it to a file or a log def
 masked separately. Core dumps are off (RLIMIT_CORE 0); a host whose core_pattern hands dumps to a collector (a
 leading | or @), which sets that limit aside, is refused, with no override. Output goes through non-blocking
 descriptors and a bounded queue, so a consumer that stops reading cannot hold the runner past a shutdown signal or
-the drain deadline. Exit status: the command's own; 128+N when it died of signal N; 2 for a usage error; 1 for a
-refusal; 126 or 127 when it cannot start. Messages carry the id, variable names, line numbers and reason codes,
-never a value, a store line or a path (docs/secret-storage.md#using-a-key). The runner is available, not yet the
-default path: the command guard does not read its command (phase 2 of the same change series).
+the drain deadline. The command leads its own session and process group. SIGINT, SIGTERM, SIGHUP, SIGQUIT, SIGUSR1,
+SIGUSR2 and SIGALRM sent to the runner are forwarded to that group; once the command has exited and its output is
+drained, and on every way out of the runner, the group gets SIGTERM and, after TERM_GRACE_SECONDS, SIGKILL, so no
+descendant that stayed in it is left running with a key in its environment. On Linux the command also asks the kernel
+for SIGTERM when the runner dies (PR_SET_PDEATHSIG). Exit status: the command's own; 128+N when it died of signal N;
+2 for a usage error; 1 for a refusal; 126 or 127 when it cannot start. Messages carry the id, variable names, line
+numbers and reason codes, never a value, a store line or a path (docs/secret-storage.md#using-a-key). The runner is
+available, not yet the default path: the command guard does not read its command (phase 2 of the same change series).
 
 Built from these references (observed 2026-09-29): the env-only exec discipline of scripts/kernel_keyring.py; the
 load_env_file grammar of blueprints/us-equities/pit-availability/measure.py:51-67 with set_credential.py's value
@@ -32,7 +36,9 @@ overlaps L255-279); buildkite/agent@3345ee60 internal/redact/redact.go (LengthMi
 internal/replacer/replacer.go (buffer, merge, never spill a partial match, L99-115); dmno-dev/varlock@1b880652
 packages/varlock/src/runtime/lib/redact-stream.ts (100 ms idle flush, L8 and L34-46); Generalized-Labs/ironrun@b611c7ce
 internal/redact/encodings.go (hex and upper- and lower-case percent forms, L13-21); torvalds/linux@v6.16
-fs/coredump.c and systemd/systemd@v257 src/coredump/coredump.c (check_core_pattern below).
+fs/coredump.c and systemd/systemd@v257 src/coredump/coredump.c (check_core_pattern below); the man-pages
+PR_SET_PDEATHSIG(2const) page of man7.org (parent_death_hook) and bazelbuild/bazel@d2545923
+src/main/tools/process-tools.cc KillEverything L94-110 (end_group).
 """
 from __future__ import annotations
 
@@ -98,7 +104,15 @@ QUEUE_LIMIT = 256 * 1024     # masked bytes one stream queues for a consumer tha
 POLL_SECONDS = 0.1
 READ_SIZE = 65536
 CORE_PATTERN_FILE = "/proc/sys/kernel/core_pattern"  # a name, never a value, in the messages that mention it
-FORWARDED = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
+# Signals the runner forwards to the command's process group. After the first four the relay waits for no consumer.
+SHUTDOWN_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT)
+# Fatal to a process by default and often handled by a command (SIGUSR1 asks dd for its progress): forwarded, so the
+# command decides and the runner does not die alone with the command left running.
+PASSED_SIGNALS = (signal.SIGUSR1, signal.SIGUSR2, signal.SIGALRM)
+FORWARDED = SHUTDOWN_SIGNALS + PASSED_SIGNALS
+TERM_GRACE_SECONDS = 2.0     # after SIGTERM to the command's process group, how long it has to end before SIGKILL
+KILL_WAIT_SECONDS = 1.0      # after SIGKILL, how long to wait for the group to be gone and the command reaped
+PR_SET_PDEATHSIG = 1         # <linux/prctl.h>
 
 
 class UsageError(Exception):
@@ -659,11 +673,81 @@ def disable_core_dumps() -> None:
         raise Refused("core_limit_not_set: could not set RLIMIT_CORE to 0") from None
 
 
+def parent_death_hook():
+    """A preexec_fn that asks the kernel to send the command SIGTERM when the runner ends, or None where it cannot (not
+    Linux, no ctypes, no prctl): the start never fails for it.
+
+    prctl(PR_SET_PDEATHSIG) (man7.org PR_SET_PDEATHSIG(2const)) is the only thing that acts when the runner is killed
+    with SIGKILL, which runs no code of ours. The "parent" is the thread that forked the command: here the main thread,
+    because run_command's signal.signal calls raise anywhere else, and its end is the runner's end. The kernel clears
+    the setting for the command's own children, so it reaches the command alone. A runner that ended before the call is
+    noticed by its pid, and the command then ends before it runs."""
+    if not sys.platform.startswith("linux"):
+        return None
+    try:
+        import ctypes
+        prctl = ctypes.CDLL(None, use_errno=True).prctl
+        prctl.argtypes = [ctypes.c_int] + [ctypes.c_ulong] * 4
+        prctl.restype = ctypes.c_int
+    except (ImportError, OSError, AttributeError):
+        return None
+    runner, sigterm = os.getpid(), int(signal.SIGTERM)
+
+    def hook() -> None:  # runs in the forked command, between fork and exec
+        try:
+            if prctl(PR_SET_PDEATHSIG, sigterm, 0, 0, 0) == 0 and os.getppid() != runner:
+                os._exit(128 + sigterm)  # the runner is already gone: nothing would end this command later
+        except Exception:  # never fail the start for this
+            pass
+
+    return hook
+
+
+def group_exists(pgid: int) -> bool:
+    """Whether any member of the process group is left to signal (a zombie counts until it is reaped)."""
+    try:
+        os.killpg(pgid, 0)
+    except OSError:  # no member, or none this user may signal
+        return False
+    return True
+
+
+def wait_for_group(child, seconds: float) -> bool:
+    """True once the command's process group is empty, False after `seconds`; reaps the command meanwhile."""
+    deadline = time.monotonic() + seconds
+    while True:
+        child.poll()  # a command that exited but was not reaped is still a member of its group
+        if not group_exists(child.pid):
+            return True
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(0.02)
+
+
+def end_group(child) -> None:
+    """SIGTERM to the command's process group, SIGKILL to what is left after TERM_GRACE_SECONDS, and reap the command.
+
+    The command leads its own group (start_new_session), so this reaches every descendant that stayed in it, and does
+    nothing but reap when none is left. run_command calls it on every way out. A descendant that left the group (setsid
+    or setpgid) is out of reach. The same order as bazelbuild/bazel@d2545923 src/main/tools/process-tools.cc
+    KillEverything (L94-110: SIGTERM to -pgrp, a timeout, SIGKILL to -pgrp)."""
+    for signum, seconds in ((signal.SIGTERM, TERM_GRACE_SECONDS), (signal.SIGKILL, KILL_WAIT_SECONDS)):
+        try:
+            os.killpg(child.pid, signum)
+        except OSError:  # no member left, or none that this user may signal
+            break
+        if wait_for_group(child, seconds):
+            break
+    with contextlib.suppress(subprocess.TimeoutExpired):
+        child.wait(timeout=KILL_WAIT_SECONDS)
+
+
 def run_command(command: list, environment: dict, needles: list) -> int:
     started, pending, shutdown = [], [], []
 
     def forward(signum, _frame) -> None:
-        shutdown.append(signum)  # the relay stops waiting for a consumer that is not reading
+        if signum in SHUTDOWN_SIGNALS:
+            shutdown.append(signum)  # the relay stops waiting for a consumer that is not reading
         if not started:
             pending.append(signum)
             return
@@ -681,7 +765,8 @@ def run_command(command: list, environment: dict, needles: list) -> int:
         signal.signal(signum, forward)
     try:
         child = subprocess.Popen(command, env=environment, stdin=None, stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE, close_fds=True, start_new_session=True)
+                                 stderr=subprocess.PIPE, close_fds=True, start_new_session=True,
+                                 preexec_fn=parent_death_hook())
     except FileNotFoundError:
         raise SpawnError(127, "not_found") from None
     except PermissionError:
@@ -691,8 +776,11 @@ def run_command(command: list, environment: dict, needles: list) -> int:
     started.append(child)
     for signum in pending:
         forward(signum, None)
-    relay(child, needles, shutdown)
-    code = child.wait()
+    try:
+        relay(child, needles, shutdown)
+        code = child.wait()
+    finally:
+        end_group(child)  # on every way out: no descendant is left running with the key in its environment
     return code if code >= 0 else 128 - code
 
 

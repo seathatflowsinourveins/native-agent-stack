@@ -58,10 +58,14 @@ def _host_hands_cores_to_a_collector() -> bool:
 # two tests of the real re-execution skip. The refusal itself is tested in process with its own pattern files.
 # CREDENTIAL_RUN_TEST_LAUNCHER=1 forces the launcher on any host, to exercise this path.
 HOST_PIPES_CORES = os.environ.get("CREDENTIAL_RUN_TEST_LAUNCHER") == "1" or _host_hands_cores_to_a_collector()
+# The launcher also switches the watchdog off on request, to see the parent-death signal alone (a module constant, as
+# CORE_PATTERN_FILE is: the tool has no environment switch for it).
 LAUNCHER = ("import os, sys\n"
             f"sys.path[:0] = [{str(TOOLS)!r}, {str(ROOT / 'scripts')!r}]\n"
             "import credential_run\n"
             "credential_run.CORE_PATTERN_FILE = os.environ.pop('CORE_PATTERN_TEST_FILE')\n"
+            "if os.environ.pop('WATCHDOG_TEST_OFF', '') == '1':\n"
+            "    credential_run.WATCHDOG = False\n"
             "sys.exit(credential_run.main(sys.argv[1:]))\n")
 
 # A child that reports what reached its environment by sha256 only, so no test output holds a value.
@@ -98,6 +102,27 @@ def py(code: str, *args: str) -> list[str]:
     return ["--", sys.executable, "-I", "-c", code, *args]
 
 
+def marker_writer(delay: float, ignore_term: bool = False) -> str:
+    """Python source of a process that creates the file named by its argv[1] after `delay` seconds, unless it is ended
+    first (a process that ignores SIGTERM can only be ended by SIGKILL)."""
+    return ("import signal, sys, time\n" + ("signal.signal(signal.SIGTERM, signal.SIG_IGN)\n" if ignore_term else "")
+            + f"time.sleep({delay})\nopen(sys.argv[1], 'w').close()\n")
+
+
+def spawn_marker_writers(*writers) -> str:
+    """Python source that starts one marker_writer per (marker path, delay, ignore_term) in its own process group and
+    prints "spawned" and the process ids; the caller adds what it does next."""
+    return ("import os, subprocess, sys, time\nkids = []\n" + "".join(
+        f"kids.append(subprocess.Popen([sys.executable, '-I', '-c', {marker_writer(delay, ignore)!r}, {str(path)!r}]))\n"
+        for path, delay, ignore in writers)
+            + "print('spawned', os.getpid(), *[k.pid for k in kids], flush=True)\n")
+
+
+def kill_quietly(pid: int) -> None:
+    with contextlib.suppress(ProcessLookupError, PermissionError):
+        os.kill(pid, signal.SIGKILL)
+
+
 def stable_interiors(raw: bytes) -> list[bytes]:
     """The characters of base64/base64url that depend only on raw, at each byte alignment (the test's own copy)."""
     found = []
@@ -121,15 +146,16 @@ class RunnerCase(unittest.TestCase):
         self.core_pattern.write_text("core\n")
         self.values: list[str] = []  # every planted value, for the never-echoed checks
 
-    def command(self, *args: str) -> list[str]:
-        """The argv that starts the runner: the tool itself, or the launcher on a host that pipes crash dumps."""
-        if HOST_PIPES_CORES:
+    def command(self, *args: str, launcher: bool = False) -> list[str]:
+        """The argv that starts the runner: the tool itself, or the launcher on a host that pipes crash dumps (and for
+        a test that needs the launcher's switch: launcher=True)."""
+        if HOST_PIPES_CORES or launcher:
             return [sys.executable, "-I", "-S", "-c", LAUNCHER, *args]
         return [sys.executable, str(TOOL), *args]
 
-    def tool_environment(self, extra: dict | None = None) -> dict:
+    def tool_environment(self, extra: dict | None = None, launcher: bool = False) -> dict:
         environment = {**self.env, **(extra or {})}
-        if HOST_PIPES_CORES:
+        if HOST_PIPES_CORES or launcher:
             environment["CORE_PATTERN_TEST_FILE"] = str(self.core_pattern)
         return environment
 
@@ -825,17 +851,31 @@ class ProcessTests(RunnerCase):
         self.assertEqual(self.run_tool("tavily", *py("raise SystemExit(7)")).returncode, 7)
         self.assertEqual(self.run_tool("tavily", *py(
             "import os, signal\nos.kill(os.getpid(), signal.SIGTERM)\n")).returncode, 128 + signal.SIGTERM)
-        for sig, code in ((signal.SIGTERM, 5), (signal.SIGINT, 6), (signal.SIGHUP, 8)):
+        # Forwarded to the command's process group: the three shutdown signals, SIGQUIT, and the three that end a process
+        # by default (SIGUSR1, SIGUSR2, SIGALRM), which used to end the runner alone and leave the command running.
+        for sig, code in ((signal.SIGTERM, 5), (signal.SIGINT, 6), (signal.SIGHUP, 8), (signal.SIGQUIT, 9),
+                          (signal.SIGUSR1, 11), (signal.SIGUSR2, 12), (signal.SIGALRM, 13)):
             with self.subTest(signal=sig.name):
                 runner = self.start_tool("tavily", *py(
-                    "import signal, sys, time\n"
+                    "import os, signal, sys, time\n"
                     f"signal.signal({int(sig)}, lambda *_: (print('got {sig.name}', flush=True), sys.exit({code})))\n"
-                    "print('ready', flush=True)\ntime.sleep(30)\n"))
-                ready = self.read_until(runner.stdout, b"ready\n")
+                    "print('ready', os.getpid(), flush=True)\ntime.sleep(30)\n"))
+                ready = self.read_until(runner.stdout, b"\n")
+                self.addCleanup(kill_quietly, int(ready.split()[1]))
                 runner.send_signal(sig)
-                rest, _ = runner.communicate(timeout=30)
-                self.assertEqual(runner.returncode, code)
-                self.assertEqual(ready + rest, f"ready\ngot {sig.name}\n".encode())
+                self.assertEqual(runner.wait(timeout=30), code)
+                self.assertEqual(runner.stdout.read(), f"got {sig.name}\n".encode())
+
+    def test_signals_the_command_does_not_handle_end_the_command_and_the_runner_reports_them(self):
+        self.tavily()
+        for sig in (signal.SIGTERM, signal.SIGQUIT, signal.SIGUSR1, signal.SIGUSR2, signal.SIGALRM):
+            with self.subTest(signal=sig.name):
+                runner = self.start_tool("tavily", *py(
+                    "import os, time\nprint('ready', os.getpid(), flush=True)\ntime.sleep(30)\n"))
+                ready = self.read_until(runner.stdout, b"\n")
+                self.addCleanup(kill_quietly, int(ready.split()[1]))
+                runner.send_signal(sig)
+                self.assertEqual(runner.wait(timeout=30), 128 + sig)  # the command's death by that signal, not the runner's
 
     def test_stdin_passes_through(self):
         self.tavily()
@@ -864,6 +904,76 @@ class ProcessTests(RunnerCase):
             "import json, os, resource\n"
             "print(json.dumps([resource.getrlimit(resource.RLIMIT_CORE), os.getsid(0) == os.getpid()]))\n"))
         self.assertEqual(json.loads(result.stdout), [[0, 0], True])
+
+    def test_descendants_left_behind_are_ended_after_the_drain_and_a_stubborn_one_is_killed(self):
+        # Second review, 2026-09-29: a descendant still running when the drain ended was left running, with the key in
+        # its environment. The runner now sends SIGTERM to the command's process group and, after TERM_GRACE_SECONDS,
+        # SIGKILL. Each descendant writes a marker file if it lives long enough to; the command itself exits at once.
+        self.tavily()
+        plain, stubborn = self.base / "plain-survived", self.base / "stubborn-survived"
+        started = time.monotonic()
+        result = self.run_tool("tavily", *py(spawn_marker_writers((plain, 3.5, False), (stubborn, 6.5, True))),
+                               timeout=60)
+        elapsed = time.monotonic() - started
+        self.addCleanup(lambda: [kill_quietly(int(pid)) for pid in result.stdout.split()[1:]])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        time.sleep(max(0.0, 7.2 - elapsed))  # past both markers' delays
+        self.assertFalse(plain.exists(), "a descendant outlived the runner")
+        self.assertFalse(stubborn.exists(), "a descendant that ignores SIGTERM outlived the runner")
+        # The 2 s drain, then SIGTERM (the plain one ends), then the grace and SIGKILL (the one that ignores SIGTERM).
+        self.assertGreaterEqual(elapsed, run_mod.DRAIN_SECONDS + run_mod.TERM_GRACE_SECONDS - 0.5)
+        self.assertLess(elapsed, run_mod.DRAIN_SECONDS + run_mod.TERM_GRACE_SECONDS + 4)
+
+    def run_in_process(self, command: list, relay) -> int:
+        """run_mod.run_command(command) with `relay` in place of the real one; this process's own handlers for the
+        signals it forwards are put back afterwards."""
+        for signum in run_mod.FORWARDED:
+            self.addCleanup(signal.signal, signum, signal.getsignal(signum))
+        with mock.patch.object(run_mod, "relay", relay):
+            return run_mod.run_command(command, {"PATH": os.environ.get("PATH", "")}, [])
+
+    def test_the_command_group_is_ended_on_every_exit_path_of_the_runner(self):
+        # A failure inside the relay (the runner's catch-all prints internal_error) must not leave the command running.
+        marker = self.base / "descendant-survived"
+        children, pids = [], []
+
+        def failing_relay(child, needles, shutdown=()):
+            children.append(child)
+            pids.extend(int(pid) for pid in child.stdout.readline().split()[1:])  # "spawned <command> <descendant>"
+            raise RuntimeError("the relay failed")
+
+        self.addCleanup(lambda: [kill_quietly(pid) for pid in pids])
+        code = spawn_marker_writers((marker, 2.0, False)) + "time.sleep(60)\n"
+        with self.assertRaises(RuntimeError):
+            self.run_in_process(py(code)[1:], failing_relay)
+        self.assertEqual(children[0].returncode, -signal.SIGTERM)  # ended by the group's SIGTERM, and reaped
+        time.sleep(2.6)
+        self.assertFalse(marker.exists(), "the runner's failure left a descendant running")
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "PR_SET_PDEATHSIG is Linux-only")
+    def test_a_killed_runner_sends_the_command_the_parent_death_signal(self):
+        # Second review, 2026-09-29: a SIGKILL of the runner (a `timeout -k`, a harness that escalates) ended only the
+        # runner. The command asks the kernel for SIGTERM when its parent dies (Linux PR_SET_PDEATHSIG). The watchdog
+        # is switched off here, so this is that signal alone.
+        self.tavily()
+        noted = self.base / "command-got-sigterm"
+        runner = subprocess.Popen(
+            self.command("tavily", *py(
+                "import os, signal, sys, time\n"
+                "def note(*_):\n    open(sys.argv[1], 'w').close()\n    os._exit(0)\n"
+                "signal.signal(signal.SIGTERM, note)\nprint('ready', os.getpid(), flush=True)\ntime.sleep(60)\n",
+                str(noted)), launcher=True),
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            env=self.tool_environment({"WATCHDOG_TEST_OFF": "1"}, launcher=True))
+        self.addCleanup(lambda: (runner.kill(), runner.communicate(timeout=30)))
+        ready = self.read_until(runner.stdout, b"\n")
+        self.addCleanup(kill_quietly, int(ready.split()[1]))
+        runner.kill()
+        runner.wait(timeout=30)
+        deadline = time.monotonic() + 10
+        while not noted.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        self.assertTrue(noted.exists(), "the command was not sent SIGTERM when its runner was killed")
 
 
 class ConsumerTests(RunnerCase):
