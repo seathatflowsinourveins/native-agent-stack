@@ -339,6 +339,31 @@ class P0_SiblingPreflight(GraderCase):
         self.assertEqual(self.NODE_PRESENT - exported, set(), "a present sibling export was renamed or removed")
         sys.stderr.write(f"P0 fixture-shaped at this base: node={sorted(self.NODE_FIXTURE_AT_BASE - exported)}\n")
 
+    def test_the_bridge_reports_the_kernel_names_it_finds(self):
+        """Stage 2 consumes the kernel only through node_bridge.mjs: at this base only the present names exist."""
+        require_node()
+        got = evm().bridge({"op": "capabilities"})
+        self.assertEqual(set(got["present"]), self.NODE_PRESENT)
+        sys.stderr.write(f"P0 bridge: sibling names absent at this base: {sorted(got['sibling_absent'])}\n")
+        self.assertEqual(set(got["sibling_present"]) | set(got["sibling_absent"]), self.NODE_FIXTURE_AT_BASE)
+
+    def test_the_real_run_mode_output_has_the_shape_the_grader_reads(self):
+        """U2's run-mode children are consumed as {agent_id, label, lanes.measurement.hook_context}; summarizeRun at this
+        base already has that shape, so the stated fixture shape is checked against the real kernel."""
+        require_node()
+        world = ClaudeWorld(self.tmp)
+        label = f"{RUN_TOKEN}.B.seed-blind-1.1"
+        rows = blind_transcript(self.tmp, "yes", read_hook=True)
+        world.child(label, "fx1", result={"answer": "yes", "evidence": []}, rows=rows)
+        world.write()
+        done = subprocess.run(["node", str(ROOT / "examples/claude-native/workflows/child-usage.mjs"), str(world.wf)],
+                              capture_output=True, text=True, timeout=120)
+        document = json.loads(done.stdout)
+        child = document["children"][0]
+        hook = child["lanes"]["measurement"]["hook_context"]
+        self.assertEqual((child["agent_id"], child["label"]), ("fx1", label))
+        self.assertEqual((hook["inserted"], hook["by_hook"]), (1, {"PreToolUse:Read": 1}))
+
     def test_toon_cli_version(self):
         require_toon()
         toon = subprocess.run(["toon", "--version"], capture_output=True, text=True, timeout=30)
@@ -1852,6 +1877,14 @@ class F27a_KeysCommand(GraderCase):
         out = self.tmp / "keys.json"
         out.write_text("keep", encoding="utf-8")
         self.assertRefusal(self.keys(out), "E_PATH", reason="exists")
+
+    def test_the_key_records_keep_the_field_order_of_the_sealed_table(self):
+        """Stage-2 finding: a canonical (key-sorted) keys file loses the order R2-02 compares, so every honest ordered
+        payload would fail with key_order once it is graded from the file."""
+        out = self.tmp / "keys-order.json"
+        self.assertEqual(self.keys(out).returncode, 0)
+        record = json.loads(out.read_text(encoding="utf-8"))["keys"]["seed-web-table-1"]["key"]["records"][0]
+        self.assertEqual(list(record), ["id", "service", "region", "status", "latency_ms", "note"])
 
 
 def real_content_repo(tmp):
@@ -3590,11 +3623,14 @@ class F28_M7(GraderCase):
         got = ev.isolate_toon_document(broken)
         self.assertEqual((got["status"], got["value"]), ("strict_decode", None))
 
-    def test_a_status_line_shape_that_is_not_documented_stays_in_the_document_text(self):
+    def test_only_the_documented_status_shapes_are_dropped(self):
         ev = evm()
+        self.assertFalse(ev.is_status_line("✔ Saved something else entirely"))
+        self.assertFalse(ev.is_status_line("Token estimates: ~136 (JSON) → ~52 (TOON)"), "the mark is part of the shape")
+        self.assertTrue(ev.is_status_line(STATUS_LINES[0]) and ev.is_status_line(ANSI_STATUS_LINES[1]))
         text = self.doc() + "\n✔ Saved something else entirely"
-        self.assertEqual(ev.isolate_toon_document(text)["status"], "strict_decode",
-                         "only the documented shapes are dropped; other text after the block is not guessed away")
+        self.assertEqual(ev.isolate_toon_document(text)["status"], "decoded",
+                         "the document is the first block that decodes; other lines around it are ignored")
 
     def test_toon_in_the_answer_only_is_not_an_encode_under_the_decided_reading(self):
         text = "```toon\n" + self.doc() + "\n```"
@@ -3990,6 +4026,13 @@ def blind_transcript(cwd, answer_text, *, evidence=(), attachments=("hook_succes
     return rows
 
 
+def strict_transcript(cwd, answer_text, *, packet=PACKET):
+    """A strict process (`claude --safe-mode -p`): no hooks, one Read of the packet, the answer as the final text."""
+    return [r_user(f"Read {packet} as the entire packet.", ts(0, 30), cwd=str(cwd)),
+            r_use("Read", {"file_path": str(Path(cwd) / packet)}, "toolu-fx-s1", ts(1), "msg-s1"),
+            r_result("toolu-fx-s1", "packet text", ts(1, 5)), r_text(answer_text, ts(3), "msg-s2")]
+
+
 def write_ledger(path, records):
     Path(path).write_text("".join(json.dumps(record) + "\n" for record in records), encoding="utf-8")
 
@@ -4046,7 +4089,7 @@ class MiniRun:
                               read_rows=1 if read_hook else 0)
         if strict:
             session = f"sess-strict-{task.rsplit('-', 1)[-1]}"
-            write_jsonl(self.root / "proj-fixture" / f"{session}.jsonl", blind_transcript(self.repo, answer_text))
+            write_jsonl(self.root / "proj-fixture" / f"{session}.jsonl", strict_transcript(self.repo, answer_text))
             (self.e2e / f"{label}.strict.out").write_text(answer_text + "\n", encoding="utf-8")
             self.launches.append({"identity": label, "actor": "strict_process", "session_id": session, "exit": 0})
         return label
@@ -4115,11 +4158,19 @@ class MiniRun:
         write_json(self.tmp / "adoption-claude.json", {"m12_inputs": self.m12_inputs()})
 
     def m12_inputs(self):
-        blind = [row for row in self.join_rows if "seed-blind-1" in row["identity"]]
+        """U4's m12_inputs of this run, in the stated shape (R14), counted from the fixture's own rows."""
+        children = {child["label"]: child for child in self.run_children}
+
+        def rows_of(task_test):
+            return [row for row in self.join_rows if task_test(row["task"])]
+        blind = rows_of(lambda task: task.startswith("seed-blind-") and task != "seed-blind-positive")
+        control = rows_of(lambda task: task == "seed-blind-positive")
         strict = [item for item in self.launches if item["actor"] == "strict_process"]
+        read = sum(children[row["identity"]]["lanes"]["measurement"]["hook_context"]["by_hook"].get("PreToolUse:Read", 0)
+                   for row in control)
         return {"blind_workflow": {"rows": len(blind), "joined": len(blind), "children_with_hook_rows": 0, "hook_rows": 0,
                                    "children_with_mcp_skill_bash": 0, "mcp_skill_bash_calls": 0},
-                "positive_control": {"rows": 1, "joined": 1, "pretooluse_read_rows": 1},
+                "positive_control": {"rows": len(control), "joined": len(control), "pretooluse_read_rows": read},
                 "strict_process": {"rows": len(strict), "joined": 0, "children_with_hook_rows": 0, "hook_rows": 0,
                                    "children_with_mcp_skill_bash": 0, "mcp_skill_bash_calls": 0}}
 
@@ -4611,10 +4662,10 @@ class F37_CodexSubagent(GraderCase):
 
     IDENT = f"{RUN_TOKEN}.B.seed-binding-1.1"
 
-    def driver(self, records, name="rollout-2026-10-05T01-00-00-thread-fx2.jsonl"):
-        directory = self.tmp / "codex-driver" / "attempts" / self.IDENT
-        write_jsonl(directory / name, records)
-        return self.tmp / "codex-driver"
+    def driver(self, records, name="rollout-2026-10-05T01-00-00-thread-fx2.jsonl", root=None):
+        root = root or self.tmp / "codex-driver"
+        write_jsonl(root / "attempts" / self.IDENT / name, records)
+        return root
 
     @staticmethod
     def said(text):
@@ -4643,8 +4694,15 @@ class F37_CodexSubagent(GraderCase):
         self.assertEqual(self.attempt(driver)["answer"]["text"], "ready")
         again = rollout({"type": "session_meta", "payload": {"id": "thread-fx2"}}, self.STARTED, self.said("ready"),
                         self.STARTED, self.said("the followup answer"))
-        self.assertEqual(self.attempt(self.driver(again, "rollout-x-thread-fx2.jsonl"), boundary="last_turn")["answer"]["text"],
-                         "the followup answer")
+        second = self.driver(again, root=self.tmp / "second-driver")
+        self.assertEqual(self.attempt(second, boundary="last_turn")["answer"]["text"], "the followup answer")
+
+    def test_two_rollout_copies_of_one_thread_are_not_guessed_between(self):
+        records = rollout({"type": "session_meta", "payload": {"id": "thread-fx2"}}, self.said("one"))
+        driver = self.driver(records)
+        self.driver(records, "rollout-other-thread-fx2.jsonl", root=driver)
+        attempt = self.attempt(driver)
+        self.assertEqual((attempt["class"], attempt["carrier"]), ("unresolved", {"status": "unknown", "reasons": ["duplicate_rollout"]}))
 
     def test_a_missing_or_compressed_rollout_is_not_guessed(self):
         self.assertEqual(self.attempt(self.tmp / "codex-driver")["class"], "unresolved")
@@ -4789,7 +4847,8 @@ def failing_with(mutant_patches, names):
             result = unittest.TextTestRunner(stream=stream, verbosity=0).run(suite)
     finally:
         INPROC[0] -= 1
-    return {test.id().partition(" (")[0] for test, _ in result.failures + result.errors}
+    # A subTest failure carries " [description]" after the method id: the method is what a mutant flips.
+    return {test.id().partition(" (")[0].partition(" [")[0] for test, _ in result.failures + result.errors}
 
 
 def full(name):

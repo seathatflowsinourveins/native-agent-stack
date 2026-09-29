@@ -51,7 +51,7 @@ M8_LANES = ("symbol-references", "qmd", "ai-memory")
 class Refusal(Exception):
     """A refusal is `E_CODE field=value ...`: a code and field names, never a private value."""
 
-    def __init__(self, code, **fields):
+    def __init__(self, code, /, **fields):  # positional-only: a field may itself be named `code` (E_IDENTITY_INVALID)
         self.code = code
         self.fields = fields
         super().__init__(" ".join([code] + [f"{name}={value}" for name, value in fields.items()]))
@@ -2113,9 +2113,24 @@ def _stated_sum(ans, structural_texts):
     return values
 
 
-def grade_payload(ans, key, readings):
+def _extracted_payloads(ans, extractions):
+    """The D-extract fallback (R3, R21): payload texts a judge quoted from the answer. Every quote must be verbatim in the
+    answer; a quote that is not makes the component unknown(judge_quote). Returns (texts, refusal Result or None)."""
+    raw, texts = answer_text(ans), []
+    for item in extractions or []:
+        if item.get("component") != "payload":
+            continue
+        quotes = item.get("answer_quotes") or []
+        if not quotes or any(quote not in raw for quote in quotes):
+            return [], unknown("judge_quote")
+        texts.extend(value for value in item.get("values", []) if isinstance(value, str) and value.strip())
+    return texts, None
+
+
+def grade_payload(ans, key, readings, extractions=None):
     """R4: every payload candidate must strictly decode and equal the key; the requested latency sum is checked
-    when the key has one. No candidate at all is unknown(unparsed); a found candidate that does not decode fails."""
+    when the key has one. No candidate at all is unknown(unparsed), and then a verified D-extract payload may decide;
+    a found candidate that does not decode fails."""
     reading = readings["R2-01"]
     ordered = readings["R2-02"] == "ordered"
     decoded, structural_texts = [], []
@@ -2136,6 +2151,18 @@ def grade_payload(ans, key, readings):
             except DecodeError:
                 value = None
             if value is not None and (payload_records(value, "wrapper_with_extras")[0] is not None):
+                decoded.append(value)
+    if not decoded:
+        texts, refused = _extracted_payloads(ans, extractions)
+        if refused is not None:
+            return refused
+        for text in texts:
+            try:
+                value = decode_candidate(text)
+            except DecodeError as stop:
+                return fail(stop.reason)
+            if payload_records(value, "wrapper_with_extras")[0] is not None:
+                structural_texts.append(text)
                 decoded.append(value)
     if not decoded:
         return unknown("unparsed")
@@ -2547,7 +2574,7 @@ def oracle_T8(params, key, ans, readings, ctx=None):
 
 
 def oracle_T9(params, key, ans, readings, ctx=None):
-    return {"A": grade_payload(ans, key, readings)}
+    return {"A": grade_payload(ans, key, readings, (ctx or {}).get("extractions"))}
 
 
 def oracle_T10(params, key, ans, readings, ctx=None):
@@ -2666,7 +2693,7 @@ PATHLIB_URL = "https://docs.python.org/3/library/pathlib.html"
 
 
 def oracle_web(params, key, ans, readings, ctx=None):
-    payload = grade_payload(ans, key, readings)
+    payload = grade_payload(ans, key, readings, (ctx or {}).get("extractions"))
     raw = answer_text(ans)
     reasons = set()
     words = {word for _, _, word in iter_words(raw)}
@@ -2730,7 +2757,7 @@ def oracle_T27(params, key, ans, readings, ctx=None):
     if run is None:
         components["B"] = unknown("key_missing")
     else:
-        components["B"] = ok() if run.get("exit") == 0 and run.get("last_line") == summary else fail("acceptance_run")
+        components["B"] = ok() if run.get("exit") == 0 and run.get("last_line") == key["summary"] else fail("acceptance_run")
     return components
 
 
@@ -3559,8 +3586,8 @@ def list_processes(since_epoch):
             continue
         if started >= since_epoch:
             found.append({"start": datetime.datetime.fromtimestamp(started, datetime.timezone.utc)
-                          .strftime("%Y-%m-%dT%H:%M:%SZ"), "comm": comm, "ppid": int(fields[1])})
-    return sorted(found, key=lambda entry: (entry["start"], entry["comm"], entry["ppid"]))
+                          .strftime("%Y-%m-%dT%H:%M:%SZ"), "comm": comm, "ppid": int(fields[1]), "pid": int(name)})
+    return sorted(found, key=lambda entry: (entry["start"], entry["comm"], entry["ppid"], entry["pid"]))
 
 
 def _export_paths(repo, rev, paths, destination):

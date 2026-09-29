@@ -2,11 +2,12 @@
 """Independent frozen-check grader for the #381 token E2E (unit U9): the command line.
 
 A local integration tool, not upstream acceptance and not a model run. Standard library only, Python 3.11+.
-This revision provides `spec`, `bind`, `keys` and `capture`, and the regeneration check that opens `grade`
-(the evidence grading itself, `identity`, `judge` and the rest follow in later stages).
+This revision provides `spec`, `bind`, `keys`, `capture`, `identity`, `grade` and `regrade` (the judge, controls,
+differential, export and check-html subcommands follow in the last stage).
 
-Exit status: 0 done, 1 not passing (reserved for grading), 2 a refusal: `E_CODE field=value ...` on the first
-line of stderr and nothing on stdout, with field names and never a private value.
+Exit status: 0 done (for `grade` and `regrade`: G-Q, M7, every M8 lane and M12 pass), 1 graded and not passing
+(judgments pending included), 2 a refusal: `E_CODE field=value ...` on the first line of stderr and nothing on
+stdout, with field names and never a private value. An unexpected exception is `E_INTERNAL stage=<command>`, exit 2.
 
 Private files (the spec, the bindings, keys and captures) are written create-only with mode 0600 and are refused
 inside any git work tree, following design R22. Sources: repair-u9.design.md b3, R10, R12, R13, R19, R20, R22.
@@ -23,6 +24,7 @@ import tempfile
 import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import evidence as ev  # noqa: E402
 import frozen_checks as fc  # noqa: E402
 
 BINDINGS_SCHEMA = "token-e2e-run-bindings/1"
@@ -71,9 +73,37 @@ def build_parser():
     capture.add_argument("--family", choices=["claude", "codex"])
     capture.add_argument("--arm")
     capture.add_argument("--out-dir", required=True)
-    grade = sub.add_parser("grade", help="grade the retained evidence (this revision: the spec check only)")
+    identity = sub.add_parser("identity", help="build the run identity table from the recorded launches")
+    identity.add_argument("--spec", required=True)
+    identity.add_argument("--bindings", required=True)
+    identity.add_argument("--launch-records", required=True, help="launch records of the main, strict, Agent-path and team rows")
+    identity.add_argument("--codex-rows", help="U10's identity-rows.codex.json")
+    identity.add_argument("--out", required=True, help="new private table (create-only, mode 0600)")
+    grade = sub.add_parser("grade", help="grade the retained evidence into a private table and an ID-free aggregate")
     grade.add_argument("--spec", required=True)
     grade.add_argument("--repo", required=True, help="checkout used to regenerate the spec (R20)")
+    # The inputs below are checked after the regeneration check, so a hand-edited spec is refused first.
+    grade.add_argument("--bindings")
+    grade.add_argument("--identity-table")
+    grade.add_argument("--keys")
+    grade.add_argument("--captures", help="directory of the capture command's files")
+    grade.add_argument("--join-ledger", action="append", default=[], metavar="FAMILY=FILE",
+                       help="U4's private join ledger of one family window (claude, codex)")
+    grade.add_argument("--adoption-report", action="append", default=[], metavar="FAMILY=FILE",
+                       help="U4's adoption report of that window (its m12_inputs cross-check U9's sums)")
+    grade.add_argument("--run-mode", action="append", default=[], metavar="ARM=FILE",
+                       help="U2's run-mode output of a Claude arm's Workflow run")
+    grade.add_argument("--call-ledger", action="append", default=[], help="U2's private call ledger (JSONL, repeatable)")
+    grade.add_argument("--codex-events-dir", help="directory of <identity>.events.jsonl (default: E2E_DIR)")
+    grade.add_argument("--codex-driver", help="U10's codex-driver directory (ledger.jsonl and attempts/)")
+    grade.add_argument("--judgments", help="retained judgments (JSONL); none leaves every D clause pending")
+    grade.add_argument("--out-private", help="new private directory for the table and the collected records")
+    grade.add_argument("--out", help="new aggregate file (create-only, mode 0600)")
+    regrade = sub.add_parser("regrade", help="repeat the grading from a private directory alone")
+    regrade.add_argument("--from", dest="source", required=True, help="the private directory a grade run wrote")
+    regrade.add_argument("--judgments", help="judgments to apply instead of the retained ones")
+    regrade.add_argument("--out-private", required=True)
+    regrade.add_argument("--out", required=True)
     return parser
 
 
@@ -162,8 +192,13 @@ def spec_bytes(repo, commit):
     if block["registry_sha256"] != fc.registry_sha256():
         raise fc.Refusal("E_GRADING_BLOCK", field="registry_sha256")
     dropped = block["dropped_tasks"]
+    frozen = document.get("thresholds") or {}
+    thresholds = {"minimum_arm_b_opportunities": document.get("minimum_arm_b_opportunities")}
+    for name in ("M7", "M8", "M12", "G-Q"):
+        thresholds[name] = (frozen.get(name) or {}).get("criteria")
     spec = {
         "schema": SPEC_SCHEMA,
+        "thresholds": thresholds,
         "preregistration": {"sha256": fc.sha256_hex(prereg), "commit": commit, "bytes": len(prereg)},
         "seal": {"amendment": number, "sha256": rows["preregistration.json"]},
         "grading_block": {"sha256": fc.sha256_hex(fc.canonical(block)), "grammar": block["grammar"],
@@ -386,7 +421,8 @@ def cmd_keys(args):
                            fc.GitSources(args.repo, spec["preregistration"]["commit"]), inputs, memory, qmd, bindings)
     document = {"schema": KEYS_SCHEMA, "exec_rev": bindings["exec_rev"], "spec_sha256": fc.sha256_hex(spec_data),
                 "bindings_sha256": fc.sha256_hex(bindings_data), "keys": keys}
-    fc.private_create(args.out, fc.canonical(document))
+    # Not the canonical (key-sorted) form: a key's records keep the field order of their source, which R2-02 compares.
+    fc.private_create(args.out, json.dumps(document, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
     return 0
 
 
@@ -471,8 +507,8 @@ def capture_arm(args, spec, bindings):
 
 def _capture_arm(args, spec, bindings, token, home):
     arm_env, plain_env, prefix, conditions = _conditions(bindings, args.family, args.arm, token, home)
-    name = f"arm-{args.arm}-{args.phase}.json"
-    pre_name = f"arm-{args.arm}-pre-arm.json"
+    name = f"arm-{args.family}-{args.arm}-{args.phase}.json"
+    pre_name = f"arm-{args.family}-{args.arm}-pre-arm.json"
     pre = None
     if args.phase == "post-arm":
         pre_path = os.path.join(args.out_dir, pre_name)
@@ -482,6 +518,7 @@ def _capture_arm(args, spec, bindings, token, home):
     started = fc.utc_now()
     record = {"phase": args.phase, "family": args.family, "arm": args.arm, "started_at": started, "t0": {},
               "trees": {}}
+    # One file per family, arm and phase: Claude and Codex both have an arm B and `grade` reads one directory.
     for task in _arm_tasks(spec, "T0", args.family, args.arm):
         tree = _tree_for(bindings, args.family, args.arm, task["id"])
         if tree is None or not os.path.isdir(tree):
@@ -572,15 +609,183 @@ def cmd_capture(args):
     return 0
 
 
-# ---- grade (this revision: the regeneration check that opens it, R20) -------------------------------------------
+# ---- identity (R19) ---------------------------------------------------------------------------------------------
+
+def cmd_identity(args):
+    refuse_output(args.out)
+    spec, _ = load_spec(args.spec)
+    bindings = load_bindings(args.bindings)
+    launches = load_json(args.launch_records, "launch_records", "E_IDENTITY_SOURCE")
+    codex = load_json(args.codex_rows, "codex_rows", "E_IDENTITY_SOURCE") if args.codex_rows else None
+    table, counts = ev.build_identity_table(spec, bindings, os.environ.get("RUN_TOKEN", ""), launches, codex)
+    validator = "absent"
+    try:
+        answer = ev.bridge({"op": "validate_identity", "table": table, "options": {}})
+        validator = "agrees" if answer.get("available") and answer.get("ok") else "absent"
+        if answer.get("available") and not answer.get("ok"):
+            raise fc.Refusal("E_IDENTITY_INVALID", code=str(answer.get("code") or "E_ROW"))
+    except fc.Refusal as stop:
+        if stop.code == "E_IDENTITY_INVALID":
+            raise
+        validator = "unchecked"
+    fc.private_create(args.out, fc.canonical(table))
+    by_actor = {}
+    for row in table["rows"]:
+        by_actor[row["actor"]] = by_actor.get(row["actor"], 0) + 1
+    print(json.dumps(dict(counts, rows=len(table["rows"]), by_actor=dict(sorted(by_actor.items())), u4_validator=validator),
+                     sort_keys=True))
+    return 0
+
+
+# ---- grade and regrade (R3-R6, R14-R18, R22) --------------------------------------------------------------------
+
+PRIVATE_FILES = ("spec.json", "keys.json", "bindings.json", "identity-table.json", "captures.json", "judgments.jsonl")
+CONTEXT_SCHEMA = "token-e2e-grade-context/1"
+
+
+def make_private_dir(path):
+    issue = fc.private_path_issue(path)
+    if issue:
+        raise fc.Refusal("E_PATH", reason=issue)
+    try:
+        os.mkdir(path, 0o700)
+    except OSError:
+        raise fc.Refusal("E_PATH", reason="unwritable") from None
+
+
+def _pairs(items, allowed, flag):
+    found = {}
+    for item in items:
+        name, sep, path = item.partition("=")
+        if not sep or name not in allowed or name in found:
+            raise fc.Refusal("E_ARGS", field=flag)
+        found[name] = path
+    return found
+
+
+def _read_lines(path, field):
+    rows, errors = ev.read_jsonl(path)
+    if rows is None or errors:
+        raise fc.Refusal("E_ARGS", field=field)
+    return rows
+
+
+def _load_captures(directory):
+    captures = {}
+    if directory:
+        for name in sorted(os.listdir(directory)):
+            if name.endswith(".json"):
+                document = ev.read_json(os.path.join(directory, name))
+                if isinstance(document, dict):
+                    captures[name] = document
+    return captures
+
+
+def _load_judgments(rows):
+    return {(item["identity"], item["actor"], item.get("run_index", 0)): item for item in rows
+            if isinstance(item, dict) and "identity" in item and "actor" in item}
+
+
+def _jsonl(rows):
+    return "".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n" for row in rows).encode("utf-8")
+
+
+def _finish(spec, keys, bindings, table, records, captures, judgments, meta, out_private, out, copies):
+    """Evaluate, run the canary, then write; nothing is written when a check refuses (R22)."""
+    rows, aggregate = ev.evaluate(spec, keys, bindings, records, captures, judgments, meta=meta)
+    aggregate["privacy"]["canary_values_checked"] = ev.assert_no_private(aggregate, ev.canary_values(bindings, table, records))
+    make_private_dir(out_private)
+    files = dict(copies)
+    files["grades.jsonl"] = _jsonl(rows)
+    files["evidence.jsonl"] = _jsonl(records)
+    files["context.json"] = fc.canonical({"schema": CONTEXT_SCHEMA, "meta": meta,
+                                          "files": {name: fc.sha256_hex(data) for name, data in sorted(copies.items())}})
+    for name in sorted(files):
+        fc.private_create(os.path.join(out_private, name), files[name])
+    fc.private_create(out, fc.canonical(aggregate))
+    summary = ev.exit_status(aggregate)
+    print(json.dumps({"g_q": aggregate["g_q"]["status"], "m7": aggregate["m7"]["status"],
+                      "m8": {lane: item["status"] for lane, item in sorted(aggregate["m8"].items())},
+                      "m12": aggregate["m12"]["status"], "exit": summary}, sort_keys=True))
+    return summary
+
 
 def cmd_grade(args):
     if not spec_matches(args.spec, args.repo):
         raise fc.Refusal("E_SPEC_MISMATCH")
-    raise fc.Refusal("E_STAGE", reason="grade_not_built")
+    for flag in ("bindings", "identity_table", "keys", "out_private", "out"):
+        if getattr(args, flag) is None:
+            raise fc.Refusal("E_ARGS", field=flag)
+    refuse_output(args.out)
+    refuse_output(args.out_private)
+    spec, spec_data = load_spec(args.spec)
+    bindings = load_bindings(args.bindings)
+    bindings_data = read_file(args.bindings, "schema")
+    keys = load_json(args.keys, "keys", "E_KEYS_MISMATCH")
+    keys_data = read_file(args.keys, "keys", "E_KEYS_MISMATCH")
+    if keys.get("spec_sha256") != fc.sha256_hex(spec_data) or keys.get("bindings_sha256") != fc.sha256_hex(bindings_data):
+        raise fc.Refusal("E_KEYS_MISMATCH")
+    table_data = read_file(args.identity_table, "identity_table", "E_ARGS")
+    table = load_json(args.identity_table, "identity_table", "E_ARGS")
+    joins = {}
+    for family, path in _pairs(args.join_ledger, ("claude", "codex"), "join_ledger").items():
+        joins[family] = {(row["identity"], row["actor"]): row for row in _read_lines(path, "join_ledger")
+                         if isinstance(row, dict) and "identity" in row and "actor" in row}
+    run_mode = {}
+    for arm, path in _pairs(args.run_mode, CLAUDE_ARMS, "run_mode").items():
+        document = load_json(path, "run_mode", "E_ARGS")
+        run_mode[arm] = document.get("children") if isinstance(document.get("children"), list) else []
+    ledger = []
+    for path in args.call_ledger:
+        ledger.extend(_read_lines(path, "call_ledger"))
+    captures = _load_captures(args.captures)
+    sources = {"join": joins, "run_mode": run_mode, "call_ledger": ledger, "events_dir": args.codex_events_dir,
+               "driver_dir": args.codex_driver}
+    judgment_rows = _read_lines(args.judgments, "judgments") if args.judgments else []
+    records = ev.collect(spec, bindings, keys, table, sources, captures)
+    reports = {}
+    for family, path in _pairs(args.adoption_report, ("claude", "codex"), "adoption_report").items():
+        reports[family] = load_json(path, "adoption_report", "E_ARGS")
+    if "claude" in reports and isinstance(reports["claude"].get("m12_inputs"), dict):
+        ev.m12_cross_check(ev.m12_sums(records), reports["claude"]["m12_inputs"])
+    meta = {"spec_sha256": fc.sha256_hex(spec_data), "bindings_sha256": fc.sha256_hex(bindings_data),
+            "keys_sha256": fc.sha256_hex(keys_data)}
+    copies = {"spec.json": spec_data, "keys.json": keys_data, "bindings.json": bindings_data,
+              "identity-table.json": table_data, "captures.json": fc.canonical(captures),
+              "judgments.jsonl": _jsonl(judgment_rows)}
+    return _finish(spec, keys, bindings, table, records, captures, _load_judgments(judgment_rows), meta, args.out_private,
+                   args.out, copies)
 
 
-HANDLERS = {"spec": cmd_spec, "bind": cmd_bind, "keys": cmd_keys, "capture": cmd_capture, "grade": cmd_grade}
+def cmd_regrade(args):
+    refuse_output(args.out)
+    refuse_output(args.out_private)
+    source = args.source
+    context = load_json(os.path.join(source, "context.json"), "context", "E_REGRADE")
+    if context.get("schema") != CONTEXT_SCHEMA:
+        raise fc.Refusal("E_REGRADE", field="schema")
+    copies = {}
+    for name in PRIVATE_FILES:
+        copies[name] = read_file(os.path.join(source, name), name, "E_REGRADE")
+        if fc.sha256_hex(copies[name]) != (context.get("files") or {}).get(name):
+            raise fc.Refusal("E_REGRADE", field="digest")
+    spec, keys, bindings = (json.loads(copies[name].decode("utf-8")) for name in ("spec.json", "keys.json", "bindings.json"))
+    table = json.loads(copies["identity-table.json"].decode("utf-8"))
+    captures = json.loads(copies["captures.json"].decode("utf-8"))
+    records, errors = ev.read_jsonl(os.path.join(source, "evidence.jsonl"))
+    if records is None or errors:
+        raise fc.Refusal("E_REGRADE", field="evidence")
+    if args.judgments:
+        judgment_rows = _read_lines(args.judgments, "judgments")
+        copies["judgments.jsonl"] = _jsonl(judgment_rows)
+    else:
+        judgment_rows, _ = ev.read_jsonl(os.path.join(source, "judgments.jsonl"))
+    return _finish(spec, keys, bindings, table, records, captures, _load_judgments(judgment_rows or []), context["meta"],
+                   args.out_private, args.out, copies)
+
+
+HANDLERS = {"spec": cmd_spec, "bind": cmd_bind, "keys": cmd_keys, "capture": cmd_capture, "grade": cmd_grade,
+            "identity": cmd_identity, "regrade": cmd_regrade}
 
 
 def main(argv=None):
