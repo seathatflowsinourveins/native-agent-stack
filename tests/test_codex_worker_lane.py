@@ -2120,6 +2120,33 @@ class CodexIntegrationTests(unittest.TestCase):
             self.assertEqual((host.codex_home / name).read_bytes(), data, name)
         self.assertFalse((host.codex_home / "stack-worker.config.toml").exists())
 
+    def test_the_doctor_reader_accepts_the_shipped_roles_and_flags_a_malformed_one(self):
+        # The parser of the installer's rehearsal against the real binary: `codex doctor --json` in a scratch home
+        # exits 1 (auth.credentials fails without a sign-in) and still prints config.load. The two shipped carriers
+        # add no startup warning; a role file without developer_instructions adds exactly one, "Ignoring malformed
+        # agent role definition", so the same reader gives ok for the first and problem for the second.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            env = self.gateway_home(root, "")
+            codex_home, cwd = Path(env["CODEX_HOME"]), root / "cwd"
+            wrapper = lane.bwrap_wrapper(root)
+            reports = {"none": lane.run_doctor(shutil.which("codex"), env, wrapper, cwd)}
+            agents = codex_home / "agents"
+            agents.mkdir(mode=0o700)
+            for name in ROLE_NAMES:
+                shutil.copy(ROLES_SOURCE_DIR / name, agents / name)
+            reports["shipped"] = lane.run_doctor(shutil.which("codex"), env, wrapper, cwd)
+            (agents / ROLE_NAMES[1]).write_text('name = "stack-verifier"\ndescription = "no developer_instructions"\n')
+            reports["malformed"] = lane.run_doctor(shutil.which("codex"), env, wrapper, cwd)
+        for label, stdout in reports.items():
+            self.assertIsNotNone(lane.doctor_config_load(stdout), f"{label}: no config.load in the report")
+        shipped = lane.doctor_role_state(reports["none"], reports["shipped"])
+        self.assertEqual(shipped, {"state": "ok", "startup_warnings_before": 0, "startup_warnings_after": 0,
+                                   "role_warnings": 0, "redacted": 0, "load_failed": False})
+        malformed = lane.doctor_role_state(reports["none"], reports["malformed"])
+        self.assertEqual(malformed, {"state": "problem", "startup_warnings_before": 0, "startup_warnings_after": 1,
+                                     "role_warnings": 1, "redacted": 0, "load_failed": False})
+
     def test_a_project_config_outranks_the_profile_but_not_the_pinned_flags(self):
         # The multi_agent_mode sentence tells the efforts apart: ultra delegates proactively, max does not.
         with tempfile.TemporaryDirectory() as tmp:
