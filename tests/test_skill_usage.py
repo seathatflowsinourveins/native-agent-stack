@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import collections
 import contextlib
+import importlib.util
 import io
 import json
 import os
@@ -354,9 +355,40 @@ class ManifestAndLock(unittest.TestCase):
         path = S.skill_lock_path(home="/home/example", environment={"XDG_STATE_HOME": "/xdg-state"})
         self.assertEqual(path, Path("/xdg-state/skills/.skill-lock.json"))
 
-    def test_skill_lock_path_relative_xdg_state_home_is_ignored(self):
-        path = S.skill_lock_path(home="/home/example", environment={"XDG_STATE_HOME": "relative/dir"})
-        self.assertEqual(path, Path("/home/example/.agents/.skill-lock.json"))
+    def test_skill_lock_path_takes_any_non_empty_xdg_state_home_as_the_cli_does(self):
+        # skills 1.7.0 (npm dist/cli.mjs L3746-3750) uses any non-empty XDG_STATE_HOME, untrimmed, relative or not,
+        # through path.join; it does not apply the XDG Base Directory spec's absolute-path rule. Empty is unset.
+        for value, expected in (("relative/dir", "relative/dir/skills/.skill-lock.json"),
+                                (" ", " /skills/.skill-lock.json"),
+                                ("", "/users/example/.agents/.skill-lock.json")):
+            with self.subTest(xdg_state_home=value):
+                path = S.skill_lock_path(home="/users/example", environment={"XDG_STATE_HOME": value})
+                self.assertEqual(path, Path(expected))
+
+    def test_skill_lock_path_is_joined_as_the_cli_path_join_joins_it(self):
+        # path.join collapses "." and ".." lexically and a leading // to /; pathlib keeps the "..", which through a
+        # missing or symlinked folder names another file than the one the CLI wrote.
+        cases = (({"XDG_STATE_HOME": "/x/missing/../state"}, None, "/x/state/skills/.skill-lock.json"),
+                 ({"XDG_STATE_HOME": "//x/./state"}, None, "/x/state/skills/.skill-lock.json"),
+                 ({}, "/users/missing/../example", "/users/example/.agents/.skill-lock.json"),
+                 ({"HOME": "//users/missing/../example"}, None, "/users/example/.agents/.skill-lock.json"))
+        for environment, home, expected in cases:
+            with self.subTest(environment=environment, home=home):
+                self.assertEqual(S.skill_lock_path(home=home, environment=environment), Path(expected))
+
+    def test_skill_lock_path_agrees_with_install_skills(self):
+        # One join serves both tools: skill_usage.node_path_join is install_skills.py's.
+        spec = importlib.util.spec_from_file_location("install_skills_for_usage_tests",
+                                                      ROOT / "tools" / "adoption" / "install_skills.py")
+        installer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(installer)
+        home = "/users/missing/../example"
+        for environment in ({}, {"XDG_STATE_HOME": "rel/../state"}, {"XDG_STATE_HOME": "//x/missing/../state"}):
+            with self.subTest(environment=environment), mock.patch.dict(os.environ, environment):
+                if not environment:
+                    os.environ.pop("XDG_STATE_HOME", None)
+                self.assertEqual(S.skill_lock_path(home=home, environment=environment),
+                                 installer.lock_file_path(Path(home)))
 
     def test_skill_lock_path_home_fallback(self):
         path = S.skill_lock_path(home="/home/example", environment={})
