@@ -335,8 +335,9 @@ stay out through `.git/info/exclude`. The driver then:
 6. requires the commit's diff to equal the validated patch byte for byte. A hunk
    that `git apply` placed at an offset refuses here (`commit_patch_mismatch`);
 7. runs `next_branch` again, and reads the rules again if the name changed;
-8. pushes through `GhHarness.push`, then `open_pull_request` opens the draft with
-   one lane label and reads it back.
+8. pushes through `GhHarness.push`, then `create_pull_request` opens the draft with
+   one lane label. The driver records the PR number at once, and
+   `confirm_pull_request` reads the PR back.
 
 Each GitHub write (push, `pr_create`, `review`, `pr_comment`) is journaled with its
 operation name and the exit status of gh or git (`GhHarness.writes`). That is the
@@ -386,9 +387,16 @@ exit status (`resolver_exit`):
 | --- | --- |
 | 0 | The draft PR is open and its one review loop completed |
 | 1 | No PR: an empty or refused patch, refused text, or an agent that did not finish |
-| 3 | A setup, gate, probe or host-step failure, or a same-day retry |
+| 3 | A setup, gate, probe or host-step failure before `pr create` succeeded, or a same-day retry |
 | 4 | The issue was refused |
-| 5 | The draft PR is open, but the review loop stopped (for example `pr_head_moved`) |
+| 5 | A PR is open, but its review loop stopped or never started (for example `pr_head_moved`, or a read-back that failed as the PR opened) |
+
+Once `gh pr create` exits 0, GitHub holds a PR, so the exit is 0 or 5 and never 3
+(`pr_created`). The driver records the PR number before the read-back, so the receipt
+names the PR whenever gh printed its URL. When gh's output could not be parsed, the
+receipt has no number, but its journal shows the `pr_create` write with exit 0: find
+the PR on the branch before any rerun, because a rerun opens a second PR on the next
+free branch name.
 
 ### Deviations from the brief and the plan
 

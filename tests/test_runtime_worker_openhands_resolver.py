@@ -3294,6 +3294,16 @@ class ResolverGitHub(ScriptedGitHub):
         return [word for argv in self.seen for word in argv]
 
 
+class ReadBackFails(ResolverGitHub):
+    """ResolverGitHub whose `gh pr view` fails, as a transient API error right after `pr create` would."""
+
+    def __call__(self, args, **kwargs):
+        if list(args[1:3]) == ["pr", "view"]:
+            self.seen.append(list(args[1:]))
+            return completed(args, "", 1, "HTTP 502: Bad Gateway\n")
+        return super().__call__(args, **kwargs)
+
+
 class ResolverAttemptTests(unittest.TestCase):
     """resolver.ResolverAttempt.finish: validate, guard, apply, commit, push and open (local git, scripted GitHub)."""
 
@@ -3460,8 +3470,38 @@ class ResolverAttemptTests(unittest.TestCase):
         patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
         github = MovesOnCreate(base=self.base)
         outcome = self.attempt(github).finish(self.result_for("moved"), patch_text=patch, final_message=FINAL_MESSAGE)
+        # Review item D1: the PR exists, so the outcome says so (pr_opened) along with the stop.
         self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"], outcome["pr"]),
-                         (None, "pr", ["pr_head_moved"], 34))
+                         ("pr_opened", "pr", ["pr_head_moved"], 34))
+
+    def test_a_pr_github_holds_is_recorded_whatever_stops_after_pr_create(self):
+        # Review item D1: once `gh pr create` exits 0, GitHub holds a PR. Its number is recorded
+        # before the read-back, and a stop from there on exits 5 (a PR open, its loop stopped),
+        # never 3, so the receipt never reads as a host failure that invites a second PR.
+        class NotDraft(ResolverGitHub):
+            def __call__(self, args, **kwargs):
+                if list(args[1:3]) == ["pr", "view"]:
+                    self.state["isDraft"] = False
+                return super().__call__(args, **kwargs)
+
+        class Unparseable(ResolverGitHub):
+            def __call__(self, args, **kwargs):
+                answer = super().__call__(args, **kwargs)
+                return completed(args, "created\n") if list(args[1:3]) == ["pr", "create"] else answer
+
+        patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
+        for github, status, reason, pr in ((ReadBackFails(base=self.base), "pr_opened", "pr_view_failed", 34),
+                                           (NotDraft(base=self.base), "pr_opened", "pr_not_draft", 34),
+                                           (Unparseable(base=self.base), None, "pr_create_unparseable", None)):
+            with self.subTest(reason=reason):
+                outcome = self.attempt(github).finish(self.result_for(reason.replace("_", "-")), patch_text=patch,
+                                                      final_message=FINAL_MESSAGE)
+                self.assertEqual((outcome["status"], outcome["failure_stage"], outcome["reasons"], outcome.get("pr")),
+                                 (status, "pr", [reason], pr))
+                self.assertEqual(outcome["writes"], [{"op": "push", "exit_code": 0}, {"op": "pr_create", "exit_code": 0}])
+                section = {"status": outcome["status"], "pr": outcome.get("pr"), "reasons": outcome["reasons"],
+                           "writes": outcome["writes"], "review": {"status": "stopped", "reason": reason}}
+                self.assertEqual(self.r.resolver_exit({"failure_stage": "pr", "resolver": section}), 5)
 
     def test_an_interrupt_inside_the_driver_is_recorded_with_its_writes(self):
         patch = self.patch_for({"docs/a.md": "a\nnew line\n"})
@@ -3499,7 +3539,13 @@ class ResolverAttemptTests(unittest.TestCase):
         self.assertEqual(exit_code(receipt(status="pr_opened")), 5)
         for status in ("patch_empty", "patch_refused", "text_refused", "agent_not_finished"):
             self.assertEqual(exit_code(receipt(status=status, review=completed_review)), 1)
-        self.assertEqual(exit_code({**receipt(status="pr_opened", review=completed_review), "failure_stage": "push"}), 3)
+        # Review item D1: once GitHub holds a PR, a recorded failure stage no longer reads as a
+        # host failure: the exit is 5, and it is 5 too when only the journal shows `pr create` exit 0.
+        self.assertEqual(exit_code({**receipt(status="pr_opened", review=completed_review), "failure_stage": "pr"}), 5)
+        created = [{"op": "push", "exit_code": 0}, {"op": "pr_create", "exit_code": 0}]
+        self.assertEqual(exit_code({**receipt(writes=created), "failure_stage": "pr"}), 5)
+        self.assertEqual(exit_code({**receipt(writes=created[:1] + [{"op": "pr_create", "exit_code": 1}]),
+                                    "failure_stage": "pr"}), 3)
         self.assertEqual(exit_code(receipt()), 3)
         self.assertEqual(exit_code({"failure_stage": None}), 3)
         # A claimed pass, complete evidence or a grader verdict never counts.
@@ -3712,6 +3758,23 @@ class ResolverRunTests(unittest.TestCase):
                          ("pr_opened", "stopped", "pr_head_moved"))
         self.assertEqual([write["op"] for write in section["writes"]], ["push", "pr_create"])
         self.assertEqual((github.reviews, github.comments), ([], []))
+
+    def test_end_to_end_a_failed_read_back_as_the_pr_opens_records_the_pr_and_exits_5(self):
+        # Review item D1 end to end: the receipt names the PR that GitHub holds, the review loop
+        # never starts (no review, no residuals comment), and the run exits 5, not 3.
+        github = ReadBackFails(base=self.base, checks=[(0, check_list("pass"), "")] * 2)
+        with mock.patch.object(self.r.ReviewLoop, "run") as loop:
+            code, printed, _ = self.run_cli(github, edits={"docs/a.md": "a\nnew line\n"})
+        self.assertEqual(code, 5, printed)
+        loop.assert_not_called()
+        receipt = self.receipt(printed)
+        section = receipt["resolver"]
+        self.assertEqual((receipt["failure_stage"], section["status"], section["pr"], section["reasons"]),
+                         ("pr", "pr_opened", 34, ["pr_view_failed"]))
+        self.assertEqual((section["review"]["status"], section["review"]["reason"]), ("stopped", "pr_view_failed"))
+        self.assertEqual([write["op"] for write in section["writes"]], ["push", "pr_create"])
+        self.assertEqual((github.reviews, github.comments), ([], []))
+        self.assertEqual((printed["pr"], printed["exit"]), (34, 5))
 
     def test_end_to_end_gate_refusal_starts_no_container(self):
         github = ResolverGitHub(base=self.base)

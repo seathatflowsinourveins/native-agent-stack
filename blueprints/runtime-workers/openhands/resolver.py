@@ -661,22 +661,36 @@ def check_read_back(view, *, number, branch, lane, body=None, head=None):
     return view
 
 
-def open_pull_request(harness, guard, receipt, *, branch):
-    """Plan step 9: one draft PR with one lane label, its body approved by the guard, then read back."""
-    lane = receipt["lane"]
+def create_pull_request(harness, guard, receipt, *, branch):
+    """Plan step 9's write: one draft PR with one lane label, its body approved by the guard.
+
+    Returns the PR number and the body. From a zero exit on, GitHub holds the PR, so a caller
+    records the number before anything else can stop it (review item D1).
+    """
     body = build_pr_body(receipt, guard=guard)
     body_file = guard.register(body, name="pr-body")
     title = pr_title(receipt["issue"]["number"], receipt["issue"]["title"])
-    created = harness.run(gh_harness.op_pr_create(branch, title, body_file, lane))
+    created = harness.run(gh_harness.op_pr_create(branch, title, body_file, receipt["lane"]))
     if created.returncode != 0:
         raise LoopStopped("pr_create_failed")
     found = PR_URL.fullmatch(created.stdout.strip())  # gh prints the URL (create.go:1146 at 0cf10924)
     if not found:
         raise LoopStopped("pr_create_unparseable")
-    number = int(found.group(1))
+    return int(found.group(1)), body
+
+
+def confirm_pull_request(harness, receipt, *, number, branch, body):
+    """Plan step 9's read-back of the PR just created (acceptance A1 and A6)."""
+    lane = receipt["lane"]
     view = check_read_back(read_back(harness, number), number=number, branch=branch, lane=lane, body=body)
     return {"number": number, "url": view.get("url"), "head": view["headRefOid"], "branch": branch, "lane": lane,
             "base": receipt["base_sha"]}
+
+
+def open_pull_request(harness, guard, receipt, *, branch):
+    """Plan step 9: one draft PR with one lane label, its body approved by the guard, then read back."""
+    number, body = create_pull_request(harness, guard, receipt, branch=branch)
+    return confirm_pull_request(harness, receipt, number=number, branch=branch, body=body)
 
 
 CHECK_BUCKETS = {"pass", "fail", "pending", "skipping", "cancel"}  # checks.go:70-71 at 0cf10924
@@ -1381,11 +1395,13 @@ class ResolverAttempt:
                 raise LoopStopped("push_failed")
             outcome.update(branch=branch, head=head)
             stage = "pr"
-            self.pr = open_pull_request(self.harness, self.guard, receipt, branch=branch)
-            outcome["pr"] = self.pr["number"]  # recorded even if the head check below stops
+            number, body = create_pull_request(self.harness, self.guard, receipt, branch=branch)
+            # Review item D1: GitHub holds the PR from here on. Its number and status are recorded
+            # before the read-back, so a stop below keeps them beside its reason (resolver_exit: 5).
+            outcome.update(status="pr_opened", pr=number)
+            self.pr = confirm_pull_request(self.harness, receipt, number=number, branch=branch, body=body)
             if self.pr["head"] != head:
                 raise LoopStopped("pr_head_moved")
-            outcome["status"] = "pr_opened"
         except (LoopStopped, gh_harness.HarnessRefused, BranchLookupFailed, BranchesExhausted) as stopped:
             outcome.update(failure_stage=stage, reasons=[getattr(stopped, "reason", type(stopped).__name__.lower())])
         except outgoing_guard.GuardRefused as refused:
@@ -1451,23 +1467,36 @@ def review_summary(loop_outcome=None, *, status, reason=None):
     return summary
 
 
+def pr_created(section):
+    """True once GitHub holds a PR for the attempt: the outcome says pr_opened, or the write
+    journal shows `pr create` with exit 0, even when its output could not be parsed (review
+    item D1). Both are host-written (receipt.resolver_summary)."""
+    writes = section.get("writes") if isinstance(section.get("writes"), list) else []
+    return section.get("status") == "pr_opened" or any(
+        isinstance(write, dict) and write.get("op") == "pr_create" and write.get("exit_code") == 0 for write in writes)
+
+
 def resolver_exit(receipt):
     """The run's exit status, from host-observed results only (RESOLVER.md "Exit status").
 
-    0: the draft PR is open and its one review loop completed; 5: the PR is open but the
-    loop stopped; 1: an attempt that ends without a PR (empty or refused patch, refused
-    text, or an agent that did not finish); 3: any setup, gate or host-step failure.
-    task_passed and evidence_complete never set it: resolver mode has no task verdict,
-    and no model-writable file is read (receipt.resolver_summary).
+    0: the draft PR is open and its one review loop completed; 5: a PR is open but its loop
+    stopped or never started; 1: an attempt that ends without a PR (empty or refused patch,
+    refused text, or an agent that did not finish); 3: any setup, gate or host-step failure
+    before `pr create` succeeded. Review item D1: once GitHub holds a PR (pr_created), the
+    exit is 0 or 5, never 3, so a stop at or after `pr create` never reads as a host failure
+    that invites a rerun and a second PR. task_passed and evidence_complete never set it:
+    resolver mode has no task verdict, and no model-writable file is read.
     """
     section = receipt.get("resolver") if isinstance(receipt, dict) else None
-    if receipt.get("failure_stage") or not isinstance(section, dict):
+    if not isinstance(section, dict):
         return 3
-    status = section.get("status")
-    if status == "pr_opened":
+    if pr_created(section):
         review = section.get("review") or {}
-        return 0 if review.get("status") == "completed" else 5
-    if status in {"patch_empty", "patch_refused", "text_refused", "agent_not_finished"}:
+        return 0 if (not receipt.get("failure_stage") and section.get("status") == "pr_opened"
+                     and review.get("status") == "completed") else 5
+    if receipt.get("failure_stage"):
+        return 3
+    if section.get("status") in {"patch_empty", "patch_refused", "text_refused", "agent_not_finished"}:
         return 1
     return 3
 
@@ -1614,7 +1643,15 @@ def _cmd_run(args, *, runner=subprocess.run, clock=time.monotonic, sleep=time.sl
         return 3
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     review = review_summary(status="not_run")
-    if isinstance(receipt.get("resolver"), dict) and receipt["resolver"].get("status") == "pr_opened" and attempt.pr:
+    section = receipt.get("resolver") if isinstance(receipt.get("resolver"), dict) else None
+    if (section is not None and pr_created(section)
+            and (receipt.get("failure_stage") or section.get("status") != "pr_opened" or not attempt.pr)):
+        # Review item D1: GitHub holds a PR, but the driver stopped as it opened it (a failed or
+        # mismatched read-back, a moved head, unparseable output, an interrupt). No review or
+        # residuals comment follows; the receipt keeps the PR and the stop, and the exit is 5.
+        reasons = section.get("reasons") or []
+        review = review_summary(status="stopped", reason=reasons[0] if reasons else "pr_not_confirmed")
+    elif section is not None and section.get("status") == "pr_opened" and attempt.pr:
         workdir = Path(tempfile.mkdtemp(prefix="reviewer-", dir=result))
         env = {"PATH": "/usr/bin:/bin", "HOME": os.environ.get("HOME", pwd.getpwuid(os.getuid()).pw_dir),
                "LANG": "C.UTF-8"}
@@ -1689,7 +1726,8 @@ def build_parser():
         "the plan; then host.run on the O1 topology with the P0-P2 probe, the draft PR from the validated patch, "
         "one review and the residuals comment. The run id is rw-openhands-res-<N>-<UTC yyyymmdd>. Exit 0: PR "
         "opened and its review loop completed; 1: no PR (empty or refused patch or text, or an unfinished "
-        "agent); 3: setup, gate or host-step failure; 4: issue refused; 5: PR opened, loop stopped.")
+        "agent); 3: setup, gate or host-step failure before `pr create` succeeded; 4: issue refused; 5: a PR "
+        "is open, but its loop stopped or never started.")
     run.add_argument("--issue", type=int, required=True)
     run.add_argument("--owned-path", action="append", required=True,
                      help="a path the patch may change; repeatable (plan section 2 step 0)")
