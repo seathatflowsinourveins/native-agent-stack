@@ -2032,6 +2032,35 @@ def has_private_shape(text):
     return False
 
 
+def _slug_shape(text):
+    for marker in ("-home-", "-Users-"):
+        index = text.find(marker)
+        while index >= 0:
+            rest = text[index + len(marker):]
+            if "-" in rest[1:] and rest[:1].isalnum():
+                return True
+            index = text.find(marker, index + 1)
+    return False
+
+
+def id_shape(text):
+    """The identifier shapes of R22 that free text (a judge packet, a generated HTML report) must never hold: a UUID, a
+    tool_use or call id (the prefix and at least eight ASCII letters or digits after it, so `call_id` and `toolu_use` are
+    words, not ids) and the project-slug shape of a home path. A leading '/' is not one: URLs and prose carry it."""
+    if _has_uuid(text) or _slug_shape(text):
+        return True
+    for prefix in ("toolu_", "call_"):
+        start = text.find(prefix)
+        while start >= 0:
+            end = start + len(prefix)
+            while end < len(text) and text[end].isascii() and text[end].isalnum():
+                end += 1
+            if end - start - len(prefix) >= 8 and (start == 0 or not text[start - 1].isalnum()):
+                return True
+            start = text.find(prefix, start + 1)
+    return False
+
+
 def assert_no_private(document, values):
     """R22: refuse (E_PRIVACY, a generic message) when any string of the document holds a gathered value of eight or more
     characters or has a private shape. Returns how many gathered values were checked."""
@@ -2765,17 +2794,17 @@ def _counter(items):
     return dict(sorted(collections.Counter(items).items()))
 
 
-def evaluate(spec, keys, bindings, records, captures, judgments, *, meta=None, join=None):
+def evaluate(spec, keys, bindings, records, captures, judgments, *, meta=None, join=None, controls=None):
     """Grade the collected records: the private rows and the ID-free aggregate (task outcomes per family and arm, G-Q, G-C,
     M7, M8, M11, M12, the alternatives). Pure: the same inputs give the same bytes, and no source file or model is read.
     `join` is {family: [U4 join-ledger rows]} for the families whose ledger was supplied: M8's opportunities follow those
     rows, and the other families' opportunities come from the spec and the records."""
-    rows, aggregate, _ = _evaluate(spec, keys, bindings, records, captures, judgments, meta=meta, join=join)
+    rows, aggregate, _ = _evaluate(spec, keys, bindings, records, captures, judgments, meta=meta, join=join, controls=controls)
     return rows, aggregate
 
 
 def _evaluate(spec, keys, bindings, records, captures, judgments, *, readings=None, with_alternatives=True, cache=None,
-              meta=None, join=None):
+              meta=None, join=None, controls=None):
     decided = spec["readings"]
     readings = dict(decided) if readings is None else readings
     cache = {} if cache is None else cache
@@ -2828,7 +2857,7 @@ def _evaluate(spec, keys, bindings, records, captures, judgments, *, readings=No
             outcomes[(arm, task["id"])] = decide_task(attempts, readings["R2-10"], kind=_kind(task), read_rows=read_rows)
             details[(arm, task["id"])] = {"not_launched": False, "read_rows": read_rows}
     aggregate = _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, by_task, captures, judgments, meta or {},
-                           join)
+                           join, controls)
     if with_alternatives:
         aggregate["alternatives"] = _alternatives(spec, keys, bindings, records, captures, judgments, decided, cache, outcomes, join)
     return rows, aggregate, outcomes
@@ -2916,6 +2945,7 @@ def _lane_opportunities(spec, lane, records, rows, readings, decided, join=None)
 
 
 GRADES_SCHEMA = "token-e2e-grades/1"
+ROUTE_FIELDS = ("calls", "judgments", "refuted", "leaks", "calibration_failed_templates", "unavailable", "usage_recorded")
 
 
 def _verdict_word(text):
@@ -2955,14 +2985,15 @@ def m12_sums(records):
     return sums
 
 
-def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, by_task, captures, judgments, meta, join=None):
+def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, by_task, captures, judgments, meta, join=None,
+               controls=None):
     tasks = spec["tasks"]
     thresholds = spec.get("thresholds") or {}
     aggregate = {"schema": GRADES_SCHEMA, "tool": spec["block"]["tool"],
                  "preregistration": {"sha256": spec["preregistration"]["sha256"], "commit": spec["preregistration"]["commit"]},
                  "grading_block": {"sha256": spec["grading_block"]["sha256"], "grammar": spec["grading_block"]["grammar"],
                                    "readings": readings},
-                 "controls": {"run": False}}
+                 "controls": controls or {"run": False}}
     aggregate.update(meta)
     attempts = {}
     for family, arms in fc.FAMILY_ARMS.items():
@@ -3066,8 +3097,13 @@ def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, 
             discarded += sum(1 for item in (document.get("t0") or {}).values() if isinstance(item, dict) and "discarded" in item)
     aggregate["t0_post_discarded"] = discarded
     counts = collections.Counter(part["status"] for row in rows for part in row["components"] if part["id"] == "D")
+    # Route summaries travel in the judgments beside the per-attempt rows, under the reserved key ("route", name, 0); the
+    # counts here are the ID-free ones (usage totals stay in the private judgments).
+    routes = {key[1]: value for key, value in judgments.items() if key[0] == "route"}
     aggregate["judges"] = {"judged": counts["pass"] + counts["fail"], "pending": counts["pending"],
-                           "unavailable": counts["unknown"], "judgments_supplied": len(judgments)}
+                           "unavailable": counts["unknown"], "judgments_supplied": len(judgments) - len(routes),
+                           "routes": {name: {field: item.get(field) for field in ROUTE_FIELDS}
+                                      for name, item in sorted(routes.items())}}
     aggregate["privacy"] = {"canary_values_checked": 0}
     return aggregate
 
@@ -3104,6 +3140,122 @@ def canary_values(bindings, table, records):
     home = os.path.expanduser("~")
     values.update({home, os.path.basename(home.rstrip("/")), os.environ.get("USER", "")})
     return sorted(value for value in values if len(value) >= 8)
+
+
+# ---- Planted controls (acceptance e5): oracles and carrier checks against answers whose verdict is known ---------------------
+
+CONTROL_BASE = "a" * 40  # a stand-in revision for the builder control: only its shape matters
+
+
+def _verdict(result):
+    return {"status": result.status, "reasons": sorted(result.reasons)}
+
+
+def _control_oracle(entry, readings):
+    """Class A: one template's oracle on a planted answer and its own key, component by component. The oracle is looked up
+    at call time, so a disarmed one shows as a control that landed elsewhere."""
+    if entry["template"] == "T36":
+        parts = {"A": fc.grade_binding(entry["key"], fc.Answer(entry["answer"], tuple(entry["evidence"])))}
+    else:
+        parts = fc.ORACLES[entry["template"]](entry["params"], entry["key"], fc.Answer(entry["answer"], tuple(entry["evidence"])),
+                                              readings, {})
+    return _verdict(parts[entry["component"]])
+
+
+def _control_builder(args):
+    after = args["after"].encode("utf-8")
+    key = {"after_sha256": "0" * 64 if args.get("wrong_key") else fc.sha256_hex(after), "after_bytes": len(after)}
+    record = {"head": CONTROL_BASE if args.get("head") is None else args["head"], "entries": args["entries"],
+              "before_sha256": fc.sha256_hex(args["before"])}
+    observed = args.get("observed") or {"status": "ok", "path": "/prepared"}
+    return _verdict(grade_builder_capture(record, prepared_path="/prepared", prepared_base=CONTROL_BASE, observed=observed,
+                                          exec_rev=CONTROL_BASE, after_bytes=after, key=key))
+
+
+def _control_t14(args, readings):
+    return _verdict(t14_check(args["text"], run_token=args["run_token"], starts=args["starts"], q=args.get("q"),
+                              background_pending=args.get("pending", 0), survivors=list(args.get("survivors", [])),
+                              readings=readings, q_status=args.get("q_status"),
+                              survival_observed=args.get("survival_observed", True)))
+
+
+def _t0_capture(spec):
+    """A capture of the shape `capture_t0` writes, from a compact description (subjects, unittest facts, missing runs)."""
+    runs = []
+    for identity in ("git-log", "git-status", "git-diff", "grep", "ls", "unittest"):
+        if identity in spec.get("missing", ()):
+            continue
+        run = {"id": identity, "exit": 0, "stdout_sha256": "a" * 64, "stderr_sha256": "b" * 64, "start": "2026-10-01T00:00:00Z",
+               "end": "2026-10-01T00:00:01Z", "facts": {}}
+        if identity == "git-log":
+            run["facts"] = {"subjects": list(spec.get("subjects", ["feat: newest"]))}
+        if identity == "unittest":
+            run["facts"] = {"ran": spec.get("ran", 49), "status": spec.get("status", "OK"), "skipped": spec.get("skipped", 0),
+                            "failures": 0, "errors": 0}
+        runs.append(run)
+    return {"tree": {"head": "h1", "status_sha256": "s1"}, "runs": runs}
+
+
+def _control_t0(args, readings, component):
+    arm, plain = _t0_capture(args["arm"]), _t0_capture(args.get("plain", args["arm"]))
+    post_arm = _t0_capture(args.get("post_arm", args["arm"]))
+    post_plain = _t0_capture(args.get("post_plain", args.get("plain", args["arm"])))
+    ctx = {"captures": {"pre": {"arm": arm, "plain": plain}, "post": {"arm": post_arm, "plain": post_plain}}}
+    return _verdict(fc.ORACLES["T0"]({}, {}, fc.Answer(args["answer"], ()), readings, ctx)[component])
+
+
+def _control_t27_run(args, readings):
+    key = dict(args["key"], acceptance=args["acceptance"])
+    return _verdict(fc.ORACLES["T27"]({"partition": args["key"]["partition"]}, key, fc.Answer(args["answer"], ()), readings, {})["B"])
+
+
+CONTROL_FUNCTIONS = {"validate_response": validate_response, "strip_agent_result": strip_agent_result, "wait_notice": wait_notice,
+                     "limit_message": limit_message, "usage_limit_message": usage_limit_message,
+                     "persisted_pointer": persisted_pointer}
+
+
+def control_outcome(entry, readings):
+    """(observed, expected) of one catalog entry; class A by oracle, class B by the named check, class C by the named carrier
+    function. A control that raises is a control that landed elsewhere."""
+    kind = entry.get("kind")
+    if entry["class"] == "A":
+        return _control_oracle(entry, readings), entry["expect"]
+    if entry["class"] == "B":
+        args = entry["args"]
+        if kind == "builder":
+            return _control_builder(args), entry["expect"]
+        if kind == "t14":
+            return _control_t14(args, readings), entry["expect"]
+        if kind == "t0":
+            return _control_t0(args, readings, entry["component"]), entry["expect"]
+        if kind == "t27_run":
+            return _control_t27_run(args, readings), entry["expect"]
+    if entry["class"] == "C":
+        return {"result": CONTROL_FUNCTIONS[entry["function"]](entry["input"])}, entry["expect"]
+    raise ValueError("unknown control")
+
+
+def run_controls(catalog, readings):
+    """{class: {expected, observed}} over a catalog of planted controls, and the ids that landed elsewhere (private)."""
+    counts, unmet = {}, []
+    for entry in catalog["controls"]:
+        counts.setdefault(entry["class"], {"expected": 0, "observed": 0})
+        counts[entry["class"]]["expected"] += 1
+        try:
+            observed, expected = control_outcome(entry, readings)
+        except Exception:  # noqa: BLE001 - a crashing oracle is a control that did not land at its expected status
+            unmet.append(entry["id"])
+            continue
+        if entry["class"] == "C":
+            met = observed == expected
+        else:
+            met = observed["status"] == expected["status"] and ("reasons" not in expected
+                                                                  or observed["reasons"] == sorted(expected["reasons"]))
+        if met:
+            counts[entry["class"]]["observed"] += 1
+        else:
+            unmet.append(entry["id"])
+    return counts, unmet
 
 
 # --- END OF PART 6 ---
