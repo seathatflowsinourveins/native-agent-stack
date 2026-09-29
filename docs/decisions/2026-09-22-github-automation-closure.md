@@ -1668,6 +1668,25 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   exit 0; #436 exit 1 with `validate-macos` failing; #409 exit 8 while checks were
   pending; `gh pr checks --help` names exit 8 for pending checks).
 
+  **Correction (2026-09-29, after the entry above):** the exit code is not the
+  verdict. On #437 the coordinator cancelled its queued `validate-macos` run on
+  purpose, and `gh pr checks 437 --required` (run through `rtk proxy`, which does not
+  filter the output) printed the seven passing checks and `validate-macos fail`, and
+  exited 0; `--json name,bucket` gave `bucket: cancel` for that check. gh v2.101.0
+  explains both: `checks.go` L248-252 returns exit 1 when `counts.Failed > 0`, else
+  exit 8 when `counts.Pending > 0`, else 0, and `aggregate.go` L72-88 sends
+  `CANCELLED` to bucket `cancel` (`counts.Canceled`) and `SKIPPED`/`NEUTRAL` to
+  `skipping`, neither of which changes the exit code; `checks.go` L189-191 returns
+  after the JSON export, so `--json` exits 0 in every state. The same source shows
+  that a failed check wins over a pending one (exit 1), which the entry's earlier
+  wording ("1 when one has failed and none is pending") did not say. GitHub's own
+  ruleset still refuses a merge while a required check is cancelled, so no merge was
+  wrongly allowed; the error was in the documented pre-merge read. `docs/lanes.md`
+  now prints the required-check count and the set of buckets and merges only on
+  `pass`, and `tests/test_merge_guard_doc.py` fails if that text drifts back to the
+  exit-code reading. **Overturn:** a newer gh that counts `cancel` as failing or
+  changes the `--json` exit code; re-read `checks.go` when the pinned gh moves.
+
   **Rollback:** PUT the committed file from before #294, `57fb6d89`. The only
   change `git diff 57fb6d89 7bbb021e -- .github/main-ruleset.json` makes is
   adding the `sota-sources` context, and `main` (`b0fb65b4`) still carries

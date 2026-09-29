@@ -14302,8 +14302,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "830049dd742c5715403070b833bf5631abd979d236eec7ff38b06901dc4637d7",
-      "bytes": 131021
+      "sha256": "5c95aa878a8132cfa5c1a4b097e00653324bfddef7e06e407b719b1ee01db715",
+      "bytes": 132498
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -14577,8 +14577,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "c6d0f0e02686f19b17c21dbf2d599077a60726f4331e2888f9b19f4b9d400ca0",
-      "bytes": 74761
+      "sha256": "ec1b57558568ed0350cbc6c3ee94b40aefe3b7002c5ed8550642ff05a431bee0",
+      "bytes": 75608
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14622,8 +14622,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "821fb700919417eb6697a3757e7dad5d4a32aee26344378bd95fe5f00cb2bc46",
-      "bytes": 12551
+      "sha256": "c7bacc23aa75a860dc3a8a0957a4c74aac135d5a03bc1187e76a86cc630c0c84",
+      "bytes": 13335
     },
     {
       "path": "docs/memory-landscape-maintenance.md",

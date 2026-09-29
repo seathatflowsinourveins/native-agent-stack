@@ -154,16 +154,24 @@ Merge with the checked and reviewed head pinned:
 
 ```sh
 gh pr view <N> --json headRefOid --jq .headRefOid
-gh pr checks <N> --required
+gh pr checks <N> --required --json name,bucket --jq '"\(length) required checks, buckets: \(map(.bucket) | unique | join(","))"'
 gh pr merge <N> --squash --match-head-commit <SHA>
 ```
 
 - `<SHA>` is the full 40-character `headRefOid` the first command prints, read
   immediately before the merge. It must be the head on which the review
-  completed. `gh pr checks --required` lists only the required checks and keeps
-  the latest run of each, so a check that failed and then passed shows as passed.
-  It exits 0 only when every required check has passed; it exits 8 while any is
-  pending, and 1 when one has failed and none is pending. A description edit
+  completed. `gh pr checks --required` lists only the required checks that exist
+  and keeps the latest run of each, so a check that failed and then passed shows
+  as passed. Merge only when the second command prints the ruleset's number of
+  required contexts (8 in `.github/main-ruleset.json`) with the single bucket
+  `pass`; a shorter count means a required check has not started. Do not read the
+  command's exit code as that verdict. It is 1 when any required check failed,
+  even while others are pending, 8 when none failed and one is pending, and 0
+  otherwise, so a cancelled or skipped required check also exits 0
+  ([`checks.go` L248-252](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/checks/checks.go#L248-L252)
+  and [`aggregate.go` L72-88](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/checks/aggregate.go#L72-L88)
+  at gh v2.101.0: `CANCELLED` is bucket `cancel`, counted as neither failed nor
+  pending), and with `--json` it exits 0 whatever the state. A description edit
   starts a new `validate.yml` run on the same head (its `pull_request` types
   include `edited`), so run it after the last edit. `gh` sends `<SHA>` as
   GitHub's `expectedHeadOid` ([gh pr merge](https://cli.github.com/manual/gh_pr_merge):
