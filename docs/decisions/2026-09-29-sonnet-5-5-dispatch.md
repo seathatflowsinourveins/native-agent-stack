@@ -3,7 +3,7 @@
 **Decided by:** the coordinator session `native-agent-stack-79` on host `nativestack-5975wx-20260925`, for the user's requests of
 2026-09-28 and 2026-09-29: compare Sonnet 5.5 with Opus 5.5, retire stale models, "assign to it [Sonnet 5.5] when large ultracode
 subagents or any tasks suitable", and make the ecosystem manifest the latest practice for both models. Checked against Claude Code
-2.1.284; branch `claude/sonnet55-dispatch-20260929`, based on `origin/main@351a1b0d`. It extends the
+2.1.284; branch `claude/sonnet55-dispatch-20260929`, based on `origin/main@11648f9a`. It extends the
 [model-currency record](2026-09-27-model-currency.md) and its 2026-09-28 addendum, and leaves the
 [2026-09-23 max-effort record](2026-09-23-max-effort-default.md) as history for Claude Code 2.1.281.
 
