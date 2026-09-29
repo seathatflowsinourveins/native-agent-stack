@@ -19,9 +19,10 @@ const configured = (key) => resolve(HERE, typeof CONFIG[key] === 'string' ? CONF
 const readOr = (path) => { try { return readFileSync(path, 'utf8') } catch { return '' } }
 const WF = { review: 'workflows/review-changes.js', readiness: 'workflows/readiness-audit.js' }
 // The one effort every saved workflow stage and project agent binds (since 2026-09-23; decision
-// docs/decisions/2026-09-23-max-effort-default.md in the catalog). The coordinator stays at xhigh under
-// ultracode: a stage with no effort of its own and no agent frontmatter effort inherits that xhigh, and
-// CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
+// docs/decisions/2026-09-23-max-effort-default.md in the catalog). The coordinator runs at xhigh, saved per
+// model (Ultracode set it on 2.1.281 and does not on 2.1.284). A stage with no effort of its own and no agent
+// frontmatter effort runs at its model's saved level or default on 2.1.284 (the coordinator's xhigh on 2.1.281),
+// and CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
 // settings leave that variable unset.
 const STAGE_EFFORT = 'max'
 function load(file, stubs) {
@@ -445,9 +446,9 @@ function agentOptionLiterals(src) {
   expect('routing doc: every default workflow subagent row binds a model at effort ' + STAGE_EFFORT, defaultRows.length > 0 && defaultRows.every((r) => new RegExp('^(Sonnet|Opus), ' + STAGE_EFFORT + '$').test(r[2])))
   const coordinatorRows = roleRows.filter((r) => r[1] === 'coordinator')
   expect('routing doc: the coordinator row stays at xhigh under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('xhigh under `ultracode`'))
-  // Effort profile: the coordinator keeps ultracode at xhigh, so the settings must not set
-  // CLAUDE_CODE_EFFORT_LEVEL (any value overrides every stage's and agent's own effort, and a value other than
-  // xhigh also leaves ultracode's orchestration inactive) and must not cap effort below the stage effort, either
+  // Effort profile: the coordinator runs at xhigh, so the settings must not set
+  // CLAUDE_CODE_EFFORT_LEVEL (any value overrides every stage's and agent's own effort; on 2.1.281 a value other than
+  // xhigh also left ultracode's orchestration inactive) and must not cap effort below the stage effort, either
   // with a top-level maxEffortLevel or with one inside a modelSettings entry.
   let settingsJson = {}
   try { settingsJson = JSON.parse(readOr(configured('settings'))) || {} } catch { settingsJson = {} }

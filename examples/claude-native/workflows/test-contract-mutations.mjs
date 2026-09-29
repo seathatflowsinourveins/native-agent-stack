@@ -74,7 +74,8 @@ const MUTATIONS = [
   ['the builder regains the removed skill', 'agents/isolated-builder.md', '  - context-mode:context-mode\n', '  - context-mode:context-mode\n  - verification-before-completion\n', 'isolated-builder preloads exactly its reviewed skills'],
   ['a harmless reordering of the security reviewer tools', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ', 'tools: Glob, Read, Grep, ', null],
   // Effort max (docs/decisions/2026-09-23-max-effort-default.md): a stage or agent that drops its effort, or binds
-  // any level other than max, must fail; a stage without effort would inherit the coordinator's xhigh.
+  // any level other than max, must fail; a stage without effort would run at its model's saved level or default (2.1.284;
+  // on 2.1.281 it inherited the coordinator's xhigh).
   ['a later stage drops its effort', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus'", 'binds model and effort inside every options literal'],
   ['a default-child stage drops its effort', 'workflows/readiness-audit.js', "schema: VERIFY, model: 'opus', effort: 'max'", "schema: VERIFY, model: 'opus'", 'binds model and effort inside every options literal'],
   ['a review stage runs at effort high', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus', effort: 'high'", 'binds effort max in every options literal'],
@@ -94,7 +95,7 @@ const MUTATIONS = [
   ['the routing table moves the coordinator off xhigh under ultracode', ROUTING_DOC_FILE, '| coordinator | Opus 5.5, xhigh under `ultracode`', '| coordinator | Opus 5.5, max', 'the coordinator row stays at xhigh under ultracode'],
   ['the instructions stop stating the stage effort literal', INSTRUCTIONS_FILE, "`effort: 'max'`", "`effort: 'high'`", 'state the effort literal every stage binds'],
   // CLAUDE_CODE_EFFORT_LEVEL overrides every stage's and agent's effort at any value (docs; probes P6 and P9 at max), and any
-  // value other than xhigh also turns ultracode's orchestration off (P1); an effort cap below max clamps the stages.
+  // value other than xhigh also turned ultracode's orchestration off on 2.1.281 (P1); an effort cap below max clamps the stages.
   ['the settings env sets CLAUDE_CODE_EFFORT_LEVEL=max', SETTINGS_FILE, 'env', { ...ENV, CLAUDE_CODE_EFFORT_LEVEL: 'max' }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
   ['the settings env sets CLAUDE_CODE_EFFORT_LEVEL=xhigh', SETTINGS_FILE, 'env', { ...ENV, CLAUDE_CODE_EFFORT_LEVEL: 'xhigh' }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
   ['the settings cap every model at xhigh', SETTINGS_FILE, 'maxEffortLevel', 'xhigh', 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],

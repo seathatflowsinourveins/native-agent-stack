@@ -366,7 +366,8 @@ class CommittedSettingsFallbackGuardTests(unittest.TestCase):
                 self.assertNotIn("maxEffortLevel", settings)
                 self.assertNotIn("CLAUDE_CODE_EFFORT_LEVEL", settings.get("env", {}))
         # The portable file, like the template, defaults an unnamed child to Opus; the project file leaves the
-        # host layer to set it, so a sealed measurement run in this repository keeps its own model composition.
+        # host layer to set it: a project-scope default would change the model of any stage, in a run started here, that names none
+        # (the sealed #381 run's stages each name one).
         portable = json.loads(self.PORTABLE.read_text(encoding="utf-8"))
         self.assertEqual(portable["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"), "opus")
 
@@ -1002,7 +1003,7 @@ class PortableTopRuleTests(unittest.TestCase):
     (`wc -w`) it had before. Re-baselined on 2026-09-27 to 1,205 words: the Workers section took the
     four dispatch modes of the user-approved global instructions and the documented named-spawn
     behaviour (docs/decisions/2026-09-27-claude-harness-settings.md), which the 925-word ceiling could
-    not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,356 words: the
+    not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,372 words: the
     Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule (its classes and conditions match the workflows README), the
     default child model and the measured effort rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
@@ -1010,7 +1011,7 @@ class PortableTopRuleTests(unittest.TestCase):
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1356  # wc -w after the 2026-09-29 Sonnet 5.5 rule and its review repair (1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1372  # wc -w after the 2026-09-29 Sonnet 5.5 rule and its review repairs (1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (

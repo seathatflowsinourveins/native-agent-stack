@@ -55,8 +55,7 @@ setting is documented for any settings file; the variable is undocumented and is
 that also stops a subagent's or workflow child's fallback in Claude Code 2.1.283, so
 re-check it after each client update (the
 [model-currency record](../docs/decisions/2026-09-27-model-currency.md) and the
-[fallback-guard record](../docs/decisions/2026-09-25-model-fallback-guard.md)). It does
-not select a model, account or permission mode. To adopt it as a project default, merge only those
+[fallback-guard record](../docs/decisions/2026-09-25-model-fallback-guard.md)). It also saves `effortLevel: xhigh`, the coordinator's effort for every model, because the `ultracode` setting sets none on 2.1.284, and defaults an unnamed subagent, teammate or workflow agent to Opus with `CLAUDE_CODE_SUBAGENT_MODEL=opus`. It does not select the session's model, an account or a permission mode. To adopt it as a project default, merge only those
 keys into the existing `.claude/settings.json`; preserve all unrelated settings.
 Project environment settings require workspace trust, and organizational policy
 or feature availability can still restrict the profile. The dated rules set behind
@@ -350,8 +349,7 @@ levels ([model configuration](https://code.claude.com/docs/en/model-config#adjus
 first bullet below is 2.1.281 history: on 2.1.284 the `--effort max` and
 `CLAUDE_CODE_EFFORT_LEVEL=max` sessions kept the Ultracode reminder (receipt cases A3, A4 and
 A8), and a stage or child that names no effort ran at its own model's saved level or default
-in a headless session (B2, B3, D2) and at the session's level in the interactive one (C1 to
-C6). The per-stage rule below is unchanged and still load-bearing.
+in a headless session (B2, B3, D2) and, in the interactive one, at the session's level for every child that named no effort (C1, C3 to C6; the project agents of C2 and C8 declare `effort: max`). The per-stage rule below is unchanged and still load-bearing.
 
 - **On 2.1.281 `max` disabled Ultracode orchestration.** Ultracode sent `xhigh` to the
   model and additionally had Claude orchestrate dynamic workflows; any other
@@ -366,9 +364,7 @@ C6). The per-stage rule below is unchanged and still load-bearing.
   `"effortLevel":"high"` ran at `high`, so the key applies a valid value (Q2).
   The earlier probes that put `max` in `effortLevel` or
   `modelSettings.<model>.effortLevel` (`--settings` or a project
-  `.claude/settings.json`: P3, P4, P7, P8) also stayed at `xhigh`, but they ran
-  with `ultracode: true`, which takes precedence over both keys, so on their
-  own they cannot show the drop. For the per-model key and a project file the
+  `.claude/settings.json`: P3, P4, P7, P8) also stayed at `xhigh`, but they ran with `ultracode: true`, which on 2.1.281 took precedence over both keys, so on their own they cannot show the drop. For the per-model key and a project file the
   evidence is the installed schema, which accepts only `low`, `medium`, `high`
   and `xhigh` in both keys, and the official docs: `max` "isn't accepted as a
   level in either key" and otherwise applies to the current session only.
@@ -400,12 +396,9 @@ wherever a child is defined:
   level or default in a headless session (2.1.284 probes; on 2.1.281 it inherited the
   coordinator's `xhigh`) and at the session's level in an interactive one, and the stage's
   effort also overrides a lower frontmatter;
-- a teammate runs at the lead's effort (`xhigh` here), whatever
-  its definition says ([agent teams](https://code.claude.com/docs/en/agent-teams),
+- a teammate runs at the lead's session effort, whatever its definition says ([agent teams](https://code.claude.com/docs/en/agent-teams),
   read 2026-09-27); spawn a child that needs `max` unnamed or as a workflow stage;
-- a single non-orchestrated session at `max` stays available on request:
-  `claude --effort max` ran at `max` with orchestration off (P2). `/effort max`
-  was not probed; the docs say Claude Code applies `max` "to the current
+- a single non-orchestrated session at `max` stays available on request. On 2.1.281 `claude --effort max` ran at `max` with orchestration off (P2). On 2.1.284 `--effort max` keeps Ultracode on (receipt cases A3 and A4), so turn Ultracode off as well: the documented forms are `/effort ultracode off` and `--settings '{"ultracode":false}'` (documented, not probed together with `--effort max`). `/effort max` was not probed; the docs say Claude Code applies `max` "to the current
   session only" and list `ultracode` as a separate entry of the `/effort` menu
   ([model configuration](https://code.claude.com/docs/en/model-config), fetched
   2026-09-23).

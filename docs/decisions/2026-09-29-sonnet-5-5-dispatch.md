@@ -24,9 +24,9 @@ child that ran an older model than its alias documents. Every stage names its mo
 | Task class | Model, effort | Why | What checks it |
 | --- | --- | --- | --- |
 | Design, architecture, adversarial review, verification of claims against source, security review, adjudication, synthesis, blind lanes | `opus` (Opus 5.5), max | the [Sonnet 5.5 card](https://www.anthropic.com/claude-sonnet-5-5-system-card) puts Opus 5.5 ahead on the automated honesty and reckless-tool-use audits and as the less self-preferring grader (sections 6.2.2, 6.2.3, 6.3.1); its targeted honesty evaluations are mixed (Sonnet 5.5 is more honest under pressure but hallucinates more on closed-book questions, sections 6.1.2 and 6.3.2), so this record does not lean on them | the role table's agents and the contract tests |
-| Shell, test, build and lint runs; the acceptance commands a task names | `sonnet` (Sonnet 5.5), max | the exit code is the check; Terminal-Bench 4.0 favours Sonnet 5.5 in two of three runs and Opus 5.5 in the third, each Sonnet lead inside its source's uncertainty where one is stated (below); the vendor rates Sonnet 5.5 Fast against Moderate for Opus 5.5, though Vals measured near-equal latency at max (below) | the command's exit code and output |
+| Shell, test, build and lint runs; the acceptance commands a task names | `sonnet` (Sonnet 5.5), max | the exit code is the check, so a different model loses nothing on correctness; Terminal-Bench 4.0 favours Sonnet 5.5 in two of three runs and Opus 5.5 in the third, each Sonnet lead inside its source's uncertainty where one is stated (below); no speed or cost advantage is assumed (below) | the command's exit code and output |
 | Exact extraction, inventories, counts, log analysis | `sonnet`, max (`source-scout`) | mechanical, deterministic output | file:line locators the consumer re-reads; Opus verifier on claims |
-| Migrations, refactors and scaffolds from a written contract, in an owned checkout | `sonnet`, max, as a per-stage override of `isolated-builder` | Vals AI ranks Sonnet 5.5 first on Code Migration (69.83% ±4.26 against 66.65% ±4.33, inside the stated error) and on Vibe Code Bench v1.1 (92.39% ±1.26 against 90.29% ±1.53); the card's FrontierCode result (below) is why a new coding class sweeps effort first | the contract's tests, then an Opus review and CI; a build without a test oracle stays on `opus` |
+| Migrations, refactors and scaffolds from a written contract, in an owned checkout | `sonnet`, max, as a per-stage override of `isolated-builder` | Vals AI ranks Sonnet 5.5 first on Code Migration (69.83% ±4.26 against 66.65% ±4.33, inside the stated error) and on Vibe Code Bench v1.1 (92.39% ±1.26 against 90.29% ±1.53); the card's FrontierCode result (below) is why a new coding class sweeps effort first | the contract's tests, then an Opus review and CI; a build without a written contract's tests stays on `opus` |
 | First-pass breadth research | `sonnet`, max, only as bulk fan-out | Anthropic's multi-agent research system is an Opus lead over Sonnet subagents | an Opus refuter or verifier stage on every claim |
 | Coordinator | Opus 5.5 by default (`model: opus[1m]` in the template, and the role table); a Sonnet 5.5 coordinator is supported and is this host's user setting; saved at xhigh either way | a Sonnet main model with an Opus advisor is Anthropic's named pairing ([advisor](https://code.claude.com/docs/en/advisor)); this host's advisor is `opus`, the template's is `fable` | the session model is the user's choice; a Sonnet coordinator sends each judgment to an `opus`-named stage instead of deciding it inline |
 | Agent-team teammates | named at spawn: `sonnet` to execute or explore, `opus` to judge | Anthropic's costs page recommends Sonnet for teammates ([costs](https://code.claude.com/docs/en/costs)) | the lead verifies teammate results before acting |
@@ -79,11 +79,7 @@ for both ([pricing](https://platform.claude.com/docs/en/about-claude/pricing), r
 [models overview](https://platform.claude.com/docs/en/about-claude/models/overview) lists the token prices and the latency ratings). Cost per
 task did not follow the price list in the independent runs. Artificial Analysis reports about 193k output tokens per Intelligence Index
 task for Sonnet 5.5 at max, around 60% above Opus 5.5 at max, and places Sonnet 5.5 off its Intelligence-versus-cost-per-task Pareto
-frontier ([article](https://artificialanalysis.ai/articles/claude-sonnet-5-5), 2026-09-28). Vals' Terminal-Bench 4.0 page shows $19.33
-per task for Sonnet 5.5 against $19.07 for Opus 5.5 while scoring lower; its model pages show $20.80 against $32.77 per test on the
-Vals Index (69.22% ±0.96 against 69.69% ±0.94) with latencies of 70 min 7 s and 72 min 1 s at max, so the vendor's "Fast" against
-"Moderate" rating is not borne out at max effort there. These are other operators' benchmark averages, so no fan-out saving is
-assumed, and no in-repository cost comparison exists.
+frontier ([article](https://artificialanalysis.ai/articles/claude-sonnet-5-5), 2026-09-28). Vals' Terminal-Bench 4.0 page shows $19.33 per task for Sonnet 5.5 against $19.07 for Opus 5.5 while scoring lower, and its embedded data lists a latency of 7,555.7 against 5,468.1 (the field carries no unit) and 33.4M against 17.0M total output tokens; its model pages show $20.80 against $32.77 per test on the Vals Index (69.22% ±0.96 against 69.69% ±0.94) with latencies of 70 min 7 s and 72 min 1 s at max. So the vendor's "Fast" against "Moderate" rating is not borne out at max effort in either Vals measurement. These are other operators' benchmark averages, so no speed or fan-out saving is assumed, and no in-repository cost comparison exists.
 
 **Effort.** `max` is not uniformly better. The card reports Sonnet 5.5 at xhigh scoring 52.1% on FrontierCode Main and 64.4% on
 Extended, and at max 46.2% and 59.1% (section 8.4), and Opus 5.5 at max (64.8%) within noise of xhigh (66.4%) on Terminal-Bench 4.0
@@ -106,9 +102,7 @@ transcript; this record relies on these:
   A14; A15 for Opus 5.5 is confounded by the user's saved Opus level). The Ultracode reminder stayed present at max effort set by flag
   and by environment variable (A3, A4, A8).
 - A subagent, workflow agent or teammate that no per-call model, definition or environment default names ran the lead's model (B1, C1,
-  C4, C6). Its effort: headless children ran at their own model's saved level or default (B2, B3, D2); in the interactive session,
-  whose effort a model picker had set to max, every child ran at max, the Opus ones (C2, C3) included; whether an explicit `--effort` in
-  a headless session reaches its children was not probed.
+  C4, C6). Its effort: headless children ran at their own model's saved level or default (B2, B3, D2); in the interactive session, whose effort a model picker had set to max, every child that named no effort ran at max (C1, C3 to C6: an unnamed subagent, an Opus 5.5 subagent named per call, two workflow stages, a named teammate), the Opus 5.5 one (C3) included; the two project agents whose definitions declare `effort: max` (C2, C8) also ran at max, which their definitions explain; whether an explicit `--effort` in a headless session reaches its children was not probed.
 - `CLAUDE_CODE_SUBAGENT_MODEL=opus` put an unnamed subagent on Opus 5.5 at xhigh under a Sonnet 5.5 lead (B2, D2), and `=sonnet` put it
   on Sonnet 5.5 at medium under an Opus 5.5 lead (B3) ([env vars](https://code.claude.com/docs/en/env-vars): the default for children that
   nothing else assigns). The probes used Agent-tool subagents; for workflow agents and teammates the documentation is the source.
@@ -123,14 +117,10 @@ transcript; this record relies on these:
 - `adoption/templates/claude.settings.template.json` pins `claude-sonnet-5-5` at xhigh beside `claude-opus-5-5` and sets the default
   child model. Tests: `tests/test_install_claude_profile.py`.
 - `examples/claude-native/workflows/README.md` gains the fan-out section; `examples/claude-native/CLAUDE.md` restates the
-  model-assignment, default-child and effort rules (its word budget is re-baselined to 1,356); `recipes/claude-native-ultracode.md`
+  model-assignment, default-child and effort rules (its word budget is re-baselined to 1,372); `recipes/claude-native-ultracode.md`
   records the change.
 - Companion changes. In this branch: alias rows for `sonnet` and `fable` in `child-usage.mjs`, and an effort guard that no longer treats
-  `ultracode: true` as xhigh (its rule holds from 2.1.284). In their own pull request (branch
-  `claude/claude-code-floor-2-1-284-20260929`): the native Claude Code floor moves to 2.1.284 (below 2.1.284 the `sonnet` alias means
-  Sonnet 5, so an older client silently routes the alias to the older model). Until that pull request merges, both platform pins still
-  read 2.1.281, so a host on 2.1.281 to 2.1.283 passes the floor check while its `sonnet` children run Sonnet 5 and its
-  `ultracode: true` sessions still run at xhigh; `child-usage.mjs` flags such a child.
+  `ultracode: true` as xhigh (its rule holds from 2.1.284). In their own pull request, #477: the native Claude Code floor moves to 2.1.284 (below 2.1.284 the `sonnet` alias means Sonnet 5 on the Anthropic API, so an older client silently routes the alias to the older model). A host on a client older than 2.1.284, which the pins admitted down to 2.1.281 before #477, runs its `sonnet` children on Sonnet 5 and its `ultracode: true` sessions at xhigh. `child-usage.mjs` does not flag that child, because its alias table records Sonnet 5 as the documented resolution before 2.1.284 (it flags a Sonnet 5 child that a 2.1.284 or later client ran), so check `claude --version` for 2.1.284 or later before routing a stage to `sonnet`.
 - The receipt `claude-model-effort-probes-20260929`. Its message counts count each assistant message id once; that corrects the
   [2026-09-28 addendum](2026-09-27-model-currency.md#addendum-2026-09-28-claude-sonnet-55-launched-and-what-the-fallback-map-now-means),
   which counted the Sonnet child's 82 transcript rows as messages (the child made 38, all `claude-sonnet-5-5` at `max`; receipt case C8).
@@ -179,8 +169,7 @@ until the branch merges. `~/.claude/CLAUDE.md` gains the portable file's Quality
 - A matched paired run (the Harbor and Terminal-Bench 4.0 run card, once the user decides the credential route, sandbox and budget)
   or an in-repository role-quality sweep shows Sonnet 5.5 below Opus 5.5, beyond the run's detectable difference, on a fan-out class
   routed here: move that class back to Opus.
-- A Sonnet child's refusal or fault-copy rate, read from `child-usage.mjs` and the run transcripts, exceeds Opus 5.5's on a routed
-  class.
+- On a routed class, the share of Sonnet 5.5 children whose output fails its oracle or its Opus review exceeds Opus 5.5's on the same class (counted from the run's handoffs and reviews; `child-usage.mjs` reports null and substituted children, not refusals or failed checks).
 - A sweep of xhigh against max on a routed coding class shows xhigh at least as good at lower cost (the card's FrontierCode result points
   that way): route that class at xhigh.
 - Claude Code restores `ultracode` precedence over saved effort (the guard's test names the behaviour), a new Sonnet or Haiku ships
