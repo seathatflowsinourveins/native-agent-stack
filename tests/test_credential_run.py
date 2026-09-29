@@ -60,13 +60,16 @@ def _host_hands_cores_to_a_collector() -> bool:
 # CREDENTIAL_RUN_TEST_LAUNCHER=1 forces the launcher on any host, to exercise this path.
 HOST_PIPES_CORES = os.environ.get("CREDENTIAL_RUN_TEST_LAUNCHER") == "1" or _host_hands_cores_to_a_collector()
 # The launcher also switches the watchdog off on request, to see the parent-death signal alone (a module constant, as
-# CORE_PATTERN_FILE is: the tool has no environment switch for it).
+# CORE_PATTERN_FILE is: the tool has no environment switch for it), and runs the Python source of RUNNER_TEST_SETUP
+# before main: a test uses it to replace a module constant or function of the tool (PINNED, pre_exec_pause) or to record
+# the calls the runner makes (recorder_setup). The variable is read here, in the test's launcher, and never by the tool.
 LAUNCHER = ("import os, sys\n"
             f"sys.path[:0] = [{str(TOOLS)!r}, {str(ROOT / 'scripts')!r}]\n"
             "import credential_run\n"
             "credential_run.CORE_PATTERN_FILE = os.environ.pop('CORE_PATTERN_TEST_FILE')\n"
             "if os.environ.pop('WATCHDOG_TEST_OFF', '') == '1':\n"
             "    credential_run.WATCHDOG = False\n"
+            "exec(os.environ.pop('RUNNER_TEST_SETUP', ''))\n"
             "sys.exit(credential_run.main(sys.argv[1:]))\n")
 
 # A child that reports what reached its environment by sha256 only, so no test output holds a value.
@@ -112,13 +115,16 @@ def marker_writer(delay: float, ignore_term: bool = False) -> str:
             + f"time.sleep({delay})\nopen(sys.argv[1], 'w').close()\n")
 
 
-def spawn_marker_writers(*writers) -> str:
+def spawn_marker_writers(*writers, quiet: bool = False) -> str:
     """Python source that starts one marker_writer per (marker path, delay, ignore_term) in its own process group, waits
-    until each is ready, and prints "spawned" and the process ids; the caller adds what it does next."""
+    until each is ready, and prints "spawned" and the process ids; the caller adds what it does next. quiet: each writer
+    gets /dev/null for stdin, stdout and stderr, so it holds none of the command's pipes and the runner sees end of file
+    as soon as the command exits, with no drain."""
     ready = [str(path) + ".ready" for path, _delay, _ignore in writers]
+    streams = ", stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL" if quiet else ""
     return ("import os, subprocess, sys, time\nkids = []\n" + "".join(
-        f"kids.append(subprocess.Popen([sys.executable, '-I', '-c', {marker_writer(delay, ignore)!r}, {str(path)!r}]))\n"
-        for path, delay, ignore in writers)
+        f"kids.append(subprocess.Popen([sys.executable, '-I', '-c', {marker_writer(delay, ignore)!r}, {str(path)!r}]"
+        f"{streams}))\n" for path, delay, ignore in writers)
             + f"ready = {ready!r}\ndeadline = time.monotonic() + 20\n"
             + "while not all(os.path.exists(path) for path in ready) and time.monotonic() < deadline:\n"
             + "    time.sleep(0.01)\n"
@@ -128,6 +134,102 @@ def spawn_marker_writers(*writers) -> str:
 def kill_quietly(pid: int) -> None:
     with contextlib.suppress(ProcessLookupError, PermissionError):
         os.kill(pid, signal.SIGKILL)
+
+
+def process_state(pid: int) -> str:
+    """The state letter of /proc/<pid>/stat ("Z" for a zombie), or "gone" (Linux)."""
+    try:
+        with open(f"/proc/{pid}/stat", "rb") as handle:
+            return handle.read().rsplit(b")", 1)[1].split()[0].decode("ascii")
+    except (FileNotFoundError, ProcessLookupError):
+        return "gone"
+
+
+def is_running(pid: int) -> bool:
+    return process_state(pid) not in ("gone", "Z", "X")
+
+
+def wait_until(predicate, seconds: float = 10.0) -> bool:
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline:
+        if predicate():
+            return True
+        time.sleep(0.02)
+    return bool(predicate())
+
+
+def wait_for_json(path: Path, seconds: float = 30.0):
+    """The JSON that a process writes to `path`, once it is there and complete."""
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline:
+        with contextlib.suppress(FileNotFoundError, ValueError):
+            return json.loads(path.read_text())
+        time.sleep(0.02)
+    raise AssertionError(f"{path.name} never appeared")
+
+
+def recorder_setup(log: Path, pinned: bool | None = None) -> str:
+    """RUNNER_TEST_SETUP source that records, in order, what the runner does to the command: each killpg with the state
+    of the command at that moment (os.waitid with WNOWAIT still sees a command that is running or has exited, and raises
+    ChildProcessError once it has been reaped), each waitpid with the pid it returned, the start of the watchdog, its
+    stand-down and the byte that carries it (a write of b"."). The list is written to `log` as JSON when the runner
+    exits. pinned=False also switches the tool's pinned cleanup off, as a platform without it would have it."""
+    return (("credential_run.PINNED = False\n" if pinned is False else "")
+            + "import atexit, json\n"
+              "events = []\n"
+              "real_killpg, real_waitpid, real_waitid = os.killpg, os.waitpid, getattr(os, 'waitid', None)\n"
+              "def killpg(pgid, signum):\n"
+              "    state = 'unknown'\n"
+              "    if real_waitid is not None:\n"
+              "        try:\n"
+              "            found = real_waitid(os.P_PID, pgid, os.WEXITED | os.WNOHANG | os.WNOWAIT)\n"
+              "            state = 'zombie' if found else 'running'\n"
+              "        except ChildProcessError:\n"
+              "            state = 'reaped'\n"
+              "    events.append(['killpg', int(signum), state])\n"
+              "    return real_killpg(pgid, signum)\n"
+              "def waitpid(pid, options):\n"
+              "    result = real_waitpid(pid, options)\n"
+              "    events.append(['waitpid', pid, result[0]])\n"
+              "    return result\n"
+              "real_write = os.write\n"
+              "def write(fd, data):\n"
+              "    if data == b'.':\n"
+              "        events.append(['byte'])\n"
+              "    return real_write(fd, data)\n"
+              "os.killpg, os.waitpid, os.write = killpg, waitpid, write\n"
+              "real_init, real_release = credential_run.Watchdog.__init__, credential_run.Watchdog.release\n"
+              "def init(self, pgid):\n"
+              "    events.append(['watchdog', pgid])\n"
+              "    real_init(self, pgid)\n"
+              "def release(self):\n"
+              "    events.append(['standdown'])\n"
+              "    real_release(self)\n"
+              "credential_run.Watchdog.__init__, credential_run.Watchdog.release = init, release\n"
+              "def dump():\n"
+              f"    with open({str(log)!r}, 'w') as handle:\n"
+              "        handle.write(json.dumps(events))\n"
+              "atexit.register(dump)\n")
+
+
+def pause_setup(directory: Path, stage: str, pause: bool) -> str:
+    """RUNNER_TEST_SETUP source that replaces the tool's pre_exec_pause: at `stage`, in the forked command, it writes the
+    pid, whether each forwarded signal has its default handler, and the blocked signals to directory/state.json, and
+    (pause=True) waits there until directory/go exists."""
+    state, go = str(directory / "state.json"), str(directory / "go")
+    return ("import json, signal, time\n"
+            "def pre_exec_pause(stage):\n"
+            f"    if stage != {stage!r}:\n"
+            "        return\n"
+            "    default = {}\n"
+            "    for number in credential_run.FORWARDED:\n"
+            "        default[signal.Signals(number).name] = signal.getsignal(number) == signal.SIG_DFL\n"
+            "    blocked = sorted(int(number) for number in signal.pthread_sigmask(signal.SIG_BLOCK, []))\n"
+            f"    with open({state!r}, 'w') as handle:\n"
+            "        handle.write(json.dumps({'pid': os.getpid(), 'default': default, 'blocked': blocked}))\n"
+            f"    while {pause!r} and not os.path.exists({go!r}):\n"
+            "        time.sleep(0.01)\n"
+            "credential_run.pre_exec_pause = pre_exec_pause\n")
 
 
 def unmasked_list() -> str:
@@ -221,10 +323,18 @@ class RunnerCase(unittest.TestCase):
         return key, second
 
     def run_tool(self, *args: str, input: bytes | None = None, env: dict | None = None,
-                 timeout: float = 60) -> subprocess.CompletedProcess:
+                 timeout: float = 60, launcher: bool = False) -> subprocess.CompletedProcess:
         stdin = subprocess.DEVNULL if input is None else None
-        return subprocess.run(self.command(*args), input=input, stdin=stdin, capture_output=True,
-                              env=self.tool_environment(env), timeout=timeout)
+        return subprocess.run(self.command(*args, launcher=launcher), input=input, stdin=stdin, capture_output=True,
+                              env=self.tool_environment(env, launcher), timeout=timeout)
+
+    def run_in_process(self, command: list, relay) -> int:
+        """run_mod.run_command(command) with `relay` in place of the real one; this process's own handlers for the
+        signals it forwards (and for SIGCHLD, which run_command sets) are put back afterwards."""
+        for signum in (*run_mod.FORWARDED, signal.SIGCHLD):
+            self.addCleanup(signal.signal, signum, signal.getsignal(signum))
+        with mock.patch.object(run_mod, "relay", relay):
+            return run_mod.run_command(command, {"PATH": os.environ.get("PATH", "")}, [])
 
     def start_tool(self, *args: str) -> subprocess.Popen:
         process = subprocess.Popen(self.command(*args), stdin=subprocess.DEVNULL,
@@ -1047,6 +1157,7 @@ class ProcessTests(RunnerCase):
             "print(json.dumps([resource.getrlimit(resource.RLIMIT_CORE), os.getsid(0) == os.getpid()]))\n"))
         self.assertEqual(json.loads(result.stdout), [[0, 0], True])
 
+    @unittest.skipUnless(run_mod.PINNED, "the runner signals a finished command's group only where it can pin the group")
     def test_descendants_left_behind_are_ended_after_the_drain_and_a_stubborn_one_is_killed(self):
         # Second review, 2026-09-29: a descendant still running when the drain ended was left running, with the key in
         # its environment. The runner now sends SIGTERM to the command's process group and, after TERM_GRACE_SECONDS,
@@ -1065,14 +1176,6 @@ class ProcessTests(RunnerCase):
         # The 2 s drain, then SIGTERM (the plain one ends), then the grace and SIGKILL (the one that ignores SIGTERM).
         self.assertGreaterEqual(elapsed, run_mod.DRAIN_SECONDS + run_mod.TERM_GRACE_SECONDS - 0.5)
         self.assertLess(elapsed, run_mod.DRAIN_SECONDS + run_mod.TERM_GRACE_SECONDS + 4)
-
-    def run_in_process(self, command: list, relay) -> int:
-        """run_mod.run_command(command) with `relay` in place of the real one; this process's own handlers for the
-        signals it forwards are put back afterwards."""
-        for signum in run_mod.FORWARDED:
-            self.addCleanup(signal.signal, signum, signal.getsignal(signum))
-        with mock.patch.object(run_mod, "relay", relay):
-            return run_mod.run_command(command, {"PATH": os.environ.get("PATH", "")}, [])
 
     def test_the_command_group_is_ended_on_every_exit_path_of_the_runner(self):
         # A failure inside the relay (the runner's catch-all prints internal_error) must not leave the command running.
@@ -1234,6 +1337,279 @@ class WatchdogTests(unittest.TestCase):
         self.assertIsNone(member.poll())
         pipe.close()  # and it still acts
         self.assertEqual(member.wait(timeout=10), -signal.SIGTERM)
+
+
+PINNED_NEEDS = "the pinned cleanup needs os.waitid with WNOWAIT and a /proc (Linux)"
+
+
+class PinnedCleanupTests(RunnerCase):
+    """Third review, 2026-09-29, finding 1. The runner and the watchdog kept only the number of the command's process
+    group, and signalled it after the command had been reaped. Nothing holds a number once its last process is reaped,
+    and the kernel may then give it to a stranger, whose group a late signal reaches. A command that has exited but has not
+    been reaped, a zombie, holds its pid and so the number of its group: the runner sees the exit without reaping it
+    (os.waitid with WNOWAIT), signals the group while the command is a zombie, stands the watchdog down, and reaps last."""
+
+    @unittest.skipUnless(run_mod.PINNED, PINNED_NEEDS)
+    def test_the_group_is_signalled_while_the_zombie_command_pins_it_and_the_watchdog_stands_down_before_the_reap(self):
+        # The command exits at once and leaves a descendant that ignores SIGTERM and holds none of its pipes, so the
+        # runner sees end of file, and the group is ended after the command has exited and before it is reaped.
+        self.tavily()
+        stubborn, log = self.base / "stubborn-survived", self.base / "events.json"
+        started = time.monotonic()
+        result = self.run_tool("tavily", *py(spawn_marker_writers((stubborn, 4.5, True), quiet=True)),
+                               env={"RUNNER_TEST_SETUP": recorder_setup(log)}, launcher=True, timeout=60)
+        elapsed = time.monotonic() - started
+        self.addCleanup(lambda: [kill_quietly(int(pid)) for pid in result.stdout.split()[1:]])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        events = json.loads(log.read_text())
+        leader = next(event[1] for event in events if event[0] == "watchdog")
+        signals = [(index, event) for index, event in enumerate(events) if event[0] == "killpg"]
+        self.assertEqual([event[1] for _index, event in signals], [signal.SIGTERM, signal.SIGKILL], events)
+        # The command had exited and was not reaped: its zombie held the group's number for both signals.
+        self.assertEqual([event[2] for _index, event in signals], ["zombie", "zombie"], events)
+        standdown = next(index for index, event in enumerate(events) if event[0] == "standdown")
+        byte = next(index for index, event in enumerate(events) if event[0] == "byte")
+        reaped = next(index for index, event in enumerate(events)
+                      if event[0] == "waitpid" and event[1] == leader and event[2] == leader)
+        self.assertLess(signals[-1][0], standdown, events)  # the watchdog stands down after the group's cleanup...
+        self.assertLess(standdown, byte, events)  # (the byte is the stand-down)...
+        self.assertLess(byte, reaped, events)  # ...and before the command is reaped
+        time.sleep(max(0.0, 5.0 - elapsed))
+        self.assertFalse(stubborn.exists(), "a descendant that ignores SIGTERM outlived the runner")
+        self.assertGreaterEqual(elapsed, run_mod.TERM_GRACE_SECONDS - 0.5)  # SIGKILL came after the grace
+
+    @unittest.skipUnless(run_mod.PINNED, PINNED_NEEDS)
+    def test_a_descendant_that_obeys_sigterm_ends_the_wait_at_once_and_is_never_sent_sigkill(self):
+        # The wait after SIGTERM ends when the group's live members are counted at 0, not after the grace.
+        self.tavily()
+        obedient, log = self.base / "obedient-survived", self.base / "events.json"
+        started = time.monotonic()
+        result = self.run_tool("tavily", *py(spawn_marker_writers((obedient, 4.0, False), quiet=True)),
+                               env={"RUNNER_TEST_SETUP": recorder_setup(log)}, launcher=True)
+        elapsed = time.monotonic() - started
+        self.addCleanup(lambda: [kill_quietly(int(pid)) for pid in result.stdout.split()[1:]])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        events = json.loads(log.read_text())
+        self.assertEqual([event[1:] for event in events if event[0] == "killpg"], [[signal.SIGTERM, "zombie"]], events)
+        self.assertLess(elapsed, run_mod.TERM_GRACE_SECONDS)
+        time.sleep(max(0.0, 4.5 - elapsed))
+        self.assertFalse(obedient.exists(), "a descendant that obeys SIGTERM outlived the runner")
+
+    @unittest.skipUnless(run_mod.PINNED, PINNED_NEEDS)
+    def test_a_command_that_leaves_nothing_behind_is_not_signalled_and_the_watchdog_stands_down_before_the_reap(self):
+        self.tavily()
+        log = self.base / "events.json"
+        started = time.monotonic()
+        result = self.run_tool("tavily", *py("pass"), env={"RUNNER_TEST_SETUP": recorder_setup(log)}, launcher=True)
+        elapsed = time.monotonic() - started
+        self.assertEqual(result.returncode, 0, result.stderr)
+        events = json.loads(log.read_text())
+        leader = next(event[1] for event in events if event[0] == "watchdog")
+        self.assertEqual([event for event in events if event[0] == "killpg"], [], events)  # nothing but its zombie left
+        self.assertLess(elapsed, run_mod.TERM_GRACE_SECONDS)  # and nothing was waited for
+        standdown = next(index for index, event in enumerate(events) if event[0] == "standdown")
+        byte = next(index for index, event in enumerate(events) if event[0] == "byte")
+        reaped = next(index for index, event in enumerate(events)
+                      if event[0] == "waitpid" and event[1] == leader and event[2] == leader)
+        self.assertLess(standdown, byte, events)
+        self.assertLess(byte, reaped, events)
+
+    def test_where_the_exit_cannot_be_seen_unreaped_the_group_is_never_signalled_after_the_reap(self):
+        # PINNED False, as on a platform without os.waitid and WNOWAIT (macOS before CPython 3.13) or without a /proc to
+        # count a group's live members: the runner learns of the exit by reaping the command, and signals nothing after
+        # that. The descendant of the exited command is left running: the limit of this mode, which the documentation states.
+        self.tavily()
+        survivor, log = self.base / "survivor-wrote", self.base / "events.json"
+        result = self.run_tool("tavily", *py(spawn_marker_writers((survivor, 1.5, False), quiet=True)),
+                               env={"RUNNER_TEST_SETUP": recorder_setup(log, pinned=False)}, launcher=True)
+        self.addCleanup(lambda: [kill_quietly(int(pid)) for pid in result.stdout.split()[1:]])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        events = json.loads(log.read_text())
+        self.assertEqual([event for event in events if event[0] == "killpg"], [], events)
+        self.assertTrue(wait_until(survivor.exists, 5), "the descendant was ended although the group's number was not held")
+
+    def test_where_the_exit_cannot_be_seen_unreaped_a_failure_in_the_relay_still_ends_the_group_before_the_reap(self):
+        marker = self.base / "descendant-survived"
+        children, pids = [], []
+
+        def failing_relay(child, needles, shutdown=()):
+            children.append(child)
+            pids.extend(int(pid) for pid in child.stdout.readline().split()[1:])  # "spawned <command> <descendant>"
+            raise RuntimeError("the relay failed")
+
+        self.addCleanup(lambda: [kill_quietly(pid) for pid in pids])
+        with mock.patch.object(run_mod, "PINNED", False), self.assertRaises(RuntimeError):
+            self.run_in_process(py(spawn_marker_writers((marker, 2.0, False)) + "time.sleep(60)\n")[1:], failing_relay)
+        self.assertEqual(children[0].returncode, -signal.SIGTERM)  # ended by the group's SIGTERM, then reaped
+        time.sleep(2.2)
+        self.assertFalse(marker.exists(), "the runner's failure left a descendant running")
+
+    def test_a_signal_that_reaches_the_runner_after_the_command_was_reaped_is_not_forwarded(self):
+        def quiet_relay(child, needles, shutdown=()):
+            child.stdout.close()
+            child.stderr.close()
+
+        self.run_in_process([sys.executable, "-I", "-c", "pass"], quiet_relay)  # its handlers stay installed
+        with mock.patch.object(os, "killpg") as killpg:
+            os.kill(os.getpid(), signal.SIGUSR1)  # run_command's handler runs in this process, after the reap
+            time.sleep(0.1)
+        killpg.assert_not_called()
+
+    def test_a_runner_started_with_sigchld_ignored_still_reports_the_commands_status(self):
+        # An inherited SIG_IGN for SIGCHLD makes the kernel reap each child the moment it exits: no zombie holds the
+        # command's number, and its status is lost. The runner sets the default disposition before it starts anything.
+        self.tavily()
+        runner = subprocess.Popen(self.command("tavily", *py("raise SystemExit(7)")), stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.tool_environment(),
+                                  preexec_fn=lambda: signal.signal(signal.SIGCHLD, signal.SIG_IGN))
+        self.addCleanup(lambda: (runner.kill(), runner.communicate(timeout=30)))
+        runner.communicate(timeout=60)
+        self.assertEqual(runner.returncode, 7)
+
+
+@unittest.skipUnless(run_mod.PINNED, PINNED_NEEDS)
+class CommandTests(unittest.TestCase):
+    """The runner's view of the command (run_mod.Command) and of its process group (run_mod.live_members)."""
+
+    def setUp(self):
+        self.processes = []
+        self.addCleanup(self.cleanup)
+
+    def cleanup(self):
+        for process in self.processes:
+            if process.returncode is None:  # unreaped, so its group's number is still held
+                with contextlib.suppress(OSError):
+                    os.killpg(process.pid, signal.SIGKILL)
+                with contextlib.suppress(Exception):
+                    process.wait(timeout=10)
+
+    def start(self, code: str, **streams) -> subprocess.Popen:
+        streams = {"stdin": subprocess.DEVNULL, "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL, **streams}
+        process = subprocess.Popen([sys.executable, "-I", "-c", code], start_new_session=True, **streams)
+        self.processes.append(process)
+        return process
+
+    def test_the_exit_is_seen_without_reaping_and_the_group_is_signalled_only_until_the_reap(self):
+        process = self.start("pass")
+        command = run_mod.Command(process)
+        self.assertTrue(wait_until(command.exited, 10))
+        self.assertIsNone(process.returncode)  # not reaped: its zombie still holds its pid, and its group's number
+        self.assertIsNotNone(os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT))
+        self.assertFalse(command.reaped)
+        with mock.patch.object(os, "killpg") as killpg:
+            self.assertTrue(command.signal_group(signal.SIGTERM))
+        killpg.assert_called_once_with(process.pid, signal.SIGTERM)
+        self.assertEqual(command.reap(), 0)
+        self.assertTrue(command.reaped)
+        with mock.patch.object(os, "killpg") as killpg:
+            self.assertFalse(command.signal_group(signal.SIGTERM))
+        killpg.assert_not_called()
+
+    def test_the_signals_the_runner_forwards_are_blocked_while_the_command_is_reaped(self):
+        # A handler that ran between the reap and the moment the runner records it would signal a number nobody holds.
+        process = self.start("pass")
+        command = run_mod.Command(process)
+        self.assertTrue(wait_until(command.exited, 10))
+        seen, real_wait = [], process.wait
+
+        def wait(timeout=None):
+            seen.append(signal.pthread_sigmask(signal.SIG_BLOCK, []))
+            return real_wait(timeout=timeout)
+
+        with mock.patch.object(process, "wait", wait):
+            command.reap()
+        self.assertTrue(set(run_mod.FORWARDED) <= set(seen[0]), seen)
+        self.assertFalse(set(run_mod.FORWARDED) & set(signal.pthread_sigmask(signal.SIG_BLOCK, [])))  # and put back
+
+    def test_a_waitid_that_is_refused_falls_back_to_seeing_the_exit_by_reaping(self):
+        process = self.start("pass")
+        command = run_mod.Command(process)
+        with mock.patch.object(os, "waitid", side_effect=OSError(38, "Function not implemented")):
+            self.assertTrue(wait_until(command.exited, 10))
+        self.assertFalse(command.pinned)  # from now on the group is not signalled once the command is reaped
+        self.assertTrue(command.reaped)  # the exit was seen by reaping it
+        self.assertEqual(command.reap(), 0)
+
+    def test_a_zombie_is_not_a_live_member_of_its_group_and_a_running_descendant_is(self):
+        code = ("import subprocess, sys\n"
+                "kid = subprocess.Popen([sys.executable, '-I', '-c', 'import time; time.sleep(60)'],"
+                " stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)\n"
+                "print(kid.pid, flush=True)\n")
+        leader = self.start(code, stdout=subprocess.PIPE)
+        kid = int(leader.stdout.readline())
+        self.addCleanup(kill_quietly, kid)
+        self.addCleanup(leader.stdout.close)
+        command = run_mod.Command(leader)
+        self.assertTrue(wait_until(command.exited, 10))  # the leader has exited: a zombie, still a member of its group
+        self.assertEqual(run_mod.live_members(leader.pid), 1)  # the sleeper alone: a zombie is not counted
+        os.killpg(leader.pid, signal.SIGKILL)  # the zombie still holds the number
+        self.assertTrue(wait_until(lambda: run_mod.live_members(leader.pid) == 0, 10))
+        command.reap()
+
+    def test_a_running_command_is_a_live_member_of_its_own_group(self):
+        process = self.start("import time\ntime.sleep(60)\n")
+        self.assertTrue(wait_until(lambda: run_mod.live_members(process.pid) == 1, 10))
+        process.kill()
+        self.assertTrue(wait_until(lambda: run_mod.live_members(process.pid) == 0, 10))  # a zombie now
+        process.wait(timeout=10)
+
+
+@unittest.skipUnless(sys.platform.startswith("linux"), "PR_SET_PDEATHSIG and its pre-exec hook are Linux-only")
+class PreExecTests(RunnerCase):
+    """Third review, 2026-09-29, finding 2. The command's pre-exec code runs with a copy of the runner's signal handlers, and
+    forward() only records a SIGTERM: the parent-death signal was queued in the copy instead of ending the command, which then
+    ran (the reviewer's probe: pause after the parent check, kill the runner, resume: exit 42). The hook puts every handled
+    signal back to its default and clears the inherited mask before it arms the signal, and checks the parent's pid after."""
+
+    def start_held(self, stage: str, pause: bool = True, preexec=None):
+        """The runner, started so that the forked command stops at `stage` (pre_exec_pause), and where it stopped."""
+        self.tavily()
+        directory = self.base / "held"
+        directory.mkdir(exist_ok=True)
+        self.ran = self.base / "command-ran"
+        runner = subprocess.Popen(
+            self.command("tavily", *py(f"open({str(self.ran)!r}, 'w').close()"), launcher=True),
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=preexec,
+            env=self.tool_environment({"RUNNER_TEST_SETUP": pause_setup(directory, stage, pause)}, launcher=True))
+        self.addCleanup(lambda: (runner.kill(), runner.communicate(timeout=30)))
+        return runner, directory
+
+    def test_a_runner_killed_while_the_command_waits_between_the_parent_check_and_exec_ends_it(self):
+        runner, directory = self.start_held("after_check")
+        held = wait_for_json(directory / "state.json")
+        self.addCleanup(kill_quietly, held["pid"])
+        runner.kill()  # the kernel sends the armed command SIGTERM
+        runner.wait(timeout=30)
+        self.assertTrue(wait_until(lambda: not is_running(held["pid"]), 5),
+                        "the command outlived its runner: the parent-death signal was swallowed before exec")
+        (directory / "go").write_text("")
+        time.sleep(0.5)
+        self.assertFalse(self.ran.exists(), "the command ran after its runner had been killed")
+
+    def test_a_runner_killed_before_the_command_armed_the_signal_still_ends_it_by_the_parent_pid(self):
+        # Nothing is sent to a command that arms the signal after its parent has gone: it must notice, and not exec.
+        runner, directory = self.start_held("before_arming")
+        held = wait_for_json(directory / "state.json")
+        self.addCleanup(kill_quietly, held["pid"])
+        runner.kill()
+        runner.wait(timeout=30)
+        time.sleep(0.3)
+        self.assertTrue(is_running(held["pid"]))  # held before arming: nothing has been sent to it
+        (directory / "go").write_text("")
+        self.assertTrue(wait_until(lambda: not is_running(held["pid"]), 5), "the command survived the death of its runner")
+        time.sleep(0.3)
+        self.assertFalse(self.ran.exists(), "the command ran after its runner had been killed")
+
+    def test_the_command_starts_with_default_handlers_and_no_blocked_signals(self):
+        # The runner is started with SIGUSR1 blocked, which its command would inherit through the exec.
+        runner, directory = self.start_held(
+            "after_check", pause=False, preexec=lambda: signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGUSR1}))
+        runner.communicate(timeout=60)
+        self.assertEqual(runner.returncode, 0)
+        state = json.loads((directory / "state.json").read_text())
+        self.assertEqual(state["default"], {signal.Signals(number).name: True for number in run_mod.FORWARDED})
+        self.assertEqual(state["blocked"], [])
+        self.assertTrue(self.ran.exists())
 
 
 class ConsumerTests(RunnerCase):

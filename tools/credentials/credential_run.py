@@ -20,16 +20,19 @@ masked separately. Core dumps are off (RLIMIT_CORE 0); a host whose core_pattern
 leading | or @), which sets that limit aside, is refused, with no override. Output goes through non-blocking
 descriptors and a bounded queue, so a consumer that stops reading cannot hold the runner past a shutdown signal or
 the drain deadline. The command leads its own session and process group. SIGINT, SIGTERM, SIGHUP, SIGQUIT, SIGUSR1,
-SIGUSR2 and SIGALRM sent to the runner are forwarded to that group; once the command has exited and its output is
-drained, and on every way out of the runner, the group gets SIGTERM and, after TERM_GRACE_SECONDS, SIGKILL, so no
-descendant that stayed in it is left running with a key in its environment. If the runner itself dies without a chance
-to do that (SIGKILL, the OOM killer), the command asks the kernel for SIGTERM (Linux PR_SET_PDEATHSIG, which reaches
-the command alone) and a watchdog process started with it ends its whole group. Both are best effort: a SIGKILL
-before the fork, a descendant that left the group with setsid, and a same-user debugger are out of reach. Exit status:
-the command's own; 128+N when it died of signal N; 2 for a usage error; 1 for a refusal; 126 or 127 when it cannot
-start. Messages carry the id, variable names, line numbers and reason codes, never a value, a store line or a path
-(docs/secret-storage.md#using-a-key). The runner is available, not yet the default path: the command guard does not
-read its command (phase 2 of the same change series).
+SIGUSR2 and SIGALRM sent to the runner are forwarded to that group. Once the command has exited and its output is
+drained, and on every way out of the runner, what is left of the group gets SIGTERM and, after TERM_GRACE_SECONDS,
+SIGKILL, so no descendant that stayed in it is left running with a key in its environment. That is done while the
+command is still a zombie, whose pid holds the group's number against reuse by a stranger; the runner then tells the
+watchdog to stand down, and reaps the command last (Command). Where the exit cannot be seen without reaping (macOS
+before CPython 3.13 has no os.waitid, and only Linux has a /proc to count the group) the group is never signalled after
+the command has been reaped. If the runner itself dies without a chance to do that (SIGKILL, the OOM killer), the
+command asks the kernel for SIGTERM (Linux PR_SET_PDEATHSIG, which reaches the command alone) and a watchdog process
+started with it ends its whole group. Both are best effort: a SIGKILL before the fork, a descendant that left the group
+with setsid, and a same-user debugger are out of reach. Exit status: the command's own; 128+N when it died of signal
+N; 2 for a usage error; 1 for a refusal; 126 or 127 when it cannot start. Messages carry the id, variable names, line
+numbers and reason codes, never a value, a store line or a path (docs/secret-storage.md#using-a-key). The runner is
+available, not yet the default path: the command guard does not read its command (phase 2 of the same change series).
 
 Built from these references (observed 2026-09-29): the env-only exec discipline of scripts/kernel_keyring.py; the
 load_env_file grammar of blueprints/us-equities/pit-availability/measure.py:51-67 with set_credential.py's value
@@ -43,7 +46,11 @@ internal/redact/encodings.go (hex and upper- and lower-case percent forms, L13-2
 fs/coredump.c and systemd/systemd@v257 src/coredump/coredump.c (check_core_pattern below); the man-pages
 PR_SET_PDEATHSIG(2const) page of man7.org (parent_death_hook), bazelbuild/bazel@d2545923
 src/main/tools/process-tools.cc KillEverything L94-110 (end_group) and python/cpython@v3.13.15
-Lib/multiprocessing/resource_tracker.py L8, L246-267 and L425-429 (the pipe-and-end-of-file helper of the watchdog).
+Lib/multiprocessing/resource_tracker.py L8, L246-267 and L425-429 (the pipe-and-end-of-file helper of the watchdog);
+torvalds/linux@v6.16 kernel/pid.c L349-369, apple-oss-distributions/xnu@xnu-12377.121.6 bsd/kern/kern_fork.c
+L972-974 and bsd/kern/kern_exit.c L2969, and python/cpython v3.9.25 to v3.13.0 Modules/posixmodule.c and
+Doc/library/os.rst (waitid on macOS from 3.13), for what holds a group's number and when os.waitid exists (Command,
+PINNED).
 """
 from __future__ import annotations
 
@@ -117,6 +124,7 @@ PASSED_SIGNALS = (signal.SIGUSR1, signal.SIGUSR2, signal.SIGALRM)
 FORWARDED = SHUTDOWN_SIGNALS + PASSED_SIGNALS
 TERM_GRACE_SECONDS = 2.0     # after SIGTERM to the command's process group, how long it has to end before SIGKILL
 KILL_WAIT_SECONDS = 1.0      # after SIGKILL, how long to wait for the group to be gone and the command reaped
+GROUP_POLL_SECONDS = 0.05    # how often the group's live members are counted while it is being ended
 PR_SET_PDEATHSIG = 1         # <linux/prctl.h>
 
 
@@ -555,7 +563,7 @@ class Sink:
 
 
 def relay(child, needles, shutdown=()) -> None:
-    """Relay both pipes through a Masker each until EOF, or DRAIN_SECONDS after the command exited.
+    """Relay both pipes through a Masker each until EOF, or DRAIN_SECONDS after the command exited (child is a Command).
 
     Output goes through a Sink each, so a consumer that stops reading cannot hold the runner: the relay stops reading
     a pipe while its queue is full (the command waits, as in any pipeline), and drops what is queued, then
@@ -593,7 +601,7 @@ def relay(child, needles, shutdown=()) -> None:
     try:
         while streams or any(sink.queue for sink in sinks):
             now = time.monotonic()
-            if drain_until is None and child.poll() is not None:
+            if drain_until is None and child.exited():  # seen, not reaped: see Command
                 drain_until = now + DRAIN_SECONDS
             if shutdown:
                 for sink in sinks:
@@ -685,6 +693,12 @@ def disable_core_dumps() -> None:
         raise Refused("core_limit_not_set: could not set RLIMIT_CORE to 0") from None
 
 
+def pre_exec_pause(stage: str) -> None:
+    """Does nothing. A test replaces it, in its launcher, to hold the forked command at a stage of parent_death_hook
+    ("before_arming", "after_check"): the windows it exercises are microseconds wide. It is a module function and not an
+    environment variable, so the tool has no switch that a caller could set."""
+
+
 def parent_death_hook():
     """A preexec_fn that asks the kernel to send the command SIGTERM when the runner ends, or None where it cannot (not
     Linux, no ctypes, no prctl): the start never fails for it.
@@ -692,8 +706,13 @@ def parent_death_hook():
     prctl(PR_SET_PDEATHSIG) (man7.org PR_SET_PDEATHSIG(2const)) is the only thing that acts when the runner is killed
     with SIGKILL, which runs no code of ours. The "parent" is the thread that forked the command: here the main thread,
     because run_command's signal.signal calls raise anywhere else, and its end is the runner's end. The kernel clears
-    the setting for the command's own children, so it reaches the command alone. A runner that ended before the call is
-    noticed by its pid, and the command then ends before it runs."""
+    the setting for the command's own children, so it reaches the command alone.
+
+    The forked command is a copy of the runner, and until it execs it still has the runner's handlers, whose forward()
+    records a signal and does nothing else: a parent-death SIGTERM that reached it there was swallowed, and the command
+    went on to exec and run (third review, finding 2). So every signal the runner handles is put back to its default,
+    and the signal mask the runner was started with is cleared, before the signal is armed. A runner that ended before
+    the call is noticed by its pid, and the command then ends before it runs."""
     if not sys.platform.startswith("linux"):
         return None
     try:
@@ -707,51 +726,184 @@ def parent_death_hook():
 
     def hook() -> None:  # runs in the forked command, between fork and exec
         try:
+            for signum in FORWARDED:
+                signal.signal(signum, signal.SIG_DFL)
+            signal.pthread_sigmask(signal.SIG_SETMASK, ())
+        except Exception:  # never fail the start for this
+            pass
+        try:
+            pre_exec_pause("before_arming")
             if prctl(PR_SET_PDEATHSIG, sigterm, 0, 0, 0) == 0 and os.getppid() != runner:
                 os._exit(128 + sigterm)  # the runner is already gone: nothing would end this command later
+            pre_exec_pause("after_check")
         except Exception:  # never fail the start for this
             pass
 
     return hook
 
 
-def group_exists(pgid: int) -> bool:
-    """Whether any member of the process group is left to signal (a zombie counts until it is reaped)."""
+def pinned_exit_supported() -> bool:
+    """Whether the command's exit can be seen without reaping it, and its process group counted: os.waitid with WNOWAIT
+    (not compiled on macOS before CPython 3.13: posixmodule.c has `HAVE_WAITID && !defined(__APPLE__)` from v3.9.25 to
+    v3.12.0) and a /proc to read the group's members from (Linux)."""
+    return (hasattr(os, "waitid") and hasattr(os, "WNOWAIT") and hasattr(os, "P_PID")
+            and os.path.exists("/proc/self/stat"))
+
+
+# Where this is False the runner learns that the command exited by reaping it, and never signals its group after that.
+PINNED = pinned_exit_supported()
+
+
+def live_members(pgid: int) -> int:
+    """How many processes of the process group are running or stopped, read from /proc: a zombie is not one.
+    kill(-pgid, 0) cannot say, because a zombie stays a member of its group until it is reaped (Linux kernel/pid.c
+    __change_pid detaches a task at release; XNU kern_exit.c reap_child_locked leaves the group at reap), so an
+    unreaped command would keep it answering "yes". An unreadable /proc counts as one, as if something were left."""
+    wanted, count = str(pgid).encode("ascii"), 0
     try:
-        os.killpg(pgid, 0)
-    except OSError:  # no member, or none this user may signal
-        return False
-    return True
+        with os.scandir("/proc") as entries:
+            for entry in entries:
+                if not entry.name.isdigit():
+                    continue
+                try:
+                    with open(f"/proc/{entry.name}/stat", "rb") as handle:
+                        fields = handle.read(1024).rsplit(b")", 1)[1].split()
+                    state, group = fields[0], fields[2]
+                except (OSError, IndexError):
+                    continue  # it ended meanwhile
+                if group == wanted and state != b"Z":
+                    count += 1
+    except OSError:
+        return 1
+    return count
 
 
-def wait_for_group(child, seconds: float) -> bool:
-    """True once the command's process group is empty, False after `seconds`; reaps the command meanwhile."""
-    deadline = time.monotonic() + seconds
-    while True:
-        child.poll()  # a command that exited but was not reaped is still a member of its group
-        if not group_exists(child.pid):
+@contextlib.contextmanager
+def forwarded_signals_blocked():
+    """The signals the runner forwards are blocked inside the block: a handler that ran between a reap and the moment
+    the runner records it would signal a group number that nobody holds."""
+    previous = signal.pthread_sigmask(signal.SIG_BLOCK, FORWARDED)
+    try:
+        yield
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous)
+
+
+class Command:
+    """The command the runner started, and the one place that reaps it (third review, finding 1).
+
+    The command leads its own process group, and the group's number is the command's pid. Once nothing holds a number
+    the kernel may give it to a stranger, and a signal sent to it then reaches the stranger's group. What holds the
+    number is the command's own zombie: nobody can take its pid, or start a group under that number, until the command
+    is reaped (Linux kernel/pid.c __change_pid frees a pid only when no task holds it; XNU kern_fork.c skips a pid that
+    is a process, group or session id). So the runner learns that the command exited without reaping it (exited(),
+    wait_exited(): os.waitid with WNOWAIT), signals the group only while the command is unreaped (signal_group() refuses
+    afterwards), and reaps last (reap()).
+
+    Where that cannot be done (pinned is False, see PINNED) the exit is seen by reaping the command, and the group is
+    never signalled after that."""
+
+    def __init__(self, process):
+        self.process, self.pid, self.pinned, self.lost = process, process.pid, PINNED, False
+
+    @property
+    def stdout(self):
+        return self.process.stdout
+
+    @property
+    def stderr(self):
+        return self.process.stderr
+
+    @property
+    def returncode(self):
+        return self.process.returncode
+
+    @property
+    def reaped(self) -> bool:
+        """True once the command has been reaped (or lost to an automatic reap): its group's number is nobody's."""
+        return self.lost or self.process.returncode is not None
+
+    def exited(self) -> bool:
+        """Whether the command has exited. Pinned, it is left a zombie, and the group's number stays held."""
+        if self.reaped:
             return True
-        if time.monotonic() >= deadline:
+        if self.pinned:
+            try:
+                return os.waitid(os.P_PID, self.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None
+            except ChildProcessError:  # reaped behind our back: nothing holds its number
+                self.lost = True
+                return True
+            except (OSError, ValueError):  # waitid is refused here: see the exit by reaping it instead
+                self.pinned = False
+        with forwarded_signals_blocked():
+            return self.process.poll() is not None
+
+    def wait_exited(self) -> None:
+        """Wait for the command to exit; it is reaped by this only where its exit cannot be seen otherwise."""
+        while not self.reaped:
+            if self.pinned:
+                try:
+                    os.waitid(os.P_PID, self.pid, os.WEXITED | os.WNOWAIT)
+                    return
+                except ChildProcessError:
+                    self.lost = True
+                    return
+                except (OSError, ValueError):
+                    self.pinned = False
+            if self.exited():
+                return
+            time.sleep(POLL_SECONDS)
+
+    def signal_group(self, signum) -> bool:
+        """Signal the command's process group, and only while the command is unreaped and so holds its number."""
+        if self.reaped:
             return False
-        time.sleep(0.02)
-
-
-def end_group(child) -> None:
-    """SIGTERM to the command's process group, SIGKILL to what is left after TERM_GRACE_SECONDS, and reap the command.
-
-    The command leads its own group (start_new_session), so this reaches every descendant that stayed in it, and does
-    nothing but reap when none is left. run_command calls it on every way out. A descendant that left the group (setsid
-    or setpgid) is out of reach. The same order as bazelbuild/bazel@d2545923 src/main/tools/process-tools.cc
-    KillEverything (L94-110: SIGTERM to -pgrp, a timeout, SIGKILL to -pgrp)."""
-    for signum, seconds in ((signal.SIGTERM, TERM_GRACE_SECONDS), (signal.SIGKILL, KILL_WAIT_SECONDS)):
         try:
-            os.killpg(child.pid, signum)
+            os.killpg(self.pid, signum)
         except OSError:  # no member left, or none that this user may signal
-            break
-        if wait_for_group(child, seconds):
-            break
-    with contextlib.suppress(subprocess.TimeoutExpired):
-        child.wait(timeout=KILL_WAIT_SECONDS)
+            return False
+        return True
+
+    def live_members(self) -> int:
+        return live_members(self.pid)
+
+    def reap(self, timeout=None):
+        """The command's exit status, reaping it: nothing may signal its group afterwards. None if it has not exited
+        within timeout."""
+        with forwarded_signals_blocked():
+            try:
+                return self.process.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                return None
+
+
+def end_group(command) -> None:
+    """SIGTERM to the command's process group, SIGKILL to what is left after TERM_GRACE_SECONDS, while the command is
+    still unreaped and so holds the group's number (Command). Nothing is signalled when nothing but the command's own
+    zombie is left. run_command calls it on every way out, and reaps the command afterwards. A descendant that left the
+    group (setsid or setpgid) is out of reach. The same order as bazelbuild/bazel@d2545923
+    src/main/tools/process-tools.cc KillEverything (L94-110: SIGTERM to -pgrp, a timeout, SIGKILL to -pgrp), which
+    signals after waitpid has reaped its child.
+
+    Where the exit cannot be seen without reaping (command.pinned is False) the group cannot be seen to empty either,
+    and once the command is reaped it may not be signalled: a command that is still unreaped (the runner failed while
+    it ran) gets SIGTERM, TERM_GRACE_SECONDS and SIGKILL, and one that was reaped gets nothing."""
+    if command.reaped:
+        return
+    if not command.pinned:
+        command.signal_group(signal.SIGTERM)
+        time.sleep(TERM_GRACE_SECONDS)
+        command.signal_group(signal.SIGKILL)
+        return
+    if command.live_members() == 0:
+        return
+    for signum, seconds in ((signal.SIGTERM, TERM_GRACE_SECONDS), (signal.SIGKILL, KILL_WAIT_SECONDS)):
+        command.signal_group(signum)
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            if command.live_members() == 0:
+                return
+            time.sleep(GROUP_POLL_SECONDS)
 
 
 WATCHDOG = True  # a test launcher switches it off, to see the parent-death signal alone; there is no environment switch
@@ -846,42 +998,42 @@ def run_command(command: list, environment: dict, needles: list) -> int:
         if not started:
             pending.append(signum)
             return
-        child = started[0]
-        try:
-            os.killpg(child.pid, signum)  # the command leads its own session and process group
-        except ProcessLookupError:
-            if child.returncode is None:  # not reaped, so the pid cannot have been reused
-                with contextlib.suppress(ProcessLookupError):
-                    os.kill(child.pid, signum)
-        except PermissionError:
-            pass
+        started[0].signal_group(signum)  # its own session and group; refused once the command is reaped
 
     for signum in FORWARDED:
         signal.signal(signum, forward)
+    # An inherited SIG_IGN for SIGCHLD makes the kernel reap each child the moment it exits: no zombie would hold the
+    # command's number, and its exit status would be lost.
+    signal.signal(signal.SIGCHLD, signal.SIG_DFL)
     try:
-        child = subprocess.Popen(command, env=environment, stdin=None, stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE, close_fds=True, start_new_session=True,
-                                 preexec_fn=parent_death_hook())
+        process = subprocess.Popen(command, env=environment, stdin=None, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE, close_fds=True, start_new_session=True,
+                                   preexec_fn=parent_death_hook())
     except FileNotFoundError:
         raise SpawnError(127, "not_found") from None
     except PermissionError:
         raise SpawnError(126, "not_executable") from None
     except OSError:
         raise SpawnError(126, "cannot_execute") from None
-    started.append(child)
-    watchdog = None
+    leader = Command(process)
+    started.append(leader)
+    watchdog, done = None, False
     try:
-        watchdog = Watchdog(child.pid)
+        watchdog = Watchdog(leader.pid)
         for signum in pending:
             forward(signum, None)
-        relay(child, needles, shutdown)
-        code = child.wait()
+        relay(leader, needles, shutdown)
+        leader.wait_exited()
+        done = True
     finally:
         try:
-            end_group(child)  # on every way out: no descendant is left running with the key in its environment
+            end_group(leader)  # on every way out: no descendant is left running with the key in its environment
         finally:
-            if watchdog is not None:
-                watchdog.release()
+            try:
+                if watchdog is not None:
+                    watchdog.release()  # it stands down before the reap, so it acts only if the runner died first
+            finally:
+                code = leader.reap(None if done else KILL_WAIT_SECONDS)
     return code if code >= 0 else 128 - code
 
 
