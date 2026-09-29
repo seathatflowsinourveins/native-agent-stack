@@ -5,9 +5,11 @@ and codex-rs/core/src/agent/role.rs; rtk-ai/rtk v0.50.0, hooks/rtk-awareness-ful
 checks, not spawned-agent acceptance.
 
 The two stack role carriers (`stack-researcher` and `stack-verifier`, 2026-09-29) are checked as bytes
-and structure only. Each rule id in RULES names its source; the tests never start a Codex session.
-The denylist and name scans are linear character scanners (no backtracking regular expressions), and
-a control compares them with the frozen tool_name_pattern of tests/test_token_e2e_preregistration.py.
+and structure only. The rules live in tools/adoption/codex_roles.py, where each rule id in RULES names its
+source; the pinned values below are independent literals, so a change on either side fails a test. The tests
+never start a Codex session. The denylist and name scans are linear character scanners (no backtracking regular
+expressions), and a control compares them with the frozen tool_name_pattern of
+tests/test_token_e2e_preregistration.py.
 A test that reads a role file or the README asserts first that the file exists, so a missing file fails by
 assertion, not by error.
 """
@@ -28,6 +30,7 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 AGENTS = ROOT / "examples" / "codex-native" / "agents"
 ADOPTION_AGENTS = ROOT / "adoption" / "agents" / "codex"
 README = ROOT / "examples" / "codex-native" / "README.md"
@@ -154,41 +157,6 @@ CLAUDE_BLOCK_LANES = {"stack-researcher": "researcher", "stack-verifier": "verif
 # ---------------------------------------------------------------------------------------------------------
 # Helpers: linear scanners and file readers.
 
-def is_ascii_alnum(char):
-    return char.isascii() and char.isalnum()
-
-
-def name_hits(text, names, fold):
-    """Names of `names` that occur in `text` with no ASCII letter or digit on either side.
-
-    This is the delimiting of tool_name_pattern() in tests/test_token_e2e_preregistration.py,
-    (?<![A-Za-z0-9])name(?![A-Za-z0-9]), and fold=True is its re.I. One str.find sweep per name; no regular
-    expression, so nothing can backtrack.
-    """
-    haystack = text.lower() if fold else text
-    found = []
-    for name in names:
-        needle = name.lower() if fold else name
-        start = 0
-        while True:
-            index = haystack.find(needle, start)
-            if index < 0:
-                break
-            end = index + len(needle)
-            before = haystack[index - 1] if index > 0 else ""
-            after = haystack[end] if end < len(haystack) else ""
-            if not (before and is_ascii_alnum(before)) and not (after and is_ascii_alnum(after)):
-                found.append(name)
-                break
-            start = index + 1
-    return found
-
-
-def text_of(data, key):
-    value = data.get(key)
-    return value if isinstance(value, str) else ""
-
-
 def load_role(path):
     return tomllib.loads(path.read_text(encoding="utf-8"))
 
@@ -227,157 +195,14 @@ def require(test, *paths):
     test.assertEqual(missing, [], "required file(s) absent")
 
 
-# ---------------------------------------------------------------------------------------------------------
-# Structural rules. Each rule is keyed by the expected role, never by the (possibly mutated) stem or name.
-
-def _rule_keys(role, stem, data):
-    return set(data) != ROLE_KEYS
-
-
-def _rule_name_stem(role, stem, data):
-    return data.get("name") != stem
-
-
-def _rule_builtin_name(role, stem, data):
-    return data.get("name") in BUILTIN_ROLES
-
-
-def _rule_description_shape(role, stem, data):
-    description = data.get("description")
-    return (not isinstance(description, str) or not description.strip() or "\n" in description
-            or "\r" in description or len(description) > 200)
-
-
-def _rule_description_denylist(role, stem, data):
-    return bool(name_hits(text_of(data, "description"), frozen_denylist(), fold=True))
-
-
-def _rule_model_pin(role, stem, data):
-    return data.get("model") != ROLE_MODEL
-
-
-def _rule_effort_pin(role, stem, data):
-    return data.get("model_reasoning_effort") != ROLE_EFFORT
-
-
-def _rule_f4_block(role, stem, data):
-    instructions = text_of(data, "developer_instructions")
-    if (f4_block() not in instructions or instructions.count(UPSTREAM_MARKER) != 1
-            or instructions.count(EXCEPTIONS_MARKER) != 1):
-        return True
-    # The blank separator before the exception marker is outside the upstream file.
-    upstream = instructions.split(UPSTREAM_MARKER, 1)[1].split("\n" + EXCEPTIONS_MARKER, 1)[0]
-    if hashlib.sha256(upstream.encode("utf-8")).hexdigest() != RTK_SHA256:
-        return True
-    return any(line.startswith("@") for line in instructions.splitlines())
-
-
-def _rule_claude_only_name(role, stem, data):
-    text = text_of(data, "description") + "\n" + text_of(data, "developer_instructions")
-    return bool(name_hits(text, CLAUDE_ONLY_NAMES, fold=False))
-
-
-def _rule_one_agent(role, stem, data):
-    return ONE_AGENT_SENTENCE not in text_of(data, "developer_instructions")
-
-
-def _rule_cwd(role, stem, data):
-    return WORKING_DIRECTORY_BULLET not in text_of(data, "developer_instructions")
-
-
-def _rule_exact_shapes(role, stem, data):
-    return EXACT_SHAPES[role] not in text_of(data, "developer_instructions")
-
-
-def _rule_no_web(role, stem, data):
-    return NO_WEB_SENTENCE not in text_of(data, "developer_instructions")
-
-
-# (rule id, roles it applies to, source, check). Sources are openai/codex at rust-v0.157.1 (36650394) unless a
-# repository path is given; a check returns True when the rule is violated.
-RULES = (
-    ("keys", STACK_ROLES,
-     "codex-rs/core/src/agent/role.rs:36-48 (AgentRoleOverrides, the applied set) and "
-     "codex-rs/agent-roles/src/agent_role_config.rs:20-28 (RawAgentRoleFileToml, deny_unknown_fields): a role "
-     "file carries exactly the five keys, since every other key is unapplied or would change tool bindings",
-     _rule_keys),
-    ("name_stem", STACK_ROLES,
-     "agent_role_config.rs:73-88 (the name field, not the file name, names the role); the stem equals the name so "
-     "the discovered file and its role cannot disagree",
-     _rule_name_stem),
-    ("builtin_name", STACK_ROLES,
-     "role.rs:33 and :337-380 (built_in::configs: default, explorer, worker); a user role of that name shadows a "
-     "built-in",
-     _rule_builtin_name),
-    ("description_shape", STACK_ROLES,
-     "agent_role_config.rs:63-66,120-130 (a blank description is rejected) and role.rs:294-334 (format_role "
-     "renders it between braces in the spawn_agent description): non-blank, one line, at most 200 characters",
-     _rule_description_shape),
-    ("description_denylist", STACK_ROLES,
-     "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json /no_tool_names_denylist under "
-     "tests/test_token_e2e_preregistration.py tool_name_pattern with re.I; role.rs:294-334 shows the description to "
-     "every parent in every arm",
-     _rule_description_denylist),
-    ("model_pin", STACK_ROLES,
-     "preregistration.json /tasks (every family codex task is gpt-6-astra at max) and "
-     "adoption/templates/codex.stack-worker.config.toml:12",
-     _rule_model_pin),
-    ("effort_pin", STACK_ROLES,
-     "preregistration.json /tasks; codex-rs/protocol/src/openai_models.rs:59-72 (ReasoningEffort::Max) and "
-     "adoption/templates/codex.stack-worker.config.toml:17",
-     _rule_effort_pin),
-    ("f4_block", STACK_ROLES,
-     "docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26; rtk-ai/rtk v0.50.0 "
-     "hooks/rtk-awareness-full.md (RTK_SHA256); adoption/templates/codex.AGENTS.template.md",
-     _rule_f4_block),
-    ("claude_only_name", STACK_ROLES,
-     "adoption/agents/claude/stack-*.md and adoption/hooks/claude/token-lanes-block.*.md name tools, frontmatter "
-     "keys and hooks that Codex does not have; matched case-sensitively with ASCII-alphanumeric delimiters",
-     _rule_claude_only_name),
-    ("one_agent_rule", STACK_ROLES,
-     "role.rs:80-126 (a role can only disable a few features, never the collaboration tools), so a child is "
-     "told not to spawn, message or follow up with other agents",
-     _rule_one_agent),
-    ("cwd_rule", STACK_ROLES,
-     "docs/token-session-handbook.md, Context Mode executor, 'Codex workers' bullet (context-mode binds the launch "
-     "directory) and evidence/artifacts/token-adoption-e2e-20260926/README.md:370 (M13: no explicit cwd)",
-     _rule_cwd),
-    ("exact_shapes", STACK_ROLES,
-     "adoption/templates/codex.AGENTS.template.md:41-46 (six exceptions, jq included) and "
-     "evidence/artifacts/token-adoption-e2e-20260926/README.md:363 (M6c: 0 exception commands wrapped in rtk)",
-     _rule_exact_shapes),
-    ("no_web_rule", ("stack-verifier",),
-     "role.rs:36-48 has no web_search override, so the verifier's no-web restriction is a prompt rule",
-     _rule_no_web),
-)
-
-
-def structural_problems(expected_role, stem, data):
-    """Sorted rule ids violated by parsed role TOML `data`, for the role a test expects and the file stem it has."""
-    return sorted(rule_id for rule_id, roles, _source, check in RULES
-                  if expected_role in roles and check(expected_role, stem, data))
-
-
-def byte_problems(adoption_dir, examples_dir, rows):
-    """Sorted rule ids: rows_names, sha256_row (a carrier differs from its row) and mirror_copy (examples differs)."""
-    problems = []
+def codex_roles(test):
+    """tools/adoption/codex_roles.py, which holds the structural rules and the byte rules (design 3.2). Imported
+    here, so a missing module fails the test by assertion, not by ImportError."""
     try:
-        expected = rows_by_name(rows)
-    except ValueError:
-        expected = {}
-    names = [f"{role}.toml" for role in STACK_ROLES]
-    if sorted(expected) != sorted(names) or len(expected) != len(rows):
-        problems.append("rows_names")
-    for name in names:
-        source = adoption_dir / name
-        mirror = examples_dir / name
-        source_bytes = source.read_bytes() if source.is_file() else None
-        mirror_bytes = mirror.read_bytes() if mirror.is_file() else None
-        if source_bytes is None or hashlib.sha256(source_bytes).hexdigest() != expected.get(name):
-            problems.append("sha256_row")
-        if source_bytes is None or source_bytes != mirror_bytes:
-            problems.append("mirror_copy")
-    return sorted(set(problems))
+        import codex_roles as module
+    except ImportError:
+        test.fail("tools/adoption/codex_roles.py missing")
+    return module
 
 
 def role_tables(text):
@@ -512,7 +337,7 @@ class CustomAgentInstructionsTests(unittest.TestCase):
         require(self, *role_paths())
         self.assertEqual(sorted(path.name for path in ADOPTION_AGENTS.glob("*.toml")),
                          [f"{role}.toml" for role in STACK_ROLES])
-        self.assertEqual(byte_problems(ADOPTION_AGENTS, AGENTS, STACK_ROLE_ROWS), [])
+        self.assertEqual(codex_roles(self).byte_problems(ROOT), [])
 
     def test_shipped_sha256sums_pin_the_two_carriers(self):
         # adoption/agents/codex/SHA256SUMS holds two sha256sum-format lines, like its precedent
@@ -547,35 +372,56 @@ class CustomAgentInstructionsTests(unittest.TestCase):
                                     "which the server is already bound to"), 1)
 
     def test_byte_mutants_fire_exactly_one_rule(self):
-        require(self, *role_paths())
+        require(self, *role_paths(), ADOPTION_AGENTS / "SHA256SUMS")
+        module = codex_roles(self)
         good_rows = rows_by_name(STACK_ROLE_ROWS)
+
+        def sums(rows):
+            return "".join(f"{digest}  {name}\n" for name, digest in rows.items())
+
         with tempfile.TemporaryDirectory(prefix="stack-roles-") as scratch:
-            adoption, examples = Path(scratch) / "adoption", Path(scratch) / "examples"
-            adoption.mkdir()
-            examples.mkdir()
+            tree = Path(scratch)
+            adoption, examples = tree / "adoption" / "agents" / "codex", tree / "examples" / "codex-native" / "agents"
+            adoption.mkdir(parents=True)
+            examples.mkdir(parents=True)
             for role in STACK_ROLES:
                 shutil.copyfile(ADOPTION_AGENTS / f"{role}.toml", adoption / f"{role}.toml")
                 shutil.copyfile(AGENTS / f"{role}.toml", examples / f"{role}.toml")
+            (adoption / "SHA256SUMS").write_text(sums(good_rows), encoding="utf-8")
             with self.subTest(mutant="pristine copies"):
-                self.assertEqual(byte_problems(adoption, examples, STACK_ROLE_ROWS), [])
+                self.assertEqual(module.byte_problems(tree), [])
             mirror = examples / "stack-verifier.toml"
             original = mirror.read_bytes()
             mirror.write_bytes(bytes([original[0] ^ 1]) + original[1:])
             with self.subTest(mutant="one byte flipped in a mirror"):
-                self.assertEqual(byte_problems(adoption, examples, STACK_ROLE_ROWS), ["mirror_copy"])
+                self.assertEqual(module.byte_problems(tree), ["mirror_copy"])
             mirror.write_bytes(original)
-            changed = dict(good_rows, **{"stack-researcher.toml": "0" * 64})
-            rows = tuple(f"| `{name}` | `{digest}` |" for name, digest in changed.items())
             with self.subTest(mutant="one row changed"):
-                self.assertEqual(byte_problems(adoption, examples, rows), ["sha256_row"])
+                (adoption / "SHA256SUMS").write_text(
+                    sums(dict(good_rows, **{"stack-researcher.toml": "0" * 64})), encoding="utf-8")
+                self.assertEqual(module.byte_problems(tree), ["sha256_row"])
             with self.subTest(mutant="a third name in the rows"):
-                self.assertEqual(byte_problems(adoption, examples, STACK_ROLE_ROWS + ("| `stack-x.toml` | `" + "1" * 64 + "` |",)),
-                                 ["rows_names"])
+                (adoption / "SHA256SUMS").write_text(sums({**good_rows, "stack-x.toml": "1" * 64}), encoding="utf-8")
+                self.assertEqual(module.byte_problems(tree), ["sha256sums_names"])
+            with self.subTest(mutant="a name missing from the rows"):
+                (adoption / "SHA256SUMS").write_text(
+                    sums({"stack-researcher.toml": good_rows["stack-researcher.toml"]}), encoding="utf-8")
+                self.assertEqual(module.byte_problems(tree), ["sha256_row", "sha256sums_names"])
+            with self.subTest(mutant="SHA256SUMS malformed"):
+                (adoption / "SHA256SUMS").write_text("not a checksum line\n", encoding="utf-8")
+                self.assertEqual(module.byte_problems(tree), ["sha256_row", "sha256sums_names"])
+            with self.subTest(mutant="SHA256SUMS absent"):
+                (adoption / "SHA256SUMS").unlink()
+                self.assertEqual(module.byte_problems(tree), ["sha256_row", "sha256sums_names"])
+            (adoption / "SHA256SUMS").write_text(sums(good_rows), encoding="utf-8")
             for directory in (adoption, examples):
                 source = directory / "stack-researcher.toml"
                 source.write_bytes(source.read_bytes() + b"\n")
             with self.subTest(mutant="identical copies with changed bytes"):
-                self.assertEqual(byte_problems(adoption, examples, STACK_ROLE_ROWS), ["sha256_row"])
+                self.assertEqual(module.byte_problems(tree), ["sha256_row"])
+            with self.subTest(mutant="a carrier absent"):
+                (adoption / "stack-verifier.toml").unlink()
+                self.assertEqual(module.byte_problems(tree), ["mirror_copy", "sha256_row"])
 
     def test_stack_role_structure(self):
         require(self, *role_paths())
@@ -585,7 +431,7 @@ class CustomAgentInstructionsTests(unittest.TestCase):
                 with self.subTest(role=role, copy=path.parent.name):
                     data = load_role(path)
                     self.assertEqual(sorted(data), sorted(ROLE_KEYS))
-                    self.assertEqual(structural_problems(role, path.stem, data), [])
+                    self.assertEqual(codex_roles(self).structural_problems(role, path.stem, data), [])
 
     def test_stack_role_pins_equal_every_codex_task(self):
         require(self, *role_paths())
@@ -615,7 +461,7 @@ class CustomAgentInstructionsTests(unittest.TestCase):
                     description = load_role(directory / f"{role}.toml")["description"]
                     self.assertEqual(description, DESCRIPTIONS[role])
                     self.assertEqual(len(description), DESCRIPTION_LENGTHS[role])
-                    self.assertEqual(name_hits(description, denylist, fold=True), [])
+                    self.assertEqual(codex_roles(self).name_hits(description, denylist, fold=True), [])
 
     def test_stack_role_shared_sentences(self):
         require(self, *role_paths())
@@ -634,10 +480,11 @@ class CustomAgentInstructionsTests(unittest.TestCase):
 
     def test_structural_mutants_fire_exactly_one_rule(self):
         require(self, *role_paths())
+        module = codex_roles(self)
         self.assertIn("rtk", frozen_denylist())
         for role in STACK_ROLES:
             data = load_role(ADOPTION_AGENTS / f"{role}.toml")
-            self.assertEqual(structural_problems(role, role, data), [], "the unmutated role has no problem")
+            self.assertEqual(module.structural_problems(role, role, data), [], "the unmutated role has no problem")
             self.assertEqual(data["developer_instructions"].count("`jq` output, "), 1)
             for label, expected, roles, build in MUTANTS:
                 if role not in roles:
@@ -645,24 +492,24 @@ class CustomAgentInstructionsTests(unittest.TestCase):
                 with self.subTest(role=role, mutant=label):
                     stem, mutated = build(role, data)
                     self.assertNotEqual((stem, mutated), (role, data), "the mutant changed nothing")
-                    self.assertEqual(structural_problems(role, stem, mutated), sorted(expected))
+                    self.assertEqual(module.structural_problems(role, stem, mutated), sorted(expected))
 
     def test_disabling_a_rule_fails_exactly_its_own_mutants(self):
         # Mutation control on the checker itself: with one rule turned into "always ok" (mock.patch.object), the
         # mutants that expect that rule stop matching, and no other mutant is affected.
         require(self, *role_paths())
-        module = sys.modules[__name__]
+        module = codex_roles(self)
         for role in STACK_ROLES:
             data = load_role(ADOPTION_AGENTS / f"{role}.toml")
-            for rule_id, roles, _source, _check in RULES:
-                if role not in roles:
+            for rule_id, rule_roles, _source, _check in module.RULES:
+                if role not in rule_roles:
                     continue
                 disabled = tuple((rid, rls, src, (lambda *args: False) if rid == rule_id else chk)
-                                 for rid, rls, src, chk in RULES)
+                                 for rid, rls, src, chk in module.RULES)
                 with mock.patch.object(module, "RULES", disabled):
                     failing = sorted(label for label, expected, mroles, build in MUTANTS
                                      if role in mroles
-                                     and structural_problems(role, *build(role, data)) != sorted(expected))
+                                     and module.structural_problems(role, *build(role, data)) != sorted(expected))
                 own = sorted(label for label, expected, mroles, _build in MUTANTS
                              if role in mroles and rule_id in expected)
                 with self.subTest(role=role, disabled_rule=rule_id):
@@ -670,13 +517,32 @@ class CustomAgentInstructionsTests(unittest.TestCase):
                     self.assertEqual(failing, own)
 
     def test_mutation_table_covers_every_rule(self):
+        module = codex_roles(self)
         for role in STACK_ROLES:
-            applicable = {rule_id for rule_id, roles, _source, _check in RULES if role in roles}
+            applicable = {rule_id for rule_id, rule_roles, _source, _check in module.RULES if role in rule_roles}
             covered = {rule for _label, expected, roles, _build in MUTANTS if role in roles for rule in expected}
             self.assertEqual(covered, applicable)
-        for rule_id, _roles, source, _check in RULES:
+        for rule_id, _roles, source, _check in module.RULES:
             with self.subTest(rule=rule_id):
                 self.assertTrue(source.strip(), "every rule names its source")
+
+    def test_rule_constants_equal_the_shared_module(self):
+        # The pinned values of this module are independent literals: the module's copy must equal each of them.
+        module = codex_roles(self)
+        self.assertEqual(set(module.ROLE_KEYS), ROLE_KEYS)
+        self.assertEqual(set(module.BUILTIN_ROLES), BUILTIN_ROLES)
+        self.assertEqual((module.ROLE_MODEL, module.ROLE_EFFORT), (ROLE_MODEL, ROLE_EFFORT))
+        self.assertEqual(module.ONE_AGENT_SENTENCE, ONE_AGENT_SENTENCE)
+        self.assertEqual(module.WORKING_DIRECTORY_BULLET, WORKING_DIRECTORY_BULLET)
+        self.assertEqual(module.NO_WEB_SENTENCE, NO_WEB_SENTENCE)
+        self.assertEqual(dict(module.EXACT_SHAPES), EXACT_SHAPES)
+        self.assertEqual(tuple(module.CLAUDE_ONLY_NAMES), CLAUDE_ONLY_NAMES)
+        self.assertEqual((module.UPSTREAM_MARKER, module.EXCEPTIONS_MARKER, module.END_MARKER, module.RTK_SHA256),
+                         (UPSTREAM_MARKER, EXCEPTIONS_MARKER, END_MARKER, RTK_SHA256))
+        self.assertEqual(module.f4_block(), f4_block())
+        self.assertEqual(module.frozen_denylist(), frozen_denylist())
+        self.assertEqual(tuple(module.ROLE_FILES), tuple(f"{role}.toml" for role in STACK_ROLES))
+        self.assertEqual(tuple(module.ROLES), STACK_ROLES)
 
     def test_no_claude_only_names_in_full_instructions(self):
         require(self, *role_paths())
@@ -685,14 +551,15 @@ class CustomAgentInstructionsTests(unittest.TestCase):
                 with self.subTest(role=role, copy=directory.name):
                     data = load_role(directory / f"{role}.toml")
                     text = data["description"] + "\n" + data["developer_instructions"]
-                    self.assertEqual(name_hits(text, CLAUDE_ONLY_NAMES, fold=False), [])
+                    self.assertEqual(codex_roles(self).name_hits(text, CLAUDE_ONLY_NAMES, fold=False), [])
         for name in CLAUDE_ONLY_NAMES:
             with self.subTest(control=name):
-                self.assertEqual(name_hits(f"Use {name}.", CLAUDE_ONLY_NAMES, fold=False), [name])
-                self.assertEqual(name_hits(f"x{name}y", (name,), fold=False), [])
+                self.assertEqual(codex_roles(self).name_hits(f"Use {name}.", CLAUDE_ONLY_NAMES, fold=False), [name])
+                self.assertEqual(codex_roles(self).name_hits(f"x{name}y", (name,), fold=False), [])
 
     def test_name_scanner_matches_frozen_tool_name_pattern(self):
         # A control that needs no role file: the linear scanner against the sealed regular expression.
+        module = codex_roles(self)
         pattern = sealed_module().tool_name_pattern
         cases = (
             ("Call mcp__SeReNa__find_symbol.", "serena", True),
@@ -703,13 +570,13 @@ class CustomAgentInstructionsTests(unittest.TestCase):
         for text, name, expected in cases:
             with self.subTest(text=text, name=name):
                 self.assertEqual(re.search(pattern(name), text, re.I) is not None, expected)
-                self.assertEqual(bool(name_hits(text, (name,), fold=True)), expected)
+                self.assertEqual(bool(module.name_hits(text, (name,), fold=True)), expected)
         # Negative control: a plain substring test disagrees on the delimiter cases, so the cases discriminate.
-        self.assertTrue("rtk" in "rtkx" and not name_hits("rtkx", ("rtk",), fold=True))
+        self.assertTrue("rtk" in "rtkx" and not module.name_hits("rtkx", ("rtk",), fold=True))
         if PREREGISTRATION.is_file():
             for text in (DESCRIPTIONS["stack-researcher"], DESCRIPTIONS["stack-verifier"], f4_block()):
                 for name in frozen_denylist():
-                    self.assertEqual(bool(name_hits(text, (name,), fold=True)),
+                    self.assertEqual(bool(module.name_hits(text, (name,), fold=True)),
                                      re.search(pattern(name), text, re.I) is not None, name)
 
     def test_stack_roles_are_discovered_not_registered(self):
