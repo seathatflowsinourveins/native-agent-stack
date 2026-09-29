@@ -241,6 +241,13 @@ follows the measurement (an unsaved model warns at `SessionStart` and heals at
 `SessionEnd`, `ultracode` or not). The
 [dispatch record](../docs/decisions/2026-09-29-sonnet-5-5-dispatch.md) has the rest.
 
+**2026-09-29, later: the terminal default is `max`, through the ecosystem launcher.** The user asked for `max` as the default. A saved
+`max` is still not accepted, and `CLAUDE_CODE_EFFORT_LEVEL` would override every child's own effort, so the launcher that `install_native`
+writes adds `--effort max` only when nothing chose an effort (a terminal, no `-p`, no `--effort`, no `CLAUDE_CODE_EFFORT_LEVEL`, a client
+at 2.1.284 or newer). `claude --effort xhigh` opts out, and the saved per-model `xhigh` above stays the fallback for launches that skip
+the launcher (IDE, desktop, web). The choice rests on the user's requirement, not on a measured gain here
+([decision record](../docs/decisions/2026-09-29-max-default-effort.md), [receipt](../evidence/receipts/claude-max-default-effort-20260929.json)).
+
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
@@ -267,8 +274,8 @@ therefore declare `effort: max` beside their task-matched models (Sonnet for
 `stack-verifier` declare Opus since 2026-09-27, per item 1 of the
 [settings decision](../docs/decisions/2026-09-27-claude-harness-settings.md);
 Haiku is not routed), and workflow stages pass
-`effort: 'max'` explicitly: a stage without its own effort inherits the
-coordinator's `xhigh` unless its agent's frontmatter sets one, and a stage's
+`effort: 'max'` explicitly: a stage without its own effort inherited the
+coordinator's `xhigh` on 2.1.281 unless its agent's frontmatter sets one, and a stage's
 effort overrides the frontmatter (probe Q3). Verify each child's resolved
 effort in its transcript rather than inferring it from a definition. The
 [Ultracode recipe](claude-native-ultracode.md#child-effort-max-under-an-ultracode-coordinator)

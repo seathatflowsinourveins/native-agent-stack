@@ -150,6 +150,48 @@ reports through the protocol above does not by itself make a PR shared. A
 on the PR, before merge. Branch names do not encode lanes; the label does. The
 [PR template](../.github/pull_request_template.md) asks for the lane.
 
+Merge with the checked and reviewed head pinned:
+
+```sh
+gh pr view <N> --json headRefOid --jq .headRefOid
+gh pr checks <N> --required
+gh pr merge <N> --squash --match-head-commit <SHA>
+```
+
+- `<SHA>` is the full 40-character `headRefOid` the first command prints, read
+  immediately before the merge. It must be the head on which the review
+  completed. `gh pr checks --required` lists only the required checks and keeps
+  the latest run of each, so a check that failed and then passed shows as passed.
+  It exits 0 only when every required check has passed; it exits 8 while any is
+  pending, and 1 when one has failed and none is pending. A description edit
+  starts a new `validate.yml` run on the same head (its `pull_request` types
+  include `edited`), so run it after the last edit. `gh` sends `<SHA>` as
+  GitHub's `expectedHeadOid` ([gh pr merge](https://cli.github.com/manual/gh_pr_merge):
+  "Commit SHA that the pull request head must match to allow merge"), and GitHub
+  refuses the merge if the head has moved since; the mechanics are in the
+  [decision record](decisions/2026-09-22-github-automation-closure.md).
+- The rebase or merge of `main` that the [hot-file protocol](#hot-file-protocol)
+  asks for comes before that read, because it makes a new head. If `main`
+  changed a shared hot file after `<SHA>` (`git fetch origin`, then
+  `git diff --name-only <SHA>...origin/main`), merge `main` again through the
+  protocol, wait for the required checks on the new head and pin that head
+  instead. The review carries over only if
+  `git diff <SHA> <new head> -- <reviewed files>` prints nothing, where
+  `<reviewed files>` leaves out `manifests/evidence.json` and the generated
+  reports; otherwise review the new head. This is analogous to GitHub's
+  stale-approval rule, which dismisses an approval when the approved diff changes
+  ([available rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-a-pull-request-before-merging)).
+- The flag guards the head, not the base. The ruleset keeps strict up-to-date
+  checks off, because concurrent sessions share `main`, and this User-owned
+  repository cannot use a merge queue
+  ([decision record](decisions/2026-09-22-github-automation-closure.md)). Two
+  pull requests that each passed against an older `main` can therefore still
+  break it together: "Status checks may fail after you merge your branch if
+  there are incompatible changes with the base branch"
+  ([loose required status checks](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging)).
+  Merging `main` right before the merge narrows that window without closing
+  it, and `validate.yml` runs again on every push to `main`.
+
 ## Coordination
 
 When another live session owns an area, hand off instead of editing it.

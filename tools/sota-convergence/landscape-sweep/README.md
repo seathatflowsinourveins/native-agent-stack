@@ -68,7 +68,7 @@ Why the roles are split this way:
 
 The role split is the design of the 2026-09-26 prototype, with these 2026-09-27 changes. No measured comparison has tested it. Moving the facts role to GPT-6 would change a vote's family, which the survival rule and the copy check key on, so it needs its own comparison first.
 
-Every `agent()` call names its model and `effort: 'max'`, so no stage inherits the coordinator's `xhigh`
+Every `agent()` call names its model and `effort: 'max'`, so no stage inherits the coordinator's effort
 ([max-effort decision](../../../docs/decisions/2026-09-23-max-effort-default.md)). The vote objects in
 `returns.json` name the model and effort each Claude refuter was measured at (its own child in the usage record),
 not the requested ones. Without `--usage`, `convert.py` writes the requested alias and effort `null`.
