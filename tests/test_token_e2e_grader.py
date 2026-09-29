@@ -1467,7 +1467,8 @@ class F25a_MemoryKeys(GraderCase):
             {"path": "fx/between.md", "at": "2026-10-03T00:00:00Z", "body": "host request lane, between the windows"},
             {"path": "fx/before.md", "at": "2026-09-20T00:00:00Z", "body": "host request lane, before both"}]}
         block = grading_block(memory=memory)
-        repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=block)
+        repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=block,
+                                    files={"recipes/host-request-lane.md": "The lane trusts only OWNER items.\n"})
         spec = self.tmp / "spec.json"
         self.assertEqual(run_grade(["spec", "--repo", repo, "--preregistration-commit", commit, "--out", spec]).returncode,
                          0)
@@ -1483,7 +1484,7 @@ class F25a_MemoryKeys(GraderCase):
 
 
 def make_bindings(tmp, *, exec_rev, run_token="tok7fixture", sentinel_value="sentinel-a-1", worktree_paths=None,
-                  worktree_bases=None, exec_checkout=None, env_extra=None):
+                  worktree_bases=None, exec_checkout=None, env_extra=None, out_name="run-bindings.json"):
     """Write the four bind input files and run `bind`; returns the bindings path."""
     inputs = tmp / "bind-inputs"
     inputs.mkdir(exist_ok=True)
@@ -1508,7 +1509,7 @@ def make_bindings(tmp, *, exec_rev, run_token="tok7fixture", sentinel_value="sen
     }
     for name, document in files.items():
         (inputs / name).write_text(json.dumps(document), encoding="utf-8")
-    out = tmp / "run-bindings.json"
+    out = tmp / out_name
     proc = run_grade(["bind", "--launch-args", f"B={inputs / 'launch-b.json'}", "--sentinels", inputs / "sentinels.json",
                       "--windows", inputs / "windows.json", "--roots", inputs / "roots.json", "--out", out],
                      env=env_extra)
@@ -1863,7 +1864,8 @@ class F27b_CaptureCommand(GraderCase):
                  "fixtures/before.py": "def greeting(name):\n    return 'x'\n",
                  "fixtures/after.py": "def greeting(name):\n    return 'y'\n"}
         commit = make_repo(self.tmp / "post-w-exec", files)
-        bindings = make_bindings(self.tmp, exec_rev=commit, exec_checkout=self.tmp / "post-w-exec")
+        bindings = make_bindings(self.tmp, exec_rev=commit, exec_checkout=self.tmp / "post-w-exec",
+                                 out_name="post-w-bindings.json")
         before = list((self.tmp / "post-w-exec").glob("**/__pycache__"))
         self.bindings = bindings
         proc = self.capture("--phase", "post-w")
