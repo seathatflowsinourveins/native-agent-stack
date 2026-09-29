@@ -41,10 +41,12 @@ if __name__ == "__main__" and not (sys.flags.isolated and sys.flags.no_site):
     os.execv(sys.executable, [sys.executable, "-I", "-S", os.path.abspath(__file__), *sys.argv[1:]])
 
 import base64  # noqa: E402
+import collections  # noqa: E402
 import contextlib  # noqa: E402
 import json  # noqa: E402
 import re  # noqa: E402
 import resource  # noqa: E402
+import select  # noqa: E402
 import selectors  # noqa: E402
 import signal  # noqa: E402
 import stat  # noqa: E402
@@ -85,7 +87,9 @@ IDLE_FLUSH_SECONDS = 0.1     # varlock FLUSH_TIMEOUT_MS
 # ends. A shorter one is written after IDLE_FLUSH_SECONDS or at the end, because it is mostly ordinary output: every
 # Tavily key starts "tvly-", whose base64 starts "d", so a command's last "d" would otherwise become a marker.
 SHORT_TAIL_MAX = 3
-DRAIN_SECONDS = 2.0          # after the command exits, how long a descendant may keep a pipe open
+DRAIN_SECONDS = 2.0          # after the command exits, how long a descendant may keep a pipe open, and a consumer may
+                             # take the output still queued for it; after a shutdown signal the consumer gets no wait
+QUEUE_LIMIT = 256 * 1024     # masked bytes one stream queues for a consumer that has stopped reading
 POLL_SECONDS = 0.1
 READ_SIZE = 65536
 CORE_PATTERN_FILE = "/proc/sys/kernel/core_pattern"  # a name, never a value, in the messages that mention it
@@ -418,58 +422,189 @@ class Masker:
 
 
 def write_out(fd: int, data: bytes) -> bool:
-    """Write all of data; False once the reader is gone (EPIPE) or the descriptor is closed."""
+    """Write all of data, waiting for room; False once the reader is gone (EPIPE) or the descriptor is closed."""
     view = memoryview(data)
     while view:
         try:
             written = os.write(fd, view)
+        except BlockingIOError:  # a terminal or file that someone else made non-blocking
+            select.select([], [fd], [])
+            continue
         except OSError:
             return False
         view = view[written:]
     return True
 
 
-def relay(child, needles) -> None:
-    """Relay both pipes through a Masker each until EOF, or DRAIN_SECONDS after the command exited."""
+class Sink:
+    """One of the runner's own output descriptors (1 or 2) and the masked bytes waiting to be written to it.
+
+    A pipe or a socket is made non-blocking for the relay and put back afterwards, so a consumer that stops reading
+    cannot stall the runner: what does not fit waits in a queue (the relay stops reading the command's pipe once it
+    holds QUEUE_LIMIT bytes) and is dropped, never waited for, when the runner is shutting down or the drain deadline
+    passes. Dropping is safe: only masked bytes are ever queued. A terminal, a regular file or /dev/null is written
+    directly, since it cannot wait on a reader that never comes, and so is a descriptor that shares its open file
+    description with the command's stdin (stdin_identity is that inode): the flag must not change under the command."""
+
+    def __init__(self, fd: int, stdin_identity=None):
+        self.fd, self.queue, self.size = fd, collections.deque(), 0
+        self.dead = False      # the consumer is gone (EPIPE): nothing more is written
+        self.dropping = False  # shutting down: nothing waits in the queue
+        self.polled = False    # non-blocking: the relay's selector watches when it can be written
+        self.flipped = False   # this sink made it non-blocking, so it puts it back
+        try:
+            info = os.fstat(fd)
+        except OSError:
+            self.dead = True
+            return
+        if (stat.S_ISFIFO(info.st_mode) or stat.S_ISSOCK(info.st_mode)) \
+                and (info.st_dev, info.st_ino) != stdin_identity:
+            with contextlib.suppress(OSError):
+                if os.get_blocking(fd):
+                    os.set_blocking(fd, False)
+                    self.flipped = True
+                self.polled = True
+
+    def full(self) -> bool:
+        return self.size >= QUEUE_LIMIT
+
+    def clear(self) -> None:
+        self.queue.clear()
+        self.size = 0
+
+    def abandon(self) -> None:
+        """Drop what is queued and queue nothing more: a shutdown signal arrived, or the drain deadline passed."""
+        self.dropping = True
+        self.clear()
+
+    def put(self, data: bytes) -> None:
+        if not data or self.dead:
+            return
+        if not self.polled:
+            if not write_out(self.fd, data):
+                self.dead = True
+            return
+        self.queue.append(data)
+        self.size += len(data)
+        self.flush()
+        if self.dropping:
+            self.clear()
+
+    def flush(self) -> None:
+        """Write what the consumer takes now; the rest stays queued."""
+        while self.queue and not self.dead:
+            chunk = self.queue[0]
+            try:
+                written = os.write(self.fd, chunk)
+            except BlockingIOError:
+                return
+            except OSError:
+                self.dead = True
+                self.clear()
+                return
+            self.size -= written
+            if written < len(chunk):
+                self.queue[0] = chunk[written:]
+                return
+            self.queue.popleft()
+
+    def demote(self) -> None:
+        """The selector cannot watch this descriptor: write to it directly from now on (blocking, as for a file)."""
+        self.restore()
+        self.polled = False
+        queued = b"".join(self.queue)
+        self.clear()
+        self.put(queued)
+
+    def restore(self) -> None:
+        if self.flipped:
+            with contextlib.suppress(OSError):
+                os.set_blocking(self.fd, True)
+            self.flipped = False
+
+
+def relay(child, needles, shutdown=()) -> None:
+    """Relay both pipes through a Masker each until EOF, or DRAIN_SECONDS after the command exited.
+
+    Output goes through a Sink each, so a consumer that stops reading cannot hold the runner: the relay stops reading
+    a pipe while its queue is full (the command waits, as in any pipeline), and drops what is queued, then
+    and later, once a shutdown signal has arrived (shutdown is not empty) or the drain deadline has passed."""
     selector = selectors.DefaultSelector()
-    streams = {}
+    stdin = os.fstat(0)
+    streams, sinks, watched = {}, [], {}
     for pipe, target in ((child.stdout, 1), (child.stderr, 2)):
-        selector.register(pipe, selectors.EVENT_READ)
-        streams[pipe] = (Masker(needles), target)
+        sinks.append(Sink(target, (stdin.st_dev, stdin.st_ino)))
+        streams[pipe] = (Masker(needles), sinks[-1])
+    by_fd = {sink.fd: sink for sink in sinks}
+
+    def watch(fileobj, mask: int) -> None:
+        """Register fileobj for exactly these events (0: none)."""
+        current = watched.get(fileobj, 0)
+        if mask == current:
+            return
+        if not mask:
+            selector.unregister(fileobj)
+            del watched[fileobj]
+        elif current:
+            selector.modify(fileobj, mask)
+            watched[fileobj] = mask
+        else:
+            selector.register(fileobj, mask)
+            watched[fileobj] = mask
 
     def finish(pipe, final: bytes) -> None:
-        write_out(streams[pipe][1], final)
-        selector.unregister(pipe)
+        streams[pipe][1].put(final)
+        watch(pipe, 0)
         pipe.close()  # a command still writing gets EPIPE: its reader is gone, as in any pipeline
         del streams[pipe]
 
     drain_until = None
     try:
-        while streams:
+        while streams or any(sink.queue for sink in sinks):
             now = time.monotonic()
             if drain_until is None and child.poll() is not None:
                 drain_until = now + DRAIN_SECONDS
-            wake = [due for due in (masker.idle_due() for masker, _target in streams.values()) if due is not None]
+            if shutdown:
+                for sink in sinks:
+                    sink.abandon()
+            for pipe, (_masker, sink) in streams.items():
+                watch(pipe, selectors.EVENT_READ if shutdown or not sink.full() else 0)
+            for sink in sinks:
+                try:
+                    watch(sink.fd, selectors.EVENT_WRITE if sink.polled and sink.queue else 0)
+                except OSError:
+                    sink.demote()
+            wake = [due for due in (masker.idle_due() for masker, _sink in streams.values()) if due is not None]
             wake.append(drain_until if drain_until is not None else now + POLL_SECONDS)
             for key, _events in selector.select(max(0.0, min(wake) - now)):
-                masker, target = streams[key.fileobj]
-                data = os.read(key.fd, READ_SIZE)
-                if not data:
-                    finish(key.fileobj, masker.close())
-                elif not write_out(target, masker.feed(data, time.monotonic())):
-                    finish(key.fileobj, b"")
+                if key.fileobj in streams:
+                    masker, sink = streams[key.fileobj]
+                    data = os.read(key.fd, READ_SIZE)
+                    if not data:
+                        finish(key.fileobj, masker.close())
+                    else:
+                        sink.put(masker.feed(data, time.monotonic()))
+                else:
+                    by_fd[key.fd].flush()
             now = time.monotonic()
-            for pipe, (masker, target) in list(streams.items()):
+            for pipe, (masker, sink) in list(streams.items()):
                 due = masker.idle_due()
-                if due is not None and due <= now and not write_out(target, masker.idle_flush()):
-                    finish(pipe, b"")
+                if due is not None and due <= now:
+                    sink.put(masker.idle_flush())
+                if sink.dead:
+                    finish(pipe, b"")  # its reader is gone: the command gets EPIPE, as in any pipeline
             if drain_until is not None and now >= drain_until:
-                for pipe, (masker, _target) in list(streams.items()):
+                for pipe, (masker, _sink) in list(streams.items()):
                     finish(pipe, masker.close())
+                for sink in sinks:
+                    sink.flush()  # one last try; what the consumer still will not take is dropped
+                    sink.abandon()
     finally:
         for pipe in list(streams):
             pipe.close()
         selector.close()
+        for sink in sinks:
+            sink.restore()
 
 
 def ensure_standard_descriptors() -> None:
@@ -520,9 +655,10 @@ def disable_core_dumps() -> None:
 
 
 def run_command(command: list, environment: dict, needles: list) -> int:
-    started, pending = [], []
+    started, pending, shutdown = [], [], []
 
     def forward(signum, _frame) -> None:
+        shutdown.append(signum)  # the relay stops waiting for a consumer that is not reading
         if not started:
             pending.append(signum)
             return
@@ -550,7 +686,7 @@ def run_command(command: list, environment: dict, needles: list) -> int:
     started.append(child)
     for signum in pending:
         forward(signum, None)
-    relay(child, needles)
+    relay(child, needles, shutdown)
     code = child.wait()
     return code if code >= 0 else 128 - code
 
