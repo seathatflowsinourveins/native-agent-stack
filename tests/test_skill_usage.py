@@ -1941,6 +1941,87 @@ class CodexRouteValues(unittest.TestCase):
                                   ("(other)", "custom-level"), (None, "max")])
         self.assertNotIn("/home/example", json.dumps(got))
 
+    def test_route_values_that_are_not_strings_are_null(self):
+        # TurnContextItem.model is a String and effort a ReasoningEffortConfig string (protocol.rs:3328, :3344-3345), so a value of
+        # another JSON type is no route: a bool is an int in Python and str(True) is name-shaped, so the type decides, not the text.
+        routes, _ = self.routes([{"model": True, "effort": True}, {"model": ["gpt-6-sol"], "effort": {"x": 1}},
+                                 {"model": None, "effort": None}])
+        self.assertEqual(routes, [(None, None), (None, None), (None, None)])
+
+
+def usage_turn(minute, usage, last_input=None, repeat=None, ordinal=None):
+    """One turn: task_started, a token_count snapshot of cumulative usage (with the request's own input tokens when given, and
+    once more with the same totals when repeat names a second request size), task_complete."""
+    def snapshot(last):
+        info = {"total_token_usage": usage, **({"last_token_usage": {"input_tokens": last}} if last is not None else {})}
+        return u3_row("event_msg", {"type": "token_count", "info": info}, f"2026-10-20T07:{minute:02d}:01Z", ordinal)
+    return [u3_row("event_msg", {"type": "task_started"}, f"2026-10-20T07:{minute:02d}:00Z", ordinal), snapshot(last_input),
+            *([snapshot(repeat)] if repeat is not None else []),
+            u3_row("event_msg", {"type": "task_complete"}, f"2026-10-20T07:{minute:02d}:02Z", ordinal)]
+
+
+def usage_of(total, cache_write=None):
+    """A TokenUsage total with every pre-0.157.1 counter at total, and cache_write_input_tokens only when given."""
+    usage = dict.fromkeys(("input_tokens", "cached_input_tokens", "output_tokens", "reasoning_output_tokens", "total_tokens"), total)
+    return usage if cache_write is None else {**usage, "cache_write_input_tokens": cache_write}
+
+
+class CodexUsageCounters(unittest.TestCase):
+    """Binding correction 4 of the U3 build (u3-corrections.md, gap G3 of the U11 design), with design commit 4 because it changes the
+    delivered provider_usage.attempts[]. TokenUsage carries cache_write_input_tokens at rust-v0.157.1 (protocol/src/protocol.rs:2239-2241)
+    with serde(default), so a rollout of an older client can lack it: it is differenced like the other cumulative counters, a rollout
+    without it reports null for it (never 0), and its absence is no usage gap, so provider_usage.complete keeps its meaning. The request's
+    own last_token_usage.input_tokens (TokenUsageInfo, :2269-2275) is kept as a per-attempt maximum, max_request_input_tokens, over the
+    attempt's counted snapshots; a snapshot that repeats the totals is no new request."""
+
+    def measure(self, rows):
+        return S.measure_codex_records(rows, since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL))["provider_usage"]
+
+    def test_cache_writes_are_differenced(self):
+        got = self.measure(usage_turn(0, usage_of(100, 30)) + usage_turn(1, usage_of(200, 75)))
+        self.assertEqual([attempt["usage"].get("cache_write_input_tokens", "missing") for attempt in got["attempts"]], [30, 45])
+        self.assertEqual((got["totals"].get("cache_write_input_tokens", "missing"), got["totals"]["input_tokens"]), (75, 200))
+        self.assertTrue(got["complete"])
+
+    def test_a_rollout_without_cache_writes_reports_them_as_unknown(self):
+        got = self.measure(usage_turn(0, usage_of(100)) + usage_turn(1, usage_of(200)))
+        self.assertEqual([attempt["usage"].get("cache_write_input_tokens", "missing") for attempt in got["attempts"]], [None, None])
+        self.assertEqual((got["totals"].get("cache_write_input_tokens", "missing"), got["totals"]["input_tokens"]), (None, 200))
+        self.assertEqual((got["complete"], got["gaps"]), (True, 0))
+        # A snapshot without the field and a later one with it: that difference is unknown too.
+        mixed = self.measure(usage_turn(0, usage_of(100)) + usage_turn(1, usage_of(200, 75)))
+        self.assertEqual([attempt["usage"].get("cache_write_input_tokens", "missing") for attempt in mixed["attempts"]], [None, None])
+        self.assertEqual((mixed["complete"], mixed["gaps"]), (True, 0))
+
+    def test_a_child_differences_cache_writes_from_its_copied_baseline(self):
+        # The parent's copied snapshot (below subagent_history_start_ordinal) is the child's baseline, as for every counter.
+        meta = u3_row("session_meta", {"id": "u3-child", "source": {"subagent": {}}, "subagent_history_start_ordinal": 3},
+                      "2026-10-20T06:59:00Z", 0)
+        copied = u3_row("event_msg", {"type": "token_count", "info": {"total_token_usage": usage_of(100, 30)}},
+                        "2026-10-20T06:59:01Z", 1)
+        got = self.measure([meta, copied, *usage_turn(0, usage_of(150, 50), ordinal=4)])
+        self.assertEqual([attempt["usage"].get("cache_write_input_tokens", "missing") for attempt in got["attempts"]], [20])
+        self.assertEqual(got["totals"]["input_tokens"], 50)
+
+    def test_a_group_total_is_unknown_when_an_actor_lacks_cache_writes(self):
+        root = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            f"rollout-2026-10-20T07-00-0{index}-u3-usage.jsonl": [
+                u3_row("session_meta", {"id": f"u3-usage-{index}", "source": "exec"}, "2026-10-20T06:59:00Z"),
+                *usage_turn(index, usage)] for index, usage in enumerate((usage_of(100, 30), usage_of(200)))})
+        group = S.scan_codex_lanes([root], load_fixture_manifest(), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL),
+                                   marker=MARKER)["groups"]["unclassified"]["measurement"]["provider_usage"]
+        self.assertEqual((group["totals"].get("cache_write_input_tokens", "missing"), group["totals"]["input_tokens"]), (None, 300))
+
+    def test_each_attempt_keeps_its_largest_request(self):
+        # The second snapshot of the first turn repeats the totals, so its request size is not read.
+        before = u3_row("event_msg", {"type": "token_count", "info": {"total_token_usage": usage_of(50),
+                                                                      "last_token_usage": {"input_tokens": 9000}}},
+                        "2026-10-19T23:59:00Z")  # before since: the baseline only
+        got = self.measure([before, *usage_turn(0, usage_of(100), last_input=90), *usage_turn(1, usage_of(250), last_input=140,
+                                                                                               repeat=999),
+                            *usage_turn(2, usage_of(300))])
+        self.assertEqual([attempt.get("max_request_input_tokens", "missing") for attempt in got["attempts"]], [90, 140, None])
+
 
 SPAWN_ROUTE = ("gpt-6-astra", "max")
 
