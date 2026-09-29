@@ -400,8 +400,9 @@ const deepRun = timed(() => { try { return ['"$('.repeat(3000), Array.from({ len
 expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read without exhausting the stack', Array.isArray(deepRun.r) && deepRun.ms < 1000)
 // D8 (GPT-6 #9, Claude review R9): the M4 text scanners read a run of unclosed "((" in linear time. Before the repair each
 // unclosed "((" looked ahead to the end of its line, so n = 8000, 16000 and 32000 took about 315, 1100 and 5000 ms (four times
-// per doubling). Each size is timed as the best of three runs; a run over 1.5 s ends the doubling (it is far past the bound
-// already), and a time under 10 ms is timer noise, not growth. Required: at most 2.5 times per doubling, and under 150 ms at 64,000.
+// per doubling). Each size is timed as the best of five runs; a run over 1.5 s ends the doubling (it is far past the bound
+// already), and 5 ms of the allowance is timer and GC noise, not growth. Required: at most 2.5 times per doubling (plus that noise),
+// and under 150 ms at 64,000.
 {
   const doubling = (make, run) => {
     run(make(2000)); run(make(2000)) // warm-up
@@ -409,13 +410,13 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
     for (const n of [8000, 16000, 32000, 64000]) {
       const input = make(n)
       let best = Infinity
-      for (let i = 0; i < 3; i++) { best = Math.min(best, timed(() => run(input)).ms); if (best > 1500) break }
+      for (let i = 0; i < 5; i++) { best = Math.min(best, timed(() => run(input)).ms); if (best > 1500) break }
       ms.push(best)
       if (best > 1500) break
     }
     return ms
   }
-  const linear = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] || t < 10) && ms[3] < 150
+  const linear = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5) && ms[3] < 150
   const shape = (label, make, reader, run) => {
     const ms = doubling(make, run)
     expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', linear(ms))

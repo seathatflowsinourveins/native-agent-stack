@@ -148,6 +148,25 @@ const QUOTED_SEPARATOR = new Set([...';&|()`\n']) // in double-quoted data, thes
 // Nested analyses (a heredoc body a shell reads, a string a shell runs, a "$( )" body inside double quotes) deeper than
 // this read as data, which errs toward possible fetches. The limit bounds the recursion; each level scans linearly.
 const NESTING_LIMIT = 32
+// For each "(" of a text, the index of the ")" that closes it within its line, else -1 (the classic parenthesis matching of
+// bash(1) ARITHMETIC EVALUATION's `(( ))` and `$(( ))` look-ahead, which counts every ( and ) up to the end of the line). One
+// linear pass per text, so a run of unclosed "((" does not look ahead to the end of its line once per opener (U1 pivot D8,
+// GPT-6 #9: n = 8000, 16000 and 32000 took 315, 1100 and 5000 ms). The last few texts stay memoized, which is enough for the
+// scans that alternate between a text and its slices; the memo is cleared when a top-level analysis ends (executedTrace).
+const PAREN_MEMO = []
+function parenClose(s) {
+  for (const entry of PAREN_MEMO) if (entry[0] === s) return entry[1]
+  const table = new Int32Array(s.length).fill(-1), open = []
+  for (let k = 0; k < s.length; k++) {
+    const c = s.charCodeAt(k)
+    if (c === 10) open.length = 0
+    else if (c === 40) open.push(k)
+    else if (c === 41 && open.length) table[open.pop()] = k
+  }
+  if (PAREN_MEMO.length === 8) PAREN_MEMO.shift()
+  PAREN_MEMO.push([s, table])
+  return table
+}
 // One unit of shell text under a stack of open frames (POSIX.1-2024 XCU 2.2 Quoting and 2.6.3 Command Substitution;
 // bash(1) QUOTING, COMMENTS, ARITHMETIC EVALUATION and Here Documents). A frame is "'" (literal up to the next '), '"'
 // (a backslash escapes the next unit; "$(" not followed by "(" opens a $( frame, a backquote a ` frame), '`' (up to the
@@ -173,10 +192,8 @@ function step(s, i, stack, on) {
   if (ch === '#' && (i === 0 || WORD_BREAK.has(s[i - 1]))) { const end = s.indexOf('\n', i); return end < 0 ? s.length : end }
   const arithmetic = ch === '$' && s.startsWith('((', i + 1) ? i + 1 : ch === '(' && s[i + 1] === '(' ? i : -1
   if (arithmetic >= 0) {
-    const newline = s.indexOf('\n', arithmetic), end = newline < 0 ? s.length : newline
-    let depth = 0, k = arithmetic
-    for (; k < end; k++) if (s[k] === '(') depth++; else if (s[k] === ')' && --depth === 0) break
-    if (k < end) return k + 1
+    const close = parenClose(s)[arithmetic]
+    if (close >= 0) return close + 1
   }
   if (s.startsWith('<<<', i)) return i + 3
   if (ch === '<') { HEREDOC.lastIndex = i; const h = HEREDOC.exec(s); if (h) { on?.heredoc(i, h); return i + h[0].length } }
@@ -195,7 +212,14 @@ function openers(line, stack) {
   const on = { cut: (i) => { cuts.push(i) }, heredoc: (i, h) => { found.push({ start: i, end: i + h[0].length, strip: h[1] === '-', quoted: h[2] !== '', delimiter: h[3] }) } }
   for (let i = 0; i < line.length;) i = step(line, i, stack, on)
   cuts.push(line.length) // ascending, so the bounds are the last cut before and the first cut after the opener
-  return found.map((h) => ({ ...h, from: cuts.filter((c) => c < h.start).pop() + 1, to: cuts.find((c) => c >= h.end) }))
+  return found.map((h) => ({ ...h, from: cuts[firstFrom(cuts, h.start) - 1] + 1, to: cuts[firstFrom(cuts, h.end)] }))
+}
+// The index of the first element of the ascending `list` that is at least `x` (binary search), so a line of many cuts and many
+// openers is bounded in O(n log n), not once per opener over every cut.
+function firstFrom(list, x) {
+  let lo = 0, hi = list.length
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (list[mid] < x) lo = mid + 1; else hi = mid }
+  return lo
 }
 // Where the frame that `stack` opens at s[i] ends: the index of the unit that pops it (a closing quote or backquote, or
 // the ")" of a $( frame), or s.length when the text ends first. One scan, whatever the nesting.
@@ -319,8 +343,10 @@ export function executedText(command, { inlineHttp = false } = {}) {
 // [first, last] range of each string or heredoc body that ssh runs on another host, and `data` the offset where each
 // command substitution of a data heredoc body starts (the body line is data; the substitution runs). The text is the same.
 function executedTrace(src, inlineHttp, resolved = new Set(), depth = 0, marks = null) {
-  const { text, sources } = resolveHeredocs(src, inlineHttp, resolved, depth, marks)
-  return joined([scanQuotes(text, inlineHttp, resolved, depth, marks), ...sources], '\n')
+  try {
+    const { text, sources } = resolveHeredocs(src, inlineHttp, resolved, depth, marks)
+    return joined([scanQuotes(text, inlineHttp, resolved, depth, marks), ...sources], '\n')
+  } finally { if (depth === 0) PAREN_MEMO.length = 0 }
 }
 // The [first, last] raw offsets of a trace, or null when it holds only inserted text.
 const rawRange = (t) => { let lo = Infinity, hi = -1; for (const n of t.p) if (n >= 0) { if (n < lo) lo = n; if (n > hi) hi = n } return hi < 0 ? null : [lo, hi] }
