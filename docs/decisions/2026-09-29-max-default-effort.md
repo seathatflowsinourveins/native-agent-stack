@@ -95,8 +95,9 @@ row re-derived from the raw transcripts by an independent verifier, 17 of 17 mat
 | H1, H2 | Haiku 4.5 with and without `--effort max` | no effort field either way; exit 0, empty stderr | absent |
 | I1 to I4 | interactive Sonnet 5.5 in a terminal through a login shell: no flag; the same session after `/effort xhigh`; `--effort xhigh`; `claude -p` in a terminal | `max`; `max` then `xhigh`; `xhigh`; `xhigh` | present |
 
-The interactive cases ran twice: first with the repository-generated launcher ahead on `PATH`, then again after the host file
-was replaced, and gave the same four results. The Windows Terminal profile is reported to start `claude` through
+The interactive cases ran through a login shell on the launcher installed on this host. A first version of the launcher passed the same
+four cases (with the generated file ahead on `PATH` and again once installed) before a cross-family review sent it back for repair; the
+repaired version was then installed and the four cases rerun, and those rows are the ones in the receipt. The Windows Terminal profile is reported to start `claude` through
 `bash -lc "exec claude"` (its settings live on the Windows side and were not read here); a login shell on this host resolves
 `claude` to the ecosystem launcher first. The repository tests pass: a 27-case table on real
 pseudo-terminals (both bootstrap scripts; it includes the short-flag clusters `-pc` and `-cp`, `--`, empty and multi-line
