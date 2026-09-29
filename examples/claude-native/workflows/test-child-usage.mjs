@@ -444,6 +444,25 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
   shape('a run of run strings', (n) => 'bash -c "x" '.repeat(n), 'executedText', (c) => executedText(c))
   shape('a run of words with # inside', (n) => 'a#'.repeat(n), 'executedText', (c) => executedText(c))
   shape('a long script of echo, substitution and pipe lines', (n) => Array.from({ length: Math.ceil(n / 8) }, (_, i) => 'echo "step ' + i + ': $(date +%s)" >> log.txt; qmd search "term ' + i + '" -n 2 | head -5').join('\n'), 'fetchKind', (c) => fetchKind(c))
+  // D8 for the command-position layer (GPT-6 #9; Claude review R9). The parser reads these texts in linear time, but the walk over a node's
+  // children with child(i) and fieldNameForChild(i) cost O(i) per call in web-tree-sitter 0.27.0, so a flat run of unclosed constructs
+  // (one wide ERROR node) or of comments (one wide program node) took four times as long for twice the text: '(('.repeat(n) + 'qmd'
+  // took 467, 1853 and 7369 ms at n = 8000, 16000 and 32000 (GPT-6 measured 320, 1266 and 4992 ms at 3cb7c4f6). Each text is about
+  // 2n characters at most. A run of unclosed `a=(` or of `<<` is not here: the parse itself is quadratic (tree-sitter-bash's error
+  // recovery and heredoc scanner), which no reading can change (README, "What the parser costs").
+  if ((await kernel.loadShellParser()).ok) {
+    const lanes = (c) => kernel.commandInvocations(c)
+    const runs = (unit, tail = '') => (n) => unit.repeat(Math.ceil((2 * n) / unit.length)) + tail
+    shape('a run of unclosed ((', dparen, 'commandInvocations', lanes)
+    shape('a run of unclosed $(', runs('$(', 'qmd'), 'commandInvocations', lanes)
+    shape('a run of unclosed "$(', runs('"$(', 'qmd'), 'commandInvocations', lanes)
+    shape('a run of unclosed $((', runs('$(( ', 'qmd'), 'commandInvocations', lanes)
+    shape('a run of backquotes', runs('`'), 'commandInvocations', lanes)
+    shape('a run of unclosed {', runs('{ '), 'commandInvocations', lanes)
+    shape('a run of unclosed if', runs('if a; then '), 'commandInvocations', lanes)
+    shape('a run of unclosed case', runs('case x in a) '), 'commandInvocations', lanes)
+    shape('a run of comment lines', runs('# c\n'), 'commandInvocations', lanes)
+  }
 }
 expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
   logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')

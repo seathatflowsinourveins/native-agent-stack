@@ -46,18 +46,25 @@ SHAPE_TEXTS = [
     "qmd status",                           # a lane invocation and no grammar limit
     "echo qmd",                             # a lane word only
     "ls -la",                               # neither
+    "echo a ) echo qmd",                    # a parse error; the lane word follows plain words, so it is an argument whatever the tree makes of it
+    'echo a ) ; echo "x; qmd"',             # a parse error; the lane word stands where a command name could, but the tree puts it in a string
 ]
+# An unread lane word of a limit command is one of: no command slot (an argument), a slot the tree puts in data (a comment, heredoc body,
+# string or assignment value), a slot anywhere else (an ERROR node included), or unplaced (the error is only in a script read again).
+# The bound counts a limit command that reads a lane, is a heredoc ended early with a lane word, or holds an unplaced or slot-elsewhere word.
 EXPECTED_SHAPES = {
-    "commands": 8, "with_a_parse_error": 4, "with_a_lane_invocation": 2, "with_a_lane_word": 7, "lane_bearing_upper": 7,
-    "grammar_limit": 5, "grammar_limit_with_a_lane_word": 5, "grammar_limit_lane_read": 1, "grammar_limit_lane_word_unread": 4,
+    "commands": 10, "with_a_parse_error": 6, "with_a_lane_invocation": 2, "with_a_lane_word": 9, "lane_bearing_upper": 9,
+    "grammar_limit": 7, "grammar_limit_with_a_lane_word": 7, "grammar_limit_lane_read": 1, "grammar_limit_lane_word_unread": 6,
     "grammar_limit_lane_word_in_an_error_node": 1, "grammar_limit_early_with_a_lane_word": 1,
     "grammar_limit_error_only_in_a_script_read_again": 1, "grammar_limit_error_only_in_a_script_read_again_lane_word": 1,
-    "grammar_limit_lost_or_invented_upper": 4, "grammar_limit_scanner_reads_more": None,
+    "grammar_limit_unread_no_command_slot": 1, "grammar_limit_unread_slot_in_data": 2, "grammar_limit_unread_slot_elsewhere": 2,
+    "grammar_limit_unread_unplaced": 1, "grammar_limit_lost_or_invented_upper": 5, "grammar_limit_scanner_reads_more": None,
+    "grammar_limit_scanner_throws": None,
 }
-# 4 commands the limit can lose or invent a lane in, of 2 that read a lane: a threshold of 0.001 is one command.
+# 5 commands the limit can lose or invent a lane in, of 2 that read a lane: a threshold of 0.001 is one command.
 EXPECTED_OVERTURN = {
-    "threshold": 0.001, "threshold_commands": 1, "lane_bearing": 2, "lane_bearing_upper": 7, "lost_or_invented_upper_bound": 4,
-    "rate_upper_bound": 2.0, "rate_lane_word_screen": 2.5, "met_by_the_upper_bound": True,
+    "threshold": 0.001, "threshold_commands": 1, "lane_bearing": 2, "lane_bearing_upper": 9, "lost_or_invented_upper_bound": 5,
+    "rate_upper_bound": 2.5, "rate_lane_word_screen": 3.5, "met_by_the_upper_bound": True,
 }
 
 
@@ -82,13 +89,47 @@ class PraU1EvidenceTooling(unittest.TestCase):
             corpus.write_text(json.dumps(SHAPE_TEXTS))
             scanner = Path(tmp) / "scanner.mjs"
             scanner.write_text("export const commandInvocations = () => [{ lane: 'qmd' }]\n")  # reads a qmd in every text
+            throwing = Path(tmp) / "throwing.mjs"
+            throwing.write_text("export const commandInvocations = () => { throw new Error('scanner failed') }\n")
             plain = self.run_node("shape-counts.mjs", "--kernel", KERNEL, "--inputs", corpus)
             crossed = self.run_node("shape-counts.mjs", "--kernel", KERNEL, "--inputs", corpus, "--scanner", scanner)
+            failed = self.run_node("shape-counts.mjs", "--kernel", KERNEL, "--inputs", corpus, "--scanner", throwing)
         for key, want in EXPECTED_SHAPES.items():
             self.assertEqual(plain.get(key, "(missing)"), want, key)
         self.assertEqual(plain.get("overturn_1"), EXPECTED_OVERTURN)
-        # the scanner finds the qmd that the tree reading does not read in the four limit texts where it reads none
-        self.assertEqual(crossed.get("grammar_limit_scanner_reads_more"), 4)
+        # the four counts of unread lane words partition the unread limit commands
+        unread = [plain["grammar_limit_unread_" + k] for k in ("no_command_slot", "slot_in_data", "slot_elsewhere", "unplaced")]
+        self.assertEqual(sum(unread), plain["grammar_limit_lane_word_unread"])
+        # the scanner finds the qmd that the tree reading does not read in the six limit texts where it reads none
+        self.assertEqual((crossed.get("grammar_limit_scanner_reads_more"), crossed.get("grammar_limit_scanner_throws")), (6, 0))
+        # a scanner that throws is counted, not fatal, and reads nothing
+        self.assertEqual((failed.get("grammar_limit_scanner_reads_more"), failed.get("grammar_limit_scanner_throws")), (0, 7))
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    def test_identity_check_compares_whole_lane_records_of_two_kernels(self):
+        """--fields lanes compares commandInvocations and measureTranscript(...).cli_lanes of two kernels, input by input: a
+        difference in either, or an exception in either kernel, is counted and never hidden."""
+        stub = "export const loadShellParser = async () => ({ ok: true })\nexport const executedText = () => 'x'\nexport const fetchKind = () => null\n"
+        a = stub + "export const commandInvocations = (t) => [{ lane: t.length > 3 ? 'qmd' : null }]\nexport const measureTranscript = () => ({ cli_lanes: { calls: 1 } })\n"
+        b = stub + ("export const commandInvocations = (t) => { if (t === 'boom') throw new Error('x'); return [{ lane: t === 'differ' ? 'toon' : t.length > 3 ? 'qmd' : null }] }\n"
+                    "export const measureTranscript = (r) => ({ cli_lanes: { calls: r[0].message.content[0].input.command === 'cli' ? 2 : 1 } })\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "a.mjs").write_text(a)
+            (Path(tmp) / "b.mjs").write_text(b)
+            inputs = Path(tmp) / "inputs.json"
+            inputs.write_text(json.dumps(["same one", "differ", "boom", "ab", "cli"]))
+            totals = self.run_node("m4-identity.mjs", "--a", Path(tmp) / "a.mjs", "--b", Path(tmp) / "b.mjs", "--inputs", inputs, "--fields", "lanes")
+        # 'same one' and 'ab' agree; 'differ' differs in a lane, 'cli' only in cli_lanes; 'boom' throws in b
+        self.assertEqual(totals, {"inputs": 5, "analysed": 5, "identical": 2, "different": 2, "a_throws": 0, "b_throws": 1})
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    @unittest.skipUnless((PARSER_DIR / "package-lock.json").is_file(), "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    def test_identity_check_of_a_kernel_with_itself_finds_no_difference(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            inputs = Path(tmp) / "inputs.json"
+            inputs.write_text(json.dumps(SHAPE_TEXTS))
+            totals = self.run_node("m4-identity.mjs", "--a", KERNEL, "--b", KERNEL, "--inputs", inputs, "--fields", "lanes")
+        self.assertEqual(totals, {"inputs": 10, "analysed": 10, "identical": 10, "different": 0, "a_throws": 0, "b_throws": 0})
 
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_real_commands_reproduces_a_corpus_as_of_a_timestamp(self):
