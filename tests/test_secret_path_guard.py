@@ -62,6 +62,20 @@ BLOCKED = {
     "declare -p": "environment_dump",
     "ps eww 1234": "environment_dump",
     "ps auxe": "environment_dump",
+    # macOS documents `-E` as the environment display too ("-E Display the environment as well", Apple adv_cmds ps.1, as the
+    # BSD-style `e` is), in a cluster before a value option (`-Ewwp 123`) or on its own, and as a capital E in a dashless
+    # cluster (2026-09-29). `-e` alone is every process (Linux, and macOS: "Identical to -A"), so `ps -ef` still passes.
+    "ps -E": "environment_dump",
+    "ps -Ewwp 123": "environment_dump",
+    "ps -p 123 -E": "environment_dump",
+    "ps -A -E": "environment_dump",
+    "ps -AE": "environment_dump",
+    "ps -eE": "environment_dump",
+    "ps -ef -E": "environment_dump",
+    "ps -o pid,command -E": "environment_dump",
+    "ps Eww 123": "environment_dump",
+    "ps auxE": "environment_dump",
+    "ps E": "environment_dump",
     "echo `printenv`": "environment_dump",
     "echo $(env)": "environment_dump",
     # Command substitution inside double quotes is executed by the shell (bash(1) "Command Substitution", the backtick
@@ -448,6 +462,9 @@ KEYRING_BLOCKED = {
     f"{EXEC} nohup env": "environment_dump_in_keyring_exec",
     f"{EXEC} printenv": "environment_dump_in_keyring_exec",
     f"{EXEC} ps eww": "environment_dump_in_keyring_exec",
+    f"{EXEC} ps -E": "environment_dump_in_keyring_exec",
+    f"{EXEC} ps auxE": "environment_dump_in_keyring_exec",
+    f"{EXEC} watch -n 5 ps -Ewwp 123": "environment_dump_in_keyring_exec",
     f"{EXEC} bash -c 'set'": "environment_dump_in_keyring_exec",
     f"{EXEC} bash -c 'export -p'": "environment_dump_in_keyring_exec",
     f"{EXEC} bash -c 'declare -p'": "environment_dump_in_keyring_exec",
@@ -544,6 +561,15 @@ ALLOWED = [
     "export EDGAR_IDENTITY=\"${EDGAR_IDENTITY:-$SEC_USER_AGENT}\"",
     "ps -ef | grep runner",
     "ps -o pid,command -p 123",
+    # ps without an environment display: every process, an elapsed-time column (a capital E that is a format word or an option's
+    # value, not a flag), a user or command name that starts with E, a sort, and the BSD-style `aux`.
+    "ps aux",
+    "ps -ef --sort=-pcpu",
+    "ps -eo pid,etime,args",
+    "ps -o pid,ETIME -p 123",
+    "ps -u Eve -o pid,command",
+    "ps -C E -o pid",
+    "ps -p 123 -o etime=",
     "declare -a items=(a b)",
     "git status && git diff --stat",
     "cat .env.example",

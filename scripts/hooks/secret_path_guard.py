@@ -204,7 +204,10 @@ REDIRECTION = re.compile(r"^\d*(?:>>?|>\||&>>?|<<<?|<>|<&|>&|<)$")
 HEREDOC_START = re.compile(r"<<(-?)[ \t]*(?:'([^'\n]*)'|\"([^\"\n]*)\"|((?:\\.|[^\s;&|()<>\\'\"])+))")
 GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
-PS_BSD_CLUSTER = re.compile(r"^[aAcfhjlmrsStTuvwxXLn]*e[aAcefhjlmrsStTuvwxXLn]*$")
+# A dashless BSD-style ps cluster that shows the environment: it holds `e` (procps and BSD: "Show the environment after the
+# command") or, from 2026-09-29, `E` (macOS: "-E Display the environment as well", Apple adv_cmds ps.1, which lists the BSD-style
+# `e` as "Same as -E"). `ps eww` and `ps auxE` match; `ps aux` does not.
+PS_BSD_CLUSTER = re.compile(r"^[aAcfhjlmrsStTuvwxXLnE]*[eE][aAcefhjlmrsStTuvwxXLnE]*$")
 PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-s", "-k",
                   "--pid", "--format", "--sort", "--ppid", "--user"}
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
@@ -676,6 +679,9 @@ def command_segments(command: str, depth: int = 0) -> list[list[str]]:
 
 
 def ps_shows_environment(words: list[str]) -> bool:
+    """Whether ps prints each process's environment: a dashless BSD-style cluster with `e` or `E` (PS_BSD_CLUSTER), or
+    macOS's dashed `-E`, alone or in a cluster before the first option that takes a value (`-Ewwp 123`, where the value
+    starts at `p`). A dashed `-e` is every process and passes, as does an `E` that is a value (`ps -u Eve`)."""
     skip = False
     for word in words[1:]:
         if skip:
@@ -684,7 +690,12 @@ def ps_shows_environment(words: list[str]) -> bool:
         if word in PS_ARG_OPTIONS:
             skip = True
             continue
-        if not word.startswith("-") and PS_BSD_CLUSTER.match(word):
+        if word.startswith("-") and not word.startswith("--") and len(word) > 1:
+            letters = word[1:]
+            value_at = next((at for at, letter in enumerate(letters) if f"-{letter}" in PS_ARG_OPTIONS), len(letters))
+            if "E" in letters[:value_at]:
+                return True
+        elif not word.startswith("-") and PS_BSD_CLUSTER.match(word):
             return True
     return False
 
