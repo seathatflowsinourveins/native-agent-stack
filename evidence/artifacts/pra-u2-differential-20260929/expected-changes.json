@@ -1,0 +1,35 @@
+{
+  "kind": "pra_u2_differential_expected_changes",
+  "schema_version": 1,
+  "base_kernel": "fe9f511b34a5029fdfc221fc91844932d81d5000 (the post-U1 base) examples/claude-native/workflows/child-usage.mjs",
+  "compare": "the JSON of child-usage.mjs --lanes-sweep (and of run mode) from the base kernel and from the U2 kernel over the same root, window and flags",
+  "rule": "every key path of the base output keeps its value unless a changed entry names it; key paths an added entry names are new; any other difference is a failure (review-u2, medium finding on the differential: an explicit allow-list, equality everywhere else)",
+  "objects": {
+    "actor": "a per-actor measurement: sweep actors[].measurement; run-mode children[].lanes.measurement and superseded_attempts[].lanes.measurement",
+    "aggregate": "an aggregateMeasurements result: every sweep group (groups.all, groups.workers, groups.negative_controls, groups.by_spawn.*, groups.by_agent_type.*, groups.by_spawn_and_agent_type.*.*, groups.by_session.*) .measurement, and main.measurement",
+    "sizes": "every sizes object inside a measurement: m3, m5, by_carrier.<carrier>, exceptions.<class>"
+  },
+  "stages": [
+    {
+      "stage": "U2 stage 1: PR-A items 1, 5 and 4, binding decision B9 and U2 correction 1",
+      "commits": ["06826ff3", "0eb8771c", "2bf419de", "77371d11"],
+      "added": [
+        {"in": "actor, aggregate", "paths": ["hook_context.inserted_blocks", "hook_context.blocks_by_event", "hook_context.claimed_by_event", "hook_context.claimed_plain_stdout", "hook_context.other_hook_rows", "hook_context.hook_names_folded"], "why": "item 1"},
+        {"in": "aggregate", "paths": ["hook_context.actors_with_insertion"], "why": "item 1"},
+        {"in": "actor, aggregate", "paths": ["loaded"], "why": "item 5"},
+        {"in": "aggregate", "paths": ["loaded_actors", "loaded_not_called_actors"], "why": "item 5; the unit of the historical 'Loaded, never called' row"},
+        {"in": "sizes", "paths": ["large_json", "large_uniform_keys", "large_uniform_flat", "large_shape_unknown"], "why": "item 4"},
+        {"in": "actor", "paths": ["mcp_attempted.ctx", "mcp_attempted.non_ctx"], "why": "item 4, section-1 per-actor figures"},
+        {"in": "aggregate", "paths": ["shell_web_large_results_per_actor", "actors_with_mcp_call", "actors_with_non_ctx_mcp_call", "actors_with_ctx_results"], "why": "item 4, section-1 per-actor figures"},
+        {"in": "actor", "paths": ["usage.messages[].cache_creation_5m", "usage.messages[].cache_creation_1h", "usage.messages[].speed", "usage.messages[].service_tier", "usage.messages[].inference_geo"], "why": "U2 correction 1"},
+        {"in": "actor", "paths": ["usage.advisor_iterations", "usage.advisor_totals", "usage.totals_including_advisor", "usage.iteration_issues"], "why": "binding decision B9"},
+        {"in": "aggregate", "paths": ["usage.advisor_totals", "usage.totals_including_advisor", "usage.advisor_iteration_count", "usage.iteration_issues"], "why": "binding decision B9"}
+      ],
+      "changed": [
+        {"in": "actor, aggregate", "path": "hook_context.by_hook['(other)']", "change": "decreases by hook_context.hook_names_folded (the entry disappears when it reaches 0); each folded name appears as a new by_hook key <Event>:mcp__<server>", "why": "item 1: an over-long MCP hook name is no longer lost under '(other)'; on this host no hook name exceeds 80 characters (scans/hook-rows.json), so the expected difference here is 0"},
+        {"in": "actor, aggregate", "path": "usage.complete", "change": "true becomes false where usage.iteration_issues names a reason (an unread entry, an inconsistent message, an advisor result without usage, an advisor call without a result) or an advisor entry lacks a model", "why": "binding decision B9; on this host 143 of 4,667 transcripts with messages (scans/kernel-usage.json)"}
+      ],
+      "unchanged_by_design": ["hook_context.inserted", "hook_context.claimed", "hook_context.with_marker", "hook_context.by_event", "loaded_not_called", "mcp_states", "the results, bytes, large_results, large_bytes and max_bytes of every sizes object", "usage.totals", "usage.messages[].ordinal, model, effort and usage", "usage.unidentified_messages", "run-mode children[].usage, usage_by_model, complete and issues; by_resolved_model; the exit code", "limits"]
+    }
+  ]
+}

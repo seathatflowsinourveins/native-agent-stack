@@ -1,0 +1,55 @@
+{
+ "ctx_echo_prefix": {
+  "ctx:ctx_execute True": 7686,
+  "ctx:ctx_execute_file True": 49
+ },
+ "ctx_json_after_echo": {
+  "ctx:ctx_execute False": 7657,
+  "ctx:ctx_execute True": 29,
+  "ctx:ctx_execute_file False": 49
+ },
+ "json_as_is": {
+  "Bash False": 14880,
+  "Bash True": 425,
+  "Glob False": 105,
+  "Grep False": 456,
+  "Read False": 11467,
+  "WebFetch False": 125,
+  "WebSearch False": 11,
+  "ctx:ctx_batch_execute False": 1076,
+  "ctx:ctx_execute False": 7686,
+  "ctx:ctx_execute_file False": 49,
+  "ctx:ctx_fetch_and_index False": 56,
+  "ctx:ctx_search False": 2313,
+  "ctx:ctx_stats False": 23,
+  "other False": 30,
+  "other True": 1,
+  "other_mcp False": 7,
+  "other_mcp True": 11
+ },
+ "large_by_class_shape": {
+  "Bash string": 15305,
+  "Glob string": 105,
+  "Grep string": 456,
+  "Read has_non_text_block": 133,
+  "Read string": 11467,
+  "WebFetch string": 125,
+  "WebSearch string": 11,
+  "ctx:ctx_batch_execute text_blocks1": 1076,
+  "ctx:ctx_execute string": 15,
+  "ctx:ctx_execute text_blocks1": 7671,
+  "ctx:ctx_execute_file text_blocks1": 49,
+  "ctx:ctx_fetch_and_index text_blocks1": 56,
+  "ctx:ctx_search text_blocks1": 2313,
+  "ctx:ctx_stats text_blocks1": 23,
+  "other string": 31,
+  "other_mcp text_blocks1": 18
+ },
+ "read_json_after_cat_n_strip": {
+  "False": 10477,
+  "True": 990
+ },
+ "read_line_numbered": {
+  "all_lines": 11467
+ }
+}

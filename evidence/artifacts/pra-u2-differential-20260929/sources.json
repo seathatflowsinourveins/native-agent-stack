@@ -1,0 +1,105 @@
+{
+  "kind": "pra_u2_sources",
+  "schema_version": 1,
+  "note": "Upstream documents the U2 kernel rules cite, fetched read-only on 2026-09-29 (UTC). Documentation pages are live: sha256 pins the bytes that were read; each quote is the sentence a rule rests on.",
+  "sources": [
+    {
+      "id": "hooks-reference",
+      "url": "https://code.claude.com/docs/en/hooks.md",
+      "fetched_at": "2026-09-29T19:34:42Z",
+      "sha256": "2153ff2405652e0401879ff792d9c446a96499a0280285a9815175b7d5847c67",
+      "bytes": 247742,
+      "sections": ["#### Exit code 0 (line 788)", "#### Add context for Claude (line 984)"],
+      "quotes": [
+        "For most events, Claude Code writes stdout to the debug log and doesn't show it in the transcript. The exceptions are `UserPromptSubmit`, `UserPromptExpansion`, `SessionStart`, and `PostModelSwitch`, where Claude Code adds plain-text stdout as context that Claude can see and act on.",
+        "**Starts with `{` but doesn't end with `}`**: Claude Code treats it as plain text.",
+        "When several hooks return `additionalContext` for the same event, Claude receives all of the values."
+      ],
+      "used_by": "hook_context.claimed_plain_stdout (PLAIN_STDOUT_EVENTS) and the plain-text rule; inserted_blocks"
+    },
+    {
+      "id": "advisor-tool",
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool.md",
+      "fetched_at": "2026-09-29T19:25:36Z",
+      "sha256": "0ddf27a013a220864cbe29f5fad524df6a1a26ae7f5e45b586b85289a551e4aa",
+      "bytes": 97933,
+      "sections": ["### Result variants (line 334)", "### Error results (line 381)", "## Usage and billing (line 1250)"],
+      "quotes": [
+        "Top-level `usage` fields reflect executor tokens only. Advisor tokens are not rolled into the top-level totals because they are billed at a different rate.",
+        "Every top-level `usage` field is the sum of that field across all executor iterations",
+        "[Priority Tier](https://platform.claude.com/docs/en/api/service-tiers) applies to each model independently. A Priority Tier commitment on the executor model does not extend to the advisor.",
+        "If the advisor call fails, the result carries an error"
+      ],
+      "used_by": "usage.advisor_iterations, advisor_totals, the executor-sum check, advisor tier fields null, advisor results without usage"
+    },
+    {
+      "id": "beta-messages-create",
+      "url": "https://platform.claude.com/docs/en/api/beta/messages/create.md",
+      "fetched_at": "2026-09-29T19:26:11Z",
+      "sha256": "992b6eb82bc0fb92dc355e6211cf73b5c4e415628494738caa1e188441026a12",
+      "bytes": 309050,
+      "sections": ["usage.iterations: BetaIterationsUsage or null (line 7725)", "BetaFallbackMessageIterationUsage (line 7863)", "usage.speed (line 7968)"],
+      "quotes": [
+        "A `compaction` entry's tokens are not included in the top-level `usage` fields.",
+        "The terminal entry of a fallback-served turn: when a fallback hop's output is the returned message, the entry for the iteration that completed it carries this type in place of `message`.",
+        "`speed: \"standard\" or \"fast\" or null`"
+      ],
+      "used_by": "the four iteration types (message, advisor_message, compaction, fallback_message) and the speed values"
+    },
+    {
+      "id": "messages-create-usage",
+      "url": "https://platform.claude.com/docs/en/api/typescript/messages/create.md",
+      "fetched_at": "2026-09-29T19:25:49Z",
+      "sha256": "5167d91f19a6a8214293080b4704bca8e59a9bb592ad7b824369ff1cd3b038db",
+      "bytes": 138002,
+      "sections": ["Usage.cache_creation (line 4101)", "Usage.inference_geo (line 4129)", "Usage.service_tier (line 4183)"],
+      "quotes": [
+        "`cache_creation: CacheCreation | null` Breakdown of cached tokens by TTL",
+        "`inference_geo: string | null` The geographic region where inference was performed for this request.",
+        "`service_tier: \"standard\" | \"priority\" | \"batch\" | null`"
+      ],
+      "used_by": "cache_creation_5m, cache_creation_1h, service_tier, inference_geo per message"
+    },
+    {
+      "id": "refusals-and-fallback",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback.md",
+      "fetched_at": "2026-09-29T19:26:42Z",
+      "sha256": "f4145f46d4a78a767f9eba85962057792ddaee49b4041425bf9e1c372559d0c3",
+      "bytes": 61249,
+      "sections": ["### What the response contains (line 646)", "### Billing and rate limits (line 746)"],
+      "quotes": [
+        "A model that declined appears as an ordinary `message` entry, and the model that served the turn appears as a `fallback_message` entry.",
+        "The `usage.iterations` array is the per-attempt record of what you're billed. The top-level `usage` counts describe only the attempt that produced the returned message."
+      ],
+      "used_by": "a fallback_message entry makes the message's usage unread (iteration_issues.unread_entries)"
+    },
+    {
+      "id": "context-mode-server",
+      "repository": "https://github.com/mksglu/context-mode",
+      "ref": "v1.0.169",
+      "commit": "442f1eb6c7cdad3f0cb2411d00756f9e5cf2b587",
+      "path": "src/server.ts",
+      "url": "https://raw.githubusercontent.com/mksglu/context-mode/v1.0.169/src/server.ts",
+      "fetched_at": "2026-09-29T19:33:55Z",
+      "sha256": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59",
+      "bytes": 225865,
+      "lines": "1511-1527 (CODE_ECHO_MAX, truncateCodeForEcho, buildExecuteEcho); 1827 and 2145 (the echo built from the user-supplied code); 1939 and 2217 (`${echo}${stdout}`)",
+      "note": "byte-identical to the installed context-mode 1.0.169 plugin cache copy",
+      "used_by": "ctxEcho (the payload of a ctx_execute or ctx_execute_file result for item 4)"
+    },
+    {
+      "id": "toon-readme",
+      "repository": "https://github.com/toon-format/toon",
+      "ref": "v4.1.1",
+      "commit": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+      "path": "packages/toon/README.md",
+      "fetched_at": "2026-09-29T19:36:50Z",
+      "sha256": "de594f20f7f1a90f61c59926245fa6a15eeddfe8f2647d1ccd0434b7dd6c8665",
+      "bytes": 35504,
+      "lines": "199",
+      "quotes": ["- **uniform**: All objects have identical fields with primitive values"],
+      "note": "the repository's root README.md at this tag is a 23-byte pointer to this file; manifests/stack.json pins toon at v4.1.1",
+      "used_by": "large_uniform_flat"
+    }
+  ]
+}

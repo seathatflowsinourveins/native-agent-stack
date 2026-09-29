@@ -1,0 +1,107 @@
+{
+ "advisor_block_ids": {
+  "advisor_message iteration on some row: False": 413,
+  "advisor_message iteration on some row: True": 2052,
+  "single row; advisor_message iteration: False": 1
+ },
+ "differ_model": {
+  "claude-opus-4-8": 3,
+  "claude-opus-5-5": 2731,
+  "claude-sonnet-5": 347,
+  "claude-sonnet-5-5": 270
+ },
+ "differ_split_minus_combined_sign": {
+  "split<combined": 3343,
+  "split>combined": 8
+ },
+ "distinct_iterations_per_id": {
+  "0": 6010,
+  "1": 162284
+ },
+ "empty_iterations_isApiError": {
+  "False": 4211
+ },
+ "empty_iterations_model": {
+  "claude-haiku-4-5-20251001": 48,
+  "claude-opus-5-5": 313,
+  "claude-sonnet-5-5": 3850
+ },
+ "empty_iterations_stop_reason": {
+  "end_turn": 534,
+  "tool_use": 3677
+ },
+ "empty_iterations_total_zero": {
+  "nonzero": 4211
+ },
+ "empty_iterations_version": {
+  "2.1.283": 9,
+  "2.1.284": 4202
+ },
+ "invariant_by_shape": {
+  "(empty) :: top==msg False top==fallback False top==msg+fallback False top==all False": 4211,
+  "message :: top==msg False top==fallback True top==msg+fallback False top==all False": 5,
+  "message :: top==msg True top==fallback False top==msg+fallback True top==all True": 283929,
+  "message+advisor_message+message :: top==msg True top==fallback False top==msg+fallback True top==all False": 3292,
+  "message+advisor_message+message+advisor_message+message :: top==msg True top==fallback False top==msg+fallback True top==all False": 11,
+  "message+fallback_message :: top==msg False top==fallback True top==msg+fallback False top==all False": 3,
+  "message+message :: top==msg True top==fallback False top==msg+fallback True top==all True": 399,
+  "message+message+message :: top==msg True top==fallback False top==msg+fallback True top==all True": 1
+ },
+ "iteration_split_vs_combined": {
+  "advisor_message:equal": 3314,
+  "fallback_message:equal": 3,
+  "message:equal": 291355
+ },
+ "kernel_pick_has_iterations": {
+  "no": 6010,
+  "yes": 162284
+ },
+ "message_iteration_model_value": {
+  "None": 78,
+  "claude-opus-5-5": 3
+ },
+ "multi_row_pattern": {
+  "--": 5144,
+  "---": 637,
+  "----": 91,
+  "-----": 93,
+  "------": 21,
+  "-----I": 614,
+  "----I": 2015,
+  "----II": 26,
+  "---...---": 24,
+  "---...--I": 844,
+  "---...-II": 7,
+  "---...III": 111,
+  "---I": 3969,
+  "---II": 349,
+  "---III": 20,
+  "--I": 19134,
+  "--II": 72,
+  "--III": 18,
+  "-I": 61442,
+  "-II": 78,
+  "II": 53642,
+  "III": 17422,
+  "III...III": 148,
+  "IIII": 1918,
+  "IIIII": 350,
+  "IIIIII": 105
+ },
+ "multi_row_totals": {
+  "equal": 79595,
+  "max_on_iteration_row": 88699
+ },
+ "split_vs_combined": {
+  "differ | iterations message": 5,
+  "differ | iterations message+advisor_message+message": 3292,
+  "differ | iterations message+advisor_message+message+advisor_message+message": 11,
+  "differ | iterations message+fallback_message": 3,
+  "differ | iterations message+message": 39,
+  "differ | iterations message+message+message": 1,
+  "equal | iterations (empty)": 4211,
+  "equal | iterations message": 283929,
+  "equal | iterations message+message": 360,
+  "equal | no_iterations_key": 145089
+ }
+}
