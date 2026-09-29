@@ -194,6 +194,20 @@ def op_issue_provenance(number):
             "-F", f"name={REPO_NAME}", "-F", f"number={number}"]
 
 
+def op_repository():
+    """GET the repository, for the preflight's identity check (plan section 3, stage 2)."""
+    return ["gh", "api", API]
+
+
+def op_base():
+    """One anonymous `git ls-remote <origin> refs/heads/main`: the pinned base (plan section 2 step 2).
+
+    git-ls-remote(1): the output is "<oid> TAB <ref>" for every ref that matches the
+    pattern; parse_base accepts exactly the one line for main.
+    """
+    return ["git", "ls-remote", ORIGIN_URL, "refs/heads/main"]
+
+
 def op_branch_rules(branch):
     return ["gh", "api", f"{API}/rules/branches/{branch}"]
 
@@ -420,6 +434,8 @@ def _templates(gh):
         "issue_comments": (["gh", "api", "--paginate", re.compile(rf"{re.escape(API)}/issues/{NUMBER}/comments")],
                            None),
         "issue_provenance": (op_issue_provenance(1)[:-1] + [re.compile(f"number={NUMBER}")], None),
+        "repository": (op_repository(), None),
+        "base": (op_base(), None),
         "branch_rules": (["gh", "api", re.compile(rf"{re.escape(API)}/rules/branches/{BRANCH}")], None),
         "base_rules": (op_base_rules(), None),
         "compare": (["gh", "api", re.compile(rf"{re.escape(API)}/compare/{SHA}\.\.\.{SHA}")], None),
@@ -445,6 +461,8 @@ def _templates(gh):
 
 
 WRITE_OPS = {"pr_create", "review", "pr_comment"}
+# Every operation that changes GitHub; GhHarness.writes journals each one (stage 2 receipt).
+GITHUB_WRITES = WRITE_OPS | {"push"}
 
 
 def _match(argv, gh):
@@ -581,11 +599,48 @@ def check_branch_rules(text):
     return types
 
 
+BASE_LINE = re.compile(rf"(?P<oid>{SHA})\trefs/heads/main")
+
+
+def parse_base(text):
+    """op_base's output: exactly one "<oid> TAB refs/heads/main" line (git-ls-remote(1))."""
+    lines = text.splitlines() if isinstance(text, str) else []
+    found = BASE_LINE.fullmatch(lines[0]) if len(lines) == 1 else None
+    if not found:
+        raise HarnessRefused("base_unparseable")
+    return found["oid"]
+
+
+def check_repository(text):
+    """op_repository's answer names this repository, with main as its default branch.
+
+    Fields of GitHub's "Get a repository" (docs.github.com/en/rest/repos/repos):
+    full_name, default_branch, archived and disabled. An archived or disabled
+    repository takes no push, so it refuses here, before any container starts.
+    """
+    try:
+        data = json.loads(text)
+    except ValueError:
+        raise HarnessRefused("repository_unparseable") from None
+    if not isinstance(data, dict):
+        raise HarnessRefused("repository_unparseable")
+    if data.get("full_name") != REPO:
+        raise HarnessRefused("repository_mismatch")
+    if data.get("default_branch") != "main":
+        raise HarnessRefused("default_branch_not_main")
+    if data.get("archived") is not False or data.get("disabled") is True:
+        raise HarnessRefused("repository_not_writable")
+    return {"full_name": REPO, "default_branch": "main"}
+
+
 class GhHarness:
     """Runs allowlisted gh and git operations with the pinned executables.
 
     `runner` defaults to subprocess.run and is injectable for tests. `guard` is the
     outgoing-text guard (resolver/outgoing_guard.py); without one every write is refused.
+    `writes` journals each GitHub write (GITHUB_WRITES) as its operation name and the
+    exit status of gh or git, which is non-zero when GitHub answers with an error. An
+    entry is added before the write runs, so one that raised keeps exit_code None.
     """
 
     def __init__(self, gh, *, base_env, workdir, git="/usr/bin/git", runner=subprocess.run, guard=None,
@@ -595,14 +650,43 @@ class GhHarness:
         self.workdir = check_workdir(workdir)
         self.env = child_env(base_env, gh_path=self.gh, workdir=self.workdir)
         self.runner, self.guard, self.timeout = runner, guard, timeout
+        self.writes = []
 
     def run(self, argv):
-        check_argv(argv, gh=self.gh, guard=self.guard)
+        op = check_argv(argv, gh=self.gh, guard=self.guard)
         check_workdir(self.workdir)
         executable = self.gh if argv[0] == "gh" else self.git
-        return self.runner([executable, *argv[1:]], cwd=self.workdir, env=dict(self.env),
-                           stdin=subprocess.DEVNULL, capture_output=True, encoding="utf-8", errors="replace",
-                           timeout=self.timeout, check=False)
+        record = None
+        if op in GITHUB_WRITES:
+            record = {"op": op, "exit_code": None}
+            self.writes.append(record)
+        result = self.runner([executable, *argv[1:]], cwd=self.workdir, env=dict(self.env),
+                             stdin=subprocess.DEVNULL, capture_output=True, encoding="utf-8", errors="replace",
+                             timeout=self.timeout, check=False)
+        if record is not None:
+            record["exit_code"] = result.returncode
+        return result
+
+    def base_sha(self):
+        """The origin/main commit the attempt pins, read anonymously (op_base)."""
+        listed = self.run(op_base())
+        if listed.returncode != 0:
+            raise HarnessRefused("base_read_failed")
+        return parse_base(listed.stdout)
+
+    def repository(self):
+        """The preflight's repository check (op_repository, check_repository)."""
+        viewed = self.run(op_repository())
+        if viewed.returncode != 0:
+            raise HarnessRefused("repository_read_failed")
+        return check_repository(viewed.stdout)
+
+    def branch_rules(self, branch):
+        """The agent branch's active rules, which must include non_fast_forward (check_branch_rules)."""
+        listed = self.run(op_branch_rules(branch))
+        if listed.returncode != 0:
+            raise HarnessRefused("branch_rules_failed")
+        return check_branch_rules(listed.stdout)
 
     def preflight(self):
         """gh 2.101.0 at the pinned path, then the stored owner login with repo scope."""

@@ -2350,5 +2350,135 @@ class ResolverSkillTests(unittest.TestCase):
         self.assertNotIn("verification-before-completion", text)
 
 
+# -- Stage 2 (RESOLVER.md "Stage 2"): the core wired into host.py, dispatch.py and worker.py.
+# Docker, the agent-server, gh, network git and gitleaks are fakes; git runs locally on
+# fixture repositories. Nothing reaches GitHub, OmniRoute or a container.
+
+SHA_BASE_LINE = "{sha}\trefs/heads/main\n"
+REPOSITORY_JSON = {"full_name": "seathatflowsinourveins/native-agent-stack", "default_branch": "main",
+                   "archived": False, "disabled": False}
+
+
+class Stage2HarnessTests(unittest.TestCase):
+    """The base read, the repository check, the branch-rules read and the write journal."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.r = load_resolver()
+        cls.h = cls.r.gh_harness
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-harness-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.fake = FakeTools(self.tmp)
+        self.home = self.tmp / "home"
+        self.home.mkdir()
+
+    def harness(self, runner=subprocess.run, guard=None):
+        return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
+                                workdir=self.h.private_workdir(self.tmp), runner=runner, guard=guard)
+
+    def test_base_and_repository_reads_are_fixed_read_only_templates(self):
+        h = self.h
+        self.assertEqual(h.op_base(), ["git", "ls-remote", ORIGIN, "refs/heads/main"])
+        self.assertEqual(h.op_repository(), ["gh", "api", API])
+        self.assertEqual(h.check_argv(h.op_base(), gh=self.fake.gh), "base")
+        self.assertEqual(h.check_argv(h.op_repository(), gh=self.fake.gh), "repository")
+        for argv, reason in (
+                (["git", "ls-remote", ORIGIN, "refs/heads/other"], "not_allowlisted"),
+                (["git", "ls-remote", "https://github.com/other/repo.git", "refs/heads/main"], "not_allowlisted"),
+                (["git", "ls-remote", "--upload-pack=/bin/sh", ORIGIN, "refs/heads/main"], "not_allowlisted"),
+                (["gh", "api", "--method", "PATCH", API], "method_denied"),
+                (["gh", "api", "-X", "DELETE", API], "method_denied"),
+                (["gh", "api", "repos/other/repo"], "not_allowlisted"),
+                (["gh", "api", API, "--jq", ".full_name"], "not_allowlisted")):
+            with self.subTest(argv=argv), self.assertRaises(h.HarnessRefused) as caught:
+                h.check_argv(argv, gh=self.fake.gh)
+            self.assertEqual(caught.exception.reason, reason)
+
+    def test_base_parser_takes_exactly_one_main_line(self):
+        sha = "a" * 40
+        self.assertEqual(self.h.parse_base(SHA_BASE_LINE.format(sha=sha)), sha)
+        for text in ("", SHA_BASE_LINE.format(sha=sha) * 2, f"{sha}\trefs/heads/other\n",
+                     SHA_BASE_LINE.format(sha="a" * 39), SHA_BASE_LINE.format(sha=sha.upper()),
+                     f"{sha} refs/heads/main\n", None):
+            with self.subTest(text=text), self.assertRaises(self.h.HarnessRefused) as caught:
+                self.h.parse_base(text)
+            self.assertEqual(caught.exception.reason, "base_unparseable")
+
+    def test_repository_check_names_this_repository_with_main_as_default(self):
+        self.assertEqual(self.h.check_repository(json.dumps(REPOSITORY_JSON)),
+                         {"full_name": REPOSITORY_JSON["full_name"], "default_branch": "main"})
+        for changes, reason in (({"full_name": "other/native-agent-stack"}, "repository_mismatch"),
+                                ({"default_branch": "develop"}, "default_branch_not_main"),
+                                ({"archived": True}, "repository_not_writable"),
+                                ({"archived": None}, "repository_not_writable"),
+                                ({"disabled": True}, "repository_not_writable")):
+            with self.subTest(changes=changes), self.assertRaises(self.h.HarnessRefused) as caught:
+                self.h.check_repository(json.dumps({**REPOSITORY_JSON, **changes}))
+            self.assertEqual(caught.exception.reason, reason)
+        for text in ("", "[]", "{"):
+            with self.subTest(text=text), self.assertRaises(self.h.HarnessRefused) as caught:
+                self.h.check_repository(text)
+            self.assertEqual(caught.exception.reason, "repository_unparseable")
+
+    def test_harness_reads_base_repository_and_branch_rules_through_its_runner(self):
+        sha = "b" * 40
+        rules = {"openhands/issue-12": rules_json(), "openhands/issue-13": json.dumps([{"type": "deletion"}])}
+
+        def runner(args, **kwargs):
+            argv = list(args[1:])
+            if argv == self.h.op_base()[1:]:
+                return completed(args, SHA_BASE_LINE.format(sha=sha))
+            if argv == self.h.op_repository()[1:]:
+                return completed(args, json.dumps(REPOSITORY_JSON))
+            branch = argv[-1].split("/rules/branches/", 1)[1]
+            return completed(args, rules[branch])
+
+        harness = self.harness(runner)
+        self.assertEqual(harness.base_sha(), sha)
+        self.assertEqual(harness.repository()["default_branch"], "main")
+        self.assertIn("non_fast_forward", harness.branch_rules("openhands/issue-12"))
+        with self.assertRaises(self.h.HarnessRefused) as caught:
+            harness.branch_rules("openhands/issue-13")
+        self.assertEqual(caught.exception.reason, "branch_rules_missing_non_fast_forward")
+        failing = self.harness(lambda args, **kwargs: completed(args, "", 128, "fatal: unable to access\n"))
+        for call, reason in ((failing.base_sha, "base_read_failed"), (failing.repository, "repository_read_failed"),
+                             (lambda: failing.branch_rules("openhands/issue-12"), "branch_rules_failed")):
+            with self.subTest(reason=reason), self.assertRaises(self.h.HarnessRefused) as caught:
+                call()
+            self.assertEqual(caught.exception.reason, reason)
+
+    def test_every_github_write_is_journaled_with_its_exit_status(self):
+        body = str(self.tmp / "body.md")
+        guard = StubGuard(files=[body])
+        statuses = iter([0, 1, 0, 0])
+
+        def runner(args, **kwargs):
+            write = args[1:3] in (["pr", "create"], ["pr", "comment"]) or "push" in args or "POST" in args
+            return completed(args, "", next(statuses) if write else 0)
+
+        harness = self.harness(runner, guard)
+        harness.run(self.h.op_pr_view(3))
+        harness.run(self.h.op_push(str(self.tmp / "clone"), "openhands/issue-12", gh=self.fake.gh))
+        harness.run(self.h.op_pr_create("openhands/issue-12", "[#12] Fix the widget", body, "lane:foundation"))
+        harness.run(self.h.op_review(3, "c" * 40, body))
+        harness.run(self.h.op_pr_comment(3, body))
+        self.assertEqual(harness.writes, [{"op": "push", "exit_code": 0}, {"op": "pr_create", "exit_code": 1},
+                                          {"op": "review", "exit_code": 0}, {"op": "pr_comment", "exit_code": 0}])
+
+        def raising(args, **kwargs):
+            raise subprocess.TimeoutExpired(args, 1)
+
+        timed_out = self.harness(raising, guard)
+        with self.assertRaises(subprocess.TimeoutExpired):
+            timed_out.run(self.h.op_pr_comment(3, body))
+        self.assertEqual(timed_out.writes, [{"op": "pr_comment", "exit_code": None}])
+        # A refused operation never reaches the runner or the journal.
+        with self.assertRaises(self.h.HarnessRefused):
+            timed_out.run(["gh", "pr", "merge", "3"])
+        self.assertEqual(len(timed_out.writes), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
