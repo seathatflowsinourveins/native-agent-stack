@@ -126,7 +126,9 @@ change, all still at 0.43.0:
   which CI runs) and the `scripts/native_token_ci.py` pin (its run-time check at
   lines 1740–1742);
 - the install references in `recipes/README.md` and
-  `docs/token-efficiency-stack.json`;
+  `docs/token-efficiency-stack.json` (the two `install` lines; the same file's per-tool
+  `card` blocks also name 0.43.0 on 12 lines as dated card facts, which the registry
+  counts and a re-pin leaves alone);
 - version-specific guidance in `recipes/README.md#history-and-usage`,
   `docs/native-dashboards.md`, `docs/native-dashboard-data.md`, the
   `scripts/native_token_ci.py` telemetry citation and a

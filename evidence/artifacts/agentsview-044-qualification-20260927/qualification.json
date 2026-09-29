@@ -86,6 +86,7 @@
       },
       {
         "path": "docs/token-efficiency-stack.json",
+        "dated_record_lines": {"count": 12, "basis": "Lines inside rows[agentsview].card, the 2026-09-27 per-tool card edition (#437): dated card facts that describe the pin the card recorded. They keep 0.43.0 after a re-pin, and the explorer shows a pin-drift note until a new card edition is recorded; a re-pin changes only the two locations below."},
         "locations": [
           {"line_at_record": 1583, "kind": "install_reference", "match": "\"gh release view v0.43.0 --repo kenn-io/agentsview --json assets\"", "change": "install"},
           {"line_at_record": 1591, "kind": "install_reference", "match": "\"install_note\": \"Official [kenn-io/agentsview v0.43.0]", "change": "install_note"}

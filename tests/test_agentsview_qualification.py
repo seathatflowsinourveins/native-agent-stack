@@ -55,16 +55,25 @@ def unclassified(registry, hits):
 
 
 def location_mismatches(registry, hits):
-    """Re-pin files whose matching lines do not pair one-to-one with their recorded locations."""
+    """Re-pin files whose matching lines do not pair one-to-one with their recorded locations.
+
+    A re-pin file may also carry dated record lines that name the pinned version and keep it after a
+    re-pin (the topic JSON's per-tool cards). The entry's dated_record_lines.count says how many; they
+    are the matching lines that contain no recorded match, and a count that differs fails the check.
+    """
     problems = []
     for entry in registry["repin_targets"]:
-        texts = [text for _, text in hits.get(entry["path"], [])]
         matches = [location["match"] for location in entry["locations"]]
-        paired = len(texts) == len(matches) and any(
-            all(match in text for match, text in zip(order, texts)) for order in itertools.permutations(matches))
+        dated = entry.get("dated_record_lines", {}).get("count", 0)
+        texts = [text for _, text in hits.get(entry["path"], [])]
+        recorded = [text for text in texts if any(match in text for match in matches)]
+        counts_fit = len(recorded) == len(matches) and len(texts) - len(recorded) == dated
+        paired = counts_fit and any(
+            all(match in text for match, text in zip(order, recorded)) for order in itertools.permutations(matches))
         if not paired:
-            detail = " that do not pair by text" if len(texts) == len(matches) else ""
-            problems.append(f"{entry['path']}: {len(texts)} matching lines, {len(matches)} recorded locations{detail}")
+            detail = " that do not pair by text" if counts_fit else ""
+            extra = f" and {dated} dated record lines" if dated else ""
+            problems.append(f"{entry['path']}: {len(texts)} matching lines, {len(matches)} recorded locations{extra}{detail}")
     return problems
 
 
@@ -307,6 +316,19 @@ class RepinLocationRegistryTests(unittest.TestCase):
     def test_recorded_repin_locations_match_the_tree_while_the_pin_holds(self):
         self.require_pin_held()
         self.assertEqual(location_mismatches(self.registry, self.hits()), [])
+
+    def test_the_dated_record_line_count_is_exact(self):
+        self.require_pin_held()
+        hits = self.hits()
+        topic = next(index for index, entry in enumerate(self.registry["repin_targets"])
+                     if entry["path"] == "docs/token-efficiency-stack.json")
+        count = self.registry["repin_targets"][topic]["dated_record_lines"]["count"]
+        self.assertGreater(count, 0)
+        for wrong in (count - 1, count + 1):
+            with self.subTest(count=wrong):
+                changed = copy.deepcopy(self.registry)
+                changed["repin_targets"][topic]["dated_record_lines"]["count"] = wrong
+                self.assertEqual(len(location_mismatches(changed, hits)), 1)
 
     def test_a_list_missing_any_entry_or_location_is_detected(self):
         self.require_pin_held()
