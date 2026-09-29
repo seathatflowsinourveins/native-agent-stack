@@ -43131,6 +43131,11 @@
       "bytes": 13781
     },
     {
+      "path": "tests/test_freeze_snapshot.py",
+      "sha256": "583f99803403c2d9def54a52a27c0e33a9a8e384fb4c857e44941a4b7a803cb3",
+      "bytes": 154939
+    },
+    {
       "path": "tests/test_gap_crosswalk.py",
       "sha256": "af5b008bbe49ad5493aac73568405442ff05d5d921b9655e2ff2caa0e8801876",
       "bytes": 5678
@@ -43959,6 +43964,16 @@
       "path": "tools/sota-convergence/reconciliations-20260922.json",
       "sha256": "a512097b7dc9b912e2e9efec0027f9d28cb9e836ee0c2d9ed93c97a81b9a1b5a",
       "bytes": 7097
+    },
+    {
+      "path": "tools/token-e2e/README.md",
+      "sha256": "ede191a840d1df5540d9bff090165778b4df7244d88821234fb1fe45683641ea",
+      "bytes": 30405
+    },
+    {
+      "path": "tools/token-e2e/freeze_snapshot.py",
+      "sha256": "bbdee8c7f86fbb53242b4da820858311aea6e72fce19901a5114c543543f161c",
+      "bytes": 108657
     },
     {
       "path": "tools/token-report/README.md",
