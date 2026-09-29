@@ -3751,8 +3751,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "2404df6c8d17b8dea544f162d439ddf8a03a5f12f0c2799a63707c9f88e98e35",
-      "bytes": 20076
+      "sha256": "67a262ef88488839f7baecafa298e52961ed2b6ca62a38105262ff12ab0d63c1",
+      "bytes": 20974
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -3976,8 +3976,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "43dcd65e8fc48a07a949c50dc6cbe5b75abb72f64f2c2206544568c4e5b97b6f",
-      "bytes": 40975
+      "sha256": "26cd1c2ac3d50e26f71e6080c9cff72711dd38f8fe9c5b2c4dfbb913e0f50d0a",
+      "bytes": 41166
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -14737,8 +14737,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "b02073ef9f01bd52a51886e2cac24ef555b23d7e7b4279a467199f91bd138ec7",
-      "bytes": 82401
+      "sha256": "77f73e86da6cae133178b44710b7b9d7ab64235982a65a8181b98c40bfe8ba2f",
+      "bytes": 87501
     },
     {
       "path": "docs/stack.md",
@@ -42177,8 +42177,8 @@
     },
     {
       "path": "recipes/tavily.md",
-      "sha256": "4d592482e246eb7cf02e34f6ad30322ea9b4b9f5d11e55fe31deda36509baf69",
-      "bytes": 9209
+      "sha256": "f45642f352835f9fa7f04c6a8b985c41b271ad10c68b7badc0b866f33dd953be",
+      "bytes": 10509
     },
     {
       "path": "scripts/adoption_status.py",
@@ -42207,8 +42207,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "e48679a0c6a7e50e59910936c76d3b97a6ac812a1ad7b77466f96832ed824d57",
-      "bytes": 22912
+      "sha256": "6269418e23241091a1007eb4e61f8b5de52c0bf1c7a79778921ec25578269f17",
+      "bytes": 28960
     },
     {
       "path": "scripts/env_freshness.py",
@@ -42747,13 +42747,13 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "a2b96d0c75ffc67950544632562ff83f23d3d248c2800c34efd64f928e51b426",
-      "bytes": 28598
+      "sha256": "c321aea763333552e199180f8262e379ddc8086b1b2b56aa362e038640cf8276",
+      "bytes": 43282
     },
     {
       "path": "tests/test_credential_tools.py",
-      "sha256": "e828fe65519be3b7665641622f7115e8e27f350362cefc0c4d6cc4c0f356ff26",
-      "bytes": 17947
+      "sha256": "93aee1682d47a0ac54d1d39ef4d566ac141bbc12434ab9983d99b942156ccc99",
+      "bytes": 34946
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -43177,8 +43177,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "767d26f16a70a9eb20a907fbe762126b9e2c132c8256e2ba19a6373cdb585e6c",
-      "bytes": 65660
+      "sha256": "7c9ff36f002aa3a04e54f8bdc32ee125659caa4bd811053b37781958be81a40f",
+      "bytes": 66048
     },
     {
       "path": "tests/test_security_identity.py",

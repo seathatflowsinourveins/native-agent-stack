@@ -505,6 +505,10 @@ ALLOWED = [
     "python3 scripts/kernel_keyring.py status tavily_api_key",
     "python3 scripts/kernel_keyring.py revoke tavily_api_key",
     "( set +x; read -rs K && printf %s \"$K\" | python3 scripts/kernel_keyring.py store tavily_api_key )",
+    # The keyring-only key's one move into the file store (2026-09-29, docs/decisions/2026-09-29-key-management.md):
+    # exec hands its one variable to the create-only writer, started with -I -S, which prints only "tavily: stored".
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- "
+    "python3 -I -S tools/credentials/set_credential.py tavily --from-env",
     f"{EXEC} tvly auth --json",
     f"{EXEC} tvly --json auth",
     f"{EXEC} tvly search \"<query>\" --depth basic --max-results 5 --json",

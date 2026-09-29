@@ -19,7 +19,7 @@ against it.
 | `databento` | Databento API key | only when you buy it | `<store>/databento.env` | `DATABENTO_API_KEY` |
 | `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` only | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
 | `omniroute` | OmniRoute local gateway key, one per lane. The workstation gateway runs keyless on loopback, so callers pass the placeholder `local-loopback` ([decision](decisions/2026-09-27-omniroute-account-pool.md)) | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
-| `tavily` | Tavily API key, memory only ([kernel keyring](#memory-only-option-linux-kernel-keyring-2026-09-26)) | optional | Linux kernel user keyring, key `tavily_api_key`; never a file (macOS: the login Keychain) | `TAVILY_API_KEY`, set only in the environment of the command that `exec` or `tvly-keyring` starts |
+| `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |
 | `openhands-session` | OpenHands agent-server session key for one runtime-worker attempt ([decision](decisions/2026-09-28-openhands-resolver-isolation.md)) | generated locally, per attempt; deleted after the attempt's containers are confirmed removed | `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env`, plus the `.headers` file beside it | none on the host; `OH_SESSION_API_KEYS_0` exists only inside the agent-server container (Docker `--env-file`) |
@@ -72,7 +72,7 @@ tools/credentials/open_credential_terminal.sh alpaca-paper --probe       # ...th
 The command opens a new terminal window: Windows Terminal on WSL2 (or a console window if Windows Terminal is missing), Terminal.app on macOS, or an X terminal on a Linux desktop. If it cannot open one, it prints the one command to run yourself. An agent may open the window, but it never sees what you type.
 
 - **Before anything is typed**, the window prints the checkout's commit. It refuses if `tools/credentials/`, `scripts/credential_status.py` or `adoption/credential-inventory.json` has uncommitted changes, so you only ever type into committed code. It clears `PYTHONPATH`, `LD_PRELOAD` and similar variables, and runs Python with `-I`.
-- **Stored keys:** `tools/credentials/set_credential.py <inventory-id>` accepts only operator-supplied entries (required, optional or paid) whose file sits directly in the store. It asks for each variable with hidden input, and refuses if the terminal cannot hide input. It writes `export NAME=value` lines atomically: a `0600` file in the `0700` store, outside Git, written through a directory handle opened without following symlinks. To replace an existing file you type `replace`, also hidden.
+- **Stored keys:** `tools/credentials/set_credential.py <inventory-id>` accepts only operator-supplied entries (required, optional or paid) whose file sits directly in the store. It asks for each variable with hidden input, and refuses if the terminal cannot hide input. It writes `export NAME=value` lines atomically: a `0600` file in the `0700` store, outside Git, written through a directory handle opened without following symlinks. To replace an existing file you type `replace`, also hidden. Its one form without a terminal, `--from-env`, is create-only and exists for a key that already lives in the kernel keyring ([Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29)).
 - **Paper rate limit:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure (200 on the standard tier), so measuring it never needs order traffic. Agents may run it with `--env-file "$PAPER_ENV_FILE"`.
 
 Live broker keys are out of scope for this repository. Live trading is handled outside it, and no tool here accepts a live endpoint.
@@ -407,21 +407,77 @@ no need for it.
 example by `hf auth token`, and follow
 [Rotation and incidents](#rotation-and-incidents).
 
-## Memory-only option: Linux kernel keyring (2026-09-26)
+<a id="memory-only-option-linux-kernel-keyring-2026-09-26"></a>
 
-On 2026-09-26 the operator supplied a Tavily API key and decided that later
-sessions and workflows should use it without it being stored in a file.
-[`scripts/kernel_keyring.py`](../scripts/kernel_keyring.py) keeps such a key
-in the Linux kernel's user keyring and hands it to one command at a time. Use
-it for Tavily, and for any other provider key that the operator wants kept
-off disk on a Linux or WSL2 host. It does not replace the file store: the
-Alpaca paper pair and the other inventory entries stay in their files,
-because their loaders read `--env-file` and because an unattended or
-scheduled run cannot rely on a key that a kernel restart erases.
+## Kernel keyring: transport and per-boot spare (2026-09-29)
 
-**Store it** in your own terminal, never through an agent. Run `store`
-without a pipe: it turns echo off, prompts, and reads one pasted line, so the
-value never passes through your shell, its history or a command line:
+Until 2026-09-29 this section was "Memory-only option: Linux kernel keyring
+(2026-09-26)": on 2026-09-26 the operator supplied a Tavily API key and
+decided that it should be used without being stored in a file, so it lived
+only here. Since 2026-09-29 no key of record lives only in the kernel keyring
+([decision](decisions/2026-09-29-key-management.md)): a kernel restart erases
+the keyring, and the user's instruction that day was that no key may be lost.
+Every key's store of record is its `0600` file in the store, and the Tavily
+key's is `<store>/tavily.env`.
+[`scripts/kernel_keyring.py`](../scripts/kernel_keyring.py) stays, as a
+transport that hands a key to one command at a time and as a per-boot spare
+that lasts until the next kernel restart. `tvly-keyring` and the `exec` lines
+below keep working with the Tavily copy until then.
+
+**Moving a keyring-only key into the file store.** First the key's inventory
+row becomes a `private_env_file`. Then one command copies the keyring value
+into that new file, so the value never passes through an agent, a prompt or
+a command line:
+
+```sh
+python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- python3 -I -S tools/credentials/set_credential.py tavily --from-env
+```
+
+`exec` puts the one variable into the writer's environment. Then
+`set_credential.py --from-env`:
+
+- refuses unless the interpreter was started with `-I -S`. It checks
+  `sys.flags.isolated` and `sys.flags.no_site` before anything else and
+  never re-executes itself in this mode, because code that ran at start-up
+  ran beside the value. `-I` ignores `PYTHONPATH`, the `PYTHON*` variables
+  and the user site directory; `-S` also skips `site`, which runs the `.pth`
+  lines of the interpreter's own `site-packages` even under `-I`, and on a
+  uv-managed Python that directory sits in the home directory;
+- stores only an entry that declares exactly one variable. A pair such as the
+  Alpaca keys is refused, because its provenance cannot be proven from an
+  inherited environment;
+- takes the variable out of its own environment first, then refuses an
+  absent, empty or out-of-grammar value by the same rules as the hidden
+  prompt;
+- is create-only. It refuses an existing file before it writes anything,
+  and the finished temporary file gets its final name through `os.link`,
+  which fails instead of replacing a file that appeared in between. There is
+  no replace option: rotate with
+  `tools/credentials/open_credential_terminal.sh tavily`;
+- writes that temporary file as a dot-file, `.tavily.env.<16 hex>.tmp`. A
+  kill before the link leaves it behind: the checker lists it by name as
+  `undeclared_store_file`, and neither the checker nor the writer ever takes
+  it for the stored key. The operator deletes it by hand;
+- prints only `tavily: stored`, and no message holds the value.
+
+Run it once, before the kernel restarts, from a checkout whose inventory
+already lists the file: the writer reads the inventory beside it.
+`scripts/credential_status.py` then reports the row `ok` ([Checker](#checker)).
+New keys never go through the keyring: the operator types each one once with
+`tools/credentials/open_credential_terminal.sh <inventory-id>`.
+
+**Interim step (2026-09-29, until the id-based runner lands).** `tvly-keyring`
+and the `exec` lines below read the keyring copy, not the file. After
+rotating the Tavily key with `tools/credentials/open_credential_terminal.sh tavily`,
+also refresh that copy in your own terminal with
+`python3 scripts/kernel_keyring.py store --replace tavily_api_key`, or accept
+that they keep the old key, which fails once it is revoked at Tavily, until
+the next kernel restart drops the copy.
+
+**Store a key in the keyring** in your own terminal, never through an agent.
+Run `store` without a pipe: it turns echo off, prompts, and reads one pasted
+line, so the value never passes through your shell, its history or a command
+line:
 
 ```sh
 python3 scripts/kernel_keyring.py store tavily_api_key     # paste at the hidden prompt, then press Enter
@@ -472,9 +528,14 @@ give `exec` only commands that use the key without printing it.
 `exec` for `tvly` alone, as an installed command:
 `tvly-keyring search "<query>" --json`
 ([adoption/tools/README.md](../adoption/tools/README.md#tvly-keyring-2026-09-26)).
-`scripts/credential_status.py` inspects files. It lists the inventory's
-`tavily` row as `unchecked` and does not query the keyring; `status` is the
-check. The Tavily commands are in [`recipes/tavily.md`](../recipes/tavily.md).
+`scripts/credential_status.py` inspects files and never queries the keyring.
+A `kernel_keyring` row, of which none remains since 2026-09-29, is listed as
+`unchecked` with persistence `memory_only` and the warning
+`memory_only_lost_on_restart`, and a required one is an inventory error.
+Keys named `native-agent-stack:<name>` that no row declares, such as the
+Alpaca spares and, until the restart, `tavily_api_key`, are listed by their
+full name under `undeclared_keyring_key`. `status` is still the presence check for one
+key. The Tavily commands are in [`recipes/tavily.md`](../recipes/tavily.md).
 
 **Lifetime.** The key stays until it is revoked or the kernel stops. The
 kernel keeps a user keyring for as long as its user namespace exists, whether
@@ -488,7 +549,8 @@ restart or update, and when WSL shuts the VM down after it has been idle for
 stops after it has been idle for `instanceIdleTimeout` (default 15 seconds)
 ([WSL configuration](https://learn.microsoft.com/en-us/windows/wsl/wsl-config),
 updated 2026-09-16). After that, `status` prints `absent`, `exec` refuses to
-start the command, and the operator stores the key again.
+start the command, and a spare must be stored again. The store file is not
+affected.
 
 **Scope.** The key is a `user` key named `native-agent-stack:<name>` in the
 user keyring of one uid on one kernel, with permissions `0x3F0B0000`: all for
@@ -500,8 +562,10 @@ This distribution runs in the kernel's initial user namespace (measured:
 distribution that also does would see the same user keyring for the same uid.
 That was not measured across distributions.
 
-**macOS** has no kernel keyring. Use the login Keychain through the
-operator's `secret` helper, as the Alpaca paper lane does
+**macOS** has no kernel keyring. The store file is the key of record there
+too, typed once with `tools/credentials/open_credential_terminal.sh tavily`.
+To run a command with the key there, the operator may use the login Keychain
+through their own `secret` helper, as the Alpaca paper lane does
 ([`adaptive-paper/README.md`](../blueprints/us-equities/adaptive-paper/README.md)
 and the 2026-09-25 addendum to
 [`decisions/2026-09-22-broker-credential-handling.md`](decisions/2026-09-22-broker-credential-handling.md)):
@@ -543,8 +607,9 @@ on a Mac.
   [Telemetry and pasted values](#telemetry-and-pasted-values). The keyring
   does not remove those copies. The Tavily key stored on 2026-09-26 arrived
   that way, and the operator accepted it for this practice use. If that exposure
-  matters, rotate the key at Tavily, run `store --replace` with the new
-  value, and purge the copies as in
+  matters, rotate the key at Tavily, store the new value with
+  `tools/credentials/open_credential_terminal.sh tavily` (type `replace` at
+  the hidden prompt), and purge the copies as in
   [Rotation and incidents](#rotation-and-incidents).
 
 **Checked on this host (2026-09-26, WSL2 kernel 6.18.33.2, x86_64).** These
@@ -1196,7 +1261,25 @@ reports:
 - tracked files with credential-shaped basenames;
 - whether `core.hooksPath` points at `scripts/git-hooks`;
 - whether gitleaks is on `PATH`;
-- whether the project guard file exists.
+- whether the project guard file exists;
+- a `kernel_keyring` row as `unchecked`, with persistence `memory_only` and
+  the warning `memory_only_lost_on_restart`, because the next kernel restart
+  erases it. A required `kernel_keyring` row is an inventory error (exit 2),
+  since a required key must survive a restart;
+- names in the store directory that no row claims (`undeclared_store_file`),
+  such as a stray file or the temporary file of an interrupted write. This
+  is one directory listing: no file is opened, and a symlinked store
+  directory is not listed through;
+- live `user` keys of your uid described `native-agent-stack:<name>` in
+  `/proc/keys` whose `<name>` no `kernel_keyring` row declares
+  (`undeclared_keyring_key`, Linux only). `<name>` is the whole rest of the
+  description, `/` and `:` included, and only a `key_name` equal to it
+  declares a key. That file shows each key's description and payload length,
+  never its value; revoked, invalidated or expired keys are skipped.
+
+Both coverage lists are names only and are warnings, never a failure.
+Together with the rows they account for every file directly in the store
+directory and every live key of your uid under this stack's keyring prefix.
 
 `--client-guards` parses `~/.claude/settings.json` and `~/.codex/config.toml`
 and reports only booleans: user deny rules for the store, the user secret-guard

@@ -10,7 +10,16 @@ expanded host paths. Environment checks report variable NAMES that are set,
 never their values. That includes a native store's path override (such as
 HF_TOKEN_PATH), which moves the store away from the path this checker inspects.
 A kernel keyring entry (memory only, scripts/kernel_keyring.py) has no file:
-it is validated and reported as `unchecked`, and the keyring is never queried.
+it is validated and reported as `unchecked` with persistence `memory_only` and
+the warning `memory_only_lost_on_restart`, and the keyring is never queried. A
+required key must survive a restart, so a required kernel keyring entry is an
+inventory error.
+
+Two coverage lists account for keys that no entry declares, by name only: the
+store root's own names (one scandir; no file is opened) and the kernel's live
+user keys described native-agent-stack:<name>, by the whole <name> (/proc/keys,
+which shows descriptions and payload lengths, never payloads; Linux only). Each
+nonempty list is a warning.
 
 Exit status is 1 when any credential file that exists is unsafe (whatever the
 entry's status, since a stored optional or paid key leaks just as badly), and 2
@@ -43,6 +52,17 @@ NONLOCAL_KINDS = {"interactive_login", "github_actions"}
 # the entry and never queries the keyring; `kernel_keyring.py status <key_name>` is the presence check.
 MEMORY_KINDS = {"kernel_keyring"}
 KEYRING_KEY_NAME = re.compile(r"[a-z0-9][a-z0-9_.-]{0,63}")  # the names scripts/kernel_keyring.py accepts
+# The kernel's list of the keys this process may view (keys(7)). Each line is formatted by proc_keys_show() in
+# linux v6.18 security/keys/proc.c: serial, the seven flags I R D Q U N i (instantiated, revoked, dead, in quota,
+# under construction, negative, invalidated), usage, expiry ("perm", "expd" or a time left), permissions, uid,
+# gid, then "%-9.9s " for the type and the type's describe output. For a "user" key, user_describe() in
+# security/keys/user_defined.c prints the whole description, which may hold "/", ":" or spaces, and then, for a
+# positive key, ": <payload length>". Only that last suffix is removed; the description is kept whole.
+PROC_KEYS = Path("/proc/keys")
+PROC_KEYS_LINE = re.compile(
+    r"[0-9a-f]+ (?P<flags>\S{7}) +\d+ +(?P<expiry>\S+) +[0-9a-f]+ +(?P<uid>\d+) +\d+ (?P<type>.{9}) (?P<describe>.*)")
+USER_DESCRIBE = re.compile(r"(?P<description>.*): \d+")  # greedy: only the final ": <payload length>" is removed
+KEYRING_PREFIX = "native-agent-stack:"  # scripts/kernel_keyring.py PREFIX
 STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native",
             "interactive_only", "ci_only"}
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
@@ -110,6 +130,9 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
             key_name = store.get("key_name")
             if store["kind"] in MEMORY_KINDS and not (isinstance(key_name, str) and KEYRING_KEY_NAME.fullmatch(key_name)):
                 errors.append(f"{label}: kernel keyring store needs a key_name that scripts/kernel_keyring.py accepts")
+            if store["kind"] in MEMORY_KINDS and entry["status"] == "required":
+                errors.append(f"{label}: a required key cannot live only in the kernel keyring, which loses it "
+                              "at every kernel restart; store it in a file")
         for key in ("variables", "optional_variables", "pointer_variables"):
             names = entry[key]
             if not isinstance(names, list) or not all(isinstance(n, str) and NAME.match(n) for n in names):
@@ -193,9 +216,12 @@ def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
         report["state"] = "not_local"
         return report
     if store["kind"] in MEMORY_KINDS:
-        # No file to inspect, and the keyring is not queried: the state says so rather than guessing.
+        # No file to inspect, and the keyring is not queried: the state says so rather than guessing. The key
+        # lives in kernel memory only, so the next kernel restart erases it.
         report["state"] = "unchecked"
         report["key_name"] = store["key_name"]
+        report["persistence"] = "memory_only"
+        report["warnings"].append("memory_only_lost_on_restart")
         return report
     path = expand_template(store["path_template"], env)
     try:
@@ -242,6 +268,59 @@ def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
         report["warnings"].append(f"older_than_{AGE_WARNING_DAYS}_days")
     report["state"] = "unsafe" if findings else "ok"
     return report
+
+
+def undeclared_store_files(entries, env) -> list[str] | None:
+    """Names in the store root that no entry's file claims; directories are skipped.
+
+    One scandir of the store root: names only, no file is opened or followed. [] when there is no store yet;
+    None when the store root is not a real directory (a symbolic link is never listed through) or cannot be
+    listed."""
+    root = expand_template(STORE_ROOT, env)
+    try:
+        if not stat.S_ISDIR(os.lstat(root).st_mode):
+            return None
+        with os.scandir(root) as listing:
+            present = {item.name for item in listing if not item.is_dir(follow_symlinks=False)}
+    except FileNotFoundError:
+        return []
+    except OSError:
+        return None
+    claimed = set()
+    for entry in entries:
+        if entry["store"]["kind"] in LOCAL_KINDS:
+            path = expand_template(entry["store"]["path_template"], env)
+            if path.parent == root:
+                claimed.add(path.name)
+    return sorted(present - claimed)
+
+
+def undeclared_keyring_keys(entries, uid: int, proc_keys: Path | None) -> list[str] | None:
+    """Full names of this uid's live "user" keys described native-agent-stack:<name> that no entry declares.
+
+    Read from the kernel's key list, which holds descriptions and payload lengths, never payloads. <name> is the
+    whole rest of the description, "/" and ":" included, and a kernel_keyring entry declares a key only when its
+    key_name equals that rest exactly. Revoked, dead, negative, invalidated and expired keys hold no usable value
+    and are skipped. None when there is no list to read (not Linux, or proc_keys is None)."""
+    if proc_keys is None:
+        return None
+    try:
+        with open(proc_keys, encoding="utf-8", errors="backslashreplace") as handle:
+            text = handle.read()
+    except OSError:
+        return None
+    declared = {entry["store"]["key_name"] for entry in entries if entry["store"]["kind"] in MEMORY_KINDS}
+    live = set()
+    for line in text.splitlines():
+        match = PROC_KEYS_LINE.fullmatch(line)
+        if (not match or match["type"].rstrip() != "user" or int(match["uid"]) != uid
+                or match["flags"][0] != "I" or set(match["flags"]) & set("RDNi") or match["expiry"] == "expd"):
+            continue
+        positive = USER_DESCRIBE.fullmatch(match["describe"])
+        description = positive["description"] if positive else match["describe"]
+        if description.startswith(KEYRING_PREFIX):
+            live.add(description[len(KEYRING_PREFIX):])
+    return sorted(live - declared)
 
 
 def tracked_sensitive_names(root: Path) -> list[str] | None:
@@ -369,16 +448,23 @@ def client_guards(env) -> dict:
 
 
 def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
-            with_client_guards=False) -> dict:
+            with_client_guards=False, proc_keys: Path | None = None) -> dict:
+    """The report. proc_keys is the kernel's key list to scan (the CLI passes PROC_KEYS); None skips it."""
     env = os.environ if env is None else env
     uid = os.getuid() if uid is None else uid
     now = time.time() if now is None else now
     entries = [inspect_entry(entry, env, uid, now) for entry in inventory["entries"]]
     exported = sorted(n for n in inventory["must_not_be_set"] if n in env)
     tracked = tracked_sensitive_names(root)
+    coverage = {"undeclared_store_files": undeclared_store_files(inventory["entries"], env),
+                "undeclared_keyring_keys": undeclared_keyring_keys(inventory["entries"], uid, proc_keys)}
     report = {
         "schema_version": 1,
         "entries": entries,
+        "coverage": coverage,
+        "warnings": [code for code, key in (("undeclared_store_file", "undeclared_store_files"),
+                                            ("undeclared_keyring_key", "undeclared_keyring_keys"))
+                     if coverage[key]],
         "environment": {"must_not_be_set_present": exported,
                         "native_store_path_overrides_present": native_store_overrides(inventory["entries"], env)},
         "repository": {
@@ -413,6 +499,13 @@ def render_text(report: dict) -> str:
                                      if "key_name" in entry else "(not local)")
         lines.append(f"{entry['state']:<9} {entry['id']:<27} {entry['status']:<16} {location}"
                      f"{extra} findings={detail}{warn}{env_note}")
+    stored, keys = report["coverage"]["undeclared_store_files"], report["coverage"]["undeclared_keyring_keys"]
+    lines.append("undeclared store files (names only): "
+                 + ("unknown (the store root is not a real directory)" if stored is None
+                    else ",".join(stored) or "none"))
+    lines.append("undeclared kernel keyring keys (names only): "
+                 + ("not checked (no readable /proc/keys)" if keys is None
+                    else (",".join(keys) + " (memory only; lost at the next kernel restart)" if keys else "none")))
     env_names = report["environment"]["must_not_be_set_present"]
     lines.append("environment must_not_be_set present: " + (",".join(env_names) or "none"))
     overrides = report["environment"]["native_store_path_overrides_present"]
@@ -441,6 +534,9 @@ def main(argv=None) -> int:
     parser.add_argument("--client-guards", action="store_true",
                         help="also check user-level Claude/Codex settings for the guard keys and "
                              "Claude telemetry content logging (booleans only)")
+    parser.add_argument("--proc-keys", type=Path, default=PROC_KEYS,
+                        help="the kernel's key list to scan for undeclared native-agent-stack keys, names only "
+                             f"(default {PROC_KEYS}; the tests pass a fixture)")
     args = parser.parse_args(argv)
     inventory_path = args.inventory or args.root / INVENTORY
     try:
@@ -452,7 +548,7 @@ def main(argv=None) -> int:
     if errors:
         print("invalid inventory:\n" + "\n".join(errors), file=sys.stderr)
         return 2
-    report = inspect(args.root, inventory, with_client_guards=args.client_guards)
+    report = inspect(args.root, inventory, with_client_guards=args.client_guards, proc_keys=args.proc_keys)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_text(report))
     return 1 if report["unsafe_stored"] else 0
 
