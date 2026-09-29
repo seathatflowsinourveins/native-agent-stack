@@ -14627,8 +14627,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
-      "sha256": "ff28b9f24dcb6f2d8cf3803d6f650b4fc96e6f1b3f344e386f113bfa1312ea40",
-      "bytes": 27666
+      "sha256": "fd0ac4c18b1a34141f548f9b473a945a4e51e52f3e7414c42ca31dce3c7d8b35",
+      "bytes": 27517
     },
     {
       "path": "docs/direct-results.md",
@@ -14762,8 +14762,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "c9d239413bbcfdf4b0f437cd67bd951cacf25d2de45cdfe676993889fd361eaa",
-      "bytes": 78820
+      "sha256": "f4c9b6aeabfb2087fe85af2a653e10baa0e5e7c2bfe673d7bd0513228bb86cfe",
+      "bytes": 79716
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",

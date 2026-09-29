@@ -192,21 +192,20 @@ depend on the shared accounts' usage windows, which are read live before a run a
 - **Trading catalog.** `catalogs/us-equities/models.json` names `claude-opus-5[1m]`, the model of a 2026-09-19 native research run. Naming
   Opus 5.5 needs a native Opus 5.5 research-runtime run first: the trading lane's call. Its session (`ecosystem-roadmap-2026`) keeps the
   row until that run exists and schedules the run after its paper series, listing it among the roadmap's trading moves.
-- **GPT-6 lane effort.** `tools/sota-convergence/codex_lane.py` defaults `--effort` to `high` (`DEFAULT_EFFORT`), and
-  `recipes/sota-convergence-practice.md` and `tools/sota-convergence/README.md` show `--effort high`, where the standing rule for GPT-6
-  lanes is `max`. Open PR #216 does not touch it. Setting the default to `max` fails 49 of the 76 tests in `tests/test_codex_lane.py`,
-  changes a file in the verdict review gate's `TRUST_PATHS` (a rules change is its own pull request) and the lane-code hash that
-  `tools/sota-convergence/lane-provenance.json` registers, and a lane return is reused only at the same `--effort`. `native-agent-stack-76`
-  took it as a standalone foundation rules pull request (default, recipe, README, fixtures and the provenance registry) and tells the
-  roadmap session when it merges; its own foundation sweep does not use `codex_lane.py` (it passes `--effort max` explicitly through
-  `tools/sota-convergence/landscape-sweep/codex_job.py`), so nothing there waits on the flip. The roadmap session checks that the flip
-  has merged before it starts the 12 trading layers.
 - **OmniRoute Claude route.** `docs/foundation-stack.md`, `docs/token-efficiency-stack.json` and `blueprints/us-equities/routing/README.md`
   name `claude/claude-opus-5`, the route recorded as tested on 2026-09-18. An Opus 5.5 route needs its own native test through OmniRoute.
 - **Codex 0.158.0.** Released 2026-09-28; the host has 0.157.1. Its staged qualification needs GPT-6 runs and has not started.
 - **Landscape sweep.** The 32-layer wave stays behind Gate A and Gate B by the user's instruction; `native-agent-stack-2d` stages it.
 - **Main-session model.** The user saved Sonnet 5.5 as the session default with `/model` on 2026-09-28; this record supports either model.
 - The receipt observed each child kind once, and did not exercise long tool-heavy sessions.
+
+**Resolved since this record's first merge.** The GPT-6 lane effort default: #505 (`7a95cf4c`, `native-agent-stack-76`, decision record
+[2026-09-29-codex-lane-default-effort.md](2026-09-29-codex-lane-default-effort.md)) set `tools/sota-convergence/codex_lane.py`'s default and
+`adjudicate.py codex --effort` to `max`, with the recipe step, the README example, five test fixtures and append-only provenance entries.
+An earlier version of this section said that the flip fails 49 of the 76 tests in `tests/test_codex_lane.py`. That count was wrong: it came
+from one scratch run with no unmodified control and did not reproduce. Two clean runs on the tree before #505 (`59cbfc41`), with the
+constant alone flipped, fail 5 tests (with `TMPDIR` under `/tmp` and outside it), and the unmodified tree passes 76 of 76. The session
+that owns the tool attributes the earlier count to an empty `/tmp/.git` that was on the host then; this record did not establish the cause.
 
 ## Limitations
 
