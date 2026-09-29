@@ -3794,8 +3794,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "67a262ef88488839f7baecafa298e52961ed2b6ca62a38105262ff12ab0d63c1",
-      "bytes": 20974
+      "sha256": "cd4308b79b30a40ad62397092d97f65c9cfa631dd1607c2d42fe9c53eaa02dba",
+      "bytes": 21132
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -3939,8 +3939,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "9fb031dac84e9ba9993c2fc460cfde14b7b2f421e44293d07406d3a360875d5d",
-      "bytes": 59148
+      "sha256": "63a39894c284540579051912994620bce3a8effef33da4588ee2a2199b949390",
+      "bytes": 61210
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -14355,8 +14355,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-broker-credential-handling.md",
-      "sha256": "f3bfafc99ca8bbe7ef567fb2fbc59997112c8f07cdd9001739b4b911133351e7",
-      "bytes": 29940
+      "sha256": "2447e90754081adc0bcaf5980dfee51c5b03048478a4239d13fa7ecd5e8a24ff",
+      "bytes": 30178
     },
     {
       "path": "docs/decisions/2026-09-22-codeql-first-analysis.md",
@@ -14805,8 +14805,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "ad9bc7f315f558eeeffb58d162bc1c51b9d0af9316d9fa6f66a642e705dba873",
-      "bytes": 91952
+      "sha256": "24c2ca3e4696d2f8630aaf529342fe454693cf34e7ae2d91bcc000e978623bec",
+      "bytes": 104339
     },
     {
       "path": "docs/stack.md",
@@ -42460,8 +42460,8 @@
     },
     {
       "path": "recipes/tavily.md",
-      "sha256": "f45642f352835f9fa7f04c6a8b985c41b271ad10c68b7badc0b866f33dd953be",
-      "bytes": 10509
+      "sha256": "af6f2ec3a748d07b844431a8aa0116f9be06dd7cb7cc661434ae42234a748ac7",
+      "bytes": 12146
     },
     {
       "path": "scripts/adoption_status.py",
@@ -42490,8 +42490,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "a45cecea83d5849c8da1fe0a7fa1bcb3549d63e1723d3cfb12823f877bc42285",
-      "bytes": 31235
+      "sha256": "636ee1a7b79941f02ea49ed5f62a7ae7860f3f2572b42d45c7cdcc7a986207e8",
+      "bytes": 33813
     },
     {
       "path": "scripts/env_freshness.py",
@@ -43030,8 +43030,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "fa62540c62e6b8d034bebf5053f200131d1de1b6a5b5df0686df199dfb161b55",
-      "bytes": 46998
+      "sha256": "3b541daf16d04b13b9a4bace798117cb485ef37c6181f3e50fe22d4e7e3df927",
+      "bytes": 52288
     },
     {
       "path": "tests/test_credential_tools.py",
