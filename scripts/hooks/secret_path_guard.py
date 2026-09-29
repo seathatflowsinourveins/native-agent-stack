@@ -235,24 +235,17 @@ REDIRECT_OUT = re.compile(r"^\d*(?:>|>>|>\||&>|&>>|>&)$")
 # Every redirection operator as shlex (punctuation_chars) splits it: `2>&1` is `2`, `>&`, `1`, and
 # `<<-EOF` is `<<`, `-EOF`. The word after one is its file, descriptor or here-document delimiter.
 REDIRECTION = re.compile(r"^\d*(?:>>?|>\||&>>?|<<<?|<>|<&|>&|<)$")
-# The start of a here-document in raw command text: `<<` or `<<-`, then its delimiter word, which may be made of unquoted
-# text, single quotes, double quotes and backslash escapes together (`<<'E'OF`). Group 1 is the `-`, group 2 the word;
-# heredoc_delimiter() reads the delimiter and whether it was quoted (then the body is data) from the word.
-HEREDOC_START = re.compile(r"<<(-?)[ \t]*((?:'[^'\n]*'|\"(?:[^\"\\\n]|\\.)*\"|\\.|[^\s;&|()<>\\'\"])+)")
-HEREDOC_QUOTING = re.compile(r"\\(.)|'([^']*)'|\"([^\"]*)\"", re.S)
-# What scan_shell() jumps to in each kind of frame (a regular expression finds the next such character). A `#` matters
-# in command text only (cmd, sub, bt), a `<` for a here-document, a newline for the body of one.
+# What scan_shell() jumps to in each kind of frame (a regular expression finds the next such character). A `#` matters in command text
+# only (cmd, sub, bt).
 SCAN_CHARACTERS = {
-    "cmd": re.compile(r"[\\'\"`$<#\n]"),
-    "bt": re.compile(r"[\\'\"`$<#\n]"),
-    "sub": re.compile(r"[\\'\"`$<#\n()]"),
+    "cmd": re.compile(r"[\\'\"`$#]"),
+    "bt": re.compile(r"[\\'\"`$#]"),
+    "sub": re.compile(r"[\\'\"`$#()]"),
     "dq": re.compile(r"[\\\"`$]"),
     "param": re.compile(r"[\\'\"`$}]"),
     "dparam": re.compile(r"[\\\"`$}]"),
     "arith": re.compile(r"[\\'\"`$()]"),
-    "hd": re.compile(r"[\\`$]"),
 }
-MAX_HEREDOC_NESTING = 8  # here-document bodies read inside here-document bodies (each is a substring scan)
 BACKQUOTE_ESCAPE = re.compile(r"\\([$`\\\"])")
 ANSI_C_TAIL = re.compile(r"\\.|'", re.S)
 LINE_END = re.compile(r"\n")
@@ -260,10 +253,6 @@ BACKQUOTE_COMMENT_END = re.compile(r"[\n`]")  # a comment in a backquote body en
 PAREN_INPUT = re.compile(r"[()]+<")  # shlex joins punctuation that touches: `$(<f)` gives the token `(<`
 PROTECTED_BACKQUOTE = "\ue000"  # stands for a backquote that tokenize() must not turn into `;`
 COMMENT_BREAK = " \t\n;&|()<>"  # what may precede a `#` that starts a word (blanks and the shell's metacharacters)
-# A comment in a here-document body, whose lines the tokenizer reads as command lines: it hides the rest of the body, as
-# shlex's `#` hid the rest of the command before, so a script written through a here-document (which begins with a
-# `#!` line) stays as unread as it was. How the guard reads here-documents is a separate, later change.
-HEREDOC_COMMENT = re.compile(r"(?:^|(?<=[ \t;&|()<>]))#", re.M)
 GIT_ARG_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace"}
 SEPARATORS = {";", "&&", "||", "|", "&", "(", ")", "|&", ";;"}
 # The letters of a dashless BSD-style ps cluster (is_ps_bsd_cluster): the flags that the guard reads, `e` and `E` among them.
@@ -281,10 +270,6 @@ MAX_DEPTH = 3
 MAX_SUBSTITUTION_NESTING = 32
 SUBSTITUTION_BUDGET_FACTOR = 4
 SUBSTITUTION_BUDGET_FLOOR = 65536
-# A command that holds a `#` is tokenized twice, comment-aware and as shlex read it before (command_segments), and shlex costs
-# about 9 microseconds a character inside quotes; above this length only the first reading is made, so a very large command
-# costs what it always did (a 840 KB message took 8.6 s once and 17.8 s twice, and the hook's timeout is 10 s).
-LEGACY_READING_LIMIT = 200_000
 # The most characters main() reads (a longer command is refused as `command_too_large`, check() itself has no such limit). A PreToolUse
 # command hook that runs past its timeout does not block the call (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A
 # timed-out `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), this hook's timeout is 10 s, and the tokenizer costs
@@ -294,27 +279,23 @@ LEGACY_READING_LIMIT = 200_000
 # substitution prints always run inside the timeout, so no reading is skipped above some length. Refusing what cannot be read in time
 # fails closed where reading it would fail open.
 MAX_COMMAND_CHARACTERS = 200_000
-# Programs that only store or print what a command substitution gives them as an argument: `git commit -m "$(cat <<'EOF' ... EOF)"`, `gh pr
-# create --body "$(...)"`, `echo`, `printf`, `cat`, `tee`. The body of a quoted here-document inside a double-quoted substitution is data
-# for them, so prose in a commit message or a pull request body is no command line (scan_shell). What a substitution prints is CODE for a
-# shell (`bash -c "$(...)"`), eval, an interpreter, `source` or `.`, xargs, watch, ssh and every program not listed here, and bash runs it;
-# for those, for an assignment whose value is run later, for a substitution in the command position and for one nested in another, the
-# body keeps the old reading, read as command lines. data_consumers() names the command; where it cannot tell, the answer is no.
-DATA_CONSUMERS = {"git", "gh", "echo", "printf", "cat", "tee"}
-# `cat` and `tee` take their positional operands as file names, not as data (`cat "$(...)"` reads the file the substitution names, and the
-# reader rules read that word for a credential path), so a substitution is data for them only as the word of a here-string
-# (`cat <<< "$(...)"`, `tee f <<< "$(...)"`): found by the 2026-09-29 matrix of consumers, where the plain allowlist loosened a `cat` of an
-# ssh, aws or pointer-variable path that the base guard refused.
-FILE_OPERAND_CONSUMERS = {"cat", "tee"}
+# The canonical idiom of a commit message or a pull-request body (idiom_spans): a double-quoted word that is exactly
+# `"$(cat <<'IDENT'` newline, the body lines, the first line that is exactly IDENT and `)"`. Its body is data for the shell, so where the
+# command that receives the word is git, gh, echo or printf (exempt_idioms), which only store or print it, the command reading sees a
+# neutral word in its place; for everything else (a shell with `-c`, eval, an interpreter, source, xargs, watch, ssh, cat, tee, an
+# assignment whose value is run later, the command position, any program the guard does not know) what a substitution prints is code or a
+# file name, and the reading stays the one before the idiom existed: the body lines are command lines. The raw-text rules (store
+# paths, secret names and expansions, /proc) read the whole text as they always did.
+IDIOM_HEAD = re.compile(r"(?<![^ \t\n])\"\$\([ \t]*cat[ \t]+<<(-?)[ \t]*'([A-Za-z_][A-Za-z0-9_]*)'[ \t]*\n")
+IDIOM_TAIL = re.compile(r"[ \t\n]*\)\"")
+IDIOM_FOLLOWERS = " \t\n;&|)<>"  # what may follow the closing quote of the word (or the end of the text)
+IDIOM_CONSUMERS = {"git", "gh", "echo", "printf"}
 # Reserved words that may stand before a command without being one (`if git commit -m ...; then`, `! cmd`, `{ cmd; }`), skipped when the
-# command that receives a substitution is looked up.
+# command that receives an idiom is looked up.
 RESERVED_STARTERS = {"!", "{", "}", "if", "then", "elif", "else", "while", "until", "do"}
-# What data_consumers() puts in place of each substitution: private-use characters around the substitution's number.
+# What exempt_idioms() puts in place of each idiom: private-use characters around its number (a text that holds one is read strictly).
 SUBSTITUTION_MARKER = re.compile("\ue001([0-9]+)\ue002")
-# The longest text data_consumers() reads, and the keyring execs nested in one another that receiving_command() follows: beyond them the
-# answer is no, which is the old, stricter reading. The text is the command without its comments, its top-level here-document bodies and
-# the substitutions it is looking up.
-DATA_CONSUMER_TEXT_LIMIT = 100_000
+# The keyring execs nested in one another that receiving_command() follows: beyond them the answer is no, which is the stricter reading.
 MAX_LAUNCH_HOPS = 16
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
@@ -402,32 +383,37 @@ HINTS = {
 
 
 def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy: bool = False,
-             protected: list[int] | tuple = (), data: list[tuple[int, int]] | tuple = ()) -> list[str]:
+             protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = (), strict: bool = False) -> list[str]:
     """The words of a command, punctuation apart. `comments` are the spans scan_shell() found to be comments and are
     removed first, and no `#` starts a comment for shlex: shlex read one anywhere (even in `$#` and `a#b`) and, since the
     lines are joined with `;` below, dropped the whole rest of the command. `protected` are the backquotes it found inside
     single-quoted and ANSI-C strings: text for the shell that string is handed to (`bash -c 'echo "`x`"'`), so they stay
-    backquotes instead of becoming `;` with the others. `data` are quoted here-document bodies inside a double-quoted
-    substitution: data for the shell, removed in both readings, so prose in a commit message is no command line (whatever
-    its quotes do to shlex's parity). `legacy` is the reading without comments and protected backquotes, kept because
-    command_segments() reads both: whatever the guard read before it still reads."""
+    backquotes instead of becoming `;` with the others. `ansi_c` are the `$'...'` strings it found: shlex knows no ANSI-C
+    quoting (it reads `$'it\\'s #\\nprintenv'` as a word, a quote that opens and a comment), so each becomes one single-quoted
+    word of the same text, its `\\'` written as a quote shlex reads. `legacy` is the reading without comments, protected
+    backquotes and ANSI-C words, kept because command_segments() reads both: whatever the guard read before it still reads. `strict`
+    raises the ValueError of a text shlex cannot read (an unbalanced quote) instead of splitting it by a regular expression."""
     if protected:
         marked = list(command)
         for at in protected:
             marked[at] = PROTECTED_BACKQUOTE
         command = "".join(marked)
-    if comments or data:
+    if comments or ansi_c:
+        edits = [(first, last, "") for first, last in comments]
+        edits += [(first, last, "'" + command[first + 2:last - 1].replace("\\'", "'\"'\"'") + "'") for first, last in ansi_c]
         pieces, cursor = [], 0
-        for first, last in sorted([*comments, *data]) if data else comments:
-            pieces.append(command[cursor:first])
-            cursor = last
+        for first, last, replacement in sorted(edits, key=lambda edit: edit[:2]):
+            if first >= cursor:
+                pieces.append(command[cursor:first])
+                pieces.append(replacement)
+                cursor = last
         pieces.append(command[cursor:])
         command = "".join(pieces)
-    tokens = lex(command, legacy)
+    tokens = lex(command, legacy, strict)
     return [token.replace(PROTECTED_BACKQUOTE, "`") for token in tokens] if protected else tokens
 
 
-def lex(text: str, legacy: bool = False) -> list[str]:
+def lex(text: str, legacy: bool = False, strict: bool = False) -> list[str]:
     """The words of text, punctuation apart, once tokenize() has cut its spans out: a backquote and a newline are `;` (the lines of a
     command are joined that way), shlex reads the rest, and a text it cannot read (an unbalanced quote) is split by a regular
     expression that keeps the quotes. Without `legacy`, `#` starts no comment for shlex (scan_shell found the real ones)."""
@@ -439,6 +425,8 @@ def lex(text: str, legacy: bool = False) -> list[str]:
             lexer.commenters = ""
         return list(lexer)
     except ValueError:
+        if strict:
+            raise
         return re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
 
 
@@ -456,13 +444,6 @@ def segments(tokens: list[str]) -> list[list[str]]:
     return result
 
 
-def heredoc_delimiter(word: str) -> tuple[str, bool]:
-    """(delimiter, quoted) for the word after `<<`: the word without its quotes and backslashes, and whether it had any,
-    which makes the body data (bash(1), Here Documents: no expansion when any part of the word is quoted)."""
-    quoted = any(mark in word for mark in "'\"\\")
-    return HEREDOC_QUOTING.sub(lambda part: part.group(1) or part.group(2) or part.group(3) or "", word), quoted
-
-
 def ansi_c_end(text: str, position: int) -> int:
     """Index just past the `'` that ends the ANSI-C string whose contents start at text[position], or -1."""
     while found := ANSI_C_TAIL.search(text, position):
@@ -472,54 +453,13 @@ def ansi_c_end(text: str, position: int) -> int:
     return -1
 
 
-def heredoc_end(text: str, position: int, heredocs: list[tuple[str, bool, bool]],
-                lines: dict[bool, dict[str, list[int]]]) -> tuple[int, list[tuple[int, int, bool]]] | None:
-    """(index just past the terminator line of the last of `heredocs`, the body of each as (start, end, quoted)), for
-    heredocs given as (delimiter, whether `<<-` strips leading tabs, quoted) whose bodies start at text[position]; None
-    when one has no terminator line, which means the `<<` was no here-document (`(( x = 1 << 2 ))`, say). `lines`
-    maps each line's text to the offsets where it starts and is filled here, once per text and only when a
-    here-document is looked up: finding a terminator is then a binary search, so no line is read twice however many
-    `<<` the text holds (a rescan per `<<` made 12,000 of them take 10 s)."""
-    regions = []
-    for delimiter, strip_tabs, quoted in heredocs:
-        if strip_tabs not in lines:
-            index: dict[str, list[int]] = {}
-            offset = 0
-            for line in text.split("\n"):
-                index.setdefault(line.lstrip("\t") if strip_tabs else line, []).append(offset)
-                offset += len(line) + 1
-            lines[strip_tabs] = index
-        starts = lines[strip_tabs].get(delimiter)
-        at = bisect.bisect_left(starts, position) if starts else 0
-        if not starts or at == len(starts):
-            return None
-        regions.append((position, starts[at], quoted))
-        end = text.find("\n", starts[at])
-        position = len(text) if end < 0 else end + 1
-    return position, regions
-
-
 def substitution_bodies(text: str) -> list[str]:
     """The bodies scan_shell() returns for text (see there)."""
     return scan_shell(text)[0]
 
 
-def without_spans(text: str, start: int, end: int, spans: list[tuple[int, int]]) -> str:
-    """text[start:end] without the (increasing, non-overlapping) spans that lie inside it."""
-    pieces, cursor = [], start
-    for first, last in spans:
-        if first >= cursor:
-            pieces.append(text[cursor:first])
-            cursor = last
-    pieces.append(text[cursor:end])
-    return "".join(pieces)
-
-
-def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[str], list[tuple[int, int]], list[int],
-                                                                          list[tuple[int, int]]]:
-    """(bodies, comments, protected, data) of a command text, read once the way bash reads it. `initial` is "hd" for the
-    body of a here-document with an unquoted delimiter, which is read as double-quoted text that has no closing quote;
-    `nesting` counts those.
+def scan_shell(text: str) -> tuple[list[str], list[tuple[int, int]], list[int], list[tuple[int, int]]]:
+    """(bodies, comments, protected, ansi_c) of a command text, read once the way bash reads it.
 
     Bodies: those of the outermost command substitutions that the shell runs inside double quotes, `$(...)` and a
     backquote pair. Inside double quotes `$` and the backquote keep their meaning and a backslash escapes only
@@ -534,67 +474,43 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
     (`$((env))` reads the variable env, a `<<` in it is a shift) but may hold real substitutions; it is one only when a
     `))` that touches closes it, and `$((printenv) )` is a substitution holding a subshell (bash tries arithmetic
     first and falls back to that). `$'...'` is an ANSI-C string, data up to the first `'` that a backslash does not
-    escape (`$'it\\'s'`); inside double quotes `$'` is nothing special. The body of a here-document is literal text
-    for this scan: prose in it (an unbalanced parenthesis, an apostrophe, backquotes) opens nothing, and when its
-    delimiter is quoted (`<<'EOF'`, `<<"EOF"`, `<<\\EOF`) the body is data to the shell, so a returned body loses it
-    (the operator line and the terminator stay), and so does the tokenizer's input once that substitution closes (the
-    fourth result): a commit message in `git commit -m "$(cat <<'EOF' ... EOF)"` is no command, whatever its quotes do
-    to shlex's parity. That holds only for a quoted here-document that stands at the command level of a returned body
-    (not inside a substitution nested in it) and only where the command that receives the substitution as an argument
-    stores or prints it (DATA_CONSUMERS, decided by data_consumers() once the whole text is scanned): what a substitution
-    prints is code for `bash -c "$(...)"`, `eval "$(...)"` and every program the guard does not know, and there the body
-    keeps its here-document, read as command lines. The body of a here-document with an unquoted delimiter is expanded by
-    the shell, so it is scanned as double-quoted text with no closing quote (`initial="hd"`) and each `$(...)` or
-    backquote pair in it is a body of its own (its here-documents are never data: the command that receives it is not
-    read there). How the guard reads a top-level here-document as commands is a separate matter and this scan does not
-    touch it.
+    escape (`$'it\\'s'`); inside double quotes `$'` is nothing special. Here-documents are not read as such: their
+    lines are command text like any other, as the tokenizer has always read them at the top level, because bash's rules
+    for where a body ends (quoted, ANSI-C and backslash forms of the delimiter, arithmetic commands that look like `<<`,
+    continuation lines) are too fine to track and each slip hid executable text; the one exemption is idiom_spans().
 
     Comments: the spans, one per line, that bash ignores at the top level of text: from a `#` that starts a word,
     outside quotes and outside any double-quoted substitution, to the end of the line (`$#`, `${#x}` and `a#b` hold none;
     inside a `$(...)` body a comment also runs to the end of its line, so a `)` in it closes nothing). tokenize()
-    removes them. A comment in a here-document body, whose lines the tokenizer reads as command lines, hides the rest of
-    that body (not the text after its terminator), as shlex's `#` hid the rest of the command before: a script written
-    through a here-document, which begins with a `#!` line, stays as unread as it was.
+    removes them.
+
+    ANSI-C strings: the top-level `$'...'` spans (the `$` to the closing quote), which tokenize() keeps as one word.
 
     One pass, each character read once: a stack of frames replaces recursion, and a regular expression jumps from one
     character that matters to the next."""
     bodies: list[str] = []
     comments: list[tuple[int, int]] = []
     protected: list[int] = []  # backquotes inside single-quoted or ANSI-C strings at the top level
-    kept: list[tuple[int, int]] = []  # quoted here-document bodies inside a returned body whose consumer takes data: data for the tokenizer too
-    data: list[tuple[int, int]] = []  # bodies of quoted here-documents at the command level of the returned body that is open
-    heredocs: list[tuple[str, bool, bool]] = []  # `<<` (delimiter, strips tabs, quoted) seen on the current line
-    lines: dict[bool, dict[str, list[int]]] = {}
-    # What data_consumers() needs, kept only for a text that has a quoted here-document to decide on: where each returned
-    # substitution lies (with the index of its body), the bodies cut out of here-documents at the top level, and the
-    # substitutions whose here-documents wait for that decision: (body index, start, end, kind, closed, here-document bodies).
-    spans: list[tuple[int, int, int]] = []
-    cuts: list[tuple[int, int]] = []
-    pending: list[tuple[int, int, int, str, bool, tuple[tuple[int, int], ...]]] = []
+    ansi_c: list[tuple[int, int]] = []
     # Frames, innermost last: [kind, start, parentheses, reported, dq, bodies_at_open]. Kinds: cmd (unquoted text),
     # sub (`$(`), bt (backquotes), dq (double quotes), param (`${`), dparam (`${` inside double quotes), arith (`$((`).
     # `dq` says whether a substitution opened here sits inside double quotes (param and arith inherit it from their
     # parent). `reported` marks a body that starts inside double quotes and is returned; `hidden` counts those on the
     # stack, so a substitution inside one is left to the next reading of that body.
-    stack: list[list] = [[initial, 0, 0, False, initial == "hd", 0]]
+    stack: list[list] = [["cmd", 0, 0, False, False, 0]]
     hidden = 0
     end = len(text)
     index = 0
     has_backquote = "`" in text
     construct_end = -1  # where the last quote, escape or substitution ended: a `#` right after it is inside a word
 
-    def close(at: int, closed: bool = True) -> None:
+    def close(at: int) -> None:
         nonlocal hidden
         kind, start, _, reported = stack.pop()[:4]
         if reported:
             hidden -= 1
             body = text[start:at]
-            spans.append((start - (2 if kind == "sub" else 1), at + 1 if closed else at, len(bodies)))
-            if data:  # its here-documents are data only if the command that receives the substitution takes data: decided below
-                pending.append((len(bodies), start, at, kind, closed, tuple(data)))
             bodies.append(BACKQUOTE_ESCAPE.sub(r"\1", body) if kind == "bt" else body)
-            if not hidden:
-                data.clear()
 
     def protect(first: int, last: int) -> None:
         tick = text.find("`", first, last)
@@ -654,6 +570,8 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
             elif following == "'" and not frame[4] and (closing := ansi_c_end(text, index + 2)) >= 0:
                 if has_backquote and not hidden:
                     protect(index + 2, closing - 1)
+                if not hidden:
+                    ansi_c.append((index, closing))
                 index = construct_end = closing
             else:
                 index += 1
@@ -671,33 +589,6 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
                 index = closing
             else:
                 index += 1
-        elif char == "<":
-            if text.startswith("<<<", index):  # a here-string: its word is read as usual
-                index += 3
-            elif match := HEREDOC_START.match(text, index):
-                delimiter, quoted = heredoc_delimiter(match.group(2))
-                if delimiter:
-                    heredocs.append((delimiter, bool(match.group(1)), quoted))
-                index = match.end()
-            else:
-                index += 1
-        elif char == "\n":
-            index += 1
-            if heredocs:
-                found_end = heredoc_end(text, index, heredocs, lines)
-                heredocs.clear()
-                if found_end is not None:
-                    index, regions = found_end
-                    for first, last, quoted in regions:
-                        if hidden:
-                            if quoted and frame[3] and initial != "hd":  # at the command level of the returned body itself
-                                data.append((first, last))
-                            continue
-                        cuts.append((first, last))
-                        if not quoted and nesting < MAX_HEREDOC_NESTING:  # the shell expands it: a `$(...)` in it runs
-                            bodies.extend(scan_shell(text[first:last], "hd", nesting + 1)[0])
-                        if comment := HEREDOC_COMMENT.search(text, first, last):
-                            comments.append((comment.start(), last - 1))
         elif char == "(":
             frame[2] += 1
             index += 1
@@ -718,26 +609,56 @@ def scan_shell(text: str, initial: str = "cmd", nesting: int = 0) -> tuple[list[
                 if frame[3]:
                     hidden += 1
                     del bodies[frame[5]:]
-                    while spans and spans[-1][2] >= frame[5]:
-                        spans.pop()
-                    while pending and pending[-1][0] >= frame[5]:
-                        pending.pop()
             index += 1
     while len(stack) > 1:  # unterminated: what is left of the text
         if stack[-1][0] == "arith":
             stack.pop()
         else:
-            close(end, False)
-    if pending:
-        answers = data_consumers(text, comments, cuts, spans)
-        numbers = {body: number for number, (_, _, body) in enumerate(spans)}
-        for body_index, start, at, kind, closed, holes in pending:
-            if answers[numbers[body_index]]:
-                body = without_spans(text, start, at, list(holes))
-                bodies[body_index] = BACKQUOTE_ESCAPE.sub(r"\1", body) if kind == "bt" else body
-                if closed:  # a substitution that never closes is a syntax error: the tokenizer keeps reading it as before
-                    kept.extend(holes)
-    return bodies, comments, protected, kept
+            close(end)
+    return bodies, comments, protected, ansi_c
+
+
+def idiom_spans(text: str) -> list[tuple[int, int]]:
+    """The spans (from the opening quote to the closing one) in text, as written, of the double-quoted words that are exactly the
+    canonical idiom of a commit message or a pull-request body: `"$(`, optional blanks, `cat`, blanks, `<<`, an optional `-`,
+    optional blanks, `'IDENT'` (single quotes, IDENT of letters, digits and `_`, not starting with a digit), nothing else but
+    blanks on that line, a newline, the body lines, the first line that is exactly IDENT (for `<<-` after its leading tabs, no
+    other trimming, no carriage return), and then only blanks and newlines before the `)"`. The word must stand alone: after a
+    blank or at the start, and before a blank, the end or one of `;&|)<>`. Anything else is not the idiom: a `\\EOF`, `"EOF"`
+    or `$'EOF'` delimiter, another first command, text on the operator line (`| sh`), text after the terminator, a body that
+    is never terminated. It is looked for in the text as written, before the guard joins backslash-newline pairs: in a quoted
+    here-document those are text, and joining them made a line `text\\` swallow the terminator behind it."""
+    spans: list[tuple[int, int]] = []
+    if '"$(' not in text:
+        return spans
+    lines: dict[bool, dict[str, list[int]]] = {}  # per `<<`/`<<-`: the offsets where each distinct line starts, built once
+    tails: dict[int, int] = {}  # per terminator line: where the blanks and the `)"` after it end, or -1 (many heads may share one)
+    position = 0
+    while head := IDIOM_HEAD.search(text, position):
+        position = head.end()
+        strip_tabs = bool(head.group(1))
+        if strip_tabs not in lines:
+            index: dict[str, list[int]] = {}
+            offset = 0
+            for line in text.split("\n"):
+                index.setdefault(line.lstrip("\t") if strip_tabs else line, []).append(offset)
+                offset += len(line) + 1
+            lines[strip_tabs] = index
+        starts = lines[strip_tabs].get(head.group(2), ())
+        at = bisect.bisect_left(starts, head.end())
+        if at == len(starts):
+            continue
+        newline = text.find("\n", starts[at])  # the terminator is a whole line, so a newline ends it
+        if newline < 0:
+            continue
+        if newline not in tails:
+            tail = IDIOM_TAIL.match(text, newline + 1)
+            tails[newline] = tail.end() if tail else -1
+        end = tails[newline]
+        if end >= 0 and (end == len(text) or text[end] in IDIOM_FOLLOWERS):
+            spans.append((head.start(), end))
+            position = end
+    return spans
 
 
 def input_redirection_segments(words: list[str]) -> list[list[str]]:
@@ -1099,41 +1020,43 @@ def receiving_command(words: list[str]) -> tuple[str, int] | None:
     return None
 
 
-def data_consumers(text: str, comments: list[tuple[int, int]], cuts: list[tuple[int, int]],
-                   spans: list[tuple[int, int, int]]) -> list[bool]:
-    """For each substitution of `spans` (first, end, body index; the double-quoted ones scan_shell returns bodies for), whether
-    the command that receives it as an argument is one of DATA_CONSUMERS (for `cat` and `tee`, as a here-string word only:
-    FILE_OPERAND_CONSUMERS), so that a quoted here-document at its command level is data. The text is read once more for that,
-    with its comments and top-level here-document bodies cut out and each substitution in place of a marker (private-use
-    characters around its number): the words of the segment that holds a marker say which command it belongs to. A marker
-    before the program word (an assignment's value, a wrapper's option value, the command position itself) is no argument, so
-    a substitution there, or one whose command is anything else (a shell with `-c`, eval, an interpreter, source, xargs, watch,
-    ssh ...), is no data: the answer is False wherever it cannot be told (a text with those characters, an unreadable
-    command, more than DATA_CONSUMER_TEXT_LIMIT characters left after the cuts)."""
+def exempt_idioms(text: str, spans: list[tuple[int, int]]) -> list[bool]:
+    """For each idiom span of text (idiom_spans), whether the command that receives it takes it as data: the program, after the reserved
+    words, assignments, wrappers and launchers the guard models (receiving_command), is one of IDIOM_CONSUMERS and the idiom is one of its
+    arguments. The text is read once more for that, with each idiom in place of a marker, its comments cut out and its lines joined as
+    check() joins them: the words of the segment that holds a marker say which command it belongs to. A marker before the program word
+    (an assignment's value, a wrapper's option value, the command position itself) is no argument, so an idiom there, or one whose command
+    is anything else (a shell with `-c`, eval, an interpreter, source, xargs, watch, ssh, cat, tee ...), is not exempt; nor is one that is
+    not a word of its own (glued to other text), nor one inside the body of a double-quoted substitution (its command is another one, and
+    shlex's reading of nested quotes can show it as a word of its own). The answer is False wherever it cannot be told (a text that holds
+    the marker characters, one shlex cannot read, no program found)."""
     answers = [False] * len(spans)
-    if "\ue001" in text or "\ue002" in text:
+    if not spans or "\ue001" in text or "\ue002" in text:
         return answers
-    edits = [(first, last, "") for first, last in comments] + [(first, last, "") for first, last in cuts]
-    edits += [(first, last, f"\ue001{number}\ue002") for number, (first, last, _) in enumerate(spans)]
     pieces, cursor = [], 0
-    for first, last, marker in sorted(edits, key=lambda edit: edit[:2]):
-        if first >= cursor:
-            pieces.append(text[cursor:first])
-            pieces.append(marker)
-            cursor = last
+    for number, (first, last) in enumerate(spans):
+        pieces.append(text[cursor:first])
+        pieces.append(f"\ue001{number}\ue002")
+        cursor = last
     pieces.append(text[cursor:])
-    marked = "".join(pieces)
-    if len(marked) > DATA_CONSUMER_TEXT_LIMIT:
-        return answers
-    for words in segments(lex(marked)):
+    marked = "".join(pieces).replace("\\\n", "")
+    bodies, comments, protected, ansi_c = scan_shell(marked)
+    try:
+        tokens = tokenize(marked, comments, protected=protected, ansi_c=ansi_c, strict=True)
+    except ValueError:
+        return answers  # an unbalanced quote: the words are a guess, and a guess is no reason to hide a body
+    inside = {int(number) for body in bodies for number in SUBSTITUTION_MARKER.findall(body)}
+    for words in segments(tokens):
         found = [(position, SUBSTITUTION_MARKER.findall(word)) for position, word in enumerate(words) if "\ue001" in word]
         command = receiving_command(words) if found else None
-        if command is None or command[0] not in DATA_CONSUMERS:
+        if command is None or command[0] not in IDIOM_CONSUMERS:
             continue
         for position, numbers in found:
-            if position > command[1] and (command[0] not in FILE_OPERAND_CONSUMERS or words[position - 1] == "<<<"):
-                for number in numbers:
-                    answers[int(number)] = True
+            # a word of its own, after the program: inside another word (a substitution's body, `--message=`, a quoted string with other
+            # text) the command that receives it is not the one this segment names
+            if position > command[1] and len(numbers) == 1 and words[position] == f"\ue001{numbers[0]}\ue002" \
+                    and int(numbers[0]) not in inside:
+                answers[int(numbers[0])] = True
     return answers
 
 
@@ -1149,8 +1072,8 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
     for nesting in range(MAX_SUBSTITUTION_NESTING + 1):
         following: list[str] = []
         for text in level:
-            bodies, comments, protected, data = scan_shell(text)
-            result.extend(command_segments(text, depth, comments, protected, data))
+            bodies, comments, protected, ansi_c = scan_shell(text)
+            result.extend(command_segments(text, depth, comments, protected, ansi_c))
             following.extend(bodies)
         spent += sum(map(len, following))
         if not following or spent > budget:
@@ -1160,17 +1083,18 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
 
 
 def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int]] | tuple = (),
-                     protected: list[int] | tuple = (), data: list[tuple[int, int]] | tuple = ()) -> list[list[str]]:
+                     protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = ()) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
     command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
     `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options). Read twice
-    when the command holds a `#`: without its comments (tokenize) and as shlex read it before, which dropped the rest of
-    the command at the first `#`; the second reading adds only the segments the first lacks."""
+    when the command holds a `#` or an ANSI-C string: without its comments and with each `$'...'` one word (tokenize),
+    and as shlex read it before, which dropped the rest of the command at the first `#`; the second reading adds only
+    the segments the first lacks. main() refuses a command long enough for two readings to outlast the hook's timeout."""
     result: list[list[str]] = []
     seen: set[tuple[str, ...]] = set()
-    readings = [tokenize(command, comments, protected=protected, data=data)]
-    if ("#" in command or protected or comments) and len(command) <= LEGACY_READING_LIMIT:
-        readings.append(tokenize(command, legacy=True, data=data))
+    readings = [tokenize(command, comments, protected=protected, ansi_c=ansi_c)]
+    if "#" in command or protected or comments or ansi_c:
+        readings.append(tokenize(command, legacy=True))
     for reading, tokens in enumerate(readings):
         for raw in segments(tokens):
             if reading:
@@ -1512,7 +1436,27 @@ def segment_reason(words: list[str]) -> str | None:
     return None
 
 
+def neutral_reading(command: str) -> str:
+    """The command as written with each exempt idiom (idiom_spans, exempt_idioms) replaced by a neutral quoted word: what the command
+    reading sees, so that the prose of a commit message or a pull-request body behind git, gh, echo or printf is no command line. It
+    is looked for in the text as written, before the guard joins backslash-newline pairs (in a quoted here-document they are text).
+    The raw-text rules never read this: they read the whole command."""
+    spans = idiom_spans(command)
+    exempt = exempt_idioms(command, spans)
+    if not any(exempt):
+        return command
+    pieces, cursor = [], 0
+    for (first, last), yes in zip(spans, exempt):
+        if yes:
+            pieces.append(command[cursor:first])
+            pieces.append('"x"')
+            cursor = last
+    pieces.append(command[cursor:])
+    return "".join(pieces)
+
+
 def check(command: str) -> str | None:
+    reading = neutral_reading(command)
     # The shell removes a backslash-newline before it splits words, so the rules read the joined command.
     # Each text pattern also reads it without quoting: `sh -c 'echo $GH_TO''KEN'` hands the inner shell
     # `echo $GH_TOKEN`. (Where quoting does end a name, as in `"$GH_TO"KEN`, that errs toward blocking.)
@@ -1526,7 +1470,7 @@ def check(command: str) -> str | None:
             return "process_environment"
         if SECRET_EXPANSION.search(text) or SECRET_LOOKUP.search(text):
             return "secret_variable_reference"
-    words_list = expand(command)
+    words_list = expand(reading.replace("\\\n", ""))
     reason = keyring_reason(texts, words_list)
     if reason:
         return reason

