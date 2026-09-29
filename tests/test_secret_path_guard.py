@@ -95,14 +95,17 @@ BLOCKED = {
     "rg KEY \"$XDG_CONFIG_HOME/native-agent-stack/\"": "credential_store_path",
     "while read -r line; do :; done < \"$PAPER_ENV_FILE\"": "credential_file_read",
     # A numbered pointer (PAPER_ENV_FILE_2 is the second paper account's, 2026-09-29): the word boundary after
-    # PAPER_ENV_FILE used to fail before `_2`, so each of these passed while the account-1 form was blocked.
+    # PAPER_ENV_FILE used to fail before `_2`, so each of these passed the guard (checked against the previous guard)
+    # while the account-1 form was blocked.
     "cat \"$PAPER_ENV_FILE_2\"": "credential_file_read",
     "cat \"${PAPER_ENV_FILE_2}\"": "credential_file_read",
     "head -n 3 \"$PAPER_ENV_FILE_2\"": "credential_file_read",
     "while read -r l; do :; done < \"$PAPER_ENV_FILE_2\"": "credential_file_read",
     "cat \"$SEC_CONTACT_ENV_2\"": "credential_file_read",
     "set -x; . \"$PAPER_ENV_FILE_2\"": "trace_while_sourcing",
-    "set -a; . \"$PAPER_ENV_FILE_2\"; set +a; env": "environment_dump_after_source",
+    "set -o xtrace; source \"${PAPER_ENV_FILE_2}\"": "trace_while_sourcing",
+    ". \"$PAPER_ENV_FILE_2\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
+    "( . \"$PAPER_ENV_FILE_2\"; python3 -c 'import os; print(dict(os.environ))' )": "environment_dump_after_source",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -711,6 +714,9 @@ SAFE_CORPUS = [
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
 EXPECTED_PASS_THROUGH = [
+    # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
+    # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
+    "cat \"$PAPER_ENV_FILE_B\"",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
