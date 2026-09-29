@@ -198,3 +198,111 @@ Dated reading (2026-09-29, designer 1, for the coordinator):
 - Any part of a value is found in a transcript, log or tool output after a
   `--from-env` run: stop using the mode, rotate the key, and type keys only
   through `open_credential_terminal.sh`.
+
+## Boot receipt (2026-09-29)
+
+The second restart safeguard of the same design (D1 PR-3), built on branch
+`claude/key-boot-receipt-20260929`, stacked on the change above (base
+`76ade87c`). The runbook is
+[Restart check](../secret-storage.md#restart-check-2026-09-29).
+
+**Decision.**
+
+1. `scripts/credential_boot_receipt.py record` writes one value-free receipt
+   per start of the user's service manager, to
+   `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/credential-boot/<sequence>-<UTC stamp>-<boot id prefix>.json`:
+   a 0600 file in a 0700 directory, written as a `mkstemp` dot-file and
+   linked into place, so no receipt is ever replaced. The 8-digit sequence
+   number, one more than the highest present, is chosen and linked under an
+   exclusive `flock` of the directory, so concurrent writers get distinct
+   numbers; a name taken anyway (`EEXIST`) means choosing again, a bounded
+   number of times. It prints one line of counts, which the runbook reads
+   with `journalctl --user -u credential-boot-receipt.service -n 20 -o cat
+   --grep='^credential boot receipt:'`: `-u` also shows systemd's own
+   messages about the unit, and a finished oneshot logs one after the tool's
+   line (review finding, 2026-09-29: `-n 1` could return it instead). The
+   receipt holds the boot id, uptime, systemd version, linger
+   (`loginctl show-user --property=Linger`), the checkout revision, the
+   checker's rows reduced to ids, statuses, store kinds, path templates,
+   states, findings and warnings, each file row's `lstat` mode, size and
+   `mtime_ns`, the coverage names, the names of this uid's live
+   `native-agent-stack:*` keys, and `claude_user_guard_matches_pin`. The
+   checker observes each file itself, so the tool brackets that scan with
+   one `lstat` just before and one just after it. A file whose device,
+   inode, mode, size, mtime or ctime differs between the two changed while
+   the checker looked; its row is `changed_during_record`, never `ok`, and
+   `compare` counts it as not ok (review finding, 2026-09-29: a file
+   removed between two separate observations had read as
+   `ok -> ok, fingerprint gone`).
+2. `compare` diffs the latest two receipts by state and by the names of
+   changed fingerprint fields. Latest means the highest sequence numbers,
+   never the clock: a WSL clock can step back after a Windows sleep or
+   before its first time sync (review finding, 2026-09-29: a restart
+   stamped 60 s earlier had reversed the order and read a deleted file as
+   `missing -> ok`). Receipts named before sequence numbers sort before
+   every sequenced one. It exits 1 when a required or optional file row
+   that was `ok` is no longer `ok` or has no row, and 0 otherwise; a single
+   receipt is reported as the baseline. It exits 2 without a readable
+   receipt or when a receipt it reads lacks a field or holds one of the
+   wrong type, as the baseline or the newer of two, with one line naming
+   the receipt file only and no traceback (review finding, 2026-09-29).
+3. `adoption/templates/systemd/credential-boot-receipt.service` runs `record`
+   as a `Type=oneshot` wanted by `default.target`, from `@REPOSITORY@`, which
+   the workstation renders to its live clone as it does for its other units:
+   never the working checkout, whose revision moves, and never a build
+   worktree, which a merge deletes. With linger on it runs at every
+   user-manager start with no login and no unlock. It has no `Environment=`,
+   `EnvironmentFile=` or `LoadCredential=` line. It is rendered by hand with
+   the repository's existing `@REPOSITORY@` convention; no render tool was
+   added.
+4. `credential_status.py --client-guards` gains
+   `claude_user_guard_matches_pin`: the sha256 of the installed user-scope
+   guard against the guard's line in the checkout's
+   `adoption/hooks/claude/SHA256SUMS`. The guard is opened with `O_NOFOLLOW`
+   and hashed only when it is a regular file, so the check opens no store
+   file even through a planted link; only the boolean leaves it.
+
+**From the leak-path review.** The local receipt keeps each file's size,
+which shows a truncated or emptied file. No printed, sanitised or published
+form carries it, because a one-variable file's size gives its value's
+length: `compare` names changed fields and never prints their values. No
+content hash of any kind is recorded, because a hash of a short or guessable
+value, such as the SEC contact identity, is an offline test for it. A
+temporary or dot file that a killed writer leaves in the store is listed by
+name in the `undeclared_store_file` warning, and so in the receipt.
+
+**Alternatives.**
+
+- A content hash per file would also catch a changed value of the same size
+  and mtime, but it is the offline test above; rejected.
+- A login hook or a `.profile` line runs only after a login, which the
+  restart check must not need.
+- `LoadCredential=` or an environment file for this unit: the unit needs no
+  value, so it is given none.
+
+**Evidence class.**
+
+- *Local integration*, synthetic stores in temporary directories:
+  `tests/test_credential_boot_receipt.py` (14 tests: the key allowlist;
+  canaries absent in raw, base64, hex, percent-encoded and hashed forms from
+  the receipt, the printed line, stderr and `compare`; modes; no replacement;
+  the ok-to-missing, ok-to-unsafe and vanished-row regressions; a restart
+  compared by name and state; the `-I` re-run; the unit pin; the runbook
+  commands under the guard) and `tests/test_credential_status.py` (the pin
+  boolean). Each new behaviour failed before its implementation, and twelve
+  mutations of the tool are each caught by the intended test.
+- *Text check of the unit*: its directive list is pinned, and
+  `systemd-analyze --user verify` on a rendered copy exited 0 on this host
+  (systemd 255.4). Nothing was installed, enabled or started.
+- *Not yet observed*: the unit on the host, a receipt written at a real boot,
+  and the restart itself. The Mac form, a `RunAtLoad` LaunchAgent, is
+  documented, not run; `boot_id` is null there.
+
+**Overturn.**
+
+- A real restart where `compare` misreports a file that survived, or where
+  the oneshot has not run before the first session: fix the comparison or
+  the unit's ordering, and record the observation.
+- A store that keeps keys through a restart without a same-uid plaintext
+  file (the overturn above) replaces the file rows whose fingerprints this
+  receipt compares.

@@ -1291,6 +1291,89 @@ exists is unsafe, whatever the entry's status, so a group-readable Hugging
 Face token fails the check as a broker key does. It is 2 for an invalid
 inventory. Missing files and warnings are informational.
 
+## Restart check (2026-09-29)
+
+A kernel restart erases the kernel keyring and must leave every key file of
+the store as it was. `scripts/credential_boot_receipt.py` shows whether it
+did, without a value and without a person present. The
+`credential-boot-receipt.service` oneshot runs `record` at every start of the
+user's service manager: with linger on, that is every boot (on WSL, every
+distro start), with no login and no unlock. Each receipt is a 0600 file in
+the 0700 directory
+`${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/credential-boot/`,
+named `<sequence>-<UTC stamp>-<boot id prefix>.json`; `compare` orders
+receipts by the sequence number, never by the clock, which can step back on
+WSL. It holds the boot id, uptime, systemd version, linger, the checkout revision,
+the checker's rows (states, findings, warnings and path templates), each file
+row's `lstat` mode, size and mtime_ns, the checker's coverage names, the names
+of live `native-agent-stack:*` kernel keys, and `claude_user_guard_matches_pin`
+(the installed user-scope guard's sha256 against its line in
+`adoption/hooks/claude/SHA256SUMS`, also reported by
+`credential_status.py --client-guards`). No store file is opened and no
+content hash is kept. `compare` prints states and the names of changed
+fingerprint fields, never their values. Publish its output, never a raw
+receipt: the size of a one-variable file gives its value's length. The paper
+units keep `--env-file "$PAPER_ENV_FILE"` (and `"$PAPER_ENV_FILE_2"`); this
+check does not change them.
+
+Before the restart, once this change is merged, the coordinator runs these
+host writes, announced to the peers first:
+
+1. Fast-forward the live clone, render and install the unit, and enable it:
+
+   ```sh
+   cd ~/code/native-agent-stack-live
+   git fetch origin main
+   git merge --ff-only origin/main
+   sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/credential-boot-receipt.service > ~/.config/systemd/user/credential-boot-receipt.service
+   systemd-analyze --user verify ~/.config/systemd/user/credential-boot-receipt.service
+   systemctl --user daemon-reload
+   systemctl --user enable credential-boot-receipt.service
+   ```
+
+   The merge fast-forwards, `verify` prints nothing and exits 0, and `enable`
+   prints one `Created symlink` line into `default.target.wants`.
+2. Smoke-run the unit, which writes the baseline receipt R0, and read it back:
+
+   ```sh
+   systemctl --user start credential-boot-receipt.service
+   journalctl --user -u credential-boot-receipt.service -n 20 -o cat --grep='^credential boot receipt:'
+   python3 -I scripts/credential_boot_receipt.py compare
+   ```
+
+   `start` exits 0. `-u` also shows systemd's own messages about the unit,
+   such as `Finished credential-boot-receipt.service - ...`, so `--grep`
+   selects the tool's lines; with `-n` it implies `--reverse`, so the first
+   line is the newest and reads `credential boot receipt: rows=<n> ok=<n> ...
+   guard_matches_pin=true result=ok receipt=<name>.json`. `compare` prints
+   `baseline: <name> (one receipt; nothing to compare yet)` and exits 0.
+3. If a canary harness from a later change of this design has landed, keep its
+   canary across the restart as that change documents.
+4. Checkpoint the peers (the grand-dashboard checkpoint). The restart is the
+   user's: once the trading lane has confirmed a time, the user runs
+   `wsl --shutdown` from Windows. No agent restarts its own host.
+
+After the restart:
+
+5. The oneshot has written R1 at the distro start. In the first session, from
+   the live clone:
+
+   ```sh
+   python3 -I scripts/credential_boot_receipt.py compare
+   ```
+
+   Expected, exit 0: `boot_id: changed`; every file row
+   `ok -> ok, fingerprint same`, the `tavily` row included (from its file);
+   `kernel keyring names: <names> -> none (memory only: a kernel restart erases
+   them)`; `claude_user_guard_matches_pin: true -> true`; `result: ok`. Exit 1
+   ends with `result: regression: <ids>`, naming each required or optional file
+   row that was `ok` and is not; exit 2 means no receipt could be read or one
+   is malformed, and its one line names the receipt file.
+6. If a canary was kept, consume, verify and clean it up with that harness: it
+   shows a stored key injected by id after a restart with no person involved.
+7. Publish sanitized, value-free output with host paths stripped, in a
+   follow-up evidence PR: `compare`'s lines, not the receipts.
+
 ## Follow-ups not in this change
 
 - A shared loader (`load_private_env`) whose `--env-file` defaults to the
