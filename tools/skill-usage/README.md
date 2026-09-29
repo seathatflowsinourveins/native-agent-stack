@@ -68,7 +68,8 @@ Common options: `--manifest PATH` (default `adoption/skills/manifest.json`), `--
 (repeatable; default 7 and 30 — the manifest's own `trial.window_days` is always included even if
 omitted, since the prune rule is defined at that window), `--now ISO8601` (fixes the reference
 time; mainly for tests), `--home DIR` (resolves the skills lock's `installedAt`, still XDG-aware:
-`$XDG_STATE_HOME/skills/.skill-lock.json` wins when set to an absolute path), and `--json` (print
+`$XDG_STATE_HOME/skills/.skill-lock.json` wins when that variable is set to any non-empty value, as
+in the skills 1.7.0 CLI, which joins both paths with Node's `path.join`), and `--json` (print
 the full JSON report instead of the text table).
 
 Nothing is written to disk unless `--out PATH` is given, and `--out` **inside this checkout is

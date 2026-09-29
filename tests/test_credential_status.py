@@ -71,10 +71,22 @@ class CredentialStatusTests(unittest.TestCase):
     def test_real_inventory_is_valid(self):
         self.assertEqual(cs.inventory_errors(self.inventory, ROOT), [])
         ids = {e["id"] for e in self.inventory["entries"]}
-        self.assertTrue({"alpaca-paper", "sec-contact", "claude-native", "codex-native", "gh-native",
+        self.assertTrue({"alpaca-paper", "alpaca-paper-2", "sec-contact", "claude-native", "codex-native", "gh-native",
                          "huggingface-native", "huggingface-native-stored"} <= ids)
         self.assertIn("HUGGING_FACE_HUB_TOKEN", self.inventory["must_not_be_set"])
         self.assertIn("HF_TOKEN", self.inventory["must_not_be_set"])
+
+    def test_second_paper_row_mirrors_the_first(self):
+        # alpaca-paper-2 names the second paper account's existing file: same class, lane, store kind and variables as
+        # account 1, its own file and its own pointer (2026-09-29), and neither row shares a pointer with the other.
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        first, second = rows["alpaca-paper"], rows["alpaca-paper-2"]
+        for key in ("class", "lane", "variables", "optional_variables"):
+            self.assertEqual(second[key], first[key], key)
+        self.assertEqual(second["store"]["kind"], first["store"]["kind"])
+        self.assertEqual(second["store"]["path_template"], first["store"]["path_template"].replace("alpaca-paper.env", "alpaca-paper-2.env"))
+        self.assertEqual(second["pointer_variables"], ["PAPER_ENV_FILE_2"])
+        self.assertFalse(set(second["pointer_variables"]) & set(first["pointer_variables"]))
 
     def test_inventory_rejects_non_home_template_and_bad_names(self):
         broken = copy.deepcopy(self.inventory)
