@@ -7,6 +7,8 @@ Claude roles in [`examples/claude-native/agents/`](../claude-native/agents/):
 | --- | --- | --- |
 | `evidence-reviewer` | independent review of an assigned patch and its evidence; no edits | inherited from the session (the file sets none) |
 | `isolated-builder` | bounded implementation in its own worktree with a verified handoff | inherited from the session (the file sets none) |
+| `stack-researcher` | bounded research from the sources a task names, with source-cited findings returned inline; no edits. A user-wide carrier: see the [2026-09-29 section](#2026-09-29-stack-role-carriers) | inherited from the session (a role file cannot set one) |
+| `stack-verifier` | re-runs the commands a task names and returns a verdict per claim; never fixes; no web search. A user-wide carrier: see the [2026-09-29 section](#2026-09-29-stack-role-carriers) | inherited from the session (a role file cannot set one) |
 
 Copy the `.toml` files into the destination project's `.codex/agents/` and merge
 [`config.agents.toml.example`](config.agents.toml.example) into `.codex/config.toml`.
@@ -61,9 +63,65 @@ parses the role file and validates `developer_instructions`,
 loads declared and discovered roles, and
 [`core/src/agent/role.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs)
 applies their developer instructions as bounded role overrides. These existing
-native templates carry the custom-agent developer instructions; no new role or installer is needed.
+native templates carry the custom-agent developer instructions; no new role or installer is needed
+(superseded on 2026-09-29: [stack role carriers](#2026-09-29-stack-role-carriers)).
 [`tests/test_codex_agents.py`](../../tests/test_codex_agents.py) checks the parsed
 developer payload of every template against the existing F4 block and the pinned
 upstream text's SHA-256. This is structural validation, not a new
 spawned-agent run or a measured token saving. See the
 [decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub).
+
+## 2026-09-29: Stack role carriers
+
+This section supersedes the sentence of the 2026-09-27 section above that says "no new role or installer is needed",
+and the matching sentence of the
+[2026-09-27 decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-27-addendum-custom-agents-and-context-hub).
+The token-adoption E2E launches Codex sub-agents that pass `agent_type` `stack-researcher` (`seed-binding-1`, `-2`, `-3` and `-5` in its
+[preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json)), and an unknown `agent_type` fails the spawn
+([`role.rs:51-60`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L51-L60)). No template carried that
+role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`, the Codex counterparts of the Claude carriers
+[`stack-researcher.md`](../../adoption/agents/claude/stack-researcher.md) and [`stack-verifier.md`](../../adoption/agents/claude/stack-verifier.md).
+
+- **Files.** The sources are
+  [`adoption/agents/codex/stack-researcher.toml`](../../adoption/agents/codex/stack-researcher.toml) and
+  [`stack-verifier.toml`](../../adoption/agents/codex/stack-verifier.toml) in the same directory; the copies in [`agents/`](agents/) are
+  byte-identical mirrors. [`tests/test_codex_agents.py`](../../tests/test_codex_agents.py) compares them and pins the digests below.
+- **Keys and pins.** Each file carries exactly `name`, `description`, `model`, `model_reasoning_effort` and `developer_instructions`.
+  The pins, `gpt-6-astra` at `max`, equal the route of every Codex task in the frozen preregistration (the test derives that set from the
+  file). Codex shows them in the `spawn_agent` tool text as the role's locked settings
+  ([`role.rs:294-334`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L294-L334)).
+- **Descriptions.** One line each, naming no tool. The same tool text lists every role's description to every parent, so a description that
+  named a tool would steer arms differently; the test checks both against the frozen no-tool-names denylist of the preregistration.
+- **Instructions.** The role text, one blank line, then the F4 block verbatim. The text is adapted from the Claude carriers sentence by
+  sentence: 17 sentences of the researcher and 16 of the verifier are kept byte for byte and pinned by the test, and the Claude-only names
+  (`ToolSearch`, `WebFetch`, `Bash`, `omitClaudeMd` and the others the test lists) are absent. Three rules are added:
+  one agent (a role file cannot remove the collaboration tools,
+  [`role.rs:80-126`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L80-L126), so the child is told not to
+  spawn, message or follow up with other agents); working directory (a task's own instruction wins, and `cwd` goes to context-mode only for a
+  directory other than the launch directory, which the server is already bound to: the "Codex workers" bullet of
+  [the handbook](../../docs/token-session-handbook.md#context-mode-executor-and-session-store); the frozen M13 leg reads sentinel files with
+  no explicit `cwd`); and `jq` output among the exact command shapes (the F4 exceptions list six commands). The verifier also says that it
+  does not use web search.
+- **Registration.** Discovery only. Codex loads every `*.toml` under `$CODEX_HOME/agents/` (`load_agent_roles` in
+  [`loader.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs)), so the roles carry no
+  `[agents.<name>]` table and neither `config.toml` nor the `stack-worker` profile changes; a test checks the repository templates for role
+  tables, and [`config.agents.toml.example`](config.agents.toml.example) still registers only the two older roles. Do not copy these two into
+  a project `.codex/agents/`: a project copy would load in every trusted session of that checkout, not only in the E2E's. On a host the files
+  live at `$CODEX_HOME/agents/<name>.toml`, mode 0600 in a 0700 directory, placed by the role step of
+  [`tools/adoption/apply_codex_lane.py`](../../tools/adoption/apply_codex_lane.py) that ships with these files.
+- **Effect and limits.** Where a Codex home holds them, the `spawn_agent` tool of a session that loads that home's user configuration lists
+  both roles and accepts `agent_type`, whichever profile it runs
+  ([`spec_plan.rs:1271`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/spec_plan.rs#L1271): exposed when user
+  roles exist). A role file cannot set the sandbox, an MCP allowlist, tools or web search (`role.rs:36-48`, as in the 2026-09-27 correction
+  above), so read-only access is a prompt rule that only the parent's `-s read-only` enforces, and the verifier's no-web rule is a prompt rule
+  too. The child starts from a clone of the parent's configuration, as above.
+- **Evidence class.** Structural validation only: the stem set, byte-identical mirrors, the digests below, the closed key set, the pins
+  against the frozen Codex tasks, description lane-neutrality, the F4 block, the kept sentences, the Claude-only names and a mutation control
+  for every rule. No Codex session has spawned either role, and nothing here measures a token saving.
+
+| File | SHA-256 |
+| --- | --- |
+| `stack-researcher.toml` | `ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00` |
+| `stack-verifier.toml` | `281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd` |
+
+The adoption source and its mirror hold these bytes; a later change to either needs a new dated section here and new rows in the test.
