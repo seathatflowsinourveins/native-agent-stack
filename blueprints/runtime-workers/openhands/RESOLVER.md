@@ -356,8 +356,47 @@ harness. `python3 scripts/validate.py` runs only inside the agent container, and
 its exit code is shown as worker-reported. The #425 recipe runs model-written code
 outside the agent container in one place only, the official grader, which gets
 network mode `none` (README "Security posture"; the decision record's "Official
-grading has no network"). The resolver satisfies the same rule by executing nothing
-at all.
+grading has no network"). On the host, the resolver meets that rule because it
+executes nothing the model wrote.
+
+**The push runs the model's code in CI.** The claim above holds for the host only.
+The driver pushes the agent's commit to a branch of this repository and opens a PR.
+main's `pull_request` workflows then run repository code from the PR's merge commit
+on GitHub-hosted runners. validate.yml, token-report.yml, security-scan.yml and
+dependency-review.yml run on `pull_request`, so an owned path under `tools/`,
+`tests/` or `examples/` puts model-written code into the jobs behind the required
+checks. The bounds, read at origin/main b0fb65b4:
+
+- **Egress is open.** Every workflow's harden-runner step uses
+  `egress-policy: audit`, and none uses `block`.
+- **The token is read-only.** Each of those workflows sets `contents: read`.
+- **No secret is reachable.** `secrets.` appears only in native-offhost-app-state.yml
+  and native-offhost-restore.yml, which run on `workflow_dispatch` only. No workflow
+  uses `pull_request_target` or `workflow_run`.
+- **No write scope runs on a PR.** security-scan's two SARIF upload jobs hold
+  `security-events: write` but skip `pull_request`
+  (`if: github.event_name != 'pull_request'`). The other write-scoped workflows run
+  on a schedule, a dispatch, a tag or a push to main.
+
+So the check results on `openhands/*` are model-controlled: the model can make a
+required check report what it wants. The residuals comment says so, and the driver
+never presents them as evidence that the change is correct. The review also named a
+possible route to a job's `contents: read` token, by writing to `$GITHUB_PATH` before
+the step that sets `GH_TOKEN`. That route was not verified in this round.
+
+**The PR body publishes model text.** Besides the validated patch, the body carries
+up to 6000 characters of the agent's final message, fenced and guarded, and the SOTA
+lines that resolve in the base tree.
+
+**The decision record needs a resolver-mode amendment.** Its scoped narrowing lets
+owner issue text reach a model with tools only when "their patch is graded with no
+network" (condition 2) and "a validated patch is the only output" (condition 3).
+Resolver mode meets neither as written: CI runs the patch with network, and the PR
+body publishes the final message. The record's
+[resolver-mode amendment](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md#resolver-mode-amendment-proposed-2026-09-28-pending-the-owners-decision)
+is proposed and waits for the owner's decision between two options: accept CI
+execution within the bounds above, or push agent branches to an owner fork. Until
+the owner accepts one, the first live run waits (the live runbook's precondition).
 
 ### 4. The review loop, after `host.run` returns
 
@@ -434,6 +473,9 @@ free branch name.
   stricter than SWE-bench mode, never looser.
 - The resolver skill's pin is computed at run time from the driver checkout. A
   committed pin cannot name the commit that adds the skill.
+- The decision record's narrowing conditions 2 and 3 do not hold for resolver mode as
+  written. The pushed commit runs in CI with network, and the PR body publishes the
+  final message. The record's amendment is proposed, not accepted.
 - The brief cites "#425 README Integration note 5" for the rule that execution
   outside the agent container uses network mode `none`. The committed README, the
   merged PR's description and the decision record contain no such numbered note.
@@ -451,6 +493,9 @@ free branch name.
   (`--safe-mode`, `--restricted` or another) is G4's result.
 - `run` holds the gh login's full scopes for the whole attempt. That is plan section
   3's residual.
+- The owner's decision on the record's resolver-mode amendment is open. The CI-side
+  mitigations the review proposed are workflow changes outside this PR: an egress
+  block in the PR jobs that run repository code, or pushing to an owner fork.
 - A7's environment listing reads `Config.Env`, the environment Docker starts the server
   with. A variable that the model's terminal exports later is not in it. The listing
   has not run against the live image. The proxy log is split from the probe's traffic
@@ -465,6 +510,8 @@ branch to be exercised, with `RECIPE` set to its
 name, never a credential.
 
 ```sh
+# Precondition: the owner has accepted one option of the decision record's resolver-mode amendment
+# (docs/decisions/2026-09-28-openhands-resolver-isolation.md). Until then, stop here.
 export PATH="$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin:$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:$HOME/.local/share/codex-ecosystem/bin:$PATH"
 RECIPE="$PWD/blueprints/runtime-workers/openhands"
 PREFIX="$HOME/.local/share/codex-ecosystem/tools/openhands-1.49.6"

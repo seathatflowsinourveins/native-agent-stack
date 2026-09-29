@@ -205,6 +205,34 @@ hold:
 The narrowing takes effect only when this record merges, and the owner may reject it. The
 SWE-bench mode reads no issue text and needs no narrowing.
 
+### Resolver-mode amendment (proposed 2026-09-28, pending the owner's decision)
+
+Independent review of the resolver's stage 2 found that resolver mode does not meet conditions 2
+and 3 as written (`blueprints/runtime-workers/openhands/RESOLVER.md`, "The push runs the model's
+code in CI"):
+- **Condition 2.** The driver grades nothing. It pushes the agent's commit to a branch of this
+  repository and opens a draft PR. main's `pull_request` workflows then run repository code from
+  the PR's merge commit, including files in the owned paths, on GitHub-hosted runners whose
+  egress is audited, not blocked. So the patch runs with network.
+- **Condition 3.** Besides the validated patch, the PR body publishes up to 6000 characters of the
+  agent's final message, fenced and guarded, and its resolvable SOTA lines.
+
+The bounds, read at origin/main b0fb65b4, are these. Those jobs get a `contents: read` token and
+no repository secret. No workflow uses `pull_request_target` or `workflow_run`, and every job
+with a write scope skips `pull_request`. Check results on `openhands/*` are model-controlled and
+are not evidence.
+
+The owner decides between two options:
+1. **Accept CI execution** for resolver mode within those bounds, re-checked whenever a workflow
+   changes, and accept the final message as a second, guarded output.
+2. **Push agent branches to an owner fork**, so that PR runs get no secret and a read-only token
+   whatever a workflow declares. This is the review's proposal; GitHub's fork-PR limits were not
+   re-read for this amendment.
+
+Either option can add an egress block to the PR jobs that run repository code; that is a
+workflow change outside the resolver PR. Until the owner accepts one option, this narrowing does
+not cover resolver mode's CI execution, and the resolver's first live run waits.
+
 ## GitHub harness (follow-up PR)
 
 The resolver's GitHub side is compared and built in the follow-up PR that adds resolver mode
