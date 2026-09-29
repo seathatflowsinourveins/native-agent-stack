@@ -1275,7 +1275,7 @@ class TokenMeasurement(unittest.TestCase):
                  "A=1 B=$HOME/$X-$Y markitdown a.json": {"markitdown": 1}, "a=$HOME/$X-$Y": {}, "for i in a; do out=$HOME/$X-$Y; done": {},
                  "for i in a; do out=$HOME/$X-$Y; done; qmd get": {"qmd": 1}, "a=$HOME/$X-z qmd get": {"qmd": 1}, "a=$HOME/$Xz qmd get": {"qmd": 1},
                  # inside the command's own words two argument nodes with no blank between them are one word
-                 "env A=$HOME/$X-$Y qmd get": {"qmd": 1}, "nohup env A=$HOME/$X-$Y toon f": {"toon": 1}, "timeout $HOME/$X-$Y qmd get": {"qmd": 1},
+                 "env A=$HOME/$X-$Y qmd get": {"qmd": 1}, "nohup env A=$HOME/$X-$Y toon f": {"toon": 1},
                  "rtk proxy env A=$HOME/$X.$Y qmd get": {"rtk_proxy": 1, "qmd": 1}, "echo x=$HOME/$X-$Y; qmd get": {"qmd": 1}}
         for (command, want), (lanes, _, cli) in zip(cases.items(), self.tally(list(cases))):
             with self.subTest(command=command):

@@ -1219,20 +1219,30 @@ const SEPARATOR_TOKENS = new Set([';', ';;', '&', '&&', '||', '|', '|&'])
 const startsLine = (text) => { for (let i = 0; i < text.length && (text[i] === ' ' || text[i] === '\t' || text[i] === '\n'); i++) if (text[i] === '\n') return true; return false }
 const continues = (gap) => { for (let i = 0; i < gap.length; i++) { if (gap[i] === '\\' && gap[i + 1] === '\n') i++; else if (gap[i] === '\n') return false } return true }
 function commandSegments(node, src, fields, extra = [], folded = []) {
-  const segments = [{ pos: node.startIndex, words: [], herestrings: [] }]
+  const segment = (pos) => ({ pos, words: [], herestrings: [], end: -1 }) // end: where the last word of the segment ends
+  const segments = [segment(node.startIndex)]
   let prev = null
   for (let i = 0; i < node.childCount; i++) {
     const child = node.child(i)
-    if (child.type === 'ERROR') { if (SEPARATOR_TOKENS.has(child.text.trim())) segments.push({ pos: child.endIndex, words: [], herestrings: [] }); prev = null; continue }
-    if (prev && (!continues(src.slice(prev.endIndex, child.startIndex)) || startsLine(child.text))) segments.push({ pos: child.startIndex, words: [], herestrings: [] })
+    if (child.type === 'ERROR') { if (SEPARATOR_TOKENS.has(child.text.trim())) segments.push(segment(child.endIndex)); prev = null; continue }
+    if (prev && (!continues(src.slice(prev.endIndex, child.startIndex)) || startsLine(child.text))) segments.push(segment(child.startIndex))
     prev = child
     if (child.type === 'herestring_redirect') segments[segments.length - 1].herestrings.push(child) // a here-string belongs to the command it follows
     const field = node.fieldNameForChild(i)
     // A name glued to the assignment before it, with no blank between, is the tail of that assignment's word that the grammar cut off
     // (`a=$x/$y-$z`: tree-sitter-bash 0.25.1 ends the value at the second `$`); the words after it are then the command's own.
     if (field === 'name' && i > 0 && node.child(i - 1).type === 'variable_assignment' && node.child(i - 1).endIndex === child.startIndex) continue
-    if (field === 'name') { const inner = child.namedChild(0); segments[segments.length - 1].words.push(inner ? { ...wordOf(inner), assignment: false } : { v: '', s: null, x: true }) }
-    else if (fields.includes(field)) segments[segments.length - 1].words.push({ ...wordOf(child), assignment: (child.type === 'word' || child.type === 'concatenation') && isAssignment(child.text) })
+    const add = (word) => {
+      const seg = segments[segments.length - 1], words = seg.words
+      if (seg.end === child.startIndex && words.length) {
+        // Two words with no blank between them are one (bash cuts words only at blanks and metacharacters): the grammar cut this one.
+        const head = words[words.length - 1]
+        head.v += word.v; head.x ||= word.x; head.s = head.s === null || word.s === null ? null : head.s + word.s; head.bang = false
+      } else words.push(word)
+      seg.end = child.endIndex
+    }
+    if (field === 'name') { const inner = child.namedChild(0); add(inner ? { ...wordOf(inner), assignment: false } : { v: '', s: null, x: true }) }
+    else if (fields.includes(field)) add({ ...wordOf(child), assignment: (child.type === 'word' || child.type === 'concatenation') && isAssignment(child.text) })
   }
   // The first command's assignment prefixes are already nodes of their own; in a command the grammar had joined they are still words
   // (bash(1) PARAMETERS: NAME=value words before the command name are assignments).
