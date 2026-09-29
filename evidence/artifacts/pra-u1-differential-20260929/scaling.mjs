@@ -5,7 +5,9 @@
 // A text is its shape's unit repeated up to about 2n characters (n is the size), plus the shape's tail. Each size is the best of --runs
 // runs; a run over --limit-ms ends that shape (the later sizes are not run). `max_ratio` is the largest growth in time from one size to the
 // next where the earlier time is above 5 ms (a linear reading grows by about 2 for twice the text, a quadratic one by about 4), and null
-// when no ratio is measurable. The kernel is loaded with its own loadShellParser() when it has one.
+// when no ratio is measurable. The kernel is loaded with its own loadShellParser() when it has one. When the kernel exports withShellTree,
+// `parse_ms` and `parse_max_ratio` are the same series for the parse alone (the tree is built and freed, nothing is read), which tells a
+// slow parse from a slow reading; without it they are null.
 //
 // The shapes are the texts that made the reading quadratic before the tree was read with a cursor (a flat run of unclosed constructs or of
 // comments is one wide node), some ordinary long texts as controls, and two that are quadratic inside tree-sitter-bash's own parse
@@ -33,28 +35,34 @@ const SHAPES = {
 }
 const names = opt('shapes') ? opt('shapes').split(',') : Object.keys(SHAPES)
 for (const name of names) if (!SHAPES[name]) throw new Error('unknown shape: ' + name)
-const bestMs = (text) => {
+const bestMs = (run, text) => {
   let best = Infinity
   for (let i = 0; i < runs; i++) {
     const t0 = process.hrtime.bigint()
-    kernel.commandInvocations(text)
+    run(text)
     best = Math.min(best, Number(process.hrtime.bigint() - t0) / 1e6)
     if (best > limitMs) break
   }
   return best
 }
+const reading = (text) => kernel.commandInvocations(text)
+const parseOnly = typeof kernel.withShellTree === 'function' ? (text) => kernel.withShellTree(text, (root) => root.hasError) : null
+const maxRatio = (ms) => {
+  const ratios = ms.slice(1).map((t, i) => (ms[i] > 5 ? t / ms[i] : null)).filter((r) => r !== null)
+  return ratios.length ? Number(Math.max(...ratios).toFixed(2)) : null
+}
 const out = { kernel_sha256: createHash('sha256').update(readFileSync(kernelPath)).digest('hex').slice(0, 12), sizes, shapes: {} }
 kernel.commandInvocations('qmd status') // warm-up
 for (const name of names) {
-  const [unit, tail] = SHAPES[name], chars = [], ms = []
+  const [unit, tail] = SHAPES[name], chars = [], ms = [], parseMs = []
   for (const n of sizes) {
     const text = unit.repeat(Math.ceil((2 * n) / unit.length)) + tail
-    const t = bestMs(text)
+    const t = bestMs(reading, text)
     chars.push(text.length)
     ms.push(Number(t.toFixed(1)))
+    if (parseOnly) parseMs.push(Number(bestMs(parseOnly, text).toFixed(1)))
     if (t > limitMs) break
   }
-  const ratios = ms.slice(1).map((t, i) => (ms[i] > 5 ? t / ms[i] : null)).filter((r) => r !== null)
-  out.shapes[name] = { chars, ms, max_ratio: ratios.length ? Number(Math.max(...ratios).toFixed(2)) : null }
+  out.shapes[name] = { chars, ms, max_ratio: maxRatio(ms), parse_ms: parseOnly ? parseMs : null, parse_max_ratio: parseOnly ? maxRatio(parseMs) : null }
 }
 console.log(JSON.stringify(out))
