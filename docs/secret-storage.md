@@ -1300,8 +1300,10 @@ did, without a value and without a person present. The
 user's service manager: with linger on, that is every boot (on WSL, every
 distro start), with no login and no unlock. Each receipt is a 0600 file in
 the 0700 directory
-`${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/credential-boot/`.
-It holds the boot id, uptime, systemd version, linger, the checkout revision,
+`${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/credential-boot/`,
+named `<sequence>-<UTC stamp>-<boot id prefix>.json`; `compare` orders
+receipts by the sequence number, never by the clock, which can step back on
+WSL. It holds the boot id, uptime, systemd version, linger, the checkout revision,
 the checker's rows (states, findings, warnings and path templates), each file
 row's `lstat` mode, size and mtime_ns, the checker's coverage names, the names
 of live `native-agent-stack:*` kernel keys, and `claude_user_guard_matches_pin`

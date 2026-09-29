@@ -210,10 +210,13 @@ The second restart safeguard of the same design (D1 PR-3), built on branch
 
 1. `scripts/credential_boot_receipt.py record` writes one value-free receipt
    per start of the user's service manager, to
-   `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/credential-boot/<UTC stamp>-<boot id prefix>.json`:
+   `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/credential-boot/<sequence>-<UTC stamp>-<boot id prefix>.json`:
    a 0600 file in a 0700 directory, written as a `mkstemp` dot-file and
-   linked into place, so no receipt is ever replaced. It prints one line of
-   counts. The receipt holds the boot id, uptime, systemd version, linger
+   linked into place, so no receipt is ever replaced. The 8-digit sequence
+   number, one more than the highest present, is chosen and linked under an
+   exclusive `flock` of the directory, so concurrent writers get distinct
+   numbers; a name taken anyway (`EEXIST`) means choosing again, a bounded
+   number of times. It prints one line of counts. The receipt holds the boot id, uptime, systemd version, linger
    (`loginctl show-user --property=Linger`), the checkout revision, the
    checker's rows reduced to ids, statuses, store kinds, path templates,
    states, findings and warnings, each file row's `lstat` mode, size and
@@ -227,8 +230,13 @@ The second restart safeguard of the same design (D1 PR-3), built on branch
    removed between two separate observations had read as
    `ok -> ok, fingerprint gone`).
 2. `compare` diffs the latest two receipts by state and by the names of
-   changed fingerprint fields. It exits 1 when a required or optional file
-   row that was `ok` is no longer `ok` or has no row, 2 without a readable
+   changed fingerprint fields. Latest means the highest sequence numbers,
+   never the clock: a WSL clock can step back after a Windows sleep or
+   before its first time sync (review finding, 2026-09-29: a restart
+   stamped 60 s earlier had reversed the order and read a deleted file as
+   `missing -> ok`). Receipts named before sequence numbers sort before
+   every sequenced one. It exits 1 when a required or optional file row
+   that was `ok` is no longer `ok` or has no row, 2 without a readable
    receipt, and 0 otherwise; a single receipt is reported as the baseline.
 3. `adoption/templates/systemd/credential-boot-receipt.service` runs `record`
    as a `Type=oneshot` wanted by `default.target`, from `@REPOSITORY@`, which

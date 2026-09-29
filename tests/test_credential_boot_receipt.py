@@ -21,6 +21,8 @@ import stat
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
 import urllib.parse
 from datetime import datetime, timedelta, timezone
@@ -54,7 +56,8 @@ LINE = re.compile(r"credential boot receipt: rows=\d+ ok=\d+ missing=\d+ unsafe=
                   r"changed_during_record=\d+ fingerprints=\d+ undeclared_store_files=(?:\d+|unknown) "
                   r"keyring_names=(?:\d+|unknown) guard_matches_pin=(?:true|false) "
                   r"result=(?:ok|unsafe|changed_during_record) "
-                  r"receipt=\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
+                  r"receipt=\d{8,}-\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
+SEQUENCE = re.compile(r"(\d{8,})-\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
 # Two boot ids in the kernel's UUID form, joined at run time: scripts/validate.py flags a UUID written out in a
 # tracked file as a possible local session identifier.
 BOOT_A = "-".join(("3f2a9c1b", "5d6e", "4f70", "8a9b", "0c1d2e3f4a5b"))
@@ -261,7 +264,7 @@ class BootReceiptTests(unittest.TestCase):
         self.assertIsNotNone(re.fullmatch(r"[0-9a-f]{40}(?:[0-9a-f]{24})?", receipt["checkout"]["revision"]))
         self.assertEqual((receipt["schema_version"], receipt["kind"], receipt["recorded_at"]),
                          (1, "credential_boot_receipt", "2026-09-29T20:15:03.123456Z"))
-        self.assertEqual(path.name, "20260929T201503.123456Z-3f2a9c1b.json")
+        self.assertEqual(path.name, "00000001-20260929T201503.123456Z-3f2a9c1b.json")
 
     def test_receipt_is_value_free(self):
         # A canary in every store file the inventory names, in a stray file, in the dot-file an interrupted writer
@@ -358,12 +361,13 @@ class BootReceiptTests(unittest.TestCase):
             os.umask(previous)
         self.assertEqual(stat.S_IMODE(os.lstat(self.receipts).st_mode), 0o700)
         self.assertEqual(stat.S_IMODE(os.lstat(second).st_mode), 0o600)
-        # A receipt is never replaced: the same name again fails and leaves the first one as it was.
+        # A receipt is never replaced: the same stamp and boot again take the next sequence number, and the earlier
+        # receipt is left as it was.
         before = second.read_bytes()
-        with self.assertRaises(FileExistsError):
-            self.record(seconds=1, uptime=9.9)
+        third, _, _ = self.record(seconds=1, uptime=9.9)
+        self.assertEqual([p.name[:9] for p in (first, second, third)], ["00000001-", "00000002-", "00000003-"])
         self.assertEqual(second.read_bytes(), before)
-        self.assertEqual(sorted(p.name for p in self.receipts.iterdir()), sorted([first.name, second.name]))
+        self.assertEqual(sorted(p.name for p in self.receipts.iterdir()), [first.name, second.name, third.name])
         # A receipt directory that is a symbolic link is refused, and nothing is written through it.
         elsewhere = self.base / "elsewhere"
         elsewhere.mkdir()
@@ -408,7 +412,7 @@ class BootReceiptTests(unittest.TestCase):
         _, latest, _ = self.record(BOOT_B, 180)
         self.assertEqual(self.run_cli("compare").returncode, 0)
         latest["rows"] = [row for row in latest["rows"] if row["id"] != "tavily"]
-        cbr.write_receipt(self.receipts, cbr.receipt_name(self.clock + timedelta(seconds=240), BOOT_B), latest)
+        cbr.write_receipt(self.receipts, latest, cbr.receipt_label(self.clock + timedelta(seconds=240), BOOT_B))
         result = self.run_cli("compare")
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertRegex(result.stdout, r"(?m)^  tavily \(optional, private_env_file\): ok -> \(no row\)  "
@@ -464,6 +468,110 @@ class BootReceiptTests(unittest.TestCase):
         self.assertEqual(receipt["result"], "ok")
         self.assertIn(" changed_during_record=0 ", line)
 
+    def test_receipts_compare_in_creation_order_when_the_clock_steps_back(self):
+        # A WSL clock can step back after a Windows sleep or before its first time sync. A receipt stamped 60 s
+        # before its predecessor is still the newer one, so a file lost across the restart is still a regression.
+        tavily = self.plant("tavily.env", "TAVILY_API_KEY")
+        self.plant("alpaca-paper.env", "APCA_API_KEY_ID")
+        first, _, _ = self.record(BOOT_A, 0)
+        tavily.unlink()
+        second, _, _ = self.record(BOOT_B, -60)
+        self.assertEqual((first.name, second.name), ("00000001-20260929T201503.123456Z-3f2a9c1b.json",
+                                                     "00000002-20260929T201403.123456Z-7c9d1e2f.json"))
+        result = self.run_cli("compare")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.splitlines()[0], f"compare: {first.name} -> {second.name}")
+        self.assertRegex(result.stdout, r"(?m)^  tavily \(optional, private_env_file\): ok -> missing, "
+                                        r"fingerprint gone  <- regression$")
+
+    def test_unsequenced_receipts_come_before_every_sequenced_one(self):
+        # Receipts named before sequence numbers (<UTC stamp>-<boot id prefix>.json) never break compare: among
+        # themselves they keep name order, and they come before every sequenced receipt whatever their stamps.
+        self.plant("tavily.env", "TAVILY_API_KEY")
+        written, kept, _ = self.record(BOOT_A, 0)
+        written.unlink()
+        lost = json.loads(json.dumps(kept))
+        next(row for row in lost["rows"] if row["id"] == "tavily").update(state="missing", fingerprint=None)
+        older, newer = "20260929T101503.123456Z-3f2a9c1b.json", "20260929T111503.123456Z-3f2a9c1b.json"
+        (self.receipts / older).write_text(json.dumps(kept))
+        (self.receipts / newer).write_text(json.dumps(lost))
+        result = self.run_cli("compare")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.splitlines()[0], f"compare: {older} -> {newer}")
+        # Unsequenced names do not count toward the sequence, and a far-future one never overtakes a sequenced one.
+        first, _, _ = self.record(BOOT_B, -86400)
+        self.assertEqual(first.name[:9], "00000001-")
+        (self.receipts / "20991231T235959.999999Z-3f2a9c1b.json").write_text(json.dumps(lost))
+        second, _, _ = self.record(BOOT_B, -86399)
+        result = self.run_cli("compare")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.splitlines()[0], f"compare: {first.name} -> {second.name}")
+
+    def test_concurrent_records_get_distinct_sequence_numbers(self):
+        self.plant("tavily.env", "TAVILY_API_KEY")
+        # Force the race: both writers leave the checker's scan together, and each holds the sequence number it chose
+        # for a moment before linking. Only the directory lock keeps them from choosing the same number.
+        barrier = threading.Barrier(2, timeout=60)
+        real_inspect, real_next = cbr.cs.inspect, cbr.next_sequence
+
+        def inspect(*args, **kwargs):
+            report = real_inspect(*args, **kwargs)
+            barrier.wait()
+            return report
+
+        def next_sequence(directory):
+            sequence = real_next(directory)
+            time.sleep(0.3)
+            return sequence
+
+        names, errors = [], []
+
+        def worker(seconds):
+            try:
+                names.append(self.record(BOOT_A, seconds)[0].name)
+            except Exception as error:  # noqa: BLE001  (reported by the assertion below)
+                errors.append(repr(error))
+
+        with patch.object(cbr.cs, "inspect", inspect), patch.object(cbr, "next_sequence", next_sequence):
+            threads = [threading.Thread(target=worker, args=(seconds,)) for seconds in (0, 1)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join(120)
+        self.assertEqual(errors, [])
+        self.assertEqual(sorted(SEQUENCE.fullmatch(name).group(1) for name in names), ["00000001", "00000002"])
+        # Two processes running the unit's own command at once: distinct numbers as well.
+        environment = {"PATH": os.environ.get("PATH", ""), **self.env}
+        processes = [subprocess.Popen([sys.executable, "-I", str(SCRIPT), "record", "--proc-keys", str(self.proc_keys)],
+                                      env=environment, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                     for _ in range(2)]
+        outputs = [process.communicate(timeout=120) for process in processes]
+        self.assertEqual([process.returncode for process in processes], [0, 0], outputs)
+        numbers = sorted(int(match.group(1)) for match in (SEQUENCE.fullmatch(p.name) for p in self.receipts.iterdir())
+                         if match)
+        self.assertEqual(numbers, [1, 2, 3, 4])
+
+    def test_a_taken_name_moves_the_writer_to_the_next_sequence(self):
+        # Under the lock no writer of this tool takes a name another one chose. A name taken anyway (EEXIST) makes the
+        # writer choose the sequence again, a bounded number of times, and never replaces the file.
+        self.plant("tavily.env", "TAVILY_API_KEY")
+        self.receipts.mkdir(parents=True, mode=0o700)
+        label = cbr.receipt_label(self.clock, BOOT_A)
+        squatter = self.receipts / f"00000001-{label}.json"
+        squatter.write_text("planted\n")
+        stale = iter([1])
+        real_next = cbr.next_sequence
+        with patch.object(cbr, "next_sequence", lambda directory: next(stale, None) or real_next(directory)):
+            path, _, _ = self.record(BOOT_A, 0)
+        self.assertEqual(path.name, f"00000002-{label}.json")
+        self.assertEqual(squatter.read_text(), "planted\n")
+        calls = []
+        with patch.object(cbr, "next_sequence", lambda directory: calls.append(directory) or 1), \
+                self.assertRaises(FileExistsError):
+            self.record(BOOT_A, 0)
+        self.assertEqual(len(calls), cbr.LINK_ATTEMPTS)
+        self.assertEqual(sorted(p.name for p in self.receipts.iterdir()), sorted([squatter.name, path.name]))
+
     def test_compare_after_a_restart_names_changes_and_never_values(self):
         alpaca = self.plant("alpaca-paper.env", "APCA_API_KEY_ID")
         self.plant("tavily.env", "TAVILY_API_KEY")
@@ -475,8 +583,8 @@ class BootReceiptTests(unittest.TestCase):
         result = self.run_cli("compare")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         lines = result.stdout.splitlines()
-        self.assertEqual(lines[0], "compare: 20260929T201503.123456Z-3f2a9c1b.json -> "
-                                   "20260929T211503.123456Z-7c9d1e2f.json")
+        self.assertEqual(lines[0], "compare: 00000001-20260929T201503.123456Z-3f2a9c1b.json -> "
+                                   "00000002-20260929T211503.123456Z-7c9d1e2f.json")
         self.assertIn("boot_id: changed (uptime at record 812.4 s -> 5.1 s)", lines)
         self.assertIn("  alpaca-paper (required, private_env_file): ok -> ok, fingerprint same", lines)
         self.assertIn("  tavily (optional, private_env_file): ok -> ok, fingerprint same", lines)
@@ -511,7 +619,7 @@ class BootReceiptTests(unittest.TestCase):
         # A leftover dot-file of a killed writer is not a receipt; an unreadable receipt stops compare.
         (self.receipts / f".{path.name}.0123abcd.tmp").write_text("{")
         self.assertEqual(self.run_cli("compare").returncode, 0)
-        (self.receipts / cbr.receipt_name(self.clock + timedelta(seconds=5), BOOT_B)).write_text("{")
+        (self.receipts / f"00000002-{cbr.receipt_label(self.clock + timedelta(seconds=5), BOOT_B)}.json").write_text("{")
         result = self.run_cli("compare")
         self.assertEqual(result.returncode, 2, result.stdout)
         self.assertIn("cannot read", result.stderr)

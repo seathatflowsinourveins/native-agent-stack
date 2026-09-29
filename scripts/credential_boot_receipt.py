@@ -4,9 +4,10 @@
     python3 -I scripts/credential_boot_receipt.py record    # credential-boot-receipt.service, at every start
     python3 -I scripts/credential_boot_receipt.py compare   # the latest two receipts: did every key file survive?
 
-`record` writes <XDG_STATE_HOME>/native-agent-stack/credential-boot/<UTC stamp>-<boot id prefix>.json, a 0600 file
-in a 0700 directory, linked into place so that no receipt is ever replaced, and prints one line of counts. A
-receipt holds the boot id, uptime, systemd version, whether the user lingers and the checkout revision; the rows of
+`record` writes <XDG_STATE_HOME>/native-agent-stack/credential-boot/<sequence>-<UTC stamp>-<boot id prefix>.json, a
+0600 file in a 0700 directory, linked into place so that no receipt is ever replaced, and prints one line of counts.
+The sequence number (8 digits, one more than the highest present, chosen under a lock of the directory) orders the
+receipts: a WSL clock can step back, so the stamp is for people only. A receipt holds the boot id, uptime, systemd version, whether the user lingers and the checkout revision; the rows of
 scripts/credential_status.py reduced to ids, statuses, store kinds, path templates, states, findings and warnings;
 each file row's fingerprint (mode, size and mtime_ns from lstat); the checker's coverage names; the names of this
 uid's live native-agent-stack:* kernel keys; and whether the installed user-scope guard matches its pin. No store
@@ -31,6 +32,8 @@ if __name__ == "__main__" and not sys.flags.isolated:
     os.execv(sys.executable, [sys.executable, "-I", os.path.abspath(__file__), *sys.argv[1:]])
 
 import argparse  # noqa: E402
+import errno  # noqa: E402
+import fcntl  # noqa: E402
 import json  # noqa: E402
 import re  # noqa: E402
 import stat  # noqa: E402
@@ -46,7 +49,9 @@ import credential_status as cs  # noqa: E402  (stdlib-only checker: lstat and na
 SCHEMA_VERSION = 1
 KIND = "credential_boot_receipt"
 RECEIPT_DIRECTORY = ("native-agent-stack", "credential-boot")
-RECEIPT_NAME = re.compile(r"\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
+RECEIPT_NAME = re.compile(r"(?P<sequence>\d{8,})-\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
+UNSEQUENCED_NAME = re.compile(r"\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")  # named before sequence numbers
+LINK_ATTEMPTS = 16
 BOOT_ID = Path("/proc/sys/kernel/random/boot_id")  # a random UUID the kernel makes at each boot (random(4))
 UPTIME = Path("/proc/uptime")
 UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
@@ -203,24 +208,68 @@ def private_directory(path: Path) -> Path:
     return path
 
 
-def receipt_name(now: datetime, boot_id: str | None) -> str:
+def receipt_label(now: datetime, boot_id: str | None) -> str:
+    """<UTC stamp>-<boot id prefix>, for people reading the directory; the order is the sequence number's."""
     prefix = boot_id.replace("-", "")[:8] if boot_id else "unknown"
-    return f"{now.strftime('%Y%m%dT%H%M%S.%f')}Z-{prefix}.json"
+    return f"{now.strftime('%Y%m%dT%H%M%S.%f')}Z-{prefix}"
 
 
-def write_receipt(directory: Path, name: str, receipt: dict) -> Path:
-    """Write a 0600 temporary dot-file (mkstemp), then link it to its name: a receipt is never replaced, and a killed
-    writer leaves only the dot-file, which compare does not read."""
-    handle, temporary = tempfile.mkstemp(prefix=f".{name}.", suffix=".tmp", dir=directory)
+def sequence_of(name: str) -> int | None:
+    match = RECEIPT_NAME.fullmatch(name)
+    return int(match["sequence"]) if match else None
+
+
+def creation_order(name: str) -> tuple:
+    """Sort key: the sequence number, never the clock (a WSL clock can step back after a Windows sleep or before its
+    first time sync). Receipts named before sequence numbers come first, in name order."""
+    sequence = sequence_of(name)
+    return (0, 0, name) if sequence is None else (1, sequence, name)
+
+
+def receipt_names(directory: Path) -> list[str]:
+    """Receipt names in creation order; dot-files (a killed writer's) and anything else in the directory are
+    skipped."""
+    try:
+        with os.scandir(directory) as listing:
+            found = [item.name for item in listing
+                     if (RECEIPT_NAME.fullmatch(item.name) or UNSEQUENCED_NAME.fullmatch(item.name))
+                     and item.is_file(follow_symlinks=False)]
+    except FileNotFoundError:
+        return []
+    return sorted(found, key=creation_order)
+
+
+def next_sequence(directory: Path) -> int:
+    return 1 + max((sequence_of(name) or 0 for name in receipt_names(directory)), default=0)
+
+
+def write_receipt(directory: Path, receipt: dict, label: str) -> Path:
+    """Write a 0600 temporary dot-file (mkstemp), then link it to <sequence>-<label>.json, the sequence one more than
+    the highest in the directory. The sequence is chosen and linked under an exclusive flock of the directory, so
+    concurrent writers get distinct numbers; a name taken anyway (EEXIST: a writer outside the lock) means choosing
+    again, at most LINK_ATTEMPTS times. A receipt is never replaced, and a killed writer leaves only the dot-file,
+    which compare does not read."""
+    handle, temporary = tempfile.mkstemp(prefix=f".{label}.", suffix=".tmp", dir=directory)
     try:
         with os.fdopen(handle, "w", encoding="utf-8") as stream:
             stream.write(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
             stream.flush()
             os.fsync(stream.fileno())
-        os.link(temporary, directory / name)
+        lock = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX)  # released when the descriptor is closed
+            for _ in range(LINK_ATTEMPTS):
+                path = directory / f"{next_sequence(directory):08d}-{label}.json"
+                try:
+                    os.link(temporary, path)
+                except FileExistsError:
+                    continue
+                return path
+            raise FileExistsError(errno.EEXIST, "no free receipt sequence number")
+        finally:
+            os.close(lock)
     finally:
         os.unlink(temporary)
-    return directory / name
 
 
 def count(names) -> str:
@@ -247,18 +296,8 @@ def record(root: Path = ROOT, env=None, *, proc_keys: Path | None = cs.PROC_KEYS
     now = datetime.now(timezone.utc) if now is None else now
     receipt = build_receipt(root, inventory, env, proc_keys=proc_keys, facts=facts, now=now)
     directory = private_directory(receipt_directory(env))
-    path = write_receipt(directory, receipt_name(now, facts["boot_id"]), receipt)
+    path = write_receipt(directory, receipt, receipt_label(now, facts["boot_id"]))
     return path, receipt, summary_line(receipt, path.name)
-
-
-def receipt_names(directory: Path) -> list[str]:
-    """Receipt names in time order; dot-files (a killed writer's) and anything else in the directory are skipped."""
-    try:
-        with os.scandir(directory) as listing:
-            return sorted(item.name for item in listing
-                          if RECEIPT_NAME.fullmatch(item.name) and item.is_file(follow_symlinks=False))
-    except FileNotFoundError:
-        return []
 
 
 def load_receipt(directory: Path, name: str) -> dict:
