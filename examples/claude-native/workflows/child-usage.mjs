@@ -779,13 +779,15 @@ function mcporterOp(words) {
 }
 // mcporter's HTTP forms (src/cli/http-utils.ts:1-69): a URL has an http(s) scheme, or is a bare host[:port] followed by a
 // path, which gets https; an HTTP tool selector is such a URL whose last path segment ends in .<tool>.
+const digit = (c) => c >= '0' && c <= '9'
+const alnum = (c) => digit(c) || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
 function httpUrl(value) {
   const s = value.trim(), head = s.slice(0, 8).toLowerCase()
   let candidate = head.startsWith('http://') || head.startsWith('https://') ? s : null
-  if (!candidate && /[A-Za-z0-9]/.test(s[0] || '')) {
+  if (!candidate && alnum(s[0])) {
     let k = 1
-    while (k < s.length && (/[A-Za-z0-9.-]/.test(s[k]))) k++
-    if (s[k] === ':') { const port = ++k; while (k < s.length && s[k] >= '0' && s[k] <= '9') k++; if (k === port) k = -1 }
+    while (k < s.length && (alnum(s[k]) || s[k] === '.' || s[k] === '-')) k++
+    if (s[k] === ':') { const port = ++k; while (k < s.length && digit(s[k])) k++; if (k === port) k = -1 }
     if (k >= 0 && s[k] === '/') candidate = 'https://' + s
   }
   if (!candidate) return null
@@ -795,8 +797,11 @@ function httpToolSelector(input) {
   const open = input.indexOf('('), url = httpUrl(open < 0 ? input : input.slice(0, open))
   if (!url) return false
   const segment = url.pathname.slice(url.pathname.lastIndexOf('/') + 1), dot = segment.lastIndexOf('.'), tool = segment.slice(dot + 1)
-  return dot > 0 && tool.length > 0 && [...tool].every((c) => /[A-Za-z0-9_-]/.test(c))
+  return dot > 0 && tool.length > 0 && [...tool].every((c) => alnum(c) || c === '_' || c === '-')
 }
+// An ad-hoc stdio selector (src/cli/call-argument-values.ts:68-83): a blank, or a path start (./ ../ ~/ / C:\ \\).
+const stdioSelector = (s) => hasBlank(s) || s.startsWith('./') || s.startsWith('../') || s.startsWith('~/') || s.startsWith('/')
+  || s.startsWith('\\\\') || (s.length > 2 && alnum(s[0]) && !digit(s[0]) && s[1] === ':' && s[2] === '\\')
 // A config server name as a report key: an HTTP URL or ad-hoc stdio command never reaches here; an expansion is
 // (unresolved), and a name with a dot, colon, slash or @ (a host, host:port, path or address) counts as (other), so no host
 // is ever emitted.
@@ -846,8 +851,7 @@ function mcporterServer(words) {
     tool = true
   }
   if (positional.length && !expression && server === undefined) selector = positional.shift()
-  const trimmed = selector?.trim() ?? ''
-  if (server === undefined && selector !== undefined && !stdio && (hasBlank(trimmed) || /^(?:\.{1,2}\/|~\/|\/|[A-Za-z]:\\|\\\\)/.test(trimmed))) { stdio = true; selector = undefined }
+  if (server === undefined && selector !== undefined && !stdio && stdioSelector(selector.trim())) { stdio = true; selector = undefined }
   if (!tool && positional.length && !positional[0].includes('=') && !positional[0].includes(':')) positional.shift()
   for (let i = 0; i < positional.length; i++) {
     const w = positional[i], eq = w.indexOf('='), colon = w.indexOf(':')
@@ -861,8 +865,8 @@ function mcporterServer(words) {
   if (stdio) return '(stdio)'
   if (adhoc) return '(unresolved)'
   if (server !== undefined) {
-    const parts = server.trim().split(/\s+/)
-    return parts.length > 1 && basename(parts[0]) === 'npx' ? '(stdio)' : serverKey(server)
+    const parts = shellWords(server, false)
+    return parts.length > 1 && basename(parts[0].v) === 'npx' ? '(stdio)' : serverKey(server)
   }
   return serverKey(selector === undefined ? undefined : selector.includes('.') ? selector.slice(0, selector.indexOf('.')) : selector)
 }
