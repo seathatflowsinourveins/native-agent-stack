@@ -955,14 +955,19 @@ class RoleStepTests(unittest.TestCase):
         self.assertTrue(path.is_file(), f"agents/{name} was not installed")
         return path.read_bytes()
 
-    def alternate_sources(self, change=None, drop=None) -> Path:
-        """A fresh copy of the shipped carriers with `change(name, bytes)` applied; `drop` names one to leave out."""
+    def alternate_sources(self, change=None, drop=None, sums=True) -> Path:
+        """A fresh copy of the shipped carriers with `change(name, bytes)` applied; `drop` names one to leave out.
+        `sums` is the SHA256SUMS beside them: True copies the shipped file, False leaves it out, a string is its text."""
         alt = self.host.tmp / "sources"
         shutil.rmtree(alt, ignore_errors=True)
         alt.mkdir()
         for name, data in self.sources.items():
             if name != drop:
                 (alt / name).write_bytes(change(name, data) if change else data)
+        if sums is True:
+            shutil.copyfile(ROLES_SOURCE_DIR / "SHA256SUMS", alt / "SHA256SUMS")
+        elif sums:
+            (alt / "SHA256SUMS").write_text(sums, encoding="utf-8")
         return alt
 
     # --- a: the dry run
@@ -1160,6 +1165,52 @@ class RoleStepTests(unittest.TestCase):
         self.assertFalse(self.agents.exists())
         self.assertFalse(self.host.state.exists())
 
+    def test_l_a_sums_row_that_is_not_the_sources_digest_is_refused(self):
+        rows = {name: digest(data) for name, data in self.sources.items()}
+        rows[ROLE_NAMES[1]] = "0" * 64
+        text = "".join(f"{value}  {name}\n" for name, value in rows.items())
+        with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(sums=text)):
+            code, out = self.host.apply()
+        self.assertEqual(code, 2, out)
+        self.assertIn(f"[fail] agent role source {ROLE_NAMES[1]}: sha256_row", out)
+        self.assertNotIn(f"[fail] agent role source {ROLE_NAMES[0]}", out)
+        self.assertFalse(self.agents.exists())
+        self.assertFalse(self.host.state.exists())
+
+    def test_l_a_missing_or_malformed_sums_file_refuses_both_carriers(self):
+        for label, sums in (("missing", False), ("malformed", "not a checksum line\n")):
+            with self.subTest(sums=label):
+                with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(sums=sums)):
+                    code, out = self.host.run()
+                self.assertEqual(code, 2, out)
+                for name in ROLE_NAMES:
+                    self.assertIn(f"[fail] agent role source {name}: sha256_row, sha256sums_names", out)
+
+    def test_l_a_third_name_in_the_sums_file_refuses_both_carriers(self):
+        text = (ROLES_SOURCE_DIR / "SHA256SUMS").read_text(encoding="utf-8") + f"{'1' * 64}  stack-x.toml\n"
+        with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(sums=text)):
+            code, out = self.host.run()
+        self.assertEqual(code, 2, out)
+        for name in ROLE_NAMES:
+            self.assertIn(f"[fail] agent role source {name}: sha256sums_names", out)
+
+    def test_l_a_consistent_edit_that_breaks_a_structural_rule_is_refused(self):
+        # The carrier was edited together with its row, so its digest agrees with SHA256SUMS: the structural rules
+        # of design 3.3 are what refuse it, and the line names the rule id, not the text.
+        anchor = b"You do not spawn, message or follow up with other agents."
+        edited = {name: (data.replace(anchor, anchor + b" Use ToolSearch.", 1) if name == ROLE_NAMES[0] else data)
+                  for name, data in self.sources.items()}
+        self.assertNotEqual(edited[ROLE_NAMES[0]], self.sources[ROLE_NAMES[0]])
+        text = "".join(f"{digest(data)}  {name}\n" for name, data in edited.items())
+        with mock.patch.object(lane, "ROLES_SOURCE", self.alternate_sources(change=lambda name, data: edited[name],
+                                                                             sums=text)):
+            code, out = self.host.apply()
+        self.assertEqual(code, 2, out)
+        self.assertIn(f"[fail] agent role source {ROLE_NAMES[0]}: claude_only_name", out)
+        self.assertNotIn("ToolSearch", out)
+        self.assertNotIn(f"[fail] agent role source {ROLE_NAMES[1]}", out)
+        self.assertFalse(self.agents.exists())
+
     def test_role_source_problems_name_each_rule(self):
         problems = need(self, lane, "role_source_problems")
         stem = ROLE_NAMES[0][:-len(".toml")].encode()
@@ -1177,14 +1228,27 @@ class RoleStepTests(unittest.TestCase):
                     found = problems()
                 self.assertEqual(found, {ROLE_NAMES[0]: expected, ROLE_NAMES[1]: []})
 
-    def test_the_pinned_rows_equal_the_agent_tests_rows_and_the_shipped_carriers(self):
+    def test_the_pinned_rows_are_shipped_in_sha256sums_and_the_installer_holds_no_second_copy(self):
+        # design 3.1: the rows the installer checks against are adoption/agents/codex/SHA256SUMS, the same ones that
+        # tests/test_codex_agents.py pins as independent literals.
         from tests.test_codex_agents import STACK_ROLE_ROWS
-        rows = need(self, lane, "ROLE_ROWS")
-        self.assertEqual(tuple(rows), STACK_ROLE_ROWS)
-        self.assertEqual(need(self, lane, "role_pins")(), {name: digest(self.sources[name]) for name in ROLE_NAMES})
+        import codex_roles
+        expected = {}
+        for row in STACK_ROLE_ROWS:
+            name, value = (cell.strip().strip("`") for cell in row.strip().strip("|").split("|"))
+            expected[name] = value
+        rows = codex_roles.sha256sums(ROLES_SOURCE_DIR / "SHA256SUMS")
+        self.assertEqual(rows, expected)
+        self.assertEqual(rows, {name: digest(self.sources[name]) for name in ROLE_NAMES})
+        self.assertFalse(hasattr(lane, "ROLE_ROWS"), "the installer carries a second copy of the rows")
+        self.assertFalse(hasattr(lane, "role_pins"), "the installer carries a second reader of the rows")
         self.assertEqual(tuple(need(self, lane, "ROLE_FILES")), ROLE_NAMES)
         self.assertEqual(Path(need(self, lane, "ROLES_SOURCE")), ROLES_SOURCE_DIR)
         self.assertEqual(need(self, lane, "role_source_problems")(), {name: [] for name in ROLE_NAMES})
+        # the helpers are the shared module's, not copies
+        for helper in ("agents_toml_count", "role_table_count", "doctor_role_state", "path_kind"):
+            with self.subTest(helper=helper):
+                self.assertIs(getattr(lane, helper, None), getattr(codex_roles, helper))
 
     # --- m: the doctor parser, on fixture pairs
     def test_m_doctor_role_state_on_the_fixture_pairs(self):
@@ -1805,7 +1869,7 @@ class RolesRowTests(unittest.TestCase):
     (CollabToolCallItem: tool, thread ids, prompt, states, status) carries neither the child's role nor its
     developer text, so a live check here could not show that a role applied."""
 
-    ROW = "installed {equal}/2 equal to the pinned rows; *.toml under agents {count}; role tables {tables}; system roles {system}"
+    ROW = "installed {equal}/2 equal to SHA256SUMS; *.toml under agents {count}; role tables {tables}; system roles {system}"
 
     def setUp(self):
         self.host = FakeHost(self)
