@@ -271,18 +271,28 @@ Native probes on Claude Code 2.1.284 (receipt [`claude-model-effort-probes-20260
 record [2026-09-29 dispatch](2026-09-29-sonnet-5-5-dispatch.md)) repeat this record's method on the client that made `sonnet` mean
 Sonnet 5.5. The 2.1.281 findings above stay as history for that release. On 2.1.284:
 
-- **Ultracode does not set or override effort.** A Sonnet 5.5 session under the host settings (`ultracode: true`, no saved level for
-  the model) ran at medium; a saved per-model level of low won over `ultracode: true` for Sonnet 5.5 and for Opus 5.5. The "Ultracode
-  sends `xhigh`" and "takes precedence over `modelSettings`" statements this record cites from the documentation did not hold in
-  those sessions, so the coordinator's xhigh is now saved per model (`modelSettings`) and in the committed project settings
-  (`effortLevel: xhigh`), which the probes showed to apply to every model.
+- **The `ultracode` setting neither sets nor overrides effort.** The documentation records this change: from v2.1.284 turning ultracode
+  on with `/effort` or the setting leaves the level unchanged, `--effort ultracode` (or the SDK's `effortLevel: "ultracode"`) still sets
+  `xhigh`, and before v2.1.284 `ultracode: true` ran the session at `xhigh`
+  ([model-config](https://code.claude.com/docs/en/model-config#adjust-effort-level),
+  [settings reference](https://code.claude.com/docs/en/settings-reference#ultracode), read 2026-09-29). The "Ultracode sends `xhigh`"
+  and "takes precedence over `modelSettings`" statements this record cites were the documentation of the earlier releases. The probes
+  confirm the setting form on 2.1.284; the `--effort ultracode` form was not probed. A Sonnet 5.5 session under the host settings
+  (`ultracode: true`, a user-scope top-level `effortLevel` of xhigh, no per-model entry for it) ran at medium; a per-model level of low
+  passed with `--settings` won over `ultracode: true` for Sonnet 5.5 and for Opus 5.5. The coordinator's xhigh is therefore saved per
+  model (`modelSettings`) and in the committed project settings (`effortLevel: xhigh`), which applies to every model
+  ([settings reference](https://code.claude.com/docs/en/settings-reference#effortlevel); the probes show it for Sonnet 5.5 in A13 and
+  A14, and A15's Opus 5.5 result is confounded by the user's saved Opus level).
 - **A max session kept the Ultracode reminder.** `--effort max` and `CLAUDE_CODE_EFFORT_LEVEL=max` sessions carried the reminder text
   (P1 and P2 above did not). The reminder is only the indicator this record used; the probes did not exercise workflow
   orchestration at max. The overturn condition "a Claude Code release accepts `max` together with Ultracode orchestration" is met by
   that indicator but not adopted: the coordinator stays at xhigh, and moving it to `max` is left to the user.
-- **The stage rule stands and is load-bearing.** A stage or child that names no effort ran at its own model's saved level or default
-  (medium for an unsaved Sonnet 5.5), so `effort: 'max'` on every stage stays explicit.
-- **The limitation "no unconfounded probe covered the per-model key or a project settings file" is closed** for 2.1.284: cases A10,
-  A11 and A13 to A15 of the receipt cover both.
+- **The stage rule stands and is load-bearing.** In the headless probes a stage or child that names no effort ran at its own model's
+  saved level or default (medium for an unsaved Sonnet 5.5); in the interactive session, whose effort a model picker had set to max,
+  every child ran at max. So `effort: 'max'` on every stage stays explicit.
+- **The limitation "no unconfounded probe covered the per-model key or a project settings file" is closed for Sonnet 5.5** on 2.1.284:
+  A13 and A14 (a project file's `effortLevel` and a `modelSettings` entry) and A10 to A12 (per-model and top-level levels passed with
+  `--settings`) cover both. For Opus 5.5 the project-file effect rests on the documentation, since A15 is confounded by the user's saved
+  Opus level.
 - **The `child-usage.mjs` mirror statement under "Vendored lane" is history.** The file here has since grown well beyond agent-lab
   `b31f640`, and a local agent-lab checkout holds a different, smaller copy.

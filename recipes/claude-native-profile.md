@@ -230,11 +230,12 @@ adds a session-level arm with Ultracode off for these pins.
 Ultracode, and Ultracode sets nothing.** Native probes
 ([receipt](../evidence/receipts/claude-model-effort-probes-20260929.json)) found that a
 Sonnet 5.5 session with no saved level ran at `medium` under `ultracode: true`; that a
-saved per-model level (`low`, in the probe) won over `ultracode: true` for both Sonnet 5.5
+per-model level (`low`, passed with `--settings` in the probe) won over `ultracode: true` for both Sonnet 5.5
 and Opus 5.5; and that a project settings file's top-level `effortLevel` or a
 `modelSettings` entry of `xhigh` raised the Sonnet 5.5 session to `xhigh`. The statement
-above that an Ultracode session already runs its coordinator at `xhigh` held for 2.1.281
-only. Save the pin for every model the agents bind (`claude-opus-5-5` and
+above that an Ultracode session already runs its coordinator at `xhigh` held before
+2.1.284 (it was measured on 2.1.281), and so did "a `max` session turns Ultracode orchestration off": on 2.1.284 the reminder stayed
+present at `max` (an indicator, not proof of workflow behaviour). Save the pin for every model the agents bind (`claude-opus-5-5` and
 `claude-sonnet-5-5`), or commit `effortLevel: xhigh` in the project file; the guard now
 follows the measurement (an unsaved model warns at `SessionStart` and heals at
 `SessionEnd`, `ultracode` or not). The
@@ -254,13 +255,13 @@ silently dropped. With `--settings '{"ultracode":false,"effortLevel":"max"}'`
 the session ran at `xhigh`, while the same key at `high` ran at `high` (probes
 Q1 and Q2); for `modelSettings.<model>.effortLevel` the installed schema and
 the docs reject `max` as well. A session started with `--effort max` or
-`CLAUDE_CODE_EFFORT_LEVEL=max` ran at `max` with Ultracode orchestration off.
+`CLAUDE_CODE_EFFORT_LEVEL=max` ran at `max` with Ultracode orchestration off (2.1.281; on 2.1.284 the reminder stayed present).
 `/effort max` was not probed; the docs say Claude Code applies `max` to the
 current session only
 ([model configuration](https://code.claude.com/docs/en/model-config), fetched
 2026-09-23). Never set `CLAUDE_CODE_EFFORT_LEVEL`: any value overrides every
-child's frontmatter and workflow-stage effort, and any value other than `xhigh`
-also turns Ultracode off. The shipped [agent definitions](../adoption/agents/claude/)
+child's frontmatter and workflow-stage effort, and on 2.1.281 any value other than
+`xhigh` also turned Ultracode off (from 2.1.284 it stays on). The shipped [agent definitions](../adoption/agents/claude/)
 therefore declare `effort: max` beside their task-matched models (Sonnet for
 `source-scout` and Opus for every other shipped role; `isolated-builder` and
 `stack-verifier` declare Opus since 2026-09-27, per item 1 of the
