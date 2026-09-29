@@ -15,6 +15,7 @@ import json
 import os
 import re
 import secrets
+import shlex
 import shutil
 import stat
 import subprocess
@@ -30,6 +31,7 @@ from scripts import credential_boot_receipt as cbr
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/credential_boot_receipt.py"
+UNIT = ROOT / "adoption/templates/systemd/credential-boot-receipt.service"
 
 # Every key a receipt may hold, as a dotted path ("rows[]" is any row). A field joins this list on purpose or not at
 # all; the fixture of the allowlist test exercises every one, so the list cannot keep a key the tool dropped.
@@ -53,6 +55,63 @@ LINE = re.compile(r"credential boot receipt: rows=\d+ ok=\d+ missing=\d+ unsafe=
                   r"receipt=\d{8}T\d{6}\.\d{6}Z-(?:[0-9a-f]{8}|unknown)\.json")
 BOOT_A = "3f2a9c1b-5d6e-4f70-8a9b-0c1d2e3f4a5b"
 BOOT_B = "7c9d1e2f-3a4b-4c5d-9e6f-7a8b9c0d1e2f"
+
+# The unit template, pinned (amendments 2 and 3 of the D1 PR-3 contract). The workstation renders @REPOSITORY@ to the
+# live clone, as its other installed units do; the working checkout and build worktrees are never the value.
+PLACEHOLDER = re.compile(r"@([A-Z][A-Z0-9_]*)@")
+LIVE_CLONE = {"REPOSITORY": "%h/code/native-agent-stack-live"}
+EXEC_START = "ExecStart=/usr/bin/python3 -I @REPOSITORY@/scripts/credential_boot_receipt.py record"
+UNIT_DIRECTIVES = [
+    "[Unit]",
+    "Description=Record a value-free receipt of the credential store at user-manager start",
+    "[Service]",
+    "Type=oneshot",
+    "UMask=0077",
+    "NoNewPrivileges=true",
+    "TimeoutStartSec=120",
+    EXEC_START,
+    "[Install]",
+    "WantedBy=default.target",
+]
+# Every directive that would hand the unit a variable or a credential: none belongs in this unit.
+CREDENTIAL_DIRECTIVE = re.compile(
+    r"(?:Environment|EnvironmentFile|PassEnvironment|LoadCredential\w*|SetCredential\w*|ImportCredential)=")
+SED_RENDER = re.compile(r"^#\s+(sed '[^']*' adoption/templates/systemd/credential-boot-receipt\.service) > (\S+)$", re.M)
+RENDER_COMMAND = ("sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' "
+                  "adoption/templates/systemd/credential-boot-receipt.service")
+
+
+def directives(text: str) -> list[str]:
+    """Non-blank, non-comment lines in order, section headers included (test_omniroute_gateway_unit.py's reading)."""
+    return [line for line in text.splitlines() if line.strip() and not line.lstrip().startswith("#")]
+
+
+def render(text: str, values: dict[str, str]) -> str:
+    return PLACEHOLDER.sub(lambda match: values.get(match.group(1), match.group(0)), text)
+
+
+def credential_directives(text: str) -> list[str]:
+    return [line for line in directives(text) if CREDENTIAL_DIRECTIVE.match(line)]
+
+
+def exec_start_problems(text: str) -> list[str]:
+    """ExecStart= must be one line: /usr/bin/python3 -I, the script under @REPOSITORY@, the record command."""
+    lines = [line for line in directives(text) if line.startswith("ExecStart=")]
+    if len(lines) != 1:
+        return [f"{len(lines)} ExecStart= lines"]
+    argv = lines[0][len("ExecStart="):].split()
+    problems = []
+    if argv[:2] != ["/usr/bin/python3", "-I"]:
+        problems.append("not /usr/bin/python3 -I")
+    if len(argv) < 3 or not argv[2].startswith("@REPOSITORY@/"):
+        problems.append("script not under @REPOSITORY@")
+    if argv[2:] != ["@REPOSITORY@/scripts/credential_boot_receipt.py", "record"]:
+        problems.append("not the record command")
+    return problems
+
+
+def with_exec_start(text: str, replacement: str) -> str:
+    return "\n".join(replacement if line.startswith("ExecStart=") else line for line in text.splitlines()) + "\n"
 
 
 def key_paths(value, prefix: str = "") -> set[str]:
@@ -393,6 +452,66 @@ class BootReceiptTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(marker.exists())
         self.assertIsNotNone(LINE.fullmatch(result.stdout.strip()), result.stdout)
+
+
+class BootReceiptUnitTemplateTests(unittest.TestCase):
+    """adoption/templates/systemd/credential-boot-receipt.service as text. Nothing here loads, enables or starts it;
+    `systemd-analyze --user verify` on a rendered copy is a separate, manual acceptance check."""
+
+    def setUp(self):
+        self.text = UNIT.read_text(encoding="utf-8")
+
+    def test_unit_text_is_pinned(self):
+        self.assertEqual(directives(self.text), UNIT_DIRECTIVES)
+
+    def test_a_oneshot_that_runs_record_isolated_at_every_user_manager_start(self):
+        lines = directives(self.text)
+        self.assertIn("Type=oneshot", lines)
+        self.assertIn("WantedBy=default.target", lines)
+        self.assertEqual(exec_start_problems(self.text), [])
+        self.assertEqual(credential_directives(self.text), [])  # no Environment=, EnvironmentFile= or LoadCredential=
+        self.assertTrue(SCRIPT.is_file())
+
+    def test_the_documented_render_gives_the_live_clone_never_the_working_checkout_or_a_worktree(self):
+        self.assertEqual(set(PLACEHOLDER.findall("\n".join(directives(self.text)))), {"REPOSITORY"})
+        header = "\n".join(line for line in self.text.splitlines() if line.startswith("#"))
+        self.assertIn("@REPOSITORY@", header)
+        self.assertIn(LIVE_CLONE["REPOSITORY"], header)
+        # The header's render command is pinned, then run on the template without a shell (stdout only, no install).
+        match = SED_RENDER.search(self.text)
+        self.assertIsNotNone(match, "the header must give the sed render command")
+        self.assertEqual(match.group(1), RENDER_COMMAND)
+        self.assertEqual(match.group(2), "~/.config/systemd/user/credential-boot-receipt.service")
+        rendered = subprocess.run(shlex.split(RENDER_COMMAND), cwd=ROOT, capture_output=True, text=True,
+                                  timeout=30, check=True).stdout
+        self.assertEqual(rendered, render(self.text, LIVE_CLONE))
+        self.assertNotIn("@REPOSITORY@", rendered)
+        exec_start = next(line for line in directives(rendered) if line.startswith("ExecStart="))
+        self.assertEqual(exec_start, "ExecStart=/usr/bin/python3 -I "
+                                     "%h/code/native-agent-stack-live/scripts/credential_boot_receipt.py record")
+        for wrong in ("%h/code/native-agent-stack/", "worktree", "scratchpad", "/tmp/"):
+            self.assertNotIn(wrong, "\n".join(directives(rendered)))
+
+    def test_the_checks_catch_planted_violations(self):
+        for line in ("Environment=TAVILY_API_KEY=planted", "Environment=HARMLESS=1",
+                     "EnvironmentFile=%h/.config/native-agent-stack/tavily.env",
+                     "LoadCredential=tavily:%h/.config/native-agent-stack/tavily.env",
+                     "LoadCredentialEncrypted=tavily:%h/tavily.cred", "SetCredential=tavily:planted",
+                     "ImportCredential=tavily", "PassEnvironment=TAVILY_API_KEY"):
+            with self.subTest(line=line):
+                planted = self.text.replace("[Service]\n", f"[Service]\n{line}\n")
+                self.assertEqual(credential_directives(planted), [line])
+                self.assertNotEqual(directives(planted), UNIT_DIRECTIVES)
+        for drifted in ("ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/credential_boot_receipt.py record",
+                        "ExecStart=/usr/bin/python3 -I %h/code/native-agent-stack/scripts/credential_boot_receipt.py "
+                        "record",
+                        "ExecStart=/usr/bin/python3 -I @REPOSITORY@/scripts/credential_boot_receipt.py compare",
+                        "ExecStart=python3 -I @REPOSITORY@/scripts/credential_boot_receipt.py record"):
+            with self.subTest(exec_start=drifted):
+                self.assertNotEqual(exec_start_problems(with_exec_start(self.text, drifted)), [])
+        self.assertEqual(exec_start_problems(with_exec_start(self.text, EXEC_START)), [])
+        self.assertNotEqual(directives(self.text.replace("WantedBy=default.target", "WantedBy=timers.target")),
+                            UNIT_DIRECTIVES)
 
 
 if __name__ == "__main__":
