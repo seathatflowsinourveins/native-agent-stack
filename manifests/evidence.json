@@ -14675,8 +14675,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
-      "sha256": "b16035ef887a80cc901a6f3aca59ece2561c0f6add8cbf68b7d41c9700e4d525",
-      "bytes": 8065
+      "sha256": "f8c38f04af8a7df791d6c398f4e035aea59828336b9e257013061246e30a66af",
+      "bytes": 10361
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
@@ -44115,8 +44115,8 @@
     },
     {
       "path": "tests/test_token_e2e_grader.py",
-      "sha256": "82f16f26a943a27da17d2ee15ef525c140ddcd5f4d029dae1273f1502460f9ac",
-      "bytes": 479399
+      "sha256": "0cc598f6cb6fb0d227fd7caed1a1d887ed75ffaffd3eddd03f564f184f05b054",
+      "bytes": 524371
     },
     {
       "path": "tests/test_token_e2e_preregistration.py",
@@ -44510,8 +44510,8 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "9e83daeef39dced03607a64c737bf2510280312012bbec8f0fa20a8613bf2935",
-      "bytes": 41129
+      "sha256": "5555451a8f5b8a6d80757d62205b70e00f8d59852799898a2b64848138db7bd4",
+      "bytes": 43223
     },
     {
       "path": "tools/token-e2e/calibration/T0.json",
@@ -44625,8 +44625,8 @@
     },
     {
       "path": "tools/token-e2e/evidence.py",
-      "sha256": "80c1761acec2f39803fda3a17efaabbbd057fef94c425f271d4a56b84691c9b2",
-      "bytes": 172941
+      "sha256": "c09d210c66c877e23200854b8d8183346fd976ed39364167526dccc5dc845f4e",
+      "bytes": 177088
     },
     {
       "path": "tools/token-e2e/freeze_snapshot.py",
@@ -44640,13 +44640,13 @@
     },
     {
       "path": "tools/token-e2e/frozen_checks.py",
-      "sha256": "1cdb4762ffd6022627a8539d6e812f9ff4e1443d4447c9f76745d84891e9e4ea",
-      "bytes": 167211
+      "sha256": "8b223c5526d85ec2b06e64949c5b3a6f30076e2224f5198eba01e46b4e2d5729",
+      "bytes": 176959
     },
     {
       "path": "tools/token-e2e/grade.py",
-      "sha256": "c3b4c55143945b705ab3ddde7c9610f83597c00989c66ee10c4d7de32e9991c9",
-      "bytes": 63035
+      "sha256": "35be55c2ff2418111f617b75a901e196bcd94fa50f9681e20c4a360204d11113",
+      "bytes": 64508
     },
     {
       "path": "tools/token-e2e/grading-block.schema.json",
@@ -44660,8 +44660,8 @@
     },
     {
       "path": "tools/token-e2e/judge.py",
-      "sha256": "96aeaefcd08757c0282e1c2efade557608a6760abaf1bc97aaf4afbd2b75702c",
-      "bytes": 76760
+      "sha256": "40c3876bb68420c016f56f7bc978e7173c181b932900cc4614c1aad4316c6f45",
+      "bytes": 76685
     },
     {
       "path": "tools/token-e2e/judgment.schema.json",
