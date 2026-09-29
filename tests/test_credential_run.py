@@ -738,6 +738,14 @@ class InventoryAndGrammarTests(unittest.TestCase):
                                       ("alpaca-paper-2", "APCA_API_BASE_URL"): "public",
                                       ("sec-contact", "EDGAR_IDENTITY"): "masked"})
 
+    def test_a_required_variable_is_masked_even_when_a_planted_entry_lists_it_public(self):
+        # Review of 2026-09-29: masked_names() trusted public_variables as written. It now comes from the schema
+        # module, where a public name is only ever an optional variable that is not also required.
+        entry = {"variables": ["KEY_ID", "SECRET_KEY"], "optional_variables": ["BASE_URL", "KEY_ID"],
+                 "public_variables": ["BASE_URL", "KEY_ID", "SECRET_KEY", "NOT_DECLARED"]}
+        self.assertEqual(run_mod.masked_names(entry), ["KEY_ID", "SECRET_KEY"])
+        self.assertEqual(run_mod.public_names(entry), ["BASE_URL"])
+
     def test_writer_and_reader_share_one_grammar(self):
         entry = {"id": "tavily", "variables": ["TAVILY_API_KEY"], "optional_variables": []}
         candidates = ["plain-Value_1.2+3/4=5:6@7", "with space inside", "semi;colon", "tilde~home", "quote'single",

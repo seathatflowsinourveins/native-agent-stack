@@ -117,9 +117,14 @@ def injectable(entry: dict) -> bool:
 
 
 def masked_names(entry: dict) -> list:
-    """Every declared variable except the entry's public_variables."""
-    public = set(entry.get("public_variables", []))
-    return [name for name in entry["variables"] + entry["optional_variables"] if name not in public]
+    """Every declared variable except the entry's public_variables, read from the schema module (scripts/
+    credential_status.py), where a required variable is never public."""
+    return cs.masked_names(entry)
+
+
+def public_names(entry: dict) -> list:
+    """The optional variables the entry classifies as not secret (a base URL): injected unmasked."""
+    return cs.public_names(entry)
 
 
 def load_inventory(root: Path = ROOT) -> dict:
@@ -570,7 +575,7 @@ def _main(argv: list, shown: list) -> int:
             raise
         print(f"{entry_id}: {refusal.state} ({refusal.detail})" + (f"; {refusal.hint}" if refusal.hint else ""))
         return 1
-    public = set(entry.get("public_variables", []))
+    public = set(public_names(entry))
     if check:
         print(f"{entry_id}: ok; would inject "
               + ", ".join(f"{name} ({'public' if name in public else 'masked'})" for name in names))
