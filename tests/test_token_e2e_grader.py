@@ -979,16 +979,58 @@ class F7_T0(GraderCase):
         captures = t0_captures(post_arm=t0_capture(subjects=("chore: other",)))
         self.result(self.grade(T0_ANSWER, captures), "unknown", "capture_conflict")
 
+    WORDS_TEXT = ("Newest commit: feat: newest. Branch state: clean. Diff stat: 3 files. Directory: 12 entries. "
+                  "Matches: 2. tests.test_host_requests: forty-nine tests, OK, 1 skipped.")
+    WORDS_QUOTE = "forty-nine tests, OK, 1 skipped"
+
+    def judged_extraction(self, text, values, quotes):
+        """The extraction exactly as the production judge contract hands it on: `check_judgment` accepts a value only when it
+        is a verbatim substring of one of its quotes and a quote only when it is verbatim in the answer."""
+        jd = load("judge")
+        packet = {"task": "t", "clauses": [], "sources": [], "answer": text, "evidence": [],
+                  "extractions": [{"component": "unittest", "request": "r"}]}
+        judged = jd.check_judgment({"clauses": [], "extractions": [{"component": "unittest", "values": values,
+                                                                     "answer_quotes": quotes}],
+                                    "leak": False, "leak_text": ""}, packet)
+        return judged
+
     def test_words_for_numbers_are_unparsed_until_d_extract_quotes_them(self):
-        text = ("Newest commit: feat: newest. Branch state: clean. Diff stat: 3 files. Directory: 12 entries. "
-                "Matches: 2. tests.test_host_requests: forty-nine tests, OK, 1 skipped.")
+        """Design F7: number words stay unparsed under g1, and a D-extract that quotes them verbatim (values inside the
+        quote, as the production judge contract requires) is read by the extraction-only number-word reader."""
+        text, quote = self.WORDS_TEXT, self.WORDS_QUOTE
         captures = t0_captures(arm=t0_capture(skipped=1), plain=t0_capture(skipped=1))
         self.result(self.grade(text, captures), "unknown", "unparsed")
-        stub = {"component": "unittest", "values": ["49 tests", "OK", "skipped=1"],
-                "answer_quotes": ["forty-nine tests, OK, 1 skipped"]}
-        self.result(self.grade(text, captures, extractions=[stub]), "pass")
-        forged = dict(stub, answer_quotes=["forty-nine tests, OK, 2 skipped"])
+        judged = self.judged_extraction(text, [quote], [quote])
+        self.assertEqual((judged["status"], judged["reason"]), ("ok", None), "the production judge contract accepts it")
+        self.result(self.grade(text, captures, extractions=judged["extractions"]), "pass")
+        wrong = self.judged_extraction(text.replace("1 skipped", "2 skipped"), [quote.replace("1 skipped", "2 skipped")],
+                                       [quote.replace("1 skipped", "2 skipped")])
+        self.result(self.grade(text.replace("1 skipped", "2 skipped"), captures, extractions=wrong["extractions"]),
+                    "fail", "test_skipped")
+        forged = {"component": "unittest", "values": [quote], "answer_quotes": [quote.replace("1 skipped", "2 skipped")]}
         self.result(self.grade(text, captures, extractions=[forged]), "unknown", "judge_quote")
+
+    def test_an_extraction_value_that_is_not_inside_its_quote_is_judge_quote(self):
+        """The grader re-checks what the judge check checked (check_judgment's docstring): a `--judgments` file must not be
+        able to inject a fact the answer never states, so a value outside every quote is unknown(judge_quote)."""
+        text, quote = self.WORDS_TEXT, self.WORDS_QUOTE
+        captures = t0_captures(arm=t0_capture(skipped=1), plain=t0_capture(skipped=1))
+        injected = {"component": "unittest", "values": ["49 tests", "OK", "skipped=1"], "answer_quotes": [quote]}
+        self.assertEqual(self.judged_extraction(text, injected["values"], [quote])["reason"], "judge_quote",
+                         "the production judge contract rejects exactly this stub")
+        self.result(self.grade(text, captures, extractions=[injected]), "unknown", "judge_quote")
+        partly = {"component": "unittest", "values": [quote, "Ran 49 tests, OK"], "answer_quotes": [quote]}
+        self.result(self.grade(text, captures, extractions=[partly]), "unknown", "judge_quote")
+
+    def test_the_number_word_reader_is_extraction_only_and_g1_is_unchanged(self):
+        fc = load("frozen_checks")
+        for words, digits in (("forty-nine tests", "49 tests"), ("twenty one tests", "21 tests"), ("seventeen", "17"),
+                              ("one hundred and five tests", "105 tests"), ("ninety-nine", "99"), ("zero failures", "0 failures"),
+                              ("three hundred", "300"), ("ran 5 tests", "ran 5 tests"), ("hundred", "hundred")):
+            with self.subTest(words):
+                self.assertEqual(fc.spelled_numbers_to_digits(words), digits)
+        self.assertEqual(fc.count_before_noun("forty-nine tests, five tests", ("tests", "test")), [5],
+                         "grammar g1 keeps zero..ten only: the compound stays unparsed")
 
     def test_an_unverified_sandbox_makes_the_unittest_fields_environment_dependent(self):
         conditions = {"kind": "codex_sandbox", "verified": False, "reason": "sandbox_probe_failed"}
@@ -3625,9 +3667,32 @@ class F25b_MemoryHits(GraderCase):
     def test_a_result_that_names_a_frozen_record_is_a_hit(self):
         self.result(self.check(self.calls("hits: pages/mem-fx-1.md (score 0.9)")), "pass")
 
-    def test_the_frozen_digest_or_the_bare_id_also_resolves_to_the_record(self):
+    def test_the_frozen_digest_also_resolves_to_the_record(self):
         self.result(self.check(self.calls("digest " + "1" * 64)), "pass")
-        self.result(self.check(self.calls("memory mem-fx-1 says")), "pass")
+
+    def test_a_bare_slug_is_not_a_frozen_id(self):
+        """Review medium: the record freezes a path and a digest (`ai-memory search --json` rows carry no id), and a slug that
+        is only the file name of the path is not the record: another page can name the same slug, so it never resolves."""
+        self.result(self.check(self.calls("memory mem-fx-1 says")), "fail", "no_historical_hit")
+
+    def test_a_later_page_that_only_mentions_the_same_slug_is_not_a_hit(self):
+        """R9 and U9-D13: the store is shared by arms B, A and A0, so a later session page that quotes another file with the
+        same base name (`recipes/host-request-lane.md`) must not count as the frozen `decisions/host-request-lane.md`."""
+        ev = evm()
+        record = {"path": "decisions/host-request-lane.md", "created_at": "2026-09-01T00:00:00Z", "content_sha256": "2" * 64}
+        later = "hits: sessions/2026-10-01-arm-a.md ... the child read recipes/host-request-lane.md and host-request-lane ..."
+        self.result(ev.memory_check(self.calls(later), [record]), "fail", "no_historical_hit")
+        self.result(ev.memory_check(self.calls('{"path":"decisions/host-request-lane.md","title":"host-request-lane"}'),
+                                    [record]), "pass")
+        self.result(ev.memory_check(self.calls("hits: decisions/host-request-lane.md, score 0.9"), [record]), "pass")
+
+    def test_a_longer_path_that_only_contains_the_frozen_path_is_another_record(self):
+        ev = evm()
+        record = {"path": "decisions/host-request-lane.md", "created_at": "2026-09-01T00:00:00Z", "content_sha256": "2" * 64}
+        for other in ("archive/decisions/host-request-lane.md", "decisions/host-request-lane.md-old",
+                      "old-decisions/host-request-lane.md"):
+            with self.subTest(other):
+                self.result(ev.memory_check(self.calls(f"hits: {other} (score 0.9)"), [record]), "fail", "no_historical_hit")
 
     def test_only_a_later_session_page_is_not_a_hit(self):
         self.result(self.check(self.calls("hits: pages/session-2026-10-01-fx.md")), "fail", "no_historical_hit")
@@ -3790,6 +3855,73 @@ class F28_M7(GraderCase):
         got = self.facts(self.calls([("Bash", {"command": command}, json.dumps(web_key()["records"]))]))
         self.assertEqual([item for item in got["roundtrip"] if item["source"] == "child_decode"], [])
 
+    def answer_items(self, text, **kw):
+        got = self.facts([], text, **kw)
+        return [item["status"] for item in got["roundtrip"] if item["source"] == "answer"]
+
+    def test_an_unfenced_toon_answer_with_a_line_after_it_is_one_equal_round_trip(self):
+        """Review high: the web-table tasks ask for the records plus their latency sum, and a Workflow answer needs no fence
+        (correction 6). TOON CLI 4.1.1 rejects content after a root array in strict mode, so the whole-answer candidate can
+        never decode; only a structural candidate (a fence or a line block) that fails to decode is an unequal trip."""
+        self.assertEqual(self.answer_items(self.doc() + "\nlatency sum: 124"), ["equal"])
+        self.assertEqual(self.answer_items("Here are the records:\n" + self.doc() + "\nLatency sum: 124\nSource: the docs."),
+                         ["equal"])
+
+    def test_an_unfenced_toon_answer_that_is_wrong_is_one_unequal_round_trip(self):
+        wrong = json.loads(json.dumps(web_key()["records"]))
+        wrong[2]["latency_ms"] += 5
+        self.assertEqual(self.answer_items(self.doc(wrong) + "\nlatency sum: 124"), ["unequal"])
+        broken = self.doc().replace("[8]", "[9]", 1)
+        self.assertEqual(self.answer_items(broken + "\nlatency sum: 124"), ["unequal"],
+                         "a structural block that does not decode is one unequal trip, not one per candidate")
+        self.assertEqual(self.answer_items("```toon\n" + broken + "\n```\nlatency sum: 124"), ["unequal"])
+
+    def test_an_unfenced_toon_answer_alone_is_still_one_equal_round_trip(self):
+        self.assertEqual(self.answer_items(self.doc()), ["equal"], "one payload, counted once")
+
+    def test_the_round_trip_rate_of_an_unfenced_answer_with_a_sum_line_is_one_on_both_bounds(self):
+        facts = self.facts([], self.doc() + "\nlatency sum: 124")
+        trips = evm().m7([dict(facts, seeded=True)], {}, DECIDED)["roundtrip"]
+        self.assertEqual((trips["checked"], trips["equal"], trips["rate_lower"], trips["rate_upper"]), (1, 1, 1.0, 1.0))
+
+    def test_an_encode_and_a_decode_in_one_command_both_count(self):
+        """Review medium: `toon --stats seed.json && toon -d out.toon` encodes, then decodes. The encode is a seeded encode
+        (the document is on stdout); the decode reads a file, so it is no observable round-trip item."""
+        merged = self.doc() + "\n" + "\n".join(STATUS_LINES) + "\n" + json.dumps(web_key()["records"])
+        for command in ("toon --stats seed.json && toon -d out.toon", "toon --stats seed.json | tee out.toon && toon -d out.toon"):
+            with self.subTest(command):
+                got = self.facts(self.calls(self.encode_call(merged, command)))
+                self.assertEqual((got["cli_encodes"], got["encode"], got["ineligible"]), (1, "encoded", 0))
+                self.assertEqual([item for item in got["roundtrip"] if item["source"] == "child_decode"], [])
+
+    def test_a_pipeline_that_ends_in_a_decode_is_an_unresolvable_encode_not_a_missing_one(self):
+        """The document went through tee into the decode, so the result holds only the decoded JSON and the status lines:
+        the encode happened and cannot be proven (R14: an unresolvable result is unknown), which the upper bound counts."""
+        result = json.dumps(web_key()["records"], indent=2) + "\n" + "\n".join(STATUS_LINES)
+        got = self.facts(self.calls(self.encode_call(result, "toon --stats seed.json | tee out.toon | toon -d")))
+        self.assertEqual((got["cli_encodes"], got["encode"], got["encode_reason"]), (1, "unknown", "unparsed"))
+
+    def test_an_option_of_another_program_is_not_a_toon_option(self):
+        """`curl -d` is not `toon -d`, and `sort -o` is not `toon -o`: each option belongs to the command it follows."""
+        document = self.doc() + "\n" + "\n".join(STATUS_LINES)
+        for command in ("curl -s -d x example.invalid > /dev/null; toon --stats seed.json",
+                        "sort -o out.txt notes.txt; toon --stats seed.json"):
+            with self.subTest(command):
+                got = self.facts(self.calls(self.encode_call(document, command)))
+                self.assertEqual((got["cli_encodes"], got["encode"], got["encode_reason"]), (1, "encoded", None))
+
+    def test_the_output_option_of_the_toon_command_itself_still_makes_the_encode_unknown(self):
+        result = "✔ Encoded `seed.json` → `out.toon`\n" + "\n".join(STATUS_LINES)
+        got = self.facts(self.calls(self.encode_call(result, "echo start; toon --stats -o out.toon seed.json | cat")))
+        self.assertEqual((got["encode"], got["encode_reason"]), ("unknown", "output_file"))
+
+    def test_a_decode_with_a_heredoc_still_makes_a_round_trip_item_when_a_cut_option_precedes_it(self):
+        records = web_key()["records"]
+        command = "cut -d, -f1 notes.csv > /dev/null\ntoon --decode <<'EOF'\n" + self.doc() + "\nEOF"
+        got = self.facts(self.calls([("Bash", {"command": command}, json.dumps(records, indent=2))]))
+        self.assertEqual([item["status"] for item in got["roundtrip"] if item["source"] == "child_decode"], ["equal"])
+        self.assertEqual(got["cli_encodes"], 0)
+
     def test_an_answer_payload_is_compared_with_the_frozen_original(self):
         equal = self.facts([], "```toon\n" + self.doc() + "\n```")
         self.assertEqual([item["status"] for item in equal["roundtrip"] if item["source"] == "answer"], ["equal"])
@@ -3947,20 +4079,33 @@ class F28_M7(GraderCase):
         self.assertEqual(got["status"], "pass", "natural payloads are optional and never gate")
 
     def test_d_extract_supplies_a_payload_the_candidates_missed(self):
+        """The payload extraction as the production judge contract hands it on: the value is the quoted text itself."""
         fc = load("frozen_checks")
-        header = self.doc().split("\n")[0]
         prose = "Result -> " + self.doc() + self.sum_line()
         key = web_key()
         base = fc.grade_payload(answer(fc, prose), key, DECIDED)
         self.result(base, "unknown", "unparsed")
-        good = [{"component": "payload", "values": [self.doc()], "answer_quotes": [header]}]
+        good = [{"component": "payload", "values": [self.doc()], "answer_quotes": [self.doc()]}]
         self.result(fc.grade_payload(answer(fc, prose), key, DECIDED, extractions=good), "pass")
         fabricated = [{"component": "payload", "values": [self.doc()], "answer_quotes": ["a quote that is not in the answer"]}]
         self.result(fc.grade_payload(answer(fc, prose), key, DECIDED, extractions=fabricated), "unknown", "judge_quote")
         wrong = json.loads(json.dumps(key["records"]))
         wrong[0]["latency_ms"] += 1
-        bad = [{"component": "payload", "values": [self.doc(wrong)], "answer_quotes": [header]}]
-        self.result(fc.grade_payload(answer(fc, prose), key, DECIDED, extractions=bad), "fail", "records")
+        wrong_prose = "Result -> " + self.doc(wrong) + self.sum_line()
+        bad = [{"component": "payload", "values": [self.doc(wrong)], "answer_quotes": [self.doc(wrong)]}]
+        self.result(fc.grade_payload(answer(fc, wrong_prose), key, DECIDED, extractions=bad), "fail", "records")
+
+    def test_a_payload_extraction_value_that_is_not_inside_its_quote_is_judge_quote(self):
+        """The grader re-checks what the judge check checked: a value outside every quote can be a payload the answer never
+        states (a `grade --judgments` file that injects the frozen key), so it is unknown(judge_quote), never a pass."""
+        fc = load("frozen_checks")
+        header = self.doc().split("\n")[0]
+        prose = "Result -> " + self.doc() + self.sum_line()
+        injected = [{"component": "payload", "values": [self.doc()], "answer_quotes": [header]}]
+        self.result(fc.grade_payload(answer(fc, prose), web_key(), DECIDED, extractions=injected), "unknown", "judge_quote")
+        absent = "I converted the records but will not show them." + self.sum_line()
+        stolen = [{"component": "payload", "values": [self.doc()], "answer_quotes": ["I converted the records"]}]
+        self.result(fc.grade_payload(answer(fc, absent), web_key(), DECIDED, extractions=stolen), "unknown", "judge_quote")
 
     def sum_line(self):
         return f"\nLatency sum: {web_key()['latency_sum']}"
@@ -6687,6 +6832,18 @@ class F35_JudgeRoutes(GraderCase):
                            "E_JUDGE_ROLE", reason="user_copy_missing")
         self.assertFalse((world.out / "claude" / "args.json").exists())
 
+    def test_an_answer_that_quotes_an_instruction_file_line_still_yields_packets(self):
+        """Review medium: the frozen instruction-file anchor lines (R22's canary does not list them) were gathered as canary
+        values, so one answer that quoted a line of AGENTS.md or CLAUDE.md refused the whole batch and every D clause stayed
+        pending. Only identifiers and private paths stop a batch."""
+        world = JudgeWorld(self, answer_suffix="\nfixture anchor line one").build()
+        proc = world.packets()
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        index = world.index()
+        real = world.real(index, world.claude_label)
+        packet = json.loads((world.out / "packets" / f"{real['id']}.json").read_text(encoding="utf-8"))
+        self.assertIn("fixture anchor line one", packet["answer"])
+
     def test_a_planted_user_name_stops_packets_with_E_PRIVACY_and_creates_nothing(self):
         world = JudgeWorld(self, answer_suffix="\nAuthor: fixtureuser99").build()
         home = self.tmp / "fixtureuser99"
@@ -7462,6 +7619,15 @@ class F29b_CheckHtml(GraderCase):
         proc = run_grade(["check-html", html, "--from", private])
         self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
 
+    def test_check_html_lets_the_actor_vocabulary_through(self):
+        """Review medium: the actors ('workflow_child', 'strict_process', ...) are 8 characters or more and were gathered as
+        canary values from every identity row, so a report that names an actor was refused. They are vocabulary, not ids."""
+        run, private, out = self.graded()
+        note = "workflow_child strict_process agent_child codex_exec codex_subagent team_teammate main"
+        proc = run_grade(["check-html", self.rendered({"note": note}), "--from", private])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertRefusal(run_grade(["check-html", self.rendered({"note": f"x {RUN_TOKEN} y"}), "--from", private]), "E_PRIVACY")
+
 
 # ---- controls (e5) and differential (e6): the grader's own instruments -------------------------------------------------
 
@@ -7758,6 +7924,247 @@ class F19c_Stage3Mutants(GraderCase):
         self.assertEqual(failing_with([], base), set(), "the unmutated controls run must pass before a mutant can flip it")
         patches = [mock.patch.dict(fc.ORACLES, {"T34": lambda params, key, ans, readings, ctx=None: {"A": fc.ok()}})]
         stage3_mutant(self, patches, base, base)
+
+
+# =====================================================================================================================
+# Repair round (2026-09-29): the independent review of the stage-3 head found two high and six medium defects. Each
+# class below is failing-first against that head; the stated review facts are the evidence.
+# =====================================================================================================================
+
+class H3_FieldNamedFacts(GraderCase):
+    """Review high 2: `_` is a word character (T1's whole-word reading depends on it), so a fact named by its field name
+    (latency_ms, latency_sum) never matched a label word and a correct answer was graded unknown(unparsed)."""
+
+    T32_KEY = {"record_id": 1, "verdict": "yes", "latency_ms": 17}
+
+    def t32(self, text):
+        fc = load("frozen_checks")
+        return fc.ORACLES["T32"]({}, self.T32_KEY, answer(fc, text), DECIDED)["A"]
+
+    def test_t32_a_fact_named_by_its_field_name_is_read(self):
+        for text in ("Verdict: yes. id 1, latency_ms 17", "Verdict: yes. record_id: 1, latency_ms: 17",
+                     "Verdict: yes. id=1 latency_ms=17", 'Verdict: yes. {"id": 1, "latency_ms": 17}',
+                     "verdict yes; record id 1; latency 17 ms"):
+            with self.subTest(text):
+                self.result(self.t32(text), "pass")
+
+    def test_t32_a_wrong_value_named_by_its_field_name_still_fails(self):
+        self.result(self.t32("Verdict: yes. id 1, latency_ms 18"), "fail", "latency")
+        self.result(self.t32('Verdict: yes. {"id": 2, "latency_ms": 17}'), "fail", "record_id")
+        self.result(self.t32("Verdict: yes. record_id: 2, latency_ms: 17"), "fail", "record_id")
+
+    def test_t32_a_hedged_field_named_value_is_still_unparsed(self):
+        self.result(self.t32("Verdict: yes. id 1, latency_ms 17 or 18"), "unknown", "unparsed")
+
+    def payload(self):
+        return "```json\n" + json.dumps(web_key()["records"]) + "\n```\n"
+
+    def grade(self, line):
+        fc = load("frozen_checks")
+        return fc.grade_payload(answer(fc, self.payload() + line), web_key(), DECIDED)
+
+    def test_a_stated_sum_named_by_its_field_name_is_read(self):
+        for line in ("latency_sum: 124", "Sum of latency_ms: 124", "total_latency_ms = 124", "latency_ms sum: 124",
+                     "The total latency is 124 ms", "Sum of latency: 124", '"latency_sum": 124'):
+            with self.subTest(line):
+                self.result(self.grade(line), "pass")
+
+    def test_a_wrong_or_hedged_sum_named_by_its_field_name_is_not_a_pass(self):
+        self.result(self.grade("latency_sum: 125"), "fail", "latency_sum")
+        self.result(self.grade("Sum of latency_ms: 125"), "fail", "latency_sum")
+        self.result(self.grade("latency_sum: 124 or 125"), "unknown", "unparsed")
+        self.result(self.grade("The records are above."), "unknown", "unparsed")
+
+    def test_a_count_named_by_a_field_is_not_a_sum(self):
+        """`total_records: 8` names another fact: with only that line the sum stays unparsed, never a failure."""
+        self.result(self.grade("total_records: 8"), "unknown", "unparsed")
+
+    def test_the_underscore_stays_a_word_character_for_whole_word_readings(self):
+        """T1's `whole_word` reading (grep -w semantics) depends on it: token_manifest is not the word token."""
+        fc = load("frozen_checks")
+        counts = {"whole_word": 66, "substring": 96, "alnum_boundary": 67}
+        self.result(fc.t1_token_lines_check("Lines containing the word token: 66", counts, "whole_word"), "pass")
+        self.assertFalse(fc.has_word("token_manifest", "token"))
+        self.assertEqual(fc.spaced_identifiers("latency_ms and read_text and _x_ and a_1"), "latency ms and read text and _x_ and a_1")
+
+
+class H3_PositiveControlOracle(GraderCase):
+    """Review medium 3: a correct answer to the positive control (in G-Q clause 1) must not fail on a negated level word
+    or on quoted raw rows; a level that is really there, or a wrong event, still fails."""
+
+    KEY = {"events": [1, 2, 3, 4, 5], "levels": ["INFO"] * 5, "file_bytes": 84003}
+    ROWS = [{"event": n, "level": "INFO", "value": n, "message": "Public synthetic observation for the frozen fixture."}
+            for n in range(1, 6)]
+
+    def t33(self, text):
+        fc = load("frozen_checks")
+        return fc.ORACLES["T33"]({}, self.KEY, answer(fc, text), DECIDED)["A"]
+
+    def test_a_negated_level_word_is_not_a_level(self):
+        for text in ("Events 1, 2, 3, 4, 5, all INFO (no ERROR among them)",
+                     "Events [1, 2, 3, 4, 5]: INFO each. No WARN, ERROR or DEBUG.",
+                     "Events 1, 2, 3, 4, 5 are all INFO, without any ERROR.",
+                     "Events 1, 2, 3, 4, 5, INFO. Zero WARN or ERROR entries.",
+                     "Events 1, 2, 3, 4, 5, all INFO; nothing at WARN or ERROR level.",
+                     "Events 1, 2, 3, 4, 5, all INFO, none of them is WARNING."):
+            with self.subTest(text):
+                self.result(self.t33(text), "pass")
+
+    def test_a_level_that_is_really_there_still_fails(self):
+        for text in ("Events 1, 2, 3, 4, 5: all INFO except the third, which is ERROR.",
+                     "Events 1, 2, 3, 4, 5; the third is not INFO, it is ERROR.",
+                     "Events 1, 2, 3, 4, 5, all INFO, none of them is WARN, but the fourth is ERROR.",
+                     "Events 1, 2, 3, 4, 5, level WARN for the last."):
+            with self.subTest(text):
+                self.result(self.t33(text), "fail", "levels")
+
+    def test_quoted_raw_rows_are_read_by_their_event_field(self):
+        rows = self.ROWS
+        for name, text in (("one array", "[" + ", ".join(json.dumps(row) for row in rows) + "]"),
+                           ("json lines", "\n".join(json.dumps(row) for row in rows)),
+                           ("fenced", "```json\n" + json.dumps(rows, indent=1) + "\n```"),
+                           ("array with a lead-in", "The first five records: " + json.dumps(rows))):
+            with self.subTest(name):
+                self.result(self.t33(text), "pass")
+
+    def test_raw_rows_with_a_wrong_event_or_level_still_fail(self):
+        wrong_event = [dict(row, event=6) if row["event"] == 5 else row for row in self.ROWS]
+        self.result(self.t33("[" + ", ".join(json.dumps(row) for row in wrong_event) + "]"), "fail", "events")
+        wrong_level = [dict(row, level="ERROR") if row["event"] == 3 else row for row in self.ROWS]
+        self.result(self.t33("[" + ", ".join(json.dumps(row) for row in wrong_level) + "]"), "fail", "levels")
+
+    def test_a_list_of_event_numbers_is_still_read_and_a_wrong_one_still_fails(self):
+        self.result(self.t33("Events [1, 2, 3, 4, 5], all INFO."), "pass")
+        self.result(self.t33("Levels [INFO, INFO, INFO, INFO, INFO] for events [1, 2, 3, 4, 5]."), "pass")
+        self.result(self.t33("Events [1, 2, 3, 4, 6], all INFO."), "fail", "events")
+        self.result(self.t33("Events 1, 2, 3, 4, 6, all INFO."), "fail", "events")
+
+
+class F17b_CanaryScope(GraderCase):
+    """Review medium 8: R22's canary is the run token, identities, labels, ids, events file names, input paths and roots,
+    the home directory and the user name; it is not every string of an identity row and not the instruction anchors."""
+
+    def values(self):
+        ev = evm()
+        rows = [{"identity": f"tok7fixture.B.seed-web-table-{number}.1", "actor": actor, "agent_id": f"agent-fx{number}",
+                 "workflow_dir": f"/fx/wf/wf_fixture{number}", "transcript": f"/fx/claude/proj/sess-fixture-{number}.jsonl",
+                 "tool_use_id": f"toolu-fx-a{number}", "events_file": f"/fx/e2e/tok7fixture.B.x.{number}.events.jsonl",
+                 "thread_id": f"thread-fx{number}", "session_id": f"sess-fixture-{number}"}
+                for number, actor in enumerate(("workflow_child", "strict_process", "agent_child", "codex_exec",
+                                                "codex_subagent", "team_teammate"), 1)]
+        table = {"run": "tok7fixture", "rows": rows}
+        bindings = {"roots": {"CLAUDE_ROOT": "/fx/claude-root", "E2E_DIR": "/fx/e2e",
+                              "memory_index_roots": ["/fx/memory-root"],
+                              "instruction_anchors": ["An instruction file anchor line"]},
+                    "instruction_anchors": ["An instruction file anchor line"], "exec_checkout": "/fx/exec-checkout",
+                    "arms": {}, "sentinels": {}}
+        records = [{"identity": row["identity"], "agent_id": row["agent_id"]} for row in rows]
+        return ev.canary_values(bindings, table, records)
+
+    def test_identifiers_paths_and_roots_are_canary_values(self):
+        values = self.values()
+        for value in ("tok7fixture", "tok7fixture.B.seed-web-table-1.1", "agent-fx1", "wf_fixture1", "sess-fixture-1.jsonl",
+                      "toolu-fx-a1", "thread-fx1", "sess-fixture-1", "tok7fixture.B.x.1.events.jsonl", "/fx/claude-root",
+                      "/fx/memory-root", "/fx/exec-checkout", "/fx/wf/wf_fixture1"):
+            self.assertIn(value, values)
+
+    def test_the_actor_vocabulary_and_the_instruction_lines_are_not_canary_values(self):
+        values = self.values()
+        for word in ("workflow_child", "strict_process", "agent_child", "codex_exec", "codex_subagent", "team_teammate",
+                     "An instruction file anchor line"):
+            self.assertNotIn(word, values)
+
+    def test_the_scrubber_still_removes_every_identifier_key_value(self):
+        """Both modules read one closed list of identifier fields, so a value the packet scrubber removes is a value the
+        canary checks (the canary is the second guard behind the scrubber)."""
+        jd, ev = load("judge"), evm()
+        self.assertEqual(tuple(jd.ID_KEYS), tuple(ev.IDENTIFIER_FIELDS))
+        for name in ("identity", "workflow_dir", "session_dir", "tool_use_id", "transcript", "events_file", "thread_id",
+                     "parent_thread_id", "parent_events_file", "session_id", "agent_id", "label"):
+            self.assertIn(name, ev.IDENTIFIER_FIELDS)
+        for name in ("actor", "arm", "family", "task", "source", "kind"):
+            self.assertNotIn(name, ev.IDENTIFIER_FIELDS)
+
+
+class F29c_ArgvSanitizer(GraderCase):
+    """Review medium 6: the command a grade run records reaches returned-results.json, so every private path is a placeholder
+    however the operator spelled the flag: `--flag value`, `--flag=value` (argparse accepts both) or an abbreviation."""
+
+    FLAGS = ("--spec", "--repo", "--bindings", "--identity-table", "--keys", "--captures", "--join-ledger",
+             "--adoption-report", "--run-mode", "--call-ledger", "--codex-events-dir", "--codex-driver", "--judgments",
+             "--out-private", "--out", "--from", "--controls")
+
+    def graded(self):
+        run = MiniRun(self).default_run()
+        self.assertEqual(run.identity().returncode, 0)
+        return run
+
+    def test_flag_equals_value_is_recorded_as_a_placeholder(self):
+        gr = load("grade")
+        got = gr.sanitize_argv(["grade", "--spec=/tmp/run/spec.json", "--join-ledger=claude=/tmp/run/j.jsonl",
+                                "--run-mode=B=/tmp/run/r.json", "--out", "/tmp/run/o.json", "--codex-driver=/tmp/run/d"])
+        self.assertEqual(got, ["python3", "tools/token-e2e/grade.py", "grade", "--spec=<spec>",
+                               "--join-ledger=claude=<join-ledger>", "--run-mode=B=<run-mode>", "--out", "<aggregate>",
+                               "--codex-driver=<codex-driver>"])
+
+    def test_every_path_flag_is_a_placeholder_in_both_spellings(self):
+        gr = load("grade")
+        for flag in self.FLAGS:
+            for spelled in ([flag, "/tmp/run/x/file.json"], [f"{flag}=/tmp/run/x/file.json"]):
+                with self.subTest(spelled[0]):
+                    joined = " ".join(gr.sanitize_argv(["grade", *spelled]))
+                    self.assertNotIn("/tmp", joined)
+                    self.assertNotIn("file.json", joined)
+
+    def test_a_grade_run_that_spells_its_flags_with_equals_records_no_path(self):
+        run = self.graded()
+        private, out = self.tmp / "private-eq", self.tmp / "aggregate-eq.json"
+        args, spelled, index = [str(item) for item in run.grade_args(private, out)], [], 0
+        while index < len(args):
+            if args[index] in self.FLAGS and index + 1 < len(args):
+                spelled.append(f"{args[index]}={args[index + 1]}")
+                index += 2
+            else:
+                spelled.append(args[index])
+                index += 1
+        self.assertGreater(sum(1 for item in spelled if "=" in item and item.startswith("--")), 5)
+        proc = run_grade(spelled)
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        argv = json.loads((private / "context.json").read_text(encoding="utf-8"))["command"]
+        self.assertNotIn(str(self.tmp), json.dumps(argv))
+        target = self.tmp / "neutral-export"
+        exported = run_grade(["export", "--from", private, "--aggregate", out, "--export-dir", target])
+        self.assertEqual(exported.returncode, 0, sanitize(exported.stderr))
+        manifest = json.loads((target / "returned-results.json").read_text(encoding="utf-8"))
+        self.assertNotIn(str(self.tmp), json.dumps(manifest))
+        for token in manifest["records"][0]["command"]["argv"][3:]:
+            self.assertNotIn("/", token)
+
+    def test_an_abbreviated_flag_is_a_usage_refusal(self):
+        """argparse takes any unambiguous prefix of a long option; a frozen instrument accepts only the written flags, so the
+        recorded command can be read against the sanitizer's own flag table."""
+        run = self.graded()
+        private, out = self.tmp / "private-abbrev", self.tmp / "aggregate-abbrev.json"
+        args = [("--out-priv" if str(item) == "--out-private" else item) for item in run.grade_args(private, out)]
+        self.assertIn("--out-priv", args)
+        proc = run_grade(args)
+        self.assertRefusal(proc, "E_ARGS", field="usage")
+        self.assertFalse(private.exists(), "nothing is written for a refused command line")
+
+    def test_export_refuses_a_recorded_command_that_still_holds_a_path(self):
+        """Fail closed: a context.json whose command carries a path shape (an older writer, a hand edit) is never copied
+        into the manifest, whatever the flag looked like."""
+        run = self.graded()
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        path = private / "context.json"
+        document = json.loads(path.read_text(encoding="utf-8"))
+        document["command"] = ["python3", "tools/token-e2e/grade.py", "grade", "--spec=/somewhere/else/spec.json"]
+        path.write_text(json.dumps(document), encoding="utf-8")
+        target = self.tmp / "neutral-export"
+        self.assertRefusal(run_grade(["export", "--from", private, "--aggregate", out, "--export-dir", target]),
+                           "E_EXPORT_INPUT", reason="argv")
+        self.assertFalse(target.exists(), "nothing is created when the command is refused")
 
 
 if __name__ == "__main__":
