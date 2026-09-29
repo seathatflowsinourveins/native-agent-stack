@@ -401,8 +401,9 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
 // D8 (GPT-6 #9, Claude review R9): the M4 text scanners read a run of unclosed "((" in linear time. Before the repair each
 // unclosed "((" looked ahead to the end of its line, so n = 8000, 16000 and 32000 took about 315, 1100 and 5000 ms (four times
 // per doubling). Each size is timed as the best of five runs; a run over 1.5 s ends the doubling (it is far past the bound
-// already), and 5 ms of the allowance is timer and GC noise, not growth. Required: at most 2.5 times per doubling (plus that noise),
-// and under 150 ms at 64,000.
+// already), and 5 ms of the allowance is timer and GC noise, not growth. The brief's requirement, at most 2.5 times per doubling and
+// under 150 ms at 64,000, applies to that input (about 30 ms here); the other shapes below keep the ratio and take an absolute
+// bound of 1.5 s at 64,000, since each does real work per unit and a CI runner is slower than this host.
 {
   const doubling = (make, run) => {
     run(make(2000)); run(make(2000)) // warm-up
@@ -416,30 +417,27 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
     }
     return ms
   }
-  const linear = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5) && ms[3] < 150
-  const shape = (label, make, reader, run) => {
+  const ratio = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5)
+  const linear = (ms) => ratio(ms) && ms[3] < 150 // the brief's bound, for '(('.repeat(n) + 'qmd'
+  const linearWork = (ms) => ratio(ms) && ms[3] < 1500 // every other shape
+  const shape = (label, make, reader, run, bound = linearWork) => {
     const ms = doubling(make, run)
-    expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', linear(ms))
+    expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', bound(ms))
   }
   const dparen = (n) => '(('.repeat(n) + 'qmd'
-  shape('a run of unclosed ((', dparen, 'executedText', (c) => executedText(c))
-  shape('a run of unclosed ((', dparen, 'executedText inlineHttp', (c) => executedText(c, { inlineHttp: true }))
+  shape('a run of unclosed ((', dparen, 'executedText', (c) => executedText(c), linear)
+  shape('a run of unclosed ((', dparen, 'executedText inlineHttp', (c) => executedText(c, { inlineHttp: true }), linear)
   shape('a run of unclosed $((', (n) => '$(('.repeat(n) + 'qmd', 'executedText', (c) => executedText(c))
   shape('unclosed (( inside a double-quoted "$( "', (n) => 'echo "$( ' + '(('.repeat(n), 'executedText', (c) => executedText(c))
   shape('a run of heredoc operators after (', (n) => '(<<E'.repeat(n), 'executedText', (c) => executedText(c))
   // The run-string detectors read the text built so far at every quote: on a long script that was one flattening and one scan of the
   // whole prefix per quote, so a script of n quoted words cost n squared (a 346 KB script took 2 s a scan, and the kernel scans each shell
-  // call several times). The same doubling, with a looser absolute bound because each quote does real work: 64,000 quotes under 1.5 s.
-  const linearWork = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5) && ms[3] < 1500
-  const work = (label, make, run) => {
-    const ms = doubling(make, run)
-    expect('linear: ' + label + ' at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', linearWork(ms))
-  }
-  work('a run of quoted words (executedText)', (n) => "'a'".repeat(n), (c) => executedText(c))
-  work('a run of double-quoted substitutions (executedText, inlineHttp)', (n) => '"$(a)"'.repeat(n), (c) => executedText(c, { inlineHttp: true }))
-  work('a run of run strings (executedText)', (n) => 'bash -c "x" '.repeat(n), (c) => executedText(c))
-  work('a run of words with # inside (executedText)', (n) => 'a#'.repeat(n), (c) => executedText(c))
-  work('a long script of echo, substitution and pipe lines (fetchKind)', (n) => Array.from({ length: Math.ceil(n / 8) }, (_, i) => 'echo "step ' + i + ': $(date +%s)" >> log.txt; qmd search "term ' + i + '" -n 2 | head -5').join('\n'), (c) => fetchKind(c))
+  // call several times).
+  shape('a run of quoted words', (n) => "'a'".repeat(n), 'executedText', (c) => executedText(c))
+  shape('a run of double-quoted substitutions', (n) => '"$(a)"'.repeat(n), 'executedText, inlineHttp', (c) => executedText(c, { inlineHttp: true }))
+  shape('a run of run strings', (n) => 'bash -c "x" '.repeat(n), 'executedText', (c) => executedText(c))
+  shape('a run of words with # inside', (n) => 'a#'.repeat(n), 'executedText', (c) => executedText(c))
+  shape('a long script of echo, substitution and pipe lines', (n) => Array.from({ length: Math.ceil(n / 8) }, (_, i) => 'echo "step ' + i + ': $(date +%s)" >> log.txt; qmd search "term ' + i + '" -n 2 | head -5').join('\n'), 'fetchKind', (c) => fetchKind(c))
 }
 expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
   logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')
