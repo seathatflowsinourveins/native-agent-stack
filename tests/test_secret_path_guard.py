@@ -55,6 +55,9 @@ BLOCKED = {
     "echo $APCA_API_SECRET_KEY": "secret_variable_reference",
     "printf '%s' \"${DATABENTO_API_KEY}\"": "secret_variable_reference",
     "python3 -c 'import os; print(os.environ[\"APCA_API_KEY_ID\"])'": "secret_variable_reference",
+    # The variable of the `canary-e2e` inventory entry (a disposable synthetic proof key, class test_canary): a secret name like any other.
+    "echo \"$CANARY_E2E_KEY\"": "secret_variable_reference",
+    "rg -n CANARY_E2E_KEY": "secret_name_search",
     "env": "environment_dump",
     "env | sort": "environment_dump",
     "env -u HOME": "environment_dump",

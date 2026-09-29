@@ -101,6 +101,9 @@ SECRET_NAMES = (
     "PREFECT_API_KEY", "MC_API_KEY", "MSB_API_KEY", "PAPERCLIP_API_KEY",
     "TWS_USERNAME", "TWS_PASSWORD", "TWS_ACCOUNT", "IBKR_ACCOUNT_ID",
     "TAVILY_API_KEY",
+    # The variable of the `canary-e2e` inventory entry (a disposable synthetic proof key: class test_canary, status test_only), listed
+    # ahead of that entry so the inventory tie test holds when it lands; it is refused like every other name.
+    "CANARY_E2E_KEY",
 )
 _NAMES = "|".join(SECRET_NAMES)
 SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
