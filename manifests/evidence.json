@@ -3461,13 +3461,31 @@
         "The review repair rounds changed install_skills.py after the first reproduction. data.scratch_reproduction ran the pre-repair file (its fixed_install_skills_sha256); data.review_repair_round.reproduction_rerun and claude_config_dir_probe ran the final file natively. The probe shows the CLI's trim and '..' handling for a folder, a blank value, a '..' value and U+FEFF alone; the other trim code points rest on node's measured trim set and fake-CLI tests. The malformed-lock, unreadable-lock and missing-binary cases are fake-CLI fault injections in tests/test_install_skills.py only: no native run produced them."
       ],
       "path": "evidence/receipts/skills-m4-host-removal-20260928.json"
+    },
+    {
+      "id": "claude-model-effort-probes-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "Twenty-seven native probes and two session counts on Claude Code 2.1.284 (the client version recorded in every transcript), run between 2026-09-28T21:20Z and 2026-09-29T00:40Z and each read from the model and effort recorded in the session's or child's own transcript, found that (1) in headless one-turn sessions the ultracode setting neither raised a session that had no per-model level (a Sonnet 5.5 session ran at medium although the user settings' top-level effortLevel was xhigh) nor overrode a per-model level passed with --settings (low won for both Sonnet 5.5 and Opus 5.5), a project settings file's top-level effortLevel or modelSettings entry of xhigh raised a Sonnet 5.5 session to xhigh, and the Ultracode reminder text stayed present at max effort set by flag or environment variable; (2) in headless sessions a subagent that no per-call model or definition names ran the lead's model, CLAUDE_CODE_SUBAGENT_MODEL=opus put it on Opus 5.5 under a Sonnet 5.5 lead, and a child on another model ran at that model's own saved level or default (xhigh for Opus 5.5, medium for Sonnet 5.5); (3) in the interactive coordinator session, whose effort a model picker had set to max, every probe child that named no effort (an unnamed subagent, an Opus subagent named by per-call model, two workflow stages and a named teammate: C1 and C3 to C6) ran at max, the Opus 5.5 one (C3) included, so the lead's session effort reached a child of either model, and the two project agents whose definitions declare effort max (C2, C8) also ran at max, which their definitions explain; and (4) after the host user settings saved claude-sonnet-5-5 at xhigh and CLAUDE_CODE_SUBAGENT_MODEL=opus, a fresh headless Sonnet 5.5 session ran at xhigh and its unnamed subagent ran on Opus 5.5 at xhigh.",
+      "limitations": [
+        "Local observation of one workstation and one client version (2.1.284); not a provider ledger, and the recorded effort field is the client's own per-message record, not an API-side confirmation.",
+        "Cases A, B and D are headless one-turn sessions in fresh scratch directories that read the host's user settings (ultracode true, a top-level effortLevel of xhigh, modelSettings for claude-opus-5-5 only before the change, no CLAUDE_CODE_SUBAGENT_MODEL before the change); the setting values are not retained beyond that shape. Case A1 therefore shows that the user settings' top-level xhigh did not reach a Sonnet 5.5 session that had no per-model entry; an interactive fresh session's default was not measured.",
+        "Cases C come from the interactive coordinator session, whose own effort was max because a model picker set it; each child kind was observed once, so C1 and C3 to C6 show the inheritance rule for one child of each kind, not its variance (C3 is the only child of the other model that named no effort), and they show the interactive effort reaching children of both models, not what a headless child of another model runs at (that is B2 and B3); C2 and C8 run project agents whose definitions declare effort max, so they show the definition, not inheritance. C7 counts the coordinator's unique assistant messages up to 2026-09-29T00:40:00Z (its transcript keeps growing); every message count in this receipt counts each assistant message id once.",
+        "The Ultracode reminder text is the indicator the 2026-09-23 record used for an active Ultracode; it is not proof of workflow behaviour. This receipt does not show that dynamic-workflow orchestration is active or inactive at a given effort, although the interactive max session ran workflows when asked.",
+        "Tool use was not exercised in cases A and C1 to C6 (one-turn replies), and B and D used only the Agent tool, so effort or model changes over a long tool-heavy session are untested.",
+        "The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every number from a client's own transcripts, given the results files the run scripts write and, for C, the coordinator's transcript.",
+        "The 2026-09-23 record's probes on 2.1.281 found that ultracode took precedence over a saved per-model level and that a max session removed the reminder; that record stays as history for 2.1.281 and this receipt does not re-test 2.1.281."
+      ],
+      "path": "evidence/receipts/claude-model-effort-probes-20260929.json"
     }
   ],
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "6a6aebbd563c3e012077a0adafa6f711813b2cedfd5d31bc8a7f742256ffb867",
-      "bytes": 2858
+      "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
+      "bytes": 2884
     },
     {
       "path": ".gitattributes",
@@ -3706,7 +3724,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "04dceef287c1a5ec81d37cebcc38a54086c975c8d350c5e7e041c94258a2018d",
+      "sha256": "b611e824165ab4465bed6729054a1c1eaed75a7c0044506f508e4c6adacd62d4",
       "bytes": 861
     },
     {
@@ -3886,8 +3904,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "e3f5dce49a83d93f07f13370dc35cd8245d2c629155cb511ba4875ff5cd9b6e7",
-      "bytes": 11039
+      "sha256": "6c4035f957c5eee4fa91a2e7b207a845e97f84acd44b48e1af37b38d31efe4e0",
+      "bytes": 11144
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -14337,8 +14355,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "087cf368a4d97719a63433ddcbc87e7f24d7b5bba3b51df92c0d4b8438ab19d7",
-      "bytes": 40927
+      "sha256": "671bffe39ea1fb59c39753becfa5e0f827c2ec593760ec5fa990fbf02ae3f2f5",
+      "bytes": 41040
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -14384,6 +14402,11 @@
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
       "sha256": "85002f8d31fe6ee4d333bf0ee4e2510bb34d549020ea29a6b5345907ef1c92c6",
       "bytes": 15185
+    },
+    {
+      "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
+      "sha256": "62b890b2057b7306e9203e910d7f25491841dbb4b376f12471827e4e52e18837",
+      "bytes": 23258
     },
     {
       "path": "docs/direct-results.md",
@@ -14517,8 +14540,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "e2fda0f7287f6a11aa59c428c51ee3a9782b61d824c8fff27ade5accff1690b7",
-      "bytes": 69779
+      "sha256": "2abbb9310b1983a456c1892fea59f6599d7467bcfdfd1ba1ffdd1830ffa89ed6",
+      "bytes": 72231
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -40781,6 +40804,11 @@
       "bytes": 20645
     },
     {
+      "path": "evidence/receipts/claude-model-effort-probes-20260929.json",
+      "sha256": "89ff70e2f8388d3fc424bf879eb8fd7753e9be851ddc58344d9dd29d484b2dca",
+      "bytes": 27658
+    },
+    {
       "path": "evidence/receipts/claude-repository-evidence-20260921.json",
       "sha256": "6182eeccec5643f70292eba5525eb70f59e47f3e52dcdda0f59393a94932f9f9",
       "bytes": 6669
@@ -41357,8 +41385,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "76f9e67b8d2afadd66258329a15466e5faef01cdf12d1b030e3e30296e86da3e",
-      "bytes": 8691
+      "sha256": "5a625cdf85688e109dc50666e1352b65815e721d896b6f7de0e12d042d674070",
+      "bytes": 9577
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -41402,17 +41430,17 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "437c91a3ce30fb83918466e4e097aa4a0068b0d3562fb34c2e7eb62d9186ad43",
-      "bytes": 364
+      "sha256": "fe05ad14ec475ba26f97b643fc95d1c2c55e676e43baeafd176912979fcd1e43",
+      "bytes": 432
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "95ac3f970e6b24f1378cb3e4366cad2b9b6fc683ab30368e4508e7b6c90d2ed2",
-      "bytes": 51953
+      "sha256": "2f587774f7a864113279fcb51702004a9d17937d0cd42b1212af0353d8566ad7",
+      "bytes": 58347
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "3b953d1081c0da3df96e1b0597449ffaafb74e151cab289be4d6adc973220c08",
+      "sha256": "ba76654eb565be620c989ff19c9537c701d117b8fdf9bde8aa6b1966241d585d",
       "bytes": 1129
     },
     {
@@ -41422,8 +41450,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "062f4c0fa48209d7dce76075faa3d074920ba67e46df425769fcd4757f8c291f",
-      "bytes": 90100
+      "sha256": "eb7df29b1ee0b9d5f722001cdb841ac9e102313806209938d650cf2fac745519",
+      "bytes": 90829
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -41447,8 +41475,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "78d60c83e31a0edc4601fb1957bf6b0fb35596b3dc88d518a6daff4f6681fce5",
-      "bytes": 51024
+      "sha256": "a73b0fcd32184138b479251acee3bc3eb73198901c6b7aab8aa82825469a3152",
+      "bytes": 53671
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -41457,13 +41485,13 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "d06eb718c525bc0f70596c041d996b275cfd1b6f5905a759f6a8749d561ec9f0",
-      "bytes": 21748
+      "sha256": "02fec283113e012d6174a168d792784b7c814b8cb32b2684c37e6dfc948d70ff",
+      "bytes": 21925
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "2a8397d130bdd5bb20eff7de4066cd46042a80590d811d996ad9e1f3a27ad558",
-      "bytes": 56857
+      "sha256": "3efa54fb02c98b3adf2779096a12363bdf6f56b1edf48b122e7426de014bd1da",
+      "bytes": 57092
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -41927,13 +41955,13 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "813ec12a6ddac2e8c6f0795ec1b50ac838852c6c95b2535eccd5d8f09ac3e73d",
-      "bytes": 29215
+      "sha256": "6c24078474ce81a6eb9c7dff8ce69cbd609de5cd4eb2e1f764eb70b91aede192",
+      "bytes": 30534
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "59b3bda2003bab3320d26c049c7b6ea45ea77b3f53d8f5028ab0dcfd6b24688d",
-      "bytes": 34964
+      "sha256": "580918b582aaa839bc7760064ccc58480a3e5a8e3c8b4ae04d0aea2235c89eef",
+      "bytes": 38651
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -42542,8 +42570,8 @@
     },
     {
       "path": "tests/test_effort_default_guard.py",
-      "sha256": "fff0de5f66721f38eeb4b3651bca79bc13b03e9db8fa37d817e9e5c521c56b0f",
-      "bytes": 27591
+      "sha256": "c1f8824c623e9b18a5002f293a4a4ee67dcd4e41b6752808174ea890d6b76a36",
+      "bytes": 31564
     },
     {
       "path": "tests/test_env_freshness.py",
@@ -42647,8 +42675,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "073d333816c0595219eaa37965eeb4e4fbd23fe4a789a8302387fa8940cb7ea0",
-      "bytes": 62207
+      "sha256": "f5c88d88e8fce91ce8ec01f9da0f64a301dcb0cbb20cd1162602a905e5c5f734",
+      "bytes": 65209
     },
     {
       "path": "tests/test_install_skills.py",

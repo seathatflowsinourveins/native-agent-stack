@@ -6,9 +6,25 @@ top-level `effortLevel` applies only to Opus 5, Fable 5.1 and earlier models; Op
 later ignore it and start at their own default (Opus 5.5: medium). In project, local and
 managed settings a top-level `effortLevel` applies to every model. Resolution: env
 CLAUDE_CODE_EFFORT_LEVEL, then the highest-precedence file (managed > local > project > user)
-that sets `modelSettings.<model>.effortLevel` or an applicable top-level `effortLevel`; an
-`ultracode: true` session runs at xhigh; any `maxEffortLevel` caps it.
-Source: https://code.claude.com/docs/en/settings-reference (fetched 2026-09-23).
+that sets `modelSettings.<model>.effortLevel` or an applicable top-level `effortLevel`; any
+`maxEffortLevel` caps it. `ultracode: true` takes no part in the resolution: on Claude Code
+2.1.284 it neither sets nor overrides a model's level, so a model with no saved level resolves
+to none (SessionStart warns, SessionEnd heals).
+Source: https://code.claude.com/docs/en/settings-reference (fetched 2026-09-23) for the file
+precedence and the top-level key. The ultracode rule comes from this measurement: Claude Code
+2.1.284, 2026-09-29, headless one-turn sessions in fresh scratch directories under user settings
+with `ultracode: true`, a top-level `effortLevel: "xhigh"` and `modelSettings` holding only
+claude-opus-5-5 at xhigh; effort read from the `effort` field of each assistant row in the native
+transcript. `--model sonnet` (claude-sonnet-5-5) with no saved level ran at medium, the
+Ultracode reminder present; a per-model `effortLevel: "low"` passed with `--settings` ran at
+low on Sonnet 5.5 and on Opus 5.5 with ultracode still true; `--settings` with `ultracode: false`
+and Sonnet 5.5 at "xhigh" ran at xhigh. The documentation records the same change: from v2.1.284 the setting leaves the level
+unchanged and `--effort ultracode` sets xhigh; before v2.1.284 `ultracode: true` ran the session at xhigh
+(https://code.claude.com/docs/en/settings-reference#ultracode, read 2026-09-29). The guard's ultracode rule therefore holds
+from 2.1.284, and the floor raise to 2.1.284 is its own change. On Claude Code 2.1.281 it was different: the
+2026-09-23 record (docs/decisions/2026-09-23-max-effort-default.md, kept as history) found
+ultracode sessions at xhigh and cited the settings reference as saying ultracode "takes
+precedence over `effortLevel` and `modelSettings` entries".
 
 Events:
   SessionStart: predictive warning when the resolved level for the event's `model` is below
@@ -104,19 +120,15 @@ def resolve(name, cwd):
     if env:
         level, source = env.lower(), "CLAUDE_CODE_EFFORT_LEVEL"
     else:
-        ultra = next((s.get("ultracode") for tag, s in files if "ultracode" in s), None)
-        if ultra is True:
-            level, source = "xhigh", "ultracode"
-        else:
-            for tag, s in files:
-                per = {canonical(k): v for k, v in (s.get("modelSettings") or {}).items() if isinstance(v, dict)}
-                if (per.get(name) or {}).get("effortLevel") in RANK:
-                    level, source = per[name]["effortLevel"], tag + " modelSettings"
-                    break
-                top = s.get("effortLevel")
-                if top in RANK and (tag != "user" or name in LEGACY_EXACT or name.startswith(LEGACY_PREFIX)):
-                    level, source = top, tag + " effortLevel"
-                    break
+        for tag, s in files:
+            per = {canonical(k): v for k, v in (s.get("modelSettings") or {}).items() if isinstance(v, dict)}
+            if (per.get(name) or {}).get("effortLevel") in RANK:
+                level, source = per[name]["effortLevel"], tag + " modelSettings"
+                break
+            top = s.get("effortLevel")
+            if top in RANK and (tag != "user" or name in LEGACY_EXACT or name.startswith(LEGACY_PREFIX)):
+                level, source = top, tag + " effortLevel"
+                break
     if level in RANK and cap and RANK[cap[0]] < RANK[level]:
         return cap[0], source, cap[1]
     return level, source, None
@@ -175,7 +187,7 @@ def start_warning(name, cwd):
     why = (f"capped at {level} by maxEffortLevel ({capped})" if capped else
            f"set to {level} by {source}" if level else "without a saved level, so it runs at the model's own default")
     return (f"Effort default check: {name} is {why}; the ecosystem default is {WANT}. "
-            f"Run `/effort {WANT}` to save it for this model (user-settings top-level effortLevel does not apply to Opus 5.5 and later).")
+            f"Run `/effort {WANT}` to save it for this model (a user-settings top-level effortLevel applies only to Opus 5, Fable 5.1 and earlier models).")
 
 
 def leave_notice(msg):
