@@ -3559,6 +3559,28 @@
         "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session."
       ],
       "path": "evidence/receipts/login-shell-contract-20260929.json"
+    },
+    {
+      "id": "claude-spend-attribution-20260929",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "claude-code",
+        "ccusage"
+      ],
+      "claim": "A count-only scan of this host's Claude Code transcripts (the 4,183 transcript files that record a version were written by Claude Code 2.1.280 to 2.1.284; scanned 2026-09-29, ccusage 20.0.26), deduplicated by message.id, covers 186,492 API calls and 1,872 advisor iterations from 2026-09-24 to 2026-09-29 (UTC dates). Its input, output, cache-read and cache-creation (5m plus 1h split) totals each match `ccusage claude daily --json --offline`, run on the same copy of the transcript tree, within 0.001%; the top-level cache_creation_input_tokens field is 2.3% higher because of tokens with no split. At Anthropic API list prices the window is $20,927 (ccusage: $19,829; the $1,098 difference is mostly claude-sonnet-5-5, which ccusage leaves unpriced, plus unsplit cache writes only the scan prices, per data.reconciliation.cost_usd): children (Agent-tool and workflow stages) are 81.3% of it, workflow stages alone 66.1%, and 4 of 710 session trees cover half; in ccusage's session view the 303 workflow runs are 68.1% of its dollars (median run $22, largest $448). Cache reads are 39.5% of dollars, executor output 23.8%, cache writes 22.8%, advisor iterations 14.0%. Children with more than 60 calls are 53.2% of dollars; children of a default agent type are 63.4% of children and 41.1% of dollars; effort max covers 82.2% of calls.",
+      "limitations": [
+        "Local observation of one host's retained transcripts (the independent-observation class of docs/acceptance-evidence-policy.md), not a provider ledger or a bill. Both tools read one copy of the transcript tree taken at data.reconciliation.snapshot_at_utc, so their differences are method differences, not drift; a transcript that was deleted or never written is not counted, and the scan skips a line cut by the copy.",
+        "The transcripts were written by more than one Claude Code release (data.scan.client_versions_by_transcript_file, 151 files without a version field); the scan and ccusage ran with the versions in data.tool_versions.",
+        "Dollar figures apply Anthropic API list prices (data.prices, pricing page fetched 2026-09-29) to counted tokens. They are not what a subscription charges and do not weight the plan meter. Cache-write tokens with no 5m/1h split are priced at the 5-minute rate, and tokens of models absent from the table (data.scan.unpriced_model_tokens) are not priced. The scan-minus-ccusage difference of $1,098 is the sum of the per-model differences in data.reconciliation.cost_usd.by_model: claude-sonnet-5-5 ($1,006, which ccusage leaves unpriced), claude-opus-4-8 (-$6: ccusage prices it and the scan does not) and the unsplit cache writes of the other models ($96, which ccusage does not count), with a residual of $1 that is not attributed.",
+        "Counts only: no path, session identifier or transcript content is retained. A session tree is a main session plus every child below it, derived from the path layout; ccusage lists each workflow run as its own session, so its per-session ranking differs from data.scan.session_trees.",
+        "Invocation counts are attempts, not success rates: each tool population has its own denominator (data.scan.tool_calls, mcp_calls_by_server), and a ToolSearch load is not a call. No per-tool eligible-task success rate follows from them.",
+        "Cache creation: ccusage counts the 5m and 1h split (965,565,309 tokens) and the scan's split matches it. The scan also reports the top-level field (987,672,811 tokens), which is 22,098,490 tokens above the split; after clamping calls whose split exceeds their top-level field to no remainder, the unsplit remainder is 22,133,575 tokens on 1,878 calls (children: 21,760,880 tokens on 1,760 calls; 1 main-session call reports a split larger than its top-level field). Which cache class the remainder belongs to is not established, and the scan prices it at the 5-minute rate. In the split fields children show no 1-hour-class tokens (their unsplit remainder has no established class); main sessions show 142,720,261.",
+        "Inference with no usage record is in neither the scan nor ccusage: session titles, compaction, WebFetch summaries, away summaries and the auto-mode classifier. Advisor inference is counted from usage.iterations only. Rows whose model is <synthetic> carry no usage and are skipped.",
+        "Cache-miss events (data.scan.cache_misses, cache_creation_children) are calls whose cache read fell below half the previous call's context. The gap is measured between the first-written entries of consecutive calls, so it includes the next call's response time (long at effort max), and calls after a compaction also meet the rule; the 5m-1h bin is therefore approximate.",
+        "The scan's rules (one row per message.id with the per-field maximum, advisor iterations, <synthetic> rows and journal files skipped, the --since filter for calls and tool counters) were checked on a synthetic fixture with hand-computed expected values and one mutant run per rule (data.control). The fixture does not check the price table or the run-shape statistics, and the reconciliation covers token totals, not dollars.",
+        "The run-shape statistics describe this host and window. They do not show that fewer or shorter children lower cost at equal quality, and data.derived is arithmetic on generic price ratios; no quality comparison was run."
+      ],
+      "path": "evidence/receipts/claude-spend-attribution-20260929.json"
     }
   ],
   "files": [
@@ -14890,8 +14912,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "d8a89b667b6cd4efa30e8b1953ba1401cd2f6a1cb77a6e758092c6cba5665ec5",
-      "bytes": 31666
+      "sha256": "9b7e15f781f7f362670c6aff860e1827dbbe50b923bbadeffd28e193fb54aa58",
+      "bytes": 36973
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -15912,6 +15934,11 @@
       "path": "evidence/artifacts/claude-repository-evidence-20260921/summary.json",
       "sha256": "527f888f33111e6bed06d315d1b56c80f7dc52c58896972a9925a632b0d1636a",
       "bytes": 37973
+    },
+    {
+      "path": "evidence/artifacts/claude-spend-scan.py.txt",
+      "sha256": "44be91b27be36efa3fb7b75c565ee6fd6c33d9020abffef69bdf9f845d4e7ab4",
+      "bytes": 28146
     },
     {
       "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
@@ -41299,6 +41326,11 @@
       "bytes": 43025
     },
     {
+      "path": "evidence/receipts/claude-spend-attribution-20260929.json",
+      "sha256": "185d7abc712f2fa50115d0467c36966b27d1789772a682dfe0f0056b16204694",
+      "bytes": 34240
+    },
+    {
       "path": "evidence/receipts/claude-upstream-checks-20260921.json",
       "sha256": "db9f8b3eafcbc88072bfe603afcfd53e8c3cac60baeaf75b23ded5956b517ca7",
       "bytes": 2818
@@ -42997,6 +43029,11 @@
       "path": "tests/test_claude_repository_evidence.py",
       "sha256": "bc84e4527cbbd894ad524981ee5c90230552a42cb53e7088699ee9a0d2730093",
       "bytes": 11326
+    },
+    {
+      "path": "tests/test_claude_spend_scan.py",
+      "sha256": "bd4994e38cdadfa5b4099351261c6908875540d5be54139aa9e4f8dae4691e4b",
+      "bytes": 2669
     },
     {
       "path": "tests/test_codex_agents.py",
