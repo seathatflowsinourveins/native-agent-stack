@@ -21,6 +21,68 @@ expect('first request cache read and effort are reported', dup.first_request_cac
 expect('first request prompt size is input plus cache read plus cache creation', dup.first_request_prompt_tokens === 502)
 expect('null result is incomplete', !summarizeChild(started, { ...done, result: null }, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 expect('missing journal result is incomplete', !summarizeChild(started, null, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
+// PR-A item 6 (#381 AA-PLAN: "a final text that is a wait notice or empty is not counted as complete"; U2 design section 6). The journal
+// result is the child's return: a string, the E2E schema's { answer, evidence } (its answer is read) or another value (its leaves are read).
+// Controls that must stay complete sit beside the failures, so a rule that flags everything fails too.
+const answered = (value) => summarizeChild(started, { ...done, result: value }, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)])
+const quality = (c, issue, value) => !c.complete && c.issues.includes(issue) && c.return_quality === value
+for (const [label, value] of [['an empty answer', { answer: '', evidence: [] }], ['an empty string', ''], ['a blank string', '   '],
+  ['an empty object', {}], ['an object whose leaves are all blank', { findings: [], summary: ' ', notes: [null] }]]) {
+  expect('item 6: ' + label + ' is an empty result', quality(answered(value), 'empty result', 'empty'))
+}
+for (const [label, value] of [['a wait-notice answer', { answer: 'Waiting for monitor', evidence: [] }], ['a wait-notice string', 'Waiting for monitor'],
+  ['a still-waiting sentence', 'Still waiting for the background build to finish.'], ["an I'll-wait sentence", "I'll wait for the monitor notification."],
+  ['a typographic apostrophe', 'I’ll wait for the monitor notification.'], ['two lead words', 'Now I am waiting on CI.'],
+  ['a bold notice', '**Waiting until the job ends**'], ['an object whose only strings are wait notices', { status: 'Waiting for the monitor to report.', count: 0 }]]) {
+  expect('item 6: ' + label + ' is a wait-notice result', quality(answered(value), 'wait-notice result', 'wait_notice'))
+}
+for (const [label, value] of [['a sentence about waiting time', 'Waiting time p90 is 3 s.'],
+  ['a later sentence that waits', { answer: 'The fix is in a.py. Waiting for review is not required.', evidence: ['a.py:3'] }],
+  ['a long answer', 'Waiting for the lock is the root cause: ' + 'x'.repeat(600)], ['a word that only starts with for', 'Waiting fortunes are not a notice'],
+  ['a boolean-only object (no string to be a wait notice)', { ok: true }], ['a number', 0], ['four non-word characters before the notice', '--- Waiting for monitor']]) {
+  const c = answered(value)
+  expect('item 6: ' + label + ' is complete', c.complete && c.return_quality === 'ok' && !c.issues.some((i) => i.endsWith(' result') && i !== 'null result'))
+}
+expect('item 6: a null result keeps its issue and has no return quality', (() => { const c = answered(null); return !c.complete && c.issues.includes('null result') && c.return_quality === null })())
+expect('item 6: waitNotice reads the first sentence of at most 400 characters', typeof kernel.waitNotice === 'function'
+  && kernel.waitNotice('We will wait until the job ends.') && !kernel.waitNotice('The job ended. We will wait until the next one.') && !kernel.waitNotice('w'.repeat(390) + ' Waiting for x')
+  && !kernel.waitNotice('') && !kernel.waitNotice('I shall wait for it') && kernel.waitNotice("let me   wait on it") && !kernel.waitNotice('still now still wait for x'))
+// The transcript side (final_return): a child whose own background task (Bash run_in_background's backgroundTaskId, a Monitor or Workflow taskId,
+// or an async Agent's agentId) has no terminal <task-notification> (a <status> of completed, failed, killed or stopped) and no TaskStop by the
+// final assistant row returned while it still ran; the client stops a foreground subagent's background command at its final response
+// (code.claude.com/docs/en/tools-reference, "Background commands"). A Monitor event notification carries no status and ends nothing.
+const said = (id, blocks, minute) => ({ type: 'assistant', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':00Z', effort: 'medium',
+  message: { id, model: 'claude-sonnet-5', usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }, content: blocks } })
+const ran = (id, name, input, minute) => said('msg-' + id, [{ type: 'tool_use', id, name, input }], minute)
+const returned = (id, content, toolUseResult, minute, isError = false) => ({ type: 'user', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':30Z',
+  message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content, is_error: isError }] }, toolUseResult })
+const note = (task, status) => '<task-notification>\n<task-id>' + task + '</task-id>\n<tool-use-id>t</tool-use-id>\n' + (status ? '<status>' + status + '</status>\n' : '<event>a line</event>\n') + '<summary>s</summary>\n</task-notification>'
+const queued = (prompt, minute) => ({ type: 'attachment', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':40Z', attachment: { type: 'queued_command', prompt, commandMode: 'task-notification' } })
+const told = (text, minute) => ({ type: 'user', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':45Z', message: { role: 'user', content: text } })
+const final = (text, minute) => said('msg-final', [{ type: 'text', text }], minute)
+const bashBg = [ran('b1', 'Bash', { command: 'sleep 60', run_in_background: true }, 1), returned('b1', 'Command running in background with ID: bg1', { backgroundTaskId: 'bg1' }, 1)]
+const monitor = [ran('w1', 'Monitor', { command: 'tail -f log' }, 1), returned('w1', 'Monitor started', { taskId: 'mon1' }, 1)]
+const background = (rows) => summarizeChild(started, done, { model: 'sonnet' }, rows)
+const pendingIssue = (c, n) => !c.complete && c.issues.includes('returned with ' + n + ' background task(s) that had no completion notification')
+const bgCase = background([...bashBg, final('Done.', 3)])
+expect('item 6: a Bash background task with no notification by the final message makes the child incomplete', pendingIssue(bgCase, 1)
+  && bgCase.final_return?.background_started === 1 && bgCase.final_return?.background_pending === 1 && bgCase.final_return?.final === 'text')
+expect('item 6: a completed notification in a queued_command prompt before the final message ends the task', background([...bashBg, queued(note('bg1', 'completed'), 2), final('Done.', 3)]).complete)
+expect('item 6: a failed, killed or stopped notification in a user string ends the task too', ['failed', 'killed', 'stopped'].every((s) => background([...bashBg, told(note('bg1', s), 2), final('Done.', 3)]).complete))
+const events = background([...monitor, told(note('mon1', null), 2), final('Done.', 3)])
+expect('item 6: a Monitor whose only notification is an event (no status) is still pending', pendingIssue(events, 1) && events.final_return?.background_pending_with_events === 1)
+expect('item 6: a Monitor with a completed notification is not pending', background([...monitor, told(note('mon1', null), 2), told(note('mon1', 'completed'), 2), final('Done.', 3)]).complete)
+expect('item 6: a status outside the terminal set ends nothing (fail closed)', pendingIssue(background([...bashBg, told(note('bg1', 'running'), 2), final('Done.', 3)]), 1))
+expect('item 6: a notification after the final assistant row does not count', pendingIssue(background([...bashBg, final('Done.', 3), queued(note('bg1', 'completed'), 4)]), 1))
+expect('item 6: a TaskStop result that names the task ends it; an error TaskStop does not',
+  background([...bashBg, ran('s1', 'TaskStop', { task_id: 'bg1' }, 2), returned('s1', 'stopped', { task_id: 'bg1', task_type: 'local_bash', message: 'm', command: 'c' }, 2), final('Done.', 3)]).complete
+  && pendingIssue(background([...bashBg, ran('s1', 'TaskStop', { task_id: 'bg1' }, 2), returned('s1', '<tool_use_error>No task</tool_use_error>', 'Error: No task', 2, true), final('Done.', 3)]), 1))
+expect('item 6: Workflow taskIds and async Agent ids are background tasks as well', pendingIssue(background([ran('f1', 'Workflow', { script: 'x' }, 1), returned('f1', 'started', { status: 'async_launched', taskId: 'wf1', taskType: 'local_workflow' }, 1),
+  ran('a1', 'Agent', { prompt: 'p', run_in_background: true }, 1), returned('a1', 'launched', { status: 'async_launched', agentId: 'ag1', isAsync: true }, 1), final('Done.', 3)]), 2))
+expect('item 6: a synchronous Agent result names no background task', background([ran('a1', 'Agent', { prompt: 'p' }, 1), returned('a1', 'done', { status: 'completed', agentId: 'ag1' }, 1), final('Done.', 3)]).complete)
+const finals = [[[...bashBg, queued(note('bg1', 'completed'), 2), final('   ', 3)], { final: 'text', empty_text: 1, wait_notice: 0 }], [[final('Waiting for monitor', 3)], { final: 'text', empty_text: 0, wait_notice: 1 }],
+  [[...bashBg, queued(note('bg1', 'completed'), 2), ran('z1', 'StructuredOutput', { answer: 'x' }, 3)], { final: 'tool_use', empty_text: 0, wait_notice: 0 }]]
+expect('item 6: final_return names the final row kind and reads its text', finals.every(([rows, want]) => { const f = background(rows).final_return || {}; return f.status === 'measured' && Object.entries(want).every(([k, v]) => f[k] === v) }))
 const inherited = summarizeChild(started, done, { agentType: 'workflow' }, [msg('m1', 'claude-fable-5-1', 5)])
 expect('an omitted model is flagged as not requested explicitly, without claiming coordinator inheritance', !inherited.complete && inherited.requested_model === null && inherited.issues.some((i) => i.includes('not requested explicitly')) && !inherited.issues.some((i) => i.includes('inherits')))
 const swapped = summarizeChild(started, done, { model: 'haiku' }, [msg('m1', 'claude-haiku-4-5-20251001', 5), msg('m2', 'claude-sonnet-5', 7)])
@@ -109,6 +171,20 @@ try {
   writeFileSync(join(fell, 'agent-a1.meta.json'), JSON.stringify({ model: 'opus', agentType: 'evidence-reviewer' }))
   writeFileSync(join(fell, 'agent-a1.jsonl'), [vmsg('m1', 'claude-opus-5-5', '2.1.281'), vmsg('m2', 'claude-opus-4-8', '2.1.281')].map((e) => JSON.stringify(e)).join('\n') + '\n')
   expect('cli: a run with a fallback child exits 1 and reports the run incomplete', cli(fell, '--require-effort', 'max') === 1 && summarizeRun(fell).status === 'incomplete')
+  // PR-A item 6 at run level: a child that handed on only a wait notice leaves the run incomplete and the CLI exits 1, although every
+  // row ran at the required effort; the same run with a real answer passes (a control that the new rule does not fail every run).
+  const waiting = join(dir, 'waiting'); mkdirSync(waiting)
+  writeFileSync(join(waiting, 'journal.jsonl'), [started, { ...done, result: { answer: 'Waiting for monitor', evidence: [] } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(waiting, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(waiting, 'agent-a1.jsonl'), JSON.stringify(msg('m1', 'claude-sonnet-5', 9, 100, 0, 'max')) + '\n')
+  const waitRun = summarizeRun(waiting)
+  expect('item 6: a run whose child returned only a wait notice is incomplete and the cli exits 1', waitRun.status === 'incomplete'
+    && waitRun.children[0].issues.includes('wait-notice result') && cli(waiting, '--require-effort', 'max') === 1)
+  const answeredDir = join(dir, 'answered'); mkdirSync(answeredDir)
+  writeFileSync(join(answeredDir, 'journal.jsonl'), [started, { ...done, result: { answer: 'The fix is in a.py.', evidence: ['a.py:3'] } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(answeredDir, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(answeredDir, 'agent-a1.jsonl'), JSON.stringify(msg('m1', 'claude-sonnet-5', 9, 100, 0, 'max')) + '\n')
+  expect('item 6: the same run with a real answer is complete and the cli exits 0', summarizeRun(answeredDir).status === 'complete' && cli(answeredDir, '--require-effort', 'max') === 0)
   // A call the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting
   // agents after the reset): the attempt that returned nothing is superseded, not lost, and its usage still counts.
   const limitRow = { type: 'assistant', isApiErrorMessage: true, effort: 'max', message: { id: 'syn1', model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } }

@@ -198,6 +198,23 @@ AUTOMODE_NO_VERDICT = ("The server-side auto mode classifier gave no verdict (er
                        "This is a transient failure of the check, not a judgment about the action.")
 
 
+def said(key, blocks, timestamp="2026-09-26T01:00:00Z"):
+    """An assistant row as the client writes it: a provider message id and its content blocks (PR-A item 6 reads final messages)."""
+    return {"type": "assistant", "timestamp": timestamp, "message": {"id": key, "content": blocks}}
+
+
+def rtk_rewrite(key, command, timestamp="2026-09-26T01:00:00Z"):
+    """The PreToolUse:Bash hook row `rtk hook claude` writes when it rewrites the call `key` to `command`."""
+    return {"type": "attachment", "timestamp": timestamp, "attachment": {
+        "type": "hook_success", "hookName": "PreToolUse:Bash", "hookEvent": "PreToolUse", "toolUseID": key, "command": "rtk hook claude",
+        "stdout": json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "updatedInput": {"command": command}}})}}
+
+
+# The empty M14 counters of rtk_parts.eligible_call_states (the per-server key set of call_states.by_server).
+M14_ROW = {"attempted": 0, "executed": 0, "succeeded": 0, "failed": 0, "interrupted": 0, "rejected": 0, "invalid": 0,
+           "cancelled_with_result": 0, "cancelled_or_unfinished": 0, "unknown": 0}
+
+
 def lane_row(calls=1, carrier="bash", **counts):
     """One cli_lanes.lanes entry: `calls` calls with one invocation each, all on `carrier`, other counters zero."""
     row = {"calls": calls, "invocations": calls, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
@@ -2332,6 +2349,152 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(got["eligible_parts"], 1)
                 self.assertEqual(got["coverage"], 1)
 
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_rtk_parts_join_eligible_calls_to_their_m14_state(self):
+        """U2 design 7.3/7.4 and binding decision B5: M1's rtk-claude success signal per child-task is a Bash call with an eligible part
+        observed covered whose M14 state is succeeded (observed_covered_succeeded_calls); eligible_call_states gives every such call's
+        state. The call is `git status && git log -3`, which the rtk hook rewrote to `rtk git status && rtk git log -3`."""
+        command, rewritten = "git status && git log -3", "rtk git status && rtk git log -3"
+        base = [call("c", "Bash", command=command), rtk_rewrite("c", rewritten)]
+        cases = {"ok": (base + [result("c", "On branch main")], "succeeded", 1),
+                 "exit 128": (base + [result("c", "Exit code 128\nfatal: not a git repository", True)], "failed", 0),
+                 "hook rejection": (base + [result("c", HOOK_DENIAL, True)], "rejected", 0),
+                 "no result": (base, "cancelled_or_unfinished", 0)}
+        for name, (rows, state, succeeded) in cases.items():
+            with self.subTest(case=name):
+                got = self.measure(rows, rtkCheck=True)["rtk_parts"]
+                self.assertEqual((got["eligible_parts"], got["observed_covered_parts"], got["eligible_calls"]), (2, 2, 1))
+                executed = 1 if state in ("succeeded", "failed") else 0
+                self.assertEqual(got["eligible_call_states"], {**M14_ROW, "attempted": 1, "executed": executed, state: 1})
+                self.assertEqual(got["observed_covered_succeeded_calls"], succeeded)
+        # Covered in replay only (no hook row): eligible and succeeded, but nothing observed covered, so no M1 success.
+        got = self.measure([call("c", "Bash", command=command), result("c", "ok")], rtkCheck=True)["rtk_parts"]
+        self.assertEqual((got["replayed_covered_parts"], got["observed_covered_parts"], got["observed_covered_succeeded_calls"]), (2, 0, 0))
+        self.assertEqual(got["eligible_call_states"]["succeeded"], 1)
+        # An rtk proxy part is outside the eligible population, so the call is no opportunity at all.
+        got = self.measure([call("c", "Bash", command="rtk proxy git diff --stat"), result("c", "ok")], rtkCheck=True)["rtk_parts"]
+        self.assertEqual((got["proxy_parts"], got["eligible_calls"], got["observed_covered_succeeded_calls"]), (1, 0, 0))
+        self.assertEqual(got["eligible_call_states"], M14_ROW)
+        # The aggregate sums the states and the numerator.
+        rows = [base + [result("c", "ok")], base + [result("c", HOOK_DENIAL, True)]]
+        agg = self.exports("cu.aggregateMeasurements(x.map((rows) => cu.measureTranscript(rows, { rtkCheck: true }))).rtk_parts", rows)
+        self.assertEqual(agg["eligible_call_states"], {**M14_ROW, "attempted": 2, "executed": 1, "succeeded": 1, "rejected": 1})
+        self.assertEqual(agg["observed_covered_succeeded_calls"], 1)
+
+    # Binding decision B8: the M-R1 part splitter reads shell text with U1's frame machine (step(): quotes, escapes, comments, $(( )) and
+    # (( )), "$( )" and backquote frames, and the redirection forms of the control-operator characters), and a here-document body is data
+    # (bash(1) Here Documents; POSIX.1-2024 XCU 2.7.4). A top-level body lies between two parts and belongs to neither part's text; a body
+    # inside a part stays in its text and is masked in its syntax.
+    B8_PARTS = {
+        "cat > notes.txt <<'EOF'\nline; with && ops | \"quote\nEOF\ngit status": [["cat > notes.txt <<'EOF'", "\n"], ["git status", ""]],
+        "git commit -m \"$(cat <<'EOF'\nmsg; x && y\nEOF\n)\" && git status": [["git commit -m \"$(cat <<'EOF'\nmsg; x && y\nEOF\n)\"", "&&"], ["git status", ""]],
+        "echo $((1 + 2)) && git status": [["echo $((1 + 2))", "&&"], ["git status", ""]],
+        "(( n = 1 << 2 )); git status": [["(( n = 1 << 2 ))", ";"], ["git status", ""]],
+        "git status # a; b\ngit log -3": [["git status # a; b", "\n"], ["git log -3", ""]],
+        "git status &> /dev/null; git log -3": [["git status &> /dev/null", ";"], ["git log -3", ""]],
+        "git status >| out.txt": [["git status >| out.txt", ""]],
+        "cat <<A <<B\na;\nA\nb|\nB\ngit status": [["cat <<A <<B", "\n"], ["git status", ""]],
+        "cat <<-EOF\n\tbody;\n\tEOF\ngit status": [["cat <<-EOF", "\n"], ["git status", ""]],
+        "cat <<'END-JSON'\n{\"a\": \"b;c\"}\nEND-JSON\ngit status": [["cat <<'END-JSON'", "\n"], ["git status", ""]],
+        "cat <<EOF\nno delimiter line; git status": [["cat <<EOF", "\n"]],
+        "git log --format='%h <<EOF' && git status": [["git log --format='%h <<EOF'", "&&"], ["git status", ""]],
+        "x=$(printf '%s' \"a;b\") && git status": [["x=$(printf '%s' \"a;b\")", "&&"], ["git status", ""]],
+        "echo `git status; ls` && git log -3": [["echo `git status; ls`", "&&"], ["git log -3", ""]],
+        "git status |& tail -n 5": [["git status", "|"], ["tail -n 5", ""]],
+        "git status 2>&1 | head": [["git status 2>&1", "|"], ["head", ""]],
+        "{ git status; git log -3; } && ls": [["{ git status; git log -3; }", "&&"], ["ls", ""]],
+        "cat <<EOF | grep x && git status\nbody\nEOF\nls": [["cat <<EOF", "|"], ["grep x", "&&"], ["git status", "\n"], ["ls", ""]],
+        "sleep 1 & git status": [["sleep 1", "&"], ["git status", ""]],
+        "echo \"a\\\"b\" ; git status": [["echo \"a\\\"b\"", ";"], ["git status", ""]],
+    }
+    # Text these rules cannot read: an open quote, a ) with no ( before it, an open $( and a << with no delimiter word.
+    B8_UNPARSED = ["git status && echo \"unterminated", "git status )", "echo $(git status", "cat <<\ngit status", "git status && cat <<"]
+
+    def test_b8_shell_parts_read_heredocs_arithmetic_and_comments(self):
+        got = self.exports("x.map((c) => { const p = cu.shellParts(c); return p && p.map((q) => [q.text, q.op]) })", list(self.B8_PARTS))
+        for (command, want), parts in zip(self.B8_PARTS.items(), got):
+            with self.subTest(command=command):
+                self.assertEqual(parts, want)
+        got = self.exports("x.map((c) => cu.shellParts(c))", self.B8_UNPARSED)
+        for command, parts in zip(self.B8_UNPARSED, got):
+            with self.subTest(command=command):
+                self.assertIsNone(parts)
+        # The syntax view masks data: a > in a heredoc body inside a part, in a comment or in $(( )) is no redirection; one outside is.
+        got = self.exports("x.map((c) => cu.shellParts(c).map((q) => q.syntax))", [
+            "x=$(cat <<'EOF'\na > b\nEOF\n) && git status > out.txt", "git status # > f", "echo $((2 > 1)) && git status"])
+        self.assertNotIn(">", got[0][0])
+        self.assertIn("> out.txt", got[0][1])
+        self.assertNotIn(">", got[1][0])
+        self.assertNotIn(">", got[2][0])
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_b8_heredoc_and_arithmetic_calls_are_classified_not_unknown(self):
+        """rtk v0.50.0 rewrites no command that holds a here-document or $(( (src/discover/registry.rs rewrite_command_precompiled, tag
+        commit 1d87b8e7), so such a call runs raw: its parts are classified, and an eligible part in it is not covered. At the base these
+        calls were unknown (shellParts refused any << or $(( ), which hid every eligible part they held."""
+        cases = {"cat > notes.txt <<'EOF'\nline; with && ops\nEOF\ngit status": 1,
+                 "git commit -m \"$(cat <<'EOF'\nmsg; x\nEOF\n)\" && git status": 1,
+                 "echo $((1 + 2)) && git status": 1}
+        for command, eligible in cases.items():
+            with self.subTest(command=command):
+                got = self.measure([call("c", "Bash", command=command), result("c", "ok")], rtkCheck=True)["rtk_parts"]
+                self.assertEqual((got["calls"], got["unknown_calls"], got["eligible_parts"], got["ineligible_parts"]), (1, 0, eligible, 1))
+                self.assertEqual((got["observed_covered_parts"], got["replayed_covered_parts"]), (0, 0))
+                self.assertEqual((got["status"], got["unknown_call_share"]), ("measured", 0))
+        # A genuinely unparsable call stays unknown and is counted once however many parts it has.
+        got = self.measure([call("c", "Bash", command="git status && git log -3 && echo \"unterminated")], rtkCheck=True)["rtk_parts"]
+        self.assertEqual((got["calls"], got["unknown_calls"], got["eligible_parts"], got["unknown_call_share"]), (1, 1, 0, 1))
+        self.assertEqual(got["status"], "incomplete")
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_b8_an_unknown_call_counts_once_and_leaves_the_eligible_denominators(self):
+        """B8: a call whose parts cannot all be classified is one unknown call and adds no eligible, ineligible, observed or replayed part.
+        A stub rtk (the real binary for everything else) fails the standalone check of two parts of one call."""
+        real = shutil.which("rtk")
+        with tempfile.TemporaryDirectory() as directory:
+            stub = Path(directory) / "rtk"
+            # The kernel runs `rtk hook check --agent claude <command>`, so the command is the fifth argument.
+            stub.write_text("#!/bin/sh\nif [ \"$1\" = hook ] && { [ \"$5\" = 'echo boom1' ] || [ \"$5\" = 'echo boom2' ]; }; then\n"
+                            "  echo 'simulated failure' >&2; exit 3\nfi\nexec " + json.dumps(real) + " \"$@\"\n")
+            stub.chmod(0o755)
+            env = {**os.environ, "PATH": directory + os.pathsep + os.environ.get("PATH", "")}
+            got = self.measure([call("c", "Bash", command="git status && echo boom1 && echo boom2"), result("c", "ok")],
+                               env=env, rtkCheck=True)["rtk_parts"]
+        self.assertEqual((got["calls"], got["unknown_calls"]), (1, 1))
+        self.assertEqual((got["eligible_parts"], got["ineligible_parts"], got["eligible_calls"], got["replayed_covered_parts"]), (0, 0, 0, 0))
+        self.assertEqual(got["eligible_call_states"], M14_ROW)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_b8_explicit_rtk_counts_even_when_replay_cannot_classify_the_call(self):
+        """M-R3/M6c's zero counter reads the command's own parts, so a call that M-R1 cannot classify (here the hook's rewrite has fewer
+        parts than the command) still shows an explicit rtk on an excluded command. At the base such a call counted nothing."""
+        rows = [call("c", "Bash", command="rtk jq . a.json && git status"), rtk_rewrite("c", "rtk jq . a.json"), result("c", "ok")]
+        got = self.measure(rows, rtkCheck=True)["rtk_parts"]
+        self.assertEqual((got["unknown_calls"], got["eligible_parts"]), (1, 0))
+        self.assertEqual(got["explicit_rtk_on_excluded_or_sensitive"], 1)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_b8_status_is_incomplete_only_when_unknown_calls_exceed_five_percent_of_calls(self):
+        """B8: M-R1 is not evaluable (status incomplete) when unknown calls exceed 5% of calls, and is evaluated on parsed parts otherwise.
+        The comparison uses the integer counts (unknown * 20 > calls), and an aggregate applies it to its summed counts, not to its actors'
+        statuses."""
+        good = [[call("g%d" % i, "Bash", command="git status"), result("g%d" % i, "ok")] for i in range(19)]
+        bad = [call("u", "Bash", command="echo \"open"), result("u", "x")]
+        one = [row for rows in good for row in rows] + bad
+        got = self.measure(one, rtkCheck=True)["rtk_parts"]
+        self.assertEqual((got["calls"], got["unknown_calls"], got["status"]), (20, 1, "measured"))
+        self.assertEqual(got["unknown_call_share"], .05)
+        two = [row for rows in good[:18] for row in rows] + bad + [call("v", "Bash", command="echo 'open"), result("v", "x")]
+        got = self.measure(two, rtkCheck=True)["rtk_parts"]
+        self.assertEqual((got["calls"], got["unknown_calls"], got["status"]), (20, 2, "incomplete"))
+        self.assertEqual(got["unknown_call_share"], .1)
+        agg = self.exports("cu.aggregateMeasurements(x.map((rows) => cu.measureTranscript(rows, { rtkCheck: true })))",
+                           [bad, [row for rows in good for row in rows]])
+        self.assertEqual((agg["rtk_parts"]["calls"], agg["rtk_parts"]["unknown_calls"], agg["rtk_parts"]["status"]), (20, 1, "measured"))
+        self.assertEqual(agg["rtk_parts"]["unknown_call_share"], .05)
+        alone = self.measure(bad, rtkCheck=True)["rtk_parts"]
+        self.assertEqual(alone["status"], "incomplete")
+
     def test_unsupported_rtk_version_reports_unavailable(self):
         with tempfile.TemporaryDirectory() as directory:
             binary = Path(directory) / "rtk"
@@ -2351,6 +2514,66 @@ class TokenMeasurement(unittest.TestCase):
                     self.assertEqual(rtk_replay_supported(), expected)
         with mock.patch.object(sys, "platform", "darwin"):
             self.assertFalse(rtk_replay_supported())
+
+    # PR-A item 6 on the transcript side (U2 design 6.2, amended by the count-only scans in evidence/artifacts/pra-u2-differential-20260929/
+    # scans: final-returns, task-notifications and task-stop). A background task is a Bash backgroundTaskId, a Monitor or Workflow taskId,
+    # or an async Agent's agentId; it ends with a <task-notification> whose <status> is completed, failed, killed or stopped, or with a
+    # TaskStop result that names it; a Monitor event notification has no status and ends nothing.
+    @staticmethod
+    def final_rows(final_text, *, notify=None, ids="task-secret-1"):
+        rows = [said("msg-1", [{"type": "tool_use", "id": "toolu_bg_1", "name": "Bash", "input": {"command": "sleep 9", "run_in_background": True}}]),
+                {"type": "user", "timestamp": "2026-09-26T01:00:01Z", "toolUseResult": {"backgroundTaskId": ids},
+                 "message": {"content": [{"type": "tool_result", "tool_use_id": "toolu_bg_1", "content": "Command running in background", "is_error": False}]}}]
+        if notify:
+            rows.append({"type": "user", "timestamp": "2026-09-26T01:00:02Z", "message": {"content":
+                         "<task-notification>\n<task-id>%s</task-id>\n<status>%s</status>\n<summary>s</summary>\n</task-notification>" % (ids, notify)}})
+        rows.append(said("msg-2", [{"type": "text", "text": final_text}], "2026-09-26T01:00:03Z"))
+        return rows
+
+    def test_final_return_reads_the_final_message_and_the_actors_background_tasks(self):
+        none = {"final": None, "empty_text": None, "wait_notice": None, "background_started": None, "background_pending": None,
+                "background_pending_with_events": None}
+        cases = {"a wait notice with a task still running": (self.final_rows("Waiting for monitor"),
+                     {"status": "measured", "final": "text", "empty_text": 0, "wait_notice": 1, "background_started": 1, "background_pending": 1,
+                      "background_pending_with_events": 0}),
+                 "an empty final text after the task completed": (self.final_rows("  ", notify="completed"),
+                     {"status": "measured", "final": "text", "empty_text": 1, "wait_notice": 0, "background_started": 1, "background_pending": 0,
+                      "background_pending_with_events": 0}),
+                 "an answer after the task failed": (self.final_rows("The build failed at step 3.", notify="failed"),
+                     {"status": "measured", "final": "text", "empty_text": 0, "wait_notice": 0, "background_started": 1, "background_pending": 0,
+                      "background_pending_with_events": 0}),
+                 # The Codex bridge's rows (and these helpers) carry no provider message id: no final message to read, not a zero.
+                 "rows without a provider message": ([call("c", "Bash", command="ls"), result("c", "a")], {"status": "not_applicable", **none})}
+        for name, (rows, want) in cases.items():
+            with self.subTest(case=name):
+                self.assertEqual(self.measure(rows)["final_return"], want)
+        # An actor with a row at or after until ran past the window end: its final return lies outside the window (the review's finding on
+        # the sweep: measureTranscript itself records it, since the sweep aggregates measurements only).
+        from datetime import datetime
+        cut = datetime.fromisoformat("2026-09-26T01:00:02+00:00").timestamp() * 1000
+        got = self.measure(self.final_rows("Done."), window={"since": 0, "until": cut})["final_return"]
+        self.assertEqual(got, {"status": "unobserved", **none})
+
+    def test_final_return_aggregate_counts_actors_and_the_sweep_stays_id_free(self):
+        runs = [self.final_rows("Waiting for monitor"), self.final_rows("Done.", notify="completed"),
+                self.final_rows("Done.", notify="stopped") + [said("msg-3", [{"type": "tool_use", "id": "toolu_x", "name": "StructuredOutput", "input": {}}],
+                                                                    "2026-09-26T01:00:04Z")],
+                [call("c", "Bash", command="ls"), result("c", "a")]]
+        agg = self.exports("cu.aggregateMeasurements(x.map((rows) => cu.measureTranscript(rows))).final_return ?? null", runs)
+        self.assertEqual(agg, {"measured": 3, "not_applicable": 1, "unobserved": 0, "by_final": {"text": 2, "tool_use": 1, "other": 0},
+                               "empty_text": 0, "wait_notice": 1, "background_started": 3, "background_pending": 1,
+                               "background_pending_with_events": 0, "actors_with_background_pending": 1})
+        with tempfile.TemporaryDirectory() as directory:
+            child = Path(directory) / "root/session-a/subagents/agent-child.jsonl"
+            child.parent.mkdir(parents=True)
+            child.write_text("\n".join(json.dumps(r) for r in self.final_rows("Waiting for monitor")) + "\n")
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", str(Path(directory) / "root")], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            got = json.loads(p.stdout)
+            self.assertEqual(got["groups"]["all"]["measurement"]["final_return"]["wait_notice"], 1)
+            self.assertEqual(got["actors"][0]["measurement"]["final_return"]["background_pending"], 1)
+            for secret in ("task-secret-1", "toolu_bg_1", "msg-1", "Waiting for monitor", directory):
+                self.assertNotIn(secret, p.stdout)
 
     def test_usage_dedup_routes_partial_counters_and_completion(self):
         def message(key, output, **kw):
