@@ -413,9 +413,20 @@ function resolveHeredocs(src, inlineHttp, resolved, depth, marks) {
       // Keep source boundaries: interpreter quotes/shift syntax must not consume later shell commands or data
       // heredocs. Each source is analyzed independently; missed matches stay possible M4 fetches.
       if (source && n >= first) {
-        const body = slice(src, lines[first][0], lines[n][1]), range = marks && command.program === 'ssh' ? rawRange(body) : null
-        if (range) marks.remote.push(range) // ssh runs the body in the remote shell (OpenSSH ssh(1))
-        sources.push(executedTrace(body, inlineHttp, resolved, depth + 1, marks))
+        const body = slice(src, lines[first][0], lines[n][1]), remote = marks && command.program === 'ssh' // ssh runs the body in the remote shell (OpenSSH ssh(1))
+        if (h.quoted) {
+          const range = remote ? rawRange(body) : null
+          if (range) marks.remote.push(range)
+          sources.push(executedTrace(body, inlineHttp, resolved, depth + 1, marks))
+        } else {
+          // Two views, as for a double-quoted string a shell runs (D7; bash(1) Here Documents, POSIX.1-2024 XCU 2.7.4): the shell that
+          // read the command line expands an unquoted-delimiter body first (each unescaped $( ) and backquote runs there, whatever
+          // its quotes or a comment say), and the shell that reads the heredoc sees the expanded text.
+          const spans = outerSpans(body.s, depth), view = withoutSpans(body, spans)
+          for (const span of spans) sources.push(outerBody(body, span, inlineHttp, resolved, depth, marks))
+          if (remote) { let at = 0; for (const span of [...spans, { from: body.s.length, to: body.s.length }]) { const range = rawRange(slice(body, at, span.from)); if (range) marks.remote.push(range); at = span.to } }
+          sources.push(executedTrace(heredocText(view), inlineHttp, resolved, depth + 1, marks))
+        }
       } else if (source) sources.push({ s: '', p: [] })
       if (n + 1 < lines.length) n++ // closing delimiter
     }
@@ -493,6 +504,17 @@ function withoutSpans(inner, spans) {
   let at = 0
   for (const span of spans) { append(out, slice(inner, at, span.from)); insert(out, '_'); at = span.to }
   append(out, slice(inner, at, inner.s.length))
+  return out
+}
+// The text a shell reads from an unquoted-delimiter heredoc body once the shell that expanded it has run: a backslash before $ ` \
+// or a newline is removed, and an escaped newline with it (bash(1) Here Documents); quotes are literal in a body, and any other
+// backslash stays. Offsets stay raw.
+function heredocText(t) {
+  const out = { s: '', p: [] }
+  for (let i = 0; i < t.s.length; i++) {
+    if (t.s[i] === '\\' && i + 1 < t.s.length && '$`\\\n'.includes(t.s[i + 1])) { i++; if (t.s[i] === '\n') continue }
+    out.s += t.s[i]; out.p.push(t.p[i])
+  }
   return out
 }
 // The commands one outer substitution runs, as executed text. The body of a "$( )" is shell text as written (double quotes leave
