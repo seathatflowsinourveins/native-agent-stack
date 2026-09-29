@@ -118,6 +118,28 @@ class PraU1EvidenceTooling(unittest.TestCase):
         self.assertEqual((shapes.get("longest_command_chars"), shapes.get("most_heredoc_operators_in_a_command"), shapes.get("most_array_openers_in_a_command")),
                          (max(len(t) for t in texts), 2, 2))
 
+    def real_shells(self, *extra):
+        done = subprocess.run(["python3", str(EVIDENCE / "m4-real-shells.py"), "--repo", str(ROOT), *extra], capture_output=True, text=True, timeout=600, check=False)
+        return done, (json.loads(done.stdout) if done.stdout.strip().startswith("{") else None)
+
+    @unittest.skipUnless(shutil.which("node") and shutil.which("bash") and shutil.which("dash"), "node, bash and dash are needed")
+    def test_m4_fixtures_agree_with_real_bash_and_dash_and_the_kernel(self):
+        """m4-real-shells.py runs every fixture of the M4 decisions (D7, R1, R3, heredoc expansion, backquote anchor) under real bash and dash with
+        a stub curl: the stub must run as often as documented in both shells, and the kernel must call a fetch confirmed exactly when it ran."""
+        done, report = self.real_shells()
+        self.assertEqual(done.returncode, 0, done.stdout[-1500:] + done.stderr[-1500:])
+        self.assertEqual((report["fixtures"], report["agree"], report["disagree"]), (75, 75, 0))
+        self.assertEqual(sorted(report["groups"]), ["BQ_DATA", "BQ_ONCE", "D7_DATA", "D7_EXECUTED", "D7_INNER", "D7_TWICE", "HD_DATA", "HD_ONCE", "HD_TWICE",
+                                                    "R1_DATA", "R1_EXECUTED", "R1_MULTILINE", "R3_EXECUTED"])
+        self.assertNotIn("example.org", done.stdout)  # counts only: no command text
+
+    @unittest.skipUnless(shutil.which("node") and shutil.which("bash") and shutil.which("dash"), "node, bash and dash are needed")
+    def test_m4_real_shells_probe_fails_when_the_stub_curl_logs_nothing(self):
+        """Negative control of the probe itself: with stubs that log nothing, the 67 fixtures that should run curl disagree and the exit is 1."""
+        done, report = self.real_shells("--control", "silent-curl")
+        self.assertEqual(done.returncode, 1, done.stdout[-1500:] + done.stderr[-1500:])
+        self.assertEqual((report["fixtures"], report["disagree"], report["control"]), (75, 67, "silent-curl"))
+
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_identity_check_compares_whole_lane_records_of_two_kernels(self):
         """--fields lanes compares commandInvocations and measureTranscript(...).cli_lanes of two kernels, input by input: a
