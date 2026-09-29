@@ -8167,5 +8167,179 @@ class F29c_ArgvSanitizer(GraderCase):
         self.assertFalse(target.exists(), "nothing is created when the command is refused")
 
 
+# ---- F19 (repair round): disarmed-guard mutants (U9-D19) -------------------------------------------------------------------
+# Each guard the repair round added is patched back to the behaviour the review found; exactly the tests written for it fail
+# and the guard tests beside them stay green, so a mutant is minimal.
+
+def repair_mutant(case, patches, held, flipped):
+    case.assertEqual(failing_with(patches, list(held) + list(flipped)), {full(name) for name in flipped})
+
+
+class F19d_RepairRoundMutants(GraderCase):
+    def test_M52_a_bare_candidate_that_does_not_decode_counts_as_an_unequal_trip(self):
+        require_toon()
+        ev, fc = evm(), load("frozen_checks")
+
+        def parent_items(ans, records, readings):  # the stage-3 head's _answer_toon_items
+            items = []
+            for candidate in fc.payload_candidates(ans):
+                first = next((line for line in candidate["text"].split("\n") if line.strip()), "")
+                if not fc.toon_header(first) or first.lstrip().startswith("- "):
+                    continue
+                if records is None:
+                    if readings["R2-16"] == "unknown_in_denominator":
+                        items.append({"source": "answer", "status": "unknown"})
+                    continue
+                try:
+                    value = fc.decode_candidate(candidate["text"])
+                except fc.DecodeError:
+                    items.append({"source": "answer", "status": "unequal"})
+                    continue
+                shaped = ev._document_records(value, readings)
+                items.append({"source": "answer", "status": "equal" if shaped is not None
+                              and ev._records_equal(shaped, records, readings) else "unequal"})
+            return items
+        held = ["F28_M7.test_an_unfenced_toon_answer_alone_is_still_one_equal_round_trip",
+                "F28_M7.test_an_answer_payload_is_compared_with_the_frozen_original"]
+        flipped = ["F28_M7.test_an_unfenced_toon_answer_with_a_line_after_it_is_one_equal_round_trip",
+                   "F28_M7.test_an_unfenced_toon_answer_that_is_wrong_is_one_unequal_round_trip",
+                   "F28_M7.test_the_round_trip_rate_of_an_unfenced_answer_with_a_sum_line_is_one_on_both_bounds"]
+        repair_mutant(self, [mock.patch.object(ev, "_answer_toon_items", parent_items)], held, flipped)
+
+    def test_M53_toon_options_are_read_from_every_word_of_the_call(self):
+        require_toon()
+        ev = evm()
+        held = ["F28_M7.test_the_output_option_of_the_toon_command_itself_still_makes_the_encode_unknown",
+                "F28_M7.test_a_decode_with_a_heredoc_still_makes_a_round_trip_item_when_a_cut_option_precedes_it",
+                "F28_M7.test_a_child_side_decode_with_the_input_in_a_heredoc_is_a_round_trip_item"]
+        flipped = ["F28_M7.test_an_encode_and_a_decode_in_one_command_both_count",
+                   "F28_M7.test_a_pipeline_that_ends_in_a_decode_is_an_unresolvable_encode_not_a_missing_one",
+                   "F28_M7.test_an_option_of_another_program_is_not_a_toon_option"]
+        repair_mutant(self, [mock.patch.object(ev, "toon_invocations", lambda text: [])], held, flipped)
+
+    def test_M54_an_extraction_value_outside_its_quote_is_accepted(self):
+        require_toon()
+        fc = load("frozen_checks")
+
+        def quotes_only(item, raw):
+            quotes = item.get("answer_quotes")
+            return isinstance(quotes, list) and bool(quotes) and all(isinstance(q, str) and q and q in raw for q in quotes)
+        held = ["F7_T0.test_words_for_numbers_are_unparsed_until_d_extract_quotes_them",
+                "F28_M7.test_d_extract_supplies_a_payload_the_candidates_missed"]
+        flipped = ["F7_T0.test_an_extraction_value_that_is_not_inside_its_quote_is_judge_quote",
+                   "F28_M7.test_a_payload_extraction_value_that_is_not_inside_its_quote_is_judge_quote"]
+        repair_mutant(self, [mock.patch.object(fc, "verified_extraction", quotes_only)], held, flipped)
+
+    def test_M55_a_frozen_record_is_matched_by_its_bare_stem(self):
+        ev = evm()
+
+        def stem_match(text, record):  # the stage-3 head's resolves_to_record
+            def bounded(token):
+                start = 0
+                while True:
+                    index = text.find(token, start)
+                    if index < 0:
+                        return False
+                    before = text[index - 1] if index else " "
+                    after = text[index + len(token)] if index + len(token) < len(text) else " "
+                    if not (load("frozen_checks").is_word_char(before) or before == "-") \
+                            and not (load("frozen_checks").is_word_char(after) or after == "-"):
+                        return True
+                    start = index + 1
+            if not isinstance(text, str):
+                return False
+            if record.get("content_sha256") and record["content_sha256"] in text:
+                return True
+            name = record["path"].rsplit("/", 1)[-1]
+            return record["path"] in text or bounded(name[:-3] if name.endswith(".md") else name)
+        held = ["F25b_MemoryHits.test_a_result_that_names_a_frozen_record_is_a_hit",
+                "F25b_MemoryHits.test_the_frozen_digest_also_resolves_to_the_record",
+                "F25b_MemoryHits.test_only_a_later_session_page_is_not_a_hit"]
+        flipped = ["F25b_MemoryHits.test_a_bare_slug_is_not_a_frozen_id",
+                   "F25b_MemoryHits.test_a_later_page_that_only_mentions_the_same_slug_is_not_a_hit",
+                   "F25b_MemoryHits.test_a_longer_path_that_only_contains_the_frozen_path_is_another_record"]
+        repair_mutant(self, [mock.patch.object(ev, "resolves_to_record", stem_match)], held, flipped)
+
+    def test_M56_a_flag_written_with_equals_is_recorded_verbatim(self):
+        gr = load("grade")
+
+        def parent_sanitize(argv):  # the stage-3 head's sanitize_argv
+            tokens, clean, index = [str(item) for item in argv], ["python3", "tools/token-e2e/grade.py"], 0
+            while index < len(tokens):
+                token = tokens[index]
+                clean.append(token)
+                if token.startswith("--") and index + 1 < len(tokens):
+                    name = gr.PATH_FLAGS.get(token)
+                    if name:
+                        head, sep, _ = tokens[index + 1].partition("=")
+                        clean.append(f"{head}=<{name}>" if sep and "/" not in head else f"<{name}>")
+                        index += 2
+                        continue
+                index += 1
+            return clean
+        held = ["F29_Export.test_grade_records_a_sanitized_command_and_regrade_records_its_own"]
+        flipped = ["F29c_ArgvSanitizer.test_flag_equals_value_is_recorded_as_a_placeholder",
+                   "F29c_ArgvSanitizer.test_every_path_flag_is_a_placeholder_in_both_spellings",
+                   "F29c_ArgvSanitizer.test_a_grade_run_that_spells_its_flags_with_equals_records_no_path"]
+        repair_mutant(self, [mock.patch.object(gr, "sanitize_argv", parent_sanitize)], held, flipped)
+
+    def test_M56b_an_abbreviated_flag_is_accepted(self):
+        gr = load("grade")
+
+        def abbreviating(self, *args, **kwargs):
+            import argparse
+            argparse.ArgumentParser.__init__(self, *args, **dict(kwargs, allow_abbrev=True))
+        held = ["F29c_ArgvSanitizer.test_flag_equals_value_is_recorded_as_a_placeholder"]
+        flipped = ["F29c_ArgvSanitizer.test_an_abbreviated_flag_is_a_usage_refusal"]
+        repair_mutant(self, [mock.patch.object(gr.Parser, "__init__", abbreviating)], held, flipped)
+
+    def test_M56c_the_export_backstop_is_off(self):
+        gr = load("grade")
+        held = ["F29_Export.test_the_manifest_holds_only_placeholders_and_attaches_the_aggregate_by_a_relative_path"]
+        flipped = ["F29c_ArgvSanitizer.test_export_refuses_a_recorded_command_that_still_holds_a_path"]
+        repair_mutant(self, [mock.patch.object(gr, "argv_issue", lambda argv: None)], held, flipped)
+
+    def test_M57_the_canary_gathers_every_row_string_and_the_instruction_anchors(self):
+        ev = evm()
+        real = ev.canary_values
+
+        def wide(bindings, table, records):
+            values = set(real(bindings, table, records))
+            for row in table.get("rows", []):
+                values.update(str(item) for item in row.values() if isinstance(item, str))
+            roots = bindings.get("roots") or {}
+            values.update(str(item) for item in roots.get("instruction_anchors") or [])
+            return sorted(value for value in values if len(value) >= 8)
+        held = ["F17b_CanaryScope.test_identifiers_paths_and_roots_are_canary_values",
+                "F29b_CheckHtml.test_check_html_refuses_each_planted_value_and_shape"]
+        flipped = ["F17b_CanaryScope.test_the_actor_vocabulary_and_the_instruction_lines_are_not_canary_values",
+                   "F29b_CheckHtml.test_check_html_lets_the_actor_vocabulary_through",
+                   "F35_JudgeRoutes.test_an_answer_that_quotes_an_instruction_file_line_still_yields_packets"]
+        repair_mutant(self, [mock.patch.object(ev, "canary_values", wide)], held, flipped)
+
+    def test_M58_a_field_name_is_not_read_through_its_words(self):
+        fc = load("frozen_checks")
+        held = ["H3_FieldNamedFacts.test_t32_a_fact_named_by_its_field_name_is_read",
+                "H3_FieldNamedFacts.test_a_count_named_by_a_field_is_not_a_sum"]
+        flipped = ["H3_FieldNamedFacts.test_a_stated_sum_named_by_its_field_name_is_read",
+                   "H3_FieldNamedFacts.test_a_wrong_or_hedged_sum_named_by_its_field_name_is_not_a_pass",
+                   "H3_FieldNamedFacts.test_the_underscore_stays_a_word_character_for_whole_word_readings"]
+        repair_mutant(self, [mock.patch.object(fc, "spaced_identifiers", lambda text: text)], held, flipped)
+
+    def test_M59_a_negated_level_word_is_a_level(self):
+        fc = load("frozen_checks")
+        held = ["H3_PositiveControlOracle.test_a_level_that_is_really_there_still_fails",
+                "H3_PositiveControlOracle.test_quoted_raw_rows_are_read_by_their_event_field"]
+        flipped = ["H3_PositiveControlOracle.test_a_negated_level_word_is_not_a_level"]
+        repair_mutant(self, [mock.patch.object(fc, "level_is_negated", lambda text, position: False)], held, flipped)
+
+    def test_M60_number_words_are_left_as_words(self):
+        fc = load("frozen_checks")
+        held = ["F7_T0.test_an_extraction_value_that_is_not_inside_its_quote_is_judge_quote"]
+        flipped = ["F7_T0.test_words_for_numbers_are_unparsed_until_d_extract_quotes_them",
+                   "F7_T0.test_the_number_word_reader_is_extraction_only_and_g1_is_unchanged"]
+        repair_mutant(self, [mock.patch.object(fc, "spelled_numbers_to_digits", lambda text: text)], held, flipped)
+
+
 if __name__ == "__main__":
     unittest.main()
