@@ -1500,6 +1500,418 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(state[3], want[1])  # the accessor is the flag
                 self.assertEqual(state[2] is not None, want[1])  # a cause exactly when the call did not run
 
+    @staticmethod
+    def m14_rows(session=None, agent=None):
+        """The M14 fixtures: U2 design 4.6 with the review's corrections (every not-executed fixture states is_error and its exact
+        toolUseResult; a call that has a result is never 'no result') and the shapes of scans/call-states.json. Codex calls are
+        bridge-normalized rows, which carry no sessionId or agentId. Returns (rows, {call number: (state, cause)})."""
+        ident = {k: v for k, v in (("sessionId", session), ("agentId", agent)) if v}
+
+        def c(n, name, **inputs):
+            return {**call("toolu_m14_%02d" % n, name, **inputs), **ident}
+
+        def r(n, content, error=True, **row):
+            return {**result("toolu_m14_%02d" % n, content, error), **ident, **row}
+
+        def codex(n, **fields):
+            row = call("toolu_m14_%02d" % n, "Bash", command="qmd search x")
+            row["message"]["content"][0].update(fields)
+            return row
+
+        unknown = result("toolu_m14_18", "Chunk ID: 1\nOutput:\nx")
+        unknown["message"]["content"][0]["native_state"] = "unknown"
+        marker = {"type": "user", "timestamp": "2026-09-26T01:00:02Z", **ident,
+                  "message": {"role": "user", "content": [{"type": "text", "text": INTERRUPT_MARKER}]}}
+        rows = [
+            c(1, "Bash", command="ls"), r(1, "a\nb", False),
+            c(2, "Bash", command="false"), r(2, "Exit code 1", toolUseResult="Error: Exit code 1"),
+            c(3, "Bash", command="rm -rf build"), r(3, HOOK_DENIAL, toolDenialKind="permission-rule", toolUseResult="Error: " + HOOK_DENIAL),
+            c(4, "Bash", command="rm -rf build"), r(4, PERMISSION_TO_USE, toolUseResult="Error: " + PERMISSION_TO_USE),
+            c(5, "Edit", file_path="a.py"), r(5, USER_REJECTION, toolDenialKind="user-rejected", toolUseResult="User rejected tool use"),
+            c(6, "Edit", file_path="a.py"), r(6, USER_REJECTION, toolUseResult="Error: " + USER_REJECTION),
+            c(7, "Read"), r(7, "<tool_use_error>InputValidationError: Read failed due to the following issue:\n"
+                               "The required parameter `file_path` is missing</tool_use_error>",
+                            toolUseResult="InputValidationError: [file_path: Required]"),
+            c(8, "mcp__qmd__search", query="x"), r(8, "<tool_use_error>Error: No such tool available: mcp__qmd__search</tool_use_error>",
+                                                  toolUseResult="Error: No such tool available: mcp__qmd__search"),
+            c(9, "Bash", command="sleep 1"), r(9, "<tool_use_error>Cancelled: Claude ended the conversation</tool_use_error>",
+                                               toolUseResult="Cancelled: Claude ended the conversation"),
+            c(10, "Grep", pattern="x"),
+            c(11, "Bash", command="sleep 60", run_in_background=True),
+            r(11, "Command running in background with ID: bg1", False, toolUseResult={"backgroundTaskId": "bg1"}),
+            c(12, "mcp__plugin_context-mode_context-mode__ctx_execute", language="shell", code="ls"),
+            r(12, USER_REJECTION, toolDenialKind="user-rejected", toolUseResult="User rejected tool use"),
+            codex(13, native_status="declined"),
+            c(14, "Bash", command="make"), r(14, USER_REJECTION, toolDenialKind="user-rejected", toolUseResult="User rejected tool use"), marker,
+            c(15, "Bash", command="make"), r(15, NOT_RUN, toolUseResult="Error: " + NOT_RUN),
+            c(16, "Bash", command="make"), r(16, INTERRUPT_MARKER),
+            c(17, "Bash", command="make"), r(17, "partial", False, toolUseResult={"stdout": "partial", "stderr": "", "interrupted": True}),
+            codex(18), unknown,
+            c(19, "Bash", command="make"),
+            r(19, AUTOMODE_NO_VERDICT, toolDenialKind="automode-unavailable", toolUseResult="Error: " + AUTOMODE_NO_VERDICT),
+            codex(20, native_status="completed", sandbox=True),
+        ]
+        want = {1: ("succeeded", None), 2: ("failed", None), 3: ("rejected", "hook"), 4: ("rejected", "config"), 5: ("rejected", "user"),
+                6: ("rejected", "user"), 7: ("invalid", "invalid"), 8: ("invalid", "invalid"), 9: ("cancelled_with_result", "cancelled"),
+                10: ("cancelled_or_unfinished", None), 11: ("succeeded", None), 12: ("rejected", "user"), 13: ("rejected", "declined"),
+                14: ("rejected", "user"), 15: ("cancelled_with_result", "cancelled"), 16: ("cancelled_with_result", "cancelled"),
+                17: ("interrupted", None), 18: ("unknown", None), 19: ("rejected", "other"), 20: ("succeeded", None)}
+        return rows, want
+
+    M14_SERVER_KEYS = ("attempted", "executed", "succeeded", "failed", "interrupted", "rejected", "invalid", "cancelled_with_result",
+                       "cancelled_or_unfinished", "unknown")
+
+    def m14_server_row(self, **counts):
+        return {**dict.fromkeys(self.M14_SERVER_KEYS, 0), **counts}
+
+    def assert_m14_invariants(self, states):
+        """attempted = executed + rejected + invalid + cancelled_with_result + cancelled_or_unfinished + unknown, per actor and per server;
+        executed = succeeded + failed + interrupted; the rejection sources add up to rejected."""
+        for label, row in [("actor", states), *states["by_server"].items()]:
+            with self.subTest(invariant=label):
+                self.assertEqual(row["attempted"], row["executed"] + row["rejected"] + row["invalid"] + row["cancelled_with_result"]
+                                 + row["cancelled_or_unfinished"] + row["unknown"])
+                self.assertEqual(row["executed"], row["succeeded"] + row["failed"] + row["interrupted"])
+        self.assertEqual(sum(states["rejected_by_source"].values()), states["rejected"])
+
+    def test_m14_call_states_one_vocabulary(self):
+        """PR-A item 7 (U2 design 4.2-4.7 with the review's corrections). call_states projects U1's callState onto the sealed M14 names
+        (E2E README.md M14 row; preregistration.json thresholds.M14.criteria.states): a call that has a transcript result is executed
+        (succeeded, failed or interrupted), rejected (by source, in the OTel tool_decision vocabulary), invalid or cancelled_with_result,
+        never 'no result'; cancelled_or_unfinished is the sealed state, the calls with no result. decided is null: transcripts cannot
+        observe the Loki tool_decision event. mcp_states keeps its #432 reading, and calls_without_result its published meaning: the
+        calls with no result, the cancelled_or_unfinished ones plus the ones a native status decided (call 13 here)."""
+        rows, want = self.m14_rows()
+        got = self.measure(rows)
+        self.assertEqual(got.get("call_states"), {
+            "attempted": 20, "decided": None, "executed": 5, "succeeded": 3, "failed": 1, "interrupted": 1, "rejected": 8,
+            "rejected_by_source": {"config": 1, "hook": 1, "user": 4, "other": 1, "declined": 1}, "invalid": 2, "cancelled_with_result": 3,
+            "cancelled_or_unfinished": 1, "unknown": 1, "background": 1, "sandbox": 1,
+            "by_server": {"qmd": self.m14_server_row(attempted=1, invalid=1),
+                          "plugin_context-mode_context-mode": self.m14_server_row(attempted=1, rejected=1)}})
+        self.assert_m14_invariants(got["call_states"])
+        # The #432 legacy view, unchanged (a result's is_error, else the native status); it counts the same attempts per server.
+        self.assertEqual(got["mcp_states"], {"qmd": {"attempted": 1, "succeeded": 0, "failed": 1, "unfinished": 0},
+                                             "plugin_context-mode_context-mode": {"attempted": 1, "succeeded": 0, "failed": 1, "unfinished": 0}})
+        for server, row in got["mcp_states"].items():
+            self.assertEqual(row["attempted"], got["call_states"]["by_server"][server]["attempted"])
+        # calls_without_result: calls 10 (no status: cancelled_or_unfinished) and 13 (declined, a native status decided it); 20 is nested.
+        self.assertEqual(got["calls_without_result"], 2)
+        # The per-call projection, exported for the ledger and its consumers.
+        states = self.exports("x.map((rows) => { const call = rows[0].message.content[0], r = rows[1] && rows[1].message.content.find("
+                              "(b) => b.type === 'tool_result'); const m = cu.m14State(call, r ? { ...r, row: rows[1] } : null);"
+                              " return [m.state, m.cause, m.executed] })",
+                              [[rows[i], rows[i + 1] if i + 1 < len(rows) and rows[i + 1]["type"] == "user"
+                                and rows[i + 1]["message"]["content"][0].get("type") == "tool_result" else None]
+                               for i in range(len(rows)) if rows[i]["type"] == "assistant"])
+        executed = {"succeeded", "failed", "interrupted"}
+        for n, state in zip(sorted(want), states):
+            with self.subTest(call=n):
+                self.assertEqual(tuple(state), (*want[n], want[n][0] in executed))
+
+    def test_m14_call_states_aggregate_and_window(self):
+        """aggregateMeasurements sums call_states and by_server (decided stays null); a call counts in the window of its tool_use row."""
+        rows, _ = self.m14_rows()
+        agg = self.exports("(() => { const a = cu.measureTranscript(x.rows), b = cu.measureTranscript(x.rows); "
+                           "return cu.aggregateMeasurements([a, b]).call_states })()", {"rows": rows})
+        self.assertEqual((agg["attempted"], agg["decided"], agg["rejected"], agg["rejected_by_source"]["user"], agg["background"]),
+                         (40, None, 16, 8, 2))
+        self.assertEqual(agg["by_server"]["qmd"], self.m14_server_row(attempted=2, invalid=2))
+        self.assert_m14_invariants(agg)
+        empty = self.exports("cu.aggregateMeasurements([]).call_states", {})
+        self.assertEqual((empty["attempted"], empty["decided"], empty["by_server"]), (0, None, {}))
+        early = [{**r, "timestamp": "2026-09-26T00:00:00Z"} if r.get("type") == "assistant" and "toolu_m14_01" in json.dumps(r) else r
+                 for r in rows]
+        windowed = self.exports("cu.measureTranscript(x.rows, { window: { since: Date.parse('2026-09-26T00:30:00Z'), until: Infinity } })"
+                                ".call_states", {"rows": early})
+        self.assertEqual((windowed["attempted"], windowed["succeeded"]), (19, 2))
+
+    def test_call_ledger_records_every_attempted_call_privately(self):
+        """AA:319, the per-child list of tool_use_ids with each call's state (scope item 7), keyed by (session_id, tool_use_id) as the M14
+        row requires. session_id and owner come from the call's row: owner is its agentId, 'main' for a row with a sessionId and no
+        agentId, and null for a row with neither (a Codex bridge row: U3 supplies conversation.id and the owner kind)."""
+        rows, want = self.m14_rows(session="sess-fixture-1", agent="agent-fixture-1")
+        ledger = self.exports("cu.callLedger(x.rows)", {"rows": rows})
+        self.assertEqual(len(ledger), 20)
+        by_id = {r["tool_use_id"]: r for r in ledger}
+        for n, (state, cause) in want.items():
+            with self.subTest(call=n):
+                record = by_id["toolu_m14_%02d" % n]
+                self.assertEqual((record["state"], record["cause"]), (state, cause))
+                codex = n in (13, 18, 20)
+                self.assertEqual((record["session_id"], record["owner"]),
+                                 (None, None) if codex else ("sess-fixture-1", "agent-fixture-1"))
+        self.assertEqual(sorted(by_id["toolu_m14_12"]), ["background", "cause", "code_mode", "m15_class", "native_status", "owner",
+                                                          "sandbox", "server", "session_id", "state", "tool", "tool_use_id"])
+        self.assertEqual((by_id["toolu_m14_12"]["server"], by_id["toolu_m14_12"]["tool"], by_id["toolu_m14_12"]["m15_class"]),
+                         ("plugin_context-mode_context-mode", "mcp__plugin_context-mode_context-mode__ctx_execute", "rejected"))
+        self.assertEqual((by_id["toolu_m14_13"]["native_status"], by_id["toolu_m14_20"]["sandbox"], by_id["toolu_m14_11"]["background"]),
+                         ("declined", True, True))
+        self.assertIsNone(by_id["toolu_m14_01"]["m15_class"])
+        main_rows, _ = self.m14_rows(session="sess-fixture-2")
+        self.assertEqual(self.exports("cu.callLedger(x.rows)[0].owner", {"rows": main_rows}), "main")
+        # Nothing of the ledger reaches the published measurement.
+        published = json.dumps(self.measure(rows))
+        for secret in ("toolu_m14", "sess-fixture-1", "agent-fixture-1"):
+            self.assertNotIn(secret, published)
+
+    def ledger_sweep_root(self, directory):
+        """A sweep root with one child transcript of the M14 fixtures and one main session transcript."""
+        root = Path(directory) / "root"
+        child = root / "session-a/subagents/agent-child.jsonl"
+        child.parent.mkdir(parents=True)
+        rows, _ = self.m14_rows(session="sess-fixture-1", agent="agent-fixture-1")
+        child.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+        main_rows = [{**call("toolu_main_01", "Bash", command="ls"), "sessionId": "sess-fixture-1"},
+                     {**result("toolu_main_01", "a"), "sessionId": "sess-fixture-1"}]
+        (root / "session-a.jsonl").write_text("\n".join(json.dumps(r) for r in main_rows) + "\n")
+        return root
+
+    def test_call_ledger_cli_writes_a_private_file_and_stdout_stays_id_free(self):
+        """--call-ledger PATH (U2 design 4.5, with the review's corrections): JSONL, one record per attempted call, created with mode 0600
+        and never over an existing file; the sweep adds the published actor ordinal. Stdout stays free of every call id, session id and
+        agent id and of the directory, and no ledger is written without the flag."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.ledger_sweep_root(directory)
+            ledger = Path(directory) / "private/calls.jsonl"
+            ledger.parent.mkdir()
+            plain = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", str(root)], capture_output=True, text=True)
+            self.assertEqual(plain.returncode, 0, plain.stderr)
+            self.assertEqual(sorted(p.name for p in ledger.parent.iterdir()), [])
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", str(root), "--call-ledger", str(ledger)],
+                               capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            self.assertEqual(p.stdout, plain.stdout)
+            self.assertEqual(oct(ledger.stat().st_mode & 0o777), "0o600")
+            records = [json.loads(line) for line in ledger.read_text().splitlines()]
+            self.assertEqual(len(records), 21)
+            got = json.loads(p.stdout)
+            ordinals = {a["actor"]: a["ordinal"] for a in got["actors"]}
+            self.assertEqual({r["actor_ordinal"] for r in records if r["owner"] == "main"}, {ordinals["main"]})
+            self.assertEqual({r["actor_ordinal"] for r in records if r["owner"] == "agent-fixture-1"}, {ordinals["child"]})
+            self.assertEqual(got["groups"]["all"]["measurement"]["call_states"]["attempted"], 20)
+            for secret in ("toolu_m14", "toolu_main", "sess-fixture-1", "agent-fixture-1", directory):
+                self.assertNotIn(secret, p.stdout)
+
+    def test_call_ledger_cli_refusals_write_nothing(self):
+        """Exit 2 and nothing written, before any output, for: a path inside this repository or inside any git work tree (the ledger holds
+        ids; skill_usage.py write_out's precedent, widened to every work tree), an existing file (create-only, so an existing file's mode
+        never stands for 0600: the review's finding on the precedent at mkdtemp), a missing directory, and the flag given twice."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.ledger_sweep_root(directory)
+            other = Path(directory) / "other-checkout"
+            (other / ".git").mkdir(parents=True)
+            (other / "sub").mkdir()
+            existing = Path(directory) / "existing.jsonl"
+            existing.write_text("keep\n")
+            existing.chmod(0o644)
+            inside = ROOT / "calls-refused.jsonl"
+            # Control: a new file in a directory outside every work tree is written, so the refusals below are not an unknown option.
+            accepted = Path(directory) / "accepted.jsonl"
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", str(root), "--call-ledger", str(accepted)],
+                               capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            self.assertTrue(accepted.is_file())
+            cases = {"inside this repository": [str(inside)], "inside another work tree": [str(other / "sub/calls.jsonl")],
+                     "an existing file": [str(existing)], "a missing directory": [str(Path(directory) / "absent/calls.jsonl")],
+                     "given twice": [str(Path(directory) / "a.jsonl"), "--call-ledger", str(Path(directory) / "b.jsonl")]}
+            for name, args in cases.items():
+                with self.subTest(case=name):
+                    p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", str(root), "--call-ledger", *args],
+                                       capture_output=True, text=True)
+                    self.assertEqual((p.returncode, p.stdout), (2, ""))
+                    self.assertIn("--call-ledger", p.stderr)
+                    self.assertNotIn("unknown option", p.stderr)
+            self.assertFalse(inside.exists())
+            self.assertFalse((other / "sub/calls.jsonl").exists())
+            self.assertEqual((existing.read_text(), oct(existing.stat().st_mode & 0o777)), ("keep\n", "0o644"))
+            self.assertFalse((Path(directory) / "a.jsonl").exists())
+
+    def test_call_ledger_run_mode_labels_attempts_and_run_stdout_has_no_call_or_session_ids(self):
+        """Run mode: each record carries the child's journal label and whether its attempt was superseded. The review's run-mode contract:
+        stdout holds agent ids and the transcript directory by design, but no tool_use_id and no sessionId value."""
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory) / "wf_run"
+            run.mkdir()
+            rows, _ = self.m14_rows(session="sess-fixture-1", agent="a1")
+            usage = {"type": "assistant", "timestamp": "2026-09-26T01:00:03Z", "sessionId": "sess-fixture-1", "agentId": "a1",
+                     "effort": "max", "message": {"id": "m1", "model": "claude-opus-5-5", "usage": {
+                         "input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}}}
+            (run / "agent-a1.jsonl").write_text("\n".join(json.dumps(r) for r in rows + [usage]) + "\n")
+            (run / "agent-a1.meta.json").write_text(json.dumps({"model": "opus", "agentType": "workflow"}))
+            (run / "journal.jsonl").write_text("\n".join(json.dumps(e) for e in [
+                {"type": "started", "agentId": "a1", "label": "inventory", "key": "k1"},
+                {"type": "result", "agentId": "a1", "result": {"answer": "done"}}]) + "\n")
+            ledger = Path(directory) / "run-calls.jsonl"
+            p = subprocess.run(["node", str(MODULE), str(run), "--call-ledger", str(ledger)], capture_output=True, text=True)
+            self.assertIn(p.returncode, (0, 1), p.stderr)
+            records = [json.loads(line) for line in ledger.read_text().splitlines()]
+            self.assertEqual(len(records), 20)
+            self.assertEqual({(r["label"], r["superseded"]) for r in records}, {("inventory", False)})
+            self.assertEqual(oct(ledger.stat().st_mode & 0o777), "0o600")
+            for secret in ("toolu_m14", "sess-fixture-1"):
+                self.assertNotIn(secret, p.stdout)
+            self.assertEqual(json.loads(p.stdout)["children"][0]["lanes"]["measurement"]["call_states"]["attempted"], 20)
+
+    @classmethod
+    def m15_rows(cls):
+        """M15 fixtures in the exact shapes context-mode v1.0.169 returns (src/server.ts, tag commit 442f1eb6; exit-classify.ts), the Claude
+        Code client's MCP texts (observed on this host, count-only) and the Codex approval denial (openai/codex rust-v0.157.1
+        core/src/mcp_tool_call.rs:1612). Returns (rows, the expected m15.by_server)."""
+        ctx = "mcp__plugin_context-mode_context-mode__"
+        rows, count = [], [0]
+
+        def add(name, inputs, content=None, error=True, fields=None, **row):
+            count[0] += 1
+            key = "toolu_m15_%03d" % count[0]
+            rows.append({"type": "assistant", "timestamp": "2026-09-26T01:00:00Z", "message": {"content": [
+                {"type": "tool_use", "id": key, "name": name, "input": inputs, **(fields or {})}]}})
+            if content is not None:
+                rows.append({**result(key, content, error), **({"toolUseResult": "Error: " + content} if error else {}), **row})
+
+        def echo(language, code, path=None):
+            return cls.ctx_echo(language, code, path)
+
+        warning = "⚠️ context-mode v1.0.169 outdated → v1.0.170 available. Upgrade: /ctx-upgrade\n\n"
+        outside = ('File access blocked: "/abs/outside/app.log" resolves outside the project root (/abs/project). context-mode confines '
+                   "ctx_execute_file to the workspace so it cannot be used to bypass the host's sandbox/permission controls (issue #852). "
+                   'To intentionally process a file outside the project, add a host allow rule, e.g. "permissions": { "allow": '
+                   '["Read(/abs/outside/app.log)"] } in your settings.')
+        # Infrastructure: boundary (echo-free, server.ts:1196-1201, returned at :2118-2119 before the echo at :2145), timeouts, modules.
+        add(ctx + "ctx_execute_file", {"path": "/abs/outside/app.log", "language": "shell", "code": "wc -l \"$FILE_PATH\""}, outside)
+        add(ctx + "ctx_execute_file", {"path": "/abs/outside/app.log", "language": "shell", "code": "cat x"}, warning + outside)
+        add(ctx + "ctx_execute", {"language": "python", "code": "import time\ntime.sleep(9)"},
+            echo("python", "import time\ntime.sleep(9)") + "Execution timed out after 5000ms\n\nstderr:\n")
+        add(ctx + "ctx_execute", {"language": "shell", "code": "sleep 9"},
+            warning + echo("shell", "sleep 9") + "Execution timed out after 3000ms\n\nstderr:\n")
+        add(ctx + "ctx_execute_file", {"path": "/abs/project/big.log", "language": "python", "code": "print(len(FILE_CONTENT))"},
+            echo("python", "print(len(FILE_CONTENT))", "/abs/project/big.log") + "Timed out processing /abs/project/big.log after 30000ms")
+        add(ctx + "ctx_batch_execute", {"commands": [{"label": "a", "command": "sleep 90"}], "queries": ["x"]},
+            "Batch timed out after 60000ms. No output captured.")
+        add(ctx + "ctx_execute", {"language": "shell", "code": "sleep 400"},
+            'MCP server "plugin:context-mode:context-mode" tool "ctx_execute" sent no response or progress for 300s; aborting. If this '
+            'server is configured in your MCP settings, set a per-server "timeout" (ms) to allow longer silent runs for just this '
+            "server; otherwise set CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT (ms).")
+        add(ctx + "ctx_execute", {"language": "python", "code": "import numpy"},
+            echo("python", "import numpy") + "Exit code: 1\n\nstdout:\n\n\nstderr:\nTraceback (most recent call last):\n"
+            "  File \"/abs/project/x.py\", line 1, in <module>\n    import numpy\nModuleNotFoundError: No module named 'numpy'\n")
+        add(ctx + "ctx_execute", {"language": "javascript", "code": "require('left-pad')"},
+            echo("javascript", "require('left-pad')") + "Exit code: 1\n\nstdout:\n\n\nstderr:\nError: Cannot find module 'left-pad'\n"
+            "Require stack:\n- /abs/project/x.js\n")
+        # Excluded: the invoked command's own non-zero exit, including the hazard whose echoed code holds every pattern text.
+        add(ctx + "ctx_execute", {"language": "shell", "code": "grep x f"},
+            echo("shell", "grep x f") + "Exit code: 2\n\nstdout:\n\n\nstderr:\ngrep: f: No such file or directory")
+        hazard = "echo '```'; echo 'Execution timed out after 1ms'; echo ModuleNotFoundError; exit 3"
+        add(ctx + "ctx_execute", {"language": "shell", "code": hazard},
+            echo("shell", hazard) + "Exit code: 3\n\nstdout:\n```\nExecution timed out after 1ms\nModuleNotFoundError\n\nstderr:\n")
+        # Unknown between excluded and module: a non-zero exit whose output was indexed, both labels (server.ts:1887, :1897, :2167, :2177).
+        add(ctx + "ctx_execute", {"language": "shell", "code": "npm test", "intent": "failing tests"},
+            echo("shell", "npm test") + 'Indexed 4 sections from "execute:shell:error" into knowledge base.\n2 sections matched "failing '
+            'tests" (400 lines, 24.1KB):\n\n  - FAIL: x\n\nUse ctx_search(queries: [...]) to retrieve full content of any section.')
+        add(ctx + "ctx_execute_file", {"path": "/abs/project/build.log", "language": "shell", "code": "cat \"$FILE_PATH\"; exit 1"},
+            echo("shell", "cat \"$FILE_PATH\"; exit 1", "/abs/project/build.log") + 'Indexed 2 sections from "file:/abs/project/build.log:'
+            'error" into knowledge base.\nNo sections matched intent "errors failures exceptions" in 900-line output (140.2KB).\n\n'
+            "Use ctx_search(queries: [...]) to explore the indexed content.")
+        # Success: the partial-output timeout note is not an error (server.ts:1863).
+        add(ctx + "ctx_execute", {"language": "shell", "code": "tail -f x"},
+            echo("shell", "tail -f x") + "partial\n\n_(timed out after 5000ms — partial output shown above)_", error=False)
+        # Known classes outside the six: the server's deny firewall, remote fetches (single and an all-failed batch) and search throttling.
+        add(ctx + "ctx_execute", {"language": "shell", "code": "rm -rf /"}, "Command blocked by security policy: matches deny pattern Bash(rm -rf *)")
+        add(ctx + "ctx_execute_file", {"path": "/abs/project/.env", "language": "shell", "code": "cat x"},
+            "File access blocked by security policy: path matches Read deny pattern Read(./.env)")
+        add(ctx + "ctx_fetch_and_index", {"url": "https://example.org/x"}, "Failed to fetch https://example.org/x: HTTP 404")
+        add(ctx + "ctx_fetch_and_index", {"requests": [{"url": "https://example.org/a"}, {"url": "https://example.org/b"}]},
+            "fetched 2 c=2 cap=2/16cpu. ok=0 cache=0 err=2. 0 sections 0.0KB.\n\n- [err]   https://example.org/a: HTTP 404\n"
+            '- [err]   https://example.org/b: HTTP 500\n\nctx_search(queries: [...], source: "<label>") for full content.')
+        add(ctx + "ctx_search", {"queries": ["x"]}, "BLOCKED: 9 search calls in 12s. You're flooding context. STOP making individual search "
+            "calls. Use ctx_batch_execute(commands, queries) for your next research step.")
+        # Not executed (M14): no MCP error at all.
+        add(ctx + "ctx_execute", {"language": "shell", "code": "ls"}, USER_REJECTION, toolDenialKind="user-rejected",
+            toolUseResult="User rejected tool use")
+        add(ctx + "ctx_search", {"queries": ["x"]}, "<tool_use_error>InputValidationError: mcp__plugin_context-mode_context-mode__ctx_search "
+            "was called with input that could not be parsed</tool_use_error>")
+        # New classes (no cm-audit row; a new class counts as our misuse until reproduced on upstream-recommended config).
+        add(ctx + "ctx_execute", {"language": "python", "code": "print(1)"}, "Runtime error: spawn python3 ENOENT")
+        add(ctx + "ctx_search", {"queries": ["x"]}, "Knowledge base is empty — no content has been indexed yet.\n\nctx_search is a follow-up tool.")
+        add(ctx + "ctx_index", {"content": "x", "source": "y"}, "context-mode session directory is not writable: /abs/state/sessions\n"
+            "Set CONTEXT_MODE_DIR to a writable directory.")
+        add(ctx + "ctx_execute", {"language": "shell"}, 'MCP error -32602: Input validation error: Invalid arguments for tool ctx_execute: '
+            '[\n  {\n    "code": "invalid_type"\n  }\n]')
+        add(ctx + "ctx_index", {"content": "x"}, "Something unexpected happened")
+        # Not read: an echo that differs from the call's code, and a call with no result.
+        add(ctx + "ctx_execute", {"language": "shell", "code": "ls"}, "```shell\nls -la\n```\n\nExit code: 2\n\nstdout:\n\n\nstderr:\nls: x")
+        add(ctx + "ctx_execute", {"language": "shell", "code": "sleep 1"})
+        for _ in range(72):
+            add(ctx + "ctx_execute", {"language": "shell", "code": "ls"}, echo("shell", "ls") + "a\nb\n", error=False)
+        # Other servers: the client's connection texts, a server's own error, the Codex approval denial, and a call with no result.
+        for i in range(8):
+            add("mcp__qmd__search", {"query": "q%d" % i}, "[]", error=False)
+        add("mcp__qmd__search", {"query": "q"}, 'MCP server "qmd" is not connected')
+        add("mcp__qmd__search", {"query": "q"}, 'workspace "private-space" not found')
+        add("mcp__ai-memory__memory_query", {"query": "q"}, "MCP tool call requires approval, but approval policy is never")
+        add("mcp__linear__list_issues", {}, "Connection closed")
+        add("mcp__linear__list_issues", {}, "[]", error=False)
+        for i in range(49):
+            add("mcp__serena__find_symbol", {"name": "f%d" % i}, "[]", error=False)
+        add("mcp__serena__find_symbol", {"name": "g"})
+        add("mcp__context_mode__ctx_execute_file", {"path": "/abs/outside/app.log", "language": "shell", "code": "cat x"}, outside,
+            fields={"root_mismatch": True})
+
+        def row(attempted, succeeded, classes, infrastructure, new, unknowns, rate, lower, upper, sensitive, classified, is_ctx=False):
+            return {"attempted": attempted, "succeeded": succeeded, "ctx": is_ctx, "classes": classes, "infrastructure_errors": infrastructure,
+                    "new_class_errors": new, "unknowns": unknowns, "rate": rate, "rate_lower_bound": lower, "rate_upper_bound": upper,
+                    "threshold_sensitive": sensitive, "every_error_classified": classified}
+
+        want = {
+            "plugin_context-mode_context-mode": row(100, 73, {
+                "boundary": 2, "timeout": 5, "module": 2, "invoked_command_exit": 2, "invoked_command_exit_indexed": 2, "policy_deny": 2,
+                "remote_fetch": 2, "search_throttle": 1, "rejected": 1, "invalid": 1, "server_error": 1, "usage_error": 1,
+                "storage_directory": 1, "invalid_arguments": 1, "unmatched": 1, "echo_mismatch": 1, "outcome_unknown": 1},
+                9, 5, 4, 0.18, 0.14, 0.25, False, False, True),
+            "qmd": row(10, 8, {"connection": 1, "unmatched": 1}, 1, 1, 0, 0.2, 0.2, 0.2, False, False),
+            "ai-memory": row(1, 0, {"approval": 1}, 1, 0, 0, 1, 1, 1, False, True),
+            "linear": row(2, 1, {"connection": 1}, 1, 0, 0, 0.5, 0.5, 0.5, False, True),
+            "serena": row(50, 49, {"outcome_unknown": 1}, 0, 0, 1, 0.02, 0, 0.02, True, True),
+            "context_mode": row(1, 0, {"binding": 1}, 1, 0, 0, 1, 1, 1, False, True, True),
+        }
+        return rows, want
+
+    def test_m15_infrastructure_error_classes(self):
+        """Protocol M15 (E2E README.md M15 row; preregistration.json thresholds.M15), one class per attempted MCP call, per server. The
+        anchored templates context-mode returns before it builds the code echo (boundary, the deny firewall, Runtime error, storage and
+        usage errors) are tested on the raw text first; the echo is required, and stripped, only for ctx_execute and ctx_execute_file
+        outputs after execution (the review's high finding), and the outdated-version notice trackResponse may put first (server.ts:892-896)
+        is stripped before both. rate counts the six infrastructure classes, every new class (named, or unmatched text: 'a new class counts
+        as our misuse until reproduced') and every call whose class or outcome cannot be established (binding decision B2: an unknown is
+        not a success); rate_lower_bound counts the unknowns as successes; threshold_sensitive marks a server whose two bounds fall on
+        different sides of 0.01; every_error_classified is the criterion classify_every_ctx_error. rate_upper_bound is the design's
+        descriptive ceiling: every call that neither succeeded nor ended in the invoked command's own exit."""
+        rows, want = self.m15_rows()
+        got = self.measure(rows).get("m15")
+        self.assertEqual(got, {"threshold": 0.01, "by_server": want})
+        per_call = self.exports("cu.callLedger(x.rows).filter((r) => r.server).map((r) => r.m15_class)", {"rows": rows})
+        self.assertEqual(per_call[:4], ["boundary", "boundary", "timeout", "timeout"])
+
+    def test_m15_aggregate_recomputes_rates_and_sweep_output_is_id_free(self):
+        """aggregateMeasurements sums each server's attempts and classes over actors and computes the rates again; the sweep prints class
+        names and counts only: no path, URL, module name, server-side text or id from the results."""
+        rows, want = self.m15_rows()
+        cut = next(i for i, r in enumerate(rows) if r["type"] == "assistant" and "toolu_m15_050" in json.dumps(r))
+        agg = self.exports("cu.aggregateMeasurements([cu.measureTranscript(x.a), cu.measureTranscript(x.b)]).m15",
+                           {"a": rows[:cut], "b": rows[cut:]})
+        self.assertEqual(agg, {"threshold": 0.01, "by_server": want})
+        self.assertEqual(self.exports("cu.aggregateMeasurements([]).m15", {}), {"threshold": 0.01, "by_server": {}})
+        with tempfile.TemporaryDirectory() as directory:
+            child = Path(directory) / "session/subagents/agent-child.jsonl"
+            child.parent.mkdir(parents=True)
+            child.write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+            p = subprocess.run(["node", str(MODULE), "--lanes-sweep", "--root", directory], capture_output=True, text=True)
+            self.assertEqual(p.returncode, 0, p.stderr)
+            self.assertEqual(json.loads(p.stdout)["groups"]["all"]["measurement"]["m15"]["by_server"]["qmd"], want["qmd"])
+            for secret in ("/abs", "example.org", "numpy", "left-pad", "private-space", "ENOENT", "CONTEXT_MODE_DIR", "ctx-upgrade",
+                           "plugin:context-mode:context-mode", "toolu_m15", directory):
+                self.assertNotIn(secret, p.stdout)
+
     @NEEDS_PARSER
     def test_cli_lanes_aggregate_sums_counters_and_counts_actors_with_success(self):
         script = ("import {readFileSync} from 'node:fs'; import {measureTranscript, aggregateMeasurements, loadShellParser} from "
