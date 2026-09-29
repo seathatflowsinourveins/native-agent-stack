@@ -97,17 +97,17 @@ against the existing maintenance task. Assign each dependency one updater.
 
 Use installed upstream checks; avoid a home-grown workflow parser as the primary
 validator. The existing pinned zizmor lane checks workflow security. Upstream
-[actionlint](https://github.com/rhysd/actionlint) checks workflow syntax, expressions
+[actionlint](https://github.com/kjanat/actionlint) checks workflow syntax, expressions
 and action usage. Neither executes a job or establishes model-task quality.
 
-The upstream [binary installation procedure](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)
-supports a task-local download and provenance verification, with no global install:
+Since 2026-09-28 the pin is kjanat/actionlint 1.17.0, the maintained fork that replaced the stalled rhysd/actionlint 1.7.12 ([swap receipt](../evidence/artifacts/actionlint-successor-swap-20260928/README.md)). Its The 2026-09-20 and 2026-09-21 results and the shellcheck finding below used this procedure against rhysd/actionlint v1.7.12 ([its install doc at v1.7.12](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)).
+[binary installation procedure](https://github.com/kjanat/actionlint/blob/v1.17.0/docs/install.md?plain=1#L124-L134) supports a task-local download and provenance verification, with no global install:
 
 ```sh
-gh release download --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.7.12
-gh attestation verify -R rhysd/actionlint actionlint_1.7.12_linux_amd64.tar.gz
-sha256sum --check --ignore-missing actionlint_1.7.12_checksums.txt
-tar -xzf actionlint_1.7.12_linux_amd64.tar.gz actionlint
+gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.17.0
+gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz
+sha256sum --check --ignore-missing actionlint_1.17.0_checksums.txt
+tar -xzf actionlint_1.17.0_linux_amd64.tar.gz actionlint
 ./actionlint -version
 ```
 
@@ -986,9 +986,11 @@ one instead of overlapping at all -- keyed on whether the run is a manual
 silently replace a pending manual request in the same queue slot (GitHub's
 default concurrency queue holds one pending run per group, and a newly
 queued run cancels/replaces it; the `queue: max` property that allows up to
-100 queued runs instead is rejected by this repository's pinned actionlint
-1.7.12, which does not yet recognize that key -- see
-[the decision record](decisions/2026-09-23-bot-pr-dispatch.md)). Two runs
+100 queued runs instead was not used because the actionlint pinned on 2026-09-23,
+rhysd/actionlint 1.7.12, rejected that key -- see
+[the decision record](decisions/2026-09-23-bot-pr-dispatch.md); kjanat/actionlint
+1.17.0, pinned since 2026-09-28, accepts it, and re-adopting it is a separate
+change). Two runs
 *within* the same category can still replace each other's pending slot
 (an accepted, lower-stakes loss: the later same-category request already
 supersedes the earlier one), and a manual and a scheduled run can therefore
