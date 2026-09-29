@@ -777,8 +777,9 @@ spawned either role, and nothing here measures a token saving.
 - Discovery under `--ignore-user-config` is a source-read prediction (`loader/mod.rs:503-519` keeps the
   ignored user layer's file, so its folder stays `$CODEX_HOME`); it has not been run.
 - The Codex `cwd` sentence of `docs/token-session-handbook.md` ("Context Mode executor and session
-  store") still says to pass `cwd` every time. The role texts follow the narrower rule above, and this
-  addendum does not change that document.
+  store") said to pass `cwd` every time, which contradicted the role texts' working-directory rule. The same
+  change now says to pass `cwd` for any directory other than the session's launch directory, which the
+  server is already bound to; no other sentence of that document changed.
 
 **Overturn conditions.** A Codex release whose role files can set a sandbox or an MCP allowlist would let
 these restrictions be enforced instead of instructed. A run in which a spawned role does not receive its
