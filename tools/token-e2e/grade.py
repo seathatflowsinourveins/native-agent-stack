@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """Independent frozen-check grader for the #381 token E2E (unit U9): the command line.
 
-A local integration tool, not upstream acceptance and not a model run. Standard library only, Python 3.11+.
-This revision provides `spec`, `bind`, `keys`, `capture`, `identity`, `grade` and `regrade` (the judge, controls,
-differential, export and check-html subcommands follow in the last stage).
+A local integration tool, not upstream acceptance and not a model run of its own: only `judge` calls a model, through the
+routes in judge.py, and only after the run windows close. Standard library only, Python 3.11+. Subcommands: `spec`,
+`bind`, `keys`, `capture`, `identity`, `grade`, `regrade`, `judge` (packets, codex, claude-args, collect), `controls`,
+`differential`, `export` and `check-html`.
 
 Exit status: 0 done (for `grade` and `regrade`: G-Q, M7, every M8 lane and M12 pass), 1 graded and not passing
-(judgments pending included), 2 a refusal: `E_CODE field=value ...` on the first line of stderr and nothing on
-stdout, with field names and never a private value. An unexpected exception is `E_INTERNAL stage=<command>`, exit 2.
+(judgments pending included; for `controls` and `differential` a control or check that landed elsewhere), 75 a `judge
+codex` run paused by a usage limit (resumable), 2 a refusal: `E_CODE field=value ...` on the first line of stderr and
+nothing on stdout, with field names and never a private value. An unexpected exception is `E_INTERNAL stage=<command>`,
+exit 2.
 
 Private files (the spec, the bindings, keys and captures) are written create-only with mode 0600 and are refused
 inside any git work tree, following design R22. Sources: repair-u9.design.md b3, R10, R12, R13, R19, R20, R22.
@@ -26,6 +29,7 @@ import traceback
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import evidence as ev  # noqa: E402
 import frozen_checks as fc  # noqa: E402
+import judge as jd  # noqa: E402
 
 BINDINGS_SCHEMA = "token-e2e-run-bindings/1"
 KEYS_SCHEMA = "token-e2e-keys/1"
@@ -96,14 +100,53 @@ def build_parser():
     grade.add_argument("--call-ledger", action="append", default=[], help="U2's private call ledger (JSONL, repeatable)")
     grade.add_argument("--codex-events-dir", help="directory of <identity>.events.jsonl (default: E2E_DIR)")
     grade.add_argument("--codex-driver", help="U10's codex-driver directory (ledger.jsonl and attempts/)")
-    grade.add_argument("--judgments", help="retained judgments (JSONL); none leaves every D clause pending")
+    grade.add_argument("--judgments", help="retained judgments: a JSONL file, or a judge directory holding judgments-*.jsonl; "
+                                            "none leaves every D clause pending")
+    grade.add_argument("--controls", help="the report `controls --out` wrote; its counts are published under `controls`")
     grade.add_argument("--out-private", help="new private directory for the table and the collected records")
     grade.add_argument("--out", help="new aggregate file (create-only, mode 0600)")
     regrade = sub.add_parser("regrade", help="repeat the grading from a private directory alone")
     regrade.add_argument("--from", dest="source", required=True, help="the private directory a grade run wrote")
-    regrade.add_argument("--judgments", help="judgments to apply instead of the retained ones")
+    regrade.add_argument("--judgments", help="judgments to apply instead of the retained ones (a file or a judge directory)")
     regrade.add_argument("--out-private", required=True)
     regrade.add_argument("--out", required=True)
+    judge = sub.add_parser("judge", help="class D judges: packets, the two blind routes and collect")
+    judge_sub = judge.add_subparsers(dest="judge_command", required=True, parser_class=Parser)
+    packets = judge_sub.add_parser("packets", help="build the scrubbed packets and the calibration controls")
+    packets.add_argument("--from", dest="private", required=True, help="the private directory a grade run wrote")
+    packets.add_argument("--repo", required=True, help="checkout holding the preregistration commit and the exec revision")
+    packets.add_argument("--out-dir", required=True, help="new private judge directory (index, packets, results)")
+    codex = judge_sub.add_parser("codex", help="judge the Claude answers with gpt-6-astra at max effort (after both windows)")
+    codex.add_argument("--index", required=True, help="the judge directory `judge packets` wrote")
+    codex.add_argument("--accept-unavailable", action="store_true",
+                       help="after a usage limit, finish with the unrun packets as unknown(judge_unavailable)")
+    codex.add_argument("--timeout", type=float, default=jd.CALL_TIMEOUT, help="seconds allowed per codex call")
+    claude_args = judge_sub.add_parser("claude-args", help="the Workflow scriptPath and args for the Codex answers")
+    claude_args.add_argument("--index", required=True)
+    collect = judge_sub.add_parser("collect", help="verify and assemble the Workflow's judgments")
+    collect.add_argument("--index", required=True)
+    collect.add_argument("--result", required=True, help="the Workflow's returned JSON")
+    collect.add_argument("--transcripts", required=True, help="the run's agent transcript directory")
+    rehearse = judge_sub.add_parser("rehearse", help="two planted controls through a route, before Amendment 4")
+    rehearse.add_argument("--route", required=True, choices=["codex", "claude"])
+    rehearse.add_argument("--out-dir", required=True, help="new private directory (the claude collect step reuses it)")
+    rehearse.add_argument("--export-dir", help="claude route: new neutral directory for the two packets")
+    rehearse.add_argument("--result", help="claude route, second step: the Workflow's returned JSON")
+    rehearse.add_argument("--transcripts", help="claude route, second step: the run's agent transcript directory")
+    rehearse.add_argument("--timeout", type=float, default=jd.CALL_TIMEOUT, help="seconds allowed per codex call")
+    controls = sub.add_parser("controls", help="planted class A, B and C controls, the E1 answers and the calibration files")
+    controls.add_argument("--spec", required=True)
+    controls.add_argument("--repo", required=True, help="the exec checkout (E1 receipts and their pinned keys)")
+    controls.add_argument("--out", help="new file for the counts (create-only, mode 0600); `grade --controls` embeds it")
+    differential = sub.add_parser("differential", help="agree with the retained checks of the earlier runs (private inputs)")
+    differential.add_argument("--inputs", required=True, help="directory holding rtk-296 and rtk-343")
+    export = sub.add_parser("export", help="one returned_results record with the aggregate as an attachment")
+    export.add_argument("--from", dest="private", required=True, help="the private directory a grade run wrote")
+    export.add_argument("--aggregate", required=True, help="the aggregate file that grade run wrote")
+    export.add_argument("--export-dir", required=True, help="new neutral directory for the manifest and its attachment")
+    check_html = sub.add_parser("check-html", help="the privacy canary over a generated HTML report")
+    check_html.add_argument("html")
+    check_html.add_argument("--from", dest="private_dir", help="a grade run's private directory (adds its run values)")
     return parser
 
 
@@ -683,23 +726,70 @@ def _load_captures(directory):
 
 
 def _load_judgments(rows):
-    return {(item["identity"], item["actor"], item.get("run_index", 0)): item for item in rows
-            if isinstance(item, dict) and "identity" in item and "actor" in item}
+    """{(identity, actor, run_index): judgment}, and the route summaries under the reserved key ("route", name, 0)."""
+    loaded = {}
+    for item in rows:
+        if not isinstance(item, dict):
+            continue
+        if item.get("kind") == "route" and isinstance(item.get("route"), str):
+            loaded[("route", item["route"], 0)] = item
+        elif "identity" in item and "actor" in item:
+            loaded[(item["identity"], item["actor"], item.get("run_index", 0))] = item
+    return loaded
+
+
+def _read_judgment_rows(path, field):
+    """A judgments file (JSONL), or a judge directory: every judgments-*.jsonl in it, in name order."""
+    if os.path.isdir(path):
+        rows = []
+        for name in sorted(os.listdir(path)):
+            if name.startswith("judgments-") and name.endswith(".jsonl"):
+                rows.extend(_read_lines(os.path.join(path, name), field))
+        return rows
+    return _read_lines(path, field)
 
 
 def _jsonl(rows):
     return "".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n" for row in rows).encode("utf-8")
 
 
-def _finish(spec, keys, bindings, table, records, captures, judgments, meta, out_private, out, copies, join=None):
+# Flags whose value is a private path: the recorded command keeps the flag and a placeholder (R22, U9-D17).
+PATH_FLAGS = {"--spec": "spec", "--repo": "exec-checkout", "--bindings": "run-bindings", "--identity-table": "identity-table",
+              "--keys": "keys", "--captures": "captures-dir", "--join-ledger": "join-ledger",
+              "--adoption-report": "adoption-report", "--run-mode": "run-mode", "--call-ledger": "call-ledger",
+              "--codex-events-dir": "codex-events-dir", "--codex-driver": "codex-driver", "--judgments": "judgments",
+              "--out-private": "private-dir", "--out": "aggregate", "--from": "private-dir", "--controls": "controls-report"}
+
+
+def sanitize_argv(argv):
+    """The command as a manifest may record it: `python3 tools/token-e2e/grade.py`, the subcommand, every flag, and a
+    placeholder for each private path (`FAMILY=FILE` values keep their family), never a path or a name of this host."""
+    tokens, clean, index = [str(item) for item in argv], ["python3", "tools/token-e2e/grade.py"], 0
+    while index < len(tokens):
+        token = tokens[index]
+        clean.append(token)
+        if token.startswith("--") and index + 1 < len(tokens):
+            value = tokens[index + 1]
+            name = PATH_FLAGS.get(token)
+            if name:
+                head, sep, _ = value.partition("=")
+                clean.append(f"{head}=<{name}>" if sep and "/" not in head else f"<{name}>")
+                index += 2
+                continue
+        index += 1
+    return clean
+
+
+def _finish(spec, keys, bindings, table, records, captures, judgments, meta, out_private, out, copies, join=None,
+            controls=None, command=None):
     """Evaluate, run the canary, then write; nothing is written when a check refuses (R22)."""
-    rows, aggregate = ev.evaluate(spec, keys, bindings, records, captures, judgments, meta=meta, join=join)
+    rows, aggregate = ev.evaluate(spec, keys, bindings, records, captures, judgments, meta=meta, join=join, controls=controls)
     aggregate["privacy"]["canary_values_checked"] = ev.assert_no_private(aggregate, ev.canary_values(bindings, table, records))
     make_private_dir(out_private)
     files = dict(copies)
     files["grades.jsonl"] = _jsonl(rows)
     files["evidence.jsonl"] = _jsonl(records)
-    files["context.json"] = fc.canonical({"schema": CONTEXT_SCHEMA, "meta": meta,
+    files["context.json"] = fc.canonical({"schema": CONTEXT_SCHEMA, "meta": meta, "command": command or sanitize_argv(["grade"]),
                                           "files": {name: fc.sha256_hex(data) for name, data in sorted(copies.items())}})
     for name in sorted(files):
         fc.private_create(os.path.join(out_private, name), files[name])
@@ -743,7 +833,11 @@ def cmd_grade(args):
     captures = _load_captures(args.captures)
     sources = {"join": joins, "run_mode": run_mode, "call_ledger": ledger, "events_dir": args.codex_events_dir,
                "driver_dir": args.codex_driver}
-    judgment_rows = _read_lines(args.judgments, "judgments") if args.judgments else []
+    judgment_rows = _read_judgment_rows(args.judgments, "judgments") if args.judgments else []
+    controls, controls_copy = None, None
+    if args.controls:
+        report = load_json(args.controls, "controls", "E_ARGS")
+        controls, controls_copy = {"run": True, "classes": report}, fc.canonical(report)
     records = ev.collect(spec, bindings, keys, table, sources, captures)
     reports = {}
     for family, path in _pairs(args.adoption_report, ("claude", "codex"), "adoption_report").items():
@@ -757,8 +851,10 @@ def cmd_grade(args):
               "judgments.jsonl": _jsonl(judgment_rows)}
     for family, rows in sorted(join_rows.items()):  # M8's opportunities follow these rows, so regrade needs them
         copies[f"join-{family}.jsonl"] = _jsonl(rows)
+    if controls_copy is not None:
+        copies["controls.json"] = controls_copy
     return _finish(spec, keys, bindings, table, records, captures, _load_judgments(judgment_rows), meta, args.out_private,
-                   args.out, copies, join_rows or None)
+                   args.out, copies, join_rows or None, controls, sanitize_argv(args.raw_argv))
 
 
 def cmd_regrade(args):
@@ -781,6 +877,12 @@ def cmd_regrade(args):
             if fc.sha256_hex(copies[name]) != context["files"][name]:
                 raise fc.Refusal("E_REGRADE", field="digest")
             join[family] = [json.loads(line) for line in copies[name].decode("utf-8").split("\n") if line.strip()]
+    controls = None
+    if "controls.json" in (context.get("files") or {}):
+        copies["controls.json"] = read_file(os.path.join(source, "controls.json"), "controls.json", "E_REGRADE")
+        if fc.sha256_hex(copies["controls.json"]) != context["files"]["controls.json"]:
+            raise fc.Refusal("E_REGRADE", field="digest")
+        controls = {"run": True, "classes": json.loads(copies["controls.json"].decode("utf-8"))}
     spec, keys, bindings = (json.loads(copies[name].decode("utf-8")) for name in ("spec.json", "keys.json", "bindings.json"))
     table = json.loads(copies["identity-table.json"].decode("utf-8"))
     captures = json.loads(copies["captures.json"].decode("utf-8"))
@@ -788,22 +890,294 @@ def cmd_regrade(args):
     if records is None or errors:
         raise fc.Refusal("E_REGRADE", field="evidence")
     if args.judgments:
-        judgment_rows = _read_lines(args.judgments, "judgments")
+        judgment_rows = _read_judgment_rows(args.judgments, "judgments")
         copies["judgments.jsonl"] = _jsonl(judgment_rows)
     else:
         judgment_rows, _ = ev.read_jsonl(os.path.join(source, "judgments.jsonl"))
     return _finish(spec, keys, bindings, table, records, captures, _load_judgments(judgment_rows or []), context["meta"],
-                   args.out_private, args.out, copies, join or None)
+                   args.out_private, args.out, copies, join or None, controls, sanitize_argv(args.raw_argv))
+
+
+# ---- judge (R21) -------------------------------------------------------------------------------------------------------
+
+def cmd_judge(args):
+    services = argparse.Namespace(context_schema=CONTEXT_SCHEMA, refuse_output=refuse_output, spec_matches=spec_matches)
+    return jd.run_command(args, services)
+
+
+# ---- controls (e5) -----------------------------------------------------------------------------------------------------
+
+E1_REV = "f5812d3f"  # the E1 receipt's catalog revision: the pinned keys its historical answers are graded at
+E1_RECEIPT = "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json"
+
+
+def e1_controls(repo, readings):
+    """The two committed E1 answers that must fail at their pinned keys: the repomix 47-name list (T8: names missing) and
+    the qmd wrong-document answer (T4: the required document is not cited)."""
+    met = 0
+    try:
+        tools = {item.get("tool"): item for item in json.loads(fc.GitSources(repo, "HEAD").read(E1_RECEIPT).decode("utf-8"))["tools"]}
+        key = fc.key_T8(fc.GitSources(repo, E1_REV), {})
+        result = fc.ORACLES["T8"]({}, key, fc.Answer(tools["repomix"]["answer_excerpt"], ()), readings, {})["A"]
+        met += 1 if result.status == "fail" and "names_missing" in result.reasons else 0
+        result = fc.ORACLES["T4"]({}, {}, fc.Answer(tools["qmd"]["answer_excerpt"], ()), readings, {})["A"]
+        met += 1 if result.status == "fail" and result.reasons == ("citation_missing",) else 0
+    except (AttributeError, KeyError, TypeError, ValueError, fc.KeyUnavailable, fc.Refusal):
+        pass
+    return {"expected": 2, "observed": met}
+
+
+def calibration_controls(block):
+    """Class D, structurally: every calibration file loads against the registry and meets the grading block's minimums (no
+    model is called here; the routes run these controls blind at grading time)."""
+    minimum = block["judges"]["calibration"]
+    templates = jd.calibrated_templates()
+    good = 0
+    for template in templates:
+        try:
+            calibration = jd.load_calibration(template)
+        except fc.Refusal:
+            continue
+        kinds = {kind: sum(1 for item in calibration["controls"] if item["kind"] == kind)
+                 for kind in ("reference", "paraphrased", "wrong")}
+        if calibration["clauses"]:
+            wrong_fail = all(False in item["expected"].values() for item in calibration["controls"] if item["kind"] == "wrong")
+            good += 1 if (kinds["reference"] >= minimum["correct"] and kinds["paraphrased"] >= minimum["paraphrased"]
+                          and kinds["wrong"] >= minimum["wrong"] and wrong_fail) else 0
+        else:
+            good += 1 if len(calibration.get("extraction_controls") or []) >= 2 else 0
+    return {"expected": len(templates), "observed": good}
+
+
+def cmd_controls(args):
+    """Planted class A, B and C controls, the E1 historical answers and the calibration files, as counts only: exit 0 when every
+    class landed where it was planted, 1 otherwise, and no answer, key or path is ever printed."""
+    if args.out:
+        refuse_output(args.out)
+    spec, _ = load_spec(args.spec)
+    catalog = load_json(str(jd.CALIBRATION_DIR / "oracle-controls.json"), "catalog", "E_CONTROLS")
+    if catalog.get("schema") != "token-e2e-oracle-controls/1" or not isinstance(catalog.get("controls"), list):
+        raise fc.Refusal("E_CONTROLS", field="catalog")
+    readings = spec["readings"]
+    counts, _ = ev.run_controls(catalog, readings)
+    for name in ("A", "B", "C"):
+        counts.setdefault(name, {"expected": 0, "observed": 0})
+    counts["D"] = calibration_controls(spec["block"])
+    counts["E1"] = e1_controls(args.repo, readings)
+    if args.out:
+        fc.private_create(args.out, fc.canonical(counts))
+    print(json.dumps(counts, sort_keys=True))
+    return 0 if all(item["expected"] == item["observed"] for item in counts.values()) else 1
+
+
+# ---- differential (e6): agreement with the retained checks of the earlier runs ---------------------------------------------
+
+DIFFERENTIAL_RUNS = ("rtk-296", "rtk-343")
+
+
+def _base_sections(text):
+    """(git log text, unittest text) of a retained baseline: the six marked sections of rtk-296, or the raw concatenation of
+    rtk-343 (its git log leads and its unittest summary closes the file)."""
+    marked = {}
+    for part in ("\n" + text).split("\n=== [")[1:]:
+        number, _, rest = part.partition("] ")
+        marked[number] = rest.partition(" ===\n")[2]
+    if "1" in marked and "6" in marked:
+        return marked["1"], marked["6"]
+    return text, text
+
+
+def _t0_from_base(text):
+    log, unit = _base_sections(text)
+    facts = fc.parse_unittest_facts(unit)
+    return {"subjects": fc.parse_git_log_subjects(log) or ["<none>"], "ran": facts["ran"], "status": facts["status"],
+            "skipped": facts["skipped"]}
+
+
+def _base_answer(text):
+    """The answer a correct child gives for the baseline `text`: the newest subject and the unittest result."""
+    spec = _t0_from_base(text)
+    result = spec["status"] + (f" (skipped={spec['skipped']})" if spec["skipped"] else "")
+    return f"Newest commit: {spec['subjects'][0]}\nUnittest: {result}; {spec['ran']} tests ran."
+
+
+def _mutations(text):
+    """The baseline unchanged, then three mutations the retained checks must reject: the newest subject, the test count and
+    the result line."""
+    spec = _t0_from_base(text)
+    yield "original", text
+    yield "subject", text.replace(spec["subjects"][0], "Unrelated subject text", 1)
+    yield "count", text.replace(f"Ran {spec['ran']} test", f"Ran {spec['ran'] + 1} test", 1)
+    lines = text.split("\n")
+    for number in range(len(lines) - 1, -1, -1):
+        stripped = lines[number].strip()
+        if stripped == "OK" or stripped.startswith(("OK (", "FAILED")):
+            lines[number] = "FAILED (failures=1)"
+            break
+    yield "result", "\n".join(lines)
+
+
+def _retained_verdict(run_dir, base_text):
+    """PASS or FAIL as the retained check.py says for `base_text`, run from a temporary copy (the inputs are never touched;
+    rtk-296's check reads a hard-coded BASE path, which the copy points at its own base.txt)."""
+    with tempfile.TemporaryDirectory(prefix="u9-diff-") as scratch:
+        for name in os.listdir(run_dir):
+            source = os.path.join(run_dir, name)
+            if os.path.isfile(source) and name not in ("base.txt", "check.py"):
+                shutil.copy(source, os.path.join(scratch, name))
+        with open(os.path.join(scratch, "base.txt"), "w", encoding="utf-8") as stream:
+            stream.write(base_text)
+        code = read_file(os.path.join(run_dir, "check.py"), "inputs", "E_DIFFERENTIAL").decode("utf-8", errors="replace")
+        lines = [f'BASE = "{os.path.join(scratch, "base.txt")}"' if line.startswith("BASE = ") else line for line in code.split("\n")]
+        with open(os.path.join(scratch, "check.py"), "w", encoding="utf-8") as stream:
+            stream.write("\n".join(lines))
+        try:
+            done = subprocess.run([sys.executable, "-B", "check.py"], cwd=scratch, env=fc.minimal_env(scratch),
+                                  capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=120)
+        except (OSError, subprocess.TimeoutExpired):
+            return "FAIL"
+        return "PASS" if done.stdout.strip().startswith("PASS") else "FAIL"
+
+
+def _grader_verdict(text, answer):
+    spec = _t0_from_base(text)
+    capture = ev._t0_capture(spec)
+    ctx = {"captures": {"pre": {"arm": capture, "plain": capture}, "post": {"arm": capture, "plain": capture}}}
+    parts = fc.ORACLES["T0"]({}, {}, fc.Answer(answer, ()), {}, ctx)
+    return "PASS" if all(part.status == "pass" for part in parts.values()) else "FAIL"
+
+
+def cmd_differential(args):
+    """Agreement of this grader's T0 oracle with the retained check.py of each earlier run on the original baseline and on
+    three mutations of it: counts only, so nothing of the private inputs is printed."""
+    reports, agree_all = [], True
+    for name in DIFFERENTIAL_RUNS:
+        run_dir = os.path.join(args.inputs, name)
+        if not os.path.isfile(os.path.join(run_dir, "base.txt")) or not os.path.isfile(os.path.join(run_dir, "check.py")):
+            raise fc.Refusal("E_DIFFERENTIAL", field="inputs")
+        base = read_file(os.path.join(run_dir, "base.txt"), "inputs", "E_DIFFERENTIAL").decode("utf-8", errors="replace")
+        answer_path = os.path.join(run_dir, "answer.json")
+        answer = None
+        if os.path.isfile(answer_path):
+            document = ev.read_json(answer_path)
+            answer = document.get("answer") if isinstance(document, dict) else None
+        answer = answer if isinstance(answer, str) else _base_answer(base)
+        agree = total = 0
+        for _, text in _mutations(base):
+            total += 1
+            agree += 1 if _retained_verdict(run_dir, text) == _grader_verdict(text, answer) else 0
+        agree_all = agree_all and agree == total
+        reports.append(f"{name} agree {agree}/{total}")
+    print("; ".join(reports))
+    return 0 if agree_all else 1
+
+
+# ---- export and check-html (R22, U9-D17) ----------------------------------------------------------------------------------
+
+MANIFEST_BOUNDARY = ("local integration grading of retained run evidence; not upstream acceptance; judge calls are separate "
+                     "model runs counted in judges")
+MANIFEST_SCOPE = "frozen-check grading of one run of the #381 token E2E"
+
+
+def _private_inputs(private, code):
+    bindings = ev.read_json(os.path.join(private, "bindings.json"))
+    table = ev.read_json(os.path.join(private, "identity-table.json"))
+    records, errors = ev.read_jsonl(os.path.join(private, "evidence.jsonl"))
+    if not isinstance(bindings, dict) or not isinstance(table, dict) or records is None or errors:
+        raise fc.Refusal(code, reason="private")
+    return bindings, table, records
+
+
+def export_dir_issue(path, values):
+    """Why an export directory cannot be used: it lies inside a work tree, exists already, or its own path names a run value,
+    the home directory or the user name (the token-report importer would carry that path into the manifest)."""
+    if fc.inside_git_work_tree(path):
+        return "work_tree"
+    if fc.path_exists(path):
+        return "exists"
+    spelled = "\0".join({os.path.abspath(path), os.path.realpath(path)})
+    if any(value in spelled for value in values if isinstance(value, str) and len(value) >= 8):
+        return "canary"
+    return None
+
+
+def cmd_export(args):
+    """One returned_results record whose attachment is the ID-free aggregate, in a fresh neutral directory. The canary runs
+    over the aggregate and over the whole manifest before anything is written; the recorded command holds placeholders."""
+    context = ev.read_json(os.path.join(args.private, "context.json"))
+    if not isinstance(context, dict) or context.get("schema") != CONTEXT_SCHEMA:
+        raise fc.Refusal("E_EXPORT_INPUT", reason="private")
+    bindings, table, records = _private_inputs(args.private, "E_EXPORT_INPUT")
+    data = read_file(args.aggregate, "aggregate", "E_EXPORT_INPUT")
+    try:
+        aggregate = json.loads(data.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        raise fc.Refusal("E_EXPORT_INPUT", reason="aggregate") from None
+    if not isinstance(aggregate, dict) or aggregate.get("schema") != ev.GRADES_SCHEMA:
+        raise fc.Refusal("E_EXPORT_INPUT", reason="aggregate")
+    values = ev.canary_values(bindings, table, records)
+    issue = export_dir_issue(args.export_dir, values)
+    if issue:
+        raise fc.Refusal("E_EXPORT_DIR", reason=issue)
+    ev.assert_no_private(aggregate, values)
+    judges = aggregate.get("judges") or {}
+    status = "pending" if judges.get("pending") else ("pass" if ev.exit_status(aggregate) == 0 else "fail")
+    stamp = fc.utc_now()
+    record = {"id": "token-e2e-frozen-check-grades", "runtime": "python3", "kind": "frozen_check_grading", "status": status,
+              "boundary": MANIFEST_BOUNDARY, "component_ids": [],
+              "command": {"argv": list(context.get("command") or sanitize_argv(["grade"]))},
+              "started_at": None, "completed_at": stamp,
+              "observation": {"g_q": aggregate["g_q"]["status"], "m7": aggregate["m7"]["status"],
+                              "m8": {lane: item["status"] for lane, item in sorted(aggregate["m8"].items())},
+                              "m12": aggregate["m12"]["status"]},
+              "attachments": [{"label": "grades-aggregate", "path": "grades-aggregate.json", "bytes": len(data),
+                               "sha256": fc.sha256_hex(data), "mime_type": "application/json"}]}
+    manifest = {"schema_version": 1, "captured_at": stamp, "scope": MANIFEST_SCOPE, "records": [record]}
+    ev.assert_no_private(manifest, values)
+    try:
+        os.makedirs(args.export_dir, mode=0o700)
+    except OSError:
+        raise fc.Refusal("E_EXPORT_DIR", reason="exists") from None
+    fc.private_create(os.path.join(args.export_dir, "grades-aggregate.json"), data)
+    fc.private_create(os.path.join(args.export_dir, "returned-results.json"),
+                      (json.dumps(manifest, indent=1, sort_keys=True) + "\n").encode("utf-8"))
+    print(json.dumps({"attachments": 1, "records": 1}, sort_keys=True))
+    return 0
+
+
+def html_values(private_dir):
+    """The run-specific canary values a grade run's private directory names; none without one."""
+    if not private_dir:
+        return []
+    bindings, table, records = _private_inputs(private_dir, "E_CHECK_HTML")
+    return ev.canary_values(bindings, table, records)
+
+
+def cmd_check_html(args):
+    """The privacy canary over a generated HTML report: gathered run values (with --from), the home directory and user name,
+    UUIDs, tool_use and call ids and the project-slug shape of a home path. A leading '/' is not one: URLs and tags carry it."""
+    text = read_file(args.html, "html", "E_ARGS").decode("utf-8", errors="replace")
+    home = os.path.expanduser("~")
+    values = sorted({value for value in list(html_values(args.private_dir)) + [home, os.path.basename(home.rstrip("/")),
+                                                                                os.environ.get("USER", "")]
+                     if isinstance(value, str) and len(value) >= 8})
+    if any(value in text for value in values) or ev.id_shape(text):
+        raise fc.Refusal("E_PRIVACY")
+    print(json.dumps({"canary_values_checked": len(values)}, sort_keys=True))
+    return 0
 
 
 HANDLERS = {"spec": cmd_spec, "bind": cmd_bind, "keys": cmd_keys, "capture": cmd_capture, "grade": cmd_grade,
-            "identity": cmd_identity, "regrade": cmd_regrade}
+            "identity": cmd_identity, "regrade": cmd_regrade, "judge": cmd_judge, "controls": cmd_controls,
+            "differential": cmd_differential, "export": cmd_export, "check-html": cmd_check_html}
 
 
 def main(argv=None):
     command = "usage"
     try:
-        args = build_parser().parse_args(argv)
+        raw = [str(item) for item in (sys.argv[1:] if argv is None else argv)]
+        args = build_parser().parse_args(raw)
+        args.raw_argv = raw
         command = args.command
         return HANDLERS[command](args) or 0
     except fc.Refusal as stop:

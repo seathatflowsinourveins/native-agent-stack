@@ -5976,6 +5976,9 @@ def main():
     args = sys.argv[1:]
     if "app-server" in args:
         return 2  # scripts/codex_quota.py starts `codex -c ... app-server`: no snapshot, a reading that never gates
+    if args == ["--version"]:
+        print("codex-cli 0.0.0-fake")
+        return 0
     script = load(os.environ.get("CODEX_FAKE_SCRIPT"))
     state_path = os.environ.get("CODEX_FAKE_STATE")
     state = load(state_path)
