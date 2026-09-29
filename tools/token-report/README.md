@@ -262,10 +262,11 @@ memory, and a successful JSON report is stored twice in its snapshot, as
 `stdout_text` and as the parsed `raw`, so use bounded queries for full-history
 reports.
 
-The OmniRoute entries send no credential. OmniRoute 3.8.51 answers both routes
-without one only while its login is off (`requireLogin` false; the upstream default
-is true) or during first-run setup from loopback (`src/shared/utils/apiAuth.ts`).
-Otherwise they require a dashboard session or a manage-scope API key in an
+The OmniRoute entries send no credential. OmniRoute (the 3.8.50 pin in
+`manifests/stack.json`) answers both routes without one only while its login is
+off (`requireLogin` false; the upstream default is true) or during first-run setup
+from loopback (`src/shared/utils/apiAuth.ts`). Otherwise they require management
+credentials, such as a dashboard session or a manage-scope API key in an
 `Authorization: Bearer` header, never in the URL. A host that keeps the dashboard
 login therefore gets 401: `curl --fail-with-body` exits 22, and the refresh records
 a failed report and an issue and exits nonzero. Do not add the key to `argv`, which
@@ -277,12 +278,12 @@ the [secret store](../../docs/secret-storage.md#storage-rules); only its path is
 retained.
 
 Loading the configuration rejects a report entry whose `argv` element contains a NUL
-character, whose name or `argv` element cannot be encoded as UTF-8 (a lone surrogate
-such as `\ud800` in the JSON), or whose name folds to a capture folder label over 100
-characters (`report-` plus the folded name, so the folded name keeps at most 93). It
-also rejects a
-`counter_scopes` value or `context_roots` name that starts with `Report / `, the
-prefix reserved for reports. A report whose `tool` is not a component id is still
+character, whose name, `tool`, `boundary` or `argv` element cannot be encoded as
+UTF-8 (a lone surrogate such as `\ud800` in the JSON), or whose name folds to a
+capture folder label over 100 characters (`report-` plus the folded name, so the
+folded name keeps at most 93). It also rejects a `counter_scopes` value or
+`context_roots` name that starts with `Report / `, the prefix reserved for reports.
+A report whose `tool` is not a component id is still
 captured and recorded, but it adds an issue, so every refresh exits nonzero until
 the id is corrected; a stack manifest that is missing, unreadable or lists no
 component skips this check.

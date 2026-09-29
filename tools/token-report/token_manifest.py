@@ -535,11 +535,11 @@ def validate_report_sources(entries):
         if any("\0" in a for a in entry["argv"]):
             raise ValueError("report_sources argv elements must not contain a NUL character")
         # JSON can carry a lone surrogate ("\ud800"); the UTF-8 manifest write would raise for it and abort the refresh.
-        for text in [entry["name"]]+entry["argv"]:
+        for text in [entry["name"],entry["tool"],entry["boundary"]]+entry["argv"]:
             try:
                 text.encode("utf-8")
             except UnicodeEncodeError:
-                raise ValueError("report_sources name and argv elements must be encodable as UTF-8 (no lone surrogates)") from None
+                raise ValueError("report_sources name, tool, boundary and argv elements must be encodable as UTF-8 (no lone surrogates)") from None
         if entry.get("format","json") not in ("json","text"):
             raise ValueError("report_sources format must be json or text")
         if "timeout" in entry and (type(entry["timeout"]) is not int or not 1<=entry["timeout"]<=600):

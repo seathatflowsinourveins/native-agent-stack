@@ -301,11 +301,12 @@ class LedgerContract(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"at most 100 characters"):
             m.load_config(path)
 
-    def test_report_source_argv_or_name_that_utf8_cannot_encode_is_rejected_when_the_configuration_loads(self):
+    def test_report_source_text_that_utf8_cannot_encode_is_rejected_when_the_configuration_loads(self):
         path=self.root/"config.json"
         # json.dumps writes a lone surrogate as an escape such as \ud800, and json.loads restores a str UTF-8 cannot encode;
         # the rendered manifest would then abort the refresh. \udcff even survives subprocess (surrogateescape makes it 0xff).
-        for field,value in [("argv",["upstream","\ud800"]),("argv",["upstream","da\udcffily"]),("name","report \ud800")]:
+        for field,value in [("argv",["upstream","\ud800"]),("argv",["upstream","da\udcffily"]),("name","report \ud800"),
+                            ("tool","jcodemunch-mcp\ud800"),("boundary","Consumption only \ud800")]:
             path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(**{field:value})]}))
             with self.subTest(field=field,value=ascii(value)),self.assertRaisesRegex(ValueError,"UTF-8"):
                 m.load_config(path)
@@ -756,7 +757,7 @@ class LedgerContract(unittest.TestCase):
                 self.assertNotIn("Unavailable",cards[scope][1])
                 self.assertNotIn("estimated tokens",cards[scope][1])
         # A failed report keeps the failed-counter state; counters keep their values.
-        self.assertIn('<p class="small">No successful measurement</p><p class="bad">Latest refresh failed. Value above is the last successful observation.</p>',
+        self.assertIn('<p class="small">No successful measurement</p><p class="bad">Latest refresh failed. The kind above is configured, not observed.</p>',
                       cards["Report / ccusage failing"][1])
         self.assertEqual((cards["WSL / all retained projects"][0],cards["WSL / native last 30 days"][0]),("40","7"))
         for title,value in (("RTK","40"),("Headroom","7")):
