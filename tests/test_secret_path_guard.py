@@ -588,6 +588,24 @@ BLOCKED = {
     "tee note.md <<< \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
     "cat <<'EOF' > note.md\nvalue: \"$(printenv)\"\nEOF": "environment_dump",  # a top-level here-document's lines are command lines
     "nice > /tmp/out -n 5 cat .env": "dotenv_read",  # a redirection operator between the options no longer ends them (172596ed passed it)
+    # A redirection is no argument (the module docstring says so), and `set`, `export` and `declare` counted it as one: `set < FILE` and
+    # `set > FILE` still print every variable, but the dump test took `<` and FILE for arguments (`set a b` sets positional parameters).
+    # Found by the grammar fuzz of launcher chains against the base guard: a redirection among a keyring exec's arguments is carried to the
+    # started command now, and the base guard, which dropped it, refused `... -- set` while the carried form passed.
+    "set > /tmp/vars": "environment_dump",
+    "set < /dev/null": "environment_dump",
+    "set >> out.txt 2>&1": "environment_dump",
+    "export -p > /tmp/vars": "environment_dump",
+    "export -p < /dev/null": "environment_dump",
+    "declare -p > /tmp/vars": "environment_dump",
+    "declare -x < /dev/null": "environment_dump",
+    "typeset -p 2> /tmp/err": "environment_dump",
+    "sudo set > /tmp/vars": "environment_dump",
+    "env FOO=1 set < /dev/null": "environment_dump",
+    "env < /dev/null set": "environment_dump",
+    "nohup set > /tmp/vars": "environment_dump",
+    "bash -c 'set > /tmp/vars'": "environment_dump",
+    "echo \"$(set > /tmp/vars)\"": "environment_dump",
     # The reviewer's two launcher strings (172596ed: None; the base guard: credential_file_read): the walk took the operator for the value of
     # `-u` and of `--unit`. The wrapper tests run them behind rtk proxy and a keyring exec too.
     "env -u < \"$PAPER_ENV_FILE\" UNUSED cat": "credential_file_read",
@@ -626,6 +644,13 @@ EXEC = "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY --"
 DEMO_EXEC = "python3 scripts/kernel_keyring.py exec kk_demo KK_DEMO_TOKEN --"
 
 KEYRING_BLOCKED = {
+    # A redirection among a keyring exec's arguments is carried to the command it starts (`exec name VAR < FILE -- set` is `exec name VAR -- set
+    # < FILE`), and a redirection is no argument of `set`: the base guard refused `-- set` there because it dropped the redirection, and the
+    # first version of the carry let it through (found by the grammar fuzz of launcher chains against the base guard).
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY < x.txt -- set": "environment_dump_in_keyring_exec",
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY > out.txt -- set": "environment_dump_in_keyring_exec",
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY < x.txt -- export -p": "environment_dump_in_keyring_exec",
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- set < x.txt": "environment_dump_in_keyring_exec",
     # keyctl(1) subcommands that print a payload, in every position the other rules cover.
     "keyctl print %user:native-agent-stack:tavily_api_key": "keyring_payload_read",
     "keyctl pipe %user:native-agent-stack:tavily_api_key | base64": "keyring_payload_read",
@@ -889,6 +914,12 @@ ALLOWED = [
     # `e`) as a dashless `ps eww` and refused both (`ps -u steve` it passed). `ps eww` and `ps auxe` stay refused.
     "ps -fu steve",
     "ps -fu eve",
+    "set -e > /dev/null",  # a redirection beside a real argument: it sets an option, it prints nothing
+    "set -euo pipefail 2> /dev/null",
+    "export FOO=1 > /dev/null",
+    "export FOO=1 < /dev/null",
+    "declare -a items > /dev/null",
+    "declare -r LIMIT=3 2> /dev/null",
     "ps -u steve",
     "ps -u eve -o pid,command",
     "git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",

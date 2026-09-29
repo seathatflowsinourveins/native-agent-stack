@@ -1322,15 +1322,18 @@ def is_env_file_word(word: str) -> bool:
 
 
 def is_environment_dump(words: list[str]) -> bool:
+    """Whether the command prints the environment or every shell variable. A redirection is no argument: `set < FILE` and `set > FILE`
+    still print every variable, where `set a b` sets positional parameters (command_arguments drops the redirections)."""
     program = program_of(words)
     if program == "printenv":
         return True
     if program == "env":
         return env_command_start(words) is None
-    if program in {"set", "export"} and (len(words) == 1 or words[1:] == ["-p"]):
+    arguments = command_arguments(words)
+    if program in {"set", "export"} and (not arguments or arguments == ["-p"]):
         return True
-    if program in {"declare", "typeset"} and all(w.startswith("-") for w in words[1:]) \
-            and (len(words) == 1 or any(set(w[1:]) & set("xp") for w in words[1:])):
+    if program in {"declare", "typeset"} and all(w.startswith("-") for w in arguments) \
+            and (not arguments or any(set(w[1:]) & set("xp") for w in arguments)):
         return True
     return program == "ps" and ps_shows_environment(words)
 

@@ -1107,7 +1107,11 @@ shell, not a shell: what it does not read is listed at the end of this subsectio
   stricter, the operand of a `cat` that the base guard missed because it stood before the command, as in
   `env -u UNUSED < .env cat`). A number before an operator still ends the options of `sudo` and `nice`
   (`sudo 2>/dev/null -u root printenv`): shlex splits `2>` and `2 >` alike, so a descriptor and a value look the same, a
-  recorded gap.
+  recorded gap. A redirection is no argument of `set`, `export`, `declare` and `typeset` either: `set > FILE` and
+  `set < FILE` still print every variable (`set a b` sets positional parameters), so they are an `environment_dump` now;
+  the base guard passed them, and without this the redirection that a keyring exec's arguments carry to the command it
+  starts would have made `exec name VAR < FILE -- set` pass, which the base guard refused (found by a grammar fuzz of
+  600,000 launcher chains and idiom placements against the base guard, now 0 looser).
 - **An internal error blocks; a timeout does not.** Only exit 2 blocks a PreToolUse call. `main()` now catches any
   exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
   `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is
