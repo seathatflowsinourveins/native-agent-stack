@@ -15,8 +15,18 @@ The host side is `blueprints/runtime-workers/openhands/resolver.py`; see
 
 - It fetched the issue and keeps only text that the owner wrote and alone edited.
   Your instruction shows it between boundary lines as untrusted data.
-- It exports your workspace diff, validates it, and only then commits, pushes and
-  opens a draft pull request. You never fetch, push or open anything.
+- `/workspace` is a clone of `main` at the base commit, with no remote and no
+  history after the base. Its `.git` is read-only, so leave your changes in the
+  working tree: do not commit, stash or check out another revision.
+- The repository's `AGENTS.md` at the base is always in your context (the `agents`
+  skill). The `tdd` and `search-first` skills and this one are available through
+  `invoke_skill`. There are no MCP servers.
+- After you finish, it exports the diff of your working tree against the base and
+  validates it. Only then does it commit, push and open a draft pull request, which
+  gets one review. You never fetch, push or open anything.
+- It never runs your code, tests or scripts on the host. Your check results reach
+  the pull request only as your own report.
+- If you stop without finishing (a loop or the iteration limit), nothing is opened.
 
 ## Scope
 

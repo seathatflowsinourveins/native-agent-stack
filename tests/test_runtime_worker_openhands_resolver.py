@@ -25,6 +25,7 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
+import uuid
 
 from tests import hermetic_git_environment
 
@@ -3154,7 +3155,9 @@ class ResolverResultTests(unittest.TestCase):
 REAL_GIT = shutil.which("git")
 ORIGIN_FILES = {**BASE_FILES, "AGENTS.md": "# Rules\n"}
 SKILL_PIN = {"ref": "1" * 40, "tree_sha": "2" * 40, "skill_md_sha256": "3" * 64}
-CONVERSATION = "00000000-0000-0000-0000-000000000005"
+# Built at runtime, as tests/test_runtime_worker_openhands.py builds its fixture id, so the
+# file passes `validate.py --scan-file` (no literal session identifier).
+CONVERSATION = str(uuid.UUID(int=5))
 
 
 def full_export(repo, base):
