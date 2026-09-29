@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-conductor-oss-conductor",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/conductor-oss/conductor",
+ "reviewed_commit": "f421832ed2b965720ada6efb74416fc6bd79d3fb",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "scheduling-supervision"
+ ],
+ "claim": "Source and documentation review of conductor-oss/conductor at commit f421832ed2b965720ada6efb74416fc6bd79d3fb (license Apache-2.0), read from README.md at that commit. Repository description: \"Conductor is an event driven agentic workflow engine providing durable and highly resilient execution engine for applications and AI Agents\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 32240,
+  "pushed_at": "2026-09-29T11:18:28Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f421832ed2b965720ada6efb74416fc6bd79d3fb",
+   "text": "Conductor is an open-source durable execution platform for microservices, AI agents, and adaptive workflow graphs. It turns runtime choices—loops, branching, fan-out, tool calls, approvals, retries, and cancellation—into durable, inspectable execution. It originated at [Netflix](https://netflixtechblog.com/netflix-conductor-a-microservices-orchestrator-2e8d4771bf40) and is actively maintained by [Orkes](https://orkes.io) and the [community](https://join.slack.com/t/orkes-conductor/shared_invite/"
+  },
+  {
+   "source": "README.md@f421832ed2b965720ada6efb74416fc6bd79d3fb",
+   "text": "**Prerequisites:** [Node.js](https://nodejs.org/) v16+ and Java 21+ must be installed."
+  },
+  {
+   "source": "README.md@f421832ed2b965720ada6efb74416fc6bd79d3fb",
+   "text": "```shell npm install -g @conductor-oss/conductor-cli conductor server start ```"
+  }
+ ]
+}

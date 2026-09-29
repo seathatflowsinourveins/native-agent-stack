@@ -17,6 +17,21 @@ spec=importlib.util.spec_from_file_location("token_manifest",Path(__file__).with
 m=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
+# Runs a rendered report's own inline script (the first non-JSON script; the returned-results sidecar is not run) in a
+# node vm against a minimal fake DOM, like test_returned_results.cjs, and prints each touched element's innerHTML.
+TEMPLATE_HARNESS=r"""
+const fs=require('fs'),vm=require('vm');
+const html=fs.readFileSync(process.argv[1],'utf8'),scripts=[...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)];
+const data=scripts.find(s=>/application\/json/.test(s[1])),code=scripts.find(s=>!/application\/json/.test(s[1]))[2];
+const dataId=/id="([^"]+)"/.exec(data[1])[1],elements=new Map(),window={scrollTo(){}};
+const element=id=>{if(!elements.has(id))elements.set(id,{innerHTML:'',textContent:id===dataId?data[2]:'',value:'',hidden:false,
+  dataset:{},classList:{add(){},remove(){},toggle(){},contains:()=>false},setAttribute(){},addEventListener(){},
+  querySelectorAll:()=>[],click(){},insertAdjacentHTML(position,text){this.innerHTML+=text;}});return elements.get(id);};
+vm.runInNewContext(code,{document:{getElementById:element,querySelectorAll:()=>[],createElement:()=>element('')},window,
+  location:{href:'file:///report/manifest.html',protocol:'file:',hash:''},history:{replaceState(){}},URL,Blob,setTimeout});
+process.stdout.write(JSON.stringify({ready:window.reportReady??null,html:Object.fromEntries([...elements].map(([id,e])=>[id,e.innerHTML]))}));
+"""
+
 class LedgerContract(unittest.TestCase):
     def portable_config(self):
         path=self.root/"config.json"
@@ -157,6 +172,243 @@ class LedgerContract(unittest.TestCase):
                 m.capture_jcodemunch(config,self.db,self.root,[],issues)
             self.assertTrue(issues)
         self.assertIsNone(self.db.native_views()[0]["latest_success"])
+
+    def report_source(self,**overrides):
+        entry={"name":"ccusage daily","tool":"ccusage","kind":"usage report","argv":["upstream","daily","--json"],
+               "boundary":"Consumed tokens, not avoided tokens"}
+        entry.update(overrides)
+        return entry
+
+    def test_report_sources_retain_upstream_reports_without_a_savings_value(self):
+        from unittest.mock import patch
+        commands=[];issues=[]
+        config={"report_sources":[self.report_source(),self.report_source(name="qmd status",tool="qmd",kind="status report",argv=["qmd","status"],format="text")],
+                "project":str(self.root)}
+        def returned(argv,cwd,root,label,timeout=60):
+            text='{"totals":{"totalTokens":1000,"savedTokens":999}}' if argv[0]=="upstream" else "Documents: 122"
+            return {"argv":argv,"exit_code":0,"stdout_text":text,"stderr_text":"","completed_at":m.now()}
+        for _ in range(2):
+            with patch.object(m,"capture",side_effect=returned):
+                m.capture_report_sources(config,self.db,self.root,commands,issues)
+        self.assertEqual(issues,[])
+        rows={r["tool"]:r for r in self.db.native_views()}
+        self.assertEqual(rows["ccusage"]["scope"],"Report / ccusage daily")
+        self.assertEqual(rows["ccusage"]["snapshot_count"],2)
+        for row in rows.values():
+            self.assertIsNone(row["latest_success"]["metrics"]["saved"])
+            self.assertFalse(row["counter_decreased"])
+        self.assertEqual(rows["ccusage"]["latest_success"]["metrics"]["kind"],"usage report")
+        self.assertEqual(rows["ccusage"]["latest_success"]["metrics"]["raw"]["totals"]["savedTokens"],999)
+        self.assertNotIn("raw",rows["qmd"]["latest_success"]["metrics"])
+        self.assertEqual(len(commands),4)
+
+    def test_report_sources_failed_or_unparsed_output_is_not_a_good_report(self):
+        from unittest.mock import patch
+        for raw,code in [("not json",0),('{"ok":true}',1),("",None)]:
+            issues=[];db=m.Ledger(self.root/("ledger-"+str(code)+raw[:3]+".sqlite3"))
+            try:
+                with patch.object(m,"capture",return_value={"exit_code":code,"stdout_text":raw,"stderr_text":"","completed_at":m.now()}):
+                    m.capture_report_sources({"report_sources":[self.report_source()],"project":str(self.root)},db,self.root,[],issues)
+                self.assertEqual(len(issues),1)
+                self.assertIsNone(db.native_views()[0]["latest_success"])
+            finally:db.close()
+
+    def test_report_source_entries_are_validated_when_the_configuration_loads(self):
+        good=self.report_source()
+        for bad in [{**good,"kind":"savings"},{**good,"argv":[]},{**good,"argv":"upstream daily"},{k:v for k,v in good.items() if k!="boundary"},
+                    {**good,"format":"yaml"},{**good,"timeout":0},{**good,"saved":1},[good,good],[good,{**good,"name":"ccusage-daily"}]]:
+            path=self.root/"config.json"
+            entries=bad if isinstance(bad,list) else [bad]
+            path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":entries}))
+            with self.subTest(bad=bad),self.assertRaises(ValueError):
+                m.load_config(path)
+        path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[good]}))
+        self.assertEqual(m.load_config(path)["report_sources"],[good])
+
+    def test_coverage_matrix_names_the_configured_report_command(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config["report_sources"]=[self.report_source(argv=["ccusage","daily","--offline","--json"])]
+        def returned(argv,cwd,root,label,timeout=60):
+            return {"argv":argv,"exit_code":0,"stdout_text":'{"daily":[]}',"stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            self.assertEqual(m.refresh(config)["issues"],[])
+        data=json.loads(Path(config["output_json"]).read_text())
+        row=next(r for r in data["coverage_matrix"] if r["id"]=="ccusage")
+        self.assertEqual(row["native_lifetime_kind"],"usage report")
+        self.assertEqual(row["native_command"],"ccusage daily --offline --json")
+        self.assertIn("Consumed tokens, not avoided tokens",row["lifetime_boundary"])
+        self.assertEqual([r["scope"] for r in row["native_reports"]],["Report / ccusage daily"])
+        self.assertIsNone(row["exact_lifetime_provider_saved"])
+
+    def test_report_failure_keeps_the_last_good_report_on_the_same_ledger(self):
+        from unittest.mock import patch
+        import subprocess
+        config={"report_sources":[self.report_source(timeout=7)],"project":str(self.root)}
+        with patch.object(m,"capture",return_value={"exit_code":0,"stdout_text":'{"totals":{"totalTokens":5}}',"stderr_text":"","completed_at":m.now()}):
+            m.capture_report_sources(config,self.db,self.root,[],[])
+        calls=[];issues=[]
+        def slow(argv,**kwargs):
+            calls.append(kwargs.get("timeout"))
+            raise subprocess.TimeoutExpired(argv,kwargs.get("timeout"),output=b'{"partial":',stderr=b"")
+        run=self.root/"run";run.mkdir()
+        with patch.object(m.subprocess,"run",side_effect=slow):
+            m.capture_report_sources(config,self.db,run,[],issues)
+        self.assertEqual(calls,[7])
+        self.assertEqual(len(issues),1)
+        row=self.db.native_views()[0]
+        self.assertFalse(row["latest"]["success"])
+        self.assertEqual(row["latest"]["evidence"]["stdout_text"],'{"partial":')
+        self.assertEqual(row["latest_success"]["metrics"]["raw"]["totals"]["totalTokens"],5)
+        self.assertEqual(row["snapshot_count"],2)
+
+    def test_report_scope_never_replaces_a_counters_last_good_value(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config.update(rtk="selected-rtk",counter_scopes={"rtk_global":"Native / all retained projects"},
+                      report_sources=[self.report_source(name="all retained projects",tool="rtk",kind="status report")])
+        def returned(argv,cwd,root,label,timeout=60):
+            return {"argv":argv,"exit_code":0,"stdout_text":'{"summary":{"total_saved":40}}' if argv[0]=="selected-rtk" else '{"ok":true}',
+                    "stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            m.refresh(config)
+        rows={r["scope"]:r for r in json.loads(Path(config["output_json"]).read_text())["native"] if r["tool"]=="rtk"}
+        self.assertEqual(rows["Native / all retained projects"]["latest_success"]["metrics"]["saved"],40)
+        self.assertIsNone(rows["Report / all retained projects"]["latest_success"]["metrics"]["saved"])
+
+    def test_report_named_by_component_id_joins_the_normalized_row(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config["report_sources"]=[self.report_source(name="jcodemunch receipt",tool="jcodemunch-mcp",kind="usage report",argv=["jcodemunch-mcp","receipt"])]
+        with patch.object(m,"capture",return_value={"argv":["x"],"exit_code":0,"stdout_text":"{}","stderr_text":"","completed_at":m.now()}):
+            m.refresh(config)
+        row=next(r for r in json.loads(Path(config["output_json"]).read_text())["coverage_matrix"] if r["id"]=="jcodemunch-mcp")
+        self.assertEqual([r["scope"] for r in row["native_reports"]],["Report / jcodemunch receipt"])
+
+    def test_report_source_argv_with_a_nul_is_rejected_when_the_configuration_loads(self):
+        path=self.root/"config.json"
+        path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(argv=["upstream","da\0ily"])]}))
+        with self.assertRaisesRegex(ValueError,"NUL"):
+            m.load_config(path)
+
+    def test_report_source_name_with_an_overlong_capture_label_is_rejected_when_the_configuration_loads(self):
+        path=self.root/"config.json"
+        fits="x"*(100-len("report-"))
+        self.assertEqual(len(m.report_label(fits)),100)
+        # The limit applies to the folded label, so punctuation that folds away does not count.
+        for name in (fits,"a"+"!"*200+"b"):
+            path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(name=name)]}))
+            self.assertEqual(m.load_config(path)["report_sources"][0]["name"],name)
+        path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(name=fits+"x")]}))
+        with self.assertRaisesRegex(ValueError,"at most 100 characters"):
+            m.load_config(path)
+
+    def test_report_source_text_that_utf8_cannot_encode_is_rejected_when_the_configuration_loads(self):
+        path=self.root/"config.json"
+        # json.dumps writes a lone surrogate as an escape such as \ud800, and json.loads restores a str UTF-8 cannot encode;
+        # the rendered manifest would then abort the refresh. \udcff even survives subprocess (surrogateescape makes it 0xff).
+        for field,value in [("argv",["upstream","\ud800"]),("argv",["upstream","da\udcffily"]),("name","report \ud800"),
+                            ("tool","jcodemunch-mcp\ud800"),("boundary","Consumption only \ud800")]:
+            path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[self.report_source(**{field:value})]}))
+            with self.subTest(field=field,value=ascii(value)),self.assertRaisesRegex(ValueError,"UTF-8"):
+                m.load_config(path)
+        accepted=self.report_source(name="ccusage täglich",argv=["upstream","données","日次"])
+        path.write_text(json.dumps({"state_dir":"state","project":".","report_sources":[accepted]}))
+        self.assertEqual(m.load_config(path)["report_sources"],[accepted])
+
+    def test_a_report_that_cannot_be_captured_does_not_abort_the_refresh(self):
+        from unittest.mock import patch
+        config=self.portable_config();stats=self.root/"stats";stats.mkdir()
+        (stats/"stats-one.json").write_text(json.dumps({"schemaVersion":1,"tokens_saved_lifetime":512,"tokens_saved":20}))
+        # A dict configuration skips load validation, so both entries reach the real capture(): subprocess raises
+        # ValueError for an argv NUL, and mkdir raises OSError (ENAMETOOLONG) for an overlong capture folder name.
+        long_name="long "+"x"*300
+        config.update(context_roots=[{"name":"Explicit scope","path":str(stats)}],report_sources=[
+            self.report_source(name="nul report",argv=["upstream","da\0ily"]),self.report_source(name=long_name),
+            self.report_source(name="later report")])
+        real=m.capture
+        def selective(argv,cwd,root,label,timeout=60):
+            if label==m.report_label("later report"):
+                return {"argv":argv,"exit_code":0,"stdout_text":'{"ok":true}',"stderr_text":"","completed_at":m.now()}
+            return real(argv,cwd,root,label,timeout=timeout)
+        with patch.object(m,"capture",side_effect=selective):
+            result=m.refresh(config)
+        self.assertEqual(result["issues"],[name+": upstream report failed; last successful report remains separate" for name in ("nul report",long_name)])
+        data=json.loads(Path(config["output_json"]).read_text())
+        rows={r["scope"]:r for r in data["native"]}
+        for scope,expected in [("Report / nul report","embedded null byte"),("Report / "+long_name,"too long")]:
+            with self.subTest(scope=scope[:20]):
+                latest=rows[scope]["latest"]
+                self.assertFalse(latest["success"])
+                self.assertIsNone(rows[scope]["latest_success"])
+                self.assertEqual({k:latest["metrics"].get(k) for k in ("saved","kind","boundary")},
+                                 {"saved":None,"kind":"usage report","boundary":"Consumed tokens, not avoided tokens"})
+                self.assertIn(expected,latest["metrics"]["error"])
+                self.assertEqual([k for k in ("stdout","stderr","stdout_text","stderr_text") if k in latest["evidence"]],[])
+        self.assertTrue(rows["Report / later report"]["latest"]["success"])
+        self.assertEqual(rows["Explicit scope"]["latest_success"]["metrics"]["saved"],512)
+        self.assertNotIn("__DATA__",Path(config["output_html"]).read_text())
+
+    def test_counter_and_context_scopes_cannot_take_the_report_prefix_when_the_configuration_loads(self):
+        path=self.root/"config.json"
+        for extra in [{"counter_scopes":{"rtk_global":"Report / all retained projects"}},
+                      {"context_roots":[{"name":"Report / Chosen","path":"stats"}]}]:
+            path.write_text(json.dumps({"state_dir":"state","project":".",**extra}))
+            with self.subTest(extra=extra),self.assertRaisesRegex(ValueError,"Report / "):
+                m.load_config(path)
+        path.write_text(json.dumps({"state_dir":"state","project":".","counter_scopes":{"rtk_global":"Linux / Report / all"},
+                                    "context_roots":[{"name":"Chosen Report / scope","path":"stats"}]}))
+        self.assertEqual(m.load_config(path)["counter_scopes"],{"rtk_global":"Linux / Report / all"})
+
+    def test_counter_and_context_scopes_cannot_take_the_report_prefix_in_refresh(self):
+        from unittest.mock import patch
+        base=self.portable_config()
+        for extra in [{"rtk":"selected-rtk","counter_scopes":{"rtk_global":"Report / all retained projects"}},
+                      {"context_roots":[{"name":"Report / Chosen","path":str(self.root)}]}]:
+            config=copy.deepcopy(base);config.update(extra)
+            with self.subTest(extra=extra):
+                with patch.object(m,"capture",side_effect=AssertionError("Command ran before the scope check")), \
+                     self.assertRaisesRegex(ValueError,"Report / "):
+                    m.refresh(config)
+                self.assertFalse(Path(config["state_dir"]).exists())
+
+    def test_report_tool_that_is_not_a_component_id_is_flagged_and_still_recorded(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config["report_sources"]=[self.report_source(name="unknown tool report",tool="not-a-component"),
+                                  self.report_source(name="jcodemunch receipt",tool="jcodemunch-mcp",argv=["jcodemunch-mcp","receipt"])]
+        def returned(argv,cwd,root,label,timeout=60):
+            return {"argv":argv,"exit_code":0,"stdout_text":'{"ok":true}',"stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            issues=m.refresh(config)["issues"]
+        self.assertEqual(len(issues),1,issues)
+        self.assertIn("unknown tool report",issues[0])
+        self.assertIn("not-a-component",issues[0])
+        row=next(r for r in json.loads(Path(config["output_json"]).read_text())["native"] if r["tool"]=="not-a-component")
+        self.assertEqual(row["scope"],"Report / unknown tool report")
+        self.assertTrue(row["latest"]["success"])
+        # A missing or unreadable manifest skips the check; it never fails the capture.
+        (self.root/"not-json.json").write_text("not json")
+        (self.root/"no-components.json").write_text('{"schema_version":1}')
+        for manifest in ("missing.json","not-json.json","no-components.json"):
+            issues=[]
+            with self.subTest(manifest=manifest),patch.object(m,"capture",side_effect=returned):
+                m.capture_report_sources({"report_sources":config["report_sources"],"project":str(self.root),
+                                          "stack_manifest":str(self.root/manifest)},self.db,self.root,[],issues)
+                self.assertEqual(issues,[])
+
+    def test_an_empty_stack_component_list_skips_the_tool_check_like_a_missing_one(self):
+        from unittest.mock import patch
+        (self.root/"empty-components.json").write_text('{"schema_version":1,"components":[]}')
+        config={"report_sources":[self.report_source(name="jcodemunch receipt",tool="jcodemunch-mcp",argv=["jcodemunch-mcp","receipt"])],
+                "project":str(self.root),"stack_manifest":str(self.root/"empty-components.json")}
+        issues=[]
+        with patch.object(m,"capture",return_value={"argv":["x"],"exit_code":0,"stdout_text":"{}","stderr_text":"","completed_at":m.now()}):
+            m.capture_report_sources(config,self.db,self.root,[],issues)
+        # An empty list names no component, so flagging every report tool (real component ids included) would be noise.
+        self.assertEqual(issues,[])
+        self.assertIsNone(m.stack_component_ids(config))
+        self.assertTrue(self.db.native_views()[0]["latest"]["success"])
 
     def test_narrative_dollar_line_does_not_invent_session_or_lifetime_footer(self):
         line="$1.18 of Opus 4.7 tokens your team didn't burn."
@@ -468,6 +720,60 @@ class LedgerContract(unittest.TestCase):
         embedded=m.json_script({"text":"</script><script>alert(1)</script>"})
         self.assertNotIn("</script>",embedded)
         self.assertEqual(json.loads(embedded)["text"],"</script><script>alert(1)</script>")
+
+    @unittest.skipUnless(shutil.which("node"),"node is required to run the template scripts")
+    def test_report_rows_render_their_kind_never_a_savings_headline_in_both_templates(self):
+        from unittest.mock import patch
+        import re
+        config=self.portable_config()
+        # Counter scopes that sort after "Report / " let the full view's first-match lookup reach a report row first.
+        config.update(rtk="selected-rtk",headroom="selected-headroom",
+                      counter_scopes={"rtk_global":"WSL / all retained projects","headroom":"WSL / native last 30 days"},
+                      report_sources=[self.report_source(name="all retained projects",tool="rtk",kind="status report"),
+                                      self.report_source(name="headroom usage",tool="headroom"),self.report_source(),
+                                      self.report_source(name="ccusage failing",kind="cache report",argv=["failing"])])
+        def returned(argv,cwd,root,label,timeout=60):
+            text={"selected-rtk":'{"summary":{"total_saved":40}}',"selected-headroom":'{"lifetime":{"tokens_saved":7}}'}.get(argv[0],'{"ok":true}')
+            return {"argv":argv,"exit_code":1 if argv[0]=="failing" else 0,"stdout_text":text,"stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            m.refresh(config)
+        data=json.loads(Path(config["output_json"]).read_text())
+        full=dict(config,html_template=str(Path(spec.origin).with_name("token_manifest.full.html.in")),
+                  output_html=str(self.root/"full.html"),output_aliases=[])
+        m.render_reports(full,data)
+        views={}
+        for name,path in (("portable",config["output_html"]),("full",full["output_html"])):
+            run=subprocess.run([shutil.which("node"),"-e",TEMPLATE_HARNESS,path],capture_output=True,text=True,timeout=60)
+            self.assertEqual(run.returncode,0,name+" template script failed: "+run.stderr[-2000:])
+            views[name]=json.loads(run.stdout)
+        # The full script's last statement sets reportReady, so the whole script ran.
+        self.assertEqual(views["full"]["ready"]["native_scopes"],len(data["native"]))
+        cards={scope:(headline,card) for card,headline,scope in re.findall(
+            r'(<article class="card"><span class="eyebrow">[^<]*</span><strong class="metric">([^<]*)</strong><p>([^<]*)</p>.*?</article>)',
+            views["portable"]["html"]["native-cards"],re.S)}
+        reports={"Report / all retained projects":"status report","Report / headroom usage":"usage report",
+                 "Report / ccusage daily":"usage report","Report / ccusage failing":"cache report"}
+        for scope,kind in reports.items():
+            with self.subTest(view="portable",scope=scope):
+                self.assertEqual(cards[scope][0],kind)
+                self.assertNotIn("Unavailable",cards[scope][1])
+                self.assertNotIn("estimated tokens",cards[scope][1])
+        # A failed report keeps the failed-counter state; counters keep their values.
+        self.assertIn('<p class="small">No successful measurement</p><p class="bad">Latest refresh failed. The kind above is configured, not observed.</p>',
+                      cards["Report / ccusage failing"][1])
+        self.assertEqual((cards["WSL / all retained projects"][0],cards["WSL / native last 30 days"][0]),("40","7"))
+        for title,value in (("RTK","40"),("Headroom","7")):
+            with self.subTest(view="full",card=title):
+                self.assertIn('<div class="eyebrow">'+title+'</div><strong class="metric">'+value+'</strong>',views["full"]["html"]["native-cards"])
+        rows=views["full"]["html"]["tool-rows"]
+        for scope,kind in reports.items():
+            with self.subTest(view="full",scope=scope):
+                failed=" · latest refresh FAILED" if scope=="Report / ccusage failing" else ""
+                self.assertIn("<p><strong>"+kind+"</strong><br>"+scope+failed+"</p>",rows)
+                self.assertNotIn("Unavailable</strong> estimated tokens<br>"+scope,rows)
+        for value,scope in (("40","WSL / all retained projects"),("7","WSL / native last 30 days")):
+            with self.subTest(view="full",scope=scope):
+                self.assertIn("<p><strong>"+value+"</strong> estimated tokens<br>"+scope+"</p>",rows)
 
     def test_money_footer_is_scoped_and_preserves_upstream_formula(self):
         d=m.dollar_explanation({"runtime":"Test client","result":{"content":[{"type":"text","text":"$0.65 this session  ·  $0.85 lifetime"}]}})

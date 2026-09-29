@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-mattpocock-skills",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/mattpocock/skills",
+ "reviewed_commit": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "instructions-skills"
+ ],
+ "claim": "Source and documentation review of mattpocock/skills at commit d81f3a183412e71a5b1e84ca21bc1a35eea03a60 (license MIT), read from README.md at that commit. Repository description: \"Skills for Real Engineers. Straight from my .agents directory.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 271785,
+  "pushed_at": "2026-09-29T12:38:37Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+   "text": "My agent skills that I use every day to do real engineering - not vibe coding."
+  },
+  {
+   "source": "README.md@d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+   "text": "Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit try to help by owning the process. But while doing so, they take away your control and make bugs in the process hard to resolve."
+  },
+  {
+   "source": "README.md@d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+   "text": "These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy."
+  }
+ ]
+}

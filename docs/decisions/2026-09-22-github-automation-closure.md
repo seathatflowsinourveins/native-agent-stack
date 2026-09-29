@@ -195,6 +195,13 @@ locally with `GH_TOKEN` set and no `--offline`, using
   one_zero engine trial (run offline under bwrap, never installed outside
   that trial): GHSA-8mgp-746c-j5xp (nltk 3.10.3) and GHSA-h35f-9h28-mq5c
   (setuptools 80.10.2; the environment was installed binary-only on Linux).
+  Since 2026-09-29 three more (until 2026-10-13) cover advisories published
+  that day, which failed every later pull_request run of the required check
+  (runs 36613233591, 36617653508 and 36618373159):
+  GHSA-hj66-6f7g-4r5v and GHSA-xpv3-w29h-x7cv (oauthlib 3.3.1, in the
+  OpenHands recipe lock and the same Lumibot lock) and GHSA-w6j9-cwv2-h6wq
+  (PyJWT 2.13.0, OpenHands lock only); see **oauthlib and PyJWT
+  (2026-09-29)** below.
   osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id and expiry only
   ([`internal/config/config.go:104-112`](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go#L104-L112)),
   and the workflow's single `--config` replaces every per-directory
@@ -239,9 +246,9 @@ locally with `GH_TOKEN` set and no `--offline`, using
   allowed paths exempted a listed lock from every advisory and bound nothing
   to its content, so a lock added for the nltk advisory alone (the pending
   GPT Researcher and crawl4ai runtime locks, #426 and #428) could have gained
-  a setuptools pin below 83 or been relocked without failing. Today one entry
-  allows both advisories for the Lumibot lock; its digest equals the
-  `lock_sha256` its evidence recorded. nltk has no patched release as of
+  a setuptools pin below 83 or been relocked without failing. Until
+  2026-09-29 one entry allowed both advisories for the Lumibot lock; its
+  digest equals the `lock_sha256` its evidence recorded. nltk has no patched release as of
   2026-09-27 (PyPI latest 3.10.3); the fixes are merged on develop
   (nltk#3757, #3759, #3813). **Expiry:** relock every allowed lock onto the
   first nltk release that ships those fixes, then delete the nltk ignore;
@@ -257,6 +264,39 @@ locally with `GH_TOKEN` set and no `--offline`, using
   and `vulnerability.ignore` drops every advisory of that package).
   **Overturn:** OSV-Scanner scopes an ignore to paths, or the workflow scans
   each lock with its own config. Evidence: `blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json`.
+  **oauthlib and PyJWT (2026-09-29).** Three Medium advisories were
+  published that day (GitHub and OSV records). GHSA-hj66-6f7g-4r5v (oauthlib
+  through 3.3.1) is JSONP callback injection in `RevocationEndpoint` with
+  `enable_jsonp=True`, and GHSA-xpv3-w29h-x7cv (oauthlib 3.x) is an `==`
+  comparison of the PKCE `code_verifier` in an oauthlib authorization
+  server; oauthlib 4.0.0 fixes both. GHSA-w6j9-cwv2-h6wq (PyJWT 2.9.0 to
+  2.13.0) lets one malformed RSA key abort parsing of a whole JWK Set;
+  PyJWT 2.14.0 fixes it. A local run of the CI command at `ed29398` failed
+  with five findings: all three in
+  `blueprints/runtime-workers/openhands/requirements.lock` (oauthlib 3.3.1,
+  PyJWT 2.13.0) and the two oauthlib ones in the Lumibot lock. Neither lock
+  is relocked here: the Lumibot lock is a frozen record, and the OpenHands
+  lock is a live recipe whose owner relocks it. Each advisory is ignored
+  until 2026-10-13, and `IGNORE_ALLOWED_LOCKS` allows both locks at their
+  reviewed sha256. The review downloaded every artifact whose sha256 either
+  lock lists (336 and 263 of 264; ibapi, a locally built wheel, from its
+  PyPI sdist) and searched its source. Nothing constructs an oauthlib
+  `RevocationEndpoint` with `enable_jsonp` or imports oauthlib's grant
+  types, endpoints or servers: oauthlib is imported only by
+  requests-oauthlib's client code and, in the Lumibot lock, by a kubernetes
+  exception import. PyJWT's `PyJWKSet`, `PyJWK` and `PyJWKClient` appear
+  only in the LiteLLM proxy server and in google-auth's ID-token
+  verification, which the recipe does not run and no installed package
+  calls. With the ignores the same run exits 0, "No issues found".
+  **Expiry:** the OpenHands owner relocks onto oauthlib 4.0.0 and PyJWT
+  2.14.0 and, in the same change, deletes that lock's `IGNORE_ALLOWED_LOCKS`
+  entry (its sha256 pin fails any change to the lock), the PyJWT ignore and
+  its `IGNORE_SCOPES` entry. The Lumibot lock keeps oauthlib 3.3.1, so on
+  2026-10-13 the scan and the allowed-lock test fail again by design: renew
+  the two oauthlib ignores for that lock alone with a new dated reason, or
+  delete the lock. The Lumibot entry now names the new record as its
+  evidence; that record carries forward the 2026-09-26 nltk and setuptools
+  review at the same sha256. Evidence: `evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json`.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day
@@ -1667,6 +1707,25 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   (`gh pr checks 389 --required` printed the eight required checks, all passing,
   exit 0; #436 exit 1 with `validate-macos` failing; #409 exit 8 while checks were
   pending; `gh pr checks --help` names exit 8 for pending checks).
+
+  **Correction (2026-09-29, after the entry above):** the exit code is not the
+  verdict. On #437 the coordinator cancelled its queued `validate-macos` run on
+  purpose, and `gh pr checks 437 --required` (run through `rtk proxy`, which does not
+  filter the output) printed the seven passing checks and `validate-macos fail`, and
+  exited 0; `--json name,bucket` gave `bucket: cancel` for that check. gh v2.101.0
+  explains both: `checks.go` L248-252 returns exit 1 when `counts.Failed > 0`, else
+  exit 8 when `counts.Pending > 0`, else 0, and `aggregate.go` L72-88 sends
+  `CANCELLED` to bucket `cancel` (`counts.Canceled`) and `SKIPPED`/`NEUTRAL` to
+  `skipping`, neither of which changes the exit code; `checks.go` L189-191 returns
+  after the JSON export, so `--json` exits 0 in every state. The same source shows
+  that a failed check wins over a pending one (exit 1), which the entry's earlier
+  wording ("1 when one has failed and none is pending") did not say. GitHub's own
+  ruleset still refuses a merge while a required check is cancelled, so no merge was
+  wrongly allowed; the error was in the documented pre-merge read. `docs/lanes.md`
+  now prints the required-check count and the set of buckets and merges only on
+  `pass`, and `tests/test_merge_guard_doc.py` fails if that text drifts back to the
+  exit-code reading. **Overturn:** a newer gh that counts `cancel` as failing or
+  changes the `--json` exit code; re-read `checks.go` when the pinned gh moves.
 
   **Rollback:** PUT the committed file from before #294, `57fb6d89`. The only
   change `git diff 57fb6d89 7bbb021e -- .github/main-ruleset.json` makes is

@@ -116,7 +116,8 @@ itself evidence the WSL UVA gap closed.
    [`adoption/receipt.json`](../receipt.json).
 3. Render configs with [`tools/adoption/render_config.py`](../../tools/adoption/render_config.py)
    (`adoption/bootstrap.md` step 4) using this host's own
-   `adoption/hosts/<host>.json`.
+   `adoption/hosts/<host>.json`. For tab titles, alerts and the login shell of Windows Terminal profiles, see
+   [Windows Terminal profiles and the login shell](#windows-terminal-profiles-and-the-login-shell) (added after `v2026.09.26.2`).
 4. Start selected `systemd --user` units per
    [`adoption/lifecycle.md`](../lifecycle.md#native-client-integration-and-process-lifecycle);
    never stop the shared MCPorter daemon to clean up another component.
@@ -163,6 +164,47 @@ upstream behavior behind each.
   `/dev/stdin` could not be reopened by path across the interop boundary
   either. Pipe the script to `bash -s` instead:
   `wsl.exe -d <distro> -- bash -s < script.sh`.
+
+## Windows Terminal profiles and the login shell
+
+Added after `v2026.09.26.2`: `adoption/templates/claude.settings.linux-wsl2.overlay.json`, the profile example
+[`examples/claude-native/windows-terminal.fragment.example.json`](../../examples/claude-native/windows-terminal.fragment.example.json)
+and `scripts/adoption_status.py --login-shell`. `adoption/templates/codex.config.template.toml` changed after
+`v2026.09.26.2` too: it adds a `[tui] notifications` list. A host pinned to that release has none of them until a release
+carries them ([moving a host to a new release](../update.md#moving-a-host-to-a-new-release)). The decision, its evidence and
+its limits are in [the 2026-09-28 terminal decision](../../docs/decisions/2026-09-28-terminal-experience.md).
+
+A Windows Terminal profile that starts a client with `bash -lc "exec claude"` gets its PATH from the Bash login shell, and a
+login shell reads only the first of `~/.bash_profile`, `~/.bash_login` and `~/.profile`
+([Bash startup files](https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files); bash 5.3 `shell.c`
+`execute_profile_file`). A file at one of the first two names, even an empty one, therefore hides `~/.profile` and every PATH
+entry it adds, and the tab ends with `exec: claude: not found` (exit 127). With `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` on Linux
+with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves it
+([anthropics/claude-code#76236](https://github.com/anthropics/claude-code/issues/76236)).
+
+1. Keep no empty `~/.bash_profile` or `~/.bash_login`. On a host that sets that variable, make `~/.bash_profile` a real file that
+   hands off:
+   `if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi`. Bootstrap writes no shell startup file; this stays the
+   operator's edit.
+2. Check without running anything:
+   `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --login-shell --json`. It stats the three
+   files and reports a state each, the file a login shell reads first and `profile_read` (`false` when an empty or unusable earlier file hides `~/.profile` or `~/.profile` is itself unusable; `null` when an earlier file has content, because whether it hands off is not read). It proves
+   no PATH. Prove that with the profile's own launch shape, from Windows or through WSL interop:
+   `wsl.exe -d <DISTRO> -u <WSL_USER> --exec /bin/bash -lc 'command -v claude codex'` must print both paths. A probe from a shell
+   that already has PATH passes even when the login files are broken.
+3. Merge the Claude Code overlay (added after `v2026.09.26.2`) into the live settings: `python3 tools/adoption/apply_claude_settings.py --template
+   adoption/templates/claude.settings.linux-wsl2.overlay.json --dry-run`, then the same without `--dry-run` (it backs the file up
+   first). It sets `preferredNotifChannel` to `notifications_disabled` and adds one `Notification` hook that rings the
+   terminal bell only when Claude Code needs the person (a permission or elicitation dialog, an agent waiting for input, a quota event); the hook runs `jq`, which the bootstrap already requires. Windows Terminal 1.24 acts on no notification sequence but BEL. The merge de-duplicates hooks by command anywhere in the event, so it never changes the matcher of a `Notification` hook that already runs the same command: if the overlay's matcher changes later, edit or remove that group first and merge again. `evidence/artifacts/wsl-terminal-defaults-20260929/overlay_noop_check.py` prints whether exactly one group holds the command and whether its matcher equals the overlay's.
+4. Render the Codex template as usual (`tools/adoption/render_config.py`; step 3 above): its `[tui] notifications` list asks for a notification on an approval, a plan-mode prompt or a question (`request_user_input` questions notify as `plan-mode-prompt`; `async-question` covers the asynchronous questions added after 0.155.1), and not when a turn finishes. Codex loads a misspelled kind
+   without an error and never notifies for it; the comment above the list names the source file that defines the kinds.
+5. Copy the profile example, replace `<DISTRO>`, `<WSL_USER>` and `<PROJECT>`, and save it as UTF-8 to
+   `%LOCALAPPDATA%\Microsoft\Windows Terminal\Fragments\native-agent-stack\<name>.json`
+   ([JSON fragment extensions](https://learn.microsoft.com/en-us/windows/terminal/json-fragment-extensions)). The page says a GUID is "optional, but strongly encouraged"; the example declares none because this repository's publication scan treats any UUID as a session identifier. Windows Terminal then derives a stable one from the folder name and the profile name (the page's UUIDv5 recipe gives the same value if you must reference a profile by it), so keep the folder name and the profile names fixed once installed: renaming either gives the profile a new identity, and a `settings.json` override or a `defaultProfile` keyed to the old GUID stops applying. Windows Terminal merges fragments on every settings load
+   and watches only `settings.json`, so touch that file after adding or editing one. The example sets no `suppressApplicationTitle` on the Claude and Codex profiles, so each tab shows the title its
+   client sends; gives them an explicit `bellStyle` array (never `"all"`) and a quiet `bellSound`; and sets `COLORTERM` through the profile's `environment` key. A profile's own `environment` completely replaces `profiles.defaults.environment` instead of merging with it ([profile-advanced](https://github.com/MicrosoftDocs/terminal/blob/main/TerminalDocs/customize-settings/profile-advanced.md), "Environment variables"), so on a host whose `defaults` set variables, copy them into that profile's `environment` too.
+
+Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1). A new host collects its own evidence.
 
 ## Listeners and ports
 

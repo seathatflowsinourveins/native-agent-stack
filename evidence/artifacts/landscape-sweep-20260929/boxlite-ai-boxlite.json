@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-boxlite-ai-boxlite",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/boxlite-ai/boxlite",
+ "reviewed_commit": "91655df3f172812c56465f96a9dac79f9b193f9f",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of boxlite-ai/boxlite at commit 91655df3f172812c56465f96a9dac79f9b193f9f (license Apache-2.0), read from README.md at that commit. Repository description: \"The micro-VM for AI agents — light enough to embed on your laptop, elastic enough to power an agentic cloud.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2355,
+  "pushed_at": "2026-09-29T14:06:18Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@91655df3f172812c56465f96a9dac79f9b193f9f",
+   "text": "BoxLite runs isolated applications in lightweight virtual machines, locally or through a cloud control plane."
+  },
+  {
+   "source": "README.md@91655df3f172812c56465f96a9dac79f9b193f9f",
+   "text": "A **Box** is a hardware-isolated micro-VM that runs any OCI image — and it persists. Agents install packages, write files, and resume across turns, never from cold."
+  },
+  {
+   "source": "README.md@91655df3f172812c56465f96a9dac79f9b193f9f",
+   "text": "- **Real isolation**: its own kernel — stronger than a container, lighter than a full VM. Small footprint, async-first for fleets. - **Daemonless**: embed as a library — no root, no background service. *(optional server mode)* - **OCI-native**: run any Docker image unchanged (`python:slim`, `node:alpine`, …). - **Controlled networking**: restrict egress with `allow_net`; inject real secrets via placeholders. - **Embed → cloud**: one engine, from your laptop to a multi-tenant cloud."
+  }
+ ]
+}

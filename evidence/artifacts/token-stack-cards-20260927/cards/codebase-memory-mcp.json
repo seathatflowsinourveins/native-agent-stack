@@ -1,0 +1,677 @@
+{
+ "tool": "codebase-memory-mcp",
+ "group": "g3-code-navigation",
+ "repo": "https://github.com/DeusData/codebase-memory-mcp",
+ "pin": "0.11.0 (GitHub release codebase-memory-mcp-linux-amd64.tar.gz, sha256 032b33c1...)",
+ "installed_version": "codebase-memory-mcp 0.11.0 (native `codebase-memory-mcp --version`)",
+ "role": "Persistent static code graph: callers and call paths without reading whole files; static edges only. Lanes: Claude and Codex user-scope MCP (0 projects indexed now); CLI `cli --json <tool>`. Landscape: code-navigation alternative (the laptop removed it from its profile).",
+ "lanes": [
+  "Claude user-scope MCP (codebase-memory)",
+  "Codex user-scope MCP",
+  "CLI: codebase-memory-mcp cli --json <tool> [json_args]"
+ ],
+ "upstream": {
+  "latest_release": "v0.11.0",
+  "latest_release_url": "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/latest",
+  "latest_date": "2026-09-15",
+  "latest_date_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+  "our_pin": "0.11.0; release tag resolves to 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+  "our_pin_url": "https://github.com/DeusData/codebase-memory-mcp/commit/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+  "behind_by": "The pin exactly matches the latest tagged release v0.11.0, so it is neither ahead of nor behind that release (https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0). Current main 64c23fab6c3eba3de226355c0ca1ff750116edab is 135 unreleased commits ahead (https://github.com/DeusData/codebase-memory-mcp/compare/v0.11.0...64c23fab6c3eba3de226355c0ca1ff750116edab). Latest release, tag commit and comparison were rechecked live; the release identity cited by the assembled Q3 evidence is still current.",
+  "recommended_install": {
+   "command": "curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash",
+   "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L46-L95"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "The upstream installer detects Claude Code and registers the executable in $HOME/.claude.json; the README also documents manual stdio MCP configuration. Its full adoption includes a skill, graph-agent profiles, session/subagent context hooks and read/coverage augmentation. --skip-config installs the binary without this agent setup; installer and hook defects should be assessed separately from the supported direct MCP transport.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L455-L550"
+   },
+   "codex": {
+    "how": "The documented installer registers MCP in the Codex configuration home and additionally installs an AGENTS.md activation pointer, skill, read-only graph agents and SessionStart/SubagentStart hooks. Installed hooks require client trust through /hooks. A manually configured stdio executable remains a narrower integration than that full installer path.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L493-L585"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Upstream provides persistent structural graph queries, caller/callee tracing and compact, paginated outputs to reduce exploratory source loading. It is a structural backend, with the MCP client supplying the language model.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md"
+   },
+   {
+    "claim": "The release already contains compact output and response budgeting; its release-note tokenizer comparison concerns a serialized tools/list fixture, not a whole agent session or this native adaptation.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+   },
+   {
+    "claim": "Upstream explicitly separates answer quality, graph performance and model-token savings. Its measurement guide requires paired runs on the same repository revision, questions, model, prompt, budget and session policy; graph query counters cannot reveal final model consumption.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/docs/MEASURING_SAVINGS.md"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "search_graph, query_graph and trace_path expose no automatic 0.5 confidence floor. trace_path's include_evidence defaults to false and reveals resolver class/confidence when enabled; the implementation explicitly presents this as an opt-in for judging edge trust. The same behavior remains in current main, so a 0.5 acceptance cutoff is a caller policy rather than an upstream default or a recommendation in these schemas.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/64c23fab6c3eba3de226355c0ca1ff750116edab/src/mcp/mcp.c#L484-L559"
+   },
+   {
+    "text": "The pinned pipeline stores confidence and strategy on CALLS edges. Its PC_SVC_PATTERN_CONF=0.5 constant assigns confidence to inferred service-pattern edges when registry resolution is empty; it does not prescribe dropping all edges below 0.5.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/pipeline/pass_calls.c#L15-L17"
+   },
+   {
+    "text": "Graph absence is not proof of complete coverage, and output budgets are deterministic byte-based sizing hints rather than tokenizer-exact limits. Callers must inspect coverage and pagination rather than assuming an empty or bounded response is an exhaustive source result.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L508-L558"
+   },
+   {
+    "text": "Automatic indexing is off by default, but automatic watching and the watcher subsystem default to on. A registered MCP server therefore does not imply an indexed repository, and disabling indexing alone does not disable all background coordination.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/docs/CONFIGURATION.md#L88-L116"
+   },
+   {
+    "text": "Retained upstream issue evidence reports that the v0.11.0 Claude SubagentStart installer emits an unsupported separate args field; the maintainer confirmed that generated shape. This is an installer-path defect, not a demonstrated failure of manually registered MCP queries.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/issues/2239#issuecomment-5744702732"
+   },
+   {
+    "text": "Retained upstream issue evidence and maintainer confirmation identify a Codex installer preservation gap: unrelated tables inside CBM's managed markers can be removed on rewrite. Re-running the full installer is not a justified repair for a missing manually managed registration.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/issues/2228#issuecomment-5744699161"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "Unreleased main bases indexing memory budgets on available memory rather than the earlier total-memory policy.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/commit/c3714f1133"
+   },
+   {
+    "text": "Unreleased main fixes graph-content differences caused by disk spilling; the upstream change identifies the defect as affecting v0.11.0.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/commit/9a2bdc8c1d"
+   },
+   {
+    "text": "Unreleased main includes deterministic graph-resolution, findability and coverage fixes following the release probe; these do not themselves establish that the local Q3 import/caller case is fixed.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/commit/1a3425536b"
+   },
+   {
+    "text": "Unreleased main adds backoff after hard indexing-worker failures; a different retry cadence is not proof that all indexing coordination failures are resolved.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/commit/76e54f7525"
+   },
+   {
+    "text": "Unreleased main rejects nonnumeric Cypher SKIP/LIMIT bounds instead of silently dropping them.",
+    "url": "https://github.com/DeusData/codebase-memory-mcp/commit/3d9a6cf5cb"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+   "version": "0.11.0",
+   "license": "MIT",
+   "profile": "core",
+   "role": "Persistent static code graph and call tracing",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+  },
+  "how_we_install": "Reviewed the checkout matching origin/main@34c56340e636ad3d3daeb8482d48d1d8f0b135ae. The catalog selects the official v0.11.0 codebase-memory-mcp-linux-amd64.tar.gz release archive and recorded checksum, then invokes the installed binary directly rather than running its all-client installer (recipes/README.md:88). The observed Codex launcher is ${ECO_ROOT}/bin/codebase-memory-mcp. Although manifests/stack.json:272 labels the component core, it appears in no adoption profile and neither platform pins file, so automated bootstrap does not install it on a new host; the handbook explicitly records this gap and the absence of a documented Mac install in that recipe (adoption/manifest.json:191; adoption/pins-linux-x86_64.json; adoption/pins-macos-arm64.json; docs/token-session-handbook.md:211).",
+  "claude_wiring": "The scope decision describes an existing Claude user-scope server that the Codex setup mirrors (docs/decisions/2026-09-25-codex-mcp-scope.md:63). Portable adoption/mcp/claude-user.json registers only ai-memory and Serena; adoption/templates/claude.settings.template.json adds no CBM registration or hooks, and examples/claude-mcp.json.example also has no CBM entry. The explicit bridge recipe is examples/mcporter.json.example:16 plus recipes/README.md:585. None of the six shipped examples/claude-native/agents/*.md tool lists grants either CBM MCP namespace; this includes examples/claude-native/agents/evidence-reviewer.md:4 and examples/claude-native/agents/isolated-builder.md:4, despite their Serena and jCodeMunch grants. Bash-enabled agents can still use a CLI/bridge, so the verified gap is direct native MCP access rather than the impossibility of every kind of invocation.",
+  "codex_wiring": "adoption/templates/codex.config.template.toml:72 registers [mcp_servers.codebase-memory] at user scope with command ${ECO_ROOT}/bin/codebase-memory-mcp and no arguments. Live read-only `codex mcp list --json` and `codex mcp get codebase-memory --json` confirm the entry; a neutral-directory merged list also contains it, so availability does not depend on the main checkout's untracked .codex/config.toml. This verifies configuration availability, not a newly executed indexing or graph-query result (docs/token-session-handbook.md:67; docs/token-session-handbook.md:214).",
+  "lane_rule": "Use the on-demand static-graph lane with explicit project/node identifiers, bounded search_graph/trace_path requests and original-source checks (docs/token-session-handbook.md:139). The recipe explicitly indexes selected code in fast mode, uses CBM_ALLOWED_ROOT in the bridge example and reindexes after relevant edits; persistence:false avoids a repository snapshot but does not make the account database ephemeral (recipes/README.md:585; examples/mcporter.json.example:16).",
+  "deviations_from_upstream": [
+   {
+    "what": "The Q3 confidence cutoff is local policy, not an upstream default or a documented upstream threshold in the reviewed query/trace contracts. Upstream supports trace_path(include_evidence=true), but leaves it false by default and applies no general 0.5 confidence floor (https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L483-L558; https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L9004-L9009). The source's service-pattern 0.5 constant is an assigned score, not a filter (https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/pipeline/pass_calls.c#L15-L17).",
+    "why": "The assembled card's Q3 fixture contains weak inferred edges and missed callers through a try/except relative import. Confidence filtering can reject a weak false positive; it cannot restore callers the index never resolved, so a smaller graph payload is not complete enumeration.",
+    "fix": "Document the 0.5 cutoff as a Q3-derived local heuristic. Read-only traversal of the matching graph yields 9 of 12 genuine direct callers; requiring confidence >= 0.5 removes two genuine callers at confidence 0.38, leaving 7 of 12, and also removes valid two-hop paths through freshness_propose.apply. A 0.5 cutoff is not established as a suitable fix merely because it removes the one demonstrated 0.07 false positive. Qualify any cutoff against known callers before recommending it; do not substitute another untested threshold. Request trace evidence, filter edge confidence explicitly in query/output handling where available only after that qualification, retain coverage caveats, and cross-check exact enumeration with Serena and original source. Keep low-confidence candidates available for source or Serena cross-check rather than silently dropping them. Do not pass include_evidence as though it were a search_graph or query_graph parameter.",
+    "pr": null
+   },
+   {
+    "what": "The manifest's core label does not match an automated fresh-host install path: no adoption profile or platform pin selects CBM, despite the user MCP template naming its executable (manifests/stack.json:272; adoption/manifest.json:191; adoption/pins-linux-x86_64.json; adoption/pins-macos-arm64.json; adoption/templates/codex.config.template.toml:72; docs/token-session-handbook.md:211).",
+    "why": "Catalog membership and server registration have been maintained separately from bootstrap coverage. An already installed host can work while a new adopter receives a server entry for an absent binary.",
+    "fix": "Either add qualified platform pins and explicit profile selection, or label the component as manual adoption and gate its server registration on installation. Keep unsupported platform coverage explicit.",
+    "pr": null
+   },
+   {
+    "what": "The shipped Claude profile supplies neither a CBM server entry nor direct CBM grants to its agents, unlike upstream's documented graph-agent integration (adoption/mcp/claude-user.json; examples/claude-native/agents/evidence-reviewer.md:4; examples/claude-native/agents/isolated-builder.md:4; https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L493-L585).",
+    "why": "A host-level registration cannot satisfy a shipped agent's explicit tool allowlist. Manual CLI/bridge use remains possible in Bash-enabled agents, but that is a separate route and does not repair direct MCP availability.",
+    "fix": "For projects adopting the graph lane, provide explicit server registration and narrow read-only graph-tool grants to the intended agents, then verify a useful call from those agents. Do not assume the current examples inherit every host MCP tool.",
+    "pr": null
+   },
+   {
+    "what": "The adaptation intentionally uses manual direct-MCP/bridge setup and explicit indexing rather than upstream's broad installer, activation pointers and generated hooks (recipes/README.md:88; recipes/README.md:585; docs/decisions/2026-09-25-codex-mcp-scope.md:74). The inspected card records that the main checkout was not indexed for the retained adaptation; user-scope registration alone does not fix that.",
+    "why": "The catalog requires bounded project adoption and preserves existing client configuration. This also avoids the installer paths implicated by the retained upstream hook and Codex configuration-preservation reports (https://github.com/DeusData/codebase-memory-mcp/issues/2239; https://github.com/DeusData/codebase-memory-mcp/issues/2228). Upstream auto_index=false is itself the default, so keeping it off is not a departure from that default.",
+    "fix": "Explicitly index an opted-in repository and verify freshness/coverage before graph work. Keep hook installation separate from MCP availability and qualify generated client configuration before enabling it.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Reconcile the core catalog label, missing adoption profiles/platform pins and unconditional executable reference in the user MCP template.",
+   "Provide an explicit Claude adoption route and narrow graph-tool grants for the shipped agents that are intended to use CBM; keep CLI/bridge availability distinct.",
+   "Document the local Q3 evidence/0.5-filter policy and its precision/recall tradeoff: a 0.5 confidence floor trades 2 of 12 genuine direct callers at confidence 0.38, reducing read-only traversal results from 9/12 to 7/12, for removing the one demonstrated 0.07 false positive; it also removes valid two-hop paths through freshness_propose.apply. Qualify any cutoff against known callers before recommending it as a fix, rather than adopting it on false-positive removal alone or substituting another untested threshold. Keep low-confidence candidates available for source or Serena cross-check and retain the need for exact-enumeration cross-checks; do not claim it fixes missing relative-import callers.",
+   "Index an explicitly adopted repository and qualify useful multi-hop queries before attributing broader effectiveness to the installed server. Qualify unreleased graph and memory fixes separately; no upgrade or indexing was performed here."
+  ],
+  "assessment": "The release pin and direct Codex MCP transport align with upstream, but the profile/pin mismatch leaves fresh-host installation incomplete (recipes/README.md:88; docs/token-session-handbook.md:211; adoption/templates/codex.config.template.toml:72). The assembled card's exact comparisons support bounded retrieval reductions, while its separate invocation evidence shows limited adoption. Missing direct MCP grants in every shipped Claude agent plausibly restrict routine use, even though Bash-enabled agents can still call the CLI/bridge (examples/claude-native/agents/evidence-reviewer.md:4; examples/claude-native/agents/isolated-builder.md:4). The Q3 graph evidence still requires a locally chosen confidence filter and source/Serena verification; removing weak edges cannot recover missed callers."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T18:27:31.297Z",
+  "fidelity": {
+   "what": "independent verifier agreement",
+   "result": "verifier: agree, 3 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 30 codebase-memory-mcp --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 codebase-memory-mcp config set ui_enabled false",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 1800 codebase-memory-mcp cli --json index_repository {\"repo_path\":\"<tmp>/rr-cbm-fx\",\"name\":\"rr-wt\",\"mode\":\"full\",\"persistence\":false}",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 codebase-memory-mcp cli --json search_graph {\"project\":\"rr-wt\",\"name_pattern\":\"^register_file$\",\"format\":\"json\",\"limit\":5}",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 codebase-memory-mcp cli --json trace_path {\"project\":\"rr-wt\",\"function_name\":\"rr-wt.scripts.host_receipts.register_file\",\"direction\":\"inbound\",\"depth\":1,\"format\":\"json\"}",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 codebase-memory-mcp cli --json search_code {\"project\":\"rr-wt\",\"pattern\":\"register_file\",\"file_pattern\":\"*.py\",\"mode\":\"compact\",\"format\":\"json\"}",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 31,
+  "records_shown": [
+   {
+    "id": "codebase-memory-mcp:identity-and-pin",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 30 codebase-memory-mcp --version",
+    "observation": "Native execution. `--version` returned `codebase-memory-mcp 0.11.0`; PATH resolves to the codex-ecosystem bin link into tools/codebase-memory-mcp-0.11.0. Probe phase (18:27Z, cwd = that install's downloads dir): `sha256sum --check --ignore-missing checksums.txt` returned `codebase-memory-mcp-linux-amd64.tar.gz: OK`, archive sha256 032b33c1833919a2... (matches the pin). Exit: a02-version=0, a01-which=0, p13-pin-checks",
+    "attachments": 4
+   },
+   {
+    "id": "codebase-memory-mcp:scratch-config",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 60 codebase-memory-mcp config set ui_enabled false",
+    "observation": "Native execution. Plan step 1: `config set ui_enabled false` returned `ui_enabled = false (restart the daemon for this to take effect)`; read back by `config list` (ui_enabled false, auto_index false, auto_watch true, watcher_enabled true) and the scratch config.json. `daemon start` later set it back to true (see daemon-start, cleanup). Exit: a03-config-set=0, a04-config-list=0, a05-ui-config=0. Sanitized (literal ho",
+    "attachments": 3
+   },
+   {
+    "id": "codebase-memory-mcp:fixture-clone",
+    "status": "passed",
+    "kind": "fixture preparation",
+    "command": "timeout -k 5 600 git clone --quiet --shared --no-checkout $WT <tmp>/rr-cbm-fx",
+    "observation": "Upstream git: shared no-checkout clone of wt-rr at <tmp>/rr-cbm-fx, detached checkout of 803bc3514ef05129c57118d8cbad0c61dd4ab141; rev-parse matched and porcelain status (untracked included) was empty before and after indexing (a13, a22, a23). Short path without the account name. Exit: a10-clone=0, a12-head=0. Sanitized (literal home directory -> $HOME, then remaining account user name -> $USER, any email ",
+    "attachments": 1
+   },
+   {
+    "id": "codebase-memory-mcp:baseline-grep-cat",
+    "status": "passed",
+    "kind": "baseline (file-by-file condition)",
+    "command": "timeout -k 5 120 grep -rn register_file . --include=*.py",
+    "observation": "Upstream grep/cat in the clone root: `grep -rn register_file . --include=*.py` returned 23 lines in 6 files (def at scripts/host_receipts.py:710); `cat` of the 5 non-test matched files returned 237,355 bytes. Relative grep instead of the plan's literal `grep ... $CLONE`, so no scratch prefix inflates each line. o200k 525 + 55,749 = 56,274 tokens (the before-artifact). Exit: a40-base-grep=0, a41-base-cat=0.",
+    "attachments": 2
+   },
+   {
+    "id": "codebase-memory-mcp:cli-index",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 1800 codebase-memory-mcp cli --json index_repository {\"repo_path\":\"<tmp>/rr-cbm-fx\",\"name\":\"rr-wt\",\"mode\":\"full\",\"persistence\":false}",
+    "observation": "Native execution. Counter-before: list_projects returned 0 projects. Plan step 2: index_repository(full, persistence false, name rr-wt) returned status indexed, 177,451 nodes, 297,576 edges (= expected), 48 not-indexed files, 29 parse_partial, 1 parse_unusable, in 32.7 s. index_status(verbose): root <tmp>/rr-cbm-fx, head 803bc351, detached. list_projects(stats): 1 project, 762,576,896 bytes. stderr of each",
+    "attachments": 8
+   },
+   {
+    "id": "codebase-memory-mcp:cli-search-graph",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 120 codebase-memory-mcp cli --json search_graph {\"project\":\"rr-wt\",\"name_pattern\":\"^register_file$\",\"format\":\"json\",\"limit\":5}",
+    "observation": "Native execution. Plan step 3: one row, register_file Function scripts/host_receipts.py 710-727, in 9, out 5. qn.py (local) derived rr-wt.scripts.host_receipts.register_file. Wall 6.4 s. Exit: a30-search=0, a31-qn=0. Sanitized (literal home directory -> $HOME, then remaining account user name -> $USER, any email address -> <email>; nothing else changed): a31-qn argv.",
+    "attachments": 3
+   },
+   {
+    "id": "codebase-memory-mcp:cli-trace-path",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 120 codebase-memory-mcp cli --json trace_path {\"project\":\"rr-wt\",\"function_name\":\"rr-wt.scripts.host_receipts.register_file\",\"direction\":\"inbound\",\"depth\":1,\"format\":\"json\"}",
+    "observation": "Native execution. Plan step 4 (inbound, depth 1, include_tests default false): callers_total 4: freshness_propose.rebuild_explorer, freshness_propose.apply, host_receipts.cmd_record, host_receipts.cmd_review. Missing vs source: component_matrix.main, hardware_profile.cmd_record_host, new_host_grand_list.main, which call host_receipts.register_file through a try/except relative-then-absolute module import; coverage re",
+    "attachments": 2
+   },
+   {
+    "id": "codebase-memory-mcp:cli-search-code",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 120 codebase-memory-mcp cli --json search_code {\"project\":\"rr-wt\",\"pattern\":\"register_file\",\"file_pattern\":\"*.py\",\"mode\":\"compact\",\"format\":\"json\"}",
+    "observation": "Native execution. search_code(register_file, *.py, compact), the literal fallback the server's instructions name: 10 of 18 results (has_more, 23 grep matches, 343 ms), covering all 7 non-test callers plus the definition, receipt_filename_stem (docstring text at line 687) and one test method. Exit: a33-search-code=0.",
+    "attachments": 2
+   },
+   {
+    "id": "codebase-memory-mcp:cli-coverage",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 120 codebase-memory-mcp cli --json check_index_coverage {\"project\":\"rr-wt\",\"paths\":[\"scripts/component_matrix.py\", \"scripts/freshness_propose.py\", \"scripts/hardware_profile.py\", \"scripts/host_receipts.py\", \"",
+    "observation": "Native execution. check_index_coverage for the 6 grep-matched files: no_recorded_issue, metadata_match, use_graph_with_best_effort_caveat for each. Exit: a42-coverage=0.",
+    "attachments": 2
+   },
+   {
+    "id": "codebase-memory-mcp:cli-delete",
+    "status": "passed",
+    "kind": "upstream native operation",
+    "command": "timeout -k 5 120 codebase-memory-mcp cli --json delete_project {\"project\":\"rr-wt\"}",
+    "observation": "Native execution. Plan step 5: delete_project returned status deleted; list_projects then returned 0 projects (CLI counter-after). Exit: a50-delete=0, a51-list-after=0.",
+    "attachments": 4
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Find register_file callers: grep+source file vs codebase-memory graph search; verified (PASS)",
+    "before_tokens": 22445,
+    "after_tokens": 19635,
+    "change_pct": -12.5,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:07:56.876682+00:00",
+    "last_seen": "2026-09-25T21:07:56.876682+00:00"
+   },
+   {
+    "lane": "codex_worker",
+    "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's codebase-memory task; answer verified against the baseline (PASS)",
+    "before_tokens": 22445,
+    "after_tokens": 16109,
+    "change_pct": -28.2,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-26T13:51:53.948236+00:00",
+    "last_seen": "2026-09-26T13:51:53.948236+00:00"
+   }
+  ],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": "Weakest saver (-12.5% Claude, -28.2% Codex) on caller search, where grep plus source is already small; the main checkout was never indexed. Q3 fixture: 9 of 12 direct callers found; a true edge sits at confidence 0.38 and a false one at 0.07, so a 0.5 cutoff would cut recall to 7 of 12. Treat low-confidence edges as candidates and verify with Serena.",
+  "q3_fixture": {
+   "result": "partial",
+   "clone_commit": "34c56340",
+   "tool_bytes": 1691,
+   "baseline_bytes": 546776,
+   "hop1_recall": "9 of 12 functions",
+   "missed": "callers that `from . import host_receipts` inside try/except",
+   "false_positive": "test_apply_claude_settings -> freshness_propose.apply at confidence 0.07; true edges range 0.38-0.95",
+   "usage_fix": "include_evidence=true; treat edges below confidence 0.5 as candidates to verify, not drops (a 0.5 cutoff cuts recall to 7 of 12); verify exact caller lists with Serena",
+   "upstream_release_checked": "v0.11.0 (2026-09-15) is the latest",
+   "evidence_class": "local integration"
+  }
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 7,
+    "cli_calls": 31,
+    "agents_using": 9,
+    "agents": 1010,
+    "pct_agents_using": 0.0089
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 7,
+    "cli_calls": 31,
+    "agents_using": 9,
+    "agents": 988,
+    "pct_agents_using": 0.0091
+   },
+   "agent_subagents": {
+    "mcp_calls": 1,
+    "cli_calls": 19,
+    "agents_using": 2,
+    "agents": 71,
+    "pct_agents_using": 0.0282
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 1,
+    "agents_using": 1,
+    "agents": 15,
+    "pct_agents_using": 0.0667
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 6,
+    "cli_calls": 0,
+    "agents_using": 1,
+    "agents": 301,
+    "pct_agents_using": 0.0033
+   }
+  },
+  "live_otel": {
+   "window": {
+    "since": "2026-09-26T22:50:00Z",
+    "until": "2026-09-26T23:37:28Z",
+    "duration": "2848s"
+   },
+   "panel": "U6 panel 31: MCP calls by client and server",
+   "series": []
+  },
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "defects",
+  "findings": [
+   {
+    "severity": "medium",
+    "field": "adapted_performance.q3_fixture.false_positive",
+    "issue": "Assembler-side factual defect: '(true edges 0.85-0.95)' excludes genuine edges at confidence 0.38. In the matching v0.11.0 graph, freshness_propose.rebuild_explorer and freshness_propose.apply both call host_receipts.register_file with confidence 0.38; the clone's source confirms the calls at lines 598 and 649. The claimed 0.07 false-positive edges are corroborated. assemble.py hard-codes the incorrect true-edge range.",
+    "fix": "Correct the assembler's Q3 characterization to include the genuine 0.38 edges and distinguish them from the 0.07 false positives. Preserve confidence-bearing evidence for the claim; fixture.py omits include_evidence and retained tool.txt contains no confidence values. This numeric field cannot be repaired in codebase-memory-mcp.upstream.json.",
+    "source": "$HOME/.cache/codebase-memory-mcp/nas-q3-clone.db"
+   },
+   {
+    "severity": "medium",
+    "field": "adapted_performance.q3_fixture.usage_fix; native_adaptation.deviations_from_upstream[0].fix; native_adaptation.pending_fixes[2]",
+    "issue": "The proposed 0.5 confidence cutoff is correctly described as local policy, but its demonstrated recall cost is omitted. Read-only traversal of the matching graph yields nine of twelve genuine direct callers; requiring confidence >=0.5 removes the two genuine 0.38 edges and leaves only seven of twelve. Applying the cutoff to every edge also removes valid two-hop paths through freshness_propose.apply. Thus this cutoff is not established as a suitable Q3 usage fix merely because it removes the 0.07 false positives.",
+    "fix": "Revise both the worker's native-adaptation recommendation and the assembler's Q3 usage_fix to disclose the precision/recall tradeoff. Keep low-confidence candidates available for source or Serena validation and qualify any cutoff against known callers before recommending it; do not substitute another untested threshold.",
+    "source": "<scratch>/cbm-q3/clone/scripts/freshness_propose.py"
+   }
+  ],
+  "checked": [
+   ".codex/config.toml (main-checkout MCP fields read through codex mcp list --json)",
+   "/proc/<pid>/exe (ten codebase-memory executable instances, read-only SHA-256 comparison)",
+   "<scratch>/cbm-q3/base.txt",
+   "<scratch>/cbm-q3/clone (read-only git rev-parse HEAD and git status --short)",
+   "<scratch>/cbm-q3/clone/scripts/component_matrix.py",
+   "<scratch>/cbm-q3/clone/scripts/freshness_propose.py",
+   "<scratch>/cbm-q3/clone/scripts/hardware_profile.py",
+   "<scratch>/cbm-q3/clone/scripts/host_receipts.py",
+   "<scratch>/cbm-q3/clone/scripts/new_host_grand_list.py",
+   "<scratch>/cbm-q3/clone/tests/test_apply_claude_settings.py",
+   "<scratch>/cbm-q3/clone/tests/test_catalog_freshness_propose.py",
+   "<scratch>/cbm-q3/clone/tests/test_host_receipts.py",
+   "<scratch>/cbm-q3/fixture.py",
+   "<scratch>/cbm-q3/index.json",
+   "<scratch>/cbm-q3/tool.txt",
+   "<scratch>/cbm-q3/truth.json",
+   "<scratch>/html-report/savings.json",
+   "<scratch>/html-report/scripts/data/live_otel.json",
+   "<scratch>/rr/codebase-memory-mcp/build_records.py",
+   "<scratch>/rr/codebase-memory-mcp/out/a01-which.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a02-version.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a03-config-set.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a04-config-list.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a05-ui-config.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a12-head.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a20-list-before.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a20-list-before.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a21-index.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a21-index.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a24-index-status.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a24-index-status.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a25-list-stats.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a25-list-stats.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a30-search.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a30-search.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a31-qn.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a32-trace.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a32-trace.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a33-search-code.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a33-search-code.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a40-base-grep.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a41-base-cat.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a42-coverage.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a42-coverage.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a50-delete.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a50-delete.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/a51-list-after.stderr",
+   "<scratch>/rr/codebase-memory-mcp/out/a51-list-after.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/p13-pin-checksum.stdout",
+   "<scratch>/rr/codebase-memory-mcp/out/p14-pin-sha256.stdout",
+   "<scratch>/rr/codebase-memory-mcp/records.json",
+   "<scratch>/rr/returned-results.json",
+   "<scratch>/token-cards/assemble.py",
+   "<scratch>/token-cards/cards/codebase-memory-mcp.json",
+   "<scratch>/token-cards/groups/g3-code-navigation/codebase-memory-mcp.upstream.json",
+   "<scratch>/token-cards/invoke_by_tool.json",
+   "<scratch>/token-cards/provenance.py",
+   "AGENTS.md",
+   "adoption/bootstrap.md",
+   "adoption/manifest.json",
+   "adoption/mcp/claude-user.json",
+   "adoption/pins-linux-x86_64.json",
+   "adoption/pins-macos-arm64.json",
+   "adoption/templates/claude.settings.template.json",
+   "adoption/templates/codex.config.template.toml",
+   "adoption/templates/project.codex.config.template.toml",
+   "codebase-memory.list_projects({\"detail\":\"stats\",\"format\":\"json\",\"limit\":100})",
+   "codebase-memory.trace_path({\"function_name\":\"register_file\",\"project\":\"nas-q3-clone\",\"direction\":\"inbound\",\"depth\":2,\"include_tests\":true,\"include_evidence\":true,\"limit\":500,\"format\":\"tree\",\"max_output_tokens\":8000})",
+   "docs/decisions/2026-09-23-claude-user-profile.md",
+   "docs/decisions/2026-09-25-codex-mcp-scope.md",
+   "docs/token-session-handbook.md",
+   "examples/claude-mcp.json.example",
+   "examples/claude-native/agents/blind-adjudicator.md",
+   "examples/claude-native/agents/blind-lane-reviewer.md",
+   "examples/claude-native/agents/evidence-reviewer.md",
+   "examples/claude-native/agents/isolated-builder.md",
+   "examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "examples/claude-native/agents/source-scout.md",
+   "examples/mcporter.json.example",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/commits/1a3425536b",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/commits/3d9a6cf5cb",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/commits/76e54f7525",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/commits/9a2bdc8c1d",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/commits/c3714f1133",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/commits/main",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/commits/main?review=20260927",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/compare/v0.11.0...64c23fab6c3eba3de226355c0ca1ff750116edab",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/compare/v0.11.0...64c23fab6c3eba3de226355c0ca1ff750116edab?review=20260927",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/contents/README.md?ref=v0.11.0",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/contents/docs/CONFIGURATION.md?ref=v0.11.0",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/contents/docs/MEASURING_SAVINGS.md?ref=v0.11.0",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/contents/src/mcp/mcp.c?ref=64c23fab6c3eba3de226355c0ca1ff750116edab",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/contents/src/mcp/mcp.c?ref=v0.11.0",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/contents/src/pipeline/pass_calls.c?ref=v0.11.0",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/git/ref/tags/v0.11.0",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/issues/2228",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/issues/2239",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/issues/comments/5744699161",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/issues/comments/5744702732",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/latest",
+   "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/latest?review=20260927",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/64c23fab6c3eba3de226355c0ca1ff750116edab/src/mcp/mcp.c#L484-L559",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L455-L550",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L46-L95",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L493-L585",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/docs/CONFIGURATION.md#L88-L116",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/docs/MEASURING_SAVINGS.md",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L483-L558",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L508-L558",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c#L9004-L9009",
+   "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/pipeline/pass_calls.c#L15-L17",
+   "https://github.com/DeusData/codebase-memory-mcp/commit/1a3425536b",
+   "https://github.com/DeusData/codebase-memory-mcp/commit/3d9a6cf5cb",
+   "https://github.com/DeusData/codebase-memory-mcp/commit/76e54f7525",
+   "https://github.com/DeusData/codebase-memory-mcp/commit/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+   "https://github.com/DeusData/codebase-memory-mcp/commit/9a2bdc8c1d",
+   "https://github.com/DeusData/codebase-memory-mcp/commit/c3714f1133",
+   "https://github.com/DeusData/codebase-memory-mcp/compare/v0.11.0...64c23fab6c3eba3de226355c0ca1ff750116edab",
+   "https://github.com/DeusData/codebase-memory-mcp/issues/2228#issuecomment-5744699161",
+   "https://github.com/DeusData/codebase-memory-mcp/issues/2239#issuecomment-5744702732",
+   "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+   "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/64c23fab6c3eba3de226355c0ca1ff750116edab/src/mcp/mcp.c",
+   "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh",
+   "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/src/mcp/mcp.c",
+   "manifests/stack.json",
+   "recipes/README.md",
+   "$HOME/.agents/skills/verification-before-completion/SKILL.md",
+   "$HOME/.cache/codebase-memory-mcp/nas-q3-clone.db (SQLite URI mode=ro&immutable=1; graph generation 2026-09-27T00:32:05Z; project identity, coverage metadata, source hashes, CALLS properties and two-hop traversal)",
+   "$HOME/.codex/RTK.md",
+   "$HOME/.codex/config.toml (MCP fields read through codex mcp list --json from the main checkout and review workspace)",
+   "$HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md",
+   "$HOME/.local/share/codex-ecosystem/bin/codebase-memory-mcp (--version and executable SHA-256)",
+   "$HOME/code/native-agent-stack/manifests/stack.json"
+  ],
+  "resolutions": [
+   "Updated native_adaptation.deviations_from_upstream[0].fix and native_adaptation.pending_fixes[2] to disclose the precision/recall tradeoff: read-only traversal yields 9/12 genuine direct callers, while confidence >= 0.5 removes two genuine callers at confidence 0.38 (leaving 7/12) and valid two-hop paths through freshness_propose.apply in exchange for removing the one demonstrated 0.07 false positive. Both fields now require qualification against known callers before recommending any cutoff, reject substituting another untested threshold, and retain low-confidence candidates for source or Serena cross-check. Existing upstream citations and the include_evidence parameter caveat are preserved. The assembler-owned adapted_performance.q3_fixture.false_positive and adapted_performance.q3_fixture.usage_fix remain unresolved here and are reported to the coordinator as assembler findings; neither is fixed in this file."
+  ],
+  "final_verdict": {
+   "tool": "codebase-memory-mcp",
+   "verdict": "adapted-with-gaps",
+   "summary": "Installed v0.11.0 matches the latest release and supports the chosen explicit-index graph workflow, but portable installation and Claude agent access remain incomplete. The historical verified task artifacts were 22,445→19,635 tokens for Claude (12.5%) and 22,445→16,109 for Codex (28.2%), eligible only for those checked caller-retrieval tasks, not provider savings (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json). The newer MCPorter comparisons of 56,274→865 (98.5%) and 56,274→1,410 (97.5%) are not clean complete-answer savings: graph-only recall is 4/7, while search_code restores 7/7 recall but includes one false positive (../rr/codebase-memory-mcp/records.json#codebase-memory-mcp:compare-mcp-plan; #codebase-memory-mcp:compare-mcp-plan-plus-search-code). In the fixed 36-hour scan, 9/1,010 Ultracode workflow children (0.89%) and 1/301 Codex workers (0.33%) invoked it, with 0/22 children carrying TOKEN LANES invoking it; these are invocation observations, not success rates (invoke_by_tool.json). Next, qualify explicit indexing, source-validated fallback and narrow Claude grants, preserve low-confidence candidates for verification, and measure the intended native worker path without combining artifact counts with counters or provider usage.",
+   "gaps": [
+    {
+     "gap": "Graph-only retrieval misses callers, and the literal fallback includes a mention that is not a call; an unqualified 0.5 confidence cutoff further reduces Q3 recall from 9/12 to 7/12.",
+     "evidence": "../rr/codebase-memory-mcp/records.json; groups/final-verdict-evidence.json#q3; https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/src/mcp/mcp.c",
+     "action": "Index the selected repository explicitly, request include_evidence, retain low-confidence candidates, and validate graph plus search_code results against original source or qualified Serena references before reporting a complete caller set.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The portable profile has a Codex server entry but no platform installation pins, Claude user-profile registration, or direct CBM namespace grants in the six shipped Claude agents.",
+     "evidence": "adoption/templates/codex.config.template.toml; adoption/pins-linux-x86_64.json; adoption/pins-macos-arm64.json; adoption/mcp/claude-user.json; examples/claude-native/agents/; https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md",
+     "action": "Add qualified opt-in installation and narrow agent grants, or explicitly gate registration on manual installation; verify an actual useful call from each intended worker scope.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The merged card's comparison list omits the newer retained comparisons and their fidelity limits.",
+     "evidence": "cards/codebase-memory-mcp.json; ../rr/codebase-memory-mcp/records.json",
+     "action": "Update the report assembler to expose newer fixture comparisons with recall and false-positive eligibility, retaining the historical native-client rows separately.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "The latest official release is v0.11.0, published 2026-09-15; retained native version output is 0.11.0.",
+     "evidence": "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/latest; ../rr/codebase-memory-mcp/records.json#codebase-memory-mcp:identity-and-pin",
+     "result": "holds"
+    },
+    {
+     "claim": "Historical Claude and Codex exact comparisons are 22,445→19,635 and 22,445→16,109 respectively; their task checks do not establish exhaustive graph accuracy on other fixtures.",
+     "evidence": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+     "result": "holds"
+    },
+    {
+     "claim": "Newer graph-only CLI 56,274→1,844 and MCPorter 56,274→865 outputs have 4/7 recall and are ineligible as equivalent complete-answer savings.",
+     "evidence": "../rr/codebase-memory-mcp/records.json#codebase-memory-mcp:compare-cli-plan; ../rr/codebase-memory-mcp/records.json#codebase-memory-mcp:compare-mcp-plan",
+     "result": "holds"
+    },
+    {
+     "claim": "Fallback CLI 56,274→2,975 and MCPorter 56,274→1,410 recover 7/7 callers but contain one mention-only row; these exact counts do not prove a fidelity-clean final answer.",
+     "evidence": "../rr/codebase-memory-mcp/records.json#codebase-memory-mcp:compare-cli-plan-plus-search-code; ../rr/codebase-memory-mcp/records.json#codebase-memory-mcp:compare-mcp-plan-plus-search-code",
+     "result": "holds"
+    },
+    {
+     "claim": "A 0.5 Q3 confidence cutoff preserves all genuine callers.",
+     "evidence": "groups/final-verdict-evidence.json#q3; ../cbm-q3/truth.json; ../cbm-q3/clone/scripts/freshness_propose.py",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The Q3 review's precision/recall correction is reflected in the merged card; the earlier restricted true-edge range must not be reused.",
+     "evidence": "groups/g3-code-navigation/codebase-memory-mcp.review.json; cards/codebase-memory-mcp.json; groups/final-verdict-evidence.json#q3",
+     "result": "holds"
+    },
+    {
+     "claim": "All 31 retained command records were opened and all 83 attachment references matched their recorded hashes and sizes.",
+     "evidence": "../rr/codebase-memory-mcp/records.json; groups/final-verdict-evidence.json#attachments",
+     "result": "holds"
+    },
+    {
+     "claim": "From 2026-09-25T11:37:28Z through 2026-09-26T23:37:28Z, workflow children made 7 MCP and 31 CLI invocations across 9/1,010 children; Codex workers made 6 MCP invocations across 1/301 workers; TOKEN LANES children were 0/22.",
+     "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+     "result": "holds"
+    },
+    {
+     "claim": "Task-matched native arm-B performance and causal provider-token savings have been measured.",
+     "evidence": "cards/codebase-memory-mcp.json#invoke_rates/arm_b_native",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 29
+    },
+    "shell_commands": 3,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-b.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 37,
+     "qmd": 4,
+     "ai-memory": 1,
+     "socraticode": 1,
+     "serena": 2
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 2,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 60
+    },
+    "shell_commands": 7,
+    "shell_commands_rtk_prefixed": 4,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: 22,445->19,635 (12.5%) caller search. #343: 22,445->16,109 (28.2%) native MCP. #338 CI: index, search and delete in isolated CBM dirs; the first draft's shared rendezvous failed 3/6, then 11 lo…"
+}

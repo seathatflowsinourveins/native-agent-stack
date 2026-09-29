@@ -1,0 +1,518 @@
+#!/usr/bin/env python3
+"""Count-only scan of Claude Code transcripts: token classes, list-price cost, run shape, invocations.
+
+Counting rule: one API call is written as several JSONL entries, one per content block, that repeat the usage
+object, so the scan merges them by `message.id` and keeps the per-field maximum. That this reproduces ccusage's
+totals is checked by the reconciliation (`totals_comparable_to_ccusage` against `ccusage claude daily --json
+--offline` on the same copy of the tree), not assumed from ccusage's source; the repository's `child-usage.mjs`
+keeps the whole row with the largest counter total instead. Rows whose model is `<synthetic>` carry no usage
+and are skipped. Advisor inference is reported only in `usage.iterations[type=advisor_message]` (top-level
+`usage` is executor-only), so those iterations are counted separately and priced at the advisor model's rates.
+
+Populations by path below the projects root: `<project>/<session>.jsonl` is a main session;
+`<project>/<session>/subagents/agent-*.jsonl` is an Agent-tool child; `<project>/<session>/subagents/workflows/
+<run>/agent-*.jsonl` is a workflow stage. Workflow `journal.jsonl` files carry no usage and are skipped. A
+"session tree" is a main session plus every child below it (ccusage lists each workflow run as its own session).
+Dates are UTC dates of the call timestamps, and `--since` keeps calls, tool calls, ToolSearch loads and Skill
+calls on or after that date.
+
+Output is one JSON object of counts, shares and distributions. It holds no path, session or transcript content.
+
+    python3 claude_spend_scan.py [--root DIR] [--project NAME] [--since YYYY-MM-DD] [--control]
+"""
+import argparse, calendar, collections, glob, json, os, re, statistics, sys, tempfile, time
+from concurrent.futures import ProcessPoolExecutor
+
+# USD per million tokens: input, output, cache write 5m, cache write 1h, cache read.
+# Source: https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-09-29). Models not listed are
+# counted in tokens and reported as unpriced.
+PRICES = {
+    'claude-opus-5-5': (4.0, 20.0, 5.0, 8.0, 0.20),
+    'claude-sonnet-5-5': (2.0, 10.0, 2.5, 4.0, 0.20),
+    'claude-sonnet-5': (2.0, 10.0, 2.5, 4.0, 0.20),
+    'claude-fable-5-1': (10.0, 50.0, 12.5, 20.0, 0.25),
+    'claude-haiku-4-5-20251001': (1.0, 5.0, 1.25, 2.0, 0.10),
+}
+CLASSES = ('in', 'out', 'cw5', 'cw1', 'cwx', 'cr')
+BIN_EDGES = (0, 50_000, 100_000, 200_000, 400_000, 700_000)
+BIN_NAMES = ('<50K', '50-100K', '100-200K', '200-400K', '400-700K', '>=700K')
+BUILTIN_KEEP = 14
+LONG_CHILD = 60
+TYPES_KEEP = 12
+DEFAULT_TYPES = ('workflow-subagent', 'general-purpose', 'claude', 'Explore')   # a child with no role definition of its own
+DEFAULT_RULES = {'dedup': True, 'skip_journal': True, 'since': True, 'advisor': True, 'skip_synthetic': True}
+NDIG = 6
+
+
+def epoch(ts):
+    try:
+        return calendar.timegm(time.strptime(ts[:19], '%Y-%m-%dT%H:%M:%S'))
+    except Exception:
+        return None
+
+
+def price_of(model, cls):
+    p = PRICES.get(model)
+    if not p:
+        return None
+    return p[{'in': 0, 'out': 1, 'cw5': 2, 'cw1': 3, 'cwx': 2, 'cr': 4}[cls]] / 1e6
+
+
+def bin_of(c):
+    i = 0
+    for k, e in enumerate(BIN_EDGES):
+        if c >= e:
+            i = k
+    return i
+
+
+def population(rel):
+    parts = rel.split(os.sep)
+    if len(parts) == 2:
+        return 'main', parts[1][:-6]
+    if 'workflows' in parts:
+        return 'workflow', parts[1]
+    if 'subagents' in parts:
+        return 'agent_tool', parts[1]
+    return None, None
+
+
+def scan_file(args):
+    path, root, since = args[:3]
+    rules = dict(DEFAULT_RULES, **(args[3] if len(args) > 3 else {}))
+    rel = os.path.relpath(path, root)
+    pop, tree = population(rel)
+    if pop is None or (rules['skip_journal'] and os.path.basename(path) == 'journal.jsonl'):
+        return None
+    meta = {}
+    mf = path[:-6] + '.meta.json'
+    if os.path.exists(mf):
+        try:
+            with open(mf) as mh:
+                meta = json.load(mh)
+        except Exception:
+            meta = {}
+    calls, order = {}, []
+    tool_ids = {}
+    tool_events = []                       # (call key, tool name, ToolSearch query or Skill name)
+    version = None
+    try:
+        fh = open(path, 'r', encoding='utf-8', errors='ignore')
+    except Exception:
+        return None
+    for lineno, line in enumerate(fh):
+        if len(line) < 20 or '"assistant"' not in line:
+            continue
+        try:
+            e = json.loads(line)
+        except Exception:
+            continue
+        if e.get('type') != 'assistant':
+            continue
+        m = e.get('message') or {}
+        u, mid = m.get('usage'), m.get('id')
+        if not u or not mid:
+            continue
+        if rules['skip_synthetic'] and m.get('model') == '<synthetic>':
+            continue
+        key = mid if rules['dedup'] else '%s#%d' % (mid, lineno)
+        version = version or e.get('version')
+        cc = u.get('cache_creation') or {}
+        rec = {'in': u.get('input_tokens') or 0, 'out': u.get('output_tokens') or 0,
+               'cw': u.get('cache_creation_input_tokens') or 0, 'cr': u.get('cache_read_input_tokens') or 0,
+               'cw5': cc.get('ephemeral_5m_input_tokens') or 0, 'cw1': cc.get('ephemeral_1h_input_tokens') or 0,
+               'think': (u.get('output_tokens_details') or {}).get('thinking_tokens') or 0, 'ctx': 0}
+        adv = {}
+        for it in (u.get('iterations') or []):
+            if it.get('type') == 'advisor_message' and rules['advisor']:
+                a = adv.setdefault(it.get('model') or '?', collections.Counter())
+                a['n'] += 1
+                a['in'] += it.get('input_tokens') or 0
+                a['out'] += it.get('output_tokens') or 0
+                a['cr'] += it.get('cache_read_input_tokens') or 0
+                a['cw'] += it.get('cache_creation_input_tokens') or 0
+            elif it.get('type') == 'message':
+                rec['ctx'] = (it.get('input_tokens') or 0) + (it.get('cache_read_input_tokens') or 0) + (it.get('cache_creation_input_tokens') or 0)
+        c = calls.get(key)
+        if c is None:
+            c = {'ts': e.get('timestamp'), 'model': m.get('model'), 'eff': e.get('perTurnEffort') or e.get('effort'), 'adv': {}, **rec}
+            calls[key] = c
+            order.append(key)
+        else:
+            for k, v in rec.items():
+                if v > c[k]:
+                    c[k] = v
+        for am, a in adv.items():
+            cur = c['adv'].setdefault(am, collections.Counter())
+            for k, v in a.items():
+                if v > cur[k]:
+                    cur[k] = v
+        for b in (m.get('content') or []):
+            if b.get('type') != 'tool_use':
+                continue
+            tid, nm = b.get('id'), b.get('name') or '?'
+            if tid in tool_ids:
+                continue
+            tool_ids[tid] = nm
+            inp = b.get('input') or {}
+            detail = None
+            if nm == 'ToolSearch':
+                detail = str(inp.get('query') or '')
+            elif nm == 'Skill':
+                detail = str(inp.get('skill') or inp.get('name') or '?')
+            tool_events.append((key, nm, detail))
+    fh.close()
+    if since and rules['since']:
+        order = [i for i in order if (calls[i]['ts'] or '')[:10] >= since]
+        if not order:
+            return None
+    kept = set(order)
+
+    tot = collections.defaultdict(collections.Counter)            # model -> class -> tokens
+    bins = [collections.Counter() for _ in BIN_NAMES]
+    eff = collections.defaultdict(collections.Counter)
+    miss = collections.Counter()
+    adv_dates = collections.defaultdict(collections.Counter)      # date -> advisor model -> iterations
+    cost = 0.0
+    prev_ctx = prev_ts = prev_model = None
+    first_ctx = 0
+    for n, key in enumerate(order):
+        c = calls[key]
+        ctx = c['ctx'] or (c['in'] + c['cw'] + c['cr'])
+        if n == 0:
+            first_ctx = ctx
+        mdl = c['model'] or '?'
+        cwx = max(0, c['cw'] - c['cw5'] - c['cw1'])
+        t = tot[mdl]
+        t['calls'] += 1
+        t['cw_reported'] += c['cw']
+        if cwx:
+            t['calls_with_unsplit_cache_write'] += 1
+        if c['cw5'] + c['cw1'] > c['cw']:
+            t['calls_split_exceeds_reported'] += 1
+        for k, v in (('in', c['in']), ('out', c['out']), ('cw5', c['cw5']), ('cw1', c['cw1']), ('cwx', cwx), ('cr', c['cr']), ('think', c['think'])):
+            t[k] += v
+        cst = 0.0
+        for k, v in (('in', c['in']), ('out', c['out']), ('cw5', c['cw5']), ('cw1', c['cw1']), ('cwx', cwx), ('cr', c['cr'])):
+            p = price_of(mdl, k)
+            if p is not None:
+                cst += v * p
+                if k == 'cwx':
+                    t['unsplit_cache_write_usd'] += v * p
+        day = (c['ts'] or '')[:10]
+        for am, a in c['adv'].items():
+            at = tot['advisor(' + am + ')']
+            at['calls'] += a['n']
+            adv_dates[day]['advisor(' + am + ')'] += a['n']
+            for k in ('in', 'out', 'cr'):
+                at[k] += a[k]
+            at['cw5'] += a['cw']
+            for k, pk in (('in', 'in'), ('out', 'out'), ('cr', 'cr'), ('cw', 'cw5')):
+                p = price_of(am, pk)
+                if p is not None:
+                    cst += a[k] * p
+        cost += cst
+        b = bins[bin_of(ctx)]
+        b['n'] += 1
+        b['cr'] += c['cr']
+        b['cost'] += cst
+        eff[str(c['eff'])]['calls'] += 1
+        eff[str(c['eff'])]['out'] += c['out']
+        te = epoch(c['ts']) if c['ts'] else None
+        if prev_ctx is not None and prev_ctx >= 20_000 and prev_model == mdl and c['cr'] < 0.5 * prev_ctx:
+            gap = (te - prev_ts) if (te is not None and prev_ts is not None) else None
+            gk = 'gap_gt_1h' if gap is not None and gap > 3600 else ('gap_5m_1h' if gap is not None and gap > 300 else 'gap_le_5m')
+            miss[gk + '_events'] += 1
+            miss[gk + '_cache_write_tokens'] += c['cw']
+            miss[gk + '_5m_class_tokens'] += c['cw5'] + cwx
+        prev_ctx, prev_ts, prev_model = ctx, te, mdl
+    tools, selects, skills = collections.Counter(), collections.Counter(), collections.Counter()
+    for key, nm, detail in tool_events:
+        if key not in kept:
+            continue
+        tools[nm] += 1
+        if nm == 'ToolSearch':
+            if detail.startswith('select:'):
+                for tn in detail[7:].split(','):
+                    selects[tn.strip()] += 1
+            else:
+                selects['<keyword-search>'] += 1
+        elif nm == 'Skill':
+            skills[detail] += 1
+    stamps = [calls[i]['ts'][:10] for i in order if calls[i]['ts']]
+    return {'pop': pop, 'tree': tree, 'atype': meta.get('agentType'), 'calls': len(order), 'cost': cost, 'version': version,
+            'first_ctx': first_ctx, 'tot': {m: dict(v) for m, v in tot.items()},
+            'bins': [dict(b) for b in bins], 'eff': {k: dict(v) for k, v in eff.items()}, 'miss': dict(miss),
+            'adv_dates': {d: dict(v) for d, v in adv_dates.items()},
+            'tools': dict(tools), 'selects': dict(selects), 'skills': dict(skills),
+            'first': min(stamps) if stamps else None, 'last': max(stamps) if stamps else None}
+
+
+def pct(sorted_vals, q):
+    return sorted_vals[min(len(sorted_vals) - 1, int(q * len(sorted_vals)))] if sorted_vals else None
+
+
+def share(x, total):
+    return round(x / total, NDIG) if total else None
+
+
+def reduce(records):
+    R = collections.OrderedDict()
+    pops = collections.defaultdict(lambda: collections.Counter())
+    pop_tot = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))   # pop -> model -> class -> tokens
+    pop_miss = collections.defaultdict(collections.Counter)
+    tot = collections.defaultdict(collections.Counter)
+    bins = [collections.Counter() for _ in BIN_NAMES]
+    eff = collections.defaultdict(collections.Counter)
+    miss = collections.Counter()
+    tools, selects, skills = collections.Counter(), collections.Counter(), collections.Counter()
+    versions = collections.Counter()
+    adv_dates = collections.defaultdict(collections.Counter)
+    trees = collections.Counter()
+    kids = []
+    stamps = []
+    for r in records:
+        p = pops[r['pop']]
+        p['files'] += 1
+        p['calls'] += r['calls']
+        p['cost_usd'] += r['cost']
+        trees[r['tree']] += r['cost']
+        versions[r['version'] or '(none)'] += 1
+        for m, v in r['tot'].items():
+            for k, x in v.items():
+                tot[m][k] += x
+                pop_tot[r['pop']][m][k] += x
+        for i, b in enumerate(r['bins']):
+            for k, x in b.items():
+                bins[i][k] += x
+        for k, v in r['eff'].items():
+            for kk, x in v.items():
+                eff[k][kk] += x
+        miss.update(r['miss'])
+        pop_miss[r['pop']].update(r['miss'])
+        for d, v in r['adv_dates'].items():
+            adv_dates[d].update(v)
+        tools.update(r['tools'])
+        selects.update(r['selects'])
+        skills.update(r['skills'])
+        if r['first']:
+            stamps += [r['first'], r['last']]
+        if r['pop'] != 'main':
+            kids.append(r)
+    total_cost = sum(v['cost_usd'] for v in pops.values())
+    R['window'] = {'first_call_date': min(stamps) if stamps else None, 'last_call_date': max(stamps) if stamps else None}
+    R['client_versions_by_transcript_file'] = dict(versions.most_common(8))
+    R['populations'] = {k: {'files': int(v['files']), 'api_calls': int(v['calls']), 'cost_usd': round(v['cost_usd'], 2),
+                            'cost_share': share(v['cost_usd'], total_cost)} for k, v in pops.items()}
+    R['api_calls'] = int(sum(p['calls'] for p in pops.values()))
+    R['cost_usd_list_price'] = round(total_cost, 2)
+    R['tokens_by_model'] = {m: {k: int(x) if not k.endswith('_usd') else round(x, 2) for k, x in v.items()} for m, v in sorted(tot.items())}
+    cls_tok, cls_cost = collections.Counter(), collections.Counter()
+    unpriced = collections.Counter()
+    for m, v in tot.items():
+        if m.startswith('advisor('):
+            continue
+        for k in CLASSES:
+            x = v.get(k, 0)
+            cls_tok[k] += x
+            p = price_of(m, k)
+            if p is None:
+                unpriced[m] += x
+            else:
+                cls_cost[k] += x * p
+    for m, v in tot.items():
+        if m.startswith('advisor(') and price_of(m[len('advisor('):-1], 'in') is None:
+            unpriced[m] += sum(v.get(k, 0) for k in CLASSES)
+    R['executor_class_tokens'] = {k: int(cls_tok[k]) for k in CLASSES}
+    all_in = sum(v.get('in', 0) for v in tot.values())
+    all_out = sum(v.get('out', 0) for v in tot.values())
+    all_cr = sum(v.get('cr', 0) for v in tot.values())
+    all_cw = sum(v.get('cw5', 0) + v.get('cw1', 0) for v in tot.values())
+    R['totals_comparable_to_ccusage'] = {'inputTokens': int(all_in), 'outputTokens': int(all_out), 'cacheReadTokens': int(all_cr), 'cacheCreationTokens': int(all_cw),
+                                         'note': 'executor plus advisor tokens; cache creation is the 5m plus 1h split, without the unsplit remainder'}
+
+    def cache_block(pop_names):
+        c = collections.Counter()
+        for pn in pop_names:
+            for m, v in pop_tot[pn].items():
+                if m.startswith('advisor('):
+                    continue
+                c['reported_top_level'] += v.get('cw_reported', 0)
+                c['split_5m'] += v.get('cw5', 0)
+                c['split_1h'] += v.get('cw1', 0)
+                c['unsplit_remainder'] += v.get('cwx', 0)
+                c['calls_with_unsplit_remainder'] += v.get('calls_with_unsplit_cache_write', 0)
+                c['calls_where_split_exceeds_reported'] += v.get('calls_split_exceeds_reported', 0)
+            for k, x in pop_miss[pn].items():
+                c['miss_' + k] += x
+        return {k: int(x) for k, x in sorted(c.items())}
+    R['cache_creation'] = cache_block(list(pops))
+    R['cache_creation_by_population'] = {pn: cache_block([pn]) for pn in sorted(pops)}
+    R['cache_creation_children'] = cache_block([pn for pn in pops if pn != 'main'])
+    adv = {m: v for m, v in tot.items() if m.startswith('advisor(')}
+    adv_cost = 0.0
+    for m, v in adv.items():
+        base = m[len('advisor('):-1]
+        adv_cost += sum(v.get(k, 0) * (price_of(base, k) or 0) for k in CLASSES)
+    R['cost_share_by_class'] = dict({k: share(cls_cost[k], total_cost) for k in CLASSES}, advisor=share(adv_cost, total_cost))
+    R['advisor'] = {'iterations': int(sum(v.get('calls', 0) for v in adv.values())), 'cost_usd': round(adv_cost, 2),
+                    'cost_share': share(adv_cost, total_cost),
+                    'by_model': {m: {'iterations': int(v.get('calls', 0)), 'input_tokens': int(v.get('in', 0)), 'output_tokens': int(v.get('out', 0)),
+                                     'cost_usd': round(sum(v.get(k, 0) * (price_of(m[len('advisor('):-1], k) or 0) for k in CLASSES), 2)} for m, v in sorted(adv.items())},
+                    'iterations_by_utc_date': {d: dict(sorted(v.items())) for d, v in sorted(adv_dates.items())}}
+    model_cost = collections.Counter()
+    for m, v in tot.items():
+        base = m[len('advisor('):-1] if m.startswith('advisor(') else m
+        model_cost[base] += sum(v.get(k, 0) * (price_of(base, k) or 0) for k in CLASSES)
+    R['model_cost_share'] = {m: share(c, total_cost) for m, c in model_cost.most_common() if total_cost and c}
+    R['model_cost_usd'] = {m: round(c, 2) for m, c in model_cost.most_common() if c}
+    R['unsplit_cache_write_cost_usd'] = round(sum(v.get('unsplit_cache_write_usd', 0.0) for m, v in tot.items() if not m.startswith('advisor(')), 2)
+    R['unpriced_model_tokens'] = {m: int(x) for m, x in unpriced.items()}
+    R['thinking_tokens_share_of_output'] = share(sum(v.get('think', 0) for m, v in tot.items() if not m.startswith('advisor(')),
+                                                  max(1, sum(v.get('out', 0) for m, v in tot.items() if not m.startswith('advisor('))))
+
+    ks = sorted((r['calls'] for r in kids))
+    long_cost = sum(r['cost'] for r in kids if r['calls'] > LONG_CHILD)
+    R['children'] = {'count': len(kids), 'calls_p50': pct(ks, .5), 'calls_p75': pct(ks, .75), 'calls_p90': pct(ks, .9), 'calls_p99': pct(ks, .99), 'calls_max': ks[-1] if ks else None,
+                     'over_%d_calls' % LONG_CHILD: {'count': sum(1 for r in kids if r['calls'] > LONG_CHILD), 'share_of_all_cost': share(long_cost, total_cost)},
+                     'median_first_call_context_tokens': int(statistics.median([r['first_ctx'] for r in kids])) if kids else None}
+    by_type = collections.defaultdict(list)
+    for r in kids:
+        by_type[r['atype'] or '(none)'].append(r)
+
+    def type_row(v):
+        return {'count': len(v), 'cost_share': share(sum(x['cost'] for x in v), total_cost),
+                'median_first_call_context_tokens': int(statistics.median([x['first_ctx'] for x in v])), 'median_calls': int(statistics.median([x['calls'] for x in v]))}
+    ranked = sorted(by_type.items(), key=lambda kv: -sum(x['cost'] for x in kv[1]))
+    R['children_by_agent_type'] = {t: type_row(v) for t, v in ranked[:TYPES_KEEP]}
+    rest = [x for _, v in ranked[TYPES_KEEP:] for x in v]
+    if rest:
+        R['children_by_agent_type']['(%d other types)' % (len(ranked) - TYPES_KEEP)] = type_row(rest)
+    dflt = [x for t in DEFAULT_TYPES for x in by_type.get(t, [])]
+    R['default_typed_children'] = dict(type_row(dflt) if dflt else {}, types=sorted(DEFAULT_TYPES),
+                                       count_share=share(len(dflt), len(kids)))
+    tv = sorted(trees.values(), reverse=True)
+
+    def top(k):
+        return share(sum(tv[:k]), total_cost)
+    cum, n50, n80 = 0.0, None, None
+    for i, x in enumerate(tv, 1):
+        cum += x
+        if n50 is None and cum >= .5 * total_cost:
+            n50 = i
+        if n80 is None and cum >= .8 * total_cost:
+            n80 = i
+    R['session_trees'] = {'count': len(tv), 'top_1_share': top(1), 'top_4_share': top(4), 'top_11_share': top(11), 'trees_covering_50pct': n50, 'trees_covering_80pct': n80}
+    R['effort_calls'] = {k: {'calls': int(v['calls']), 'output_tokens': int(v['out'])} for k, v in sorted(eff.items(), key=lambda kv: -kv[1]['calls'])}
+    R['context_bins'] = {BIN_NAMES[i]: {'calls': int(b['n']), 'cache_read_tokens': int(b['cr']), 'cost_usd': round(b['cost'], 2)} for i, b in enumerate(bins)}
+    R['cache_misses'] = {k: int(v) for k, v in sorted(miss.items())}
+
+    def server(nm):
+        return nm.split('__')[1] if nm.startswith('mcp__') else None
+    calls_by_srv, loads_by_srv = collections.Counter(), collections.Counter()
+    for nm, n in tools.items():
+        if server(nm):
+            calls_by_srv[server(nm)] += n
+    for nm, n in selects.items():
+        loads_by_srv[server(nm) or ('<keyword-search>' if nm == '<keyword-search>' else '(builtin or unknown)')] += n
+    R['tool_calls'] = {'total': int(sum(tools.values())), 'mcp_total': int(sum(calls_by_srv.values())), 'builtin_top': [[n, int(c)] for n, c in tools.most_common(BUILTIN_KEEP + 30) if not n.startswith('mcp__')][:BUILTIN_KEEP]}
+    R['mcp_calls_by_server'] = {s: int(c) for s, c in calls_by_srv.most_common()}
+    R['toolsearch_loads_by_server'] = {s: int(c) for s, c in loads_by_srv.most_common()}
+    R['skill_tool_calls'] = {'total': int(sum(skills.values())), 'top': [[n, int(c)] for n, c in skills.most_common(8)]}
+    return R
+
+
+def control():
+    """Synthetic transcripts with a hand-computed answer, then one mutant run per counting rule.
+
+    The fixture holds: two entries of one message.id (per-field maximum), an advisor turn with an unsplit cache write
+    and a ToolSearch select, a call before `--since` that also invoked a Skill, a `<synthetic>` row, an Agent-tool
+    child, a workflow stage and a workflow journal. The expected values below are written by hand from that
+    layout. Each mutant switches one rule off and must give the hand-computed wrong value, so the control fails
+    when the rule is removed."""
+    def put(path, text):
+        with open(path, 'w') as fh:
+            fh.write(text)
+
+    def asst(mid, ts, out, cr, cw=0, cw5=0, cw1=0, iters=None, tool=None, model='claude-opus-5-5'):
+        content = [{'type': 'text', 'text': 'x'}]
+        if tool:
+            content.append({'type': 'tool_use', 'id': 'tu_' + mid, 'name': tool[0], 'input': tool[1]})
+        u = {'input_tokens': 10, 'output_tokens': out, 'cache_read_input_tokens': cr, 'cache_creation_input_tokens': cw,
+             'cache_creation': {'ephemeral_5m_input_tokens': cw5, 'ephemeral_1h_input_tokens': cw1}}
+        if iters:
+            u['iterations'] = iters
+        return json.dumps({'type': 'assistant', 'timestamp': ts, 'version': '0.0.0-fixture', 'message': {'id': mid, 'model': model, 'usage': u, 'content': content}})
+    adv_iters = [{'type': 'message', 'input_tokens': 10, 'cache_read_input_tokens': 2000, 'cache_creation_input_tokens': 0},
+                 {'type': 'advisor_message', 'model': 'claude-fable-5-1', 'input_tokens': 300, 'output_tokens': 20},
+                 {'type': 'message', 'input_tokens': 5, 'cache_read_input_tokens': 2005, 'cache_creation_input_tokens': 0}]
+    with tempfile.TemporaryDirectory() as d:
+        pj = os.path.join(d, 'proj')
+        wfd = os.path.join(pj, 'S1', 'subagents', 'workflows', 'wf_x')
+        os.makedirs(wfd)
+        main = [asst('m1', '2026-09-28T10:00:00Z', 5, 1000), asst('m1', '2026-09-28T10:00:01Z', 50, 1000),                      # one call, out = 50
+                asst('m2', '2026-09-28T10:01:00Z', 7, 2000, cw=100, cw5=60, cw1=20, iters=adv_iters,
+                     tool=('ToolSearch', {'query': 'select:mcp__serena__find_symbol,Read'})),                              # unsplit 20, one advisor iteration
+                asst('m0', '2026-09-20T10:00:00Z', 9, 9, tool=('Skill', {'skill': 'old-skill'})),                          # before --since
+                asst('ms', '2026-09-28T10:02:00Z', 0, 0, model='<synthetic>')]                                             # skipped
+        put(os.path.join(pj, 'S1.jsonl'), '\n'.join(main) + '\n')
+        put(os.path.join(pj, 'S1', 'subagents', 'agent-t.jsonl'), asst('a1', '2026-09-28T10:03:00Z', 4, 700, tool=('Skill', {'skill': 'search-first'})) + '\n')
+        put(os.path.join(wfd, 'agent-a.jsonl'), asst('w1', '2026-09-28T10:04:00Z', 3, 500) + '\n')
+        put(os.path.join(wfd, 'agent-a.meta.json'), json.dumps({'agentType': 'workflow-subagent'}))
+        put(os.path.join(wfd, 'journal.jsonl'), asst('j1', '2026-09-28T10:05:00Z', 99, 99) + '\n')
+        paths = sorted(glob.glob(d + '/**/*.jsonl', recursive=True))
+
+        def run(rules):
+            recs = [r for r in map(scan_file, [(p, d, '2026-09-23', rules) for p in paths]) if r]
+            R = reduce(recs)
+            return {'api_calls': R['api_calls'], 'executor_output_tokens': R['executor_class_tokens']['out'],
+                    'advisor_iterations': R['advisor']['iterations'], 'skill_calls': R['skill_tool_calls']['total'],
+                    'serena_loads': R['toolsearch_loads_by_server'].get('serena', 0), 'workflow_files': R['populations']['workflow']['files'],
+                    'agent_tool_calls': R['populations']['agent_tool']['api_calls'], 'unsplit_remainder': R['cache_creation']['unsplit_remainder'],
+                    'reported_cache_creation': R['cache_creation']['reported_top_level']}
+        expected = {'api_calls': 4, 'executor_output_tokens': 50 + 7 + 4 + 3, 'advisor_iterations': 1, 'skill_calls': 1, 'serena_loads': 1,
+                    'workflow_files': 1, 'agent_tool_calls': 1, 'unsplit_remainder': 20, 'reported_cache_creation': 100}
+        baseline = run({})
+        mutants = {   # rule switched off -> the metrics that must move, with their hand-computed wrong values
+            'dedup': {'api_calls': 5, 'executor_output_tokens': 50 + 5 + 7 + 4 + 3},
+            'skip_journal': {'api_calls': 5, 'workflow_files': 2, 'executor_output_tokens': 50 + 7 + 4 + 3 + 99},
+            'since': {'api_calls': 5, 'skill_calls': 2, 'executor_output_tokens': 50 + 7 + 4 + 3 + 9},
+            'advisor': {'advisor_iterations': 0},
+            'skip_synthetic': {'api_calls': 5},
+        }
+        results = {}
+        for rule, wrong in mutants.items():
+            got = run({rule: False})
+            results[rule] = {'expected_wrong_values': wrong, 'observed': {k: got[k] for k in wrong}, 'moved_as_expected': all(got[k] == v for k, v in wrong.items())}
+    passed = baseline == expected and all(r['moved_as_expected'] for r in results.values())
+    return {'expected': expected, 'observed': baseline, 'mutants': results, 'passed': passed}
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
+    ap.add_argument('--root', default=os.path.join(os.path.expanduser('~'), '.claude', 'projects'))
+    ap.add_argument('--project', action='append', help='project directory name below root (repeatable; default all)')
+    ap.add_argument('--since', help='keep calls on or after this UTC date (YYYY-MM-DD)')
+    ap.add_argument('--workers', type=int, default=16)
+    ap.add_argument('--control', action='store_true', help='run the synthetic-fixture control and its mutants, then exit')
+    a = ap.parse_args()
+    if a.control:
+        out = control()
+        print(json.dumps(out, indent=1, sort_keys=True))
+        return 0 if out['passed'] else 1
+    projs = a.project or sorted(p for p in os.listdir(a.root) if os.path.isdir(os.path.join(a.root, p)))
+    files = []
+    for p in projs:
+        for dp, _, fn in os.walk(os.path.join(a.root, p)):
+            files += [(os.path.join(dp, f), a.root, a.since) for f in fn if f.endswith('.jsonl') and f != 'journal.jsonl']
+    files.sort()
+    with ProcessPoolExecutor(max_workers=a.workers) as ex:
+        recs = [r for r in ex.map(scan_file, files, chunksize=8) if r]
+    out = reduce(recs)
+    out['scanned'] = {'projects': len(projs), 'transcript_files': len(files), 'files_with_calls': len(recs), 'since': a.since}
+    print(json.dumps(out, indent=1, sort_keys=True))
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

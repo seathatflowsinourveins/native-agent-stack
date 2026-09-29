@@ -14,7 +14,9 @@ version_probe only (never one declared "npm-metadata" or another method, since t
 method exists exactly because running the tool starts a server or a UI), each in its
 own process group that is killed once the probe exits, times out or is interrupted,
 and emits booleans, counts, component ids and version strings from the checked-in
-manifest and pins file and the output of a probe that exited 0.
+manifest and pins file and the output of a probe that exited 0. The opt-in --login-shell looks at the metadata of the
+three personal startup files a Bash login shell reads (~/.bash_profile, ~/.bash_login, ~/.profile) without opening or
+executing any of them, and emits a fixed state per file, never a value, path or environment value.
 """
 
 from __future__ import annotations
@@ -30,6 +32,7 @@ import re
 import shlex
 import shutil
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -92,6 +95,30 @@ PINNED_VERSION_LIMITATIONS = [
     "platform, or whose declared method is not \"exec\" (for example context-mode's \"npm-metadata\", declared "
     "because any other argument starts its MCP stdio server), is reported unchecked; this never execs a probe "
     "whose declared method is not \"exec\".",
+]
+# --login-shell: the personal files a Bash login shell reads, in bash(1) INVOCATION order. GNU bash 5.3 shell.c
+# execute_profile_file (1116-1127) runs ~/.bash_profile and, only while maybe_execute_file returns 0, ~/.bash_login and
+# then ~/.profile; builtins/evalfile.c evalfile_internal returns 0 only for a missing file (FEVAL_ENOENTOK) and nonzero
+# for an empty file (nr == 0), a directory and every other open error, so the first file that exists ends the search
+# even when it reads as nothing; maybe_execute_file does not set FEVAL_REGFILE, so a device is read as empty and a FIFO
+# blocks the shell. Key -> file name under HOME.
+LOGIN_SHELL_FILES = {"bash_profile": ".bash_profile", "bash_login": ".bash_login", "profile": ".profile"}
+LOGIN_FILE_STATES = ("absent", "empty", "content", "unusable")
+LOGIN_SHELL_KEYS = (*LOGIN_SHELL_FILES, "first_read", "profile_read")
+# --login-shell appends this statement.
+LOGIN_SHELL_LIMITATIONS = [
+    "--login-shell looks at the metadata of ~/.bash_profile, ~/.bash_login and ~/.profile under HOME (existence, regular "
+    "file, read permission, size) and never opens, reads or executes one, so it emits a fixed state per file (absent, "
+    "empty, content or unusable), the file a Bash login shell reads first and whether that shell reaches ~/.profile, "
+    "never a value, path or environment value. It mirrors GNU bash 5.3's login search (shell.c execute_profile_file, "
+    "builtins/evalfile.c evalfile_internal): the first of the three that exists ends the search even when it is empty "
+    "or unusable (a directory, an unreadable file or a special file: a device reads as empty and a FIFO blocks the login "
+    "shell), so an empty ~/.bash_profile hides a real ~/.profile. profile_read is true when the search reaches ~/.profile "
+    "and it is usable, false when an earlier file is empty or unusable, when ~/.profile is itself unusable or when it does "
+    "not exist, and null when an earlier file has content, since whether that file sources ~/.profile is not read. HOME "
+    "is the environment's, else the passwd entry's, else \"/\", the way bash falls back (shell.c). It does not run a login shell, so it proves neither a PATH nor a command; "
+    "/etc/profile, ~/.bashrc, another shell, --noprofile, POSIX mode and an sh-mode login (which read other files or "
+    "none, bash(1) INVOCATION) are outside it.",
 ]
 # The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
 CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
@@ -892,6 +919,56 @@ def client_wiring(root: Path, env=None) -> dict:
     return {**groups, "complete": wiring_complete(groups)}
 
 
+def login_file_state(path: Path) -> str:
+    """How a Bash login shell finds one startup file, from its metadata alone: absent (ENOENT, a dangling symlink
+    included: the search goes on), empty (read as nothing, yet the search ends), content, or unusable (a directory,
+    a special file, no read permission or any other error: the search ends at that file, whatever bash then does with
+    it: it reports a directory, reads a device such as /dev/null as empty, and blocks on a FIFO). Never opens it."""
+    try:
+        info = path.stat()
+    except FileNotFoundError:
+        return "absent"
+    except OSError:
+        return "unusable"
+    if not stat.S_ISREG(info.st_mode) or not os.access(path, os.R_OK):
+        return "unusable"
+    return "content" if info.st_size else "empty"
+
+
+def fixed_login_shell(result) -> bool:
+    """The exact LOGIN_SHELL_KEYS shape over fixed literals only: no text from a file can pass."""
+    return (isinstance(result, dict) and set(result) == set(LOGIN_SHELL_KEYS)
+            and all(result[key] in LOGIN_FILE_STATES for key in LOGIN_SHELL_FILES)
+            and any(result["first_read"] is value for value in (*LOGIN_SHELL_FILES, None))
+            and any(result["profile_read"] is value for value in (True, False, None)))
+
+
+def login_shell(env=None) -> dict:
+    """Opt-in static check of the files a Bash login shell reads under HOME (see LOGIN_SHELL_FILES). Fixed keys: a
+    state per file, first_read (the first file that exists, None when none does) and profile_read (True when the
+    search reaches ~/.profile and it is usable, False when an empty or unusable file ends the search first, when
+    ~/.profile is itself unusable or when it does not exist, None when an earlier file has content and may or may not
+    source it). HOME comes from the environment, else from the user's passwd entry, else "/" as bash falls back to it
+    (shell.c sets current_user.home_dir to "/" when getpwuid fails)."""
+    env = os.environ if env is None else env
+    try:
+        home = Path(env.get("HOME") or Path.home())
+    except (KeyError, RuntimeError, OSError):
+        home = Path("/")
+    states = {key: login_file_state(home / name) for key, name in LOGIN_SHELL_FILES.items()}
+    first = next((key for key, state in states.items() if state != "absent"), None)
+    if first is None:
+        profile_read = False
+    elif first == "profile":
+        profile_read = states["profile"] != "unusable"
+    else:
+        profile_read = None if states[first] == "content" else False
+    result = {**states, "first_read": first, "profile_read": profile_read}
+    if not fixed_login_shell(result):
+        raise AssertionError("login shell state must be the fixed keys with fixed values")
+    return result
+
+
 def pins_file_path(root: Path, host: dict) -> Path:
     """This catalog's platform pins file (adoption/pins-<os>-<arch>.json), matching each pin's own
     version_probe (#251) against a profile's component_ids. PIN_OS_ALIASES covers a platform.system()
@@ -1133,7 +1210,8 @@ def pinned_versions_match(profiles: list[dict]) -> bool | None:
 
 
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
-                     *, with_client_wiring: bool = False, with_pinned_versions: bool = False, env=None) -> dict:
+                     *, with_client_wiring: bool = False, with_pinned_versions: bool = False,
+                     with_login_shell: bool = False, env=None) -> dict:
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
     host = {"os": platform.system().lower(), "architecture": platform.machine().lower(),
@@ -1149,6 +1227,9 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
     if with_pinned_versions:
         result["limitations"] = [item for item in result["limitations"]
                                  if item != NO_PINNED_VERSION] + PINNED_VERSION_LIMITATIONS
+    if with_login_shell:
+        result["login_shell"] = login_shell(env)
+        result["limitations"] = result["limitations"] + LOGIN_SHELL_LIMITATIONS
     try:
         require(manifest.resolve().is_relative_to(root), "manifest must be inside the repository root")
         require(manifest.is_file(), "manifest must be a regular file")
@@ -1210,10 +1291,16 @@ def main(argv: list[str] | None = None) -> int:
                              "pinned_versions_match that is false when any checked component differs from its pin "
                              "(booleans, ids and version strings only; never execs a probe whose declared "
                              "method is not \"exec\", and the exit code is unchanged)")
+    parser.add_argument("--login-shell", action="store_true",
+                        help="Also report, from file metadata alone (never a read or an exec), which of "
+                             "~/.bash_profile, ~/.bash_login and ~/.profile a Bash login shell reads first and "
+                             "whether it reaches ~/.profile: a state per file, first_read and profile_read only; "
+                             "the exit code is unchanged")
     args = parser.parse_args(argv)
     with signals_interrupt_probes() if args.pinned_versions else contextlib.nullcontext():
         report = inspect_adoption(args.manifest, args.repo_root, args.profile,
-                                  with_client_wiring=args.client_wiring, with_pinned_versions=args.pinned_versions)
+                                  with_client_wiring=args.client_wiring, with_pinned_versions=args.pinned_versions,
+                                  with_login_shell=args.login_shell)
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -1234,6 +1321,8 @@ def main(argv: list[str] | None = None) -> int:
             wiring = dict(report["client_wiring"])
             print(f"Client wiring complete: {json.dumps(wiring.pop('complete', None))}")
             print("Client wiring: " + json.dumps(wiring, sort_keys=True))
+        if "login_shell" in report:
+            print("Login shell: " + json.dumps(report["login_shell"], sort_keys=True))
         for error in report["errors"]:
             print(f"Error: {error}")
         for limitation in report["limitations"]:

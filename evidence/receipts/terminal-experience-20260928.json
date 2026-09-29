@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "id": "terminal-experience-20260928",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex"
+  ],
+  "claim": "On this host from 2026-09-28T23:50Z to 2026-09-29T02:36:54Z (Claude Code 2.1.284, Codex 0.157.1, Windows Terminal 1.24.11911.0): removing suppressApplicationTitle from the Claude and Codex profiles of the NativeStack fragment took the window from 7 tabs with 1 distinct title to 7 distinct titles, all in Claude tabs (a trial read the program title with the flag absent and the static title with it set). Alerts were narrowed to pending decisions: a pty probe of a real session measured one permission_prompt Notification and one bare BEL byte about 6 s (+6.0 to +6.1 s) after an unanswered AskUserQuestion (in this host's own bypassPermissions mode and in default mode) and after an unanswered plan approval (plan mode) opened, with no BEL at open, and separate runs with every hook disabled produced no bare BEL byte (Notification events cannot be observed in that setup). The bell sound was chosen from measured levels (RMS -24.7 dBFS replaced by -40.9), and COLORTERM=truecolor changed Claude Code's first frame from 41 256-colour sequences and no truecolor to 45 truecolor sequences and none in 256 colours; Windows Terminal's profile environment key delivered it to a wsl.exe --exec process (env=truecolor against env= without the key).",
+  "limitations": [
+    "One workstation, one Windows Terminal window and one user (the independent-observation class of docs/acceptance-evidence-policy.md). Another host collects its own evidence.",
+    "Tab titles were read through UI Automation as counts and a hash prefix; live titles carry session topics and are not retained. Names are visible only for the trial sentinels. Every observed tab was a Claude tab: no Codex tab was open, so Codex's title behaviour rests on source (types.rs terminal_title default) and the flag trial, not observation.",
+    "The bell trial is a user report: a chime and a tab bell icon were reported; a taskbar flash was not reported, so the taskbar flag's effect on this host is not confirmed. No toast exists in Windows Terminal 1.24 or 1.25, and none is claimed.",
+    "The AskUserQuestion and plan-approval alerts were measured by a pty probe of a real session (Notification event and bare BEL byte), not heard by the user. The hooks-disabled controls count BEL bytes only: with every hook disabled the observer hook is off, so Notification events cannot be observed. The chimes the user did hear were the trial tab's bell and the since-removed immediate PreToolUse chime. The probe counts the bytes the client writes to its pty with a model of the cited Windows Terminal parser transitions (22 hand-derived cases); ConPTY sits between that stream and Windows Terminal. The hook command was also run as a fixture (synthetic class).",
+    "The colour capture is a bare-mode first frame with a dummy API key and a throwaway configuration directory. It counts emitted SGR classes; it does not judge appearance. The profile environment key was proven separately in a trial tab; colour in a Claude tab launched from the updated profile was not captured end to end, and sessions started before the change keep 256 colours.",
+    "Whether preferredNotifChannel reaches sessions started before the edit was not observed on a peer. The installed 2.1.284 sender reads the setting on every notification, which supports hot reload but does not prove it; hooks and permissions do hot-reload (seven ConfigChange log lines per edit with seven sessions live). A peer that still rings twice or still sends the idle ping can be restarted or checked in /config.",
+    "worker_permission_prompt is not in the hooks reference; its presence in the matcher rests on the installed 2.1.284 binary's notification type list and inbox poller. The other six matcher types are documented. permission_prompt for a tool-permission dialog cannot be triggered in this host's bypass mode and was not measured; AskUserQuestion (in bypassPermissions and in default mode) and the plan approval (plan mode) raised it in the probe.",
+    "Codex --strict-config does not validate the [tui] notifications kind strings; the three kinds were compared with type_name() at rust-v0.157.1 and the host check asserts the exact list.",
+    "The toast watch by release ancestry can miss a backport (release tags sit on servicing branches and report diverged); the decision record adds a direct probe of the tag's profiles.schema.json BellStyle enum (false on both tags, true on main, measured 2026-09-28).",
+    "Agent view (claude agents, --bg) was not probed in this change; the pass criteria are in the decision record.",
+    "Excluding idle_prompt also silences a question asked in prose and then left waiting."
+  ],
+  "evidence_class": "independent observation: native Claude Code, Codex and Windows Terminal commands run on this host, with negative controls (trial profiles B and E, hooks-disabled probe runs, the previous fragment, a loud-sound fixture, nine single-defect mutants each isolating one rule) and a user-reported bell observation; the hook-command run and the mutants are synthetic fixtures",
+  "recorded_at_utc": "2026-09-29T02:36:54Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64 on Windows 11 with Windows Terminal 1.24.11911.0",
+    "identity": "one workstation; the running user's Windows Terminal profiles, Claude Code user settings and Codex user config"
+  },
+  "data": {
+    "started_at_utc": "2026-09-28T23:50:03Z",
+    "finished_at_utc": "2026-09-29T02:36:54Z",
+    "local_time_offset": "UTC-4 (times marked local below)",
+    "versions": {
+      "claude_code": "2.1.284",
+      "codex": "0.157.1",
+      "windows_terminal": "1.24.11911.0 (latest stable 2026-07-16; preview 1.25.1912.0 read from source only)"
+    },
+    "titles": {
+      "baseline": {
+        "tabs": 7,
+        "distinct_titles": 1,
+        "static_profile_titles": 7
+      },
+      "trial": {
+        "profile_a_flag_absent_read": "title-trial-ok",
+        "profile_b_flag_true_read": "trial-B-static",
+        "tabs_during_trial": 9,
+        "tab_set_hash_restored_after_trial": true,
+        "windows_terminal_settings_json_restored_byte_identical": true,
+        "trial_profiles": 3
+      },
+      "after_promotion_local": [
+        {
+          "t": "20:03:23",
+          "distinct": 2
+        },
+        {
+          "t": "20:03:44",
+          "distinct": 3
+        },
+        {
+          "t": "20:04:46",
+          "distinct": 3
+        },
+        {
+          "t": "20:05:06",
+          "distinct": 4
+        },
+        {
+          "t": "20:11:13",
+          "static_profile_titles": 2,
+          "dynamic_distinct": 5
+        },
+        {
+          "t": "20:12:14",
+          "static_profile_titles": 0,
+          "dynamic_distinct": 7,
+          "max_duplicates": 1
+        },
+        {
+          "t": "20:26:01",
+          "static_profile_titles": 0,
+          "dynamic_distinct": 7,
+          "max_duplicates": 1
+        },
+        {
+          "t": "21:25:25",
+          "tabs": 8,
+          "static_profile_titles": 0,
+          "dynamic_distinct": 8,
+          "max_duplicates": 1
+        }
+      ],
+      "codex_tabs_observed": 0,
+      "idle_sessions_woken_by_a_message": 2
+    },
+    "bell_user_report": {
+      "chime_heard": true,
+      "tab_bell_icon_seen": true,
+      "taskbar_flash_reported": false,
+      "absolute_local_bellSound_accepted_by_fragment": true
+    },
+    "sound_levels_dbfs": {
+      "Windows Notify System Generic": {
+        "peak": -9.8,
+        "rms": -24.7,
+        "seconds": 1.29,
+        "verdict": "rejected as too loud"
+      },
+      "Windows Ding": {
+        "peak": -22.7,
+        "rms": -40.9,
+        "seconds": 1.09,
+        "verdict": "chosen"
+      },
+      "Windows Notify": {
+        "peak": -22.5,
+        "rms": -38.1,
+        "seconds": 1.29
+      },
+      "chimes": {
+        "peak": -24.3,
+        "rms": -41.1,
+        "seconds": 1.23
+      },
+      "notify": {
+        "peak": -22.9,
+        "rms": -35.6,
+        "seconds": 1.29
+      },
+      "ding": {
+        "peak": -34.0,
+        "rms": -50.0,
+        "seconds": 0.4,
+        "verdict": "softer alternative"
+      }
+    },
+    "colour_capture_claude_bare_first_frame": {
+      "COLORTERM_unset": {
+        "fg_truecolor": 0,
+        "bg_truecolor": 0,
+        "fg_256": 37,
+        "bg_256": 4
+      },
+      "COLORTERM_truecolor": {
+        "fg_truecolor": 39,
+        "bg_truecolor": 6,
+        "fg_256": 0,
+        "bg_256": 0
+      }
+    },
+    "alert_probes": {
+      "counter": "bare BEL bytes counted by a model of Windows Terminal v1.24.11911.0's output state machine (stateMachine.cpp), parser state kept across reads; an OSC-terminating BEL is not counted",
+      "selftest_checks_passed": "24 of 24 (22 counter cases, 2 private-directory cleanup cases)",
+      "ask_user_question_host_default_mode": {
+        "permission_mode_read_from_footer": "bypassPermissions",
+        "notification_type": "permission_prompt",
+        "notification_seconds_after_open": 6.1,
+        "bare_bel_bytes_after_open": 1,
+        "bel_read_seconds_after_open": [
+          6.1
+        ],
+        "bel_at_open": false,
+        "notification_events": 1
+      },
+      "ask_user_question_explicit_default_mode": {
+        "permission_mode_read_from_footer": "default (no mode footer)",
+        "notification_type": "permission_prompt",
+        "notification_seconds_after_open": 6.0,
+        "bare_bel_bytes_after_open": 1,
+        "bel_read_seconds_after_open": [
+          6.0
+        ],
+        "bel_at_open": false,
+        "notification_events": 1
+      },
+      "plan_approval": {
+        "permission_mode_read_from_footer": "plan",
+        "notification_type": "permission_prompt",
+        "notification_seconds_after_open": 6.0,
+        "bare_bel_bytes_after_open": 1,
+        "bel_read_seconds_after_open": [
+          6.0
+        ],
+        "bel_at_open": false,
+        "notification_events": 1
+      },
+      "earlier_probe_versions_bel_read_seconds_after_open": "6.0 to 6.1",
+      "hooks_disabled_controls": {
+        "method": "separate runs with the same session setup and every hook disabled (disableAllHooks, the observer hook included); dialog detected from its on-screen text; 16 s observed; no keys sent",
+        "notification_events": "not observable with hooks disabled",
+        "ask_user_question_host_default_mode": {
+          "permission_mode_read_from_footer": "bypassPermissions",
+          "dialog_opened": true,
+          "bare_bel_bytes_after_open": 0
+        },
+        "plan_approval": {
+          "permission_mode_read_from_footer": "plan",
+          "dialog_opened": true,
+          "bare_bel_bytes_after_open": 0
+        }
+      },
+      "keys_sent_while_waiting": 0,
+      "probe_process_groups_left": 0,
+      "raw_payload_directory_removed": true
+    },
+    "hook_command_fixture": {
+      "extracted_from_saved_settings": true,
+      "decodes_to_single_bel": true
+    },
+    "hot_reload": {
+      "config_change_log_lines_per_edit": 7,
+      "live_sessions": 7,
+      "notification_sender_reads_channel_per_call_in_2_1_284": true,
+      "peer_session_observed_after_channel_edit": false
+    },
+    "environment_key_trial": {
+      "profile_d_environment_key_read": "env=truecolor",
+      "profile_e_no_key_control_read": "env=",
+      "command": "wsl.exe --exec /bin/bash -lc printf title of $COLORTERM",
+      "trial_fragment_and_stubs_removed": true,
+      "windows_terminal_settings_json_byte_identical_to_pre_trial_backup": true
+    },
+    "codex": {
+      "strict_config_exec_exit": 0,
+      "stdout": "ok",
+      "tui_notifications_kinds": [
+        "approval-requested",
+        "plan-mode-prompt",
+        "async-question"
+      ],
+      "schema_errors_rust_v0_157_1": 0,
+      "kinds_compared_with_type_name": true,
+      "kind_strings_validated_by_strict_config": false
+    },
+    "check_script_controls": {
+      "previous_fragment_fails_title_rule": true,
+      "loud_sound_fixture_fails_quiet_sound_rule": true,
+      "single_defect_mutants": 9,
+      "distinct_rules_isolated_one_per_mutant": 8,
+      "single_defect_mutants_wrong": 0,
+      "new_fragment_passes_all": true,
+      "deployed_equals_repository_source": true,
+      "static_profiles_bellStyle": [
+        "taskbar"
+      ],
+      "host_check_script_sha256": "ce41104e136859f3601104518a7c6fb453599eb18f853bad4875307bf2ccef99"
+    },
+    "hashes_sha256": {
+      "fragment_before": "8ff8ac8d43d186265b1e868cac2523120fa1f42754c890d5c3ca188d87e11aea",
+      "fragment_after_repo_and_deployed": "9988dce5c3ccc3749eb11223f730e005aeef352447e7405f591eb9bc3591d2b5",
+      "claude_settings_before": "2dcd599b08f18ff1a8599aed69bdbe8ceea5e2373c44074efc02cb74f93433a6",
+      "claude_settings_after": "93caddc85b0e141b6a1717b7cb87ef20dec7cff3d7f21fcfe4b22a15074d9294",
+      "codex_config_before": "34030fef633fd2c175e5d13232a44300ee1f87d1505df9ba20f83e7a85c0d101",
+      "codex_config_after": "e2731085f0ceafd7ff715f25e65ecaefed443ec0686c7ed4ddb507774695fead",
+      "windows_terminal_settings_before_and_now_equal": true
+    },
+    "settings_changes": {
+      "claude_user_settings": "preferredNotifChannel terminal_bell -> notifications_disabled; one Notification hook (7 exact matcher names; command builds a bare BEL terminalSequence with jq); a PreToolUse chime on AskUserQuestion|ExitPlanMode was applied and removed the same session at the user's request",
+      "codex_user_config": "[tui] notifications = [approval-requested, plan-mode-prompt, async-question]",
+      "fragment_claude_and_codex_profiles": "suppressApplicationTitle removed; bellStyle [audible, taskbar]; bellSound Windows Ding; Claude profile sets environment COLORTERM=truecolor (command unchanged)",
+      "fragment_static_profiles": "Shell, Operations and Local Chat keep static titles and gain bellStyle [taskbar]",
+      "not_changed": [
+        "settings template",
+        "AGENTS.md",
+        "~/.profile (the settings template denies Edit on it, adoption/templates/claude.settings.template.json L84)"
+      ]
+    }
+  },
+  "provenance": {
+    "artifacts_dir": "evidence/artifacts/terminal-experience-20260928",
+    "scripts_sha256": {
+      "alert_probe.py": "1282ff2b8dbb987671677c39381e62d8e6ce00b9a7a1d52976c276ab986e2246",
+      "color_capture.py": "05a24ea6135598b24e5786286b57cab54f7d48f590dd76b00aa029c4edf622c3",
+      "fragment_check_mutants.py": "34e674a815e443b33b2a6bded2dffde50532cf8b546c6f856fa438c9c1d8db4f",
+      "validate_fragment.py": "c625417ab67b2e71e2befb87269b4b811dc7551d0b1d5ca0e965db7292bac251",
+      "wav_levels.py": "18be16470d36e2e38a8a86ec55e40645999a178d805bc8f7f06a22b2f1156b24",
+      "wt_tab_sentinels.ps1": "62efcd3c24d07ca2a7a5638cabf72733d20c4e29ca216aaa4e784a90ca2d2e6f",
+      "wt_tab_titles.ps1": "9ec4658b06baab2f3fe8429ddd0e1d1e4a740a0f433053cd47071e72b4e3133d"
+    },
+    "commands": [
+      "wt_tab_titles.ps1 / wt_tab_sentinels.ps1 via powershell.exe -File (before, during, after)",
+      "python3 -B color_capture.py",
+      "python3 -B alert_probe.py --selftest; python3 -B alert_probe.py ask; python3 -B alert_probe.py ask --permission-mode default; python3 -B alert_probe.py plan",
+      "python3 -B alert_probe.py ask --control; python3 -B alert_probe.py plan --control",
+      "python3 -B fragment_check_mutants.py",
+      "python3 -B wav_levels.py",
+      "uv run --no-project --with jsonschema python validate_fragment.py <fragment>  (draft 2020-12; rejects an invalid tabColor and bellStyle in a negative control)",
+      "codex --strict-config exec --skip-git-repo-check -s read-only \"Reply with exactly: ok\" </dev/null",
+      "gh api repos/microsoft/terminal/contents/doc/cascadia/profiles.schema.json?ref=<tag> | jq (BellStyle enum contains notification): v1.24.11911.0 false, v1.25.1912.0 false, main true"
+    ],
+    "upstream_sources": "docs/decisions/2026-09-28-terminal-experience.md (What upstream sources establish)"
+  }
+}
