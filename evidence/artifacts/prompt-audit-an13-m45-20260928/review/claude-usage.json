@@ -1,0 +1,17 @@
+{
+ "claude-review": {
+  "agent_type": "evidence-reviewer",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 47,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 96,
+   "cache_creation_input_tokens": 247252,
+   "cache_read_input_tokens": 6475741,
+   "output_tokens": 115571
+  },
+  "harness_counters": {}
+ }
+}

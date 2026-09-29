@@ -3,8 +3,10 @@
   "enableWorkflows": true,
   "ultracode": true,
   "workflowSizeGuideline": "unrestricted",
+  "switchModelsOnFlag": false,
   "env": {
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
-    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
+    "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1"
   }
 }

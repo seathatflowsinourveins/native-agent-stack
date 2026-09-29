@@ -1,6 +1,6 @@
 # Repository work
 
-**Top rule: research first, and never self-write without a SOTA source.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. Stars, installs and popularity guide discovery; they are not evidence. With no SOTA source, stop and report instead of writing one.
+**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report instead of writing one. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one. Stars, installs and popularity guide discovery; they are not evidence.
 
 Check capability claims in the order given in [Upstream verification and compounding learning](docs/harness-defaults.md#upstream-verification-and-compounding-learning), and record each proven mistake in its anti-pattern log.
 
@@ -33,8 +33,8 @@ Read `docs/token-practice.md` on demand for the selected context lane, native co
 
 - One coordinator integrates. Writing workers need separate worktrees and bounded file ownership.
 - This repository commits `.claude/settings.json` with Ultracode on. The Claude coordinator stays at `xhigh` under Ultracode, because a `max` session turns its workflow orchestration off, and never sets `CLAUDE_CODE_EFFORT_LEVEL` (any value overrides every child's effort). Pass `effort: 'max'` with an explicit task-matched `model` on every ad-hoc workflow `agent()` call: a stage without its own `effort` inherits the coordinator's `xhigh` unless its agent's frontmatter sets one. Probes and overturn conditions: `docs/decisions/2026-09-23-max-effort-default.md`.
-- Dispatch each workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call.
-- Until the trading lane moves to its own repository, `docs/lanes.md` assigns foundation, trading and shared paths, gives the protocol for shared hot files such as `manifests/evidence.json`, and requires one `lane:*` label per PR. Hand off to a live session that owns an area instead of editing it.
+- Dispatch each new or ad-hoc workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call. The saved scripts vendored in that directory keep their reviewed routing, byte-identical to agent-lab.
+- Until the trading lane moves to its own repository, `docs/lanes.md` assigns foundation, trading and shared paths, gives the protocol for shared hot files such as `manifests/evidence.json`, and requires one `lane:*` label per PR. Build each PR description from `.github/pull_request_template.md`: the required `sota-sources` check fails a PR whose description lacks a non-empty `## SOTA sources` or `### SOTA sources` section (exact, case-sensitive heading). Hand off to a live session that owns an area instead of editing it.
 
 ## Hosts, credentials and records
 
@@ -70,8 +70,8 @@ is the validated repository union; register new decision arrays explicitly with
 
 The simulation-research wave adopts isolated EdgarTools and skfolio
 recipes. Read `blueprints/us-equities/simulation-research/README.md` for current
-results and remaining data gates. Its 2021 control segment is now inspected;
-future experiments must not call it a fresh untouched holdout. Native filing
+results and remaining data gates. Its 2021 control segment has been inspected,
+so no experiment may present it as a fresh untouched holdout. Native filing
 parsing, live SEC access and historical information availability are separate
 claims. Keep provider identities local and preserve acquisition refusals.
 `blueprints/us-equities/catalyst-provenance/access-resolution.md` records successful native

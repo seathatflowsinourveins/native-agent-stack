@@ -213,7 +213,9 @@ Revisit this record when any of these happens:
 
 - a measured effort sweep on the comparison harness (agent-lab `tools/compare`)
   shows that `max` gives no quality gain over `xhigh` or `high` for a role at higher
-  cost; that role returns to the cheaper effort;
+  cost; that role returns to the cheaper effort; **amended 2026-09-28:** the result now
+  goes to the user as a recommendation and lowers no role by itself
+  ([M7, 2026-09-27 review](2026-09-28-community-sweep.md#amendments-to-the-2026-09-24-rows));
 - usage limits block work;
 - a Claude Code release accepts `max` together with Ultracode orchestration; the main
   loop then moves to `max`;

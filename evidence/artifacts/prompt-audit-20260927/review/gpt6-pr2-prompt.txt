@@ -1,0 +1,16 @@
+Review the change on this repository checkout's branch (read-only; do not write, install or change anything).
+The diff origin/main...HEAD is saved at <work>/review/pr2.diff; it also re-registers AGENTS.md in manifests/evidence.json.
+The decision record for these edits is on another branch; its text is at
+<pr1>/docs/decisions/2026-09-27-prompt-audit-resolution.md (items F1 and F4).
+
+Check, against the original files in this checkout:
+1. Is each edited AGENTS.md statement accurate against the files it describes (examples/claude-native/workflows/README.md,
+   including lines 9-10 and 219 and the role table it links; blueprints/us-equities/simulation-research/README.md;
+   blueprints/us-equities/research-evaluation/README.md)?
+2. Would any test (for example tests/test_install_claude_profile.py) or other rule in AGENTS.md or a file it links now
+   contradict or break it? Run read-only checks the sandbox allows (PYTHONDONTWRITEBYTECODE=1); otherwise reason from
+   the source and say so.
+3. Will the target models (Claude through @AGENTS.md, and Codex) follow each new sentence as intended?
+
+Answer with one line per finding: severity (high, medium or low), file:line, the issue, the fix. For a check with no
+finding, say so in one line.

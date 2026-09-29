@@ -1,0 +1,136 @@
+{
+ "lane": "Claude Agent tool, blind-adjudicator (frontmatter model opus, effort max; Read, Glob and Grep only)",
+ "usage": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 14,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 30,
+   "cache_creation_input_tokens": 126988,
+   "cache_read_input_tokens": 1189561,
+   "output_tokens": 51047
+  },
+  "harness_counters": {
+   "subagent_tokens": 146908,
+   "tool_uses": 19,
+   "duration_ms": 544247
+  }
+ },
+ "return": {
+  "leak": false,
+  "leak_text": "",
+  "items": [
+   {
+    "id": "X9",
+    "choice": "B",
+    "reasons": "Nothing the installed client, the repository or the sources say contradicts either return, so rule 15 does not force 'neither'. A's 'user-typed commands' matches C1/C2, and B's Skill clause matches C3 and R5. B's `/plugin` is missing from the headless command list (C4), but it is a real interactive command (R10), and NF1 finds /plugin dialog fixes at 2.1.247-2.1.280. The current line also scored 10 correct statuses in K5-K6. But it tells the model to use commands the installed client refuses to run for it (C1, C2), so under rule 15 it loses to either return. Between the returns, the preregistered K5-K6 order ranks B first: wrong_status ties at 0, correct_status is B 10 vs A 8, and non_answer ties at 0. The whole gap is in K5 (A '5; 0; 3; 0; 2', B '5; 0; 5; 0; 1'). The hook ran in every run, but two A runs took A's fallback and reported unconfirmed with a negative lean ('nothing in this session suggests it is'). This evidence has limits. The gap is 2 runs of 5. B's five affirmations followed Bash reads, under bypassPermissions, that included the process command line and the fixture's hook state file. Interactive sessions were not tested. On wording, B's 'Distinguish listed availability from successful execution' matches three things: R27 (a tool list can come from the discovery cache before any connection), the K6 fixture (tools stay listed while the server is not connected) and the repository's own check at docs/token-session-handbook.md:67 ('make one useful call and check its returned content'). This is agreement with the sources, not a measured change in behavior, since every arm scored 5 of 5 on K6. B also covers agents, which T1 lists as a plugin component and A omits. B's order, read-only diagnostics first and then asking the user, follows examples/claude-native/CLAUDE.md:17 and the client's own refusal text (C1/C2 'Ask the user to run'). A's best argument is that its fallback still gives a status in headless runs and workflow children (round_2_points). The matching risk for B is untested, not refuted. B never asked the user in any headless run (asks_user 0 in K1-K3, K4 and K5-K6; question_only 0 and non_answer 0 in K5-K6). A is shorter and cost less per run (K5-K6 total USD 1.9892 vs 2.4406, which the packet marks descriptive only). B read settings files in 2 more K6 runs (evidence_settings 7 vs 5). Every arm read them in K5, so this is a minor cost under AGENTS.md:43. Neither point outweighs B's edge in correct statuses or its better-sourced verification standard.",
+    "sources": [
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6 (ranking sentence)",
+      "quote": "By the preregistered order, Return B's text ranks first between the two returns, decided by correct_status (wrong_status: Return B's text 0, Return A's text 0; correct_status: Return B's text 10, Return A's text 8)."
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6, first table (columns: text, runs, wrong_status, correct_status, non_answer, affirms, denies, says_unconfirmed, question_only, asks_user, names_command, called_target, executed_target, loaded_schema, evidence_settings, no_builtin_skill, total USD)",
+      "quote": "| Return A's text | 10 | 0 | 8 | 0 | 3 | 5 | 2 | 0 | 0 | 8 | 5 | 0 | 9 | 5 | 10 | 1.9892 |\n| Return B's text | 10 | 0 | 10 | 0 | 5 | 5 | 1 | 0 | 0 | 7 | 5 | 0 | 7 | 7 | 10 | 2.4406 |"
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6, by-question table (runs; wrong_status; correct_status; non_answer; says_unconfirmed), K5 then K6",
+      "quote": "| Return A's text | 5; 0; 3; 0; 2 | 5; 0; 5; 0; 0 |\n| Return B's text | 5; 0; 5; 0; 1 | 5; 0; 5; 0; 0 |"
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6, run list, Return A's text K5, first run",
+      "quote": "status sentence: \"I can't confirm it's active, and nothing in this session suggests it is.\""
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6, run list, Return A's text K5, fifth run",
+      "quote": "status sentence: \"It's unconfirmed, and I found nothing showing it's active in this session.\""
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6_method, K5 fixture",
+      "quote": "the hook appends one line to its state file for the session and prints nothing, so nothing in the session names the plugin. Truth: active when the run's hook marker exists with at least one line (expected in every run)."
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6_method, run settings",
+      "quote": "explicitly (bypassPermissions; setting sources user,project,local)"
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6_method, Not tested",
+      "quote": "Not tested: interactive sessions, where a user can answer a request to run a command (only the user can run them)"
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k5_k6_method, K6 fixture",
+      "quote": "so its tools stay listed while it is not connected."
+     },
+     {
+      "locator": "packet source C1",
+      "quote": "context is a built-in CLI command, not a skill. Ask the user to run /context themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "packet source C2",
+      "quote": "mcp is a UI command, not a skill. Ask the user to run /mcp themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "packet source C3",
+      "quote": "Only names from the listing (or that the user typed explicitly) are valid. Built-in CLI commands (`/help`, `/clear`, …) aren't skills."
+     },
+     {
+      "locator": "packet source R5 (https://code.claude.com/docs/en/skills.md, line 766)",
+      "quote": "A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`. Other built-in commands such as `/compact` are not."
+     },
+     {
+      "locator": "packet source C4",
+      "quote": "slash_commands (107 entries) includes \"mcp\", \"context\" and \"reload-plugins\" and no \"plugin\""
+     },
+     {
+      "locator": "packet source R10 (https://code.claude.com/docs/en/plugins/troubleshooting.md, line 26)",
+      "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel."
+     },
+     {
+      "locator": "packet source NF1, third query",
+      "quote": "same range: bullets containing `/mcp` or `/plugin` plus invok|Skill|model|on its own|typed|Claude can -> 2.1.280, 2.1.277, 2.1.247, all dialog or VS Code fixes"
+     },
+     {
+      "locator": "packet source R27 (https://code.claude.com/docs/en/mcp.md, lines 268, 270)",
+      "quote": "Claude Code loaded the server's tool list from its discovery cache, saved in a previous session, instead of connecting at startup, and Claude Code connects the server the first time Claude calls one of the server's tools."
+     },
+     {
+      "locator": "packet source T1 (https://code.claude.com/docs/en/plugins.md, line 9)",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components that Claude Code installs and loads as one unit."
+     },
+     {
+      "locator": "docs/token-session-handbook.md:67",
+      "quote": "After a relevant setup change, inspect connected servers with `/mcp`, then make one useful call and check its returned content."
+     },
+     {
+      "locator": "examples/claude-native/CLAUDE.md:17",
+      "quote": "Settle a discoverable harness capability by step 2 before asking the user"
+     },
+     {
+      "locator": "CLAUDE.md:3-4",
+      "quote": "Inspect native loaded tools with `/mcp` and loaded context with `/context` before\nclaiming a plugin is active."
+     },
+     {
+      "locator": "AGENTS.md:43",
+      "quote": "Keep host paths and native sign-ins private, and do not fetch private state or authentication stores."
+     },
+     {
+      "locator": "packets/x9.AB.json round_2_points, second item",
+      "quote": "'report it as unconfirmed and name the command' gives a status whether or not anyone can answer, and CLAUDE.md also loads in headless runs and workflow children."
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k1_k3, first table, Return B's text row (columns: text, runs, correct, answered, no_builtin_skill, loaded_schema, executed_target, cli_diagnostic, asks_user, ...)",
+      "quote": "| Return B's text | 9 | 9 | 9 | 9 | 9 | 6 | 0 | 0 | 6 | 5 | 31.8625 | 0.2628 | 2.4542 |"
+     },
+     {
+      "locator": "packets/x9.AB.json comparison_k4, table, Return B's text row (columns: text, runs, status_given, affirms, denies, says_unconfirmed, question_only, wrong_status, asks_user, ...)",
+      "quote": "| Return B's text | 3 | 2 | 2 | 0 | 1 | 0 | 0 | 0 | 1 | 3 | 0 | 3 | 0.8152 |"
+     }
+    ],
+    "confidence": 0.6
+   }
+  ]
+ }
+}

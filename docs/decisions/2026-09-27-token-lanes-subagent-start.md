@@ -337,3 +337,349 @@ list includes WebSearch and `ctx_fetch_and_index` and excludes WebFetch. The
 existing option. Revisit containment if M5 remains above its target; merely
 delivering the text cannot close it. No after-change native workflow run, live
 installation, provider usage or token savings is claimed here.
+
+## Addendum 2026-09-27: qmd scope in the carrier
+
+**Need.** The named QMD index `native-agent-stack-catalog` gained two collections on the workstation on
+2026-09-27: `foundation-docs` (docs/, with `ecosystem/**` ignored because it holds the generated guide) and
+`foundation-adoption` (adoption/). The token E2E session's E1 task needed `adoption/update.md`, which neither
+us-equities collection contains. A QMD MCP server reads its default collection list once, when it is created
+([qmd v2.8.3 `src/mcp/server.ts` L189](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L189)), and a `query` without `collections` searches only that list
+([L355](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L355)). An explicit filter ([L330](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L330)) reaches collections added later. On 2026-09-27 a lexical
+`query` with `collections: ["foundation-adoption"]` and `rerank: false`, sent through this workstation's QMD MCP
+server, returned `foundation-adoption/update.md` as its top hit. That server's start-up instructions still listed
+only the two us-equities collections and 121 documents.
+
+**Change.** The carrier's QMD line now reads: "Use qmd query with collections (foundation-docs,
+foundation-adoption, us-equities-foundation, us-equities-catalog), then get a line window." The window follows the
+query tool's own recipe, `get(file, fromLine = max(1, line - 20), maxLines = 80, lineNumbers = true)`
+([L257](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L257); `get` parameters at [L412-413](https://github.com/tobi/qmd/blob/v2.8.3/src/mcp/server.ts#L412-L413)). It is a bounded read, like Read with an offset
+and a limit, not a lossless transform, and line numbers stay on for `file:line` citations. The handbook mirror and
+its sources line changed with it. The portable setup in
+[native-workflows.md](../../catalogs/us-equities/native-workflows.md#use-the-catalog-without-loading-all-of-it) and
+[adoption/update.md](../../adoption/update.md#refresh-only-adopted-retrieval) now creates the two foundation
+collections, so the four names resolve on any host that follows it.
+
+**Size.** The block measures **4,094 UTF-8 bytes**, within the existing **4,100-byte** bound, which does not
+move. Relative to the 4,051-byte block:
+
+| Change | Additional UTF-8 bytes |
+| --- | ---: |
+| Four collection names and the explicit `collections` wording | 29 |
+| "a line window" | 14 |
+| Total | 43 |
+
+**Alternatives rejected.**
+- Keep the two-collection line and restart every QMD MCP server after a collection change. A server's default
+  list is fixed at creation, and long-lived sessions on any host would silently search the old scope.
+- Look up collections with the `status` tool before each search. That adds a call to every task; keep it for
+  troubleshooting.
+- `lineNumbers:false` on `get` and `multi_get` with `maxLines`, from an unmerged first build of this change. The
+  independent review found three problems: `multi_get` is outside the carrier's single ToolSearch list and the
+  `stack-researcher` grant; `maxLines` truncates each file although the first build called it lossless; and those
+  two items pushed the block to 4,152 bytes and the bound to 4,200 without a measured need. Line numbers also
+  serve `file:line` citations. All were withdrawn.
+
+**Overturn.** Revisit if QMD refreshes its default collection list per call (an upstream change at L189 or L355),
+if the index's collections change, or if a measured child run shows the four-name scope missing documents that a
+`status` lookup would have found.
+
+**#381.** The carrier hash changes. #381 freezes carrier and skill hashes at execution
+([sources, boundaries and freeze, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#sources-boundaries-and-freeze)),
+so its run records the installed hash and install time. No other carrier rule changed, and no child run with this
+block is claimed.
+
+## Addendum 2026-09-27: role-matched blocks
+
+**Need: instructions must match grants.** A subagent whose `tools` field is an explicit allowlist can use only the
+tools it lists; an omitted field inherits the parent's tools ([sub-agents](https://code.claude.com/docs/en/sub-agents)).
+ToolSearch returns only granted tools
+([measured gaps](../../evidence/artifacts/token-lanes-subagent-start-20260927/measured-gaps.md#repair-round-observations-2026-09-27)).
+The Decision above sent the same 4,094-byte block, which names 17 MCP tool ids, to every non-blind child. Seven of
+the eight shipped non-blind roles therefore received instructions to load or use tools they cannot call. The table
+compares each [`adoption/agents/claude/*.md`](../../adoption/agents/claude/) `tools:` line at base `e82e6be7` with
+that block:
+
+| `agent_type` | Ungranted ids named | Lines needing a tool the role lacks |
+| --- | ---: | --- |
+| `stack-researcher` | 5 of 17 | SocratiCode clause, codebase-memory, Headroom; both skills (no Skill tool or `skills:` preload) |
+| `stack-verifier` | 14 of 17 | fetch, code navigation, codebase-memory, QMD and ai-memory, Headroom; both skills |
+| `evidence-reviewer` | 8 of 17 | fetch, RTK (no Bash), jCodeMunch `menu`, codebase-memory, QMD, Headroom; both skills |
+| `security-reviewer` | 8 of 17 | as `evidence-reviewer` (its only preload is `security-best-practices`) |
+| `isolated-builder` | 8 of 17 | fetch, jCodeMunch `menu`, codebase-memory, QMD MCP, Headroom; `search-first` |
+| `source-scout` | 17 of 17 | bootstrap (no ToolSearch), every MCP line, the RTK line's `ctx_execute` clause; both skills |
+| `semantic-evidence-reviewer` | 17 of 17 | every line except TOON and one-lane accounting (no Bash, ToolSearch or Skill) |
+| `landscape-sweep-worker` | 0 | none: it has no `tools:` line and inherits every tool except WebFetch |
+
+The three `blind-*` roles already received 0 bytes.
+
+**Change.** The [hook](../../adoption/hooks/claude/token-lanes-subagent-start.py) keeps the `blind-*` gate and
+adds a literal map from the exact `agent_type` to a sibling block. It never builds a path from `agent_type`:
+`stack-researcher`, `stack-verifier`, `evidence-reviewer` and `security-reviewer` (one shared reviewer block),
+`isolated-builder` and `source-scout` get role blocks; `semantic-evidence-reviewer` joins an exact-name set that
+receives nothing; every other value keeps [`token-lanes-block.md`](../../adoption/hooks/claude/token-lanes-block.md)
+unchanged. A missing, empty or unreadable role block is silent and does not fall back to the default, because the
+default would restore the ungranted ids. Each role block copies its lines from the default block. Where a line
+names ungranted tools, a variant replaces it; the variants are stated verbatim in the
+[handbook](../token-session-handbook.md#token-lanes-carried-into-subagents), with the agent-type table.
+Two corrections from the design's verification apply. The builder's output line says `cwd = the owned worktree
+your brief names`, since [`isolated-builder.md`](../../adoption/agents/claude/isolated-builder.md) starts in the
+coordinator's directory, which is not its to edit. The builder keeps only the verification sentence: that skill
+is preloaded in its frontmatter, and `search-first` would need the Skill tool it lacks.
+
+| Block | UTF-8 bytes | MCP ids named |
+| --- | ---: | ---: |
+| `token-lanes-block.md` (default, unchanged) | 4,094 | 17 |
+| `token-lanes-block.researcher.md` | 3,075 | 12 |
+| `token-lanes-block.builder.md` | 2,883 | 9 |
+| `token-lanes-block.verifier.md` | 2,186 | 4 |
+| `token-lanes-block.reviewer.md` | 2,088 | 9 |
+| `token-lanes-block.scout.md` | 1,089 | 0 |
+| `semantic-evidence-reviewer` | 0 | 0 |
+
+Every block stays within the unchanged 4,100-byte bound. The
+[installer](../../tools/adoption/install_claude_profile.py) `HOOKS` map and
+[`SHA256SUMS`](../../adoption/hooks/claude/SHA256SUMS) add the five role blocks, listed before the script, so an
+upgrade installs a new script after its siblings.
+
+**Tests.** The [text contract test](../../tests/test_token_lanes_subagent_start.py) now expects each type's own
+block, keeps the full-block key phrases on the default and gives each role block its own phrase set. It applies
+the budget, host-path and verbatim-handbook checks to all six files, and adds a grant-agreement test. For each
+shipped agent with a `tools:` line, every `mcp__` id the hook injects for its `agent_type` must be in that line.
+So must every tool a line names or needs: ToolSearch, Bash for the RTK line, `ctx_fetch_and_index` and the other
+bare lane tool names. A named skill must be invocable through the Skill tool or preloaded through `skills:`. As a
+failing-first control, run against the unchanged hook, that test failed for 7 of the 10 allowlisted agents (every
+row above except `landscape-sweep-worker`; the blind roles passed with 0 bytes); it passes after the change. This
+is text-versus-allowlist agreement checked by local subprocess tests, not a native child run, observed tool
+exposure, compliance or a token saving.
+
+**Supersedes.** The Decision's "default routing carrier for every non-blind subagent" now means the default for
+every non-blind type that neither the map nor the silent set (`semantic-evidence-reviewer`) names. Exclusion stays inside the hook. The measured-gap addendum's coverage
+sentence ("covers all seven shipped non-blind roles ... not tool access") is superseded by the per-role
+expectations and the grant-agreement test above.
+
+**No grant in this change.** The repository's own rules reject adding a tool to these roles now:
+- the [role-dispatch record, alternative 5](2026-09-26-stack-agents-role-dispatch.md#alternatives) (L82-83)
+  grants a lane only with a written route in the body and prunes it by measured use;
+- the [harness-settings record, `codebase-memory-mcp#2`](2026-09-27-claude-harness-settings.md#codebase-memory-mcp-codebase-memory-mcp2)
+  (L75-84) says no shipped agent's exact tool list gains codebase-memory tools until each platform has a pinned
+  install and each intended agent has a recorded useful call;
+- the [workflow role-routing notes](../../examples/claude-native/workflows/README.md#role-routing-and-child-prompt-size-2026-09-21) (L494)
+  keeps guarded Headroom coordinator-side;
+- #381's [preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json) says of
+  Headroom "No default role grant; report M10 N/A and explain any invocation."
+
+The five role bodies sealed for #381 are unchanged, so no amendment is needed. A later `stack-researcher` grant of
+the read-only codebase-memory tools remains possible. It would need #381 to have executed or an Amendment 3, the
+`codebase-memory-mcp#2` overturn condition, a written body route and a role-dispatch addendum.
+
+**Alternatives rejected.**
+- Native per-agent `SubagentStart` matchers. Upstream supports a matcher on the agent name. They would add one
+  settings group per role to the template's single empty-matcher group, which the installer merge test pins.
+- One block with "where granted" qualifiers. It would exceed the 4,100-byte bound and still name ungranted ids.
+- Skipping every named role. That would drop carrier-only rules the sealed bodies do not state: `intent`, `cwd`
+  for every language and the RTK rewrite details.
+- Falling back to the default block when a role block is missing. That restores the ungranted ids.
+
+**#381.** The carrier is now the hook and six block files. #381 freezes "carrier and skill hashes" at execution
+([step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84)), so its run records
+the installed hash of the hook and of every block file. `SHA256SUMS` lists all seven together. In arm B the frozen
+named roles now receive their role blocks instead of the default block.
+
+**Limitations and open items.** A plugin-scoped `agent_type` such as `my-plugin:stack-verifier` receives the
+default block, as the blind gate already documents for plugin-shipped roles; the installer copies user agents
+with bare names. The map also matches a same-named agent in any other project, because the hook runs from user settings for every project and a project-scope definition overrides the user-scope one; that agent receives the role block written for the shipped allowlist whatever its own `tools:` line grants, and the grant-agreement test checks only the shipped definitions. A new shipped agent with a `tools:` line and no map entry receives the default block, and the
+grant-agreement test fails for it unless its allowlist covers every line. The Codex stack-worker profile's
+codebase-memory and Headroom exposure is outside this Claude carrier and is not reconciled here.
+
+**Overturn.** Revisit a role block when its agent's `tools:` line changes, though the grant-agreement test
+fails only when a block still names a tool the line no longer grants; a new grant or a `disallowedTools` entry fails no test. Also revisit when a native child run shows a role block without a lane that the role uses and is
+granted, or when a SubagentStart hook can read the child's resolved tool list, which would let one block be
+filtered at run time.
+
+| Earlier assumption | Correction and verification path |
+| --- | --- |
+| One carrier text fits every non-blind child | Allowlisted roles receive only lanes their `tools:` line grants; the grant-agreement test compares each shipped allowlist with the injected text. |
+
+## Addendum 2026-09-28: verification line
+
+**Need.** Since the original carrier ([#378](https://github.com/seathatflowsinourveins/native-agent-stack/pull/378),
+merged 2026-09-27T06:11:54Z), its last line has told every child that receives the default block: "Before claiming a
+task done, follow the installed verification-before-completion skill: real command output before any success claim."
+The role-matched blocks kept that sentence for `isolated-builder`. It is an explicit verification instruction. The
+[Opus 5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md),
+read 2026-09-28, says at L61 that Claude Opus 5 "verifies its own work without being told to", that explicit
+verification instructions "cause over-verification" and should be removed, and that "The same applies to legacy
+harness scaffolding that adds separate verification steps." At L81, re-check instructions "compound with the model's
+own behavior and add cost without improving results." The
+[Opus 5.5 guide, L9](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md)
+keeps the Opus 5 patterns as "a reasonable starting point", and
+[prompting best practices, L780](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md)
+makes Opus 5 the exception to its self-check advice: "remove these instructions rather than rewriting them." The
+sentence also assumes a command runner. A child whose tools include neither Bash nor Context Mode's `ctx_execute`,
+such as a plugin-scoped or unmapped allowlisted agent (role-matched addendum, limitations), still receives the
+default block and cannot return command output. A role without Bash but with `ctx_execute`, such as
+[`security-reviewer`](../../adoption/agents/claude/security-reviewer.md), can. This
+carrier's own unit wrote the line, so, as with the qmd scope, a dated addendum changes it. Each documentation quote
+in this addendum was re-read at its cited line of the page's Markdown source at 08:55Z on 2026-09-28.
+
+**Change: default block.** Line 13 of [`token-lanes-block.md`](../../adoption/hooks/claude/token-lanes-block.md) now
+reads: "Show evidence before a success claim: the command and what it returned (code.claude.com best practices), or
+the file:line read. Research upstream first with the installed search-first skill before writing custom code.
+Source: skillOverrides in adoption/templates/claude.settings.template.json." The first sentence follows
+[Claude Code best practices, L52](https://code.claude.com/docs/en/best-practices.md): "Have Claude show evidence
+rather than asserting success: the test output, the command it ran and what it returned, or a screenshot of the
+result." The tag follows the item L52 names. The file:line alternative is local policy, not in L52: a file:line
+read is evidence that a child without Bash can give. The sentence asks for the evidence of work already done; it
+adds no verification step and names no skill. The `search-first` sentence and its source are unchanged. The
+[handbook](../token-session-handbook.md#token-lanes-carried-into-subagents) mirrors the line, and its sources
+paragraph now names only `search-first` under `skillOverrides`, with the sources above and the local-policy note.
+
+**Builder line, decided on its own merits: removed.** `isolated-builder` has Bash, so the argument about children
+without Bash does not apply to it. Its line goes for another reason: it was the third copy of one instruction. The
+unchanged [`isolated-builder.md`](../../adoption/agents/claude/isolated-builder.md) preloads
+`verification-before-completion` in its frontmatter (L7-9), and "The full content of each listed skill is injected
+into the subagent's context at startup" ([sub-agents reference, L600](https://code.claude.com/docs/en/sub-agents.md)).
+Its body at L12 says "Use the preloaded verification-before-completion skill before claiming success". It runs
+`model: opus` (L5), which on this host has resolved to Opus 5.5 since September 22
+([grand catalog handbook, L242-244](../grand-catalog-handbook.md#runtime-workers-sdks-and-research-applications)),
+so the Opus 5 advice reaches it through the 5.5 guide's L9 carry-forward. Before
+[#402](https://github.com/seathatflowsinourveins/native-agent-stack/pull/402) (`d022295a`, merged
+2026-09-27T14:04:25Z) it ran `model: sonnet`. The role-matched addendum kept the sentence because the role could
+follow it: the skill is preloaded, while `search-first` would need a Skill tool the role lacks. That makes a line
+admissible, not needed. The frontmatter preload and the body line stay as they are; agent
+definitions are outside this change, which also leaves the skill's `on` listing unchanged. The handbook drops the
+builder-verification variant and that item from the builder's table row.
+
+| Block | Before (UTF-8 bytes) | After | Change |
+| --- | ---: | ---: | --- |
+| `token-lanes-block.md` | 4,094 | 4,088 | line 13 goes from 301 to 295 bytes |
+| `token-lanes-block.builder.md` | 2,883 | 2,747 | the 135-byte verification line and its newline are removed |
+
+The 4,100-byte bound does not move, and the other four role blocks are unchanged.
+[`SHA256SUMS`](../../adoption/hooks/claude/SHA256SUMS) lists both new hashes.
+
+**Tests.** In the [text contract test](../../tests/test_token_lanes_subagent_start.py), the default block's key phrase
+`verification-before-completion` becomes `Show evidence before a success claim`, and the builder's phrase set drops
+the skill name. A new withdrawn-phrase check requires that no block file names `verification-before-completion`; the
+grant-agreement test's skill guard is unchanged. As a failing-first control, the new module ran against the base
+(`f508ffba`) default block, builder block and handbook together, so the verbatim-handbook check still held.
+`python3 -m unittest tests.test_token_lanes_subagent_start` returned "FAILED (failures=19)": the withdrawn phrase in
+both blocks, and the new key phrase missing from the default block file and from each of the 16 hook payloads that
+receive the default block. With this change the same command returns "Ran 17 tests" and "OK". This is local text
+agreement, not a native child run, compliance or a measured saving.
+
+**Boundary.** The upstream removal advice is written for Claude Opus 5 and carried forward to Opus 5.5. For other
+models, best practices L780 still says a self-check "catches errors reliably, especially for coding and math". The
+default block also reaches children on other models, such as the Haiku probe and the Sonnet wrappers above; for them
+the evidence sentence is what remains, and the overturn conditions below give them their own comparison.
+
+**Alternatives rejected.**
+- Keep the default line with a model or tool qualifier. Best practices L780 says to remove such instructions on
+  Opus 5 rather than rewrite them, and the carrier text cannot see the child's model or tools.
+- Reword the builder line to the evidence sentence (2,877 bytes). The preloaded skill's core principle is already
+  "Evidence before claims, always"
+  ([obra/superpowers `8ca22db`, `skills/verification-before-completion/SKILL.md` L10](https://github.com/obra/superpowers/blob/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion/SKILL.md#L10);
+  the installed copy on this host matched the manifest's `skill_md_sha256` under `sha256sum` on 2026-09-28), so the
+  line would still duplicate the preload.
+- Remove the builder's preload or its body line as well. Agent definitions are outside this change; the
+  [skills-trial record](2026-09-25-skills-trial-and-usage.md#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule)
+  adds a with/without comparison of that preload to the skill's review.
+- Follow the community setups that keep standing self-verify instructions, such as superpowers, this skill's source.
+  Their popularity is not evidence, and the primary sources above point the other way.
+
+**#381.** The carrier hash changes again. #381 freezes carrier and skill hashes at execution
+([procedure, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84)), so its run
+records the hash of the hook and of every block file. Step 2 records no install time, and the installer writes none:
+[`install_claude_profile.py`](../../tools/adoption/install_claude_profile.py) copies with `shutil.copy2` (L113),
+which keeps the source file's modification time. At `f508ffba`, and at `origin/main` `4f31ef46` on 2026-09-28, its
+README reads "frozen protocol, not executed or accepted"; that is the committed record, not live state, and this
+change lands only if the E2E has not started. A host receives the new text at its next
+`python3 tools/adoption/install_claude_profile.py --only guard`; this change runs no installer, and no child run with
+this text is claimed.
+
+**Supersedes.** In the [role-matched addendum](#addendum-2026-09-27-role-matched-blocks), "The builder keeps only the
+verification sentence" and the byte counts 4,094 (default) and 2,883 (builder) describe the previous revision. The
+[qmd addendum](#addendum-2026-09-27-qmd-scope-in-the-carrier)'s "#381" paragraph says the run records "the installed
+hash and install time"; step 2 freezes hashes, not an install time, as above.
+
+**Overturn.** Each condition names what it varies. Each comparison runs through an upstream evaluation harness named
+with its pin before the run, on frozen tasks, and counts review-found defects, tokens and elapsed time.
+- Default block: restore an explicit verification instruction if a comparison that varies line 13 alone (the removed
+  sentence against the evidence sentence), with `general-purpose` or Workflow children on the coordinator's model,
+  shows fewer defects with the instruction at no larger token or time cost.
+- Other models: run the same comparison with children on a non-Opus model, such as Haiku or Sonnet. A gain there
+  alone supports a line in a role block for an agent type on that model, not in the default block, because the
+  carrier cannot see a child's model.
+- Builder: the skills-trial comparison varies the builder's preload, not a carrier line, so it cannot overturn this
+  removal. Restore the builder line only if a comparison that varies that line, with the preload held on, shows the
+  same gain.
+- Any child: a Claude prompting guide for the running model reverses the L61 and L81 advice.
+
+| Earlier assumption | Correction and verification path |
+| --- | --- |
+| A standing instruction to follow the verification skill belongs in every child's start context | The Opus 5 guide (L61, L81), carried forward by the 5.5 guide (L9), says to remove explicit verification instructions. The carrier now asks only for evidence, the builder gets the skill from its own preload, and the withdrawn-phrase test keeps the skill name out of every block. |
+
+## Addendum 2026-09-28: builder evidence sentence
+
+**Need.** The [verification-line addendum](#addendum-2026-09-28-verification-line) removed the builder's line for one
+reason: "Its line goes for another reason: it was the third copy of one instruction." It rejected the evidence
+sentence as the builder's line for the same reason: "so the line would still duplicate the preload." Both rest on the
+builder's `verification-before-completion` preload and the body line that named it. On 2026-09-28 the skills trial
+removed that skill under its conflict rule, and with it the preload and the body line in all three copies of
+`isolated-builder.md` ([removal addendum](2026-09-25-skills-trial-and-usage.md#addendum-2026-09-28-verification-before-completion-removed-conflict-rule)).
+The hook gives `isolated-builder` its role block instead of the default block
+([role-matched addendum](#addendum-2026-09-27-role-matched-blocks)), so the default block's line 13 does not reach it.
+Its body still says "Run the appropriate existing checks and report their outcomes", which names no form of evidence.
+Without a change here, the builder's definition and role block would carry no evidence rule.
+
+**Change.** [`token-lanes-block.builder.md`](../../adoption/hooks/claude/token-lanes-block.builder.md) gains, as its
+last line, the first sentence of the default block's line 13: "Show evidence before a success claim: the command and
+what it returned (code.claude.com best practices), or the file:line read." This is the builder text the
+verification-line addendum weighed and rejected as a duplicate, at the size it gave: the block goes from 2,747 to
+2,877 UTF-8 bytes and from 9 to 10 lines. The `search-first` and Source sentences stay out because the builder has no
+Skill tool; C2 gave the builder the verification sentence alone for the same reason. As in the default block, the
+sentence asks for the evidence of work already done, adds no verification step and names no skill, so the Opus 5
+advice to remove explicit verification instructions (L61, L81) does not apply to it.
+[`SHA256SUMS`](../../adoption/hooks/claude/SHA256SUMS) lists the new hash: `c665c230…` becomes `c81a91c4…`. The
+[handbook](../token-session-handbook.md#token-lanes-carried-into-subagents) adds "builder evidence" to the builder's
+table row and a builder-evidence variant that gives the reason.
+
+**The verification-line addendum's builder overturn.** It reads "Restore the builder line only if a comparison that
+varies that line, with the preload held on, shows the same gain." This change neither meets nor relies on it. That condition
+governs the removed verification line and presupposes the preload, which no longer exists. The new line is the
+evidence sentence, which the verification-line addendum turned down for the builder only because it duplicated the
+preload.
+
+**Tests.** In the [text contract test](../../tests/test_token_lanes_subagent_start.py), the builder's key phrases gain
+`Show evidence before a success claim`. The withdrawn-phrase check and the grant-agreement test's skill guard are
+unchanged; the check's comment now says that no agent preloads the skill and that the builder block carries the
+evidence sentence instead. As a failing-first control, the changed module ran against the base (`3058b237`) builder
+block with this change's handbook, so the verbatim-handbook check still held.
+`python3 -m unittest tests.test_token_lanes_subagent_start` returned "Ran 17 tests" and "FAILED (failures=2)": the
+builder block file and the hook's `isolated-builder` payload each lacked the new key phrase. With this change the same
+command returns "Ran 17 tests" and "OK". This is local text agreement, not a native child run, compliance or a
+measured saving.
+
+**#381.** The builder block hash changes again, and #381 records each block file's hash at execution
+([procedure, step 2](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#procedure--aa-84)). The
+preload removal also changes the builder's role body, which #381 pins by hash:
+[its Amendment 3](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#amendment-3-2026-09-28-the-isolated-builder-body-without-verification-before-completion-before-execution)
+replaces the `isolated-builder.md` row before execution. A host receives the new block and body at its next
+`python3 tools/adoption/install_claude_profile.py --only guard --only agents`; this change runs no installer, and no
+child run with this text is claimed.
+
+**Supersedes.** In the verification-line addendum, "The frontmatter preload and the body line stay as they are", the
+rejected alternatives "Reword the builder line to the evidence sentence (2,877 bytes)" and "Remove the builder's
+preload or its body line as well", and the table cell "the builder gets the skill from its own preload" describe the
+previous revision.
+
+**Overturn.**
+- Remove the builder's evidence line if the builder again receives the same rule at start from another source, such
+  as a re-pinned skill preload or a body line, since the verification-line addendum's duplication reason then returns.
+- Remove it if a comparison that varies this line alone, run as the verification-line addendum's overturn conditions
+  describe, shows no fewer review-found defects with the line and a larger token or time cost.
+
+| Earlier assumption | Correction and verification path |
+| --- | --- |
+| The builder's own preload gives it the evidence rule, so a block line would only duplicate it | Since 2026-09-28 no agent preloads the skill. The builder block's last line carries the evidence sentence, and the builder's key-phrase test keeps it there. |

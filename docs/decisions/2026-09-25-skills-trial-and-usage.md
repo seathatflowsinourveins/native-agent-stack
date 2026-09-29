@@ -494,3 +494,1009 @@ run of these two skills specifically; first-prompt size for all three preloaded
 configurations is unmeasured. They join the researcher/verifier preregistration in the
 stack-agent decision; no default preload is added to every role child (that decision's own
 D3 constraint, narrowed rather than reversed).
+
+## Addendum 2026-09-27: security-audit trial row, stale-upstream flags, sandbox gate
+
+Evidence: [`evidence/artifacts/cloudflare-audit-skill-trial-20260927/`](../../evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md).
+`delta.json` records the pin and its file hashes, each fetched page's size and sha256, and every
+passage quoted here with its file or URL and line (`quoted_passages` holds the skill, schema and
+repository quotes). Repository mechanics cited without a quote are read at the base commit. The
+upstream reads ran on 2026-09-28 between 02:03Z and 02:18Z (UTC), which is the evening of
+2026-09-27 on the host (EDT). A review repair round read again, between about 03:05Z and 03:17Z,
+the pinned `SKILL.md` (same sha256), `report-schema.json` (same size as the tree listing), the
+settings reference, the sandboxing page and the Trust Hub audit page (each the same bytes and
+sha256), and read the local `claude plugin eval --help` (Claude Code 2.1.283). A second repair
+round, at 07:07Z on 2026-09-28 (03:07 EDT, so 2026-09-28 on the host), fetched the skills page, the
+settings reference and the commands reference again with curl (each the same bytes and sha256) and
+corrected the invocation claims (`checks.repair_round_2`). Dates below are host dates.
+
+**Decided by** the user on 2026-09-27: no user invocation; the skill runs through LLM-native
+automation (workflow stages), with the full trial, and the bake-off only if it proves suitable,
+under the token-saving stack for every run. The bake-off budget is high but waits until the
+token-saving practice passes end to end with real evidence (Gate A) and, per the plan of record,
+the GPT-6 route is settled (Gate B). Settings enforce neither restriction (no user invocation,
+workflow stages only). The wiring below carries both as a usage policy, and the `name-only` listing
+leaves the skill invocable by the user and by the model (see **LLM-native wiring** and its
+enforcement residual).
+
+**Added for trial**, under the [selection rule](#selection-rule):
+
+| Name | Source @ ref | Status | Listing | Codex | Gap |
+| --- | --- | --- | --- | --- | --- |
+| security-audit | cloudflare/security-audit-skill@c1c8a8c | trial | name-only | no | No installed procedure audits the whole repository with a coverage ledger and a `confirmed`/`needs_validation`/`rejected` verdict contract (restated below). |
+
+Pin facts, read with `gh api` at the pin:
+
+- `c1c8a8c` is still `main`'s HEAD, committed 2026-09-14.
+- `skills/security-audit` is git tree `ccbc33e` at the pin and at HEAD: 20 files, 314,670 bytes,
+  including two Node validators and their tests.
+- `SKILL.md` is 22,026 bytes (blob `92178da`, re-hashed locally). Its frontmatter holds only `name`
+  and `description`, so upstream does not disable model invocation. The description is 359
+  characters (PyYAML 6.0.3, the manifest's method).
+- License: MIT, from the repository `LICENSE` at the pin. The installed folder carries no license
+  file.
+- `official` is true by the manifest's owner-scoped convention: https://skills.sh/official lists the
+  `cloudflare` owner, as it lists `vercel-labs` for both `vercel-labs` rows.
+
+**Rule 3: audits re-observed.** The skills.sh page and its three audit pages:
+
+| Audit | Page label | Audit page | Audit API (`add-skill.vercel.sh/audit`) |
+| --- | --- | --- | --- |
+| Gen Agent Trust Hub | Pass | "Risk Level: SAFE"; lists COMMAND_EXECUTION, DYNAMIC_EXECUTION and INDIRECT_PROMPT_INJECTION (the Node validators, untrusted target code) | `ath` risk `safe` |
+| Socket | Pass | Pass, analyzed 2026-09-15 | `socket` risk `safe`, 0 alerts, score 90 |
+| Snyk | Warn | "W011: Third-party content exposure detected (indirect prompt injection risk)", MEDIUM, "medium risk: 0.30" | `snyk` risk `medium` |
+
+All three were analyzed on 2026-09-15, after the pin became HEAD on 2026-09-14; no page names the
+revision it scanned. A Warn is not a Fail and does not exclude ([rule 3](#selection-rule)). W011
+describes the skill's purpose, reading untrusted code. The wiring below keeps its listing name-only
+and starts it from workflow stages by usage policy. It does not stop a user or the model from
+invoking the skill by name.
+
+**The 2026-09-23 `not_adopted` proposal and its refutation.** The 2026-09-23 landscape sweep
+proposed `not_adopted` with "No demonstrated gap. The native /security-review and
+security-best-practices skills already cover security review." Both refuters voted it refuted, so it
+did not survive. The citation critic asked the next pass to restate the gap with the qualification
+from `docs/native-skill-practice-20260921.md:13` ("security findings and false-positive control
+remain unqualified") and to "state whether the candidate closes the qualification gap"
+(`catalogs/sota-convergence/manifest-20260923.json`, lines 6035-6060 and 17195-17201; that dated
+file is not edited). The restated gap, from the Claude Code
+[commands reference](https://code.claude.com/docs/en/commands), read 2026-09-27:
+
+- `/security-review` "Reviews the diff between your branch and origin's default branch". It is
+  diff-scoped.
+- `/code-review` reviews "the current diff, or a PR number, branch, or path you pass, for correctness
+  bugs". It can take a path, but its subject is correctness, not security.
+- `security-best-practices` is framework guidance. Its catalog record says "The skill is not a full
+  security audit" (`catalogs/landscape/native-practice.json`).
+- None of the three documents a whole-repository coverage ledger or a per-finding
+  `confirmed`/`needs_validation`/`rejected` contract. The pinned skill defines both and checks them
+  with `validate-coverage-ledger.cjs` and `validate-findings.cjs`.
+
+Whether the skill closes the qualification gap (useful findings with controlled false positives) is
+unknown: nothing has been measured here. The M5c bake-off below is the 2026-09-23 overturn condition
+itself.
+
+**Third-party evidence, weak.** [Issue #20](https://github.com/cloudflare/security-audit-skill/issues/20)
+is open, filed 2026-09-16 by an account with no association to the repository, and reports one
+blind comparison. Quoted, emphasis removed:
+
+- "n = 3 per arm, one target".
+- For the skill, "precision held at a median of 90% across rounds, zero hits on either deliberate
+  look-alike decoy in any round".
+- "median cost per run ...: the skill's quick profile $29.95, a plain single-agent review $2.06, a
+  multi-lens review pipeline of ours $7.66", with quick's median recall equal to the single-agent
+  review's ("0.467 vs 0.467, on 15 seeds").
+- "Disclosure: the multi-lens pipeline is our own tool, so we have an interest here".
+
+The issue says only "pinned to a recent commit", never which. One seeded target, three rounds and an
+interested author make this a discovery signal for the M5c design, not evidence of merit.
+
+**LLM-native wiring.**
+
+- **Listing `name-only`.** "Claude sees the skill by name without its description" (settings
+  reference, `skillOverrides`). Workflow stages and the model can invoke it by name. Its broad
+  description, which says "Use for security questions", stays out of the listing. That narrows what
+  Claude sees, not who can invoke the skill:
+  - The model can still pick the skill by name on any prompt, an ordinary security question
+    included: "By default, Claude can invoke any skill that doesn't have
+    `disable-model-invocation: true` set." How often it would without the description is
+    unmeasured.
+  - The skills page's [visibility table](https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings)
+    gives `name-only` as "Name only" to Claude and "Yes" in the column "In `/` menu", so a user can
+    still type `/security-audit`.
+  - Running it only from workflow stages is therefore a usage policy that the stage prompts carry,
+    not a guarantee.
+  - No `skillOverrides` state hides the `/` entry and keeps the skill listed to Claude. Only `off`
+    hides the `/` entry, and then "Claude doesn't see the skill and `/name` is hidden from
+    autocomplete". Invoking such a skill "by its full name still returns the `skillOverrides` error
+    instead of running it", so `off` would stop the workflow stages too.
+  - `user-invocable-only` is not used: the user rejected user invocation, "Claude doesn't see the
+    skill" in that state, and it blocks agent preloads ([listing state and agent
+    preload](#addendum-2026-09-26-listing-state-and-agent-preload)).
+- **Enforcement residual (the user trigger only).** The native control for the user trigger is
+  frontmatter: with `user-invocable: false`, "Claude Code hides it from the `/` menu and doesn't
+  run it when you type `/name`". The field leaves Claude's own invocation on: "With
+  `user-invocable: false`, you can't invoke the skill, but Claude still can." Keeping Claude from
+  invoking it takes `disable-model-invocation: true`, which "removes the skill from Claude's
+  context entirely", so the session that drives the stages could not load it either. Stage-only use
+  therefore stays a usage policy with or without either field. The pinned `SKILL.md` has neither
+  field, and the install is as-is: `tools/adoption/install_skills.py` counts an installed
+  `SKILL.md` as current only when its sha256 matches the pin (`classify_skill`) and rolls back an
+  add that does not match, so a local frontmatter edit would break the pin. Removing the user
+  trigger therefore needs a new upstream pin. Even then, the docs do not say how the field combines
+  with a `name-only` override; their invocation table gives `user-invocable: false` a "Description
+  always in context". A native probe of the combination comes before any claim that the user
+  trigger is gone.
+- **No agent preload.** `SKILL.md` alone is 22,026 bytes and the folder 314,670. Stages paste the
+  companion blocks they need, as the skill intends: `HUNTING.md` and `VALIDATION-AND-REPORTING.md`
+  "carry this procedure as one identical fenced block for hunter and verifier prompts". The six-role
+  preload table above is unchanged.
+- **Guidance by default.** Upstream says: "This skill is guidance by default. Loading it does not
+  authorize the complete audit workflow or file creation." A stage runs full audit mode only when its
+  prompt asks for it explicitly, with a profile, scope, budget and an output directory outside the
+  target.
+- **Parent and children.** The skill is "agent-neutral": its "Task tool" is "the platform's
+  delegation or sub-agent mechanism". A headless coordinator session is the parent and maps that to
+  the Agent tool. Hunters are its direct children, because spawn depth is 1.
+- **Sandbox.** Upstream says: "If every control cannot be enforced, do not execute target code:
+  report the missing sandbox capability as a needs-validation blocker". Without a measured sandbox
+  profile, execution-dependent leads stay `needs_validation`. Those dated blockers are the pressure
+  evidence for the foundation open gate `claude-code-sandbox-profile` in
+  `catalogs/foundation/manifest.json`.
+- **Codex off.** Codex's `[[skills.config]]` has only `enabled`, with no name-only state. Enabled,
+  Codex would list the 359-character description and could fire it on any security question. No M5
+  arm uses Codex as the skill's parent; the GPT-6 lane is the cross-family verifier. The manifest
+  schema requires only a boolean, so `false` needs no schema change. `tools/adoption/install_skills.py`
+  still installs the folder for both agents, so the table from `--print-codex-config` goes into
+  `~/.codex/config.toml` before the install.
+
+**M5b: suitability gate.** The bake-off runs only if all three hold:
+
+1. The unchanged upstream `node --test validate-findings.test.cjs validate-coverage-ledger.test.cjs`
+   passes at the pin.
+2. A labelled fixture exists. An upstream labelled set comes first. Otherwise, use a pre-registered
+   seeded copy of `scripts/`, `.github/workflows` and the installers, with known-pass, known-fail,
+   malformed and decoy controls, labelled as a local integration.
+3. The user sets a per-run budget.
+
+If any fails, record the reason and move the row to watch.
+
+**M5c: bake-off.** Queued behind Gate A and Gate B, with a high budget (user, 2026-09-27).
+
+- Arms, 3 runs each:
+  1. the unchanged skill, `quick` profile, source-only;
+  2. bundled `/security-review` on a branch that introduces the seeds;
+  3. a plain single-agent control.
+- Harnesses, all upstream: skill-creator's paired with-skill/without-skill benchmark, Harbor for
+  native transcripts, and scipy `bootstrap`/`permutation_test` for the statistics. No self-written
+  scorer.
+- A native paired candidate runs beside skill-creator's benchmark. It comes from a 2026-09-27 peer
+  practice sweep and from [M9 of the 2026-09-24 community sweep](2026-09-24-community-sweep.md#keep-but-compare):
+  `claude plugin eval --ablation with-without --model claude-opus-5-5 --judge-model <model> --no-publish --json <path>`.
+  - The judge must not be Haiku. The help (Claude Code 2.1.283) says "Override LLM-grader model
+    (default: haiku)", so `--judge-model` must name another model.
+  - Record the resolved model from the `--json` result. If the result does not name it, record that
+    gap.
+  - The help ties the baseline arm to a plugin: "default: with-without whenever a plugin resolves —
+    by name, or from the target path — and none when nothing does". This skill installs through the
+    skills CLI, not as a plugin, so the `--json` result must show that the no-plugin baseline arm
+    ran, or the arm does not count. The 2026-09-24 sweep lists `claude plugin eval` as "named in M9
+    but not qualified".
+- Scores: recall at equal false positives; precision and decoy hits; complete provider usage,
+  including failed attempts; wall time.
+- Promote only if the skill beats `/security-review` on recall at equal false positives. Otherwise,
+  exclude it with the numbers and keep the method as a cited reference.
+
+**M6: sandbox open gate.** The foundation open gate `claude-code-sandbox-profile` in
+`catalogs/foundation/manifest.json` carries the whole measurement list:
+
+- the deferral's three controls ([2026-09-24 secret storage](2026-09-24-secret-storage.md), lines
+  91-95): `sandbox.enabled`, `allowUnsandboxedCommands: false`, and the `credentials.files` deny.
+  In current settings that deny is a `sandbox.credentials.files` entry with mode `deny` for the
+  store;
+- `failIfUnavailable`, the host check, and the refusals of writes outside the worktree and of
+  `/mnt/c` launches;
+- a credentials arm: with filesystem isolation on, a sandboxed read of a store file fails through a
+  `~/` path and through its absolute path. The sandboxing page says "The file protection is part of
+  the filesystem layer", so the deny does not apply when filesystem isolation is off;
+- a separate `strictAllowlist` arm. With it false, the settings reference leaves a host outside the
+  allowlist to the permission mode, and "in `bypassPermissions` mode and in interactive terminal
+  plan-mode sessions where bypass is available it allows" it. The ungated permission profile stays
+  by user decision (PS-1 in `docs/harness-rules-convergence-20260922.md`);
+- the deferral's gh, git push, codex, paper-runner and systemd-bus items.
+
+The two extra arms come from a 2026-09-27 peer practice sweep. `adoption/manifest.json` now lists
+the gate in `continuation.next_action_refs`, as it listed each open foundation gate before
+(`d17b3cff` and `49c094d9` kept the two lists together), so a resumed task or a new host meets it at
+the entry point. `tests/test_adoption_contract.py` checks only that the list is a subset of the open
+gates, so this listing rests on that precedent, not on a failing test.
+
+**Trial exit and overturn.**
+
+- An M5b failure moves the row to watch. An M5c loss moves it to `excluded[]` with the numbers. An
+  M5c win goes to a sealed verdict re-record ([verdict boundary](#verdict-boundary)).
+- Its prune window starts at its own install on each host, so it is not a prune candidate at the
+  2026-10-25 review.
+- Remove it at once if any audit turns to Fail.
+- Re-decide the listing if a new pin changes the description or adds `disable-model-invocation`,
+  or if a native probe shows that a workflow stage cannot invoke a `name-only` skill by name.
+- Close the user-trigger residual only when a native probe on one host shows both halves: a typed
+  `/security-audit` does not run, and a workflow stage still invokes the skill by name. The
+  candidates are a new pin that adds `user-invocable: false`, probed together with the `name-only`
+  override, or a future `skillOverrides` state with that effect. Closing it does not make
+  stage-only use enforced: Claude can still invoke the skill unprompted, so that stays a usage
+  policy.
+- Re-decide Codex if Codex gains a name-only state.
+
+**Stale upstreams, flagged for the next verdict wave** and re-observed with `gh api` on 2026-09-27.
+
+`openai/skills`:
+
+- `main`'s HEAD is still `49f948f` (2026-06-24), the pin of `gh-fix-ci`, `security-best-practices`,
+  `security-threat-model` and `gh-address-comments`.
+- `main` has had 0 commits since 2026-06-29. The repository's `pushed_at` of 2026-09-08 is not on
+  `main`.
+- The manifest's skill rows have no notes field, so the note lives here: the next verdict wave
+  fields a challenger for the kept `security-best-practices` and the trial `security-threat-model`.
+
+`praetorian-inc/noseyparker`:
+
+- Archived on 2026-04-24. Last push 2026-02-21; last release v0.24.0 (2025-05-08).
+- Its README opens: "Nosey Parker is now Replaced by Titus. Nosey Parker is Officially Retired".
+- No current catalog presents it as a survivor or candidate. It appears only in dated records:
+  - `evidence/artifacts/landscape-sweep-20260926/`;
+  - `catalogs/sota-convergence/manifest-20260926.json`;
+  - the 2026-09-26 sweep in `catalogs/saturation/ledger.json`. That ledger is append-only and
+    hash-chained ("Editing, reordering or deleting a record breaks the chain",
+    `scripts/saturation_ledger.py`).
+- The correction is therefore recorded here:
+  - the 2026-09-26 sweep's facts vote passed a repository archived five months earlier;
+  - `manifest-20260926` carries it into the verdict wave as a `secrets-credentials` survivor;
+  - the ledger learns of it only through the next sweep's record.
+- The verdict wave should refute it on facts.
+
+**Evidence class.**
+
+| Item | Class | Basis |
+| --- | --- | --- |
+| Pin identity, tree, `SKILL.md` hash, license, quoted upstream and docs text | upstream-unchanged | `gh api` and page reads at the pin; proves identity and wording, not behavior |
+| skills.sh labels, audit pages, audit API | upstream-unchanged (independent observation) | Another platform's 2026-09-15 scan; not this repository's behavior |
+| Issue #20 numbers | upstream-unchanged (third-party report, weak) | One seeded target, n = 3, an interested author |
+| `claude plugin eval --help` lines | upstream-unchanged (local native client help, Claude Code 2.1.283) | Wording only; the arm itself is not qualified |
+| Manifest row, template key, foundation gate, tests, `scripts/validate.py` | our-integration | Structural checks, each with a failing control run first |
+| Gate listed in `adoption/manifest.json` `next_action_refs` | our-integration | Precedent check (`d17b3cff`, `49c094d9`); no test fails without it |
+| Install, settings apply, Codex disable, host read-back | our-integration, with Claude Code's own `/skill-doctor` as the native read-back (one host, 2026-09-28) | [security-audit-host-install-20260928](../../evidence/artifacts/security-audit-host-install-20260928/README.md): `installed`, every `skills_status` check `ok`, listing `name-only` at 20 context tokens. The Codex disable went in 10 s after the install, not before |
+| M5b gate 1: the unchanged upstream `node --test` at the pin | upstream-unchanged (one host, 2026-09-28) | Same receipt: 65 of 65 pass on Node v24.21.0. The four test and validator files match the pin byte for byte |
+| `name-only` invocation reach (a typed `/security-audit`, unprompted model invocation), M5b gates 2 and 3, M5c, sandbox measurement | live-run-pending | M5c waits for Gate A and Gate B; no labelled fixture exists yet |
+
+## Addendum 2026-09-28: carrier conditions and the verification review rule
+
+**Why the trial needs this.** The TOKEN LANES carrier
+([decision](2026-09-27-token-lanes-subagent-start.md)) adds text to a subagent's start context
+through `SubagentStart`. From its first revision, that text told children to follow
+`verification-before-completion` and to research with `search-first`. An instruction that names a
+skill can raise its use count with no change in the skill's listing or usefulness, so the
+[name-only confound](#listing-policy) ("compare only within a listing state") gains another
+dimension: the instructions a child receives. The carrier is one source; the landscape-sweep
+templates and two role changes are others (other sources and role changes, below). This
+addendum logs these conditions and adds a comparison to the review of
+`verification-before-completion`'s Claude listing. It changes no `skillOverrides` state, no
+manifest entry (the prune rule included) and no agent preload.
+
+**Condition log.**
+
+| Condition | Carrier revision (merge, UTC) | What children's start context says about the two skills |
+| --- | --- | --- |
+| C0 | none | nothing from the carrier |
+| C1 | [#378](https://github.com/seathatflowsinourveins/native-agent-stack/pull/378), `0c33b37a` (2026-09-27T06:11:54Z) | every non-blind child: "follow the installed verification-before-completion skill: real command output before any success claim", then the `search-first` sentence; #412 and #421 left both instructions unchanged |
+| C2 | [#447](https://github.com/seathatflowsinourveins/native-agent-stack/pull/447), `f508ffba` (2026-09-28T03:39:00Z) | default-block types: both sentences; `isolated-builder`: the verification sentence only; `stack-researcher`, `stack-verifier`, `evidence-reviewer`, `security-reviewer` and `source-scout`: neither; `semantic-evidence-reviewer` and `blind-*` types: nothing ([role-matched addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)) |
+| C3 | the [verification-line addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-28-verification-line), dated 2026-09-28 and merged with this addendum | default-block types: an evidence sentence that names no skill, then the `search-first` sentence; no role block names either skill |
+
+**Boundaries.** A host changes condition when `tools/adoption/install_claude_profile.py`
+installs a revision, not at its merge: the hook reads the block files installed beside it. The
+installer writes no install record, and its `shutil.copy2` (L113 for hooks, L143 for agents)
+keeps the source file's modification time; #381's frozen procedure records hashes, not install
+times. The one install time this repository records is the C1 install that the coordinator
+reported for its local measurement: 08:26:32Z on 2026-09-27, from `main` at `5f3a7c21`
+([measured-gap addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-measured-fetch-and-containment-gaps)).
+The review therefore assigns a window to a condition only from a host's own record of its
+installs, and it reports a window that crosses an unrecorded boundary as mixed. A separate
+boundary lies inside C0: `isolated-builder` has preloaded the skill, and its body has named it,
+since [#376](https://github.com/seathatflowsinourveins/native-agent-stack/pull/376) (`623d34fa`,
+merged 2026-09-27T03:38:47Z; the
+[targeted role preloads](#addendum-2026-09-26-targeted-role-preloads-security-reviewer-isolated-builder)
+addendum). On a host, that boundary is when `install_claude_profile.py` installed the agent
+definition. This record does not establish whether `/skill-doctor` counts a preload as a use.
+
+**Other sources and role changes.**
+- The landscape-sweep templates name both skills in every sweep worker's prompt from `1b0e4598`
+  (2026-09-26T05:08:52Z) onward: "Discovery: search-first ... Refutation:
+  verification-before-completion (evidence before any verdict)"
+  ([`templates.json`](../../tools/sota-convergence/landscape-sweep/templates.json), `common`;
+  `TEMPLATE_SKILLS` in [`build_args.py`](../../tools/sota-convergence/landscape-sweep/build_args.py)
+  L59). The Claude workers and the GPT-6 lane, which composes its prompts from the same templates,
+  both receive them, and no carrier revision changes them. In the C0 baseline window, when no child
+  received `SubagentStart` context, 120 workflow-subagent children in one session made 108
+  `verification-before-completion` and 46 `search-first` Skill calls
+  ([child-lane baseline](../../evidence/artifacts/child-lane-baseline-20260926/README.md#results-claude-children-639-in-7-sessions)).
+  That set matches the templates' Discovery and Refutation list, which is consistent with
+  template-driven use but does not prove it.
+- [#398](https://github.com/seathatflowsinourveins/native-agent-stack/pull/398) (`54834120`,
+  merged 2026-09-27T14:27:46Z) moved the sweep's Claude judgment stages to the
+  `landscape-sweep-worker` type on Opus, `refute-facts` from Sonnet. Earlier sweep children carry no
+  such type, so the sweep's own run records identify them.
+- [#402](https://github.com/seathatflowsinourveins/native-agent-stack/pull/402) (`d022295a`,
+  merged 2026-09-27T14:04:25Z), inside C1, moved `isolated-builder` from `model: sonnet` with
+  `isolation: worktree` to `model: opus` without frontmatter isolation.
+
+**Review rule, 2026-10-25.** The review splits each skill's uses by host and condition, within
+its listing state. On each client it reports sweep workers apart from other children, and it
+reports builder uses before and after each host's #402 install apart. For
+`verification-before-completion`'s Claude listing (`trial`, `on`, preloaded by
+`isolated-builder`), a Claude use count does not show usefulness: under C1 and C2 the carrier
+prompted its use, the sweep templates prompt it, and the builder's preload delivers its content
+without a `Skill` call. The review therefore adds a with/without comparison that varies that
+preload on frozen builder tasks, run through an upstream evaluation harness that the review record
+names with its pin before the run, comparing tokens, elapsed time and review-found defects. The
+count rule still applies as written: this addendum changes no manifest entry, and
+`tools/skill-usage/skill_usage.py` (L516-538) lists a trial skill as a prune candidate when every
+evaluated client shows zero uses and the skill is at least `window_days` old. Codex enablement
+stays under that rule, read with the sweep split. If the comparison and the count rule disagree
+for the Claude listing, the review writes the resulting exception or demotion into the manifest
+update and follow-up decision record that the [trial window end](#overturn-conditions) already
+requires. `search-first` is a `kept` verdict winner: its split usage is reported, and it changes
+only through a verdict re-record, as the prune rule already states.
+
+**Evidence class.** The condition log and the other sources are structural: merge commits, block
+files, templates and agent definitions at each revision. The C0 counts are the baseline's
+retained measurement, quoted as such. This addendum makes no new measurement of use and claims no
+review result.
+
+## Addendum 2026-09-28: host listing drift restored
+
+Evidence: the receipt
+[`skills-listing-restore-20260928`](../../evidence/receipts/skills-listing-restore-20260928.json)
+holds the failing pre-edit run, the edit, the passing post-edit run and the settings-backup states.
+[`evidence/artifacts/skills-listing-restore-20260928/`](../../evidence/artifacts/skills-listing-restore-20260928/README.md)
+holds the `supply-chain-risk-auditor` tree check and its five controls.
+
+**Decided by** the coordinator, on the user's 2026-09-28 delegation, quoted exactly:
+"the decision should make with evidances andrsearch covnvergence, they should done in your end as you have have full access to them".
+A coordinator decision workflow (three lens proposals, a synthesis and an adversarial refute)
+produced the per-skill verdicts. The refute upheld all 15 and listed defects in the drafted
+record, which this addendum resolves. The coordinator reads the delegation as also covering the
+host edit; this record holds no separate approval of that edit. The earlier host edit of
+2026-09-28 was different: `2026-09-28-community-sweep.md` (line 117) records it as applied "with
+the user's approval".
+
+**What drifted.** Fourteen skills that the manifest, the settings template and the
+[trial table](#the-26-pinned-skills) list `on` read `name-only` in this host's user settings:
+`agentic-actions-auditor`, `codeql`, `diagnosing-bugs`, `frontend-design`, `gh-address-comments`,
+`gh-fix-ci`, `modern-python`, `resolving-merge-conflicts`, `sarif-parsing`,
+`security-best-practices`, `security-threat-model`, `semgrep`, `tdd` and `variant-analysis`. No
+version of the manifest (6 versions), the template (32) or `.claude/settings.json` (11) in any
+ref's history (`git log --all`, read 2026-09-28) sets any of them to a state other than `on`. No
+decision record authorizes the change; the
+[2026-09-28 community sweep](2026-09-28-community-sweep.md) notes it as drift (lines 174-175). The
+settings backups, read value-free with `scripts/skills_status.py`'s own reader, split this host's
+history into segments:
+
+| Segment | Bounds (UTC) | Backup reading |
+| --- | --- | --- |
+| `on` | Read at 2026-09-26T20:00:20Z, the earliest backup read. The installs were earlier: 2026-09-25T04:15Z for the two kept skills, 22:50Z-22:51Z for eleven trial skills and 2026-09-26T09:33Z for `variant-analysis` | `settings.json.20260926T200020Z.pre-skills-off`: 13 of the 14 set `on`, `variant-analysis` absent (so `on`), `writing-for-agents` absent |
+| `off` | Began after 20:00:20Z and held at 20:12:39Z | `settings.json.20260926T201239Z.pre-skills-nameonly`: the 14 `off`, with `agent-browser`, `grill-me` and `improve-codebase-architecture` (17); `codebase-design`, `verification-before-completion`, `supply-chain-risk-auditor`, `property-based-testing`, `fp-check` and `mcp-builder` `on` |
+| `name-only` | From about 20:12:39Z to 2026-09-28T15:09:02Z, at most 42.94 hours | `settings.json.bak.20260927T053110Z.agent-teams` and the pre-restore backup: the 14 `name-only` |
+| `on` | From 2026-09-28T15:09:02Z | The restore below |
+
+- Each backup is named for the edit that followed it, so the `off` segment lasted about 12
+  minutes. The stamps are bounds; the edit times are inferred from the labels.
+- Two Codex backups from the same minutes exist, `codex-config.toml.20260926T200118Z.pre-skills-off`
+  and `.20260926T201239Z.pre-skills-reenable`. Their content was not opened. Both status runs below
+  find the Codex disable entries matching the manifest.
+- `variant-analysis` was installed about 10.45 hours before the first backup read, which holds it
+  absent (`on`). Its own first window, which starts at its install on each host
+  ([first 2026-09-26 addendum](#addendum-2026-09-26-two-trial-additions-one-deferral-corrected-counts-on-disk-tree-check)),
+  also crosses the `off` and `name-only` segments.
+- None of the 14 had a lifetime use at the restore, so every earlier segment holds zero uses.
+- The [claude.ai sync addendum](#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)
+  records that, before its change, a same-day request to turn off the never-used user and plugin
+  skills was replaced by "don't just mindlessly delete, but improve their usage", and that it
+  changed no `skillOverrides` state. The host edits themselves, who made them and the user's fuller
+  words are recorded only in a coordinator memory note: untrusted history, not evidence.
+
+**What the drift changed.**
+
+- `tools/skill-usage/skill_usage.py` takes each skill's listing label from the manifest (L469) and
+  its age from the lock's `installedAt` (L473-479), so it kept labelling the 14's counts `on`. With
+  zero lifetime uses (L537-558), it would list the eleven 2026-09-25 trial skills under
+  `prune_candidates` from 2026-10-25T22:50:51Z to 22:51:17Z (per install), `gh-fix-ci` and `security-best-practices` under
+  `verdict_recheck` ("verdict re-record required") from 2026-10-25T04:15:04Z, and
+  `variant-analysis` from 2026-10-26T09:33:36Z.
+- Two kept verdict winners changed listing without the verdict re-record that the prune rule
+  requires.
+- Zeros counted at `name-only` or `off` entered a comparison that the
+  [name-only confound](#listing-policy) limits to one listing state.
+
+**Change, this host only.** At 2026-09-28T15:09:02Z, after a backup labelled
+`settings.json.20260928T150902Z.pre-listing-restore`, a script that touches only `skillOverrides`
+set the 14 to `on`. It also added an explicit `"writing-for-agents": "on"`, the key the template
+already writes (`adoption/templates/claude.settings.template.json` L341). An absent key already
+means `on`, so that key changes no behavior; the key count went from 28 to 29. The script's
+assertions held: the top-level key list, every other override, and all 15 at `on`. The manifest,
+the template and `budget.claude_on_description_chars` (7,409 of the 8,000-character cap) are
+unchanged, because they already say `on`.
+
+**Read-back** ([receipt](../../evidence/receipts/skills-listing-restore-20260928.json)). Context
+figures are `/skill-doctor`'s listing-cost estimates
+([Mechanics](#mechanics-source-review-skills-cli-v170)), not provider counts.
+
+| Skill | Status | Before: listing, context | After: listing, context | Lifetime uses |
+| --- | --- | --- | --- | --- |
+| agentic-actions-auditor | trial | name-only, 20 | on, 200 | 0 |
+| codeql | trial | name-only, 20 | on, 250 | 0 |
+| diagnosing-bugs | trial | name-only, 20 | on, 60 | 0 |
+| frontend-design | trial | name-only, 20 | on, 70 | 0 |
+| gh-address-comments | trial | name-only, 20 | on, 60 | 0 |
+| gh-fix-ci | kept | name-only, 20 | on, 110 | 0 |
+| modern-python | trial | name-only, 20 | on, 60 | 0 |
+| resolving-merge-conflicts | trial | name-only, 20 | on, 30 | 0 |
+| sarif-parsing | trial | name-only, 20 | on, 130 | 0 |
+| security-best-practices | kept | name-only, 20 | on, 140 | 0 |
+| security-threat-model | trial | name-only, 20 | on, 150 | 0 |
+| semgrep | trial | name-only, 20 | on, 240 | 0 |
+| tdd | trial | name-only, 20 | on, 50 | 0 |
+| variant-analysis | trial | name-only, 20 | on, 200 | 0 |
+| writing-for-agents | trial | on (key absent), 40 | on (explicit key), 40 | 2 |
+
+- Before (captured 15:08:39Z), `python3 scripts/skills_status.py --json` exited 1 with result
+  `fail`: 14 `claude_listing` mismatches, and every other required check `ok`. This failing run is
+  the discriminating control for the passing one.
+- After (captured 15:09:12Z), the same command exited 0 with result `ok` and 0 mismatches.
+- `python3 tools/skill-usage/skill_usage.py --run-skill-doctor --json` exited 0 both times. Both
+  `/skill-doctor` runs made 0 model turns at $0, so neither could add a use. The 15 read 320
+  context tokens before and 1,790 after; the 14 went from 280 to 1,750 (+1,470).
+- `skills_status.py` reads only the user settings file. `/skill-doctor` reports on the skills in
+  the session (the skills page's "Find unused skills"), and its report shows the same change.
+
+**Per-skill result.** All 15 are `on`, on this host only. The manifest sets the listing states,
+which the template's `skillOverrides` must equal, and no authorized path moved these 14.
+`gh-fix-ci` and `security-best-practices` are kept verdict winners, which change only through a
+sealed verdict re-record. `on`, like `name-only`, stays preload-eligible
+([listing state and agent preload](#addendum-2026-09-26-listing-state-and-agent-preload)).
+
+**Upstream guidance and the tiebreak.** Claude Code's
+[skills page](https://code.claude.com/docs/en/skills) (read 2026-09-28) makes two
+recommendations:
+
+1. `/skill-doctor` "flags skills in the listing that have never been invoked and says where to
+   turn them off. Of the skills it tells you where to turn off, start with the ones that have the
+   highest context cost."
+2. "To free budget for other skills, set low-priority entries to `"name-only"` in
+   `skillOverrides` so they list without a description."
+
+The same page says a dropped description "removes the keywords Claude needs to match your
+request". The trial's own rules decide the timing. The 30-day window, the one-step prune rule and
+the confound rule (`adoption/skills/manifest.json` L26-31) apply the first recommendation at the
+window's end. P2 defers its own demotion because "a listing change mid-trial would confound the
+within-state comparison, so it waits for the review"
+(`evidence/artifacts/skills-agents-layer-20260926/delta.json` L4227, cited below as `delta.json`).
+The second recommendation applies when the listing overflows its budget, which scales at 1% of the
+model's context window. Whether it overflows in a smaller-window child is unmeasured (overturn
+condition 1). How often Claude picks a `name-only` skill on its own is not found in the skills page
+or the settings reference. The nearest statement is about descriptions dropped for budget, which
+leave Claude "less likely to choose one on its own"
+([settings reference](https://code.claude.com/docs/en/settings-reference),
+`skillListingBudgetFraction`, read 2026-09-28). That is an analogue for `name-only`, not a
+statement about it.
+
+**Name-only use.** `iterative-retrieval` and `search-first` are `name-only` and still used (58 and
+66 lifetime uses). That is consistent with instruction-driven use but does not prove it. The
+landscape-sweep templates name both (`TEMPLATE_SKILLS`,
+`tools/sota-convergence/landscape-sweep/build_args.py` L59). For `search-first` and
+`verification-before-completion` only, the
+[carrier addendum](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule) finds
+the C0 Skill calls "consistent with template-driven use but does not prove it". `delta.json` L4372
+draws the contrary reading: "a name-only listing does not by itself prevent invocation when the
+name is descriptive".
+
+**Observational counts.** Lifetime `/skill-doctor` uses after the restore:
+
+- Skills listed `on` with uses: `verification-before-completion` 153, `supply-chain-risk-auditor`
+  135, `fp-check` 89, `codebase-design` 5, `property-based-testing` 3, `writing-for-agents` 2 and
+  `mcp-builder` 1.
+- `name-only` skills with uses: `search-first` 66 and `iterative-retrieval` 58.
+- The 14 restored skills: 0.
+
+These counts are observational, not causal: preloads, templates and instructions also drive uses.
+
+**`semgrep` and `codeql`.** Both go back to `on` with the other twelve. P2 ("Unless pinned semgrep
+and codeql CLIs are adopted, demote the semgrep and codeql trial skills to name-only", `delta.json`
+L4225) names both without ranking them, and it names its own paths: the "2026-10-25 review or a
+verdict re-record" (L4224). In one shell on this host at 2026-09-28T15:42:00Z,
+`command -v semgrep` and `command -v codeql` each exited 1 (the receipt's `local_checks`), so
+neither was on that shell's `PATH`. P2's condition therefore stands for the review.
+
+- **Dissent, recorded.** Move both to `name-only` now, through the manifest, template and budget,
+  because upstream says to start with the highest context cost (240 and 250 tokens). It lost. An
+  addendum is neither of P2's paths, and P2 waits to avoid the confound. The docs set no evaluation
+  window, while the trial sets 30 days. A template or manifest change would also move every host's
+  declared state, not only this host's.
+- **Correction to the dissent's early path.** Measured harm before the review removes the skill at
+  once under this record's [overturn conditions](#overturn-conditions), which prescribe removal,
+  not demotion. This addendum counts as harm a misfire, or an invocation that fails on the missing
+  CLI and costs a turn. P2 stays on its own paths.
+
+**Window exception, this host only.** The carrier addendum states: "The count rule still applies
+as written". The per-host window precedent (the first 2026-09-26 addendum and the security-audit
+trial exit) starts a window at each skill's own install. This addendum departs from both, for these
+14 skills on host `nativestack-5975wx-20260925` only.
+
+- Their clean `on` window starts at the receipted restore, 2026-09-28T15:09:02Z, and ends at
+  2026-10-28T15:09:02Z. The receipted restore time is the guard: `skills_status.py`'s
+  `claude_listing` check compares only the current value (`check_claude_listing`, L325-334), so it
+  now reads `ok` and cannot show the earlier segments.
+- The 2026-10-25 review sets aside `skill_usage.py`'s `prune_candidates` and `verdict_recheck`
+  entries for these 14 on this host until 2026-10-28T15:09:02Z, and evaluates them then. Their
+  lifetime uses were 0 at the restore, so a lifetime count read later belongs to the restored
+  period while the listing stays `on`.
+- The review reports this host's segments split as above, not as one mixed window.
+- `writing-for-agents` is outside the exception: its listing never left `on`, and its window
+  already starts at its own install.
+- The review record carries this exception into the manifest update and follow-up decision record
+  that the [trial window end](#overturn-conditions) requires.
+- **Overturn.** The exception ends for a skill in either of two cases. The trigger comparison
+  (overturn condition 2) shows its description gives no trigger gain, so its `name-only` zeros are
+  comparable. Or its manifest listing changes.
+- **Another change on this host.** If `skills_status.py` finds one of the 14 in a state other than
+  `on` again, or `/skill-doctor` reads it at the 20 tokens it showed at `name-only` while
+  `skills_status.py` reads `on`, the review reports its window as mixed from that recorded
+  boundary, as the carrier addendum does for an unrecorded one, until a new receipted restore.
+
+**The `supply-chain-risk-auditor` tree drift.** The
+[tree check](../../evidence/artifacts/skills-listing-restore-20260928/README.md) of 2026-09-28
+lists the pinned tree (`truncated: false`). It finds the same 13 file paths in the installed
+folder once `scripts/.venv/` and `scripts/__pycache__/` are left out, and only `scripts/uv.lock`
+differs. With the fetched upstream blob substituted in memory, the folder's rows hash to
+`954cc68e…`, the manifest `tree_sha` and the upstream folder row. This matches the
+[2026-09-26 mechanics correction](#addendum-2026-09-26-two-trial-additions-one-deferral-corrected-counts-on-disk-tree-check):
+the skill's own `uv run` rewrote the pinned `scripts/uv.lock`. There is no reinstall. `SKILL.md`
+and the lock entry match, so `tools/adoption/install_skills.py` classifies the skill `ok`. The
+`folder_tree` check in `skills_status.py` stays informational.
+
+- **Per-blob re-check.** `tree_drift_check.py` in that directory, run with
+  `--allow scripts/uv.lock` as its README shows, writes nothing. It fails (exit 1) on any other
+  differing, missing or extra blob. It refuses (exit 2) an installed entry other than a regular
+  file or directory, a `.git` entry, and an upstream row other than a `100644` or `100755` blob or
+  a tree. None of its five controls passed. No allowance, and a planted one-byte change to
+  `scripts/model.py` in a copy, each exited 1. A copy whose `scripts` is a symlink to an outside
+  directory, a copy holding a FIFO and a `.git` file, and a listing rewritten to hold a gitlink
+  each exited 2. It runs at the 2026-10-25 review on each trial host, and before any reinstall or
+  re-pin of this skill.
+- **Escalation.** The `SKILL.md` sha256 and lock checks are required `skills_status.py` checks. A
+  `SKILL.md` sha256 mismatch, or a lock entry whose `skillFolderHash` differs from the pin, makes
+  `classify_skill` return `install` (`install_skills.py` L117-135). The supported path is then
+  `python3 tools/adoption/install_skills.py --only supply-chain-risk-auditor --skills-bin <tools-root>/skills-1.7.0/bin/skills`,
+  after installing the pinned CLI per the manifest's `cli.install`. That path checks the pinned
+  version (L148-162), runs with `DISABLE_TELEMETRY=1` (L143), adds with `--skill` (L181), and
+  verifies or rolls back (L195-204). With no lock entry and a changed `SKILL.md`,
+  `classify_skill` returns `local-modified`, and the installer refuses unless `--force` is passed.
+- **Per-blob-only failure.** When `SKILL.md` and the lock still match, the installer has no path:
+  `classify_skill` returns `ok` and the add is skipped (L172-175). Until P4's installer half is
+  decided, that case is re-added by hand with the installer's own argument vector and environment,
+  `DISABLE_TELEMETRY=1 <skills-bin> add <manifest url> --skill supply-chain-risk-auditor -g -y -a claude-code codex`,
+  followed by `skills_status.py` and the re-check.
+- **P4** (`delta.json` L4237-4241, "for": "upstream issue plus installer follow-up") has two
+  halves. Its upstream-issue half ("Ask trailofbits to run supply-chain-risk-auditor's stdlib-only
+  scripts with 'uv run --no-project'") is dropped under the rule to "never file upstream issues,
+  comments or pull requests"
+  ([harness defaults](../harness-defaults.md#build-on-upstream-as-foundation-platform-and-runtime-workers)).
+  Its installer half ("an opt-in install_skills.py flag that reinstalls a folder whose on-disk tree
+  drifted") stays open for the verdict wave or the 2026-10-25 review. This addendum neither adopts
+  nor rejects it.
+- **This addendum's own watch**, which is not P4's text: when an upstream revision runs these
+  stdlib scripts with `uv run --no-project`, re-pin to it through a manifest update with its own
+  record, applied as in
+  [Apply the skills manifest](../../adoption/update.md#apply-the-skills-manifest).
+
+**Other hosts.** Before 2026-10-25, the Mac coordinator and every other trial host run
+`python3 scripts/skills_status.py --json` and record the result. A `claude_listing` mismatch there
+gets its own receipt and addendum before the review counts that host's windows. This exception
+does not extend to another host.
+
+**Handed to the sweep record's owner.** This addendum answers pending decision (g) of the
+[2026-09-28 community sweep](2026-09-28-community-sweep.md) (line 532). It also answers that
+record's notes on the same drift, at lines 174-175, 556 and 558 ("gh-fix-ci stays name-only
+(skills lane)"). That record's owner updates them. This change does not edit that record,
+following the M10 hand-off precedent in the [listing policy](#listing-policy).
+
+**Dated narrowing, 2026-09-28.** The 2026-09-26 anti-pattern row "Disabling capabilities to save
+context instead of routing them" (`docs/harness-defaults.md`) says "Keep on-demand skills
+`name-only`". Its source question, in the
+[preload addendum](#addendum-2026-09-26-listing-state-and-agent-preload), describes the listing
+policy as keeping "on-demand skills out of the listing to save context".
+
+- From 2026-09-28, that rule applies to a skill's manifest listing, changed through the manifest,
+  template and budget together. It does not license a host-only edit of a skill that the manifest
+  lists `on`.
+- This narrowing is dated today. It is not a claim about what the row meant when it was written:
+  the only record of its author's intent, a coordinator memory note (untrusted history), shows a
+  global `name-only` rule.
+- The listing policy does not reserve `name-only` for a class of skill. It gives the three kept
+  `name-only` skills' reason as deliberate invocation, matching M10's rule, and the prune rule
+  (`adoption/skills/manifest.json` L30) demotes unused trial skills to `name-only`.
+
+**Overturn conditions.**
+
+1. **Listing budget.** A `--debug` run shows the warning that Claude Code writes when the listing
+   exceeds its budget, in the main session or in any child model in use (`/context`'s Skills row
+   reports the listing after the budget). Claude Code then drops descriptions starting with the
+   skills invoked least, including the 14, along with other zero-use user and plugin skills.
+   Action: apply a documented remedy by addendum: `name-only` for low-priority entries, through the
+   manifest, template and budget together, or a lower `skillListingMaxDescChars` or higher
+   `skillListingBudgetFraction` in the template.
+2. **Trigger comparison.** There is no fixed date: it runs once an upstream harness is named with
+   its pin before the run, as the carrier addendum requires for its own comparison. The trigger is
+   a preregistered `on`-versus-`name-only` comparison that shows no trigger gain for a skill. It
+   runs in fresh sessions, with frozen should-trigger prompts and adjacent should-not-trigger
+   prompts, graded on Skill tool calls. Action: demote that skill through the manifest, template
+   and budget, with an addendum.
+3. **Count rule at the window end.** The review is held on 2026-10-25, but each skill's
+   eligibility date is its own, per host. On a host whose listing never drifted, a skill becomes
+   eligible 30 days after its own install on that host (the lock's `installedAt`), as
+   `skill_usage.py` computes it (L473-479, L537-541). The
+   [first 2026-09-26 addendum](#addendum-2026-09-26-two-trial-additions-one-deferral-corrected-counts-on-disk-tree-check)
+   says so for its two additions: "Each addition's prune window starts at its own install on each
+   host (the lock's `installedAt`), so neither is a prune candidate at the 2026-10-25 review." For
+   these 14 on this host, eligibility starts at 2026-10-28T15:09:02Z; their install-based dates,
+   which the exception replaces, are in the receipt's `data.skill_usage_30_day_age_reached`. A
+   trial skill past its eligibility date with zero uses across its clean `on` window is demoted
+   one step or removed under the prune rule. A skill not yet eligible at the review is not a
+   prune candidate there. The kept pair is excepted.
+4. **`semgrep` and `codeql`.** P2 decides at the 2026-10-25 review or a verdict re-record. Measured
+   harm before then means removal, as above.
+5. **Kept pair.** Only a sealed verdict re-record changes `gh-fix-ci` or
+   `security-best-practices`. For `security-best-practices`, the next verdict wave fields a
+   challenger ([security-audit addendum](#addendum-2026-09-27-security-audit-trial-row-stale-upstream-flags-sandbox-gate)).
+6. **User choice.** The user may choose a listing directly, including a global `name-only` rule.
+   It is carried through the manifest, template and budget together, never host-only.
+   `tests/test_skills_manifest.py` L187-189 holds the template's `skillOverrides` equal to the
+   manifest listings, and L149-151 holds the budget to the manifest's `on` descriptions; both read
+   repository files only, so they pass on host drift. A host-only change is also overwritten at
+   the next apply (the Overturn in the
+   [claude.ai sync addendum](#addendum-2026-09-26-claudeai-skill-sync-and-mcp-servers-off)).
+7. **Cost.** A provider-counted first-request measurement, not yet run, shows the 14 descriptions
+   add more than 2,940 tokens per request. The measurement is
+   `examples/claude-native/workflows/child-usage.mjs` on one workflow child of a type that
+   receives the skill listing, with the 14 `on` and at `name-only`, on one host. The threshold,
+   twice the `/skill-doctor` estimate of +1,470, was set on 2026-09-28, before any measurement.
+   Action: re-decide the 14's listing, starting with the highest context cost, as the skills page
+   advises. A budget diagnostic uses prompts that match none of the 14 and records any Skill call
+   it makes.
+8. **Client or pin change.** These are this addendum's own conditions: the
+   [preload addendum](#addendum-2026-09-26-listing-state-and-agent-preload)'s overturn covers
+   preload eligibility only, and the
+   [security-audit addendum](#addendum-2026-09-27-security-audit-trial-row-stale-upstream-flags-sandbox-gate)'s
+   pin condition covers that skill only. A Claude Code release after 2.1.283 changes the absent-key
+   default, `name-only` semantics or the listing budget, or a new pin changes one of the 14's
+   description. Action: re-decide that listing.
+9. **Tree drift.** The per-blob re-check exits 1, or exits 2 refusing an entry of the installed
+   folder, which lies outside the pinned tree: follow the escalation above. Any other exit 2 is
+   resolved and the check re-run; no exit 2 counts as a pass. An upstream revision runs the
+   scripts with `uv run --no-project`: re-pin as in this addendum's watch above.
+
+**Evidence class.**
+
+| Item | Class | Policy class | Basis |
+| --- | --- | --- | --- |
+| `/skill-doctor` before and after, through `skill_usage.py --run-skill-doctor`, with lifetime use counts | native-measurement | Upstream example or native operation | [Receipt](../../evidence/receipts/skills-listing-restore-20260928.json); 0 turns, $0; context figures are estimates, and use counts are observational, not causal |
+| `skills_status.py` before (exit 1) and after (exit 0), and the edit script's assertions | our-integration | Local integration check | Same receipt; the failing run is the control for the passing one |
+| Settings-backup states | our-integration | Independent observation | Same receipt; read value-free with `skills_status.py`'s own reader |
+| `command -v semgrep` and `command -v codeql` | native-measurement | Upstream example or native operation | Same receipt, `local_checks`; one shell's `PATH` at one time |
+| `gh api` tree and blob reads | native-measurement | Upstream example or native operation | [Tree check](../../evidence/artifacts/skills-listing-restore-20260928/README.md), with stdout digests |
+| Scan, per-blob comparison and in-memory substitution | our-integration | Local integration check | Same directory; both self-checks in each run that passes the entry scan |
+| Tree-check controls | synthetic-fixture | Synthetic fixture | Same directory: five controls built by `run_checks.sh`, two exiting 1 and three exiting 2, none a pass |
+| Skills page and settings reference wording | upstream wording | None; cited, not executed | URL and read date (2026-09-28) only; no copy retained |
+| Who made the 2026-09-26 edits, and why | untrusted-history | None; not evidence | A coordinator memory note |
+
+## Addendum 2026-09-28: verification-before-completion removed (conflict rule)
+
+**Rule.** The [overturn conditions](#overturn-conditions) (L284-286) say: "A trial skill shows
+measurable harm, or gives instructions that conflict with CLAUDE.md/AGENTS.md once actually read
+in full → remove it immediately, not at the trial window's end." This addendum applies that rule
+to `verification-before-completion` (`obra/superpowers` at `8ca22dba`, SKILL.md sha256
+`2befe7fc…`). It was a `trial` skill, listed `on` for Claude, enabled for Codex, and preloaded by
+`isolated-builder`.
+
+**Findings.** Each was made on 2026-09-28 from a full read.
+
+| # | Evidence class and source | Finding |
+| --- | --- | --- |
+| 1 | Primary-source read by the trial owner, the coordinating session, whose position is quoted in [`coordination.md`](../../evidence/artifacts/delegated-decisions-20260928/coordination.md#m4-claude-readings) (item 3). Its line citations were re-read for this record in the installed copy, whose SKILL.md matched the pinned sha256 under `sha256sum`. | The 120-line SKILL.md says at L20 "If you haven't run the verification command in this message, you cannot claim it passes" and at L28 "Execute the FULL command (fresh, complete)". Its Common Failures table (L42) lists "Previous run" as Not Sufficient for "Tests pass". Its rationalization table answers "Just this once" with "No exceptions" (L67) and "Partial check is enough" with "Partial proves nothing" (L71). [AGENTS.md](../../AGENTS.md) L16 says "Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap". |
+| 2 | Claude readings in the practice-sweep session (`native-agent-stack-a9`), quoted in [`coordination.md`](../../evidence/artifacts/delegated-decisions-20260928/coordination.md#m4-claude-readings) (items 1 and 2): first the independent `evidence-reviewer` stage of workflow `wf_811a77e9-a4e` (Opus, max), then that session's coordinator on a full read. Neither was a lane on the GPT-6 packet. | The refuter found that the first "keep" recommendation never tested the in-force rule, and that "Read in full, the pinned text sits in surface tension with AGENTS.md:16". The coordinator found that L20 and L28 conflict with AGENTS.md L16. |
+| 3 | Cross-family model judgment on a frozen packet ([`m4/packet.redacted.md`](../../evidence/artifacts/delegated-decisions-20260928/m4/packet.redacted.md)): `codex exec -s read-only` (codex-cli 0.157.1), requesting `gpt-6-astra` at `model_reasoning_effort=max`. The Codex event stream records no model field, so the model is the pinned request, not an observed resolution. The return is retained at [`m4/gpt6-return.md`](../../evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md). | "VERDICT: conflict", citing SKILL L20, L28 and L42 against AGENTS.md L16. If tests passed earlier and the inputs are unchanged, a status reply that reuses the result violates the skill, and a re-run violates AGENTS.md. It found L108-114 compatible with AGENTS.md L15. Disposition: "remove now". |
+
+Findings 1 and 2 are not shown to be independent of each other: the practice-sweep coordinator's
+reading "was sent to both peers before the GPT-6 verdict returned" (`coordination.md`, item 2).
+The GPT-6 lane read only its frozen packet. The user delegated this decision to the practice-sweep
+session, which recorded it in its
+[M4 decision](2026-09-28-delegated-decisions.md#m4-remove-the-trial-skill) (#462, `c1581fa2`), and
+the trial owner accepted the result.
+
+**What was removed, and where.**
+- [`manifest.json`](../../adoption/skills/manifest.json): the row moves from `skills` to
+  `excluded` with a dated reason and an overturn condition, leaving 28 skills and 28 excluded
+  entries, and `checked_at` becomes 2026-09-28. The budget was recomputed by its
+  `description_chars_method` from the installed SKILL.md copies, each hash-identical to its pin,
+  and agrees with the sum of the remaining rows' `description_chars`. Against the manifest at
+  `3058b237`, `claude_on_description_chars` goes from 7,409 to 7,184 of the 8,000 cap, leaving
+  816, and `codex_enabled_description_chars` goes from 3,054 to 2,829. Each drops by the skill's
+  225 characters.
+- [`claude.settings.template.json`](../../adoption/templates/claude.settings.template.json): the
+  `skillOverrides` key.
+- `isolated-builder.md` in `.claude/agents/`,
+  [`adoption/agents/claude/`](../../adoption/agents/claude/isolated-builder.md) and
+  `examples/claude-native/agents/`: the `skills:` preload entry. The body sentence "Use the
+  preloaded verification-before-completion skill before claiming success; when the brief names
+  another project skill, Read its SKILL.md path." now reads "When the brief names a project skill,
+  Read its SKILL.md path." The three copies stay byte-identical, and
+  `tests/test_install_claude_profile.py` expects `context-mode:context-mode` as the builder's only
+  preload.
+- The builder's token-lanes block gains the evidence sentence
+  ([token-lanes addendum](2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-28-builder-evidence-sentence)).
+  The #381 preregistration replaces the builder's role-body row in
+  [its Amendment 3](../../evidence/artifacts/token-adoption-e2e-20260926/README.md#amendment-3-2026-09-28-the-isolated-builder-body-without-verification-before-completion-before-execution).
+- The landscape-sweep templates: `templates.json` `common`, `TEMPLATE_SKILLS` in `build_args.py`
+  and the sweep README. The refutation role keeps "evidence before any verdict" as plain text that
+  names no skill. `PROMPTS_SHA256_CURRENT` in `tests/test_landscape_sweep_harness.py` records the
+  new prompt hash.
+- The workflow suites' reviewed builder preload set becomes `['context-mode:context-mode']` in
+  `test-envelope.mjs` and `test-contract-mutations.mjs`, and their `SHA256SUMS` lines change.
+- Current-state prose: the workflows README, the Ultracode recipe, `adoption/bootstrap.md`,
+  `catalogs/foundation/practice-references.json` and `docs/community-native-practice.md`, where
+  superpowers stays an `alternative`.
+
+Dated decision records and earlier addenda, including this record's, stay as written.
+
+**The evidence principle stays.** The skill's core principle, "Evidence before claims, always"
+(L10), does not leave with it. Three carriers remain:
+- [AGENTS.md](../../AGENTS.md) L16 states when earlier evidence still counts.
+- [`acceptance-evidence-policy.md`](../acceptance-evidence-policy.md) counts a passing check only
+  after the same check has failed with its condition absent (L42-45). It also requires retained
+  argument vectors, exit codes, output and artifact hashes (L57-59).
+- The builder block's last line: "Show evidence before a success claim: the command and what it
+  returned (code.claude.com best practices), or the file:line read." The same sentence opens line
+  13 of the default block.
+
+**Condition C4.** This extends the [condition log](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule):
+
+| Condition | Change (date) | What children's start context says about the two skills |
+| --- | --- | --- |
+| C4 | this removal (2026-09-28) | default-block types: as C3; `isolated-builder`: the evidence sentence, with no preload and no body line naming the skill; the landscape-sweep templates name `search-first` only |
+
+On a host, C4 starts when the host steps below have run. As for C1 to C3, the review dates it only
+from that host's own record of those steps, and it reports a window that crosses an unrecorded
+boundary as mixed.
+
+**Host steps after the merge.** This change runs none of them.
+1. `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y -a claude-code codex`,
+   through the pinned skills 1.7.0 CLI. This is the rollback that
+   [`install_skills.py`](../../tools/adoption/install_skills.py) runs (L201), including its
+   agent list. Without `-a`, skills 1.7.0's `remove` selects every known agent and would delete a
+   same-named skill that another agent owns (L60-62). The practice-sweep record's M4 section gives
+   the form without `-a`; run the form above.
+2. `python3 tools/adoption/install_claude_profile.py --only guard --only agents` installs the new
+   builder block beside the hook and the new agent definitions.
+3. `python3 scripts/skills_status.py` reads the result back. The skill is no longer among the
+   manifest rows it checks. A leftover canonical folder or lock entry appears under "extra skills
+   not in manifest" (L360-366), which never affects the exit code, so the read-back must read that
+   list, not only the exit status. The script does not look for a leftover
+   `~/.claude/skills` link for a name outside the manifest, so check that path directly.
+
+The host's `skillOverrides` key for the skill in `~/.claude/settings.json` survives
+`apply_claude_settings.py`, whose merge keeps "base keys the template does not mention"
+(`deep_merge_dict`, L141-145). `skills_status.py` checks overrides only for manifest skills
+(L418-432), so the key is inert once the skill is gone, and removing it by hand is optional.
+
+**Review rule and counts.** The [carrier-conditions addendum](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule)
+added a with/without comparison of the builder's preload for this skill's Claude listing. That
+comparison no longer runs, because no preload or listing remains to vary. The
+[host-listing addendum](#addendum-2026-09-28-host-listing-drift-restored) (#461) records 153
+lifetime `/skill-doctor` uses of the skill as an observational count; this record did not measure
+them. They do not bear on the removal, because the rule triggers on conflict, not on use. Whether
+`/skill-doctor` counts a preload as a use stays open, as the carrier-conditions addendum left it.
+
+**Evidence class.** The rule and the removed text are structural: this record, the manifest, the
+template, and the agent and block files. Finding 1's citations were re-read in the hash-matching
+installed copy. Findings 2 and 3 are the practice-sweep session's retained quotes and lane return,
+linked above, and the use count is #461's observational count. None was re-run here. The budget
+totals were recomputed with the manifest's method from installed SKILL.md copies that match their
+pins. No host removal, native child run or review result is claimed.
+
+**Overturn.** Re-add the skill as a trial row only if all three hold:
+- an upstream revision drops the absolute freshness requirement (L20, L28 and the "Previous run"
+  entry at L42);
+- that revision is read in full against CLAUDE.md and AGENTS.md again;
+- it is re-pinned through this manifest with its tree, SKILL.md hash and budget.
+
+## Addendum 2026-09-28: M4 host removal and the scoped-remove correction
+
+**What ran.** The coordinator ran the [M4 addendum](#addendum-2026-09-28-verification-before-completion-removed-conflict-rule)'s
+host steps on 2026-09-28, through the pinned skills 1.7.0 CLI. The
+[receipt](../../evidence/receipts/skills-m4-host-removal-20260928.json) records them value-free.
+- 18:30:15Z: step 1, `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y -a claude-code codex`,
+  exited 0 and printed "Successfully removed 1 skill(s)". It removed only the `~/.claude/skills` link. The
+  canonical `~/.agents/skills/verification-before-completion` folder and its lock entry stayed. The receipt
+  keeps this run as a failed attempt.
+- A `find` to depth 5 below home then returned only the canonical folder.
+- 18:30:55Z: the unscoped `DISABLE_TELEMETRY=1 skills remove verification-before-completion -g -y` exited 0 and
+  removed the folder and the lock entry. 28 skill folders remain.
+- Steps 2 and 3 followed. The profile install from `c0966da2` wrote only the builder block and the
+  `isolated-builder` definition. `skills_status.py --json` returned result ok for 28 skills with no extra skills.
+  The optional drop of the stale `skillOverrides` key ran after a backup labelled
+  `settings.json.20260928T183120Z.pre-m4-override-drop`, taking the keys from 29 to 28.
+- A read-only read-back at 18:50:01Z found no copy of the skill and no lock entry. It found 28 skill folders
+  equal to the lock and to the manifest, and a `skillOverrides` key equal to the template's; it compared no
+  other setting.
+
+For the [condition log](#addendum-2026-09-28-carrier-conditions-and-the-verification-review-rule), C4's start
+context is in place on this host from 18:31:10Z, the coordinator's time for step 2. By the coordinator's order,
+step 3 followed before the 18:31:20Z key drop, and it changes no context. The read-back confirms the installed
+files, not those times. A review window that includes 18:30:15Z to 18:31:10Z is mixed.
+
+**Correction: the scoped form does not remove the skill.** Step 1 of the M4 host steps is incomplete on any
+host where skills 1.7.0 detects a universal agent other than the two it names.
+- Without `-a`, `remove` targets every known agent
+  ([`src/remove.ts` L209-217](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L209-L217)).
+  With `-a`, it cleans the named agents' paths only. It then keeps the canonical folder and the lock entry if
+  any other detected agent's install path exists
+  ([L293-324](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L293-L324)),
+  and reports success either way (L335-340).
+- A universal agent is one whose project `skillsDir` is `.agents/skills`
+  ([`src/agents.ts` L910-912](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L910-L912)).
+  22 of v1.7.0's 79 agent entries qualify, among them Codex, Cursor, Gemini CLI, GitHub Copilot and OpenCode.
+  Each one's install path is the canonical folder, whatever its `globalSkillsDir`
+  ([`src/installer.ts` L157-159](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L157-L159)).
+  One detected universal agent is therefore enough to keep the folder.
+- Codex goes on reading the kept folder. At the pinned Codex 0.157.1, it lists user skills from
+  `$HOME/.agents/skills`
+  ([`codex-rs/ext/skills/src/host_roots.rs` L103-108](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/ext/skills/src/host_roots.rs#L103-L108),
+  tag `rust-v0.157.1`). For the other universal agents, the skills CLI treats the folder as their install. This
+  record did not check whether each of those agents reads it.
+- The installed `skills@1.7.0` npm `dist/cli.mjs` has the same code. The relevant lines are L6834-6838 (no
+  `-a`), L6883-6907 (`isStillUsed`), L6909-6914 and L6943 (success), `isUniversalAgent` at L2180 and
+  `getAgentBaseDir` at L2214. The practice-sweep session verified the same lines independently. Its matching
+  note on the #462 uninstall line is in the
+  [delegated-decisions record](2026-09-28-delegated-decisions.md#m4-remove-the-trial-skill) (PR #466, merged
+  as `08aec098`).
+- Upstream intends this. The code's comments cite upstream #287 (do not break the other agents) and #1718 (keep
+  the lock entry while the folder survives), and commit `4c719f3f` (2026-07-26) added the lock half. `-a` means
+  "uninstall for these agents". On 2026-09-28, v1.7.0 is the latest release and npm `latest`, and `main` keeps
+  the same logic.
+- A scratch-HOME run of the pinned CLI discriminates, under `env -i` with an empty working directory.
+  - With an empty `.cursor` folder, the scoped remove exited 0 and printed its success line, but kept the
+    canonical folder and a seeded lock entry.
+  - Without that folder, the same command removed both.
+  - The unscoped form removed both with `.cursor` present.
+
+The M4 addendum's reason for `-a` still holds, since without it `remove` deletes a same-named skill that
+another agent owns. The flag does not make the scoped form a removal.
+
+**Complete host procedure.** To remove a skill from a host entirely:
+1. Assert that the canonical folder is the only copy. Without `-a`, `remove` cleans every agent's global
+   folder, so search every one of them for the skill's name. At skills 1.7.0, with no relocating variable set,
+   each lies at most 5 levels below home. `XDG_CONFIG_HOME`, `CODEX_HOME`, `CLAUDE_CONFIG_DIR`, `VIBE_HOME`,
+   `HERMES_HOME`, `AUTOHAND_HOME`, `GROK_HOME` and `SARVAM_HOME` move one
+   ([`src/agents.ts` L9-16](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L9-L16)),
+   so search there too when any of them is set. If another copy exists, stop: the unscoped form would delete it.
+2. Change to an empty directory. Two agents, PromptScript and Eve, have no global folder. For them, a `-g`
+   remove without `-a` also deletes `<cwd>/.agents/skills/<name>`, `<cwd>/agent/skills/<name>` and each Eve
+   subagent's copy
+   ([`src/remove.ts` L260-270](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L260-L270)).
+3. Run `DISABLE_TELEMETRY=1 skills remove <name> -g -y` through the pinned CLI.
+4. Read back. Check that the canonical folder, the lock entry, `~/.claude/skills/<name>` and
+   `~/.codex/skills/<name>` are gone, and that `python3 scripts/skills_status.py` lists no extra skill.
+
+On this host the read-back checked two of step 1's conditions. It found no relocating variable set in the
+recorder's shell. It also found no project-scope copy tracked at `c0966da2` or present on disk in the checkout.
+The coordinator's environment and the unscoped run's working directory were not recorded.
+
+**The installer's rollback.** [`install_skills.py`](../../tools/adoption/install_skills.py) rolls back a
+mismatched global add with the same scoped form. At `bdf25d28` (#429) it read back only a project rollback: the
+project's canonical folder, its lock entry and, for a claude-code install, the `.claude/skills/<name>` link,
+reported as `error` with "rollback retained, in use by another agent" or "rollback incomplete" (the
+[runtime-workers skills blueprint](../../blueprints/runtime-workers/skills/README.md#lifecycle-through-the-existing-installer)
+describes it). Its global rollback read nothing back. On a host where skills 1.7.0 detects another universal
+agent, a bad global install therefore stayed on disk while the script reported `rolled-back`. Codex reads the
+canonical folder while it exists, and the skills CLI still counted the copy as installed for every universal
+agent. A global remove that could not run raised its exception instead of returning a state.
+
+The fix extends #429's read-back to the global rollback and deletes nothing.
+- After the remove, in either mode and whatever it reported, `process_skill` reads back the canonical folder,
+  the lock entry and the claude-code link (L452-478). Globally these are `~/.agents/skills/<name>`, its entry
+  in the global lock and the link where skills 1.7.0 puts it (`claude_skills_dir`):
+  `$CLAUDE_CONFIG_DIR/skills/<name>` when that variable is set and not blank, else `~/.claude/skills/<name>`
+  (`dist/cli.mjs` L1398 and L1511). Like the CLI, it trims with JavaScript's `trim()` set (`JS_TRIM_CHARS`,
+  the 25 code points node removes) and normalizes as `path.join` does.
+- If the remove exited nonzero or any of the three remains, the state is `error` with #429's reasons:
+  "rollback retained, in use by another agent" when the remove exited 0 and left the canonical folder, and
+  "rollback incomplete" otherwise. The stderr line keeps #429's format, reading `lock=` for the global lock
+  where a project reads `project-lock=`, and now names what remains in both modes. There is no new state.
+- A read-back that cannot observe the three is `error` with the one new reason, "rollback could not be
+  verified", in both modes: an `OSError` or `ValueError` while reading them, such as an unreadable lock, or a
+  malformed one. Only a missing lock file, or a lock that parses without the entry, confirms removal
+  (`lock_retains`). `load_lock`, which the install checks still use, reads a malformed lock as empty.
+- A remove that cannot run (`OSError` or a timeout) is reported and returns `error` in both modes (L449-451).
+- It never deletes what remains, because only the skills CLI writes there. The docstring (L17-33) points to
+  this addendum for the manual procedure. The `SKILL_AGENTS` comment (L125-136) states the behaviour with the
+  upstream lines, including Codex's `host_roots.rs`.
+
+`GlobalRollbackReadBackTests` in `tests/test_install_skills.py` uses the module's fake CLI. Its remove keeps what
+`retain_after_remove` names, and this change adds `remove_exit` (the remove exits nonzero) and
+`remove_cannot_run` (the rollback cannot execute the CLI).
+- Against the script at `bdf25d28`, the module ran 52 tests with 6 failures. Five read
+  `{'drift-skill': 'rolled-back'} != {'drift-skill': 'error'}`: the kept canonical folder and lock entry, each
+  of the three artifacts kept alone, and a remove that exited 1. The sixth was the `PermissionError` traceback
+  that the global rollback raised when the remove could not run. The control and the 47 tests already on main
+  passed.
+- With the fix, all 52 pass.
+- In the scratch run, the pinned CLI with `.cursor` present gave `rolled-back` from the script at `bdf25d28` and
+  `error` with "rollback retained, in use by another agent" from the fixed script, each with the canonical
+  folder left in place. Without `.cursor`, both gave `rolled-back`.
+
+**Review repair round.** The cross-family review of PR #467 at `6744c2eb` (read-only `codex exec`,
+`gpt-6-astra` at reasoning effort max) returned MERGE-AFTER-FIXES. Its findings are all fixed above:
+- the global read-back looked for the link only under `~/.claude`, so a set `CLAUDE_CONFIG_DIR` gave a false
+  `error` for another copy there, or missed the CLI's own link;
+- a malformed lock that still held the entry confirmed the rollback;
+- an unreadable lock raised out of the read-back;
+- this addendum said "settings" where the read-back compared only `skillOverrides`.
+
+The independent verifier confirmed all eight claims at `6744c2eb` and noted that no test covered a missing
+binary.
+- The fake CLI now links under `$CLAUDE_CONFIG_DIR/skills` as the CLI does, and adds `lock_after_remove`
+  (`malformed` or `unreadable`) and a deleted binary (`remove_cannot_run` 2). The test module strips a host's
+  `CLAUDE_CONFIG_DIR` as it strips `XDG_STATE_HOME`.
+- With the repair, 57 tests pass. With the pre-repair script from `6744c2eb`, five fail: both
+  `CLAUDE_CONFIG_DIR` tests, the malformed lock in each mode, and the unreadable lock. The blank-value and
+  missing-binary subtests pass on both versions.
+- A scratch-HOME probe ran the pinned CLI and both scripts
+  ([script](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_claude_config_dir_probe.py)).
+  - With `CLAUDE_CONFIG_DIR` set, `add` linked the skill only under `$CLAUDE_CONFIG_DIR/skills`. With the value
+    set to two spaces, it linked under `~/.claude/skills`.
+  - With another `SKILL.md` folder at `~/.claude/skills/<name>`, the pre-repair script reported `error`
+    "rollback incomplete". The repaired script reported `rolled-back` and left that folder intact. Both
+    reported `rolled-back` without it.
+- The unchanged reproduction, rerun with the repaired script, gave the same states as its first run.
+
+The re-check of that repair at `bb3c88fb` (same model and effort) found the lock and error findings and the
+nit fixed, and the `CLAUDE_CONFIG_DIR` finding partial. A second independent verifier confirmed nine of ten
+claims and found the same two gaps.
+- Python's `str.strip()` and `pathlib` differ from the CLI's `trim()` and `path.join`. `strip()` keeps U+FEFF
+  and removes U+001C to U+001F and U+0085. `pathlib` keeps a `..`, so a value such as `…/missing/../x` named
+  a path that cannot exist while the CLI linked under `…/x`. Either way a kept link could read as removed.
+- One line reference in this addendum was stale.
+
+The final round mirrors both rules in `claude_skills_dir` and in the fake CLI. The trim set is the 25 code points
+that node's `trim()` removed when run over every code point, and a test compares it with node when node is on
+`PATH`.
+- 59 tests pass. With the script from `bb3c88fb`, the three trim and `..` subtests (`..`, U+FEFF alone, a
+  trailing U+0085) fail and the trim-set test errors.
+- The probe's new arms ran the pinned CLI on node v24.21.0. A `…/missing/../claude-config` value linked under
+  the normalized folder without creating `missing`. U+FEFF alone linked under `~/.claude/skills`. The installer
+  arms and the reproduction gave the same results as before with the final script.
+
+**Evidence class.**
+
+| Evidence | Class | Acceptance-policy class | Where |
+| --- | --- | --- | --- |
+| The two host removes | native-measurement | Upstream example or native operation | [Receipt](../../evidence/receipts/skills-m4-host-removal-20260928.json): retained exit codes and output lines |
+| The first remove's leftovers, the `find`, the profile-install lines and the key counts | coordinator-reported | None; the coordinator's account | Receipt, marked `coordinator_reported` |
+| Read-only read-back at 18:50:01Z | our-integration | Independent observation | Receipt `data.independent_readback`; script in [`skills-m4-host-removal-20260928/`](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_host_readback.py) |
+| Scratch-HOME reproduction | native-measurement, synthetic-fixture | Upstream example or native operation; Synthetic fixture | Receipt `data.scratch_reproduction`; [script](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_scoped_remove_repro.py) |
+| `install_skills.py` rollback tests | our-integration | Local integration check | `GlobalRollbackReadBackTests` in `tests/test_install_skills.py`, failing first against `bdf25d28`; the repair round's tests failing first against `6744c2eb` |
+| `CLAUDE_CONFIG_DIR` probe and reproduction rerun | native-measurement, synthetic-fixture | Upstream example or native operation; Synthetic fixture | Receipt `data.review_repair_round`; [probe script](../../evidence/artifacts/skills-m4-host-removal-20260928/m4_claude_config_dir_probe.py) |
+| Upstream source and `dist/cli.mjs` lines | upstream source | None; cited, not executed | Links above: skills at commit `7407f389` (tag `v1.7.0`) and Codex `host_roots.rs` at commit `36650394` (tag `rust-v0.157.1`) |
+
+**Overturn.** Suppose a skills release removes the canonical folder and its lock entry under `-a` while another
+detected agent still resolves to that folder, or documents a flag that does. The scoped form is then complete on
+that release. Re-pin the CLI and rerun the reproduction's `.cursor` arm before relying on it.

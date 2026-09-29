@@ -78,6 +78,8 @@
       "Read(**/mnt/*/Users/*/AppData/Roaming/omniroute/**)",
       "Read(//mnt/*/Users/*/.omniroute/**)",
       "Read(**/mnt/*/Users/*/.omniroute/**)",
+      "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
+      "Read(**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)",
       "Edit(~/.bashrc)",
       "Edit(~/.profile)",
       "Edit(~/.zshrc)",
@@ -119,6 +121,7 @@
     "defaultMode": "bypassPermissions"
   },
   "model": "opus[1m]",
+  "advisorModel": "fable",
   "hooks": {
     "PreToolUse": [
       {
@@ -322,7 +325,6 @@
     "resolving-merge-conflicts": "on",
     "grill-me": "user-invocable-only",
     "improve-codebase-architecture": "user-invocable-only",
-    "verification-before-completion": "on",
     "security-threat-model": "on",
     "gh-address-comments": "on",
     "semgrep": "on",
@@ -338,6 +340,7 @@
     "agent-browser": "name-only",
     "find-skills": "user-invocable-only",
     "variant-analysis": "on",
-    "writing-for-agents": "on"
+    "writing-for-agents": "on",
+    "security-audit": "name-only"
   }
 }

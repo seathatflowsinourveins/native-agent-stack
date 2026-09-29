@@ -1,0 +1,142 @@
+{
+ "items": [
+  {
+   "id": "M4",
+   "verdict": "reject",
+   "resolution_text": "",
+   "reasons": "Reject: change no file for this item in this unit. The concern is real, but the fix goes through the wrong mechanism. (1) Hunks D1-D3 hand-edit a vendored, pinned upstream file. The standing rules exclude that, and there is no upstream revision to re-pin to: U1 records that the pinned blob is upstream main on 2026-09-28. (2) Upstream's latest change to this file (U2, 2026-07-24) removed the persuasion prose but kept the Iron Law, the gate function and the rationalization table as the parts that 'enforce' the discipline, with its own evals deciding. D1 and D2 delete exactly those parts. (3) The edit fails project checks. scripts/skills_status.py:262 would report sha_mismatch for the canonical copy; lines 431, 451 and 455 make that a required failure, and line 511 turns it into exit 1. tools/adoption/install_skills.py:127 would classify the locked but edited copy as 'install', so the next installer run re-adds the pinned upstream folder and discards the edit. (4) ~/.claude/skills/<name> resolves to the canonical ~/.agents/skills folder (skills_status.py:12), and the manifest enables the skill for Codex (manifest.json:338). The edit would therefore silently change the second client and every project. The concern itself has support. U3 says explicit verification instructions cause over-verification on Opus 5. The repository's own 2026-09-28 record carries that advice forward to Opus 5.5 (token-lanes decision L516 and L572). The M4b trigger list ('Moving to next task', 'Delegating to agents', 'ANY positive statement about work state') is broader than a builder's success claims. The in-project remedy the audit names (drop the builder preload or end the trial) is already recorded and deferred to a with/without comparison of that preload on frozen builder tasks at the 2026-10-25 trial review (skills-trial addendum L832-840). The token-lanes addendum (L585-587) declined to remove the preload in that change. That remedy would also have to change test-envelope.mjs:505, test-contract-mutations.mjs:70-73, all three isolated-builder.md copies and adoption/bootstrap.md:346-347. isolated-builder.md is also in the #381 frozen role-body table, and #381 requires executed copies to equal the recorded sha256 (token-adoption-e2e README L655-663). Editing the skill locally now would also change the treatment arm before that comparison runs. What would show this reject wrong: the 2026-10-25 comparison finds that the preload adds tokens or elapsed time without reducing review-found defects on the Opus 5.5 builder (then drop or replace the preload in all builder copies, updating the tests, the bootstrap note and the #381 seal together), or upstream lands a revision that removes these sections (then re-pin). Verification gaps: without web access I did not read the Opus 5.5 guide itself, so neither the packet's 're-test' reading nor the repository's 'reasonable starting point' reading is verified here. I did not check the installed host copy's hash or symlink, or whether the current isolated-builder.md still equals the #381 seal.",
+   "sources": [
+    {
+     "locator": "<work>/packet.md:13-14",
+     "quote": "a vendored upstream file is changed by re-pinning to an upstream revision, not by a local edit"
+    },
+    {
+     "locator": "<work>/sources.json U1 note (https://github.com/obra/superpowers/blob/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion/SKILL.md)",
+     "quote": "The GitHub contents API gives the same blob (7d45333cc4a4) at 8ca22dba and on upstream main on 2026-09-28, so the pin is upstream's current file."
+    },
+    {
+     "locator": "https://github.com/obra/superpowers/commit/3be5aad3dd24 (sources.json U2, wrapped lines joined)",
+     "quote": "Why This Matters (failure-memory testimonials), the dishonesty reframing in the Overview, and The Bottom Line recap all restate stakes the Iron Law, gate function, and rationalization table already enforce. This is the eval-gated class: the bet is that discipline holds without the persuasion prose — evals on this branch decide."
+    },
+    {
+     "locator": "<base>/scripts/skills_status.py:262",
+     "quote": "return {\"state\": \"ok\" if digest == skill[\"skill_md_sha256\"] else \"sha_mismatch\"}"
+    },
+    {
+     "locator": "<base>/scripts/skills_status.py:455",
+     "quote": "report[\"result\"] = \"ok\" if required_pass else \"fail\""
+    },
+    {
+     "locator": "<base>/scripts/skills_status.py:511",
+     "quote": "return 0 if report[\"result\"] == \"ok\" else 1"
+    },
+    {
+     "locator": "<base>/tools/adoption/install_skills.py:127",
+     "quote": "return \"ok\" if (md_matches and entry.get(\"skillFolderHash\") == skill[\"tree_sha\"]) else \"install\""
+    },
+    {
+     "locator": "<base>/adoption/skills/manifest.json:322",
+     "quote": "\"skill_md_sha256\": \"2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3\","
+    },
+    {
+     "locator": "<base>/adoption/skills/manifest.json:338",
+     "quote": "\"codex_enabled\": true"
+    },
+    {
+     "locator": "<base>/scripts/skills_status.py:12",
+     "quote": "``~/.claude/skills/<name>`` exists and resolves to that canonical folder"
+    },
+    {
+     "locator": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md (sources.json U3, 'Task scope and over-verification')",
+     "quote": "instructions like these cause over-verification on Claude Opus 5, and removing them reduces wasted tokens with no loss in quality."
+    },
+    {
+     "locator": "<base>/docs/decisions/2026-09-27-token-lanes-subagent-start.md:516",
+     "quote": "keeps the Opus 5 patterns as \"a reasonable starting point\""
+    },
+    {
+     "locator": "<base>/docs/decisions/2026-09-27-token-lanes-subagent-start.md:572",
+     "quote": "The upstream removal advice is written for Claude Opus 5 and carried forward to Opus 5.5."
+    },
+    {
+     "locator": "<work>/sources/verification-before-completion-8ca22dba.SKILL.md:111",
+     "quote": "- ANY positive statement about work state"
+    },
+    {
+     "locator": "<base>/docs/decisions/2026-09-25-skills-trial-and-usage.md:838-840 (wrapped lines joined)",
+     "quote": "The review therefore adds a with/without comparison that varies that preload on frozen builder tasks, run through an upstream evaluation harness that the review record names with its pin before the run, comparing tokens, elapsed time and review-found defects."
+    },
+    {
+     "locator": "<base>/docs/decisions/2026-09-27-token-lanes-subagent-start.md:585",
+     "quote": "Remove the builder's preload or its body line as well. Agent definitions are outside this change;"
+    },
+    {
+     "locator": "<base>/examples/claude-native/workflows/test-envelope.mjs:505",
+     "quote": "expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode', 'verification-before-completion']))"
+    },
+    {
+     "locator": "<base>/examples/claude-native/workflows/test-contract-mutations.mjs:70",
+     "quote": "['the builder loses its preloads', 'agents/isolated-builder.md',"
+    },
+    {
+     "locator": "<base>/evidence/artifacts/token-adoption-e2e-20260926/README.md:657-658 (wrapped lines joined)",
+     "quote": "The RUNBOOK freeze requires every executed copy to equal these values."
+    },
+    {
+     "locator": "<base>/evidence/artifacts/token-adoption-e2e-20260926/README.md:663",
+     "quote": "| `isolated-builder.md` | `57452a64ca8b97996aeb35916fb1f1f4d06452857178d6ad6dc7c49723d84cf7` |"
+    }
+   ],
+   "confidence": 0.87
+  },
+  {
+   "id": "M5",
+   "verdict": "amend",
+   "resolution_text": "Keep this application's contract in this directory. The project-readiness\ninstaller writes guidance and actions at the enclosing worktree's root;\nleave that installer, and the root guidance and actions, to the coordinator,\nwho integrates this nested contract.",
+   "reasons": "Amend. The finding is right. Line 15 is a past-tense account of a readiness run, and the rule sits in a descriptive 'so' clause. The history is already kept in receipt.json:88 and README.md:88-90, so an imperative rule loses no record. Explicit wording also matters for both readers of this file: Codex reads AGENTS.md (S10 says GPT-6 Astra is more sensitive to AGENTS.md), and Claude loads it through CLAUDE.md's @AGENTS.md import. Hunk E, however, changes a fact. In the original, 'Its installer' follows 'Project-readiness' (AGENTS.md:15-16), and receipt.json:88 names the tool as the 'installed project-readiness contract validator'. Hunk E instead says 'The enclosing repository's installer writes its worktree-root guidance and actions', which those two lines contradict. The tools/adoption installers I checked write user-level locations (apply_codex_lane.py:403 writes $CODEX_HOME/AGENTS.md), not worktree-root guidance. Under hunk E, a model working here is no longer told that the project-readiness installer is what would write to the enclosing root, and it is told that the root guidance is written by an installer. The amended text keeps hunk E's imperative form and restores the attribution. 'Leave that installer ... to the coordinator' is not a new rule. It follows from line 18's 'without modifying the enclosing repository's native actions', because running that installer from this directory is what would modify them. The root guidance is included because the same installer writes it, as hunk E also assumes. The edit changes the file's sha256 and byte count, so the entry at manifests/evidence.json:3905-3907 must be updated in the same change and python3 scripts/validate.py rerun (validate.py:384-387 checks both). Grep found the recorded sha256 only in evidence.json and the phrases only in this file, so no test, freeze record or receipt quotes or hashes these lines. The effect on behavior is unmeasured. What would show the amend wrong: a child run in this directory that still writes root guidance or actions, or refuses to work on the application; or evidence that the installer belongs to the enclosing repository rather than to project-readiness. Verification gap: project-readiness is not in this repository, so I could not inspect its installer's exact outputs.",
+   "sources": [
+    {
+     "locator": "<base>/blueprints/convergence-practice/application-delivery/AGENTS.md:15-16 (wrapped lines joined)",
+     "quote": "Project-readiness inspected the enclosing public worktree. Its installer writes worktree-root guidance and actions"
+    },
+    {
+     "locator": "<base>/blueprints/convergence-practice/application-delivery/AGENTS.md:17-18 (wrapped lines joined)",
+     "quote": "for the coordinator to integrate without modifying the enclosing repository's native actions."
+    },
+    {
+     "locator": "<base>/blueprints/convergence-practice/application-delivery/receipt.json:88",
+     "quote": "validated against installed project-readiness contract validator; enclosing worktree actions not modified"
+    },
+    {
+     "locator": "<base>/blueprints/convergence-practice/application-delivery/README.md:89-90 (wrapped lines joined)",
+     "quote": "The enclosing repository's global actions were not modified by this bounded contribution."
+    },
+    {
+     "locator": "<base>/tools/adoption/apply_codex_lane.py:403",
+     "quote": "self.agents_path = self.codex_home / \"AGENTS.md\""
+    },
+    {
+     "locator": "<base>/blueprints/convergence-practice/application-delivery/CLAUDE.md:1",
+     "quote": "@AGENTS.md"
+    },
+    {
+     "locator": "https://developers.openai.com/api/docs/guides/latest-model.md (sources.json S10, GPT-6 Astra behavior)",
+     "quote": "It can be more sensitive to instructions contained in skills and other files, such as `AGENTS.md`."
+    },
+    {
+     "locator": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md (sources.json S1, Be clear and direct)",
+     "quote": "Claude responds well to clear, explicit instructions."
+    },
+    {
+     "locator": "<base>/manifests/evidence.json:3906",
+     "quote": "\"sha256\": \"12ec72f9a905c105ee44e6daa6c0767bbb9978ad0b51e1ec570372afb54d8bd2\","
+    },
+    {
+     "locator": "<base>/scripts/validate.py:384",
+     "quote": "if hashlib.sha256(content).hexdigest() != digest:"
+    }
+   ],
+   "confidence": 0.74
+  }
+ ]
+}

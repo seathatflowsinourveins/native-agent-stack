@@ -1,5 +1,7 @@
 # Inactive project MCP fragment; replace literal absolute paths, then merge.
 # No account, model, approval, sandbox or feature settings are changed here.
+# The socraticode path names the linux-x86_64 pin, socraticode-1.15.0; on macos-arm64 use
+# socraticode-1.14.0 until a Mac qualifies 1.15.0 (adoption/pins-macos-arm64.json).
 [mcp_servers.serena]
 command = "/ABSOLUTE/UVX_EXECUTABLE"
 args = ["--from", "git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143", "serena", "start-mcp-server", "--transport", "stdio", "--project-from-cwd", "--context", "codex", "--enable-web-dashboard", "false", "--open-web-dashboard", "false", "--enable-gui-log-window", "false"]
@@ -10,7 +12,7 @@ url = "http://127.0.0.1:49374/mcp"
 
 [mcp_servers.socraticode]
 command = "/ABSOLUTE/NODE_EXECUTABLE"
-args = ["/ABSOLUTE/STACK_HOME/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
+args = ["/ABSOLUTE/STACK_HOME/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"]
 startup_timeout_sec = 120
 
 [mcp_servers.socraticode.env]

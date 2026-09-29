@@ -1,0 +1,66 @@
+{
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-28T10:17:26Z",
+  "finished": "2026-09-28T10:23:02Z",
+  "usage": {
+   "input_tokens": 557285,
+   "cached_input_tokens": 429696,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 10499,
+   "reasoning_output_tokens": 6689
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "X5c",
+    "choice": "B",
+    "reasons": "B better preserves the existing meaning while carrying the operator’s convergence wording. A retains installed-client-first checking, but a checking sequence does not explicitly preserve the installed client’s authority when current upstream differs from installed behavior. B retains that authority and matches the agreed X5a opening apart from markup. This supports clearer instruction following without introducing a conflicting obligation. I verified the packet hash, ran the three read-only template tests directly in each tree, and reproduced both manifests exactly from the changed files. B’s recomputed hash, 153-word block and 3371-byte template match its co-changes. The evidence therefore favors B on semantic preservation, not on a mechanical failure in A.",
+    "sources": [
+     {
+      "locator": "packet.md:22",
+      "quote": "The operator's rule itself is not under review. Judge whether each proposed text carries that wording correctly and\n  keeps the file's tested obligations and its existing meaning, and whether the co-changes are complete and correct."
+     },
+     {
+      "locator": "base/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth."
+     },
+     {
+      "locator": "proposed/adoption/templates/codex.AGENTS.template.md:5",
+      "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "base/docs/harness-defaults.md:58",
+      "quote": "Upstream repositories, their changelogs and release notes, and the installed client are the source of truth."
+     },
+     {
+      "locator": "amended/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one."
+     },
+     {
+      "locator": "proposed/examples/claude-native/CLAUDE.md:3",
+      "quote": "**Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "amended/tests/test_codex_worker_lane.py:209",
+      "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n        self.assertEqual(len(top.split()), 153)\n        self.assertEqual(hashlib.sha256(upstream.encode(\"utf-8\")).hexdigest(), RTK_AWARENESS_SHA256)"
+     },
+     {
+      "locator": "amended/manifests/evidence.json:3749",
+      "quote": "\"path\": \"adoption/templates/codex.AGENTS.template.md\",\n      \"sha256\": \"dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3\",\n      \"bytes\": 3371"
+     }
+    ],
+    "confidence": 0.91
+   }
+  ]
+ }
+}

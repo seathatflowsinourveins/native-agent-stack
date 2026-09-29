@@ -16,7 +16,9 @@ explicit Opus declaration and reporting instruction to satisfy the combined
 portable contract; that change has local checks and no new native provider
 qualification. Since 2026-09-26 this catalog diverges from agent-lab in four
 definitions: `isolated-builder` holds only Serena's read tools and preloads context-mode
-and verification-before-completion; `stack-researcher`, `stack-verifier` and
+(its verification-before-completion preload was removed on 2026-09-28 with that skill's
+trial, [skills-trial record](../../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-28-verification-before-completion-removed-conflict-rule));
+`stack-researcher`, `stack-verifier` and
 `security-reviewer` are new roles with local checks and no native run recorded yet.
 The new builder preload also has no native qualification
 ([decision](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)).
@@ -56,7 +58,12 @@ the Codex side.
    [the routing guide](../../../docs/ultracode-token-routing-20260921.md)) when the
    loaded settings carry no permission mode or allow rule for it; keep that rule in
    user settings or the launch flag, since the portable settings file selects no
-   permission mode.
+   permission mode. A `claude -p` run also stops waiting for its background
+   workflow once `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS` of idle time passes after
+   the final turn (default 600000, 10 minutes; `0` waits indefinitely; Claude Code
+   2.1.182 or later; [environment variables](https://code.claude.com/docs/en/env-vars)).
+   Set it for any run that can outlast that, and bound the run externally when you
+   set `0`.
 4. Start a fresh native session or run `/reload-skills`, then invoke a saved
    workflow by name with explicit `args`. Load the bundled `/workflow-authoring`
    skill before editing a script.
@@ -73,7 +80,7 @@ reads the inventoried files in full and marks diff-dependent claims unverifiable
 | `source-scout` | Sonnet, max | Read, Grep, Glob, Bash; no project instructions loaded | exact extraction, inventories, running the acceptance commands a task names (raw through `rtk proxy` where `rtk` is installed) |
 | `evidence-reviewer` | Opus, max | Read, Glob, Grep, ToolSearch and named read-only MCP tools; no Bash, Edit or Write | independent review from source and recorded evidence |
 | `security-reviewer` | Opus, max | Same named read tools as evidence-reviewer behind ToolSearch; no Bash, Edit, Write, WebFetch or Skill; `security-best-practices` preloaded | adversarial security review, including agent permission and tool-surface widening; reports findings, never fixes |
-| `isolated-builder` | Opus, max, in the coordinator-created worktree its brief names | Read, Edit, Write, Glob, Grep, Bash, ToolSearch and named MCP read tools (no Serena symbol-edit tool); `context-mode:context-mode` and `verification-before-completion` preloaded | a bounded implementation from a clear contract |
+| `isolated-builder` | Opus, max, in the coordinator-created worktree its brief names | Read, Edit, Write, Glob, Grep, Bash, ToolSearch and named MCP read tools (no Serena symbol-edit tool); `context-mode:context-mode` preloaded | a bounded implementation from a clear contract |
 | `stack-researcher` | Opus, max | Read, Glob, Grep, Bash, WebSearch, ToolSearch and named Context Mode, QMD, ai-memory, Serena and jCodeMunch read tools; no Edit, Write, WebFetch or Skill | research from the web, documentation, repository and catalog, returned inline |
 | `stack-verifier` | Opus, max | Read, Glob, Grep, Bash, ToolSearch and named Context Mode tools; no project instructions; no Edit, Write, WebFetch or Skill | re-running named commands and deciding claims from their output and source; never fixes |
 
@@ -142,7 +149,7 @@ position of the text a shell runs, also behind a shell keyword such as `do` or `
 so quoted text and heredoc bodies count only under `sh -c`, `eval`, `ssh` or a shell
 heredoc, escaped characters and comments never count, and `$(...)` or backticks inside
 double quotes or an unquoted heredoc still run (bash(1) QUOTING, COMMENTS and Here
-Documents), with loopback-only calls apart; a fetch run inside a Context Mode sandbox, a
+Documents), with loopback-only calls apart; in these legacy lane counters a fetch run inside a Context Mode sandbox, a
 `gh api` call or an HTTP call in a script is in no lane, so `ctx_fetch_and_index_share`
 compares those three lanes only), the
 SubagentStart hook types, and whether an
@@ -152,6 +159,226 @@ prompt or in SubagentStart hook context. A marker inside tool input or output do
 not count. `--rtk-db <RTK history.db>` also joins each Bash call to RTK's
 `hook_decisions` row by `tool_use_id`, opened read-only through `node:sqlite`
 (Node 22.13 or later); `allow` plus `ask` is RTK's own "covered" outcome.
+
+### PR-A measurement fields (2026-09-27)
+
+`lanes.measurement` in a run, and `actors[].measurement` plus each group's
+`measurement` in a sweep, compute the preregistered M3/M4/M5 fields. A sweep
+also reads main transcript JSONL files under its explicit roots and reports
+them in `main`, separately from child populations. Use the project directory
+as a root to include the native `<session>.jsonl` next to `<session>/subagents`.
+Actor ordinals are local to the supplied roots; private run/task identity joins
+remain the caller's responsibility. Existing lane counters remain available
+for comparison with historical receipts; their three-lane fetch share is **not M4**.
+
+```sh
+node examples/claude-native/workflows/child-usage.mjs --lanes-sweep \
+  --root "${CLAUDE_ROOT}" --since "${SINCE}" --until "${UNTIL}" \
+  --rtk-check --rtk-db "${RTK_DB_PATH}" --exceptions "${PRIVATE_EXCEPTIONS}"
+```
+
+`m3` covers every result carrier, including `rtk proxy`, with `results`, `bytes`,
+`large_results`, `large_bytes`, `large_result_share`, `large_byte_share` and
+`max_bytes`. Large means strictly greater than 5,120 UTF-8 bytes. This tool's
+content-byte rule measures strings directly and sums the UTF-8 bytes of `text`
+fields in text blocks, with no wrapper, escaping or separator bytes. Non-text
+blocks use compact JSON individually. Equal text therefore has equal size in a
+Bash string and a ctx text-block array. The citation to context-mode v1.0.169's
+[UTF-8 accounting](https://github.com/mksglu/context-mode/blob/v1.0.169/src/session/extract.ts#L1060-L1069)
+supports UTF-8 accounting only; this rule is local and does not serialize a
+hook `tool_response` object. Provider tokens remain separate.
+`by_carrier` includes exception bytes; `m3`
+excludes them. Group `m3_large_results_per_actor` gives nearest-rank percentiles.
+`m5` includes **all** ctx results, even M3 exceptions, so a single enormous ctx
+result cannot hide behind a low count share. No threshold verdict is inferred
+from choosing a ctx tool. Missing calls/results and parse errors remain visible.
+
+The three exception classes come from
+[#381 preregistration](../../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json).
+A successful Read followed by a successful Edit/Write of the same exact path
+and cwd in that actor's observed transcript is automatic. No future row beyond
+`--until` qualifies it. Other exceptions require a reviewed private JSON array
+passed with `--exceptions`. Each record has `transcript_sha256` (SHA-256 of
+the exact file bytes), `tool_use_id`, `exception`, and a nonempty `witness`.
+Allowed classes are `read_of_subsequently_edited_file`,
+`original_source_quoted_or_line_cited`, and `exact_bytes_required_by_frozen_check`.
+The tool validates binding and vocabulary; the reviewer establishes semantic
+truth. Sidecars, identifiers and witness text are never echoed. A mismatched
+digest removes no bytes. An entry may instead carry `proxy_purpose: "acceptance"`
+and a witness; this classifies M6 without granting an M3 exception.
+Every supplied `exception`, `proxy_purpose` and `rtk_log_find` field must be
+valid, and at least one must be present. A valid class does not mask a malformed
+sibling; present null fields are invalid.
+Top-level `sidecar_records.bound` and `.unbound` count records whose digest
+matches at least one measured transcript or none, respectively. Each sidecar
+record counts once across actors. A bound digest does not prove a call exists,
+a witness is correct or an exception was applied; the exception counters show
+actual removals. Skipped/out-of-window transcripts cannot bind a record.
+
+The legacy `transcripts_found`, `transcripts_skipped_unmodified` and
+`parse_errors` remain child-only, preserving the #369 comparison population.
+`main_transcripts_found`, `main_transcripts_skipped_unmodified` and
+`main_parse_errors` describe main files separately; `all_transcripts_found`
+is their combined discovery count.
+
+`m4` counts confirmed, statically visible remote operations, including individual `requests` in
+`ctx_fetch_and_index`, shell commands in `ctx_batch_execute`, and literal
+subprocess commands in JavaScript/Python ctx code. Loopback fetches are separate.
+The existing `ctx_sandbox_fetch` bucket includes both context-mode sandbox
+curl/wget commands and nested Codex code-mode shell curl/wget commands from the
+[shared adapter](../../../tools/skill-usage/README.md). It measures sandbox
+execution, not exclusive use of context-mode; both stay in the remote denominator.
+Script HTTP calls, dynamic URL fetches and `gh api` are `unclassifiable` and
+stay in the denominator; over 10% makes the metric `incomplete`. The regression
+of one indexed fetch plus nineteen sandbox curls therefore reports 5%.
+Detection follows the [#381 M4 definition](../../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json#L2921-L2930)
+and extends the maintained
+[context-mode v1.0.169 routing detector](https://github.com/mksglu/context-mode/blob/v1.0.169/hooks/core/routing.mjs#L788-L795)
+and the existing shell-text parser. Before inline-HTTP matching, data heredoc
+bodies and shell comments are removed and quoted argument syntax is neutralized.
+Quoted Python `-c` (including combined flags ending in `c`), Node
+`-e`/`--eval`/`-p`/`--print`, Deno `eval`, Bun `-e`/`--eval`, and ctx JS/Python
+code remain visible to the script detector, including dynamic URLs (kept
+unclassifiable). A heredoc body is source only when the simple command that
+contains its `<<` operator runs stdin as source. That command is the text
+between the nearest control operators around the operator, with quotes removed
+and redirection words and their targets dropped, so a pipe, list or redirection
+after the heredoc (`bash <<'EOF' 2>&1 | tail -n 5`, `> log.txt`, `&& ...`) does
+not replace it. A `<<` inside quotes, a comment or `$(( ))` opens no heredoc.
+Two known limits err toward counting a fetch: `$(` is not tracked inside
+double quotes, and a quoted string that a shell runs (`bash -c '...'`) is added
+as executed text without its own heredoc resolution. A heredoc body inside
+`"$( ... )"` (the usual `git commit -m "$(cat <<'EOF' ... EOF)"` form) or inside
+such a string therefore counts as executed even when it is the inner command's
+data: a line-start `curl`/`wget` in it counts as a confirmed fetch (inside
+`"$( ... )"` only when the body has no parentheses) and a `gh api` line as
+unclassifiable. This can lower the routed shares, never raise them.
+Python or Node read stdin with no script operand or with `-`; the retained
+explicit stdin forms apply to other interpreters. A shell reads its script from
+stdin unless `-c` supplies a command string or an operand names a script file:
+`-s` keeps stdin, a shell's `-` equals `--`, `-o`/`+o`/`-O`/`+O` take a name,
+`--rcfile`/`--init-file` take a file, and `-n` reads without executing
+(POSIX sh OPTIONS/STDIN, bash(1) 5.2 OPTIONS/ARGUMENTS). `ssh` runs stdin in the
+remote login shell when no remote command follows the destination, or when the
+remote command itself reads stdin as source; `-n`, `-f`, `-N`, `-s`, `-W`, `-O`,
+`-G`, `-V` and `-Q` never do ([OpenSSH ssh(1)](https://man.openbsd.org/ssh)).
+Python `-c`/`-m`, Node `-e`/`-p`, and script-file invocations leave their stdin
+as data. Each retained body is analyzed separately so its quoting or shift
+syntax cannot consume later shell commands or data heredocs. The legacy
+`bash_curl_wget` lane uses the same rule. Upstream strips every heredoc.
+Entrypoint references:
+[Python](https://docs.python.org/3.13/using/cmdline.html#interface-options),
+[Node](https://nodejs.org/docs/v24.21.0/api/cli.html#-),
+[POSIX sh](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/sh.html),
+[Deno](https://docs.deno.com/runtime/reference/cli/eval/), and
+[Bun](https://bun.sh/docs/runtime).
+Shell-fed source heredocs retain executed commands. A grep pattern containing
+`fetch(`, a comment, or a heredoc writing a script gives zero confirmed fetches.
+
+`fetch_mentions_unconfirmed` separately counts raw detector matches that the
+executed-text analysis did not confirm, per command/code input: `HTTP_SCRIPT`
+matches anywhere in the raw text, `curl`/`wget` in command position of the raw
+text (a line start, or after `;`, `&`, `|`, `(`, a backtick or `$(`, also behind
+a shell keyword or wrapper as in the legacy lane), and `gh api` at a line start
+or after a separator. An executed-text match confirms a raw match only when it
+traces back to that raw offset; matches the analysis creates (backslash-newline
+joins, unescaping, quoted strings a shell runs) confirm nothing. These are
+possible fetches, including data-only mentions such as a heredoc that writes a
+script, not confirmed operations.
+The count and both shares are reported in `m4` and `m4.by_carrier[carrier]`:
+
+- `routed_share = ctx_fetch_and_index / remote_fetches` uses confirmed fetches.
+- `routed_share_lower_bound = ctx_fetch_and_index / (remote_fetches + fetch_mentions_unconfirmed)`
+  treats every possible fetch as unrouted. **The #381 M4 >= 0.9 gate must read
+  `routed_share_lower_bound`.** Confirmed-only share cannot establish that gate.
+
+For one routed fetch plus either a Python shift-syntax parser miss or a Node
+comment containing an apostrophe before `fetch`, the confirmed share is 1,
+the unconfirmed count is 1, and the lower bound is 0.5. A `curl` in a heredoc
+whose command does not run stdin (`ssh -n host <<'EOF'`, `cat <<'EOF' > run.sh`)
+gives the same values. Dropping a raw detector match from confirmed analysis, or
+confirming a created match in its place, therefore cannot inflate the gate's
+share. Counts are summed before shares are recomputed across actors; shares
+retain the existing four-decimal reporting convention, so the gate should
+compare the integer counts. Any unconfirmed mention leaves M4 status
+`incomplete`; a zero denominator gives null for its respective share.
+
+This is a lower bound against these raw detector patterns, not against every
+possible runtime request. A `curl` inside a quoted string the parser does not
+treat as run (`ssh -o Opt=value host 'curl ...'`, `watch 'curl ...'`), behind
+`xargs`, `find -exec` or an unrecognized wrapper, or passed to a subprocess
+inside interpreter code, is in neither count. Loops, dynamic code, external
+scripts, aliases and nonliteral subprocess arguments still require separate
+observation. The static detector cannot prove the absence of fetches in
+arbitrary code.
+
+`--rtk-check` enables M-R1/M6c in `rtk_parts` on Linux, using **a binary on PATH
+self-reporting `rtk 0.50.0` that passes the five-exclusion probe**, an isolated
+temporary five-exclusion configuration from
+[the adopted recipe](../../../recipes/README.md#native-context-mode-and-hooks),
+and native `rtk hook check --agent claude` on every simple part and whole call.
+No transcript command executes. Sources:
+[native check](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952),
+[lexer](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/lexer.rs#L488-L526),
+[pipeline rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1087-L1345),
+and [consumer rules](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs#L1451-L1494).
+These sources identify the reference implementation. The runtime gate does not
+compare the binary hash with the [qualification receipt](../../../evidence/receipts/rtk-050-qualification-20260925.json)
+and therefore does not establish that the binary is the qualified pinned build.
+The adapter retains every part; upstream's analytics splitter stops at the
+first pipe. Native refusals, exclusions and consumers requiring raw input are
+outside eligibility. Redirection is recognized using the splitter's quote state;
+a quoted `>` is data. The native check decides standalone eligibility, including
+its accepted `2>/dev/null` form. Heredocs/arithmetic
+or unsupported shapes stay unknown. `coverage` and `call_coverage` use observed
+command prefixes/recorded hook rewrites, while `replayed_*` fields describe
+potential routing under the fixed config. Replay never proves execution.
+`explicit_rtk_on_excluded_or_sensitive` is the deterministic zero counter used
+by M-R3 and M6c: the five exclusions, `cd`/`export`/`source`, adopted by-design
+refusals, file-target redirects and raw-input pipelines. Conditional log/find
+forms contribute only to `explicit_rtk_log_find_advisory`, not this zero counter
+or an additional exclusion. Syntax cannot establish complete-history intent or
+path existence ([adopted conditional exceptions](../../../adoption/templates/codex.AGENTS.template.md)).
+The advisory is partitioned into `log_find_permitted_parts`,
+`log_find_requires_raw_parts` and `log_find_unresolved_parts`. Resolve it in the
+same digest-bound sidecar with a witness and `rtk_log_find: [{"part": 1,
+"disposition": "permitted"}]` (or `"requires_raw"`); `part` is the one-based
+position among all command segments. M-R3/M6c's deterministic zero is not full
+exception clearance while advisory parts are unresolved or require raw output.
+These semantic adjudications never change the fixed-config eligible denominator.
+
+Every `rtk proxy` part is counted in `proxy_parts` and excluded from M-R1/M6c's
+eligible population, including an otherwise eligible `git diff --stat`.
+This follows #381's separate acceptance/raw-proxy population. M6 still requires
+acceptance/exception justification; excluding a proxy from coverage does not
+justify it or remove its output from M3.
+A different self-reported version, a non-Linux platform or a failed exclusion
+probe reports `unavailable`; omitted replay is `not_measured`.
+`rtk.not_logged_share` needs the read-only DB join. `measurement.proxy` reports
+acceptance/exception adjudications and unclassified calls for M6.
+
+`usage.messages` deduplicates Claude messages and reports model, effort and
+ordinary input, cache creation, cache read and output separately, with ordinals
+instead of message IDs. Streamed updates use the largest counter total, following
+[ccusage v20.0.24](https://github.com/ccusage/ccusage/blob/v20.0.24/rust/adapters/claude/src/daily.rs#L410-L523).
+Windowed messages subtract their prior snapshot; absent counters remain null.
+`usage.complete` describes accounting, not successful task completion. Failed
+and interrupted attempts still contribute known usage. These numbers cannot be
+added to byte measurements or tool savings estimates.
+
+`hook_context` counts every inserted `hook_additional_context` by event/name,
+separately from stdout claims and marker presence. Stdout alone no longer sets
+the legacy SubagentStart insertion flag. `mcp_states` distinguishes attempts,
+success, failure and unfinished calls; persisted Codex item status supplies state
+when result bytes are absent. `sandbox_operations` counts normalized nested
+code-mode operations, whose results return to code. They contribute M4/RTK/MCP
+state observations but no M3/M5 context bytes or missing-context-result counts.
+The outer exec return is measured once as carrier `code_mode`.
+`loaded_not_called` counts loaded server
+references without an attempted call by that actor. These implement PR-A's
+review controls, but do not supply a rejected/cancelled native-ID reconciliation
+ledger or an E2E acceptance verdict. Synthetic controls run through
+`python3 -m unittest tests.test_token_measurement tests.test_child_usage_suite`.
 
 `--lanes-sweep --root <dir> [--root <dir> ...] --since <ISO> --until <ISO>` aggregates
 the same lanes over every workflow and Agent-tool child transcript under explicit
@@ -213,11 +440,11 @@ Applies to the coordinator and every Workflow/Agent child (project agents and `.
 
 - **One context lane per artifact class.** Known source identifiers: focused `rg`/Serena read. Indexed Markdown: scoped QMD BM25. Unfamiliar or conceptual code: SocratiCode. Prior decisions: ai-memory. Large command output: Context Mode. Choose one lane per artifact; do not chain compressors, and verify original source before editing or judging retrieved text.
 - **Worker packet.** Bounded objective, explicit source paths, allowed effects (no writes except what an acceptance command named in the task itself produces, unless a worktree is owned), and a small return schema with source-cited fields. No word-count instructions; no whole-repository or transcript pastes.
-- **Brief contract (2026-09-27).** Each brief states the objective and why; the owned scope and what each sibling covers, with no overlap; the starting sources and what is already settled or excluded; allowed effects and stop conditions; a bounded output schema with an evidence class per claim; a tool-call budget scaled to the task (about 3-10 calls for a fact, 10-15 per agent in a comparison); and a completion criterion. Its source is the [multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system): "Each subagent needs an objective, an output format, guidance on the tools and sources to use, and clear task boundaries". Name only the one rule a stage needs; never paste session history or CLAUDE.md. The [SubagentStart carrier](../../../docs/decisions/2026-09-27-token-lanes-subagent-start.md) injects the token-lane block into non-blind children, but its native acceptance covers Agent-tool children only, and the [hooks reference](https://code.claude.com/docs/en/hooks#subagentstart) lists Agent-tool spawns, resumes and in-process teammates. Saved-workflow packets and agent bodies therefore keep their lane text until a native Workflow-child run shows the block in a stage's first prompt.
+- **Brief contract (2026-09-27).** Each brief states the objective and why; the owned scope and what each sibling covers, with no overlap; the starting sources and what is already settled or excluded; allowed effects and stop conditions; a bounded output schema with an evidence class per claim; a tool-call budget scaled to the task (about 3-10 calls for a fact, 10-15 per agent in a comparison); and a completion criterion. Its source is the [multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system): "Each subagent needs an objective, an output format, guidance on the tools and sources to use, and clear task boundaries". A writer's brief also tells the writer not to make an existing test or check pass by deleting, skipping, weakening or rewriting it, or by special-casing that test's inputs, unless the brief names that test change; the writer reports a test that looks wrong, with its failing output, instead of working around it (2026-09-28; [prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#avoid-focusing-on-passing-tests-and-hardcoding)). Name only the one rule a stage needs; never paste session history or CLAUDE.md. The [SubagentStart carrier](../../../docs/decisions/2026-09-27-token-lanes-subagent-start.md) injects a token-lane block matched to each non-blind child's role (a named role with a `tools:` allowlist gets only the lanes it grants, `semantic-evidence-reviewer` gets none, other types the full block; [agent-type table](../../../docs/token-session-handbook.md#token-lanes-carried-into-subagents)), but its native acceptance covers Agent-tool children only, and the [hooks reference](https://code.claude.com/docs/en/hooks#subagentstart) lists Agent-tool spawns, resumes and in-process teammates. Saved-workflow packets and agent bodies therefore keep their lane text until a native Workflow-child run shows the block in a stage's first prompt.
 - **Stable policy prefix.** Keep the shared contract text byte-identical across saved workflows (asserted by `test-envelope.mjs`) and vary only the task packet. What the provider was observed to reuse across children is the agent type's system prompt and tool definitions, per model; identical packet text alone has no measured cache effect. Reuse one agent type and model for sibling workers, and preserve deferred tool discovery and compaction. Sibling stages share one prompt-cache prefix only when model, effort, agent type, tools, output schema and working directory all match (official workflows doc, fetched 2026-09-22); keep them identical and leave `CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS` at its 5,000 ms default.
 - **Task-matched models at effort max.** Set model and effort explicitly per stage: Sonnet only for exact extraction, inventories and running named acceptance commands (`source-scout`), Opus for implementation, verification, research, review and judgment (the user's 2026-09-27 rule: never a weaker model for build or verification; Haiku is not routed), and every saved stage and project agent at effort `max` (since 2026-09-23), with the coordinator at xhigh under `ultracode`, because a `max` session turns ultracode's orchestration off. A stage with no `effort` of its own inherits the coordinator's xhigh unless its agent's frontmatter sets one, and a stage's own effort overrides the frontmatter, so every `agent()` call, ad-hoc ones included, passes `effort: 'max'`. Never set `CLAUDE_CODE_EFFORT_LEVEL`: any value overrides every child's frontmatter and stage effort, and any value other than `xhigh` also turns ultracode's orchestration off. These effort rules were probed on Claude Code 2.1.281 on 2026-09-23 (`docs/decisions/2026-09-23-max-effort-default.md` in this catalog). Record requested and resolved child model and effort, and treat nulls, schema retries, stub payloads and substitutions as incomplete results. The routing table below is the default; `test-envelope.mjs` fails a saved workflow or project agent that omits model or effort or binds an effort other than `max`.
 - **Dispatch by role.** Every new or ad-hoc `agent()` stage names the `agentType` of its role in [the role table](#dispatch-by-role-2026-09-26); a stage with `general-purpose` or no `agentType` carries a `// dispatch: <reason>` comment beside the call. The saved scripts keep their reviewed routing, since they are vendored byte-identical (the `readiness-audit` verify stage runs as the default child).
-- **Usage accounting.** Count each client separately: native `/usage`, `claude agents`/`/workflows` journals, `ccusage` offline reports and `ecosystem-token-report refresh`. Never sum RTK, Context Mode, jCodeMunch, Headroom and provider counters, and never state a savings percentage from a fixture. After a Workflow run, `node .claude/workflows/child-usage.mjs <Transcript dir printed by the Workflow tool>` (or `--latest`) returns each child's requested and resolved model, effort, provider-returned usage and first-prompt size, and exits 1 when a child is null, substituted or inherited the coordinator model. An attempt that returned nothing and that the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting agents after the reset) is listed under `superseded_attempts`, not as a lost child, and its usage still counts in `by_resolved_model`. Usage such an attempt holds that cannot be counted (an assistant message without provider usage or without a resolved model, or no transcript at all) is its `usage_issues`, and it leaves the run incomplete.
+- **Usage accounting.** Count each client separately: native `/usage`, `claude agents`/`/workflows` journals, `ccusage` offline reports and `ecosystem-token-report refresh`. Never sum RTK, Context Mode, jCodeMunch, Headroom and provider counters, and never state a savings percentage from a fixture. After a Workflow run, `node .claude/workflows/child-usage.mjs <Transcript dir printed by the Workflow tool>` (or `--latest`) returns each child's requested and resolved model, effort, provider-returned usage and first-prompt size, and exits 1 when a child is null, substituted or inherited the coordinator model. An attempt that returned nothing and that the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting agents after the reset) is listed under `superseded_attempts`, not as a lost child, and its usage still counts in `by_resolved_model`. Usage such an attempt holds that cannot be counted (an assistant message without provider usage or without a resolved model, or no transcript at all) is its `usage_issues`, and it leaves the run incomplete. Advisor usage lies outside these totals (2026-09-28): subagents inherit the configured advisor ([advisor](https://code.claude.com/docs/en/advisor)), the API reports each advisor call as a `usage.iterations[]` entry of type `advisor_message` and keeps top-level usage executor-only ([advisor tool usage](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing)), and `child-usage.mjs` reads only the top-level counters. A count-only scan of one host found 1,018 advisor iterations in 660 of 2,912 subagent transcripts ([receipt](../../../evidence/receipts/claude-advisor-usage-scan-20260928.json)). Take complete session usage from `/usage`, which includes advisor usage, and hold the advisor state equal across comparison arms with `CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` or `/advisor off`.
 - **Cross-family review.** Explicit `/codex:review` or `/codex:adversarial-review --background` at integration points (see `recipes/claude-codex-cooperation-lanes.md`); findings are verified against source, not accepted by agreement.
 - **Opt-in and limits.** The `ultracode` keyword starts a workflow only from a prompt typed in the session; it is inert from `-p`, an unstamped SDK prompt, a scheduled task or a relayed comment, so a headless run invokes a saved workflow by name under a settings source whose permission mode or allow rule (`Workflow` or `Workflow(<name>)`) covers the tool. Scripts take no mid-run user input, no `import()` and no `Date.now()`, `Math.random()` or argless `new Date()` (pass timestamps through `args`; run a stage that needs sign-off as its own workflow); one `parallel()`/`pipeline()` call takes at most 4,096 items and a run at most 1,000 agents.
 - **Failure and replay.** On resume a failed or stopped agent runs again together with every agent started after it, completed ones included, and a run with nothing cached has nothing to resume; native failure, cancel and recovery remain documented but unobserved (open gate in `docs/native-ultracode-20260921.md`).
@@ -232,7 +459,7 @@ Name the role's `agentType` on each stage beside an explicit `model` and `effort
 | --- | --- | --- | --- |
 | scout | `source-scout` | Sonnet, max | exact extraction, inventories and the acceptance commands a task names |
 | researcher | `stack-researcher` | Opus, max | web, documentation, repository and catalog research; pages through `ctx_fetch_and_index`; findings returned inline |
-| builder | `isolated-builder` | Opus, max | a bounded implementation in the owned checkout the coordinator prepared at the exact base and named in the brief |
+| builder | `isolated-builder` | Opus, max | a bounded implementation in the owned checkout the coordinator prepared at the exact base and named in the brief; its handoff runs the three registry test methods `tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed`, `tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified` and `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered` with zizmor on `PATH`, where a skip is not a pass (the same three that `scripts/git-hooks/pre-push` runs on the tip commit of each pushed ref) |
 | reviewer | `evidence-reviewer` | Opus, max | independent review from source and recorded evidence, running no commands |
 | security | `security-reviewer` | Opus, max | adversarial security review from original source, including agent tool grants; security-best-practices preloaded; never fixes or runs acceptance commands |
 | verifier | `stack-verifier` | Opus, max | re-running named commands and deciding claims from their output and source; never fixes |
@@ -261,7 +488,7 @@ Effort column since 2026-09-23: every child role runs at `max` with its task-mat
 | Requirements, decomposition, integration, hard judgments | coordinator | Opus 5.5, xhigh under `ultracode` (a `max` session turns its orchestration off); Fable 5.1 as an explicit escalation | all, one per artifact |
 | Exact extraction, inventory, running acceptance commands | `source-scout` | Sonnet, max | `rg`/focused Read, `qmd search`, `jq` pipelines, RTK-filtered Bash with `rtk proxy` recovery; acceptance commands run raw through `rtk proxy` where `rtk` is installed. Bash is granted, so its read-only rule is an instruction, not a sandbox |
 | Web, documentation, repository and catalog research | `stack-researcher` | Opus, max | WebSearch, then `ctx_fetch_and_index` and `ctx_search`, with no WebFetch (the lane a default child used when told to on 2026-09-21: 1 fetch, 5 searches, 8 requests); Context Mode for large output; `rg`/Read plus Serena and jCodeMunch reads for code; `qmd query`/`get`; ai-memory query; all deferred and returned inline. Bash is granted, so its read-only rule is an instruction |
-| Implementation from a clear contract | `isolated-builder` (coordinator-created worktree) | Opus, max | Edit and Write in the owned checkout the brief names, after checking that it is not the coordinator's own checkout and sits at the stated base (no frontmatter `isolation` since 2026-09-27); named Serena read tools, SocratiCode, jCodeMunch, Context Mode, ai-memory, all deferred. Serena binds the parent session's project at startup, so its symbol-edit tools, removed on 2026-09-26, would edit that checkout rather than the worktree. Preloads `context-mode:context-mode` and `verification-before-completion`; first-prompt size is unmeasured for this configuration |
+| Implementation from a clear contract | `isolated-builder` (coordinator-created worktree) | Opus, max | Edit and Write in the owned checkout the brief names, after checking that it is not the coordinator's own checkout and sits at the stated base (no frontmatter `isolation` since 2026-09-27); named Serena read tools, SocratiCode, jCodeMunch, Context Mode, ai-memory, all deferred. Serena binds the parent session's project at startup, so its symbol-edit tools, removed on 2026-09-26, would edit that checkout rather than the worktree. Preloads `context-mode:context-mode` (its `verification-before-completion` preload was removed on 2026-09-28); first-prompt size is unmeasured for this configuration |
 | Independent review from source and recorded evidence | `evidence-reviewer` | Opus, max | named Serena, SocratiCode, jCodeMunch and ai-memory read tools plus Context Mode `ctx_execute*`, all deferred. No Bash, Edit, Write or symbol-edit tool; `ctx_execute*` can still run commands in the working tree, so file safety there is an instruction, not a sandbox |
 | Adversarial security review of a supplied diff or artifact | `security-reviewer` | Opus, max | Same named read tools as evidence-reviewer behind ToolSearch; `security-best-practices` preloaded. No Bash, Edit, Write, WebFetch or Skill; Context Mode and jCodeMunch read-only use remains an instruction. None yet: first-prompt size, lane use, correctness and cost are preregistered in the [decision record](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md) |
 | Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` | Opus, max | Read, Glob, Grep and the `typesafe-ai` skill preloaded (first prompt 15,059 in the 2026-09-22 probe); no MCP grants, Bash or writes |
@@ -272,3 +499,16 @@ Effort column since 2026-09-23: every child role runs at `max` with its task-mat
 | Cross-family review | `/codex:review` lanes | Codex | see `recipes/claude-codex-cooperation-lanes.md`; usage is not in the Claude journal |
 
 Haiku is not routed. In the same-packet trial the Opus verifier scored the Sonnet/medium inventory 14/14 lane rows and the Haiku inventory 9/14, including a quote attributed to a file that does not contain it; Haiku also ignored the requested effort and used more requests (22 vs 17). Overturn this with a repeat trial in which Haiku returns no unanchored citation on two distinct extraction packets. RTK and ai-memory hooks were observed firing inside workflow children (`rtk hook claude` rewrote child Bash calls). Context Mode's PreToolUse and PostToolUse hooks run for child tool calls too (dated 2026-09-26, Claude Code 2.1.283 with Context Mode 1.0.169 at `6f0cc684`): Claude Code runs plugin hooks inside subagents and adds `agent_id` and `agent_type` to their input ([hooks](https://code.claude.com/docs/en/hooks)). Context Mode then skips, by design, its redirects to `ctx_*` tools (WebFetch, curl or wget, inline HTTP, gradle, mvn and sbt), because a subagent may not have those tools (`hooks/pretooluse.mjs:167-171`, `hooks/core/routing.mjs:28-29, 666-668`; upstream #794 and #834); its guidance and the `ctx_*` security checks still apply (the Bash, Grep and smaller-Read tips once per session, the large-Read tip on every Read over 50,000 bytes; `hooks/core/routing.mjs:121-144, 839-871`). Its routing block is injected only at SessionStart and into an Agent tool call's prompt (`hooks/sessionstart.mjs:49, 166`; `hooks/core/routing.mjs:894-918`), so a Workflow child does not receive it and its Context Mode use depends on the packet and agent text. Child events land in the parent's session store ([session notes](../../../docs/token-session-handbook.md#context-mode-executor-and-session-store)). Repomix, guarded Headroom and TOON stay coordinator-side: workers read focused ranges instead of packed sources, Context Mode already owns large worker output (no chained compressors), and a Workflow script has no filesystem or CLI access to run a TOON conversion on the packets it passes.
+
+## SOTA references (2026-09-27 review)
+
+The [2026-09-27 review](../../../docs/decisions/2026-09-28-community-sweep.md) of 22
+pinned community Claude Code repositories against the primary Claude Code, platform
+and CHANGELOG sources is the reference set behind this README's 2026-09-28 changes:
+the background-wait ceiling in Adopt step 3, the test-integrity clause of the brief
+contract and the advisor note under usage accounting. Its
+[community pins](../../../docs/decisions/2026-09-28-community-sweep.md#community-pins)
+carry full commit SHAs, where stars are discovery metadata and not evidence, and its
+[primary sources](../../../docs/decisions/2026-09-28-community-sweep.md#primary-sources)
+carry read dates. Its keep-but-compare rows name the comparison that would change a
+rule here, such as the effort arms for the child roles.

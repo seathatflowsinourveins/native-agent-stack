@@ -1,0 +1,23 @@
+Review the change on this repository checkout's branch (read-only; do not write, install or change anything).
+The diff origin/main...HEAD is saved at <work>/review/pr1.diff. It leaves out the retained evidence directory
+evidence/artifacts/prompt-audit-20260927/ and the manifests/evidence.json registration; read those in the checkout as
+needed. The change resolves items of a prompt and instruction-file audit; its decision record is
+docs/decisions/2026-09-27-prompt-audit-resolution.md.
+
+Check, against the original files in this checkout and current official documentation:
+1. Behavior. Do the edited facts template text (tools/sota-convergence/landscape-sweep/templates.json, key "facts"),
+   the new and changed tests, the two README edits and the four new anti-pattern log rows state only what the
+   repository and the cited sources support? Would any other file, test, fixture or hash chain contradict or break them?
+2. The pin. Recompute PROMPTS_SHA256_CURRENT yourself: in tools/sota-convergence/landscape-sweep run
+   PYTHONDONTWRITEBYTECODE=1 python3 -c "import build_args, sweep_common; print(sweep_common.prompts_sha256(build_args.fill_build(build_args.load_templates(), '2026-09-26', 32, '2026-09-25')))"
+   and compare it with tests/test_landscape_sweep_harness.py.
+3. The failing controls. Does each new check fail on origin/main and pass on HEAD, as the files under
+   evidence/artifacts/prompt-audit-20260927/controls/ claim? Run what the read-only sandbox allows
+   (for example with PYTHONDONTWRITEBYTECODE=1); otherwise reason from the source and say so.
+4. The decision record. Does each claim, count, hash, quote and line number match the retained files (round1/,
+   adjudication/, decisions.json, usage.json, controls/) and the repository?
+5. Privacy. Is anything private left in the retained evidence: host paths, account or thread identifiers, e-mail
+   addresses, tokens?
+
+Answer with one line per finding: severity (high, medium or low), file:line, the issue, the fix. For a check with no
+finding, say so in one line. Cite a source for every claim about external documentation.

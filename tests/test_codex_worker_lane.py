@@ -2,7 +2,7 @@
 tools/adoption/prove_codex_lane.py.
 
 Evidence classes (docs/acceptance-evidence-policy.md):
-- template and block tests read the repository files only;
+- template and block tests are structural validation: they read the repository files only;
 - the apply, dry-run and rollback tests are synthetic: they drive the script against a fake `codex` written below,
   which speaks the app-server stdio protocol as openai/codex rust-v0.157.1 defines it (no "jsonrpc" field,
   `initialize` then `initialized`, `config/read` with layers and a sha256 version, `config/batchWrite` with
@@ -42,9 +42,9 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0
+# The staged top-rule block (153 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0
 # hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
-TOP_RULE_SHA256 = "476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311"
+TOP_RULE_SHA256 = "ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -207,7 +207,7 @@ class TemplateTests(unittest.TestCase):
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 120)
+        self.assertEqual(len(top.split()), 153)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     def test_exceptions_name_every_raw_sensitive_form(self):
@@ -234,7 +234,12 @@ class TemplateTests(unittest.TestCase):
         # max, the effort of #359's control arm; ultra (the user default) turns on proactive delegation.
         self.assertEqual(profile["model_reasoning_effort"], "max")
         self.assertEqual(profile["web_search"], "live")
-        self.assertLessEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers"})
+        self.assertLessEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers",
+                                            "shell_environment_policy"})
+        # Profile-v2 is a full config layer (config/src/loader/mod.rs at rust-v0.157.1).
+        # Context Hub v0.1.4 cli/src/lib/telemetry.js checks these before loading home-scoped config.
+        self.assertEqual(profile.get("shell_environment_policy"),
+                         {"set": {"CHUB_TELEMETRY": "0", "CHUB_FEEDBACK": "0"}})
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         # Each table only amends a server the user template registers; alone it would be an invalid server.
         self.assertLessEqual(set(profile["mcp_servers"]), set(user["mcp_servers"]))
@@ -256,6 +261,30 @@ class TemplateTests(unittest.TestCase):
             self.assertFalse(set(table["enabled_tools"]) & excluded, name)
         self.assertLessEqual({"ctx_upgrade", "ctx_purge"}, set(profile["mcp_servers"]["context-mode"]["disabled_tools"]))
         self.assertNotIn("default_tools_approval_mode", profile["mcp_servers"]["context-mode"])
+
+    def test_worker_startup_timeouts_layer_over_user_servers(self):
+        # openai/codex rust-v0.157.1: RawMcpServerConfig.startup_timeout_sec in
+        # core/config.schema.json; codex-mcp/src/rmcp_client.rs:103 defaults to 30 s.
+        # config/src/config_layer_source.rs: profile 21 < project 25 < session 30.
+        profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
+        user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        for name in ("serena", "codebase-memory"):
+            with self.subTest(server=name):
+                self.assertIn("command", user["mcp_servers"][name])
+                self.assertEqual(profile["mcp_servers"].get(name), {"startup_timeout_sec": 60})
+
+    def test_project_jcodemunch_approves_only_read_front_door(self):
+        # openai/codex rust-v0.157.1 codex-mcp/src/mcp/mod.rs:89-98 and core/config.schema.json;
+        # jgravelle/jcodemunch-mcp 8f7b34abe16fb459e0bf1c04747d584216dfe32e
+        # src/jcodemunch_mcp/counter.py FRONT_DOOR, server.py:5500-5511 (order defaults read-only).
+        project = tomllib.loads((TEMPLATES / "project.codex.config.template.toml").read_text(encoding="utf-8"))
+        server = project["mcp_servers"]["jcodemunch"]
+        self.assertEqual(server.get("default_tools_approval_mode"), "approve")
+        self.assertEqual(set(server.get("enabled_tools", [])), {"route", "menu", "order"})
+        for name in ("codex.config.template.toml", "codex.stack-worker.config.toml"):
+            with self.subTest(template=name):
+                config = tomllib.loads((TEMPLATES / name).read_text(encoding="utf-8"))
+                self.assertNotIn("jcodemunch", config["mcp_servers"])
 
     def test_owned_edits_stay_on_the_lanes_keys(self):
         live = {"mcp_servers": {"headroom": {"command": "/x/headroom", "env": {"HEADROOM_OFFLINE": "1"}}}}
@@ -1166,6 +1195,36 @@ while True:
                             os.killpg(json.loads(pids.read_text())["group"], signal.SIGKILL)
 
 
+class SandboxProbeControlTests(unittest.TestCase):
+    """Synthetic controls for the local probe, not native Codex acceptance.
+
+    Exercise the sibling sandbox test's availability convention and the command
+    output contract from rust-v0.157.1 cli/src/debug_sandbox.rs without a provider.
+    """
+
+    def test_unavailable_sandbox_skips_after_collecting_all_cases(self):
+        test = CodexIntegrationTests("test_worker_profile_sets_chub_opt_outs_in_an_isolated_home")
+        unavailable = subprocess.CompletedProcess([], 1, "", "sandbox unavailable (synthetic)")
+        with mock.patch.object(CodexIntegrationTests, "isolation", return_value=[]), \
+             mock.patch.object(shutil, "which", return_value="/fixture/bin/codex"), \
+             mock.patch.object(subprocess, "run", return_value=unavailable) as run:
+            with self.assertRaises(unittest.SkipTest):
+                test.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home()
+        self.assertEqual(run.call_count, 6)
+        self.assertTrue(all(call.kwargs["timeout"] == 120 for call in run.call_args_list))
+
+    def test_partial_sandbox_failure_is_not_skipped(self):
+        test = CodexIntegrationTests("test_worker_profile_sets_chub_opt_outs_in_an_isolated_home")
+        started = subprocess.CompletedProcess([], 0,
+            "telemetry=1\nfeedback=1\nbase=kept\nchubdir=unset\nfilter=absent\n", "")
+        failed = subprocess.CompletedProcess([], 1, "", "one sandbox failed (synthetic)")
+        with mock.patch.object(CodexIntegrationTests, "isolation", return_value=[]), \
+             mock.patch.object(shutil, "which", return_value="/fixture/bin/codex"), \
+             mock.patch.object(subprocess, "run", side_effect=[started, failed, started, started, started, started]):
+            with self.assertRaises(AssertionError):
+                test.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home()
+
+
 @unittest.skipUnless(os.environ.get("NAS_CODEX_INTEGRATION") == "1" and shutil.which("codex"),
                      "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.157.1 on PATH to run the real app-server")
 class CodexIntegrationTests(unittest.TestCase):
@@ -1242,6 +1301,50 @@ class CodexIntegrationTests(unittest.TestCase):
         self.assertEqual(runs["filtered"].stdout.split(), ["key=absent", "set=kept"])
         self.assertNotIn("fixture-not-a-key", runs["filtered"].stdout + runs["filtered"].stderr)
 
+    def test_worker_profile_sets_chub_opt_outs_in_an_isolated_home(self):
+        # Profile-v2 shell environment: real output, no provider. Sources at openai/codex rust-v0.157.1:
+        # config/src/loader/mod.rs (profile-v2 layering), cli/src/debug_sandbox.rs (create_env),
+        # protocol/src/shell_environment.rs (set overrides inherited variables).
+        profile = (TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8")
+        probe = ('printf "%s\\n" "telemetry=${CHUB_TELEMETRY:-missing}" '
+                 '"feedback=${CHUB_FEEDBACK:-missing}" "base=${NAS_PROBE_SET:-missing}" '
+                 '"chubdir=${CHUB_DIR:-unset}"; '
+                 'if [ -n "${NAS_PROBE_FILTERED+x}" ]; then echo filter=present; else echo filter=absent; fi')
+        runs = []
+        for chub_dir in (False, True):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                env = self.gateway_home(root, "")  # allowlisted environment; HOME and CODEX_HOME are scratch
+                env.update(CHUB_TELEMETRY="1", CHUB_FEEDBACK="1", NAS_PROBE_FILTERED="fixture")
+                if chub_dir:
+                    env["CHUB_DIR"] = str(root / "separate-chub")
+                    Path(env["CHUB_DIR"]).mkdir()
+                expected_tail = ["base=kept", f"chubdir={env.get('CHUB_DIR', 'unset')}", "filter=absent"]
+                home = Path(env["CODEX_HOME"])
+                base = ('[shell_environment_policy.set]\nNAS_PROBE_SET = "kept"\n'
+                        'CHUB_TELEMETRY = "1"\nCHUB_FEEDBACK = "1"\n'
+                        '[shell_environment_policy.filters]\nNAS_PROBE_FILTERED = "exclude"\n')
+                # Register each amended server; sandbox runs no MCP server or model.
+                for name in tomllib.loads(profile)["mcp_servers"]:
+                    base += f'[mcp_servers."{name}"]\ncommand = "/bin/false"\n'
+                (home / "config.toml").write_text(base, encoding="utf-8")
+                (home / "stack-worker.config.toml").write_text(profile, encoding="utf-8")
+                cases = (("base", [], ["telemetry=1", "feedback=1"]),
+                         ("worker", ["-p", "stack-worker"], ["telemetry=0", "feedback=0"]),
+                         ("override", ["-p", "stack-worker", "-c", 'shell_environment_policy.set.CHUB_TELEMETRY="1"'],
+                          ["telemetry=1", "feedback=0"]))
+                for label, flags, expected in cases:
+                    got = subprocess.run([*self.isolation(root), "codex", *flags, "sandbox", "--", "sh", "-c", probe],
+                                         cwd=root / "cwd", env=env, stdin=subprocess.DEVNULL,
+                                         capture_output=True, text=True, timeout=120)
+                    runs.append((chub_dir, label, got, expected + expected_tail))
+        if all(got.returncode != 0 for _, _, got, _ in runs):
+            self.skipTest(f"codex sandbox cannot run here: {runs[0][2].stderr.strip()[-200:]}")
+        for chub_dir, label, got, expected in runs:
+            with self.subTest(chub_dir_overridden=chub_dir, case=label):
+                self.assertEqual(got.returncode, 0, got.stderr[-400:])
+                self.assertEqual(got.stdout.splitlines(), expected)
+
     def strict_exec(self, root: Path, env: dict, *flags: str, strict: bool = True) -> subprocess.CompletedProcess:
         """`codex [--strict-config] <flags> exec` in a scratch home with stdin closed. At 0.157.1 `codex debug`
         refuses --strict-config ("not supported for `codex debug`"), so exec is the strict read: without the gateway
@@ -1289,7 +1392,7 @@ class CodexIntegrationTests(unittest.TestCase):
         fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
                    "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
                    "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
-                   "EMBED_URL": "127.0.0.1:1"}
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0"}
         base = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -1346,6 +1449,7 @@ class CodexIntegrationTests(unittest.TestCase):
                 f'[features]\ndaemon_auto_start = false\n\n[shell_environment_policy.set]\n'
                 f'PATH = "{host.eco}/bin:/usr/bin:/bin"\n\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n\n'
                 f'[mcp_servers.serena]\ncommand = "{host.eco}/bin/serena"\n\n'
+                '[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n\n'
                 f'[mcp_servers.socraticode]\ncommand = "{host.eco}/bin/node"\nstartup_timeout_sec = 120\n\n'
                 f'[mcp_servers.headroom]\ncommand = "{host.eco}/bin/headroom"\n\n[mcp_servers.headroom.env]\n'
                 'HEADROOM_OFFLINE = "1"\n\n[plugins."context-mode@context-mode"]\nenabled = true\n')
@@ -1377,6 +1481,7 @@ class CodexIntegrationTests(unittest.TestCase):
             (home / ".codex" / "config.toml").write_text(
                 'model_reasoning_effort = "max"\n[mcp_servers.ai-memory]\nurl = "http://127.0.0.1:1/mcp"\n'
                 '[mcp_servers.socraticode]\ncommand = "/bin/false"\n[mcp_servers.headroom]\ncommand = "/bin/false"\n'
+                '[mcp_servers.serena]\ncommand = "/bin/false"\n[mcp_servers.codebase-memory]\ncommand = "/bin/false"\n'
                 f'[mcp_servers.context-mode]\ncommand = "/bin/false"\n[projects."{project}"]\ntrust_level = "trusted"\n')
             (project / ".codex" / "config.toml").write_text('model_reasoning_effort = "ultra"\n')
             subprocess.run(["git", "-C", str(project), "init", "-q"], check=True)

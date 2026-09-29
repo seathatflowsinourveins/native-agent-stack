@@ -35,6 +35,10 @@ FIXTURE_VALUES = {
     "AI_MEMORY_BIN": "/home/example/.local/share/codex-ecosystem/tools/ai-memory-{}/ai-memory".format(next(
         tool["version"] for tool in json.loads((ROOT / "adoption" / "pins-linux-x86_64.json").read_text(
             encoding="utf-8"))["tools"] if tool["id"] == "ai-memory")),
+    # Derived the same way (SocratiCodeVersionTests), spelled out as the Linux pin for the direct substitutions.
+    "SOCRATICODE_VERSION": next(
+        tool["version"] for tool in json.loads((ROOT / "adoption" / "pins-linux-x86_64.json").read_text(
+            encoding="utf-8"))["tools"] if tool["id"] == "socraticode"),
 }
 
 
@@ -78,10 +82,13 @@ class RenderConfigTests(unittest.TestCase):
         # The templates carry the WSL2 workstation's values, so the Linux pins file is the reference.
         pins = {tool["id"]: tool["version"] for tool in
                 json.loads((ROOT / "adoption" / "pins-linux-x86_64.json").read_text(encoding="utf-8"))["tools"]}
+        # SocratiCode's version is a derived placeholder instead, since its Linux and macOS pins differ
+        # (SocratiCodeVersionTests).
         pattern = r"\$\{ECO_ROOT\}/tools/([a-z][a-z0-9-]*?)-([0-9][0-9A-Za-z.]*)/"
         paths = [(name, tool, version) for name in TEMPLATE_NAMES
                  for tool, version in re.findall(pattern, (TEMPLATES / name).read_text(encoding="utf-8"))]
-        self.assertLessEqual({"context-mode", "socraticode"}, {tool for _, tool, _ in paths}, paths)
+        self.assertLessEqual({"context-mode"}, {tool for _, tool, _ in paths}, paths)
+        self.assertNotIn("socraticode", {tool for _, tool, _ in paths}, paths)
         for name, tool, version in paths:
             with self.subTest(template=name, tool=tool):
                 self.assertEqual(version, pins.get(tool))
@@ -452,6 +459,76 @@ class AiMemoryBinTests(unittest.TestCase):
         escape = run("--host", self.host, "--platform", "../hosts/example", "--out", str(out_dir) + "-escape")
         self.assertEqual(escape.returncode, 1)
         self.assertIn("--platform must look like", escape.stderr)
+
+
+class SocratiCodeVersionTests(unittest.TestCase):
+    """PR #446 review R1 (2026-09-28): the Codex user template named tools/socraticode-1.15.0 on every
+    platform, while adoption/pins-macos-arm64.json keeps 1.14.0 and adoption/bootstrap-macos.sh installs
+    tools/<id>-<version> from it, so a Mac render launched a file that does not exist. render_config.py now
+    renders ${SOCRATICODE_VERSION} from the selected platform's pin unless a host supplies it."""
+
+    CODEX = TEMPLATES / "codex.config.template.toml"
+    DIST = "lib/node_modules/socraticode/dist/index.js"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.hosts_dir = ROOT / "adoption" / "hosts"
+        # A host value file without either derived value, as adoption/hosts/example.json is.
+        self.host = "test-fixture-no-socraticode-version"
+        values = {key: value for key, value in FIXTURE_VALUES.items()
+                  if key not in ("AI_MEMORY_BIN", "SOCRATICODE_VERSION")}
+        (self.hosts_dir / f"{self.host}.json").write_text(json.dumps(values, indent=2))
+        self.addCleanup((self.hosts_dir / f"{self.host}.json").unlink, missing_ok=True)
+
+    @staticmethod
+    def pinned(platform_id: str) -> str:
+        tools = json.loads((ROOT / "adoption" / f"pins-{platform_id}.json").read_text(encoding="utf-8"))["tools"]
+        return next(tool["version"] for tool in tools if tool["id"] == "socraticode")
+
+    def socraticode_args(self, out_dir: Path) -> list[str]:
+        import tomllib  # Python 3.11+, as the Codex wiring check already requires
+
+        return tomllib.loads((out_dir / "codex.config.toml").read_text(encoding="utf-8"))[
+            "mcp_servers"]["socraticode"]["args"]
+
+    def test_the_template_names_no_versioned_socraticode_install(self):
+        text = self.CODEX.read_text(encoding="utf-8")
+        self.assertIsNone(re.search(r"tools/socraticode-[0-9]", text))
+        self.assertEqual(text.count("${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/" + self.DIST), 1)
+
+    def test_each_platform_renders_its_own_pinned_install(self):
+        # The two pins differ today (Linux 1.15.0, macOS 1.14.0), so one literal could not match both.
+        self.assertNotEqual(self.pinned("linux-x86_64"), self.pinned("macos-arm64"))
+        platforms = sorted(path.name[len("pins-"):-len(".json")] for path in (ROOT / "adoption").glob("pins-*.json"))
+        self.assertLessEqual({"linux-x86_64", "macos-arm64"}, set(platforms))
+        for platform_id in platforms:
+            with self.subTest(platform=platform_id):
+                out_dir = Path(self.tmp.name) / platform_id
+                result = run("--host", self.host, "--platform", platform_id, "--out", str(out_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                expected = f"{FIXTURE_VALUES['ECO_ROOT']}/tools/socraticode-{self.pinned(platform_id)}/{self.DIST}"
+                self.assertEqual(self.socraticode_args(out_dir), [expected])
+
+    def test_a_host_supplied_version_wins_over_the_pin(self):
+        out_dir = Path(self.tmp.name) / "override"
+        result = run("--host", self.host, "--platform", "macos-arm64",
+                     "--set", "SOCRATICODE_VERSION=9.9.9", "--out", str(out_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.socraticode_args(out_dir),
+                         [f"{FIXTURE_VALUES['ECO_ROOT']}/tools/socraticode-9.9.9/{self.DIST}"])
+
+    def test_a_platform_without_a_pins_file_fails_closed_unless_the_version_is_given(self):
+        out_dir = Path(self.tmp.name) / "unknown"
+        result = run("--host", self.host, "--platform", "linux-aarch64",
+                     "--set", "AI_MEMORY_BIN=/opt/running/ai-memory", "--out", str(out_dir))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("no pins file for platform 'linux-aarch64'", result.stderr)
+        self.assertIn("--set SOCRATICODE_VERSION=", result.stderr)
+        self.assertFalse((out_dir / "codex.config.toml").exists())
+        given = run("--host", self.host, "--platform", "linux-aarch64", "--set", "AI_MEMORY_BIN=/opt/running/ai-memory",
+                    "--set", "SOCRATICODE_VERSION=1.15.0", "--out", str(out_dir))
+        self.assertEqual(given.returncode, 0, given.stderr)
 
 
 class VerifyStdinTests(unittest.TestCase):

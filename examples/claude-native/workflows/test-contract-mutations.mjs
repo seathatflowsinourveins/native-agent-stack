@@ -67,10 +67,12 @@ const MUTATIONS = [
   ['the security reviewer gains Skill invocation', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ToolSearch, ', 'tools: Read, Glob, Grep, Skill, ToolSearch, ', 'security-reviewer tool surface is exactly the reviewed list'],
   ['the security reviewer loses its preload', 'agents/security-reviewer.md', 'skills:\n  - security-best-practices\n', '', 'security-reviewer preloads exactly its reviewed skill'],
   ['the role table sends security to the general reviewer', ROUTING_DOC_FILE, '| security | `security-reviewer` |', '| security | `evidence-reviewer` |', 'the role table maps each dispatch role'],
-  ['the builder loses its preloads', 'agents/isolated-builder.md', 'skills:\n  - context-mode:context-mode\n  - verification-before-completion\n', '', 'isolated-builder preloads exactly its reviewed skills'],
-  ['the builder substitutes a user-invocable-only skill', 'agents/isolated-builder.md', '  - verification-before-completion\n', '  - grill-me\n', 'isolated-builder preloads exactly its reviewed skills'],
+  ['the builder loses its preload', 'agents/isolated-builder.md', 'skills:\n  - context-mode:context-mode\n', '', 'isolated-builder preloads exactly its reviewed skills'],
+  ['the builder substitutes a user-invocable-only skill', 'agents/isolated-builder.md', '  - context-mode:context-mode\n', '  - grill-me\n', 'isolated-builder preloads exactly its reviewed skills'],
+  // Removed from the skills trial on 2026-09-28 (docs/decisions/2026-09-25-skills-trial-and-usage.md); with one
+  // preload left, the former harmless reordering case has nothing to reorder.
+  ['the builder regains the removed skill', 'agents/isolated-builder.md', '  - context-mode:context-mode\n', '  - context-mode:context-mode\n  - verification-before-completion\n', 'isolated-builder preloads exactly its reviewed skills'],
   ['a harmless reordering of the security reviewer tools', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ', 'tools: Glob, Read, Grep, ', null],
-  ['a harmless reordering of the builder preloads', 'agents/isolated-builder.md', '  - context-mode:context-mode\n  - verification-before-completion\n', '  - verification-before-completion\n  - context-mode:context-mode\n', null],
   // Effort max (docs/decisions/2026-09-23-max-effort-default.md): a stage or agent that drops its effort, or binds
   // any level other than max, must fail; a stage without effort would inherit the coordinator's xhigh.
   ['a later stage drops its effort', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus'", 'binds model and effort inside every options literal'],

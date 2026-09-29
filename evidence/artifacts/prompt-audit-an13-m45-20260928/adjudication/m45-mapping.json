@@ -1,0 +1,11 @@
+{
+ "AB": {
+  "A": "claude",
+  "B": "gpt6"
+ },
+ "BA": {
+  "A": "gpt6",
+  "B": "claude"
+ },
+ "normalization": "each return's resolution_text with trailing whitespace removed"
+}

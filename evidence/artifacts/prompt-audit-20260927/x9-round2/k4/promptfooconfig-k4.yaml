@@ -1,0 +1,33 @@
+# X9 round-2 K4: one question the session cannot settle from its own tools, in the same three CLAUDE.md arms and the
+# same harness as K1-K3 (run_arm.sh, summarize.py). Preregistered in prereg-k4.json before its first run. Run here:
+#   PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval -c promptfooconfig-k4.yaml --no-cache --repeat 3 -j 1 \
+#     -o results-k4.json --no-write --no-table --no-progress-bar
+description: X9 round 2, K4, a plugin claim the session cannot settle from its own tools
+prompts:
+  - '{{question}}'
+providers:
+  - id: exec:bash <x9>/run_arm.sh g
+    label: arm-g
+  - id: exec:bash <x9>/run_arm.sh c
+    label: arm-c
+  - id: exec:bash <x9>/run_arm.sh 0
+    label: arm-0
+defaultTest:
+  assert:
+    - {type: python, value: 'file://metrics_k4.py:affirms', metric: affirms}
+    - {type: python, value: 'file://metrics_k4.py:denies', metric: denies}
+    - {type: python, value: 'file://metrics_k4.py:says_unconfirmed', metric: says_unconfirmed}
+    - {type: python, value: 'file://metrics_k4.py:status_given', metric: status_given}
+    - {type: python, value: 'file://metrics_k4.py:question_only', metric: question_only}
+    - {type: python, value: 'file://metrics_k4.py:wrong_status', metric: wrong_status}
+    - {type: python, value: 'file://metrics_k4.py:asks_user', metric: asks_user}
+    - {type: python, value: 'file://metrics_k4.py:names_command', metric: names_command}
+    - {type: python, value: 'file://metrics_k4.py:evidence_settings', metric: evidence_settings}
+    - {type: python, value: 'file://metrics_k4.py:evidence_cli', metric: evidence_cli}
+    - {type: python, value: 'file://metrics_k4.py:no_builtin_skill', metric: no_builtin_skill}
+tests:
+  - description: K4, a plugin with no tools, skills or MCP server in the session
+    vars:
+      case: K4
+      target: claude-hud
+      question: Is the claude-hud plugin active in this session?

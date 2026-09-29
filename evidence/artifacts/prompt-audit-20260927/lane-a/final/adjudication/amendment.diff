@@ -1,0 +1,84 @@
+diff --git a/adoption/templates/codex.AGENTS.template.md b/adoption/templates/codex.AGENTS.template.md
+index f87a0420..a77fd688 100644
+--- a/adoption/templates/codex.AGENTS.template.md
++++ b/adoption/templates/codex.AGENTS.template.md
+@@ -1,6 +1,6 @@
+ <!-- native-agent-stack:codex-user-instructions:begin (adoption/templates/codex.AGENTS.template.md) -->
+ <!-- native-agent-stack:top-rule -->
+-Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.
++Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.
+ Reuse maintained upstream tools, runtimes and orchestration patterns through their supported install and test commands, naming each source (repository and pin, file or paper); with none, stop and report.
+ Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs. Absence claims need the first two, else say "not found in X, Y".
+ Worker, docs-agent and cross-family answers are leads; relay claims only with upstream citations.
+diff --git a/examples/claude-native/CLAUDE.md b/examples/claude-native/CLAUDE.md
+index 8819b8a5..ae1b420d 100644
+--- a/examples/claude-native/CLAUDE.md
++++ b/examples/claude-native/CLAUDE.md
+@@ -1,6 +1,6 @@
+ # Native engineering defaults
+ 
+-**Top rule: research first, and never self-write without a SOTA source.** Upstream and the installed client are the source of truth.
++**Top rule: research convergence first; current upstream SOTA is the source of truth.** The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.
+ 
+ 1. Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job, with their supported install and test commands, and name each source (repository and pin, file or paper). Judge candidates head-to-head on measured quality, security and maintenance; license, stars, installs and incumbency are not criteria. With no SOTA source, stop and report.
+ 2. Check capability claims in order: installed client (commands, `--help`, settings), upstream changelog or release notes for that version (`gh api`), upstream source at that tag, official docs. An absence claim needs at least the first two, else write "not found in X, Y".
+diff --git a/manifests/evidence.json b/manifests/evidence.json
+index 065bddd7..b6ba741b 100644
+--- a/manifests/evidence.json
++++ b/manifests/evidence.json
+@@ -3747,8 +3747,8 @@
+     },
+     {
+       "path": "adoption/templates/codex.AGENTS.template.md",
+-      "sha256": "7ce4fbc38f1994746c21d7dc5b9d9367d6c7c3b02ee4d725ea859e54ab93f313",
+-      "bytes": 3151
++      "sha256": "dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3",
++      "bytes": 3371
+     },
+     {
+       "path": "adoption/templates/codex.config.template.toml",
+@@ -38708,8 +38708,8 @@
+     },
+     {
+       "path": "examples/claude-native/CLAUDE.md",
+-      "sha256": "bd9cd167681b637aed3ea4d70c07e561ea64a30862c07a6bc3a06565f9426dd0",
+-      "bytes": 8480
++      "sha256": "a31b3551bb9be77f91a3ff841768bb30ef90d61a9870a657044df3b4e98f663a",
++      "bytes": 8680
+     },
+     {
+       "path": "examples/claude-native/agents/blind-adjudicator.md",
+@@ -39823,7 +39823,7 @@
+     },
+     {
+       "path": "tests/test_codex_worker_lane.py",
+-      "sha256": "3338942353fbcf0464e2437969c81da6d3e8a02baee87fdba07fc98fcd5d3cbf",
++      "sha256": "b00f272b2167ea269fe0134657bcbb51b4ac78c03b91e6ecc4ccc2baaba1d1dd",
+       "bytes": 95109
+     },
+     {
+diff --git a/tests/test_codex_worker_lane.py b/tests/test_codex_worker_lane.py
+index 3b4e2ac7..7b0d0935 100644
+--- a/tests/test_codex_worker_lane.py
++++ b/tests/test_codex_worker_lane.py
+@@ -42,9 +42,9 @@ from scripts import adoption_status  # noqa: E402
+ 
+ TEMPLATES = ROOT / "adoption" / "templates"
+ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
+-# The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0
++# The staged top-rule block (153 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0
+ # hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
+-TOP_RULE_SHA256 = "476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311"
++TOP_RULE_SHA256 = "ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d"
+ RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
+ UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
+ 
+@@ -207,7 +207,7 @@ class TemplateTests(unittest.TestCase):
+     def test_top_rule_and_upstream_text_are_verbatim(self):
+         top, upstream, _ = template_segments()
+         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
+-        self.assertEqual(len(top.split()), 120)
++        self.assertEqual(len(top.split()), 153)
+         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
+ 
+     def test_exceptions_name_every_raw_sensitive_form(self):
