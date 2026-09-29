@@ -1192,15 +1192,31 @@ const SHELLS = new Set(['sh', 'bash', 'dash', 'zsh', 'ksh'])
 // the shells, eval, ssh and rtk. Any other program (a host, an id, a package, a script) reads null however name-shaped it is.
 const PROGRAM_NAMES = new Set([...LANE_EXECUTABLES.keys(), ...WRAPPER_OPTIONS.keys(), 'env', 'rtk', 'eval', 'ssh', ...SHELLS])
 const programName = (name) => PROGRAM_NAMES.has(name) ? name : null
+// The children of a node in source order with each one's field name. node.child(i) and node.fieldNameForChild(i) cost O(i) per call in
+// web-tree-sitter 0.27.0, so a loop over a wide node (a flat run of statements, comments or unclosed constructs is one) is quadratic; a cursor
+// step is O(1) but a cursor costs more than a few index calls, so a narrow node (the usual one) is read by index. Every loop over a node's
+// children below goes through this.
+const NARROW = 16
+function childrenOf(node) {
+  const out = [], count = node.childCount
+  if (count <= NARROW) {
+    for (let i = 0; i < count; i++) out.push({ node: node.child(i), field: node.fieldNameForChild(i) })
+    return out
+  }
+  const cursor = node.walk()
+  try {
+    if (cursor.gotoFirstChild()) do out.push({ node: cursor.currentNode, field: cursor.currentFieldName }); while (cursor.gotoNextSibling())
+  } finally { cursor.delete() }
+  return out
+}
 // The arguments a here-document operator carries after its delimiter, without the words of its body that tree-sitter-bash 0.25.1 puts among
 // them when the first body line begins with a backslash: that line starts with the newline (a word that starts on a new line, and every
 // argument after it, is body text).
 function operatorArguments(r) {
   const words = []
   let body = false
-  for (let i = 0; i < r.childCount; i++) {
-    if (r.fieldNameForChild(i) !== 'argument') continue
-    const child = r.child(i)
+  for (const { node: child, field } of childrenOf(r)) {
+    if (field !== 'argument') continue
     body ||= startsLine(child.text)
     if (!body) words.push(child)
   }
@@ -1222,16 +1238,17 @@ function commandSegments(node, src, fields, extra = [], folded = []) {
   const segment = (pos) => ({ pos, words: [], herestrings: [], end: -1 }) // end: where the last word of the segment ends
   const segments = [segment(node.startIndex)]
   let prev = null
-  for (let i = 0; i < node.childCount; i++) {
-    const child = node.child(i)
+  const kids = childrenOf(node)
+  for (let i = 0; i < kids.length; i++) {
+    const child = kids[i].node
     if (child.type === 'ERROR') { if (SEPARATOR_TOKENS.has(child.text.trim())) segments.push(segment(child.endIndex)); prev = null; continue }
     if (prev && (!continues(src.slice(prev.endIndex, child.startIndex)) || startsLine(child.text))) segments.push(segment(child.startIndex))
     prev = child
     if (child.type === 'herestring_redirect') segments[segments.length - 1].herestrings.push(child) // a here-string belongs to the command it follows
-    const field = node.fieldNameForChild(i)
+    const field = kids[i].field
     // A name glued to the assignment before it, with no blank between, is the tail of that assignment's word that the grammar cut off
     // (`a=$x/$y-$z`: tree-sitter-bash 0.25.1 ends the value at the second `$`); the words after it are then the command's own.
-    if (field === 'name' && i > 0 && node.child(i - 1).type === 'variable_assignment' && node.child(i - 1).endIndex === child.startIndex) continue
+    if (field === 'name' && i > 0 && kids[i - 1].node.type === 'variable_assignment' && kids[i - 1].node.endIndex === child.startIndex) continue
     const add = (word) => {
       const seg = segments[segments.length - 1], words = seg.words
       if (seg.end === child.startIndex && words.length) {
@@ -1476,11 +1493,14 @@ function heredocWord(text) {
 // The delimiter of the first here-document (in source order) that has no delimiter line, or null. One at a time: while a heredoc is open the
 // grammar may read a later body line as a second operator, which is only body text once the first is closed.
 function missingDelimiter(root) {
-  const stack = [root]
+  const stack = [{ node: root, closesAt: -1 }] // closesAt: where the last non-empty delimiter line among the node's siblings starts
   while (stack.length) {
-    const node = stack.pop()
-    if (node.type === 'heredoc_start' && !node.parent?.children.some((c) => c.type === 'heredoc_end' && c.endIndex > c.startIndex && c.startIndex > node.startIndex)) return heredocWord(node.text)
-    for (let i = node.childCount - 1; i >= 0; i--) stack.push(node.child(i))
+    const { node, closesAt } = stack.pop()
+    if (node.type === 'heredoc_start' && !(closesAt > node.startIndex)) return heredocWord(node.text)
+    const kids = childrenOf(node)
+    let last = -1
+    for (const { node: c } of kids) if (c.type === 'heredoc_end' && c.endIndex > c.startIndex && c.startIndex > last) last = c.startIndex
+    for (let i = kids.length - 1; i >= 0; i--) stack.push({ node: kids[i].node, closesAt: last })
   }
   return null
 }
@@ -1581,13 +1601,13 @@ function walkTree(root, src, cx) {
       entries.push({ pos: segments[k].pos, records })
     }
   }
-  const stack = [root]
+  const stack = [{ node: root, parentType: null }] // the parent's type is carried: node.parent costs O(depth)
   while (stack.length) {
-    const node = stack.pop(), type = node.type
+    const { node, parentType } = stack.pop(), type = node.type
     if (type === 'ERROR' || type === 'comment' || type === 'heredoc_body' || type === 'heredoc_start' || type === 'heredoc_end') continue
     if (type === '&') { cx.acc.async = true; continue }
     if (COUNTED.has(type)) cx.acc.simple++
-    else if (type === 'variable_assignment' && STATEMENT_PARENTS.has(node.parent?.type)) cx.acc.simple++
+    else if (type === 'variable_assignment' && STATEMENT_PARENTS.has(parentType)) cx.acc.simple++
     else if (type === 'compound_statement' && node.child(0)?.type === '((') cx.acc.simple++
     if (type === 'command_substitution' && node.child(0)?.type === '`') {
       // A backquoted body is unescaped before the shell parses it (POSIX.1-2024 XCU 2.6.3, bash(1) Command Substitution): a backslash before
@@ -1609,15 +1629,15 @@ function walkTree(root, src, cx) {
     } else if (type === 'heredoc_redirect') {
       // The operator line's own children are walked; the body is handled with its owner (here: none, so its substitutions only).
       if (!claimed.has(node.id)) { const records = []; feed(node, null, records, false); entries.push({ pos: node.startIndex, records }) }
-      const kept = new Set(operatorArguments(node).words.map((w) => w.id))
-      for (let i = node.childCount - 1; i >= 0; i--) {
-        const child = node.child(i)
-        if (node.fieldNameForChild(i) === 'argument' && !kept.has(child.id)) continue // body text the grammar put here
-        stack.push(child)
+      const kept = new Set(operatorArguments(node).words.map((w) => w.id)), kids = childrenOf(node)
+      for (let i = kids.length - 1; i >= 0; i--) {
+        if (kids[i].field === 'argument' && !kept.has(kids[i].node.id)) continue // body text the grammar put here
+        stack.push({ node: kids[i].node, parentType: type })
       }
       continue
     }
-    for (let i = node.childCount - 1; i >= 0; i--) stack.push(node.child(i))
+    const kids = childrenOf(node)
+    for (let i = kids.length - 1; i >= 0; i--) stack.push({ node: kids[i].node, parentType: type })
   }
   entries.sort((a, b) => a.pos - b.pos)
   for (const e of entries) for (const r of e.records) cx.records.push(r)

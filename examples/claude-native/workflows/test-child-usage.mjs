@@ -505,6 +505,18 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['cat <<EOF\n$(qmd get a)\nEOF', ['-/-', 'qmd/qmd']], ['qmd search x 2>&1 >/dev/null | head -n 5', ['qmd/qmd', '-/-']],
     ['echo $(date) qmd', ['-/-', '-/-']], ['cat <(qmd get a)', ['-/-', 'qmd/qmd']],
   ])
+  // childrenOf reads a node of more than 16 children with a cursor and a narrower one by index (node.child(i) is O(i) in web-tree-sitter
+  // 0.27.0); the two must read alike, so each text below has a node wide enough for the cursor (a command's words, its assignment prefixes,
+  // a list, the branches of a case, a run of comments, and the arguments a heredoc operator carries).
+  const many = (n, f) => Array.from({ length: n }, (_, i) => f(i)), plain = (n) => many(n, () => '-/-')
+  check('cli lanes: a node of many children (read with a cursor) reads like a narrow one', [
+    ['echo ' + many(40, (i) => 'w' + i).join(' ') + '; qmd status', ['-/-', 'qmd/qmd']],
+    [many(30, (i) => 'A' + i + '=1').join(' ') + ' qmd status', qmd],
+    [many(40, (i) => 'x' + i).join('; ') + '; qmd status', [...plain(40), 'qmd/qmd']],
+    ['case x in ' + many(30, (i) => 'a' + i + ') :;; ').join('') + 'b) qmd status;; esac', [...plain(30), 'qmd/qmd']],
+    [many(20, (i) => '# c' + i).join('\n') + '\nqmd status', qmd],
+    ['bash <<E' + ' -e'.repeat(20) + '\nqmd status\nE', ['-/bash', 'qmd/qmd']],
+  ])
   check('cli lanes: rtk proxy after global options, its own options and an optional --; one spaced argument is split and no shell runs it', [
     ['rtk proxy qmd search x', [proxy, 'qmd/qmd']], ["rtk proxy 'qmd search x'", [proxy, 'qmd/qmd']], ['rtk --ultra-compact proxy pytest', [proxy, '-/-']],
     ['rtk -v proxy pytest', [proxy, '-/-']], ['rtk -vv --skip-env proxy pytest', [proxy, '-/-']], ['rtk proxy -- qmd status', [proxy, 'qmd/qmd']],
