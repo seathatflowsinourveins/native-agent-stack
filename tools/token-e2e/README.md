@@ -178,6 +178,9 @@ four items as `missing` with reason `skipped`.
   unit's `Environment`; a build id kept only in a unit's environment is not captured.
 - `shell-parser.pin.json` ships with U1, so `tools.parser.*` are `missing` on a checkout that predates it, and the seal
   then freezes that absence.
+- `unifiedWindows` in the `rate_limit_event` (the five-hour and seven-day windows) is observed on claude 2.1.284, not
+  documented: a client update may drop it, and the four Claude capacity items then read `missing`. The Agent SDK reference
+  documents only the single-window fields `status`, `resets_at`, `rate_limit_type` and `utilization`.
 - Only the first configuration flag of a unit's `ExecStart` is hashed. A unit that reads its configuration from an
   environment variable or from arguments the flags above do not name reports `not_applicable`.
 - macOS: `services.*` and the memory item report `not_applicable`; the other items are unverified there because no macOS
@@ -194,18 +197,37 @@ TMPDIR=<private dir> python3 -B -m unittest tests.test_freeze_snapshot
 The suite builds a temporary host (a git checkout, a home directory, fake `claude`, `codex`, `rtk`, `node`, `python3`,
 `qmd`, `systemctl` and `git` on a private `PATH`, canned repo scripts and a loopback HTTP server) whose canned outputs
 copy the shapes read from the real commands on 2026-09-29. `MutationControlTests` writes a mutant of the tool for each
-property (an environment leak with and without the guard, a collector blind to each item class, informational drift that
-fails, a check that always passes, credential refusal off, a missing tool that raises) and requires the test for that
-property to fail on it. `FREEZE_SNAPSHOT_TOOL` points the suite at another copy of the tool and `FREEZE_MUTANT_DIR` keeps
+property (an environment leak with and without the guard, a variant that prints `os.environ`, a collector blind to each
+item class, informational drift that fails, a check that always passes, credential refusal off, a missing tool that
+raises) and requires the test for that property to fail on it. `FREEZE_SNAPSHOT_TOOL` points the suite at another copy of the tool and `FREEZE_MUTANT_DIR` keeps
 the mutants and each one's exit code and failing assertion.
 
 ## Sources
 
-There is no upstream implementation of this glue. The rules follow the #381
-[README "Procedure"](../../evidence/artifacts/token-adoption-e2e-20260926/README.md) and
-[RUNBOOK freeze rules](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md) in this repository;
-[`systemctl show`](https://www.freedesktop.org/software/systemd/man/255/systemctl.html) (systemd 255: "To select
-specific properties to show, use `--property=`. This command is intended to be used whenever computer-parsable output is
-required"); [git](https://git-scm.com/docs/git) `--no-optional-locks` ("Do not perform optional operations that require
-locks") and [git-status](https://git-scm.com/docs/git-status) `--porcelain --untracked-files=no`; and the tools' own
-`--version` outputs and `--json` reports, whose shapes the tests record.
+There is no upstream implementation of this glue. The closest maintained tools were checked on 2026-09-29 and not
+adopted: osquery (`specs/linux/systemd_units.table` has no `MainPID` or `NRestarts` column and `specs/hash.table` covers
+files, and it needs the osquery binary), AIDE (a file-integrity hash database) and Ansible or InSpec (frameworks that check
+declared state). None reads `claude`, `codex` or `qmd`, derives values from a settings file, digests a gateway answer or
+carries the redaction rules above. Each rule follows its own source:
+
+- The #381 [README "Procedure"](../../evidence/artifacts/token-adoption-e2e-20260926/README.md) and
+  [RUNBOOK freeze rules](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md) in this repository: the frozen
+  list and the rule that nothing changes while a run window is open.
+- [`systemctl show`](https://www.freedesktop.org/software/systemd/man/255/systemctl.html) (systemd 255: "To select
+  specific properties to show, use `--property=`. This command is intended to be used whenever computer-parsable output
+  is required"), and the configuration flag each default unit's own binary lists in its `--help` (otelcol `--config`,
+  Loki `-config.file`, Prometheus `--config.file`, Grafana `server --config`), read on 2026-09-29.
+- [git](https://git-scm.com/docs/git) `--no-optional-locks` ("Do not perform optional operations that require locks") and
+  [git-status](https://git-scm.com/docs/git-status) `--porcelain --untracked-files=no`.
+- The [Claude Code CLI reference](https://code.claude.com/docs/en/cli-reference) for the probe flags: `--no-session-persistence`
+  ("Disable session persistence so sessions are not saved to disk and cannot be resumed. Print mode only") and
+  `--setting-sources` ("Comma-separated list of setting sources to load (user, project, local)"), with `--output-format`,
+  `--verbose` and `--model`.
+- [proc_meminfo(5)](https://man7.org/linux/man-pages/man5/proc_meminfo.5.html): `MemAvailable` ("An estimate of how much
+  memory is available for starting new applications, without swapping").
+- Output shapes read on 2026-09-29 and kept as fixtures in `tests/test_freeze_snapshot.py`: `claude mcp list` and
+  `claude -p ... --output-format json` (claude 2.1.284), `qmd status` (qmd 2.8.3, whose `Documents` block prints the
+  Orphaned and Pending lines only above zero), `scripts/adoption_status.py --client-wiring --json`,
+  `--pinned-versions --json` and `scripts/codex_quota.py --json` (this repository), and the tools' `--version` lines.
+  `claude mcp list` has no documented machine-readable form, and the Agent SDK reference documents `RateLimitInfo` without
+  `unifiedWindows`, so both shapes are observed, not specified.
