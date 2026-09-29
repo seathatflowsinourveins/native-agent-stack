@@ -1076,6 +1076,8 @@ CODEX_COUNTERS = ("input_tokens", "cached_input_tokens", "cache_write_input_toke
 # can lack it (binding correction 4 of the U3 build): its value is then null, never 0, and its absence is no usage gap.
 OPTIONAL_CODEX_COUNTERS = ("cache_write_input_tokens",)
 MEASUREMENT_MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
+# The kernel's rtkAgent for Codex replay (PR-A U3 10d): rtk-ai/rtk v0.50.0 InProcess(Host::Codex), src/hooks/decision.rs:196-204.
+CODEX_RTK_AGENT = "codex"
 # Codex tools whose command the bridge reads as a Bash call (a local_shell_call is one as well).
 CODEX_SHELL_TOOLS = ("exec_command", "shell_command", "shell")
 # The unified exec response header of openai/codex rust-v0.157.1 (36650394) core/src/tools/context.rs:524-548:
@@ -1547,17 +1549,22 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
             code_mode_counts["legacy_unobservable_sites"] += sites
     window = {"since": since.timestamp() * 1000 if since else -8640000000000000,
               "until": until.timestamp() * 1000 if until else 8640000000000000}
+    # PR-A U3 10d: replay asks rtk what the held Codex hook would decide (`rtk hook check --agent codex`, which no Claude
+    # permission rule reaches), and the kernel adds rtk_parts.d7 for it.
     measured = _measurement_bridge({"rows": normalized, "options": {
-        "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}}})
+        "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}, "rtkAgent": CODEX_RTK_AGENT}})
     # Claude per-message fields are inapplicable to Codex cumulative native counters.
     measured.pop("usage", None)
+    measured["rtk_parts"]["agent"] = CODEX_RTK_AGENT
     unresolved = commands["non_posix_shell"] + commands["unknown_shell"]
     if unresolved:
         # An unresolved command's fetches cannot be read, so M4 cannot be measured or not_applicable (the U3 review; m4_unread
-        # below), and replay read its text '' (rtk 0.50.0 answers "No rewrite for:": no parts), so each is an explicit unknown call.
+        # below), and replay read its text '' (rtk 0.50.0 answers "No rewrite for:" for either agent: no parts), so each is an
+        # explicit unknown call, which leaves d7 incomplete as well.
         if measured["rtk_parts"]["status"] in ("measured", "incomplete"):
             measured["rtk_parts"]["unknown_calls"] += unresolved
             measured["rtk_parts"]["status"] = "incomplete"
+            measured["rtk_parts"]["d7"]["status"] = "incomplete"
     measured["codex_commands"] = commands
     measured["code_mode"] = code_mode_counts
     if m4_unread(commands, code_mode_counts):
@@ -1866,6 +1873,7 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
     if measurements:
         out["measurement"] = _measurement_bridge(measurements, aggregate=True)
         out["measurement"].pop("usage", None)
+        out["measurement"]["rtk_parts"]["agent"] = CODEX_RTK_AGENT
         out["measurement"]["provider_usage"] = {
             "complete": all(m["provider_usage"]["complete"] for m in measurements),
             "totals": {key: (sum(m["provider_usage"]["totals"][key] for m in measurements)
@@ -2067,7 +2075,7 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
             "window": {"since": since.isoformat() if since else None,
                        "until": until.isoformat() if until else None},
             "marker": marker, **scan, "limits": "Legacy lane fields: " + LANES_LIMITS
-            + " PR-A measurement fields use the shared child-usage.mjs kernel and own persisted response_item outputs, with item_completed fallback. Native cumulative provider_usage is separate from Claude per-message counters and from byte measurements. --rtk-check enables fixed-config eligibility replay. Missing usage, output and dynamic fetch evidence cannot establish acceptance; see README.md."
+            + " PR-A measurement fields use the shared child-usage.mjs kernel and own persisted response_item outputs, with item_completed fallback. Native cumulative provider_usage is separate from Claude per-message counters and from byte measurements. --rtk-check enables fixed-config eligibility replay, asked as the held Codex hook would decide (rtk hook check --agent codex, rtk_parts.agent), with the Codex-only D7 view rtk_parts.d7 (reviewed requires_raw log/find parts left out, unreviewed ones leaving it incomplete). Missing usage, output and dynamic fetch evidence cannot establish acceptance; see README.md."
             + " The PR-A measurement reads a Codex shell call by the shell that ran it: an argv's program (a POSIX shell's -c"
             " script, any other program's argv as one command) and exec_command's cmd in the shell its shell argument names, as"
             " Codex types it. A command run by pwsh, powershell or cmd, or by a shell the rollout does not name, is unresolved"

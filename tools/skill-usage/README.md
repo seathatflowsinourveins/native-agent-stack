@@ -430,14 +430,37 @@ self-reporting `rtk 0.50.0` that passes the isolated five-exclusion probe.
 This checks behavior, not build identity or the qualification receipt's hash.
 `--exceptions` shares the private digest-bound adjudication contract, including
 validation of every supplied review class.
-For Codex, observed coverage comes from explicit prefixes; the replay fields
-are hypothetical Claude-hook routing, never evidence a Codex hook ran.
+For Codex, observed coverage comes from explicit prefixes, since the Codex hook is held. The replay
+asks `rtk hook check --agent codex` (U3 design section 5, commit 9; `rtk_parts.agent` says so): the
+decision the held Codex hook would make, never evidence that one ran. rtk-ai/rtk v0.50.0 maps `codex`
+to `InProcess(Host::Codex)`, which has no RTK-side permission rules, while `claude` merges the Bash
+rules of the project's and the home's `.claude/settings(.local).json`
+([decision.rs:196-204](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/decision.rs#L196-L204),
+[permissions.rs:56-67, :141-175](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/permissions.rs#L141-L175)).
+Before commit 9 the Codex lane replayed with `--agent claude`, so a Claude deny rule of the machine
+running the tool turned a Codex part into an unknown call. The rewrite decision is the same for both
+agents ([decision.rs:61-97](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/decision.rs#L61-L97)).
 Add these flags to the existing `--lanes` command when measuring M6c.
 M6c reads the deterministic `explicit_rtk_on_excluded_or_sensitive` zero counter;
 conditional log/find forms stay in the separate advisory counters and require
 the shared per-part `rtk_log_find` sidecar review described in the kernel docs.
 Proxy parts stay outside the coverage denominator. `sidecar_records` reports
 bound/unbound digest counts across measured rollouts without publishing records.
+
+`rtk_parts.d7` is the Codex-only view of D7's RTK-eligible class, computed by the kernel for Codex replay:
+
+- It starts from the fixed-config eligible parts and drops each `git log` or `find` part that a digest-bound
+  `rtk_log_find` review marks `requires_raw`, prefixed or not.
+- An unreviewed `log` or `find` part stays and leaves `d7.status` incomplete, as does an unknown call.
+  An unresolved command is an unknown call.
+- `covered_parts` are observed, from explicit prefixes.
+- `wrapped_exceptions` inherits the fixed-config `explicit_rtk_on_excluded_or_sensitive` (M6c's zero counter,
+  whose classes are broader than the deployed exception list, the review's provenance finding) and adds
+  `wrapped_requires_raw_parts`, the prefixed parts a review says required raw output.
+- The deployed list in `adoption/templates/codex.AGENTS.template.md` names `git log` and `find` as conditional
+  exceptions. The unconditional ones (`git show REV:path`, `diff`, `git branch`, `jq`, and `rtk` before
+  `cd`, `export` or `source`) are already ineligible under the five exclusions, or have no rewrite.
+- The fixed-config fields keep their meaning. Which of the two views M6c grades from is the M6c owner's call.
 
 `measurement.provider_usage` differences cumulative `token_count` counters
 per rollout and attempt, using inherited/pre-window snapshots only as a

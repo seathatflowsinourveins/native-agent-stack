@@ -1633,7 +1633,7 @@ class TokenMeasurement(unittest.TestCase):
             self.assertEqual((codex["eligible_parts"], codex["unknown_calls"], codex["status"]), (1, 0, "measured"))
             rows = [call(str(i), "Bash", command=command) for i, command in enumerate([
                 "git log -3 && gh pr view 1 | head -n 5", "rtk git log -3", "rtk cd x && ls -la", "rtk proxy git diff --stat",
-                "git status > out.txt", "rtk jq . a.json", "find . -name x"])]
+                "ls > out.txt", "rtk jq . a.json", "find . -name x"])]  # none of them is the denied git status
             claude = self.measure(rows, env=env, cwd=cwd, rtkCheck=True)["rtk_parts"]
             codex = self.measure(rows, env=env, cwd=cwd, rtkCheck=True, rtkAgent="codex")["rtk_parts"]
             self.assertIn("d7", codex)
