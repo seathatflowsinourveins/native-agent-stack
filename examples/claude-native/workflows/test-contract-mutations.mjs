@@ -74,8 +74,9 @@ const MUTATIONS = [
   ['the builder regains the removed skill', 'agents/isolated-builder.md', '  - context-mode:context-mode\n', '  - context-mode:context-mode\n  - verification-before-completion\n', 'isolated-builder preloads exactly its reviewed skills'],
   ['a harmless reordering of the security reviewer tools', 'agents/security-reviewer.md', 'tools: Read, Glob, Grep, ', 'tools: Glob, Read, Grep, ', null],
   // Effort max (docs/decisions/2026-09-23-max-effort-default.md): a stage or agent that drops its effort, or binds
-  // any level other than max, must fail; a stage without effort would run at its model's saved level or default (2.1.284;
-  // on 2.1.281 it inherited the coordinator's xhigh).
+  // any level other than max, must fail; a stage without effort would run at its agent's frontmatter effort, else at
+  // its model's saved level or default in a headless 2.1.284 session (the session's level when interactive; on 2.1.281 the
+  // coordinator's xhigh).
   ['a later stage drops its effort', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus'", 'binds model and effort inside every options literal'],
   ['a default-child stage drops its effort', 'workflows/readiness-audit.js', "schema: VERIFY, model: 'opus', effort: 'max'", "schema: VERIFY, model: 'opus'", 'binds model and effort inside every options literal'],
   ['a review stage runs at effort high', 'workflows/review-changes.js', "agentType: 'evidence-reviewer', model: 'opus', effort: 'max'", "agentType: 'evidence-reviewer', model: 'opus', effort: 'high'", 'binds effort max in every options literal'],

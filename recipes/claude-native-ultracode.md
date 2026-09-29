@@ -171,8 +171,7 @@ Claude Code 2.1.284 made `sonnet` Sonnet 5.5. The
 [workflows README](../examples/claude-native/workflows/README.md#sonnet-55-fan-out-units-and-the-default-child-model-2026-09-29)
 lists the units that may run on it (fan-out whose output an executable oracle or an Opus stage checks) and keeps every judgment on
 Opus. Native probes on 2.1.284 ([receipt](../evidence/receipts/claude-model-effort-probes-20260929.json)) measured that Ultracode
-neither raises nor overrides effort, so a Sonnet 5.5 session ran at medium until a saved level was added, and that a stage naming no
-model runs the lead's; the portable settings file above therefore carries `effortLevel: xhigh` and
+neither raises nor overrides effort, so a Sonnet 5.5 session ran at medium until a saved level was added, and that a stage naming no model, with no definition model and no `CLAUDE_CODE_SUBAGENT_MODEL`, runs the lead's (the documented order is the definition's model, then that variable, then the lead's); the portable settings file above therefore carries `effortLevel: xhigh` and
 `CLAUDE_CODE_SUBAGENT_MODEL=opus`. The role defaults in the table below are unchanged. Statements further down that Ultracode runs
 the coordinator or teammates at `xhigh`, or that raising the lead to `max` turns orchestration off, are dated 2026-09-23 to 2026-09-27
 and were measured on Claude Code 2.1.281; on 2.1.284 the reminder stayed present at `max`.
