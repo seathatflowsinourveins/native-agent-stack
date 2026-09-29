@@ -36382,8 +36382,8 @@
     },
     {
       "path": "evidence/artifacts/rtk-coverage-study-20260927/METHOD.md",
-      "sha256": "f6c9e23e9538b057c4ab23ace9f74d4fe0dcc1ea35836aad8b000ee3a0e7a018",
-      "bytes": 10945
+      "sha256": "4ae86b6eb0922d30c8366552ec7d9288fc3431781d63964fe269ca19653e7599",
+      "bytes": 11434
     },
     {
       "path": "evidence/artifacts/rtk-coverage-study-20260927/README.md",
@@ -39352,8 +39352,8 @@
     },
     {
       "path": "evidence/artifacts/token-tool-currency-20260927/METHOD.md",
-      "sha256": "59dbdaefd4021d5972b72bf2651cf219f3dabec07b187b2419cce6fa10b4ffce",
-      "bytes": 9020
+      "sha256": "eb4ea620ed4e0bc0e8bb549d28a1ac3ddf11a633b619d04b2e966316dfe2cdad",
+      "bytes": 10011
     },
     {
       "path": "evidence/artifacts/token-tool-currency-20260927/README.md",
@@ -43152,8 +43152,8 @@
     },
     {
       "path": "tests/test_token_full_save_evidence.py",
-      "sha256": "c19bcf98259f6e71891572ac31e6fa34f51a504fc17d2d0db8733b0c0efac5ec",
-      "bytes": 11030
+      "sha256": "94e4d5ce12008c4f2c1c788759d95fb9f5d34b2aab02bee40e805dc0347a8e56",
+      "bytes": 15415
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
