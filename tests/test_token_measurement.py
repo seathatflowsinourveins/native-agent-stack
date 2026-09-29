@@ -182,6 +182,21 @@ CLI_CARRIERS = ("bash", "rtk_proxy", "ctx", "nested")
 EMPTY_CLI = {"status": "measured", "parser": PARSER_RECORD, "lanes": {}, "mcporter_downstream": {}, "excluded_version_help": {},
              "calls_with_lane_invocation": 0, "unresolved_programs": 0, "remote_invocations": 0, "parse_errors": 0}
 
+# Result templates of calls that never ran (U2 item 7; M14). The Claude Code client writes them (observed on this host, not a documented
+# schema; count-only: evidence/artifacts/pra-u2-differential-20260929/scans/call-states.json). Every observed row that did not run carries a
+# toolDenialKind or a <tool_use_error> or user-rejection content, so the config and cancelled texts below are read by U1's rule only through
+# the denial kind; the fixtures that omit it are the ones that fail first. The interrupt marker is written as a user text block after a
+# user-rejection result (37 of 37), never as a result: its result form is the U2 design's binary constant, kept as not observed.
+PERMISSION_TO_USE = "Permission to use Bash with command rm -rf build has been denied."
+NOT_RUN = "Not run: the response that made this tool call was stopped by a safety classifier."
+INTERRUPT_MARKER = "[Request interrupted by user for tool use]"
+USER_REJECTION = ("The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the "
+                  "new_string was NOT written to the file). STOP what you are doing and wait for the user to tell you how to proceed.")
+HOOK_DENIAL = "PreToolUse:Bash hook error: Blocked by a project hook"
+PERMISSION_FOR = "Permission for this tool use was denied."
+AUTOMODE_NO_VERDICT = ("The server-side auto mode classifier gave no verdict (error), so auto mode cannot determine the safety of Bash. "
+                       "This is a transient failure of the check, not a judgment about the action.")
+
 
 def lane_row(calls=1, carrier="bash", **counts):
     """One cli_lanes.lanes entry: `calls` calls with one invocation each, all on `carrier`, other counters zero."""
@@ -1396,6 +1411,94 @@ class TokenMeasurement(unittest.TestCase):
             with self.subTest(state=name):
                 row = (cli or {}).get("lanes", {}).get("qmd", {})
                 self.assertEqual({k: row.get(k, 0) for k in counters}, {k: want.get(k, 0) for k in counters})
+
+    @NEEDS_PARSER
+    def test_call_state_reads_each_not_executed_template_in_both_fields_and_names_its_cause(self):
+        """U2 item 7, the callState extension the review's dependency finding asks for: the config and cancelled templates (U1 reads them
+        only through toolDenialKind), each template read at the start of the result content and of the toolUseResult string (after
+        'Error: '), and the exported callState and notExecuted accessor. The cause is the first match of: a template's own cause unless it
+        is 'other', the toolDenialKind (permission-rule config, user-rejected user, cancelled cancelled, anything else other), the
+        template's 'other', and a native declined state. Hook denials carry toolDenialKind permission-rule on this host (809 of 809), so the
+        text decides before the denial kind. Cases marked (control) already read not-executed at ebcca292; the others fail there."""
+        def answer(content, error=True, **row):
+            return {**result("a", content, error), **row}
+
+        bash = call("a", "Bash", command="qmd search x")
+        declined = call("a", "Bash", command="qmd search x")
+        declined["message"]["content"][0]["native_status"] = "declined"
+        native_declined = answer("exec command rejected by user")
+        native_declined["message"]["content"][0]["native_state"] = "declined"
+        cases = {  # name: (call row, result row or None, (state, not_executed, cause))
+            "config: 'Permission to use' in the content, no denial kind": (
+                bash, answer(PERMISSION_TO_USE, toolUseResult="Error: " + PERMISSION_TO_USE), ("failed", True, "config")),
+            "config: 'Permission to use' only in the toolUseResult": (
+                bash, answer("denied", toolUseResult="Error: " + PERMISSION_TO_USE), ("failed", True, "config")),
+            "config: with its observed denial kind (control)": (
+                bash, answer(PERMISSION_TO_USE, toolDenialKind="permission-rule", toolUseResult="Error: " + PERMISSION_TO_USE),
+                ("failed", True, "config")),
+            "cancelled: 'Not run: the response ...', no denial kind": (
+                bash, answer(NOT_RUN, toolUseResult="Error: " + NOT_RUN), ("failed", True, "cancelled")),
+            "cancelled: with its observed denial kind (control)": (
+                bash, answer(NOT_RUN, toolDenialKind="cancelled", toolUseResult=NOT_RUN), ("failed", True, "cancelled")),
+            "cancelled: the interrupt marker as a result (the design's constant, not observed as a result)": (
+                bash, answer(INTERRUPT_MARKER), ("failed", True, "cancelled")),
+            "cancelled: <tool_use_error>Cancelled (control)": (
+                bash, answer("<tool_use_error>Cancelled: Claude ended the conversation</tool_use_error>"), ("failed", True, "cancelled")),
+            "cancelled: <tool_use_error>Error: Streaming fallback (control)": (
+                bash, answer("<tool_use_error>Error: Streaming fallback - tool execution discarded</tool_use_error>"),
+                ("failed", True, "cancelled")),
+            "invalid: another <tool_use_error> (control)": (
+                bash, answer("<tool_use_error>InputValidationError: command: Required</tool_use_error>"), ("failed", True, "invalid")),
+            "user: the rejection content with 'User rejected tool use' (control)": (
+                bash, answer(USER_REJECTION, toolUseResult="User rejected tool use"), ("failed", True, "user")),
+            "user: the rejection content with toolUseResult 'Error: ' + content (control)": (
+                bash, answer(USER_REJECTION, toolUseResult="Error: " + USER_REJECTION), ("failed", True, "user")),
+            "user: the rejection only in the toolUseResult": (
+                bash, answer("no", toolUseResult="Error: " + USER_REJECTION), ("failed", True, "user")),
+            "user: denial kind user-rejected with another text (control)": (
+                bash, answer("Cannot call mcp__x__y while in plan mode.", toolDenialKind="user-rejected",
+                             toolUseResult="Error: Cannot call mcp__x__y while in plan mode."), ("failed", True, "user")),
+            "hook: the text decides over its observed denial kind permission-rule (control)": (
+                bash, answer(HOOK_DENIAL, toolDenialKind="permission-rule", toolUseResult="Error: " + HOOK_DENIAL), ("failed", True, "hook")),
+            "other: 'Permission for' in a toolUseResult 'Error: ' + text (control)": (
+                bash, answer(PERMISSION_FOR, toolUseResult="Error: " + PERMISSION_FOR), ("failed", True, "other")),
+            "other: 'Permission for' in a bare toolUseResult (control)": (
+                bash, answer(PERMISSION_FOR, toolUseResult=PERMISSION_FOR), ("failed", True, "other")),
+            "other: 'Permission for' only in the content": (bash, answer(PERMISSION_FOR), ("failed", True, "other")),
+            "config: the denial kind permission-rule decides over the generic 'Permission for' text (control)": (
+                bash, answer("Permission for this command was denied by a built-in rule.", toolDenialKind="permission-rule",
+                             toolUseResult="Error: Permission for this command was denied by a built-in rule."), ("failed", True, "config")),
+            "other: the classifier text with denial kind automode-unavailable (control)": (
+                bash, answer(AUTOMODE_NO_VERDICT, toolDenialKind="automode-unavailable", toolUseResult="Error: " + AUTOMODE_NO_VERDICT),
+                ("failed", True, "other")),
+            "other: a denial kind this reading does not know (control)": (
+                bash, answer("no", toolDenialKind="some-new-kind"), ("failed", True, "other")),
+            "declined: a Codex call with no result (control)": (declined, None, ("failed", True, "declined")),
+            "declined: a Codex result with native state declined (control)": (bash, native_declined, ("failed", True, "declined")),
+            "failed: the command's own exit (control)": (
+                bash, answer("Exit code 1\nboom", toolUseResult="Error: Exit code 1\nboom"), ("failed", False, None)),
+            "failed: a host hook's own refusal text (control)": (
+                bash, answer("This agent is isolated in the worktree /w", toolUseResult="Error: This agent is isolated in the worktree /w"),
+                ("failed", False, None)),
+            "succeeded: a template in a result that is not an error is data (control)": (
+                bash, answer(PERMISSION_TO_USE, error=False), ("succeeded", False, None)),
+            "unfinished: no result (control)": (bash, None, ("unfinished", False, None)),
+        }
+        rows = [[c, r] for c, r, _ in cases.values()]
+        # The rows as cli_lanes reads them: qmd's not_executed counter, a value U1's rule already gives at ebcca292.
+        lanes = self.exports("x.map(([c, r]) => (cu.measureTranscript(r ? [c, r] : [c]).cli_lanes?.lanes?.qmd ?? {}).not_executed ?? 0)", rows)
+        for (name, (_, _, want)), not_executed in zip(cases.items(), lanes):
+            with self.subTest(case=name, view="cli_lanes not_executed"):
+                self.assertEqual(not_executed, int(want[1]))
+        # The exported reading: callState(call, result) and notExecuted(call, result), with the result a tool_result block and its row.
+        got = self.exports("x.map(([c, r]) => { const call = c.message.content[0], result = r ? { ...r.message.content[0], row: r } : null;"
+                           " const s = cu.callState(call, result); return [s.state, s.not_executed === true, s.cause ?? null,"
+                           " cu.notExecuted(call, result)] })", rows)
+        for (name, (_, _, want)), state in zip(cases.items(), got):
+            with self.subTest(case=name, view="callState"):
+                self.assertEqual(tuple(state[:3]), want)
+                self.assertEqual(state[3], want[1])  # the accessor is the flag
+                self.assertEqual(state[2] is not None, want[1])  # a cause exactly when the call did not run
 
     @NEEDS_PARSER
     def test_cli_lanes_aggregate_sums_counters_and_counts_actors_with_success(self):
