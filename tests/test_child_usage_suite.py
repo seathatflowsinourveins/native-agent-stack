@@ -106,6 +106,19 @@ class PraU1EvidenceTooling(unittest.TestCase):
         self.assertEqual((failed.get("grammar_limit_scanner_reads_more"), failed.get("grammar_limit_scanner_throws")), (0, 7))
 
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
+    @unittest.skipUnless((PARSER_DIR / "package-lock.json").is_file(), "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    def test_shape_counts_report_the_largest_commands(self):
+        """The maxima that bound the shapes whose parse is quadratic (a run of here-document operators or of array openers): the longest
+        command, the most heredoc operators (a here-string <<< is not one) and the most `=(` in one command."""
+        texts = ["a=(x y); b=(z)", "cat <<A <<B\nx\nA\ny\nB", "cat <<<word", "ls"]
+        with tempfile.TemporaryDirectory() as tmp:
+            corpus = Path(tmp) / "corpus.json"
+            corpus.write_text(json.dumps(texts))
+            shapes = self.run_node("shape-counts.mjs", "--kernel", KERNEL, "--inputs", corpus)
+        self.assertEqual((shapes.get("longest_command_chars"), shapes.get("most_heredoc_operators_in_a_command"), shapes.get("most_array_openers_in_a_command")),
+                         (max(len(t) for t in texts), 2, 2))
+
+    @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_identity_check_compares_whole_lane_records_of_two_kernels(self):
         """--fields lanes compares commandInvocations and measureTranscript(...).cli_lanes of two kernels, input by input: a
         difference in either, or an exception in either kernel, is counted and never hidden."""
