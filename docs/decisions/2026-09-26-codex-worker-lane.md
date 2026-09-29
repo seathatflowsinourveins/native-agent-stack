@@ -760,12 +760,16 @@ verifier is qualified as capability evidence only.
   digests, the set of `*.toml` files below the Codex home's `agents/` and the number of
   `[agents.<name>]` tables in `config.toml` and the profile (0 expected), the same two counts for the
   system layer (`/etc/codex`, always loaded, N included) and the checkout's project layer, the digests
-  of the `codex` on `PATH` and of the executable it runs, and the server names and enabled flags of
+  of the `codex` on `PATH` and of the file its launcher executes, and the server names and enabled flags of
   `codex mcp list --json` with and without `-p stack-worker`, read in an empty directory so that a
   project layer adds none: the parent's effective tool set, which a role child is compared with because
-  a role cannot bind tools at this pin. The executable row follows the identity launcher one hop
+  a role cannot bind tools at this pin. The binary row follows the identity launcher one hop
   (its last line, `exec '<absolute path>' "$@"`): the design's "file the entry resolves to" would be
-  the launcher itself, since the entry on the reference host is a script and not a link. No row
+  the launcher itself, since the entry on the reference host is a script and not a link. The file
+  that line names is a link to the npm package's Node entry (`@openai/codex` `bin/codex.js`), which
+  resolves and starts the native executable, so the row pins the install's entry point and
+  `codex.version` names the release; the native executable is not hashed, and following the entry
+  on to it would need a rule of its own for the platform package. No row
   publishes a path, a file name a host chose, or a transport, environment value, argument or URL.
   The rows are captured through `CODEX_HOME` as `adoption_status.py` reads it; the older `codex.*`
   rows of the snapshot still read `~/.codex` whatever the variable says.

@@ -2583,7 +2583,7 @@ class CodexRoleRowTests(HostCase):
         launcher = self.host.write(self.host.bin / "codex", FAKE_CODEX + line, 0o755)
         return launcher, target
 
-    def test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_executable(self):
+    def test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_file_it_executes(self):
         launcher, target = self.install_launcher()
         cap = self.capture("l-a")
         with self.subTest(check="the launcher row"):
@@ -2593,13 +2593,37 @@ class CodexRoleRowTests(HostCase):
         self.assertNotEqual(cap.value("codex.launcher.sha256"), cap.value("codex.binary.sha256"))
         for item_id in ("codex.launcher.sha256", "codex.binary.sha256"):
             self.assertNotIn("path", cap.item(item_id, "full"), f"{item_id}: no path is stored for what PATH led to")
-        self.host.append_byte(target)  # the real executable changes: only the binary row drifts
+        self.host.append_byte(target)  # the file the launcher executes changes: only the binary row drifts
         second = self.capture("l-b")
         self.assert_drift(cap, second, ["codex.binary.sha256"])
-        with open(launcher, "a", encoding="utf-8") as handle:  # the launcher changes and still names the same executable
+        with open(launcher, "a", encoding="utf-8") as handle:  # the launcher changes and still names the same file
             handle.write("# rendered again\n")
             handle.write(f"exec '{target}' \"$@\"\n")
         self.assert_drift(second, self.capture("l-c"), ["codex.launcher.sha256"])
+
+    def test_the_binary_row_stops_after_one_hop(self):
+        third = self.host.write(self.host.home / "third-hop" / "codex", "the third file\n", 0o755)
+        launcher, target = self.install_launcher(target_bytes=f"#!/bin/sh\nexec '{third}' \"$@\"\n".encode("utf-8"))
+        cap = self.capture("h-one")  # the launcher's target is itself a launcher: only its own bytes are hashed
+        self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(target), "codex.binary.sha256")
+        self.assertNotEqual(cap.value("codex.binary.sha256"), sha256_path(third))
+        self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(launcher))
+
+    def test_a_launcher_target_that_is_a_link_to_a_node_entry_is_hashed_through_the_link(self):
+        # The reference host: the launcher's last line names a link, bin/codex, to the npm package's Node entry. The row pins
+        # that entry point (the native executable it starts is not hashed), so it must follow the link and not hash the link.
+        tools = self.host.home / ".local" / "share" / "codex-ecosystem" / "tools" / "codex-0.157.1"
+        entry = self.host.write(tools / "lib" / "node_modules" / "@openai" / "codex" / "bin" / "codex.js",
+                                "#!/usr/bin/env node\n// the package's entry point\n", 0o755)
+        launcher, named = self.install_launcher(f"exec '{tools / 'bin' / 'codex'}' \"$@\"\n")  # writes a file at the named path
+        named.unlink()
+        named.symlink_to(entry)  # now the path the launcher names is a link, as on the reference host
+        self.assertTrue(named.is_symlink())
+        cap = self.capture("h-node")
+        self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(entry), "codex.binary.sha256")
+        self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(launcher), "codex.launcher.sha256")
+        self.host.append_byte(entry)  # the package's entry point changes: only the binary row drifts
+        self.assert_drift(cap, self.capture("h-node2"), ["codex.binary.sha256"])
 
     def test_an_entry_that_is_not_a_recognised_launcher_is_its_own_binary(self):
         cases = {"an unrecognised exec form": "exec env A=1 '/opt/x/codex' \"$@\"\n",
@@ -2945,17 +2969,23 @@ class CodexRoleMutationControlTests(unittest.TestCase):
          (('tables_item(ctx, "codex.project.role_tables", [ctx.repo / ".codex" / "config.toml"])',
            'tables_item(ctx, "codex.project.role_tables", [ctx.repo / ".codex" / "config.tomz"])'),),
          ROLE + "test_the_project_layer_rows_read_the_checkouts_codex_folder", "codex.project.role_tables"),
-        ("launcher_row_hashes_the_executable",
+        ("launcher_row_hashes_the_target",
          (("    return [ctx.item(ids[0], status, digest, reason), binary_item(ctx, ids[1], entry)]\n",
            "    return [binary_item(ctx, ids[0], entry), binary_item(ctx, ids[1], entry)]\n"),),
-         ROLE + "test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_executable", "codex.launcher.sha256"),
+         ROLE + "test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_file_it_executes", "codex.launcher.sha256"),
         ("binary_row_does_not_follow_the_launcher",
          (("    target = launcher_target(text) if text is not None else None\n", "    target = None\n"),),
-         ROLE + "test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_executable", "codex.binary.sha256"),
+         ROLE + "test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_file_it_executes", "codex.binary.sha256"),
         ("binary_row_skips_the_path_policy",
          (("        path = check_path_policy(target, ctx.home, ctx.repo, allow_relative=False)\n", "        path = Path(target)\n"),),
          ROLE + "test_a_launcher_target_that_is_missing_refused_or_a_credential_store_is_an_error_for_the_binary_row",
          "codex.binary.sha256: outside"),
+        ("binary_row_follows_a_second_hop",
+         (('        return ctx.item(item_id, ERROR, None, "refused_path")\n    status, digest, reason = ctx.hash_file(path)\n',
+           '        return ctx.item(item_id, ERROR, None, "refused_path")\n    second = script_text(ctx, path)\n'
+           '    hop = launcher_target(second) if second is not None else None\n'
+           '    status, digest, reason = ctx.hash_file(Path(hop) if hop else path)\n'),),
+         ROLE + "test_the_binary_row_stops_after_one_hop", "codex.binary.sha256"),
         ("default_servers_read_with_the_profile",
          ((' ["codex", "mcp", "list", "--json"]', ' ["codex", "-p", CODEX_PROFILE, "mcp", "list", "--json"]'),),
          ROLE + "test_the_server_rows_are_names_and_flags_read_in_an_empty_directory", "codex.mcp.servers.default"),

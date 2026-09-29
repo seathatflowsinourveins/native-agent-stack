@@ -46,7 +46,9 @@ Sources for the rules implemented here (no upstream implementation of this glue 
   `codex mcp list --json` (a JSON array of objects, of which only `name` and `enabled` are read). The codex.* role rows are
   the U13 rows of the Codex role carriers (adoption/agents/codex, tools/adoption/codex_roles.py); this tool stays
   self-contained and repeats their counting rules. observability/collector/codex-identity-launcher.sh.example ends with
-  `exec '<absolute path of the real codex>' "$@"`, the shape codex.binary.sha256 follows one hop.
+  `exec '<absolute path>' "$@"`, the shape codex.binary.sha256 follows one hop: it hashes the file that line names, read
+  through links. On the reference host that file is a link to the npm package's Node entry (@openai/codex bin/codex.js), which
+  resolves and starts the native executable; the native executable itself is not hashed, and codex.version names the release.
 """
 
 from __future__ import annotations
@@ -777,9 +779,11 @@ def build_specs(config: dict) -> list[Spec]:
         "the number of [agents.<name>] tables in .codex/config.toml of the checkout under freeze (0 when absent)")
     add("codex.launcher.sha256", "codex_roles", "sha256 of file",
         "sha256 of the file the `codex` on PATH names (the launcher when one is installed); missing when there is no codex on PATH")
-    add("codex.binary.sha256", "codex_roles", "sha256 of the executable codex runs",
-        "sha256 of the file the launcher script on PATH ends by executing (its last line `exec '<absolute path>' \"$@\"`, one hop; "
-        "the path must meet the path policy and is not stored), else of the file the `codex` on PATH resolves to")
+    add("codex.binary.sha256", "codex_roles", "sha256 of the file the launcher executes",
+        "sha256 of the file the launcher script on PATH ends by executing (its last line `exec '<absolute path>' \"$@\"`, one hop, "
+        "read through links; the path must meet the path policy and is not stored), else of the file the `codex` on PATH resolves "
+        "to. That file is the npm package's Node entry on the reference host, which starts the native executable: the row pins the "
+        "entry point and codex.version names the release")
     add("codex.mcp.servers.default", "codex_roles", "codex mcp list --json names and enabled flags",
         "server name and enabled flag from `codex mcp list --json` run in an empty temporary directory, so no project layer "
         "adds a server: the parent's effective set; transport, environment, arguments and URLs are never read")
@@ -1284,9 +1288,11 @@ def script_text(ctx: Ctx, path: Path) -> Optional[str]:
 
 
 def binary_item(ctx: Ctx, item_id: str, entry: Path) -> dict:
-    """sha256 of the executable the codex on PATH runs. On a host with the identity launcher the entry is a script that ends
-    by executing the real codex, and the real file is hashed (one hop; its path meets the path policy and is not stored);
-    otherwise it is the file the entry resolves to, the same file as codex.launcher.sha256."""
+    """sha256 of the file the codex on PATH executes. On a host with the identity launcher the entry is a script that ends by
+    executing another file, and that file is hashed (one hop, read through links; its path meets the path policy and is not
+    stored). It is the entry point of the codex install, not necessarily the native executable: the npm package's Node entry
+    starts that one, and is what this hashes on the reference host. Otherwise it is the file the entry resolves to, the same
+    file as codex.launcher.sha256."""
     text = script_text(ctx, entry)
     target = launcher_target(text) if text is not None else None
     if target is None:

@@ -132,7 +132,7 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   makes `complete` false and a count never does, see [the coverage check](../../docs/token-efficiency-stack.md#coverage-check)). The freeze
   snapshot ([`tools/token-e2e`](../../tools/token-e2e/README.md)) captures twelve frozen `codex.*` rows, so the E2E's role item takes its
   values from a capture and not from a hand count: the two carriers' digests, `codex.agents.toml_set` and `codex.agents.role_tables`, the
-  same two counts for the system layer (`/etc/codex`) and the checkout's project layer, the launcher and executable digests, and the server
+  same two counts for the system layer (`/etc/codex`) and the checkout's project layer, the digests of the launcher and of the file it executes (the install's entry point, not the native binary), and the server
   names and enabled flags of `codex mcp list --json` with and without `-p stack-worker`, which are the parent's effective tool set that a
   role child is compared with (a role cannot bind tools at `rust-v0.157.1`).
 - **Evidence class.** Structural validation only: the stem set, byte-identical mirrors, the digests below, the closed key set, the pins
