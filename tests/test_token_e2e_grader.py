@@ -2840,8 +2840,8 @@ class F11_AgentToolCarrier(GraderCase):
     IDENT = f"{RUN_TOKEN}.B.seed-agent-path.1"
     TOOL_USE = "toolu-fx-agent1"
 
-    def build(self, result_text, child_rows, *, tool_use_result=None):
-        world = ClaudeWorld(self.tmp)
+    def build(self, result_text, child_rows, *, tool_use_result=None, root=None):
+        world = ClaudeWorld(root or self.tmp)
         agent_use = r_use("Agent", {"description": "d", "prompt": "p", "subagent_type": "stack-researcher"},
                           self.TOOL_USE, ts(0), "msg-h1")
         rows = [r_user("harness", ts(0, 1)), agent_use]
@@ -2895,7 +2895,7 @@ class F11_AgentToolCarrier(GraderCase):
     def test_an_empty_or_wait_notice_final_text_fails_with_its_cause(self):
         for text, cause in (("", "empty"), ("Waiting for the monitor notification.", "wait_notice")):
             with self.subTest(cause):
-                world = self.build(framed(text or " "), self.CHILD(text or " "))
+                world = self.build(framed(text or " "), self.CHILD(text or " "), root=self.tmp / cause)
                 attempt = self.attempt(world)
                 self.assertEqual((attempt["class"], attempt["cause"]), ("completed", cause))
                 self.assertEqual(attempt["carrier"], {"status": "fail", "reasons": [cause]})
