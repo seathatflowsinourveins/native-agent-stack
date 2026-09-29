@@ -38,6 +38,7 @@ unresolved programs. `program` names are not compared: the old reading emitted a
 | `states-count.mjs` | the not-executed and interrupted shapes in Claude Code transcripts |
 | `real-commands.mjs` | extracts the private corpus of real commands from the local transcripts (`--until` rebuilds an earlier corpus) |
 | `scaling.mjs` | the time of `commandInvocations`, and of the parse alone, by input size for 21 shapes (round 2) |
+| `m4-real-shells.py` | the M4 fixtures of the decision under real bash and dash with a stub `curl`, against the kernel (round 2; `--control silent-curl` shows that it can fail) |
 | `update-round2.py` | round 2: the shape scan, the whole-record identity check, the scaling and the differential totals, spliced into `counts.json` |
 | `capture-covering.py` | the shell texts the covering test tables feed the kernel |
 
@@ -337,7 +338,7 @@ what a run could close. What was and was not run again:
 
 | run again | not run again |
 | --- | --- |
-| the shape scan (`shapes`), now with the first overturn condition; the whole-record identity check (`lanes_identity`); the scaling (`scaling`); the differential totals (`differential_rerun`); the committed oracle module (163 of 163 probes, 28 of 28 recovery probes, 456 of 456 and 463 of 463 generated commands: `python3 -m unittest tests.test_command_position_oracle`); the M4 fixtures of the decision (D7, R1, R3, heredoc expansion, backquote anchor: 75 commands) under real bash 5.2.21 and dash with a stub `curl`; the parser pins against the npm registry, the GitHub tag refs and the installed files | the oracle over fresh seeds (50,661 commands) and the reduction of every difference to a witness with its classification (round 1's numbers stand; they describe the kernel `a9126a77fd7f`, and the identity check below shows the kernel of round 2 reads every input alike); the timing and the states (the transcript store has grown since); the covering lists (`capture-covering.py` would pick up the new fixtures) |
+| the shape scan (`shapes`), now with the first overturn condition; the whole-record identity check (`lanes_identity`); the scaling (`scaling`); the differential totals (`differential_rerun`); the committed oracle module (163 of 163 probes, 28 of 28 recovery probes, 456 of 456 and 463 of 463 generated commands: `python3 -m unittest tests.test_command_position_oracle`); the M4 fixtures of the decision (D7, R1, R3, heredoc expansion, backquote anchor: 75 commands) under real bash 5.2.21 and dash with a stub `curl`, by the committed `m4-real-shells.py` (75 of 75 agree; its control, a stub that logs nothing, fails 67 of 75); the parser pins against the npm registry, the GitHub tag refs and the installed files, by hand with the commands of the `verified` block of `shell-parser.pin.json` (not a committed script) | the oracle over fresh seeds (50,661 commands) and the reduction of every difference to a witness with its classification (round 1's numbers stand; they describe the kernel `a9126a77fd7f`, and the identity check below shows the kernel of round 2 reads every input alike); the timing and the states (the transcript store has grown since); the covering lists (`capture-covering.py` would pick up the new fixtures) |
 
 ### The corpus
 

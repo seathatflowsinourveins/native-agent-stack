@@ -122,7 +122,7 @@ reads every input alike (scripts and a counts-only README are in that directory)
     could be invented. In the other 27 the reading reads none: 13 have the lane word after plain words (`echo qmd`: an argument,
     whatever the tree makes of it), 13 have it where a command name could stand but the tree puts it in a comment, a heredoc body, a
     string or an assignment value, and 1 has it there inside an ERROR node (a comment in a heredoc body under a skipped subtree),
-    which counts toward the bound. The bound is 4 + 1 = 5.
+    which counts toward the bound. The bound is 4 + 1 = 5 (the one heredoc ended early with a lane word is among them).
   - The scanner reading of `0c421c66`, which needs no parser, reads no lane that the tree reading lacks in any of the 247.
   - What the bound does not cover: a misparse with no ERROR node is measured by the oracle and the differential instead (above), and
     the 27 are classified from the text and the tree as given, before the reading's heredoc repairs. Real commands are never run, so
