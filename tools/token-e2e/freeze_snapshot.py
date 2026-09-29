@@ -43,6 +43,7 @@ import os
 import shutil
 import signal
 import socket
+import stat
 import subprocess
 import sys
 import tempfile
@@ -126,9 +127,10 @@ class PathRefused(Exception):
 
 
 class PrivacyRefusal(Exception):
-    def __init__(self, items: list[str]):
+    def __init__(self, items: list[str], variables: Optional[list[str]] = None):
         super().__init__("privacy guard")
         self.items = items
+        self.variables = variables or []  # names only, never values
 
 
 # ----------------------------------------------------------------------------------------------- text helpers
@@ -269,7 +271,7 @@ def parse_mcp_list(text: str) -> Optional[dict]:
             start = 0
             while start < len(status) and not status[start].isalnum():
                 start += 1
-            servers[name] = status[start:] == "Connected"
+            servers[name] = status[start:].startswith("Connected")
         index += 1
     return servers
 
@@ -433,6 +435,14 @@ def kill_group(process: "subprocess.Popen[bytes]") -> None:
             stream.close()
 
 
+def regular_file_problem(path: Path) -> Optional[str]:
+    """A reason token when `path` is not a regular file (a FIFO or device would block the read); None when it is one."""
+    mode = os.stat(path).st_mode
+    if stat.S_ISDIR(mode):
+        return "is_directory"
+    return None if stat.S_ISREG(mode) else "not_regular_file"
+
+
 def git_environment(env: dict[str, str]) -> dict[str, str]:
     """The environment for git with every GIT_* variable dropped except the two that isolate its configuration, so a
     hook's GIT_DIR or GIT_INDEX_FILE cannot select another repository (tests/__init__.py, issue #179)."""
@@ -521,6 +531,9 @@ class Ctx:
         try:
             if is_credential_store(str(path), self.home):
                 return ERROR, None, "credential_store"
+            kind = regular_file_problem(path)
+            if kind:
+                return ERROR, None, kind
             with open(path, "rb") as handle:
                 data = handle.read(limit + 1)
             return (OK, data, None) if len(data) <= limit else (ERROR, None, "too_large")
@@ -538,6 +551,9 @@ class Ctx:
         try:
             if is_credential_store(str(path), self.home):
                 return ERROR, None, "credential_store"
+            kind = regular_file_problem(path)
+            if kind:
+                return ERROR, None, kind
             digest = hashlib.sha256()
             with open(path, "rb") as handle:
                 while True:
@@ -706,16 +722,16 @@ def build_specs(config: dict) -> list[Spec]:
     add("tools.parser.file.*", "tools", "sha256 of file",
         f"sha256 of each file named in {PARSER_PIN} read from the installed parser directory (config key parser_dir)")
 
-    for unit in service_units(config):
+    for unit, unit_class in service_units(config):
         base = f"services.{unit}."
         show = f"systemctl --user show {unit} -p"
-        add(base + "load_state", "services", "systemctl show LoadState", f"{show} LoadState")
-        add(base + "active_state", "services", "systemctl show ActiveState", f"{show} ActiveState")
-        add(base + "main_pid", "services", "systemctl show MainPID", f"{show} MainPID")
-        add(base + "n_restarts", "services", "systemctl show NRestarts", f"{show} NRestarts")
+        add(base + "load_state", "services", "systemctl show LoadState", f"{show} LoadState", unit_class)
+        add(base + "active_state", "services", "systemctl show ActiveState", f"{show} ActiveState", unit_class)
+        add(base + "main_pid", "services", "systemctl show MainPID", f"{show} MainPID", unit_class)
+        add(base + "n_restarts", "services", "systemctl show NRestarts", f"{show} NRestarts", unit_class)
         add(base + "config_sha256", "services", "sha256 of the configuration file the unit runs",
             f"sha256 of the configuration file named by --config, --config.file or -config.file in `{show} ExecStart` "
-            "(the path is stored only in the private capture)")
+            "(the path is stored only in the private capture)", unit_class)
 
     for gateway in config.get("gateways", []):
         for route in gateway["routes"]:
@@ -762,7 +778,8 @@ def collect_repo(ctx: Ctx) -> list[dict]:
     if head.state == "ok" and (is_hex(revision, 40) or is_hex(revision, 64)):
         items.append(ctx.item("repo.head", OK, revision))
     else:
-        items.append(ctx.item("repo.head", ERROR if head.state != "missing" else MISSING, None, head.state))
+        items.append(ctx.item("repo.head", ERROR if head.state != "missing" else MISSING, None,
+                              "unrecognized_output" if head.state == "ok" else head.state))
     status = ctx.git(["status", "--porcelain", "--untracked-files=no"])
     if status.state == "ok":
         items.append(ctx.item("repo.tree_clean", OK, status.out.strip() == ""))
@@ -983,6 +1000,11 @@ def qmd_items(ctx: Ctx) -> list[dict]:
     return [ctx.item(f"tools.qmd.{name}", OK, counts[name]) for name in names]
 
 
+def parser_key(relative: str) -> str:
+    """The item id suffix of a pinned parser file: no node_modules prefix, colons for slashes."""
+    return (relative[len("node_modules/"):] if relative.startswith("node_modules/") else relative).replace("/", ":")
+
+
 def parser_items(ctx: Ctx) -> list[dict]:
     """Each file the parser pin names, hashed in the installed parser directory; the pin itself is never trusted for a value."""
     status, data, reason = ctx.read(ctx.repo / PARSER_PIN, 1 << 20)
@@ -997,7 +1019,7 @@ def parser_items(ctx: Ctx) -> list[dict]:
             raise ValueError("shape")
         for relative, expected in files.items():
             valid = (isinstance(relative, str) and not relative.startswith("/") and ".." not in relative.split("/")
-                     and isinstance(expected, str) and is_hex(expected, 64))
+                     and plain_name(parser_key(relative), "._:-+", 120) and isinstance(expected, str) and is_hex(expected, 64))
             if not valid:
                 raise ValueError("entry")
         configured = ctx.config.get("parser_dir")
@@ -1007,11 +1029,8 @@ def parser_items(ctx: Ctx) -> list[dict]:
     items = []
     matches = True
     for relative, expected in sorted(files.items()):
-        key = (relative[len("node_modules/"):] if relative.startswith("node_modules/") else relative).replace("/", ":")
         item_status, digest, item_reason = ctx.hash_file(root / relative)
-        if not plain_name(key, "._:-+", 120):
-            continue
-        items.append(ctx.item("tools.parser.file." + key, item_status, digest, item_reason, root / relative))
+        items.append(ctx.item("tools.parser.file." + parser_key(relative), item_status, digest, item_reason, root / relative))
         matches = matches and item_status == OK and digest == expected
     items.append(ctx.item("tools.parser.all_match_pin", OK, matches))
     return items
@@ -1090,15 +1109,17 @@ def collect_adoption(ctx: Ctx) -> list[dict]:
     return items
 
 
-def service_units(config: dict) -> list[str]:
-    return list(DEFAULT_UNITS) + [unit for unit in config.get("units", []) if unit not in DEFAULT_UNITS]
+def service_units(config: dict) -> list[tuple[str, str]]:
+    """(unit, class): the nine defaults are always frozen; a configured unit is frozen unless it says informational."""
+    return [(unit, FROZEN) for unit in DEFAULT_UNITS] + [
+        (entry["name"], entry["class"]) for entry in config.get("units", []) if entry["name"] not in DEFAULT_UNITS]
 
 
 def collect_services(ctx: Ctx) -> list[dict]:
     if ctx.platform != "linux":
         return ctx.not_applicable("services")
     items = []
-    for unit in service_units(ctx.config):
+    for unit, _ in service_units(ctx.config):
         items.extend(unit_items(ctx, unit))
     return items
 
@@ -1254,7 +1275,10 @@ def claude_capacity(ctx: Ctx) -> list[dict]:
     if not ctx.probe:
         return [ctx.item(item_id, MISSING, None, "skipped") for item_id in ids]
     environment = {key: value for key, value in ctx.env.items() if key not in ("OTEL_RESOURCE_ATTRIBUTES", "RTK_DB_PATH")}
-    folder = tempfile.mkdtemp(prefix="freeze-probe-")
+    try:
+        folder = tempfile.mkdtemp(prefix="freeze-probe-")
+    except OSError:
+        return [ctx.item(item_id, ERROR, None, "no_scratch_directory") for item_id in ids]
     try:
         result = ctx.run(["claude", "-p", "OK", "--model", "haiku", "--output-format", "json", "--verbose",
                           "--no-session-persistence", "--setting-sources", "project"],
@@ -1379,29 +1403,54 @@ def has_word(text: str, word: str) -> bool:
         start = found + 1
 
 
+WORD_MARK = "\x00word:"  # a NUL cannot occur in an environment value, so this prefix cannot collide with one
+
+
+def catalogue_tokens(ctx: Ctx) -> tuple[str, set[str]]:
+    """The tool's own static text (item ids and methods) and its lower-case alphanumeric words."""
+    structure = [SCHEMA, FROZEN, INFORMATIONAL, *STATUSES, "sanitized", "label", "platform", "items", "id", "class", "status",
+                 "value", "method", "reason", "path"]
+    text = "\n".join([f"{spec.id}\n{spec.method}" for spec in ctx.specs] + structure)
+    words: set[str] = set()
+    current: list[str] = []
+    for char in text.lower() + " ":
+        if char.isalnum():
+            current.append(char)
+        elif current:
+            words.add("".join(current))
+            current = []
+    return text, words
+
+
 def forbidden_values(ctx: Ctx) -> list[str]:
-    """Environment values of eight characters or more (except the model alias) and the home and checkout paths."""
-    values = {value for key, value in os.environ.items() if len(value) >= MIN_SECRET_LENGTH and key != ALIAS_EXEMPT_VARIABLE}
+    """What the output must not carry: environment values of eight characters or more (except the model alias), the home
+    and checkout paths, and the user and host names (entries with WORD_MARK, matched as whole words). A value or name that
+    the tool's own catalogue text already contains cannot be a leak of it, and refusing it would stop every capture on a
+    host whose user or variable happens to equal a catalogue word, so it is not listed."""
+    text, words = catalogue_tokens(ctx)
+    values = {value for key, value in os.environ.items()
+              if len(value) >= MIN_SECRET_LENGTH and key != ALIAS_EXEMPT_VARIABLE and value not in text}
     values.update({str(ctx.home), str(ctx.repo), os.path.realpath(ctx.home), os.path.realpath(ctx.repo),
                    os.path.expanduser("~")})
-    return sorted(value for value in values if value and value != "/")
+    listed = sorted(value for value in values if value and value != "/")
+    return listed + [WORD_MARK + name for name in identity_words() if name not in words]
 
 
 def guard_output(record: dict, text: str, forbidden: list[str], sanitized: bool) -> None:
-    """Refuse output that carries an environment value, a host path or an identity; the backstop behind the collectors."""
-    words = identity_words()
-    bad: set[str] = set()
-    for item in record.get("items", []):
-        for string in iter_strings(item):
-            if any(value in string for value in forbidden) or any(has_word(string.lower(), word) for word in words) \
-                    or (sanitized and any(char in PATH_CHARS for char in string)):
-                bad.add(str(item.get("id", "item")))
-    head = {key: value for key, value in record.items() if key != "items"}
-    for string in iter_strings(head):
-        if any(value in string for value in forbidden) or any(has_word(string.lower(), word) for word in words) \
-                or (sanitized and any(char in PATH_CHARS for char in string)):
-            bad.add("record")
-    if not bad and (any(value in text for value in forbidden) or any(has_word(text.lower(), word) for word in words)):
+    """Refuse output that carries an environment value, a host path or an identity; the backstop behind the collectors.
+    `forbidden` entries are substrings, or whole words when they start with WORD_MARK."""
+    substrings = [value for value in forbidden if not value.startswith(WORD_MARK)]
+    words = [value[len(WORD_MARK):] for value in forbidden if value.startswith(WORD_MARK)]
+
+    def leaks(string: str) -> bool:
+        return (any(value in string for value in substrings) or any(has_word(string.lower(), word) for word in words)
+                or (sanitized and any(char in PATH_CHARS for char in string)))
+
+    bad: set[str] = {str(item.get("id", "item")) for item in record.get("items", [])
+                     if any(leaks(string) for string in iter_strings(item))}
+    if any(leaks(string) for string in iter_strings({key: value for key, value in record.items() if key != "items"})):
+        bad.add("record")
+    if not bad and (any(value in text for value in substrings) or any(has_word(text.lower(), word) for word in words)):
         bad.add("record")
     if bad:
         raise PrivacyRefusal(sorted(bad))
@@ -1454,11 +1503,22 @@ def load_config(path: Optional[str], home: Path, repo: Optional[Path]) -> dict:
         if cls not in (FROZEN, INFORMATIONAL):
             raise UsageError(f"{where}: class must be frozen or informational")
         config["files"].append({"id": entry["id"], "path": path_value(entry["path"], where), "class": cls})
-    for index, unit in enumerate(array("units", 100)):
-        if not plain_name(unit, "._@:-", 80):
-            raise UsageError(f"units[{index}] must be a systemd unit name")
-        if unit not in config["units"]:
-            config["units"].append(unit)
+    for index, entry in enumerate(array("units", 100)):
+        where = f"units[{index}]"
+        if isinstance(entry, str):
+            entry = {"name": entry}
+        if not isinstance(entry, dict) or set(entry) - {"name", "class"} or "name" not in entry:
+            raise UsageError(f"{where} must be a unit name or an object with name and an optional class")
+        if not plain_name(entry["name"], "._@:-", 80):
+            raise UsageError(f"{where}: name must be a systemd unit name")
+        cls = entry.get("class", FROZEN)
+        if cls not in (FROZEN, INFORMATIONAL):
+            raise UsageError(f"{where}: class must be frozen or informational")
+        if entry["name"] in DEFAULT_UNITS:
+            if cls != FROZEN:
+                raise UsageError(f"{where}: a default unit is always frozen")
+        elif all(entry["name"] != known["name"] for known in config["units"]):
+            config["units"].append({"name": entry["name"], "class": cls})
     if "qmd_index" in raw:
         if not plain_name(raw["qmd_index"], "._-", 64):
             raise UsageError("qmd_index must be a short token")
@@ -1524,8 +1584,8 @@ def parse_loopback(url: Any, where: str) -> tuple[str, int]:
         close = authority.find("]")
         host, rest = authority[:close + 1], authority[close + 1:]
     else:
-        host, _, rest = authority.partition(":")
-        rest = ":" + rest if _ else ""
+        host, colon, rest = authority.partition(":")
+        rest = ":" + rest if colon else ""
     if host not in LOOPBACK_HOSTS:
         raise UsageError(f"{where}: base_url must name a loopback host (127.0.0.1, localhost or [::1])")
     port = 80
@@ -1544,6 +1604,13 @@ def resolve_home() -> Path:
     return Path(os.path.normpath(os.path.expanduser("~")))
 
 
+def current_directory() -> Path:
+    try:
+        return Path.cwd()
+    except OSError:
+        raise UsageError("the current directory is gone; pass --repo")
+
+
 def find_checkout(directory: Path, home: Path) -> Path:
     if not directory.is_dir():
         raise UsageError("the checkout is not a directory")
@@ -1559,7 +1626,7 @@ def command_capture(args: argparse.Namespace) -> int:
     if not plain_name(args.label, "._-", 64):
         raise UsageError("the label must be 1 to 64 letters, digits, dots, dashes or underscores and start with a letter or digit")
     home = resolve_home()
-    repo = find_checkout(Path(args.repo) if args.repo else Path.cwd(), home)
+    repo = find_checkout(Path(args.repo) if args.repo else current_directory(), home)
     config = load_config(args.config, home, repo)
     out = Path(os.path.realpath(args.out))
     if under(out, Path(os.path.realpath(repo))):
@@ -1576,7 +1643,10 @@ def command_capture(args: argparse.Namespace) -> int:
         shown = [{key: value for key, value in item.items() if not (sanitized and key == "path")} for item in items]
         record = build_record(args.label, shown, sanitized, platform)
         text = json.dumps(record, indent=2) + "\n"
-        guard_output(record, text, forbidden, sanitized)
+        try:
+            guard_output(record, text, forbidden, sanitized)
+        except PrivacyRefusal as refusal:
+            raise PrivacyRefusal(sorted({safe_label(ctx, item_id) for item_id in refusal.items}), leaking_variables(text))
         records.append(text)
     created = not out.exists()
     try:
@@ -1597,6 +1667,23 @@ def command_capture(args: argparse.Namespace) -> int:
           f"error={counts[ERROR]} not_applicable={counts[NOT_APPLICABLE]} frozen_not_ok={not_ok}")
     print(f"wrote {full_path.name} (private, mode 0600) and {clean_path.name}")
     return EXIT_OK
+
+
+def leaking_variables(text: str) -> list[str]:
+    """Names of the environment variables whose value the output text contains, so a refusal can be acted on."""
+    return sorted(name for name, value in os.environ.items()
+                  if len(value) >= MIN_SECRET_LENGTH and name != ALIAS_EXEMPT_VARIABLE and value in text)
+
+
+def safe_label(ctx: Ctx, item_id: str) -> str:
+    """How a refused item is named in the message: a catalogue id as it is, a host-derived family member by its family,
+    because the member's own id is the string that carries the value the guard keeps out."""
+    if item_id == "record":
+        return item_id
+    try:
+        return ctx.spec_for(item_id).id
+    except KeyError:
+        return "unknown"
 
 
 def build_record(label: str, items: list[dict], sanitized: bool, platform: str) -> dict:
@@ -1760,8 +1847,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         note(str(error))
         return EXIT_USAGE
     except PrivacyRefusal as refusal:
+        detail = f"; environment variables: {', '.join(refusal.variables[:10])}" if refusal.variables else ""
         note("refused: output strings carry an environment value, a host path or an identity; nothing was written "
-             f"(items: {', '.join(refusal.items[:10])})")
+             f"(items: {', '.join(refusal.items[:10])}{detail})")
         return EXIT_PRIVACY
 
 

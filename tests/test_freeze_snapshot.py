@@ -22,6 +22,7 @@ import importlib
 import json
 import os
 import pwd
+import re
 import shutil
 import socket
 import stat
@@ -150,6 +151,37 @@ def find_leaks(texts: dict[str, str], forbidden: dict[str, str], words: dict[str
             if len(value) >= 4 and words_in(text, value):
                 leaks.append(f"{where}: {label}")
     return leaks
+
+
+OWNER_PREFIXES = ("repo.", "roles.", "hooks.", "claude.", "codex.", "wiring.", "tools.", "services.", "gateways.", "extra.",
+                  "capacity.", "time.")
+
+
+def expand_braces(pattern: str) -> list[str]:
+    """`a.{b, c}.d` -> [`a.b.d`, `a.c.d`]; every brace group multiplies the list."""
+    found = re.search(r"\{([^{}]*)\}", pattern)
+    if not found:
+        return [pattern]
+    out: list[str] = []
+    for option in found.group(1).split(","):
+        out += expand_braces(pattern[:found.start()] + option.strip() + pattern[found.end():])
+    return out
+
+
+def pattern_regex(pattern: str) -> str:
+    """`<name>` matches one or more characters and a `*` any run; everything else is literal."""
+    out, index = [], 0
+    while index < len(pattern):
+        if pattern[index] == "<":
+            index = pattern.index(">", index) + 1
+            out.append(".+")
+        elif pattern[index] == "*":
+            index += 1
+            out.append(".*")
+        else:
+            out.append(re.escape(pattern[index]))
+            index += 1
+    return "".join(out)
 
 
 def blind_patch(owner: str) -> tuple[str, str]:
@@ -439,12 +471,12 @@ class FakeHost:
                               cwd=str(cwd or self.root), capture_output=True, text=True, timeout=timeout)
 
     def capture(self, tool: Path, label: str, *extra: str, env: dict | None = None, out: Path | None = None,
-                probe: bool = True) -> "Capture":
+                probe: bool = True, timeout: int = 180) -> "Capture":
         folder = out or self.out
         args = ["capture", "--label", label, "--out", str(folder), "--repo", str(self.repo), "--platform", "linux"]
         if not probe:
             args.append("--no-usage-probe")
-        proc = self.run(tool, *args, *extra, env=env)
+        proc = self.run(tool, *args, *extra, env=env, timeout=timeout)
         return Capture(proc, folder / f"freeze-{label}.json", folder / f"freeze-{label}.sanitized.json")
 
 
@@ -590,6 +622,24 @@ class CatalogueTests(HostCase):
         for role in ROLES:
             for copy in (*COPIES, "identical_across_copies"):
                 self.assertIn(f"roles.{role}.{copy}", ids)
+
+    def test_the_readme_table_covers_every_catalogue_id_and_names_no_other_one(self):
+        """Every backticked id pattern of the README (`a.{b,c}.<d>.*`) is matched against list-frozen, both ways."""
+        readme = (DEFAULT_TOOL.parent / "README.md").read_text(encoding="utf-8")
+        rows = [line for line in readme.splitlines() if line.startswith("| `")]  # table rows only: prose wildcards cover nothing
+        patterns = sorted({span for row in rows for span in re.findall(r"`([^`]+)`", row) if span.startswith(OWNER_PREFIXES)}, key=len)
+        compiled = [(pattern, re.compile(pattern_regex(expanded))) for pattern in patterns for expanded in expand_braces(pattern)]
+        ids = [row["id"] for row in json.loads(self.list_frozen("--all", "--json").stdout)]
+        uncovered = [item_id for item_id in ids if not any(rx.fullmatch(item_id) for _, rx in compiled)]
+        self.assertEqual(uncovered, [], "catalogue ids the README table does not cover")
+        documented_only = ("gateways.", "extra.")
+        stale = sorted({pattern for pattern, rx in compiled
+                        if not pattern.startswith(documented_only) and not any(rx.fullmatch(item_id) for item_id in ids)})
+        self.assertEqual(stale, [], "README id patterns that match no catalogue id")
+        for command in ("capture", "compare", "check", "list-frozen", "--no-usage-probe", "--full", "--quiet"):
+            self.assertIn(command, readme)
+        for code in ("`0`", "`1`", "`2`", "`3`"):
+            self.assertIn(code, readme)
 
     def test_capture_produces_every_catalogued_id_with_a_status(self):
         listing = json.loads(self.list_frozen("--all", "--json").stdout)
@@ -759,6 +809,24 @@ class PrivacyTests(HostCase):
         self.assertEqual(result.proc.returncode, 3, result.proc.stdout + result.proc.stderr)
         self.assertFalse(result.sanitized.exists() or result.full.exists(), "a refused capture writes no file")
         self.assertNotIn("2.1.284", result.proc.stderr + result.proc.stdout, "the refusal does not echo the value")
+        self.assertIn("FREEZE_PLANTED_VERSION", result.proc.stderr, "but it names the variable, which is not a value")
+
+    def test_a_value_or_name_that_the_catalogue_already_contains_is_not_a_leak(self):
+        """A host whose user is called `claude` or whose variable equals a catalogue id must still be able to capture."""
+        env = self.host.env(FREEZE_COINCIDENCE="claude.mcp_count", USER="claude", LOGNAME="claude")
+        cap = self.host.capture(self.tool, "coincide", env=env)
+        self.assertEqual(cap.proc.returncode, 0, cap.proc.stdout + cap.proc.stderr)
+        self.assertEqual(cap.status("claude.mcp_count"), "ok")
+        structural = self.host.capture(self.tool, "structural", env=self.host.env(USER="status", LOGNAME="reason"))
+        self.assertEqual(structural.proc.returncode, 0, structural.proc.stdout + structural.proc.stderr)
+
+    def test_the_user_name_in_a_family_id_is_refused_and_nothing_is_written(self):
+        self.host.write(self.host.home / ".claude" / "hooks" / f"{self.host.user}.py", "hook\n")
+        result = self.host.capture(self.tool, "identity")
+        self.assertEqual(result.proc.returncode, 3, result.proc.stdout + result.proc.stderr)
+        self.assertFalse(result.sanitized.exists() or result.full.exists())
+        self.assertIn("hooks.installed.*", result.proc.stderr, "the refusal names the family, not the member")
+        self.assertNotIn(self.host.user, result.proc.stdout + result.proc.stderr, "and never the value")
 
     def test_capture_never_requests_the_unit_environment(self):
         self.capture("units")
@@ -1032,6 +1100,24 @@ class ConfigTests(HostCase):
         self.assertIn("services.extra-unit.main_pid", listing.stdout)
         self.assertNotIn("extra.repo-note", listing.stdout, "an informational extra is listed only with --all")
 
+    def test_a_configured_unit_can_be_informational_and_a_default_unit_cannot(self):
+        """Paper-trading units run inside a run window and are recorded at its start and end, so their state must not fail."""
+        self.host.set_unit("paper-unit", main_pid=5, exec_start="/usr/bin/x --port 1")
+        config = self.config({"units": [{"name": "paper-unit", "class": "informational"}, "omniroute"]})
+        first = self.capture("u-a", "--config", str(config))
+        self.assertEqual(first.item("services.paper-unit.main_pid")["class"], "informational")
+        self.assertEqual(first.item("services.omniroute.main_pid")["class"], "frozen")
+        self.host.set_unit("paper-unit", main_pid=6, exec_start="/usr/bin/x --port 1", restarts=1)
+        second = self.capture("u-b", "--config", str(config))
+        proc = self.compare(first, second)
+        self.assertEqual(proc.returncode, 0, proc.stdout)
+        self.assertEqual(sorted(k for k in self.kinds(proc).get("INFO", []) if k.startswith("services.")),
+                         ["services.paper-unit.main_pid", "services.paper-unit.n_restarts"])
+        for body in ({"units": [{"name": "omniroute", "class": "informational"}]},
+                     {"units": [{"name": "x", "class": "other"}]}, {"units": [{"name": "x", "extra": 1}]}, {"units": [{"class": "frozen"}]}):
+            result = self.host.capture(self.tool, "bad", "--config", str(self.config(body)))
+            self.assertEqual(result.proc.returncode, 2, f"{body}: {result.proc.stdout}{result.proc.stderr}")
+
     def test_invalid_configuration_is_a_usage_error(self):
         bad = ({"nope": 1}, {"files": [{"id": "has space", "path": "~/x"}]}, {"files": [{"id": "x"}]}, {"units": ["../evil"]},
                {"units": ["-p"]}, {"gateways": [{"id": "g", "base_url": "http://example.com", "routes": []}]}, {"files": "x"},
@@ -1052,6 +1138,24 @@ class ConfigTests(HostCase):
         self.assertEqual(before.status("tools.parser.file.tree-sitter-bash:package.json"), "missing")
         cap = self.capture("p-b", "--config", str(self.config({"parser_dir": "~/moved-parser"})))
         self.assertIs(cap.value("tools.parser.all_match_pin"), True)
+
+    def test_a_configured_file_that_is_not_a_regular_file_is_an_error_and_never_blocks(self):
+        os.mkfifo(self.host.home / "pipe")
+        config = self.config({"files": [{"id": "pipe", "path": "~/pipe"}, {"id": "dir", "path": "~/.claude"}]})
+        cap = self.host.capture(self.tool, "fifo", "--config", str(config), timeout=60)
+        self.assertEqual(cap.proc.returncode, 0, cap.proc.stdout + cap.proc.stderr)
+        self.assertEqual((cap.status("extra.pipe"), cap.item("extra.pipe")["reason"]), ("error", "not_regular_file"))
+        self.assertEqual((cap.status("extra.dir"), cap.item("extra.dir")["reason"]), ("error", "is_directory"))
+
+    def test_a_parser_pin_with_an_unusable_key_is_unrecognized_not_partly_read(self):
+        pin_path = self.host.repo / "examples" / "claude-native" / "workflows" / "shell-parser.pin.json"
+        pin = json.loads(pin_path.read_text(encoding="utf-8"))
+        pin["files"]["node_modules/tree-sitter-bash/has space.json"] = "0" * 64
+        self.host.write(pin_path, json.dumps(pin))
+        cap = self.capture("pin")
+        self.assertEqual((cap.status("tools.parser.all_match_pin"), cap.item("tools.parser.all_match_pin")["reason"]),
+                         ("error", "unrecognized_pin"))
+        self.assertFalse([i for i in cap.items() if i.startswith("tools.parser.file.")])
 
     def test_tokenizer_location_can_be_overridden(self):
         moved = self.host.home / "moved-tokenizer"
@@ -1442,6 +1546,8 @@ class ParserTests(unittest.TestCase):
                  "odd name: has a space - ✔ Connected\n"
                  "\nMCP config diagnostics\n\nLocation: /p - q [project: /r - s]\n")
         self.assertEqual(parse(mixed), {"qmd": False, "serena": False, "ai-memory": True})
+        other = "Checking MCP server health\u2026\n\na: x - \u2718 Disconnected\nb: x - Connecting...\nc: x - \u2714 Connected\n"
+        self.assertEqual(parse(other), {"a": False, "b": False, "c": True})
         self.assertEqual(parse("Checking MCP server health…\n\n"), {})
         self.assertEqual(parse("No MCP servers configured\n"), {})
         self.assertIsNone(parse(""))
@@ -1491,6 +1597,26 @@ class ParserTests(unittest.TestCase):
             self.assertEqual(alias(value), value)
         for value in ("Opus", "sk-ant-" + "a" * 60, "a b", "opus/../x", "", "1x", "x" * 41, 7, None, ["opus"]):
             self.assertEqual(alias(value), "other", repr(value))
+
+    def test_guard_output_refuses_substrings_and_whole_words_and_path_characters_in_the_sanitized_record(self):
+        guard, refusal = self.api("guard_output"), self.api("PrivacyRefusal")
+        mark = self.api("WORD_MARK")
+        record = {"items": [{"id": "a.b", "value": "prefix-zz-secret-7f3a-suffix"}, {"id": "c.d", "value": "fine"}]}
+        with self.assertRaises(refusal) as caught:
+            guard(record, json.dumps(record), ["zz-secret-7f3a"], False)
+        self.assertEqual(caught.exception.items, ["a.b"])
+        guard(record, json.dumps(record), [mark + "name", "unrelated-value"], False)
+        named = {"items": [{"id": "e.f", "value": "the Name here"}, {"id": "g.h", "value": "renamed"}]}
+        with self.assertRaises(refusal) as caught:
+            guard(named, json.dumps(named), [mark + "name"], False)
+        self.assertEqual(caught.exception.items, ["e.f"], "a whole word matches, a substring of a longer word does not")
+        pathy = {"items": [{"id": "i.j", "value": "a/b", "path": "~/x"}]}
+        guard(pathy, json.dumps(pathy), [], False)
+        with self.assertRaises(refusal):
+            guard(pathy, json.dumps(pathy), [], True)
+        with self.assertRaises(refusal) as caught:
+            guard({"items": [], "label": "zz-secret-7f3a"}, "{}", ["zz-secret-7f3a"], True)
+        self.assertEqual(caught.exception.items, ["record"])
 
     def test_digest_rule_and_ignore_keys(self):
         digest = self.api("digest_body")
