@@ -2936,5 +2936,106 @@ class CodexCodeModeAttribution(unittest.TestCase):
                          ("incomplete", 1))
 
 
+class CodexRtkReplay(unittest.TestCase):
+    """PR-A item 10d (U3 design section 5, commit 9, with the review's wrapped_exceptions provenance finding). The Codex bridge
+    asks the kernel to replay with `rtk hook check --agent codex`, the decision the held Codex hook would make: rtk-ai/rtk
+    v0.50.0 maps codex to InProcess(Host::Codex), which has no RTK-side permission rules, while claude merges the project's and
+    the home's .claude/settings(.local).json Bash rules (src/hooks/decision.rs:196-204, permissions.rs:56-67, :141-175).
+    rtk_parts.agent names the replay agent, and rtk_parts.d7 is the Codex-only D7 view: the fixed-config eligible parts less
+    the log and find parts a digest-bound review marks requires_raw, prefixed or not; an unreviewed log or find part stays
+    and leaves d7 incomplete; d7.wrapped_exceptions inherits the kernel's explicit_rtk_on_excluded_or_sensitive (M6c's zero
+    counter, workflows README) and adds each prefixed requires_raw part."""
+
+    REVIEWED = "bounded history, independently checked"
+
+    def test_the_bridge_asks_the_kernel_for_codex_replay(self):
+        payloads = []
+        real = S._measurement_bridge
+
+        def recording(payload, **kwargs):
+            payloads.append(payload)
+            return real(payload, **kwargs)
+        with mock.patch.object(S, "_measurement_bridge", side_effect=recording):
+            got = u3_measure(PAGINATED_META, sourced_command("item_b1", ["bash", "-lc", "git status"], "agent"))
+        self.assertEqual([payload["options"].get("rtkAgent") for payload in payloads], ["codex"])
+        self.assertEqual(got["rtk_parts"].get("agent"), "codex")
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_codex_replay_ignores_claude_permission_rules(self):
+        # A home settings file that denies Bash(git status), with the working directory outside any project: rtk 0.50.0
+        # answers the claude agent with a denial (exit 1, not "No rewrite for:"), which the kernel counts as an unknown call,
+        # and the codex agent with its rewrite (probed on this host, 2026-09-29). The file registers the rtk hook, since a
+        # Claude directory without one makes the claude agent print a once-a-day "No hook installed" warning first
+        # (rtk-ai/rtk v0.50.0 src/hooks/hook_check.rs:26-35, :88-135), which fails the kernel's five-exclusion probe.
+        scratch = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (scratch / "home" / ".claude").mkdir(parents=True)
+        (scratch / "home" / ".claude" / "settings.json").write_text(json.dumps({
+            "permissions": {"deny": ["Bash(git status)"]},
+            "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "rtk hook claude"}]}]}}))
+        (scratch / "cwd").mkdir()
+        self.enterContext(mock.patch.dict(os.environ, {"HOME": str(scratch / "home")}))
+        self.enterContext(contextlib.chdir(scratch / "cwd"))
+        codex = S.measure_codex_records([PAGINATED_META, sourced_command("item_d1", ["bash", "-lc", "git status"], "agent")],
+                                        since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), rtk_check=True)["rtk_parts"]
+        self.assertEqual((codex["eligible_parts"], codex["unknown_calls"], codex["status"]), (1, 0, "measured"))
+        claude = S._measurement_bridge({"rows": [{"type": "assistant", "timestamp": "2026-10-20T02:00:00Z", "message": {
+            "content": [{"type": "tool_use", "id": "toolu_priv_1", "name": "Bash", "input": {"command": "git status"}}]}}],
+            "options": {"rtkCheck": True}})["rtk_parts"]
+        self.assertEqual((claude["eligible_parts"], claude["unknown_calls"], claude["status"]), (0, 1, "incomplete"))
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_d7_excludes_reviewed_log_find_parts_and_counts_wrapped_exceptions(self):
+        def review(disposition):
+            return {"rtk_log_find": [{"part": 1, "disposition": disposition}], "witness": self.REVIEWED}
+        keys = ("eligible_parts", "covered_parts", "eligible_calls", "all_covered_calls", "wrapped_exceptions",
+                "log_find_permitted_parts", "log_find_requires_raw_parts", "log_find_unresolved_parts", "status")
+        cases = [  # command, its review, the fixed-config eligible parts, then d7 by `keys`
+            ("git log -n 200", review("requires_raw"), 1, (0, 0, 0, 0, 0, 0, 1, 0, "measured")),
+            ("rtk git log -n 200", review("requires_raw"), 1, (0, 0, 0, 0, 1, 0, 1, 0, "measured")),
+            ("rtk git log -3", review("permitted"), 1, (1, 1, 1, 1, 0, 1, 0, 0, "measured")),
+            ("git log --oneline -5", None, 1, (1, 0, 1, 0, 0, 0, 0, 1, "incomplete")),
+            ("rtk cd x && ls", None, 1, (1, 0, 1, 0, 1, 0, 0, 0, "measured")),
+            ("rtk proxy git log", None, 0, (0, 0, 0, 0, 0, 0, 0, 0, "measured")),
+            ("git status && rtk git status", None, 2, (2, 1, 1, 0, 0, 0, 0, 0, "measured"))]
+        for command, sidecar, eligible, expected in cases:
+            with self.subTest(command=command):
+                got = S.measure_codex_records(
+                    [PAGINATED_META, sourced_command("item_v1", ["bash", "-lc", command], "agent")],
+                    since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), rtk_check=True,
+                    exceptions={"item_v1": sidecar} if sidecar else {})["rtk_parts"]
+                self.assertEqual(got["eligible_parts"], eligible)
+                d7 = got.get("d7", {})
+                self.assertEqual(tuple(d7.get(key) for key in keys), expected)
+        got = S.measure_codex_records([PAGINATED_META, sourced_command("item_v2", ["bash", "-lc", "git status && ls"], "agent")],
+                                      since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), rtk_check=True)
+        self.assertEqual((got["rtk_parts"].get("d7", {}).get("coverage"), got["rtk_parts"].get("d7", {}).get("call_coverage")),
+                         (0.0, 0.0))
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_an_unresolved_command_leaves_d7_incomplete_and_groups_sum_d7(self):
+        # The unresolved text '' is replayed as a measured call without parts under either agent (rtk 0.50.0 answers
+        # "No rewrite for: "), so the bridge adds it as an unknown call (commit 6) and d7 is incomplete as well.
+        got = S.measure_codex_records([PAGINATED_META, sourced_command("item_w1", ["pwsh", "-Command", "git status"], "agent")],
+                                      since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), rtk_check=True)
+        self.assertEqual((got["rtk_parts"]["unknown_calls"], got["rtk_parts"].get("d7", {}).get("status")), (1, "incomplete"))
+
+        def rollout(key, command):
+            return [{**PAGINATED_META, "payload": {**PAGINATED_META["payload"], "id": "u3-session-" + key}},
+                    codex_row("response_item", developer(CATALOG)),
+                    sourced_command("item_" + key, ["bash", "-lc", command], "agent")]
+        root = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            "rollout-2026-10-20T02-00-00-u3-d7-a.jsonl": rollout("a", "rtk git status && ls"),
+            "rollout-2026-10-20T02-10-00-u3-d7-b.jsonl": rollout("b", "git status")})
+        scan = S.scan_codex_lanes([root], load_fixture_manifest(), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL),
+                                  marker=MARKER, rtk_check=True)
+        group = scan["groups"]["workers"]["measurement"]["rtk_parts"]
+        self.assertEqual(group.get("agent"), "codex")
+        d7 = group.get("d7", {})
+        self.assertEqual({key: d7.get(key) for key in ("eligible_parts", "covered_parts", "coverage", "eligible_calls",
+                                                         "all_covered_calls", "status")},
+                         {"eligible_parts": 3, "covered_parts": 1, "coverage": 0.3333, "eligible_calls": 2,
+                          "all_covered_calls": 0, "status": "measured"})
+
+
 if __name__ == "__main__":
     unittest.main()

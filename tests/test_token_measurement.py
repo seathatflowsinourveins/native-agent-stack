@@ -215,18 +215,22 @@ def proxy_row(calls=1, prefix_rule_calls=0, **counts):
 
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
 class TokenMeasurement(unittest.TestCase):
-    def measure(self, rows, *, env=None, parser=True, **options):
+    def measure(self, rows, *, env=None, parser=True, cwd=None, **options):
         """measureTranscript over `rows`. With parser=True (the default) the kernel's loadShellParser() is awaited first, as its CLI and
         the Codex bridge do; on a host with no install, or with CHILD_USAGE_SHELL_PARSER in `env` naming none, cli_lanes says so."""
+        p = self.run_measure(rows, env=env, parser=parser, cwd=cwd, **options)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        return json.loads(p.stdout)
+
+    def run_measure(self, rows, *, env=None, parser=True, cwd=None, **options):
+        """The node process of measure(), returned whatever its exit status."""
         script = ("import {readFileSync} from 'node:fs'; import {measureTranscript, loadShellParser} from "
                   + json.dumps(MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); "
                   + ("await loadShellParser(); " if parser else "")
                   + "process.stdout.write(JSON.stringify(measureTranscript(x.rows,x.options))); ")
-        p = subprocess.run(["node", "--input-type=module", "-e", script],
-                           input=json.dumps({"rows": rows, "options": options}),
-                           text=True, capture_output=True, check=False, env=env)
-        self.assertEqual(p.returncode, 0, p.stderr)
-        return json.loads(p.stdout)
+        return subprocess.run(["node", "--input-type=module", "-e", script],
+                              input=json.dumps({"rows": rows, "options": options}),
+                              text=True, capture_output=True, check=False, env=env, cwd=cwd)
 
     def exports(self, expression, value, *, env=None, parser=True):
         """Evaluate `expression` (awaited) over the module's exports (`cu`) and the JSON input (`x`), after awaiting loadShellParser()
@@ -1591,6 +1595,65 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(got["proxy_parts"], 1)
                 self.assertEqual(got["eligible_parts"], 1)
                 self.assertEqual(got["coverage"], 1)
+
+    def test_rtk_agent_is_claude_by_default_or_codex(self):
+        # PR-A U3 10d (design section 5): measureTranscript's rtkAgent is claude unless the caller asks for codex, and any other
+        # value is refused, so a typo cannot silently replay for another agent. The Claude output keeps its exact shape
+        # (no d7), and a Codex measurement carries rtk_parts.d7 whatever its status.
+        rows = [call("a", "Bash", command="git status")]
+        refused = self.run_measure(rows, rtkAgent="copilot")
+        self.assertNotEqual(refused.returncode, 0)
+        default = self.measure(rows)
+        self.assertEqual(self.measure(rows, rtkAgent="claude"), default)
+        self.assertNotIn("d7", default["rtk_parts"])
+        codex = self.measure(rows, rtkAgent="codex")["rtk_parts"]
+        self.assertEqual({key: codex.get("d7", {}).get(key) for key in ("status", "eligible_parts", "coverage")},
+                         {"status": "not_measured", "eligible_parts": 0, "coverage": None})
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_rtk_agent_codex_replays_without_claude_permission_rules(self):
+        # rtk-ai/rtk v0.50.0: claude merges the project's and the home's .claude/settings(.local).json Bash rules into its verdict
+        # and codex has none (src/hooks/permissions.rs:56-67, :141-175), while the rewrite decision is the same for both
+        # (decision.rs:61-97). With a home settings file denying Bash(git status) and the working directory outside any
+        # project, claude's denial is an unknown call and codex's answer is the rewrite; every other fixed-config field agrees.
+        # The settings register the rtk hook: a Claude directory without one makes the claude agent print a once-a-day
+        # "No hook installed" warning first (src/hooks/hook_check.rs:26-35, :88-135), which fails the five-exclusion probe.
+        with tempfile.TemporaryDirectory() as directory:
+            home, cwd = Path(directory) / "home", Path(directory) / "cwd"
+            (home / ".claude").mkdir(parents=True)
+            (home / ".claude" / "settings.json").write_text(json.dumps({
+                "permissions": {"deny": ["Bash(git status)"]},
+                "hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "rtk hook claude"}]}]}}))
+            cwd.mkdir()
+            env = {**os.environ, "HOME": str(home)}
+            denied = [call("a", "Bash", command="git status")]
+            claude = self.measure(denied, env=env, cwd=cwd, rtkCheck=True)["rtk_parts"]
+            codex = self.measure(denied, env=env, cwd=cwd, rtkCheck=True, rtkAgent="codex")["rtk_parts"]
+            self.assertEqual((claude["eligible_parts"], claude["unknown_calls"], claude["status"]), (0, 1, "incomplete"))
+            self.assertEqual((codex["eligible_parts"], codex["unknown_calls"], codex["status"]), (1, 0, "measured"))
+            rows = [call(str(i), "Bash", command=command) for i, command in enumerate([
+                "git log -3 && gh pr view 1 | head -n 5", "rtk git log -3", "rtk cd x && ls -la", "rtk proxy git diff --stat",
+                "git status > out.txt", "rtk jq . a.json", "find . -name x"])]
+            claude = self.measure(rows, env=env, cwd=cwd, rtkCheck=True)["rtk_parts"]
+            codex = self.measure(rows, env=env, cwd=cwd, rtkCheck=True, rtkAgent="codex")["rtk_parts"]
+            self.assertIn("d7", codex)
+            self.assertEqual({key: value for key, value in codex.items() if key != "d7"}, claude)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_aggregate_sums_d7_only_for_codex_measurements(self):
+        runs = [[call("a", "Bash", command="rtk git status && ls")], [call("b", "Bash", command="git status")]]
+        home = self.enterContext(tempfile.TemporaryDirectory())  # no home settings reach the claude replay
+        env = {**os.environ, "HOME": home}
+        codex = self.exports("cu.aggregateMeasurements(x.map((rows) => cu.measureTranscript(rows, {rtkCheck: true, "
+                             "rtkAgent: 'codex'})))", runs, env=env)["rtk_parts"]
+        self.assertEqual({key: codex.get("d7", {}).get(key) for key in ("eligible_parts", "covered_parts", "coverage",
+                                                                          "eligible_calls", "all_covered_calls", "status")},
+                         {"eligible_parts": 3, "covered_parts": 1, "coverage": 0.3333, "eligible_calls": 2,
+                          "all_covered_calls": 0, "status": "measured"})
+        claude = self.exports("cu.aggregateMeasurements(x.map((rows) => cu.measureTranscript(rows, {rtkCheck: true})))",
+                              runs, env=env)["rtk_parts"]
+        self.assertNotIn("d7", claude)
+        self.assertEqual({key: value for key, value in codex.items() if key != "d7"}, claude)
 
     def test_unsupported_rtk_version_reports_unavailable(self):
         with tempfile.TemporaryDirectory() as directory:
