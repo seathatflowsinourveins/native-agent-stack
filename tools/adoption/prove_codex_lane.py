@@ -22,9 +22,12 @@ Static checks (no model call):
                 agents folder holds exactly two *.toml files, and the live config.toml, the worker profile and the
                 system layer (/etc/codex) declare no other role: counts and booleans only, no model call. There is no
                 live role check here: the --live workers below run with --ephemeral, which persists no rollout, and
-                the exec JSONL item of a spawn_agent call (CollabToolCallItem, codex-rs/exec/src/exec_events.rs at
-                rust-v0.157.1) carries neither the child's role nor its developer text, so such a check could not
-                show that a role applied. Only the child's own rollout, from a non-ephemeral run, can.
+                the exec JSONL stream cannot tell a found role from an unknown one. At openai/codex rust-v0.157.1 with
+                multi-agent V2, a successful spawn_agent emits a SubAgentActivity item that exec's mapping drops
+                (codex-rs/exec/src/event_processor_with_jsonl_output.rs, its catch-all arm; core/src/tools/handlers/
+                multi_agents_v2/spawn.rs), a failed spawn (an unknown agent_type) emits no item, and wait_agent's
+                item has empty receiver_thread_ids and agents_states (multi_agents_v2/wait.rs). Only the child's own
+                rollout, from a non-ephemeral run, shows the role; those probes are the capability-gate follow-up.
   rtk-exactness in a scratch repository whose committed big.txt is over 8 KiB: `rtk git status` exits 0,
                 native `git show HEAD:big.txt` is byte-exact, and `rtk git show HEAD:big.txt` is not (the
                 reason it is an exception)

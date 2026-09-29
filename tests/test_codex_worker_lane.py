@@ -1918,9 +1918,10 @@ class RolesRowTests(unittest.TestCase):
     """prove_codex_lane's static `roles` row (design 4.3 case o): the installed carriers against their pinned rows,
     the *.toml files under agents, the role tables of the live config and profile, and the system layer. Counts
     and booleans only; no model call. Live role checks are deliberately not part of this tool: its --live workers
-    run with --ephemeral, which persists no rollout, and the exec JSONL item of a spawn_agent call
-    (CollabToolCallItem: tool, thread ids, prompt, states, status) carries neither the child's role nor its
-    developer text, so a live check here could not show that a role applied."""
+    run with --ephemeral, which persists no rollout, and at rust-v0.157.1 with multi-agent V2 the exec JSONL stream
+    carries no item for a spawn_agent call (a successful one emits a SubAgentActivity item that exec's mapping
+    drops, a failed one none, and wait_agent's item has empty receiver_thread_ids), so a live check here could not
+    tell a found role from an unknown one."""
 
     ROW = "installed {equal}/2 equal to SHA256SUMS; *.toml under agents {count}; role tables {tables}; system roles {system}"
 
