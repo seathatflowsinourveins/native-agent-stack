@@ -88,6 +88,7 @@ SHORT_TAIL_MAX = 3
 DRAIN_SECONDS = 2.0          # after the command exits, how long a descendant may keep a pipe open
 POLL_SECONDS = 0.1
 READ_SIZE = 65536
+CORE_PATTERN_FILE = "/proc/sys/kernel/core_pattern"  # a name, never a value, in the messages that mention it
 FORWARDED = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 
 
@@ -467,12 +468,41 @@ def ensure_standard_descriptors() -> None:
             if opened != fd:
                 os.dup2(opened, fd)
                 os.close(opened)
+            os.set_inheritable(fd, True)  # os.open's descriptor is close-on-exec: the command would get EBADF, not EOF
+
+
+def check_core_pattern(path=None) -> None:
+    """Refuse a host whose kernel hands a crashing process to a collector: RLIMIT_CORE 0 stops a core file, not that.
+
+    The kernel sets the limit aside for a pattern that begins `|` (a program: systemd-coredump, apport) and for one that
+    begins `@` (a core socket): torvalds/linux@v6.16 fs/coredump.c L795-820 and L242-243 and L919. systemd-coredump
+    then declines to store a core when the limit is 0 but still journals the process environment, COREDUMP_ENVIRON
+    (systemd/systemd@v257 src/coredump/coredump.c L472-479 and L1458-1459). There is no override. A file that does not
+    exist (macOS, no /proc) skips the check; one that cannot be read is refused. The message names the file, never
+    what it holds. Only the pattern is read: a debugger, ptrace or /proc reads by the same uid are out of scope."""
+    path = CORE_PATTERN_FILE if path is None else path
+    where = "inspect " + CORE_PATTERN_FILE
+    try:
+        with open(path, "rb") as handle:
+            first = handle.read(1)
+    except (FileNotFoundError, NotADirectoryError):
+        return
+    except OSError:
+        raise Refused(f"core_pattern_unreadable: cannot read {CORE_PATTERN_FILE}; inspect that file") from None
+    if first == b"|":
+        raise Refused(f"core_pattern_pipe: this host sends crash dumps to a program; {where}")
+    if first == b"@":
+        raise Refused(f"core_pattern_socket: this host sends crash dumps to a socket; {where}")
 
 
 def disable_core_dumps() -> None:
-    """RLIMIT_CORE 0 for this process and, inherited, for the command: no core file ever holds a value."""
-    with contextlib.suppress(ValueError, OSError):
+    """RLIMIT_CORE 0 for this process and, inherited, for the command: no core file ever holds a value. A host whose
+    core_pattern hands dumps to a collector is refused first, and so is a limit that cannot be set."""
+    check_core_pattern()
+    try:
         resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+    except (ValueError, OSError):
+        raise Refused("core_limit_not_set: could not set RLIMIT_CORE to 0") from None
 
 
 def run_command(command: list, environment: dict, needles: list) -> int:
