@@ -268,6 +268,13 @@ class BootReceiptTests(unittest.TestCase):
         self.assertEqual(len(written), 1, [p.name for p in written])
         text = written[0].read_text(encoding="utf-8")
         receipt = json.loads(text)
+        # The receipt the unit's command writes keeps to the same allowlist, with fingerprints of exactly three fields.
+        found = key_paths(receipt)
+        self.assertLessEqual(found, ALLOWED_KEYS, f"keys outside the allowlist: {sorted(found - ALLOWED_KEYS)}")
+        fingerprints = [row["fingerprint"] for row in receipt["rows"] if row.get("fingerprint") is not None]
+        self.assertGreaterEqual(len(fingerprints), 7)
+        for fingerprint in fingerprints:
+            self.assertEqual(set(fingerprint), FINGERPRINT_KEYS)
         compare = self.run_cli("compare")
         self.assertEqual(compare.returncode, 0, compare.stderr)
         outputs = {"receipt": text, "printed line": result.stdout, "stderr": result.stderr,
