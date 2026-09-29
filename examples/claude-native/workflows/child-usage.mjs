@@ -443,8 +443,20 @@ function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
     const run = depth < NESTING_LIMIT ? RUN_QUOTED.exec(out.s) : null
     if (run) {
       // The ssh alternative of RUN_QUOTED: the string runs in the remote shell.
-      if (marks && run[0].startsWith('ssh', ' \t\n;&|('.includes(run[0][0]) ? 1 : 0)) { const range = rawRange(inner); if (range) marks.remote.push(range) }
-      insert(out, ';'); append(out, executedTrace(ch === '"' ? unquoted(inner) : inner, inlineHttp, resolved, depth + 1, marks)); insert(out, ';')
+      const remote = marks && run[0].startsWith('ssh', ' \t\n;&|('.includes(run[0][0]) ? 1 : 0)
+      if (ch === '"') {
+        // Two views of a double-quoted string a shell runs (POSIX.1-2024 XCU 2.2.3 and 2.6.3; U1 pivot D7, GPT-6 #8): the shell
+        // that expands the word runs each unescaped "$( )" and backquoted span itself, before the shell it starts reads anything,
+        // whatever that shell then makes of the text; that shell reads the string with each of them replaced by its output,
+        // which is unknown, so a placeholder word. The outer bodies come first, as they run, each as commands of their own.
+        const spans = outerSpans(inner.s, depth), view = withoutSpans(inner, spans)
+        for (const span of spans) { insert(out, ';'); append(out, outerBody(inner, span, inlineHttp, resolved, depth, marks)); insert(out, ';') }
+        if (remote) { let at = 0; for (const span of [...spans, { from: inner.s.length, to: inner.s.length }]) { const range = rawRange(slice(inner, at, span.from)); if (range) marks.remote.push(range); at = span.to } }
+        insert(out, ';'); append(out, executedTrace(unquoted(view), inlineHttp, resolved, depth + 1, marks)); insert(out, ';')
+      } else {
+        if (remote) { const range = rawRange(inner); if (range) marks.remote.push(range) }
+        insert(out, ';'); append(out, executedTrace(inner, inlineHttp, resolved, depth + 1, marks)); insert(out, ';')
+      }
     } else if (inlineHttp && RUN_HTTP_CODE.test(out.s)) { insert(out, ';'); append(out, inner); insert(out, ';') }
     else if (ch === '"') { insert(out, '"'); quotedData(out, inner, inlineHttp, resolved, depth, marks); insert(out, '"') }
     else { insert(out, "'"); append(out, { s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); insert(out, "'") }
@@ -452,22 +464,74 @@ function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
   }
   return out
 }
+// The substitutions of a double-quoted string that the shell expanding it runs, in order (POSIX.1-2024 XCU 2.2.3 and 2.6.3):
+// each "$( ... )" and each backquoted span outside an escape, as { from, to, body: [start, end), kind }. A "$((" opens an
+// arithmetic expansion, not a substitution, though the substitutions inside it are found. A "$(" at NESTING_LIMIT is not
+// followed (its text then reads as data), and text that ends first ends the span there. One scanner serves both views of a string.
+function outerSpans(s, depth) {
+  const spans = []
+  for (let i = 0; i < s.length;) {
+    const ch = s[i]
+    if (ch === '\\' && i + 1 < s.length) i += 2
+    else if (ch === '$' && s[i + 1] === '(' && s[i + 2] !== '(' && depth < NESTING_LIMIT) {
+      const k = matchParen(s, i + 2)
+      spans.push({ from: i, to: Math.min(k + 1, s.length), body: [i + 2, k], kind: '$' })
+      i = k + 1
+    } else if (ch === '`') {
+      const k = closeQuote(s, i)
+      spans.push({ from: i, to: Math.min(k + 1, s.length), body: [i + 1, k], kind: '`' })
+      i = k + 1
+    } else i++
+  }
+  return spans
+}
+// `inner` with each span replaced by the placeholder word _ (inserted text: offset -1), the string a shell reads once the
+// shell that expanded it has run its substitutions.
+function withoutSpans(inner, spans) {
+  if (!spans.length) return inner
+  const out = { s: '', p: [] }
+  let at = 0
+  for (const span of spans) { append(out, slice(inner, at, span.from)); insert(out, '_'); at = span.to }
+  append(out, slice(inner, at, inner.s.length))
+  return out
+}
+// The commands one outer substitution runs, as executed text. The body of a "$( )" is shell text as written (double quotes leave
+// it alone, 2.6.3); a backquoted span first loses the backslash before $ ` \ and " (2.6.3, and 2.2.3 inside double quotes). Any
+// heredoc in a body that an outer phase already resolved is in `resolved` and is skipped.
+function outerBody(inner, span, inlineHttp, resolved, depth, marks) {
+  const [a, b] = span.body
+  let body = slice(inner, a, b)
+  if (span.kind === '`') {
+    const plain = { s: '', p: [] }
+    for (let i = 0; i < body.s.length; i++) {
+      if (body.s[i] === '\\' && i + 1 < body.s.length && '$`\\"'.includes(body.s[i + 1])) i++
+      plain.s += body.s[i]; plain.p.push(body.p[i])
+    }
+    body = plain
+  }
+  return executedTrace(body, inlineHttp, resolved, depth + 1, marks)
+}
 // Double-quoted data keeps its words and loses the separators that would put a word in command position, while its
 // command substitutions still run (POSIX.1-2024 XCU 2.2.3): the body of a "$( ... )" is analyzed as shell text, its
 // tokens recognized recursively up to the matching ")" (2.6.3; its heredocs were resolved with its lines), a backquoted
 // span is kept as it is, and an escaped character becomes the data character _.
 function quotedData(out, inner, inlineHttp, resolved, depth, marks) {
   const s = inner.s
-  for (let i = 0; i < s.length;) {
-    const ch = s[i]
-    if (ch === '\\' && i + 1 < s.length) { out.s += '_'; out.p.push(inner.p[i + 1]); i += 2 }
-    else if (ch === '$' && s[i + 1] === '(' && s[i + 2] !== '(' && depth < NESTING_LIMIT) {
-      const k = matchParen(s, i + 2)
-      append(out, slice(inner, i, i + 2)); append(out, scanQuotes(slice(inner, i + 2, k), inlineHttp, resolved, depth + 1, marks)); append(out, slice(inner, k, k + 1))
-      i = k + 1
-    } else if (ch === '`') { const k = closeQuote(s, i); append(out, slice(inner, i, k + 1)); i = k + 1 }
-    else { out.s += QUOTED_SEPARATOR.has(ch) ? ' ' : ch; out.p.push(inner.p[i]); i++ }
+  let at = 0
+  const literal = (to) => {
+    for (let i = at; i < to;) {
+      if (s[i] === '\\' && i + 1 < s.length) { out.s += '_'; out.p.push(inner.p[i + 1]); i += 2 }
+      else { out.s += QUOTED_SEPARATOR.has(s[i]) ? ' ' : s[i]; out.p.push(inner.p[i]); i++ }
+    }
   }
+  for (const span of outerSpans(s, depth)) {
+    literal(span.from)
+    const [a, b] = span.body
+    if (span.kind === '$') { append(out, slice(inner, span.from, a)); append(out, scanQuotes(slice(inner, a, b), inlineHttp, resolved, depth + 1, marks)); append(out, slice(inner, b, b + 1)) }
+    else append(out, slice(inner, span.from, span.to))
+    at = span.to
+  }
+  literal(s.length)
 }
 // The string a shell receives from a double-quoted word: a backslash before $ ` " \ or newline is removed, and an
 // escaped newline with it (POSIX.1-2024 XCU 2.2.3), except inside a "$( )" or a backquoted span, whose text the double
