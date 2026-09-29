@@ -134,7 +134,7 @@ Each cell gives the job conclusion, then the actionlint step's conclusion:
 
 | Item (2026-09-27 `live_run_pending`) | Now | Closed by |
 | --- | --- | --- |
-| 1. First hosted run of the successor job and green PR checks | closed | PR #449's checks and the 25 runs above |
+| 1. First hosted run of the successor job and green PR checks | closed except the shellcheck sub-claim | PR #449's checks and the 25 runs above; no hosted log shows 1.17.0's shellcheck rule running (no `-verbose`) |
 | 2. zizmor's online audits in the required job, with `github.token` | closed | validate job 109180818981, below |
 | 3. `test_job_parser_matches_yaml_when_available` (needs PyYAML) | **open** | not observable from the hosted log, below |
 | 4. Swapping the required gate | done here | this branch; its hosted run is pending |
@@ -227,12 +227,32 @@ Re-open the selection if either happens:
 Compare the candidate with kjanat/actionlint by the 2026-09-27 trial's parity
 method before changing the pin.
 
+## Local negative control (our integration)
+
+[`fixtures/nc.yml.txt`](fixtures/nc.yml.txt) (sha256 `39e955c9…`) is a
+`workflow_dispatch`-only workflow with no `uses:`, whose step condition reads an
+output of a step that does not exist. In a scratch tree with it at
+`.github/workflows/nc.yml`, on 2026-09-29T00:11:29Z:
+
+| Run | Exit | Output |
+| --- | --- | --- |
+| zizmor 1.30.1, `--persona regular` (the validate step's form) | 0 | No findings (1 suppressed) |
+| kjanat 1.17.0 `actionlint -color`, no shellcheck on PATH | 1 | `.github/workflows/nc.yml:17:13: property "missing" is not defined in object type {} [expression]` |
+| the same, shellcheck 0.9.0-1 on PATH | 1 | the same diagnostic |
+
+So the validate job would pass zizmor and fail at the actionlint step. The
+hosted counterpart is pending (below).
+
 ## Live-run pending
 
 - This branch's hosted validate run: the swapped step and zizmor's online
   audits over the changed `validate.yml`.
 - A hosted negative control showing the swapped step failing a workflow it
-  should reject.
+  should reject. Not run: it needs the pre-push workflow-coverage test bypassed
+  or edited on a throwaway branch. The local negative control below uses the same
+  fixture and binary.
+- Evidence that 1.17.0's shellcheck rule ran on the hosted runner (a hosted
+  `-verbose` run or a `command -v shellcheck` line in the step).
 - Item 3, the PyYAML parser cross-check.
 
 ## Retained failures and sanitization

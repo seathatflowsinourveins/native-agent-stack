@@ -100,7 +100,7 @@ validator. The existing pinned zizmor lane checks workflow security. Upstream
 [actionlint](https://github.com/kjanat/actionlint) checks workflow syntax, expressions
 and action usage. Neither executes a job or establishes model-task quality.
 
-Since 2026-09-28 the pin is kjanat/actionlint 1.17.0, the maintained fork that replaced the stalled rhysd/actionlint 1.7.12 ([swap receipt](../evidence/artifacts/actionlint-successor-swap-20260928/README.md)). Its
+Since 2026-09-28 the pin is kjanat/actionlint 1.17.0, the maintained fork that replaced the stalled rhysd/actionlint 1.7.12 ([swap receipt](../evidence/artifacts/actionlint-successor-swap-20260928/README.md)). Its The 2026-09-20 and 2026-09-21 results and the shellcheck finding below used this procedure against rhysd/actionlint v1.7.12 ([its install doc at v1.7.12](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)).
 [binary installation procedure](https://github.com/kjanat/actionlint/blob/v1.17.0/docs/install.md?plain=1#L124-L134) supports a task-local download and provenance verification, with no global install:
 
 ```sh

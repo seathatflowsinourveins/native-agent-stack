@@ -172,6 +172,33 @@
   "matches_20260927_trial": "The archive digest, the extracted-binary digest, the signer identity, source digest 08bb2c4f and the run invocation equal evidence/artifacts/actionlint-successor-parity-20260927/receipt.json verification.kjanat_actionlint_1.17.0.",
   "asset_disposition": "The downloaded archive, the checksums file and the extracted binary were deleted from scratch after the checks; none is committed."
  },
+ "local_negative_control": {
+  "evidence_class": "our-integration",
+  "recorded_utc": "2026-09-29T00:11:29Z",
+  "fixture": "evidence/artifacts/actionlint-successor-swap-20260928/fixtures/nc.yml.txt (sha256 39e955c94cbea88dc5a1342f46d2b2a96d47c9a0cb76f37649ec5a1eeb857a57), placed at .github/workflows/nc.yml in a git-initialised scratch tree for the runs, then removed",
+  "binary": "actionlint.kjanat.dev 1.17.0 from the verified archive (extracted binary sha256 6e0e370a627682be87b2f20e4b4e9bed0d675cec3f7feac206baed7873e8e5fd)",
+  "runs": [
+   {
+    "argv": "zizmor --no-config --no-ignores --persona regular --strict-collection .",
+    "tool": "zizmor 1.30.1 (pip --require-hashes)",
+    "exit": 0,
+    "output": "No findings to report. Good job! (1 suppressed)"
+   },
+   {
+    "argv": "actionlint -color",
+    "config": "no shellcheck on PATH",
+    "exit": 1,
+    "output": ".github/workflows/nc.yml:17:13: property \"missing\" is not defined in object type {} [expression]"
+   },
+   {
+    "argv": "actionlint -color",
+    "config": "shellcheck 0.9.0-1 on PATH",
+    "exit": 1,
+    "output": ".github/workflows/nc.yml:17:13: property \"missing\" is not defined in object type {} [expression]"
+   }
+  ],
+  "meaning": "The validate job's zizmor step would pass this workflow and its actionlint step (the same argv) exits 1 on it, so the required check would fail at the actionlint step. Local run only; the hosted counterpart is in live_run_pending."
+ },
  "hosted_parity": {
   "evidence_class": "hosted-observed",
   "question": "Did the non-required actionlint-successor job (kjanat v1.17.0) agree with the required validate job's rhysd 1.7.12 step on every hosted push run on main since #449 merged it?",
@@ -555,7 +582,7 @@
   {
    "item": 1,
    "text": "The first hosted run of validate.yml's actionlint-successor job on ubuntu-24.04 (its checksum step, -version and -color with the runner's shellcheck), and the pull request's checks turning green.",
-   "status": "closed",
+   "status": "closed except the shellcheck sub-claim",
    "by": "PR #449's checks (run 36395668639: validate and actionlint-successor success) and the 25 push runs in hosted_parity; the successor step's log in run 36497637857 shows the checksum OK line, the 1.17.0 version lines and step success. The runner image carries shellcheck (per the 2026-09-27 trial's image readme reading), but no hosted log shows the shellcheck rule running, since validate.yml passes no -verbose."
   },
   {
@@ -730,7 +757,7 @@
   },
   {
    "id": "dated-records",
-   "text": "Dated statements that name rhysd/actionlint 1.7.12 stay as recorded: docs/github-automation.md lines 134-142 and 252-258, docs/catalog-provenance.md lines 141 and 178, docs/github-automation-evidence.json, decision records, catalogs/saturation/ledger.json and catalogs/sota-convergence/*."
+   "text": "Dated statements that name rhysd/actionlint 1.7.12 stay as recorded: docs/github-automation.md lines 134-142 and 252-258, docs/catalog-provenance.md lines 133-189 (the 2026-09-20 observations), docs/github-automation-evidence.json, decision records, catalogs/saturation/ledger.json and catalogs/sota-convergence/*."
   },
   {
    "id": "selection-risk",
@@ -739,7 +766,8 @@
  ],
  "live_run_pending": [
   "This branch's hosted validate run: the swapped step's checksum line, -version and -color on ubuntu-24.04, and zizmor's online audits over the changed validate.yml.",
-  "A hosted negative control that shows the swapped required step failing on a workflow it should reject.",
+  "A hosted negative control that shows the swapped required step failing on a workflow it should reject. Not run: pushing a workflow the gate rejects needs the pre-push workflow-coverage test bypassed (--no-verify) or edited on a throwaway branch, and neither is used here. local_negative_control records the same fixture against the same binary.",
+  "Evidence that 1.17.0's shellcheck rule ran on the hosted runner: a hosted -verbose run or a `command -v shellcheck` line in the step. The runner image carries shellcheck per the 2026-09-27 trial's image readme reading, but no hosted log shows the rule running (live_run_pending_20260927 item 1).",
   "The PyYAML-dependent parser cross-check (live_run_pending_20260927 item 3)."
  ],
  "overturn_when": "rhysd/actionlint resumes releases (a release after v1.7.12), or GitHub ships an official workflow linter CLI. Either is compared with kjanat/actionlint by the parity method in evidence/artifacts/actionlint-successor-parity-20260927/ before the pin changes.",

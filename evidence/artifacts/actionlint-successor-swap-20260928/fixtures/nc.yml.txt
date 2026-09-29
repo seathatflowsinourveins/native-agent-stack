@@ -1,0 +1,18 @@
+# Negative control for the required validate job's actionlint step (kjanat/actionlint v1.17.0).
+# workflow_dispatch is its only trigger, and it has no `uses:`, so zizmor's online audits
+# (impostor-commit, known-vulnerable-actions, ref-confusion, ref-version-mismatch) have nothing to act on.
+# The step condition reads an output of a step that does not exist; actionlint types the steps
+# context at that step as an empty object and reports the property access. It does not depend on
+# shellcheck or pyflakes being on PATH.
+name: actionlint negative control
+on: workflow_dispatch
+permissions: {}
+jobs:
+  control:
+    name: actionlint negative control
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: Condition on an undefined step output
+        if: steps.missing.outputs.value == 'x'
+        run: echo control
