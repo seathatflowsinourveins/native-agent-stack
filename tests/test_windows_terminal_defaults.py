@@ -78,10 +78,14 @@ class OverlayTests(unittest.TestCase):
     @unittest.skipUnless(INSTALLED_CLAUDE.exists(), "needs the installed Claude Code binary")
     def test_the_installed_client_knows_no_notification_type_without_a_decision(self):
         # The one check that a later client release cannot slip past: it runs the scan's own reader on the installed binary and
-        # fails on a type the table does not carry (skipped where no client is installed, so CI without one does not run it).
-        types, base_size = SCAN.scan(os.path.realpath(INSTALLED_CLAUDE))
-        self.assertGreaterEqual(base_size, 10)
-        self.assertEqual(sorted(kind for kind in types if kind not in DECISIONS), [], "a type this client knows has no decision in DECISIONS")
+        # fails on a type the table does not carry (skipped where no client is installed, so CI without one does not run it). A reader that finds
+        # nothing must not pass: the base array and the catalog's extra values must both be found (the catalog's spread name is a minified
+        # identifier that can contain `$`, as `P$o` in 2.1.283; a pattern that misses it read 15 of the 17 matcher values without an error).
+        found = SCAN.scan(os.path.realpath(INSTALLED_CLAUDE))
+        self.assertGreaterEqual(found["base_array_size"], 10, "the base array of matcher values was not found")
+        self.assertTrue(found["catalog_found"], "the Notification matcher catalog was not found")
+        self.assertGreaterEqual(len(found["catalog_extra_values"]), 1, "the catalog's extra values were not read")
+        self.assertEqual(sorted(kind for kind in found["types"] if kind not in DECISIONS), [], "a type this client knows has no decision in DECISIONS")
 
     def test_one_hook_rings_the_bell_for_a_needed_action_only(self):
         (group,) = self.overlay["hooks"]["Notification"]
@@ -279,6 +283,42 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
         }.items():
             with self.subTest(label), self.assertRaises(AssertionError):
                 self.check_ai({**copy.deepcopy(good), **change}, "claude")
+
+
+class ScanReaderTests(unittest.TestCase):
+    """The scan's reader on a synthetic binary: no installed client is needed, so these run wherever the tests run."""
+
+    BASE = ",".join(f'"{name}"' for name in ("permission_prompt", "idle_prompt", "auth_success", "elicitation_dialog"))
+
+    def blob(self, spread="Ojo", catalog=True):
+        text = f'a=[{self.BASE}];b={{notificationType:"push_notification"}};'
+        if catalog:
+            text += f'c={{fieldToMatch:"notification_type",values:[...{spread},"elicitation_complete","elicitation_response"]}};'
+        return text.encode()
+
+    def scan_of(self, blob):
+        with tempfile.TemporaryDirectory() as raw:
+            path = Path(raw) / "client"
+            path.write_bytes(blob)
+            return SCAN.scan(path), subprocess.run([sys.executable, "-B", str(_SCAN_PATH), str(path), str(ROOT)], capture_output=True, text=True, timeout=60)
+
+    def test_the_catalog_is_read_whatever_the_minified_spread_name_is(self):
+        for spread in ("Ojo", "P$o", "$a", "a_1"):
+            with self.subTest(spread):
+                found, _run = self.scan_of(self.blob(spread))
+                self.assertTrue(found["catalog_found"])
+                self.assertEqual(found["catalog_extra_values"], ["elicitation_complete", "elicitation_response"])
+                self.assertEqual(found["base_array_size"], 4)
+                self.assertTrue(found["types"]["elicitation_response"]["matcher_value"])
+                self.assertEqual(found["types"]["push_notification"]["notificationType_literals"], 1)
+
+    def test_a_reader_that_finds_nothing_exits_nonzero_instead_of_passing(self):
+        found, run = self.scan_of(self.blob(catalog=False))
+        self.assertFalse(found["catalog_found"])
+        self.assertEqual(run.returncode, 1, "a binary without the catalog must not pass")
+        self.assertIn('"catalog_found": false', run.stdout)
+        found, run = self.scan_of(b"nothing a reader could find")
+        self.assertEqual((found["base_array_size"], found["catalog_found"], run.returncode), (0, False, 1))
 
 
 class DocumentationTests(unittest.TestCase):

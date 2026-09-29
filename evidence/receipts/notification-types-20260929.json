@@ -5,19 +5,20 @@
   "component_ids": [
     "claude-code"
   ],
-  "claim": "On this host on 2026-09-29 (Claude Code 2.1.285, and 2.1.283 in a second distro; tmux 3.4; Windows Terminal 1.24.11911.0) the installed client knows 17 distinct notification types, all valid matcher values (a 15-item base array plus the two elicitation completion types), the same 17 in 2.1.283, 2.1.284 and 2.1.285; 12 are documented in the hooks reference. 8 now ring through the overlay's bell hook and 9 stay quiet, each with a reason in one table that the scan and the repository's test share; none is without a decision. The type the bell missed was `push_notification`, the model's own PushNotification. In an interactive pty probe with no user-scope settings a model push raised one Notification event of that type and rang nothing; with one more hook that matches the type, exactly one BEL reached the terminal; and with this host's own settings after the change, the same one BEL. The tool sends only while the client judges the user away: the probe's arms show both branches of the rule read from the binary (with a focus-out report the event fires whatever the elapsed time; with no focus report it fires after more than 60 s without input and does not fire after 15 s). Before the change, the same probe on this host's settings gave one event and no BEL (the coordinator's own output, recorded as values). Both Claude settings files (this host's and the second distro's) were brought to the overlay with the repository's merge tool on a private copy, backed up, and differ from their originals only in the bell group; a rerun reports nothing to do. tmux 3.4 forwards a pane's BEL to the outer terminal (a pty in the probe) by default, and `bell-action none` or `visual-bell on` stops it.",
+  "claim": "On this host on 2026-09-29 (Claude Code 2.1.285, and 2.1.283 in a second distro; tmux 3.4; Windows Terminal 1.24.11911.0) the installed client knows 17 distinct notification types, all valid matcher values (a 15-item base array plus the two elicitation completion types), the same 17 in 2.1.283, 2.1.284 and 2.1.285; 12 are documented in the hooks reference. 8 now ring through the overlay's bell hook and 9 stay quiet, each with a reason in one table that the scan and the repository's test share; none is without a decision. The type the bell missed was `push_notification`, the model's own PushNotification. In an interactive pty probe with no user-scope settings a model push raised one Notification event of that type and rang nothing; with one more hook that matches the type, exactly one BEL reached the terminal; and with this host's own settings after the change, the same one BEL. The tool sends only while the client judges the user away: the probe's arms show both branches of the rule read from the binary (with a focus-out report the event fires whatever the elapsed time; with no focus report it fires after more than 60 s without input and does not fire after 15 s); once a focus report has arrived its last state decides, so a tab last reported focused counts as present however long the user is away, and how Windows Terminal reports a background tab was not measured. Before the change, the same probe on this host's settings gave one event and no BEL (the coordinator's own output, recorded as values). Both Claude settings files (this host's and the second distro's) were brought to the overlay with the repository's merge tool on a private copy, backed up, and differ from their originals only in the bell group; a rerun of the hardened replacement tool reports nothing to do on both. The scan's first catalog pattern read 15 of the 17 matcher values on 2.1.283 without an error (a `$` in a minified name); the reader now reads 17 on all three releases, exits 1 when it finds nothing, and the fix is covered by tests and negative controls. tmux 3.4 forwards a pane's BEL to the outer terminal (a pty in the probe) by default, and `bell-action none` or `visual-bell on` stops it.",
   "limitations": [
-    "One workstation, one probe model (Haiku) and one Ubuntu 24.04 distro plus a second distro (the independent-observation class of docs/acceptance-evidence-policy.md). No audible bell in Windows Terminal was observed by the user in this work, and the probe's outer terminal is a Python pty, not Windows Terminal: Windows Terminal defines DECSET 1004 focus reporting (microsoft/terminal v1.24.11911.0 DispatchTypes.hpp L541), but whether it reports focus for a background tab, and so whether a push rings while the user is on another tab, was not measured.",
-    "The presence rule is read from the installed client (`function V4r`, `var KWt=60000`: the terminal's focus report when one has arrived, otherwise input within 60 seconds; `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it) and the probe measures both branches with a synthetic focus-out report, not with a real absence. Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
+    "One workstation, one probe model (Haiku) and one Ubuntu 24.04 distro plus a second distro (the independent-observation class of docs/acceptance-evidence-policy.md). No audible bell in Windows Terminal was observed by the user in this work, and the probe's outer terminal is a Python pty, not Windows Terminal: Windows Terminal defines DECSET 1004 focus reporting (microsoft/terminal v1.24.11911.0 DispatchTypes.hpp L541), but whether it reports focus for a background tab or an unfocused window, and what the last report is when a real user walks away, was not measured.",
+    "The presence rule is read from the installed client, not run against a real absence (`function V4r`, called only by the PushNotification tool: the terminal's focus state is undefined until the first focus report and then the last reported state decides; before any report, input within 60 seconds (`var KWt=60000`); `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it). The probe measures both branches with a synthetic focus-out report or none. A tab last reported focused counts as present however long the user is away, so the bell can stay silent for a user who left a focused tab; the other alert types are timed by input idleness (about 6 s in the earlier probe) and whether a focus report also affects them was not checked. Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
+    "The probe does not record the tool's reply, so the \"Not sent because you're active in this terminal.\" text (`disabledReason: user_present`) comes from the binary. A headless `-p` run of a few seconds (the elapsed time was not recorded) raised no Notification event and the tool's result began \"Not sent\"; the same presence rule applies to `-p`, and a longer run was not measured.",
     "The probe cannot say how often a model chooses to send a push, so the decision's overturn condition (models over-notify) is the check.",
-    "The 'before' run on this host's own settings (one event, no BEL) is the coordinator's own output of the same probe, recorded here as values; it cannot be repeated now that the live matcher changed. Arms A and B reproduce the same causal pair independently of any user setting. The first recorded runs of arms A and B used the earlier probe without the timing lines and failed to start under a heavily loaded host; the arms here were rerun with the readiness gate.",
-    "The scan counts `notificationType:\"<type>\"` literals, which is a lower bound: seven types show zero (the documented quota and elicitation dialog types that fire through other spellings, and `computer_use_enter` and `model_refusal_fallback`). A text search found no emit site for `computer_use_enter` or `model_refusal_fallback`, which cannot prove absence; this host also sets `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`. Five types are outside the hooks reference (`worker_permission_prompt`, `push_notification`, `computer_use_enter`, `computer_use_exit`, `model_refusal_fallback`); all rest on the installed binary and a later release can change them.",
-    "The second distro's binary is byte-identical to this host's 2.1.283 (recorded by SHA-256 prefix in the receipt wsl-terminal-defaults-20260929); the type list was scanned on this host's copy of that release, and the second distro's settings were read back as values. No session of that distro was observed ringing.",
-    "The agent-teams statements are a source review of the documentation fetched on 2026-09-29, not a team run: in-process display works in any terminal, split panes need tmux or iTerm2, and the same page's limitations say split-pane mode isn't supported in Windows Terminal (it may mean native panes; tmux inside WSL is outside its stated support and unmeasured for teams here). No `teammateMode` setting and no team hook was added.",
-    "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference."
+    "The 'before' run on this host's own settings (one event, no BEL) is the coordinator's own output of the same probe, recorded here as values; it cannot be repeated now that the live matcher changed. Arms A and B reproduce the same causal pair independently of any user setting. The first recorded runs of arms A and B ended without a tool call (state waiting_tool) while the host was heavily loaded by a peer's build; both are kept in recorded/push_probe_arms.txt and the arms above are the reruns after the load fell.",
+    "The scan counts `notificationType:\"<type>\"` literals, which is a lower bound: seven types show zero (the documented quota and elicitation dialog types that fire through other spellings, and `computer_use_enter` and `model_refusal_fallback`). `computer_use_enter` occurs once in the binary, in the matcher list; `model_refusal_fallback` is a matcher value and a system-message subtype with no such call site; a text search cannot prove absence (this host also sets `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`), while `computer_use_exit` has a call site (the client says \"Claude is done using your computer\"). Five types are outside the hooks reference (`worker_permission_prompt`, `push_notification`, `computer_use_enter`, `computer_use_exit`, `model_refusal_fallback`); all rest on the installed binary and a later release can change them.",
+    "The second distro's binary is byte-identical to this host's 2.1.283 (recorded by SHA-256 prefix in the receipt wsl-terminal-defaults-20260929); the type list was scanned on this host's copy of that release, and the second distro's settings were read back as values. No session of that distro was observed ringing. The hardened replacement tool's `polaris` write path (a `mktemp` staging file, refusals for a symlink and an existing backup) was not run against a real distro after the change; only its read-only dry run was; its shell snippet ran under this host's dash on a synthetic home in the coordinator's own scratch check (a normal install, a symlink and an existing backup; not retained), and its `local` path in the controls.",
+    "The agent-teams statements are a source review of the documentation fetched on 2026-09-29, not a team run: in-process display works in any terminal and keeps the teammates in the lead's terminal, split panes need tmux or iTerm2, and the same page's limitations say split-pane mode isn't supported in Windows Terminal (it may mean native panes; tmux inside WSL is outside its stated support and unmeasured for teams here). Whether an alert a teammate raises (`worker_permission_prompt`) reaches the hook was not observed. No `teammateMode` setting and no team hook was added.",
+    "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference. The file was rewritten later the same day for an unrelated reason, which moves its hash; the bell group is unchanged (the dry run above)."
   ],
   "evidence_class": "independent observation: the native Claude Code binary and interactive sessions in a pty, the installed tmux and the repository's merge tool on this host's and a second distro's settings; the notification-type table is read from the installed binary; the agent-teams statements are source review",
-  "recorded_at_utc": "2026-09-29T22:04:06Z",
+  "recorded_at_utc": "2026-09-29T22:41:30Z",
   "host_scope": {
     "host": "nativestack-5975wx-20260925",
     "platform": "NativeStack workstation, WSL2 Ubuntu 24.04 on Windows 11 with Windows Terminal 1.24.11911.0",
@@ -69,19 +70,54 @@
       "releases_scanned": {
         "2.1.283": {
           "distinct_types": 17,
-          "push_notification_is_a_matcher_value": true
+          "base_array_size": 15,
+          "catalog_found": true,
+          "matcher_values": 17
         },
         "2.1.284": {
           "distinct_types": 17,
-          "push_notification_is_a_matcher_value": true
+          "base_array_size": 15,
+          "catalog_found": true,
+          "matcher_values": 17
         },
         "2.1.285": {
           "distinct_types": 17,
-          "push_notification_is_a_matcher_value": true
+          "base_array_size": 15,
+          "catalog_found": true,
+          "matcher_values": 17
+        }
+      },
+      "earlier_catalog_pattern_matcher_values": {
+        "2.1.283": {
+          "first_pattern": 15,
+          "first_pattern_found_the_catalog": false,
+          "current_reader": 17
+        },
+        "2.1.284": {
+          "first_pattern": 17,
+          "first_pattern_found_the_catalog": true,
+          "current_reader": 17
+        },
+        "2.1.285": {
+          "first_pattern": 17,
+          "first_pattern_found_the_catalog": true,
+          "current_reader": 17
         }
       },
       "scan_exit_code": 0,
-      "decision_table": "DECISIONS in notification_types_scan.py, imported by tests/test_windows_terminal_defaults.py"
+      "decision_table": "DECISIONS in notification_types_scan.py, imported by tests/test_windows_terminal_defaults.py",
+      "reader_tests": {
+        "synthetic_spread_names": [
+          "Ojo",
+          "P$o",
+          "$a",
+          "a_1"
+        ],
+        "mutants": {
+          "the first catalog pattern": "fails the $a and P$o cases only",
+          "an exit code that ignores a blind reader": "fails the exit-code test only"
+        }
+      }
     },
     "source_review": {
       "hooks_reference_documents": [
@@ -128,9 +164,14 @@
         "source": "tmux show-options -g on a private server; the manual's entry lists values only"
       },
       "presence_rule_read_from_the_binary": {
-        "focus_report_decides_when_present": true,
+        "terminal_focus_undefined_until_the_first_focus_report": true,
+        "after_a_report_the_last_reported_state_decides": true,
         "fallback_seconds_since_last_input": 60,
-        "override_variable": "CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK"
+        "consumers_of_the_rule": [
+          "the PushNotification tool"
+        ],
+        "override_variable": "CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK",
+        "not_sent_text_for_a_present_user": "Not sent because you're active in this terminal."
       },
       "conditions_that_keep_the_push_silent_read_from_the_binary": [
         "config_off (Remote Control connected and agentPushNotifEnabled off)",
@@ -149,7 +190,8 @@
           "client_enabled_focus_reporting": true,
           "focus_out_report_sent": true,
           "prompt_sleep_seconds": 45,
-          "seconds_from_enter_to_the_tool_call": 52.6
+          "seconds_from_enter_to_the_tool_call": 52.6,
+          "probe_state": "observing"
         },
         "B_no_user_settings_plus_bell_hook": {
           "notification_events": 1,
@@ -160,7 +202,8 @@
           "client_enabled_focus_reporting": true,
           "focus_out_report_sent": true,
           "prompt_sleep_seconds": 45,
-          "seconds_from_enter_to_the_tool_call": 54.3
+          "seconds_from_enter_to_the_tool_call": 54.3,
+          "probe_state": "observing"
         },
         "C_this_hosts_own_settings_after_the_change": {
           "notification_events": 1,
@@ -171,7 +214,8 @@
           "client_enabled_focus_reporting": true,
           "focus_out_report_sent": true,
           "prompt_sleep_seconds": 45,
-          "seconds_from_enter_to_the_tool_call": 53.7
+          "seconds_from_enter_to_the_tool_call": 53.7,
+          "probe_state": "observing"
         },
         "D_no_focus_report_75_s": {
           "notification_events": 2,
@@ -183,7 +227,8 @@
           "client_enabled_focus_reporting": true,
           "focus_out_report_sent": false,
           "prompt_sleep_seconds": 75,
-          "seconds_from_enter_to_the_tool_call": 81.1
+          "seconds_from_enter_to_the_tool_call": 81.1,
+          "probe_state": "observing"
         },
         "E_no_focus_report_15_s": {
           "notification_events": 0,
@@ -192,7 +237,32 @@
           "client_enabled_focus_reporting": true,
           "focus_out_report_sent": false,
           "prompt_sleep_seconds": 15,
-          "seconds_from_enter_to_the_tool_call": 20.1
+          "seconds_from_enter_to_the_tool_call": 20.1,
+          "probe_state": "observing"
+        }
+      },
+      "first_attempts_of_arms_A_and_B_kept": {
+        "A": {
+          "notification_events": 0,
+          "types": [],
+          "bel_bytes_after_the_tool_call": 0,
+          "client_enabled_focus_reporting": true,
+          "focus_out_report_sent": true,
+          "prompt_sleep_seconds": 45,
+          "seconds_from_enter_to_the_tool_call": null,
+          "probe_state": "waiting_tool"
+        },
+        "B": {
+          "notification_events": 1,
+          "types": [
+            "idle_prompt"
+          ],
+          "bel_bytes_after_the_tool_call": 0,
+          "client_enabled_focus_reporting": true,
+          "focus_out_report_sent": true,
+          "prompt_sleep_seconds": 45,
+          "seconds_from_enter_to_the_tool_call": null,
+          "probe_state": "waiting_tool"
         }
       },
       "before_the_change_on_this_hosts_settings": {
@@ -204,8 +274,10 @@
         "recorded_as": "coordinator's own output of the same probe, values only"
       },
       "headless_run": {
-        "tool_result": "Not sent (the terminal is treated as active)",
-        "notification_events": 0
+        "tool_result_begins": "Not sent",
+        "notification_events": 0,
+        "elapsed_seconds": "a few, not recorded",
+        "presence_rule_applies_in_headless": "read from the binary; a longer run not measured"
       }
     },
     "tmux_bell_forwarding": {
@@ -229,8 +301,9 @@
         ],
         "other_hook_events_equal": true,
         "backup_kept": true,
-        "rerun_result": "nothing to do",
-        "overlay_in_effect": true
+        "rerun_result_of_the_final_tool": "nothing to do",
+        "overlay_in_effect": true,
+        "rewritten_later_by_an_unrelated_change": true
       },
       "second_distro": {
         "claude_code": "2.1.283",
@@ -241,17 +314,23 @@
         ],
         "other_hook_events_equal": true,
         "backup_kept": true,
-        "rerun_result": "nothing to do"
+        "rerun_result_of_the_final_tool": "nothing to do"
       },
       "replacement_script": {
-        "controls": "9 cases, 0 problems",
+        "controls": "17 cases, 0 problems",
+        "mutants": "10 runs, 0 problems (the unmutated script, then nine with one guard removed each, each failing exactly its named cases)",
         "refuses": [
           "a bell group that holds another hook",
+          "a bell hook with a key beyond type and command",
+          "a matcher that names a type the overlay's does not, or none",
+          "an existing different preferredNotifChannel",
           "two bell groups",
           "a symlinked file",
-          "an unknown target"
+          "an unknown target or flag"
         ],
-        "finds_a_hand_requoted_bell_command": true
+        "finds_a_hand_requoted_bell_command": true,
+        "nothing_to_do_only_when": "the bell group equals the overlay's and merging would change nothing",
+        "apply_uses": "the merge tool's write_backup (never overwrites) and atomic_write (a random staging name in the same directory)"
       }
     },
     "unit_tests": {
@@ -262,12 +341,14 @@
         "test_render_config",
         "test_apply_claude_settings"
       ],
-      "ran": 217,
-      "result": "OK (skipped=1)"
+      "ran": 228,
+      "result": "OK (skipped=1)",
+      "skipped": "test_the_cell_check_rejects_wrong_and_missing_release_notes (not part of this change)"
     },
     "decisions": {
       "push_notification_added_to_the_matcher": true,
       "other_types_quiet_with_a_recorded_reason": true,
+      "presence_check_override_adopted": false,
       "teammate_mode_setting_added": false,
       "team_quality_gate_hooks_added": false
     }
@@ -275,17 +356,34 @@
   "provenance": {
     "artifacts_dir": "evidence/artifacts/notification-types-20260929",
     "scripts_sha256": {
-      "notification_types_scan.py": "ed29e5d3e54d288a85a778deaccdc450e8944110b9cb14f01990332837c3d719",
+      "notification_types_scan.py": "12a9bbb1ac0cd8a3b0eb9a12014d19871ca248a91da9fe0d1b10eb8947bfd99a",
       "push_notification_probe.py": "1ac0cf1f950e34527308f2916180399dd1f3fb043c4c81f2d2981a82b4f978ba",
-      "replace_bell_group.py": "f6c36f68c066951abfbe86adcc1fc5606d49a7e51f6c1b324db9728939432047",
-      "replace_bell_group_controls.py": "3d9cdf85712a0cc9449fc665085f35c0b5ce5613a795ba9bc9db76240db49897",
+      "replace_bell_group.py": "df63e6f3c271701e004003dab01d3dff5c86c37f0b24dace2a006ec58bb8679a",
+      "replace_bell_group_controls.py": "bed9b093aeca9bf4ec530a508ec515f2b05face915a546f86b080167dcd0615a",
+      "replace_bell_group_mutants.py": "f488c5ce2e7e26ecd82990b1edaf66219353be116e537ee3d79e833664671015",
+      "scan_reader_mutants.py": "016da24f2723f6bc29a73780b5e1a1e6008103b9ca4f4cc3479963b07ed2480f",
       "tmux_bell_probe.py": "5ef02fa27e168c7310c0083d51c68683ca32084d49c0c63f25db64e2a67a4153"
     },
+    "recorded_outputs_sha256": {
+      "exit_codes.txt": "a83298a69680f8ecb6fbd814c8ff0466306ccaee241a807f1b1002fb8cc4dd37",
+      "notification_types_scan_2.1.283.json": "58a5cfeeb8782d52f95e18cf62cece20f13d8c9b7bbd54492694dc0de3fa2ceb",
+      "notification_types_scan_2.1.284.json": "83996b5c13657d83b5b7513cc1ec3cd8fceee670cdee50b1c3366eb05b0f93e6",
+      "notification_types_scan_2.1.285.json": "eb2e772ebd9d0c83e7ec4aab1584c18cb66ccc2237b921c1dfe6165126f2cef8",
+      "overlay_noop_check.txt": "20d67288079b69c879e72b744505f1bac5a4449d615af3f121a9caef7f7c85da",
+      "push_probe_arms.txt": "be71ed5844000e9372d69fd03b5a514c793a090466ddcc8e20c270db27318238",
+      "replace_bell_group_controls.txt": "a25a6b2b63df16da25e5a687a0f45c4a0480b76fc0c2b563ecca4448b6009cd8",
+      "replace_bell_group_live_dry_runs.txt": "8bc2d61fe14e334c47cfb2d38ab85e1b890060b038785c4e121dbc76d68b053c",
+      "replace_bell_group_mutants.txt": "5c5f9784f700a3eaded9df240a9dd6f0bcec87c8fc3f04b939af952c5cbcc40f",
+      "scan_reader_negative_control.txt": "6885bbbc35cd35cf6d737a583d67924704abed787644fca4f52380d1c30adc27",
+      "tmux_bell_probe.txt": "2837e6c652ea2f391344e5dcfcad6f454c07f87caabec14a803abc2c114ae55b",
+      "unit_tests.txt": "5be8083c63db900431c9907f8855dc077dbd75894f79dbfabc9a352da0ac2755"
+    },
     "commands": [
-      "python3 -B notification_types_scan.py <checkout> (and with each installed release's binary path)",
+      "python3 -B notification_types_scan.py <binary> <checkout> (with each of the three installed releases' binaries)",
+      "python3 -B scan_reader_mutants.py <checkout> <the three release binaries>",
       "python3 -B push_notification_probe.py push --no-user-settings | ... --bell-hook | push | ... --no-focus-report --sleep 75 | ... --no-focus-report --sleep 15",
       "python3 -B tmux_bell_probe.py",
-      "python3 -B replace_bell_group.py <checkout> local|polaris --apply (once each), then without --apply (nothing to do); python3 -B replace_bell_group_controls.py <checkout>",
+      "python3 -B replace_bell_group.py <checkout> local|polaris --apply (once each, earlier version), then the final tool without --apply on both (nothing to do); python3 -B replace_bell_group_controls.py <checkout>; python3 -B replace_bell_group_mutants.py <checkout>",
       "python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/overlay_noop_check.py <checkout>",
       "python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings"
     ],
