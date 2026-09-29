@@ -38,6 +38,8 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / ".gitleaks.toml"
+# The dated SOTA manifests whose catalog pin ids the allowlist pins by value (one exact path each).
+REVIEWED_MANIFESTS = ("manifest-20260926.json", "manifest-20260929.json")
 
 # A 64-hex and a 40-hex synthetic digest-shaped value, plus a synthetic GitHub
 # personal-access-token-shaped value. None of these are real credentials.
@@ -358,11 +360,12 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
         """The reviewed git commit ids in the 2026-09-26 manifest's free-form "pin" values are exempt."""
         ids = self._reviewed_manifest_ids()
         self.assertGreaterEqual(len(ids), 4, "the allowlist must pin the reviewed ids by value")
-        with tempfile.TemporaryDirectory() as tmp:
-            target = Path(tmp)
-            self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260926.json", ids, [])
-            findings = [f for f in self._scan(target) if f["RuleID"] == "sourcegraph-access-token"]
-            self.assertEqual(findings, [], "reviewed pin commit ids in the reviewed manifest must not be flagged")
+        for name in REVIEWED_MANIFESTS:
+            with self.subTest(manifest=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                self._free_form_manifest(target, f"catalogs/sota-convergence/{name}", ids, [])
+                findings = [f for f in self._scan(target) if f["RuleID"] == "sourcegraph-access-token"]
+                self.assertEqual(findings, [], "reviewed pin commit ids in the reviewed manifest must not be flagged")
 
     def test_d4_unreviewed_values_and_other_paths_stay_detected(self):
         """Only the reviewed ids in that exact file are exempt. An unreviewed 40-hex value (under another field, or
@@ -371,18 +374,19 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
         ids = self._reviewed_manifest_ids()
         extra = [{"token": HEX40}, {"pin": f"sourcegraph legacy access token {HEX40}"},
                  {"pin": ids[0].upper()}, {"pin": f"sgp_{ids[0]}"}]
-        with tempfile.TemporaryDirectory() as tmp:
-            target = Path(tmp)
-            self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260926.json", ids, extra)
-            self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260925.json", ids, [])
-            by_file = {}
-            for f in self._scan(target):
-                if f["RuleID"] == "sourcegraph-access-token":
-                    by_file.setdefault(f["File"], []).append(f["StartLine"])
-            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260926.json", [])), len(extra),
-                             f"every unreviewed value in the reviewed manifest must be detected: {by_file}")
-            self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260925.json", [])), 4,
-                             f"reviewed ids outside the exact reviewed path must be detected: {by_file}")
+        for name in REVIEWED_MANIFESTS:
+            with self.subTest(manifest=name), tempfile.TemporaryDirectory() as tmp:
+                target = Path(tmp)
+                self._free_form_manifest(target, f"catalogs/sota-convergence/{name}", ids, extra)
+                self._free_form_manifest(target, "catalogs/sota-convergence/manifest-20260925.json", ids, [])
+                by_file = {}
+                for f in self._scan(target):
+                    if f["RuleID"] == "sourcegraph-access-token":
+                        by_file.setdefault(f["File"], []).append(f["StartLine"])
+                self.assertEqual(len(by_file.get(f"catalogs/sota-convergence/{name}", [])), len(extra),
+                                 f"every unreviewed value in the reviewed manifest must be detected: {by_file}")
+                self.assertEqual(len(by_file.get("catalogs/sota-convergence/manifest-20260925.json", [])), 4,
+                                 f"reviewed ids outside the exact reviewed paths must be detected: {by_file}")
 
     # The 4 reviewed ai-memory rejection fingerprints (SHA-256 digests, not credentials) the
     # .gitleaks.toml entry pins by value.

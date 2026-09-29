@@ -3721,8 +3721,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "13ed17cef6456fae390a2c0555ef2fd3442c7e306466e38c4e31134067e803a5",
-      "bytes": 31945
+      "sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
+      "bytes": 32556
     },
     {
       "path": ".gitleaksignore",
@@ -13912,8 +13912,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "9762a7107f947d67308c4372778b5ccbb306f122a00c92eb3b34bd7cc4b4a1ef",
-      "bytes": 312448
+      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "bytes": 314853
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -13992,8 +13992,8 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "c3bff524b94f0dda2cb9bbd85dde9a1a687b63a39107e25e29820493441067d1",
-      "bytes": 284300
+      "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
+      "bytes": 403074
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -14019,6 +14019,11 @@
       "path": "catalogs/sota-convergence/manifest-20260926.json",
       "sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
       "bytes": 1548502
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20260929.json",
+      "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
+      "bytes": 1149103
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -14432,8 +14437,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "21291c62d623c7c623beb457e3763a3db05d33b6541e189bef410120d6952070",
-      "bytes": 32302
+      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "bytes": 32903
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -31146,6 +31151,211 @@
       "bytes": 2072
     },
     {
+      "path": "evidence/artifacts/landscape-sweep-20260929-attempts/child-usage-wf_08a5b367-311.json",
+      "sha256": "b5f0aa00a623ab743a0443cdb23df2bcdb2f493d7d72ecc632d85c797a615ecf",
+      "bytes": 1881383
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929-attempts/child-usage-wf_3ec5fdfe-6e6.json",
+      "sha256": "068e5d89ccd61fef92a28eeb76f2adb2deed410eb6ec7309b89d1b51322f8973",
+      "bytes": 74400
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929-attempts/child-usage-wf_466387c0-f92.json",
+      "sha256": "294f584f86a7bda1a662c21074b6ec96bdf645324a625c1fd0c22a931e5b2dc3",
+      "bytes": 14467
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/abhigyanpatwari-gitnexus.json",
+      "sha256": "3d511c2784e38f98b0fcc1d49474f2caf66a2e74bfd1d81080443f8b7f3abe1f",
+      "bytes": 1661
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/adbar-trafilatura.json",
+      "sha256": "c88a931a329499a9ef702703fb51841275375ac8b8e4b1e9e3c828b2bef04f6a",
+      "bytes": 2233
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/agentproto-ts.json",
+      "sha256": "26fde660fcca6ba0434939322fc3240b1fefd4edde9ce1999b6143be0bc5b9d9",
+      "bytes": 2601
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/anthropics-claude-plugins-official.json",
+      "sha256": "9c1594ba4e535870385cef9f73aa9af1b80aa170a124006318827474c3bc5d0c",
+      "bytes": 1818
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/arabold-docs-mcp-server.json",
+      "sha256": "746b524ee3706d68134ffd34bd3ca7e9fcbb505c1f4e11289e4267c1b828c2f9",
+      "bytes": 2121
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/ataraxy-labs-sem.json",
+      "sha256": "e5e4dae7dc9b850a0c5291b60b7fed785bde6dc2895db8dbe773d3a71cfca77d",
+      "bytes": 2318
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/betterleaks-betterleaks.json",
+      "sha256": "8597ad91135017b0f9ee73dd4a416c4f5caaae93a607323f742fba4700df36f1",
+      "bytes": 1920
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/boostsecurityio-poutine.json",
+      "sha256": "24193903078471b7270cd744bc9cc539823c132947c21351e3e3258df89846dd",
+      "bytes": 2126
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/boxlite-ai-boxlite.json",
+      "sha256": "65fdd1c168640ee5c01125fbd32d255150a586be63e66c2079ace5c93b89b9d8",
+      "bytes": 2013
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/conductor-oss-conductor.json",
+      "sha256": "1b52f328964d4755ee8bbbb0dda1a5824b46ac1d0582e8f513c9a8535aabcf63",
+      "bytes": 1971
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/dagucloud-dagu.json",
+      "sha256": "3bfe5693e766f1452fccd0fee1a797aa13e3903d08b34f216db5de41ac54624a",
+      "bytes": 2643
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/docling-project-docling.json",
+      "sha256": "59fd1ec7d6920fe378fa94db54a4bf1210289b6ee24fad67a89cfe1a5f6b7c80",
+      "bytes": 2393
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/gitguardian-ggshield.json",
+      "sha256": "5d296677a99108323868916d0152e90464321c31febb6832bb91ab760e2e7556",
+      "bytes": 1762
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/github-copilot-sdk.json",
+      "sha256": "6764e80e51e578a900ccdf89e89117b3becf86bcbca8084a59080d0873e29089",
+      "bytes": 1681
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/kjanat-actionlint.json",
+      "sha256": "b2dbe5cb1db5f7508cefabc0fee9000cac980ea7e972c85372fe92def643ff1d",
+      "bytes": 2047
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/lightonai-next-plaid.json",
+      "sha256": "b25e01be4b89964d6ccc9a85192e3cf784bdaf4598ac5d76540c57afb20b7124",
+      "bytes": 1599
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/lockedinlabs-ai-agent-console.json",
+      "sha256": "807e1f1bc837f55c9a11f2ac8a7315f04f755744b8cc6e44d683f199ff6e20de",
+      "bytes": 2071
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/mattpocock-skills.json",
+      "sha256": "7a5192a17a8f1274c2cf1a23e804a213d029445870d4d11e00d543a1a7d0ea91",
+      "bytes": 1672
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/mempalace-mempalace.json",
+      "sha256": "6e69e9ff6d4f792950b2b1daf5fd07bc119ab32c4ab4ca79a83e30221e633bda",
+      "bytes": 2123
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/mibayy-token-savior.json",
+      "sha256": "ce7d1937a1c0801555736936bdacf1fe95274aa94bfbb4fabd9bddb9ef08fad1",
+      "bytes": 1774
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/microsoft-pg-durable.json",
+      "sha256": "ab6b3db1cdc6796353e41880b14e8e35b4f30cf7c92bfb0e851ed0581cd507ca",
+      "bytes": 1871
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/minishlab-semble.json",
+      "sha256": "4f56924e9dbc70eac1733ab55ee1abe2ae884f08136bff27c1abecbb7596140c",
+      "bytes": 2013
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/ojuschugh1-sqz.json",
+      "sha256": "ca4896e3d1cbbf1a288f676e34ca9794354b47a674aadd751c94e98de13e2b7e",
+      "bytes": 2099
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/ollama-ollama.json",
+      "sha256": "999f71b8445d004bea6cc74428a8793b88fadc345f1df2a573f51474bc9b8867",
+      "bytes": 1406
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/openai-codex.json",
+      "sha256": "dea5f06f98b77d18513a4640ced7798e7ded75bfdf5d7eabdcfbf509e3642ef1",
+      "bytes": 1618
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/opendatalab-mineru.json",
+      "sha256": "10d1bfb8b8faa9d5a6d7408f0bf1200666cb8e823af69a2efd886d790391652e",
+      "bytes": 2425
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/paritok-official-paritok-4b-v1.json",
+      "sha256": "2d7b7d94b3b932881d127664d163b9607a44c8e057860988032a85d35ec6a992",
+      "bytes": 2471
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/praetorian-inc-noseyparker.json",
+      "sha256": "9f59f643e801499b801e995a608e4700a3f902ba2bdf1e775e1e5d1152a17ad9",
+      "bytes": 1685
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/restatedev-restate.json",
+      "sha256": "91832b9b85b8791f1aaf4861b67eb6b81f4a9e7dab0204d4cfd542b149f2c7a6",
+      "bytes": 1943
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+      "sha256": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c",
+      "bytes": 2378440
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/rhysd-actionlint.json",
+      "sha256": "8d6e7c74f742d64ca1d9ddca4da6f2700ef3f24822ba64e34920363222453cf9",
+      "bytes": 1870
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/rohitg00-agentmemory.json",
+      "sha256": "bc88c1018fe292fa96c823602bf2bcbcfdfc8a2314fd3646acce4b54607b84e0",
+      "bytes": 2510
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/superradcompany-microsandbox.json",
+      "sha256": "cb934e53579c13aa0ce94b0bc123692d8c18e326cf30a13704dced1dde4d0d4c",
+      "bytes": 2220
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/tigerless-labs-agent-memory.json",
+      "sha256": "efb233c0b4c7a8031ede2baa6c66edf0e3aaeebc4b4923e984d88e06a43bc8b1",
+      "bytes": 2563
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/ukgovernmentbeis-inspect-ai.json",
+      "sha256": "b03b6e0b4f0a49beefbd917e0f290b165898503dbbad51ab0aa8fcff46bdb8a5",
+      "bytes": 1717
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/vectifyai-pageindex.json",
+      "sha256": "ec4602d1db36727ebe977ab48f6f7e8f3adb174b3dd248fe2562ec99f6087f6e",
+      "bytes": 2465
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/vectorize-io-hindsight.json",
+      "sha256": "34da4a04ff22b523dc62b8d7968cf25f873c9d599e32949baecd4f3f4391eceb",
+      "bytes": 1888
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260929/vshulcz-deja-vu.json",
+      "sha256": "1ecffbbd16d616fe5a3728d23cf16824fd84579c55544c4fc131086486b628d1",
+      "bytes": 2160
+    },
+    {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
       "sha256": "ea63e60442960a996b29432e74465859bd25fe381b54ca66cbc2bf61856de178",
       "bytes": 879
@@ -43237,8 +43447,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "23fadc780ce36235dc4a120e01b2312ca5a5266493d62acce896869d895a8e24",
-      "bytes": 61651
+      "sha256": "af4fcd8fc06c207a0fed3ceafdfafff46092278e733c0ad29309c59da538ec2d",
+      "bytes": 61987
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",

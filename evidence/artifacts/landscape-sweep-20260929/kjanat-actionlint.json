@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-kjanat-actionlint",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/kjanat/actionlint",
+ "reviewed_commit": "f45fbd2f408424ef20fa300d6b8386ba92a3d3d7",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "ci-supply-chain"
+ ],
+ "claim": "Source and documentation review of kjanat/actionlint at commit f45fbd2f408424ef20fa300d6b8386ba92a3d3d7 (license MIT), read from README.md at that commit. Repository description: \"Find problems in your GitHub Actions workflows\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 37,
+  "pushed_at": "2026-09-26T19:41:06Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f45fbd2f408424ef20fa300d6b8386ba92a3d3d7",
+   "text": "[actionlint][repo] is a static checker for GitHub Actions workflow files. [Try it online!][playground]"
+  },
+  {
+   "source": "README.md@f45fbd2f408424ef20fa300d6b8386ba92a3d3d7",
+   "text": "This is an actively maintained fork of [rhysd/actionlint][upstream]. It carries the upstream checks plus cache safety policies enabled by default, configurable opt-in [policy checks][config], composite action step validation, shell completion, and a first-party GitHub Action, and it ships attested binaries, a Docker image on [GHCR][ghcr] and [Docker Hub][dockerhub], and a Go module at `actionlint.kjanat.dev`. Report problems through [this fork's issue tracker][issue-form]."
+  },
+  {
+   "source": "README.md@f45fbd2f408424ef20fa300d6b8386ba92a3d3d7",
+   "text": "This fork builds on upstream [v1.7.12](https://github.com/rhysd/actionlint/releases/tag/v1.7.12) ([`rhysd/actionlint@914e7df`]). Its independent release series starts at v1.8.0. Tags published by `kjanat/actionlint` identify this fork's releases; a matching tag need not exist in `rhysd/actionlint`."
+  }
+ ]
+}
