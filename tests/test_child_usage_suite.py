@@ -236,7 +236,7 @@ class DecisionRecordOverturnCondition(unittest.TestCase):
         overturn = counts["shapes"].get("overturn_1")
         self.assertIsNotNone(overturn, "counts.json has no shapes.overturn_1: the condition was never evaluated")
         text = DECISION.read_text()
-        section = text.split("## What would overturn it", 1)[1].split("\n## ", 1)[0]
+        section = " ".join(text.split("## What would overturn it", 1)[1].split("\n## ", 1)[0].split())  # line wrapping does not matter
         bound, denominator = overturn["lost_or_invented_upper_bound"], overturn["lane_bearing"]
         self.assertIn(f"an upper bound of {bound} of {denominator:,} lane-bearing commands ({overturn['rate_upper_bound'] * 100:.3f}%)", section)
         self.assertIn(f"a threshold of {overturn['threshold_commands']} commands", section)

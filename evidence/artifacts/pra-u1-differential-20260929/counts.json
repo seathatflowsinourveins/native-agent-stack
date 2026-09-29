@@ -489,7 +489,37 @@
   "two_heredoc_operators_with_a_tree_error": 2,
   "word_cut_after_an_assignment": 4837,
   "word_cut_after_an_assignment_lane_word": 37,
-  "shell_c_of_a_cat_heredoc_substitution": 5
+  "shell_c_of_a_cat_heredoc_substitution": 5,
+  "with_a_lane_word": 14210,
+  "lane_bearing_upper": 14210,
+  "grammar_limit": 247,
+  "grammar_limit_with_a_lane_word": 31,
+  "grammar_limit_lane_read": 4,
+  "grammar_limit_lane_word_unread": 27,
+  "grammar_limit_lane_word_in_an_error_node": 1,
+  "grammar_limit_early_with_a_lane_word": 1,
+  "grammar_limit_error_only_in_a_script_read_again": 11,
+  "grammar_limit_error_only_in_a_script_read_again_lane_word": 0,
+  "grammar_limit_unread_no_command_slot": 13,
+  "grammar_limit_unread_slot_in_data": 13,
+  "grammar_limit_unread_slot_elsewhere": 1,
+  "grammar_limit_unread_unplaced": 0,
+  "grammar_limit_lost_or_invented_upper": 5,
+  "grammar_limit_scanner_reads_more": 0,
+  "grammar_limit_scanner_throws": 0,
+  "longest_command_chars": 49096,
+  "most_heredoc_operators_in_a_command": 71,
+  "most_array_openers_in_a_command": 12,
+  "overturn_1": {
+   "threshold": 0.001,
+   "threshold_commands": 7,
+   "lane_bearing": 6527,
+   "lane_bearing_upper": 14210,
+   "lost_or_invented_upper_bound": 5,
+   "rate_upper_bound": 0.000766,
+   "rate_lane_word_screen": 0.00475,
+   "met_by_the_upper_bound": false
+  }
  },
  "timing": [
   {
@@ -569,5 +599,1261 @@
   },
   "bash_interrupted_true": 0,
   "marked_bash_rows": 1073
+ },
+ "corpus": {
+  "source": "real-commands.mjs",
+  "until": "2026-09-29T07:08:07Z",
+  "until_reconstructed": true,
+  "distinct_shell_texts": 136361
+ },
+ "lanes_identity": {
+  "baseline_sha256": "a9126a77fd7f2908570d680bb79784905eab4876ade4b3ff794befc893542716",
+  "kernel_sha256": "119ce9764447ea0f7c7b53622d3cac14b73b34e3b657bd65833f062fb534f6bb",
+  "corpora": {
+   "real": {
+    "inputs": 136361,
+    "analysed": 136361,
+    "identical": 136361,
+    "different": 0,
+    "a_throws": 0,
+    "b_throws": 0
+   },
+   "soup": {
+    "inputs": 40000,
+    "analysed": 40000,
+    "identical": 40000,
+    "different": 0,
+    "a_throws": 0,
+    "b_throws": 0
+   },
+   "heredoc": {
+    "inputs": 20000,
+    "analysed": 20000,
+    "identical": 20000,
+    "different": 0,
+    "a_throws": 0,
+    "b_throws": 0
+   },
+   "lanes": {
+    "inputs": 20000,
+    "analysed": 20000,
+    "identical": 20000,
+    "different": 0,
+    "a_throws": 0,
+    "b_throws": 0
+   },
+   "covering_current_tests": {
+    "inputs": 728,
+    "analysed": 728,
+    "identical": 728,
+    "different": 0,
+    "a_throws": 0,
+    "b_throws": 0
+   },
+   "covering_stage_a_339": {
+    "inputs": 339,
+    "analysed": 339,
+    "identical": 339,
+    "different": 0,
+    "a_throws": 0,
+    "b_throws": 0
+   }
+  }
+ },
+ "scaling": {
+  "baseline": {
+   "kernel_sha256": "a9126a77fd7f",
+   "sizes": [
+    2000,
+    4000,
+    8000,
+    16000,
+    32000
+   ],
+   "shapes": {
+    "unclosed_double_paren": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      33.5,
+      123,
+      483,
+      1888.2,
+      7442.8
+     ],
+     "max_ratio": 3.94,
+     "parse_ms": [
+      0.9,
+      1.8,
+      3.4,
+      6.7,
+      13.2
+     ],
+     "parse_max_ratio": 1.97
+    },
+    "unclosed_dollar_paren": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      8.5,
+      31.3,
+      119.6,
+      467.9,
+      1875.5
+     ],
+     "max_ratio": 4.01,
+     "parse_ms": [
+      0.7,
+      1.2,
+      2.5,
+      5,
+      10.1
+     ],
+     "parse_max_ratio": null
+    },
+    "unclosed_dq_dollar_paren": {
+     "chars": [
+      4005,
+      8004,
+      16005,
+      32004,
+      64005
+     ],
+     "ms": [
+      14.3,
+      53.9,
+      213.2,
+      834,
+      3366.8
+     ],
+     "max_ratio": 4.04,
+     "parse_ms": [
+      0.7,
+      1.5,
+      2.9,
+      5.7,
+      11.7
+     ],
+     "parse_max_ratio": 2.05
+    },
+    "unclosed_arith": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      5.2,
+      18.5,
+      69.7,
+      270.5,
+      1067.2
+     ],
+     "max_ratio": 3.95,
+     "parse_ms": [
+      0.7,
+      1.3,
+      2.6,
+      5.1,
+      10.5
+     ],
+     "parse_max_ratio": 2.06
+    },
+    "backquotes": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      31.7,
+      119.9,
+      481.8,
+      1886.7,
+      7556
+     ],
+     "max_ratio": 4.02,
+     "parse_ms": [
+      0.9,
+      1.9,
+      3.7,
+      7.6,
+      15.4
+     ],
+     "parse_max_ratio": 2.03
+    },
+    "unclosed_brace": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      8.6,
+      31.6,
+      121.3,
+      485.9,
+      1885.1
+     ],
+     "max_ratio": 4.01,
+     "parse_ms": [
+      0.7,
+      1.4,
+      2.9,
+      5.9,
+      11.9
+     ],
+     "parse_max_ratio": 2.02
+    },
+    "unclosed_if": {
+     "chars": [
+      4004,
+      8008,
+      16005,
+      32010,
+      64009
+     ],
+     "ms": [
+      5,
+      16.5,
+      59.5,
+      222.9,
+      876.8
+     ],
+     "max_ratio": 3.93,
+     "parse_ms": [
+      1,
+      2,
+      4,
+      7.9,
+      16.4
+     ],
+     "parse_max_ratio": 2.08
+    },
+    "unclosed_case": {
+     "chars": [
+      4004,
+      8008,
+      16003,
+      32006,
+      64012
+     ],
+     "ms": [
+      5.4,
+      19.5,
+      73.4,
+      283.7,
+      1119.1
+     ],
+     "max_ratio": 3.94,
+     "parse_ms": [
+      0.7,
+      1.4,
+      2.9,
+      5.6,
+      11.3
+     ],
+     "parse_max_ratio": 2.02
+    },
+    "comments": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      2.4,
+      8.2,
+      29.8,
+      113.6,
+      443.9
+     ],
+     "max_ratio": 3.91,
+     "parse_ms": [
+      0.4,
+      0.7,
+      1.5,
+      3.1,
+      6.1
+     ],
+     "parse_max_ratio": null
+    },
+    "words": {
+     "chars": [
+      4002,
+      8004,
+      16002,
+      32004,
+      64002
+     ],
+     "ms": [
+      6.8,
+      12.9,
+      25.4,
+      51.1,
+      103.6
+     ],
+     "max_ratio": 2.03,
+     "parse_ms": [
+      2.1,
+      4.2,
+      8.6,
+      17.3,
+      35.1
+     ],
+     "parse_max_ratio": 2.03
+    },
+    "semicolons": {
+     "chars": [
+      4002,
+      8001,
+      16002,
+      32001,
+      64002
+     ],
+     "ms": [
+      7,
+      14.6,
+      28.1,
+      56.2,
+      119.4
+     ],
+     "max_ratio": 2.12,
+     "parse_ms": [
+      2.1,
+      4.3,
+      8.6,
+      17.7,
+      36.7
+     ],
+     "parse_max_ratio": 2.07
+    },
+    "and_list": {
+     "chars": [
+      4008,
+      8012,
+      16006,
+      32008,
+      64012
+     ],
+     "ms": [
+      2.4,
+      4.5,
+      9.3,
+      18.4,
+      35.2
+     ],
+     "max_ratio": 1.98,
+     "parse_ms": [
+      0.7,
+      1.4,
+      2.8,
+      5.8,
+      11.3
+     ],
+     "parse_max_ratio": 1.95
+    },
+    "dq_substitutions": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      9.1,
+      8.7,
+      17.5,
+      34.6,
+      71.5
+     ],
+     "max_ratio": 2.07,
+     "parse_ms": [
+      1.3,
+      2.7,
+      5.4,
+      11.1,
+      23.4
+     ],
+     "parse_max_ratio": 2.11
+    },
+    "heredocs": {
+     "chars": [
+      4014,
+      8010,
+      16002,
+      32004,
+      64008
+     ],
+     "ms": [
+      3.7,
+      6.8,
+      13.8,
+      27.2,
+      50.9
+     ],
+     "max_ratio": 2.03,
+     "parse_ms": [
+      0.9,
+      1.7,
+      3.4,
+      7.2,
+      14.4
+     ],
+     "parse_max_ratio": 2
+    },
+    "shell_heredocs": {
+     "chars": [
+      4004,
+      8008,
+      16016,
+      32004,
+      64008
+     ],
+     "ms": [
+      4.8,
+      8.7,
+      15.5,
+      30.6,
+      57.8
+     ],
+     "max_ratio": 1.97,
+     "parse_ms": [
+      0.6,
+      1.1,
+      2.3,
+      4.8,
+      9.6
+     ],
+     "parse_max_ratio": null
+    },
+    "shell_strings": {
+     "chars": [
+      4004,
+      8008,
+      16002,
+      32004,
+      64008
+     ],
+     "ms": [
+      2.6,
+      5.2,
+      10.7,
+      21.3,
+      45.5
+     ],
+     "max_ratio": 2.14,
+     "parse_ms": [
+      0.9,
+      1.8,
+      3.7,
+      7.6,
+      15.4
+     ],
+     "parse_max_ratio": 2.03
+    },
+    "pipes": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      11,
+      22.9,
+      46,
+      96.2,
+      198.8
+     ],
+     "max_ratio": 2.09,
+     "parse_ms": [
+      7,
+      15.2,
+      30.1,
+      64.1,
+      127.3
+     ],
+     "parse_max_ratio": 2.17
+    },
+    "redirs": {
+     "chars": [
+      4023,
+      8019,
+      16011,
+      32022,
+      64017
+     ],
+     "ms": [
+      4.7,
+      8.4,
+      16.7,
+      33.5,
+      66.5
+     ],
+     "max_ratio": 2.01,
+     "parse_ms": [
+      0.9,
+      1.7,
+      3.4,
+      7.1,
+      14.5
+     ],
+     "parse_max_ratio": 2.04
+    },
+    "assignments": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      5.9,
+      11.3,
+      23.9,
+      49,
+      99.2
+     ],
+     "max_ratio": 2.12,
+     "parse_ms": [
+      2.7,
+      5.5,
+      10.7,
+      22,
+      46.7
+     ],
+     "parse_max_ratio": 2.12
+    },
+    "unclosed_array": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      62.9,
+      223.4,
+      827.2,
+      3233.2,
+      12718.5
+     ],
+     "max_ratio": 3.93,
+     "parse_ms": [
+      61.6,
+      220.3,
+      829.7,
+      3192,
+      12662.9
+     ],
+     "parse_max_ratio": 3.97
+    },
+    "heredoc_operators": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      92.2,
+      361.4,
+      1439,
+      5837.2,
+      22971.2
+     ],
+     "max_ratio": 4.06,
+     "parse_ms": [
+      91.3,
+      362.4,
+      1446.2,
+      5717.2,
+      22882.1
+     ],
+     "parse_max_ratio": 4
+    }
+   }
+  },
+  "kernel": {
+   "kernel_sha256": "119ce9764447",
+   "sizes": [
+    2000,
+    4000,
+    8000,
+    16000,
+    32000
+   ],
+   "shapes": {
+    "unclosed_double_paren": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      5.3,
+      8,
+      15.8,
+      27.4,
+      62.7
+     ],
+     "max_ratio": 2.29,
+     "parse_ms": [
+      0.9,
+      1.7,
+      3.3,
+      6.7,
+      13.6
+     ],
+     "parse_max_ratio": 2.03
+    },
+    "unclosed_dollar_paren": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      2.7,
+      5.2,
+      8.3,
+      14.2,
+      33.2
+     ],
+     "max_ratio": 2.34,
+     "parse_ms": [
+      0.6,
+      1.2,
+      2.4,
+      4.8,
+      9.7
+     ],
+     "parse_max_ratio": null
+    },
+    "unclosed_dq_dollar_paren": {
+     "chars": [
+      4005,
+      8004,
+      16005,
+      32004,
+      64005
+     ],
+     "ms": [
+      2.6,
+      4.4,
+      8.9,
+      17.6,
+      32.7
+     ],
+     "max_ratio": 1.98,
+     "parse_ms": [
+      0.7,
+      1.4,
+      2.8,
+      5.6,
+      11.1
+     ],
+     "parse_max_ratio": 1.98
+    },
+    "unclosed_arith": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      1.4,
+      2.7,
+      5.4,
+      11.2,
+      22.6
+     ],
+     "max_ratio": 2.07,
+     "parse_ms": [
+      0.6,
+      1.2,
+      2.5,
+      5,
+      9.9
+     ],
+     "parse_max_ratio": null
+    },
+    "backquotes": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      2.9,
+      5.8,
+      12,
+      24,
+      48.2
+     ],
+     "max_ratio": 2.07,
+     "parse_ms": [
+      0.9,
+      1.8,
+      3.6,
+      7.2,
+      14.6
+     ],
+     "parse_max_ratio": 2.03
+    },
+    "unclosed_brace": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      1.7,
+      3.4,
+      6.9,
+      14,
+      28.9
+     ],
+     "max_ratio": 2.06,
+     "parse_ms": [
+      0.7,
+      1.4,
+      2.8,
+      5.8,
+      11.5
+     ],
+     "parse_max_ratio": 1.98
+    },
+    "unclosed_if": {
+     "chars": [
+      4004,
+      8008,
+      16005,
+      32010,
+      64009
+     ],
+     "ms": [
+      2.2,
+      4.4,
+      8.6,
+      17.2,
+      35.9
+     ],
+     "max_ratio": 2.09,
+     "parse_ms": [
+      1,
+      2,
+      3.9,
+      7.8,
+      15.8
+     ],
+     "parse_max_ratio": 2.03
+    },
+    "unclosed_case": {
+     "chars": [
+      4004,
+      8008,
+      16003,
+      32006,
+      64012
+     ],
+     "ms": [
+      1.4,
+      3,
+      5.9,
+      12.5,
+      23.9
+     ],
+     "max_ratio": 2.12,
+     "parse_ms": [
+      0.7,
+      1.4,
+      2.7,
+      5.4,
+      10.7
+     ],
+     "parse_max_ratio": 1.98
+    },
+    "comments": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      0.8,
+      1.5,
+      3,
+      6,
+      12.7
+     ],
+     "max_ratio": 2.12,
+     "parse_ms": [
+      0.4,
+      0.7,
+      1.4,
+      2.9,
+      6.1
+     ],
+     "parse_max_ratio": null
+    },
+    "words": {
+     "chars": [
+      4002,
+      8004,
+      16002,
+      32004,
+      64002
+     ],
+     "ms": [
+      5.8,
+      11.4,
+      22.6,
+      46,
+      91.5
+     ],
+     "max_ratio": 2.04,
+     "parse_ms": [
+      2.2,
+      4.2,
+      8.7,
+      17.2,
+      34.6
+     ],
+     "parse_max_ratio": 2.01
+    },
+    "semicolons": {
+     "chars": [
+      4002,
+      8001,
+      16002,
+      32001,
+      64002
+     ],
+     "ms": [
+      7.6,
+      15.5,
+      29.9,
+      62.5,
+      128.2
+     ],
+     "max_ratio": 2.09,
+     "parse_ms": [
+      2.1,
+      4.4,
+      8.5,
+      17.1,
+      35.6
+     ],
+     "parse_max_ratio": 2.08
+    },
+    "and_list": {
+     "chars": [
+      4008,
+      8012,
+      16006,
+      32008,
+      64012
+     ],
+     "ms": [
+      2.4,
+      4.8,
+      9.9,
+      19.5,
+      38.3
+     ],
+     "max_ratio": 1.97,
+     "parse_ms": [
+      0.7,
+      1.4,
+      2.8,
+      5.6,
+      11.3
+     ],
+     "parse_max_ratio": 2.02
+    },
+    "dq_substitutions": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      4.9,
+      8.5,
+      17,
+      35.4,
+      72
+     ],
+     "max_ratio": 2.08,
+     "parse_ms": [
+      1.5,
+      2.7,
+      5.4,
+      11.2,
+      22.7
+     ],
+     "parse_max_ratio": 2.07
+    },
+    "heredocs": {
+     "chars": [
+      4014,
+      8010,
+      16002,
+      32004,
+      64008
+     ],
+     "ms": [
+      4.5,
+      8.2,
+      16.6,
+      32.9,
+      64.7
+     ],
+     "max_ratio": 2.02,
+     "parse_ms": [
+      0.9,
+      1.7,
+      3.4,
+      7,
+      14
+     ],
+     "parse_max_ratio": 2
+    },
+    "shell_heredocs": {
+     "chars": [
+      4004,
+      8008,
+      16016,
+      32004,
+      64008
+     ],
+     "ms": [
+      9.6,
+      8.7,
+      17.3,
+      34.3,
+      67.8
+     ],
+     "max_ratio": 1.99,
+     "parse_ms": [
+      0.6,
+      1.1,
+      2.2,
+      4.6,
+      9.3
+     ],
+     "parse_max_ratio": null
+    },
+    "shell_strings": {
+     "chars": [
+      4004,
+      8008,
+      16002,
+      32004,
+      64008
+     ],
+     "ms": [
+      2.4,
+      4.7,
+      9.5,
+      19.4,
+      40.1
+     ],
+     "max_ratio": 2.07,
+     "parse_ms": [
+      0.9,
+      1.8,
+      3.6,
+      7.3,
+      15
+     ],
+     "parse_max_ratio": 2.05
+    },
+    "pipes": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      11.2,
+      23.3,
+      46.9,
+      95.4,
+      197.5
+     ],
+     "max_ratio": 2.08,
+     "parse_ms": [
+      7,
+      14.8,
+      29.5,
+      60.1,
+      121.8
+     ],
+     "parse_max_ratio": 2.11
+    },
+    "redirs": {
+     "chars": [
+      4023,
+      8019,
+      16011,
+      32022,
+      64017
+     ],
+     "ms": [
+      4.5,
+      8.5,
+      17.3,
+      35.4,
+      70.7
+     ],
+     "max_ratio": 2.05,
+     "parse_ms": [
+      0.8,
+      1.7,
+      3.5,
+      7,
+      14
+     ],
+     "parse_max_ratio": 2
+    },
+    "assignments": {
+     "chars": [
+      4003,
+      8003,
+      16003,
+      32003,
+      64003
+     ],
+     "ms": [
+      5.5,
+      10.8,
+      22.3,
+      46.2,
+      94.7
+     ],
+     "max_ratio": 2.07,
+     "parse_ms": [
+      2.6,
+      5.5,
+      10.6,
+      21.5,
+      46.2
+     ],
+     "parse_max_ratio": 2.15
+    },
+    "unclosed_array": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      63.2,
+      221.8,
+      828.2,
+      3199.8,
+      12573.8
+     ],
+     "max_ratio": 3.93,
+     "parse_ms": [
+      61.2,
+      215.5,
+      812.4,
+      3166.4,
+      12459.7
+     ],
+     "parse_max_ratio": 3.93
+    },
+    "heredoc_operators": {
+     "chars": [
+      4000,
+      8000,
+      16000,
+      32000,
+      64000
+     ],
+     "ms": [
+      91.3,
+      359.6,
+      1431.7,
+      5725.8,
+      23207.1
+     ],
+     "max_ratio": 4.05,
+     "parse_ms": [
+      90.6,
+      361.1,
+      1427.3,
+      5729.2,
+      22919.7
+     ],
+     "parse_max_ratio": 4.01
+    }
+   }
+  }
+ },
+ "differential_rerun": {
+  "real": {
+   "inputs": 136361,
+   "bash_valid": null,
+   "same": 136248,
+   "differ": 113,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 135707,
+   "differ_new_parse_error": 7,
+   "differ_kinds": {
+    "unresolved": 105,
+    "lanes": 7,
+    "lanes+unresolved": 1
+   },
+   "equal_to_round1": true
+  },
+  "soup": {
+   "inputs": 40000,
+   "bash_valid": 4397,
+   "same": 4104,
+   "differ": 293,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 2739,
+   "differ_new_parse_error": 273,
+   "differ_kinds": {
+    "unresolved": 268,
+    "remote": 5,
+    "lanes+unresolved": 13,
+    "lanes": 7
+   },
+   "equal_to_round1": true
+  },
+  "heredoc": {
+   "inputs": 20000,
+   "bash_valid": 4656,
+   "same": 4119,
+   "differ": 537,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 3433,
+   "differ_new_parse_error": 520,
+   "differ_kinds": {
+    "unresolved": 465,
+    "lanes": 45,
+    "remote": 3,
+    "lanes+unresolved": 22,
+    "lanes+remote": 1,
+    "lanes+remote+unresolved": 1
+   },
+   "equal_to_round1": true
+  },
+  "lanes": {
+   "inputs": 20000,
+   "bash_valid": 4740,
+   "same": 4098,
+   "differ": 642,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 1916,
+   "differ_new_parse_error": 532,
+   "differ_kinds": {
+    "lanes": 326,
+    "unresolved": 201,
+    "lanes+unresolved": 75,
+    "remote": 35,
+    "remote+unresolved": 2,
+    "lanes+remote+unresolved": 3
+   },
+   "equal_to_round1": true
+  },
+  "covering_current_tests": {
+   "inputs": 728,
+   "bash_valid": null,
+   "same": 661,
+   "differ": 67,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 405,
+   "differ_new_parse_error": 2,
+   "differ_kinds": {
+    "lanes": 58,
+    "lanes+unresolved": 4,
+    "unresolved": 4,
+    "remote": 1
+   },
+   "equal_to_round1": true
+  },
+  "covering_stage_a_339": {
+   "inputs": 339,
+   "bash_valid": null,
+   "same": 338,
+   "differ": 1,
+   "old_throws": 0,
+   "new_throws": 0,
+   "new_program_outside_vocabulary": 0,
+   "old_program_outside_vocabulary": 241,
+   "differ_new_parse_error": 1,
+   "differ_kinds": {
+    "unresolved": 1
+   },
+   "equal_to_round1": true
+  }
+ },
+ "round2": {
+  "sections": [
+   "corpus",
+   "shapes",
+   "lanes_identity",
+   "scaling",
+   "differential_rerun"
+  ],
+  "other_sections_measured_on_kernel_sha256": "a9126a77fd7f2908570d680bb79784905eab4876ade4b3ff794befc893542716"
  }
 }

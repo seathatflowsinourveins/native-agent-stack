@@ -448,7 +448,14 @@ It also has these reading limits, most of them limits of the grammar
 (tree-sitter-bash 0.25.1):
 
 - an ERROR node hides what is under it: 247 of the real commands have a parse
-  error (`parse_errors`), and a lane inside one is not counted;
+  error (`parse_errors`), and a lane inside one is not counted. Of the 247, 31
+  name a lane (a lane word anywhere in the text) and 216 do not. Of the 31, 4
+  still read a lane from the valid parts of their tree; in 13 the lane word
+  follows plain words (`echo qmd`: an argument), in 13 it stands where a command
+  name could but the tree puts it in a comment, a heredoc body, a string or an
+  assignment value, and in 1 it stands there inside an ERROR node (a comment in
+  a heredoc body). No lost call is confirmed, and the upper bound is 5 of the
+  6,527 commands that read a lane (decision record, "What would overturn it");
 - a heredoc operator that begins a statement (`<<'EOF' cat`) is read as two
   redirections and its body as commands (0 of 15,128 real commands with a
   heredoc); several heredoc operators on one line can be an error (2 real
@@ -466,6 +473,15 @@ counted so a later host can compare (commands with the shape): a command named `
 into a redirection 500 (1 with a lane word), `time` before an assignment or `!`
 12, a heredoc with no delimiter line 0 of 15,128, and words the grammar cut in
 two 4,837 (37 with a lane word after the cut).
+
+**What the parser costs.** `commandInvocations` takes time linear in the length of the text on every shape measured but two
+(`scaling` in `counts.json`; `test-child-usage.mjs` checks 9 of the shapes at n = 8,000 to 64,000). The tree is read with a cursor when a node has more
+than 16 children, because `node.child(i)` and `fieldNameForChild(i)` cost O(i) per call in web-tree-sitter 0.27.0: a flat run of unclosed constructs or of
+comments is one wide node, and the reading had taken four times as long for twice the text (`'(('.repeat(n) + 'qmd'`, 64,003 characters: 7.4 s, now
+63 ms). Two shapes are quadratic inside tree-sitter-bash's parse, which no reading changes (`parse_ms` in `scaling` is the parse alone and takes the reading's time): a
+run of unclosed array assignments (`a=( `: 12.6 s at 64,000 characters) and a run of here-document operators with no delimiter (`<<`: 23.2 s at
+64,000). Nothing on this host comes near: its largest command has 49,096 characters, at most 71 heredoc operators and 12 array openers, and
+`commandInvocations` took at most 12.3 ms on any of the 136,361 real commands (`timing` in `counts.json`, round 1's kernel). A parse budget that marks such a text unresolved is a follow-up.
 
 **Changed meanings.** `measurement.proxy.calls`, M3 `by_carrier.rtk_proxy` and
 `m4.by_carrier` now use this command-position rule, where a prefix rule
@@ -592,7 +608,7 @@ blanks before a heredoc operator (`A=$(( 1 + 2 )) bash <<EOF`); a data heredoc w
 paren-free substitutions with its regular expression (`$(curl $(date))` misses the outer `curl`); a newline read as a
 blank in `bash` newline `-c "x"`; and a heredoc that a quote or `"$( )"` carries over lines has its head on an earlier
 line, so its heredoc reads as a possible fetch. The text scanners read in linear time (a run of 64,000 unclosed `((`
-takes under 150 ms and at most 2.5 times longer per doubling: `test-child-usage.mjs`). The repeated reading is cheap and
+takes under 150 ms and at most 2.5 times longer per doubling: `test-child-usage.mjs`), and so does the reading of the lanes (below, "What the parser costs"). The repeated reading is cheap and
 is not cached: over this host's 136,361 distinct real commands `measureTranscript` of one Bash call took 44 s in all
 (mean 0.32 ms, p99 1.2 ms, at most 10.9 ms), of which `executedText` is 0.07 ms plain and 0.09 ms with inline HTTP,
 `fetchKind` 0.08 ms and `commandInvocations` 0.13 ms (`evidence/artifacts/pra-u1-differential-20260929/timing.mjs`).

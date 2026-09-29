@@ -245,7 +245,12 @@ kernel's `loadShellParser()` before it reads, as the kernel's own CLI does: the 
 needs the verified tree-sitter-bash install (`CHILD_USAGE_SHELL_PARSER`, then the ecosystem tools
 directory that `shell-parser.pin.json` names), and without one `measurement.cli_lanes` is `{status:
 'parser_unavailable', reason}` and no lane is counted. The unified exec header's exit code is read
-up to nine digits; a longer one leaves the state `unknown` instead of raising (finding 12).
+up to nine digits; a longer one leaves the state `unknown` instead of raising (finding 12). Codex prints
+an `i32` there (`exit_code: Option<i32>` at `codex-rs/core/src/tools/context.rs:389`, formatted at `:535`,
+rust-v0.157.1), so ten digits can only come from a Windows-native Codex, whose crash statuses (an access violation
+is `-1073741819`) then read `unknown`, never succeeded. On this stack (Linux) the statuses are small (0 to 255, and
+-1 for a call declined before it ran). Checked by calling `exec_header_state` with `-1073741819`, `1073741819` and `3221225477` (each
+`(False, "unknown")`); not checked against a Windows Codex.
 
 A call's state comes
 from its persisted item status when there is one: `failed` is failed, and
