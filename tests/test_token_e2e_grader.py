@@ -825,6 +825,18 @@ class F6_StrictDecode(GraderCase):
             self.assertNotIn("--no-strict", argv)
         self.assertEqual(fc.toon_decode_argv()[1:], ["--decode"])
 
+    def test_a_toon_cli_that_is_not_4_1_1_is_refused(self):
+        """Review H-4: the strict decode is TOON CLI 4.1.1's; another version could change strictness silently."""
+        fc = load("frozen_checks")
+        bin_dir = self.tmp / "fake-toon-bin"
+        bin_dir.mkdir()
+        script = bin_dir / "toon"
+        script.write_text("#!/bin/sh\nif [ \"$1\" = \"--version\" ]; then echo 4.2.0; exit 0; fi\ncat\n", encoding="utf-8")
+        script.chmod(0o755)
+        with mock.patch.dict(os.environ, {"PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}):
+            self.assertRefused(lambda: fc.toon_decode("[1]: 1"), "E_TOOL", tool="toon", reason="version")
+        self.assertEqual(fc.toon_decode_argv()[0], "toon", "no host path may reach a recorded argv")
+
     def test_unfenced_payload_is_a_candidate(self):
         text = "Here are the records:\n" + toon_encode(web_key()["records"]) + "\nLatency sum: 124\n"
         self.result(self.grade(text), "pass")
@@ -908,6 +920,18 @@ class F7_T0(GraderCase):
         older = T0_ANSWER.replace("feat: newest", "fix: older one")
         self.result(self.grade(older, captures), "fail", "subject_not_newest")
         self.result(self.grade(T0_ANSWER, captures), "pass")
+
+    def test_the_first_subject_mentioned_must_be_the_newest(self):
+        """Review J-3: an older subject reported before the newest one is 'an older subject reported as newest'."""
+        captures = t0_captures(arm=t0_capture(subjects=("feat: newest", "fix: older one")))
+        text = T0_ANSWER.replace("Newest commit: feat: newest.", "Commit fix: older one, then feat: newest.")
+        self.result(self.grade(text, captures), "fail", "subject_not_newest")
+        newest_first = T0_ANSWER.replace("Newest commit: feat: newest.", "Commit feat: newest, before fix: older one.")
+        self.result(self.grade(newest_first, captures), "pass")
+
+    def test_a_hedged_skip_count_is_unparsed(self):
+        captures = t0_captures(arm=t0_capture(skipped=1), plain=t0_capture(skipped=1))
+        self.result(self.grade(T0_ANSWER.replace("OK.", "OK (1 skipped or 0 skipped)."), captures), "unknown", "unparsed")
 
     def test_test_count_mismatch_when_not_environment_dependent(self):
         self.result(self.grade(T0_ANSWER.replace("Ran 49", "Ran 48")), "fail", "test_count")
@@ -1271,6 +1295,21 @@ class F20_GradingBlock(GraderCase):
             proc, _ = self.spec(repo, commit, self.tmp / (path + ".json"))
             self.assertRefusal(proc, "E_GRADING_BLOCK", field=path)
 
+    def test_a_page_url_that_could_read_a_local_file_is_refused(self):
+        """Review J-4: curl reads file:// URLs; a page URL must be http or https."""
+        block = grading_block()
+        block["pages"]["json"] = "file:///etc/hostname"
+        repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=block)
+        proc, _ = self.spec(repo, commit)
+        self.assertRefusal(proc, "E_GRADING_BLOCK", field="pages.json")
+
+    def test_a_memory_query_that_could_parse_as_an_option_is_refused(self):
+        memory = grading_block()["memory"]
+        memory["reuse-296-07"] = {"query": "--config=x", "anchors": ["host"]}
+        repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(memory=memory))
+        proc, _ = self.spec(repo, commit)
+        self.assertRefusal(proc, "E_GRADING_BLOCK", field="memory.reuse-296-07.query")
+
     def test_a_stale_registry_hash_is_refused(self):
         repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(registry_sha256="0" * 64))
         proc, _ = self.spec(repo, commit)
@@ -1632,7 +1671,7 @@ class F26_Bind(GraderCase):
     def test_codex_bindings_are_merged_and_checked(self):
         inputs = self.files()
         codex = {"exec_rev": exec_full(),
-                 "trees": [{"task": "seed-binding-1", "slot": "slot-1", "path": str(self.tmp / "codex-tree-1"),
+                 "trees": [{"task": "seed-binding-1", "slot": "slot-1", "arm": "B", "path": str(self.tmp / "codex-tree-1"),
                             "kind": "worktree", "base": "b" * 40,
                             "sentinel": {"value": "sentinel-codex-1", "sha256": sha256("sentinel-codex-1")}}],
                  "window": {"label": "W_X", "since": "2026-10-05T00:00:00Z", "until": "2026-10-06T00:00:00Z"}}
@@ -1643,10 +1682,33 @@ class F26_Bind(GraderCase):
         record = json.loads((self.tmp / "with-codex.json").read_text(encoding="utf-8"))
         self.assertEqual(record["sentinels"]["seed-binding-1"]["sha256"], sha256("sentinel-codex-1"))
         self.assertEqual(record["codex"]["trees"][0]["base"], "b" * 40)
+        self.assertEqual(record["codex"]["trees"][0]["arm"], "B")
         codex["exec_rev"] = "c" * 40
         path.write_text(json.dumps(codex), encoding="utf-8")
         self.assertRefusal(self.run_bind(inputs, out=self.tmp / "other.json", extra=("--codex-bindings", path)),
                            "E_BIND", field="exec_rev")
+
+    def test_run_record_args_with_another_token_or_arm_conflict_for_every_task(self):
+        """Review J-6: R19 says any args difference makes the affected tasks unknown(binding_conflict)."""
+        fc = load("frozen_checks")
+        record = json.loads(make_bindings(self.tmp, exec_rev=exec_full()).read_text(encoding="utf-8"))
+        same = {"worktree_paths": {"reuse-296-00": str(self.tmp / "tree-b")},
+                "worktree_bases": {"reuse-296-00": "a" * 40},
+                "input_paths": {"reuse-296-02": str(self.tmp / "bind-inputs" / "retained-history.txt")}}
+        everything = ["reuse-296-00", "reuse-296-02"]
+        self.assertEqual(fc.binding_conflicts(record, "B", dict(same, run="tok7fixture")), [])
+        self.assertEqual(fc.binding_conflicts(record, "B", dict(same, run="another-token")), everything)
+        self.assertEqual(fc.binding_conflicts(record, "B", dict(same, arm="A")), everything)
+
+    def test_codex_trees_are_matched_by_arm(self):
+        """Review K-2: U10's arms B, A and N each have their own tree for a task."""
+        gr = load("grade")
+        trees = {"codex": {"trees": [{"task": "t", "arm": "B", "path": "/one"}, {"task": "t", "arm": "A", "path": "/two"}]}}
+        self.assertEqual(gr._tree_for(trees, "codex", "A", "t"), "/two")
+        ambiguous = {"codex": {"trees": [{"task": "t", "path": "/one"}, {"task": "t", "path": "/two"}]}}
+        self.assertRefused(lambda: gr._tree_for(ambiguous, "codex", "A", "t"), "E_CAPTURE", field="codex_tree")
+        single = {"codex": {"trees": [{"task": "t", "path": "/one"}]}}
+        self.assertEqual(gr._tree_for(single, "codex", "N", "t"), "/one")
 
     def test_run_record_args_that_differ_from_the_bind_mark_the_task(self):
         fc = load("frozen_checks")
@@ -1822,6 +1884,61 @@ class F27b_CaptureCommand(GraderCase):
 
     def test_a_window_capture_needs_a_family(self):
         self.assertRefusal(self.capture("--phase", "w-open", env=fake_curl(self.tmp)), "E_ARGS", field="family")
+
+    def test_curl_is_restricted_to_http_protocols(self):
+        fc = load("frozen_checks")
+        env = fake_curl(self.tmp)
+        with mock.patch.dict(os.environ, env):
+            fc.capture_page("mcp", "https://code.claude.com/docs/en/mcp")
+        argv = json.loads((self.tmp / "fake-curl.log").read_text().splitlines()[0])
+        self.assertEqual(argv[argv.index("--proto") + 1], "=http,https")
+        self.assertEqual(argv[argv.index("--proto-redir") + 1], "=http,https")
+
+    def test_the_t0_commands_never_see_the_operator_environment(self):
+        """Review J-5 and K-3: the six identities, including the unittest that runs the tree's tests, get an allowlisted
+        environment, not the operator's secrets nor RUN_TOKEN itself."""
+        tests = ("import os, unittest\n\nclass T(unittest.TestCase):\n    def test_no_secret(self):\n"
+                 "        self.assertNotIn('U9_SECRET_FIXTURE', os.environ)\n"
+                 "        self.assertNotIn('RUN_TOKEN', os.environ)\n")
+        (self.tree / "tests" / "test_host_requests.py").write_text(tests, encoding="utf-8")
+        git(self.tree, "add", "-A")
+        git(self.tree, "commit", "-q", "-m", "environment probe")
+        proc = self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B",
+                            env={"U9_SECRET_FIXTURE": "s3cret"})
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        t0 = self.read("arm-B-pre-arm.json")["t0"]["reuse-296-00"]
+        for condition in ("arm", "plain"):
+            self.assertEqual(t0[condition]["runs"][5]["facts"]["status"], "OK", condition)
+
+    def test_a_structurally_broken_spec_is_an_internal_refusal_not_a_traceback(self):
+        """Review K-1: an unexpected exception must not print a traceback with a host path and exit 1 (reserved for
+        'graded and not passing')."""
+        broken = self.tmp / "broken-spec.json"
+        broken.write_text("{\"a\": 1}", encoding="utf-8")
+        proc = run_grade(["capture", "--spec", broken, "--bindings", self.bindings, "--phase", "w-open",
+                          "--family", "claude", "--out-dir", self.out_dir], env=fake_curl(self.tmp))
+        self.assertRefusal(proc, "E_INTERNAL", stage="capture")
+        self.assertEqual(proc.stderr.strip().count("\n"), 0, "one line, no traceback")
+
+    def test_post_arm_retains_the_builder_bytes_and_entries(self):
+        """Review J-6: T31 is graded from the live tree at grade time, so the post-arm capture keeps what grade needs
+        in case the tree is cleaned up first."""
+        builder = self.tmp / "builder-tree"
+        make_repo(builder, {"fixtures/before.py": "def greeting(name):\n    return 'x'\n"})
+        bindings = make_bindings(self.tmp, exec_rev=self.exec_commit, exec_checkout=self.exec_checkout,
+                                 worktree_paths={"reuse-296-00": str(self.tree), "seed-builder-1": str(builder)},
+                                 worktree_bases={"reuse-296-00": git(self.tree, "rev-parse", "HEAD"),
+                                                 "seed-builder-1": git(builder, "rev-parse", "HEAD")},
+                                 out_name="builder-bindings.json")
+        self.bindings = bindings
+        self.assertEqual(self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B").returncode, 0)
+        edited = "def greeting(name):\n    return 'Hello, ' + name + '!'\n"
+        (builder / "fixtures" / "before.py").write_text(edited, encoding="utf-8")
+        proc = self.capture("--phase", "post-arm", "--family", "claude", "--arm", "B")
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        kept = self.read("arm-B-post-arm.json")["builders"]["seed-builder-1"]
+        self.assertEqual(kept["entries"], [{"status": "M", "path": "fixtures/before.py"}])
+        self.assertEqual((kept["before_sha256"], kept["before_py"]), (sha256(edited), edited))
 
     def test_a_url_that_is_not_http_is_never_handed_to_curl(self):
         fc = load("frozen_checks")
@@ -2081,6 +2198,99 @@ class G_TemplateSweep(GraderCase):
                                       DECIDED)["A"], "fail", "elements_missing")
         other = dict(key, input_sha256="0" * 64)
         self.result(fc.ORACLES["T38"]({}, other, answer(fc, markdown), DECIDED)["A"], "unknown", "input_hash")
+
+
+class H_OracleReviewFindings(GraderCase):
+    """Loop-2 review of the oracles: hedged answers (H-1), paraphrases that must reach the judge (H-2), numbered heading
+    lines (H-3), a stated function count (H-5) and the subject order (J-3). A single-valued fact passes only when every
+    recognised value equals the key; disagreeing values with one equal are unknown(unparsed); none equal fails."""
+
+    def oracle(self, template, key, text, reading=None, params=None):
+        fc = load("frozen_checks")
+        return fc.ORACLES[template](params or {}, key, answer(fc, text), reading or DECIDED)["A"]
+
+    def hedged(self, template, key, text, params=None):
+        res = self.oracle(template, key, text, params=params)
+        self.result(res, "unknown", "unparsed")
+
+    def test_t34_count(self):
+        key = {"count": 10}
+        self.hedged("T34", key, "9 or 10")
+        self.result(self.oracle("T34", key, "There are 10 ERROR records out of 640 rows."), "pass")
+        self.result(self.oracle("T34", key, "9"), "fail", "count")
+        self.result(self.oracle("T34", key, "10"), "pass")
+
+    def test_t35_first_and_last(self):
+        key = {"first": 64, "last": 640}
+        self.hedged("T35", key, "First 64 or 65, last 640.")
+        self.hedged("T35", key, "First 64, last 640 or 641.")
+
+    def test_t1_token_lines(self):
+        fc = load("frozen_checks")
+        counts = {"whole_word": 66, "substring": 96, "alnum_boundary": 67}
+        for text in ("Lines containing the word token: 96 (or 66)", "Lines containing the word token: 96; by whole word 66"):
+            self.result(fc.t1_token_lines_check(text, counts, "whole_word"), "unknown", "unparsed")
+        self.result(fc.t1_token_lines_check("Lines containing the word token: 66", counts, "whole_word"), "pass")
+
+    def test_t1_heading_count_is_not_satisfied_by_numbered_heading_lines(self):
+        fc = load("frozen_checks")
+        key = {"heading_count": 10, "first_ten": ["Alpha topic", "Beta topic"],
+               "token_lines": {"whole_word": 66, "substring": 96, "alnum_boundary": 67}}
+        text = ("Heading 1: Alpha topic\nHeading 10: Beta topic\nSecond-level headings: 11\n"
+                "Lines containing the word token: 66")
+        self.result(fc.ORACLES["T1"]({}, key, answer(fc, text), DECIDED)["A"], "fail", "heading_count")
+
+    def test_a_hedged_payload_sum(self):
+        fc = load("frozen_checks")
+        key = web_key()
+        text = "```json\n" + json.dumps(key["records"]) + "\n```\nLatency sum: 124 or 999"
+        self.result(fc.grade_payload(answer(fc, text), key, DECIDED), "unknown", "unparsed")
+
+    def test_t28_numbers(self):
+        key = {"bytes": 52631, "files": ["run.py"], "hunks": 31, "added": 166, "deleted": 581}
+        self.hedged("T28", key, "Changed file: run.py. 30 or 31 hunks, 166 added lines and 581 deleted lines.")
+        self.hedged("T28", key, "Changed file: run.py. 31 hunks, 166 added lines and 580 or 581 deleted lines.")
+
+    def test_t32_verdict_and_latency(self):
+        key = {"record_id": 3, "verdict": "yes", "latency_ms": 18}
+        self.hedged("T32", key, "Verdict: yes or no. id 3, latency 18 ms.")
+        self.hedged("T32", key, "Verdict: yes. id 3, latency 17 or 18 ms.")
+
+    def test_t27_exit_code(self):
+        key = {"partition": 2, "fixture_bytes": 84003, "rows": 640, "error_rows": 10, "wc_l": 640,
+               "ls": ["events.jsonl", "table.json"], "summary": "PASS partition 2"}
+        text = "ls: events.jsonl, table.json; wc -l: 640. Acceptance exit code 1 or exit code 0, final summary: PASS partition 2"
+        self.hedged("T27", key, text, params={"partition": 2})
+
+    def test_t8_a_stated_count_must_equal_the_number_of_names(self):
+        fc = load("frozen_checks")
+        key = {"path": "scripts/host_requests.py", "names": ["alpha", "beta", "gamma"], "distractors": ["__init__"]}
+        listing = "alpha, beta, gamma"
+        self.result(fc.ORACLES["T8"]({}, key, answer(fc, "3 total: " + listing), DECIDED)["A"], "pass")
+        self.result(fc.ORACLES["T8"]({}, key, answer(fc, "4 total: " + listing), DECIDED)["A"], "fail", "count")
+
+    def test_a_paraphrase_of_the_release_pin_reaches_the_judge_instead_of_failing(self):
+        """R3 reserves FAIL for a contradiction or an absent required citation; an absent key fact is unparsed, because a
+        deterministic FAIL sends no packet to the semantic judge (F15/R21)."""
+        fc = load("frozen_checks")
+        key = keys_at_exec_rev()["reuse-296-04"]["key"]
+        text = ("A new machine pins a release by taking the release tag from adoption/update.md, which points at step 0 "
+                "of the bootstrap guide.")
+        self.result(fc.ORACLES["T4"](params_of("reuse-296-04"), key, answer(fc, text), DECIDED)["A"], "unknown",
+                    "unparsed")
+
+    def test_a_catalog_answer_with_the_citation_but_paraphrased_facts_is_unparsed(self):
+        fc = load("frozen_checks")
+        text = "Per catalogs/us-equities/README.md the destination is the newest engine release with the main broker."
+        res = fc.ORACLES["T21"]({}, {}, answer(fc, text), DECIDED)["A"]
+        self.result(res, "unknown", "unparsed")
+        res = fc.ORACLES["T21"]({}, {}, answer(fc, "Nothing relevant."), DECIDED)["A"]
+        self.result(res, "fail", "citation_missing")
+
+    def test_an_absent_scope_name_is_unparsed_because_the_judge_settles_wording(self):
+        fc = load("frozen_checks")
+        res = fc.ORACLES["T13"]({}, {}, answer(fc, "Scopes are local, project and global."), DECIDED)["A"]
+        self.result(res, "unknown", "unparsed")
 
 
 # ---- F19 (stage-1 subset): disarmed-guard mutants -------------------------------------------------------------------
