@@ -433,6 +433,10 @@ def build_convergence(root, read, file_url):
             "layers": layers}
 
 
+def build_ranking(root, read, file_url):
+    return None
+
+
 def token_topic_card(card, edition_date, stack_version, root):
     """Validate one topic row's dated tool card. Returns (card, pin drift note, missing-card marker)."""
     require(edition_date is not None and isinstance(card, dict) and card.get("edition") == edition_date,
@@ -872,6 +876,7 @@ def build_data(root):
         landscape = build_landscape(root, config["landscape_manifest"], read=read,
                                     track=track, file_url=file_url)
     convergence = build_convergence(root, read, file_url)
+    ranking = build_ranking(root, read, file_url)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars_observed_at, "historical_star_audit_count": stars["count"],
@@ -881,7 +886,7 @@ def build_data(root):
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
-            "grand_catalogs": grand_catalogs, "landscape": landscape, "convergence": convergence,
+            "grand_catalogs": grand_catalogs, "landscape": landscape, "convergence": convergence, "ranking": ranking,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),

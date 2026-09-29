@@ -1492,12 +1492,19 @@ vm.runInNewContext(input.script, {document, location, window: {scrollTo() {}, ad
   history: {replaceState() {}}, requestAnimationFrame(callback) { callback(); }, URL, Blob: class {}, setTimeout, atob,
   console: {error(message, error) { errors.push(String((error && error.stack) || error || message)); }}});
 const text = id => byId[id] ? byId[id].children.map(child => child.textContent) : null;
+const descendants = (element, tag) => (element ? element.children : []).flatMap(child =>
+  [...(child.tagName === tag ? [child] : []), ...descendants(child, tag)]);
 process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-app"].hidden,
   recovery_hidden: byId["catalog-recovery"].hidden, tab_hidden: (byId["tab-convergence"] || {}).hidden,
   panel_hidden: (byId["convergence"] || {}).hidden,
   rows: (byId["convergence-rows"] || {children: []}).children.map(row => row.children.map(cell => cell.textContent)),
   summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null,
-  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null}));
+  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null,
+  ranking_tab_hidden: (byId["tab-ranking"] || {}).hidden, ranking_panel_hidden: (byId["ranking"] || {}).hidden,
+  ranking_summary: text("ranking-summary"),
+  ranking_rows: descendants(byId["ranking-layers"], "TR").map(row => row.children.map(cell => cell.textContent)),
+  ranking_layers: byId["ranking-layers"] ? byId["ranking-layers"].textContent : null,
+  ranking_details: byId["ranking-details"] ? byId["ranking-details"].textContent : null}));
 '''
 
     @staticmethod
@@ -1615,6 +1622,228 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         self.assertEqual(convergence["overall"], real["summary"]["convergence"]["overall"])
         self.assertEqual([(row["catalog"], row["layer_id"]) for row in convergence["layers"]],
                          [(row["catalog"], row["layer_id"]) for row in real["rows"]])
+
+    # ------------------------------------------------------------------------- ranked catalog index
+
+    RANKING = "catalogs/landscape/catalog-index.json"
+    NO_MEASUREMENT = "no comparable measurement recorded"
+
+    @classmethod
+    def ranking_index(cls):
+        """A two-layer ranked index in the shape scripts/catalog_index.py writes, with sort keys and positions that
+        follow its rule: recorded role, evidence tier, verification level, measured rank; competition positions."""
+        def placement(entity, role, key, position, shared, field, recorded, state, *, retained=None, flags=(),
+                      macos=None, receipts=None, pin_current=None, component_id=None, pin=None):
+            return {"entity": entity, "role": role, "component_id": component_id, "pin": pin,
+                    "role_records": [{"path": "catalogs/landscape/foundation.json", "pointer": "/layers/0/winners/0",
+                                      "role": role, "disposition": None}],
+                    "matrix_record": None,
+                    "evidence": {"field": field, "recorded": recorded, "tier": "ABCU"[key[1]],
+                                 "retained_local_result": retained, "policy_rows": []},
+                    "verification": {"level": key[2], "state": state, "declared": None, "macos": macos,
+                                     "host_receipts": receipts},
+                    "freshness": {"pin_current": pin_current},
+                    "measured": {"group": None, "rank": key[3], "basis": cls.NO_MEASUREMENT},
+                    "sort_key": list(key), "position": position, "shared": shared, "flags": list(flags)}
+
+        def banner(state, note, status="recorded", review="dual_lane_same_winner"):
+            return {"decision": "retain", "verdict_status": status, "independent_review": review, "layer_state": state,
+                    "verdict_checked_at": "2026-09-22", "reopened_by": [], "open_gaps": 2,
+                    "overturn_metric": "recall on the frozen fixture", "note": note}
+
+        retrieval = {
+            "ref": "layer:foundation/retrieval", "catalog": "foundation", "layer_id": "retrieval", "title": "Retrieval",
+            "source": {"path": "catalogs/landscape/foundation.json", "pointer": "/layers/0"},
+            "banner": banner("confirmed_current", ""),
+            "placements": [
+                placement("repo:example/search", "winner", (0, 0, 0, 0), 1, False, "evidence_class", "native_proven",
+                          "host_verified", macos="untested", pin_current="false", component_id="search", pin="1.0",
+                          receipts={"pass": 2, "fail": 0, "independently_reviewed_pass": 1},
+                          flags=("freshness/pin-behind-upstream",)),
+                placement("repo:example/idea", "alternative", (1, 2, 1, 0), 2, False, "evidence_class",
+                          "source_review", "not_run", flags=("role/selected-card-not-winner",))],
+            "outside_ranking": [{"entity": "repo:example/other", "role": "candidate", "reason": "out_of_scope",
+                                 "role_records": [], "flags": []}],
+            "caution": []}
+        pending = {
+            "ref": "layer:us-equities/pending", "catalog": "us-equities", "layer_id": "pending",
+            "title": "Pending layer", "source": {"path": "catalogs/landscape/us-equities.json", "pointer": "/layers/0"},
+            "banner": banner("pending_lanes", "No recorded verdict: every entry is a historical candidate card; the "
+                             "order is candidate-card evidence only, not a selection.", "pending_lanes",
+                             "pending_lanes"),
+            "placements": [
+                placement("repo:example/idea", "candidate", (2, 0, 0, 0), 1, True, "evidence_kind", "mixed",
+                          "not_applicable", retained=True),
+                placement("repo:example/search", "candidate", (2, 0, 0, 0), 1, True, "evidence_kind",
+                          "native_execution", "not_applicable", retained=False)],
+            "outside_ranking": [], "caution": []}
+        items = [
+            {"type": "coverage/not-reached", "level": "info", "message": "catalogs/review.json is not reached",
+             "refs": ["catalogs/review.json"]},
+            {"type": "freshness/pin-behind-upstream", "level": "info", "message": "pin_current is false",
+             "refs": ["layer:foundation/retrieval", "repo:example/search"]},
+            {"type": "role/selected-card-not-winner", "level": "warning", "message": "a selected card, not a winner",
+             "refs": ["layer:foundation/retrieval", "repo:example/idea"]}]
+        def entity(ref):
+            return {"ref": ref, "aliases": [], "component_ids": [], "stack_profiles": [],
+                    "decision_index": {"key": ref[5:], "reference_kinds": {}}, "placements": [],
+                    "receipts": {"ids": [], "kinds": {}}}
+
+        return {
+            "schema_version": 1, "id": "catalog-index", "generated_by": "scripts/catalog_index.py",
+            "scope": "Read-only join. It never selects a winner, changes a verdict, records a receipt or infers a "
+                     "benchmark win.",
+            "universal_superiority": "not_established",
+            "rule": {"version": 1, "frozen_at": "2026-09-29", "tie": "competition", "blended_score": False,
+                     "keys": ["recorded_role", "evidence_tier", "verification_at_current_pin", "measured_rank"],
+                     "verification_platform": "linux-wsl2-x86_64",
+                     "definitions": [{"term": "recorded_role", "definition": "Winner, then alternative, then card."},
+                                     {"term": "position", "definition": "Competition ranking within one layer."}]},
+            "inputs": [], "unresolved": [], "measurements": [],
+            "counts": {"placements": {"layers": 2, "ranked": 4, "outside_ranking": 1, "caution": 0},
+                       "status_items": {"coverage/not-reached": 1, "freshness/pin-behind-upstream": 1,
+                                        "role/selected-card-not-winner": 1},
+                       "coverage": {"index_input": 2, "matrix_input": 0, "decision_index_source": 1,
+                                    "not_reached": 1}},
+            "layers": [retrieval, pending],
+            "entities": [entity("repo:example/idea"), entity("repo:example/other"), entity("repo:example/search")],
+            "status_items": items,
+            "evidence": {"receipts_unattached": [], "experiments": []},
+            "coverage": {"catalog_files": [], "unmodeled_collections": []}}
+
+    def write_ranking(self, index):
+        self.ranking = index
+        self.write(self.RANKING, index)
+
+    def test_ranking_is_absent_without_the_generated_index(self):  # 31
+        self.use_real_template()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        self.assertIn("ranking", data)
+        self.assertIsNone(data["ranking"])
+        self.assertIn("tab-ranking", page.elements)
+        self.assertIn("hidden", page.elements["tab-ranking"])
+
+    def test_ranking_block_is_embedded_with_its_input_hash(self):  # 32
+        self.use_real_template()
+        self.write_ranking(self.ranking_index())
+        page, text = self.build()
+        data = json.loads(page.data)
+        ranking = data["ranking"]
+        self.assertIsNotNone(ranking)
+        self.assertEqual([layer["ref"] for layer in ranking["layers"]],
+                         ["layer:foundation/retrieval", "layer:us-equities/pending"])
+        for key in ("banner", "placements", "outside_ranking", "caution", "title"):
+            with self.subTest(key=key):
+                self.assertEqual([layer[key] for layer in ranking["layers"]],
+                                 [layer[key] for layer in self.ranking["layers"]])
+        self.assertEqual(ranking["rule"]["definitions"], self.ranking["rule"]["definitions"])
+        self.assertEqual(ranking["rule"]["keys"], self.ranking["rule"]["keys"])
+        self.assertEqual(ranking["counts"], self.ranking["counts"])
+        self.assertEqual([item["type"] for item in ranking["global_items"]], ["coverage/not-reached"])
+        self.assertNotIn("entities", ranking)
+        self.assertEqual(ranking["universal_superiority"], "not_established")
+        self.assertIn("/blob/main/" + self.RANKING, ranking["url"])
+        hashes = {row["path"]: row["sha256"] for row in data["inputs"]}
+        self.assertEqual(hashes[self.RANKING], hashlib.sha256((self.root / self.RANKING).read_bytes()).hexdigest())
+        self.assertEqual(page.elements["ranking"]["role"], "tabpanel")
+        self.assertEqual(page.elements["tab-ranking"]["aria-controls"], "ranking")
+        self.assertIn("Ranked by evidence", text)
+        self.assertEqual(len(page.scripts), 2)
+
+        def retitle():
+            index = self.ranking_index()
+            index["layers"][0]["title"] = "Retrieval, retitled"
+            self.write_ranking(index)
+        self.assert_check_digest_changes(retitle)
+
+    def test_ranking_block_must_agree_with_the_index_module_rule(self):  # 33
+        def second(index, layer=0):
+            return index["layers"][layer]["placements"][1]
+        cases = (
+            (lambda index: second(index).update(position=3), "position"),
+            (lambda index: second(index, 1).update(shared=False), "position"),
+            (lambda index: second(index).update(sort_key=[1, 0, 1, 0]), "sort_key"),
+            (lambda index: second(index)["evidence"].update(tier="A"), "catalog index"),
+            (lambda index: second(index)["verification"].update(level=0), "catalog index"),
+            (lambda index: second(index).update(entity="repo:example/unknown"), "entity"),
+            (lambda index: index["layers"][0]["outside_ranking"][0].update(entity="repo:example/unknown"), "entity"),
+            (lambda index: index.update(universal_superiority="established"), "universal_superiority"),
+            (lambda index: index["rule"].update(blended_score=True), "blended"),
+            (lambda index: index["counts"]["placements"].update(ranked=5), "counts"),
+            (lambda index: index["counts"]["status_items"].update({"coverage/not-reached": 2}), "counts"),
+        )
+        for mutate, message in cases:
+            with self.subTest(message=message):
+                index = self.ranking_index()
+                mutate(index)
+                self.write_ranking(index)
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stdout)
+
+    def test_ranking_text_is_inert_public_data(self):  # 34
+        self.use_real_template()
+        hostile = '</script><script src="https://invalid.example/steal.js"></script>'
+        index = self.ranking_index()
+        index["layers"][0]["title"] = hostile
+        index["layers"][0]["banner"]["note"] = hostile
+        index["status_items"][0]["message"] = hostile
+        index["rule"]["definitions"][0]["definition"] = hostile
+        self.write_ranking(index)
+        page, _ = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        ranking = json.loads(page.data).get("ranking")
+        self.assertIsNotNone(ranking)
+        self.assertEqual(ranking["layers"][0]["title"], hostile)
+        self.assertEqual(ranking["layers"][0]["banner"]["note"], hostile)
+        self.assertEqual(ranking["global_items"][0]["message"], hostile)
+        self.assertEqual(ranking["rule"]["definitions"][0]["definition"], hostile)
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_ranking_tab(self):  # 35
+        self.use_real_template()
+        _, without = self.build()
+        observed = self.run_page(without, tab="ranking")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        # No index: the tab stays hidden and #ranking falls back to the overview.
+        self.assertEqual((observed.get("ranking_tab_hidden"), observed.get("ranking_panel_hidden"),
+                          observed.get("ranking_rows")), (True, True, []))
+
+        self.write_ranking(self.ranking_index())
+        _, with_index = self.build()
+        observed = self.run_page(with_index, tab="ranking")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed.get("ranking_tab_hidden"), observed.get("ranking_panel_hidden")), (False, False))
+        rows = [row for row in observed["ranking_rows"] if row and row[0] != "Position"]
+        self.assertEqual(rows, [
+            ["1", "example/search", "winner", "native_proven · tier A", "host_verified (Linux) · macOS untested",
+             "false", self.NO_MEASUREMENT, "freshness/pin-behind-upstream"],
+            ["2", "example/idea", "alternative", "source_review · tier C", "not_run (Linux)", "-",
+             self.NO_MEASUREMENT, "role/selected-card-not-winner"],
+            ["=1", "example/idea", "candidate", "mixed · tier A", "not applicable", "-", self.NO_MEASUREMENT, "-"],
+            ["=1", "example/search", "candidate", "native_execution · tier A", "not applicable", "-",
+             self.NO_MEASUREMENT, "-"]])
+        for expected in ("Outside this ranking: example/other (out_of_scope)",
+                         "No recorded verdict: every entry is a historical candidate card"):
+            self.assertIn(expected, observed["ranking_layers"])
+        self.assertTrue(observed["ranking_summary"])
+        for expected in ("coverage/not-reached", "catalogs/review.json is not reached",
+                         "recorded_role", "Competition ranking within one layer."):
+            self.assertIn(expected, observed["ranking_details"])
+
+    def test_the_repository_index_ranking_block_is_accepted(self):  # 36
+        """The real generated index, not the fixture: the page accepts what scripts/catalog_index.py writes."""
+        source = ROOT / self.RANKING
+        self.assertTrue(source.is_file(), "no committed ranked catalog index")
+        self.write(self.RANKING, source.read_text(encoding="utf-8"))
+        page, _ = self.build()
+        ranking = json.loads(page.data)["ranking"]
+        real = json.loads(source.read_text(encoding="utf-8"))
+        self.assertEqual([layer["ref"] for layer in ranking["layers"]], [layer["ref"] for layer in real["layers"]])
+        self.assertEqual(ranking["counts"], real["counts"])
 
 
 if __name__ == "__main__":
