@@ -783,7 +783,7 @@ class ImportLoadingPathTests(unittest.TestCase):
     def test_the_runner_prefers_a_package_and_loads_no_site_or_pytest_file_from_the_tree(self):
         hook = (ROOT / "scripts/git-hooks/pre-push").read_text(encoding="utf-8")
         runner = re.search(r"^runner='(.*?)'$", hook, re.S | re.M).group(1)
-        tree = Path(tempfile.mkdtemp(prefix="resolver-import-"))
+        tree = Path(tempfile.mkdtemp(prefix="resolver-import-")).resolve()
         self.addCleanup(shutil.rmtree, tree, True)
         marks = tree / "marks"
         marks.mkdir()
@@ -939,7 +939,7 @@ class GhHarnessTests(unittest.TestCase):
         cls.h = cls.r.gh_harness
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-gh-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-gh-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.fake = FakeTools(self.tmp)
         self.home = self.tmp / "home"
@@ -1448,7 +1448,7 @@ class BranchNamingTests(unittest.TestCase):
                 self.r.parse_ls_remote_heads(bad)
 
     def test_the_name_comes_from_one_anonymous_ls_remote_through_the_harness(self):
-        tmp = Path(tempfile.mkdtemp(prefix="resolver-branch-"))
+        tmp = Path(tempfile.mkdtemp(prefix="resolver-branch-")).resolve()
         self.addCleanup(shutil.rmtree, tmp, True)
         fake = FakeTools(tmp)
         home = tmp / "home"
@@ -1491,7 +1491,7 @@ class OutgoingGuardTests(unittest.TestCase):
         cls.g = cls.r.outgoing_guard
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-guard-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-guard-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.key_value = secrets.token_urlsafe(32)
         self.host_root = str(self.tmp / "state" / "attempt")
@@ -1828,7 +1828,7 @@ class PullRequestLoopTests(unittest.TestCase):
         cls.fixture.close()
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-loop-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-loop-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.fake = FakeTools(self.tmp)
         self.home = self.tmp / "home"
@@ -2237,7 +2237,7 @@ class CommandLineTests(unittest.TestCase):
         cls.r = load_resolver()
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-cli-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-cli-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
 
     def write_json(self, name, value):
@@ -2415,7 +2415,7 @@ class Stage2HarnessTests(unittest.TestCase):
         cls.h = cls.r.gh_harness
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-harness-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-harness-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.fake = FakeTools(self.tmp)
         self.home = self.tmp / "home"
@@ -2597,7 +2597,7 @@ class ResolverWorkerTests(unittest.TestCase):
     RESOLVER_SET = ("resolver", "search-first", "tdd")
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-worker-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-worker-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.worker = load_recipe("worker.py")
         self.run_input = self.tmp / "run-input"
@@ -2768,7 +2768,7 @@ class ResolverHostTests(unittest.TestCase):
     """host.py in resolver mode: preflight, gates, workspace, skills, mounts and the request."""
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-host-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-host-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.host = load_recipe("host.py")
         self.pins = json.loads((RECIPE / "pins.json").read_text(encoding="utf-8"))
@@ -3212,7 +3212,7 @@ class ResolverResultTests(unittest.TestCase):
     """dispatch.finish_result in resolver mode, and the receipt's resolver section."""
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-result-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-result-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.dispatch = load_recipe("dispatch.py")
         self.receipts = load_recipe("receipt.py")
@@ -3438,7 +3438,7 @@ class ResolverAttemptTests(unittest.TestCase):
         cls.r = load_resolver()
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-attempt-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-attempt-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.bare, self.base, _ = origin_fixture(self.tmp, ORIGIN_FILES)
         self.fake = FakeTools(self.tmp)
@@ -3693,7 +3693,7 @@ class ResolverRunTests(unittest.TestCase):
         cls.host, cls.dispatch, cls.receipts = (cls.r._recipe(name) for name in ("host", "dispatch", "receipt"))
 
     def setUp(self):
-        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-run-"))
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-run-")).resolve()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.bare, self.base, _ = origin_fixture(self.tmp, ORIGIN_FILES)
         self.fake = FakeTools(self.tmp)
