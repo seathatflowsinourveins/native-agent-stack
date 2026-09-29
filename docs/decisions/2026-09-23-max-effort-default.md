@@ -286,7 +286,9 @@ Sonnet 5.5. The 2.1.281 findings above stay as history for that release. On 2.1.
 - **A max session kept the Ultracode reminder.** `--effort max` and `CLAUDE_CODE_EFFORT_LEVEL=max` sessions carried the reminder text
   (P1 and P2 above did not). The reminder is only the indicator this record used; the probes did not exercise workflow
   orchestration at max. The overturn condition "a Claude Code release accepts `max` together with Ultracode orchestration" is met by
-  that indicator but not adopted: the coordinator stays at xhigh, and moving it to `max` is left to the user.
+  that indicator and was acted on later that day: the user asked for `max` as the default, and the
+  [2026-09-29 max-default record](2026-09-29-max-default-effort.md) starts interactive terminal launches at `max` through the launcher,
+  with the saved xhigh as the fallback where the launcher is not used.
 - **The stage rule stands and is load-bearing.** In the headless probes a stage or child that names no effort ran at its own model's
   saved level or default (medium for an unsaved Sonnet 5.5); in the interactive session, whose effort a model picker had set to max, every child that named no effort ran at max (two project agents ran at max from their own frontmatter). So `effort: 'max'` on every stage stays explicit.
 - **The limitation "no unconfounded probe covered the per-model key or a project settings file" is closed for Sonnet 5.5** on 2.1.284:

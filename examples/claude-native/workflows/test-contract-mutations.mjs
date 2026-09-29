@@ -93,7 +93,7 @@ const MUTATIONS = [
   ['an agent gains a second, lower effort line', 'agents/blind-lane-reviewer.md', 'effort: max\n', 'effort: max\neffort: high\n', 'runs at effort max on a single effort line'],
   ['the routing table restates source-scout at medium', ROUTING_DOC_FILE, 'running acceptance commands | `source-scout` | Sonnet, max |', 'running acceptance commands | `source-scout` | Sonnet, medium |', 'lists every project agent once with the model and effort its file declares'],
   ['the routing table restates a default child at high', ROUTING_DOC_FILE, '| default workflow subagent | Opus, max |', '| default workflow subagent | Opus, high |', 'every default workflow subagent row binds a model at effort max'],
-  ['the routing table moves the coordinator off xhigh under ultracode', ROUTING_DOC_FILE, '| coordinator | Opus 5.5, xhigh under `ultracode`', '| coordinator | Opus 5.5, max', 'the coordinator row stays at xhigh under ultracode'],
+  ['the routing table drops the saved xhigh fallback from the coordinator row', ROUTING_DOC_FILE, '| coordinator | Opus 5.5, max from the launcher, else saved xhigh, under `ultracode`', '| coordinator | Opus 5.5, max under `ultracode`', 'the coordinator row states the launcher max and the saved xhigh fallback under ultracode'],
   ['the instructions stop stating the stage effort literal', INSTRUCTIONS_FILE, "`effort: 'max'`", "`effort: 'high'`", 'state the effort literal every stage binds'],
   // CLAUDE_CODE_EFFORT_LEVEL overrides every stage's and agent's effort at any value (docs; probes P6 and P9 at max), and any
   // value other than xhigh also turned ultracode's orchestration off on 2.1.281 (P1); an effort cap below max clamps the stages.
