@@ -692,6 +692,193 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("must be selected and unique", result.stdout)
 
+    TOPIC_EDITION = "2026-09-27"
+    TOPIC_CARD_SOURCE = "evidence/artifacts/token-cards/cards/search.json"
+
+    def topic_card(self, recorded_pin="1.0"):
+        """A present per-tool card: every block keeps its own evidence class, the row cites exact card bytes."""
+        raw = json.dumps({"tool": "search", "pin": recorded_pin + " (fixture card)"}).encode()
+        target = self.root / self.TOPIC_CARD_SOURCE
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+        return {"status": "present", "edition": self.TOPIC_EDITION, "recorded_pin": recorded_pin,
+                "source": {"path": self.TOPIC_CARD_SOURCE, "bytes": len(raw),
+                           "sha256": hashlib.sha256(raw).hexdigest()},
+                "upstream": {"evidence_class": "upstream provenance (live release metadata)",
+                             "latest_release": "v1.1", "latest_date": "2026-09-24",
+                             "behind_by": "One minor release behind",
+                             "recommended_install": {"command": "search install",
+                                                     "url": "https://github.com/example/search#install"}},
+                "native_adaptation": {"evidence_class": "repository configuration review",
+                                      "assessment": "Claude hook and Codex instructions follow upstream"},
+                "e2e_returned_results": {"evidence_class": "local integration (upstream commands, returned data retained)",
+                                         "status": "pass", "records_total": 3,
+                                         "cited_records": ["search-01-query"]},
+                "adapted_performance": {"evidence_class": "one class per entry; never summed across classes",
+                                        "per_payload_and_lane": [
+                                            {"lane": "claude_subagent", "payload": "Same query raw versus search output",
+                                             "before_tokens": 400, "after_tokens": 100, "change_pct": -75.0,
+                                             "encoding": "o200k_base", "evidence_class": "exact artifact comparison"}]},
+                "invoke_rates": {"evidence_class": "local integration (transcript counts)",
+                                 "window": "2026-09-25T11:37:28Z to 2026-09-26T23:37:28Z",
+                                 "populations": [{"population": "agent_subagents", "agents_using": 14, "agents": 71,
+                                                  "pct_agents_using": 0.1972, "mcp_calls": 0, "cli_calls": 85}]},
+                "gpt6_review": {"evidence_class": "model review (judgment over retained sources, not execution)",
+                                "review_verdict": "defects", "final_verdict": "adapted-with-gaps",
+                                "summary": "Aligned with one documented gap", "open_findings": []}}
+
+    def write_topic(self, card, **row_fields):
+        row = {"component_id": "search", "group": "core", "purpose": "Find exact source",
+               "upstream_commands": {"use": "search --native"},
+               "returned_result_summary": "Exact source returned",
+               "session_statistics": {"value": None, "summary": "Not provided by upstream"},
+               "lifetime_statistics": {"value": None, "summary": "No cumulative savings counter"},
+               "baseline_summary": "Keep the focused read", "lifecycle_summary": "Dated acceptance only",
+               "source_paths": ["evidence/history.json"], "card": card, **row_fields}
+        evidence = [card["source"]["path"]] if isinstance(card, dict) and "source" in card else []
+        self.write("docs/token-efficiency-stack.json", {
+            "schema_version": 1, "scope": "Dated topic evidence",
+            "edition": {"date_utc": self.TOPIC_EDITION, "source_paths": evidence},
+            "rows": [row]})
+
+    def test_topic_card_joins_the_current_stack_pin_and_keeps_each_evidence_class(self):
+        self.write_topic(self.topic_card())
+        page, _ = self.build()
+        data = json.loads(page.data)
+        topic = data["efficiency"]["topic"]
+        actual = topic["rows"][0]
+        self.assertEqual(actual["pin"], {"version": "1.0", "repository": "https://github.com/example/search",
+                                         "source": "manifests/stack.json"})
+        self.assertEqual(actual["version"], "1.0")
+        self.assertIsNone(actual["pin_drift"])
+        self.assertIsNone(actual["card_marker"])
+        card = actual["card"]
+        for block in ("upstream", "native_adaptation", "e2e_returned_results", "adapted_performance",
+                      "invoke_rates", "gpt6_review"):
+            with self.subTest(block=block):
+                self.assertTrue(card[block]["evidence_class"].strip())
+        self.assertEqual(card["adapted_performance"]["per_payload_and_lane"][0]["evidence_class"],
+                         "exact artifact comparison")
+        # The edition's new artifacts do not exist at the immutable base: they resolve at the publication ref.
+        self.assertTrue(card["source"]["url"].endswith("/blob/main/" + self.TOPIC_CARD_SOURCE))
+        self.assertTrue(topic["edition"]["sources"][0]["url"].endswith("/blob/main/" + self.TOPIC_CARD_SOURCE))
+        self.assertIn(self.TOPIC_CARD_SOURCE, {row["path"] for row in data["inputs"]})
+
+    def test_topic_card_pin_drift_note_appears_only_when_the_stack_pin_differs(self):
+        self.write_topic(self.topic_card(recorded_pin="0.9"))
+        page, _ = self.build()
+        actual = json.loads(page.data)["efficiency"]["topic"]["rows"][0]
+        self.assertEqual(actual["version"], "1.0")
+        self.assertEqual(actual["pin_drift"],
+                         "Pin drift: this card recorded 0.9; manifests/stack.json now pins 1.0. The card's "
+                         "upstream, E2E, performance and review facts describe 0.9 until a newer card edition "
+                         "is recorded.")
+        self.write_topic(self.topic_card(recorded_pin="1.0"))
+        page, _ = self.build()
+        self.assertIsNone(json.loads(page.data)["efficiency"]["topic"]["rows"][0]["pin_drift"])
+
+    def test_topic_row_without_a_card_carries_only_the_edition_marker(self):
+        self.write_topic({"status": "no card in this edition", "edition": self.TOPIC_EDITION})
+        page, _ = self.build()
+        actual = json.loads(page.data)["efficiency"]["topic"]["rows"][0]
+        self.assertEqual(actual["card"], {"status": "no card in this edition", "edition": self.TOPIC_EDITION})
+        self.assertEqual(actual["card_marker"], "No card in this edition (2026-09-27)")
+        self.assertIsNone(actual["pin_drift"])
+        self.assertEqual(actual["pin"]["version"], "1.0")
+        # A missing card is a marker, never invented card data.
+        self.write_topic({"status": "no card in this edition", "edition": self.TOPIC_EDITION,
+                          "gpt6_review": {"evidence_class": "model review"}})
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("carries only the edition marker", result.stdout)
+
+    def test_topic_card_rejects_missing_blocks_unlabelled_figures_and_tampered_sources(self):
+        cases = []
+        card = self.topic_card()
+        del card["gpt6_review"]
+        cases.append(("missing block", card, {}, "gpt6_review with its evidence class"))
+        card = self.topic_card()
+        del card["adapted_performance"]["per_payload_and_lane"][0]["evidence_class"]
+        cases.append(("unlabelled figure", card, {}, "comparison needs its lane, payload and evidence class"))
+        card = self.topic_card()
+        card["adapted_performance"]["per_payload_and_lane"][0]["change_pct"] = -80.0
+        cases.append(("inconsistent change", card, {}, "comparison counts are inconsistent"))
+        card = self.topic_card()
+        card["source"]["sha256"] = "0" * 64
+        cases.append(("tampered source", card, {}, "card source hash or size mismatch"))
+        card = self.topic_card()
+        card["source"]["path"] = "evidence/history.json"
+        cases.append(("non-artifact source", card, {}, "card source must be a public evidence artifact"))
+        cases.append(("row-level pin", self.topic_card(), {"version": "9.9"},
+                      "pins come from manifests/stack.json"))
+        cases.append(("missing card", None, {}, "needs a card of this edition"))
+        for label, card, fields, message in cases:
+            with self.subTest(case=label):
+                self.write_topic(card, **fields)
+                if card is None:
+                    topic = json.loads((self.root / "docs/token-efficiency-stack.json").read_text())
+                    del topic["rows"][0]["card"]
+                    self.write("docs/token-efficiency-stack.json", topic)
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stdout)
+
+    # docs/ecosystem/template.html topicCard renders these four upstream fields as links (sourcedLine), so they
+    # pass the build's public_url gate, the one every other external source link uses (card.source.url is built
+    # by file_url instead).
+    TOPIC_CARD_LINK_FIELDS = {
+        "upstream.recommended_install.url": lambda upstream, url: upstream["recommended_install"].update(url=url),
+        "upstream.recommended_wiring[0].url": lambda upstream, url: upstream.update(
+            recommended_wiring=[{"client": "claude", "how": "Plugin marketplace", "url": url}]),
+        "upstream.new_since_pin[0].url": lambda upstream, url: upstream.update(
+            new_since_pin=[{"text": "Adds a JSON report", "url": url}]),
+        "upstream.limitations[0].url": lambda upstream, url: upstream.update(
+            limitations=[{"text": "Large files are skipped", "url": url}]),
+    }
+
+    def test_topic_card_links_outside_the_public_url_gate_fail_the_check(self):
+        planted = {"plain http": "http://github.com/example/search#install",
+                   "loopback address": "https://127.0.0.1/example/search",
+                   "script scheme": "javascript:alert(document.domain)"}
+        for field, plant in self.TOPIC_CARD_LINK_FIELDS.items():
+            for label, url in planted.items():
+                with self.subTest(field=field, url=label):
+                    card = self.topic_card()
+                    plant(card["upstream"], url)
+                    self.write_topic(card)
+                    result = self.run_generator("--check")
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(f"token topic card {self.TOPIC_CARD_SOURCE}: {field} must be a public HTTPS URL",
+                                  result.stdout)
+
+    def test_topic_card_list_fields_reject_any_non_list_value(self):
+        # The template maps over these fields, so a falsy non-list ({} or "") must not slip past the list guard.
+        for field in ("recommended_wiring", "new_since_pin", "limitations"):
+            for label, value in (("empty object", {}), ("empty string", ""), ("null", None)):
+                with self.subTest(field=field, value=label):
+                    card = self.topic_card()
+                    card["upstream"][field] = value
+                    self.write_topic(card)
+                    result = self.run_generator("--check")
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(f"token topic card {self.TOPIC_CARD_SOURCE}: upstream.{field} must be a list", result.stdout)
+
+    def test_topic_card_public_https_links_pass_the_check_unchanged(self):
+        card = self.topic_card()
+        clean = {"upstream.recommended_install.url": "https://github.com/example/search#install",
+                 "upstream.recommended_wiring[0].url": "https://github.com/example/search#claude-code",
+                 "upstream.new_since_pin[0].url": "https://github.com/example/search/releases/tag/v1.1",
+                 "upstream.limitations[0].url": "https://github.com/example/search/issues/7"}
+        for field, url in clean.items():
+            self.TOPIC_CARD_LINK_FIELDS[field](card["upstream"], url)
+        self.write_topic(card)
+        self.check_report()
+        page, _ = self.build()
+        upstream = json.loads(page.data)["efficiency"]["topic"]["rows"][0]["card"]["upstream"]
+        self.assertEqual([upstream["recommended_install"]["url"], upstream["recommended_wiring"][0]["url"],
+                          upstream["new_since_pin"][0]["url"], upstream["limitations"][0]["url"]],
+                         list(clean.values()))
+
     def grand_catalog_fixture(self):
         self.config["grand_catalogs"] = {
             "foundation_manifest": "catalogs/foundation/manifest.json",
@@ -1309,7 +1496,8 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
   recovery_hidden: byId["catalog-recovery"].hidden, tab_hidden: (byId["tab-convergence"] || {}).hidden,
   panel_hidden: (byId["convergence"] || {}).hidden,
   rows: (byId["convergence-rows"] || {children: []}).children.map(row => row.children.map(cell => cell.textContent)),
-  summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null}));
+  summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null,
+  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null}));
 '''
 
     @staticmethod
@@ -1374,6 +1562,48 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
                          "Layers missing from the newest sweep manifestfoundation/f-missing",
                          "Newest sweep manifest layers without a matrix rowus-equities/u-unlisted"):
             self.assertIn(expected, observed["definitions"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated page script execution needs Node")
+    def test_the_generated_page_script_renders_the_token_topic_cards(self):
+        """The topic section shows each card block with its evidence class, the drift note and the marker."""
+        self.use_real_template()
+        self.write_topic(self.topic_card(recorded_pin="0.9"))
+        _, with_card = self.build()
+        observed = self.run_page(with_card)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        topic = observed["token_topic"]
+        for expected in (
+                "Edition 2026-09-27",
+                "Pin drift: this card recorded 0.9; manifests/stack.json now pins 1.0. The card's upstream, E2E, "
+                "performance and review facts describe 0.9 until a newer card edition is recorded.",
+                "Per-tool card · edition 2026-09-27",
+                "Card source: " + self.TOPIC_CARD_SOURCE + " ↗",
+                "UpstreamEvidence class: upstream provenance (live release metadata)",
+                "Latest release v1.1 (2026-09-24)", "Behind: One minor release behind",
+                "Recommended install: search install",
+                "Native adaptationEvidence class: repository configuration review",
+                "Assessment: Claude hook and Codex instructions follow upstream",
+                "E2E returned resultsEvidence class: local integration (upstream commands, returned data retained)",
+                "Status pass", "Records: 3; cited: search-01-query",
+                "Adapted performance per payload and laneEvidence class: one class per entry; never summed across classes",
+                "claude_subagent · Same query raw versus search output: 400 → 100 tokens (-75%) · o200k_base · "
+                "exact artifact comparison",
+                "Invoke ratesEvidence class: local integration (transcript counts)",
+                "Window: 2026-09-25T11:37:28Z to 2026-09-26T23:37:28Z",
+                "agent_subagents: 14 of 71 agents (19.72%) · MCP calls 0 · CLI calls 85",
+                "GPT-6 reviewEvidence class: model review (judgment over retained sources, not execution)",
+                "Verdict adapted-with-gaps (review: defects)", "Aligned with one documented gap"):
+            with self.subTest(expected=expected[:60]):
+                self.assertIn(expected, topic)
+        self.assertNotIn("No card in this edition", topic)
+
+        self.write_topic({"status": "no card in this edition", "edition": self.TOPIC_EDITION})
+        _, without_card = self.build()
+        observed = self.run_page(without_card)
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertIn("No card in this edition (2026-09-27)", observed["token_topic"])
+        self.assertNotIn("Pin drift", observed["token_topic"])
+        self.assertNotIn("Per-tool card", observed["token_topic"])
 
     def test_the_repository_matrix_convergence_block_is_accepted(self):
         """The real generated matrix, not the fixture: the page accepts what scripts/component_matrix.py writes."""

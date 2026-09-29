@@ -145,7 +145,10 @@ operator's account. The resulting state is read back, value-free, in the
   only. The template stays at the default `auto`, which already notifies in Ghostty, Kitty and
   iTerm2 ([terminal configuration](https://code.claude.com/docs/en/terminal-config)). A
   Notification hook stays the fallback. How Windows Terminal's bellStyle responds to BEL is
-  not reproduced (see [Not covered](#not-covered)).
+  not reproduced (see [Not covered](#not-covered)). Superseded 2026-09-28 by
+  [the terminal-experience decision](2026-09-28-terminal-experience.md): the host now sets
+  `notifications_disabled` with a needed-only Notification hook, and the bellStyle response is
+  read from source and observed there.
 
 The same approval covered the install audit's native-installation gaps. That audit was a
 read-only `stack-verifier` pass of 26 rows at `f508ffba`, which found the core token stack, its
@@ -569,7 +572,7 @@ which items this change closes in part.
   - ruvnet's cache-aware pacing;
   - a non-UUID --session-id;
   - whether a session-level `claude --worktree` rewrites core.hooksPath;
-  - how Windows Terminal's bellStyle responds to BEL. The legacy ~/.claude.json value was not read, per the rules.
+  - how Windows Terminal's bellStyle responds to BEL (closed 2026-09-28 by [the terminal-experience decision](2026-09-28-terminal-experience.md)). The legacy ~/.claude.json value was not read, per the rules.
 - The six non-Claude workflows without a concurrency group were not evaluated against GitHub guidance: native-foundation-e2e, native-offhost-app-state, native-offhost-restore, native-service-reboot, native-token-e2e and publish-catalog. The primary caps cover Claude runs only.
 - The agent-lab placements ('Profile invariants' for HOST-06 and PERM-03) were not checked, because agent-lab is not checked out on this host. The PERM-03 correction may need a twin there.
 - How the Agent SDK's third-party claude.ai-login restriction applies to single-user subscription use was not verified.

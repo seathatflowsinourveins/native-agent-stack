@@ -522,8 +522,10 @@ and needs no substitution.
 
 **Provenance.** Written in this repository on 2026-09-26, after the operator
 decided that the Tavily API key lives only in the Linux kernel user keyring
-([docs/secret-storage.md](../../docs/secret-storage.md#memory-only-option-linux-kernel-keyring-2026-09-26)).
-It has no external source.
+([docs/secret-storage.md](../../docs/secret-storage.md#kernel-keyring-transport-and-per-boot-spare-2026-09-29)).
+It has no external source. Since 2026-09-29 the key's store of record is the
+file `<store>/tavily.env`; the wrapper uses the keyring copy, which the next
+kernel restart erases, after which it exits 2 (key absent).
 
 **What it does.** `tvly-keyring <args>` runs
 `python3 kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- <tvly> <args>`,

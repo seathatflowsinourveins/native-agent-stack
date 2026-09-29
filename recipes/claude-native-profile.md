@@ -56,6 +56,50 @@ already supports Shift+Enter; use the official
 for a demonstrated keyboard/display problem. Shell or tmux customizations are
 not prerequisites.
 
+Tab titles, bell and colour in those profiles (measured on one host; reasons, sources and
+limits in [the 2026-09-28 terminal decision](../docs/decisions/2026-09-28-terminal-experience.md)):
+
+- Do not set `suppressApplicationTitle` on a Claude or Codex profile. It discards every
+  program-sent title, so all tabs read the same. Leave it off, keep `tabTitle` as the
+  initial title and `tabColor` as the static identity, and each session shows its own
+  native title (Claude's AI session title and busy spinner; Codex's `terminal_title`).
+  A settings reload applies the change to open tabs at their next title write. Static
+  shell profiles may keep a fixed title; give them `"bellStyle": ["taskbar"]` so a readline
+  completion bell stays silent.
+- BEL is the only bell or notification signal Windows Terminal acts on (`DECPS` plays notes
+  but raises no bell indicator, and a hook cannot send it): it does not handle
+  plain OSC 9 text, OSC 777 or OSC 99 in 1.24 stable or the 1.25 preview, and `OSC 9;4` only
+  sets tab and taskbar progress state. The default `bellStyle`,
+  `audible`, gives a sound and a tab bell icon that stays until the tab is focused. Write
+  an explicit array such as `["audible", "taskbar"]`, never `"all"` (on Terminal `main`
+  `"all"` will also raise a toast), and choose a quiet `bellSound`: the Windows Ding sound
+  measured 16 dB quieter (RMS) than Windows Notify System Generic.
+- To be alerted only when a decision is pending, set `preferredNotifChannel` to
+  `notifications_disabled` and add one `Notification` hook whose matcher is the exact list
+  `permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt`
+  and whose command is `jq -nc --arg s "$(printf '\a')" '{terminalSequence:$s}'`. The dialog
+  types (permission, elicitation and an agent-team setup question) wait until you have been
+  unresponsive for about 6 s; `agent_needs_input` also fires when a background session starts
+  waiting while agent view is open; the quota types fire when the quota event occurs, and
+  `worker_permission_prompt` (a teammate needs permission) is not in the hooks reference: it
+  comes from the 2.1.284 binary. The same hook covered a pending `AskUserQuestion` and plan
+  approval in a native probe. In Codex set
+  `[tui] notifications = ["approval-requested", "plan-mode-prompt", "async-question"]`.
+- Claude Code draws in 256 colours under WSL because `COLORTERM` is unset, although Windows
+  Terminal renders 24-bit. Add `"environment": { "COLORTERM": "truecolor" }` to its profile:
+  Windows Terminal sets the key on the launched process and adds it to `WSLENV`, so the
+  `--exec` command line above stays unchanged. Codex promotes truecolor itself when
+  `WT_SESSION` is set.
+- If the profile starts a login shell (`bash -lc`), bash reads only the first of `~/.bash_profile`, `~/.bash_login` and
+  `~/.profile` (`bash(1)` INVOCATION), so a file created at one of the first two names hides the PATH and `~/.bashrc` that
+  `~/.profile` provides. `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` on Linux with bubblewrap does exactly that: it pre-creates empty
+  placeholder files for missing protected paths, `~/.bash_profile` among them, and leaves them (anthropics/claude-code #76236 and
+  #78072; reproduced on 2.1.284). Keep a real `~/.bash_profile` that hands off to `~/.profile`
+  (`if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi`), never an empty one, and probe the way the profile starts, with a clean
+  environment (`env -i HOME="$HOME" PATH=<distro default> /bin/bash -lc 'command -v claude'`): a probe from a shell that already has
+  PATH passes even when the login files are broken. Do not put a fixed `-n` or `--name` in a shared profile, because every tab would
+  carry the fixed name or a variant of it instead of its own generated title; use `/rename` in a tab.
+
 For the matching Codex entry, add a separate `Codex (Ubuntu)` profile using the
 same distro/project and the installed native `codex` executable. On this host,
 the accepted `ecosystem-codex --project /absolute/project` launcher selects the
@@ -241,6 +285,13 @@ follows the measurement (an unsaved model warns at `SessionStart` and heals at
 `SessionEnd`, `ultracode` or not). The
 [dispatch record](../docs/decisions/2026-09-29-sonnet-5-5-dispatch.md) has the rest.
 
+**2026-09-29, later: the terminal default is `max`, through the ecosystem launcher.** The user asked for `max` as the default. A saved
+`max` is still not accepted, and `CLAUDE_CODE_EFFORT_LEVEL` would override every child's own effort, so the launcher that `install_native`
+writes adds `--effort max` only when nothing chose an effort (a terminal, no `-p`, no `--effort`, no `CLAUDE_CODE_EFFORT_LEVEL`, a client
+at 2.1.284 or newer). `claude --effort xhigh` opts out, and the saved per-model `xhigh` above stays the fallback for launches that skip
+the launcher (IDE, desktop, web). The choice rests on the user's requirement, not on a measured gain here
+([decision record](../docs/decisions/2026-09-29-max-default-effort.md), [receipt](../evidence/receipts/claude-max-default-effort-20260929.json)).
+
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
@@ -267,8 +318,8 @@ therefore declare `effort: max` beside their task-matched models (Sonnet for
 `stack-verifier` declare Opus since 2026-09-27, per item 1 of the
 [settings decision](../docs/decisions/2026-09-27-claude-harness-settings.md);
 Haiku is not routed), and workflow stages pass
-`effort: 'max'` explicitly: a stage without its own effort inherits the
-coordinator's `xhigh` unless its agent's frontmatter sets one, and a stage's
+`effort: 'max'` explicitly: a stage without its own effort inherited the
+coordinator's `xhigh` on 2.1.281 unless its agent's frontmatter sets one, and a stage's
 effort overrides the frontmatter (probe Q3). Verify each child's resolved
 effort in its transcript rather than inferring it from a definition. The
 [Ultracode recipe](claude-native-ultracode.md#child-effort-max-under-an-ultracode-coordinator)

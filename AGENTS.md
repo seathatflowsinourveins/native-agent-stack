@@ -12,7 +12,7 @@ This is a portable reference stack with evidence, native recipes and examples. T
 - Use upstream executables and supported integration formats, with the supported installation and native test commands of the selected upstream revision.
 - Follow `docs/acceptance-evidence-policy.md`: distinguish unchanged upstream tests from our integration checks and synthetic fixtures; retain actual returned output and independent observation. Do not promote locally authored tests or generated summaries into upstream acceptance.
 - Keep historical host execution, reproducible artifact checks and live provider/GPU acceptance distinct; metadata, pinned source review and native execution are different evidence levels. Never describe a version check or recorded receipt replay as a new model run.
-- Carry authorized setup, fixes, checks and documentation through useful completion. Use a short internal plan; do not add intake, brainstorming or separate planning approval to bounded work. Recorded limitations are context, not automatic new approval steps. Stop only for necessary native sign-in, operating system consent or an unresolved material decision, and continue independent work.
+- Carry authorized setup, fixes, checks and documentation through useful completion, without intake, brainstorming or a separate planning approval for bounded work. Recorded limitations are context, not automatic new approval steps. Stop only for necessary native sign-in, operating system consent or an unresolved material decision, and continue independent work.
 - Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap; for a native tool gap, consult `docs/token-native-saturation.md` and its component matrix.
 - Run `python3 scripts/validate.py` before committing changed evidence or manifests.
 - For general engineering and ecosystem changes, start with `docs/convergence-architecture.md`. New convergence claims use `scripts/validate_convergence.py` with a scoped experiment record. Preserve failed attempts and failed conditions with their usage, and keep unknown usage unknown; the checker verifies declared consistency, not truth.
@@ -23,16 +23,17 @@ Read `docs/token-practice.md` on demand for the selected context lane, native co
 
 - Load only the layer, capability, recipe or guide the current task needs; never preload the full catalog or the generated HTML guide into the startup instructions, a session or every worker.
 - Choose the cheapest measured representation that meets the task's information contract. Known-source reads, compact JSON and full-original reads remain valid defaults when an extra retrieval or compression step is larger or inadequate.
+- For one tool's adoption, read its row (by `component_id`) in `docs/token-efficiency-stack.json`, which `scripts/build_ecosystem.py` renders; its card is a dated snapshot, and the current lane list is the SubagentStart carrier block `adoption/hooks/claude/token-lanes-block.md`.
 - Delegate a step when only its conclusion is needed, and return concise findings with source or artifact locations.
 - Keep client accounts, model routes, native caching, tool discovery and compaction intact. Do not rerun the full audit or model trials at startup.
 - Count once: never sum cumulative snapshots, overlapping artifact reductions or provider/cache subset counters, and keep native counter snapshots, exact artifact comparisons, cache reuse and complete provider usage separate.
 - Read `docs/token-session-handbook.md` on demand for Codex session environment, MCP reload or another PC. Use `tools/token-report/README.md` for a new host's lifetime JSON/HTML manifest, and keep its private state outside the checkout.
-- For catalog lookup on a host that adopted the named QMD index, refresh changed files with `qmd --index native-agent-stack-catalog update`, then use scoped `search` and `get` from `us-equities-catalog` or `us-equities-foundation`; `catalogs/us-equities/native-workflows.md` documents explicit setup for other checkouts. Do not index unrelated folders.
+- For catalog lookup on a host that adopted the named QMD index, refresh changed files with `qmd --index native-agent-stack-catalog update`, followed by `qmd --index native-agent-stack-catalog embed` where that index carries embeddings, then use scoped `query`, `search` and `get` from `us-equities-catalog`, `us-equities-foundation`, `foundation-adoption` or `foundation-docs`; `catalogs/us-equities/native-workflows.md` documents explicit setup for other checkouts. Do not index unrelated folders.
 
 ## Workers, effort and lanes
 
 - One coordinator integrates. Writing workers need separate worktrees and bounded file ownership.
-- This repository commits `.claude/settings.json` with Ultracode on. The Claude coordinator stays at `xhigh` under Ultracode, because a `max` session turns its workflow orchestration off, and never sets `CLAUDE_CODE_EFFORT_LEVEL` (any value overrides every child's effort). Pass `effort: 'max'` with an explicit task-matched `model` on every ad-hoc workflow `agent()` call: a stage without its own `effort` inherits the coordinator's `xhigh` unless its agent's frontmatter sets one. Probes and overturn conditions: `docs/decisions/2026-09-23-max-effort-default.md`.
+- This repository commits `.claude/settings.json` with Ultracode on and `effortLevel: xhigh`, the saved fallback for any model. A terminal session started through the ecosystem `claude` launcher runs the coordinator at `max` (the launcher adds `--effort max` only when nothing chose an effort and the client is 2.1.284 or newer; `claude --effort xhigh` opts out). On Claude Code 2.1.284 Ultracode stays on at any effort level and the `ultracode` setting sets none, so a `max` session keeps its workflow orchestration on; the `max` default rests on the user's requirement, not on a measured gain here. Headless `-p` runs pass `--effort` per call site, and `CLAUDE_CODE_EFFORT_LEVEL` stays unset at every scope (any value overrides every child's effort). Pass `effort: 'max'` with an explicit task-matched `model` on every ad-hoc workflow `agent()` call: a stage that names no effort runs at its agent's frontmatter effort, else at the effort the session was given explicitly (`--effort`, `/effort`, the model picker), else at its model's saved level or default, and one that names no model takes its definition's model, else `CLAUDE_CODE_SUBAGENT_MODEL` (`opus`), else the lead's. `opus` takes judgment; `sonnet` (Sonnet 5.5) takes fan-out units that an executable oracle or a later Opus stage checks (`examples/claude-native/workflows/README.md`, "Sonnet 5.5 fan-out units"). Probes and overturn conditions: `docs/decisions/2026-09-29-max-default-effort.md`, `docs/decisions/2026-09-29-sonnet-5-5-dispatch.md` and `docs/decisions/2026-09-23-max-effort-default.md`.
 - Dispatch each new or ad-hoc workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call. The saved scripts vendored in that directory keep their reviewed routing, byte-identical to agent-lab.
 - Until the trading lane moves to its own repository, `docs/lanes.md` assigns foundation, trading and shared paths, gives the protocol for shared hot files such as `manifests/evidence.json`, and requires one `lane:*` label per PR. Build each PR description from `.github/pull_request_template.md`: the required `sota-sources` check fails a PR whose description lacks a non-empty `## SOTA sources` or `### SOTA sources` section (exact, case-sensitive heading). Hand off to a live session that owns an area instead of editing it.
 
@@ -63,41 +64,4 @@ paper readiness and measured acceptance without repeated human approval. Missing
 live credentials or live configuration do not gate paper; live trading and paid
 hosting remain separate scopes.
 
-For architecture or research waves, read `blueprints/us-equities/architecture/README.md`
-and the matching source-review supplement. `catalogs/us-equities/decision-index.json`
-is the validated repository union; register new decision arrays explicitly with
-`scripts/catalog_decisions.py --write --supplement PATH.json#/collection`.
-
-The simulation-research wave adopts isolated EdgarTools and skfolio
-recipes. Read `blueprints/us-equities/simulation-research/README.md` for current
-results and remaining data gates. Its 2021 control segment has been inspected,
-so no experiment may present it as a fresh untouched holdout. Native filing
-parsing, live SEC access and historical information availability are separate
-claims. Keep provider identities local and preserve acquisition refusals.
-`blueprints/us-equities/catalyst-provenance/access-resolution.md` records successful native
-SEC access and real-index compatibility. Keep its monitored contact private;
-bounded streaming diagnostics must bypass the upstream cache after closing clients.
-
-`blueprints/us-equities/data-readiness/README.md` links the
-September 20 catalyst-dataset and corporate-action wave. Retained source bytes,
-native parser behavior, materialized data integrity and actual historical
-availability are separate claims. Read that plan and the matching receipt before
-repeating acquisition or advancing a strategy gate.
-
-`blueprints/us-equities/authenticated-data/README.md` records native
-Alpaca AAPL acceptance. Continue with `blueprints/us-equities/identity-readiness/README.md`
-for the symbol-mapping/observation gate. A request's symbol-asof date, current asset
-UUID/status and newly captured historical values are not original availability or
-historical universe membership. Reuse retained anchored runs before refetching;
-new hosts must establish their own permitted observations and acceptance.
-
-For the catalyst-convergence wave, read `blueprints/us-equities/catalyst-convergence/README.md`
-and its plan on demand. The frozen daily/intraday protocol is in
-`blueprints/us-equities/catalyst-experiment/protocol.json`; lifecycle evidence is in
-`blueprints/us-equities/lifecycle-sample/native-receipt.json`. Local observation
-availability cannot substitute for original historical publication/revisions.
-Native research efficiency also requires both semantic quality and the frozen
-output contract. The selected direction is daily/intraday
-catalyst research, including historical +200% mover discovery. Preserve as-known
-candidate universes and source revisions; the current synthetic temporal fixture
-and fixed LEAN schedule are not an accepted historical strategy dataset.
+Trading-lane rules for research waves, data readiness and experiments live in `blueprints/us-equities/AGENTS.md`; read it before any trading research wave, experiment, data acquisition, strategy-gate change or registration of a decision array under `catalogs/us-equities/`.

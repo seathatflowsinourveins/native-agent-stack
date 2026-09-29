@@ -1009,16 +1009,25 @@ def cmd_record(args: argparse.Namespace) -> int:
         print(refuse_overwrite_message(relative_path, target, latest_generation_id(root, host_id, base_id)))
         return 2
 
+    # output_sha256 binds the published bytes and nothing else: the sha256 of output_excerpt (UTF-8;
+    # sanitize(output) cut at MAX_EXCERPT_CHARS). A digest of the raw output let anyone confirm a
+    # guessed home directory or user name offline whenever the output fit in the excerpt: put the
+    # guess back in place of "~" or "<user>", hash, compare. A digest of the unpublished rest of a
+    # long output is no better: a reader who knows or guesses that text can tell which name was
+    # sanitized in it, so the digest never depends on unpublished text. From 2026-09-29; receipts
+    # recorded before then, or by an older copy of this recorder, hash the raw output. No per-command
+    # basis marker is recorded: the schema's command items forbid additional properties, so a marker
+    # would be a structural schema change that a checkout on the older schema rejects.
     command_records = []
     for cmd in commands_to_run:
         exit_code, output, duration = run_command(cmd, cwd=root, timeout=args.timeout)
-        sanitized = sanitize(output)
+        excerpt = sanitize(output)[:MAX_EXCERPT_CHARS]
         command_records.append({
             "cmd": cmd,
             "exit": exit_code,
             "duration_s": round(duration, 3),
-            "output_sha256": hashlib.sha256(output.encode("utf-8", "surrogateescape")).hexdigest(),
-            "output_excerpt": sanitized[:MAX_EXCERPT_CHARS],
+            "output_sha256": hashlib.sha256(excerpt.encode("utf-8", "surrogateescape")).hexdigest(),
+            "output_excerpt": excerpt,
         })
 
     result = "pass" if all(record["exit"] == 0 for record in command_records) else "fail"

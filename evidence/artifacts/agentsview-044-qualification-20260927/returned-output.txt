@@ -1,0 +1,71 @@
+AgentsView qualification, 2026-09-27
+Selected actual native returned lines; aggregate projections are in native-checks.json.
+This file is not a transcript and does not replace the retained failed attempts.
+
+Release archive checksum
+agentsview_0.44.0_linux_amd64.tar.gz: OK
+
+Installed baseline --version
+agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, built 2026-09-14T02:30:01Z)
+
+Candidate --version
+agentsview v0.44.0 (commit 413a87f7bfbd67b2815b1119ac51abc1efbeeaba, built 2026-09-21T12:48:49Z)
+
+Native test runtime
+go version go1.27.0 linux/amd64
+
+Initial upstream test prerequisite failure
+internal/pricing/fallback.go:33:12: pattern snapshot/litellm_snapshot.json.gz: no matching files found
+
+Upstream-supported prerequisite restore
+Restored internal/pricing/snapshot/litellm_snapshot.json.gz
+
+Broad unchanged upstream package result, first runnable attempt (exit 1)
+ok  	go.kenn.io/agentsview/internal/mcp	4.826s
+FAIL
+FAIL	go.kenn.io/agentsview/internal/parser	107.392s
+ok  	go.kenn.io/agentsview/internal/db	136.960s
+
+Unchanged #1855 selector result after prerequisite restore (exit 0)
+ok  	go.kenn.io/agentsview/internal/parser	0.082s
+ok  	go.kenn.io/agentsview/internal/db	0.069s
+
+Confirming unchanged upstream package rerun (exit 1)
+ok  	go.kenn.io/agentsview/internal/mcp	6.004s
+FAIL
+FAIL	go.kenn.io/agentsview/internal/parser	123.913s
+ok  	go.kenn.io/agentsview/internal/db	148.694s
+
+Candidate occupied explicit-port daemon diagnostic (exit 1)
+fatal: requested port 17384 on 127.0.0.1 is unavailable; choose another --port or use --port 0
+
+Native Codex review launch diagnostic, normal and ephemeral attempts (exit 1)
+Error: failed to initialize in-process app-server client: Read-only file system (os error 30)
+
+Source: kenn-io/agentsview v0.44.0 / 413a87f7bfbd67b2815b1119ac51abc1efbeeaba,
+.github/workflows/ci.yml:233-238; cmd/agentsview/serve_runtime.go:57-65.
+Native Codex diagnostic is an observed launch limitation, not an AgentsView test.
+
+2026-09-27 repair addendum
+The confirming rerun above survives as selected lines and an in-session summary;
+its full raw stdout/stderr were not retained. The earlier blanket retention claim
+was incorrect. The following lines were extracted from the coordinator's retained
+JSONL, identified by file and SHA-256 in upstream-tests.json. Both tags ran outside
+the Codex sandbox with TMPDIR=/var/tmp/claude-w3-agentsview-go. Earlier failures are
+preserved and classified environmental; counts from attempts are not added.
+
+Candidate v0.44.0 broad selection (exit 0)
+ok  	go.kenn.io/agentsview/internal/mcp	5.887s
+ok  	go.kenn.io/agentsview/internal/parser	103.889s
+ok  	go.kenn.io/agentsview/internal/db	138.591s
+
+Baseline v0.43.0 broad selection, same environment (exit 0)
+ok  	go.kenn.io/agentsview/internal/mcp	2.533s
+ok  	go.kenn.io/agentsview/internal/parser	102.354s
+ok  	go.kenn.io/agentsview/internal/db	120.326s
+
+Candidate v0.44.0 #1855 serve-runtime selection (exit 0)
+ok  	go.kenn.io/agentsview/cmd/agentsview	1.083s
+
+Sources: unchanged kenn-io/agentsview v0.44.0 / 413a87f7 and v0.43.0 / 9be7745a;
+.github/workflows/ci.yml:233-238 and cmd/agentsview/serve_runtime_test.go.

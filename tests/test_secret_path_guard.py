@@ -94,6 +94,18 @@ BLOCKED = {
     "ls ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack": "credential_store_path",
     "rg KEY \"$XDG_CONFIG_HOME/native-agent-stack/\"": "credential_store_path",
     "while read -r line; do :; done < \"$PAPER_ENV_FILE\"": "credential_file_read",
+    # A numbered pointer (PAPER_ENV_FILE_2 is the second paper account's, 2026-09-29): the word boundary after
+    # PAPER_ENV_FILE used to fail before `_2`, so each of these passed the guard (checked against the previous guard)
+    # while the account-1 form was blocked.
+    "cat \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"${PAPER_ENV_FILE_2}\"": "credential_file_read",
+    "head -n 3 \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "while read -r l; do :; done < \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"$SEC_CONTACT_ENV_2\"": "credential_file_read",
+    "set -x; . \"$PAPER_ENV_FILE_2\"": "trace_while_sourcing",
+    "set -o xtrace; source \"${PAPER_ENV_FILE_2}\"": "trace_while_sourcing",
+    ". \"$PAPER_ENV_FILE_2\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
+    "( . \"$PAPER_ENV_FILE_2\"; python3 -c 'import os; print(dict(os.environ))' )": "environment_dump_after_source",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -462,6 +474,18 @@ ALLOWED = [
     "wc -c \"$PAPER_ENV_FILE\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE\"",
     "( set -a; . \"$PAPER_ENV_FILE\"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py --once )",
+    # The second paper account (2026-09-29): its pointer handed to a loader or a size check, as account 1's is.
+    "python3 runner.py preflight --env-file \"$PAPER_ENV_FILE_2\" --output out.json",
+    "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_2\" --out rate-limit.json",
+    "wc -c \"$PAPER_ENV_FILE_2\"",
+    "stat -c '%a %U' \"$PAPER_ENV_FILE_2\"",
+    # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
+    # loader as --env-file. It must keep passing for both accounts, so closing the numbered-pointer hole never blocks a unit.
+    "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE\"'",
+    "systemd-run --user --unit=paper-series-2 --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE_2\"'",
+    "systemd-run --user --unit=x --collect /bin/bash -ic \"exec python3 X --env-file \\\"$PAPER_ENV_FILE_2\\\" --output out.json\"",
     # Hugging Face: hf reads its own store, so checking the sign-in, the operator's interactive
     # login, revision-pinned downloads and checksum verification never expose the token.
     "hf auth whoami",
@@ -481,6 +505,10 @@ ALLOWED = [
     "python3 scripts/kernel_keyring.py status tavily_api_key",
     "python3 scripts/kernel_keyring.py revoke tavily_api_key",
     "( set +x; read -rs K && printf %s \"$K\" | python3 scripts/kernel_keyring.py store tavily_api_key )",
+    # The keyring-only key's one move into the file store (2026-09-29, docs/decisions/2026-09-29-key-management.md):
+    # exec hands its one variable to the create-only writer, started with -I -S, which prints only "tavily: stored".
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- "
+    "python3 -I -S tools/credentials/set_credential.py tavily --from-env",
     f"{EXEC} tvly auth --json",
     f"{EXEC} tvly --json auth",
     f"{EXEC} tvly search \"<query>\" --depth basic --max-results 5 --json",
@@ -697,6 +725,13 @@ SAFE_CORPUS = [
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
 EXPECTED_PASS_THROUGH = [
+    # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
+    # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
+    "cat \"$PAPER_ENV_FILE_B\"",
+    # systemd-run is not a modelled launcher: a reader it starts is not inspected, for either account (found 2026-09-29 while
+    # adding the loader-path rows above); with --pipe --wait its output returns to the caller.
+    "systemd-run --user --pipe --wait cat \"$PAPER_ENV_FILE\"",
+    "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.

@@ -55,7 +55,7 @@ setting is documented for any settings file; the variable is undocumented and is
 that also stops a subagent's or workflow child's fallback in Claude Code 2.1.283, so
 re-check it after each client update (the
 [model-currency record](../docs/decisions/2026-09-27-model-currency.md) and the
-[fallback-guard record](../docs/decisions/2026-09-25-model-fallback-guard.md)). It also saves `effortLevel: xhigh`, the coordinator's effort for every model, because the `ultracode` setting sets none on 2.1.284, and defaults an unnamed subagent, teammate or workflow agent to Opus with `CLAUDE_CODE_SUBAGENT_MODEL=opus`. It does not select the session's model, an account or a permission mode. To adopt it as a project default, merge only those
+[fallback-guard record](../docs/decisions/2026-09-25-model-fallback-guard.md)). It also saves `effortLevel: xhigh`, the fallback coordinator effort for every model (the `ultracode` setting sets none on 2.1.284, and a terminal session started through the ecosystem launcher runs at `max`), and defaults an unnamed subagent, teammate or workflow agent to Opus with `CLAUDE_CODE_SUBAGENT_MODEL=opus`. It does not select the session's model, an account or a permission mode. To adopt it as a project default, merge only those
 keys into the existing `.claude/settings.json`; preserve all unrelated settings.
 Project environment settings require workspace trust, and organizational policy
 or feature availability can still restrict the profile. The dated rules set behind
@@ -174,11 +174,11 @@ Opus. Native probes on 2.1.284 ([receipt](../evidence/receipts/claude-model-effo
 neither raises nor overrides effort, so a Sonnet 5.5 session ran at medium until a saved level was added, and that a stage naming no model, with no definition model and no `CLAUDE_CODE_SUBAGENT_MODEL`, runs the lead's (the documented order is the definition's model, then that variable, then the lead's); the portable settings file above therefore carries `effortLevel: xhigh` and
 `CLAUDE_CODE_SUBAGENT_MODEL=opus`. The role defaults in the table below are unchanged. Statements further down that Ultracode runs
 the coordinator or teammates at `xhigh`, or that raising the lead to `max` turns orchestration off, are dated 2026-09-23 to 2026-09-27
-and were measured on Claude Code 2.1.281; on 2.1.284 the reminder stayed present at `max`.
+and were measured on Claude Code 2.1.281; on 2.1.284 the reminder stayed present at `max`, and the terminal default is now `max` through the ecosystem launcher ([decision record](../docs/decisions/2026-09-29-max-default-effort.md)).
 
 | Role | Starting choice | Qualification |
 | --- | --- | --- |
-| Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (saved at `xhigh`, plus dynamic workflow orchestration), the default for every session (a Sonnet 5.5 coordinator, the user's choice, sends each judgment to an `opus` stage); escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
+| Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (`max` in a terminal session started through the ecosystem launcher, else saved `xhigh`, plus dynamic workflow orchestration), the default for every session (a Sonnet 5.5 coordinator, the user's choice, sends each judgment to an `opus` stage); escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
 | Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, max; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory stage of eight native reviews and the readers of two readiness audits (one deployed, one in the scratch adoption); the recheck stage exists since the eighth review and ran there and in the three scratch-adoption reviews |
 | Research from the web, documentation, repository and catalog | `stack-researcher` (Opus, max; Read, Glob, Grep, Bash, WebSearch, ToolSearch and named Context Mode, QMD, ai-memory, Serena and jCodeMunch read tools; no Edit, Write, WebFetch or Skill) | None yet. Added 2026-09-26 in place of the default child for research; its first-prompt size, lane use, correctness and billed cost against `general-purpose` are preregistered in the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md) and not yet run |
 | Implementation from a clear contract | `isolated-builder` (Opus, max since 2026-09-27; edits only in the owned checkout its brief names, never the coordinator's own, with no frontmatter `isolation`; named MCP read tools behind ToolSearch; Serena's symbol-edit tools removed on 2026-09-26 because they would edit the parent session's checkout; `context-mode:context-mode` preloaded, and `verification-before-completion` no longer since its trial removal on 2026-09-28) | One real task on Sonnet, before the preload: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864). The Opus model, the preload and the coordinator-created worktree have no native qualification or measured first-prompt size; they join the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)'s preregistered comparison |
@@ -348,7 +348,7 @@ levels ([model configuration](https://code.claude.com/docs/en/model-config#adjus
 first bullet below is 2.1.281 history: on 2.1.284 the `--effort max` and
 `CLAUDE_CODE_EFFORT_LEVEL=max` sessions kept the Ultracode reminder (receipt cases A3, A4 and
 A8), and a stage or child that names no effort ran at its own model's saved level or default
-in a headless session (B2, B3, D2) and, in the interactive one, at the session's level for every child that named no effort (C1, C3 to C6; the project agents of C2 and C8 declare `effort: max`). The per-stage rule below is unchanged and still load-bearing.
+in a headless session with no explicit effort (B2, B3, D2) and at the explicit effort otherwise: in the interactive session at the session's level for every child that named no effort (C1, C3 to C6; the project agents of C2 and C8 declare `effort: max`), and in a headless `--effort max` session an unnamed subagent and a stage that named none ran at `max` while a frontmatter `medium` stayed `medium` (max-default receipt, cases F5 to F7). The user asked for `max` as the terminal default on 2026-09-29; a saved `max` is not accepted and `CLAUDE_CODE_EFFORT_LEVEL` would flatten every child's own effort, so the ecosystem launcher adds `--effort max` when nothing chose an effort ([decision record](../docs/decisions/2026-09-29-max-default-effort.md); its receipt `claude-max-default-effort-20260929`, cases E2 and E4 for the variable). The per-stage rule below is unchanged and still load-bearing.
 
 - **On 2.1.281 `max` disabled Ultracode orchestration.** Ultracode sent `xhigh` to the
   model and additionally had Claude orchestrate dynamic workflows; any other
@@ -391,13 +391,13 @@ wherever a child is defined:
   and the [examples](../examples/claude-native/agents/) do);
 - every saved workflow stage and every ad-hoc `agent()` call in a workflow
   script passes `effort: 'max'` together with an explicit `model`: a stage
-  without its own `effort` runs at its agent's frontmatter effort, else at its model's saved
-  level or default in a headless session (2.1.284 probes; on 2.1.281 it inherited the
-  coordinator's `xhigh`) and at the session's level in an interactive one, and the stage's
+  without its own `effort` runs at its agent's frontmatter effort, else at the effort the session was given explicitly (`--effort`, `/effort` or the model picker) (max-default receipt, cases F5 to F7; dispatch receipt, cases C1 to C6), else at its model's saved
+  level or default (2.1.284 probes B1 to B3 and D2; on 2.1.281 it inherited the
+  coordinator's `xhigh`), and the stage's
   effort also overrides a lower frontmatter;
 - a teammate runs at the lead's session effort, whatever its definition says ([agent teams](https://code.claude.com/docs/en/agent-teams),
   read 2026-09-27); spawn a child that needs `max` unnamed or as a workflow stage;
-- a single non-orchestrated session at `max` stays available on request. On 2.1.281 `claude --effort max` ran at `max` with orchestration off (P2). On 2.1.284 `--effort max` keeps Ultracode on (receipt cases A3 and A4), so turn Ultracode off as well: the documented forms are `/effort ultracode off` and `--settings '{"ultracode":false}'` (documented, not probed together with `--effort max`). `/effort max` was not probed; the docs say Claude Code applies `max` "to the current
+- a single non-orchestrated session at `max` stays available on request. On 2.1.281 `claude --effort max` ran at `max` with orchestration off (P2). On 2.1.284 `--effort max` keeps Ultracode on (receipt cases A3 and A4), so turn Ultracode off as well: `--effort max --settings '{"ultracode":false}'` ran at `max` with the Ultracode reminder absent and its Workflow stages kept their own efforts (max-default receipt, cases C3 and C4); `/effort ultracode off` is the in-session form (documented, not probed). `/effort max` was not probed; the docs say Claude Code applies `max` "to the current
   session only" and list `ultracode` as a separate entry of the `/effort` menu
   ([model configuration](https://code.claude.com/docs/en/model-config), fetched
   2026-09-23).
@@ -427,7 +427,7 @@ the action has no `effort`, `ultracode` or `model` input, and `base-action`
 runs Claude through the Agent SDK's `query()`, so a job is a non-interactive
 Agent SDK run. Request Ultracode through `claude_args: '--effort ultracode'` or
 the `settings` input `'{"ultracode": true}'`, and, on a client older than 2.1.284, never put `--effort max` in `claude_args` beside Ultracode: there an explicit `max` won and turned
-orchestration off (from 2.1.284 Ultracode stays on at `max`). In `claude -p` and Agent SDK runs Claude Code shows no workflow approval
+orchestration off (from 2.1.284 Ultracode stays on at `max`; a job asks for it with `claude_args: '--effort max'`, which the max-default receipt measured from the user settings as cases F1 and F5, and no Actions run was executed). In `claude -p` and Agent SDK runs Claude Code shows no workflow approval
 prompt; a Workflow launch goes through the session's normal permission
 evaluation, so it starts only under a `Workflow` or `Workflow(<name>)` allow
 rule, auto or bypass permission mode, or a hook that allows the call

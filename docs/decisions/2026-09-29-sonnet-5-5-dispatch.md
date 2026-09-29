@@ -28,7 +28,7 @@ child that ran an older model than its alias documents. Every stage names its mo
 | Exact extraction, inventories, counts, log analysis | `sonnet`, max (`source-scout`) | mechanical, deterministic output | file:line locators the consumer re-reads; Opus verifier on claims |
 | Migrations, refactors and scaffolds from a written contract, in an owned checkout | `sonnet`, max, as a per-stage override of `isolated-builder` | Vals AI ranks Sonnet 5.5 first on Code Migration (69.83% ±4.26 against 66.65% ±4.33, inside the stated error) and on Vibe Code Bench v1.1 (92.39% ±1.26 against 90.29% ±1.53); the card's FrontierCode result (below) is why a new coding class sweeps effort first | the contract's tests, then an Opus review and CI; a build without a written contract's tests stays on `opus` |
 | First-pass breadth research | `sonnet`, max, only as bulk fan-out | Anthropic's multi-agent research system is an Opus lead over Sonnet subagents | an Opus refuter or verifier stage on every claim |
-| Coordinator | Opus 5.5 by default (`model: opus[1m]` in the template, and the role table); a Sonnet 5.5 coordinator is supported and is this host's user setting; saved at xhigh either way | a Sonnet main model with an Opus advisor is Anthropic's named pairing ([advisor](https://code.claude.com/docs/en/advisor)); this host's advisor is `opus`, the template's is `fable` | the session model is the user's choice; a Sonnet coordinator sends each judgment to an `opus`-named stage instead of deciding it inline |
+| Coordinator | Opus 5.5 by default (`model: opus[1m]` in the template, and the role table); a Sonnet 5.5 coordinator is supported and is this host's user setting; saved at xhigh, and `max` in a terminal session started through the ecosystem launcher ([2026-09-29 max-default record](2026-09-29-max-default-effort.md)) | a Sonnet main model with an Opus advisor is Anthropic's named pairing ([advisor](https://code.claude.com/docs/en/advisor)); this host's advisor is `opus`, the template's is `fable` | the session model is the user's choice; a Sonnet coordinator sends each judgment to an `opus`-named stage instead of deciding it inline |
 | Agent-team teammates | named at spawn: `sonnet` to execute or explore, `opus` to judge | Anthropic's costs page recommends Sonnet for teammates ([costs](https://code.claude.com/docs/en/costs)) | the lead collects teammate results and has any claim verified on Opus before acting |
 | Cross-family judgment and review | `gpt-6-astra` at max; `gpt-6-sol` at medium for mechanical extraction | unchanged: measured tiering of 2026-09-27 | unchanged |
 
@@ -86,7 +86,11 @@ Extended, and at max 46.2% and 59.1% (section 8.4), and Opus 5.5 at max (64.8%) 
 (section 8.5); the documentation says `max` "may show diminishing returns and is prone to overthinking, so test before adopting it
 broadly" ([model-config](https://code.claude.com/docs/en/model-config#adjust-effort-level)). This repository's rule, effort max on every
 stage since 2026-09-23, is kept: it is the user's, and the Terminal-Bench 4.0 lead Anthropic reports for Sonnet 5.5 was measured at
-max. The first run of a coding class on Sonnet 5.5 sweeps xhigh against max before the class is routed at max (see Overturn).
+max. The first run of a coding class on Sonnet 5.5 sweeps xhigh against max before the class is routed at max (see Overturn). The
+coordinator's terminal default became `max` on 2026-09-29 through the launcher, on the same footing: the user's requirement, with no
+measured gain on this repository's work (the [max-default record](2026-09-29-max-default-effort.md) collects the vendor and third-party
+numbers, including Sonnet 5.5 losing to xhigh on FrontierCode in the full client at about 12.6 times the tokens); `claude --effort xhigh`
+is the one-word opt-out until the sweep named in that record reports.
 
 **Measured on this host (Claude Code 2.1.284).** The [receipt](../../evidence/receipts/claude-model-effort-probes-20260929.json) holds 29
 cases, 27 probes and two counts of transcripts that real sessions left (C7 and C8), each read from the model and effort recorded in the
@@ -192,3 +196,17 @@ until the branch merges. `~/.claude/CLAUDE.md` gains the portable file's Quality
 - The per-stage Sonnet overrides are a routing rule, not a qualification: no role-quality comparison on Sonnet 5.5 exists here.
 - Receipt cases C7 and C8 are session observations, not designed probes, and the receipt's message counts count each assistant message id once.
 - The receipt's limitations apply, in particular that the Ultracode reminder is an indicator and not proof of workflow behaviour.
+
+## Addendum (2026-09-29, later): the coordinator's terminal effort is max
+
+The [max-default record](2026-09-29-max-default-effort.md) and its receipt `claude-max-default-effort-20260929` (session
+`native-agent-stack-03`, #483) start interactive terminal launches through the ecosystem launcher at `max`, with the saved per-model
+`xhigh` above as the fallback elsewhere. The text follow-up that carries this addendum replaces the three clauses listed under "Not changed,
+and why" in `AGENTS.md` line 35 and states the rule in the portable and host `CLAUDE.md`, the workflows README, the recipes and the
+2026-09-23 addendum. The open item under "Measured on this host" (whether an explicit `--effort` in a headless session reaches its children) is answered by that
+receipt's cases F5 to F7: under `--effort max` an unnamed subagent and a Workflow stage that named no effort ran at `max`, a stage that named
+`low` ran at `low`, and a project agent whose frontmatter says `medium` ran at `medium`. Together with this record's cases the rule is: a child
+that names no effort runs at its frontmatter effort, else at the effort the session was given explicitly, else at its model's saved level or
+default. Nothing in this record's routing changed: every stage still names its model and `effort: 'max'`, judgment stays on
+Opus 5.5, and the committed project `effortLevel: xhigh` does not defeat the launcher's `--effort max` (receipt
+`claude-project-effort-flag-20260929`).
