@@ -460,6 +460,13 @@ directory into `tools/llama-cpp-b11057` and places a wrapper script at
 `bin/llama-server` that exports `DYLD_LIBRARY_PATH` before exec'ing the real
 binary, instead of a bare symlink.
 
+### Codex notifications on macOS
+
+Changed after `v2026.09.26.2` (drafted, not run on a Mac): the shared `codex.config.template.toml` sets `[tui] notifications` to the needed-action kinds, so a
+rendered macOS config asks Codex for a notification on an approval, a plan-mode prompt or a question and not when a turn finishes. Codex keeps its own per-terminal channel, so a Mac keeps native notifications in Ghostty, iTerm2 and Kitty for those kinds and stops receiving the turn-complete one. At this platform's pin (0.155.1) a `request_user_input` question already notifies as `plan-mode-prompt`; the `async-question` kind covers the asynchronous questions added after that release, so it is inert there and no notification 0.155.1 emits is lost. To keep the turn-complete notification, add
+`"agent-turn-complete"` to the list in the rendered `config.toml`. The decision is in
+[the 2026-09-28 terminal decision](../../docs/decisions/2026-09-28-terminal-experience.md#repository-carried-defaults-and-the-second-distros-profiles-2026-09-29).
+
 ### ai-memory hook paths on macOS
 
 Until 2026-09-27 the shared Claude settings template named the Linux pin's ai-memory

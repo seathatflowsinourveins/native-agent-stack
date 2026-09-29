@@ -6,19 +6,20 @@
     "claude-code",
     "codex"
   ],
-  "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag.",
+  "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The reproduction was re-run after the bounded re-check with the client's temporary state redirected to a short private directory beside each throwaway home (TMPDIR and CLAUDE_CODE_TMPDIR): the real /tmp and /tmp/claude-<uid> gained no top-level entry during the recorded run apart from /tmp/inline-comments-buffer.jsonl, which was absent before, appeared during the run and was removed by the script, the real home's placeholder names were unchanged, and the arm counts were 0 empty files with no variable, 27 with it in the stock home and 26 with a real hand-off file. A control run whose socket path (121 bytes, from a 99-byte private path) exceeded the client's own 103-byte cap on `<dir>/cc-socks/<pid>.sock` put the messaging-socket directory into a fixed /tmp/cc-socks-<uid> directory in the real /tmp instead, so the redirect holds only while the private path is short (under about 81 bytes with a 7-digit pid) and XDG_RUNTIME_DIR stays unset. The native `claude doctor` warned 3 times with the sandbox off and 4 times with it enabled and a planted stale mask file; it named the planted file (the warning is live) and named the scrub-created ~/.bash_profile, a writable 0644 file outside the warning's documented scope of 0-byte read-only placeholders, in neither run. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag (rust-v0.159.0 at the re-run).",
   "limitations": [
     "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The Polaris distro's profiles (Librarium, Phoyo) were not measured. Another host collects its own evidence.",
     "The incident's creator is established by timing, by the same-second leftovers in the probe's scratch working directory (present in its scrub arm, absent in its no-scrub arm), by the owning session's confirmation, and by the isolated reproduction plus public reports (anthropics/claude-code #76236, #78072). The peer probe itself was not re-run. The reproduction stops at the API-key check: it shows the files are created at startup, and says nothing about a full session or about exit. Upstream states the placeholders persist after exit and is considering cleaning them up; that was not measured here.",
     "The observations of the incident (login probes before and after, the leftover list, the journal and unit checks) are the coordinator's own shell output of 2026-09-29, recorded here as values; no raw output is retained.",
     "The hand-off file protects only the name ~/.bash_profile. A creator that truncates or replaces an existing file is not covered; the doctor check catches an empty ~/.bash_profile or ~/.bash_login and any missing command, but the doctor has no scheduler, so it finds a recurrence only when it is run.",
     "The doctor code lives in a repository with no remote (practice repository commit 512c3e3); this receipt's artifact folder carries a copy of the function with the home made a parameter. The full doctor run predates the creation of the hand-off file; the check alone was re-run after it.",
-    "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.158.0 was not run. The candidate notifiers were compared by repository head and latest release only, not run.",
-    "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (for example 50 and 49 entries in the stock-home arm); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` result was measured in one throwaway home with the scrub-created file and without the sandbox feature enabled.",
-    "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session."
+    "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.159.0 (the newest stable at the re-run) was not run. The candidate notifiers were compared by repository head and latest release only, not run. The three candidates agent-deck, ccmanager and zellij were first recorded by the refresh script on 2026-09-29, so their heads have no earlier pin to be compared with.",
+    "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (50 entries in the stock-home arm in the first run, 49 in the re-runs); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` was run in one throwaway home with the scrub-created file, with the sandbox off and with it enabled plus a planted stale mask file. That planted file shows the warning is live; it is not a positive control for the scrub placeholder, which the warning's documented scope (0-byte read-only placeholders at settings paths) does not cover, so the doctor's silence about ~/.bash_profile follows from that scope and is not evidence about the file.",
+    "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session.",
+    "The private temporary directory changes where the client's temporary state goes, not what it creates in the home or the working directory, and it holds only while it is short: the client caps its messaging-socket path, <dir>/cc-socks/<pid>.sock, at 103 bytes (its own constant), and a private path of 99 bytes, which gives a 121-byte socket path, made it use a fixed /tmp/cc-socks-<uid> directory in the real /tmp (the control run; the client also prefers XDG_RUNTIME_DIR, which the probes never set). That the real /tmp and /tmp/claude-<uid> gained no other top-level entry is a property of the recorded run (about three seconds, on a host where other sessions were running): a concurrent session can add an entry inside that window, and one would have counted. What each arm's private directory held varies a little between runs, so those counts are one run's observation. The shared /tmp/inline-comments-buffer.jsonl sits at a path the client hard-codes; the script cannot tell its own arms' creation of it from a concurrent session's, so it reports that the file appeared during the run and removes it only when it was absent before and is an empty regular file created after the run began."
   ],
   "evidence_class": "independent observation: the native Claude Code binary and the Windows Terminal profile start-up command run on this host, with a no-variable control arm and five doctor-check controls; the reproduction arms and controls are isolated fixtures; the upstream issue states and release facts are source review",
-  "recorded_at_utc": "2026-09-29T05:47:08Z",
+  "recorded_at_utc": "2026-09-29T16:07:51Z",
   "host_scope": {
     "host": "nativestack-5975wx-20260925",
     "platform": "NativeStack workstation, WSL2 Ubuntu 24.04 on Windows 11 with Windows Terminal 1.24.11911.0",
@@ -132,9 +133,9 @@
           "scrub_variable": false,
           "real_bash_profile_present_before": false,
           "client_exit": 1,
-          "entries_created": 10,
+          "entries_created": 9,
           "empty_files_created": 0,
-          "directories_created": 7,
+          "directories_created": 6,
           "empty_directories_created": 2,
           "created_in_home_top_level": [
             ".claude",
@@ -143,19 +144,26 @@
           "created_in_working_dir": [],
           "bash_profile_exists_after": false,
           "bash_profile_empty_after": false,
+          "bash_profile_mode_after": null,
           "real_bash_profile_untouched": null,
           "login_path_had_local_bin_before": true,
           "login_path_has_local_bin_after": true,
-          "client_state_entries_removed": 0
+          "client_temp_entries_in_private_dir": {
+            "messaging_socket_dirs": 1,
+            "sandbox_multiplexer_sockets": 0,
+            "file_watch_probe_dirs": 1,
+            "client_state_dirs": 1,
+            "other": 0
+          }
         },
         {
           "arm": "B_scrub_stock_home",
           "scrub_variable": true,
           "real_bash_profile_present_before": false,
           "client_exit": 1,
-          "entries_created": 50,
+          "entries_created": 49,
           "empty_files_created": 27,
-          "directories_created": 20,
+          "directories_created": 19,
           "empty_directories_created": 12,
           "created_in_home_top_level": [
             ".bash_aliases",
@@ -199,25 +207,41 @@
           ],
           "bash_profile_exists_after": true,
           "bash_profile_empty_after": true,
+          "bash_profile_mode_after": "0o644",
           "real_bash_profile_untouched": null,
           "login_path_had_local_bin_before": true,
           "login_path_has_local_bin_after": false,
           "native_doctor": {
-            "exit": 0,
-            "warnings_found": 3,
-            "mentions_bash_profile": false,
-            "mentions_mask_stale_or_placeholder": false
+            "sandbox_off": {
+              "exit": 0,
+              "warnings_found": 3,
+              "mentions_bash_profile": false,
+              "mentions_mask_stale_or_placeholder": false
+            },
+            "sandbox_on_with_planted_stale_mask_file": {
+              "exit": 0,
+              "warnings_found": 4,
+              "mentions_bash_profile": false,
+              "mentions_mask_stale_or_placeholder": true,
+              "names_planted_stale_mask_file": true
+            }
           },
-          "client_state_entries_removed": 1
+          "client_temp_entries_in_private_dir": {
+            "messaging_socket_dirs": 1,
+            "sandbox_multiplexer_sockets": 1,
+            "file_watch_probe_dirs": 1,
+            "client_state_dirs": 1,
+            "other": 2
+          }
         },
         {
           "arm": "C_scrub_real_bash_profile",
           "scrub_variable": true,
           "real_bash_profile_present_before": true,
           "client_exit": 1,
-          "entries_created": 49,
+          "entries_created": 48,
           "empty_files_created": 26,
-          "directories_created": 20,
+          "directories_created": 19,
           "empty_directories_created": 12,
           "created_in_home_top_level": [
             ".bash_aliases",
@@ -260,20 +284,120 @@
           ],
           "bash_profile_exists_after": true,
           "bash_profile_empty_after": false,
+          "bash_profile_mode_after": "0o644",
           "real_bash_profile_untouched": true,
           "login_path_had_local_bin_before": true,
           "login_path_has_local_bin_after": true,
-          "client_state_entries_removed": 1
+          "client_temp_entries_in_private_dir": {
+            "messaging_socket_dirs": 1,
+            "sandbox_multiplexer_sockets": 1,
+            "file_watch_probe_dirs": 1,
+            "client_state_dirs": 1,
+            "other": 2
+          }
         }
       ],
       "shared_temp_file": {
         "name": "inline-comments-buffer.jsonl",
         "present_before_run": false,
-        "created_by_run": true,
+        "appeared_during_run": true,
         "removed_by_script": true,
         "present_after_script": false
       },
-      "client_startup_code_2_1_284": "opens a fixed list of paths in append mode (creates a missing file, never truncates an existing one) when the variable is set, including the home dotfiles and one absolute path in the system temp directory"
+      "client_startup_code_2_1_284": {
+        "read_by": "startup_placeholder_names.py (reads the installed binary, prints names only)",
+        "open_mode": "a",
+        "creates_parent_directories": true,
+        "home_relative_names": [
+          ".gitconfig",
+          ".bash_profile",
+          ".bashrc",
+          ".bash_aliases",
+          ".profile",
+          ".zshrc",
+          ".bunfig.toml",
+          ".netrc",
+          ".npmrc",
+          ".yarnrc",
+          ".yarnrc.yml"
+        ],
+        "working_directory_relative_names": [
+          ".npmrc",
+          ".yarnrc",
+          ".yarnrc.yml",
+          "bunfig.toml",
+          "package.json",
+          ".gitmodules",
+          "package-lock.json",
+          "yarn.lock",
+          "pnpm-lock.yaml"
+        ],
+        "absolute_path_outside_any_home": "/tmp/inline-comments-buffer.jsonl",
+        "further_working_directory_names_from_a_variable": true,
+        "bash_profile_in_list": true,
+        "profile_in_list": true,
+        "bash_login_in_list": false,
+        "meaning": "a fixed list is opened in append mode with its parent directories created: a missing file is created empty and an existing file is never truncated"
+      },
+      "real_temp_top_level_entries_new_during_run": {
+        "in_tmp_excluding_the_shared_file": {
+          "messaging_socket_dirs": 0,
+          "sandbox_multiplexer_sockets": 0,
+          "file_watch_probe_dirs": 0,
+          "client_state_dirs": 0,
+          "other": 0
+        },
+        "in_tmp_claude_uid": {
+          "messaging_socket_dirs": 0,
+          "sandbox_multiplexer_sockets": 0,
+          "file_watch_probe_dirs": 0,
+          "client_state_dirs": 0,
+          "other": 0
+        }
+      },
+      "private_temp_dir_environment": [
+        "TMPDIR",
+        "CLAUDE_CODE_TMPDIR"
+      ],
+      "socket_path_fallback_control": {
+        "socket_path_cap_bytes": 103,
+        "runs": [
+          {
+            "run": "short private path",
+            "private_dir_path_bytes": 17,
+            "socket_path_bytes_with_a_7_digit_pid": 39,
+            "exceeds_the_clients_socket_path_cap": false,
+            "cc_socks_in_private_dir": 1,
+            "cc_socks_fallback_dirs_appeared_in_real_tmp": 0,
+            "fallback_dir_already_present_before_the_run": false,
+            "conclusive": true,
+            "other_new_names_in_real_tmp": 0,
+            "fallback_dirs_removed_after_assertions": 0,
+            "shared_temp_file": {
+              "present_before_run": false,
+              "appeared_during_run": true,
+              "removed_by_script": true
+            }
+          },
+          {
+            "run": "long private path",
+            "private_dir_path_bytes": 99,
+            "socket_path_bytes_with_a_7_digit_pid": 121,
+            "exceeds_the_clients_socket_path_cap": true,
+            "cc_socks_in_private_dir": 0,
+            "cc_socks_fallback_dirs_appeared_in_real_tmp": 1,
+            "fallback_dir_already_present_before_the_run": false,
+            "conclusive": true,
+            "other_new_names_in_real_tmp": 0,
+            "fallback_dirs_removed_after_assertions": 1,
+            "shared_temp_file": {
+              "present_before_run": false,
+              "appeared_during_run": true,
+              "removed_by_script": true
+            }
+          }
+        ]
+      }
     },
     "doctor_check_controls": {
       "cases": [
@@ -460,8 +584,8 @@
       "codex": {
         "installed_tag": "rust-v0.157.1",
         "newest_stable": [
-          "rust-v0.158.0",
-          "2026-09-28T05:07"
+          "rust-v0.159.0",
+          "2026-09-29T08:05"
         ],
         "source_diff_changed_lines": {
           "codex-rs/tui/src/chatwidget/notifications.rs": 0,
@@ -481,54 +605,63 @@
         "DevinoSolutions/anotifier-for-claude-codex-cursor": {
           "head": "92c080a7",
           "pin_unchanged": true,
+          "baseline_first_recorded_by_this_script": false,
           "latest_release": "v1.2.6",
           "archived": false
         },
         "777genius/agent-notifications": {
           "head": "0376f9c9",
           "pin_unchanged": true,
+          "baseline_first_recorded_by_this_script": false,
           "latest_release": "v1.45.18",
           "archived": false
         },
         "congmnguyen/claude-code-wsl2-setup": {
           "head": "69620ec4",
           "pin_unchanged": true,
+          "baseline_first_recorded_by_this_script": false,
           "latest_release": "v1.0.0",
           "archived": false
         },
         "shanselman/toasty": {
           "head": "973eeb8d",
           "pin_unchanged": true,
+          "baseline_first_recorded_by_this_script": false,
           "latest_release": "v0.8.1",
           "archived": false
         },
         "PeonPing/peon-ping": {
           "head": "8ef37660",
           "pin_unchanged": true,
+          "baseline_first_recorded_by_this_script": false,
           "latest_release": "v2.37.0",
           "archived": false
         },
         "mylee04/code-notify": {
           "head": "dcfd4ae6",
           "pin_unchanged": true,
+          "baseline_first_recorded_by_this_script": false,
           "latest_release": "v1.13.1",
           "archived": false
         },
         "asheshgoplani/agent-deck": {
           "head": "035fd602",
-          "pin_unchanged": true,
+          "pin_unchanged": null,
+          "baseline_first_recorded_by_this_script": true,
           "latest_release": "v1.16.22",
           "archived": false
         },
         "kbwo/ccmanager": {
           "head": "ee0af836",
-          "pin_unchanged": true,
+          "pin_unchanged": null,
+          "baseline_first_recorded_by_this_script": true,
           "latest_release": "v4.4.4",
           "archived": false
         },
         "zellij-org/zellij": {
           "head": "a79e15e1",
-          "pin_unchanged": true,
+          "pin_unchanged": null,
+          "baseline_first_recorded_by_this_script": true,
           "latest_release": "v0.45.1",
           "archived": false
         }
@@ -586,6 +719,20 @@
         [
           "2.1.78",
           "Fixed `git log HEAD` failing with \"ambiguous argument\" inside sandboxed Bash on Linux, and stub files polluting `git status` in the working directory"
+        ],
+        [
+          "2.1.69",
+          "Fixed ghost dotfiles (`.bashrc`, `HEAD`, etc.) appearing as untracked files in the working directory after sandboxed Bash commands on Linux"
+        ]
+      ],
+      "claude_code_changelog_scrub_variable_entries": [
+        [
+          "2.1.98",
+          "Added subprocess sandboxing with PID namespace isolation on Linux when `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` is set, and `CLAUDE_CODE_SCRIPT_CAPS` env va"
+        ],
+        [
+          "2.1.83",
+          "Added `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` to strip Anthropic and cloud provider credentials from subprocess environments (Bash tool, hooks, MCP stdio"
         ]
       ],
       "claude_code_changelog_top_version": "2.1.284"
@@ -608,19 +755,24 @@
       "agent_view_adopted": false,
       "agent_view_probe_run": false,
       "telemetry_tab_identity_changed": false
-    }
+    },
+    "revision_note": "Revised on 2026-09-29 after the bounded re-check of the merged change and the first review round of the follow-up: only the sections `isolated_reproduction` (arms, shared file, real-temp measurement, socket-path control, startup-code names) and `landscape_2026_09_29` were re-run and carry the re-run values; the incident, hand-off, doctor-control, agents-snapshot and decision values are unchanged from the first recording."
   },
   "provenance": {
     "artifacts_dir": "evidence/artifacts/login-shell-contract-20260929",
     "scripts_sha256": {
       "agents_json_probe.py": "914afe098321ac0ad0c5e36e0c910efe184b79f739ca32eca20e040999934a24",
-      "landscape_refresh.py": "1729003cffe560d246fa06131bbb62679867f410df4e815eb792fbea1ee5fa4b",
+      "landscape_refresh.py": "6e36f4368d67e130a75577e94d6d1cee77a8e257137a4ce457023758ff2af11e",
       "login_path_digest.py": "c6106a9ac19976ab64befddf3be762690bcca27ede1a25be2b5ab4537d720af9",
       "login_shell_check_controls.py": "e7cdc7776a671c2654a5f2805977769120ff117df971f30e7bbef9f10b6910d4",
-      "scrub_placeholder_probe.py": "0eff1d26583879c0e74b79fbda23b134b66a3e7868fd593deab8c596dc2869f6"
+      "scrub_placeholder_probe.py": "cd9ad8e51fd842bf8a0f9cf79e3376b59ad9015d4ab3b0fa255c67f628e5b56c",
+      "socket_path_fallback_probe.py": "caa50ab0e7e54a4bbabf407a56db9ef5012688ff911dec71d56a389554a18239",
+      "startup_placeholder_names.py": "491bd010f639b4b353c76e4a18b4be4d510735fc0039cd17f214d50080c7cea4"
     },
     "commands": [
       "python3 -B scrub_placeholder_probe.py",
+      "python3 -B socket_path_fallback_probe.py",
+      "python3 -B startup_placeholder_names.py",
       "python3 -B login_shell_check_controls.py --real-host",
       "python3 -B login_path_digest.py",
       "python3 -B agents_json_probe.py",

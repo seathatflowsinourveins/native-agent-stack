@@ -12,12 +12,15 @@ import difflib, json, re, subprocess, sys
 
 INSTALLED_CODEX = sys.argv[sys.argv.index("--installed-codex") + 1] if "--installed-codex" in sys.argv else "rust-v0.157.1"
 TOAST_MERGE_BASE = "93bdbfaa3d62304f4b50b4ca4484da4dd08e4a1f"   # the merge commit of microsoft/terminal#20012 (OSC 777)
-CANDIDATES = {  # repository -> pin recorded in the decision (short head, latest release where one was recorded)
+# repository -> (short head, latest release) recorded when this script first ran, 2026-09-29. Six of them were pins the decision's table
+# already carried; BASELINES were first recorded here, so for them "unchanged" has nothing earlier to compare with and reads null.
+CANDIDATES = {
     "DevinoSolutions/anotifier-for-claude-codex-cursor": ("92c080a7", "v1.2.6"), "777genius/agent-notifications": ("0376f9c9", "v1.45.18"),
     "congmnguyen/claude-code-wsl2-setup": ("69620ec4", "v1.0.0"), "shanselman/toasty": ("973eeb8d", "v0.8.1"),
     "PeonPing/peon-ping": ("8ef37660", None), "mylee04/code-notify": ("dcfd4ae6", None), "asheshgoplani/agent-deck": ("035fd602", None),
     "kbwo/ccmanager": ("ee0af836", None), "zellij-org/zellij": ("a79e15e1", "v0.45.1"),
 }
+BASELINES = {"asheshgoplani/agent-deck", "kbwo/ccmanager", "zellij-org/zellij"}
 CODEX_FILES = ["codex-rs/tui/src/chatwidget/notifications.rs", "codex-rs/tui/src/notifications/mod.rs", "codex-rs/tui/src/terminal_palette.rs",
                "codex-rs/config/src/types.rs"]
 ISSUE_QUERIES = ["bash_profile sandbox", "\"mount point\" sandbox empty file", "SUBPROCESS_ENV_SCRUB leftover", "sandbox leaves empty .zshrc"]
@@ -89,7 +92,9 @@ def main():
         meta = gh(f"repos/{repo}")
         head = gh(f"repos/{repo}/commits/{meta['default_branch']}") if meta else None
         latest = gh(f"repos/{repo}/releases/latest")
-        out["candidates"][repo] = {"head": head["sha"][:8] if head else None, "pin_unchanged": bool(head) and head["sha"].startswith(pin),
+        out["candidates"][repo] = {"head": head["sha"][:8] if head else None,
+                                   "pin_unchanged": None if repo in BASELINES else bool(head) and head["sha"].startswith(pin),
+                                   "baseline_first_recorded_by_this_script": repo in BASELINES,
                                    "latest_release": latest["tag_name"] if latest else None, "archived": meta["archived"] if meta else None}
     reported = {}
     for query in ISSUE_QUERIES:
@@ -103,18 +108,22 @@ def main():
             out["claude_code_issues"][number] = {"state": item["state"], "state_reason": item.get("state_reason"), "created": item["created_at"][:10],
                                                   "closed": (item.get("closed_at") or "")[:10] or None, "found_by_search": number in reported}
     out["claude_code_changelog_sandbox_stub_entries"] = None
+    out["claude_code_changelog_scrub_variable_entries"] = None
     changelog = gh("repos/anthropics/claude-code/contents/CHANGELOG.md", raw=True)
     if changelog is not None:
         out["claude_code_changelog_top_version"] = re.search(r"^## (\d+\.\d+\.\d+)", changelog, re.M).group(1)
-        entries, version = [], None
+        entries, scrub_entries, version = [], [], None
         for line in changelog.splitlines():
             heading = re.match(r"^## (\d+\.\d+\.\d+)", line)
             if heading:
                 version = heading.group(1)
             elif re.search(r"sandbox|SUBPROCESS_ENV_SCRUB|bwrap|bubblewrap", line, re.I) and re.search(
-                    r"placeholder|empty (regular )?file|stub|mount point|mask file|clean ?up|left behind|leftover|0-byte|\.lock", line, re.I):
+                    r"placeholder|empty (regular )?file|stub|mount point|mask file|clean ?up|left behind|leftover|0-byte|\.lock|dotfile|ghost", line, re.I):
                 entries.append((version, line.strip("- ").strip()[:150]))
+            if "SUBPROCESS_ENV_SCRUB" in line:
+                scrub_entries.append((version, line.strip("- ").strip()[:150]))
         out["claude_code_changelog_sandbox_stub_entries"] = entries
+        out["claude_code_changelog_scrub_variable_entries"] = scrub_entries
     print(json.dumps(out, indent=2, default=list))
 
 
