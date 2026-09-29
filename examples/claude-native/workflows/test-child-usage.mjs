@@ -531,7 +531,7 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ["echo 'rtk proxy ls'", ['-/echo']], ['echo "rtk proxy pytest"', ['-/echo']], ['git log --grep="rtk proxy"', ['-/git']], ['# qmd search x', []],
     ['cat ~/.qmd/index.sqlite', ['-/cat']], ['ls toon/', ['-/ls']], ["git commit -m \"$(cat <<'EOF'\nqmd search x\nEOF\n)\"", ['-/git', '-/cat']],
     ['cat <<EOF > run.sh\nrtk proxy pytest\nEOF', ['-/cat']], ['claude mcp add context-mode -- npx -y context-mode', ['-/claude']], ['codex mcp add qmd -- qmd mcp', ['-/codex']],
-    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', 'qmd/qmd remote']],
+    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['echo `ssh host "qmd get a"`', ['-/echo', '-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', 'qmd/qmd remote']],
     ['$QMD search x', ['-/- unresolved']], ['"$QMD" search x', ['-/- unresolved']], ["'$QMD' search x", ['-/(other)']],
     ['qmd --version', ['qmd/qmd excluded']], ['qmd search x --help', ['qmd/qmd excluded']], ['qmd search -- --help', qmd], ['qmd -h', qmd],
     ['toon --help', ['toon/toon excluded']], ['ai-memory --version', ['ai-memory/ai-memory excluded']],

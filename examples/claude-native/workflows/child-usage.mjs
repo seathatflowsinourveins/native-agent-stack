@@ -434,44 +434,60 @@ function resolveHeredocs(src, inlineHttp, resolved, depth, marks) {
   }
   return { text: joined(kept, '\n'), sources }
 }
+// Only the end of the text built so far decides whether a quote opens a run string (RUN_QUOTED, RUN_HTTP_CODE), and reading
+// out.s for it flattens the whole concatenation and scans it once per quote: quadratic on a long script (a 346 KB script took 2 s
+// a scan, and the kernel scans each shell call several times). scanQuotes keeps that end in `tail`, a string of at most 2 * TAIL
+// characters cut back to TAIL, and reads only it. Once a cut has been made the detectors run without their start-of-text
+// alternative (a cut is no start of text). Limit: a run keyword more than TAIL characters before its quote, after a text that has
+// itself grown past 2 * TAIL, is missed and the string reads as data like any run string the detector does not recognize (its
+// fetch is lost, as the raw detector anchors curl, not the quote): only a single ssh option word that long can put it there
+// (`ssh -oProxyCommand=<1500 characters> host "curl u"` read as a fetch before the window and as data after it; the words
+// between a shell, eval or ssh and its string are short options and one host).
+const TAIL = 512
+const withoutStart = (re) => new RegExp(re.source.replace('^|', ''))
+const RUN_QUOTED_CUT = withoutStart(RUN_QUOTED), RUN_HTTP_CODE_CUT = withoutStart(RUN_HTTP_CODE)
 // Phase 2 over the kept text: escapes, comments and quoted strings. A quoted string that a shell runs is analyzed as
 // that shell's input, with its own heredocs; a double-quoted one first loses the backslashes the outer shell removes.
 function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
   const out = { s: '', p: [] }
+  let tail = '', cut = false
+  const note = (s) => { tail += s; if (tail.length > 2 * TAIL) { tail = tail.slice(-TAIL); cut = true } }
+  const put = (s) => { insert(out, s); note(s) }
+  const putTrace = (t) => { append(out, t); note(t.s) }
   for (let i = 0; i < text.s.length; i++) {
     const ch = text.s[i]
     if (ch === '\\') {
       const next = text.s[i + 1]
-      if (next !== undefined && next !== '\n') { out.s += ESCAPED_DATA.has(next) ? '_' : next; out.p.push(text.p[i + 1]) }
+      if (next !== undefined && next !== '\n') { const c = ESCAPED_DATA.has(next) ? '_' : next; out.s += c; out.p.push(text.p[i + 1]); note(c) }
       i++
       continue
     }
-    if (ch === '#' && (out.s === '' || WORD_BREAK.has(out.s[out.s.length - 1]))) {
+    if (ch === '#' && (out.p.length === 0 || WORD_BREAK.has(tail[tail.length - 1]))) {
       while (i + 1 < text.s.length && text.s[i + 1] !== '\n') i++
       continue
     }
-    if (ch !== "'" && ch !== '"') { out.s += ch; out.p.push(text.p[i]); continue }
+    if (ch !== "'" && ch !== '"') { out.s += ch; out.p.push(text.p[i]); note(ch); continue }
     const j = closeQuote(text.s, i), inner = slice(text, i + 1, j)
-    const run = depth < NESTING_LIMIT ? RUN_QUOTED.exec(out.s) : null
+    const run = depth < NESTING_LIMIT ? (cut ? RUN_QUOTED_CUT : RUN_QUOTED).exec(tail) : null
     if (run) {
       // The ssh alternative of RUN_QUOTED: the string runs in the remote shell.
-      const remote = marks && run[0].startsWith('ssh', ' \t\n;&|('.includes(run[0][0]) ? 1 : 0)
+      const remote = marks && run[0].startsWith('ssh', ' \t\n;&|(`'.includes(run[0][0]) ? 1 : 0)
       if (ch === '"') {
         // Two views of a double-quoted string a shell runs (POSIX.1-2024 XCU 2.2.3 and 2.6.3; U1 pivot D7, GPT-6 #8): the shell
         // that expands the word runs each unescaped "$( )" and backquoted span itself, before the shell it starts reads anything,
         // whatever that shell then makes of the text; that shell reads the string with each of them replaced by its output,
         // which is unknown, so a placeholder word. The outer bodies come first, as they run, each as commands of their own.
         const spans = outerSpans(inner.s, depth), view = withoutSpans(inner, spans)
-        for (const span of spans) { insert(out, ';'); append(out, outerBody(inner, span, inlineHttp, resolved, depth, marks)); insert(out, ';') }
+        for (const span of spans) { put(';'); putTrace(outerBody(inner, span, inlineHttp, resolved, depth, marks)); put(';') }
         if (remote) { let at = 0; for (const span of [...spans, { from: inner.s.length, to: inner.s.length }]) { const range = rawRange(slice(inner, at, span.from)); if (range) marks.remote.push(range); at = span.to } }
-        insert(out, ';'); append(out, executedTrace(unquoted(view), inlineHttp, resolved, depth + 1, marks)); insert(out, ';')
+        put(';'); putTrace(executedTrace(unquoted(view), inlineHttp, resolved, depth + 1, marks)); put(';')
       } else {
         if (remote) { const range = rawRange(inner); if (range) marks.remote.push(range) }
-        insert(out, ';'); append(out, executedTrace(inner, inlineHttp, resolved, depth + 1, marks)); insert(out, ';')
+        put(';'); putTrace(executedTrace(inner, inlineHttp, resolved, depth + 1, marks)); put(';')
       }
-    } else if (inlineHttp && RUN_HTTP_CODE.test(out.s)) { insert(out, ';'); append(out, inner); insert(out, ';') }
-    else if (ch === '"') { insert(out, '"'); quotedData(out, inner, inlineHttp, resolved, depth, marks); insert(out, '"') }
-    else { insert(out, "'"); append(out, { s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); insert(out, "'") }
+    } else if (inlineHttp && (cut ? RUN_HTTP_CODE_CUT : RUN_HTTP_CODE).test(tail)) { put(';'); putTrace(inner); put(';') }
+    else if (ch === '"') { const data = { s: '', p: [] }; quotedData(data, inner, inlineHttp, resolved, depth, marks); put('"'); putTrace(data); put('"') }
+    else { put("'"); putTrace({ s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); put("'") }
     i = j
   }
   return out
