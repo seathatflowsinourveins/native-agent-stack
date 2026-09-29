@@ -854,12 +854,12 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         block = match.group(1)
         self.assertIn(f"group: {EXPECTED_PROPOSE_CONCURRENCY_GROUP}", block)
         self.assertIn("cancel-in-progress: false", block)
-        # queue: max is the documented fix for the same problem, but this
-        # repository's pinned actionlint 1.7.12 rejects that key (checked
-        # directly -- docs/decisions/2026-09-23-bot-pr-dispatch.md); it must not
-        # be reintroduced as an actual concurrency key without re-verifying
-        # actionlint support first (the surrounding prose may still *mention*
-        # `queue:` to explain why it is not used).
+        # queue: max is the documented fix for the same problem, but the
+        # actionlint pinned on 2026-09-23 (rhysd/actionlint 1.7.12) rejected that
+        # key (checked directly -- docs/decisions/2026-09-23-bot-pr-dispatch.md).
+        # kjanat/actionlint 1.17.0, pinned since 2026-09-28, accepts it; adopting
+        # it is a separate change that updates this assertion (the surrounding
+        # prose may still *mention* `queue:` to explain why it is not used).
         active_keys = [
             line.strip().split(":", 1)[0] for line in block.splitlines()
             if line.strip() and not line.strip().startswith("#")

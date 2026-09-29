@@ -1,0 +1,766 @@
+{
+ "schema_version": 1,
+ "kind": "actionlint_successor_swap",
+ "plan_move": "M2 step 3: the required validate job's actionlint step moves from rhysd/actionlint 1.7.12 to kjanat/actionlint v1.17.0 (integrity-gate wave)",
+ "date_local": "2026-09-28 (America/New_York, EDT)",
+ "window_utc": {
+  "start": "2026-09-28T23:57:59Z",
+  "verification": "2026-09-29T00:06:02Z to 00:06:29Z",
+  "negative_control_and_upstream_recheck_end": "2026-09-29T00:11:51Z",
+  "note": "Upstream status was read at 23:57:59Z and the hosted run data after it; the documented install procedure and the attestation checks ran at 00:06Z; the queue-key check, the local lint and zizmor runs, the negative control and the branch checks followed in the same session."
+ },
+ "catalog_revision": "f02192630ae121705556708ed28ad1596af31dd3",
+ "catalog_revision_note": "The brief's exact base (#469): origin/main's tip when the session started (git fetch) and the last commit in the hosted table. main advanced to bab06007 at 2026-09-29T00:02:29Z during the session (gh api compare f0219263...main: status ahead, ahead_by 1, behind_by 0). That commit changes none of this branch's files except manifests/evidence.json, and its validate run was still in progress when read, so it is outside the table.",
+ "host": {
+  "os": "Ubuntu 24.04.5 LTS under WSL2",
+  "arch": "linux/amd64",
+  "gh": "gh version 2.101.0 (2026-09-15)",
+  "zizmor": "zizmor 1.30.1, installed into a scratch venv with validate.yml's pip command (--only-binary=:all: --require-hashes -r .github/requirements-ci.txt)",
+  "shellcheck": "0.9.0-1 (the ubuntu-24.04 runner image's version) fetched with apt-get download and extracted with dpkg-deb -x, never installed; .deb sha256 eadf78f4dfcb1a271f47a9be5e38d124dffe9d4fea74956fab34e8c3e322a854, equal to apt-cache show's SHA256 and to the 2026-09-27 trial's value"
+ },
+ "evidence_class_legend": {
+  "upstream-unchanged": "An upstream tool or verifier run as published (gh api, gh release download, sha256sum, gh attestation verify, the kjanat/actionlint and zizmor binaries).",
+  "hosted-observed": "GitHub-hosted runs of this repository's workflows, read back with gh (run, job and step conclusions and job log lines); not re-executed here.",
+  "our-integration": "This repository's tests and validators, and scratch copies or fixtures composed around the upstream tools; never an upstream test.",
+  "live-run-pending": "Needs a hosted run of this branch or of a control; not observed here."
+ },
+ "sources": {
+  "release": "https://github.com/kjanat/actionlint/releases/tag/v1.17.0: immutable, published 2026-09-13T16:07:47Z; annotated tag object 2da2ceb4af2c7ecc48f5b9311d85080c3971b5f0 points to commit 08bb2c4f0d039744455b87aef1c647fb8b66d37b (gh api git/ref/tags/v1.17.0 and git/tags/2da2ceb4: type commit, tagger date 2026-09-13T16:02:41Z, verification.verified true)",
+  "asset": "actionlint_1.17.0_linux_amd64.tar.gz, 3067604 bytes, release asset digest sha256:620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a",
+  "install_procedure": "kjanat/actionlint@v1.17.0:docs/install.md lines 124-128 (gh release download, tar, ./actionlint -version) and 130-134 (gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz)",
+  "exit_status": [
+   "kjanat/actionlint@v1.17.0:docs/usage.md lines 275-284: 0 = ran successfully and no problem was found; 1 = some problem was found; 2 = invalid command line option; 3 = fatal error",
+   "rhysd/actionlint@v1.7.12:docs/usage.md lines 181-190: the same table"
+  ],
+  "changelog": [
+   "kjanat/actionlint@v1.17.0:CHANGELOG.md line 13: upgrade note, the three new cache safety policies are enabled without a configuration file and can make previously clean workflows exit 1",
+   "kjanat/actionlint@v1.17.0:CHANGELOG.md line 238 (v1.8.0): `queue` in workflow- and job-level concurrency; `single` and `max` accepted; invalid values and `queue: max` with `cancel-in-progress: true` reported as errors"
+  ],
+  "prior_trial": "evidence/artifacts/actionlint-successor-parity-20260927/ (unedited)"
+ },
+ "upstream_status": {
+  "evidence_class": "upstream-unchanged",
+  "observed_at_utc": "2026-09-28T23:57:59Z; kjanat activity and the main compare at 2026-09-29T00:11:51Z",
+  "method": "gh api repos/rhysd/actionlint (releases/latest, commits?per_page=1, commits?since=2026-06-29T00:00:00Z&sha=main, issues/719, the repository); repos/kjanat/actionlint (releases/latest, releases?per_page=3, releases/tags/v1.17.0, git/ref/tags/v1.17.0, git/tags/2da2ceb4..., commits?per_page=1, the repository)",
+  "rhysd/actionlint": {
+   "latest_release": {
+    "tag": "v1.7.12",
+    "published": "2026-03-30T17:49:21Z"
+   },
+   "latest_main_commit": {
+    "sha": "011a6d15e749",
+    "committed": "2026-04-19T14:46:58Z"
+   },
+   "commits_on_main_since_2026_06_29": 0,
+   "archived": false,
+   "repository_pushed_at": "2026-07-16T06:05:57Z",
+   "issue_719": {
+    "title": "rhysd (the author) inactive. Any active forks?",
+    "state": "open",
+    "updated": "2026-09-18T02:41:20Z",
+    "comments": 6
+   }
+  },
+  "kjanat/actionlint": {
+   "fork_of": "rhysd/actionlint",
+   "archived": false,
+   "latest_release": {
+    "tag": "v1.17.0",
+    "published": "2026-09-13T16:07:47Z",
+    "immutable": true
+   },
+   "previous_releases": [
+    {
+     "tag": "v1.16.1",
+     "published": "2026-09-09T19:28:57Z",
+     "immutable": true
+    },
+    {
+     "tag": "v1.16.0",
+     "published": "2026-09-08T16:30:53Z",
+     "immutable": true
+    }
+   ],
+   "latest_default_branch_commit": {
+    "sha": "f45fbd2f4084",
+    "committed": "2026-09-25T14:28:28Z"
+   },
+   "pushed_at": "2026-09-26T19:41:06Z"
+  },
+  "change_since_20260927": "None observed: the same latest releases, rhysd main tip, #719 state and kjanat pushed_at and last default-branch commit date as evidence/artifacts/actionlint-successor-parity-20260927/receipt.json upstream_status."
+ },
+ "verification": {
+  "evidence_class": "upstream-unchanged",
+  "cwd": "<scratch>/dl, an empty directory made for this run",
+  "procedure": "docs/github-automation.md's five-command block as changed on this branch, run verbatim. It is kjanat/actionlint@v1.17.0:docs/install.md lines 124-134 plus the release's actionlint_1.17.0_checksums.txt check, the same composition the 1.7.12 block used.",
+  "steps": [
+   {
+    "argv": "gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.17.0",
+    "at_utc": "2026-09-29T00:06:02Z",
+    "exit": 0,
+    "files_bytes": {
+     "actionlint_1.17.0_checksums.txt": 2461,
+     "actionlint_1.17.0_linux_amd64.tar.gz": 3067604
+    }
+   },
+   {
+    "argv": "sha256sum actionlint_1.17.0_linux_amd64.tar.gz",
+    "exit": 0,
+    "stdout": "620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a  actionlint_1.17.0_linux_amd64.tar.gz"
+   },
+   {
+    "argv": "printf '%s  %s\\n' 620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a actionlint_1.17.0_linux_amd64.tar.gz | sha256sum --check",
+    "note": "validate.yml's form with the pinned digest",
+    "exit": 0,
+    "stdout": "actionlint_1.17.0_linux_amd64.tar.gz: OK"
+   },
+   {
+    "argv": "gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz",
+    "window_utc": "2026-09-29T00:06:03Z to 00:06:07Z",
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "note": "Verbatim: nothing on either stream, exit 0. A second plain run at 00:06:19Z again returned exit 0 with 0 bytes on stdout and 0 on stderr. With stdout not a terminal this gh prints no report on success; the --format json run below carries the verified fields."
+   },
+   {
+    "argv": "sha256sum --check --ignore-missing actionlint_1.17.0_checksums.txt",
+    "exit": 0,
+    "stdout": "actionlint_1.17.0_linux_amd64.tar.gz: OK",
+    "checksums_line": "620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a  actionlint_1.17.0_linux_amd64.tar.gz"
+   },
+   {
+    "argv": "tar -xzf actionlint_1.17.0_linux_amd64.tar.gz actionlint",
+    "exit": 0,
+    "extracted_binary_sha256": "6e0e370a627682be87b2f20e4b4e9bed0d675cec3f7feac206baed7873e8e5fd"
+   },
+   {
+    "argv": "./actionlint -version",
+    "at_utc": "2026-09-29T00:06:07Z",
+    "exit": 0,
+    "stdout": [
+     "actionlint.kjanat.dev 1.17.0",
+     "https://github.com/kjanat/actionlint/releases/tag/v1.17.0",
+     "built with go1.27.1 compiler for linux/amd64"
+    ]
+   }
+  ],
+  "gh_attestation_verify_json": {
+   "argv": "gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz --format json",
+   "at_utc": "2026-09-29T00:06:19Z to 00:06:29Z",
+   "exit": 0,
+   "stderr_bytes": 0,
+   "results": 1,
+   "predicate_type": "https://slsa.dev/provenance/v1",
+   "subjects": 23,
+   "subject_alternative_name": "https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0",
+   "issuer": "https://token.actions.githubusercontent.com",
+   "build_signer_uri": "https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0",
+   "build_signer_digest": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+   "source_repository_uri": "https://github.com/kjanat/actionlint",
+   "source_repository_ref": "refs/tags/v1.17.0",
+   "source_repository_digest": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+   "build_trigger": "push",
+   "runner_environment": "github-hosted",
+   "run_invocation_uri": "https://github.com/kjanat/actionlint/actions/runs/34767392704/attempts/1"
+  },
+  "negative_control": {
+   "argv": "gh attestation verify -R rhysd/actionlint actionlint_1.17.0_linux_amd64.tar.gz",
+   "exit": 1,
+   "output": "Error: HTTP 404: Not Found (https://api.github.com/repos/rhysd/actionlint/attestations/sha256:620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a?per_page=30&predicate_type=https%3A%2F%2Fslsa.dev%2Fprovenance%2Fv1)",
+   "meaning": "The same archive has no attestation under another repository, so the check discriminates on the repository."
+  },
+  "matches_20260927_trial": "The archive digest, the extracted-binary digest, the signer identity, source digest 08bb2c4f and the run invocation equal evidence/artifacts/actionlint-successor-parity-20260927/receipt.json verification.kjanat_actionlint_1.17.0.",
+  "asset_disposition": "The downloaded archive, the checksums file and the extracted binary were deleted from scratch after the checks; none is committed."
+ },
+ "hosted_parity": {
+  "evidence_class": "hosted-observed",
+  "question": "Did the non-required actionlint-successor job (kjanat v1.17.0) agree with the required validate job's rhysd 1.7.12 step on every hosted push run on main since #449 merged it?",
+  "scope": "Every push run of validate.yml on main whose head is one of the 25 first-parent commits from b60d5182 (#449, run created 2026-09-28T08:28:02Z) through f0219263 (#469, run created 2026-09-28T23:22:19Z).",
+  "method": [
+   "git log --first-parent --format='%H %cI %s' b60d5182^..f0219263: 25 commits",
+   "gh run list --workflow validate.yml --branch main --event push --limit 60 --json databaseId,headSha,createdAt,conclusion,status,attempt,event,headBranch,displayTitle: 25 of the 60 listed runs have one of those heads, one run per commit, none missing, all run_attempt 1, all completed with conclusion success",
+   "gh api repos/seathatflowsinourveins/native-agent-stack/actions/runs/<run_id>/jobs?per_page=100 --jq '.jobs[] | select(.name==\"validate\" or .name==\"actionlint-successor\") | [<run_id>, .name, .id, .run_attempt, .status, .conclusion, .started_at, .completed_at, ([.steps[] | select(.name|test(\"actionlint\")) | (.name + \"=\" + (.conclusion//\"null\"))] | join(\";\"))] | @tsv'"
+  ],
+  "count": {
+   "commits": 25,
+   "runs": 25,
+   "validate_job_success": 25,
+   "validate_actionlint_step_success": 25,
+   "successor_job_success": 25,
+   "successor_actionlint_step_success": 25,
+   "runs_with_both_jobs_and_both_steps_success": "25 of 25"
+  },
+  "what_success_means": "Each actionlint step runs under bash -e (the log's `shell: /usr/bin/bash -e {0}`) and ends with `actionlint -color`; a success conclusion means the script exited 0, and actionlint exits 0 only when it found no problem (sources.exit_status). So on each run both binaries reported no diagnostic on that commit's workflows. The table pairs step conclusions; it does not pair diagnostics, and no run exercised a workflow that either binary rejects.",
+  "runs": [
+   {
+    "run_id": 36397523830,
+    "head": "b60d518260b9f8923acc4de680cca0cc9bf0a5b9",
+    "created_at": "2026-09-28T08:28:02Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108847342813,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108847342704,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36398443755,
+    "head": "4f31ef46a6354ce34a34ec1043cb1ad13a881221",
+    "created_at": "2026-09-28T08:37:16Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108850301586,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108850301539,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36401537552,
+    "head": "8315274fee9a9173a28b6115862a7539b4fc3bee",
+    "created_at": "2026-09-28T09:07:52Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108860314771,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108860315063,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36403888087,
+    "head": "718e56206a2a3d15a72dca0b0216189c47abdeae",
+    "created_at": "2026-09-28T09:30:01Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108867890196,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108867890380,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36406958313,
+    "head": "c484ef9a82f3548af538ab862d005fb53d1665c5",
+    "created_at": "2026-09-28T09:59:38Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108877907087,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108877907098,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36409124789,
+    "head": "4a8b729a4160ed82e62590b40013c27602bb83d7",
+    "created_at": "2026-09-28T10:20:30Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108884868961,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108884869053,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36410172987,
+    "head": "eb678281fd87c5d33b7dd0833f85727491ece03e",
+    "created_at": "2026-09-28T10:31:01Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108888245171,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108888245334,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36413530210,
+    "head": "4a610e1822437930a4fc58eee48148dd9ed4c5df",
+    "created_at": "2026-09-28T11:05:16Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108899125700,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108899125296,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36416522826,
+    "head": "85a604ac1279b312d12989ed9058774554b717c9",
+    "created_at": "2026-09-28T11:35:11Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108908861588,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108908861437,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36420558684,
+    "head": "fb14dedfab612664dd9067066d8e297ac4cbb606",
+    "created_at": "2026-09-28T12:14:26Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108921963028,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108921963025,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36429700534,
+    "head": "9f8db5828e89400081bf0e75706cb5db964c46ea",
+    "created_at": "2026-09-28T13:35:35Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108952402139,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108952401753,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36431699003,
+    "head": "dd9967708cf77518a4c113a3c55273846d60cf57",
+    "created_at": "2026-09-28T13:52:08Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108959232859,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108959233048,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36438426118,
+    "head": "3058b2379086677871d092cc6197e907445a03a9",
+    "created_at": "2026-09-28T14:45:53Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 108982282110,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 108982281461,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36450989979,
+    "head": "8d8f79cd85dfc945d5509f00c69426f72473c756",
+    "created_at": "2026-09-28T16:26:03Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109025391643,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109025391433,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36453850824,
+    "head": "b9eb62d2554c00d3bc91e6394366fd01c40aafa8",
+    "created_at": "2026-09-28T16:49:53Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109035049856,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109035049611,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36456458035,
+    "head": "c1581fa2037ef06ae6438a870322297ec3c7ccbb",
+    "created_at": "2026-09-28T17:12:11Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109043925124,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109043924887,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36459546042,
+    "head": "c61e665731c9f56264c131a4386592d7d7c6a67a",
+    "created_at": "2026-09-28T17:38:21Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109054352377,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109054352155,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36465601051,
+    "head": "c0966da2aae07c09b71fe57e1577e06a04f14a9b",
+    "created_at": "2026-09-28T18:29:58Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109074781035,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109074780890,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36470292826,
+    "head": "08aec098061d95bd7adae00286bce1ef347aaf1f",
+    "created_at": "2026-09-28T19:09:44Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109090552366,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109090552498,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36470666243,
+    "head": "c3f15cd28b2c5881765cf23d01fe78192cca66df",
+    "created_at": "2026-09-28T19:12:57Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109091818409,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109091818368,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36473583529,
+    "head": "bdf25d28a269e93a02e34848c78e887bb3a07887",
+    "created_at": "2026-09-28T19:38:03Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109101616526,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109101616206,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36487587560,
+    "head": "11a23f1b0a344b4239071972f7e967bd49ba725f",
+    "created_at": "2026-09-28T21:39:48Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109148150583,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109148150415,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36488253438,
+    "head": "83229e2493100392b87c67dce9470c8b3e6f03b1",
+    "created_at": "2026-09-28T21:45:58Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109150326448,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109150326518,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36495358989,
+    "head": "f6e5a0384c97ac40fcc21a260217257b15b333c4",
+    "created_at": "2026-09-28T22:57:22Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109173545168,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109173545241,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   },
+   {
+    "run_id": 36497637857,
+    "head": "f02192630ae121705556708ed28ad1596af31dd3",
+    "created_at": "2026-09-28T23:22:19Z",
+    "run_attempt": 1,
+    "run_conclusion": "success",
+    "validate_job_id": 109180818981,
+    "validate_job": "success",
+    "validate_actionlint_step": "success",
+    "successor_job_id": 109180818986,
+    "successor_job": "success",
+    "successor_actionlint_step": "success"
+   }
+  ],
+  "pull_request_449": {
+   "method": "gh pr view 449 --json statusCheckRollup,mergedAt,mergeCommit",
+   "merged": "2026-09-28T08:27:59Z as b60d518260b9f8923acc4de680cca0cc9bf0a5b9",
+   "run_id": 36395668639,
+   "validate": {
+    "job_id": 108841338672,
+    "conclusion": "success"
+   },
+   "actionlint-successor": {
+    "job_id": 108841338668,
+    "conclusion": "success"
+   }
+  },
+  "latest_run_logs": {
+   "method": "gh run view 36497637857 --job <job_id> --log",
+   "run_id": 36497637857,
+   "head": "f02192630ae121705556708ed28ad1596af31dd3",
+   "runner_image": "ubuntu-24.04, image version 20260920.314.1, for both jobs",
+   "validate_job_109180818981_actionlint_step": [
+    "$RUNNER_TEMP/actionlint/archive.tar.gz: OK",
+    "1.7.12",
+    "installed by downloading from release page",
+    "built with go1.26.1 compiler for linux/amd64"
+   ],
+   "actionlint_successor_job_109180818986_actionlint_step": [
+    "$RUNNER_TEMP/actionlint-successor/archive.tar.gz: OK",
+    "actionlint.kjanat.dev 1.17.0",
+    "https://github.com/kjanat/actionlint/releases/tag/v1.17.0",
+    "built with go1.27.1 compiler for linux/amd64"
+   ],
+   "actionlint_successor_egress": "harden-runner (audit) recorded the step's curl reaching github.com:443 and release-assets.githubusercontent.com:443"
+  }
+ },
+ "live_run_pending_20260927": [
+  {
+   "item": 1,
+   "text": "The first hosted run of validate.yml's actionlint-successor job on ubuntu-24.04 (its checksum step, -version and -color with the runner's shellcheck), and the pull request's checks turning green.",
+   "status": "closed",
+   "by": "PR #449's checks (run 36395668639: validate and actionlint-successor success) and the 25 push runs in hosted_parity; the successor step's log in run 36497637857 shows the checksum OK line, the 1.17.0 version lines and step success. The runner image carries shellcheck (per the 2026-09-27 trial's image readme reading), but no hosted log shows the shellcheck rule running, since validate.yml passes no -verbose."
+  },
+  {
+   "item": 2,
+   "text": "The required validate job's zizmor online audits (impostor-commit, known-vulnerable-actions, ref-confusion, ref-version-mismatch) over the changed validate.yml with the read-only github.token.",
+   "status": "closed",
+   "by": "Validate job 109180818981 (run 36497637857, head f0219263, whose validate.yml still has the trial job): the zizmor step's env block shows `GH_TOKEN: ***` (masked by GitHub); the step printed no offline-mode warning, where the local tokenless run prints `zizmor is running in offline mode by default`; harden-runner's audit log recorded the zizmor process (pid 3408) reaching github.com:443 and api.github.com:443; the step logged `completed` for .github/dependabot.yml and the 20 workflows and ended `No findings to report. Good job! (48 suppressed)` with success. The online audits over this branch's validate.yml are a new live_run_pending item."
+  },
+  {
+   "item": 3,
+   "text": "tests.test_workflow_hardening's test_job_parser_matches_yaml_when_available, which needs PyYAML (skipped on this host).",
+   "status": "open",
+   "by": "Not observable from the hosted log. validate.yml line 141 (at f0219263) runs `python3 -m unittest` without -v, and job 109180818981's log ends `Ran 7079 tests in 620.749s` and `OK (skipped=710)`: it counts skips but names none, and no step prints whether PyYAML imports. A hosted run that names this test's result (for example `python3 -m unittest -v tests.test_workflow_hardening.HardenRunnerTests.test_job_parser_matches_yaml_when_available`) would close it. Locally it still skips: `PyYAML not installed; the text parser is the only job source`."
+  },
+  {
+   "item": 4,
+   "text": "Swapping the required gate: out of scope until the hosted job agrees with this local result.",
+   "status": "done on this branch; the swapped step's hosted run is pending",
+   "by": "hosted_parity (25 of 25) and this branch's validate.yml change"
+  }
+ ],
+ "queue_key_check": {
+  "evidence_class": "upstream-unchanged binary on scratch copies (our-integration inputs)",
+  "why": "docs/decisions/2026-09-23-bot-pr-dispatch.md records that rhysd/actionlint 1.7.12 rejected the concurrency `queue` key, and its overturn condition asks for a release that accepts it, checked directly. This branch rewords the three present-tense claims as dated statements and changes no behaviour.",
+  "binary": "the verified kjanat/actionlint 1.17.0 (binary sha256 6e0e370a627682be87b2f20e4b4e9bed0d675cec3f7feac206baed7873e8e5fd)",
+  "runs": [
+   {
+    "input": "a scratch copy of this branch's catalog-freshness.yml with `queue: max` added to the propose job's concurrency block (line 216), in a git-initialised scratch tree",
+    "argv": "actionlint -color",
+    "exit": 0,
+    "output": ""
+   },
+   {
+    "input": "the same copy",
+    "argv": "actionlint -no-color .github/workflows/catalog-freshness.yml",
+    "exit": 0,
+    "output": ""
+   },
+   {
+    "input": "the same line changed to `queue: bogus` (control)",
+    "argv": "actionlint -no-color .github/workflows/catalog-freshness.yml",
+    "exit": 1,
+    "output": ".github/workflows/catalog-freshness.yml:216:14: invalid value \"bogus\" for \"queue\" in \"concurrency\" section. valid values are \"single\" and \"max\" [syntax-check]"
+   },
+   {
+    "input": "evidence/artifacts/actionlint-successor-parity-20260927/fixtures/c6-queue-conflict.yml.txt copied as c6.yml",
+    "argv": "actionlint -no-color c6.yml",
+    "exit": 1,
+    "output": "c6.yml:4:10: \"queue: max\" cannot be combined with \"cancel-in-progress: true\" in \"concurrency\" section [expression]"
+   }
+  ],
+  "not_done": "Re-adopting `queue: max` (the decision record's overturn action) is a behaviour change outside this branch."
+ },
+ "local_lint_at_head": {
+  "evidence_class": "upstream-unchanged",
+  "tree": "this branch's .github/workflows (20 files)",
+  "environment": "env -i PATH=<config PATH> HOME=<empty scratch directory> LANG=C.UTF-8, from the checkout root; no .github/actionlint.yaml exists, so the binary uses its defaults",
+  "runs": [
+   {
+    "config": "no shellcheck on PATH",
+    "argv": "actionlint -color",
+    "exit": 0,
+    "diagnostics": 0
+   },
+   {
+    "config": "no shellcheck on PATH",
+    "argv": "actionlint -format '{{json .}}' .github/workflows/*.yml",
+    "exit": 0,
+    "diagnostics": 0
+   },
+   {
+    "config": "no shellcheck on PATH",
+    "argv": "actionlint -verbose .github/workflows/*.yml",
+    "exit": 0,
+    "files_linted": 20,
+    "summary": "Found 0 errors in 20 files",
+    "shellcheck_rule": "logged as disabled: shellcheck not found in PATH"
+   },
+   {
+    "config": "shellcheck 0.9.0-1 on PATH",
+    "argv": "actionlint -color",
+    "exit": 0,
+    "diagnostics": 0
+   },
+   {
+    "config": "shellcheck 0.9.0-1 on PATH",
+    "argv": "actionlint -format '{{json .}}' .github/workflows/*.yml",
+    "exit": 0,
+    "diagnostics": 0
+   },
+   {
+    "config": "shellcheck 0.9.0-1 on PATH",
+    "argv": "actionlint -verbose .github/workflows/*.yml",
+    "exit": 0,
+    "files_linted": 20,
+    "summary": "Found 0 errors in 20 files",
+    "shellcheck_rule": "no disabled line, so the shellcheck path ran"
+   }
+  ],
+  "base_tree": "The same binary on the unedited base f0219263 (20 workflows): actionlint -color exit 0 without and with shellcheck 0.9.0-1."
+ },
+ "zizmor_at_head": {
+  "evidence_class": "upstream-unchanged",
+  "argv": "zizmor --no-config --no-ignores --persona regular --strict-collection . (validate.yml's command, from the checkout root, without a token, so offline)",
+  "base_f0219263": {
+   "exit": 0,
+   "result": "No findings to report. Good job! (48 suppressed)"
+  },
+  "this_branch": {
+   "exit": 0,
+   "result": "No findings to report. Good job! (47 suppressed)"
+  },
+  "difference": "With --persona pedantic --format json the base has 45 findings and this branch 44; the one missing is anonymous-definition in validate.yml, the removed unnamed actionlint-successor job."
+ },
+ "changes_on_this_branch": [
+  ".github/workflows/validate.yml: the required validate job's actionlint step downloads kjanat/actionlint v1.17.0 with the trial job's URL, digest, sha256sum --check, extract and -version/-color pattern; the step keeps its place after zizmor; the non-required actionlint-successor job is deleted. The job keeps the workflow-level `permissions: contents: read`, harden-runner in audit mode first and persist-credentials: false; no job-level permissions block is added.",
+  ".github/workflows/catalog-freshness.yml: the pin-drift row is actionlint|kjanat/actionlint|1.17.0, and the propose job's concurrency comment states the `queue` history as dated facts.",
+  "catalogs/foundation/automation.json: the actionlint interface entry names kjanat/actionlint 1.17.0 at 08bb2c4f with a dated selection note and overturn condition; the 2026-09-27 stale-upstream note is kept verbatim as history. The entry keeps its six lines.",
+  "docs/github-automation.md: the install and attestation procedure names kjanat/actionlint v1.17.0 (same line count, so line citations after it still hold), and the `queue` sentence is dated.",
+  "tests/test_catalog_freshness_propose.py: the comment above the concurrency-key assertion is dated; the assertion is unchanged."
+ ],
+ "checks_on_this_branch": {
+  "evidence_class": "our-integration",
+  "rows": [
+   {
+    "argv": "python3 -m unittest tests.test_catalog_freshness_pins",
+    "state": "validate.yml swapped, catalog-freshness.yml row not yet changed (failing first)",
+    "exit": 1,
+    "result": "test_actionlint_pin_matches_validate_workflow: AssertionError: '1.7.12' != '1.17.0'; Ran 6 tests, FAILED (failures=1)"
+   },
+   {
+    "argv": "python3 -m unittest tests.test_catalog_freshness_pins",
+    "state": "row changed to actionlint|kjanat/actionlint|1.17.0",
+    "exit": 0,
+    "result": "Ran 6 tests, OK"
+   },
+   {
+    "argv": "python3 -m unittest -v tests.test_workflow_hardening",
+    "exit": 0,
+    "result": "Ran 74 tests, OK (skipped=2: no workflow is hash-frozen; PyYAML not installed, so test_job_parser_matches_yaml_when_available did not run)"
+   },
+   {
+    "argv": "python3 -m unittest tests.test_zizmor_negative_control tests.test_workflow_security tests.test_workflow_security_coverage",
+    "exit": 0,
+    "result": "Ran 16 tests, OK"
+   },
+   {
+    "argv": "python3 -m unittest tests.test_workflow_hardening tests.test_catalog_freshness_pins tests.test_adoption_docs_consistency tests.test_catalog_freshness_propose",
+    "state": "before the registration commit",
+    "exit": 1,
+    "result": "Ran 197 tests, FAILED (failures=1, skipped=3): test_general_publication_validator_passes_after_the_run reported SHA-256 and byte-count mismatches for the five changed registered files, which the branch's last commit re-registers"
+   }
+  ],
+  "reported_in_handoff": "The acceptance set after registration, python3 scripts/validate.py, the component-matrix and new-host grand-list checks and the pre-push registry tests ran after this receipt was registered in manifests/evidence.json, so their exit codes are in the handoff."
+ },
+ "residuals": [
+  {
+   "id": "landscape-layer-11",
+   "text": "catalogs/landscape/foundation.json /layers/11 (ci-supply-chain) still names rhysd/actionlint as a candidate with disposition 'selected' and as an 'overlap' alternative with 1.7.12 evidence, under the sealed two-lane verdict foundation-ci-supply-chain-20260922. It changes only through a sealed re-record in the verdict wave (F-LT-1); this branch leaves catalogs/landscape/* untouched."
+  },
+  {
+   "id": "decision-index",
+   "text": "catalogs/us-equities/decision-index.json lists https://github.com/rhysd/actionlint from that layer's candidates and has no kjanat/actionlint entry; it follows the landscape re-record."
+  },
+  {
+   "id": "queue-overturn",
+   "text": "docs/decisions/2026-09-23-bot-pr-dispatch.md's overturn condition (an actionlint release that accepts `queue`, checked directly) is met by kjanat/actionlint 1.17.0 (queue_key_check). Re-adopting `queue: max` and dropping the per-job keying is a separate behaviour change."
+  },
+  {
+   "id": "dashboard",
+   "text": "observability/grand-dashboard/state.json's actionlint-successor-trial row still reads 'required gate stays rhysd 1.7.12'; the coordinator owns that checkpoint, and this branch leaves it untouched."
+  },
+  {
+   "id": "dated-records",
+   "text": "Dated statements that name rhysd/actionlint 1.7.12 stay as recorded: docs/github-automation.md lines 134-142 and 252-258, docs/catalog-provenance.md lines 141 and 178, docs/github-automation-evidence.json, decision records, catalogs/saturation/ledger.json and catalogs/sota-convergence/*."
+  },
+  {
+   "id": "selection-risk",
+   "text": "The 2026-09-27 trial's selection risk stands: kjanat/actionlint is a fork whose default-branch commits since 2026-08-07 were 242 of 253 by one maintainer; it shipped 12 releases from 2026-08-18 to 2026-09-13; this recording saw no release after v1.17.0 and no default-branch commit after 2026-09-25."
+  }
+ ],
+ "live_run_pending": [
+  "This branch's hosted validate run: the swapped step's checksum line, -version and -color on ubuntu-24.04, and zizmor's online audits over the changed validate.yml.",
+  "A hosted negative control that shows the swapped required step failing on a workflow it should reject.",
+  "The PyYAML-dependent parser cross-check (live_run_pending_20260927 item 3)."
+ ],
+ "overturn_when": "rhysd/actionlint resumes releases (a release after v1.7.12), or GitHub ships an official workflow linter CLI. Either is compared with kjanat/actionlint by the parity method in evidence/artifacts/actionlint-successor-parity-20260927/ before the pin changes.",
+ "retained_failures": [
+  {
+   "what": "gh api repos/seathatflowsinourveins/native-agent-stack/actions/jobs/<job_id>/logs",
+   "exit": 1,
+   "output": "the response contains terminal escape sequences; pass --allow-escape-sequences to output it anyway",
+   "resolution": "the job logs were read with gh run view <run_id> --job <job_id> --log instead"
+  },
+  {
+   "what": "the first queue_key_check run, in a scratch directory that was not a git repository",
+   "exit": 3,
+   "output": "no project was found in any parent directories of \"<scratch>/queue\". check workflows directory is put correctly in your Git repository",
+   "resolution": "the scratch tree was git-initialised, as a checkout is, and the run repeated (queue_key_check)"
+  }
+ ],
+ "sanitization": [
+  "Hosted log paths under the runner's temporary directory are written as $RUNNER_TEMP/...; local scratch and checkout paths as <scratch> and <checkout root>.",
+  "Raw gh JSON, job logs and verbose lint output stayed in scratch; only the fields quoted here were extracted.",
+  "No credential value was read or printed. The hosted log shows GH_TOKEN only as GitHub's mask ***; local zizmor ran without a token."
+ ],
+ "claim_boundary": "On GitHub-hosted ubuntu-24.04 runners, the non-required kjanat/actionlint 1.17.0 job and the required rhysd/actionlint 1.7.12 step both succeeded, and so reported no diagnostic, on all 25 push runs of validate.yml on main from b60d5182 through f0219263. On this host the release archive, its checksum and its SLSA provenance verify, and 1.17.0 reports no diagnostic on this branch's 20 workflows with and without shellcheck 0.9.0-1. That supports swapping the required step; it does not pair diagnostics on hosted runs, is not this branch's hosted run, and does not re-record the sealed ci-supply-chain landscape verdict."
+}
