@@ -14674,6 +14674,11 @@
       "bytes": 15185
     },
     {
+      "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
+      "sha256": "b16035ef887a80cc901a6f3aca59ece2561c0f6add8cbf68b7d41c9700e4d525",
+      "bytes": 8065
+    },
+    {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
       "sha256": "ae31b360ec348e3d7f58948e06e1d82de2fc99b33fad44bb7d3e8fb20de0fb54",
       "bytes": 17458
@@ -44109,6 +44114,11 @@
       "bytes": 6838
     },
     {
+      "path": "tests/test_token_e2e_grader.py",
+      "sha256": "82f16f26a943a27da17d2ee15ef525c140ddcd5f4d029dae1273f1502460f9ac",
+      "bytes": 479399
+    },
+    {
       "path": "tests/test_token_e2e_preregistration.py",
       "sha256": "4e7f464773f6bf8324e7622522d64367d501e76758ebf96930f2094a5e824055",
       "bytes": 55079
@@ -44500,13 +44510,168 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "86227fabca32e7d7a19433c5ce3342021ee7dd19b5c35ec5560aecdf8e823ce7",
-      "bytes": 33946
+      "sha256": "9e83daeef39dced03607a64c737bf2510280312012bbec8f0fa20a8613bf2935",
+      "bytes": 41129
+    },
+    {
+      "path": "tools/token-e2e/calibration/T0.json",
+      "sha256": "27d917b630a55bb3f563c101ed2d1f1856317e1a9bdae9bfc2cbe9dd5205fe45",
+      "bytes": 889
+    },
+    {
+      "path": "tools/token-e2e/calibration/T12.json",
+      "sha256": "786d6d70747926fe7ecad2a5994dfcbc269aa178a5d98f777d3d7375ac9b0aca",
+      "bytes": 1894
+    },
+    {
+      "path": "tools/token-e2e/calibration/T13.json",
+      "sha256": "0066dbbcc5e4fd894234516da4853a0bd36b5f02557165f9efbd9a6e7d63a985",
+      "bytes": 1789
+    },
+    {
+      "path": "tools/token-e2e/calibration/T14.json",
+      "sha256": "6d06146ab95499b96f9a869bd29e9b9ce45a6474d01e15ef74feb84e9fd79bf6",
+      "bytes": 1683
+    },
+    {
+      "path": "tools/token-e2e/calibration/T16.json",
+      "sha256": "455e9849451ad1bd23ef6cb7ed02fc40acd6ce0449a343397da38ca3da9e3438",
+      "bytes": 2529
+    },
+    {
+      "path": "tools/token-e2e/calibration/T17.json",
+      "sha256": "f20d0c7c0a59e1fa898183ba5d4ff1f5ff2ca44ece779576b8b8b2f6da8cf753",
+      "bytes": 2691
+    },
+    {
+      "path": "tools/token-e2e/calibration/T18.json",
+      "sha256": "06f9f0689d717e898184b0e52d1c735d05824a9e1d6925d635bf402b48833ae8",
+      "bytes": 2503
+    },
+    {
+      "path": "tools/token-e2e/calibration/T19.json",
+      "sha256": "42bb15a0be9d259e9ae4a147cf010dd8ec47bd7c157793c864559592893d44a4",
+      "bytes": 2360
+    },
+    {
+      "path": "tools/token-e2e/calibration/T20.json",
+      "sha256": "97a80987196045dcf7b6bfa31c58e9aea69086c83fc5986c9182ad500e027f6b",
+      "bytes": 2516
+    },
+    {
+      "path": "tools/token-e2e/calibration/T21.json",
+      "sha256": "57395d76836ac64d37b6c58ed7a471335486b2471cfa057666204a1582e709ef",
+      "bytes": 2654
+    },
+    {
+      "path": "tools/token-e2e/calibration/T22.json",
+      "sha256": "49ab6689b10c335e8e71190c5528578740d786f5d730f930b02cc89321e7ffa6",
+      "bytes": 2715
+    },
+    {
+      "path": "tools/token-e2e/calibration/T23.json",
+      "sha256": "03f1aee3e756c542b9262460419340bceefa639beda876894bbeb5429b249cb8",
+      "bytes": 2730
+    },
+    {
+      "path": "tools/token-e2e/calibration/T24.json",
+      "sha256": "a0d544f01689051ca99164163bd4d0c271dd0fc4816870c92e03aed953fb7c3a",
+      "bytes": 2854
+    },
+    {
+      "path": "tools/token-e2e/calibration/T25.json",
+      "sha256": "0d7a8439baf7a6909909c3ea90466e01d5b64a37269104af156af2082ff24ba5",
+      "bytes": 2531
+    },
+    {
+      "path": "tools/token-e2e/calibration/T28.json",
+      "sha256": "51c6f528bbccf9a6a79fe5574a641ac93302252f922b308a40c6d6ec52e8fbc3",
+      "bytes": 3195
+    },
+    {
+      "path": "tools/token-e2e/calibration/T37.json",
+      "sha256": "04cea21ba05ef337970dcd27f5d961d3f7d2ec6ee83df9d3da04cc9a28d8a9c4",
+      "bytes": 1531
+    },
+    {
+      "path": "tools/token-e2e/calibration/T4.json",
+      "sha256": "ca0beef6746a37a7554ccef331c1f74bfe604cb9e72aa2b676c078dff196cd20",
+      "bytes": 2875
+    },
+    {
+      "path": "tools/token-e2e/calibration/T5.json",
+      "sha256": "ef1af04fc82cb703721947fd26418f581e4447ec296951ccb8cd6fdc3e688cc0",
+      "bytes": 2140
+    },
+    {
+      "path": "tools/token-e2e/calibration/T6.json",
+      "sha256": "41390c8dee257492257e0ae5e1ad768e581a8445e61ad44bcd9220d6b818ad16",
+      "bytes": 4218
+    },
+    {
+      "path": "tools/token-e2e/calibration/T7.json",
+      "sha256": "40f53df3e6737c317d268cb3f3dd3ac6f6b30f392444db8bdbc5e0c7ebd2f3fe",
+      "bytes": 2329
+    },
+    {
+      "path": "tools/token-e2e/calibration/T9.json",
+      "sha256": "af77364f5657f3ac87c848eb8fff1d30623188609e681047183d3121766148b2",
+      "bytes": 850
+    },
+    {
+      "path": "tools/token-e2e/calibration/oracle-controls.json",
+      "sha256": "0c5708f48f1471f0d47930dec850d108079eb4bdee0a27489e6e1803c0d62b10",
+      "bytes": 60754
+    },
+    {
+      "path": "tools/token-e2e/evidence.py",
+      "sha256": "80c1761acec2f39803fda3a17efaabbbd057fef94c425f271d4a56b84691c9b2",
+      "bytes": 172941
     },
     {
       "path": "tools/token-e2e/freeze_snapshot.py",
       "sha256": "27e9c97f9e82b71deb27e04d933fe5752c045ac931bdc7e4432ecbc1b987acb7",
       "bytes": 126664
+    },
+    {
+      "path": "tools/token-e2e/frozen-check-judge.js",
+      "sha256": "0d78ba73e8bc251a714eb397b0501390313207b35f0a2af59e0865c3362b1cb0",
+      "bytes": 7194
+    },
+    {
+      "path": "tools/token-e2e/frozen_checks.py",
+      "sha256": "1cdb4762ffd6022627a8539d6e812f9ff4e1443d4447c9f76745d84891e9e4ea",
+      "bytes": 167211
+    },
+    {
+      "path": "tools/token-e2e/grade.py",
+      "sha256": "c3b4c55143945b705ab3ddde7c9610f83597c00989c66ee10c4d7de32e9991c9",
+      "bytes": 63035
+    },
+    {
+      "path": "tools/token-e2e/grading-block.schema.json",
+      "sha256": "a03902e0a73ab4bd78e5f3a1d8a4efeb0552e53a45532fb3e6696c7be5f9876e",
+      "bytes": 11141
+    },
+    {
+      "path": "tools/token-e2e/judge-template.md",
+      "sha256": "19068ee982c74199f1ab9ff5f46b495333313cc3f28832e7c9d27657e3f94a2a",
+      "bytes": 2769
+    },
+    {
+      "path": "tools/token-e2e/judge.py",
+      "sha256": "96aeaefcd08757c0282e1c2efade557608a6760abaf1bc97aaf4afbd2b75702c",
+      "bytes": 76760
+    },
+    {
+      "path": "tools/token-e2e/judgment.schema.json",
+      "sha256": "0ac512fd538d4d2443ee3af105c9d939994652338da9baea87eafd1e5d2103cf",
+      "bytes": 1040
+    },
+    {
+      "path": "tools/token-e2e/node_bridge.mjs",
+      "sha256": "848f576bc3c210429f9fb4f8fb31efea91c316eb6bd1285ff3807beafb0632b3",
+      "bytes": 4121
     },
     {
       "path": "tools/token-report/README.md",
