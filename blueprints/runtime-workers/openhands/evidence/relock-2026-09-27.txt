@@ -1,0 +1,584 @@
+Runtime lock security relock, 2026-09-27. Local scratch evidence only: no
+container, image installation, model, gateway or official grading run.
+<scratch> is a private scratch directory and <worktree> the recipe checkout.
+<sdk> is an unchanged copy of
+OpenHands/software-agent-sdk@fcc102a697874d54a357e36004e02c95040dbdc0; <upgrade>
+and <env-upgrade> are further copies used for relocks. uv is the installed
+0.12.17. The final lock is section F: the environments restriction plus four
+upgrades, with cryptography left at 50.0.0. Section C (five upgrades, including
+cryptography 50.0.1) and its checks in sections D and E are superseded and kept
+as returned. Section B keeps the rejected, declined and superseded attempts.
+
+== A. Upstream source and reproduction of the previous lock
+
+Command: curl -fsSL -o <scratch>/sdk-fcc102a6.tar.gz https://codeload.github.com/OpenHands/software-agent-sdk/tar.gz/fcc102a697874d54a357e36004e02c95040dbdc0; sha256sum of the archive and of its extracted uv.lock
+Exit code: 0
+Returned output:
+2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8  sdk-fcc102a6.tar.gz
+d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910  <sdk>/uv.lock
+(Both equal pins.json source_archive.sha256 and uv_lock.sha256.)
+
+Command (in <sdk>): uv lock --check
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 419 packages in 4ms
+
+Command (in <sdk>): uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace -o <export>
+Exit code: 0
+It ran three times: with UV_NO_CONFIG=1, with UV_NO_CONFIG=1 plus --no-dev, and
+without UV_NO_CONFIG. Each output was compared by cmp with the previous
+requirements.lock minus its last four lines.
+Exit codes: 0, 0, 0
+Returned output: (empty)
+
+Command: python3 - (append "<name> @ <url> \\\n    --hash=sha256:<sha256>\n" for each pins.json wheels entry, in file order, to the first export; compare with the previous requirements.lock)
+Exit code: 0
+Returned output:
+reconstructed sha256 c4ca55604ea0bc85e74ccaa8b2c5bf9fa7b17cec35b830eda653025cb90ebd56
+current sha256       c4ca55604ea0bc85e74ccaa8b2c5bf9fa7b17cec35b830eda653025cb90ebd56
+identical: True
+
+== B. Rejected, declined and superseded attempts (universal resolution)
+
+B1, rejected. Command (in <upgrade>, with UV_NO_CONFIG=1): uv lock --upgrade-package anyio --upgrade-package click --upgrade-package cryptography --upgrade-package pypdf --upgrade-package soupsieve
+Exit code: 0
+Returned output:
+Using CPython 3.14.7
+Resolving despite existing lockfile due to removal of global exclude newer
+Resolved 418 packages in 2.15s
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v48.0.1
+Updated pypdf v6.14.2 -> v6.19.0
+Updated soupsieve v2.8.4 -> v2.10
+Reason rejected: UV_NO_CONFIG disables pyproject.toml discovery, so the
+workspace's seven-day exclude-newer was dropped (soupsieve 2.10 was uploaded
+2026-09-24T02:36:33Z).
+
+B2, rejected. Command (in a fresh <upgrade>, workspace configuration honored): uv lock --upgrade-package anyio --upgrade-package click --upgrade-package cryptography --upgrade-package pypdf --upgrade-package soupsieve
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 418 packages in 232ms
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v48.0.1
+Updated pypdf v6.14.2 -> v6.19.0
+Updated soupsieve v2.8.4 -> v2.9.2
+Reason rejected: the cryptography fork collapsed to 48.0.1 under
+pyproject.toml:18, "cryptography<49; sys_platform == 'darwin' and
+platform_machine == 'x86_64'", which would downgrade Linux from 50.0.0.
+
+B3, superseded intermediate. Command (in a fresh <upgrade>, started 2026-09-27T21:49:57Z): uv lock --upgrade-package anyio --upgrade-package click --upgrade-package pypdf --upgrade-package soupsieve
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 419 packages in 321ms
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated pypdf v6.14.2 -> v6.19.0
+Updated soupsieve v2.8.4 -> v2.9.2
+Resulting uv.lock SHA256: 531e84bb0955a9da8be6adfb37f9c2e7ecf7a002417ce13c97387b6ffa7d1ec6
+The version-pinned replay (anyio==4.14.2, click==8.5.0, pypdf==6.19.0,
+soupsieve==2.9.2) printed the same four updates and produced the same uv.lock
+(cmp exit 0). The export and wheel append gave requirements SHA256
+da0d550f1e03d42ef2d1f4fe31a608eb8abdb796ecb9354d30457875f2172d71, four changed
+three-line blocks. Section D2 shows its remaining advisories.
+
+Probe, not applied. Command (in a fresh copy of <sdk>): uv lock --dry-run --upgrade-package anyio --upgrade-package typing-extensions
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 419 packages in 225ms
+Update anyio v4.11.0 -> v4.15.1
+Update typing-extensions v4.15.0 -> v4.16.0
+(uv.lock unchanged. PyPI metadata for anyio 4.15.0 and 4.15.1 lists
+'typing_extensions>=4.16.0; python_version < "3.15"'.)
+
+B4, declined. Command (in a copy of the B3 <upgrade>): delete pyproject.toml line 18, then uv lock --upgrade-package cryptography
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 418 packages in 256ms
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.1
+The coordinator declined deleting the upstream constraint and selected the
+environments restriction in section C.
+
+== C. Superseded by section F: linux x86_64 environments restriction plus five upgrades
+
+Change (in <env-upgrade>, a fresh copy of <sdk>; git diff --no-index -U0 of pyproject.toml):
+@@ -6,0 +7 @@ members = ["openhands-sdk", "openhands-tools", "openhands-workspace", "openhands
++environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+Resulting pyproject.toml SHA256: 9abe06798fbc2c42454e0c5685991fab682725fb3ba4363e5078b754777db2e9
+
+Command (in <env-upgrade>, started 2026-09-27T22:08:28Z): uv lock --upgrade-package anyio --upgrade-package click --upgrade-package cryptography --upgrade-package pypdf --upgrade-package soupsieve
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 412 packages in 1.86s
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.1
+Removed cython v3.1.4
+Removed macholib v1.16.3
+Removed pefile v2023.2.7
+Removed pyobjc-framework-pubsub v11.1
+Updated pypdf v6.14.2 -> v6.19.0
+Removed pywin32 v311
+Removed pywin32-ctypes v0.2.3
+Updated soupsieve v2.8.4 -> v2.9.2
+Resulting uv.lock SHA256: b3e8a6f4c32ce5d558a8152b63993f5cbaf852b0ff6a667c14069b47d5443d91
+Then: uv lock --check
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 412 packages in 2ms
+
+Version-pinned replay. Command (in a fresh copy of <sdk> with the same pyproject.toml): uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package cryptography==50.0.1 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 412 packages in 232ms
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.1
+Removed cython v3.1.4
+Removed macholib v1.16.3
+Removed pefile v2023.2.7
+Removed pyobjc-framework-pubsub v11.1
+Updated pypdf v6.14.2 -> v6.19.0
+Removed pywin32 v311
+Removed pywin32-ctypes v0.2.3
+Updated soupsieve v2.8.4 -> v2.9.2
+Resulting uv.lock SHA256: b3e8a6f4c32ce5d558a8152b63993f5cbaf852b0ff6a667c14069b47d5443d91 (cmp exit 0 against the run above)
+
+Command (in <env-upgrade>): the section A export command with -o <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+Exit code: 0
+The four pins.json wheel lines were then appended with the editor. A separate
+copy was built in <scratch> from the same export plus the section A append.
+Then: sha256sum, wc -l and cmp of the worktree lock against that copy
+Returned output: f215ac9f6446b3b7c3068695f23f9d96556b0dda36b83134b701aae2ddefaacf
+for both files; 1133 lines; cmp exit 0.
+
+Classification of every change against the previous lock. Local check, not
+upstream acceptance: a scratch Python script using packaging 26.3 (installed
+from build-requirements.lock with hashes) parsed both requirement files. It
+mapped every removed or added hash to its file through the upstream and relocked
+uv.lock files, checked each removed wheel's platform tags for linux x86_64
+(manylinux, musllinux or linux x86_64, or any), and evaluated the old and new
+markers with Marker.evaluate on eight environments: sys_platform linux,
+platform_system Linux, platform_machine x86_64, CPython and PyPy, Python 3.12,
+3.13, 3.14 and 3.15.
+Exit code: 0
+Returned output (the 329 per-entry marker lines and the 159 remaining pyobjc
+lines are summarized by count):
+requirement entries: old 342, new 336
+environment grid: linux x86_64 x (CPython, PyPy) x (3.12, 3.13, 3.14, 3.15) = 8
+
+== Packages removed entirely (old marker; applies on linux x86_64 grid?)
+  colorama==0.4.6 ; sys_platform == 'win32'  -> applies on linux x86_64: False
+  cython==3.1.4 ; platform_system != 'darwin' and sys_platform == 'darwin'  -> applies on linux x86_64: False
+  pyobjc-framework-pubsub==11.1 ; platform_release >= '9' and platform_release < '18' and platform_system == 'darwin' and sys_platform == 'darwin'  -> applies on linux x86_64: False
+  pywin32==311 ; sys_platform == 'win32'  -> applies on linux x86_64: False
+  pywin32-ctypes==0.2.3 ; sys_platform == 'win32'  -> applies on linux x86_64: False
+
+== Packages added
+
+== Version changes
+  anyio: 4.11.0 -> 4.14.2  [one of the five]
+  click: 8.1.8 -> 8.5.0  [one of the five]
+  cryptography: 48.0.1, 50.0.0 -> 50.0.1  [one of the five]
+  pypdf: 6.14.2 -> 6.19.0  [one of the five]
+  soupsieve: 2.8.4 -> 2.9.2  [one of the five]
+
+== Marker changes on unchanged (name, version) entries
+  [329 lines. 162 read "<name>==<version>: None -> \"platform_machine == 'x86_64' and sys_platform == 'linux'\"".
+   The other 167 (159 pyobjc entries, cffi, google-api-core 2.26.0 and 2.31.0,
+   hf-xet, jeepney, pycparser, screeninfo and secretstorage) combine that marker
+   with the previous one, for example
+   cffi==2.0.0: "platform_python_implementation != 'PyPy'" -> "platform_machine == 'x86_64' and platform_python_implementation != 'PyPy' and sys_platform == 'linux'".
+   Every line ends "same linux x86_64 applicability: True"; none ends False.]
+  total marker changes: 329
+
+== Hash lines removed from unchanged (name, version) entries, by wheel platform family
+  android arm64_v8a: 2
+  android x86_64: 2
+  ios ios_13_0_arm64_iphoneos: 5
+  ios ios_13_0_arm64_iphonesimulator: 5
+  linux armv7l: 3
+  macosx arm64: 102
+  macosx universal2: 533
+  macosx x86_64: 96
+  manylinux aarch64: 121
+  manylinux armv7l: 54
+  manylinux i686: 53
+  manylinux ppc64le: 71
+  manylinux riscv64: 20
+  manylinux s390x: 68
+  musllinux aarch64: 102
+  musllinux armv7l: 42
+  musllinux i686: 31
+  musllinux ppc64le: 38
+  musllinux riscv64: 10
+  musllinux s390x: 32
+  win amd64: 108
+  win arm64: 75
+  win win32: 94
+  total removed hashes: 1667 across 128 packages
+  hashes added to unchanged entries: 0
+
+== The five: old -> new, hash counts
+  anyio: 4.11.0 (None) 2 hashes  ->  4.14.2 (platform_machine == 'x86_64' and sys_platform == 'linux') 2 hashes
+  click: 8.1.8 (None) 2 hashes  ->  8.5.0 (platform_machine == 'x86_64' and sys_platform == 'linux') 2 hashes
+  cryptography: 48.0.1 (platform_machine == 'x86_64' and sys_platform == 'darwin') 4 hashes; 50.0.0 (platform_machine != 'x86_64' or sys_platform != 'darwin') 40 hashes  ->  50.0.1 (platform_machine == 'x86_64' and sys_platform == 'linux') 13 hashes
+  pypdf: 6.14.2 (None) 2 hashes  ->  6.19.0 (platform_machine == 'x86_64' and sys_platform == 'linux') 2 hashes
+  soupsieve: 2.8.4 (None) 2 hashes  ->  2.9.2 (platform_machine == 'x86_64' and sys_platform == 'linux') 2 hashes
+
+== Remaining entries whose marker never applies on linux x86_64
+  [159 lines, all pyobjc, pyobjc-core or pyobjc-framework-* entries]
+
+VIOLATIONS: 0
+
+The 13 cryptography 50.0.1 hashes map through the relocked uv.lock to
+cryptography-50.0.1.tar.gz and twelve x86_64 wheels: cp39-abi3, cp311-abi3 and
+cp314-cp314t, each as manylinux2014/manylinux_2_17, manylinux_2_28,
+manylinux_2_34 and musllinux_1_2.
+
+== D. OSV-Scanner 2.6.0 (D3 and D4 scanned the superseded section C lock; section F repeats D4)
+
+Binary SHA256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108,
+as pinned in .github/workflows/security-scan.yml; osv-scanner --version: 2.6.0.
+Single-file scans ran in <scratch>/exp with --config
+<worktree>/.github/osv-scanner.toml --no-resolve. Their notice that the two
+Lumibot ignores were unused, and the scan log lines, are omitted below.
+
+D1. Command: osv-scanner scan source ... --lockfile=requirements.txt:old-requirements.lock (the previous lock, from git HEAD)
+Exit code: 1
+Returned output:
+Total 5 packages affected by 14 known vulnerabilities (1 Critical, 3 High, 10 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+14 vulnerabilities can be fixed.
+
++-------------------------------------+------+-----------+--------------+---------+---------------+-----------------------+
+| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE      | VERSION | FIXED VERSION | SOURCE                |
++-------------------------------------+------+-----------+--------------+---------+---------------+-----------------------+
+| https://osv.dev/GHSA-5p39-cfhj-2xmp | 6.8  | PyPI      | anyio        | 4.11.0  | 4.14.2        | old-requirements.lock |
+| https://osv.dev/GHSA-82r6-8w77-94w6 | 9.3  | PyPI      | anyio        | 4.11.0  | 4.14.2        | old-requirements.lock |
+| https://osv.dev/PYSEC-2026-2132     | 7.2  | PyPI      | click        | 8.1.8   | 8.3.3         | old-requirements.lock |
+| https://osv.dev/PYSEC-2026-3552     | 8.2  | PyPI      | cryptography | 48.0.1  | 50.0.0        | old-requirements.lock |
+| https://osv.dev/GHSA-g6cj-pr64-35w5 |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3553     | 8.7  | PyPI      | cryptography | 48.0.1  | 49.0.0        | old-requirements.lock |
+| https://osv.dev/GHSA-jwv3-5hgf-82ww |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3554     | 6.9  | PyPI      | cryptography | 48.0.1  | 49.0.0        | old-requirements.lock |
+| https://osv.dev/GHSA-m2h6-j472-rp4c |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3655     | 4.8  | PyPI      | pypdf        | 6.14.2  | 6.15.0        | old-requirements.lock |
+| https://osv.dev/GHSA-fp3f-mc75-235c |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3656     | 4.8  | PyPI      | pypdf        | 6.14.2  | 6.15.0        | old-requirements.lock |
+| https://osv.dev/GHSA-fwg2-594c-jp42 |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3910     | 4.8  | PyPI      | pypdf        | 6.14.2  | 6.16.1        | old-requirements.lock |
+| https://osv.dev/GHSA-23w6-3w8w-8484 |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3911     | 4.8  | PyPI      | pypdf        | 6.14.2  | 6.16.1        | old-requirements.lock |
+| https://osv.dev/GHSA-763m-79hh-57f2 |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3912     | 6.9  | PyPI      | pypdf        | 6.14.2  | 6.15.0        | old-requirements.lock |
+| https://osv.dev/GHSA-fc8x-2rww-xw9m |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3913     | 6.9  | PyPI      | pypdf        | 6.14.2  | 6.16.0        | old-requirements.lock |
+| https://osv.dev/GHSA-jp53-mhqp-8xcg |      |           |              |         |               |                       |
+| https://osv.dev/GHSA-gjv8-xp57-g29c | 5.3  | PyPI      | soupsieve    | 2.8.4   | 2.9.0         | old-requirements.lock |
+| https://osv.dev/GHSA-j934-xhv5-fg8f | 5.3  | PyPI      | soupsieve    | 2.8.4   | 2.9.0         | old-requirements.lock |
++-------------------------------------+------+-----------+--------------+---------+---------------+-----------------------+
+
+D2. Command: osv-scanner scan source ... --lockfile=requirements.txt:new-requirements.lock (the superseded B3 lock)
+Exit code: 1
+Returned output (the Total line and table rows; table borders, header and the
+"3 vulnerabilities can be fixed." line omitted):
+Total 1 package affected by 3 known vulnerabilities (0 Critical, 2 High, 1 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+| https://osv.dev/PYSEC-2026-3552     | 8.2  | PyPI      | cryptography | 48.0.1  | 50.0.0        | new-requirements.lock |
+| https://osv.dev/GHSA-g6cj-pr64-35w5 |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3553     | 8.7  | PyPI      | cryptography | 48.0.1  | 49.0.0        | new-requirements.lock |
+| https://osv.dev/GHSA-jwv3-5hgf-82ww |      |           |              |         |               |                       |
+| https://osv.dev/PYSEC-2026-3554     | 6.9  | PyPI      | cryptography | 48.0.1  | 49.0.0        | new-requirements.lock |
+| https://osv.dev/GHSA-m2h6-j472-rp4c |      |           |              |         |               |                       |
+
+D3. Command: osv-scanner scan source ... --lockfile=requirements.txt:env-requirements.lock (the section C lock)
+Exit code: 0
+Returned output:
+Scanned <scratch>/exp/env-requirements.lock file and found 334 packages
+No issues found
+
+D4. Command (from <worktree> after the change): mapfile -t lockfiles < <(jq -r '.lockfiles[] | "--lockfile=\(.parser // ""):\(.path)"' .github/osv-scanner-lockfiles.json); osv-scanner scan source --config .github/osv-scanner.toml --no-resolve "${lockfiles[@]}"
+Exit code: 0
+Returned output (49 lockfile arguments; scan log lines omitted; the filtered
+lines were identical in the scan before this change):
+Filtered 175 local/unscannable package/s from the scan.
+GHSA-8mgp-746c-j5xp and 2 aliases have been filtered out because: nltk 3.10.3 [Lumibot ignore reason as in .github/osv-scanner.toml]
+GHSA-h35f-9h28-mq5c and 3 aliases have been filtered out because: setuptools 80.10.2 [Lumibot ignore reason as in .github/osv-scanner.toml]
+Filtered 3 vulnerabilities from output
+
+No issues found
+The scan log includes: Scanned <worktree>/blueprints/runtime-workers/openhands/requirements.lock file and found 334 packages
+
+== E. Consistency check on the section C lock (superseded; see section F)
+
+Environment: uv venv --python python3.13 <scratch>/venv (CPython 3.13.15), with
+TMPDIR, UV_CACHE_DIR and the venv under <scratch>, PYTHONDONTWRITEBYTECODE=1,
+UV_NO_CONFIG=1 and UV_PYTHON_DOWNLOADS=never.
+
+Command: curl -fsSL https://pypi.org/pypi/func-timeout/json (file types per 4.3.x release)
+Exit code: 0
+Returned output:
+latest 4.3.5
+{'4.3.0': ['sdist'], '4.3.1': ['sdist'], '4.3.2': ['sdist'], '4.3.3': ['sdist'], '4.3.4': ['sdist'], '4.3.5': ['sdist']}
+
+Command: uv pip install --python <scratch>/venv/bin/python --require-hashes --only-binary=:all: --no-deps -r requirements.lock
+Exit code: 1
+Returned output:
+Using Python 3.13.15 environment at: <scratch>/venv
+error: No solution found when resolving dependencies
+  cause: Because func-timeout{platform_machine == 'x86_64' and sys_platform == 'linux'}==4.3.5 has no usable wheels and you require func-timeout{platform_machine == 'x86_64' and sys_platform == 'linux'}==4.3.5, we can conclude that your requirements are unsatisfiable.
+
+hint: Wheels are required for `func-timeout` because building from source is disabled for all packages (i.e., with `--no-build`)
+
+Command (install-container.sh step 1): uv pip install --python <scratch>/venv/bin/python --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r build-requirements.lock
+Exit code: 0
+Returned output:
+Using Python 3.13.15 environment at: <scratch>/venv
+Resolved 3 packages in 1ms
+Installed 3 packages in 31ms
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3
+
+Command (install-container.sh step 2): uv pip install --python <scratch>/venv/bin/python --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r requirements.lock
+Exit code: 0
+Returned output (excerpt: every line except the Downloading/Downloaded lines and
+175 "+" lines, then selected "+" lines):
+Using Python 3.13.15 environment at: <scratch>/venv
+Resolved 176 packages in 18ms
+   Building func-timeout==4.3.5
+      Built func-timeout==4.3.5
+Prepared 175 packages in 1.30s
+Installed 175 packages in 522ms
+ + anyio==4.14.2
+ + cffi==2.0.0
+ + click==8.5.0
+ + cryptography==50.0.1
+ + func-timeout==4.3.5
+ + google-api-core==2.31.0
+ + jeepney==0.9.0
+ + openhands-sdk==1.49.6 (from https://files.pythonhosted.org/packages/e9/ac/d27c5becc3b59b8cc46a1614ac478cc94eb73e626ab15831906fcdaafb29/openhands_sdk-1.49.6-py3-none-any.whl)
+ + openhands-tools==1.49.6 (from https://files.pythonhosted.org/packages/68/20/27d6d20cc8f3465ec861c450bc0113c8646285aa6c8f4291b62366dcb8a2/openhands_tools-1.49.6-py3-none-any.whl)
+ + pypdf==6.19.0
+ + soupsieve==2.9.2
+
+Command (install-container.sh step 3): uv pip check --python <scratch>/venv/bin/python
+Exit code: 0
+Returned output:
+Using Python 3.13.15 environment at: <scratch>/venv
+Checked 178 packages in 3ms
+All installed packages are compatible
+
+Command: diff of the sorted "+" lines from step 2 on the B3 lock (same commands, earlier venv) and on the section C lock
+Exit code: 1
+Returned output:
+29c29
+<  + cryptography==50.0.0
+---
+>  + cryptography==50.0.1
+(The B3 run's steps 1 to 3 also exited 0, 0 and 0, with "Installed 175 packages"
+and "All installed packages are compatible".)
+
+Command (install-container.sh import check): bwrap --unshare-net --die-with-parent --ro-bind / / --bind <scratch> <scratch> --dev /dev --proc /proc --tmpfs /tmp --setenv HOME <scratch>/home --setenv TMPDIR <scratch> --setenv PYTHONDONTWRITEBYTECODE 1 -- <scratch>/venv/bin/python -c '<the install-container.sh import assertion, unchanged>'
+Exit code: 0
+Returned output (ANSI colour codes removed):
+18:11:16 - LiteLLM:WARNING: get_model_cost_map.py:290 - LiteLLM: Failed to fetch remote model cost map from https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json: [Errno -3] Temporary failure in name resolution. Falling back to local backup.
++----------------------------------------------------------------------+
+|  OpenHands SDK v1.49.6                                               |
+|                                                                      |
+|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |
+|  Get help: openhands.dev/joinslack                                   |
+|  Scale up: openhands.dev/product/sdk                                 |
+|                                                                      |
+|  Set OPENHANDS_SUPPRESS_BANNER=1 to hide this message                |
++----------------------------------------------------------------------+
+
+SDK/tools 1.49.6 imports passed; no model request
+
+== F. Final lock: linux x86_64 environments restriction plus four upgrades
+
+Coordinator decision, 2026-09-27T22:06:57Z: cryptography is not upgraded. The
+linux x86_64 resolution already locks cryptography 50.0.0, and PYSEC-2026-3552,
+PYSEC-2026-3553 and PYSEC-2026-3554 are fixed in 50.0.0, 49.0.0 and 49.0.0
+(section D1). The section C lock (cryptography 50.0.1; uv.lock b3e8a6f4...,
+requirements.lock f215ac9f...) is superseded.
+
+The relock builder produced this lock; its session ended before it recorded the
+run here. The coordinator then reproduced it independently from a fresh copy
+<repro> of <sdk>, with uv 0.12.17 and UV_CACHE_DIR under <scratch>.
+
+Command: sha256sum <repro>/uv.lock (before any change)
+Exit code: 0
+Returned output:
+d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910  uv.lock
+
+Change (diff <sdk>/pyproject.toml <repro>/pyproject.toml), the same line as section C:
+6a7
+> environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+Resulting pyproject.toml SHA256: 9abe06798fbc2c42454e0c5685991fab682725fb3ba4363e5078b754777db2e9 (as in section C)
+
+Command (in <repro>): uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2
+Exit code: 0
+Returned output (Resolved and download lines filtered by the command):
+Using CPython 3.13.15
+Updated anyio v4.11.0 -> v4.14.2
+Updated click v8.1.8 -> v8.5.0
+Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+Removed cython v3.1.4
+Removed macholib v1.16.3
+Removed pefile v2023.2.7
+Removed pyobjc-framework-pubsub v11.1
+Updated pypdf v6.14.2 -> v6.19.0
+Removed pywin32 v311
+Removed pywin32-ctypes v0.2.3
+Updated soupsieve v2.8.4 -> v2.9.2
+Resulting uv.lock SHA256: 30e608b1fdb091db1609e8261a787020df12e0350911079cc2177c772a9ccffd
+(cmp: byte-identical to the relock builder's four-package workspace. The
+cryptography line is the darwin x86_64 fork leaving the resolved environment;
+linux keeps 50.0.0.)
+
+Command (in <repro>): uv lock --check
+Exit code: 0
+Returned output:
+Using CPython 3.13.15
+Resolved 412 packages in 2ms
+
+Command (in <repro>): uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace, then the pins.json wheels appended as in section A (`<name> @ <url> \` and `    --hash=sha256:<sha256>`)
+Exit code: 0
+Returned output (sha256sum; `cmp` against <worktree>/blueprints/runtime-workers/openhands/requirements.lock exited 0):
+02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394
+(A first append without the trailing ` \` differed from the worktree lock only
+on the two URL lines, 1130 and 1132.)
+
+Command: <scratch>/toolvenv/bin/python <scratch>/analyze_lock_diff.py <HEAD requirements.lock> <new export> <sdk>/uv.lock <repro>/uv.lock
+Exit code: 0
+Returned output (long package lists cut at 250 characters):
+requirement entries: old 342, new 336
+environment grid: linux x86_64 x (CPython, PyPy) x (3.12, 3.13, 3.14, 3.15) = 8
+
+== Old entries without a same-version new entry
+  anyio==4.11.0 ; None  -> upgraded (allowed)
+  click==8.1.8 ; None  -> upgraded (allowed)
+  colorama==0.4.6 ; sys_platform == 'win32'  -> removed; never applies on linux x86_64
+  cryptography==48.0.1 ; platform_machine == 'x86_64' and sys_platform == 'darwin'  -> removed; never applies on linux x86_64
+  cython==3.1.4 ; platform_system != 'darwin' and sys_platform == 'darwin'  -> removed; never applies on linux x86_64
+  pyobjc-framework-pubsub==11.1 ; platform_release >= '9' and platform_release < '18' and platform_system == 'darwin' and sys_platform == 'darwin'  -> removed; never applies on linux x86_64
+  pypdf==6.14.2 ; None  -> upgraded (allowed)
+  pywin32==311 ; sys_platform == 'win32'  -> removed; never applies on linux x86_64
+  pywin32-ctypes==0.2.3 ; sys_platform == 'win32'  -> removed; never applies on linux x86_64
+  soupsieve==2.8.4 ; None  -> upgraded (allowed)
+
+== New entries without a same-version old entry
+  anyio==4.14.2 ; platform_machine == 'x86_64' and sys_platform == 'linux'  (2 hashes) -> upgrade target (allowed)
+  click==8.5.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'  (2 hashes) -> upgrade target (allowed)
+  pypdf==6.19.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'  (2 hashes) -> upgrade target (allowed)
+  soupsieve==2.9.2 ; platform_machine == 'x86_64' and sys_platform == 'linux'  (2 hashes) -> upgrade target (allowed)
+
+== Marker changes on same-version entries: 330
+-- 162 entries had no marker and now carry "platform_machine == 'x86_64' and sys_platform == 'linux'":
+   agent-client-protocol==0.12.1, aiofile==3.9.0, aiofiles==25.1.0, aiohappyeyeballs==2.6.1, aiohttp==3.14.3, aiosignal==1.4.0, annotated-types==0.7.0, anthropic==0.75.0, attrs==25.3.0, authlib==1.6.12, backoff==2.2.1, beartype==0.22.9, beautifulsoup
+-- 9 other non-pyobjc entries (old -> new):
+   cffi==2.0.0: "platform_python_implementation != 'PyPy'" -> "platform_machine == 'x86_64' and platform_python_implementation != 'PyPy' and sys_platform == 'linux'"
+   cryptography==50.0.0: "platform_machine != 'x86_64' or sys_platform != 'darwin'" -> "platform_machine == 'x86_64' and sys_platform == 'linux'"
+   google-api-core==2.26.0: "python_full_version < '3.13'" -> "python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux'"
+   google-api-core==2.31.0: "python_full_version >= '3.13'" -> "python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux'"
+   hf-xet==1.1.10: "platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" -> "platform_machine == 'x86_64' and sys_platform == 'linux'"
+   jeepney==0.9.0: "sys_platform == 'linux'" -> "platform_machine == 'x86_64' and sys_platform == 'linux'"
+   pycparser==2.23: "implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'" -> "implementation_name != 'PyPy' and platform_machine == 'x86_64' and platform_python_implementation != 'PyPy' and sys_platform == 'linux'"
+   screeninfo==0.8.1: "platform_system != 'darwin'" -> "platform_machine == 'x86_64' and platform_system != 'darwin' and sys_platform == 'linux'"
+   secretstorage==3.5.0: "sys_platform == 'linux'" -> "platform_machine == 'x86_64' and sys_platform == 'linux'"
+-- 159 pyobjc entries; 159 of them never apply on linux x86_64, before or after:
+   pyobjc==11.1, pyobjc-core==11.1, pyobjc-framework-accessibility==11.1, pyobjc-framework-accounts==11.1, pyobjc-framework-addressbook==11.1, pyobjc-framework-adservices==11.1, pyobjc-framework-adsupport==11.1, pyobjc-framework-applescriptkit==11.1,
+   example: pyobjc: "platform_system == 'darwin'" -> "platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux'"
+   Every marker change keeps linux x86_64 applicability: True
+
+== Hash lines removed from same-version entries, by wheel platform family
+  android arm64_v8a: 2
+  android x86_64: 2
+  ios ios_13_0_arm64_iphoneos: 5
+  ios ios_13_0_arm64_iphonesimulator: 5
+  linux armv7l: 3
+  macosx arm64: 105
+  macosx universal2: 533
+  macosx x86_64: 96
+  manylinux aarch64: 130
+  manylinux armv7l: 57
+  manylinux i686: 53
+  manylinux ppc64le: 77
+  manylinux riscv64: 20
+  manylinux s390x: 68
+  musllinux aarch64: 105
+  musllinux armv7l: 42
+  musllinux i686: 31
+  musllinux ppc64le: 38
+  musllinux riscv64: 10
+  musllinux s390x: 32
+  win amd64: 111
+  win arm64: 75
+  win win32: 94
+  total removed hashes: 1694 across 129 entries
+
+VIOLATIONS: 0
+
+Command (from <worktree>, the section F lock in place): the section D4 command
+Exit code: 0
+Returned output (scan log lines omitted, except the OpenHands lock line):
+Scanned <worktree>/blueprints/runtime-workers/openhands/requirements.lock file and found 334 packages
+Filtered 175 local/unscannable package/s from the scan.
+GHSA-8mgp-746c-j5xp and 2 aliases have been filtered out because: nltk 3.10.3 [Lumibot ignore reason as in .github/osv-scanner.toml]
+GHSA-h35f-9h28-mq5c and 3 aliases have been filtered out because: setuptools 80.10.2 [Lumibot ignore reason as in .github/osv-scanner.toml]
+Filtered 3 vulnerabilities from output
+No issues found
+
+Consistency check (install-container.sh order) in <repro-venv>, CPython 3.13.15
+from `uv venv --python 3.13`, UV_NO_CONFIG=1, working directory outside any
+workspace. A first run without UV_NO_CONFIG=1 from inside <repro> exited 2 on
+step 1: "error: In `--require-hashes` mode, all requirements must have their
+versions pinned with `==`, but found: starlette>=0.49.1". That is the workspace's
+`[tool.uv]` constraint-dependencies, which install-container.sh's UV_NO_CONFIG=1
+keeps out.
+
+Command (step 1): uv pip install --python <repro-venv>/bin/python --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r build-requirements.lock
+Exit code: 0
+Returned output:
+Using Python 3.13.15 environment at: <repro-venv>
+Resolved 3 packages in 1ms
+Installed 3 packages in 31ms
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3
+
+Command (step 2): uv pip install --python <repro-venv>/bin/python --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r requirements.lock
+Exit code: 0
+Returned output (summary lines; no build line was printed: func-timeout 4.3.5 was built earlier into the same uv cache):
+Using Python 3.13.15 environment at: <repro-venv>
+Resolved 176 packages in 19ms
+Installed 175 packages in 535ms
+
+Command (step 3): uv pip check --python <repro-venv>/bin/python
+Exit code: 0
+Returned output:
+Checked 178 packages in 4ms
+All installed packages are compatible
+
+Command: <repro-venv>/bin/python -c (importlib.metadata versions of the five advisory packages)
+Exit code: 0
+Returned output:
+anyio 4.14.2; click 8.5.0; cryptography 50.0.0; pypdf 6.19.0; soupsieve 2.9.2
+
+Command (install-container.sh import check): bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --unshare-net -- <repro-venv>/bin/python -c '<the script's import check>'
+Exit code: 0
+Returned output (last line; LiteLLM's cost-map fetch failed on name resolution, as in section E):
+SDK/tools 1.49.6 imports passed; no model request
+
+Test suites on <worktree> (TMPDIR outside the checkout, PYTHONDONTWRITEBYTECODE=1):
+python3 -m unittest tests.test_runtime_worker_openhands -> Ran 59 tests ... OK
+python3 -m unittest tests.test_osv_lockfile_coverage tests.test_blind_checkout tests.test_workflow_security_coverage -> Ran 57 tests ... OK

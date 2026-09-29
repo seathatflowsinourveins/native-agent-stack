@@ -1,0 +1,5 @@
+base 55fc8d17; tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+AGENTS.md bytes 11907 tokens 2374 words 1477 lines 103 sha256 cf44536f3793cc37187c9800b682bbf3f5d4e01c85fab6ee0be070c77a161a7c
+CLAUDE.md bytes 123 tokens 30 words 18 lines 4 sha256 1a55ee0b21f83c543529caf5e020af65dc53298223b15cac8b6f22c6614d0f64
+tools/sota-convergence/landscape-sweep/templates.json bytes 10060 tokens 2239 words 1413 lines 8 sha256 56caeef02581a21ad672470718295f8d6f210d13ce4b6ee7783a59ac383ce675
+docs/harness-defaults.md bytes 41101 tokens 9455 words 5306 lines 121 sha256 2a40695b8910272d20b2cdc455370d2f59dd384adc20c36eece754138075b678

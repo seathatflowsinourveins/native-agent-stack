@@ -23,9 +23,11 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
   "enableWorkflows": true,
   "ultracode": true,
   "workflowSizeGuideline": "unrestricted",
+  "switchModelsOnFlag": false,
   "env": {
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
-    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
+    "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1"
   }
 }
 ```
@@ -43,8 +45,16 @@ provider or search-quota errors; no run has saturated eight. A new host starts a
 raises only after `child-usage.mjs --latest` shows a full run with no rate-limit errors
 or empty results), and `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`
 so workflow and Agent children cannot fan out a second layer (the client default is
-three layers; official sub-agents doc, fetched 2026-09-22). It does not select a model,
-account or permission mode. To adopt it as a project default, merge only those
+three layers; official sub-agents doc, fetched 2026-09-22). It also carries the two
+model-fallback guards, `switchModelsOnFlag: false` and
+`CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`, so a request that the safeguards of Opus 5.5
+or a Fable model flag ends in a refusal instead of re-running on Opus 4.8 or Opus 5. The
+setting is documented for any settings file; the variable is undocumented and is the one
+that also stops a subagent's or workflow child's fallback in Claude Code 2.1.283, so
+re-check it after each client update (the
+[model-currency record](../docs/decisions/2026-09-27-model-currency.md) and the
+[fallback-guard record](../docs/decisions/2026-09-25-model-fallback-guard.md)). It does
+not select a model, account or permission mode. To adopt it as a project default, merge only those
 keys into the existing `.claude/settings.json`; preserve all unrelated settings.
 Project environment settings require workspace trust, and organizational policy
 or feature availability can still restrict the profile. The dated rules set behind
@@ -153,7 +163,7 @@ Sonnet, so neither is qualified on Opus yet
 | Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (`xhigh` plus dynamic workflow orchestration), the default for every session; escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
 | Exact extraction, inventories, running acceptance commands | `source-scout` (Sonnet, max; four built-in tools, no project instructions) | First prompt 8,048 tokens versus 42,396 for the default child on one identical task; ran the inventory stage of eight native reviews and the readers of two readiness audits (one deployed, one in the scratch adoption); the recheck stage exists since the eighth review and ran there and in the three scratch-adoption reviews |
 | Research from the web, documentation, repository and catalog | `stack-researcher` (Opus, max; Read, Glob, Grep, Bash, WebSearch, ToolSearch and named Context Mode, QMD, ai-memory, Serena and jCodeMunch read tools; no Edit, Write, WebFetch or Skill) | None yet. Added 2026-09-26 in place of the default child for research; its first-prompt size, lane use, correctness and billed cost against `general-purpose` are preregistered in the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md) and not yet run |
-| Implementation from a clear contract | `isolated-builder` (Opus, max since 2026-09-27; edits only in the owned checkout its brief names, never the coordinator's own, with no frontmatter `isolation`; named MCP read tools behind ToolSearch; Serena's symbol-edit tools removed on 2026-09-26 because they would edit the parent session's checkout; `context-mode:context-mode` and `verification-before-completion` preloaded) | One real task on Sonnet, before the preload: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864). The Opus model, the preload and the coordinator-created worktree have no native qualification or measured first-prompt size; they join the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)'s preregistered comparison |
+| Implementation from a clear contract | `isolated-builder` (Opus, max since 2026-09-27; edits only in the owned checkout its brief names, never the coordinator's own, with no frontmatter `isolation`; named MCP read tools behind ToolSearch; Serena's symbol-edit tools removed on 2026-09-26 because they would edit the parent session's checkout; `context-mode:context-mode` preloaded, and `verification-before-completion` no longer since its trial removal on 2026-09-28) | One real task on Sonnet, before the preload: a manifest probe implemented, checked and committed from its own worktree (first prompt 17,864). The Opus model, the preload and the coordinator-created worktree have no native qualification or measured first-prompt size; they join the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)'s preregistered comparison |
 | Independent review from source and recorded evidence | `evidence-reviewer` (Opus, max; read-only named MCP tools behind ToolSearch, no Bash/Edit/Write) | Eight native review runs; first prompt 12,164 for the deferred shape versus 42,220 with bare server grants |
 | Adversarial security review of a supplied diff or artifact | `security-reviewer` (Opus, max; evidence-reviewer's named read tools behind ToolSearch, no Bash/Edit/Write/WebFetch/Skill; `security-best-practices` preloaded) | None yet. Added 2026-09-26; first-prompt size, lane use, correctness and billed cost are preregistered in the [decision record](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md), with no native run recorded |
 | Verification that re-runs named commands | `stack-verifier` (Opus, max since 2026-09-27; Read, Glob, Grep, Bash, ToolSearch and named Context Mode tools; no project instructions) | None yet. Added 2026-09-26 in place of the default child for ad-hoc verification; the same preregistered comparison applies |

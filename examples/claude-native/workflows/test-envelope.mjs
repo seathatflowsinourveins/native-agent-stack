@@ -502,7 +502,7 @@ function agentOptionLiterals(src) {
   // Exact lists also reject substitution of an off/user-invocable-only skill; the
   // installer tests separately read the pinned table's Listing column for all agents.
   const skillsOf = (agent) => ((frontOf(agent).match(/^skills:\n((?:  - [^\n]+(?:\n|$))*)/m) || [null, ''])[1]).split('\n').filter(Boolean).map((line) => line.replace(/^  - /, '')).sort()
-  expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode', 'verification-before-completion']))
+  expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode']))
   expect('agents: security-reviewer preloads exactly its reviewed skill', JSON.stringify(skillsOf('security-reviewer')) === JSON.stringify(['security-best-practices']))
   const ctx = (t) => 'mcp__plugin_context-mode_context-mode__' + t
   const expectedResearcherTools = ['Read', 'Glob', 'Grep', 'Bash', 'WebSearch', 'ToolSearch',

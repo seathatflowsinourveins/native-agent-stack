@@ -138,6 +138,37 @@ class Normalization(unittest.TestCase):
         with self.assertRaises(t.TransportError):
             t.timestamp_ns("2026-09-21T15:00:00")
 
+    def test_timestamp_rfc3339_offsets_and_zero_to_nine_fraction_digits(self):
+        # RFC 3339 section 5.6 / reviewer probe_ts.py. All clocks below
+        # represent the same UTC second; expected nanoseconds use integers.
+        base = 1_790_002_800_000_000_000
+        fractions = (("", 0), (".1", 100_000_000), (".12", 120_000_000),
+                     (".123", 123_000_000), (".1234", 123_400_000),
+                     (".12345", 123_450_000), (".123456", 123_456_000),
+                     (".1234567", 123_456_700), (".12345678", 123_456_780),
+                     (".123456789", 123_456_789))
+        for clock, zone in (("15:00:00", "Z"), ("15:00:00", "+00:00"),
+                            ("11:00:00", "-04:00"), ("20:30:00", "+05:30")):
+            for fraction, nanos in fractions:
+                value = f"2026-09-21T{clock}{fraction}{zone}"
+                with self.subTest(value=value):
+                    self.assertEqual(t.timestamp_ns(value), base + nanos)
+
+    def test_timestamp_accepts_lowercase_z(self):
+        for fraction, nanos in (("", 0), (".1", 100_000_000), (".123456789", 123_456_789)):
+            with self.subTest(fraction=fraction):
+                self.assertEqual(t.timestamp_ns(f"2026-09-21T15:00:00{fraction}z"),
+                                 1_790_002_800_000_000_000 + nanos)
+
+    def test_timestamp_truncates_subnanosecond_fraction(self):
+        for value in ("2026-09-21T15:00:00.1234567891Z",
+                      "2026-09-21T15:00:00.1234567899+00:00",
+                      "2026-09-21T11:00:00.123456789123-04:00",
+                      "2026-09-21T20:30:00.123456789123+05:30",
+                      "2026-09-21T15:00:00.1234567891z"):
+            with self.subTest(value=value):
+                self.assertEqual(t.timestamp_ns(value), 1_790_002_800_123_456_789)
+
     def test_crossed_and_one_sided_quotes_are_untradable_not_corrupt(self):
         base = {"S": "SPY", "bp": "100.01", "ap": "100.02", "bs": 1, "as": 1, "t": "2026-09-23T15:00:00.000000001Z"}
         self.assertEqual(t.normalize_quote(base)["bid"], "100.01")
@@ -846,6 +877,115 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.port._observed["trial-1"]["status"], "canceled")   # stored state never moves back
         self.assertNotIn("execution_id", self.port._observed["trial-1"])
         self.assertEqual(self.port.health["reasons"], [])
+
+    async def test_stream_fill_time_reaches_ledger_losslessly(self):
+        import tempfile
+        from runner import Controller
+        from safety import Ledger, Quote, RiskLimits
+
+        self.port._on_order = lambda row: None
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "ledger.sqlite3"
+            limits = RiskLimits(max_order_qty=t.Decimal(2))
+            ledger = Ledger(path, limits)
+            self.addCleanup(ledger.close)
+            now = time.time()
+            ledger.start_trial(now)
+            ledger.reserve_intent("trial-1", "SPY", "buy", "2", "100.01",
+                quote=Quote("SPY", "100", "100.01", now), now=now, market_open=True,
+                session_close=now + 3600, stop_file=Path(root) / "STOP")
+            self.port.sink_observation = Controller(ledger, now + 3600, market_open=True).observe
+            # Alpaca https://docs.alpaca.markets/docs/websocket-streaming:
+            # trade_updates.data.timestamp is fill time, not order.updated_at.
+            for cum, event, fraction in ((1, "partial_fill", "123456789"), (2, "fill", "123456790")):
+                self.port._enqueue("order", {"data": {
+                    "event": event, "timestamp": "2026-09-21T15:00:00." + fraction + "Z",
+                    "execution_id": "exec-%d" % cum, "qty": "1", "price": "100",
+                    "order": order(qty="2", filled_qty=str(cum), filled_avg_price="100",
+                                   status="filled" if cum == 2 else "partially_filled",
+                                   updated_at="2026-09-21T15:00:05.999999999Z")}})
+            await self._drain()
+            self.assertEqual(self.port.health["reasons"], [])
+            ledger.close()
+            reopened = Ledger(path, limits)
+            self.addCleanup(reopened.close)
+            rows = reopened.db.execute("SELECT * FROM executions ORDER BY cum_qty").fetchall()
+            self.assertEqual(len(rows), 2)
+            self.assertIn("execution_time_ns", rows[0].keys())
+            expected = [1790002800123456789, 1790002800123456790]
+            self.assertEqual([r["execution_time_ns"] for r in rows], expected)
+            self.assertTrue(all(type(r["execution_time_ns"]) is int for r in rows))
+            self.assertNotIn("execution_time_ns", self.port._observed["trial-1"])
+
+    async def test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order(self):
+        import tempfile
+        from runner import Controller
+        from safety import Ledger, Quote, RiskLimits
+
+        self.port._on_order = lambda row: None
+        for first in ("S", "U"):
+            with self.subTest(first=first), tempfile.TemporaryDirectory() as root:
+                limits = RiskLimits(max_order_qty=t.Decimal(2), max_gross_loss_usd=t.Decimal(100),
+                                    max_drawdown_usd=t.Decimal(100))
+                path = Path(root) / "ledger.sqlite3"
+                ledger = Ledger(path, limits)
+                self.addCleanup(ledger.close)
+                now = time.time()
+                ledger.start_trial(now)
+                ledger.adopt_broker_snapshot({"positions": [
+                    {"symbol": "SPY", "qty": "1", "avg_entry_price": "100"}]}, now)
+                controller = Controller(ledger, now + 3600, market_open=True)
+                self.port.sink_observation = controller.observe
+                rows = {}
+
+                def reserve(label, side, price):
+                    cid = first + "-" + label
+                    ledger.reserve_intent(cid, "SPY", side, "1", price,
+                        quote=Quote("SPY", "130", "130.01", now), now=now, market_open=True,
+                        session_close=now + 3600, stop_file=Path(root) / "STOP")
+                    rows[label] = order(client_order_id=cid, id="broker-" + cid, side=side,
+                                        limit_price=price, filled_qty="1", filled_avg_price=price, status="filled")
+
+                async def execution(label, second):
+                    self.port._enqueue("order", {"event": "fill", "execution_id": first + "-" + label,
+                        "qty": "1", "price": rows[label]["filled_avg_price"], "order": rows[label],
+                        "timestamp": "2026-09-21T15:00:0%d.000000001Z" % second})
+                    await self._drain()
+                    self.assertEqual(self.port.health["reasons"], [])
+
+                reserve("B", "buy", "130")
+                await execution("B", 2)
+                reserve("U", "sell", "95")
+                self.assertEqual(ledger.accounting().outstanding_orders, 1)
+                await self.port._observe(t.normalize_order(rows["U"]))
+                reserve("S", "sell", "110")
+                await self.port._observe(t.normalize_order(rows["S"]))
+                await execution(first, 1 if first == "S" else 3)
+                # With U still untimed, swapping S into B's slot would leave
+                # zero held before U. Fall back to B,U,S: each sale closes at
+                # $115, losing $20 and $5. This intermediate state is durable.
+                state = ledger.accounting()
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                  state.cumulative_realized_loss_usd),
+                                 (t.Decimal(75), t.Decimal(-25), t.Decimal(25)))
+                self.assertEqual(ledger.db.execute("SELECT COUNT(*) FROM executions").fetchone()[0], 2)
+                before = tuple(ledger.db.iterdump())
+                ledger.close()
+                ledger = Ledger(path, limits)
+                self.addCleanup(ledger.close)
+                controller.ledger = ledger
+                self.assertEqual(tuple(ledger.db.iterdump()), before)
+                self.assertEqual(ledger.accounting(), state)
+                other = "U" if first == "S" else "S"
+                await execution(other, 3 if other == "U" else 1)
+                # All three now timed: S(+10), B, U(-35), flat. Same cash/net
+                # as fallback, but gains cannot offset the $35 losing fill.
+                state = ledger.accounting()
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                  state.cumulative_realized_loss_usd),
+                                 (t.Decimal(75), t.Decimal(-25), t.Decimal(35)))
+                self.assertEqual(ledger.positions(), {})
+                self.assertEqual(ledger.db.execute("SELECT COUNT(*) FROM executions").fetchone()[0], 3)
 
     def fill_activity(self, cum, qty, price="5.61", *, index=0, order_id=ID, **changes):
         row = {"activity_type": "FILL", "id": "20260924150021%03d::%s" % (index, __import__("uuid").uuid4()),

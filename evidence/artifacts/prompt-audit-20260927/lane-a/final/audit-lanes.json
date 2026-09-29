@@ -1,0 +1,40 @@
+{
+ "patterns_sha256": "ace9737a41379407341b5d65030207d50617eac1b6000ce2350c2be7c184385d",
+ "judgments": {
+  "gpt6": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 5,
+    "command_execution": 48,
+    "web_search": 5
+   }
+  },
+  "claude": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 136,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 41,
+    "tool_use": 63,
+    "tool_result": 63,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 51,
+    "attachment hook_additional_context": 8,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  }
+ }
+}

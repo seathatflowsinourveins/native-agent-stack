@@ -1,0 +1,73 @@
+{
+ "rule": "a text is applied only when all four adjudications choose it",
+ "void": {
+  "gpt6-AB": "audit: ACCESS in command",
+  "gpt6-BA": "audit: ACCESS in command"
+ },
+ "items": {
+  "X5a": {
+   "votes": {
+    "gpt6-AB": {
+     "choice_label": "A",
+     "lane": "c",
+     "confidence": 0.83
+    },
+    "gpt6-BA": {
+     "choice_label": "neither",
+     "lane": "neither",
+     "confidence": 0.86
+    },
+    "claude-AB": {
+     "choice_label": "B",
+     "lane": "g",
+     "confidence": 0.58
+    },
+    "claude-BA": {
+     "choice_label": "A",
+     "lane": "g",
+     "confidence": 0.55
+    }
+   },
+   "counted": [
+    "claude-AB",
+    "claude-BA"
+   ],
+   "outcome": {
+    "applied": false,
+    "reason": "a judgment is void, refused or malformed"
+   }
+  },
+  "X5c": {
+   "votes": {
+    "gpt6-AB": {
+     "choice_label": "B",
+     "lane": "g",
+     "confidence": 0.93
+    },
+    "gpt6-BA": {
+     "choice_label": "A",
+     "lane": "g",
+     "confidence": 0.97
+    },
+    "claude-AB": {
+     "choice_label": "A",
+     "lane": "c",
+     "confidence": 0.6
+    },
+    "claude-BA": {
+     "choice_label": "B",
+     "lane": "c",
+     "confidence": 0.6
+    }
+   },
+   "counted": [
+    "claude-AB",
+    "claude-BA"
+   ],
+   "outcome": {
+    "applied": false,
+    "reason": "a judgment is void, refused or malformed"
+   }
+  }
+ }
+}

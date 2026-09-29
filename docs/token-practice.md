@@ -50,11 +50,12 @@ home gets RTK's instructions from the global `AGENTS.md` block of the
 (changed after `v2026.09.26.2`), because Codex does not expand the `@RTK.md`
 pointer that `rtk init` writes. An installed executable alone does not prove
 either behavior.
-A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's four
-`exclude_commands` entries, which keep blob reads, `git branch` and `diff` native.
-The recipe explains how RTK anchors each entry. On 2026-09-26 it grew from two
-entries to four: `^git show [^ ]*:` alone missed spellings such as
-`git -C . show HEAD:x`. Confirm the file with `rtk hook check`, since RTK can ignore
+A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's five
+`exclude_commands` entries, which keep blob reads, `git branch`, `diff` and
+standalone `jq` native. The recipe explains how RTK anchors each entry. On
+2026-09-26 it grew from two entries to four: `^git show [^ ]*:` alone missed
+spellings such as `git -C . show HEAD:x`. On 2026-09-27 standalone `jq` became
+the fifth. Confirm the file with `rtk hook check`, since RTK can ignore
 a TOML-valid file. The exclusions cover only hook rewrites, never an explicit `rtk`
 command.
 Preserve canonical generated instructions and the host's hook policy; historical
@@ -166,6 +167,7 @@ Desktop WSL, native Claude and native Codex Context Mode runtime scopes.
 | toon input.json --stats -o output.toon | One conversion | TOON 4.1.1 uses tokenx 1.3.0 estimates here; no native cross-run savings ledger. Exact o200k_base recount is separate. |
 | Context Mode ctx_stats | Connection/session and reported lifetime estimates | Session estimates differ from lifetime event-count × 256-token heuristics; neither is exact provider usage. A new Inspector connection has its own session. The persisted counters and the rendered bars measure different things; see below. |
 | headroom savings --json | Native usage ledger report | In 0.37.0, the field named lifetime is capped by a 30-day report lookback. Offline guard results do not populate it automatically. |
+| Claude Code `/usage` "Prompt cache (main)" line; status-line `prompt_cache` object | Main conversation of one session | Native prompt-cache hit-ratio counters for the main conversation only, not subagents; Claude Code 2.1.251 or later, and the likely-miss cause 2.1.260 or later ([costs](https://code.claude.com/docs/en/costs), [status line](https://code.claude.com/docs/en/statusline), read 2026-09-28). The reset on `/clear` applies only to the `/usage` Session line. For children, read the cache counters of `examples/claude-native/workflows/child-usage.mjs` or OTel `claude_code.token.usage`, and prefer `query_source` to `agent.name` ([monitoring](https://code.claude.com/docs/en/monitoring-usage)). |
 
 The reviewed RTK retained-history snapshot reported 46 commands, 11,509 input,
 9,852 output and 1,657 estimated saved tokens (14.3974%). Its project view
@@ -285,6 +287,21 @@ E1 and E2 subagent receipts.
   ([E1 correction](../evidence/artifacts/token-e2e-ultracode-20260925/README.md#results),
   [E2 erratum](../evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md#erratum-2026-09-27)).
   Read `tools[].adjudication`, not `quality_check.passed`.
+- **A proxy arm changes the harness too (2026-09-28).** Behind a non-first-party
+  `ANTHROPIC_BASE_URL`, Claude Code turns MCP tool search off and loads every MCP
+  tool into the cached prefix, so connecting a server, or deliberately disabling
+  it or denying its tools, invalidates the cache, while an unexpected disconnect
+  keeps it ([gateway caveat](foundation-stack.md),
+  [MCP tool search](https://code.claude.com/docs/en/mcp#configure-tool-search),
+  [prompt caching](https://code.claude.com/docs/en/prompt-caching)). The only
+  independent billed-cost study the 2026-09-26 landscape sweep found (arXiv
+  2607.12161) measured the Headroom v0.27.0 API-boundary proxy at +48.4% billed
+  cost, not 0.37 or 0.39.
+  An arm routed through `ANTHROPIC_BASE_URL` holds `ENABLE_TOOL_SEARCH` and the
+  cache-TTL variables fixed across arms, confirms that the proxy forwards
+  `tool_reference` blocks and keeps the 1M window, and reports cache creation and
+  reads per arm; otherwise compression is confounded with lost tool search and a
+  changed cache lifetime.
 
 ## Shared Codex quota (2026-09-26)
 

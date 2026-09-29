@@ -41,7 +41,10 @@ def template_server_names() -> list[str]:
 
 class GuardInstallTests(unittest.TestCase):
     def test_token_lanes_assets_cli_dry_run_and_temp_home_install(self):
-        names = ("token-lanes-block.md", "token-lanes-subagent-start.py")
+        script = "token-lanes-subagent-start.py"
+        names = ("token-lanes-block.md", "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
+                 "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md",
+                 script)
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
@@ -60,13 +63,16 @@ class GuardInstallTests(unittest.TestCase):
                 dest = home / ".claude/hooks" / name
                 self.assertIn(f"installed {dest}", installed.stdout)
                 self.assertEqual(dest.read_bytes(), (ROOT / "adoption/hooks/claude" / name).read_bytes())
-            # The installed script resolves the installed block, even from a different cwd.
-            injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / names[1])],
-                                      input='{"agent_type":"general-purpose"}', env=env, cwd=home,
-                                      capture_output=True, text=True, timeout=30)
-            self.assertEqual(injected.returncode, 0, injected.stderr)
-            self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
-                             (home / ".claude/hooks" / names[0]).read_text(encoding="utf-8"))
+            # The installed script resolves the installed default or role block, even from a different cwd.
+            for agent_type, block in (("general-purpose", "token-lanes-block.md"),
+                                      ("stack-verifier", "token-lanes-block.verifier.md")):
+                with self.subTest(agent_type=agent_type):
+                    injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / script)],
+                                              input=json.dumps({"agent_type": agent_type}), env=env, cwd=home,
+                                              capture_output=True, text=True, timeout=30)
+                    self.assertEqual(injected.returncode, 0, injected.stderr)
+                    self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
+                                     (home / ".claude/hooks" / block).read_text(encoding="utf-8"))
 
     def test_installs_when_absent(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -292,6 +298,56 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
         self.assertEqual(settings["env"]["BASH_MAX_TIMEOUT_MS"], "1800000")
         self.assertNotIn("BASH_DEFAULT_TIMEOUT_MS", settings["env"])
         self.assertEqual(settings["statusLine"]["refreshInterval"], 5)
+
+    def test_the_advisor_is_fable_and_accepted_for_the_main_model(self):
+        # docs/decisions/2026-09-27-model-currency.md. https://code.claude.com/docs/en/settings-reference#advisormodel
+        # (fetched 2026-09-27): scope "Any file"; "fable", "opus", "sonnet" or a full model ID; unset turns the advisor
+        # off. https://code.claude.com/docs/en/advisor, "Choose an advisor model": an Opus 5.5 main model accepts "Fable,
+        # and Opus 5 or later". The advisor needs feature-flag fetching, which DISABLE_GROWTHBOOK, DISABLE_TELEMETRY,
+        # DO_NOT_TRACK and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC turn off (env-vars, "Features that need feature-flag
+        # fetching"), and CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 makes Claude Code ignore advisorModel.
+        settings = self.settings()
+        self.assertEqual(settings.get("advisorModel"), "fable")
+        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Fable for an Opus main model")
+        for name in ("DISABLE_GROWTHBOOK", "DISABLE_TELEMETRY", "DO_NOT_TRACK", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+                     "CLAUDE_CODE_DISABLE_ADVISOR_TOOL"):
+            with self.subTest(env=name):
+                self.assertNotIn(name, settings["env"])
+
+
+class CommittedSettingsFallbackGuardTests(unittest.TestCase):
+    """The committed project settings and the portable Ultracode settings carry the template's two model-fallback
+    guards (docs/decisions/2026-09-27-model-currency.md), so a session that loads only this repository's files cannot
+    re-run a flagged Opus 5.5 or Fable request on Opus 4.8 or Opus 5. `switchModelsOnFlag` is documented for any
+    settings file (https://code.claude.com/docs/en/settings-reference#switchmodelsonflag), but Claude Code 2.1.283
+    returns "subagent" for a non-main thread before it reads the setting, so only the undocumented
+    CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK variable, which the client reads live from the environment, stops a
+    subagent's or workflow child's fallback (source review of the 2.1.283 client; not probed)."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+    PROJECT = ROOT / ".claude" / "settings.json"
+    PORTABLE = ROOT / "examples" / "claude-native" / "ultracode.settings.json"
+    RECIPE = ROOT / "recipes" / "claude-native-ultracode.md"
+
+    def test_project_and_portable_settings_carry_both_guards_in_the_template_form(self):
+        template = json.loads(self.TEMPLATE.read_text(encoding="utf-8"))
+        for path in (self.PROJECT, self.PORTABLE):
+            settings = json.loads(path.read_text(encoding="utf-8"))
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertEqual(settings.get("env", {}).get("CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"),
+                                 template["env"]["CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"])
+                self.assertEqual(settings["env"]["CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"], "1")
+                self.assertIs(settings.get("switchModelsOnFlag"), template["switchModelsOnFlag"])
+                self.assertIs(settings["switchModelsOnFlag"], False)
+
+    def test_the_recipe_embeds_the_portable_settings_file(self):
+        # recipes/claude-native-ultracode.md shows the file an adopter passes with --settings; keep the two equal.
+        marker = "The portable [settings file](../examples/claude-native/ultracode.settings.json):"
+        block = re.search(re.escape(marker) + r"\s*```json\n(.*?)\n```", self.RECIPE.read_text(encoding="utf-8"), re.S)
+        self.assertIsNotNone(block, "the recipe's embedded settings block")
+        portable = json.loads(self.PORTABLE.read_text(encoding="utf-8"))
+        portable.pop("$schema", None)
+        self.assertEqual(json.loads(block.group(1)), portable)
 
 
 class AgentsInstallTests(unittest.TestCase):
@@ -618,7 +674,7 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
                         self.assertIn(listing.get(skill), {"on", "name-only"},
                                       f"{path.name} preloads {skill} with Listing={listing.get(skill)!r}")
         for agent, expected in {
-            "isolated-builder": ["context-mode:context-mode", "verification-before-completion"],
+            "isolated-builder": ["context-mode:context-mode"],
             "security-reviewer": ["security-best-practices"],
         }.items():
             with self.subTest(agent=agent):

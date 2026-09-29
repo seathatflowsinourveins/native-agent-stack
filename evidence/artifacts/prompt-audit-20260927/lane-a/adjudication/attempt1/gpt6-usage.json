@@ -1,0 +1,37 @@
+{
+ "note": "Attempt 1's GPT-6 runner jobs, void before any return was read. Usage is the `usage` object of each `turn.completed` event in the runner's event log; Codex counts cached input inside input_tokens and reasoning output inside output_tokens. No return, item or message was read.",
+ "jobs": {
+  "x5-adj-AB": {
+   "exit": "0",
+   "model": "gpt-6-astra",
+   "codex_version": "codex-cli 0.157.1",
+   "started": "2026-09-28T08:50:24Z",
+   "finished": "2026-09-28T08:59:34Z",
+   "turn_usage": [
+    {
+     "input_tokens": 754205,
+     "cached_input_tokens": 661888,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 17414,
+     "reasoning_output_tokens": 9862
+    }
+   ]
+  },
+  "x5-adj-BA": {
+   "exit": "0",
+   "model": "gpt-6-astra",
+   "codex_version": "codex-cli 0.157.1",
+   "started": "2026-09-28T08:50:24Z",
+   "finished": "2026-09-28T08:56:04Z",
+   "turn_usage": [
+    {
+     "input_tokens": 637800,
+     "cached_input_tokens": 554752,
+     "cache_write_input_tokens": 0,
+     "output_tokens": 10342,
+     "reasoning_output_tokens": 5053
+    }
+   ]
+  }
+ }
+}

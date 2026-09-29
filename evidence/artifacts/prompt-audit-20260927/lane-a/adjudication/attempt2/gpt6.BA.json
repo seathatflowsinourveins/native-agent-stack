@@ -1,0 +1,74 @@
+{
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-28T09:00:06Z",
+  "finished": "2026-09-28T09:05:56Z",
+  "usage": {
+   "input_tokens": 572158,
+   "cached_input_tokens": 493952,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 10838,
+   "reasoning_output_tokens": 6144
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "X5a",
+    "choice": "neither",
+    "reasons": "Both amendments pass the two portable-template tests in memory. However, both change the manifest-pinned template. A specifies no manifest update; B labels its update non-blocking, rather than required in the same commit. Under the stated effective-resolution rule, neither includes the necessary refresh. Applied exactly, both therefore fail hash and byte-count validation.",
+    "sources": [
+     {
+      "locator": "../adjudication-inputs/x5.BA.json:18",
+      "quote": "A return's effective resolution includes any co-change its reasons name as required in the same commit; judge the resolution together with those co-changes."
+     },
+     {
+      "locator": "../adjudication-inputs/x5.BA.json:61",
+      "quote": "Non-blocking co-change: re-register examples/claude-native/CLAUDE.md in manifests/evidence.json (:38815)"
+     },
+     {
+      "locator": "manifests/evidence.json:38815",
+      "quote": "\"path\": \"examples/claude-native/CLAUDE.md\",\n      \"sha256\": \"bd9cd167681b637aed3ea4d70c07e561ea64a30862c07a6bc3a06565f9426dd0\",\n      \"bytes\": 8480"
+     },
+     {
+      "locator": "scripts/validate.py:384",
+      "quote": "if hashlib.sha256(content).hexdigest() != digest:\n                    self.error(f\"{path_value}: SHA-256 mismatch\")\n                if len(content) != size:\n                    self.error(f\"{path_value}: byte count mismatch\")"
+     }
+    ],
+    "confidence": 0.86
+   },
+   {
+    "id": "X5c",
+    "choice": "A",
+    "reasons": "B's required co-changes fix the template tests: the verified replacement has 144 words and the stated hash. But those co-changes also modify tests/test_codex_worker_lane.py, itself hash-listed in the evidence manifest. B requires re-registering only the template, leaving the test file's hash stale. That still fails validation. A's no-edit resolution preserves consistency.",
+    "sources": [
+     {
+      "locator": "../adjudication-inputs/x5.BA.json:123",
+      "quote": "Set TOP_RULE_SHA256 (:47) to that value, change 120 to 144 at :210 and in the :45 comment, and re-register the template in manifests/evidence.json (:3749)."
+     },
+     {
+      "locator": "tests/test_codex_worker_lane.py:209",
+      "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n        self.assertEqual(len(top.split()), 120)"
+     },
+     {
+      "locator": "manifests/evidence.json:39930",
+      "quote": "\"path\": \"tests/test_codex_worker_lane.py\",\n      \"sha256\": \"3338942353fbcf0464e2437969c81da6d3e8a02baee87fdba07fc98fcd5d3cbf\""
+     },
+     {
+      "locator": "scripts/validate.py:384",
+      "quote": "if hashlib.sha256(content).hexdigest() != digest:\n                    self.error(f\"{path_value}: SHA-256 mismatch\")"
+     }
+    ],
+    "confidence": 0.97
+   }
+  ]
+ }
+}

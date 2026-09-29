@@ -1,0 +1,2653 @@
+{
+ "harness": {
+  "promptfooVersion": "0.123.1",
+  "nodeVersion": "v24.21.0",
+  "platform": "linux",
+  "arch": "x64",
+  "exportedAt": "2026-09-28T08:31:10.521Z",
+  "evaluationCreatedAt": "2026-09-28T08:14:59.364Z"
+ },
+ "eval_id": "eval-mQd-2026-09-28T08:14:59",
+ "runtime_options": {
+  "eventSource": "cli",
+  "showProgressBar": false,
+  "repeat": 5,
+  "maxConcurrency": 1,
+  "cache": false
+ },
+ "stats": {
+  "successes": 0,
+  "failures": 30,
+  "errors": 0,
+  "tokenUsage": {
+   "prompt": 0,
+   "completion": 0,
+   "cached": 0,
+   "total": 0,
+   "numRequests": 30,
+   "completionDetails": {
+    "reasoning": 0,
+    "acceptedPrediction": 0,
+    "rejectedPrediction": 0,
+    "cacheReadInputTokens": 0,
+    "cacheCreationInputTokens": 0
+   },
+   "assertions": {
+    "total": 0,
+    "prompt": 0,
+    "completion": 0,
+    "cached": 0,
+    "numRequests": 0,
+    "completionDetails": {
+     "reasoning": 0,
+     "acceptedPrediction": 0,
+     "rejectedPrediction": 0,
+     "cacheReadInputTokens": 0,
+     "cacheCreationInputTokens": 0
+    }
+   }
+  },
+  "durationMs": 971135,
+  "evaluationDurationMs": 971135
+ },
+ "rows": [
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 64977,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": false,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T081459Z-397695.jsonl",
+    "exit": 0,
+    "duration_ms": 64882,
+    "result_subtype": "success",
+    "num_turns": 9,
+    "cost_usd": 0.5384564000000001,
+    "usage": {
+     "input_tokens": 18,
+     "cache_creation_input_tokens": 41824,
+     "cache_read_input_tokens": 403262,
+     "output_tokens": 6157
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 27364,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": false,
+    "affirms": false,
+    "denies": false,
+    "says_unconfirmed": true,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T081604Z-407321.jsonl",
+    "exit": 0,
+    "duration_ms": 27278,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.3438558,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 35287,
+     "cache_read_input_tokens": 103979,
+     "output_tokens": 2037
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "workspace-guard",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 40252,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T081632Z-412407.jsonl",
+    "exit": 0,
+    "duration_ms": 40164,
+    "result_subtype": "success",
+    "num_turns": 6,
+    "cost_usd": 0.4607116,
+    "usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 42142,
+     "cache_read_input_tokens": 253738,
+     "output_tokens": 3639
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 54637,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": false,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T081713Z-422246.jsonl",
+    "exit": 0,
+    "duration_ms": 54548,
+    "result_subtype": "success",
+    "num_turns": 6,
+    "cost_usd": 0.47744639999999994,
+    "usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 40569,
+     "cache_read_input_tokens": 252132,
+     "output_tokens": 5121
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 48482,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T081808Z-439939.jsonl",
+    "exit": 0,
+    "duration_ms": 48392,
+    "result_subtype": "success",
+    "num_turns": 5,
+    "cost_usd": 0.4730476,
+    "usage": {
+     "input_tokens": 10,
+     "cache_creation_input_tokens": 42587,
+     "cache_read_input_tokens": 209258,
+     "output_tokens": 4523
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 35142,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T081857Z-457539.jsonl",
+    "exit": 0,
+    "duration_ms": 35055,
+    "result_subtype": "success",
+    "num_turns": 5,
+    "cost_usd": 0.44843279999999996,
+    "usage": {
+     "input_tokens": 10,
+     "cache_creation_input_tokens": 42908,
+     "cache_read_input_tokens": 204944,
+     "output_tokens": 3207
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 49688,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T081932Z-462969.jsonl",
+    "exit": 0,
+    "duration_ms": 49584,
+    "result_subtype": "success",
+    "num_turns": 6,
+    "cost_usd": 0.21941539999999998,
+    "usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 8222,
+     "cache_read_input_tokens": 289057,
+     "output_tokens": 4789
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 50181,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": false,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T082022Z-469844.jsonl",
+    "exit": 0,
+    "duration_ms": 50094,
+    "result_subtype": "success",
+    "num_turns": 9,
+    "cost_usd": 0.21862619999999997,
+    "usage": {
+     "input_tokens": 16,
+     "cache_creation_input_tokens": 6577,
+     "cache_read_input_tokens": 383531,
+     "output_tokens": 4462
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "workspace-guard",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 49946,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T082113Z-478758.jsonl",
+    "exit": 0,
+    "duration_ms": 49855,
+    "result_subtype": "success",
+    "num_turns": 6,
+    "cost_usd": 0.177949,
+    "usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 6692,
+     "cache_read_input_tokens": 284525,
+     "output_tokens": 3373
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 59202,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": true,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T082203Z-486976.jsonl",
+    "exit": 0,
+    "duration_ms": 59118,
+    "result_subtype": "success",
+    "num_turns": 7,
+    "cost_usd": 0.34738199999999997,
+    "usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 20981,
+     "cache_read_input_tokens": 334230,
+     "output_tokens": 5632
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "workspace guard",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 58558,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": false,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T082303Z-500504.jsonl",
+    "exit": 0,
+    "duration_ms": 58473,
+    "result_subtype": "success",
+    "num_turns": 11,
+    "cost_usd": 0.2586454,
+    "usage": {
+     "input_tokens": 20,
+     "cache_creation_input_tokens": 7744,
+     "cache_read_input_tokens": 483767,
+     "output_tokens": 4993
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "workspace-guard",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 44847,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T082402Z-509111.jsonl",
+    "exit": 0,
+    "duration_ms": 44762,
+    "result_subtype": "success",
+    "num_turns": 6,
+    "cost_usd": 0.18839080000000002,
+    "usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 6767,
+     "cache_read_input_tokens": 284434,
+     "output_tokens": 3866
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 63683,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": false,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T082447Z-522715.jsonl",
+    "exit": 0,
+    "duration_ms": 63588,
+    "result_subtype": "success",
+    "num_turns": 9,
+    "cost_usd": 0.2889124,
+    "usage": {
+     "input_tokens": 16,
+     "cache_creation_input_tokens": 10970,
+     "cache_read_input_tokens": 394242,
+     "output_tokens": 6112
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "workspace-guard",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 38507,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": false,
+    "affirms": false,
+    "denies": false,
+    "says_unconfirmed": true,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T082551Z-539297.jsonl",
+    "exit": 0,
+    "duration_ms": 38411,
+    "result_subtype": "success",
+    "num_turns": 7,
+    "cost_usd": 0.1859384,
+    "usage": {
+     "input_tokens": 12,
+     "cache_creation_input_tokens": 7271,
+     "cache_read_input_tokens": 296612,
+     "output_tokens": 3420
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "workspace guard",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K5"
+   },
+   "latency_ms": 37253,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": true,
+    "denies": false,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": false,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": false,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T082630Z-547200.jsonl",
+    "exit": 0,
+    "duration_ms": 37164,
+    "result_subtype": "success",
+    "num_turns": 5,
+    "cost_usd": 0.179862,
+    "usage": {
+     "input_tokens": 10,
+     "cache_creation_input_tokens": 8071,
+     "cache_read_input_tokens": 236470,
+     "output_tokens": 3398
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 15414,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T082708Z-552690.jsonl",
+    "exit": 0,
+    "duration_ms": 15325,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.3129442,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 34281,
+     "cache_read_input_tokens": 103361,
+     "output_tokens": 900
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, it's registered but not connected.\n\n- **Registered:** The session lists two ticket-tracker tools, `list_open_tickets` and `get_ticket`. Their schemas loaded without errors.\n- **Not working:** I called `list_open_tickets`, which only reads, and it returned `MCP server \"ticket-tracker\" is not connected`.\n\nSo the tool names are there, but the server isn't answering, and no ticket-tracker calls wi"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 14509,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T082723Z-554813.jsonl",
+    "exit": 0,
+    "duration_ms": 14415,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.3128996,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 34350,
+     "cache_read_input_tokens": 103378,
+     "output_tokens": 870
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__get_ticket,mcp__ticket-tracker__list_open_tickets",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, the ticket-tracker MCP server isn't active right now. It's registered in this session, but it isn't connected.\n\n- **Registered:** its two tools, `get_ticket` and `list_open_tickets`, are in the session's tool list, and ToolSearch loaded their definitions.\n- **Not connected:** calling `list_open_tickets` returned `MCP server \"ticket-tracker\" is not connected`. I only tried that one tool, but it"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 15892,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T082738Z-556788.jsonl",
+    "exit": 0,
+    "duration_ms": 15796,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.3150566,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 34348,
+     "cache_read_input_tokens": 103343,
+     "output_tokens": 979
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, it isn't active right now.\n\n- **Registered:** its two tools, `list_open_tickets` and `get_ticket`, are listed in this session, and their schemas loaded without error.\n- **Not connected:** I called `list_open_tickets`, which only reads, and it failed with `MCP server \"ticket-tracker\" is not connected`.\n\nSo the session knows about the server, but the server isn't answering. It may have failed at"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 20513,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T082755Z-559416.jsonl",
+    "exit": 0,
+    "duration_ms": 20421,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.0774932,
+    "usage": {
+     "input_tokens": 8,
+     "cache_creation_input_tokens": 1650,
+     "cache_read_input_tokens": 183306,
+     "output_tokens": 1380
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__get_ticket,mcp__ticket-tracker__list_open_tickets",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": false
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 13575,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T082816Z-562686.jsonl",
+    "exit": 0,
+    "duration_ms": 13484,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.0473594,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 743,
+     "cache_read_input_tokens": 136657,
+     "output_tokens": 703
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__get_ticket,mcp__ticket-tracker__list_open_tickets",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No. The ticket-tracker server is configured for this session, but it isn't connected, so its tools can't be used right now.\n\n- **Configured:** ToolSearch found and loaded both of its tools, `mcp__ticket-tracker__list_open_tickets` and `mcp__ticket-tracker__get_ticket`.\n- **Not connected:** I called `list_open_tickets`, which only reads data and takes no arguments. It returned `MCP server \"ticket-t"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 13949,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T082830Z-565357.jsonl",
+    "exit": 0,
+    "duration_ms": 13852,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.051259200000000005,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 867,
+     "cache_read_input_tokens": 136596,
+     "output_tokens": 849
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, it isn't. The ticket-tracker server is set up in this session but isn't connected right now.\n\n- **Registered:** Both of its tools (`list_open_tickets` and `get_ticket`) are listed, and their definitions loaded.\n- **Not running:** A read-only call to `list_open_tickets` failed with `MCP server \"ticket-tracker\" is not connected`.\n\nThe server probably failed to start or dropped its connection aft"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 14114,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T082844Z-570660.jsonl",
+    "exit": 0,
+    "duration_ms": 14021,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.049591800000000005,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 799,
+     "cache_read_input_tokens": 136879,
+     "output_tokens": 790
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No. The ticket-tracker server is listed in this session, but it isn't connected.\n\n- **Listed:** both of its tools, `mcp__ticket-tracker__list_open_tickets` and `mcp__ticket-tracker__get_ticket`, appear among the session's deferred tools. ToolSearch loaded their definitions without trouble.\n- **Not working:** I called `list_open_tickets`, which only reads data and takes no arguments. It failed with"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 15694,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T082859Z-573653.jsonl",
+    "exit": 0,
+    "duration_ms": 15594,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.051954,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 886,
+     "cache_read_input_tokens": 136810,
+     "output_tokens": 874
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__get_ticket,mcp__ticket-tracker__list_open_tickets",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No. The ticket-tracker server is configured in this session, but it isn't connected, so its tools don't work right now.\n\n- **It is registered:** ToolSearch loaded the definitions for both of its tools, `mcp__ticket-tracker__get_ticket` and `mcp__ticket-tracker__list_open_tickets`.\n- **It isn't reachable:** I called the read-only `list_open_tickets` and got `MCP server \"ticket-tracker\" is not conne"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 14967,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T082915Z-575407.jsonl",
+    "exit": 0,
+    "duration_ms": 14877,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.051685800000000004,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 885,
+     "cache_read_input_tokens": 136609,
+     "output_tokens": 863
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No. The ticket-tracker server is registered in this session, but it isn't connected.\n\n- **Registered:** its two tools, `list_open_tickets` and `get_ticket`, appear in the session's tool list, and their schemas loaded.\n- **Not connected:** I tried the read-only `list_open_tickets` call and it failed with `MCP server \"ticket-tracker\" is not connected`.\n\nSo you can't use it right now. Run `/mcp` to s"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 19676,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": true
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T082930Z-577220.jsonl",
+    "exit": 0,
+    "duration_ms": 19591,
+    "result_subtype": "success",
+    "num_turns": 4,
+    "cost_usd": 0.0771338,
+    "usage": {
+     "input_tokens": 8,
+     "cache_creation_input_tokens": 1637,
+     "cache_read_input_tokens": 183129,
+     "output_tokens": 1369
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     },
+     {
+      "name": "Bash",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "[withheld: this run read client settings files, so its answer may quote them]"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 18251,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T082950Z-580023.jsonl",
+    "exit": 0,
+    "duration_ms": 18167,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.048899000000000005,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 811,
+     "cache_read_input_tokens": 136735,
+     "output_tokens": 752
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__get_ticket,mcp__ticket-tracker__list_open_tickets",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, it isn't. The server is configured for this session, but it isn't connected, so its tools can't be used.\n\n- **Its tools are registered:** `get_ticket` and `list_open_tickets` both showed up in the deferred tool list, and their schemas loaded through ToolSearch.\n- **The server isn't responding:** I called `list_open_tickets`, which only reads, and it returned `MCP server \"ticket-tracker\" is not"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 15911,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T083009Z-583490.jsonl",
+    "exit": 0,
+    "duration_ms": 15826,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.057588600000000004,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 1041,
+     "cache_read_input_tokens": 136783,
+     "output_tokens": 1094
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, it isn't active right now. The ticket-tracker server is registered in this session, but it isn't connected.\n\n- **Registered:** its two tools (`list_open_tickets` and `get_ticket`) are on this session's tool list, and their definitions loaded when I requested them.\n- **Not connected:** when I called `list_open_tickets`, which only reads, it failed with `MCP server \"ticket-tracker\" is not connec"
+   }
+  },
+  {
+   "provider": "arm-g",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 14528,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "g",
+    "transcript": "20260928T083025Z-585389.jsonl",
+    "exit": 0,
+    "duration_ms": 14436,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.0517874,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 891,
+     "cache_read_input_tokens": 136977,
+     "output_tokens": 862
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, it isn't. The ticket-tracker server is registered in this session, but it isn't connected, so its tools can't run.\n\n- **Listed:** both of its tools, `list_open_tickets` and `get_ticket`, appear in this session's deferred tools. Their schemas also loaded when I looked them up.\n- **Not working:** I tried the read-only `list_open_tickets` call and it failed with `MCP server \"ticket-tracker\" is no"
+   }
+  },
+  {
+   "provider": "arm-c",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 13698,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "c",
+    "transcript": "20260928T083040Z-587217.jsonl",
+    "exit": 0,
+    "duration_ms": 13611,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.047927800000000007,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 754,
+     "cache_read_input_tokens": 136659,
+     "output_tokens": 727
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__get_ticket,mcp__ticket-tracker__list_open_tickets",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No, it isn't active right now. The server is set up in this session, but it's not connected.\n\n- **Registered:** loading the tool search returned definitions for its two tools, `get_ticket` and `list_open_tickets`.\n- **Not connected:** I then ran `list_open_tickets`, which only reads. It failed with `MCP server \"ticket-tracker\" is not connected`.\n\nSo the tool names show up, but calling them fails u"
+   }
+  },
+  {
+   "provider": "arm-0",
+   "vars": {
+    "case": "K6"
+   },
+   "latency_ms": 15655,
+   "assertions": {
+    "wrong_status": false,
+    "correct_status": true,
+    "affirms": false,
+    "denies": true,
+    "says_unconfirmed": false,
+    "status_given": true,
+    "question_only": false,
+    "called_target": true,
+    "executed_target": false,
+    "asks_user": false,
+    "names_command": true,
+    "no_builtin_skill": true,
+    "loaded_schema": true,
+    "cli_diagnostic": false,
+    "evidence_settings": false
+   },
+   "output": {
+    "arm": "0",
+    "transcript": "20260928T083054Z-589208.jsonl",
+    "exit": 0,
+    "duration_ms": 15568,
+    "result_subtype": "success",
+    "num_turns": 3,
+    "cost_usd": 0.052077,
+    "usage": {
+     "input_tokens": 6,
+     "cache_creation_input_tokens": 838,
+     "cache_read_input_tokens": 136545,
+     "output_tokens": 902
+    },
+    "target_tools_in_init": 2,
+    "hook": {
+     "exists": true,
+     "lines": 1
+    },
+    "mcp": {
+     "exists": true,
+     "events": [
+      "start",
+      "tools/list",
+      "exit:timer",
+      "start-refused",
+      "start-refused"
+     ]
+    },
+    "init": {
+     "version": "2.1.283",
+     "model": "claude-opus-5-5[1m]",
+     "permission_mode": "bypassPermissions",
+     "ticket_tracker_status": "connected",
+     "workspace_guard_loaded": true
+    },
+    "calls": [
+     {
+      "name": "ToolSearch",
+      "skill": null,
+      "query": "select:mcp__ticket-tracker__list_open_tickets,mcp__ticket-tracker__get_ticket",
+      "is_error": false
+     },
+     {
+      "name": "mcp__ticket-tracker__list_open_tickets",
+      "skill": null,
+      "query": "",
+      "is_error": true
+     }
+    ],
+    "final_head": "No. The ticket-tracker server is registered in this session but isn't connected.\n\n- **Registered:** its two tools (`list_open_tickets` and `get_ticket`) are in this session's tool list, and their schemas loaded.\n- **Not connected:** a read-only `list_open_tickets` call returned `MCP server \"ticket-tracker\" is not connected`.\n\nSo the session knows about the server, but no ticket-tracker tool calls "
+   }
+  }
+ ]
+}

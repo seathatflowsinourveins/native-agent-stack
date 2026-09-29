@@ -1,0 +1,15 @@
+{
+  "description": "Appends one line per session start to the plugin's state directory and prints nothing.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/mark.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

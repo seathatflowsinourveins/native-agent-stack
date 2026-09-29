@@ -1,0 +1,7 @@
+on: pull_request_target
+cache-mode: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo test

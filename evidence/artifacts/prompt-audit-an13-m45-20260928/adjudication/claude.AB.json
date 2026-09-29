@@ -1,0 +1,54 @@
+{
+ "leak": false,
+ "leak_text": "",
+ "items": [
+  {
+   "id": "M5",
+   "choice": "A",
+   "reasons": "Neither return states anything the repository or the sources contradict: blueprints/convergence-practice/application-delivery/AGENTS.md:15-18, blueprints/convergence-practice/application-delivery/receipt.json:88, blueprints/convergence-practice/application-delivery/README.md:90, S1 and S10 are all consistent with both. The tie-break is therefore rule 16: will both clients' models follow the wording as intended. Both returns replace the past-tense narrative with direct rules. Both keep the two parts of the 'so' clause: keep the nested contract here for the coordinator to integrate (AGENTS.md:17), and leave the enclosing root's actions alone (AGENTS.md:18; receipt.json:88 'enclosing worktree actions not modified'). The difference is the present-tense fact in AGENTS.md:15-16 that project-readiness's installer 'writes worktree-root guidance and actions'. That fact explains the rule. A keeps it and turns it into a scoped rule that names what would break the rule: 'leave that installer, and the root guidance and actions, to the coordinator'. B drops it. A model loading B is not told that running the project-readiness installer writes at the enclosing root, and B forbids changes only to 'native actions', not the root guidance that AGENTS.md:16 says the installer also writes. S1 favours the more specific instruction. S10 says the second client's model can be more sensitive to AGENTS.md instructions, which makes a precisely scoped rule more important. A's attribution of the installer rests on AGENTS.md:15, whose subject is 'Project-readiness', and on receipt.json:88 ('installed project-readiness contract validator'). The adoption installer at tools/adoption/install_claude_profile.py:2 installs user-scope profile assets, not worktree-root guidance, so it does not undercut that attribution. Lines 15-18 do not say who handles the installer, so A's hand-off to the coordinator is new. It is supported by AGENTS.md:34 ('One coordinator integrates. Writing workers need separate worktrees and bounded file ownership.'). It also does not conflict with receipt.json:88, which records use of the installed validator, not a run of the installer. The case against A: B converts the 'so' clause more literally and adds no directive, and A drops the words 'reviewable' and 'native'. Neither word changes what a model would do, whereas B loses the installer fact that the current lines carry.",
+   "sources": [
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/AGENTS.md:15",
+     "quote": "Project-readiness inspected the enclosing public worktree. Its installer writes"
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/AGENTS.md:16",
+     "quote": "worktree-root guidance and actions, so this bounded application retains the"
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/AGENTS.md:17",
+     "quote": "reviewable nested contract for the coordinator to integrate without modifying"
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/AGENTS.md:18",
+     "quote": "the enclosing repository's native actions."
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/receipt.json:88",
+     "quote": "validated against installed project-readiness contract validator; enclosing worktree actions not modified"
+    },
+    {
+     "locator": "blueprints/convergence-practice/application-delivery/README.md:90",
+     "quote": "repository's global actions were not modified by this bounded contribution."
+    },
+    {
+     "locator": "AGENTS.md:34",
+     "quote": "One coordinator integrates. Writing workers need separate worktrees and bounded file ownership."
+    },
+    {
+     "locator": "tools/adoption/install_claude_profile.py:2",
+     "quote": "user-scope profile assets onto a host:"
+    },
+    {
+     "locator": "S1",
+     "quote": "Being specific about your desired output can help enhance results."
+    },
+    {
+     "locator": "S10",
+     "quote": "It can be more sensitive to instructions contained in skills and other files, such as `AGENTS.md`."
+    }
+   ],
+   "confidence": 0.65
+  }
+ ]
+}

@@ -4,7 +4,9 @@ Sources: AA sections 8.1 and 8.3; PR-H build specification; unittest/path
 conventions in tests/test_token_report_refresh_units.py:12-25. Amendment 2
 (README, 2026-09-27): the #402 role bodies at d022295a and the sub-agents
 reference (https://code.claude.com/docs/en/sub-agents: scope priority, working
-directory, `isolation` and model resolution order).
+directory, `isolation` and model resolution order). Amendment 3 (README,
+2026-09-28): the isolated-builder body after the skills trial removed
+verification-before-completion (docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286).
 """
 
 import json
@@ -25,6 +27,10 @@ REQUIRED_LANES = {
     "blind", "binding", "attribution", "mcp-errors",
 }
 UUID_SHAPE = re.compile(r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b", re.I)
+# A client project-directory prefix for any user under /home or /Users (-home-<user>-..., -Users-<user>-...),
+# so no host's user name is published here. Conservative: ordinary text such as "take-home-task" also matches.
+# Not covered: a project at the home directory itself (-home-<user> with no separator) or other roots (-root-).
+PROJECT_DIR_SHAPE = re.compile(r"-(?:home|Users)-[A-Za-z0-9_]+-")
 # Amendment 2 literals, independent of the manifest. Models: #402's definitions
 # at d022295a (adoption/agents/claude/{stack-verifier,isolated-builder}.md:5 say
 # opus, source-scout.md:5 says sonnet) and the user's Opus rule for build and
@@ -37,7 +43,7 @@ AMENDED_CLAUDE_ROLE_MODELS = {
 AMENDED_ROLE_TABLE = [
     "| stack-researcher | opus | max | #376 role body, after merge/install proof; unchanged by #402 |",
     "| stack-verifier | opus | max | #402 role body at d022295a |",
-    "| isolated-builder | opus | max | #402 role body at d022295a |",
+    "| isolated-builder | opus | max | #402 role body at d022295a as changed by Amendment 3 |",
     "| evidence-reviewer | opus | max | Existing role body; unchanged by #402 |",
     "| source-scout | sonnet | max | #402 role body at d022295a |",
     "| blind-lane-reviewer / blind-judge | opus | max | Existing stripped blind bodies; no skill preload |",
@@ -80,6 +86,12 @@ ROLE_BODY_ROWS = (
     "| `stack-researcher.md` | `a35b015fcf7e8d608b5cf60e4172c6f1033bf4d9b3b8047a008efc5e89dcb446` |",
     "| `evidence-reviewer.md` | `3aa5e3f0aac4b43f7196cb46aee3ce1ef06e795ae93ba2a925ea53ac62f5e256` |",
 )
+# Amendment 3 (2026-09-28): SHA256 of the amended adoption/agents/claude/isolated-builder.md
+# (preload and body sentence for verification-before-completion removed); the .claude/agents
+# copy is the same bytes. It replaces the d022295a row above, which stays in README as history.
+AMENDMENT_3_ROLE_BODY_ROWS = (
+    "| `isolated-builder.md` | `0f8e0834012ec80af39398bfb948b0fe7f0b6dff8effaf06f264d20eb3ed5db7` |",
+)
 # The README amendment rule preserves every earlier seal table: the Repair 1
 # rows, verbatim. Kept as table rows, not "name": "digest" pairs, which the
 # pre-commit gitleaks generic-api-key rule reads as a keyed secret.
@@ -87,6 +99,14 @@ REPAIR_1_SEAL_ROWS = (
     "| `preregistration.json` | `e04c1a08de610356e2f24cf8d1f59a70e8b630e093c93934cd03ab0a8091bee4` |",
     "| `token-e2e-run.mjs` | `6ca129d94d51c6c99c5a9430e2b7fb0d23b0919001acf789bf5d59d74c7cb828` |",
     "| `RUNBOOK.md` | `a8ee0e09ce001db21269f66dc5ec4a4aa39abc3020e86e37d610a4aa9236c5a4` |",
+    "| `fixtures/table.json` | `fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448` |",
+    "| `fixtures/events.jsonl` | `81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e` |",
+)
+# The Amendment 2 seal rows, verbatim: history since Amendment 3 resealed RUNBOOK.md.
+AMENDMENT_2_SEAL_ROWS = (
+    "| `preregistration.json` | `d41152f460c475e6dabe0d8c144e7bd0ef59c0181835afbbba58a6eed445e81a` |",
+    "| `token-e2e-run.mjs` | `eb7029f9c7f5d6672525b0c8cb59263b78a29b40bc4254cf84a666e99dc47913` |",
+    "| `RUNBOOK.md` | `33810ef7b1583163abb81f3111cfcfc9927863a1f2930d6f9f3de9bcafd2ca93` |",
     "| `fixtures/table.json` | `fdf314394a9854039da18b2f827f8caf2d8ffb3651594733eb84699f74c09448` |",
     "| `fixtures/events.jsonl` | `81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e` |",
 )
@@ -615,13 +635,16 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
     def test_amendment_2_pins_executed_role_bodies(self):
         # Repair round, finding 2: the README table pins the d022295a blobs, the
         # freeze requires every executed copy to equal them, and the repository
-        # copies still do; a later change needs another dated amendment.
+        # copies still do unless a later dated amendment replaces a row
+        # (Amendment 3: isolated-builder.md).
         readme = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
         amendment_2 = section(readme, "## Amendment 2 (2026-09-27)", "\n## ")
         for row in ROLE_BODY_ROWS:
-            filename, digest = row.split("`")[1], row.split("`")[3]
-            with self.subTest(file=filename, field="readme_row"):
+            with self.subTest(file=row.split("`")[1], field="readme_row"):
                 self.assertIn(row, amendment_2)
+        current = {row.split("`")[1]: row.split("`")[3] for row in ROLE_BODY_ROWS + AMENDMENT_3_ROLE_BODY_ROWS}
+        self.assertEqual(len(current), len(ROLE_BODY_ROWS))
+        for filename, digest in current.items():
             for copy in ("adoption/agents/claude", ".claude/agents"):
                 with self.subTest(file=filename, copy=copy):
                     self.assertEqual(
@@ -636,6 +659,35 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
                        "requires another dated amendment"):
             with self.subTest(file="RUNBOOK.md", phrase=phrase):
                 self.assertIn(phrase, freeze)
+
+    def test_amendment_3_replaces_the_builder_body_row(self):
+        # Amendment 3 (2026-09-28): the skills trial's conflict rule removed
+        # verification-before-completion from the builder's preload and body; the
+        # README and RUNBOOK rules gain dated sentences, and the d022295a table stays.
+        readme = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
+        amendment_3 = section(readme, "## Amendment 3 (2026-09-28)", "\n## ")
+        for row in AMENDMENT_3_ROLE_BODY_ROWS:
+            with self.subTest(field="readme_row"):
+                self.assertIn(row, amendment_3)
+        flat_3 = flat(amendment_3)
+        for phrase in ("No organic run, capability probe or Workflow of this protocol has run",
+                       "no result was observed", "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+                       "`57452a64…`", "`c81a91c4…`", "`27bf3108`", "2026-09-27T16:35:23Z", "`3058b237`",
+                       "re-verify"):
+            with self.subTest(file="README.md", phrase=phrase):
+                self.assertIn(phrase, flat_3)
+        with self.subTest(file="README.md", field="carrier_rule"):
+            self.assertIn("**Amendment 3 (2026-09-28)** replaces its `isolated-builder.md` row",
+                          flat(readme.partition("## Sealing")[0]))
+        freeze = flat(section((BLUEPRINT / "RUNBOOK.md").read_text(encoding="utf-8"),
+                              "## Freeze and preflight", "\n## "))
+        with self.subTest(file="RUNBOOK.md", field="freeze_rule"):
+            self.assertIn("**Amendment 3 (2026-09-28):** for `isolated-builder.md` the required value is "
+                          "README's Amendment 3 role-body row", freeze)
+        for copy in ("adoption/agents/claude", ".claude/agents"):
+            with self.subTest(copy=copy):
+                self.assertNotIn("verification-before-completion",
+                                 (ROOT / copy / "isolated-builder.md").read_text(encoding="utf-8"))
 
     def test_amendment_2_records_builder_base_binding(self):
         # Repair round: the change table states the input binding and its limits;
@@ -754,7 +806,7 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
                 continue  # This contract covers text files recursively.
             label = str(document.relative_to(BLUEPRINT))
             self.assertNotIn("/" + "tmp/", text, label)
-            self.assertNotIn("-home-" + "apoth-", text, label)
+            self.assertIsNone(PROJECT_DIR_SHAPE.search(text), label)
             self.assertNotIn("/" + "home/", text, label)
             self.assertNotIn("/" + "Users/", text, label)
             self.assertIsNone(re.search(r"[A-Za-z]:" + r"[\\/]Users[\\/]", text), label)
@@ -762,7 +814,7 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
 
     def test_privacy_guard_rejects_leaks_outside_readme(self):
         # Synthetic values only; no host identity is embedded in the fixture.
-        probes = ["/" + "tmp/example", "-home-" + "apoth-example",
+        probes = ["/" + "tmp/example", "-home-" + "example-x", "-Users-" + "example-x",
                   "/" + "home/example", "/" + "Users/example", "C:" + "\\Users\\example",
                   "-".join(["0" * 8, "0" * 4, "0" * 4, "0" * 4, "0" * 12])]
         read_text = Path.read_text
@@ -827,25 +879,32 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
 
     def test_sealing_hashes_and_amendment_rule(self):
         # retrieval-quality-v2/PREREGISTRATION.md Sealing and Amendments: the
-        # Repair 1 seal stays; the Amendment 2 seal holds the current hashes.
+        # Repair 1 and Amendment 2 seals stay; the Amendment 3 seal holds the
+        # current hashes.
         text = (BLUEPRINT / "README.md").read_text(encoding="utf-8")
         for term in ("## Sealing", "## Amendment 1 (2026-09-26)", "## Amendment 2 (2026-09-27)",
-                     "append-only", "never a silent rewrite"):
+                     "## Amendment 3 (2026-09-28)", "append-only", "never a silent rewrite"):
             with self.subTest(term=term):
                 self.assertTrue(term in text, term)
         repair_1 = section(text, "## Sealing", "## Amendment 1 (2026-09-26)")
         for filename, row in zip(SEALED_FILES, REPAIR_1_SEAL_ROWS):
             with self.subTest(seal="repair_1", file=filename):
                 self.assertTrue(row in repair_1, filename)
+        with self.subTest(seal="sealing_note"):
+            self.assertIn("the launch check uses the Amendment 3 seal below", flat(repair_1))
         amendment_2 = section(text, "## Amendment 2 (2026-09-27)", "\n## ")
-        for filename in SEALED_FILES:
-            digest = hashlib.sha256((BLUEPRINT / filename).read_bytes()).hexdigest()
+        for filename, row in zip(SEALED_FILES, AMENDMENT_2_SEAL_ROWS):
             with self.subTest(seal="amendment_2", file=filename):
-                self.assertTrue(f"| `{filename}` | `{digest}` |" in amendment_2, filename)
+                self.assertTrue(row in amendment_2, filename)
         for term in ("`c7b78854`", "2026-09-27T06:39:20Z", "`d022295a`", "2026-09-27T14:04:25Z",
                      "no result was observed"):
             with self.subTest(field="chronology", term=term):
                 self.assertIn(term, amendment_2)
+        amendment_3 = section(text, "## Amendment 3 (2026-09-28)", "\n## ")
+        for filename in SEALED_FILES:
+            digest = hashlib.sha256((BLUEPRINT / filename).read_bytes()).hexdigest()
+            with self.subTest(seal="amendment_3", file=filename):
+                self.assertTrue(f"| `{filename}` | `{digest}` |" in amendment_3, filename)
 
 
 if __name__ == "__main__":
