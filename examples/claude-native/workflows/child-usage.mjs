@@ -1764,9 +1764,81 @@ const RESULT_LIMIT = 5120
 const contentBytes = (content) => typeof content === 'string' ? Buffer.byteLength(content, 'utf8')
   : Array.isArray(content) ? content.reduce((n, b) => n + contentBytes(b?.type === 'text' && typeof b.text === 'string' ? b.text : b), 0)
     : Buffer.byteLength(JSON.stringify(content), 'utf8')
-const emptySizes = () => ({ results: 0, bytes: 0, large_results: 0, large_bytes: 0, max_bytes: 0 })
-const addSize = (s, n) => { s.results++; s.bytes += n; if (n > RESULT_LIMIT) { s.large_results++; s.large_bytes += n } s.max_bytes = Math.max(s.max_bytes, n) }
+// PR-A item 4: every sizes object also counts, among its results over RESULT_LIMIT, the JSON ones, the uniform-tabular ones and the ones
+// whose shape this reading cannot tell (largeShape below), so a count of 0 never stands for "not inspected".
+const emptySizes = () => ({ results: 0, bytes: 0, large_results: 0, large_bytes: 0, max_bytes: 0, large_json: 0, large_uniform_keys: 0, large_uniform_flat: 0, large_shape_unknown: 0 })
+const addSize = (s, n, shape = null) => {
+  s.results++; s.bytes += n
+  if (n > RESULT_LIMIT) {
+    s.large_results++; s.large_bytes += n
+    if (!shape) s.large_shape_unknown++
+    else { if (shape.json) s.large_json++; if (shape.uniform_keys) s.large_uniform_keys++; if (shape.uniform_flat) s.large_uniform_flat++ }
+  }
+  s.max_bytes = Math.max(s.max_bytes, n)
+}
+// Sum of sizes objects: every counter adds up except max_bytes, the largest; a counter an older measurement lacks adds nothing.
+const sumSizes = (rows) => rows.reduce((a, b) => Object.fromEntries(Object.keys(a).map((k) => [k, k === 'max_bytes' ? Math.max(a[k], b[k] || 0) : a[k] + (b[k] || 0)])), emptySizes())
 const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s.results), large_byte_share: share(s.large_bytes, s.bytes) })
+// JSON and uniform-tabular shape of a result over RESULT_LIMIT (PR-A item 4; the AA §1 large-output table's JSON column). The payload is the
+// result text (a string, or text blocks joined with '', the join contentBytes implies) after its carrier's own wrapper: ctx_execute and
+// ctx_execute_file put the code echo before stdout (ctxEcho), and Read returns cat -n numbered lines (the Read tool's description; on this
+// host all 11,467 Read results over 5,120 B were numbered on every line, and JSON was found in 0 of them as returned but in 990 without the
+// numbers). json: the trimmed payload opens with [ or { and parses. uniform_keys: it, or the one value of a one-key object, is an array of at
+// least five objects with one non-empty key set. uniform_flat: uniform_keys and every value of those objects is null, a boolean, a number or
+// a string (TOON v4.1.1 packages/toon/README.md:199, "All objects have identical fields with primitive values"; #381 toon-seeded: "at least
+// five flat records"); keyed maps of uniform objects, which TOON also tabulates, are not counted. null when this reading cannot tell: a
+// non-text block, a result without its call, or an echo or line numbers it cannot find (large_shape_unknown).
+const NOT_JSON = { json: false, uniform_keys: false, uniform_flat: false }
+const primitive = (v) => v === null || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+const record = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
+function jsonShape(text) {
+  const trimmed = text.trim(), open = trimmed.charCodeAt(0)
+  if (open !== 91 && open !== 123) return NOT_JSON
+  let value
+  try { value = JSON.parse(trimmed) } catch (e) { return e instanceof SyntaxError ? NOT_JSON : null }
+  let rows = value
+  if (!Array.isArray(rows)) { const keys = Object.keys(rows); rows = keys.length === 1 ? rows[keys[0]] : null }
+  let uniform = Array.isArray(rows) && rows.length >= 5 && rows.every(record)
+  if (uniform) { const keys = JSON.stringify(Object.keys(rows[0]).sort()); uniform = keys !== '[]' && rows.every((r) => JSON.stringify(Object.keys(r).sort()) === keys) }
+  return { json: true, uniform_keys: uniform, uniform_flat: uniform && rows.every((r) => Object.values(r).every(primitive)) }
+}
+// context-mode's code echo before a ctx_execute or ctx_execute_file result (mksglu/context-mode v1.0.169, tag commit 442f1eb6,
+// src/server.ts:1511-1527 buildExecuteEcho; :1827 and :2145 build it from the user-supplied code, and :1939 and :2217 return `${echo}${stdout}`):
+// "path=<path>\n" for ctx_execute_file, then the code clipped at 2,000 UTF-16 units with "\n… (truncated)", fenced with its language, and a
+// blank line. null when the call input cannot rebuild it.
+export function ctxEcho(name, input) {
+  const i = input && typeof input === 'object' ? input : {}, file = /__ctx_execute_file$/.test(String(name || ''))
+  if (typeof i.language !== 'string' || typeof i.code !== 'string' || (file && i.path !== undefined && i.path !== null && typeof i.path !== 'string')) return null
+  const clip = i.code.length <= 2000 ? i.code : i.code.slice(0, 2000) + '\n… (truncated)'
+  return (file && i.path ? 'path=' + i.path + '\n' : '') + '```' + i.language + '\n' + clip + '\n```\n\n'
+}
+// A Read result without its cat -n line numbers (spaces, digits and a tab before every line), or null when a line lacks them. A linear scan.
+function withoutLineNumbers(text) {
+  const lines = []
+  for (let at = 0; at < text.length;) {
+    let i = at
+    while (text.charCodeAt(i) === 32) i++
+    const digits = i
+    while (text.charCodeAt(i) >= 48 && text.charCodeAt(i) <= 57) i++
+    if (i === digits || text.charCodeAt(i) !== 9) return null
+    const end = text.indexOf('\n', i + 1), stop = end < 0 ? text.length : end
+    lines.push(text.slice(i + 1, stop))
+    at = stop + 1
+  }
+  return lines.join('\n')
+}
+function largeShape(content, call) {
+  const text = typeof content === 'string' ? content
+    : Array.isArray(content) && content.every((b) => b?.type === 'text' && typeof b.text === 'string') ? content.map((b) => b.text).join('') : null
+  if (text === null || !call) return null
+  const name = String(call.name || '')
+  if (/__ctx_execute(?:_file)?$/.test(name)) {
+    const echo = ctxEcho(name, call.input)
+    return echo !== null && text.startsWith(echo) ? jsonShape(text.slice(echo.length)) : null
+  }
+  const payload = name === 'Read' ? withoutLineNumbers(text) : text
+  return payload === null ? null : jsonShape(payload)
+}
 const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
 // A Bash call is carried by rtk proxy when its command invokes `rtk proxy` in command position (commandInvocations, through
 // the caller's per-call memo `proxied`); the earlier prefix rule survives only as measurement.proxy.prefix_rule_calls.
@@ -2004,6 +2076,25 @@ function rtkParts(calls, rewrites, enabled, exceptions) {
   }
   return { ...out, status: out.unknown_calls ? 'incomplete' : 'measured', coverage: share(out.observed_covered_parts, out.eligible_parts), call_coverage: share(out.observed_all_covered_calls, out.eligible_calls) }
 }
+// Hook context (PR-A item 1). An insertion is a hook_additional_context row, the row M12 counts (E2E README.md M12: "0
+// hook_additional_context rows from any hook event"); its content array holds one entry per hook whose context Claude Code delivered (the
+// hooks reference: "When several hooks return additionalContext for the same event, Claude receives all of the values"). A claim is a
+// hook_success row whose stdout asks for context and is never an insertion: JSON with hookSpecificOutput.additionalContext on any event,
+// or plain text (stdout that does not both start with { and end with }) on the four events whose plain stdout Claude Code adds as context
+// (code.claude.com/docs/en/hooks, "Exit code 0", fetched 2026-09-29). Every other hook_* row type is counted apart, descriptively.
+const PLAIN_STDOUT_EVENTS = new Set(['UserPromptSubmit', 'UserPromptExpansion', 'SessionStart', 'PostModelSwitch'])
+const HOOK_EVENT = /^[A-Z][A-Za-z]{0,39}$/
+// The by_hook key of a hook name: the name when it is name-shaped (SAFE_KEY), else, for <Event>:mcp__<server>__<tool> with an event-shaped
+// <Event> and a name-shaped <server>, <Event>:mcp__<server> (a long MCP tool name would otherwise be lost under '(other)'), else '(other)'.
+// [key, folded]
+function hookNameKey(name) {
+  const key = safeKey(name || '(none)')
+  if (key !== '(other)' || typeof name !== 'string') return [key, false]
+  const at = name.indexOf(':mcp__'), event = at > 0 ? name.slice(0, at) : ''
+  const server = HOOK_EVENT.test(event) ? mcpServer(name.slice(at + 1)) : null
+  const folded = server && server !== '(other)' ? safeKey(event + ':mcp__' + server) : '(other)'
+  return folded === '(other)' ? [key, false] : [folded, true]
+}
 // ccusage/ccusage v20.0.24 rust/adapters/claude/src/daily.rs:410-458,505-523;
 // #381 RUNBOOK mandates per-message deduplication. Keep absent counters unknown.
 export function transcriptUsage(transcript, window = null) {
@@ -2050,18 +2141,30 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     }
   }
   const m3 = emptySizes(), m5 = emptySizes(), carriers = counter(), excluded = counter(), m4 = emptyFetches(), fetchCarriers = counter()
-  const hookContext = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }
+  // inserted counts rows and inserted_blocks their content entries; with_marker counts rows; claims and other hook rows see hookContext above.
+  const hookContext = { inserted: 0, inserted_blocks: 0, claimed: 0, with_marker: 0, hook_names_folded: 0, by_hook: counter(), by_event: counter(),
+    blocks_by_event: counter(), claimed_by_event: counter(), claimed_plain_stdout: counter(), other_hook_rows: counter() }
   for (const row of transcript) {
     if (!inside(row)) continue
     const a = row?.attachment
-    if (a?.type === 'hook_additional_context') {
+    if (typeof a?.type !== 'string' || !a.type.startsWith('hook_')) continue
+    const event = safeKey(a.hookEvent || '(none)')
+    if (a.type === 'hook_additional_context') {
+      const blocks = Array.isArray(a.content) ? a.content.length : typeof a.content === 'string' && a.content ? 1 : 0
+      const [key, folded] = hookNameKey(a.hookName)
       hookContext.inserted++
-      bump(hookContext.by_hook, safeKey(a.hookName || '(none)'))
-      bump(hookContext.by_event, safeKey(a.hookEvent || '(none)'))
+      hookContext.inserted_blocks += blocks
+      if (folded) hookContext.hook_names_folded++
+      bump(hookContext.by_hook, key)
+      bump(hookContext.by_event, event)
+      hookContext.blocks_by_event[event] = (hookContext.blocks_by_event[event] || 0) + blocks
       if (textOf(a.content).includes(marker)) hookContext.with_marker++
-    } else if (a?.type === 'hook_success') {
-      try { if (JSON.parse(a.stdout).hookSpecificOutput?.additionalContext) hookContext.claimed++ } catch { /* no claim */ }
-    }
+    } else if (a.type === 'hook_success') {
+      const out = typeof a.stdout === 'string' ? a.stdout.trim() : ''
+      if (out.startsWith('{') && out.endsWith('}')) {
+        try { if (JSON.parse(out).hookSpecificOutput?.additionalContext) { hookContext.claimed++; bump(hookContext.claimed_by_event, event) } } catch { /* a parse failure adds nothing */ }
+      } else if (out && PLAIN_STDOUT_EVENTS.has(a.hookEvent)) bump(hookContext.claimed_plain_stdout, event)
+    } else bump(hookContext.other_hook_rows, safeKey(a.type))
   }
   // One command-position reading per call (U1 design 2.6): carrierOf, measurement.proxy and cli_lanes all read it. It needs a verified
   // tree-sitter-bash install (loadShellParser); without one nothing is read, cli_lanes says why, and the carrier of an rtk proxy call is
@@ -2072,7 +2175,9 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   const proxied = lanesOn ? (c) => analysisOf(c).proxy > 0 : rtkProxyPrefix
   for (const c of calls.values()) if (inside(c.row)) countFetches(c, fetchCarriers[carrierOf(c, proxied)] ||= emptyFetches())
   for (const f of Object.values(fetchCarriers)) for (const k of Object.keys(m4)) m4[k] += f[k]
-  const mcpStates = counter(), loaded = counter(), cli = emptyCliLanes()
+  // mcpAttempted splits the MCP calls attempted in the window by tool: a ctx_ tool (isCtx, as M5 and the ctx carrier read it) or another,
+  // for the AA §1 per-actor figures "children with any MCP call" and "children with a non-ctx MCP call" (aggregateMeasurements).
+  const mcpStates = counter(), loaded = counter(), notCalled = counter(), mcpAttempted = { ctx: 0, non_ctx: 0 }, cli = emptyCliLanes()
   // measurement.proxy: the M6 population is the Bash calls carried by rtk proxy (sandbox-nested Codex calls included, as
   // before), with its invocations; rtk proxy in ctx shell code is reported apart and left out of M6, and the prefix rule's
   // count is kept for comparison with earlier receipts.
@@ -2088,6 +2193,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       const status = r ? (r.is_error ? 'failed' : 'succeeded')
         : c.native_status === 'completed' ? 'succeeded' : c.native_status === 'failed' ? 'failed' : 'unfinished'
       state.attempted++; state[status]++
+      mcpAttempted[isCtx(c.name) ? 'ctx' : 'non_ctx']++
     }
     const analysis = lanesOn ? analysisOf(c) : null, carrier = carrierOf(c, proxied)
     if (rtkProxyPrefix(c)) proxy.prefix_rule_calls++
@@ -2102,9 +2208,15 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     if (lanesOn && analysis.errors) cli.parse_errors++ // calls whose shell text has a syntax error, not nodes
     if (lanesOn && analysis.invocations.length) countLanes(cli, analysis, callState(c, r), c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
   }
+  // PR-A item 5: loaded counts the tool references a ToolSearch result inside the window returned, per MCP server, whether or not the actor
+  // called the server; loaded_not_called keeps the #432 unit, the references of servers the actor attempted no call on inside the window
+  // (a call before since does not make a later load a call). Built-in tools (a reference such as Read) name no server.
   for (const [id, r] of results) if (inside(r.row) && calls.get(id)?.name === 'ToolSearch' && Array.isArray(r.content)) {
     for (const ref of r.content) if (ref?.type === 'tool_reference') {
-      const server = mcpServer(ref.tool_name); if (server && !mcpStates[server]) bump(loaded, server)
+      const server = mcpServer(ref.tool_name)
+      if (!server) continue
+      bump(loaded, server)
+      if (!mcpStates[server]) bump(notCalled, server)
     }
   }
   let orphanResults = 0, invalidExceptions = 0, unknownResultBytes = 0
@@ -2118,8 +2230,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     if (c?.sandbox) continue // Nested results return to code, not model context.
     if (!c) orphanResults++
     if (r.content === undefined || r.content === null) { unknownResultBytes++; continue }
-    const n = contentBytes(r.content)
-    addSize(carriers[carrier] ||= emptySizes(), n)
+    const n = contentBytes(r.content), shape = n > RESULT_LIMIT ? largeShape(r.content, c) : null
+    addSize(carriers[carrier] ||= emptySizes(), n, shape)
     let exception = null
     if (!r.is_error && c?.name === 'Read' && c.input?.file_path && edits.some((e) => e.index > r.index && e.input.file_path === c.input.file_path && e.row.cwd === c.row.cwd)) exception = EXCEPTIONS[0]
     if (Object.hasOwn(exceptions, id)) {
@@ -2127,9 +2239,9 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       if (validReview(review)) exception = EXCEPTIONS.includes(review.exception) ? review.exception : exception
       else invalidExceptions++
     }
-    if (exception) addSize(excluded[exception] ||= emptySizes(), n)
-    else addSize(m3, n)
-    if (carrier === 'ctx') addSize(m5, n)
+    if (exception) addSize(excluded[exception] ||= emptySizes(), n, shape)
+    else addSize(m3, n, shape)
+    if (carrier === 'ctx') addSize(m5, n, shape)
   }
   const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
   const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
@@ -2137,7 +2249,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
     usage: transcriptUsage(transcript, window),
     hook_context: hookContext,
-    mcp_states: mcpStates, loaded_not_called: loaded,
+    mcp_states: mcpStates, mcp_attempted: mcpAttempted, loaded_not_called: notCalled, loaded,
     proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
     cli_lanes: lanesOn ? { status: 'measured', parser: { versions: parserState.versions, wasm_sha256: parserState.wasm_sha256 }, ...cli } : { status: 'parser_unavailable', reason: parserState.reason },
     invalid_exceptions: invalidExceptions, orphan_results: orphanResults,
@@ -2146,9 +2258,12 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     calls_without_result: unfinished }
 }
 
+const HOOK_SCALARS = ['inserted', 'inserted_blocks', 'claimed', 'with_marker', 'hook_names_folded']
+const HOOK_MAPS = ['by_hook', 'by_event', 'blocks_by_event', 'claimed_by_event', 'claimed_plain_stdout', 'other_hook_rows']
+// The carriers of the AA §1 per-child shell/web figure: Bash, rtk proxy and WebFetch results (WebSearch results stay in 'other').
+const SHELL_WEB_CARRIERS = ['bash', 'rtk_proxy', 'webfetch']
 export function aggregateMeasurements(items) {
-  const sizes = (rows) => finishSizes(rows.reduce((a, b) => ({ results: a.results + b.results, bytes: a.bytes + b.bytes,
-    large_results: a.large_results + b.large_results, large_bytes: a.large_bytes + b.large_bytes, max_bytes: Math.max(a.max_bytes, b.max_bytes) }), emptySizes()))
+  const sizes = (rows) => finishSizes(sumSizes(rows))
   const groups = (key) => Object.fromEntries([...new Set(items.flatMap((m) => Object.keys(m[key])))].sort().map((k) => [k, sizes(items.map((m) => m[key][k]).filter(Boolean))]))
   const f = emptyFetches(), fetchCarriers = counter(), rtk = emptyRtk()
   for (const m of items) {
@@ -2160,7 +2275,11 @@ export function aggregateMeasurements(items) {
     for (const k of Object.keys(rtk)) rtk[k] += m.rtk_parts[k]
   }
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
-  const hooks = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }, states = counter(), loaded = counter()
+  // actors_with_insertion counts the actors with at least one insertion row; loaded_actors and loaded_not_called_actors count, per server,
+  // the actors with at least one such reference: the unit of the historical 'Loaded, never called' baseline row (children per server).
+  const hooks = { ...Object.fromEntries(HOOK_SCALARS.map((k) => [k, 0])), actors_with_insertion: 0, ...Object.fromEntries(HOOK_MAPS.map((k) => [k, counter()])) }
+  const states = counter(), notCalled = counter(), loaded = counter(), loadedActors = counter(), notCalledActors = counter()
+  const addCounts = (target, source) => { for (const [s, n] of Object.entries(source || {})) target[s] = (target[s] || 0) + n }
   const proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
   // CLI lanes sum their counters over the actors whose lanes were measured; actors_with_success counts the actors with at least one
   // succeeded call of the lane. An actor measured without a parser has no lane counts (cli_lanes.status parser_unavailable), so the
@@ -2170,10 +2289,14 @@ export function aggregateMeasurements(items) {
   const records = new Set(measured.map((m) => JSON.stringify(m.cli_lanes.parser ?? null)))
   const rules = new Set(items.map((m) => m.proxy.rule ?? 'command_position'))
   for (const m of items) {
-    for (const k of ['inserted', 'claimed', 'with_marker']) hooks[k] += m.hook_context[k]
-    for (const k of ['by_hook', 'by_event']) for (const [s, n] of Object.entries(m.hook_context[k])) hooks[k][s] = (hooks[k][s] || 0) + n
+    for (const k of HOOK_SCALARS) hooks[k] += m.hook_context[k] || 0
+    for (const k of HOOK_MAPS) addCounts(hooks[k], m.hook_context[k])
+    if (m.hook_context.inserted) hooks.actors_with_insertion++
     for (const [s, row] of Object.entries(m.mcp_states)) for (const [k, n] of Object.entries(row)) { states[s] ||= counter(); states[s][k] = (states[s][k] || 0) + n }
-    for (const [s, n] of Object.entries(m.loaded_not_called)) loaded[s] = (loaded[s] || 0) + n
+    addCounts(notCalled, m.loaded_not_called)
+    addCounts(loaded, m.loaded)
+    for (const s of Object.keys(m.loaded_not_called)) bump(notCalledActors, s)
+    for (const s of Object.keys(m.loaded || {})) bump(loadedActors, s)
     for (const k of Object.keys(proxies)) proxies[k] = proxies[k] === null || m.proxy[k] === null ? null : proxies[k] + (m.proxy[k] || 0)
     const part = m.cli_lanes
     if (!part || statusOf(m) !== 'measured') continue
@@ -2191,13 +2314,20 @@ export function aggregateMeasurements(items) {
     for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations', 'parse_errors']) cli[k] += part[k] || 0
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
-    hook_context: hooks, mcp_states: states, loaded_not_called: loaded,
+    hook_context: hooks, mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
     proxy: { ...proxies, rule: rules.size === 1 ? [...rules][0] : 'mixed', acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
     cli_lanes: !items.length ? { status: 'not_measured' }
       : unavailable.length === items.length ? { status: 'parser_unavailable', reason: unavailable[0].cli_lanes.reason }
         : { status: measured.length === items.length && records.size === 1 ? 'measured' : 'incomplete', ...(records.size === 1 ? { parser: JSON.parse([...records][0]) } : {}),
           ...(measured.length === items.length ? {} : { actors_measured: measured.length, actors_unmeasured: items.length - measured.length }), ...cli },
     m3_large_results_per_actor: tokenStats(items.map((m) => m.m3.large_results)),
+    // AA §1 figures that exist per actor only (the scope extract's baseline derivation order): the per-child distribution of shell/web results
+    // over RESULT_LIMIT, the actors with any MCP call attempted in the window and with one that is not a ctx_ tool, and M5's population, the
+    // actors with a ctx result ("All B children using ctx", E2E README.md M5 row).
+    shell_web_large_results_per_actor: tokenStats(items.map((m) => SHELL_WEB_CARRIERS.reduce((n, k) => n + (m.by_carrier[k]?.large_results || 0), 0))),
+    actors_with_mcp_call: items.filter((m) => Object.values(m.mcp_states).some((s) => s.attempted > 0)).length,
+    actors_with_non_ctx_mcp_call: items.filter((m) => m.mcp_attempted?.non_ctx > 0).length,
+    actors_with_ctx_results: items.filter((m) => m.m5.results > 0).length,
     by_carrier: groups('by_carrier'), exceptions: groups('exceptions'),
     orphan_results: items.reduce((n, m) => n + m.orphan_results, 0),
     sandbox_operations: items.reduce((n, m) => n + m.sandbox_operations, 0),
