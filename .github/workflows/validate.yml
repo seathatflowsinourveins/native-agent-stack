@@ -24,7 +24,11 @@ jobs:
     # Raised to 20 on 2026-09-26: the unittest step alone ran 534s in run 36265075411, main's
     # job took 598s in run 36263674462, and runs 36265075411, 36265091632 and 36269293122
     # exceeded the 10-minute limit ("exceeded the maximum execution time of 10m0s").
-    timeout-minutes: 20
+    # Raised to 40 on 2026-09-29: after #502 this job took 753s in run 36572588202 (limit 1200s) and the
+    # measurement tooling still to merge for the #381 token E2E (units U1 to U5, U9, U10, U13) adds an
+    # estimated 600 to 900s of unit tests (one of them alone runs about 190s locally), which would
+    # pass the old limit; the limit stays a hang guard, not a test-time budget.
+    timeout-minutes: 40
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
