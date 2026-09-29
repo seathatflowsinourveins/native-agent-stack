@@ -1914,6 +1914,133 @@ function largeShape(content, call) {
   return payload === null ? null : jsonShape(payload)
 }
 const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
+// Protocol M15, MCP infrastructure errors per server (E2E README.md M15 row; preregistration.json thresholds.M15: the rate of
+// infrastructure-class errors per server at most 0.01, the invoked command's non-zero exit excluded, every ctx error classified, a new class
+// our misuse until reproduced on upstream-recommended config). mcpErrorClass gives each attempted MCP call one class, or null for a success:
+// - a call that did not run keeps its M14 state (rejected, invalid, cancelled_with_result), and a call whose outcome is not known
+//   (no result, or an unknown or interrupted state) is outcome_unknown; the Codex approval denial is approval even when it did not run
+//   (openai/codex rust-v0.157.1 core/src/mcp_tool_call.rs:1612, a ReviewDecision::denied text);
+// - the Claude Code client's own texts come next: "MCP server ... is not connected" (connection), "... sent no response or progress for
+//   ...; aborting" (timeout: the documented idle timeout, code.claude.com/docs/en/mcp and env-vars CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT), and
+//   the MCP SDK's "Connection closed" (-32000) and "MCP error -32602: Input validation error" (@modelcontextprotocol/sdk 1.30.1
+//   shared/protocol.js:263, server/mcp.js:178);
+// - a context-mode tool's text then has the outdated-version notice stripped (server.ts:892-896; getUpgradeHint :802-808 holds no blank
+//   line), and the templates the server returns before it builds any code echo are tested on it as it is (the review's high finding: the
+//   boundary refusal :1196-1201 returns at :2118-2119, before the echo at :2145): boundary (binding when the Codex adapter flags a root
+//   mismatch; cm-audit rows 1-3), the deny firewall (:1122, :1152, :1232), Runtime/Batch execution/Index/Search errors (:1946, :2224,
+//   :3886, :2432, :2801), storage directory errors (session/db.ts storageDirectoryErrorMessage, invalidStorageOverride), usage errors
+//   (:2318, :2611, :2628, :3510, :4518), the batch timeout (:3815), fetch failures (:3599-3611) and an all-failed fetch batch (:3653-3669),
+//   and search throttling (:2659);
+// - only a ctx_execute or ctx_execute_file output after execution carries the echo (ctxEcho; :1827, :2145): it must open the text, and the
+//   rest is read for the execution timeout (:1872, :2152), the exit (exit-classify.ts:31, "Exit code: N\n\nstdout:\n...\n\nstderr:\n..."), a
+//   module error (the stderr's last line a ModuleNotFoundError, or Cannot find module or ERR_MODULE_NOT_FOUND in it; cm-audit row 6) and an
+//   exit whose output the server indexed (:1887, :1897, :2167, :2177, labels execute:<language>:error and file:<path>:error);
+// - anything else is unmatched, and a ctx_execute(_file) text without its echo is echo_mismatch. Echoed code is never matched.
+// Every template is anchored at the start of the text or of its first line, and read with linear scans.
+const M15_THRESHOLD = 0.01 // preregistration.json thresholds.M15.criteria.per_server_infrastructure_error_rate_lte
+const INFRASTRUCTURE_CLASSES = ['approval', 'boundary', 'binding', 'timeout', 'module', 'connection']
+const NEW_CLASSES = ['server_error', 'storage_directory', 'usage_error', 'invalid_arguments', 'unmatched']
+const UNKNOWN_CLASSES = ['outcome_unknown', 'invoked_command_exit_indexed', 'echo_mismatch']
+const SERVER_ERRORS = ['Runtime error: ', 'Batch execution error: ', 'Index error: ', 'Search error: ']
+const USAGE_ERRORS = ['Error: Either content or path must be provided', 'Knowledge base is empty', 'Error: provide query or queries.',
+  'ctx_fetch_and_index requires either `url`', 'Ambiguous purge: ']
+const VERSION_NOTICE = '⚠️ context-mode v'
+const firstLine = (text) => { const end = text.indexOf('\n'); return end < 0 ? text : text.slice(0, end) }
+const digitsEnd = (text, i) => { let j = i; while (j < text.length && text.charCodeAt(j) >= 48 && text.charCodeAt(j) <= 57) j++; return j }
+// The text holds one or more digits at i, then tail: the index after the tail, else -1.
+const digitsThen = (text, i, tail) => { const j = digitsEnd(text, i); return j > i && text.startsWith(tail, j) ? j + tail.length : -1 }
+function withoutVersionNotice(text) {
+  if (!text.startsWith(VERSION_NOTICE) || !firstLine(text).includes(' available. Upgrade: ')) return text
+  const end = text.indexOf('\n\n')
+  return end < 0 ? text : text.slice(end + 2)
+}
+function clientClass(text) {
+  if (text.startsWith('MCP server ')) {
+    const line = firstLine(text)
+    if (line.includes(' is not connected')) return 'connection'
+    if (line.includes(' sent no response or progress for ')) return 'timeout'
+  }
+  if (text.trimEnd() === 'Connection closed' || text.startsWith('MCP error -32000: Connection closed')) return 'connection'
+  return text.startsWith('MCP error -32602: ') ? 'invalid_arguments' : null
+}
+// "fetched N c=K[ cap=K/Ncpu]. ok=0 cache=0 err=N.": a batch whose every URL failed (server.ts:3653-3656, isError at :3669).
+function allFetchesFailed(text) {
+  let i = text.startsWith('fetched ') ? digitsThen(text, 8, ' c=') : -1
+  if (i < 0 || digitsEnd(text, i) === i) return false
+  i = digitsEnd(text, i)
+  if (text.startsWith(' cap=', i)) {
+    i = digitsThen(text, i + 5, '/')
+    if (i < 0 || (i = digitsThen(text, i, 'cpu')) < 0) return false
+  }
+  return text.startsWith('. ok=0 cache=0 err=', i) && digitsThen(text, i + 19, '.') > 0
+}
+// A context-mode refusal or error the server returns without a code echo, tested on the text as returned.
+function ctxRefusal(call, text) {
+  const line = firstLine(text)
+  if (text.startsWith('File access blocked: "') && line.includes('" resolves outside the project root')) return call?.root_mismatch === true ? 'binding' : 'boundary'
+  if (text.startsWith('Command blocked by security policy: ') || text.startsWith('File access blocked by security policy: ')) return 'policy_deny'
+  if (SERVER_ERRORS.some((p) => text.startsWith(p))) return 'server_error'
+  if ((text.startsWith('context-mode ') && line.includes(' directory is not writable: ')) || text.startsWith('Invalid CONTEXT_MODE_DIR for context-mode ')) return 'storage_directory'
+  if (USAGE_ERRORS.some((p) => text.startsWith(p))) return 'usage_error'
+  if (text.startsWith('Batch timed out after ') && digitsThen(text, 22, 'ms') > 0) return 'timeout'
+  if (text.startsWith('Failed to fetch ') || text.startsWith('Fetch error: ') || allFetchesFailed(text)
+    || (text.startsWith('Fetched ') && (line.includes(' but got empty content') || line.includes(' but could not read subprocess output')))) return 'remote_fetch'
+  return text.startsWith('BLOCKED: ') && digitsThen(text, 9, ' search calls in ') > 0 ? 'search_throttle' : null
+}
+// The stderr section of an exit output (the last one: the server writes stderr last) ends with a missing module.
+function moduleNotFound(rest) {
+  const at = rest.lastIndexOf('\n\nstderr:\n')
+  if (at < 0) return false
+  const stderr = rest.slice(at + 10)
+  if (stderr.includes('Cannot find module') || stderr.includes('ERR_MODULE_NOT_FOUND')) return true
+  const trimmed = stderr.trimEnd(), last = trimmed.slice(trimmed.lastIndexOf('\n') + 1).trimStart()
+  return last === 'ModuleNotFoundError' || last.startsWith('ModuleNotFoundError:')
+}
+// A ctx_execute or ctx_execute_file output after execution: the code echo first, then the server's own text.
+function ctxExecuted(name, call, text) {
+  const echo = ctxEcho(name, call?.input)
+  if (echo === null || !text.startsWith(echo)) return 'echo_mismatch'
+  const rest = text.slice(echo.length), line = firstLine(rest)
+  if (rest.startsWith('Execution timed out after ') && digitsThen(rest, 26, 'ms') > 0) return 'timeout'
+  if (rest.startsWith('Timed out processing ') && line.includes(' after ') && line.endsWith('ms')) return 'timeout'
+  if (rest.startsWith('Exit code: ') && digitsThen(rest, rest.charCodeAt(11) === 45 ? 12 : 11, '\n\nstdout:\n') > 0) return moduleNotFound(rest) ? 'module' : 'invoked_command_exit'
+  const at = rest.startsWith('Indexed ') ? digitsThen(rest, 8, ' sections from "') : -1
+  return at > 0 && (rest.startsWith('execute:', at) || rest.startsWith('file:', at)) && line.endsWith(':error" into knowledge base.') ? 'invoked_command_exit_indexed' : null
+}
+// One attempted MCP call's M15 class, or null for a success (s: its callState).
+export function mcpErrorClass(call, result, s = callState(call, result)) {
+  const name = String(call?.name || ''), ctx = isCtx(name)
+  const text = result ? (ctx ? withoutVersionNotice(resultText(result.content)) : resultText(result.content)) : ''
+  if (text.startsWith('MCP tool call requires approval, but approval policy is never')) return 'approval'
+  if (s.state === 'succeeded') return null
+  if (s.not_executed) return projectState(s)
+  if (s.state !== 'failed') return 'outcome_unknown'
+  if (!result) return 'unmatched'
+  return clientClass(text) ?? (ctx ? ctxRefusal(call, text) ?? (/__ctx_execute(?:_file)?$/.test(name) ? ctxExecuted(name, call, text) : null) : null) ?? 'unmatched'
+}
+// The counts of one server as rates: rate counts the infrastructure classes, every new class (named, or unmatched text) and every call
+// whose class or outcome this reading cannot establish (outcome_unknown; an indexed exit, which is the command's own exit or a hidden module
+// error; echo_mismatch), since binding decision B2 holds an unknown not successful; rate_lower_bound counts those unknowns as successes, and
+// threshold_sensitive marks a server whose two bounds fall on different sides of the threshold (B2). every_error_classified is the
+// criterion classify_every_ctx_error (no unmatched or echo_mismatch; binding decision B1 adds no status). rate_upper_bound is the U2
+// design's descriptive ceiling: every call that neither succeeded nor ended in the invoked command's own exit.
+function finishM15Row(row) {
+  const sum = (keys) => keys.reduce((n, k) => n + (row.classes[k] || 0), 0)
+  const infrastructure = sum(INFRASTRUCTURE_CLASSES), newClass = sum(NEW_CLASSES), unknowns = sum(UNKNOWN_CLASSES)
+  const rate = share(infrastructure + newClass + unknowns, row.attempted), lower = share(infrastructure + newClass, row.attempted)
+  return { attempted: row.attempted, succeeded: row.succeeded, ctx: row.ctx, classes: row.classes, infrastructure_errors: infrastructure,
+    new_class_errors: newClass, unknowns, rate, rate_lower_bound: lower,
+    rate_upper_bound: share(row.attempted - row.succeeded - (row.classes.invoked_command_exit || 0), row.attempted),
+    threshold_sensitive: rate !== null && rate > M15_THRESHOLD && lower <= M15_THRESHOLD, every_error_classified: !row.classes.unmatched && !row.classes.echo_mismatch }
+}
+const finishM15 = (servers) => ({ threshold: M15_THRESHOLD, by_server: Object.fromEntries(Object.entries(servers).map(([s, row]) => [s, finishM15Row(row)])) })
+function addM15(servers, server, ctx, cls) {
+  const row = servers[server] ||= { attempted: 0, succeeded: 0, ctx: false, classes: counter() }
+  row.attempted++
+  row.ctx ||= ctx
+  if (cls === null) row.succeeded++
+  else bump(row.classes, cls)
+}
 // A Bash call is carried by rtk proxy when its command invokes `rtk proxy` in command position (commandInvocations, through
 // the caller's per-call memo `proxied`); the earlier prefix rule survives only as measurement.proxy.prefix_rule_calls.
 // The rule before the command-position reading, kept as the fallback without a parser and as measurement.proxy.prefix_rule_calls.
@@ -2325,7 +2452,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   // for the AA §1 per-actor figures "children with any MCP call" and "children with a non-ctx MCP call" (aggregateMeasurements).
   const mcpStates = counter(), loaded = counter(), notCalled = counter(), mcpAttempted = { ctx: 0, non_ctx: 0 }, cli = emptyCliLanes()
   // PR-A item 7: every call attempted in the window, in M14's names (callStates above); one callState per call, which cli_lanes reads too.
-  const callStates = emptyCallStates()
+  // Protocol M15: every attempted MCP call's class, per server (mcpErrorClass).
+  const callStates = emptyCallStates(), m15 = counter()
   // measurement.proxy: the M6 population is the Bash calls carried by rtk proxy (sandbox-nested Codex calls included, as
   // before), with its invocations; rtk proxy in ctx shell code is reported apart and left out of M6, and the prefix rule's
   // count is kept for comparison with earlier receipts.
@@ -2343,6 +2471,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
         : c.native_status === 'completed' ? 'succeeded' : c.native_status === 'failed' ? 'failed' : 'unfinished'
       state.attempted++; state[status]++
       mcpAttempted[isCtx(c.name) ? 'ctx' : 'non_ctx']++
+      addM15(m15, server, isCtx(c.name), mcpErrorClass(c, r, s))
     }
     const analysis = lanesOn ? analysisOf(c) : null, carrier = carrierOf(c, proxied)
     if (rtkProxyPrefix(c)) proxy.prefix_rule_calls++
@@ -2398,7 +2527,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
     usage: transcriptUsage(transcript, window),
     hook_context: hookContext,
-    call_states: callStates,
+    call_states: callStates, m15: finishM15(m15),
     mcp_states: mcpStates, mcp_attempted: mcpAttempted, loaded_not_called: notCalled, loaded,
     proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
     cli_lanes: lanesOn ? { status: 'measured', parser: { versions: parserState.versions, wasm_sha256: parserState.wasm_sha256 }, ...cli } : { status: 'parser_unavailable', reason: parserState.reason },
@@ -2431,6 +2560,15 @@ export function aggregateMeasurements(items) {
   const states = counter(), notCalled = counter(), loaded = counter(), loadedActors = counter(), notCalledActors = counter()
   const callStates = emptyCallStates() // M14 counters add up over actors; decided stays null
   for (const m of items) sumCallStates(callStates, m.call_states)
+  // M15: each server's attempts, successes and classes add up over actors, and the rates are computed again from the sums.
+  const m15 = counter()
+  for (const m of items) for (const [server, row] of Object.entries(m.m15?.by_server || {})) {
+    const total = m15[server] ||= { attempted: 0, succeeded: 0, ctx: false, classes: counter() }
+    total.attempted += row.attempted || 0
+    total.succeeded += row.succeeded || 0
+    total.ctx ||= Boolean(row.ctx)
+    for (const [k, n] of Object.entries(row.classes || {})) total.classes[k] = (total.classes[k] || 0) + n
+  }
   const addCounts = (target, source) => { for (const [s, n] of Object.entries(source || {})) target[s] = (target[s] || 0) + n }
   const proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
   // CLI lanes sum their counters over the actors whose lanes were measured; actors_with_success counts the actors with at least one
@@ -2466,7 +2604,7 @@ export function aggregateMeasurements(items) {
     for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations', 'parse_errors']) cli[k] += part[k] || 0
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
-    hook_context: hooks, call_states: callStates, mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
+    hook_context: hooks, call_states: callStates, m15: finishM15(m15), mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
     proxy: { ...proxies, rule: rules.size === 1 ? [...rules][0] : 'mixed', acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
     cli_lanes: !items.length ? { status: 'not_measured' }
       : unavailable.length === items.length ? { status: 'parser_unavailable', reason: unavailable[0].cli_lanes.reason }
