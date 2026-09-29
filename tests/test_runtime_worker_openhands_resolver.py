@@ -2392,9 +2392,10 @@ class Stage2HarnessTests(unittest.TestCase):
                 (["gh", "api", "-X", "DELETE", API], "method_denied"),
                 (["gh", "api", "repos/other/repo"], "not_allowlisted"),
                 (["gh", "api", API, "--jq", ".full_name"], "not_allowlisted")):
-            with self.subTest(argv=argv), self.assertRaises(h.HarnessRefused) as caught:
-                h.check_argv(argv, gh=self.fake.gh)
-            self.assertEqual(caught.exception.reason, reason)
+            with self.subTest(argv=argv):
+                with self.assertRaises(h.HarnessRefused) as caught:
+                    h.check_argv(argv, gh=self.fake.gh)
+                self.assertEqual(caught.exception.reason, reason)
 
     def test_base_parser_takes_exactly_one_main_line(self):
         sha = "a" * 40
@@ -2402,9 +2403,10 @@ class Stage2HarnessTests(unittest.TestCase):
         for text in ("", SHA_BASE_LINE.format(sha=sha) * 2, f"{sha}\trefs/heads/other\n",
                      SHA_BASE_LINE.format(sha="a" * 39), SHA_BASE_LINE.format(sha=sha.upper()),
                      f"{sha} refs/heads/main\n", None):
-            with self.subTest(text=text), self.assertRaises(self.h.HarnessRefused) as caught:
-                self.h.parse_base(text)
-            self.assertEqual(caught.exception.reason, "base_unparseable")
+            with self.subTest(text=text):
+                with self.assertRaises(self.h.HarnessRefused) as caught:
+                    self.h.parse_base(text)
+                self.assertEqual(caught.exception.reason, "base_unparseable")
 
     def test_repository_check_names_this_repository_with_main_as_default(self):
         self.assertEqual(self.h.check_repository(json.dumps(REPOSITORY_JSON)),
@@ -2414,13 +2416,15 @@ class Stage2HarnessTests(unittest.TestCase):
                                 ({"archived": True}, "repository_not_writable"),
                                 ({"archived": None}, "repository_not_writable"),
                                 ({"disabled": True}, "repository_not_writable")):
-            with self.subTest(changes=changes), self.assertRaises(self.h.HarnessRefused) as caught:
-                self.h.check_repository(json.dumps({**REPOSITORY_JSON, **changes}))
-            self.assertEqual(caught.exception.reason, reason)
+            with self.subTest(changes=changes):
+                with self.assertRaises(self.h.HarnessRefused) as caught:
+                    self.h.check_repository(json.dumps({**REPOSITORY_JSON, **changes}))
+                self.assertEqual(caught.exception.reason, reason)
         for text in ("", "[]", "{"):
-            with self.subTest(text=text), self.assertRaises(self.h.HarnessRefused) as caught:
-                self.h.check_repository(text)
-            self.assertEqual(caught.exception.reason, "repository_unparseable")
+            with self.subTest(text=text):
+                with self.assertRaises(self.h.HarnessRefused) as caught:
+                    self.h.check_repository(text)
+                self.assertEqual(caught.exception.reason, "repository_unparseable")
 
     def test_harness_reads_base_repository_and_branch_rules_through_its_runner(self):
         sha = "b" * 40
@@ -2445,9 +2449,10 @@ class Stage2HarnessTests(unittest.TestCase):
         failing = self.harness(lambda args, **kwargs: completed(args, "", 128, "fatal: unable to access\n"))
         for call, reason in ((failing.base_sha, "base_read_failed"), (failing.repository, "repository_read_failed"),
                              (lambda: failing.branch_rules("openhands/issue-12"), "branch_rules_failed")):
-            with self.subTest(reason=reason), self.assertRaises(self.h.HarnessRefused) as caught:
-                call()
-            self.assertEqual(caught.exception.reason, reason)
+            with self.subTest(reason=reason):
+                with self.assertRaises(self.h.HarnessRefused) as caught:
+                    call()
+                self.assertEqual(caught.exception.reason, reason)
 
     def test_every_github_write_is_journaled_with_its_exit_status(self):
         body = str(self.tmp / "body.md")
@@ -2478,6 +2483,155 @@ class Stage2HarnessTests(unittest.TestCase):
         with self.assertRaises(self.h.HarnessRefused):
             timed_out.run(["gh", "pr", "merge", "3"])
         self.assertEqual(len(timed_out.writes), 1)
+
+
+def load_recipe(filename):
+    """A recipe module by file path, with the recipe directory on sys.path only while it loads
+    (tests/test_runtime_worker_openhands.py load_recipe_module)."""
+    name = "openhands_resolver_s2_" + filename.replace("/", "_").replace(".py", "")
+    spec = importlib.util.spec_from_file_location(name, RECIPE / filename)
+    module = importlib.util.module_from_spec(spec)
+    sys.path.insert(0, str(RECIPE))
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.path.pop(0)
+    return module
+
+
+class ResolverWorkerTests(unittest.TestCase):
+    """worker.py in resolver mode: the request container's agent, with SDK stand-ins only."""
+
+    RESOLVER_SET = ("resolver", "search-first", "tdd")
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp(prefix="resolver-s2-worker-"))
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        self.worker = load_recipe("worker.py")
+        self.run_input = self.tmp / "run-input"
+        self.run_input.mkdir()
+        (self.run_input / "agents.md").write_text("# Repository work\n\nOwner rules at the base.\n", encoding="utf-8")
+
+    def sdk(self, installed):
+        """Stand-ins for the pinned SDK classes: each records its keyword arguments."""
+        created = []
+
+        def model(name):
+            def init(self, **fields):
+                self.fields = fields
+                created.append((name, fields))
+            return type(name, (), {"__init__": init, "model_copy": lambda self, update: self})
+
+        mcp = mock.Mock(side_effect=AssertionError("resolver mode reads no MCP configuration"))
+        skills = {name: model("InstalledSkill")(name=name) for name in installed}
+        modules = {
+            "openhands.sdk": mock.Mock(Agent=model("Agent"), AgentContext=model("AgentContext"), LLM=model("LLM"),
+                                       Tool=model("Tool")),
+            "openhands.sdk.context.condenser": mock.Mock(LLMSummarizingCondenser=model("Condenser")),
+            "openhands.sdk.mcp.config": mock.Mock(coerce_mcp_config=mcp),
+            "openhands.sdk.skills": mock.Mock(load_skills_from_dir=lambda path: ({}, {}, dict(skills)),
+                                              Skill=model("Skill")),
+            "openhands.tools.file_editor": mock.Mock(FileEditorTool=mock.Mock(name="file_editor_tool")),
+            "openhands.tools.terminal": mock.Mock(TerminalTool=mock.Mock(name="terminal_tool")),
+        }
+        modules["openhands.tools.file_editor"].FileEditorTool.name = "file_editor"
+        modules["openhands.tools.terminal"].TerminalTool.name = "terminal"
+        return modules, created, mcp
+
+    def build(self, installed, listed, *, resolver=True):
+        modules, created, mcp = self.sdk(installed)
+        real = self.worker.read_json
+
+        def read_json(path):
+            return {"names": list(listed)} if str(path) == "/run-input/skills.json" else real(path)
+
+        with mock.patch.dict(sys.modules, modules), mock.patch.object(self.worker, "read_json", side_effect=read_json), \
+                mock.patch.object(self.worker, "RUN_INPUT", self.run_input), \
+                mock.patch("importlib.metadata.version", return_value="1.49.6"):
+            result = self.worker.build_agent({"OPENHANDS_ARM": "control"}, "rw-openhands-res-12-20260928",
+                                             resolver=resolver)
+        return result, created, mcp
+
+    def test_resolver_agent_has_the_three_skills_agents_context_and_no_mcp(self):
+        (agent, versions, skills), created, mcp = self.build(self.RESOLVER_SET, self.RESOLVER_SET)
+        self.assertEqual(skills, sorted(self.RESOLVER_SET))
+        self.assertEqual(versions, {"openhands-sdk": "1.49.6", "openhands-tools": "1.49.6"})
+        mcp.assert_not_called()
+        fields = agent.fields
+        self.assertNotIn("mcp_config", fields)
+        # recipe.tool_filter({}): the two tools only; SDK 1.49.6 agent/base.py:565-590 exempts
+        # the built-in FinishTool and InvokeSkill tools from the filter.
+        self.assertEqual(fields["filter_tools_regex"], "^(?:terminal|file_editor)$")
+        self.assertEqual(fields["include_default_tools"], ["FinishTool"])
+        self.assertEqual([tool.fields for tool in fields["tools"]],
+                         [{"name": "terminal", "params": {"terminal_type": "subprocess"}}, {"name": "file_editor"}])
+        context = fields["agent_context"].fields
+        self.assertEqual({key: context[key] for key in ("load_user_skills", "load_public_skills",
+                                                        "load_project_skills", "load_memory")},
+                         dict.fromkeys(("load_user_skills", "load_public_skills", "load_project_skills",
+                                        "load_memory"), False))
+        names = [skill.fields["name"] for skill in context["skills"]]
+        self.assertEqual(sorted(names), ["agents", *sorted(self.RESOLVER_SET)])
+        agents = context["skills"][-1].fields
+        # SDK skill.py:196-208 and agent_context.py:336-358: no trigger and not AgentSkills
+        # format means REPO_CONTEXT, always active.
+        self.assertEqual(agents, {"name": "agents", "trigger": None,
+                                  "content": (self.run_input / "agents.md").read_text(encoding="utf-8")})
+        suffix = context["system_message_suffix"]
+        self.assertEqual(suffix, self.worker.RESOLVER_SUFFIX)
+        for phrase in ("no network", "untrusted", "owned paths", "invoke_skill"):
+            self.assertIn(phrase, suffix)
+        for absent in ("QMD", "context-mode", "MCP tools are capabilities"):
+            self.assertNotIn(absent, suffix)
+
+    def test_resolver_agent_refuses_any_other_skill_set(self):
+        swebench = ("tdd", "search-first", "systematic-debugging")
+        for installed, listed, reason in ((swebench, swebench, "resolver_skill_set_mismatch"),
+                                          (self.RESOLVER_SET[:2], self.RESOLVER_SET[:2], "resolver_skill_set_mismatch"),
+                                          (self.RESOLVER_SET, self.RESOLVER_SET[:2], "skill_discovery_mismatch")):
+            with self.subTest(installed=installed, listed=listed):
+                with self.assertRaises(RuntimeError) as caught:
+                    self.build(installed, listed)
+                self.assertEqual(str(caught.exception), reason)
+
+    def test_resolver_request_has_no_hook_config_and_the_resolver_agent(self):
+        class NativeModel:
+            def __init__(self, **fields):
+                self.fields = fields
+
+            def model_dump(self, **options):
+                return self.fields
+
+        modules = {"openhands.sdk": mock.Mock(TextContent=NativeModel),
+                   "openhands.sdk.workspace": mock.Mock(LocalWorkspace=NativeModel),
+                   "openhands.sdk.conversation.request": mock.Mock(StartConversationRequest=NativeModel,
+                                                                   SendMessageRequest=NativeModel)}
+        with mock.patch.dict(sys.modules, modules), \
+                mock.patch.object(self.worker, "build_agent", return_value=("resolver-agent", {}, [])) as build, \
+                mock.patch.object(self.worker, "worker_hooks") as hooks:
+            body = self.worker.start_request("Resolve issue 12", "rw-openhands-res-12-20260928", "control",
+                                             resolver=True)
+        self.assertIs(build.call_args.kwargs["resolver"], True)
+        hooks.assert_not_called()
+        self.assertEqual(body["agent"], "resolver-agent")
+        self.assertNotIn("hook_config", body)
+        self.assertEqual(body["tags"], {"source": "ultracode", "dispatch": "rw-openhands-res-12-20260928",
+                                        "arm": "control"})
+        self.assertEqual(body["initial_message"].fields["content"][0].fields["text"], "Resolve issue 12")
+
+    def test_request_entry_point_selects_the_mode_from_argv(self):
+        environment = {"OPENHANDS_OWNED_CONTAINER": "1", "OPENHANDS_RUN_ID": "rw-openhands-res-12-20260928",
+                       "OPENHANDS_ARM": "control"}
+        for argv, resolver in ((["--request"], False), (["--request", "--resolver"], True)):
+            with self.subTest(argv=argv), mock.patch.dict(os.environ, environment), \
+                    mock.patch.object(sys, "argv", ["worker.py", *argv]), \
+                    mock.patch.object(self.worker, "start_request", return_value={"agent": "a"}) as start, \
+                    mock.patch.object(self.worker.Path, "exists", return_value=True), \
+                    mock.patch.object(self.worker.Path, "read_text", return_value="task text"), \
+                    mock.patch.object(self.worker.Path, "write_text") as write:
+                self.assertEqual(self.worker.main(), 0)
+            start.assert_called_once_with("task text", "rw-openhands-res-12-20260928", "control", resolver=resolver)
+            write.assert_called_once()
 
 
 if __name__ == "__main__":
