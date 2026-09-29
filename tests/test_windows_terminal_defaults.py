@@ -6,7 +6,9 @@ only for a real needed action and quietly, and a profile that starts a client th
 """
 
 import copy
+import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -26,11 +28,18 @@ BASE_TEMPLATE = ROOT / "adoption/templates/claude.settings.template.json"
 FRAGMENT = ROOT / "examples/claude-native/windows-terminal.fragment.example.json"
 RECIPE = ROOT / "recipes/claude-native-profile.md"
 PLATFORM_PAGE = ROOT / "adoption/platforms/linux-wsl2.md"
-# The Notification types that mean Claude Code needs the person (permission and elicitation dialogs, a teammate or an
-# agent waiting, a quota event); the decision record lists where each comes from.
-NEEDED_TYPES = ("permission_prompt", "elicitation_dialog", "elicitation_url_dialog", "agent_needs_input",
-                "quota_auto_resume_stale", "quota_auto_resume_disabled", "worker_permission_prompt")
-QUIET_TYPES = ("idle_prompt", "auth_success", "elicitation_complete", "elicitation_response")
+# The decision each notification type carries lives in one table, DECISIONS in the scan that reads the installed client
+# (evidence/artifacts/notification-types-20260929/notification_types_scan.py); this test imports it, so the scan and the test cannot disagree.
+# `ring` types mean Claude Code needs the person (permission and elicitation dialogs, a teammate or an agent waiting, a quota event, the
+# model's own push notification); `quiet` ones are documented or undocumented types kept quiet, each with its reason.
+_SCAN_PATH = ROOT / "evidence/artifacts/notification-types-20260929/notification_types_scan.py"
+_spec = importlib.util.spec_from_file_location("notification_types_scan", _SCAN_PATH)
+SCAN = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(SCAN)
+DECISIONS = SCAN.DECISIONS
+NEEDED_TYPES = tuple(kind for kind, (decision, _doc, _why) in DECISIONS.items() if decision == "ring")
+QUIET_TYPES = tuple(kind for kind, (decision, _doc, _why) in DECISIONS.items() if decision == "quiet")
+INSTALLED_CLAUDE = Path.home() / ".local/bin/claude"
 BEL_HOOK = "jq -nc --arg s \"$(printf '\\a')\" '{terminalSequence:$s}'"
 # codex-rs/tui/src/chatwidget/notifications.rs type_name() at rust-v0.157.1; async-question does not exist at
 # rust-v0.155.1, where naming it is inert.
@@ -54,6 +63,25 @@ class OverlayTests(unittest.TestCase):
         self.assertEqual(set(self.overlay), {"$schema", "preferredNotifChannel", "hooks"})
         self.assertEqual(self.overlay["preferredNotifChannel"], "notifications_disabled")
         self.assertEqual(set(self.overlay["hooks"]), {"Notification"})
+
+    def test_every_type_carries_a_decision_with_a_reason_and_the_matcher_rings_for_exactly_the_ring_ones(self):
+        (group,) = self.overlay["hooks"]["Notification"]
+        self.assertEqual(sorted(group["matcher"].split("|")), sorted(NEEDED_TYPES))
+        self.assertEqual(len(DECISIONS), 17, "a notification type added to or removed from the table changes this count on purpose")
+        self.assertEqual(sum(1 for _d, documented, _w in DECISIONS.values() if documented), 12, "the hooks reference documents 12 types")
+        for kind, (decision, documented, reason) in DECISIONS.items():
+            self.assertIn(decision, ("ring", "quiet"), kind)
+            self.assertIsInstance(documented, bool, kind)
+            self.assertGreater(len(reason.strip()), 20, f"{kind} needs its reason")
+            self.assertEqual(re.fullmatch(f"(?:{group['matcher']})", kind) is not None, decision == "ring", kind)
+
+    @unittest.skipUnless(INSTALLED_CLAUDE.exists(), "needs the installed Claude Code binary")
+    def test_the_installed_client_knows_no_notification_type_without_a_decision(self):
+        # The one check that a later client release cannot slip past: it runs the scan's own reader on the installed binary and
+        # fails on a type the table does not carry (skipped where no client is installed, so CI without one does not run it).
+        types, base_size = SCAN.scan(os.path.realpath(INSTALLED_CLAUDE))
+        self.assertGreaterEqual(base_size, 10)
+        self.assertEqual(sorted(kind for kind in types if kind not in DECISIONS), [], "a type this client knows has no decision in DECISIONS")
 
     def test_one_hook_rings_the_bell_for_a_needed_action_only(self):
         (group,) = self.overlay["hooks"]["Notification"]
@@ -254,6 +282,11 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
 
 
 class DocumentationTests(unittest.TestCase):
+    def test_the_matcher_quoted_in_the_recipe_and_the_decision_is_the_overlays(self):
+        matcher = json.loads(OVERLAY.read_text(encoding="utf-8"))["hooks"]["Notification"][0]["matcher"]
+        self.assertIn(f"`{matcher}`", RECIPE.read_text(encoding="utf-8"))
+        self.assertIn(f"`{matcher}`", (ROOT / "docs/decisions/2026-09-28-terminal-experience.md").read_text(encoding="utf-8"))
+
     def test_the_platform_page_names_every_shipped_default_and_the_recipe_anchor_exists(self):
         page = PLATFORM_PAGE.read_text(encoding="utf-8")
         self.assertIn("\n## Windows Terminal profiles and the login shell\n", page)
