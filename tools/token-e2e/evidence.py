@@ -2545,6 +2545,21 @@ def _role_child(rows, row, attempt, bindings, sources):
     return {"status": state["status"], "reasons": state["reasons"]}
 
 
+def lane_use(calls, lane):
+    """M9 use of one seeded optional lane by one completed attempt: `adopted` when a call on the lane's path succeeded (the
+    lane's CLI as a whole command word of a shell call, or an MCP server of the lane's name), `unknown` when no such call
+    succeeded but one has no ledger state, else `not_adopted` (a failed call, or no call). U4's join lanes are the eight
+    required tool lanes, so the optional lanes are read from the attempt's own calls, the ledger's state deciding success."""
+    states = []
+    for call in calls:
+        text = command_text(call)
+        if call.get("server") == lane or (text is not None and has_program_word(text, lane)):
+            states.append(call["state"])
+    if "succeeded" in states:
+        return "adopted"
+    return "unknown" if None in states else "not_adopted"
+
+
 def _record_facts(attempt, rows, events, row, task, keys, spec, bindings, sources, captures, arm):
     readings = spec["readings"]
     template, family = task["template"], task["family"]
@@ -2600,6 +2615,9 @@ def _record_facts(attempt, rows, events, row, task, keys, spec, bindings, source
         seeded = "toon-seeded" in task["lane_tags"]
         facts["toon"] = _variants(lambda r: toon_facts(calls, ans, key, r, seeded=seeded), readings,
                                   ["R2-01", "R2-02", "R2-15", "R2-16"])
+    lane = next((tag for tag in task["lane_tags"] if tag in fc.M9_LANES), None)
+    if arm == "B" and task["opportunity"] == "optional" and lane and attempt["actor"] in GRADED_ACTORS:
+        facts["use"] = {"lane": lane, "state": lane_use(calls, lane)}  # M9: reported, never gating
     if attempt["actor"] == "codex_subagent":
         facts["role_child"] = _role_child(rows or [], row, attempt, bindings, sources)
     if template == "T34" and isinstance(row.get("transcript"), str) and os.path.exists(row["transcript"]):
@@ -2654,7 +2672,7 @@ def collect(spec, bindings, keys, table, sources, captures):
 # ---- Evaluate: the pure grading of the collected records (R3-R6, R14-R18, R22) ----------------------------------
 
 ORACLE_READINGS = {"T1": ("R2-09",), "T2": ("R2-17",), "T3": ("R2-03",), "T5": ("R2-04",), "T9": ("R2-01", "R2-02"),
-                   "T11": ("R2-05",), "T14": ("R2-19", "R2-20")}
+                   "T11": ("R2-05",), "T14": ("R2-19", "R2-20"), "T38": ("R2-06",)}
 ORACLE_READINGS.update({name: ("R2-01", "R2-02", "R2-18") for name in fc.WEB_TEMPLATES})
 GRADED_ACTORS = ("workflow_child", "agent_child", "codex_exec", "codex_subagent")
 STRICT_KEYS = {"T32", "T33"}
@@ -2965,6 +2983,34 @@ def _status_counts(statuses):
     return {name: counts.get(name, 0) for name in ("pass", "fail", "unknown")}
 
 
+def _m9_use(items, lane):
+    """M9 use of one seeded optional task: per arm-B attempt identity (an identity that has no measured completed run counts
+    as unknown), whether the attempt used the lane's tool. Reported beside the task's correctness, never gating."""
+    identities = collections.defaultdict(list)
+    for record, _ in items:
+        identities[(record["identity"], record["actor"])].append(record)
+    counts = collections.Counter()
+    for runs in identities.values():
+        measured = [run["facts"]["use"]["state"] for run in runs
+                    if run["class"] == "completed" and not run["superseded"] and (run.get("facts") or {}).get("use")]
+        counts[measured[-1] if measured else "unknown"] += 1
+    return {"lane": lane, "attempts": len(identities),
+            **{state: counts.get(state, 0) for state in ("adopted", "not_adopted", "unknown")}}
+
+
+def _optional_block(tasks, outcomes, by_task):
+    """R18: the optional tasks' correctness counts across their arms, and (M9) the use of the task's lane in arm B."""
+    block = {}
+    for task in tasks:
+        if task["opportunity"] != "optional":
+            continue
+        counts = _status_counts([outcomes[(arm, task["id"])]["status"] for arm in task["arms"]])
+        lane = next((tag for tag in task["lane_tags"] if tag in fc.M9_LANES), None)
+        counts["use"] = _m9_use(by_task.get((task["family"], "B", task["id"]), []), lane) if lane else None
+        block[task["id"]] = counts
+    return block
+
+
 def m12_sums(records):
     """U9's per-attempt sums in the shape of U4's m12_inputs (R7), for the cross-check. U4 counts one join row per identity,
     so a superseded run of an identity never enters the sums."""
@@ -3070,8 +3116,7 @@ def _aggregate(spec, keys, records, rows, outcomes, details, readings, decided, 
     aggregate["m12"] = {"blind": blind, "positive_read_rows": read_rows, "strict": {"hook_rows": strict_hooks},
                         "status": status["status"], "reason": status["reason"], "sensitive": status["sensitive"]}
     aggregate["blind"] = {"verdict_parity": parity}
-    aggregate["optional"] = {task["id"]: _status_counts([outcomes[(arm, task["id"])]["status"] for arm in task["arms"]])
-                             for task in tasks if task["opportunity"] == "optional"}
+    aggregate["optional"] = _optional_block(tasks, outcomes, by_task)
     team = [(record, row) for record, row in zip(records, rows) if record["arm"] == "T"]
     aggregate["team_T"] = {"tasks": len({record["task"] for record, _ in team}),
                            **_status_counts([row["status"] for record, row in team if record["class"] != "inadmissible"]),

@@ -44,6 +44,7 @@ from html.parser import HTMLParser
 GRAMMAR = "g1"
 FAMILY_ARMS = {"claude": ["B", "A", "A0"], "codex": ["B", "A", "N"]}
 M8_LANES = ("symbol-references", "qmd", "ai-memory")
+M9_LANES = ("repomix", "markitdown")  # the lanes of the seeded optional tasks; reported (M9), never gating
 
 
 # ---- Refusals and results ---------------------------------------------------------------------------------------
@@ -1726,10 +1727,98 @@ def key_T37(src, params):
     return key_T29(src, params)
 
 
+# The ten elements of the T38 fixture, named as scripts/native_token_ci.py markdown_elements names them.
+ELEMENT_KINDS = ("headings", "table", "ordered_list", "nested_list", "link", "emphasis", "blockquote", "code_block",
+                 "inline_code_and_entity", "image")
+_HEADING_TAGS = frozenset({"h1", "h2", "h3", "h4", "h5", "h6"})
+_CONTENT_TAGS = _HEADING_TAGS | {"th", "td", "li", "ol", "ul", "blockquote", "pre", "code", "strong", "em", "a", "p"}
+
+
+class _ElementContents(HTMLParser):
+    """R2-06 element_contents: the text of each element the ten structure checks look for, in document order. Script, style
+    and comment text is never content, and of the attributes only a link's target and an image's alt text are read. A list
+    item keeps its own text (a nested list's items are separate entries), so the nested list reads as three items."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.contents = {kind: [] for kind in ELEMENT_KINDS}
+        self.stack, self.skip = [], 0
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag in ("script", "style"):
+            self.skip += 1
+        elif tag == "img":
+            self.contents["image"].append(attrs.get("alt") or "")
+        elif tag in _CONTENT_TAGS:
+            frame = {"tag": tag, "parts": [], "href": attrs.get("href"), "inline_code": False}
+            if tag == "li":
+                lists = [item["tag"] for item in self.stack if item["tag"] in ("ol", "ul")]
+                frame["kind"] = "ordered_list" if lists and lists[-1] == "ol" else "nested_list"
+                frame["slot"] = len(self.contents[frame["kind"]])
+                self.contents[frame["kind"]].append("")  # reserve the slot so an outer item precedes its nested items
+            elif tag == "code" and not any(item["tag"] == "pre" for item in self.stack):
+                for item in self.stack:
+                    if item["tag"] == "p":
+                        item["inline_code"] = True
+            self.stack.append(frame)
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style"):
+            self.skip = max(0, self.skip - 1)
+            return
+        for index in range(len(self.stack) - 1, -1, -1):
+            if self.stack[index]["tag"] == tag:
+                while len(self.stack) > index:
+                    self.close_frame(self.stack.pop())
+                return
+
+    def handle_data(self, data):
+        if self.skip:
+            return
+        innermost = max((index for index, item in enumerate(self.stack) if item["tag"] == "li"), default=None)
+        for index, frame in enumerate(self.stack):
+            if frame["tag"] != "li" or index == innermost:
+                frame["parts"].append(data)
+
+    def close_frame(self, frame):
+        raw, tag = "".join(frame["parts"]), frame["tag"]
+        text = " ".join(raw.split())
+        if tag in _HEADING_TAGS:
+            self.contents["headings"].append(text)
+        elif tag in ("th", "td"):
+            self.contents["table"].append(text)
+        elif tag == "li":
+            self.contents[frame["kind"]][frame["slot"]] = text
+        elif tag == "blockquote":
+            self.contents["blockquote"].append(text)
+        elif tag == "pre":
+            self.contents["code_block"] += [" ".join(line.split()) for line in raw.splitlines()]
+        elif tag in ("strong", "em"):
+            self.contents["emphasis"].append(text)
+        elif tag == "a":
+            self.contents["link"] += [text, frame["href"] or ""]
+        elif tag == "p" and frame["inline_code"]:
+            self.contents["inline_code_and_entity"].append(text)
+
+
+def html_contents(html_bytes):
+    """{element kind: [content strings]} of the T38 fixture, document order, no empty strings."""
+    parser = _ElementContents()
+    parser.feed(html_bytes.decode("utf-8", errors="replace"))
+    parser.close()
+    while parser.stack:
+        parser.close_frame(parser.stack.pop())
+    return {kind: [text for text in parser.contents[kind] if text] for kind in ELEMENT_KINDS}
+
+
 def key_T38(src, params, inputs):
     data = _need(src.read(params["fixture_path"]))
+    contents = html_contents(data)
+    _need(all(contents.values()) or None)  # a fixture without one of the ten elements would make its check vacuous
     bound = (inputs or {}).get("seed-conversion")
-    return {"fixture_sha256": sha256_hex(data), "input_sha256": bound.get("sha256") if bound else None}
+    return {"fixture_sha256": sha256_hex(data), "input_sha256": bound.get("sha256") if bound else None,
+            "contents": contents}
 
 
 def key_T2(task_id, inputs):
@@ -2904,10 +2993,21 @@ def markdown_elements(text):
 
 
 def oracle_T38(params, key, ans, readings, ctx=None):
+    """R2-06: `answer_elements` (decided) reads the answer as Markdown, the ten structure checks of markdown_elements;
+    `element_contents` reads the content of the same ten elements wherever it sits (each string of the fixture's element,
+    as a whole word, in the normalized answer), so a plain report of the fixture passes only the second reading."""
     if key.get("input_sha256") is not None and key["input_sha256"] != key["fixture_sha256"]:
         return {"A": unknown("input_hash")}
-    held = markdown_elements(answer_text(ans))
-    missing = sorted(name for name, present in held.items() if not present)
+    if readings["R2-06"] == "element_contents":
+        contents = key.get("contents")
+        if not isinstance(contents, dict) or not contents:
+            return {"A": unknown("key_missing")}
+        text = flat(answer_text(ans))
+        missing = sorted(kind for kind, strings in contents.items()
+                         if not all(has_word(text, flat(string), ignore_case=False) for string in strings))
+    else:
+        held = markdown_elements(answer_text(ans))
+        missing = sorted(name for name, present in held.items() if not present)
     return {"A": fail("elements_missing", missing=missing) if missing else ok()}
 
 
