@@ -824,7 +824,8 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
                 self.assertIn(message, result.stdout)
 
     # docs/ecosystem/template.html topicCard renders these four upstream fields as links (sourcedLine), so they
-    # pass the build's public_url gate, the one card.source and every other external source link already uses.
+    # pass the build's public_url gate, the one every other external source link uses (card.source.url is built
+    # by file_url instead).
     TOPIC_CARD_LINK_FIELDS = {
         "upstream.recommended_install.url": lambda upstream, url: upstream["recommended_install"].update(url=url),
         "upstream.recommended_wiring[0].url": lambda upstream, url: upstream.update(
@@ -849,6 +850,18 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
                     self.assertNotEqual(result.returncode, 0, result.stdout)
                     self.assertIn(f"token topic card {self.TOPIC_CARD_SOURCE}: {field} must be a public HTTPS URL",
                                   result.stdout)
+
+    def test_topic_card_list_fields_reject_any_non_list_value(self):
+        # The template maps over these fields, so a falsy non-list ({} or "") must not slip past the list guard.
+        for field in ("recommended_wiring", "new_since_pin", "limitations"):
+            for label, value in (("empty object", {}), ("empty string", ""), ("null", None)):
+                with self.subTest(field=field, value=label):
+                    card = self.topic_card()
+                    card["upstream"][field] = value
+                    self.write_topic(card)
+                    result = self.run_generator("--check")
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    self.assertIn(f"token topic card {self.TOPIC_CARD_SOURCE}: upstream.{field} must be a list", result.stdout)
 
     def test_topic_card_public_https_links_pass_the_check_unchanged(self):
         card = self.topic_card()

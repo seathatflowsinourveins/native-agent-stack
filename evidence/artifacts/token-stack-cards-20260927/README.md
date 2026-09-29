@@ -38,7 +38,8 @@ an unchanged upstream test suite or a new provider run.
 
 In `returned-results-subset.json`, each record keeps its command, `exit`, status
 and a summary of at most 606 characters: an observation longer than 600
-characters is cut at its last space before character 600, or at character 600,
+characters is cut at its last space before character 600 when that space is past
+character 300, otherwise at character 600,
 and ends with the 6-character marker ` [...]`. 138 of the 206 summaries are
 cut, and 60 of them are longer than 600 characters. The subset's own `method`
 field keeps the generator's wording, "at most 600 characters", which leaves out
@@ -178,6 +179,7 @@ row components. #446 (`3058b237`) later pinned socraticode 1.15.0 and ccusage
 Run it in a temporary root that holds the stack manifest the cards assume:
 
 ```sh
+set -e
 root=$(mktemp -d)
 mkdir -p "$root/docs" "$root/manifests" "$root/evidence/artifacts"
 cp docs/token-efficiency-stack.json "$root/docs/"
@@ -187,8 +189,11 @@ python3 evidence/artifacts/token-stack-cards-20260927/tools/condense.py --repo-r
 cmp "$root/docs/token-efficiency-stack.json" docs/token-efficiency-stack.json
 ```
 
-At 2026-09-29T03:28Z this block exited 0 with identical bytes, and so did the
-same block with `55fc8d17` in place of `34c56340`.
+With `set -e`, the block's status is `condense.py`'s or `cmp`'s, whichever fails first. Measured at
+2026-09-29T04:13Z on this tree: the block as written exits 0 with identical bytes; the same block with
+the current tree's `manifests/stack.json` copied in place of the `git show` line exits 1 because
+`condense.py` stops at socraticode. At 03:28Z the block with `55fc8d17` in place of `34c56340` also
+exited 0 with identical bytes.
 
 Both generators are deterministic for fixed inputs, and rerunning `condense.py`
 on its own output reproduces the same bytes. Pins are not copied into the rows:
