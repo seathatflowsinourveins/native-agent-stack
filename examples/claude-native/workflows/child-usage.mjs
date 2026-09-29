@@ -1694,24 +1694,53 @@ function callAnalysis(call) {
 // interrupted when toolUseResult.interrupted is true (the command started and was cut short; the recount found none, so that state is
 // exercised by a synthetic fixture only); background marks a run that only started (run_in_background, or a toolUseResult
 // backgroundTaskId).
-const NOT_EXECUTED_RESULT = ['PreToolUse:', 'Permission for', 'User rejected tool use']
-const NOT_EXECUTED_CONTENT = ['<tool_use_error>', "The user doesn't want to proceed", 'The server-side auto mode classifier gave no verdict']
-function callState(call, result) {
+// U2 item 7 extends the rule (the review's dependency finding) without changing a call U1 already reads: every template is read at the
+// start of the result content and of the toolUseResult string (after "Error: "), and two client templates join it, "Permission to use
+// <tool> ... has been denied" (a deny rule) and "Not run: the response that made this tool call" (a response stopped before the call
+// ran), with the U2 design's constant "[Request interrupted by user for tool use]" (on this host that marker is a user text block after
+// a user-rejection result, 37 of 37, never a result). A call that did not run also gets its cause, the source of the decision in the
+// vocabulary of the OTel tool_decision event (code.claude.com/docs/en/monitoring-usage, "Tool decision event": config, hook, the user's
+// answers; "Tool result event": "Not emitted if the tool call was rejected"): a template's own cause unless it is 'other', then the
+// toolDenialKind, then the template's 'other', then a native declined state. Hook denials carry toolDenialKind permission-rule (809 of 809
+// on this host), so a text decides first; "Permission for this command was denied by a built-in Claude Code safety check" carries
+// permission-rule too (11 of 11), an automatic decision, which the monitoring doc's source "config" names ("Decided automatically without
+// prompting"). Counts: evidence/artifacts/pra-u2-differential-20260929/scans/call-states.json.
+// [prefix, cause, text the prefix's first line must also hold]
+const NOT_EXECUTED_TEMPLATES = [['<tool_use_error>Cancelled: ', 'cancelled'], ['<tool_use_error>Error: Streaming fallback', 'cancelled'],
+  ['<tool_use_error>', 'invalid'], ["The user doesn't want to proceed", 'user'], ['User rejected tool use', 'user'], ['PreToolUse:', 'hook'],
+  ['Permission to use ', 'config', ' has been denied'], ['Permission for', 'other'], ['The server-side auto mode classifier gave no verdict', 'other'],
+  ['Not run: the response that made this tool call', 'cancelled'], ['[Request interrupted by user for tool use]', 'cancelled']]
+const DENIAL_KINDS = { 'permission-rule': 'config', 'user-rejected': 'user', cancelled: 'cancelled', 'automode-unavailable': 'other' }
+function templateCause(text) {
+  for (const [prefix, cause, within] of NOT_EXECUTED_TEMPLATES) {
+    if (!text.startsWith(prefix)) continue
+    const end = text.indexOf('\n')
+    if (!within || (end < 0 ? text : text.slice(0, end)).includes(within)) return cause
+  }
+  return null
+}
+// The state of one call: { state: succeeded | failed | unfinished | unknown | interrupted, not_executed, cause, background }; the
+// result is a tool_result block with its row (measureTranscript's results), or null.
+export function callState(call, result) {
   if (!result) {
     const status = call?.native_status
     return status === 'completed' ? { state: 'succeeded' } : status === 'failed' ? { state: 'failed' }
-      : status === 'declined' ? { state: 'failed', not_executed: true } : { state: 'unfinished' }
+      : status === 'declined' ? { state: 'failed', not_executed: true, cause: 'declined' } : { state: 'unfinished' }
   }
   const native = result.native_state ?? call?.native_state, said = result.row?.toolUseResult
   if (result.is_error) {
-    const reason = typeof said === 'string' ? (said.startsWith('Error: ') ? said.slice(7) : said) : '', content = resultText(result.content)
-    return { state: 'failed', not_executed: Boolean(result.row?.toolDenialKind) || NOT_EXECUTED_CONTENT.some((m) => content.startsWith(m))
-      || NOT_EXECUTED_RESULT.some((m) => reason.startsWith(m)) || native === 'declined' }
+    const reason = typeof said === 'string' ? (said.startsWith('Error: ') ? said.slice(7) : said) : ''
+    const text = templateCause(resultText(result.content)) ?? templateCause(reason), denial = result.row?.toolDenialKind
+    const kind = denial ? (typeof denial === 'string' && Object.hasOwn(DENIAL_KINDS, denial) ? DENIAL_KINDS[denial] : 'other') : null
+    const cause = (text !== 'other' && text) || kind || text || (native === 'declined' ? 'declined' : null)
+    return cause ? { state: 'failed', not_executed: true, cause } : { state: 'failed', not_executed: false }
   }
   if (native === 'unknown') return { state: 'unknown' }
   if (said && typeof said === 'object' && said.interrupted === true) return { state: 'interrupted' }
   return { state: 'succeeded', background: Boolean(call?.input?.run_in_background) || Boolean(said && typeof said === 'object' && said.backgroundTaskId) }
 }
+// The per-call flag M14 reads: the call never ran (a rejection, an invalid call or a cancellation that has a result, or a declined call).
+export const notExecuted = (call, result) => callState(call, result).not_executed === true
 const LANE_COUNTERS = ['calls', 'invocations', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'interrupted', 'background', 'ambiguous', 'via_mcporter']
 const CLI_CARRIERS = ['bash', 'rtk_proxy', 'ctx', 'nested']
 const DOWNSTREAM_COUNTERS = ['calls', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'interrupted']
