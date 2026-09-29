@@ -69,21 +69,25 @@ python3 tools/credentials/credential_run.py alpaca-paper --check
 [`tools/credentials/credential_run.py`](../tools/credentials/credential_run.py)
 reads the entry's `0600` file and starts the command with that entry's
 declared variables added to its environment. `--only NAME` narrows them. The
-caller's own copies of every inventory and `must_not_be_set` name are
-removed first. No value goes into the command line, a temporary file or a
-shell. The command's stdout and stderr are relayed with each injected value
-replaced by `[REDACTED:<NAME>]`, raw or encoded: base64 and base64url at
-every byte alignment; percent-encoding as `quote()` and `quote_plus()`
-write it (with `/` kept or escaped, a space as `%20` or `+`, in both hex
-cases); JSON escaping as Python writes it, with `/` written `\/` (PHP's
-`json_encode`) and with `<`, `>` and `&` written `<`, `>` and
-`&` (Go's `encoding/json`, and the `<` form of PHP's
-`JSON_HEX_TAG`); and hex. A variable
-that the entry lists in `public_variables`, such as `APCA_API_BASE_URL`, is
-injected unmasked. The command's exit code, stdin, signals and non-UTF-8
-bytes pass through. `--check` starts nothing: it prints the names it would
-inject and the file state (`ok`, `missing` or `unsafe`). No subcommand
-prints or returns a value.
+caller's own copies of every inventory variable, every `must_not_be_set` name
+and every other entry's pointer variable (`PAPER_ENV_FILE`,
+`SEC_CONTACT_ENV` and the like, each the path of a store file) are removed
+first; the entry's own pointer variables stay. No value goes into the
+command line, a temporary file or a shell. The command's stdout and stderr
+are relayed with each injected value replaced by `[REDACTED:<NAME>]`, raw or
+encoded: base64 and base64url at every byte alignment; percent-encoding as
+`quote()` and `quote_plus()` write it (with `/` kept or escaped, a space as
+`%20` or `+`, in both hex cases); JSON escaping as Python writes it, with `/`
+written `\/` (PHP's `json_encode`) and with `<`, `>` and `&` written
+`\u003c`, `\u003e` and `\u0026` (Go's `encoding/json`), or `\u003C`
+and `\u003E` (the tag flag of PHP's `json_encode`); and hex. A variable that
+the entry lists in `public_variables`, such as `APCA_API_BASE_URL`, is
+injected unmasked. The command's exit code, stdin and non-UTF-8 bytes pass
+through. The runner forwards `SIGINT`, `SIGTERM`, `SIGHUP`, `SIGQUIT`,
+`SIGUSR1`, `SIGUSR2` and `SIGALRM` to the command's process group and no
+other signal (`SIGKILL` and `SIGSTOP` cannot be forwarded). `--check` starts
+nothing: it prints the names it would inject and the file state (`ok`,
+`missing` or `unsafe`). No subcommand prints or returns a value.
 
 The runner refuses the following, naming the id, a variable or a line
 number but never a value or a path:
@@ -95,7 +99,11 @@ number but never a value or a path:
   [`set_credential.py`](../tools/credentials/set_credential.py). A
   hand-edited `$`, backtick or backslash is refused, never expanded;
 - a masked value shorter than 6 bytes, which could not be masked without
-  masking ordinary output;
+  masking ordinary output (a public variable is not masked, so it has no
+  minimum);
+- an inventory entry that declares a variable the dynamic loader or the
+  interpreter reads at start-up (`LD_*`, `DYLD_*`, `PYTHON*`), reason
+  `reserved_variable`, before any store is read;
 - a host whose `/proc/sys/kernel/core_pattern` begins with `|` (a program,
   such as systemd-coredump or apport) or `@` (a core socket), reason
   `core_pattern_pipe` or `core_pattern_socket`. `RLIMIT_CORE` 0 stops a core
@@ -119,26 +127,43 @@ requires. It then opens the window from that worktree.
 **Output and shutdown.** The runner writes to a pipe or socket without
 blocking, through a queue of at most 256 KiB per stream. A consumer that
 stops reading holds the command back, as in any pipeline, but not the
-runner. After a shutdown signal (`SIGINT`, `SIGTERM`, `SIGHUP`, which the
-runner forwards to the command's process group) it waits for no consumer:
-what is queued is dropped, and the runner exits with the command's status.
-Once the command has exited, the consumer has 2 seconds to take what is
-queued, and the rest is dropped. Dropping is safe, because only masked
-bytes are queued. A terminal, a regular file and `/dev/null` are written
-directly, and a descriptor that shares its open file description with the
-command's stdin is not made non-blocking, so an interactive terminal stays
-blocking for the command. A runner that is killed with `SIGKILL` leaves a
-shared pipe non-blocking.
+runner. After a shutdown signal (`SIGINT`, `SIGTERM`, `SIGHUP` or `SIGQUIT`,
+which the runner forwards to the command's process group) it waits for no
+consumer: what is queued is dropped, and the runner exits with the
+command's status. Once the command has exited, the consumer has 2 seconds
+to take what is queued, and the rest is dropped. Dropping is safe, because
+only masked bytes are queued. A terminal, a regular file and `/dev/null`
+are written directly, and a descriptor that shares its open file
+description with the command's stdin is not made non-blocking, so an
+interactive terminal stays blocking for the command. The limits of this
+path are in the list below.
+
+**The command's lifetime.** The command leads its own session and process
+group. Once it has exited and its output is drained, and on every way out of
+the runner, the runner sends that group `SIGTERM` and, after 2 seconds,
+`SIGKILL`, so no descendant that stayed in the group is left running with
+the key in its environment. If the runner itself is killed without a chance
+to do that (`SIGKILL`, the out-of-memory killer, `timeout -k`), the command
+asks the kernel for `SIGTERM` (Linux `PR_SET_PDEATHSIG`), and a small
+watchdog process, started with the command in its own session and with an
+empty environment, ends the command's whole group the same way when the
+pipe it shares with the runner closes. The limits are in the list below.
 
 **What masking does not cover.** Masking guards against accidents; it is
 not a boundary.
-- Only the entry's injected variables are masked, and only whole values in
-  the forms above. Printed as they are: a fragment (plain `tvly auth`
-  prints a key's first eight and last four characters); a reversed,
-  encrypted or otherwise transformed value; a nested encoding (an encoding
-  of an encoding); base64 wrapped across lines; another escaper (Gson's
-  `=` for `=`, or a percent-encoding with a safe set other than `/`
-  or none); and a value split between stdout and stderr.
+- Only the entry's injected variables are masked, and a value is masked
+  only where a whole form of it appears unbroken in one stream (2026-09-29).
+  Printed as they are: a fragment (plain `tvly auth` prints a key's first
+  eight and last four characters); a reversed, encrypted or otherwise
+  transformed value; a nested encoding (an encoding of an encoding); base64
+  wrapped across lines; another escaper (Gson's `\u003d` for `=`, or a
+  percent-encoding with a safe set other than `/` or none); a value split
+  between stdout and stderr; a value broken by wrapping or by other bytes
+  between its parts (`xxd` or `hexdump -C` columns, `fold`, wrapped table
+  cells, colour codes, two writers on one stream); hex with separators; a
+  value with a single quote that the shell requotes (`set -x`,
+  `printf %q`); and anything the command writes to an inherited read-write
+  stdin (a terminal or a pty), which never passes through the relay.
 - Stdout and stderr are masked separately. What the command writes to a
   file, a log or the network never passes the masker.
 - Output that ends, or a command that is killed, part-way through a value
@@ -155,7 +180,32 @@ not a boundary.
 - The guard hook runs only for Claude's Bash tool, and it does not read the
   runner's command yet (phase 2). Codex, OmniRoute lanes and units run no
   guard, so there the masking is the only layer.
-
+- Output path, the non-blocking flag (2026-09-29). The runner sets it on the
+  open file description of an inherited pipe or socket, and other writers
+  on that description share it (`xargs -P` siblings, background jobs, a
+  unit's other processes): they can see `EAGAIN` for the length of a run.
+  With two runners on one pipe, the first to exit makes the pipe blocking
+  under the second, and a runner killed with `SIGKILL` leaves the
+  description non-blocking. The fix is planned for the hardening change
+  before the default-path flip: `poll` and writes of at most `PIPE_BUF` for
+  pipes, `send` with `MSG_DONTWAIT` for sockets, or a writer thread that can
+  be abandoned, and never a flag flipped on an inherited description.
+- Output path, the queue (2026-09-29). "A consumer that stops reading cannot
+  hold the runner" holds only for the pipes and sockets the runner can make
+  non-blocking. A terminal, a pty, a regular file, a descriptor that shares
+  its description with stdin, and any sink that falls back to direct writes
+  use blocking writes, and a consumer that stops reading can hold the
+  runner there, past a shutdown signal.
+- The command's lifetime (2026-09-29). A `SIGKILL` of the runner before its
+  watchdog has started (a few milliseconds after the command's start) leaves
+  only the parent-death signal, which reaches the command and not its
+  children. A descendant that leaves the command's process group (`setsid`,
+  `setpgid`, a double fork with `setsid`) is out of reach of the group kill
+  and of the watchdog, and so is a set-user-ID command (the kernel clears
+  the parent-death signal for such a binary, and its process cannot be
+  signalled). Only Linux has been run: `PR_SET_PDEATHSIG` is Linux-only, and
+  the watchdog has not been run on macOS. A same-user debugger or `ptrace`
+  is out of scope.
 **Units and other clients.**
 - A systemd user unit may run its program through the runner:
   `ExecStart=/usr/bin/python3 -I <checkout>/tools/credentials/credential_run.py <inventory-id> -- <program>`.
