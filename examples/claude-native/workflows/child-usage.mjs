@@ -1562,12 +1562,19 @@ function callAnalysis(call) {
 // Call states (U1 design 4). AA-PLAN: "Successful" means the tool_result is not an error (Messages API is_error); M14
 // reconciles attempted, decided, executed, failed and unfinished calls. With no result a persisted native status decides
 // (Codex CommandExecutionStatus, openai/codex rust-v0.157.1 protocol/src/items.rs), else the call is unfinished. is_error
-// true is failed, and not_executed as well when the call never ran: its content opens with <tool_use_error> (a validation
-// or blocked call; code.claude.com hooks, PostToolUseFailure), the row's toolUseResult names a PreToolUse hook denial, a
-// permission denial or a user rejection (strings observed on Claude Code 2.1.282-2.1.283, not a documented schema), or an
-// adapter marks it declined. is_error false is succeeded, or unknown when an adapter could not read the outcome
-// (native_state); background marks a run that only started (run_in_background, or a toolUseResult backgroundTaskId).
-const NOT_EXECUTED = ['PreToolUse:', 'Permission for', 'User rejected tool use', "The user doesn't want to proceed"]
+// true is failed, and not_executed as well when the call never ran. Where the Claude Code client records that (observed on this
+// host's transcripts, 122,648 Bash results; not a documented schema): a row-level toolDenialKind (permission-rule, user-rejected,
+// cancelled, automode-unavailable: every client denial, 798 rows, and no failed command); a result content that opens with
+// <tool_use_error> (a validation or blocked call; code.claude.com hooks, PostToolUseFailure), with "The user doesn't want to proceed"
+// (a rejection: 25 rows, whose toolUseResult reads "User rejected tool use") or with the classifier text "The server-side auto mode
+// classifier gave no verdict" (its own text: a failure of the check, not a judgment about the action, and the action may be tried again);
+// a toolUseResult string that names a PreToolUse hook denial, a permission denial or a user rejection; or an adapter marking it declined.
+// A host hook's own refusal text (209 rows opening "This agent is isolated") carries none of these and stays failed: its meaning is the
+// hook's, not the client's. is_error false is succeeded, unknown when an adapter could not read the outcome (native_state), or
+// interrupted when toolUseResult.interrupted is true (the command started and was cut short; none of 25,506 observed object results);
+// background marks a run that only started (run_in_background, or a toolUseResult backgroundTaskId).
+const NOT_EXECUTED_RESULT = ['PreToolUse:', 'Permission for', 'User rejected tool use']
+const NOT_EXECUTED_CONTENT = ['<tool_use_error>', "The user doesn't want to proceed", 'The server-side auto mode classifier gave no verdict']
 function callState(call, result) {
   if (!result) {
     const status = call?.native_status
@@ -1576,15 +1583,17 @@ function callState(call, result) {
   }
   const native = result.native_state ?? call?.native_state, said = result.row?.toolUseResult
   if (result.is_error) {
-    const reason = typeof said === 'string' ? (said.startsWith('Error: ') ? said.slice(7) : said) : ''
-    return { state: 'failed', not_executed: resultText(result.content).startsWith('<tool_use_error>') || NOT_EXECUTED.some((m) => reason.startsWith(m)) || native === 'declined' }
+    const reason = typeof said === 'string' ? (said.startsWith('Error: ') ? said.slice(7) : said) : '', content = resultText(result.content)
+    return { state: 'failed', not_executed: Boolean(result.row?.toolDenialKind) || NOT_EXECUTED_CONTENT.some((m) => content.startsWith(m))
+      || NOT_EXECUTED_RESULT.some((m) => reason.startsWith(m)) || native === 'declined' }
   }
   if (native === 'unknown') return { state: 'unknown' }
+  if (said && typeof said === 'object' && said.interrupted === true) return { state: 'interrupted' }
   return { state: 'succeeded', background: Boolean(call?.input?.run_in_background) || Boolean(said && typeof said === 'object' && said.backgroundTaskId) }
 }
-const LANE_COUNTERS = ['calls', 'invocations', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'background', 'ambiguous', 'via_mcporter']
+const LANE_COUNTERS = ['calls', 'invocations', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'interrupted', 'background', 'ambiguous', 'via_mcporter']
 const CLI_CARRIERS = ['bash', 'rtk_proxy', 'ctx', 'nested']
-const DOWNSTREAM_COUNTERS = ['calls', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown']
+const DOWNSTREAM_COUNTERS = ['calls', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'interrupted']
 const emptyLane = () => ({ ...Object.fromEntries(LANE_COUNTERS.map((k) => [k, 0])), by_carrier: Object.fromEntries(CLI_CARRIERS.map((k) => [k, 0])) })
 const emptyCliLanes = () => ({ lanes: counter(), mcporter_downstream: counter(), excluded_version_help: counter(), calls_with_lane_invocation: 0, unresolved_programs: 0, remote_invocations: 0, parse_errors: 0 })
 // One call's lane counts (U1 design 5): each lane it invokes locally counts the call once, with its invocations, its state
