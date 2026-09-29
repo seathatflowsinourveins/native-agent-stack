@@ -1141,6 +1141,10 @@ def classify_e2(out: Path, f1doc, f2doc, cal, rules):
           "touch_share_among_N2": rnd(sum(r["touch"] is True for r in n2) / len(n2)) if n2 else None,
           "candidate_rule_share_among_N2": rnd(sum(r["candidate_rule_pass"] for r in n2) / len(n2)) if n2 else None,
           "f2_identity_among_N2": zero_counts(IDENTITY_OUTCOMES, [r["identity"] for r in n2]),
+          # Post hoc, added after the first classify: the identity test's other-issuer side, on the package
+          # events outside N2 (the price audit README names reused tickers there). It changes no estimand.
+          "f2_identity_outside_N2_post_hoc": zero_counts(IDENTITY_OUTCOMES + ("no_event_data",),
+                                                        [r["identity"] or "no_event_data" for r in rows if not r["in_n2"]]),
           "failure_classes_among_N2": zero_counts(CLASS_ORDER[:7], [r["failure_class"] for r in n2 if r["failure_class"]]),
           "verdicts": dict(sorted(Counter(r["verdict"] for r in rows).items())),
           "flags_among_N2": flag_totals(n2), "by_tier": by_tier,
@@ -1169,7 +1173,8 @@ def classify(args) -> int:
     docs = {"results.json": dict(head, kind="mover_coverage_asof_results", events=results),
             "labels.json": dict(head, kind="mover_coverage_asof_labels", labels=label_doc),
             "summary.json": dict(head, kind="mover_coverage_asof_private_summary", **body,
-                                 **run_facts(out, f1doc, f2doc, ctrl, cal))}
+                                 **run_facts(out, f1doc, f2doc, ctrl, cal),
+                                 classify_code_revision=code_revision(require_clean=False))}
     blobs = {name: dumps(doc) for name, doc in docs.items()}
     plan_guard()
     if args.verify:
@@ -1227,7 +1232,7 @@ def estimand_block(folder: Path, name: str, gate_ok: bool) -> dict:
     verify = read_doc(folder / "verify.json") if (folder / "verify.json").exists() else {}
     block = dict(summary[name])
     for key in ("positive_control", "exposure", "requests", "responses", "fetched_at_utc", "control_sent_at_utc",
-                "finished_at_utc", "code_revision"):
+                "finished_at_utc", "code_revision", "classify_code_revision"):
         block[key] = summary.get(key)
     conditions = {"positive_control_passed": summary["positive_control"]["passed"],
                   "classify_rerun_byte_identical": verify.get("byte_identical") is True,

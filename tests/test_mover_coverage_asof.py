@@ -579,6 +579,9 @@ class E2Flow(unittest.TestCase):
         self.assertEqual(e2["f2_identity_among_N2"], {"f1_raw_unavailable": 0, "f2_error": 0, "f2_not_fetched": 0,
                                                      "no_row": 0, "other_issuer": 1, "same_issuer": 1})
         self.assertEqual(e2["N2_minus_committed_events"], 2 - 594)
+        outside = e2["f2_identity_outside_N2_post_hoc"]
+        self.assertEqual((outside["no_row"], sum(outside.values())), (1, 1))  # the +5% event's symbol has no F2 row
+        self.assertIn("head", summary["classify_code_revision"])
         self.assertEqual(summary["positive_control"], {"KOD": {"touch": True}, "LFCR": {"touch": True}, "passed": True})
         self.assertEqual(summary["exposure"]["price_rows_in_holdout"], 0)
         self.assertEqual(summary["E2"]["verdicts"]["mismatch"], 1)
