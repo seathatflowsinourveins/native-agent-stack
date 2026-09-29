@@ -15,7 +15,7 @@ Decide by evidence and research convergence: a choice stands when current primar
 - Define acceptance from the requested outcome. Verify changed behavior with relevant upstream or project checks, inspect original source, and obtain independent review for substantive changes.
 - Resolve supported findings before claiming completion. Distinguish measured results, simulations and untested boundaries; unchanged upstream tests, local integration checks, synthetic fixtures and actual provider execution are different evidence classes. New machines collect their own evidence; historical receipts do not certify the new host.
 - Settle a discoverable harness capability by step 2 before asking the user; compare community alternatives against demonstrated gaps and run the selected native path through returned results. Dated exclusions are not current availability evidence.
-- Carry the user's authorized work through implementation, relevant verification and a concise handoff. Use a short plan for bounded work; do not add intake, repeated approvals, diagnostic campaigns or restarts without a concrete need. Preserve existing edits, native accounts, model choices and project scope.
+- Carry the user's authorized work through implementation, relevant verification and a concise handoff. Do not add intake, repeated approvals, diagnostic campaigns or restarts to bounded work without a concrete need. Preserve existing edits, native accounts, model choices and project scope.
 - Use the project's canonical instructions for memory scope, tests and domain rules, and keep durable memory and indexes scoped to that project.
 
 ## Token practice (base layer)
