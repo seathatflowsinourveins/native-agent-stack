@@ -45,7 +45,7 @@ RTK_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 STACK_ROLES = ("stack-researcher", "stack-verifier")
 STACK_STEMS = {"evidence-reviewer", "isolated-builder", "semantic-evidence-reviewer", *STACK_ROLES}
 ROLE_KEYS = {"name", "description", "model", "model_reasoning_effort", "developer_instructions"}
-# role.rs:33 (DEFAULT_ROLE_NAME) and :337-372 (built_in::configs): a user role of one of these names shadows it.
+# role.rs:33 (DEFAULT_ROLE_NAME) and :337-380 (built_in::configs): a user role of one of these names shadows it.
 BUILTIN_ROLES = {"default", "explorer", "worker"}
 ROLE_MODEL = "gpt-6-astra"
 ROLE_EFFORT = "max"

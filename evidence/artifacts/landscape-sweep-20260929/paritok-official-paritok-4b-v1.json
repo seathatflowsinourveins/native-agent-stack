@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-paritok-official-paritok-4b-v1",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Paritok-official/paritok-4b-v1",
+ "reviewed_commit": "2c913302073367f2402d8bc4bb1a929a3f70a030",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "token-efficiency"
+ ],
+ "claim": "Source and documentation review of Paritok-official/paritok-4b-v1 at commit 2c913302073367f2402d8bc4bb1a929a3f70a030 (license Apache-2.0), read from README.md at that commit. Repository description: \"Non-destructive compression gateway for AI coding agents. Cuts token bills 25% on turn 1 to past 85% in long or saturated sessions, and fits ~3× more turns in the same context window. Powered by our open-source code-native 4B model. Drop-in for Claude Code, Cursor, Codex, OpenHands, and any BASE_URL agent.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1453,
+  "pushed_at": "2026-09-26T23:01:53Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@2c913302073367f2402d8bc4bb1a929a3f70a030",
+   "text": "- **2026-08-17** &nbsp; **v1.3.8** — a visual `/stats` dashboard (live token savings + per-request original→compressed before/after, in place of the raw JSON) and the new [Paritok VS Code extension](https://github.com/Paritok-official/paritok-vscode). - **2026-07-31** &nbsp; **v1.3.0** — stability release: edit-recovery, `read_original` API rename (from `expand_context`). - **2026-07-19** &nbsp; **v1.2.0** ships the embedding-based tool filter — the biggest single-turn lever (~29K → ~8K on a typ"
+  },
+  {
+   "source": "README.md@2c913302073367f2402d8bc4bb1a929a3f70a030",
+   "text": "Paritok runs as a **middle layer between your agent and the LLM API** — your agent points at Paritok instead of Anthropic/OpenAI, and everything else stays the same."
+  },
+  {
+   "source": "README.md@2c913302073367f2402d8bc4bb1a929a3f70a030",
+   "text": "``` Your Agent (Claude Code / Cursor / Codex) → builds request (tool schemas + history + tool results / file reads) ★ Paritok gateway rewrites the request here ★ → forwarded to Anthropic / OpenAI (billed on the compressed tokens) ← response flows back unchanged; compressed refs expand on demand ```"
+  }
+ ]
+}

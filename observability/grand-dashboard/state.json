@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-29T02:02:44Z",
+  "recorded_at_utc": "2026-09-29T07:38:10Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -13,9 +13,9 @@
     {
       "kind": "lane",
       "id": "paper",
-      "title": "Dedicated Alpaca paper account",
-      "state": "engine P0 + cancel identity + margin model 09-25 / cross-family fixes + startup fills + per-fill loss 09-26 / 1x ladder blocked (paper keys HTTP 401) / flat",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+      "title": "Alpaca paper accounts 1 and 2",
+      "state": "acct 1 401 cleared 09-28 (new keys) / HTTP 200 + flat 09-29 / RTH series frozen / acct 2 ext-20260928 2 of 8 passed 10 filled -8.91 USD reconciled flat",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md"
     },
     {
       "kind": "lane",

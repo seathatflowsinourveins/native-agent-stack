@@ -10,7 +10,9 @@ Claude roles in [`examples/claude-native/agents/`](../claude-native/agents/):
 | `stack-researcher` | bounded research from the sources a task names, with source-cited findings returned inline; no edits. A user-wide carrier: see the [2026-09-29 section](#2026-09-29-stack-role-carriers) | inherited from the session (a role file cannot set one) |
 | `stack-verifier` | re-runs the commands a task names and returns a verdict per claim; never fixes; no web search. A user-wide carrier: see the [2026-09-29 section](#2026-09-29-stack-role-carriers) | inherited from the session (a role file cannot set one) |
 
-Copy the `.toml` files into the destination project's `.codex/agents/` and merge
+Copy the three example `.toml` files (`evidence-reviewer`, `isolated-builder`, `semantic-evidence-reviewer`) into the
+destination project's `.codex/agents/` (not the two `stack-*` carriers: those are installed user-wide, see the
+[2026-09-29 section](#2026-09-29-stack-role-carriers)) and merge
 [`config.agents.toml.example`](config.agents.toml.example) into `.codex/config.toml`.
 The example also registers each role under `[agents."<name>"]` with `config_file`
 and `description`. Verified against the Codex source at tag `rust-v0.155.1`

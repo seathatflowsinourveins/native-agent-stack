@@ -1725,12 +1725,10 @@ class ProveVerdictTests(unittest.TestCase):
             default = json.loads(default_path.read_text())
             planted = dict(report, elsewhere={"note": f"see {tmp}"})
         self.assertNotIn("codex_home", report)
-        self.assertIs(report.get("codex_home_is_default"), False)  # the home came from --codex-home
-        self.assertIs(default.get("codex_home_is_default"), True)  # the home came from $CODEX_HOME
-        identifier = report.get("codex_home_id", "")
-        self.assertEqual(len(identifier), len("sha256:") + 16)
-        self.assertTrue(identifier.startswith("sha256:") and set(identifier[len("sha256:"):]) <= set("0123456789abcdef"))
-        self.assertEqual(default.get("codex_home_id"), identifier)  # the same home, the same identifier
+        self.assertIs(report.get("codex_home_is_default"), False)  # a scratch home is not ~/.codex
+        self.assertIs(default.get("codex_home_is_default"), False)  # nor is a non-default $CODEX_HOME
+        self.assertNotIn("codex_home_id", report)  # no identifier of the home: an unsalted digest confirms a guessed user name
+        self.assertNotIn("codex_home_id", default)
         self.assertNotIn(tmp, json.dumps({key: value for key, value in report.items() if key != "checks"}))
         self.assertEqual(absolute_paths({key: value for key, value in report.items() if key != "checks"}), [])
         self.assertEqual(absolute_paths({key: value for key, value in planted.items() if key != "checks"}), [tmp])  # control

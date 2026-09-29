@@ -53,6 +53,10 @@ PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b21158006
 REQ, PLAT = "a" * 64, "b" * 64
 LIMIT_TEXT = ("You’ve hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more "
               "credits or try again at Sep 30th, 2026 11:50 PM.")
+# Codex's report of an HTTP 429 without a usage-limit body (RetryLimitReachedError's Display,
+# codex-rs/protocol/src/error.rs at rust-v0.157.1): the text of the ten jobs that ended so on 2026-09-29
+# (gpt6-job-outcomes.json), with a fixture id.
+RETRY_429_TEXT = "exceeded retry limit, last status: 429 Too Many Requests, request id: req_fixture0001"
 
 
 def load(name):
@@ -1291,6 +1295,40 @@ class RunnerTests(RunnerCase):
             self.assertEqual((result["exit"], result["limit"]), (3, True), name)
             self.assertTrue((self.work / "LIMIT").exists(), name)
 
+    def test_gateway_429_sets_the_marker_with_a_reason_and_blocks_later_starts(self):
+        # A pooled route answers 429 without the usage-limit body, and Codex retries no 429, so it ends at once with
+        # its retry-limit report (an `error` then a `turn.failed` event); on 2026-09-29 nine follow-up jobs ended so
+        # within two seconds each while the workflow kept spending.
+        result = self.job("gpt6-gateway-429", exit=1, stderr="Reading additional input from stdin...\n",
+                          events=[{"type": "error", "message": RETRY_429_TEXT},
+                                  {"type": "turn.failed", "error": {"message": RETRY_429_TEXT}}])
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (3, True, True))
+        reason = (self.work / "LIMIT").read_text()
+        self.assertIn("HTTP 429 from the route", reason)
+        self.assertIn("gpt6-gateway-429", reason)
+        self.assertIn("no reset time", reason)
+        refused = self.call("start", "gpt6-fit-beta", self.prompt, self.schema)
+        self.assertEqual(refused.returncode, 3)
+        self.assertIn("LIMIT marker present; refusing to start gpt6-fit-beta", refused.stdout)
+
+    def test_a_usage_limit_report_keeps_its_empty_marker_when_a_retry_report_follows(self):
+        result = self.job("gpt6-both", exit=1, stderr="Reading additional input from stdin...\n",
+                          events=[{"type": "error", "message": LIMIT_TEXT},
+                                  {"type": "error", "message": RETRY_429_TEXT}])
+        self.assertEqual((result["exit"], result["limit"]), (3, True))
+        self.assertEqual((self.work / "LIMIT").read_text(), "")
+
+    def test_a_retry_limit_report_for_another_status_is_a_fault_not_a_limit(self):
+        # Synthetic: Codex builds this report for a 429 only, so these pin the pattern's status boundary.
+        for status in ("500 Internal Server Error", "502 Bad Gateway", "4290 Unknown", "404 Not Found"):
+            with self.subTest(status=status):
+                (self.work / "LIMIT").unlink(missing_ok=True)
+                result = self.job(f"gpt6-status-{status.split()[0]}", exit=1, stderr="Reading additional input from stdin...\n",
+                                  events=[{"type": "error", "message":
+                                           f"exceeded retry limit, last status: {status}, request id: r"}])
+                self.assertEqual((result["exit"], result["limit"]), (1, False))
+                self.assertFalse((self.work / "LIMIT").exists())
+
     def test_other_failures_do_not_set_the_marker_and_rerun_on_the_next_start(self):
         log = self.bin / "runs.log"
         result = self.job("gpt6-flaky", exit=1, log=str(log), events=[{"type": "error", "message": "stream error"}])
@@ -1452,11 +1490,27 @@ class RunnerTests(RunnerCase):
             ("2026-09-26T03:47:00.000000Z TRACE codex_api::sse::responses: " + LIMIT_TEXT, [], False),
             ("a quoted page: " + LIMIT_TEXT, [], False),
             ("ERROR: " + LIMIT_TEXT, [{"type": "turn.completed", "usage": {"output_tokens": 1}}], False),
+            # Codex's 429 report counts like the usage-limit report, and only that status (the 500 and 4290 cases are synthetic)
+            ("", [{"type": "error", "message": RETRY_429_TEXT}], True),
+            ("", [{"type": "turn.failed", "error": {"message": RETRY_429_TEXT}}], True),
+            ("", [{"type": "error", "message": "exceeded retry limit, last status: 500 Internal Server Error"}], False),
+            ("", [{"type": "error", "message": "exceeded retry limit, last status: 4290 Unknown"}], False),
+            ("", [{"type": "item.completed", "item": {"type": "agent_message", "text": RETRY_429_TEXT}}], False),
+            ("2026-09-29T13:47:00.000000Z ERROR codex_core::codex: " + RETRY_429_TEXT, [], True),
+            ("2026-09-29T13:47:00.000000Z TRACE codex_api::sse::responses: " + RETRY_429_TEXT, [], False),
+            ("a quoted page: " + RETRY_429_TEXT, [], False),
+            ("ERROR: " + RETRY_429_TEXT, [{"type": "turn.completed", "usage": {"output_tokens": 1}}], False),
         ]
         for stderr, events, expected in cases:
             (directory / "stderr.txt").write_text(stderr)
             (directory / "events.jsonl").write_text("\n".join(json.dumps(e) for e in events) + "\nnot json\n")
             self.assertEqual(codex_job.limit_error(directory), expected, (stderr, events))
+        for events, kind in (([{"type": "error", "message": LIMIT_TEXT}], "usage"),
+                             ([{"type": "error", "message": RETRY_429_TEXT}], "http_429"),
+                             ([{"type": "error", "message": RETRY_429_TEXT}, {"type": "error", "message": LIMIT_TEXT}], "usage")):
+            (directory / "stderr.txt").write_text("")
+            (directory / "events.jsonl").write_text("\n".join(json.dumps(e) for e in events) + "\n")
+            self.assertEqual(codex_job.limit_kind(directory), kind, events)
 
 
 def quota_answer(used, reached=None):

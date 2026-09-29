@@ -88,6 +88,20 @@ SENSITIVE_BASENAME = re.compile(
     r"|auth\.json|hosts\.yml|\.netrc|id_rsa|id_ecdsa|id_ed25519|stored_tokens)$")
 
 
+def public_names(entry: dict) -> list[str]:
+    """The entry's variables that tools/credentials/credential_run.py injects unmasked: only an optional variable that
+    the entry classifies in public_variables and that is not also required (inventory_errors rejects such an entry;
+    this keeps a required variable masked even for one that was not validated)."""
+    required, optional = entry["variables"], entry["optional_variables"]
+    return [name for name in entry.get("public_variables", []) if name in optional and name not in required]
+
+
+def masked_names(entry: dict) -> list[str]:
+    """Every declared variable of the entry except its public_variables."""
+    public = set(public_names(entry))
+    return [name for name in dict.fromkeys(entry["variables"] + entry["optional_variables"]) if name not in public]
+
+
 def inventory_errors(inventory, root: Path | None = None) -> list[str]:
     """Structural check of the inventory; returns reason strings, never values."""
     errors: list[str] = []
@@ -138,6 +152,27 @@ def inventory_errors(inventory, root: Path | None = None) -> list[str]:
             names = entry[key]
             if not isinstance(names, list) or not all(isinstance(n, str) and NAME.match(n) for n in names):
                 errors.append(f"{label}: {key} must be uppercase variable names")
+            elif len(set(names)) != len(names):
+                errors.append(f"{label}: {key} must not repeat a name")
+        required = [n for n in entry["variables"] if isinstance(n, str)] \
+            if isinstance(entry["variables"], list) else []
+        optional = [n for n in entry["optional_variables"] if isinstance(n, str)] \
+            if isinstance(entry["optional_variables"], list) else []
+        if set(required) & set(optional):  # else a required variable could be classified public below
+            errors.append(f"{label}: variables and optional_variables must not share a name "
+                          "(a required variable is never optional or public)")
+        # Optional key: the optional variables that tools/credentials/credential_run.py injects unmasked (not secret,
+        # such as a base URL); it masks every other variable it injects. An env-file entry with optional variables
+        # classifies them explicitly, [] masking them all.
+        if "public_variables" in entry:
+            public = entry["public_variables"]
+            if not isinstance(public, list) or not all(isinstance(n, str) and NAME.match(n) for n in public):
+                errors.append(f"{label}: public_variables must be uppercase variable names")
+            elif len(set(public)) != len(public) or not set(public) <= set(optional):
+                errors.append(f"{label}: public_variables must name distinct optional_variables of the entry")
+        elif isinstance(store, dict) and store.get("kind") == "private_env_file" and optional:
+            errors.append(f"{label}: an env-file entry with optional_variables must classify them in "
+                          "public_variables (the names injected unmasked; [] masks them all)")
         for key in ("loaders", "environment_only_consumers"):
             refs = entry[key]
             if not isinstance(refs, list) or not all(isinstance(r, str) for r in refs):

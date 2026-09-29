@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-lightonai-next-plaid",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/lightonai/next-plaid",
+ "reviewed_commit": "00e26aae0006b322727db277672211d9a0e3ccec",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of lightonai/next-plaid at commit 00e26aae0006b322727db277672211d9a0e3ccec (license Apache-2.0), read from README.md at that commit. Repository description: \"NextPlaid, ColGREP: Multi-vector search, from database to coding agents.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 552,
+  "pushed_at": "2026-09-22T15:06:53Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@00e26aae0006b322727db277672211d9a0e3ccec",
+   "text": "Semantic code search for your terminal and your coding agents. Searches combine regex filtering with semantic ranking. All local, your code never leaves your machine."
+  },
+  {
+   "source": "README.md@00e26aae0006b322727db277672211d9a0e3ccec",
+   "text": "```bash # Homebrew (macOS / Linux) brew install lightonai/tap/colgrep"
+  },
+  {
+   "source": "README.md@00e26aae0006b322727db277672211d9a0e3ccec",
+   "text": "# Shell installer curl --proto '=https' --tlsv1.2 -LsSf https://github.com/lightonai/next-plaid/releases/latest/download/colgrep-installer.sh | sh ```"
+  }
+ ]
+}
