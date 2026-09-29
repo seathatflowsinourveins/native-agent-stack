@@ -745,6 +745,18 @@ hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
 `qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
 three has run on a Mac workstation.
 
+**Credential boot receipt (added after `v2026.09.26.2`; documented, not
+run).** On Linux/WSL2 the `credential-boot-receipt.service` oneshot runs
+`python3 -I scripts/credential_boot_receipt.py record` at every start of the
+user's service manager
+([Restart check](../../docs/secret-storage.md#restart-check-2026-09-29)). On a
+Mac the same tool would run from a `RunAtLoad` LaunchAgent, which launchd
+starts only after the user's FileVault login, so a receipt there follows a
+login rather than the boot itself. No plist template exists for it, and it has
+not run on any Mac. macOS has no `/proc`, so a receipt there records
+`boot_id`, `uptime_seconds` and the kernel keyring names as null, and
+`compare` reports the boot change as `unknown`.
+
 **2026-09-23 decision: brew-services semantics, no backup or reconcile.**
 
 - **Chosen:** stateless, path-verified ownership with no backup, no

@@ -28,6 +28,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts import credential_boot_receipt as cbr
+from scripts.hooks import secret_path_guard as guard
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/credential_boot_receipt.py"
@@ -512,6 +513,41 @@ class BootReceiptUnitTemplateTests(unittest.TestCase):
         self.assertEqual(exec_start_problems(with_exec_start(self.text, EXEC_START)), [])
         self.assertNotEqual(directives(self.text.replace("WantedBy=default.target", "WantedBy=timers.target")),
                             UNIT_DIRECTIVES)
+
+
+class RestartCheckRunbookTests(unittest.TestCase):
+    """docs/secret-storage.md, "Restart check (2026-09-29)". The coordinator runs its fenced commands under the
+    secret-path guard (scripts/hooks/secret_path_guard.py), and they install exactly the pinned render of the unit."""
+
+    def section(self) -> str:
+        text = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8")
+        match = re.search(r"^## Restart check \(2026-09-29\)\n(.*?)(?=^## )", text, re.M | re.S)
+        self.assertIsNotNone(match, "docs/secret-storage.md has no Restart check section")
+        return match.group(1)
+
+    def commands(self) -> list[str]:
+        blocks = re.findall(r"^[ \t]*```sh\n(.*?)^[ \t]*```", self.section(), re.M | re.S)
+        return [line.strip() for block in blocks for line in block.splitlines() if line.strip()]
+
+    def test_every_runbook_command_passes_the_guard(self):
+        commands = self.commands()
+        self.assertGreaterEqual(len(commands), 10)
+        for command in commands:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_the_runbook_installs_the_pinned_render_and_leaves_the_restart_to_the_user(self):
+        commands = self.commands()
+        for command in (f"{RENDER_COMMAND} > ~/.config/systemd/user/credential-boot-receipt.service",
+                        "systemd-analyze --user verify ~/.config/systemd/user/credential-boot-receipt.service",
+                        "systemctl --user daemon-reload", "systemctl --user enable credential-boot-receipt.service",
+                        "systemctl --user start credential-boot-receipt.service",
+                        "python3 -I scripts/credential_boot_receipt.py compare"):
+            self.assertIn(command, commands)
+        section = self.section()
+        self.assertIn("`wsl --shutdown`", section)  # the user's step, from Windows
+        self.assertFalse([command for command in commands if "shutdown" in command or "reboot" in command])
+        self.assertIn('`--env-file "$PAPER_ENV_FILE"`', section)  # the paper units are unchanged
 
 
 if __name__ == "__main__":
