@@ -1029,9 +1029,9 @@ read is listed at the end of this subsection.
   here-document (`# unique values` and then `print(len(set([1, 1])))`) is refused as the shell's `set`: the base guard's
   `#` hole hid it, and reading an interpreter's here-document as that interpreter's code is a later change. Write such
   text with the Write tool and pass the path: `git commit -F FILE`, `gh pr create --body-file FILE`, a script file for the
-  interpreter. Measured 2026-09-29: of the 2,015 distinct commit messages on all refs of this repository (`git log
-  --all`, a count that grows), in the `git commit -m` and `gh pr create --body` patterns, this guard refuses 36 and the
-  base guard 16, and none that the base guard refuses passes; the five real messages that `tests/test_secret_path_guard.py`
+  interpreter. Measured 2026-09-29 with the guard of 752def7f: of the 2,015 distinct commit messages on all refs of this
+  repository then (`git log --all`, a count that grows), in the `git commit -m` and `gh pr create --body` patterns, this
+  guard refuses 36 and the base guard 16, and none that the base guard refuses passes; the five real messages that `tests/test_secret_path_guard.py`
   records (`REAL_COMMIT_MESSAGES`) are among them. Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: an
   unquoted here-document that expands `$(...)` between single quotes (`cat <<EOF` with `'$(printenv)'` in its body),
   which the base guard passed too.
@@ -1159,12 +1159,14 @@ read is listed at the end of this subsection.
   interpreter words stays inside the budget and reports its dump. Measured just under each limit, one counter at a time
   (the timing rows and `tests/test_secret_path_guard.py`): 398,000 characters of one quoted word and a `#` (two readings)
   1.1 s, 390,000 units of two-byte characters 0.9 s, 396,000 of four-byte 0.5 s, 9,900 texts 0.3 s, 1,000,000 words 0.2 s
-  (40 keyring execs over a 20,000-word tail spend 1,005,859 in 0.18 s), 490 reads 0.03 s. 500 random mixes of 22
-  adversarial building blocks at 199,000 characters took at most 0.9 s, and 64 shape families at 25,000 to 199,000
+  (40 keyring execs over a 20,000-word tail spend 1,005,859 in 0.18 s), 490 reads 0.03 s. 1,000 random mixes of 22
+  adversarial building blocks at 199,000 characters took at most 0.91 s, and 64 shape families at 25,000 to 199,000
   characters at most 1.1 s (the shapes that grow faster than linearly are one long shlex token, which the
-  200,000-character cap bounds at 0.5 s). The largest real command of this repository, an 82,000-character script written
-  through a here-document, spends 35% of the characters, 1% of the words and under 1% of the texts and reads; the
-  largest commit message (27,600 characters, read twice as a body) 57% of the characters. Nothing in the repository's
+  200,000-character cap bounds at 0.5 s). Each figure is a run on a shared host: the same 192,000-character quoted word took
+  0.8 s alone and 1.7 s at a load average of 8, so read a figure as within a factor of two. The largest real command of
+  this repository, an 82,000-character script written through a here-document, spends 35% of the characters, 1% of the
+  words and under 1% of the texts and reads; the largest commit message (27,600 characters, read twice as a body) 57% of
+  the characters. Nothing in the repository's
   fences, scripts or commit messages (1,877 distinct messages on all refs) comes near a limit. The friction is a command
   that needs more than that, measured as the largest size that still passes: a text whose characters, counted at their
   storage width and once for each reading (two when it holds a `#`), pass 400,000 (an ASCII script of 199,990 characters
@@ -1180,7 +1182,16 @@ read is listed at the end of this subsection.
   `-q`, `-s`, `-k` and procps's `-C` take the next word as their value in a cluster too: `ps -fu steve`, `ps -fu eve`,
   `ps -fo user`, `ps -ft e`, `ps -fU steve` and `ps -fC e` pass. Each has rows in `tests/test_secret_path_guard.py`
   (ALLOWED), and a differential against the base guard over every `ps` command line of up to three words from a
-  vocabulary of 65 finds no other loosening (the review's probe, `loosened rows: 0`, holds none of these forms).
+  vocabulary of 65 (and 200,000 random ones of four to six words) finds no other loosening (the review's probe, `loosened
+  rows: 0`, holds none of these forms). Measured 2026-09-29 with the guard of 36c847db (the tests changed after it, not the
+  guard): a differential over 66,176 commands derived from 1,079 table and oracle rows (each wrapped in 8 launcher prefixes
+  and 6 suffixes, and in `bash -c`, `sh -c` and `eval`) loosens 510, which are 10 `ps` forms (`ps -fu steve`, `-fu eve`,
+  `-fo user`, `-ft e`, `-fO user`, `-fU steve`, `-fG eve`, `-fg steve`, `-fC e`, `-fC eww`) in 51 wrappers each; three
+  seeds of a mutation fuzz (26,400 mutants of the 440 strings that the base guard blocks, per seed) loosen 153, 175 and
+  173, every one a `ps` form of that family under a mutation that leaves it readable; and nothing is loosened by the 785
+  fenced blocks, 4,338 fenced lines, 201 scripts (written through a here-document and as one command) and 16,119 distinct
+  lines of this repository, two fuzzers of 60,000 random strings, ten grammar fuzzes of 60,000 launcher chains with
+  redirections, the 40-consumer matrix of 115,200 commands, and the 684 launcher redirection positions.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)
