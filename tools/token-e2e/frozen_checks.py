@@ -394,6 +394,74 @@ def count_before_noun(text, nouns):
     return found
 
 
+_UNIT_WORDS = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+               "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
+               "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19}
+_TENS_WORDS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
+
+
+def spelled_numbers_to_digits(text):
+    """The extraction-only reading of number words (R3, R21): numbers up to 999 written in English (forty-nine, twenty one,
+    one hundred and five) become digits. Grammar g1 keeps zero..ten only and leaves compounds unparsed, so a fact stated in
+    words is unknown(unparsed) until a blind judge has quoted it verbatim; the grader then reads that quote (whose text the
+    judge check and `verified_extraction` have tied to the answer) with this reader. Words that do not spell a number, a
+    lone `hundred` and numbers joined by anything but one space or hyphen are left as they are. A linear scan."""
+    words, index, size = [], 0, len(text)
+    while index < size:
+        if text[index].isascii() and text[index].isalpha():
+            end = index
+            while end < size and text[end].isascii() and text[end].isalpha():
+                end += 1
+            words.append((index, end, text[index:end].lower()))
+            index = end
+        else:
+            index += 1
+
+    def joined(left, right):
+        return text[words[left][1]:words[right][0]] in (" ", "-")
+
+    def below_hundred(at):
+        if at >= len(words):
+            return None
+        word = words[at][2]
+        if word in _UNIT_WORDS:
+            return _UNIT_WORDS[word], at + 1
+        if word in _TENS_WORDS:
+            ones = words[at + 1][2] if at + 1 < len(words) and joined(at, at + 1) else None
+            if ones in _UNIT_WORDS and 1 <= _UNIT_WORDS[ones] <= 9:
+                return _TENS_WORDS[word] + _UNIT_WORDS[ones], at + 2
+            return _TENS_WORDS[word], at + 1
+        return None
+
+    def read(at):
+        word = words[at][2]
+        if word in _UNIT_WORDS and 1 <= _UNIT_WORDS[word] <= 9 and at + 1 < len(words) and joined(at, at + 1) \
+                and words[at + 1][2] == "hundred":
+            value, follow = _UNIT_WORDS[word] * 100, at + 2
+            if follow + 1 < len(words) and joined(follow - 1, follow) and words[follow][2] == "and" \
+                    and joined(follow, follow + 1):
+                follow += 1
+            rest = below_hundred(follow) if follow < len(words) and joined(follow - 1, follow) else None
+            if rest is not None and rest[0] > 0:
+                return value + rest[0], rest[1]
+            return value, at + 2
+        return below_hundred(at)
+
+    out, cursor, at = [], 0, 0
+    while at < len(words):
+        found = read(at)
+        if found is None:
+            at += 1
+            continue
+        value, follow = found
+        out.append(text[cursor:words[at][0]])
+        out.append(str(value))
+        cursor = words[follow - 1][1]
+        at = follow
+    out.append(text[cursor:])
+    return "".join(out)
+
+
 _LINKING = {"is", "are", "was", "were", "of", "equals", "equal", "to", "at", "about", "totals", "total"}
 _LABEL_GAP = " \t:=-(\"'"  # between a label and its integer: separators, and the closing quote of a quoted field name
 
@@ -2225,17 +2293,30 @@ def _stated_sum(ans, structural_texts):
     return values
 
 
+def verified_extraction(item, raw):
+    """R21: a D-extract item is usable only when it quotes the answer verbatim and every value lies inside one of its
+    quotes. `judge.check_judgment` enforces both when it accepts a judgment (its docstring says the oracle verifies them
+    again); the grader enforces them here as well because a `grade --judgments` or `regrade --judgments` file is data from
+    outside, and a value that is no part of a quote could be a fact the answer never states."""
+    quotes, values = item.get("answer_quotes"), item.get("values")
+    if not isinstance(quotes, list) or not quotes or not isinstance(values, list):
+        return False
+    if any(not isinstance(quote, str) or not quote or quote not in raw for quote in quotes):
+        return False
+    return all(isinstance(value, str) and any(value in quote for quote in quotes) for value in values)
+
+
 def _extracted_payloads(ans, extractions):
     """The D-extract fallback (R3, R21): payload texts a judge quoted from the answer. Every quote must be verbatim in the
-    answer; a quote that is not makes the component unknown(judge_quote). Returns (texts, refusal Result or None)."""
+    answer and every value inside a quote; otherwise the component is unknown(judge_quote). Returns (texts, refusal Result
+    or None)."""
     raw, texts = answer_text(ans), []
     for item in extractions or []:
         if item.get("component") != "payload":
             continue
-        quotes = item.get("answer_quotes") or []
-        if not quotes or any(quote not in raw for quote in quotes):
+        if not verified_extraction(item, raw):
             return [], unknown("judge_quote")
-        texts.extend(value for value in item.get("values", []) if isinstance(value, str) and value.strip())
+        texts.extend(value for value in item["values"] if value.strip())
     return texts, None
 
 
@@ -3372,13 +3453,15 @@ def _answer_unittest(text):
 
 
 def _apply_extraction(facts, extractions, raw):
-    """A D-extract fallback: quotes must be verbatim in the answer; the values are parsed by the same grammar."""
+    """A D-extract fallback: quotes must be verbatim in the answer and every value inside a quote (`verified_extraction`);
+    the values are then read with the extraction-only number-word reader, so words the deterministic grammar leaves
+    unparsed (forty-nine tests) can decide once a judge has quoted them. None when the extraction is refused."""
     for item in extractions or []:
         if item.get("component") != "unittest":
             continue
-        if any(quote not in raw for quote in item.get("answer_quotes", [])) or not item.get("answer_quotes"):
+        if not verified_extraction(item, raw):
             return None
-        extracted = _answer_unittest(" ".join(item.get("values", [])))
+        extracted = _answer_unittest(spelled_numbers_to_digits(normalize(" ".join(item["values"]))))
         for name in ("ran", "status"):
             if not facts[name] and extracted[name]:
                 facts[name] = extracted[name]
