@@ -18,6 +18,20 @@
       "used_by": "hook_context.claimed_plain_stdout (PLAIN_STDOUT_EVENTS) and the plain-text rule; inserted_blocks"
     },
     {
+      "id": "tools-reference",
+      "url": "https://code.claude.com/docs/en/tools-reference.md",
+      "fetched_at": "2026-09-29T20:16:09Z",
+      "sha256": "cc0eda9856f0f966182acb7a9b63000197fe15672dd14cea6c69e52c573e93d3",
+      "bytes": 72977,
+      "sections": ["## Read tool behavior (line 448)"],
+      "quotes": [
+        "The Read tool takes a file path and returns the contents with line numbers.",
+        "When a whole-file read exceeds the token limit, Read returns the first page with a `PARTIAL view` notice"
+      ],
+      "note": "the documented behavior; the exact form of each number (spaces, digits and a tab before every line) is observed client behavior, not a documented schema: 11,467 of 11,467 text Read results over 5,120 B on this host (scans/large-results.json)",
+      "used_by": "withoutLineNumbers, the payload of a Read result for item 4; a result with a line that lacks the number, such as a PARTIAL view notice, reads as large_shape_unknown"
+    },
+    {
       "id": "advisor-tool",
       "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool.md",
       "fetched_at": "2026-09-29T19:25:36Z",

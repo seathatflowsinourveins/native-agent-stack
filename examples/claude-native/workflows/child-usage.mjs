@@ -1781,10 +1781,12 @@ const sumSizes = (rows) => rows.reduce((a, b) => Object.fromEntries(Object.keys(
 const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s.results), large_byte_share: share(s.large_bytes, s.bytes) })
 // JSON and uniform-tabular shape of a result over RESULT_LIMIT (PR-A item 4; the AA §1 large-output table's JSON column). The payload is the
 // result text (a string, or text blocks joined with '', the join contentBytes implies) after its carrier's own wrapper: ctx_execute and
-// ctx_execute_file put the code echo before stdout (ctxEcho), and Read returns cat -n numbered lines (the Read tool's description; on this
-// host all 11,467 text Read results over 5,120 B were numbered on every line, and JSON was found in 0 of them as returned, in 990 without the
-// numbers). json: the trimmed payload opens with [ or { and parses. uniform_keys: it, or the one value of a one-key object, is an array of at
-// least five objects with one non-empty key set. uniform_flat: uniform_keys and every value of those objects is null, a boolean, a number or
+// ctx_execute_file put the code echo before stdout (ctxEcho), and Read "returns the contents with line numbers" (code.claude.com/docs/en/
+// tools-reference, "Read tool behavior"; the form, spaces, digits and a tab before every line, is observed client behavior, not a documented
+// schema: all 11,467 text Read results over 5,120 B on this host had it on every line, and JSON was found in 0 of them as returned, in 990
+// without the numbers; a PARTIAL view notice has no number and reads as unknown). json: the trimmed payload opens with [ or { and parses.
+// uniform_keys: it, or the one value of a one-key object, is an array of at least five objects with one non-empty key set. uniform_flat:
+// uniform_keys and every value of those objects is null, a boolean, a number or
 // a string (TOON v4.1.1 packages/toon/README.md:199, "All objects have identical fields with primitive values"; #381 toon-seeded: "at least
 // five flat records"); keyed maps of uniform objects, which TOON also tabulates, are not counted. null when this reading cannot tell: a
 // non-text block, a result without its call, or an echo or line numbers it cannot find (large_shape_unknown).
