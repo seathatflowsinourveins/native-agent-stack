@@ -1837,6 +1837,166 @@ class TokenMeasurement(unittest.TestCase):
         self.assertFalse(partial["complete"])
         self.assertIsNone(partial["totals"]["output_tokens"])
 
+    # Binding decision B9 and U2 correction 1: per-child usage reads usage.iterations[] of assistant messages. The shapes follow a count-only
+    # scan of this host's transcripts (evidence/artifacts/pra-u2-differential-20260929) and the beta Messages API reference (BetaIterationsUsage):
+    # `message` entries are the executor's and the top-level counters are their sum; an `advisor_message` entry carries its own model and is
+    # never in the top-level counters (advisor tool doc, "Usage and billing"); on a row with several iterations the top-level cache_creation
+    # object holds the first iteration's split, while each entry's own split adds up to its combined counter.
+    @staticmethod
+    def iteration(kind, i, o, cr, cc, split=None, model=None):
+        it = {"type": kind, "input_tokens": i, "output_tokens": o, "cache_read_input_tokens": cr, "cache_creation_input_tokens": cc}
+        if split is not None:
+            it["cache_creation"] = {"ephemeral_5m_input_tokens": split[0], "ephemeral_1h_input_tokens": split[1]}
+        if model is not None:
+            it["model"] = model
+        return it
+
+    @staticmethod
+    def usage_row(key, usage, content=None, timestamp="2026-09-26T01:00:00Z", model="claude-opus-5-5"):
+        return {"type": "assistant", "timestamp": timestamp, "effort": "max",
+                "message": {"id": key, "model": model, "usage": usage, **({"content": content} if content is not None else {})}}
+
+    @staticmethod
+    def advisor_blocks(key, result="advisor_redacted_result"):
+        call = {"type": "server_tool_use", "id": key, "name": "advisor", "input": {}}
+        if result is None:
+            return [call]
+        content = {"type": result, "encrypted_content": "opaque"} if result != "advisor_tool_result_error" else {"type": result, "error_code": "overloaded"}
+        return [call, {"type": "advisor_tool_result", "tool_use_id": key, "content": content}]
+
+    def advisor_usage(self, advisor_model="claude-fable-5-1"):
+        """Executor iterations 100/10/0/50 (5m 50) and 150/20/100/60 (1h 60) around an advisor sub-inference 200/300/7/40 (1h 40); the
+        top-level cache_creation object is the first iteration's split, as observed on 3,706 of 3,706 multi-iteration rows here."""
+        it = self.iteration
+        return {"input_tokens": 250, "output_tokens": 30, "cache_read_input_tokens": 100, "cache_creation_input_tokens": 110,
+                "cache_creation": {"ephemeral_5m_input_tokens": 50, "ephemeral_1h_input_tokens": 0},
+                "speed": "standard", "service_tier": "standard", "inference_geo": "not_available",
+                "iterations": [it("message", 100, 10, 0, 50, (50, 0)), it("advisor_message", 200, 300, 7, 40, (0, 40), model=advisor_model),
+                               it("message", 150, 20, 100, 60, (0, 60))]}
+
+    def test_usage_advisor_iterations_tier_fields_and_split(self):
+        it, row = self.iteration, self.usage_row
+        rows = [
+            row("m1", {"input_tokens": 10, "output_tokens": 5, "cache_read_input_tokens": 20, "cache_creation_input_tokens": 30,
+                       "cache_creation": {"ephemeral_5m_input_tokens": 10, "ephemeral_1h_input_tokens": 20},
+                       "speed": "standard", "service_tier": "standard", "inference_geo": "not_available",
+                       "iterations": [it("message", 10, 5, 20, 30, (10, 20))]}),
+            row("m2", {"input_tokens": 4, "output_tokens": 2, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 7}),  # combined only
+            row("m3", {"input_tokens": 1, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0,
+                       "cache_creation": {"ephemeral_5m_input_tokens": 0, "ephemeral_1h_input_tokens": 0},
+                       "speed": "fast", "service_tier": "standard", "inference_geo": "global", "iterations": [it("message", 1, 1, 0, 0, (0, 0))]}),
+            row("m4", {"input_tokens": 6, "output_tokens": 2, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 3,
+                       "cache_creation": {"ephemeral_5m_input_tokens": 3, "ephemeral_1h_input_tokens": 0},
+                       "speed": "standard", "service_tier": "priority", "inference_geo": "us"}),
+            row("m5", self.advisor_usage(), content=self.advisor_blocks("srv1")),
+        ]
+        usage = self.measure(rows)["usage"]
+        # controls: the combined counters and the deduplication by message id are unchanged
+        self.assertEqual(usage["totals"], {"input_tokens": 271, "output_tokens": 40, "cache_read_input_tokens": 120, "cache_creation_input_tokens": 150})
+        self.assertEqual([m["usage"]["cache_creation_input_tokens"] for m in usage["messages"]], [30, 7, 0, 3, 110])
+        fields = ("cache_creation_5m", "cache_creation_1h", "speed", "service_tier", "inference_geo")
+        self.assertEqual([tuple(m.get(k) for k in fields) for m in usage["messages"]], [
+            (10, 20, "standard", "standard", "not_available"),
+            (None, None, None, None, None),  # a record without the fields reads null, never 0
+            (0, 0, "fast", "standard", "global"),
+            (3, 0, "standard", "priority", "us"),
+            (50, 60, "standard", "standard", "not_available")])  # the executor iterations' own splits, not the top-level object (50, 0)
+        self.assertEqual(usage.get("advisor_iterations"), [{
+            "message_ordinal": 5, "model": "claude-fable-5-1",
+            "usage": {"input_tokens": 200, "output_tokens": 300, "cache_read_input_tokens": 7, "cache_creation_input_tokens": 40},
+            "cache_creation_5m": 0, "cache_creation_1h": 40, "speed": None, "service_tier": None, "inference_geo": None}])
+        self.assertEqual(usage.get("advisor_totals"), {"input_tokens": 200, "output_tokens": 300, "cache_read_input_tokens": 7, "cache_creation_input_tokens": 40})
+        self.assertEqual(usage.get("totals_including_advisor"), {"input_tokens": 471, "output_tokens": 340, "cache_read_input_tokens": 127, "cache_creation_input_tokens": 190})
+        self.assertTrue(usage["complete"])
+        self.assertEqual(usage.get("iteration_issues"), {"unread_entries": {}, "inconsistent_messages": 0, "advisor_results_without_usage": 0,
+                                                          "advisor_calls_without_result": 0})
+
+    def test_usage_iterations_streamed_rows_and_adjacent_windows(self):
+        """Streamed rows of one message id carry the iterations on the last rows only (observed: every multi-row id with iterations has them
+        on its last rows): the counted row, the one with the largest counters, holds them. An advisor iteration counts in the window of the
+        first row that carries it, so adjacent windows add up."""
+        it, row = self.iteration, self.usage_row
+        early = {"input_tokens": 100, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 50,
+                 "cache_creation": {"ephemeral_5m_input_tokens": 50, "ephemeral_1h_input_tokens": 0}}
+        streamed = [row("adv", early, content=self.advisor_blocks("srv1", result=None)),
+                    row("adv", self.advisor_usage(), content=self.advisor_blocks("srv1")[1:])]
+        got = self.measure(streamed)["usage"]
+        self.assertEqual((len(got["messages"]), got["messages"][0]["usage"]["output_tokens"]), (1, 30))  # control
+        self.assertEqual([a["model"] for a in got.get("advisor_iterations", [])], ["claude-fable-5-1"])
+        self.assertTrue(got["complete"])
+        from datetime import datetime
+        split = datetime.fromisoformat("2026-09-26T01:30:00+00:00").timestamp() * 1000
+        rows = [row("w", early, content=self.advisor_blocks("srv1", result=None), timestamp="2026-09-26T01:00:00Z"),
+                row("w", self.advisor_usage(), content=self.advisor_blocks("srv1")[1:], timestamp="2026-09-26T02:00:00Z"),
+                row("v", self.advisor_usage("claude-opus-5-5"), content=self.advisor_blocks("srv2"), timestamp="2026-09-26T01:00:00Z"),
+                row("v", self.advisor_usage("claude-opus-5-5"), timestamp="2026-09-26T02:00:00Z")]
+        a = self.measure(rows, window={"since": 0, "until": split})["usage"]
+        b = self.measure(rows, window={"since": split, "until": split + 86400000})["usage"]
+        self.assertEqual(a["totals"]["output_tokens"] + b["totals"]["output_tokens"], 60)  # control: counters partition
+        self.assertEqual(([x["model"] for x in a.get("advisor_iterations", [])], [x["model"] for x in b.get("advisor_iterations", [])]),
+                         (["claude-opus-5-5"], ["claude-fable-5-1"]))
+        self.assertEqual(b["messages"][0]["cache_creation_5m"], 0)  # 50 at the late row less 50 at the early one
+        self.assertEqual(b["messages"][0]["cache_creation_1h"], 60)
+        # a window that ends between an advisor call and its result reads a call without a result, so the earlier window's usage is
+        # incomplete (only an actor with a row at or after until, the sweep's ran_past_window_end, can show it); the later window is complete
+        self.assertEqual((a["complete"], (a.get("iteration_issues") or {}).get("advisor_calls_without_result"), b["complete"]), (False, 1, True))
+
+    def test_usage_is_incomplete_when_iterations_cannot_be_read(self):
+        """usage.complete is false when a message carries iterations this reading cannot read or account for (B9), each reason counted
+        in iteration_issues; an empty list, an advisor error result and the fields of a plain message keep it complete."""
+        it, row = self.iteration, self.usage_row
+        def top(i, o, cr, cc, iterations=None):
+            u = {"input_tokens": i, "output_tokens": o, "cache_read_input_tokens": cr, "cache_creation_input_tokens": cc,
+                 "cache_creation": {"ephemeral_5m_input_tokens": cc, "ephemeral_1h_input_tokens": 0}}
+            if iterations is not None:
+                u["iterations"] = iterations
+            return u
+        issues = {"unread_entries": {}, "inconsistent_messages": 0, "advisor_results_without_usage": 0, "advisor_calls_without_result": 0}
+        cases = [
+            ("an empty iterations list: the top level stands (4,211 rows here)", [row("e", top(5, 1, 0, 2, []))], True, issues),
+            ("an advisor error result has no sub-inference usage", [row("x", top(5, 3, 0, 0, [it("message", 2, 1, 0, 0), it("message", 3, 2, 0, 0)]),
+                                                                       content=self.advisor_blocks("srvx", "advisor_tool_result_error"))], True, issues),
+            ("top-level counters that are not the sum of the message entries (1 message here)",
+             [row("z", top(0, 0, 0, 0, [it("message", 9, 3, 0, 4, (4, 0))]))], False, {**issues, "inconsistent_messages": 1}),
+            ("a fallback-served turn: the declined hop's message entry is outside the top level",
+             [row("f", top(3, 1, 0, 0, [it("message", 5, 2, 0, 0, model="claude-opus-5-5"), it("fallback_message", 3, 1, 0, 0, model="claude-opus-4-8")]),
+                  model="claude-opus-4-8")], False, {**issues, "unread_entries": {"fallback_message": 1}}),
+            ("a compaction entry is not in the top level", [row("c", top(3, 1, 0, 0, [it("compaction", 50, 9, 0, 0), it("message", 3, 1, 0, 0)]))],
+             False, {**issues, "unread_entries": {"compaction": 1}}),
+            ("an entry that is not an object", [row("n", top(3, 1, 0, 0, [7, it("message", 3, 1, 0, 0)]))], False, {**issues, "unread_entries": {"(not_an_object)": 1}}),
+            ("a message entry without a numeric counter", [row("s", top(3, 1, 0, 0, [{**it("message", 3, 1, 0, 0), "output_tokens": "1"}]))],
+             False, {**issues, "unread_entries": {"message": 1}}),
+            ("a successful advisor result without its advisor_message entry (105 message ids here)",
+             [row("a", top(5, 1, 0, 0), content=self.advisor_blocks("srva"))], False, {**issues, "advisor_results_without_usage": 1}),
+            ("an advisor call without a result: the sub-inference may have run (47 message ids here)",
+             [row("b", top(3, 1, 0, 0, [it("message", 3, 1, 0, 0)]), content=self.advisor_blocks("srvb", result=None))],
+             False, {**issues, "advisor_calls_without_result": 1}),
+        ]
+        for name, rows, complete, want in cases:
+            with self.subTest(case=name):
+                got = self.measure(rows)["usage"]
+                self.assertEqual((got["complete"], got.get("iteration_issues")), (complete, want))
+        # an advisor entry without a model cannot be priced
+        got = self.measure([row("m", self.advisor_usage(), content=self.advisor_blocks("srvm"))])["usage"]
+        self.assertTrue(got["complete"])  # control for the case below
+        unnamed = self.advisor_usage()
+        del unnamed["iterations"][1]["model"]
+        got = self.measure([row("m", unnamed, content=self.advisor_blocks("srvm"))])["usage"]
+        self.assertEqual((got["complete"], [a["model"] for a in got.get("advisor_iterations", [])]), (False, ["(unresolved)"]))
+
+    def test_usage_aggregate_sums_advisor_totals_and_iteration_issues(self):
+        it, row = self.iteration, self.usage_row
+        ok = [row("m5", self.advisor_usage(), content=self.advisor_blocks("srv1"))]
+        unread = [row("c", {"input_tokens": 3, "output_tokens": 1, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0,
+                            "iterations": [it("compaction", 50, 9, 0, 0), it("message", 3, 1, 0, 0)]})]
+        agg = self.exports("cu.aggregateMeasurements(x.map((r) => cu.measureTranscript(r)))", [ok, ok, unread])["usage"]
+        self.assertEqual((agg["complete"], agg["totals"]["input_tokens"]), (False, 503))  # control: 250 + 250 + 3
+        self.assertEqual(agg.get("advisor_totals"), {"input_tokens": 400, "output_tokens": 600, "cache_read_input_tokens": 14, "cache_creation_input_tokens": 80})
+        self.assertEqual(agg.get("totals_including_advisor"), {"input_tokens": 903, "output_tokens": 661, "cache_read_input_tokens": 214, "cache_creation_input_tokens": 300})
+        self.assertEqual(agg.get("advisor_iteration_count"), 2)
+        self.assertEqual(agg.get("iteration_issues"), {"unread_entries": {"compaction": 1}, "inconsistent_messages": 0, "advisor_results_without_usage": 0,
+                                                        "advisor_calls_without_result": 0})
+
     def test_sweep_reports_children_and_main_separately_with_digest_bound_exceptions(self):
         import hashlib
         with tempfile.TemporaryDirectory() as directory:

@@ -149,6 +149,23 @@ try {
   expect('rerun: a superseded attempt without a transcript has unknown usage, so the run is incomplete', noLog.status === 'incomplete' && ((noLog.superseded_attempts || [])[0] || {}).usage_issues.some((i) => i.includes('no transcript')))
   const quiet = summarizeRun(rerunWith('rerun-no-request', [{ type: 'user', message: { role: 'user', content: 'go' } }]))
   expect('rerun: a superseded attempt that made no request (zero usage) leaves the run complete', quiet.status === 'complete' && !((quiet.superseded_attempts || [])[0] || {}).usage_issues)
+  // Binding decision B9 and U2 correction 1 in run mode: children[].lanes.measurement.usage, a superseded attempt's too, reads usage.iterations[]
+  // (advisor_iterations with their own model and split; tier fields per message). Control: a child whose usage this reading cannot complete
+  // (a compaction entry) keeps the run complete and the cli at exit 0, because summarizeChild and the exit code do not read measurement.usage.
+  const iter = (type, i, o, cc, extra = {}) => ({ type, input_tokens: i, output_tokens: o, cache_read_input_tokens: 0, cache_creation_input_tokens: cc, cache_creation: { ephemeral_5m_input_tokens: cc, ephemeral_1h_input_tokens: 0 }, ...extra })
+  const advisorRow = { type: 'assistant', effort: 'max', message: { id: 'am1', model: 'claude-sonnet-5-5', content: [{ type: 'server_tool_use', id: 'srv1', name: 'advisor', input: {} }, { type: 'advisor_tool_result', tool_use_id: 'srv1', content: { type: 'advisor_redacted_result', encrypted_content: 'e' } }],
+    usage: { input_tokens: 5, output_tokens: 3, cache_read_input_tokens: 0, cache_creation_input_tokens: 2, cache_creation: { ephemeral_5m_input_tokens: 2, ephemeral_1h_input_tokens: 0 }, speed: 'standard', service_tier: 'standard', inference_geo: 'not_available',
+      iterations: [iter('message', 2, 1, 2), iter('advisor_message', 40, 60, 10, { model: 'claude-opus-5-5' }), iter('message', 3, 2, 0)] } } }
+  const compactionRow = { type: 'assistant', effort: 'max', message: { id: 'am2', model: 'claude-sonnet-5-5', usage: { input_tokens: 3, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, iterations: [iter('compaction', 50, 9, 0), iter('message', 3, 1, 0)] } } }
+  const adv = join(dir, 'advisor'); mkdirSync(adv)
+  writeFileSync(join(adv, 'journal.jsonl'), [started, done].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(adv, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(adv, 'agent-a1.jsonl'), [advisorRow, compactionRow].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  const advRun = summarizeRun(adv), advUsage = advRun.children[0]?.lanes?.measurement?.usage || {}
+  expect('usage: a child whose usage iterations cannot all be read keeps the run complete and the cli at exit 0 (control)', advRun.status === 'complete' && advRun.children[0].complete && cli(adv, '--require-effort', 'max') === 0)
+  expect('usage: run-mode children carry advisor iterations with their own model and split, tier fields per message, and incomplete usage for a compaction entry', advUsage.complete === false && JSON.stringify((advUsage.advisor_iterations || []).map((a) => [a.message_ordinal, a.model, a.usage.output_tokens, a.cache_creation_5m, a.cache_creation_1h])) === JSON.stringify([[1, 'claude-opus-5-5', 60, 10, 0]]) && advUsage.messages[0].speed === 'standard' && advUsage.messages[0].cache_creation_5m === 2 && JSON.stringify(advUsage.iteration_issues?.unread_entries) === '{"compaction":1}')
+  const supAdv = summarizeRun(rerunWith('rerun-advisor', [advisorRow, limitRow]))
+  expect('usage: a superseded attempt carries its advisor iterations too', (((supAdv.superseded_attempts || [])[0] || {}).lanes?.measurement?.usage?.advisor_iterations || []).length === 1)
   const capRun = join(dir, 'cap'); mkdirSync(capRun)
   writeFileSync(join(capRun, 'journal.jsonl'), [started, done, { ...started, agentId: 'a2', label: 'review' }, { type: 'result', agentId: 'a2', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
   for (const id of ['a1', 'a2']) writeFileSync(join(capRun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'opus', agentType: 'workflow' }))
