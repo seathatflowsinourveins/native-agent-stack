@@ -52,6 +52,7 @@ import contextlib
 import copy
 import datetime
 import difflib
+import errno
 import hashlib
 import json
 import os
@@ -1146,8 +1147,7 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         print("refused: nothing written")
         return 2
     changes = plan.config_changes()
-    if (not any(c["changed"] for c in changes) and not plan.agents_changed() and plan.profile_state() == "same"
-            and plan.omniroute_state() in (None, "same")):
+    if plan.nothing_to_do():  # the roles count too: a host set up before they existed still gets them
         print("already in place: nothing to do")
         return 0
     root.mkdir(parents=True, exist_ok=True)
@@ -1179,6 +1179,14 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
     if plan.omniroute:  # records of runs without --omniroute-profile, and older records, have no such entry
         record["omniroute_profile"] = {"path": str(plan.omniroute_path), "existed": plan.omniroute_bytes is not None,
                                        "sha256_after": sha256_bytes(plan.omniroute_template), "state": "pending"}
+    role_pins_now = role_pins()
+    role_states = plan.role_states()
+    record["agent_roles"] = {  # records of runs of an older tool have none, and rollback then leaves the roles alone
+        "dir": str(plan.agents_dir), "existed_dir": plan.agents_dir_kind == "dir", "creating_dir": False,
+        "created_dir": False,
+        "files": {name: {"path": str(plan.agents_dir / name), "existed": role_states[name] != "create",
+                         "sha256_after": role_pins_now[name], "state": "pending", "creating": False,
+                         "created": False} for name in ROLE_FILES}}
     write_record(run, record)
     if latest.is_symlink() or latest.exists():
         latest.unlink()
@@ -1239,6 +1247,39 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
             record[part]["state"] = "done"
             write_record(run, record)
             print(f"{path.name}: in place")
+        # 3b. the role carriers, after the profiles: create-only, mode 0600, in a 0700 folder when this run makes it.
+        # Each creation is journaled first, like the profiles', so rollback trusts an interrupted one.
+        roles = record["agent_roles"]
+        if any(state == "create" for state in role_states.values()):
+            if plan.agents_dir_kind == "absent":
+                roles["creating_dir"] = True
+                write_record(run, record)
+                try:
+                    plan.agents_dir.mkdir(mode=0o700)
+                except FileExistsError:
+                    roles["creating_dir"] = False  # it appeared since it was read; it is not ours
+                else:
+                    os.chmod(plan.agents_dir, 0o700)
+                    roles["created_dir"] = True
+                write_record(run, record)
+            if path_kind(plan.agents_dir) != "dir":
+                raise Failed("the agents directory is not a real directory; no role file written")
+        for name in ROLE_FILES:
+            entry, path = roles["files"][name], plan.agents_dir / name
+            if role_states[name] == "create":
+                entry["creating"] = True
+                write_record(run, record)
+                try:
+                    atomic_write(path, plan.role_sources[name], 0o600, None, create_only=True)
+                except FileExistsError:
+                    entry["creating"] = False  # another writer made it in between; it is not ours
+                    raise Failed(f"agents/{name} appeared since it was read; left as it is") from None
+                entry["created"] = True
+            if sha256_file(path) != entry["sha256_after"]:
+                raise Failed(f"read-back: agents/{name} does not hold the source")
+            entry["state"] = "done"
+            write_record(run, record)
+            print(f"agents/{name}: in place")
         # 4. Codex's own view
         found = readbacks(codex, env, None, Path("/"), omniroute=plan.omniroute)
         record["readback"] = found
@@ -1277,6 +1318,42 @@ def cmd_rollback(args: argparse.Namespace, codex: str) -> int:
         print(f"refused: {len(running)} codex processes running (pids {', '.join(running)})")
         return 2
     outcome, conflicts = {}, []
+    # 3b. the role carriers, applied after the profiles and so undone before them: a file only when this run created
+    # it (or was creating it when it stopped) and it still holds what the run wrote, the folder only when this run
+    # made it and it is empty. A record without "agent_roles" (a run of an older tool) leaves them alone.
+    roles = record.get("agent_roles")
+    if roles:
+        for name, entry in roles["files"].items():
+            key, path = f"agents/{name}", Path(entry["path"])
+            if not (entry.get("created") or entry.get("creating")):
+                outcome[key] = "not created by this run"
+                continue
+            kind = path_kind(path)
+            if kind == "absent":
+                outcome[key] = "already absent"
+            elif kind == "file" and sha256_file(path) == entry["sha256_after"]:
+                path.unlink()
+                outcome[key] = "removed"
+            else:
+                conflicts.append(f"{key} changed since the run; left in place")
+        directory = Path(roles["dir"])
+        if roles.get("created_dir") or roles.get("creating_dir"):
+            kind = path_kind(directory)
+            if kind == "absent":
+                outcome["agents directory"] = "already absent"
+            elif kind != "dir":
+                conflicts.append("agents directory is no longer a real directory; left in place")
+            else:
+                try:
+                    directory.rmdir()
+                    outcome["agents directory"] = "removed (the run created it)"
+                except OSError as error:
+                    if error.errno not in (errno.ENOTEMPTY, errno.EEXIST):
+                        conflicts.append(f"agents directory could not be removed ({error.strerror}); left in place")
+                    else:
+                        outcome["agents directory"] = "left in place (not empty)"
+        else:
+            outcome["agents directory"] = "not created by this run"
     # 3. the profiles: remove one only if this run created it (or was creating it when it stopped) and nobody
     # changed it since. A record without "omniroute_profile" (no --omniroute-profile, or an older run) has only one.
     for part in ("profile", "omniroute_profile"):

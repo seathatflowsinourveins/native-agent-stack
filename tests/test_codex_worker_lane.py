@@ -1389,6 +1389,7 @@ class RoleStepTests(unittest.TestCase):
         need(self, lane.Plan, "role_states")
         code, out = self.host.apply()
         self.assertEqual(code, 0, out)
+        self.assertTrue(self.agents.is_dir(), "the agents directory was not created")
         shutil.rmtree(self.agents)
         with mock.patch.object(lane.Plan, "role_states", lambda self: {name: "same" for name in ROLE_NAMES}):
             code, out = self.host.apply()
