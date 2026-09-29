@@ -1782,7 +1782,7 @@ const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s
 // JSON and uniform-tabular shape of a result over RESULT_LIMIT (PR-A item 4; the AA §1 large-output table's JSON column). The payload is the
 // result text (a string, or text blocks joined with '', the join contentBytes implies) after its carrier's own wrapper: ctx_execute and
 // ctx_execute_file put the code echo before stdout (ctxEcho), and Read returns cat -n numbered lines (the Read tool's description; on this
-// host all 11,467 Read results over 5,120 B were numbered on every line, and JSON was found in 0 of them as returned but in 990 without the
+// host all 11,467 text Read results over 5,120 B were numbered on every line, and JSON was found in 0 of them as returned, in 990 without the
 // numbers). json: the trimmed payload opens with [ or { and parses. uniform_keys: it, or the one value of a one-key object, is an array of at
 // least five objects with one non-empty key set. uniform_flat: uniform_keys and every value of those objects is null, a boolean, a number or
 // a string (TOON v4.1.1 packages/toon/README.md:199, "All objects have identical fields with primitive values"; #381 toon-seeded: "at least
@@ -2076,9 +2076,9 @@ function rtkParts(calls, rewrites, enabled, exceptions) {
   }
   return { ...out, status: out.unknown_calls ? 'incomplete' : 'measured', coverage: share(out.observed_covered_parts, out.eligible_parts), call_coverage: share(out.observed_all_covered_calls, out.eligible_calls) }
 }
-// Hook context (PR-A item 1). An insertion is a hook_additional_context row, the row M12 counts (E2E README.md M12: "0
-// hook_additional_context rows from any hook event"); its content array holds one entry per hook whose context Claude Code delivered (the
-// hooks reference: "When several hooks return additionalContext for the same event, Claude receives all of the values"). A claim is a
+// Hook context (PR-A item 1). An insertion is a hook_additional_context row, the row M12 counts (E2E README.md M12 row: blind evidence
+// needs 0 hook_additional_context rows from any hook event); its content array holds one entry per hook whose context Claude Code delivered
+// (the hooks reference: "When several hooks return `additionalContext` for the same event, Claude receives all of the values"). A claim is a
 // hook_success row whose stdout asks for context and is never an insertion: JSON with hookSpecificOutput.additionalContext on any event,
 // or plain text (stdout that does not both start with { and end with }) on the four events whose plain stdout Claude Code adds as context
 // (code.claude.com/docs/en/hooks, "Exit code 0", fetched 2026-09-29). Every other hook_* row type is counted apart, descriptively.
