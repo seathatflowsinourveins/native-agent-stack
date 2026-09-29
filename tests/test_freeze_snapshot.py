@@ -239,6 +239,50 @@ def blind_patch(owner: str) -> tuple[str, str]:
     return anchor, constant
 
 
+# The Codex role rows (U13): the two carriers, what else can add a role, the codex launcher and the parent's MCP server sets.
+CODEX_ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
+CODEX_ROLE_IDS = (
+    "codex.agents.stack-researcher.sha256", "codex.agents.stack-verifier.sha256", "codex.agents.toml_set",
+    "codex.agents.role_tables", "codex.system.agents_toml_count", "codex.system.role_tables",
+    "codex.project.agents_toml_count", "codex.project.role_tables", "codex.launcher.sha256", "codex.binary.sha256",
+    "codex.mcp.servers.default", "codex.mcp.servers.stack_worker")
+MCP_DEFAULT = {"ai-memory": True, "context-mode": True, "serena": True, "zz-disabled": False}
+MCP_WORKER = {"ai-memory": True, "context-mode": True, "serena": True, "socraticode": True}
+# The fake `codex` keeps the `--version` behaviour of FAKE_VERSION_TOOL (its data/codex.version and data/codex.exit) and answers
+# the two forms of `mcp list --json` from data/codex.mcp.<default|stack-worker>.json, noting where it ran. Anything else exits 64.
+FAKE_CODEX = """#!/bin/sh
+d="$(dirname "$0")/data"
+echo "${FREEZE_PLANTED_MARKER:-}" >&2
+if [ "$1" = "--version" ]; then
+  cat "$d/codex.version"
+  [ -f "$d/codex.exit" ] && exit "$(cat "$d/codex.exit")"
+  exit 0
+fi
+case "$*" in
+"mcp list --json") which_set=default ;;
+"-p stack-worker mcp list --json") which_set=stack-worker ;;
+*) exit 64 ;;
+esac
+pwd > "$d/codex.mcp.$which_set.cwd"
+cat "$d/codex.mcp.$which_set.json"
+[ -f "$d/codex.mcp.$which_set.exit" ] && exit "$(cat "$d/codex.mcp.$which_set.exit")"
+exit 0
+"""
+
+
+def codex_mcp_json(servers: dict, marker: str) -> str:
+    """`codex mcp list --json` at 0.157.1 (keys read from a real run): a JSON array with one object per server. Only `name` and
+    `enabled` matter to the tool; the transport, with a command, an argument, an environment value and a URL that hold `marker`,
+    is what must never reach a capture."""
+    return json.dumps([{
+        "name": name, "enabled": enabled, "disabled_reason": None if enabled else "user", "startup_timeout_sec": None,
+        "tool_timeout_sec": None, "auth_status": "unsupported",
+        "transport": {"type": "stdio", "command": f"/opt/{marker}/bin/{name}", "args": [f"--key={marker}"],
+                      "env": {"SECRET_LOOKING": marker}, "env_vars": [], "cwd": None, "url": f"http://127.0.0.1:1/{marker}",
+                      "bearer_token_env_var": None, "http_headers": None, "env_http_headers": None,
+                      "http_headers_helper": None}} for name, enabled in servers.items()])
+
+
 class Loopback(http.server.ThreadingHTTPServer):
     """A loopback HTTP server that serves `routes` ({path: (status, body, headers)}) and records each request."""
 
@@ -353,6 +397,7 @@ class FakeHost:
         self._build_home()
         self._build_repo()
         self._build_fakes()
+        self._build_codex_roles()
         self.git("init", "-q", "-b", "main")
         self.commit_all("fixture")
         self.write(self.repo / ".claude" / "settings.local.json", json.dumps({"env": {}}))
@@ -485,6 +530,20 @@ class FakeHost:
         self.write(self.bin / "qmd", FAKE_QMD, 0o755)
         self.write(self.bin / "systemctl", FAKE_SYSTEMCTL, 0o755)
         self.write(self.bin / "git", FAKE_GIT.replace("REAL_GIT", REAL_GIT), 0o755)
+
+    def _build_codex_roles(self) -> None:
+        """The Codex role rows' fixtures (U13). The two carriers sit in the Codex home's agents folder, the home's two
+        configuration files become valid TOML without a role table (the tool parses them for role tables), and `codex` also
+        lists its MCP servers. Every new frozen row is then ok on the plain host, which the catalogue test requires."""
+        codex = self.home / ".codex"
+        for name in ("config.toml", "stack-worker.config.toml"):
+            self.write(codex / name, f"# codex {name} v1\n")
+        for name in CODEX_ROLE_FILES:
+            self.write(codex / "agents" / name, f"role carrier {name} v1\n")
+        self.mcp_marker = "zz-mcp-transport-secret-3d8e1a94c7b052"
+        self.fake_text("codex.mcp.default.json", codex_mcp_json(MCP_DEFAULT, self.mcp_marker))
+        self.fake_text("codex.mcp.stack-worker.json", codex_mcp_json(MCP_WORKER, self.mcp_marker))
+        self.write(self.bin / "codex", FAKE_CODEX, 0o755)
 
     def fake_text(self, name: str, text: str) -> None:
         self.write(self.data / name, text)
@@ -2291,6 +2350,728 @@ class MutationControlTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr[-2000:])
 
     def test_each_mutant_fails_the_test_for_its_property(self):
+        source = DEFAULT_TOOL.read_text(encoding="utf-8")
+        folder = self.mutant_dir()
+        prepared = []
+        for name, patches, target, *expected in self.MUTANTS:
+            mutated = source
+            for anchor, replacement in patches:
+                self.assertEqual(mutated.count(anchor), 1, f"{name}: anchor not found exactly once: {anchor!r}")
+                mutated = mutated.replace(anchor, replacement)
+            compile(mutated, name, "exec")  # a mutant that does not compile would fail every test for the wrong reason
+            path = folder / name / "freeze_snapshot.py"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(mutated, encoding="utf-8")
+            prepared.append((name, path, target, expected))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, os.cpu_count() or 2)) as pool:
+            results = list(pool.map(lambda entry: self.nested(entry[1], entry[2]), prepared))
+        for (name, path, target, expected), proc in zip(prepared, results):
+            with self.subTest(mutant=name):
+                lines = proc.stderr.splitlines()
+                shown = [line for line in lines if line.startswith(("AssertionError", "FAILED"))][:4]
+                (folder / name / "result.txt").write_text(f"target: {target}\nexit: {proc.returncode}\n" + "\n".join(shown) + "\n",
+                                                          encoding="utf-8")
+                self.assertNotEqual(proc.returncode, 0, f"{name}: {target} still passes against the mutant")
+                self.assertIn("FAILED", proc.stderr, f"{name}: the nested run did not fail on an assertion\n" + "\n".join(lines[-14:]))
+                for wanted in expected:
+                    self.assertIn(wanted, proc.stderr, f"{name}: the nested run failed, but not on {wanted!r}\n" + "\n".join(lines[-14:]))
+
+
+class CodexRoleRowTests(HostCase):
+    """The Codex role rows (U13) on the synthetic host: the carriers, everything else that can add a role, the launcher and
+    the parent's MCP server sets. Values are counts, booleans, hashes and server names; a name a host chose is never published."""
+
+    def agents(self) -> Path:
+        return self.host.home / ".codex" / "agents"
+
+    def home_codex(self) -> Path:
+        return self.host.home / ".codex"
+
+    def test_the_catalogue_lists_every_codex_role_row_as_a_frozen_static_item(self):
+        rows = {row["id"]: row for row in json.loads(self.host.run(self.tool, "list-frozen", "--all", "--json").stdout)}
+        listed = {line.split("\t")[0] for line in self.host.run(self.tool, "list-frozen").stdout.splitlines() if line.strip()}
+        needles = {"codex.agents.stack-researcher.sha256": "agents folder", "codex.agents.toml_set": "*.toml",
+                   "codex.agents.role_tables": "[agents.<name>]", "codex.system.agents_toml_count": "/etc/codex/agents",
+                   "codex.project.role_tables": ".codex/config.toml", "codex.launcher.sha256": "PATH",
+                   "codex.binary.sha256": "exec", "codex.mcp.servers.default": "codex mcp list --json",
+                   "codex.mcp.servers.stack_worker": "-p stack-worker"}
+        for item_id in CODEX_ROLE_IDS:
+            with self.subTest(item=item_id):
+                self.assertIn(item_id, rows)
+                self.assertEqual((rows[item_id]["class"], rows[item_id]["family"], rows[item_id]["owner"]),
+                                 ("frozen", False, "codex_roles"))
+                self.assertIn(item_id, listed, "listed without --all")
+                if item_id in needles:
+                    self.assertIn(needles[item_id], rows[item_id]["how"])
+
+    def test_values_on_the_plain_host(self):
+        cap = self.capture("plain")
+        items = cap.items()
+        self.assertEqual({item_id: items[item_id]["status"] for item_id in CODEX_ROLE_IDS if item_id in items},
+                         dict.fromkeys(CODEX_ROLE_IDS, "ok"))
+        for name in CODEX_ROLE_FILES:
+            self.assertEqual(cap.value(f"codex.agents.{name[:-5]}.sha256"), sha256_path(self.agents() / name))
+        self.assertEqual(cap.value("codex.agents.toml_set"),
+                         {"stack-researcher.toml": True, "stack-verifier.toml": True, "other": 0})
+        self.assertEqual(cap.value("codex.agents.role_tables"), 0)
+        self.assertEqual((cap.value("codex.project.agents_toml_count"), cap.value("codex.project.role_tables")), (0, 0))
+        for item_id in ("codex.system.agents_toml_count", "codex.system.role_tables"):
+            self.assertEqual(type(cap.value(item_id)), int, item_id)  # the host's own /etc/codex: the count is not asserted here
+        entry = self.host.bin / "codex"
+        self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(entry))
+        self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(entry), "no launcher is recognised: the file itself")
+        self.assertEqual(cap.value("codex.mcp.servers.default"), MCP_DEFAULT)
+        self.assertEqual(cap.value("codex.mcp.servers.stack_worker"), MCP_WORKER)
+        for name, enabled in cap.value("codex.mcp.servers.default").items():
+            self.assertIs(type(enabled), bool, name)
+        full = cap.items("full")
+        self.assertEqual(full["codex.agents.stack-researcher.sha256"]["path"], "~/.codex/agents/stack-researcher.toml")
+        self.assertEqual(full["codex.agents.toml_set"]["path"], "~/.codex/agents")
+        for item_id in CODEX_ROLE_IDS[3:]:
+            self.assertNotIn("path", full[item_id], f"{item_id}: only the carrier rows record where they were read")
+
+    def test_a_changed_carrier_drifts_only_its_own_item(self):
+        first = self.capture("c-a")
+        self.host.append_byte(self.agents() / "stack-researcher.toml")
+        second = self.capture("c-b")
+        self.assert_drift(first, second, ["codex.agents.stack-researcher.sha256"])
+        self.host.append_byte(self.agents() / "stack-verifier.toml")
+        self.assert_drift(second, self.capture("c-c"), ["codex.agents.stack-verifier.sha256"])
+
+    def test_the_toml_set_counts_every_other_file_below_the_folder_and_publishes_no_name(self):
+        agents = self.agents()
+        first = self.capture("t-a")
+        self.host.write(agents / f"{self.host.user}-notes.toml", "x = 1\n")  # a name that holds the user name
+        self.host.write(agents / "nested" / "deeper" / "stack-researcher.toml", "x = 1\n")  # a carrier's name, not at the top
+        (agents / "link.toml").symlink_to(agents / "stack-verifier.toml")  # a link to a file, named *.toml: counted, never read
+        for name in ("notes.toml.bak", ".toml", "UPPER.TOML", "README.md"):  # not *.toml by Codex's exact extension rule
+            self.host.write(agents / name, "x\n")
+        (agents / "folder.toml").mkdir()  # a folder is not a role file
+        second = self.capture("t-b")  # exit 0: the user name in a file name never reaches the output
+        with self.subTest(check="the value"):
+            self.assertEqual(second.value("codex.agents.toml_set"),
+                             {"stack-researcher.toml": True, "stack-verifier.toml": True, "other": 3})
+        self.assert_drift(first, second, ["codex.agents.toml_set"])
+        with self.subTest(check="no host-chosen name is published"):
+            for which in ("sanitized", "full"):
+                text = (second.sanitized if which == "sanitized" else second.full).read_text(encoding="utf-8")
+                self.assertNotIn(self.host.user, text, f"a host-chosen file name is published in the {which} capture")
+                self.assertNotIn("nested", text)
+
+    def test_a_folder_link_below_agents_is_an_error_and_never_an_undercount(self):
+        # Codex enters a linked folder and loads what it finds there as roles (rust-v0.157.1 exec-server/src/
+        # local_file_system.rs:710-735), so a set that skipped one would read `other: 0` beside a role Codex loads. The set,
+        # and the count of a layer's agents folder, are `error` (reason linked_folder): unknown, and unknown is not the frozen
+        # state. The carriers' own hash rows do not depend on the folder link.
+        first = self.capture("k-a")
+        (self.host.home / "other-agents").mkdir()
+        self.host.write(self.host.home / "other-agents" / "elsewhere.toml", "x = 1\n")
+        (self.agents() / "linked-folder").symlink_to(self.host.home / "other-agents")
+        project = self.host.repo / ".codex" / "agents"
+        self.host.write(project / "one.toml", "x = 1\n")
+        (project / "linked-folder").symlink_to(self.host.home / "other-agents")
+        second = self.capture("k-b")
+        for item_id in ("codex.agents.toml_set", "codex.project.agents_toml_count"):
+            with self.subTest(item=item_id):
+                self.assertEqual((second.status(item_id), second.item(item_id).get("reason")), ("error", "linked_folder"),
+                                 f"{item_id}: a folder link below the agents folder was skipped")
+                self.assertIsNone(second.item(item_id).get("value"), f"{item_id} published a count beside an unknown")
+        for name in CODEX_ROLE_FILES:
+            self.assertEqual(second.status(f"codex.agents.{name[:-5]}.sha256"), "ok")
+        (self.agents() / "linked-folder").unlink()
+        (project / "linked-folder").unlink()
+        third = self.capture("k-c")  # control: without the links the same folders are counted again
+        self.assertEqual(third.value("codex.agents.toml_set"), first.value("codex.agents.toml_set"))
+        self.assertEqual(third.value("codex.project.agents_toml_count"), 1)
+
+    def test_a_missing_carrier_an_absent_folder_a_linked_folder_and_a_linked_carrier(self):
+        first = self.capture("m-a")
+        (self.agents() / "stack-verifier.toml").unlink()
+        second = self.capture("m-b")
+        self.assertEqual(second.status("codex.agents.stack-verifier.sha256"), "missing")
+        self.assertEqual(second.value("codex.agents.toml_set"),
+                         {"stack-researcher.toml": True, "stack-verifier.toml": False, "other": 0})
+        self.assert_drift(first, second, ["codex.agents.stack-verifier.sha256", "codex.agents.toml_set"])
+        shutil.rmtree(self.agents())  # no folder at all: two missing carriers and an empty set
+        third = self.capture("m-c")
+        self.assertEqual([third.status(f"codex.agents.{name[:-5]}.sha256") for name in CODEX_ROLE_FILES], ["missing", "missing"])
+        self.assertEqual(third.value("codex.agents.toml_set"),
+                         {"stack-researcher.toml": False, "stack-verifier.toml": False, "other": 0})
+        self.host.write(self.host.home / "real-agents" / "stack-researcher.toml", "x\n")
+        self.agents().symlink_to(self.host.home / "real-agents")  # a linked folder is refused whole
+        fourth = self.capture("m-d")
+        for item_id in CODEX_ROLE_IDS[:3]:
+            self.assertEqual((fourth.status(item_id), fourth.item(item_id).get("reason")), ("error", "not_a_directory"), item_id)
+        self.agents().unlink()
+        self.agents().write_text("a file where the folder belongs\n", encoding="utf-8")
+        fifth = self.capture("m-e")
+        for item_id in CODEX_ROLE_IDS[:3]:
+            self.assertEqual((fifth.status(item_id), fifth.item(item_id).get("reason")), ("error", "not_a_directory"), item_id)
+        self.agents().unlink()
+        self.agents().mkdir()
+        self.host.write(self.host.home / "elsewhere.toml", "x\n")
+        (self.agents() / "stack-researcher.toml").symlink_to(self.host.home / "elsewhere.toml")
+        sixth = self.capture("m-f")  # a carrier that is a link: Codex's file is not the file the installer wrote
+        self.assertEqual((sixth.status("codex.agents.stack-researcher.sha256"), sixth.item("codex.agents.stack-researcher.sha256").get("reason")),
+                         ("error", "link"))
+        self.assertEqual(sixth.value("codex.agents.toml_set"),
+                         {"stack-researcher.toml": True, "stack-verifier.toml": False, "other": 0})
+
+    def test_role_tables_are_counted_in_both_home_files_and_the_scalar_keys_are_not(self):
+        config, profile = self.home_codex() / "config.toml", self.home_codex() / "stack-worker.config.toml"
+        first = self.capture("r-a")
+        config.write_text("[agents]\nenabled = true\nmax_concurrent_threads_per_session = 4\n", encoding="utf-8")
+        second = self.capture("r-b")
+        self.assertEqual(second.value("codex.agents.role_tables"), 0, "the scalar keys of [agents] are not roles")
+        self.assert_drift(first, second, ["codex.config.sha256"])
+        config.write_text('[agents.alpha]\ndescription = "a"\n\n[agents.beta]\ndescription = "b"\n', encoding="utf-8")
+        third = self.capture("r-c")
+        self.assertEqual(third.value("codex.agents.role_tables"), 2, "codex.agents.role_tables: config.toml")
+        self.assert_drift(second, third, ["codex.agents.role_tables", "codex.config.sha256"])
+        profile.write_text('[agents.gamma]\ndescription = "c"\n', encoding="utf-8")
+        fourth = self.capture("r-d")
+        self.assertEqual(fourth.value("codex.agents.role_tables"), 3, "codex.agents.role_tables: config.toml and the profile add up")
+        self.assert_drift(third, fourth, ["codex.agents.role_tables", "codex.stack_worker_profile.sha256"])
+        config.write_text('agents.alpha = { description = "a" }\n', encoding="utf-8")  # an inline table is a role table too
+        profile.unlink()  # an absent profile has no role tables
+        fifth = self.capture("r-e")
+        self.assertEqual((fifth.status("codex.agents.role_tables"), fifth.value("codex.agents.role_tables")), ("ok", 1))
+
+    def test_a_home_file_that_cannot_be_parsed_is_an_error_for_the_role_tables_only(self):
+        config = self.home_codex() / "config.toml"
+        for label, content, reason in (("bad", "[agents\n", "unparsable"), ("bytes", b"\xff\xfe\x00", "unparsable")):
+            with self.subTest(case=label):
+                config.write_bytes(content if isinstance(content, bytes) else content.encode("utf-8"))
+                cap = self.capture(f"p-{label}")
+                self.assertEqual((cap.status("codex.agents.role_tables"), cap.item("codex.agents.role_tables").get("reason")),
+                                 ("error", reason))
+                self.assertEqual(cap.status("codex.config.sha256"), "ok", "the file keeps its hash")
+                self.assertEqual(cap.status("codex.agents.toml_set"), "ok")
+        config.unlink()
+        config.mkdir()  # a folder where the file belongs
+        cap = self.capture("p-dir")
+        self.assertEqual((cap.status("codex.agents.role_tables"), cap.item("codex.agents.role_tables").get("reason")),
+                         ("error", "is_directory"))
+
+    def test_the_project_layer_rows_read_the_checkouts_codex_folder(self):
+        first = self.capture("j-a")
+        project = self.host.repo / ".codex"
+        self.host.write(project / "config.toml", '[agents.a]\ndescription = "a"\n[agents.b]\ndescription = "b"\n')
+        self.host.write(project / "agents" / "one.toml", "x = 1\n")
+        self.host.write(project / "agents" / "deeper" / "two.toml", "x = 1\n")
+        second = self.capture("j-b")  # host-only files, untracked: the checkout stays clean
+        self.assertEqual(second.value("codex.project.agents_toml_count"), 2, "codex.project.agents_toml_count")
+        self.assertEqual(second.value("codex.project.role_tables"), 2, "codex.project.role_tables")
+        self.assert_drift(first, second, ["codex.project.agents_toml_count", "codex.project.role_tables"])
+        (project / "agents").rename(project / "moved-agents")
+        third = self.capture("j-c")
+        self.assertEqual(third.value("codex.project.agents_toml_count"), 0)
+
+    def test_codex_home_moves_the_role_rows_and_its_location_is_never_stored(self):
+        alt = self.host.home / "alt-codex"
+        for name in CODEX_ROLE_FILES:
+            self.host.write(alt / "agents" / name, f"alternative carrier {name}\n")
+        self.host.write(alt / "config.toml", '[agents.only]\ndescription = "a"\n')
+        cap = self.capture("h-a", env=self.host.env(CODEX_HOME=str(alt)))
+        with self.subTest(check="the variable's folder is read"):
+            for name in CODEX_ROLE_FILES:
+                self.assertEqual(cap.value(f"codex.agents.{name[:-5]}.sha256"), sha256_path(alt / "agents" / name),
+                                 f"CODEX_HOME: codex.agents.{name[:-5]}.sha256 reads the variable's folder")
+            self.assertEqual(cap.value("codex.agents.role_tables"), 1, "CODEX_HOME: codex.agents.role_tables")
+        with self.subTest(check="its location is not stored"):
+            full = cap.items("full")
+            for item_id in CODEX_ROLE_IDS[:4]:
+                self.assertNotIn("path", full[item_id], f"{item_id}: a location that came from the environment is not stored")
+        default = self.capture("h-b", env=self.host.env(CODEX_HOME=""))  # an empty variable is unset
+        self.assertEqual(default.value("codex.agents.stack-researcher.sha256"), sha256_path(self.agents() / "stack-researcher.toml"))
+        self.assertEqual(default.item("codex.agents.stack-researcher.sha256", "full")["path"], "~/.codex/agents/stack-researcher.toml")
+        outside = self.host.root / "outside-codex"
+        outside.mkdir()
+        for label, value in (("relative", "relative/codex"), ("outside", str(outside)), ("tilde", "~/alt-codex"),
+                             ("credential", str(self.host.home / ".codex" / "auth.json"))):
+            with self.subTest(case=label):
+                refused = self.capture(f"h-{label}", env=self.host.env(CODEX_HOME=value))
+                for item_id in CODEX_ROLE_IDS[:4]:
+                    self.assertEqual((refused.status(item_id), refused.item(item_id).get("reason")), ("error", "refused_path"),
+                                     f"CODEX_HOME={label}: {item_id}")
+                self.assertEqual(refused.status("codex.system.role_tables"), "ok", "the other rows do not depend on the variable")
+                self.assertEqual(refused.status("codex.launcher.sha256"), "ok")
+
+    def install_launcher(self, last_line: str | None = None, target_bytes: bytes = b"real codex v1\n") -> tuple[Path, Path]:
+        """`bin/codex` becomes a launcher: the fake codex followed by an unreachable last line, `exec '<target>' "$@"` as the
+        identity launcher ends. The target sits under the fake home, where the path policy allows a read."""
+        target = self.host.home / ".local" / "share" / "codex-ecosystem" / "tools" / "codex-0.157.1" / "bin" / "codex"
+        self.host.write(target, target_bytes, 0o755)
+        line = last_line if last_line is not None else f"exec '{target}' \"$@\"\n"
+        launcher = self.host.write(self.host.bin / "codex", FAKE_CODEX + line, 0o755)
+        return launcher, target
+
+    def test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_file_it_executes(self):
+        launcher, target = self.install_launcher()
+        cap = self.capture("l-a")
+        with self.subTest(check="the launcher row"):
+            self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(launcher), "codex.launcher.sha256")
+        with self.subTest(check="the binary row"):
+            self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(target), "codex.binary.sha256")
+        self.assertNotEqual(cap.value("codex.launcher.sha256"), cap.value("codex.binary.sha256"))
+        for item_id in ("codex.launcher.sha256", "codex.binary.sha256"):
+            self.assertNotIn("path", cap.item(item_id, "full"), f"{item_id}: no path is stored for what PATH led to")
+        self.host.append_byte(target)  # the file the launcher executes changes: only the binary row drifts
+        second = self.capture("l-b")
+        self.assert_drift(cap, second, ["codex.binary.sha256"])
+        with open(launcher, "a", encoding="utf-8") as handle:  # the launcher changes and still names the same file
+            handle.write("# rendered again\n")
+            handle.write(f"exec '{target}' \"$@\"\n")
+        self.assert_drift(second, self.capture("l-c"), ["codex.launcher.sha256"])
+
+    def test_the_binary_row_stops_after_one_hop(self):
+        third = self.host.write(self.host.home / "third-hop" / "codex", "the third file\n", 0o755)
+        launcher, target = self.install_launcher(target_bytes=f"#!/bin/sh\nexec '{third}' \"$@\"\n".encode("utf-8"))
+        cap = self.capture("h-one")  # the launcher's target is itself a launcher: only its own bytes are hashed
+        self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(target), "codex.binary.sha256")
+        self.assertNotEqual(cap.value("codex.binary.sha256"), sha256_path(third))
+        self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(launcher))
+
+    def test_a_launcher_target_that_is_a_link_to_a_node_entry_is_hashed_through_the_link(self):
+        # The reference host: the launcher's last line names a link, bin/codex, to the npm package's Node entry. The row pins
+        # that entry point (the native executable it starts is not hashed), so it must follow the link and not hash the link.
+        tools = self.host.home / ".local" / "share" / "codex-ecosystem" / "tools" / "codex-0.157.1"
+        entry = self.host.write(tools / "lib" / "node_modules" / "@openai" / "codex" / "bin" / "codex.js",
+                                "#!/usr/bin/env node\n// the package's entry point\n", 0o755)
+        launcher, named = self.install_launcher(f"exec '{tools / 'bin' / 'codex'}' \"$@\"\n")  # writes a file at the named path
+        named.unlink()
+        named.symlink_to(entry)  # now the path the launcher names is a link, as on the reference host
+        self.assertTrue(named.is_symlink())
+        cap = self.capture("h-node")
+        self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(entry), "codex.binary.sha256")
+        self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(launcher), "codex.launcher.sha256")
+        self.host.append_byte(entry)  # the package's entry point changes: only the binary row drifts
+        self.assert_drift(cap, self.capture("h-node2"), ["codex.binary.sha256"])
+
+    def test_an_entry_that_is_not_a_recognised_launcher_is_its_own_binary(self):
+        cases = {"an unrecognised exec form": "exec env A=1 '/opt/x/codex' \"$@\"\n",
+                 "a trailing comment": "exec '/opt/x/codex' \"$@\" # comment\n",
+                 "a relative target": "exec 'bin/codex' \"$@\"\n",
+                 "an empty target": "exec '' \"$@\"\n",
+                 "a quote inside the target": "exec '/opt/a'b/codex' \"$@\"\n",
+                 "a variable": 'exec "$CODEX_REAL" "$@"\n',
+                 "no exec line": "echo done\n"}
+        for label, last in cases.items():
+            with self.subTest(case=label):
+                launcher, _ = self.install_launcher(last)
+                cap = self.capture("n-" + label.replace(" ", "-"))
+                self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(launcher), f"codex.binary.sha256: {label}")
+                self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(launcher))
+
+    def test_a_launcher_target_that_is_missing_refused_or_a_credential_store_is_an_error_for_the_binary_row(self):
+        outside = self.host.root / "outside-bin"
+        self.host.write(outside / "codex", "real codex outside\n", 0o755)
+        cases = (("missing", f"exec '{self.host.home}/nowhere/codex' \"$@\"\n", "missing", "file_absent"),
+                 ("outside", f"exec '{outside / 'codex'}' \"$@\"\n", "error", "refused_path"),
+                 ("credential", f"exec '{self.host.home}/.codex/auth.json' \"$@\"\n", "error", "refused_path"),
+                 ("folder", f"exec '{self.host.home}/.codex' \"$@\"\n", "error", "is_directory"))
+        for label, last, status, reason in cases:
+            with self.subTest(case=label):
+                launcher, _ = self.install_launcher(last)
+                cap = self.capture("o-" + label)
+                item = cap.item("codex.binary.sha256")
+                self.assertEqual((item["status"], item.get("reason"), item["value"]), (status, reason, None), f"codex.binary.sha256: {label}")
+                self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(launcher), "the launcher row still holds")
+                for which in ("sanitized", "full"):
+                    text = (cap.sanitized if which == "sanitized" else cap.full).read_text(encoding="utf-8")
+                    self.assertNotIn(self.host.credential_marker, text)
+                    self.assertNotIn("outside-bin", text)
+
+    def test_a_link_on_path_is_hashed_through_and_needs_no_launcher(self):
+        real = self.host.write(self.host.root / "elsewhere" / "codex-real", FAKE_CODEX, 0o755)
+        (self.host.bin / "codex").unlink()
+        (self.host.bin / "codex").symlink_to(real)  # the bootstrap's absolute link: `$0` is the link, so the fake finds its data
+        cap = self.capture("k-a")
+        self.assertEqual(cap.value("codex.launcher.sha256"), sha256_path(real))
+        self.assertEqual(cap.value("codex.binary.sha256"), sha256_path(real))
+        self.assertEqual(cap.status("codex.mcp.servers.default"), "ok")
+
+    def test_no_codex_on_path_is_missing_for_the_launcher_binary_and_server_rows(self):
+        (self.host.bin / "codex").unlink()
+        cap = self.capture("z-a")
+        for item_id in ("codex.launcher.sha256", "codex.binary.sha256", "codex.mcp.servers.default", "codex.mcp.servers.stack_worker"):
+            self.assertEqual((cap.status(item_id), cap.item(item_id).get("reason")), ("missing", "tool_absent"), item_id)
+        for item_id in CODEX_ROLE_IDS[:8]:
+            self.assertEqual(cap.status(item_id), "ok", item_id)
+
+    def test_the_server_rows_are_names_and_flags_read_in_an_empty_directory(self):
+        cap = self.capture("s-a")
+        with self.subTest(check="values"):
+            self.assertEqual(cap.value("codex.mcp.servers.default"), MCP_DEFAULT, "codex.mcp.servers.default")
+            self.assertEqual(cap.value("codex.mcp.servers.stack_worker"), MCP_WORKER, "codex.mcp.servers.stack_worker")
+        with self.subTest(check="the directory each listing ran in"):
+            for which in ("default", "stack-worker"):
+                noted = self.host.data / f"codex.mcp.{which}.cwd"
+                self.assertTrue(noted.exists(), f"the {which} listing was not run with exactly `mcp list --json`")
+                seen = Path(noted.read_text(encoding="utf-8").strip())
+                real_seen = Path(os.path.realpath(seen.parent)) / seen.name
+                self.assertTrue(seen.name.startswith("freeze-mcp-"), f"{which}: the scratch directory is named freeze-mcp-*, not {seen.name}")
+                self.assertEqual(real_seen.parent, Path(os.path.realpath(self.host.tmp)), "a temporary directory of its own")
+                self.assertFalse(seen.exists(), "the scratch directory is removed afterwards")
+                for root in (self.host.repo, self.host.home):
+                    self.assertNotIn(Path(os.path.realpath(root)), real_seen.parents, f"{which}: not the checkout, not the home")
+        with self.subTest(check="privacy"):
+            for path in (cap.sanitized, cap.full):
+                text = path.read_text(encoding="utf-8")
+                self.assertNotIn(self.host.mcp_marker, text, "transport, environment, arguments and URLs are never read")
+                self.assertNotIn("transport", text)
+        self.host.fake_text("codex.mcp.default.json", codex_mcp_json({**MCP_DEFAULT, "zz-disabled": True}, self.host.mcp_marker))
+        second = self.capture("s-b")
+        self.assert_drift(cap, second, ["codex.mcp.servers.default"])
+        self.host.fake_text("codex.mcp.stack-worker.json", codex_mcp_json({**MCP_WORKER, "extra": True}, self.host.mcp_marker))
+        third = self.capture("s-c")
+        self.assert_drift(second, third, ["codex.mcp.servers.stack_worker"])
+        self.assertEqual(third.value("codex.mcp.servers.stack_worker"), {**MCP_WORKER, "extra": True})
+
+    def test_a_server_list_that_is_not_what_codex_prints_is_an_error_and_says_so(self):
+        good = codex_mcp_json(MCP_DEFAULT, self.host.mcp_marker)
+        cases = (("not_json", "Error: could not load the config\n", "unrecognized_output"),
+                 ("object", json.dumps({"servers": []}), "unrecognized_output"),
+                 ("string_flag", good.replace('"enabled": true', '"enabled": "true"', 1), "unrecognized_output"),
+                 ("no_flag", json.dumps([{"name": "serena"}]), "unrecognized_output"),
+                 ("duplicate", json.dumps([{"name": "serena", "enabled": True}, {"name": "serena", "enabled": False}]),
+                  "unrecognized_output"),
+                 ("path_name", json.dumps([{"name": "a/b", "enabled": True}]), "unrecognized_output"),
+                 ("entry_not_object", json.dumps(["serena"]), "unrecognized_output"))
+        for label, text, reason in cases:
+            with self.subTest(case=label):
+                self.host.fake_text("codex.mcp.default.json", text)
+                cap = self.capture("f-" + label)
+                item = cap.item("codex.mcp.servers.default")
+                self.assertEqual((item["status"], item.get("reason"), item["value"]), ("error", reason, None), f"codex.mcp.servers.default: {label}")
+                self.assertEqual(cap.status("codex.mcp.servers.stack_worker"), "ok", "the other set is unaffected")
+        self.host.fake_text("codex.mcp.default.json", "[]")  # no server at all is a valid, empty set
+        self.assertEqual(self.capture("f-empty").value("codex.mcp.servers.default"), {})
+        self.host.fake_text("codex.mcp.default.json", good)
+        self.host.fake_text("codex.mcp.default.exit", "1")
+        failed = self.capture("f-exit")
+        item = failed.item("codex.mcp.servers.default")
+        self.assertEqual((item["status"], item.get("reason")), ("error", "exit"), "a listing that exits nonzero attests nothing")
+
+    def test_check_fails_the_changed_role_row_and_no_other(self):
+        seal, later = self.capture("k-seal"), self.capture("k-open")
+        self.assertEqual(self.check(later, seal.sanitized).returncode, 0)
+        self.host.append_byte(self.agents() / "stack-verifier.toml")
+        (self.host.repo / ".codex").mkdir()
+        self.host.write(self.host.repo / ".codex" / "config.toml", '[agents.x]\ndescription = "x"\n')
+        proc = self.check(self.capture("k-drift"), seal.sanitized)
+        self.assertEqual(proc.returncode, 1, proc.stdout)
+        self.assertEqual(sorted(self.kinds(proc).get("FAIL", [])),
+                         ["codex.agents.stack-verifier.sha256", "codex.project.role_tables"])
+
+
+class CodexRoleHelperTests(unittest.TestCase):
+    """The scanners and readers of the Codex role rows, called directly."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(TOOL.parent))
+        sys.modules.pop("freeze_snapshot", None)
+        cls.module = importlib.import_module("freeze_snapshot")
+
+    @classmethod
+    def tearDownClass(cls):
+        sys.path.remove(str(TOOL.parent))
+
+    def api(self, name: str):
+        found = getattr(self.module, name, None)
+        if found is None:
+            raise AssertionError(f"freeze_snapshot.{name} is not defined")
+        return found
+
+    def scratch(self) -> Path:
+        folder = Path(tempfile.mkdtemp(prefix="freeze-helper-", dir=os.environ.get("TMPDIR") or None))
+        self.addCleanup(shutil.rmtree, folder, True)
+        return folder
+
+    def test_launcher_target_reads_only_the_exact_last_line(self):
+        target = self.api("launcher_target")
+        real = "exec '/opt/example/codex-0.157.1/bin/codex' \"$@\""
+        self.assertEqual(target("#!/usr/bin/env bash\nset -eu\n" + real + "\n"), "/opt/example/codex-0.157.1/bin/codex")
+        self.assertEqual(target(real), "/opt/example/codex-0.157.1/bin/codex")
+        self.assertEqual(target("x\n" + real + "\n\n   \n"), "/opt/example/codex-0.157.1/bin/codex",
+                         "blank lines after it do not matter")
+        self.assertEqual(target("  exec '/a b/c' \"$@\"  \n"), "/a b/c", "surrounding blanks and a space in the path")
+        for text in ("", "\n\n", "exec", "exec '' \"$@\"", "exec '/x' \"$@\" # c", "exec '/x' \"$*\"", 'exec "/x" "$@"',
+                     "exec 'x/y' \"$@\"", "exec '/a'b' \"$@\"", real + "\n# trailing comment\n", "exec '/x'\"$@\"",
+                     "exec ' \"$@\"", "exec '\"$@\""):
+            with self.subTest(text=text):
+                self.assertIsNone(target(text))
+
+    def test_parse_codex_mcp_list_keeps_names_and_flags_only(self):
+        parse = self.api("parse_codex_mcp_list")
+        text = codex_mcp_json({"serena": True, "ai-memory": False, "plugin:x@y": True}, "zz-secret-marker-1234567")
+        self.assertEqual(parse(text), {"ai-memory": False, "plugin:x@y": True, "serena": True})
+        self.assertEqual(list(parse(text)), ["ai-memory", "plugin:x@y", "serena"], "in name order")
+        self.assertEqual(parse("[]"), {})
+        for bad in ("", "{}", "null", '"x"', "[1]", '[{"name": 1, "enabled": true}]', '[{"name": "a", "enabled": 1}]',
+                    '[{"name": "a"}]', '[{"enabled": true}]', '[{"name": "", "enabled": true}]', '[{"name": "-a", "enabled": true}]',
+                    '[{"name": "a b", "enabled": true}]', '[{"name": "a", "enabled": true}, {"name": "a", "enabled": true}]',
+                    "[" * 5000):
+            with self.subTest(text=bad[:30]):
+                self.assertIsNone(parse(bad), f"a list Codex does not print is refused: {bad[:40]}")
+
+    def test_toml_names_follows_discoverys_rules(self):
+        names = self.api("toml_names")
+        root = self.scratch()
+        self.assertEqual(names(root / "absent"), ([], None))
+        (root / "file").write_text("x", encoding="utf-8")
+        self.assertEqual(names(root / "file"), (None, "not_a_directory"))
+        (root / "link").symlink_to(root)
+        self.assertEqual(names(root / "link"), (None, "not_a_directory"), "a linked folder is not one")
+        folder = root / "agents"
+        for relative in ("b.toml", "a.toml", "n/c.toml", "n/d/e.toml", "skip.toml.bak", ".toml", "UP.TOML", "x"):
+            (folder / relative).parent.mkdir(parents=True, exist_ok=True)
+            (folder / relative).write_text("x", encoding="utf-8")
+        (folder / "dir.toml").mkdir()
+        (folder / "l.toml").symlink_to(folder / "a.toml")
+        (folder / "dangling.toml").symlink_to(folder / "nowhere")
+        (root / "agents-other").mkdir()
+        (root / "agents-other" / "z.toml").write_text("x", encoding="utf-8")
+        self.assertEqual(names(folder), (["a.toml", "b.toml", "dangling.toml", "l.toml", "n/c.toml", "n/d/e.toml"], None))
+        # Codex follows links (openai/codex rust-v0.157.1 exec-server/src/local_file_system.rs:710-735: read_directory takes a
+        # link's target's type; checked against codex-cli 0.157.1 by tests/test_codex_worker_lane.py CodexIntegrationTests.
+        # test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it), so it enters a linked folder and
+        # loads a role from it. Not entering it would undercount, so a folder link at any depth is an error, whatever its name.
+        for where in (folder, folder / "n", folder / "n" / "d"):
+            for link_name in ("linked", "linked.toml"):
+                with self.subTest(link_in=where.name, link=link_name):
+                    (where / link_name).symlink_to(root / "agents-other")
+                    self.assertEqual(names(folder), (None, "linked_folder"), "a folder link below the folder was skipped")
+                    (where / link_name).unlink()
+                    self.assertEqual(names(folder), (["a.toml", "b.toml", "dangling.toml", "l.toml", "n/c.toml", "n/d/e.toml"], None))
+
+    @unittest.skipIf(hasattr(os, "geteuid") and os.geteuid() == 0, "root reads a folder whatever its mode")
+    def test_toml_names_reports_a_folder_it_cannot_read(self):
+        root = self.scratch()
+        (root / "agents" / "locked").mkdir(parents=True)
+        (root / "agents" / "a.toml").write_text("x", encoding="utf-8")
+        (root / "agents" / "locked").chmod(0)
+        self.addCleanup((root / "agents" / "locked").chmod, 0o755)
+        self.assertEqual(self.api("toml_names")(root / "agents"), (None, "unreadable"))
+
+    def test_role_tables_in_counts_the_tables_below_agents_only(self):
+        ctx_class = self.api("Ctx")
+        root = self.scratch()
+        ctx = ctx_class.for_tests(root / "home", root / "repo", {})
+        count = self.api("role_tables_in")
+
+        def read(text: str | bytes):
+            path = root / "c.toml"
+            path.write_bytes(text if isinstance(text, bytes) else text.encode("utf-8"))
+            return count(ctx, path)
+
+        self.assertEqual(count(ctx, root / "absent.toml"), (0, None))
+        self.assertEqual(read(""), (0, None))
+        self.assertEqual(read("[agents]\nenabled = true\nmax_depth = 2\n"), (0, None))
+        self.assertEqual(read('[agents.a]\ndescription = "x"\n[agents.b]\n'), (2, None))
+        self.assertEqual(read('agents.a = { description = "x" }\n'), (1, None))
+        self.assertEqual(read('[agents.a.nested]\nk = 1\n'), (1, None), "one role, however deep its own tables go")
+        self.assertEqual(read('agents = "not a table"\n'), (0, None))
+        self.assertEqual(read('[other.a]\nk = 1\n'), (0, None))
+        self.assertEqual(read("[agents\n"), (None, "unparsable"))
+        self.assertEqual(read(b"\xff\xfe"), (None, "unparsable"))
+        self.assertEqual(read("# " + "x" * (1 << 20) + "\n"), (None, "too_large"))
+        self.assertEqual(count(ctx, root), (None, "is_directory"))
+
+    def test_the_new_scanners_are_linear_on_adversarial_input(self):
+        started = time.monotonic()
+        self.api("launcher_target")("exec '" + "'" * 200000 + "\n" + "exec " * 50000)
+        self.api("launcher_target")("\n" * 200000 + "exec '/x' \"$@\"")
+        self.api("parse_codex_mcp_list")("[" + '{"name": "a", "enabled": true}, ' * 20000 + "1]")
+        self.api("parse_codex_mcp_list")("[" + ",".join('{"name": "n%d", "enabled": true}' % index for index in range(20000)) + "]")
+        self.assertLess(time.monotonic() - started, 5.0)
+
+
+class CodexSystemLayerTests(HostCase):
+    """The system layer (/etc/codex) cannot be planted in a subprocess capture, so the collector runs in this process with the
+    module's CODEX_SYSTEM_DIR pointed at a temporary folder; the project layer is the same code on the checkout's .codex."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(TOOL.parent))
+        sys.modules.pop("freeze_snapshot", None)
+        cls.module = importlib.import_module("freeze_snapshot")
+
+    @classmethod
+    def tearDownClass(cls):
+        sys.path.remove(str(TOOL.parent))
+
+    def collect(self, system_dir: Path) -> dict[str, dict]:
+        module = self.module
+        ctx = module.Ctx(self.host.home, self.host.repo, self.host.env(), "linux", module.build_specs({}), {}, False)
+        with mock.patch.object(module, "CODEX_SYSTEM_DIR", Path(system_dir)):
+            return {item["id"]: item for item in module.collect_codex_roles(ctx)}
+
+    def system(self) -> Path:
+        return self.host.root / "etc-codex"
+
+    def test_the_system_rows_count_the_role_files_and_tables_of_the_planted_layer(self):
+        system = self.system()
+        self.host.write(system / "agents" / "a.toml", "x = 1\n")
+        self.host.write(system / "agents" / "n" / "b.toml", "x = 1\n")
+        self.host.write(system / "config.toml", '[agents]\nenabled = true\n[agents.x]\ndescription = "x"\n[agents.y]\ndescription = "y"\n')
+        items = self.collect(system)
+        for item_id in ("codex.system.agents_toml_count", "codex.system.role_tables"):
+            self.assertEqual((items[item_id]["status"], items[item_id]["value"]), ("ok", 2), item_id)
+            self.assertNotIn("path", items[item_id], f"{item_id}: /etc/codex is outside the roots and never stored")
+        empty = self.collect(self.host.root / "no-such-etc")
+        for item_id in ("codex.system.agents_toml_count", "codex.system.role_tables"):
+            self.assertEqual((empty[item_id]["status"], empty[item_id]["value"]), ("ok", 0), item_id)
+        for item_id in ("codex.project.agents_toml_count", "codex.project.role_tables"):
+            self.assertEqual(items[item_id]["value"], 0, f"{item_id} does not read the system layer")
+
+    def test_a_system_layer_that_cannot_be_read_is_an_error_not_a_zero(self):
+        system = self.system()
+        self.host.write(system / "config.toml", "[agents\n")
+        (system / "agents").write_text("a file where the folder belongs\n", encoding="utf-8")
+        items = self.collect(system)
+        self.assertEqual((items["codex.system.role_tables"]["status"], items["codex.system.role_tables"].get("reason")),
+                         ("error", "unparsable"))
+        self.assertEqual((items["codex.system.agents_toml_count"]["status"], items["codex.system.agents_toml_count"].get("reason")),
+                         ("error", "not_a_directory"))
+        self.assertEqual(items["codex.agents.toml_set"]["status"], "ok", "the user layer is not the system layer")
+
+
+class CodexRoleMutationControlTests(unittest.TestCase):
+    """A mutant of the tool for each Codex role row; the real test for that row must fail on it and name it. Same runner as
+    MutationControlTests (which this leaves as it was): a mutant is the tool source with exact anchor lines replaced, each
+    anchor must occur exactly once, and the nested run is `python3 -m unittest <test id>` with FREEZE_SNAPSHOT_TOOL set."""
+
+    nested = MutationControlTests.nested
+    mutant_dir = MutationControlTests.mutant_dir
+    ROLE = "CodexRoleRowTests."
+    HELPER = "CodexRoleHelperTests."
+    SYSTEM = "CodexSystemLayerTests."
+    RESEARCHER = ("        items = [role_file_item(ctx, ids[0], agents / CODEX_ROLE_FILES[0], agents / CODEX_ROLE_FILES[0] if stored else None),\n",
+                  "        items = [role_file_item(ctx, ids[0], agents / CODEX_ROLE_FILES[1], agents / CODEX_ROLE_FILES[1] if stored else None),\n")
+    VERIFIER = ("                 role_file_item(ctx, ids[1], agents / CODEX_ROLE_FILES[1], agents / CODEX_ROLE_FILES[1] if stored else None),\n",
+                "                 role_file_item(ctx, ids[1], agents / CODEX_ROLE_FILES[0], agents / CODEX_ROLE_FILES[0] if stored else None),\n")
+    TOML_SET_NAMES = ('    value["other"] = sum(1 for name in names if name not in CODEX_ROLE_FILES)\n',
+                      '    value["other"] = [name for name in names if name not in CODEX_ROLE_FILES]\n')
+    SERVERS_KEEP_ENTRY = ("        servers[name] = enabled\n", "        servers[name] = entry\n")
+    LINK_CHECK = 'if any(path_kind(Path(current) / name) == "link" for name in directories):'
+    MUTANTS = (
+        ("blind_codex_roles", (blind_patch("codex_roles"),), ROLE + "test_a_changed_carrier_drifts_only_its_own_item", "codex.agents"),
+        ("researcher_row_reads_the_verifier", (RESEARCHER,), ROLE + "test_a_changed_carrier_drifts_only_its_own_item",
+         "codex.agents.stack-researcher.sha256"),
+        ("verifier_row_reads_the_researcher", (VERIFIER,), ROLE + "test_a_changed_carrier_drifts_only_its_own_item",
+         "codex.agents.stack-verifier.sha256"),
+        ("toml_set_counts_only_the_top_level",
+         (('    value["other"] = sum(1 for name in names if name not in CODEX_ROLE_FILES)\n',
+           '    value["other"] = sum(1 for name in names if name not in CODEX_ROLE_FILES and "/" not in name)\n'),),
+         ROLE + "test_the_toml_set_counts_every_other_file_below_the_folder_and_publishes_no_name", "'other': 3"),
+        # A host-chosen file name in the value: the privacy guard refuses the capture (guarded), and with it disabled the
+        # collector's own rule is what the test checks (unguarded).
+        ("toml_set_publishes_the_names_guarded", (TOML_SET_NAMES,),
+         ROLE + "test_the_toml_set_counts_every_other_file_below_the_folder_and_publishes_no_name",
+         "refused: output strings carry", "items: codex.agents.toml_set"),
+        ("toml_set_publishes_the_names_unguarded", (TOML_SET_NAMES, MutationControlTests.GUARD_OFF),
+         ROLE + "test_the_toml_set_counts_every_other_file_below_the_folder_and_publishes_no_name",
+         "a host-chosen file name is published"),
+        # Codex enters a linked folder, so a folder link below agents must make the set an error, never a smaller count: the
+        # mutant that skips the link (the walker never enters it) and the one that follows it (and counts what lies behind).
+        ("linked_folder_is_skipped", ((LINK_CHECK, "if False:"),),
+         ROLE + "test_a_folder_link_below_agents_is_an_error_and_never_an_undercount",
+         "a folder link below the agents folder was skipped"),
+        ("linked_folder_is_followed",
+         ((LINK_CHECK, "if False:"),
+          ("os.walk(folder, followlinks=False, onerror=failed.append)", "os.walk(folder, followlinks=True, onerror=failed.append)")),
+         ROLE + "test_a_folder_link_below_agents_is_an_error_and_never_an_undercount",
+         "a folder link below the agents folder was skipped"),
+        ("role_tables_skip_the_profile",
+         (('[home / "config.toml", home / f"{CODEX_PROFILE}.config.toml"]', '[home / "config.toml"]'),),
+         ROLE + "test_role_tables_are_counted_in_both_home_files_and_the_scalar_keys_are_not", "codex.agents.role_tables: config.toml and the profile"),
+        ("role_tables_skip_config_toml",
+         (('[home / "config.toml", home / f"{CODEX_PROFILE}.config.toml"]', '[home / f"{CODEX_PROFILE}.config.toml"]'),),
+         ROLE + "test_role_tables_are_counted_in_both_home_files_and_the_scalar_keys_are_not", "codex.agents.role_tables: config.toml"),
+        ("role_tables_count_the_scalar_keys",
+         (("    return sum(1 for value in agents.values() if isinstance(value, dict)) if isinstance(agents, dict) else 0, None\n",
+           "    return len(agents) if isinstance(agents, dict) else 0, None\n"),),
+         ROLE + "test_role_tables_are_counted_in_both_home_files_and_the_scalar_keys_are_not", "the scalar keys of [agents] are not roles"),
+        ("system_agents_folder_misread",
+         (('count_item(ctx, "codex.system.agents_toml_count", CODEX_SYSTEM_DIR / "agents")',
+           'count_item(ctx, "codex.system.agents_toml_count", CODEX_SYSTEM_DIR / "agentz")'),),
+         SYSTEM + "test_the_system_rows_count_the_role_files_and_tables_of_the_planted_layer", "codex.system.agents_toml_count"),
+        ("system_config_misread",
+         (('tables_item(ctx, "codex.system.role_tables", [CODEX_SYSTEM_DIR / "config.toml"])',
+           'tables_item(ctx, "codex.system.role_tables", [CODEX_SYSTEM_DIR / "config.tomz"])'),),
+         SYSTEM + "test_the_system_rows_count_the_role_files_and_tables_of_the_planted_layer", "codex.system.role_tables"),
+        ("project_agents_folder_misread",
+         (('count_item(ctx, "codex.project.agents_toml_count", ctx.repo / ".codex" / "agents")',
+           'count_item(ctx, "codex.project.agents_toml_count", ctx.repo / ".codex" / "agentz")'),),
+         ROLE + "test_the_project_layer_rows_read_the_checkouts_codex_folder", "codex.project.agents_toml_count"),
+        ("project_config_misread",
+         (('tables_item(ctx, "codex.project.role_tables", [ctx.repo / ".codex" / "config.toml"])',
+           'tables_item(ctx, "codex.project.role_tables", [ctx.repo / ".codex" / "config.tomz"])'),),
+         ROLE + "test_the_project_layer_rows_read_the_checkouts_codex_folder", "codex.project.role_tables"),
+        ("launcher_row_hashes_the_target",
+         (("    return [ctx.item(ids[0], status, digest, reason), binary_item(ctx, ids[1], entry)]\n",
+           "    return [binary_item(ctx, ids[0], entry), binary_item(ctx, ids[1], entry)]\n"),),
+         ROLE + "test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_file_it_executes", "codex.launcher.sha256"),
+        ("binary_row_does_not_follow_the_launcher",
+         (("    target = launcher_target(text) if text is not None else None\n", "    target = None\n"),),
+         ROLE + "test_the_launcher_row_hashes_the_entry_and_the_binary_row_follows_one_hop_to_the_file_it_executes", "codex.binary.sha256"),
+        ("binary_row_skips_the_path_policy",
+         (("        path = check_path_policy(target, ctx.home, ctx.repo, allow_relative=False)\n", "        path = Path(target)\n"),),
+         ROLE + "test_a_launcher_target_that_is_missing_refused_or_a_credential_store_is_an_error_for_the_binary_row",
+         "codex.binary.sha256: outside"),
+        ("binary_row_follows_a_second_hop",
+         (('        return ctx.item(item_id, ERROR, None, "refused_path")\n    status, digest, reason = ctx.hash_file(path)\n',
+           '        return ctx.item(item_id, ERROR, None, "refused_path")\n    second = script_text(ctx, path)\n'
+           '    hop = launcher_target(second) if second is not None else None\n'
+           '    status, digest, reason = ctx.hash_file(Path(hop) if hop else path)\n'),),
+         ROLE + "test_the_binary_row_stops_after_one_hop", "codex.binary.sha256"),
+        ("default_servers_read_with_the_profile",
+         ((' ["codex", "mcp", "list", "--json"]', ' ["codex", "-p", CODEX_PROFILE, "mcp", "list", "--json"]'),),
+         ROLE + "test_the_server_rows_are_names_and_flags_read_in_an_empty_directory", "codex.mcp.servers.default"),
+        ("worker_servers_read_without_the_profile",
+         (('["codex", "-p", CODEX_PROFILE, "mcp", "list", "--json"]))', '["codex", "mcp", "list", "--json"]))'),),
+         ROLE + "test_the_server_rows_are_names_and_flags_read_in_an_empty_directory", "codex.mcp.servers.stack_worker"),
+        ("servers_read_in_the_checkout",
+         (("        result = ctx.run(argv, timeout=60.0, cwd=Path(folder))\n", "        result = ctx.run(argv, timeout=60.0)\n"),),
+         ROLE + "test_the_server_rows_are_names_and_flags_read_in_an_empty_directory", "freeze-mcp-"),
+        ("servers_keep_the_transport_guarded", (SERVERS_KEEP_ENTRY,),
+         ROLE + "test_the_server_rows_are_names_and_flags_read_in_an_empty_directory",
+         "refused: output strings carry", "items: codex.mcp.servers.default"),
+        ("servers_keep_the_transport_unguarded", (SERVERS_KEEP_ENTRY, MutationControlTests.GUARD_OFF),
+         ROLE + "test_the_server_rows_are_names_and_flags_read_in_an_empty_directory",
+         "transport, environment, arguments and URLs are never read"),
+        ("servers_accept_a_string_flag",
+         (("        if not plain_name(name, \"._:@+-\", 80) or not isinstance(enabled, bool) or name in servers:\n",
+           "        if not plain_name(name, \"._:@+-\", 80) or name in servers:\n"),),
+         HELPER + "test_parse_codex_mcp_list_keeps_names_and_flags_only", "\"enabled\": 1}]"),
+        ("codex_home_variable_ignored",
+         (("    value = ctx.env.get(CODEX_HOME_VARIABLE)\n", "    value = None\n"),),
+         ROLE + "test_codex_home_moves_the_role_rows_and_its_location_is_never_stored", "reads the variable's folder"),
+        ("codex_home_location_stored",
+         (("            return check_path_policy(value, ctx.home, ctx.repo, allow_relative=False), False\n",
+           "            return check_path_policy(value, ctx.home, ctx.repo, allow_relative=False), True\n"),),
+         ROLE + "test_codex_home_moves_the_role_rows_and_its_location_is_never_stored", "a location that came from the environment is not stored"),
+        ("codex_home_skips_the_path_policy",
+         (("            return check_path_policy(value, ctx.home, ctx.repo, allow_relative=False), False\n", "            return Path(value), False\n"),),
+         ROLE + "test_codex_home_moves_the_role_rows_and_its_location_is_never_stored", "CODEX_HOME=outside"),
+        ("linked_carrier_is_hashed",
+         (('    if kind == "link":\n        return ctx.item(item_id, ERROR, None, "link", shown)\n', '    if kind == "link":\n        pass\n'),),
+         ROLE + "test_a_missing_carrier_an_absent_folder_a_linked_folder_and_a_linked_carrier", "'link'"),
+        ("linked_folder_is_entered",
+         (('    if kind in ("link", "file", "other", "error"):\n', '    if kind in ("file", "other", "error"):\n'),),
+         ROLE + "test_a_missing_carrier_an_absent_folder_a_linked_folder_and_a_linked_carrier", "not_a_directory"),
+        ("launcher_target_may_be_relative",
+         (('    if "\'" in target or "\\x00" in target or not os.path.isabs(target):\n', '    if "\'" in target or "\\x00" in target:\n'),),
+         HELPER + "test_launcher_target_reads_only_the_exact_last_line", "is not None"),
+    )
+
+    def test_the_nested_runner_passes_on_the_real_tool(self):
+        proc = self.nested(DEFAULT_TOOL, self.ROLE + "test_values_on_the_plain_host")
+        self.assertEqual(proc.returncode, 0, proc.stderr[-2000:])
+
+    def test_each_mutant_fails_the_test_for_its_row(self):
         source = DEFAULT_TOOL.read_text(encoding="utf-8")
         folder = self.mutant_dir()
         prepared = []
