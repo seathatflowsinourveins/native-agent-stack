@@ -315,15 +315,20 @@ export function executedText(command, { inlineHttp = false } = {}) {
   return executedTrace(traced(String(command || '')), inlineHttp).s
 }
 // `resolved` holds the raw offsets of the here-document operators already resolved; every nested analysis shares it.
-function executedTrace(src, inlineHttp, resolved = new Set(), depth = 0) {
-  const { text, sources } = resolveHeredocs(src, inlineHttp, resolved, depth)
-  return joined([scanQuotes(text, inlineHttp, resolved, depth), ...sources], '\n')
+// `marks`, when given, collects what the CLI-lane reading needs beside the text, in raw offsets: `remote` gets the
+// [first, last] range of each string or heredoc body that ssh runs on another host, and `data` the offset where each
+// command substitution of a data heredoc body starts (the body line is data; the substitution runs). The text is the same.
+function executedTrace(src, inlineHttp, resolved = new Set(), depth = 0, marks = null) {
+  const { text, sources } = resolveHeredocs(src, inlineHttp, resolved, depth, marks)
+  return joined([scanQuotes(text, inlineHttp, resolved, depth, marks), ...sources], '\n')
 }
+// The [first, last] raw offsets of a trace, or null when it holds only inserted text.
+const rawRange = (t) => { let lo = Infinity, hi = -1; for (const n of t.p) if (n >= 0) { if (n < lo) lo = n; if (n > hi) hi = n } return hi < 0 ? null : [lo, hi] }
 // Phase 1, line by line: a here-document body becomes its data (the substitutions an unquoted delimiter still runs) or,
 // when a shell (or in inlineHttp mode an interpreter) reads it as source, a separate source. An operator that is already
 // resolved is skipped: the outer shell resolves a heredoc inside the "$( )" of a double-quoted string that a shell then
 // runs, and the lines after it must not be read as its body a second time.
-function resolveHeredocs(src, inlineHttp, resolved, depth) {
+function resolveHeredocs(src, inlineHttp, resolved, depth, marks) {
   const lines = [], kept = [], sources = [], stack = []
   for (let at = 0; ;) { const end = src.s.indexOf('\n', at); lines.push([at, end < 0 ? src.s.length : end]); if (end < 0) break; at = end + 1 }
   const lineText = (n) => src.s.slice(lines[n][0], lines[n][1])
@@ -334,19 +339,27 @@ function resolveHeredocs(src, inlineHttp, resolved, depth) {
       const operator = src.p[lines[n][0] + h.start]
       if (resolved.has(operator)) continue
       resolved.add(operator)
-      const reader = stdinProgram(invocationOf(commandWords(line.slice(h.from, h.to))))
+      const command = invocationOf(commandWords(line.slice(h.from, h.to))), reader = stdinProgram(command)
       const source = depth < NESTING_LIMIT && (SHELL.test(reader) || inlineHttp && INTERPRETER_WORD.test(reader))
       const first = n + 1
       while (n + 1 < lines.length && (h.strip ? lineText(n + 1).replace(/^\t+/, '') : lineText(n + 1)) !== h.delimiter) {
         n++
         if (source) continue
         const data = { s: '', p: [] }
-        if (!h.quoted) for (const m of lineText(n).matchAll(SUBSTITUTION)) if (m[0][0] !== '\\') { if (data.s) insert(data, ' '); append(data, slice(src, lines[n][0] + m.index, lines[n][0] + m.index + m[0].length)) }
+        if (!h.quoted) for (const m of lineText(n).matchAll(SUBSTITUTION)) if (m[0][0] !== '\\') {
+          if (data.s) insert(data, ' ')
+          append(data, slice(src, lines[n][0] + m.index, lines[n][0] + m.index + m[0].length))
+          if (marks && src.p[lines[n][0] + m.index] >= 0) marks.data.add(src.p[lines[n][0] + m.index])
+        }
         kept.push(data)
       }
       // Keep source boundaries: interpreter quotes/shift syntax must not consume later shell commands or data
       // heredocs. Each source is analyzed independently; missed matches stay possible M4 fetches.
-      if (source) sources.push(n >= first ? executedTrace(slice(src, lines[first][0], lines[n][1]), inlineHttp, resolved, depth + 1) : { s: '', p: [] })
+      if (source && n >= first) {
+        const body = slice(src, lines[first][0], lines[n][1]), range = marks && command.program === 'ssh' ? rawRange(body) : null
+        if (range) marks.remote.push(range) // ssh runs the body in the remote shell (OpenSSH ssh(1))
+        sources.push(executedTrace(body, inlineHttp, resolved, depth + 1, marks))
+      } else if (source) sources.push({ s: '', p: [] })
       if (n + 1 < lines.length) n++ // closing delimiter
     }
   }
@@ -354,7 +367,7 @@ function resolveHeredocs(src, inlineHttp, resolved, depth) {
 }
 // Phase 2 over the kept text: escapes, comments and quoted strings. A quoted string that a shell runs is analyzed as
 // that shell's input, with its own heredocs; a double-quoted one first loses the backslashes the outer shell removes.
-function scanQuotes(text, inlineHttp, resolved, depth) {
+function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
   const out = { s: '', p: [] }
   for (let i = 0; i < text.s.length; i++) {
     const ch = text.s[i]
@@ -370,10 +383,13 @@ function scanQuotes(text, inlineHttp, resolved, depth) {
     }
     if (ch !== "'" && ch !== '"') { out.s += ch; out.p.push(text.p[i]); continue }
     const j = closeQuote(text.s, i), inner = slice(text, i + 1, j)
-    if (depth < NESTING_LIMIT && RUN_QUOTED.test(out.s)) {
-      insert(out, ';'); append(out, executedTrace(ch === '"' ? unquoted(inner) : inner, inlineHttp, resolved, depth + 1)); insert(out, ';')
+    const run = depth < NESTING_LIMIT ? RUN_QUOTED.exec(out.s) : null
+    if (run) {
+      // The ssh alternative of RUN_QUOTED: the string runs in the remote shell.
+      if (marks && run[0].startsWith('ssh', ' \t\n;&|('.includes(run[0][0]) ? 1 : 0)) { const range = rawRange(inner); if (range) marks.remote.push(range) }
+      insert(out, ';'); append(out, executedTrace(ch === '"' ? unquoted(inner) : inner, inlineHttp, resolved, depth + 1, marks)); insert(out, ';')
     } else if (inlineHttp && RUN_HTTP_CODE.test(out.s)) { insert(out, ';'); append(out, inner); insert(out, ';') }
-    else if (ch === '"') { insert(out, '"'); quotedData(out, inner, inlineHttp, resolved, depth); insert(out, '"') }
+    else if (ch === '"') { insert(out, '"'); quotedData(out, inner, inlineHttp, resolved, depth, marks); insert(out, '"') }
     else { insert(out, "'"); append(out, { s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); insert(out, "'") }
     i = j
   }
@@ -383,14 +399,14 @@ function scanQuotes(text, inlineHttp, resolved, depth) {
 // command substitutions still run (POSIX.1-2024 XCU 2.2.3): the body of a "$( ... )" is analyzed as shell text, its
 // tokens recognized recursively up to the matching ")" (2.6.3; its heredocs were resolved with its lines), a backquoted
 // span is kept as it is, and an escaped character becomes the data character _.
-function quotedData(out, inner, inlineHttp, resolved, depth) {
+function quotedData(out, inner, inlineHttp, resolved, depth, marks) {
   const s = inner.s
   for (let i = 0; i < s.length;) {
     const ch = s[i]
     if (ch === '\\' && i + 1 < s.length) { out.s += '_'; out.p.push(inner.p[i + 1]); i += 2 }
     else if (ch === '$' && s[i + 1] === '(' && s[i + 2] !== '(' && depth < NESTING_LIMIT) {
       const k = matchParen(s, i + 2)
-      append(out, slice(inner, i, i + 2)); append(out, scanQuotes(slice(inner, i + 2, k), inlineHttp, resolved, depth + 1)); append(out, slice(inner, k, k + 1))
+      append(out, slice(inner, i, i + 2)); append(out, scanQuotes(slice(inner, i + 2, k), inlineHttp, resolved, depth + 1, marks)); append(out, slice(inner, k, k + 1))
       i = k + 1
     } else if (ch === '`') { const k = closeQuote(s, i); append(out, slice(inner, i, k + 1)); i = k + 1 }
     else { out.s += QUOTED_SEPARATOR.has(ch) ? ' ' : ch; out.p.push(inner.p[i]); i++ }
@@ -432,6 +448,590 @@ const timeOf = (row) => { const t = Date.parse(row && row.timestamp); return Num
 const counter = () => Object.create(null)
 const bump = (counts, key) => { counts[key] = (counts[key] || 0) + 1 }
 
+// ------------------------------------------------------------------ CLI lanes
+// #381 AA-PLAN PR-A item 3 (private Gate A spec): count the CLI lanes toon, repomix, markitdown, qmd, headroom, jcodemunch-mcp,
+// codebase-memory-mcp, ai-memory, serena, context-mode, `rtk proxy` and mcporter in command position, leaving --version and
+// --help calls out; an `mcporter call <server>.<tool>` counts for its downstream server, never for mcporter. A lane is the
+// exact basename of its executable (U1 sources S5-S16, at the manifests/stack.json pins): toon-format/toon@a9e6d97e
+// packages/cli/package.json:25-26; yamadashy/repomix@80b4280a package.json:21 (a string bin takes the package name);
+// microsoft/markitdown@b8f79c57 packages/markitdown/pyproject.toml:74-75; tobi/qmd@facd35e0 package.json:14-15;
+// headroomlabs-ai/headroom@32d7ca45 pyproject.toml:333-334; jgravelle/jcodemunch-mcp@8f7b34ab pyproject.toml:87-89 (its gcm
+// script is a separate Groq CLI, not this lane); DeusData/codebase-memory-mcp@8972ea69 Makefile.cbm:1077,1103;
+// akitaonrails/ai-memory@433a19f3 crates/ai-memory-cli/Cargo.toml:18-20; oraios/serena@c6fbd1c5 pyproject.toml:64-67 (serena
+// and serena-agent; serena-hooks is a hook entry point, not this lane); mksglu/context-mode@589d8214 package.json:58-59;
+// openclaw/mcporter@93e0916c package.json:16-17; rtk-ai/rtk@1d87b8e7 Cargo.toml:1-3, whose only lane is `rtk proxy`.
+const LANE_EXECUTABLES = new Map([['toon', 'toon'], ['repomix', 'repomix'], ['markitdown', 'markitdown'], ['qmd', 'qmd'],
+  ['headroom', 'headroom'], ['jcodemunch-mcp', 'jcodemunch-mcp'], ['codebase-memory-mcp', 'codebase-memory-mcp'],
+  ['ai-memory', 'ai-memory'], ['serena', 'serena'], ['serena-agent', 'serena'], ['context-mode', 'context-mode'], ['mcporter', 'mcporter']])
+// A package runner names a package, mapped to its lane: npm packages for npx, bunx, bun x, pnpm dlx and yarn dlx, PyPI
+// projects (PEP 503 names) for uvx, uv tool run and pipx run, and for python -m the markitdown module, whose __main__ entry
+// module the console script names (U1 S7; the README shows only the script).
+const NPM_LANES = new Map([['@toon-format/cli', 'toon'], ['repomix', 'repomix'], ['@tobilu/qmd', 'qmd'], ['mcporter', 'mcporter'], ['context-mode', 'context-mode']])
+const PYPI_LANES = new Map([['jcodemunch-mcp', 'jcodemunch-mcp'], ['headroom-ai', 'headroom'], ['serena-agent', 'serena'],
+  ['codebase-memory-mcp', 'codebase-memory-mcp'], ['markitdown', 'markitdown']])
+const MODULE_LANES = new Map([['markitdown', 'markitdown']])
+// An mcporter call reaches a lane only through these config server names, seeded from manifests/stack.json:280
+// (codebase-memory) and :407 (context-mode); every other server is counted in mcporter_downstream only.
+const MCPORTER_ALIASES = new Map([['codebase-memory', 'codebase-memory-mcp'], ['context-mode', 'context-mode']])
+// Reserved words (POSIX.1-2024 XCU 2.4; bash(1) RESERVED WORDS): the first set precedes a command name, the second closes a
+// compound command, and a command that starts with the third (or with `((`, an arithmetic command) invokes nothing.
+const OPENERS = new Set(['!', '{', 'do', 'then', 'else', 'elif', 'if', 'while', 'until'])
+const CLOSERS = new Set(['}', 'done', 'fi', 'esac'])
+const HEADERS = new Set(['for', 'case', 'select', 'in', 'function'])
+const nameStart = (c) => c === '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+// NAME=value or NAME+=value before the command name (XCU 2.9.1 Rule 7; bash(1) PARAMETERS), unquoted up to the =.
+function isAssignment(e) {
+  if (!nameStart(e[0])) return false
+  for (let k = 1; k < e.length; k++) {
+    if (e[k] === '=' || (e[k] === '+' && e[k + 1] === '=')) return true
+    if (!nameStart(e[k]) && !(e[k] >= '0' && e[k] <= '9')) return false
+  }
+  return false
+}
+const basename = (v) => v.slice(v.lastIndexOf('/') + 1)
+const hasBlank = (v) => v.includes(' ') || v.includes('\t') || v.includes('\n')
+// The simple commands of executed text (executedTrace; POSIX.1-2024 XCU 2.9.1-2.9.4 and 2.6.3; bash(1) SHELL GRAMMAR and
+// REDIRECTION), in source order: split at the text start and at ; & && | || |& newline ( ) and around each command
+// substitution ($( ) or backquotes, also inside double quotes, whose bodies are commands of their own), never inside a
+// quoted span; the & or | of >& <& &> &>> >| belongs to its redirection, and a redirection operator and its target word
+// are dropped. Words split at unquoted blanks. A word's value maps each executed character back to its raw character and
+// drops the quotes the analysis inserted (p = -1), so data the analysis blanked (a quoted selector's parentheses, `rtk
+// proxy '<one string>'`) keeps its exact bytes; x marks an expansion ($ or a backquote outside single quotes). An
+// arithmetic $(( )) or (( )) is one unit up to its matching )) in its line; after one that does not close there, the rest
+// of that line reads parentheses as separators, which keeps the scan linear. Text nested deeper than NESTING_LIMIT reads
+// as words. `async` records a lone & (a command run in the background).
+function simpleCommands(t, raw) {
+  const commands = []
+  let async = false
+  const wordOf = (from, to) => {
+    let v = '', x = false, at = -1
+    for (let k = from; k < to; k++) {
+      const c = t.s[k], p = t.p[k]
+      if (p < 0 && (c === '"' || c === "'")) continue
+      if (c === '$' || c === '`') x = true
+      v += p >= 0 ? raw[p] : c
+      if (at < 0 && p >= 0) at = p
+    }
+    return { v, x, e: t.s.slice(from, to), i: from, at }
+  }
+  // Command substitutions inside a double-quoted span [from, to).
+  const inDouble = (from, to, depth) => {
+    for (let i = from; i < to;) {
+      const c = t.s[i]
+      if (c === '\\') i += 2
+      else if (c === '`') { const k = Math.min(closeQuote(t.s, i), to); walk(i + 1, k, depth + 1); i = k + 1 }
+      else if (c === '$' && t.s[i + 1] === '(' && t.s[i + 2] !== '(') { const k = Math.min(matchParen(t.s, i + 2), to); walk(i + 2, k, depth + 1); i = k + 1 }
+      else i++
+    }
+  }
+  const walk = (from, to, depth) => {
+    let words = [], start = -1, target = false, plainUntil = -1
+    const endWord = (end) => { if (start < 0) return; if (target) target = false; else words.push(wordOf(start, end)); start = -1 }
+    const endCommand = (end) => { endWord(end); target = false; if (words.length) commands.push(words); words = [] }
+    const nested = depth < NESTING_LIMIT
+    for (let i = from; i < to;) {
+      const c = t.s[i]
+      if (c === ' ' || c === '\t') { endWord(i); i++; continue }
+      if (c === '<' || c === '>' || (c === '&' && t.s[i + 1] === '>')) {
+        let digits = start >= 0 // an all-digit word before the operator is its file descriptor
+        for (let k = start; digits && k < i; k++) digits = t.s[k] >= '0' && t.s[k] <= '9'
+        if (digits) start = -1
+        else endWord(i)
+        REDIRECTION.lastIndex = i
+        const r = REDIRECTION.exec(t.s)
+        i += r ? r[0].length : 1
+        target = true
+        continue
+      }
+      const arithmetic = c === '$' && t.s[i + 1] === '(' && t.s[i + 2] === '(' ? i + 1 : c === '(' && t.s[i + 1] === '(' && start < 0 ? i : -1
+      if (arithmetic >= 0 && i >= plainUntil) {
+        let depthOf = 0, k = arithmetic
+        for (; k < to && t.s[k] !== '\n'; k++) if (t.s[k] === '(') depthOf++; else if (t.s[k] === ')' && --depthOf === 0) break
+        if (k < to && t.s[k] === ')') { if (start < 0) start = i; i = k + 1; continue }
+        plainUntil = k
+      }
+      if (c === '\n' || c === ';' || c === '(' || c === ')') {
+        endCommand(i)
+        i += c !== ';' ? 1 : t.s[i + 1] === ';' ? (t.s[i + 2] === '&' ? 3 : 2) : t.s[i + 1] === '&' ? 2 : 1
+        continue
+      }
+      if (c === '|') { endCommand(i); i += t.s[i + 1] === '|' || t.s[i + 1] === '&' ? 2 : 1; continue }
+      if (c === '&') { endCommand(i); if (t.s[i + 1] === '&') i += 2; else { async = true; i++ } continue }
+      if (start < 0) start = i
+      if (nested && c === '`') { const k = Math.min(closeQuote(t.s, i), to); walk(i + 1, k, depth + 1); i = k + 1 }
+      else if (nested && c === '$' && t.s[i + 1] === '(' && t.s[i + 2] !== '(') { const k = Math.min(matchParen(t.s, i + 2), to); walk(i + 2, k, depth + 1); i = k + 1 }
+      else if (c === '"' || c === "'") { const k = Math.min(closeQuote(t.s, i), to); if (nested && c === '"') inDouble(i + 1, k, depth); i = k + 1 }
+      else i++
+    }
+    endCommand(to)
+  }
+  walk(0, t.s.length, 0)
+  return { commands: commands.sort((a, b) => a[0].i - b[0].i), async }
+}
+// Words of one string split with shell quoting and no expansion: blanks separate words, '...' and "..." group, and a
+// backslash escapes the next character (inside double quotes only $ ` " \). Used for `rtk proxy '<one string>'` (rtk
+// src/main.rs:3023-3033, discover/lexer.rs:590-595 shell_split) and env -S (GNU env(1), which also expands ${NAME}).
+function shellWords(text, expands) {
+  const out = []
+  let v = null
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (c === ' ' || c === '\t' || c === '\n') { if (v !== null) { out.push(v); v = null } continue }
+    v ??= ''
+    if (c === "'") { const k = text.indexOf("'", i + 1), end = k < 0 ? text.length : k; v += text.slice(i + 1, end); i = end }
+    else if (c === '"') {
+      let k = i + 1
+      for (; k < text.length && text[k] !== '"'; k++) { if (text[k] === '\\' && '$`"\\'.includes(text[k + 1] || '-')) k++; v += text[k] }
+      i = k
+    } else if (c === '\\' && i + 1 < text.length) v += text[++i]
+    else v += c
+  }
+  if (v !== null) out.push(v)
+  return out.map((s) => ({ v: s, x: expands && s.includes('$'), e: s }))
+}
+// How many words the option at words[i] takes (1, or 2 with its option-argument in the next word), 0 at an operand, -1
+// for an option the spec does not list, null for one after which no utility runs (POSIX.1-2024 XBD 12.2 Utility Syntax
+// Guidelines 3-10: grouped flags, an option-argument attached or in the next word; GNU getopt_long adds --name[=value]).
+// A long option's kind is 0 (a flag), 1 (a value, attached with = or in the next word) or 2 (a value only with =).
+function optionWords(words, i, spec) {
+  const v = words[i].v
+  if (v.length < 2 || v[0] !== '-') return 0
+  if (v[1] === '-') {
+    const eq = v.indexOf('='), name = eq < 0 ? v : v.slice(0, eq), kind = spec.long?.get(name)
+    if (spec.stop?.has(name)) return null
+    if (kind === undefined || (kind === 0 && eq >= 0)) return -1
+    return kind === 1 && eq < 0 ? 2 : 1
+  }
+  for (let k = 1; k < v.length; k++) {
+    if (spec.stop?.has('-' + v[k])) return null
+    if (spec.flags.includes(v[k])) continue
+    if (spec.values.includes(v[k])) return k === v.length - 1 ? 2 : 1
+    return -1
+  }
+  return 1
+}
+// The index of the first operand after the options at words[i], past one `--`; -1 or null as optionWords.
+function afterOptions(words, i, spec) {
+  while (i < words.length) {
+    if (words[i].v === '--') return i + 1
+    const n = optionWords(words, i, spec)
+    if (n === null || n < 0) return n
+    if (n === 0) return i
+    i += n
+  }
+  return i
+}
+const optionGiven = (words, from, to, name) => words.slice(from, to).some((w) => w.v === name || w.v.startsWith(name + '='))
+// Wrappers run the utility named after their options: POSIX.1-2024 time, nohup, nice, timeout (one duration first),
+// command, exec, env and xargs (echo when no utility is named); GNU coreutils 9.4 stdbuf and the GNU long forms of
+// timeout, nice and env; sudo 1.9.15p5's run form (`sudo --help`), whose VAR=value words precede the command. An option a
+// spec does not list leaves the program unresolved (bash's exec -a/-c/-l, GNU xargs -P, nice -N); command -v/-V and sudo's
+// list, edit, validate, version, help and timestamp modes run no utility.
+const WRAPPER_OPTIONS = new Map([
+  ['time', { flags: 'p', values: '' }], ['nohup', { flags: '', values: '' }], ['exec', { flags: '', values: '' }],
+  ['nice', { flags: '', values: 'n', long: new Map([['--adjustment', 1]]) }],
+  ['stdbuf', { flags: '', values: 'ioe', long: new Map([['--input', 1], ['--output', 1], ['--error', 1]]) }],
+  ['timeout', { flags: 'fpv', values: 'ks', long: new Map([['--preserve-status', 0], ['--foreground', 0], ['--verbose', 0], ['--kill-after', 1], ['--signal', 1]]) }],
+  ['command', { flags: 'p', values: '', stop: new Set(['-v', '-V']) }],
+  ['xargs', { flags: 'prtx0', values: 'EILns', long: new Map([['--null', 0]]) }],
+  ['sudo', { flags: 'ABbEHkNnPSis', values: 'aCcDghpRrTtu', stop: new Set(['-l', '-e', '-v', '-V', '-K', '--list', '--edit', '--validate', '--version', '--help', '--remove-timestamp']),
+    long: new Map([['--askpass', 0], ['--bell', 0], ['--background', 0], ['--preserve-env', 2], ['--set-home', 0], ['--non-interactive', 0],
+      ['--preserve-groups', 0], ['--stdin', 0], ['--login', 0], ['--shell', 0], ['--reset-timestamp', 0], ['--auth-type', 1], ['--close-from', 1],
+      ['--login-class', 1], ['--chdir', 1], ['--group', 1], ['--host', 1], ['--prompt', 1], ['--chroot', 1], ['--role', 1], ['--type', 1],
+      ['--command-timeout', 1], ['--user', 1]]) }],
+])
+const ENV_OPTIONS = { flags: 'i0v', values: 'uC', long: new Map([['--ignore-environment', 0], ['--null', 0], ['--debug', 0], ['--unset', 1], ['--chdir', 1]]) }
+// [words, index of the utility], null when no utility runs, or -1 when the wrapper's options are not all known.
+function wrapped(name, words, i) {
+  if (name === 'env') {
+    // env [-i0v] [-u NAME] [-C DIR] [-S STRING] [-] [NAME=value]... [utility]: -S splits its string into arguments read in
+    // its place, and a lone - is -i (GNU coreutils 9.4 env(1)).
+    for (let splits = 0; i < words.length;) {
+      const v = words[i].v, whole = v === '-S' || v === '--split-string'
+      if (v === '--') { i++; break }
+      if (v === '-') { i++; continue }
+      const split = whole ? words[i + 1]?.v : v.startsWith('--split-string=') ? v.slice(15) : v.startsWith('-S') ? v.slice(2) : undefined
+      if (split !== undefined) {
+        if (++splits > 8) return -1
+        words = [...shellWords(split, true), ...words.slice(i + (whole ? 2 : 1))]
+        i = 0
+        continue
+      }
+      if (whole) return -1
+      const n = optionWords(words, i, ENV_OPTIONS)
+      if (n < 0) return -1
+      if (n === 0) break
+      i += n
+    }
+    while (i < words.length && isAssignment(words[i].e)) i++
+    return i < words.length ? [words, i] : null
+  }
+  let k = afterOptions(words, i, WRAPPER_OPTIONS.get(name))
+  if (k === null || k < 0) return k
+  if (name === 'timeout') k++
+  if (name === 'sudo') while (k < words.length && isAssignment(words[k].e)) k++
+  if (name === 'xargs' && k >= words.length) return [[{ v: 'echo', x: false, e: 'echo' }], 0]
+  return k < words.length ? [words, k] : null
+}
+// Package runners (U1 design 2.2): npx [-y|--yes|--no] [--package SPEC]... [--] PKG, or CMD after --package (npm 11.19.0
+// `npx --help`); bunx PKG, bun x PKG, pnpm dlx PKG and yarn dlx PKG, with no option; uvx and uv tool run with the uv
+// 0.12.17 `uvx --help` options below, --from naming the command's package; pipx run [--spec SPEC] NAME; python -m MODULE
+// behind interface options that take no value (docs.python.org/3.13/using/cmdline.html). Any other option leaves the
+// program unresolved, because the runners' full option grammars are not pinned upstream.
+const NPX_OPTIONS = { flags: 'y', values: '', long: new Map([['--yes', 0], ['--no', 0], ['--package', 1]]) }
+const UV_OPTIONS = { flags: 'Unqv', values: 'wpP', long: new Map([['--from', 1], ['--with', 1], ['--with-editable', 1], ['--with-requirements', 1],
+  ['--python', 1], ['--python-platform', 1], ['--directory', 1], ['--project', 1], ['--upgrade-package', 1], ['--reinstall-package', 1],
+  ['--refresh-package', 1], ['--isolated', 0], ['--upgrade', 0], ['--reinstall', 0], ['--no-cache', 0], ['--refresh', 0], ['--quiet', 0],
+  ['--verbose', 0], ['--offline', 0]]) }
+const PIPX_OPTIONS = { flags: '', values: '', long: new Map([['--spec', 1]]) }
+const npmName = (spec) => { const at = spec.indexOf('@', 1); return at < 0 ? spec : spec.slice(0, at) }
+// A PyPI requirement's project name, PEP 503-normalized: lowercase, each run of - _ . one -, extras and version dropped.
+function pypiName(spec) {
+  let name = '', dash = false
+  for (const c of spec.toLowerCase()) {
+    if (c === '-' || c === '_' || c === '.') { dash = true; continue }
+    if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))) break
+    if (dash && name) name += '-'
+    dash = false
+    name += c
+  }
+  return name
+}
+const isPython = (name) => name.startsWith('python') && [...name.slice(6)].every((c) => c === '.' || (c >= '0' && c <= '9'))
+const PYTHON_FLAGS = 'bBdEiIOPqRsSuvx'
+// { lane, program, k (the first argument), via } for a runner form, null for none, -1 for an unknown runner option.
+function runnerTarget(name, words, i) {
+  const pkg = (k, map, via) => {
+    const w = words[k]
+    if (!w) return null
+    if (w.x) return -1
+    const id = map === NPM_LANES ? npmName(w.v) : pypiName(w.v), lane = map.get(id) ?? null
+    return { lane, program: lane ?? id, k: k + 1, via }
+  }
+  const command = (k, via) => {
+    const w = words[k]
+    if (!w) return null
+    if (w.x) return -1
+    const program = basename(w.v)
+    return { lane: LANE_EXECUTABLES.get(program) ?? null, program, k: k + 1, via }
+  }
+  if (name === 'npx') {
+    const k = afterOptions(words, i, NPX_OPTIONS)
+    return k === null || k < 0 ? -1 : optionGiven(words, i, k, '--package') ? command(k, 'npx') : pkg(k, NPM_LANES, 'npx')
+  }
+  const dlx = name === 'bunx' ? i : (name === 'bun' && words[i]?.v === 'x') || ((name === 'pnpm' || name === 'yarn') && words[i]?.v === 'dlx') ? i + 1 : -1
+  if (dlx >= 0) return words[dlx]?.v.startsWith('-') ? -1 : pkg(dlx, NPM_LANES, name === 'bunx' ? 'bunx' : name + ' ' + words[i].v)
+  const uv = name === 'uvx' ? i : name === 'uv' && words[i]?.v === 'tool' && words[i + 1]?.v === 'run' ? i + 2 : -1
+  const pipx = name === 'pipx' && words[i]?.v === 'run' ? i + 1 : -1
+  if (uv >= 0 || pipx >= 0) {
+    const from = uv >= 0 ? uv : pipx, k = afterOptions(words, from, uv >= 0 ? UV_OPTIONS : PIPX_OPTIONS), via = uv < 0 ? 'pipx run' : name === 'uvx' ? 'uvx' : 'uv tool run'
+    return k === null || k < 0 ? -1 : optionGiven(words, from, k, uv >= 0 ? '--from' : '--spec') ? command(k, via) : pkg(k, PYPI_LANES, via)
+  }
+  if (isPython(name)) {
+    let k = i
+    while (k < words.length && words[k].v.length > 1 && words[k].v[0] === '-' && [...words[k].v.slice(1)].every((c) => PYTHON_FLAGS.includes(c))) k++
+    const flag = words[k]?.v
+    if (flag === undefined || !flag.startsWith('-m')) return null
+    const module = flag === '-m' ? words[k + 1] : { ...words[k], v: flag.slice(2) }
+    if (!module) return null
+    if (module.x) return -1
+    const lane = MODULE_LANES.get(module.v) ?? null
+    return { lane, program: lane ?? module.v, k: k + (flag === '-m' ? 2 : 1), via: 'python -m' }
+  }
+  return null
+}
+// mcporter (openclaw/mcporter@93e0916c, v0.14.1). Global flags with a value (src/cli/cli-factory.ts:19) are removed before
+// `--` (src/cli/flag-utils.ts:4-24) and the next word is the command (src/cli.ts:115-146): none prints help, and so does a
+// help token (--help, -h, help), while a version token (--version, -v, -V; src/cli/help-output.ts:200-210) prints the
+// version. generate-cli, inspect-cli, serve and emit-ts print help for a help token anywhere, record and replay before
+// `--`, daemon and config for their first word (src/cli.ts:149-262; src/cli/daemon-command.ts:28; config-command.ts:14).
+// Other commands are inferred (src/cli/command-inference.ts:10-95): describe and list-tools are list; list, call, auth,
+// vault, resource and resources are explicit; an HTTP tool selector is a call, a URL a list, a word with . or ( an
+// implicit call, and any other word a configured server name, listed (or auto-corrected, or refused). They print help
+// for a help token anywhere (src/cli.ts:306-364: consumeMatchingTokens, src/cli/flag-utils.ts:34-40, scans every word).
+const MCPORTER_GLOBALS = new Set(['--config', '--root', '--log-level', '--oauth-timeout'])
+const MCPORTER_EARLY = new Set(['generate-cli', 'inspect-cli', 'serve', 'emit-ts', 'record', 'replay', 'daemon', 'config'])
+const MCPORTER_EXPLICIT = new Set(['list', 'call', 'auth', 'vault', 'resource', 'resources'])
+const mcporterHelp = (v) => v === '--help' || v === '-h' || v === 'help'
+const mcporterVersion = (v) => v === '--version' || v === '-v' || v === '-V'
+function mcporterOp(words) {
+  const args = []
+  for (let i = 0, literal = false; i < words.length; i++) {
+    literal ||= words[i] === '--'
+    if (!literal && MCPORTER_GLOBALS.has(words[i])) i++
+    else args.push(words[i])
+  }
+  const [command, ...rest] = args
+  if (command === undefined || mcporterHelp(command)) return { op: 'help', excluded: true }
+  if (mcporterVersion(command)) return { op: 'version', excluded: true }
+  if (MCPORTER_EARLY.has(command)) {
+    const separator = rest.indexOf('--')
+    return { op: command, excluded: command === 'daemon' ? !rest.length || rest[0] === 'help' || rest[0] === '--help'
+      : command === 'config' ? !rest.length || mcporterHelp(rest[0])
+        : (separator >= 0 && (command === 'record' || command === 'replay') ? rest.slice(0, separator) : rest).some(mcporterHelp) }
+  }
+  let op = 'list', target = args
+  if (command === 'describe' || command === 'list-tools') target = rest
+  else if (MCPORTER_EXPLICIT.has(command)) { op = command; target = rest }
+  else if (httpToolSelector(command) || (!httpUrl(command) && (command.includes('.') || command.includes('(')))) op = 'call'
+  if (target.some(mcporterHelp)) return { op, excluded: true }
+  return op === 'call' ? { op, server: mcporterServer(target), excluded: false } : { op, excluded: false }
+}
+// mcporter's HTTP forms (src/cli/http-utils.ts:1-69): a URL has an http(s) scheme, or is a bare host[:port] followed by a
+// path, which gets https; an HTTP tool selector is such a URL whose last path segment ends in .<tool>.
+function httpUrl(value) {
+  const s = value.trim(), head = s.slice(0, 8).toLowerCase()
+  let candidate = head.startsWith('http://') || head.startsWith('https://') ? s : null
+  if (!candidate && /[A-Za-z0-9]/.test(s[0] || '')) {
+    let k = 1
+    while (k < s.length && (/[A-Za-z0-9.-]/.test(s[k]))) k++
+    if (s[k] === ':') { const port = ++k; while (k < s.length && s[k] >= '0' && s[k] <= '9') k++; if (k === port) k = -1 }
+    if (k >= 0 && s[k] === '/') candidate = 'https://' + s
+  }
+  if (!candidate) return null
+  try { return new URL(candidate) } catch { return null }
+}
+function httpToolSelector(input) {
+  const open = input.indexOf('('), url = httpUrl(open < 0 ? input : input.slice(0, open))
+  if (!url) return false
+  const segment = url.pathname.slice(url.pathname.lastIndexOf('/') + 1), dot = segment.lastIndexOf('.'), tool = segment.slice(dot + 1)
+  return dot > 0 && tool.length > 0 && [...tool].every((c) => /[A-Za-z0-9_-]/.test(c))
+}
+// A config server name as a report key: an HTTP URL or ad-hoc stdio command never reaches here; an expansion is
+// (unresolved), and a name with a dot, colon, slash or @ (a host, host:port, path or address) counts as (other), so no host
+// is ever emitted.
+const serverKey = (name) => !name ? '(unresolved)' : name.includes('$') || name.includes('`') ? '(unresolved)'
+  : ['.', ':', '/', '@'].some((c) => name.includes(c)) ? '(other)' : safeKey(name)
+// The server an mcporter call reaches. Ephemeral flags anywhere (src/cli/ephemeral-flags.ts:9-128, which does not stop at
+// `--`) and --output/--raw (src/cli/output-format.ts:10-59) are removed first; then words up to `--` are read with the call
+// flags' arities and the generic --key value rule (src/cli/call-arguments.ts:63-128,249-359). A leading call expression
+// (HTTP, or name(...) split at its first dot) gives the server; otherwise --server/--mcp does, and without it the first
+// positional is the selector, promoted to an ad-hoc stdio command when it holds a blank or starts as a path, and a later
+// server= or server: sets a server not yet set (call-arguments.ts:130-233; call-argument-values.ts:9-39,68-83;
+// call-expression-parser.ts:24-29,94-103). A URL server or selector is an ad-hoc HTTP server, an npx command line given as
+// the server an ad-hoc stdio server, and other ad-hoc flags without --http-url or --stdio fail
+// (src/cli/call-command.ts:114-173; ephemeral-target.ts:26-85,134-158; adhoc-server.ts:32-35). The server is the explicit
+// one, else the selector up to its first dot (call-command.ts:309-348). A configured server whose URL matches an HTTP
+// selector is reused upstream; statically that is still (http).
+const MCPORTER_EPHEMERAL = new Map([['--http-url', 2], ['--sse', 2], ['--allow-http', 1], ['--insecure', 1], ['--stdio', 2], ['--stdio-arg', 2],
+  ['--env', 2], ['--header', 2], ['--cwd', 2], ['--name', 2], ['--description', 2], ['--persist', 2]])
+const MCPORTER_CALL_FLAGS = new Map([['--server', 2], ['--mcp', 2], ['--tool', 2], ['--timeout', 2], ['--save-images', 2], ['--args', 2], ['--params', 2],
+  ['--json', 2], ['--tail-log', 1], ['--no-oauth', 1], ['--yes', 1], ['--raw-strings', 1], ['--no-coerce', 1]])
+function mcporterServer(words) {
+  let http = false, stdio = false, adhoc = false, server, selector, tool = false
+  const kept = [], call = [], positional = []
+  for (let i = 0; i < words.length; i++) {
+    const width = MCPORTER_EPHEMERAL.get(words[i])
+    if (!width) { kept.push(words[i]); continue }
+    adhoc = true
+    http ||= words[i] === '--http-url' || words[i] === '--sse'
+    stdio ||= words[i] === '--stdio'
+    i += width - 1
+  }
+  for (let i = 0; i < kept.length; i++) if (kept[i] === '--output') i++; else if (kept[i] !== '--raw') call.push(kept[i])
+  for (let i = 0; i < call.length && call[i] !== '--'; i++) {
+    const w = call[i], width = MCPORTER_CALL_FLAGS.get(w)
+    if (!w) continue
+    if (width) { if (w === '--server' || w === '--mcp') server = call[i + 1]; tool ||= w === '--tool'; i += width - 1 }
+    else if (w.startsWith('--')) { if (!w.includes('=')) i++ }
+    else positional.push(w)
+  }
+  let expression = false
+  const first = positional[0]?.trim() ?? '', open = first.indexOf('(')
+  if (positional.length && httpToolSelector(open < 0 ? first : first.slice(0, open))) { positional.shift(); http = true; expression = tool = true }
+  else if (open > 0 && first.endsWith(')')) {
+    positional.shift()
+    const name = first.slice(0, open).trim(), dot = name.indexOf('.')
+    if (dot > 0) { server ??= name.slice(0, dot); expression = true }
+    tool = true
+  }
+  if (positional.length && !expression && server === undefined) selector = positional.shift()
+  const trimmed = selector?.trim() ?? ''
+  if (server === undefined && selector !== undefined && !stdio && (hasBlank(trimmed) || /^(?:\.{1,2}\/|~\/|\/|[A-Za-z]:\\|\\\\)/.test(trimmed))) { stdio = true; selector = undefined }
+  if (!tool && positional.length && !positional[0].includes('=') && !positional[0].includes(':')) positional.shift()
+  for (let i = 0; i < positional.length; i++) {
+    const w = positional[i], eq = w.indexOf('='), colon = w.indexOf(':')
+    const key = eq >= 0 ? w.slice(0, eq > 0 && w[eq - 1] === ':' ? eq - 1 : eq) : colon >= 0 ? w.slice(0, colon) : null
+    const value = eq >= 0 ? w.slice(eq + 1) : colon >= 0 && colon < w.length - 1 ? w.slice(colon + 1) : colon >= 0 ? positional[++i] : undefined
+    if (key === 'server' && server === undefined) server = value
+  }
+  if (server !== undefined && httpUrl(server)) { http = true; server = undefined }
+  if (selector !== undefined && httpUrl(selector)) { http = true; selector = undefined }
+  if (http) return '(http)'
+  if (stdio) return '(stdio)'
+  if (adhoc) return '(unresolved)'
+  if (server !== undefined) {
+    const parts = server.trim().split(/\s+/)
+    return parts.length > 1 && basename(parts[0]) === 'npx' ? '(stdio)' : serverKey(server)
+  }
+  return serverKey(selector === undefined ? undefined : selector.includes('.') ? selector.slice(0, selector.indexOf('.')) : selector)
+}
+// The invocations of one simple command: past reserved words and assignments, each wrapper, runner and `rtk proxy` to the
+// program it runs. A program word with an expansion is unresolved. For rtk proxy its own record comes first, then the
+// proxied command, which rtk runs without a shell. --version and --help among a lane's own words (before `--`) exclude it.
+function resolveInvocation(words, remote, out) {
+  let i = 0
+  for (; i < words.length; i++) {
+    const w = words[i], bare = w.e === w.v
+    if (bare && (OPENERS.has(w.v) || CLOSERS.has(w.v))) continue
+    if ((bare && HEADERS.has(w.v)) || w.e.startsWith('((')) return
+    if (!isAssignment(w.e)) break
+  }
+  const push = (fields) => { out.push({ lane: null, program: null, op: null, server: null, excluded: false, remote, unresolved: false, via: null, ...fields }) }
+  const finish = (lane, program, args, via) => {
+    if (lane === 'mcporter') { const m = mcporterOp(args.map((w) => w.v)); return push({ lane, program: safeKey(program), op: m.op, server: m.server ?? null, excluded: m.excluded, via }) }
+    const end = args.findIndex((w) => w.v === '--'), own = end < 0 ? args : args.slice(0, end)
+    push({ lane, program: safeKey(program), excluded: lane !== null && own.some((w) => w.v === '--version' || w.v === '--help'), via })
+  }
+  for (let hop = 0; hop < 64; hop++) {
+    const w = words[i]
+    if (!w) return
+    if (w.x) return push({ unresolved: true })
+    const name = basename(w.v)
+    if (name === 'env' || WRAPPER_OPTIONS.has(name)) {
+      const next = wrapped(name, words, i + 1)
+      if (next === null) return
+      if (next === -1) return push({ unresolved: true })
+      ;[words, i] = next
+      continue
+    }
+    if (name === 'rtk') {
+      // rtk-ai/rtk@1d87b8e7 src/main.rs:68-90: -v/--verbose counts (only before the subcommand), --ultra-compact and
+      // --skip-env are global, and clap's -V/--version and -h/--help print and exit (observed on the installed rtk 0.50.0).
+      let k = i + 1, help = false
+      for (; k < words.length; k++) {
+        const v = words[k].v
+        if (v === '--version' || v === '-V' || v === '--help' || v === '-h') help = true
+        else if (v !== '--ultra-compact' && v !== '--skip-env' && v !== '--verbose' && !(v.length > 1 && v[0] === '-' && [...v.slice(1)].every((c) => c === 'v'))) break
+      }
+      if (help) return push({ lane: 'rtk_proxy', program: 'rtk', excluded: true })
+      if (words[k]?.v !== 'proxy') return push({ program: 'rtk' })
+      // proxy (src/main.rs:708-713, 3008-3042): --ultra-compact, --skip-env and -h/--help still bind before the first argument
+      // and one `--` is consumed (observed on rtk 0.50.0); -v or any other word there is already the program. One argument
+      // with a blank is shell-split (#388); the program runs with no shell (src/core/utils.rs:615-632, resolved_command).
+      for (k++; k < words.length; k++) {
+        const v = words[k].v
+        if (v === '-h' || v === '--help') help = true
+        else if (v !== '--ultra-compact' && v !== '--skip-env') { if (v === '--') k++; break }
+      }
+      push({ lane: 'rtk_proxy', program: 'rtk', op: 'proxy', excluded: help })
+      if (help || k >= words.length) return
+      words = words.length - k === 1 && hasBlank(words[k].v) ? shellWords(words[k].v, false) : words.slice(k)
+      i = 0
+      continue
+    }
+    const runner = runnerTarget(name, words, i + 1)
+    if (runner === -1) return push({ unresolved: true })
+    if (runner) return finish(runner.lane, runner.program, words.slice(runner.k), runner.via)
+    return finish(LANE_EXECUTABLES.get(name) ?? null, name, words.slice(i + 1), null)
+  }
+  push({ unresolved: true })
+}
+// Every simple command of a shell script and its invocations. A data heredoc line (marks.data) is not a command; its
+// substitutions are. `simple` counts commands (a lone closing reserved word is none) and `async` a background &.
+function analyzeScript(command) {
+  const raw = String(command || ''), marks = { remote: [], data: new Set() }
+  const { commands, async } = simpleCommands(executedTrace(traced(raw), false, new Set(), 0, marks), raw)
+  const invocations = []
+  let simple = 0
+  for (const words of commands) {
+    const at = words[0].at
+    if (at >= 0 && marks.data.has(at)) continue
+    if (words.some((w) => w.e !== w.v || !CLOSERS.has(w.v))) simple++
+    resolveInvocation(words, at >= 0 && marks.remote.some(([a, b]) => at >= a && at <= b), invocations)
+  }
+  return { invocations, simple, async }
+}
+// U1 design 2.6: the invocations of one shell command, in source order, as { lane (a lane name or null), program (the
+// name-shaped basename, or null when unresolved), op (proxy, or an mcporter operation), server (an mcporter call's
+// downstream key), excluded (a --version or --help call), remote (run on another host by ssh), unresolved (a program
+// named by an expansion, or behind an option this reading does not know), via (the package runner) }. No raw text, no ids.
+export function commandInvocations(command) {
+  return analyzeScript(command).invocations
+}
+// The shell scripts of a call, as countFetches selects them: the Bash command (also a sandbox-nested Codex command),
+// ctx_batch_execute commands and shell ctx_execute(_file) code. Python, JavaScript and Codex code-mode source are not read.
+function shellScripts(call) {
+  const input = call?.input || {}, name = String(call?.name || '')
+  if (name === 'Bash') return [String(input.command || '')]
+  if (name.endsWith('__ctx_batch_execute')) return (Array.isArray(input.commands) ? input.commands : []).map((c) => String(c?.command || ''))
+  return /__ctx_execute(?:_file)?$/.test(name) && input.language === 'shell' ? [String(input.code || '')] : []
+}
+function callAnalysis(call) {
+  const out = { invocations: [], simple: 0, async: false, proxy: 0 }
+  for (const script of shellScripts(call)) {
+    const a = analyzeScript(script)
+    for (const invocation of a.invocations) out.invocations.push(invocation)
+    out.simple += a.simple
+    out.async ||= a.async
+  }
+  for (const invocation of out.invocations) if (invocation.lane === 'rtk_proxy' && !invocation.excluded && !invocation.remote) out.proxy++
+  return out
+}
+// Call states (U1 design 4). AA-PLAN: "Successful" means the tool_result is not an error (Messages API is_error); M14
+// reconciles attempted, decided, executed, failed and unfinished calls. With no result a persisted native status decides
+// (Codex CommandExecutionStatus, openai/codex rust-v0.157.1 protocol/src/items.rs), else the call is unfinished. is_error
+// true is failed, and not_executed as well when the call never ran: its content opens with <tool_use_error> (a validation
+// or blocked call; code.claude.com hooks, PostToolUseFailure), the row's toolUseResult names a PreToolUse hook denial, a
+// permission denial or a user rejection (strings observed on Claude Code 2.1.282-2.1.283, not a documented schema), or an
+// adapter marks it declined. is_error false is succeeded, or unknown when an adapter could not read the outcome
+// (native_state); background marks a run that only started (run_in_background, or a toolUseResult backgroundTaskId).
+const NOT_EXECUTED = ['PreToolUse:', 'Permission for', 'User rejected tool use', "The user doesn't want to proceed"]
+function callState(call, result) {
+  if (!result) {
+    const status = call?.native_status
+    return status === 'completed' ? { state: 'succeeded' } : status === 'failed' ? { state: 'failed' }
+      : status === 'declined' ? { state: 'failed', not_executed: true } : { state: 'unfinished' }
+  }
+  const native = result.native_state ?? call?.native_state, said = result.row?.toolUseResult
+  if (result.is_error) {
+    const reason = typeof said === 'string' ? (said.startsWith('Error: ') ? said.slice(7) : said) : ''
+    return { state: 'failed', not_executed: resultText(result.content).startsWith('<tool_use_error>') || NOT_EXECUTED.some((m) => reason.startsWith(m)) || native === 'declined' }
+  }
+  if (native === 'unknown') return { state: 'unknown' }
+  return { state: 'succeeded', background: Boolean(call?.input?.run_in_background) || Boolean(said && typeof said === 'object' && said.backgroundTaskId) }
+}
+const LANE_COUNTERS = ['calls', 'invocations', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'background', 'ambiguous', 'via_mcporter']
+const CLI_CARRIERS = ['bash', 'rtk_proxy', 'ctx', 'nested']
+const DOWNSTREAM_COUNTERS = ['calls', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown']
+const emptyLane = () => ({ ...Object.fromEntries(LANE_COUNTERS.map((k) => [k, 0])), by_carrier: Object.fromEntries(CLI_CARRIERS.map((k) => [k, 0])) })
+const emptyCliLanes = () => ({ lanes: counter(), mcporter_downstream: counter(), excluded_version_help: counter(), calls_with_lane_invocation: 0, unresolved_programs: 0, remote_invocations: 0 })
+// One call's lane counts (U1 design 5): each lane it invokes locally counts the call once, with its invocations, its state
+// and its carrier; a call with more than one simple command or a background & is ambiguous, since its one state covers
+// every command. An mcporter call counts for its downstream server, and for a lane only through MCPORTER_ALIASES.
+function countLanes(cli, analysis, s, carrier) {
+  const lanes = new Map(), servers = new Set()
+  const use = (lane, via) => { const e = lanes.get(lane) || { n: 0, via: false }; e.n++; e.via ||= via; lanes.set(lane, e) }
+  for (const invocation of analysis.invocations) {
+    if (invocation.remote) { if (invocation.lane) cli.remote_invocations++; continue }
+    if (invocation.unresolved) { cli.unresolved_programs++; continue }
+    if (!invocation.lane) continue
+    if (invocation.excluded) bump(cli.excluded_version_help, invocation.lane)
+    else if (invocation.lane === 'mcporter' && invocation.op === 'call') {
+      servers.add(invocation.server)
+      if (MCPORTER_ALIASES.has(invocation.server)) use(MCPORTER_ALIASES.get(invocation.server), true)
+    } else use(invocation.lane, false)
+  }
+  for (const [lane, e] of lanes) {
+    const row = cli.lanes[lane] ||= emptyLane()
+    row.calls++
+    row.invocations += e.n
+    row[s.state]++
+    if (s.not_executed) row.not_executed++
+    if (s.background) row.background++
+    if (analysis.simple > 1 || analysis.async) row.ambiguous++
+    if (e.via) row.via_mcporter++
+    row.by_carrier[carrier]++
+  }
+  for (const server of servers) {
+    const row = cli.mcporter_downstream[server] ||= Object.fromEntries(DOWNSTREAM_COUNTERS.map((k) => [k, 0]))
+    row.calls++
+    row[s.state]++
+    if (s.not_executed) row.not_executed++
+  }
+  if (lanes.size) cli.calls_with_lane_invocation++
+}
+
 // PR-A result accounting. Source: #381 preregistration.json M3/M5,
 // mksglu/context-mode v1.0.169 src/session/extract.ts:1060-1069 (UTF-8
 // accounting only), and
@@ -447,7 +1047,9 @@ const emptySizes = () => ({ results: 0, bytes: 0, large_results: 0, large_bytes:
 const addSize = (s, n) => { s.results++; s.bytes += n; if (n > RESULT_LIMIT) { s.large_results++; s.large_bytes += n } s.max_bytes = Math.max(s.max_bytes, n) }
 const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s.results), large_byte_share: share(s.large_bytes, s.bytes) })
 const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
-const carrierOf = (call) => call?.code_mode ? 'code_mode' : call?.name === 'Bash' ? (/^\s*rtk\s+proxy\b/.test(call.input?.command || '') ? 'rtk_proxy' : 'bash')
+// A Bash call is carried by rtk proxy when its command invokes `rtk proxy` in command position (commandInvocations, through
+// the caller's per-call memo `proxied`); the earlier prefix rule survives only as measurement.proxy.prefix_rule_calls.
+const carrierOf = (call, proxied = () => false) => call?.code_mode ? 'code_mode' : call?.name === 'Bash' ? (proxied(call) ? 'rtk_proxy' : 'bash')
   : call?.name === 'WebFetch' ? 'webfetch' : call?.name === 'Read' ? 'read'
     : ['Grep', 'Glob'].includes(call?.name) ? 'grep_glob' : isCtx(call?.name) ? 'ctx'
       : mcpServer(call?.name) ? 'other_mcp' : 'other'
@@ -736,9 +1338,17 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       try { if (JSON.parse(a.stdout).hookSpecificOutput?.additionalContext) hookContext.claimed++ } catch { /* no claim */ }
     }
   }
-  for (const c of calls.values()) if (inside(c.row)) countFetches(c, fetchCarriers[carrierOf(c)] ||= emptyFetches())
+  // One command-position reading per call (U1 design 2.6): carrierOf, measurement.proxy and cli_lanes all read it.
+  const analyses = new Map()
+  const analysisOf = (c) => { let a = analyses.get(c); if (!a) analyses.set(c, a = callAnalysis(c)); return a }
+  const proxied = (c) => analysisOf(c).proxy > 0
+  for (const c of calls.values()) if (inside(c.row)) countFetches(c, fetchCarriers[carrierOf(c, proxied)] ||= emptyFetches())
   for (const f of Object.values(fetchCarriers)) for (const k of Object.keys(m4)) m4[k] += f[k]
-  const mcpStates = counter(), loaded = counter(), proxy = { calls: 0, acceptance: 0, exception: 0, unclassified: 0 }
+  const mcpStates = counter(), loaded = counter(), cli = emptyCliLanes()
+  // measurement.proxy: the M6 population is the Bash calls carried by rtk proxy (sandbox-nested Codex calls included, as
+  // before), with its invocations; rtk proxy in ctx shell code is reported apart and left out of M6, and the prefix rule's
+  // count is kept for comparison with earlier receipts.
+  const proxy = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
   for (const c of calls.values()) {
     if (!inside(c.row)) continue
     const server = mcpServer(c.name), r = results.get(c.id)
@@ -750,12 +1360,17 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
         : c.native_status === 'completed' ? 'succeeded' : c.native_status === 'failed' ? 'failed' : 'unfinished'
       state.attempted++; state[status]++
     }
-    if (carrierOf(c) === 'rtk_proxy') {
+    const analysis = analysisOf(c), carrier = carrierOf(c, proxied)
+    if (c.name === 'Bash' && /^\s*rtk\s+proxy\b/.test(c.input?.command || '')) proxy.prefix_rule_calls++
+    if (carrier === 'rtk_proxy') {
       proxy.calls++
+      proxy.invocations += analysis.proxy
+      if (c.sandbox) proxy.nested++
       const review = exceptions[c.id]
       proxy[validReview(review) && review.proxy_purpose === 'acceptance' ? 'acceptance'
         : validReview(review) && EXCEPTIONS.includes(review.exception) ? 'exception' : 'unclassified']++
-    }
+    } else if (isCtx(c.name) && analysis.proxy) proxy.in_ctx_code++
+    if (analysis.invocations.length) countLanes(cli, analysis, callState(c, r), c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
   }
   for (const [id, r] of results) if (inside(r.row) && calls.get(id)?.name === 'ToolSearch' && Array.isArray(r.content)) {
     for (const ref of r.content) if (ref?.type === 'tool_reference') {
@@ -769,7 +1384,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   const edits = [...calls.values()].filter((c) => ['Edit', 'Write'].includes(c.name) && c.input?.file_path && results.has(c.id) && !results.get(c.id).is_error)
   for (const [id, r] of results) {
     if (!inside(r.row)) continue
-    const c = calls.get(id), carrier = carrierOf(c)
+    const c = calls.get(id), carrier = carrierOf(c, proxied)
     if (c?.sandbox) continue // Nested results return to code, not model context.
     if (!c) orphanResults++
     if (r.content === undefined || r.content === null) { unknownResultBytes++; continue }
@@ -794,6 +1409,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     hook_context: hookContext,
     mcp_states: mcpStates, loaded_not_called: loaded,
     proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
+    cli_lanes: cli,
     invalid_exceptions: invalidExceptions, orphan_results: orphanResults,
     sandbox_operations: [...calls.values()].filter((c) => inside(c.row) && c.sandbox).length,
     unknown_result_bytes: unknownResultBytes, bytes_complete: !unknownResultBytes && !orphanResults && !unfinished,
@@ -814,17 +1430,35 @@ export function aggregateMeasurements(items) {
     for (const k of Object.keys(rtk)) rtk[k] += m.rtk_parts[k]
   }
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
-  const hooks = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }, states = counter(), loaded = counter(), proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0 }
+  const hooks = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }, states = counter(), loaded = counter()
+  const proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
+  // CLI lanes sum their counters; actors_with_success counts the actors with at least one succeeded call of the lane.
+  const cli = emptyCliLanes()
   for (const m of items) {
     for (const k of ['inserted', 'claimed', 'with_marker']) hooks[k] += m.hook_context[k]
     for (const k of ['by_hook', 'by_event']) for (const [s, n] of Object.entries(m.hook_context[k])) hooks[k][s] = (hooks[k][s] || 0) + n
     for (const [s, row] of Object.entries(m.mcp_states)) for (const [k, n] of Object.entries(row)) { states[s] ||= counter(); states[s][k] = (states[s][k] || 0) + n }
     for (const [s, n] of Object.entries(m.loaded_not_called)) loaded[s] = (loaded[s] || 0) + n
-    for (const k of Object.keys(proxies)) proxies[k] += m.proxy[k]
+    for (const k of Object.keys(proxies)) proxies[k] += m.proxy[k] || 0
+    const part = m.cli_lanes
+    if (!part) continue
+    for (const [lane, row] of Object.entries(part.lanes)) {
+      const total = cli.lanes[lane] ||= { ...emptyLane(), actors_with_success: 0 }
+      for (const k of LANE_COUNTERS) total[k] += row[k] || 0
+      for (const k of CLI_CARRIERS) total.by_carrier[k] += row.by_carrier?.[k] || 0
+      if (row.succeeded) total.actors_with_success++
+    }
+    for (const [server, row] of Object.entries(part.mcporter_downstream)) {
+      const total = cli.mcporter_downstream[server] ||= Object.fromEntries(DOWNSTREAM_COUNTERS.map((k) => [k, 0]))
+      for (const k of DOWNSTREAM_COUNTERS) total[k] += row[k] || 0
+    }
+    for (const [lane, n] of Object.entries(part.excluded_version_help)) cli.excluded_version_help[lane] = (cli.excluded_version_help[lane] || 0) + n
+    for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations']) cli[k] += part[k] || 0
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
     hook_context: hooks, mcp_states: states, loaded_not_called: loaded,
     proxy: { ...proxies, acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
+    cli_lanes: cli,
     m3_large_results_per_actor: tokenStats(items.map((m) => m.m3.large_results)),
     by_carrier: groups('by_carrier'), exceptions: groups('exceptions'),
     orphan_results: items.reduce((n, m) => n + m.orphan_results, 0),
@@ -1038,6 +1672,8 @@ export function findChildTranscripts(roots, unreadable = { count: 0 }, includeMa
 
 const LANES_LIMITS = 'Counts come from native transcript rows inside [since, until); rows at or after until are never read. A tool call (tool_use blocks deduplicated by id) counts in the window of its first row, a ToolSearch load (tool_reference blocks in its result) in the window of the result row, and an RTK rewrite (a PreToolUse:Bash row from `rtk hook` whose stdout carries updatedInput, for a Bash call whose tool_use row came before until) in the window of its hook row, so adjacent windows add up. RTK decisions (with --rtk-db) are hook_decisions rows joined 1:1 by tool_use_id to the Bash calls counted in the window; covered = allow + ask. A call whose hook row falls on the other side of a window edge therefore counts in hook_rewrites and in decisions of different windows. The marker is looked for only in the first prompt and in SubagentStart hook context, never in tool input or output. first_prompt_tokens is provider-returned (input + cache read + cache creation) and counted only for children whose first request is inside the window. curl/wget counts only in command position of the text a shell runs (quoted strings, heredoc bodies, escaped characters and comments are data unless sh -c, eval, ssh or a shell heredoc runs them, though $(...) and `...` inside double quotes or an unquoted heredoc still run: bash(1) QUOTING, COMMENTS and Here Documents), optionally behind the shell keywords do, then, else, elif, if, while, until, ! and { and behind rtk, sudo, env, command, exec, time, nice, nohup or timeout N; a call whose literal URLs are all loopback is counted apart. ctx_fetch_and_index_share is ctx_fetch_and_index / (WebFetch + ctx_fetch_and_index + remote curl/wget): a fetch run inside a Context Mode sandbox (ctx_execute or ctx_batch_execute code), a gh api call and fetch() or an HTTP library in a script are in no lane. Names that are not name-shaped are counted under (other). Transcripts not modified since the window start are skipped unread. Every child transcript is a child, so a Workflow call the runtime re-ran under the same key (superseded_attempts in the per-run report) is one child per attempt. Children whose agent type starts with blind- are negative controls and are left out of workers; by_spawn_and_agent_type compares spawn paths within one agent type.'
 
+const CLI_LANES_LIMITS = 'cli_lanes counts lane executables in command position of the shell text a call runs (Bash commands, shell ctx code, ctx_batch_execute commands and sandbox-nested Codex commands), behind wrappers, package runners and rtk proxy, with rtk proxy calls in ctx code apart from measurement.proxy; it cannot see aliases, shell functions called by name (a function body counts where it is defined), programs a variable names or eval runs, scripts and Makefile or npm targets that call a lane, find -exec, parallel, watch or other unknown wrappers, subprocesses of non-shell code, or how often xargs runs its utility. A call state covers every command of the call (ambiguous marks more than one), and ssh-run lane invocations count only in remote_invocations.'
+
 // Lane use of every child transcript under the roots that has a row inside [since, until).
 export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [] } = {}) {
   const window = { since: since ?? -Infinity, until: until ?? Infinity }
@@ -1109,7 +1745,7 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     main_sessions_in_window: main.length, main: aggregateLanes(main),
     actors: [...children, ...main].map((c, i) => ({ ordinal: i + 1, actor: c.spawn === 'main' ? 'main' : 'child',
       spawn: c.spawn, agent_type: c.agent_type, session_ordinal: c.session_ordinal ?? null, measurement: c.lanes.measurement })),
-    limits: 'Legacy lane fields: ' + LANES_LIMITS + ' PR-A measurement fields supersede the legacy fetch share and hook-context interpretation: UTF-8 text payloads and individually serialized non-text blocks across every carrier; nested static fetch operations; all-hook insertions separate from stdout claims. Main actors and file counters are separate from children. Sidecar binding reports counts only. rtk_parts needs --rtk-check and keeps observed command coverage separate from native replay. Unknown usage and missing results cannot establish acceptance; see workflows/README.md.',
+    limits: 'Legacy lane fields: ' + LANES_LIMITS + ' PR-A measurement fields supersede the legacy fetch share and hook-context interpretation: UTF-8 text payloads and individually serialized non-text blocks across every carrier; nested static fetch operations; all-hook insertions separate from stdout claims. Main actors and file counters are separate from children. Sidecar binding reports counts only. rtk_parts needs --rtk-check and keeps observed command coverage separate from native replay. ' + CLI_LANES_LIMITS + ' Unknown usage and missing results cannot establish acceptance; see workflows/README.md.',
   }
 }
 
