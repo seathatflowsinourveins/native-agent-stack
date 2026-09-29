@@ -472,25 +472,25 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['env -C d repomix', ['repomix/repomix']], ['env -i -- FOO=1 qmd status', qmd], ['env -S "qmd search x"', qmd], ['nice -n 10 repomix', ['repomix/repomix']],
     ['sudo -u u ai-memory status', ['ai-memory/ai-memory']], ['sudo -E VAR=1 qmd status', qmd], ['command qmd status', qmd], ['command -p qmd status', qmd],
     ['time -p toon f.json', ['toon/toon']], ['stdbuf -oL qmd search x', qmd], ['nohup qmd update &', qmd], ['exec qmd mcp', qmd], ['FOO=1 BAR=2 qmd status', qmd],
-    ['find . -print0 | xargs -0 -n1 markitdown', ['-/find', 'markitdown/markitdown']], ['xargs', ['-/echo']],
+    ['find . -print0 | xargs -0 -n1 markitdown', ['-/-', 'markitdown/markitdown']], ['xargs', ['-/-']],
   ])
   check('cli lanes: an option a wrapper does not document leaves the program unresolved, and a lookup or non-run mode runs none', [
     ['command -v qmd', []], ['command -V qmd', []], ['sudo -l qmd', []], ['exec -a name qmd mcp', ['-/- unresolved']], ['exec -- qmd mcp', ['-/- unresolved']], ['xargs -P 4 qmd get', ['-/- unresolved']],
     ['nice -10 qmd update', ['-/- unresolved']], ['env --bogus qmd', ['-/- unresolved']], ['timeout 60', []],
   ])
   check('cli lanes: compound commands, substitutions, shell strings and shell heredocs', [
-    ['for f in *.pdf; do markitdown "$f"; done', ['markitdown/markitdown']], ['if qmd status; then :; fi', ['qmd/qmd', '-/(other)']],
-    ['(cd d && qmd status)', ['-/cd', 'qmd/qmd']], ['{ qmd get a; }', qmd], ['! qmd search x', qmd], ['x=$(qmd get a)', qmd],
-    ['echo "$(qmd get a)"', ['-/echo', 'qmd/qmd']], ['echo `qmd get a`', ['-/echo', 'qmd/qmd']], ["bash -c 'qmd search x'", ['-/bash', 'qmd/qmd']],
-    ['sh -c "rtk proxy pytest"', ['-/sh', proxy, '-/pytest']], ["bash <<'EOF'\nqmd search x\nEOF", ['-/bash', 'qmd/qmd']],
-    ['cat <<EOF\n$(qmd get a)\nEOF', ['-/cat', 'qmd/qmd']], ['qmd search x 2>&1 >/dev/null | head -n 5', ['qmd/qmd', '-/head']],
-    ['echo $(date) qmd', ['-/echo', '-/date']], ['cat <(qmd get a)', ['-/cat', 'qmd/qmd']],
+    ['for f in *.pdf; do markitdown "$f"; done', ['markitdown/markitdown']], ['if qmd status; then :; fi', ['qmd/qmd', '-/-']],
+    ['(cd d && qmd status)', ['-/-', 'qmd/qmd']], ['{ qmd get a; }', qmd], ['! qmd search x', qmd], ['x=$(qmd get a)', qmd],
+    ['echo "$(qmd get a)"', ['-/-', 'qmd/qmd']], ['echo `qmd get a`', ['-/-', 'qmd/qmd']], ["bash -c 'qmd search x'", ['-/bash', 'qmd/qmd']],
+    ['sh -c "rtk proxy pytest"', ['-/sh', proxy, '-/-']], ["bash <<'EOF'\nqmd search x\nEOF", ['-/bash', 'qmd/qmd']],
+    ['cat <<EOF\n$(qmd get a)\nEOF', ['-/-', 'qmd/qmd']], ['qmd search x 2>&1 >/dev/null | head -n 5', ['qmd/qmd', '-/-']],
+    ['echo $(date) qmd', ['-/-', '-/-']], ['cat <(qmd get a)', ['-/-', 'qmd/qmd']],
   ])
   check('cli lanes: rtk proxy after global options, its own options and an optional --; one spaced argument is split and no shell runs it', [
-    ['rtk proxy qmd search x', [proxy, 'qmd/qmd']], ["rtk proxy 'qmd search x'", [proxy, 'qmd/qmd']], ['rtk --ultra-compact proxy pytest', [proxy, '-/pytest']],
-    ['rtk -v proxy pytest', [proxy, '-/pytest']], ['rtk -vv --skip-env proxy pytest', [proxy, '-/pytest']], ['rtk proxy -- qmd status', [proxy, 'qmd/qmd']],
-    ['rtk proxy --skip-env qmd status', [proxy, 'qmd/qmd']], ['rtk proxy -v qmd', [proxy, '-/(other)']], ['rtk proxy', [proxy]],
-    ["rtk proxy 'cd repo && qmd x'", [proxy, '-/cd']], ['cd repo && rtk proxy pytest -q', ['-/cd', proxy, '-/pytest']], ['FOO=1 rtk proxy pytest', [proxy, '-/pytest']],
+    ['rtk proxy qmd search x', [proxy, 'qmd/qmd']], ["rtk proxy 'qmd search x'", [proxy, 'qmd/qmd']], ['rtk --ultra-compact proxy pytest', [proxy, '-/-']],
+    ['rtk -v proxy pytest', [proxy, '-/-']], ['rtk -vv --skip-env proxy pytest', [proxy, '-/-']], ['rtk proxy -- qmd status', [proxy, 'qmd/qmd']],
+    ['rtk proxy --skip-env qmd status', [proxy, 'qmd/qmd']], ['rtk proxy -v qmd', [proxy, '-/-']], ['rtk proxy', [proxy]],
+    ["rtk proxy 'cd repo && qmd x'", [proxy, '-/-']], ['cd repo && rtk proxy pytest -q', ['-/-', proxy, '-/-']], ['FOO=1 rtk proxy pytest', [proxy, '-/-']],
     ['rtk proxy --help', [proxy + ' excluded']], ['rtk --version', ['rtk_proxy/rtk excluded']], ['rtk -V', ['rtk_proxy/rtk excluded']],
     ['rtk proxy qmd --version', [proxy, 'qmd/qmd excluded']], ['rtk git status', ['-/rtk']], ['rtk proxy npx repomix', [proxy, 'repomix/repomix']],
   ])
@@ -507,22 +507,22 @@ expect('git options: any reading of the option words reaches the subcommand, as 
     ['serena init', ['serena/serena']], ['serena-agent start', ['serena/serena-agent']], ['context-mode doctor', ['context-mode/context-mode']],
     ["codebase-memory-mcp cli search_graph '{}'", ['codebase-memory-mcp/codebase-memory-mcp']], ['/usr/local/bin/qmd search x', qmd],
     ['headroom mcp serve --proxy-url http://127.0.0.1:1', ['headroom/headroom']], ['jcodemunch-mcp', ['jcodemunch-mcp/jcodemunch-mcp']],
-    ['gcm chat', ['-/gcm']], ['serena-hooks pre-tool', ['-/serena-hooks']], ['qmdx', ['-/qmdx']], ['my-repomix', ['-/my-repomix']],
+    ['gcm chat', ['-/-']], ['serena-hooks pre-tool', ['-/-']], ['qmdx', ['-/-']], ['my-repomix', ['-/-']],
   ])
   check('cli lanes: mcporter operations, and the downstream server of a call (never a host)', [
-    ['mcporter call linear.create_comment --issue-id X', ['mcporter/mcporter:call@linear']],
-    [`mcporter call 'linear.create_comment(issueId: "LNR-123", body: "Hi")'`, ['mcporter/mcporter:call@linear']],
-    [`mcporter 'context7.resolve-library-id("React hooks docs", "react")'`, ['mcporter/mcporter:call@context7']],
-    ['mcporter call --server linear --tool create_comment', ['mcporter/mcporter:call@linear']], ['mcporter call linear create_comment', ['mcporter/mcporter:call@linear']],
-    ['mcporter call create_comment server=linear', ['mcporter/mcporter:call@linear']], ['mcporter call server=linear tool=create_comment', ['mcporter/mcporter:call@(other)']],
-    ['mcporter call --server other linear.create_comment', ['mcporter/mcporter:call@other']],
+    ['mcporter call linear.create_comment --issue-id X', ['mcporter/mcporter:call@(other)']],
+    [`mcporter call 'linear.create_comment(issueId: "LNR-123", body: "Hi")'`, ['mcporter/mcporter:call@(other)']],
+    [`mcporter 'context7.resolve-library-id("React hooks docs", "react")'`, ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --server linear --tool create_comment', ['mcporter/mcporter:call@(other)']], ['mcporter call linear create_comment', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call create_comment server=linear', ['mcporter/mcporter:call@(other)']], ['mcporter call server=linear tool=create_comment', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --server other linear.create_comment', ['mcporter/mcporter:call@(other)']],
     ['npx mcporter call https://mcp.context7.com/mcp.resolve-library-id', ['mcporter/mcporter:call@(http)']],
     ['mcporter call mcp.context7.com/mcp.resolve-library-id', ['mcporter/mcporter:call@(http)']],
     ['mcporter call --http-url https://mcp.example.org/mcp --server linear create_comment', ['mcporter/mcporter:call@(http)']],
     ['mcporter call --stdio "qmd mcp" query', ['mcporter/mcporter:call@(stdio)']], ['mcporter call "npx -y chrome-devtools-mcp@latest" list_pages', ['mcporter/mcporter:call@(stdio)']],
     ['mcporter call ./server.js tool', ['mcporter/mcporter:call@(stdio)']], ['mcporter call --server mcp.example.org tool', ['mcporter/mcporter:call@(other)']],
     ['mcporter call --server "npx -y some-mcp" tool', ['mcporter/mcporter:call@(stdio)']], ['mcporter call --server "my server" tool', ['mcporter/mcporter:call@(other)']],
-    ['mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@x']],
+    ['mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@(other)']],
     ['mcporter call', ['mcporter/mcporter:call@(unresolved)']], ['mcporter list socraticode --brief --no-oauth', ['mcporter/mcporter:list']],
     ['mcporter socraticode', ['mcporter/mcporter:list']], ['mcporter https://mcp.context7.com/mcp', ['mcporter/mcporter:list']], ['mcporter describe linear', ['mcporter/mcporter:list']],
     ['mcporter auth linear', ['mcporter/mcporter:auth']], ['mcporter daemon start', ['mcporter/mcporter:daemon']],
@@ -532,13 +532,24 @@ expect('git options: any reading of the option words reaches the subcommand, as 
   ])
   // ssh(1) (OpenSSH 9.6p1): the words after the destination are the command the remote host runs, so `ssh host bash -s` runs bash there
   // (a remote invocation of its own) and the heredoc it reads is its script.
+  // U1 pivot D5: a server of the stack (manifests/stack.json:280, :407, :629 and :966, and the coordinator's closed set) is emitted by name in
+  // every selector form; any other server reads (other), an HTTP or stdio selector (http) or (stdio).
+  check('cli lanes: the stack\'s own servers are read by name in every selector form', [
+    ['mcporter call socraticode.create_comment --issue-id X', ['mcporter/mcporter:call@socraticode']],
+    [`mcporter call 'serena.create_comment(issueId: "LNR-123", body: "Hi")'`, ['mcporter/mcporter:call@serena']],
+    [`mcporter 'jcodemunch.resolve-library-id("React hooks docs", "react")'`, ['mcporter/mcporter:call@jcodemunch']],
+    ['mcporter call --server ai-memory --tool create_comment', ['mcporter/mcporter:call@ai-memory']], ['mcporter call qmd create_comment', ['mcporter/mcporter:call@qmd']],
+    ['mcporter call create_comment server=headroom', ['mcporter/mcporter:call@headroom']],
+    ['mcporter --config c.json --log-level debug call context-mode.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@context-mode']],
+    ['mcporter call codebase-memory.search_graph', ['mcporter/mcporter:call@codebase-memory']],
+  ])
   check('cli lanes: data, lookups, registrations, remote strings, version and help, and programs a variable names', [
-    ['type qmd', ['-/type']], ['which qmd', ['-/which']], ['hash qmd', ['-/hash']], ['grep -n qmd notes.md', ['-/grep']], ['git commit -m "use toon"', ['-/git']],
-    ["echo 'rtk proxy ls'", ['-/echo']], ['echo "rtk proxy pytest"', ['-/echo']], ['git log --grep="rtk proxy"', ['-/git']], ['# qmd search x', []],
-    ['cat ~/.qmd/index.sqlite', ['-/cat']], ['ls toon/', ['-/ls']], ["git commit -m \"$(cat <<'EOF'\nqmd search x\nEOF\n)\"", ['-/git', '-/cat']],
-    ['cat <<EOF > run.sh\nrtk proxy pytest\nEOF', ['-/cat']], ['claude mcp add context-mode -- npx -y context-mode', ['-/claude']], ['codex mcp add qmd -- qmd mcp', ['-/codex']],
-    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['echo `ssh host "qmd get a"`', ['-/echo', '-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', '-/bash remote', 'qmd/qmd remote']],
-    ['$QMD search x', ['-/- unresolved']], ['"$QMD" search x', ['-/- unresolved']], ["'$QMD' search x", ['-/(other)']],
+    ['type qmd', ['-/-']], ['which qmd', ['-/-']], ['hash qmd', ['-/-']], ['grep -n qmd notes.md', ['-/-']], ['git commit -m "use toon"', ['-/-']],
+    ["echo 'rtk proxy ls'", ['-/-']], ['echo "rtk proxy pytest"', ['-/-']], ['git log --grep="rtk proxy"', ['-/-']], ['# qmd search x', []],
+    ['cat ~/.qmd/index.sqlite', ['-/-']], ['ls toon/', ['-/-']], ["git commit -m \"$(cat <<'EOF'\nqmd search x\nEOF\n)\"", ['-/-', '-/-']],
+    ['cat <<EOF > run.sh\nrtk proxy pytest\nEOF', ['-/-']], ['claude mcp add context-mode -- npx -y context-mode', ['-/-']], ['codex mcp add qmd -- qmd mcp', ['-/-']],
+    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['echo `ssh host "qmd get a"`', ['-/-', '-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', '-/bash remote', 'qmd/qmd remote']],
+    ['$QMD search x', ['-/- unresolved']], ['"$QMD" search x', ['-/- unresolved']], ["'$QMD' search x", ['-/-']],
     ['qmd --version', ['qmd/qmd excluded']], ['qmd search x --help', ['qmd/qmd excluded']], ['qmd search -- --help', qmd], ['qmd -h', qmd],
     ['toon --help', ['toon/toon excluded']], ['ai-memory --version', ['ai-memory/ai-memory excluded']],
   ])

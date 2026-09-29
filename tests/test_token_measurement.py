@@ -919,19 +919,29 @@ class TokenMeasurement(unittest.TestCase):
     def test_cli_lanes_mcporter_calls_count_for_the_downstream_server(self):
         # openclaw/mcporter@93e0916c (v0.14.1): global flags (cli-factory.ts:19), command inference
         # (command-inference.ts:10-95), call parsing (call-arguments.ts:79-233), target resolution (call-command.ts:114-173,
-        # 309-348). An HTTP selector or ad-hoc stdio command has no config name: it reads (http) or (stdio), never a host.
-        cases = {"mcporter call linear.create_comment --issue-id X": "linear",
-                 "mcporter call 'linear.create_comment(issueId: \"LNR-123\", body: \"Hi\")'": "linear",
-                 "mcporter 'context7.resolve-library-id(\"React hooks docs\", \"react\")'": "context7",
-                 "mcporter call --server linear --tool create_comment": "linear",
-                 "mcporter call linear create_comment": "linear",
-                 "mcporter call create_comment server=linear": "linear",
+        # 309-348). An HTTP selector or ad-hoc stdio command has no config name: it reads (http) or (stdio), never a host. U1 pivot
+        # D5: only the stack's own servers (manifests/stack.json:280, :407, :629, :966 and the coordinator's closed set) are emitted
+        # by name; any other server reads (other), so `linear` below is (other) while the same selector forms name `socraticode`.
+        cases = {"mcporter call linear.create_comment --issue-id X": "(other)",
+                 "mcporter call 'linear.create_comment(issueId: \"LNR-123\", body: \"Hi\")'": "(other)",
+                 "mcporter 'context7.resolve-library-id(\"React hooks docs\", \"react\")'": "(other)",
+                 "mcporter call --server linear --tool create_comment": "(other)",
+                 "mcporter call linear create_comment": "(other)",
+                 "mcporter call create_comment server=linear": "(other)",
                  # The first positional is the selector even with '=' (call-arguments.ts:170-172), so this names a
                  # server "server=linear", which is not name-shaped.
                  "mcporter call server=linear tool=create_comment": "(other)",
                  "npx mcporter call https://mcp.context7.com/mcp.resolve-library-id": "(http)",
                  "mcporter call \"npx -y chrome-devtools-mcp@latest\" list_pages": "(stdio)",
-                 "mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal": "x"}
+                 "mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal": "(other)",
+                 # the same selector forms with a server of the stack read by name
+                 "mcporter call socraticode.create_comment --issue-id X": "socraticode",
+                 "mcporter call 'socraticode.create_comment(issueId: \"LNR-123\", body: \"Hi\")'": "socraticode",
+                 "mcporter 'socraticode.resolve(\"React hooks docs\", \"react\")'": "socraticode",
+                 "mcporter call --server socraticode --tool create_comment": "socraticode",
+                 "mcporter call socraticode create_comment": "socraticode",
+                 "mcporter call create_comment server=socraticode": "socraticode",
+                 "mcporter --config c.json --log-level debug call socraticode.y --timeout 5000 --output json -- --literal": "socraticode"}
         for (command, server), (cli, _) in zip(cases.items(), self.lanes_of(list(cases))):
             with self.subTest(command=command):
                 self.assertEqual(cli, {**EMPTY_CLI, "mcporter_downstream": {server: downstream_row(succeeded=1)}})
@@ -1280,7 +1290,7 @@ class TokenMeasurement(unittest.TestCase):
             **EMPTY_CLI, "calls_with_lane_invocation": 3, "excluded_version_help": {"qmd": 1},
             "lanes": {"qmd": {**lane_row(calls=2, succeeded=1, failed=1), "actors_with_success": 1},
                       "rtk_proxy": {**lane_row(carrier="ctx", succeeded=1), "actors_with_success": 1}},
-            "mcporter_downstream": {"linear": downstream_row(succeeded=1)}})
+            "mcporter_downstream": {"(other)": downstream_row(succeeded=1)}})
         self.assertEqual(got["proxy"], proxy_row(calls=0, in_ctx_code=1))
         self.assertEqual(empty.get("cli_lanes"), {"status": "not_measured"})  # an aggregate of no measurements has no lane counts
 
@@ -1302,7 +1312,7 @@ class TokenMeasurement(unittest.TestCase):
             got = json.loads(p.stdout)
             cli = got["groups"]["all"]["measurement"].get("cli_lanes") or {}
             self.assertEqual(sorted(cli.get("lanes", {})), ["qmd", "rtk_proxy"])
-            self.assertEqual(sorted(cli.get("mcporter_downstream", {})), ["(http)", "linear"])
+            self.assertEqual(sorted(cli.get("mcporter_downstream", {})), ["(http)", "(other)"])
             self.assertEqual(cli.get("remote_invocations"), 1)
             self.assertEqual(got["actors"][0]["measurement"]["proxy"].get("invocations"), 1)
             for secret in [directory, "toolu_private", "context7", "buildhost", "example.net", "private query",
