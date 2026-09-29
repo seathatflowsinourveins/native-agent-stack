@@ -28,7 +28,8 @@ Rules and their sources (read 2026-09-29):
   lines 11, 26, 28 and 37 (image 20260920.314.1: Node.js 22.23.2, Python 3.12.3, npm 10.9.8).
 - The sibling contract for a provisioned venv: tests/test_promotion_gate.py, WorkflowProvisioningContract.
 
-Every message here carries a fixed reason code, never a path or the text of a command.
+Failure messages are fixed strings and reason codes: no assertion here prints a child process's output, a path or the
+text of a command.
 """
 
 from __future__ import annotations
@@ -177,9 +178,9 @@ class TripwireControls(unittest.TestCase):
 
     def assert_failed(self, done, reason):
         self.assertEqual(done.returncode, 1, f"the tripwire did not fail (exit {done.returncode})")
-        self.assertIn("FAILED (failures=1)", done.stderr)
-        self.assertIn(f"reason={reason}", done.stderr)
-        self.assertNotIn("skipped", done.stderr)
+        self.assertTrue("FAILED (failures=1)" in done.stderr, "the tripwire run did not report exactly one failure")
+        self.assertTrue(f"reason={reason}" in done.stderr, f"the tripwire run did not report reason={reason}")
+        self.assertFalse("skipped" in done.stderr, "the tripwire run skipped instead of failing")
 
     def copy_install(self, scratch):
         copy = Path(scratch) / "copy"
@@ -218,8 +219,8 @@ class TripwireControls(unittest.TestCase):
         with tempfile.TemporaryDirectory() as home:
             done = self.run_tripwire(home, **{ENV_NAME: str(self.install)})
         self.assertEqual(done.returncode, 0, f"the tripwire failed (exit {done.returncode})")
-        self.assertIn("OK", done.stderr)
-        self.assertNotIn("skipped", done.stderr)
+        self.assertTrue("OK" in done.stderr, "the tripwire run did not report OK")
+        self.assertFalse("skipped" in done.stderr, "the tripwire run skipped instead of running")
 
     def test_other_jobs_and_local_runs_skip_with_a_message(self):
         other = {"another job": {"GITHUB_JOB": "validate-macos"},
@@ -230,8 +231,8 @@ class TripwireControls(unittest.TestCase):
             with self.subTest(label), tempfile.TemporaryDirectory() as home:
                 done = self.run_tripwire(home, **extra)
                 self.assertEqual(done.returncode, 0, f"exit {done.returncode}")
-                self.assertIn("skipped", done.stderr)
-                self.assertIn("not the validate job of validate.yml", done.stderr)
+                self.assertTrue("skipped" in done.stderr, "the tripwire run did not skip")
+                self.assertTrue("not the validate job of validate.yml" in done.stderr, "the tripwire run gave no reason for skipping")
 
 
 def step_blocks(job_text):
@@ -349,8 +350,9 @@ class ProvisioningStepTests(unittest.TestCase):
 
     def test_the_provisioning_job_is_the_job_that_runs_the_suite(self):
         # The tripwire is keyed on this job name: renaming the job must not leave it skipping in CI.
-        self.assertIn(PROVISIONING_JOB, jobs(self.text))
-        self.assertTrue(any(runs_suite(step) for step in step_blocks(jobs(self.text)[PROVISIONING_JOB])))
+        job = jobs(self.text).get(PROVISIONING_JOB)
+        self.assertTrue(job is not None, "validate.yml has no job named as the tripwire expects")
+        self.assertTrue(any(runs_suite(step) for step in step_blocks(job)), "that job does not run the whole suite")
 
     def test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap(self):
         provisioning, without = set(), set()
@@ -394,7 +396,7 @@ class ProvisioningControls(unittest.TestCase):
         self.assertEqual(provisioning_problems(self.text), [])
         for label, (category, mutant) in self.mutants().items():
             with self.subTest(label):
-                self.assertNotEqual(mutant, self.text, "the mutation must apply")
+                self.assertTrue(mutant != self.text, "the mutation must apply")
                 self.assertIn(category, categories(mutant))
 
     def test_a_scratch_copy_of_the_workflow_without_the_step_fails_the_structure_tests(self):
@@ -445,9 +447,10 @@ class ProvisioningStepRuns(unittest.TestCase):
         result = self.run_step()
         directory = os.path.join(result.temp, os.path.basename(pin["install"]["default_directory"]))
         self.assertEqual(result.code, 0)
-        self.assertEqual(result.argv, [directory if word == "<directory>" else word for word in words[1:]])
+        self.assertTrue(result.argv == [directory if word == "<directory>" else word for word in words[1:]],
+                        "npm did not receive the pin's command with the directory filled in")
         self.assertTrue(result.made, "the step creates the directory before npm runs")
-        self.assertEqual(result.exported, self.PRIOR + f"{ENV_NAME}={directory}\n", "appended to the file, one line")
+        self.assertTrue(result.exported == self.PRIOR + f"{ENV_NAME}={directory}\n", "the step did not append exactly one export line")
 
     def test_it_refuses_a_command_without_exactly_one_directory_placeholder(self):
         for label, command in (("none", "npm install --ignore-scripts pkg@1"), ("two", "npm install --prefix <directory> <directory> pkg@1")):
@@ -456,8 +459,8 @@ class ProvisioningStepRuns(unittest.TestCase):
                 pin["install"]["command"] = command
                 result = self.run_step(pin)
                 self.assertNotEqual(result.code, 0)
-                self.assertIsNone(result.argv, "npm must not run")
-                self.assertEqual(result.exported, self.PRIOR)
+                self.assertTrue(result.argv is None, "npm must not run")
+                self.assertTrue(result.exported == self.PRIOR, "the step changed the GITHUB_ENV file")
 
     def test_it_refuses_a_command_that_is_not_an_npm_install(self):
         # `true` succeeds whatever it is given, so only the check can make this step fail.
@@ -465,8 +468,8 @@ class ProvisioningStepRuns(unittest.TestCase):
         pin["install"]["command"] = "true --prefix <directory>"
         result = self.run_step(pin)
         self.assertNotEqual(result.code, 0)
-        self.assertIsNone(result.argv, "nothing may run")
-        self.assertEqual(result.exported, self.PRIOR)
+        self.assertTrue(result.argv is None, "nothing may run")
+        self.assertTrue(result.exported == self.PRIOR, "the step changed the GITHUB_ENV file")
 
     def test_it_refuses_an_install_directory_name_that_could_inject_a_variable_or_leave_runner_temp(self):
         for label, name in (("newline", "tools/x\nNODE_OPTIONS=--require=evil"), ("dot dot", "tools/.."), ("space", "tools/a b"),
@@ -476,13 +479,13 @@ class ProvisioningStepRuns(unittest.TestCase):
                 pin["install"]["default_directory"] = name
                 result = self.run_step(pin)
                 self.assertNotEqual(result.code, 0)
-                self.assertIsNone(result.argv, "npm must not run")
-                self.assertEqual(result.exported, self.PRIOR)
+                self.assertTrue(result.argv is None, "npm must not run")
+                self.assertTrue(result.exported == self.PRIOR, "the step changed the GITHUB_ENV file")
 
     def test_a_failing_npm_fails_the_step_and_exports_nothing(self):
         result = self.run_step(npm_exit=1)
         self.assertNotEqual(result.code, 0)
-        self.assertEqual(result.exported, self.PRIOR)
+        self.assertTrue(result.exported == self.PRIOR, "the step changed the GITHUB_ENV file")
 
 
 class HostInstallLineTests(unittest.TestCase):
@@ -497,8 +500,9 @@ class HostInstallLineTests(unittest.TestCase):
     def test_the_handbook_gives_the_pin_command_with_the_default_directory(self):
         pin = load_pin()
         command = pin["install"]["command"].replace("<directory>", f'"$HOME/{pin["install"]["default_directory"]}"')
-        self.assertIn(command, self.handbook())
-        self.assertIn(ENV_NAME, self.handbook())
+        text = self.handbook()
+        self.assertTrue(command in text, "the handbook does not give the pin's install command with its default directory")
+        self.assertTrue(ENV_NAME in text, "the handbook does not name the directory override")
 
     @unittest.skipUnless(shutil.which("node") and shutil.which("bash"), "node and bash are not installed")
     def test_the_documented_check_reports_not_installed_on_a_clean_host(self):
