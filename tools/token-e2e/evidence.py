@@ -1110,32 +1110,32 @@ def retrieval_check(calls, urls, window, readings):
 
 # ---- Historical memory (R9) and T2 recovery (R2-17) ---------------------------------------------------------------
 
-def _stem(path):
-    name = path.rsplit("/", 1)[-1]
-    return name[:-3] if name.endswith(".md") else name
-
-
-def _bounded(text, token):
-    """True when `token` occurs in `text` with no name character on either side (a longer id is another record)."""
+def _names_path(text, path):
+    """True when `path` occurs in `text` as a whole path: no name character, '.' or '/' before it and no name character after
+    it, so `archive/<path>` and `<path>-old` are other pages."""
     start = 0
-    while True:
-        index = text.find(token, start)
+    while path:
+        index = text.find(path, start)
         if index < 0:
             return False
         before = text[index - 1] if index else " "
-        after = text[index + len(token)] if index + len(token) < len(text) else " "
-        if not (fc.is_word_char(before) or before == "-") and not (fc.is_word_char(after) or after == "-"):
+        after = text[index + len(path)] if index + len(path) < len(text) else " "
+        if not (fc.is_word_char(before) or before in "-./") and not (fc.is_word_char(after) or after == "-"):
             return True
         start = index + 1
+    return False
 
 
 def resolves_to_record(text, record):
-    """A result resolves to a frozen record when it names its path, its bare id or its content digest."""
+    """A result resolves to a frozen record when it names the record's whole path or its content digest (R9, U9-D13). The
+    bare file name is not the record: the store is shared by arms B, A and A0, and a later page can quote another file with
+    the same base name (`recipes/host-request-lane.md` is not `decisions/host-request-lane.md`), which would count as a
+    historical hit. The freeze keeps a path and a digest per record because `ai-memory search --json` rows carry no id."""
     if not isinstance(text, str):
         return False
     if record.get("content_sha256") and record["content_sha256"] in text:
         return True
-    return record["path"] in text or _bounded(text, _stem(record["path"]))
+    return _names_path(text, record["path"])
 
 
 def names_server_call(text, server):
