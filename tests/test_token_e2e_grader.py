@@ -152,7 +152,19 @@ def drop_task(prereg, task_id):
     return edit_prereg(prereg, lambda d: d.__setitem__("tasks", [t for t in d["tasks"] if t["id"] != task_id]))
 
 
+def require_toon():
+    """CI runners may lack the TOON CLI 4.1.1; the workstation acceptance run has it and must show 0 skips."""
+    if shutil.which("toon") is None:
+        raise unittest.SkipTest("needs the TOON CLI 4.1.1 on PATH")
+
+
+def require_node():
+    if shutil.which("node") is None:
+        raise unittest.SkipTest("needs node")
+
+
 def toon_encode(value):
+    require_toon()
     done = subprocess.run(["toon", "--encode"], input=json.dumps(value), capture_output=True, text=True, timeout=60)
     assert done.returncode == 0, f"toon --encode failed: {done.stderr[:200]}"
     return done.stdout.rstrip("\n")
@@ -291,10 +303,8 @@ class P0_SiblingPreflight(GraderCase):
     NODE_FIXTURE_AT_BASE = {"loadShellParser", "shellParserStatus", "commandInvocations", "callLedger",
                             "m14State", "validateIdentityTable"}
 
-    def test_preflight(self):
+    def test_python_interfaces(self):
         self.assertGreaterEqual(sys.version_info[:2], (3, 11))
-        toon = subprocess.run(["toon", "--version"], capture_output=True, text=True, timeout=30)
-        self.assertEqual(toon.stdout.strip(), "4.1.1", "TOON CLI 4.1.1 decides strict decode (R4)")
         self.assertEqual(sha256(sealed_bytes()), PREREG_SHA256, "the c0966da2 blob is the Amendment 3 seal")
         for module_dir, names in (
                 ("sota-convergence", {"transcript_audit": ["_parse", "_call_reads", "_within", "audit", "run_record_path",
@@ -312,18 +322,26 @@ class P0_SiblingPreflight(GraderCase):
                     self.assertTrue(hasattr(imported, attribute), f"{module}.{attribute} is missing")
         sys.path.insert(0, str(ROOT / "scripts"))
         self.assertTrue(hasattr(importlib.import_module("native_token_ci"), "markdown_elements"))
+        skill_usage = importlib.import_module("skill_usage")
+        missing_py = [] if hasattr(skill_usage, "inside_git_work_tree") else ["skill_usage.inside_git_work_tree"]
+        for path in ("README.md", "freeze_snapshot.py"):
+            self.assertTrue((TOOLS / path).is_file(), f"U8 file {path} is the placement contract")
+        sys.stderr.write(f"P0 fixture-shaped at this base: python={missing_py}\n")
+
+    def test_node_exports(self):
+        require_node()
         probe = ("import * as m from '" + str(ROOT / "examples/claude-native/workflows/child-usage.mjs")
                  + "'; console.log(JSON.stringify(Object.keys(m)))")
         node = subprocess.run(["node", "--input-type=module", "-e", probe], capture_output=True, text=True, timeout=60)
         self.assertEqual(node.returncode, 0, node.stderr[:200])
         exported = set(json.loads(node.stdout))
         self.assertEqual(self.NODE_PRESENT - exported, set(), "a present sibling export was renamed or removed")
-        missing_node = sorted(self.NODE_FIXTURE_AT_BASE - exported)
-        skill_usage = importlib.import_module("skill_usage")
-        missing_py = [] if hasattr(skill_usage, "inside_git_work_tree") else ["skill_usage.inside_git_work_tree"]
-        for path in ("README.md", "freeze_snapshot.py"):
-            self.assertTrue((TOOLS / path).is_file(), f"U8 file {path} is the placement contract")
-        sys.stderr.write(f"P0 fixture-shaped at this base: node={missing_node} python={missing_py}\n")
+        sys.stderr.write(f"P0 fixture-shaped at this base: node={sorted(self.NODE_FIXTURE_AT_BASE - exported)}\n")
+
+    def test_toon_cli_version(self):
+        require_toon()
+        toon = subprocess.run(["toon", "--version"], capture_output=True, text=True, timeout=30)
+        self.assertEqual(toon.stdout.strip(), "4.1.1", "TOON CLI 4.1.1 decides strict decode (R4)")
 
     def test_isolated_mode_cannot_import_the_tests_package(self):
         """Why correction 2 replaced `python3 -I -S`: the tests package is not importable under it."""
@@ -1839,6 +1857,8 @@ class F27b_CaptureCommand(GraderCase):
                            "E_CAPTURE", field="pre_arm")
 
     def test_post_arm_discards_a_changed_tree_and_lists_new_processes(self):
+        if not os.path.exists("/proc/stat"):
+            self.skipTest("needs Linux /proc for the process listing")
         self.assertEqual(self.capture("--phase", "pre-arm", "--family", "claude", "--arm", "B").returncode, 0)
         name = "u9s" + os.urandom(4).hex()  # comm is the executed file name: unique, so other sleepers never count
         link = self.tmp / name
@@ -2104,6 +2124,7 @@ class F19_Mutants(GraderCase):
                          "F5_SymbolSites.test_import_comment_and_string_sites_are_excluded"])
 
     def test_M6_no_strict(self):
+        require_toon()
         fc = load("frozen_checks")
         self.run_mutant([mock.patch.object(fc, "toon_decode_argv", lambda: ["toon", "--decode", "--no-strict"])],
                         ["F6_StrictDecode.test_decode_argv_never_carries_no_strict",

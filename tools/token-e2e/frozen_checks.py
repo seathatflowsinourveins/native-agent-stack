@@ -1050,6 +1050,8 @@ class GitSources:
     def __init__(self, repo, rev):
         self.repo, self.rev = str(repo), rev
         self._listing = {}
+        self._blobs = {}
+        self.parsed = {}
 
     def _git(self, *args, check=False):
         try:
@@ -1081,6 +1083,12 @@ class GitSources:
         wanted = list(paths)
         if not wanted:
             return {}
+        fetch = [path for path in wanted if path not in self._blobs]
+        if fetch:
+            self._blobs.update(self._batch(fetch))
+        return {path: self._blobs[path] for path in wanted}
+
+    def _batch(self, wanted):
         request = "".join(f"{self.rev}:{path}\n" for path in wanted).encode("utf-8")
         try:
             done = subprocess.run(["git", "-C", self.repo, "cat-file", "--batch"], input=request, capture_output=True,
@@ -1111,6 +1119,7 @@ class DirSources:
 
     def __init__(self, root):
         self.root = str(root)
+        self.parsed = {}
 
     def read(self, path):
         try:
@@ -1284,36 +1293,64 @@ def _enclosing_names(tree):
     return names
 
 
-def _mention_lines(text, symbol):
-    """Lines of comment and string tokens that hold the symbol as a whole word."""
-    lines = []
+def _token_strings(text):
+    """(line, string) of the comment and string tokens of a Python source."""
+    found = []
     kinds = {tokenize.COMMENT, tokenize.STRING}
     middle = getattr(tokenize, "FSTRING_MIDDLE", None)
     if middle is not None:
         kinds.add(middle)
     try:
         for token in tokenize.generate_tokens(io.StringIO(text).readline):
-            if token.type in kinds and word_positions(token.string, symbol, ignore_case=False):
-                lines.append(token.start[0])
+            if token.type in kinds:
+                found.append((token.start[0], token.string))
     except (tokenize.TokenError, IndentationError, SyntaxError):
         pass
-    return lines
+    return found
+
+
+class _Parsed:
+    """One Python source parsed once: the tree at once, comment/string tokens and enclosing names on demand."""
+
+    def __init__(self, data):
+        self.text, self.tree = parse_py(data)
+        self._tokens = self._enclosing = None
+
+    @property
+    def tokens(self):
+        if self._tokens is None:
+            self._tokens = _token_strings(self.text) if self.tree is not None else []
+        return self._tokens
+
+    @property
+    def enclosing(self):
+        if self._enclosing is None:
+            self._enclosing = _enclosing_names(self.tree) if self.tree is not None else {}
+        return self._enclosing
+
+
+def parsed_file(src, path, data):
+    if path not in src.parsed:
+        src.parsed[path] = _Parsed(data)
+    return src.parsed[path]
 
 
 def symbol_sites(src, prefixes, symbol, with_functions=False):
-    """Definition-independent site analysis of one symbol over the tracked Python files under the prefixes."""
+    """Definition-independent site analysis of one symbol over the tracked Python files under the prefixes. A file
+    that never spells the symbol has no site for it, so only files that do are parsed."""
     paths = [path for path in src.files(*prefixes) if path.endswith(".py")]
     sources = src.read_many(paths)
+    needle = symbol.encode("utf-8")
     name_calls, attr_calls, imports, mentions = [], [], [], []
     for path in paths:
         data = sources.get(path)
-        if data is None:
+        if data is None or needle not in data:
             continue
-        text, tree = parse_py(data)
-        if tree is None:
+        parsed = parsed_file(src, path, data)
+        if parsed.tree is None:
             continue
-        enclosing = _enclosing_names(tree) if with_functions else {}
-        for node in ast.walk(tree):
+        enclosing = parsed.enclosing if with_functions else {}
+        for node in ast.walk(parsed.tree):
             if isinstance(node, ast.Call):
                 if isinstance(node.func, ast.Name) and node.func.id == symbol:
                     entry = [path, node.lineno]
@@ -1324,7 +1361,8 @@ def symbol_sites(src, prefixes, symbol, with_functions=False):
                     attr_calls.append([path, node.lineno])
             elif isinstance(node, ast.ImportFrom) and any(alias.name == symbol for alias in node.names):
                 imports.append([path, node.lineno])
-        mentions.extend([path, line] for line in _mention_lines(text, symbol))
+        mentions.extend([path, line] for line, string in parsed.tokens
+                        if word_positions(string, symbol, ignore_case=False))
     for group in (name_calls, attr_calls, imports, mentions):
         group.sort()
     return {"name_calls": name_calls, "attr_calls": attr_calls, "imports": imports, "mentions": mentions}
@@ -1456,8 +1494,13 @@ def key_T9(src, params, prereg_src):
 
 def key_T10(src, params):
     sites = []
-    for path in [item for item in src.files("scripts") if item.endswith(".py")]:
-        _, tree = parse_py(_need(src.read(path)))
+    paths = [item for item in src.files("scripts") if item.endswith(".py")]
+    blobs = src.read_many(paths)
+    for path in paths:
+        data = _need(blobs.get(path))
+        if b"subprocess" not in data:
+            continue
+        tree = parsed_file(src, path, data).tree
         if tree is None:
             continue
         for node in ast.walk(tree):
