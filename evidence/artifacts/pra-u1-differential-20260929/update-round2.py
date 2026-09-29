@@ -4,12 +4,15 @@ the timing and the transcript states) stays as round 1 measured it, on the kerne
 
     python3 update-round2.py --repo <checkout> --scanner <0c421c66 child-usage.mjs> --baseline <33dcfd24 child-usage.mjs> --work <private dir> \\
         --real <real-commands.json> --real-until <instant> [--until-reconstructed] [--identity NAME=PATH ...] \\
-        [--sizes 2000,4000,8000,16000,32000] [--limit-ms 10000] [--counts <counts.json>]
+        [--differential NAME=INPUTS[:VALID] ...] [--sizes 2000,4000,8000,16000,32000] [--limit-ms 10000] [--counts <counts.json>]
 
 --scanner is the scanner reading of commit 0c421c66 (a second opinion in the shape scan) and --baseline the kernel that round 1 measured
 (`git show 33dcfd24:examples/claude-native/workflows/child-usage.mjs`, sha256 a9126a77...): the identity check compares its whole
 commandInvocations and cli_lanes records with the kernel of --repo on every --identity corpus (JSON arrays of shell texts, none filtered
-by bash -n), and scaling.mjs times both. --work holds copies of the two kernels beside the pin file and must stay outside every checkout.
+by bash -n), and scaling.mjs times both. --differential re-runs differential.mjs (no reduction) of --scanner against the kernel on a corpus
+(INPUTS a JSON array of shell texts, VALID the optional bash -n validity list of round 1) and records its totals with `equal_to_round1`: whether
+they equal round 1's record of the same corpus (`distinct_witnesses`, which needs a reduction, is not compared; null when round 1 has no record).
+--work holds copies of the two kernels beside the pin file and must stay outside every checkout.
 --real is the output of real-commands.mjs (--real-until its cutoff; --until-reconstructed says the cutoff was recovered rather than
 recorded). Why not the driver of round 1: it captures the covering tests again (which now hold new fixtures, so their count of 728
 would change), and recounts the live transcript store (which has grown, so the 5,074 files would not repeat).
@@ -31,6 +34,7 @@ parser.add_argument("--real", required=True)
 parser.add_argument("--real-until")
 parser.add_argument("--until-reconstructed", action="store_true")
 parser.add_argument("--identity", nargs="*", default=[], help="NAME=PATH of a list of shell texts")
+parser.add_argument("--differential", nargs="*", default=[], help="NAME=INPUTS[:VALID]: a corpus for the differential of --scanner against the kernel")
 parser.add_argument("--sizes", default="2000,4000,8000,16000,32000")
 parser.add_argument("--limit-ms", default="10000")
 parser.add_argument("--counts")
@@ -71,8 +75,17 @@ for spec in args.identity:
 scaling = {which: node("scaling.mjs", "--kernel", path, "--sizes", args.sizes, "--limit-ms", args.limit_ms) for which, path in (("baseline", baseline), ("kernel", kernel))}
 
 counts = json.loads(counts_path.read_text())
-counts.update({"corpus": corpus, "shapes": shapes, "lanes_identity": identity, "scaling": scaling,
-               "round2": {"sections": ["corpus", "shapes", "lanes_identity", "scaling"],
+rerun = {}
+for spec in args.differential:
+    name, paths = spec.split("=", 1)
+    inputs, _, valid = paths.partition(":")
+    totals = node("differential.mjs", "--old", scanner, "--new", kernel, "--inputs", inputs, *(["--valid", valid] if valid else []))
+    before = counts.get("differential", {}).get(name)
+    same = None if before is None else all(before.get(k) == v for k, v in totals.items())
+    rerun[name] = {**totals, "equal_to_round1": same}
+sections = ["corpus", "shapes", "lanes_identity", "scaling"] + (["differential_rerun"] if rerun else [])
+counts.update({"corpus": corpus, "shapes": shapes, "lanes_identity": identity, "scaling": scaling, **({"differential_rerun": rerun} if rerun else {}),
+               "round2": {"sections": sections,
                           "other_sections_measured_on_kernel_sha256": counts.get("kernels", {}).get("new_sha256")}})
 counts_path.write_text(json.dumps(counts, indent=1) + "\n")
 print(json.dumps({"written": str(counts_path.name), "kernel_sha256": identity["kernel_sha256"][:12],
