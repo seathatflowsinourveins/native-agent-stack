@@ -1161,7 +1161,7 @@ read is listed at the end of this subsection.
   1.1 s, 390,000 units of two-byte characters 0.9 s, 396,000 of four-byte 0.5 s, 9,900 texts 0.3 s, 1,000,000 words 0.2 s
   (40 keyring execs over a 20,000-word tail spend 1,005,859 in 0.18 s), 490 reads 0.03 s. 500 random mixes of 22
   adversarial building blocks at 199,000 characters took at most 0.9 s, and 64 shape families at 25,000 to 199,000
-  characters (`r6_scaling`) at most 1.1 s (the shapes that grow faster than linearly are one long shlex token, which the
+  characters at most 1.1 s (the shapes that grow faster than linearly are one long shlex token, which the
   200,000-character cap bounds at 0.5 s). The largest real command of this repository, an 82,000-character script written
   through a here-document, spends 35% of the characters, 1% of the words and under 1% of the texts and reads; the
   largest commit message (27,600 characters, read twice as a body) 57% of the characters. Nothing in the repository's

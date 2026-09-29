@@ -689,6 +689,9 @@ BLOCKED = {
 # The reviewer's fifth string in full: a here-document whose second line holds a quoted `#`, a dump, and 200,000 x after a last hash (the
 # guard's own limit refuses such a command as too large before check() reads it; check() itself blocks it too).
 BLOCKED["bash <<'EOF'\nprintf ' #x'\nprintenv\nEOF\n#" + "x" * 200000] = "environment_dump"
+# The first review's ps input in full: 70,000 `E`, a letter that is no flag and a dump (a regular expression backtracked on it for 13 s, past the
+# hook timeout; PATHOLOGICAL times it, this row blocks it behind rtk proxy and a keyring exec as well).
+BLOCKED["ps " + "E" * 70000 + "q; printenv"] = "environment_dump"
 
 # The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
 # variable that is not one of the guard's secret names, so only the keyring rules can catch it.
@@ -1296,6 +1299,9 @@ EXPECTED_PASS_THROUGH = [
     # sudo, nice and the older wrappers (`timeout 5 > out cmd` reads its duration `5` as a descriptor, and shlex splits `2>` and `2 >`
     # alike, so the walk cannot tell a descriptor from a value): the number is taken for the command.
     "sudo 2>/dev/null -u root printenv",
+    # macOS's legacy command mode (ps.c: `case 'e'` falls through to `case 'E'` when u03, the unix2003 flag, is off) reads a dashed `-e` as the
+    # environment display; the guard reads it as every process, as procps and macOS's default do, since refusing it would refuse every `ps -ef`.
+    "ps -e",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
@@ -2255,6 +2261,7 @@ class SecretPathGuardTests(unittest.TestCase):
             ("characters", 'echo "' + "\U0001f600" * 101_000 + '"'),  # four-byte characters count four times: 404,000 in one reading
             ("texts", "sh -c a;" * 12_000),  # 12,000 inline strings, each one text
             ("words", "kernel_keyring.py exec n X -- " * 6_000 + "printenv"),  # every hop emits the rest of the words again
+            ("words", "kernel_keyring.py exec n X -- " * 40 + "echo " + "w " * 60_000 + "; printenv"),  # 40 hops over a 60,000-word tail: 2.4 million
             ("reads", "".join(f"kernel_keyring.py exec n{i} X -- watch python3 a{i}; " for i in range(300))),  # 2 reads a segment: 600 of 500
         ]
         for kind, command in cases:
