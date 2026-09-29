@@ -3,10 +3,11 @@
 // call, not native evidence). Real runs are checked by passing their directory;
 // stored receipts from real runs are bound to the documentation by test-usage-receipts.mjs.
 import { summarizeChild, summarizeRun, latestRunDir, effortMismatches, modelGeneration, expectedModel, webSearch, childLanes, aggregateLanes, sweepLanes, fetchKind, mcpServer, safeKey, tokenStats, parseArgs, loadRtkDecisions, DEFAULT_MARKER, executedText, logFindPart, sensitivePart } from './child-usage.mjs'
-import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync, readFileSync, chmodSync } from 'node:fs'
+import * as kernel from './child-usage.mjs'
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync, utimesSync, readFileSync, chmodSync, copyFileSync, existsSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { tmpdir } from 'node:os'
+import { tmpdir, homedir } from 'node:os'
 import { join } from 'node:path'
 let passed = 0, failed = 0
 const expect = (n, c) => { console.log((c ? 'PASS ' : 'FAIL ') + n); if (c) passed++; else failed++ }
@@ -259,6 +260,17 @@ expect('fetch: an escaped character or a comment is data, and an unquoted heredo
   "cat <<'EOF'\n$(curl -s https://x.org)\nEOF", 'cat <<"EOF"\n$(curl -s https://x.org)\nEOF',
   'cat <<EOF\n\\$(curl https://x.org) and; curl https://x.org\nEOF', 'cat <<-EOF\n\t$(wget -q https://x.org)\n\tEOF',
 ].map(fetchKind)) === JSON.stringify([null, null, null, null, null, null, null, null, null, 'fetch', 'fetch', 'fetch', 'fetch', 'fetch', 'fetch', 'loopback', 'fetch', null, null, null, 'fetch']))
+// N1, the #432 residual (POSIX.1-2024 XCU 2.6.3 and 2.2.3): a heredoc inside "$( )" in double quotes, or inside a string a
+// shell runs, resolves like any other; quotes inside "$( )" do not end the string; a run string is that shell's input.
+{
+  const n1 = ["git commit -m \"$(cat <<'EOF'\nfix: don't \"break\" (it)\n\ncurl -s https://x.org\nEOF\n)\"", "bash -c 'cat <<EOF > x.sh\ncurl https://x.org\nEOF'",
+    'echo "$(echo "a" && curl https://x.org)"', 'bash -c "echo \\"a; curl https://x.org\\""', "ssh host 'bash -c \"curl https://x.org\"'"]
+  expect('fetch: a heredoc inside "$( )" or a run string is data, quotes inside "$( )" do not end it, and a run string is its shell\'s input',
+    JSON.stringify(n1.map(fetchKind)) === JSON.stringify([null, null, 'fetch', null, 'fetch']))
+  expect('executed text: a "$( )" body is shell text with its heredoc resolved, and a run string is analyzed after the outer escapes go',
+    JSON.stringify(n1.map((c) => executedText(c))) === JSON.stringify(["git commit -m \"$(cat <<'EOF'\n\n\n\n)\"", 'bash -c ;cat <<EOF > x.sh\n;',
+      'echo "$(echo "a" && curl https://x.org)"', 'bash -c ;echo "a  curl https://x.org";', 'ssh host ;bash -c ;curl https://x.org;;']))
+}
 expect('mcp: the server is the segment between mcp__ and the next __', mcpServer('mcp__plugin_context-mode_context-mode__ctx_execute') === 'plugin_context-mode_context-mode' && mcpServer('mcp__qmd__query') === 'qmd' && mcpServer('Bash') === null && mcpServer('mcp__') === null)
 {
   const odd = childLanes([ask('packet', 0), call('p1', 'mcp__constructor__query', {}, 1), call('p2', 'Skill', { skill: '/home/example/private/SKILL.md' }, 2), call('p3', 'Skill', { skill: 'tdd' }, 3), attach({ type: 'hook_success', hookName: 'SubagentStart:has space', hookEvent: 'SubagentStart', toolUseID: 's', command: 'x', stdout: '', stderr: '', exitCode: 0 }, 0)])
@@ -383,8 +395,403 @@ const gitRun = timed(() => [logFindPart(gitWitness), sensitivePart(gitWitness)])
 expect('redos: repeated --git-dir option words are read in linear time', gitRun.ms < 1000 && gitRun.r.join() === 'false,false')
 const codeRun = timed(() => ['node -', 'bun -', 'deno eval -'].map((p) => executedText(p + '-- -'.repeat(28) + " 'fetch(u)'", { inlineHttp: true })))
 expect('redos: repeated interpreter option words are matched in linear time', codeRun.ms < 1000)
+// Nesting witnesses (2026-09-28): without NESTING_LIMIT both threw RangeError (maximum call stack size), aborting a sweep.
+const deepRun = timed(() => { try { return ['"$('.repeat(3000), Array.from({ length: 3000 }, (_, i) => 'bash <<E' + i).join('\n')].map((c) => executedText(c).length + executedText(c, { inlineHttp: true }).length) } catch (e) { return e } })
+expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read without exhausting the stack', Array.isArray(deepRun.r) && deepRun.ms < 1000)
+// D8 (GPT-6 #9, Claude review R9): the M4 text scanners read a run of unclosed "((" in linear time. Before the repair each
+// unclosed "((" looked ahead to the end of its line, so n = 8000, 16000 and 32000 took about 315, 1100 and 5000 ms (four times
+// per doubling). Each size is timed as the best of five runs; a run over 1.5 s ends the doubling (it is far past the bound
+// already), and 5 ms of the allowance is timer and GC noise, not growth. The brief's requirement, at most 2.5 times per doubling and
+// under 150 ms at 64,000, applies to that input (about 30 ms here); the other shapes below keep the ratio and take an absolute
+// bound of 1.5 s at 64,000, since each does real work per unit and a CI runner is slower than this host.
+{
+  const ratio = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5)
+  // Best of five per size; when the ratio fails, up to two more rounds and the elementwise minimum of all rounds, so one pause
+  // (a GC or a busy runner) cannot fail a linear scan, while a quadratic one fails every round.
+  const doubling = (make, run) => {
+    run(make(2000)); run(make(2000)) // warm-up
+    let best = []
+    for (let round = 0; round < 3 && !ratio(best); round++) {
+      const ms = []
+      for (const n of [8000, 16000, 32000, 64000]) {
+        const input = make(n)
+        let t = Infinity
+        for (let i = 0; i < 5; i++) { t = Math.min(t, timed(() => run(input)).ms); if (t > 1500) break }
+        ms.push(t)
+        if (t > 1500) break // far past the bound already
+      }
+      best = best.length ? ms.map((t, i) => Math.min(t, best[i] ?? Infinity)) : ms
+    }
+    return best
+  }
+  const linear = (ms) => ratio(ms) && ms[3] < 150 // the brief's bound, for '(('.repeat(n) + 'qmd'
+  const linearWork = (ms) => ratio(ms) && ms[3] < 1500 // every other shape
+  const shape = (label, make, reader, run, bound = linearWork) => {
+    const ms = doubling(make, run)
+    expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', bound(ms))
+  }
+  const dparen = (n) => '(('.repeat(n) + 'qmd'
+  shape('a run of unclosed ((', dparen, 'executedText', (c) => executedText(c), linear)
+  shape('a run of unclosed ((', dparen, 'executedText inlineHttp', (c) => executedText(c, { inlineHttp: true }), linear)
+  shape('a run of unclosed $((', (n) => '$(('.repeat(n) + 'qmd', 'executedText', (c) => executedText(c))
+  shape('unclosed (( inside a double-quoted "$( "', (n) => 'echo "$( ' + '(('.repeat(n), 'executedText', (c) => executedText(c))
+  shape('a run of heredoc operators after (', (n) => '(<<E'.repeat(n), 'executedText', (c) => executedText(c))
+  // The run-string detectors read the text built so far at every quote: on a long script that was one flattening and one scan of the
+  // whole prefix per quote, so a script of n quoted words cost n squared (a 346 KB script took 2 s a scan, and the kernel scans each shell
+  // call several times).
+  shape('a run of quoted words', (n) => "'a'".repeat(n), 'executedText', (c) => executedText(c))
+  shape('a run of double-quoted substitutions', (n) => '"$(a)"'.repeat(n), 'executedText, inlineHttp', (c) => executedText(c, { inlineHttp: true }))
+  shape('a run of run strings', (n) => 'bash -c "x" '.repeat(n), 'executedText', (c) => executedText(c))
+  shape('a run of words with # inside', (n) => 'a#'.repeat(n), 'executedText', (c) => executedText(c))
+  shape('a long script of echo, substitution and pipe lines', (n) => Array.from({ length: Math.ceil(n / 8) }, (_, i) => 'echo "step ' + i + ': $(date +%s)" >> log.txt; qmd search "term ' + i + '" -n 2 | head -5').join('\n'), 'fetchKind', (c) => fetchKind(c))
+  // D8 for the command-position layer (GPT-6 #9; Claude review R9). The parser reads these texts in linear time, but the walk over a node's
+  // children with child(i) and fieldNameForChild(i) cost O(i) per call in web-tree-sitter 0.27.0, so a flat run of unclosed constructs
+  // (one wide ERROR node) or of comments (one wide program node) took four times as long for twice the text: '(('.repeat(n) + 'qmd'
+  // took 467, 1853 and 7369 ms at n = 8000, 16000 and 32000 (GPT-6 measured 320, 1266 and 4992 ms at 3cb7c4f6). Each text is about
+  // 2n characters at most. A run of unclosed `a=(` or of `<<` is not here: the parse itself is quadratic (tree-sitter-bash's error
+  // recovery and heredoc scanner), which no reading can change (README, "What the parser costs").
+  if ((await kernel.loadShellParser()).ok) {
+    const lanes = (c) => kernel.commandInvocations(c)
+    const runs = (unit, tail = '') => (n) => unit.repeat(Math.ceil((2 * n) / unit.length)) + tail
+    shape('a run of unclosed ((', dparen, 'commandInvocations', lanes)
+    shape('a run of unclosed $(', runs('$(', 'qmd'), 'commandInvocations', lanes)
+    shape('a run of unclosed "$(', runs('"$(', 'qmd'), 'commandInvocations', lanes)
+    shape('a run of unclosed $((', runs('$(( ', 'qmd'), 'commandInvocations', lanes)
+    shape('a run of backquotes', runs('`'), 'commandInvocations', lanes)
+    shape('a run of unclosed {', runs('{ '), 'commandInvocations', lanes)
+    shape('a run of unclosed if', runs('if a; then '), 'commandInvocations', lanes)
+    shape('a run of unclosed case', runs('case x in a) '), 'commandInvocations', lanes)
+    shape('a run of comment lines', runs('# c\n'), 'commandInvocations', lanes)
+  }
+}
 expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
   logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')
   && !logFindPart('git status') && sensitivePart('git -C repo branch -a') && sensitivePart('git --git-dir=.g show HEAD:a') && !sensitivePart('git -C repo status'))
+// CLI lanes (#381 AA-PLAN PR-A item 3; U1 design sections 2 and 7). commandInvocations reads every simple command of the text
+// a shell runs (POSIX.1-2024 XCU 2.9.1-2.9.4 and 2.6.3) past assignments, reserved words, wrappers, package runners and `rtk
+// proxy`, and names lane executables by exact basename; data, lookups and registrations run none. Each invocation is shown
+// as lane/program[:op][@server] plus its flags, with '-' for no lane or no program.
+{
+  // The lane reading needs the verified tree-sitter-bash install (loadShellParser; CHILD_USAGE_SHELL_PARSER or the default directory).
+  const laneParser = await kernel.loadShellParser()
+  if (!laneParser.ok) console.log('SKIP cli lanes: no verified tree-sitter-bash install (' + laneParser.reason + '); see shell-parser.pin.json for the install command')
+  const show = (i) => (i.lane ?? '-') + '/' + (i.program ?? '-') + (i.op ? ':' + i.op : '') + (i.server ? '@' + i.server : '')
+    + (i.excluded ? ' excluded' : '') + (i.remote ? ' remote' : '') + (i.unresolved ? ' unresolved' : '')
+  const read = (c) => {
+    try { return typeof kernel.commandInvocations === 'function' ? kernel.commandInvocations(c).map(show) : ['(not exported)'] } catch (e) { return ['(threw ' + e.name + ')'] }
+  }
+  const check = (name, cases) => {
+    if (!laneParser.ok) return
+    const bad = cases.filter(([c, want]) => JSON.stringify(read(c)) !== JSON.stringify(want)).map(([c]) => JSON.stringify(c) + ' => ' + JSON.stringify(read(c)))
+    expect(name + (bad.length ? ' [' + bad.join('; ') + ']' : ''), bad.length === 0)
+  }
+  const qmd = ['qmd/qmd'], proxy = 'rtk_proxy/rtk:proxy'
+  check('cli lanes: POSIX, GNU and sudo wrappers are read to the utility they run', [
+    ['timeout -k 5 60 qmd search x', qmd], ['timeout --signal=KILL -v 60 qmd search x', qmd], ['env -u X markitdown f.pdf', ['markitdown/markitdown']],
+    ['env -C d repomix', ['repomix/repomix']], ['env -i -- FOO=1 qmd status', qmd], ['env -S "qmd search x"', qmd], ['nice -n 10 repomix', ['repomix/repomix']],
+    ['sudo -u u ai-memory status', ['ai-memory/ai-memory']], ['sudo -E VAR=1 qmd status', qmd], ['command qmd status', qmd], ['command -p qmd status', qmd],
+    ['time -p toon f.json', ['toon/toon']], ['stdbuf -oL qmd search x', qmd], ['nohup qmd update &', qmd], ['exec qmd mcp', qmd], ['FOO=1 BAR=2 qmd status', qmd],
+    ['find . -print0 | xargs -0 -n1 markitdown', ['-/-', 'markitdown/markitdown']], ['xargs', ['-/-']],
+  ])
+  check('cli lanes: an option a wrapper does not document leaves the program unresolved, and a lookup or non-run mode runs none', [
+    ['command -v qmd', []], ['command -V qmd', []], ['sudo -l qmd', []], ['exec -a name qmd mcp', ['-/- unresolved']], ['exec -- qmd mcp', ['-/- unresolved']], ['xargs -P 4 qmd get', ['-/- unresolved']],
+    ['nice -10 qmd update', ['-/- unresolved']], ['env --bogus qmd', ['-/- unresolved']], ['timeout 60', []],
+  ])
+  check('cli lanes: compound commands, substitutions, shell strings and shell heredocs', [
+    ['for f in *.pdf; do markitdown "$f"; done', ['markitdown/markitdown']], ['if qmd status; then :; fi', ['qmd/qmd', '-/-']],
+    ['(cd d && qmd status)', ['-/-', 'qmd/qmd']], ['{ qmd get a; }', qmd], ['! qmd search x', qmd], ['x=$(qmd get a)', qmd],
+    ['echo "$(qmd get a)"', ['-/-', 'qmd/qmd']], ['echo `qmd get a`', ['-/-', 'qmd/qmd']], ["bash -c 'qmd search x'", ['-/bash', 'qmd/qmd']],
+    ['sh -c "rtk proxy pytest"', ['-/sh', proxy, '-/-']], ["bash <<'EOF'\nqmd search x\nEOF", ['-/bash', 'qmd/qmd']],
+    ['cat <<EOF\n$(qmd get a)\nEOF', ['-/-', 'qmd/qmd']], ['qmd search x 2>&1 >/dev/null | head -n 5', ['qmd/qmd', '-/-']],
+    ['echo $(date) qmd', ['-/-', '-/-']], ['cat <(qmd get a)', ['-/-', 'qmd/qmd']],
+  ])
+  // childrenOf reads a node of more than 16 children with a cursor and a narrower one by index (node.child(i) is O(i) in web-tree-sitter
+  // 0.27.0); the two must read alike, so each text below has a node wide enough for the cursor (a command's words, its assignment prefixes,
+  // a list, the branches of a case, a run of comments, and the arguments a heredoc operator carries).
+  const many = (n, f) => Array.from({ length: n }, (_, i) => f(i)), plain = (n) => many(n, () => '-/-')
+  check('cli lanes: a node of many children (read with a cursor) reads like a narrow one', [
+    ['echo ' + many(40, (i) => 'w' + i).join(' ') + '; qmd status', ['-/-', 'qmd/qmd']],
+    [many(30, (i) => 'A' + i + '=1').join(' ') + ' qmd status', qmd],
+    [many(40, (i) => 'x' + i).join('; ') + '; qmd status', [...plain(40), 'qmd/qmd']],
+    ['case x in ' + many(30, (i) => 'a' + i + ') :;; ').join('') + 'b) qmd status;; esac', [...plain(30), 'qmd/qmd']],
+    [many(20, (i) => '# c' + i).join('\n') + '\nqmd status', qmd],
+    ['bash <<E' + ' -e'.repeat(20) + '\nqmd status\nE', ['-/bash', 'qmd/qmd']],
+  ])
+  check('cli lanes: rtk proxy after global options, its own options and an optional --; one spaced argument is split and no shell runs it', [
+    ['rtk proxy qmd search x', [proxy, 'qmd/qmd']], ["rtk proxy 'qmd search x'", [proxy, 'qmd/qmd']], ['rtk --ultra-compact proxy pytest', [proxy, '-/-']],
+    ['rtk -v proxy pytest', [proxy, '-/-']], ['rtk -vv --skip-env proxy pytest', [proxy, '-/-']], ['rtk proxy -- qmd status', [proxy, 'qmd/qmd']],
+    ['rtk proxy --skip-env qmd status', [proxy, 'qmd/qmd']], ['rtk proxy -v qmd', [proxy, '-/-']], ['rtk proxy', [proxy]],
+    ["rtk proxy 'cd repo && qmd x'", [proxy, '-/-']], ['cd repo && rtk proxy pytest -q', ['-/-', proxy, '-/-']], ['FOO=1 rtk proxy pytest', [proxy, '-/-']],
+    ['rtk proxy --help', [proxy + ' excluded']], ['rtk --version', ['rtk_proxy/rtk excluded']], ['rtk -V', ['rtk_proxy/rtk excluded']],
+    ['rtk proxy qmd --version', [proxy, 'qmd/qmd excluded']], ['rtk git status', ['-/rtk']], ['rtk proxy npx repomix', [proxy, 'repomix/repomix']],
+  ])
+  check('cli lanes: npm and PyPI runners map their package to the lane; --package and --from name the executable', [
+    ['npx -y repomix --mcp', ['repomix/repomix']], ['npx repomix@latest', ['repomix/repomix']], ['npx @toon-format/cli f.json', ['toon/toon']],
+    ['npx @tobilu/qmd@2.8.3 search x', qmd], ['npx --package=@tobilu/qmd -- qmd search x', qmd], ['bunx @tobilu/qmd search x', qmd],
+    ['bun x repomix', ['repomix/repomix']], ['pnpm dlx repomix', ['repomix/repomix']], ['yarn dlx @toon-format/cli f.json', ['toon/toon']],
+    ['uvx jcodemunch-mcp', ['jcodemunch-mcp/jcodemunch-mcp']], ['uvx --from serena-agent serena start-mcp-server', ['serena/serena']],
+    ['uvx markitdown==0.1.8 f.pdf', ['markitdown/markitdown']], ['uv tool run markitdown f.pdf', ['markitdown/markitdown']], ['pipx run headroom-ai', ['headroom/headroom']],
+    ['python3 -m markitdown f.pdf', ['markitdown/markitdown']], ['npx markitdown f.pdf', ['-/markitdown']], ['npx -c "qmd search x"', ['-/- unresolved']],
+    ['uvx --bogus qmd', ['-/- unresolved']], ['npx repomix --version', ['repomix/repomix excluded']],
+  ])
+  check('cli lanes: lane executables by exact basename; gcm and serena-hooks are not lane executables', [
+    ['serena init', ['serena/serena']], ['serena-agent start', ['serena/serena-agent']], ['context-mode doctor', ['context-mode/context-mode']],
+    ["codebase-memory-mcp cli search_graph '{}'", ['codebase-memory-mcp/codebase-memory-mcp']], ['/usr/local/bin/qmd search x', qmd],
+    ['headroom mcp serve --proxy-url http://127.0.0.1:1', ['headroom/headroom']], ['jcodemunch-mcp', ['jcodemunch-mcp/jcodemunch-mcp']],
+    ['gcm chat', ['-/-']], ['serena-hooks pre-tool', ['-/-']], ['qmdx', ['-/-']], ['my-repomix', ['-/-']],
+  ])
+  check('cli lanes: mcporter operations, and the downstream server of a call (never a host)', [
+    ['mcporter call linear.create_comment --issue-id X', ['mcporter/mcporter:call@(other)']],
+    [`mcporter call 'linear.create_comment(issueId: "LNR-123", body: "Hi")'`, ['mcporter/mcporter:call@(other)']],
+    [`mcporter 'context7.resolve-library-id("React hooks docs", "react")'`, ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --server linear --tool create_comment', ['mcporter/mcporter:call@(other)']], ['mcporter call linear create_comment', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call create_comment server=linear', ['mcporter/mcporter:call@(other)']], ['mcporter call server=linear tool=create_comment', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --server other linear.create_comment', ['mcporter/mcporter:call@(other)']],
+    ['npx mcporter call https://mcp.context7.com/mcp.resolve-library-id', ['mcporter/mcporter:call@(http)']],
+    ['mcporter call mcp.context7.com/mcp.resolve-library-id', ['mcporter/mcporter:call@(http)']],
+    ['mcporter call --http-url https://mcp.example.org/mcp --server linear create_comment', ['mcporter/mcporter:call@(http)']],
+    ['mcporter call --stdio "qmd mcp" query', ['mcporter/mcporter:call@(stdio)']], ['mcporter call "npx -y chrome-devtools-mcp@latest" list_pages', ['mcporter/mcporter:call@(stdio)']],
+    ['mcporter call ./server.js tool', ['mcporter/mcporter:call@(stdio)']], ['mcporter call --server mcp.example.org tool', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --server "npx -y some-mcp" tool', ['mcporter/mcporter:call@(stdio)']], ['mcporter call --server "my server" tool', ['mcporter/mcporter:call@(other)']],
+    ['mcporter --config c.json --log-level debug call x.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call', ['mcporter/mcporter:call@(unresolved)']], ['mcporter list socraticode --brief --no-oauth', ['mcporter/mcporter:list']],
+    ['mcporter socraticode', ['mcporter/mcporter:list']], ['mcporter https://mcp.context7.com/mcp', ['mcporter/mcporter:list']], ['mcporter describe linear', ['mcporter/mcporter:list']],
+    ['mcporter auth linear', ['mcporter/mcporter:auth']], ['mcporter daemon start', ['mcporter/mcporter:daemon']],
+    ['mcporter --version', ['mcporter/mcporter:version excluded']], ['mcporter -v', ['mcporter/mcporter:version excluded']], ['mcporter -V', ['mcporter/mcporter:version excluded']],
+    ['mcporter', ['mcporter/mcporter:help excluded']], ['mcporter help', ['mcporter/mcporter:help excluded']], ['mcporter -h', ['mcporter/mcporter:help excluded']],
+    ['mcporter call linear.create_comment --help', ['mcporter/mcporter:call excluded']], ['mcporter serve --help', ['mcporter/mcporter:serve excluded']],
+  ])
+  // openclaw/mcporter@93e0916c (v0.14.1; the installed 0.14.1 binary reads every case below the same way): a global flag is removed only as the
+  // exact word --config, --root, --log-level or --oauth-timeout with its value in the next word (src/cli/cli-factory.ts:19; extractFlags matches a
+  // token by equality, src/cli/flag-utils.ts:12), and the call and ad-hoc flags are matched by equality too (src/cli/call-arguments.ts:63,115;
+  // src/cli/ephemeral-flags.ts:30), so a flag written with = is not one of them: on a call it is the generic --key=value named argument
+  // (call-arguments.ts:120-121, :333), and before the command it is the command word itself. `mcporter --config=c.json list x` therefore
+  // reads as the implicit call `list.x` (a command word with a dot), and `mcporter call --server=qmd x.y` calls the server x, not qmd.
+  check('cli lanes: mcporter takes a flag written with = as a named argument or a command word, never as a global, server or ad-hoc server flag', [
+    ['mcporter --config=c.json list x', ['mcporter/mcporter:call@(other)']], ['mcporter --root=. list x', ['mcporter/mcporter:call@(other)']],
+    ['mcporter --log-level=debug list', ['mcporter/mcporter:list']], ['mcporter --config c.json list x', ['mcporter/mcporter:list']],
+    ['mcporter call --server=qmd x.y', ['mcporter/mcporter:call@(other)']], ['mcporter call --server qmd x.y', ['mcporter/mcporter:call@qmd']],
+    ['mcporter call --mcp=qmd x.y', ['mcporter/mcporter:call@(other)']], ['mcporter call --http-url=https://mcp.example.org/mcp x.y', ['mcporter/mcporter:call@(other)']],
+    ['mcporter call --http-url https://mcp.example.org/mcp x.y', ['mcporter/mcporter:call@(http)']],
+  ])
+  // ssh(1) (OpenSSH 9.6p1): the words after the destination are the command the remote host runs, so `ssh host bash -s` runs bash there
+  // (a remote invocation of its own) and the heredoc it reads is its script.
+  // U1 pivot D5: a server of the stack (manifests/stack.json:280, :407, :629 and :966, and the coordinator's closed set) is emitted by name in
+  // every selector form; any other server reads (other), an HTTP or stdio selector (http) or (stdio).
+  check('cli lanes: the stack\'s own servers are read by name in every selector form', [
+    ['mcporter call socraticode.create_comment --issue-id X', ['mcporter/mcporter:call@socraticode']],
+    [`mcporter call 'serena.create_comment(issueId: "LNR-123", body: "Hi")'`, ['mcporter/mcporter:call@serena']],
+    [`mcporter 'jcodemunch.resolve-library-id("React hooks docs", "react")'`, ['mcporter/mcporter:call@jcodemunch']],
+    ['mcporter call --server ai-memory --tool create_comment', ['mcporter/mcporter:call@ai-memory']], ['mcporter call qmd create_comment', ['mcporter/mcporter:call@qmd']],
+    ['mcporter call create_comment server=headroom', ['mcporter/mcporter:call@headroom']],
+    ['mcporter --config c.json --log-level debug call context-mode.y --timeout 5000 --output json -- --literal', ['mcporter/mcporter:call@context-mode']],
+    ['mcporter call codebase-memory.search_graph', ['mcporter/mcporter:call@codebase-memory']],
+  ])
+  check('cli lanes: data, lookups, registrations, remote strings, version and help, and programs a variable names', [
+    ['type qmd', ['-/-']], ['which qmd', ['-/-']], ['hash qmd', ['-/-']], ['grep -n qmd notes.md', ['-/-']], ['git commit -m "use toon"', ['-/-']],
+    ["echo 'rtk proxy ls'", ['-/-']], ['echo "rtk proxy pytest"', ['-/-']], ['git log --grep="rtk proxy"', ['-/-']], ['# qmd search x', []],
+    ['cat ~/.qmd/index.sqlite', ['-/-']], ['ls toon/', ['-/-']], ["git commit -m \"$(cat <<'EOF'\nqmd search x\nEOF\n)\"", ['-/-', '-/-']],
+    ['cat <<EOF > run.sh\nrtk proxy pytest\nEOF', ['-/-']], ['claude mcp add context-mode -- npx -y context-mode', ['-/-']], ['codex mcp add qmd -- qmd mcp', ['-/-']],
+    ["ssh host 'qmd search x'", ['-/ssh', 'qmd/qmd remote']], ['echo `ssh host "qmd get a"`', ['-/-', '-/ssh', 'qmd/qmd remote']], ['ssh host bash -s <<EOF\nqmd search x\nEOF', ['-/ssh', '-/bash remote', 'qmd/qmd remote']],
+    ['$QMD search x', ['-/- unresolved']], ['"$QMD" search x', ['-/- unresolved']], ["'$QMD' search x", ['-/-']],
+    ['qmd --version', ['qmd/qmd excluded']], ['qmd search x --help', ['qmd/qmd excluded']], ['qmd search -- --help', qmd], ['qmd -h', qmd],
+    ['toon --help', ['toon/toon excluded']], ['ai-memory --version', ['ai-memory/ai-memory excluded']],
+  ])
+  // GPT-6 #10 (U1 pivot D5): `program` is a fixed name, never text from the command: it is set only for a lane executable or a name
+  // this reading interprets itself (a wrapper, a shell, eval, ssh, rtk); any other program reads null, however name-shaped it is.
+  if (laneParser.ok) {
+    const programs = (c) => { try { return kernel.commandInvocations(c).map((i) => i.program) } catch (e) { return ['(threw ' + e.name + ')'] } }
+    const want = [['my-private-host.example', [null]], ['call_PRIVATE.search x', [null]], ['git status', [null]], ['./deploy-secret-name --now', [null]],
+      ['qmd search x', ['qmd']], ['/usr/local/bin/toon f.json', ['toon']], ['rtk git status', ['rtk']], ["bash -c 'x'", ['bash', null]],
+      ['env FOO=1 my-private-host.example', [null]], ['npx some-private-package', [null]], ['npx repomix', ['repomix']], ['uvx private-pkg', [null]],
+      ['xargs my-private-host.example', [null]], ['echo $(my-private-host.example)', [null, null]], ["ssh host 'qmd get a'", ['ssh', 'qmd']]]
+    const bad = want.filter(([c, p]) => JSON.stringify(programs(c)) !== JSON.stringify(p)).map(([c]) => JSON.stringify(c) + ' => ' + JSON.stringify(programs(c)))
+    expect('cli lanes: a program name is emitted only for a lane executable or a name the reading interprets' + (bad.length ? ' [' + bad.join('; ') + ']' : ''), bad.length === 0)
+  }
+  // D9 (GPT-6 #13, Claude review R2): the earlier assertion read every input through read(), which turns an exception into an
+  // array whose length is an integer, so it passed when every stress input threw. The stress reader below lets an exception
+  // fail the check, and a mutation control shows that it does. '$('.repeat(3000) is the unquoted nesting that walks past
+  // NESTING_LIMIT (the '"$(' input stays inside the quoted-data scan, which never reaches that guard).
+  const stressInputs = ['env -u X '.repeat(4000) + 'qmd', 'rtk -v '.repeat(4000) + 'proxy qmd', 'timeout -k 1 '.repeat(3000) + '5 qmd', '"$('.repeat(3000),
+    '$('.repeat(3000), 'mcporter call --x '.repeat(4000) + 'a.b', '(('.repeat(4000) + 'qmd', "'".repeat(8001)]
+  const stress = (invocations) => {
+    const threw = []
+    const run = timed(() => stressInputs.map((c) => { try { return invocations(c).length } catch (e) { threw.push(e.name); return -1 } }))
+    return { ms: run.ms, threw, lengths: run.r }
+  }
+  const stressPasses = (s) => s.ms < 1000 && s.threw.length === 0 && s.lengths.every((n) => Number.isInteger(n) && n >= 0)
+  const throwing = (c) => { if (c.length > 5000) throw new RangeError('mutation control'); return kernel.commandInvocations(c) }
+  // The mutation control needs no parser: the reader below throws for every long input, and the check must fail for it.
+  const mutated = stress((c) => { if (c.length > 5000) throw new RangeError('mutation control'); return [] })
+  expect('cli lanes: the stress check fails when every long input throws (mutation control) [threw ' + mutated.threw.length + ' of ' + stressInputs.length + ']',
+    mutated.threw.length === stressInputs.filter((c) => c.length > 5000).length && !stressPasses(mutated))
+  if (laneParser.ok) {
+    const real = stress(kernel.commandInvocations)
+    expect('cli lanes: long and deeply nested commands are read in linear time without exhausting the stack [' + real.ms.toFixed(0) + ' ms, threw: ' + (real.threw.join() || 'none') + ']', stressPasses(real))
+    const partial = stress(throwing)
+    expect('cli lanes: the same check fails on the real reader wrapped to throw for long input [threw ' + partial.threw.length + ']', !stressPasses(partial))
+    // D4(a): a string that a shell, eval or ssh runs is read again up to NESTING_LIMIT (32) levels; the text of a deeper level is one
+    // unresolved record and never a lane, and nothing throws or leaves a tree open (the stress inputs above never reach this guard).
+    const nested = (n) => {
+      const found = kernel.commandInvocations('eval '.repeat(n) + 'qmd status')
+      return { evals: found.filter((i) => i.program === 'eval').length, lanes: found.filter((i) => i.lane === 'qmd').length, unresolved: found.filter((i) => i.unresolved).length }
+    }
+    const depth = JSON.stringify([nested(31), nested(32), nested(33), nested(3000)])
+    expect('cli lanes: 32 levels of eval are read, the 33rd is one unresolved record and never a lane, and 3,000 levels neither throw nor leave a tree open [' + depth + ']',
+      depth === JSON.stringify([{ evals: 31, lanes: 1, unresolved: 0 }, { evals: 32, lanes: 1, unresolved: 0 }, { evals: 33, lanes: 0, unresolved: 1 }, { evals: 33, lanes: 0, unresolved: 1 }])
+      && kernel.openShellTrees() === 0)
+  }
+}
+// D1 (U1 pivot brief): loadShellParser verifies the pinned tree-sitter-bash install (shell-parser.pin.json: the sha256 of every
+// pinned file and both npm integrity values of the install's package-lock.json) before anything loads, and never falls back to the
+// text scanners: without the parser commandInvocations returns null and measurement says so (cli_lanes.status
+// parser_unavailable, proxy.rule prefix_fallback). The expected values below are the ones the coordinator provisioned and this
+// stage re-verified against the npm registry (dist.integrity) and the installed files (sha256sum) on 2026-09-29.
+{
+  const load = typeof kernel.loadShellParser === 'function' ? kernel.loadShellParser : async () => ({ ok: false, reason: '(loadShellParser is not exported)' })
+  const status = typeof kernel.shellParserStatus === 'function' ? kernel.shellParserStatus : () => ({ ok: false, reason: '(shellParserStatus is not exported)' })
+  const PACKAGES = {
+    'web-tree-sitter': { version: '0.27.0', integrity: 'sha512-XK08gj6RwTMQatAG7uVRP8MunqotL/XC19vHgkSPKmELgbGPBj4ECvB8haHOUnyj6ls2B8t42UTro14zxGgAHg==' },
+    'tree-sitter-bash': { version: '0.25.1', integrity: 'sha512-7hMytuYIMoXOq24yRulgIxthE9YmggZIOHCyPTTuJcu6EU54tYD+4G39cUb28kxC6jMf/AbPfWGLQtgPTdh3xw==' },
+  }
+  const FILES = {
+    'node_modules/tree-sitter-bash/package.json': '757d74350c9a8cf2635010326ef3b28b59c392e705906af4d98e5a45fcaff32d',
+    'node_modules/tree-sitter-bash/tree-sitter-bash.wasm': '8292919c88a0f7d3fb31d0cd0253ca5a9531bc1ede82b0537f2c63dd8abe6a7a',
+    'node_modules/web-tree-sitter/package.json': '707dd14277ba63ca8dcaad6b6df8051e23df78c878b5cbdc27885b3cfd72bfac',
+    'node_modules/web-tree-sitter/web-tree-sitter.cjs': '743de33347202f863b6714fc7218c455d93f751943d43500500f6c5c65654dce',
+    'node_modules/web-tree-sitter/web-tree-sitter.js': '7c49e3c1d87e24e0bb4c2def909d17154dfde281f5f8280225450090bb4b8110',
+    'node_modules/web-tree-sitter/web-tree-sitter.wasm': 'c03bccdc3b448a32848f5ae327e209c982bbb0840d43eec8bc2d5759544a1ed3',
+  }
+  const same = (a, b) => typeof kernel.sortedJson === 'function' && kernel.sortedJson(a) === kernel.sortedJson(b)
+  const RECORD = { versions: { tree_sitter_bash: '0.25.1', web_tree_sitter: '0.27.0' },
+    wasm_sha256: { tree_sitter_bash: FILES['node_modules/tree-sitter-bash/tree-sitter-bash.wasm'], web_tree_sitter: FILES['node_modules/web-tree-sitter/web-tree-sitter.wasm'] } }
+  let pin = null
+  try { pin = JSON.parse(readFileSync(new URL('./shell-parser.pin.json', import.meta.url), 'utf8')) } catch { pin = null }
+  expect('parser pin: shell-parser.pin.json pins both packages (version, npm integrity, upstream tag), the six files and the install command',
+    pin !== null && Object.entries(PACKAGES).every(([name, p]) => pin.packages?.[name]?.version === p.version && pin.packages[name].integrity === p.integrity
+      && typeof pin.packages[name].upstream?.tag === 'string' && /^[0-9a-f]{40}$/.test(pin.packages[name].upstream?.tag_commit ?? ''))
+    && same(pin.files, FILES) && typeof pin.install?.command === 'string' && pin.install.command.includes('--ignore-scripts') && pin.install.command.includes('web-tree-sitter@0.27.0 tree-sitter-bash@0.25.1'))
+  const home = process.env.CHILD_USAGE_SHELL_PARSER || join(homedir(), '.local', 'share', 'codex-ecosystem', 'tools', 'tree-sitter-bash-0.25.1')
+  const installed = existsSync(join(home, 'package-lock.json'))
+  const tmp = mkdtempSync(join(tmpdir(), 'shell-parser-'))
+  try {
+    const missing = await load(join(tmp, 'absent'))
+    expect('parser: a directory with no install is not_installed [' + JSON.stringify(missing) + ']', same(missing, { ok: false, reason: 'not_installed' }))
+    // An explicit --shell-parser that cannot be honored is an error (exit 2 like --rtk-db and --exceptions), never a silent default.
+    const flagRoot = join(tmp, 'flag-sweep'), flagFile = join(flagRoot, 'proj', 'sess', 'subagents', 'agent-a1.jsonl')
+    mkdirSync(join(flagFile, '..'), { recursive: true })
+    writeFileSync(flagFile, JSON.stringify({ type: 'user', timestamp: T(1), message: { role: 'user', content: 'go' } }) + '\n')
+    utimesSync(flagFile, new Date('2026-09-27T00:00:00Z'), new Date('2026-09-27T00:00:00Z'))
+    const refused = spawnSync(process.execPath, [fileURLToPath(new URL('./child-usage.mjs', import.meta.url)), '--lanes-sweep', '--root', flagRoot, '--shell-parser', join(tmp, 'absent')],
+      { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp } })
+    expect('parser: --shell-parser naming a directory with no install exits 2 with the reason and no report [' + refused.status + ', ' + JSON.stringify(refused.stderr.slice(0, 80)) + ']',
+      refused.status === 2 && refused.stderr.includes('--shell-parser') && refused.stderr.includes('not_installed') && refused.stdout === '' && !refused.stderr.includes(tmp))
+    expect('parser: without the parser commandInvocations returns null (no fallback to the scanners) and the status says why [' + JSON.stringify(status()) + ']',
+      kernel.commandInvocations('qmd search x') === null && same(status(), { ok: false, reason: 'not_installed' }))
+    const rows = [
+      { type: 'assistant', timestamp: T(1), message: { content: [{ type: 'tool_use', id: 'p1', name: 'Bash', input: { command: 'rtk proxy pytest' } }] } },
+      { type: 'user', timestamp: T(1), message: { content: [{ type: 'tool_result', tool_use_id: 'p1', content: 'ok', is_error: false }] } },
+      { type: 'assistant', timestamp: T(2), message: { content: [{ type: 'tool_use', id: 'p2', name: 'Bash', input: { command: 'cd repo && rtk proxy pytest -q' } }] } },
+      { type: 'user', timestamp: T(2), message: { content: [{ type: 'tool_result', tool_use_id: 'p2', content: 'ok', is_error: false }] } },
+      { type: 'assistant', timestamp: T(3), message: { content: [{ type: 'tool_use', id: 'p3', name: 'Bash', input: { command: 'qmd search x && curl https://example.org' } }] } },
+      { type: 'user', timestamp: T(3), message: { content: [{ type: 'tool_result', tool_use_id: 'p3', content: 'ok', is_error: false }] } },
+    ]
+    const closed = kernel.measureTranscript(rows)
+    expect('parser: cli_lanes reports parser_unavailable with the reason and no lane counts [' + JSON.stringify(closed.cli_lanes) + ']', same(closed.cli_lanes, { status: 'parser_unavailable', reason: 'not_installed' }))
+    expect('parser: without the parser proxy uses the prefix rule and says so; the counts that need the parser are unknown [' + JSON.stringify(closed.proxy) + ']',
+      closed.proxy.rule === 'prefix_fallback' && closed.proxy.calls === 1 && closed.proxy.prefix_rule_calls === 1 && closed.proxy.invocations === null && closed.proxy.in_ctx_code === null
+      && closed.by_carrier.rtk_proxy?.results === 1 && closed.by_carrier.bash?.results === 2)
+    expect('parser: M4 stays text-based and is unchanged without the parser [' + JSON.stringify([closed.m4.shell_fetch, closed.m4.fetch_mentions_unconfirmed]) + ']', closed.m4.shell_fetch === 1 && closed.m4.fetch_mentions_unconfirmed === 0)
+    expect('parser: withShellTree returns null and opens no tree without the parser', typeof kernel.withShellTree === 'function' && kernel.withShellTree('a=1', () => 1) === null && kernel.openShellTrees?.() === 0)
+    const agg = kernel.aggregateMeasurements([closed, closed])
+    expect('parser: an aggregate of measurements without the parser says so [' + JSON.stringify(agg.cli_lanes) + ']', agg.cli_lanes?.status === 'parser_unavailable' && agg.cli_lanes.reason === 'not_installed' && agg.proxy.rule === 'prefix_fallback' && agg.proxy.invocations === null)
+    expect('parser: an aggregate of no measurements is not_measured [' + JSON.stringify(kernel.aggregateMeasurements([]).cli_lanes) + ']', kernel.aggregateMeasurements([]).cli_lanes?.status === 'not_measured')
+    if (!installed) console.log('SKIP parser: no tree-sitter-bash install at the default directory (or CHILD_USAGE_SHELL_PARSER); the installed, hash_mismatch and parse checks need it')
+    else {
+      const copy = (name, tamper = () => {}) => {
+        const dest = join(tmp, name)
+        for (const rel of [...Object.keys(FILES), 'package-lock.json']) { mkdirSync(join(dest, rel, '..'), { recursive: true }); copyFileSync(join(home, rel), join(dest, rel)) }
+        tamper(dest)
+        return dest
+      }
+      const append = (rel, text) => (dest) => writeFileSync(join(dest, rel), Buffer.concat([readFileSync(join(dest, rel)), Buffer.from(text)]))
+      // One byte of the file changed in place (bit 0 of the middle byte): the same length, so only the hash can tell.
+      const flip = (rel) => (dest) => { const b = readFileSync(join(dest, rel)); b[b.length >> 1] ^= 1; writeFileSync(join(dest, rel), b) }
+      const good = await load(copy('good'))
+      expect('parser: the pinned install loads and reports versions and the two wasm sha256 values, never a path [' + JSON.stringify(good) + ']',
+        good.ok === true && same({ versions: good.versions, wasm_sha256: good.wasm_sha256 }, RECORD) && !JSON.stringify(good).includes(tmp) && !JSON.stringify(good).includes(homedir()))
+      expect('parser: shellParserStatus repeats the loaded record', same(status(), good) && kernel.commandInvocations('qmd search x')?.length === 1)
+      const opened = kernel.withShellTree?.('a=( qmd )', (root) => [root.type, root.hasError, root.firstNamedChild?.type])
+      expect('parser: withShellTree hands over the tree root and frees the tree [' + JSON.stringify(opened) + ']', same(opened, ['program', false, 'variable_assignment']) && kernel.openShellTrees?.() === 0)
+      let threw = null
+      try { kernel.withShellTree?.('a=1', () => { throw new RangeError('visitor failed') }) } catch (e) { threw = e.name }
+      expect('parser: a visitor that throws still frees the tree [' + threw + ', open ' + kernel.openShellTrees?.() + ']', threw === 'RangeError' && kernel.openShellTrees?.() === 0)
+      const cases = [
+        ['one flipped byte in the bash grammar wasm', 'wasm', flip('node_modules/tree-sitter-bash/tree-sitter-bash.wasm')],
+        ['a modified web-tree-sitter.js, which is never imported', 'js', append('node_modules/web-tree-sitter/web-tree-sitter.js', '\nglobalThis.__shellParserPwned = true\n')],
+        ['a modified package.json', 'pkg', append('node_modules/tree-sitter-bash/package.json', ' ')],
+        ['another integrity value in package-lock.json', 'lock', (dest) => writeFileSync(join(dest, 'package-lock.json'), readFileSync(join(dest, 'package-lock.json'), 'utf8').replace('sha512-7hMytu', 'sha512-XXXXXX'))],
+        ['another version in package-lock.json', 'version', (dest) => writeFileSync(join(dest, 'package-lock.json'), readFileSync(join(dest, 'package-lock.json'), 'utf8').replace('"version": "0.27.0"', '"version": "0.27.1"'))],
+      ]
+      for (const [what, name, tamper] of cases) {
+        const r = await load(copy('bad-' + name, tamper))
+        expect('parser: ' + what + ' is hash_mismatch, and the parser stays unavailable [' + JSON.stringify(r) + ']',
+          same(r, { ok: false, reason: 'hash_mismatch' }) && status().ok === false && kernel.commandInvocations('qmd') === null && globalThis.__shellParserPwned === undefined)
+      }
+      if (typeof process.getuid === 'function' && process.getuid() !== 0) {
+        const locked = copy('locked', (dest) => chmodSync(join(dest, 'node_modules/tree-sitter-bash/tree-sitter-bash.wasm'), 0o000))
+        const denied = await load(locked)
+        chmodSync(join(locked, 'node_modules/tree-sitter-bash/tree-sitter-bash.wasm'), 0o600)
+        expect('parser: a pinned file that cannot be read is load_error, not a hash mismatch [' + JSON.stringify(denied) + ']', same(denied, { ok: false, reason: 'load_error' }) && kernel.commandInvocations('qmd') === null)
+      } else console.log('SKIP parser: the unreadable-file check needs a non-root user')
+      for (const rel of Object.keys(FILES)) {
+        const r = await load(copy('flip-' + rel.replaceAll('/', '_'), flip(rel)))
+        expect('parser: one flipped byte in ' + rel + ' is hash_mismatch and leaves no parser [' + JSON.stringify(r) + ']',
+          same(r, { ok: false, reason: 'hash_mismatch' }) && status().ok === false && kernel.commandInvocations('qmd') === null && globalThis.__shellParserPwned === undefined)
+      }
+      const partial = await load(copy('partial', (dest) => rmSync(join(dest, 'node_modules/web-tree-sitter/web-tree-sitter.wasm'))))
+      expect('parser: an install with a pinned file missing is not_installed and leaves no parser [' + JSON.stringify(partial) + ']', same(partial, { ok: false, reason: 'not_installed' }) && kernel.commandInvocations('qmd') === null)
+      const noLock = await load(copy('no-lock', (dest) => rmSync(join(dest, 'package-lock.json'))))
+      expect('parser: an install without its package-lock.json is not_installed and leaves no parser [' + JSON.stringify(noLock) + ']', same(noLock, { ok: false, reason: 'not_installed' }) && kernel.commandInvocations('qmd') === null)
+      const again = await load(copy('good-again'))
+      expect('parser: a good install loads again after failures [' + JSON.stringify(again) + ']', again.ok === true && kernel.commandInvocations('qmd search x')?.length === 1)
+      const open = kernel.measureTranscript(rows)
+      expect('parser: with the parser cli_lanes is measured and records the parser, and proxy follows command position [' + JSON.stringify([open.cli_lanes?.status, open.cli_lanes?.parser, open.proxy.rule, open.proxy.calls]) + ']',
+        open.cli_lanes?.status === 'measured' && same(open.cli_lanes.parser, RECORD) && open.proxy.rule === 'command_position' && open.proxy.calls === 2 && open.proxy.prefix_rule_calls === 1)
+      const aggOpen = kernel.aggregateMeasurements([open, open])
+      expect('parser: an aggregate of measured transcripts keeps the parser record and sums lanes [' + JSON.stringify([aggOpen.cli_lanes?.status, aggOpen.cli_lanes?.parser]) + ']',
+        aggOpen.cli_lanes?.status === 'measured' && same(aggOpen.cli_lanes.parser, RECORD) && aggOpen.cli_lanes.lanes.qmd?.calls === 2)
+      expect('parser: an aggregate that mixes measured and unavailable transcripts is incomplete [' + JSON.stringify(kernel.aggregateMeasurements([open, closed]).cli_lanes?.status) + ']', kernel.aggregateMeasurements([open, closed]).cli_lanes?.status === 'incomplete')
+      // Directory order: an explicit argument, then the environment (CHILD_USAGE_SHELL_PARSER), then the ecosystem default under HOME.
+      const emptyHome = join(tmp, 'home'); mkdirSync(emptyHome)
+      const goodDir = join(tmp, 'good')
+      const probe = (env, ...argument) => {
+        const script = 'import * as k from ' + JSON.stringify(new URL('./child-usage.mjs', import.meta.url).href) + '; process.stdout.write(JSON.stringify(await k.loadShellParser(...' + JSON.stringify(argument) + ')))'
+        const r = spawnSync(process.execPath, ['--input-type=module', '-e', script], { encoding: 'utf8', env: { PATH: process.env.PATH, ...env } })
+        try { return JSON.parse(r.stdout) } catch { return { ok: false, reason: '(no output: ' + r.stderr.slice(0, 120) + ')' } }
+      }
+      const order = [probe({ HOME: emptyHome }), probe({ HOME: emptyHome, CHILD_USAGE_SHELL_PARSER: goodDir }), probe({ HOME: emptyHome, CHILD_USAGE_SHELL_PARSER: join(tmp, 'absent') }),
+        probe({ HOME: emptyHome, CHILD_USAGE_SHELL_PARSER: join(tmp, 'absent') }, goodDir), probe({ HOME: emptyHome, CHILD_USAGE_SHELL_PARSER: '' })]
+      expect('parser: directory order is the argument, then CHILD_USAGE_SHELL_PARSER, then the default under HOME [' + order.map((r) => r.ok ? 'ok' : r.reason).join(',') + ']',
+        order.map((r) => r.ok ? 'ok' : r.reason).join() === 'not_installed,ok,not_installed,ok,not_installed')
+      // The CLI flag, in a sweep over one child transcript with one shell call.
+      const root = join(tmp, 'sweep'), file = join(root, 'proj', 'sess', 'subagents', 'agent-a1.jsonl')
+      mkdirSync(join(file, '..'), { recursive: true })
+      writeFileSync(file, rows.map((r) => JSON.stringify({ ...r, timestamp: r.timestamp })).join('\n') + '\n')
+      utimesSync(file, new Date('2026-09-27T00:00:00Z'), new Date('2026-09-27T00:00:00Z'))
+      const sweep = (...flags) => {
+        const r = spawnSync(process.execPath, [fileURLToPath(new URL('./child-usage.mjs', import.meta.url)), '--lanes-sweep', '--root', root, '--since', '2026-09-25T17:18:00Z', '--until', '2026-09-26T15:05:00Z', ...flags],
+          { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: emptyHome } })
+        try { return { status: r.status, cli: JSON.parse(r.stdout).groups.all.measurement.cli_lanes } } catch { return { status: r.status, cli: '(no report: ' + r.stderr.slice(0, 120) + ')' } }
+      }
+      const withFlag = sweep('--shell-parser', goodDir), without = sweep()
+      expect('parser: --shell-parser names the install; without it the default under HOME (empty here) is not_installed [' + JSON.stringify([withFlag.cli?.status, without.cli]) + ']',
+        withFlag.status === 0 && withFlag.cli?.status === 'measured' && same(withFlag.cli.parser, RECORD) && without.status === 0 && same(without.cli, { status: 'parser_unavailable', reason: 'not_installed' }))
+      expect('parser: --shell-parser needs a value and is given once [' + JSON.stringify([parseArgs(['--lanes-sweep', '--root', 'a', '--shell-parser', 'd']).shellParser, parseArgs(['--lanes-sweep', '--root', 'a', '--shell-parser']).error]) + ']',
+        parseArgs(['--lanes-sweep', '--root', 'a', '--shell-parser', 'd']).shellParser === 'd' && Boolean(parseArgs(['--lanes-sweep', '--root', 'a', '--shell-parser']).error)
+        && Boolean(parseArgs(['--lanes-sweep', '--root', 'a', '--shell-parser', 'd', '--shell-parser', 'e']).error))
+    }
+  } finally { rmSync(tmp, { recursive: true, force: true }); await load() }
+}
 console.log('SUMMARY passed=' + passed + ' failed=' + failed + ' total=' + (passed + failed))
 process.exit(failed ? 1 : 0)
