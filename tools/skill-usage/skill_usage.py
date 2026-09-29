@@ -840,6 +840,58 @@ def catalog_texts(record: dict) -> list[str]:
 CODEX_COUNTERS = ("input_tokens", "cached_input_tokens", "output_tokens",
                   "reasoning_output_tokens", "total_tokens")
 MEASUREMENT_MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
+# Codex tools whose command the bridge reads as a Bash call (a local_shell_call is one as well).
+CODEX_SHELL_TOOLS = ("exec_command", "shell_command", "shell")
+# The unified exec response header of openai/codex rust-v0.157.1 (36650394) core/src/tools/context.rs:524-548:
+# "Chunk ID: <id>" (omitted when empty), "Wall time: <s> seconds", "Process exited with code <n>" when the
+# process ended, "Process running with session ID <id>" while it runs, "Original token count: <n>", then the
+# line "Output:" and the output itself (:550-575).
+EXEC_HEADER_SECTIONS = 5
+EXEC_EXITED = "Process exited with code "
+EXEC_RUNNING = "Process running with session ID "
+
+
+def codex_call_name(payload: dict) -> str:
+    """A function or custom call's tool name. Native FunctionCall keeps namespace separate
+    (models.rs:1073-1088), so an MCP namespace is joined back in front of its tool name."""
+    name, namespace = payload.get("name", "unknown"), payload.get("namespace") or ""
+    if namespace.startswith("mcp__") and not name.startswith("mcp__"):
+        name = namespace.rstrip("_") + "__" + name
+    return name
+
+
+def exec_header_state(output) -> tuple[bool, str | None]:
+    """(is_error, native_state) of a shell call's result read from its unified exec header alone, for a call
+    with no persisted item state: a rollout output never carries the success flag (protocol/src/models.rs:
+    2173-2182) and legacy history mode persists no CommandExecution item (rollout/src/policy.rs:94-112).
+    An exit code of 0 is success and any other exit a failure. A running process (write_stdin can report a
+    live process with an exit code, core/src/unified_exec/process_manager.rs:1066-1071), a header without
+    either line, or text without the header leaves the state unknown. Only the lines before "Output:" are
+    read, with a linear line scan and no regular expression."""
+    if isinstance(output, list):
+        first = output[0] if output else None
+        output = first.get("text") if isinstance(first, dict) else None
+    if not isinstance(output, str) or not output.startswith(("Chunk ID: ", "Wall time: ")):
+        return False, "unknown"
+    start, code, running = 0, None, False
+    for _ in range(EXEC_HEADER_SECTIONS + 1):
+        end = output.find("\n", start)
+        line = output[start:] if end < 0 else output[start:end]
+        if line == "Output:":
+            if running or code is None:
+                return False, "unknown"
+            return code != 0, None
+        if line.startswith(EXEC_RUNNING):
+            running = True
+        elif line.startswith(EXEC_EXITED):
+            digits = line[len(EXEC_EXITED):]
+            digits = digits[1:] if digits.startswith("-") else digits
+            if digits.isascii() and digits.isdigit():
+                code = int(line[len(EXEC_EXITED):])
+        if end < 0:
+            break
+        start = end + 1
+    return False, "unknown"
 
 
 def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
@@ -943,11 +995,32 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     failed_ids = {r.get("payload", {}).get("item", {}).get("id") for r in visible
                   if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
                   and r.get("payload", {}).get("item", {}).get("status") == "failed"}
+    # A declined command never ran: events.rs:562-573 ends a rejected exec with exit -1 and status declined.
+    declined_ids = {r.get("payload", {}).get("item", {}).get("id") for r in visible
+                    if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
+                    and r.get("payload", {}).get("item", {}).get("status") == "declined"}
     item_states = {r["payload"]["item"].get("id"): r["payload"]["item"].get("status") for r in visible
                    if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
                    and isinstance(r.get("payload", {}).get("item"), dict)}
     model_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
                       if r.get("type") == "response_item" and r.get("payload", {}).get("type") in CALL_PAYLOAD_TYPES}
+    shell_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
+                      if r.get("type") == "response_item" and (
+                          r.get("payload", {}).get("type") == "local_shell_call"
+                          or (r.get("payload", {}).get("type") == "function_call"
+                              and codex_call_name(r["payload"]).rsplit(".", 1)[-1] in CODEX_SHELL_TOOLS))}
+
+    def result_state(key, output) -> dict:
+        """The kernel's is_error and native_state for a call's model-visible output: a persisted item state
+        decides when there is one; otherwise a shell call's unified exec header does (exec_header_state)."""
+        if key in declined_ids:
+            return {"is_error": True, "native_state": "declined"}
+        if key in failed_ids:
+            return {"is_error": True}
+        if key in shell_call_ids and item_states.get(key) is None:
+            failed, state = exec_header_state(output)
+            return {"is_error": failed, **({"native_state": state} if state else {})}
+        return {"is_error": False}
 
     def arguments(value):
         if isinstance(value, dict):
@@ -962,7 +1035,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         normalized.append({"type": role, "timestamp": r["timestamp"], "message": {"content": [block]}})
 
     def use(r, key, name, inputs, *, sandbox=False, code_mode=False):
-        if name.rsplit(".", 1)[-1] in ("exec_command", "shell_command", "shell"):
+        if name.rsplit(".", 1)[-1] in CODEX_SHELL_TOOLS:
             name, inputs = "Bash", {"command": shell_script(inputs.get("cmd", inputs.get("command", "")))}
         emit(r, {"type": "tool_use", "id": key, "name": name, "input": inputs,
                  "sandbox": sandbox, "code_mode": code_mode, "native_status": item_states.get(key)}, "assistant")
@@ -978,10 +1051,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         if r.get("type") == "response_item":
             kind, key = p.get("type"), p.get("call_id") or p.get("id") or f"missing-{index}"
             if kind in ("function_call", "custom_tool_call"):
-                # Native FunctionCall keeps namespace separate (models.rs:1073-1088).
-                name, namespace = p.get("name", "unknown"), p.get("namespace") or ""
-                if namespace.startswith("mcp__") and not name.startswith("mcp__"):
-                    name = namespace.rstrip("_") + "__" + name
+                name = codex_call_name(p)
                 code_mode = kind == "custom_tool_call" and name.rsplit(".", 1)[-1] == "exec"
                 if code_mode:
                     active_exec.add(key)
@@ -993,7 +1063,8 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                 active_exec.clear()
                 use(r, key, "Bash", {"command": shell_script((p.get("action") or {}).get("command"))})
             elif kind in ("function_call_output", "custom_tool_call_output"):
-                emit(r, {"type": "tool_result", "tool_use_id": key, "content": p.get("output"), "is_error": key in failed_ids}, "user")
+                emit(r, {"type": "tool_result", "tool_use_id": key, "content": p.get("output"),
+                         **result_state(key, p.get("output"))}, "user")
                 active_exec.discard(key)
         elif r.get("type") == "event_msg" and p.get("type") == "item_completed":
             item = p.get("item") or {}
@@ -1014,8 +1085,10 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                 action = item.get("action") or {}
                 use(r, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
             if has_output and key not in output_ids:
+                status = item.get("status")
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": output,
-                         "is_error": item.get("status") == "failed"}, "user")
+                         "is_error": status in ("failed", "declined"),
+                         **({"native_state": "declined"} if status == "declined" else {})}, "user")
         elif r.get("type") == "event_msg" and p.get("type") in ("task_started", "task_complete", "turn_aborted"):
             active_exec.clear()
     window = {"since": since.timestamp() * 1000 if since else -8640000000000000,

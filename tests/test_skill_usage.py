@@ -1021,6 +1021,35 @@ class CodexLanes(unittest.TestCase):
                 self.assertEqual(got["cli_lanes"]["lanes"], {"qmd": row})
                 self.assert_id_free(got)
 
+    def test_exec_header_state_reads_only_the_pinned_header(self):
+        # context.rs:524-548 sections before "Output:"; the exit code is an i32 written in decimal. A running line
+        # wins over an exit line (write_stdin can report both, unified_exec/process_manager.rs:1066-1071).
+        unknown, ok, failed = (False, "unknown"), (False, None), (True, None)
+        cases = {
+            "exit 0": (exec_response("Process exited with code 0", "x"), ok),
+            "exit 1": (exec_response("Process exited with code 1", "x"), failed),
+            "exit -1": (exec_response("Process exited with code -1", "x"), failed),
+            "no chunk id": ("Wall time: 0.0100 seconds\nProcess exited with code 0\nOutput:\nx", ok),
+            "running": (exec_response("Process running with session ID 3", "x"), unknown),
+            "running and exit": ("Chunk ID: a\nWall time: 1.0 seconds\nProcess exited with code 0\n"
+                                 "Process running with session ID 3\nOutput:\nx", unknown),
+            "neither line": (exec_response(None, "x"), unknown),
+            "exit only in the output": (exec_response(None, "Process exited with code 0"), unknown),
+            "underscore digits": (exec_response("Process exited with code 1_0", "x"), unknown),
+            "plus sign": (exec_response("Process exited with code +1", "x"), unknown),
+            "padded": (exec_response("Process exited with code  1", "x"), unknown),
+            "non-ASCII digit": (exec_response("Process exited with code ²", "x"), unknown),
+            "no Output line within the sections": ("Wall time: 1 seconds\n" + "Original token count: 1\n" * 5
+                                                   + "Process exited with code 0\nOutput:\nx", unknown),
+            "no header": ("Process exited with code 0\nOutput:\nx", unknown),
+            "content items": ([{"type": "input_text", "text": exec_response("Process exited with code 2", "x")}],
+                              failed),
+            "no output": (None, unknown),
+        }
+        for name, (output, expected) in cases.items():
+            with self.subTest(case=name):
+                self.assertEqual(S.exec_header_state(output), expected)
+
     def test_codex_aggregate_passes_cli_lanes_and_proxy_through(self):
         # aggregate_codex_lanes hands the per-actor measurements to the kernel's aggregateMeasurements, which sums
         # cli_lanes and proxy and adds actors_with_success per lane.

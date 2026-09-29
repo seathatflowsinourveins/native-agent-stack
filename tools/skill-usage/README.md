@@ -229,12 +229,25 @@ not contribute M5 bytes unless represented by a direct model-visible ctx call.
 
 `measurement.cli_lanes` and `measurement.proxy` come from the same kernel
 ([CLI lanes by command position](../../examples/claude-native/workflows/README.md#cli-lanes-by-command-position-2026-09-28)).
-Shell commands of `exec_command`, `shell` and local-shell calls and of
-`CommandExecution` items are read in command position; those nested in a
-code-mode `exec` count under carrier `nested`. A call's state comes from this adapter's result
-mapping, which marks only a `failed` item as an error. A declined item still
-reads as succeeded, and so does a legacy exec output whose only failure signal
-is its `Process exited with code N` header, until the adapter maps them.
+Shell commands of `exec_command`, `shell_command`, `shell` and local-shell
+calls and of `CommandExecution` items are read in command position; those
+nested in a code-mode `exec` count under carrier `nested`. A call's state comes
+from its persisted item status when there is one: `failed` is failed, and
+`declined` (a rejected command, exit -1 in
+[events.rs:562-573](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/events.rs#L562-L573))
+is failed and not executed. Without an item state, as in legacy history mode,
+a shell call's output is read by the unified exec header of
+[context.rs:524-548](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tools/context.rs#L524-L548),
+and only by the lines before `Output:`. `Process exited with code 0` is
+succeeded and any other exit code failed. A `Process running with session ID
+N` line, a header with neither line, or an output without the header reads
+`unknown`, since a rollout output never carries the success flag
+([models.rs:2173-2182](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/models.rs#L2173-L2182)).
+The later `write_stdin` output that reports a running process's exit is not
+linked back to its call. No `shell`, `shell_command` or local-shell handler
+exists at rust-v0.157.1, so their outputs have no pinned header and read
+`unknown` unless an item state decides; the `Exit code: N` text that
+`apply_patch` returns is not read.
 
 Nested Codex code-mode shell curl/wget commands share M4's existing
 `ctx_sandbox_fetch` bucket with context-mode sandbox curl/wget commands. Both
