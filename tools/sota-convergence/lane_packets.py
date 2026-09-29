@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import posixpath
@@ -323,10 +324,11 @@ def trading_cards_by_id(root: Path) -> dict:
 
 def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: dict,
                               recipe_map: dict, root: Path, evidence_files: dict = None,
-                              withhold: bool = False) -> list:
+                              withhold: bool = False, absent: set = frozenset()) -> list:
     """Layer-specific trading candidates: the sota manifest's own entries for this
     layer (adopted when their card decision is default or conditional), then its
-    newcomer candidates and keep-but-compare entries (never adopted). Evidence paths,
+    newcomer candidates and keep-but-compare entries (never adopted; manifest_newcomers,
+    with ``absent``). Evidence paths,
     role and limitations come from the entry's domain catalog card; the card's
     rationale and decision are withheld like the ledger's. The manifest id is the
     component id directly, because two entries can share one repository."""
@@ -355,14 +357,15 @@ def manifest_layer_candidates(layer: dict, cards: dict, ledger_names_by_slug: di
             "decisions": [],
         })
     seen = {candidate_identity(c["repository"], evidence_files is not None) for c in candidates if c["repository"]}
-    for newcomer in manifest_newcomers(layer, seen, evidence_files, root, withhold):
+    for newcomer in manifest_newcomers(layer, seen, evidence_files, root, withhold, absent):
         candidates.append({**newcomer, "role": None, "card_limitations": []})
     return candidates
 
 
-# --manifest-newcomers (2026-09-23 landscape sweep): a manifest candidate whose discovery was refuted is not
-# carried, and a newcomer's evidence_refs are the repository-relative evidence/ paths its manifest evidence[]
-# lists that manifests/evidence.json registers in files[] with the file's current sha256.
+# --manifest-newcomers (2026-09-23 landscape sweep): a manifest candidate whose discovery was refuted on merit is
+# not carried (one refuted only because a vote did not return is carried: absence_refuted, 2026-09-28), and a
+# newcomer's evidence_refs are the repository-relative evidence/ paths its manifest evidence[] lists that
+# manifests/evidence.json registers in files[] with the file's current sha256.
 REFUTED_DISPOSITION_PREFIX = "refuted_"
 
 
@@ -382,6 +385,50 @@ def registered_evidence_files(root: Path) -> dict:
     """Repository-relative path -> sha256 for every file manifests/evidence.json lists in files[]."""
     return {entry["path"]: entry.get("sha256") for entry in load_json(root / EVIDENCE_MANIFEST_PATH).get("files") or []
             if isinstance(entry, dict) and isinstance(entry.get("path"), str)}
+
+
+def absence_refuted(root: Path, manifest: str) -> dict:
+    """(catalog, layer_id) -> {(lane, identity)} of the manifest rows refuted only because a vote did not return.
+    They come from each completed sweep of the saturation ledger that recorded this manifest (its manifest_sha256
+    is the file's): a refuted entry of a sweep layer that no returned vote refutes (saturation_ledger
+    refuted_by_absence over the sweep's retained returns) was not adjudicated and stays new, as
+    landscape-sweep/build_inputs.py reads it. No ledger, no completed sweep of these manifest bytes, lens votes and
+    a vote ref of either role that does not resolve all leave the refutation standing. The returns themselves are trusted as
+    scripts/saturation_ledger.py --check binds them (returns_sha256); this build checks only the manifest bytes."""
+    # The rule is reused (not reimplemented) from this checkout's scripts/saturation_ledger.py, loaded by path as
+    # landscape-sweep/sweep_common.ledger_module loads it: an import statement would pull the ledger into the verdict
+    # review gate's trust base, which tests/test_saturation_ledger.py SeparationTests keeps it out of (the gate
+    # judges sealed packets by sha256 and never rebuilds them).
+    spec = importlib.util.spec_from_file_location("lane_packets_saturation_ledger",
+                                                  REPO_ROOT / "scripts" / "saturation_ledger.py")
+    ledger = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ledger)
+    if not (root / ledger.LEDGER).is_file():
+        return {}
+    manifest_sha256 = hashlib.sha256((root / manifest).read_bytes()).hexdigest()
+    documents = {}
+    target_of = ledger.ref_resolver(lambda path: documents[path] if path in documents
+                                    else documents.setdefault(path, ledger.load_json(root, path)))
+    def resolves(entry):
+        # refuted_by_absence resolves only the refuting votes; a release also needs every role's vote to resolve,
+        # so a broken ref on a not-refuting vote keeps the refutation standing (Codex review of #471).
+        try:
+            return all(isinstance(entry.get(role), dict) and target_of(entry[role].get("ref")) is not None
+                       for role in ledger.ROLES)
+        except (ledger.LedgerError, TypeError, ValueError):
+            return False
+
+    absent = {}
+    for sweep in load_json(root / ledger.LEDGER).get("sweeps") or []:
+        if sweep.get("status") != "completed" or sweep.get("manifest_sha256") != manifest_sha256:
+            continue
+        for layer in sweep.get("layers") or []:
+            for entry in layer.get("refuted") or []:
+                if (isinstance(entry.get("repo"), str) and ledger.refuted_by_absence(entry, target_of)
+                        and resolves(entry)):
+                    absent.setdefault((layer.get("catalog"), layer.get("layer_id")), set()).add(
+                        (sweep.get("lane"), candidate_identity(entry["repo"], True)))
+    return absent
 
 
 def newcomer_evidence_refs(item: dict, evidence_files: dict, root: Path, withhold: bool) -> list:
@@ -406,11 +453,13 @@ def newcomer_evidence_refs(item: dict, evidence_files: dict, root: Path, withhol
 
 
 def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root: Path = None,
-                       withhold: bool = False) -> list:
+                       withhold: bool = False, absent: set = frozenset()) -> list:
     """Candidate records for a manifest layer's candidates and keep-but-compare alternatives whose repository
     slug is not in ``seen`` (updated; first seen wins). Without ``evidence_files`` (the default build) every
     such item is carried with no evidence_refs, as the 2026-09-22 packets were; with it (--manifest-newcomers),
-    a refuted discovery is left out and the registered evidence files are attached."""
+    a discovery refuted on merit is left out and the registered evidence files are attached. ``absent`` holds
+    the (lane, identity) pairs of this layer's rows refuted only because a vote did not return
+    (absence_refuted); such a row does not count as refuted."""
     newcomers = []
     items = list(layer.get("candidates", [])) + list(layer.get("alternatives_keep_but_compare", []))
     # A refuted_* disposition is the outcome of a discovery proposal, not a judgment of the repository: the
@@ -418,10 +467,12 @@ def manifest_newcomers(layer: dict, seen: set, evidence_files: dict = None, root
     # (anthropics/skills, inspect_ai, mise, claude-agent-sdk-python). So it only withholds a newcomer
     # addition; a ledger candidate (``seen``) keeps its place and its own evidence (Codex review of #151).
     # A repository refuted in any of its entries is left out entirely, even where another list repeats it
-    # without a disposition.
+    # without a disposition. An entry no returned vote refuted (``absent``) was not adjudicated
+    # (saturation_ledger.refuted_by_absence), so it is not a refutation here (F-2W-3, 2026-09-28).
     extended = evidence_files is not None
     refuted = {candidate_identity(item["repository"], extended) for item in items if item.get("repository")
-               and str(item.get("disposition") or "").startswith(REFUTED_DISPOSITION_PREFIX)}
+               and str(item.get("disposition") or "").startswith(REFUTED_DISPOSITION_PREFIX)
+               and (item.get("lane"), candidate_identity(item["repository"], extended)) not in absent}
     for item in items:
         repository = item.get("repository")
         slug = candidate_identity(repository, extended)
@@ -1103,6 +1154,7 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                          "previous winner")
     gap_index = gap_receipts_index(root) if gap_receipts else None
     evidence_files = registered_evidence_files(root) if manifest_newcomers_on else None
+    absent = absence_refuted(root, manifest or SOTA_MANIFEST_PATH) if manifest_newcomers_on else {}
     manifest_rows = {"foundation": {layer["layer"]: layer for layer in sota_doc.get("foundation", [])},
                      "us-equities": trading_layers}
 
@@ -1126,14 +1178,15 @@ def build_all_packets(root: Path, *, catalogs: list, seed: str, checked_at: str,
                          for c in row.get("candidates") or [] if c.get("repository")}
                 layer_candidates = manifest_layer_candidates(
                     trading_layers.get(row["layer_id"], {}), cards, names, recipe_map, root, evidence_files,
-                    withhold)
+                    withhold, absent.get((catalog, row["layer_id"]), frozenset()))
             newcomers = None
             if evidence_files is not None and layer_candidates is None:
-                # --manifest-newcomers on a ledger-built packet: the manifest row's surviving newcomers.
+                # --manifest-newcomers on a ledger-built packet: the manifest row's newcomers not refuted on merit.
                 seen = {candidate_identity(c["repository"], True) for c in row.get("candidates") or []
                         if c.get("repository")}
                 newcomers = manifest_newcomers(manifest_rows[catalog].get(row["layer_id"], {}), seen,
-                                               evidence_files, root, withhold)
+                                               evidence_files, root, withhold,
+                                               absent.get((catalog, row["layer_id"]), frozenset()))
             packet = build_packet(
                 row, catalog=catalog, sota_components=sota_index.get((catalog, row["layer_id"]), []),
                 catalog_components=catalog_components(sota_index, catalog),
@@ -1224,7 +1277,9 @@ def parse_args(argv=None):
     parser.add_argument("--manifest-newcomers", action="store_true",
                         help="Carry the dated manifest's newcomer candidates and keep-but-compare alternatives in "
                              "every packet (foundation included, shuffled with the ledger candidates), leave out "
-                             "any whose discovery was refuted (disposition refuted_*), and attach as a newcomer's "
+                             "any whose discovery was refuted on merit (disposition refuted_*, unless the completed "
+                             "saturation-ledger sweep that recorded this manifest shows no returned vote refuted it: "
+                             "scripts/saturation_ledger.py refuted_by_absence), and attach as a newcomer's "
                              "evidence_refs each evidence[] entry that is exactly an evidence/ path registered in "
                              "manifests/evidence.json files[] with its current sha256. Off by default so the "
                              "2026-09-22 packets reproduce.")

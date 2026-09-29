@@ -1,0 +1,19 @@
+{
+ "seed": "lane-a-final-x5c-20260928",
+ "g": "the GPT-6 lane's return (returns/gpt6.json, agree)",
+ "c": "the Claude lane's return (returns/claude.json, amend)",
+ "orders": {
+  "AB": {
+   "X5c": {
+    "A": "c",
+    "B": "g"
+   }
+  },
+  "BA": {
+   "X5c": {
+    "A": "g",
+    "B": "c"
+   }
+  }
+ }
+}

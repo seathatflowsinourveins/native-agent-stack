@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "id": "memory-scheduled-lifecycle-20260928",
+  "kind": "native_cli_observation",
+  "recorded_at_utc": "2026-09-28T13:13:20Z",
+  "trigger": {
+    "automation_id": "maintain-native-foundation-and-trading-catalogs",
+    "timestamp_utc": "2026-09-28T13:02:23.037Z",
+    "provenance": "Actual scheduler-provided heartbeat envelope received in the native task",
+    "separate_dispatch_id": null,
+    "operation": "Scoped daily memory/RAG observation and recovery of PR400's native secret-scan false positives",
+    "restart_persistence": {
+      "app": null,
+      "service": null,
+      "physical_pc": null
+    }
+  },
+  "prior_receipt": "observability/memory-scheduled-20260927.json",
+  "native_report": {
+    "command": "ai-memory auto-improve-report --workspace agent-lab --project agent-lab --json",
+    "exit_code": 0,
+    "generated_at": "2026-09-28T13:03:39.313518858Z",
+    "since_created_at": 1788008619313518,
+    "summary": "83 run(s), 19 terminal learning proposal(s), 100.0% approved in the last 30 day(s).",
+    "report_body_unchanged_except_generated_at_and_since_created_at": true,
+    "reused_returned_body": "observability/memory-scheduled-results-20260927.json; command entry for ai-memory auto-improve-report",
+    "interpretation": "The paused hourly learning scheduler did not gain report runs or proposals. Database page counts do not prove learned edits."
+  },
+  "retained_results": {
+    "location": "Private per-host state/memory-scheduled-20260928/returned-results.json, mode0600; native tool records retained",
+    "sha256": "1bb79aed5d9826c73d15fa92a10d7297bb9084501440bdfec2755317abd19c97",
+    "redactions": "Stable local identifiers and home paths sanitized; no credential stores read"
+  },
+  "completed_session": {
+    "default_native_selection": {
+      "started_at": "2026-09-26T00:03:19.422179Z",
+      "ended_at": "2026-09-26T00:03:25.983864Z",
+      "observation_count": 2,
+      "ordering": "started_at DESC, id DESC among completed scoped sessions"
+    },
+    "explicit_latest_end_selection": {
+      "started_at": "2026-09-22T19:49:04.048902Z",
+      "ended_at": "2026-09-28T01:22:54.542565Z",
+      "observation_count": 31006,
+      "native_session_end_observed_at": "2026-09-28T01:22:54.155774Z",
+      "consolidation": {
+        "agent_kind": "claude-code",
+        "started_at": "2026-09-22T19:49:04.048902+00:00",
+        "ended_at": "2026-09-28T01:22:54.542565+00:00",
+        "ended_observation_count": 31006,
+        "generation": 31006,
+        "state": "completed",
+        "job_started_at": "2026-09-28T01:26:07.295248+00:00",
+        "completed_at": "2026-09-28T01:26:43.401352+00:00",
+        "attempts": 1,
+        "last_error": null
+      }
+    },
+    "source": {
+      "commit": "62e73148fa4712540dab82d7fadf2ebf09a42cec",
+      "mcp": "crates/ai-memory-mcp/src/server.rs:3532",
+      "store": "crates/ai-memory-store/src/reader.rs:2997-3006",
+      "finding": "Omitting session_id selects the most recently started completed session, not the latest end time. The explicitly selected later-ending session was read back through native MCP."
+    },
+    "interpretation": "Native completed-session capture and a matching completed generation agree. Job state alone does not prove provider success, absence of heuristic fallback, learned quality or savings.",
+    "retained_query_correction": "An initial latest-end SQL join ordered sessions but not their multiple consolidation generations and returned an older job. The retained final query additionally orders generation DESC."
+  },
+  "retrieval": {
+    "socraticode": {
+      "native_status": "green",
+      "chunks": 1974,
+      "watcher": "active in another native process",
+      "query": "collect native Linux and Desktop usage separately",
+      "file": "tools/ecosystem/linux-usage-report.test.cjs",
+      "lines": [
+        76,
+        83
+      ],
+      "source_sha256": "da5975a3bb9a3b0af972af387dd28497c590881ed08d868411efd1a6a9e16b54",
+      "matches_source": true
+    },
+    "qmd": {
+      "changed_input": false,
+      "source": "docs/tasks/2026-09-25-quality-optimization.md",
+      "source_sha256": "1eace1655ce74cb960b7e0091e45245cdcde954c3e8076ce3b9b7421e1038661",
+      "decision": "Reuse matching September27 search/get; no new document retrieval needed"
+    }
+  },
+  "observer": {
+    "classification": "Independent read-only native service/API observation; original outputs retained in worker tool records",
+    "observed_interval_utc": [
+      "2026-09-28T13:02:41Z",
+      "2026-09-28T13:03:48Z"
+    ],
+    "services": "ai-memory, Qdrant, Nemotron active/running/enabled/success",
+    "native_inventory": {
+      "rows": 78,
+      "marker": 1,
+      "unknown": 0,
+      "stale": 5,
+      "generation_utc": "2026-09-28T13:02:41.425Z",
+      "emission_utc": "2026-09-28T13:02:41.944Z",
+      "http_status": 204,
+      "latest_pages": 214,
+      "versions": 646,
+      "sessions": 314,
+      "observations": 454449,
+      "missing_latest_embeddings": 0,
+      "unresolved_embedding_failures": 0,
+      "snapshot_sha256": "d579dd549a2dc974ba929a2a03d65cc07fc9d50343420b2d5c9d6aeea55a037d",
+      "loki_payload_sha256": "6b4be786b7aa63f489ef6648c1e56c9c9e723b31c71d77ec4b1661e94f57a2e1"
+    },
+    "progress": {
+      "rows": 100,
+      "emission_utc": "2026-09-28T13:02:35.130Z",
+      "source_checkpoint_utc": "2026-09-25T22:46:00Z",
+      "source_sha256": "f73f1f175ee31b2fbdcce4b23294c97093dcf7645433b9309a763f66b6c266dd"
+    },
+    "prometheus": {
+      "up": 9,
+      "total": 9,
+      "observed_at_utc": "2026-09-28T13:03:30Z"
+    },
+    "qdrant": {
+      "points": 1974,
+      "status": "green"
+    },
+    "qmd": {
+      "files": 183,
+      "vectors": 0
+    },
+    "warnings": {
+      "unchanged_firing": [
+        "EcosystemOmniRouteHealthUnexpected",
+        "EcosystemFreeLLMAPIHealthUnexpected"
+      ],
+      "swap_warning_firing": false,
+      "swap_bytes": 959840256,
+      "swap_observed_at_utc": "2026-09-28T13:03:48Z",
+      "exact_clear_time": null
+    },
+    "metadata_limits": "Five token-counter inputs retain old timestamps. Inventory llm_status=ok and embedding_model=unavailable are metadata fields; config separately confirms the unchanged selected model.",
+    "configuration": "Unchanged prefix-enabled ai-memory, vLLM0.30.0, codex/gpt-6-sol medium, disabled hourly auto-improve scheduler"
+  },
+  "ci_recovery": {
+    "pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/400",
+    "failed_job": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36321969153/job/108627421116",
+    "original_head": "9ddaa798d753e8238c642be33de562c6142445e3",
+    "original_findings": 7,
+    "rule": "generic-api-key",
+    "affected_file": "observability/memory-scheduled-results-20260927.json",
+    "source_review": {
+      "ai_memory_commit": "62e73148fa4712540dab82d7fadf2ebf09a42cec",
+      "files": [
+        "crates/ai-memory-store/src/auto_improve.rs:1368-1396",
+        "crates/ai-memory-store/src/reader.rs:8701-8727",
+        "crates/ai-memory-consolidate/src/auto_improve_telemetry.rs:179-191"
+      ],
+      "finding": "Each reported key is a SHA-256 of normalized rejection metadata, copied unchanged into upstream reports.",
+      "gitleaks": "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md#configuration"
+    },
+    "fix": "One separate rule-specific AND allowlist: exact September27 report path, whole key line, seven literal reviewed values. Earlier exception and all other configuration preserved.",
+    "verification": {
+      "classification": "Local integration and synthetic adversarial fixtures executed with the guarded upstream scanner; not runtime-memory E2E",
+      "before_fix": {
+        "command": "ecosystem-bounded-run python3 -m unittest tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests.test_e3_returned_report_reviewed_fingerprints_are_not_detected",
+        "exit_code": 1,
+        "findings": 7
+      },
+      "after_fix": {
+        "command": "ecosystem-bounded-run python3 -m unittest tests.test_gitleaks_config.GitleaksConfigContextRestrictionTests",
+        "exit_code": 0,
+        "tests": 23
+      },
+      "initial_actual_branch_scan": {
+        "command": "gitleaks git . --config .gitleaks.toml --log-opts=origin/main..HEAD --redact --no-banner",
+        "exit_code": 0,
+        "commits": 4,
+        "bytes_approx": 38337,
+        "findings": 0,
+        "scope": "Four prior committed changes; final fix/config additions require the subsequent final bounded scan reported in PR400."
+      },
+      "independent_review": "Confirmed only one exact-path/seven-value exception added; tests preserve detection of other paths, unreviewed values, credential fields, old-report restrictions and adjacent credentials. No supported defect."
+    }
+  },
+  "limitations": [
+    "No install, restart, model/account/permission change, model probe, manual learning, new monitor, broker order or paid resource.",
+    "Required semantic retrieval uses embedding inference; no new quality comparison or cross-client lifecycle qualification.",
+    "Native report aggregates remain historical. Exact session and lifetime token savings are unknown.",
+    "Current GitHub CI outcome remains separate from local checks; failed upstream scanner attempts were retained and are not relabeled as passes."
+  ],
+  "exact_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  }
+}

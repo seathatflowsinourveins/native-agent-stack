@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "version": "1.49.6",
+  "tag": "v1.49.6",
+  "repository": "https://github.com/OpenHands/software-agent-sdk",
+  "commit": "fcc102a697874d54a357e36004e02c95040dbdc0",
+  "source_archive": {
+    "url": "https://codeload.github.com/OpenHands/software-agent-sdk/tar.gz/fcc102a697874d54a357e36004e02c95040dbdc0",
+    "sha256": "2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8"
+  },
+  "uv_lock": {
+    "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/fcc102a697874d54a357e36004e02c95040dbdc0/uv.lock",
+    "sha256": "d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910"
+  },
+  "image": {
+    "tag_observed": "1.49.6-python",
+    "ref": "ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37",
+    "platform": "linux/amd64",
+    "manifest_sha256": "ec7ed86f4021a21e161815853156521b44929d913f2e6ee06a173ef2f660aa12",
+    "config_sha256": "39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f",
+    "provenance": "GHCR returned manifest bytes SHA256; image config OPENHANDS_BUILD_GIT_SHA and OPENHANDS_BUILD_GIT_REF match the SDK tag."
+  },
+  "gateway_proxy": {
+    "tag_observed": "1.30.5-alpine",
+    "ref": "ghcr.io/nginx/nginx-unprivileged@sha256:ed04ec1ff34502c339ee5c3ae3f855442398edc1d05591e2b98981dcbbd20b1e",
+    "platform": "linux/amd64",
+    "manifest_sha256": "f4522a5f23f9caebcae9be6e3940ea0599a2b9eb05222c7118d01fc887e848d6",
+    "config_sha256": "61640a44f99dcfd7f1af9f144f023195e82fdefd2f5aba7f917548867d4f3a6f",
+    "source": "https://github.com/nginx/docker-nginx-unprivileged/tree/588b4cbc88065a313909f47a02510639e01cc508",
+    "provenance": "Anonymous GHCR OCI reads on 2026-09-28: the SHA256 of the returned index, linux/amd64 manifest and config bytes equal their digests. Config: NGINX_VERSION=1.30.5, org.opencontainers.image.version 1.30.5-alpine, revision 588b4cbc, user 101, exposed 8080/tcp. Pulled by index digest into the rootless store and checked with host.pinned_image_identity."
+  },
+  "wheels": {
+    "openhands-sdk": {
+      "url": "https://files.pythonhosted.org/packages/e9/ac/d27c5becc3b59b8cc46a1614ac478cc94eb73e626ab15831906fcdaafb29/openhands_sdk-1.49.6-py3-none-any.whl",
+      "sha256": "3b4701f125925e804929ab02b61fe2fe10b4fb1e7d723a2c4afdea35566328bb",
+      "filename": "openhands_sdk-1.49.6-py3-none-any.whl"
+    },
+    "openhands-tools": {
+      "url": "https://files.pythonhosted.org/packages/68/20/27d6d20cc8f3465ec861c450bc0113c8646285aa6c8f4291b62366dcb8a2/openhands_tools-1.49.6-py3-none-any.whl",
+      "sha256": "11e57a6635fd93c9f1fed14f804ab6f24a4873f75a2d35f0d1c3e57df2c51c87",
+      "filename": "openhands_tools-1.49.6-py3-none-any.whl"
+    }
+  },
+  "requirements_sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
+  "build_requirements_sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
+  "grader": {
+    "repository": "https://github.com/OpenHands/benchmarks",
+    "commit": "405bae7140d7e961a75f4910a0b2e7069731db96",
+    "sdk_submodule_commit": "43376f1868ffd702746080714a59c16d3f69ec12",
+    "swebench_version": "4.1.0",
+    "swebench_wheel_sha256": "1243776f720047cc9e20a427f7a52b75c13a07abda6154fb60fe77f82ec8af57",
+    "installation": "uv sync --locked --dev --no-build-isolation --inexact with hashed build-requirements.lock",
+    "uv_lock_sha256": "287a42d2157d044ca0f5e723fe3a05c1e4bdf6413049370360226374db6d7e8c",
+    "lock_source": "OpenHands/benchmarks@405bae7140d7e961a75f4910a0b2e7069731db96 uv.lock; Makefile:33-42",
+    "uv_version": "0.12.17",
+    "uv_source": "adoption/pins-linux-x86_64.json uv archive; astral-sh/uv@0.12.17",
+    "build_source": "OpenHands/software-agent-sdk@43376f1868ffd702746080714a59c16d3f69ec12 openhands-sdk/pyproject.toml:36-38; tools:26-28; agent-server:27-29; workspace:19-21",
+    "verdict": "swebench.harness.run_evaluation official Docker tests and resolved_ids",
+    "evaluation_image": "Required per-instance digest in frozen OPENHANDS_GRADER_IMAGE_FILE; no task or digest selected in this worktree",
+    "runner_up": {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "tag": "v0.23.0",
+      "reason": "Terminal-Bench uses a different task contract."
+    }
+  },
+  "canvas": {
+    "tag": "v1.24.0",
+    "repository": "https://github.com/OpenHands/OpenHands",
+    "commit": "7dc6805406ea3c76cb4a3ce407c3c72d481b0ac6",
+    "install": false
+  }
+}

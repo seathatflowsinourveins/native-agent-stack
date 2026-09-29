@@ -1,0 +1,5 @@
+{
+ "file": "CLAUDE.md",
+ "old": "Inspect native loaded tools with `/mcp` and loaded context with `/context` before\nclaiming a plugin is active.",
+ "new": "Before claiming a plugin or MCP server is active, confirm that its tools, skills or hook output are\npresent in this session (ToolSearch loads a deferred tool). `/mcp` and `/context` are user-typed commands:\nwhen your session cannot settle the claim, report it as unconfirmed and name the command that would."
+}

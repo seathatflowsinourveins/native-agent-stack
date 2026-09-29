@@ -1,0 +1,20 @@
+{
+ "status": "done",
+ "exit": 0,
+ "started": "2026-09-28T10:16:20Z",
+ "finished": "2026-09-28T10:17:15Z",
+ "usage": {
+  "input_tokens": 93247,
+  "cached_input_tokens": 49536,
+  "cache_write_input_tokens": 0,
+  "output_tokens": 1500,
+  "reasoning_output_tokens": 1073
+ },
+ "usage_status": "reported",
+ "limit": false,
+ "limit_marker": false,
+ "model": "gpt-6-astra",
+ "effort": "max",
+ "codex_version": "codex-cli 0.157.1",
+ "attempts": []
+}

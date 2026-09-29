@@ -136,9 +136,44 @@ class SkillDoctorParsing(unittest.TestCase):
         self.assertEqual(parsed["total_cost_usd"], 0.004)
         self.assertEqual(parsed["num_turns"], 1)
 
-    def test_refuses_json_that_is_not_an_event_array(self):
-        parsed = S.parse_claude_output(json.dumps({"not": "a list"}))
-        self.assertIn("error", parsed)
+    def test_refuses_a_nonzero_cost_result_object(self):
+        # The zero-cost check holds for the single result object `claude -p --output-format json` prints
+        # (`claude --help` 2.1.283: "json" (single result)) as it does for the message array printed when verbose is
+        # on (a 2.1.283 binary read, not a live reproduction; see S.parse_claude_output).
+        messages = json.loads((FIXTURES / "skill-doctor-nonzero-cost.json").read_text())
+        parsed = S.parse_claude_output(json.dumps(S.find_result_event(messages)))
+        self.assertIn("refusing a nonzero-cost result", parsed.get("error", ""))
+        self.assertEqual(parsed["rows"], {})
+        self.assertEqual((parsed["total_cost_usd"], parsed["num_turns"]), (0.004, 1))
+
+    def test_refuses_json_that_is_neither_a_result_object_nor_an_event_array(self):
+        # An object that is no result message, even one carrying zero-cost fields and a table, and a JSON scalar.
+        row = "  gh-fix-ci                       userSettings       ~110         340    6×  2 days ago"
+        for raw in (json.dumps({"not": "a list"}),
+                    json.dumps({"type": "assistant", "total_cost_usd": 0, "num_turns": 0, "result": row}),
+                    "42", "null", json.dumps(row)):
+            with self.subTest(raw=raw):
+                parsed = S.parse_claude_output(raw)
+                self.assertIn("error", parsed)
+                self.assertEqual(parsed["rows"], {})
+
+    def test_refuses_an_error_result_in_either_shape(self):
+        # is_error can be true with subtype "success" (an API error; claude-agent-sdk-python types.py:1358-1360),
+        # and a zero-cost error result must not be read as a measured /skill-doctor table.
+        messages = json.loads((FIXTURES / "skill-doctor-sample.json").read_text())
+        result = S.find_result_event(messages)
+        for change in ({"is_error": True}, {"subtype": "error_during_execution", "is_error": True},
+                       {"subtype": "error_max_turns"}, {"is_error": None}):
+            for shape in ("object", "array"):
+                with self.subTest(change=change, shape=shape):
+                    event = {**result, **change}
+                    raw = json.dumps(event if shape == "object" else
+                                     [m if m is not result else event for m in messages])
+                    parsed = S.parse_claude_output(raw)
+                    self.assertIn("refusing an error result", parsed.get("error", ""))
+                    self.assertEqual(parsed["rows"], {})
+        missing = {k: v for k, v in result.items() if k != "is_error"}
+        self.assertIn("refusing an error result", S.parse_claude_output(json.dumps(missing)).get("error", ""))
 
     def test_refuses_array_with_no_result_event(self):
         parsed = S.parse_claude_output(json.dumps([{"type": "system"}, {"type": "assistant"}]))
@@ -167,6 +202,23 @@ class RunSkillDoctor(unittest.TestCase):
         result = S.run_skill_doctor(runner=runner)
         self.assertNotIn("error", result)
         self.assertEqual(result["rows"]["gh-fix-ci"]["uses"], 6)
+
+    def test_run_reads_either_json_output_shape(self):
+        # `claude -p --output-format json` prints one result object (`claude --help` 2.1.283: "json" (single result))
+        # or, when verbose is on, the message array (a 2.1.283 binary read, not a live reproduction; see
+        # S.parse_claude_output). find_result_event takes the last element of type "result" from either, this
+        # repository's selection; anthropics/claude-agent-sdk-python@36f95486ee9f
+        # src/claude_agent_sdk/_internal/message_parser.py:308 parses a message of that type as the ResultMessage.
+        sample = (FIXTURES / "skill-doctor-sample.json").read_text()
+        stdouts = {"array": sample, "object": json.dumps(S.find_result_event(json.loads(sample)))}
+        results = {}
+        for shape, stdout in stdouts.items():
+            with self.subTest(shape=shape):
+                runner = lambda argv, stdout=stdout, **kw: subprocess.CompletedProcess(argv, 0, stdout, "")
+                results[shape] = S.run_skill_doctor(runner=runner)
+                self.assertNotIn("error", results[shape])
+                self.assertEqual(results[shape]["rows"]["gh-fix-ci"]["uses"], 6)
+        self.assertEqual(results["object"], results["array"])
 
     def test_refuses_nonzero_cost_from_a_run(self):
         sample = (FIXTURES / "skill-doctor-nonzero-cost.json").read_text()
@@ -487,9 +539,9 @@ class RenderTextAndCli(unittest.TestCase):
         tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self.roots = [str(root) for root in materialize_codex_roots(tmp)]
 
-    def run_main(self, extra_args, out=None):
+    def run_main(self, extra_args, out=None, claude_file=None):
         args = ["--manifest", str(self.manifest_path), "--now", NOW, "--home", str(self.home),
-                "--claude-skill-doctor", str(self.claude_file)]
+                "--claude-skill-doctor", str(claude_file or self.claude_file)]
         for root in self.roots:
             args += ["--codex-root", root]
         if out is not None:
@@ -506,6 +558,24 @@ class RenderTextAndCli(unittest.TestCase):
         report = json.loads(output)
         self.assertEqual(report["kind"], "skill_invoke_rate_report")
         self.assertIn("tdd", {c["name"] for c in report["prune_candidates"]})
+
+    def test_main_measures_either_json_output_shape(self):
+        # A capture of `claude -p "/skill-doctor" --output-format json` is one result object (`claude --help` 2.1.283:
+        # "json" (single result)) or, when verbose is on, the message array (a 2.1.283 binary read, not a live
+        # reproduction; see S.parse_claude_output); both yield the same report.
+        messages = json.loads(self.claude_file.read_text())
+        object_file = Path(self.enterContext(tempfile.TemporaryDirectory())) / "skill-doctor-object.json"
+        object_file.write_text(json.dumps(S.find_result_event(messages)), encoding="utf-8")
+        reports = {}
+        for shape, claude_file in (("array", self.claude_file), ("object", object_file)):
+            with self.subTest(shape=shape):
+                code, output = self.run_main(["--json"], claude_file=claude_file)
+                self.assertEqual(code, 0)
+                reports[shape] = json.loads(output)
+                self.assertEqual({key: reports[shape]["claude"].get(key) for key in
+                                  ("measured", "format", "total_cost_usd", "num_turns")},
+                                 {"measured": True, "format": "json", "total_cost_usd": 0, "num_turns": 0})
+        self.assertEqual(reports["object"], reports["array"])
 
     def test_render_text_default_output(self):
         code, output = self.run_main([])

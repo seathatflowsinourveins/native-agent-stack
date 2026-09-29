@@ -1,0 +1,390 @@
+{
+ "lane": "Claude Agent tool, evidence-reviewer (frontmatter model opus, effort max)",
+ "usage": {
+  "agent_type": "evidence-reviewer",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 53,
+  "provider_usage": {
+   "input_tokens": 110,
+   "cache_creation_input_tokens": 564261,
+   "cache_read_input_tokens": 9049321,
+   "output_tokens": 158874
+  },
+  "harness_counters": {
+   "subagent_tokens": 344702,
+   "tool_uses": 77,
+   "duration_ms": 1588283
+  }
+ },
+ "return": {
+  "items": [
+   {
+    "id": "F1",
+    "verdict": "amend",
+    "resolution_text": "{\n \"file\": \"AGENTS.md\",\n \"line\": 36,\n \"old\": \"- Dispatch each workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call.\",\n \"new\": \"- Dispatch each new or ad-hoc workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call. The saved scripts vendored in that directory keep their reviewed routing, byte-identical to agent-lab.\"\n}",
+    "confidence": 0.6,
+    "reasons": "The diagnosis is right. AGENTS.md:36 requires role dispatch for every workflow agent() stage, while README:219 (same commit 623d34fa) exempts the saved scripts because they are vendored byte-identical, so a literal reader could retrofit readiness-audit.js and break its agent-lab/SHA256SUMS identity. The proposed addition overshoots in two ways. First, 'Saved scripts keep their reviewed routing' widens README:219's exemption, which rests on vendoring, to every saved script in the repository. That includes repository-authored workflows such as tools/sota-convergence/landscape-sweep/sweep.js, whose GPT-6 wrapper stages (109-110, 121-122) carry no agentType and no // dispatch: comment; this is the scope-restating mistake N3 row 3 records. Second, 'byte-identical' has no object; README:9-10 says byte-identical to agent-lab. The amended line keeps the new-or-ad-hoc scope, names only the vendored scripts, and still passes tests/test_install_claude_profile.py:654-656 (README path and agentType on one line; checked). The old line occurs once. Routine for every edit in this unit: manifests/evidence.json /files records each edited file's sha256 (AGENTS.md at 3474-3476), so regenerate it with scripts/evidence_manifest.py --write (named at scripts/validate.py:373).",
+    "sources": [
+     {
+      "locator": "AGENTS.md:36",
+      "quote": "- Dispatch each workflow `agent()` stage by role: take its `agentType` from the role table in `examples/claude-native/workflows/README.md#dispatch-by-role-2026-09-26`, and give a `general-purpose` or omitted `agentType` a `// dispatch: <reason>` comment beside the call."
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:219",
+      "quote": "The saved scripts keep their reviewed routing, since they are vendored byte-identical (the `readiness-audit` verify stage runs as the default child)."
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:9-10",
+      "quote": "`review-changes.js`, `readiness-audit.js` and `layer-verdict-lane.js` are\nbyte-identical to agent-lab `b31f640`"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/sweep.js:109-110",
+      "quote": "const r = await agent(wrapperPrompt(job, steps, promptFile, 'discover'),\n    { label: `gpt6-discover:${L.layer_id}${suffix ? ':followup' : ''}`, phase: phaseName, model: 'sonnet', effort: 'max', schema: WRAP_SCHEMA })"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:656",
+      "quote": "self.assertTrue(any(\"agentType\" in line for line in pointer), \"no AGENTS.md line points dispatch at the table\")"
+     }
+    ]
+   },
+   {
+    "id": "F2",
+    "verdict": "agree",
+    "resolution_text": "",
+    "confidence": 0.7,
+    "reasons": "Each of the ten old phrases occurs exactly once in its key (checked). The capitalized scope words reach Claude through common plus the role text (sweep.js:85, 172, 174, 197) and GPT-6 through make_prompt.py:65. A fit prompt therefore carries five emphases and a discover prompt four. Claude Code's CLAUDE.md guidance (S5) reserves emphasis for a single line the model keeps skipping. S1 (Opus 4.5/4.6) and S9 (GPT-5) report capitalized or aggressive wording over-triggering, and S10 says GPT-6 Astra is more sensitive to instructions. The lowercase wording keeps the same scope, and 'One vote per proposal' and 'Set layer_id' remain. No test asserts a replaced phrase. The FOLLOW-UP ROUND. label (test :325), the ROLE: labels and the test-asserted output marker TOO NEW TO ASSESS (<90 days) (test :266) stay, and TEMPLATE_SKILLS is untouched. PROMPTS_SHA256_CURRENT (test :45, :247) must be recomputed once, for the final text after F2, F3 and X7. Confidence is moderate because sources.json records no Anthropic statement on all-caps wording for the 5.x models.",
+    "sources": [
+     {
+      "locator": "https://code.claude.com/docs/en/best-practices.md (sources.json S5)",
+      "quote": "If Claude keeps skipping one instruction, add emphasis such as \"IMPORTANT\" to that line alone. If you emphasize many lines, none of them stands out."
+     },
+     {
+      "locator": "https://github.com/openai/openai-cookbook/blob/6dc6324fb9ed780b32b787f23fad336e9f1eff15/examples/gpt-5/gpt-5_prompting_guide.ipynb (sources.json S9)",
+      "quote": "While this worked well with older models that needed encouragement to analyze context thoroughly, they found it counterproductive with GPT-5, which is already naturally introspective and proactive at gathering context."
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/make_prompt.py:65",
+      "quote": "return templates[\"common\"] + \"\\n\\n\" + body + TAIL"
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:247",
+      "quote": "self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_CURRENT)"
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:266",
+      "quote": "self.assertIn(\"TOO NEW TO ASSESS (<90 days)\", common)"
+     }
+    ]
+   },
+   {
+    "id": "F3",
+    "verdict": "amend",
+    "resolution_text": "{\n \"file\": \"tools/sota-convergence/landscape-sweep/templates.json\",\n \"key\": \"facts\",\n \"old\": \"Default to refuted=true when uncertain.\",\n \"new\": \"Default to refuted=true when uncertain. Unknown fields, maintenance and license are the exceptions (the selection principles): a null upstream_now field means unknown, not a false claim; record an unverifiable commit or activity fact as unknown, and a wrong or unverifiable license as a correction or as unknown, in your reasoning; none of these is a reason to refute.\",\n \"test_comment\": {\n  \"file\": \"tests/test_landscape_sweep_harness.py\",\n  \"line\": 258,\n  \"old\": \"        # No role other than the facts refuter's accuracy check may treat a license as a criterion.\",\n  \"new\": \"        # No role treats a license as a criterion: the facts refuter records a wrong or unverifiable license in its\\n        # reasoning and never refutes on it.\"\n },\n \"new_test_asserts_in_facts\": [\n  \"a null upstream_now field means unknown\",\n  \"record an unverifiable commit or activity fact as unknown\",\n  \"none of these is a reason to refute\"\n ],\n \"note\": \"One replacement serves F3 and X7 together; apply it once, then recompute PROMPTS_SHA256_CURRENT for the final templates.\"\n}",
+    "confidence": 0.7,
+    "reasons": "The conflict is real. facts is sent with common (sweep.js:172). common tells a lane that cannot reach commit evidence to record it as unknown and never refute on it, and fit says unknown maintenance is never a reason to refute. facts, however, refutes unverifiable facts and defaults to refuted, and survival needs a not-refuted facts vote (README:48-49), so the facts gate cancels the #385 rule. The proposed sentence covers only unverifiable facts and misses the case the pipeline produces by design. The facts refuter receives each proposal's upstream_now (sweep.js:155-156), and the discover template and schemas/discover.json:53-100 allow null 'when unknowable'. After #385 the web-only GPT-6 discovery lane records commit facts as unknown. In the retained 2026-09-26 run the facts refuter refuted anomalyco/opencode and alpacahq/cli for null upstream_now fields (returns.json:2218, :17006); that role ran on Sonnet then and runs on Opus now, so this evidence is weighted modestly. The replacement is one edit of the single sentence 'Default to refuted=true when uncertain.' in facts, identical to X7's resolution_text, so apply it once. It also fixes the combined note's 'a wrong or unverifiable license is corrected', since an unverifiable license cannot be corrected. Checked on the base text: no banned license phrase (test :259-261), every assertion at :249-270 still holds, and the three new-test phrases are absent on base (the new test fails there) and present after the edit. Left as a residual: a verified but stale activity value, such as the same-day pushed_at drift that refuted eslazarev/purged-cross-validation, still refutes. A blanket exemption would let fabricated upstream_now pass the facts gate, and the xtdb vote used an implausible pushed_at as a fabrication signal.",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:4 (facts)",
+      "quote": "Vote refuted=true if any material factual claim is false, unsupported by its cited source, or unverifiable; refuted=false only when you verified the facts. Default to refuted=true when uncertain."
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:2 (common)",
+      "quote": "a lane that cannot reach either source, such as a web-only lane, records the commit fact as unknown and never excludes or refutes a repository on unknown maintenance, because a missing result is pending, never refuted"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:3 (discover)",
+      "quote": "upstream_now (latest_release tag, released_at date, stars, pushed_at, archived, license -- from the GitHub API or page; null when unknowable)"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/sweep.js:156",
+      "quote": "comparison_that_would_overturn: p.comparison_that_would_overturn, evidence: p.evidence, upstream_now: p.upstream_now, proposed_by: p.families }))"
+     },
+     {
+      "locator": "evidence/artifacts/landscape-sweep-20260926/returns.json:2218",
+      "quote": "The proposal's upstream_now block claims stars, pushed_at, archived, latest_release, and released_at are all unavailable (null)"
+     },
+     {
+      "locator": "evidence/artifacts/landscape-sweep-20260926/returns.json:17006",
+      "quote": "upstream_now block states latest_release=null, released_at=null and pushed_at=null, which is factually false"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/README.md:48-49",
+      "quote": "A proposal survives only when the facts refuter, the Claude fit refuter and the\nGPT-6 fit refuter all vote not refuted."
+     }
+    ]
+   },
+   {
+    "id": "F4",
+    "verdict": "agree",
+    "resolution_text": "",
+    "confidence": 0.55,
+    "reasons": "The replacement keeps the rule's force and widens its literal scope. 'future experiments must not call it' becomes 'no experiment may present it', which covers current experiments and any presentation, not only naming. It matches the source guide's own verb ('cannot be presented'). This matters under S2's advice that a literal model needs the scope stated. The hash-frozen guide (fixture.json:456) is not edited, no test pins the AGENTS.md phrase (repository grep), and the old text occurs once. The gain is marginal, hence modest confidence.",
+    "sources": [
+     {
+      "locator": "AGENTS.md:73-74",
+      "quote": "Its 2021 control segment is now inspected;\nfuture experiments must not call it a fresh untouched holdout."
+     },
+     {
+      "locator": "blueprints/us-equities/research-evaluation/README.md:35",
+      "quote": "for future work and cannot be presented as a fresh untouched holdout."
+     },
+     {
+      "locator": "blueprints/convergence-practice/local-fixture/fixture.json:456",
+      "quote": "\"source_sha256\": \"5f6e4b5cc7338e9f5fc3edeb0d2d5092f1c2ba779d0243ed3ba29da76a80edde\","
+     },
+     {
+      "locator": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5.md (sources.json S2)",
+      "quote": "If you need Claude to apply an instruction broadly, state the scope explicitly"
+     }
+    ]
+   },
+   {
+    "id": "X5",
+    "verdict": "agree",
+    "resolution_text": "",
+    "confidence": 0.7,
+    "reasons": "No logical contradiction: the template's trigger ('Before writing anything, reuse ...') is contained in AGENTS.md's broader one, and the two files load together only when work reads files under examples/claude-native/ (S8). AGENTS.md's 'any action' traces to the user's verbatim 'ALL ACTION NEED SOTA REFERENCES BACKED' in the decision record. The template is the portable file a new host installs, so its drift from the operator's live user file is the operator's call. This pass does not edit prohibition text. Residuals to record: read literally, 'Before any action, research ...' can trigger research for trivial actions (reads, answers), and S10 says GPT-6 Astra is more sensitive to AGENTS.md instructions. The template also carries lines 36 and 39 that the packet says the live user file lacks.",
+    "sources": [
+     {
+      "locator": "AGENTS.md:3",
+      "quote": "Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found."
+     },
+     {
+      "locator": "examples/claude-native/CLAUDE.md:5",
+      "quote": "1. Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job"
+     },
+     {
+      "locator": "docs/decisions/2026-09-25-top-rule-sota-sources.md:19",
+      "quote": "ALL ACTION NEED SOTA REFERENCES BACKED"
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/memory.md (sources.json S8)",
+      "quote": "Files in subdirectories load on demand when Claude reads files in those directories."
+     },
+     {
+      "locator": "https://developers.openai.com/api/docs/guides/latest-model.md (sources.json S10)",
+      "quote": "It can be more sensitive to instructions contained in skills and other files, such as `AGENTS.md`."
+     }
+    ]
+   },
+   {
+    "id": "X6",
+    "verdict": "agree",
+    "resolution_text": "",
+    "confidence": 0.8,
+    "reasons": "The PACKET already limits lanes to the tools a role has and tells it to skip the rest. The blind roles get an explicit override. test-envelope.mjs requires the PACKET to be byte-identical across saved workflows and to name every lane. The README keeps lane text in saved-workflow packets until a native Workflow-child run shows the SubagentStart block, and the three example workflows are vendored from agent-lab (README:9-11). A role-specific packet is therefore an agent-lab change, correctly recorded as a residual. No role is told to use a tool it lacks.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/workflows/review-changes.js:29",
+      "quote": "'Context lanes, limited to the tools your role has (load a deferred one with ToolSearch \"select:<tool name>\" before calling it; skip lanes your role lacks)"
+     },
+     {
+      "locator": "examples/claude-native/workflows/test-envelope.mjs:348",
+      "quote": "expect('contract: PACKET text is byte-identical across saved workflows', new Set(packets).size === 1)"
+     },
+     {
+      "locator": "examples/claude-native/workflows/layer-verdict-lane.js:48",
+      "quote": "const BLIND = 'Blind lane: this rule overrides the context lanes above."
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:216",
+      "quote": "Saved-workflow packets and agent bodies therefore keep their lane text until a native Workflow-child run shows the block in a stage's first prompt."
+     }
+    ]
+   },
+   {
+    "id": "X7",
+    "verdict": "amend",
+    "resolution_text": "{\n \"file\": \"tools/sota-convergence/landscape-sweep/templates.json\",\n \"key\": \"facts\",\n \"old\": \"Default to refuted=true when uncertain.\",\n \"new\": \"Default to refuted=true when uncertain. Unknown fields, maintenance and license are the exceptions (the selection principles): a null upstream_now field means unknown, not a false claim; record an unverifiable commit or activity fact as unknown, and a wrong or unverifiable license as a correction or as unknown, in your reasoning; none of these is a reason to refute.\",\n \"test_comment\": {\n  \"file\": \"tests/test_landscape_sweep_harness.py\",\n  \"line\": 258,\n  \"old\": \"        # No role other than the facts refuter's accuracy check may treat a license as a criterion.\",\n  \"new\": \"        # No role treats a license as a criterion: the facts refuter records a wrong or unverifiable license in its\\n        # reasoning and never refutes on it.\"\n },\n \"new_test_asserts_in_facts\": [\n  \"a null upstream_now field means unknown\",\n  \"record an unverifiable commit or activity fact as unknown\",\n  \"none of these is a reason to refute\"\n ],\n \"note\": \"One replacement serves F3 and X7 together; apply it once, then recompute PROMPTS_SHA256_CURRENT for the final templates.\"\n}",
+    "confidence": 0.7,
+    "reasons": "The direction is right. common, which is sent in the same prompt as facts, says licenses are never a reason to refute. facts makes a wrong license a refuting fact, and a refuted facts vote drops the candidate (README:48-49), so a license mismatch acts as a selection gate against the operator's standing rule. The deliberate carve-out lives only in a test comment (test :258), which the model never sees, so the prompt itself is contradictory. Refuting is also unnecessary for accuracy: the facts vote's reasoning is carried into the record (convert.py:484), and survivors' licenses are read from the GitHub API in their source reviews (source_reviews.py:175). Apply the same single replacement as F3 (identical resolution_text), which states the license exception without implying that an unverifiable license can be 'corrected'. The proposal's note cites the test comment at line 256; it is at line 258 (line 256 is an assertion). The exact new comment text is in the resolution. The text contains no banned license phrase (test :259-261; checked).",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:2 (common)",
+      "quote": "licenses are recorded as information only and are never a reason to exclude, refute or rank down a candidate (the operator's private experimental environment)"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:4 (facts)",
+      "quote": "and the license, latest release, release date, stars/activity and every cited evidence URL actually say what the proposal claims. Vote refuted=true if any material factual claim is false"
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:258",
+      "quote": "# No role other than the facts refuter's accuracy check may treat a license as a criterion."
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/source_reviews.py:175",
+      "quote": "license_id = (meta.get(\"license\") or {}).get(\"spdx_id\") or \"NOASSERTION\""
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/convert.py:484",
+      "quote": "\"reasoning\": f\"facts ({facts_model}): \" + (as_dict(fv).get(\"reasoning\") or \"missing\")},"
+     }
+    ]
+   },
+   {
+    "id": "X8",
+    "verdict": "agree",
+    "resolution_text": "",
+    "confidence": 0.85,
+    "reasons": "This is permission text, fixed for this pass. Only the operator can define or close 'the current foundation work'. The phrase is undefined where it gates the authorization, in AGENTS.md:60-61 and docs/paper-lane-policy.md:3-4, and the packet lists six other places. Record it as a residual for the operator rather than infer a definition.",
+    "sources": [
+     {
+      "locator": "AGENTS.md:60-61",
+      "quote": "The user has explicitly authorized broker-specific paper-trading E2E after the\ncurrent foundation work."
+     },
+     {
+      "locator": "docs/paper-lane-policy.md:3-4",
+      "quote": "The user explicitly authorizes broker-specific IBKR and Alpaca paper E2E after\nthe current foundation work."
+     }
+    ]
+   },
+   {
+    "id": "X9",
+    "verdict": "amend",
+    "resolution_text": "{\n \"file\": \"CLAUDE.md\",\n \"old\": \"Inspect native loaded tools with `/mcp` and loaded context with `/context` before\\nclaiming a plugin is active.\",\n \"new\": \"Before claiming a plugin or MCP server is active, confirm that its tools, skills or hook output are\\npresent in this session (ToolSearch loads a deferred tool). `/mcp` and `/context` are user-typed commands:\\nwhen your session cannot settle the claim, report it as unconfirmed and name the command that would.\"\n}",
+    "confidence": 0.6,
+    "reasons": "The diagnosis stands. The repository's own recipe and closure record treat /context and /mcp as commands run in the interactive client, and the commands reference presents commands as typed at the start of the user's message. The installed client's Skill description (quoted in the packet) excludes built-in CLI commands, apart from a few the skills page names, such as /init and /security-review. sources.json records not_found for an explicit statement about /mcp or /context, so this rests on the client text and the repository records, not on a docs statement. The proposed fallback 'ask the user to run them' can stall headless or workflow runs, which load CLAUDE.md but have no user to answer. It also conflicts with AGENTS.md:15, which limits stopping to sign-in, OS consent or an unresolved decision. The amendment reports the claim as unconfirmed and names the command instead. It also counts skills and hook output, since a plugin can be active without tools. It stays three lines, line 1 '@AGENTS.md' stays, the old text occurs once, and no test pins it.",
+    "sources": [
+     {
+      "locator": "CLAUDE.md:3-4",
+      "quote": "Inspect native loaded tools with `/mcp` and loaded context with `/context` before\nclaiming a plugin is active."
+     },
+     {
+      "locator": "recipes/claude-native-profile.md:272-273",
+      "quote": "Inside an authenticated interactive Claude session, use `/context all`, `/mcp`\nand `/usage` to inspect loaded context, connections and usage."
+     },
+     {
+      "locator": "docs/foundation-closure-20260921.md:110-111",
+      "quote": "`/context all`, `/context`,\n`/usage` and `/mcp` ran in the interactive client, not as headless model prompts."
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/commands.md (sources.json S6)",
+      "quote": "A command is only recognized at the start of your message. Text that follows the command name becomes its arguments."
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/skills.md (sources.json S7)",
+      "quote": "A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`. Other built-in commands such as `/compact` are not."
+     },
+     {
+      "locator": "AGENTS.md:15",
+      "quote": "Stop only for necessary native sign-in, operating system consent or an unresolved material decision, and continue independent work."
+     }
+    ]
+   },
+   {
+    "id": "X10",
+    "verdict": "agree",
+    "resolution_text": "",
+    "confidence": 0.85,
+    "reasons": "Each prompt has one or two emphasized words in an adversarial verifier role whose purpose is stated. That matches the single-line emphasis S5 allows, not the many-line emphasis F2 removes. Both scripts are vendored byte-identical to agent-lab and checked byte-for-byte through SHA256SUMS, so an edit would first need an agent-lab change.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/workflows/review-changes.js:72",
+      "quote": "Try to REFUTE each behavior claim"
+     },
+     {
+      "locator": "examples/claude-native/workflows/readiness-audit.js:96",
+      "quote": "were NOT read"
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:25-26",
+      "quote": "`SHA256SUMS` in this directory (`sha256sum -- *.mjs *.js *.json`, excluding\n`README.md` and `SHA256SUMS` itself) is checked byte-for-byte by the"
+     },
+     {
+      "locator": "https://code.claude.com/docs/en/best-practices.md (sources.json S5)",
+      "quote": "add emphasis such as \"IMPORTANT\" to that line alone"
+     }
+    ]
+   },
+   {
+    "id": "N1",
+    "verdict": "amend",
+    "resolution_text": "{\n \"replacements\": [\n  {\n   \"file\": \"tools/sota-convergence/landscape-sweep/README.md\",\n   \"old\": \"dated templates. `build_args.py` writes it to `prompts_sha256.txt`. With the 2026-09-26 values filled in, the\\n  templates here give `3adfbed7…18d4` (tested), the value computed on 2026-09-26 from that run's staged\\n  `templates.json`. That is a local check; the run's registered record is the evidence of what it used.\",\n   \"new\": \"dated templates. `build_args.py` writes it to `prompts_sha256.txt`. With the 2026-09-26 values filled in, the\\n  templates here give `PROMPTS_SHA256_CURRENT` in `tests/test_landscape_sweep_harness.py`, which changes with\\n  every intended template edit; the 2026-09-26 run's own value is kept there as `PROMPTS_SHA256_20260926`.\\n  That is a local check; the run's registered record is the evidence of what it used.\"\n  },\n  {\n   \"file\": \"tools/sota-convergence/landscape-sweep/README.md\",\n   \"old\": \"Parity with the prototype is not established by this package. On 2026-09-26 three unretained local checks were\\nrun (prompt bytes, the smoke's conversion, `usage_record.py` on the smoke's transcripts); their outputs are not\\nkept, so they are not evidence. `PROMPTS_SHA256_20260926` in the tests is the value this package computes from its\\ntemplates, and it matches the 2026-09-26 run only if that run's retained record carries the same\\n`prompts_sha256`. Treat parity as unverified until that record is registered and compared.\",\n   \"new\": \"The prompt templates are the only part with a retained comparison to the prototype. Until the 2026-09-27 template edits (#385),\\nthis package's templates filled with the run's values gave `PROMPTS_SHA256_20260926` in the tests (a local check),\\nand the run's registered record, `landscape-sweep-20260926` in `catalogs/saturation/ledger.json`, carries the same\\n`prompts_sha256`. On 2026-09-26 three unretained local checks were run (prompt bytes, the smoke's conversion,\\n`usage_record.py` on the smoke's transcripts); their outputs are not kept, so they are not evidence, and parity of\\nthe smoke's conversion and of `usage_record.py` stays unverified.\"\n  },\n  {\n   \"file\": \"evidence/artifacts/landscape-sweep-20260926/README.md\",\n   \"old\": \"prototype's staged templates. The packaged templates, filled with this run's values, give the same hash (a local check\\nin `tests/test_landscape_sweep_harness.py`). The packaged tools produced the returns, lanes, layers, usage records,\",\n   \"new\": \"prototype's staged templates. The packaged templates, filled with this run's values, gave the same hash until the\\n2026-09-27 template edits (#385), a local check whose value `tests/test_landscape_sweep_harness.py` keeps as\\n`PROMPTS_SHA256_20260926`. The packaged tools produced the returns, lanes, layers, usage records,\"\n  }\n ],\n \"unchanged\": \"catalogs/saturation/ledger.json:2846 and the lane-limit text in evidence/artifacts/landscape-sweep-20260926/lanes.json and catalogs/sota-convergence/manifest-20260926.json are dated run records and stay as written (the ledger chain and manifest_sha256 pin the ledger note and the manifest).\"\n}",
+    "confidence": 0.7,
+    "reasons": "The diagnosis is right: the test now pins PROMPTS_SHA256_CURRENT (f64eec22...), while README:193-195 still says the templates give 3adfbed7...18d4 (tested). Replacement 1 of the proposal is kept unchanged. Replacement 2 needs three fixes. (1) The registered record is the ledger entry landscape-sweep-20260926 (catalogs/saturation/ledger.json:2839), not the evidence README. (2) Keeping the lead sentence 'Parity with the prototype is not established by this package.' beside a new claim that the templates matched contradicts it, so the paragraph is replaced whole. (3) The evidence classes stay distinct: the pre-#385 hash computation is a local check, and the ledger record carrying the same prompts_sha256 is the run's evidence. The unretained checks stay 'not evidence'. The evidence README cited by the proposal (lines 18-19) makes the same stale present-tense claim ('give the same hash'), so leaving it would contradict the corrected README; it gets replacement 3. The ledger note (2846) and the lane-limit text in lanes.json and manifest-20260926.json are dated run records and stay. Each old string occurs exactly once (checked).",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/README.md:194",
+      "quote": "templates here give `3adfbed7…18d4` (tested), the value computed on 2026-09-26 from that run's staged"
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:45",
+      "quote": "PROMPTS_SHA256_CURRENT = \"f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d\""
+     },
+     {
+      "locator": "catalogs/saturation/ledger.json:2839",
+      "quote": "\"prompts_sha256\": \"3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4\","
+     },
+     {
+      "locator": "catalogs/saturation/ledger.json:2846",
+      "quote": "prompts_sha256 is the prototype's prompts_sha256.txt, which the packaged templates reproduce."
+     },
+     {
+      "locator": "evidence/artifacts/landscape-sweep-20260926/README.md:18-19",
+      "quote": "The packaged templates, filled with this run's values, give the same hash (a local check\nin `tests/test_landscape_sweep_harness.py`)."
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/README.md:435",
+      "quote": "Parity with the prototype is not established by this package."
+     }
+    ]
+   },
+   {
+    "id": "N2",
+    "verdict": "agree",
+    "resolution_text": "",
+    "confidence": 0.85,
+    "reasons": "Line 92 is the only blank line between the header (85) and the last row (121). Under GFM 4.10 it ends the table, so rows 93-121 fall outside it. log_errors keeps only lines starting with '|', so it passes on base. A contiguity check from the header to the last row finds one non-row line on base and none after the blank is replaced by the N3 rows (simulated). The rejection test counts exactly one error per mutant, so the new mutant should add a second, valid row after a blank line. The other open PRs that add rows only need the rebase the constraint already names.",
+    "sources": [
+     {
+      "locator": "docs/harness-defaults.md:93",
+      "quote": "| 2026-09-27 | Guessing version-specific CLI syntax or source paths |"
+     },
+     {
+      "locator": "tests/test_adoption_docs_consistency.py:809",
+      "quote": "rows = [line for line in section.splitlines() if line.startswith(\"|\")]"
+     },
+     {
+      "locator": "https://github.github.com/gfm/ (sources.json S11, 4.10 Tables)",
+      "quote": "The table is broken at the first empty line, or beginning of another block-level structure:"
+     },
+     {
+      "locator": "tests/test_adoption_docs_consistency.py:851",
+      "quote": "self.assertEqual(len(self.log_errors(mutant)), 1)"
+     }
+    ]
+   },
+   {
+    "id": "N3",
+    "verdict": "amend",
+    "resolution_text": "{\n \"file\": \"docs/harness-defaults.md\",\n \"placement\": \"in place of the blank line at line 92 (N2), between the 'Using strict config as a universal worker-profile validator' and 'Guessing version-specific CLI syntax or source paths' rows\",\n \"rows\": [\n  \"| 2026-09-27 | Changing a rule in some co-loaded prompt templates but not all | #385 put the unknown-maintenance and license rules into the landscape sweep's `common` and `fit` templates, but the `facts` template, which the refuter receives with `common` and each proposal's `upstream_now`, still said \\\"Default to refuted=true when uncertain\\\" and counted a wrong license as a refuting fact. In the 2026-09-26 run the facts refuter refuted proposals whose `upstream_now` fields were null, which the discover template allows (\\\"null when unknowable\\\"; `evidence/artifacts/landscape-sweep-20260926/returns.json`, anomalyco/opencode and alpacahq/cli) | When a rule changes, update every template that shares the prompt; the facts template states the unknown-field, maintenance and license exceptions | `tests/test_landscape_sweep_harness.py` (the facts-refuter rule test) |\",\n  \"| 2026-09-27 | Leaving a blank line inside a Markdown table | A blank line after the fifth 2026-09-27 row ended this log's table, since GFM 0.29-gfm 4.10 says \\\"The table is broken at the first empty line\\\", so every row after it fell outside the table; the shape test read only lines that start with a pipe and passed | Keep a table's rows contiguous from the header to the last row | `tests/test_adoption_docs_consistency.py` (the anti-pattern log check) |\",\n  \"| 2026-09-27 | Restating a linked rule without its scope | `AGENTS.md` required role dispatch for every workflow `agent()` stage, while the Workflow contract of the README it links (`examples/claude-native/workflows/README.md`, its Dispatch by role bullet, from the same commit) exempts the vendored saved scripts | Restate a linked rule with its scope, or link it without restating | This log |\",\n  \"| 2026-09-27 | Quoting a changing value as current in prose | The landscape-sweep README and the 2026-09-26 run's evidence README still said the packaged templates give the 2026-09-26 prompt hash after #385 changed the templates and the test's pin | Point at the pinned source of a changing value instead of quoting it | This log |\"\n ]\n}",
+    "confidence": 0.8,
+    "reasons": "Four defects. (1) Row 2 contains an unescaped pipe inside backticks ('`|`-prefixed'). The shape check splits it into 6 cells (checked), so test_the_anti_pattern_log_has_the_columns_and_dated_rows fails, and GFM splits the cell as well. The amended row says 'lines that start with a pipe'. (2) Row 3 says the README section AGENTS.md links exempts the saved scripts. The linked section (#dispatch-by-role-2026-09-26, README:227-241) has no such exemption; it is in the Workflow contract's Dispatch by role bullet (README:219). (3) Row 2 places the blank line 'after the 2026-09-27 rows', but it follows the fifth of seven 2026-09-27 rows at the top of the table. It also asserts GitHub rendering that was not observed, so the amended row cites GFM 4.10 instead. (4) Rows 1 and 4 are aligned with the F3/X7 and N1 amendments: row 1 covers license and null fields and cites the retained returns, and row 4 names the evidence README. All four amended rows parse to 5 non-empty cells with valid dates, and after N2 the table has no gap (checked). The first two rows still name checks that must be seen failing on base (harness-defaults:81).",
+    "sources": [
+     {
+      "locator": "tests/test_adoption_docs_consistency.py:802",
+      "quote": "return [cell.strip() for cell in re.split(r\"(?<!\\\\)\\|\", row)]"
+     },
+     {
+      "locator": "tests/test_adoption_docs_consistency.py:822-823",
+      "quote": "if len(cells) != len(cls.COLUMNS) or not all(cells):\n                errors.append(f\"row {number} has {len(cells)} cells or an empty cell\")"
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:229",
+      "quote": "a stage no role fits runs as the default child with a `// dispatch: <reason>` comment beside the call."
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:219",
+      "quote": "- **Dispatch by role.** Every new or ad-hoc `agent()` stage names the `agentType` of its role in [the role table](#dispatch-by-role-2026-09-26)"
+     },
+     {
+      "locator": "docs/harness-defaults.md:81",
+      "quote": "name a check there only after seeing it fail on that mistake or a reproduction of it"
+     }
+    ]
+   }
+  ]
+ }
+}

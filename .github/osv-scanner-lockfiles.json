@@ -42,6 +42,14 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
       "parser": "packages.lock.json"
     },

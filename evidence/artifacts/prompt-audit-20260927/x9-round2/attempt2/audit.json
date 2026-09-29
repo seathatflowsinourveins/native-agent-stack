@@ -1,0 +1,77 @@
+{
+ "patterns_sha256": "d16e99d67d8ee5d0b809782d8d2035fccb36c5d290acc367cc90d846499ec3c4",
+ "judgments": {
+  "gpt6-AB": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 3,
+    "command_execution": 5,
+    "web_search": 5
+   }
+  },
+  "gpt6-BA": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 3,
+    "command_execution": 4,
+    "web_search": 5
+   }
+  },
+  "claude-AB": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 33,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 10,
+    "tool_use": 14,
+    "tool_result": 14,
+    "attachment hook_additional_context": 3,
+    "attachment read_truncation_notice": 1,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 7,
+    "server_tool_use": 2,
+    "advisor_tool_result": 2,
+    "text": 1
+   }
+  },
+  "claude-BA": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 38,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 11,
+    "tool_use": 17,
+    "tool_result": 17,
+    "attachment hook_additional_context": 2,
+    "attachment read_truncation_notice": 1,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 10,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  }
+ }
+}

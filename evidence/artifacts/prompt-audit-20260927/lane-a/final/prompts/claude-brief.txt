@@ -1,0 +1,8 @@
+Packet file: <k2>/packets/packet.md
+Repository root: <root>
+
+Task: judge the 2 items in the packet and return only one JSON object, one entry per item id, matching this schema:
+{"type": "object", "additionalProperties": false, "required": ["items"], "properties": {"items": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "verdict", "resolution_text", "reasons", "sources", "confidence"], "properties": {"id": {"type": "string", "enum": ["X5a", "X5c"]}, "verdict": {"type": "string", "enum": ["agree", "amend", "reject"]}, "resolution_text": {"type": "string"}, "reasons": {"type": "string"}, "sources": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["locator", "quote"], "properties": {"locator": {"type": "string"}, "quote": {"type": "string"}}}}, "confidence": {"type": "number"}}}}}}
+The root holds `base/` (main at 8315274f), `proposed/` (the complete proposal applied) and `proposal.diff`; both
+trees are plain copies without git history. You cannot run commands: the packet's measured results were run by the
+coordinator, and you check them against the files. Packet sha256: 31c496f8d079ce0f9499527c432ea9948ab6f13b28fd3083af596c8d889a7133.

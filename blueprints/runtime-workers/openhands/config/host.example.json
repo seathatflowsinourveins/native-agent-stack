@@ -1,0 +1,23 @@
+{
+  "variables": {
+    "ECO_ROOT": "<private installed ecosystem prefix>",
+    "HOST_PATH": "<container-compatible PATH for the existing MCP executables>",
+    "AI_MEMORY_URL": "10.0.2.2:49474",
+    "QDRANT_URL": "<private host service address reachable from the container>",
+    "EMBED_URL": "10.0.2.2:18232",
+    "CODE_INDEX_PATH": "/state/mcp/jcodemunch"
+  },
+  "mcp_readonly_mounts": [
+    "<private existing MCP executable/dependency directory>"
+  ],
+  "qmd_collections": {
+    "foundation-docs": "<private foundation docs directory>",
+    "foundation-adoption": "<private adoption directory>",
+    "us-equities-foundation": "<private foundation blueprint directory>",
+    "us-equities-catalog": "<private US-equities catalog directory>"
+  },
+  "gateway_providers": {
+    "control": ["codex"],
+    "engines-on": ["openai-compatible-responses-*"]
+  }
+}

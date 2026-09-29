@@ -1,0 +1,310 @@
+{
+ "lane": "GPT-6 packaged runner (codex_call.sh start/wait/result)",
+ "runner": {
+  "status": "done",
+  "exit": 0,
+  "started": "2026-09-27T22:13:51Z",
+  "finished": "2026-09-27T22:26:41Z",
+  "usage": {
+   "input_tokens": 1579412,
+   "cached_input_tokens": 1432448,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 24440,
+   "reasoning_output_tokens": 14080
+  },
+  "usage_status": "reported",
+  "limit": false,
+  "limit_marker": false,
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "codex_version": "codex-cli 0.157.1",
+  "inputs": {
+   "effort": "max",
+   "model": "gpt-6-astra",
+   "prompt_sha256": "b3dab6763de087b12d61e0014625fd5c61a4d074cd26fc44bbd63d9de15db04b",
+   "schema_sha256": "2990223f078feb067bd9b16e7d48cf4b7fd730b2207875eb120e69dad3ab0530"
+  },
+  "attempts": []
+ },
+ "return": {
+  "items": [
+   {
+    "id": "F1",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The edit restores the README's explicit scope and preserves the tested README/agentType pointer. It also avoids incorrectly requiring changes to the saved readiness verifier's reviewed routing.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/workflows/README.md:219",
+      "quote": "The saved scripts keep their reviewed routing, since they are vendored byte-identical (the `readiness-audit` verify stage runs as the default child)."
+     },
+     {
+      "locator": "examples/claude-native/workflows/readiness-audit.js:97",
+      "quote": "{ label: 'verify', phase: 'Verify', schema: VERIFY, model: 'opus', effort: 'max' }"
+     },
+     {
+      "locator": "tests/test_install_claude_profile.py:656",
+      "quote": "self.assertTrue(any(\"agentType\" in line for line in pointer), \"no AGENTS.md line points dispatch at the table\")"
+     }
+    ],
+    "confidence": 0.99
+   },
+   {
+    "id": "F2",
+    "verdict": "reject",
+    "resolution_text": "",
+    "reasons": "These capitals emphasize scope, quantifiers and recency in separate bounded prompts. The supplied evidence does not establish a compliance problem for the configured models. The cited warning concerns aggressive tool prompting for older named models; it does not justify this case-only cleanup on behavioral grounds.",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:3",
+      "quote": "Task: find the strongest CURRENT candidates that could beat, replace or usefully complement this layer's winners for THIS requirement on these hosts."
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/README.md:35-46",
+      "quote": "Claude `opus` (claude-opus-5-5 on 2026-09-26), max, as `landscape-sweep-worker`"
+     },
+     {
+      "locator": "[Anthropic prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)",
+      "quote": "Claude Opus 4.5 and Claude Opus 4.6 are also more responsive to the system prompt than previous models."
+     }
+    ],
+    "confidence": 0.87
+   },
+   {
+    "id": "F3",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The later facts instruction can override the shared unknown-maintenance rule in practice. An explicit local exception resolves that conflict while leaving established falsehoods refutable. Since X7 is also accepted, use the proposed combined sentence once, add the required regression test, and recompute PROMPTS_SHA256_CURRENT.",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:2",
+      "quote": "never excludes or refutes a repository on unknown maintenance, because a missing result is pending, never refuted"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:4",
+      "quote": "Vote refuted=true if any material factual claim is false, unsupported by its cited source, or unverifiable; refuted=false only when you verified the facts. Default to refuted=true when uncertain."
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:41-42",
+      "quote": "# PROMPTS_SHA256_CURRENT, the sha256 of json.dumps(T, sort_keys=True, ensure_ascii=False). An intended template edit\n# changes every later run's prompts_sha256; update PROMPTS_SHA256_CURRENT with it."
+     }
+    ],
+    "confidence": 0.99
+   },
+   {
+    "id": "F4",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The replacement preserves the lasting post-inspection restriction, including reproductions. Edit only AGENTS.md. Qualification: the fixture freezes the README at bf99d340; its stored hash matches that historical version, not the current README.",
+    "sources": [
+     {
+      "locator": "AGENTS.md:73-74",
+      "quote": "results and remaining data gates. Its 2021 control segment is now inspected;\nfuture experiments must not call it a fresh untouched holdout."
+     },
+     {
+      "locator": "blueprints/us-equities/research-evaluation/README.md:113-114",
+      "quote": "A reproduction replays inspected evidence; it does not reset\nthe reserved segment's status."
+     },
+     {
+      "locator": "blueprints/convergence-practice/local-fixture/fixture.json:5",
+      "quote": "\"base_commit\": \"bf99d340f798bf72cc3104619edc482882eb423d\""
+     }
+    ],
+    "confidence": 0.95
+   },
+   {
+    "id": "X5",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The narrower writing procedure does not authorize skipping the broader research requirement. The two instructions can be followed together. Preserve the prohibition text and treat portable/live instruction drift as a separate residual.",
+    "sources": [
+     {
+      "locator": "AGENTS.md:3",
+      "quote": "Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found."
+     },
+     {
+      "locator": "examples/claude-native/CLAUDE.md:5",
+      "quote": "Before writing anything, reuse maintained upstream tools, skills, runtimes and orchestration patterns that already do the job"
+     },
+     {
+      "locator": "docs/decisions/2026-09-25-top-rule-sota-sources.md:22-24",
+      "quote": "Every layer, component and action comes from a maintained\n> SOTA repository or published reference: install it directly, or build only from a cited reference implementation"
+     }
+    ],
+    "confidence": 0.97
+   },
+   {
+    "id": "X6",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The packet already limits lanes to available tools, and the blind instructions explicitly override it. Independent checks confirmed identical saved PACKET blocks and matching SHA256SUMS. Removing lane names or specializing these packets would conflict with the existing contract.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/workflows/review-changes.js:29",
+      "quote": "Context lanes, limited to the tools your role has (load a deferred one with ToolSearch \"select:<tool name>\" before calling it; skip lanes your role lacks)"
+     },
+     {
+      "locator": "examples/claude-native/workflows/layer-verdict-lane.js:48",
+      "quote": "Blind lane: this rule overrides the context lanes above. Use only Read, Glob and Grep on the packet and on files under the repository root."
+     },
+     {
+      "locator": "examples/claude-native/workflows/test-envelope.mjs:348",
+      "quote": "expect('contract: PACKET text is byte-identical across saved workflows', new Set(packets).size === 1)"
+     },
+     {
+      "locator": "examples/claude-native/workflows/test-envelope.mjs:350",
+      "quote": "['serena', 'socraticode', 'jcodemunch', 'qmd', 'ai-memory', 'context mode', 'toolsearch'].every((lane) => packets[0].toLowerCase().includes(lane) && contractDoc.includes(lane))"
+     }
+    ],
+    "confidence": 0.99
+   },
+   {
+    "id": "X7",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "A license-only facts refutation eliminates the candidate, making license accuracy a selection gate despite the categorical standing rule. Preserve accuracy by recording a correction—or unknown when unverifiable—without refuting on that basis. The test comment must follow the standing rule. Use the proposed combined F3/X7 sentence.",
+    "sources": [
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/templates.json:2",
+      "quote": "licenses are recorded as information only and are never a reason to exclude, refute or rank down a candidate"
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/README.md:48-49",
+      "quote": "A proposal survives only when the facts refuter, the Claude fit refuter and the\nGPT-6 fit refuter all vote not refuted."
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:258",
+      "quote": "# No role other than the facts refuter's accuracy check may treat a license as a criterion."
+     }
+    ],
+    "confidence": 0.98
+   },
+   {
+    "id": "X8",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "Record the undefined condition without inventing its meaning or declaring it satisfied. This unit must preserve permission text, including the instruction against repeated approval requests once the authorization applies.",
+    "sources": [
+     {
+      "locator": "AGENTS.md:60-62",
+      "quote": "The user has explicitly authorized broker-specific paper-trading E2E after the\ncurrent foundation work. Follow `docs/paper-lane-policy.md`: proceed through native\npaper readiness and measured acceptance without repeated human approval."
+     },
+     {
+      "locator": "docs/paper-lane-policy.md:6-8",
+      "quote": "Continue that authorized work without repeated human permission requests.\nProgression depends on actual measured performance and operational results.\nThis policy records authority; it is not evidence that paper execution has run."
+     }
+    ],
+    "confidence": 0.99
+   },
+   {
+    "id": "X9",
+    "verdict": "amend",
+    "resolution_text": "Before claiming a plugin or MCP server is active, verify the relevant component in this\nsession: tools (including deferred tools via ToolSearch), skills, agents or hooks.\nDistinguish listed availability from successful execution. Use available read-only\ndiagnostics first; if the claim remains unresolved, ask for the relevant `/plugin`,\n`/mcp` or `/context` output. Invoke a command through Skill only if the installed\nclient exposes it there.",
+    "reasons": "The original needs an actionable verification path, but tool presence is not a universal plugin test: plugins can contain skills, agents or hooks. Also, some built-in commands are model-invocable through Skill. The amendment verifies the claimed component, distinguishes availability from operation, and makes user diagnostics a conditional fallback.",
+    "sources": [
+     {
+      "locator": "CLAUDE.md:3-4",
+      "quote": "Inspect native loaded tools with `/mcp` and loaded context with `/context` before\nclaiming a plugin is active."
+     },
+     {
+      "locator": "[Claude Code plugins overview](https://code.claude.com/docs/en/plugins)",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components"
+     },
+     {
+      "locator": "[Claude Code skills](https://code.claude.com/docs/en/skills)",
+      "quote": "A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`."
+     },
+     {
+      "locator": "[Claude Code MCP documentation](https://code.claude.com/docs/en/mcp)",
+      "quote": "MCP tools are deferred and discovered on demand."
+     }
+    ],
+    "confidence": 0.98
+   },
+   {
+    "id": "X10",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The sparse emphasis reinforces the verifier's assigned task and the unread-packet boundary. No demonstrated behavioral defect justifies changing the vendored bytes. Official guidance permits selective emphasis rather than imposing a capitalization ban.",
+    "sources": [
+     {
+      "locator": "examples/claude-native/workflows/review-changes.js:72",
+      "quote": "You are an independent reviewer. Try to REFUTE each behavior claim below"
+     },
+     {
+      "locator": "examples/claude-native/workflows/readiness-audit.js:96",
+      "quote": "Packets whose result is null were NOT read: list their sources under missing and do not treat the audit as complete."
+     },
+     {
+      "locator": "[Claude Code best practices](https://code.claude.com/docs/en/best-practices)",
+      "quote": "If Claude keeps skipping one instruction, add emphasis such as “IMPORTANT” to that line alone."
+     }
+    ],
+    "confidence": 0.97
+   },
+   {
+    "id": "N1",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "Recomputation confirms the current f64eec22…daf8d hash and the pre-#385 package's historical 3adfbed7…18d4 hash. The latter matches the registered ledger record. The replacement correctly separates the changing local check, historical run evidence and unretained parity checks.",
+    "sources": [
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:45",
+      "quote": "PROMPTS_SHA256_CURRENT = \"f64eec22f82355b18854be9c05c4eba0fdbaf6b6732296fc18c2fae0ff5daf8d\""
+     },
+     {
+      "locator": "tests/test_landscape_sweep_harness.py:48",
+      "quote": "PROMPTS_SHA256_20260926 = \"3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4\""
+     },
+     {
+      "locator": "catalogs/saturation/ledger.json:2839",
+      "quote": "\"prompts_sha256\": \"3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4\""
+     },
+     {
+      "locator": "tools/sota-convergence/landscape-sweep/README.md:435-437",
+      "quote": "On 2026-09-26 three unretained local checks were\nrun (prompt bytes, the smoke's conversion, `usage_record.py` on the smoke's transcripts); their outputs are not\nkept, so they are not evidence."
+     }
+    ],
+    "confidence": 0.99
+   },
+   {
+    "id": "N2",
+    "verdict": "agree",
+    "resolution_text": "",
+    "reasons": "The existing validator passes while discarding the separating blank line. An in-memory continuity check fails on the base; removing that line passes while preserving every original row. The proposed regression test addresses the actual structural defect.",
+    "sources": [
+     {
+      "locator": "tests/test_adoption_docs_consistency.py:809",
+      "quote": "rows = [line for line in section.splitlines() if line.startswith(\"|\")]"
+     },
+     {
+      "locator": "[GitHub Flavored Markdown, tables](https://github.github.com/gfm/#tables-extension-)",
+      "quote": "The table is broken at the first empty line"
+     }
+    ],
+    "confidence": 1.0
+   },
+   {
+    "id": "N3",
+    "verdict": "amend",
+    "resolution_text": "| 2026-09-27 | Changing a rule in some co-loaded prompt templates but not all | #385 put the unknown-maintenance and license rules into the landscape sweep's `common` and `fit` templates, but the `facts` refuter, which receives `common` in the same prompt, kept \"Default to refuted=true when uncertain\" for unverifiable activity facts | When a rule changes, update every template that shares the prompt; the facts template states the rule | `tests/test_landscape_sweep_harness.py` (the facts-refuter rule test) |\n| 2026-09-27 | Leaving a blank line inside a Markdown table | A blank line after the 2026-09-27 rows ended this log's table on GitHub, so every later row rendered as plain text; the shape test read only `\\|`-prefixed lines and passed | Keep a table's rows contiguous; GFM ends a table at the first empty line | `tests/test_adoption_docs_consistency.py` (the anti-pattern log check) |\n| 2026-09-27 | Restating a linked rule without its scope | `AGENTS.md` required role dispatch for every workflow `agent()` stage, while the README section it links, from the same commit, exempts the saved scripts | Restate a linked rule with its scope, or link it without restating | this log |\n| 2026-09-27 | Quoting a changing value as current in prose | The landscape-sweep README still called the 2026-09-26 prompt hash current after #385 changed the templates and the test's pin | Point at the pinned source of a changing value instead of quoting it | this log |",
+    "reasons": "Escape the pipe inside the second row's inline code. The proposed row produces six cells and fails log_errors; the escaped version passes. The substantive corrections are supported. Retain the requirement to observe the new checks failing on the mistakes before recording them as enforcement.",
+    "sources": [
+     {
+      "locator": "tests/test_adoption_docs_consistency.py:820-823",
+      "quote": "for number, line in enumerate(rows[2:], 1):\n            cells = cls.cells(line)\n            if len(cells) != len(cls.COLUMNS) or not all(cells):\n                errors.append(f\"row {number} has {len(cells)} cells or an empty cell\")"
+     },
+     {
+      "locator": "[GitHub Flavored Markdown, tables](https://github.github.com/gfm/#tables-extension-)",
+      "quote": "Include a pipe in a cell’s content by escaping it"
+     },
+     {
+      "locator": "docs/harness-defaults.md:81",
+      "quote": "name a check there only after seeing it fail on that mistake or a reproduction of it"
+     }
+    ],
+    "confidence": 1.0
+   }
+  ]
+ }
+}

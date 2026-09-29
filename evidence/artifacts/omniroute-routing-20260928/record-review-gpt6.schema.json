@@ -1,0 +1,45 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "findings",
+  "overall"
+ ],
+ "properties": {
+  "findings": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "id",
+     "verdict",
+     "reason",
+     "source"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "verdict": {
+      "type": "string",
+      "enum": [
+       "confirm",
+       "refute",
+       "amend"
+      ]
+     },
+     "reason": {
+      "type": "string"
+     },
+     "source": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "overall": {
+   "type": "string"
+  }
+ }
+}

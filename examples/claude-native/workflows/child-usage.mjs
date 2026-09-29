@@ -5,8 +5,9 @@
 //   node .claude/workflows/child-usage.mjs <transcriptDir>   (the "Transcript dir" the Workflow tool prints)
 //   node .claude/workflows/child-usage.mjs --latest          (newest run recorded for this working directory)
 //   add --require-effort max to also fail (exit 1) when any child ran at another effort
-//   (docs/tasks/2026-09-23-max-effort-default.md: a stage without effort inherits the
-//   coordinator's xhigh, and CLAUDE_CODE_EFFORT_LEVEL overrides every stage).
+//   (docs/decisions/2026-09-23-max-effort-default.md and its 2026-09-29 addendum: a stage without effort runs at its
+//   agent's frontmatter effort, else at its model's saved level or default in a headless session, or at the
+//   coordinator's xhigh on 2.1.281; CLAUDE_CODE_EFFORT_LEVEL overrides every stage).
 //   add --rtk-db <RTK history.db> to join each child Bash call to RTK's hook_decisions row by
 //   tool_use_id (opened read-only through node:sqlite), and --marker <text> to look for another
 //   injected block than Context Mode's routing block (DEFAULT_MARKER below).
@@ -60,10 +61,13 @@ const lines = (file) => readRows(file).rows.filter(Boolean)
 const SYNTHETIC = '<synthetic>'
 // Documented resolution of an alias on the Anthropic API by the client version that wrote the
 // transcript entry, as [first client version, model] rows in ascending order (model-config doc,
-// fetched 2026-09-24: opus is Opus 5.5 from v2.1.280, Opus 5 from v2.1.219, Opus 4.8 from v2.1.154).
-// An entry older than the first row, and an alias without rows (sonnet, haiku, fable), has no
-// expectation. An ANTHROPIC_DEFAULT_OPUS_MODEL pin to an older model would be flagged; none is set here.
-export const ALIAS_RESOLUTION = { opus: [['2.1.154', 'claude-opus-4-8'], ['2.1.219', 'claude-opus-5'], ['2.1.280', 'claude-opus-5-5']] }
+// "version history" table, fetched 2026-09-29: opus is Opus 5.5 from v2.1.280, Opus 5 from v2.1.219, Opus 4.8
+// from v2.1.154; sonnet is Sonnet 5.5 from v2.1.284, Sonnet 5 from v2.1.197; fable is Fable 5.1 from v2.1.257).
+// An entry older than the first row, and an alias without rows (haiku, or any alias not listed here),
+// has no expectation. An ANTHROPIC_DEFAULT_OPUS_MODEL pin to an older model would be flagged; none is set here. The sub-agents
+// doc ("Choose a model") adds one exception: a family alias resolves to the lead's exact model when the lead belongs to that
+// family, so a `sonnet` child under a lead pinned to an older Sonnet is flagged here although the client did as documented.
+export const ALIAS_RESOLUTION = { opus: [['2.1.154', 'claude-opus-4-8'], ['2.1.219', 'claude-opus-5'], ['2.1.280', 'claude-opus-5-5']], sonnet: [['2.1.197', 'claude-sonnet-5'], ['2.1.284', 'claude-sonnet-5-5']], fable: [['2.1.257', 'claude-fable-5-1']] }
 const semver = (v) => { const m = /^(\d+)\.(\d+)\.(\d+)/.exec(typeof v === 'string' ? v : ''); return m ? m.slice(1).map(Number) : null }
 const compareParts = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++) { const d = (a[i] || 0) - (b[i] || 0); if (d) return d < 0 ? -1 : 1 } return 0 }
 // claude-opus-5-5 -> { family: 'opus', version: [5, 5] }; a date suffix and a [1m] suffix are ignored; other shapes -> null.
@@ -1078,7 +1082,7 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   if (unresolved) usageIssues.push(unresolved + ' assistant message(s) without a resolved model')
   if (!messages.length) issues.push('no assistant usage in transcript')
   issues.push(...usageIssues)
-  if (!requested) issues.push('model not requested explicitly (inherits the coordinator model)')
+  if (!requested) issues.push("model not requested explicitly (the child ran its definition's model, CLAUDE_CODE_SUBAGENT_MODEL or the coordinator's model)")
   else if (!resolved.length || resolved.some((m) => !m.toLowerCase().includes(requested.toLowerCase()))) issues.push('resolved model outside requested family: ' + (resolved.join(',') || '(none resolved)'))
   // Classifier fallback (model-config doc, "Automatic model fallback"): after a flagged request the
   // child continues on the fallback model, so a change of resolved model within the child, or a model

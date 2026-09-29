@@ -267,21 +267,29 @@ class ReconcileTests(unittest.TestCase):
 
     def test_summary_fits_the_receipt_excerpt_and_needs_every_condition(self):
         versions = "promptfoo 0.123.1, codex-cli 0.157.1, run 2026-09-27T20:00:00Z"
+        sha = "0123456789abcdef" * 4
         result = run_gate.verdict(run_gate.parse_rows(results(*jcodemunch_matrix()), "jcodemunch"), "jcodemunch")
-        line, ok = run_gate.summary("jcodemunch", result, (10, 10, 8), versions)
+        line, ok = run_gate.summary("jcodemunch", result, (10, 10, 8), versions, sha)
         self.assertTrue(ok)
+        self.assertIn(f" | results {sha} | promptfoo 0.123.1", line)
         self.assertTrue(line.startswith("capability-gate jcodemunch: PASS | gate 6/6 pass; ctrl-disabled 2/2 fail as "
                                         "predicted; ctrl-prompt 2/2 fail as predicted | 10 rows as expected, 10 "
                                         "distinct sessions | loki 10/10 rows match"), line)
-        self.assertFalse(run_gate.summary("jcodemunch", result, (0, 0, 0), "")[1])
-        self.assertFalse(run_gate.summary("jcodemunch", result, (9, 10, 8), "")[1])
+        self.assertFalse(run_gate.summary("jcodemunch", result, (0, 0, 0), "", sha)[1])
+        self.assertFalse(run_gate.summary("jcodemunch", result, (9, 10, 8), "", sha)[1])
+        unretained, unretained_ok = run_gate.summary("jcodemunch", result, (10, 10, 8), versions)
+        self.assertFalse(unretained_ok)
+        self.assertIn("| results NOT retained |", unretained)
         for key in ("matrix_ok", "sessions_ok", "gate_ok", "controls_ok"):
-            self.assertFalse(run_gate.summary("jcodemunch", {**result, key: False}, (10, 10, 8), versions)[1], key)
+            self.assertFalse(run_gate.summary("jcodemunch", {**result, key: False}, (10, 10, 8), versions, sha)[1], key)
+        m13_pass = run_gate.verdict(run_gate.parse_rows(results(*m13_matrix()), "m13"), "m13")
+        m13_pass_line, m13_pass_ok = run_gate.summary("m13", m13_pass, (52, 52, 236), versions, sha)
+        self.assertTrue(m13_pass_ok)
         m13 = run_gate.verdict(run_gate.parse_rows(results(*m13_matrix()[1:]), "m13"), "m13")
-        m13_line, m13_ok = run_gate.summary("m13", m13, (51, 51, 230), versions)
+        m13_line, m13_ok = run_gate.summary("m13", m13, (51, 51, 230), versions, sha)
         self.assertFalse(m13_ok)
         self.assertIn("51 rows NOT the expected 52 by arm", m13_line)
-        self.assertLessEqual(max(len(line), len(m13_line)), 400)
+        self.assertLessEqual(max(len(line), len(m13_pass_line), len(m13_line)), 400)
 
 
 class EnvironmentTests(unittest.TestCase):
@@ -300,6 +308,42 @@ class EnvironmentTests(unittest.TestCase):
         self.assertEqual(env["CAPABILITY_GATE_MAIN_CHECKOUT"], "/main")
 
 
+class RetentionTests(unittest.TestCase):
+    def test_results_are_copied_privately_hashed_and_never_overwritten(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "results.json"
+            source.write_bytes(b'{"results": {"results": []}}')
+            root = Path(tmp) / "state" / "capability-gate"
+            sha, relative = run_gate.retain(source, root, "m13-20260927T220000Z-1")
+            target = root / relative
+            self.assertEqual(relative, "m13-20260927T220000Z-1/results.json")
+            self.assertEqual(target.read_bytes(), source.read_bytes())
+            self.assertEqual(sha, __import__("hashlib").sha256(source.read_bytes()).hexdigest())
+            self.assertEqual(target.stat().st_mode & 0o777, 0o600)
+            self.assertEqual(target.parent.stat().st_mode & 0o777, 0o700)
+            self.assertEqual(root.stat().st_mode & 0o777, 0o700)
+            with self.assertRaises(FileExistsError):
+                run_gate.retain(source, root, "m13-20260927T220000Z-1")
+
+    def test_m13_rows_need_their_own_sentinel_in_the_results(self):
+        def results(*variables):
+            return {"results": {"results": [{"vars": v} for v in variables]}}
+        own = {"tree": "a", "rep": "r07", "sentinel": "CGTOK-a-r07-0123456789abcdef"}
+        self.assertEqual(run_gate.rows_without_sentinel(results(own), "m13"), 0)
+        redacted = {**own, "sentinel": "[REDACTED]"}
+        other_rep = {**own, "sentinel": "CGTOK-a-r08-0123456789abcdef"}
+        old_name = {"tree": "a", "rep": "r07", "token": own["sentinel"]}
+        self.assertEqual(run_gate.rows_without_sentinel(results(own, redacted, other_rep, old_name), "m13"), 3)
+        self.assertEqual(run_gate.rows_without_sentinel(results(redacted), "jcodemunch"), 0)
+
+    def test_the_retention_root_is_private_state_outside_the_checkout(self):
+        with mock.patch.dict(os.environ, {"CAPABILITY_GATE_RETAIN": "/r", "XDG_STATE_HOME": "/s"}):
+            self.assertEqual(run_gate.retain_root(), Path("/r"))
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "/s"}):
+            os.environ.pop("CAPABILITY_GATE_RETAIN", None)
+            self.assertEqual(run_gate.retain_root(), Path("/s/native-agent-stack/capability-gate"))
+
+
 @unittest.skipUnless(NODE, "node is not on PATH")
 class AssertionTests(unittest.TestCase):
     def batch(self, function, contexts):
@@ -310,19 +354,61 @@ class AssertionTests(unittest.TestCase):
                   f"return a.{function}('', c); }})));")
         return json.loads(subprocess.run([NODE, "-e", script], check=True, capture_output=True, text=True).stdout)
 
-    def test_completed_result_needs_a_completed_error_free_matching_call(self):
-        base = {"prompt": "find register_file", "vars": {"detail": "relative_path: str"}, "config": {"server": "jcodemunch"}}
-        ok, failed, other_server, in_prompt = self.batch("completedResult", [
-            {**base, "items": [mcp("jcodemunch", "order", text="relative_path: str")]},
-            {**base, "items": [mcp("jcodemunch", "order", "failed", {"message": "requires approval"}, text="relative_path: str")]},
-            {**base, "items": [mcp("serena", "find_symbol", text="relative_path: str")]},
-            {**base, "prompt": "relative_path: str", "items": [mcp("jcodemunch", "order", text="relative_path: str")]},
+    def test_completed_result_needs_the_prescribed_call_completed_and_matching(self):
+        call = {"action": "search_symbols", "args": {"repo": "native-agent-stack", "query": "register_file"}}
+        sent = {"action": "search_symbols", "args": {**call["args"], "kind": "function", "max_results": 1}}
+        base = {"prompt": "find register_file", "vars": {"detail": "relative_path: str", "call": json.dumps(call)},
+                "config": {"server": "jcodemunch", "tool": "order"}}
+        hit = "relative_path: str"
+        ok, failed, other_server, in_prompt, other_tool, other_args, no_call, no_tool = self.batch("completedResult", [
+            {**base, "items": [mcp("jcodemunch", "order", text=hit, arguments=sent)]},
+            {**base, "items": [mcp("jcodemunch", "order", "failed", {"message": "requires approval"}, text=hit,
+                                   arguments=sent)]},
+            {**base, "items": [mcp("serena", "find_symbol", text=hit, arguments=sent)]},
+            {**base, "prompt": hit, "items": [mcp("jcodemunch", "order", text=hit, arguments=sent)]},
+            {**base, "items": [mcp("jcodemunch", "route", text=hit, arguments={"task": "find register_file"})]},
+            {**base, "items": [mcp("jcodemunch", "order", text=hit,
+                                   arguments={"action": "search_symbols", "args": {"repo": "native-agent-stack",
+                                                                                    "query": "register"}})]},
+            {**base, "vars": {"detail": hit}, "items": [mcp("jcodemunch", "order", text=hit, arguments=sent)]},
+            {**base, "config": {"server": "jcodemunch"}, "items": [mcp("jcodemunch", "order", text=hit, arguments=sent)]},
         ])
-        self.assertTrue(ok["pass"])
+        self.assertTrue(ok["pass"], ok["reason"])
         self.assertFalse(failed["pass"])
         self.assertIn("order:failed requires approval", failed["reason"])
         self.assertFalse(other_server["pass"])
         self.assertFalse(in_prompt["pass"])
+        self.assertFalse(other_tool["pass"])
+        self.assertFalse(other_args["pass"])
+        self.assertTrue(no_call["reason"].startswith("misconfigured"))
+        self.assertTrue(no_tool["reason"].startswith("misconfigured"))
+
+    def test_the_jcodemunch_details_need_the_symbol_id_and_the_full_signature(self):
+        # search_symbols results of jcodemunch-mcp 1.108.319 for the two fixtures, as the MCP server returned them on
+        # 2026-09-27 (text content, abridged to the fields the details use).
+        found = {
+            "register_file": '{"result_count":1,"results":[{"id":"scripts/host_receipts.py::register_file#function",'
+                             '"kind":"function","name":"register_file","file":"scripts/host_receipts.py","line":710,'
+                             '"signature":"def register_file(root: Path, relative_path: str) -> None"}]}',
+            "profile_servers_without_base":
+                '{"result_count":1,"results":[{"id":"tools/sota-convergence/landscape-sweep/build_args.py::'
+                'profile_servers_without_base#function","kind":"function","name":"profile_servers_without_base",'
+                '"file":"tools/sota-convergence/landscape-sweep/build_args.py","line":195,"signature":'
+                '"def profile_servers_without_base(profile_bytes: bytes, base_servers: list) -> list"}]}',
+        }
+        text = (GATE / "jcodemunch.yaml").read_text()
+        details = re.findall(r"detail: '(.+)'\n      call: '(.+)'", text)
+        self.assertEqual(len(details), 6)
+        contexts = []
+        for detail, call in details:
+            query = json.loads(call)["args"]["query"]
+            other = next(value for key, value in found.items() if key != query)
+            for result in (found[query], other, found[query].replace(") -> None", ")").replace(") -> list", ")")):
+                contexts.append({"prompt": "", "vars": {"detail": detail, "call": call},
+                                 "config": {"server": "jcodemunch", "tool": "order"},
+                                 "items": [mcp("jcodemunch", "order", text=result, arguments=json.loads(call))]})
+        verdicts = self.batch("completedResult", contexts)
+        self.assertEqual([v["pass"] for v in verdicts], [True, False, False] * 6)
 
     def test_m13_class_verdicts(self):
         good = prescribed(OWN)
@@ -345,6 +431,42 @@ class AssertionTests(unittest.TestCase):
             ("directory change", "ctx_execute", [ctx_exec(OWN, "cd /w/wt-a && cat .cg/r01/sentinel-ctx-execute.txt")],
              "not_prescribed"),
             ("explicit cwd", "ctx_execute", [ctx_exec(OWN, cwd="/w/wt-a")], "not_prescribed"),
+            ("pushd", "ctx_execute", [ctx_exec(OWN, "pushd /w/wt-a; cat .cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("os.chdir", "ctx_execute", [ctx_exec(OWN, "import os; os.chdir('/w/wt-a'); "
+                                                       "print(open('.cg/r01/sentinel-ctx-execute.txt').read())")],
+             "not_prescribed"),
+            ("process.chdir", "ctx_execute", [ctx_exec(OWN, "process.chdir('/w/wt-a'); "
+                                                            "require('fs').readFileSync('.cg/r01/sentinel-ctx-execute.txt')")],
+             "not_prescribed"),
+            ("git -C", "ctx_execute", [ctx_exec(OWN, "git -C /w/wt-a show HEAD:.cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("env --chdir", "ctx_execute", [ctx_exec(OWN, "env --chdir=/w/wt-a cat .cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("Set-Location", "ctx_execute", [ctx_exec(OWN, "Set-Location /w/wt-a; cat .cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("Push-Location", "ctx_execute", [ctx_exec(OWN, "Push-Location /w/wt-a; cat .cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("attached -C", "shell", [shell("/bin/bash -lc 'env -C/w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
+            ("grouped -C", "ctx_execute", [ctx_exec(OWN, "tar -xC/w/wt-a -f x.tar; cat .cg/r01/sentinel-ctx-execute.txt")],
+             "not_prescribed"),
+            ("-C in an argument list", "ctx_execute",
+             [ctx_exec(OWN, "subprocess.run(['git', '-C', '/w/wt-a', 'show', 'HEAD:.cg/r01/sentinel-ctx-execute.txt'])")],
+             "not_prescribed"),
+            ("git --work-tree", "ctx_execute",
+             [ctx_exec(OWN, "git --work-tree=/w/wt-a show HEAD:.cg/r01/sentinel-ctx-execute.txt")], "not_prescribed"),
+            ("sudo -D", "shell", [shell("/bin/bash -lc 'sudo -D /w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
+            ("unshare -w", "shell", [shell("/bin/bash -lc 'unshare -w /w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
+            ("systemd-run --working-directory", "shell",
+             [shell("/bin/bash -lc 'systemd-run --working-directory=/w/wt-a cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
+            ("directory change in the file snippet", "ctx_execute_file",
+             [ctx_file(OWN, code='cd /w/wt-a && echo "$FILE_CONTENT"')], "not_prescribed"),
+            ("shell pushd", "shell", [shell("/bin/bash -lc 'pushd /w/wt-a && cat .cg/r01/sentinel-shell.txt'", OWN)],
+             "not_prescribed"),
             ("another repetition's path", "ctx_execute", [ctx_exec(OWN, "cat .cg/r02/sentinel-ctx-execute.txt")],
              "not_prescribed"),
             ("token in the file snippet", "ctx_execute_file", [ctx_file(OWN, code=f"echo {OWN}")], "not_prescribed"),
@@ -362,14 +484,14 @@ class AssertionTests(unittest.TestCase):
              good["shell"] + [shell("/bin/bash -lc 'ls'", OTHER)], "wrong_root_or_stale"),
             ("serena on another path", "serena", [find_symbol(OWN, ".cg/r02/cg_sentinel.py")], "not_prescribed"),
         ]
-        base = {"prompt": "read .cg/r01/...", "vars": {"token": OWN, "rep": "r01"}}
+        base = {"prompt": "read .cg/r01/...", "vars": {"sentinel": OWN, "rep": "r01"}}
         verdicts = self.batch("m13Class", [{**base, "config": {"cls": cls}, "items": items} for _, cls, items, _ in cases])
         for (name, _, _, expected), got in zip(cases, verdicts):
             self.assertEqual(got["reason"], expected, name)
             self.assertEqual(got["pass"], expected == "own", name)
         in_prompt, no_rep = self.batch("m13Class", [
             {**base, "prompt": OWN, "config": {"cls": "ctx_execute"}, "items": good["ctx_execute"]},
-            {**base, "vars": {"token": OWN}, "config": {"cls": "ctx_execute"}, "items": good["ctx_execute"]},
+            {**base, "vars": {"sentinel": OWN}, "config": {"cls": "ctx_execute"}, "items": good["ctx_execute"]},
         ])
         self.assertFalse(in_prompt["pass"])
         self.assertTrue(no_rep["reason"].startswith("misconfigured"))
@@ -393,7 +515,7 @@ class AssertionTests(unittest.TestCase):
             env = {**os.environ, "CAPABILITY_GATE_WT_A": str(trees["a"]), "CAPABILITY_GATE_WT_B": str(trees["b"])}
             out = json.loads(subprocess.run([NODE, "-e", script], check=True, capture_output=True, text=True,
                                             env=env).stdout)
-            token = out["test"]["vars"]["token"]
+            token = out["test"]["vars"]["sentinel"]
             self.assertRegex(token, r"^CGTOK-a-r07-[0-9a-f]{16}$")
             written = sorted(p.name for p in (trees["a"] / ".cg" / "r07").iterdir())
             self.assertEqual(written, ["cg_sentinel.py", "sentinel-ctx-execute.txt", "sentinel-ctx-file.txt",
@@ -440,11 +562,31 @@ class LauncherAndConfigTests(unittest.TestCase):
                 counts[provider] += int(repeat.group(1)) if repeat else 1
             self.assertEqual(counts, Counter(run_gate.GATES[gate]["rows"]), name)
 
+    def test_each_row_prescribes_its_briefs_call_and_the_assertion_names_the_tool(self):
+        for name, tool in (("jcodemunch.yaml", "order"), ("ai-memory.yaml", "memory_query")):
+            text = (GATE / name).read_text()
+            self.assertIn(f"        tool: {tool}\n", text, name)
+            rows = re.findall(r"instruction: file://(briefs/\S+\.md)\n      detail: '.+'\n      call: '(.+)'", text)
+            self.assertEqual(len(rows), 6, name)  # two fixtures, each in the gate and both controls
+            for brief, call in rows:
+                brief_text = (GATE / brief).read_text()
+                self.assertIn(f"Call {name.split('.')[0]} {tool} once with ", brief_text, brief)
+                sent = json.loads(re.search(r" once with (\{.*\})\. Make no other", brief_text).group(1))
+                expected = json.loads(call)
+                self.assertTrue(expected and _subset(expected, sent), (brief, call))
+
     def test_fixture_details_are_absent_from_their_briefs(self):
         for name in ("jcodemunch.yaml", "ai-memory.yaml"):
             text = (GATE / name).read_text()
             for brief, detail in re.findall(r"instruction: file://(briefs/\S+\.md)\n      detail: '(.+)'", text):
                 self.assertIsNone(re.search(detail.replace("''", "'"), (GATE / brief).read_text()), (name, brief))
+
+
+def _subset(expected, actual):
+    """assertions.js subset() in Python: every key of expected is in actual with an equal value."""
+    if not isinstance(expected, dict):
+        return expected == actual
+    return isinstance(actual, dict) and all(k in actual and _subset(v, actual[k]) for k, v in expected.items())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,91 @@
+{
+ "note": "usage: k4_mentions.py RESULTS_K4_JSON OUT_JSON\nThe packet's count (\"N of 9 answers cite claude-hud:setup or claude-hud:configure\") was computed from the full\nanswers, which are not published (the K4 answers also quote client settings). This keeps only each matching sentence,\ncut to 300 characters, so the count can be recomputed from retained text. Host paths are replaced by \"~\".",
+ "pattern": "claude-hud:(?:setup|configure)",
+ "runs": [
+  {
+   "arm": "g",
+   "transcript": "20260928T025524Z-1683412.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": true,
+   "sentences": [
+    "- Its two skills (`claude-hud:setup`, `claude-hud:configure`) are in this session's available-skills list, consistent with an enabled plugin."
+   ]
+  },
+  {
+   "arm": "c",
+   "transcript": "20260928T025605Z-1690071.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": true,
+   "sentences": [
+    "Yes, partially confirmable from here: the `claude-hud:setup` and `claude-hud:configure` skills appear in this session's available-skills list, which confirms the plugin itself is enabled/loaded in this session.",
+    "What I can't confirm from inside the session is whether it's actively configured as your current statusline (that's separate runtime state I have no visibility into) — running `/context` would show loaded plugins, and `/statusline` or `/claude-hud:setup` would show/set the actual statusline configur"
+   ]
+  },
+  {
+   "arm": "0",
+   "transcript": "20260928T025633Z-1693371.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": false,
+   "sentences": []
+  },
+  {
+   "arm": "g",
+   "transcript": "20260928T025722Z-1700425.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": false,
+   "sentences": []
+  },
+  {
+   "arm": "c",
+   "transcript": "20260928T030010Z-1724341.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": true,
+   "sentences": [
+    "It's also visible as installed skills in this session (`claude-hud:setup`, `claude-hud:configure`)."
+   ]
+  },
+  {
+   "arm": "0",
+   "transcript": "20260928T030040Z-1727411.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": true,
+   "sentences": [
+    "- Its `claude-hud:setup` and `claude-hud:configure` skills are in this session's available-skills list."
+   ]
+  },
+  {
+   "arm": "g",
+   "transcript": "20260928T030119Z-1732785.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": true,
+   "sentences": [
+    "- Its skills (`claude-hud:setup`, `claude-hud:configure`) are present in this session's available-skills list."
+   ]
+  },
+  {
+   "arm": "c",
+   "transcript": "20260928T030157Z-1738123.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": true,
+   "sentences": [
+    "- Its skills, `claude-hud:setup` and `claude-hud:configure`, are listed as available in this session's skill listing — satisfying the \"skills present in this session\" check from `AGENTS.md`."
+   ]
+  },
+  {
+   "arm": "0",
+   "transcript": "20260928T030223Z-1742767.jsonl",
+   "model": "claude-sonnet-5",
+   "cites": true,
+   "sentences": [
+    "**This session's loaded-skills list** already includes `claude-hud:setup` and `claude-hud:configure`, meaning the plugin's skills are registered in the current session, not just installed on disk."
+   ]
+  }
+ ],
+ "counts": {
+  "g": 2,
+  "c": 3,
+  "0": 2,
+  "total": 7,
+  "runs": 9
+ }
+}
