@@ -2401,6 +2401,151 @@ export function transcriptUsage(transcript, window = null) {
     totals_including_advisor: Object.fromEntries(COUNTERS.map((k) => [k, totals[k] === null ? null : totals[k] + advisorTotals[k]])),
     iteration_issues: { unread_entries: unread, ...issues } }
 }
+
+// PR-A item 6, incomplete returns (#381 AA-PLAN item 6: "a final text that is a wait notice or empty is not counted as complete"; U2 design
+// section 6). No upstream source defines a wait notice. This is the U2 design's rule, read by a linear word scanner rather than its regex
+// (CodeQL js/redos has flagged this kernel's patterns before): the trimmed text has at most 400 characters, and its first sentence (up to the
+// first . ! or ? that a blank follows) is, after at most three non-word characters, at most two of the lead phrases below, each followed by
+// blanks, then "wait" or "waiting", blanks and the whole word "for", "on" or "until", in any case. An apostrophe may also be the typographic
+// U+2019, which the design's regex left out.
+const WAIT_LEADS = ['still', 'now', "i'll", 'i will', "i'm", 'i am', 'let me', "we'll", 'we will']
+const WAIT_OBJECTS = ['for', 'on', 'until']
+const WAIT_TEXT_LIMIT = 400
+const wordUnit = (c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c === '_' // \w without the u flag
+export function waitNotice(text) {
+  const t = String(text ?? '').trim()
+  if (!t || t.length > WAIT_TEXT_LIMIT) return false
+  let s = t.toLowerCase().split('’').join("'")
+  for (let i = 0; i + 1 < s.length; i++) if ((s[i] === '.' || s[i] === '!' || s[i] === '?') && /\s/.test(s[i + 1])) { s = s.slice(0, i + 1); break }
+  const blanksAfter = (k) => { let j = k; while (j < s.length && /\s/.test(s[j])) j++; return j > k ? j : -1 } // the index after one or more blanks
+  let at = 0
+  while (at < 3 && at < s.length && !wordUnit(s[at])) at++
+  for (let leads = 0; leads < 2; leads++) {
+    const lead = WAIT_LEADS.find((w) => s.startsWith(w, at) && blanksAfter(at + w.length) > 0)
+    if (!lead) break
+    at = blanksAfter(at + lead.length)
+  }
+  const verb = s.startsWith('waiting', at) ? 'waiting' : s.startsWith('wait', at) ? 'wait' : null
+  at = verb ? blanksAfter(at + verb.length) : -1
+  return at > 0 && WAIT_OBJECTS.some((w) => s.startsWith(w, at) && !wordUnit(s[at + w.length] ?? ' '))
+}
+// The quality of a child's return (its journal result): null for no result (the child keeps its existing issue), else 'empty', 'wait_notice'
+// or 'ok'. A string is read as it is; an object with a string `answer` (the E2E schema, token-e2e-run.mjs) by its answer; any other object or
+// array by its leaves, down to depth 6 and over at most 10,000 values: 'empty' when no leaf is a non-blank string, a number or a boolean,
+// 'wait_notice' when at least one leaf is a non-blank string and every such string is a wait notice (the design's rule read literally made
+// { ok: true } a wait notice, since it has no string at all), else 'ok'. Values beyond the walk are content it cannot read, so 'ok'.
+const RETURN_WALK_DEPTH = 6, RETURN_WALK_VALUES = 10000
+const textQuality = (s) => !s.trim() ? 'empty' : waitNotice(s) ? 'wait_notice' : 'ok'
+export function returnQuality(value) {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'string') return textQuality(value)
+  if (typeof value !== 'object') return 'ok'
+  if (!Array.isArray(value) && typeof value.answer === 'string') return textQuality(value.answer)
+  let strings = 0, waits = 0, scalars = 0, values = 0, unread = false
+  for (const stack = [[value, 0]]; stack.length && !unread;) {
+    const [v, depth] = stack.pop()
+    if (typeof v === 'string') { if (v.trim()) { strings++; if (waitNotice(v)) waits++ } }
+    else if (typeof v === 'number' || typeof v === 'boolean') scalars++
+    else if (v && typeof v === 'object') {
+      if (depth >= RETURN_WALK_DEPTH) { unread = true; break }
+      for (const x of Object.values(v)) { if (++values > RETURN_WALK_VALUES) { unread = true; break } stack.push([x, depth + 1]) }
+    }
+  }
+  return unread ? 'ok' : strings && waits === strings ? 'wait_notice' : strings || scalars ? 'ok' : 'empty'
+}
+// The transcript side of item 6 (counts only): the kind of the final assistant row, whether its message's text is empty or a wait notice, and
+// the actor's background tasks still running at that row. A foreground subagent's background command "stops when that subagent gives its final
+// response" (code.claude.com/docs/en/tools-reference, "Background commands"), and so do its monitors ("Monitor tool"), so such a task's result
+// never reached the return. Count-only scans of this host (evidence/artifacts/pra-u2-differential-20260929/scans: final-returns,
+// task-notifications and task-stop) replace the design's rule, which read only backgroundTaskId and any notification: a task starts with a
+// result whose toolUseResult carries a backgroundTaskId (Bash run_in_background, or a command moved to the background at its timeout), a
+// Monitor or Workflow result's taskId, or an async Agent result's agentId (isAsync true); it ends with a <task-notification> naming it in
+// <task-id> whose <status> is completed, failed, killed or stopped (the values observed), found in a queued_command attachment's prompt, a user
+// row's string content or a user text block, or with a TaskStop result that is not an error and names it in toolUseResult.task_id (the client
+// sends no notification after a TaskStop of a Bash, Monitor or Workflow task: 88 of 88 observed). A notification with another status or none,
+// such as a Monitor event, ends nothing; background_pending_with_events counts the pending tasks that had one. Only rows before until and up to
+// the final assistant row are read. status: 'measured'; 'not_applicable' when no row is an assistant row with a provider message id (the Codex
+// bridge's normalized rows carry tool calls and results only, so their final return cannot be read); 'unobserved' when a row lies at or after
+// until (the actor ran past the window end, so its final return lies outside the window). Counters are null unless measured.
+const TERMINAL_TASK_STATUSES = new Set(['completed', 'failed', 'killed', 'stopped'])
+const FINAL_RETURN_COUNTS = ['empty_text', 'wait_notice', 'background_started', 'background_pending', 'background_pending_with_events']
+const NO_FINAL_RETURN = { final: null, ...Object.fromEntries(FINAL_RETURN_COUNTS.map((k) => [k, null])) }
+const tagText = (block, tag) => { const a = block.indexOf('<' + tag + '>'), b = a < 0 ? -1 : block.indexOf('</' + tag + '>', a); return b < 0 ? null : block.slice(a + tag.length + 2, b).trim() }
+// The <task-notification> blocks of a text as [{ task, status }], by indexOf (no pattern).
+function taskNotifications(text) {
+  const out = []
+  for (let at = 0; at < text.length;) {
+    const i = text.indexOf('<task-notification>', at)
+    if (i < 0) break
+    const j = text.indexOf('</task-notification>', i), block = text.slice(i, j < 0 ? text.length : j)
+    out.push({ task: tagText(block, 'task-id'), status: tagText(block, 'status') })
+    at = j < 0 ? text.length : j + 1
+  }
+  return out
+}
+export function finalReturn(transcript, window = null) {
+  const provider = (row) => row?.type === 'assistant' && typeof row.message?.id === 'string' && row.message.id !== ''
+  const kept = (row) => !window || (timeOf(row) !== null && timeOf(row) < window.until)
+  let last = -1, any = false, past = false
+  for (const [i, row] of transcript.entries()) {
+    if (provider(row)) any = true
+    if (window && timeOf(row) !== null && timeOf(row) >= window.until) past = true
+    else if (kept(row) && provider(row)) last = i
+  }
+  if (!any) return { status: 'not_applicable', ...NO_FINAL_RETURN }
+  if (past || last < 0) return { status: 'unobserved', ...NO_FINAL_RETURN }
+  const blocks = blocksOf(transcript[last]), id = transcript[last].message.id
+  const final = blocks.some((b) => b.type === 'tool_use') ? 'tool_use' : blocks.some((b) => b.type === 'text') ? 'text' : 'other'
+  const names = new Map(), started = new Set(), ended = new Set(), evented = new Set()
+  let text = ''
+  for (let i = 0; i <= last; i++) {
+    const row = transcript[i]
+    if (!row || typeof row !== 'object' || !kept(row)) continue
+    if (row.type === 'assistant') {
+      for (const b of blocksOf(row)) {
+        if (b.type === 'tool_use') names.set(b.id, b.name)
+        else if (final === 'text' && b.type === 'text' && typeof b.text === 'string' && row.message?.id === id) text += (text ? '\n' : '') + b.text
+      }
+      continue
+    }
+    const notes = []
+    if (row.type === 'attachment' && row.attachment?.type === 'queued_command') notes.push(textOf(row.attachment.prompt))
+    if (row.type === 'user') {
+      if (typeof row.message?.content === 'string') notes.push(row.message.content)
+      const said = row.toolUseResult && typeof row.toolUseResult === 'object' ? row.toolUseResult : null
+      for (const b of blocksOf(row)) {
+        if (b.type === 'text' && typeof b.text === 'string') notes.push(b.text)
+        if (b.type !== 'tool_result' || !said) continue
+        const tool = names.get(b.tool_use_id)
+        if (typeof said.backgroundTaskId === 'string') started.add(said.backgroundTaskId)
+        else if ((tool === 'Monitor' || tool === 'Workflow') && typeof said.taskId === 'string') started.add(said.taskId)
+        else if ((tool === 'Agent' || tool === 'Task') && said.isAsync === true && typeof said.agentId === 'string') started.add(said.agentId)
+        else if (tool === 'TaskStop' && !b.is_error && typeof said.task_id === 'string') ended.add(said.task_id)
+      }
+    }
+    for (const note of notes) for (const n of taskNotifications(note)) if (n.task !== null) (TERMINAL_TASK_STATUSES.has(n.status) ? ended : evented).add(n.task)
+  }
+  const pending = [...started].filter((t) => !ended.has(t))
+  return { status: 'measured', final, empty_text: final === 'text' && !text.trim() ? 1 : 0, wait_notice: final === 'text' && waitNotice(text) ? 1 : 0,
+    background_started: started.size, background_pending: pending.length, background_pending_with_events: pending.filter((t) => evented.has(t)).length }
+}
+// Actors by final_return status and final kind, with the counters summed over measured actors; a measurement without final_return (an
+// older shape) counts as not_applicable.
+function aggregateFinalReturns(items) {
+  const out = { measured: 0, not_applicable: 0, unobserved: 0, by_final: { text: 0, tool_use: 0, other: 0 },
+    ...Object.fromEntries(FINAL_RETURN_COUNTS.map((k) => [k, 0])), actors_with_background_pending: 0 }
+  for (const m of items) {
+    const f = m.final_return
+    if (!f || f.status === 'not_applicable') { out.not_applicable++; continue }
+    if (f.status !== 'measured') { out.unobserved++; continue }
+    out.measured++
+    if (Object.hasOwn(out.by_final, f.final)) out.by_final[f.final]++
+    for (const k of FINAL_RETURN_COUNTS) out[k] += f[k] || 0
+    if (f.background_pending) out.actors_with_background_pending++
+  }
+  return out
+}
+
 export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER } = {}) {
   const calls = new Map(), results = new Map(), rewrites = new Map()
   const inside = (row) => !window || (timeOf(row) !== null && timeOf(row) >= window.since && timeOf(row) < window.until)
@@ -2527,7 +2672,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
   return { m3: finishSizes(m3), m4: finishFetches(m4, fetchCarriers), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
     rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
-    usage: transcriptUsage(transcript, window),
+    usage: transcriptUsage(transcript, window), final_return: finalReturn(transcript, window),
     hook_context: hookContext,
     call_states: callStates, m15: finishM15(m15),
     mcp_states: mcpStates, mcp_attempted: mcpAttempted, loaded_not_called: notCalled, loaded,
@@ -2659,7 +2804,8 @@ export function aggregateMeasurements(items) {
     for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations', 'parse_errors']) cli[k] += part[k] || 0
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
-    hook_context: hooks, call_states: callStates, m15: finishM15(m15), mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
+    hook_context: hooks, call_states: callStates, m15: finishM15(m15), final_return: aggregateFinalReturns(items),
+    mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
     proxy: { ...proxies, rule: rules.size === 1 ? [...rules][0] : 'mixed', acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
     cli_lanes: !items.length ? { status: 'not_measured' }
       : unavailable.length === items.length ? { status: 'parser_unavailable', reason: unavailable[0].cli_lanes.reason }
@@ -3004,6 +3150,13 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   const usageIssues = []
   if (!result) issues.push('no result entry in journal')
   else if (result.result === null || result.result === undefined) issues.push('null result')
+  // PR-A item 6: an empty or wait-notice return (returnQuality) and a background task the child left running at its final message
+  // (final_return) are incomplete returns. They are issues, never usage_issues, so a superseded attempt is unaffected (summarizeRun).
+  const quality = result ? returnQuality(result.result) : null
+  if (quality === 'empty') issues.push('empty result')
+  else if (quality === 'wait_notice') issues.push('wait-notice result')
+  const lanes = childLanes(transcript, lanesOptions), finalRet = lanes.measurement.final_return
+  if (finalRet.background_pending) issues.push('returned with ' + finalRet.background_pending + ' background task(s) that had no completion notification')
   if (!meta) issues.push('missing meta.json')
   if (!transcriptFound) usageIssues.push('no transcript file (usage unknown)')
   const neverCounted = [...withoutUsage].filter((id) => !byId.has(id)).length
@@ -3040,8 +3193,9 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
     // the fixed cost of spawning this child before it does any work.
     first_request_prompt_tokens: messages.length ? PROMPT_COUNTERS.reduce((n, k) => n + (messages[0].message.usage[k] || 0), 0) : null,
     complete: issues.length === 0, issues, ...(usageIssues.length ? { usage_issues: usageIssues } : {}),
+    return_quality: quality, final_return: finalRet,
     // Tool lanes, hook rewrites and the injected-block marker (childLanes above); names and counts only.
-    lanes: childLanes(transcript, lanesOptions),
+    lanes,
   }
 }
 
@@ -3091,7 +3245,7 @@ export function summarizeRun(dir, lanesOptions = {}) {
     uncounted.length ? uncounted.length + ' superseded attempt(s) with usage by_resolved_model cannot count (usage_issues)' : null].filter(Boolean)
   return {
     status: !children.length || gaps.length ? 'incomplete' : 'complete',
-    reason: (!children.length ? 'journal has no started children' : gaps.length ? gaps.join('; ') : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result') + rerun,
+    reason: (!children.length ? 'journal has no started children' : gaps.length ? gaps.join('; ') : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result that is neither empty nor a wait notice, with no background task left running at its final message') + rerun,
     multi_model_children: children.filter((c) => c.resolved_models.length > 1).map((c) => c.label || c.agent_id),
     // Over every attempt (children and superseded attempts), like by_resolved_model.
     web_search: {
