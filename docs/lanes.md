@@ -150,20 +150,50 @@ reports through the protocol above does not by itself make a PR shared. A
 on the PR, before merge. Branch names do not encode lanes; the label does. The
 [PR template](../.github/pull_request_template.md) asks for the lane.
 
-Merge with the reviewed head pinned:
+Merge with the checked and reviewed head pinned:
 
 ```sh
+gh pr view <N> --json headRefOid,statusCheckRollup \
+  --jq '.headRefOid, (.statusCheckRollup[] | "\(.name // .context) \(.status // "") \(.conclusion // .state)")'
 gh pr merge <N> --squash --match-head-commit <SHA>
 ```
 
-`<SHA>` is the head commit that `scripts/validate.py`, CI and the review ran
-on. `gh` refuses the merge if the head has moved since
-([gh pr merge](https://cli.github.com/manual/gh_pr_merge): "Commit SHA that the
-pull request head must match to allow merge"). The ruleset keeps strict
-up-to-date checks off, because concurrent sessions share `main`, and this
-User-owned repository cannot use a merge queue. That makes this flag the guard
-against merging a head nobody reviewed
-([decision record](decisions/2026-09-22-github-automation-closure.md)).
+- Run the first command immediately before the merge. `<SHA>` is the
+  `headRefOid` it prints, the full 40-character object id. It must be the head
+  on which the review completed, and in the rollup every required check must
+  have run, with none still running and none failed. A description edit
+  starts a new `validate.yml` run on the same head (its `pull_request` types
+  include `edited`), so read the rollup after the last edit. `gh` sends
+  `<SHA>` as the `expectedHeadOid` of GitHub's `mergePullRequest` mutation
+  ([gh pr merge](https://cli.github.com/manual/gh_pr_merge): "Commit SHA that
+  the pull request head must match to allow merge";
+  [`http.go`](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/merge/http.go#L77-L80)
+  at v2.101.0), and GitHub refuses the merge if the head has moved since
+  ([`MergePullRequestInput`](https://docs.github.com/en/graphql/reference/pulls#input-object-mergepullrequestinput):
+  "OID that the pull request head ref must match to allow merge; if omitted,
+  no check is performed").
+- The rebase or merge of `main` that the [hot-file protocol](#hot-file-protocol)
+  asks for comes before that read, because it makes a new head. If `main`
+  changed a shared hot file after `<SHA>` (`git fetch origin`, then
+  `git diff --name-only <SHA>...origin/main`), merge `main` again through the
+  protocol, wait for the required checks on the new head and pin that head
+  instead. The review carries over only if
+  `git diff <SHA> <new head> -- <reviewed files>` prints nothing, where
+  `<reviewed files>` leaves out `manifests/evidence.json` and the generated
+  reports; otherwise review the new head. GitHub's stale-approval rule works
+  the same way: it records the approved diff and dismisses the approval when
+  that diff changes
+  ([available rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-a-pull-request-before-merging)).
+- The flag guards the head, not the base. The ruleset keeps strict up-to-date
+  checks off, because concurrent sessions share `main`, and this User-owned
+  repository cannot use a merge queue
+  ([decision record](decisions/2026-09-22-github-automation-closure.md)). Two
+  pull requests that each passed against an older `main` can therefore still
+  break it together: "Status checks may fail after you merge your branch if
+  there are incompatible changes with the base branch"
+  ([loose required status checks](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging)).
+  Merging `main` right before the merge narrows that window without closing
+  it, and `validate.yml` runs again on every push to `main`.
 
 ## Coordination
 
