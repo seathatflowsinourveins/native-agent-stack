@@ -2744,10 +2744,10 @@ class CodexRoleHelperTests(unittest.TestCase):
 
     def test_launcher_target_reads_only_the_exact_last_line(self):
         target = self.api("launcher_target")
-        real = "exec '/home/u/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex' \"$@\""
-        self.assertEqual(target("#!/usr/bin/env bash\nset -eu\n" + real + "\n"), "/home/u/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex")
-        self.assertEqual(target(real), "/home/u/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex")
-        self.assertEqual(target("x\n" + real + "\n\n   \n"), "/home/u/.local/share/codex-ecosystem/tools/codex-0.157.1/bin/codex",
+        real = "exec '/opt/example/codex-0.157.1/bin/codex' \"$@\""
+        self.assertEqual(target("#!/usr/bin/env bash\nset -eu\n" + real + "\n"), "/opt/example/codex-0.157.1/bin/codex")
+        self.assertEqual(target(real), "/opt/example/codex-0.157.1/bin/codex")
+        self.assertEqual(target("x\n" + real + "\n\n   \n"), "/opt/example/codex-0.157.1/bin/codex",
                          "blank lines after it do not matter")
         self.assertEqual(target("  exec '/a b/c' \"$@\"  \n"), "/a b/c", "surrounding blanks and a space in the path")
         for text in ("", "\n\n", "exec", "exec '' \"$@\"", "exec '/x' \"$@\" # c", "exec '/x' \"$*\"", 'exec "/x" "$@"',
