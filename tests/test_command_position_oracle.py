@@ -208,6 +208,9 @@ PROBES = [
     # dash rejects that); the grammar reads the second one, or one after a line it joined, as the command's name. A quoted or escaped `!` is a name.
     ("c1 double negation", "! ! qmd status"),
     ("c1 triple negation", "! ! ! qmd status"),
+    ("c1 double negation before an assignment", "! ! A=1 qmd status"),
+    ("c1 negation before an assignment", "! A=1 qmd status"),
+    ("c1 double negation, assignment substitution", "! ! A=$(toon x) qmd"),
     ("c1 quoted bang is a name", "'!' qmd status"),
     ("c1 escaped bang is a name", "\\! qmd status"),
     ("c1 negation on a joined line", "nohup markitdown | bash -n -c 'qmd x' | a=( $(nice -n 5 markitdown) )\n! rtk proxy 'markitdown v1' || :"),
@@ -519,7 +522,7 @@ class GeneratorExt(Generator):
             lambda: "while " + lane() + "; do break; done",
             lambda: "until " + lane() + "; do :; done",
             lambda: "for i in $(" + lane() + "); do :; done",
-            lambda: "case $(" + lane() + ") in *) : ;; esac",
+            lambda: "case x$(" + lane() + ") in *) : ;; esac",  # an empty word after `case` is a syntax error, and an unquoted heredoc expands it empty
             lambda: ": $(" + lane() + ")",
             lambda: "{ " + lane() + "; } > /dev/null",
             lambda: "( " + lane() + " ) 2>&1",
@@ -528,7 +531,7 @@ class GeneratorExt(Generator):
             lambda: "( " + self.end(inner()) + ") & wait",
             lambda: "echo `echo \\`" + lane() + "\\``",
             lambda: "{ f() ( " + self.end(inner()) + "); f; }",
-            lambda: "{ f() { " + lane() + " \"$1\"; }; f x; }",
+            lambda: "{ f() { " + r.choice(LANES) + " \"$1\"; }; f x; }",
             substituted_heredoc,
             lane_heredoc,
             lambda: inner() + "\n# " + r.choice(LANES) + " toon\n" + inner(),

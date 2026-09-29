@@ -1242,6 +1242,7 @@ class TokenMeasurement(unittest.TestCase):
             # 1. `!` is a reserved word wherever a pipeline may begin, twice in bash (bash(1) SHELL GRAMMAR); the grammar reads the second as a
             # command name, also after a line it joined to an array assignment. A quoted or escaped `!` is a program name.
             "! ! qmd status": ({"qmd": 1}, {}), "! ! ! qmd status": ({"qmd": 1}, {}), "'!' qmd status": ({}, {}), "\\! qmd status": ({}, {}),
+            "! ! A=1 qmd status": ({"qmd": 1}, {}), "! A=1 qmd status": ({"qmd": 1}, {}), "! ! A=$(toon x) qmd": ({"toon": 1, "qmd": 1}, {}),
             "nohup markitdown | bash -n -c 'qmd x' | a=( $(nice -n 5 markitdown) )\n! rtk proxy 'markitdown v1' || :": ({"markitdown": 1, "rtk_proxy": 1}, {}),
             "time ! qmd status || :": ({"qmd": 1}, {}), "time -p ! qmd status || :": ({"qmd": 1}, {}), "! time qmd status || :": ({"qmd": 1}, {}),
             # 2. A backquoted body is unescaped before it is parsed (POSIX.1-2024 XCU 2.6.3): \` nests a substitution, \$ starts one, \\ is data.
