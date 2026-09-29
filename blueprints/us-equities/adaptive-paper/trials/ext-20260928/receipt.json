@@ -1,0 +1,1435 @@
+{
+  "schema_version": 1,
+  "kind": "mover_paper_series_receipt",
+  "series": "ext-20260928",
+  "status": "two_passed_six_no_orders",
+  "evidence_class": "PAPER",
+  "evidence_level": "metadata_plus_broker_reconciliation",
+  "gate": null,
+  "gate_note": "Not a frozen gate run. No gate receipt and no gate row changes with this record; the alpaca-paper-extended-hours gate row is unchanged.",
+  "label": "mechanics-only test; no validated edge",
+  "broker": "alpaca",
+  "endpoint": "paper",
+  "feed": "sip",
+  "account": "second Alpaca paper account (credential inventory id alpaca-paper-2). No credential, account id, account number or account fingerprint is recorded.",
+  "account_designation_note": "docs/secret-storage.md:17 and blueprints/us-equities/incentive-monitor/forward-protocol-v1.json:63 designate alpaca-paper-2 as the isolated incentive-monitor study account. This series traded on it; see limitations.",
+  "credential_route": "kernel keyring wrapper; since 2026-09-29 the 0600 env file store",
+  "credential_route_note": "The series on 2026-09-28 received the key pair through the kernel keyring wrapper. The 2026-09-29 broker reconciliation read the 0600 env file store through its pointer variable. Route names only.",
+  "session": {
+    "date": "2026-09-28",
+    "segment": "POST",
+    "protocol": "mover-early-entry-v1-20260924",
+    "section": "paper_e2e"
+  },
+  "recorded_at_utc": "2026-09-29T07:37:22Z",
+  "started_at": "2026-09-28T20:23:34Z",
+  "finished_at": "2026-09-28T22:29:36Z",
+  "client_id_prefix": "mvr-ext-20260928-",
+  "code": {
+    "commit": "3058b2379086677871d092cc6197e907445a03a9",
+    "checkout": "a detached checkout of that SHA in a session scratch directory; the pc-20260928 run script and the retained copy of this series' run script name the same checkout path",
+    "clean_basis": "The pc-20260928 freeze SHA256SUMS, written 2026-09-28T15:59:26Z, list 60 of the 196 files that adaptive-paper/ and mover-early-entry/ hold at 3058b237: exactly their top-level non-README files, including every engine source below. All 60 equal git show 3058b237. This series' freeze adopts those SUMS by reference. The checkout was later removed and was not re-hashed at run time.",
+    "clean_basis_limits": "The SUMS predate attempt 1 by about 4.4 hours. A change to the 60 hashed files after they were written, or any state of the 136 unhashed files (99 of them committed trial records under adaptive-paper/trials/), is not excluded. The pc-20260928 freeze note does not name the path it hashed; the pc-20260928 run script, modified 2026-09-28T16:02:44Z, names the same path as this series' run script, whose retained copy is matched to the run by modification time only.",
+    "runtime": {
+      "engine": "NautilusTrader LiveNode 2.0.0rc5",
+      "alpaca_py": "0.44.0",
+      "python": "3.12.3",
+      "interpreter": "the pinned adaptive-paper virtual environment, run with python -B",
+      "runtime_basis": "engine name from the trial receipts; alpaca-py and Python versions read from the same environment on 2026-09-29 by the broker reconciliation"
+    },
+    "engine_sources_sha256": [
+      {
+        "path": "adaptive-paper/benchmark.py",
+        "sha256": "6ef1551c60855e43b75e9e02f48915236518100b9f0e910f15794877c754f866"
+      },
+      {
+        "path": "adaptive-paper/corporate_actions.py",
+        "sha256": "8f0839427b9d8a3c9b3fbd02f286985c7a720bf85a3c599fce2022573bff71cd"
+      },
+      {
+        "path": "adaptive-paper/credential_guard.py",
+        "sha256": "f5a3d0d038ed3f01d486493ce416395039fb260762232785bb0a9073c777da7e"
+      },
+      {
+        "path": "adaptive-paper/credential_source.py",
+        "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc"
+      },
+      {
+        "path": "adaptive-paper/exits.py",
+        "sha256": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df"
+      },
+      {
+        "path": "adaptive-paper/feeds.py",
+        "sha256": "0db3009a724ae2433572c5070066d6806d7365031f9db4e81c4b69ad1cbebacb"
+      },
+      {
+        "path": "adaptive-paper/financing.py",
+        "sha256": "562652297f87d1b2650158f73795013a52d895ce116fb535a205c41a83880350"
+      },
+      {
+        "path": "adaptive-paper/leverage.py",
+        "sha256": "7f4a86f312d718a0a0b87e6eafe9a2d57b8709ec85a8746fdf7def0a5b502ea0"
+      },
+      {
+        "path": "adaptive-paper/live_manifest.py",
+        "sha256": "ca34cb59b4ff8f3a9dc763a0937a351ecab815d16164c75c319e3880a57585bd"
+      },
+      {
+        "path": "adaptive-paper/market_research.py",
+        "sha256": "bba9cf77c3c3c6dff32dec1cb01fa8c1957c6b012b7d5bd9693fcc268d557158"
+      },
+      {
+        "path": "adaptive-paper/metrics.py",
+        "sha256": "437fce8aaca350b9d8fe5d5b68212879d82e118f01d93fdcd333233709b80397"
+      },
+      {
+        "path": "adaptive-paper/mover.py",
+        "sha256": "ac34fd84485a054b27fb857b5ef3b0dfb7f7dee9c407eb42d4579e9e80e5ee88"
+      },
+      {
+        "path": "adaptive-paper/mover_runner.py",
+        "sha256": "ff1baf36baf4dd319cd0ed549cc5258194536548a098892bd203f8ab61c13bcd"
+      },
+      {
+        "path": "adaptive-paper/mover_simulation.py",
+        "sha256": "8ac5955de1e814bb26fbfbca068a5719b9033b2bae0d8e50e78d7a78a546761e"
+      },
+      {
+        "path": "adaptive-paper/mover_strategy.py",
+        "sha256": "4730c5e535aa480030d6484669a9d8565ca25e4e1ea50ea12a45bd1892536cba"
+      },
+      {
+        "path": "adaptive-paper/native_adapter.py",
+        "sha256": "fe544c95ea2ee066052e1009e2f75a90e00ac5aaa34304f0264a00e5bc313b75"
+      },
+      {
+        "path": "adaptive-paper/native_strategy.py",
+        "sha256": "bc102eb6c4456cb651510fe59cf5f92decf3b70b31e0da1c833e7a27d6f1a226"
+      },
+      {
+        "path": "adaptive-paper/recovery.py",
+        "sha256": "5cf7dcea572efbda6979a2726eebf6d676f6bd62263900c7b6626da8b45c1215"
+      },
+      {
+        "path": "adaptive-paper/runner.py",
+        "sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4"
+      },
+      {
+        "path": "adaptive-paper/safety.py",
+        "sha256": "dd4ef862d9f8658a786db7f5df0fb0918ed177f01bad88db0e5029d535127626"
+      },
+      {
+        "path": "adaptive-paper/selector.py",
+        "sha256": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3"
+      },
+      {
+        "path": "adaptive-paper/sessions.py",
+        "sha256": "95f0affee512e88dd44f196fa72bb7471e00899356793bdbb12f15c4ed84e64d"
+      },
+      {
+        "path": "adaptive-paper/simulation.py",
+        "sha256": "0119e0efe3b498be3c415eee9c1a0be922c9b5b17e3b774aa7528668c4eb0b30"
+      },
+      {
+        "path": "adaptive-paper/strategies.py",
+        "sha256": "2d488a4fdd21ad323ab07cf7fb147b3623fd6e38951abcf2fc59cf8094a1383e"
+      },
+      {
+        "path": "adaptive-paper/strategies_v1.py",
+        "sha256": "1952be269694485e12e4d927f124adca0ee29667588d6ac6651caede454c92f7"
+      },
+      {
+        "path": "adaptive-paper/transport.py",
+        "sha256": "76c8a83d327545b2dd88a0bed416d857066d5389debaeddfce4137cc8ed5e484"
+      },
+      {
+        "path": "mover-early-entry/mover_scan.py",
+        "sha256": "f584b2c9d5719ceb237d7b57db9c610935b5348b7bc4fe2634359e8b61e480d9"
+      }
+    ],
+    "engine_sources_note": "a list of path and sha256 pairs, each computed as git show 3058b237:blueprints/us-equities/<path> | sha256sum"
+  },
+  "config": {
+    "sha256": "768957da790acabee02ee92331a8184e40a6fcd7b3026b5da0f609e87d0da597",
+    "mode": "mover_paper",
+    "protocol": "mover-early-entry-v1-20260924",
+    "feed": "sip",
+    "extended_hours_enabled": true,
+    "overnight_holds": false,
+    "benchmarks": [
+      "SPY"
+    ],
+    "rule": "10:00|G20|V1000000|any",
+    "exit": "X2",
+    "session_scope": "any_session",
+    "trial_end_et": "19:45",
+    "capital_usd": "5000",
+    "max_symbols": 5,
+    "max_entry_notional_usd": "1000",
+    "max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "max_gross_exposure_usd": "10000",
+    "max_outstanding_orders": 20,
+    "max_gross_loss_usd": "500",
+    "max_drawdown_usd": "500",
+    "max_api_requests_per_minute": 200,
+    "max_submit_requests_per_minute": 180,
+    "quote_max_age_seconds": 3,
+    "max_spread_bps": "100",
+    "entry": {
+      "limit_cap_bps": "50",
+      "timeout_seconds": 60,
+      "window_seconds": 30
+    },
+    "exit_orders": {
+      "limit_cap_bps": "50",
+      "timeout_seconds": 10,
+      "max_orders_per_symbol": 20
+    },
+    "duration_seconds": 3600,
+    "cleanup_seconds": 600,
+    "stream_quote_timeout_seconds": 30,
+    "appreciation_allowance": "2",
+    "gross_guard_fraction": "0.9",
+    "rung": "4",
+    "leverage_policy": "leverage-schedule-v1-20260922",
+    "leverage_note": "Rung 4 under leverage-schedule-v1-20260922, whose POST cell caps the ledger envelope at 1x: engine_leverage_multiple 1, gross budget 5000.00 USD, gross guard 9000.00 USD (every attempt's sizing, asserted)."
+  },
+  "scanner_rule": {
+    "frozen_config_rule": "10:00|G20|V1000000|any",
+    "attempt_1_argument": "10:00|G20|V1000000|any",
+    "attempt_1_engine_scan_rule": "10:00|G2000|V1000000|any",
+    "attempts_2_to_8_argument": "10:00|G0.20|V1000000|any",
+    "note": "mover_scan.py reads G as a ratio and writes the engine scan file in percent points, so the argument G20 became G2000 (a 2000 percent gain), fired 0 and was refused by check (scan_rule_differs_from_config). The argument was corrected to G0.20 (20 percent) before attempt 2; the frozen config and its sha256 did not change, and attempt 1 sent no order."
+  },
+  "series_procedure": {
+    "per_attempt": "scan (mover_scan.py), mover_runner.py check, synthetic (SYN, 4 s hold), paper; recover on needs_attention (never needed)",
+    "freeze_plan": "The freeze (FREEZE.md, modified 2026-09-28T20:23:08Z) fixes no trial count. It runs trials ext-20260928-N in sequence, each only after the previous one passed or recovered, with the last start at 18:30 ET. It stops the series on a ledger halt, a failed recovery, a preflight refusal or 18:30 ET. Eight attempts ran.",
+    "retry": "retry-benchmark.sh starts the next attempt 20 s after a preflight refusal benchmark_quotes_not_ready (the preflight found no SPY quote within the engine's freshness bounds: at most 3 s old and no more than 0.25 s ahead), up to its try count; every attempt keeps its own directory and no limit changes",
+    "retry_timing": "retry-benchmark.sh made the 20 s retry only after the refusals of attempts 4, 5, 6 and 7, inside the chain4 unit (each console gap 20 s). After attempt 2's refusal the operator started the r3 unit 61 s after unit 2 stopped. After attempt 1's refusal the operator started unit 2 65 s after unit 1 stopped.",
+    "scan_note": "fired counts every symbol that met the rule; the engine scan file keeps the top 5 by rank (max_symbols 5) as candidates",
+    "chain": "chain-next.sh starts the next unit only after the previous unit ended and the previous trial passed or recovered, and only if the clock is not past 18:30 ET when it checks, once, before handing over to retry-benchmark.sh; retry-benchmark.sh does not check the clock",
+    "scripts_note": "run-series-trial.sh was edited again at 2026-09-29T05:09Z for a later series. run-series-trial.20260928.sh is the retained copy whose modification time (2026-09-28T20:23:19Z) precedes attempt 1; it is matched by time, not proven identical to the bytes that ran. The modification times of retry-benchmark.sh (20:25:56Z) and chain-next.sh (20:38:43Z) precede the units that ran them and are unchanged since.",
+    "deviations_from_freeze": [
+      "Scanner argument: corrected from G20 to G0.20 after attempt 1 (scanner_rule). Attempt 1 sent no order.",
+      "Retries: the freeze lists a preflight refusal as a series stop. After attempt 2's benchmark_quotes_not_ready refusal the operator started the r3 unit (retry-benchmark.sh from attempt 3) instead, and within the chain4 unit the refusals of attempts 4 to 7 were retried automatically: five refusals, five retries. No limit, gate or config changed, and the refused attempts sent no order.",
+      "Unfrozen series scripts: the freeze names and hashes no script. run-series-trial.sh (retained copy modified 20:23:19Z), retry-benchmark.sh (20:25:56Z) and chain-next.sh (20:38:43Z) were all written after FREEZE.md (20:23:08Z). chain-next.sh, which chained attempts 4 to 8, was not part of the freeze. It implements the freeze's start rule, but checks the 18:30 ET last start once rather than per trial; every attempt started by 17:28:55 ET."
+    ]
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "trial_id": "ext-20260928-1",
+      "unit": "paper-ext-20260928-1",
+      "started_at": "2026-09-28T20:23:35Z",
+      "ended_at": "2026-09-28T20:23:40Z",
+      "scan": {
+        "argument_rule": "10:00|G20|V1000000|any",
+        "fired": 0,
+        "candidates": []
+      },
+      "status": "refused_at_check",
+      "stage": "check",
+      "reason": "scan_rule_differs_from_config",
+      "orders_submitted": 0,
+      "flat_at_end": true,
+      "flat_basis": "no paper stage ran; the broker listing has no order before 20:26:11Z and attempt 2's preflight at 20:24:56Z observed 0 positions and 0 open orders",
+      "check_rc": 2
+    },
+    {
+      "attempt": 2,
+      "trial_id": "ext-20260928-2",
+      "unit": "paper-ext-20260928-2",
+      "started_at": "2026-09-28T20:24:45Z",
+      "ended_at": "2026-09-28T20:24:57Z",
+      "scan": {
+        "argument_rule": "10:00|G0.20|V1000000|any",
+        "fired": 7,
+        "candidates": [
+          "KOD",
+          "CLRO",
+          "NAMI",
+          "MEDS",
+          "KNRX"
+        ]
+      },
+      "check": "valid",
+      "synthetic": "passed (SYN, flat)",
+      "rule": "10:00|G20|V1000000|any",
+      "exit_rule": "X2",
+      "caps": {
+        "entry_notional_usd": "1000",
+        "gross_budget_usd": "5000.00",
+        "gross_guard_usd": "9000.00",
+        "ledger_max_order_notional_usd": "10000",
+        "max_order_quantity": 100,
+        "engine_leverage_multiple": "1",
+        "sizing_equity_usd": "5000"
+      },
+      "caps_source": "check stage sizing (check assumes session 1 and equity = capital_usd)",
+      "preflight": {
+        "account_status": "ACTIVE",
+        "positions": 0,
+        "open_orders": 0,
+        "observed_at": "2026-09-28T20:24:56.900Z"
+      },
+      "status": "not_started",
+      "stage": "preflight",
+      "reason": "benchmark_quotes_not_ready",
+      "orders_submitted": 0,
+      "flat_at_end": true,
+      "flat_basis": "preflight observed 0 positions and 0 open orders; no order was sent (the broker listing has no order from this attempt)",
+      "paper_rc": 2
+    },
+    {
+      "attempt": 3,
+      "trial_id": "ext-20260928-3",
+      "unit": "paper-ext-20260928-r3",
+      "started_at": "2026-09-28T20:25:58Z",
+      "ended_at": "2026-09-28T21:26:43Z",
+      "scan": {
+        "argument_rule": "10:00|G0.20|V1000000|any",
+        "fired": 7,
+        "candidates": [
+          "KOD",
+          "CLRO",
+          "NAMI",
+          "MEDS",
+          "KNRX"
+        ]
+      },
+      "check": "valid",
+      "synthetic": "passed (SYN, flat)",
+      "rule": "10:00|G20|V1000000|any",
+      "exit_rule": "X2",
+      "caps": {
+        "entry_notional_usd": "1000",
+        "gross_budget_usd": "5000.00",
+        "gross_guard_usd": "9000.00",
+        "ledger_max_order_notional_usd": "10000",
+        "max_order_quantity": 100,
+        "engine_leverage_multiple": "1",
+        "sizing_equity_usd": "5000"
+      },
+      "caps_source": "paper stage sizing",
+      "preflight": {
+        "account_status": "ACTIVE",
+        "positions": 0,
+        "open_orders": 0,
+        "observed_at": "2026-09-28T20:26:10.071Z"
+      },
+      "status": "passed",
+      "orders_submitted": 6,
+      "entries": [
+        {
+          "symbol": "KOD",
+          "qty": "11",
+          "limit_price": "88.44",
+          "average_fill_price": "88",
+          "fills": 2
+        },
+        {
+          "symbol": "CLRO",
+          "qty": "100",
+          "limit_price": "5.14",
+          "average_fill_price": "5.12",
+          "fills": 2
+        },
+        {
+          "symbol": "KNRX",
+          "qty": "100",
+          "limit_price": "1.01",
+          "average_fill_price": "1.01",
+          "fills": 4
+        }
+      ],
+      "exits": [
+        {
+          "symbol": "KOD",
+          "qty": "11",
+          "limit_price": "87.72",
+          "average_fill_price": "88.16",
+          "fills": 1,
+          "reason": "x2_time",
+          "realized_pnl_usd": "1.7600"
+        },
+        {
+          "symbol": "CLRO",
+          "qty": "100",
+          "limit_price": "5.18",
+          "average_fill_price": "5.2",
+          "fills": 4,
+          "reason": "x2_time",
+          "realized_pnl_usd": "8.0000"
+        },
+        {
+          "symbol": "KNRX",
+          "qty": "100",
+          "limit_price": "0.9386",
+          "average_fill_price": "0.9433",
+          "fills": 4,
+          "reason": "x2_time",
+          "realized_pnl_usd": "-6.6700"
+        }
+      ],
+      "skipped_entries": [
+        {
+          "symbol": "NAMI",
+          "rank": 3,
+          "reason": "entries_not_enabled"
+        },
+        {
+          "symbol": "MEDS",
+          "rank": 4,
+          "reason": "entries_not_enabled"
+        }
+      ],
+      "skipped_note": "entries_not_enabled is the leg's last wait reason when the 30 s entry window closed: the engine's per-tick entry enable was false whenever these legs were evaluated. The receipt does not record which enable condition was false.",
+      "fills": {
+        "engine_fill_events": 17,
+        "ledger_executions": 17,
+        "broker_fill_activities": 17,
+        "matched": 17,
+        "unconfirmed": 0,
+        "at_reference_quote": 17
+      },
+      "rejects": {
+        "native_rejections": 0,
+        "pre_wire_refusals": 0,
+        "cancels": 0
+      },
+      "errors": {
+        "error_type": null,
+        "adapter_errors": 0,
+        "callback_faults": 0,
+        "average_invariant_mismatches": 0,
+        "duplicate_executions": 0,
+        "open_fill_gaps_at_stop": 0,
+        "halts": {
+          "seed_items": 95,
+          "halted": 0
+        },
+        "websocket_restart_lines": {
+          "data": 1,
+          "trading": 1
+        }
+      },
+      "dropped_crossed_quotes": {
+        "CLRO": 1,
+        "KNRX": 528,
+        "SPY": 17,
+        "total": 546
+      },
+      "native_quotes": 29929,
+      "requests": {
+        "read": 498,
+        "submit": 6,
+        "peak_requests_any_60s": 21,
+        "peak_submits_any_60s": 3,
+        "engine_reported": {
+          "read": 488,
+          "submit": 6
+        },
+        "requests_note": "The ledger logs 10 reads in the 5 s before trial_start (the first 0.39 s before it): the preflight's trading-API reads. From trial_start on it holds exactly the engine-reported 488 reads and 6 submits."
+      },
+      "trial_start": "2026-09-28T20:26:10.155124Z",
+      "elapsed_seconds": 3632.7,
+      "realized_pnl_usd": {
+        "engine": "3.0900",
+        "broker_recomputed": "3.0900"
+      },
+      "buy_notional_usd": "1581.00",
+      "sell_notional_usd": "1584.0900",
+      "reconciliation_end": {
+        "cash_match": true,
+        "positions_match": true,
+        "open_orders": 0,
+        "positions": 0,
+        "ledger_cash_delta_usd_since_series_start": "3.09"
+      },
+      "flat_at_end": true,
+      "paper_rc": 0
+    },
+    {
+      "attempt": 4,
+      "trial_id": "ext-20260928-4",
+      "unit": "paper-ext-20260928-chain4",
+      "started_at": "2026-09-28T21:26:49Z",
+      "ended_at": "2026-09-28T21:27:00Z",
+      "scan": {
+        "argument_rule": "10:00|G0.20|V1000000|any",
+        "fired": 6,
+        "candidates": [
+          "KOD",
+          "CLRO",
+          "NAMI",
+          "MEDS",
+          "LFCR"
+        ]
+      },
+      "check": "valid",
+      "synthetic": "passed (SYN, flat)",
+      "rule": "10:00|G20|V1000000|any",
+      "exit_rule": "X2",
+      "caps": {
+        "entry_notional_usd": "1000",
+        "gross_budget_usd": "5000.00",
+        "gross_guard_usd": "9000.00",
+        "ledger_max_order_notional_usd": "10000",
+        "max_order_quantity": 100,
+        "engine_leverage_multiple": "1",
+        "sizing_equity_usd": "5000"
+      },
+      "caps_source": "check stage sizing (check assumes session 1 and equity = capital_usd)",
+      "preflight": {
+        "account_status": "ACTIVE",
+        "positions": 0,
+        "open_orders": 0,
+        "observed_at": "2026-09-28T21:27:00.740Z"
+      },
+      "status": "not_started",
+      "stage": "preflight",
+      "reason": "benchmark_quotes_not_ready",
+      "orders_submitted": 0,
+      "flat_at_end": true,
+      "flat_basis": "preflight observed 0 positions and 0 open orders; no order was sent (the broker listing has no order from this attempt)",
+      "paper_rc": 2
+    },
+    {
+      "attempt": 5,
+      "trial_id": "ext-20260928-5",
+      "unit": "paper-ext-20260928-chain4",
+      "started_at": "2026-09-28T21:27:20Z",
+      "ended_at": "2026-09-28T21:27:32Z",
+      "scan": {
+        "argument_rule": "10:00|G0.20|V1000000|any",
+        "fired": 6,
+        "candidates": [
+          "KOD",
+          "CLRO",
+          "NAMI",
+          "MEDS",
+          "LFCR"
+        ]
+      },
+      "check": "valid",
+      "synthetic": "passed (SYN, flat)",
+      "rule": "10:00|G20|V1000000|any",
+      "exit_rule": "X2",
+      "caps": {
+        "entry_notional_usd": "1000",
+        "gross_budget_usd": "5000.00",
+        "gross_guard_usd": "9000.00",
+        "ledger_max_order_notional_usd": "10000",
+        "max_order_quantity": 100,
+        "engine_leverage_multiple": "1",
+        "sizing_equity_usd": "5000"
+      },
+      "caps_source": "check stage sizing (check assumes session 1 and equity = capital_usd)",
+      "preflight": {
+        "account_status": "ACTIVE",
+        "positions": 0,
+        "open_orders": 0,
+        "observed_at": "2026-09-28T21:27:32.629Z"
+      },
+      "status": "not_started",
+      "stage": "preflight",
+      "reason": "benchmark_quotes_not_ready",
+      "orders_submitted": 0,
+      "flat_at_end": true,
+      "flat_basis": "preflight observed 0 positions and 0 open orders; no order was sent (the broker listing has no order from this attempt)",
+      "paper_rc": 2
+    },
+    {
+      "attempt": 6,
+      "trial_id": "ext-20260928-6",
+      "unit": "paper-ext-20260928-chain4",
+      "started_at": "2026-09-28T21:27:52Z",
+      "ended_at": "2026-09-28T21:28:04Z",
+      "scan": {
+        "argument_rule": "10:00|G0.20|V1000000|any",
+        "fired": 6,
+        "candidates": [
+          "KOD",
+          "CLRO",
+          "NAMI",
+          "MEDS",
+          "LFCR"
+        ]
+      },
+      "check": "valid",
+      "synthetic": "passed (SYN, flat)",
+      "rule": "10:00|G20|V1000000|any",
+      "exit_rule": "X2",
+      "caps": {
+        "entry_notional_usd": "1000",
+        "gross_budget_usd": "5000.00",
+        "gross_guard_usd": "9000.00",
+        "ledger_max_order_notional_usd": "10000",
+        "max_order_quantity": 100,
+        "engine_leverage_multiple": "1",
+        "sizing_equity_usd": "5000"
+      },
+      "caps_source": "check stage sizing (check assumes session 1 and equity = capital_usd)",
+      "preflight": {
+        "account_status": "ACTIVE",
+        "positions": 0,
+        "open_orders": 0,
+        "observed_at": "2026-09-28T21:28:04.071Z"
+      },
+      "status": "not_started",
+      "stage": "preflight",
+      "reason": "benchmark_quotes_not_ready",
+      "orders_submitted": 0,
+      "flat_at_end": true,
+      "flat_basis": "preflight observed 0 positions and 0 open orders; no order was sent (the broker listing has no order from this attempt)",
+      "paper_rc": 2
+    },
+    {
+      "attempt": 7,
+      "trial_id": "ext-20260928-7",
+      "unit": "paper-ext-20260928-chain4",
+      "started_at": "2026-09-28T21:28:24Z",
+      "ended_at": "2026-09-28T21:28:35Z",
+      "scan": {
+        "argument_rule": "10:00|G0.20|V1000000|any",
+        "fired": 6,
+        "candidates": [
+          "KOD",
+          "CLRO",
+          "NAMI",
+          "MEDS",
+          "LFCR"
+        ]
+      },
+      "check": "valid",
+      "synthetic": "passed (SYN, flat)",
+      "rule": "10:00|G20|V1000000|any",
+      "exit_rule": "X2",
+      "caps": {
+        "entry_notional_usd": "1000",
+        "gross_budget_usd": "5000.00",
+        "gross_guard_usd": "9000.00",
+        "ledger_max_order_notional_usd": "10000",
+        "max_order_quantity": 100,
+        "engine_leverage_multiple": "1",
+        "sizing_equity_usd": "5000"
+      },
+      "caps_source": "check stage sizing (check assumes session 1 and equity = capital_usd)",
+      "preflight": {
+        "account_status": "ACTIVE",
+        "positions": 0,
+        "open_orders": 0,
+        "observed_at": "2026-09-28T21:28:35.377Z"
+      },
+      "status": "not_started",
+      "stage": "preflight",
+      "reason": "benchmark_quotes_not_ready",
+      "orders_submitted": 0,
+      "flat_at_end": true,
+      "flat_basis": "preflight observed 0 positions and 0 open orders; no order was sent (the broker listing has no order from this attempt)",
+      "paper_rc": 2
+    },
+    {
+      "attempt": 8,
+      "trial_id": "ext-20260928-8",
+      "unit": "paper-ext-20260928-chain4",
+      "started_at": "2026-09-28T21:28:55Z",
+      "ended_at": "2026-09-28T22:29:36Z",
+      "scan": {
+        "argument_rule": "10:00|G0.20|V1000000|any",
+        "fired": 6,
+        "candidates": [
+          "KOD",
+          "CLRO",
+          "NAMI",
+          "MEDS",
+          "LFCR"
+        ]
+      },
+      "check": "valid",
+      "synthetic": "passed (SYN, flat)",
+      "rule": "10:00|G20|V1000000|any",
+      "exit_rule": "X2",
+      "caps": {
+        "entry_notional_usd": "1000",
+        "gross_budget_usd": "5000.00",
+        "gross_guard_usd": "9000.00",
+        "ledger_max_order_notional_usd": "10000",
+        "max_order_quantity": 100,
+        "engine_leverage_multiple": "1",
+        "sizing_equity_usd": "5003.0900"
+      },
+      "caps_source": "paper stage sizing",
+      "preflight": {
+        "account_status": "ACTIVE",
+        "positions": 0,
+        "open_orders": 0,
+        "observed_at": "2026-09-28T21:29:06.912Z"
+      },
+      "status": "passed",
+      "orders_submitted": 4,
+      "entries": [
+        {
+          "symbol": "KOD",
+          "qty": "11",
+          "limit_price": "88.64",
+          "average_fill_price": "88.2",
+          "fills": 2
+        },
+        {
+          "symbol": "CLRO",
+          "qty": "100",
+          "limit_price": "5.25",
+          "average_fill_price": "5.23",
+          "fills": 1
+        }
+      ],
+      "exits": [
+        {
+          "symbol": "KOD",
+          "qty": "11",
+          "limit_price": "87.76",
+          "average_fill_price": "88.2",
+          "fills": 1,
+          "reason": "x2_time",
+          "realized_pnl_usd": "0.0000"
+        },
+        {
+          "symbol": "CLRO",
+          "qty": "100",
+          "limit_price": "5.09",
+          "average_fill_price": "5.11",
+          "fills": 2,
+          "reason": "x2_time",
+          "realized_pnl_usd": "-12.0000"
+        }
+      ],
+      "skipped_entries": [
+        {
+          "symbol": "NAMI",
+          "rank": 3,
+          "reason": "entries_not_enabled"
+        },
+        {
+          "symbol": "MEDS",
+          "rank": 4,
+          "reason": "entries_not_enabled"
+        },
+        {
+          "symbol": "LFCR",
+          "rank": 5,
+          "reason": "entries_not_enabled"
+        }
+      ],
+      "skipped_note": "entries_not_enabled is the leg's last wait reason when the 30 s entry window closed: the engine's per-tick entry enable was false whenever these legs were evaluated. The receipt does not record which enable condition was false.",
+      "fills": {
+        "engine_fill_events": 6,
+        "ledger_executions": 6,
+        "broker_fill_activities": 6,
+        "matched": 6,
+        "unconfirmed": 0,
+        "at_reference_quote": 6
+      },
+      "rejects": {
+        "native_rejections": 0,
+        "pre_wire_refusals": 0,
+        "cancels": 0
+      },
+      "errors": {
+        "error_type": null,
+        "adapter_errors": 0,
+        "callback_faults": 0,
+        "average_invariant_mismatches": 0,
+        "duplicate_executions": 0,
+        "open_fill_gaps_at_stop": 0,
+        "halts": {
+          "seed_items": 95,
+          "halted": 0
+        },
+        "websocket_restart_lines": {
+          "data": 1,
+          "trading": 1
+        }
+      },
+      "dropped_crossed_quotes": {
+        "MEDS": 1,
+        "NAMI": 1,
+        "SPY": 3,
+        "total": 5
+      },
+      "native_quotes": 1619,
+      "requests": {
+        "read": 498,
+        "submit": 4,
+        "peak_requests_any_60s": 20,
+        "peak_submits_any_60s": 2,
+        "engine_reported": {
+          "read": 488,
+          "submit": 4
+        },
+        "requests_note": "The ledger logs 10 reads in the 5 s before trial_start (the first 0.32 s before it): the preflight's trading-API reads. From trial_start on it holds exactly the engine-reported 488 reads and 4 submits."
+      },
+      "trial_start": "2026-09-28T21:29:06.918071Z",
+      "elapsed_seconds": 3629.3,
+      "realized_pnl_usd": {
+        "engine": "-12.0000",
+        "broker_recomputed": "-12.00"
+      },
+      "buy_notional_usd": "1493.20",
+      "sell_notional_usd": "1481.20",
+      "reconciliation_end": {
+        "cash_match": true,
+        "positions_match": true,
+        "open_orders": 0,
+        "positions": 0,
+        "ledger_cash_delta_usd_since_series_start": "-8.9100"
+      },
+      "flat_at_end": true,
+      "paper_rc": 0
+    }
+  ],
+  "orders": [
+    {
+      "client_order_id": "mvr-ext-20260928-3-0000001",
+      "symbol": "KNRX",
+      "side": "buy",
+      "reason": "entry",
+      "qty": "100",
+      "limit_price": "1.01",
+      "reference_quote": {
+        "ask": "1.01"
+      },
+      "average_fill_price": "1.01",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 4,
+      "engine_fills": 4,
+      "ledger_executions": 4,
+      "broker_fill_activities": 4,
+      "submitted_at": "2026-09-28T20:26:11.528519Z",
+      "filled_at": "2026-09-28T20:26:12.674276Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 3
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-3-0000002",
+      "symbol": "KOD",
+      "side": "buy",
+      "reason": "entry",
+      "qty": "11",
+      "limit_price": "88.44",
+      "reference_quote": {
+        "ask": "88"
+      },
+      "average_fill_price": "88",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 2,
+      "engine_fills": 2,
+      "ledger_executions": 2,
+      "broker_fill_activities": 2,
+      "submitted_at": "2026-09-28T20:26:12.144331Z",
+      "filled_at": "2026-09-28T20:26:12.665312Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 3
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-3-0000003",
+      "symbol": "CLRO",
+      "side": "buy",
+      "reason": "entry",
+      "qty": "100",
+      "limit_price": "5.14",
+      "reference_quote": {
+        "ask": "5.12"
+      },
+      "average_fill_price": "5.12",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 2,
+      "engine_fills": 2,
+      "ledger_executions": 2,
+      "broker_fill_activities": 2,
+      "submitted_at": "2026-09-28T20:26:32.303238Z",
+      "filled_at": "2026-09-28T20:26:32.775475Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 3
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-3-0000004",
+      "symbol": "KNRX",
+      "side": "sell",
+      "reason": "x2_time",
+      "qty": "100",
+      "limit_price": "0.9386",
+      "reference_quote": {
+        "bid": "0.9433"
+      },
+      "average_fill_price": "0.9433",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 4,
+      "engine_fills": 4,
+      "ledger_executions": 4,
+      "broker_fill_activities": 4,
+      "submitted_at": "2026-09-28T21:26:11.715890Z",
+      "filled_at": "2026-09-28T21:26:12.847202Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 3
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-3-0000005",
+      "symbol": "KOD",
+      "side": "sell",
+      "reason": "x2_time",
+      "qty": "11",
+      "limit_price": "87.72",
+      "reference_quote": {
+        "bid": "88.16"
+      },
+      "average_fill_price": "88.16",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 1,
+      "engine_fills": 1,
+      "ledger_executions": 1,
+      "broker_fill_activities": 1,
+      "submitted_at": "2026-09-28T21:26:35.199019Z",
+      "filled_at": "2026-09-28T21:26:35.590813Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 3
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-3-0000006",
+      "symbol": "CLRO",
+      "side": "sell",
+      "reason": "x2_time",
+      "qty": "100",
+      "limit_price": "5.18",
+      "reference_quote": {
+        "bid": "5.2"
+      },
+      "average_fill_price": "5.2",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 4,
+      "engine_fills": 4,
+      "ledger_executions": 4,
+      "broker_fill_activities": 4,
+      "submitted_at": "2026-09-28T21:26:41.360030Z",
+      "filled_at": "2026-09-28T21:26:42.562260Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 3
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-8-0000001",
+      "symbol": "CLRO",
+      "side": "buy",
+      "reason": "entry",
+      "qty": "100",
+      "limit_price": "5.25",
+      "reference_quote": {
+        "ask": "5.23"
+      },
+      "average_fill_price": "5.23",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 1,
+      "engine_fills": 1,
+      "ledger_executions": 1,
+      "broker_fill_activities": 1,
+      "submitted_at": "2026-09-28T21:29:09.998027Z",
+      "filled_at": "2026-09-28T21:29:10.404473Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 8
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-8-0000002",
+      "symbol": "KOD",
+      "side": "buy",
+      "reason": "entry",
+      "qty": "11",
+      "limit_price": "88.64",
+      "reference_quote": {
+        "ask": "88.2"
+      },
+      "average_fill_price": "88.2",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 2,
+      "engine_fills": 2,
+      "ledger_executions": 2,
+      "broker_fill_activities": 2,
+      "submitted_at": "2026-09-28T21:29:30.876556Z",
+      "filled_at": "2026-09-28T21:29:31.335399Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 8
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-8-0000003",
+      "symbol": "CLRO",
+      "side": "sell",
+      "reason": "x2_time",
+      "qty": "100",
+      "limit_price": "5.09",
+      "reference_quote": {
+        "bid": "5.11"
+      },
+      "average_fill_price": "5.11",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 2,
+      "engine_fills": 2,
+      "ledger_executions": 2,
+      "broker_fill_activities": 2,
+      "submitted_at": "2026-09-28T22:29:10.477199Z",
+      "filled_at": "2026-09-28T22:29:10.834824Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 8
+    },
+    {
+      "client_order_id": "mvr-ext-20260928-8-0000004",
+      "symbol": "KOD",
+      "side": "sell",
+      "reason": "x2_time",
+      "qty": "11",
+      "limit_price": "87.76",
+      "reference_quote": {
+        "bid": "88.2"
+      },
+      "average_fill_price": "88.2",
+      "adverse_slippage_vs_reference_usd_per_share": "0",
+      "fills_at_reference_quote": 1,
+      "engine_fills": 1,
+      "ledger_executions": 1,
+      "broker_fill_activities": 1,
+      "submitted_at": "2026-09-28T22:29:35.588918Z",
+      "filled_at": "2026-09-28T22:29:35.869134Z",
+      "type": "limit",
+      "time_in_force": "day",
+      "extended_hours": true,
+      "final_status": {
+        "engine": "filled",
+        "ledger": "filled",
+        "broker": "filled"
+      },
+      "broker_agrees_with_ledger": true,
+      "trial": 8
+    }
+  ],
+  "fills_at_reference_quote": {
+    "fills": 23,
+    "of": 23,
+    "basis": "Each ledger execution price (the reconciliation matched every one to a broker FILL activity on cum_qty, qty and price) equals its order's reference quote from the engine events: the ask for buys and the bid for sells."
+  },
+  "cleanup": {
+    "flat": true,
+    "broker_positions": 0,
+    "broker_open_orders": 0,
+    "ledger_positions_nonzero": 0,
+    "proof": "each passed trial's end reconciliation (cash_match and positions_match true, 0 open orders, 0 positions) and the independent broker read below"
+  },
+  "broker_reconciliation": {
+    "observed_at": "2026-09-29T07:29:04.931678Z",
+    "tool": "reconcile_ext_series.py (committed in this directory)",
+    "tool_sha256": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+    "stdout": "reconcile-ext-series.stdout.json",
+    "stdout_sha256": "ba554311f8a69b59d305942492a49d34af0291b92da922cd9e06b60e872eb677",
+    "stdout_note": "byte-identical to the run's stdout; the private-detail scan found nothing to redact",
+    "exit_code": 0,
+    "argv": "python -B reconcile_ext_series.py --env-file \"$PAPER_ENV_FILE_2\" --ledger \"$MOVER_LEDGER\" --prefix mvr-ext-20260928- --after 2026-09-28T20:00:00+00:00 --until 2026-09-29T00:30:00+00:00",
+    "argv_note": "Run once, from this directory of the worktree, inside bash -ic, whose interactive start-up exports the credential pointer. python is the pinned adaptive-paper virtual environment's interpreter. PAPER_ENV_FILE_2 is the inventory pointer of alpaca-paper-2. MOVER_LEDGER was set in the same shell to the one mover ledger under the paper state root, from a glob that had to match exactly one file. Only the variable names are recorded, never their paths.",
+    "stderr": "The tool's stderr was 0 bytes. The non-terminal interactive bash wrote its two job-control notices.",
+    "earlier_read": "A scratch version of the same tool read the broker at 2026-09-29T06:24:16Z. It located the ledger by a glob inside the script and read the broker before the ledger. Its stdout (sha256 d72eec5d138dfe3f50af0a76e627789edc479aec98ad4ac28e85de770a31b6c9, not committed) holds the same values as this run except observed_at and one broker timestamp: mvr-ext-20260928-8-0000004 submitted_at read 22:29:35.588917Z then and 22:29:35.588918Z now.",
+    "method": "alpaca-py TradingClient.get_orders(status=all, after, until, limit=500, asc); GET /v2/account/activities?activity_types=FILL (after, until, asc, page_size=100, page_token); get_all_positions; get_orders(status=open); joined in memory to the engine mover ledger (sqlite mode=ro) on client order id and (cum_qty, qty, price)",
+    "alpaca_py": "0.44.0",
+    "python": "3.12.3",
+    "window": {
+      "after": "2026-09-28T20:00:00Z",
+      "until": "2026-09-29T00:30:00Z"
+    },
+    "orders_listed_in_window": 10,
+    "orders_with_series_prefix": 10,
+    "orders_without_series_prefix": 0,
+    "order_final_status_counts": {
+      "filled": 10
+    },
+    "fill_activity_pages": 1,
+    "fill_activities_in_window": 23,
+    "fill_activities_not_joined_to_series_orders": 0,
+    "ledger_intents": 10,
+    "ledger_executions": 23,
+    "executions_matched_on_cum_qty_qty_price": 23,
+    "executions_matched_on_execution_id": 23,
+    "max_ledger_vs_broker_time_skew_seconds": 0.004,
+    "unconfirmed_executions": [],
+    "orders_agreeing_with_ledger": 10,
+    "realized_pnl_usd_broker_recomputed": {
+      "3": "3.0900",
+      "8": "-12.00",
+      "total": "-8.9100"
+    },
+    "positions_now": 0,
+    "open_orders_now": 0,
+    "independence": "Separate from the engine transport and ledger, same broker API and account: independent of the engine code, not of the broker."
+  },
+  "journal_query": {
+    "queried_at": "2026-09-29T07:37:22Z",
+    "command": "journalctl --user --no-pager -o json USER_UNIT=<unit>.service",
+    "journald": "systemd 255 (255.4-1ubuntu8.17)",
+    "result": "Units 1 and 2 each have an exit record (EXIT_CODE exited, EXIT_STATUS 2) and a result record (UNIT_RESULT exit-code). The r3, chain4 and incentive-monitor units each have only a start record and a resource-accounting record: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record."
+  },
+  "units": [
+    {
+      "unit": "paper-ext-20260928-1",
+      "role": "run-series-trial.sh for attempt 1 (key pair of the second account)",
+      "started_at": "2026-09-28T20:23:34Z",
+      "exit_status": 2,
+      "result": "exit-code",
+      "stopped_at": "2026-09-28T20:23:40Z",
+      "journal_records": [
+        "unit_process_exit",
+        "unit_resources",
+        "unit_result",
+        "unit_started"
+      ],
+      "journal_exit_records": 2,
+      "inferred": false
+    },
+    {
+      "unit": "paper-ext-20260928-2",
+      "role": "run-series-trial.sh for attempt 2 (key pair of the second account)",
+      "started_at": "2026-09-28T20:24:45Z",
+      "exit_status": 2,
+      "result": "exit-code",
+      "stopped_at": "2026-09-28T20:24:57Z",
+      "journal_records": [
+        "unit_process_exit",
+        "unit_resources",
+        "unit_result",
+        "unit_started"
+      ],
+      "journal_exit_records": 2,
+      "inferred": false
+    },
+    {
+      "unit": "paper-ext-20260928-r3",
+      "role": "retry-benchmark.sh from attempt 3, up to 6 attempts (key pair of the second account)",
+      "started_at": "2026-09-28T20:25:58Z",
+      "stopped_at": "2026-09-28T21:26:43Z",
+      "journal_records": [
+        "unit_resources",
+        "unit_started"
+      ],
+      "journal_exit_records": 0,
+      "result": null,
+      "exit_status": null,
+      "inferred": true,
+      "inferred_result": "success",
+      "result_note": "The journal holds only this unit's start record and its resource-accounting record at stop: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record. Success is inferred from the absence of a failure record, not observed."
+    },
+    {
+      "unit": "paper-ext-20260928-chain4",
+      "role": "chain-next.sh: waited for the r3 unit, required attempt 3 passed and a start no later than 18:30 ET, then retry-benchmark.sh from attempt 4, up to 6 attempts",
+      "started_at": "2026-09-28T20:38:45Z",
+      "stopped_at": "2026-09-28T22:29:36Z",
+      "journal_records": [
+        "unit_resources",
+        "unit_started"
+      ],
+      "journal_exit_records": 0,
+      "result": null,
+      "exit_status": null,
+      "inferred": true,
+      "inferred_result": "success",
+      "result_note": "The journal holds only this unit's start record and its resource-accounting record at stop: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record. Success is inferred from the absence of a failure record, not observed."
+    },
+    {
+      "unit": "incentive-monitor-20260928",
+      "role": "incentive-monitor monitor.py run --standalone until 20:00 ET on the first paper account's key pair; data only (its docstring: it never places, changes or cancels an order). Not a writer on the second account: the broker listing there has 0 orders without the series prefix in the window.",
+      "started_at": "2026-09-28T20:28:10Z",
+      "stopped_at": "2026-09-29T00:00:19Z",
+      "journal_records": [
+        "unit_resources",
+        "unit_started"
+      ],
+      "journal_exit_records": 0,
+      "result": null,
+      "exit_status": null,
+      "inferred": true,
+      "inferred_result": "success",
+      "result_note": "The journal holds only this unit's start record and its resource-accounting record at stop: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record. Success is inferred from the absence of a failure record, not observed."
+    }
+  ],
+  "series_totals": {
+    "attempts": 8,
+    "passed": [
+      3,
+      8
+    ],
+    "not_started_benchmark_quotes_not_ready": [
+      2,
+      4,
+      5,
+      6,
+      7
+    ],
+    "refused_at_check": [
+      1
+    ],
+    "orders_submitted": 10,
+    "entries_filled": 5,
+    "exits_filled": 5,
+    "fill_events": 23,
+    "fills_at_reference_quote": 23,
+    "rejects": 0,
+    "cancels": 0,
+    "unconfirmed_fills": 0,
+    "benchmark_quotes_not_ready_refusals": 5,
+    "retries": {
+      "after_rule_argument_fix": 1,
+      "after_benchmark_refusal": 5
+    },
+    "realized_pnl_usd": {
+      "ledger": "-8.9100",
+      "engine_trials_sum": "-8.9100",
+      "broker_recomputed": "-8.9100"
+    },
+    "ledger_gross_loss_usd": "18.6700",
+    "ledger_gross_loss_note": "safety.py realized_loss: the sum of each fill's realized loss (safety.py:1153 at 3058b237). Here it equals the two losing legs, KNRX -6.67 and CLRO -12.00 (asserted).",
+    "ledger_peak_pnl_usd": "14.8900",
+    "ledger_peak_pnl_note": "safety.py peak_pnl: the mark-to-market peak, max(peak, realized + unrealized), where unrealized marks open positions at the bid (safety.py:742 at 3058b237). It is not a realized figure, and no second source can recompute it.",
+    "ledger_cash_delta_usd": "-8.9100"
+  },
+  "committed_copies": {
+    "mover-paper-2.json": {
+      "source": "ext-20260928/2/mover-paper.json",
+      "sha256": "8c736cc29228d6d0421a4c0df51f61fa5ba9beb66ce3fd46fba2958c5bf8301c",
+      "sanitization": "none needed"
+    },
+    "mover-paper-3.json": {
+      "source": "ext-20260928/3/mover-paper.json",
+      "sha256": "baf34d865c31c261ac690431ab866547672652624d2a41b98578d7e1b24db538",
+      "sanitization": "6 broker_order_ref values replaced by \"withheld\""
+    },
+    "mover-paper-4.json": {
+      "source": "ext-20260928/4/mover-paper.json",
+      "sha256": "dd9182517eac75770c1124ffd9f111852ed7f85af376951cd4d0afed17ffdb6b",
+      "sanitization": "none needed"
+    },
+    "mover-paper-5.json": {
+      "source": "ext-20260928/5/mover-paper.json",
+      "sha256": "ce9789e5cef06d43182e838fd60988988ef6a8ddbe7016a1493c9e39033c7787",
+      "sanitization": "none needed"
+    },
+    "mover-paper-6.json": {
+      "source": "ext-20260928/6/mover-paper.json",
+      "sha256": "c6632f2f8ebda18666b9a85b54fbae3b6a1e492f347856ca6a21c156f221fe52",
+      "sanitization": "none needed"
+    },
+    "mover-paper-7.json": {
+      "source": "ext-20260928/7/mover-paper.json",
+      "sha256": "38dfc092ded4b6d0adbfa4df20e3576de04b1d1f519416447a058e17802fba11",
+      "sanitization": "none needed"
+    },
+    "mover-paper-8.json": {
+      "source": "ext-20260928/8/mover-paper.json",
+      "sha256": "9892e9a5f67825abc3e06f6a2fa36f42c31b74f94c03204d6e2aa3084321aa66",
+      "sanitization": "4 broker_order_ref values replaced by \"withheld\""
+    },
+    "frozen-3058b237.SHA256SUMS": {
+      "source": "pc-20260928/frozen-3058b237.SHA256SUMS",
+      "sha256": "77de4228864b73c5aa436399359c13a5e2c4388956ca1e8c200c97282b41134e",
+      "sanitization": "none; byte-identical to the private file"
+    },
+    "trial-1.console": {
+      "source": "ext-20260928/trial-1.console",
+      "sha256": "1c284307623b190ff293d8d8c326175babc008f45219ffd91fe7a1a7350b7947",
+      "sanitization": "none; byte-identical to the private file"
+    },
+    "trial-2.console": {
+      "source": "ext-20260928/trial-2.console",
+      "sha256": "c5c082ded9e43e33e834ca5763f2680fcd3f997cf77859729e323a4eb99057cd",
+      "sanitization": "none; byte-identical to the private file"
+    },
+    "trial-r3.console": {
+      "source": "ext-20260928/trial-r3.console",
+      "sha256": "4f3944cc6faf0dac1594a2d1c8d8a33cddc93e162fa42a74e1bf0927c22c37f9",
+      "sanitization": "none; byte-identical to the private file"
+    },
+    "chain-4.console": {
+      "source": "ext-20260928/chain-4.console",
+      "sha256": "3102dfbb292565a98a0238f312192046e9cce062d771e160b69d0b9808b541a7",
+      "sanitization": "none; byte-identical to the private file"
+    }
+  },
+  "committed_copies_note": "Retained private files committed here after the private-detail scan (account fingerprints and their prefixes, broker order ids and refs, execution ids, the host user, home and tmp paths, UUIDs and key-like strings) and gitleaks. Only seven mover-paper.json files exist: attempt 1 was refused at check and never reached the paper stage, so its record is trial-1.console. Each copy's source hash is in private_artifacts_sha256.",
+  "private_artifacts_sha256": {
+    "ext-20260928/config-mover-ext-20260928.json": "768957da790acabee02ee92331a8184e40a6fcd7b3026b5da0f609e87d0da597",
+    "ext-20260928/rule.txt": "398ee47f8659973e74eb250723cf96293fbcdb82b22769252a17271f6b76a284",
+    "ext-20260928/trial-1.console": "1c284307623b190ff293d8d8c326175babc008f45219ffd91fe7a1a7350b7947",
+    "ext-20260928/trial-2.console": "c5c082ded9e43e33e834ca5763f2680fcd3f997cf77859729e323a4eb99057cd",
+    "ext-20260928/trial-r3.console": "4f3944cc6faf0dac1594a2d1c8d8a33cddc93e162fa42a74e1bf0927c22c37f9",
+    "ext-20260928/chain-4.console": "3102dfbb292565a98a0238f312192046e9cce062d771e160b69d0b9808b541a7",
+    "ext-20260928/1/scan.json": "25d0e34897756045e84ea94571fb48c925904b1a9b456a4c53050ce6dc5687fe",
+    "ext-20260928/1/check.log": "f0a70b4c674601f48d7d8b96d0323459160d72652cef48c9cdcfa3afb2fad269",
+    "ext-20260928/2/mover-paper.json": "8c736cc29228d6d0421a4c0df51f61fa5ba9beb66ce3fd46fba2958c5bf8301c",
+    "ext-20260928/3/mover-paper.json": "0617e16b1b34f651a18d719b6f4591e4f2d716ea976229ac32e6c297e2088775",
+    "ext-20260928/4/mover-paper.json": "dd9182517eac75770c1124ffd9f111852ed7f85af376951cd4d0afed17ffdb6b",
+    "ext-20260928/5/mover-paper.json": "ce9789e5cef06d43182e838fd60988988ef6a8ddbe7016a1493c9e39033c7787",
+    "ext-20260928/6/mover-paper.json": "c6632f2f8ebda18666b9a85b54fbae3b6a1e492f347856ca6a21c156f221fe52",
+    "ext-20260928/7/mover-paper.json": "38dfc092ded4b6d0adbfa4df20e3576de04b1d1f519416447a058e17802fba11",
+    "ext-20260928/8/mover-paper.json": "c68da8a3988d3533a5fd39eb240f5c17851abea006de79c4bc5ce9e843c8f2b5",
+    "ext-20260928/3/live/events.jsonl": "2176b19a15b26f345ea8f1b59d04f374697d440f4683066a81649f01037f72b7",
+    "ext-20260928/8/live/events.jsonl": "08da7457947b460ecb8ca82e6b27cb35ba5a36ad099180077b57a71a3328608f",
+    "run-series-trial.20260928.sh": "8723ff0797c9a5224a3ea8b150168240e4ca344033a93e497f8daed5bf1e1836",
+    "retry-benchmark.sh": "4f82d5f936257869450c72d6f9cc03b0cf0f2fa584891d1abfc9b8a95fe1f27e",
+    "chain-next.sh": "c1189b686abbcc0ad951ed13d25ca8a00c8be853f585740a65d2b4226a404365",
+    "pc-20260928/frozen-3058b237.SHA256SUMS": "77de4228864b73c5aa436399359c13a5e2c4388956ca1e8c200c97282b41134e"
+  },
+  "private_artifacts_note": "Hashes of retained private files that carry no account fingerprint (checked before hashing). The files in committed_copies are committed here. The rest stay private: config-mover-ext-20260928.json and rule.txt (their content is in config and scanner_rule), attempt 1's scan.json and check.log (quoted in scanner_rule and the attempt), the engine events and the three series scripts (not requested for publication and not reviewed for it). FREEZE.md and OUTCOME.json name account fingerprints and are not hashed; the scan page caches, the engine ledger and the NautilusTrader logs stay private and are not hashed either.",
+  "field_provenance": {
+    "legend": "asserted: the builder stops unless two or more sources agree. single_source: copied from one source with no cross-source assertion. derived: computed by the builder from the named source. literal: text or a constant written into the builder. Descriptive labels and notes are literal.",
+    "asserted": {
+      "code.engine_sources_sha256, code.clean_basis counts": "git show 3058b237 and the pc-20260928 SHA256SUMS",
+      "config.leverage_note figures": "every attempt's sizing (engine_leverage_multiple, gross budget, guard)",
+      "attempts[].orders_submitted (passed trials)": "engine receipt and the broker-matched order rows",
+      "scanner_rule": "rule.txt, attempt 1's scan.log and scan.json, and the config",
+      "attempts[].status, stage, reason, check_rc, paper_rc": "check.log or mover-paper.json and the console rc; units 1 and 2 also against the journal exit status",
+      "attempts[].check, synthetic, rule, exit_rule": "check.json, synthetic.log and the config",
+      "attempts[].entries, exits (qty, limit, average price, fills, realized)": "engine receipt, ledger (execution counts) and broker listing",
+      "attempts[].fills": "engine fill events, ledger executions and broker FILL activities",
+      "attempts[].requests.read, submit": "ledger requests table from trial_start and the engine receipt",
+      "attempts[].realized_pnl_usd": "engine receipt, ledger delta and broker recompute",
+      "attempts[].buy_notional_usd, sell_notional_usd": "engine receipt and broker filled qty x average price",
+      "orders[] (symbol, side, qty, limit, average price, final status, fill counts)": "engine receipt, ledger and broker",
+      "orders[].fills_at_reference_quote, fills_at_reference_quote": "ledger execution prices (matched to broker activities) and the engine events",
+      "cleanup.ledger_positions_nonzero": "ledger positions table and the reconciliation",
+      "units[1-2].exit_status": "journal and series console rc",
+      "series_totals.realized_pnl_usd": "ledger meta realized, the per-trial engine receipts and the broker recompute",
+      "series_totals.ledger_gross_loss_usd": "ledger meta realized_loss and the losing legs' realized P&L",
+      "series_totals.ledger_cash_delta_usd": "ledger meta cash_delta, trial 8's end reconciliation and the broker recompute",
+      "series_procedure.retry_timing": "journal unit times and series consoles (gaps asserted)",
+      "code.checkout path equality": "pc-20260928 run-trial.sh and run-series-trial.20260928.sh",
+      "committed_copies": "sha256 of each committed file against its private source"
+    },
+    "single_source": {
+      "config (every field)": "the config file; its sha256 is asserted in check.json and every mover-paper.json, so these are the values the engine ran, but no second source repeats them",
+      "started_at (top level), units[] times, results and journal records": "systemd user journal",
+      "code.runtime.engine": "mover-paper.json native.engine",
+      "code.runtime.alpaca_py, python": "the 2026-09-29 reconciliation environment, not observed at run time",
+      "attempts[].started_at, ended_at, finished_at": "series consoles (ET wall times)",
+      "attempts[].scan (argument_rule, fired, candidates)": "each attempt's scan.log",
+      "attempts[].caps, caps_source": "mover-paper.json sizing or check.json sizing",
+      "attempts[].preflight": "mover-paper.json preflight",
+      "attempts[].skipped_entries": "mover-paper.json symbols",
+      "attempts[].rejects.native_rejections": "engine receipt (consistent with every broker status filled)",
+      "attempts[].rejects.pre_wire_refusals, cancels": "per-order flags in the engine receipt",
+      "attempts[].errors (error_type, adapter_errors, callback_faults, average_invariant_mismatches, duplicate_executions, open_fill_gaps_at_stop)": "engine receipt",
+      "attempts[].errors.halts.seed_items, halted": "engine receipt halts",
+      "attempts[].errors.websocket_restart_lines": "series consoles",
+      "attempts[].dropped_crossed_quotes": "engine receipt native.dropped_quotes",
+      "attempts[].native_quotes": "engine receipt native.native_quotes",
+      "attempts[].requests (pre-trial reads, peaks)": "ledger requests table",
+      "attempts[].trial_start, elapsed_seconds": "engine receipt",
+      "attempts[].reconciliation_end": "engine receipt end reconciliation",
+      "orders[].reference_quote": "engine events (events.jsonl)",
+      "orders[].reason": "engine receipt",
+      "orders[].submitted_at, filled_at, type, time_in_force, extended_hours": "broker listing",
+      "cleanup.broker_positions, broker_open_orders; broker_reconciliation (observed_at, window, pages, positions_now, open_orders_now, versions)": "the committed reconciliation stdout; its counts and P&L are in asserted above",
+      "broker_reconciliation.max_ledger_vs_broker_time_skew_seconds": "computed by the reconciliation tool",
+      "series_totals.ledger_peak_pnl_usd": "ledger meta peak_pnl",
+      "series_procedure.scripts_note, freeze_plan times": "file modification times and FREEZE.md text"
+    },
+    "derived": {
+      "series_totals counts (attempts, passed, refusals, retries, entries, exits, fill events, rejects, cancels, unconfirmed)": "the attempts and orders above",
+      "attempts[].requests peaks": "ledger request timestamps",
+      "orders[].adverse_slippage_vs_reference_usd_per_share": "broker average price and the engine events",
+      "private_artifacts_sha256": "sha256 of each private file"
+    },
+    "literal": {
+      "series_totals.retries.after_rule_argument_fix": "1: the operator's rule-argument correction before attempt 2 (scanner_rule)",
+      "attempts[].errors.error_type null, adapter_errors 0, callback_faults 0, average_invariant_mismatches 0": "constants written after asserting the engine receipt's fields empty",
+      "units[].role": "the builder's description of each unit",
+      "attempts[].flat_at_end, flat_basis; cleanup.flat, proof": "text written after the asserts on the end reconciliation, the preflight counts and the broker read"
+    }
+  },
+  "error": null,
+  "limitations": [
+    "Volatile scratch checkout: the engine ran from a detached checkout of 3058b237 in a session scratch directory that no longer exists. Code identity rests on the pc-20260928 freeze SHA256SUMS (60 of 196 files, written 4.4 hours before attempt 1) and git show, not on a hash taken at run time (code.clean_basis_limits).",
+    "Metadata plus broker-reconciled evidence, not a frozen gate run. It qualifies no gate, including alpaca-paper-extended-hours.",
+    "Unconfirmed fills would be marked unconfirmed. This reconciliation found none: 23 of 23 ledger executions matched broker FILL activities.",
+    "The broker read uses the same broker API and account as the engine, so it is independent of the engine code but not of the broker.",
+    "Alpaca paper fills are simulated by the broker from quotes. They are not exchange executions and do not establish live slippage, queue position or partial-fill behaviour. Here every one of the 23 fills was at its order's reference quote.",
+    "Two passed trials in one POST session are not a strategy evaluation. The scanner measures gain against the previous official close, so in POST it selects the day's movers and holds them into after-hours; it does not select after-hours-only catalysts.",
+    "The freeze's stop on a preflight refusal was replaced by bounded retries, and the series scripts, including chain-next.sh, were not part of the freeze (series_procedure.deviations_from_freeze).",
+    "Account designation: the series kept its own engine ledger (the default paper state root's directory for this account, which holds only this series' two trials) but traded broker account alpaca-paper-2, which blueprints/us-equities/incentive-monitor/forward-protocol-v1.json:63 and docs/secret-storage.md:17 designate as the isolated incentive-monitor study account. The broker account's orders, fills and cash are shared even where engine ledgers are not. Whether this use is compatible with the forward study's isolation is referred to the forward protocol's owner, the trading lane; this receipt does not decide it.",
+    "The websocket restart lines carry no timestamp. They are normal-close (1000) records, which an earlier isolation check found only after the engine's stop(); this run neither confirms nor rules that out.",
+    "The journal holds no exit record for the r3, chain4 and incentive-monitor units (journal_query). Their success is inferred from the absence of a failure record; the last attempt of r3 and of chain4 logged paper rc 0."
+  ],
+  "evidence_note": "Built from the private trial workspace (the engine's own receipts, consoles and events), the engine mover ledger read with sqlite mode=ro, the systemd user journal, git show 3058b237 and a fresh read-only broker reconciliation (GET only, paper endpoint) whose tool and stdout are committed here. Figures present in two or more of those sources (orders, fills, final statuses, fill prices against reference quotes, P&L, notional, cash delta, gross loss, in-trial request counts and code hashes) were cross-checked by assertion, and a mismatch stops the build. Other fields come from one source; field_provenance names them. No credential, account id, account number, account fingerprint, broker order id or ref, activity id, execution id or host path is recorded."
+}

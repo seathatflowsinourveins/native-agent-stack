@@ -121,6 +121,7 @@
       {"path": "catalogs/sota-convergence/manifest-20260922.json", "class": "dated_record", "basis": "20260922", "reason": "Dated convergence manifest."},
       {"path": "catalogs/sota-convergence/manifest-20260923.json", "class": "dated_record", "basis": "20260923", "reason": "Dated convergence manifest."},
       {"path": "catalogs/sota-convergence/manifest-20260926.json", "class": "dated_record", "basis": "20260926", "reason": "Dated convergence manifest; one of its matches is an unrelated RTK version."},
+      {"path": "catalogs/sota-convergence/manifest-20260929.json", "class": "dated_record", "basis": "20260929", "reason": "Dated convergence manifest, added with the 2026-09-29 landscape-sweep record; its catalog pin fields copy the pinned version. The search counts above describe the 2026-09-28 tree."},
       {"path": "catalogs/us-equities/star-audit.json", "class": "dated_record", "basis": "\"checked_at\": \"2026-09-19\"", "reason": "Prior-baseline source link in a dated star audit."},
       {"path": "docs/ecosystem/claude-repository-evidence.html", "class": "dated_record", "basis": "claude-repository-evidence-20260921", "reason": "Rendered page of the 2026-09-21 evidence run."},
       {"path": "docs/ecosystem/claude-upstream-checks.html", "class": "dated_record", "basis": "claude-upstream-checks-20260921", "reason": "Rendered page of the 2026-09-21 upstream checks."},

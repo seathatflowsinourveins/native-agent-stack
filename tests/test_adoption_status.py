@@ -5,6 +5,7 @@ import dis
 import errno
 import hashlib
 import io
+import itertools
 import json
 import os
 from pathlib import Path
@@ -22,9 +23,11 @@ import unittest
 from unittest.mock import patch
 
 from scripts import adoption_status
-from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, NO_CLIENT_STATE,
-                                     NO_PINNED_VERSION, PINNED_VERSION_LIMITATIONS, client_wiring, git_revision,
-                                     inspect_adoption, main, pins_file_path, probe_pinned_version,
+from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, LOGIN_FILE_STATES,
+                                     LOGIN_SHELL_FILES, LOGIN_SHELL_KEYS, LOGIN_SHELL_LIMITATIONS, NO_CLIENT_STATE,
+                                     NO_PINNED_VERSION, PINNED_VERSION_LIMITATIONS, client_wiring,
+                                     fixed_login_shell, git_revision, inspect_adoption, login_file_state,
+                                     login_shell, main, pins_file_path, probe_pinned_version,
                                      signals_interrupt_probes, version_output_matches)
 
 REPO = Path(__file__).resolve().parents[1]
@@ -568,6 +571,305 @@ class AdoptionStatusTests(unittest.TestCase):
         self.assertEqual(set(result["client_wiring"]), {*CLIENT_WIRING_KEYS, "complete"})
         self.assertIs(result["client_wiring"]["complete"], False)
         self.assertNotIn(str(self.root), json.dumps(result))
+
+    def test_login_shell_is_opt_in(self):
+        with patch("scripts.adoption_status.login_shell") as shell, \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main(["--manifest", str(self.path), "--json"]), 0)
+        shell.assert_not_called()
+        payload = json.loads(output.getvalue())
+        self.assertNotIn("login_shell", payload)
+        self.assertFalse(set(LOGIN_SHELL_LIMITATIONS) & set(payload["limitations"]))
+
+    def test_login_shell_flag_reports_and_restates_the_limitations(self):
+        home = self.root / "home"
+        home.mkdir()
+        (home / ".profile").write_text(f"export {PRIVATE}=1\n")
+        with patch.dict("os.environ", {"HOME": str(home)}), contextlib.redirect_stdout(io.StringIO()) as output:
+            # The exit code stays the prerequisite result: a reported login shell state is never exited on.
+            self.assertEqual(main(["--manifest", str(self.path), "--json", "--login-shell"]), 0)
+        payload = json.loads(output.getvalue())
+        self.assertEqual(payload["login_shell"], {"bash_profile": "absent", "bash_login": "absent", "profile": "content",
+                                                  "first_read": "profile", "profile_read": True})
+        self.assertEqual(payload["limitations"][-1:], LOGIN_SHELL_LIMITATIONS)
+        self.assertIn(NO_CLIENT_STATE, payload["limitations"])
+        (home / ".bash_profile").write_bytes(b"")
+        with patch.dict("os.environ", {"HOME": str(home)}), contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main(["--manifest", str(self.path), "--login-shell"]), 0)
+        self.assertIn('Login shell: {"bash_login": "absent", "bash_profile": "empty", "first_read": "bash_profile", '
+                      '"profile": "content", "profile_read": false}\n', output.getvalue())
+        self.assertNotIn(PRIVATE, output.getvalue())
+        self.assertNotIn(str(home), output.getvalue())
+
+    def test_login_shell_is_reported_even_for_an_invalid_manifest(self):
+        self.path.write_text("{", encoding="utf-8")
+        home = self.root / "empty-home"
+        home.mkdir()
+        result = inspect_adoption(self.path, self.root, with_login_shell=True, env={"HOME": str(home)})
+        self.assertEqual(result["manifest"]["status"], "invalid")
+        self.assertEqual(set(result["login_shell"]), set(LOGIN_SHELL_KEYS))
+        self.assertIs(result["login_shell"]["profile_read"], False)
+        self.assertNotIn(str(self.root), json.dumps(result))
+
+    def test_login_shell_composes_with_client_wiring_and_pinned_versions(self):
+        home = self.root / "compose-home"
+        home.mkdir()
+        canned = {"claude": {"rtk_hook": True}, "complete": False}
+        with patch("scripts.adoption_status.client_wiring", return_value=canned):
+            result = inspect_adoption(self.path, self.root, with_client_wiring=True, with_pinned_versions=True,
+                                      with_login_shell=True, env={"HOME": str(home)})
+        self.assertEqual(result["limitations"][-1:], LOGIN_SHELL_LIMITATIONS)
+        self.assertNotIn(NO_CLIENT_STATE, result["limitations"])
+        self.assertNotIn(NO_PINNED_VERSION, result["limitations"])
+        for statement in CLIENT_WIRING_LIMITATIONS + PINNED_VERSION_LIMITATIONS + LOGIN_SHELL_LIMITATIONS:
+            self.assertIn(statement, result["limitations"])
+        self.assertEqual(result["client_wiring"], canned)
+        self.assertIn("login_shell", result)
+
+
+class LoginShellTests(unittest.TestCase):
+    """--login-shell against real files in a temporary HOME, and against the real bash login search: the static
+    model must name the file bash reads, for every combination of startup-file states, from metadata alone."""
+
+    def setUp(self):
+        self.fresh_home()
+
+    def fresh_home(self) -> Path:
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.home = Path(temporary.name)
+        return self.home
+
+    def build(self, states: dict) -> None:
+        """Materialize one state per startup file; a file with content exports MARK=<its key>."""
+        for key, state in states.items():
+            target = self.home / LOGIN_SHELL_FILES[key]
+            line = f"MARK={key}; export MARK\n"
+            if state == "empty":
+                target.write_bytes(b"")
+            elif state == "content":
+                target.write_text(line)
+            elif state == "directory":
+                target.mkdir()
+            elif state == "dangling":
+                target.symlink_to(self.home / "nowhere")
+            elif state == "linked":
+                (self.home / f"real-{key}").write_text(line)
+                target.symlink_to(self.home / f"real-{key}")
+            elif state == "unreadable":
+                target.write_text(line)
+                target.chmod(0)
+                self.addCleanup(target.chmod, 0o600)
+            elif state == "devnull":
+                target.symlink_to("/dev/null")
+            elif state == "loop":
+                target.symlink_to(target.name)
+            elif state == "fifo":
+                os.mkfifo(target)
+
+    def report(self, states: dict) -> dict:
+        self.build(states)
+        return login_shell({"HOME": str(self.home)})
+
+    def test_a_host_without_startup_files_reads_none(self):
+        self.assertEqual(self.report({}), {"bash_profile": "absent", "bash_login": "absent", "profile": "absent",
+                                          "first_read": None, "profile_read": False})
+
+    def test_profile_alone_is_read(self):
+        result = self.report({"profile": "content"})
+        self.assertEqual((result["first_read"], result["profile_read"]), ("profile", True))
+
+    def test_an_empty_bash_profile_hides_a_real_profile(self):
+        # The 2026-09-29 incident: an empty ~/.bash_profile left by a sandbox scrub ended the login search, so
+        # ~/.profile and its PATH were never read and `exec claude` exited 127.
+        self.assertEqual(self.report({"bash_profile": "empty", "profile": "content"}),
+                         {"bash_profile": "empty", "bash_login": "absent", "profile": "content",
+                          "first_read": "bash_profile", "profile_read": False})
+
+    def test_an_empty_bash_login_hides_a_real_profile_too(self):
+        result = self.report({"bash_login": "empty", "profile": "content"})
+        self.assertEqual((result["first_read"], result["profile_read"]), ("bash_login", False))
+
+    def test_a_bash_profile_with_content_may_hand_off_and_that_is_not_read(self):
+        result = self.report({"bash_profile": "content", "profile": "content"})
+        self.assertEqual((result["first_read"], result["profile_read"]), ("bash_profile", None))
+
+    def test_a_directory_or_unreadable_file_ends_the_search(self):
+        for state in ("directory", *(() if os.geteuid() == 0 else ("unreadable",))):
+            with self.subTest(state=state):
+                self.fresh_home()
+                result = self.report({"bash_profile": state, "profile": "content"})
+                self.assertEqual((result["bash_profile"], result["first_read"], result["profile_read"]),
+                                 ("unusable", "bash_profile", False))
+
+    def test_symlinks_follow_the_target_as_open_does(self):
+        result = self.report({"bash_profile": "dangling", "profile": "content"})
+        self.assertEqual((result["bash_profile"], result["first_read"], result["profile_read"]),
+                         ("absent", "profile", True))
+        self.fresh_home()
+        result = self.report({"bash_profile": "linked", "profile": "content"})
+        self.assertEqual((result["bash_profile"], result["first_read"], result["profile_read"]),
+                         ("content", "bash_profile", None))
+
+    def test_a_device_reads_as_empty_and_a_fifo_blocks_and_both_end_the_search(self):
+        # Verified against the real shell, not assumed: bash reads /dev/null as an empty file without a message, and a FIFO
+        # blocks the login shell at open(); the model calls both unusable and reports that ~/.profile is not reached.
+        for state in ("devnull", "fifo"):
+            with self.subTest(state=state):
+                self.fresh_home()
+                result = self.report({"bash_profile": state, "profile": "content"})
+                self.assertEqual((result["bash_profile"], result["first_read"], result["profile_read"]),
+                                 ("unusable", "bash_profile", False))
+                if not native_which("bash"):
+                    continue
+                run = lambda: subprocess.run([native_which("bash"), "-l", "-c", 'printf %s "$MARK"'], env={"HOME": str(self.home)},
+                                             capture_output=True, text=True, timeout=3)
+                if state == "fifo":
+                    with self.assertRaises(subprocess.TimeoutExpired):
+                        run()
+                else:
+                    self.assertEqual(run().stdout, "")
+
+    def bash_mark(self, home: Path) -> str:
+        return subprocess.run([native_which("bash"), "-l", "-c", 'printf %s "$MARK"'], env={"HOME": str(home)}, capture_output=True,
+                              text=True, timeout=30).stdout
+
+    def test_an_unusable_profile_is_reached_but_not_read(self):
+        for state in ("directory", "devnull", *(() if os.geteuid() == 0 else ("unreadable",))):
+            with self.subTest(state=state):
+                self.fresh_home()
+                result = self.report({"profile": state})
+                self.assertEqual((result["profile"], result["first_read"], result["profile_read"]), ("unusable", "profile", False))
+                if native_which("bash"):
+                    self.assertEqual(self.bash_mark(self.home), "")
+
+    def test_other_stat_errors_end_the_search_as_bash_open_errors_do(self):
+        # ELOOP, ENOTDIR and EACCES are neither ENOENT nor a readable file, so bash's open() fails with an error that ends the search
+        # (evalfile_internal returns -1): the state is unusable for each, checked against the real shell where one is installed.
+        self.report({"bash_profile": "loop", "profile": "content"})
+        loop = login_shell({"HOME": str(self.home)})
+        self.assertEqual((loop["bash_profile"], loop["first_read"], loop["profile_read"]), ("unusable", "bash_profile", False))
+        if native_which("bash"):
+            self.assertEqual(self.bash_mark(self.home), "")
+        regular = self.fresh_home() / "a-file-not-a-directory"
+        regular.write_text("x\n")
+        as_file = login_shell({"HOME": str(regular)})
+        self.assertEqual((as_file["bash_profile"], as_file["bash_login"], as_file["profile"], as_file["profile_read"]),
+                         ("unusable", "unusable", "unusable", False))
+        if native_which("bash"):
+            self.assertEqual(self.bash_mark(regular), "")
+        if os.geteuid() != 0:
+            closed = self.fresh_home() / "closed"
+            closed.mkdir()
+            (closed / ".profile").write_text("MARK=profile; export MARK\n")
+            closed.chmod(0)
+            self.addCleanup(closed.chmod, 0o700)
+            searched = login_shell({"HOME": str(closed)})
+            self.assertEqual((searched["bash_profile"], searched["first_read"], searched["profile_read"]), ("unusable", "bash_profile", False))
+            if native_which("bash"):
+                self.assertEqual(self.bash_mark(closed), "")
+
+    def test_a_home_that_cannot_be_determined_falls_back_to_the_root_like_bash(self):
+        # bash sets current_user.home_dir to "/" when getpwuid fails (shell.c), so a user with no home entry reads /.bash_profile,
+        # /.bash_login and /.profile; the model stats those names and a traceback is never the answer.
+        asked = []
+
+        def record(path):
+            asked.append(str(path))
+            return "absent"
+
+        with patch("scripts.adoption_status.Path.home", side_effect=RuntimeError("Could not determine home directory.")), \
+                patch("scripts.adoption_status.login_file_state", side_effect=record):
+            result = login_shell({})
+            payload = inspect_adoption(REPO / "adoption/manifest.json", REPO, with_login_shell=True, env={})
+        self.assertEqual(sorted(set(asked)), ["/.bash_login", "/.bash_profile", "/.profile"])
+        self.assertEqual(result, {"bash_profile": "absent", "bash_login": "absent", "profile": "absent", "first_read": None, "profile_read": False})
+        self.assertEqual(payload["login_shell"], result)
+
+    def test_home_comes_from_the_passwd_entry_when_the_environment_has_none(self):
+        # An environment with no HOME must not be read as the working directory: Path.home() (the passwd entry) is the second source.
+        passwd_home = self.home
+        (passwd_home / ".profile").write_text("MARK=profile; export MARK\n")
+        elsewhere = self.fresh_home()
+        (elsewhere / ".bash_profile").write_text("x\n")   # the current directory would find this one if it were read
+        cwd = os.getcwd()
+        os.chdir(elsewhere)
+        self.addCleanup(os.chdir, cwd)
+        with patch("scripts.adoption_status.Path.home", return_value=passwd_home):
+            result = login_shell({})
+        self.assertEqual((result["bash_profile"], result["profile"], result["first_read"], result["profile_read"]), ("absent", "content", "profile", True))
+
+    def test_an_empty_profile_that_the_search_reaches_is_reached(self):
+        # profile_read means the search reaches a usable ~/.profile: an empty one counts, since bash reads it and finds nothing to run.
+        result = self.report({"profile": "empty"})
+        self.assertEqual((result["profile"], result["first_read"], result["profile_read"]), ("empty", "profile", True))
+
+    def test_only_metadata_is_used_and_no_content_or_path_is_reported(self):
+        for name in LOGIN_SHELL_FILES.values():
+            (self.home / name).write_text(f"export {PRIVATE}=1\n")
+
+        def refuse(*_args, **_kwargs):
+            raise AssertionError("a startup file must never be opened or read")
+
+        with patch("builtins.open", refuse), patch("io.open", refuse), patch("os.open", refuse), \
+                patch.object(Path, "open", refuse), patch.object(Path, "read_text", refuse), \
+                patch.object(Path, "read_bytes", refuse):
+            result = login_shell({"HOME": str(self.home)})
+        self.assertEqual(result["first_read"], "bash_profile")
+        self.assertNotIn(PRIVATE, json.dumps(result))
+        self.assertNotIn(str(self.home), json.dumps(result))
+
+    def test_home_defaults_to_the_process_home_and_a_missing_one_is_not_an_error(self):
+        (self.home / ".profile").write_text("x\n")
+        with patch.dict("os.environ", {"HOME": str(self.home)}):
+            self.assertEqual(login_shell()["first_read"], "profile")
+        self.assertIsNone(login_shell({"HOME": str(self.home / "missing")})["first_read"])
+
+    def test_the_result_shape_is_fixed_and_a_stray_value_is_refused(self):
+        good = self.report({"bash_profile": "empty", "profile": "content"})
+        self.assertTrue(fixed_login_shell(good))
+        self.assertEqual(tuple(good), LOGIN_SHELL_KEYS)
+        for broken in ({**good, "extra": True}, {**good, "profile": "/private/dir/.profile"},
+                       {**good, "first_read": "/private/dir"}, {**good, "profile_read": 1},
+                       {key: value for key, value in good.items() if key != "profile_read"}, [], None):
+            with self.subTest(broken=broken):
+                self.assertFalse(fixed_login_shell(broken))
+        with patch("scripts.adoption_status.login_file_state", return_value="export SECRET=1"), \
+                self.assertRaises(AssertionError):
+            login_shell({"HOME": str(self.home)})
+        self.assertEqual(set(LOGIN_FILE_STATES), {"absent", "empty", "content", "unusable"})
+        self.assertEqual(login_file_state(self.home / "nothing-here"), "absent")
+
+    @unittest.skipUnless(native_which("bash"), "needs bash")
+    def test_the_static_model_names_the_file_real_bash_reads(self):
+        # Every combination of the three files over the states below (a FIFO blocks the shell and has its own test), each run through `bash -l`: the MARK bash
+        # exports names the file it read, which is the first existing file when that has content and nothing when it
+        # is empty or unusable. The negative control (an empty file taken as absent) must disagree with bash
+        # somewhere, or this comparison could not tell a wrong model from a right one.
+        states = ["absent", "empty", "content", "directory", "dangling", "linked", "devnull",
+                  *(() if os.geteuid() == 0 else ("unreadable",))]
+        bash = native_which("bash")
+        keys = tuple(LOGIN_SHELL_FILES)
+        combinations = mismatches = control_disagreements = 0
+        for combo in itertools.product(states, repeat=len(keys)):
+            self.fresh_home()
+            result = self.report(dict(zip(keys, combo)))
+            observed = subprocess.run([bash, "-l", "-c", 'printf %s "$MARK"'], env={"HOME": str(self.home)},
+                                      capture_output=True, text=True, timeout=30).stdout
+            first = result["first_read"]
+            predicted = first if first is not None and result[first] == "content" else ""
+            control_first = next((key for key in keys if result[key] not in ("absent", "empty")), None)
+            control = control_first if control_first is not None and result[control_first] == "content" else ""
+            combinations += 1
+            mismatches += observed != predicted
+            control_disagreements += observed != control
+            if result["profile_read"] is False:
+                self.assertNotEqual(observed, "profile", combo)
+            if result["profile_read"] is True:
+                self.assertEqual(observed, "profile" if result["profile"] == "content" else "", combo)
+        self.assertEqual(combinations, len(states) ** len(keys))
+        self.assertEqual(mismatches, 0)
+        self.assertGreater(control_disagreements, 0)
 
 
 class PinnedVersionProbeTests(unittest.TestCase):

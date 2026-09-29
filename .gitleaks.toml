@@ -371,11 +371,17 @@ regexes = [
 # stays detected, on a pin line or elsewhere: an unreviewed id, an uppercase variant, or a legacy
 # Sourcegraph token. So does an sgp_-prefixed token, and so do the same ids in any other file
 # (tests/test_gitleaks_config.py test_d3/test_d4).
+# 2026-09-29 (landscape-sweep-20260929): the same shape. The rule id is named again in the secrets-credentials
+# refuters' reasoning, the lane's free-text commit ids were again shortened to 12 characters before the manifest
+# was built (the retained returns hold no bare 40-hex value), and the 60 "pin" values the generator copies from
+# the catalog layer files are the same 39 distinct commit ids, checked value by value against the list below
+# (no id added, none removed). Only the exact path of that manifest joins the allowlist.
 [[rules.allowlists]]
-description = "The reviewed git commit ids of the catalog pins in the 2026-09-26 SOTA manifest"
+description = "The reviewed git commit ids of the catalog pins in the 2026-09-26 and 2026-09-29 SOTA manifests"
 condition = "AND"
 paths = [
   '''^catalogs/sota-convergence/manifest-20260926\.json$''',
+  '''^catalogs/sota-convergence/manifest-20260929\.json$''',
 ]
 regexTarget = "secret"
 regexes = [

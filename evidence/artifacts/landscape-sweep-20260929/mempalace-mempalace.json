@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-mempalace-mempalace",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/MemPalace/mempalace",
+ "reviewed_commit": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of MemPalace/mempalace at commit 5ea40d30caf0ed2ff6e49623e386a0863b28edaa (license MIT), read from README.md at that commit. Repository description: \"The best-benchmarked open-source AI memory system. And it's free.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 59358,
+  "pushed_at": "2026-09-29T11:22:35Z",
+  "archived": false,
+  "default_branch": "develop"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+   "text": "Local-first AI memory. Verbatim storage, pluggable backend, 96.6% R@5 raw on LongMemEval — zero API calls."
+  },
+  {
+   "source": "README.md@5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+   "text": "> [!CAUTION] > **Beware of impostor sites.** MemPalace has no other official websites. The **only** official sources are this **[GitHub repository](https://github.com/MemPalace/mempalace)**, the **[PyPI package](https://pypi.org/project/mempalace/)**, and the docs at **[mempalaceofficial.com](https://mempalaceofficial.com)**. Any other domain (including `.tech`, `.net`, or other `.com` variants) is an impostor and may distribute malware. Details and timeline: [docs/HISTORY.md](docs/HISTORY.md)."
+  },
+  {
+   "source": "README.md@5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+   "text": "> [!IMPORTANT] > **Claude Code sessions expire in 30 days without auto-save hooks wired.** [Read this →](https://github.com/MemPalace/mempalace/discussions/1388) > > Need the shortest recovery/setup path? Use the [Claude Code retention setup checklist](https://mempalaceofficial.com/guide/claude-code-retention.html)."
+  }
+ ]
+}

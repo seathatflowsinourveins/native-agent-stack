@@ -1,0 +1,30 @@
+{
+ "schema_version": 1,
+ "id": "source-review-abhigyanpatwari-gitnexus",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/abhigyanpatwari/GitNexus",
+ "reviewed_commit": "acb65b95b62647b19781caa60afd17d3bed23d4a",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "code-navigation"
+ ],
+ "claim": "Source and documentation review of abhigyanpatwari/GitNexus at commit acb65b95b62647b19781caa60afd17d3bed23d4a (license NOASSERTION), read from README.md at that commit. Repository description: \"GitNexus: The Zero-Server Code Intelligence Engine\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 47644,
+  "pushed_at": "2026-09-29T14:14:45Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@acb65b95b62647b19781caa60afd17d3bed23d4a",
+   "text": "> _Like DeepWiki, but deeper._ DeepWiki helps you _understand_ code. GitNexus lets you _analyze_ it — a knowledge graph tracks every relationship, not just descriptions."
+  },
+  {
+   "source": "README.md@acb65b95b62647b19781caa60afd17d3bed23d4a",
+   "text": "**TL;DR:** The **CLI + MCP** makes your AI agent reliable — it gives Cursor, Claude Code, Antigravity, Codex, and friends a deep architectural view of your codebase so they stop missing dependencies, breaking call chains, and shipping blind edits. Even smaller models get full architectural clarity. The **Web UI** is a quick way to chat with any repo in the browser."
+  }
+ ]
+}
