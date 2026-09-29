@@ -27,11 +27,12 @@ getopt reads them, and a secret variable set through `systemd-run`'s
 process listing while it runs and the unit's Environment property can be read
 over the user bus), and the body
 of a command substitution inside double quotes (`echo "$(printenv)"` runs
-printenv; single quotes, an ANSI-C string and a `#` comment stay data, and so
-does a quoted here-document inside a substitution whose command is git, gh,
-echo, printf, cat or tee: `git commit -m "$(cat <<'EOF' ... EOF)"`; behind a
-shell with `-c`, eval, an interpreter or any other program it is read as
-command lines). `ps -E` (macOS) and `systemctl show-environment` or a bare
+printenv; single quotes, an ANSI-C string and a `#` comment stay data). A
+here-document's lines are command lines like any other; the one exemption is a
+strict canonical idiom, a double-quoted word of exactly the shape
+`"$(cat <<'EOF'` newline, body, `EOF` newline, `)"` (idiom_spans), behind git,
+gh, echo or printf: its body is data for the command reading, while the
+raw-text rules still read it. `ps -E` (macOS) and `systemctl show-environment` or a bare
 `systemctl show` (a service manager's whole environment block) dump the
 environment like `ps e` and `env`. For a key
 held in the Linux kernel keyring it blocks payload reads (`keyctl print`,
@@ -41,8 +42,9 @@ the command that `kernel_keyring.py exec` or `tvly-keyring` starts with every
 rule above, and blocks that command when it names the injected variable or
 dumps the environment it inherits, also behind a launcher's options
 (`stdbuf -o0`) or a launcher the guard does not model (`watch`, `flock`).
-A backslash-newline is joined first and every raw-text rule also reads the
-command after the shell's quote removal, so a name split by quotes, a
+A backslash-newline is joined first (the canonical idiom is looked for before
+that) and every raw-text rule also reads the command after the shell's quote
+removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
 are never taken for arguments. An internal error blocks the command (`guard_error`), because only exit 2
 blocks; a hook that outlasts its timeout does not, so every scan reads a text once and a command of more than
@@ -1081,7 +1083,7 @@ def receiving_command(words: list[str]) -> tuple[str, int] | None:
 
 
 def exempt_idioms(text: str, spans: list[tuple[int, int]]) -> list[bool]:
-    """For each idiom span of text (idiom_spans), whether the command that receives it takes it as data: the program, after the reserved
+    """For each idiom span of text (idiom_spans), whether the command that receives it only stores or prints it: the program, after the reserved
     words, assignments, wrappers and launchers the guard models (receiving_command), is one of IDIOM_CONSUMERS and the idiom is one of its
     arguments. The text is read once more for that, with each idiom in place of a marker, its comments cut out and its lines joined as
     check() joins them: the words of the segment that holds a marker say which command it belongs to. A marker before the program word
