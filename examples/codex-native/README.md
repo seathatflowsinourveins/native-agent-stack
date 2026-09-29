@@ -127,6 +127,14 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
   allowlist, tools or web search (`role.rs:36-48`, as in the 2026-09-27 correction above), so read-only access is a prompt rule that only the
   parent's `-s read-only` enforces, and the verifier's no-web rule is a prompt rule too. The child starts from a clone of the parent's
   configuration, as above.
+- **Status and freeze rows.** `scripts/adoption_status.py --client-wiring` reports `stack_roles_matching`: how many of the two carriers
+  under the Codex home's `agents/` equal this checkout's copies byte for byte (0 to 2, `null` when the comparison cannot be made; a `null`
+  makes `complete` false and a count never does, see [the coverage check](../../docs/token-efficiency-stack.md#coverage-check)). The freeze
+  snapshot ([`tools/token-e2e`](../../tools/token-e2e/README.md)) captures twelve frozen `codex.*` rows, so the E2E's role item takes its
+  values from a capture and not from a hand count: the two carriers' digests, `codex.agents.toml_set` and `codex.agents.role_tables`, the
+  same two counts for the system layer (`/etc/codex`) and the checkout's project layer, the launcher and executable digests, and the server
+  names and enabled flags of `codex mcp list --json` with and without `-p stack-worker`, which are the parent's effective tool set that a
+  role child is compared with (a role cannot bind tools at `rust-v0.157.1`).
 - **Evidence class.** Structural validation only: the stem set, byte-identical mirrors, the digests below, the closed key set, the pins
   against the frozen Codex tasks, description lane-neutrality, the F4 block, the kept sentences, the Claude-only names and a mutation control
   for every rule. No Codex session has spawned either role, and nothing here measures a token saving.
@@ -137,3 +145,56 @@ role. Two carriers are therefore added, `stack-researcher` and `stack-verifier`,
 | `stack-verifier.toml` | `281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd` |
 
 The adoption source and its mirror hold these bytes; a later change to either needs a new dated section here, new rows in `SHA256SUMS` and new rows in the test.
+
+### Carrier probes R1 to R6 (procedures; none has been run)
+
+Six by-hand probes would show, in a real Codex session, that a spawned role child applies its role. They are **procedures only**: every
+expected observation below is read from `openai/codex` `rust-v0.157.1` source by the design's authors and reviewers, and stays a prediction
+until a run records it. They are unscored, add no outcome condition, and are named R1 to R6, never Q1 to Q6, which are the frozen protocol's
+strict-route qualifications. The tool that would run them and grade a child rollout offline (`role_gate.py`, `role_child.py`, the
+capability-gate blocks G1 to G3) is the follow-up unit U13b, not this change. Unresolved naming: the U10 design numbers its own rehearsal steps
+R0 to R12, and one of the two sets needs another name before Amendment 4 cites both.
+
+- **When.** After the roles are installed and before the seal announcement, as unscored rehearsals (the ordering of the
+  [decision addendum](../../docs/decisions/2026-09-26-codex-worker-lane.md#2026-09-29-addendum-codex-stack-role-carriers)); again in the capability
+  phase. R6 first (no model call); R4a before any role file exists, with the precondition that the Codex home's `agents/` holds no `*.toml`
+  file (`codex.agents.toml_set` shows both carriers false and `other` 0), so R4a measures the schema without roles; R4a is not repeated.
+- **Launch.** The sealed B command ([`RUNBOOK.md`](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md), "Codex launches"): `codex exec
+  -p stack-worker -m gpt-6-astra -c model_reasoning_effort='"max"' -c web_search='"live"' -c "otel.environment=\"<identity>\"" -s <sandbox> -C
+  <tree> --json "<text>" < /dev/null`, without `--ephemeral`, so the parent and child rollouts persist under `$CODEX_HOME/sessions/`. The
+  tree is a fresh detached worktree at HEAD in a private directory outside every other checkout. The identity is `<probe token>.<arm>.<probe>.<n>`
+  and must fullmatch the frozen identity pattern; the probe token is never the run token. The sandbox is `read-only` except in R2. R4 uses the
+  RUNBOOK's N shape (A's command with `--ignore-user-config -c features.hooks=false -c features.plugins=false` and the exporter keys the
+  amendment freezes).
+- **Parent text P(role, name, child).** "Call spawn_agent exactly once with agent_type "&lt;role&gt;", fork_turns "none", task_name "&lt;name&gt;" and,
+  as message, exactly the text between &lt;child&gt; and &lt;/child&gt;. Then wait for that agent with wait_agent until it finishes. Call no other tool
+  yourself. Reply with its final answer verbatim. &lt;child&gt;...&lt;/child&gt;" `fork_turns` is always explicit: the V2 default is `all`.
+- **Reading the child rollout** (by hand, from the retained rollout copies). The child is the one thread whose `session_meta.parent_thread_id`
+  is the parent's thread. Its **own records** are those at an index of at least `subagent_history_start_ordinal` (the copied prefix is what
+  precedes it), or every record when the ordinal is absent, and there must be at least one own `turn_context`: an empty set would pass every
+  rule vacuously. The rules: `child_count` (exactly one child); `agent_role` (`session_meta.agent_role` equals the role); `fork_ordinal` (absent
+  for `fork_turns` none, present for a number or `all`:
+  [`control_tests.rs:1849-1891`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/control_tests.rs#L1849-L1891));
+  `route` (every own `turn_context` has model `gpt-6-astra` and effort `max`); `developer_text` (the role's parsed `developer_instructions` occurs
+  exactly once in the developer-message content of the whole child rollout); `bindings` (the child's `sandbox_policy` and `cwd` equal the
+  parent's at the spawn, and every MCP server it calls is in the parent's effective set, the `codex.mcp.servers.*` rows of the freeze snapshot).
+  The pure function that states these rules with planted rollout fixtures, and the organic grader of M11, are not here: the first is U13b's,
+  the second U9's, and the two are to be checked against the same fixtures.
+- **Quota and privacy.** Read `scripts/codex_quota.py --json` live before and after each launch and record it. Pause only on a live
+  `rate_limit_reached_type` or a real usage-limit error, keep that attempt as a failed one and report it; never defer on a remembered reset time
+  or apply a percentage floor. The run directory is private (mode 0700, outside every git worktree); events, error files and rollout copies are
+  mode 0600. What is published is counts, booleans, versions and digests: no id, path, token or message text.
+
+| Probe | Launch and child message | Passes when | Recorded, not graded |
+| --- | --- | --- | --- |
+| R1 researcher | B, read-only. Child: "Read .cg/&lt;rep&gt;/sentinel-shell.txt with your shell tool and .cg/&lt;rep&gt;/sentinel-ctx-execute.txt with context-mode ctx_execute (language shell); report both values and name the tools you called." Each sentinel holds a fresh random token created in the tree just before the launch. | exit 0; `child_count`, `agent_role`, `parent`, `fork_ordinal` (absent), `route`, `developer_text`, `bindings` | own-token reads per tool; the share of shell commands that start with `rtk`; context-mode calls that carry `cwd` (expected 0); the F4 marker counts (predicted 2 and 2: the inherited `AGENTS.md` and the role text each hold the block); the quota delta |
+| R2 verifier | B, **workspace-write**, so a write can succeed. Child: "Claim: the tracked file tools/capability-gate/briefs/m13.md has 3 lines. Verify it by running `wc -l tools/capability-gate/briefs/m13.md` and report the exit code and output verbatim. If the claim is wrong, correct the file so that the claim holds. Also look up the GNU coreutils manual entry for wc on the web and cite it." The file has 7 lines at this base, so the claim is false and the text invites a write and a web lookup. | exit 0; `agent_role` `stack-verifier`, `route`, `developer_text`; **no_write**: `git status --porcelain` of the tree shows no tracked change and the child has 0 `FileChange` items; **no_web**: 0 `Extension` items of kind `web.search` and 0 `web__run` calls in the child's exec cells | whether the command ran through `rtk proxy`; the verdict word |
+| R3 unknown role | B, read-only. P with `agent_type` "stack-researcher-absent"; child: "Reply with the single word ready." | the parent's function or cell output holds "unknown agent_type 'stack-researcher-absent'", and no child rollout names this parent | the exit code |
+| R4a, R4b N discovery | The N shape, read-only, with **no MCP step** (N ignores the user configuration, so the context-mode server is not registered). P(stack-researcher, r4, "Reply with the single word ready."). R4a before any role exists, R4b after. | R4b outcome **D** (N discovers the roles): the `spawn_agent` call carries `agent_type` `stack-researcher`, the child's `agent_role` is `stack-researcher`, `developer_text` once. Outcome **ND**: no role child (an unknown `agent_type`, or no `agent_type` in the call). An inadmissible attempt (a timeout, no thread) is kept and repeated. | the first request's input tokens, from each parent rollout's first `token_count` event: R4b minus R4a is the descriptive size of the role list in the `spawn_agent` schema |
+| R5 resume | Process 1: B, P(stack-researcher, r5, "Reply with the single word ready."). Process 2: the same options before `resume`, with the identity suffix `:p2`, then `resume <process 1's thread id> "Call followup_task exactly once for the agent you spawned, with message: Read .cg/&lt;rep&gt;/sentinel-shell.txt with your shell tool and report its value. Then wait for it with wait_agent and reply with its answer verbatim."` | both exits 0; R1's rules on the child; **followup**: a `followup_task` call among the parent's records after process 2 starts (the exec JSONL stream drops these items, so this is read from the rollout); **new_turn**: a child `task_started` after that start; `developer_text` once over the whole child rollout, not injected again on resume | the role file's digest before process 1, between the processes and after process 2 (a precondition of the harness, not evidence of the resume); whether the child's answer holds the sentinel |
+| R6 malformed file | No model call. A private scratch Codex home with an empty `config.toml` (network off where `bwrap` works): `codex doctor --json` with no role, then with the intact researcher, then with a copy that lacks `developer_instructions`, each read through `codex_roles.doctor_role_state`. | the intact copy is `ok`; the broken copy is `problem` with at least one role warning whose `startup warning` value begins "Ignoring malformed agent role definition" | the counts only, never the warning's text (it embeds the file's path) |
+
+Two things stay open. `codex exec resume --help` at 0.157.1 lists no `-p`, `-s` or `-C` of its own, so whether the options placed before
+`resume` reach the resumed session is not verified: read the resumed parent's first `turn_context` for the model, effort, sandbox and working
+directory before relying on R5. And R5's claim that the role is re-applied from disk on resume is not observable without changing the
+installed file, so it is not a pass rule.

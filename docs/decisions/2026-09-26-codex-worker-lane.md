@@ -753,6 +753,37 @@ verifier is qualified as capability evidence only.
   than the launch directory, which the server is already bound to; the frozen M13 leg reads sentinel
   files with no explicit `cwd`
   ([`README.md:370`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)).
+- **Status and freeze rows.** `scripts/adoption_status.py --client-wiring` gains `stack_roles_matching`, how
+  many of the two carriers the Codex home holds byte for byte (a count; `null` when it cannot be
+  compared, which makes `complete` false as every `null` does). `tools/token-e2e/freeze_snapshot.py`
+  gains twelve frozen `codex.*` rows that the E2E's role item takes its values from: the two carriers'
+  digests, the set of `*.toml` files below the Codex home's `agents/` and the number of
+  `[agents.<name>]` tables in `config.toml` and the profile (0 expected), the same two counts for the
+  system layer (`/etc/codex`, always loaded, N included) and the checkout's project layer, the digests
+  of the `codex` on `PATH` and of the executable it runs, and the server names and enabled flags of
+  `codex mcp list --json` with and without `-p stack-worker`, read in an empty directory so that a
+  project layer adds none: the parent's effective tool set, which a role child is compared with because
+  a role cannot bind tools at this pin. The executable row follows the identity launcher one hop
+  (its last line, `exec '<absolute path>' "$@"`): the design's "file the entry resolves to" would be
+  the launcher itself, since the entry on the reference host is a script and not a link. No row
+  publishes a path, a file name a host chose, or a transport, environment value, argument or URL.
+  The rows are captured through `CODEX_HOME` as `adoption_status.py` reads it; the older `codex.*`
+  rows of the snapshot still read `~/.codex` whatever the variable says.
+- **Order of use** (binding decision U13-D5). After this change merges and before the E2E's seal
+  announcement, in an announced quiet window with no `codex` process running, from a checkout at
+  origin/main that holds it: (1) run R4a if a live `scripts/codex_quota.py --json` reading shows no reached
+  limit, because it needs a Codex home without any role file; (2) make a private 0600 backup of
+  `$CODEX_HOME/stack-worker.config.toml`; (3) assert that the live file still has the hash recorded for
+  the drifted profile and only then remove that literal path; (4) run the installer's dry run and expect
+  the profile and both roles to be `create` and "rehearsal passed"; (5) run the printed `--apply` command
+  with its two `--expect-*` hashes; (6) read back the profile hash against the template, `sha256sum
+  --check --strict SHA256SUMS`, `stack_roles_matching` 2, and the `roles` row of `prove_codex_lane.py`;
+  then run the probes R6, R1, R2, R3, R4b and R5 of the
+  [examples README](../../examples/codex-native/README.md#carrier-probes-r1-to-r6-procedures-none-has-been-run)
+  as unscored rehearsals, and only then write Amendment 4 citing them. When no live capacity exists the
+  roles and the profile are still installed and verified, and the probes move to the capability phase with
+  both outcomes for N described in advance. Undo is `--rollback <run>` and then restoring the private
+  backup by hand.
 
 **Alternatives considered.** Source read at openai/codex `rust-v0.157.1`; none was run in a session.
 
@@ -782,6 +813,18 @@ spawned either role, and nothing here measures a token saving.
   store") said to pass `cwd` every time, which contradicted the role texts' working-directory rule. The same
   change now says to pass `cwd` for any directory other than the session's launch directory, which the
   server is already bound to; no other sentence of that document changed.
+- **Not in this change** (a follow-up unit, U13b, by a coordinator decision of 2026-09-29, recorded in
+  the history of this branch). The capability-gate blocks for role children (the sealed M13 structure
+  with disabled-server and wrong-root negatives per role and tool pair, and a spawned-children leg), the
+  offline grader of a child rollout (`role_child_state`, whose rules are stated in the
+  [examples README](../../examples/codex-native/README.md#carrier-probes-r1-to-r6-procedures-none-has-been-run)
+  and which the E2E's organic M11 grader must agree with), the tool that runs the probes, the gate's
+  refusal when the captured freeze rows differ from the pinned carriers, and the review's residuals for
+  the gate (a Serena wrong-root negative, and a web-search fixture that a wrong search cannot pass). The
+  probes R1 to R6 exist as procedures only. `prove_codex_lane.py` has a static `roles` row and no live
+  role check: `exec` forces `--ephemeral`, so no rollout persists, and the exec JSONL item for a spawned
+  agent carries no role or developer text (`codex-rs/exec/src/exec_events.rs:250-259` at
+  `rust-v0.157.1`), so a check through it could not show that a role applied.
 
 **Overturn conditions.** A Codex release whose role files can set a sandbox or an MCP allowlist would let
 these restrictions be enforced instead of instructed. A run in which a spawned role does not receive its
