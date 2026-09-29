@@ -278,3 +278,75 @@ carries the redaction rules above. Each rule follows its own source:
   `unifiedWindows`, so both shapes are observed, not specified. A call rejected at the session limit was observed to
   return the `rate_limit_event` with `status` `rejected` and both windows, then a result with `is_error` true and
   `api_error_status` 429.
+
+## Frozen-check grader (`grade.py`)
+
+`grade.py` is the independent grader that the #381 protocol names ("graders use the independent frozen checks"). It grades
+what the token E2E retained with checks frozen before the run, and publishes counts that carry no identifier. It is a local
+integration check, not upstream acceptance, and its judge calls are separate model runs. Design and rejected alternatives:
+[the decision record](../../docs/decisions/2026-09-29-frozen-check-grader.md).
+
+- **Spec and inputs.** `spec` builds the grading spec from the newest seal of the sealed preregistration (no override) and
+  its `grading` block (Amendment 4: readings, judges, pages, memory anchors, dropped tasks, tool digests); at the commit
+  before Amendment 4 it refuses with `E_GRADING_BLOCK field=missing`. `bind` records the private launch inputs, `identity`
+  builds and validates the identity table from the recorded launches, `keys` computes every freeze key from pinned Git
+  content at the exec revision (`--memory` and `--qmd` add the historical memory records and the qmd coverage), and `capture`
+  observes pages, trees, builders and the T0 commands around a window or an arm (`w-open`, `pre-arm`, `post-arm`, `w-close`,
+  `post-w`).
+- **Grading.** `grade` reads the identity table, keys, captures, U4's join ledgers and adoption reports, U2's run-mode
+  output and call ledger, and U10's Codex events and driver directory, and grades every attempt. Class A oracles read
+  independent originals and keys, class B re-run or observe a tree, class C read the structure of the answer carrier and class
+  D clauses (a semantic requirement) are settled by the blind judge. An attempt is `completed`, `inadmissible` (a usage limit
+  or a launch fault) or `unresolved` (a run that cannot be mapped to an identity); the attempt rule, the gates (G-Q, M7, M8,
+  M12) and the optional-task block (M9: correctness and the use of the task's lane tool, never gating) follow the
+  preregistration. Every ambiguity of its register takes the harder reading the spec names, and the other readings are
+  published under `alternatives`; production code has no default reading. `regrade --from <private dir>` repeats the grading
+  from a private directory alone, optionally with other judgments.
+- **Judges.** `judge packets` builds scrubbed packets (values, identifiers, paths and tool names replaced, spans kept so a
+  quote maps back to the answer) and the blind calibration controls of each template and route. Claude answers are judged by
+  gpt-6-astra at `max` effort through the packaged Codex lane (`codex_lane.build_command` with its isolation arguments, an
+  empty home directory, a strict output schema and the packet inline; any tool item voids the call): `judge codex`. Codex
+  answers are judged by Opus at `max` through the saved Workflow `frozen-check-judge.js` with agent type `blind-lane-reviewer`
+  (Read, Glob and Grep over file packets in a scrubbed export root): `judge claude-args`, run the printed request from that
+  root, then `judge collect`. A judgment counts only when every quote is a verbatim substring of the packet, no leak screen
+  fires, a refuter (passes only) does not overturn it, the route's isolation audit passes (the transcript audit and zero
+  `hook_additional_context` rows on the Claude route) and its calibration controls came out right. Otherwise the clause is
+  `unknown` with the reason `judge_quote`, `judge_leak`, `judge_refuted`, `judge_audit`, `judge_hook_rows`,
+  `judge_calibration` or `judge_unavailable`. An infrastructure failure is retried once; a usage limit pauses the run (exit
+  `75`, rerun to resume) and `--accept-unavailable` finishes with the unrun packets as `judge_unavailable`. Both windows
+  must be closed (`E_WINDOW_OPEN window=W_C` or `W_X`). `judge rehearse --route codex|claude` sends two planted controls
+  through a route before Amendment 4 and skips the window check.
+- **Controls.** `controls` runs the planted class A, B and C answers with known verdicts (`calibration/oracle-controls.json`),
+  the E1 answers at their pinned keys and the class D calibration files (`calibration/T*.json`: per template a reference, a
+  paraphrased correct and at least two planted wrong answers, and extraction controls for the payload and unittest
+  templates); `grade --controls FILE` embeds its counts. `differential --inputs <dir>` compares the T0 oracle with the
+  retained `check.py` of two earlier runs on the original baseline and three mutations of it; exit 0 when every verdict
+  agrees, 1 otherwise, counts only.
+- **Publishing.** `export` writes one returned_results record whose attachment is the ID-free aggregate
+  (`token-e2e-grades/1`) into a fresh neutral directory (it refuses an existing one, one inside a work tree and one whose
+  path names a run value, the home directory or the user name). `check-html` is the privacy canary over a generated HTML
+  report, with `--from <private dir>` adding the run's own values. The report producer (U11) must hand
+  `render_reports` only neutral `origin` and `path` values anywhere in its data, capture from a neutral directory, and run
+  `check-html --from` on the result.
+- **Privacy and exit codes.** Private files are 0600, create-only and refused inside any git work tree; the aggregate holds
+  counts and statuses only (no `tool_use_id`, call id, path, host, user name or command text). Exit 0 when G-Q, M7, M8 and
+  M12 pass, 1 otherwise, 2 on a refusal with a code and a field, never a value (a crash is a refusal, `E_INTERNAL`).
+
+Limits:
+
+- The real judge routes have not run in this build (no network in the unit that built it): the suite drives `judge codex`
+  with a scripted `codex` on `PATH` and `judge collect` with a recorded Workflow result. The rehearsal commands above are the
+  acceptance step that needs the real routes and is still open.
+- `spec` and `keys` run against the real preregistration only after Amendment 4 exists; until then the suite uses a fixture
+  repository whose grading block names the decided readings. Calibration keys are self-contained synthetic keys; only the E1
+  group of `controls` uses real receipts.
+- A judged answer is screened for identifiers and the canary, not for hit text it quotes from a retrieval (recorded residual).
+- The suite checks this code against synthetic hosts and fixtures; only a real grade run measures a real run.
+
+Tests: `PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest -v tests.test_token_e2e_grader` (needs `git`, `node` and the `toon`
+CLI 4.1.1; on Linux none is skipped, and two tests skip without `/proc`). The mutant classes (`F19_Mutants`,
+`F19b_Stage2Mutants`, `F19c_Stage3Mutants`) patch the tool once per property and require the named test to fail on the
+mutant. Sources: `tools/sota-convergence/codex_lane.py`, `transcript_audit.py` and `adjudication-lane.js` (used unchanged),
+`scripts/native_token_ci.py` `markdown_elements` (unchanged), the TOON CLI 4.1.1 strict decode, `tools/token-report`
+(`returned_results.js`, `render_reports`) and the
+[preregistration](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json).
