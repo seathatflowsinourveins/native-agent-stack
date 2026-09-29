@@ -3516,6 +3516,29 @@
         "The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every row given the results file run6.sh writes."
       ],
       "path": "evidence/receipts/claude-project-effort-flag-20260929.json"
+    },
+    {
+      "id": "terminal-experience-20260928",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "On this host from 2026-09-28T23:50Z to 2026-09-29T02:36:54Z (Claude Code 2.1.284, Codex 0.157.1, Windows Terminal 1.24.11911.0): removing suppressApplicationTitle from the Claude and Codex profiles of the NativeStack fragment took the window from 7 tabs with 1 distinct title to 7 distinct titles, all in Claude tabs (a trial read the program title with the flag absent and the static title with it set). Alerts were narrowed to pending decisions: a pty probe of a real session measured one permission_prompt Notification and one bare BEL byte about 6 s (+6.0 to +6.1 s) after an unanswered AskUserQuestion (in this host's own bypassPermissions mode and in default mode) and after an unanswered plan approval (plan mode) opened, with no BEL at open, and separate runs with every hook disabled produced no bare BEL byte (Notification events cannot be observed in that setup). The bell sound was chosen from measured levels (RMS -24.7 dBFS replaced by -40.9), and COLORTERM=truecolor changed Claude Code's first frame from 41 256-colour sequences and no truecolor to 45 truecolor sequences and none in 256 colours; Windows Terminal's profile environment key delivered it to a wsl.exe --exec process (env=truecolor against env= without the key).",
+      "limitations": [
+        "One workstation, one Windows Terminal window and one user (the independent-observation class of docs/acceptance-evidence-policy.md). Another host collects its own evidence.",
+        "Tab titles were read through UI Automation as counts and a hash prefix; live titles carry session topics and are not retained. Names are visible only for the trial sentinels. Every observed tab was a Claude tab: no Codex tab was open, so Codex's title behaviour rests on source (types.rs terminal_title default) and the flag trial, not observation.",
+        "The bell trial is a user report: a chime and a tab bell icon were reported; a taskbar flash was not reported, so the taskbar flag's effect on this host is not confirmed. No toast exists in Windows Terminal 1.24 or 1.25, and none is claimed.",
+        "The AskUserQuestion and plan-approval alerts were measured by a pty probe of a real session (Notification event and bare BEL byte), not heard by the user. The hooks-disabled controls count BEL bytes only: with every hook disabled the observer hook is off, so Notification events cannot be observed. The chimes the user did hear were the trial tab's bell and the since-removed immediate PreToolUse chime. The probe counts the bytes the client writes to its pty with a model of the cited Windows Terminal parser transitions (22 hand-derived cases); ConPTY sits between that stream and Windows Terminal. The hook command was also run as a fixture (synthetic class).",
+        "The colour capture is a bare-mode first frame with a dummy API key and a throwaway configuration directory. It counts emitted SGR classes; it does not judge appearance. The profile environment key was proven separately in a trial tab; colour in a Claude tab launched from the updated profile was not captured end to end, and sessions started before the change keep 256 colours.",
+        "Whether preferredNotifChannel reaches sessions started before the edit was not observed on a peer. The installed 2.1.284 sender reads the setting on every notification, which supports hot reload but does not prove it; hooks and permissions do hot-reload (seven ConfigChange log lines per edit with seven sessions live). A peer that still rings twice or still sends the idle ping can be restarted or checked in /config.",
+        "worker_permission_prompt is not in the hooks reference; its presence in the matcher rests on the installed 2.1.284 binary's notification type list and inbox poller. The other six matcher types are documented. permission_prompt for a tool-permission dialog cannot be triggered in this host's bypass mode and was not measured; AskUserQuestion (in bypassPermissions and in default mode) and the plan approval (plan mode) raised it in the probe.",
+        "Codex --strict-config does not validate the [tui] notifications kind strings; the three kinds were compared with type_name() at rust-v0.157.1 and the host check asserts the exact list.",
+        "The toast watch by release ancestry can miss a backport (release tags sit on servicing branches and report diverged); the decision record adds a direct probe of the tag's profiles.schema.json BellStyle enum (false on both tags, true on main, measured 2026-09-28).",
+        "Agent view (claude agents, --bg) was not probed in this change; the pass criteria are in the decision record.",
+        "Excluding idle_prompt also silences a question asked in prose and then left waiting."
+      ],
+      "path": "evidence/receipts/terminal-experience-20260928.json"
     }
   ],
   "files": [
@@ -13692,8 +13715,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "69df9b7a431a119ec95e94ff20d8703d7795dd6eca496238fcdbc884e47d81d5",
-      "bytes": 25269
+      "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
+      "bytes": 25723
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -14417,8 +14440,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-community-sweep.md",
-      "sha256": "00308f2518104678c26de43a61d669c106b887975275a0486e1c3d4cac026576",
-      "bytes": 119015
+      "sha256": "5dc56e3e9f47d69389aad1488665ebebba0102d53dfbebba2a4cb820a5be82ec",
+      "bytes": 119358
     },
     {
       "path": "docs/decisions/2026-09-28-delegated-decisions.md",
@@ -14434,6 +14457,11 @@
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
       "sha256": "1a2d28d0a0f998d3945ddbadb2c4ae18dd4e72838a0315a77bfea885483435ab",
       "bytes": 19915
+    },
+    {
+      "path": "docs/decisions/2026-09-28-terminal-experience.md",
+      "sha256": "97896b69c558adc664b25b04bb95c00a693286344f61eab5b6da3414f4f39bd1",
+      "bytes": 25588
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -39256,6 +39284,46 @@
       "bytes": 10192
     },
     {
+      "path": "evidence/artifacts/terminal-experience-20260928/README.md",
+      "sha256": "71334203bec2880f69e3ad4aa27c55baeb1ec766068b23a2210abb07656987e1",
+      "bytes": 4214
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+      "sha256": "1282ff2b8dbb987671677c39381e62d8e6ce00b9a7a1d52976c276ab986e2246",
+      "bytes": 17612
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
+      "sha256": "05a24ea6135598b24e5786286b57cab54f7d48f590dd76b00aa029c4edf622c3",
+      "bytes": 2792
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/fragment_check_mutants.py",
+      "sha256": "34e674a815e443b33b2a6bded2dffde50532cf8b546c6f856fa438c9c1d8db4f",
+      "bytes": 4207
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/validate_fragment.py",
+      "sha256": "c625417ab67b2e71e2befb87269b4b811dc7551d0b1d5ca0e965db7292bac251",
+      "bytes": 1900
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/wav_levels.py",
+      "sha256": "18be16470d36e2e38a8a86ec55e40645999a178d805bc8f7f06a22b2f1156b24",
+      "bytes": 1513
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/wt_tab_sentinels.ps1",
+      "sha256": "62efcd3c24d07ca2a7a5638cabf72733d20c4e29ca216aaa4e784a90ca2d2e6f",
+      "bytes": 1498
+    },
+    {
+      "path": "evidence/artifacts/terminal-experience-20260928/wt_tab_titles.ps1",
+      "sha256": "9ec4658b06baab2f3fe8429ddd0e1d1e4a740a0f433053cd47071e72b4e3133d",
+      "bytes": 1283
+    },
+    {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
       "sha256": "a3bc6729bc53859782337027c8af22f64ebfe276104d54907c580dad36c0b13b",
       "bytes": 76920
@@ -41591,6 +41659,11 @@
       "bytes": 8690
     },
     {
+      "path": "evidence/receipts/terminal-experience-20260928.json",
+      "sha256": "1975f87640e986ca29681bd2819a9deb582a5675e8325d37bdf6cea0be40bb47",
+      "bytes": 16066
+    },
+    {
       "path": "evidence/receipts/token-native-retained-functional-20260920.json",
       "sha256": "3d68bc99234035207d7b6b9b5a7161b53c9bf7ffd73366250f7ce65f9d183b91",
       "bytes": 17135
@@ -42287,8 +42360,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "ca67178bfe3d2c7d84e20504e8ef5471928b48459456f7ea9cd0c06b5aa2b4d8",
-      "bytes": 31347
+      "sha256": "25681d438f6595e18982034f30e57ead9bc94b75be7371899fcfdde1b5d56a37",
+      "bytes": 34154
     },
     {
       "path": "recipes/claude-native-ultracode.md",
