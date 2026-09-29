@@ -3634,8 +3634,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "74966f913e068d58673764e4071b7508e28b1ed9e9a249a52895f789cf20eb22",
-      "bytes": 12593
+      "sha256": "03ebc8e8d7fe2c4ab60b356f97daa9f66cce618c5d44e8f79b8b13b7044b9292",
+      "bytes": 12594
     },
     {
       "path": "CLAUDE.md",
@@ -3964,8 +3964,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "5d34b3bc799f9be962b19cb39623555662505a0ee172c93c8db1c92180f4ba60",
-      "bytes": 19426
+      "sha256": "b80b56cc5eb5bb6ca44a650b11f004e22f8354160b734f8e1e1fbc100ee20dca",
+      "bytes": 20778
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
