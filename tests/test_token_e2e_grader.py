@@ -3783,6 +3783,12 @@ class F31b_T14Check(GraderCase):
         self.result(self.check(f"1 session matched: {self.R1}"), "pass")
         self.result(self.check(f"2 sessions matched: {self.R1} and {self.R2}"), "pass")
 
+    def test_the_reported_and_expected_counts_are_recorded_as_a_descriptive_ratio(self):
+        res = self.check(f"1 session matched: {self.R1}")
+        self.assertEqual((res.status, res.detail), ("pass", {"reported": 1, "expected": 2}))
+        wrong = self.check(f"2 sessions matched: {self.R1}, {self.R3}")
+        self.assertEqual((wrong.status, wrong.detail), ("fail", {"reported": 2, "expected": 2}))
+
     def test_a_session_that_started_after_the_query_fails(self):
         self.result(self.check(f"2 sessions matched: {self.R1}, {self.R3}"), "fail", "session_not_before_query")
 
@@ -4412,6 +4418,34 @@ class F16_GradeCommand(GraderCase):
                          {"C": "pass", "A": "pass", "R": "pass", "D": "pending"})
         t0 = by_key[(run.ident("B", "reuse-296-00"), "workflow_child")]
         self.assertEqual(t0["status"], "pass")
+
+    def test_the_private_rows_carry_the_recorded_descriptive_fields(self):
+        """c1 (RV-30): payload bytes, main-transcript bytes and the conversion state are recorded beside the grade."""
+        run, proc, private, out = self.graded()
+        rows = {(row["identity"], row["actor"]): row for row in
+                (json.loads(line) for line in (private / "grades.jsonl").read_text(encoding="utf-8").splitlines())}
+        main = rows[(run.ident("B", "seed-main-output"), "main")]
+        self.assertEqual(main["recorded"], {"main_transcript_bytes": (run.root / "proj-fixture" / "sess-main-1.jsonl").stat().st_size})
+        codex = rows[(run.ident("B", "seed-codex-web-table-1"), "codex_exec")]
+        self.assertGreater(codex["recorded"]["payload_bytes"], 300)
+        self.assertEqual(rows[(run.ident("B", "seed-blind-1"), "workflow_child")]["recorded"], {})
+
+    def test_the_conversion_call_of_the_mcp_page_task_is_recorded(self):
+        run = MiniRun(self)
+        page = grading_block()["pages"]["mcp"]
+        text = "scopes: local and project only"
+        rows = [r_user("t", ts(0)), r_use("WebFetch", {"url": page, "prompt": "p"}, "toolu-fx-c1", ts(1), "msg-c1"),
+                r_result("toolu-fx-c1", text, ts(2)),
+                r_use("StructuredOutput", {"answer": "local, project and user", "evidence": []}, "toolu-fx-so", ts(3), "msg-so"),
+                r_result("toolu-fx-so", "ok", ts(3, 1)), r_text("done", ts(4))]
+        label = run.workflow("B", "reuse-296-13", rows, {"answer": "local, project and user", "evidence": []}, agent_id="fx6")
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        row = next(json.loads(line) for line in (private / "grades.jsonl").read_text(encoding="utf-8").splitlines()
+                   if json.loads(line)["identity"] == label)
+        self.assertEqual(row["recorded"]["conversion"], {"tool": "WebFetch", "state": "succeeded", "bytes": len(text),
+                                                         "missing_scopes": ["user"]})
 
     def test_a_discarded_post_arm_t0_capture_is_counted_and_published(self):
         run = MiniRun(self)
