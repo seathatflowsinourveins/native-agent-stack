@@ -35,6 +35,9 @@ lossless. The historical fixture comparisons exercise the filters directly.
 
 ## Population and replay
 
+The unpublished original report (REPORT.md in the input table below) states
+every population figure in this paragraph; only the 59,041-call total is also
+retained in the published aggregates, tables.txt and frame-summary.txt.
 The study scanned 1,945 transcript files. Of these, 1,606 were modified in the
 window, including 1,594 subagent transcripts. It counted 59,041 Bash calls,
 53,895 from subagents. The window starts with the first hook-log row at
@@ -172,3 +175,8 @@ It cannot regenerate the private population, joins, individual classifications
 or original binaries from these aggregates alone. The fixture script and raw
 upstream-test output are also not public artifacts here. These are deliberate
 reproduction limits, not passing acceptance for another host.
+
+A 2026-09-29 recount of the 22 bucket rows in frame-summary.txt gives 15,623
+missed parts, matching its TOTAL line, but 25,947 covered parts, 7 fewer than
+the 25,954 on its TOTAL line and `ask` decision row; the published files do not
+attribute that difference.
