@@ -1900,15 +1900,25 @@ def t14_facts(*, family, rows, calls, attempt, post, pending, rollout, survivors
     if observed:
         owned = owned_survivors(post["processes"], lifetime, command_programs([code_text(call) for call in calls]))
     survivors = [{"comm": item["comm"], "start": item["start"]} for item in owned["owned"]]
+    unattributed = owned["unattributed"]
     if family == "codex":
         count = survivors_record.get("count") if isinstance(survivors_record, dict) else None
         observed = isinstance(count, int) and not isinstance(count, bool)
         if observed and count > 0:
+            # U10 lists every process of the session but the main one, including what codex itself started (an MCP server
+            # still shutting down). As on the Claude path a process is owned only when its program is one the child ran;
+            # the record has no parent pid, so descendants cannot be followed. The rest is unattributed and never fails.
+            programs = command_programs([code_text(call) for call in calls])
             entries = [item for item in survivors_record.get("processes") or [] if isinstance(item, dict)]
-            survivors += [{"comm": _comm_of(item.get("command")), "start": item.get("start_time")} for item in entries] \
-                or [{"comm": None, "start": None} for _ in range(count)]
+            for item in entries:
+                comm = _comm_of(item.get("command"))
+                if comm is not None and comm in programs:
+                    survivors.append({"comm": comm, "start": item.get("start_time")})
+                else:
+                    unattributed += 1
+            unattributed += max(0, count - len(entries))
     return {"q": found.detail.get("q") if found.status == "pass" else None, "q_status": q_status,
-            "background_pending": pending, "survivors": survivors, "unattributed": owned["unattributed"],
+            "background_pending": pending, "survivors": survivors, "unattributed": unattributed,
             "survival_observed": observed}
 
 
@@ -2884,6 +2894,7 @@ def _lane_opportunities(spec, lane, records, rows, readings, decided, join=None)
                 if entry.get("source") == "not_launched":
                     mine.append({"adopted": "unknown", "grade": "unknown", "kind": "not_launched"})
                 elif entry.get("source") == "unlisted":
+                    listed.add((task["id"], entry.get("identity"), entry.get("actor")))  # a record of it is not a second opportunity
                     mine.append({"adopted": "unknown", "grade": "unknown", "kind": "attempt"})
                 else:
                     key = (task["id"], entry.get("identity"), entry.get("actor"))
