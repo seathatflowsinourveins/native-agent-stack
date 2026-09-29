@@ -18,6 +18,7 @@ import importlib.util
 import json
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import tomllib
@@ -512,6 +513,38 @@ class CustomAgentInstructionsTests(unittest.TestCase):
         self.assertEqual(sorted(path.name for path in ADOPTION_AGENTS.glob("*.toml")),
                          [f"{role}.toml" for role in STACK_ROLES])
         self.assertEqual(byte_problems(ADOPTION_AGENTS, AGENTS, STACK_ROLE_ROWS), [])
+
+    def test_shipped_sha256sums_pin_the_two_carriers(self):
+        # adoption/agents/codex/SHA256SUMS holds two sha256sum-format lines, like its precedent
+        # adoption/hooks/claude/SHA256SUMS (which install_claude_profile.py verifies before copying): the rows above
+        # as `<hex>  <name>`, equal to the files, and accepted by `sha256sum --check --strict` from its directory.
+        sums = ADOPTION_AGENTS / "SHA256SUMS"
+        require(self, sums, *role_paths())
+        lines = sums.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(len(lines), 2)
+        parsed = {}
+        for line in lines:
+            digest, separator, name = line.partition("  ")
+            self.assertEqual((separator, len(digest), set(digest) <= set("0123456789abcdef")), ("  ", 64, True),
+                             "not a sha256sum-format line")
+            parsed[name] = digest
+        self.assertEqual(parsed, rows_by_name(STACK_ROLE_ROWS))
+        for name, digest in parsed.items():
+            self.assertEqual(hashlib.sha256((ADOPTION_AGENTS / name).read_bytes()).hexdigest(), digest)
+        if shutil.which("sha256sum"):
+            got = subprocess.run(["sha256sum", "--check", "--strict", "SHA256SUMS"], cwd=ADOPTION_AGENTS,
+                                 capture_output=True, text=True, check=False)
+            self.assertEqual(got.returncode, 0, got.stdout + got.stderr)
+
+    def test_handbook_states_the_working_directory_rule_the_roles_follow(self):
+        # U13-D2: the role texts' Working-directory bullet wins, so the handbook's Codex sentence no longer says
+        # "pass `cwd` there every time"; the Codex server is already bound to the launch directory.
+        handbook = ROOT / "docs" / "token-session-handbook.md"
+        require(self, handbook)
+        text = handbook.read_text(encoding="utf-8")
+        self.assertNotIn("so pass `cwd` there every time.", text)
+        self.assertEqual(text.count("so pass `cwd` there for any directory other than the session's launch directory, "
+                                    "which the server is already bound to"), 1)
 
     def test_byte_mutants_fire_exactly_one_rule(self):
         require(self, *role_paths())
