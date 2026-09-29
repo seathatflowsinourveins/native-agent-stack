@@ -3563,6 +3563,30 @@ class F24_Retrieval(GraderCase):
                              "arguments": {"url": PATHLIB_URL, "source": "s"}})
         self.result(self.check(failed), "fail", "missing_source")
 
+    WRAPPED = "/bin/bash -lc "  # how codex exec events spell every command: 4 of 4 retained command items begin so
+
+    def test_a_shell_fetch_in_the_bash_lc_wrapper_counts_as_the_script_it_ran(self):
+        """The retained command items are `/bin/bash -lc "<script>"`; the script is what the child ran."""
+        json_fetch = self.codex({"type": "command_execution", "command": f'{self.WRAPPED}"curl -sL {JSON_URL} | head -50"',
+                                 "aggregated_output": "x", "exit_code": 0},
+                                {"type": "command_execution", "command": f"{self.WRAPPED}'wget -qO- {PATHLIB_URL}'",
+                                 "aggregated_output": "x", "exit_code": 0})
+        self.result(self.check(json_fetch), "pass")
+        echoed = self.codex({"type": "command_execution", "command": f'{self.WRAPPED}"echo {JSON_URL}"',
+                             "aggregated_output": "x", "exit_code": 0},
+                            {"type": "command_execution", "command": f'{self.WRAPPED}"curl -sL {PATHLIB_URL}"',
+                             "aggregated_output": "x", "exit_code": 0})
+        self.result(self.check(echoed), "unknown", "retrieval_unconfirmed")
+
+    def test_the_bash_lc_wrapper_is_removed_only_from_a_whole_wrapped_command(self):
+        unwrap = evm().unwrap_shell_command
+        self.assertEqual(unwrap('/bin/bash -lc "curl -sL https://x.example/a | head -50"'), "curl -sL https://x.example/a | head -50")
+        self.assertEqual(unwrap("bash -c 'ls -la'"), "ls -la")
+        self.assertEqual(unwrap('/usr/bin/zsh -lc "echo \\"hi\\""'), 'echo "hi"')
+        self.assertEqual(unwrap("/bin/bash -lc \"toon --decode <<'EOF'\n[1]: 5\nEOF\n\""), "toon --decode <<'EOF'\n[1]: 5\nEOF\n")
+        for plain in ("curl -sL https://x.example/a", "bash script.sh", "/bin/bash --login", "ls -la", "", None):
+            self.assertEqual(unwrap(plain), plain)
+
     def test_the_retained_exec_item_spellings_read_their_status_result_and_error(self):
         """Real 0.157.1 exec items (retained streams): command_execution {aggregated_output, command, exit_code, id, status,
         type} and mcp_tool_call {arguments, error, id, result, server, status, tool, type}."""
@@ -3818,6 +3842,22 @@ class F28_M7(GraderCase):
                 "aggregated_output": self.doc() + "\n" + "\n".join(STATUS_LINES)}
         calls = evm().codex_calls([{"type": "item.completed", "item": dict({"id": "item_0"}, **item)}])
         self.assertEqual(self.facts(calls)["encode"], "encoded")
+
+    def test_wrapped_codex_commands_encode_and_decode_like_plain_ones(self):
+        """Codex exec events spell a command `/bin/bash -lc "<script>"`; a heredoc's closing tag is then followed by the
+        wrapper's closing quote, so only the unwrapped script has a body to decode."""
+        def calls(command, output):
+            return evm().codex_calls([{"type": "item.completed", "item": {
+                "id": "item_0", "type": "command_execution", "command": command, "aggregated_output": output, "exit_code": 0,
+                "status": "completed"}}])
+        wrapper = "/bin/bash -lc "
+        encoded = self.doc() + "\n" + "\n".join(STATUS_LINES)
+        self.assertEqual(self.facts(calls(f'{wrapper}"toon --stats seed.json"', encoded))["encode"], "encoded")
+        decode = wrapper + "\"toon --decode <<'EOF'\n" + self.doc() + "\nEOF\""  # the wrapper's quote follows the tag
+        got = self.facts(calls(decode, json.dumps(web_key()["records"])))
+        self.assertEqual([item["status"] for item in got["roundtrip"] if item["source"] == "child_decode"], ["equal"])
+        output = self.facts(calls(f'{wrapper}"toon --stats -o out.toon seed.json"', "\n".join(STATUS_LINES)))
+        self.assertEqual((output["encode"], output["encode_reason"]), ("unknown", "output_file"))
 
     def test_a_natural_payload_is_an_eligible_flat_array_in_the_answer_or_an_eligible_encode(self):
         """Stage-2 review: design R14 leaves natural payloads optional; here a payload is a strictly decoded flat array of at
@@ -4129,6 +4169,17 @@ class F31c_T14Facts(GraderCase):
                          post={"processes": processes})
         self.assertEqual((got["q"], got["q_status"], got["survival_observed"]), (self.QUERY, "observed", True))
         self.assertEqual(got["survivors"], [{"comm": "sleep", "start": ts(20)}], "only the process inside the rollout's lifetime")
+
+    def test_a_codex_process_started_through_the_bash_lc_wrapper_is_owned(self):
+        """The programs a Codex child ran are those of the script inside `/bin/bash -lc "..."`, not `bash`."""
+        rollout = {"status": "ok", "records": self.rollout(self.CARRIERS["command_item"])}
+        calls = evm().codex_calls([{"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": '/bin/bash -lc "nohup sleep 300 > /dev/null 2>&1 &"',
+            "aggregated_output": "", "exit_code": 0, "status": "completed"}}])
+        processes = [{"pid": 600, "start": ts(20), "comm": "sleep", "ppid": 1}]
+        got = self.facts(family="codex", calls=calls, attempt={"start": None, "end": None}, rollout=rollout,
+                         post={"processes": processes})
+        self.assertEqual(got["survivors"], [{"comm": "sleep", "start": ts(20)}])
 
     def test_a_codex_query_that_the_events_show_but_no_rollout_can_time_is_unobserved(self):
         named = evm().codex_calls([{"type": "item.completed", "item": {
