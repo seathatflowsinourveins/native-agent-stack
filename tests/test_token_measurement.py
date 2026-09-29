@@ -817,6 +817,34 @@ class TokenMeasurement(unittest.TestCase):
         commands = BQ_ONCE + BQ_DATA
         self.assertEqual(self.exports("x.map(cu.fetchKind)", commands), ["fetch"] * len(BQ_ONCE) + [None] * len(BQ_DATA))
 
+    def test_m4_a_run_keyword_beyond_the_tail_window_is_unclassifiable_not_lost(self):
+        # D8 work budget: scanQuotes reads the last 512 characters of the text built so far (never the whole rope, which made a long
+        # script quadratic). The brief's fallback for input past a budget is "marks the command unclassifiable for M4", not a silent
+        # miss: an ssh option word (`-oProxyCommand=...`) long enough to push `ssh` out of the window, in a text past 1,024
+        # characters, counts one unclassifiable operation instead of reading its "curl u" as data with no mention at all.
+        def command(n, after=""):
+            return "ssh -oProxyCommand=" + "y" * n + " host \"curl https://example.org\"" + after
+        for n in (100, 400, 700):  # inside the window, or before the text has grown past 1,024 characters: read as before
+            for _, name, _, key, m4 in self.carrier_m4([command(n)]):
+                with self.subTest(option=n, carrier=name):
+                    self.assertEqual(m4[key], 1)
+                    self.assertEqual(m4["unclassifiable"], 0)
+        for _, name, _, key, m4 in self.carrier_m4([command(1500)]):
+            with self.subTest(option=1500, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["unclassifiable"], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        # Counted once for the command, and only for the command that held the keyword: a later command is read on its own.
+        for _, name, _, key, m4 in self.carrier_m4([command(1500, "; echo \"hi\"; echo \"there\"")]):
+            with self.subTest(option="1500 then more commands", carrier=name):
+                self.assertEqual(m4["unclassifiable"], 1)
+        # A long command with no run keyword in it is no miss, however many quotes it holds.
+        for _, name, _, key, m4 in self.carrier_m4(["printf '%s' " + "a " * 1500 + "\"x\" 'y'; echo \"z\""]):
+            with self.subTest(command="long printf", carrier=name):
+                self.assertEqual(m4["unclassifiable"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+
     def test_m4_r3_an_escaped_metacharacter_before_a_hash_is_not_a_comment_start(self):
         # R3 (Claude review): in a $( ) frame a # after an escaped blank, `;` or newline was read as a comment, so the ) and
         # the closing quote ran on to the end of the command and the `; curl` after them fell inside double-quoted data.
