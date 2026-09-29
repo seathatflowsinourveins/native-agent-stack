@@ -72,6 +72,12 @@ NETWORK_FORMAT = ('{"id":{{json .Id}},"name":{{json .Name}},"driver":{{json .Dri
 # Never a full container inspect: the server's Config.Env holds the session key.
 CONTAINER_FORMAT = ('{"id":{{json .Id}},"name":{{json .Name}},"running":{{json .State.Running}},'
                     '"labels":{{json .Config.Labels}},"networks":{{json .NetworkSettings.Networks}}}')
+# Plan acceptance A7 (review item D7): a names-only listing of the agent container's environment.
+# Each Config.Env entry is "NAME=value"; the template emits the part before the first "=" as a
+# JSON string and never a value. split, index and json are the Docker CLI's template functions
+# (docs.docker.com "Format command and log output"); rendered with the local CLI 29.8.1.
+ENV_NAMES_FORMAT = '[{{range $i, $e := .Config.Env}}{{if $i}},{{end}}{{json (index (split $e "=") 0)}}{{end}}]'
+ENV_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,127}")
 PROXY_TEMPLATE = HERE / "config/proxy-nginx.conf"
 PLACEHOLDER = re.compile(r"@[A-Z]+@")
 # Plan section 1 and E1: a P0-P2 receipt gates dispatch start for at most 900 s
@@ -1051,12 +1057,33 @@ def cleanup_network(name, record):
     return cleanup["confirmed_removed"]
 
 
+def record_env_names(name, record):
+    """Write the names in container `name`'s environment to `record`, never a value (plan A7).
+
+    One `docker inspect --format ENV_NAMES_FORMAT` read. Output that is not a JSON array of
+    environment names reads as unreadable, so no value can reach the file. Never raises for
+    Docker's answer: teardown continues whatever it finds.
+    """
+    listing = {"status": "unreadable", "names": None}
+    try:
+        answer = subprocess.run(DOCKER + ["inspect", "--format", ENV_NAMES_FORMAT, name], capture_output=True,
+                                text=True, check=False, timeout=30)
+        names = json.loads(answer.stdout) if answer.returncode == 0 else None
+        if isinstance(names, list) and all(isinstance(item, str) and ENV_NAME.fullmatch(item) for item in names):
+            listing = {"status": "observed", "names": sorted(set(names))}
+    except (OSError, subprocess.TimeoutExpired, ValueError, TypeError):
+        pass
+    write_json(record, listing)
+
+
 def teardown_attempt(state, run_id, arm):
     """Remove the attempt's proxy, server and networks by exact name; never prune.
 
     Container logs go to private files first (the proxy access log is the
-    denied-path evidence). The key files are deleted only after both
-    containers are confirmed removed. True only if all four are confirmed.
+    denied-path evidence), and the server's environment names are listed while
+    it still exists (record_env_names, plan acceptance A7). The key files are
+    deleted only after both containers are confirmed removed. True only if all
+    four are confirmed.
     """
     stem = attempt_stem(run_id, arm)
     result = Path(state) / "runs" / run_id / arm
@@ -1064,6 +1091,8 @@ def teardown_attempt(state, run_id, arm):
     for role in ("proxy", "server"):
         name, logfile = f"{stem}-{role}", result / f"{role}.log"
         try:
+            if role == "server":
+                record_env_names(name, result / "server-env-names.json")
             logged_command(DOCKER + ["logs", name], logfile, cwd=result, timeout=30)
         finally:
             cleanup_container(name, logfile)

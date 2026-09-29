@@ -385,7 +385,19 @@ That section is built from host-written files only, and each field has a fixed s
 - the branch, PR number and head;
 - the SOTA source counts;
 - each GitHub write's operation and exit status;
-- the gates' receipt hashes (stage-gates.json and the P0-P2 probe receipt);
+- the gates' receipt hashes (stage-gates.json and the P0-P2 probe receipt) and the
+  G4-qualified reviewer argv's hash;
+- the containment evidence of plan acceptance A7 (`containment`), as names and
+  counts only:
+  - the agent container's environment names, which `teardown_attempt` lists while the
+    container still exists (`record_env_names`), with the plan's forbidden ones
+    (`GH_*`, `GITHUB_*`, `OMNIROUTE_*`, `*_TOKEN`). The template emits each entry's
+    name and never a value;
+  - the proxy access log's hash and counts. Lines before the dispatch start are the
+    P0-P2 probe's and the health gate's traffic. After it, agent-side requests are
+    counted per allowlisted route, and every other request line only as a count. The
+    model chose those request lines, so they stay in the private `proxy.log`
+    (`receipt.not_allowlisted_lines`, live runbook step 9);
 - the review loop's outcome: status, stop reason, review id, reviewed commit, the
   checks summary and the final draft state.
 
@@ -439,6 +451,11 @@ free branch name.
   (`--safe-mode`, `--restricted` or another) is G4's result.
 - `run` holds the gh login's full scopes for the whole attempt. That is plan section
   3's residual.
+- A7's environment listing reads `Config.Env`, the environment Docker starts the server
+  with. A variable that the model's terminal exports later is not in it. The listing
+  has not run against the live image. The proxy log is split from the probe's traffic
+  by time, so a probe line logged in the start's second counts as the agent's: a false
+  alarm for triage, never a hidden request.
 
 ### Live runbook (first attempt)
 
@@ -496,7 +513,11 @@ python3 -c 'import hashlib, shlex, sys; print(hashlib.sha256(b"".join(a.encode()
 PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/resolver.py" run --issue <N> --owned-path <path> --task "<task>" --lane lane:foundation --arm control --dry-run
 # 8. The real run (a background task: the checks wait alone is bounded at 60 minutes).
 PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/resolver.py" run --issue <N> --owned-path <path> --task "<task>" --lane lane:foundation --arm control --reviewer-command "$REVIEWER"
-# 9. Teardown check: the attempt removes its own containers and networks; confirm, and retry any unconfirmed removal.
+# 9. A7 triage, private: the receipt's resolver.containment has env_names.forbidden (must be empty) and the proxy
+#    log's counts. List the agent-side request lines that are no allowlisted route, triage each, and never publish
+#    them: the model chose them.
+(cd "$RECIPE" && python3 -c 'import sys, receipt; print("\n".join(receipt.not_allowlisted_lines(sys.argv[1])))' "$STATE/runs/rw-openhands-res-<N>-<yyyymmdd>/control")
+# 10. Teardown check: the attempt removes its own containers and networks; confirm, and retry any unconfirmed removal.
 docker --context rootless ps -a --filter label=com.native-agent-stack.owner=gpt6-omniroute-framework-integration --format '{{.Names}}'
 docker --context rootless network ls --filter label=com.native-agent-stack.owner=gpt6-omniroute-framework-integration --format '{{.Name}}'
 PYTHONDONTWRITEBYTECODE=1 python3 "$RECIPE/host.py" teardown --prefix "$PREFIX" --state "$STATE" --run-id rw-openhands-res-<N>-<yyyymmdd> --arm control

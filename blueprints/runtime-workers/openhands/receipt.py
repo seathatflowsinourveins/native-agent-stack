@@ -54,11 +54,12 @@ NOT_COLLECTED_REASON = (
     "fields are not read.")
 
 
-def read_bounded(path, limit=4 * 1024 * 1024):
+def read_bounded(path, limit=4 * 1024 * 1024, errors="strict"):
     """CPython@v3.13.15 os.open dir_fd/O_NOFOLLOW; refuse every symlink hop.
 
     Worker files are untrusted even if their content parses. O_NONBLOCK avoids
     hanging on a malicious FIFO; fstat checks the opened object, not its name.
+    `errors` is the UTF-8 decoding's error handler (bytes.decode).
     """
     path = Path(path).absolute()
     directory = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY)
@@ -77,7 +78,7 @@ def read_bounded(path, limit=4 * 1024 * 1024):
         data = stream.read(limit + 1)
         if len(data) > limit:
             raise ValueError("receipt_input_too_large")
-    return data.decode("utf-8")
+    return data.decode("utf-8", errors)
 
 
 def gateway_database(arm):
@@ -238,6 +239,101 @@ def _matching(value, pattern):
     return value if isinstance(value, str) and pattern.fullmatch(value) else None
 
 
+# Plan acceptance A7 (review item D7): the containment evidence an attempt leaves on the host.
+# The environment names come from host.record_env_names; forbidden are the plan's GH_*, GITHUB_*,
+# OMNIROUTE_* and *_TOKEN. The proxy's access log (host.teardown_attempt's proxy.log) has two
+# formats (config/proxy-nginx.conf): nginx's default "combined" on the agent side (gw:8081) and
+# "ingress" ($time_iso8601 $request_method $status) on the host side (gw:8080).
+ENV_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,127}")
+FORBIDDEN_ENV_PREFIXES, FORBIDDEN_ENV_SUFFIX = ("GH_", "GITHUB_", "OMNIROUTE_"), "_TOKEN"
+ALLOWLISTED_ROUTES = ("POST /v1/responses", "POST /v1/chat/completions", "GET /v1/models")  # proxy-nginx.conf:64-66
+AGENT_LINE = re.compile(r'\S+ - \S+ \[(?P<time>[^\]]+)\] "(?P<request>[^"]*)" (?P<status>[0-9]{3}) \S+ "[^"]*" "[^"]*"')
+HOST_LINE = re.compile(r"(?P<time>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[+-][0-9]{2}:[0-9]{2}|Z))"
+                       r" [A-Z]{1,16} [0-9]{3}")
+PROXY_LOG_LIMIT = 16 * 1024 * 1024
+
+
+def env_names_summary(result):
+    """The server's environment names, and the forbidden ones among them; never a value."""
+    empty = {"names": [], "forbidden": []}
+    try:
+        record = json.loads(read_bounded(Path(result) / "server-env-names.json", limit=256 * 1024))
+    except FileNotFoundError:
+        return {"status": "absent", **empty}
+    except (OSError, ValueError):
+        return {"status": "unreadable", **empty}
+    names = record.get("names") if isinstance(record, dict) and record.get("status") == "observed" else None
+    if not isinstance(names, list) or not all(isinstance(name, str) and ENV_NAME.fullmatch(name) for name in names):
+        return {"status": "unreadable", **empty}
+    names = sorted(set(names))
+    return {"status": "observed", "names": names,
+            "forbidden": [name for name in names
+                          if name.startswith(FORBIDDEN_ENV_PREFIXES) or name.endswith(FORBIDDEN_ENV_SUFFIX)]}
+
+
+def _proxy_lines(result, window):
+    """Classify each proxy.log line: "before_start" (before the dispatch start, so the P0-P2 probe's
+    and the health gate's traffic), an allowlisted route, "denied" (a 403 for any other request
+    line), "not_allowlisted", "host_side" or "other". Returns (start known, [(kind, line)]).
+
+    The start is the window's started_at, cut to whole seconds as nginx logs them, so a line in the
+    start's second counts as the agent's. Only the exact request line of an allowlisted route
+    counts as allowlisted; a line nginx would normalize to one (dot segments) is reported."""
+    text = read_bounded(Path(result) / "proxy.log", limit=PROXY_LOG_LIMIT, errors="replace")
+    try:
+        start = time_value(window.get("started_at")).replace(microsecond=0)
+    except (ValueError, TypeError, OverflowError, OSError):
+        start = None
+    classified = []
+    for line in text.splitlines():
+        agent, host = AGENT_LINE.fullmatch(line), HOST_LINE.fullmatch(line)
+        try:
+            when = (datetime.strptime(agent["time"], "%d/%b/%Y:%H:%M:%S %z") if agent
+                    else time_value(host["time"]) if host else None)
+        except (ValueError, TypeError, OverflowError):
+            when, agent, host = None, None, None
+        if when is None:
+            kind = "other"
+        elif start is not None and when < start:
+            kind = "before_start"
+        elif host:
+            kind = "host_side"
+        else:
+            method, _, rest = agent["request"].partition(" ")
+            target, _, protocol = rest.partition(" ")
+            route = f"{method} {target}"
+            if route in ALLOWLISTED_ROUTES and protocol in ("HTTP/1.0", "HTTP/1.1"):
+                kind = route
+            else:
+                kind = "denied" if agent["status"] == "403" else "not_allowlisted"
+        classified.append((kind, line))
+    return start is not None, classified
+
+
+def proxy_log_summary(result, window):
+    """The proxy access log as counts only (plan A7). The request lines stay in the private log:
+    the model chose them (not_allowlisted_lines returns them for the coordinator's triage)."""
+    try:
+        split, classified = _proxy_lines(result, window)
+        sha256 = hashlib.sha256(Path(result, "proxy.log").read_bytes()).hexdigest()
+    except FileNotFoundError:
+        return {"status": "absent"}
+    except (OSError, ValueError):
+        return {"status": "unreadable"}
+    counts = Counter(kind for kind, _ in classified)
+    return {"status": "observed", "sha256": sha256, "split_at_start": split, "before_start": counts["before_start"],
+            "agent_allowlisted": {route: counts[route] for route in ALLOWLISTED_ROUTES},
+            "agent_not_allowlisted": counts["denied"] + counts["not_allowlisted"],
+            "agent_denied_403": counts["denied"], "host_side": counts["host_side"], "other_lines": counts["other"]}
+
+
+def not_allowlisted_lines(result):
+    """The agent-side proxy log lines after dispatch start that are no allowlisted route, for the
+    coordinator's private A7 triage (RESOLVER.md live runbook). Never publish them."""
+    window = json.loads(read_bounded(Path(result) / "window.json"))
+    return [line for kind, line in _proxy_lines(result, window)[1] if kind in ("denied", "not_allowlisted")]
+
+
 def _count(value):
     return value if type(value) is int and value >= 0 else None
 
@@ -290,6 +386,8 @@ def resolver_summary(result, window):
                   "isolation_probe_sha256": probe,
                   # Gate G4's qualified reviewer argv (host.verify_reviewer_gate), by hash only.
                   "reviewer_argv_sha256": _matching(identity.get("reviewer_argv_sha256"), HEX64)},
+        # Plan acceptance A7 (review item D7): names and counts only.
+        "containment": {"env_names": env_names_summary(result), "proxy_log": proxy_log_summary(result, window)},
         "review": None,
     }
 
