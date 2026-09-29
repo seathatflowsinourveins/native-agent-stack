@@ -45,7 +45,7 @@ upstream tracked source was unchanged.
 | Local integration, port control | With an owned listener occupying 17384, baseline succeeds on 17385; candidate exits 1. The candidate gives an explicit choose-another-port diagnostic. | Only the owned scratch listeners and daemons were used. |
 | Local measurement | One full sync over the same two copied logs: 0.407672 seconds on baseline; 0.358587 seconds on candidate. | Too small and unreplicated for an efficiency or throughput conclusion. |
 | Provider execution / review | The only GPT-6 review activity is two Codex launches, each exit 1 before provider execution; both JSONL captures are empty and neither final-message target exists. The build session stopped the stalled Claude review with SIGINT, exit 130; usage is unknown. | Four fresh native lanes and both independent reviews remain unaccepted. |
-| Structural validation | Repository unittests check receipt consistency and sanitization, including planted home-path, UUID and forbidden-key violations through the same publication checks. | These checks establish no upstream or provider execution. |
+| Structural validation | Repository unittests check receipt consistency and sanitization, including planted home-path, UUID and forbidden-key violations through the same publication checks. Since 2026-09-28 they also classify every tracked line that names the pinned version and reject a location list with any entry removed. | These checks establish no upstream or provider execution. |
 
 The initial upstream test attempts failed to build because the generated pricing
 snapshot was absent. The supported
@@ -79,8 +79,10 @@ known limitation; it does not fix the MCP tool.
 A future qualifying pin PR must rewire the AgentsView block in `recipes/README.md#history-and-usage` and
 the mirrored `install`, `install_note` and `use` entries in
 `docs/token-efficiency-stack.json` (lines 1583–1591), the input to
-`scripts/build_ecosystem.py`. Update the version and release link in
-`docs/stack.md:9` together with the manifest and CI pin. The recipe line range
+`scripts/build_ecosystem.py`. The same PR must change every other location
+under `repository_pin_locations.repin_targets` in
+[qualification.json](qualification.json), including the `agentsview` install row
+of the `recipes/README.md` component table. The recipe line range
 has shifted from the plan's older range. Search/list intended to include workers must use
 `--include-automated --include-one-shot --include-children`, preserving selected
 source roots and the cwd allowlist. Sources:
@@ -110,10 +112,33 @@ identities were corrected to the upstream layout; versioned capture filenames
 now append extensions rather than replacing them. Attempt 3's overwritten raw
 captures are not used as accepted evidence.
 
-The platform pins files currently have no AgentsView entry. Existing version
-references are in `manifests/stack.json`, `scripts/native_token_ci.py`,
-`recipes/README.md`, `docs/token-efficiency-stack.json` and `docs/stack.md`;
-all remain at 0.43.0. The upstream ccusage source is
+The platform pins files currently have no AgentsView entry. On 2026-09-28,
+`git grep -n -I -E '0\.43\.0|v0\.43\.0'` over the tracked tree matched 68 files.
+Thirty-nine lie under the dated `evidence/artifacts/` and `evidence/hosts/`
+records. Of the other 29, nine hold the 18 current references a re-pin must
+change, all still at 0.43.0:
+
+- the pin in `manifests/stack.json`;
+- three mirrors that existing checks compare with it:
+  `blueprints/token-native-focus/saturation-audit.json`
+  (`tests/test_stack_lifecycle.py:28-32`),
+  `catalogs/landscape/upstream-snapshot.json` (`scripts/landscape.py:1373-1380`,
+  which CI runs) and the `scripts/native_token_ci.py` pin (its run-time check at
+  lines 1740–1742);
+- the install references in `recipes/README.md` and
+  `docs/token-efficiency-stack.json`;
+- version-specific guidance in `recipes/README.md#history-and-usage`,
+  `docs/native-dashboards.md`, `docs/native-dashboard-data.md`, the
+  `scripts/native_token_ci.py` telemetry citation and a
+  `tests/test_native_token_ci.py` comment.
+
+The remaining 20 are dated records or an unrelated package and keep their
+values. `docs/stack.md` is one of them: its header dates it September 19, 2026,
+and no earlier re-pin changed it. Measured on 2026-09-28, 14 of its 47 rows
+already differ from the manifest. [qualification.json](qualification.json)
+records each location and the basis for each classification. The test fails
+when a matching line is unclassified or a recorded location no longer matches.
+The upstream ccusage source is
 [ccusage/ccusage at ecb676cc](https://github.com/ccusage/ccusage/tree/ecb676cce27cb5dd0090c7804a5cecc35e8ba805/rust/adapters/codex),
 whose maintained adapter is Rust. The guessed older TypeScript path was a 404,
 not evidence of a missing capability.
@@ -145,6 +170,15 @@ confirming broad rerun's raw bytes were not retained, despite the old blanket
 retention claim; its printed hash identifies no available raw file. The new
 coordinator runs retain their JSONL and stderr. Fixture hashes and expectations
 are retrospective repair additions, with original observations preserved.
+
+**2026-09-28 location-list repair:** the 2026-09-27 re-pin list named five
+files. It missed the checked mirrors, the `recipes/README.md` install row and
+the version-specific guidance, and it wrongly included `docs/stack.md`. The
+classification above replaces it. The 2026-09-27 erratum reason no longer calls
+its evidence review independent: no retained record names that reviewer, and
+its returned report is not retained. The same holds for this repair's review.
+The branch's last commit registers the changed files in `manifests/evidence.json`
+under the `docs/lanes.md` hot-file protocol.
 
 Requalification needs four fresh native lanes, both completed independent
 reviews, execution of the unchanged full-save E2E runner and the final recipe
