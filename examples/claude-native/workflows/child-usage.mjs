@@ -371,22 +371,17 @@ export function executedText(command, { inlineHttp = false } = {}) {
   return executedTrace(traced(String(command || '')), inlineHttp).s
 }
 // `resolved` holds the raw offsets of the here-document operators already resolved; every nested analysis shares it.
-// `marks`, when given, collects what the CLI-lane reading needs beside the text, in raw offsets: `remote` gets the
-// [first, last] range of each string or heredoc body that ssh runs on another host, and `data` the offset where each
-// command substitution of a data heredoc body starts (the body line is data; the substitution runs). The text is the same.
-function executedTrace(src, inlineHttp, resolved = new Set(), depth = 0, marks = null) {
+function executedTrace(src, inlineHttp, resolved = new Set(), depth = 0) {
   try {
-    const { text, sources } = resolveHeredocs(src, inlineHttp, resolved, depth, marks)
-    return joined([scanQuotes(text, inlineHttp, resolved, depth, marks), ...sources], '\n')
+    const { text, sources } = resolveHeredocs(src, inlineHttp, resolved, depth)
+    return joined([scanQuotes(text, inlineHttp, resolved, depth), ...sources], '\n')
   } finally { if (depth === 0) PAREN_MEMO.length = 0 }
 }
-// The [first, last] raw offsets of a trace, or null when it holds only inserted text.
-const rawRange = (t) => { let lo = Infinity, hi = -1; for (const n of t.p) if (n >= 0) { if (n < lo) lo = n; if (n > hi) hi = n } return hi < 0 ? null : [lo, hi] }
 // Phase 1, line by line: a here-document body becomes its data (the substitutions an unquoted delimiter still runs) or,
 // when a shell (or in inlineHttp mode an interpreter) reads it as source, a separate source. An operator that is already
 // resolved is skipped: the outer shell resolves a heredoc inside the "$( )" of a double-quoted string that a shell then
 // runs, and the lines after it must not be read as its body a second time.
-function resolveHeredocs(src, inlineHttp, resolved, depth, marks) {
+function resolveHeredocs(src, inlineHttp, resolved, depth) {
   const lines = [], kept = [], sources = [], stack = []
   for (let at = 0; ;) { const end = src.s.indexOf('\n', at); lines.push([at, end < 0 ? src.s.length : end]); if (end < 0) break; at = end + 1 }
   const lineText = (n) => src.s.slice(lines[n][0], lines[n][1])
@@ -407,26 +402,22 @@ function resolveHeredocs(src, inlineHttp, resolved, depth, marks) {
         if (!h.quoted) for (const m of lineText(n).matchAll(SUBSTITUTION)) if (m[0][0] !== '\\') {
           if (data.s) insert(data, ' ')
           append(data, slice(src, lines[n][0] + m.index, lines[n][0] + m.index + m[0].length))
-          if (marks && src.p[lines[n][0] + m.index] >= 0) marks.data.add(src.p[lines[n][0] + m.index])
         }
         kept.push(data)
       }
       // Keep source boundaries: interpreter quotes/shift syntax must not consume later shell commands or data
       // heredocs. Each source is analyzed independently; missed matches stay possible M4 fetches.
       if (source && n >= first) {
-        const body = slice(src, lines[first][0], lines[n][1]), remote = marks && command.program === 'ssh' // ssh runs the body in the remote shell (OpenSSH ssh(1))
+        const body = slice(src, lines[first][0], lines[n][1])
         if (h.quoted) {
-          const range = remote ? rawRange(body) : null
-          if (range) marks.remote.push(range)
-          sources.push(executedTrace(body, inlineHttp, resolved, depth + 1, marks))
+          sources.push(executedTrace(body, inlineHttp, resolved, depth + 1))
         } else {
           // Two views, as for a double-quoted string a shell runs (D7; bash(1) Here Documents, POSIX.1-2024 XCU 2.7.4): the shell that
           // read the command line expands an unquoted-delimiter body first (each unescaped $( ) and backquote runs there, whatever
           // its quotes or a comment say), and the shell that reads the heredoc sees the expanded text.
           const spans = outerSpans(body.s, depth), view = withoutSpans(body, spans)
-          for (const span of spans) sources.push(outerBody(body, span, inlineHttp, resolved, depth, marks))
-          if (remote) { let at = 0; for (const span of [...spans, { from: body.s.length, to: body.s.length }]) { const range = rawRange(slice(body, at, span.from)); if (range) marks.remote.push(range); at = span.to } }
-          sources.push(executedTrace(heredocText(view), inlineHttp, resolved, depth + 1, marks))
+          for (const span of spans) sources.push(outerBody(body, span, inlineHttp, resolved, depth))
+          sources.push(executedTrace(heredocText(view), inlineHttp, resolved, depth + 1))
         }
       } else if (source) sources.push({ s: '', p: [] })
       if (n + 1 < lines.length) n++ // closing delimiter
@@ -454,7 +445,7 @@ const RUN_WORD_IN = /[\s;&|(`](?:(?:ba|z|da|k)?sh|su|eval|ssh)(?=\s)/
 let windowMisses = 0
 // Phase 2 over the kept text: escapes, comments and quoted strings. A quoted string that a shell runs is analyzed as
 // that shell's input, with its own heredocs; a double-quoted one first loses the backslashes the outer shell removes.
-function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
+function scanQuotes(text, inlineHttp, resolved, depth) {
   const out = { s: '', p: [] }
   let tail = '', cut = false, word = false // word: a run word was written outside quotes since the last command separator
   const note = (s) => {
@@ -485,23 +476,19 @@ function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
     const run = depth < NESTING_LIMIT ? (cut ? RUN_QUOTED_CUT : RUN_QUOTED).exec(tail) : null
     if (word && cut && !run && !SEPARATOR.test(tail) && !RUN_WORD_IN.test(tail)) { windowMisses++; word = false }
     if (run) {
-      // The ssh alternative of RUN_QUOTED: the string runs in the remote shell.
-      const remote = marks && run[0].startsWith('ssh', ' \t\n;&|(`'.includes(run[0][0]) ? 1 : 0)
       if (ch === '"') {
         // Two views of a double-quoted string a shell runs (POSIX.1-2024 XCU 2.2.3 and 2.6.3; U1 pivot D7, GPT-6 #8): the shell
         // that expands the word runs each unescaped "$( )" and backquoted span itself, before the shell it starts reads anything,
         // whatever that shell then makes of the text; that shell reads the string with each of them replaced by its output,
         // which is unknown, so a placeholder word. The outer bodies come first, as they run, each as commands of their own.
         const spans = outerSpans(inner.s, depth), view = withoutSpans(inner, spans)
-        for (const span of spans) { put(';'); putTrace(outerBody(inner, span, inlineHttp, resolved, depth, marks)); put(';') }
-        if (remote) { let at = 0; for (const span of [...spans, { from: inner.s.length, to: inner.s.length }]) { const range = rawRange(slice(inner, at, span.from)); if (range) marks.remote.push(range); at = span.to } }
-        put(';'); putTrace(executedTrace(unquoted(view), inlineHttp, resolved, depth + 1, marks)); put(';')
+        for (const span of spans) { put(';'); putTrace(outerBody(inner, span, inlineHttp, resolved, depth)); put(';') }
+        put(';'); putTrace(executedTrace(unquoted(view), inlineHttp, resolved, depth + 1)); put(';')
       } else {
-        if (remote) { const range = rawRange(inner); if (range) marks.remote.push(range) }
-        put(';'); putTrace(executedTrace(inner, inlineHttp, resolved, depth + 1, marks)); put(';')
+        put(';'); putTrace(executedTrace(inner, inlineHttp, resolved, depth + 1)); put(';')
       }
     } else if (inlineHttp && (cut ? RUN_HTTP_CODE_CUT : RUN_HTTP_CODE).test(tail)) { put(';'); putTrace(inner); put(';') }
-    else if (ch === '"') { const data = { s: '', p: [] }; quotedData(data, inner, inlineHttp, resolved, depth, marks); put('"'); putTrace(data); put('"') }
+    else if (ch === '"') { const data = { s: '', p: [] }; quotedData(data, inner, inlineHttp, resolved, depth); put('"'); putTrace(data); put('"') }
     else { put("'"); putTrace({ s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); put("'") }
     i = j
   }
@@ -552,7 +539,7 @@ function heredocText(t) {
 // The commands one outer substitution runs, as executed text. The body of a "$( )" is shell text as written (double quotes leave
 // it alone, 2.6.3); a backquoted span first loses the backslash before $ ` \ and " (2.6.3, and 2.2.3 inside double quotes). Any
 // heredoc in a body that an outer phase already resolved is in `resolved` and is skipped.
-function outerBody(inner, span, inlineHttp, resolved, depth, marks) {
+function outerBody(inner, span, inlineHttp, resolved, depth) {
   const [a, b] = span.body
   let body = slice(inner, a, b)
   if (span.kind === '`') {
@@ -563,13 +550,13 @@ function outerBody(inner, span, inlineHttp, resolved, depth, marks) {
     }
     body = plain
   }
-  return executedTrace(body, inlineHttp, resolved, depth + 1, marks)
+  return executedTrace(body, inlineHttp, resolved, depth + 1)
 }
 // Double-quoted data keeps its words and loses the separators that would put a word in command position, while its
 // command substitutions still run (POSIX.1-2024 XCU 2.2.3): the body of a "$( ... )" is analyzed as shell text, its
 // tokens recognized recursively up to the matching ")" (2.6.3; its heredocs were resolved with its lines), a backquoted
 // span is kept as it is, and an escaped character becomes the data character _.
-function quotedData(out, inner, inlineHttp, resolved, depth, marks) {
+function quotedData(out, inner, inlineHttp, resolved, depth) {
   const s = inner.s
   let at = 0
   const literal = (to) => {
@@ -581,7 +568,7 @@ function quotedData(out, inner, inlineHttp, resolved, depth, marks) {
   for (const span of outerSpans(s, depth)) {
     literal(span.from)
     const [a, b] = span.body
-    if (span.kind === '$') { append(out, slice(inner, span.from, a)); append(out, scanQuotes(slice(inner, a, b), inlineHttp, resolved, depth + 1, marks)); append(out, slice(inner, b, b + 1)) }
+    if (span.kind === '$') { append(out, slice(inner, span.from, a)); append(out, scanQuotes(slice(inner, a, b), inlineHttp, resolved, depth + 1)); append(out, slice(inner, b, b + 1)) }
     else append(out, slice(inner, span.from, span.to))
     at = span.to
   }
