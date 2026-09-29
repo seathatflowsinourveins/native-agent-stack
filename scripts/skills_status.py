@@ -9,14 +9,22 @@ this checks, under a given home directory:
   * the global skills-CLI lock (``$XDG_STATE_HOME/skills/.skill-lock.json`` when
     ``XDG_STATE_HOME`` is set, else ``~/.agents/.skill-lock.json``) has an entry for
     the skill whose ``skillFolderHash`` equals the manifest's ``tree_sha``;
-  * ``~/.claude/skills/<name>`` exists and resolves to that canonical folder (the
+  * ``~/.claude/skills/<name>`` (``$CLAUDE_CONFIG_DIR/skills/<name>`` when that is set and
+    not blank) exists and resolves to that canonical folder (the
     link's own kind -- relative, absolute, or a plain directory copy instead of a
     link -- is reported, not just pass/fail);
-  * ``~/.claude/settings.json`` ``skillOverrides[name]`` equals the manifest's
+  * ``~/.claude/settings.json`` (under ``$CLAUDE_CONFIG_DIR`` when set) ``skillOverrides[name]``
+    equals the manifest's
     ``claude_listing`` (a missing key defaults to ``"on"`` per Claude Code's own
     documented behaviour, so that default only satisfies a manifest of ``"on"``);
-  * ``~/.codex/config.toml`` has, or lacks, a ``[[skills.config]]`` table naming the
+  * ``~/.codex/config.toml`` (``$CODEX_HOME/config.toml`` when set) has, or lacks, a
+    ``[[skills.config]]`` table naming the
     skill with ``enabled = false``, matching the manifest's ``codex_enabled``.
+
+Each path is built as the program that writes or reads it builds it: the skills CLI's
+folders, lock and links with Node's ``path.join`` (``node_path_join``), Claude Code's
+settings and Codex's config with their own rules (``claude_settings_path``,
+``codex_config_path``).
 
 It also reports (informationally; these never affect the exit code): skills present
 under ``~/.agents/skills`` or in the lock but absent from the manifest; canonical
@@ -59,6 +67,7 @@ import re
 import stat
 import subprocess
 import sys
+import unicodedata
 
 
 DEFAULT_MANIFEST = Path("adoption/skills/manifest.json")
@@ -85,6 +94,12 @@ SHA1_RE = re.compile(r"[0-9a-f]{40}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 REQUIRED_SKILL_KEYS = {"name", "tree_sha", "skill_md_sha256", "skill_md_bytes",
                        "description_chars", "claude_listing", "codex_enabled"}
+
+# What JavaScript's trim() removes, with which skills 1.7.0 trims $CLAUDE_CONFIG_DIR (npm dist/cli.mjs L1398):
+# ECMA-262 WhiteSpace and LineTerminator. A copy of tools/adoption/install_skills.py JS_TRIM_CHARS (see
+# node_path_join for why this checker keeps copies); tests/test_skills_status.py asserts that they agree.
+JS_TRIM_CHARS = ("\t\n\v\f\r              "
+                 "    　﻿")
 
 
 class ManifestError(ValueError):
@@ -181,11 +196,48 @@ def _git_blob_sha(data: bytes) -> bytes:
 
 
 def resolve_lock_path(home: Path, env) -> tuple[Path, str]:
-    """(path, source) where source is "xdg_state_home" or "default"."""
+    """(path, source), source "xdg_state_home" or "default"; joined as the CLI joins it (node_path_join)."""
     xdg_state_home = env.get("XDG_STATE_HOME")
     if xdg_state_home:
-        return Path(xdg_state_home) / "skills" / LOCK_BASENAME, "xdg_state_home"
-    return home / ".agents" / LOCK_BASENAME, "default"
+        return node_path_join(xdg_state_home, "skills", LOCK_BASENAME), "xdg_state_home"
+    return node_path_join(str(home), ".agents", LOCK_BASENAME), "default"
+
+
+def agents_skills_dir(home: Path) -> Path:
+    """The CLI's global canonical folder, path.join(os.homedir(), ".agents", "skills") (dist/cli.mjs L2208-2210)."""
+    return node_path_join(str(home), ".agents", "skills")
+
+
+def claude_skills_dir(home: Path, env) -> Path:
+    """Where the CLI links claude-code skills globally: path.join(claudeHome, "skills"), claudeHome being
+    $CLAUDE_CONFIG_DIR trimmed by JavaScript's trim() when that leaves it non-empty, else path.join(HOME, ".claude")
+    (dist/cli.mjs L1398, L1511), as tools/adoption/install_skills.py claude_skills_dir reads it back."""
+    config_dir = (env.get("CLAUDE_CONFIG_DIR") or "").strip(JS_TRIM_CHARS)
+    return node_path_join(config_dir, "skills") if config_dir else node_path_join(str(home), ".claude", "skills")
+
+
+def claude_settings_path(home: Path, env) -> Path:
+    """Where Claude Code reads user settings: under $CLAUDE_CONFIG_DIR when set (code.claude.com/docs/en/env-vars and
+    /settings). Its installed 2.1.284 bundle joins path.join(path.resolve(dir), "settings.json") with
+    dir = (CLAUDE_CONFIG_DIR ?? path.join(os.homedir(), ".claude")).normalize("NFC"): unlike the skills CLI's link
+    folder (claude_skills_dir), the variable is not trimmed, and a set but empty value still counts."""
+    config_dir = env.get("CLAUDE_CONFIG_DIR")
+    base = config_dir if config_dir is not None else str(node_path_join(str(home), ".claude"))
+    return node_path_join(os.path.abspath(unicodedata.normalize("NFC", base)), "settings.json")
+
+
+def codex_config_path(home: Path, env) -> Path:
+    """Where Codex reads config.toml: under $CODEX_HOME, else ~/.codex (developers.openai.com/codex/config-advanced,
+    "Config and state locations"). Codex rust-v0.157.1 (codex-rs/utils/home-dir/src/lib.rs find_codex_home) takes a
+    non-empty CODEX_HOME untrimmed and canonicalizes it, so a ".." there is resolved on disk, through any symlink,
+    which a pathlib join leaves to the operating system too; path.join would name another file. Without it, HOME/.codex
+    is normalized lexically (utils/absolute-path/src/absolutize.rs normalize_path), as path.join does. The skills
+    CLI's trimmed codexHome (dist/cli.mjs L1397, L1575-1577) names Codex's skills folder and detects Codex; it reads
+    no config.toml."""
+    codex_home = env.get("CODEX_HOME")
+    if codex_home:
+        return Path(codex_home) / "config.toml"
+    return node_path_join(str(home), ".codex", "config.toml")
 
 
 def load_lock(path: Path) -> tuple[dict | None, str]:
@@ -410,13 +462,13 @@ def check_cli_version(binary: str, manifest_version: str) -> dict:
 
 def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None) -> dict:
     env = os.environ if env is None else env
-    agents_skills = home / ".agents" / "skills"
-    claude_skills = home / ".claude" / "skills"
+    agents_skills = agents_skills_dir(home)
+    claude_skills = claude_skills_dir(home, env)
 
     lock_file, lock_source = resolve_lock_path(home, env)
     lock_data, lock_state = load_lock(lock_file)
-    overrides, overrides_state = load_skill_overrides(home / ".claude" / "settings.json")
-    codex_config, codex_config_state = load_codex_config(home / ".codex" / "config.toml")
+    overrides, overrides_state = load_skill_overrides(claude_settings_path(home, env))
+    codex_config, codex_config_state = load_codex_config(codex_config_path(home, env))
 
     skills_report = []
     for skill in manifest["skills"]:
@@ -497,7 +549,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST,
                         help="Path to the pinned skills manifest")
     parser.add_argument("--home", type=Path, default=Path.home(),
-                        help="Home directory to check (~/.agents, ~/.claude, ~/.codex)")
+                        help="Home directory to check (~/.agents, ~/.claude, ~/.codex); a set CLAUDE_CONFIG_DIR, "
+                             "CODEX_HOME or XDG_STATE_HOME moves its folder as the CLI or client does")
     parser.add_argument("--skills-bin", help="Executable whose '--version' is compared to manifest cli.version")
     parser.add_argument("--json", action="store_true", help="Print the machine-readable JSON report")
     args = parser.parse_args(argv)
@@ -509,6 +562,19 @@ def main(argv: list[str] | None = None) -> int:
     report = inspect(manifest, args.home, skills_bin=args.skills_bin)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_text(report))
     return 0 if report["result"] == "ok" else 1
+
+
+def node_path_join(*parts: str) -> Path:
+    """Node's POSIX path.join, with which skills 1.7.0 builds every global path it writes: the lock
+    (vercel-labs/skills@7407f389 src/skill-lock.ts:67-72, npm dist/cli.mjs L3746-3750), the canonical folder
+    (L2208-2210) and the claude-code link folder (L1511). The non-empty parts are joined with / and normalized,
+    so "." and ".." collapse lexically and a leading // becomes / (os.path.normpath alone keeps it). pathlib
+    keeps a "..", which through a missing or symlinked folder names another file than the CLI's.
+    tools/adoption/install_skills.py applies the same join. This checker keeps its own copy because
+    evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py executes it from its own bytes and
+    records their sha256 (load_checker); tests/test_skills_status.py asserts that the paths both build agree."""
+    joined = os.path.normpath("/".join(part for part in parts if part))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
 
 
 if __name__ == "__main__":

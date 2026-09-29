@@ -9,6 +9,7 @@ independently-typed expectation.
 """
 
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -138,12 +139,14 @@ class SkillsStatusTests(unittest.TestCase):
     def skill_result(self, report, name: str) -> dict:
         return next(s for s in report["skills"] if s["name"] == name)
 
-    def run_cli(self, manifest, *extra_args, env=None):
+    def run_cli(self, manifest, *extra_args, env=None, home_args=None):
+        """home_args replaces ["--home", <fixture home>]; [] leaves --home at its default, Path.home()."""
         manifest_path = self.tmp / "manifest.json"
         manifest_path.write_text(json.dumps(manifest))
         cli_env = {"PATH": os.environ.get("PATH", ""), **(env if env is not None else self.env)}
+        home_args = ["--home", str(self.home)] if home_args is None else home_args
         return subprocess.run(
-            [sys.executable, str(SCRIPT), "--manifest", str(manifest_path), "--home", str(self.home), *extra_args],
+            [sys.executable, str(SCRIPT), "--manifest", str(manifest_path), *home_args, *extra_args],
             cwd=str(ROOT), env=cli_env, capture_output=True, text=True, timeout=60)
 
     # -- all-pass -------------------------------------------------------------
@@ -420,6 +423,156 @@ class SkillsStatusTests(unittest.TestCase):
         default_report = self.report(manifest)
         self.assertEqual(default_report["lock"]["state"], "missing")
         self.assertEqual(default_report["result"], "fail")
+
+    def test_lock_path_is_joined_as_the_cli_path_join_joins_it(self):
+        # skills 1.7.0 builds the lock path with path.join (vercel-labs/skills@7407f389 src/skill-lock.ts:67-72),
+        # which collapses ".." and a leading //, from HOME or XDG_STATE_HOME verbatim. pathlib keeps the "..",
+        # and a path through the missing folder does not exist, so the lock the CLI wrote read as missing.
+        manifest, alpha, beta = self.setup_pair()
+        missing, xdg_state = self.tmp / "missing", self.tmp / "xdg-state"
+        xdg_lock = xdg_state / "skills" / ".skill-lock.json"
+        env = {**self.env, "XDG_STATE_HOME": str(missing / ".." / "xdg-state")}
+        self.assertEqual(ss.resolve_lock_path(self.home, env), (xdg_lock, "xdg_state_home"))
+        self.assertEqual(ss.resolve_lock_path(self.home, {"XDG_STATE_HOME": "/" + str(xdg_state)}),
+                         (xdg_lock, "xdg_state_home"))
+        self.assertEqual(ss.resolve_lock_path(missing / ".." / "home", {}),
+                         (self.home / ".agents" / ".skill-lock.json", "default"))
+        (self.home / ".agents" / ".skill-lock.json").unlink()  # only the CLI's XDG lock holds the entries now
+        self.write_lock(self.lock_entries_for([alpha, beta]), path=xdg_lock)
+        report = self.report(manifest, env=env)
+        self.assertEqual(report["lock"], {"source": "xdg_state_home", "state": "ok", "version": 3,
+                                          "version_matches": True})
+        self.assertEqual(report["result"], "ok")
+        result = self.run_cli(manifest, env=env)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def make_link_dotdot(self) -> Path:
+        """tmp/link -> deep/er, so tmp/link/.. is tmp/deep on disk and tmp lexically."""
+        (self.tmp / "deep" / "er").mkdir(parents=True)
+        (self.tmp / "link").symlink_to("deep/er", target_is_directory=True)
+        return self.tmp / "link" / ".."
+
+    def test_report_reads_every_path_through_a_dotdot_in_home_as_the_cli_joins_it(self):
+        # skills 1.7.0 joins the canonical folder, the lock and the claude-code link folder with path.join from HOME
+        # verbatim (os.homedir(); npm dist/cli.mjs L2208-2210, L3746-3750, L1398 and L1511), which collapses a ".."
+        # lexically, and so do Claude Code for its settings and Codex for its default config (claude_settings_path,
+        # codex_config_path). pathlib keeps the "..": after a missing folder that path does not exist, and after a
+        # symlink it names the link target's parent. The fixture is installed at the lexical tmp/home.
+        manifest, alpha, beta = self.setup_pair()
+        for label, parent in (("missing", self.tmp / "missing" / ".."), ("symlink", self.make_link_dotdot())):
+            home = parent / "home"
+            with self.subTest(case=label, home=str(home)):
+                report = ss.inspect(manifest, home, {"HOME": str(home)})
+                self.assertEqual(report["lock"], {"source": "default", "state": "ok", "version": 3,
+                                                  "version_matches": True})
+                self.assertEqual([{check: skill[check]["state"] for check in ("canonical", "lock", "claude_link")}
+                                  for skill in report["skills"]],
+                                 [{"canonical": "ok", "lock": "ok", "claude_link": "ok"}] * 2)
+                self.assertEqual(report["result"], "ok")
+                # Through main() without --home, whose default is Path.home(): HOME verbatim.
+                result = self.run_cli(manifest, "--json", env={"HOME": str(home)}, home_args=[])
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], report["skills"])
+
+    def test_claude_config_dir_moves_the_link_folder_as_the_cli_does(self):
+        # skills 1.7.0 links claude-code skills in path.join(CLAUDE_CONFIG_DIR.trim(), "skills") when that is not
+        # blank, else in path.join(HOME, ".claude", "skills") (dist/cli.mjs L1398, L1511). JavaScript's trim() also
+        # removes U+FEFF and U+3000, and path.join collapses the "..".
+        manifest, alpha, beta = self.setup_pair()
+        links = {"alpha-skill": {"state": "ok", "kind": "relative"}, "beta-skill": {"state": "ok", "kind": "relative"}}
+        missing = {name: {"state": "missing", "kind": "missing"} for name in links}
+
+        def link_states(value: str) -> dict:
+            report = self.report(manifest, env={**self.env, "CLAUDE_CONFIG_DIR": value})
+            return {skill["name"]: skill["claude_link"] for skill in report["skills"]}
+
+        # While it is set, the correct links under ~/.claude are not the CLI's; a blank value is unset.
+        (self.tmp / "claude-config").mkdir()
+        self.assertEqual(link_states(str(self.tmp / "claude-config")), missing)
+        self.assertEqual(link_states(" 　\t"), links)
+        link_dir = self.tmp / "claude-config" / "skills"
+        link_dir.mkdir()
+        for name in links:
+            canonical = self.home / ".agents" / "skills" / name
+            (link_dir / name).symlink_to(os.path.relpath(canonical, link_dir), target_is_directory=True)
+            default_link = self.home / ".claude" / "skills" / name
+            default_link.unlink()
+            default_link.symlink_to(self.tmp, target_is_directory=True)  # only the moved link can pass now
+        padded = "﻿" + str(self.tmp / "missing" / ".." / "claude-config") + "　"
+        self.assertEqual(link_states(padded), links)
+
+    def test_claude_config_dir_moves_the_settings_file_as_claude_code_does(self):
+        # Claude Code keeps settings under CLAUDE_CONFIG_DIR when set (code.claude.com/docs/en/env-vars, settings).
+        # Its installed 2.1.284 bundle reads path.join(path.resolve(dir), "settings.json") with
+        # dir = (CLAUDE_CONFIG_DIR ?? path.join(os.homedir(), ".claude")).normalize("NFC"): not trimmed, unlike the
+        # skills CLI's link folder, and set even when empty.
+        manifest, alpha, beta = self.setup_pair()
+        self.write_claude_settings({"beta-skill": "off"})  # the default file now disagrees with the manifest
+        config_dir = self.tmp / "café"
+        config_dir.mkdir()
+        (config_dir / "settings.json").write_text(json.dumps({"skillOverrides": {"beta-skill": "name-only"}}))
+
+        def beta_listing(env: dict) -> dict:
+            report = self.report(manifest, env=env)
+            self.assertEqual(report["claude_settings"], {"state": "ok"})
+            return self.skill_result(report, "beta-skill")["claude_listing"]
+
+        for label, value in (("dotdot", str(self.tmp / "missing" / ".." / "café")),
+                             ("nfd", str(self.tmp / "café"))):
+            with self.subTest(case=label):
+                self.assertEqual(beta_listing({**self.env, "CLAUDE_CONFIG_DIR": value}),
+                                 {"state": "ok", "actual": "name-only"})
+        # Untrimmed, a padded value names no settings file, so beta falls back to the default "on".
+        self.assertEqual(beta_listing({**self.env, "CLAUDE_CONFIG_DIR": "　" + str(config_dir)}),
+                         {"state": "mismatch", "actual": "on"})
+        self.assertEqual(beta_listing(self.env), {"state": "mismatch", "actual": "off"})
+        self.assertEqual(ss.claude_settings_path(self.home, {"CLAUDE_CONFIG_DIR": ""}),
+                         Path(os.getcwd()) / "settings.json")  # path.resolve("") is the working directory
+        self.assertEqual(ss.claude_settings_path(self.home, {}), self.home / ".claude" / "settings.json")
+
+    def test_codex_home_moves_the_config_file_as_codex_does(self):
+        # Codex reads config.toml under CODEX_HOME (developers.openai.com/codex/config-advanced). rust-v0.157.1
+        # canonicalizes a non-empty CODEX_HOME (codex-rs/utils/home-dir/src/lib.rs find_codex_home), so a ".." after
+        # a symlink is resolved on disk: link/../codex is deep/codex, not the tmp/codex that path.join would name.
+        manifest, alpha, beta = self.setup_pair()
+        self.write_codex_config([])  # the default config now lacks beta's disable entry
+        parent = self.make_link_dotdot()
+        for folder, names in ((self.tmp / "deep" / "codex", ["beta-skill"]), (self.tmp / "codex", [])):
+            folder.mkdir()
+            (folder / "config.toml").write_text(
+                "".join(f'[[skills.config]]\nname = "{name}"\nenabled = false\n\n' for name in names))
+
+        def beta_disable(value: str) -> dict:
+            report = self.report(manifest, env={**self.env, "CODEX_HOME": value})
+            return self.skill_result(report, "beta-skill")["codex_disable"]
+
+        self.assertEqual(beta_disable(str(parent / "codex")), {"state": "ok", "disable_entry_present": True})
+        self.assertEqual(beta_disable(str(self.tmp / "codex")),
+                         {"state": "missing_disable_entry", "disable_entry_present": False})
+        # An empty CODEX_HOME is unset (find_codex_home filters it): the default config is read again.
+        self.assertEqual(beta_disable(""), {"state": "missing_disable_entry", "disable_entry_present": False})
+
+    def test_global_paths_agree_with_install_skills(self):
+        # This checker keeps copies of install_skills.py's join and trim (node_path_join, JS_TRIM_CHARS); the global
+        # paths both build from them must agree, for a "..", // or relative HOME and a blank, padded or ".."
+        # CLAUDE_CONFIG_DIR or XDG_STATE_HOME.
+        spec = importlib.util.spec_from_file_location("install_skills_for_status_tests",
+                                                      ROOT / "tools" / "adoption" / "install_skills.py")
+        installer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(installer)
+        self.assertEqual(ss.JS_TRIM_CHARS, installer.JS_TRIM_CHARS)
+        homes = (Path("/h/missing/../base"), Path("//h/./base"), Path("rel/../../x"))
+        values = (None, " 　", "﻿/c/missing/../config ", "//c//config/", "\u0085/c", "rel/../c")
+        for home in homes:
+            for value in values:
+                env = {} if value is None else {"CLAUDE_CONFIG_DIR": value, "XDG_STATE_HOME": value}
+                with self.subTest(home=str(home), value=value), mock.patch.dict(os.environ, env):
+                    for name in ("CLAUDE_CONFIG_DIR", "XDG_STATE_HOME"):
+                        if value is None:
+                            os.environ.pop(name, None)
+                    self.assertEqual(ss.agents_skills_dir(home) / "x", installer.canonical_skill_dir(home, "x"))
+                    self.assertEqual(ss.claude_skills_dir(home, env), installer.claude_skills_dir(home))
+                    self.assertEqual(ss.resolve_lock_path(home, env)[0], installer.lock_file_path(home))
 
     # -- extra skill warning ----------------------------------------------------
 
