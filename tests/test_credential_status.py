@@ -139,6 +139,51 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertNotIn("public_variables", next(e for e in tavily["entries"] if e["id"] == "tavily"))
         self.assertEqual(cs.inventory_errors(tavily, ROOT), [])
 
+    def test_variable_lists_reject_overlap_and_repeats_and_keep_required_masked(self):
+        # Review of 2026-09-29: a REQUIRED variable listed again in optional_variables and in public_variables passed
+        # the schema and dropped out of masked_names(), so the runner would have injected it unmasked.
+        def planted(mutate):
+            broken = copy.deepcopy(self.inventory)
+            row = next(e for e in broken["entries"] if e["id"] == "alpaca-paper")
+            mutate(row)
+            return broken, row
+
+        cases = [
+            ("variables and optional_variables must not share a name",
+             lambda row: row["optional_variables"].append("APCA_API_KEY_ID")),
+            ("variables and optional_variables must not share a name",  # the review's case: also public
+             lambda row: (row["optional_variables"].append("APCA_API_SECRET_KEY"),
+                          row["public_variables"].append("APCA_API_SECRET_KEY"))),
+            ("public_variables must name distinct optional_variables",  # a required name that is not optional
+             lambda row: row["public_variables"].append("APCA_API_SECRET_KEY")),
+            ("variables must not repeat a name",
+             lambda row: row["variables"].append("APCA_API_KEY_ID")),
+            ("optional_variables must not repeat a name",
+             lambda row: row["optional_variables"].append("APCA_API_BASE_URL")),
+            ("pointer_variables must not repeat a name",
+             lambda row: row["pointer_variables"].append("PAPER_ENV_FILE")),
+            ("public_variables must name distinct optional_variables",
+             lambda row: row["public_variables"].append("APCA_API_BASE_URL")),
+        ]
+        for message, mutate in cases:
+            broken, _row = planted(mutate)
+            with self.subTest(message=message):
+                errors = cs.inventory_errors(broken, ROOT)
+                self.assertEqual(len(errors), 1, errors)
+                self.assertIn("entries[0]: ", errors[0])
+                self.assertIn(message, errors[0])
+        # Whatever the schema check reports, the masked set is computed from the validated shape: a required variable
+        # is masked even when a planted entry lists it as public, and a public name is only ever an optional one.
+        _broken, row = planted(lambda row: (row["optional_variables"].append("APCA_API_SECRET_KEY"),
+                                            row["public_variables"].append("APCA_API_SECRET_KEY")))
+        self.assertIn("APCA_API_SECRET_KEY", cs.masked_names(row))
+        self.assertNotIn("APCA_API_SECRET_KEY", cs.public_names(row))
+        self.assertEqual(cs.public_names(row), ["APCA_API_BASE_URL"])
+        real = next(e for e in self.inventory["entries"] if e["id"] == "alpaca-paper")
+        self.assertEqual(cs.masked_names(real), ["APCA_API_KEY_ID", "APCA_API_SECRET_KEY"])
+        self.assertEqual(cs.public_names(real), ["APCA_API_BASE_URL"])
+        self.assertEqual(cs.inventory_errors(self.inventory, ROOT), [])
+
     def test_inventory_rejects_non_home_template_and_bad_names(self):
         broken = copy.deepcopy(self.inventory)
         broken["entries"][0]["store"]["path_template"] = "/srv/shared/alpaca.env"
