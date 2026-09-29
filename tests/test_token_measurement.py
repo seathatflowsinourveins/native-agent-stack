@@ -537,6 +537,26 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
         self.assertEqual(self.exports("x.map(cu.fetchKind)", [command]), ["fetch"])
 
+    def test_m4_n1_run_string_is_analyzed_as_the_inner_shells_input(self):
+        # A string that a shell runs is that shell's input. In a double-quoted word the outer shell
+        # removes the backslash before $ ` " \ and newline (POSIX.1-2024 XCU 2.2.3), so an escaped
+        # quote stays a quote for the inner shell, and a string the inner shell runs in turn is
+        # analyzed as well (bash 5.2.21 and dash: `bash -c "echo \"a; echo x\""` prints one line).
+        quoted = "bash -c \"echo \\\"a; curl https://example.org\\\"\""
+        for _, name, _, key, m4 in self.carrier_m4([quoted]):
+            with self.subTest(command=quoted, carrier=name):
+                self.assertEqual(m4[key], 0)
+                self.assertEqual(m4["remote_fetches"], 0)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 1)
+        # Before the fix the nested curl was in neither count, so it could not lower the bound.
+        nested = "ssh host 'bash -c \"curl https://example.org\"'"
+        for _, name, _, key, m4 in self.carrier_m4([nested]):
+            with self.subTest(command=nested, carrier=name):
+                self.assertEqual(m4[key], 1)
+                self.assertEqual(m4["remote_fetches"], 1)
+                self.assertEqual(m4["fetch_mentions_unconfirmed"], 0)
+        self.assertEqual(self.exports("x.map(cu.fetchKind)", [quoted, nested]), [None, "fetch"])
+
     def test_hook_context_is_inserted_only_by_additional_context_rows(self):
         def hook(kind, name, **rest):
             return {"type": "attachment", "timestamp": "2026-09-26T01:00:00Z", "attachment": {
