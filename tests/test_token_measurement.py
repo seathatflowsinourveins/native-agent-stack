@@ -1202,6 +1202,27 @@ class TokenMeasurement(unittest.TestCase):
                 self.assertEqual(cli["parse_errors"], errors)
 
     @NEEDS_PARSER
+    def test_a_command_the_grammar_joined_to_the_previous_one_is_read_on_its_own(self):
+        # tree-sitter-bash 0.25.1 reads what follows a command as more of its arguments after an unquoted `==` or `=~` (an ERROR on the
+        # `;`, `&&` or `|`, or none at all after a newline) and after a redirection that follows a here-document operator (an ERROR on
+        # the `|` or `;`). Measured on this host's real commands: 732 of 136,361 with no error, 163 more with one. A separator ERROR
+        # or an unescaped newline inside one command's words is a boundary (bash(1) SHELL GRAMMAR), so the words after it are read as a
+        # command of their own; parse_errors still counts the calls whose tree has an ERROR. The inputs are the recovery probes of the
+        # oracle, whose expected lanes are what real bash ran.
+        cases = {"echo ==; qmd get a": ({"qmd": 1}, 1), "echo ==\nqmd get a": ({"qmd": 1}, 0), "echo == | toon f": ({"toon": 1}, 1),
+                 "echo == && qmd get a": ({"qmd": 1}, 1), "echo =~; qmd get a": ({"qmd": 1}, 1), "echo ==; qmd a; toon b": ({"qmd": 1, "toon": 1}, 1),
+                 "cat <<'EOF' 2>&1 | qmd index x\nbody\nEOF": ({"qmd": 1}, 1), "cat <<'EOF' > out; qmd get a\nbody\nEOF": ({"qmd": 1}, 1),
+                 "bash <<'EOF' 2>&1 | qmd index x\nqmd status\nEOF": ({"qmd": 1}, 1),
+                 'echo "$M" | tr " " "\\n" | grep -c . \nstart=$(date +%s)\nTMPDIR=/x rtk proxy python3 -m unittest $M > run.txt 2>&1\nrc=$?':
+                 ({"rtk_proxy": 1}, 0),
+                 # an ordinary continuation and a comment are not boundaries
+                 "qmd get a \\\n  b": ({"qmd": 1}, 0), "qmd get a # toon b\n": ({"qmd": 1}, 0)}
+        for (command, (lanes, errors)), (got, _, cli) in zip(cases.items(), self.tally(list(cases))):
+            with self.subTest(command=command):
+                self.assertEqual(got, lanes)
+                self.assertEqual(cli["parse_errors"], errors)
+
+    @NEEDS_PARSER
     def test_a_name_is_emitted_only_from_the_closed_vocabulary(self):
         # GPT-6 #10 and U1 pivot D5: a mcporter server key is one of the stack's own servers or (other), (http), (stdio) or
         # (unresolved); a string that only looks like a name (an id, a host) never reaches the output.

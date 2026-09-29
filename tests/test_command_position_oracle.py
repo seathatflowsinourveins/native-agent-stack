@@ -197,6 +197,25 @@ PROBES = [
     ("nested shells", "bash -c \"sh -c 'qmd status'\""),
 ]
 
+# Commands tree-sitter-bash 0.25.1 reads as one: it puts an ERROR on `;`, `&&` or `|` after an unquoted `==` or `=~` word and on the
+# separator inside the destinations of a redirection that follows a here-document operator, and in some shapes it joins the next line to
+# the command that ends the previous one without any error (a newline after `==`, and the last shape). Real shells run every command of them;
+# the kernel starts a new command at a separator ERROR or an unescaped newline inside one command's words. A parse error is allowed here.
+RECOVERY_PROBES = [
+    ("echo == ;", "echo ==; qmd get a"),
+    ("echo == blank ;", "echo == ; qmd get a"),
+    ("echo == newline", "echo ==\nqmd get a"),
+    ("echo == pipe", "echo == | toon f"),
+    ("echo == and", "echo == && qmd get a"),
+    ("echo =~ ;", "echo =~; qmd get a"),
+    ("echo == then two", "echo ==; qmd a; toon b"),
+    ("heredoc 2>&1 pipe", "cat <<'EOF' 2>&1 | qmd index x\nbody\nEOF"),
+    ("heredoc > then ;", "cat <<'EOF' > out; qmd get a\nbody\nEOF"),
+    ("heredoc 2>&1 then ;", "cat <<EOF 2>&1; qmd get a\nbody\nEOF"),
+    ("shell heredoc 2>&1 pipe", "bash <<'EOF' 2>&1 | qmd index x\nqmd status\nEOF"),
+    ("joined lines", 'echo "$M" | tr " " "\\n" | grep -c . \nstart=$(date +%s)\nTMPDIR=/x rtk proxy python3 -m unittest $M > run.txt 2>&1\nrc=$?'),
+]
+
 # ------------------------------------------------------------------------------------------------------------- the generator
 QUOTES = [lambda w: w, lambda w: "'" + w + "'", lambda w: '"' + w + '"', lambda w: w[0] + '""' + w[1:], lambda w: "\\" + w]
 
@@ -422,6 +441,14 @@ class CommandPositionOracle(unittest.TestCase):
         names = {command: name for name, command in PROBES}
         self.assertEqual(wrong, [], "\n".join("%s: %r ran %s, read %s (parse error: %s)" % (names[c], c, r, s, e) for c, r, s, e in wrong))
         print("oracle probes: %d of %d agree (%d lane runs)" % (agreed, len(commands), ran))
+
+    def test_recovery_probes_read_what_real_bash_runs(self):
+        commands = [command for _, command in RECOVERY_PROBES]
+        truth, read = run_real(commands, self.bin, self.home), read_lanes(commands)
+        names = {command: name for name, command in RECOVERY_PROBES}
+        wrong = [(names[c], c, dict(real), seen["tokens"]) for c, real, seen in zip(commands, truth, read) if collections.Counter(seen["tokens"]) != real]
+        self.assertEqual(wrong, [], "\n".join("%s: %r ran %s, read %s" % w for w in wrong))
+        print("oracle recovery probes: %d of %d agree (%d with a parse error)" % (len(commands), len(commands), sum(1 for seen in read if seen["error"])))
 
     def test_generated_commands_read_what_real_bash_runs(self):
         commands = generate()
