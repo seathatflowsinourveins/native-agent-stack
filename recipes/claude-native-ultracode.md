@@ -22,12 +22,14 @@ The portable [settings file](../examples/claude-native/ultracode.settings.json):
 {
   "enableWorkflows": true,
   "ultracode": true,
+  "effortLevel": "xhigh",
   "workflowSizeGuideline": "unrestricted",
   "switchModelsOnFlag": false,
   "env": {
     "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "8",
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1",
-    "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1"
+    "CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK": "1",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
   }
 }
 ```
@@ -157,6 +159,15 @@ refuses to edit when they match, when no path is named or when `HEAD` is not the
 base. Both roles' qualification rows below were recorded on
 Sonnet, so neither is qualified on Opus yet
 ([decision record](../docs/decisions/2026-09-27-claude-harness-settings.md)).
+
+**2026-09-29: Sonnet 5.5 takes fan-out units; effort and the default child model live in settings.**
+Claude Code 2.1.284 made `sonnet` Sonnet 5.5. The
+[workflows README](../examples/claude-native/workflows/README.md#sonnet-55-fan-out-units-and-the-default-child-model-2026-09-29)
+lists the units that may run on it (fan-out whose output an executable oracle or an Opus stage checks) and keeps every judgment on
+Opus. Native probes on 2.1.284 ([receipt](../evidence/receipts/claude-model-effort-probes-20260929.json)) measured that Ultracode
+neither raises nor overrides effort, so a Sonnet 5.5 session ran at medium until a saved level was added, and that a stage naming no
+model runs the lead's; the portable settings file above therefore carries `effortLevel: xhigh` and
+`CLAUDE_CODE_SUBAGENT_MODEL=opus`. The role defaults in the table below are unchanged.
 
 | Role | Starting choice | Qualification |
 | --- | --- | --- |

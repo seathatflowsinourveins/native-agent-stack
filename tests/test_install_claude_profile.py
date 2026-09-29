@@ -314,6 +314,21 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
             with self.subTest(env=name):
                 self.assertNotIn(name, settings["env"])
 
+    def test_both_current_models_are_pinned_at_xhigh_and_an_unnamed_child_defaults_to_opus(self):
+        # docs/decisions/2026-09-29-sonnet-5-5-dispatch.md, receipt claude-model-effort-probes-20260929 (Claude Code
+        # 2.1.284): a user-scope top-level effortLevel does not apply to Opus 5.5 or Sonnet 5.5, and ultracode neither
+        # sets nor overrides a saved per-model level, so an unsaved Sonnet 5.5 session ran at medium. Every alias the
+        # shipped agents bind therefore needs a saved level. CLAUDE_CODE_SUBAGENT_MODEL is the default model of a
+        # subagent, teammate or workflow agent that no per-call model or definition assigns
+        # (https://code.claude.com/docs/en/env-vars); "opus" keeps an unnamed judgment stage off a Sonnet lead.
+        settings = self.settings()
+        pins = {name: entry.get("effortLevel") for name, entry in settings["modelSettings"].items()}
+        self.assertEqual(pins.get("claude-opus-5-5"), "xhigh")
+        self.assertEqual(pins.get("claude-sonnet-5-5"), "xhigh")
+        self.assertEqual(settings["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"), "opus")
+        self.assertNotIn("CLAUDE_CODE_SUBAGENT_MODEL_FORCE", settings["env"],
+                         "FORCE would put every Opus-named role on the lead's model")
+
 
 class CommittedSettingsFallbackGuardTests(unittest.TestCase):
     """The committed project settings and the portable Ultracode settings carry the template's two model-fallback
@@ -339,6 +354,21 @@ class CommittedSettingsFallbackGuardTests(unittest.TestCase):
                 self.assertEqual(settings["env"]["CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"], "1")
                 self.assertIs(settings.get("switchModelsOnFlag"), template["switchModelsOnFlag"])
                 self.assertIs(settings["switchModelsOnFlag"], False)
+
+    def test_project_and_portable_settings_pin_the_coordinator_effort_at_xhigh(self):
+        # Claude Code 2.1.284 (receipt claude-model-effort-probes-20260929): ultracode: true does not raise a session
+        # that has no saved level (Sonnet 5.5 ran at medium), and a project or portable settings file's top-level
+        # effortLevel does apply to every model. maxEffortLevel would cap the stages' max effort, so it stays absent.
+        for path in (self.PROJECT, self.PORTABLE):
+            settings = json.loads(path.read_text(encoding="utf-8"))
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertEqual(settings.get("effortLevel"), "xhigh")
+                self.assertNotIn("maxEffortLevel", settings)
+                self.assertNotIn("CLAUDE_CODE_EFFORT_LEVEL", settings.get("env", {}))
+        # The portable file, like the template, defaults an unnamed child to Opus; the project file leaves the
+        # host layer to set it, so a sealed measurement run in this repository keeps its own model composition.
+        portable = json.loads(self.PORTABLE.read_text(encoding="utf-8"))
+        self.assertEqual(portable["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"), "opus")
 
     def test_the_recipe_embeds_the_portable_settings_file(self):
         # recipes/claude-native-ultracode.md shows the file an adopter passes with --settings; keep the two equal.
@@ -972,13 +1002,15 @@ class PortableTopRuleTests(unittest.TestCase):
     (`wc -w`) it had before. Re-baselined on 2026-09-27 to 1,205 words: the Workers section took the
     four dispatch modes of the user-approved global instructions and the documented named-spawn
     behaviour (docs/decisions/2026-09-27-claude-harness-settings.md), which the 925-word ceiling could
-    not hold; the 5% rule applies from the new baseline. docs/harness-defaults.md#upstream-verification-and-compounding-learning
-    holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
+    not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,310 words: the
+    Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule, the default child model and the measured effort
+    rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
+    docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1205  # wc -w after the 2026-09-27 Workers section (881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1310  # wc -w after the 2026-09-29 Sonnet 5.5 rule (1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
