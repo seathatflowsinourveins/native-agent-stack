@@ -4166,7 +4166,7 @@ class F31c_T14Facts(GraderCase):
             "status": "completed"}}])
         processes = [{"pid": 600, "start": ts(20), "comm": "sleep", "ppid": 1}, {"pid": 601, "start": ts(50), "comm": "sleep", "ppid": 1}]
         got = self.facts(family="codex", calls=calls, attempt={"start": None, "end": None}, rollout=rollout,
-                         post={"processes": processes})
+                         post={"processes": processes}, survivors_record=self.NO_SURVIVORS)
         self.assertEqual((got["q"], got["q_status"], got["survival_observed"]), (self.QUERY, "observed", True))
         self.assertEqual(got["survivors"], [{"comm": "sleep", "start": ts(20)}], "only the process inside the rollout's lifetime")
 

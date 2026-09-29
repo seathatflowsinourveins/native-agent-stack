@@ -1869,11 +1869,19 @@ def codex_archive_query_time(records):
     return fc.unknown("no_query")
 
 
-def t14_facts(*, family, rows, calls, attempt, post, pending, rollout):
+def _comm_of(command):
+    """The program name of a recorded process command: the basename of its first word."""
+    words = command.split() if isinstance(command, str) else []
+    return words[0].rsplit("/", 1)[-1] if words else None
+
+
+def t14_facts(*, family, rows, calls, attempt, post, pending, rollout, survivors_record=None):
     """The R11 facts of one completed T14 attempt: the query time and how it was observed, the pending background jobs, the
-    owned processes still alive at the post-arm capture and whether survival could be observed at all. A Claude child's query
-    time and lifetime come from its transcript; a Codex child's from the timestamped rollout copy, and without one a query
-    the events show is unobserved (the time is unknown) rather than absent."""
+    owned processes still alive and whether survival could be observed at all. A Claude child's query time and lifetime come
+    from its transcript, its survival from the post-arm process listing; a Codex child's query time and lifetime come from the
+    timestamped rollout copy (without one, a query the events show is unobserved rather than absent), and its survival from
+    U10's record of the attempt's session processes (`survivors.json`, {count, processes}), which U10 ends before any capture:
+    a missing record leaves survival unobserved, and the post-arm listing still adds a process that left the session."""
     if family == "claude":
         found = fc.archive_query_time(rows or [])
         lifetime = (attempt.get("start"), attempt.get("end"))
@@ -1884,14 +1892,24 @@ def t14_facts(*, family, rows, calls, attempt, post, pending, rollout):
         named = any(names_archive_query([code_text(call)], call.get("server")) for call in calls)
         found = fc.unknown("archive_query_unobserved" if named else "no_query")
         lifetime = (attempt.get("start"), attempt.get("end"))
+    if found.status == "pass" and iso_seconds(found.detail.get("q")) is None:
+        found = fc.unknown("archive_query_unobserved")  # a matching row with no readable timestamp: the time is unknown
     q_status = "observed" if found.status == "pass" else "unobserved" if "archive_query_unobserved" in found.reasons else "none"
     observed = post.get("processes") is not None and all(lifetime)
     owned = {"owned": [], "unattributed": 0}
     if observed:
         owned = owned_survivors(post["processes"], lifetime, command_programs([code_text(call) for call in calls]))
+    survivors = [{"comm": item["comm"], "start": item["start"]} for item in owned["owned"]]
+    if family == "codex":
+        count = survivors_record.get("count") if isinstance(survivors_record, dict) else None
+        observed = isinstance(count, int) and not isinstance(count, bool)
+        if observed and count > 0:
+            entries = [item for item in survivors_record.get("processes") or [] if isinstance(item, dict)]
+            survivors += [{"comm": _comm_of(item.get("command")), "start": item.get("start_time")} for item in entries] \
+                or [{"comm": None, "start": None} for _ in range(count)]
     return {"q": found.detail.get("q") if found.status == "pass" else None, "q_status": q_status,
-            "background_pending": pending, "survivors": [{"comm": item["comm"], "start": item["start"]} for item in owned["owned"]],
-            "unattributed": owned["unattributed"], "survival_observed": observed}
+            "background_pending": pending, "survivors": survivors, "unattributed": owned["unattributed"],
+            "survival_observed": observed}
 
 
 # ---- Tree drift (R13) and the builder (T31) from the post-arm capture --------------------------------------------
@@ -2515,13 +2533,16 @@ def _record_facts(attempt, rows, events, row, task, keys, spec, bindings, source
         children = (sources.get("run_mode") or {}).get(arm, []) if family == "claude" else []
         child = next((item for item in children if item.get("agent_id") == attempt.get("agent_id")), None)
         pending = ((child or {}).get("final_return") or {}).get("background_pending") or 0
-        rollout = None
+        rollout, survivors_record = None, None
         if family == "codex":  # exec events carry no timestamps: U10's rollout copy times the query and the lifetime
             thread = row.get("thread_id") or next((item.get("thread_id") for item in events or []
                                                    if item.get("type") == "thread.started"), None)
             rollout = find_rollout(sources.get("driver_dir"), attempt["identity"], thread)
+            if sources.get("driver_dir"):  # and U10's list of the session's processes ends them before any capture
+                survivors_record = read_json(os.path.join(str(sources["driver_dir"]), "attempts", attempt["identity"],
+                                                          "survivors.json"))
         facts["t14"] = t14_facts(family=family, rows=rows, calls=calls, attempt=attempt, post=post, pending=pending,
-                                 rollout=rollout)
+                                 rollout=rollout, survivors_record=survivors_record)
     if template == "T31" and key:
         post = captures.get(f"arm-{family}-{arm}-post-arm.json") or {}
         capture = (post.get("builders") or {}).get(task["id"])
@@ -2836,51 +2857,50 @@ def _attempt_item(task, runs, state, readings, decided):
 
 
 def _lane_opportunities(spec, lane, records, rows, readings, decided, join=None):
-    """R15: the opportunities of one M8 lane in arm B. For a family whose U4 join ledger was supplied they are its rows
-    (excluded rows aside): a row that names the lane is one opportunity; a `not_launched` row was never launched, an
-    `unlisted` row is a recorded attempt no identity row lists (unknown, never graded) and any other row is graded from the
-    records of its identity. For a family without a ledger they are one per recorded attempt (identity) of each organic task
-    that carries the lane tag, and one not_launched opportunity for a task with none."""
+    """R15: the opportunities of one M8 lane in arm B, per planned task of the lane's population (organic, arm B, carrying
+    the lane tag), the same population on both paths. Where the family's U4 join ledger was supplied, the task's ledger rows
+    (excluded rows aside) are its opportunities: a `not_launched` row was never launched, an `unlisted` row is a recorded
+    attempt no identity row lists (unknown, never graded) and any other row is graded from the records of its identity. A graded
+    attempt the ledger does not list is still an opportunity, and a task with neither row nor record is one not_launched
+    opportunity, so a ledger that lacks a row can never shrink O. Without a ledger the opportunities are the recorded attempts
+    (one per identity) or that one not_launched opportunity."""
     items = []
-    tasks = {task["id"]: task for task in spec["tasks"]}
     graded = collections.defaultdict(list)
     for record, row in zip(records, rows):
         if record["arm"] == "B" and record["actor"] in GRADED_ACTORS:
             graded[(record["task"], record["identity"], record["actor"])].append((record, row))
     for family in fc.FAMILY_ARMS:
-        ledger = (join or {}).get(family)
-        if ledger is not None:
-            for entry in ledger:
-                task = tasks.get(entry.get("task"))
-                if task is None or task["family"] != family or entry.get("arm") != "B" or entry.get("excluded_kind") \
-                        or lane not in (entry.get("lanes") or {}):
-                    continue
-                state = (entry["lanes"][lane] or {}).get("state")
-                if entry.get("source") == "not_launched":
-                    items.append({"adopted": "unknown", "grade": "unknown", "kind": "not_launched"})
-                elif entry.get("source") == "unlisted":
-                    items.append({"adopted": "unknown", "grade": "unknown", "kind": "attempt"})
-                elif graded.get((task["id"], entry.get("identity"), entry.get("actor"))):
-                    items.append(_attempt_item(task, graded[(task["id"], entry["identity"], entry["actor"])], state, readings,
-                                               decided))
-                else:
-                    items.append({"adopted": state if state in ("adopted", "not_adopted") else "unknown", "grade": "unknown",
-                                  "kind": "attempt"})
-            continue
+        by_task = collections.defaultdict(list)
+        for entry in (join or {}).get(family) or []:
+            if entry.get("arm") == "B" and not entry.get("excluded_kind"):
+                by_task[entry.get("task")].append(entry)
         for task in spec["tasks"]:
             if task["family"] != family or "B" not in task["arms"] or task["opportunity"] != "organic" \
                     or lane not in task["lane_tags"]:
                 continue
-            by_identity = collections.defaultdict(list)
-            for record, row in zip(records, rows):
-                if record["task"] == task["id"] and record["arm"] == "B" and record["actor"] in GRADED_ACTORS:
-                    by_identity[record["identity"]].append((record, row))
-            if not by_identity:
-                items.append({"adopted": "unknown", "grade": "unknown", "kind": "not_launched"})
-            for identity in sorted(by_identity):
-                runs = by_identity[identity]
+            listed, mine = set(), []
+            for entry in by_task.get(task["id"], []):
+                state = ((entry.get("lanes") or {}).get(lane) or {}).get("state")
+                if entry.get("source") == "not_launched":
+                    mine.append({"adopted": "unknown", "grade": "unknown", "kind": "not_launched"})
+                elif entry.get("source") == "unlisted":
+                    mine.append({"adopted": "unknown", "grade": "unknown", "kind": "attempt"})
+                else:
+                    key = (task["id"], entry.get("identity"), entry.get("actor"))
+                    listed.add(key)
+                    runs = graded.get(key)
+                    mine.append(_attempt_item(task, runs, state, readings, decided) if runs else
+                                {"adopted": state if state in ("adopted", "not_adopted") else "unknown", "grade": "unknown",
+                                 "kind": "attempt"})
+            recorded = collections.defaultdict(list)
+            for key, runs in graded.items():
+                if key[0] == task["id"] and key not in listed:
+                    recorded[key[1]] += runs
+            for identity in sorted(recorded):
+                runs = recorded[identity]
                 lanes = next((record.get("lanes") for record, _ in runs if record.get("lanes")), {}) or {}
-                items.append(_attempt_item(task, runs, (lanes.get(lane) or {}).get("state", "unknown"), readings, decided))
+                mine.append(_attempt_item(task, runs, (lanes.get(lane) or {}).get("state", "unknown"), readings, decided))
+            items += mine or [{"adopted": "unknown", "grade": "unknown", "kind": "not_launched"}]
     return items
 
 
