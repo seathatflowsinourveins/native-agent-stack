@@ -2034,41 +2034,51 @@ def spawn_ids(case):
 
 
 def spawn_case(case, *, args=None, parent_route=SPAWN_ROUTE, child_routes=(SPAWN_ROUTE,), role=None, start=True,
-               parent=True, spawn_call=True, other_parent=False, followups=()):
+               parent=True, spawn_call=True, other_parent=False, followups=(), legacy_parent=False, namespace="collaboration"):
     """One parent rollout that spawns one child through a direct spawn_agent function_call (spawn.rs:253-263) and records
     a SubAgentActivity started item whose id is that call_id (spawn.rs:216-226), then the child's rollout: its meta with the
     ThreadSpawn source, the parent's records below subagent_history_start_ordinal when it is forked, its own
     ThreadSettingsApplied (thread_id is its own id) and one turn per child route. followups are followup_task calls whose
-    target is the child's thread id or its task path (multi_agents_spec.rs:217-241)."""
+    target is the child's thread id ("thread") or its task path ("path") (multi_agents_spec.rs:217-241), or a V1
+    resume_agent call with the child's id ("resume", :246-266). A legacy_parent persists no started item, only a completed
+    one (rollout/src/policy.rs:94-112); namespace multi_agent_v1 is a V1 spawn, whose history comes from fork_context
+    (multi_agents_spec.rs:591-628)."""
     ids, hour = spawn_ids(case), int(case[1:])
 
     def at(minute, second):
         return f"2026-10-20T{hour:02d}:{minute:02d}:{second:02d}Z"
     parent_meta = {"id": ids["parent"], "source": "exec", "originator": "codex_exec", "cli_version": "0.157.1",
-                   "history_mode": "paginated"}
+                   "history_mode": "legacy" if legacy_parent else "paginated"}
     parent_rows = [("session_meta", parent_meta, at(0, 0)), ("response_item", developer(CATALOG), at(0, 1)),
                    ("event_msg", {"type": "task_started", "turn_id": ids["turn"]}, at(0, 2)),
                    ("turn_context", {"turn_id": ids["turn"], "model": parent_route[0], "effort": parent_route[1]},
                     at(0, 3))]
     if spawn_call:
         arguments = {"message": ids["message"], "task_name": ids["path"].rsplit("/", 1)[-1], **(args or {})}
-        parent_rows.append(("response_item", {"type": "function_call", "name": "spawn_agent", "namespace": "collaboration",
+        parent_rows.append(("response_item", {"type": "function_call", "name": "spawn_agent", "namespace": namespace,
                                               "arguments": json.dumps(arguments), "call_id": ids["call"]}, at(0, 4)))
-    parent_rows.append(("event_msg", {"type": "item_completed", "item": {
-        "type": "SubAgentActivity", "id": ids["call"] if spawn_call else ids["nested"], "kind": "started",
-        "agent_thread_id": ids["child"], "agent_path": ids["path"]}}, at(0, 5)))
+    if not legacy_parent:
+        parent_rows.append(("event_msg", {"type": "item_completed", "item": {
+            "type": "SubAgentActivity", "id": ids["call"] if spawn_call else ids["nested"], "kind": "started",
+            "agent_thread_id": ids["child"], "agent_path": ids["path"]}}, at(0, 5)))
     if spawn_call:
         parent_rows.append(("response_item", {"type": "function_call_output", "call_id": ids["call"],
                                               "output": json.dumps({"task_name": ids["path"], "nickname": ids["nick"]})},
                             at(0, 6)))
     for index, target in enumerate(followups):
         key = f"{ids['followup_call']}-{index}"
-        parent_rows += [("response_item", {"type": "function_call", "name": "followup_task", "namespace": "collaboration",
-                                           "arguments": json.dumps({"target": ids["child"] if target == "thread" else ids["path"],
-                                                                    "message": ids["followup"]}),
-                                           "call_id": key}, at(0, 7 + 2 * index)),
+        call = ({"name": "resume_agent", "namespace": "multi_agent_v1", "arguments": json.dumps({"id": ids["child"]})}
+                if target == "resume" else
+                {"name": "followup_task", "namespace": "collaboration",
+                 "arguments": json.dumps({"target": ids["child"] if target == "thread" else ids["path"],
+                                          "message": ids["followup"]})})
+        parent_rows += [("response_item", {"type": "function_call", **call, "call_id": key}, at(0, 7 + 2 * index)),
                         ("response_item", {"type": "function_call_output", "call_id": key, "output": "{}"},
                          at(0, 8 + 2 * index))]
+    if legacy_parent:
+        parent_rows.append(("event_msg", {"type": "item_completed", "item": {
+            "type": "SubAgentActivity", "id": ids["call"], "kind": "completed", "agent_thread_id": ids["child"],
+            "agent_path": ids["path"]}}, at(0, 29)))
     parent_rows.append(("event_msg", {"type": "task_complete", "turn_id": ids["turn"]}, at(0, 30)))
     spawn_role = {"agent_role": role} if role else {}
     child_meta = {"id": ids["child"], "source": {"subagent": {"thread_spawn": {
@@ -2107,10 +2117,13 @@ class CodexSpawnJoin(unittest.TestCase):
     (spawn.rs:253-299). fork_turns is a string at rust-v0.157.1, so a JSON integer fails the call there and yields no child;
     the frozen launch matrix writes `fork_turns: 2` (preregistration.json seed-binding-2), so a positive integer reads as
     last_n as well (the review). The child's route starts from the invoking step, then a spawn value or the [agents] default
-    applies, a model chosen without an effort takes that model's default effort, and a role file overrides both
-    (core/src/agent/child_config.rs:109-121, :196-253, :283-299): expected_route_basis is per field. Reroutes are not persisted
-    in rollouts (rollout/src/policy.rs:141-204). A resumed child is a followup_task whose target is the child's thread id or
-    task path (multi_agents_spec.rs:217-241). Join keys stay in memory; only states are published."""
+    applies (a spawn model or effort, else agent_default_subagent_model or _reasoning_effort, child_config.rs:204-206), a model
+    chosen without an effort takes the [agents] default effort, else that model's default effort (:229-238), and a role file
+    overrides both (core/src/agent/child_config.rs:109-121, :196-253, :283-299): expected_route_basis is per field. Reroutes are
+    not persisted in rollouts (rollout/src/policy.rs:141-204). A resumed child is a followup_task whose target is the child's
+    thread id or task path (multi_agents_spec.rs:217-241), or a V1 resume_agent with its id (:246-266). A legacy rollout
+    persists no started item (policy.rs:94-112), so its children read parent_without_started_item; a V1 spawn
+    (namespace multi_agent_v1) forks when fork_context is true (:607-613). Join keys stay in memory; only states are published."""
 
     CASES = {
         "c01": {"args": {"fork_turns": "2"}},                                      # C1
@@ -2134,6 +2147,9 @@ class CodexSpawnJoin(unittest.TestCase):
         "c19": {"other_parent": True},                                             # parent_mismatch
         "c20": {"args": {"agent_type": "stack-researcher"}, "role": "other-role"},  # a role mismatch
         "c21": {"role": "default"},                                                # a configured default role
+        "c22": {"legacy_parent": True},                                            # no started item persisted
+        "c23": {"namespace": "multi_agent_v1", "args": {"fork_context": False}, "start": False,
+                "followups": ("resume",)},                                          # a V1 spawn, resumed by id
     }
 
     @classmethod
@@ -2187,12 +2203,13 @@ class CodexSpawnJoin(unittest.TestCase):
     @pending("commit 5: spawn join and subagent_spawns")
     def test_join_states(self):
         expected = {**dict.fromkeys(self.CASES, "joined"), "c13": "parent_not_scanned",
-                    "c14": "activity_without_spawn_call", "c19": "parent_mismatch"}
+                    "c14": "activity_without_spawn_call", "c19": "parent_mismatch", "c22": "parent_without_started_item"}
         self.assertEqual({case: self.field(case, "join") for case in self.CASES}, expected)
         self.assertEqual({case: self.field(case, "reroute_evidence") for case in self.CASES},
                          dict.fromkeys(self.CASES, "not_persisted_in_rollout"))
         self.assertEqual(self.scan.get("subagent_spawns", {}).get("join"),
-                         {"joined": 18, "parent_not_scanned": 1, "activity_without_spawn_call": 1, "parent_mismatch": 1})
+                         {"joined": 19, "parent_not_scanned": 1, "activity_without_spawn_call": 1, "parent_mismatch": 1,
+                          "parent_without_started_item": 1})
 
     @pending("commit 5: spawn join and subagent_spawns")
     def test_requested_fork_turns_and_fork_consistency(self):
@@ -2216,7 +2233,8 @@ class CodexSpawnJoin(unittest.TestCase):
             "c01": (None, "(none)", "not_requested", parent_turn),
             "c09": ("stack-researcher", "stack-researcher", "match", role_file),
             "c10": (None, "(none)", "not_requested", {"model": "spawn_request", "effort": "spawn_request"}),
-            "c11": (None, "(none)", "not_requested", {"model": "spawn_request", "effort": "model_default"}),
+            # A model without an effort takes the [agents] default effort, else the model's (child_config.rs:204-206, :229-238).
+            "c11": (None, "(none)", "not_requested", {"model": "spawn_request", "effort": "agents_default_or_model_default"}),
             "c20": ("stack-researcher", "other-role", "mismatch", role_file),
             "c21": (None, "default", "not_requested", role_file)})
         self.assertEqual((self.field("c13", "requested", "role"), self.field("c13", "role_state")), ("unknown", "unknown"))
@@ -2249,6 +2267,93 @@ class CodexSpawnJoin(unittest.TestCase):
                for case in ("c16", "c17", "c18")}
         self.assertEqual(got, {"c16": (2, False, ["max"], 0), "c17": (2, True, ["high", "max"], 0),
                                "c18": (2, False, ["max"], 2)})
+
+    def test_legacy_parents_v1_spawns_and_unscanned_parents(self):
+        got = {case: (self.field(case, "join"), self.field(case, "requested", "fork_turns"), self.field(case, "effective", "history"),
+                      self.field(case, "fork_consistent"), self.field(case, "followups"))
+               for case in ("c13", "c19", "c22", "c23")}
+        self.assertEqual(got, {"c13": ("parent_not_scanned", "unknown", "forked", None, None),
+                               "c19": ("parent_mismatch", "unknown", "forked", None, None),
+                               "c22": ("parent_without_started_item", "unknown", "forked", None, 0),
+                               "c23": ("joined", "none", "fresh", True, 1)})
+
+    def test_subagent_spawns_count_each_state(self):
+        spawns = self.scan.get("subagent_spawns", {})
+        self.assertEqual(spawns.get("requested.fork_turns"),
+                         {"default_all": 11, "invalid": 2, "last_n": 2, "none": 4, "unknown": 4})
+        self.assertEqual(spawns.get("fork_consistent"), {"false": 1, "null": 6, "true": 16})
+        self.assertEqual(sum(spawns.get("reroute_evidence", {}).values()), len(self.CASES))
+
+    def test_fork_turns_follow_the_spawn_handler(self):
+        # SpawnAgentArgs.fork_turns (spawn.rs:265-299): trimmed with str::trim (Unicode White_Space, not Python's strip), absent,
+        # null or empty is all, none and all match ASCII case-insensitively, else usize::from_str (an optional '+' and ASCII
+        # digits, within u64) and nonzero. The review's integer form reads as a positive integer string would.
+        classify = getattr(S, "requested_fork_turns", None)
+        self.assertTrue(callable(classify))
+        cases = [(None, ("default_all", None)), ("", ("default_all", None)), (" 　", ("default_all", None)),
+                 ("all", ("all", None)), (" ALL ", ("all", None)), ("NoNe", ("none", None)), ("2", ("last_n", 2)),
+                 ("+2", ("last_n", 2)), (" 02　", ("last_n", 2)), (2, ("last_n", 2)),
+                 ("18446744073709551615", ("last_n", 18446744073709551615)), ("18446744073709551616", ("invalid", None)),
+                 ("0", ("invalid", None)), (0, ("invalid", None)), (-1, ("invalid", None)), ("-1", ("invalid", None)),
+                 ("2_000", ("invalid", None)), ("٣", ("invalid", None)), ("1e3", ("invalid", None)),
+                 ("\x1c2", ("invalid", None)), ("+", ("invalid", None)), ("resume", ("invalid", None)),
+                 (True, ("invalid", None)), (2.0, ("invalid", None)), (["2"], ("invalid", None)),
+                 ("Kll", ("invalid", None))]
+        self.assertEqual([(value, classify(value)) for value, _ in cases], cases)
+
+    def test_copied_spawn_records_stay_the_parents(self):
+        # A forked child copies its parent's history below subagent_history_start_ordinal: here an earlier spawn_agent call and
+        # the sibling's started item, the parent's turn context and its settings. They are the parent's records. The sibling
+        # joins the parent, never the forked child: with the parent outside the roots it reads parent_not_scanned, not
+        # parent_mismatch. The forked child's route, turns and settings are its own.
+        def rows(*records):
+            return [u3_row(kind, payload, f"2026-10-20T08:{i // 60:02d}:{i % 60:02d}Z", i) for i, (kind, payload) in enumerate(records)]
+        parent_meta = {"id": "thread-P-PRIV", "source": "exec", "history_mode": "paginated"}
+
+        def spawn(call, child, path, args):
+            return [("response_item", {"type": "function_call", "name": "spawn_agent", "namespace": "collaboration",
+                                       "call_id": call, "arguments": json.dumps({"message": "PRIV m", "task_name": path[6:], **args})}),
+                    ("event_msg", {"type": "item_completed", "item": {"type": "SubAgentActivity", "id": call, "kind": "started",
+                                                                      "agent_thread_id": child, "agent_path": path}}),
+                    ("response_item", {"type": "function_call_output", "call_id": call, "output": "{}"})]
+        parent = [("session_meta", parent_meta), ("response_item", developer(CATALOG)), ("event_msg", {"type": "task_started"}),
+                  ("turn_context", {"model": "gpt-6-sol", "effort": "low"}),
+                  ("event_msg", {"type": "thread_settings_applied", "thread_id": "thread-P-PRIV",
+                                 "thread_settings": {"model": "gpt-6-sol", "reasoning_effort": "low"}}),
+                  *spawn("call-A-PRIV", "thread-A-PRIV", "/root/PRIV_a", {"fork_turns": "none"}),
+                  *spawn("call-B-PRIV", "thread-B-PRIV", "/root/PRIV_b", {}), ("event_msg", {"type": "task_complete"})]
+
+        def child(thread, path, copied):
+            meta = {"id": thread, "source": {"subagent": {"thread_spawn": {"parent_thread_id": "thread-P-PRIV", "depth": 1,
+                                                                             "agent_path": path}}},
+                    "agent_path": path, "history_mode": "paginated", "multi_agent_version": "v2",
+                    **({"subagent_history_start_ordinal": len(copied) + 1} if copied else {})}
+            return rows(("session_meta", meta), *copied, ("response_item", developer(CATALOG)),
+                        ("event_msg", {"type": "thread_settings_applied", "thread_id": thread,
+                                       "thread_settings": {"model": "gpt-6-astra", "reasoning_effort": "max"}}),
+                        ("event_msg", {"type": "task_started"}), ("turn_context", {"model": "gpt-6-astra", "effort": "max"}),
+                        ("event_msg", {"type": "task_complete"}))
+        rollouts = {"rollout-2026-10-20T08-00-01-u3-copied-a.jsonl": child("thread-A-PRIV", "/root/PRIV_a", ()),
+                    # B forks after its own spawn call: it copies the parent's records up to that call, sibling A's included.
+                    "rollout-2026-10-20T08-00-02-u3-copied-b.jsonl": child("thread-B-PRIV", "/root/PRIV_b", parent[:9])}
+        tmp = Path(self.enterContext(tempfile.TemporaryDirectory()))
+
+        def scan(with_parent):
+            files = {**rollouts, **({"rollout-2026-10-20T08-00-00-u3-copied-p.jsonl": rows(*parent)} if with_parent else {})}
+            got = S.scan_codex_lanes([write_rollouts(tmp / str(with_parent), files)], load_fixture_manifest(),
+                                     since=self.since, until=self.until, marker=MARKER)
+            assert_id_free_report(self, got, ["PRIV", str(tmp)])
+            return [actor.get("spawn") or {} for actor in got["actors"] if actor["kind"] == "subagent"]
+        a, b = scan(True)
+        self.assertEqual((a.get("join"), a.get("requested", {}).get("fork_turns"), a.get("effective", {}).get("history"),
+                          a.get("fork_consistent")), ("joined", "none", "fresh", True))
+        self.assertEqual((b.get("join"), b.get("requested", {}).get("fork_turns"), b.get("fork_consistent")),
+                         ("joined", "default_all", True))
+        self.assertEqual(b.get("effective"), {"role": "(none)", "history": "forked", "turns": 1, "models": ["gpt-6-astra"],
+                                              "efforts": ["max"], "settings": {"model": "gpt-6-astra", "effort": "max"}})
+        self.assertEqual((b.get("route_changes_within_child"), b.get("route_vs_parent_turn")),
+                         (False, {"model": "mismatch", "effort": "mismatch"}))
+        self.assertEqual([spawn.get("join") for spawn in scan(False)], ["parent_not_scanned", "parent_not_scanned"])
 
 
 PAGINATED_META = u3_row("session_meta", {"id": "u3-session", "source": "exec", "history_mode": "paginated"})
