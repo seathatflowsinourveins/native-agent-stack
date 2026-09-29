@@ -121,6 +121,16 @@ first generated file with 48 findings, all false positives, so two fields of the
   value-pinned allowlist, with its test), then a one-line generator change; the ranking reads no pin, so the order does
   not change.
 
+**Sign-off.** The coordinator approved both deviations in the repair round (2026-09-29), for the reason above: each
+avoids a gitleaks false positive without a rule change.
+- The winner `pin` is dropped from placements. Every winner still reaches its pin through `matrix_record`, a pointer into
+  `catalogs/landscape/component-evidence-matrix.json`, and 66 of 66 resolve to the matrix entry with that component id
+  and its pin.
+- `decision_index.key` is renamed `decision_index.repository` (875 of 875 entities).
+
+For the same reason the repair round's `receipt_versions` counts versions and never repeats one, and the file holds no
+bare 40-hex id (test 30).
+
 ## Alternatives rejected
 
 - **A blended score** (for example the best-of-generator project score): it hides which behaviour a result rests on; the
@@ -193,6 +203,19 @@ Read 2026-09-29 during the design review; the quotations are the review's.
   `docs/decisions/2026-09-23-bot-pr-dispatch.md`).
 - This record is a new `docs/**/*.md` file, which the QMD `foundation-docs` collection indexes; merge it outside the Gate A
   window W or hold it until the window closes.
+- **Secret scan on a clean tree.** Run `gitleaks dir . --config .gitleaks.toml --max-target-megabytes 2 --redact
+  --no-banner` on a tree without `__pycache__` directories: remove them first, or run the tests with
+  `PYTHONDONTWRITEBYTECODE=1`. After the test suite has written bytecode, the ignored, untracked
+  `tests/__pycache__/test_omniroute_gateway_unit.cpython-313.pyc` holds a pre-existing `generic-api-key` false positive
+  whose source test this branch does not touch. The committed tree and the branch's history scan clean.
+- **Five-symbol rule and `scripts/freshness_propose.py`.** The repair round edits that module for the bot's index
+  regeneration. It already held two bare `register_file(...)` calls, which are Name-call sites of the Gate A oracle
+  (`main` lines 598 and 649). They are left as they were (now lines 608 and 680), so the oracle's set of sites does not
+  change, and no definition or bare call of the five symbols is added anywhere. The literal AST scan over the branch's
+  changed files therefore lists those two pre-existing sites. Converting them to attribute calls would remove two oracle
+  sites; that choice is left to the coordinator.
+- **No GPT-6 cross-family review ran** on this build or its repair round: Codex capacity is reserved for the Gate A
+  (#381) reviews until 2026-10-04. The independent review and verification were Claude sessions.
 - `domain-card/default-never-winner` counts 8, a figure the review had not verified: the reuse-first design reported 5
   (ntfy, grafana, context-mode, alertmanager, quantstats); the generator also flags
   open-telemetry/opentelemetry-collector, quantconnect/lean.brokerages.alpaca and the repository itself, each a

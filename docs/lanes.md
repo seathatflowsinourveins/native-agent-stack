@@ -33,7 +33,7 @@ Every path below was verified against `main` at `6d9a7a5`.
 - `catalogs/landscape/component-evidence-matrix.json`,
   `docs/component-evidence-matrix.md`,
   `catalogs/landscape/new-host-grand-list.json`,
-  `docs/new-host-grand-list.md` and
+  `docs/new-host-grand-list.md` and, added after `6d9a7a5`,
   `catalogs/landscape/catalog-index.json` are generated foundation reports.
   Either lane rewrites them, but only with their `--write` commands (see the
   [hot-file protocol](#hot-file-protocol)).
