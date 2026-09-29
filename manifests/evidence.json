@@ -39352,13 +39352,13 @@
     },
     {
       "path": "evidence/artifacts/token-tool-currency-20260927/METHOD.md",
-      "sha256": "eb4ea620ed4e0bc0e8bb549d28a1ac3ddf11a633b619d04b2e966316dfe2cdad",
-      "bytes": 10011
+      "sha256": "16d8b2e78deffeabc6e2900cb00514087a0a1746ee083924f6d0af659e1e89b1",
+      "bytes": 10339
     },
     {
       "path": "evidence/artifacts/token-tool-currency-20260927/README.md",
-      "sha256": "e4216c283764029e45f25ef21f9933535eacb1804fe3980225d97a0c08c78e14",
-      "bytes": 10631
+      "sha256": "c8788e1cab6336a13d55bd53e1a9aafde1a9f635697332e3f7b53fd2efb100b2",
+      "bytes": 10960
     },
     {
       "path": "evidence/artifacts/token-tool-currency-20260927/records/agentsview.json",
