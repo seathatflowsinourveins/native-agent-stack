@@ -71,8 +71,7 @@ EXTRACT_REQUEST = {
 }
 MODEL_NAMES = ("claude", "codex", "anthropic", "openai", "gpt-6-astra", "gpt-6", "opus", "sonnet", "haiku", "arm A0", "arm A",
                "arm B", "arm N", "arm T")
-ID_KEYS = ("identity", "workflow_dir", "session_dir", "tool_use_id", "transcript", "events_file", "thread_id",
-           "parent_thread_id", "parent_events_file", "session_id", "agent_id", "label")
+ID_KEYS = ev.IDENTIFIER_FIELDS  # the one closed list of identifier fields, shared with the canary (evidence.canary_values)
 
 
 def now_seconds():

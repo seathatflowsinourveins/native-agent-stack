@@ -3188,20 +3188,33 @@ def exit_status(aggregate):
     return 0 if ok else 1
 
 
+# The identity-row fields that hold an identifier or a locator of this run. Both the packet scrubber (judge.ID_KEYS) and the
+# canary read this one closed list: a value the scrubber removes is a value the canary checks. The row's other strings are
+# vocabulary (actor, arm, family, task, source), which appears in every report and identifies nothing.
+IDENTIFIER_FIELDS = ("identity", "workflow_dir", "session_dir", "tool_use_id", "transcript", "events_file", "thread_id",
+                     "parent_thread_id", "parent_events_file", "session_id", "agent_id", "label")
+LOCATOR_PATH_FIELDS = ("workflow_dir", "session_dir", "transcript", "events_file", "parent_events_file")
+
+
 def canary_values(bindings, table, records):
-    """R22: the identifier values the aggregate must never hold: the run token, every identity, label, id, path and root of
-    the inputs, the home directory and the user name."""
+    """R22: the identifier values the aggregate must never hold: the run token, every identity, label and id of the identity
+    table and the records (a path-like locator also by its last name), every input path and root, the home directory and
+    the user name. The row vocabulary (actor, arm, family, task) and the frozen instruction-file anchor lines are not
+    identifiers and are not gathered: a report that names an actor, or an answer that quotes a line of AGENTS.md, leaks
+    nothing, and gathering them refused every such output (in `judge packets` it refused the whole batch)."""
     values = {table.get("run", "")}
     for row in table.get("rows", []):
-        values.update(str(item) for item in row.values() if isinstance(item, str))
-        for name in ("events_file", "transcript", "workflow_dir", "session_dir"):
-            if isinstance(row.get(name), str):
-                values.add(os.path.basename(row[name]))
+        for name in IDENTIFIER_FIELDS:
+            item = row.get(name)
+            if isinstance(item, str) and item:
+                values.add(item)
+                if name in LOCATOR_PATH_FIELDS:
+                    values.add(os.path.basename(item.rstrip("/")))
     for record in records:
         values.update(str(record.get(name)) for name in ("identity", "agent_id") if record.get(name))
     roots = bindings.get("roots") or {}
     values.update(str(item) for item in roots.values() if isinstance(item, str))
-    values.update(str(item) for name in ("memory_index_roots", "instruction_anchors") for item in roots.get(name) or [])
+    values.update(str(item) for item in roots.get("memory_index_roots") or [])
     values.add(str(bindings.get("exec_checkout", "")))
     for arm in (bindings.get("arms") or {}).values():
         values.update(str(item) for item in (arm.get("worktree_paths") or {}).values())
