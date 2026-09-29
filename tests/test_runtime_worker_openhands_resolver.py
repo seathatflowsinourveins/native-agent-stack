@@ -2902,6 +2902,30 @@ class ResolverHostTests(unittest.TestCase):
             self.host.resolver_workspace_skills(workspace, path)
         self.assertEqual(str(caught.exception), "resolver_skill_set_mismatch")
 
+    def test_swebench_skill_contract_follows_the_runtime_manifest_exclusion(self):
+        # The runtime manifest (#429, bdf25d28) lists verification-before-completion under
+        # "excluded", and the plan's 2026-09-28 update keeps it out of every container skill
+        # set, so requiring it made every live `host.py prepare` stop at the skills stage.
+        stack = self.tmp / "stack"
+        manifest = stack / "blueprints/runtime-workers/skills/manifest.json"
+        workspace = self.tmp / "workspace"
+        texts = {"tdd": "tdd body\n", "search-first": "search body\n"}
+        for name, text in texts.items():
+            write_file(workspace, f".agents/skills/{name}/SKILL.md", text)
+        entries = [{"name": name, "skill_md_sha256": hashlib.sha256(text.encode()).hexdigest()}
+                   for name, text in texts.items()]
+        write_file(stack, "blueprints/runtime-workers/skills/manifest.json", json.dumps({"skills": entries}))
+        self.assertEqual(self.host.workspace_skills(stack, workspace)["names"], ["search-first", "tdd"])
+        runtime = json.loads((ROOT / "blueprints/runtime-workers/skills/manifest.json").read_text(encoding="utf-8"))
+        self.assertIn("verification-before-completion", [entry["name"] for entry in runtime["excluded"]])
+        for skills, in (([{"name": "search-first", "skill_md_sha256": entries[1]["skill_md_sha256"]}],),
+                        ([*entries, {"name": "verification-before-completion", "skill_md_sha256": "0" * 64}],)):
+            with self.subTest(names=[entry["name"] for entry in skills]):
+                manifest.write_text(json.dumps({"skills": skills}), encoding="utf-8")
+                with self.assertRaises(ValueError) as caught:
+                    self.host.workspace_skills(stack, workspace)
+                self.assertEqual(str(caught.exception), "runtime_skills_manifest_contract")
+
     def test_skill_installer_takes_the_resolver_manifest_through_the_same_path(self):
         workspace = self.tmp / "workspace"
         (workspace / ".git/info").mkdir(parents=True)

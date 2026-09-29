@@ -399,7 +399,11 @@ def workspace_skills(stack_root, workspace):
     entries = read_json(manifest)["skills"]
     installed = workspace / ".agents/skills"
     names = [entry["name"] for entry in entries]
-    if len(names) != len(set(names)) or not {"tdd", "verification-before-completion"} <= set(names):
+    # verification-before-completion is excluded: the runtime manifest lists it under
+    # "excluded" (#429, bdf25d28), and the resolver plan's 2026-09-28 update keeps it out
+    # of every container skill set. Requiring it stopped every live prepare here.
+    if (len(names) != len(set(names)) or "tdd" not in names
+            or "verification-before-completion" in names):
         raise ValueError("runtime_skills_manifest_contract")
     for entry in entries:
         path = installed / entry["name"] / "SKILL.md"
