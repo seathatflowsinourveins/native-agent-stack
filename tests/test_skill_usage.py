@@ -786,14 +786,6 @@ NO_HOOKS = {"inserted": 0, "with_marker": 0, "inherited": 0, "inherited_with_mar
 TOKENS = {"type": "token_count", "info": {"last_token_usage": {"input_tokens": 100}}}
 
 
-def pending(commit):
-    """A U3 failing-first test that a later design commit makes pass; that commit removes the marker. unittest reports an
-    unexpected success as a failure, so a marker cannot outlive its fix. The assertions read through .get() so that a
-    missing field fails as an assertion, not as an error that expectedFailure would also absorb."""
-    del commit  # documentation only: the design commit that lifts the marker
-    return unittest.expectedFailure
-
-
 def u3_row(kind, payload, at="2026-10-20T02:00:00Z", ordinal=None):
     row = {"timestamp": at, "type": kind, "payload": payload}
     if ordinal is not None:
@@ -2823,7 +2815,6 @@ class CodexCodeModeAttribution(unittest.TestCase):
         self.assertEqual({key: group.get(key) for key in ("exec_calls", "wait_calls", "nested_items", "unattributed_items")},
                          {"exec_calls": 2, "wait_calls": 0, "nested_items": 2, "unattributed_items": 0})
 
-    @pending("commit 8: legacy-mode spans")
     def test_a_legacy_exec_with_fetch_sites_and_no_items_is_unobservable(self):
         # F1 and its controls.
         four_sites = ("await tools.exec_command({cmd: 'a'}); await tools.exec_command({cmd: 'b'}); "
@@ -2847,7 +2838,6 @@ class CodexCodeModeAttribution(unittest.TestCase):
                          exec_output("call_priv_g"))
         self.assertEqual((got.get("code_mode", {}).get("legacy_unobservable_exec_calls"), got["m4"]["status"]), (0, "measured"))
 
-    @pending("commit 8: legacy-mode spans")
     def test_legacy_spans_make_the_actor_and_group_incomplete(self):
         # The retained isolated fixture is legacy (no history_mode) and its exec, with a tools.exec_command site, has no item
         # of its own; the retained worker's exec has twelve. The kernel's aggregate recomputes M4 status from counts, so the

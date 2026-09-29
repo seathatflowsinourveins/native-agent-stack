@@ -1102,7 +1102,92 @@ TURN_EVENTS = ("task_started", "turn_started", "task_complete", "turn_complete",
 # The code-mode wait tool, which resumes a running exec cell (code-mode-protocol/src/lib.rs:51-52, description.rs:44-51); the
 # multi-agent wait is wait_agent (core/src/tools/handlers/multi_agents_spec.rs:268-291).
 CODE_MODE_WAIT = "wait"
-CODE_MODE_COUNTERS = ("exec_calls", "wait_calls", "nested_items", "unattributed_items")
+CODE_MODE_COUNTERS = ("exec_calls", "wait_calls", "nested_items", "unattributed_items", "legacy_unobservable_exec_calls",
+                      "legacy_unobservable_sites", "outer_http_mentions", "outer_http_unverified_exec_calls")
+# PR-A 10e legacy-mode spans (U3 design section 7, commit 8): a legacy rollout persists no nested tool item
+# (rollout/src/policy.rs:94-112), so an exec there whose code can reach a fetch runs unobserved. The nested tools that can
+# fetch, by their code-mode identifiers (code-mode-protocol/src/description.rs:21 and normalize_code_mode_identifier, :365-387):
+# a shell command, the standalone web tool, and a Context Mode code or fetch tool of any MCP server.
+CODE_MODE_FETCH_TOOLS = ("exec_command", "web__run")
+CODE_MODE_CTX_TOOLS = ("ctx_execute", "ctx_execute_file", "ctx_batch_execute", "ctx_fetch_and_index")
+JS_NAME_CHARS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$")
+# The 10e outer-JS decision (2026-09-29; tools/skill-usage/README.md, "The outer exec code"). The clients whose code-mode isolate
+# was read at their tags: "Runs raw JavaScript -- no Node, no file system, no network access, no console." (code-mode-protocol/
+# src/description.rs:24 at rust-v0.157.1 36650394, :20 at rust-v0.155.1 be2951ea), and globals.rs:36-48 (byte-identical at
+# both tags) installs tools, ALL_TOOLS, clearTimeout, setTimeout, text, image, audio, generatedImage, store, load, notify,
+# yield_control and exit, no fetch. There, a network operation is a nested tool call and the outer code is never a fetch; a
+# rollout of any other client, or naming none, is the decision's overturn trigger.
+NO_NETWORK_ISOLATE_CLIENTS = ("0.155.1", "0.157.1")
+# The kernel's HTTP_SCRIPT detector (child-usage.mjs): \b(?:fetch\s*\(|(?:requests|httpx|urllib\.request|https?|axios)\s*\.\s*
+# (?:get|post|put|request|urlopen)\s*\(), read here as a linear scan.
+HTTP_WORD_CHARS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+HTTP_MODULES = ("requests", "httpx", "urllib.request", "https", "http", "axios")
+HTTP_METHODS = ("get", "post", "put", "request", "urlopen")
+
+
+def _skip_blanks(code: str, index: int) -> int:
+    while index < len(code) and code[index].isspace():
+        index += 1
+    return index
+
+
+def code_mode_fetch_sites(code: str) -> int:
+    """PR-A 10e: the static fetch-capable call sites in code-mode exec source. A site is the global `tools` (not part of a
+    longer name, not a property such as x.tools) followed by a dot (blanks and ?. allowed) and a CODE_MODE_FETCH_TOOLS name or
+    mcp__<server>__<CODE_MODE_CTX_TOOLS name>, or any bracket access tools[...], which can name any tool (conservative).
+    Strings and comments are not told apart, so a mention counts; an alias (const t = tools) or destructuring is not seen.
+    A linear scan."""
+    sites, index = 0, 0
+    while True:
+        index = code.find("tools", index)
+        if index < 0:
+            return sites
+        end = index + 5
+        if (index and (code[index - 1] in JS_NAME_CHARS or code[index - 1] == ".")) or (end < len(code) and code[end] in JS_NAME_CHARS):
+            index = end
+            continue
+        at = _skip_blanks(code, end)
+        if code.startswith("?.", at) or code.startswith(".", at):
+            at = _skip_blanks(code, at + (2 if code[at] == "?" else 1))
+        elif not code.startswith("[", at):
+            index = end
+            continue
+        if code.startswith("[", at):  # tools[...] or tools?.[...]
+            sites += 1
+            index = at + 1
+            continue
+        stop = at
+        while stop < len(code) and code[stop] in JS_NAME_CHARS:
+            stop += 1
+        name = code[at:stop]
+        server, _, tool = name[5:].rpartition("__") if name.startswith("mcp__") else ("", "", "")
+        sites += name in CODE_MODE_FETCH_TOOLS or bool(server) and tool in CODE_MODE_CTX_TOOLS
+        index = max(stop, end)
+
+
+def http_script_mentions(code: str) -> int:
+    """The raw matches of the kernel's HTTP_SCRIPT detector in code (HTTP_WORD_CHARS as the \\b word characters): fetch(,
+    and requests, httpx, urllib.request, https, http or axios . get, post, put, request or urlopen (, with blanks around the
+    dot and before the parenthesis. A linear scan over word starts."""
+    mentions = 0
+    for index, char in enumerate(code):
+        if char not in HTTP_WORD_CHARS or (index and code[index - 1] in HTTP_WORD_CHARS):
+            continue
+        if code.startswith("fetch", index):
+            at = _skip_blanks(code, index + 5)
+            mentions += code.startswith("(", at)
+            continue
+        module = next((name for name in HTTP_MODULES if code.startswith(name, index)), None)
+        if module is None:
+            continue
+        at = _skip_blanks(code, index + len(module))
+        if not code.startswith(".", at):
+            continue
+        at = _skip_blanks(code, at + 1)
+        method = next((name for name in HTTP_METHODS if code.startswith(name, at)), None)
+        if method is not None:
+            mentions += code.startswith("(", _skip_blanks(code, at + len(method)))
+    return mentions
 
 
 def codex_call_name(payload: dict) -> str:
@@ -1172,6 +1257,15 @@ def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
     return json.loads(result.stdout)
 
 
+def m4_unread(commands: dict, code_mode: dict) -> bool:
+    """Whether fetches may have run where they cannot be read, so M4 is incomplete for the actor or group (the U3 review):
+    an unresolved command (codex_commands non_posix_shell, unknown_shell), a legacy unobservable exec span, or an outer
+    HTTP_SCRIPT mention in a code-mode isolate that was not read. The kernel's aggregate recomputes M4 status from its
+    counts, so a group applies this again to its sums."""
+    return bool(commands["non_posix_shell"] + commands["unknown_shell"] + code_mode["legacy_unobservable_exec_calls"]
+                + code_mode["outer_http_unverified_exec_calls"])
+
+
 def measure_codex_records(records, *, since=None, until=None, rtk_check=False, exceptions=None,
                           marker=DEFAULT_LANES_MARKER):
     """Local transcript measurement, not a provider run. Parent copies establish the
@@ -1184,10 +1278,18 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     (inserted, with_marker) in the window of their own record, and items copied from the parent (inherited,
     inherited_with_marker) once, in the window of the child's first own record, so adjacent windows add up (a window
     that holds only copied records is not measured at all). The kernel's hook_context counts Claude hook attachments only.
+
+    code_mode (PR-A 10e) reads the first session_meta: a history_mode other than paginated, or none (the upstream default,
+    protocol/src/protocol.rs:772-779), or no session_meta at all, is legacy, and a cli_version outside
+    NO_NETWORK_ISOLATE_CLIENTS, or none, is a client whose code-mode isolate was not read.
     """
     start = next((r.get("payload", {}).get("subagent_history_start_ordinal") for r in records
                   if r.get("type") == "session_meta"), None)
     child = isinstance(start, int) and not isinstance(start, bool)
+    meta = next((r.get("payload") for r in records if r.get("type") == "session_meta"), None)
+    meta = meta if isinstance(meta, dict) else {}
+    paginated = meta.get("history_mode") == "paginated"
+    isolate_read = isinstance(meta.get("cli_version"), str) and meta["cli_version"] in NO_NETWORK_ISOLATE_CLIENTS
     normalized, visible, visible_at = [], [], []
     previous = None if child else dict.fromkeys(CODEX_COUNTERS, 0)
     totals = dict.fromkeys(CODEX_COUNTERS, 0)
@@ -1348,16 +1450,24 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     # with no model call id counts in code_mode.unattributed_items. A wait call without a namespace after an exec of its turn
     # is code mode, since its output is the cell's. Direct response IDs win. code_mode counts a call or an item once, at its
     # first record inside [since, until), as codex_commands does, so adjacent windows add up.
+    # Commit 8: an exec counted here, in a rollout that is not paginated, whose code has a static fetch-capable site
+    # (code_mode_fetch_sites) and to which no nested item is attributed (an item nested after it and before the next exec
+    # call or the turn's end) is an unobservable span; the outer code is never a fetch where the isolate was read
+    # (NO_NETWORK_ISOLATE_CLIENTS), so its HTTP_SCRIPT mentions are only counted, and elsewhere they make M4 incomplete.
     code_mode_counts = dict.fromkeys(CODE_MODE_COUNTERS, 0)
     code_mode_seen = set()
+    legacy_sites, items_of = {}, {}  # counted legacy exec -> its sites; exec -> its attributed nested items
 
-    def count_code_mode(at, key, counter):
-        if key not in code_mode_seen:
-            code_mode_seen.add(key)
-            if since is None or at >= since:
-                code_mode_counts[counter] += 1
+    def count_code_mode(at, key, counter) -> bool:
+        if key in code_mode_seen:
+            return False
+        code_mode_seen.add(key)
+        if since is not None and at < since:
+            return False
+        code_mode_counts[counter] += 1
+        return True
 
-    turn_exec = False  # an own exec call came earlier in the current turn
+    turn_exec = None  # the latest own exec call of the current turn
     for index, r in enumerate(visible):
         p = r.get("payload") or {}
         at = visible_at[index]
@@ -1366,12 +1476,19 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
             if kind in ("function_call", "custom_tool_call"):
                 name = codex_call_name(p)
                 exec_call = kind == "custom_tool_call" and name.rsplit(".", 1)[-1] == "exec"
-                wait_call = (kind == "function_call" and turn_exec and p.get("name") == CODE_MODE_WAIT
+                wait_call = (kind == "function_call" and turn_exec is not None and p.get("name") == CODE_MODE_WAIT
                              and not p.get("namespace"))
                 if exec_call:
-                    turn_exec = True
-                if exec_call or wait_call:
-                    count_code_mode(at, ("call", key), "exec_calls" if exec_call else "wait_calls")
+                    turn_exec = key
+                    if count_code_mode(at, ("call", key), "exec_calls"):
+                        code = p.get("input") if isinstance(p.get("input"), str) else ""
+                        mentions = http_script_mentions(code)
+                        code_mode_counts["outer_http_mentions"] += mentions
+                        code_mode_counts["outer_http_unverified_exec_calls"] += bool(mentions) and not isolate_read
+                        if not paginated:
+                            legacy_sites[key] = code_mode_fetch_sites(code)
+                elif wait_call:
+                    count_code_mode(at, ("call", key), "wait_calls")
                 inputs = arguments(p.get("arguments")) if kind == "function_call" else {"code": p.get("input", "")}
                 use(r, at, key, name, inputs, code_mode=exec_call or wait_call)
             elif kind == "local_shell_call":
@@ -1384,7 +1501,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
             key = item.get("id", f"missing-{index}")
             kind = item.get("type")
             direct = key in model_call_ids
-            sandbox = turn_exec and not direct
+            sandbox = turn_exec is not None and not direct
             # Only an emitted item (a tool_use below) without a model call id is nested or unattributed (the review's item kinds).
             attributed = None if direct else "nested_items" if sandbox else "unattributed_items"
             output, has_output, used = None, False, False
@@ -1415,13 +1532,19 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                 used = True
             if used and attributed:
                 count_code_mode(at, ("item", key), attributed)
+                if sandbox:
+                    items_of[turn_exec] = items_of.get(turn_exec, 0) + 1
             if has_output and key not in output_ids:
                 status = item.get("status")
                 emit(r, {"type": "tool_result", "tool_use_id": key, "content": output,
                          "is_error": status in ("failed", "declined"),
                          **({"native_state": "declined"} if status == "declined" else {})}, "user")
         elif r.get("type") == "event_msg" and p.get("type") in TURN_EVENTS:
-            turn_exec = False
+            turn_exec = None
+    for key, sites in legacy_sites.items():
+        if sites and not items_of.get(key):
+            code_mode_counts["legacy_unobservable_exec_calls"] += 1
+            code_mode_counts["legacy_unobservable_sites"] += sites
     window = {"since": since.timestamp() * 1000 if since else -8640000000000000,
               "until": until.timestamp() * 1000 if until else 8640000000000000}
     measured = _measurement_bridge({"rows": normalized, "options": {
@@ -1430,14 +1553,15 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     measured.pop("usage", None)
     unresolved = commands["non_posix_shell"] + commands["unknown_shell"]
     if unresolved:
-        # An unresolved command's fetches cannot be read, so M4 cannot be measured or not_applicable (the U3 review), and
-        # replay read its text '' (rtk 0.50.0 answers "No rewrite for:": no parts), so each is an explicit unknown call.
-        measured["m4"]["status"] = "incomplete"
+        # An unresolved command's fetches cannot be read, so M4 cannot be measured or not_applicable (the U3 review; m4_unread
+        # below), and replay read its text '' (rtk 0.50.0 answers "No rewrite for:": no parts), so each is an explicit unknown call.
         if measured["rtk_parts"]["status"] in ("measured", "incomplete"):
             measured["rtk_parts"]["unknown_calls"] += unresolved
             measured["rtk_parts"]["status"] = "incomplete"
     measured["codex_commands"] = commands
     measured["code_mode"] = code_mode_counts
+    if m4_unread(commands, code_mode_counts):
+        measured["m4"]["status"] = "incomplete"
     if first_own_at is None or (since is not None and first_own_at < since):
         hooks["inherited"] = hooks["inherited_with_marker"] = 0  # copied items count in the window of the first own record
     measured["codex_hook_context"] = hooks
@@ -1752,7 +1876,7 @@ def aggregate_codex_lanes(sessions: list[dict]) -> dict:
         commands = {key: sum(m["codex_commands"][key] for m in measurements) for key in CODEX_COMMAND_STATES}
         out["measurement"]["codex_commands"] = commands
         out["measurement"]["code_mode"] = {key: sum(m["code_mode"][key] for m in measurements) for key in CODE_MODE_COUNTERS}
-        if commands["non_posix_shell"] + commands["unknown_shell"]:
+        if m4_unread(commands, out["measurement"]["code_mode"]):
             out["measurement"]["m4"]["status"] = "incomplete"  # aggregateMeasurements recomputes it from the counts
     return out
 
@@ -1954,6 +2078,12 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
             " call id (a hosted web_search_call included) is nested when an own exec call came earlier in its turn, else direct"
             " and counted in measurement.code_mode.unattributed_items; a wait call without a namespace after an exec of its"
             " turn is code mode; concurrent cells are not told apart."
+            + " A rollout that is not paginated (no history_mode is legacy) persists no nested item, so an exec there with a"
+            " static fetch-capable tools site and no nested item attributed to it is an unobservable span"
+            " (code_mode.legacy_unobservable_exec_calls, _sites) and M4 is incomplete. The outer exec code is never a fetch"
+            " where the code-mode isolate was read to have no network access (cli_version 0.155.1, 0.157.1): its HTTP_SCRIPT"
+            " mentions are only counted (code_mode.outer_http_mentions); for any other client an exec with one makes M4"
+            " incomplete (code_mode.outer_http_unverified_exec_calls)."
             + " actors[].spawn and subagent_spawns publish sub-agent spawn states only: the join of a child to its parent's"
             " SubAgentActivity started item and spawn_agent call runs in memory, the route is client-side (turn contexts and"
             " ThreadSettingsApplied), and provider reroutes are not persisted in rollouts."}

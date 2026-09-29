@@ -365,6 +365,66 @@ boundary. On this host's store 271 items moved from direct to nested and 352 `wa
 which changes `sandbox_operations`, M3 `by_carrier`, the M4 `shell_fetch`/`ctx_sandbox_fetch` split and
 U1's `proxy.nested` and `cli_lanes` carrier `nested`.
 
+Legacy history mode persists no nested tool item
+([policy.rs:94-112](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L94-L112)),
+and a `SessionMeta` without `history_mode` is legacy
+([protocol.rs:772-779](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L772-L779)).
+Rows with no `session_meta`, or with a `history_mode` other than `paginated`, are read the same way (U3 design
+section 7, commit 8, with the review's per-exec finding):
+
+- An `exec` call is an unobservable span when its code has a static fetch-capable site and no nested item
+  is attributed to it (an emitted item after it and before the next `exec` call or the end of its turn).
+  `code_mode.legacy_unobservable_exec_calls` counts it once, in the window of its call record;
+  `legacy_unobservable_sites` counts its sites. Either makes `m4.status` incomplete for the actor and its
+  groups. `fetch_mentions_unconfirmed` keeps its raw-detector meaning.
+- A site is the global `tools` (not a longer name, not a property such as `x.tools`) followed by a dot
+  (blanks and `?.` allowed) and `exec_command`, `web__run`, or `mcp__<server>__` plus `ctx_execute`,
+  `ctx_execute_file`, `ctx_batch_execute` or `ctx_fetch_and_index`, the code-mode identifiers of
+  [description.rs:21 and :365-387](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/code-mode-protocol/src/description.rs#L365-L387).
+  Any bracket access `tools[...]` also counts, since it can name any tool. Strings and comments are not
+  told apart, and an alias (`const t = tools`) or destructuring is not seen. The scan is linear.
+- This host's store is paginated throughout, so the rule changes nothing there.
+
+#### The outer exec code (the 10e decision, 2026-09-29)
+
+Scope item 10e left one piece open: AA:328's rule that `fetch()` or an HTTP library in a script counts as
+unknown, applied to the JavaScript of a code-mode `exec` call itself (the U3 review's outer-JS finding).
+
+- **Evidence.** At both client versions in this host's store, the code-mode isolate has no network access.
+  `code-mode-protocol/src/description.rs` says "Runs raw JavaScript -- no Node, no file system, no network
+  access, no console." (line 24 at rust-v0.157.1, 36650394; line 20 at rust-v0.155.1, be2951ea). And
+  `code-mode-runtime/src/runtime/globals.rs:36-48`, byte-identical at both tags, installs only `tools`,
+  `ALL_TOOLS`, `clearTimeout`, `setTimeout`, `text`, `image`, `audio`, `generatedImage`, `store`,
+  `load`, `notify`, `yield_control` and `exit`: no `fetch`, and V8 has none of its own. A cell's network
+  operation is therefore a nested tool call, which a paginated rollout persists as an item, and the
+  frozen M4 population is remote fetches
+  ([#381 M4](../../evidence/artifacts/token-adoption-e2e-20260926/preregistration.json#L2921-L2930)).
+- **Chosen.** Where the isolate was read (`NO_NETWORK_ISOLATE_CLIENTS`: 0.155.1 and 0.157.1, from
+  `session_meta.cli_version`), the outer code is never a fetch. Its mentions of the kernel's
+  `HTTP_SCRIPT` pattern are only counted, in `code_mode.outer_http_mentions`. For any other client,
+  or a rollout naming none, an `exec` with a mention counts in
+  `code_mode.outer_http_unverified_exec_calls` and makes `m4.status` incomplete for the actor and its
+  groups; the fetch counts keep their meaning.
+- **Alternatives.**
+  - (a) The review's fallback: count each outer mention that no nested item explains as unclassifiable.
+    Rejected where the isolate was read, because the mention cannot fetch and would put a non-fetch in
+    M4's denominator. It would also need a persisted parent field to say which item explains it, and
+    none exists (commit 7).
+  - (b) The design's plan: scan nothing and record nothing. Rejected, because it hides the residual and
+    is not limited to the versions that were read.
+- **Residual on this host.** A count-only census up to 2026-09-29T00:00Z found 1,532 mentions in 1,091
+  of 16,410 exec calls. Of these, 51 mentions in 33 calls have no nested Context Mode code item after
+  them; most mentions are the code string handed to a nested ctx tool, which the kernel scans itself.
+  All 1,620 rollouts name 0.155.1 (277) or 0.157.1 (1,343).
+- **Overturn.** Any of these reopens the decision:
+  - a pinned client whose description drops "no network access", or whose globals gain a
+    network-capable function;
+  - a rollout from a client that was not read (checked by the measurement itself, as above);
+  - the PR-A owner's rejection, in which case alternative (a) applies.
+- **Record.** `docs/decisions/` is outside this unit's paths, so the PR-A owner accepts or rejects this
+  text. The census script and its counts are in
+  [pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md).
+
 `--rtk-check` uses the same Linux gate as the Claude tool: a binary on PATH
 self-reporting `rtk 0.50.0` that passes the isolated five-exclusion probe.
 This checks behavior, not build identity or the qualification receipt's hash.
