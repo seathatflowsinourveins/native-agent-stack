@@ -3466,8 +3466,8 @@
   "files": [
     {
       "path": ".claude/settings.json",
-      "sha256": "e433126c44fcb687ec6fec7d6c2a6a568af645f7a99331a048cc7208333be28e",
-      "bytes": 2778
+      "sha256": "6a6aebbd563c3e012077a0adafa6f711813b2cedfd5d31bc8a7f742256ffb867",
+      "bytes": 2858
     },
     {
       "path": ".gitattributes",
@@ -3886,8 +3886,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "25568fe9a02fbebd8618bd5d353f04a511d24856565ca83602c4d9f0d3fa06c2",
-      "bytes": 11012
+      "sha256": "e3f5dce49a83d93f07f13370dc35cd8245d2c629155cb511ba4875ff5cd9b6e7",
+      "bytes": 11039
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -13632,8 +13632,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "0daad888d852dc86b479e8253dcd7bcde6bad937542607860eddc7420be08661",
-      "bytes": 139755
+      "sha256": "755e9d1e85f8abca24355a8a3cc31421e00f434f140157ced62d12a435394db7",
+      "bytes": 139753
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -13797,8 +13797,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "6c94bd6d4eaefeab854b76f715dba5b7efdb13678a950ebf740a4e66a1e13312",
-      "bytes": 16994
+      "sha256": "057ff7c549fcaf527d86e4131e97babbc243179b383c1b96b125454fbf6bfa41",
+      "bytes": 17353
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -14041,6 +14041,11 @@
       "bytes": 86033
     },
     {
+      "path": "catalogs/us-equities/research-20260928-movers.md",
+      "sha256": "d97b17683f4d061958d9da306898212511f5889a0e6d52d2af5a500f11a5dcab",
+      "bytes": 14870
+    },
+    {
       "path": "catalogs/us-equities/research-receipt.json",
       "sha256": "c3db6928bdcea3d57eefd859d01cabfd6e30a4f7f5096c076b929418b9624c00",
       "bytes": 11827
@@ -14272,8 +14277,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
-      "sha256": "fc8fcb14204d10b459d0cbbeafcb7c89a3e07e5b89b1e3a9ebbeead982c1d3e8",
-      "bytes": 46043
+      "sha256": "b939e5ab75888ead18804c529841e106ee10ae22b31af2d7229643a02f052985",
+      "bytes": 46286
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
@@ -14331,6 +14336,11 @@
       "bytes": 7782
     },
     {
+      "path": "docs/decisions/2026-09-27-model-currency.md",
+      "sha256": "087cf368a4d97719a63433ddcbc87e7f24d7b5bba3b51df92c0d4b8438ab19d7",
+      "bytes": 40927
+    },
+    {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
       "sha256": "0614dd48d7d90bf7ea10036f77913ab903664cbac5cebe732283397787a3b9ad",
       "bytes": 41432
@@ -14362,8 +14372,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "6cf9d24e64af05bce2d5f035a0359cf75f5df86289fe69f805a4be203592c5b1",
-      "bytes": 27597
+      "sha256": "595a9dbc924cb6c5747f270c50f2b1de716825e904c2da2933da76f284da7d23",
+      "bytes": 30495
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -41387,8 +41397,8 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "42e3087a50fc464be293f3ec7695b4780fa45ede696037819ea335cfa196d2a3",
-      "bytes": 284
+      "sha256": "437c91a3ce30fb83918466e4e097aa4a0068b0d3562fb34c2e7eb62d9186ad43",
+      "bytes": 364
     },
     {
       "path": "examples/claude-native/workflows/README.md",
@@ -41917,8 +41927,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "d3e458a09a609111d8278ee9e5e49840c357385a5ee7e4f915b27a7556824a9f",
-      "bytes": 34253
+      "sha256": "59b3bda2003bab3320d26c049c7b6ea45ea77b3f53d8f5028ab0dcfd6b24688d",
+      "bytes": 34964
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -42552,8 +42562,8 @@
     },
     {
       "path": "tests/test_foundation_catalog.py",
-      "sha256": "e89631495b52c7ee0c3a1387c4dac315a4d1d75f26850f4951b3c632fb26a6be",
-      "bytes": 11791
+      "sha256": "4a099466241a5d124c814c59fc018c487a4f5714cc87b10231062c5f4f11c5af",
+      "bytes": 13781
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -42632,8 +42642,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "e4fff38dd980eee8c2ae969cf74a51d7f9f696246e31b298b2d352ec34cc8bfa",
-      "bytes": 58381
+      "sha256": "073d333816c0595219eaa37965eeb4e4fbd23fe4a789a8302387fa8940cb7ea0",
+      "bytes": 62207
     },
     {
       "path": "tests/test_install_skills.py",
@@ -42667,8 +42677,8 @@
     },
     {
       "path": "tests/test_lane_packets.py",
-      "sha256": "940485c85045360783b344debc7bc92caf74ea203c739108a3b0a2800174011b",
-      "bytes": 98784
+      "sha256": "f1e74add4e93c382c46e9df426d40a084fa327ebdbbda6873bb03740a42ce4cf",
+      "bytes": 111632
     },
     {
       "path": "tests/test_layer_verdicts.py",
@@ -43217,8 +43227,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "44c3a359f42f42e9a790e9f900185a9f3475a7a295d86c3416b426f9131781f6",
-      "bytes": 177541
+      "sha256": "4c2829824cf704311f850963852f78faadd6a4aba4d40c073990b0f1607502cc",
+      "bytes": 178260
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
