@@ -28,6 +28,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import tomllib
 import shlex
 import unittest
@@ -687,27 +688,40 @@ class InteractiveEffortLauncherTests(unittest.TestCase):
         master, slave = pty.openpty()
         opened = [master, slave]
         proc = None
-        text = ""
+        text = stderr = ""
         try:
             proc = subprocess.Popen(
                 [str(launcher), *argv],
                 stdin=slave if stdin_tty else subprocess.DEVNULL,
                 stdout=slave if stdout_tty else subprocess.PIPE,
-                stderr=subprocess.DEVNULL, env=env, close_fds=True)
-            os.close(slave)  # the child holds its own copy, so reading the master ends when the child is done
-            opened.remove(slave)
-            piped, _ = proc.communicate(timeout=30)
+                stderr=subprocess.PIPE, env=env, close_fds=True)
+            # The parent keeps its own slave descriptor until the child is gone and the master is read: macOS discards a
+            # terminal's unread output when the last slave descriptor closes (apple-oss-distributions/xnu, bsd/kern/tty_dev.c
+            # ptsclose calls ttyclose, whose ttyflush(tp, FREAD | FWRITE) empties both queues), so closing it early lost the
+            # stub's lines on the macOS runner while Linux keeps them. With the slave held open the master never reports end
+            # of file, so the read stops once the stub's two lines are in, or once the child has exited and nothing more arrives.
             if stdout_tty:
-                while select.select([master], [], [], 5)[0]:
-                    try:
-                        chunk = os.read(master, 65536)
-                    except OSError:  # EIO: the terminal's other side closed after the last write
-                        break
-                    if not chunk:
-                        break
-                    text += chunk.decode()
+                deadline = time.monotonic() + 30
+                quiet = 0
+                while text.count("\n") < 2 and quiet < 2:
+                    if select.select([master], [], [], 0.05)[0]:
+                        try:
+                            chunk = os.read(master, 65536)
+                        except OSError:
+                            break
+                        if not chunk:
+                            break
+                        text += chunk.decode()
+                        quiet = 0
+                    elif proc.poll() is not None:
+                        quiet += 1
+                    elif time.monotonic() > deadline:
+                        self.fail("the launcher did not finish within 30 seconds")
+                _, err = proc.communicate(timeout=30)
             else:
-                text = piped.decode()
+                out, err = proc.communicate(timeout=30)
+                text = out.decode()
+            stderr = err.decode(errors="replace")
         finally:
             if proc is not None and proc.poll() is None:
                 proc.kill()
@@ -715,7 +729,7 @@ class InteractiveEffortLauncherTests(unittest.TestCase):
             for fd in opened:
                 os.close(fd)
         lines = [line.rstrip("\r") for line in text.splitlines()]
-        self.assertIn("RAN", lines, f"the stub client did not run: {text!r}")
+        self.assertIn("RAN", lines, f"the stub client did not run: {text!r} (stderr {stderr[:300]!r})")
         return json.loads(lines[lines.index("RAN") + 1])
 
     def outcomes(self, launcher: Path, home: Path) -> dict:
