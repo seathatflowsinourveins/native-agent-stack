@@ -15,9 +15,13 @@ no subcommand that prints, lists or returns a value, and there never will be.
 
 Masking is accident-proofing, not a boundary: a command that transforms a value (reverses it, encrypts it, prints a
 fragment such as its first eight characters) or writes it to a file or a log defeats it, and stdout and stderr are
-masked separately. Exit status: the command's own; 128+N when it died of signal N; 2 for a usage error; 1 for a
+masked separately. Core dumps are off (RLIMIT_CORE 0); a host whose core_pattern hands dumps to a collector (a
+leading | or @), which sets that limit aside, is refused, with no override. Output goes through non-blocking
+descriptors and a bounded queue, so a consumer that stops reading cannot hold the runner past a shutdown signal or
+the drain deadline. Exit status: the command's own; 128+N when it died of signal N; 2 for a usage error; 1 for a
 refusal; 126 or 127 when it cannot start. Messages carry the id, variable names, line numbers and reason codes,
-never a value, a store line or a path (docs/secret-storage.md#using-a-key).
+never a value, a store line or a path (docs/secret-storage.md#using-a-key). The runner is available, not yet the
+default path: the command guard does not read its command (phase 2 of the same change series).
 
 Built from these references (observed 2026-09-29): the env-only exec discipline of scripts/kernel_keyring.py; the
 load_env_file grammar of blueprints/us-equities/pit-availability/measure.py:51-67 with set_credential.py's value
@@ -27,7 +31,8 @@ shifted alignments L16-39 and L146-159, JSON escape L52-58, URI data escape L60-
 overlaps L255-279); buildkite/agent@3345ee60 internal/redact/redact.go (LengthMin 6, L20-25) and
 internal/replacer/replacer.go (buffer, merge, never spill a partial match, L99-115); dmno-dev/varlock@1b880652
 packages/varlock/src/runtime/lib/redact-stream.ts (100 ms idle flush, L8 and L34-46); Generalized-Labs/ironrun@b611c7ce
-internal/redact/encodings.go (hex and upper- and lower-case percent forms, L13-21).
+internal/redact/encodings.go (hex and upper- and lower-case percent forms, L13-21); torvalds/linux@v6.16
+fs/coredump.c and systemd/systemd@v257 src/coredump/coredump.c (check_core_pattern below).
 """
 from __future__ import annotations
 
