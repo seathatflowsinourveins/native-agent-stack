@@ -1,7 +1,7 @@
 """Run the whole differential and write counts.json (numbers only).
 
     python3 run-differential.py --repo <checkout> --old <0c421c66 child-usage.mjs> --pre-ast <f1ed98ac child-usage.mjs> \
-        --work <private scratch directory> [--real <real-commands.json>] [--covering NAME=PATH ...]
+        --work <private scratch directory> [--real <real-commands.json> [--real-until <instant>]] [--covering NAME=PATH ...]
 
 --old is the scanner reading the AST reading replaced (`git show 0c421c66:examples/claude-native/workflows/child-usage.mjs`, sha256
 acc7bb51...), --pre-ast the kernel before the AST walker (f1ed98ac, sha256 1dcf6ff9...: its M4 helpers are the ones kept). Neither is
@@ -26,6 +26,7 @@ parser.add_argument("--old", required=True)
 parser.add_argument("--pre-ast", required=True)
 parser.add_argument("--work", required=True)
 parser.add_argument("--real")
+parser.add_argument("--real-until", help="the --until instant real-commands.mjs was run with (recorded in counts.json with the size of the corpus, so the corpus can be rebuilt; see the header of real-commands.mjs when it is reconstructed)")
 parser.add_argument("--pre-repair-kernel", help="the kernel before this stage's repairs (2bad7320 child-usage.mjs): the oracle's generators run against it too")
 parser.add_argument("--marks-before", help="child-usage.mjs of 11d7e0bd (before the marks collector): with --marks-after, re-runs the executedText/fetchKind identity check of commit 9a4e9f97")
 parser.add_argument("--marks-after", help="child-usage.mjs of 9a4e9f97")
@@ -157,7 +158,8 @@ counts["oracle_committed"] = {**committed, "unittest_exit": done.returncode}
 
 # 5. shapes, timing and states of the real commands
 if args.real:
-    counts["shapes"] = json.loads(node("shape-counts.mjs", "--kernel", new_kernel, "--inputs", args.real))
+    counts["corpus"] = {"source": "real-commands.mjs", "until": args.real_until, "distinct_shell_texts": len(json.loads(Path(args.real).read_text()))}
+    counts["shapes"] = json.loads(node("shape-counts.mjs", "--kernel", new_kernel, "--inputs", args.real, "--scanner", args.old))
     counts["timing"] = json.loads(node("timing.mjs", "--kernel", new_kernel, "--inputs", args.real))
 counts["states"] = json.loads(node("states-count.mjs"))
 

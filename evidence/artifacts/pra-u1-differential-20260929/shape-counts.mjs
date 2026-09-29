@@ -1,9 +1,23 @@
 // Count-only scan of a corpus of shell texts for the shapes the command-position reading has to know about. Prints numbers only.
 //
-//   node shape-counts.mjs --kernel <kernel.mjs> --inputs <inputs.json>
+//   node shape-counts.mjs --kernel <kernel.mjs> --inputs <inputs.json> [--scanner <old-kernel.mjs>]
 //
 // The inputs are a JSON array of shell texts (the differential's real-command corpus). Every count is the number of texts (commands) with
-// the shape, not of occurrences. `lane word` means a whole word equal to a lane executable's name (its basename), anywhere in the text.
+// the shape, not of occurrences. `lane word` means a whole word equal to a lane executable's name (its basename), anywhere in the text: it
+// needs no parser, so it also finds a lane the reading cannot see. --scanner names the scanner reading of commit 0c421c66 (no parser
+// needed), a second and independent opinion on which lanes a text holds.
+//
+// The first overturn condition of docs/decisions/2026-09-29-shell-command-parser.md ("a grammar limit that loses or invents a lane
+// call in 0.1% or more of the lane-bearing commands") is evaluated in `overturn_1`. A grammar limit is a parse error the reading met
+// (`parse_errors`, after its own heredoc repairs) or a heredoc the grammar ended early. A lane call can be lost only where the reading
+// does not look, and invented only where it reads text the grammar structured wrongly, so a limit command counts toward the upper
+// bound when: a lane word lies inside an ERROR node (the subtree the reading skips; the node is taken from the tree of the text as
+// given, before the reading's repairs), or it is a heredoc ended early with a lane word, or its only error is in a script the reading
+// read again (a shell string) and it holds a lane word (the word cannot be placed), or the reading reads a lane in it (the lane
+// of a tree with an error could be invented). `lane_bearing` is the number of commands in which the reading reads a lane invocation,
+// the smaller and so the stricter denominator; `lane_bearing_upper` adds the commands with only a lane word. The bound is an upper
+// bound of what the reading loses or invents, from the tree's own limits: a silent misparse (no ERROR node) is not in it, and is
+// measured by the oracle and the differential instead.
 import { readFileSync } from 'node:fs'
 
 const args = process.argv.slice(2)
@@ -11,9 +25,15 @@ const opt = (name) => { const i = args.indexOf('--' + name); return i < 0 ? null
 const kernel = await import(opt('kernel'))
 const parser = await kernel.loadShellParser()
 if (!parser.ok) throw new Error('no verified tree-sitter-bash install: ' + parser.reason)
+const scanner = opt('scanner') ? await import(opt('scanner')) : null
+if (scanner && typeof scanner.loadShellParser === 'function') await scanner.loadShellParser()
 const inputs = JSON.parse(readFileSync(opt('inputs'), 'utf8'))
 const LANE = new Set(['toon', 'repomix', 'markitdown', 'qmd', 'headroom', 'jcodemunch-mcp', 'codebase-memory-mcp', 'ai-memory', 'serena', 'serena-agent', 'context-mode', 'mcporter', 'rtk'])
 const hasLaneWord = (text) => text.split(/[^A-Za-z0-9_./~-]+/).some((w) => w && LANE.has(w.slice(w.lastIndexOf('/') + 1)))
+// The [start, end) of every lane word (the same words as hasLaneWord), by a linear scan.
+const laneWordSpans = (text) => [...text.matchAll(/[A-Za-z0-9_./~-]+/g)].filter((m) => LANE.has(m[0].slice(m[0].lastIndexOf('/') + 1))).map((m) => [m.index, m.index + m[0].length])
+const laneTokens = (records) => records.filter((i) => i.lane && !i.remote && !i.unresolved).map((i) => i.lane + (i.excluded ? '!' : '')).sort()
+const minus = (a, b) => { const left = [...b]; return a.filter((t) => { const i = left.indexOf(t); if (i < 0) return true; left.splice(i, 1); return false }) }
 const call = (command) => [{ type: 'assistant', timestamp: '2026-09-26T01:00:00Z', message: { content: [{ type: 'tool_use', id: 'c', name: 'Bash', input: { command } }] } }]
 const SHELL_CS = /(?:\bba?sh|\bsh|\bdash|\bzsh)\s+(?:-[A-Za-z]+\s+)*-[A-Za-z]*c\s+"\$\(\s*cat\s+<<-?\s*['"\\]?[A-Za-z_0-9-]+/
 const c = {
@@ -21,6 +41,11 @@ const c = {
   named_bang: 0, escaped_backquote_body: 0, folded_redirect_words: 0, folded_redirect_words_lane_word: 0, time_then_assignment_or_bang: 0,
   with_a_heredoc_operator: 0, heredoc_ended_early: 0, heredoc_unterminated: 0, heredoc_operator_begins_a_statement: 0, two_heredoc_operators_with_a_tree_error: 0,
   word_cut_after_an_assignment: 0, word_cut_after_an_assignment_lane_word: 0, shell_c_of_a_cat_heredoc_substitution: 0,
+  // the first overturn condition (see the header)
+  with_a_lane_word: 0, lane_bearing_upper: 0, grammar_limit: 0, grammar_limit_with_a_lane_word: 0, grammar_limit_lane_read: 0,
+  grammar_limit_lane_word_unread: 0, grammar_limit_lane_word_in_an_error_node: 0, grammar_limit_early_with_a_lane_word: 0,
+  grammar_limit_error_only_in_a_script_read_again: 0, grammar_limit_error_only_in_a_script_read_again_lane_word: 0,
+  grammar_limit_lost_or_invented_upper: 0, grammar_limit_scanner_reads_more: scanner ? 0 : null, grammar_limit_scanner_throws: scanner ? 0 : null,
 }
 for (const text of inputs) {
   const m = kernel.measureTranscript(call(text)).cli_lanes
@@ -30,10 +55,11 @@ for (const text of inputs) {
   if (SHELL_CS.test(text)) c.shell_c_of_a_cat_heredoc_substitution++
   if (text.includes('<<')) c.with_a_heredoc_operator++
   const seen = kernel.withShellTree(text, (root) => {
-    const s = { bang: false, bq: false, fold: false, foldLane: false, time: false, early: false, open: false, leading: false, cut: false, cutLane: false, tree: root.hasError }
+    const s = { bang: false, bq: false, fold: false, foldLane: false, time: false, early: false, open: false, leading: false, cut: false, cutLane: false, tree: root.hasError, errors: [] }
     const stack = [root]
     while (stack.length) {
       const n = stack.pop()
+      if (n.type === 'ERROR') s.errors.push([n.startIndex, n.endIndex])
       if (n.type === 'command_name' && n.text === '!') s.bang = true
       if (n.type === 'command_substitution' && n.text.startsWith('`') && /\\[$`\\]/.test(n.text)) s.bq = true
       if (n.type === 'file_redirect') {
@@ -72,5 +98,31 @@ for (const text of inputs) {
   if (seen.leading) c.heredoc_operator_begins_a_statement++
   if (seen.cut) { c.word_cut_after_an_assignment++; if (seen.cutLane) c.word_cut_after_an_assignment_lane_word++ }
   if (seen.tree && text.split('\n').some((l) => (l.match(/<<(?!<)/g) ?? []).length >= 2)) c.two_heredoc_operators_with_a_tree_error++
+  // The first overturn condition: lane-bearing commands without the parser's help, and what a grammar limit can lose or invent in them.
+  const words = laneWordSpans(text), read = m.calls_with_lane_invocation > 0
+  if (words.length) c.with_a_lane_word++
+  if (read || words.length) c.lane_bearing_upper++
+  if (m.parse_errors || seen.early) {
+    c.grammar_limit++
+    if (words.length) c.grammar_limit_with_a_lane_word++
+    if (read) c.grammar_limit_lane_read++
+    else if (words.length) c.grammar_limit_lane_word_unread++
+    const inError = words.some(([a, b]) => seen.errors.some(([x, y]) => a < y && b > x))
+    if (inError) c.grammar_limit_lane_word_in_an_error_node++
+    if (seen.early && words.length) c.grammar_limit_early_with_a_lane_word++
+    // The error lies in a script the reading read again (a shell string), not in the text's own tree: the lane word cannot be placed.
+    const elsewhere = m.parse_errors > 0 && !seen.tree
+    if (elsewhere) { c.grammar_limit_error_only_in_a_script_read_again++; if (words.length) c.grammar_limit_error_only_in_a_script_read_again_lane_word++ }
+    if (scanner) {
+      try { if (minus(laneTokens(scanner.commandInvocations(text)), laneTokens(kernel.commandInvocations(text))).length) c.grammar_limit_scanner_reads_more++ } catch { c.grammar_limit_scanner_throws++ }
+    }
+    if (inError || (seen.early && words.length) || (elsewhere && words.length) || read) c.grammar_limit_lost_or_invented_upper++
+  }
 }
+const THRESHOLD = 0.001
+const rate = (n, d) => d ? Number((n / d).toFixed(6)) : null
+c.overturn_1 = { threshold: THRESHOLD, threshold_commands: Math.ceil(THRESHOLD * c.with_a_lane_invocation), lane_bearing: c.with_a_lane_invocation, lane_bearing_upper: c.lane_bearing_upper,
+  lost_or_invented_upper_bound: c.grammar_limit_lost_or_invented_upper, rate_upper_bound: rate(c.grammar_limit_lost_or_invented_upper, c.with_a_lane_invocation),
+  rate_lane_word_screen: rate(c.grammar_limit_with_a_lane_word, c.with_a_lane_invocation),
+  met_by_the_upper_bound: c.with_a_lane_invocation ? c.grammar_limit_lost_or_invented_upper / c.with_a_lane_invocation >= THRESHOLD : null }
 console.log(JSON.stringify(c, null, 1))
