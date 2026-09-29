@@ -632,7 +632,9 @@ expect('git options: any reading of the option words reaches the subcommand, as 
         tamper(dest)
         return dest
       }
-      const append = (rel, text) => (dest) => writeFileSync(join(dest, rel), readFileSync(join(dest, rel), 'utf8') + text)
+      const append = (rel, text) => (dest) => writeFileSync(join(dest, rel), Buffer.concat([readFileSync(join(dest, rel)), Buffer.from(text)]))
+      // One byte of the file changed in place (bit 0 of the middle byte): the same length, so only the hash can tell.
+      const flip = (rel) => (dest) => { const b = readFileSync(join(dest, rel)); b[b.length >> 1] ^= 1; writeFileSync(join(dest, rel), b) }
       const good = await load(copy('good'))
       expect('parser: the pinned install loads and reports versions and the two wasm sha256 values, never a path [' + JSON.stringify(good) + ']',
         good.ok === true && same({ versions: good.versions, wasm_sha256: good.wasm_sha256 }, RECORD) && !JSON.stringify(good).includes(tmp) && !JSON.stringify(good).includes(homedir()))
@@ -643,7 +645,7 @@ expect('git options: any reading of the option words reaches the subcommand, as 
       try { kernel.withShellTree?.('a=1', () => { throw new RangeError('visitor failed') }) } catch (e) { threw = e.name }
       expect('parser: a visitor that throws still frees the tree [' + threw + ', open ' + kernel.openShellTrees?.() + ']', threw === 'RangeError' && kernel.openShellTrees?.() === 0)
       const cases = [
-        ['a flipped byte in the bash grammar wasm', 'wasm', append('node_modules/tree-sitter-bash/tree-sitter-bash.wasm', '\0')],
+        ['one flipped byte in the bash grammar wasm', 'wasm', flip('node_modules/tree-sitter-bash/tree-sitter-bash.wasm')],
         ['a modified web-tree-sitter.js, which is never imported', 'js', append('node_modules/web-tree-sitter/web-tree-sitter.js', '\nglobalThis.__shellParserPwned = true\n')],
         ['a modified package.json', 'pkg', append('node_modules/tree-sitter-bash/package.json', ' ')],
         ['another integrity value in package-lock.json', 'lock', (dest) => writeFileSync(join(dest, 'package-lock.json'), readFileSync(join(dest, 'package-lock.json'), 'utf8').replace('sha512-7hMytu', 'sha512-XXXXXX'))],
@@ -660,10 +662,15 @@ expect('git options: any reading of the option words reaches the subcommand, as 
         chmodSync(join(locked, 'node_modules/tree-sitter-bash/tree-sitter-bash.wasm'), 0o600)
         expect('parser: a pinned file that cannot be read is load_error, not a hash mismatch [' + JSON.stringify(denied) + ']', same(denied, { ok: false, reason: 'load_error' }) && kernel.commandInvocations('qmd') === null)
       } else console.log('SKIP parser: the unreadable-file check needs a non-root user')
+      for (const rel of Object.keys(FILES)) {
+        const r = await load(copy('flip-' + rel.replaceAll('/', '_'), flip(rel)))
+        expect('parser: one flipped byte in ' + rel + ' is hash_mismatch and leaves no parser [' + JSON.stringify(r) + ']',
+          same(r, { ok: false, reason: 'hash_mismatch' }) && status().ok === false && kernel.commandInvocations('qmd') === null && globalThis.__shellParserPwned === undefined)
+      }
       const partial = await load(copy('partial', (dest) => rmSync(join(dest, 'node_modules/web-tree-sitter/web-tree-sitter.wasm'))))
-      expect('parser: an install with a pinned file missing is not_installed [' + JSON.stringify(partial) + ']', same(partial, { ok: false, reason: 'not_installed' }))
+      expect('parser: an install with a pinned file missing is not_installed and leaves no parser [' + JSON.stringify(partial) + ']', same(partial, { ok: false, reason: 'not_installed' }) && kernel.commandInvocations('qmd') === null)
       const noLock = await load(copy('no-lock', (dest) => rmSync(join(dest, 'package-lock.json'))))
-      expect('parser: an install without its package-lock.json is not_installed [' + JSON.stringify(noLock) + ']', same(noLock, { ok: false, reason: 'not_installed' }))
+      expect('parser: an install without its package-lock.json is not_installed and leaves no parser [' + JSON.stringify(noLock) + ']', same(noLock, { ok: false, reason: 'not_installed' }) && kernel.commandInvocations('qmd') === null)
       const again = await load(copy('good-again'))
       expect('parser: a good install loads again after failures [' + JSON.stringify(again) + ']', again.ok === true && kernel.commandInvocations('qmd search x')?.length === 1)
       const open = kernel.measureTranscript(rows)
