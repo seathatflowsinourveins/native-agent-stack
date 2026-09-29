@@ -34486,6 +34486,76 @@
       "bytes": 195
     },
     {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/README.md",
+      "sha256": "ce8d6379f412746a311e681616526f12ad508a364783ce8bcddef575c1c802f3",
+      "bytes": 22797
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/capture-covering.py",
+      "sha256": "0f38e3927f51421904cedc02de93ba8b94c27f80bfcf0f315ad0f15357123d80",
+      "bytes": 4165
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/classify.py",
+      "sha256": "b56a47c18f867b538ff944473105707fa00220eed948db2d03b458d93eb5913e",
+      "bytes": 18994
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/counts.json",
+      "sha256": "2faf6b110132cff10623c2ec95350c4068b63394578de69e22f13f14b46a5755",
+      "bytes": 18112
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/differential.mjs",
+      "sha256": "97b3424c950326b029e49128a075519d2973f46d84a68d2abfea3e2b83cc973b",
+      "bytes": 8763
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/m4-identity.mjs",
+      "sha256": "a8902037800e922bc63aac29a7b6950f49c213bac08c314b964d70c45ff712d9",
+      "bytes": 1960
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/make-inputs.mjs",
+      "sha256": "97fbe780db72c6db99a251c8d4f409703911be1733d28343c5c01dc3c35a58d5",
+      "bytes": 4057
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/oracle-scale.py",
+      "sha256": "5094bc0e4c3c2eb299c9a1be3851cc0240b28855e2d1f628f5c0f7d1184f9797",
+      "bytes": 3997
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/real-commands.mjs",
+      "sha256": "1cdcd669792b01227dd40d6ccadde867d30faed065c57e739f990b60c45f9ba4",
+      "bytes": 2746
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/repeat-oracle.sh",
+      "sha256": "bb3d99145b0b9a0a501f4ce579c48736124ea95e005b460f8d36b56afb387252",
+      "bytes": 667
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/run-differential.py",
+      "sha256": "5b270e794de35dfc5ddeb1c1d05e5fa6139d34bdf0b9bfd86d28005563e38aa8",
+      "bytes": 10305
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/shape-counts.mjs",
+      "sha256": "fa1d6d197693f005b6e533d081134487353a7209a40f90eb437a23f6a7fa9930",
+      "bytes": 5744
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/states-count.mjs",
+      "sha256": "9cb54cf95fba5dbde5b5b3a317585894c0cadd5629e5820c2175bc9c5fd531c3",
+      "bytes": 3603
+    },
+    {
+      "path": "evidence/artifacts/pra-u1-differential-20260929/timing.mjs",
+      "sha256": "066e3320afcda8c0503ca0ea8b845edf38685af4050ce41165baa27eb7e15dd7",
+      "bytes": 2227
+    },
+    {
       "path": "evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json",
       "sha256": "c4136fac7d8c341708e65aa7c6a8f78e4adeab57baa8b443065c5f4551318fc1",
       "bytes": 1365997
@@ -41957,13 +42027,13 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "45d3115d2f869cef8566fb97a7208993c6f6a2aa4c8d1f812aa3fa526b84eb98",
-      "bytes": 59308
+      "sha256": "13228806f0276ced242cfbd055db54adae8bef1b5d255bc0534eb1ebb7dd07b9",
+      "bytes": 87317
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "633a5d511261b5df04ef74bdc8c873cd5b2a1f7cc6cceacb755b9b50a2d4da20",
-      "bytes": 1129
+      "sha256": "02d76ef2d151e492b2b39bc0a65da4193938a7a442e40692ed0c2c15a5f96cbd",
+      "bytes": 1217
     },
     {
       "path": "examples/claude-native/workflows/check-syntax.mjs",
@@ -41972,8 +42042,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "eb7df29b1ee0b9d5f722001cdb841ac9e102313806209938d650cf2fac745519",
-      "bytes": 90829
+      "sha256": "a9126a77fd7f2908570d680bb79784905eab4876ade4b3ff794befc893542716",
+      "bytes": 191676
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -41996,9 +42066,14 @@
       "bytes": 18059
     },
     {
+      "path": "examples/claude-native/workflows/shell-parser.pin.json",
+      "sha256": "961f4555c9067f17ae5fc2666d20ee797fbd2cd7abcbff80aa4963e912bf64d0",
+      "bytes": 3039
+    },
+    {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "a73b0fcd32184138b479251acee3bc3eb73198901c6b7aab8aa82825469a3152",
-      "bytes": 53671
+      "sha256": "caecee21c535a2d51e193b45c6dc3937bb9880c701205593a31b887380b20efe",
+      "bytes": 93665
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -43056,6 +43131,11 @@
       "bytes": 12476
     },
     {
+      "path": "tests/test_command_position_oracle.py",
+      "sha256": "3a3481ab44509ae2d553bc7b2b49a2c97360d4ac4e20ba78b91e91754031d304",
+      "bytes": 41303
+    },
+    {
       "path": "tests/test_component_matrix.py",
       "sha256": "a98574895dd7e4dda8c45d6d993af8ec335a5a4a02644efaee64e1688d162de4",
       "bytes": 83131
@@ -43547,8 +43627,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "fbc0e085ed8867b187c2b22d9a251732e492270b10cb3c94ac49e0f5400b88e6",
-      "bytes": 78579
+      "sha256": "3fc5a11b0ccf4219872d268fc7aa6580094091860041f5ac093a49459767b3a3",
+      "bytes": 98671
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -43602,8 +43682,8 @@
     },
     {
       "path": "tests/test_token_measurement.py",
-      "sha256": "314c86151c3fab9236b0c20fa9682491b9191d7ae5ec5bc1774e9bd21c8c9699",
-      "bytes": 45198
+      "sha256": "05287a643ea6edceb080ab0095b1719bf7b1042d7ecac07cbde0c4f6bdf0cf86",
+      "bytes": 125555
     },
     {
       "path": "tests/test_trading_gates.py",
@@ -43792,13 +43872,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "c48c4cd8dd860a448927cef7ece87688cc9b9c2980e3da9f6858b82842429fbb",
-      "bytes": 22215
+      "sha256": "61eb6d379a6c6220c402c5406b9d729ce8cce1a8d928a81c34aad5af8d0809a1",
+      "bytes": 25576
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "78db8b063d193fdd7077af44bc9f25f1c1ea1543f6725b9789d6032cf459c613",
-      "bytes": 82602
+      "sha256": "af03ba206f951d221ffc282a6494b0cc3e6965bae224ec469e0e4878d2a7d6e1",
+      "bytes": 88338
     },
     {
       "path": "tools/sota-convergence/README.md",
