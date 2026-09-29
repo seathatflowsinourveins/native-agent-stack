@@ -10,8 +10,9 @@ overnight-tradable US equity and flags a name when its session volume stands out
 It only monitors:
 
 - It makes no order, cancel or position call and no trading-API write.
-- Every request is a GET on an allow-list (paper trading `/v2/assets`; data `/v2/stocks/snapshots` and
-  `/v2/stocks/bars`) and passes a per-source call budget (`monitor.Budget`) before it is made.
+- Every Alpaca request is a GET on an allow-list (paper trading `/v2/assets`; data `/v2/stocks/snapshots` and
+  `/v2/stocks/bars`). Before it is made, it passes a per-source call budget (`monitor.Budget`) and a cap on all data
+  calls in any minute. The only other request is the notify tier's POST to a loopback ntfy topic.
 - It reads the PAPER key pair only, from the 0600 file that `PAPER_ENV_FILE` names in an interactive shell
   (`docs/secret-storage.md`), and never prints a key.
 
@@ -84,8 +85,13 @@ Tiers and lists:
 Call budget for 9,683 names:
 
 - Start-up makes 99 calls: 1 assets call, 49 SIP 1Day calls and 49 BOATS 1Day calls.
-- Each 120 s sweep makes 20 snapshot calls, or 10 a minute.
-- The first minute has 108 data calls, against a refusal cap of 500 (5% of 10,000).
+- Each 120 s sweep makes 20 snapshot calls at once, or 10 a minute on average.
+- The busiest minute has at most 118 data calls: the 98 daily-bar calls, then the first sweep's 20. The plan is refused
+  above 500 (5% of 10,000), so a universe above 41,600 names is refused.
+- While the watch runs, the budget refuses any data call beyond 500 in a rolling minute, daily bars and snapshots
+  together.
+- A sweep's first snapshot call is a probe. After an error or a rate-limited answer (fewer than 3,500 calls left, a
+  429's headers included), the sweep makes no other call, and it checks the calls left again before each later call.
 - `watch.py plan --symbols N` prints the plan without a network call.
 
 ## Commands
@@ -105,9 +111,18 @@ bash -ic 'PYTHONDONTWRITEBYTECODE=1 python3 blueprints/us-equities/overnight-vol
   --env-file "$PAPER_ENV_FILE" --out "$HOME/.local/state/native-agent-stack/overnight-volume/20260929"'
 ```
 
-To stop before 04:00 ET, run `touch "$OUT/STOP"` (it takes effect within 5 s) or send SIGTERM. Both write `stop.json`.
-`--no-push` records notify alerts without posting them. A restart on the same `--out` restores what was already
-alerted and pushed from `alerts.jsonl`, so nothing alerts or posts twice. Dry-run records are never restored.
+To stop before 04:00 ET, run `touch "$OUT/STOP"` or send SIGTERM. Both write `stop.json`.
+
+- Between sweeps, SIGTERM takes effect at once and the STOP file within 5 s.
+- Start-up checks both before every request and ends a retry wait early. It also ends at its 600 s deadline
+  (`startup_deadline`, exit code 1).
+- A request in flight is never interrupted. Each blocking read has a 20 s timeout, so a stop can wait that long for
+  it. A sweep in progress finishes its snapshot calls first (20 at 9,683 names, three at a time).
+
+`--no-push` records notify alerts without posting them, and it holds back queued alerts restored from an earlier run.
+A restart on the same `--out` restores what was already alerted and pushed from `alerts.jsonl`, so nothing alerts or
+posts twice. Each push attempt is written to disk before it is posted, so a crash can lose a notice but never repeat
+it. Dry-run records are never restored.
 
 Read-back:
 
@@ -122,17 +137,18 @@ curl -s 'http://127.0.0.1:18080/overnight-volume/json?poll=1'   # the ntfy topic
 ## Output files
 
 All files live in the one `--out` directory: owner-only 0600 files in 0700 directories, as `monitor.Sink` writes
-them.
+them. The watch refuses an `--out` inside a git worktree (a `.git` entry at or above it, symlinks resolved) before it
+creates a file or makes a request.
 
 | File | Contents |
 | --- | --- |
 | `start.json` | Git HEAD, code and thresholds sha256, the plan, universe and reference coverage, and the restored counts |
 | `sweeps.jsonl` | One record a sweep: each chunk's status, calls, rate-limit remaining, counts, new alerts and pushes. Also start, stop, `sweep_error` and `session_bar_rolled` records |
-| `alerts.jsonl` | The first crossing per symbol and tier, with every measure, and every push attempt (sent or failed) |
+| `alerts.jsonl` | The first crossing per symbol and tier, with every measure. Each push attempt (`push`, fsynced before the post) and its result (`push_result`: sent or failed) |
 | `top.jsonl` | Both top-25 lists, every sweep |
 | `board.json` | The latest state, replaced atomically |
 | `snapshots/HHMMSS.json.gz` | The raw BOATS snapshots of every name with a session bar (point-in-time record, ET time of the sweep) |
-| `stop.json` | The stop reason (`stop_time`, `stop_file`, `sigterm`, `once`, `refused`, `error`) and totals |
+| `stop.json` | The stop reason (`stop_time`, `stop_file`, `sigterm`, `once`, `refused`, `error`, `startup_deadline`) and totals |
 
 Pushes go to the observability stack's loopback ntfy topic `http://127.0.0.1:18080/overnight-volume`, which is
 separate from Alertmanager's `ecosystem-alerts`.

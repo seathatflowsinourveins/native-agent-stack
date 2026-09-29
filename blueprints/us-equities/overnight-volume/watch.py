@@ -4,9 +4,10 @@
   python watch.py once --env-file ENV --out DIR               # dry run (alias --once): start-up, one sweep, counts only
   python watch.py run  --env-file ENV --out DIR [--no-push]   # a sweep every 120 s until 04:00 ET, a STOP file or SIGTERM
 
-Data only: it never places, changes or cancels an order and makes no trading-API write. Every request must pass a GET
-allow-list (paper trading /v2/assets; data /v2/stocks/snapshots and /v2/stocks/bars) and a per-source call budget
-(monitor.Budget) before it is made. ENV is the 0600 PAPER key file (monitor.credentials); no key is ever printed.
+Data only: it never places, changes or cancels an order and makes no trading-API write. Every Alpaca request must pass a
+GET allow-list (paper trading /v2/assets; data /v2/stocks/snapshots and /v2/stocks/bars), a per-source call budget
+(monitor.Budget) and a cap on all data calls in any minute before it is made. ENV is the 0600 PAPER key file
+(monitor.credentials); no key is ever printed.
 
 Sources (docs.alpaca.markets): the overnight session runs 20:00-04:00 ET on the evening before its trade date, on the
 Blue Ocean ATS (BOATS); with Algo Trader Plus, feed=boats serves snapshots and historical bars. thresholds-v1.json,
@@ -19,10 +20,11 @@ committed before the first sweep, fixes the measures, tiers and lists (any chang
   change            BOATS dailyBar.c / SIP 1Day close of the prior regular session - 1
   relvol_boats20    overnight_shares / (BOATS 1Day volume summed over the 20 SIP sessions before the trade date / 20)
 
-Output goes to one fixed --out directory, owner-only as monitor.Sink: start.json, sweeps.jsonl, alerts.jsonl (the first
-crossing per symbol and tier, and every push), top.jsonl, board.json, snapshots/HHMMSS.json.gz and stop.json. The notify
-tier is pushed, best effort, to a loopback ntfy topic. These are indicative data from one ATS, not consolidated volume,
-and the tiers are unvalidated monitoring thresholds, not a trading rule.
+Output goes to one fixed --out directory outside every git worktree, owner-only as monitor.Sink: start.json, sweeps.jsonl,
+alerts.jsonl (the first crossing per symbol and tier, every push attempt before its post, and its result), top.jsonl,
+board.json, snapshots/HHMMSS.json.gz and stop.json. The notify tier is pushed, best effort, to a loopback ntfy topic.
+These are indicative data from one ATS, not consolidated volume, and the tiers are unvalidated monitoring thresholds,
+not a trading rule.
 """
 from __future__ import annotations
 
@@ -38,9 +40,10 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
-from collections import defaultdict
+from collections import defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, time as dtime, timedelta, timezone
 from pathlib import Path
@@ -52,12 +55,14 @@ import monitor as M  # noqa: E402  (neutral helpers; this file is not named moni
 THRESHOLDS_PATH = HERE / "thresholds-v1.json"
 # The only requests this watch makes, as (host, path) of a GET; the trading host is the paper API.
 ALLOWED_GETS = frozenset({(M.TRADING_HOST, "/v2/assets"), (M.DATA_HOST, "/v2/stocks/snapshots"), (M.DATA_HOST, "/v2/stocks/bars")})
+# monitor.Budget's sources on the data host (snapshots, adv_bars), which share its one rate limit
+DATA_SOURCES = frozenset(M.source_of(f"https://{host}{path}") for host, path in ALLOWED_GETS if host == M.DATA_HOST)
 BASELINE_SESSIONS = 20      # relvol_boats20 divides the 20-session BOATS sum by 20 (a missing date counts as 0)
 SIP_WINDOW_DAYS = 40        # calendar days of SIP 1Day bars: at least 20 sessions around a holiday
 READING_MAX_AGE = 60.0      # a rate-limit reading older than one window says nothing about the current one
 BUDGET_WAIT = 5.0           # seconds between tries while the daily-bar source's per-minute cap is spent
 LOAD_ATTEMPTS = 4           # resumed attempts of one daily-bar pass after a request failed ADV_ATTEMPTS times
-STARTUP_SECONDS = 600.0     # the daily-bar passes give up after this long
+STARTUP_SECONDS = 600.0     # the start-up gives up after this long, checked before every request and wait
 SNAPSHOT_WORKERS = 3        # as monitor.run's snapshot sweep
 WAIT_STEP = 5.0             # between sweeps the stop conditions are checked at least this often
 ROLL_PROBE = "SPY"          # a change of its BOATS dailyBar.t is logged as session_bar_rolled
@@ -83,6 +88,14 @@ class Refused(RuntimeError):
     def __init__(self, codes: list[str], detail: dict | None = None):
         super().__init__(", ".join(codes))
         self.codes, self.detail = list(codes), detail or {}
+
+
+class Stopped(RuntimeError):
+    """The start-up ended between two requests, by a stop request or its deadline (the reason): nothing more is requested."""
+
+    def __init__(self, reason: str):
+        super().__init__(reason)
+        self.reason = reason
 
 
 def utcnow() -> datetime:
@@ -114,7 +127,7 @@ def allowed_get(url: str) -> str:
 
 class GuardedHttp(M.Http):
     """monitor.Http (per-source budget, call counts, rate-limit headers) behind the GET allow-list, keeping the time of
-    each host's last reading."""
+    each host's last reading and the reading of an error answer (a 429 included), which monitor.Http drops."""
 
     def __init__(self, alpaca_headers: dict, budget: M.Budget | None, clock=time.monotonic):
         super().__init__(alpaca_headers, None, budget)
@@ -122,9 +135,19 @@ class GuardedHttp(M.Http):
 
     def get(self, url: str, kind: str, headers: dict, timeout: float = 20) -> bytes:
         allowed_get(url)
-        body = super().get(url, kind, headers, timeout)
+        host = urllib.parse.urlsplit(url).hostname
+        try:
+            body = super().get(url, kind, headers, timeout)
+        except urllib.error.HTTPError as exc:
+            limit = exc.headers.get("X-Ratelimit-Limit") if exc.headers is not None else None
+            if limit is not None:
+                with self.lock:
+                    self.ratelimit[host] = {"limit": limit, "remaining": exc.headers.get("X-Ratelimit-Remaining"),
+                                            "reset": exc.headers.get("X-Ratelimit-Reset")}
+                    self.read_at[host] = self.clock()
+            raise
         with self.lock:
-            self.read_at[urllib.parse.urlsplit(url).hostname] = self.clock()
+            self.read_at[host] = self.clock()
         return body
 
     def fresh_data_remaining(self, max_age: float = READING_MAX_AGE) -> int | None:
@@ -133,6 +156,31 @@ class GuardedHttp(M.Http):
         if at is None or self.clock() - at > max_age:
             return None
         return self.data_remaining()
+
+
+class DataBudget(M.Budget):
+    """monitor.Budget plus one cap on all data-host calls together (daily bars and snapshots) in any rolling minute: the
+    plan's 5% data cap, whatever each source's own cap admits. It refuses every data call until the plan sets the cap."""
+
+    def __init__(self, data_per_min: float = 0, **kwargs):
+        super().__init__(**kwargs)
+        self.data_per_min, self.data_recent, self.data_lock = data_per_min, deque(), threading.Lock()
+
+    def take(self, source: str) -> bool:
+        if source not in DATA_SOURCES:
+            return super().take(source)
+        with self.data_lock:
+            now = self.clock()
+            while self.data_recent and now - self.data_recent[0] >= 60:
+                self.data_recent.popleft()
+            if len(self.data_recent) >= self.data_per_min:
+                with self.lock:
+                    self.refused["data_host"] += 1
+                return False
+            if not super().take(source):
+                return False
+            self.data_recent.append(now)
+            return True
 
 
 def data_floor(http: GuardedHttp) -> tuple[bool, int | None]:
@@ -198,8 +246,10 @@ def overnight_universe(assets: list, rules: dict) -> dict:
 
 
 def plan_calls(symbols: int, sources: dict, sweep_seconds: float | None = None) -> dict:
-    """The call plan for ``symbols`` names, refused by monitor.plan_budget's rule: the sweep rate plus both daily-bar
-    passes in one minute must stay within 5% of the 10,000/min data limit (and the asset load within 5% of 200/min)."""
+    """The call plan for ``symbols`` names, refused by monitor.plan_budget's rule on the busiest rolling minute: both
+    daily-bar passes (their per-minute cap) and then every sweep that can start within that minute, each at once, must
+    stay within 5% of the 10,000/min data limit (and the asset load within 5% of 200/min). DataBudget enforces the cap
+    on all data calls together while the watch runs."""
     seconds = sources["sweep_seconds"] if sweep_seconds is None else sweep_seconds
     if seconds <= 0:
         return {"symbols": symbols, "refusals": ["invalid_bounds"]}
@@ -209,18 +259,19 @@ def plan_calls(symbols: int, sources: dict, sweep_seconds: float | None = None) 
     passes = math.ceil(symbols / sources["bars_symbols_per_call"])
     sweeps_per_min = 60.0 / seconds
     data_per_min = chunks * sweeps_per_min
+    data_first_min = 2 * passes + chunks * math.ceil(sweeps_per_min)   # the first sweep follows the passes at once
     data_cap = M.DATA_LIMIT_PER_MIN * min(M.BUDGET_FRACTION, sources["max_data_fraction_per_min"])
     trading_cap = M.TRADING_LIMIT_PER_MIN * M.BUDGET_FRACTION
     once = {"assets": 5}   # the start-up asset load, retries included (monitor.retry's five attempts)
     refusals = []
-    if data_per_min + 2 * passes > data_cap:
+    if data_first_min > data_cap:
         refusals.append("data_calls_above_5pct_of_limit")
     if once["assets"] > trading_cap:
         refusals.append("trading_calls_above_5pct_of_limit")
     return {"symbols": symbols, "sweep_seconds": seconds, "sweeps_per_min": round(sweeps_per_min, 3),
             "per_sweep": {"snapshots": chunks}, "once": once, "per_minute": {"adv_bars": 2 * passes},
             "startup_calls": 1 + 2 * passes, "data_per_min": round(data_per_min, 1),
-            "data_first_min": round(data_per_min + 2 * passes, 1), "data_cap_per_min": data_cap,
+            "data_first_min": data_first_min, "data_cap_per_min": data_cap,
             "trading_first_min": once["assets"], "trading_cap_per_min": trading_cap, "refusals": refusals}
 
 
@@ -235,12 +286,13 @@ class DailyBars:
     """1Day bars for many symbols from one feed, 200 symbols a request, modeled on monitor.AdvLoader: each request is
     tried up to ADV_ATTEMPTS times; a request that still fails ends the attempt where it stopped, and the next attempt
     resumes from that chunk and page, so finished requests are never repeated; a budget refusal ends the attempt at once.
-    Unlike AdvLoader (volume only, feed sip) it keeps each bar's time, close and volume and takes the feed and window."""
+    Unlike AdvLoader (volume only, feed sip) it keeps each bar's time, close and volume and takes the feed and window.
+    ``check`` runs before every request and may raise to end the pass there (Watch.checkpoint)."""
 
     def __init__(self, symbols: list[str], feed: str, start: str, end: str, adjustment: str | None = None, per_call: int = 200,
-                 attempts: int = M.ADV_ATTEMPTS, first_wait: float = M.ADV_RETRY_WAIT, sleep=time.sleep):
+                 attempts: int = M.ADV_ATTEMPTS, first_wait: float = M.ADV_RETRY_WAIT, sleep=time.sleep, check=lambda: None):
         self.symbols, self.feed, self.start, self.end, self.adjustment = list(symbols), feed, start, end, adjustment
-        self.per_call, self.attempts, self.first_wait, self.sleep = per_call, attempts, first_wait, sleep
+        self.per_call, self.attempts, self.first_wait, self.sleep, self.check = per_call, attempts, first_wait, sleep, check
         self.index, self.token, self.bars, self.failures, self.calls = 0, None, defaultdict(list), 0, 0
 
     def run(self, http) -> dict:
@@ -250,6 +302,7 @@ class DailyBars:
                       **({"adjustment": self.adjustment} if self.adjustment else {}),
                       **({"page_token": self.token} if self.token else {})}
             for attempt in range(self.attempts):
+                self.check()
                 try:
                     body = http.alpaca_json(M.DATA, "/v2/stocks/bars", params)
                 except (M.BudgetExceeded, NotAllowed):
@@ -282,7 +335,7 @@ def load_bars(loader: DailyBars, http, deadline: float, sleep=time.sleep, clock=
             if clock() >= deadline:
                 raise
             sleep(BUDGET_WAIT)
-        except NotAllowed:
+        except (NotAllowed, Stopped):
             raise
         except Exception:
             failed += 1
@@ -502,6 +555,25 @@ class FixedSink(M.Sink):
     def path(self, name: str, day: str | None = None) -> Path:
         return self.root / name
 
+    def write_synced(self, name: str, record: dict) -> None:
+        """write, then flush and fsync the file (order-throughput/capacity.py's Journal.write(sync=True)): the record is on
+        disk before the step it announces."""
+        self.write(name, record)
+        with self.lock:
+            handle = self.files[self.path(f"{name}.jsonl")]
+            handle.flush()
+            os.fsync(handle.fileno())
+
+
+def git_worktree(path: Path) -> Path | None:
+    """The nearest directory at or above ``path`` (symlinks resolved) that holds a .git entry, or None, as
+    data-lake/backfill.py's git_work_tree: a linked worktree's .git file and a .git git cannot open count too."""
+    resolved = Path(path).resolve()
+    for candidate in (resolved, *resolved.parents):
+        if os.path.lexists(candidate / ".git"):
+            return candidate
+    return None
+
 
 def sha256(path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -532,8 +604,8 @@ class Watch:
         self.push_enabled = not self.dry_run and not getattr(args, "no_push", False)
         self.notify_url = check_notify_url(self.th["alerts"]["ntfy_url"])
         self.sink = FixedSink(Path(args.out))
-        self.stop_event, self.stop_reason = threading.Event(), None
-        self.monotonic, self.wait, self.send, self.sleep = time.monotonic, self.stop_event.wait, send_notice, time.sleep
+        self.stop_event, self.stop_reason, self.deadline = threading.Event(), None, math.inf
+        self.monotonic, self.wait, self.send = time.monotonic, self.stop_event.wait, send_notice
         self.alerts = Alerts(self.th)
         self.http = self.budget = self.plan = self.ref_session = self.last = self.roll_t = None
         self.symbols, self.names, self.ctx = [], {}, {}
@@ -562,6 +634,28 @@ class Watch:
                 return None
             self.wait(min(WAIT_STEP, left))
 
+    def checkpoint(self) -> None:
+        """Before every start-up request: a stop request, or the start-up deadline passed, ends the start-up here."""
+        reason = self.should_stop() or ("startup_deadline" if self.monotonic() >= self.deadline else None)
+        if reason:
+            raise Stopped(reason)
+
+    def nap(self, seconds: float) -> None:
+        """A start-up wait (a retry or the daily-bar budget), never past the deadline: SIGTERM or SIGINT ends it at once
+        and a STOP file within WAIT_STEP, and the next checkpoint then ends the start-up."""
+        self.pause(min(self.monotonic() + seconds, self.deadline))
+
+    def retry(self, call, attempts: int = 5, first_wait: float = 2.0):
+        """monitor.retry (five attempts, waits of 2, 4, 8 and 16 s) with a checkpoint before every attempt and naps."""
+        for attempt in range(attempts):
+            self.checkpoint()
+            try:
+                return call()
+            except Exception:
+                if attempt == attempts - 1:
+                    raise
+                self.nap(first_wait * 2 ** attempt)
+
     def execute(self) -> int:
         self.t0 = time.monotonic()
         if self.mode == "run" and utcnow() >= self.stop_at:
@@ -571,6 +665,8 @@ class Watch:
             return self.finish(reason)
         try:
             self.startup()
+        except Stopped as exc:   # seen between two start-up requests: nothing more was requested
+            return self.finish(exc.reason, code=1 if exc.reason == "startup_deadline" else 0)
         except Refused as exc:
             return self.finish("refused", code=2, refused=exc.codes, detail=exc.detail)
         except Exception as exc:   # credentials, network or budget: recorded, nothing swept
@@ -596,22 +692,23 @@ class Watch:
         return self.finish(reason)
 
     def startup(self) -> None:
+        self.deadline = self.monotonic() + STARTUP_SECONDS
         key, secret = M.credentials(Path(self.args.env_file))
-        self.budget = M.Budget(once={"assets": 5})
+        self.budget = DataBudget(once={"assets": 5}, clock=self.monotonic)
         self.http = GuardedHttp({"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}, self.budget, clock=self.monotonic)
         rules, sources = self.th["universe"], self.th["sources"]
-        assets = M.retry(lambda: self.http.alpaca_json(M.TRADING, "/v2/assets", {"status": rules["status"], "asset_class": rules["asset_class"]}))
+        assets = self.retry(lambda: self.http.alpaca_json(M.TRADING, "/v2/assets", {"status": rules["status"], "asset_class": rules["asset_class"]}))
         self.names = overnight_universe(assets, rules)
         self.symbols = sorted(self.names)
         self.plan = plan_calls(len(self.symbols), sources)
         if self.plan["refusals"]:
             raise Refused(self.plan["refusals"], {"symbols": len(self.symbols)})
         self.budget.configure(self.plan["per_sweep"], self.plan["once"], self.plan["per_minute"])
-        deadline = self.monotonic() + STARTUP_SECONDS
+        self.budget.data_per_min = self.plan["data_cap_per_min"]
         end = datetime.combine(self.trade_date, dtime(0), timezone.utc)
         sip = load_bars(DailyBars(self.symbols, sources["reference_feed"], zulu(end - timedelta(days=SIP_WINDOW_DAYS)), zulu(end),
-                                  adjustment="split", per_call=sources["bars_symbols_per_call"], sleep=self.sleep),
-                        self.http, deadline, sleep=self.sleep, clock=self.monotonic)
+                                  adjustment="split", per_call=sources["bars_symbols_per_call"], sleep=self.nap, check=self.checkpoint),
+                        self.http, self.deadline, sleep=self.nap, clock=self.monotonic)
         ref = reference(sip, self.trade_date)
         if ref["prior_session"] != self.expected_prior:
             raise Refused(["prior_session_mismatch"], {"prior_session": str(ref["prior_session"]), "expected": str(self.expected_prior)})
@@ -620,8 +717,9 @@ class Watch:
         # BOATS bars from the day before the first date (start inclusivity does not matter) to 1 s before 00:00Z of the
         # trade date; baseline20 still keeps only the 20 dates, since the in-progress trade-date bar can come back.
         boats = load_bars(DailyBars(self.symbols, sources["overnight_feed"], zulu(datetime.combine(ref["dates20"][0] - timedelta(days=1), dtime(0), timezone.utc)),
-                                    zulu(end - timedelta(seconds=1)), per_call=sources["bars_symbols_per_call"], sleep=self.sleep),
-                          self.http, deadline, sleep=self.sleep, clock=self.monotonic)
+                                    zulu(end - timedelta(seconds=1)), per_call=sources["bars_symbols_per_call"], sleep=self.nap,
+                                    check=self.checkpoint),
+                          self.http, self.deadline, sleep=self.nap, clock=self.monotonic)
         base = baseline20(boats, ref["dates20"])
         self.ctx = {"adv20": ref["adv20"], "ref_close": ref["ref_close"], "base_sum": base["base_sum"], "prior_sessions": base["prior_sessions"]}
         self.ref_session = ref["prior_session"]
@@ -670,20 +768,24 @@ class Watch:
         results = [None] * len(chunks)
 
         def fetch(k: int) -> None:
+            if k and not data_floor(self.http)[0]:   # checked again before each request, as monitor.poll_option_oi does
+                return
             try:
                 body = self.http.alpaca_json(M.DATA, "/v2/stocks/snapshots", {"symbols": ",".join(chunks[k]), "feed": feed})
                 results[k] = ("ok", body.get("snapshots", body))
             except Exception as exc:   # recorded per chunk; the other chunks still run
                 results[k] = ("error", f"{type(exc).__name__}: {str(exc)[:160]}")
 
-        fetch(0)   # its response refreshes the rate-limit reading the floor needs
+        fetch(0)   # the probe: its answer, an error answer included, refreshes the rate-limit reading the floor needs
         spare, remaining = data_floor(self.http)
-        if spare and len(chunks) > 1:
+        probed = results[0][0] == "ok"
+        if spare and probed and len(chunks) > 1:   # a failed or rate-limited probe stops the fan-out
             with ThreadPoolExecutor(max_workers=SNAPSHOT_WORKERS) as pool:
                 list(pool.map(fetch, range(1, len(chunks))))
+        skipped = "skipped_ratelimit_floor" if probed or not spare else "skipped_probe_error"
         snaps, statuses = {}, []
         for k, chunk in enumerate(chunks):
-            status, value = results[k] or ("skipped_ratelimit_floor", None)
+            status, value = results[k] or (skipped, None)
             entry = {"i": k, "symbols": len(chunk), "status": status}
             if status == "ok":
                 entry["returned"] = len(value)
@@ -729,13 +831,18 @@ class Watch:
         return record
 
     def push(self, rows: list[dict], at: datetime) -> dict:
-        """Post the due notify names (best effort): every attempt is recorded, and a failure never stops the sweep."""
+        """Post the due notify names (best effort), never while pushing is disabled (--no-push), restored alerts included.
+        Each attempt is written and fsynced as a push record before its post, which restore() counts, so a crash can lose
+        a notice but never repeat one; its push_result follows, and a failure never stops the sweep."""
         current, done = {r["s"]: r for r in rows}, {"sent": 0, "failed": 0}
+        if not self.push_enabled:
+            return done
         for symbol in self.alerts.due():
             row = current.get(symbol) or self.alerts.rows.get(symbol) or {"s": symbol}
             text = notice_text(row, self.ref_session, at, self.th["notify"]["relvol_min_prior_sessions"])
             self.alerts.record_push(symbol)
-            record = {"event": "push", "at": iso(at), "s": symbol, "message": text}
+            self.sink.write_synced("alerts", {"event": "push", "at": iso(at), "s": symbol, "message": text})
+            record = {"event": "push_result", "at": iso(at), "s": symbol}
             try:
                 self.send(self.notify_url, text)
                 record["status"] = "sent"
@@ -805,6 +912,10 @@ def main(argv=None) -> int:
     if args.env_file is None or args.out is None:
         ap.error(f"{args.mode} needs --env-file and --out")
     try:
+        tree = git_worktree(args.out)   # before any file or request: a routine git add -A would stage the output
+        if tree is not None:
+            raise UsageError(f"--out {args.out} lies inside the git worktree {tree}: keep the output outside every "
+                             "checkout (for example under ~/.local/state/native-agent-stack/overnight-volume)")
         watch = Watch(args)
     except UsageError as exc:
         print(f"watch: {exc}", file=sys.stderr)

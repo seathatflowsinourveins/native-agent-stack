@@ -1,20 +1,27 @@
 """Synthetic fixtures for blueprints/us-equities/overnight-volume/watch.py (local integration; no network).
 
 Every response below is written here, shaped after the BOATS and SIP payloads observed on 2026-09-29 01:14Z; none is a
-recorded provider response, and no test makes a network request."""
+recorded provider response, and no test makes a network request (NoticeTransport posts to HTTP servers on 127.0.0.1 in
+this process)."""
 from __future__ import annotations
 
 import contextlib
 import copy
 import gzip
 import hashlib
+import http.server
 import io
 import json
+import os
 import stat
+import subprocess
 import sys
 import tempfile
+import threading
 import unittest
+import urllib.error
 import urllib.parse
+from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -91,11 +98,13 @@ class FakeResponse:
 
 
 class Market:
-    """A fake Alpaca: GET /v2/assets, /v2/stocks/bars (sip, boats) and /v2/stocks/snapshots, filtered like the API."""
+    """A fake Alpaca: GET /v2/assets, /v2/stocks/bars (sip, boats) and /v2/stocks/snapshots, filtered like the API.
+    ``answers`` queues (status, remaining) per path, an error status answering with its rate-limit headers; ``paged``
+    splits every bars answer into two pages; ``on_request`` sees each path while its answer is being read."""
 
     def __init__(self, drop_sip_day: date | None = None):
         self.assets, self.sip, self.boats, self.snaps, self.requests = [], {}, {}, {}, []
-        self.remaining = "9990"
+        self.remaining, self.answers, self.paged, self.on_request = "9990", defaultdict(list), False, None
         self.add("SPY", "SPDR S&P 500 ETF Trust", adv=80_000_000, ref=765.61, boats={d: 60_000 for d in SESSIONS},
                  snap=snapshot(24_128, 765.100369, 764.46, prev_c=768.15))
         self.add("AAA", "Alpha Therapeutics Inc", adv=1_000_000, ref=10.0, boats={d: 2_000 for d in SESSIONS},
@@ -139,21 +148,29 @@ class Market:
         query = urllib.parse.parse_qs(parts.query)
         if method != "GET":
             raise AssertionError(f"unexpected {method}")
+        if self.on_request is not None:
+            self.on_request(parts.path)
+        status, remaining = self.answers[parts.path].pop(0) if self.answers[parts.path] else (200, self.remaining)
+        headers = {"X-Ratelimit-Limit": "10000", "X-Ratelimit-Remaining": remaining, "X-Ratelimit-Reset": "1790000000"}
+        if status != 200:
+            raise urllib.error.HTTPError(url, status, "synthetic error", headers, io.BytesIO(b"{}"))
         if parts.path == "/v2/assets":
             body = self.assets
         elif parts.path == "/v2/stocks/bars":
             source = {"sip": self.sip, "boats": self.boats}[query["feed"][0]]
             start, end = query["start"][0], query["end"][0]
             bars = {s: [b for b in source.get(s, []) if start <= b["t"] <= end] for s in query["symbols"][0].split(",")}
-            body = {"bars": {s: b for s, b in bars.items() if b}, "next_page_token": None}
+            if self.paged:   # the first half of each symbol's bars, then the rest behind a page token
+                bars = {s: b[len(b) // 2:] if "page_token" in query else b[:len(b) // 2] for s, b in bars.items()}
+            body = {"bars": {s: b for s, b in bars.items() if b},
+                    "next_page_token": "p2" if self.paged and "page_token" not in query else None}
         elif parts.path == "/v2/stocks/snapshots":
             if query["feed"][0] != "boats":
                 raise AssertionError("snapshots must use feed=boats")
             body = {s: self.snaps[s] for s in query["symbols"][0].split(",") if s in self.snaps}
         else:
             raise AssertionError(f"unexpected path {parts.path}")
-        return FakeResponse(json.dumps(body).encode(), {"X-Ratelimit-Limit": "10000", "X-Ratelimit-Remaining": self.remaining,
-                                                        "X-Ratelimit-Reset": "1790000000"})
+        return FakeResponse(json.dumps(body).encode(), headers)
 
 
 class FakeClock:
@@ -398,7 +415,8 @@ class PlanAndSession(unittest.TestCase):
         self.assertEqual(plan["once"], {"assets": 5})
         self.assertEqual(plan["per_minute"], {"adv_bars": 98})
         self.assertEqual(plan["startup_calls"], 99)
-        self.assertEqual((plan["data_per_min"], plan["data_first_min"], plan["data_cap_per_min"]), (10.0, 108.0, 500.0))
+        # the busiest minute: both daily-bar passes (98 calls), then the first sweep's 20 snapshot calls at once
+        self.assertEqual((plan["data_per_min"], plan["data_first_min"], plan["data_cap_per_min"]), (10.0, 118, 500.0))
         self.assertEqual(plan["refusals"], [])
 
     def test_plan_refuses_above_five_percent_of_the_data_limit(self):
@@ -406,6 +424,21 @@ class PlanAndSession(unittest.TestCase):
         self.assertEqual(W.plan_calls(9_683, sources, sweep_seconds=2)["refusals"], ["data_calls_above_5pct_of_limit"])
         self.assertEqual(W.plan_calls(9_683, sources, sweep_seconds=0)["refusals"], ["invalid_bounds"])
         self.assertEqual(W.plan_calls(0, sources)["refusals"], ["empty_universe"])
+
+    def test_plan_refuses_a_large_universe_by_its_busiest_minute(self):
+        # 45,400 names: 454 daily-bar calls and a 91-call sweep fit in one minute (545), not the average rate (499.5)
+        sources = thresholds()["sources"]
+        for symbols, busiest, refusals in ((45_400, 545, ["data_calls_above_5pct_of_limit"]), (41_600, 500, []),
+                                           (41_601, 502, ["data_calls_above_5pct_of_limit"])):
+            plan = W.plan_calls(symbols, sources)
+            self.assertEqual((plan["data_first_min"], plan["refusals"]), (busiest, refusals), symbols)
+
+    def test_readme_matches_the_plan_and_the_request_methods(self):
+        text = (W.HERE / "README.md").read_text()
+        self.assertIn("Every Alpaca request is a GET", text)   # send_notice POSTs to the loopback ntfy topic
+        self.assertNotIn("Every request is a GET", text)
+        plan = W.plan_calls(9_683, thresholds()["sources"])
+        self.assertIn(f"at most {plan['data_first_min']} data calls", text)
 
     def test_stop_times(self):
         stop_at, backstop = W.stop_times(TRADE_DATE, thresholds()["session"])
@@ -497,6 +530,19 @@ class Network(unittest.TestCase):
         with self.assertRaises(M.BudgetExceeded):
             W.load_bars(stuck, Http(), deadline=1_010.0, sleep=sleep, clock=lambda: now[0])
 
+    def test_data_budget_caps_all_data_calls_together_in_any_rolling_minute(self):
+        now = [0.0]
+        plan = W.plan_calls(45_400, thresholds()["sources"])   # the sources' own caps admit 454 + 91 calls in a minute
+        budget = W.DataBudget(per_sweep=plan["per_sweep"], once=plan["once"], per_minute=plan["per_minute"], clock=lambda: now[0])
+        self.assertFalse(budget.take("adv_bars"))   # closed until the plan's cap is set
+        budget.data_per_min = plan["data_cap_per_min"]
+        self.assertEqual(sum(budget.take("adv_bars") for _ in range(454)), 454)
+        self.assertEqual(sum(budget.take("snapshots") for _ in range(91)), 46)   # 500 data calls in the minute
+        self.assertTrue(budget.take("assets"))   # the trading host is not a data call
+        self.assertEqual((budget.refused["data_host"], dict(budget.used)), (46, {"snapshots": 46}))
+        now[0] = 60.0
+        self.assertTrue(budget.take("snapshots"))
+
 
 class Notifier(unittest.TestCase):
     URLS = ("http://127.0.0.1:18080/overnight-volume", "http://localhost/overnight-volume", "https://127.0.0.1:18080/t",
@@ -532,6 +578,58 @@ class Notifier(unittest.TestCase):
                                  "text/plain; charset=utf-8", 5)])
         with self.assertRaises(W.UsageError):
             W.send_notice("http://example.com/t", "x", opener=Opener())
+
+
+class NoticeTransport(unittest.TestCase):
+    """send_notice() against HTTP servers on 127.0.0.1 in this process, with an HTTP proxy in the environment, as
+    tests/test_host_requests.py's NoticeTransportTests: the notice goes to the topic only, never through the proxy or
+    after a redirect."""
+
+    def serve(self, status: int, location: str | None = None) -> tuple[str, list]:
+        hits: list = []
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def answer(self):
+                length = int(self.headers.get("Content-Length") or 0)
+                hits.append((self.command, self.path, self.rfile.read(length).decode("utf-8")))
+                self.send_response(status)
+                if location:
+                    self.send_header("Location", location)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+
+            do_GET = do_POST = answer
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(lambda: (server.shutdown(), server.server_close(), thread.join(5)))
+        return f"http://127.0.0.1:{server.server_address[1]}", hits
+
+    def send(self, url: str, proxy: str) -> None:
+        environment = {key: value for key, value in os.environ.items() if not key.lower().endswith("_proxy")}
+        environment.update(http_proxy=proxy, HTTP_PROXY=proxy)   # and no no_proxy exemption for loopback
+        with mock.patch.dict(os.environ, environment, clear=True):
+            W.send_notice(url, "overnight XYZ $3.2M")
+
+    def test_the_notice_is_posted_to_the_topic_and_not_through_a_proxy(self):
+        proxy, proxied = self.serve(200)
+        topic, received = self.serve(200)
+        self.send(f"{topic}/overnight-volume", proxy)
+        self.assertEqual((received, proxied), ([("POST", "/overnight-volume", "overnight XYZ $3.2M")], []))
+
+    def test_a_redirect_is_not_followed(self):
+        proxy, proxied = self.serve(200)
+        elsewhere, redirected = self.serve(200)
+        topic, received = self.serve(302, location=f"{elsewhere}/other-topic")
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            self.send(f"{topic}/overnight-volume", proxy)
+        caught.exception.close()
+        self.assertEqual(caught.exception.code, 302)   # an OSError: push() records it as failed
+        self.assertEqual(([hit[:2] for hit in received], redirected, proxied), ([("POST", "/overnight-volume")], [], []))
 
 
 class EndToEnd(unittest.TestCase):
@@ -612,11 +710,13 @@ class EndToEnd(unittest.TestCase):
             self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600, path.name)
         self.assertFalse(any(p.is_dir() and p.name.isdigit() for p in self.out.iterdir()))   # no per-day subdirectory
 
-    def run_watch(self, clock: FakeClock, send=None, **extra) -> tuple[int, W.Watch]:
-        watch = W.Watch(args("run", self.out, **extra))
+    def run_watch(self, clock: FakeClock, send=None, mode: str = "run", on_request=None, **extra) -> tuple[int, W.Watch]:
+        watch = W.Watch(args(mode, self.out, **extra))
         watch.monotonic, watch.wait = clock.monotonic, clock.wait
         if send is not None:
             watch.send = send
+        if on_request is not None:
+            self.market.on_request = lambda path: on_request(watch, path)
         with mock.patch.object(W, "utcnow", side_effect=clock.utcnow), contextlib.redirect_stdout(io.StringIO()):
             return watch.execute(), watch
 
@@ -632,7 +732,8 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(stop["pushes"], {"sent": 1, "failed": 0})
         records = self.lines("alerts.jsonl")
         self.assertEqual(sum(r["event"] == "alert" for r in records), 5)
-        self.assertEqual([(r["s"], r["status"]) for r in records if r["event"] == "push"], [("AAA", "sent")])
+        self.assertEqual([(r["event"], r["s"], r.get("status")) for r in records if r["event"].startswith("push")],
+                         [("push", "AAA", None), ("push_result", "AAA", "sent")])   # the attempt is recorded before the post
         sweeps = [r for r in self.lines("sweeps.jsonl") if r["event"] == "sweep"]
         self.assertEqual([r["new_alerts"] for r in sweeps], [{"significant": 3, "notify": 2}, {"significant": 0, "notify": 0}])
         self.assertEqual(self.market.requests[-1][1].split("?")[0], "https://data.alpaca.markets/v2/stocks/snapshots")
@@ -652,7 +753,7 @@ class EndToEnd(unittest.TestCase):
 
         code, _ = self.run_watch(FakeClock(datetime(2026, 9, 29, 7, 59, tzinfo=timezone.utc)), send=refuse)
         self.assertEqual(code, 0)
-        pushes = [r for r in self.lines("alerts.jsonl") if r["event"] == "push"]
+        pushes = [r for r in self.lines("alerts.jsonl") if r["event"] == "push_result"]
         self.assertEqual([(r["s"], r["status"]) for r in pushes], [("AAA", "failed")])
         self.assertIn("OSError", pushes[0]["error"])
         self.assertEqual(json.loads((self.out / "stop.json").read_text())["pushes"], {"sent": 0, "failed": 1})
@@ -663,6 +764,137 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual((code, sent), (0, []))
         notify = [r for r in self.lines("alerts.jsonl") if r.get("tier") == "notify"]
         self.assertEqual({r["push"] for r in notify}, {"disabled", "excluded_fund_name"})
+
+    def test_no_push_never_posts_restored_alerts(self):
+        # a notify alert still queued at a stop (the per-sweep cap held it back), then a restart with --no-push
+        self.out.mkdir(parents=True)
+        queued = {"event": "alert", "tier": "notify", "at": "2026-09-29T07:55:00+00:00", "s": "AAA", "dry_run": False,
+                  "push": "queued", "overnight_dollar_volume": 4_400_000.0}
+        (self.out / "alerts.jsonl").write_text(json.dumps(queued) + "\n")
+        sent = []
+        code, _ = self.run_watch(FakeClock(datetime(2026, 9, 29, 7, 59, tzinfo=timezone.utc)), send=lambda u, t: sent.append(t), no_push=True)
+        self.assertEqual((code, sent), (0, []))
+        self.assertFalse(any(r["event"].startswith("push") for r in self.lines("alerts.jsonl")))
+
+    def test_a_push_is_recorded_before_it_is_posted_so_a_crash_never_repeats_it(self):
+        class Crash(BaseException):
+            pass
+
+        posted = []
+
+        def crash(url, text):   # the process dies while the notice is posted: it may have arrived
+            posted.append(text)
+            raise Crash
+
+        watch, clock = W.Watch(args("run", self.out)), FakeClock(datetime(2026, 9, 29, 7, 57, tzinfo=timezone.utc))
+        watch.monotonic, watch.wait, watch.send = clock.monotonic, clock.wait, crash
+        with mock.patch.object(W, "utcnow", side_effect=clock.utcnow), contextlib.redirect_stdout(io.StringIO()), \
+                self.assertRaises(Crash):
+            watch.execute()
+        watch.sink.close()   # the dead process's descriptors
+        again = []
+        code, _ = self.run_watch(FakeClock(datetime(2026, 9, 29, 7, 58, tzinfo=timezone.utc)), send=lambda u, t: again.append(t))
+        self.assertEqual((code, len(posted), again), (0, 1, []))
+        self.assertEqual(json.loads((self.out / "start.json").read_text())["restored"],
+                         {"significant": 3, "notify": 2, "pushes": 1, "pending": 0})
+
+    def test_a_rate_limited_or_failed_probe_stops_the_fan_out(self):
+        for status, remaining, skipped in ((429, "0", "skipped_ratelimit_floor"), (500, "9990", "skipped_probe_error")):
+            with self.subTest(status=status):
+                self.out = Path(self.tmp.name) / str(status)
+                self.market.requests.clear()
+                self.market.answers["/v2/stocks/snapshots"] = [(status, remaining)]
+                code, watch = self.run_watch(FakeClock(NOW), mode="once")
+                self.assertEqual(code, 0)
+                self.assertEqual([c["status"] for c in watch.last["chunks"]], ["error", skipped, skipped])
+                self.assertEqual(sum("/v2/stocks/snapshots" in u for _, u in self.market.requests), 1)
+                self.assertEqual(watch.http.data_remaining(), int(remaining))   # the error answer's reading is kept
+
+    def test_capacity_is_rechecked_before_each_fan_out_request(self):
+        self.market.answers["/v2/stocks/snapshots"] = [(200, "9990"), (200, str(M.RATELIMIT_FLOOR - 1))]
+        with mock.patch.object(W, "SNAPSHOT_WORKERS", 1):   # one request at a time, so the order is fixed
+            code, watch = self.run_watch(FakeClock(NOW), mode="once")
+        self.assertEqual(code, 0)
+        self.assertEqual([c["status"] for c in watch.last["chunks"]], ["ok", "ok", "skipped_ratelimit_floor"])
+        self.assertEqual(watch.last["calls"], {"snapshots": 2})
+
+    def test_sweep_skips_the_fan_out_below_the_rate_limit_floor(self):
+        self.market.remaining = str(M.RATELIMIT_FLOOR - 1)
+        code, watch = self.run_watch(FakeClock(NOW), mode="once")
+        self.assertEqual(code, 0)
+        self.assertEqual([c["status"] for c in watch.last["chunks"]], ["ok", "skipped_ratelimit_floor", "skipped_ratelimit_floor"])
+        self.assertEqual((watch.last["calls"], watch.last["ratelimit_floor"]), ({"snapshots": 1}, M.RATELIMIT_FLOOR - 1))
+
+    def test_start_up_budget_holds_daily_bars_to_their_per_minute_cap(self):
+        # two pages a chunk: both passes need 28 daily-bar calls against the plan's 14 in any minute (7 chunks a pass)
+        self.market.paged = True
+        clock, made = FakeClock(NOW), []
+        code, watch = self.run_watch(clock, mode="once", on_request=lambda w, path: made.append((path, clock.elapsed)))
+        self.assertEqual(code, 0)
+        self.assertIs(watch.http.budget, watch.budget)
+        self.assertEqual((watch.budget.per_minute, watch.budget.data_per_min), ({"adv_bars": 14}, watch.plan["data_cap_per_min"]))
+        bars = [at for path, at in made if path == "/v2/stocks/bars"]
+        self.assertEqual(len(bars), 28)
+        self.assertEqual(max(sum(at <= t < at + 60 for t in bars) for at in bars), 14)
+        self.assertGreaterEqual(bars[-1], 60.0)
+        self.assertEqual((watch.last["significant"], watch.last["notify"]), (3, 2))   # every page was read
+
+    def test_reference_bars_are_split_adjusted_and_overnight_bars_are_not(self):
+        code, _ = self.run_watch(FakeClock(NOW), mode="once")
+        self.assertEqual(code, 0)
+        queries = [urllib.parse.parse_qs(urllib.parse.urlsplit(u).query) for _, u in self.market.requests if "/v2/stocks/bars" in u]
+        self.assertEqual(sorted({(q["feed"][0], q.get("adjustment", ["none"])[0]) for q in queries}),
+                         [("boats", "none"), ("sip", "split")])
+
+    def test_a_stop_during_start_up_ends_it_before_the_next_request(self):
+        def sigterm_while_the_assets_are_read(watch, path):
+            if path == "/v2/assets":
+                watch.request_stop("sigterm")
+
+        code, _ = self.run_watch(FakeClock(NOW), on_request=sigterm_while_the_assets_are_read)
+        self.assertEqual(code, 0)
+        self.assertEqual([urllib.parse.urlsplit(u).path for _, u in self.market.requests], ["/v2/assets"])
+        stop = json.loads((self.out / "stop.json").read_text())
+        self.assertEqual((stop["reason"], stop["sweeps"], stop["calls"]), ("sigterm", 0, {"assets": 1}))
+
+    def test_a_stop_file_during_a_start_up_retry_wait_ends_it(self):
+        self.out.mkdir(parents=True)
+        self.market.answers["/v2/assets"] = [(503, "199")]
+        clock = FakeClock(NOW)
+        code, _ = self.run_watch(clock, on_request=lambda w, path: (self.out / "STOP").touch())
+        self.assertEqual(code, 0)
+        self.assertEqual([urllib.parse.urlsplit(u).path for _, u in self.market.requests], ["/v2/assets"])
+        self.assertEqual(clock.elapsed, 0.0)   # the 2 s retry wait ended at once
+        self.assertEqual(json.loads((self.out / "stop.json").read_text())["reason"], "stop_file")
+
+    def test_start_up_ends_at_its_deadline_between_requests(self):
+        clock = FakeClock(NOW)
+
+        def slow_first_bars(watch, path):   # the first daily-bar answer takes the whole start-up allowance
+            if path == "/v2/stocks/bars" and clock.elapsed < W.STARTUP_SECONDS:
+                clock.elapsed += W.STARTUP_SECONDS
+
+        code, _ = self.run_watch(clock, mode="once", on_request=slow_first_bars)
+        self.assertEqual(code, 1)
+        self.assertEqual(sum("/v2/stocks/bars" in u for _, u in self.market.requests), 1)
+        stop = json.loads((self.out / "stop.json").read_text())
+        self.assertEqual((stop["reason"], stop["sweeps"]), ("startup_deadline", 0))
+
+    def test_out_inside_a_git_worktree_is_refused_before_any_file_or_request(self):
+        root = Path(self.tmp.name)
+        repo, linked, elsewhere = root / "repo", root / "linked", root / "elsewhere"
+        subprocess.run(["git", "init", "-q", str(repo)], check=True, capture_output=True)   # tests/__init__.py: hermetic git
+        linked.mkdir()
+        (linked / ".git").write_text("gitdir: /nonexistent/.git/worktrees/linked\n")   # a linked worktree git cannot open
+        elsewhere.mkdir()
+        (elsewhere / "checkout").symlink_to(repo, target_is_directory=True)
+        for out in (repo, repo / "20260929", linked / "20260929", elsewhere / "checkout" / "state" / "20260929"):
+            stderr = io.StringIO()
+            with contextlib.redirect_stderr(stderr), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(W.main(["--once", "--env-file", "unused.env", "--out", str(out)]), 2, out)
+            self.assertIn("inside the git worktree", stderr.getvalue())
+        self.assertEqual((sorted(p.name for p in repo.iterdir()), sorted(p.name for p in linked.iterdir())), ([".git"], [".git"]))
+        self.assertEqual(self.market.requests, [])
 
     def test_run_refuses_after_the_session_and_makes_no_request(self):
         code, _ = self.run_watch(FakeClock(datetime(2026, 9, 29, 8, 0, 1, tzinfo=timezone.utc)))
