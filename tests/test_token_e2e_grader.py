@@ -1540,6 +1540,55 @@ class F25a_MemoryKeys(GraderCase):
             self.assertEqual(paths, ["fx/before.md"], f"{task}: a page written between the windows is not history")
 
 
+class F25c_QmdCoverage(GraderCase):
+    """`keys --qmd`: a read-only `qmd ls` per frozen collection; the coverage of adoption/update.md goes into the T4 key
+    and an unreadable index is recorded as such, never guessed (qmd 2.8.3 listing lines end in qmd://<collection>/<file>)."""
+
+    def fake_qmd(self):
+        bin_dir = self.tmp / "fake-qmd-bin"
+        bin_dir.mkdir()
+        script = bin_dir / "qmd"
+        script.write_text(
+            "#!/usr/bin/env python3\nimport sys\nargs = sys.argv[1:]\n"
+            "listings = {'coll-fixture': ' 20.5 KB  Sep 29 01:32  qmd://coll-fixture/update.md\\n'\n"
+            "            '  1.0 KB  Sep 29 01:32  qmd://coll-fixture/README.md\\n',\n"
+            "            'other': '  2.0 KB  Sep 28 12:00  qmd://other/notes.md\\n'}\n"
+            "if args[:3] == ['--index', 'idx-fixture', 'ls'] and args[3] in listings:\n"
+            "    sys.stdout.write(listings[args[3]])\nelse:\n    sys.exit(3)\n", encoding="utf-8")
+        script.chmod(0o755)
+        return {"PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+
+    def test_coverage_is_read_from_the_listings(self):
+        fc = load("frozen_checks")
+        with mock.patch.dict(os.environ, self.fake_qmd()):
+            coverage = fc.qmd_coverage({"index": "idx-fixture", "collections": ["coll-fixture", "other"]},
+                                       ["adoption/update.md", "docs/missing.md"])
+        self.assertEqual(coverage["adoption/update.md"], {"covered": True, "collection": "coll-fixture", "queried": True})
+        self.assertEqual(coverage["docs/missing.md"], {"covered": False, "collection": None, "queried": True})
+
+    def test_an_unreadable_index_is_recorded_as_not_queried(self):
+        fc = load("frozen_checks")
+        with mock.patch.dict(os.environ, self.fake_qmd()):
+            coverage = fc.qmd_coverage({"index": "wrong-index", "collections": ["coll-fixture"]}, ["adoption/update.md"])
+        self.assertEqual(coverage["adoption/update.md"], {"covered": False, "collection": None, "queried": False})
+
+    def test_the_keys_command_records_it_in_the_t4_key(self):
+        files = {"adoption/update.md": "Re-pin: `source.release_tag` and `source.release_commit` (bootstrap step 0).\n",
+                 "adoption/bootstrap.md": "# Bootstrap\n\n**Step 0, before anything below: pin the release.**\nRun the check.\n"
+                                          "**Step 1: install.**\n"}
+        repo, commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(), files=files)
+        spec = self.tmp / "spec.json"
+        self.assertEqual(run_grade(["spec", "--repo", repo, "--preregistration-commit", commit, "--out", spec]).returncode, 0)
+        bindings = make_bindings(self.tmp, exec_rev=commit)
+        proc = run_grade(["keys", "--spec", spec, "--bindings", bindings, "--repo", repo, "--qmd",
+                          "--out", self.tmp / "keys.json"], env=self.fake_qmd())
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        key = json.loads((self.tmp / "keys.json").read_text(encoding="utf-8"))["keys"]["reuse-296-04"]["key"]
+        self.assertEqual(key["qmd_coverage"], {"covered": True, "collection": "coll-fixture", "queried": True})
+        self.assertEqual(key["bootstrap_excerpt"][0][:7], "**Step ")
+        self.assertEqual(len(key["bootstrap_excerpt"]), 2, "the excerpt stops at the next step")
+
+
 def make_bindings(tmp, *, exec_rev, run_token="tok7fixture", sentinel_value="sentinel-a-1", worktree_paths=None,
                   worktree_bases=None, exec_checkout=None, env_extra=None, out_name="run-bindings.json"):
     """Write the four bind input files and run `bind`; returns the bindings path."""
@@ -1797,6 +1846,10 @@ class F27c_KeysOnRealContent(GraderCase):
         spec = self.tmp / "spec.json"
         proc = run_grade(["spec", "--repo", clone, "--preregistration-commit", commit, "--out", spec])
         self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        again = self.tmp / "spec-again.json"
+        proc = run_grade(["spec", "--repo", clone, "--preregistration-commit", commit, "--out", again])
+        self.assertEqual(proc.returncode, 0, sanitize(proc.stderr))
+        self.assertEqual(spec.read_bytes(), again.read_bytes(), "the spec over the real sealed bytes is byte-identical")
         bindings = make_bindings(self.tmp, exec_rev=exec_full())
         outputs = [self.tmp / "keys-1.json", self.tmp / "keys-2.json"]
         for out in outputs:
@@ -2377,6 +2430,16 @@ class F19_Mutants(GraderCase):
                          "H_OracleReviewFindings.test_t1_token_lines", "H_OracleReviewFindings.test_a_hedged_payload_sum",
                          "H_OracleReviewFindings.test_t28_numbers", "H_OracleReviewFindings.test_t32_verdict_and_latency",
                          "H_OracleReviewFindings.test_t27_exit_code", "F7_T0.test_a_hedged_skip_count_is_unparsed"])
+
+    def test_M30_qmd_coverage_never_found(self):
+        fc = load("frozen_checks")
+        never = {"covered": False, "collection": None, "queried": False}
+        self.run_mutant([mock.patch.object(fc, "qmd_coverage", lambda config, documents: {d: dict(never) for d in documents})],
+                        ["F25c_QmdCoverage.test_coverage_is_read_from_the_listings",
+                         "F25c_QmdCoverage.test_the_keys_command_records_it_in_the_t4_key",
+                         "F25c_QmdCoverage.test_an_unreadable_index_is_recorded_as_not_queried"],
+                        ["F25c_QmdCoverage.test_coverage_is_read_from_the_listings",
+                         "F25c_QmdCoverage.test_the_keys_command_records_it_in_the_t4_key"])
 
     def test_M28_toon_version_pin_off(self):
         require_toon()
