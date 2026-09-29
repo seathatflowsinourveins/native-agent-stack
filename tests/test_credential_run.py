@@ -36,7 +36,8 @@ sys.path.insert(0, str(TOOLS))
 import credential_run as run_mod  # noqa: E402
 import set_credential as writer  # noqa: E402
 
-INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily"}
+INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily",
+                  "canary-e2e"}
 NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
                       "github-actions")

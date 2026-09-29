@@ -602,9 +602,11 @@ def exclusions(ctx: Context, agent_pass: bool) -> list:
 
 
 def launch_environment(ctx: Context, extra=None) -> dict:
-    """The caller's environment minus every inventory variable and must_not_be_set name (credential_run.py's own
-    rule), plus extra. No client sandbox or scrub setting is added."""
-    environment = runner.child_environment(ctx.entry[1], {}, ctx.env)
+    """The caller's environment minus every inventory variable, must_not_be_set name and pointer variable
+    (credential_run.py's child_environment for the canary entry, which declares no pointer of its own), plus extra.
+    No client sandbox or scrub setting is added."""
+    entry, inventory = ctx.entry
+    environment = runner.child_environment(inventory, entry, {}, ctx.env)
     environment.update(extra or {})
     return environment
 
