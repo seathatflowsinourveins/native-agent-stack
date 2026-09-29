@@ -1209,6 +1209,8 @@ def private_dir(path):
 # ---- Key recipes (a4): keys computed from pinned Git content, never from an answer -------------------------------
 
 E2E_DIR = "evidence/artifacts/token-adoption-e2e-20260926"
+PREREG_PATH = f"{E2E_DIR}/preregistration.json"
+README_PATH = f"{E2E_DIR}/README.md"
 TABLE_PATH = f"{E2E_DIR}/fixtures/table.json"
 EVENTS_PATH = f"{E2E_DIR}/fixtures/events.jsonl"
 # The Amendment 3 seal rows for the two fixtures (README "Amendment 3 seal"); Amendment 4 leaves them unchanged.
