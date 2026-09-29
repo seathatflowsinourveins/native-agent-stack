@@ -801,6 +801,8 @@ PIN_SITES=(
     ("README.md","install line",r"npm install --prefix \.runtime/tokenizer --ignore-scripts --no-audit --no-fund gpt-tokenizer@"+VERSION+r"\n"),
     ("tools/token-report/README.md","install line",r'npm install --prefix "\$REPORT_TOOLS/tokenizer" --ignore-scripts --no-audit --no-fund gpt-tokenizer@'+VERSION+r"\n"),
     ("tools/token-report/token_manifest.full.html.in","report label",r"gpt-tokenizer "+VERSION+r" / o200k_base"),
+    ("observability/README.md","counter statement",r"counter uses upstream `gpt-tokenizer@"+VERSION+r"`"),
+    ("docs/token-practice.md","measurement infrastructure",r"\*\*Measurement infrastructure saves nothing itself\.\*\* gpt-tokenizer "+VERSION),
 )
 
 def tokenizer_pin_sites(root):
