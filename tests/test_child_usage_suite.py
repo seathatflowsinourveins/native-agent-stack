@@ -23,6 +23,20 @@ DECISION = ROOT / "docs" / "decisions" / "2026-09-29-shell-command-parser.md"
 PARSER_DIR = Path(os.environ.get("CHILD_USAGE_SHELL_PARSER") or Path.home() / ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1")
 
 
+def bash_is_5_2() -> bool:
+    """The real-shell probe documents its curl counts for bash 5.2 (Ubuntu 24.04 ships 5.2.21). macOS runners have bash 3.2
+    (/bin/bash) or a newer Homebrew bash first on PATH, and one R3 fixture differs there (hosted run 36618373211, validate-macos),
+    so the two real-shell tests below run only where `bash` is 5.2 and are skipped elsewhere with that reason."""
+    exe = shutil.which("bash")
+    if not exe:
+        return False
+    try:
+        done = subprocess.run([exe, "-c", 'echo "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}"'], capture_output=True, text=True, timeout=10, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return done.stdout.strip() == "5.2"
+
+
 class ChildUsageNodeSuite(unittest.TestCase):
     @unittest.skipUnless(shutil.which("node"), "node is not installed")
     def test_node_suite_passes(self):
@@ -122,7 +136,7 @@ class PraU1EvidenceTooling(unittest.TestCase):
         done = subprocess.run(["python3", str(EVIDENCE / "m4-real-shells.py"), "--repo", str(ROOT), *extra], capture_output=True, text=True, timeout=600, check=False)
         return done, (json.loads(done.stdout) if done.stdout.strip().startswith("{") else None)
 
-    @unittest.skipUnless(shutil.which("node") and shutil.which("bash") and shutil.which("dash"), "node, bash and dash are needed")
+    @unittest.skipUnless(shutil.which("node") and bash_is_5_2() and shutil.which("dash"), "node, bash 5.2 (the documented counts) and dash are needed")
     def test_m4_fixtures_agree_with_real_bash_and_dash_and_the_kernel(self):
         """m4-real-shells.py runs every fixture of the M4 decisions (D7, R1, R3, heredoc expansion, backquote anchor) under real bash and dash with
         a stub curl: the stub must run as often as documented in both shells, and the kernel must call a fetch confirmed exactly when it ran."""
@@ -133,7 +147,7 @@ class PraU1EvidenceTooling(unittest.TestCase):
                                                     "R1_DATA", "R1_EXECUTED", "R1_MULTILINE", "R3_EXECUTED"])
         self.assertNotIn("example.org", done.stdout)  # counts only: no command text
 
-    @unittest.skipUnless(shutil.which("node") and shutil.which("bash") and shutil.which("dash"), "node, bash and dash are needed")
+    @unittest.skipUnless(shutil.which("node") and bash_is_5_2() and shutil.which("dash"), "node, bash 5.2 (the documented counts) and dash are needed")
     def test_m4_real_shells_probe_fails_when_the_stub_curl_logs_nothing(self):
         """Negative control of the probe itself: with stubs that log nothing, the 67 fixtures that should run curl disagree and the exit is 1."""
         done, report = self.real_shells("--control", "silent-curl")

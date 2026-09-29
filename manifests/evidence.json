@@ -43490,8 +43490,8 @@
     },
     {
       "path": "tests/test_child_usage_suite.py",
-      "sha256": "3dd89d6cf98887f9a6ff672eeaf9b84f879910de8a8a0697a784081b9efe8f67",
-      "bytes": 21883
+      "sha256": "73d9b3ccf9ef348d1cd74494a7e7fdc169666b1b748d7310a78a2913f5fd55dd",
+      "bytes": 22660
     },
     {
       "path": "tests/test_claude_recovery.py",
