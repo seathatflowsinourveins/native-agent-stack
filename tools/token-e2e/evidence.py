@@ -949,9 +949,36 @@ def claude_calls(rows, ledger, owner, roots=()):
     return calls
 
 
+_SHELL_NAMES = frozenset({"bash", "sh", "zsh", "dash", "ksh"})
+
+
+def unwrap_shell_command(command):
+    """codex exec events spell every command as `/bin/bash -lc "<script>"` (the retained command items all do), and the script
+    is what the child ran: `<shell> -c|-lc <script>` gives the script, unquoted; anything else is returned unchanged."""
+    if not isinstance(command, str):
+        return command
+    text = command.lstrip()
+    end = text.find(" ")
+    if end < 0 or text[:end].rsplit("/", 1)[-1] not in _SHELL_NAMES:
+        return command
+    rest = text[end:].lstrip()
+    flag_end = rest.find(" ")
+    if flag_end < 0:
+        return command
+    flag = rest[:flag_end]
+    if not flag.startswith("-") or flag.startswith("--") or "c" not in flag[1:]:
+        return command
+    script = rest[flag_end:].strip()
+    if len(script) >= 2 and script[0] in "'\"" and script[-1] == script[0]:
+        inner = script[1:-1]
+        return inner.replace('\\"', '"').replace("\\\\", "\\") if script[0] == '"' else inner
+    return script
+
+
 def codex_calls(records):
     """The calls of a Codex exec events file: web_search, command_execution and mcp_tool_call items, with the state from
-    the item's own status and exit code. Exec events carry no timestamps: the launch is the unit of the window."""
+    the item's own status and exit code. Exec events carry no timestamps: the launch is the unit of the window. A command is
+    the script inside its `bash -lc` wrapper."""
     calls = []
     for row in records:
         item = row.get("item") if row.get("type") == "item.completed" and isinstance(row.get("item"), dict) else None
@@ -968,7 +995,8 @@ def codex_calls(records):
         elif kind == "command_execution":
             code = item.get("exit_code")
             ok = status in (None, "completed") and code == 0
-            calls.append(dict(base, name="command_execution", tool="command", server=None, input={"command": item.get("command")},
+            calls.append(dict(base, name="command_execution", tool="command", server=None,
+                              input={"command": unwrap_shell_command(item.get("command"))},
                               state="succeeded" if ok else "failed", result_text=item.get("aggregated_output")))
         elif kind == "mcp_tool_call":
             arguments = item.get("arguments") if isinstance(item.get("arguments"), dict) else {}
