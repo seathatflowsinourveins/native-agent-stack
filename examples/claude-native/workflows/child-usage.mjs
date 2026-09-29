@@ -141,38 +141,70 @@ const RESERVED = new Set(['!', '{', 'do', 'then', 'else', 'elif', 'if', 'while',
 // Shell text is read by bash(1) (GNU bash 5.2) QUOTING, COMMENTS and Here Documents: an escaped character is literal and
 // \<newline> is a line continuation; a word beginning with # ends the line as a comment; inside double quotes, and in the
 // body of a heredoc whose delimiter is unquoted, $(...) and `...` still run, while \$ and \` are literal.
-const DOUBLE_QUOTED_DATA = /\\[\s\S]|\$\([^()]*\)|`[^`]*`|[;&|()`\n]/g
 const SUBSTITUTION = /\\[\s\S]|\$\([^()]*\)|`[^`]*`/g
 const ESCAPED_DATA = new Set([...' \t;&|()<>`$\'"\\#{}!']) // escaped, these become the data character _
 const WORD_BREAK = new Set([...' \t\n;&|()<>']) // bash metacharacters: a # after one begins a comment
-// Here-document openers in one kept line outside quotes, comments and $(( )) (bash(1) QUOTING, COMMENTS, ARITHMETIC
-// EVALUATION), each with the bounds of the simple command that contains it: the text between the nearest control
-// operators (bash(1) DEFINITIONS: || & && ; ;; ( ) | |& and newline; the & and | of the redirections >& <& &> >| are
-// not). `quote` is a quote an earlier kept line left open: a << inside it stays with the quoted-string analysis.
-function openers(line, quote) {
-  const found = [], cuts = [-1]
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i]
-    if (quote) { if (ch === '\\' && quote === '"') i++; else if (ch === quote) quote = null; continue }
-    if (ch === '\\') { i++; continue }
-    if (ch === "'" || ch === '"') { quote = ch; continue }
-    if (ch === '#' && (i === 0 || WORD_BREAK.has(line[i - 1]))) break
-    const arithmetic = ch === '$' && line.startsWith('((', i + 1) ? i + 1 : ch === '(' && line[i + 1] === '(' ? i : -1
-    if (arithmetic >= 0) {
-      let depth = 0, k = arithmetic
-      for (; k < line.length; k++) if (line[k] === '(') depth++; else if (line[k] === ')' && --depth === 0) break
-      if (k < line.length) { i = k; continue }
-    }
-    if (line.startsWith('<<<', i)) { i += 2; continue }
-    let h = null
-    if (ch === '<') { HEREDOC.lastIndex = i; h = HEREDOC.exec(line) }
-    if (h) { found.push({ start: i, end: i + h[0].length, strip: h[1] === '-', quoted: h[2] !== '', delimiter: h[3] }); i += h[0].length - 1; continue }
-    const prev = line[i - 1], next = line[i + 1]
-    if ('|&;()`'.includes(ch) && !(ch === '&' && (prev === '>' || prev === '<' || next === '>')) && !(ch === '|' && prev === '>')) cuts.push(i)
+const QUOTED_SEPARATOR = new Set([...';&|()`\n']) // in double-quoted data, these become a space
+// Nested analyses (a heredoc body a shell reads, a string a shell runs, a "$( )" body inside double quotes) deeper than
+// this read as data, which errs toward possible fetches. The limit bounds the recursion; each level scans linearly.
+const NESTING_LIMIT = 32
+// One unit of shell text under a stack of open frames (POSIX.1-2024 XCU 2.2 Quoting and 2.6.3 Command Substitution;
+// bash(1) QUOTING, COMMENTS, ARITHMETIC EVALUATION and Here Documents). A frame is "'" (literal up to the next '), '"'
+// (a backslash escapes the next unit; "$(" not followed by "(" opens a $( frame, a backquote a ` frame), '`' (up to the
+// next unescaped backquote) or a $( frame { depth }. With no frame, or in a $( frame, the command rules apply: quotes
+// open frames, a # at a word start comments out the rest of the line, $(( )) and (( )) are skipped within their line,
+// <<< is a here-string and << or <<- a here-document operator; in a $( frame "(" adds one to depth and ")" at depth 0
+// closes the frame. step() updates `stack` and returns the index after the unit. `on` receives each here-document
+// operator and each cut: a control operator (bash(1) DEFINITIONS: || & && ; ;; ( ) | |& and newline; the & and | of
+// the redirections >& <& &> >| are not), the ( of a "$(" inside double quotes and the ) that closes it.
+function step(s, i, stack, on) {
+  const top = stack[stack.length - 1], ch = s[i]
+  if (top === "'") { if (ch === "'") stack.pop(); return i + 1 }
+  if (top === '`') { if (ch === '`') stack.pop(); return ch === '\\' ? i + 2 : i + 1 }
+  if (top === '"') {
+    if (ch === '\\') return i + 2
+    if (ch === '"') stack.pop()
+    else if (ch === '`') stack.push('`')
+    else if (ch === '$' && s[i + 1] === '(' && s[i + 2] !== '(') { stack.push({ depth: 0 }); on?.cut(i + 1); return i + 2 }
+    return i + 1
   }
-  cuts.push(line.length) // ascending, so the bounds are the last cut before and the first cut after the opener
-  return { quote, found: found.map((h) => ({ ...h, from: cuts.filter((c) => c < h.start).pop() + 1, to: cuts.find((c) => c >= h.end) })) }
+  if (ch === '\\') return i + 2
+  if (ch === "'" || ch === '"') { stack.push(ch); return i + 1 }
+  if (ch === '#' && (i === 0 || WORD_BREAK.has(s[i - 1]))) { const end = s.indexOf('\n', i); return end < 0 ? s.length : end }
+  const arithmetic = ch === '$' && s.startsWith('((', i + 1) ? i + 1 : ch === '(' && s[i + 1] === '(' ? i : -1
+  if (arithmetic >= 0) {
+    const newline = s.indexOf('\n', arithmetic), end = newline < 0 ? s.length : newline
+    let depth = 0, k = arithmetic
+    for (; k < end; k++) if (s[k] === '(') depth++; else if (s[k] === ')' && --depth === 0) break
+    if (k < end) return k + 1
+  }
+  if (s.startsWith('<<<', i)) return i + 3
+  if (ch === '<') { HEREDOC.lastIndex = i; const h = HEREDOC.exec(s); if (h) { on?.heredoc(i, h); return i + h[0].length } }
+  if (top && ch === '(') top.depth++
+  else if (top && ch === ')' && top.depth-- === 0) stack.pop()
+  const prev = s[i - 1], next = s[i + 1]
+  if ('|&;()`'.includes(ch) && !(ch === '&' && (prev === '>' || prev === '<' || next === '>')) && !(ch === '|' && prev === '>')) on?.cut(i)
+  return i + 1
 }
+// Here-document openers in one kept line outside quotes, comments and $(( )), each with the bounds of the simple command
+// that contains it: the text between the nearest cuts (step). `stack` holds the frames earlier kept lines left open and
+// is updated in place: a << inside a quote stays with the quoted-string analysis, while a << inside a "$( )" that a
+// double-quoted word opens is found here, as in an unquoted $( ) (POSIX.1-2024 XCU 2.6.3: tokenized recursively).
+function openers(line, stack) {
+  const found = [], cuts = [-1]
+  const on = { cut: (i) => { cuts.push(i) }, heredoc: (i, h) => { found.push({ start: i, end: i + h[0].length, strip: h[1] === '-', quoted: h[2] !== '', delimiter: h[3] }) } }
+  for (let i = 0; i < line.length;) i = step(line, i, stack, on)
+  cuts.push(line.length) // ascending, so the bounds are the last cut before and the first cut after the opener
+  return found.map((h) => ({ ...h, from: cuts.filter((c) => c < h.start).pop() + 1, to: cuts.find((c) => c >= h.end) }))
+}
+// Where the frame that `stack` opens at s[i] ends: the index of the unit that pops it (a closing quote or backquote, or
+// the ")" of a $( frame), or s.length when the text ends first. One scan, whatever the nesting.
+function frameEnd(s, i, stack) {
+  for (let next; i < s.length; i = next) { next = step(s, i, stack); if (!stack.length) return i }
+  return s.length
+}
+const closeQuote = (s, i) => frameEnd(s, i + 1, [s[i]]) // s[i] is ', " or `
+const matchParen = (s, i) => frameEnd(s, i, [{ depth: 0 }]) // s[i] follows the "$("
 // The words of one simple command with quotes removed and every redirection and its target dropped (bash(1)
 // REDIRECTION: [n]< [n]> [n]>| [n]>> &> &>> [n]<< [n]<<- [n]<<< [n]<& [n]>& [n]<>).
 const REDIRECTION = /(?:\d*(?:<<-|<<<|<<|<>|<&|>&|>>|>\||<|>)|&>>?)/y
@@ -275,24 +307,35 @@ const insert = (out, s) => { out.s += s; for (let i = 0; i < s.length; i++) out.
 const joined = (parts, separator) => { const out = { s: '', p: [] }; parts.forEach((t, k) => { if (k) insert(out, separator); append(out, t) }); return out }
 // The command text a shell would run: a heredoc body is data unless the heredoc's simple command runs its stdin as a
 // shell script (or as interpreter source in inlineHttp mode), though with an unquoted delimiter its command
-// substitutions still run; a quoted string is data unless a shell runs it (RUN_QUOTED), though inside double quotes
-// $(...) and `...` still run; an escaped character and a comment are data, and \<newline> joins lines. Data keeps its
-// words (so URL arguments stay) but loses the separators that would put a word in command position.
+// substitutions still run; a quoted string is data unless a shell runs it (RUN_QUOTED), when it is analyzed as that
+// shell's input, though inside double quotes $(...) and `...` still run, and the body of "$( ... )" is analyzed as
+// shell text (POSIX.1-2024 XCU 2.6.3); an escaped character and a comment are data, and \<newline> joins lines. Data
+// keeps its words (so URL arguments stay) but loses the separators that would put a word in command position.
 export function executedText(command, { inlineHttp = false } = {}) {
   return executedTrace(traced(String(command || '')), inlineHttp).s
 }
-function executedTrace(src, inlineHttp) {
-  const lines = [], kept = [], sources = []
+// `resolved` holds the raw offsets of the here-document operators already resolved; every nested analysis shares it.
+function executedTrace(src, inlineHttp, resolved = new Set(), depth = 0) {
+  const { text, sources } = resolveHeredocs(src, inlineHttp, resolved, depth)
+  return joined([scanQuotes(text, inlineHttp, resolved, depth), ...sources], '\n')
+}
+// Phase 1, line by line: a here-document body becomes its data (the substitutions an unquoted delimiter still runs) or,
+// when a shell (or in inlineHttp mode an interpreter) reads it as source, a separate source. An operator that is already
+// resolved is skipped: the outer shell resolves a heredoc inside the "$( )" of a double-quoted string that a shell then
+// runs, and the lines after it must not be read as its body a second time.
+function resolveHeredocs(src, inlineHttp, resolved, depth) {
+  const lines = [], kept = [], sources = [], stack = []
   for (let at = 0; ;) { const end = src.s.indexOf('\n', at); lines.push([at, end < 0 ? src.s.length : end]); if (end < 0) break; at = end + 1 }
   const lineText = (n) => src.s.slice(lines[n][0], lines[n][1])
-  let quote = null
   for (let n = 0; n < lines.length; n++) {
-    const line = lineText(n), scan = openers(line, quote)
+    const line = lineText(n), found = openers(line, stack)
     kept.push(slice(src, lines[n][0], lines[n][1]))
-    quote = scan.quote
-    for (const h of scan.found) { // bodies follow the opener line in order (bash(1) Here Documents)
+    for (const h of found) { // bodies follow the opener line in order (bash(1) Here Documents)
+      const operator = src.p[lines[n][0] + h.start]
+      if (resolved.has(operator)) continue
+      resolved.add(operator)
       const reader = stdinProgram(invocationOf(commandWords(line.slice(h.from, h.to))))
-      const source = SHELL.test(reader) || inlineHttp && INTERPRETER_WORD.test(reader)
+      const source = depth < NESTING_LIMIT && (SHELL.test(reader) || inlineHttp && INTERPRETER_WORD.test(reader))
       const first = n + 1
       while (n + 1 < lines.length && (h.strip ? lineText(n + 1).replace(/^\t+/, '') : lineText(n + 1)) !== h.delimiter) {
         n++
@@ -303,11 +346,16 @@ function executedTrace(src, inlineHttp) {
       }
       // Keep source boundaries: interpreter quotes/shift syntax must not consume later shell commands or data
       // heredocs. Each source is analyzed independently; missed matches stay possible M4 fetches.
-      if (source) sources.push(n >= first ? executedTrace(slice(src, lines[first][0], lines[n][1]), inlineHttp) : { s: '', p: [] })
+      if (source) sources.push(n >= first ? executedTrace(slice(src, lines[first][0], lines[n][1]), inlineHttp, resolved, depth + 1) : { s: '', p: [] })
       if (n + 1 < lines.length) n++ // closing delimiter
     }
   }
-  const text = joined(kept, '\n'), out = { s: '', p: [] }
+  return { text: joined(kept, '\n'), sources }
+}
+// Phase 2 over the kept text: escapes, comments and quoted strings. A quoted string that a shell runs is analyzed as
+// that shell's input, with its own heredocs; a double-quoted one first loses the backslashes the outer shell removes.
+function scanQuotes(text, inlineHttp, resolved, depth) {
+  const out = { s: '', p: [] }
   for (let i = 0; i < text.s.length; i++) {
     const ch = text.s[i]
     if (ch === '\\') {
@@ -321,27 +369,47 @@ function executedTrace(src, inlineHttp) {
       continue
     }
     if (ch !== "'" && ch !== '"') { out.s += ch; out.p.push(text.p[i]); continue }
-    let j = i + 1
-    while (j < text.s.length && text.s[j] !== ch) j += ch === '"' && text.s[j] === '\\' ? 2 : 1
-    const inner = slice(text, i + 1, j)
-    if (RUN_QUOTED.test(out.s)) { insert(out, ';'); append(out, inlineHttp ? executedTrace(inner, inlineHttp) : inner); insert(out, ';') }
-    else if (inlineHttp && RUN_HTTP_CODE.test(out.s)) { insert(out, ';'); append(out, inner); insert(out, ';') }
-    else if (ch === '"') {
-      insert(out, '"')
-      let last = 0
-      for (const m of inner.s.matchAll(DOUBLE_QUOTED_DATA)) {
-        append(out, slice(inner, last, m.index))
-        if (m[0][0] === '\\') { out.s += '_'; out.p.push(inner.p[m.index + 1]) }
-        else if (m[0].length > 1) append(out, slice(inner, m.index, m.index + m[0].length))
-        else { out.s += ' '; out.p.push(inner.p[m.index]) }
-        last = m.index + m[0].length
-      }
-      append(out, slice(inner, last, inner.s.length))
-      insert(out, '"')
-    } else { insert(out, "'"); append(out, { s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); insert(out, "'") }
+    const j = closeQuote(text.s, i), inner = slice(text, i + 1, j)
+    if (depth < NESTING_LIMIT && RUN_QUOTED.test(out.s)) {
+      insert(out, ';'); append(out, executedTrace(ch === '"' ? unquoted(inner) : inner, inlineHttp, resolved, depth + 1)); insert(out, ';')
+    } else if (inlineHttp && RUN_HTTP_CODE.test(out.s)) { insert(out, ';'); append(out, inner); insert(out, ';') }
+    else if (ch === '"') { insert(out, '"'); quotedData(out, inner, inlineHttp, resolved, depth); insert(out, '"') }
+    else { insert(out, "'"); append(out, { s: inner.s.replace(/[;&|()`$\n]/g, ' '), p: inner.p }); insert(out, "'") }
     i = j
   }
-  return joined([out, ...sources], '\n')
+  return out
+}
+// Double-quoted data keeps its words and loses the separators that would put a word in command position, while its
+// command substitutions still run (POSIX.1-2024 XCU 2.2.3): the body of a "$( ... )" is analyzed as shell text, its
+// tokens recognized recursively up to the matching ")" (2.6.3; its heredocs were resolved with its lines), a backquoted
+// span is kept as it is, and an escaped character becomes the data character _.
+function quotedData(out, inner, inlineHttp, resolved, depth) {
+  const s = inner.s
+  for (let i = 0; i < s.length;) {
+    const ch = s[i]
+    if (ch === '\\' && i + 1 < s.length) { out.s += '_'; out.p.push(inner.p[i + 1]); i += 2 }
+    else if (ch === '$' && s[i + 1] === '(' && s[i + 2] !== '(' && depth < NESTING_LIMIT) {
+      const k = matchParen(s, i + 2)
+      append(out, slice(inner, i, i + 2)); append(out, scanQuotes(slice(inner, i + 2, k), inlineHttp, resolved, depth + 1)); append(out, slice(inner, k, k + 1))
+      i = k + 1
+    } else if (ch === '`') { const k = closeQuote(s, i); append(out, slice(inner, i, k + 1)); i = k + 1 }
+    else { out.s += QUOTED_SEPARATOR.has(ch) ? ' ' : ch; out.p.push(inner.p[i]); i++ }
+  }
+}
+// The string a shell receives from a double-quoted word: a backslash before $ ` " \ or newline is removed, and an
+// escaped newline with it (POSIX.1-2024 XCU 2.2.3), except inside a "$( )" or a backquoted span, whose text the double
+// quotes leave alone (2.6.3). Offsets stay raw.
+function unquoted(inner) {
+  const out = { s: '', p: [] }, stack = ['"'], s = inner.s
+  for (let i = 0; i < s.length;) {
+    if (stack.length === 1 && s[i] === '\\' && i + 1 < s.length && '$`"\\\n'.includes(s[i + 1])) {
+      if (s[i + 1] !== '\n') { out.s += s[i + 1]; out.p.push(inner.p[i + 1]) }
+      i += 2
+      continue
+    }
+    for (const end = Math.min(step(s, i, stack), s.length); i < end; i++) { out.s += s[i]; out.p.push(inner.p[i]) }
+  }
+  return out
 }
 // 'loopback' when every literal URL in an executed curl/wget command is a loopback host, 'fetch' for any
 // other executed curl/wget command (a remote URL, or no literal URL), null when the command runs neither.
