@@ -27,6 +27,10 @@ NOW = "2026-10-30T00:00:00Z"
 # else the ecosystem tools directory. Tests that count lanes skip, with this message, on a host without it.
 PARSER_DIR = Path(os.environ.get("CHILD_USAGE_SHELL_PARSER") or Path.home() / ".local/share/codex-ecosystem/tools/tree-sitter-bash-0.25.1")
 PARSER_INSTALLED = (PARSER_DIR / "package-lock.json").is_file()
+# The kernel's RTK replay prerequisite, as tests/test_token_measurement.py checks it: Linux and a binary on PATH self-reporting
+# rtk 0.50.0 (the kernel also probes the five exclusions; neither check pins a build).
+RTK_REPLAY_SUPPORTED = (sys.platform == "linux" and shutil.which("rtk") is not None and bool(re.fullmatch(
+    r"rtk 0\.50\.0\s*", subprocess.run(["rtk", "--version"], text=True, capture_output=True, check=False).stdout)))
 
 
 def load_fixture_manifest() -> dict:
@@ -2460,6 +2464,78 @@ class CodexCommandNormalization(unittest.TestCase):
                                     codex_off=[s["name"] for s in manifest["skills"] if s["codex_enabled"] is False],
                                     codex_on=[s["name"] for s in manifest["skills"] if s["codex_enabled"] is True])[0]
         self.assertEqual((session["shell_calls"], session["rtk_prefixed"], session["fetch"]["shell_curl_wget"]), (3, 1, 1))
+
+    @unittest.skipUnless(PARSER_INSTALLED, "no tree-sitter-bash install at the default directory or CHILD_USAGE_SHELL_PARSER")
+    def test_a_shell_is_typed_by_its_name_or_file_stem(self):
+        # exec_command's shell only selects a ShellType, by the value or else its file stem, case-sensitively
+        # (shell-command/src/shell_detect.rs:39-59, :329-334): pwsh, powershell and cmd are not POSIX (a Windows path included),
+        # zsh, bash and sh are. A name Codex does not know (dash) runs its fallback shell, /bin/sh on Unix and cmd.exe on Windows
+        # (:315-327), which the rollout does not record, so it is unresolved too (unknown_shell). Without --rtk-check nothing
+        # is replayed, so no unknown call is added.
+        ok = exec_response("Process exited with code 0", "ok")
+        got = u3_measure(PAGINATED_META,
+                         *shell_function_call("call_priv_s1", {"cmd": "qmd search x", "shell": "dash"}, ok),
+                         *shell_function_call("call_priv_s2", {"cmd": "qmd search x",
+                                                               "shell": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"}, ok),
+                         sourced_command("item_s3", ["C:\\Windows\\System32\\cmd.exe", "/c", "qmd search x"], "unified_exec_startup"),
+                         sourced_command("item_s4", ["powershell.exe", "-NoProfile", "-Command", "qmd search x"], "agent"),
+                         *shell_function_call("call_priv_s5", {"cmd": "qmd search x", "shell": "/usr/bin/sh"}, ok))
+        self.assertEqual(got.get("codex_commands"), {"non_posix_shell": 3, "unknown_shell": 1, "user_shell": 0,
+                                                     "exec_interactions": 0})
+        self.assertEqual({lane: row["calls"] for lane, row in got["cli_lanes"]["lanes"].items()}, {"qmd": 1})
+        self.assertEqual(got["m4"]["status"], "incomplete")
+        self.assertEqual((got["rtk_parts"]["status"], got["rtk_parts"]["unknown_calls"]), ("not_measured", 0))
+
+    def test_a_command_counts_once_in_the_window_of_its_first_record(self):
+        # As the kernel keeps a call's first tool_use: a function_call and its own CommandExecution item are one call, counted
+        # where the first record is, in [since, until); an item's own counters likewise, so adjacent windows add up.
+        def at(hour, minute, row):
+            return {**row, "timestamp": f"2026-10-20T{hour:02d}:{minute:02d}:00Z"}
+        pwsh = ["pwsh", "-Command", "qmd search x"]
+        call, output = shell_function_call("call_priv_w1", {"cmd": "qmd search x", "shell": "pwsh"},
+                                           exec_response("Process exited with code 0", "ok"))
+        rows = [at(0, 30, PAGINATED_META), at(1, 0, call), at(1, 0, output),
+                at(1, 1, sourced_command("call_priv_w1", pwsh, "unified_exec_startup")),
+                at(1, 30, sourced_command("item_w3", ["bash", "-lc", "ls"], "user_shell")),
+                at(2, 30, sourced_command("item_w5", ["bash", "-lc", "ls"], "unified_exec_interaction")),
+                at(3, 0, sourced_command("item_w2", pwsh, "unified_exec_startup")),
+                at(3, 30, sourced_command("item_w4", ["bash", "-lc", "ls"], "user_shell"))]
+
+        def commands(since, until):
+            got = S.measure_codex_records(rows, since=S.parse_iso(f"2026-10-20T{since:02d}:00:00Z"),
+                                          until=S.parse_iso(f"2026-10-20T{until:02d}:00:00Z"))
+            return got.get("codex_commands", {})
+        whole, first, second = commands(0, 4), commands(0, 2), commands(2, 4)
+        self.assertEqual(whole, {"non_posix_shell": 2, "unknown_shell": 0, "user_shell": 2, "exec_interactions": 1})
+        self.assertEqual(first, {"non_posix_shell": 1, "unknown_shell": 0, "user_shell": 1, "exec_interactions": 0})
+        self.assertEqual({key: first.get(key, 0) + second.get(key, 0) for key in whole}, whole)
+
+    def test_skipped_items_leave_no_result_and_groups_stay_incomplete(self):
+        # A user_shell or interaction item is no call: neither a tool_use nor a result (no orphan, nothing in M3). The kernel
+        # recomputes a group's M4 status from its counts, so an unresolved command is forced incomplete there as well.
+        got = u3_measure(PAGINATED_META, sourced_command("item_k1", ["bash", "-lc", "ls"], "user_shell", "z" * 6000),
+                         sourced_command("item_k2", ["bash", "-lc", "ls"], "unified_exec_interaction", "z" * 6000))
+        self.assertEqual((got["m3"]["results"], got["orphan_results"], got["calls_without_result"], got["sandbox_operations"]),
+                         (0, 0, 0, 0))
+        root = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            "rollout-2026-10-20T02-00-00-u3-unresolved.jsonl": [
+                PAGINATED_META, codex_row("response_item", developer(CATALOG)),
+                sourced_command("item_k3", ["pwsh", "-Command", "curl https://example.org"], "unified_exec_startup")]})
+        scan = S.scan_codex_lanes([root], load_fixture_manifest(), since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL),
+                                  marker=MARKER)
+        for measurement in (scan["actors"][0]["measurement"], scan["groups"]["workers"]["measurement"]):
+            self.assertEqual((measurement["m4"]["status"], measurement.get("codex_commands", {}).get("non_posix_shell")),
+                             ("incomplete", 1))
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_rtk_replay_reports_an_unresolved_command_as_unknown(self):
+        # The review: an unresolved command reaches replay as an empty Bash command (rtk 0.50.0 answers "No rewrite for:", no
+        # parts), so it is reported as an explicit unknown call instead of a measured call without parts.
+        got = S.measure_codex_records([PAGINATED_META, sourced_command("item_r1", ["pwsh", "-Command", "git status"], "agent"),
+                                       sourced_command("item_r2", ["bash", "-lc", "git status"], "agent")],
+                                      since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), rtk_check=True)
+        rtk = got["rtk_parts"]
+        self.assertEqual((rtk["calls"], rtk["unknown_calls"], rtk["eligible_parts"], rtk["status"]), (2, 1, 1, "incomplete"))
 
 
 class CodexCodeModeAttribution(unittest.TestCase):
