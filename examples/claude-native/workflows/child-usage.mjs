@@ -1445,7 +1445,7 @@ const quotedDelimiter = (text) => { for (const ch of text) if (ch === "'" || ch 
 // A here-document with no delimiter line is closed by the end of the text: bash warns ("here-document delimited by end-of-file") and runs
 // it, its body being everything after the operator's line (bash(1) Here Documents; POSIX.1-2024 XCU 2.7.4 leaves the case undefined).
 // tree-sitter-bash 0.25.1 reads that body as an ERROR (its words as commands of the operator's line), or drops it when the text ends with a
-// newline, so the missing delimiter lines are appended before the text is read. The delimiter is the operator's word with its quotes removed.
+// newline, so the missing delimiter lines are appended, one per round, before the text is read. The delimiter is the operator's word with its quotes removed.
 function heredocWord(text) {
   let out = ''
   for (let i = 0; i < text.length; i++) {
@@ -1457,14 +1457,16 @@ function heredocWord(text) {
   }
   return out
 }
-function missingDelimiters(root) {
-  const missing = [], stack = [root]
+// The delimiter of the first here-document (in source order) that has no delimiter line, or null. One at a time: while a heredoc is open the
+// grammar may read a later body line as a second operator, which is only body text once the first is closed.
+function missingDelimiter(root) {
+  const stack = [root]
   while (stack.length) {
     const node = stack.pop()
-    if (node.type === 'heredoc_start' && !node.parent?.children.some((c) => c.type === 'heredoc_end' && c.endIndex > c.startIndex && c.startIndex > node.startIndex)) missing.push(heredocWord(node.text))
+    if (node.type === 'heredoc_start' && !node.parent?.children.some((c) => c.type === 'heredoc_end' && c.endIndex > c.startIndex && c.startIndex > node.startIndex)) return heredocWord(node.text)
     for (let i = node.childCount - 1; i >= 0; i--) stack.push(node.child(i))
   }
-  return missing
+  return null
 }
 // Every command of a script, as { records, readers } (readers: how many of its commands would run their standard input as a script).
 function readScript(text, remote, depth, acc) {
@@ -1474,10 +1476,12 @@ function readScript(text, remote, depth, acc) {
   if (!tree) { acc.errors = true; return { records, readers: 0 } }
   openShellTreeCount++
   try {
-    const missing = tree.rootNode.hasError ? missingDelimiters(tree.rootNode) : []
-    if (missing.length) {
-      const closed = text + (text.endsWith('\n') ? '' : '\n') + missing.join('\n') + '\n', again = parseShell(closed)
-      if (again) { tree.delete(); tree = again; text = closed }
+    for (let round = 0; round < 8 && tree.rootNode.hasError; round++) {
+      const missing = missingDelimiter(tree.rootNode)
+      if (missing === null) break
+      const closed = text + (text.endsWith('\n') ? '' : '\n') + missing + '\n', again = parseShell(closed)
+      if (!again) break
+      tree.delete(); tree = again; text = closed
     }
     return { records, readers: walkTree(tree.rootNode, text, { remote, depth, acc, records }) }
   } finally { tree.delete(); openShellTreeCount-- }
