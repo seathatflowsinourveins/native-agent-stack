@@ -3,7 +3,8 @@
 //   node shape-counts.mjs --kernel <kernel.mjs> --inputs <inputs.json> [--scanner <old-kernel.mjs>]
 //
 // The inputs are a JSON array of shell texts (the differential's real-command corpus). Every count is the number of texts (commands) with
-// the shape, not of occurrences. `lane word` means a whole word equal to a lane executable's name (its basename), anywhere in the text: it
+// the shape, not of occurrences, except the three keys that name a largest command (longest_command_chars, most_heredoc_operators_in_a_command,
+// most_array_openers_in_a_command), which are maxima: they bound the shapes whose parse is quadratic (scaling.mjs). `lane word` means a whole word equal to a lane executable's name (its basename), anywhere in the text: it
 // needs no parser, so it also finds a lane the reading cannot see. --scanner names the scanner reading of commit 0c421c66 (no parser
 // needed), a second and independent opinion on which lanes a text holds.
 //
@@ -58,6 +59,16 @@ function treePosition(root, a, b) {
   }
   return position ?? 'elsewhere'
 }
+// A heredoc operator is a `<<` that is not part of a here-string `<<<`; an array opener is `=(`. Both by a linear scan.
+function heredocOperators(text) {
+  let n = 0
+  for (let i = text.indexOf('<<'); i >= 0; i = text.indexOf('<<', i)) {
+    if (text[i + 2] === '<') i += 3
+    else { n++; i += 2 }
+  }
+  return n
+}
+const arrayOpeners = (text) => { let n = 0; for (let i = text.indexOf('=('); i >= 0; i = text.indexOf('=(', i + 2)) n++; return n }
 const laneTokens = (records) => records.filter((i) => i.lane && !i.remote && !i.unresolved).map((i) => i.lane + (i.excluded ? '!' : '')).sort()
 const minus = (a, b) => { const left = [...b]; return a.filter((t) => { const i = left.indexOf(t); if (i < 0) return true; left.splice(i, 1); return false }) }
 const call = (command) => [{ type: 'assistant', timestamp: '2026-09-26T01:00:00Z', message: { content: [{ type: 'tool_use', id: 'c', name: 'Bash', input: { command } }] } }]
@@ -73,6 +84,7 @@ const c = {
   grammar_limit_error_only_in_a_script_read_again: 0, grammar_limit_error_only_in_a_script_read_again_lane_word: 0,
   grammar_limit_unread_no_command_slot: 0, grammar_limit_unread_slot_in_data: 0, grammar_limit_unread_slot_elsewhere: 0, grammar_limit_unread_unplaced: 0,
   grammar_limit_lost_or_invented_upper: 0, grammar_limit_scanner_reads_more: scanner ? 0 : null, grammar_limit_scanner_throws: scanner ? 0 : null,
+  longest_command_chars: 0, most_heredoc_operators_in_a_command: 0, most_array_openers_in_a_command: 0,
 }
 for (const text of inputs) {
   const m = kernel.measureTranscript(call(text)).cli_lanes
@@ -81,6 +93,9 @@ for (const text of inputs) {
   if (m.unresolved_programs) { c.with_an_unresolved_program++; if (hasLaneWord(text)) c.unresolved_and_a_lane_word++ }
   if (SHELL_CS.test(text)) c.shell_c_of_a_cat_heredoc_substitution++
   if (text.includes('<<')) c.with_a_heredoc_operator++
+  c.longest_command_chars = Math.max(c.longest_command_chars, text.length)
+  c.most_heredoc_operators_in_a_command = Math.max(c.most_heredoc_operators_in_a_command, heredocOperators(text))
+  c.most_array_openers_in_a_command = Math.max(c.most_array_openers_in_a_command, arrayOpeners(text))
   const words = laneWordSpans(text), read = m.calls_with_lane_invocation > 0
   const needPositions = words.length > 0 && !read && (m.parse_errors > 0 || text.includes('<<')) // the unread lane words of a possible grammar limit
   const seen = kernel.withShellTree(text, (root) => {
