@@ -438,20 +438,30 @@ function resolveHeredocs(src, inlineHttp, resolved, depth, marks) {
 // out.s for it flattens the whole concatenation and scans it once per quote: quadratic on a long script (a 346 KB script took 2 s
 // a scan, and the kernel scans each shell call several times). scanQuotes keeps that end in `tail`, a string of at most 2 * TAIL
 // characters cut back to TAIL, and reads only it. Once a cut has been made the detectors run without their start-of-text
-// alternative (a cut is no start of text). Limit: a run keyword more than TAIL characters before its quote, after a text that has
-// itself grown past 2 * TAIL, is missed and the string reads as data like any run string the detector does not recognize (its
-// fetch is lost, as the raw detector anchors curl, not the quote): only a single ssh option word that long can put it there
-// (`ssh -oProxyCommand=<1500 characters> host "curl u"` read as a fetch before the window and as data after it; the words
-// between a shell, eval or ssh and its string are short options and one host).
+// alternative (a cut is no start of text). Work budget (D8): scanQuotes also notes, outside quotes, when a shell, eval, ssh or su
+// word has been written since the last command separator; when a cut has left the tail without that word and without a separator,
+// the next quote that does not read as a run string is counted once in `windowMisses` (countFetches adds it to unclassifiable, an
+// operation of unknown kind) instead of being read as data with no trace. Only a single ssh option word longer than TAIL does this
+// (`ssh -oProxyCommand=<1500 characters> host "curl u"`): the words between a shell, eval or ssh and its string are short options and
+// one host.
 const TAIL = 512
 const withoutStart = (re) => new RegExp(re.source.replace('^|', ''))
 const RUN_QUOTED_CUT = withoutStart(RUN_QUOTED), RUN_HTTP_CODE_CUT = withoutStart(RUN_HTTP_CODE)
+const SEPARATOR = /[;&|(`\n]/
+const RUN_WORD_DONE = /(?:^|[\s;&|(`])(?:(?:ba|z|da|k)?sh|su|eval|ssh)\s$/ // the last characters written: a run word, then its blank
+const RUN_WORD_END = new Set(['h', 'u', 'l']) // the last letter of sh, bash, zsh, dash, ksh, ssh, su and eval
+const RUN_WORD_IN = /[\s;&|(`](?:(?:ba|z|da|k)?sh|su|eval|ssh)(?=\s)/
+let windowMisses = 0
 // Phase 2 over the kept text: escapes, comments and quoted strings. A quoted string that a shell runs is analyzed as
 // that shell's input, with its own heredocs; a double-quoted one first loses the backslashes the outer shell removes.
 function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
   const out = { s: '', p: [] }
-  let tail = '', cut = false
-  const note = (s) => { tail += s; if (tail.length > 2 * TAIL) { tail = tail.slice(-TAIL); cut = true } }
+  let tail = '', cut = false, word = false // word: a run word was written outside quotes since the last command separator
+  const note = (s) => {
+    if (word && SEPARATOR.test(s)) word = false
+    tail += s
+    if (tail.length > 2 * TAIL) { tail = tail.slice(-TAIL); cut = true }
+  }
   const put = (s) => { insert(out, s); note(s) }
   const putTrace = (t) => { append(out, t); note(t.s) }
   for (let i = 0; i < text.s.length; i++) {
@@ -466,9 +476,14 @@ function scanQuotes(text, inlineHttp, resolved, depth, marks = null) {
       while (i + 1 < text.s.length && text.s[i + 1] !== '\n') i++
       continue
     }
-    if (ch !== "'" && ch !== '"') { out.s += ch; out.p.push(text.p[i]); note(ch); continue }
+    if (ch !== "'" && ch !== '"') {
+      out.s += ch; out.p.push(text.p[i]); note(ch)
+      if ((ch === ' ' || ch === '\t' || ch === '\n') && RUN_WORD_END.has(tail[tail.length - 2]) && RUN_WORD_DONE.test(tail.length > 8 ? tail.slice(-8) : tail)) word = true
+      continue
+    }
     const j = closeQuote(text.s, i), inner = slice(text, i + 1, j)
     const run = depth < NESTING_LIMIT ? (cut ? RUN_QUOTED_CUT : RUN_QUOTED).exec(tail) : null
+    if (word && cut && !run && !SEPARATOR.test(tail) && !RUN_WORD_IN.test(tail)) { windowMisses++; word = false }
     if (run) {
       // The ssh alternative of RUN_QUOTED: the string runs in the remote shell.
       const remote = marks && run[0].startsWith('ssh', ' \t\n;&|(`'.includes(run[0][0]) ? 1 : 0)
@@ -1356,7 +1371,9 @@ function countFetches(call, counts) {
     const raw = traced(code)
     const literals = shell ? [] : [...code.matchAll(LITERAL)].map((m) => m[2] !== undefined ? slice(raw, ...m.indices[2])
       : joined([...m[3].matchAll(/(["'])(.*?)\1/g)].map((s) => slice(raw, m.indices[3][0] + s.index + 1, m.indices[3][0] + s.index + 1 + s[2].length)), ' '))
+    const missesBefore = windowMisses
     const exec = shell ? executedTrace(raw, false) : joined(literals.map((t) => executedTrace(t, false)), '\n'), text = exec.s
+    counts.unclassifiable += windowMisses - missesBefore // run strings the scan window lost track of: operations of unknown kind
     const word = new RegExp(FETCH_WORD.source.replace('rtk|', 'rtk|proxy|'), 'gm')
     const matches = [...text.matchAll(word)]
     for (let i = 0; i < matches.length; i++) {
