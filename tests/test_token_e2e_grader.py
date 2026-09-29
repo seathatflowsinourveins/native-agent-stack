@@ -8252,6 +8252,56 @@ class F19d_RepairRoundMutants(GraderCase):
                    "F28_M7.test_the_round_trip_rate_of_an_unfenced_answer_with_a_sum_line_is_one_on_both_bounds"]
         repair_mutant(self, [mock.patch.object(ev, "_answer_toon_items", parent_items)], held, flipped)
 
+    def test_M52b_a_payload_with_no_original_counts_before_the_reading_is_asked(self):
+        """The repair round's own regression: the records-None case decided by decoding first, whatever R2-16 says."""
+        require_toon()
+        ev, fc = evm(), load("frozen_checks")
+
+        def decode_first(ans, records, readings):
+            items = []
+            for candidate in fc.payload_candidates(ans):
+                first = next((line for line in candidate["text"].split("\n") if line.strip()), "")
+                if not fc.toon_header(first) or first.lstrip().startswith("- "):
+                    continue
+                try:
+                    value = fc.decode_candidate(candidate["text"])
+                except fc.DecodeError:
+                    if candidate["structural"]:
+                        items.append({"source": "answer", "status": "unequal" if records is not None else "unknown"})
+                    continue
+                if records is None:
+                    if readings["R2-16"] == "unknown_in_denominator":
+                        items.append({"source": "answer", "status": "unknown"})
+                    continue
+                shaped = ev._document_records(value, readings)
+                items.append({"source": "answer", "status": "equal" if shaped is not None
+                              and ev._records_equal(shaped, records, readings) else "unequal"})
+            return items
+        held = ["F28_M7.test_an_unfenced_toon_answer_with_a_line_after_it_is_one_equal_round_trip",
+                "F28_M7.test_an_unfenced_toon_answer_that_is_wrong_is_one_unequal_round_trip"]
+        flipped = ["F28_M7.test_a_payload_with_no_frozen_original_is_one_unknown_trip_or_none_by_the_reading"]
+        repair_mutant(self, [mock.patch.object(ev, "_answer_toon_items", decode_first)], held, flipped)
+
+    def test_M61_the_scanners_of_the_positive_control_search_again_from_every_start(self):
+        fc = load("frozen_checks")
+
+        def quadratic(text):  # the 7c6ab09c version of integer_lists
+            lists, start = [], 0
+            while True:
+                open_at = text.find("[", start)
+                close = text.find("]", open_at) if open_at >= 0 else -1
+                if close < 0:
+                    return lists
+                body = text[open_at + 1:close]
+                if body.strip() and all(char in "0123456789, \t" for char in body):
+                    lists.append(fc.int_values(fc.int_tokens(text[open_at:close + 1])))
+                start = open_at + 1
+        held = ["H3_PositiveControlOracle.test_a_list_of_event_numbers_is_still_read_and_a_wrong_one_still_fails"]
+        flipped = ["H3_PositiveControlOracle.test_the_integer_list_scan_is_one_pass"]
+        repair_mutant(self, [mock.patch.object(fc, "integer_lists", quadratic)], held, flipped)
+        flipped = ["H3_PositiveControlOracle.test_the_negation_walk_is_bounded_to_one_clause"]
+        repair_mutant(self, [mock.patch.object(fc, "_NEGATION_WALK", 10 ** 9)], held, flipped)
+
     def test_M53_toon_options_are_read_from_every_word_of_the_call(self):
         require_toon()
         ev = evm()
