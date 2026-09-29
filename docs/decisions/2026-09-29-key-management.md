@@ -336,7 +336,9 @@ grammar.
   `set_credential.py`'s value grammar, so the writer and the reader share
   one grammar.
 - The command gets only the entry's declared variables. The caller's copies
-  of every inventory and `must_not_be_set` name are removed first.
+  of every inventory variable, `must_not_be_set` name and other entry's
+  pointer variable (the path of that entry's store file) are removed first;
+  the entry's own pointers stay.
 - Each injected value is masked on both streams, raw and in its encoded
   forms: base64 and base64url interiors at three byte alignments; percent
   as `quote()` and `quote_plus()` write it, with `/` kept or escaped and in
@@ -349,6 +351,10 @@ grammar.
 - Output goes through non-blocking descriptors and a bounded queue in the
   relay's own select loop, so a consumer that stops reading cannot hold the
   runner past a shutdown signal or the 2 s drain deadline.
+- The command's process group is ended (`SIGTERM`, 2 s, `SIGKILL`) on every
+  way out of the runner. On Linux a killed runner is answered by
+  `PR_SET_PDEATHSIG` for the command and by a watchdog process for its
+  whole group.
 - It refuses a host whose `core_pattern` begins with `|` or `@`, one it
   cannot read, and a `RLIMIT_CORE` it cannot set to 0, with no override.
 - The inventory's new optional `public_variables` names the variables that
@@ -390,6 +396,25 @@ limits, and `recipes/tavily.md` keeps the keyring commands as its default.
   limit is below a page (L472-479), and the metadata still carries
   `COREDUMP_ENVIRON`, the process environment (L1458-1459).
 
+**Read for the second repair round, 2026-09-29:**
+- the man-pages `PR_SET_PDEATHSIG(2const)` page (man7.org): the setting is
+  cleared for the child of a `fork`, so the signal reaches the command and
+  not its children; it is sent when the thread that started the command
+  ends; a set-user-ID binary clears it;
+- python/cpython@v3.13.15 `Lib/multiprocessing/resource_tracker.py` (L8,
+  L246-267, L425-429): a helper process that waits for the end of a pipe
+  and ignores `SIGINT` and `SIGTERM`, the shape of the watchdog;
+- bazelbuild/bazel@d2545923 `src/main/tools/process-tools.cc`
+  `KillEverything` (L94-110): `SIGTERM` to the process group, a timeout,
+  `SIGKILL` to the group, the order of the runner's group kill;
+- krallin/tini@924c4bd6 `src/tini.c` (L472-475, L533): a supervisor that
+  forwards the signals it receives to its child, or with `-g` to the child's
+  group, except the ones in its own list (fault and job-control signals).
+  The runner forwards seven, a narrower set on purpose;
+- torvalds/linux@v6.16 `fs/coredump.c`: the `RLIMIT_CORE` of 1 that the
+  kernel sets for a core-dump helper (L630) and the check that aborts a
+  piped dump at that limit (L801-819).
+
 **Alternatives, with pins and evidence class:**
 - **mise v2026.9.16** (commit `2184db81`). *Measured* in a scratch home
   with synthetic canaries (the coordinator's session notes
@@ -398,7 +423,9 @@ limits, and `recipes/tavily.md` keeps the keyring commands as its default.
     child read 0 bytes);
   - a non-UTF-8 line drops the rest of stdout;
   - it injects a decodable copy of the injected environment as
-    `__MISE_DIFF`, and it expands `$` in values;
+    `__MISE_DIFF` (a task can close it with `unset __MISE_DIFF`, which does
+    not change the rejection: a masked run still passes no stdin), and it
+    expands `$` in values;
   - on a malformed line it prints the store path and the raw line with its
     value;
   - it has no id concept and no minimum value length.
@@ -449,6 +476,13 @@ of the same command would also depend on whether it paused before exiting.
 The constant `SHORT_TAIL_MAX` restores the literal rule. A mutation of it is
 caught by `test_flushes_an_unterminated_tail_at_eof`.
 
+**A second deviation from the build contract.** The 6-byte minimum length
+applies to masked names only. A public variable (a base URL that the entry
+lists in `public_variables`) is injected whatever its length, because it is
+not masked, so the rule that keeps a short value from masking ordinary
+output does not concern it. `test_short_values_are_refused` checks a
+one-byte public value.
+
 **Repair round (2026-09-29).** A read-only GPT-6 review at effort max of the
 first head (`e437a361`) returned seven findings. Each was reproduced with a
 synthetic value in a temporary store, or failed a new test first, and is
@@ -462,19 +496,26 @@ fixed with its own test:
    same-uid debugger, `ptrace` or `/proc` read.
 3. *Medium.* The common percent and JSON encoders write forms the masker
    did not register: `quote()` keeps `/`, `quote_plus()` writes `+`, PHP
-   writes `\/`, Go writes `<`. All are needles now. What stays unmasked
-   (nested encodings, wrapped base64, other escapers, fragments) is listed
-   in the runbook, and a test pins the list.
+   writes `\/`, Go writes `\u003c`. All are needles now. What stays
+   unmasked (nested encodings, wrapped base64, other escapers, fragments,
+   and what the second round added) is listed in the runbook, and a test
+   reads that list, prints each form as it is and checks that the list
+   names it.
 4. *Medium.* Overlapping matches were held without a bound: 126,976 bytes
    after 31 chunks of six identical characters. The masker keeps at most
    the longest form minus one byte, and a long run comes out as several
    markers. A scratch fuzz of 40,000 dense-overlap streams in four
-   chunkings (not committed) left the same unmasked bytes as the
-   whole-buffer masker.
+   chunkings (not committed, so not reproducible from this repository) is
+   recorded as having left the same unmasked bytes as the whole-buffer
+   masker. The committed check that stands for it compares the two outputs
+   with the markers removed: it shows that the same bytes are left
+   unmasked, not how many markers there are or where they stand.
 5. *Medium.* Blocking writes let a stalled consumer hold the runner past
    `SIGTERM` (2.7 s, until it read). Output is now non-blocking behind a
-   256 KiB queue per stream. Measured in the tests: a stalled consumer
-   after `SIGTERM`, 0.1 s; after the command's exit, 2.1 s.
+   256 KiB queue per stream. The tests assert bounds: a stalled consumer
+   is not waited for after `SIGTERM` (under 1.5 s), and the runner exits
+   between 1.5 s and 10 s after the command's exit (the 2 s drain). Single
+   manual measurements gave 0.1 s and 2.1 s.
 6. *Medium.* The schema accepted a required variable that was also
    optional and public. It now rejects an overlap and a repeated name, and
    the masked set comes from the schema module.
@@ -482,15 +523,108 @@ fixed with its own test:
    again by the exec (`EBADF` in the command, not end of file). It is
    inheritable now.
 
+**Second repair round (2026-09-29).** A second read-only review of the
+repaired head (`3275b47d`), by an Opus security reviewer with synthetic
+probes, found no path that prints a whole masked value in a form the runner
+claims to mask, and confirmed six of the seven fixes above. It left the
+items below. Each code item failed a new test first.
+1. *Medium.* The command could outlive the runner. It runs in its own
+   session; only `SIGINT`, `SIGTERM` and `SIGHUP` were forwarded; a `SIGKILL`
+   of the runner, or a default-fatal `SIGQUIT`, `SIGUSR1`, `SIGUSR2` or
+   `SIGALRM`, ended only the runner; and descendants still running after
+   the 2 s drain were left running with the key in their environment. The
+   runner now ends the command's process group on every way out
+   (`SIGTERM`, 2 s, `SIGKILL`, reap), forwards the four other signals, and
+   on Linux the command asks the kernel for `SIGTERM` when the runner dies.
+   One step goes beyond the review's wording. The parent-death signal
+   reaches the command and not its children (the kernel clears it for a
+   `fork`), and the test that failed first showed a descendant writing its
+   marker file after a `SIGKILL` of the runner, so a watchdog process ends
+   the whole group when the pipe it shares with the runner closes. It has
+   the shape of CPython's `multiprocessing` resource tracker.
+2. *Low.* The runner removed `variables`, `optional_variables` and
+   `must_not_be_set` of every entry, but not the `pointer_variables` of the
+   others, so a command run under one id could load another entry's file
+   through a pointer that the shell profile sets (`ENV_FILE`,
+   `SEC_CONTACT_ENV`). It now removes every entry's pointer except the ones
+   the selected entry declares.
+3. *Low, tests.* Two rules had no pinning test, and a mutant of each
+   survived a copy of the previous head's test module. A planted entry that
+   declares `LD_PRELOAD`, `PYTHONPATH` or another reserved name is refused
+   before any store is read. One socket end as the runner's stdin, stdout
+   and stderr must stay blocking for the command, which the terminal test
+   could not show (a terminal is never made non-blocking). Both are pinned,
+   with mutants that are caught.
+4. *Docs.* The four limits below are stated once here and once in the
+   runbook.
+5. *Corrections.* The runbook says which signals are forwarded instead of
+   saying that signals pass through. The first round's sentences on the
+   list of unmasked forms, the fuzz and the timing are reworded (above). The
+   tests named after "every real encoder" are renamed, because the PHP and
+   Go JSON forms are string-replacement models of what those encoders
+   write, and only the Python encoders are executed. The deviation on public
+   names is listed (above), and so is the note on the mise spike.
+6. *CodeQL.* The pull request's code scanning reported
+   `py/clear-text-storage-sensitive-data` (high) at
+   `tests/test_credential_run.py` line 141, the `path.write_bytes(...)` of
+   the test helper that writes a synthetic store file. The SARIF data flow
+   of the analysis (`gh api` with `Accept: application/sarif+json`) starts at
+   a variable named `secret` at line 152 that holds a `fake()` value: a name
+   heuristic on a fixture. The variable is renamed, with no suppression
+   comment. CodeQL was not run locally, so CI is the check; if the alert
+   stays, it is a verified false positive for the coordinator to dismiss
+   with a dated comment.
+
+**Limits recorded on 2026-09-29**, once each here and once in the runbook:
+- *The non-blocking flag* is set on the open file description of an
+  inherited pipe or socket, so other writers on that description (`xargs -P`
+  siblings, background jobs, a unit's other processes) can see `EAGAIN` for
+  the length of a run. With two runners on one pipe, the first to exit makes
+  the pipe blocking under the second. The fix (`poll` and writes of at most
+  `PIPE_BUF` for pipes, `send` with `MSG_DONTWAIT` for sockets, or a writer
+  thread that can be abandoned, and never a flag flipped on an inherited
+  description) is planned for the hardening change before the default-path
+  flip.
+- *"Cannot hold the runner"* holds only for the pipes and sockets the
+  runner can make non-blocking. A terminal, a pty, a regular file, a
+  description shared with stdin, and any sink that falls back to direct
+  writes use blocking writes, and can hold the runner past a signal.
+- *Unmasked forms.* The list gains a value broken by wrapping or by other
+  bytes between its parts (`xxd` or `hexdump -C` columns, `fold`, wrapped
+  table cells, colour codes, two writers on one stream), hex with
+  separators, a value with a single quote that the shell requotes (`set -x`,
+  `printf %q`), and anything the command writes to an inherited read-write
+  stdin, which never passes through the relay. The rule: a value is masked
+  only where a whole form of it appears unbroken in one stream.
+- *The command's lifetime.* A `SIGKILL` of the runner before the watchdog
+  has started leaves only the parent-death signal. A descendant that leaves
+  the process group (`setsid`, `setpgid`) is out of reach of the group kill
+  and of the watchdog, and so is a set-user-ID command. Only Linux has been
+  run; the watchdog has not been run on macOS. A same-user debugger or
+  `ptrace` is out of scope.
+
+**Unverified lead, not a claim (2026-09-29).** At an `RLIMIT_CORE` of exactly
+1 the kernel aborts a piped core dump: in torvalds/linux@v6.16
+`fs/coredump.c` a limit of 1 is the recursion guard (L801-819, reported as
+"RLIMIT_CORE is set to 1, aborting core"), and L630 sets it for the dump
+helper itself. The runner might therefore set (1, 1) instead of (0, 0) and
+work on a host with a piped `core_pattern` instead of refusing it. It has
+not been tested against a real collector, and the refusal stays until it
+is.
+
 **Evidence class.**
 - *Local integration*, synthetic values in temporary stores:
-  `tests/test_credential_run.py` (60 tests) and the schema tests in
+  `tests/test_credential_run.py` (77 tests) and the schema tests in
   `tests/test_credential_status.py`. The runner tests were written first
   and failed to import the missing tool; the schema tests failed on the
-  missing field; each repair test failed before its fix. In a scratch
-  mutation run, each of 61 mutants (32 of the first round, 29 for the
-  repair round, one rule removed or changed each time) failed its intended
-  test, and the files were restored by sha256. The tests start the runner
+  missing field; each test of a code repair failed before its fix (the
+  second round's items 1 and 2 on the previous head). The pinning tests of
+  the second round's item 3 passed at once, so a mutant of each rule was
+  run against a copy of the previous test module first, and survived it. In
+  a scratch mutation run, each of 80 mutants (32 of the first round, 29 for
+  the first repair round, 19 for the second, one rule removed or changed
+  each time) failed its intended test, and the files were restored by
+  sha256. The tests start the runner
   through a test-only launcher on a host whose real `core_pattern` pipes
   crash dumps, which CI runners commonly do; the two tests of the real
   re-execution skip there, and one test checks the real tool against the
@@ -499,14 +633,20 @@ fixed with its own test:
   at apple-oss-distributions/adv_cmds@6bed8737.
 - *Measured once in a session scratch directory, no committed receipt*: the
   mise, agentself and dotenvx spikes, the check of this checkout's guard on
-  `tvly auth` behind the runner, and one run of the 60 runner tests under a
-  uv-managed CPython 3.9.25 on Linux (all pass).
+  `tvly auth` behind the runner, one run of the 77 runner tests under
+  uv-managed CPython 3.9.25 and 3.14.7 on Linux (all pass, with
+  `DeprecationWarning` an error in the test process), and one run of
+  coreutils `timeout -k` against the runner with a command and a descendant
+  that both ignore `SIGTERM`, in a synthetic store: `timeout` killed the
+  runner, and both were gone about 3 s after it returned.
 - *Not yet observed*: the runner on macOS, including the Command Line Tools
-  `python3`, a
+  `python3` and the watchdog, a
   real key through it (the canary harness is a later change), a host that
   pipes crash dumps (the refusal is tested with pattern files, not with a
-  real `systemd-coredump` crash), and the runner's guard model and the
-  default-path flip, which are the second phase of this change.
+  real `systemd-coredump` crash), a harness escalation such as `timeout -k`
+  (the tests send `SIGKILL` to the runner directly), and the runner's guard
+  model and the default-path flip, which are the second phase of this
+  change.
 
 **Overturn.**
 - A maintained upstream tool does all of the following, measured with the
