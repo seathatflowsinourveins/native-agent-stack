@@ -44,11 +44,11 @@ It never writes ~/.agents/skills, ~/.claude/skills or
 the skill lock file directly -- only the `skills` CLI does, exactly as it
 would for a person running it by hand.
 
-The global skill lock path honors $XDG_STATE_HOME exactly like the upstream
-CLI: ``$XDG_STATE_HOME/skills/.skill-lock.json`` when that variable is set,
-else ``~/.agents/.skill-lock.json``. Only *that* lock path check reads the
-variable; the canonical skill folders and the claude-code symlink stay under
---home/.agents and --home/.claude regardless of $XDG_STATE_HOME.
+The global skill lock path honors $XDG_STATE_HOME exactly like the upstream CLI:
+``$XDG_STATE_HOME/skills/.skill-lock.json`` when that variable is set, else ``~/.agents/.skill-lock.json``.
+Only *that* lock path check reads the variable; the canonical skill folders and the claude-code symlink
+stay under --home/.agents and --home/.claude regardless of $XDG_STATE_HOME. Every global path is joined as
+the CLI's path.join joins it (node_path_join), so a ".." in --home or $XDG_STATE_HOME names what it wrote.
 
 With --project-dir, the same pipeline invokes the CLI in that existing directory,
 without -g, targeting --agent (default universal). The project lock is
@@ -186,9 +186,10 @@ def sha256_of(path: Path) -> str:
 
 
 def canonical_skill_dir(home: Path, name: str, project_dir: Path | None = None) -> Path:
-    """The upstream CLI's one canonical copy; Codex reads this directly and
+    """The upstream CLI's one canonical copy (src/installer.ts:128-131); Codex reads this directly and
     claude-code gets a relative symlink onto it (../../.agents/skills/<name>)."""
-    return (project_dir or home) / ".agents" / "skills" / name
+    return (project_dir / ".agents" / "skills" / name if project_dir is not None
+            else node_path_join(str(home), ".agents", "skills", name))
 
 
 # What JavaScript's String.prototype.trim removes (ECMA-262 WhiteSpace and LineTerminator): the 25 code points
@@ -202,13 +203,12 @@ def claude_skills_dir(home: Path, project_dir: Path | None = None) -> Path:
     """Where the CLI links claude-code skills: <project>/.claude/skills, or globally
     $CLAUDE_CONFIG_DIR/skills when that is set and not blank, else home/.claude/skills
     (skills@1.7.0 npm dist/cli.mjs L1398 claudeHome, L1511 globalSkillsDir). The global
-    path is trimmed and normalized as the CLI's trim() and path.join do: os.path.normpath,
-    except that a leading // collapses to / as in Node."""
+    path is trimmed as the CLI's trim() trims it (JS_TRIM_CHARS) and joined as its
+    path.join joins it (node_path_join)."""
     if project_dir is not None:
         return project_dir / ".claude" / "skills"
     claude_config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip(JS_TRIM_CHARS)
-    joined = os.path.normpath(os.path.join(claude_config_dir or str(home / ".claude"), "skills"))
-    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
+    return node_path_join(claude_config_dir or str(home / ".claude"), "skills")
 
 
 def project_containment_problem(project_dir: Path, home: Path, names: list[str]) -> str | None:
@@ -238,10 +238,10 @@ def project_containment_problem(project_dir: Path, home: Path, names: list[str])
 def lock_file_path(home: Path, project_dir: Path | None = None) -> Path:
     if project_dir is not None:
         return project_dir / "skills-lock.json"
-    xdg_state_home = os.environ.get("XDG_STATE_HOME")
+    xdg_state_home = os.environ.get("XDG_STATE_HOME")  # dist/cli.mjs L3746-3750: untrimmed, any non-empty value
     if xdg_state_home:
-        return Path(xdg_state_home) / "skills" / ".skill-lock.json"
-    return home / ".agents" / ".skill-lock.json"
+        return node_path_join(xdg_state_home, "skills", ".skill-lock.json")
+    return node_path_join(str(home), ".agents", ".skill-lock.json")
 
 
 def load_lock(home: Path, project_dir: Path | None = None) -> dict:
@@ -479,6 +479,19 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
     print(f"{name}: installed content did not match the pinned manifest hash/tree; rolled back",
           file=sys.stderr)
     return "rolled-back"
+
+
+def node_path_join(*parts: str) -> Path:
+    """Node's POSIX path.join, with which the pinned CLI builds every global path it writes: the lock
+    (skills@7407f389 src/skill-lock.ts:67-72, npm dist/cli.mjs L3746-3750), the canonical folder
+    (src/installer.ts:128-131, dist/cli.mjs L2208-2210) and the claude-code link (dist/cli.mjs L1511).
+    Node joins the non-empty parts with / and normalizes the result, so "." and ".." collapse lexically.
+    os.homedir() is HOME verbatim, so only this join removes a ".." from --home; pathlib keeps it, and
+    through a missing or symlinked folder it names another path than the CLI's. os.path.normpath
+    normalizes as Node does, except that it keeps a leading // (POSIX leaves it implementation-defined),
+    which Node collapses to /. No part joined here ends in /, which Node would keep."""
+    joined = os.path.normpath("/".join(part for part in parts if part))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
 
 
 def print_codex_config(skills: list[dict]) -> None:

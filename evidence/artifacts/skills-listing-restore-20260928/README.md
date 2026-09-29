@@ -135,3 +135,20 @@ state.
   They are the discriminating runs for the passing one. The folder fixtures are altered copies of
   this host's installed folder. The gitlink listing is a rewritten response, not an upstream state.
 - The results cover this host's folder at the time of the runs, not another host's.
+
+## Erratum (2026-09-28)
+
+[`tree_drift_check.py`](tree_drift_check.py) takes two more functions from `scripts/skills_status.py`
+than the [Method](#method) section and each output's `method.functions` name: `resolve_lock_path` and
+`load_lock` (`tree_drift_check.py` L284-285). They pick and read the global skills lock behind
+`local.lock_entry_state`. The script keeps no copy of them: `load_checker` (L121-128) executes the
+checkout's live `scripts/skills_status.py`, the same code an import runs. A re-run therefore uses the
+`resolve_lock_path` that the checkout holds, and records that file's sha256 as `method.module_sha256`.
+
+A later change joins that lock path as the skills 1.7.0 CLI joins it, with `path.join`
+([`src/skill-lock.ts` L67-72](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/skill-lock.ts#L67-L72)),
+which collapses a `..`. From that change on, a re-run records a new `method.module_sha256` in place of
+`adf89cd8…`. Its lock read, and so `local.lock_entry_state`, matches the recorded outputs only when
+neither `HOME` nor `XDG_STATE_HOME` has a `..` component. With one, it reads the lock where the CLI
+wrote it, while the default folder (`~/.agents/skills/<skill>`, joined by `pathlib`) keeps the `..`.
+The script and its six outputs are unchanged.

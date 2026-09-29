@@ -421,6 +421,29 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(default_report["lock"]["state"], "missing")
         self.assertEqual(default_report["result"], "fail")
 
+    def test_lock_path_is_joined_as_the_cli_path_join_joins_it(self):
+        # skills 1.7.0 builds the lock path with path.join (vercel-labs/skills@7407f389 src/skill-lock.ts:67-72),
+        # which collapses ".." and a leading //, from HOME or XDG_STATE_HOME verbatim. pathlib keeps the "..",
+        # and a path through the missing folder does not exist, so the lock the CLI wrote read as missing.
+        manifest, alpha, beta = self.setup_pair()
+        missing, xdg_state = self.tmp / "missing", self.tmp / "xdg-state"
+        xdg_lock = xdg_state / "skills" / ".skill-lock.json"
+        env = {**self.env, "XDG_STATE_HOME": str(missing / ".." / "xdg-state")}
+        self.assertEqual(ss.resolve_lock_path(self.home, env), (xdg_lock, "xdg_state_home"))
+        self.assertEqual(ss.resolve_lock_path(self.home, {"XDG_STATE_HOME": "/" + str(xdg_state)}),
+                         (xdg_lock, "xdg_state_home"))
+        self.assertEqual(ss.resolve_lock_path(missing / ".." / "home", {}),
+                         (self.home / ".agents" / ".skill-lock.json", "default"))
+        (self.home / ".agents" / ".skill-lock.json").unlink()  # only the CLI's XDG lock holds the entries now
+        self.write_lock(self.lock_entries_for([alpha, beta]), path=xdg_lock)
+        report = self.report(manifest, env=env)
+        self.assertEqual(report["lock"], {"source": "xdg_state_home", "state": "ok", "version": 3,
+                                          "version_matches": True})
+        self.assertEqual(report["result"], "ok")
+        result = self.run_cli(manifest, env=env)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse(missing.exists())
+
     # -- extra skill warning ----------------------------------------------------
 
     def test_extra_skill_warning(self):

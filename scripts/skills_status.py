@@ -181,11 +181,11 @@ def _git_blob_sha(data: bytes) -> bytes:
 
 
 def resolve_lock_path(home: Path, env) -> tuple[Path, str]:
-    """(path, source) where source is "xdg_state_home" or "default"."""
+    """(path, source), source "xdg_state_home" or "default"; joined as the CLI joins it (node_path_join)."""
     xdg_state_home = env.get("XDG_STATE_HOME")
     if xdg_state_home:
-        return Path(xdg_state_home) / "skills" / LOCK_BASENAME, "xdg_state_home"
-    return home / ".agents" / LOCK_BASENAME, "default"
+        return node_path_join(xdg_state_home, "skills", LOCK_BASENAME), "xdg_state_home"
+    return node_path_join(str(home), ".agents", LOCK_BASENAME), "default"
 
 
 def load_lock(path: Path) -> tuple[dict | None, str]:
@@ -509,6 +509,18 @@ def main(argv: list[str] | None = None) -> int:
     report = inspect(manifest, args.home, skills_bin=args.skills_bin)
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_text(report))
     return 0 if report["result"] == "ok" else 1
+
+
+def node_path_join(*parts: str) -> Path:
+    """Node's POSIX path.join, with which skills 1.7.0 builds the lock path (vercel-labs/skills@7407f389
+    src/skill-lock.ts:67-72, npm dist/cli.mjs L3746-3750): the non-empty parts joined with / and normalized,
+    so "." and ".." collapse lexically and a leading // becomes / (os.path.normpath alone keeps it). pathlib
+    keeps a "..", which through a missing or symlinked folder names another file than the CLI's.
+    tools/adoption/install_skills.py applies the same join. This checker keeps its own copy because
+    evidence/artifacts/skills-listing-restore-20260928/tree_drift_check.py executes it from its own bytes and
+    records their sha256 (load_checker)."""
+    joined = os.path.normpath("/".join(part for part in parts if part))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
 
 
 if __name__ == "__main__":
