@@ -104,8 +104,11 @@ a slash. `<unit>` is one of `ecosystem-otelcol`, `ecosystem-loki`, `ecosystem-pr
 The usage probe is `claude -p OK --model haiku --output-format json --verbose --no-session-persistence --setting-sources
 project`, run in a temporary directory without `OTEL_RESOURCE_ATTRIBUTES` and `RTK_DB_PATH`. The brief's command reads the
 same event; `--verbose` makes the output the event array whatever the user's settings say, and the other flags keep the
-call from running the user's hooks or MCP servers or leaving a transcript. `--no-usage-probe` skips it and reports the
-four items as `missing` with reason `skipped`.
+call from loading the user settings, where the user's hooks, plugins and MCP servers are configured, and from saving a
+session. Observed on 2026-09-29 (claude 2.1.284): the isolated call started none of the MCP servers that a call with the
+user settings reported (seven) and left no transcript directory. The event stream does not name hooks, so that no user
+hook ran is inferred from the settings source, not observed. `--no-usage-probe` skips the call and reports the four items
+as `missing` with reason `skipped`.
 
 ## Configuration
 
