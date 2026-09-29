@@ -137,8 +137,12 @@ class PraU1EvidenceTooling(unittest.TestCase):
         next where the earlier time is measurable; a run over the limit ends the shape."""
         with tempfile.TemporaryDirectory() as tmp:
             stub = Path(tmp) / "kernel.mjs"
-            stub.write_text("export const commandInvocations = (text) => [{ lane: null, length: text.length }]\n")
+            stub.write_text("export const commandInvocations = (text) => [{ lane: null, length: text.length }]\n"
+                            "export const withShellTree = (text, visit) => visit({ hasError: text.length < 0 })\n")
+            bare = Path(tmp) / "bare.mjs"
+            bare.write_text("export const commandInvocations = (text) => []\n")  # no withShellTree: no parse-only series
             out = self.run_node("scaling.mjs", "--kernel", stub, "--sizes", "50,100,200", "--shapes", "words,comments", "--runs", "2")
+            without = self.run_node("scaling.mjs", "--kernel", bare, "--sizes", "50,100", "--shapes", "words", "--runs", "1")
         self.assertEqual(out["sizes"], [50, 100, 200])
         self.assertEqual(sorted(out["shapes"]), ["comments", "words"])
         for name, shape in out["shapes"].items():
@@ -146,6 +150,10 @@ class PraU1EvidenceTooling(unittest.TestCase):
             self.assertEqual(len(shape["ms"]), 3, name)
             self.assertTrue(all(isinstance(t, (int, float)) and t >= 0 for t in shape["ms"]), name)
             self.assertIn("max_ratio", shape)
+            # the time of the parse alone (kernel.withShellTree with nothing to do), to tell a slow parse from a slow reading
+            self.assertEqual(len(shape["parse_ms"]), 3, name)
+            self.assertIn("parse_max_ratio", shape)
+        self.assertIsNone(without["shapes"]["words"]["parse_ms"])
         self.assertEqual(out["shapes"]["comments"]["chars"], [100, 200, 400])  # '# c\n' x ceil(2n / 4)... = about 2n characters
         self.assertRegex(out["kernel_sha256"], r"^[0-9a-f]{12}$")
 
