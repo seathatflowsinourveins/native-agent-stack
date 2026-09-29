@@ -1714,7 +1714,8 @@ def parse_args(argv=None):
     codex.add_argument("--model", required=True,
                        help="Model passed to codex exec -m and recorded on each judgment; must match the openai "
                             "pattern of scripts/landscape.py FAMILY_MODEL_PATTERNS.")
-    codex.add_argument("--effort", default="high")
+    codex.add_argument("--effort", default="max",
+                       help="model_reasoning_effort for the judge and the refuter (default max, the standing GPT-6 lane setting; a judgment made at another effort is rerun).")
     codex.add_argument("--jobs", type=int, default=1)
     codex.add_argument("--layers", default=None)
     codex.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT)

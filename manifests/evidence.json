@@ -42497,8 +42497,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "da4982920c74778a547769b8b99803fd8b28cd11d82cef7746920fd2d6436d68",
-      "bytes": 25562
+      "sha256": "9542727e2b64ae38edd4222a86314008397150655fec84303faba44513b1e6c7",
+      "bytes": 25561
     },
     {
       "path": "recipes/tavily.md",
@@ -43807,13 +43807,13 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "4c2829824cf704311f850963852f78faadd6a4aba4d40c073990b0f1607502cc",
-      "bytes": 178260
+      "sha256": "a5abfdeefb962d5f78e90a375eb84f3c4c722a0ab7ee7ac1b57236877dcd6f66",
+      "bytes": 178282
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
-      "sha256": "58fd1870007d59c8f2b8a46dec434ecb6363607fc4dbd78962496085757cc8d2",
-      "bytes": 108209
+      "sha256": "81645780e37d87756f10c5a023068105b9a4f32de8fcf3ca858ef60683caaad5",
+      "bytes": 108384
     },
     {
       "path": "tools/sota-convergence/adjudication-prompt.md",
@@ -43952,8 +43952,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "e95afe885137aabc4d39c7c42b6da6f7e70fcbfe9fd7988d776670a64cc1331f",
-      "bytes": 11480
+      "sha256": "fc304fcd5fca49dcc17330e09621700ba2e2b8a18e631b2d7a96cef59d4d00e5",
+      "bytes": 12503
     },
     {
       "path": "tools/sota-convergence/practice_references.py",
