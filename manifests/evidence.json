@@ -3547,16 +3547,17 @@
         "claude-code",
         "codex"
       ],
-      "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag.",
+      "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, bubblewrap 0.9.0, Windows Terminal 1.24.11911.0): a login shell started the way the Windows Terminal profiles start it (wsl.exe --exec /bin/bash -lc) could not find claude, codex or rtk while an empty ~/.bash_profile hid ~/.profile; the empty file had been created within about a second of 14 other empty entries (13 in the home directory, one in the system temp directory) by a scrub-mode `claude -p` probe of a peer session, and removing that one file restored the commands. In an isolated home with the installed client, CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 created an empty ~/.bash_profile and removed ~/.local/bin from the login PATH; the same run without the variable created no empty files; and a real ~/.bash_profile that hands off to ~/.profile stayed byte-identical and kept the PATH. The doctor's login-shell-path check failed on the three broken temporary homes and passed on the two healthy ones and on the real host, and the real host's login PATH was identical before and after the hand-off file was created. The reproduction was re-run after the bounded re-check with the client's temporary state redirected to a short private directory beside each throwaway home (TMPDIR and CLAUDE_CODE_TMPDIR): the real /tmp and /tmp/claude-<uid> gained no top-level entry during the recorded run apart from /tmp/inline-comments-buffer.jsonl, which was absent before, appeared during the run and was removed by the script, the real home's placeholder names were unchanged, and the arm counts were 0 empty files with no variable, 27 with it in the stock home and 26 with a real hand-off file. A control run whose socket path (121 bytes, from a 99-byte private path) exceeded the client's own 103-byte cap on `<dir>/cc-socks/<pid>.sock` put the messaging-socket directory into a fixed /tmp/cc-socks-<uid> directory in the real /tmp instead, so the redirect holds only while the private path is short (under about 81 bytes with a 7-digit pid) and XDG_RUNTIME_DIR stays unset. The native `claude doctor` warned 3 times with the sandbox off and 4 times with it enabled and a planted stale mask file; it named the planted file (the warning is live) and named the scrub-created ~/.bash_profile, a writable 0644 file outside the warning's documented scope of 0-byte read-only placeholders, in neither run. The upstream landscape on 2026-09-29 gave no trigger to change the terminal settings: no new Windows Terminal release, both toast signals unchanged, Claude Code 2.1.284 still the newest, and Codex's notification, palette and kind sources identical between the installed tag and the newest stable tag (rust-v0.159.0 at the re-run).",
       "limitations": [
         "One workstation and one Ubuntu 24.04 distro (the independent-observation class of docs/acceptance-evidence-policy.md). The Polaris distro's profiles (Librarium, Phoyo) were not measured. Another host collects its own evidence.",
         "The incident's creator is established by timing, by the same-second leftovers in the probe's scratch working directory (present in its scrub arm, absent in its no-scrub arm), by the owning session's confirmation, and by the isolated reproduction plus public reports (anthropics/claude-code #76236, #78072). The peer probe itself was not re-run. The reproduction stops at the API-key check: it shows the files are created at startup, and says nothing about a full session or about exit. Upstream states the placeholders persist after exit and is considering cleaning them up; that was not measured here.",
         "The observations of the incident (login probes before and after, the leftover list, the journal and unit checks) are the coordinator's own shell output of 2026-09-29, recorded here as values; no raw output is retained.",
         "The hand-off file protects only the name ~/.bash_profile. A creator that truncates or replaces an existing file is not covered; the doctor check catches an empty ~/.bash_profile or ~/.bash_login and any missing command, but the doctor has no scheduler, so it finds a recurrence only when it is run.",
         "The doctor code lives in a repository with no remote (practice repository commit 512c3e3); this receipt's artifact folder carries a copy of the function with the home made a parameter. The full doctor run predates the creation of the hand-off file; the check alone was re-run after it.",
-        "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.158.0 was not run. The candidate notifiers were compared by repository head and latest release only, not run.",
-        "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (for example 50 and 49 entries in the stock-home arm); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` result was measured in one throwaway home with the scrub-created file and without the sandbox feature enabled.",
-        "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session."
+        "The Codex comparison is a source diff of four files between two tags plus a check of the notification definitions; Codex 0.159.0 (the newest stable at the re-run) was not run. The candidate notifiers were compared by repository head and latest release only, not run. The three candidates agent-deck, ccmanager and zellij were first recorded by the refresh script on 2026-09-29, so their heads have no earlier pin to be compared with.",
+        "The reproduction and the five controls are isolated fixtures (synthetic class); the incident probes and the real-host runs are native observations. Entry counts of the reproduction varied by one between runs of the same script (50 entries in the stock-home arm in the first run, 49 in the re-runs); the conclusions rest on the booleans and the empty-file counts. The native `claude doctor` was run in one throwaway home with the scrub-created file, with the sandbox off and with it enabled plus a planted stale mask file. That planted file shows the warning is live; it is not a positive control for the scrub placeholder, which the warning's documented scope (0-byte read-only placeholders at settings paths) does not cover, so the doctor's silence about ~/.bash_profile follows from that scope and is not evidence about the file.",
+        "The `claude agents --json` figures are a live snapshot of this host's sessions at the time of the run; the same command with a path that holds no session printed no rows, and `--all` added one completed background session.",
+        "The private temporary directory changes where the client's temporary state goes, not what it creates in the home or the working directory, and it holds only while it is short: the client caps its messaging-socket path, <dir>/cc-socks/<pid>.sock, at 103 bytes (its own constant), and a private path of 99 bytes, which gives a 121-byte socket path, made it use a fixed /tmp/cc-socks-<uid> directory in the real /tmp (the control run; the client also prefers XDG_RUNTIME_DIR, which the probes never set). That the real /tmp and /tmp/claude-<uid> gained no other top-level entry is a property of the recorded run (about three seconds, on a host where other sessions were running): a concurrent session can add an entry inside that window, and one would have counted. What each arm's private directory held varies a little between runs, so those counts are one run's observation. The shared /tmp/inline-comments-buffer.jsonl sits at a path the client hard-codes; the script cannot tell its own arms' creation of it from a concurrent session's, so it reports that the file appeared during the run and removes it only when it was absent before and is an empty regular file created after the run began."
       ],
       "path": "evidence/receipts/login-shell-contract-20260929.json"
     },
@@ -3581,6 +3582,28 @@
         "The run-shape statistics describe this host and window. They do not show that fewer or shorter children lower cost at equal quality, and data.derived is arithmetic on generic price ratios; no quality comparison was run."
       ],
       "path": "evidence/receipts/claude-spend-attribution-20260929.json"
+    },
+    {
+      "id": "wsl-terminal-defaults-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex"
+      ],
+      "claim": "On this host on 2026-09-29 (Claude Code 2.1.284, and 2.1.283 in a second distro; Codex 0.157.1; bash 5.2.21; Windows Terminal 1.24.11911.0) the repository now carries the terminal defaults that had been set by hand on the host. Merging the linux-wsl2 Claude Code overlay into the live settings with the repository's merge tool changed nothing (the merge equalled the live file), exactly one Notification group holds the bell command, and its matcher equals the overlay's (the acceptance script checks the matcher because the merge alone cannot see it). The rendered Codex template loads under `codex --strict-config` (the run stops at authentication, never at configuration); a wrong type for `[tui] notifications` and an unknown top-level key are refused, and an unknown key inside `[tui]` is not. The static `adoption_status.py --login-shell` model agreed with the real bash login search in all 512 combinations of three startup files over eight states, a FIFO made bash block (the model calls it unusable and unread), and a control that takes an empty file as absent disagreed in 26. In the second distro, the two per-project Claude profiles of the Windows Terminal settings dropped `suppressApplicationTitle` and gained the quiet bell, the audible-and-taskbar bell style and `COLORTERM` through the profile environment key, with every other profile and setting unchanged; the overlay merged into that distro's Claude settings changed only `$schema`, `hooks` and `preferredNotifChannel`, and its installed hook command printed exactly one BEL. The host practice repository's terminal-profile check now scans the live settings file and passed with 0 findings (the pre-change settings file fails it with 8 findings on the two per-project profiles), and its 22 single-defect controls each failed for exactly their rule.",
+      "limitations": [
+        "One workstation and one Ubuntu 24.04 distro plus one second distro (the independent-observation class of docs/acceptance-evidence-policy.md). Another host collects its own evidence, and none of the new files is in the pinned release: a new host gets them only after a release carries them and the manifest is re-pinned.",
+        "No Windows Terminal tab was opened or measured after the second distro's profile change, and no session of that distro was started or observed after its overlay. Claude Code applies edits to `hooks` to a running session without a restart (settings reference, \"When edits take effect\"), so open sessions there should pick the overlay up; that was not observed, and an audible or taskbar bell for the alert path was not observed by the user in this work.",
+        "The profile example was checked as JSON against the policy. It declares no `guid`, so Windows Terminal derives a stable one from the folder and profile names (read in its source at the installed tag); it was not loaded into Windows Terminal or installed on any host. The host's deployed fragment is the practice repository's own file.",
+        "The `--login-shell` check reads file metadata only and models bash's login search from the source of bash 5.3 (shell.c execute_profile_file, builtins/evalfile.c) and the installed 5.2.21 on Linux; it does not run a login shell, read a startup file (so a non-empty file's hand-off is unknown, reported as null), or cover /etc/profile, ~/.bashrc, another shell, --noprofile, POSIX mode, an sh-mode login or macOS's bash 3.2. A special file is reported unusable: bash reads a device as empty and blocks on a FIFO, and both end the search; an unusable ~/.profile is reached but not read, so profile_read is false; HOME is the environment's, else the passwd entry's, else \"/\", the way bash falls back.",
+        "The Codex acceptance is a configuration load: no Codex notification was produced in this work, `async-question` does not exist at the macOS pin's tag (inert there) and Codex 0.155.1 was not run. Codex does not validate keys inside `[tui]`, so the repository's test pins that table's setting names. A `request_user_input` question notifies as `plan-mode-prompt` at both tags (tool_requests.rs L449-458), so `async-question` adds only the asynchronous questions 0.155.1 lacks.",
+        "The second distro's `tui` is `fullscreen` by its own setting; `CLAUDE_CODE_ALT_SCREEN_FULL_REPAINT` was not set, as the upstream documentation makes it a reactive fix and no stale rendering was observed or measured.",
+        "The host practice repository has no remote (commits fcd291f, 396d1c1, 9500656, c14e8c3, 9f615ad and d0c7d9c); its check and controls are recorded here as results only. The Windows Terminal settings patch and the second distro's merge were host operations on private files, recorded as values.",
+        "The second distro's Claude Code is 2.1.283, one release before this host's. A scan of the installed binaries (this host's 2.1.282, 2.1.283 and 2.1.284, and that distro's 2.1.283) found the `notifications_disabled` and `terminalSequence` literals and `worker_permission_prompt` emitted from the same two team-inbox call sites in each (the second distro's binary is byte-identical to this host's 2.1.283 by SHA-256 prefix, and its occurrence counts by `grep -a -o` equal this host's scan), so the whole matcher is live there. The changelog dates `terminalSequence` to 2.1.141 and has no entry for `notifications_disabled`, which the settings reference documents. The hook was run in that distro.",
+        "The merge de-duplicates hooks by command anywhere in the event, so it never changes the matcher of a Notification hook that already runs the bell command: after a later matcher change the old group must be edited or removed first. The acceptance script checks the group count and the matcher for that reason, and a unit test proves it refuses a catch-all group and an older matcher.",
+        "The Codex `[tui] notifications` list is in the template that a macOS host also renders. Codex keeps its own per-terminal channel there, so needed kinds still notify natively and the turn-complete one stops; at the macOS pin `async-question` does not exist and is inert. This was decided and documented, and not observed on a Mac."
+      ],
+      "path": "evidence/receipts/wsl-terminal-defaults-20260929.json"
     }
   ],
   "files": [
@@ -3811,8 +3834,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "b255c1f62275d1632913cf67b09ce8b8141c1eb4ead9a53c503981f4ba5ec577",
-      "bytes": 46441
+      "sha256": "41d3ce13ea5b87697c605a426fe7d8e43afa1e319b8bba937cffc0dff5b1772b",
+      "bytes": 47232
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3956,13 +3979,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "6fff01fecf2f77e7257442c3cf128cfbe57d8d9f37b781e9d21ff59fda600f78",
-      "bytes": 15867
+      "sha256": "a547db2e82f27299671f3a6361c86b7b8d962e89f1289948f54d6d7da1cf1157",
+      "bytes": 21951
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "63a39894c284540579051912994620bce3a8effef33da4588ee2a2199b949390",
-      "bytes": 61210
+      "sha256": "b1527acccffb8602192ce51d8a3e48071e34b8ba6d950bc263e21303a2ac310b",
+      "bytes": 62249
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -4005,6 +4028,11 @@
       "bytes": 50612
     },
     {
+      "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
+      "sha256": "52042017abb798c913f3abbeb01a5c9448bfa0bca26d11ab0bb82496afee40aa",
+      "bytes": 533
+    },
+    {
       "path": "adoption/templates/claude.settings.template.json",
       "sha256": "6c4035f957c5eee4fa91a2e7b207a845e97f84acd44b48e1af37b38d31efe4e0",
       "bytes": 11144
@@ -4016,8 +4044,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f84f0e0836db9bc59cf0676bfceff94b0812c1f972d7844a004a165a7df0f6a6",
-      "bytes": 12118
+      "sha256": "0716d4f6996f40d762fa0c98f23ef91cd39ca7422eddedaa0b344d999c53e4da",
+      "bytes": 12875
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -14622,8 +14650,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "d317155036ffbca44aeabcfd156f0537d12ff33cb3cdb7033789555c592ea7e9",
-      "bytes": 38862
+      "sha256": "5076e3d335546f2bdf17682ee7b99cad622305ad20d7d8d7a6c5ccd87d6fb7e5",
+      "bytes": 51477
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -14767,8 +14795,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "7751294f9a56ba8681a126a6d079a2cc49739d4b026475e4afeafa536642b6da",
-      "bytes": 79884
+      "sha256": "0da5409d42adb063e2c3cc549feeaccf2c4b7c454af72f915bff0265712bb68a",
+      "bytes": 82073
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -32052,8 +32080,8 @@
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/README.md",
-      "sha256": "7eec0eea94f66f6c0f259db00c9e8d4fc6e99b6afb3130f1c01f169de790cfd5",
-      "bytes": 3568
+      "sha256": "97fc3a22e79c67e692be998e42404958e66b5f017b283d2c6386249c5ee0a7b3",
+      "bytes": 5980
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/agents_json_probe.py",
@@ -32062,8 +32090,8 @@
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
-      "sha256": "1729003cffe560d246fa06131bbb62679867f410df4e815eb792fbea1ee5fa4b",
-      "bytes": 8047
+      "sha256": "6e36f4368d67e130a75577e94d6d1cee77a8e257137a4ce457023758ff2af11e",
+      "bytes": 8758
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
@@ -32077,8 +32105,18 @@
     },
     {
       "path": "evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py",
-      "sha256": "0eff1d26583879c0e74b79fbda23b134b66a3e7868fd593deab8c596dc2869f6",
-      "bytes": 8906
+      "sha256": "cd9ad8e51fd842bf8a0f9cf79e3376b59ad9015d4ab3b0fa255c67f628e5b56c",
+      "bytes": 13152
+    },
+    {
+      "path": "evidence/artifacts/login-shell-contract-20260929/socket_path_fallback_probe.py",
+      "sha256": "caa50ab0e7e54a4bbabf407a56db9ef5012688ff911dec71d56a389554a18239",
+      "bytes": 4949
+    },
+    {
+      "path": "evidence/artifacts/login-shell-contract-20260929/startup_placeholder_names.py",
+      "sha256": "491bd010f639b4b353c76e4a18b4be4d510735fc0039cd17f214d50080c7cea4",
+      "bytes": 2303
     },
     {
       "path": "evidence/artifacts/mac-stage1-client-layer-20260927/README.md",
@@ -40586,6 +40624,31 @@
       "bytes": 12602
     },
     {
+      "path": "evidence/artifacts/wsl-terminal-defaults-20260929/README.md",
+      "sha256": "01e5536e1cbdbe9c0f83855bab85d26fc6f817cb2ca5b82e2dc58880e5c10896",
+      "bytes": 3535
+    },
+    {
+      "path": "evidence/artifacts/wsl-terminal-defaults-20260929/claude_binary_notification_scan.py",
+      "sha256": "9a7a198b1c71af87efd9ff60c77b24b3f05154a69809e5c29c5ddeeee5775808",
+      "bytes": 1863
+    },
+    {
+      "path": "evidence/artifacts/wsl-terminal-defaults-20260929/codex_tui_strict_check.py",
+      "sha256": "9660ea362bed9fa6ebc642adfab1b5cf7348b76f5a0cf4bb664a6b4370bcd00d",
+      "bytes": 3392
+    },
+    {
+      "path": "evidence/artifacts/wsl-terminal-defaults-20260929/login_shell_bash_truth.py",
+      "sha256": "fc2bd10af1b87aea10cc652f57140cd83695bffeeefb5c484236a22346fc9db5",
+      "bytes": 6082
+    },
+    {
+      "path": "evidence/artifacts/wsl-terminal-defaults-20260929/overlay_noop_check.py",
+      "sha256": "d664484902a07ee14c4ed2f412726baa3fdd3ff0920ed1f3ffe3725b3400682b",
+      "bytes": 2702
+    },
+    {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--ai-memory--use--20260925.json",
       "sha256": "491a43789016027cd144f38a0bc9fc30f6d305a32025a9dc8972e542f96fd8c4",
       "bytes": 7687
@@ -41747,8 +41810,8 @@
     },
     {
       "path": "evidence/receipts/login-shell-contract-20260929.json",
-      "sha256": "407e7935c155ae63c0418874075e911c2eef82a9bf5d2775d8b4e1934054a79b",
-      "bytes": 23717
+      "sha256": "c72ca272d69e34bf34b20a0c73f0f001aa389744fc612a2b765873a122b97fd6",
+      "bytes": 32904
     },
     {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
@@ -42166,6 +42229,11 @@
       "bytes": 2455
     },
     {
+      "path": "evidence/receipts/wsl-terminal-defaults-20260929.json",
+      "sha256": "f1b6dcfc195e0aa2381169676b5b981441ab4000be6411f5714c4a70f6a3ad82",
+      "bytes": 14628
+    },
+    {
       "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
       "sha256": "150c1d59848e227df6886863473838a032cd17b9e28303dedf8dcb2e4f1112d4",
       "bytes": 1013
@@ -42249,6 +42317,11 @@
       "path": "examples/claude-native/ultracode.settings.json",
       "sha256": "fe05ad14ec475ba26f97b643fc95d1c2c55e676e43baeafd176912979fcd1e43",
       "bytes": 432
+    },
+    {
+      "path": "examples/claude-native/windows-terminal.fragment.example.json",
+      "sha256": "470b1389448ddef3111c092f1e8534f3ce462e81be9d12c386bcac19f42d2a56",
+      "bytes": 1296
     },
     {
       "path": "examples/claude-native/workflows/README.md",
@@ -42772,8 +42845,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "e3971d3129b3a3fb23e8ddfc0fd926cb65a2b4df9814791187a450623ad4e314",
-      "bytes": 35251
+      "sha256": "98046ad28281c33e990c350461fe2bcd41b0a8baaa0dc2c6efb7ead0362e626b",
+      "bytes": 36542
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -42802,8 +42875,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "00a8e0751c4dd472fe57c6b79c1929390f96ee58fd7d2e1db16abe7086882533",
-      "bytes": 69847
+      "sha256": "2ff8a0c9cb10dc7a1226ed21e3cdb172b7a02a2ebd38be9effa7c7b37c8bca0a",
+      "bytes": 76115
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -43212,8 +43285,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "27ec4454bbe1c871c96d9653ecb1695d07efc949820f962cb62036c89c88dd8f",
-      "bytes": 108593
+      "sha256": "f02aa28dab10276f588e93624035795331e601fd22d06df7f282b87721d82939",
+      "bytes": 126953
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -43934,6 +44007,11 @@
       "path": "tests/test_verdict_lane_vendoring.py",
       "sha256": "02465e7ca09a3d4ee72e3855084cc5b54ee223b209bb6169cb9deea1c5d9fdab",
       "bytes": 12669
+    },
+    {
+      "path": "tests/test_windows_terminal_defaults.py",
+      "sha256": "7eb940f52441bb02bc137658639a201da0f170a82282de4b4374f83c84d7f027",
+      "bytes": 15926
     },
     {
       "path": "tests/test_worker_recovery.py",
