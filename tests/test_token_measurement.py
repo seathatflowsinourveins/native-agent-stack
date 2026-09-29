@@ -100,8 +100,17 @@ R1_EXECUTED = [
     "FOO=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF", "bash -s -- \"$(pwd)\" <<'EOF'\ncurl https://example.org\nEOF",
     "ssh \"$(echo host)\" <<'EOF'\ncurl https://example.org\nEOF", "x=\"$(cat <<'A'\nbody\nA\n)\" bash <<'B'\ncurl https://example.org\nB",
     "echo \"$(FOO=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF\n)\"", "FOO=$(pwd) bash <<'EOF'\ncurl https://example.org\nEOF",
+    # A quote inside the substitution, a string that runs over lines, two substitutions, text after the closing ) in the string.
+    "FOO=\"$(echo \"a b\")\" bash <<'EOF'\ncurl https://example.org\nEOF", "ssh \"$(echo \"h o\")\" <<'EOF'\ncurl https://example.org\nEOF",
+    "x=\"a\nb\" bash <<'EOF'\ncurl https://example.org\nEOF", "x='a\nb' bash <<'EOF'\ncurl https://example.org\nEOF",
+    "x=\"$(cat <<'A'\nbody\nA\n) tail\" bash <<'B'\ncurl https://example.org\nB", "A=\"$(pwd)\" B=\"$(pwd)\" bash <<'EOF'\ncurl https://example.org\nEOF",
+    "FOO=\"`pwd`\" bash <<'EOF'\ncurl https://example.org\nEOF", "x=\"$(cat <<'A'\nbody\nA\n)\" && bash <<'B'\ncurl https://example.org\nB",
+    "echo \"$(echo \"$(pwd)\" | bash <<'EOF'\ncurl https://example.org\nEOF\n)\"",
 ]
-R1_DATA = ["FOO=\"$(pwd)\" cat <<'EOF'\ncurl https://example.org\nEOF"]  # cat reads the body as data: curl never ran
+R1_DATA = [  # the reader is cat, so the body is data and curl never ran
+    "FOO=\"$(pwd)\" cat <<'EOF'\ncurl https://example.org\nEOF", "FOO=\"$(echo \"a b\")\" cat <<'EOF'\ncurl https://example.org\nEOF",
+    "echo \"$(cat <<'EOF'\ncurl https://example.org\nEOF\n)\"",
+]
 # R3: an escaped blank, `;` or newline before a # is not a comment start, so the ) and the closing quote are found (curl ran once).
 R3_EXECUTED = [
     'x="$(echo a\\ #b)"; curl https://example.org', 'x="$(echo a\\;#b)"; curl https://example.org',

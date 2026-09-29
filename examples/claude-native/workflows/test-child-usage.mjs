@@ -573,6 +573,15 @@ expect('git options: any reading of the option words reaches the subcommand, as 
   try {
     const missing = await load(join(tmp, 'absent'))
     expect('parser: a directory with no install is not_installed [' + JSON.stringify(missing) + ']', same(missing, { ok: false, reason: 'not_installed' }))
+    // An explicit --shell-parser that cannot be honored is an error (exit 2 like --rtk-db and --exceptions), never a silent default.
+    const flagRoot = join(tmp, 'flag-sweep'), flagFile = join(flagRoot, 'proj', 'sess', 'subagents', 'agent-a1.jsonl')
+    mkdirSync(join(flagFile, '..'), { recursive: true })
+    writeFileSync(flagFile, JSON.stringify({ type: 'user', timestamp: T(1), message: { role: 'user', content: 'go' } }) + '\n')
+    utimesSync(flagFile, new Date('2026-09-27T00:00:00Z'), new Date('2026-09-27T00:00:00Z'))
+    const refused = spawnSync(process.execPath, [fileURLToPath(new URL('./child-usage.mjs', import.meta.url)), '--lanes-sweep', '--root', flagRoot, '--shell-parser', join(tmp, 'absent')],
+      { encoding: 'utf8', env: { PATH: process.env.PATH, HOME: tmp } })
+    expect('parser: --shell-parser naming a directory with no install exits 2 with the reason and no report [' + refused.status + ', ' + JSON.stringify(refused.stderr.slice(0, 80)) + ']',
+      refused.status === 2 && refused.stderr.includes('--shell-parser') && refused.stderr.includes('not_installed') && refused.stdout === '' && !refused.stderr.includes(tmp))
     expect('parser: without the parser commandInvocations returns null (no fallback to the scanners) and the status says why [' + JSON.stringify(status()) + ']',
       kernel.commandInvocations('qmd search x') === null && same(status(), { ok: false, reason: 'not_installed' }))
     const rows = [
