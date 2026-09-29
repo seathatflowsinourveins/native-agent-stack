@@ -581,7 +581,7 @@ class E2Flow(unittest.TestCase):
         self.assertEqual(e2["N2_minus_committed_events"], 2 - 594)
         outside = e2["f2_identity_outside_N2_post_hoc"]
         self.assertEqual((outside["no_row"], sum(outside.values())), (1, 1))  # the +5% event's symbol has no F2 row
-        self.assertIn("head", summary["classify_code_revision"])
+        self.assertNotIn("classify_code_revision", summary)  # classify outputs depend on the snapshots alone
         self.assertEqual(summary["positive_control"], {"KOD": {"touch": True}, "LFCR": {"touch": True}, "passed": True})
         self.assertEqual(summary["exposure"]["price_rows_in_holdout"], 0)
         self.assertEqual(summary["E2"]["verdicts"]["mismatch"], 1)
@@ -589,12 +589,16 @@ class E2Flow(unittest.TestCase):
     def test_classify_is_byte_identical_and_totals_hold_no_event_values(self):
         with tempfile.TemporaryDirectory() as tmp:
             out, _, events = self.run_flow(tmp)
+            rev = lambda h: mock.patch.object(M, "code_revision", return_value={"head": h * 40, "clean": True})  # noqa: E731
             with mock.patch.object(M, "load_package_events", return_value=events[:3]):
-                self.assertEqual(M.main(["classify", "--out-dir", str(out)]), 0)
+                with rev("1"):
+                    self.assertEqual(M.main(["classify", "--out-dir", str(out)]), 0)
                 first = {n: (out / n).read_bytes() for n in ("results.json", "labels.json", "summary.json")}
-                self.assertEqual(M.main(["classify", "--out-dir", str(out), "--verify"]), 0)
+                with rev("2"):  # a verify at a later commit still compares the classify outputs byte for byte
+                    self.assertEqual(M.main(["classify", "--out-dir", str(out), "--verify"]), 0)
             verify = json.loads((out / "verify.json").read_text())
             self.assertTrue(verify["byte_identical"])
+            self.assertEqual(verify["classify_code_revision"]["head"], "2" * 40)
             self.assertEqual(first, {n: (out / n).read_bytes() for n in first})
             text = (out / "summary.json").read_text()
             modes = {p.name: stat.S_IMODE(os.stat(p).st_mode) for p in out.iterdir() if p.is_file()}
@@ -619,6 +623,7 @@ class E2Flow(unittest.TestCase):
         self.assertEqual(doc["E1"]["status"], "not_run")
         self.assertIsNone(doc["E1"]["coverage_with_asof"])
         self.assertEqual(doc["E2"]["validity"]["stands"], True)
+        self.assertIn("head", doc["E2"]["classify_code_revision"])  # carried over from verify.json
         self.assertNotIn(tmp, text)
         for needle in ("ZZQ", "2023-03-15"):
             self.assertNotIn(needle, text)
