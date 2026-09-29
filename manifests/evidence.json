@@ -14507,8 +14507,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "acd0455565ff29d9044fe656526256504b6c316009fd04d5dacaab05cc78c4bf",
-      "bytes": 90463
+      "sha256": "2a935e2be416783beeb98f61dc2cb781a58fd18d83486e914921d446eade38b2",
+      "bytes": 90685
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -14852,13 +14852,18 @@
     },
     {
       "path": "evidence/artifacts/actionlint-successor-swap-20260928/README.md",
-      "sha256": "ccebf6dbaaef4494b1e2b2d0d4fb17c8cbcdadd22786f41f9607e579ec89ee8a",
-      "bytes": 13637
+      "sha256": "81ac764bdc84ec13dff2bb303f7ddc3a0486965f9591c396818d6968293eebbe",
+      "bytes": 14859
+    },
+    {
+      "path": "evidence/artifacts/actionlint-successor-swap-20260928/fixtures/nc.yml.txt",
+      "sha256": "39e955c94cbea88dc5a1342f46d2b2a96d47c9a0cb76f37649ec5a1eeb857a57",
+      "bytes": 837
     },
     {
       "path": "evidence/artifacts/actionlint-successor-swap-20260928/receipt.json",
-      "sha256": "f7480eb280330a427d34c3352edc2a694762f90e4416dc6387e0f4d0cae88334",
-      "bytes": 38178
+      "sha256": "a722aabd25d7d46f1779563ec67c012c36d4e983985014f0d913841923141b56",
+      "bytes": 40237
     },
     {
       "path": "evidence/artifacts/adoption-status-truth-20260926/README.md",
