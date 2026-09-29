@@ -3800,6 +3800,21 @@
       "bytes": 3799
     },
     {
+      "path": "adoption/agents/codex/SHA256SUMS",
+      "sha256": "6c0f818d9eadc0d8fa361c2012735f4159404fc0cafcf6d266032bb556b6203a",
+      "bytes": 174
+    },
+    {
+      "path": "adoption/agents/codex/stack-researcher.toml",
+      "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00",
+      "bytes": 7223
+    },
+    {
+      "path": "adoption/agents/codex/stack-verifier.toml",
+      "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd",
+      "bytes": 6349
+    },
+    {
       "path": "adoption/bootstrap-linux.sh",
       "sha256": "94e3daf91408b4ed71c969f91e553d7887055a590aa5bf242262360c503aeffc",
       "bytes": 41075
@@ -14432,8 +14447,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
-      "sha256": "15092d762e018a24df27f04019d5d14542ddf739f054380f142224d1837e7f5a",
-      "bytes": 50684
+      "sha256": "04b95580f8fb5523a0a09b99ea761ab78b08f305e9a9b99c4fc189b3761330e2",
+      "bytes": 62594
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -14902,8 +14917,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "46f159dc2712d95665db4b449a737bea0fc5a12c2453b5ecb098ade39d71d3d5",
-      "bytes": 32798
+      "sha256": "701ae440e016c8fa1085f34f567dfbfa74e9746c22582f3510fde4b87dfbfd44",
+      "bytes": 33810
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -14917,8 +14932,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "bb936e1921b19769528c48b5d341f75f9c4e1daa9d35f8f6f13c8cc011630406",
-      "bytes": 88615
+      "sha256": "e2b37bcf0ffd7ba6f7ce02d0020ce1e976f620a644e4848678a030c2c149542b",
+      "bytes": 88739
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -42027,8 +42042,8 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "830e06b6edae7c9ed18b162b5ab951d48b773ca0a6770510e5d2a8d33f6bf19c",
-      "bytes": 4836
+      "sha256": "289066a96981373dda1227ccd3cc164100c3193293832f3c0c710bf9b8ef40df",
+      "bytes": 23395
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
@@ -42044,6 +42059,16 @@
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
       "sha256": "c0e628320644d847dbad7766b1f412bf1ef48213d16cef8e326fcd296f41114d",
       "bytes": 4287
+    },
+    {
+      "path": "examples/codex-native/agents/stack-researcher.toml",
+      "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00",
+      "bytes": 7223
+    },
+    {
+      "path": "examples/codex-native/agents/stack-verifier.toml",
+      "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd",
+      "bytes": 6349
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
@@ -42462,8 +42487,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "0551a170707f0845237942f210ce67f10b3118cdb7c6c9c5f775d84b71e83596",
-      "bytes": 121895
+      "sha256": "f9887685ddb61970e70cc414a8937e126a77507e879fb3e9111e33bcb20d7662",
+      "bytes": 123259
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -42507,8 +42532,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "00a8e0751c4dd472fe57c6b79c1929390f96ee58fd7d2e1db16abe7086882533",
-      "bytes": 69847
+      "sha256": "70928346e71994714f9ae182f6505ec2b107777849d81488d087577415cc4340",
+      "bytes": 73861
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -42917,8 +42942,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "27ec4454bbe1c871c96d9653ecb1695d07efc949820f962cb62036c89c88dd8f",
-      "bytes": 108593
+      "sha256": "46167594fdc4bb1b3e8e7c3c6f00855986ea2fc5b7826ed6af4c8fcf6641bcc5",
+      "bytes": 115852
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -43037,8 +43062,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "1c0f6253a26296ce7bfd9d672756034270d72af9cdaedcbf0ad981093fe5c30e",
-      "bytes": 2288
+      "sha256": "4cfec75f40a31ae1700d8c64e11541cf9594385a4e356e5b7a2d9b87afbb2c6a",
+      "bytes": 37676
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -43046,9 +43071,14 @@
       "bytes": 17722
     },
     {
+      "path": "tests/test_codex_roles.py",
+      "sha256": "6b276979114ebe2eb74a3e251f5cd2ae38638a85c1b2b6ce3687946c07e76efc",
+      "bytes": 11010
+    },
+    {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "41dc80dcfc66c88b597ecd4fc3591210b86f30e77573afd37fff7d4bdb04096e",
-      "bytes": 95142
+      "sha256": "7868c6ea2816d0873f6d4a04677a67a163945f65bc53ae10a293b4c359c42696",
+      "bytes": 143309
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -43132,8 +43162,8 @@
     },
     {
       "path": "tests/test_freeze_snapshot.py",
-      "sha256": "583f99803403c2d9def54a52a27c0e33a9a8e384fb4c857e44941a4b7a803cb3",
-      "bytes": 154939
+      "sha256": "f2e1d2fd61dc4de441482838e3169232621cf6066219d80be017b575aedb71ad",
+      "bytes": 205592
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -43687,8 +43717,13 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "a5605cb436cb5fad97394d7c35634e3901c2321a1f7aa33a8aa293a8e4f159db",
-      "bytes": 62148
+      "sha256": "3f5ec4ad7d36f21d0555264658af2758e32f7334e0054071b348c0e7d637e9e9",
+      "bytes": 76231
+    },
+    {
+      "path": "tools/adoption/codex_roles.py",
+      "sha256": "125646e7574c2eb20ca63d4d114096cd9a63ee5a47fc47113e03f2328ad84e49",
+      "bytes": 26160
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
@@ -43707,8 +43742,8 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "a399117aa14bec57fd5be59badc0121523148449ae758d7d37ecf052f7c92e23",
-      "bytes": 31531
+      "sha256": "77aa58e8a3a996ac5b26bccf8255d83d552c4cd608e05cced3b71713e5ee3fbe",
+      "bytes": 34990
     },
     {
       "path": "tools/adoption/render_config.py",
@@ -43967,13 +44002,13 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "ede191a840d1df5540d9bff090165778b4df7244d88821234fb1fe45683641ea",
-      "bytes": 30405
+      "sha256": "ed23371b5ae1adba901d09f0a747512fb2d23427547bb1cfbc8f68f5cc55d626",
+      "bytes": 32884
     },
     {
       "path": "tools/token-e2e/freeze_snapshot.py",
-      "sha256": "bbdee8c7f86fbb53242b4da820858311aea6e72fce19901a5114c543543f161c",
-      "bytes": 108657
+      "sha256": "6a3715f9a76e348e2e8e90c02bc0d77278bbef7779742da6ea91f4bb328639a1",
+      "bytes": 124715
     },
     {
       "path": "tools/token-report/README.md",
