@@ -1655,8 +1655,8 @@ class F25c_QmdCoverage(GraderCase):
 
 
 def make_bindings(tmp, *, exec_rev, run_token="tok7fixture", sentinel_value="sentinel-a-1", worktree_paths=None,
-                  worktree_bases=None, exec_checkout=None, env_extra=None, out_name="run-bindings.json"):
-    """Write the four bind input files and run `bind`; returns the bindings path."""
+                  worktree_bases=None, exec_checkout=None, env_extra=None, out_name="run-bindings.json", codex=None):
+    """Write the four bind input files and run `bind`; returns the bindings path. `codex` adds U10's bindings file."""
     inputs = tmp / "bind-inputs"
     inputs.mkdir(exist_ok=True)
     retained = inputs / "retained-history.txt"
@@ -1681,8 +1681,12 @@ def make_bindings(tmp, *, exec_rev, run_token="tok7fixture", sentinel_value="sen
     for name, document in files.items():
         (inputs / name).write_text(json.dumps(document), encoding="utf-8")
     out = tmp / out_name
+    extra = []
+    if codex is not None:
+        (inputs / "codex-bindings.json").write_text(json.dumps(dict({"exec_rev": exec_rev}, **codex)), encoding="utf-8")
+        extra = ["--codex-bindings", inputs / "codex-bindings.json"]
     proc = run_grade(["bind", "--launch-args", f"B={inputs / 'launch-b.json'}", "--sentinels", inputs / "sentinels.json",
-                      "--windows", inputs / "windows.json", "--roots", inputs / "roots.json", "--out", out],
+                      "--windows", inputs / "windows.json", "--roots", inputs / "roots.json", "--out", out, *extra],
                      env=env_extra)
     assert proc.returncode == 0, f"bind fixture failed: {sanitize(proc.first_line())}"
     return out
@@ -1813,6 +1817,16 @@ class F26_Bind(GraderCase):
         self.assertEqual(fc.binding_conflicts(record, "B", dict(same, run="tok7fixture")), [])
         self.assertEqual(fc.binding_conflicts(record, "B", dict(same, run="another-token")), everything)
         self.assertEqual(fc.binding_conflicts(record, "B", dict(same, arm="A")), everything)
+
+    def test_the_parents_effective_server_set_is_kept_for_the_role_child_check(self):
+        """Correction 9 (M11): the parent's `codex mcp list` server names, captured at the freeze, reach the bindings."""
+        out = make_bindings(self.tmp, exec_rev=exec_full(), codex={"trees": [], "parent_servers": ["ai-memory", "qmd"]})
+        self.assertEqual(json.loads(out.read_text(encoding="utf-8"))["codex"]["parent_servers"], ["ai-memory", "qmd"])
+        inputs = self.tmp / "bind-inputs"
+        bad = inputs / "bad-codex.json"
+        bad.write_text(json.dumps({"exec_rev": exec_full(), "trees": [], "parent_servers": "ai-memory"}), encoding="utf-8")
+        proc = self.run_bind(inputs, out=self.tmp / "bad.json", extra=("--codex-bindings", bad))
+        self.assertRefusal(proc, "E_BIND", field="codex_bindings")
 
     def test_codex_trees_are_matched_by_arm(self):
         """Review K-2: U10's arms B, A and N each have their own tree for a task."""
@@ -4048,14 +4062,18 @@ class MiniRun:
     keys commands over a tiny repository, a Claude projects tree (one Workflow run, a main session, an Agent-tool
     harness, a strict process), Codex events, launch records, and the sibling ledgers in their stated shapes."""
 
-    def __init__(self, case, *, token=RUN_TOKEN):
+    def __init__(self, case, *, token=RUN_TOKEN, roles=False):
         self.case, self.tmp, self.token = case, case.tmp, token
         files = {f"{E2E}/fixtures/table.json": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/table.json"),
                  f"{E2E}/fixtures/events.jsonl": git_blob(PREREG_COMMIT, f"{E2E}/fixtures/events.jsonl")}
+        codex = None
+        if roles:  # the Codex role file at exec_rev and the parent's effective server set (U13's inputs to M11)
+            files["adoption/agents/codex/stack-researcher.toml"] = ROLE_TOML
+            codex = {"trees": [], "parent_servers": ["ai-memory", "qmd"]}
         self.repo, self.commit, _ = spec_repo(self.tmp, sealed_bytes(), block=grading_block(), files=files)
         self.spec = self.tmp / "spec.json"
         self.ok(["spec", "--repo", self.repo, "--preregistration-commit", self.commit, "--out", self.spec])
-        self.bindings = make_bindings(self.tmp, exec_rev=self.commit, exec_checkout=self.repo, run_token=token)
+        self.bindings = make_bindings(self.tmp, exec_rev=self.commit, exec_checkout=self.repo, run_token=token, codex=codex)
         self.keys = self.tmp / "keys.json"
         self.ok(["keys", "--spec", self.spec, "--bindings", self.bindings, "--repo", self.repo, "--out", self.keys])
         self.world = ClaudeWorld(self.tmp)
@@ -4140,6 +4158,21 @@ class MiniRun:
         self.codex_rows.append({"identity": label, "actor": "codex_exec", "events_file": str(path)})
         return label
 
+    def codex_subagent(self, task="seed-binding-1", *, arm="B", **child):
+        """A Codex sub-agent launch: the parent's and the child's rollout copies under the driver's attempts directory."""
+        label = self.ident(arm, task)
+        directory = self.e2e / "codex-driver" / "attempts" / label
+        write_jsonl(directory / "rollout-2026-10-05T01-00-00-thread-fx1.jsonl",
+                    rollout({"type": "session_meta", "payload": {"id": "thread-fx1"}}, turn_context()))
+        records = child_rollout(**child)
+        records.append({"timestamp": ts(2), "ordinal": len(records), "type": "response_item",
+                        "payload": {"type": "message", "role": "assistant",
+                                    "content": [{"type": "output_text", "text": "sentinel-a-1 and the listing"}]}})
+        write_jsonl(directory / "rollout-2026-10-05T01-00-01-thread-fx2.jsonl", records)
+        self.codex_rows.append({"identity": label, "actor": "codex_subagent", "parent_thread_id": "thread-fx1",
+                                "thread_id": "thread-fx2"})
+        return label
+
     def t0(self, *, discarded=False):
         label = self.workflow("B", "reuse-296-00", answer_rows(T0_ANSWER), {"answer": T0_ANSWER, "evidence": []},
                               agent_id="fx5")
@@ -4194,7 +4227,8 @@ class MiniRun:
                 f"claude={self.tmp / 'join-claude.jsonl'}", "--join-ledger", f"codex={self.tmp / 'join-codex.jsonl'}",
                 "--adoption-report", f"claude={self.tmp / 'adoption-claude.json'}", "--run-mode",
                 f"B={self.tmp / 'run-mode-B.json'}", "--call-ledger", self.tmp / "call-ledger.jsonl",
-                "--codex-events-dir", self.e2e, "--out-private", private, "--out", out, *extra]
+                "--codex-events-dir", self.e2e, "--out-private", private, "--out", out,
+                *(["--codex-driver", self.e2e / "codex-driver"] if (self.e2e / "codex-driver").exists() else []), *extra]
 
     def grade(self, name="one", extra=(), env=None):
         private, out = self.tmp / f"private-{name}", self.tmp / f"aggregate-{name}.json"
@@ -4429,6 +4463,66 @@ class F16_GradeCommand(GraderCase):
         codex = rows[(run.ident("B", "seed-codex-web-table-1"), "codex_exec")]
         self.assertGreater(codex["recorded"]["payload_bytes"], 300)
         self.assertEqual(rows[(run.ident("B", "seed-blind-1"), "workflow_child")]["recorded"], {})
+
+    def test_role_children_are_counted_per_arm_with_their_unknowns(self):
+        """Correction 9: M11 for Codex role children is a required row; the grader's function decides each child."""
+        run = MiniRun(self, roles=True)
+        run.codex_subagent("seed-binding-1", arm="B")
+        run.codex_subagent("seed-binding-1", arm="A", texts=("some other developer message",))
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["m11_roles"], {"A": {"children": 1, "pass": 0, "fail": 1, "unknown": 0},
+                                                  "B": {"children": 1, "pass": 1, "fail": 0, "unknown": 0}})
+
+    def test_a_role_child_without_its_inputs_is_unknown_never_a_pass(self):
+        run = MiniRun(self)  # no role file at exec_rev and no parent server set in the bindings
+        run.codex_subagent("seed-binding-1", arm="B")
+        self.assertEqual(run.identity().returncode, 0)
+        proc, private, out = run.grade()
+        aggregate = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(aggregate["m11_roles"], {"B": {"children": 1, "pass": 0, "fail": 0, "unknown": 1}})
+
+    def write_judgments(self, run, name, **judgment):
+        path = run.tmp / name
+        record = dict({"identity": run.ident("B", "seed-codex-web-table-1"), "actor": "codex_exec", "run_index": 0,
+                       "status": "ok", "reason": None, "clauses": [{"id": "c1", "holds": True}], "extractions": []}, **judgment)
+        path.write_text(json.dumps(record) + "\n", encoding="utf-8")
+        return path
+
+    def codex_web_row(self, run, private):
+        rows = [json.loads(line) for line in (private / "grades.jsonl").read_text(encoding="utf-8").splitlines()]
+        return next(row for row in rows if row["identity"] == run.ident("B", "seed-codex-web-table-1"))
+
+    def test_judgments_settle_the_d_component(self):
+        """Stage 3 produces the judgments; grading consumes them as data: ok with every clause held passes the D
+        component, a clause that does not hold fails it, an unavailable judgment leaves it unknown with its reason."""
+        run = self.graded()[0]
+        cases = {"held": ({}, "pass", None), "not held": ({"clauses": [{"id": "c1", "holds": False}]}, "fail", "clause"),
+                 "unavailable": ({"status": "unknown", "reason": "judge_quote", "clauses": []}, "unknown", "judge_quote")}
+        for name, (judgment, status, reason) in cases.items():
+            with self.subTest(name):
+                proc, private, out = run.grade(name.replace(" ", "-"), extra=("--judgments", self.write_judgments(run, f"j-{name}.jsonl", **judgment)))
+                self.assertIn(proc.returncode, (0, 1), sanitize(proc.stderr))
+                row = self.codex_web_row(run, private)
+                self.assertEqual(row["status"], status)
+                self.assertEqual({part["id"]: part["status"] for part in row["components"]}["D"],
+                                 "pass" if status == "pass" else "fail" if status == "fail" else "unknown")
+                if reason:
+                    self.assertIn(reason, row["reasons"])
+                self.assertEqual(json.loads(out.read_text(encoding="utf-8"))["judges"]["judgments_supplied"], 1)
+
+    def test_regrade_applies_new_judgments_from_the_private_directory_alone(self):
+        run, proc, private, out = self.graded()
+        judgments = self.write_judgments(run, "j-new.jsonl")
+        again, out2 = self.tmp / "private-regraded", self.tmp / "aggregate-regraded.json"
+        redo = run_grade(["regrade", "--from", private, "--judgments", judgments, "--out-private", again, "--out", out2])
+        self.assertIn(redo.returncode, (0, 1), sanitize(redo.stderr))
+        self.assertEqual(self.codex_web_row(run, again)["status"], "pass")
+        direct = run.grade("direct", extra=("--judgments", judgments))
+        self.assertEqual(sha256_file(out2), sha256_file(direct[2]), "regrade equals a fresh grade with the same judgments")
+        self.assertEqual((again / "judgments.jsonl").read_bytes(), (direct[1] / "judgments.jsonl").read_bytes())
 
     def test_the_conversion_call_of_the_mcp_page_task_is_recorded(self):
         run = MiniRun(self)
@@ -4874,6 +4968,21 @@ class F19b_Stage2Mutants(GraderCase):
                 "F28_M7.test_a_seeded_cli_encode_that_decodes_to_the_records_is_encoded",
                 "F28_M7.test_an_output_file_encode_is_unknown_not_a_failure"]
         stage2_mutant(self, [mock.patch.object(ev, "isolate_toon_document", whole)], base, base[:2])
+
+    def test_M37_judgments_ignored(self):
+        """A grader that never adds the D component: the pending and the judged cases both flip."""
+        ev = evm()
+        base = ["F16_GradeCommand.test_a_grades_row_exists_per_identity_and_actor_with_its_components",
+                "F16_GradeCommand.test_judgments_settle_the_d_component",
+                "F16_GradeCommand.test_the_aggregate_counts_attempts_and_tasks_by_family_and_arm"]
+        stage2_mutant(self, [mock.patch.object(ev, "_judged", lambda components, classes, judgment: None)], base, base[:2])
+
+    def test_M38_the_role_child_check_never_runs(self):
+        ev = evm()
+        base = ["F16_GradeCommand.test_role_children_are_counted_per_arm_with_their_unknowns",
+                "F16_GradeCommand.test_a_role_child_without_its_inputs_is_unknown_never_a_pass"]
+        stage2_mutant(self, [mock.patch.object(ev, "role_child_state", lambda *args: {"status": "pass", "reasons": []})],
+                      base, base[:1])
 
     def test_M36_tree_drift_ignored(self):
         ev = evm()
