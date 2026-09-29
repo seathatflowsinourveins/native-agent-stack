@@ -11,7 +11,8 @@ not out of the report: an alias, a function that is never called or a variable p
 loop body that the run does not reach (`true || x`, the untaken side of if/else or case, a loop that runs zero or twice), `exec`
 (it ends the shell), `sudo` and `ssh` (no real executable exists here), a pipe that feeds a script to a shell (`cat <<EOF | bash`),
 a heredoc attached to a compound command, several heredocs on one command, and the shapes tree-sitter-bash 0.25.1 misparses
-(a heredoc operator followed by `;` or `&`, or by a redirection and a pipe on its line).
+(a heredoc operator followed by `;` or `&`, or by a redirection and a pipe on its line: see RECOVERY_PROBES for the ones the kernel
+reads anyway). A text that bash rejects (`bash -n`) is dropped, since nothing runs.
 The hand-written probes below hold every finding of the two U1 reviews that concerns command position; their expected
 values are the runs of real bash, not what this kernel says.
 """
@@ -213,6 +214,13 @@ RECOVERY_PROBES = [
     ("heredoc > then ;", "cat <<'EOF' > out; qmd get a\nbody\nEOF"),
     ("heredoc 2>&1 then ;", "cat <<EOF 2>&1; qmd get a\nbody\nEOF"),
     ("shell heredoc 2>&1 pipe", "bash <<'EOF' 2>&1 | qmd index x\nqmd status\nEOF"),
+    # A line that begins with a backslash (`\\ls`, the alias bypass) reaches the grammar as a word that begins with the newline, so it joins the
+    # command on the line before it; when it is the first line of a here-document body the grammar leaves the body node without it.
+    ("backslash line", "{ timeout 5 repomix\n\\markitdown --flag; }"),
+    ("backslash line after a list", "cd /x; toon f\n\\qmd get a"),
+    ("backslash first body line", "! timeout -k 1 5 bash <<'END-2'\n\\markitdown a.json\nEND-2\n:"),
+    ("backslash first body line, shell", "bash <<'E'\n\\qmd status\nrtk proxy toon f\nE"),
+    ("here-string then a backslash line", "for i in a; do bash <<< 'nice -n 5 codebase-memory-mcp'\n\\markitdown search; done"),
     ("joined lines", 'echo "$M" | tr " " "\\n" | grep -c . \nstart=$(date +%s)\nTMPDIR=/x rtk proxy python3 -m unittest $M > run.txt 2>&1\nrc=$?'),
 ]
 
@@ -250,6 +258,8 @@ class Generator:
         return text + ("\n" if self.ends_heredoc(text) else "; ")
 
     def then(self, first, operator, second):
+        if operator == "|" and (second.startswith("!") or "<<" in second):
+            operator = ";"  # `x | ! y` is bash, not POSIX; a reader that ignores its pipe (a heredoc feeds it) kills the writer with SIGPIPE
         return first + ("\n" if self.ends_heredoc(first) else " " + operator + " ") + second
 
     def lane(self):
@@ -278,15 +288,16 @@ class Generator:
         ]
         return r.choice(forms)()
 
-    def data(self):
+    def data(self, posix=False):
         delimiter = self.delimiter()
-        return self.pick("echo qmd", "echo 'toon status'", 'echo "repomix"', ": qmd", "cat <<'" + delimiter + "'\nqmd status\n" + delimiter, "a=( qmd toon )",
-                         "case x in qmd) : ;; esac", "echo bash -c 'qmd x'", "bash -n -c 'qmd x'", "bash -c ':' qmd x")
+        shapes = ["echo qmd", "echo 'toon status'", 'echo "repomix"', ": qmd", "cat <<'" + delimiter + "' > /dev/null\nqmd status\n" + delimiter,
+                  "case x in qmd) : ;; esac", "echo bash -c 'qmd x'", "bash -n -c 'qmd x'", "bash -c ':' qmd x"]
+        return self.pick(*(shapes if posix else shapes + ["a=( qmd toon )"]))
 
     def statement(self, depth, posix=False):
         r = self.rnd
         if depth <= 0 or r.random() < 0.28:
-            return self.lane() if r.random() < 0.85 else self.data()
+            return self.lane() if r.random() < 0.85 else self.data(posix)
         inner = lambda: self.statement(depth - 1, posix)
         forms = [
             lambda: self.then(inner(), "&&", inner()),
@@ -306,7 +317,7 @@ class Generator:
             lambda: 'echo "$(' + self.lane() + ')"',
             lambda: "echo `" + self.lane() + "`",
             lambda: "echo $(echo $(" + self.lane() + "))",
-            lambda: "f() { " + self.end(inner()) + "}; f",
+            lambda: "{ f() { " + self.end(inner()) + "}; f; }",
             lambda: self.heredoc_owner(depth, posix),
             lambda: self.shell_string(depth, posix),
             lambda: "eval " + sq(inner()),
@@ -341,8 +352,8 @@ class Generator:
         if form == "strip":
             return wrapper + shell + " <<-" + delimiter + "\n" + "".join("\t" + line + "\n" for line in body.split("\n")) + "\t" + delimiter
         if form == "unquoted-data":
-            return "cat <<" + delimiter + "\nplain text\n" + delimiter
-        return "cat <<" + delimiter + "\nbefore $(" + self.lane() + ") after\n" + delimiter
+            return "cat <<" + delimiter + " > /dev/null\nplain text\n" + delimiter
+        return "cat <<" + delimiter + " > /dev/null\nbefore $(" + self.lane() + ") after\n" + delimiter
 
     def shell_string(self, depth, posix):
         r = self.rnd
@@ -354,13 +365,18 @@ class Generator:
         return wrapper + shell + " " + flags + " " + quote(body)
 
 
+def valid(command):
+    """Whether bash accepts the text (`bash -n`): a construct composed at random can be a syntax error (`x | ! y`), and then nothing runs."""
+    return subprocess.run([shutil.which("bash"), "-n"], input=command, text=True, capture_output=True, check=False).returncode == 0
+
+
 def generate():
     seen, commands = set(), []
     for seed in SEEDS:
         generator = Generator(seed)
         for _ in range(PER_SEED):
             command = generator.statement(generator.rnd.choice([1, 2, 2, 3]))
-            if command not in seen:
+            if command not in seen and valid(command):
                 seen.add(command)
                 commands.append(command)
     return commands

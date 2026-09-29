@@ -1215,6 +1215,12 @@ class TokenMeasurement(unittest.TestCase):
                  "bash <<'EOF' 2>&1 | qmd index x\nqmd status\nEOF": ({"qmd": 1}, 1),
                  'echo "$M" | tr " " "\\n" | grep -c . \nstart=$(date +%s)\nTMPDIR=/x rtk proxy python3 -m unittest $M > run.txt 2>&1\nrc=$?':
                  ({"rtk_proxy": 1}, 0),
+                 # a line that begins with a backslash reaches the grammar as a word that starts with the newline, and as the first line of a
+                 # heredoc body it leaves the body node without that line
+                 "{ timeout 5 repomix\n\\markitdown --flag; }": ({"repomix": 1, "markitdown": 1}, 0), "cd /x; toon f\n\\qmd get a": ({"toon": 1, "qmd": 1}, 0),
+                 "! timeout -k 1 5 bash <<'END-2'\n\\markitdown a.json\nEND-2\n:": ({"markitdown": 1}, 0),
+                 "bash <<'E'\n\\qmd status\nrtk proxy toon f\nE": ({"qmd": 1, "rtk_proxy": 1, "toon": 1}, 0),
+                 "for i in a; do bash <<< 'nice -n 5 codebase-memory-mcp'\n\\markitdown search; done": ({"codebase-memory-mcp": 1, "markitdown": 1}, 0),
                  # an ordinary continuation and a comment are not boundaries
                  "qmd get a \\\n  b": ({"qmd": 1}, 0), "qmd get a # toon b\n": ({"qmd": 1}, 0)}
         for (command, (lanes, errors)), (got, _, cli) in zip(cases.items(), self.tally(list(cases))):
