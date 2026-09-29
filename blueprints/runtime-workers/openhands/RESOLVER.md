@@ -27,9 +27,9 @@ local composition of cited mechanisms.
 | Path | Role |
 | --- | --- |
 | `resolver.py` | Issue selection, the delimited instruction, branch naming, SOTA sources, PR body, review loop, the stage-2 driver (`ResolverAttempt`, `run`) and CLI |
-| `resolver/patch_policy.py` | Fail-closed patch parser and validator; derives the host-executed set at the base commit |
+| `resolver/patch_policy.py` | Fail-closed patch parser and validator; derives the host-executed set at the base commit; extracts what a patch adds |
 | `resolver/gh_harness.py` | Allowlisted gh and git operations, the child environment, preflight, the base and repository reads, push, and the journal of GitHub writes |
-| `resolver/outgoing_guard.py` | Checks every text before it reaches GitHub; approves body files by hash |
+| `resolver/outgoing_guard.py` | Checks every text before it reaches GitHub, including what the pushed patch adds; approves body files by hash |
 | `host.py` | Resolver mode of `run`: resolver preflight, early gates, the pinned clone, `AGENTS.md`, the resolver skill set |
 | `dispatch.py` | `finish_result`'s resolver branch: the export, then the driver |
 | `worker.py` | `--request --resolver`: the resolver agent, with no MCP server and no hook |
@@ -198,7 +198,10 @@ Checks run in this order:
 5. For model text only: no closing keyword with an issue reference and no
    @mention.
 
-Model text reaches GitHub only inside an adaptive code fence or code span.
+Model text reaches GitHub only inside an adaptive code fence or code span. What a
+patch adds is checked too, in plain mode, before `git apply`
+(`patch_content_refusal`, step 3 of the driver below), because the pushed commit is
+the patch.
 
 ## PR loop
 
@@ -333,18 +336,27 @@ stay out through `.git/info/exclude`. The driver then:
    the base;
 2. runs `validate_patch` on a `GitTree` of that clone at the base. An empty or
    refused patch means no GitHub write, only a receipt;
-3. guards, before any write, every text GitHub would receive: the commit message,
-   the PR title and the PR body, which holds only SOTA sources that resolve from
-   repository content;
-4. runs `git apply --index --check`, then `git apply --index`. git-apply(1) refuses
+3. guards what the patch adds, because the pushed commit is the patch
+   (`patch_content_refusal`). The paths it adds and its added hunk lines
+   (`patch_policy.added_content`) pass the outgoing guard in plain mode, since code
+   may hold closing keywords and @-names, and the guard includes its gitleaks
+   scanner. `scan_file_for_private_content` then reads the exact patch bytes. A
+   finding refuses the patch (`patch_refused`, reason `content_<guard reason>`)
+   before any write;
+4. guards, before any write, every other text GitHub would receive: the commit
+   message, the PR title and the PR body, which holds only SOTA sources that resolve
+   from repository content;
+5. runs `git apply --index --check`, then `git apply --index`. git-apply(1) refuses
    out-of-tree paths, and `--unsafe-paths` has no effect with `--index`;
-5. commits with EXT's identity (`OpenHands <openhands@all-hands.dev>`, EXT
+6. commits with EXT's identity (`OpenHands <openhands@all-hands.dev>`, EXT
    `main.py:65-66`) and message (`Address issue #N: <title>`, `main.py:604`), with
-   every hook off: `core.hooksPath=/dev/null`, `--no-verify` and no template hooks;
-6. requires the commit's diff to equal the validated patch byte for byte. A hunk
+   every hook off: `core.hooksPath=/dev/null`, `--no-verify` and no template hooks.
+   The repository's own pre-commit gitleaks therefore does not run, which is why
+   step 3 scans the patch;
+7. requires the commit's diff to equal the validated patch byte for byte. A hunk
    that `git apply` placed at an offset refuses here (`commit_patch_mismatch`);
-7. runs `next_branch` again, and reads the rules again if the name changed;
-8. pushes through `GhHarness.push`, then `create_pull_request` opens the draft with
+8. runs `next_branch` again, and reads the rules again if the name changed;
+9. pushes through `GhHarness.push`, then `create_pull_request` opens the draft with
    one lane label. The driver records the PR number at once, and
    `confirm_pull_request` reads the PR back.
 
