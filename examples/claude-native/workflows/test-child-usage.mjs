@@ -427,6 +427,19 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
   shape('a run of unclosed $((', (n) => '$(('.repeat(n) + 'qmd', 'executedText', (c) => executedText(c))
   shape('unclosed (( inside a double-quoted "$( "', (n) => 'echo "$( ' + '(('.repeat(n), 'executedText', (c) => executedText(c))
   shape('a run of heredoc operators after (', (n) => '(<<E'.repeat(n), 'executedText', (c) => executedText(c))
+  // The run-string detectors read the text built so far at every quote: on a long script that was one flattening and one scan of the
+  // whole prefix per quote, so a script of n quoted words cost n squared (a 346 KB script took 2 s a scan, and the kernel scans each shell
+  // call several times). The same doubling, with a looser absolute bound because each quote does real work: 64,000 quotes under 1.5 s.
+  const linearWork = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5) && ms[3] < 1500
+  const work = (label, make, run) => {
+    const ms = doubling(make, run)
+    expect('linear: ' + label + ' at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', linearWork(ms))
+  }
+  work('a run of quoted words (executedText)', (n) => "'a'".repeat(n), (c) => executedText(c))
+  work('a run of double-quoted substitutions (executedText, inlineHttp)', (n) => '"$(a)"'.repeat(n), (c) => executedText(c, { inlineHttp: true }))
+  work('a run of run strings (executedText)', (n) => 'bash -c "x" '.repeat(n), (c) => executedText(c))
+  work('a run of words with # inside (executedText)', (n) => 'a#'.repeat(n), (c) => executedText(c))
+  work('a long script of echo, substitution and pipe lines (fetchKind)', (n) => Array.from({ length: Math.ceil(n / 8) }, (_, i) => 'echo "step ' + i + ': $(date +%s)" >> log.txt; qmd search "term ' + i + '" -n 2 | head -5').join('\n'), (c) => fetchKind(c))
 }
 expect('git options: any reading of the option words reaches the subcommand, as in the RTK exclude_commands',
   logFindPart('git -C repo -c core.pager=cat --no-pager log -3') && logFindPart('git --git-dir .git --work-tree . log') && logFindPart('find . -name x')
