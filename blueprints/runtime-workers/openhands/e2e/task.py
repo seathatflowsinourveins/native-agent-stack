@@ -43,13 +43,15 @@ def load_task(path, expected_sha256):
 
 
 def worker_instruction(row):
-    # Deliberately exclude patch, test_patch and test-name oracle fields.
+    # Deliberately exclude patch, test_patch and test-name oracle fields. Name only skills the
+    # SWE-bench contract installs (host.workspace_skills): the runtime manifest excludes
+    # verification-before-completion, so the check before finishing names no skill.
     return (
         "Repair the repository at /workspace for the following issue.\n"
         f"Repository: {row['repo']}\nBase commit: {row['base_commit']}\n\n"
         + row["problem_statement"]
-        + "\n\nInvoke the tdd skill using invoke_skill before editing and the "
-        "verification-before-completion skill before finishing. The existing code/test "
+        + "\n\nInvoke the tdd skill using invoke_skill before editing. Before finishing, run "
+        "the tests that reproduce the issue again and report what they returned. The existing code/test "
         "interfaces and test-first work are authorized. Inspect the repository's native "
         "test instructions; reproduce the issue and retain test results in the trace. "
         "This is a bare checkout, not the upstream Conda testbed. Do not claim an "

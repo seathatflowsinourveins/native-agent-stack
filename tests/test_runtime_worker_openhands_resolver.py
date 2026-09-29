@@ -3040,6 +3040,22 @@ class ResolverHostTests(unittest.TestCase):
                     self.host.workspace_skills(stack, workspace)
                 self.assertEqual(str(caught.exception), "runtime_skills_manifest_contract")
 
+    def test_the_swebench_instruction_asks_only_for_skills_the_contract_installs(self):
+        # Review item D6: 2d1d074d made the SWE-bench skill contract refuse verification-before-completion,
+        # which the runtime manifest excludes, so the agent's instruction may not ask it to invoke that
+        # skill. Every skill the instruction names must be selected in the runtime manifest, not excluded.
+        runtime = json.loads((ROOT / "blueprints/runtime-workers/skills/manifest.json").read_text(encoding="utf-8"))
+        selected = {entry["name"] for entry in runtime["skills"]}
+        excluded = {entry["name"] for entry in runtime["excluded"]}
+        self.assertIn("verification-before-completion", excluded)
+        prompt = self.host.worker_instruction({"repo": "django/django", "base_commit": "a" * 40,
+                                               "problem_statement": "Fix the selected issue."})
+        named = set(re.findall(r"\bthe ([a-z0-9][a-z0-9-]*) skill\b", prompt))
+        self.assertIn("tdd", named)
+        self.assertEqual(named & excluded, set(), prompt)
+        self.assertLessEqual(named, selected)
+        self.assertIn("Before finishing", prompt)  # the verification step stays, without a skill
+
     def test_skill_installer_takes_the_resolver_manifest_through_the_same_path(self):
         workspace = self.tmp / "workspace"
         (workspace / ".git/info").mkdir(parents=True)
