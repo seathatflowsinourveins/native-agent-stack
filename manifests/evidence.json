@@ -3604,6 +3604,26 @@
         "The Codex `[tui] notifications` list is in the template that a macOS host also renders. Codex keeps its own per-terminal channel there, so needed kinds still notify natively and the turn-complete one stops; at the macOS pin `async-question` does not exist and is inert. This was decided and documented, and not observed on a Mac."
       ],
       "path": "evidence/receipts/wsl-terminal-defaults-20260929.json"
+    },
+    {
+      "id": "notification-types-20260929",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "On this host on 2026-09-29 (Claude Code 2.1.285, and 2.1.283 in a second distro; tmux 3.4; Windows Terminal 1.24.11911.0) the installed client knows 17 distinct notification types, all valid matcher values (a 15-item base array plus the two elicitation completion types), the same 17 in 2.1.283, 2.1.284 and 2.1.285; 12 are documented in the hooks reference. 8 now ring through the overlay's bell hook and 9 stay quiet, each with a reason in one table that the scan and the repository's test share; none is without a decision. The type the bell missed was `push_notification`, the model's own PushNotification. In an interactive pty probe with no user-scope settings a model push raised one Notification event of that type and rang nothing; with one more hook that matches the type, exactly one BEL reached the terminal; and with this host's own settings after the change, the same one BEL. The tool sends only while the client judges the user away: the probe's arms show both branches of the rule read from the binary (with a focus-out report the event fires whatever the elapsed time; with no focus report it fires after more than 60 s without input and does not fire after 15 s); once a focus report has arrived its last state decides, so a tab last reported focused counts as present however long the user is away, and how Windows Terminal reports a background tab was not measured. Before the change, the same probe on this host's settings gave one event and no BEL (the coordinator's own output, recorded as values). Both Claude settings files (this host's and the second distro's) were brought to the overlay with the repository's merge tool on a private copy, backed up, and differ from their originals only in the bell group; a rerun of the hardened replacement tool reports nothing to do on both. The scan's first catalog pattern read 15 of the 17 matcher values on 2.1.283 without an error (a `$` in a minified name); the reader now reads 17 on all three releases, exits 1 when it finds nothing, and the fix is covered by tests and negative controls. tmux 3.4 forwards a pane's BEL to the outer terminal (a pty in the probe) by default, and `bell-action none` or `visual-bell on` stops it.",
+      "limitations": [
+        "One workstation, one probe model (Haiku) and one Ubuntu 24.04 distro plus a second distro (the independent-observation class of docs/acceptance-evidence-policy.md). No audible bell in Windows Terminal was observed by the user in this work, and the probe's outer terminal is a Python pty, not Windows Terminal: Windows Terminal defines DECSET 1004 focus reporting (microsoft/terminal v1.24.11911.0 DispatchTypes.hpp L541), but whether it reports focus for a background tab or an unfocused window, and what the last report is when a real user walks away, was not measured.",
+        "The presence rule is read from the installed client, not run against a real absence (`function V4r`, called only by the PushNotification tool: the terminal's focus state is undefined until the first focus report and then the last reported state decides; before any report, input within 60 seconds (`var KWt=60000`); `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses it). The probe measures both branches with a synthetic focus-out report or none. A tab last reported focused counts as present however long the user is away, so the bell can stay silent for a user who left a focused tab; the other alert types are timed by input idleness (about 6 s in the earlier probe) and whether a focus report also affects them was not checked. Two more conditions leave the bell silent and were read from the binary, not run: with Remote Control connected and `agentPushNotifEnabled` off the tool returns `config_off` before it raises the event, and the tool exists only where the server-side flag `tengu_kairos_push_notifications` is on (it is on for this account).",
+        "The probe does not record the tool's reply, so the \"Not sent because you're active in this terminal.\" text (`disabledReason: user_present`) comes from the binary. A headless `-p` run of a few seconds (the elapsed time was not recorded) raised no Notification event and the tool's result began \"Not sent\"; the same presence rule applies to `-p`, and a longer run was not measured.",
+        "The probe cannot say how often a model chooses to send a push, so the decision's overturn condition (models over-notify) is the check.",
+        "The 'before' run on this host's own settings (one event, no BEL) is the coordinator's own output of the same probe, recorded here as values; it cannot be repeated now that the live matcher changed. Arms A and B reproduce the same causal pair independently of any user setting. The first recorded runs of arms A and B ended without a tool call (state waiting_tool) while the host was heavily loaded by a peer's build; both are kept in recorded/push_probe_arms.txt and the arms above are the reruns after the load fell.",
+        "The scan counts `notificationType:\"<type>\"` literals, which is a lower bound: seven types show zero (the documented quota and elicitation dialog types that fire through other spellings, and `computer_use_enter` and `model_refusal_fallback`). `computer_use_enter` occurs once in the binary, in the matcher list; `model_refusal_fallback` is a matcher value and a system-message subtype with no such call site; a text search cannot prove absence (this host also sets `CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK=1`), while `computer_use_exit` has a call site (the client says \"Claude is done using your computer\"). Five types are outside the hooks reference (`worker_permission_prompt`, `push_notification`, `computer_use_enter`, `computer_use_exit`, `model_refusal_fallback`); all rest on the installed binary and a later release can change them.",
+        "The second distro's binary is byte-identical to this host's 2.1.283 (recorded by SHA-256 prefix in the receipt wsl-terminal-defaults-20260929); the type list was scanned on this host's copy of that release, and the second distro's settings were read back as values. No session of that distro was observed ringing. The hardened replacement tool's `polaris` write path (a `mktemp` staging file, refusals for a symlink and an existing backup) was not run against a real distro after the change; only its read-only dry run was; its shell snippet ran under this host's dash on a synthetic home in the coordinator's own scratch check (a normal install, a symlink and an existing backup; not retained), and its `local` path in the controls.",
+        "The agent-teams statements are a source review of the documentation fetched on 2026-09-29, not a team run: in-process display works in any terminal and keeps the teammates in the lead's terminal, split panes need tmux or iTerm2, and the same page's limitations say split-pane mode isn't supported in Windows Terminal (it may mean native panes; tmux inside WSL is outside its stated support and unmeasured for teams here). Whether an alert a teammate raises (`worker_permission_prompt`) reaches the hook was not observed. No `teammateMode` setting and no team hook was added.",
+        "The change touches ~/.claude/settings.json, which the Gate A freeze list names; it was made before any seal announcement and reported to that lane's owner, who verified the hash and the single-group difference. The file was rewritten later the same day for an unrelated reason, which moves its hash; the bell group is unchanged (the dry run above)."
+      ],
+      "path": "evidence/receipts/notification-types-20260929.json"
     }
   ],
   "files": [
@@ -3994,8 +4014,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "a547db2e82f27299671f3a6361c86b7b8d962e89f1289948f54d6d7da1cf1157",
-      "bytes": 21951
+      "sha256": "6319b70436d4c6d649d662131104c710fb2670f12df1b3734073233ae5da51f2",
+      "bytes": 22519
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -4044,8 +4064,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
-      "sha256": "52042017abb798c913f3abbeb01a5c9448bfa0bca26d11ab0bb82496afee40aa",
-      "bytes": 533
+      "sha256": "691003167dc4e03cdf9dfb4bb5628ca01194d65b74bf7180179f80d822af0d77",
+      "bytes": 551
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
@@ -14665,8 +14685,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "5076e3d335546f2bdf17682ee7b99cad622305ad20d7d8d7a6c5ccd87d6fb7e5",
-      "bytes": 51477
+      "sha256": "ca169302401b777db17752555e7f689537fc6869f777361dbce647aeb6d6b3b4",
+      "bytes": 63324
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -34309,6 +34329,106 @@
       "bytes": 817
     },
     {
+      "path": "evidence/artifacts/notification-types-20260929/README.md",
+      "sha256": "5c1d0bc5932bb85de78576d74bcccad274c6170473608384914e357bac0ab878",
+      "bytes": 7198
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+      "sha256": "12a9bbb1ac0cd8a3b0eb9a12014d19871ca248a91da9fe0d1b10eb8947bfd99a",
+      "bytes": 7328
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
+      "sha256": "1ac0cf1f950e34527308f2916180399dd1f3fb043c4c81f2d2981a82b4f978ba",
+      "bytes": 21057
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/exit_codes.txt",
+      "sha256": "a83298a69680f8ecb6fbd814c8ff0466306ccaee241a807f1b1002fb8cc4dd37",
+      "bytes": 834
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/notification_types_scan_2.1.283.json",
+      "sha256": "58a5cfeeb8782d52f95e18cf62cece20f13d8c9b7bbd54492694dc0de3fa2ceb",
+      "bytes": 4018
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/notification_types_scan_2.1.284.json",
+      "sha256": "83996b5c13657d83b5b7513cc1ec3cd8fceee670cdee50b1c3366eb05b0f93e6",
+      "bytes": 4018
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/notification_types_scan_2.1.285.json",
+      "sha256": "eb2e772ebd9d0c83e7ec4aab1584c18cb66ccc2237b921c1dfe6165126f2cef8",
+      "bytes": 4018
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/overlay_noop_check.txt",
+      "sha256": "20d67288079b69c879e72b744505f1bac5a4449d615af3f121a9caef7f7c85da",
+      "bytes": 261
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/push_probe_arms.txt",
+      "sha256": "be71ed5844000e9372d69fd03b5a514c793a090466ddcc8e20c270db27318238",
+      "bytes": 4691
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/replace_bell_group_controls.txt",
+      "sha256": "a25a6b2b63df16da25e5a687a0f45c4a0480b76fc0c2b563ecca4448b6009cd8",
+      "bytes": 1573
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/replace_bell_group_live_dry_runs.txt",
+      "sha256": "8bc2d61fe14e334c47cfb2d38ab85e1b890060b038785c4e121dbc76d68b053c",
+      "bytes": 587
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/replace_bell_group_mutants.txt",
+      "sha256": "5c5f9784f700a3eaded9df240a9dd6f0bcec87c8fc3f04b939af952c5cbcc40f",
+      "bytes": 1075
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/scan_reader_negative_control.txt",
+      "sha256": "6885bbbc35cd35cf6d737a583d67924704abed787644fca4f52380d1c30adc27",
+      "bytes": 767
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/tmux_bell_probe.txt",
+      "sha256": "2837e6c652ea2f391344e5dcfcad6f454c07f87caabec14a803abc2c114ae55b",
+      "bytes": 581
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/unit_tests.txt",
+      "sha256": "5be8083c63db900431c9907f8855dc077dbd75894f79dbfabc9a352da0ac2755",
+      "bytes": 40
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/replace_bell_group.py",
+      "sha256": "df63e6f3c271701e004003dab01d3dff5c86c37f0b24dace2a006ec58bb8679a",
+      "bytes": 11162
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py",
+      "sha256": "bed9b093aeca9bf4ec530a508ec515f2b05face915a546f86b080167dcd0615a",
+      "bytes": 10980
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/replace_bell_group_mutants.py",
+      "sha256": "f488c5ce2e7e26ecd82990b1edaf66219353be116e537ee3d79e833664671015",
+      "bytes": 4617
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/scan_reader_mutants.py",
+      "sha256": "016da24f2723f6bc29a73780b5e1a1e6008103b9ca4f4cc3479963b07ed2480f",
+      "bytes": 3868
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+      "sha256": "5ef02fa27e168c7310c0083d51c68683ca32084d49c0c63f25db64e2a67a4153",
+      "bytes": 3708
+    },
+    {
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
@@ -42184,6 +42304,11 @@
       "bytes": 867
     },
     {
+      "path": "evidence/receipts/notification-types-20260929.json",
+      "sha256": "0dbf22b72ede2d8aa7d6802669df51fc720174d7d4d4079df0ea73089989386c",
+      "bytes": 22656
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
@@ -42980,8 +43105,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "98046ad28281c33e990c350461fe2bcd41b0a8baaa0dc2c6efb7ead0362e626b",
-      "bytes": 36542
+      "sha256": "923a0a3610f3325fefb666b7037d6ae38d6d8125c271c08a9143ddcb60c0de5e",
+      "bytes": 38777
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -44160,8 +44285,8 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "7eb940f52441bb02bc137658639a201da0f170a82282de4b4374f83c84d7f027",
-      "bytes": 15926
+      "sha256": "c749503c0c8bd2a737075bb1b50a16329f491e726939e1472594f97fea4823e1",
+      "bytes": 21173
     },
     {
       "path": "tests/test_worker_recovery.py",
