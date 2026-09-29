@@ -21,11 +21,18 @@ TEMPLATES = [
     ("permission_to_use_denied", re.compile(r"Permission to use \S+(?: .*)? has been denied")),
     ("permission_to_use_other", re.compile(r"Permission to use ")),
     ("permission_for_denied", re.compile(r"Permission for this tool use was denied")),
+    ("permission_for_command_built_in", re.compile(r"Permission for this command was denied by a built-in")),
+    ("permission_for_other", re.compile(r"Permission for ")),
+    ("not_run_response_stopped", re.compile(r"Not run: the response that made this tool call")),
     ("pretooluse_hook_error", re.compile(r"PreToolUse:\S+ hook error: ")),
     ("automode_no_verdict", re.compile(r"The server-side auto mode classifier gave no verdict")),
     ("host_hook_agent_isolated", re.compile(r"This agent is isolated")),
     ("exit_code", re.compile(r"Exit code -?\d+")),
-    ("mcp_not_connected", re.compile(r"MCP server \S.* is not connected \(status: ")),
+    # The Claude Code client's MCP texts (M15): a server it is not connected to, its documented idle timeout, and the MCP SDK's errors.
+    ("mcp_not_connected", re.compile(r"MCP server \S.* is not connected")),
+    ("mcp_idle_timeout", re.compile(r"MCP server \S.* sent no response or progress for ")),
+    ("mcp_connection_closed", re.compile(r"(?:MCP error -32000: )?Connection closed")),
+    ("mcp_invalid_params", re.compile(r"MCP error -32602: ")),
 ]
 
 
@@ -88,9 +95,10 @@ for root in sys.argv[1:]:
                 continue
             files += 1
             names = {}
+            last = None  # the template class of the latest tool result in this file
             with fh:
                 for raw in fh:
-                    if b'"tool_use"' not in raw and b'"tool_result"' not in raw:
+                    if b'"tool_use"' not in raw and b'"tool_result"' not in raw and b"Request interrupted" not in raw:
                         continue
                     try:
                         row = json.loads(raw)
@@ -107,9 +115,14 @@ for root in sys.argv[1:]:
                             continue
                         if row.get("type") == "assistant" and b.get("type") == "tool_use":
                             names.setdefault(b.get("id"), b.get("name"))
+                        elif (row.get("type") == "user" and b.get("type") == "text" and isinstance(b.get("text"), str)
+                              and b["text"].startswith("[Request interrupted by user for tool use]")):
+                            # The interrupt marker as a user text block, and the class of the tool result before it.
+                            c["interrupt_marker_text_blocks"]["after " + (last or "no tool result")] += 1
                         elif row.get("type") == "user" and b.get("type") == "tool_result":
                             text = text_of(b.get("content"))
                             t = template(text)
+                            last = t
                             err = b.get("is_error") is True
                             kind = kind_of(names.get(b.get("tool_use_id")))
                             denial = row.get("toolDenialKind")

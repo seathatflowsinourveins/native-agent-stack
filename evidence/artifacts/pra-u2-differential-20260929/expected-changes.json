@@ -30,6 +30,18 @@
         {"in": "actor, aggregate", "path": "usage.complete", "change": "true becomes false where usage.iteration_issues names a reason (an unread entry, an inconsistent message, an advisor result without usage, an advisor call without a result) or an advisor entry lacks a model", "why": "binding decision B9; on this host 143 of 4,667 transcripts with messages (scans/kernel-usage.json)"}
       ],
       "unchanged_by_design": ["hook_context.inserted", "hook_context.claimed", "hook_context.with_marker", "hook_context.by_event", "loaded_not_called", "mcp_states", "the results, bytes, large_results, large_bytes and max_bytes of every sizes object", "usage.totals", "usage.messages[].ordinal, model, effort and usage", "usage.unidentified_messages", "run-mode children[].usage, usage_by_model, complete and issues; by_resolved_model; the exit code", "limits"]
+    },
+    {
+      "stage": "U2 stage 2: PR-A item 7 (the callState extension, M14 call states, the private ledger) and protocol M15",
+      "commits": ["50c9f3fc", "486da6ac", "3e0e6059", "7f9b0990", "a176d1d9", "2fa508e4"],
+      "added": [
+        {"in": "actor, aggregate", "paths": ["call_states.attempted", "call_states.decided", "call_states.executed", "call_states.succeeded", "call_states.failed", "call_states.interrupted", "call_states.rejected", "call_states.rejected_by_source.{config,hook,user,other,declined}", "call_states.invalid", "call_states.cancelled_with_result", "call_states.cancelled_or_unfinished", "call_states.unknown", "call_states.background", "call_states.sandbox", "call_states.by_server.<server>.{attempted,executed,succeeded,failed,interrupted,rejected,invalid,cancelled_with_result,cancelled_or_unfinished,unknown}"], "why": "item 7, M14 in the sealed names"},
+        {"in": "actor, aggregate", "paths": ["m15.threshold", "m15.by_server.<server>.{attempted,succeeded,ctx,classes,infrastructure_errors,new_class_errors,unknowns,rate,rate_lower_bound,rate_upper_bound,threshold_sensitive,every_error_classified}"], "why": "protocol M15, rates under binding decision B2"}
+      ],
+      "changed": [
+        {"in": "actor, aggregate", "path": "cli_lanes.lanes.<lane>.not_executed and cli_lanes.mcporter_downstream.<server>.not_executed", "change": "an error result with no toolDenialKind and no native declined state now counts as not_executed when it opens with one of the three new templates ('Permission to use ... has been denied', 'Not run: the response that made this tool call', '[Request interrupted by user for tool use]'), or with one of U1's templates in the field U1 did not read it in (U1 read '<tool_use_error>', \"The user doesn't want to proceed\" and the classifier text only in the content, and 'PreToolUse:', 'Permission for' and 'User rejected tool use' only in the toolUseResult; every template is now read in both)", "why": "the callState extension of item 7; on this host 0 of 228,531 calls change (scans/not-executed-delta.json), because every such row carries a toolDenialKind"}
+      ],
+      "unchanged_by_design": ["cli_lanes.lanes.<lane>.failed and every other cli_lanes counter (U1's meaning: failed counts is_error calls, not_executed a subset of them; M14's failed is failed minus not_executed. tests/test_skill_usage.py:970-974, outside this unit's paths, pins it for the Codex declined fixtures)", "mcp_states (the #432 reading; test_skill_usage.py:828-829 and :936-939 pin it)", "calls_without_result and bytes_complete (the published no-result count; test_skill_usage.py:831, :854, :866 and :939 pin it)", "stdout of both modes, which is the same with and without --call-ledger", "the run-mode exit code", "limits (the docs stage changes it)"]
     }
   ]
 }

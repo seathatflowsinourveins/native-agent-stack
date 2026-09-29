@@ -1,0 +1,202 @@
+{
+ "transcript_files": 5165,
+ "parse_errors": 0,
+ "actors_with_calls": 4349,
+ "invariant_violations": {
+  "actor": 0,
+  "server": 0,
+  "executed": 0,
+  "rejected_sources": 0
+ },
+ "claude_calls_without_result_equal_cancelled_or_unfinished": {
+  "equal": 4349,
+  "differ": 0
+ },
+ "call_states": {
+  "attempted": 229062,
+  "decided": null,
+  "executed": 227817,
+  "succeeded": 224328,
+  "failed": 3489,
+  "interrupted": 0,
+  "rejected": 892,
+  "invalid": 337,
+  "cancelled_with_result": 1,
+  "cancelled_or_unfinished": 15,
+  "unknown": 0,
+  "rejected_by_source": {
+   "config": 24,
+   "hook": 817,
+   "user": 50,
+   "other": 1,
+   "declined": 0
+  },
+  "background": 1846,
+  "sandbox": 0
+ },
+ "m15_threshold": 0.01,
+ "m15_by_server": {
+  "(other)": {
+   "attempted": 20,
+   "succeeded": 3,
+   "ctx": false,
+   "classes": {
+    "connection": 16,
+    "unmatched": 1
+   },
+   "infrastructure_errors": 16,
+   "new_class_errors": 1,
+   "unknowns": 0,
+   "rate": 0.85,
+   "rate_lower_bound": 0.85,
+   "rate_upper_bound": 0.85,
+   "threshold_sensitive": false,
+   "every_error_classified": false
+  },
+  "ai-memory": {
+   "attempted": 140,
+   "succeeded": 138,
+   "ctx": false,
+   "classes": {
+    "unmatched": 2
+   },
+   "infrastructure_errors": 0,
+   "new_class_errors": 2,
+   "unknowns": 0,
+   "rate": 0.0143,
+   "rate_lower_bound": 0.0143,
+   "rate_upper_bound": 0.0143,
+   "threshold_sensitive": false,
+   "every_error_classified": false
+  },
+  "codebase-memory": {
+   "attempted": 27,
+   "succeeded": 26,
+   "ctx": false,
+   "classes": {
+    "connection": 1
+   },
+   "infrastructure_errors": 1,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "rate": 0.037,
+   "rate_lower_bound": 0.037,
+   "rate_upper_bound": 0.037,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "headroom": {
+   "attempted": 26,
+   "succeeded": 26,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "jcodemunch": {
+   "attempted": 87,
+   "succeeded": 85,
+   "ctx": false,
+   "classes": {
+    "unmatched": 2
+   },
+   "infrastructure_errors": 0,
+   "new_class_errors": 2,
+   "unknowns": 0,
+   "rate": 0.023,
+   "rate_lower_bound": 0.023,
+   "rate_upper_bound": 0.023,
+   "threshold_sensitive": false,
+   "every_error_classified": false
+  },
+  "plugin_context-mode": {
+   "attempted": 2,
+   "succeeded": 0,
+   "ctx": true,
+   "classes": {
+    "invalid": 2
+   },
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 1,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "plugin_context-mode_context-mode": {
+   "attempted": 34427,
+   "succeeded": 34084,
+   "ctx": true,
+   "classes": {
+    "boundary": 77,
+    "invalid": 9,
+    "invalid_arguments": 1,
+    "invoked_command_exit": 190,
+    "invoked_command_exit_indexed": 2,
+    "module": 10,
+    "rejected": 20,
+    "remote_fetch": 22,
+    "search_throttle": 4,
+    "timeout": 8
+   },
+   "infrastructure_errors": 95,
+   "new_class_errors": 1,
+   "unknowns": 2,
+   "rate": 0.0028,
+   "rate_lower_bound": 0.0028,
+   "rate_upper_bound": 0.0044,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "qmd": {
+   "attempted": 58,
+   "succeeded": 58,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "serena": {
+   "attempted": 30,
+   "succeeded": 30,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "socraticode": {
+   "attempted": 68,
+   "succeeded": 68,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  }
+ }
+}

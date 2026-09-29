@@ -1701,10 +1701,10 @@ function callAnalysis(call) {
 // a user-rejection result, 37 of 37, never a result). A call that did not run also gets its cause, the source of the decision in the
 // vocabulary of the OTel tool_decision event (code.claude.com/docs/en/monitoring-usage, "Tool decision event": config, hook, the user's
 // answers; "Tool result event": "Not emitted if the tool call was rejected"): a template's own cause unless it is 'other', then the
-// toolDenialKind, then the template's 'other', then a native declined state. Hook denials carry toolDenialKind permission-rule (809 of 809
-// on this host), so a text decides first; "Permission for this command was denied by a built-in Claude Code safety check" carries
-// permission-rule too (11 of 11), an automatic decision, which the monitoring doc's source "config" names ("Decided automatically without
-// prompting"). Counts: evidence/artifacts/pra-u2-differential-20260929/scans/call-states.json.
+// toolDenialKind, then the template's 'other', then a native declined state. Hook denials carry toolDenialKind permission-rule (817 of 817
+// on this host), so a text decides first; "Permission for this command was denied by a built-in ..." carries permission-rule too (11 of
+// 11), a rule's automatic decision, which the monitoring doc's source "config" names ("Decided automatically without prompting").
+// Counts (5,168 transcript files, 2026-09-29): evidence/artifacts/pra-u2-differential-20260929/scans/call-states.json.
 // [prefix, cause, text the prefix's first line must also hold]
 const NOT_EXECUTED_TEMPLATES = [['<tool_use_error>Cancelled: ', 'cancelled'], ['<tool_use_error>Error: Streaming fallback', 'cancelled'],
   ['<tool_use_error>', 'invalid'], ["The user doesn't want to proceed", 'user'], ['User rejected tool use', 'user'], ['PreToolUse:', 'hook'],
@@ -1929,7 +1929,7 @@ const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
 //   boundary refusal :1196-1201 returns at :2118-2119, before the echo at :2145): boundary (binding when the Codex adapter flags a root
 //   mismatch; cm-audit rows 1-3), the deny firewall (:1122, :1152, :1232), Runtime/Batch execution/Index/Search errors (:1946, :2224,
 //   :3886, :2432, :2801), storage directory errors (session/db.ts storageDirectoryErrorMessage, invalidStorageOverride), usage errors
-//   (:2318, :2611, :2628, :3510, :4518), the batch timeout (:3815), fetch failures (:3599-3611) and an all-failed fetch batch (:3653-3669),
+//   (:2315, :2603, :2627, :3508, :4515), the batch timeout (:3815), fetch failures (:3599-3611) and an all-failed fetch batch (:3653-3669),
 //   and search throttling (:2659);
 // - only a ctx_execute or ctx_execute_file output after execution carries the echo (ctxEcho; :1827, :2145): it must open the text, and the
 //   rest is read for the execution timeout (:1872, :2152), the exit (exit-classify.ts:31, "Exit code: N\n\nstdout:\n...\n\nstderr:\n..."), a

@@ -1418,7 +1418,7 @@ class TokenMeasurement(unittest.TestCase):
         only through toolDenialKind), each template read at the start of the result content and of the toolUseResult string (after
         'Error: '), and the exported callState and notExecuted accessor. The cause is the first match of: a template's own cause unless it
         is 'other', the toolDenialKind (permission-rule config, user-rejected user, cancelled cancelled, anything else other), the
-        template's 'other', and a native declined state. Hook denials carry toolDenialKind permission-rule on this host (809 of 809), so the
+        template's 'other', and a native declined state. Hook denials carry toolDenialKind permission-rule on this host (817 of 817), so the
         text decides before the denial kind. Cases marked (control) already read not-executed at ebcca292; the others fail there."""
         def answer(content, error=True, **row):
             return {**result("a", content, error), **row}

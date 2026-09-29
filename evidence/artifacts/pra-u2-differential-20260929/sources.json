@@ -114,6 +114,126 @@
       "quotes": ["- **uniform**: All objects have identical fields with primitive values"],
       "note": "the repository's root README.md at this tag is a 23-byte pointer to this file; manifests/stack.json pins toon at v4.1.1",
       "used_by": "large_uniform_flat"
+    },
+    {
+      "id": "monitoring-usage",
+      "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+      "fetched_at": "2026-09-29T21:19:31Z",
+      "sha256": "0e8d8d57a26d38bdbcc6c38dc803e3172b747a35584c0a8394781f3242cd2818",
+      "bytes": 138674,
+      "sections": ["Tool result event (line 753)", "Tool decision event (line 907)"],
+      "quotes": [
+        "Logged when a tool completes execution. Not emitted if the tool call was rejected; see the [Tool decision event](#tool-decision-event) for rejections.",
+        "Always `\"accept\"`, since this event is only emitted after the tool runs. Rejected calls don't produce a tool result",
+        "`source`: Where the decision came from. One of `\"config\"`, `\"hook\"`, `\"user_permanent\"`, `\"user_temporary\"`, `\"user_abort\"`, or `\"user_reject\"`.",
+        "`\"config\"`: Decided automatically without prompting"
+      ],
+      "used_by": "call_states (U2 item 7): executed versus rejected, the rejection sources, decided null; the cause order in callState"
+    },
+    {
+      "id": "mcp-idle-timeout",
+      "url": "https://code.claude.com/docs/en/mcp.md",
+      "fetched_at": "2026-09-29T21:17:21Z",
+      "sha256": "fd7f9908f8151c27be527b99980c847b01ea8b8b23c215af44cbbbf0ce79d71d",
+      "bytes": 116162,
+      "lines": "412",
+      "quotes": ["A tool call to an MCP server that sends no response and no progress notification for the idle window aborts with an error instead of waiting for the wall-clock limit."],
+      "used_by": "M15 class timeout for the client's 'sent no response or progress for ... aborting' text (4 results here: scans/call-states.json mcp_idle_timeout)"
+    },
+    {
+      "id": "env-vars-idle-timeout",
+      "url": "https://code.claude.com/docs/en/env-vars.md",
+      "fetched_at": "2026-09-29T21:17:21Z",
+      "sha256": "9724f41e30b5cb16cca35f543d31e150e6077588e3407295c194e2199454cc83",
+      "bytes": 156483,
+      "lines": "318",
+      "quotes": ["Idle timeout in milliseconds for MCP tool calls."],
+      "used_by": "M15 class timeout (the variable the client's idle-timeout text names)"
+    },
+    {
+      "id": "context-mode-server-m15",
+      "repository": "https://github.com/mksglu/context-mode",
+      "ref": "v1.0.169",
+      "commit": "442f1eb6c7cdad3f0cb2411d00756f9e5cf2b587",
+      "path": "src/server.ts",
+      "sha256": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59",
+      "note": "the file of the context-mode-server entry; these are the lines the M15 classes rest on",
+      "lines": "802-808 getUpgradeHint; 892-896 the outdated-version notice trackResponse prepends; 1122, 1152 and 1232 the deny firewall; 1196-1201 the boundary refusal, returned at 2118-2119 before the echo is built at 2145; 1745-1751 ctx_execute's deny checks, before its echo at 1827; 1863 the partial-output note (no isError); 1872 and 2152 the execution timeouts; 1887, 1897, 2167 and 2177 the indexed error outputs with labels execute:<language>:error and file:<path>:error; 1946, 2224, 2432, 2801 and 3886 the Runtime, Index, Search and Batch execution errors; 2315, 2603, 2627, 3508 and 4515 usage errors; 2659 search throttling; 3599-3611 fetch failures; 3653-3669 the batch header and isError when every URL failed; 3815 the batch timeout",
+      "quotes": [
+        "`File access blocked: \"${filePath}\" resolves outside the project root ` +",
+        "`${echo}Execution timed out after ${effTimeout}ms\\n\\nstderr:\\n${result.stderr}`",
+        "`${echo}Timed out processing ${path} after ${effTimeout}ms`",
+        "`Indexed ${indexed.totalChunks} sections from \"${source}\" into knowledge base.`",
+        "isError: errorCount === batch.length, // only mark error if every URL failed"
+      ],
+      "used_by": "mcpErrorClass (M15), withoutVersionNotice"
+    },
+    {
+      "id": "context-mode-exit-classify",
+      "repository": "https://github.com/mksglu/context-mode",
+      "ref": "v1.0.169",
+      "commit": "442f1eb6c7cdad3f0cb2411d00756f9e5cf2b587",
+      "path": "src/exit-classify.ts",
+      "url": "https://raw.githubusercontent.com/mksglu/context-mode/v1.0.169/src/exit-classify.ts",
+      "fetched_at": "2026-09-29T22:04:59Z",
+      "sha256": "bf746d41e1c47f976620b1d395b7eac508df03af2a0af5bcae240b61976d1862",
+      "bytes": 846,
+      "lines": "22-31",
+      "quotes": ["`Exit code: ${exitCode}\\n\\nstdout:\\n${stdout}\\n\\nstderr:\\n${stderr}`"],
+      "note": "byte-identical to the installed context-mode 1.0.169 plugin cache copy",
+      "used_by": "M15 classes invoked_command_exit and module"
+    },
+    {
+      "id": "context-mode-storage-errors",
+      "repository": "https://github.com/mksglu/context-mode",
+      "ref": "v1.0.169",
+      "commit": "442f1eb6c7cdad3f0cb2411d00756f9e5cf2b587",
+      "path": "src/session/db.ts",
+      "url": "https://raw.githubusercontent.com/mksglu/context-mode/v1.0.169/src/session/db.ts",
+      "fetched_at": "2026-09-29T22:04:59Z",
+      "sha256": "6537e1b90faa6c9f9a3485efb94824606d4d2a0918ca4592efef0f6b96259acb",
+      "bytes": 67346,
+      "lines": "28, 116-124, 263-273",
+      "quotes": ["`context-mode ${kind} directory is not writable: ${path}`,", "[`Invalid ${STORAGE_ROOT_ENV} for context-mode ${kind} directory: ${detail}`, storageDirectoryHint()].join(\"\\n\"),"],
+      "note": "byte-identical to the installed context-mode 1.0.169 plugin cache copy; server.ts:763-768 returns these messages with isError",
+      "used_by": "M15 class storage_directory"
+    },
+    {
+      "id": "codex-mcp-approval",
+      "repository": "https://github.com/openai/codex",
+      "ref": "rust-v0.157.1",
+      "commit": "36650394c5b38c2990ccf2a3457165ca3e9d9726",
+      "path": "codex-rs/core/src/mcp_tool_call.rs",
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.157.1/codex-rs/core/src/mcp_tool_call.rs",
+      "fetched_at": "2026-09-29T21:12:00Z",
+      "git_blob": "0112be0b4001e3ca47cc68d3f04b85fb32dd7728",
+      "sha256": "b794c2046726cd08df6b6d0aec8057f3144f659b69f395d3e24d6260ba4a0159",
+      "bytes": 88572,
+      "lines": "1610-1613",
+      "quotes": ["\"MCP tool call requires approval, but approval policy is never\","],
+      "note": "returned as ReviewDecision::denied, so the class is read even when an adapter marks the call not executed",
+      "used_by": "M15 class approval (cm-audit row 4)"
+    },
+    {
+      "id": "mcp-typescript-sdk",
+      "package": "@modelcontextprotocol/sdk",
+      "version": "1.30.1",
+      "tarball": "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.30.1.tgz",
+      "integrity": "sha512-H2HxLvC3HDNybePJaLdSrU1hhUK5iQw+WvV1b01myFyI7sdVGe1u/IPTE5D9fGCiJDVtgMV/lmFkQXLmQyIFYA==",
+      "git_head": "289ac2c3af7e1536160e80414296b175171a1a87",
+      "fetched_at": "2026-09-29T22:06:00Z",
+      "files": {
+        "package/dist/esm/shared/protocol.js": {"sha256": "8de524602541771e084f7185e7d0fc418b8142a9cae1bd80a3ee7c70e9a9e132", "lines": "263"},
+        "package/dist/esm/server/mcp.js": {"sha256": "a5caaddfa0f6aadea64604aa57136bab6540298b846bbe861a80bf7392ae5aad", "lines": "178"},
+        "package/dist/esm/types.js": {"sha256": "962836b0f8dad85bcd398ad3ddb5ba81a7c7530c706955aa846dd8dfc02dd6a9", "lines": "161, 167, 2031"}
+      },
+      "quotes": [
+        "const error = McpError.fromError(ErrorCode.ConnectionClosed, 'Connection closed');",
+        "throw new McpError(ErrorCode.InvalidParams, `Input validation error: Invalid arguments for tool ${toolName}: ${errorMessage}`);",
+        "super(`MCP error ${code}: ${message}`);"
+      ],
+      "note": "the version the context-mode 1.0.169 install holds (its package.json asks ^1.26.0); the tarball's sha512 equals the registry integrity and the three installed files equal the tarball's",
+      "used_by": "M15 classes connection ('Connection closed', -32000) and invalid_arguments (-32602)"
     }
   ]
 }

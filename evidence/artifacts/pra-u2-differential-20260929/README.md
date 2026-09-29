@@ -17,6 +17,9 @@ and counts only.
 | `scans/large-results.py` and `.json` | Results over 5,120 B per tool: content shapes, JSON as returned, after the ctx code echo, after the Read `cat -n` numbers |
 | `scans/kernel-usage.mjs` and `.json` | The U2 kernel's `transcriptUsage` over every transcript: how often each B9 reason makes usage incomplete |
 | `scans/kernel-split-differs.mjs` and `.json` | Which message has a 5m/1h split unequal to its combined counter under the kernel |
+| `scans/call-states.py` and `.json` | Tool results by template class (the client's not-executed texts and its MCP texts), with `is_error`, `toolDenialKind`, the `toolUseResult` form and the tool kind |
+| `scans/not-executed-delta.mjs` and `.json` | U1's not-executed rule (copied verbatim from ebcca292) against the extended `callState`, call by call, and the cause of every call that did not run |
+| `scans/kernel-m14-m15.mjs` and `.json` | The U2 kernel's `call_states` and `m15` over every transcript: invariant checks and the per-server M15 classes and rates |
 
 Reproduce with the Claude Code projects directory as `<root>`. The `.mjs` checks also take the kernel path.
 The store keeps growing, so expect later counts to be larger.
@@ -67,9 +70,27 @@ node scans/kernel-usage.mjs examples/claude-native/workflows/child-usage.mjs <ro
   the echo, 29 do. Every text Read result over 5,120 B (11,467; another 133 hold a non-text block) is
   numbered on every line. As returned, 0 read as JSON; without the numbers, 990 do. (`large-results.json`)
 
+- **Calls that did not run (item 7).** Every such row carries a `toolDenialKind` or a `<tool_use_error>` or
+  user-rejection content (`call-states.json`, 5,168 files). The config text "Permission to use ... has been
+  denied." (8 rows) and the cancelled text "Not run: the response that made this tool call ..." (1 row) are read
+  by U1's rule only through their denial kind. Hook denials carry `permission-rule` (817 of 817), and so does
+  "Permission for this command was denied by a built-in ..." (11 rows). The interrupt marker
+  "[Request interrupted by user for tool use]" is a user text block after a user-rejection result (37 of 37),
+  never a result.
+  Over 228,531 calls, U1's rule and the extended `callState` mark the same 1,228 calls as not run and differ on 0
+  (`not-executed-delta.json`, which also gives the causes).
+- **M14 and M15 over the store (`kernel-m14-m15.json`).** Across 4,349 actors with calls there are 0 invariant
+  violations (per actor and per server). `calls_without_result` equals `cancelled_or_unfinished` for every one of
+  them, since a Claude transcript has no native statuses. The context-mode server's 34,427 calls classify
+  completely: 0 `unmatched` and 0 `echo_mismatch`, a rate of 0.0028 and a ceiling of 0.0044.
+  The client's MCP texts occur as counted in `call-states.json`: 16 "is not connected", 4 idle timeouts,
+  1 "Connection closed" and 1 −32602 validation error. Server names outside the stack's vocabulary are
+  folded into `(other)`.
+
 ## Differential (a later U2 stage)
 
-`expected-changes.json` lists, stage by stage, the key paths U2 adds and the two pre-existing paths it
+`expected-changes.json` lists, stage by stage, the key paths U2 adds and the pre-existing paths it
 changes on purpose. These are `hook_context.by_hook['(other)']`, which loses over-long MCP hook names to
-their server-level key, and `usage.complete` under B9. The later stage runs the base and U2 kernels over one
-root and window and requires equality on every other path.
+their server-level key, `usage.complete` under B9, and the cli_lanes `not_executed` counters for a
+not-executed template without a denial kind. The last of these changes 0 calls on this host. The later
+stage runs the base and U2 kernels over one root and window and requires equality on every other path.
