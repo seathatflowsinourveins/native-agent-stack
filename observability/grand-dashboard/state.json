@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-28T10:33:57Z",
+  "recorded_at_utc": "2026-09-29T02:02:44Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
@@ -316,9 +316,9 @@
     {
       "kind": "gate",
       "id": "actionlint-successor-trial",
-      "title": "actionlint successor trial (M2)",
-      "state": "non-required kjanat 1.17.0 job merged 2026-09-28 / required gate stays rhysd 1.7.12 / swap waits on hosted-job parity",
-      "evidence_ref": "evidence/artifacts/actionlint-successor-parity-20260927/receipt.json"
+      "title": "actionlint successor (M2)",
+      "state": "required validate step on kjanat 1.17.0 since 2026-09-29 (PR 476) / trial job retired / hosted parity 25 of 25 main runs / rhysd 1.7.12 retired",
+      "evidence_ref": "evidence/artifacts/actionlint-successor-swap-20260928/receipt.json"
     },
     {
       "kind": "gate",
@@ -330,9 +330,16 @@
     {
       "kind": "gate",
       "id": "codeql-quality-suites",
-      "title": "CodeQL quality suites (M4)",
-      "state": "measured locally 2026-09-27 / default setup and suite kept / extended deferred / merge gate unchanged",
+      "title": "CodeQL quality suites (integrity M4)",
+      "state": "measured locally 2026-09-27 / default setup kept / 10 Scorecard pin alerts dismissed as false positive 2026-09-28 / trading findings in issue 473",
       "evidence_ref": "docs/decisions/2026-09-27-codeql-quality-suites.md"
+    },
+    {
+      "kind": "gate",
+      "id": "skills-trial-window",
+      "title": "Skills trial window 2026-09-25 to 2026-10-25",
+      "state": "listing restored to manifest 2026-09-28 / verification-before-completion removed 2026-09-28 / 28 skills / Mac check issue 472 / review issue 474",
+      "evidence_ref": "docs/decisions/2026-09-25-skills-trial-and-usage.md"
     }
   ],
   "workers": [
