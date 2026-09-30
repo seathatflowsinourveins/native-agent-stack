@@ -1,0 +1,274 @@
+// Published copy: the live 20128 build's source checkout (B2, ae5539a56) is shown as <B2>; the imports below need that checkout.
+// S1 screen: the gateway's pre-translation compression step, called in isolation.
+//
+// Mirrors open-sse/handlers/chatCore.ts L1424-2045 at c19983a66 (the block is unchanged from
+// 81c9b6da except log text at L2144-2175): exclusions -> master/per-key gate -> header ->
+// selectCompressionStrategy -> legacy default-combo fallback -> selectCompressionPlan ->
+// stacked-pipeline handoff -> resolveCacheAwareConfig -> applyCompressionAsync ->
+// "body = result.body only when result.stats && result.compressed".
+// Not mirrored (and why): output styles (outputStyles [] and cavemanOutputMode off in both
+// captured configs; reported by the plan table instead), live zone (liveZone.enabled false),
+// DB analytics writes, reactive compaction (no screen payload reaches its threshold; the plan
+// table reports whether it is armed). Every module is imported from the B checkout by path.
+const C = "<B2>/open-sse/services/compression";
+const H = "<B2>/open-sse/handlers/chatCore";
+
+import {
+  selectCompressionPlan,
+  selectCompressionStrategy,
+  applyCompressionAsync,
+  applyCompression,
+  resolveCacheAwareConfig,
+  buildNamedComboLookup,
+  enginesMapDerivesStackedPipeline,
+  activeComboResolves,
+  formatCompressionMeta,
+} from "<B2>/open-sse/services/compression/strategySelector.ts";
+import { isCompressionExcluded } from "<B2>/open-sse/services/compression/exclusions.ts";
+import { deriveEffectivePreviewPlan } from "<B2>/open-sse/services/compression/deriveEffectivePreviewPlan.ts";
+import { isCompressionWorkerEligible } from "<B2>/open-sse/services/compression/compressionWorkerProtocol.ts";
+import { resolveOmniGlyphTransport } from "<B2>/open-sse/services/compression/imageTransportPolicy.ts";
+import { resolveOutputStyleSelection } from "<B2>/open-sse/services/compression/outputStyles/backCompat.ts";
+import { isBuiltinStackedPipeline } from "<B2>/open-sse/handlers/chatCore/compressionComboPredicates.ts";
+
+export { C, H };
+
+export type Combo = {
+  id: string;
+  name?: string | null;
+  pipeline: Array<{ engine: string; intensity?: string; config?: Record<string, unknown> }>;
+  isDefault?: boolean;
+  outputMode?: boolean;
+  outputModeIntensity?: string;
+  languagePacks?: string[];
+};
+
+export interface GatewayCtx {
+  provider: string;
+  model: string;
+  sourceFormat: string;
+  targetFormat: string;
+  /** chatCore L1737-1738 passes getTokenLimit(provider, model) as modelContextLimit. */
+  contextLimit: number;
+}
+
+export function estimateChars4(body: Record<string, unknown>): number {
+  const arr = (body.messages ?? body.input ?? []) as unknown;
+  return Math.ceil(JSON.stringify(arr).length / 4);
+}
+
+/** chatCore L1561-1687 subset: the legacy default-combo fallback (DB combo with is_default=1). */
+function applyDefaultComboIfLegacy(
+  config: any,
+  modeBefore: string,
+  namedCombos: Record<string, any>,
+  combos: Combo[]
+): { config: any; applied: string | null } {
+  if (
+    modeBefore === "stacked" &&
+    !config.compressionComboId &&
+    isBuiltinStackedPipeline(config.stackedPipeline) &&
+    !enginesMapDerivesStackedPipeline(config) &&
+    !activeComboResolves(config, namedCombos)
+  ) {
+    const def = combos.find((c) => c.isDefault) ?? null;
+    if (def && def.pipeline.length >= 1) {
+      const packs = [...new Set((def.languagePacks ?? []).map((p) => p.trim()).filter(Boolean))];
+      const intensity = ["lite", "full", "ultra"].includes(String(def.outputModeIntensity))
+        ? def.outputModeIntensity
+        : (config.cavemanOutputMode?.intensity ?? "full");
+      return {
+        applied: def.id,
+        config: {
+          ...config,
+          compressionComboId: def.id,
+          stackedPipeline: def.pipeline,
+          languageConfig: {
+            ...(config.languageConfig ?? { enabled: false, defaultLanguage: "en", autoDetect: true, enabledPacks: ["en"] }),
+            enabled: true,
+            defaultLanguage: packs.find((p) => p === config.languageConfig?.defaultLanguage) ?? packs[0] ?? config.languageConfig?.defaultLanguage ?? "en",
+            enabledPacks: packs.length > 0 ? packs : (config.languageConfig?.enabledPacks ?? ["en"]),
+          },
+          cavemanOutputMode: {
+            ...(config.cavemanOutputMode ?? { enabled: false, intensity: "full", autoClarity: true }),
+            enabled: Boolean(def.outputMode),
+            intensity,
+          },
+        },
+      };
+    }
+  }
+  return { config, applied: null };
+}
+
+export interface PlanOnly {
+  excluded: boolean;
+  promptCompressionEnabled: boolean;
+  reactiveCompactionArmed: boolean;
+  modeBeforeOutputTransform: string;
+  defaultComboApplied: string | null;
+  outputStylesWouldApply: boolean;
+  plan: { mode: string; stackedPipeline: any[]; source?: string };
+  meta: string;
+  stackedPipelineUsed: any[] | null;
+  previewPlan: { mode: string; stackedPipeline: any[] };
+  config: any;
+}
+
+export function resolvePlan(
+  settings: any,
+  header: string | null,
+  combos: Combo[],
+  body: Record<string, unknown>,
+  ctx: GatewayCtx,
+  estimatedTokens?: number
+): PlanOnly {
+  const namedCombos = buildNamedComboLookup(combos as any);
+  const excluded = isCompressionExcluded({ provider: ctx.provider, model: ctx.model }, settings?.exclusions);
+  let config: any = { ...settings };
+  if (excluded) config = { ...config, enabled: false }; // chatCore L1495-1497 (per-key opt-out n/a: no API keys)
+  const promptCompressionEnabled = Boolean(settings?.enabled) && !excluded;
+  const reactiveCompactionArmed = Boolean(settings?.enabled) && !excluded; // chatCore L1448
+  const est = estimatedTokens ?? estimateChars4(body);
+  const cctx = { provider: ctx.provider, targetFormat: ctx.targetFormat, model: ctx.model, connectionCacheOverride: null };
+  const modeBefore = selectCompressionStrategy(config, null, est, body as any, cctx as any, namedCombos, header) as string;
+  const fb = applyDefaultComboIfLegacy(config, modeBefore, namedCombos, combos);
+  config = fb.config;
+  const outputStylesWouldApply =
+    Boolean(config.enabled) && header?.trim().toLowerCase() !== "off" && resolveOutputStyleSelection(config).length > 0;
+  const plan = selectCompressionPlan(config, null, est, body as any, cctx as any, namedCombos, header, {
+    modelContextLimit: ctx.contextLimit,
+    requestMaxTokens: typeof (body as any)?.max_tokens === "number" ? (body as any).max_tokens : null,
+  }) as any;
+  let stackedPipelineUsed: any[] | null = null;
+  if (plan.mode === "stacked" && plan.stackedPipeline.length > 0 && !fb.applied && !config.compressionComboId) {
+    config = { ...config, stackedPipeline: plan.stackedPipeline };
+  }
+  if (plan.mode === "stacked") stackedPipelineUsed = config.stackedPipeline ?? null;
+  const previewPlan = deriveEffectivePreviewPlan(settings, namedCombos as any) as any;
+  return {
+    excluded,
+    promptCompressionEnabled,
+    reactiveCompactionArmed,
+    modeBeforeOutputTransform: modeBefore,
+    defaultComboApplied: fb.applied,
+    outputStylesWouldApply,
+    plan,
+    meta: formatCompressionMeta(plan),
+    stackedPipelineUsed,
+    previewPlan,
+    config,
+  };
+}
+
+export interface GatewayRun extends PlanOnly {
+  ran: boolean;
+  compressed: boolean;
+  statsSummary: any;
+  bodyOut: Record<string, unknown>;
+  inputMutatedInPlace: boolean;
+  workerEligible: boolean;
+  syncParity: "equal" | "differs" | "n/a";
+  durationMs: number;
+}
+
+function canon(v: unknown): string {
+  return JSON.stringify(v);
+}
+
+export async function runGateway(
+  settings: any,
+  header: string | null,
+  combos: Combo[],
+  pristine: Record<string, unknown>,
+  ctx: GatewayCtx,
+  opts: { syncParity?: boolean; supportsVision?: boolean | null } = {}
+): Promise<GatewayRun> {
+  const body = structuredClone(pristine);
+  const p = resolvePlan(settings, header, combos, body, ctx);
+  const t0 = performance.now();
+  let ran = false;
+  let compressed = false;
+  let statsSummary: any = null;
+  let bodyOut: Record<string, unknown> = body;
+  let workerEligible = false;
+  let syncParity: "equal" | "differs" | "n/a" = "n/a";
+  if (p.plan.mode !== "off") {
+    ran = true;
+    const cctx = { provider: ctx.provider, targetFormat: ctx.targetFormat, model: ctx.model, connectionCacheOverride: null };
+    const compressionConfig = resolveCacheAwareConfig(p.config, body as any, cctx as any);
+    const options: any = {
+      model: ctx.model,
+      // chatCore passes getResolvedModelCapabilities().supportsVision; unknown -> null (default here).
+      supportsVision: opts.supportsVision === undefined ? null : opts.supportsVision,
+      ...resolveOmniGlyphTransport(ctx.provider),
+      provider: ctx.provider,
+      sourceFormat: ctx.sourceFormat,
+      targetFormat: ctx.targetFormat,
+      compressionStage: "pre-translation",
+      config: compressionConfig,
+      cachingContext: cctx,
+    };
+    workerEligible = isCompressionWorkerEligible(body as any, p.plan.mode as any, {
+      model: options.model,
+      supportsVision: options.supportsVision,
+      providerTransport: options.providerTransport,
+      provider: options.provider,
+      imageTransportFidelity: options.imageTransportFidelity,
+      sourceFormat: options.sourceFormat,
+      targetFormat: options.targetFormat,
+      compressionStage: options.compressionStage,
+      config: options.config,
+    });
+    const result = await applyCompressionAsync(body as any, p.plan.mode as any, options);
+    if (result.stats) {
+      const s = result.stats as any;
+      statsSummary = {
+        originalTokens: s.originalTokens,
+        compressedTokens: s.compressedTokens,
+        savingsPercent: s.savingsPercent,
+        techniquesUsed: s.techniquesUsed,
+        engine: s.engine ?? null,
+        validationWarnings: s.validationWarnings ?? [],
+        validationErrors: s.validationErrors ?? [],
+        fallbackApplied: s.fallbackApplied ?? false,
+        ultraTier: s.ultraTier ?? null,
+        engineBreakdown: (s.engineBreakdown ?? []).map((b: any) => ({
+          engine: b.engine,
+          originalTokens: b.originalTokens,
+          compressedTokens: b.compressedTokens,
+          savingsPercent: b.savingsPercent,
+          techniquesUsed: b.techniquesUsed,
+          rejected: b.rejected ?? false,
+          rejectReason: b.rejectReason ?? null,
+        })),
+        rtkRawOutputPointers: (s.rtkRawOutputPointers ?? []).length,
+      };
+      if (result.compressed) {
+        compressed = true;
+        bodyOut = result.body as Record<string, unknown>;
+      }
+    }
+    if (opts.syncParity) {
+      const body2 = structuredClone(pristine);
+      const r2 = applyCompression(body2 as any, p.plan.mode as any, options);
+      const eff2 = r2.stats && r2.compressed ? r2.body : body2;
+      syncParity = canon(eff2) === canon(bodyOut) ? "equal" : "differs";
+    }
+  }
+  // An engine that rewrote its input object in place changes what chatCore forwards even when
+  // it reports compressed=false (chatCore keeps the same object). bodyOut already reflects that.
+  const inputMutatedInPlace = canon(body) !== canon(pristine);
+  return {
+    ...p,
+    config: undefined,
+    ran,
+    compressed,
+    statsSummary,
+    bodyOut,
+    inputMutatedInPlace,
+    workerEligible,
+    syncParity,
+    durationMs: Math.round((performance.now() - t0) * 10) / 10,
+  } as any;
+}

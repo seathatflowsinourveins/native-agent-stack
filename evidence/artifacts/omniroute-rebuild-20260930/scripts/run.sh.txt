@@ -1,0 +1,20 @@
+# Published copy: <B2> is the live 20128 build's source checkout (ae5539a56), <scratch> a throwaway directory.
+#!/usr/bin/env bash
+# S1 screen runner: isolated env (scratch DATA_DIR/HOME/TMPDIR), network blocked by preload,
+# tsx from the B checkout so `@/` and relative imports resolve into B (read-only use of B).
+# Relative path arguments are made absolute BEFORE the cd into B, so no output can land in B.
+# SCRATCH defaults to the S1 scratch dir; the harness files are taken from this script's dir.
+set -euo pipefail
+H="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+S="${SCRATCH:-<scratch>}"
+B="${OMNI_B:-<B2>}"
+args=()
+for a in "$@"; do
+  if [[ "$a" != /* && ( -e "$a" || "$a" == *.json || "$a" == */* ) ]]; then a="$PWD/$a"; fi
+  args+=("$a")
+done
+mkdir -p "$S/data" "$S/home" "$S/tmp"
+export DATA_DIR="$S/data" HOME="$S/home" TMPDIR="$S/tmp" COMPRESSION_CCR_DURABLE_STORE=false NODE_ENV=production
+unset OMNIROUTE_LITE_MAX_TOOL_LENGTH OMNI_COMPRESSION_WORKERS OMNI_COMPRESSION_WORKER_TIMEOUT_MS || true
+cd "$B"
+exec node --import tsx --import "$H/blocknet.mjs" "${args[@]}"

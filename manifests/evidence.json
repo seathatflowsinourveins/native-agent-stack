@@ -4119,9 +4119,14 @@
       "bytes": 2701
     },
     {
+      "path": "adoption/templates/systemd/omniroute-fw.service",
+      "sha256": "a81772106fd2ed2be213679c683f002f1ac0b0b3a27ac68093508aa2ebb0aef5",
+      "bytes": 5935
+    },
+    {
       "path": "adoption/templates/systemd/omniroute.service",
-      "sha256": "4957a20bc3139080f8a79feabfeae9fbd54b39c1217a3e5138c392ce6323d45a",
-      "bytes": 5868
+      "sha256": "5545e946ed96d3f7371ebf7af9ac029854d99b9376a8ed9effc936f7e53da4f9",
+      "bytes": 6994
     },
     {
       "path": "adoption/tools/README.md",
@@ -14681,8 +14686,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
-      "sha256": "0614dd48d7d90bf7ea10036f77913ab903664cbac5cebe732283397787a3b9ad",
-      "bytes": 41432
+      "sha256": "12076b4c53141f4f093ed66ddd2e73d90273a53cf870f5b21b4bbf7621e15e41",
+      "bytes": 41895
     },
     {
       "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
@@ -14743,6 +14748,11 @@
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
       "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
       "bytes": 28168
+    },
+    {
+      "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
+      "sha256": "fbd3959bdc46e618eb8ea73709f7dd5eef81d9aea2f21f51333b1a7df8dd7aef",
+      "bytes": 32096
     },
     {
       "path": "docs/direct-results.md",
@@ -14826,8 +14836,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "d0116cb7f5969955e617774aac6ede3c578c2134cc830da1d1c2e3c51a907f88",
-      "bytes": 34382
+      "sha256": "32631879f04b8cc5d5e26d43cbec253298d85c0d4dc7c6dfeaca7ad197d3d0b9",
+      "bytes": 39005
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -34665,6 +34675,261 @@
       "bytes": 141
     },
     {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/PLAN.md",
+      "sha256": "5fa3250851d524e71614f71648ad3402f3eeba40304614d848a880700d02eed8",
+      "bytes": 29028
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/README.md",
+      "sha256": "3f5b7eeb6dd58351d0292f9ac0eaf504ae8286127abb9ddced60e7f744d108e7",
+      "bytes": 5645
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-digests-after-dry.json",
+      "sha256": "ec7de0adfd1ec5ab7fbecee71ba3ca523a07df23f26df28735663a3a99fa5874",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-digests-after-run1.json",
+      "sha256": "7b6ae7d69f30a2d75ff8a2b1c0ba6bf33feb74a885f522781ef283678024d58e",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-digests-after.json",
+      "sha256": "93552e49808b29a00c69d64828b20e2ffd36a1cb1a1bc09219f7254242253f62",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-digests-before-dry.json",
+      "sha256": "ec7de0adfd1ec5ab7fbecee71ba3ca523a07df23f26df28735663a3a99fa5874",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-digests-before-run1.json",
+      "sha256": "594ae22b4e852f81b6c8a323f6824895b90a31f5218db9681715d47f8c7892ad",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-digests-before.json",
+      "sha256": "16a4c744a3ef7d8b0f55c45e472651869008efce554c45ddd7dfb26611d61c4d",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-log-apply-2026-09-30T000604Z.json",
+      "sha256": "e31ffa486906940033c07c7275705c97eff87d685f699c821f6510f65ddd1c95",
+      "bytes": 15583
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-log-apply-2026-09-30T000611Z.json",
+      "sha256": "85c56bec6e66e5ed50744c64613a7daa0dacd333eca7617b8fe3f1786b83db0e",
+      "bytes": 9039
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/apply-log-dry-run-2026-09-30T000557Z.json",
+      "sha256": "a275a2843fc9e41a8bd90b6018c39e3e09907658d9a50984e42757c4a2462ec7",
+      "bytes": 9377
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-after-2026-09-30T004352Z.json",
+      "sha256": "403e0a10165151f3b214c32810a1e08a9f88c05becc3f9f4b8381c85bb865810",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-after-dry-2026-09-30T004338Z.json",
+      "sha256": "76419024bc803487c56af74f89c72a4888dbd367d00c9ffbcf6448cd0b10f8af",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-after-dry.json",
+      "sha256": "76419024bc803487c56af74f89c72a4888dbd367d00c9ffbcf6448cd0b10f8af",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-after.json",
+      "sha256": "403e0a10165151f3b214c32810a1e08a9f88c05becc3f9f4b8381c85bb865810",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-before-2026-09-30T004352Z.json",
+      "sha256": "c0ce1869e77bedad94427000e061601043903db7db6613f872f1c92949231772",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-before-dry-2026-09-30T004338Z.json",
+      "sha256": "76419024bc803487c56af74f89c72a4888dbd367d00c9ffbcf6448cd0b10f8af",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-before-dry.json",
+      "sha256": "76419024bc803487c56af74f89c72a4888dbd367d00c9ffbcf6448cd0b10f8af",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-digests-before.json",
+      "sha256": "c0ce1869e77bedad94427000e061601043903db7db6613f872f1c92949231772",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-log-apply-2026-09-30T004352Z.json",
+      "sha256": "7f4770c9880dc518fb1516af9ed983c7309ab82a740e562b54b2d2c440b96f03",
+      "bytes": 15140
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/apply-logs/delta-log-dry-run-2026-09-30T004338Z.json",
+      "sha256": "f06ee9c4b336d7202b3595f629f4666278591ee87cc3b955036831c299cc2676",
+      "bytes": 5386
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/effective-plan-20260930.json",
+      "sha256": "f31a6f6ac851839bd3fef45a983b3e81e7ba1d1446d73c66fc6f7b4692818970",
+      "bytes": 12322
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/installed-check-20260930.json",
+      "sha256": "c2412445d627a7082f8412a0d1ce560d493c67ffe36dfdc6f83538ba2e60ef11",
+      "bytes": 502
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/lite-whitespace-probe-20260930.json",
+      "sha256": "b71a0029ff4138cce9941a2ac5942e53dc74d98b7f365912b19c0d1831dbd656",
+      "bytes": 9095
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/real-codex-bodies-lane-probe-20260930.json",
+      "sha256": "c23f4682cb4a54832de23a05f69d7169839dcfaf8e6f9258fbb1cc5de2bfe9a0",
+      "bytes": 11993
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/recorded-outputs.txt",
+      "sha256": "81c86d3123e8da79766b61cd469e972447abfd29640e0502ca6ccc017e6c1e6d",
+      "bytes": 7037
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/checks/upstream-release-check-20260930.json",
+      "sha256": "64b227234dfab57127994a0ee94005e3b19140914a756265fd494c36f223330e",
+      "bytes": 1416
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/host-readback-20260930.json",
+      "sha256": "b3fd757fcd1b8129bdd0dc619173bff269f042fde345d7eb7ca66d545cb2dc90",
+      "bytes": 5369
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/omniroute-fw.service",
+      "sha256": "fbdace7eeec524e37794432aa4c57ac5a8b4b925ef0b700f70b5e299a951c802",
+      "bytes": 1776
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/omniroute.service",
+      "sha256": "899e4fdb06775216094953815ed2836c2df9be12e26b459558a600742694b097",
+      "bytes": 1723
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/plan-delta.json.txt",
+      "sha256": "2b65669eb4a6f196730711e20cac70a6aacbed0bb2792f2750f808b1226f6060",
+      "bytes": 24484
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/plan.json.txt",
+      "sha256": "5dd396b913b2adfe29c3a8a6f6bffa14be81bd43140eda005fc201de69eab43a",
+      "bytes": 62254
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/qualification-extract.json",
+      "sha256": "faf86e07f5be8b038e18df63dc3cfc6111da04dc0a51b2e09a6624d8ea3e2efc",
+      "bytes": 15024
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/receipt.json",
+      "sha256": "103fe4d089c2503e22319afa4f6b53cf80ae307af5b6c3df2df7656b4fc58eb3",
+      "bytes": 21415
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/backup_stores.py.txt",
+      "sha256": "b74fc6c93cb266c4af7bca7848805669f9984fa28f0671adead2fa0ea7866ef5",
+      "bytes": 4404
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/blocknet.mjs.txt",
+      "sha256": "0247075bef1ebc18c76e148f1727e13763eb7b5f6056c506a33916829b01b3ec",
+      "bytes": 1286
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/codex_lane_probe.ts.txt",
+      "sha256": "5c222b97066488bc5703178eb5d4914fb91cae8d47ce4342093de6813fa2588a",
+      "bytes": 4568
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/compare_record.py.txt",
+      "sha256": "4c4b883da3c5eea34c8ea8baa78eda54638db6db8f2539063bdf345a0b2317c1",
+      "bytes": 1923
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/gatewayPath.ts.txt",
+      "sha256": "f287fddd9d4debf0abcd1fa2f57703b041619d3a9f3acddb0b48eab3678347aa",
+      "bytes": 11304
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/gateway_apply.py.txt",
+      "sha256": "fe045e3f83ba503ecee148e66a2011b6b6a0c87169f7931b43d4e98abec79408",
+      "bytes": 27604
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/installed_check.py.txt",
+      "sha256": "5fdd348f531e94181e604e343eef5b74df8049a49668e0327d570894e8d2ab02",
+      "bytes": 1938
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/plan_table.ts.txt",
+      "sha256": "528deca1cf35c2f40534ffe76745a79b2afa2ec75ff2b89bafad90457528ba66",
+      "bytes": 8146
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/post_apply_checks.py.txt",
+      "sha256": "dce26c2a8f9605af30b032a6c944bd48f948066bf940785019693e0ffa9516bb",
+      "bytes": 17248
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/preview_probe.py.txt",
+      "sha256": "5e7673d6847547c85ecada4c08f16e3f262095232819f6832155a7bd4efceb8d",
+      "bytes": 3739
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/read_live_settings.py.txt",
+      "sha256": "f5815aa9f5cbb6d9eb5737862d3b576ee9e3caa6c4ec5d77acc852e990c14121",
+      "bytes": 5771
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/real_bodies_probe.ts.txt",
+      "sha256": "d5382c950345985af617e36d3eee366c8b4e1a18bfae6ae1215f81bd9e95c9c3",
+      "bytes": 6878
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/run.sh.txt",
+      "sha256": "079fb2199b6786e90a6979a32e50405f09224563af20a08c5fea8c3eb7c1991b",
+      "bytes": 1083
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/snapshot_gateways.py.txt",
+      "sha256": "6f3a7791dd22d319041141dab5c45e1488bb52c8c297230383e9241c09d49af3",
+      "bytes": 3371
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/switch_gateways.py.txt",
+      "sha256": "0afe9d9866e3d7e0eafeb0c6a9b2d353d3f7577c9b72f988d9b707fd77041b15",
+      "bytes": 10736
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/test_gateway_apply.py.txt",
+      "sha256": "d72ef4d72e822d0f6f3091833ab2861c1cc69fa80a7431076b0252a213161e99",
+      "bytes": 22074
+    },
+    {
+      "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/upstream_release_check.py.txt",
+      "sha256": "647c629b58638cd40b9c75941bdae30b12a906de97db31424cbb5810de2f482e",
+      "bytes": 3032
+    },
+    {
       "path": "evidence/artifacts/omniroute-routing-20260928/README.md",
       "sha256": "87b1b7f8d5ddb3043a67a7fb942b8b287573899eff83be56b59052626ddd91e9",
       "bytes": 14467
@@ -44356,8 +44621,8 @@
     },
     {
       "path": "tests/test_omniroute_gateway_unit.py",
-      "sha256": "84fbb3a1d2282e6e517270d4353fbb298f6f48f1dc41093737f4c7ae746dc5ad",
-      "bytes": 13895
+      "sha256": "ebf44a8f8b263c2271aa29fe6f284678a0bb2bdf5700c664522ec6504b1242c7",
+      "bytes": 23194
     },
     {
       "path": "tests/test_order_contract.py",
@@ -44768,6 +45033,11 @@
       "path": "tools/capability-gate/run_gate.py",
       "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
       "bytes": 22476
+    },
+    {
+      "path": "tools/omniroute/gateway_record.py",
+      "sha256": "d5cfcfbd61bcfcb1808270deab7e793d4021c8dd0c3079fe5ff71ee723ab46e6",
+      "bytes": 4963
     },
     {
       "path": "tools/skill-usage/README.md",

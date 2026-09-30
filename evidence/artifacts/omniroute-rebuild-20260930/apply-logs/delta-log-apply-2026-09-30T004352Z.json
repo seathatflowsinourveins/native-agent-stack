@@ -1,0 +1,695 @@
+{
+ "finished": "2026-09-30T00:43:52Z",
+ "mode": "apply",
+ "started": "2026-09-30T00:43:52Z",
+ "steps": {
+  "T10": {
+   "finished": "2026-09-30T00:43:52Z",
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "engines",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "outputStyles",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "liveZone",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "languageConfig",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "rtkConfig",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "codexResponsesConfig",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cavemanConfig",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "sessionDedup",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "headroom",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "aggressive",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultra",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "defaultMode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "autoTriggerTokens",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "contextBudget.mode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "activeComboId",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "compressionComboId",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "comboOverrides",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "exclusions",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "lite",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "preserveSystemPrompt",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "preserveSystemPromptMode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cavemanOutputMode.enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultraEngine",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultraSlmPrewarm",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "mcpDescriptionCompressionEnabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "enginesExplicit",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "stackedPipeline",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cacheMinutes",
+     "route": "/api/settings/compression"
+    }
+   ],
+   "readback": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "engines",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "outputStyles",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "liveZone",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cacheMinutes",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "languageConfig.enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "languageConfig.defaultLanguage",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "languageConfig.autoDetect",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "languageConfig.enabledPacks",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "rtkConfig.disabledFilters",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "rtkConfig.maxLinesPerResult",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "rtkConfig.maxCharsPerResult",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "rtkConfig.deduplicateThreshold",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "rtkConfig.customFiltersEnabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "codexResponsesConfig.minBytes",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "codexResponsesConfig.minSearchMatches",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "codexResponsesConfig.minLogLines",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "codexResponsesConfig.preserveToolNames",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cavemanConfig.enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cavemanConfig.compressRoles",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cavemanConfig.minMessageLength",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "aggressive.thresholds",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "aggressive.toolStrategies",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "aggressive.summarizerEnabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "aggressive.maxTokensPerMessage",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "aggressive.minSavingsThreshold",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultra.enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultra.compressionRate",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultra.minScoreThreshold",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultra.slmFallbackToAggressive",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultra.maxTokensPerMessage",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "headroom.minRows",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "sessionDedup.minBlockChars",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "sessionDedup.fuzzy",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "stackedPipeline",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "stackedPipeline.0.engine",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "stackedPipeline.0.intensity",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "stackedPipeline.1.engine",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "stackedPipeline.1.intensity",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "defaultMode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "autoTriggerTokens",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "contextBudget.mode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "activeComboId",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "compressionComboId",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "comboOverrides",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "exclusions",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "lite",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "preserveSystemPrompt",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "preserveSystemPromptMode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cavemanOutputMode.enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultraEngine",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultraSlmPrewarm",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "mcpDescriptionCompressionEnabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "enginesExplicit",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "absent",
+     "path": "lite.maxToolLength",
+     "route": "/api/settings/compression"
+    }
+   ],
+   "recorded_state": [
+    "not-applied",
+    "no apply recorded"
+   ],
+   "result": "applied",
+   "started": "2026-09-30T00:43:52Z",
+   "title": "20129: compression settings to upstream defaults (user direction: upstream as source of truth): headerless plan [session-dedup, ccr, lite], no output style, liveZone off, cacheMinutes 5",
+   "write_http": 200
+  }
+ }
+}
