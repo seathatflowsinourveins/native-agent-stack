@@ -1,0 +1,77 @@
+{
+ "agent_status_values": {
+  "agent_status:async_launched": 307,
+  "agent_status:completed": 36,
+  "agent_status:teammate_spawned": 31
+ },
+ "counts": {
+  "attachment_type:task_reminder": 7,
+  "attachment_type:task_status": 149,
+  "files_main": 1038,
+  "files_subagent": 3823,
+  "final_message_rows_1": 1138,
+  "final_message_rows_2": 2961,
+  "final_message_rows_3plus": 706,
+  "final_message_rows_one_block_each": 4805,
+  "main_actors_with_background_start": 74,
+  "main_actors_with_notification_of_an_id_not_started_here": 45,
+  "main_actors_with_pending_at_last_assistant": 36,
+  "main_files_without_assistant_row": 53,
+  "queued_command_rows": 2965,
+  "started_backgroundTaskId": 1053,
+  "sub_actors_with_background_start": 70,
+  "sub_actors_with_notification_of_an_id_not_started_here": 330,
+  "sub_actors_with_pending_at_last_assistant": 10,
+  "sub_files_without_assistant_row": 3
+ },
+ "final_row_kind": {
+  "main:text": 954,
+  "main:tool_use": 31,
+  "sub:other:advisor_tool_result": 4,
+  "sub:other:server_tool_use": 15,
+  "sub:other:thinking": 9,
+  "sub:text": 837,
+  "sub:tool_use": 2955
+ },
+ "notification_locations": {
+  "queued_command_prompt": 2149,
+  "user_string_content": 1164
+ },
+ "run_in_background_inputs_by_tool": {
+  "Agent": 6,
+  "Bash": 1571
+ },
+ "task_like_result_keys_by_tool": {
+  "Agent": {
+   "agentId": 343,
+   "isAsync": 307,
+   "status": 374
+  },
+  "Bash": {
+   "backgroundCwdHint": 474,
+   "backgroundTaskId": 1053,
+   "backgroundedToDeliverMessage": 1
+  },
+  "ExitPlanMode": {
+   "hasTaskTool": 13
+  },
+  "Monitor": {
+   "taskId": 198
+  },
+  "SendMessage": {
+   "resumedAgentId": 99
+  },
+  "TaskList": {
+   "tasks": 1
+  },
+  "TaskStop": {
+   "task_id": 97,
+   "task_type": 97
+  },
+  "Workflow": {
+   "status": 350,
+   "taskId": 350,
+   "taskType": 350
+  }
+ }
+}

@@ -1,0 +1,116 @@
+{
+ "counts": {
+  "notifications@queued_command": 2155,
+  "notifications@user_string": 1178,
+  "notifications@user_text_block": 7,
+  "starts:Agent.agentId(isAsync)": 307,
+  "starts:Bash.backgroundTaskId": 1054,
+  "starts:Monitor.taskId": 198,
+  "starts:Workflow.taskId": 350
+ },
+ "notification_status_values": {
+  "None": 726,
+  "completed": 2499,
+  "failed": 83,
+  "killed": 14,
+  "stopped": 18
+ },
+ "notification_tag_names": {
+  "agent_count": 270,
+  "agents_done": 270,
+  "agents_empty_result": 270,
+  "agents_error": 270,
+  "agents_skipped": 270,
+  "diagnostics": 266,
+  "duration_ms": 660,
+  "event": 936,
+  "failures": 27,
+  "note": 438,
+  "output-file": 2597,
+  "recovery": 4,
+  "result": 676,
+  "status": 2614,
+  "subagent_tokens": 660,
+  "summary": 3333,
+  "task-id": 3318,
+  "task-notification": 3340,
+  "task-type": 15,
+  "tool-use-id": 2589,
+  "tool_uses": 660,
+  "usage": 660,
+  "worktree": 40,
+  "worktreeBranch": 40,
+  "worktreePath": 40
+ },
+ "notified_task_start_source": {
+  "(not started in this transcript)": 1139,
+  "Agent.agentId(isAsync)": 401,
+  "Bash.backgroundTaskId": 975,
+  "Monitor.taskId": 547,
+  "Workflow.taskId": 278
+ },
+ "status_by_source": {
+  "(not started in this transcript)": {
+   "None": 282,
+   "completed": 834,
+   "failed": 23
+  },
+  "Agent.agentId(isAsync)": {
+   "completed": 371,
+   "failed": 19,
+   "killed": 8,
+   "stopped": 3
+  },
+  "Bash.backgroundTaskId": {
+   "completed": 929,
+   "failed": 36,
+   "killed": 6,
+   "stopped": 4
+  },
+  "Monitor.taskId": {
+   "None": 444,
+   "completed": 99,
+   "failed": 1,
+   "stopped": 3
+  },
+  "Workflow.taskId": {
+   "completed": 266,
+   "failed": 4,
+   "stopped": 8
+  }
+ },
+ "task_state_at_final_assistant_row": {
+  "main:Agent.agentId(isAsync):never_notified": 4,
+  "main:Agent.agentId(isAsync):notified:completed": 282,
+  "main:Agent.agentId(isAsync):notified:failed": 13,
+  "main:Agent.agentId(isAsync):notified:killed": 7,
+  "main:Agent.agentId(isAsync):notified:stopped": 1,
+  "main:Bash.backgroundTaskId:never_notified": 70,
+  "main:Bash.backgroundTaskId:notified:completed": 723,
+  "main:Bash.backgroundTaskId:notified:failed": 26,
+  "main:Bash.backgroundTaskId:notified:killed": 1,
+  "main:Bash.backgroundTaskId:notified:stopped": 1,
+  "main:Monitor.taskId:never_notified": 5,
+  "main:Monitor.taskId:notified:None": 83,
+  "main:Monitor.taskId:notified:completed": 78,
+  "main:Monitor.taskId:notified:failed": 1,
+  "main:Monitor.taskId:notified:stopped": 3,
+  "main:Workflow.taskId:never_notified": 77,
+  "main:Workflow.taskId:notified:completed": 266,
+  "main:Workflow.taskId:notified:failed": 4,
+  "main:Workflow.taskId:notified:stopped": 3,
+  "sub:Bash.backgroundTaskId:never_notified": 16,
+  "sub:Bash.backgroundTaskId:notified:completed": 206,
+  "sub:Bash.backgroundTaskId:notified:failed": 10,
+  "sub:Monitor.taskId:never_notified": 2,
+  "sub:Monitor.taskId:notified:None": 5,
+  "sub:Monitor.taskId:notified:completed": 21
+ },
+ "tasks_with_more_than_one_notification_by_source": {
+  "(not started in this transcript)": 44,
+  "Agent.agentId(isAsync)": 50,
+  "Bash.backgroundTaskId": 3,
+  "Monitor.taskId": 107,
+  "Workflow.taskId": 5
+ }
+}
