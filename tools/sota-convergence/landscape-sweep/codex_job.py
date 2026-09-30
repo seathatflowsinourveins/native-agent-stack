@@ -855,33 +855,34 @@ def limit_reason(base: Path) -> str:
     return " ".join((read(base / "LIMIT") or "").split())[:400]
 
 
-def group_alive(pgid: int) -> bool:
+def signal_group(pgid: int, signum: int) -> bool:
+    """killpg for the job's own process group; False when nothing took the signal. ESRCH: the group is gone. EPERM:
+    on Darwin, killpg skips zombies and reports EPERM when a still-existing group has no other member
+    (apple-oss-distributions/xnu xnu-12377.121.6, bsd/kern/kern_sig.c, killpg1: the `p_stat != SZOMB` filter and
+    `nfound > 0 ? 0 : EPERM`), so the group only holds members that have already exited; Linux signals a zombie
+    silently. Every member is this runner's own descendant, so EPERM never means a live process of another user."""
     try:
-        os.killpg(pgid, 0)
+        os.killpg(pgid, signum)
         return True
-    except ProcessLookupError:
+    except (ProcessLookupError, PermissionError):
         return False
-    except PermissionError:
-        return True
+
+
+def group_alive(pgid: int) -> bool:
+    return signal_group(pgid, 0)
 
 
 def stop_group(process: subprocess.Popen, grace_s: float) -> None:
     """TERM the job's whole process group, then KILL whatever is left of it after the grace period, including
     children that ignore TERM after Codex itself has exited (they would keep the slot and job locks)."""
     pgid = process.pid
-    try:
-        os.killpg(pgid, signal.SIGTERM)
-    except ProcessLookupError:
-        pass
+    signal_group(pgid, signal.SIGTERM)
     end = time.monotonic() + grace_s
     while time.monotonic() < end:
         if process.poll() is not None and not group_alive(pgid):
             return
         time.sleep(0.1)
-    try:
-        os.killpg(pgid, signal.SIGKILL)
-    except ProcessLookupError:
-        pass
+    signal_group(pgid, signal.SIGKILL)
     process.wait()
 
 

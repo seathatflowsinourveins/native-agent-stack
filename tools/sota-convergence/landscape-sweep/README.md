@@ -514,6 +514,11 @@ new run from the latest retained record, and say so when no record exists yet.
   the runner waits up to `kill_grace_s` for a clean exit before stopping the group, because exec shuts down before
   writing `-o` (`codex-rs/exec/src/lib.rs:1318-1321`,
   `codex-rs/exec/src/event_processor_with_jsonl_output.rs:631-636`).
+  Stopping a group whose members have all exited is complete on macOS although `killpg` reports EPERM there
+  (apple-oss-distributions/xnu `xnu-12377.121.6` `bsd/kern/kern_sig.c` `killpg1` skips zombies and returns EPERM when
+  nothing was signalled, where Linux signals a zombie silently): the runner treats ESRCH and EPERM alike, which the
+  2026-09-30 macOS full-suite job on this branch had reported as exit 2 "refused" for every watchdog test whose group
+  died at TERM.
   Usage-limit and HTTP-429 handling take precedence.
 - **Quota gate (optional).** `build_args.py --quota-stop-percent 95` writes `codex.quota_stop_percent` into
   `staged.json`; without it the gate is off. With it, each job, after it gets its slot and before every attempt,

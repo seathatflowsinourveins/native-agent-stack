@@ -11,6 +11,7 @@ from __future__ import annotations
 import base64
 import contextlib
 import copy
+import errno
 import hashlib
 import importlib.util
 import io
@@ -20,6 +21,7 @@ import re
 import shlex
 import shutil
 import stat
+import signal
 import subprocess
 import sys
 import tempfile
@@ -1120,7 +1122,12 @@ class RunnerCase(unittest.TestCase):
         self.assertEqual(started.stdout.strip(), f"started {name}")
         waited = self.call("wait", name, "20", shell=shell)
         self.assertTrue(waited.stdout.startswith("done exit="), waited.stdout + waited.stderr)
-        return json.loads(self.call("result", name, shell=shell).stdout)
+        result = json.loads(self.call("result", name, shell=shell).stdout)
+        if result.get("exit") == codex_job.EXIT_REFUSED:  # a started job is never refused: retain the runner's reason
+            directory = self.work / "gpt6" / name
+            self.fail(f"the runner refused {name}: {codex_job.read(directory / 'stderr.txt')!r} "
+                      f"{codex_job.read(directory / 'failure.json')!r}")
+        return result
 
     def record(self):
         return json.loads((self.bin / "record.json").read_text())
@@ -1129,6 +1136,58 @@ class RunnerCase(unittest.TestCase):
 LAST = {"repository": "https://github.com/ggml-org/llama.cpp", "latest_release": "b1", "stars_known": 1}
 COMPLETED = {"type": "turn.completed", "usage": {"input_tokens": 100, "cached_input_tokens": 80, "output_tokens": 7,
                                                  "reasoning_output_tokens": 3}}
+
+
+class ProcessGroupStopTests(unittest.TestCase):
+    """Darwin's killpg skips zombies and reports EPERM when a still-existing group has nothing else to signal
+    (apple-oss-distributions/xnu xnu-12377.121.6, bsd/kern/kern_sig.c, killpg1); Linux signals a zombie silently. The
+    2026-09-30 macOS full-suite job on this branch failed every watchdog test whose group died at TERM with exit 2
+    "refused" (the uncaught PermissionError from the SIGKILL after the grace period). Synthetic fixture: os.killpg is
+    patched to answer EPERM once the group holds only exited members; the macOS job on the fixed head is the real
+    observation."""
+
+    def child(self) -> subprocess.Popen:
+        process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"], start_new_session=True,
+                                   stdin=subprocess.DEVNULL)
+        self.addCleanup(lambda: (process.kill(), process.wait()) if process.poll() is None else None)
+        return process
+
+    @staticmethod
+    def darwin_killpg(real):
+        def killpg(pgid, signum):
+            if signum == signal.SIGTERM:
+                return real(pgid, signum)
+            raise PermissionError(errno.EPERM, "Operation not permitted")  # signal 0 or SIGKILL: only zombies left
+        return killpg
+
+    def test_stop_group_completes_when_darwin_reports_eperm_for_the_dead_group(self):
+        process = self.child()
+        with mock.patch.object(codex_job.os, "killpg", side_effect=self.darwin_killpg(os.killpg)):
+            codex_job.stop_group(process, 0.1)
+        self.assertEqual(process.returncode, -signal.SIGTERM)
+
+    def test_stop_group_still_kills_a_group_that_survives_term(self):
+        process = self.child()
+        real = os.killpg
+        calls = []
+
+        def killpg(pgid, signum):
+            calls.append(signum)
+            if signum == signal.SIGTERM:
+                return None  # a member ignores TERM: the group stays alive until KILL
+            return real(pgid, signum)
+        with mock.patch.object(codex_job.os, "killpg", side_effect=killpg):
+            codex_job.stop_group(process, 0.2)
+        self.assertEqual((process.returncode, calls[0], calls[-1]), (-signal.SIGKILL, signal.SIGTERM, signal.SIGKILL))
+
+    def test_group_alive_treats_esrch_and_darwin_eperm_as_stopped(self):
+        for error in (ProcessLookupError(errno.ESRCH, "No such process"),
+                      PermissionError(errno.EPERM, "Operation not permitted")):
+            with self.subTest(error=type(error).__name__), \
+                    mock.patch.object(codex_job.os, "killpg", side_effect=error):
+                self.assertFalse(codex_job.group_alive(2 ** 22 + 1))
+        with mock.patch.object(codex_job.os, "killpg", return_value=None):
+            self.assertTrue(codex_job.group_alive(2 ** 22 + 1))
 
 
 class OmniRouteLaneRunnerTests(RunnerCase):
