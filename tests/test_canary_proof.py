@@ -1128,5 +1128,288 @@ class BoundaryTests(unittest.TestCase):
         self.assertFalse(list((host.state / "native-agent-stack" / "canary-proof").glob("*.json")), "B8-no-receipt")
 
 
+class Shared:
+    """One clean run per class (its record is the classifier table's base); cleaned up with the class."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.case = unittest.TestCase()
+        cls.host, cls.lane = clean_run(cls.case)
+        cls.events = cls.host.events()
+        cls.masking = {attempt: cp.masked_markers(cls.host.canary("systemd-user-unit", attempt)) for attempt in (1,)}
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.case.doCleanups()
+
+
+def mutate(events: list, *changes) -> list:
+    events = copy.deepcopy(events)
+    for change in changes:
+        events = change(events) or events
+    return events
+
+
+def latest(events, kind, **match):
+    return [e for e in events if e["event"] == kind and all(e.get(k) == v for k, v in match.items())][-1]
+
+
+@needs_tools
+class RequestTests(Shared, unittest.TestCase):
+    """R1-R8: the latest request decides; incomplete, unfinished, stale or early is never clean."""
+
+    def codes(self, events, settle: int = 0):
+        from unittest import mock
+        with mock.patch.object(cp, "SETTLE_SECONDS", settle):  # the launcher's patched settle (contract 13.7)
+            return cp.classify(events, masking=self.masking)
+
+    def test_r3_the_clean_record_and_every_classifier_code(self):
+        self.assertEqual(self.codes(self.events)["verdict"], "clean", "R3-clean-base")
+        final_seq = latest(self.events, "scan_requested", phase="final")["request"]
+        base_seq = latest(self.events, "scan_requested", phase="baseline")["request"]
+
+        def drop(kind, request):
+            return lambda ev: [e for e in ev if not (e["event"] == kind and e.get("request") == request)]
+
+        def edit(kind, request, **fields):
+            def change(ev):
+                for e in ev:
+                    if e["event"] == kind and e.get("request") == request:
+                        e.update(fields)
+            return change
+
+        def sinks(request, function):
+            def change(ev):
+                for e in ev:
+                    if e["event"] == "scan_finished" and e["request"] == request:
+                        function(e["sinks"])
+            return change
+
+        def arm_edit(kind, consumer, **fields):
+            def change(ev):
+                latest(ev, kind, consumer=consumer).update(fields)
+            return change
+
+        table = {
+            "no_baseline": [lambda ev: [e for e in ev if e.get("request") != base_seq]],
+            "baseline_unfinished": [drop("scan_finished", base_seq)],
+            "baseline_incomplete": [edit("scan_finished", base_seq, status="incomplete")],
+            "baseline_after_arm": [edit("scan_requested", base_seq, seq=10**6)],
+            "no_final": [lambda ev: [e for e in ev if e.get("request") != final_seq]],
+            "final_unfinished": [drop("scan_planned", final_seq)],
+            "final_incomplete": [edit("scan_finished", final_seq, status="incomplete")],
+            "final_stale": [lambda ev: ev.append(dict(latest(ev, "disarmed", consumer="subagent"), seq=10**7))],
+            "final_too_early": [edit("scan_requested", final_seq, boottime_ns=latest(
+                self.events, "disarmed", consumer="omniroute-lane")["boottime_ns"] + 1)],
+            "sink_not_scanned:A4": [sinks(final_seq, lambda s: s.pop("A4"))],
+            "sink_incomplete:A1:deadline": [sinks(final_seq, lambda s: s["A1"].update(status="incomplete",
+                                                                                         reasons=["deadline"]))],
+            "control_missing:A3": [sinks(final_seq, lambda s: s["A3"].update(status="incomplete",
+                                                                            reasons=["control_missing"]))],
+            "recording_missing:subagent": [sinks(final_seq, lambda s: s["A1"].update(observations=[
+                row for row in s["A1"]["observations"] if not (row[0] == 2 and row[1] == 3)]))],
+            "recording_missing:codex-exec": [sinks(final_seq, lambda s: s["A4"].update(observations=[
+                row for row in s["A4"]["observations"] if not (row[0] == 2 and row[1] == 5)]))],
+            "masking_markers_mismatch": [sinks(final_seq, lambda s: s["A11"]["observations"].append(
+                [3, 0, 0, 9, "00" * 16, 1]))],
+            "not_disarmed:subagent": [lambda ev: [e for e in ev if not (e["event"] == "disarmed"
+                                                                         and e["consumer"] == "subagent")]],
+            "store_armed": [lambda ev: [e for e in ev if not (e["event"] == "disarmed"
+                                                              and e["consumer"] == "omniroute-lane")]],
+            "disarm_unverified:codex-exec": [arm_edit("disarmed", "codex-exec", absent_verified=False)],
+            "guard_not_pinned_at_arm:subagent": [arm_edit("armed", "subagent", guard_pinned=False)],
+            "not_armed:workflow-child": [lambda ev: [e for e in ev if e.get("consumer") != "workflow-child"]],
+            "arming_unresolved": [lambda ev: ev.append(dict(latest(ev, "arming", consumer="subagent"), seq=10**8))],
+            "user_run_unfinished": [lambda ev: ev.append(dict(latest(ev, "scan_requested", phase="final"),
+                                                               group="user", request="u1", seq=10**6))],
+            "comparison_unfinished": [lambda ev: ev.append(dict(latest(ev, "scan_requested", phase="final"),
+                                                                 phase="comparison", group="user", request="c1",
+                                                                 seq=10**6))],
+            "clock_stepped": [lambda ev: ev.append(dict(ev[-1], event="clock_stepped", seq=10**6))],
+            "tool_changed": [lambda ev: ev.append({**{k: ev[-1][k] for k in cp.COMMON}, "event": "integrity_failed",
+                                                   "code": "tool_changed", "seq": 10**6})],
+        }
+        for code, changes in table.items():
+            with self.subTest(code=code):
+                result = self.codes(mutate(self.events, *changes), settle=1 if code == "final_too_early" else 0)
+                self.assertIn(code, result["codes"], f"R3-code {code}")
+                self.assertEqual(result["verdict"], "incomplete", f"R3-verdict {code}")
+        leaky = mutate(self.events, *table["final_incomplete"], lambda ev: ev.append(dict(
+            latest(ev, "scan_requested"), event="hit", seq=10**6)))
+        self.assertEqual(cp.classify([dict(e, **({"sink": "A1", "subpass": 0, "root": "", "object": "", "check": 1,
+                                                  "mode": 1, "view": 1, "path": 13, "consumer": "subagent",
+                                                  "attempt": 1, "count": 1} if e["event"] == "hit" else {}))
+                                      for e in leaky])["verdict"], "leak", "R3-precedence leak")
+        truncated = copy.deepcopy(self.events)
+        truncated[3]["unknown_field"] = 1
+        self.assertFalse(cp.validate(truncated, self.host.run_id), "R8-invalid unknown field")
+        gap = copy.deepcopy(self.events)
+        del gap[4]
+        self.assertFalse(cp.validate(gap, self.host.run_id), "R8-invalid gap")
+        impossible = copy.deepcopy(self.events)
+        first_armed = next(i for i, e in enumerate(impossible) if e["event"] == "armed")
+        del impossible[first_armed]
+        for number, event in enumerate(impossible, 1):
+            event["seq"] = number
+        self.assertFalse(cp.validate(impossible, self.host.run_id), "R8-invalid transition")
+
+    def test_r1_a_kill_before_the_plan_supersedes_the_passing_final(self):
+        for point in ("after_request", "before_mkdir", "before_union", "before_plan"):
+            with self.subTest(point=point):
+                result = self.host.scan("final", hooks={point: {"do": "kill"}})
+                self.assertEqual(result.returncode, -9)
+                code, verdict, codes = self.host.verdict()
+                self.assertNotEqual(verdict, "clean", f"R1-{point}")
+                self.assertIn("final_unfinished", codes, f"R1-{point}")
+        self.assertEqual(self.host.scan("final").returncode, 0)
+        self.assertEqual(self.host.verdict()[1], "clean", "R1-recovered by a new request")
+
+    def test_r2_a_setup_failure_leaves_no_earlier_pass_current(self):
+        order = self.host.root / "order"
+        for point in ("before_mkdir", "before_union", "before_controls", "before_exec_check", "before_launch",
+                      "before_plan"):
+            with self.subTest(point=point):
+                result = self.host.scan("final", hooks={
+                    "after_request": {"do": "record", "path": str(order), "label": "request"},
+                    point: {"do": "fail"}})
+                self.assertEqual(result.returncode, 3, f"R2-{point}")
+                self.assertEqual(self.host.finished()["status"], "incomplete", f"R2-{point}")
+                self.assertIn(self.host.verdict()[2][0] if self.host.verdict()[2] else "",
+                              ("final_incomplete", "final_unfinished"), f"R2-{point}")
+        self.assertEqual(order.read_text().splitlines()[0], "request", "R2-order")
+        self.assertEqual(self.host.scan("final").returncode, 0)
+
+
+@needs_tools
+class RequestRunTests(unittest.TestCase):
+    """R4-R8 on their own runs."""
+
+    def test_r4_rearm_unbaselined_home_attempt_binding_and_settle(self):
+        host, lane = clean_run(self)
+        self.assertEqual(host.verdict()[1], "clean")
+        attempt = host.arm("subagent")
+        self.assertEqual(attempt, 2, "R4-new-attempt")
+        host.consume("subagent", attempt)
+        host.disarm()
+        code, verdict, codes = host.verdict()
+        self.assertIn("final_stale", codes, "R4-stale")
+        self.assertEqual(host.scan("final").returncode, 0)
+        self.assertIn("recording_missing:subagent", host.verdict()[2], "R4-attempt-1-tag-insufficient")
+        other = host.root / "unregistered"
+        other.mkdir()
+        refused = host.tool("arm", "--run", host.run_id, "omniroute-lane", "--codex-home", str(other))
+        self.assertEqual(refused.returncode, 1, "R4-unbaselined-home")
+        self.assertIn(b"baseline_scope_missing", refused.stderr, "R4-unbaselined-home")
+        host.constants["SETTLE_SECONDS"] = 1200
+        self.assertEqual(host.scan("final").returncode, 0)
+        self.assertIn("final_too_early", host.verdict()[2], "R4-settle")
+
+    def test_r6_absent_vanished_and_declined_roots(self):
+        host = Host(self, session=SESSION)
+        (host.home / ".cache" / "claude-cli-nodejs").mkdir()
+        (host.home / ".cache" / "claude-cli-nodejs" / "a.log").write_text("x\n")
+        host.prepare()
+        self.assertEqual(host.scan("baseline").returncode, 0)
+        rows = host.finished()["sinks"]
+        self.assertTrue(rows["A9"]["absent_only"], "R6-absent")
+        self.assertEqual(rows["A12"]["status"], "complete", "R6-absent-store")
+        shutil.rmtree(host.home / ".cache" / "claude-cli-nodejs")
+        self.assertEqual(host.scan("baseline").returncode, 3)
+        self.assertIn("vanished", host.finished()["sinks"]["A3"]["reasons"], "R6-vanished")
+        (host.home / ".cache" / "claude-cli-nodejs").mkdir()
+        for policy in ("exclude", "confirmed"):  # C5: exactly ~/.claude/projects/** and each home's sessions/**
+            host.prepare("--transcripts", policy)
+            (host.home / ".claude" / "projects" / "p").mkdir(parents=True, exist_ok=True)
+            (host.home / ".claude" / "projects" / "p" / "s.jsonl").write_text(host.canary("subagent") + "\n")
+            (host.codex / "sessions").mkdir(exist_ok=True)
+            (host.codex / "sessions" / "rollout-x.jsonl").write_text(host.canary("codex-exec") + "\n")
+            result = host.scan("baseline")
+            if policy == "exclude":
+                self.assertEqual(result.returncode, 0, "R6-declined not read")
+                self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["declined"], 1, "R6-declined A1")
+                self.assertEqual(host.finished()["sinks"]["A4"]["counters"]["declined"], 1, "R6-declined A4")
+            else:
+                self.assertEqual(result.returncode, 5, "R6-confirmed read")
+                self.assertEqual({e["sink"] for e in hits(host)}, {"A1", "A4"}, "R6-confirmed read")
+
+    def test_r7_recording_classes_and_markers(self):
+        cases = {"fresh-claude-session": ".claude/projects/p/{own}.jsonl",
+                 "subagent": ".claude/projects/p/other-session.jsonl",
+                 "workflow-child": ".claude/projects/p/other-session/subagents/w.jsonl",
+                 "codex-exec": "lane:sessions/2026/rollout-a.jsonl"}
+        for consumer, misplaced in cases.items():
+            with self.subTest(consumer=consumer):
+                host = Host(self, session=SESSION)
+                lane = host.root / "lane-home"
+                lane.mkdir()
+                host.prepare("--codex-home", str(lane), "--transcripts", "confirmed")
+                self.assertEqual(host.scan("baseline").returncode, 0)
+                for each in cp.CONSUMERS:
+                    attempt = host.arm(each, *(["--codex-home", str(lane)] if each == "omniroute-lane" else []))
+                    out, err = host.consume(each, attempt)
+                    if each == "systemd-user-unit":
+                        host.journal_add(*[line for line in (out + err).split(b"\n") if line])
+                    elif each == consumer:
+                        target = (lane / misplaced[5:]) if misplaced.startswith("lane:") else \
+                            host.home / misplaced.format(own=SESSION)
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        target.write_text(out.decode())
+                    else:
+                        host.record(each, out.decode().strip(), lane)
+                    host.disarm()
+                self.assertEqual(host.scan("final").returncode, 0)
+                self.assertIn(f"recording_missing:{consumer}", host.verdict()[2], f"R7-class {consumer}")
+
+    def test_r7_marker_count_and_partial_marker(self):
+        for change in ("drop", "partial"):
+            with self.subTest(change=change):
+                host = Host(self, session=SESSION)
+                lane = host.root / "lane-home"
+                lane.mkdir()
+                host.prepare("--codex-home", str(lane), "--transcripts", "confirmed")
+                self.assertEqual(host.scan("baseline").returncode, 0)
+                host.full_cycle(lane)
+                entries = json.loads(host.journal.read_text())
+                marked = [e for e in entries if dict(e)["MESSAGE"].startswith("hex:")
+                          and b"[REDACTED:" in bytes.fromhex(dict(e)["MESSAGE"][4:])]
+                if change == "drop":
+                    entries.remove(marked[0])
+                else:
+                    host.journal_add(b"x [REDACTED-PARTIAL:CANARY_E2E_KEY]")
+                    entries = json.loads(host.journal.read_text())
+                host.journal.write_text(json.dumps(entries))
+                self.assertEqual(host.scan("final").returncode, 0)
+                self.assertIn("masking_markers_mismatch", host.verdict()[2], f"R7-markers {change}")
+
+    def test_r7_unknown_session_fallback_and_user_arrival(self):
+        host, lane = clean_run(self, session=None)
+        self.assertEqual(host.verdict()[1], "clean", "R7-unknown-session workflow any session")
+        (host.home / ".agentsview").mkdir()
+        result = host.scan("final", "--user-run", tty=True)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("user_arrival_missing:agentsview", host.verdict()[2], "R7-agentsview")
+        sqlite_file(host.home / ".agentsview" / "sessions.db", [("CREATE TABLE m(v)", ()), (
+            "INSERT INTO m VALUES (?)", (cp.tag_line(host.canary(), host.run_id, "fresh-claude-session", 1),))])
+        self.assertEqual(host.scan("final", "--user-run", tty=True).returncode, 0)
+        self.assertEqual(host.verdict()[1], "clean", "R7-agentsview arrival")
+        del lane
+
+    def test_r5_r8_sticky_user_and_comparison_results(self):
+        host, _lane = clean_run(self)
+        (host.home / ".config" / "systemd" / "user").mkdir(parents=True)
+        result = host.scan("comparison", "--user-run", tty=True, worker={"hooks": {"after_prewalk": {"do": "kill"}}})
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("comparison_incomplete", host.verdict()[2], "R8-comparison-required")
+        self.assertEqual(host.scan("comparison", "--user-run", tty=True).returncode, 0)
+        self.assertEqual(host.verdict()[1], "clean", "R8-comparison-complete")
+        (host.home / ".config" / "systemd" / "user" / "x.conf").write_text(host.canary("codex-exec") + "\n")
+        self.assertEqual(host.scan("final", "--user-run", tty=True).returncode, 5, "R5-user-hit")
+        (host.home / ".config" / "systemd" / "user" / "x.conf").unlink()
+        self.assertEqual(host.scan("final", "--user-run", tty=True).returncode, 5, "R5-sticky-user")
+        self.assertEqual(host.verdict()[1], "leak", "R5-sticky-user")
+        self.assertEqual(host.tool("scan", "--run", host.run_id, "--phase", "comparison").returncode, 1,
+                         "R8-comparison-needs-user-run")
+
+
 if __name__ == "__main__":
     unittest.main()

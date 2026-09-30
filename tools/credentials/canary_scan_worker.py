@@ -1770,6 +1770,7 @@ def dump(control_fd: int) -> int:
     if tuple_of(held) != planned:
         return 10
     before = own_descriptors()
+    hook("before_sqlite_open")
     uri = "file:" + urllib.parse.quote_from_bytes(path, safe="/") + "?mode=ro"
     try:
         connection = sqlite3.connect(uri, uri=True, isolation_level=None)

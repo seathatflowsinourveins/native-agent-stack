@@ -815,8 +815,8 @@ class Session:
             if record.mode == 2 and record.expected in (2, 3, 4, 5) and record.view == 3:
                 formats.add({2: "gzip", 3: "bzip2", 4: "xz", 5: "lzma"}[record.expected])
             result = self.completed.get(ident)
-            if result is None or result.status != wire.STATUS["complete"] or record.mode == 3 and record.expected != 1:
-                continue
+            if result is None or result.status != wire.STATUS["complete"] or record.expected == 0:
+                continue  # a producer-only stage has no scanner of its own; its scanner check carries the controls
             for control in wanted:
                 report = reports.get(ident, {}).get(control)
                 if report is None or (report.observed < 1 if report.klass == 8 else report.observed != report.expected):
