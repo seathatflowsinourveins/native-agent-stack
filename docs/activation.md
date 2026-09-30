@@ -15,7 +15,7 @@ Configuration on disk and tools callable by a running client are separate facts.
 
 A new task is appropriate after changing startup configuration or tool registration. Restarting does not replenish an account allowance. The additional native Codex CLI document/graph/browser attempt was quota-blocked; the current Desktop task and native Claude completed those workflows separately.
 
-These practices persist through the installed project instructions, native registrations and service configuration. They do not automatically index all future repositories or start every optional tool. The public examples are inactive templates, not copies of the original machine's active settings. Follow the [native recipes](../recipes/README.md) to adopt the stack for another project.
+These practices persist through the installed project instructions, native registrations and service configuration. They do not automatically index all future repositories or start every optional tool. The public examples are inactive templates, not copies of the original machine's active settings. Start each new repository from the scaffold, `python3 tools/adoption/scaffold_repo.py --target <repo>`, which writes its top rule, its `CLAUDE.md` import, a pull-request template and the `sota-sources` check ([new repositories](../adoption/bootstrap.md#new-repositories)); a new host gets the user-scope layers from `adoption/bootstrap-linux.sh --configure-full-profile` ([refresh the user profile](../adoption/update.md#refresh-the-user-profile-from-main)). Follow the [native recipes](../recipes/README.md) to adopt the rest of the stack for another project.
 
 See the [evidence boundaries](evidence.md) and individual receipts for the exact host, execution level and remaining limits.
 

@@ -242,6 +242,45 @@ wrap either read-only command in a systemd/launchd timer: this project's `automa
 policy is `false`, and a timer that invokes a model command is exactly what that policy
 excludes, whatever the command's own token cost.
 
+The `skills` step of `--configure-full-profile` (next section) runs the same `install_skills.py`,
+after installing the manifest's pinned CLI under `$ECO_INSTALL_ROOT/tools/skills-<version>` when it is
+missing.
+
+## Refresh the user profile from main
+
+Added after `v2026.09.26.2`. On Linux/WSL2, one command re-applies every user-scope layer this
+catalog manages, instead of the hand steps of [bootstrap](bootstrap.md) steps 4 and 4a and the section
+above:
+
+```sh
+git -C "$MAIN_CLONE" fetch origin && git -C "$MAIN_CLONE" checkout --detach origin/main
+bash "$MAIN_CLONE/adoption/bootstrap-linux.sh" --profile <id> --configure-full-profile --host <name>
+```
+
+`MAIN_CLONE` is a clone used only for this; it must sit at `origin/main`, or the flag refuses and
+prints both commits. The steps, in order, are `claude-profile`, `claude-settings`, `claude-md`,
+`skills`, `codex-lane`, `path-block` and `login-shell` (the table is in
+[bootstrap step 2](bootstrap.md)); each is idempotent and can be left out with `--skip <step>`. It
+writes managed blocks into `~/.claude/CLAUDE.md` and `~/.profile` (backups beside each file), never
+installs the rendered user-level `codex.config.toml` (review its trust state first, bootstrap step 4),
+and ends by checking that `claude` in a login shell is the ecosystem launcher. A failed step exits 6
+after the others have run. A host installed from a release tag keeps the per-step commands until
+that release carries the flag.
+
+## Start a new repository
+
+Added after `v2026.09.26.2`. Scaffold every new repository from this catalog, so it carries the
+standing rule and the `sota-sources` check from its first commit
+([new repositories](bootstrap.md#new-repositories)):
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run
+python3 tools/adoption/scaffold_repo.py --target <repo>
+```
+
+A rerun changes nothing; a file edited since is skipped (exit 3) unless `--force` is given. To move
+an existing repository's workflow to a newer gate, run it again with `--force` for that file.
+
 ## Current next moves
 
 The current entry point is the [20-layer research queue](../catalogs/landscape/research-state.json)

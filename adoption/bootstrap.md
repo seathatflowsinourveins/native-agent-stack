@@ -89,7 +89,7 @@ GitHub-hosted macOS runner; see
 
 2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>
    [--skip-system-packages] [--allow-unpinned <id,id,...>]
-   [--configure-claude-user-profile]` on Linux/WSL2, or
+   [--configure-claude-user-profile | --configure-full-profile --host <name> [--skip <step>]...]` on Linux/WSL2, or
    `adoption/bootstrap-macos.sh --profile <id> [--skip-system-packages]
    [--allow-unpinned <id,id,...>] [--plan] [--configure-claude-user-profile]`
    on macOS (`ECO_INSTALL_ROOT` env,
@@ -220,6 +220,48 @@ GitHub-hosted macOS runner; see
    web keep the saved per-model level; bypass with `--effort <level>` or by
    running `~/.local/bin/claude` directly.
 
+   **The whole user profile in one run** (Linux/WSL2; `--configure-full-profile`,
+   `tools/adoption/managed_block.py` and `scripts/adoption_status.py --launcher-resolution`
+   added after `v2026.09.26.2`, so a checkout at that tag runs steps 4 and 4a by hand).
+   After native sign-in (step 3), `adoption/bootstrap-linux.sh --profile <id>
+   --configure-full-profile --host <name>` replaces the hand steps with the
+   repository's own tools, in this order, each skippable with `--skip <step>`
+   (repeat it, or give a comma-separated list):
+
+   | Step | What runs |
+   | --- | --- |
+   | `claude-profile` | `tools/adoption/install_claude_profile.py` (guard hooks, agents, MCP servers; step 4a) |
+   | `claude-settings` | `tools/adoption/render_config.py --host <name> --out` into the run's staging directory, then `tools/adoption/apply_claude_settings.py` with the rendered `settings.json`, then with `adoption/templates/claude.settings.linux-wsl2.overlay.json` when `WSL_DISTRO_NAME` is set (step 4a; [WSL page](platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)) |
+   | `claude-md` | `tools/adoption/managed_block.py claude-md`: `examples/claude-native/CLAUDE.md` as a managed block in `~/.claude/CLAUDE.md` |
+   | `skills` | the skills CLI pinned in `adoption/skills/manifest.json` (its npm tarball and sha256, through the script's own checksum-verified npm install) when missing, then `tools/adoption/install_skills.py` ([skills manifest](update.md#apply-the-skills-manifest)) |
+   | `codex-lane` | `tools/adoption/apply_codex_lane.py`: its dry run, then `--apply` with the two `--expect-*-sha256` hashes that dry run printed |
+   | `path-block` | `tools/adoption/managed_block.py profile-path`: a managed block in `~/.profile` that puts `$ECO_INSTALL_ROOT/bin` first on `PATH` |
+   | `login-shell` | `scripts/adoption_status.py --login-shell --launcher-resolution` under Python 3.13 (step 6's form); the step fails unless `claude` in a login shell is the ecosystem launcher |
+
+   `--host <name>` names `adoption/hosts/<name>.json` (step 4); it is required
+   unless both `claude-settings` and `codex-lane` are skipped. The flag refuses
+   (exit 1, before installing anything) unless `git rev-parse HEAD` equals `git
+   ls-remote origin refs/heads/main`, and prints both commits: it applies what
+   main documents, so run it from a clone at `origin/main` (a release checkout
+   follows steps 4 and 4a by hand, as the note above says). A failed step is
+   reported and the rest still run; the script then exits 6. Every step is
+   idempotent: fix the cause and re-run, skipping what is done.
+
+   Both managed blocks work alike. The begin and end markers must appear exactly
+   once and in order, or the file is refused; without them the block is appended
+   after the existing text; every line outside them is kept; the file is backed
+   up beside itself first (`<name>.bak.<UTC stamp>`, never overwriting an earlier
+   backup) and replaced atomically with its mode kept; a file already up to date
+   is not touched. In `~/.claude/CLAUDE.md`, rtk's `@RTK.md` import stays outside
+   the block, and a hand-merged copy of the example with no markers is replaced
+   only when it equals the current example ([the recipe's rule](../recipes/claude-native-profile.md#small-persistent-contract-selected-upstream-skills));
+   any other copy is refused, so remove it or wrap it in the markers first. The
+   `~/.profile` block is the only shell startup file this script writes. A login
+   shell reads `~/.profile` only when no `~/.bash_profile` or `~/.bash_login`
+   exists, which is why the last step checks where `claude` resolves. The
+   user-level `codex.config.toml` that `render_config.py` renders is not
+   installed by any step: its trust state needs the review in step 4's warning.
+
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
    Use each client's own device flow:
@@ -248,6 +290,10 @@ GitHub-hosted macOS runner; see
    Templates are in [`adoption/templates/`](templates/): `claude.settings.template.json`,
    `codex.config.template.toml` (user-level `~/.codex/config.toml`), and
    `project.codex.config.template.toml` (project-level `.codex/config.toml`).
+   A new repository gets its `.codex/config.toml` from
+   `tools/adoption/scaffold_repo.py` (added after `v2026.09.26.2`), which renders
+   that template with the same renderer for this host instead of a hand copy
+   ([new repositories](#new-repositories)).
    `--check`'s `project.codex.config.toml` comparison targets the project
    being onboarded (`$PROJECT_ROOT`, e.g. `agent-lab`), never this catalog
    checkout, which has no `.codex/config.toml` of its own and will always
@@ -581,3 +627,44 @@ GitHub-hosted macOS runner; see
 Every step above is guidance; running or validating this page does not itself
 execute anything (`adoption/lifecycle.md`, "This guide supplies future-host
 commands; reading or validating it does not run those commands").
+
+## New repositories
+
+Added after `v2026.09.26.2`: `tools/adoption/scaffold_repo.py`, `adoption/scaffold/` and
+`.github/workflows/sota-sources-gate.yml`. Every new repository starts from the scaffold
+instead of hand copies, so it carries the standing rule from its first commit:
+
+```sh
+git init <repo>
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run   # the plan; writes nothing
+python3 tools/adoption/scaffold_repo.py --target <repo>             # writes it
+```
+
+| File in the new repository | From |
+| --- | --- |
+| `AGENTS.md` | `adoption/scaffold/AGENTS.md`: the top rule, byte for byte the block after the `native-agent-stack:top-rule` marker of `adoption/templates/codex.AGENTS.template.md` (a test binds the two), and a repository-expectations section to fill in |
+| `CLAUDE.md` | `@AGENTS.md` and one comment line: Claude Code reads the shared file through the import ([memory docs](https://code.claude.com/docs/en/memory), "Share one file with other coding tools") |
+| `.agents/skills/README.md` | where skills only this repository needs go; skills every repository uses stay global (`adoption/skills/manifest.json`) |
+| `.github/pull_request_template.md` | scope, lane, `## SOTA sources` and the evidence classes of this repository's own template |
+| `.github/workflows/sota-sources.yml` | `sota-sources.yml.template` with `<sha>` filled in: it calls this repository's reusable `sota-sources-gate.yml` at that main commit |
+| `.codex/config.toml` | `adoption/templates/project.codex.config.template.toml`, rendered for this host |
+
+The gate is `validate.yml`'s required `sota-sources` job made reusable (`on: workflow_call`), the same
+check byte for byte (`tests/test_sota_sources_gate.py`); a called workflow runs in its caller's
+context, so it reads the new repository's pull request
+([reusing workflow configurations](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations),
+"`github` context"). `<sha>` is `--main-sha`, else what `git ls-remote origin refs/heads/main` reports;
+when that commit is in this checkout it must carry `.github/workflows/sota-sources-gate.yml`, or nothing
+is written (exit 2). The caller is kept as a `.template` file because zizmor also audits nested
+`.github/workflows` directories, where an unfilled `<sha>` is an unpinned `uses:`. In the new repository,
+make the check the workflow reports a required status check, and if its Actions settings allow only
+selected actions, allow this reusable workflow too.
+
+`.codex/config.toml` takes `ECO_ROOT` from `ECO_INSTALL_ROOT` (default `~/.local/share/codex-ecosystem`),
+`CODE_INDEX_PATH` from its variable (default `~/.code-index`) and `HOST_PATH` from
+`adoption/hosts/example.json`'s system directories, never this shell's `PATH`; `--host <name>` reads
+`adoption/hosts/<name>.json` instead and `--set KEY=VALUE` overrides one value. It holds this host's
+paths, so each host renders its own. Each file is created when absent and left alone when identical; one
+whose content differs is skipped and the run exits 3 unless `--force` overwrites it, and a symlink is
+never written through. The tool prints one line per file (`created`, `unchanged`, `skipped`,
+`overwritten`) and a summary.
