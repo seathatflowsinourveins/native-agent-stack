@@ -7,8 +7,11 @@ import asyncio
 import json
 import math
 import os
+import tomllib
 import uuid
 from pathlib import Path
+from urllib.parse import urlsplit
+from urllib.request import urlopen
 
 import openai_codex
 from openai_codex import AsyncCodex, ApprovalMode, CodexConfig, Sandbox
@@ -16,6 +19,58 @@ from openai_codex.client import CodexClient
 from openai_codex.generated.v2_all import GetAccountRateLimitsResponse
 
 MODEL = "gpt-6-astra"
+GATEWAY_MODEL = "cx/gpt-6-astra-max"
+
+
+def gateway_base_url(value: str) -> str:
+    """Keep the adopted keyless inference service inside its loopback scope."""
+    parsed = urlsplit(value)
+    if (parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "::1", "localhost"}
+            or parsed.username is not None or parsed.password is not None
+            or parsed.query or parsed.fragment or parsed.path.rstrip("/") != "/v1"
+            or parsed.port is None):
+        raise ValueError("gateway base URL must be a port-qualified HTTP loopback /v1 endpoint")
+    return value.rstrip("/")
+
+
+def route_overrides(provider: str, base_url: str, extra: tuple[str, ...]) -> tuple[str, ...]:
+    """Use native Codex provider settings; do not create a second agent loop.
+
+    Sources: openai/codex rust-v0.159.2 sdk/python and the official
+    https://developers.openai.com/codex/config-reference/ provider contract.
+    """
+    if provider == "openai":
+        return (*extra, 'model_reasoning_effort="max"')
+    if provider != "omniroute":
+        raise ValueError("unsupported provider")
+    base_url = gateway_base_url(base_url)
+    for override in extra:
+        parsed = tomllib.loads(override)
+        if {"model", "model_provider", "model_reasoning_effort", "model_providers"} & parsed.keys():
+            raise ValueError("extra overrides must not replace the OmniRoute route contract")
+    return (*extra, 'model_provider="omniroute"', 'model_reasoning_effort="max"',
+            'model_providers.omniroute.name="OmniRoute clean GPT lane"',
+            "model_providers.omniroute.base_url=" + json.dumps(base_url),
+            'model_providers.omniroute.wire_api="responses"',
+            "model_providers.omniroute.requires_openai_auth=false")
+
+
+def gateway_readiness(base_url: str) -> dict:
+    """Inspect advertised models only; this is not a successful model run.
+
+    The custom provider uses gateway readiness rather than the native account's
+    subscription allowance. No sign-in or authentication store is read here.
+    """
+    endpoint = gateway_base_url(base_url) + "/models"
+    with urlopen(endpoint, timeout=10) as response:
+        raw = response.read(1_048_577)
+    if len(raw) > 1_048_576:
+        raise ValueError("gateway model listing exceeds the bounded readiness contract")
+    listing = json.loads(raw)
+    available = any(model.get("id") == GATEWAY_MODEL for model in listing.get("data", []))
+    return {"model": GATEWAY_MODEL, "model_available": available,
+            "provider": "omniroute", "evidence_level": "advertised_model_only",
+            "ready": available}
 
 
 def process_telemetry_env(scope: str) -> dict[str, str]:
@@ -32,7 +87,7 @@ def write_observation(directory: Path, result: dict) -> None:
     identifier = str(uuid.uuid4())
     observation = {"observation_id": identifier}
     observation.update({key: result.get(key) for key in (
-        "status", "configured_model", "duration_ms", "usage_status")})
+        "status", "configured_model", "duration_ms", "usage_status", "usage_scope")})
     usage = result.get("usage")
     observation["usage"] = {"total": usage["total"]} if isinstance(usage, dict) and "total" in usage else None
     temporary = directory / (identifier + ".pending")
@@ -80,6 +135,8 @@ async def run(config: CodexConfig, prompt: str, deadline: float, receipt: dict,
     sandbox and approval_mode.
     """
     options = thread_options or {}
+    model = options.get("model", MODEL)
+    provider = options.get("provider", "openai")
     sandbox = options.get("sandbox", Sandbox.read_only)
     approval_mode = options.get("approval_mode", ApprovalMode.deny_all)
     policy = Path(__file__).with_name("policy.md").read_text()
@@ -89,7 +146,7 @@ async def run(config: CodexConfig, prompt: str, deadline: float, receipt: dict,
                                      "user_agent": metadata.get("userAgent")}
         if options.get("resume_thread_id"):
             thread = await codex.thread_resume(
-                options["resume_thread_id"], cwd=config.cwd, model=MODEL,
+                options["resume_thread_id"], cwd=config.cwd, model=model,
                 sandbox=sandbox, approval_mode=approval_mode,
                 developer_instructions=policy)
             receipt["thread_id"] = thread.id
@@ -97,7 +154,7 @@ async def run(config: CodexConfig, prompt: str, deadline: float, receipt: dict,
         else:
             persistent = bool(options.get("persistent"))
             thread = await codex.thread_start(
-                cwd=config.cwd, model=MODEL, ephemeral=not persistent,
+                cwd=config.cwd, model=model, ephemeral=not persistent,
                 sandbox=sandbox, approval_mode=approval_mode,
                 developer_instructions=policy)
             receipt["thread_mode"] = "persistent" if persistent else "ephemeral"
@@ -107,9 +164,9 @@ async def run(config: CodexConfig, prompt: str, deadline: float, receipt: dict,
         selected = (await thread.read()).thread
         receipt["configured_model"] = selected.model
         receipt["configured_provider"] = selected.model_provider
-        if selected.model != MODEL or selected.model_provider != "openai":
+        if selected.model != model or selected.model_provider != provider:
             return {"status": "blocked_model_or_provider_mismatch", "usage": None}
-        turn = await thread.turn(prompt, model=MODEL)
+        turn = await thread.turn(prompt, model=model)
         receipt["model_inference_submitted"] = True
         pending = asyncio.create_task(turn.run())
         try:
@@ -126,6 +183,7 @@ async def run(config: CodexConfig, prompt: str, deadline: float, receipt: dict,
                 "final_response": result.final_response,
                 "duration_ms": result.duration_ms,
                 "usage_status": "reported" if result.usage is not None else "unavailable",
+                "usage_scope": "native_thread_cumulative" if result.usage is not None else None,
                 "items": [item.model_dump(by_alias=True, mode="json") for item in result.items],
                 "usage": result.usage.model_dump(by_alias=True, mode="json")
                 if result.usage is not None else None}
@@ -167,7 +225,7 @@ def run_with_tool(config: CodexConfig, prompt: str, deadline: float, receipt: di
                   thread_options: dict, tool: LookupTool) -> dict:
     """Run one deny-all turn with one custom tool registered through the SDK client.
 
-    The high-level AsyncCodex.thread_start has no dynamic-tool field in 0.155.1, so
+    The high-level AsyncCodex.thread_start has no dynamic-tool field in 0.159.2, so
     this path uses the SDK's CodexClient: its approval_handler answers the tool
     call and its thread_start/thread_resume accept the app-server's JSON params.
     """
@@ -176,7 +234,9 @@ def run_with_tool(config: CodexConfig, prompt: str, deadline: float, receipt: di
     import threading
     policy = Path(__file__).with_name("policy.md").read_text()
     sandbox = "workspace-write" if thread_options["sandbox"] == Sandbox.workspace_write else "read-only"
-    common = {"cwd": config.cwd, "model": MODEL, "sandbox": sandbox, "approvalPolicy": "never",
+    model = thread_options.get("model", MODEL)
+    provider = thread_options.get("provider", "openai")
+    common = {"cwd": config.cwd, "model": model, "sandbox": sandbox, "approvalPolicy": "never",
               "developerInstructions": policy}
     with CodexClient(config, approval_handler=tool) as client:
         metadata = client.initialize().model_dump(by_alias=True, mode="json")
@@ -199,9 +259,9 @@ def run_with_tool(config: CodexConfig, prompt: str, deadline: float, receipt: di
         selected = client.thread_read(thread_id).thread
         receipt["configured_model"] = selected.model
         receipt["configured_provider"] = selected.model_provider
-        if selected.model != MODEL or selected.model_provider != "openai":
+        if selected.model != model or selected.model_provider != provider:
             return {"status": "blocked_model_or_provider_mismatch", "usage": None}
-        turn_id = client.turn_start(thread_id, prompt, {"model": MODEL}).turn.id
+        turn_id = client.turn_start(thread_id, prompt, {"model": model}).turn.id
         receipt["model_inference_submitted"] = True
         box: dict = {"items": [], "usage": None}
 
@@ -238,6 +298,7 @@ def run_with_tool(config: CodexConfig, prompt: str, deadline: float, receipt: di
     return {"status": turn.status.value, "final_response": final.get("text") if final else None,
             "duration_ms": turn.duration_ms,
             "usage_status": "reported" if usage is not None else "unavailable",
+            "usage_scope": "native_thread_cumulative" if usage is not None else None,
             "items": items,
             "usage": usage.model_dump(by_alias=True, mode="json") if usage is not None else None}
 
@@ -250,6 +311,10 @@ def main() -> int:
     parser.add_argument("--workspace", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     parser.add_argument("--prompt", type=Path)
+    parser.add_argument("--provider", choices=("openai", "omniroute"), default="openai",
+                        help="native account control or the clean loopback GPT worker lane")
+    parser.add_argument("--gateway-base-url", default="http://127.0.0.1:20128/v1",
+                        help="port-qualified loopback /v1 endpoint; used only for OmniRoute")
     parser.add_argument("--context-mode-start", type=Path,
                         help="installed upstream start.mjs; scopes this worker's MCP server")
     parser.add_argument("--turn-deadline-seconds", type=float, default=180,
@@ -292,7 +357,10 @@ def main() -> int:
         if args.approval_mode != "deny_all":
             parser.error("--lookup-tool runs deny_all only")
         tool = LookupTool(args.lookup_tool)
-    overrides = tuple(args.config_override)
+    try:
+        overrides = route_overrides(args.provider, args.gateway_base_url, tuple(args.config_override))
+    except (ValueError, tomllib.TOMLDecodeError) as error:
+        parser.error(str(error))
     if args.context_mode_start is not None:
         if not args.context_mode_start.is_file():
             parser.error("Context Mode start.mjs must already be installed")
@@ -309,10 +377,15 @@ def main() -> int:
                                 "CONTEXT_MODE_PROJECT_DIR": str(args.workspace.resolve()),
                                 **process_telemetry_env("sdk-worker")})
     result = {"mode": args.mode, "model_inference_submitted": False,
-              "usage": None, "usage_status": "not_requested",
+              "usage": None, "usage_status": "not_requested", "usage_scope": None,
               "sdk_version": openai_codex.__version__, "sandbox": args.sandbox,
+              "route_contract": {"provider": args.provider,
+                                 "model": GATEWAY_MODEL if args.provider == "omniroute" else MODEL,
+                                 "reasoning_effort": "max", "wire_api": "responses"},
               "approval_mode": args.approval_mode, "config_overrides": list(overrides)}
     thread_options = {"persistent": args.persistent, "resume_thread_id": args.resume_thread_id,
+                      "model": GATEWAY_MODEL if args.provider == "omniroute" else MODEL,
+                      "provider": args.provider,
                       "sandbox": Sandbox.workspace_write if args.sandbox == "workspace-write" else Sandbox.read_only,
                       "approval_mode": ApprovalMode(args.approval_mode)}
     exit_code = 1
@@ -320,13 +393,16 @@ def main() -> int:
     fd = os.open(args.receipt, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w") as output:
         try:
-            with CodexClient(config_for_process()) as client:
-                client.initialize()
-                models = client.model_list().model_dump(by_alias=True, mode="json")
-                limits = client.request("account/rateLimits/read", {},
-                    response_model=GetAccountRateLimitsResponse).model_dump(
-                        by_alias=True, mode="json")
-            result["readiness"] = readiness(models, limits)
+            if args.provider == "omniroute":
+                result["readiness"] = gateway_readiness(args.gateway_base_url)
+            else:
+                with CodexClient(config_for_process()) as client:
+                    client.initialize()
+                    models = client.model_list().model_dump(by_alias=True, mode="json")
+                    limits = client.request("account/rateLimits/read", {},
+                        response_model=GetAccountRateLimitsResponse).model_dump(
+                            by_alias=True, mode="json")
+                result["readiness"] = readiness(models, limits)
             if args.mode == "inspect":
                 result["status"] = "discovery_complete"
                 exit_code = 0

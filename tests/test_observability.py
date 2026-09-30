@@ -36,7 +36,7 @@ class ObservabilityTests(unittest.TestCase):
         exec(compile(ast.Module(body=[helper], type_ignores=[]), "native_worker.py", "exec"), scope)
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory)
-            data = {"status": "failed", "usage": None, "usage_status": "unavailable_after_failure",
+            data = {"status": "failed", "usage": None, "usage_status": "unavailable_after_failure", "usage_scope": None,
                     "items": [{"text": "PRIVATE_TOOL_CONTENT"}], "error": "PRIVATE_ERROR_CONTENT"}
             scope["write_observation"](target, data)
             files = list(target.iterdir())
@@ -45,13 +45,20 @@ class ObservabilityTests(unittest.TestCase):
             self.assertEqual(files[0].stat().st_mode & 0o777, 0o600)
             saved = json.loads(files[0].read_text())
             self.assertIsNone(saved["usage"])
+            self.assertIsNone(saved["usage_scope"])
             self.assertNotIn("PRIVATE_", files[0].read_text())
             self.assertEqual(saved["status"], "failed")
             self.assertEqual(saved["observation_id"], files[0].stem)
-            scope["write_observation"](target, data)
+            scope["write_observation"](target, {**data, "usage_scope": "native_thread_cumulative",
+                                               "usage": {"total": {"inputTokens": 7}},
+                                               "thread_id": "PRIVATE_THREAD_ID"})
             observations = list(target.glob("*.json"))
             self.assertEqual(len(observations), 2)
             self.assertNotEqual(observations[0].read_bytes()[:1000], observations[1].read_bytes()[:1000])
+            cumulative = next(json.loads(f.read_text()) for f in observations
+                              if json.loads(f.read_text())["usage_scope"] is not None)
+            self.assertEqual(cumulative["usage_scope"], "native_thread_cumulative")
+            self.assertNotIn("thread_id", cumulative)
 
     def test_sdk_observation_never_replaces_existing_receipt(self):
         source = ast.parse((ROOT / "blueprints/us-equities/workers/native_worker.py").read_text())
