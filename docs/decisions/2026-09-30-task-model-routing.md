@@ -18,8 +18,8 @@ Task-to-model routing is decided in several places and enforced in more:
   record (`docs/decisions/2026-09-29-max-default-effort.md:33`).
 - Two open pull requests that are not on main. #423 resolves every OmniRoute feature of the gateway on port 20128 (its
   record, line 5) and notes a framework-only instance (line 137), which the landscape-sweep README stages on port 20129
-  (`tools/sota-convergence/landscape-sweep/README.md:155`). #508's token-stack record keeps role dispatch as a run-shape
-  lever that Gate A per-row results decide (lines 90 and 93).
+  (`tools/sota-convergence/landscape-sweep/README.md:155`). #508's token-stack record lists role dispatch among the
+  run-shape levers owned by the Gate A owner after #381 closes (line 90).
 
 Several routes bind nothing in a file: a Sonnet 5.5 stage override, a design or synthesis stage, and GPT-6 Sol at medium
 are instructions to whoever dispatches. GPT-6.1 Sol is absent from main: the only `gpt-6.1` string is the model-name
@@ -134,7 +134,7 @@ Open pull requests, not on main, cited at their head commits:
 - #508, "Token stack winner: one full stack chosen on recorded evidence, provisional until Gate A (decision record)",
   head `b7fcc2196c9ff5557f30486468f614fc0dc9d8b5`:
   [record](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b7fcc2196c9ff5557f30486468f614fc0dc9d8b5/docs/decisions/2026-09-29-token-stack-winner.md)
-  lines 90 and 93.
+  line 90.
 
 Anthropic, as the workflows README cites them (`:869`, `:872`, `:873`); each returned HTTP 200 on 2026-09-30:
 
