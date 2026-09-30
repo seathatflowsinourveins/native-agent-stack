@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-30",
+  "base_commit": "a266a3831c32de3fb9ee907a0a6d7092548182c9",
+  "evidence_classes": ["local pinned-source review", "synthetic discrete examples", "synthetic negative controls"],
+  "scope": "Repair-round-2 protocol and decision-record changes; no installation, deployment, model run or fresh online maintenance gate.",
+  "network_requests": 0,
+  "source_observation": {
+    "method": "Read the supplied local upstream checkouts; verify each HEAD and commit date with rtk git show -s --format='%H %cI'; inspect the cited source at that checkout. No upstream checkout was edited or executed.",
+    "pins": [
+      {"repo": "Gentleman-Programming/engram", "commit": "818be842f57a95063f62f1b745297a96c407c143", "commit_date": "2026-09-25T23:04:24+00:00"},
+      {"repo": "HUST-AI-HYZ/MemoryAgentBench", "commit": "538026089d1a8a8eff05121d0db89b388f360eba", "commit_date": "2026-09-25T02:11:33-04:00"},
+      {"repo": "MemPalace/mempalace", "commit": "22fd87f09c19d5ffb2d6966486483353937931c0", "commit_date": "2026-09-15T21:22:41-03:00"},
+      {"repo": "ZexueHe/MemoryArena", "commit": "6cd9de14b71915e39ac742a20dc33785e14b6aab", "commit_date": "2026-05-31T20:10:42-04:00"},
+      {"repo": "akitaonrails/ai-memory", "commit": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1", "commit_date": "2026-09-29T13:27:08-03:00"},
+      {"repo": "basicmachines-co/basic-memory", "commit": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048", "commit_date": "2026-08-25T15:43:45-05:00"},
+      {"repo": "getzep/graphiti", "commit": "eaa4128681bc53487138a4bbc22d58336ebe70d2", "commit_date": "2026-09-08T16:37:55-04:00"},
+      {"repo": "rohitg00/agentmemory", "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a", "commit_date": "2026-08-16T14:54:32+01:00"},
+      {"repo": "supermemoryai/supermemory", "commit": "5d2b5855fe492a3682a1cde4a255e2db0c4db595", "commit_date": "2026-08-16T23:20:38+00:00"},
+      {"repo": "topoteretes/cognee", "commit": "ba3631f2ed363a6ea50d649c34c56885af6b36fe", "commit_date": "2026-09-29T23:58:03+02:00"},
+      {"repo": "vectorize-io/agent-memory-benchmark", "commit": "03c1d0f1d27da63034f0931121c858faba512383", "commit_date": "2026-09-22T14:23:44+02:00"},
+      {"repo": "vectorize-io/hindsight", "commit": "5fc4ce20917b916240cef27c212c387a177f115b", "commit_date": "2026-09-29T11:40:54+02:00"},
+      {"repo": "volcengine/OpenViking", "commit": "e8716760934d95ef73414484a45bfe475b9296e2", "commit_date": "2026-09-28T13:55:14+08:00"},
+      {"repo": "xiaowu0162/LongMemEval-V2", "commit": "2cc8c540bdb87fe6761629b585e727e1c4704520", "commit_date": "2026-08-09T15:31:22-07:00"},
+      {"repo": "zilliztech/memsearch", "commit": "2a4652fa086fbd45e92bfd8da7781ebe1642baa7", "commit_date": "2026-09-24T16:07:41+08:00"}
+    ],
+    "maintenance_boundary": "Commit dates of supplied pins are observed. The brief supplies active LongMemEval-V2/MemoryAgentBench and stale MemoryArena classifications; this repair does not refresh archival/default-branch metadata. Executing transitive dependencies still need current gate receipts before scoring. MemoryArena code is never run.",
+    "observations": [
+      {
+        "finding": "H1/M4",
+        "sources": ["vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/runner.py:363", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/runner.py:385", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/runner.py:459", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/runner.py:474", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/runner.py:492"],
+        "observed": "Per-unit async gather may abort before a final row/save. Native output path is output_dir/dataset/run_name/mode/split.json; final saves merge/filter/write the file. The S3 collector must reconcile failures to the frozen denominator, and each tuple/attempt must own its output_dir."
+      },
+      {
+        "finding": "M2",
+        "sources": ["vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/__init__.py:1", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/bm25.py:1", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/mem0.py:5", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/hybrid_search.py:5", "topoteretes/cognee@ba3631f2:cognee/infrastructure/databases/vector/embeddings/config.py:19", "zilliztech/memsearch@2a4652fa:src/memsearch/core.py:62", "zilliztech/memsearch@2a4652fa:src/memsearch/core.py:274", "rohitg00/agentmemory@2d38dafe:src/providers/_openai-shared.ts:25", "MemPalace/mempalace@22fd87f0:mempalace/__init__.py:59"],
+        "observed": "Provider imports execute BM25/Mem0/Qdrant/sentence-transformers code even when those providers implement no arm. Default OpenAI endpoints/providers and logger-only telemetry suppression cannot establish an egress boundary."
+      },
+      {
+        "finding": "M3/L3",
+        "sources": ["vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/modes/rag.py:49", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/base.py:54", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/dataset/longmemeval.py:131", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/dataset/longmemeval.py:296", "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/runner.py:228"],
+        "observed": "RAG omits k; base async k defaults to 10; the answer prompt JSON-serializes truthy raw_response and otherwise uses context. Stock adapter exposes question_id as user_id. Empty open-QA context is scored incorrect before judge dispatch."
+      },
+      {
+        "finding": "M5/M6",
+        "sources": ["vectorize-io/hindsight@5fc4ce20:hindsight-api-slim/hindsight_api/api/http.py:448", "rohitg00/agentmemory@2d38dafe:src/providers/_openai-shared.ts:148", "MemPalace/mempalace@22fd87f0:mempalace/llm_client.py:347"],
+        "observed": "Hindsight default recall budget is mid, token limit 4096. Selected agentmemory auth-header path supplies native auth headers; MemPalace's compatible client sends temperature 0.1 and auth-only headers. Header exemptions/routes have not been measured."
+      },
+      {
+        "finding": "H2/F7/L4",
+        "sources": ["xiaowu0162/LongMemEval-V2@2cc8c540:README.md:41", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:50", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:114", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:191", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:236", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:25", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:146", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:170", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:128", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:190", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:69", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:126", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:335", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/qa_eval_metrics.py:491", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/scripts/run_no_retrieval.sh:20", "HUST-AI-HYZ/MemoryAgentBench@538026089:README.md:178", "HUST-AI-HYZ/MemoryAgentBench@538026089:bash_files/sh/run_memagent_rag_agents.sh:18"],
+        "observed": "LongMemEval-V2 supports registered Memory backends and direct memory-config harness use. JSON alone requires an already registered type. Baseline scripts own domain/tier/output arguments and invoke run_eval. That wrapper does not forward evaluator base URL; direct harness does. Evaluator effort choices are low/medium/high. Native no-base evaluator constructs the OpenAI SDK client. TTL/CR metrics and the actual MemoryAgentBench sh-directory script are verified."
+      },
+      {
+        "finding": "N1",
+        "sources": ["akitaonrails/ai-memory@a0ca8d1a:crates/ai-memory-mcp/src/server.rs:2114", "akitaonrails/ai-memory@a0ca8d1a:crates/ai-memory-mcp/src/server.rs:2133", "akitaonrails/ai-memory@a0ca8d1a:crates/ai-memory-mcp/src/server.rs:2157", "akitaonrails/ai-memory@a0ca8d1a:crates/ai-memory-mcp/src/server.rs:2176", "akitaonrails/ai-memory@a0ca8d1a:crates/ai-memory-mcp/src/server.rs:6004"],
+        "observed": "After provider success, the stage rejects a missing, duplicate, unknown-ID, nonfinite or out-of-range score set; it emits 'reranker returned incomplete or invalid scores; keeping pre-rerank order'. Saturation/error/timeout have separate signals. The referenced upstream unit test is read, not run."
+      }
+    ],
+    "deployment_review": {
+      "lead": "Coordinator-supplied deployment-spec review; only upstream locators, not the private input location, are published.",
+      "recipes_source_supported_as_specified": ["agentmemory", "hindsight", "memsearch", "basic-memory", "openviking", "engram"],
+      "corrections_verified_in_pinned_source": [
+        {"system": "cognee", "sources": ["topoteretes/cognee@ba3631f2:cognee/api/client.py:132", "topoteretes/cognee@ba3631f2:cognee/api/client.py:297", "topoteretes/cognee@ba3631f2:cognee-mcp/src/cognee_client.py:84", "topoteretes/cognee@ba3631f2:cognee/shared/utils.py:400", "topoteretes/cognee@ba3631f2:cognee/version.py:22"], "correction": "Explicitly provision auth for the selected authenticated deployment, configure x-api-key MCP auth, disable API and MCP telemetry, and expect the source-build -local version suffix."},
+        {"system": "supermemory-local", "sources": ["supermemoryai/supermemory@5d2b5855:apps/docs/concepts/how-it-works.mdx:109", "supermemoryai/supermemory@5d2b5855:apps/docs/ingestion/add-memories.mdx:73"], "correction": "Native status includes failed; irrecoverable errors may delete a document. Polls must terminate on failed/404/deadline and verify searchable evidence. Supplied review's isolated bind/auth gap remains pending."},
+        {"system": "mempalace", "sources": ["MemPalace/mempalace@22fd87f0:deploy/docker-compose.server.yml:47", "MemPalace/mempalace@22fd87f0:mempalace/palace/backend.py:41", "MemPalace/mempalace@22fd87f0:mempalace/cli/cmd_serve.py:145", "MemPalace/mempalace@22fd87f0:mempalace/cli/cmd_init.py:110", "MemPalace/mempalace@22fd87f0:mempalace/cli/cmd_init.py:178"], "correction": "Init/mine and server must share compose project, store, backend and writable corpus files; helpers require the explicit backend. Retain the native token guard."},
+        {"system": "ai-memory", "sources": ["akitaonrails/ai-memory@a0ca8d1a:docker/docker-compose.yml:13", "akitaonrails/ai-memory@a0ca8d1a:docker/docker-compose.yml:25", "akitaonrails/ai-memory@a0ca8d1a:docker/docker-compose.yml:26", "akitaonrails/ai-memory@a0ca8d1a:README.md:288", "akitaonrails/ai-memory@a0ca8d1a:crates/ai-memory-cli/src/commands/serve.rs:2497"], "correction": "Build the local pinned image and use upstream docker run env-file wiring with a new name/volume/free port; avoid occupied 49374 and live 49474."},
+        {"system": "graphiti", "sources": ["getzep/graphiti@eaa41286:mcp_server/docker/Dockerfile.standalone:46", "getzep/graphiti@eaa41286:mcp_server/docker/README.md:92", "getzep/graphiti@eaa41286:mcp_server/docker/docker-compose-neo4j.yml:3", "getzep/graphiti@eaa41286:mcp_server/docker/docker-compose-neo4j.yml:38", "getzep/graphiti@eaa41286:mcp_server/src/graphiti_mcp_server.py:1188"], "correction": "Pin core build version and dependency/image identities, use in-network bolt://neo4j:7687, pull and pin Neo4j before pull-never, and use the actual mounted config path."}
+      ],
+      "boundary": "Recipes and corrections are source-reviewed only; no installation, readiness, lifecycle, network or gateway acceptance is claimed. The eleven-system deployment section retains source locators for the six available recipes as well."
+    }
+  },
+  "synthetic_checks": {
+    "source": "blueprints/memory-layer-s3/PREREGISTRATION.md",
+    "method": "Extract each named python fenced block without its fence and trailing newline; execute verbatim with rtk python3 -c BLOCK. Compare the 7.2-7.3 block to rtk proxy git show HEAD:blueprints/memory-layer-s3/PREREGISTRATION.md. Each negative control changes only the named rule and must raise AssertionError.",
+    "positive": [
+      {"section": "7.1", "sha256": "b4c82874cf3e08ec6f50090e35c91135b07525ccdbc793b64b294badad3af91f", "exit_code": 0, "stdout": "7.1 usefulness examples: all assertions hold", "stderr": ""},
+      {"section": "7.2-7.3", "sha256": "541b59b2161848ef21dcf7e89ef46d6f85d722bdf390847c26727625b3b406bf", "byte_identical_to_base": true, "exit_code": 0, "stdout": "7.2-7.3 frozen examples: all assertions hold", "stderr": ""},
+      {"section": "7.5", "sha256": "5e801ce8666ae6145bea1a2e9a07862d1b42db17c226883238671f5299c1b7ef", "exit_code": 0, "stdout": "7.5 successful-transport invalid-score example: fallback observed; unknown is pending", "stderr": ""}
+    ],
+    "negative": [
+      {"mutation": "7.2 all leaders changed to any leader", "exit_code": 1, "observed_error": "AssertionError"},
+      {"mutation": "7.3 strict tied-cost inequality changed to inclusive", "exit_code": 1, "observed_error": "AssertionError"},
+      {"mutation": "7.1 not-worse-than-all-best changed to any best", "exit_code": 1, "observed_error": "AssertionError"},
+      {"mutation": "7.5 successful gateway completion falsely implies accepted stage output", "exit_code": 1, "observed_error": "AssertionError"}
+    ],
+    "boundary": "Synthetic examples verify discrete protocol logic. They are not unchanged upstream tests, bootstrap/Holm execution, actual gateway successes, native provider fallback observation, benchmark scores or model runs."
+  },
+  "publication_check_correction": {
+    "evidence_class": "local structural validation; retained failed attempt",
+    "command": "rtk python3 scripts/validate.py",
+    "exit_code": 1,
+    "stdout": "Publication validation failed:\nblueprints/memory-layer-s3/PREREGISTRATION.md: contains possible personal home path\n",
+    "stderr": "",
+    "cause": "The publication scanner matched an upstream relative documentation directory named home inside a source locator; it was not an absolute private host path. An earlier substring-only privacy check made the same false-positive classification.",
+    "correction": "Use the equivalent named-provider configuration table at zilliztech/memsearch@2a4652fa:docs/cli.md:303, verified directly in the pinned source. No source claim or private-path policy was relaxed; validation is rerun after re-registration."
+  },
+  "residuals": [
+    "Native provider/collector/registration-bootstrap implementations and parity/failure/depth/output-ownership acceptance are not built/run in this protocol repair.",
+    "Current maintenance/transitive dependency gates, all-wire/outcome coverage and network-isolation receipts must be supplied before scored execution; AMB execution is pending.",
+    "agentmemory and MemPalace lack the required verified header exemption/per-arm route; supermemory-local's isolated bind/auth boundary remains unresolved.",
+    "The N1 actual successful-gateway invalid-score native fault control remains pending; only the source-backed synthetic rule has run.",
+    "LongMemEval-V2 data/subset, preflight cost/power, native backend and five-replication results are pending; secondary MemoryAgentBench has not run.",
+    "Joint embedder/reranker/local-LLM serving residency has not been measured.",
+    "cx/GPT-6 price mappings are unpriced; any cost-dependent tie is unresolved, without a zero or partial-total substitution.",
+    "S8's separately frozen do-no-harm design and relayed 36-task receipt remain pending; A17 supersession is outside the allowed paths."
+  ]
+}

@@ -7245,8 +7245,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "0d7b7fddae9e4618ce9718e1c494ee932f8a37cd57786d92991f7043f39e239d",
-      "bytes": 172845
+      "sha256": "edbbe413b5fda8f59b08e44fbb94ceba91ccc4f4256c1293b8fb64b1ba46fb7e",
+      "bytes": 216577
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/r6/eval-frameworks-report.md",
@@ -7287,6 +7287,11 @@
       "path": "blueprints/memory-layer-s3/inputs/r7/repair1-verification-20260930.json",
       "sha256": "e17484588948dc7150afba464d4806924bc08ae7858a726bda5ef1b70c9a2b35",
       "bytes": 15941
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/repair2-verification-20260930.json",
+      "sha256": "e547fdbffb01245eb2afbe748163bb552c0c07891f47e2a983325af922b6ee6a",
+      "bytes": 15700
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/README.md",
@@ -14792,6 +14797,11 @@
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
       "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
       "bytes": 28168
+    },
+    {
+      "path": "docs/decisions/2026-09-30-memory-s3-r7.md",
+      "sha256": "ec9bbdc2edd934c5896bca51feb309e23bdd08cf57f48b5af872b331c50eec01",
+      "bytes": 30309
     },
     {
       "path": "docs/direct-results.md",
