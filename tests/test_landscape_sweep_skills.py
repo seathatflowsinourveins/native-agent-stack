@@ -23,6 +23,7 @@ import importlib.util
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -36,6 +37,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import host_receipts  # noqa: E402  (the repository's JSON Schema subset validator)
 import saturation_ledger as sl  # noqa: E402
 import tests.test_landscape_sweep_harness as harness_tests  # noqa: E402  (helpers only; its test classes run there)
+import tests.test_shell_parser_ci as shell_ci  # noqa: E402  (the tree-sitter pin's CI helpers; its tests run there)
 
 HARNESS = harness_tests.HARNESS
 CATALOG = ROOT / "catalogs" / "landscape" / "skills-lifecycle.json"
@@ -910,6 +912,69 @@ class CliDiscoveryOrderTests(unittest.TestCase):
         self.assertEqual(source_reviews.cli_skill_dir({"skills/find-bugs", "skills/odd"}, "find-bugs", [], inspect)[0],
                          "skills/find-bugs")
 
+    # Opus round-4 review of #541, D1: discoverSkills walks each search location with readdir, which follows a symlink at
+    # or above the location (dist/cli.mjs lines 1339-1370), and skips a symlinked folder inside it (entry.isDirectory()
+    # is false, src/skills.ts lines 284-298); the git tree lists a symlink as one blob and nothing below it.
+
+    def doubt(self, skill_dirs, symlinks=(), linked=()):
+        return lambda container, depth: source_reviews.location_doubt(container, depth, set(skill_dirs), set(symlinks),
+                                                                      set(linked))
+
+    def test_a_symlink_at_or_above_a_location_or_a_symlinked_skill_md_above_skill_folders_is_a_doubt(self):
+        doubt = source_reviews.location_doubt
+        self.assertEqual(source_reviews.symlink_at_or_above(".posit/assistant/skills", {".posit"}), ".posit")
+        self.assertIsNone(source_reviews.symlink_at_or_above("skills", {"skills-old", "x/skills"}))
+        self.assertIn("the search location skills/ is a symlink", doubt("skills", 3, set(), {"skills"}, set()))
+        self.assertIn("is below the symlink .posit", doubt(".posit/assistant/skills", 3, set(), {".posit"}, set()))
+        self.assertIsNone(doubt("", 1, {"a"}, {"a"}, set()))  # the root is the clone; a symlinked child is skipped
+        self.assertIsNone(doubt("skills", 3, {"skills/find-bugs"}, {"skills/alias", "skills/find-bugs/x"}, set()))
+        # skills/tools/SKILL.md is a symlink: the CLI descends below skills/tools only when its target is not a file.
+        dirs = {"skills/tools", "skills/tools/find-bugs"}
+        self.assertIn("skills/tools/SKILL.md is a symlink with the skill folder skills/tools/find-bugs below it",
+                      doubt("skills", 3, dirs, set(), {"skills/tools"}))
+        self.assertIsNone(doubt("skills", 3, {"skills/tools"}, set(), {"skills/tools"}))  # nothing below it
+        self.assertIsNone(doubt("skills", 1, dirs, set(), {"skills/tools"}))  # below the walk's depth
+        self.assertIsNone(doubt("skills", 3, {"skills/tools", "skills/tools/node_modules/x"}, set(), {"skills/tools"}))
+
+    def test_a_doubtful_location_before_the_pick_stops_it_and_one_after_does_not(self):
+        LocationUnverified = source_reviews.LocationUnverified
+        cases = {
+            # skills -> elsewhere comes before .agents/skills: the CLI may find find-bugs through it first.
+            "symlinked skills before the copy": ({".agents/skills/find-bugs"}, {"skills"}, (), [], None),
+            # .claude/skills -> ../skills comes after skills/: the pick is made before the CLI walks it.
+            "symlinked agent folder after the copy": ({"skills/find-bugs"}, {".claude/skills"}, (), [], "skills/find-bugs"),
+            # No location holds a valid skill, so the recursive search would decide, unless the symlinked location
+            # holds one (then the CLI never searches recursively).
+            "symlinked location and the recursive search": ({"x/y/find-bugs"}, {".github/skills"}, (), [], None),
+            # A plugin folder below a symlink is the last location: it matters only when nothing earlier decides.
+            "symlinked plugin folder, no earlier copy": ({"x/y/find-bugs"}, {"plugins"}, (), ["plugins/p/skills"], None),
+            "symlinked plugin folder after the copy": ({"skills/find-bugs"}, {"plugins"}, (), ["plugins/p/skills"],
+                                                       "skills/find-bugs"),
+            # A symlinked SKILL.md above a copy: the CLI may walk below it and find skills/tools/find-bugs first.
+            "symlinked SKILL.md above a copy": ({"skills/tools", "skills/tools/find-bugs", ".agents/skills/find-bugs"},
+                                                (), {"skills/tools"}, [], None),
+        }
+        for label, (dirs, symlinks, linked, plugins, expected) in cases.items():
+            with self.subTest(label):
+                call = lambda: source_reviews.cli_skill_dir(dirs, "find-bugs", plugins, doubt=self.doubt(dirs, symlinks, linked))  # noqa: E731
+                if expected is None:
+                    with self.assertRaisesRegex(LocationUnverified, "no earlier location the CLI searches holds a valid copy"):
+                        call()
+                else:
+                    self.assertEqual(call()[0], expected)
+        # The same trees without the symlinks: the round-4 resolver's answers, which the doubts now stop.
+        self.assertEqual(source_reviews.cli_skill_dir({".agents/skills/find-bugs"}, "find-bugs")[0], ".agents/skills/find-bugs")
+        self.assertEqual(source_reviews.cli_skill_dir({"x/y/find-bugs"}, "find-bugs")[0], "x/y/find-bugs")
+
+    def test_unknown_plugin_folders_stop_the_pick_only_when_nothing_earlier_decides(self):
+        why = "the plugin manifest folder .claude-plugin is a symlink, which the CLI reads through"
+        with self.assertRaisesRegex(source_reviews.LocationUnverified, "is a symlink, which the CLI reads through"):
+            source_reviews.cli_skill_dir({"x/y/find-bugs"}, "find-bugs", [], plugin_doubt=why)
+        with self.assertRaisesRegex(source_reviews.LocationUnverified, "is a symlink, which the CLI reads through"):
+            source_reviews.cli_skill_dir({"plugins/p/skills/find-bugs"}, "find-bugs", ["plugins/p/skills"], plugin_doubt=why)
+        self.assertEqual(source_reviews.cli_skill_dir({"skills/find-bugs"}, "find-bugs", [], plugin_doubt=why)[0],
+                         "skills/find-bugs")
+
 
 PYYAML = importlib.util.find_spec("yaml") is not None
 DOCUMENTED_OPENAI_YAML = (  # the example of https://developers.openai.com/codex/skills, Optional metadata
@@ -1207,6 +1272,45 @@ class SkillMdReaderPinTests(unittest.TestCase):
         self.assertEqual([item["ok"] for item in order], [False, True, False, True])
         self.assertEqual(order[1]["package"], "yaml@2.9.0")
 
+    @unittest.skipUnless(SKILLS_YAML, NO_READER)
+    def test_the_environment_beats_the_default_under_home(self):
+        # Test gap (round-4 review): HOME was empty in every case above. Here HOME holds a verified install at the pin's
+        # default directory: it is found when nothing else names one, and the environment variable (a tampered copy, or
+        # an absent directory) is read instead of it when set.
+        home = temp_dir(self)
+        pin = json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))
+        shutil.copytree(SKILLS_YAML, home / pin["install"]["default_directory"], symlinks=True)
+        tampered = temp_dir(self) / "tampered"
+        shutil.copytree(SKILLS_YAML, tampered, symlinks=True)
+        composer = tampered / "node_modules/yaml/dist/compose/composer.js"
+        composer.write_bytes(composer.read_bytes() + b"\n")
+        env = {"PATH": os.environ.get("PATH", ""), "HOME": str(home), "TMPDIR": tempfile.gettempdir()}
+        found = [reader_run([], None, env)[1]["reader"], reader_run([], None, {**env, YAML_ENV: str(tampered)})[1]["reader"],
+                 reader_run([], None, {**env, YAML_ENV: str(home / "absent")})[1]["reader"]]
+        self.assertEqual([item.get("reason", "ok") for item in found], ["ok", "hash_mismatch", "not_installed"])
+
+    @unittest.skipUnless(SKILLS_YAML, NO_READER)
+    def test_a_file_that_cannot_be_read_or_a_broken_pin_refuses_with_load_error(self):
+        # Test gap (round-4 review): the load_error refusal. A pinned file that is a directory (EISDIR, not a missing
+        # file), and a pin file that is not the pin's shape, both refuse to parse anything.
+        unreadable = temp_dir(self) / "install"
+        shutil.copytree(SKILLS_YAML, unreadable, symlinks=True)
+        entry = unreadable / "node_modules/yaml/dist/index.js"
+        entry.unlink()
+        entry.mkdir()
+        self.assertEqual(reader_run([("skills/find-bugs/SKILL.md", FIND_BUGS)], unreadable),
+                         (3, {"reader": {"ok": False, "reason": "load_error"}, "results": []}))
+        reader_dir = temp_dir(self)
+        shutil.copyfile(SKILL_MD_MJS, reader_dir / "skill_md.mjs")
+        for label, pin_text in (("not JSON", "{"), ("no files", json.dumps({"package": {"name": "yaml"}}))):
+            with self.subTest(label):
+                (reader_dir / "skills-yaml.pin.json").write_text(pin_text, encoding="utf-8")
+                done = subprocess.run([NODE, str(reader_dir / "skill_md.mjs"), "--install", SKILLS_YAML],
+                                      input='{"items": []}', capture_output=True, text=True, timeout=120, check=False,
+                                      env={**os.environ, "TMPDIR": tempfile.gettempdir()})
+                self.assertEqual((done.returncode, json.loads(done.stdout)),
+                                 (3, {"reader": {"ok": False, "reason": "load_error"}, "results": []}))
+
 
 @unittest.skipUnless(SKILLS_YAML, NO_READER)
 class SkillMdReaderTests(unittest.TestCase):
@@ -1301,15 +1405,17 @@ class SkillReviewFixture:
     META = {"full_name": "O/Skills-Repo", "default_branch": "main", "license": {"spdx_id": "MIT"},
             "description": "skills", "stargazers_count": 7, "pushed_at": "2026-09-29T00:00:00Z", "archived": False}
 
-    def review(self, answers, survivors, install=None):
+    def review(self, answers, survivors, install=None, flag=None):
+        """Runs source_reviews.py; with `flag`, --skills-yaml names that install, and the environment variable an
+        absent directory, so only the flag can find it."""
         work, bin_dir = temp_dir(self), temp_dir(self)
         gh = bin_dir / "gh"
         gh.write_text(harness_tests.FAKE_GH.format(python=sys.executable, answers=repr(answers)), encoding="utf-8")
         gh.chmod(0o755)
         env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}",
-               YAML_ENV: str(install or SKILLS_YAML or work / "no-yaml-install")}
+               YAML_ENV: str(work / "no-yaml-install" if flag else install or SKILLS_YAML or work / "no-yaml-install")}
         done = run([sys.executable, HARNESS / "source_reviews.py", "--survivors", write_json(work / "s.json", survivors),
-                    "--out", work / "reviews", "--lane", LANE], env=env)
+                    "--out", work / "reviews", "--lane", LANE, *(["--skills-yaml", flag] if flag else [])], env=env)
         return done, work / "reviews"
 
     @staticmethod
@@ -1323,21 +1429,22 @@ class SkillReviewFixture:
             out[path] = data
         return out
 
-    def add_commit(self, answers, commit, files, truncated=False):
+    def add_commit(self, answers, commit, files, truncated=False, symlinks=None):
         contents = self.contents(files)
-        answers[f"repos/O/Skills-Repo/git/trees/{commit}?recursive=1"] = dict(git_listing(self, contents),
-                                                                              truncated=truncated)
+        answers[f"repos/O/Skills-Repo/git/trees/{commit}?recursive=1"] = dict(
+            git_listing(self, contents, symlinks=symlinks), truncated=truncated)
         for path, raw in contents.items():
             answers[f"repos/O/Skills-Repo/contents/{path}?ref={commit}"] = {
                 "path": path, "type": "file", "encoding": "base64", "content": base64.b64encode(raw).decode()}
 
-    def answers(self, files, pin=PIN, truncated=False, head=None):
-        """Fake gh answers for O/Skills-Repo: `files` at the adjudicated pin, whose commit lookup answers that pin (pin
-        None: not answered, so gh exits 1); with `head`, the default branch at HEAD holding `head`."""
+    def answers(self, files, pin=PIN, truncated=False, head=None, symlinks=None):
+        """Fake gh answers for O/Skills-Repo: `files` and `symlinks` ({path: target}, listed with mode 120000 as git
+        lists them) at the adjudicated pin, whose commit lookup answers that pin (pin None: not answered, so gh exits
+        1); with `head`, the default branch at HEAD holding `head`."""
         answers = {"repos/o/skills-repo": dict(self.META)}
         if pin:
             answers[f"repos/O/Skills-Repo/commits/{pin}"] = {"sha": pin}
-            self.add_commit(answers, pin, files, truncated)
+            self.add_commit(answers, pin, files, truncated, symlinks)
         if head is not None:
             answers["repos/O/Skills-Repo/commits/main"] = {"sha": HEAD}
             self.add_commit(answers, HEAD, head, truncated)
@@ -1686,6 +1793,67 @@ class SkillSourceReviewTests(SkillReviewFixture, unittest.TestCase):
         observed = self.reviewed(out)["observed"]
         self.assertIsNone(observed["codex_implicit"])
         self.assertIn("PyYAML cannot parse" if PYYAML else "the escape \\s", observed["unverified_reason"])
+
+    # Opus round-4 review of #541, D1: the CLI walks a search location through a symlink at or above it (readdir
+    # follows it: dist/cli.mjs lines 1339-1370) and keeps the first skill of a name (seenNames, line 1352), while the git
+    # tree lists the symlink as one blob and nothing below it. Round 4 reviewed a later copy the CLI throws away.
+
+    def test_a_symlinked_search_location_before_the_pick_stops_the_review(self):
+        marketplace = json.dumps({"plugins": [{"name": "p", "source": "./plugins/p"}]}).encode()
+        cases = {
+            # skills -> packages/core/skills: the CLI takes packages/core/skills/find-bugs through skills/ and drops
+            # the .agents/skills copy, which the review named.
+            "a symlinked skills folder": (
+                {"packages/core/skills/find-bugs/SKILL.md": FIND_BUGS, ".agents/skills/find-bugs/SKILL.md": FIND_BUGS},
+                {"skills": "packages/core/skills"}, "the search location skills/ is a symlink"),
+            # .claude -> config/claude: .claude/skills lies below the symlink and comes before .github/skills.
+            "a symlink above an agent folder": (
+                {"config/claude/skills/find-bugs/SKILL.md": FIND_BUGS, ".github/skills/find-bugs/SKILL.md": FIND_BUGS},
+                {".claude": "config/claude"}, "the search location .claude/skills/ is below the symlink .claude"),
+            # plugins -> vendor/plugins: the plugin's skills/ folder holds a valid skill, so the CLI never runs the
+            # recursive search that found x/y/find-bugs for the review.
+            "a plugin folder below a symlink": (
+                {".claude-plugin/marketplace.json": marketplace, "vendor/plugins/p/skills/other/SKILL.md": None,
+                 "x/y/find-bugs/SKILL.md": FIND_BUGS},
+                {"plugins": "vendor/plugins"}, "the search location plugins/p/skills/ is below the symlink plugins"),
+            # .claude-plugin -> meta: the CLI reads the manifest through the symlink; the review cannot, and the plugin
+            # folders it declares come before the recursive search.
+            "manifests behind a symlink": (
+                {"meta/marketplace.json": marketplace, "plugins/p/skills/other/SKILL.md": None,
+                 "x/y/find-bugs/SKILL.md": FIND_BUGS},
+                {".claude-plugin": "meta"}, "the plugin manifest folder .claude-plugin is a symlink"),
+            # skills/tools/SKILL.md -> a missing file: hasSkillMd is false for it, so the CLI walks below skills/tools and
+            # takes skills/tools/find-bugs first; the review treated skills/tools as a skill and named the later copy.
+            "a symlinked SKILL.md above a copy": (
+                {"skills/tools/find-bugs/SKILL.md": FIND_BUGS, ".agents/skills/find-bugs/SKILL.md": FIND_BUGS},
+                {"skills/tools/SKILL.md": "../../missing.md"},
+                "skills/tools/SKILL.md is a symlink with the skill folder skills/tools/find-bugs below it"),
+        }
+        for label, (files, symlinks, phrase) in cases.items():
+            with self.subTest(label):
+                entry = self.stopped(*self.review(self.answers(files, symlinks=symlinks), [self.survivor()]))
+                self.assertEqual(entry["pin_lookup"], "ok")
+                for expected in (phrase, "no earlier location the CLI searches holds a valid copy of find-bugs",
+                                 "which copy the skills CLI installs is unverified"):
+                    self.assertIn(expected, entry["reason"])
+
+    def test_a_symlink_that_cannot_change_the_pick_leaves_the_review(self):
+        # The common layout: .claude/skills -> ../skills, searched after skills/, so the copy the CLI meets there again
+        # has a name it has seen. A symlinked folder inside a location is skipped by the CLI (its entry is not a
+        # directory) as the tree shows it, and a symlinked SKILL.md with nothing below it shadows nothing.
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS}
+        symlinks = {".claude/skills": "../skills", "skills/alias": "find-bugs", "skills/tools/SKILL.md": "../../x.md"}
+        done, out = self.review(self.answers(files, symlinks=symlinks), [self.survivor()])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(self.reviewed(out)["readme_path"], "skills/find-bugs/SKILL.md")
+
+    def test_the_skills_yaml_flag_names_the_install(self):
+        # Test gap (round-4 review): --skills-yaml was never passed; here the environment variable names an absent
+        # directory and HOME holds none, so only the flag finds the install.
+        done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor()],
+                                flag=SKILLS_YAML)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(self.reviewed(out)["observed"]["skill_md_reader"]["package"], "yaml@2.9.0")
 
     # The folder hash (GPT-6 review of #541: a SKILL.md hash did not freeze agents/openai.yaml).
 
@@ -2086,6 +2254,349 @@ class SkillsDocsTests(unittest.TestCase):
                 for phrase in ("skill_md.mjs", "skills-yaml.pin.json", "2.9.1", "a line break other than LF",
                                "U+2028", "symlink", "evidence/artifacts/skills-md-reader-20260930/README.md"):
                     self.assertIn(phrase, text)
+
+    def test_the_docs_say_the_cli_walks_a_symlinked_location(self):
+        # Opus round-4 review of #541, D1: both documents said a symlinked folder is not followed while the clone would
+        # walk it; the CLI walks a symlinked search location (readdir follows it) and skips a symlinked skill folder.
+        for path in self.DOCS:
+            with self.subTest(path.name):
+                text = re.sub(r"\s+", " ", path.read_text(encoding="utf-8"))
+                self.assertNotIn("A symlinked folder is not followed", text)
+                for phrase in ("walks a search location through a symlink", "skips a symlinked skill folder",
+                               ".gitattributes"):
+                    self.assertIn(phrase, text)
+
+
+# --------------------------------------------------------------------------- CI provisioning of the yaml pin
+#
+# The tests that run skill_md.mjs skip without a verified yaml install, so a CI job that never installed the pin would
+# pass while exercising only the fail-closed gate. validate.yml installs the pin before the suite, as it does the
+# tree-sitter-bash pin, and these tests hold it there with the pattern of tests/test_shell_parser_ci.py: a runtime
+# tripwire that fails an Actions job without the verified install (outside the recorded gaps), structure checks on the
+# provisioning step, a ratchet over the jobs that run the whole suite, and mutation controls for each.
+
+YAML_PIN_REL = "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json"
+YAML_WORKFLOW, YAML_JOB = "validate.yml", "validate"
+YAML_KEY = f"{YAML_WORKFLOW}:{YAML_JOB}"
+# Whole-suite jobs that do not install the yaml pin yet: adoption-bootstrap.yml validate-macos and catalog-freshness.yml
+# freshness, the jobs tests/test_shell_parser_ci.py records for the tree-sitter pin. Unit A1 was widened to validate.yml
+# only, so their reader tests skip there, and the tripwire skips there and says so. To close a gap, add the provisioning
+# step to that job and delete its entry here; until then the ratchet reports the entry as stale.
+YAML_KNOWN_UNPROVISIONED = {"adoption-bootstrap.yml:validate-macos", "catalog-freshness.yml:freshness"}
+YAML_TRIPWIRE = "tests.test_landscape_sweep_skills.SkillsYamlInstalledInCI"
+
+
+def yaml_stand_down(env):
+    """None when skill_md.mjs must report the pinned install in a process with `env`; otherwise why the tripwire does
+    not apply: outside GitHub Actions, or in a job recorded in YAML_KNOWN_UNPROVISIONED. Anything else fails closed."""
+    if env.get("GITHUB_ACTIONS") != "true":
+        return "not in GitHub Actions (GITHUB_ACTIONS is not 'true')"
+    if shell_ci.job_key(env) in YAML_KNOWN_UNPROVISIONED:
+        return "a recorded gap: this job runs the whole suite without installing the yaml pin (YAML_KNOWN_UNPROVISIONED)"
+    return None
+
+
+def reader_status(env):
+    """What skill_md.mjs reports about its yaml install in a node process with `env` (no --install: the environment
+    variable, then the default under HOME): its reader record, which carries no path, or node_missing / probe_failed."""
+    node = shutil.which("node", path=env.get("PATH"))
+    if node is None:
+        return {"ok": False, "reason": "node_missing"}
+    try:
+        done = subprocess.run([node, str(SKILL_MD_MJS)], input='{"items": []}', env=env, capture_output=True,
+                              text=True, timeout=120, check=False)
+        record = json.loads(done.stdout)["reader"]
+    except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, TypeError):
+        return {"ok": False, "reason": "probe_failed"}
+    return record if isinstance(record, dict) else {"ok": False, "reason": "probe_failed"}
+
+
+def reader_verified(status):
+    """True when the reader reports the pinned package, its integrity and this pin file's sha256."""
+    pin = json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))
+    expected = {"package": f"{pin['package']['name']}@{pin['package']['version']}",
+                "integrity": pin["package"]["integrity"], "pin_sha256": hashlib.sha256(YAML_PIN_PATH.read_bytes()).hexdigest()}
+    return status.get("ok") is True and all(status.get(key) == value for key, value in expected.items())
+
+
+def reader_describe(status):
+    """A path-free reason for a status that is not the verified record."""
+    if status.get("ok") is True:
+        return "the reader's record differs from the pin"
+    reason = status.get("reason")
+    return f"reason={reason}" if isinstance(reason, str) and reason.isidentifier() else "reason=unrecognized"
+
+
+def yaml_ci_env(home, drop=(), **extra):
+    """The validate job's environment as far as the tripwire reads it, over a clean host: no inherited GITHUB_ or
+    LANDSCAPE_SWEEP_SKILLS_YAML variable, and HOME an empty directory, so that no host install is found by default."""
+    env = {key: value for key, value in os.environ.items() if not key.startswith(("GITHUB_", YAML_ENV))}
+    env.update({"GITHUB_ACTIONS": "true", "GITHUB_JOB": YAML_JOB, "HOME": str(home),
+                "GITHUB_WORKFLOW_REF": f"owner/repo/.github/workflows/{YAML_WORKFLOW}@refs/pull/1/merge"})
+    env.update(extra)
+    for key in drop:
+        env.pop(key, None)
+    return env
+
+
+class SkillsYamlInstalledInCI(unittest.TestCase):
+    """The runtime tripwire. It skips outside GitHub Actions and in the recorded gaps, and fails everywhere else."""
+
+    def test_a_github_actions_job_has_the_verified_yaml_install(self):
+        reason = yaml_stand_down(os.environ)
+        if reason is not None:
+            self.skipTest(reason)
+        status = reader_status(dict(os.environ))
+        if not reader_verified(status):
+            self.fail(f"this GitHub Actions job has no verified yaml install for skill_md.mjs ({reader_describe(status)}): "
+                      "the reader tests would skip; a step that installs skills-yaml.pin.json must run before the suite, "
+                      "as validate.yml's does, or the job must be a recorded gap")
+
+
+class SkillsYamlTripwireControls(unittest.TestCase):
+    """The tripwire run in each environment a job can present, over a clean host: it must fail on each way the install
+    can be missing or wrong, skip only outside Actions and in the recorded gaps, and pass on the verified install."""
+
+    BARE = ("GITHUB_JOB", "GITHUB_WORKFLOW_REF")  # GITHUB_ACTIONS=true and nothing else that names a job
+
+    def run_tripwire(self, home, drop=(), **extra):
+        return subprocess.run([sys.executable, "-m", "unittest", "-v", YAML_TRIPWIRE], cwd=ROOT, capture_output=True,
+                              text=True, timeout=300, check=False, env=yaml_ci_env(home, drop, **extra))
+
+    def assert_failed(self, done, reason):
+        self.assertEqual(done.returncode, 1, f"the tripwire did not fail (exit {done.returncode})")
+        self.assertIn("FAILED (failures=1)", done.stderr)
+        self.assertIn(f"reason={reason}", done.stderr)
+        self.assertNotIn("skipped", done.stderr)
+
+    def assert_skipped(self, done, why):
+        self.assertEqual(done.returncode, 0, f"the tripwire run exited {done.returncode}, not 0")
+        self.assertIn("skipped", done.stderr)
+        self.assertIn(why, done.stderr)
+
+    @unittest.skipUnless(NODE, "node is not installed")
+    def test_no_install_or_a_nonexistent_directory_fails_the_tripwire(self):
+        for label, drop, extra in (("no install anywhere", (), {}), ("a nonexistent directory", (), {"absent": True}),
+                                   ("Actions alone, no install", self.BARE, {})):
+            with self.subTest(label), tempfile.TemporaryDirectory() as home:
+                named = {YAML_ENV: str(Path(home) / "absent")} if extra else {}
+                self.assert_failed(self.run_tripwire(home, drop, **named), "not_installed")
+
+    @unittest.skipUnless(SKILLS_YAML, NO_READER)
+    def test_a_one_byte_change_fails_the_tripwire_and_the_verified_install_passes(self):
+        with tempfile.TemporaryDirectory() as home:
+            copy = Path(home) / "copy"
+            shutil.copytree(SKILLS_YAML, copy, symlinks=True)
+            passed = self.run_tripwire(home, **{YAML_ENV: str(copy)})
+            self.assertEqual(passed.returncode, 0, "the unchanged copy must pass, or the change proves nothing")
+            self.assertIn("OK", passed.stderr)
+            self.assertNotIn("skipped", passed.stderr)
+            composer = copy / "node_modules/yaml/dist/compose/composer.js"
+            data = bytearray(composer.read_bytes())
+            data[len(data) >> 1] ^= 1  # one bit of the middle byte: the same length, so only the hash can tell
+            composer.write_bytes(bytes(data))
+            self.assert_failed(self.run_tripwire(home, **{YAML_ENV: str(copy)}), "hash_mismatch")
+
+    @unittest.skipUnless(NODE, "node is not installed")
+    def test_an_unlisted_job_fails_and_a_recorded_gap_skips(self):
+        unlisted = {"another job of the validate workflow": {"GITHUB_JOB": "another-job"},
+                    "the validate job's name in another workflow": {
+                        "GITHUB_WORKFLOW_REF": "owner/repo/.github/workflows/other.yml@refs/heads/main"},
+                    "a gap's job name in the validate workflow": {"GITHUB_JOB": "validate-macos"}}
+        for label, extra in unlisted.items():
+            with self.subTest(label), tempfile.TemporaryDirectory() as home:
+                self.assert_failed(self.run_tripwire(home, **extra), "not_installed")
+        for key in sorted(YAML_KNOWN_UNPROVISIONED):
+            workflow, _, job = key.partition(":")
+            extra = {"GITHUB_JOB": job, "GITHUB_WORKFLOW_REF": f"owner/repo/.github/workflows/{workflow}@refs/heads/main"}
+            with self.subTest(key), tempfile.TemporaryDirectory() as home:
+                self.assert_skipped(self.run_tripwire(home, **extra), "a recorded gap")
+
+    def test_runs_outside_actions_skip_with_a_message(self):
+        with tempfile.TemporaryDirectory() as home:
+            self.assert_skipped(self.run_tripwire(home, ("GITHUB_ACTIONS",)), "not in GitHub Actions")
+
+
+def yaml_provisioning_indexes(steps):
+    return [index for index, step in enumerate(steps) if YAML_PIN_REL in shell_ci.uncommented(step)]
+
+
+def yaml_provisioning_problems(text, job_id=YAML_JOB):
+    """(category, message) for each way the yaml provisioning of job `job_id` in the workflow `text` departs from what
+    these tests require (the categories of tests/test_shell_parser_ci.py). With no single provisioning step to inspect,
+    every category is reported."""
+    job = shell_ci.jobs(text).get(job_id)
+    steps = shell_ci.step_blocks(job) if job is not None else []
+    found = yaml_provisioning_indexes(steps)
+    if len(found) != 1:
+        reason = "no such job" if job is None else f"expected one step that reads the pin file, found {len(found)}"
+        return [(category, reason) for category in shell_ci.CATEGORIES]
+    step = shell_ci.uncommented(steps[found[0]])
+    problems = []
+    suite = [index for index, other in enumerate(steps) if shell_ci.runs_suite(other)]
+    if not suite:
+        problems.append(("order", "no step runs the whole suite"))
+    elif found[0] >= suite[0]:
+        problems.append(("order", "the provisioning step does not come before the step that runs the whole suite"))
+    for key in ("install", "command", "default_directory"):
+        if not shell_ci.mentions(step, key):
+            problems.append(("derived", f"the step does not read {key} from the pin"))
+    package = json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))["package"]
+    retyped = [f"{package['name']}@{package['version']}", package["version"], "--ignore-scripts", "--save-exact"]
+    problems += [("derived", "the step retypes part of the pinned command") for token in retyped if token in step][:1]
+    if YAML_ENV not in step or "GITHUB_ENV" not in step:
+        problems.append(("export", f"the step does not write {YAML_ENV} to the GITHUB_ENV file"))
+    if "continue-on-error" in step:
+        problems.append(("enforced", "the step continues on error"))
+    if any(line.startswith(("        if:", "      - if:")) for line in step.splitlines()):
+        problems.append(("enforced", "the step has a condition, so some events would skip the install"))
+    if "${{" in step:
+        problems.append(("enforced", "the step expands an expression inside its script"))
+    return problems
+
+
+def yaml_ratchet_problems(texts, gaps=YAML_KNOWN_UNPROVISIONED):
+    """'unlisted': a whole-suite job lacks the yaml provisioning step and is not a recorded gap; 'stale': a recorded gap
+    provisions, no longer runs the suite or is gone; 'required': validate.yml's job does not provision, or is a gap."""
+    found = shell_ci.suite_jobs(texts)
+    installing = {key for key, job_text in found.items() if yaml_provisioning_indexes(shell_ci.step_blocks(job_text))}
+    without = set(found) - installing
+    problems = [("unlisted", f"{key} runs the whole suite without installing the yaml pin and is not a recorded gap")
+                for key in sorted(without - gaps)]
+    problems += [("stale", f"{key} is a recorded gap but does not run the whole suite without the yaml pin")
+                 for key in sorted(gaps - without)]
+    if YAML_KEY not in installing or YAML_KEY in gaps:
+        problems.append(("required", f"{YAML_KEY} must run the whole suite with the provisioning step and cannot be a gap"))
+    return problems
+
+
+def yaml_provisioning_span(lines):
+    index = next((i for i, line in enumerate(lines) if YAML_PIN_REL in line and not line.lstrip().startswith("#")), None)
+    if index is None:
+        raise AssertionError("no step of the workflow reads the yaml pin file: there is no provisioning step to inspect")
+    return shell_ci.step_span(lines, index)
+
+
+class SkillsYamlProvisioningTests(unittest.TestCase):
+    """validate.yml installs the yaml pin before the suite, derived from the pin, exported, and not skippable; every
+    other whole-suite job does so too or is a recorded gap."""
+
+    texts = shell_ci.workflow_texts()
+
+    def test_the_validate_job_provisions_the_yaml_pin_before_the_suite(self):
+        self.assertEqual(yaml_provisioning_problems(self.texts[YAML_WORKFLOW]), [])
+
+    def test_every_whole_suite_job_provisions_the_yaml_pin_or_is_a_recorded_gap(self):
+        self.assertEqual(yaml_ratchet_problems(self.texts), [])
+
+
+class SkillsYamlProvisioningControls(unittest.TestCase):
+    """Each mutant is the real workflow with one defect and must be reported in its category; the ratchet reports a new
+    whole-suite job and a recorded gap that now provisions."""
+
+    texts = shell_ci.workflow_texts()
+    text = texts[YAML_WORKFLOW]
+
+    def mutants(self):
+        lines = self.text.split("\n")
+        start, end = yaml_provisioning_span(lines)
+        step = lines[start:end]
+        run_index = next(i for i, line in enumerate(step) if line.startswith("        run: |"))
+        suite_end = shell_ci.step_span(lines, next(i for i, line in enumerate(lines)
+                                                   if line.strip() == "run: python3 -m unittest"))[1]
+        return {
+            "removed step": ("missing", "\n".join(lines[:start] + lines[end:])),
+            "step after the suite": ("order", "\n".join(lines[:start] + lines[end:suite_end] + step + lines[suite_end:])),
+            "command retyped": ("derived", "\n".join(lines[:start + run_index + 1] + ['          echo "yaml@2.9.0"']
+                                                    + lines[start + run_index + 1:])),
+            "export dropped": ("export", "\n".join(lines[:start] + [line.replace(YAML_ENV, "SKILLS_YAML_DIR") for line in step]
+                                                  + lines[end:])),
+            "continues on error": ("enforced", "\n".join(lines[:start + 1] + ["        continue-on-error: true"] + lines[start + 1:])),
+            "conditional": ("enforced", "\n".join(lines[:start + 1] + ["        if: github.event_name == 'push'"] + lines[start + 1:])),
+            "expression in the script": ("enforced", "\n".join(lines[:start + run_index + 1] + ["          echo ${{ github.sha }}"]
+                                                              + lines[start + run_index + 1:])),
+        }
+
+    def test_each_mutant_is_reported_in_its_category(self):
+        self.assertEqual(yaml_provisioning_problems(self.text), [])
+        for label, (category, mutant) in self.mutants().items():
+            with self.subTest(label):
+                self.assertNotEqual(mutant, self.text, "the mutation must apply")
+                self.assertIn(category, {found for found, _ in yaml_provisioning_problems(mutant)})
+
+    def test_the_ratchet_reports_a_new_whole_suite_job_and_a_gap_that_now_provisions(self):
+        gap_files = {key.partition(":")[0] for key in YAML_KNOWN_UNPROVISIONED}
+        name = next(file for file in sorted(self.texts) if file != YAML_WORKFLOW and file not in gap_files)
+        added = self.texts[name].rstrip("\n") + "\n\n  extra-suite:\n    runs-on: ubuntu-24.04\n    steps:\n" + shell_ci.SUITE_STEP
+        self.assertEqual([category for category, _ in yaml_ratchet_problems({**self.texts, name: added})], ["unlisted"])
+        lines = self.text.split("\n")
+        start, end = yaml_provisioning_span(lines)
+        for key in sorted(YAML_KNOWN_UNPROVISIONED):
+            workflow, _, job = key.partition(":")
+            with self.subTest(key):
+                mutant = {**self.texts, workflow: shell_ci.with_step(self.texts[workflow], job, lines[start:end])}
+                self.assertEqual([category for category, _ in yaml_ratchet_problems(mutant)], ["stale"])
+                self.assertEqual(yaml_ratchet_problems(mutant, YAML_KNOWN_UNPROVISIONED - {key}), [])
+                self.assertEqual(yaml_provisioning_problems(mutant[workflow], job), [])
+        bare = {**self.texts, YAML_WORKFLOW: "\n".join(lines[:start] + lines[end:])}
+        self.assertIn("required", [category for category, _ in yaml_ratchet_problems(bare)])
+
+
+@unittest.skipUnless(shutil.which("bash"), "the step runs under bash, as on the runner")
+class SkillsYamlProvisioningStepRuns(unittest.TestCase):
+    """Runs the step's script as the runner does (bash -e over the script file) in a scratch workspace, with a stand-in
+    npm that records its arguments, so nothing is installed and nothing leaves the machine."""
+
+    PRIOR = "CHILD_USAGE_SHELL_PARSER=stub\n"  # the steps before this one append to the same file
+
+    def run_step(self, pin=None, npm_exit=0):
+        lines = (ROOT / ".github/workflows" / YAML_WORKFLOW).read_text(encoding="utf-8").split("\n")
+        start, end = yaml_provisioning_span(lines)
+        script = shell_ci.run_script("\n".join(lines[start:end]))
+        pin = pin if pin is not None else json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))
+        scratch = temp_dir(self)
+        workspace, runner_temp, stub = scratch / "workspace", scratch / "runner-temp", scratch / "bin"
+        (workspace / YAML_PIN_REL).parent.mkdir(parents=True)
+        (workspace / YAML_PIN_REL).write_text(json.dumps(pin), encoding="utf-8")
+        runner_temp.mkdir()
+        stub.mkdir()
+        (stub / "npm").write_text('#!/bin/sh\nprintf \'%s\\n\' "$@" > "$NPM_ARGV_FILE"\nexit "$NPM_EXIT"\n', encoding="utf-8")
+        (stub / "npm").chmod(0o755)
+        (scratch / "github-env").write_text(self.PRIOR, encoding="utf-8")
+        (scratch / "step.sh").write_text(script, encoding="utf-8")
+        env = {"PATH": f"{stub}{os.pathsep}{os.environ['PATH']}", "HOME": str(scratch), "RUNNER_TEMP": str(runner_temp),
+               "GITHUB_ENV": str(scratch / "github-env"), "NPM_ARGV_FILE": str(scratch / "argv"), "NPM_EXIT": str(npm_exit)}
+        done = subprocess.run(["bash", "--noprofile", "--norc", "-e", str(scratch / "step.sh")], cwd=workspace, env=env,
+                              capture_output=True, text=True, timeout=60, check=False)
+        argv = (scratch / "argv").read_text(encoding="utf-8").splitlines() if (scratch / "argv").exists() else None
+        directory = os.path.join(str(runner_temp), os.path.basename(pin["install"]["default_directory"]))
+        return done.returncode, argv, (scratch / "github-env").read_text(encoding="utf-8"), directory
+
+    def test_it_runs_the_pin_command_into_runner_temp_and_exports_the_directory(self):
+        words = shlex.split(json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))["install"]["command"])
+        code, argv, exported, directory = self.run_step()
+        self.assertEqual(code, 0)
+        self.assertEqual(argv, [directory if word == "<directory>" else word for word in words[1:]])
+        self.assertTrue(os.path.isdir(directory), "the step creates the directory under RUNNER_TEMP before npm runs")
+        self.assertEqual(exported, self.PRIOR + f"{YAML_ENV}={directory}\n")
+
+    def test_it_refuses_a_bad_command_or_directory_and_a_failing_npm_exports_nothing(self):
+        base = json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))
+        bad = {"no placeholder": ("command", "npm install --ignore-scripts yaml@2.9.0"),
+               "not an npm install": ("command", "true --prefix <directory>"),
+               "a newline in the directory": ("default_directory", "tools/x\nNODE_OPTIONS=--require=evil"),
+               "a leading dot": ("default_directory", "tools/.hidden")}
+        for label, (key, value) in bad.items():
+            with self.subTest(label):
+                pin = copy.deepcopy(base)
+                pin["install"][key] = value
+                code, argv, exported, _ = self.run_step(pin)
+                self.assertNotEqual(code, 0)
+                self.assertIsNone(argv, "npm must not run")
+                self.assertEqual(exported, self.PRIOR)
+        code, _, exported, _ = self.run_step(npm_exit=1)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(exported, self.PRIOR)
 
 
 if __name__ == "__main__":

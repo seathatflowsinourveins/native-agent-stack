@@ -43,8 +43,11 @@ frontmatter (the yaml package and the CLI's pattern break lines only there, liby
 also at a lone CR, U+0085, U+2028 and U+2029), none runs without node or a verified yaml install, and each SKILL.md
 read must be the regular-file blob the tree lists (tree_file: a symlink, content gh does not return, or bytes that are
 not that blob give none). When such a copy's verdict decides which copy the CLI takes, no review is written and the
-survivor is stopped (pin_lookup ok). Only two valid same-named folders in the first location that holds a valid one
-are ambiguous. A folder's name stands for the skill's name (the Agent Skills specification requires them to match,
+survivor is stopped (pin_lookup ok). Symlinks change what the CLI walks (location_doubt): it reads a search location
+through a symlink at or above it, which the git tree lists as one blob, and a folder whose SKILL.md is a symlink is a
+skill folder only when the link's target is a file; plugin manifests behind a symlink, or without verified bytes,
+leave the plugin folders unknown. Such a location, reached before the pick is decided, stops the survivor too. Only
+two valid same-named folders in the first location that holds a valid one are ambiguous. A folder's name stands for the skill's name (the Agent Skills specification requires them to match,
 https://agentskills.io/specification), and a copy whose name, as the CLI matches --skill against it
 (getSkillDisplayName: the sanitized name, or the folder's name when that is empty), names another skill is not a copy
 (filterSkills). The review records the SKILL.md's path, sha256 and size, the copies skipped on the way, the reader
@@ -372,6 +375,11 @@ def claude_true(value) -> bool:
 class SkillMdUnverified(GhError):
     """No verdict stands behind this SKILL.md copy (skill_md_check), so no review rests on that copy's place in the
     CLI's discovery order."""
+
+
+class LocationUnverified(SkillMdUnverified):
+    """What the CLI finds in a search location cannot be read from the git tree (location_doubt, plugin_manifests),
+    and the location comes before the pick is decided."""
 
 
 def skill_md_check(raw: bytes, path: str = "SKILL.md") -> dict:
@@ -807,19 +815,56 @@ def cli_plugin_dirs(marketplace, plugin) -> list[str]:
 
 
 def cli_locations(skill_dirs, plugin_dirs=()) -> list:
-    """[(where, folders)] of the locations discoverSkills searches without --full-depth, in its order: the root's child
-    folders, each of CLI_CONTAINERS three levels deep, then each plugin folder one level deep, each with the folders
-    it finds a SKILL.md in that no earlier location found (parseSkillAt skips a SKILL.md it parsed before)."""
+    """[(container, depth, where, folders)] of the locations discoverSkills searches without --full-depth, in its order:
+    the root's child folders, each of CLI_CONTAINERS three levels deep, then each plugin folder one level deep, each
+    with the folders it finds a SKILL.md in that no earlier location found (parseSkillAt skips a SKILL.md it parsed
+    before)."""
     parsed, locations = set(), []
     for container, depth in [("", 1), *((container, CLI_CONTAINER_DEPTH) for container in CLI_CONTAINERS),
                              *((folder, 1) for folder in plugin_dirs)]:
         found = [folder for folder in cli_walk(container, depth, skill_dirs) if folder not in parsed]
         parsed.update(found)
-        locations.append((f"{container}/" if container else "the repository root", found))
+        locations.append((container, depth, f"{container}/" if container else "the repository root", found))
     return locations
 
 
-def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=None) -> tuple[str | None, str]:
+def symlink_at_or_above(path: str, symlinks) -> str | None:
+    """The symlink (a git tree path of mode 120000) that `path` is or lies below, or None: `path` itself or one of the
+    folders above it."""
+    parts = path.split("/") if path else []
+    return next(("/".join(parts[:depth]) for depth in range(1, len(parts) + 1) if "/".join(parts[:depth]) in symlinks),
+                None)
+
+
+def location_doubt(container: str, depth: int, skill_dirs, symlinks, linked_skill_md) -> str | None:
+    """Why what the CLI finds in this search location cannot be read from the git tree, or None. The CLI walks a
+    location with readdir, which follows a symlink at or above it (dist/cli.mjs lines 1339-1370, src/skills.ts lines
+    284-298), so a symlinked location holds whatever its target holds, while the tree lists the symlink as one blob and
+    nothing below it. Below the location a symlinked folder is skipped (its directory entry is not a directory), as the
+    tree shows too, but a folder whose SKILL.md is a symlink is a skill folder only when the link's target is a file
+    (hasSkillMd stats it, following the link): whether the walk stops there or descends to the skill folders below it
+    depends on a target the tree does not resolve. `linked_skill_md` are the folders whose SKILL.md is a symlink."""
+    if container:
+        link = symlink_at_or_above(container, symlinks)
+        if link is not None:
+            return (f"the search location {container}/ is {'a symlink' if link == container else f'below the symlink {link}'}"
+                    ", which the CLI walks through (readdir follows it) and the git tree does not show")
+    prefix = f"{container}/" if container else ""
+    for folder in cli_walk(container, depth, skill_dirs):
+        if folder not in linked_skill_md or folder.rsplit("/", 1)[-1] in CLI_SKIP_DIRS:
+            continue
+        level = len(folder[len(prefix):].split("/"))
+        for other in skill_dirs:
+            below = other[len(folder) + 1:].split("/") if other.startswith(f"{folder}/") else None
+            if below and level + len(below) <= depth and not CLI_SKIP_DIRS.intersection(below[:-1]):
+                return (f"{folder}/SKILL.md is a symlink with the skill folder {other} below it in {prefix or 'the root'}: "
+                        "whether the CLI walks below it depends on the link's target, which the git tree does not "
+                        "resolve")
+    return None
+
+
+def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=None, doubt=None,
+                  plugin_doubt=None) -> tuple[str | None, str]:
     """(folder, where) of the skill <name> as discoverSkills finds it without --full-depth, or (None, why not). The
     root SKILL.md is decided before this (a valid one is the repository's only skill). The CLI validates a SKILL.md
     before it takes its name (parseSkillMd returns null for one without a name or description, and tryAddSkillAt then
@@ -832,10 +877,20 @@ def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=N
     first location that holds a copy decides; two copies there are ambiguous (the CLI keeps whichever its directory
     listing returns first). Only when no location holds a valid skill of any name (skills.length === 0) does the CLI
     search every folder up to five levels deep, where a copy shadows the copies below it and two unnested copies are
-    ambiguous. A folder anywhere else (docs/<lang>/skills/<name>, examples/) needs --full-depth and is never taken."""
+    ambiguous. A folder anywhere else (docs/<lang>/skills/<name>, examples/) needs --full-depth and is never taken.
+    doubt(container, depth) says why what the CLI finds in a location cannot be read from the git tree (location_doubt:
+    a symlink at or above it, or a symlinked SKILL.md with skill folders below it), and plugin_doubt why the plugin
+    folders are unknown (the manifests lie behind a symlink or their bytes are not the listed blobs): reaching such a
+    location before the pick is decided raises SkillMdUnverified, since the CLI may find a copy of <name> there first, or
+    a valid skill that keeps it from the recursive search. A location searched after the pick is decided cannot change
+    it: the CLI keeps the first skill of a name (seenNames)."""
     inspect = inspect or (lambda folder: (None, folder.rsplit("/", 1)[-1]))
     skipped = [] if skipped is None else skipped
     named_skips, doubts = [], []
+
+    def unknown(why):
+        return LocationUnverified(f"{why}; no earlier location the CLI searches holds a valid copy of {name}, so the "
+                                  "CLI may take one from there, or skip its recursive search because of what is there")
 
     def copies(folders):
         good = []
@@ -851,13 +906,22 @@ def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=N
         return good
 
     locations = cli_locations(skill_dirs, plugin_dirs)
-    for where, found in locations:
+    plugin_start = 1 + len(CLI_CONTAINERS)  # the root, then the containers, then the plugin folders
+    for index, (container, depth, where, found) in enumerate(locations):
+        if index == plugin_start and plugin_doubt:
+            raise unknown(plugin_doubt)
+        why = doubt(container, depth) if doubt else None
+        if why:
+            raise unknown(why)
         matches = copies([folder for folder in found if folder.rsplit("/", 1)[-1] == name])
         if len(matches) == 1:
             return matches[0], f"{where}, the first location the CLI searches that holds a valid folder named {name}"
         if matches:
             return None, (f"{len(matches)} folders named {name} in {where}, the first location the CLI searches that "
                           f"holds a valid one: {matches} (the CLI keeps whichever its directory listing returns first)")
+    if plugin_doubt and len(locations) <= plugin_start:
+        raise unknown(plugin_doubt)
+
     def takes(folder):
         try:
             return inspect(folder)[0] is None
@@ -867,7 +931,7 @@ def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=N
 
     # Any valid SKILL.md in the locations stops the fallback, inspected in the CLI's order up to the first valid one; a
     # SKILL.md the reader cannot tell about decides it only when none of the others is valid.
-    if any(takes(folder) for _, found in locations for folder in found):
+    if any(takes(folder) for *_, found in locations for folder in found):
         if named_skips:
             return None, (f"every copy of {name} in the locations the CLI searches without --full-depth is invalid, "
                           "and a valid skill there keeps the CLI from searching further")
@@ -923,6 +987,9 @@ def tree_file(full: str, path: str, commit: str, entry) -> bytes:
         raw = gh_file(full, path, commit)
     except GhError as error:  # the CLI reads the blob the tree lists from its clone; this API read says nothing
         raise SkillMdUnverified(f"{path} could not be read here ({error})") from None
+    # Residual: these are the blob's bytes. The CLI reads its clone's checkout, where .gitattributes can change them
+    # (filter=lfs leaves a pointer or fetches the object, eol and text normalization, working-tree-encoding), and the
+    # review does not read .gitattributes.
     if git_blob_id(raw) != entry.get("sha"):
         raise SkillMdUnverified(f"the {len(raw)} bytes read for {path} are not the git blob {entry.get('sha')} the tree "
                                 "lists")
@@ -930,16 +997,34 @@ def tree_file(full: str, path: str, commit: str, entry) -> bytes:
 
 
 def tree_json_file(full: str, path: str, commit: str, entry):
-    """A plugin manifest the CLI parses (tree_file's bytes), or None when it is not JSON: the CLI skips it. Unverified
-    bytes stop the review: the manifests decide where the CLI searches."""
-    try:
-        raw = tree_file(full, path, commit, entry)
-    except SkillMdUnverified as why:
-        raise GhError(str(why)) from None
+    """A plugin manifest the CLI parses (tree_file's bytes), or None when it is not JSON: the CLI skips it. Raises
+    SkillMdUnverified for bytes tree_file does not verify; the caller then treats the plugin folders as unknown."""
+    raw = tree_file(full, path, commit, entry)
     try:
         return json.loads(raw)
     except ValueError:
         return None
+
+
+def plugin_manifests(full: str, commit: str, entries: dict, symlinks) -> tuple[list, str | None]:
+    """([marketplace, plugin] as the CLI parses them from .claude-plugin (None when absent or not JSON), why the plugin
+    folders they declare are unknown or None). getPluginSkillPaths reads both files with readFile, which follows a
+    symlink, so a symlinked .claude-plugin or manifest, or manifest bytes that are not the listed blob, leave the
+    plugin folders unknown."""
+    if symlink_at_or_above(".claude-plugin", symlinks) is not None:
+        return [None, None], "the plugin manifest folder .claude-plugin is a symlink, which the CLI reads through"
+    parsed, doubt = [], None
+    for path in PLUGIN_MANIFESTS:
+        entry = entries.get(path)
+        if not entry or entry.get("type") != "blob":
+            parsed.append(None)
+            continue
+        try:
+            parsed.append(tree_json_file(full, path, commit, entry))
+        except SkillMdUnverified as why:
+            parsed.append(None)
+            doubt = doubt or f"the plugin manifest {path} has no verified bytes ({why})"
+    return parsed, doubt
 
 
 def git_tree_id(entries, folder: str) -> str:
@@ -1048,6 +1133,8 @@ def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str
                and isinstance(entry.get("path"), str)}
     blobs = {path for path, entry in entries.items() if entry.get("type") == "blob"}
     skill_dirs = {path[:-len("/SKILL.md")] for path in blobs if path.endswith("/SKILL.md")}
+    symlinks = {path for path, entry in entries.items() if entry.get("mode") == "120000"}
+    linked_skill_md = {path[:-len("/SKILL.md")] for path in symlinks if path.endswith("/SKILL.md")}
     files = {}  # SKILL.md path -> (bytes, skill_md_check's result), or SkillMdUnverified
 
     def read(path):
@@ -1090,12 +1177,17 @@ def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str
             else:
                 skipped.append(("", root["reason"]))  # the CLI skips it and searches on
         if skill_path is None:
-            plugin_dirs = cli_plugin_dirs(*(tree_json_file(full, path, pin, entries[path]) if path in blobs else None
-                                            for path in PLUGIN_MANIFESTS))
-            folder, found_by = cli_skill_dir(skill_dirs, name, plugin_dirs, inspect, skipped)
+            manifests, plugin_doubt = plugin_manifests(full, pin, entries, symlinks)
+            folder, found_by = cli_skill_dir(
+                skill_dirs, name, cli_plugin_dirs(*manifests), inspect, skipped,
+                doubt=lambda container, depth: location_doubt(container, depth, skill_dirs, symlinks, linked_skill_md),
+                plugin_doubt=plugin_doubt)
             if folder is None:
                 raise GhError(f"{full}@{name} at {pin}: {found_by}{skipped_detail()}")
             skill_path = f"{folder}/SKILL.md"
+    except LocationUnverified as why:
+        raise GhError(f"{full}@{name} at {pin}: {why}; which copy the skills CLI installs is unverified"
+                      f"{skipped_detail()}") from None
     except SkillMdUnverified as why:
         raise GhError(f"{full}@{name} at {pin}: {why}; whether the skills CLI takes that copy, and so which copy it "
                       f"installs, is unverified{skipped_detail()}") from None
