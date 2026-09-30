@@ -2270,9 +2270,10 @@ class ModeTests(unittest.TestCase):
                 elif case == "excluded-boundary-name":
                     (root / "sessions").mkdir()
                     (root / "sessions" / (form + ".key")).write_bytes(b"")
-                else:
-                    (root / (value[:20] + "-partial")).write_bytes(b"")
-                    os.symlink("/nonexistent/" + value[:20], root / "partial-link")
+                else:  # a partial value (its "/" replaced so it stays one name) is no pattern
+                    partial = value.replace("/", "_")[:20]
+                    (root / (partial + "-partial")).write_bytes(b"")
+                    os.symlink("/nonexistent/" + partial, root / "partial-link")
                 expected = 0 if case == "negative" else 5
                 self.assertEqual(host.scan().returncode, expected, "M6-" + case)
                 self.assertEqual(all(e["mode"] == 6 for e in hits(host)) and len(hits(host)) >= (expected == 5),
@@ -2583,6 +2584,22 @@ class CommandTests(unittest.TestCase):
         (host.home / ".claude/sample").write_text("old")
         self.assertEqual(host.scan().returncode, 0, "C9-paths-from-plan")
         self.assertFalse((host.root / "wrong-runtime").exists(), "C9-no-environment-derived-state")
+
+    def test_documented_and_workflow_commands_pass_the_guard_and_name_no_variable(self):
+        """Every command in the Canary proof section's command blocks and every command the workflow's stages run is
+        an allowed agent command and names no secret variable; the user-run pair waits for K4 (C2)."""
+        sys.path.insert(0, str(ROOT / "scripts/hooks"))
+        import secret_path_guard as guard
+        section = (ROOT / "docs/secret-storage.md").read_text().split("\n## Canary proof\n", 1)[1].split("\n## ", 1)[0]
+        commands = [line for block in re.findall(r"```sh\n(.*?)```", section, re.S) for line in block.splitlines()
+                    if line.strip()]
+        workflow = (ROOT / "tools/credentials/canary_workflow.js").read_text()
+        commands += re.findall(r"python3 -I tools/credentials/credential_run\.py canary-e2e --check", workflow)
+        self.assertGreaterEqual(len(commands), 12, "CMD-docs-commands-found")
+        for command in commands:
+            self.assertNotIn(cp.VARIABLE, command, "CMD-docs-id-only")
+            if "--user-run" not in command:
+                self.assertIsNone(guard.check(command), "CMD-docs-allowed " + command)
 
 
 if __name__ == "__main__":
