@@ -1,10 +1,13 @@
 # Decision: task-to-model routing across Claude Code and Codex, and where each route is enforced (2026-09-30)
 
 **Decided by:** unit A4 of the 2026-09-30 SOTA-defaults wave (coordinator session `native-agent-stack-c5`), on branch
-`claude/sota-defaults-a4-20260930` based on `origin/main@e45328d3`. The record gathers the routing rules of the earlier
-records and the workflows README into one table. It changes no route: no agent definition, settings file, template,
-workflow or lane script is edited. It also accepts the `token-efficiency` adoption profile as the selection that carries
-these routes and adds three tools to it (the last paragraphs of the Decision).
+`claude/sota-defaults-a4-20260930`, written at `origin/main@e45328d3`: the `path:line` citations below are that revision's
+lines, and the branch is now based on `origin/main@11227bfd`, where `examples/claude-native/workflows/README.md` has grown
+by 249 lines. The record gathers the routing rules of the earlier records and the workflows README into one table. It
+changes no route: no agent definition, settings file, template, workflow or lane script is edited. It also accepts the
+`token-efficiency` adoption profile as the selection that carries these routes, with the profile's 14 pinned components
+unchanged. Three code-navigation tools stay outside it until each has a reviewed pin on both platforms (the last
+paragraphs of the Decision).
 
 ## Context
 
@@ -41,11 +44,24 @@ fixture `my_gw/gpt-6.1` in `tests/test_landscape_sweep_harness.py:754`.
   model (`examples/claude-native/workflows/README.md:873`). No measured result favours one.
 - **Status quo, recorded in one table (chosen).** Keep each assignment where it is enforced today, and list them
   together with their enforcement points, so that a change to any one of them has one place to restate.
-- **Leave the three tools out of the profile (the state before this record).** The profile's tests and
-  `docs/token-efficiency-stack.md` classed jCodeMunch, ast-grep and codebase-memory-mcp as optional rows. Not chosen:
-  this unit's brief found the omission a defect, because the carrier names the tools and the code-navigation current
-  choice names all three. #508's rows for jCodeMunch and codebase-memory-mcp favour this alternative for those two
-  (Decision, "Where #508 differs"), so the choice rests on the carrier and the current choice, not on a measured result.
+- **Leave the three tools out of the profile (chosen, and the state before this record).** The profile keeps its 14
+  pinned components. jCodeMunch, ast-grep and codebase-memory-mcp stay optional rows of
+  `docs/token-efficiency-stack.json`, installed on demand from their recipes, and stay named as the carrier's
+  task-appended lanes and by the code-navigation current choice. Both bootstraps fail closed on a selected component
+  with no pin (`adoption/bootstrap-linux.sh:144-172`, `adoption/bootstrap-macos.sh:177-223`) and none of the three has
+  an entry in either pin file, so this is the only membership that both bootstraps can plan and install today. It also
+  agrees with #508's rows for jCodeMunch and codebase-memory-mcp (Decision, "#508's rows").
+- **Add the three tools to the profile now (this unit's first round, reverted).** The carrier names them and the
+  code-navigation current choice names all three, so the first round put them in `component_ids` and `required_commands`
+  and stated the gap (14 of 17 pinned, a bootstrap needing `--allow-unpinned`). Not chosen: a profile is what a
+  bootstrap plans and installs, and `bootstrap-macos.sh --profile token-efficiency --plan` refused it with "No pin in
+  adoption/pins-macos-arm64.json for selected component(s): jcodemunch-mcp codebase-memory-mcp ast-grep" (exit 3). That
+  failed three tests of `tests/test_adoption_bootstrap_macos.py` (`TokenEfficiencyPlanTests`) in #540's `validate-macos`
+  job (run 36728291629, step "Gate on the adoption test modules") and again locally (`python3 -m unittest
+  tests.test_adoption_bootstrap_macos tests.test_adoption_bootstrap tests.test_adoption_launchd`: failures=3).
+  `--allow-unpinned` would make a bootstrap skip the three, not install them, and the plan tests require the full plan
+  with no such flag (`tests/test_adoption_bootstrap_macos.py:1015-1017`). A pin for macOS cannot be reviewed from the
+  Linux host that wrote this record.
 - **List the three under a new manifest key.** That would leave `component_ids` and the pin and landscape checks that
   read it unchanged. Not chosen: it is a schema change with no consumer, since `scripts/adoption_status.py` reads a
   profile's five keys by name.
@@ -113,10 +129,17 @@ pinned-version check and one useful native call per tool in each client, and rec
 (`adoption/README.md:41`), and the profile's end-to-end protocol stays frozen and unexecuted
 (`evidence/artifacts/token-adoption-e2e-20260926/README.md:3`).
 
-**Three tools join the profile.** Each is a `component_ids` entry and a `required_commands` entry, at the version
-`manifests/stack.json` pins at `e45328d3` (this unit does not edit that file). A manifest profile has five keys and
-carries no version or wiring field, so neither is copied into `adoption/manifest.json`; the wiring is stated here, from
-the files that carry it.
+**Three tools stay outside the profile.** The profile keeps its 14 components, each with an entry in
+`adoption/pins-linux-x86_64.json` and in `adoption/pins-macos-arm64.json` (`tests/test_adoption_status.py`,
+`TokenEfficiencyProfileTests`). jCodeMunch, codebase-memory-mcp and ast-grep are neither a `component_ids` entry nor a
+`required_commands` entry, because both bootstraps fail closed on a selected component with no pin, before they install
+anything. `adoption/bootstrap-linux.sh:144-172` and `adoption/bootstrap-macos.sh:177-223` print "No pin in <pin file> for
+selected component(s)" and exit 3 unless the operator names the component in `--allow-unpinned`, and the macOS script
+records that no selected component is exempted from a pin by default, so that "a future undocumented gap still fails
+closed" (`:177-187`). The three are the carrier's task-appended lanes and the code-navigation layer's current choice,
+installed on demand from their recipes at the versions `manifests/stack.json` pins at `e45328d3` (this unit does not edit
+that file), and they stay optional rows of `docs/token-efficiency-stack.json`. A manifest profile has five keys and carries
+no version or wiring field, so the wiring is stated here, from the files that carry it.
 
 - `jcodemunch-mcp` 1.108.319, source pin `8f7b34abe16fb459e0bf1c04747d584216dfe32e` (`manifests/stack.json:1674`);
   command `jcodemunch-mcp`. Claude Code: registered per project, not at user scope (`adoption/bootstrap.md`,
@@ -134,24 +157,24 @@ the files that carry it.
 
 The coverage check's client wiring (`WIRED_MCP_SERVERS` in `scripts/adoption_status.py`) stays the Serena, SocratiCode
 and ai-memory servers, so `client_wiring.complete` does not depend on the three. None has an entry in
-`adoption/pins-linux-x86_64.json` or `adoption/pins-macos-arm64.json`, so the profile's pin coverage is 14 of 17 on both
-platforms, `--pinned-versions` reports the three unchecked, and `adoption/bootstrap-linux.sh` exits 3 for this profile
-until the three are named in `--allow-unpinned` or pinned.
+`adoption/pins-linux-x86_64.json` or `adoption/pins-macos-arm64.json`, so the profile's pin coverage stays all 14 on both
+platforms (`adoption/README.md:41`) and neither bootstrap needs `--allow-unpinned` for it.
 
-**Basis for the three.** The SubagentStart carrier lists jCodeMunch's `route`, `menu` and `order` and codebase-memory's
+**Basis for naming the three.** The SubagentStart carrier lists jCodeMunch's `route`, `menu` and `order` and codebase-memory's
 `search_graph` and `trace_path` among the ids a task appends (`adoption/hooks/claude/token-lanes-block.md:2`). The
 code-navigation layer's current choice names all three, and its only winner is Serena
 (`catalogs/landscape/foundation.json:1236`, `current_choice`). All three ran on real work in the 2026-09-25 Ultracode
 run, a local integration result that claims no benefit and no provider saving
 (`evidence/artifacts/token-e2e-ultracode-20260925/receipt.json`), and each already has a row and card in
-`docs/token-efficiency-stack.json`.
+`docs/token-efficiency-stack.json`. That basis names the three tools as lanes; it does not give them the pin on each
+platform that the bootstraps require of a profile member.
 
-**Where #508 differs.** #508, "Token stack winner: one full stack chosen on recorded evidence, provisional until Gate A
-(decision record)", is open and does not give the same basis for two of the three. Its line 85 names ast-grep as the
-structural-code lane, its line 86 makes jCodeMunch a lane owner only "once wired" and after its route operation is
-repaired, and its line 103 lists codebase-memory-mcp among the "Not members". This record follows the carrier and the
-code-navigation current choice, not #508, for those two. If #508 merges as written, its membership rows and this profile
-disagree, and Gate A decides which is restated.
+**#508's rows.** #508, "Token stack winner: one full stack chosen on recorded evidence, provisional until Gate A
+(decision record)", is open. Leaving the three out of the profile agrees with its rows for two of them: its line 86
+makes jCodeMunch a lane owner only "once wired" and after its route operation is repaired, and its line 103 lists
+codebase-memory-mcp among the "Not members". Its line 85 names ast-grep as the structural-code lane, so #508 would make
+ast-grep a member; this record keeps it out only for want of a pin, and it is the first candidate for the follow-up unit
+named in the overturn conditions. If #508 merges as written, Gate A decides whether ast-grep joins.
 
 ## Overturn condition
 
@@ -163,12 +186,19 @@ disagree, and Gate A decides which is restated.
   `docs/decisions/2026-09-29-sonnet-5-5-dispatch.md:171-180`; for GPT-6 Sol, a rerun of the #359 tiering with an arm
   outside its frozen 0.02 micro-F1 bound (`docs/decisions/2026-09-27-model-currency.md:47`); for any other row, a paired
   result on the same task class that puts the routed model below its alternative.
-- **#508 merges with different membership rows, or a Gate A per-row result removes a tool.** If jCodeMunch,
-  codebase-memory-mcp or ast-grep leaves the selected stack, or the code-navigation current choice stops naming it, take
-  it out of the profile, of `NAVIGATION_CHOICE` in `tests/test_adoption_status.py` and of the Ultracode split in
-  `docs/token-efficiency-stack.md` in the same change.
-- **Pins arrive for the three.** Once both pin files carry entries with SHA-256 digests for them, restate the pin cells
-  of `adoption/README.md`'s profile row, and the bootstrap no longer needs `--allow-unpinned` for them.
+- **#508 merges with different membership rows, or a Gate A per-row result changes a tool's role.** If the
+  code-navigation current choice stops naming jCodeMunch, codebase-memory-mcp or ast-grep, or #508's rows and a Gate A
+  result take one of them out of the selected stack, restate the lane and wiring claims above and their check in
+  `tests/test_task_model_routing.py` in the same change.
+- **A tool of the three gets a reviewed pin on both platforms and a host receipt for each.** A follow-up unit, not this
+  one, then adds it to the profile's `component_ids` and `required_commands`. Its precondition is an entry for the tool in
+  `adoption/pins-linux-x86_64.json` and in `adoption/pins-macos-arm64.json`, with the fields the other entries carry
+  (`sha256`, `url`, `version`, `version_probe`), reviewed against the upstream release, and a host receipt on each
+  platform (`scripts/host_receipts.py record`, the step `adoption/update.md:128` names for a changed pin) for its
+  install and one native call (`adoption/README.md:41`). The same change restates the pin cells and description of
+  `adoption/README.md`'s profile row, the optional-row and Ultracode split of `docs/token-efficiency-stack.md`,
+  `OPTIONAL` in `tests/test_adoption_status.py` and `CARRIER_TOOLS` in `tests/test_task_model_routing.py`, which fails
+  as soon as a pin for one of the three appears.
 - **Unit D4 qualifies `gpt-6.1-sol`** on a Codex 0.159.x or later pin: add the row it earns, with its enforcement point.
 - **An enforcement point changes** (an agent's frontmatter, a settings key, a Codex profile, a lane constant): restate
   its row in the same change.
@@ -195,6 +225,14 @@ Records and files on main (`origin/main@e45328d3`):
   `docs/decisions/2026-09-23-claude-user-profile.md:127`, `docs/acceptance-evidence-policy.md:33`,
   `adoption/README.md:37,41`, `evidence/artifacts/token-adoption-e2e-20260926/README.md:3` and
   `evidence/artifacts/token-e2e-ultracode-20260925/receipt.json`.
+- The pin rule that keeps the three tools out of the profile: `adoption/bootstrap-linux.sh:21,144-172`,
+  `adoption/bootstrap-macos.sh:30,177-223`, `adoption/pins-linux-x86_64.json`, `adoption/pins-macos-arm64.json`,
+  `tests/test_adoption_bootstrap_macos.py:1015-1017`, `adoption/update.md:128` and `scripts/host_receipts.py`. The two
+  bootstrap scripts, both pin files, that test and that page are unchanged between `e45328d3` and `11227bfd`.
+- The check that failed for the first round: GitHub Actions run 36728291629 ("Adoption bootstrap smoke", head
+  `8ca7895415cd17feca6085600a6ac34a50f897a0` of #540), job `validate-macos`, step 19 "Gate on the adoption test
+  modules", three `TokenEfficiencyPlanTests` failures with "No pin in .../adoption/pins-macos-arm64.json for selected
+  component(s): jcodemunch-mcp codebase-memory-mcp ast-grep", reproduced locally at that head.
 
 Open pull requests, not on main, cited at their head commits:
 
