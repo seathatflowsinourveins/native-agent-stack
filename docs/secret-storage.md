@@ -2180,8 +2180,8 @@ host writes, announced to the peers first:
    line is the newest and reads `credential boot receipt: rows=<n> ok=<n> ...
    guard_matches_pin=true result=ok receipt=<name>.json`. `compare` prints
    `baseline: <name> (one receipt; nothing to compare yet)` and exits 0.
-3. If a canary harness from a later change of this design has landed, keep its
-   canary across the restart as that change documents.
+3. Finish and disarm any canary proof before restart; no canary survives a
+restart. Runtime proof records are bound to one boot and cannot qualify another.
 4. Checkpoint the peers (the grand-dashboard checkpoint). The restart is the
    user's: once the trading lane has confirmed a time, the user runs
    `wsl --shutdown` from Windows. No agent restarts its own host.
@@ -2202,10 +2202,210 @@ After the restart:
    ends with `result: regression: <ids>`, naming each required or optional file
    row that was `ok` and is not; exit 2 means no receipt could be read or one
    is malformed, and its one line names the receipt file.
-6. If a canary was kept, consume, verify and clean it up with that harness: it
-   shows a stored key injected by id after a restart with no person involved.
-7. Publish sanitized, value-free output with host paths stripped, in a
+6. Publish sanitized, value-free output with host paths stripped, in a
    follow-up evidence PR: `compare`'s lines, not the receipts.
+
+## Canary proof
+
+`tools/credentials/canary_proof.py` is a Linux-only, synthetic proof tool for
+six consumers: systemd-user-unit, fresh-claude-session, subagent,
+workflow-child, codex-exec and omniroute-lane. It launches no consumers.
+Its test-only inventory row is environment-only (`CANARY_E2E_KEY`, class
+`test_canary`, status `test_only`); the synthetic file exists only between
+arm and disarm. Patterns and controls stay in private runtime storage until
+cleanup. HMAC tag lines intentionally reach the consumer's recording sink.
+No canary is kept across restart; the boot-receipt comparison above qualifies
+restart persistence separately.
+
+The coordinator holds synthetic values and fixed records. A contained worker
+and its dumper are scanner-equivalent children: like ripgrep, they hold sink
+bytes. They alone walk names, sniff headers, read link targets, decode streams,
+read configuration to check the guard pin, and parse Git/SQLite/journal data.
+The coordinator never receives those bytes or raw diagnostics. Its output,
+log, run record and receipts contain fixed enums, keyed opaque ids and counts.
+This process boundary is the real-value guarantee; the scanner-side children's
+memory is a stated residual, not an assertion that no process sees values.
+
+Reuse sources are [ripgrep 14.1.0](https://github.com/BurntSushi/ripgrep/tree/e50df40a1967708b9781486b1c017e48040bceb0),
+`crates/core/flags/defs.rs`, `hiargs.rs`, `main.rs` and the standard printer;
+GNU gzip/bzip2/xz's installed `-d -c` interfaces; Git v2.43.0 cat-file/fsck/
+verify-pack; SQLite URI/WAL/schema interfaces; and the unchanged repository
+`ecosystem-bounded-run`, credential runner, writer and boot-receipt publisher.
+The reviewed alternative ripgrep 15.2.0 is accepted with its separate stats
+grammar. Resolve, hash and invoke absolute executables; a new version requires
+review and the corresponding fixtures. No ripgrep compression switch, quiet
+mode, recursive sink-path argv or raw fallback is used.
+
+The runtime root must be an absolute, owned 0700 `XDG_RUNTIME_DIR`; records
+and patterns are 0600. One nonblocking per-user flock spans each invocation,
+including cleanup. `--session` optionally binds the coordinator session id;
+without it, attribution reports reduced assurance. Register every planned
+Codex home before baseline. A later arm cannot add an unbaselined home.
+
+```sh
+rtk python3 tools/credentials/canary_proof.py prepare --transcripts confirmed --codex-home LANE_HOME --session SESSION_ID
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase baseline
+rtk python3 tools/credentials/canary_proof.py arm --run RUN CONSUMER
+rtk python3 tools/credentials/canary_proof.py disarm --run RUN
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase final
+rtk python3 tools/credentials/canary_proof.py status --run RUN
+rtk python3 tools/credentials/canary_proof.py verdict --run RUN
+rtk python3 tools/credentials/canary_proof.py cleanup --run RUN
+```
+
+Arm prints an id-only probe command followed by the disarm command; use that
+exact probe command in each approved consumer. Systemd adds `--leak-check`
+and records the masked form corpus in the user journal. Other consumer output
+goes to `/dev/null`; the client records the tag in its usual sink. S8 is the
+packaged `canary_lane_consumer.sh`, which selects the registered home, profile
+stack-worker, model cx/gpt-6-astra, effort max and a 900-second bound; it takes
+stdin and sends stdout/stderr to `/dev/null`, with no capture file. The
+placeholder assignment stays inside the wrapper. The workflow has two
+source-scout stages, each sonnet/max, under the native Workflow interface.
+
+Only the user in their terminal may run these optional commands:
+
+```sh
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase final --user-run
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase comparison --user-run
+```
+
+The TTY/unset-CLAUDECODE checks are accident guards. K4 must deny agent Bash
+`--user-run`, `--phase comparison` and `--phase=comparison`. Argparse accepts
+no abbreviations. The build skips denial acceptance only when K4 item 14 is
+absent; installing K4 is mandatory before the operational window.
+
+Every scan request is appended and fsynced before its directory, union,
+controls or workers are prepared. The latest request supersedes earlier
+passes even if setup fails or SIGKILL occurs before the plan. Every valid
+hit is fsynced before acknowledgement and remains sticky across retries,
+rotation, user scans, comparison and cleanup. An optional request becomes
+required once made. A successful fragment never fills a missing obligation.
+Final/user/comparison freshness requires matching attempts, patterns, pins,
+boot, complete ledgers and at least 1,200 boottime seconds since last disarm.
+The one stability retry consumes the original sink deadline.
+
+| Exit | Meaning |
+| --- | --- |
+| 0 | Successful operation, complete zero-hit baseline/scan, or clean classifier result |
+| 1 | Safety/precondition refusal, including unsupported platform |
+| 2 | CLI usage |
+| 3 | Incomplete classifier or scan |
+| 4 | Invalid record |
+| 5 | Sticky canary leak; invalid-record precedence remains exit 4 |
+| 75 | Lock busy; no request admitted |
+
+`status`, `verdict` and `cleanup` return the classifier's 0/3/4/5, or 1 on a
+precondition refusal and 75 on contention. `record_invalid` maps to 4.
+Every other code below maps to 3; a validated sticky hit takes precedence
+over incompleteness and yields 5.
+
+| Code family (closed suffixes are consumer, sink, opaque id or fixed reason) | Exit |
+| --- | --- |
+| boot_changed, tool_changed, pattern_file_mismatch, clock_stepped, guard_not_pinned | 3 |
+| no_baseline, baseline_unfinished, baseline_incomplete, baseline_after_arm, baseline_scope_missing | 3 |
+| baseline_sink_not_scanned, baseline_sink_incomplete, baseline_control_missing | 3 |
+| not_armed, not_disarmed, disarm_unverified, guard_not_pinned_at_arm, recording_missing | 3 |
+| no_final, final_unfinished, final_incomplete, final_stale, final_too_early | 3 |
+| sink_not_scanned, check_not_scanned, sink_incomplete, inventory_unreconciled, protocol_error | 3 |
+| control_missing, negative_control_matched, masking_markers_mismatch | 3 |
+| user_run_unfinished, user_run_incomplete, user_run_stale, user_run_too_early | 3 |
+| user_run_sink_not_scanned, user_run_sink_incomplete, user_run_control_missing, user_arrival_missing | 3 |
+| comparison_unfinished, comparison_incomplete, comparison_stale, comparison_too_early | 3 |
+| comparison_sink_not_scanned, comparison_sink_incomplete, comparison_control_missing | 3 |
+| store_armed, arming_unresolved, store_absence_unverified | 3 |
+
+An agent scan covers A1 Claude state; A2 audit/bash history; A3 MCP cache;
+A4 all registered Codex homes; A9 collector file export; A10 task directories;
+A11 inclusive-cursor user-journal export; and A12 configured Git stores plus
+stores discovered inside an already covered root. A5–A8 are retired.
+
+User scans add U1 OmniRoute account state; U2 Docker environments/auth config;
+U3 Codex shell snapshots; U4 full user-manager environment; U5 environment/unit
+configuration; U6 Claude history/paste cache and each Codex history.jsonl;
+U7 client configuration and backups; U8 agentsview/ai-memory/context-mode/RTK/
+headroom aggregates and top-level Codex SQLite families. Codex rust-v0.157.1
+[`message-history/src/lib.rs`](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/message-history/src/lib.rs#L52)
+places history.jsonl in CODEX_HOME; this mapping does not inspect a real history.
+Requested U finals require the fresh-session tag's agentsview arrival.
+
+K is never scanned: the key store, exact inventory credential/native-store
+paths, registered auth files, declared pointer targets, SSH/GnuPG, the Claude
+daemon key and keys directly in its sessions directory. Exclusions match
+canonical locations, not an arbitrary basename. Metadata at a parent's
+boundary is counted; key-home contents are never opened. The narrow synthetic
+store lifecycle exception permits only create-only publication, no-follow stat
+of the fixed leaf, and identity-checked unlink. A missing/unsafe store is
+neither created nor chmodded. A foreign file is preserved.
+
+`--transcripts exclude` is the default and excludes exactly every Claude
+projects subtree and every registered Codex sessions subtree, all or nothing.
+It cannot be broadened within a run. Required tags in declined roots remain
+missing, so such a run cannot establish the six-consumer proof. At window time
+the user may confirm those roots are safe and inactive through the last scan;
+no transcript purge is requested or performed.
+
+Selection uses full-file ctime at the prepare reference minus one hour,
+selecting all on unknown filesystems and in comparison. Held regular fds,
+pre/post full identity tuples, complete directory entry lists, family membership
+and route rechecks establish metadata quiescence. This is not an atomic snapshot.
+Every claim retains backward clock excursions beyond the hour margin that are
+undone between checks, deferred shared-mapping timestamps, privileged/direct-
+disk or same-uid tampering, and writes after the final check as residuals.
+
+M1 raw always runs; BOM, compression, Git and SQLite logical views are additive.
+Every compressed UTF-16 stream fans one decoder into raw and BOM-first readers.
+Git reconciles physical loose/packs against verified enumeration and scans
+metadata such as .keep. The .keep control exists only in the synthetic control
+repository. SQLite covers schema SQL/names and ordinary/shadow-table values,
+checks escaped read-only URIs and the actual main fd, and never creates missing
+WAL/SHM to rescue a read. Virtual tables require real shadow tables. Special
+entries are name-checked but never opened for content. Each request/control
+kind gets a fresh control value. Unrelated sentinels exist only in test fixtures.
+
+Recognized unsupported zstd/lz4/compress/lzip/lzop/Snappy/brotli and containers
+make selected content incomplete. Container signatures at offset zero include
+zip local/empty/spanned, 7z, RAR, PDF, cpio newc/crc/odc, ar, cabinet, xar and
+PACK outside a reconciled Git store; tar's ustar signature is at offset 257.
+Zlib without recognized magic, nameless lzma, UTF-16 without BOM, application-
+compressed cells, arbitrary transformations and paths split across Git objects
+are explicit residuals. Freed SQLite pages/superseded WAL frames have raw coverage
+only. Indexes, API-fed stores, unrelated scratch/state, privileged journals,
+process/unit memory, terminal scrollback, remote/provider and Windows copies
+remain outside scope. Receipts always say `not_covered:proxy_unverified` for Loki;
+collector/Loki equality belongs only to the external window record.
+
+The operational window requires P1 explicit Gate A closure, P2 K4 installed,
+P3 accepted build plus independent Astra/Opus review, P4 pinned tools/core/scopes,
+P5 no-arm rehearsal, P6 quota and a 25-point lane reserve, P7 normal client
+sandbox/scrub settings, P8 packaged S8 and P9 transcript confirmation or decline.
+Other Claude/Codex sessions must be idle; baseline and final come from a user
+terminal, and scan output appears only after every sink finishes. P5 exercises
+real session writes/Git rotations, journal cursor/anchor and collector/Loki
+marker counts after W. The build suite writes nothing to the real journal.
+
+| Window step | Action |
+| --- | --- |
+| W1 | Prepare with all homes, session and transcript policy registered |
+| W2 | Require complete zero-hit baseline |
+| W3 | Arm systemd consumer, run emitted probe with leak-check to journal, disarm |
+| W4 | Arm fresh Claude, run emitted command in sonnet/max session, discard output, disarm |
+| W5 | Arm subagent, one sonnet/max child runs command, discard client output, disarm |
+| W6 | Arm workflow, run two-stage native workflow with run/attempt, disarm |
+| W7 | Arm ordinary Codex, read-only exec with null stdin/output, disarm |
+| W8 | Arm registered lane, packaged null-output wrapper, disarm |
+| W9 | Wait 1,200 boottime seconds, request agent final from user terminal |
+| W10 | Optional U final/comparison in the user's terminal; requests become required |
+| W11 | Verdict publishes current high-water receipt and scoped claim |
+| W12 | Cleanup safely disarms if pending/armed, checks absence, publishes same classifier result |
+
+On failure disarm, preserve sticky hits and resolve the cause before a new
+request. A zstd installation requires an announced host change after W, an
+updated decoder contract and fixtures. Cleanup records its absence check as
+`cleaned`, which does not stale final evidence, then removes owned runtime files.
+Receipt publication is create-only and rejects synthetic forms/tags/controls.
+An old receipt is historical at its high-water mark; it never authorizes a
+new invocation. No operational acceptance is claimed by synthetic tests.
 
 ## Follow-ups not in this change
 

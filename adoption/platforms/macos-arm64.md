@@ -766,6 +766,12 @@ not run on any Mac. macOS has no `/proc`, so a receipt there records
 
 **2026-09-23 decision: brew-services semantics, no backup or reconcile.**
 
+The canary proof in `tools/credentials/canary_proof.py` is Linux-only: prepare,
+arm and scan refuse `unsupported_platform` on macOS. Its systemd/cgroup-v2 and
+setpriv parent-death guarantees have no Mac fallback; pure logic tests still
+run. See [Canary proof](../../docs/secret-storage.md#canary-proof). Boot-receipt
+restart comparison is separate, and no synthetic canary survives a restart.
+
 - **Chosen:** stateless, path-verified ownership with no backup, no
   rollback and no ownership file -- the same model Homebrew's own
   `brew services` uses. In **Homebrew/brew

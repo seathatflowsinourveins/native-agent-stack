@@ -926,3 +926,132 @@ Overturn: any new snapshot file with a credential-named `declare -x` line. That 
 - **Claude OAuth token for headless runs.**
   - A credential window stores the token from `claude setup-token` in the kernel keyring as `claude-oauth-token` (transport only; a kernel restart erases it). Commands receive it through `kernel_keyring.py exec claude-oauth-token CLAUDE_CODE_OAUTH_TOKEN -- <command>`.
   - Its variable is not yet a secret name in the guard, so K4 adds it and an inventory entry. `set_credential.py` can then persist it.
+
+## Part 5 — Canary proof continuation (2026-09-30)
+
+The earlier parked harness remains unaccepted. The replacement is
+`canary_proof.py` plus a contained `canary_scan_worker.py`, isolated probe,
+native two-stage workflow and null-output packaged lane wrapper. This is a
+build and synthetic qualification, not a production proof. The operational
+procedure is [Canary proof](../secret-storage.md#canary-proof). Acceptance of
+the window still requires K4 installed, explicit Gate A window closure,
+independent final Astra/Opus review, workstation containment and P5 rehearsal.
+No production canary, credential, transcript, journal or database was used by
+this build. The coordinator registers evidence pins separately.
+
+The selected scanner remains upstream ripgrep 14.1.0, commit
+[`e50df40a1967708b9781486b1c017e48040bceb0`](https://github.com/BurntSushi/ripgrep/tree/e50df40a1967708b9781486b1c017e48040bceb0).
+Its standard printer's only-matching records carry exact matched literal
+bytes behind a known label/NUL; its stats count completed file searches.
+`crates/printer/src/standard.rs:837,923,1064,1698,1760`,
+`crates/core/main.rs:94,126,461` and `flags/hiargs.rs:232,728` establish the
+failure/count/encoding assumptions. Quiet mode has a documented match/error
+exception, so this tool never uses quiet mode. Installed `/usr/bin/rg` is
+14.1.0; the PATH scanner can be newer, so resolve/hash absolute executables.
+Reviewed 15.2.0 (`e89fff89ac9af12e8d4ce9d5fd07beb408ca730f`) has its own stats
+terminator. A release lookup is currency evidence, not scanner acceptance.
+
+Compression uses GNU gzip 1.12, bzip2 1.0.8 and xz 5.4.5 producers reading
+held descriptors through their supported `-d -c` interfaces; lzma uses xz's
+explicit `--format=lzma`. These versions are encoded in setup FACT records.
+No implicit package installation or ripgrep --search-zip path is adopted.
+The supplied scanner comparison considered grep/ripgrep, gitleaks, TruffleHog
+and detect-secrets; it favored exact literals with explicit controls and
+failure accounting for this known synthetic corpus. That comparison is
+supplied research, not a new benchmark. Kingfisher/Titus were not evaluated
+and are not asserted inferior.
+
+Containment reuses `adoption/tools/ecosystem-bounded-run` unchanged, with its
+enforced memory/pids/CPU scope and finite RuntimeMaxSec/TimeoutStopSec backstop.
+Upstream systemd v255 is
+[`db11bab38ccf1ed257f310d29070843d4c58ea01`](https://github.com/systemd/systemd/tree/db11bab38ccf1ed257f310d29070843d4c58ea01):
+`src/run/run.c:620,962,1721` and `man/systemd.scope.xml:113` document inherited
+scope descriptors and lifetime semantics. A scope cannot use --pipe/--pty.
+Util-linux v2.39.3
+[`2da5c904e18fdcffd2b252d641e6f76374c7b406`](https://github.com/util-linux/util-linux/blob/2da5c904e18fdcffd2b252d641e6f76374c7b406/sys-utils/setpriv.c#L1055)
+arms PR_SET_PDEATHSIG before exec. Each upstream executable started by the
+worker uses setpriv; stdin is DEVNULL, a held descriptor or an owned pipe.
+There is no undefined lifeline. The pre-arming race and setsid/TERM-ignoring
+descendants rely on the verified finite scope backstop. CI's exec stub tests
+direct process death only and cannot establish cgroup/grandchild acceptance.
+
+Repository reuse is explicit: credential_run's encoded_forms, Masker,
+Command/end_group, inventory and core checks; set_credential's encode and
+create_exclusively; credential_status's inventory/metadata/guard pin helpers;
+and credential_boot_receipt's private directory and create-only publisher.
+The store-worktree helper performs ancestor metadata checks, not an external
+Git call. Guard pin checking stays inside a setup child and never uses the
+client_guards reader. Forbidden upstream/repository files stay unchanged.
+
+Git v2.43.0 `Documentation/git-cat-file.txt`, `git-verify-pack.txt`,
+`git-fsck.txt`, `gitrepository-layout.txt` and setup.c provide the logical
+framing/physical verification interfaces. SQLite's
+[URI filenames](https://www.sqlite.org/uri.html),
+[schema table](https://www.sqlite.org/schematab.html),
+[read-only WAL](https://www.sqlite.org/wal.html#read_only_databases) and
+[table_list](https://www.sqlite.org/pragma.html#pragma_table_list) provide the
+database interface. CPython's subprocess/os/struct/sqlite3 interfaces and
+POSIX/Linux no-follow/nonblocking descriptors complete the local integration.
+
+The seven draft-3 repairs have executable negative oracles:
+
+| Repair | Resulting contract / oracle |
+| --- | --- |
+| Parent byte exposure | Every raw channel stays in worker/dumper; unrelated header/name/target/diagnostic sentinels audit coordinator fds, payloads and artifacts |
+| Old pass survives setup crash | Fsynced request precedes mkdir/union/control/plan; SIGKILL and setup errors supersede old passes |
+| Unstable handoff/file set | Retain the original prewalk tuples/lists; held-fd and ctime/route/final-rewalk fixtures detect replacement and same-inode writes |
+| Git objects subtree exemption | Scan .keep/metadata raw; reconcile every loose/pack member with exact logical enumeration; unknown/orphan/index-only payload is incomplete |
+| Compression plus BOM | One decoder stream fans raw and BOM-first/encoded-control views; absent branch or decoder failure is incomplete |
+| SQLite schema hidden | Empty UTF-16/overflow schema/default/view/trigger/name canaries are found logically even when raw bytes miss |
+| Wrong SQLite URI/inode | Escape %, ?, #; verify PRAGMA path and actual opened main fd against held inode; replacement is incomplete |
+
+Continuation testing exposed another false-zero route: a regular file replaced
+by FIFO after held handoff could fail the first subpass but be called a harmless
+special on retry. Hard type failures now remain incomplete and are independently
+asserted by F-M1b/c. The scanner still reads the held original inode; that alone
+is not stability acceptance. Likewise, reading current scan metadata into the
+prewalk record could erase the original identity; ST1–ST5 retain and reconcile it.
+Mutation acceptance preserves each historical fault family and adds the draft-3
+repairs, nonce/ledger/branch/request obligations. A kill requires a passing
+pristine named test followed by its actual assertion failure, never import,
+syntax or unrelated fixture failure. Raw returned logs and patches are retained
+outside the repository until a future evidence PR.
+
+Evidence classes remain distinct: installed help/version, fresh pinned source
+retrieval, synthetic local integration, independent kernel process observation,
+workstation scope enforcement and live consumer/provider execution. This build
+uses the first four; skips name the unavailable service-manager scope. It runs
+no upstream test suite and does not relabel these local fixtures as upstream
+acceptance. Network retrieval worked through the installed public context-mode
+channel despite shell-network failure. Returned source pins and hashes are
+retained with the build handoff; no credentials or host paths enter public
+evidence. Foreign shared /tmp metadata is preserved; the synthetic launcher
+limits worktree ancestry checking to its owned fixture, without a production
+environment override or credential-runner edit.
+
+Draft 3 estimates 650 coordinator lines, 1,150 worker lines, 1,800 aggregate
+and 2,800 test lines (probe/workflow/wrapper excluded from aggregate). The
+inherited implementation already exceeded the implementation ceilings. This
+continuation retains explicit checks rather than compressing statements or
+dropping obligations. Actual final counts and deviations are reported in the
+handoff for the coordinator's decision under amendment C13. The mutation
+runner is allowed separately and excluded from the test-line ceiling.
+
+One classifier selects latest requests, binds attempts/roots/ledgers, retains
+sticky hits and rejects missing/error/stale checks. Requested U/comparison
+become obligations until a fresh complete request replaces them. Cleanup's
+absence fact does not stale evidence. Loki always remains proxy_unverified
+inside tool receipts; equality is an external P5 window record only. Transcripts
+are excluded all-or-nothing unless confirmed at prepare. Every claim identifies
+absent roots, exclusions, application transformations, special content, remote
+copies, process memory and scanner-side children's memory, plus metadata
+quiescence limits (backward clocks, shared mappings, privileged/same-uid changes
+and writes after the check). No macOS port or restart canary is asserted.
+
+Reconsider the choice when a maintained scanner demonstrates equivalent failure
+propagation, descriptor/file-list inputs, logical SQLite coverage or decoder
+repairs against this same suite; when a supported runner test-store option
+removes the narrowly authorized synthetic production-store exception; or when
+P5 reveals a new required encoding/container. Installing zstd is a separately
+announced post-W host change plus a decoder contract/fixture update. Replacing
+the scanner based on popularity or a newer release alone is insufficient.
