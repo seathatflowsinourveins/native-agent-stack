@@ -55,8 +55,11 @@ PROMPTS_SHA256_CURRENT = "9c34fa7211bcd90e8ebc3bc5f45ed308fede34098b59dbc308a8f2
 # The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
 # and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
 # the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
-# 7798ad98a5d3…ec25, named a flattened owner/repo@name list.
-PROMPTS_SHA256_SKILLS_CURRENT = "5d9ae85a17be9016c44a10cb7ed3539e87820a7cdd0a79491d222df3a29348db"
+# 7798ad98a5d3…ec25, named a flattened owner/repo@name list. 2026-09-30 review repair: a true-valued
+# disable-model-invocation is true/yes/on/1 in any letter case (Claude Code), Codex's allow_implicit_invocation counts
+# only as a plain false, a source the catalog marks maintenance stale labels its skills not_adopted, and writing
+# CLAUDE.md or AGENTS.md conflicts only when unasked (skills-agent-docs maintains them). Previous value: 5d9ae85a17be…48db.
+PROMPTS_SHA256_SKILLS_CURRENT = "2c2efbaed4d98e80e54311579bd96775c522996dfb87f4fdd971feed3e0263d3"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"

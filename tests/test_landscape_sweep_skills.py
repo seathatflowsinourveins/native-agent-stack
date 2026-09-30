@@ -460,9 +460,23 @@ class SkillsTemplateTests(unittest.TestCase):
                                       templates["modality_skills"])
         for phrase in ("maintenance rule", "never evidence of quality or fit", "Primary sources only",
                        "Read-only: never install a skill", "DISABLE_TELEMETRY=1 npx skills@1.7.0 find",
-                       "disable-model-invocation: true", "allow_implicit_invocation: false",
                        "skill-creator's paired with-skill/without-skill benchmark", "promptfoo", "skill_ref"):
             self.assertIn(phrase, discover, phrase)
+        # Invocation flags as the clients read them: Claude Code's boolean set, and a plain false for Codex's serde_yaml.
+        for text in (discover, modality):
+            self.assertIn("a true-valued disable-model-invocation (true/yes/on/1) in any letter case", text)
+            self.assertIn("allow_implicit_invocation to a plain false", text)
+            self.assertIn("quoted or another word such as no", text)
+            self.assertNotIn("disable-model-invocation: true", text)
+            # Unasked writes to the instruction files conflict; skills-agent-docs maintains them on request.
+            self.assertIn("writes into CLAUDE.md or AGENTS.md on its own initiative", text)
+            self.assertIn("skills-agent-docs task's requirement", text)
+        # A source the catalog marks stale (the common block's maintenance rule, recorded with its API fact).
+        self.assertIn("carries a maintenance record with status stale failed that rule", discover)
+        self.assertIn("label its skills not_adopted and cite the record, unless you find a maintained fork or "
+                      "replacement", discover)
+        self.assertIn("has maintenance status stale is stale under the selection principles' maintenance rule", modality)
+        self.assertIn("no commit on its default branch in the last 90 days", templates["common"])
         self.assertIn("<<LAYER_COUNT>>-layer skills sweep", critic)
         self.assertIn("never evidence", critic)
         for phrase in ("vote with that exact string as repository", "skill-creator", "promptfoo",
