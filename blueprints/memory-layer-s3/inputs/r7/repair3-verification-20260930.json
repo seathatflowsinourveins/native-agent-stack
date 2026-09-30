@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-30",
+  "base_commit": "0d027e06902f25d6448efbcc19ddbe9431b571f8",
+  "evidence_classes": [
+    "local pinned-source review",
+    "synthetic discrete examples",
+    "synthetic negative controls",
+    "synthetic native source-function/CLI-template check"
+  ],
+  "scope": "Repair-round-3 protocol, decision-record and locator corrections; landscape completeness deferred by the current instruction. No installation, deployment, downloaded-data verification, model run or fresh online maintenance/vulnerability gate.",
+  "network_requests": 0,
+  "source_observation": {
+    "method": "Read the supplied local upstream checkouts; verify HEAD/commit dates with rtk git show -s --format='%H %cI'; inspect original source at those pins. The template check extracts unchanged native parser/request-function segments into a synthetic namespace. No full upstream runner or provider is executed, and no upstream checkout is edited.",
+    "pins": [
+      {
+        "repo": "xiaowu0162/LongMemEval-V2",
+        "commit": "2cc8c540bdb87fe6761629b585e727e1c4704520",
+        "commit_date": "2026-08-09T15:31:22-07:00"
+      },
+      {
+        "repo": "HUST-AI-HYZ/MemoryAgentBench",
+        "commit": "538026089d1a8a8eff05121d0db89b388f360eba",
+        "commit_date": "2026-09-25T02:11:33-04:00"
+      },
+      {
+        "repo": "vectorize-io/agent-memory-benchmark",
+        "commit": "03c1d0f1d27da63034f0931121c858faba512383",
+        "commit_date": "2026-09-22T14:23:44+02:00"
+      },
+      {
+        "repo": "dorianbrown/rank_bm25",
+        "commit": "47aa3ddf8dc1ebeb7ef4e65f2b4536af44594099",
+        "commit_date": "2024-10-08T14:30:42+02:00"
+      }
+    ],
+    "observations": [
+      {
+        "finding": "1: LME2 control/arm invocation parity",
+        "sources": [
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:75-78",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:188-189",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:297-354",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:153-199",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:853-885",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/qa_eval_metrics.py:517-530",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/memory_configs/no_retrieval.json:1-4",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:data/public_data.py:79-124"
+        ],
+        "observed": "The wrapper forwards reader temperature 0.6, top-p 0.95, top-k 20 and concurrency 16, but not reader reasoning effort or evaluator base URL. The native no_retrieval JSON matches run_eval's built configuration. Per-domain question selection rejects IDs absent in that domain. All arms/control now use one registration bootstrap calling the unchanged direct harness with identical reader/judge argv, omitted sampling overrides, explicit evaluator base URL and a mandatory actual request-body wire check."
+      },
+      {
+        "finding": "2: independent resampling unit",
+        "sources": [
+          "xiaowu0162/LongMemEval-V2@2cc8c540:data/public_data.py:51-64",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:data/public_data.py:110-124",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:1169-1170",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:1180-1213",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:leaderboard/README.md:149-150"
+        ],
+        "observed": "The loader maps each question to trajectory IDs; the native harness shares one memory for a common haystack. Leaderboard points preserve the domain haystacks. The protocol now fixes full-tier connected components of shared trajectories/content/native memory before subsets/results, verifies them against downloaded bytes, and requires at least 20 represented independent components. Under the minimum the lane stays pending; no question-level substitute or seed multiplication is allowed.",
+        "boundary": "The minimum 20 is a preregistered design safeguard, not an upstream requirement or certified statistical sufficiency. No downloaded haystacks or actual cluster count were verified in this source-only repair; the likely two-domain shared-haystack design remains pending."
+      },
+      {
+        "finding": "3: open-QA context cap",
+        "sources": [
+          "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/modes/rag.py:49-54",
+          "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/dataset/longmemeval.py:131-132"
+        ],
+        "observed": "RAG omits k and formats every returned document, so retrieval escalation can enlarge the answer prompt. Open QA now returns the shortest prefix of the final native ranking covering five distinct sessions, capped at 20 items, with raw_response=None. It reports exact formatted context tokens per question/seed/arm separately from native reader input tokens. Retrieval-only scoring keeps the full final ranking."
+      },
+      {
+        "finding": "4: MemoryAgentBench applicability",
+        "sources": [
+          "HUST-AI-HYZ/MemoryAgentBench@538026089:agent.py:64-89",
+          "HUST-AI-HYZ/MemoryAgentBench@538026089:agent.py:236-255",
+          "HUST-AI-HYZ/MemoryAgentBench@538026089:agent.py:518-531",
+          "HUST-AI-HYZ/MemoryAgentBench@538026089:methods/agentmemory.py:3-17",
+          "HUST-AI-HYZ/MemoryAgentBench@538026089:methods/agentmemory.py:57-82",
+          "HUST-AI-HYZ/MemoryAgentBench@538026089:methods/agentmemory.py:111-190",
+          "HUST-AI-HYZ/MemoryAgentBench@538026089:README.md:178-180"
+        ],
+        "observed": "Dispatch supports letta, mem0, cognee, zep, knowl, agentmemory, total_agent_memory, rag_* and long-context controls. The agentmemory path uses the external REST service and normalized numbered facts for CR; TTL validity is not established for that parser. Cognee uses the benchmark's vendored directory, not the selected 1.6.2 release; Zep constructs the cloud client, not Graphiti. The per-system table restricts secondary results to applicable native modes and prohibits vendored candidate copies. No MAB run or unsupported-system adapter is claimed."
+      },
+      {
+        "finding": "5-7: discrete decision corrections",
+        "sources": [
+          "blueprints/memory-layer-s3/PREREGISTRATION.md:section 4.5",
+          "blueprints/memory-layer-s3/PREREGISTRATION.md:section 6",
+          "blueprints/memory-layer-s3/PREREGISTRATION.md:section 7.1",
+          "blueprints/memory-layer-s3/PREREGISTRATION.md:section 7.6"
+        ],
+        "observed": "Best is computed only over operationally eligible, completely observed memory systems. Baseline final failures above 5% make the whole usefulness family pending, with p=1 placeholders. Insufficient clusters/comparison coverage and pending contenders that could change qualification or primary selection also leave the decision pending/unresolved. Synthetic examples/negative controls exercise eligible-best, cluster/failure boundaries, pending higher/equal/unknown scorers and pending qualification."
+      },
+      {
+        "finding": "8: corrected locators",
+        "sources": [
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:193-196",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:219-223",
+          "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:69-70"
+        ],
+        "observed": "Judge reasoning-effort choices are low/medium/high at harness.py:193-196. Query privacy is README.md:219-223. run_eval.py:69 is --limit; :70 is --question-ids. The preregistration, decision record and round-2 receipt are corrected; historical round-2 synthetic outputs remain bound to source_revision."
+      },
+      {
+        "finding": "User decision 3: dependency maintenance scope",
+        "sources": [
+          "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/__init__.py:2",
+          "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/bm25.py:1",
+          "dorianbrown/rank_bm25@47aa3ddf8dc1ebeb7ef4e65f2b4536af44594099",
+          "native-agent-stack@0d027e06:.github/workflows/security-scan.yml:46-86"
+        ],
+        "observed": "Accepted user decision 3 replaces the executing-transitive maintenance gate: selected repositories pass the 90-day Maintained rule; transitive dependencies require a clean OSV scan and per-arm SBOM. A stale dependency is flagged without blocking its harness. AMB imports rank_bm25 0.2.2; supplied source last commit 2024-10-08 is a stale flag. Other dependency versions are not declared stale from age alone. Repository CI pins OSV-Scanner 2.6.0 and scans lockfiles with scan source --no-resolve.",
+        "scanner_discovery": {
+          "command": "rtk osv-scanner --version",
+          "exit_code": 127,
+          "stdout": "",
+          "stderr": "[rtk: No such file or directory (os error 2)]\n"
+        },
+        "boundary": "The scanner command was not found in this worker environment. No online gate, advisory download, dependency scan, clean vulnerability result or installation is claimed. AMB is pending for missing dependency SBOM/OSV acceptance, not the rank_bm25 stale flag."
+      }
+    ]
+  },
+  "accepted_decision": {
+    "id": 3,
+    "date": "2026-09-30",
+    "status": "ACCEPTED",
+    "relayed_user_words": "with best sota practice you recommend, make sure all repos candidates are latest sota",
+    "scope": "90-day Maintained for repositories selected to run; no-known-vulnerability OSV acceptance and per-arm SBOM for transitive dependencies; stale dependencies flagged without blocking the harness",
+    "stale_transitive_flags": [
+      {
+        "package": "rank_bm25",
+        "version": "0.2.2",
+        "repo": "dorianbrown/rank_bm25",
+        "commit": "47aa3ddf8dc1ebeb7ef4e65f2b4536af44594099",
+        "last_observed_commit": "2024-10-08",
+        "importer": "vectorize-io/agent-memory-benchmark@03c1d0f1:src/memory_bench/memory/bm25.py:1",
+        "blocks_harness_by_staleness": false
+      }
+    ]
+  },
+  "synthetic_checks": {
+    "command": "rtk python3 -c BLOCK (verbatim fenced examples; one mutation per negative control)",
+    "positive": [
+      {
+        "section": "4.5",
+        "sha256": "3d458a5c1d74faa0aa2c44111ff15ae0f3033fc99d8abb1689b3eddabb1804f0",
+        "exit_code": 0,
+        "stdout": "4.5 open-QA prefix examples: all assertions hold\n",
+        "stderr": ""
+      },
+      {
+        "section": "7.1",
+        "sha256": "6b7778260d09f852653a9f9ea93b8bf13af009f7aa986ce0981943e9692dc1fd",
+        "exit_code": 0,
+        "stdout": "7.1 usefulness examples: all assertions hold\n",
+        "stderr": ""
+      },
+      {
+        "section": "7.2-7.3",
+        "sha256": "541b59b2161848ef21dcf7e89ef46d6f85d722bdf390847c26727625b3b406bf",
+        "exit_code": 0,
+        "stdout": "7.2-7.3 frozen examples: all assertions hold\n",
+        "stderr": "",
+        "byte_identical_to_base": true
+      },
+      {
+        "section": "7.5",
+        "sha256": "5e801ce8666ae6145bea1a2e9a07862d1b42db17c226883238671f5299c1b7ef",
+        "exit_code": 0,
+        "stdout": "7.5 successful-transport invalid-score example: fallback observed; unknown is pending\n",
+        "stderr": "",
+        "byte_identical_to_base": true
+      },
+      {
+        "section": "7.6",
+        "sha256": "48ab67635c85abc791eda43f93f6401bc51b22461736fec9de77c3c1ec9b9f53",
+        "exit_code": 0,
+        "stdout": "7.6 pending-contender examples: all assertions hold\n",
+        "stderr": ""
+      }
+    ],
+    "negative": [
+      {
+        "section": "7.2-7.3",
+        "mutation": "all leaders changed to any leader",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 34, in <module>\n    assert tie_break_set(q, {(\"C\", \"A\")}) == ({\"A\", \"B\"}, {\"A\", \"B\", \"D\"})\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.2-7.3",
+        "mutation": "strict cost inequality changed to inclusive",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 47, in <module>\n    assert cost_tied({\"A\": F(8), \"B\": F(10)}) == {\"A\"}\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.1",
+        "mutation": "not-worse-than-all-best changed to any best",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 30, in <module>\n    assert usefulness_status(\"C\", tied, {(\"no_retrieval\", \"C\"), (\"C\", \"B\")}, **tied_ready) == \"unqualified\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.1",
+        "mutation": "eligible-best filter removed",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 33, in <module>\n    assert usefulness_status(\"A\", ineligible_high, losses | {(\"A\", \"X\")}, **ready) == \"qualified\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.1",
+        "mutation": "minimum cluster guard removed",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 40, in <module>\n    assert usefulness_status(\"A\", scores, losses, eligible={\"A\", \"B\"}, cluster_count=19) == \"pending\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.1",
+        "mutation": "baseline failure guard removed",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 39, in <module>\n    assert usefulness_status(system, scores, losses, baseline_failure_rate=F(51, 1000), **ready) == \"pending\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "4.5",
+        "mutation": "20-item prompt cap removed",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 16, in <module>\n    assert len(prefix) == 20 and short\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "4.5",
+        "mutation": "shortest-prefix stopping removed",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 12, in <module>\n    assert [item[\"id\"] for item in prefix] == list(range(13)) and not short\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.5",
+        "mutation": "gateway completion falsely implies accepted stage output",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 21, in <module>\n    assert observed_stage_outcome(ids, invalid, gateway_completed=True) == \"fallback:invalid_output\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.6",
+        "mutation": "pending-contender guard removed",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 20, in <module>\n    assert fallback_status(scores, {\"A\", \"B\"}, {\"P\"}) == (\"pending\", set())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.6",
+        "mutation": "pending exact tie ignored",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 21, in <module>\n    assert fallback_status({**scores, \"P\": F(8, 10)}, {\"A\", \"B\"}, {\"P\"}) == (\"pending\", set())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.6",
+        "mutation": "unknown pending primary ignored",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 22, in <module>\n    assert fallback_status(scores, {\"A\", \"B\"}, {\"unknown\"}) == (\"pending\", set())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      },
+      {
+        "section": "7.6",
+        "mutation": "pending qualification ignored",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 24, in <module>\n    assert fallback_status({**scores, \"P\": F(7, 10)}, {\"A\", \"B\"}, {\"P\"},\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                           pending_qualification=True) == (\"pending\", set())\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+      }
+    ],
+    "result": "5 positive blocks passed; 13 negative controls failed as expected; frozen 7.2-7.3 and 7.5 blocks byte-identical to base"
+  },
+  "native_source_function_check": {
+    "evidence_class": "synthetic source-function and CLI-template check; not an unchanged upstream test or native wire acceptance",
+    "source": "xiaowu0162/LongMemEval-V2@2cc8c540bdb87fe6761629b585e727e1c4704520",
+    "functions": [
+      {
+        "name": "parse_args",
+        "sha256": "427ff2eb610b241ffb58de5943f34fe860bf33bef6027695d5a3163458df0246"
+      },
+      {
+        "name": "build_extra_body",
+        "sha256": "b37b51dec8d791d912e5a9907b045c74d2964ff980890028f4b5c2463dc9ad95"
+      },
+      {
+        "name": "build_reader_request",
+        "sha256": "2aea3e2cb89d8acf1a75d838882e5cbba6bc514dfa222b737f9dc2d49c2af4f2"
+      },
+      {
+        "name": "_call_chat_completion",
+        "sha256": "f6a6bff328ed69c61d7ba9e850761d871ec394a6aba81d7e1e2d9b2b2e48a970"
+      }
+    ],
+    "template_sha256": "b3d3f354d948a0c90e54b7473370d011f015431d5c2f12263ccb1a5c1517e109",
+    "command": "rtk python3 -c CODE (unchanged source function segments, native parser argv from 5.5 template, synthetic client)",
+    "positive": {
+      "exit_code": 0,
+      "stdout": "5.5 native parser/request-function check: common control/arm parameters accepted; no wire or model call\n",
+      "stderr": ""
+    },
+    "negative": {
+      "mutation": "inject wrapper temperature 0.6 and top-k 20 into common argv",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 171, in <module>\n    assert params == expected, params\n           ^^^^^^^^^^^^^^^^^^\nAssertionError: {'model': 'cx/gpt-6-astra-max', 'timeout': 43200.0, 'max_tokens': 20000, 'reasoning_effort': 'high', 'temperature': 0.6, 'extra_body': {'top_k': 20}}\n"
+    },
+    "boundary": "Functions are extracted from pinned source into a synthetic namespace; a fake SDK client captures kwargs. No native backend, upstream full runner, gateway request, provider effort or model was run."
+  },
+  "evidence_boundary": "Synthetic outputs verify source-derived argv and discrete protocol decisions only. They are not unchanged upstream tests, a bootstrap/Holm run, downloaded-file cluster verification, real gateway request-body/effective-effort observation, benchmark outcomes or model runs.",
+  "residuals": [
+    "Landscape completeness is deferred as instructed; no candidates are added or removed by a new landscape sweep.",
+    "Downloaded LongMemEval-V2 haystack/trajectory files and the outcome-independent component-count preflight are pending. A small-tier design with about two shared haystacks cannot qualify under the minimum 20; no alternative question-level test is authorized.",
+    "Native backend registration/bootstrap/collector and open-QA provider-prefix implementations, per-domain materialization, actual request-body parity, retry/failure accounting and paired main-usefulness results remain required before scoring.",
+    "Fresh selected-repository maintenance receipts and per-arm dependency SBOM/OSV acceptance are pending; no clean scan is claimed.",
+    "MemoryAgentBench has not run; agentmemory is applicable only to normalized-fact CR pending native acceptance. Unsupported/vendored modes do not supply selected-system secondary evidence.",
+    "Header-limited gateway routes, supermemory-local isolated bind/auth, native successful-gateway invalid-score fault control and joint serving-model residency remain pending.",
+    "cx/GPT-6 prices remain unpriced; cost-dependent ties are unresolved. S8's amendment/36-task receipt and the out-of-scope A17 update remain outstanding."
+  ]
+}

@@ -24,7 +24,7 @@
       {"repo": "xiaowu0162/LongMemEval-V2", "commit": "2cc8c540bdb87fe6761629b585e727e1c4704520", "commit_date": "2026-08-09T15:31:22-07:00"},
       {"repo": "zilliztech/memsearch", "commit": "2a4652fa086fbd45e92bfd8da7781ebe1642baa7", "commit_date": "2026-09-24T16:07:41+08:00"}
     ],
-    "maintenance_boundary": "Commit dates of supplied pins are observed. The brief supplies active LongMemEval-V2/MemoryAgentBench and stale MemoryArena classifications; this repair does not refresh archival/default-branch metadata. Executing transitive dependencies still need current gate receipts before scoring. MemoryArena code is never run.",
+    "maintenance_boundary": "Commit dates of supplied pins are observed. The round-2 brief supplies active LongMemEval-V2/MemoryAgentBench and stale MemoryArena classifications; that repair did not refresh archival/default-branch metadata. Round 2 required maintenance receipts for executing dependencies; ACCEPTED user decision 3 in round 3 supersedes that scope: gate selected repositories, require dependency SBOM/OSV acceptance and flag stale dependencies without blocking their harness. MemoryArena code is never run.",
     "observations": [
       {
         "finding": "H1/M4",
@@ -48,7 +48,7 @@
       },
       {
         "finding": "H2/F7/L4",
-        "sources": ["xiaowu0162/LongMemEval-V2@2cc8c540:README.md:41", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:50", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:114", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:191", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:236", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:25", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:146", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:170", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:128", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:190", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:69", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:126", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:335", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/qa_eval_metrics.py:491", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/scripts/run_no_retrieval.sh:20", "HUST-AI-HYZ/MemoryAgentBench@538026089:README.md:178", "HUST-AI-HYZ/MemoryAgentBench@538026089:bash_files/sh/run_memagent_rag_agents.sh:18"],
+        "sources": ["xiaowu0162/LongMemEval-V2@2cc8c540:README.md:41", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:50", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:114", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:191", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:219-223", "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:236", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:25", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:146", "xiaowu0162/LongMemEval-V2@2cc8c540:memory_modules/memory.py:170", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:128", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:190", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:193-196", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:70", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:126", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:335", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/qa_eval_metrics.py:491", "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/scripts/run_no_retrieval.sh:20", "HUST-AI-HYZ/MemoryAgentBench@538026089:README.md:178", "HUST-AI-HYZ/MemoryAgentBench@538026089:bash_files/sh/run_memagent_rag_agents.sh:18"],
         "observed": "LongMemEval-V2 supports registered Memory backends and direct memory-config harness use. JSON alone requires an already registered type. Baseline scripts own domain/tier/output arguments and invoke run_eval. That wrapper does not forward evaluator base URL; direct harness does. Evaluator effort choices are low/medium/high. Native no-base evaluator constructs the OpenAI SDK client. TTL/CR metrics and the actual MemoryAgentBench sh-directory script are verified."
       },
       {
@@ -72,6 +72,7 @@
   },
   "synthetic_checks": {
     "source": "blueprints/memory-layer-s3/PREREGISTRATION.md",
+    "source_revision": "0d027e06902f25d6448efbcc19ddbe9431b571f8",
     "method": "Extract each named python fenced block without its fence and trailing newline; execute verbatim with rtk python3 -c BLOCK. Compare the 7.2-7.3 block to rtk proxy git show HEAD:blueprints/memory-layer-s3/PREREGISTRATION.md. Each negative control changes only the named rule and must raise AssertionError.",
     "positive": [
       {"section": "7.1", "sha256": "b4c82874cf3e08ec6f50090e35c91135b07525ccdbc793b64b294badad3af91f", "exit_code": 0, "stdout": "7.1 usefulness examples: all assertions hold", "stderr": ""},
@@ -97,12 +98,19 @@
   },
   "residuals": [
     "Native provider/collector/registration-bootstrap implementations and parity/failure/depth/output-ownership acceptance are not built/run in this protocol repair.",
-    "Current maintenance/transitive dependency gates, all-wire/outcome coverage and network-isolation receipts must be supplied before scored execution; AMB execution is pending.",
+    "Current selected-repository maintenance gates, dependency SBOM/OSV acceptance, all-wire/outcome coverage and network-isolation receipts must be supplied before scored execution; AMB remains pending for missing acceptance, not dependency staleness alone (accepted round-3 scope).",
     "agentmemory and MemPalace lack the required verified header exemption/per-arm route; supermemory-local's isolated bind/auth boundary remains unresolved.",
     "The N1 actual successful-gateway invalid-score native fault control remains pending; only the source-backed synthetic rule has run.",
     "LongMemEval-V2 data/subset, preflight cost/power, native backend and five-replication results are pending; secondary MemoryAgentBench has not run.",
     "Joint embedder/reranker/local-LLM serving residency has not been measured.",
     "cx/GPT-6 price mappings are unpriced; any cost-dependent tie is unresolved, without a zero or partial-total substitution.",
     "S8's separately frozen do-no-harm design and relayed 36-task receipt remain pending; A17 supersession is outside the allowed paths."
-  ]
+  ],
+  "round3_locator_corrections": {
+    "evidence_class": "local pinned-source re-read; correction of source locators, not a replay of round-2 checks",
+    "judge_effort": {"previous": "evaluation/harness.py:188 or :190", "corrected": "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/harness.py:193-196", "observed": "evaluator reasoning-effort choices are low, medium, high; :188 is the section comment and :190 is evaluator base URL"},
+    "privacy": {"previous": "README.md:191 used for the query privacy claim", "corrected": "xiaowu0162/LongMemEval-V2@2cc8c540:README.md:219-223", "observed": "query context has only random run-local query_invocation_id; evaluator keeps question metadata, gold and configuration private"},
+    "question_ids": {"previous": "evaluation/run_eval.py:69", "corrected": "xiaowu0162/LongMemEval-V2@2cc8c540:evaluation/run_eval.py:70", "observed": ":69 is --limit; :70 is --question-ids"},
+    "historical_checks": "Round-2 synthetic results/hashes are retained at source_revision; round-3 changed examples and actual outputs are recorded separately in repair3-verification-20260930.json."
+  }
 }
