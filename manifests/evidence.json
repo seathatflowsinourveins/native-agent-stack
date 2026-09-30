@@ -8920,18 +8920,18 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.builder.sh.txt",
-      "sha256": "cd25c2b05cda577cc3052355ffc6afdc79ed4b2ad969bf356ddaa747645cf759",
-      "bytes": 17421
+      "sha256": "3ec8811aa0b33530f1a7e9adc50971a287e443dbadb0a0f085c379b6d35cc289",
+      "bytes": 18991
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.jwt-callers.py.txt",
-      "sha256": "56b5ac6942faefa9bfca4f77463b8085b5b57e6b0cd54a554bb987031c9eb258",
-      "bytes": 3327
+      "sha256": "d4eb55d798102e5a6d64d4d629a3a994acfadff74daa971195b73592c2a77cff",
+      "bytes": 5704
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.txt",
-      "sha256": "9631cf75714fc6c12d3bb619f2147f88b9b90ec88f18b4088b35902e200ea933",
-      "bytes": 23583
+      "sha256": "67862738e093b35d7b80ddf24bf7ffd244e5b184196de498d6a797adaa24ba51",
+      "bytes": 25849
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
@@ -9050,8 +9050,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "07c10856a5afa23ecc11b9dfbc4f357973c165eaf543b0df6353773bc8707189",
-      "bytes": 66411
+      "sha256": "a2b3f7c2b86587e21c4df5ee827c70fbf94c8859249e6b226a60f6a7eaa696d4",
+      "bytes": 66786
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -14565,7 +14565,7 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "4c16da626f69874d44e144bd18558aafeeab9b6f73fdb3e77cbbf9a3278099eb",
+      "sha256": "bd87c4a7d7ddf1f60aeaa6806413e4c0dcfb42958b0025e201321e445bed14aa",
       "bytes": 138874
     },
     {
@@ -42340,8 +42340,8 @@
     },
     {
       "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
-      "sha256": "f0263564ccbde71fef9571b6582cf510dd8d6cb8bfbc182906dbb13a934be9cb",
-      "bytes": 29263
+      "sha256": "44682cd5fe1a556a06fee4d797ea2eae2bff55ff69dda8570abbf61aeb6051c4",
+      "bytes": 30986
     },
     {
       "path": "evidence/receipts/pit-availability.json",
