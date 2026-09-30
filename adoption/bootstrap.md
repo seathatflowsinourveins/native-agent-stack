@@ -637,9 +637,9 @@ Added after `v2026.09.26.2`: `tools/adoption/scaffold_repo.py`, `adoption/scaffo
 instead of hand copies, so it carries the standing rule from its first commit:
 
 ```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run   # the plan; writes nothing, even before git init
 git init <repo>
-python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run   # the plan; writes nothing
-python3 tools/adoption/scaffold_repo.py --target <repo>             # writes it
+python3 tools/adoption/scaffold_repo.py --target <repo>             # writes it; <repo> must exist
 ```
 
 | File in the new repository | From |
@@ -657,7 +657,9 @@ context, so it reads the new repository's pull request
 ([reusing workflow configurations](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations),
 "`github` context"). `<sha>` is `--main-sha`, else what `git ls-remote origin refs/heads/main` reports;
 when that commit is in this checkout it must carry `.github/workflows/sota-sources-gate.yml`, or nothing
-is written (exit 2). The caller is kept as a `.template` file because zizmor also audits nested
+is written (exit 2), and a commit this checkout lacks is used as given and reported unchecked. GitHub
+resolves the reusable workflow when the check runs, so the new repository's check works only once that
+commit, pushed to this repository on GitHub, carries the gate file. The caller is kept as a `.template` file because zizmor also audits nested
 `.github/workflows` directories, where an unfilled `<sha>` is an unpinned `uses:`. In the new repository,
 make the check the workflow reports a required status check, and if its Actions settings allow only
 selected actions, allow this reusable workflow and `step-security/harden-runner`, which it runs
@@ -668,6 +670,10 @@ selected actions, allow this reusable workflow and `step-security/harden-runner`
 `adoption/hosts/example.json`'s system directories, never this shell's `PATH`; `--host <name>` reads
 `adoption/hosts/<name>.json` instead and `--set KEY=VALUE` overrides one value. It holds this host's
 paths, so each host renders its own. Each file is created when absent and left alone when identical; one
-whose content differs is skipped and the run exits 3 unless `--force` overwrites it, and a symlink is
-never written through. The tool prints one line per file (`created`, `unchanged`, `skipped`,
-`overwritten`) and a summary.
+whose content differs is skipped and the run exits 3 unless `--force <path>` names it (the path as the
+table prints it, repeatable; no backup is kept, so commit first). Only the named files are overwritten:
+every other file that differs is still skipped, a bare `--force` or a path outside the scaffold is a usage
+error (exit 2), and a symlink is never written through. `--dry-run` also plans a `--target` that does
+not exist yet; a real run refuses one. The tool prints one line per file (`created`, `unchanged`,
+`skipped`, `overwritten`) and a summary; [update](update.md#start-a-new-repository) has the recipe
+that moves an existing repository's workflow to a newer gate.

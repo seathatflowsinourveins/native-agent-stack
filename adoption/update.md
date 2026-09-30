@@ -278,8 +278,20 @@ python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run
 python3 tools/adoption/scaffold_repo.py --target <repo>
 ```
 
-A rerun changes nothing; a file edited since is skipped (exit 3) unless `--force` is given. To move
-an existing repository's workflow to a newer gate, run it again with `--force` for that file.
+A rerun changes nothing; a file edited since is skipped (exit 3) unless `--force <path>` names it,
+with the path as the table prints it. To move an existing repository's workflow to a newer gate,
+commit first, then name only the workflow:
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run --force .github/workflows/sota-sources.yml
+python3 tools/adoption/scaffold_repo.py --target <repo> --force .github/workflows/sota-sources.yml
+```
+
+That replaces the workflow alone (no backup is kept) with one pinned to the current main commit.
+Every other file that differs, such as a filled-in `AGENTS.md` or this host's `.codex/config.toml`,
+is left as it is and reported `skipped`, so the run exits 3. A bare `--force`, or a path that is not
+a scaffold file, is a usage error (exit 2) and writes nothing. The new pin takes effect once that
+commit on GitHub carries `.github/workflows/sota-sources-gate.yml`.
 
 ## Current next moves
 

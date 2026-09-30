@@ -20,11 +20,15 @@ A scaffold file whose name ends in `.template` holds a placeholder: the tool fil
 copier applies to its template suffix (copier v9.18.2 docs/configuring.md, `templates_suffix`, default `.jinja`);
 every other file is copied byte for byte. The workflow is kept under that name because zizmor 1.30.1 collects nested
 .github/workflows directories, and validate.yml's repository-wide zizmor gate would report the unfilled `<sha>` as an
-unpinned `uses:`. --force and --dry-run are copier's `overwrite` and `pretend` (same page).
+unpinned `uses:`. --dry-run is copier's `pretend` (same page). Copier's `overwrite` replaces every existing file and
+its `skip_if_exists` (`--skip`) names the files to keep; the scaffold's AGENTS.md is meant to be filled in, so this
+tool runs the other way round: every file whose content differs is kept unless --force names it.
 
 `<sha>` is --main-sha, else what `git ls-remote origin refs/heads/main` reports for this checkout. When that commit is
 in this checkout it must carry .github/workflows/sota-sources-gate.yml, since the written workflow would otherwise
 call a missing file: refused before any write. A commit this checkout lacks is used as given and reported unchecked.
+Either way GitHub resolves the reusable workflow at run time, so the new repository's check runs only once that
+commit, pushed to this repository on GitHub, carries the gate file.
 
 Template values for .codex/config.toml: ECO_ROOT is $ECO_INSTALL_ROOT, else ~/.local/share/codex-ecosystem (the
 bootstrap default); HOST_PATH is the system directories of adoption/hosts/example.json, never this process's PATH
@@ -32,9 +36,13 @@ bootstrap default); HOST_PATH is the system directories of adoption/hosts/exampl
 --host <name> reads adoption/hosts/<name>.json instead, and --set KEY=VALUE overrides one value.
 
 For each file: created when absent and unchanged when identical. A file whose content differs is skipped, never
-overwritten, unless --force is given (then overwritten, keeping its mode bits). A symlink or a non-regular file on the
-way to a target is skipped even with --force, so nothing is written through it. --dry-run writes nothing and reports
-what a real run would do, with the same exit status. The table goes to stdout.
+overwritten, unless --force names it: `--force <path>`, the path as the table prints it (for example
+`--force .github/workflows/sota-sources.yml`), repeatable. A named file is overwritten, keeping its mode bits, with no
+backup (commit first); every other file that differs is still skipped. A bare --force is a usage error, and a path that
+is not a scaffold file is refused before any write. A symlink or a non-regular file on the way to a target is skipped
+even when named, so nothing is written through it. --dry-run writes nothing and reports what a real run would do, with
+the same exit status; it also plans a --target that does not exist yet (every file would be created), which a real
+run refuses. The table goes to stdout.
 
 Exit status: 0 done (nothing skipped), 3 a file was skipped (refusal), 2 a usage error or an input the scaffold
 cannot be written from (nothing written), 1 an unexpected error.
@@ -178,7 +186,19 @@ def blocked(target: Path, relative: str) -> str | None:
     return None
 
 
-def plan(target: Path, files: list[tuple[str, bytes]], force: bool) -> list[dict]:
+def forced_files(named: list[str], files: list[tuple[str, bytes]]) -> set[str]:
+    """The scaffold paths --force names, each as the table prints it; any other path is unusable."""
+    known = [relative for relative, _ in files]
+    forced = set()
+    for name in named:
+        relative = PurePosixPath(name).as_posix()
+        if relative not in known:
+            raise Unusable(f"--force {name!r} is not a scaffold file; name one of: {', '.join(known)}")
+        forced.add(relative)
+    return forced
+
+
+def plan(target: Path, files: list[tuple[str, bytes]], force: set[str]) -> list[dict]:
     rows = []
     for relative, data in files:
         destination = target / relative
@@ -189,10 +209,10 @@ def plan(target: Path, files: list[tuple[str, bytes]], force: bool) -> list[dict
             row["status"] = "create"
         elif destination.read_bytes() == data:
             row["status"] = "unchanged"
-        elif force:
+        elif relative in force:
             row["status"] = "overwrite"
         else:
-            row["status"], row["reason"] = "skipped", "differs from the scaffold; --force overwrites it"
+            row["status"], row["reason"] = "skipped", f"differs from the scaffold; --force {relative} overwrites it"
         rows.append(row)
     return rows
 
@@ -237,11 +257,14 @@ def report(rows: list[dict], dry_run: bool) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--target", required=True, type=Path, help="the new repository's directory (must exist)")
+    parser.add_argument("--target", required=True, type=Path,
+                        help="the new repository's directory (a real run needs it to exist; --dry-run does not)")
     parser.add_argument("--dry-run", action="store_true", help="write nothing; report what a real run would do")
     parser.add_argument("--main-sha", help="the main commit the workflow pins the gate to (default: git ls-remote "
                                            "origin refs/heads/main)")
-    parser.add_argument("--force", action="store_true", help="overwrite a file whose content differs")
+    parser.add_argument("--force", action="append", default=[], metavar="PATH",
+                        help="overwrite this scaffold file although its content differs, PATH as the table prints it "
+                             "(e.g. .github/workflows/sota-sources.yml); repeatable. Other differing files are kept")
     parser.add_argument("--host", help="read .codex/config.toml's values from adoption/hosts/<host>.json")
     parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE",
                         help="override one of ECO_ROOT, HOST_PATH, CODE_INDEX_PATH; repeatable")
@@ -252,22 +275,28 @@ def main(argv: list[str] | None = None, env=None) -> int:
     args = build_parser().parse_args(argv)
     env = os.environ if env is None else env
     target = args.target
+    # Only a dry run may name a directory that does not exist yet: it writes nothing, so its plan can come before
+    # `git init`. A dangling symlink or a file in its place is refused either way.
+    missing = not target.exists() and not target.is_symlink()
     try:
-        if not target.is_dir():
-            raise Unusable(f"--target {target} is not an existing directory (create it, for example with git init)")
+        if not target.is_dir() and not (missing and args.dry_run):
+            raise Unusable(f"--target {target} is not an existing directory (create it, for example with git init; "
+                           "--dry-run plans one that does not exist yet)")
         if target.resolve() == ROOT:
             raise Unusable("--target is this catalog checkout; name the new repository's directory")
         codex_text = render_codex_config(codex_values(args.host, args.set, env))
         sha = main_sha(args.main_sha)
         files = scaffold_files(sha, codex_text)
+        force = forced_files(args.force, files)
     except (Unusable, ValueError) as error:
         print(f"refused: {error}; nothing written", file=sys.stderr)
         return EXIT_USAGE
     gate = gate_state(sha)
-    rows = plan(target, files, args.force)
+    rows = plan(target, files, force)
     # A refused run writes nothing either, so its plan is shown the way a dry run shows it.
     hypothetical = args.dry_run or gate == "absent"
-    print(("DRY RUN: nothing is written. " if args.dry_run else "") + f"Scaffold for {target}")
+    print(("DRY RUN: nothing is written. " if args.dry_run else "") + f"Scaffold for {target}"
+          + (" (does not exist yet: create it, for example with git init, before a real run)" if missing else ""))
     print(f"gate: {GATE_FILE} at {sha} ({GATE_NOTES[gate]})")
     report(rows, hypothetical)
     if gate == "absent":

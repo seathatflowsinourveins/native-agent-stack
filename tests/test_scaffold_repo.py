@@ -5,8 +5,10 @@
 - CLAUDE.md is the `@AGENTS.md` import and one comment line, nothing else.
 - The scaffold is exactly six files, one of them rendered for the host.
 - Against real temporary directories: a fresh directory gets every file, a rerun changes nothing, a modified file is
-  skipped (exit 3) and kept while an absent one is still created, --force overwrites it keeping its mode, --dry-run
-  writes nothing and exits as a real run would, a symlink is never written through, a main commit that lacks the gate
+  skipped (exit 3) and kept while an absent one is still created, `--force <path>` overwrites that file only (keeping
+  its mode) while every other file that differs stays as it is, a bare --force and a path outside the scaffold are
+  usage errors that write nothing, --dry-run writes nothing and exits as a real run would (also for a target that
+  does not exist yet, which a real run refuses), a symlink is never written through, a main commit that lacks the gate
   is refused before any write, and a template value that would break the TOML is refused.
 """
 
@@ -31,9 +33,12 @@ SCAFFOLD = ROOT / "adoption/scaffold"
 CODEX_AGENTS_TEMPLATE = ROOT / "adoption/templates/codex.AGENTS.template.md"
 TOP_RULE_MARKER = "<!-- native-agent-stack:top-rule -->\n"
 A_COMMIT = "0123456789abcdef0123456789abcdef01234567"  # not in any checkout: the gate check reports it unchecked
+B_COMMIT = "89abcdef0123456789abcdef0123456789abcdef"  # a later main commit, also unchecked
+HOME = "/opt/example"  # a fixture HOME outside /home, so no added line reads as a personal home path
 VALUES = ["--set", "ECO_ROOT=/opt/eco", "--set", "HOST_PATH=/usr/bin:/bin", "--set", "CODE_INDEX_PATH=/opt/index"]
-EXPECTED = {"AGENTS.md", "CLAUDE.md", ".agents/skills/README.md", ".github/pull_request_template.md",
-            ".github/workflows/sota-sources.yml", ".codex/config.toml"}
+WORKFLOW = ".github/workflows/sota-sources.yml"
+EXPECTED = {"AGENTS.md", "CLAUDE.md", ".agents/skills/README.md", ".github/pull_request_template.md", WORKFLOW,
+            ".codex/config.toml"}
 
 
 def top_rule_block(text: str) -> str:
@@ -46,7 +51,7 @@ def run(target: Path, *extra: str, env=None) -> tuple:
     out, err = io.StringIO(), io.StringIO()
     with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
         code = scaffold_repo.main(["--target", str(target), "--main-sha", A_COMMIT, *VALUES, *extra],
-                                  env=env if env is not None else {"HOME": "/home/example"})
+                                  env=env if env is not None else {"HOME": HOME})
     return code, out.getvalue(), err.getvalue()
 
 
@@ -100,12 +105,11 @@ class ScaffoldContentTests(unittest.TestCase):
 
     def test_the_default_host_path_is_the_example_hosts_never_this_processs_path(self):
         example = json.loads((ROOT / "adoption/hosts/example.json").read_text(encoding="utf-8"))
-        values = scaffold_repo.codex_values(None, [], {"HOME": "/home/example",
-                                                        "PATH": "/mnt/c/Users/example/bin:/usr/bin"})
+        values = scaffold_repo.codex_values(None, [], {"HOME": HOME, "PATH": "/mnt/c/Users/example/bin:/usr/bin"})
         self.assertEqual(values["HOST_PATH"], example["HOST_PATH"])
-        self.assertEqual(values["ECO_ROOT"], "/home/example/.local/share/codex-ecosystem")
-        self.assertEqual(values["CODE_INDEX_PATH"], "/home/example/.code-index")
-        values = scaffold_repo.codex_values(None, [], {"HOME": "/home/example", "ECO_INSTALL_ROOT": "/opt/eco",
+        self.assertEqual(values["ECO_ROOT"], HOME + "/.local/share/codex-ecosystem")
+        self.assertEqual(values["CODE_INDEX_PATH"], HOME + "/.code-index")
+        values = scaffold_repo.codex_values(None, [], {"HOME": HOME, "ECO_INSTALL_ROOT": "/opt/eco",
                                                         "CODE_INDEX_PATH": "/opt/index"})
         self.assertEqual((values["ECO_ROOT"], values["CODE_INDEX_PATH"]), ("/opt/eco", "/opt/index"))
 
@@ -158,18 +162,67 @@ class ScaffoldRunTests(unittest.TestCase):
         self.assertEqual((self.target / "CLAUDE.md").read_bytes(), (SCAFFOLD / "CLAUDE.md").read_bytes())
         self.assertEqual(rows(out)["AGENTS.md"], "skipped")
         self.assertEqual(rows(out)["CLAUDE.md"], "created")
-        self.assertIn("differs from the scaffold; --force overwrites it", out)
+        self.assertIn("differs from the scaffold; --force AGENTS.md overwrites it", out)
 
-    def test_force_overwrites_a_modified_file_and_keeps_its_mode(self):
+    def test_force_overwrites_the_named_file_and_keeps_its_mode(self):
         self.assertEqual(run(self.target)[0], 0)
         agents = self.target / "AGENTS.md"
         agents.write_text("# Our own rules\n", encoding="utf-8")
         agents.chmod(0o600)
-        code, out, err = run(self.target, "--force")
+        code, out, err = run(self.target, "--force", "AGENTS.md")
         self.assertEqual(code, 0, out + err)
         self.assertEqual(rows(out)["AGENTS.md"], "overwritten")
         self.assertEqual(agents.read_bytes(), (SCAFFOLD / "AGENTS.md").read_bytes())
         self.assertEqual(stat.S_IMODE(agents.stat().st_mode), 0o600)
+
+    def test_forcing_the_workflow_to_a_newer_gate_leaves_every_other_file_untouched(self):
+        # update.md's recipe: a repository whose AGENTS.md, CLAUDE.md and .codex/config.toml were customized moves
+        # only its workflow to a newer main commit.
+        self.assertEqual(run(self.target)[0], 0)
+        customized = {"AGENTS.md": b"# Our own rules\n", "CLAUDE.md": b"@AGENTS.md\n@docs/extra.md\n",
+                      ".codex/config.toml": b"# this host's own\n"}
+        for name, data in customized.items():
+            (self.target / name).write_bytes(data)
+        before = tree(self.target)
+        code, out, err = run(self.target, "--main-sha", B_COMMIT, "--force", WORKFLOW)
+        self.assertEqual(code, scaffold_repo.EXIT_REFUSED, out + err)  # the kept files are still reported
+        after = tree(self.target)
+        self.assertIn(f"sota-sources-gate.yml@{B_COMMIT}\n", after[WORKFLOW].decode("utf-8"))
+        self.assertEqual({name: data for name, data in after.items() if name != WORKFLOW},
+                         {name: data for name, data in before.items() if name != WORKFLOW})
+        self.assertEqual({name: rows(out)[name] for name in customized}, {name: "skipped" for name in customized})
+        self.assertEqual(rows(out)[WORKFLOW], "overwritten")
+        for name in customized:
+            self.assertIn(f"differs from the scaffold; --force {name} overwrites it", out)
+        # Naming every differing file overwrites them all, and the run then exits 0.
+        code, out, err = run(self.target, "--main-sha", B_COMMIT, *[arg for name in customized
+                                                                     for arg in ("--force", f"./{name}")])
+        self.assertEqual(code, 0, out + err)
+        self.assertEqual(tree(self.target)["AGENTS.md"], (SCAFFOLD / "AGENTS.md").read_bytes())
+
+    def test_a_bare_force_or_a_path_outside_the_scaffold_is_a_usage_error_that_writes_nothing(self):
+        self.assertEqual(run(self.target)[0], 0)
+        (self.target / "AGENTS.md").write_text("# Our own rules\n", encoding="utf-8")
+        before = tree(self.target)
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err), \
+                self.assertRaises(SystemExit) as raised:
+            scaffold_repo.main(["--target", str(self.target), "--main-sha", A_COMMIT, *VALUES, "--force"],
+                               env={"HOME": HOME})
+        self.assertEqual(raised.exception.code, scaffold_repo.EXIT_USAGE)
+        self.assertIn("argument --force: expected one argument", err.getvalue())
+        for name in ("README.md", ".github/workflows/sota-sources.yml.template", "../AGENTS.md"):
+            with self.subTest(name=name):
+                code, out, err = run(self.target, "--force", name)
+                self.assertEqual(code, scaffold_repo.EXIT_USAGE, out + err)
+                self.assertIn("is not a scaffold file; name one of: ", err)
+                self.assertIn(WORKFLOW, err)
+        self.assertEqual(tree(self.target), before)
+        result = subprocess.run([sys.executable, str(ROOT / "tools/adoption/scaffold_repo.py"), "--target",
+                                 str(self.target), "--main-sha", A_COMMIT, *VALUES, "--force"],
+                                capture_output=True, text=True, timeout=120, check=False, env={**os.environ, "HOME": HOME})
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertEqual(tree(self.target), before)
 
     def test_dry_run_writes_nothing_and_exits_as_a_real_run_would(self):
         code, out, err = run(self.target, "--dry-run")
@@ -181,17 +234,36 @@ class ScaffoldRunTests(unittest.TestCase):
         code, out, _ = run(self.target, "--dry-run")
         self.assertEqual(code, scaffold_repo.EXIT_REFUSED)
         self.assertEqual(tree(self.target), {"CLAUDE.md": b"@README.md\n"})
-        code, out, _ = run(self.target, "--dry-run", "--force")
+        code, out, _ = run(self.target, "--dry-run", "--force", "CLAUDE.md")
         self.assertEqual((code, rows(out)["CLAUDE.md"]), (0, "would overwrite"))
         self.assertEqual(tree(self.target), {"CLAUDE.md": b"@README.md\n"})
 
-    def test_a_symlink_is_never_written_through_even_with_force(self):
+    def test_dry_run_plans_a_target_that_does_not_exist_yet_and_a_real_run_refuses_it(self):
+        missing = self.base / "not-yet" / "repo"
+        code, out, err = run(missing, "--dry-run")
+        self.assertEqual(code, 0, out + err)
+        self.assertEqual(rows(out), {name: "would create" for name in EXPECTED})
+        self.assertIn("does not exist yet: create it, for example with git init, before a real run", out)
+        self.assertFalse((self.base / "not-yet").exists())
+        code, out, err = run(missing)
+        self.assertEqual(code, scaffold_repo.EXIT_USAGE)
+        self.assertIn("--dry-run plans one that does not exist yet", err)
+        self.assertFalse((self.base / "not-yet").exists())
+        # A file or a dangling symlink in the target's place is refused even in a dry run.
+        (self.base / "a-file").write_text("x\n", encoding="utf-8")
+        (self.base / "dangling").symlink_to(self.base / "nowhere")
+        for target in (self.base / "a-file", self.base / "dangling"):
+            with self.subTest(target=target.name):
+                self.assertEqual(run(target, "--dry-run")[0], scaffold_repo.EXIT_USAGE)
+        self.assertFalse((self.base / "nowhere").exists())
+
+    def test_a_symlink_is_never_written_through_even_when_named(self):
         outside = self.base / "outside"
         outside.mkdir()
         (outside / "AGENTS.md").write_text("elsewhere\n", encoding="utf-8")
         (self.target / "AGENTS.md").symlink_to(outside / "AGENTS.md")
         (self.target / ".github").symlink_to(outside, target_is_directory=True)
-        code, out, _ = run(self.target, "--force")
+        code, out, _ = run(self.target, "--force", "AGENTS.md", "--force", WORKFLOW)
         self.assertEqual(code, scaffold_repo.EXIT_REFUSED)
         self.assertEqual(tree(outside), {"AGENTS.md": b"elsewhere\n"})
         self.assertEqual(rows(out)["AGENTS.md"], "skipped")
@@ -208,7 +280,7 @@ class ScaffoldRunTests(unittest.TestCase):
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             code = scaffold_repo.main(["--target", str(self.target), "--main-sha", root[-1], *VALUES],
-                                      env={"HOME": "/home/example"})
+                                      env={"HOME": HOME})
         self.assertEqual(code, scaffold_repo.EXIT_USAGE)
         self.assertEqual(list(self.target.iterdir()), [])
         self.assertIn("MISSING at that commit", out.getvalue())
@@ -237,7 +309,7 @@ class ScaffoldRunTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(ROOT / "tools/adoption/scaffold_repo.py"), "--target",
                                  str(self.target), "--dry-run", "--main-sha", A_COMMIT, *VALUES],
                                 capture_output=True, text=True, timeout=120, check=False,
-                                env={**os.environ, "HOME": "/home/example"})
+                                env={**os.environ, "HOME": HOME})
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(rows(result.stdout), {name: "would create" for name in EXPECTED})
         self.assertEqual(list(self.target.iterdir()), [])
