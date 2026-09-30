@@ -41,7 +41,7 @@
     "candidate": "stack arm: the same pi with the practice on: RTK extension with the recipe's five exclude_commands, context-mode through MCP (tools declared directly, no message-injecting hooks), serena, jcodemunch, qmd and headroom deferred behind tool_search, toon on PATH, the generated AGENTS.md, and no compression header, so the gateway's headerless lane [session-dedup, ccr, lite] applies (upstream's documented safe lane plus ccr). Variant arms: stack-ext (context-mode as its pi extension, which appends a transient user message to the first request of each prompt) and stack-gwoff (the stack arm with x-omniroute-compression: off, the control that separates the gateway lane from the client stack)."
   },
   "frozen_inputs": {
-    "base_revision": "8d1be2833dd70afe4a24d3f90be40ec592e26c8f",
+    "base_revision": "b4056a355580f079560cb612cf03a0a2568c3af7",
     "tasks": [
       "wiring-smoke",
       "calc-sign-bug",

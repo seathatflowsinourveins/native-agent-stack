@@ -5476,8 +5476,8 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/README.md",
-      "sha256": "570c7f44fbf31e00bfd82151f5b5b9c5a923da9991d8fb6b329084fbb3b39a67",
-      "bytes": 18145
+      "sha256": "25b69720d05cd7539ff3eb11527ecac0c4e9d3d4cd0ab51b36280fd79b43859c",
+      "bytes": 20708
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/gateway-readback-20260930T0009Z-first-apply.json",
@@ -5496,8 +5496,8 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/r1.json",
-      "sha256": "5304819a1628c1e0ccf8b32aede4bd9c714cefdb42c296ebbdae75d23ea3309a",
-      "bytes": 6384
+      "sha256": "de9a6db195400ce76c475a91a143f6644f3e2739f8c01be1e8bdca1f12202c43",
+      "bytes": 6490
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-nocap-attempt-1.json",
@@ -5506,13 +5506,13 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
-      "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0",
-      "bytes": 11118
+      "sha256": "85e97f76708f62a73de1a3cb05462efee9758107eb3048addd7833fd2d42d5db",
+      "bytes": 11644
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-      "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5",
-      "bytes": 103815
+      "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a",
+      "bytes": 106651
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-summary.txt",
@@ -5521,13 +5521,13 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/experiment.json",
-      "sha256": "5479c73f86c8c269c9acc735e05523ded1538bc8596c48c510745fbcbab70b07",
-      "bytes": 76013
+      "sha256": "6377549f4c3a0fd3f46f4560ac2088c6af7a547add5594ab57aacd9536793b87",
+      "bytes": 78997
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/build_evidence.py",
-      "sha256": "a29bed2899dc729fa87b56b95fb3f1619cd5c063095329d03fa0e2090fea9011",
-      "bytes": 5124
+      "sha256": "e6e6c12ce2e355f6e6ff421264f37c869fcd1233f673d191701f4956c9c13788",
+      "bytes": 5573
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/fixtures.py",
@@ -5536,8 +5536,8 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/gateway_usage.py",
-      "sha256": "928b2f330fba1ece95d35c0a069d9650d0187233c9eed5df8f89a3e84b00f9fc",
-      "bytes": 3059
+      "sha256": "1c3052fc07fa0bc2ca6bbe47d5abaa91426715a76c2dcf43578938de247a7613",
+      "bytes": 3243
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/omni_verify.py",
@@ -5556,8 +5556,8 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/probes.py",
-      "sha256": "1509a598ca2334a494a323c576a67e234ed6d1a628b4e784fed484a88d9b2197",
-      "bytes": 20369
+      "sha256": "f2395c35bf6f4e53908de8a4378cc4bf991cc4746915f414a826db499308294c",
+      "bytes": 20564
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_r1.py",
@@ -5566,8 +5566,8 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_s2.sh",
-      "sha256": "6447ea6369a443cf1c85cf9c86377f66ea8f2fdded57533df5d7524d3c641f1b",
-      "bytes": 2402
+      "sha256": "19b0f6f997902b1d97071e95e36b25e1041c5f0f1babe54512cbf3914b4ce450",
+      "bytes": 2575
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_task.py",
@@ -5581,8 +5581,8 @@
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/summarize_runs.py",
-      "sha256": "8843602df814b6ebf7423d7223e6f6fa9a35fef6a2e47919792e1a9b5189a759",
-      "bytes": 5277
+      "sha256": "8bbe61abe0a7c321d84fc3bfc657ade342de1c934ded627d501ff73f1df4668a",
+      "bytes": 6323
     },
     {
       "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/mcp.stack-ext.json.tmpl",
