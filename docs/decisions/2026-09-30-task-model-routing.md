@@ -114,9 +114,9 @@ pinned-version check and one useful native call per tool in each client, and rec
 (`evidence/artifacts/token-adoption-e2e-20260926/README.md:3`).
 
 **Three tools join the profile.** Each is a `component_ids` entry and a `required_commands` entry, at the version
-`manifests/stack.json` pins (this unit does not edit that file). A manifest profile has five keys and carries no version
-or wiring field, so neither is copied into `adoption/manifest.json`; the wiring is stated here, from the files that
-carry it.
+`manifests/stack.json` pins at `e45328d3` (this unit does not edit that file). A manifest profile has five keys and
+carries no version or wiring field, so neither is copied into `adoption/manifest.json`; the wiring is stated here, from
+the files that carry it.
 
 - `jcodemunch-mcp` 1.108.319, source pin `8f7b34abe16fb459e0bf1c04747d584216dfe32e` (`manifests/stack.json:1674`);
   command `jcodemunch-mcp`. Claude Code: registered per project, not at user scope (`adoption/bootstrap.md`,

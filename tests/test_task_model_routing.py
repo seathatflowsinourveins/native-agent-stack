@@ -12,6 +12,7 @@ it as a model; a mention in prose is not a binding.
 
 from __future__ import annotations
 
+import json
 import re
 import unittest
 from pathlib import Path
@@ -19,6 +20,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / "docs" / "decisions" / "2026-09-30-task-model-routing.md"
 POINTER = ROOT / "docs" / "token-practice.md"
+MANIFEST = ROOT / "adoption" / "manifest.json"
+# The three code-navigation tools the record's Decision adds to the token-efficiency profile.
+PROFILE_TOOLS = ("jcodemunch-mcp", "codebase-memory-mcp", "ast-grep")
 SECTIONS = ["Context", "Alternatives", "Decision", "Overturn condition", "Sources"]
 HEADER = ["Task class", "Client", "Model", "Effort", "Enforced today", "Rule source"]
 # The task classes the routing brief names (research split into breadth and judgment, building split by whether a
@@ -117,6 +121,23 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
                 if path.is_file():
                     with self.subTest(path=path.relative_to(ROOT).as_posix()):
                         self.assertIsNone(BINDS_GPT_6_1.search(path.read_text(encoding="utf-8", errors="replace")))
+
+    def test_the_token_efficiency_profile_is_accepted_by_this_record_and_carries_the_three_tools(self):
+        # The Decision's "Profile acceptance" and "Three tools join the profile" paragraphs make claims about
+        # adoption/manifest.json: hold them to the file. Versions are not compared: manifests/stack.json owns them and
+        # the record dates the ones it quotes at its base revision.
+        [profile] = [item for item in json.loads(MANIFEST.read_text(encoding="utf-8"))["profiles"]
+                     if item["id"] == "token-efficiency"]
+        relative = RECORD.relative_to(ROOT).as_posix()
+        self.assertIn("Accepted", profile["label"])
+        self.assertNotIn("Drafted", profile["label"])
+        self.assertIn(relative, profile["label"])
+        self.assertIn(relative, profile["recipe_paths"])
+        for tool in PROFILE_TOOLS:
+            with self.subTest(tool=tool):
+                self.assertIn(tool, profile["component_ids"])
+                self.assertIn(tool, profile["required_commands"])
+                self.assertIn(f"`{tool}` ", self.text)
 
     def test_token_practice_points_to_the_record(self):
         self.assertIn("](decisions/2026-09-30-task-model-routing.md)", POINTER.read_text(encoding="utf-8"))
