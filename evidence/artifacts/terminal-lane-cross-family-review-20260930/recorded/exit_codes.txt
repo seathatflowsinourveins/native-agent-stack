@@ -7,6 +7,7 @@ exit 0 <- python3 -B replace_bell_group_mutants.py <checkout>
 exit 0 <- python3 -B tmux_bell_probe.py --selftest
 exit 0 <- python3 -B tmux_bell_probe.py (tmux 3.4, private server)
 exit 0 <- python3 -B tmux_sync_probe.py (tmux 3.4, private server)
+exit 0 <- python3 -B tmux_sync_probe.py --selftest (shutdown-failure control)
 exit 0 <- python3 -B push_notification_probe.py --selftest
 exit 0 <- python3 -B alert_probe.py --selftest
 exit 0 <- python3 -B color_capture.py --selftest

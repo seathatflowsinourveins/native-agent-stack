@@ -12,7 +12,7 @@ error: a JSON line with `measurement_error`, exit 1, no digest. `--selftest` run
 probe, and `exec /bin/true`, which replaces the shell before the probe) and exits 1 unless the working home measures and every failing one is refused.
 
 Revised again 2026-09-30 after the re-check of that repair: it took the first `PATH=` line of the output, so a startup file that printed one had its own text hashed (two different PATHs
-compared equal) and a newline inside a PATH component cut it short. A startup file cannot know the nonce, the payload is read as bytes (no newline translation) and the digest covers all of it.
+compared equal) and a newline inside a PATH component cut it short. The nonce is fresh per run, so a startup file's ORDINARY output cannot pass for the record; a startup file that deliberately replays the command string (`$BASH_EXECUTION_STRING`) can, so shell stdout is not authenticated, and the framing defends against accidental output only. The payload is read as bytes (no newline translation) and the digest covers all of it.
 `--selftest` adds a startup file that logs a `PATH=` line, one that prints a plain line, one that prints a non-UTF-8 byte, two different PATHs, and a newline inside a component (ten checks in all).
 
 usage: python3 -B login_path_digest.py [--selftest]
@@ -36,7 +36,7 @@ def measure(home):
     """The measurement dict for a home, or {"measurement_error": reason} when the login shell did not reach the end of the probe."""
     user = os.environ.get("USER", home.name)
     default_path = distro_default_path()
-    nonce = secrets.token_hex(8)   # a startup file cannot know it, so what it prints cannot pass for the probe's own record
+    nonce = secrets.token_hex(8)   # fresh per run: what a startup file ordinarily prints cannot pass for the probe's own record (one that replays $BASH_EXECUTION_STRING can: out of scope)
     begin, end = f"BEGIN-{nonce}\n".encode(), f"\nEND-{nonce}\n".encode()
     try:
         run = subprocess.run(["/usr/bin/env", "-i", f"HOME={home}", f"USER={user}", f"LOGNAME={user}", "SHELL=/bin/bash", f"PATH={default_path}",

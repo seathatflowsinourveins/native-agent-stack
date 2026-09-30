@@ -1,8 +1,9 @@
 ok    alert, the unmutated probe passes every case
 ok    alert, mutant, no signal handler is installed: failing 5 of 6 (expected 5)
-ok    alert, mutant, SIGINT is not handled: failing 1 of 6 (expected 1)
-ok    alert, mutant, the client's cleanup is not deferred and the first signal does not silence the rest: failing 3 of 6 (expected 3)
-ok    alert, mutant, the client is created without the spawn flag: failing 1 of 6 (expected 1)
-ok    alert, mutant, the client is created under a signal mask (it inherits the mask): failing 5 of 6 (expected 5)
-ok    alert, mutant, the private directory's cleanup is not deferred: failing 1 of 6 (expected 1)
-7 runs, 0 problems
+ok    alert, mutant, the handler raises (the earlier design): failing 4 of 6 (expected 4)
+ok    alert, mutant, the last signal wins: failing 1 of 6 (expected 1)
+ok    alert, mutant, the observation loop does not poll the latch: failing 5 of 6 (expected 5)
+ok    alert, mutant, the client is not stopped in the cleanup: failing 5 of 6 (expected 5)
+ok    alert, mutant, the private directory is not removed: failing 6 of 6 (expected 6)
+ok    alert, mutant, the measurement ignores exit_status: failing 1 of 6 (expected 1)
+8 runs, 0 problems

@@ -16,6 +16,9 @@ and a second re-check found (5) that `type -P` can print a path that the profile
 entry and fails with 127) or, when no executable matches, a non-executable regular file that bash falls back to (a mode-0644 `claude` on PATH; `exec` exits 126). A name therefore counts as found only
 when the resolved path is an executable regular file.
 
+Scope: the FOUND, MISSING and DONE lines are ordinary stdout, so like the PATH digest this check guards against accidental early exits and startup output, not against a startup file that deliberately
+replays the command string (`$BASH_EXECUTION_STRING`) and prints them itself.
+
 usage: python3 -B login_shell_check_controls.py [--real-host]
 Prints one JSON summary of booleans and names; temporary homes only, removed afterwards. --real-host also runs the check on the running user's own home (read-only).
 """

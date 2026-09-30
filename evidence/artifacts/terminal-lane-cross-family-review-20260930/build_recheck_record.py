@@ -7,6 +7,9 @@ usage: build_recheck_record.py <consolidated.json> [<consolidated.json> ...] --j
 import json, re, sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import record_sanitizer  # noqa: E402  (the shared sanitizer rules; the private labels come from a private file)
+
 args = sys.argv[1:]
 out = Path(args[args.index("--out") + 1])
 journals_at = args.index("--journals")
@@ -14,11 +17,7 @@ consolidated = [Path(a) for a in args[:journals_at]]
 journals = [Path(a) for a in args[journals_at + 1:args.index("--out")]]
 HOME, USER = str(Path.home()), Path.home().name
 
-first = (Path(__file__).resolve().parent / "build_findings_record.py").read_text(encoding="utf-8")
-rules_source = first[first.index("RULES = ["):first.index("\nreplaced = {}")]
-namespace = {"re": re, "HOME": HOME, "USER": USER}
-exec(rules_source, namespace)
-RULES = namespace["RULES"]
+RULES = record_sanitizer.rules()
 
 V, DUP, C = "verifier", "duplicate", "coordinator"
 DISPOSITIONS = {
@@ -114,8 +113,7 @@ for name, payload in (("recheck-results.json", results), ("recheck-verification.
     payload = clean(payload)
     (out / name).write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     text = (out / name).read_text(encoding="utf-8")
-    assert HOME not in text and USER not in text.replace("<user>", ""), f"{name} still holds a home path or the user name"
-    assert not re.search(r"\b(?:Librarium|Phoyo)\b", text), f"{name} still holds a private project label"
+    record_sanitizer.assert_clean(text, name)
     print(f"wrote {name}: {len(text)} bytes")
 by_disposition, kinds, graded = {}, {}, {}
 for row in rows:
