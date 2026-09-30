@@ -1,0 +1,3407 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "local_native_integration_evaluation",
+  "upstream_test_claim": false,
+  "preregistrations": [
+    {
+      "file": "preregistered-cases.json",
+      "sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "frozen_at_utc": "2026-09-30 05:46:35 UTC"
+    },
+    {
+      "file": "followup-preregistration.json",
+      "sha256": "ea036dc0c5ca708de353f51d210dffa0127212366e5d62a692ccbc01735b24d7",
+      "frozen_at_utc": "2026-09-30 06:16:41 UTC"
+    },
+    {
+      "file": "edit-followup-preregistration.json",
+      "sha256": "71bab9abe0757ef7cafdc35c5adbeeeb434291c22397579bf2707271404fddbe",
+      "frozen_at_utc": "2026-09-30 06:19:41 UTC"
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://developers.openai.com/blog/eval-skills",
+      "use": "Define success first; trace + outcome checks; explicit, implicit and adjacent negative; minimum ten focused prompts."
+    },
+    {
+      "url": "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md",
+      "use": "Same-prompt with/without-skill baseline and difficult near-miss trigger cases."
+    },
+    {
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md",
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+    }
+  ],
+  "summary": {
+    "original_executions": 25,
+    "followup_executions": 4,
+    "outer_exit_zero": 29,
+    "original_outcome_passed": 23,
+    "original_outcome_failed": [
+      "claude-w05_completion_branches-with_skill",
+      "claude-w10_markdown_lookup-with_skill"
+    ],
+    "original_implicit_activation_misses": [
+      "codex-w02_implicit_agents-with_skill",
+      "codex-w04_conditional_pointer-with_skill"
+    ],
+    "original_explicit_load_observation_limits": [
+      "claude-s02_explicit_csv-with_skill",
+      "claude-w01_explicit_agents-with_skill",
+      "codex-w01_explicit_agents-with_skill"
+    ],
+    "original_negative_cases": 12,
+    "original_false_positives": [],
+    "followup_outcome_passed": 4,
+    "followup_loads_observed": [
+      "claude-f01_explicit_skill_csv-with_skill",
+      "codex-f03_w02_actual_agents-with_skill",
+      "codex-f04_w04_actual_claude-with_skill"
+    ],
+    "baseline": {
+      "same_prompt_sha256": true,
+      "same_remaining_native_argv": true,
+      "candidate_outcome_passed": true,
+      "baseline_outcome_passed": true,
+      "native_disabled_verified": true,
+      "quality_improvement_established": false
+    }
+  },
+  "named_input_hash_snapshots": [
+    {
+      "id": "inputs-0",
+      "value": {
+        "search_first": {
+          "sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+          "bytes": 8210
+        },
+        "writing_for_agents": {
+          "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "bytes": 10886
+        },
+        "project_agents": {
+          "sha256": "c188d822fdca21e256696cee1c9fb4d34b4974d73aafe71077170fb6b322170c",
+          "bytes": 11450
+        },
+        "project_claude": {
+          "sha256": "9321c84716393baef05243d70d83030c27453d99235007800069f6d2534f22d0",
+          "bytes": 766
+        },
+        "project_claude_settings": {
+          "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
+          "bytes": 2884
+        },
+        "global_codex_agents": {
+          "sha256": "50524adf7e4eef59dec3a367839f328f356e5a6e96e70c002108dc34bfb5dd14",
+          "bytes": 3683
+        }
+      }
+    }
+  ],
+  "native_control_sets": [
+    {
+      "id": "controls-0",
+      "value": [
+        "claude",
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--no-session-persistence",
+        "--debug-file",
+        "<private-path>",
+        "--model",
+        "opus",
+        "--effort",
+        "max",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch",
+        "--allowed-tools",
+        "Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch,mcp__plugin_context-mode_context-mode__ctx_fetch_and_index,mcp__plugin_context-mode_context-mode__ctx_search",
+        "--disallowed-tools",
+        "Write,Edit,NotebookEdit,Agent"
+      ]
+    },
+    {
+      "id": "controls-1",
+      "value": [
+        "claude",
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--no-session-persistence",
+        "--debug-file",
+        "<private-path>",
+        "--model",
+        "opus",
+        "--effort",
+        "max",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch",
+        "--allowed-tools",
+        "Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch,mcp__plugin_context-mode_context-mode__ctx_fetch_and_index,mcp__plugin_context-mode_context-mode__ctx_search",
+        "--disallowed-tools",
+        "Write,Edit,NotebookEdit,Agent",
+        "--json-schema",
+        "{\"type\":\"object\",\"properties\":{\"text\":{\"type\":\"string\"},\"url\":{\"type\":\"string\"}},\"required\":[\"text\",\"url\"],\"additionalProperties\":false}"
+      ]
+    },
+    {
+      "id": "controls-2",
+      "value": [
+        "claude",
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--no-session-persistence",
+        "--debug-file",
+        "<private-path>",
+        "--model",
+        "opus",
+        "--effort",
+        "max",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch",
+        "--allowed-tools",
+        "Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch",
+        "--disallowed-tools",
+        "Write,Edit,NotebookEdit,Agent"
+      ]
+    },
+    {
+      "id": "controls-3",
+      "value": [
+        "claude",
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--no-session-persistence",
+        "--model",
+        "opus",
+        "--effort",
+        "max",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch",
+        "--allowed-tools",
+        "Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch",
+        "--disallowed-tools",
+        "Write,Edit,NotebookEdit,Agent"
+      ]
+    },
+    {
+      "id": "controls-4",
+      "value": [
+        "claude",
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--no-session-persistence",
+        "--debug-file",
+        "<private-path>",
+        "--model",
+        "opus",
+        "--effort",
+        "max",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "Read,Glob,Grep,Bash,Skill,WebFetch,WebSearch,ToolSearch",
+        "--allowed-tools",
+        "Read,Glob,Grep,Skill,Bash(rtk *),WebFetch,WebSearch,ToolSearch",
+        "--disallowed-tools",
+        "Write,Edit,NotebookEdit,Agent",
+        "--disable-slash-commands"
+      ]
+    },
+    {
+      "id": "controls-5",
+      "value": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"ultra\"",
+        "-c",
+        "approval_policy=\"never\"",
+        "-s",
+        "workspace-write",
+        "--skip-git-repo-check",
+        "-o",
+        "<private-path>"
+      ]
+    },
+    {
+      "id": "controls-6",
+      "value": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-m",
+        "gpt-6.1-sol",
+        "-c",
+        "model_reasoning_effort=\"ultra\"",
+        "-c",
+        "approval_policy=\"never\"",
+        "-s",
+        "read-only",
+        "-o",
+        "<private-path>"
+      ]
+    }
+  ],
+  "grading_method": "Criterion numbers refer to the frozen case outcome_checks in each preregistration. Manual semantic reviews are separate from strict JSON/native structured-output checks and whitespace word counts. Original failed criteria remain failed.",
+  "usage_scope": "One cumulative native result per run. Main usage and model scopes are retained separately; cache and reasoning fields are subsets. Advisor/model buckets are not added to main usage. Native costUSD fields are list estimates, not an invoice. These counters omit the coordinator and worker orchestration sessions. No quality or efficiency gain is established.",
+  "runs": [
+    {
+      "run_id": "claude-f01_explicit_skill_csv-with_skill",
+      "case_id": "f01_explicit_skill_csv",
+      "phase": "followup",
+      "preregistration": "followup-preregistration.json",
+      "preregistration_sha256": "ea036dc0c5ca708de353f51d210dffa0127212366e5d62a692ccbc01735b24d7",
+      "prompt_sha256": "29292a05cb12685faaf781fd043805e8ff7e68ac9761cfdf2111020ccf083e4c",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:20:36.290Z",
+      "finished_at_utc": "2026-09-30T06:23:57.956Z",
+      "duration_ms": 201665,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "search-first",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [
+        {
+          "name": "Skill",
+          "input": {
+            "skill": "search-first",
+            "args": "Python CSV reader for a small project; rows may contain commas inside quoted fields. Recommend the maintained existing component and API calls to reuse, with one primary-source link and a short reason. Recommendation only, no file changes."
+          }
+        }
+      ],
+      "instruction_loads": [
+        {
+          "method": "native_injected_full_body",
+          "event_index": 22,
+          "matched_instruction_body_sha256": "6df7f6b7700ffabb22941a65ce7cd8405356ed93763c7dcae1fbd7854166c85e",
+          "matched_skill_md_sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+          "matched_body_bytes": 7813,
+          "output_excerpt": "# /search-first — Research Before You Code"
+        }
+      ],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [
+        "2026-09-30T06:20:45.711Z [DEBUG] SkillTool returning 3 newMessages for skill search-first"
+      ],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "**Use Python's built-in `csv` module.** There's nothing to install, and it ships and is maintained with CPython itself. The current docs are for 3.14.7.\n\n```python\nimport csv\n\nwith open(path, newline=\"\", encoding=\"utf-8\") as f:\n    reader = csv.DictReader(f, strict=True)   # or csv.reader(f) to get plain lists\n    try:\n        for row in reader:\n            ...\n    except csv.Error as e:\n        raise ValueError(f\"{path}, line {reader.line_num}: {e}\") from e\n```\n\n- **Why it handles your case:** by default it treats `,` as the separator and `\"` as the quote character, and reads a doubled `\"\"` as a literal quote. So `1,\"Smith, Jane\"` comes back as two fields, not three.\n- **`newline=\"\"` is required:** the docs say quoted fields that contain line breaks aren't read correctly without it.\n- **`strict=True`:** raises `csv.Error` on badly quoted input instead of quietly accepting it. Reporting `reader.line_num` in the error follows the docs' own example.\n- **Types:** every value comes back as a string, so convert numbers and dates yourself.\n\nSource: https://docs.python.org/3/library/csv.html\n\n**Alternatives I didn't pick:** pandas, polars or pyarrow's CSV reader are only worth adding if you need typed columns or speed on large files. Use `csv.Sniffer` only if you don't know the delimiter in advance. This repo already imports `csv` in 28 files (e.g. `scripts/verify_nautilus_ci.py:99`), so it also matches how the code already reads CSV.\n\n**What I checked:** I followed the search-first skill's quick mode and compared the recommendation against the live docs and this machine's copy of the module (`<private-system-path>`). I didn't actually run a test parse, because running shell commands and code was blocked in this session. For the same reason I skipped the version, package-registry, GitHub and skills-folder checks; they don't matter for a standard-library choice. No files were changed.",
+      "structured_output": null,
+      "graded_artifact": "**Use Python's built-in `csv` module.** There's nothing to install, and it ships and is maintained with CPython itself. The current docs are for 3.14.7.",
+      "final_word_count": 282,
+      "graded_artifact_word_count": 24,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Skill": 1,
+          "Bash": 1,
+          "Grep": 3,
+          "ToolSearch": 2,
+          "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index": 1,
+          "Glob": 1,
+          "mcp__plugin_context-mode_context-mode__ctx_search": 2,
+          "mcp__plugin_context-mode_context-mode__ctx_execute": 1,
+          "Read": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [
+          {
+            "tool_use_id": "toolu_01NPTXozqyTMHTSa79TtwKhH",
+            "actual_returned_excerpt": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's request, STOP and explain to the user what you were tryin"
+          },
+          {
+            "tool_use_id": "toolu_01SYk5enrQgQBxp98UMPERGB",
+            "actual_returned_excerpt": "Permission to use mcp__plugin_context-mode_context-mode__ctx_execute has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's request, ST"
+          }
+        ],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 14,
+        "cache_creation_input_tokens": 69519,
+        "cache_read_input_tokens": 371504,
+        "output_tokens": 15302,
+        "output_tokens_details": {
+          "thinking_tokens": 12473
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 68498,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 14,
+          "outputTokens": 15302,
+          "cacheReadInputTokens": 371504,
+          "cacheCreationInputTokens": 69519,
+          "webSearchRequests": 0,
+          "costUSD": 0.9334858,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 12473,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 67201,
+          "outputTokens": 4146,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.87931,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "755605e375c697d3319953b753c70809732f1ce13f283b0316879e6931520831",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-0"
+    },
+    {
+      "run_id": "claude-f02_native_json-with_skill",
+      "case_id": "f02_native_json",
+      "phase": "followup",
+      "preregistration": "followup-preregistration.json",
+      "preregistration_sha256": "ea036dc0c5ca708de353f51d210dffa0127212366e5d62a692ccbc01735b24d7",
+      "prompt_sha256": "f3b49c3f2dcac6e53ff517d1ed581ad3f0fe5eaecee45f7e64e221bd89faa298",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:27:16.195Z",
+      "finished_at_utc": "2026-09-30T06:27:33.554Z",
+      "duration_ms": 17358,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "{\"text\":\"Agent handbook\",\"url\":\"docs/agents.md\"}",
+      "structured_output": {
+        "text": "Agent handbook",
+        "url": "docs/agents.md"
+      },
+      "graded_artifact": "{\"text\":\"Agent handbook\",\"url\":\"docs/agents.md\"}",
+      "final_word_count": 2,
+      "graded_artifact_word_count": 2,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "recorded_check",
+          "assessment": "Graded native result.structured_output, produced through --json-schema; the original fenced case remains separate."
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Bash": 1,
+          "StructuredOutput": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [
+          {
+            "tool_use_id": "toolu_01XS9mpnPE9ru2J7TTom2c82",
+            "actual_returned_excerpt": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's request, STOP and explain to the user what you were tryin"
+          }
+        ],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 46266,
+        "cache_read_input_tokens": 44555,
+        "output_tokens": 1357,
+        "output_tokens_details": {
+          "thinking_tokens": 1080
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 46266,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 1357,
+          "cacheReadInputTokens": 44555,
+          "cacheCreationInputTokens": 46266,
+          "webSearchRequests": 0,
+          "costUSD": 0.406195,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 1080,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "27c5d50e546df2508bc8e74b2409401fb7b290f827461d0399390ab20895605d",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-1"
+    },
+    {
+      "run_id": "claude-s02_explicit_csv-with_skill",
+      "case_id": "s02_explicit_csv",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "04008e8a5179641252c25c229d09558b73c1305ace41609bf71b22301b7e7a2f",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:08:34.237Z",
+      "finished_at_utc": "2026-09-30T06:11:28.407Z",
+      "duration_ms": 174169,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "search-first",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "explicit_cli_dispatch_full_load_unobservable",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Use Python's built-in **`csv` module**. It needs no new dependency, and this repo already uses the same pattern at `scripts/verify_nautilus_ci.py:98-99`.\n\n**API calls to reuse:**\n- **Open the file:** `open(path, newline='', encoding='utf-8')`. The `newline=''` part is required; without it, line breaks inside quoted fields are read incorrectly.\n- **Read rows:** `csv.DictReader(f)` gives each row as a dict keyed by the header row; `csv.reader(f)` gives plain lists. The default settings already handle `\"Smith, Jane\"` and doubled quotes (`\"\"`).\n- **Handle bad rows:** catch `csv.Error` and report `reader.line_num`. Pass `strict=True` if badly quoted input should raise an error instead of being read leniently.\n\n**Source:** https://docs.python.org/3/library/csv.html\n\n**Reason:** it ships with Python, and unlike `line.split(',')` it keeps commas inside quoted fields as part of the value. Switch to `pandas.read_csv` or polars only if you need typed columns or faster loading of large files.\n\nI couldn't test this myself because running code (Bash and the sandbox tool) is blocked in this mode. The behavior above comes from the Python 3.14.7 docs and the existing code in the repo. No files were changed.",
+      "structured_output": null,
+      "graded_artifact": "Use Python's built-in **`csv` module**. It needs no new dependency, and this repo already uses the same pattern at `scripts/verify_nautilus_ci.py:98-99`.",
+      "final_word_count": 176,
+      "graded_artifact_word_count": 20,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "ToolSearch": 2,
+          "Bash": 1,
+          "Grep": 2,
+          "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index": 1,
+          "mcp__plugin_context-mode_context-mode__ctx_search": 3,
+          "mcp__plugin_context-mode_context-mode__ctx_execute": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [
+          {
+            "tool_use_id": "toolu_019xspLmBXXP4a4aanst95Fm",
+            "actual_returned_excerpt": "Permission to use Bash has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's request, STOP and explain to the user what you were tryin"
+          },
+          {
+            "tool_use_id": "toolu_0175bDhvF7BKNSSXfKvdywib",
+            "actual_returned_excerpt": "Permission to use mcp__plugin_context-mode_context-mode__ctx_execute has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's request, ST"
+          }
+        ],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 18,
+        "cache_creation_input_tokens": 59535,
+        "cache_read_input_tokens": 444052,
+        "output_tokens": 10514,
+        "output_tokens_details": {
+          "thinking_tokens": 8183
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 58182,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 18,
+          "outputTokens": 10514,
+          "cacheReadInputTokens": 444052,
+          "cacheCreationInputTokens": 59535,
+          "webSearchRequests": 0,
+          "costUSD": 0.7713834,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 8183,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 57496,
+          "outputTokens": 5016,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.82576,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "ac437a35834258f8e4d90717c93101ad71bba97df529fadd0e7a9a7c0aadd755",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-0"
+    },
+    {
+      "run_id": "claude-s03_adjacent_copyedit-with_skill",
+      "case_id": "s03_adjacent_copyedit",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "9b1c7a2cc4ed694e5e55af5c0798cdefe3e732783a033491300c64317ee94caf",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:05:57.165Z",
+      "finished_at_utc": "2026-09-30T06:06:10.253Z",
+      "duration_ms": 13088,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "search-first",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Search first, then write the utility.",
+      "structured_output": null,
+      "graded_artifact": "Search first, then write the utility.",
+      "final_word_count": 6,
+      "graded_artifact_word_count": 6,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 37296,
+        "cache_read_input_tokens": 7030,
+        "output_tokens": 839,
+        "output_tokens_details": {
+          "thinking_tokens": 827
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 37296,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 839,
+          "cacheReadInputTokens": 7030,
+          "cacheCreationInputTokens": 37296,
+          "webSearchRequests": 0,
+          "costUSD": 0.316562,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 827,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "04c1f2cb5fa134646fa0d739951eb97ba246d2721fd6d76ff6b223dc35bbcef2",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w01_explicit_agents-with_skill",
+      "case_id": "w01_explicit_agents",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "e864c05fa8542d6dec485d878068eca501b4109887e04ed3ff9ab8792ca60f29",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T05:50:55.550Z",
+      "finished_at_utc": "2026-09-30T05:52:21.661Z",
+      "duration_ms": 86110,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "explicit_cli_dispatch_full_load_unobservable",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "**Replacement paragraph (19 words):**\n\n> When you change application code, run the checks docs/testing.md requires; the change is complete only when every one passes.\n\n**What changed:** Following the writing-for-agents rules on one trigger per branch and no duplication, the rewrite states the application-code trigger and the docs/testing.md pointer once each, relies on running the checks to imply reading the doc, and keeps the strict rule that every check must pass.",
+      "structured_output": null,
+      "graded_artifact": "When you change application code, run the checks docs/testing.md requires; the change is complete only when every one passes.",
+      "final_word_count": 70,
+      "graded_artifact_word_count": 19,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 47451,
+        "cache_read_input_tokens": 41377,
+        "output_tokens": 5977,
+        "output_tokens_details": {
+          "thinking_tokens": 5806
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 41377,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 5977,
+          "cacheReadInputTokens": 41377,
+          "cacheCreationInputTokens": 47451,
+          "webSearchRequests": 0,
+          "costUSD": 0.48921739999999997,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 5806,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 48345,
+          "outputTokens": 1600,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.56345,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "bf176a799f371ea020c3419baea102fb3e5ca654216c256bd906514af2f4152f",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-3"
+    },
+    {
+      "run_id": "claude-w02_implicit_agents-with_skill",
+      "case_id": "w02_implicit_agents",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "fe03e963c7e73be89a4e30640cf41e5ad488e35b921ad552506a1d7fde41023d",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T05:54:09.919Z",
+      "finished_at_utc": "2026-09-30T05:57:19.002Z",
+      "duration_ms": 189082,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [
+        {
+          "name": "Skill",
+          "input": {
+            "skill": "writing-for-agents"
+          }
+        }
+      ],
+      "instruction_loads": [
+        {
+          "method": "native_injected_full_body",
+          "event_index": 49,
+          "matched_instruction_body_sha256": "44d3b277b1ac16f004179e7df9435d071e6ace0c8e4997782efbda979e114a92",
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_body_bytes": 10734,
+          "output_excerpt": "Reference for writing any document an agent consumes: a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable, since the agent takes the same _process_ every run rather than producing the same output."
+        }
+      ],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [
+        "2026-09-30T05:55:01.860Z [DEBUG] SkillTool returning 3 newMessages for skill writing-for-agents"
+      ],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "```markdown\nWhen you change or test executable code, follow `docs/testing.md` and run the tests in `package.json`. When you prepare a release, review `docs/release.md` and run every release check it lists before shipping.\n```\n\nI removed the unconditional \"Always read\" line, the repeated `docs/testing.md` instruction and the empty \"Be thorough\", so each doc is now read only when its case comes up (a code change or a release) and both duties remain.",
+      "structured_output": null,
+      "graded_artifact": "When you change or test executable code, follow `docs/testing.md` and run the tests in `package.json`. When you prepare a release, review `docs/release.md` and run every release check it lists before shipping.",
+      "final_word_count": 71,
+      "graded_artifact_word_count": 31,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 5,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Skill": 1,
+          "ToolSearch": 1,
+          "Bash": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [
+          {
+            "tool_use_id": "toolu_01FN8FKr5XgnnW9C5Wvk3hrj",
+            "actual_returned_excerpt": "Exit code 2\n/usr/bin/ls: cannot access 'docs/testing.md': No such file or directory\n/usr/bin/ls: cannot access 'docs/release.md': No such file or directory\n/usr/bin/ls: cannot access 'package.json': No such file or directory"
+          }
+        ],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 56492,
+        "cache_read_input_tokens": 105697,
+        "output_tokens": 17299,
+        "output_tokens_details": {
+          "thinking_tokens": 16891
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 47284,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 17299,
+          "cacheReadInputTokens": 105697,
+          "cacheCreationInputTokens": 56492,
+          "webSearchRequests": 0,
+          "costUSD": 0.7914554,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 16891,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 58604,
+          "outputTokens": 2217,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.69689,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "3698b2d3dc7237fbfc02b67e4a974f2b3d5aa0472215c9d0e397df955197b4e3",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w02_implicit_agents-without_all_skills",
+      "case_id": "w02_implicit_agents",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "fe03e963c7e73be89a4e30640cf41e5ad488e35b921ad552506a1d7fde41023d",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T05:57:19.515Z",
+      "finished_at_utc": "2026-09-30T05:59:02.520Z",
+      "duration_ms": 103005,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "without_all_skills",
+      "activation_assessment": "native_disabled_baseline_verified",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": {
+        "skills": [],
+        "skill_tool_present": false
+      },
+      "final_returned_result_sanitized": "> When you work on or run tests, or change executable code, read `docs/testing.md` and follow it; after any executable-code change, run the test scripts in `package.json`. Before shipping a release, read `docs/release.md` and run its release checks.\n\nThe rewrite removes the \"Always read\" line, the repeated \"Follow docs/testing.md\" and the vague \"Be thorough\", and ties each document to the work that needs it (`docs/testing.md` for testing or code changes, `docs/release.md` for release preparation), so a session doing neither reads neither file while the testing and release-check duties stay the same.",
+      "structured_output": null,
+      "graded_artifact": "When you work on or run tests, or change executable code, read `docs/testing.md` and follow it; after any executable-code change, run the test scripts in `package.json`. Before shipping a release, read `docs/release.md` and run its release checks.",
+      "final_word_count": 91,
+      "graded_artifact_word_count": 37,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 5,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Glob": 1,
+          "Grep": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 41625,
+        "cache_read_input_tokens": 70388,
+        "output_tokens": 7382,
+        "output_tokens_details": {
+          "thinking_tokens": 6959
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 38912,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 7382,
+          "cacheReadInputTokens": 70388,
+          "cacheCreationInputTokens": 41625,
+          "webSearchRequests": 0,
+          "costUSD": 0.4866026,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 6959,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 37869,
+          "outputTokens": 2385,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.49793999999999994,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "8ae9264ca65adeaa2c5997f79ab1d32af51cf4e4c233596210e8057b6e5b709b",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-4"
+    },
+    {
+      "run_id": "claude-w03_implicit_claude-with_skill",
+      "case_id": "w03_implicit_claude",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "b243a7e3402ca03101cbcd7c2407a994dadc4a533892304d5f4dbf0b58a1268a",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T05:59:02.639Z",
+      "finished_at_utc": "2026-09-30T06:03:56.134Z",
+      "duration_ms": 293494,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [
+        {
+          "name": "Skill",
+          "input": {
+            "skill": "writing-for-agents"
+          }
+        }
+      ],
+      "instruction_loads": [
+        {
+          "method": "native_injected_full_body",
+          "event_index": 93,
+          "matched_instruction_body_sha256": "44d3b277b1ac16f004179e7df9435d071e6ace0c8e4997782efbda979e114a92",
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_body_bytes": 10734,
+          "output_excerpt": "Reference for writing any document an agent consumes: a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable, since the agent takes the same _process_ every run rather than producing the same output."
+        }
+      ],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [
+        "2026-09-30T06:00:41.319Z [DEBUG] SkillTool returning 3 newMessages for skill writing-for-agents"
+      ],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "**Replacement (20 words):**\n\n> Before you finish changing executable code, run the test and build scripts in the repository's `package.json` and confirm both pass.\n\nI cut the first three sentences because they repeated what `package.json` already defines (including the `npm test` and `npm run build` names) and asked whoever edits the file to keep that repeated copy up to date; since the file is always current, a copy in the instructions can only go out of date (Pruning section of the `writing-for-agents` skill, mattpocock/skills@c55ee46).",
+      "structured_output": null,
+      "graded_artifact": "Before you finish changing executable code, run the test and build scripts in the repository's `package.json` and confirm both pass.",
+      "final_word_count": 84,
+      "graded_artifact_word_count": 20,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Skill": 1,
+          "ToolSearch": 3,
+          "Grep": 2,
+          "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index": 1,
+          "WebFetch": 1,
+          "Bash": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [
+          {
+            "tool_use_id": "toolu_01MYdbGbHJm2uUtAsqpJkRFx",
+            "actual_returned_excerpt": "Permission to use mcp__plugin_context-mode_context-mode__ctx_fetch_and_index has been denied because Claude Code is running in don't ask mode. IMPORTANT: You *may* attempt to accomplish this action using other tools that might naturally be used to accomplish this goal, e.g. using head instead of cat. But you *should not* attempt to work around this denial in malicious ways, e.g. do not use your ability to run tests to execute non-test actions. You should only try to work around this restriction in reasonable ways that do not attempt to bypass the intent behind this denial. If you believe this capability is essential to complete the user's req"
+          },
+          {
+            "tool_use_id": "toolu_0171Di7bEqY1ekRqcnzkZWc5",
+            "actual_returned_excerpt": "PreToolUse:WebFetch hook error: context-mode: WebFetch redirected. Call mcp__plugin_context-mode_context-mode__ctx_fetch_and_index(url: \"https://code.claude.com/docs/en/best-practices\", source: \"...\") to fetch + index the page, then mcp__plugin_context-mode_context-mode__ctx_search(queries: [...]) to query the indexed content — the raw page bytes stay in storage instead of entering your conversation. Or call mcp__plugin_context-mode_context-mode__ctx_execute(language, code) when you want to derive your answer in one round trip (parse, extract, count) without persisting the response. Both have full network access. Retry the same call on a tran"
+          }
+        ],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 16,
+        "cache_creation_input_tokens": 73792,
+        "cache_read_input_tokens": 499394,
+        "output_tokens": 28072,
+        "output_tokens_details": {
+          "thinking_tokens": 26484
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 73064,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 28072,
+          "cacheReadInputTokens": 499394,
+          "cacheCreationInputTokens": 73792,
+          "webSearchRequests": 0,
+          "costUSD": 1.2495348,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 26484,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 56383,
+          "outputTokens": 2805,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.70408,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "8fd470d0696efcf5c5d9717f857688ed8902ebff0cee3fae954bd365607fcdf2",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w04_conditional_pointer-with_skill",
+      "case_id": "w04_conditional_pointer",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "afe7e4e2ce3f2a069ba2a01bee42c7e29218bd81ca05b284a4874a8244f4a45d",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:03:56.270Z",
+      "finished_at_utc": "2026-09-30T06:05:12.047Z",
+      "duration_ms": 75776,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [
+        {
+          "name": "Skill",
+          "input": {
+            "skill": "writing-for-agents"
+          }
+        }
+      ],
+      "instruction_loads": [
+        {
+          "method": "native_injected_full_body",
+          "event_index": 34,
+          "matched_instruction_body_sha256": "44d3b277b1ac16f004179e7df9435d071e6ace0c8e4997782efbda979e114a92",
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_body_bytes": 10734,
+          "output_excerpt": "Reference for writing any document an agent consumes: a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable, since the agent takes the same _process_ every run rather than producing the same output."
+        }
+      ],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [
+        "2026-09-30T06:04:21.964Z [DEBUG] SkillTool returning 3 newMessages for skill writing-for-agents"
+      ],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Read `docs/migration.md` before adding a migration or changing the migration runner.",
+      "structured_output": null,
+      "graded_artifact": "Read `docs/migration.md` before adding a migration or changing the migration runner.",
+      "final_word_count": 11,
+      "graded_artifact_word_count": 11,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Skill": 1,
+          "Glob": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 46202,
+        "cache_read_input_tokens": 101802,
+        "output_tokens": 4693,
+        "output_tokens_details": {
+          "thinking_tokens": 4530
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 43379,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 4693,
+          "cacheReadInputTokens": 101802,
+          "cacheCreationInputTokens": 46202,
+          "webSearchRequests": 0,
+          "costUSD": 0.47539139999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 4530,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 51907,
+          "outputTokens": 1286,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.58337,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "45fca02acd766a8d8cbdb5ba962c9726bfff2c8141a98f67315367086657d790",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w05_completion_branches-with_skill",
+      "case_id": "w05_completion_branches",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "27339136c36801e5bbfc2191f21ede8edd0077bd283b43c57b8fd2cfe16c7b95",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:05:12.182Z",
+      "finished_at_utc": "2026-09-30T06:08:34.047Z",
+      "duration_ms": 201864,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [
+        {
+          "name": "Skill",
+          "input": {
+            "skill": "writing-for-agents"
+          }
+        }
+      ],
+      "instruction_loads": [
+        {
+          "method": "native_injected_full_body",
+          "event_index": 62,
+          "matched_instruction_body_sha256": "44d3b277b1ac16f004179e7df9435d071e6ace0c8e4997782efbda979e114a92",
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_body_bytes": 10734,
+          "output_excerpt": "Reference for writing any document an agent consumes: a skill, an `AGENTS.md` / `CLAUDE.md`, a doc reached by a pointer. The packaging differs; the writing does not: the same levers make each one predictable, since the agent takes the same _process_ every run rather than producing the same output."
+        }
+      ],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [
+        "2026-09-30T06:06:20.299Z [DEBUG] SkillTool returning 3 newMessages for skill writing-for-agents"
+      ],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Here's the replacement section. It's 39 words by `wc -w`, counting the bullet and bold markers:\n\n```markdown\n- **Documentation-only edits:** complete when links in the changed sections resolve and examples match the existing commands.\n- **Deployment-script changes:** read the deploy guide, `docs/deploy.md`, in full before editing; complete when every check in its native validation procedure passes.\n```\n\nThis changes one behaviour on purpose. The original's \"read the entire guide for every task\" now applies only to deployment-script changes. Put it back if other tasks need the guide.\n\nThe old \"looks good\" and \"do testing\" steps are gone because the section's own completion criteria replace them. I kept your wording for both criteria.\n\nI followed the installed `writing-for-agents` skill: one bullet per case, each action next to its completion check, and positive wording. `docs/deploy.md` isn't in this checkout, so I couldn't check the procedure's name against the file. I made no file changes.",
+      "structured_output": null,
+      "graded_artifact": "- **Documentation-only edits:** complete when links in the changed sections resolve and examples match the existing commands.\n- **Deployment-script changes:** read the deploy guide, `docs/deploy.md`, in full before editing; complete when every check in its native validation procedure passes.",
+      "final_word_count": 152,
+      "graded_artifact_word_count": 39,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": false,
+          "method": "recorded_check",
+          "assessment": "The full returned result has 152 whitespace-delimited words; its replacement section has 39 words. The frozen grader targets total output while the task clause targets the replacement section. No deployment execution is introduced."
+        }
+      ],
+      "outcome_passed": false,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Skill": 1,
+          "Glob": 1,
+          "Bash": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 68963,
+        "cache_read_input_tokens": 161653,
+        "output_tokens": 17102,
+        "output_tokens_details": {
+          "thinking_tokens": 16464
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 59049,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 17102,
+          "cacheReadInputTokens": 161653,
+          "cacheCreationInputTokens": 68963,
+          "webSearchRequests": 0,
+          "costUSD": 0.8963646,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 16464,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 58810,
+          "outputTokens": 2382,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.7072,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "e584e3409213aebd6117effbd7bf3b000d0292903933556972833daae839edfb",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w06_human_readme-with_skill",
+      "case_id": "w06_human_readme",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "b4fe43e0b26852f703d03cbd2086fc67f383e9455ab531a28973bba85585b5a2",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:07:33.292Z",
+      "finished_at_utc": "2026-09-30T06:08:21.732Z",
+      "duration_ms": 48440,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "`CONTRIBUTING.md` is the guide written for humans, while our automation agents read `AGENTS.md`. You can also search the documentation from the website.",
+      "structured_output": null,
+      "graded_artifact": "`CONTRIBUTING.md` is the guide written for humans, while our automation agents read `AGENTS.md`. You can also search the documentation from the website.",
+      "final_word_count": 22,
+      "graded_artifact_word_count": 22,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 37413,
+        "cache_read_input_tokens": 7030,
+        "output_tokens": 4956,
+        "output_tokens_details": {
+          "thinking_tokens": 4903
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 37413,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 4956,
+          "cacheReadInputTokens": 7030,
+          "cacheCreationInputTokens": 37413,
+          "webSearchRequests": 0,
+          "costUSD": 0.399838,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 4903,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "a3930267d28a05273d702a9bbf84e67dd16ee24c6dd901f6f424a90c2249d62d",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w07_human_newsletter-with_skill",
+      "case_id": "w07_human_newsletter",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "00355b45581834111a1d242b95e94245214da38cd79edae441192b2cc476317f",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:07:02.481Z",
+      "finished_at_utc": "2026-09-30T06:07:33.185Z",
+      "duration_ms": 30704,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "If you've poked around a software project lately, you may have spotted files named AGENTS.md or CLAUDE.md sitting beside the familiar README. They're plain Markdown notes in which developers give AI coding assistants the background a new teammate would need, such as how the project is built and tested and which conventions it follows; AGENTS.md is an open format that many coding tools recognize, while CLAUDE.md is the version read by Anthropic's Claude Code.",
+      "structured_output": null,
+      "graded_artifact": "If you've poked around a software project lately, you may have spotted files named AGENTS.md or CLAUDE.md sitting beside the familiar README. They're plain Markdown notes in which developers give AI coding assistants the background a new teammate would need, such as how the project is built and tested and which conventions it follows; AGENTS.md is an open format that many coding tools recognize, while CLAUDE.md is the version read by Anthropic's Claude Code.",
+      "final_word_count": 74,
+      "graded_artifact_word_count": 74,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 37436,
+        "cache_read_input_tokens": 7030,
+        "output_tokens": 2956,
+        "output_tokens_details": {
+          "thinking_tokens": 2809
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 37436,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 2956,
+          "cacheReadInputTokens": 7030,
+          "cacheCreationInputTokens": 37436,
+          "webSearchRequests": 0,
+          "costUSD": 0.36002199999999995,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 2809,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "47bbf9a5562d35598ef3797c26657261fcf34d6bd326ad4765069d78ca164611",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w08_human_support-with_skill",
+      "case_id": "w08_human_support",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "47ba0850290c793de09b889aceb1d8ea6b07342daaffbbddaf15b0f328a1f5f9",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:06:45.839Z",
+      "finished_at_utc": "2026-09-30T06:07:02.337Z",
+      "duration_ms": 16498,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "`CLAUDE.md` is a plain Markdown instructions file that Claude Code looks for when a session starts (in the project folder, its parent folders, or `~/.claude/`), so the message only means Claude Code didn't find one and is running without those project instructions. Builds don't read that file, so the message says nothing about whether yours succeeded; check the build's exit code and error output for that.",
+      "structured_output": null,
+      "graded_artifact": "`CLAUDE.md` is a plain Markdown instructions file that Claude Code looks for when a session starts (in the project folder, its parent folders, or `~/.claude/`), so the message only means Claude Code didn't find one and is running without those project instructions. Builds don't read that file, so the message says nothing about whether yours succeeded; check the build's exit code and error output for that.",
+      "final_word_count": 66,
+      "graded_artifact_word_count": 66,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {
+          "Grep": 1
+        },
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 38406,
+        "cache_read_input_tokens": 51386,
+        "output_tokens": 1082,
+        "output_tokens_details": {
+          "thinking_tokens": 851
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 38406,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 1082,
+          "cacheReadInputTokens": 51386,
+          "cacheCreationInputTokens": 38406,
+          "webSearchRequests": 0,
+          "costUSD": 0.33918119999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 851,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "88d6a2654fab28334ca256a5cf2af0eef21d2390612f328a739a9a6f0289569c",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w09_human_copyedit-with_skill",
+      "case_id": "w09_human_copyedit",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "be902a34e9e5aae1c5d8b75b18a2f53f90fc77b95c3fb186afb88feb594c90e0",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:06:24.021Z",
+      "finished_at_utc": "2026-09-30T06:06:45.704Z",
+      "duration_ms": 21683,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Writing for agents and people needs clear instructions.",
+      "structured_output": null,
+      "graded_artifact": "Writing for agents and people needs clear instructions.",
+      "final_word_count": 8,
+      "graded_artifact_word_count": 8,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 37310,
+        "cache_read_input_tokens": 7030,
+        "output_tokens": 1979,
+        "output_tokens_details": {
+          "thinking_tokens": 1961
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 37310,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 1979,
+          "cacheReadInputTokens": 7030,
+          "cacheCreationInputTokens": 37310,
+          "webSearchRequests": 0,
+          "costUSD": 0.339474,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 1961,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "e5a6481ed3adcd6b94ee69013956465b586a5ef9f76e50ac7238836ac7a323ed",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "claude-w10_markdown_lookup-with_skill",
+      "case_id": "w10_markdown_lookup",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "f3b49c3f2dcac6e53ff517d1ed581ad3f0fe5eaecee45f7e64e221bd89faa298",
+      "client": "claude",
+      "client_version": "2.1.285",
+      "model_requested": "opus",
+      "model_resolved": "claude-opus-5-5",
+      "effort_requested": "max",
+      "started_at_utc": "2026-09-30T06:06:10.389Z",
+      "finished_at_utc": "2026-09-30T06:06:23.895Z",
+      "duration_ms": 13505,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "```json\n{\"text\": \"Agent handbook\", \"url\": \"docs/agents.md\"}\n```",
+      "structured_output": null,
+      "graded_artifact": "```json\n{\"text\": \"Agent handbook\", \"url\": \"docs/agents.md\"}\n```",
+      "final_word_count": 7,
+      "graded_artifact_word_count": 7,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": false,
+          "method": "recorded_check",
+          "assessment": "Strict JSON.parse of the unchanged native final string failed: Unexpected token '`', \"```json\n{\"\"... is not valid JSON No fence stripping is used."
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": false,
+      "artifact_content_passed": false,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 37311,
+        "cache_read_input_tokens": 7030,
+        "output_tokens": 1020,
+        "output_tokens_details": {
+          "thinking_tokens": 988
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 37311,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 1020,
+          "cacheReadInputTokens": 7030,
+          "cacheCreationInputTokens": 37311,
+          "webSearchRequests": 0,
+          "costUSD": 0.320302,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 988,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "4fef06ae2912389060646c724e6812a6b36e2e661848edde07365a47a15772ee",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr_actual_excerpt_sanitized": "",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-2"
+    },
+    {
+      "run_id": "codex-f03_w02_actual_agents-with_skill",
+      "case_id": "f03_w02_actual_agents",
+      "phase": "followup",
+      "preregistration": "edit-followup-preregistration.json",
+      "preregistration_sha256": "71bab9abe0757ef7cafdc35c5adbeeeb434291c22397579bf2707271404fddbe",
+      "prompt_sha256": "8ff0e0a9033619d422cc492c33153a67c40a159b571436b195e52426f2f5d450",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T06:20:36.297Z",
+      "finished_at_utc": "2026-09-30T06:21:45.118Z",
+      "duration_ms": 68820,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [
+        {
+          "method": "native_command_full_file",
+          "event_index": 4,
+          "command": "/bin/bash -lc 'rtk cat <private-path> <private-path>'",
+          "native_exit": 0,
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_bytes": 10886
+        }
+      ],
+      "selected_read_commands": [
+        {
+          "command": "/bin/bash -lc 'rtk cat <private-path> <private-path>'",
+          "native_exit": 0,
+          "full_file_match": true
+        }
+      ],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Updated [AGENTS.md](<private-path>) to preserve testing and release duties, make each reference conditional on its relevant task, and remove redundant instructions.",
+      "structured_output": null,
+      "graded_artifact": "When changing executable code, read and follow docs/testing.md and run the tests in package.json. When preparing a release, read docs/release.md and run its release checks before shipping.\n",
+      "final_word_count": 20,
+      "graded_artifact_word_count": 27,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 5,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 4,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": [
+          {
+            "command": "/bin/bash -lc 'rtk cat AGENTS.md docs/testing.md docs/release.md'",
+            "native_exit": 1,
+            "actual_returned_excerpt": "Always read docs/testing.md and docs/release.md. Follow docs/testing.md for testing; when you change executable code, run the tests in package.json. Before shipping a release, review docs/release.md and run its release checks. Be thorough. Follow docs/testing.md.\n/usr/bin/cat: docs/testing.md: No such file or directory\n/usr/bin/cat: docs/release.md: No such file or directory\n"
+          },
+          {
+            "command": "/bin/bash -lc 'rtk git diff -- AGENTS.md'",
+            "native_exit": 129,
+            "actual_returned_excerpt": "warning: Not a git repository. Use --no-index to compare two paths outside a working tree\nusage: git diff --no-index [<options>] <path> <path>\n\nDiff output format options\n    -p, --patch           generate patch\n    -s, --no-patch        suppress diff output\n    -u                    generate patch\n    -U, --unified[=<n>]   generate diffs with <n> lines context\n    -W, --[no-]function-context\n                          generate diffs with <n> lines context\n    --raw                 generate the diff in raw format\n    --patch-with-raw      synonym for '-p --raw'\n    --patch-with-stat     synonym for '-p --stat'\n    --numstat             machine"
+          }
+        ]
+      },
+      "native_main_usage": {
+        "input_tokens": 127302,
+        "cached_input_tokens": 105600,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1147,
+        "reasoning_output_tokens": 452
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": {
+        "fixture_target": "AGENTS.md",
+        "after_sha256": "e907fc21d389365ab23e3d8fd43bdb0fc5f532d1fccfeb54c38433753f79bb38",
+        "after_content": "When changing executable code, read and follow docs/testing.md and run the tests in package.json. When preparing a release, read docs/release.md and run its release checks before shipping.\n",
+        "native_diff_outer_exit": 1,
+        "native_diff_stdout": "--- fixture-before\n+++ fixture-after\n@@ -1 +1 @@\n-Always read docs/testing.md and docs/release.md. Follow docs/testing.md for testing; when you change executable code, run the tests in package.json. Before shipping a release, review docs/release.md and run its release checks. Be thorough. Follow docs/testing.md.\n+When changing executable code, read and follow docs/testing.md and run the tests in package.json. When preparing a release, read docs/release.md and run its release checks before shipping.\n",
+        "native_diff_stderr": "",
+        "workspace_entries": [
+          "AGENTS.md"
+        ]
+      },
+      "raw_capture_sha256": {
+        "stdout": "08d8c10db2629caee899db8e41a85f6501c6b579f8da00f2be06f52866faa756",
+        "stderr": "7ec158194bbd7626c0533246ebd011070f8e47300610f270eae3ea073c69a3fa"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n2026-09-30T06:21:22.183702Z ERROR codex_core::tools::router: error=collab spawn failed: Fatal error: failed to load model context for thread <private-session-id>: invalid thread-store request: no rollout found for thread id <private-session-id>\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-5"
+    },
+    {
+      "run_id": "codex-f04_w04_actual_claude-with_skill",
+      "case_id": "f04_w04_actual_claude",
+      "phase": "followup",
+      "preregistration": "edit-followup-preregistration.json",
+      "preregistration_sha256": "71bab9abe0757ef7cafdc35c5adbeeeb434291c22397579bf2707271404fddbe",
+      "prompt_sha256": "839a7a3446103db698d50c9c1111a4218910b1633fedc9f8058b4baa7f37685a",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T06:22:49.447Z",
+      "finished_at_utc": "2026-09-30T06:23:50.530Z",
+      "duration_ms": 61083,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [
+        {
+          "method": "native_command_full_file",
+          "event_index": 8,
+          "command": "/bin/bash -lc 'rtk cat <private-path>'",
+          "native_exit": 0,
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_bytes": 10886
+        }
+      ],
+      "selected_read_commands": [
+        {
+          "command": "/bin/bash -lc 'rtk cat <private-path>'",
+          "native_exit": 0,
+          "full_file_match": true
+        }
+      ],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Updated CLAUDE.md to read `docs/migration.md` before adding a new migration or changing the migration runner.",
+      "structured_output": null,
+      "graded_artifact": "Read docs/migration.md before adding a new migration or changing the migration runner.\n",
+      "final_word_count": 15,
+      "graded_artifact_word_count": 12,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 8,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": [
+          {
+            "command": "/bin/bash -lc 'rtk git status --short'",
+            "native_exit": 128,
+            "actual_returned_excerpt": "fatal: not a git repository (or any of the parent directories): .git\n"
+          },
+          {
+            "command": "/bin/bash -lc 'rtk git diff --check'",
+            "native_exit": 129,
+            "actual_returned_excerpt": "warning: Not a git repository. Use --no-index to compare two paths outside a working tree\nusage: git diff --no-index [<options>] <path> <path>\n\nDiff output format options\n    -p, --patch           generate patch\n    -s, --no-patch        suppress diff output\n    -u                    generate patch\n    -U, --unified[=<n>]   generate diffs with <n> lines context\n    -W, --[no-]function-context\n                          generate diffs with <n> lines context\n    --raw                 generate the diff in raw format\n    --patch-with-raw      synonym for '-p --raw'\n    --patch-with-stat     synonym for '-p --stat'\n    --numstat             machine"
+          },
+          {
+            "command": "/bin/bash -lc 'rtk git diff -- CLAUDE.md'",
+            "native_exit": 129,
+            "actual_returned_excerpt": "warning: Not a git repository. Use --no-index to compare two paths outside a working tree\nusage: git diff --no-index [<options>] <path> <path>\n\nDiff output format options\n    -p, --patch           generate patch\n    -s, --no-patch        suppress diff output\n    -u                    generate patch\n    -U, --unified[=<n>]   generate diffs with <n> lines context\n    -W, --[no-]function-context\n                          generate diffs with <n> lines context\n    --raw                 generate the diff in raw format\n    --patch-with-raw      synonym for '-p --raw'\n    --patch-with-stat     synonym for '-p --stat'\n    --numstat             machine"
+          },
+          {
+            "command": "/bin/bash -lc 'rtk git status --short'",
+            "native_exit": 128,
+            "actual_returned_excerpt": "fatal: not a git repository (or any of the parent directories): .git\n"
+          }
+        ]
+      },
+      "native_main_usage": {
+        "input_tokens": 113209,
+        "cached_input_tokens": 94592,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 893,
+        "reasoning_output_tokens": 259
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": {
+        "fixture_target": "CLAUDE.md",
+        "after_sha256": "e13d727bf2b4256562420825572c3baecfede3c48211e4c04e26b7a05f3601d2",
+        "after_content": "Read docs/migration.md before adding a new migration or changing the migration runner.\n",
+        "native_diff_outer_exit": 1,
+        "native_diff_stdout": "--- fixture-before\n+++ fixture-after\n@@ -1 +1 @@\n-Read docs/migration.md for every task.\n+Read docs/migration.md before adding a new migration or changing the migration runner.\n",
+        "native_diff_stderr": "",
+        "workspace_entries": [
+          "CLAUDE.md"
+        ]
+      },
+      "raw_capture_sha256": {
+        "stdout": "9fea3c58e083dc7f00f17a59603dbf12fb637d1c23a6c41afa6461736df598a0",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-5"
+    },
+    {
+      "run_id": "codex-s01_implicit_csv-with_skill",
+      "case_id": "s01_implicit_csv",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "cec3db7d47bddd26e8fcd67d0cfbe467030d8c3157183f6c321a3e9d81a60737",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:59:14.899Z",
+      "finished_at_utc": "2026-09-30T06:00:50.469Z",
+      "duration_ms": 95570,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "search-first",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [
+        {
+          "method": "native_command_full_file",
+          "event_index": 4,
+          "command": "/bin/bash -lc 'rtk proxy cat <private-path>'",
+          "native_exit": 0,
+          "matched_skill_md_sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+          "matched_bytes": 8210,
+          "output_excerpt": "# /search-first — Research Before You Code"
+        }
+      ],
+      "selected_read_commands": [
+        {
+          "command": "/bin/bash -lc 'rtk proxy cat <private-path>'",
+          "native_exit": 0,
+          "full_file_match": true
+        }
+      ],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Reuse Python’s maintained standard-library [`csv` module](https://docs.python.org/3/library/csv.html).\n\nUse `open(path, newline='')` and iterate `csv.reader(f)`. Choose `csv.DictReader(f)` if you want rows keyed by column headers.\n\nIt correctly handles commas inside double-quoted fields and requires no external dependency.",
+      "structured_output": null,
+      "graded_artifact": "Reuse Python’s maintained standard-library [`csv` module](https://docs.python.org/3/library/csv.html).",
+      "final_word_count": 34,
+      "graded_artifact_word_count": 6,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 4,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 97894,
+        "cached_input_tokens": 79744,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1255,
+        "reasoning_output_tokens": 698
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "f568fdb5e0e807bd93cfd29d5d3869b58d4c79f0878a5f78ffbc8db79c9e65ee",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-s03_adjacent_copyedit-with_skill",
+      "case_id": "s03_adjacent_copyedit",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "9b1c7a2cc4ed694e5e55af5c0798cdefe3e732783a033491300c64317ee94caf",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T06:00:50.592Z",
+      "finished_at_utc": "2026-09-30T06:00:58.210Z",
+      "duration_ms": 7618,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "search-first",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Search first, then write the utility.",
+      "structured_output": null,
+      "graded_artifact": "Search first, then write the utility.",
+      "final_word_count": 6,
+      "graded_artifact_word_count": 6,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20645,
+        "cached_input_tokens": 7168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 42,
+        "reasoning_output_tokens": 28
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "d7b7aa34e76fdb9dbad17dc84e49ab91a60f2f644f4133ae73580cdb4cd599a0",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w01_explicit_agents-with_skill",
+      "case_id": "w01_explicit_agents",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "1c2b916838255d34cae3803bbaa8a9caf457fab957b920b6ca1ce9e1de1a64f7",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:50:55.547Z",
+      "finished_at_utc": "2026-09-30T05:51:28.216Z",
+      "duration_ms": 32668,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "explicit_cli_dispatch_full_load_unobservable",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "For every application-code change, read `docs/testing.md` and run all checks it requires; the change is complete only after every required check passes.\n\nThis removes repeated wording while preserving the trigger, required actions, and exhaustive completion gate.",
+      "structured_output": null,
+      "graded_artifact": "For every application-code change, read `docs/testing.md` and run all checks it requires; the change is complete only after every required check passes.",
+      "final_word_count": 36,
+      "graded_artifact_word_count": 22,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 23084,
+        "cached_input_tokens": 7168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 555,
+        "reasoning_output_tokens": 473
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "0f0d5cce3202259dd4b24d3d2c7a825a2f36877988f6168fa04a3642d9b58842",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w02_implicit_agents-with_skill",
+      "case_id": "w02_implicit_agents",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "fe03e963c7e73be89a4e30640cf41e5ad488e35b921ad552506a1d7fde41023d",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:52:41.301Z",
+      "finished_at_utc": "2026-09-30T05:53:32.713Z",
+      "duration_ms": 51412,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "implicit_activation_miss",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "When testing or changing executable code, read and follow `docs/testing.md`; for executable-code changes, run the tests defined in `package.json`. When preparing a release, review `docs/release.md` and run its release checks before shipping.\n\nThis makes each guide conditional on the relevant work, removes repetition, and preserves the testing and release duties.",
+      "structured_output": null,
+      "graded_artifact": "When testing or changing executable code, read and follow `docs/testing.md`; for executable-code changes, run the tests defined in `package.json`. When preparing a release, review `docs/release.md` and run its release checks before shipping.",
+      "final_word_count": 50,
+      "graded_artifact_word_count": 32,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 5,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20725,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 962,
+        "reasoning_output_tokens": 886
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "ecaf1f511a98681399a1b98bfe2ccd5e62918e7f682b148e59fc098dfe618401",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w03_implicit_claude-with_skill",
+      "case_id": "w03_implicit_claude",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "b243a7e3402ca03101cbcd7c2407a994dadc4a533892304d5f4dbf0b58a1268a",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:55:20.958Z",
+      "finished_at_utc": "2026-09-30T05:56:18.456Z",
+      "duration_ms": 57497,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [
+        {
+          "method": "native_command_full_file",
+          "event_index": 4,
+          "command": "/bin/bash -lc 'rtk cat <private-path>'",
+          "native_exit": 0,
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_bytes": 10886
+        }
+      ],
+      "selected_read_commands": [
+        {
+          "command": "/bin/bash -lc 'rtk cat <private-path>'",
+          "native_exit": 0,
+          "full_file_match": true
+        }
+      ],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Before completing changes to executable code, read the current test and build scripts in package.json, run both with npm, and confirm both pass.\n\nRemoved duplicated command names and the update reminder because package.json remains the source of truth.",
+      "structured_output": null,
+      "graded_artifact": "Before completing changes to executable code, read the current test and build scripts in package.json, run both with npm, and confirm both pass.",
+      "final_word_count": 38,
+      "graded_artifact_word_count": 23,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 1,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 91744,
+        "cached_input_tokens": 67200,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 721,
+        "reasoning_output_tokens": 375
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "a88ee5c64a454dc56775178a029480eb203ec84fef102ba1c12d907507def288",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w04_conditional_pointer-with_skill",
+      "case_id": "w04_conditional_pointer",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "afe7e4e2ce3f2a069ba2a01bee42c7e29218bd81ca05b284a4874a8244f4a45d",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:56:47.972Z",
+      "finished_at_utc": "2026-09-30T05:57:02.049Z",
+      "duration_ms": 14076,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "implicit_activation_miss",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Read `docs/migration.md` when adding a new migration or changing the migration runner.",
+      "structured_output": null,
+      "graded_artifact": "Read `docs/migration.md` when adding a new migration or changing the migration runner.",
+      "final_word_count": 12,
+      "graded_artifact_word_count": 12,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20673,
+        "cached_input_tokens": 7168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 121,
+        "reasoning_output_tokens": 97
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "e2f5c5b69ae96d40ce762f4696c9bbf7a56ef128b9854560bb9cb47a8c78d4a8",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w05_completion_branches-with_skill",
+      "case_id": "w05_completion_branches",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "27339136c36801e5bbfc2191f21ede8edd0077bd283b43c57b8fd2cfe16c7b95",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:57:02.209Z",
+      "finished_at_utc": "2026-09-30T05:57:56.738Z",
+      "duration_ms": 54529,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": true,
+      "arm": "with_skill",
+      "activation_assessment": "observed_selected_skill_load",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [
+        {
+          "method": "native_command_full_file",
+          "event_index": 4,
+          "command": "/bin/bash -lc 'rtk cat <private-path>'",
+          "native_exit": 0,
+          "matched_skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "matched_bytes": 10886
+        }
+      ],
+      "selected_read_commands": [
+        {
+          "command": "/bin/bash -lc 'rtk cat <private-path>'",
+          "native_exit": 0,
+          "full_file_match": true
+        }
+      ],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "- **Documentation-only changes:** Verify that all links in changed sections resolve and examples match existing commands. Complete the task when both conditions hold.\n- **Deployment-script changes:** Read and run the native validation procedure in `docs/deploy.md`. Complete the task only when every check passes.\n- **Changes affecting both:** Apply both sets of completion criteria.",
+      "structured_output": null,
+      "graded_artifact": "- **Documentation-only changes:** Verify that all links in changed sections resolve and examples match existing commands. Complete the task when both conditions hold.\n- **Deployment-script changes:** Read and run the native validation procedure in `docs/deploy.md`. Complete the task only when every check passes.\n- **Changes affecting both:** Apply both sets of completion criteria.",
+      "final_word_count": 53,
+      "graded_artifact_word_count": 53,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 4,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 1,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 45292,
+        "cached_input_tokens": 27776,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 969,
+        "reasoning_output_tokens": 796
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "c63666971c982334701af461c81a4719c203de00ea0cf71e871d5086bd141129",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w06_human_readme-with_skill",
+      "case_id": "w06_human_readme",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "b4fe43e0b26852f703d03cbd2086fc67f383e9455ab531a28973bba85585b5a2",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:57:56.847Z",
+      "finished_at_utc": "2026-09-30T05:58:13.674Z",
+      "duration_ms": 16826,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Automation agents read AGENTS.md. Human contributors can find guidance in CONTRIBUTING.md and search the documentation on the website.",
+      "structured_output": null,
+      "graded_artifact": "Automation agents read AGENTS.md. Human contributors can find guidance in CONTRIBUTING.md and search the documentation on the website.",
+      "final_word_count": 18,
+      "graded_artifact_word_count": 18,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20666,
+        "cached_input_tokens": 15360,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 234,
+        "reasoning_output_tokens": 204
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "199cb06af3a0a094a35421a510e435672d51d9433588027592bf3afb95d06b7f",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w07_human_newsletter-with_skill",
+      "case_id": "w07_human_newsletter",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "00355b45581834111a1d242b95e94245214da38cd79edae441192b2cc476317f",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:58:13.781Z",
+      "finished_at_utc": "2026-09-30T05:58:33.726Z",
+      "duration_ms": 19944,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Developers may encounter files named AGENTS.md and CLAUDE.md in software repositories, often containing project context and conventions for AI coding tools. These Markdown documents vary by project, from codebase overviews to notes about development workflows.",
+      "structured_output": null,
+      "graded_artifact": "Developers may encounter files named AGENTS.md and CLAUDE.md in software repositories, often containing project context and conventions for AI coding tools. These Markdown documents vary by project, from codebase overviews to notes about development workflows.",
+      "final_word_count": 35,
+      "graded_artifact_word_count": 35,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20662,
+        "cached_input_tokens": 7168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 314,
+        "reasoning_output_tokens": 261
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "24c962814c5772a2734c446abff1bbb381883f3ae4350b8b4f2eb262436290b0",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w08_human_support-with_skill",
+      "case_id": "w08_human_support",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "47ba0850290c793de09b889aceb1d8ea6b07342daaffbbddaf15b0f328a1f5f9",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:58:33.882Z",
+      "finished_at_utc": "2026-09-30T05:58:56.069Z",
+      "duration_ms": 22186,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "`CLAUDE.md` is a Markdown file that gives Claude Code project-specific instructions and context. “No CLAUDE.md found” only means that file wasn’t located; a build failure would require evidence from the build command, such as an error or nonzero exit status.",
+      "structured_output": null,
+      "graded_artifact": "`CLAUDE.md` is a Markdown file that gives Claude Code project-specific instructions and context. “No CLAUDE.md found” only means that file wasn’t located; a build failure would require evidence from the build command, such as an error or nonzero exit status.",
+      "final_word_count": 40,
+      "graded_artifact_word_count": 40,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 3,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20668,
+        "cached_input_tokens": 7168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 329,
+        "reasoning_output_tokens": 266
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "b47ddf2f60f2b410d619b171c429e9f8edddc9c05ccb4f3fb203bfb1ec22a6fa",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w09_human_copyedit-with_skill",
+      "case_id": "w09_human_copyedit",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "be902a34e9e5aae1c5d8b75b18a2f53f90fc77b95c3fb186afb88feb594c90e0",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:58:56.182Z",
+      "finished_at_utc": "2026-09-30T05:59:07.861Z",
+      "duration_ms": 11678,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "Writing for agents and people needs clear instructions.",
+      "structured_output": null,
+      "graded_artifact": "Writing for agents and people needs clear instructions.",
+      "final_word_count": 8,
+      "graded_artifact_word_count": 8,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "manual"
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20651,
+        "cached_input_tokens": 7168,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 120,
+        "reasoning_output_tokens": 105
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "578cb0f4279eb2ea56537da0d1fed741c903cef55bab9e9983ca42fb10906524",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    },
+    {
+      "run_id": "codex-w10_markdown_lookup-with_skill",
+      "case_id": "w10_markdown_lookup",
+      "phase": "original",
+      "preregistration": "preregistered-cases.json",
+      "preregistration_sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "prompt_sha256": "f3b49c3f2dcac6e53ff517d1ed581ad3f0fe5eaecee45f7e64e221bd89faa298",
+      "client": "codex",
+      "client_version": "0.159.2",
+      "model_requested": "gpt-6.1-sol",
+      "model_resolved": null,
+      "effort_requested": "ultra",
+      "started_at_utc": "2026-09-30T05:59:07.960Z",
+      "finished_at_utc": "2026-09-30T05:59:14.800Z",
+      "duration_ms": 6839,
+      "outer_exit": 0,
+      "outer_signal": null,
+      "timed_out": false,
+      "skill": "writing-for-agents",
+      "expected_activation": false,
+      "arm": "with_skill",
+      "activation_assessment": "negative_no_selected_load_observed",
+      "observed_skill_tool_calls": [],
+      "instruction_loads": [],
+      "selected_read_commands": [],
+      "native_skill_diagnostics": [],
+      "baseline_startup": null,
+      "final_returned_result_sanitized": "{\"text\":\"Agent handbook\",\"url\":\"docs/agents.md\"}",
+      "structured_output": null,
+      "graded_artifact": "{\"text\":\"Agent handbook\",\"url\":\"docs/agents.md\"}",
+      "final_word_count": 2,
+      "graded_artifact_word_count": 2,
+      "outcome_checks": [
+        {
+          "criterion": 1,
+          "passed": true,
+          "method": "recorded_check",
+          "assessment": "Strict JSON.parse of the native final string succeeded with exactly text and url."
+        },
+        {
+          "criterion": 2,
+          "passed": true,
+          "method": "manual"
+        }
+      ],
+      "outcome_passed": true,
+      "artifact_content_passed": true,
+      "process": {
+        "native_tool_counts": {},
+        "native_command_count": 0,
+        "nested_agent_tool_calls": 0,
+        "tool_errors": [],
+        "command_failures": []
+      },
+      "native_main_usage": {
+        "input_tokens": 20655,
+        "cached_input_tokens": 20480,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 45,
+        "reasoning_output_tokens": 26
+      },
+      "native_model_usage": null,
+      "usage_missing": false,
+      "independent_fixture_observation": null,
+      "raw_capture_sha256": {
+        "stdout": "de10704955da7b4c7ee06bc76c84689146751021d74133c39f8e4b4e2ddbe099",
+        "stderr": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+      },
+      "stderr_actual_excerpt_sanitized": "Reading additional input from stdin...\n",
+      "input_hashes_before_ref": "inputs-0",
+      "input_hashes_after_ref": "inputs-0",
+      "native_control_ref": "controls-6"
+    }
+  ],
+  "sanitization": "Private host paths and native thread/session identifiers in commands and final results are replaced with <private-path>, <private-system-path> or <private-session-id>. Raw JSONL, native debug, instruction bodies, conversations and provider signatures stay private. Public receipts retain actual final outputs and compact actual returned error excerpts; no hidden reasoning is published."
+}

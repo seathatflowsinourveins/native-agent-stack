@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "local_native_integration_evaluation",
+  "run_count": 29,
+  "counting": "Each native run contributes exactly one final cumulative result. Totals group equal native counter fields within their own scopes. Main usage and native per-model usage are alternate or additional native scopes and are not added together. Cache and reasoning counts remain separate subset counters. Model contextWindow and maxOutputTokens are descriptive metadata and are not summed.",
+  "scope_limits": "One cumulative native result per run. Main usage and model scopes are retained separately; cache and reasoning fields are subsets. Advisor/model buckets are not added to main usage. Native costUSD fields are list estimates, not an invoice. These counters omit the coordinator and worker orchestration sessions. No quality or efficiency gain is established.",
+  "scopes": {
+    "codex": {
+      "native_run_count": 14,
+      "main_usage_result_count": 14,
+      "native_main_usage": {
+        "input_tokens": 663870,
+        "cached_input_tokens": 453760,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 7707,
+        "reasoning_output_tokens": 4926
+      },
+      "native_model_usage": {},
+      "usage_missing_runs": []
+    },
+    "claude": {
+      "native_run_count": 15,
+      "main_usage_result_count": 15,
+      "native_main_usage": {
+        "input_tokens": 96,
+        "cache_creation_input_tokens": 735017,
+        "cache_read_input_tokens": 1926958,
+        "output_tokens": 120530,
+        "output_tokens_details": {
+          "thinking_tokens": 111209
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 701183,
+          "ephemeral_5m_input_tokens": 0
+        }
+      },
+      "native_model_usage": {
+        "claude-opus-5-5": {
+          "run_count": 15,
+          "counters": {
+            "inputTokens": 96,
+            "outputTokens": 120530,
+            "cacheReadInputTokens": 1926958,
+            "cacheCreationInputTokens": 735017,
+            "webSearchRequests": 0,
+            "costUSD": 8.5750096,
+            "thinkingTokens": 111209
+          }
+        },
+        "claude-fable-5-1": {
+          "run_count": 8,
+          "counters": {
+            "inputTokens": 436615,
+            "outputTokens": 21837,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 5.458000000000001,
+            "thinkingTokens": 0
+          }
+        }
+      },
+      "usage_missing_runs": []
+    }
+  },
+  "native_process_failures": {
+    "tool_error_count": 8,
+    "command_failure_count": 6,
+    "all_native_outer_exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "timed_out_count": 0
+  },
+  "comparison": {
+    "same_prompt_baseline": {
+      "same_prompt_sha256": true,
+      "same_remaining_native_argv": true,
+      "candidate_outcome_passed": true,
+      "baseline_outcome_passed": true,
+      "native_disabled_verified": true,
+      "quality_improvement_established": false
+    },
+    "quality_gain_established": false,
+    "efficiency_gain_established": false
+  }
+}
