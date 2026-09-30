@@ -6,20 +6,21 @@
   "component_ids": [
     "codex"
   ],
-  "claim": "On host nativestack-5975wx-20260925 on 2026-09-30, Codex CLI 0.159.2 was qualified in its existing prefix tools/codex-0.159.2 and the Linux pin moved to it from 0.157.1. The host launcher bin/codex already executes that prefix (its exec line names it, and `codex --version` through the launcher printed codex-cli 0.159.2 at 2026-09-30T04:32:26Z): a peer installed that prefix and wrote the launcher at 2026-09-30T03:21Z to 03:22Z, before this unit, which installed, relinked and wrote nothing on the host. The npm wrapper @openai/codex@0.159.2 (4,904 bytes, sha256 cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2) and its platform package @openai/codex@0.159.2-linux-x64 (162,475,310 bytes, sha256 84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations; each attestation's subject digest equals the downloaded tarball's sha512, and the SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.159.2, commit ff6aec96948b70d94983af2641a6b67c94faeff5, the commit the tag object 8b9fa496bbf2c47aebd62e85a080b9a522a455b5 peels to. The native binary in the platform package (sha256 1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e, 286,754,152 bytes) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the release API digest, and the package's whole vendor tree (44 files, with codex-code-mode-host, rg and bwrap) is byte-identical to the complete native package codex-package-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals both its API digest and its line in codex-package_SHA256SUMS. All 49 files of the existing prefix are byte-identical to the two verified tarballs; its only other entry is npm's bin/codex link. Each of these comparisons failed on a copy with one byte changed. In bwrap sandboxes with no network, a read-only root and a fresh scratch HOME and CODEX_HOME per case (~/.codex never used, no credential read), 0.159.2 and the 0.157.1 baseline printed their own versions; `codex exec --help` and `codex --help` were byte-identical between them and to the committed 0.157.1 outputs of the previous qualification; `codex mcp list --json` printed [] in an empty home, and after `codex mcp add` both versions returned the same entry and transport keys from `codex mcp list --json` and `codex mcp get --json`; `codex features list` still lists daemon_auto_start as stable and on, and `codex features disable daemon_auto_start` still writes [features] daemon_auto_start = false; `codex debug prompt-input` rendered the stack's AGENTS.md top-rule marker once from a scratch home holding adoption/templates/codex.AGENTS.template.md and zero times from an empty home, on both versions; offline `codex debug models` lists gpt-6.1-sol at priority 1 in 0.159.2's bundled catalog (gpt-6-astra moves to priority 2) and not at all in 0.157.1's. At the two tag commits the exec layer (codex-rs/exec/src/cli.rs, exec_events.rs, event_processor_with_jsonl_output.rs and codex-rs/utils/cli/src/shared_options.rs) is byte-identical, so the `codex exec --json` events that tools/adoption/prove_codex_lane.py and tools/sota-convergence/landscape-sweep/codex_job.py read keep their shapes, and the config schema adds 18 key paths and removes none. `prove_codex_lane.py --help` exited 0, and its static checks (no --live) in a scratch home gave 0.159.2 and 0.157.1 the same row verdicts, the lane not being applied there; tools/adoption/apply_codex_lane.py's dry run fails its codex version precondition on 0.159.2 because its CODEX_VERSION is still 0.157.1. The repository's merged rollout parsers (tools/token-e2e/evidence.py and tools/skill-usage/skill_usage.py), run unchanged and read-only over the host's 19 existing rollouts written by 0.159.2 (3,783 records), reported 0 parse errors, as over the 1,350 rollouts written by 0.157.1; a synthetic malformed line counted as 1 error in each. No live model call ran.",
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-30, Codex CLI 0.159.2 was qualified in its existing prefix tools/codex-0.159.2 and the Linux pin moved to it from 0.157.1. The host launcher bin/codex already executes that prefix (its exec line names it, and `codex --version` through the launcher printed codex-cli 0.159.2 at 2026-09-30T04:32:26Z): a peer installed that prefix and wrote the launcher at 2026-09-30T03:21Z to 03:22Z, before this unit, which installed, relinked and wrote nothing on the host. The npm wrapper @openai/codex@0.159.2 (4,904 bytes, sha256 cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2) and its platform package @openai/codex@0.159.2-linux-x64 (162,475,310 bytes, sha256 84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations; each attestation's subject digest equals the downloaded tarball's sha512, and the SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.159.2, commit ff6aec96948b70d94983af2641a6b67c94faeff5, the commit the tag object 8b9fa496bbf2c47aebd62e85a080b9a522a455b5 peels to. The native binary in the platform package (sha256 1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e, 286,754,152 bytes) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the release API digest, and the package's whole vendor tree (44 files, with codex-code-mode-host, rg and bwrap) is byte-identical to the complete native package codex-package-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals both its API digest and its line in codex-package_SHA256SUMS. All 49 files of the existing prefix are byte-identical to the two verified tarballs; its only other entry is npm's bin/codex link. Each of these comparisons failed on a copy with one byte changed. In bwrap sandboxes with no network, a read-only root and a fresh scratch HOME and CODEX_HOME per case (~/.codex never used, no credential read), 0.159.2 and the 0.157.1 baseline printed their own versions; `codex exec --help` and `codex --help` were byte-identical between them and to the committed 0.157.1 outputs of the previous qualification; `codex mcp list --json` printed [] in an empty home, and after `codex mcp add` both versions returned the same entry and transport keys from `codex mcp list --json` and `codex mcp get --json`; `codex features list` still lists daemon_auto_start as stable and on, and `codex features disable daemon_auto_start` still writes [features] daemon_auto_start = false; `codex debug prompt-input` rendered the stack's AGENTS.md top-rule marker once from a scratch home holding adoption/templates/codex.AGENTS.template.md and zero times from an empty home, on both versions; offline `codex debug models` lists gpt-6.1-sol at priority 1 in 0.159.2's bundled catalog (gpt-6-astra moves to priority 2) and not at all in 0.157.1's or in the 0.155.1 build's (`codex debug models --bundled`). At the two tag commits the exec layer (codex-rs/exec/src/cli.rs, exec_events.rs, event_processor_with_jsonl_output.rs and codex-rs/utils/cli/src/shared_options.rs) is byte-identical, so the `codex exec --json` events that tools/adoption/prove_codex_lane.py and tools/sota-convergence/landscape-sweep/codex_job.py read keep their shapes, and the config schema adds 18 key paths and removes none. `prove_codex_lane.py --help` exited 0, and its static checks (no --live) in a scratch home gave 0.159.2 and 0.157.1 the same row verdicts, the lane not being applied there, and printed byte-identical output when re-run with this branch's prove_codex_lane.py. tools/adoption/apply_codex_lane.py's dry run failed its codex version precondition on 0.159.2 while its CODEX_VERSION was 0.157.1; with the constant moved to 0.159.2 on the same branch it prints '[ok] codex version: codex-cli 0.159.2 (pin 0.159.2)' and the 0.157.1 control '[fail] codex version: codex-cli 0.157.1 (pin 0.159.2)', each dry run still refusing only on the three preconditions an empty scratch home cannot meet (HOST_PATH, config.toml, daemon_auto_start), and the opt-in CodexIntegrationTests of tests/test_codex_worker_lane.py passed 10 of 10 against the prefix's native binary, while all 10 skip with 0.157.1 on PATH. The repository's merged rollout parsers (tools/token-e2e/evidence.py and tools/skill-usage/skill_usage.py), run unchanged and read-only over the host's 19 existing rollouts written by 0.159.2 (3,783 records), reported 0 parse errors, as over the 1,350 rollouts written by 0.157.1; a synthetic malformed line counted as 1 error in each. No live model call ran.",
   "limitations": [
     "No live model call ran (not run): `prove_codex_lane.py --live`, a GPT-6 or GPT-6.1 turn through 0.159.2 and any provider request are outside this unit, because the native Codex allowance belongs to the sealed Gate A run. The sandbox cases exercise the CLI surface (version, help, MCP registration, features, prompt input, the bundled catalog) without a provider, a sign-in, streamed turns, sandboxed tool execution, compaction or a running MCP server.",
     "Live 0.159.2 behaviour on this stack (role spawn through agent_type, --ignore-user-config with the role carriers, sandbox behaviour and the join proof) is covered by the Gate A owner's rehearsal receipts: peer rehearsal (session native-agent-stack-2d), not re-run here.",
     "The switch was not made by this unit: a peer installed tools/codex-0.159.2 (files written 2026-09-30T03:21:27Z to 03:21:30Z) and wrote the launcher with its exec line naming that prefix at 2026-09-30T03:22:59Z, and ~/.local/share/codex-ecosystem/installed-versions.txt still reads codex-cli 0.157.1, a host record this unit does not own and did not change.",
-    "The lane is not accepted on 0.159.2 here: in a scratch home the static rows marker, rtk-inline, binding (from / and from the checkout), profile and roles fail because the lane is not applied there, with the same verdicts on 0.157.1; blind failed with exit 127 when --codex named the prefix's npm bin (the row's PATH is that directory plus the default path, which has no node) and passed through the launcher. Applying the lane on a 0.159.2 host needs tools/adoption/apply_codex_lane.py's CODEX_VERSION (line 114) and its test fixtures moved first, which is outside this unit.",
+    "The lane is not accepted on 0.159.2 here: in a scratch home the static rows marker, rtk-inline, binding (from / and from the checkout), profile and roles fail because the lane is not applied there, with the same verdicts on 0.157.1; blind failed with exit 127 when --codex named the prefix's npm bin (the row's PATH is that directory plus the default path, which has no node) and passed through the launcher. The opt-in CodexIntegrationTests meet the same gap: they build PATH from codex's own directory plus the default path, so with the prefix's npm bin first on PATH codex never started (FAILED, failures=15, skipped=2), and a scratch directory pairing that launcher with node sits under /tmp, which their bwrap hides (4 failures and 2 skips on 'bwrap: execvp codex'). Their 10 of 10 pass ran the prefix's native binary directly, without the two CODEX_MANAGED_* variables the npm launcher adds. Neither the lane's apply nor its --live proof ran on a real Codex home.",
     "The `npm audit signatures` control did not discriminate: flipping one character of the wrapper's integrity in both lockfiles still gave exit 0 and the same report, because npm 11.19.0 verifies the registry's own manifest for each name and version (lib/utils/verify-signatures.js lines 296-303), not the lockfile. The audit therefore shows only that the registry metadata of both versions is signed and attested; the downloaded bytes are bound to that metadata by the integrity check and to the attestations by their subject digests, each with a failing control.",
     "The .sigstore bundles of the two GitHub assets were downloaded but not verified: no sigstore verifier is installed here, and `gh attestation verify` needs the GitHub REST API, which was rate-limited for the host's shared login. The tag's own signature was not checked.",
     "GitHub REST through gh answered HTTP 403 'API rate limit exceeded' for the shared login at 2026-09-30T04:14:32Z and 04:15:10Z, before and after its bucket reset, so the four release records came from the unauthenticated REST endpoint (HTTP 200 at 04:15:38Z), tag objects from git ls-remote and source files from raw.githubusercontent.com at the two tag commits.",
     "The background app-server probe of the 0.157.1 qualification was not repeated at 0.159.2: only the feature's listing and the disable path were checked, so the interactive-launch copy into CODEX_HOME/packages/app-server-daemon and its updater loop are measured at 0.157.1 only.",
     "The rollout check covers 19 rollouts written by 0.159.2 (3,783 records) and retains counts and schema type names only. Types present in the 0.157.1 rollouts but absent from that sample (compacted, CollabAgentToolCall, ContextCompaction) were not observed, which is no evidence that 0.159.2 removed them; the one type new to the sample, retained_context, is a RolloutItemWire variant at both tags (codex-rs/history/src/rollout_payload.rs line 51 at rust-v0.157.1, line 60 at rust-v0.159.2).",
     "rust-v0.159.2 was published 2026-09-29T23:57:16Z, so the pin moves inside the 7-day cooldown that docs/decisions/2026-09-25-workstation-sota-refresh.md applied to a release that is not a security fix; it moves because the Gate A owner chose 0.159.2 as the candidate frozen Codex version (relayed by the coordinator) and the host launcher already runs it.",
-    "The Linux pin, manifests/stack.json and the records that mirror its version move (catalogs/landscape/upstream-snapshot.json, whose codex entry was re-checked on 2026-09-30, blueprints/token-native-focus/saturation-audit.json and the generated new-host grand list); adoption/pins-macos-arm64.json keeps 0.155.1 until its own qualification, catalogs/landscape/foundation.json keeps its winner pins, and recipes/README.md's codex rows, adoption/bootstrap.md's release-disclosure line and tools/adoption/apply_codex_lane.py still name 0.157.1.",
+    "The Linux pin, manifests/stack.json and the records that mirror its version move (catalogs/landscape/upstream-snapshot.json, whose codex entry was re-checked on 2026-09-30, blueprints/token-native-focus/saturation-audit.json and the generated new-host grand list), and so do tools/adoption/apply_codex_lane.py's CODEX_VERSION with its test fakes and the current-pin statements of recipes/README.md, adoption/bootstrap.md and the two platform pages; adoption/pins-macos-arm64.json keeps 0.155.1 until its own qualification, catalogs/landscape/foundation.json keeps its winner pins, and dated measurements and source citations made at 0.157.1 stay as recorded.",
     "Upstream tests (cargo test) were not run on this host. The qualification and this receipt come from one worker family (Claude Opus 5.5) and were not independently reviewed.",
+    "The shared Codex template's new default does not fit the macOS pin: adoption/templates/codex.config.template.toml names gpt-6.1-sol, which offline `codex debug models --bundled` lists for the Linux 0.159.2 build but not for the Linux 0.155.1 or 0.157.1 builds (the rust-v0.159.1 release notes add it to the bundled catalog), while adoption/pins-macos-arm64.json stays 0.155.1. Follow-up: macOS needs its own 0.159.x qualification before the template default applies there; a model placeholder that tools/adoption/render_config.py fills from the selected platform's pins file, as it fills SOCRATICODE_VERSION, would be the per-platform override (not implemented).",
     "Linux x86_64 only, one host; nothing here is macOS evidence."
   ],
   "host_scope": {
@@ -205,7 +206,35 @@
       "prove_help": "python3 tools/adoption/prove_codex_lane.py --help: exit 0",
       "prove_static_prefix": "--codex tools/codex-0.159.2/bin/codex, scratch --codex-home, no --live: exit 1, 1 pass (rtk-exactness), 7 fail (marker, rtk-inline, blind with exit 127, binding from /, binding from the checkout, profile, roles); 0.157.1: the same verdicts",
       "prove_static_launcher": "--codex ~/.local/share/codex-ecosystem/bin/codex (execs 0.159.2): exit 1, 2 pass (blind: exit 0, 0 top-rule lines; rtk-exactness), 6 fail (the lane is not applied in the scratch home)",
-      "apply_dry_run": "python3 tools/adoption/apply_codex_lane.py (dry run, scratch --codex-home and --state-dir): 0.159.2 '[fail] codex version: codex-cli 0.159.2 (pin 0.157.1)', exit 2; control 0.157.1 '[ok] codex version: codex-cli 0.157.1 (pin 0.157.1)', exit 2 (other preconditions fail in a scratch home)"
+      "apply_dry_run": "At origin/main f77612b6 (apply_codex_lane.py sha256 f867e186..., CODEX_VERSION 0.157.1): python3 tools/adoption/apply_codex_lane.py (dry run, scratch --codex-home and --state-dir): 0.159.2 '[fail] codex version: codex-cli 0.159.2 (pin 0.157.1)', exit 2; control 0.157.1 '[ok] codex version: codex-cli 0.157.1 (pin 0.157.1)', exit 2 (other preconditions fail in a scratch home)",
+      "prove_static_rerun": "2026-09-30T07:18:28Z, the scratch lane_checks.py unchanged, with this branch's prove_codex_lane.py (sha256 9dcff7ea..., whose one changed line is the fold's live-worker description): --help exit 0; the static checks exit 1 on both versions with stdout byte-identical to the base-sha run (sha256 169d713f..., the same for both versions)",
+      "apply_dry_run_after_constant_move": "2026-09-30T07:18:44Z (lane_checks.py unchanged) and 07:19:35Z (apply_dry_full.py, every precondition line), apply_codex_lane.py sha256 2509b78b... with CODEX_VERSION 0.159.2: 0.159.2 '[ok] codex version: codex-cli 0.159.2 (pin 0.159.2)', exit 2 on three [fail] lines that come from the empty scratch home (HOST_PATH not derivable from shell_environment_policy.set.PATH; config.toml missing; features.daemon_auto_start not false), every other precondition [ok]; control 0.157.1 '[fail] codex version: codex-cli 0.157.1 (pin 0.159.2)', exit 2",
+      "integration_tests": {
+        "command": "NAS_CODEX_INTEGRATION=1 python3 -m unittest -v tests.test_codex_worker_lane.CodexIntegrationTests, TMPDIR in the worktree's ignored scratch directory",
+        "test_file_sha256": "94a4d0fe7ee792210a3f7ad882bb9d150adc108cd550205e85e89a00fe5dd5f4",
+        "runs": [
+          {
+            "codex_on_path": "tools/codex-0.159.2/bin, the npm launcher (a node script)",
+            "started_utc": "2026-09-30T07:13:00Z",
+            "result": "FAILED (failures=15, skipped=2) in 1.230s: codex never started, since the tests' PATH is codex's own directory plus the default path, which has no node; the skips and the direct failures print '/usr/bin/env: ‘node’: No such file or directory' and the rest fail on the empty output that follows"
+          },
+          {
+            "codex_on_path": "a scratch directory under the worktree linking that launcher and node",
+            "started_utc": "2026-09-30T07:13:28Z",
+            "result": "FAILED (failures=4, skipped=2), 4 ok, in 93.384s: every failure and skip prints 'bwrap: execvp codex: No such file or directory', since the tests' bwrap mounts a tmpfs over /tmp, where the worktree lives"
+          },
+          {
+            "codex_on_path": "the prefix's native binary directory, lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin (codex sha256 1748767b..., the verified native binary)",
+            "started_utc": "2026-09-30T07:27:33Z",
+            "result": "Ran 10 tests in 99.707s, OK (also 10 of 10 OK at 07:16:10Z, before two comment-only test edits)"
+          },
+          {
+            "codex_on_path": "the 0.157.1 prefix's native binary directory (control)",
+            "result": "OK (skipped=10): 'codex on PATH is codex-cli 0.157.1, not 0.159.2'"
+          }
+        ],
+        "earlier_in_this_unit": "with CODEX_VERSION 0.157.1 and codex 0.157.1 on PATH: 10 of 10 OK at 05:02Z, before the Sol fold; 3 failures at 06:13Z, after it, because 0.157.1's catalog has no gpt-6.1-sol and the stack-worker profile's max effort then did not reach the prompt input (scratch logs, not published)"
+      }
     },
     "rollout_item_shapes": {
       "parsers": "tools/token-e2e/evidence.py read_jsonl and _rollout_call; tools/skill-usage/skill_usage.py scan_rollout_file (unchanged, at origin/main f77612b6)",
@@ -280,7 +309,20 @@
         "codex-rs/utils/cli/src/shared_options.rs"
       ],
       "config_schema": "codex-rs/core/config.schema.json: 1,160 -> 1,178 key paths, 18 added (among them features.instant_interrupt, features.multi_agent_v2.disable_direct_message, mcp_servers.*.startup_readiness, mcp_servers.*.tool_input_schema_max_bytes, mcp_servers.*.oauth.client_secret, tui.copy_on_select), 0 removed; skills.max_context_tokens unchanged ('Defaults to 2% of the model context window and is capped at 10,000 tokens when set.'); every key path the two Codex templates set that was checked (mcp_servers.*.default_tools_approval_mode, enabled_tools, startup_timeout_sec, features.daemon_auto_start, features.shell_snapshot, agents.default_subagent_reasoning_effort) is present at both tags",
-      "rollout_payload": "codex-rs/history/src/rollout_payload.rs: RetainedContext is a RolloutItemWire variant at both tags; rust-v0.159.2 adds a conversion that writes a delivered assistant message as a response_item message for earlier clients"
+      "rollout_payload": "codex-rs/history/src/rollout_payload.rs: RetainedContext is a RolloutItemWire variant at both tags; rust-v0.159.2 adds a conversion that writes a delivered assistant message as a response_item message for earlier clients",
+      "lane_citations": {
+        "what": "the Codex sources that tools/adoption/apply_codex_lane.py and tests/test_codex_worker_lane.py cite at rust-v0.157.1, fetched at both tag commits through raw.githubusercontent.com (HTTP 200 each)",
+        "identical": [
+          "codex-rs/app-server/src/config_manager_service.rs",
+          "codex-rs/agent-roles/src/loader.rs",
+          "codex-rs/agent-roles/src/discovery.rs",
+          "codex-rs/config/src/loader/mod.rs"
+        ],
+        "changed": {
+          "codex-rs/codex-mcp/src/rmcp_client.rs": "DEFAULT_STARTUP_TIMEOUT = Duration::from_secs(30) and its unwrap_or are unchanged, at L105 and L344 (L103 and L342 at rust-v0.157.1); the added lines carry an executor-only MCP credential policy",
+          "codex-rs/cli/src/doctor.rs": "one handshake-error match arm (ApiError::FlexUnavailable, ServerOverloaded { .. }); the JSON report code is unchanged"
+        }
+      }
     },
     "release_notes_affecting_this_stack": [
       {
@@ -361,7 +403,14 @@
       "re-checking the codex entry of catalogs/landscape/upstream-snapshot.json: the unauthenticated REST commits endpoint for rust-v0.157.1 and rust-v0.159.2 answered 403 'API rate limit exceeded' for the host's address at 05:29:02Z and 05:29:37Z to 05:29:40Z (one unhashed call at 05:29:25Z succeeded); the entry keeps the 2026-09-26 record for rust-v0.157.1 and records rust-v0.159.2's commit through git protocol at 05:30:30Z"
     ],
     "overturn_when": "a live 0.159.2 turn or the Gate A rehearsal shows a regression against 0.157.1, a later stable release changes the exec --json events, the flags the lanes use or the background server's start or update defaults, or an advisory lands against 0.159.2",
-    "raw_outputs": "retained only in the worktree's git-ignored scratch directory (.local/d4-scratch) and not published: downloads, command outputs and the four scratch scripts named in provenance"
+    "raw_outputs": "retained only in the worktree's git-ignored scratch directory (.local/d4-scratch) and not published: downloads, command outputs and the four scratch scripts named in provenance",
+    "checks_after_the_constant_move": {
+      "observed_at_utc": "2026-09-30",
+      "mcp_add_help": "codex mcp add --help from each prefix's native binary under env -i with a scratch HOME and CODEX_HOME (no file written): exit 0 on 0.157.1 and 0.159.2, no timeout option in either; 0.159.2 adds only --oauth-client-secret",
+      "bundled_catalogs_offline": "codex debug models --bundled in bwrap --unshare-net with a scratch HOME and CODEX_HOME: 0.155.1 443,829 bytes, gpt-6.1-sol 0 times, gpt-6-astra once; 0.157.1 605,341 bytes, 0 and once; 0.159.2 658,937 bytes, once and once (Linux builds; no Mac build was run)",
+      "strict_config_stderr": "the two strict-config cases of CodexIntegrationTests re-run through their own helpers (strict_stderr.py) on 0.159.2: -p stack-worker under --strict-config exit 1, 'stack-worker.config.toml:39:1: invalid transport' at [mcp_servers.serena], the profile's first server table; the OmniRoute launcher's flags under --strict-config exit 1, 'unknown configuration field `model_providers.omniroute.model` in -c/--config override'; the same flags without it print '`model_providers.omniroute.model` is ignored', 'model: gpt-6.1-sol' and 'Missing environment variable: `OMNIROUTE_API_KEY`'"
+    },
+    "amended_at_utc": "2026-09-30T07:30:00Z"
   },
   "provenance": [
     {
@@ -377,12 +426,27 @@
     {
       "path": "tools/adoption/prove_codex_lane.py",
       "sha256": "6bf68149a6619a866fcf7a55368137ecd61970b3b02b9b0f9c59003384ae0448",
-      "role": "run unchanged: --help and the static checks"
+      "role": "run unchanged at origin/main f77612b6: --help and the static checks (the branch's fold later changed only its live-worker description line)"
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
       "sha256": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0",
-      "role": "run unchanged: dry run only"
+      "role": "run unchanged at origin/main f77612b6 (CODEX_VERSION 0.157.1): dry run only"
+    },
+    {
+      "path": "tools/adoption/prove_codex_lane.py",
+      "sha256": "9dcff7ea43326166f0bc085ba638165894bbdd87d94075bcf953a9ce9a2dcfeb",
+      "role": "this branch's file: --help and the static checks re-run"
+    },
+    {
+      "path": "tools/adoption/apply_codex_lane.py",
+      "sha256": "2509b78bbeb2be923d71022245ad3f5824d2324caf7fa8ed527ef8532614a099",
+      "role": "this branch's file (CODEX_VERSION 0.159.2): the dry runs after the move and the integration tests"
+    },
+    {
+      "path": "tests/test_codex_worker_lane.py",
+      "sha256": "94a4d0fe7ee792210a3f7ad882bb9d150adc108cd550205e85e89a00fe5dd5f4",
+      "role": "CodexIntegrationTests, run unchanged from this branch"
     },
     {
       "path": "tools/token-e2e/evidence.py",
@@ -418,6 +482,16 @@
       "path": "scratch rollout_shapes.py (not published)",
       "sha256": "ccea53a5b858d42aae6e71ad9e14c18171336c2b68e4ba8aedd9957c8ed34336",
       "role": "the read-only rollout check"
+    },
+    {
+      "path": "scratch apply_dry_full.py (not published)",
+      "sha256": "fd7d40d39fb43e01149ffb5984388f0375107b7c3edd171ae86e80b7db672b3f",
+      "role": "every precondition line of the dry run after the move"
+    },
+    {
+      "path": "scratch strict_stderr.py (not published)",
+      "sha256": "4c8c5302f0c99cfa086ca56c1b4f82daef5543557b5b35f1229ecfc199805dca",
+      "role": "stderr of the two strict-config cases at 0.159.2"
     }
   ]
 }
