@@ -2184,18 +2184,20 @@ class ModeTests(unittest.TestCase):
         self.assertTrue(any(e["mode"] == 5 for e in hits(host)), "M5-wal-only-change-selects-main")
 
     def test_m5_actual_main_fd_race_with_the_name_restored(self):
-        """SQLite opens another file under the planned name, which is then restored: the pathname checks before and
-        after pass, and only the identity of the main descriptor SQLite actually opened catches it (contract 10.8)."""
+        """While SQLite opens the planned name, its parent directory is swapped for a decoy holding another database,
+        then swapped back. The database's own inode is never touched (a rename of the file itself would change its
+        ctime), so the held descriptor's tuple, PRAGMA database_list and the pathname stat before and after all
+        pass: only the identity of the main descriptor SQLite actually opened catches it (contract 10.8)."""
         host = self.fixture()
         host.prepare()
         value = host.canary()
-        path = sqlite_file(host.home / ".claude" / "sample", [(f'CREATE TABLE "{value}"(x)', ())], "UTF-16le")
-        replacement = sqlite_file(host.root / "replacement", [("CREATE TABLE t(v)", ())])
-        aside = host.root / "aside"
-        hooks = {"before_sqlite_open": {"do": "swap", "target": str(path), "aside": str(aside),
-                                        "source": str(replacement), "once": str(host.root / "once-swap")},
-                 "after_sqlite_open": {"do": "replace", "source": str(aside), "target": str(path),
-                                       "once": str(host.root / "once-restore")}}
+        database = host.home / ".claude" / "db"
+        sqlite_file(database / "sample", [(f'CREATE TABLE "{value}"(x)', ())], "UTF-16le")
+        sqlite_file(host.root / "decoy" / "sample", [("CREATE TABLE t(v)", ())])
+        hooks = {"before_sqlite_open": {"do": "swap", "target": str(database), "aside": str(host.root / "original"),
+                                        "source": str(host.root / "decoy"), "once": str(host.root / "once-swap")},
+                 "after_sqlite_open": {"do": "swap", "target": str(database), "aside": str(host.root / "decoy-back"),
+                                       "source": str(host.root / "original"), "once": str(host.root / "once-restore")}}
         self.assertEqual(host.scan(dumper={"hooks": hooks}).returncode, 3, "M5-actual-main-fd-race")
         self.assertIn("sqlite_uri_identity", sink_reasons(host), "M5-actual-main-fd-race")
 
