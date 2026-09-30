@@ -2225,6 +2225,33 @@ The coordinator never receives those bytes or raw diagnostics. Its output,
 log, run record and receipts contain fixed enums, keyed opaque ids and counts.
 This process boundary is the real-value guarantee; the scanner-side children's
 memory is a stated residual, not an assertion that no process sees values.
+"Upstream executable" means a child the worker starts (rg, gzip, bzip2, xz,
+journalctl, git, systemctl, systemd-cat and the SQLite dumper); each starts
+through `setpriv --pdeathsig TERM` with stdin from `/dev/null`, a held sink
+descriptor or an owned pipe, and never inherits the plan, protocol or
+acknowledgement descriptor.
+
+Three fixed frames cross the boundary, all big-endian (network order), all
+defined once in `canary_scan_worker.py` and imported by the coordinator:
+
+| Frame | Bytes | Layout (offset:width field) |
+| --- | --- | --- |
+| PLAN, coordinator to worker, once | 64 + body | 0:4 `CPPL`; 4:1 version 1; 5:1 kind 1; 6:2 zero; 8:16 request nonce; 24:4 body length (at most 4 MiB); 28:32 SHA-256 of the body; 60:4 zero; then the body, canonical JSON (sorted keys, ASCII, no spaces) |
+| CP03, worker to coordinator | 128 | 0:4 `CP03`; 4:1 version 1; 5:1 kind; 6:2 zero; 8:16 nonce; 24:8 sequence; 32:8 check id; 40:2 sink; 42:1 mode; 43:1 view; 44:1 class; 45:1 path class; 46:1 status; 47:1 reason; 48:1 consumer; 49:7 zero; 56:4 attempt; 60:4 subpass; 64:8 observed; 72:8 expected; 80:4 signed exit; 84:4 zero; 88:16 opaque object id; 104:16 seal; 120:8 auxiliary count |
+| ACK, coordinator to worker, per HIT | 32 | 0:4 `CPAK`; 4:1 version 1; 5:1 kind 1; 6:2 zero; 8:16 nonce; 24:8 the HIT's sequence number, sent only after the `hit` event is fsynced |
+
+CP03 is contract draft 3's record with amendment C7's extensions: kind 9
+COUNTER (check id 1-12: selected, unselected, special, excluded_key,
+excluded_user, declined, declared_link, dangling_link, covered_link,
+excluded_link, directories, git_stores; observed is the count), class 8
+anchor, path classes 14-16 for the coordinator's own session (main, subagent,
+workflow) beside 1-3 for other sessions, and FACT 10 guard pin and 11 store
+outside a worktree. Every field a kind does not use must be zero; a partial
+frame, a gap in the sequence, another nonce or an unknown value makes the
+request incomplete. Version FACTs use one formula for every executable the
+worker calls (rg, git, gzip, bzip2, xz, journalctl, systemctl, systemd-cat,
+setpriv, nice, ionice, python3) and for SQLite: major x 1,000,000 + minor x
+1,000 + patch, so rg 14.1.0 is 14001000.
 
 Reuse sources are [ripgrep 14.1.0](https://github.com/BurntSushi/ripgrep/tree/e50df40a1967708b9781486b1c017e48040bceb0),
 `crates/core/flags/defs.rs`, `hiargs.rs`, `main.rs` and the standard printer;
@@ -2246,6 +2273,7 @@ Codex home before baseline. A later arm cannot add an unbaselined home.
 rtk python3 tools/credentials/canary_proof.py prepare --transcripts confirmed --codex-home LANE_HOME --session SESSION_ID
 rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase baseline
 rtk python3 tools/credentials/canary_proof.py arm --run RUN CONSUMER
+rtk python3 tools/credentials/canary_proof.py arm --run RUN omniroute-lane --codex-home LANE_HOME
 rtk python3 tools/credentials/canary_proof.py disarm --run RUN
 rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase final
 rtk python3 tools/credentials/canary_proof.py status --run RUN
@@ -2406,6 +2434,22 @@ updated decoder contract and fixtures. Cleanup records its absence check as
 Receipt publication is create-only and rejects synthetic forms/tags/controls.
 An old receipt is historical at its high-water mark; it never authorizes a
 new invocation. No operational acceptance is claimed by synthetic tests.
+
+The build's synthetic acceptance runs from the checkout, never against the
+operator's homes: `tests/test_canary_proof.py` (every class builds its own
+host under `/tmp`; `python3 -I tests/test_canary_proof.py --skip-list` prints
+the machine-readable skip list, and on the workstation the boundary, request,
+stability, mode, FIFO, store and real-scope containment classes skip nothing)
+and the mutation table:
+
+```sh
+rtk python3 -I tests/canary_mutants.py --json
+```
+
+It prints one JSON object per mutant (`id`, `target_file`, `patch_sha256`,
+`killing_test`, `failing_assertion`, `killed`) and exits 0 only when every
+mutant is killed: its named test passes unmutated and fails with that exact
+assertion on the mutant, in a scratch copy under `/tmp`.
 
 ## Follow-ups not in this change
 

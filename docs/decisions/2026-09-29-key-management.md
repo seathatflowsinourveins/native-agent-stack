@@ -971,8 +971,10 @@ Util-linux v2.39.3
 [`2da5c904e18fdcffd2b252d641e6f76374c7b406`](https://github.com/util-linux/util-linux/blob/2da5c904e18fdcffd2b252d641e6f76374c7b406/sys-utils/setpriv.c#L1055)
 arms PR_SET_PDEATHSIG before exec. Each upstream executable started by the
 worker uses setpriv; stdin is DEVNULL, a held descriptor or an owned pipe.
-There is no undefined lifeline. The pre-arming race and setsid/TERM-ignoring
-descendants rely on the verified finite scope backstop. CI's exec stub tests
+No lifeline pipe is used (C13): parent death reaches each child through
+PR_SET_PDEATHSIG, and whatever a signal misses through the scope's
+RuntimeMaxSec plus TimeoutStopSec. The pre-arming race and setsid/TERM-ignoring
+descendants rely on that verified finite scope backstop. CI's exec stub tests
 direct process death only and cannot establish cgroup/grandchild acceptance.
 
 Repository reuse is explicit: credential_run's encoded_forms, Masker,
@@ -1012,16 +1014,26 @@ asserted by F-M1b/c. The scanner still reads the held original inode; that alone
 is not stability acceptance. Likewise, reading current scan metadata into the
 prewalk record could erase the original identity; ST1–ST5 retain and reconcile it.
 Mutation acceptance preserves each historical fault family and adds the draft-3
-repairs, nonce/ledger/branch/request obligations. A kill requires a passing
-pristine named test followed by its actual assertion failure, never import,
-syntax or unrelated fixture failure. Raw returned logs and patches are retained
-outside the repository until a future evidence PR.
+repairs, nonce/ledger/branch/request obligations: `tests/canary_mutants.py`
+(amendment C3) holds draft 2's 65 rows adapted to this design, one row per G6
+repair, the protocol/branch/request rows and two continuation repairs. A kill
+requires a passing pristine named test followed by its actual assertion failure,
+never import, syntax or unrelated fixture failure. Where two layers guard the
+same fault (the worker and the coordinator, a hard-coded key path and the
+inventory, a post-walk and the END seal), a one-layer mutant survived its first
+run; each layer then got its own oracle or the row mutates the fault as a whole,
+and the table says which. Raw returned logs and patches are retained outside the
+repository until a future evidence PR.
 
 Evidence classes remain distinct: installed help/version, fresh pinned source
 retrieval, synthetic local integration, independent kernel process observation,
 workstation scope enforcement and live consumer/provider execution. This build
-uses the first four; skips name the unavailable service-manager scope. It runs
-no upstream test suite and does not relabel these local fixtures as upstream
+uses the first five. The GPT-6 worker's sandbox had no user service manager and
+skipped the real-scope classes; the Opus continuation ran them on the
+workstation, where they first failed only because the fixture CHILD_PATH lacked
+what the unchanged runner resolves through PATH (`bash`, `id`, `stat`), then
+passed, with a kernel observer of processes and scope cgroups. It runs no
+upstream test suite and does not relabel these local fixtures as upstream
 acceptance. Network retrieval worked through the installed public context-mode
 channel despite shell-network failure. Returned source pins and hashes are
 retained with the build handoff; no credentials or host paths enter public
@@ -1031,10 +1043,12 @@ environment override or credential-runner edit.
 
 Draft 3 estimates 650 coordinator lines, 1,150 worker lines, 1,800 aggregate
 and 2,800 test lines (probe/workflow/wrapper excluded from aggregate). The
-inherited implementation already exceeded the implementation ceilings. This
-continuation retains explicit checks rather than compressing statements or
-dropping obligations. Actual final counts and deviations are reported in the
-handoff for the coordinator's decision under amendment C13. The mutation
+inherited implementation already exceeded the implementation ceilings; at the
+continuation's head the coordinator is 1,720 lines and the worker 1,968, about
+twice the aggregate ceiling, while the probe (110), workflow (28), wrapper (25)
+and tests (2,710 of 2,800) stay within theirs. This continuation retains explicit checks rather
+than compressing statements or dropping obligations; the deviation is reported
+in the handoff for the coordinator's decision under amendment C13. The mutation
 runner is allowed separately and excluded from the test-line ceiling.
 
 One classifier selects latest requests, binds attempts/roots/ledgers, retains
