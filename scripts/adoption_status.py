@@ -21,7 +21,8 @@ three personal startup files a Bash login shell reads (~/.bash_profile, ~/.bash_
 executing any of them, and emits a fixed state per file, never a value, path or environment value. The opt-in
 --launcher-resolution is the one check that runs them: a bounded Bash login shell from a fixed environment reports
 where `command -v claude` resolves (claude itself never runs), shown only under $ECO_ROOT, $HOME or a system
-directory, with whether it is the ecosystem launcher and that launcher's sha256.
+directory, with whether it is the ecosystem launcher and that launcher's sha256. Without that flag, --login-shell
+reports launcher_resolution as {"status": "not_run", "flag": "--launcher-resolution"}.
 """
 
 from __future__ import annotations
@@ -139,6 +140,9 @@ LAUNCHER_MARKER = "native-agent-stack:launcher-resolution:"
 LAUNCHER_SYSTEM_PREFIXES = ("/usr/", "/bin/", "/sbin/", "/opt/", "/snap/", "/nix/")
 LAUNCHER_RESOLUTIONS = ("ecosystem_launcher", "other", "not_found", "unavailable")
 LAUNCHER_RESOLUTION_KEYS = ("resolution", "path", "is_ecosystem_launcher", "launcher_sha256")
+# --login-shell without --launcher-resolution: that check executes the login files, which --login-shell never does, so
+# the report says the check was not run and which flag runs it instead of leaving the key out.
+LAUNCHER_NOT_RUN = {"status": "not_run", "flag": "--launcher-resolution"}
 # --launcher-resolution appends this statement.
 LAUNCHER_RESOLUTION_LIMITATIONS = [
     "--launcher-resolution runs one Bash login shell (`bash -l -c`, stdin from /dev/null, its own process group killed "
@@ -1401,6 +1405,8 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
     if with_launcher_resolution:
         result["launcher_resolution"] = launcher_resolution(env)
         result["limitations"] = result["limitations"] + LAUNCHER_RESOLUTION_LIMITATIONS
+    elif with_login_shell:
+        result["launcher_resolution"] = dict(LAUNCHER_NOT_RUN)
     try:
         require(manifest.resolve().is_relative_to(root), "manifest must be inside the repository root")
         require(manifest.is_file(), "manifest must be a regular file")
@@ -1466,7 +1472,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="Also report, from file metadata alone (never a read or an exec), which of "
                              "~/.bash_profile, ~/.bash_login and ~/.profile a Bash login shell reads first and "
                              "whether it reaches ~/.profile: a state per file, first_read and profile_read only; "
-                             "the exit code is unchanged")
+                             "without --launcher-resolution, launcher_resolution is "
+                             '{"status": "not_run", "flag": "--launcher-resolution"}; the exit code is unchanged')
     parser.add_argument("--launcher-resolution", action="store_true",
                         help="Also run one bounded Bash login shell from a fixed environment and report where "
                              "`command -v claude` resolves (under $ECO_ROOT, $HOME or a system directory, else "

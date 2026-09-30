@@ -619,6 +619,7 @@ class AdoptionStatusTests(unittest.TestCase):
         self.assertEqual(result["manifest"]["status"], "invalid")
         self.assertEqual(set(result["login_shell"]), set(LOGIN_SHELL_KEYS))
         self.assertIs(result["login_shell"]["profile_read"], False)
+        self.assertEqual(result["launcher_resolution"], {"status": "not_run", "flag": "--launcher-resolution"})
         self.assertNotIn(str(self.root), json.dumps(result))
 
     def test_login_shell_composes_with_client_wiring_and_pinned_versions(self):
@@ -995,8 +996,17 @@ class LauncherResolutionTests(unittest.TestCase):
             main(["--manifest", str(manifest), "--json", "--login-shell"])
         probe.assert_not_called()
         payload = json.loads(output.getvalue())
-        self.assertNotIn("launcher_resolution", payload)
+        # --login-shell never executes a login file, so it names the flag that does instead of leaving the key out.
+        self.assertEqual(payload["launcher_resolution"], {"status": "not_run", "flag": "--launcher-resolution"})
         self.assertEqual(payload["limitations"][-1:], LOGIN_SHELL_LIMITATIONS)
+        with patch("scripts.adoption_status.launcher_resolution") as probe, \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(manifest), "--login-shell"])
+        probe.assert_not_called()
+        self.assertIn('Launcher resolution: {"flag": "--launcher-resolution", "status": "not_run"}\n', output.getvalue())
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(manifest), "--json"])
+        self.assertNotIn("launcher_resolution", json.loads(output.getvalue()))  # nothing asked, nothing stated
         self.write_profile_block()
         with patch.dict("os.environ", self.env), contextlib.redirect_stdout(io.StringIO()) as output:
             main(["--manifest", str(manifest), "--json", "--login-shell", "--launcher-resolution"])

@@ -604,6 +604,15 @@ GitHub-hosted macOS runner; see
    (see its own docstring and `adoption/README.md`'s "Native verification
    tiers" table).
 
+   `--login-shell` adds the static check of `~/.bash_profile`, `~/.bash_login` and `~/.profile`
+   (file metadata only; none is opened or run). Where `claude` resolves in a login shell is known only
+   by running one, so that report carries `"launcher_resolution": {"status": "not_run", "flag":
+   "--launcher-resolution"}`. `--launcher-resolution` (added after `v2026.09.26.2`) runs one bounded
+   Bash login shell from a fixed environment, never `claude` itself, and reports the resolved path,
+   whether it is the ecosystem launcher `$ECO_INSTALL_ROOT/bin/claude` and that launcher's sha256
+   ([WSL page](platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)); the
+   `login-shell` step of `--configure-full-profile` passes both flags.
+
 7. **Per-host receipt.** Record `evidence/receipts/adoption-<host>-<date>.json`
    using the [`adoption/receipt.json`](receipt.json) schema: `schema_version`,
    `id`, `kind`, `component_ids`, `observed_at_utc`, `status`, `claim`, `scope`,
