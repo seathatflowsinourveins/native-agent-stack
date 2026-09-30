@@ -3,8 +3,12 @@
 - Usage: an unknown --skip step, --skip or --host without the flag, a missing --host and a host without a value file
   exit 2 before anything else runs.
 - The real script refuses (exit 1, both commits printed) from a checkout that is not at its origin's main, before it
-  reads the manifest; at origin's main it goes on, and without the flag it never asks git. The origin is a local bare
-  repository, so no network is used.
+  reads the manifest and before its first host change; at origin's main it goes on, and without the flag it never asks
+  git. The origin is a local bare repository, so no network is used. The first host change is the system-package step
+  (`sudo apt-get`): with `sudo` and `dpkg-query` stubbed on PATH, a refused checkout (ahead of its origin, or with an
+  unreachable one) leaves the stub's call log empty, while a checkout at origin's main, and any checkout without the
+  flag, do reach the stubbed package commands (so an empty log is the ordering, not a stub that never ran); a host
+  without git is refused with the instruction to install it, again with an empty log.
 - The steps run in the order the script declares, each once; a failing step is recorded and the rest still run.
 - The step functions, extracted verbatim as tests/test_adoption_bootstrap.py extracts install_native, run against
   stubs: the Codex lane prepares the Codex home, then applies exactly the hashes its own dry run printed (in the format
@@ -80,6 +84,13 @@ def function(name: str, text: str = TEXT) -> str:
     return match.group(0)
 
 
+def position(fragment: str, text: str = TEXT) -> int:
+    at = text.find(fragment)
+    if at < 0:
+        raise AssertionError(f"{fragment!r} not found in {SCRIPT}")
+    return at
+
+
 def clean_env(**extra) -> dict:
     return {**{key: value for key, value in os.environ.items() if not key.startswith("GIT_")}, **extra}
 
@@ -132,6 +143,19 @@ class StepOrderTests(unittest.TestCase):
         self.assertGreater(TEXT.index('if [[ "$configure_full_profile" == 1 ]]; then\n  command -v python3'),
                            report_end)
 
+    def test_the_origin_main_check_comes_before_the_system_packages_and_every_other_host_change(self):
+        # The source order, which holds on every host (the stubbed runs below need a Debian one): the git prerequisite
+        # and the one origin/main comparison, then the system-package step (the first host change), then the first
+        # directory the script creates.
+        self.assertEqual(TEXT.count("ls-remote origin refs/heads/main"), 1)
+        origin_check = position('git -C "$repo_root" ls-remote origin refs/heads/main')
+        git_prerequisite = position("command -v git >/dev/null")
+        system_packages = position("sudo apt-get update")
+        first_directory = position('mkdir -p "$ecosystem_root"')
+        self.assertLess(git_prerequisite, origin_check)
+        self.assertLess(origin_check, system_packages)
+        self.assertLess(system_packages, first_directory)
+
     def test_a_failing_step_is_recorded_and_the_rest_still_run(self):
         body = ("full_profile_skips=(skills)\nfull_profile_failed=()\n" + function("full_profile_selected") + "\n"
                 + function("full_profile_run") + "\n"
@@ -150,7 +174,7 @@ class OriginMainGateTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
-        base = Path(temporary.name)
+        self.base = base = Path(temporary.name)
         self.repo, origin = base / "checkout", base / "origin.git"
         (self.repo / "adoption").mkdir(parents=True)
         self.script = self.repo / "adoption/bootstrap-linux.sh"
@@ -164,6 +188,7 @@ class OriginMainGateTests(unittest.TestCase):
         self.env = clean_env(ECO_INSTALL_ROOT=str(base / "eco"))
         self.flags = ["--profile", "foundation-cpu", "--skip-system-packages", "--configure-full-profile",
                       "--skip", "claude-settings,codex-lane"]
+        self.package_flags = [flag for flag in self.flags if flag != "--skip-system-packages"]
 
     def git(self, *args: str) -> str:
         return subprocess.run([GIT, "-C", str(self.repo), *args], check=True, capture_output=True, text=True,
@@ -203,6 +228,83 @@ class OriginMainGateTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("origin main (git ls-remote origin main):   unknown", result.stdout)
         self.assertIn("not at origin/main", result.stderr)
+
+    # The system-package step is the script's first host change. Its commands are stubs: dpkg-query reports every
+    # package missing and sudo (how the script runs apt-get) appends its command line to a log and does nothing else,
+    # so a run that reaches the step leaves a record and the host is never touched.
+    def package_stubs(self) -> tuple:
+        stubs, log = self.base / "stubs", self.base / "package-calls.log"
+        stubs.mkdir(exist_ok=True)
+        (stubs / "dpkg-query").write_text("#!/bin/sh\nexit 1\n")
+        (stubs / "sudo").write_text(f"#!/bin/sh\nprintf 'sudo %s\\n' \"$*\" >> {shlex.quote(str(log))}\nexit 0\n")
+        for name in ("dpkg-query", "sudo"):
+            (stubs / name).chmod(0o755)
+        log.unlink(missing_ok=True)
+        return stubs, log
+
+    def stubbed_env(self, stubs: Path) -> dict:
+        return clean_env(PATH=f"{stubs}{os.pathsep}{os.environ['PATH']}", ECO_INSTALL_ROOT=str(self.base / "eco"))
+
+    @staticmethod
+    def calls(log: Path) -> list:
+        return log.read_text().splitlines() if log.exists() else []
+
+    @RUNS_THE_SCRIPT
+    def test_a_checkout_ahead_of_origin_main_is_refused_before_any_package_command_runs(self):
+        stubs, log = self.package_stubs()
+        self.commit("local only")
+        result = run_script(self.script, *self.package_flags, env=self.stubbed_env(stubs))
+        self.assertEqual(self.calls(log), [], "a package command ran before the origin/main check")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Refusing --configure-full-profile: this checkout is not at origin/main", result.stderr)
+        self.assertFalse((self.base / "eco").exists())
+
+    @RUNS_THE_SCRIPT
+    def test_an_unreachable_origin_is_refused_before_any_package_command_runs(self):
+        stubs, log = self.package_stubs()
+        self.git("remote", "set-url", "origin", str(self.base / "gone.git"))
+        result = run_script(self.script, *self.package_flags, env=self.stubbed_env(stubs))
+        self.assertEqual(self.calls(log), [], "a package command ran before the origin/main check")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("origin main (git ls-remote origin main):   unknown", result.stdout)
+        self.assertIn("not at origin/main", result.stderr)
+        self.assertFalse((self.base / "eco").exists())
+
+    @RUNS_THE_SCRIPT
+    def test_a_host_without_git_is_told_to_install_it_before_any_package_command_runs(self):
+        stubs, log = self.package_stubs()
+        for tool in ("uname", "dirname"):  # all the script runs before the check; git is the one tool left out
+            (stubs / tool).symlink_to(shutil.which(tool))
+        result = run_script(self.script, *self.package_flags,
+                            env=clean_env(PATH=str(stubs), ECO_INSTALL_ROOT=str(self.base / "eco")))
+        self.assertEqual(self.calls(log), [], "a package command ran before the git prerequisite check")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Refusing --configure-full-profile: git is not installed", result.stderr)
+        self.assertIn("Install git first", result.stderr)
+        self.assertNotIn("origin main (git ls-remote", result.stdout)
+        self.assertFalse((self.base / "eco").exists())
+
+    # The controls for the empty logs above: the same stubs record the package commands of a run that is allowed to
+    # reach the step, and the default path (no flag) keeps its order, package step first and git never asked.
+    @RUNS_THE_SCRIPT
+    def test_at_origin_main_and_without_the_flag_the_same_stubs_do_log_the_package_commands(self):
+        stubs, log = self.package_stubs()
+        env = self.stubbed_env(stubs)
+        cases = (("--configure-full-profile at origin main", self.package_flags, True),
+                 ("no flag, checkout ahead of origin main", ["--profile", "foundation-cpu"], False))
+        for label, flags, at_origin_main in cases:
+            with self.subTest(label):
+                log.unlink(missing_ok=True)
+                if not at_origin_main:
+                    self.commit("local only")
+                result = run_script(self.script, *flags, env=env)
+                self.assertIn("Missing manifest", result.stderr)  # the next check, in this manifest-less checkout
+                self.assertNotIn("Refusing --configure-full-profile", result.stderr)
+                self.assertEqual(("origin main (git ls-remote origin main)" in result.stdout), at_origin_main)
+                calls = self.calls(log)
+                self.assertEqual(len(calls), 2, calls)
+                self.assertEqual(calls[0], "sudo apt-get update")
+                self.assertTrue(calls[1].startswith("sudo apt-get install -y --no-install-recommends "), calls[1])
 
 
 @unittest.skipUnless(BASH and JQ, "needs bash and jq")

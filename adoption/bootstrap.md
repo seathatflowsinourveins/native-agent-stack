@@ -239,13 +239,23 @@ GitHub-hosted macOS runner; see
    | `login-shell` | `scripts/adoption_status.py --login-shell --launcher-resolution` under Python 3.13 (step 6's form); the step fails unless `claude` in a login shell is the ecosystem launcher |
 
    `--host <name>` names `adoption/hosts/<name>.json` (step 4); it is required
-   unless both `claude-settings` and `codex-lane` are skipped. The flag refuses
-   (exit 1, before installing anything) unless `git rev-parse HEAD` equals `git
-   ls-remote origin refs/heads/main`, and prints both commits: it applies what
-   main documents, so run it from a clone at `origin/main` (a release checkout
-   follows steps 4 and 4a by hand, as the note above says). A failed step is
-   reported and the rest still run; the script then exits 6. Every step is
-   idempotent: fix the cause and re-run, skipping what is done.
+   unless both `claude-settings` and `codex-lane` are skipped. The flag applies
+   what main documents, so it runs only from a clone at `origin/main` (a release
+   checkout follows steps 4 and 4a by hand, as the note above says). Its checks
+   come first, in this order, and the script installs and writes nothing until
+   they pass: the usage checks (exit 2); the platform checks (x86_64 Linux, not
+   root, Ubuntu or Debian; exit 1); `git` on `PATH`; and `git rev-parse HEAD`
+   equal to `git ls-remote origin refs/heads/main`, with both commits printed.
+   Only then does the script install the missing system packages (the `sudo
+   apt-get` step), check the prerequisites, install the pins, write the version
+   report and run the steps above. A checkout that is not at `origin/main`, or
+   whose origin cannot be read, is refused with exit 1 and the host unchanged.
+   So is a host without `git`: the package step that would install it comes
+   after this check, so the refusal names `sudo apt-get install -y git`, and a
+   run of the script without the flag installs it as well. Without the flag the
+   order is unchanged: system packages first, and git is never asked. A failed
+   step is reported and the rest still run; the script then exits 6. Every step
+   is idempotent: fix the cause and re-run, skipping what is done.
 
    Both managed blocks work alike. The begin and end markers must appear exactly
    once and in order, or the file is refused; without them the block is appended

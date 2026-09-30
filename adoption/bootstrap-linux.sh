@@ -33,8 +33,10 @@ usage() {
     '--configure-full-profile appends to ~/.profile. That flag then applies' \
     'the whole user profile in order, each step skippable with --skip:' \
     "  ${full_profile_steps[*]}" \
-    'It runs only from a checkout at origin/main (exit 1 otherwise, before' \
-    'installing anything), needs --host <name> (adoption/hosts/<name>.json)' \
+    'It runs only from a checkout at origin/main: right after the platform' \
+    'checks, before the system-package step or any other write, it needs git' \
+    '(install it first) and refuses with exit 1 when HEAD is not origin main.' \
+    'It needs --host <name> (adoption/hosts/<name>.json)' \
     'unless claude-settings and codex-lane are skipped, and exits 6 when a' \
     'step fails; every step is idempotent, so fix the cause and re-run.'
 }
@@ -175,6 +177,28 @@ case "${ID:-}" in
   *) printf 'This bootstrap supports Ubuntu and Debian.\n' >&2; exit 1 ;;
 esac
 
+# --configure-full-profile applies the profile main documents, so it runs only
+# from a checkout whose HEAD is origin's main; both commits are printed. Nothing
+# above this point writes to the host, and this check comes before the system
+# packages below, the script's first host change, so a refused checkout changes
+# nothing. It needs git, which that step would otherwise install: a host
+# without git is told to install it first, not given packages before the check.
+if [[ "$configure_full_profile" == 1 ]]; then
+  command -v git >/dev/null || {
+    printf 'Refusing --configure-full-profile: git is not installed, so this checkout cannot be compared with origin/main, and nothing is installed before that check. Install git first (Ubuntu/Debian: sudo apt-get install -y git), then re-run from a clone at origin/main.\n' >&2
+    exit 1
+  }
+  checkout_head="$(git -C "$repo_root" rev-parse --verify --quiet 'HEAD^{commit}' 2>/dev/null || true)"
+  # git asks for credentials on the terminal, not on stdin, so the prompt itself is turned off.
+  origin_main="$(GIT_TERMINAL_PROMPT=0 timeout 60 git -C "$repo_root" ls-remote origin refs/heads/main </dev/null 2>/dev/null | awk 'NR == 1 { print $1 }' || true)"
+  printf 'This checkout (git rev-parse HEAD):        %s\n' "${checkout_head:-unknown}"
+  printf 'origin main (git ls-remote origin main):   %s\n' "${origin_main:-unknown}"
+  if [[ -z "$checkout_head" || -z "$origin_main" || "$checkout_head" != "$origin_main" ]]; then
+    printf 'Refusing --configure-full-profile: this checkout is not at origin/main. Run it from a clone at origin/main (git fetch origin && git checkout --detach origin/main); a release checkout follows the per-step commands in adoption/bootstrap.md instead.\n' >&2
+    exit 1
+  fi
+fi
+
 # Unless the caller opts out, install missing curl/git/tar/jq (and their apt
 # dependencies) *before* checking for them below, so a bare Ubuntu/Debian host
 # with none of them yet installed satisfies the check without a second run.
@@ -203,21 +227,6 @@ if [[ ${#missing_prerequisites[@]} -gt 0 ]]; then
     printf 'Re-run without --skip-system-packages, or install them manually first.\n' >&2
   fi
   exit 4
-fi
-
-# --configure-full-profile applies the profile main documents, so it runs only
-# from a checkout whose HEAD is origin's main; both commits are printed, and the
-# refusal comes before anything is installed.
-if [[ "$configure_full_profile" == 1 ]]; then
-  checkout_head="$(git -C "$repo_root" rev-parse --verify --quiet 'HEAD^{commit}' 2>/dev/null || true)"
-  # git asks for credentials on the terminal, not on stdin, so the prompt itself is turned off.
-  origin_main="$(GIT_TERMINAL_PROMPT=0 timeout 60 git -C "$repo_root" ls-remote origin refs/heads/main </dev/null 2>/dev/null | awk 'NR == 1 { print $1 }' || true)"
-  printf 'This checkout (git rev-parse HEAD):        %s\n' "${checkout_head:-unknown}"
-  printf 'origin main (git ls-remote origin main):   %s\n' "${origin_main:-unknown}"
-  if [[ -z "$checkout_head" || -z "$origin_main" || "$checkout_head" != "$origin_main" ]]; then
-    printf 'Refusing --configure-full-profile: this checkout is not at origin/main. Run it from a clone at origin/main (git fetch origin && git checkout --detach origin/main); a release checkout follows the per-step commands in adoption/bootstrap.md instead.\n' >&2
-    exit 1
-  fi
 fi
 
 manifest_path="$repo_root/adoption/manifest.json"
