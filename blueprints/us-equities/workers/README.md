@@ -77,7 +77,11 @@ rejects extra settings that would replace this route contract. No sampling
 parameter is added. Gateway discovery checks the advertised alias and makes no
 native account-allowance claim; only a completed model run provides execution
 evidence. The default `openai` invocation keeps native account readiness and
-sign-in. Claude itself retains its native Claude model route.
+sign-in. This revision also explicitly sets `model_reasoning_effort="max"` on
+the default `openai` path; earlier revisions passed only caller overrides on
+that path. That effort change applies to this bounded worker example, rather
+than a global client setting. Claude itself retains its native Claude model
+route.
 
 The turn deadline starts after the upstream turn is accepted. Startup and
 readiness RPCs can block independently; the outer native process timeout limits

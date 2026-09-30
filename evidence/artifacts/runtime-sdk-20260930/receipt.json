@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "kind": "native-sdk-route-lifecycle-qualification",
+  "evidence_class": "local_integration",
   "checked_at": "2026-09-30T05:26:01Z",
   "status": "bounded_native_execution_verified",
   "scope": "Official Codex Python SDK installation, native custom-provider routing, dynamic lookup tool and persistent thread resume on the same Linux host. No whole-roster quality or SDK-default promotion claim.",
