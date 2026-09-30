@@ -1,7 +1,8 @@
 # Native practice finalization, 2026-09-30
 
 Attribution (2026-09-30): pre-existing uncommitted changes observed in the main checkout; original author not
-established. Folded unchanged below this paragraph by unit F1 of coordinator session native-agent-stack-c5 from a
+established (an earlier attribution to the Codex coordinator lane rested on a process census of file
+writes, which does not establish document authorship; the Codex runtime lane asked for this neutral wording). Folded unchanged below this paragraph by unit F1 of coordinator session native-agent-stack-c5 from a
 read-only snapshot of those changes (tracked diff sha256 314bd1b260da0939, relative to checkout commit 5cfa2400),
 together with 18 of the 19 evidence files of `evidence/artifacts/sota-finalization-20260930/`, which are
 byte-identical to the snapshot: a privacy scan found no personal path, host user name, session identifier or

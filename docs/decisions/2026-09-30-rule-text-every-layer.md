@@ -68,9 +68,13 @@ The user-level file's GPT-6 routing wording is replaced, not kept, because the S
 
 The RTK upstream text and the exceptions block stay byte-identical, so the F4 block in every Codex role is unchanged.
 
+### Conditional skill discovery
+
+At the Gate A owner's note (a measured child would otherwise add Skill and Bash calls in every arm), the discovery clause is conditional on all three surfaces: `search-first` runs before custom code or a tool choice, and `find-skills` (`npx skills find`, a network call) runs only when no listed skill fits the task. Seamless discovery for a novel task is kept; a task with a fitting listed skill makes no extra call.
+
 ### Folded from the main checkout
 
-Provenance for every item in this list: pre-existing uncommitted changes observed in the main checkout; original author not established. The coordinator delegated the fold to this unit and took read-only snapshots of that state on 2026-09-30: r1 (tracked diff sha256 `5de56d6d81453ed3`) and r2 (`314bd1b260da0939`, relative to checkout commit `5cfa2400`). Only the true delta against origin/main was taken, by a three-way merge with `5cfa2400` as the base, so main's later edits stay.
+Provenance for every item in this list: pre-existing uncommitted changes observed in the main checkout; original author not established. The unit brief and the fold brief had attributed these items to the Codex coordinator lane on the strength of a process census of file writes; a census does not establish document authorship, and the Codex runtime lane asked for the neutral wording, so the coordinator's 2026-09-30 amendment to the brief adopts it. The coordinator delegated the fold to this unit and took read-only snapshots of that state on 2026-09-30: r1 (tracked diff sha256 `5de56d6d81453ed3`) and r2 (`314bd1b260da0939`, relative to checkout commit `5cfa2400`). Only the true delta against origin/main was taken, by a three-way merge with `5cfa2400` as the base, so main's later edits stay.
 
 - **`AGENTS.md`.** Two bullets:
   - the skill-lifecycle bullet, whose target `adoption/skills/lifecycle.md` lands with unit F3;
@@ -150,7 +154,7 @@ How the sum was reached:
 - **The Ultra/Max split** added 27, 22 and 24 tokens to the three files.
 - **One tightening pass** then cut 9, 3 and 14 tokens. It removed only words that carry no rule: the contract pointer moved into parentheses, one registry label was dropped and the Codex invocation clauses were merged. Every phrase both phrase checks require still holds.
 
-**Over the unit's growth budget, accepted.** The brief set a budget of at most 200 tokens of always-loaded growth, summed over `AGENTS.md` and the portable template. The measured sum is +723: +139 from the folded text and +584 from this unit's clauses, the user-level rules and the routing split. The coordinator accepted the miss on 2026-09-30, because the clauses are the user's explicit directive.
+**Over the unit's growth budget, accepted by the coordinator's dated amendment to the unit brief (2026-09-30, its Amendments section), because the six clauses are the user's explicit directive.** The brief set a budget of at most 200 tokens of always-loaded growth, summed over `AGENTS.md` and the portable template. The measured sum is +723: +139 from the folded text and +584 from this unit's clauses, the user-level rules and the routing split. The coordinator accepted the miss on 2026-09-30, because the clauses are the user's explicit directive.
 - **The floor.** The portable template alone grows by 382, because it must carry the user-level rules and all six clauses. The floor stays above 200 even with `AGENTS.md` unchanged.
 - **The fallback.** In the first build, `AGENTS.md` kept (d) and (f) inline and pointed to the user-level files for the rest. That measured +106 before the fold.
 - **What this host loads.** In this repository a Claude session loads the user-level file and `AGENTS.md`. Once the template replaces the current user-level file, those two files grow from 1,988 + 2,392 to 2,433 + 2,733 o200k tokens: +786, before the managed markers.
