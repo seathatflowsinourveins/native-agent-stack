@@ -77,6 +77,25 @@ def needs_scope(test):
     return unittest.skipUnless(SCOPE_OK, NO_SCOPE)(needs_tools(test))
 
 
+# A foreign /tmp/.git exists on some shared hosts. This test-only metadata seam
+# checks every owned ancestor, while leaving unrelated ancestors untouched. It
+# preserves the real helper's refusal for a .git inside the fixture. No production
+# environment bypass or runner change is introduced (contract 9.5).
+STORE_METADATA_SEAM = r"""
+import credential_status as cs
+from pathlib import Path
+def fixture_worktree(directory):
+    current = Path(os.path.realpath(directory))
+    boundary = Path(os.environ["HOME"]).parent
+    while current == boundary or boundary in current.parents:
+        if os.path.lexists(current / ".git"):
+            return current
+        current = current.parent
+    return None
+cs.git_worktree_of = fixture_worktree
+"""
+
+
 COORDINATOR = r"""
 import json, os, signal, sys, time
 config = json.loads(sys.argv[1])
@@ -185,6 +204,36 @@ import json, os, sys, time
 config = json.loads(sys.argv[1])
 sys.path[:0] = [config["root"] + "/tools/credentials", config["root"] + "/scripts"]
 import canary_scan_worker as w
+if config.get("wrong_runtime"):
+    os.environ["XDG_RUNTIME_DIR"] = config["wrong_runtime"]
+if config.get("fail_spawn"):
+    original_spawn = w.Child.__init__
+    def fail_spawn(self, scan, argv, *args, **kwargs):
+        if argv[0].endswith('/' + config['fail_spawn']):
+            raise OSError(11, "synthetic EAGAIN")
+        original_spawn(self, scan, argv, *args, **kwargs)
+    w.Child.__init__ = fail_spawn
+if config.get("argv_record"):
+    original_child = w.Child.__init__
+    def record_child(self, scan, argv, *args, **kwargs):
+        with open(config["argv_record"], "ab") as handle:
+            handle.write(repr(argv).encode() + b"\n")
+        original_child(self, scan, argv, *args, **kwargs)
+    w.Child.__init__ = record_child
+if config.get("forbid_paths"):
+    import builtins
+    original_open, original_builtin = os.open, builtins.open
+    forbidden = [os.fsencode(p) for p in config["forbid_paths"]]
+    def guarded_open(path, *args, **kwargs):
+        if isinstance(path, int):
+            return original_builtin(path, *args, **kwargs)
+        value = os.fsencode(path)
+        if kwargs.get("dir_fd") is not None:
+            value = os.fsencode(os.readlink('/proc/self/fd/' + str(kwargs["dir_fd"]))) + b'/' + value
+        if any(value == p or value.startswith(p + b'/') for p in forbidden):
+            raise AssertionError("excluded path opened")
+        return original_open(path, *args, **kwargs)
+    os.open = guarded_open
 for name, value in config["constants"].items():
     setattr(w, name, value)
 if config.get("stub_scope"):
@@ -256,6 +305,11 @@ if config.get("trace"):  # test diagnostics of synthetic fixtures only; producti
     w.Scan.run, w.dump = traced(w.Scan.run), traced(w.dump)
 sys.exit(w.main(sys.argv[2:]))
 """
+WORKER_LAUNCHER = WORKER_LAUNCHER.replace("import canary_scan_worker as w", STORE_METADATA_SEAM +
+                                         "\nimport canary_scan_worker as w")
+
+RUNNER_LAUNCHER = "import os, sys\nsys.path[:0] = [sys.argv[1] + '/tools/credentials', sys.argv[1] + '/scripts']\n" + \
+    STORE_METADATA_SEAM + "\nimport credential_run as r\nsys.exit(r.main(sys.argv[2:]))\n"
 
 FAKE_JOURNALCTL = r"""#!/usr/bin/python3 -I
 import json, os, struct, sys
@@ -355,8 +409,9 @@ class Host:
         self.session = session
         self.worker = {"constants": {"BUDGET_CAP": 30.0}, "hooks": {}, "stub_scope": not real_scope,
                        "runtime": str(self.run_dir)}
-        self.dumper = {"constants": {}, "hooks": {}}
+        self.dumper = {"constants": {}, "hooks": {}, "stub_scope": not real_scope}
         self.constants = {"CHILD_PATH": str(self.bin), "RUNNER": str(RUNNER if real_scope else self.bin / "stub-runner"),
+                          "PRIMARY_CHECKOUT": str(self.home / "code/native-agent-stack"),
                           "TASKS_ROOT": str(self.root / "tasks"), "SETTLE_SECONDS": 0,
                           "SCOPE_SECONDS": {**{sink: 120 for sink in wire.SINKS}, "setup": 120}}
         self.run_id = None
@@ -386,7 +441,7 @@ class Host:
         return {name: value for name, value in env.items() if value is not None}
 
     def tool(self, *argv, hooks=None, audit=None, unsafe=None, timeout=300, env=None, tty=False,
-             worker=None, dumper=None, forbid_list=None, count_pipes=None) -> subprocess.CompletedProcess:
+             worker=None, dumper=None, forbid_list=None, count_pipes=None, background=False) -> subprocess.CompletedProcess:
         """Run canary_proof.main(argv) in a launcher process whose module hooks and constants are set here."""
         worker_config = copy.deepcopy(self.worker)
         worker_config.update(root=str(ROOT), **(worker or {}))
@@ -402,6 +457,9 @@ class Host:
                   "forbid_list": str(forbid_list) if forbid_list else None,
                   "count_pipes": str(count_pipes) if count_pipes else None}
         command = [sys.executable, "-I", "-S", "-c", COORDINATOR, json.dumps(config)]
+        if background:
+            return subprocess.Popen(command, env=env or self.env(), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    start_new_session=True)
         if tty:
             return run_in_pty(command, env or self.env(), timeout)
         return subprocess.run(command, env=env or self.env(), capture_output=True, timeout=timeout)
@@ -443,7 +501,7 @@ class Host:
 
     def consume(self, consumer: str, attempt: int) -> tuple:
         """The probe through the real credential runner and the synthetic store: (masked stdout, masked stderr)."""
-        command = [PYTHON, "-I", str(ROOT / "tools/credentials/credential_run.py"), "canary-e2e", "--", PYTHON, "-I",
+        command = [PYTHON, "-I", "-S", "-c", RUNNER_LAUNCHER, str(ROOT), "canary-e2e", "--", PYTHON, "-I",
                    str(ROOT / "tools/credentials/canary_probe.py"), "--run", self.run_id, "--consumer", consumer,
                    "--attempt", str(attempt)] + (["--leak-check"] if consumer == "systemd-user-unit" else [])
         result = subprocess.run(command, env=self.env(), capture_output=True, timeout=60)
@@ -519,7 +577,8 @@ def processes_with(marker: str) -> list:
                 cmdline = handle.read()
             if os.stat(f"/proc/{entry}").st_uid != os.getuid():
                 continue
-            state = open(f"/proc/{entry}/stat", "rb").read().rsplit(b")", 1)[1].split()[0]
+            with open(f"/proc/{entry}/stat", "rb") as handle:
+                state = handle.read().rsplit(b")", 1)[1].split()[0]
         except OSError:
             continue
         if needle in cmdline and state != b"Z":
@@ -537,7 +596,7 @@ def wait_gone(marker: str, seconds: float) -> list:
     return processes_with(marker)
 
 
-SESSION = "0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0"
+SESSION = "synthetic-coordinator-session"
 
 
 def clean_run(test, real_scope: bool = False, session: str = SESSION) -> tuple:
@@ -682,7 +741,7 @@ class ProbeTests(unittest.TestCase):
         writer.create_exclusively(fd, "canary-e2e.env", writer.encode("CANARY_E2E_KEY", canary))
         os.close(fd)
         result = subprocess.run(
-            [PYTHON, "-I", str(ROOT / "tools/credentials/credential_run.py"), "canary-e2e", "--", PYTHON, "-I",
+            [PYTHON, "-I", "-S", "-c", RUNNER_LAUNCHER, str(ROOT), "canary-e2e", "--", PYTHON, "-I",
              str(ROOT / "tools/credentials/canary_probe.py"), "--run", "cp-20260930t120000z-abcdef", "--consumer",
              "systemd-user-unit", "--attempt", "1", "--leak-check"], env=host.env(), capture_output=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -985,6 +1044,10 @@ class BoundaryTests(unittest.TestCase):
         session.nonce, session.seal = nonce, os.urandom(16)
 
         def record(kind, **fields):
+            if kind in (wire.RESULT, wire.HIT, wire.OBSERVATION, wire.CONTROL) and fields.get("check") in session.checks:
+                declared = session.checks[fields["check"]][0]
+                fields = {"mode": declared.mode, "view": declared.view, "path": declared.path,
+                          **({"object": declared.object} if kind != wire.CONTROL else {}), **fields}
             return wire.unpack(wire.pack(kind=kind, nonce=nonce, seq=session.seq + 1, **fields))
         good = [record(wire.BEGIN, seal=session.seal)]
         self.assertTrue(session.accept(good[0]), "B4-begin")
@@ -1411,5 +1474,771 @@ class RequestRunTests(unittest.TestCase):
                          "R8-comparison-needs-user-run")
 
 
+@needs_tools
+class StabilityTests(unittest.TestCase):
+    """ST1–ST9: independent writers change synthetic sinks at the real worker's seams."""
+
+    def fixture(self, data=b"original\n", name="sample"):
+        host = Host(self)
+        host.constants["AGENT_SINKS"] = ["A1"]
+        host.prepare("--transcripts", "confirmed")
+        path = host.home / ".claude" / name
+        path.write_bytes(data)
+        return host, path
+
+    def test_st1_replacement_before_and_after_held_handoff(self):
+        for seam in ("after_prewalk", "after_handoff"):
+            with self.subTest(seam=seam):
+                host, path = self.fixture()
+                replacement = host.root / "replacement"
+                replacement.write_text(host.canary() + "\n")
+                result = host.scan(worker={"hooks": {seam: {"do": "replace", "source": str(replacement),
+                    "target": str(path), "once": str(host.root / "once"), "when": "sample" if seam != "after_prewalk" else ""}}})
+                self.assertEqual(result.returncode, 5, "ST1-retry-finds-replacement")
+                self.assertEqual(host.finished()["sinks"]["A1"]["subpass"], 1, "ST1-stability-retry")
+
+    def test_st2_same_inode_overwrite_append_truncate_and_restored_mtime(self):
+        for offset, content in ((0, "overwrite"), (None, "append"), (0, "truncate")):
+            with self.subTest(content=content):
+                host, path = self.fixture(b"x" * 200)
+                identity = path.stat()
+                spec = {"do": "write", "target": str(path), "data": host.canary().encode().hex(), "offset": offset,
+                        "mtime": identity.st_mtime_ns, "once": str(host.root / "once"), "when": "sample"}
+                if content == "truncate":
+                    spec["do"] = "create"
+                result = host.scan(worker={"hooks": {"after_file_scan": spec}})
+                self.assertEqual(result.returncode, 5, "ST2-retry-finds-overwrite")
+                self.assertEqual(host.finished()["sinks"]["A1"]["subpass"], 1, "ST2-ctime-retry")
+
+    def test_st3_plain_to_compressed_and_reverse_conversion(self):
+        import gzip
+        for reverse in (False, True):
+            host, path = self.fixture(gzip.compress(b"old\n") if reverse else b"old\n")
+            replacement = host.root / "replacement"
+            replacement.write_bytes(host.canary().encode() if reverse else gzip.compress(host.canary().encode()))
+            result = host.scan(worker={"hooks": {"after_file_scan": {"do": "replace", "source": str(replacement),
+                "target": str(path), "once": str(host.root / "once"), "when": "sample"}}})
+            self.assertEqual(result.returncode, 5, "ST3-route-retry-finds-canary")
+            self.assertTrue(any(e["mode"] == (1 if reverse else 2) for e in hits(host)), "ST3-new-route")
+
+    def test_st4_new_file_directory_and_task_glob_are_reconciled(self):
+        for task in (False, True):
+            host, _path = self.fixture()
+            if task:
+                host.constants["AGENT_SINKS"] = ["A10"]
+                target = host.root / "tasks" / "branch" / "second" / "tasks" / "new"
+            else:
+                target = host.home / ".claude" / "new-directory" / "new"
+            result = host.scan(worker={"hooks": {"after_prewalk": {"do": "create", "target": str(target),
+                "data": host.canary().encode().hex(), "once": str(host.root / "once")}}})
+            self.assertEqual(result.returncode, 5, "ST4-retry-finds-new-entry")
+            self.assertEqual(host.finished()["sinks"]["A10" if task else "A1"]["subpass"], 1, "ST4-entry-list")
+
+    def test_st5_changes_in_both_subpasses_are_incomplete(self):
+        host, path = self.fixture()
+        result = host.scan(worker={"hooks": {"after_file_scan": {"do": "write", "target": str(path),
+            "data": b"added".hex(), "when": "sample"}}})
+        self.assertEqual(result.returncode, 3, "ST5-bounded-retries")
+        self.assertEqual(host.finished()["sinks"]["A1"]["subpass"], 1, "ST5-one-retry")
+        self.assertIn("file_set_changed", sink_reasons(host), "ST5-full-tuple")
+
+    def test_st6_names_targets_paths_and_newlines_never_enter_argv(self):
+        host, _path = self.fixture()
+        root, value = host.home / ".claude", host.canary()
+        first, second = value.split("/")
+        (root / first).mkdir()
+        (root / first / second).write_bytes(b"")
+        os.symlink("/nonexistent/" + value, root / "dangling")
+        os.mkfifo(root / (value.replace("/", "_") + "\nname"))
+        os.close(os.open(os.fsencode(root) + b"/nonutf-\xff\n", os.O_CREAT | os.O_WRONLY, 0o600))
+        (root / "newline\nfile").write_text(value)
+        argv_record = host.root / "argv"
+        host.worker["argv_record"] = str(argv_record)
+        self.assertEqual(host.scan().returncode, 5, "ST6-path-leak")
+        self.assertTrue(any(e["mode"] == 6 for e in hits(host)), "ST6-name-class")
+        self.assertFalse(any(form.encode() in argv_record.read_bytes() for form in cp.forms(value)), "ST6-no-sink-argv")
+
+    def test_st7_exact_exclusions_and_unreadable_entries(self):
+        host, path = self.fixture()
+        path.chmod(0)
+        (path.parent / "locked").mkdir(mode=0)
+        self.assertEqual(host.scan().returncode, 3, "ST7-permission-incomplete")
+        self.assertIn("open_error", sink_reasons(host), "ST7-000-file")
+        self.assertIn("walk_error", sink_reasons(host), "ST7-000-directory")
+        path.chmod(0o600)
+        (path.parent / "locked").chmod(0o700)
+        for rel in (".credentials.json", "daemon/control.key", "sessions/x.key", "settings.json", "context-mode/x",
+                    "history.jsonl", "paste-cache/x", "backups/x"):
+            target = path.parent / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(host.canary())
+        forbidden = [str(path.parent / name) for name in (".credentials.json", "daemon/control.key", "sessions/x.key",
+            "settings.json", "context-mode", "history.jsonl", "paste-cache", "backups")]
+        self.assertEqual(host.scan(worker={"forbid_paths": forbidden}).returncode, 0, "ST7-K-U-never-opened")
+        (path.parent / "ordinary").mkdir()
+        (path.parent / "ordinary" / "auth.json").write_text(host.canary())
+        self.assertEqual(host.scan().returncode, 5, "ST7-ordinary-auth-scanned")
+
+    def test_st8_threshold_unknown_fs_unverifiable_fs_and_clock(self):
+        from unittest import mock
+        host, path = self.fixture()
+        path.write_text(host.canary())
+        prepared = host.events()[0]
+        self.assertEqual(prepared["threshold_ns"], prepared["ref"]["ctime_ns"] - 3600 * 10**9, "ST8-hour-margin")
+        with mock.patch.object(cp, "clock", return_value=("x", prepared["realtime_ns"] - 61 * 10**9,
+                                                       prepared["boottime_ns"])):
+            run = cp.Run(host.env(), host.run_id)
+            run.load()
+            self.assertIn("clock_stepped", cp.integrity(run), "ST8-drift")
+            os.close(run.lock)
+        for magic, expected in ((1234567, 5), (0x6969, 3)):
+            other, p = self.fixture()
+            p.write_text(other.canary() if expected == 5 else "plain")
+            self.assertEqual(other.scan(worker={"fs_magic": magic}).returncode, expected, "ST8-filesystem")
+        scan = type("S", (), {"plan": {"roots": [], "threshold_ns": path.stat().st_ctime_ns + 1, "selection": "changed"}})()
+        walk = wire.Walk(scan, {"id": "00" * 16, "kind": "dir", "path": str(path.parent)}, number=1)
+        walk.fs_all = False
+        self.assertFalse(walk.selected_by_time(path.stat()), "ST8-unselected")
+        walk.threshold -= 1800 * 10**9
+        self.assertTrue(walk.selected_by_time(path.stat()), "ST8-30-minute-selected")
+
+    def test_st9_pointer_binding_and_directory_refusal(self):
+        host, path = self.fixture()
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
+        name = next(name for entry in inventory["entries"] for name in entry["pointer_variables"])
+        refused = host.tool("prepare", env=host.env(**{name: str(path.parent)}))
+        self.assertEqual(refused.returncode, 1, "ST9-pointer-directory")
+        self.assertEqual(host.scan(env=host.env(**{name: str(path)})).returncode, 3, "ST9-new-pointer")
+        self.assertIn("pointer_changed", sink_reasons(host), "ST9-bound-only")
+
+
+def blocked_program(host, name, phase=None, prefix=""):
+    """A labelled executable blocks on an owned FIFO, while --version remains the real upstream version."""
+    fifo = host.root / ("blocked-" + name)
+    os.mkfifo(fifo)
+    real = REAL.get(name) or "/usr/bin/" + name
+    code = ("#!/usr/bin/python3 -I\nimport os, sys\n"
+            f"if sys.argv[1:] == ['--version']:\n    os.execv({real!r}, [{real!r}, '--version'])\n")
+    if phase:
+        code += f"if {phase!r} not in sys.argv:\n    os.execv({real!r}, [{real!r}] + sys.argv[1:])\n"
+    code += prefix + f"\nopen({str(fifo)!r}, 'rb').read()\n"
+    host.script(name, code)
+    return fifo
+
+
+@needs_tools
+class FifoTests(unittest.TestCase):
+    """F-M1a/b/c, F-M2/b, F-M3/4/5/6 and F-U4: five-second deadlines, independent kernel observers."""
+
+    def fixture(self, sink="A1"):
+        host = Host(self)
+        host.constants["AGENT_SINKS"] = [sink]
+        host.worker["constants"]["BUDGET_CAP"] = 5.0
+        host.constants["SCOPE_SECONDS"] = {**{name: 5 for name in wire.SINKS}, "setup": 120}
+        return host
+
+    def ended(self, host, result):
+        self.assertEqual(result.returncode, 3, "FIFO-incomplete-never-zero")
+        self.assertEqual(host.finished()["status"], "incomplete", "FIFO-incomplete-record")
+        self.assertEqual(wait_gone(str(host.root), 20), [], "FIFO-kernel-processes-gone")
+
+    def test_f_m1a_special_is_named_and_never_opened(self):
+        host = self.fixture()
+        host.prepare()
+        fifo = host.home / ".claude" / "initial-fifo"
+        os.mkfifo(fifo)
+        self.assertEqual(host.scan(worker={"forbid_paths": [str(fifo)]}).returncode, 0, "F-M1a-no-content-open")
+        self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["special"], 1, "F-M1a-special-count")
+        self.assertNotEqual(host.verdict()[1], "clean", "F-M1a-walk-is-not-six-consumer-proof")
+
+    def test_f_m1b_c_swaps_before_and_after_handoff_raw_le_be(self):
+        for data in (b"plain", b"\xff\xfep\x00l\x00", b"\xfe\xff\x00p\x00l"):
+            for seam in ("before_handoff", "after_handoff"):
+                with self.subTest(data=data[:2], seam=seam):
+                    host = self.fixture()
+                    path = host.home / ".claude" / "sample"
+                    path.write_bytes(data)
+                    host.prepare()
+                    result = host.scan(worker={"hooks": {seam: {"do": "fifo", "target": str(path), "when": "sample",
+                        "once": str(host.root / "once")}}})
+                    self.ended(host, result)
+
+    def test_f_m2_each_decoder_and_both_bom_readers(self):
+        import bz2, gzip, lzma
+        compressors = {"gzip": gzip.compress, "bzip2": bz2.compress, "xz": lzma.compress,
+                       "lzma": lambda value: lzma.compress(value, format=lzma.FORMAT_ALONE)}
+        for fmt, compress in compressors.items():
+            for bom in (False, True):
+                with self.subTest(fmt=fmt, bom=bom):
+                    host = self.fixture()
+                    name = "xz" if fmt == "lzma" else fmt
+                    prefix = "os.write(1, b'\\xff\\xfe' + b'x\\x00' * 300)" if bom else ""
+                    blocked_program(host, name, prefix=prefix)
+                    (host.home / ".claude" / ("sample.lzma" if fmt == "lzma" else "sample")).write_bytes(compress(b"old"))
+                    host.prepare()
+                    self.ended(host, host.scan())
+        host = self.fixture()
+        path = host.home / ".claude" / "sample.gz"
+        path.write_bytes(gzip.compress(b"old"))
+        host.prepare()
+        self.ended(host, host.scan(worker={"hooks": {"before_handoff": {"do": "fifo", "target": str(path),
+            "when": "sample"}}}))
+
+    def test_f_m2b_one_reader_stalls(self):
+        import gzip
+        host = self.fixture()
+        blocked_program(host, "rg", phase="auto")
+        (host.home / ".claude" / "sample.gz").write_bytes(gzip.compress(b"\xff\xfe" + "old".encode("utf-16-le")))
+        host.prepare()
+        self.ended(host, host.scan())
+
+    def test_f_m3_journal_producer(self):
+        host = self.fixture("A11")
+        host.prepare()
+        # Change and rebind only the synthetic executable; this exercises the stream rather than pin refusal.
+        blocked_program(host, "journalctl", phase="--user")
+        self.repin(host, "journalctl")
+        self.ended(host, host.scan())
+
+    def repin(self, host, name):
+        events = host.events()
+        events[0]["executables"][name] = wire.sha256_file(host.bin / name)
+        (host.path / "events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events))
+
+    def test_f_m4_each_git_stage_and_metadata_fifo(self):
+        for phase in ("fsck", "verify-pack", "--batch-check=%(objectname) %(objecttype) %(objectsize)",
+                      "--batch=%(objectname) %(objecttype) %(objectsize)"):
+            with self.subTest(phase=phase):
+                host = self.fixture()
+                git_repo(host.home / ".claude" / "plugins" / "p", {"file": b"old"})
+                blocked_program(host, "git", phase=phase)
+                host.prepare()
+                self.ended(host, host.scan())
+        host = self.fixture()
+        repo = git_repo(host.home / ".claude" / "plugins" / "p", {"file": b"old"})
+        keep = next(repo.glob("objects/pack/*.pack")).with_suffix(".keep")
+        keep.write_text("old")
+        host.prepare()
+        self.ended(host, host.scan(worker={"hooks": {"before_handoff": {"do": "fifo", "target": str(keep),
+            "when": ".keep"}}}))
+
+    def test_f_m5_database_swap_and_dumper_stall(self):
+        for swap in (True, False):
+            host = self.fixture()
+            path = sqlite_file(host.home / ".claude" / "sample", [("CREATE TABLE t(v)", ())])
+            host.prepare()
+            if swap:
+                result = host.scan(worker={"hooks": {"before_handoff": {"do": "fifo", "target": str(path),
+                    "when": "sample"}}})
+            else:
+                fifo = host.root / "dumper-fifo"
+                os.mkfifo(fifo)
+                result = host.scan(dumper={"hooks": {"after_identity": {"do": "block", "path": str(fifo)}}})
+            self.ended(host, result)
+
+    def test_f_m6_name_and_link_target_are_never_opened_and_worker_deadline(self):
+        host = self.fixture()
+        host.prepare()
+        value = next(form for form in cp.forms(host.canary()) if "/" not in form)
+        fifo = host.home / ".claude" / value
+        os.mkfifo(fifo)
+        os.symlink(str(fifo), fifo.parent / "link")
+        self.assertEqual(host.scan(worker={"forbid_paths": [str(fifo)]}).returncode, 5, "F-M6-name-hit")
+        other = self.fixture()
+        other.prepare()
+        block = other.root / "m6-fifo"
+        os.mkfifo(block)
+        self.ended(other, other.scan(worker={"hooks": {"before_m6": {"do": "block", "path": str(block)}}}))
+
+    def test_f_u4_full_environment_producer_in_pty(self):
+        host = self.fixture()
+        host.constants["USER_SINKS"] = ["U4"]
+        blocked_program(host, "systemctl", phase="show-environment")
+        host.prepare()
+        self.ended(host, host.scan("final", "--user-run", tty=True))
+
+
+@needs_tools
+class ModeTests(unittest.TestCase):
+    """M1–M7: actual reviewed scanners/decoders, strict failures and independent logical-vs-raw oracles."""
+
+    def fixture(self, sink="A1"):
+        host = Host(self)
+        host.constants["AGENT_SINKS"] = [sink]
+        return host
+
+    def test_m1_nul_empty_bom_raw_and_utf16_views(self):
+        host = self.fixture()
+        host.prepare()
+        value, root = host.canary(), host.home / ".claude"
+        for name, data in (("nul", b"\0" + value.encode()), ("empty", b""), ("negative", b"old"),
+                           ("bomraw", b"\xff\xfe" + value.encode()),
+                           ("le", b"\xff\xfe" + value.encode("utf-16-le")),
+                           ("be", b"\xfe\xff" + value.encode("utf-16-be"))):
+            (root / name).write_bytes(data)
+        self.assertEqual(host.scan().returncode, 5, "M1-positive-raw-and-bom")
+        self.assertEqual({e["view"] for e in hits(host)}, {1, 2}, "M1-additive-views")
+        self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["selected"], 7, "M1-empty-accounted")
+
+    def test_m1_scanner_exit_stderr_stats_and_unknown_records(self):
+        cases = {"exit": "sys.exit(2)", "stderr": "os.write(2, b'x')",
+                 "empty": "os.write(1, b'<stdin>\\0\\n'); sys.exit(0)",
+                 "unknown": "os.write(1, b'<stdin>\\0unknownmatch\\n'); sys.exit(0)",
+                 "label": "os.write(1, b'unknown\\0unknownmatch\\n'); sys.exit(0)",
+                 "stats": "os.write(1, b'\\n0 matches\\n'); sys.exit(0)"}
+        for kind, prefix in cases.items():
+            with self.subTest(kind=kind):
+                host = self.fixture()
+                wrapper(host, "rg", prefix=prefix)
+                (host.home / ".claude" / "sample").write_text("old")
+                host.prepare()
+                self.assertEqual(host.scan().returncode, 3, "M1-invalid-output-incomplete " + kind)
+                self.assertEqual(host.finished()["status"], "incomplete", "M1-no-complete " + kind)
+
+    def test_m1_stat_counts_control_origins_and_output_cap(self):
+        from unittest import mock
+        scan = type("Scan", (), {"patterns": type("Patterns", (), {"classes": {b"CNRYCTLpositive": []}})(),
+                                   "plan": {"rg_version": 14001000}, "attribute": lambda *args: None})()
+        stats = b"\n1 matches\n1 matched lines\n1 files contained matches\n1 files searched\n0 bytes printed\n0 bytes searched\n0.0 seconds spent searching\n0.0 seconds\n"
+        for old, new, expected in ((b"1 matches", b"0 matches", "matches_mismatch"),
+                                   (b"1 files searched", b"0 files searched", "files_searched_mismatch")):
+            check = wire.Check(1, "M1", "raw", "other", bytes(16), 0)
+            parser = wire.RgOutput(scan, check, {b"<stdin>": None})
+            parser.feed(b"<stdin>\0CNRYCTLpositive\n" + stats.replace(old, new))
+            parser.close(1)
+            self.assertEqual(check.reason, expected, "M1-reconcile " + expected)
+        with mock.patch.object(wire, "STDOUT_CAP", 8):
+            parser = wire.RgOutput(scan, wire.Check(1, "M1", "raw", "other", bytes(16), 0), {b"<stdin>": None})
+            with self.assertRaises(wire.Stop, msg="M1-cap"):
+                parser.feed(b"oversized" * 10)
+
+    def test_m1_deleted_positive_control_is_incomplete(self):
+        for control in ("m1/0001", "m1/0002", "m1/0003", "m1/0004", "m1/0005", "m1/0006-wal", "bom/0001"):
+            host = self.fixture()
+            (host.home / ".claude" / "sample").write_bytes(b"\xff\xfeo\x00l\x00d\x00")
+            host.prepare()
+            self.assertEqual(host.scan(worker={"hooks": {"after_prewalk": {"do": "unlink-control", "glob": control}}})
+                             .returncode, 3, "M1-control-removal " + control)
+
+    def test_m2_every_compressor_endian_concat_and_physical_header(self):
+        import bz2, gzip, lzma
+        compressors = {"gz": gzip.compress, "bz2": bz2.compress, "xz": lzma.compress,
+                       "lzma": lambda data: lzma.compress(data, format=lzma.FORMAT_ALONE)}
+        for suffix, compress in compressors.items():
+            host = self.fixture()
+            host.prepare()
+            root, value = host.home / ".claude", host.canary()
+            for label, data in (("plain", value.encode()), ("le", b"\xff\xfe" + value.encode("utf-16-le")),
+                                ("be", b"\xfe\xff" + value.encode("utf-16-be")),
+                                ("rawbom", b"\xff\xfe" + value.encode())):
+                (root / (label + "." + suffix)).write_bytes(compress(data))
+            self.assertEqual(host.scan().returncode, 5, "M2-each-compressor " + suffix)
+            self.assertTrue(any(e["mode"] == 2 and e["view"] == 4 for e in hits(host)), "M2-decoded-bom " + suffix)
+            self.assertTrue(any(e["mode"] == 2 and e["view"] == 3 for e in hits(host)), "M2-decoded-raw " + suffix)
+        host = self.fixture()
+        host.prepare()
+        value = host.canary()
+        (host.home / ".claude" / "two.gz").write_bytes(gzip.compress(b"first") + gzip.compress(value.encode()))
+        member = gzip.compress(b"old")
+        (host.home / ".claude" / "fname.gz").write_bytes(member[:3] + b"\x08" + member[4:10] + value.encode() +
+                                                         b"\0" + member[10:])
+        self.assertEqual(host.scan().returncode, 5, "M2-member2-and-physical-header")
+        self.assertEqual({e["mode"] for e in hits(host)}, {1, 2}, "M2-physical-additive")
+
+    def test_m2_missing_decoder_spawn_failure_stderr_trailing_nested_and_odd_bom(self):
+        import bz2, gzip
+        cases = {"missing": gzip.compress(b"old"), "spawn": gzip.compress(b"old"),
+                 "stderr": gzip.compress(b"old"), "trailing": bz2.compress(b"old") + b"garbage",
+                 "padding": gzip.compress(b"old") + b"\0" * 8 + gzip.compress(b"old"),
+                 "nested": gzip.compress(gzip.compress(b"old")), "odd": gzip.compress(b"\xff\xfex"),
+                 "truncated": gzip.compress(b"old")[:-3]}
+        for kind, data in cases.items():
+            with self.subTest(kind=kind):
+                host = self.fixture()
+                if kind == "missing":
+                    (host.bin / "gzip").unlink()
+                elif kind == "stderr":
+                    wrapper(host, "gzip", stderr=b"warning")
+                (host.home / ".claude" / "sample").write_bytes(data)
+                host.prepare()
+                worker = {"fail_spawn": "gzip"} if kind == "spawn" else {}
+                self.assertEqual(host.scan(worker=worker).returncode, 3, "M2-failure-incomplete " + kind)
+
+    def test_m2_every_magic_name_container_and_residual(self):
+        import zlib
+        rows = [(magic, b"opaque") for magic, _fmt in wire.UNCOVERED]
+        rows += [(b"\x50\x2a\x4d\x18", b"opaque")]
+        rows += [(b"x" * offset + magic, b"opaque") for offset, magic in wire.CONTAINERS]
+        rows += [(b"opaque", b"x" + name) for name, _fmt in wire.UNCOVERED_NAMES + wire.NAMED]
+        for header, name in rows:
+            host = self.fixture()
+            (host.home / ".claude" / os.fsdecode(name)).write_bytes(header + b"old")
+            host.prepare()
+            self.assertEqual(host.scan().returncode, 3, "M2-routing-row " + name.decode())
+        self.assertEqual(wire.route(zlib.compress(b"opaque"), b"extensionless"), ("plain", None), "M2-zlib-residual")
+
+    def test_m3_cursor_anchor_binary_fields_and_cmdline(self):
+        host = self.fixture("A11")
+        host.prepare()
+        host.journal_add(b"old", _CMDLINE="hex:" + host.canary().encode().hex())
+        self.assertEqual(host.scan().returncode, 5, "M3-full-cmdline")
+        other = self.fixture("A11")
+        other.prepare()
+        anchor = other.path.joinpath("anchor").read_bytes().strip()
+        entries = json.loads(other.journal.read_text())
+        entries.clear()
+        entries.append(journal_entry(2, "hex:" + other.canary().encode().hex(), BINARY="hex:" + b"\n__CURSOR=fake\n\n".hex()))
+        other.journal.write_text(json.dumps(entries))
+        other.journal_add(anchor)
+        self.assertEqual(other.scan().returncode, 5, "M3-vacuum-retains-first-hit")
+        self.assertIn("journal_cursor_missing", sink_reasons(other, "A11"), "M3-first-cursor-required")
+        third = self.fixture("A11")
+        third.prepare()
+        third.journal.write_text(json.dumps([journal_entry(1, "no anchor")]))
+        self.assertEqual(third.scan().returncode, 3, "M3-anchor-required")
+
+    def test_m4_real_discovered_and_configured_stores_keep_and_duplicates(self):
+        for configured in (False, True):
+            host = self.fixture("A12" if configured else "A1")
+            path = host.home / "code/native-agent-stack-live" if configured else host.home / ".claude/plugins/p"
+            store = git_repo(path, {"packed": b"old"}, loose={"loose": b"old"})
+            host.prepare()
+            canary = host.canary()
+            next(store.glob("objects/pack/*.pack")).with_suffix(".keep").write_text(canary)
+            self.assertEqual(host.scan().returncode, 5, "M4-keep-metadata-leak")
+            self.assertTrue(any(e["mode"] == 1 for e in hits(host)), "M4-keep-raw")
+            self.assertEqual(host.finished()["status"], "complete", "M4-duplicates-physical-logical")
+
+    def test_m4_orphan_index_corrupt_payload_alternate_and_promisor(self):
+        for kind in ("orphan", "index", "loose", "unknown", "alternate", "promisor"):
+            host = self.fixture()
+            repo = git_repo(host.home / ".claude/plugins/p", {"file": b"old"})
+            pack = next(repo.glob("objects/pack/*.pack"))
+            if kind == "orphan":
+                pack.with_suffix(".idx").unlink()
+            elif kind == "index":
+                pack.unlink()
+            elif kind == "loose":
+                (repo / "objects/ab").mkdir()
+                (repo / ("objects/ab/" + "c" * 38)).write_bytes(b"corrupt")
+            elif kind == "unknown":
+                (repo / "objects/pack/unindexed").write_bytes(b"PACK" + b"old")
+            elif kind == "alternate":
+                (repo / "objects/info/alternates").write_text(str(host.root / "unplanned"))
+            else:
+                pack.with_suffix(".promisor").write_bytes(b"")
+            host.prepare()
+            self.assertEqual(host.scan().returncode, 3, "M4-unaccounted-incomplete " + kind)
+
+    def test_m4_stream_exact_framing_and_marker_reconciliation(self):
+        from unittest import mock
+        for malformed in (False, True):
+            check = wire.Check(1, "M4", "logical", "git_object", b"x" * 16, 0)
+            object_id = b"a" * 40
+            relay = wire.GitStream(check, {object_id: (b"blob", 3)}, {})
+            relay.flow, relay.fd, relay.marker = mock.Mock(), 1, b"CNRYOBJpositive"
+            if malformed:
+                with self.assertRaises(wire.Stop, msg="M4-size-header"):
+                    relay.transform(object_id + b" blob 4\nbody\n")
+            else:
+                relay.transform(object_id + b" blob 3\nold\n")
+                relay.transform(b"")
+                self.assertEqual(relay.seen, {object_id}, "M4-objects-accounted")
+                relay.scan, relay.ident, relay.parser = mock.Mock(), bytes(16), mock.Mock(searched=1)
+                relay.finish()
+                self.assertEqual(check.reason, "object_count_mismatch", "M4-scanner-marker-required")
+
+    def test_m5_schema_utf16_overflow_and_uri_names_with_empty_tables(self):
+        for encoding in ("UTF-16le", "UTF-16be"):
+            host = self.fixture()
+            host.prepare()
+            value = host.canary()
+            for name in ("extensionless", "pct%41", "q?mode=memory&cache=private", "hash#x", "all%25?x#y"):
+                path = sqlite_file(host.home / ".claude" / name, [(f"CREATE TABLE \"{value}\"(x TEXT DEFAULT '{'x' * 9000}{value}')", ()),
+                    (f"CREATE VIEW v AS SELECT '{value}'", ()),
+                    (f"CREATE TRIGGER g AFTER INSERT ON \"{value}\" BEGIN SELECT '{value}'; END", ())], encoding)
+                self.assertNotIn(value.encode(), path.read_bytes(), "M5-independent-raw-miss")
+            self.assertEqual(host.scan().returncode, 5, "M5-schema-uri-leak")
+            self.assertTrue(hits(host) and all(e["mode"] == 5 for e in hits(host)), "M5-logical-only")
+
+    def test_m5_wal_only_change_overflow_and_virtual_shadow_policy(self):
+        import sqlite3
+        host = self.fixture()
+        host.prepare()
+        path = host.home / ".claude" / "state"
+        connection = sqlite3.connect(path)
+        self.addCleanup(connection.close)
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("PRAGMA wal_autocheckpoint=0")
+        connection.execute("CREATE TABLE t(v)")
+        connection.execute("INSERT INTO t VALUES (?)", ("x" * 6000 + host.canary(),))
+        connection.commit()
+        self.assertEqual(host.scan().returncode, 5, "M5-uncheckpointed-overflow")
+        self.assertTrue(any(e["mode"] == 5 for e in hits(host)), "M5-wal-logical")
+        (Path(str(path) + "-shm")).unlink()
+        self.assertEqual(host.scan().returncode, 5, "M5-hit-survives-incomplete-wal")
+        self.assertEqual(host.finished()["status"], "incomplete", "M5-no-shm-incomplete")
+        other = self.fixture()
+        db = sqlite_file(other.home / ".claude" / "virtual", [("CREATE VIRTUAL TABLE t USING fts5(v)", ())])
+        other.prepare()
+        self.assertEqual(other.scan().returncode, 0, "M5-shadow-tables-covered")
+        del db
+
+    def test_m5_replaced_main_inode_and_schema_errors_are_incomplete(self):
+        host = self.fixture()
+        path = sqlite_file(host.home / ".claude" / "sample", [("CREATE TABLE t(v)", ())])
+        replacement = sqlite_file(host.root / "replacement", [("CREATE TABLE t(v)", ())])
+        host.prepare()
+        self.assertEqual(host.scan(dumper={"hooks": {"before_sqlite_open": {"do": "replace", "source": str(replacement),
+            "target": str(path), "once": str(host.root / "once")}}}).returncode, 3, "M5-actual-main-identity")
+        self.assertIn("sqlite_uri_identity", sink_reasons(host), "M5-inode-mismatch")
+
+    def test_m7_environment_value_is_scanned(self):
+        host = self.fixture()
+        host.constants["USER_SINKS"] = ["U4"]
+        host.prepare()
+        host.environment.write_text("HARMLESS=" + host.canary() + "\n")
+        self.assertEqual(host.scan("final", "--user-run", tty=True).returncode, 5, "M7-full-name-value")
+
+
+@needs_tools
+class ContainmentTests(unittest.TestCase):
+    """C2/C3/C5/C6/C7/C8/C9: direct parent-death and ownership; no cgroup claim for the CI exec stub."""
+
+    def blocked(self, kind="rg", real=False):
+        host = Host(self, real_scope=real)
+        host.constants["AGENT_SINKS"] = ["A11" if kind == "journalctl" else "A1"]
+        if kind == "git":
+            git_repo(host.home / ".claude/plugins/p", {"file": b"old"})
+        elif kind == "gzip":
+            import gzip
+            (host.home / ".claude/sample").write_bytes(gzip.compress(b"\xff\xfe" + b'x\x00' * 300))
+        elif kind == "sqlite":
+            sqlite_file(host.home / ".claude/sample", [("CREATE TABLE t(v)", ())])
+        else:
+            (host.home / ".claude/sample").write_bytes(b"old")
+        host.prepare()
+        if kind not in ("worker", "sqlite"):
+            blocked_program(host, kind, phase="fsck" if kind == "git" else "--user" if kind == "journalctl" else None,
+                            prefix="os.write(1, b'\\xff\\xfe' + b'x\\x00' * 300)" if kind == "gzip" else "")
+            FifoTests.repin(self, host, kind)
+        else:
+            fifo = host.root / "owned-fifo"
+            os.mkfifo(fifo)
+            target = host.dumper if kind == "sqlite" else host.worker
+            target["hooks"]["after_identity" if kind == "sqlite" else "after_prewalk"] = {
+                "do": "block", "path": str(fifo)}
+        process = host.tool("scan", "--run", host.run_id, "--phase", "baseline", background=True)
+        self.addCleanup(self.reap, host, process)
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            owned = processes_with(str(host.root))
+            if len(owned) >= (2 if kind == "worker" else 3):
+                break
+            time.sleep(0.05)
+        self.assertGreaterEqual(len(owned), 2, "C-owned-process-started")
+        return host, process
+
+    def reap(self, host, process):
+        # Emergency cleanup signals only this fixture's independently labelled pids.
+        for pid in processes_with(str(host.root)):
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        process.communicate(timeout=20)
+
+    def test_c2_coordinator_death_direct_children_for_each_kind(self):
+        for kind in ("rg", "gzip", "git", "journalctl", "sqlite", "worker"):
+            with self.subTest(kind=kind):
+                host, process = self.blocked(kind)
+                process.kill()
+                process.communicate(timeout=20)
+                self.assertEqual(wait_gone(str(host.root), 20), [], "C2-direct-parent-death " + kind)
+                self.assertIn("baseline_unfinished", host.verdict()[2], "C2-unfinished " + kind)
+
+    def test_c3_worker_death_direct_scanner_and_decoder(self):
+        host, process = self.blocked("gzip")
+        candidates = []
+        for pid in processes_with(str(host.root)):
+            with open(f"/proc/{pid}/cmdline", "rb") as handle:
+                cmdline = handle.read()
+            if b"worker" in cmdline.split(b"\0"):
+                candidates.append(pid)
+        self.assertTrue(candidates, "C3-worker-observed")
+        os.kill(candidates[0], signal.SIGKILL)
+        process.communicate(timeout=20)
+        self.assertEqual(wait_gone(str(host.root), 20), [], "C3-direct-children-gone")
+        self.assertNotEqual(host.verdict()[1], "clean", "C3-incomplete")
+
+    def test_c5_handled_signals_and_exception_reap_children(self):
+        for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT):
+            host, process = self.blocked()
+            process.send_signal(signum)
+            process.communicate(timeout=20)
+            self.assertEqual(wait_gone(str(host.root), 20), [], "C5-signal-cleanup")
+            self.assertNotEqual(host.verdict()[1], "clean", "C5-incomplete")
+
+    def test_c6_exited_group_leader_keeps_descendant_ownership(self):
+        from unittest import mock
+        host = Host(self)
+        script = host.root / "forker.py"
+        script.write_text("import os, time\nif os.fork() == 0:\n    os.close(0); os.close(1); os.close(2); time.sleep(60)\n")
+        scan = type("Scan", (), {"setpriv": REAL["setpriv"], "child_env": host.env()})()
+        child = wire.Child(scan, [PYTHON, "-I", str(script)], subprocess.DEVNULL, subprocess.DEVNULL, subprocess.DEVNULL)
+        deadline = time.monotonic() + 5
+        while not child.command.exited() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        self.assertTrue(child.command.exited(), "C6-leader-exited")
+        self.assertTrue(processes_with(str(host.root)), "C6-descendant-alive-before-cleanup")
+        child.finish(time.monotonic() + 3)
+        self.assertEqual(wait_gone(str(host.root), 5), [], "C6-descendant-reaped")
+        with mock.patch.object(runner.os, "killpg") as kill:
+            runner.end_group(child.command)
+            kill.assert_not_called()  # The already reaped group must never be signalled again.
+
+    def test_c7_launch_prefix_core_limit_and_inherited_fds(self):
+        exes = {name: ["/usr/bin/" + name, "0" * 64] for name in cp.EXECUTABLES}
+        argv = cp.launch_argv(exes)
+        self.assertEqual(argv[:4], ["/usr/bin/setpriv", "--pdeathsig", "TERM", "--"], "C7-pdeath-launch")
+        self.assertIn("-I", argv, "C7-isolation")
+        self.assertIn("-S", argv, "C7-no-site")
+        self.assertIn(str(cp.RUNNER), argv, "C7-supported-runner")
+        host = Host(self)
+        record = host.root / "core"
+        wrapper(host, "rg", prefix=f"import resource\nopen({str(record)!r}, 'a').write(str(resource.getrlimit(resource.RLIMIT_CORE)[0]) + '\\n')")
+        (host.home / ".claude/sample").write_bytes(b"old")
+        host.prepare()
+        self.assertEqual(host.scan().returncode, 0)
+        self.assertEqual(set(record.read_text().splitlines()), {"0"}, "C7-core-zero-inherited")
+
+    def test_c8_bootstrap_missing_handshake_and_core_collectors(self):
+        from unittest import mock
+        host = Host(self)
+        host.prepare()
+        stub = host.bin / "stub-runner"
+        stub.write_text("#!/bin/sh\nexit 78\n")
+        self.assertEqual(host.scan().returncode, 3, "C8-bootstrap-refusal")
+        self.assertIn("containment_unavailable", host.finished()["reasons"], "C8-enum-only")
+        for pattern in (b"|collector", b"@socket"):
+            file = host.root / "core-pattern"
+            file.write_bytes(pattern)
+            with mock.patch.object(runner, "CORE_PATTERN_FILE", str(file)):
+                with self.assertRaises(runner.Refused, msg="C8-core-collector-refused"):
+                    cp.runner.disable_core_dumps()
+
+
+@needs_scope
+class ContainmentRealScopeTests(ContainmentTests):
+    """C1/C3/C4/C7: workstation-only manager, backstop and setsid-descendant acceptance."""
+
+    def blocked(self, kind="rg", real=True):
+        return super().blocked(kind, True)
+
+    def test_c4_simultaneous_coordinator_runner_death_and_setsid_backstop(self):
+        host = Host(self, real_scope=True)
+        host.constants["SCOPE_SECONDS"] = {**{sink: 15 for sink in wire.SINKS}, "setup": 120}
+        (host.home / ".claude/sample").write_text("old")
+        host.prepare()
+        wrapper(host, "rg", prefix="import signal, time\nif os.fork() == 0:\n    os.setsid(); signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(60)\ntime.sleep(60)")
+        FifoTests.repin(self, host, "rg")
+        process = host.tool("scan", "--run", host.run_id, "--phase", "baseline", background=True)
+        self.addCleanup(self.reap, host, process)
+        time.sleep(2)
+        owned = processes_with(str(host.root))
+        process.kill()
+        for pid in owned:
+            with open(f"/proc/{pid}/cmdline", "rb") as handle:
+                if b"ecosystem-bounded-run" in handle.read():
+                    os.kill(pid, signal.SIGKILL)
+        process.communicate(timeout=20)
+        self.assertEqual(wait_gone(str(host.root), 30), [], "C4-scope-backstop-kernel-observer")
+
+
+@needs_tools
+class CommandTests(unittest.TestCase):
+    """C2/C8/C9/C11 and S3–S8 templates: syntax, guard decisions and discarded consumer outputs."""
+
+    def test_cli_exact_spellings_and_tty_guards(self):
+        parser = cp.parser()
+        for option in ("--user", "--user-r", "--pha"):
+            with self.assertRaises(SystemExit, msg="CMD-abbreviation-refused"):
+                parser.parse_args(["scan", "--run", "cp-20260930t120000z-abcdef", "--phase", "final", option])
+        self.assertEqual(parser.parse_args(["scan", "--run", "x", "--phase=comparison", "--user-run"]).phase,
+                         "comparison", "CMD-equals-phase")
+        host = Host(self)
+        host.prepare()
+        self.assertEqual(host.scan("final", "--user-run").returncode, 1, "CMD-TTY-required")
+        self.assertEqual(host.scan("final", "--user-run", tty=True, env=host.env(CLAUDECODE="1")).returncode, 1,
+                         "CMD-no-agent-user-run")
+        self.assertEqual(host.scan("baseline", "--user-run", tty=True).returncode, 1, "CMD-baseline-agent-only")
+
+    def test_k4_deny_spellings_if_rule_installed(self):
+        sys.path.insert(0, str(ROOT / "scripts/hooks"))
+        import secret_path_guard as guard
+        stem = "python3 tools/credentials/canary_proof.py scan --run cp-20260930t120000z-abcdef "
+        commands = [stem + "--phase final --user-run", stem + "--phase comparison", stem + "--phase=comparison"]
+        if all(guard.check(command) is None for command in commands):
+            self.skipTest("guard deny rule not present (K4 item 14)")
+        for command in commands:
+            self.assertIsNotNone(guard.check(command), "CMD-K4-denial")
+
+    def test_emitted_probe_workflow_and_consumer_templates_pass_guard(self):
+        sys.path.insert(0, str(ROOT / "scripts/hooks"))
+        import secret_path_guard as guard
+        run = "cp-20260930t120000z-abcdef"
+        for consumer in cp.CONSUMERS:
+            probe_command = f"python3 -I tools/credentials/credential_run.py canary-e2e -- python3 -I tools/credentials/canary_probe.py --run {run} --consumer {consumer} --attempt 1"
+            commands = [probe_command, f"python3 tools/credentials/canary_proof.py arm --run {run} {consumer}"]
+            if consumer == "systemd-user-unit":
+                commands += [f"systemd-run --user --wait --collect --quiet -p Type=oneshot --unit=canary-proof-{run}-unit-1 " + probe_command + " --leak-check"]
+            for command in commands:
+                self.assertIsNone(guard.check(command), "CMD-allowed-template " + consumer)
+                self.assertNotIn(cp.VARIABLE, command, "CMD-id-only")
+        self.assertIsNone(guard.check(f"bash tools/credentials/canary_lane_consumer.sh {run} 1 /tmp/registered-lane </dev/null >/dev/null 2>&1"), "CMD-S8-allowed")
+        workflow = (ROOT / "tools/credentials/canary_workflow.js").read_text()
+        self.assertEqual(workflow.count("effort: 'max'"), 2, "CMD-workflow-effort")
+        self.assertEqual(workflow.count("agentType: 'source-scout'"), 2, "CMD-workflow-role")
+
+    def test_lane_wrapper_argv_home_and_null_descriptors_using_fake_client(self):
+        host = Host(self)
+        record, lane = host.root / "client-argv", host.root / "lane"
+        lane.mkdir()
+        host.script("codex", "#!/usr/bin/python3 -I\nimport os, sys, json\n" +
+            f"json.dump(dict(argv=sys.argv[1:], home=os.environ['CODEX_HOME'], fds=[os.readlink('/proc/self/fd/' + str(n)) for n in range(3)]), open({str(record)!r}, 'w'))\n")
+        result = subprocess.run(["bash", str(ROOT / "tools/credentials/canary_lane_consumer.sh"),
+            "cp-20260930t120000z-abcdef", "1", str(lane)], env=host.env(PATH=f"{host.bin}:/usr/bin:/bin"),
+            stdin=subprocess.DEVNULL, capture_output=True, timeout=10)
+        self.assertEqual(result.returncode, 0, "CMD-wrapper")
+        data = json.loads(record.read_text())
+        self.assertEqual(data["home"], str(lane), "CMD-registered-home")
+        self.assertEqual(data["fds"], ["/dev/null"] * 3, "CMD-null-input-and-output")
+        self.assertIn('model_reasoning_effort="max"', data["argv"], "CMD-literal-TOML")
+        self.assertNotIn("-o", data["argv"], "CMD-no-capture")
+        self.assertIn("cx/gpt-6-astra", data["argv"], "CMD-S8-model")
+
+    def test_setup_guard_pin_stays_child_side_and_runtime_comes_from_plan(self):
+        host = Host(self)
+        sentinel_value = sentinel("unrelated-")
+        (host.home / ".claude/settings.json").write_text(sentinel_value)
+        (host.codex / "config.toml").write_text(sentinel_value)
+        audit = host.root / "setup-audit"
+        result = host.tool("prepare", audit=audit)
+        self.assertEqual(result.returncode, 0, "CMD-guard-setup")
+        self.assertFalse(forms_in(audit.read_bytes(), sentinel_value), "C8-no-parent-configuration-read")
+        self.assertFalse(any(path.name == "client_guards" for path in host.root.rglob("*")), "C8-only-guard-pin")
+        host.run_id = re.search(rb"run: (cp-\S+)", result.stdout).group(1).decode()
+        host.worker["wrong_runtime"] = str(host.root / "wrong-runtime")
+        (host.home / ".claude/sample").write_text("old")
+        self.assertEqual(host.scan().returncode, 0, "C9-paths-from-plan")
+        self.assertFalse((host.root / "wrong-runtime").exists(), "C9-no-environment-derived-state")
+
+
 if __name__ == "__main__":
+    if "--skip-list" in sys.argv:
+        result = unittest.TestResult()
+        unittest.defaultTestLoader.loadTestsFromModule(sys.modules[__name__]).run(result)
+        print(json.dumps({"skipped": [{"test": test.id(), "reason": reason} for test, reason in result.skipped],
+                          "failures": len(result.failures), "errors": len(result.errors)}))
+        sys.exit(not result.wasSuccessful())
     unittest.main()
