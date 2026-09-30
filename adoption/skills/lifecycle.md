@@ -17,13 +17,18 @@ installer. The selections and their listing states are decided in the
 [skills trial record](../../docs/decisions/2026-09-25-skills-trial-and-usage.md) and the
 [LLM-native listing record](../../docs/decisions/2026-09-30-skills-llm-native-listing.md).
 See the [September 30 maintenance record](../../docs/decisions/2026-09-30-native-skill-lifecycle.md)
-for observed execution and its limits; the host's source refresh, native Codex/Claude
-outcomes and cross-family review are in the finalization record,
-`docs/decisions/2026-09-30-sota-native-finalization.md`.
+for observed execution and its limits, and the
+[native evaluation of two selected skills](../../evidence/artifacts/native-skill-finalization-20260930/README.md)
+for their Codex and Claude outcomes. The finalization record, with the host's source
+refresh and the cross-family review, lands with unit F1.
 
 ## How a task finds its skill
 
-1. **Listed skills.** Both clients list every enabled skill's name and description.
+1. **Listed skills.** Both clients list the name and description of every
+   model-invocable skill, within their listing budgets. The two upstream user-only
+   skills are not listed (`/name` in Claude, `$name` in Codex; see
+   [Activate and invoke](#activate-and-invoke)), and a listing over its budget
+   loses descriptions (see [Listing budget](#listing-budget)).
    Match the task's actual workflow rather than a shared keyword, then read the
    whole selected `SKILL.md` before acting. A name mention is not an application.
 2. **`search-first`.** When no listed skill fits, the model invokes
@@ -34,7 +39,9 @@ outcomes and cross-family review are in the finalization record,
    registry discovery: its steps 1-3 read the skills.sh leaderboard and run
    `"$SKILLS_BIN" find <query>`. Its install-count, source and star thresholds
    (step 4) guide discovery only; popularity is not evidence. Its step-6
-   `skills add <owner/repo@skill> -g -y` is replaced by a pin in the manifest.
+   `skills add <owner/repo@skill> -g -y` is replaced by a pin in the manifest:
+   a session never installs a skill ad hoc; it records the candidate and the
+   coordinator pins it (see [Install and inspect](#install-and-inspect)).
 4. **The sweep.** Candidates for a gap compete head-to-head through the
    [landscape sweep](../../tools/sota-convergence/landscape-sweep/README.md) or a
    scoped comparison in a dated decision record that names the alternatives, the
@@ -82,6 +89,24 @@ immutable tree URL and only the selected clients, then verifies or rolls back a
 failed installation. It disables telemetry and the add-time audit request. A
 matching existing installation is reused. Apply only the selected profile's
 listing controls from [the update guide](../update.md#apply-the-skills-manifest).
+
+A session never installs a skill ad hoc; it records the candidate and the
+coordinator pins it, and installation runs only through this manifest-driven
+installer. The Claude settings template therefore denies, in every session, the
+Skills CLI commands that write installed skills (skills 1.7.0
+[`src/cli.ts` L336-402](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/cli.ts#L336-L402):
+`add`, `a`, `i`, `install`, `remove`, `rm`, `r`, `check`, `update`, `upgrade` and
+`experimental_*`) in four forms: a bare `skills`, `npx [flags] skills`,
+`npx [flags] skills@<version>` and a path ending in `bin/skills`, such as the pinned
+`<tools-root>/skills-1.7.0/bin/skills`. `Edit(~/.agents/**)` keeps the file tools
+out of the canonical skill folders. `find`, `list`, `init`, `use` and `--version`
+stay allowed, and the installer's own `add` and rollback `remove` run as
+subprocesses, which Bash rules do not see. The rules match the command text a
+model writes, not every route to the program: `"$SKILLS_BIN" add`, `sh -c`,
+`node <path>/cli.mjs` or another package runner is not matched
+([permissions](https://code.claude.com/docs/en/permissions), "Wildcard patterns",
+"Compound commands" and "What a Bash rule doesn't match"), so the manifest and
+`skills_status.py` stay the check of what is installed.
 
 `skills_status.py` checks required metadata and reports supporting-file hashes
 separately. Its zero exit does not establish full-tree integrity or successful
@@ -220,8 +245,11 @@ manifest skills, so remove a retired skill's installed folder instead. Remove it
 runtime-worker `reuse_ref` entry and coverage selections while retaining dated
 evidence.
 
-For removal, use upstream `"$SKILLS_BIN" remove NAME -g -y`, then inspect the
-canonical folder, lock and client links. Omit `-g` in an owned disposable project.
+For removal, the host batch runs upstream `"$SKILLS_BIN" remove NAME -g -y` from a
+shell outside a Claude session, since the settings template denies the CLI's
+remove commands in a session (see [Install and inspect](#install-and-inspect)).
+Then inspect the canonical folder, lock and client links. Omit `-g` in an owned
+disposable project.
 Removing a shared selected skill affects its client aliases; update its selection
 before claiming the host still matches the manifest. Retain useful evidence and
 delete only the owned temporary installation. Rollback and cleanup are operations
