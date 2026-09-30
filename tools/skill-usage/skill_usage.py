@@ -2427,6 +2427,10 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
             return 2
         if out_refused(args.out):
             return 2
+        if args.out is not None and args.out.resolve() == Path(os.path.abspath(args.call_ledger)).resolve():
+            print("skill_usage: --call-ledger: refusing the --out path (the report would be written over the ledger)",
+                  file=sys.stderr)
+            return 2
         if not kernel_exports("callLedger"):
             print("skill_usage: --call-ledger: the measurement kernel exports no callLedger (PR-A U2), so no call state can "
                   "be read; nothing was written", file=sys.stderr)
