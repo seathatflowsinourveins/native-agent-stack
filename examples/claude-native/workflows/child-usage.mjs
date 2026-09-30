@@ -2020,20 +2020,31 @@ export function mcpErrorClass(call, result, s = callState(call, result)) {
   if (!result) return 'unmatched'
   return clientClass(text) ?? (ctx ? ctxRefusal(call, text) ?? (/__ctx_execute(?:_file)?$/.test(name) ? ctxExecuted(name, call, text) : null) : null) ?? 'unmatched'
 }
-// The counts of one server as rates: rate counts the infrastructure classes, every new class (named, or unmatched text) and every call
-// whose class or outcome this reading cannot establish (outcome_unknown; an indexed exit, which is the command's own exit or a hidden module
-// error; echo_mismatch), since binding decision B2 holds an unknown not successful; rate_lower_bound counts those unknowns as successes, and
-// threshold_sensitive marks a server whose two bounds fall on different sides of the threshold (B2). every_error_classified is the
-// criterion classify_every_ctx_error (no unmatched or echo_mismatch; binding decision B1 adds no status). rate_upper_bound is the U2
-// design's descriptive ceiling: every call that neither succeeded nor ended in the invoked command's own exit.
+// The counts of one server as rates. The graded rate is rate_upper_bound, the ceiling: every attempted call that neither succeeded nor
+// ended in the invoked command's own exit, the one exclusion the frozen M15 row names ("A non-zero exit from the command the child ran is
+// excluded"). The frozen row names six infrastructure classes and none of the classes outside the named groups below (policy_deny,
+// remote_fetch, search_throttle, and the M14 states rejected, invalid and cancelled_with_result; the cm-audit rows the U2 design cites for
+// the first three could not be verified here), so they count as errors until a dated amendment (Amendment 4) assigns them: the U2 design
+// 5.3 ("Grading reads rate_upper_bound until a dated amendment assigns the 'other' classes") and the Gate A binding decisions ("the
+// harder-to-pass reading applies"; the review's high finding: a server whose every call fails with the client's "No such tool available"
+// invalid call read rate 0). The ceiling is a residual, so a class a later template adds counts too; unassigned_errors is that residual
+// after the named groups, and over_threshold the verdict on the ceiling's count.
+// rate counts the infrastructure classes, every new class (named, or unmatched text) and every call whose class or outcome this reading
+// cannot establish (outcome_unknown; an indexed exit, which is the command's own exit or a hidden module error; echo_mismatch), since
+// binding decision B2 holds an unknown not successful: the rate if Amendment 4 finds the unassigned classes not infrastructure.
+// rate_lower_bound also counts those unknowns as successes, and threshold_sensitive marks a server whose two bounds, rate_lower_bound and
+// rate_upper_bound, fall on different sides of the threshold (B2's flag, which here also covers the class assignment).
+// every_error_classified is the criterion classify_every_ctx_error (no unmatched or echo_mismatch; binding decision B1 adds no status).
 function finishM15Row(row) {
   const sum = (keys) => keys.reduce((n, k) => n + (row.classes[k] || 0), 0)
   const infrastructure = sum(INFRASTRUCTURE_CLASSES), newClass = sum(NEW_CLASSES), unknowns = sum(UNKNOWN_CLASSES)
+  const ceiling = row.attempted - row.succeeded - (row.classes.invoked_command_exit || 0)
   const over = (errors) => errors * M15_THRESHOLD_CALLS_PER_ERROR > row.attempted
   return { attempted: row.attempted, succeeded: row.succeeded, ctx: row.ctx, classes: row.classes, infrastructure_errors: infrastructure,
-    new_class_errors: newClass, unknowns, rate: share(infrastructure + newClass + unknowns, row.attempted), rate_lower_bound: share(infrastructure + newClass, row.attempted),
-    rate_upper_bound: share(row.attempted - row.succeeded - (row.classes.invoked_command_exit || 0), row.attempted),
-    threshold_sensitive: over(infrastructure + newClass + unknowns) && !over(infrastructure + newClass), every_error_classified: !row.classes.unmatched && !row.classes.echo_mismatch }
+    new_class_errors: newClass, unknowns, unassigned_errors: ceiling - infrastructure - newClass - unknowns,
+    rate: share(infrastructure + newClass + unknowns, row.attempted), rate_lower_bound: share(infrastructure + newClass, row.attempted),
+    rate_upper_bound: share(ceiling, row.attempted), over_threshold: over(ceiling),
+    threshold_sensitive: over(ceiling) && !over(infrastructure + newClass), every_error_classified: !row.classes.unmatched && !row.classes.echo_mismatch }
 }
 const finishM15 = (servers) => ({ threshold: M15_THRESHOLD, by_server: Object.fromEntries(Object.entries(servers).map(([s, row]) => [s, finishM15Row(row)])) })
 function addM15(servers, server, ctx, cls) {
