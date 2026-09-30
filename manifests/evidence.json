@@ -35059,6 +35059,226 @@
       "bytes": 6032
     },
     {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/README.md",
+      "sha256": "a24a4b510a151c3e862931670a96b5ff449843b8ee10b222634cc50607885203",
+      "bytes": 20678
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/combine-chunks.mjs",
+      "sha256": "778f23379068463e9e888b6ef61a49a84867ac04b062d474485fdd3926243ee7",
+      "bytes": 3099
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/differential-runs.json",
+      "sha256": "b0495ba1d9c75ca6763c435c4ef9398854862684bf4a1dbd8aade574982d3cfd",
+      "bytes": 5722
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/differential-sweep-waa-rtk.json",
+      "sha256": "0ec30fd42bb0d490901b0f8b810c46a8ee35c1531c08b072a0ba35350dd909ed",
+      "bytes": 4744
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/differential-sweep-waa.json",
+      "sha256": "933a2c53f49007c655237210c0b825564e0a3b5491018f56f72563b4f23f0321",
+      "bytes": 4154
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/differential.mjs",
+      "sha256": "17d22054919859b10e28cf48e5489d1ec7352a2d6290897739529f04a4e72f6c",
+      "bytes": 11797
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/expected-changes.json",
+      "sha256": "84459117ecee65abf468ef27f70a1c756082b419c34c3f5d4a8a61f56c61f12f",
+      "bytes": 12151
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/call-states.json",
+      "sha256": "a1f90daa7fac78629b9c44462489448071c68d7cdcdf97944f7b8049b6eacc2a",
+      "bytes": 7379
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/call-states.py",
+      "sha256": "1a7c88b230f79e977ea03082f916518110755dbce0d47c71df67320775cfd4db",
+      "bytes": 7368
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/final-returns.json",
+      "sha256": "70b98cd555b76fba0dd36677a1d1b761ac5d996b6addb3e2e3e1bfdd0301b3d2",
+      "bytes": 1794
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/final-returns.py",
+      "sha256": "38661779c78a239b6a1e1ec7e23a6eadc24cbbd7f755a8dc4e743c8c3dc9bf13",
+      "bytes": 9425
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/hook-rows.json",
+      "sha256": "e1aae49c637b6b15d0379d70396c7fb93c018616312114603c1949c54fad379a",
+      "bytes": 1885
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/hook-rows.py",
+      "sha256": "bc8faf764628cabf9ca0d30db653fb8e9efb3dfeba0c4091806a74b0368eb131",
+      "bytes": 3544
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/kernel-m14-m15.json",
+      "sha256": "2b0256de262815a47bae94c5553a22bb4bb2c49573235fb1db1735b0fc8dd288",
+      "bytes": 4830
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/kernel-m14-m15.mjs",
+      "sha256": "c4e031c2a657312be7616157ccd648c43591f929ff2e1a387c85beaeeccde523",
+      "bytes": 3864
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/kernel-split-differs.json",
+      "sha256": "443a56da2d6a249303d42033a0c118e4e864d553c08cc3839b018311b1e59353",
+      "bytes": 82
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/kernel-split-differs.mjs",
+      "sha256": "44b86894415439aa820d3e30bc6436ad610ea719d991e485645a8dcf1ed6893d",
+      "bytes": 1375
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/kernel-usage.json",
+      "sha256": "04fd308bfb7712d76262dde60491eb28f74e2915cd4d85a7aaf24639066f33ec",
+      "bytes": 749
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/kernel-usage.mjs",
+      "sha256": "41d43f7d0705f2cc17a4d8131176636109213f92f560602d775c41fcb8d10c06",
+      "bytes": 3230
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/large-results.json",
+      "sha256": "a513c97bfce24a83cf2016f8f5765a521de3a35f9d699e3a346d154d1f2b8cd1",
+      "bytes": 1361
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/large-results.py",
+      "sha256": "b43cab0d20273f5ab1910101fd6b4ac7d493fc90c417fb0e395a3918d051610a",
+      "bytes": 5370
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/not-executed-delta.json",
+      "sha256": "a4cae1f57e64f00de208072e22897fadd1c3714093724d92b23933d1ce563963",
+      "bytes": 454
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/not-executed-delta.mjs",
+      "sha256": "840be816d6d8230f4fa093fe33cc417347e0c2fc08275e04d687c70bd89205e1",
+      "bytes": 3720
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/parts-compare.json",
+      "sha256": "9dbbbf0e0a813d536cbf06a158a0b40ef6b2578c9eb6f36ae208c61555144944",
+      "bytes": 1017
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/parts-compare.mjs",
+      "sha256": "6780d9419a79f5bc548c1e4d25bc55c90af41314a4e329276fda735c1084883d",
+      "bytes": 3746
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/task-notifications.json",
+      "sha256": "81c9296126d50e0ccc970e2ac4741acee5f193dc8fbb0acf19be6bc29f2a99d1",
+      "bytes": 3138
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/task-notifications.py",
+      "sha256": "e575b6f9b306fd003a88a762a80a77035234f9fe5291cf7bcf901616c7fb896c",
+      "bytes": 7045
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/task-stop-2.json",
+      "sha256": "bdca3ffd7ec3b56aa67ab394ff28083e4235af325f2cc1abb040ade8157824bd",
+      "bytes": 366
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/task-stop-2.py",
+      "sha256": "c16afef0b05b2dbf734e62af6a44034df6397dc613bc25d0fb0b9d88b3df61ae",
+      "bytes": 2762
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/task-stop.json",
+      "sha256": "ef20b18cc96d6a6d6a715fa76dc95e87d5fb4fdd995c844e38335d2465e693ac",
+      "bytes": 1031
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/task-stop.py",
+      "sha256": "5c0085e46f43328581c91f852dcadde1959f9e341c1438402ca92c5d3db5de2e",
+      "bytes": 5648
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-1.json",
+      "sha256": "1f53a43d1b97f41bb744ee51bea77bb1e87545a64d2f5978165abbbbcb312f65",
+      "bytes": 3973
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-1.py",
+      "sha256": "e0f21b588c70b2c4d2a0aca6e218b619191131fbe53583483f5cae87407b6f61",
+      "bytes": 9783
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-2.json",
+      "sha256": "41980251291b272b107c6beb09dc72859618a4f4e5222903bc9e68641b9ef0a3",
+      "bytes": 3057
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-2.py",
+      "sha256": "9c7f0c78c939b72a0ac52d3b2af4b3ffec540ef26fe27054877a67630c433058",
+      "bytes": 8148
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-3.json",
+      "sha256": "7fe51d4f0abcc380368585c7f4afed832da477ad44f0f33ce81d68295ae28268",
+      "bytes": 2441
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-3.py",
+      "sha256": "957ea8128ae1a3758fed0d7863baf20a49ab00df087957a8848380c0666b09fd",
+      "bytes": 5060
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-4.json",
+      "sha256": "1980763b7f9b44bf714dd13ba11ea6374e11cc618f96410b0621b5273bf84892",
+      "bytes": 740
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/scans/usage-iterations-4.py",
+      "sha256": "7d9bf55a3f589de1882f9e40be1810063ff6d0f59c191e61ce96f0e1d0eebf0b",
+      "bytes": 4213
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/shell-parts-property.json",
+      "sha256": "d97f126cfefe2b85a56924d4b53dcaa11e2a73f6ef30d907134734ad582d02ef",
+      "bytes": 1490
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/shell-parts-property.mjs",
+      "sha256": "4063e4ae7e9fd21e9315098f85fe01604a889fefdef264502b14a2528f0b80a7",
+      "bytes": 8799
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/sources.json",
+      "sha256": "e04599365cbc1a76115619a73875e24c3763135d580c7ce28767c3ad313cc597",
+      "bytes": 19907
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/waa-invariants.json",
+      "sha256": "ad53e36d54c8071f8502ad2015a205d204903b1a2fd7f6522178eb20e8138ab5",
+      "bytes": 5221
+    },
+    {
+      "path": "evidence/artifacts/pra-u2-differential-20260929/waa-invariants.py",
+      "sha256": "4b3c0c5a12a72c8878e411ab564c2804bc5c2ff8b047ac66726243492d3995ec",
+      "bytes": 4711
+    },
+    {
       "path": "evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json",
       "sha256": "c4136fac7d8c341708e65aa7c6a8f78e4adeab57baa8b443065c5f4551318fc1",
       "bytes": 1365997
@@ -42580,12 +42800,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "6f74f33f909ecd0f9e4c01789bb2da7038bd21dcd6e8015badf3a0eeaf971ce2",
-      "bytes": 89176
+      "sha256": "99dab3c2de107abc7ae343efac22aefbe0fcf5ef5ebe457f781e71f034b981a7",
+      "bytes": 104014
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "6192d920087017995809c50ba7a44cbae3dbf03bb4dad4468d7a7a2c162971ef",
+      "sha256": "78373d8f15470d0cc14dc7f9dc59cd90c38b24f9a178ad762d91b9366b6dff32",
       "bytes": 1217
     },
     {
@@ -42595,8 +42815,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "119ce9764447ea0f7c7b53622d3cac14b73b34e3b657bd65833f062fb534f6bb",
-      "bytes": 192984
+      "sha256": "c1d9ad1602902259058367a46e437543cab866402c47ea99edc029583abd3d0a",
+      "bytes": 258795
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -42625,8 +42845,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "61db9bde4b3d5e586cf83b840bbd7425c6c91b39b8629b40cc1b66b4f8d3c008",
-      "bytes": 98150
+      "sha256": "b5ba8b1601bdad0998d672f90e60ee59fd2ba3bdc82716874532efce320e0dce",
+      "bytes": 114280
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -44270,8 +44490,8 @@
     },
     {
       "path": "tests/test_token_measurement.py",
-      "sha256": "05287a643ea6edceb080ab0095b1719bf7b1042d7ecac07cbde0c4f6bdf0cf86",
-      "bytes": 125555
+      "sha256": "ef80f9f0aefe61a4b8366ccde8a46501572a2f9f61e4fc4468d54c3f80bb183b",
+      "bytes": 228909
     },
     {
       "path": "tests/test_trading_gates.py",
@@ -44470,8 +44690,8 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "fc25ee1850359c69c4700ec1d1888fdacbff43d019d0ec036e704c633bfc58c9",
-      "bytes": 26121
+      "sha256": "4dd067f554366aa802e43919d126272d18e990ea95ec493b3dd03a73cad2c8d4",
+      "bytes": 27439
     },
     {
       "path": "tools/skill-usage/skill_usage.py",

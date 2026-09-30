@@ -1,0 +1,42 @@
+{
+ "kind": "pra_u2_parts_compare",
+ "window": {
+  "since": "2026-09-26T00:00:00Z",
+  "until": "2026-09-26T18:37:00Z"
+ },
+ "bash": "GNU bash, version 5.2.21",
+ "bash_calls": 30673,
+ "both_read": 26150,
+ "both_read_same_parts": 26133,
+ "both_read_part_count_differs": 17,
+ "only_u2_reads": 4459,
+ "only_base_reads": 1,
+ "neither_reads": 63,
+ "only_u2_reads_bash_accepts": 4459,
+ "only_base_reads_bash_accepts": 0,
+ "neither_reads_bash_accepts": 62,
+ "constructs_only_u2_reads": {
+  "heredoc_operator": 4262,
+  "comment": 755,
+  "substitution_in_double_quotes": 583,
+  "arithmetic": 204,
+  "backquote_in_double_quotes": 406,
+  "and_greater": 1,
+  "clobber": 9,
+  "pipe_both": 1
+ },
+ "constructs_part_count_differs": {
+  "substitution_in_double_quotes": 17,
+  "less_and": 1,
+  "backquote_in_double_quotes": 1
+ },
+ "constructs_neither_reads": {
+  "none_of_these": 18,
+  "substitution_in_double_quotes": 44,
+  "arithmetic": 4,
+  "heredoc_operator": 6,
+  "backquote_in_double_quotes": 4,
+  "comment": 3,
+  "clobber": 1
+ }
+}

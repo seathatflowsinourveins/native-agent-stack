@@ -35,8 +35,8 @@
 // most CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls (default 200), counted across the main
 // conversation and every subagent, and a capped call returns a notice instead of results (tools-reference,
 // "Session search limit"). A capped call changes no usage and no exit code; callers decide what it means.
-import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { readFileSync, existsSync, readdirSync, statSync, mkdtempSync, mkdirSync, writeFileSync, rmSync, openSync, closeSync, fchmodSync, lstatSync, realpathSync } from 'node:fs'
+import { join, resolve, dirname, basename as pathBasename } from 'node:path'
 import { homedir, tmpdir } from 'node:os'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawnSync } from 'node:child_process'
@@ -1694,23 +1694,95 @@ function callAnalysis(call) {
 // interrupted when toolUseResult.interrupted is true (the command started and was cut short; the recount found none, so that state is
 // exercised by a synthetic fixture only); background marks a run that only started (run_in_background, or a toolUseResult
 // backgroundTaskId).
-const NOT_EXECUTED_RESULT = ['PreToolUse:', 'Permission for', 'User rejected tool use']
-const NOT_EXECUTED_CONTENT = ['<tool_use_error>', "The user doesn't want to proceed", 'The server-side auto mode classifier gave no verdict']
-function callState(call, result) {
+// U2 item 7 extends the rule (the review's dependency finding) without changing a call U1 already reads: every template is read at the
+// start of the result content and of the toolUseResult string (after "Error: "), and two client templates join it, "Permission to use
+// <tool> ... has been denied" (a deny rule) and "Not run: the response that made this tool call" (a response stopped before the call
+// ran), with the U2 design's constant "[Request interrupted by user for tool use]" (on this host that marker is a user text block after
+// a user-rejection result, 37 of 37, never a result). A call that did not run also gets its cause, the source of the decision in the
+// vocabulary of the OTel tool_decision event (code.claude.com/docs/en/monitoring-usage, "Tool decision event": config, hook, the user's
+// answers; "Tool result event": "Not emitted if the tool call was rejected"): a template's own cause unless it is 'other', then the
+// toolDenialKind, then the template's 'other', then a native declined state. Hook denials carry toolDenialKind permission-rule (817 of 817
+// on this host), so a text decides first; "Permission for this command was denied by a built-in ..." carries permission-rule too (11 of
+// 11), a rule's automatic decision, which the monitoring doc's source "config" names ("Decided automatically without prompting").
+// Counts (5,168 transcript files, 2026-09-29): evidence/artifacts/pra-u2-differential-20260929/scans/call-states.json.
+// [prefix, cause, text the prefix's first line must also hold]
+const NOT_EXECUTED_TEMPLATES = [['<tool_use_error>Cancelled: ', 'cancelled'], ['<tool_use_error>Error: Streaming fallback', 'cancelled'],
+  ['<tool_use_error>', 'invalid'], ["The user doesn't want to proceed", 'user'], ['User rejected tool use', 'user'], ['PreToolUse:', 'hook'],
+  ['Permission to use ', 'config', ' has been denied'], ['Permission for', 'other'], ['The server-side auto mode classifier gave no verdict', 'other'],
+  ['Not run: the response that made this tool call', 'cancelled'], ['[Request interrupted by user for tool use]', 'cancelled']]
+const DENIAL_KINDS = { 'permission-rule': 'config', 'user-rejected': 'user', cancelled: 'cancelled', 'automode-unavailable': 'other' }
+function templateCause(text) {
+  for (const [prefix, cause, within] of NOT_EXECUTED_TEMPLATES) {
+    if (!text.startsWith(prefix)) continue
+    const end = text.indexOf('\n')
+    if (!within || (end < 0 ? text : text.slice(0, end)).includes(within)) return cause
+  }
+  return null
+}
+// The state of one call: { state: succeeded | failed | unfinished | unknown | interrupted, not_executed, cause, background }; the
+// result is a tool_result block with its row (measureTranscript's results), or null.
+export function callState(call, result) {
   if (!result) {
     const status = call?.native_status
     return status === 'completed' ? { state: 'succeeded' } : status === 'failed' ? { state: 'failed' }
-      : status === 'declined' ? { state: 'failed', not_executed: true } : { state: 'unfinished' }
+      : status === 'declined' ? { state: 'failed', not_executed: true, cause: 'declined' } : { state: 'unfinished' }
   }
   const native = result.native_state ?? call?.native_state, said = result.row?.toolUseResult
   if (result.is_error) {
-    const reason = typeof said === 'string' ? (said.startsWith('Error: ') ? said.slice(7) : said) : '', content = resultText(result.content)
-    return { state: 'failed', not_executed: Boolean(result.row?.toolDenialKind) || NOT_EXECUTED_CONTENT.some((m) => content.startsWith(m))
-      || NOT_EXECUTED_RESULT.some((m) => reason.startsWith(m)) || native === 'declined' }
+    const reason = typeof said === 'string' ? (said.startsWith('Error: ') ? said.slice(7) : said) : ''
+    const text = templateCause(resultText(result.content)) ?? templateCause(reason), denial = result.row?.toolDenialKind
+    const kind = denial ? (typeof denial === 'string' && Object.hasOwn(DENIAL_KINDS, denial) ? DENIAL_KINDS[denial] : 'other') : null
+    const cause = (text !== 'other' && text) || kind || text || (native === 'declined' ? 'declined' : null)
+    return cause ? { state: 'failed', not_executed: true, cause } : { state: 'failed', not_executed: false }
   }
   if (native === 'unknown') return { state: 'unknown' }
   if (said && typeof said === 'object' && said.interrupted === true) return { state: 'interrupted' }
   return { state: 'succeeded', background: Boolean(call?.input?.run_in_background) || Boolean(said && typeof said === 'object' && said.backgroundTaskId) }
+}
+// The per-call flag M14 reads: the call never ran (a rejection, an invalid call or a cancellation that has a result, or a declined call).
+export const notExecuted = (call, result) => callState(call, result).not_executed === true
+// M14 call states (PR-A item 7; U2 design 4.2 with the review's corrections): callState projected onto the sealed M14 names (E2E README.md M14
+// row; preregistration.json thresholds.M14.criteria.states: attempted, decided, executed, failed, cancelled_or_unfinished). A call that has a
+// transcript result is never "no result": it executed (succeeded, failed, or interrupted after it started), was rejected (by source, config,
+// hook, user, other or a native declined state; the tool_result event is "Not emitted if the tool call was rejected", monitoring-usage doc),
+// was invalid (a <tool_use_error> the client raised before running it) or was cancelled with a result (the client's "Not run" or "Cancelled"
+// results: cancelled_with_result, kept apart until a Loki probe shows whether such a call emits tool_result). cancelled_or_unfinished is the
+// sealed state, the calls with no result and no native status that decides them; unknown is an outcome an adapter could not read. decided is
+// null: a transcript cannot observe the tool_decision event. attempted = executed + rejected + invalid + cancelled_with_result +
+// cancelled_or_unfinished + unknown, per actor and per MCP server. calls_without_result keeps its published meaning: the calls with no result,
+// which are the cancelled_or_unfinished ones plus those a native status decided (completed, failed or declined).
+const M14_STATES = ['succeeded', 'failed', 'interrupted', 'rejected', 'invalid', 'cancelled_with_result', 'cancelled_or_unfinished', 'unknown']
+const M14_EXECUTED = new Set(['succeeded', 'failed', 'interrupted'])
+const REJECTION_SOURCES = ['config', 'hook', 'user', 'other', 'declined']
+const M14_SERVER_KEYS = ['attempted', 'executed', ...M14_STATES]
+const projectState = (s) => s.not_executed ? (s.cause === 'invalid' ? 'invalid' : s.cause === 'cancelled' ? 'cancelled_with_result' : 'rejected')
+  : s.state === 'unfinished' ? 'cancelled_or_unfinished' : s.state
+const m14Of = (s) => { const state = projectState(s); return { state, cause: s.cause ?? null, executed: M14_EXECUTED.has(state), background: Boolean(s.background) } }
+// One call's M14 state: { state (one of M14_STATES), cause (callState's, or null), executed, background }.
+export const m14State = (call, result) => m14Of(callState(call, result))
+const emptyServerStates = () => Object.fromEntries(M14_SERVER_KEYS.map((k) => [k, 0]))
+const emptyCallStates = () => ({ attempted: 0, decided: null, executed: 0, ...Object.fromEntries(M14_STATES.map((k) => [k, 0])),
+  rejected_by_source: Object.fromEntries(REJECTION_SOURCES.map((k) => [k, 0])), background: 0, sandbox: 0, by_server: counter() })
+function addCallState(states, m, server, sandbox) {
+  states.attempted++
+  states[m.state]++
+  if (m.executed) states.executed++
+  if (m.state === 'rejected') states.rejected_by_source[REJECTION_SOURCES.includes(m.cause) ? m.cause : 'other']++
+  if (m.background) states.background++
+  if (sandbox) states.sandbox++
+  if (!server) return
+  const row = states.by_server[server] ||= emptyServerStates()
+  row.attempted++
+  row[m.state]++
+  if (m.executed) row.executed++
+}
+function sumCallStates(target, source) {
+  for (const k of ['attempted', 'executed', ...M14_STATES, 'background', 'sandbox']) target[k] += source?.[k] || 0
+  for (const k of REJECTION_SOURCES) target.rejected_by_source[k] += source?.rejected_by_source?.[k] || 0
+  for (const [server, row] of Object.entries(source?.by_server || {})) {
+    const total = target.by_server[server] ||= emptyServerStates()
+    for (const k of M14_SERVER_KEYS) total[k] += row[k] || 0
+  }
 }
 const LANE_COUNTERS = ['calls', 'invocations', 'succeeded', 'failed', 'not_executed', 'unfinished', 'unknown', 'interrupted', 'background', 'ambiguous', 'via_mcporter']
 const CLI_CARRIERS = ['bash', 'rtk_proxy', 'ctx', 'nested']
@@ -1764,10 +1836,224 @@ const RESULT_LIMIT = 5120
 const contentBytes = (content) => typeof content === 'string' ? Buffer.byteLength(content, 'utf8')
   : Array.isArray(content) ? content.reduce((n, b) => n + contentBytes(b?.type === 'text' && typeof b.text === 'string' ? b.text : b), 0)
     : Buffer.byteLength(JSON.stringify(content), 'utf8')
-const emptySizes = () => ({ results: 0, bytes: 0, large_results: 0, large_bytes: 0, max_bytes: 0 })
-const addSize = (s, n) => { s.results++; s.bytes += n; if (n > RESULT_LIMIT) { s.large_results++; s.large_bytes += n } s.max_bytes = Math.max(s.max_bytes, n) }
+// PR-A item 4: every sizes object also counts, among its results over RESULT_LIMIT, the JSON ones, the uniform-tabular ones and the ones
+// whose shape this reading cannot tell (largeShape below), so a count of 0 never stands for "not inspected".
+const emptySizes = () => ({ results: 0, bytes: 0, large_results: 0, large_bytes: 0, max_bytes: 0, large_json: 0, large_uniform_keys: 0, large_uniform_flat: 0, large_shape_unknown: 0 })
+const addSize = (s, n, shape = null) => {
+  s.results++; s.bytes += n
+  if (n > RESULT_LIMIT) {
+    s.large_results++; s.large_bytes += n
+    if (!shape) s.large_shape_unknown++
+    else { if (shape.json) s.large_json++; if (shape.uniform_keys) s.large_uniform_keys++; if (shape.uniform_flat) s.large_uniform_flat++ }
+  }
+  s.max_bytes = Math.max(s.max_bytes, n)
+}
+// Sum of sizes objects: every counter adds up except max_bytes, the largest; a counter an older measurement lacks adds nothing.
+const sumSizes = (rows) => rows.reduce((a, b) => Object.fromEntries(Object.keys(a).map((k) => [k, k === 'max_bytes' ? Math.max(a[k], b[k] || 0) : a[k] + (b[k] || 0)])), emptySizes())
 const finishSizes = (s) => ({ ...s, large_result_share: share(s.large_results, s.results), large_byte_share: share(s.large_bytes, s.bytes) })
+// JSON and uniform-tabular shape of a result over RESULT_LIMIT (PR-A item 4; the AA §1 large-output table's JSON column). The payload is the
+// result text (a string, or text blocks joined with '', the join contentBytes implies) after its carrier's own wrapper: ctx_execute and
+// ctx_execute_file put the code echo before stdout (ctxEcho), and Read "returns the contents with line numbers" (code.claude.com/docs/en/
+// tools-reference, "Read tool behavior"; the form, spaces, digits and a tab before every line, is observed client behavior, not a documented
+// schema: all 11,467 text Read results over 5,120 B on this host had it on every line, and JSON was found in 0 of them as returned, in 990
+// without the numbers; a PARTIAL view notice has no number and reads as unknown). json: the trimmed payload opens with [ or { and parses.
+// uniform_keys: it, or the one value of a one-key object, is an array of at least five objects with one non-empty key set. uniform_flat:
+// uniform_keys and every value of those objects is null, a boolean, a number or
+// a string (TOON v4.1.1 packages/toon/README.md:199, "All objects have identical fields with primitive values"; #381 toon-seeded: "at least
+// five flat records"); keyed maps of uniform objects, which TOON also tabulates, are not counted. null when this reading cannot tell: a
+// non-text block, a result without its call, or an echo or line numbers it cannot find (large_shape_unknown).
+const NOT_JSON = { json: false, uniform_keys: false, uniform_flat: false }
+const primitive = (v) => v === null || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+const record = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
+function jsonShape(text) {
+  const trimmed = text.trim(), open = trimmed.charCodeAt(0)
+  if (open !== 91 && open !== 123) return NOT_JSON
+  let value
+  try { value = JSON.parse(trimmed) } catch (e) { return e instanceof SyntaxError ? NOT_JSON : null }
+  let rows = value
+  if (!Array.isArray(rows)) { const keys = Object.keys(rows); rows = keys.length === 1 ? rows[keys[0]] : null }
+  let uniform = Array.isArray(rows) && rows.length >= 5 && rows.every(record)
+  if (uniform) { const keys = JSON.stringify(Object.keys(rows[0]).sort()); uniform = keys !== '[]' && rows.every((r) => JSON.stringify(Object.keys(r).sort()) === keys) }
+  return { json: true, uniform_keys: uniform, uniform_flat: uniform && rows.every((r) => Object.values(r).every(primitive)) }
+}
+// context-mode's code echo before a ctx_execute or ctx_execute_file result (mksglu/context-mode v1.0.169, tag commit 442f1eb6,
+// src/server.ts:1511-1527 buildExecuteEcho; :1827 and :2145 build it from the user-supplied code, and :1939 and :2217 return `${echo}${stdout}`):
+// "path=<path>\n" for ctx_execute_file, then the code clipped at 2,000 UTF-16 units with "\n… (truncated)", fenced with its language, and a
+// blank line. null when the call input cannot rebuild it.
+export function ctxEcho(name, input) {
+  const i = input && typeof input === 'object' ? input : {}, file = /__ctx_execute_file$/.test(String(name || ''))
+  if (typeof i.language !== 'string' || typeof i.code !== 'string' || (file && i.path !== undefined && i.path !== null && typeof i.path !== 'string')) return null
+  const clip = i.code.length <= 2000 ? i.code : i.code.slice(0, 2000) + '\n… (truncated)'
+  return (file && i.path ? 'path=' + i.path + '\n' : '') + '```' + i.language + '\n' + clip + '\n```\n\n'
+}
+// A Read result without its cat -n line numbers (spaces, digits and a tab before every line), or null when a line lacks them. A linear scan.
+function withoutLineNumbers(text) {
+  const lines = []
+  for (let at = 0; at < text.length;) {
+    let i = at
+    while (text.charCodeAt(i) === 32) i++
+    const digits = i
+    while (text.charCodeAt(i) >= 48 && text.charCodeAt(i) <= 57) i++
+    if (i === digits || text.charCodeAt(i) !== 9) return null
+    const end = text.indexOf('\n', i + 1), stop = end < 0 ? text.length : end
+    lines.push(text.slice(i + 1, stop))
+    at = stop + 1
+  }
+  return lines.join('\n')
+}
+function largeShape(content, call) {
+  const text = typeof content === 'string' ? content
+    : Array.isArray(content) && content.every((b) => b?.type === 'text' && typeof b.text === 'string') ? content.map((b) => b.text).join('') : null
+  if (text === null || !call) return null
+  const name = String(call.name || '')
+  if (/__ctx_execute(?:_file)?$/.test(name)) {
+    const echo = ctxEcho(name, call.input)
+    return echo !== null && text.startsWith(echo) ? jsonShape(text.slice(echo.length)) : null
+  }
+  const payload = name === 'Read' ? withoutLineNumbers(text) : text
+  return payload === null ? null : jsonShape(payload)
+}
 const isCtx = (name) => /^mcp__.+__ctx_/.test(name)
+// Protocol M15, MCP infrastructure errors per server (E2E README.md M15 row; preregistration.json thresholds.M15: the rate of
+// infrastructure-class errors per server at most 0.01, the invoked command's non-zero exit excluded, every ctx error classified, a new class
+// our misuse until reproduced on upstream-recommended config). mcpErrorClass gives each attempted MCP call one class, or null for a success:
+// - a call that did not run keeps its M14 state (rejected, invalid, cancelled_with_result), and a call whose outcome is not known
+//   (no result, or an unknown or interrupted state) is outcome_unknown; the Codex approval denial is approval even when it did not run
+//   (openai/codex rust-v0.157.1 core/src/mcp_tool_call.rs:1612, a ReviewDecision::denied text);
+// - the Claude Code client's own texts come next: "MCP server ... is not connected" (connection), "... sent no response or progress for
+//   ...; aborting" (timeout: the documented idle timeout, code.claude.com/docs/en/mcp and env-vars CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT), and
+//   the MCP SDK's "Connection closed" (-32000) and "MCP error -32602: Input validation error" (@modelcontextprotocol/sdk 1.30.1
+//   shared/protocol.js:263, server/mcp.js:178);
+// - a context-mode tool's text then has the outdated-version notice stripped (server.ts:892-896; getUpgradeHint :802-808 holds no blank
+//   line), and the templates the server returns before it builds any code echo are tested on it as it is (the review's high finding: the
+//   boundary refusal :1196-1201 returns at :2118-2119, before the echo at :2145): boundary (binding when the Codex adapter flags a root
+//   mismatch; cm-audit rows 1-3), the deny firewall (:1122, :1152, :1232), Runtime/Batch execution/Index/Search errors (:1946, :2224,
+//   :3886, :2432, :2801), storage directory errors (session/db.ts storageDirectoryErrorMessage, invalidStorageOverride), usage errors
+//   (:2315, :2603, :2627, :3508, :4515), the batch timeout (:3815), fetch failures (:3599-3611) and an all-failed fetch batch (:3653-3669),
+//   and search throttling (:2659);
+// - only a ctx_execute or ctx_execute_file output after execution carries the echo (ctxEcho; :1827, :2145): it must open the text, and the
+//   rest is read for the execution timeout (:1872, :2152), the exit (exit-classify.ts:31, "Exit code: N\n\nstdout:\n...\n\nstderr:\n..."), a
+//   module error (the stderr's last line a ModuleNotFoundError, or Cannot find module or ERR_MODULE_NOT_FOUND in it; cm-audit row 6) and an
+//   exit whose output the server indexed (:1887, :1897, :2167, :2177, labels execute:<language>:error and file:<path>:error);
+// - anything else is unmatched, and a ctx_execute(_file) text without its echo is echo_mismatch. Echoed code is never matched.
+// Every template is anchored at the start of the text or of its first line, and read with linear scans.
+// preregistration.json thresholds.M15.criteria.per_server_infrastructure_error_rate_lte, 0.01: one error in 100 calls. A rate is rounded to
+// four places, so a comparison with the threshold uses the counts (errors * 100 > attempted), never the rounded rate.
+const M15_THRESHOLD = 0.01, M15_THRESHOLD_CALLS_PER_ERROR = 100
+const INFRASTRUCTURE_CLASSES = ['approval', 'boundary', 'binding', 'timeout', 'module', 'connection']
+const NEW_CLASSES = ['server_error', 'storage_directory', 'usage_error', 'invalid_arguments', 'unmatched']
+const UNKNOWN_CLASSES = ['outcome_unknown', 'invoked_command_exit_indexed', 'echo_mismatch']
+const SERVER_ERRORS = ['Runtime error: ', 'Batch execution error: ', 'Index error: ', 'Search error: ']
+const USAGE_ERRORS = ['Error: Either content or path must be provided', 'Knowledge base is empty', 'Error: provide query or queries.',
+  'ctx_fetch_and_index requires either `url`', 'Ambiguous purge: ']
+const VERSION_NOTICE = '⚠️ context-mode v'
+const firstLine = (text) => { const end = text.indexOf('\n'); return end < 0 ? text : text.slice(0, end) }
+const digitsEnd = (text, i) => { let j = i; while (j < text.length && text.charCodeAt(j) >= 48 && text.charCodeAt(j) <= 57) j++; return j }
+// The text holds one or more digits at i, then tail: the index after the tail, else -1.
+const digitsThen = (text, i, tail) => { const j = digitsEnd(text, i); return j > i && text.startsWith(tail, j) ? j + tail.length : -1 }
+function withoutVersionNotice(text) {
+  if (!text.startsWith(VERSION_NOTICE) || !firstLine(text).includes(' available. Upgrade: ')) return text
+  const end = text.indexOf('\n\n')
+  return end < 0 ? text : text.slice(end + 2)
+}
+function clientClass(text) {
+  if (text.startsWith('MCP server ')) {
+    const line = firstLine(text)
+    if (line.includes(' is not connected')) return 'connection'
+    if (line.includes(' sent no response or progress for ')) return 'timeout'
+  }
+  if (text.trimEnd() === 'Connection closed' || text.startsWith('MCP error -32000: Connection closed')) return 'connection'
+  return text.startsWith('MCP error -32602: ') ? 'invalid_arguments' : null
+}
+// "fetched N c=K[ cap=K/Ncpu]. ok=0 cache=0 err=N.": a batch whose every URL failed (server.ts:3653-3656, isError at :3669).
+function allFetchesFailed(text) {
+  let i = text.startsWith('fetched ') ? digitsThen(text, 8, ' c=') : -1
+  if (i < 0 || digitsEnd(text, i) === i) return false
+  i = digitsEnd(text, i)
+  if (text.startsWith(' cap=', i)) {
+    i = digitsThen(text, i + 5, '/')
+    if (i < 0 || (i = digitsThen(text, i, 'cpu')) < 0) return false
+  }
+  return text.startsWith('. ok=0 cache=0 err=', i) && digitsThen(text, i + 19, '.') > 0
+}
+// A context-mode refusal or error the server returns without a code echo, tested on the text as returned.
+function ctxRefusal(call, text) {
+  const line = firstLine(text)
+  if (text.startsWith('File access blocked: "') && line.includes('" resolves outside the project root')) return call?.root_mismatch === true ? 'binding' : 'boundary'
+  if (text.startsWith('Command blocked by security policy: ') || text.startsWith('File access blocked by security policy: ')) return 'policy_deny'
+  if (SERVER_ERRORS.some((p) => text.startsWith(p))) return 'server_error'
+  if ((text.startsWith('context-mode ') && line.includes(' directory is not writable: ')) || text.startsWith('Invalid CONTEXT_MODE_DIR for context-mode ')) return 'storage_directory'
+  if (USAGE_ERRORS.some((p) => text.startsWith(p))) return 'usage_error'
+  if (text.startsWith('Batch timed out after ') && digitsThen(text, 22, 'ms') > 0) return 'timeout'
+  if (text.startsWith('Failed to fetch ') || text.startsWith('Fetch error: ') || allFetchesFailed(text)
+    || (text.startsWith('Fetched ') && (line.includes(' but got empty content') || line.includes(' but could not read subprocess output')))) return 'remote_fetch'
+  return text.startsWith('BLOCKED: ') && digitsThen(text, 9, ' search calls in ') > 0 ? 'search_throttle' : null
+}
+// The stderr section of an exit output (the last one: the server writes stderr last) ends with a missing module.
+function moduleNotFound(rest) {
+  const at = rest.lastIndexOf('\n\nstderr:\n')
+  if (at < 0) return false
+  const stderr = rest.slice(at + 10)
+  if (stderr.includes('Cannot find module') || stderr.includes('ERR_MODULE_NOT_FOUND')) return true
+  const trimmed = stderr.trimEnd(), last = trimmed.slice(trimmed.lastIndexOf('\n') + 1).trimStart()
+  return last === 'ModuleNotFoundError' || last.startsWith('ModuleNotFoundError:')
+}
+// A ctx_execute or ctx_execute_file output after execution: the code echo first, then the server's own text.
+function ctxExecuted(name, call, text) {
+  const echo = ctxEcho(name, call?.input)
+  if (echo === null || !text.startsWith(echo)) return 'echo_mismatch'
+  const rest = text.slice(echo.length), line = firstLine(rest)
+  if (rest.startsWith('Execution timed out after ') && digitsThen(rest, 26, 'ms') > 0) return 'timeout'
+  if (rest.startsWith('Timed out processing ') && line.includes(' after ') && line.endsWith('ms')) return 'timeout'
+  if (rest.startsWith('Exit code: ') && digitsThen(rest, rest.charCodeAt(11) === 45 ? 12 : 11, '\n\nstdout:\n') > 0) return moduleNotFound(rest) ? 'module' : 'invoked_command_exit'
+  const at = rest.startsWith('Indexed ') ? digitsThen(rest, 8, ' sections from "') : -1
+  return at > 0 && (rest.startsWith('execute:', at) || rest.startsWith('file:', at)) && line.endsWith(':error" into knowledge base.') ? 'invoked_command_exit_indexed' : null
+}
+// One attempted MCP call's M15 class, or null for a success (s: its callState).
+export function mcpErrorClass(call, result, s = callState(call, result)) {
+  const name = String(call?.name || ''), ctx = isCtx(name)
+  const text = result ? (ctx ? withoutVersionNotice(resultText(result.content)) : resultText(result.content)) : ''
+  if (text.startsWith('MCP tool call requires approval, but approval policy is never')) return 'approval'
+  if (s.state === 'succeeded') return null
+  if (s.not_executed) return projectState(s)
+  if (s.state !== 'failed') return 'outcome_unknown'
+  if (!result) return 'unmatched'
+  return clientClass(text) ?? (ctx ? ctxRefusal(call, text) ?? (/__ctx_execute(?:_file)?$/.test(name) ? ctxExecuted(name, call, text) : null) : null) ?? 'unmatched'
+}
+// The counts of one server as rates. The graded rate is rate_upper_bound, the ceiling: every attempted call that neither succeeded nor
+// ended in the invoked command's own exit, the one exclusion the frozen M15 row names ("A non-zero exit from the command the child ran is
+// excluded"). The frozen row names six infrastructure classes and none of the classes outside the named groups below (policy_deny,
+// remote_fetch, search_throttle, and the M14 states rejected, invalid and cancelled_with_result; the cm-audit rows the U2 design cites for
+// the first three could not be verified here), so they count as errors until a dated amendment (Amendment 4) assigns them: the U2 design
+// 5.3 ("Grading reads rate_upper_bound until a dated amendment assigns the 'other' classes") and the Gate A binding decisions ("the
+// harder-to-pass reading applies"; the review's high finding: a server whose every call fails with the client's "No such tool available"
+// invalid call read rate 0). The ceiling is a residual, so a class a later template adds counts too; unassigned_errors is that residual
+// after the named groups, and over_threshold the verdict on the ceiling's count.
+// rate counts the infrastructure classes, every new class (named, or unmatched text) and every call whose class or outcome this reading
+// cannot establish (outcome_unknown; an indexed exit, which is the command's own exit or a hidden module error; echo_mismatch), since
+// binding decision B2 holds an unknown not successful: the rate if Amendment 4 finds the unassigned classes not infrastructure.
+// rate_lower_bound also counts those unknowns as successes, and threshold_sensitive marks a server whose two bounds, rate_lower_bound and
+// rate_upper_bound, fall on different sides of the threshold (B2's flag, which here also covers the class assignment).
+// every_error_classified is the criterion classify_every_ctx_error (no unmatched or echo_mismatch; binding decision B1 adds no status).
+function finishM15Row(row) {
+  const sum = (keys) => keys.reduce((n, k) => n + (row.classes[k] || 0), 0)
+  const infrastructure = sum(INFRASTRUCTURE_CLASSES), newClass = sum(NEW_CLASSES), unknowns = sum(UNKNOWN_CLASSES)
+  const ceiling = row.attempted - row.succeeded - (row.classes.invoked_command_exit || 0)
+  const over = (errors) => errors * M15_THRESHOLD_CALLS_PER_ERROR > row.attempted
+  return { attempted: row.attempted, succeeded: row.succeeded, ctx: row.ctx, classes: row.classes, infrastructure_errors: infrastructure,
+    new_class_errors: newClass, unknowns, unassigned_errors: ceiling - infrastructure - newClass - unknowns,
+    rate: share(infrastructure + newClass + unknowns, row.attempted), rate_lower_bound: share(infrastructure + newClass, row.attempted),
+    rate_upper_bound: share(ceiling, row.attempted), over_threshold: over(ceiling),
+    threshold_sensitive: over(ceiling) && !over(infrastructure + newClass), every_error_classified: !row.classes.unmatched && !row.classes.echo_mismatch }
+}
+const finishM15 = (servers) => ({ threshold: M15_THRESHOLD, by_server: Object.fromEntries(Object.entries(servers).map(([s, row]) => [s, finishM15Row(row)])) })
+function addM15(servers, server, ctx, cls) {
+  const row = servers[server] ||= { attempted: 0, succeeded: 0, ctx: false, classes: counter() }
+  row.attempted++
+  row.ctx ||= ctx
+  if (cls === null) row.succeeded++
+  else bump(row.classes, cls)
+}
 // A Bash call is carried by rtk proxy when its command invokes `rtk proxy` in command position (commandInvocations, through
 // the caller's per-call memo `proxied`); the earlier prefix rule survives only as measurement.proxy.prefix_rule_calls.
 // The rule before the command-position reading, kept as the fallback without a parser and as measurement.proxy.prefix_rule_calls.
@@ -1868,30 +2154,109 @@ const finishFetches = (f, carriers = null) => {
 // the five-exclusion probe; this does not identify its build or binary hash.
 // Keep every part (upstream discover stops at its first pipe). Complex shell
 // constructs are unknown, never guessed or executed. This is a local adapter.
-function shellParts(command) {
-  if (/<<|\$\(\(/.test(command)) return null
-  const parts = [], syntax = command.split('')
-  const part = (end, op) => ({ text: command.slice(start, end).trim(), syntax: syntax.slice(start, end).join('').trim(), op })
-  let start = 0, quote = null, depth = 0
-  for (let i = 0; i < command.length; i++) {
-    const ch = command[i]
-    if (ch === '\\' && quote !== "'") { syntax[i] = '_'; if (i + 1 < command.length) syntax[++i] = '_'; continue }
-    if (quote) { syntax[i] = '_'; if (ch === quote) quote = null; continue }
-    if (ch === "'" || ch === '"' || ch === '`') { syntax[i] = '_'; quote = ch; continue }
-    if (ch === '(' || ch === '{') { depth++; continue }
-    if (ch === ')' || ch === '}') { depth--; if (depth < 0) return null; continue }
-    if (depth) continue
-    if (ch === '#' && (i === 0 || /\s/.test(command[i - 1]))) return null
-    if (';&|\n'.includes(ch)) {
-      const op = command[i + 1] === ch && '&|'.includes(ch) ? ch + ch : ch
-      // & in 2>&1 is a redirection, not an asynchronous command boundary.
-      if (ch === '&' && command[i - 1] === '>') continue
-      parts.push(part(i, op))
-      i += op.length - 1; start = i + 1
-    }
+//
+// The parts of a shell command for M-R1 (binding decision B8): its top-level simple commands and pipeline stages, each with the control
+// operator after it (; ;; & && || | and newline; |& is read as |), outside quotes, "$( )", subshells, backquotes and { } groups, which stay
+// inside their part. The text is read unit by unit with U1's frame machine (step() above: quotes, escapes, comments, $(( )) and (( )),
+// "$( )" and backquote frames, and bash(1) DEFINITIONS' rule that the & of >& <& &> and the | of >| are redirections), with a ( or a
+// backquote at the top level opening a frame of its own. A here-document is data (bash(1) Here Documents; POSIX.1-2024 XCU 2.7.4): its body
+// begins after the first newline that no quote holds at the frame depth of its operator or shallower, and ends at the line that equals its
+// delimiter (after leading tabs for <<-), or at the end of the text, which bash reads as the delimiter; its delimiter is any word, quotes
+// removed (heredocWord, U1's reading of the operator's word). A top-level body lies between two parts and belongs to neither part's text; a
+// body inside a part (in a "$( )", say) stays in its text. Each part also has a syntax view in which quoted and escaped characters, comments, arithmetic and here-document bodies are the data
+// character _, so a > there is no redirection. null when the text cannot be read so (an open quote, frame or group, a ) or } that closes
+// nothing, a << with no word): M-R1 then counts the call as unknown. rtk v0.50.0 rewrites no command that holds a here-document or $((
+// (src/discover/registry.rs rewrite_command_precompiled, tag commit 1d87b8e7), so the eligible parts of such a call are observed uncovered.
+const QUOTE_FRAMES = new Set(["'", '"', '`'])
+const HEREDOC_WORD_END = new Set([...' \t\n;&|()<>'])
+// At most this many here-documents wait for their bodies at once (a command with more is unknown), so each newline checks a bounded list
+// and the scan stays linear; real commands hold a few.
+const HEREDOC_PENDING_LIMIT = 64, NO_HEREDOCS = []
+// The here-document operator << or <<- at s[i] with its word: { end, delimiter, strip }, or null when no word follows (a syntax error).
+function heredocOperator(s, i) {
+  let j = i + 2
+  const strip = s[j] === '-'
+  if (strip) j++
+  while (s[j] === ' ' || s[j] === '\t') j++
+  const from = j
+  while (j < s.length && !HEREDOC_WORD_END.has(s[j])) {
+    if (s[j] === "'") { const k = s.indexOf("'", j + 1); if (k < 0) return null; j = k + 1 }
+    else if (s[j] === '"') { let k = j + 1; while (k < s.length && s[k] !== '"') k += s[k] === '\\' ? 2 : 1; if (k >= s.length) return null; j = k + 1 }
+    else j += s[j] === '\\' ? 2 : 1
   }
-  if (quote || depth) return null
-  parts.push(part(command.length, ''))
+  return j === from ? null : { end: Math.min(j, s.length), delimiter: heredocWord(s.slice(from, Math.min(j, s.length))), strip }
+}
+// The index after the delimiter line of a here-document whose body starts at `at`, or s.length when no line closes it.
+function heredocEnd(s, at, h) {
+  while (at < s.length) {
+    const nl = s.indexOf('\n', at), end = nl < 0 ? s.length : nl
+    let k = at
+    if (h.strip) while (k < end && s[k] === '\t') k++
+    if (s.slice(k, end) === h.delimiter) return nl < 0 ? s.length : nl + 1
+    at = end + 1
+  }
+  return s.length
+}
+export function shellParts(command) {
+  const s = String(command ?? ''), syntax = s.split(''), parts = [], stack = [], heredocs = []
+  let start = 0, braces = 0, quoted = 0, broken = false // quoted: the quote frames (' " `) on the stack
+  const part = (end, op) => ({ text: s.slice(start, end).trim(), syntax: syntax.slice(start, end).join('').trim(), op })
+  const mask = (a, b) => { for (let k = a; k < b && k < s.length; k++) syntax[k] = '_' }
+  const on = {
+    cut: (i, frame) => { // a cut of the top level: its ( and backquote open a frame here, and a ) there closes nothing
+      if (frame !== undefined) return
+      if (s[i] === '(') stack.push({ depth: 0 })
+      else if (s[i] === '`') stack.push('`')
+      else if (s[i] === ')') broken = true
+    },
+    heredoc: () => {}, // never reached: every << outside a quote is read below before step() sees it
+  }
+  for (let i = 0; i < s.length;) {
+    const top = stack[stack.length - 1], ch = s[i]
+    if (!QUOTE_FRAMES.has(top)) {
+      // The bodies this newline begins: those of the operators read at its frame depth or deeper (a "$( )" reads its own here-documents at
+      // its own newlines, and one it leaves open is read after the enclosing line; GNU bash 5.2.21 and dash, 2026-09-29).
+      const ready = ch === '\n' && heredocs.length ? heredocs.filter((h) => h.depth >= stack.length) : NO_HEREDOCS
+      if (ready.length) {
+        const after = ready.reduce((at, h) => heredocEnd(s, at, h), i + 1)
+        heredocs.splice(0, heredocs.length, ...heredocs.filter((h) => h.depth < stack.length))
+        mask(i + 1, after)
+        if (!stack.length && !braces) { parts.push(part(i, '\n')); start = after }
+        i = after
+        continue
+      }
+      if (ch === '<' && s[i + 1] === '<' && s[i + 2] !== '<') {
+        const h = heredocOperator(s, i)
+        if (!h || heredocs.length >= HEREDOC_PENDING_LIMIT) return null
+        heredocs.push({ ...h, depth: stack.length })
+        i = h.end
+        continue
+      }
+      if (!stack.length) {
+        if (ch === '{') braces++
+        else if (ch === '}' && --braces < 0) return null
+        else if (!braces && (ch === ';' || ch === '&' || ch === '|' || ch === '\n')) {
+          const prev = s[i - 1], next = s[i + 1]
+          if (!(ch === '&' && (prev === '>' || prev === '<' || next === '>')) && !(ch === '|' && prev === '>')) {
+            const pipeBoth = ch === '|' && next === '&', op = pipeBoth ? '|' : ch !== '\n' && next === ch ? ch + ch : ch
+            parts.push(part(i, op))
+            i += pipeBoth ? 2 : op.length
+            start = i
+            continue
+          }
+        }
+      }
+    }
+    const depth = stack.length, before = quoted
+    const next = step(s, i, stack, on)
+    if (broken) return null
+    if (stack.length > depth && QUOTE_FRAMES.has(stack[stack.length - 1])) quoted++
+    else if (stack.length < depth && QUOTE_FRAMES.has(top)) quoted--
+    if (before || quoted || next - i > 1) mask(i, next)
+    i = next
+  }
+  if (stack.length || braces) return null
+  parts.push(part(s.length, ''))
   return parts.filter((p) => p.text)
 }
 // git(1) global options before the subcommand: -C, -c, --git-dir or --work-tree with the next word, or one --option.
@@ -1954,26 +2319,38 @@ export function sensitivePart(text) {
 }
 export const logFindPart = (text) => /^find\b/.test(text) || afterGitOptions(String.raw`log\b`, text)
 const safeConsumer = (part) => /^(?:cat|head)(?:\s|$)/.test(part) || /^tail(?:\s|$)/.test(part) && !/(?:^|\s)(?:-[^-\s]*[fF]|--follow)(?:\S*)/.test(part)
-const emptyRtk = () => ({ calls: 0, eligible_parts: 0, eligible_calls: 0, observed_covered_parts: 0, observed_all_covered_calls: 0,
-  replayed_covered_parts: 0, replayed_all_covered_calls: 0, explicit_rtk_on_excluded_or_sensitive: 0,
-  explicit_rtk_log_find_advisory: 0, log_find_permitted_parts: 0, log_find_requires_raw_parts: 0, log_find_unresolved_parts: 0,
-  proxy_parts: 0, ineligible_parts: 0, unknown_calls: 0 })
-function rtkParts(calls, rewrites, enabled, exceptions) {
+// The counters rtk_parts sums over actors. eligible_call_states holds, per M14 state (the call_states.by_server key set), the Bash calls with
+// at least one eligible part, and observed_covered_succeeded_calls those with an eligible part observed covered whose state is succeeded:
+// the per-child-task success signal of M1's rtk-claude lane (binding decision B5; U2 design 7.3; RUNBOOK.md: an actual non-error call).
+const RTK_COUNTERS = ['calls', 'eligible_parts', 'eligible_calls', 'observed_covered_parts', 'observed_all_covered_calls', 'replayed_covered_parts',
+  'replayed_all_covered_calls', 'explicit_rtk_on_excluded_or_sensitive', 'explicit_rtk_log_find_advisory', 'log_find_permitted_parts',
+  'log_find_requires_raw_parts', 'log_find_unresolved_parts', 'proxy_parts', 'ineligible_parts', 'unknown_calls', 'observed_covered_succeeded_calls']
+const emptyRtk = () => ({ ...Object.fromEntries(RTK_COUNTERS.map((k) => [k, 0])), eligible_call_states: emptyServerStates() })
+// Binding decision B8: M-R1 is not evaluable (status incomplete) when unknown calls exceed 5% of the Bash calls, compared on the counts, and
+// is evaluated on the parsed parts otherwise. unavailable and not_measured (no check ran) keep their meaning and have no shares.
+const RTK_UNKNOWN_PERCENT_LIMIT = 5
+const rtkStatus = (out) => out.unknown_calls * 100 > out.calls * RTK_UNKNOWN_PERCENT_LIMIT ? 'incomplete' : 'measured'
+const finishRtk = (out, status = rtkStatus(out)) => {
+  const checked = status === 'measured' || status === 'incomplete'
+  return { ...out, status, unknown_call_share: checked ? share(out.unknown_calls, out.calls) : null,
+    coverage: checked ? share(out.observed_covered_parts, out.eligible_parts) : null, call_coverage: checked ? share(out.observed_all_covered_calls, out.eligible_calls) : null }
+}
+function rtkParts(calls, rewrites, enabled, exceptions, results = new Map()) {
   const out = emptyRtk(), check = enabled ? rtkChecker() : null
-  if (!check) return { ...out, status: enabled ? 'unavailable' : 'not_measured', coverage: null, call_coverage: null }
+  if (!check) return finishRtk(out, enabled ? 'unavailable' : 'not_measured')
   for (const c of calls) {
     if (c.name !== 'Bash') continue
     out.calls++
-    const command = String(c.input?.command || ''), parts = shellParts(command), replay = check(command)
-    const executed = shellParts(rewrites.get(c.id) ?? command), predicted = shellParts(replay.rewrite ?? command)
-    if (!parts || !executed || !predicted || replay.error || parts.length !== executed.length || parts.length !== predicted.length) { out.unknown_calls++; continue }
-    let eligible = 0, observed = 0, covered = 0
-    for (const [i, part] of parts.entries()) {
+    const command = String(c.input?.command || ''), parts = shellParts(command)
+    if (!parts) { out.unknown_calls++; continue }
+    // What a part says about explicit rtk use needs only the command's own parts, so it counts for every call whose parts parse, including one
+    // M-R1 cannot classify below: M-R3 and M6c's zero counter must not lose a violation to a replay that could not be read.
+    const views = parts.map((part, i) => {
       const explicit = /^rtk\s+/.test(part.text), proxy = /^rtk\s+proxy\s+/.test(part.text)
       const raw = part.text.replace(/^rtk\s+(?:proxy\s+)?/, '')
       // #381 preregistration: acceptance/raw-proxy runs are a separate population.
       // Unclassified proxies still fail the separate M6 adjudication requirement.
-      if (proxy) { out.proxy_parts++; continue }
+      if (proxy) { out.proxy_parts++; return null }
       const downstream = []
       for (let j = i; parts[j]?.op === '|'; j++) downstream.push(parts[j + 1]?.text || '')
       // Native pipeline mode rewrites only supported grep/rg filter stages;
@@ -1983,7 +2360,7 @@ function rtkParts(calls, rewrites, enabled, exceptions) {
       // Same quote state as the splitter; quoted/escaped > is argument data.
       // RTK lexer redirect_has_file_target exempts fd duplication and /dev/null.
       const redirected = [...part.syntax.matchAll(/>+\s*([^\s]+)/g)].some((m) => m[1] !== '/dev/null' && !/^&(?:\d+|-)$/.test(m[1]))
-      if (explicit && !proxy && (sensitivePart(raw) || redirected || rawPipeline)) out.explicit_rtk_on_excluded_or_sensitive++
+      if (explicit && (sensitivePart(raw) || redirected || rawPipeline)) out.explicit_rtk_on_excluded_or_sensitive++
       if (explicit && logFindPart(raw)) {
         out.explicit_rtk_log_find_advisory++
         const review = exceptions[c.id]
@@ -1991,19 +2368,94 @@ function rtkParts(calls, rewrites, enabled, exceptions) {
           ? review.rtk_log_find.find((p) => p.part === i + 1)?.disposition : null
         out[disposition === 'permitted' ? 'log_find_permitted_parts' : disposition === 'requires_raw' ? 'log_find_requires_raw_parts' : 'log_find_unresolved_parts']++
       }
+      return { raw, rawPipeline, pipelineConsumer }
+    })
+    // M-R1 reads a call whole: its native replay, the command the hook ran and every part's standalone check. A call any of them fails for is
+    // one unknown call, whatever its number of parts, and adds nothing to the part counters (B8: out of the eligible-part denominators).
+    const replay = check(command), executed = shellParts(rewrites.get(c.id) ?? command), predicted = shellParts(replay.rewrite ?? command)
+    if (!executed || !predicted || replay.error || parts.length !== executed.length || parts.length !== predicted.length) { out.unknown_calls++; continue }
+    let eligible = 0, ineligible = 0, observed = 0, covered = 0, unknown = false
+    for (const [i, view] of views.entries()) {
+      if (!view) continue
       // Query EVERY standalone part, even exclusions; the native hook decides eligibility.
-      const alone = check(raw)
-      if (alone.error) { out.unknown_calls++; continue }
-      if (rawPipeline || pipelineConsumer || !alone.rewrite) { out.ineligible_parts++; continue }
+      const alone = check(view.raw)
+      if (alone.error) { unknown = true; break }
+      if (view.rawPipeline || view.pipelineConsumer || !alone.rewrite) { ineligible++; continue }
       eligible++
       if (/^rtk\s+(?!proxy\b)/.test(executed[i].text)) observed++
       if (/^rtk\s+(?!proxy\b)/.test(predicted[i].text)) covered++
     }
-    out.eligible_parts += eligible; out.observed_covered_parts += observed; out.replayed_covered_parts += covered
-    if (eligible) { out.eligible_calls++; out.observed_all_covered_calls += observed === eligible ? 1 : 0; out.replayed_all_covered_calls += covered === eligible ? 1 : 0 }
+    if (unknown) { out.unknown_calls++; continue }
+    out.eligible_parts += eligible; out.ineligible_parts += ineligible; out.observed_covered_parts += observed; out.replayed_covered_parts += covered
+    if (!eligible) continue
+    out.eligible_calls++; out.observed_all_covered_calls += observed === eligible ? 1 : 0; out.replayed_all_covered_calls += covered === eligible ? 1 : 0
+    const m = m14State(c, results.get(c.id) ?? null), states = out.eligible_call_states
+    states.attempted++; states[m.state]++
+    if (m.executed) states.executed++
+    if (observed && m.state === 'succeeded') out.observed_covered_succeeded_calls++
   }
-  return { ...out, status: out.unknown_calls ? 'incomplete' : 'measured', coverage: share(out.observed_covered_parts, out.eligible_parts), call_coverage: share(out.observed_all_covered_calls, out.eligible_calls) }
+  return finishRtk(out)
 }
+// Hook context (PR-A item 1). An insertion is a hook_additional_context row, the row M12 counts (E2E README.md M12 row: blind evidence
+// needs 0 hook_additional_context rows from any hook event); its content array holds one entry per hook whose context Claude Code delivered
+// (the hooks reference: "When several hooks return `additionalContext` for the same event, Claude receives all of the values"). A claim is a
+// hook_success row whose stdout asks for context and is never an insertion: JSON with hookSpecificOutput.additionalContext on any event,
+// or plain text (stdout that does not both start with { and end with }) on the four events whose plain stdout Claude Code adds as context
+// (code.claude.com/docs/en/hooks, "Exit code 0", fetched 2026-09-29). Every other hook_* row type is counted apart, descriptively.
+const PLAIN_STDOUT_EVENTS = new Set(['UserPromptSubmit', 'UserPromptExpansion', 'SessionStart', 'PostModelSwitch'])
+const HOOK_EVENT = /^[A-Z][A-Za-z]{0,39}$/
+// The by_hook key of a hook name: the name when it is name-shaped (SAFE_KEY), else, for <Event>:mcp__<server>__<tool> with an event-shaped
+// <Event> and a name-shaped <server>, <Event>:mcp__<server> (a long MCP tool name would otherwise be lost under '(other)'), else '(other)'.
+// [key, folded]
+function hookNameKey(name) {
+  const key = safeKey(name || '(none)')
+  if (key !== '(other)' || typeof name !== 'string') return [key, false]
+  const at = name.indexOf(':mcp__'), event = at > 0 ? name.slice(0, at) : ''
+  const server = HOOK_EVENT.test(event) ? mcpServer(name.slice(at + 1)) : null
+  const folded = server && server !== '(other)' ? safeKey(event + ':mcp__' + server) : '(other)'
+  return folded === '(other)' ? [key, false] : [folded, true]
+}
+// Usage iterations (binding decision B9; U2 correction 1). The beta Messages API reports usage.iterations[] (platform.claude.com/docs/en/api/
+// beta/messages/create, BetaIterationsUsage, fetched 2026-09-29): `message` entries are the executor's sampling iterations, and every top-level
+// counter is their sum; an `advisor_message` entry is an advisor sub-inference with its own model, billed at that model's rates and never in the
+// top-level counters (advisor tool doc, "Usage and billing"); a `compaction` entry is not in the top-level counters either; a `fallback_message`
+// entry ends a turn a fallback model served, whose top-level counters describe only the serving attempt, while a declined hop's `message` entry
+// is billed on conditions the transcript does not carry (refusals-and-fallback doc, "Billing and rate limits"). This reading reads `message` and
+// `advisor_message` entries. A message's usage is unreadable, and usage.complete false, when it carries any other entry, an entry that is not an
+// object or lacks a numeric counter, top-level counters unequal to the sum of its message entries (or fewer advisor entries than an earlier row
+// of the message), a successful advisor result without an advisor_message entry, or an advisor call without a result (the sub-inference may have
+// run); iteration_issues counts each reason. A window that ends between an advisor call and its result shows the earlier window a call without a
+// result: only an actor with a row at or after until can. Observed on this host (count-only scans, evidence/artifacts/pra-u2-differential-
+// 20260929): the top-level counters equal the sum of the message entries on every row with advisor entries (3,303 of 3,303); on a row with
+// several iterations the top-level cache_creation object holds the first iteration's 5m/1h split (3,706 of 3,706), while each entry's split
+// adds up to its own combined counter. A message's split is therefore the sum of its message entries' splits, and the top-level object's only
+// when the row carries no entries. speed, service_tier and inference_geo are the counted row's top-level values (an advisor entry carries none:
+// Priority Tier "applies to each model independently", advisor tool doc); each is null when absent, never 0.
+const ADVISOR_RESULTS = new Set(['advisor_result', 'advisor_redacted_result'])
+const ITERATION_ISSUES = ['inconsistent_messages', 'advisor_results_without_usage', 'advisor_calls_without_result']
+function readIterations(usage) {
+  const list = usage?.iterations
+  if (list === undefined || list === null) return { readable: true, entries: 0, unread: [], message: [], advisor: [] }
+  if (!Array.isArray(list)) return { readable: false, entries: 0, unread: ['(not_a_list)'], message: [], advisor: [] }
+  const out = { readable: true, entries: list.length, unread: [], message: [], advisor: [] }
+  for (const e of list) {
+    if (!e || typeof e !== 'object' || Array.isArray(e)) { out.unread.push('(not_an_object)'); continue }
+    const type = typeof e.type === 'string' && e.type ? e.type : null
+    if ((type === 'message' || type === 'advisor_message') && COUNTERS.every((k) => Number.isFinite(e[k]) && e[k] >= 0)) out[type === 'message' ? 'message' : 'advisor'].push(e)
+    else out.unread.push(type ? safeKey(type) : '(none)')
+  }
+  out.readable = !out.unread.length
+  return out
+}
+const splitOf = (cc) => [cc?.ephemeral_5m_input_tokens, cc?.ephemeral_1h_input_tokens].map((n) => Number.isFinite(n) && n >= 0 ? n : null)
+// [5m, 1h] of a row: its message entries' splits added up when it carries readable entries, its top-level cache_creation object when it carries
+// none, [null, null] when its entries are unreadable.
+function rowSplit(usage, read) {
+  if (!read.readable) return [null, null]
+  if (!read.entries) return splitOf(usage?.cache_creation)
+  return read.message.map((e) => splitOf(e.cache_creation)).reduce((a, b) => a.map((n, j) => n === null || b[j] === null ? null : n + b[j]), [0, 0])
+}
+const tierOf = (v) => typeof v === 'string' && v ? safeKey(v) : null
 // ccusage/ccusage v20.0.24 rust/adapters/claude/src/daily.rs:410-458,505-523;
 // #381 RUNBOOK mandates per-message deduplication. Keep absent counters unknown.
 export function transcriptUsage(transcript, window = null) {
@@ -2016,25 +2468,201 @@ export function transcriptUsage(transcript, window = null) {
     if (window && (at === null || at >= window.until)) continue
     const id = row.message.id || '(missing-' + i + ')'
     if (!row.message.id) unidentified++
-    const prev = messages.get(id) || { current: null, baseline: null }
+    const prev = messages.get(id) || { current: null, baseline: null, calls: new Set(), results: new Set(), succeeded: new Set() }
     if (!prev.current || total(row.message.usage) >= total(prev.current.message.usage)) prev.current = row
     if (window && at < window.since && (!prev.baseline || total(row.message.usage) >= total(prev.baseline.message.usage))) prev.baseline = row
+    // The advisor tool's blocks of the message, from every row read: a server_tool_use named advisor and its advisor_tool_result (advisor tool
+    // doc, "Result variants" and "Error results"; an error result reports no sub-inference usage).
+    for (const b of Array.isArray(row.message.content) ? row.message.content : []) {
+      if (b?.type === 'server_tool_use' && b.name === 'advisor') prev.calls.add(String(b.id))
+      else if (b?.type === 'advisor_tool_result') {
+        prev.results.add(String(b.tool_use_id))
+        if (ADVISOR_RESULTS.has(b.content?.type)) prev.succeeded.add(String(b.tool_use_id))
+      }
+    }
     messages.set(id, prev)
   }
-  const rows = []
-  for (const { current: row, baseline } of messages.values()) {
+  const rows = [], advisor = [], unread = counter(), issues = Object.fromEntries(ITERATION_ISSUES.map((k) => [k, 0]))
+  for (const m of messages.values()) {
+    const { current: row, baseline } = m
     if (row === baseline) continue
+    const top = row.message.usage, read = readIterations(top), before = baseline ? readIterations(baseline.message.usage) : null
     const usage = Object.fromEntries(COUNTERS.map((k) => {
-      const n = row.message.usage?.[k], before = baseline ? baseline.message.usage?.[k] : 0
-      return [k, Number.isFinite(n) && Number.isFinite(before) && n >= before ? n - before : null]
+      const n = top?.[k], was = baseline ? baseline.message.usage?.[k] : 0
+      return [k, Number.isFinite(n) && Number.isFinite(was) && n >= was ? n - was : null]
     }))
-    rows.push({ ordinal: rows.length + 1, model: safeKey(row.message.model || '(unresolved)'),
-      effort: EFFORTS.includes(row.effort) ? row.effort : null, usage })
+    const split = rowSplit(top, read), wasSplit = baseline ? rowSplit(baseline.message.usage, before) : [0, 0]
+    const [fiveMinutes, oneHour] = split.map((n, j) => n !== null && wasSplit[j] !== null && n >= wasSplit[j] ? n - wasSplit[j] : null)
+    const ordinal = rows.length + 1
+    rows.push({ ordinal, model: safeKey(row.message.model || '(unresolved)'), effort: EFFORTS.includes(row.effort) ? row.effort : null, usage,
+      cache_creation_5m: fiveMinutes, cache_creation_1h: oneHour, speed: tierOf(top?.speed), service_tier: tierOf(top?.service_tier), inference_geo: tierOf(top?.inference_geo) })
+    for (const type of read.unread) bump(unread, type)
+    if (read.readable && ((read.entries && COUNTERS.some((k) => top?.[k] !== read.message.reduce((n, e) => n + e[k], 0)))
+      || (before?.readable && before.advisor.length > read.advisor.length))) issues.inconsistent_messages++
+    issues.advisor_results_without_usage += Math.max(0, m.succeeded.size - read.advisor.length)
+    for (const call of m.calls) if (!m.results.has(call)) issues.advisor_calls_without_result++
+    // An advisor entry counts in the window of the first row that carries it: the counted row's entries beyond those of the baseline row.
+    for (const e of read.readable ? read.advisor.slice(before?.readable ? before.advisor.length : 0) : []) {
+      const [five, hour] = splitOf(e.cache_creation)
+      advisor.push({ message_ordinal: ordinal, model: typeof e.model === 'string' && e.model ? safeKey(e.model) : '(unresolved)',
+        usage: Object.fromEntries(COUNTERS.map((k) => [k, e[k]])), cache_creation_5m: five, cache_creation_1h: hour, speed: null, service_tier: null, inference_geo: null })
+    }
   }
   const totals = Object.fromEntries(COUNTERS.map((k) => [k, rows.length && rows.every((r) => r.usage[k] !== null) ? rows.reduce((n, r) => n + r.usage[k], 0) : null]))
+  const advisorTotals = Object.fromEntries(COUNTERS.map((k) => [k, advisor.reduce((n, a) => n + a.usage[k], 0)]))
+  const resolved = (model) => model !== '(other)' && model !== '(unresolved)'
   return { messages: rows, totals, unidentified_messages: unidentified,
-    complete: rows.length > 0 && !unidentified && Object.values(totals).every((n) => n !== null) && rows.every((r) => r.model !== '(other)' && r.model !== '(unresolved)') }
+    complete: rows.length > 0 && !unidentified && Object.values(totals).every((n) => n !== null) && rows.every((r) => resolved(r.model))
+      && !Object.keys(unread).length && ITERATION_ISSUES.every((k) => !issues[k]) && advisor.every((a) => resolved(a.model)),
+    advisor_iterations: advisor, advisor_totals: advisorTotals,
+    totals_including_advisor: Object.fromEntries(COUNTERS.map((k) => [k, totals[k] === null ? null : totals[k] + advisorTotals[k]])),
+    iteration_issues: { unread_entries: unread, ...issues } }
 }
+
+// PR-A item 6, incomplete returns (#381 AA-PLAN item 6: "a final text that is a wait notice or empty is not counted as complete"; U2 design
+// section 6). No upstream source defines a wait notice. This is the U2 design's rule, read by a linear word scanner rather than its regex
+// (CodeQL js/redos has flagged this kernel's patterns before): the trimmed text has at most 400 characters, and its first sentence (up to the
+// first . ! or ? that a blank follows) is, after at most three non-word characters, at most two of the lead phrases below, each followed by
+// blanks, then "wait" or "waiting", blanks and the whole word "for", "on" or "until", in any case. An apostrophe may also be the typographic
+// U+2019, which the design's regex left out.
+const WAIT_LEADS = ['still', 'now', "i'll", 'i will', "i'm", 'i am', 'let me', "we'll", 'we will']
+const WAIT_OBJECTS = ['for', 'on', 'until']
+const WAIT_TEXT_LIMIT = 400
+const wordUnit = (c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c === '_' // \w without the u flag
+export function waitNotice(text) {
+  const t = String(text ?? '').trim()
+  if (!t || t.length > WAIT_TEXT_LIMIT) return false
+  let s = t.toLowerCase().split('’').join("'")
+  for (let i = 0; i + 1 < s.length; i++) if ((s[i] === '.' || s[i] === '!' || s[i] === '?') && /\s/.test(s[i + 1])) { s = s.slice(0, i + 1); break }
+  const blanksAfter = (k) => { let j = k; while (j < s.length && /\s/.test(s[j])) j++; return j > k ? j : -1 } // the index after one or more blanks
+  let at = 0
+  while (at < 3 && at < s.length && !wordUnit(s[at])) at++
+  for (let leads = 0; leads < 2; leads++) {
+    const lead = WAIT_LEADS.find((w) => s.startsWith(w, at) && blanksAfter(at + w.length) > 0)
+    if (!lead) break
+    at = blanksAfter(at + lead.length)
+  }
+  const verb = s.startsWith('waiting', at) ? 'waiting' : s.startsWith('wait', at) ? 'wait' : null
+  at = verb ? blanksAfter(at + verb.length) : -1
+  return at > 0 && WAIT_OBJECTS.some((w) => s.startsWith(w, at) && !wordUnit(s[at + w.length] ?? ' '))
+}
+// The quality of a child's return (its journal result): null for no result (the child keeps its existing issue), else 'empty', 'wait_notice'
+// or 'ok'. A string is read as it is; an object with a string `answer` (the E2E schema, token-e2e-run.mjs) by its answer; any other object or
+// array by its leaves, down to depth 6 and over at most 10,000 values: 'empty' when no leaf is a non-blank string, a number or a boolean,
+// 'wait_notice' when at least one leaf is a non-blank string and every such string is a wait notice (the design's rule read literally made
+// { ok: true } a wait notice, since it has no string at all), else 'ok'. Values beyond the walk are content it cannot read, so 'ok'.
+const RETURN_WALK_DEPTH = 6, RETURN_WALK_VALUES = 10000
+const textQuality = (s) => !s.trim() ? 'empty' : waitNotice(s) ? 'wait_notice' : 'ok'
+export function returnQuality(value) {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'string') return textQuality(value)
+  if (typeof value !== 'object') return 'ok'
+  if (!Array.isArray(value) && typeof value.answer === 'string') return textQuality(value.answer)
+  let strings = 0, waits = 0, scalars = 0, values = 0, unread = false
+  for (const stack = [[value, 0]]; stack.length && !unread;) {
+    const [v, depth] = stack.pop()
+    if (typeof v === 'string') { if (v.trim()) { strings++; if (waitNotice(v)) waits++ } }
+    else if (typeof v === 'number' || typeof v === 'boolean') scalars++
+    else if (v && typeof v === 'object') {
+      if (depth >= RETURN_WALK_DEPTH) { unread = true; break }
+      for (const x of Object.values(v)) { if (++values > RETURN_WALK_VALUES) { unread = true; break } stack.push([x, depth + 1]) }
+    }
+  }
+  return unread ? 'ok' : strings && waits === strings ? 'wait_notice' : strings || scalars ? 'ok' : 'empty'
+}
+// The transcript side of item 6 (counts only): the kind of the final assistant row, whether its message's text is empty or a wait notice, and
+// the actor's background tasks still running at that row. A foreground subagent's background command "stops when that subagent gives its final
+// response" (code.claude.com/docs/en/tools-reference, "Background commands"), and the monitors of a stopped subagent "stop with it" ("Monitor
+// tool"); either way the return did not wait for the task's outcome. Count-only scans of this host (evidence/artifacts/pra-u2-differential-20260929/scans: final-returns,
+// task-notifications and task-stop) replace the design's rule, which read only backgroundTaskId and any notification: a task starts with a
+// result whose toolUseResult carries a backgroundTaskId (Bash run_in_background, or a command moved to the background at its timeout), a
+// Monitor or Workflow result's taskId, or an async Agent result's agentId (isAsync true); it ends with a <task-notification> naming it in
+// <task-id> whose <status> is completed, failed, killed or stopped (the values observed), found in a queued_command attachment's prompt, a user
+// row's string content or a user text block, or with a TaskStop result that is not an error and names it in toolUseResult.task_id (the client
+// sends no notification after a TaskStop of a Bash, Monitor or Workflow task: 88 of 88 observed). A notification with another status or none,
+// such as a Monitor event, ends nothing; background_pending_with_events counts the pending tasks that had one. Only rows before until and up to
+// the final assistant row are read. status: 'measured'; 'not_applicable' when no row is an assistant row with a provider message id (the Codex
+// bridge's normalized rows carry tool calls and results only, so their final return cannot be read); 'unobserved' when a row lies at or after
+// until (the actor ran past the window end, so its final return lies outside the window). Counters are null unless measured.
+const TERMINAL_TASK_STATUSES = new Set(['completed', 'failed', 'killed', 'stopped'])
+const FINAL_RETURN_COUNTS = ['empty_text', 'wait_notice', 'background_started', 'background_pending', 'background_pending_with_events']
+const NO_FINAL_RETURN = { final: null, ...Object.fromEntries(FINAL_RETURN_COUNTS.map((k) => [k, null])) }
+const tagText = (block, tag) => { const a = block.indexOf('<' + tag + '>'), b = a < 0 ? -1 : block.indexOf('</' + tag + '>', a); return b < 0 ? null : block.slice(a + tag.length + 2, b).trim() }
+// The <task-notification> blocks of a text as [{ task, status }], by indexOf (no pattern).
+function taskNotifications(text) {
+  const out = []
+  for (let at = 0; at < text.length;) {
+    const i = text.indexOf('<task-notification>', at)
+    if (i < 0) break
+    const j = text.indexOf('</task-notification>', i), block = text.slice(i, j < 0 ? text.length : j)
+    out.push({ task: tagText(block, 'task-id'), status: tagText(block, 'status') })
+    at = j < 0 ? text.length : j + 1
+  }
+  return out
+}
+export function finalReturn(transcript, window = null) {
+  const provider = (row) => row?.type === 'assistant' && typeof row.message?.id === 'string' && row.message.id !== ''
+  const kept = (row) => !window || (timeOf(row) !== null && timeOf(row) < window.until)
+  let last = -1, any = false, past = false
+  for (const [i, row] of transcript.entries()) {
+    if (provider(row)) any = true
+    if (window && timeOf(row) !== null && timeOf(row) >= window.until) past = true
+    else if (kept(row) && provider(row)) last = i
+  }
+  if (!any) return { status: 'not_applicable', ...NO_FINAL_RETURN }
+  if (past || last < 0) return { status: 'unobserved', ...NO_FINAL_RETURN }
+  const blocks = blocksOf(transcript[last]), id = transcript[last].message.id
+  const final = blocks.some((b) => b.type === 'tool_use') ? 'tool_use' : blocks.some((b) => b.type === 'text') ? 'text' : 'other'
+  const names = new Map(), started = new Set(), ended = new Set(), evented = new Set()
+  let text = ''
+  for (let i = 0; i <= last; i++) {
+    const row = transcript[i]
+    if (!row || typeof row !== 'object' || !kept(row)) continue
+    if (row.type === 'assistant') {
+      for (const b of blocksOf(row)) {
+        if (b.type === 'tool_use') names.set(b.id, b.name)
+        else if (final === 'text' && b.type === 'text' && typeof b.text === 'string' && row.message?.id === id) text += (text ? '\n' : '') + b.text
+      }
+      continue
+    }
+    const notes = []
+    if (row.type === 'attachment' && row.attachment?.type === 'queued_command') notes.push(textOf(row.attachment.prompt))
+    if (row.type === 'user') {
+      if (typeof row.message?.content === 'string') notes.push(row.message.content)
+      const said = row.toolUseResult && typeof row.toolUseResult === 'object' ? row.toolUseResult : null
+      for (const b of blocksOf(row)) {
+        if (b.type === 'text' && typeof b.text === 'string') notes.push(b.text)
+        if (b.type !== 'tool_result' || !said) continue
+        const tool = names.get(b.tool_use_id)
+        if (typeof said.backgroundTaskId === 'string') started.add(said.backgroundTaskId)
+        else if ((tool === 'Monitor' || tool === 'Workflow') && typeof said.taskId === 'string') started.add(said.taskId)
+        else if ((tool === 'Agent' || tool === 'Task') && said.isAsync === true && typeof said.agentId === 'string') started.add(said.agentId)
+        else if (tool === 'TaskStop' && !b.is_error && typeof said.task_id === 'string') ended.add(said.task_id)
+      }
+    }
+    for (const note of notes) for (const n of taskNotifications(note)) if (n.task !== null) (TERMINAL_TASK_STATUSES.has(n.status) ? ended : evented).add(n.task)
+  }
+  const pending = [...started].filter((t) => !ended.has(t))
+  return { status: 'measured', final, empty_text: final === 'text' && !text.trim() ? 1 : 0, wait_notice: final === 'text' && waitNotice(text) ? 1 : 0,
+    background_started: started.size, background_pending: pending.length, background_pending_with_events: pending.filter((t) => evented.has(t)).length }
+}
+// Actors by final_return status and final kind, with the counters summed over measured actors; a measurement without final_return (an
+// older shape) counts as not_applicable.
+function aggregateFinalReturns(items) {
+  const out = { measured: 0, not_applicable: 0, unobserved: 0, by_final: { text: 0, tool_use: 0, other: 0 },
+    ...Object.fromEntries(FINAL_RETURN_COUNTS.map((k) => [k, 0])), actors_with_background_pending: 0 }
+  for (const m of items) {
+    const f = m.final_return
+    if (!f || f.status === 'not_applicable') { out.not_applicable++; continue }
+    if (f.status !== 'measured') { out.unobserved++; continue }
+    out.measured++
+    if (Object.hasOwn(out.by_final, f.final)) out.by_final[f.final]++
+    for (const k of FINAL_RETURN_COUNTS) out[k] += f[k] || 0
+    if (f.background_pending) out.actors_with_background_pending++
+  }
+  return out
+}
+
 export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER } = {}) {
   const calls = new Map(), results = new Map(), rewrites = new Map()
   const inside = (row) => !window || (timeOf(row) !== null && timeOf(row) >= window.since && timeOf(row) < window.until)
@@ -2050,18 +2678,30 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     }
   }
   const m3 = emptySizes(), m5 = emptySizes(), carriers = counter(), excluded = counter(), m4 = emptyFetches(), fetchCarriers = counter()
-  const hookContext = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }
+  // inserted counts rows and inserted_blocks their content entries; with_marker counts rows; claims and other hook rows see hookContext above.
+  const hookContext = { inserted: 0, inserted_blocks: 0, claimed: 0, with_marker: 0, hook_names_folded: 0, by_hook: counter(), by_event: counter(),
+    blocks_by_event: counter(), claimed_by_event: counter(), claimed_plain_stdout: counter(), other_hook_rows: counter() }
   for (const row of transcript) {
     if (!inside(row)) continue
     const a = row?.attachment
-    if (a?.type === 'hook_additional_context') {
+    if (typeof a?.type !== 'string' || !a.type.startsWith('hook_')) continue
+    const event = safeKey(a.hookEvent || '(none)')
+    if (a.type === 'hook_additional_context') {
+      const blocks = Array.isArray(a.content) ? a.content.length : typeof a.content === 'string' && a.content ? 1 : 0
+      const [key, folded] = hookNameKey(a.hookName)
       hookContext.inserted++
-      bump(hookContext.by_hook, safeKey(a.hookName || '(none)'))
-      bump(hookContext.by_event, safeKey(a.hookEvent || '(none)'))
+      hookContext.inserted_blocks += blocks
+      if (folded) hookContext.hook_names_folded++
+      bump(hookContext.by_hook, key)
+      bump(hookContext.by_event, event)
+      hookContext.blocks_by_event[event] = (hookContext.blocks_by_event[event] || 0) + blocks
       if (textOf(a.content).includes(marker)) hookContext.with_marker++
-    } else if (a?.type === 'hook_success') {
-      try { if (JSON.parse(a.stdout).hookSpecificOutput?.additionalContext) hookContext.claimed++ } catch { /* no claim */ }
-    }
+    } else if (a.type === 'hook_success') {
+      const out = typeof a.stdout === 'string' ? a.stdout.trim() : ''
+      if (out.startsWith('{') && out.endsWith('}')) {
+        try { if (JSON.parse(out).hookSpecificOutput?.additionalContext) { hookContext.claimed++; bump(hookContext.claimed_by_event, event) } } catch { /* a parse failure adds nothing */ }
+      } else if (out && PLAIN_STDOUT_EVENTS.has(a.hookEvent)) bump(hookContext.claimed_plain_stdout, event)
+    } else bump(hookContext.other_hook_rows, safeKey(a.type))
   }
   // One command-position reading per call (U1 design 2.6): carrierOf, measurement.proxy and cli_lanes all read it. It needs a verified
   // tree-sitter-bash install (loadShellParser); without one nothing is read, cli_lanes says why, and the carrier of an rtk proxy call is
@@ -2072,7 +2712,12 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   const proxied = lanesOn ? (c) => analysisOf(c).proxy > 0 : rtkProxyPrefix
   for (const c of calls.values()) if (inside(c.row)) countFetches(c, fetchCarriers[carrierOf(c, proxied)] ||= emptyFetches())
   for (const f of Object.values(fetchCarriers)) for (const k of Object.keys(m4)) m4[k] += f[k]
-  const mcpStates = counter(), loaded = counter(), cli = emptyCliLanes()
+  // mcpAttempted splits the MCP calls attempted in the window by tool: a ctx_ tool (isCtx, as M5 and the ctx carrier read it) or another,
+  // for the AA §1 per-actor figures "children with any MCP call" and "children with a non-ctx MCP call" (aggregateMeasurements).
+  const mcpStates = counter(), loaded = counter(), notCalled = counter(), mcpAttempted = { ctx: 0, non_ctx: 0 }, cli = emptyCliLanes()
+  // PR-A item 7: every call attempted in the window, in M14's names (callStates above); one callState per call, which cli_lanes reads too.
+  // Protocol M15: every attempted MCP call's class, per server (mcpErrorClass).
+  const callStates = emptyCallStates(), m15 = counter()
   // measurement.proxy: the M6 population is the Bash calls carried by rtk proxy (sandbox-nested Codex calls included, as
   // before), with its invocations; rtk proxy in ctx shell code is reported apart and left out of M6, and the prefix rule's
   // count is kept for comparison with earlier receipts.
@@ -2080,7 +2725,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     rule: lanesOn ? 'command_position' : 'prefix_fallback' }
   for (const c of calls.values()) {
     if (!inside(c.row)) continue
-    const server = mcpServer(c.name), r = results.get(c.id)
+    const server = mcpServer(c.name), r = results.get(c.id), s = callState(c, r)
+    addCallState(callStates, m14Of(s), server, c.sandbox)
     if (server) {
       const state = mcpStates[server] ||= { attempted: 0, succeeded: 0, failed: 0, unfinished: 0 }
       // Codex UI items can retain status without a model-visible result payload
@@ -2088,6 +2734,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       const status = r ? (r.is_error ? 'failed' : 'succeeded')
         : c.native_status === 'completed' ? 'succeeded' : c.native_status === 'failed' ? 'failed' : 'unfinished'
       state.attempted++; state[status]++
+      mcpAttempted[isCtx(c.name) ? 'ctx' : 'non_ctx']++
+      addM15(m15, server, isCtx(c.name), mcpErrorClass(c, r, s))
     }
     const analysis = lanesOn ? analysisOf(c) : null, carrier = carrierOf(c, proxied)
     if (rtkProxyPrefix(c)) proxy.prefix_rule_calls++
@@ -2100,11 +2748,17 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
         : validReview(review) && EXCEPTIONS.includes(review.exception) ? 'exception' : 'unclassified']++
     } else if (lanesOn && isCtx(c.name) && analysis.proxy) proxy.in_ctx_code++
     if (lanesOn && analysis.errors) cli.parse_errors++ // calls whose shell text has a syntax error, not nodes
-    if (lanesOn && analysis.invocations.length) countLanes(cli, analysis, callState(c, r), c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
+    if (lanesOn && analysis.invocations.length) countLanes(cli, analysis, s, c.sandbox ? 'nested' : isCtx(c.name) ? 'ctx' : carrier)
   }
+  // PR-A item 5: loaded counts the tool references a ToolSearch result inside the window returned, per MCP server, whether or not the actor
+  // called the server; loaded_not_called keeps the #432 unit, the references of servers the actor attempted no call on inside the window
+  // (a call before since does not make a later load a call). Built-in tools (a reference such as Read) name no server.
   for (const [id, r] of results) if (inside(r.row) && calls.get(id)?.name === 'ToolSearch' && Array.isArray(r.content)) {
     for (const ref of r.content) if (ref?.type === 'tool_reference') {
-      const server = mcpServer(ref.tool_name); if (server && !mcpStates[server]) bump(loaded, server)
+      const server = mcpServer(ref.tool_name)
+      if (!server) continue
+      bump(loaded, server)
+      if (!mcpStates[server]) bump(notCalled, server)
     }
   }
   let orphanResults = 0, invalidExceptions = 0, unknownResultBytes = 0
@@ -2118,8 +2772,8 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     if (c?.sandbox) continue // Nested results return to code, not model context.
     if (!c) orphanResults++
     if (r.content === undefined || r.content === null) { unknownResultBytes++; continue }
-    const n = contentBytes(r.content)
-    addSize(carriers[carrier] ||= emptySizes(), n)
+    const n = contentBytes(r.content), shape = n > RESULT_LIMIT ? largeShape(r.content, c) : null
+    addSize(carriers[carrier] ||= emptySizes(), n, shape)
     let exception = null
     if (!r.is_error && c?.name === 'Read' && c.input?.file_path && edits.some((e) => e.index > r.index && e.input.file_path === c.input.file_path && e.row.cwd === c.row.cwd)) exception = EXCEPTIONS[0]
     if (Object.hasOwn(exceptions, id)) {
@@ -2127,17 +2781,18 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
       if (validReview(review)) exception = EXCEPTIONS.includes(review.exception) ? review.exception : exception
       else invalidExceptions++
     }
-    if (exception) addSize(excluded[exception] ||= emptySizes(), n)
-    else addSize(m3, n)
-    if (carrier === 'ctx') addSize(m5, n)
+    if (exception) addSize(excluded[exception] ||= emptySizes(), n, shape)
+    else addSize(m3, n, shape)
+    if (carrier === 'ctx') addSize(m5, n, shape)
   }
   const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
   const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
   return { m3: finishSizes(m3), m4: finishFetches(m4, fetchCarriers), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
-    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions),
-    usage: transcriptUsage(transcript, window),
+    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions, results),
+    usage: transcriptUsage(transcript, window), final_return: finalReturn(transcript, window),
     hook_context: hookContext,
-    mcp_states: mcpStates, loaded_not_called: loaded,
+    call_states: callStates, m15: finishM15(m15),
+    mcp_states: mcpStates, mcp_attempted: mcpAttempted, loaded_not_called: notCalled, loaded,
     proxy: { ...proxy, acceptance_or_exception_share: share(proxy.acceptance + proxy.exception, proxy.calls) },
     cli_lanes: lanesOn ? { status: 'measured', parser: { versions: parserState.versions, wasm_sha256: parserState.wasm_sha256 }, ...cli } : { status: 'parser_unavailable', reason: parserState.reason },
     invalid_exceptions: invalidExceptions, orphan_results: orphanResults,
@@ -2146,9 +2801,65 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
     calls_without_result: unfinished }
 }
 
+// The private per-call ledger (AA:319, the per-child list of tool_use_ids with each call's state; U2 design 4.5): one record per call
+// attempted in the window (tool_use blocks deduplicated by id, counted in the window of their row, as measureTranscript counts them), in
+// the order of their rows, keyed by (session_id, tool_use_id) as the E2E README M14 row requires, with the call's M14 state and cause and,
+// for an MCP call, its M15 class. session_id and owner come from the call's row: owner is its agentId, 'main' for a row with a sessionId
+// and no agentId, and null for a row with neither, such as a Codex bridge row, whose conversation.id and owner the Codex adapter supplies.
+// Nothing here is published: the CLI writes the records only behind --call-ledger (writeLedger).
+export function callLedger(transcript, { window = null } = {}) {
+  const calls = new Map(), results = new Map()
+  const inside = (row) => !window || (timeOf(row) !== null && timeOf(row) >= window.since && timeOf(row) < window.until)
+  for (const row of transcript) {
+    if (window && (timeOf(row) === null || timeOf(row) >= window.until)) continue
+    for (const b of blocksOf(row)) {
+      if (row.type === 'assistant' && b.type === 'tool_use' && !calls.has(b.id)) calls.set(b.id, { ...b, row })
+      if (row.type === 'user' && b.type === 'tool_result' && !results.has(b.tool_use_id)) results.set(b.tool_use_id, { ...b, row })
+    }
+  }
+  const named = (v) => typeof v === 'string' && v ? v : null
+  const records = []
+  for (const c of calls.values()) {
+    if (!inside(c.row)) continue
+    const r = results.get(c.id), s = callState(c, r), m = m14Of(s), server = mcpServer(c.name)
+    const session = named(c.row?.sessionId), agent = named(c.row?.agentId)
+    records.push({ session_id: session, owner: agent ?? (session ? 'main' : null), tool_use_id: c.id, tool: String(c.name ?? ''), server,
+      state: m.state, cause: m.cause, native_status: named(c.native_status), background: m.background, sandbox: Boolean(c.sandbox),
+      code_mode: Boolean(c.code_mode), m15_class: server ? mcpErrorClass(c, r, s) : null })
+  }
+  return records
+}
+// --call-ledger: the ledger holds call, session and agent ids, so it is only created, never written over an existing file (whose mode could
+// be wider than 0600: the review's finding on the mkdtemp precedent), in an existing directory outside every git work tree (a directory that
+// holds .git, or one below it; skill_usage.py write_out refuses its own checkout, and this refuses any). { path } or { error }.
+export function ledgerTarget(path) {
+  const target = resolve(String(path))
+  let dir
+  try { dir = realpathSync(dirname(target)) } catch { return { error: 'the directory for the ledger does not exist' } }
+  try { if (!statSync(dir).isDirectory()) return { error: 'the ledger path must name a file in a directory' } } catch { return { error: 'the directory for the ledger cannot be read' } }
+  for (let d = dir; ; d = dirname(d)) {
+    if (existsSync(join(d, '.git'))) return { error: 'refusing a path inside a git work tree: the ledger holds call and session ids' }
+    if (dirname(d) === d) break
+  }
+  const file = join(dir, pathBasename(target))
+  try { lstatSync(file); return { error: 'refusing an existing file: the ledger is created, never written over' } } catch { /* absent, as required */ }
+  return { path: file }
+}
+// JSONL, created exclusively ('wx') with mode 0600, then set to 0600 against a umask.
+export function writeLedger(path, records) {
+  const fd = openSync(path, 'wx', 0o600)
+  try {
+    fchmodSync(fd, 0o600)
+    writeFileSync(fd, records.map((r) => JSON.stringify(r) + '\n').join(''))
+  } finally { closeSync(fd) }
+}
+
+const HOOK_SCALARS = ['inserted', 'inserted_blocks', 'claimed', 'with_marker', 'hook_names_folded']
+const HOOK_MAPS = ['by_hook', 'by_event', 'blocks_by_event', 'claimed_by_event', 'claimed_plain_stdout', 'other_hook_rows']
+// The carriers of the AA §1 per-child shell/web figure: Bash, rtk proxy and WebFetch results (WebSearch results stay in 'other').
+const SHELL_WEB_CARRIERS = ['bash', 'rtk_proxy', 'webfetch']
 export function aggregateMeasurements(items) {
-  const sizes = (rows) => finishSizes(rows.reduce((a, b) => ({ results: a.results + b.results, bytes: a.bytes + b.bytes,
-    large_results: a.large_results + b.large_results, large_bytes: a.large_bytes + b.large_bytes, max_bytes: Math.max(a.max_bytes, b.max_bytes) }), emptySizes()))
+  const sizes = (rows) => finishSizes(sumSizes(rows))
   const groups = (key) => Object.fromEntries([...new Set(items.flatMap((m) => Object.keys(m[key])))].sort().map((k) => [k, sizes(items.map((m) => m[key][k]).filter(Boolean))]))
   const f = emptyFetches(), fetchCarriers = counter(), rtk = emptyRtk()
   for (const m of items) {
@@ -2157,10 +2868,29 @@ export function aggregateMeasurements(items) {
       const target = fetchCarriers[carrier] ||= emptyFetches()
       for (const k of Object.keys(target)) target[k] += counts[k]
     }
-    for (const k of Object.keys(rtk)) rtk[k] += m.rtk_parts[k]
+    for (const k of RTK_COUNTERS) rtk[k] += m.rtk_parts[k] || 0
+    for (const k of M14_SERVER_KEYS) rtk.eligible_call_states[k] += m.rtk_parts.eligible_call_states?.[k] || 0
   }
+  // rtk_parts.status: B8's rule on the summed counts when every actor's parts were checked (measured or incomplete), never a vote of the
+  // actors' statuses; otherwise the one status every actor has (unavailable or not_measured), or incomplete for a mix.
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
-  const hooks = { inserted: 0, claimed: 0, with_marker: 0, by_hook: counter(), by_event: counter() }, states = counter(), loaded = counter()
+  const rtkChecked = rtkStates.length > 0 && rtkStates.every((s) => s === 'measured' || s === 'incomplete')
+  // actors_with_insertion counts the actors with at least one insertion row; loaded_actors and loaded_not_called_actors count, per server,
+  // the actors with at least one such reference: the unit of the historical 'Loaded, never called' baseline row (children per server).
+  const hooks = { ...Object.fromEntries(HOOK_SCALARS.map((k) => [k, 0])), actors_with_insertion: 0, ...Object.fromEntries(HOOK_MAPS.map((k) => [k, counter()])) }
+  const states = counter(), notCalled = counter(), loaded = counter(), loadedActors = counter(), notCalledActors = counter()
+  const callStates = emptyCallStates() // M14 counters add up over actors; decided stays null
+  for (const m of items) sumCallStates(callStates, m.call_states)
+  // M15: each server's attempts, successes and classes add up over actors, and the rates are computed again from the sums.
+  const m15 = counter()
+  for (const m of items) for (const [server, row] of Object.entries(m.m15?.by_server || {})) {
+    const total = m15[server] ||= { attempted: 0, succeeded: 0, ctx: false, classes: counter() }
+    total.attempted += row.attempted || 0
+    total.succeeded += row.succeeded || 0
+    total.ctx ||= Boolean(row.ctx)
+    for (const [k, n] of Object.entries(row.classes || {})) total.classes[k] = (total.classes[k] || 0) + n
+  }
+  const addCounts = (target, source) => { for (const [s, n] of Object.entries(source || {})) target[s] = (target[s] || 0) + n }
   const proxies = { calls: 0, acceptance: 0, exception: 0, unclassified: 0, invocations: 0, nested: 0, in_ctx_code: 0, prefix_rule_calls: 0 }
   // CLI lanes sum their counters over the actors whose lanes were measured; actors_with_success counts the actors with at least one
   // succeeded call of the lane. An actor measured without a parser has no lane counts (cli_lanes.status parser_unavailable), so the
@@ -2170,10 +2900,14 @@ export function aggregateMeasurements(items) {
   const records = new Set(measured.map((m) => JSON.stringify(m.cli_lanes.parser ?? null)))
   const rules = new Set(items.map((m) => m.proxy.rule ?? 'command_position'))
   for (const m of items) {
-    for (const k of ['inserted', 'claimed', 'with_marker']) hooks[k] += m.hook_context[k]
-    for (const k of ['by_hook', 'by_event']) for (const [s, n] of Object.entries(m.hook_context[k])) hooks[k][s] = (hooks[k][s] || 0) + n
+    for (const k of HOOK_SCALARS) hooks[k] += m.hook_context[k] || 0
+    for (const k of HOOK_MAPS) addCounts(hooks[k], m.hook_context[k])
+    if (m.hook_context.inserted) hooks.actors_with_insertion++
     for (const [s, row] of Object.entries(m.mcp_states)) for (const [k, n] of Object.entries(row)) { states[s] ||= counter(); states[s][k] = (states[s][k] || 0) + n }
-    for (const [s, n] of Object.entries(m.loaded_not_called)) loaded[s] = (loaded[s] || 0) + n
+    addCounts(notCalled, m.loaded_not_called)
+    addCounts(loaded, m.loaded)
+    for (const s of Object.keys(m.loaded_not_called)) bump(notCalledActors, s)
+    for (const s of Object.keys(m.loaded || {})) bump(loadedActors, s)
     for (const k of Object.keys(proxies)) proxies[k] = proxies[k] === null || m.proxy[k] === null ? null : proxies[k] + (m.proxy[k] || 0)
     const part = m.cli_lanes
     if (!part || statusOf(m) !== 'measured') continue
@@ -2191,13 +2925,21 @@ export function aggregateMeasurements(items) {
     for (const k of ['calls_with_lane_invocation', 'unresolved_programs', 'remote_invocations', 'parse_errors']) cli[k] += part[k] || 0
   }
   return { actors: items.length, m3: sizes(items.map((m) => m.m3)), m5: sizes(items.map((m) => m.m5)), m4: finishFetches(f, fetchCarriers),
-    hook_context: hooks, mcp_states: states, loaded_not_called: loaded,
+    hook_context: hooks, call_states: callStates, m15: finishM15(m15), final_return: aggregateFinalReturns(items),
+    mcp_states: states, loaded_not_called: notCalled, loaded, loaded_actors: loadedActors, loaded_not_called_actors: notCalledActors,
     proxy: { ...proxies, rule: rules.size === 1 ? [...rules][0] : 'mixed', acceptance_or_exception_share: share(proxies.acceptance + proxies.exception, proxies.calls) },
     cli_lanes: !items.length ? { status: 'not_measured' }
       : unavailable.length === items.length ? { status: 'parser_unavailable', reason: unavailable[0].cli_lanes.reason }
         : { status: measured.length === items.length && records.size === 1 ? 'measured' : 'incomplete', ...(records.size === 1 ? { parser: JSON.parse([...records][0]) } : {}),
           ...(measured.length === items.length ? {} : { actors_measured: measured.length, actors_unmeasured: items.length - measured.length }), ...cli },
     m3_large_results_per_actor: tokenStats(items.map((m) => m.m3.large_results)),
+    // AA §1 figures that exist per actor only (the scope extract's baseline derivation order): the per-child distribution of shell/web results
+    // over RESULT_LIMIT, the actors with any MCP call attempted in the window and with one that is not a ctx_ tool, and M5's population, the
+    // actors with a ctx result ("All B children using ctx", E2E README.md M5 row).
+    shell_web_large_results_per_actor: tokenStats(items.map((m) => SHELL_WEB_CARRIERS.reduce((n, k) => n + (m.by_carrier[k]?.large_results || 0), 0))),
+    actors_with_mcp_call: items.filter((m) => Object.values(m.mcp_states).some((s) => s.attempted > 0)).length,
+    actors_with_non_ctx_mcp_call: items.filter((m) => m.mcp_attempted?.non_ctx > 0).length,
+    actors_with_ctx_results: items.filter((m) => m.m5.results > 0).length,
     by_carrier: groups('by_carrier'), exceptions: groups('exceptions'),
     orphan_results: items.reduce((n, m) => n + m.orphan_results, 0),
     sandbox_operations: items.reduce((n, m) => n + m.sandbox_operations, 0),
@@ -2205,10 +2947,18 @@ export function aggregateMeasurements(items) {
     bytes_complete: items.length > 0 && items.every((m) => m.bytes_complete && !m.parse_errors),
     invalid_exceptions: items.reduce((n, m) => n + m.invalid_exceptions, 0),
     calls_without_result: items.reduce((n, m) => n + m.calls_without_result, 0),
-    rtk_parts: { ...rtk, status: rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured',
-      coverage: share(rtk.observed_covered_parts, rtk.eligible_parts), call_coverage: share(rtk.observed_all_covered_calls, rtk.eligible_calls) },
-    ...(items.every((m) => m.usage) ? { usage: { complete: items.length > 0 && items.every((m) => m.usage.complete),
-      totals: Object.fromEntries(COUNTERS.map((k) => [k, items.length && items.every((m) => m.usage.totals[k] !== null) ? items.reduce((n, m) => n + m.usage.totals[k], 0) : null])) } } : {}) }
+    rtk_parts: finishRtk(rtk, rtkChecked ? rtkStatus(rtk) : rtkStates.length === 1 ? rtkStates[0] : items.length ? 'incomplete' : 'not_measured'),
+    ...(items.every((m) => m.usage) ? { usage: aggregateUsage(items.map((m) => m.usage)) } : {}) }
+}
+// Usage over actors (a measurement without usage, such as a Codex one whose provider_usage replaces it, leaves the aggregate without usage):
+// a counter is null when any actor's is unknown; advisor_iteration_count counts the actors' advisor_iterations; iteration_issues add up.
+function aggregateUsage(usages) {
+  const sum = (key) => Object.fromEntries(COUNTERS.map((k) => [k, usages.length && usages.every((u) => Number.isFinite(u[key]?.[k])) ? usages.reduce((n, u) => n + u[key][k], 0) : null]))
+  const unread = counter()
+  for (const u of usages) for (const [type, n] of Object.entries(u.iteration_issues?.unread_entries || {})) unread[type] = (unread[type] || 0) + n
+  return { complete: usages.length > 0 && usages.every((u) => u.complete), totals: sum('totals'), advisor_totals: sum('advisor_totals'),
+    totals_including_advisor: sum('totals_including_advisor'), advisor_iteration_count: usages.reduce((n, u) => n + (u.advisor_iterations || []).length, 0),
+    iteration_issues: { unread_entries: unread, ...Object.fromEntries(ITERATION_ISSUES.map((k) => [k, usages.reduce((n, u) => n + (u.iteration_issues?.[k] || 0), 0)])) } }
 }
 
 // Private adjudications are bound to exact transcript bytes; only the exception's
@@ -2412,8 +3162,10 @@ const LANES_LIMITS = 'Counts come from native transcript rows inside [since, unt
 
 const CLI_LANES_LIMITS = 'cli_lanes counts lane executables in command position of the shell text a call runs, read with the pinned tree-sitter-bash install that loadShellParser verified (its versions and wasm sha256 values are in cli_lanes.parser; without it cli_lanes is only { status: parser_unavailable, reason } and measurement.proxy uses the prefix rule, rule prefix_fallback) (Bash commands, shell ctx code, ctx_batch_execute commands and sandbox-nested Codex commands), behind wrappers, package runners and rtk proxy, with rtk proxy calls in ctx code apart from measurement.proxy; it cannot see aliases, shell functions called by name (a function body counts where it is defined), programs a variable names (an eval of literal words is read), scripts and Makefile or npm targets that call a lane, find -exec, parallel, watch or other unknown wrappers, subprocesses of non-shell code, or how often xargs runs its utility; text the grammar reports as an error is skipped and its calls are counted in parse_errors. A call state covers every command of the call (ambiguous marks more than one), and ssh-run lane invocations count only in remote_invocations.'
 
-// Lane use of every child transcript under the roots that has a row inside [since, until).
-export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [] } = {}) {
+const U2_LIMITS = 'U2 fields (2026-09-29): hook_context keeps inserted rows, their content blocks and stdout claims apart, by event; loaded counts tool references and loaded_actors the actors per server; a result over the limit is read as JSON or uniform-tabular only after its carrier wrapper (the ctx code echo, Read line numbers), else it counts in large_shape_unknown; usage.complete is false when usage iterations cannot be read, and advisor iterations are counted apart; call_states gives every call one sealed M14 state (decided is null, since a transcript cannot observe the decision; cancelled_or_unfinished has no result), and call and session ids exist only in the private --call-ledger file; m15 is graded on rate_upper_bound, whose count over_threshold compares: every call that neither succeeded nor ended in a non-zero exit of the command it ran, since the classes outside the named groups (unassigned_errors) count as errors until Amendment 4 assigns them; rate counts calls of unknown outcome as errors (B2) but not the unassigned classes, rate_lower_bound neither, and threshold_sensitive marks a server whose rate_lower_bound and rate_upper_bound fall on different sides of the threshold; final_return is not_applicable without provider message ids and unobserved for an actor that ran past the window end; rtk_parts counts a call it cannot classify once in unknown_calls and in no part counter, and its status is incomplete only when such calls exceed 5% of Bash calls (B8).'
+// Lane use of every child transcript under the roots that has a row inside [since, until). onLedger, when given, receives each actor's
+// private call ledger (callLedger) with the ordinal the actor has in the published actors list; nothing of it enters the returned report.
+export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT_MARKER, rtk = null, rtkCheck = false, exceptionRecords = [], onLedger = null } = {}) {
   const window = { since: since ?? -Infinity, until: until ?? Infinity }
   const unreadable = { count: 0 }
   const files = findChildTranscripts(roots, unreadable, true)
@@ -2449,6 +3201,7 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     }
     actor.lanes.measurement.parse_errors = errors
     if (errors) { actor.lanes.measurement.bytes_complete = false; actor.lanes.measurement.usage.complete = false }
+    if (onLedger) actor.ledger = callLedger(rows, { window })
     ;(file.spawn === 'main' ? main : children).push(actor)
   }
   // Sessions are reported as session-01, session-02 ... in order of their earliest child row, never by id.
@@ -2464,6 +3217,8 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
   const blind = (c) => c.agent_type.startsWith('blind-')
   const iso = (t) => Number.isFinite(t) ? new Date(t).toISOString() : null
   const bound = exceptionRecords.filter((r) => measuredDigests.has(r.transcript_sha256)).length
+  // The actors list below numbers children, then main sessions, from 1; each ledger record carries its actor's number.
+  if (onLedger) [...children, ...main].forEach((c, i) => { onLedger(c.ledger.map((r) => ({ ...r, actor_ordinal: i + 1 }))); delete c.ledger })
   return {
     kind: 'claude_child_lane_usage', schema_version: 1,
     window: { since: iso(window.since), until: iso(window.until) }, marker,
@@ -2483,7 +3238,7 @@ export function sweepLanes(roots, { since = null, until = null, marker = DEFAULT
     main_sessions_in_window: main.length, main: aggregateLanes(main),
     actors: [...children, ...main].map((c, i) => ({ ordinal: i + 1, actor: c.spawn === 'main' ? 'main' : 'child',
       spawn: c.spawn, agent_type: c.agent_type, session_ordinal: c.session_ordinal ?? null, measurement: c.lanes.measurement })),
-    limits: 'Legacy lane fields: ' + LANES_LIMITS + ' PR-A measurement fields supersede the legacy fetch share and hook-context interpretation: UTF-8 text payloads and individually serialized non-text blocks across every carrier; nested static fetch operations; all-hook insertions separate from stdout claims. Main actors and file counters are separate from children. Sidecar binding reports counts only. rtk_parts needs --rtk-check and keeps observed command coverage separate from native replay. ' + CLI_LANES_LIMITS + ' Unknown usage and missing results cannot establish acceptance; see workflows/README.md.',
+    limits: 'Legacy lane fields: ' + LANES_LIMITS + ' PR-A measurement fields supersede the legacy fetch share and hook-context interpretation: UTF-8 text payloads and individually serialized non-text blocks across every carrier; nested static fetch operations; all-hook insertions separate from stdout claims. Main actors and file counters are separate from children. Sidecar binding reports counts only. rtk_parts needs --rtk-check and keeps observed command coverage separate from native replay. ' + CLI_LANES_LIMITS + ' ' + U2_LIMITS + ' Unknown usage and missing results cannot establish acceptance; see workflows/README.md.',
   }
 }
 
@@ -2516,6 +3271,13 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   const usageIssues = []
   if (!result) issues.push('no result entry in journal')
   else if (result.result === null || result.result === undefined) issues.push('null result')
+  // PR-A item 6: an empty or wait-notice return (returnQuality) and a background task the child left running at its final message
+  // (final_return) are incomplete returns. They are issues, never usage_issues, so a superseded attempt is unaffected (summarizeRun).
+  const quality = result ? returnQuality(result.result) : null
+  if (quality === 'empty') issues.push('empty result')
+  else if (quality === 'wait_notice') issues.push('wait-notice result')
+  const lanes = childLanes(transcript, lanesOptions), finalRet = lanes.measurement.final_return
+  if (finalRet.background_pending) issues.push('returned with ' + finalRet.background_pending + ' background task(s) that had no completion notification')
   if (!meta) issues.push('missing meta.json')
   if (!transcriptFound) usageIssues.push('no transcript file (usage unknown)')
   const neverCounted = [...withoutUsage].filter((id) => !byId.has(id)).length
@@ -2552,8 +3314,9 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
     // the fixed cost of spawning this child before it does any work.
     first_request_prompt_tokens: messages.length ? PROMPT_COUNTERS.reduce((n, k) => n + (messages[0].message.usage[k] || 0), 0) : null,
     complete: issues.length === 0, issues, ...(usageIssues.length ? { usage_issues: usageIssues } : {}),
+    return_quality: quality, final_return: finalRet,
     // Tool lanes, hook rewrites and the injected-block marker (childLanes above); names and counts only.
-    lanes: childLanes(transcript, lanesOptions),
+    lanes,
   }
 }
 
@@ -2582,6 +3345,8 @@ export function summarizeRun(dir, lanesOptions = {}) {
     const data = found ? readRows(logPath) : { rows: [], errors: 0, digest: '' }
     const child = summarizeChild(s, results.get(s.agentId) || null, meta, data.rows, found,
       { ...lanesOptions, exceptions: exceptionsFor(lanesOptions.exceptionRecords || [], data.digest) })
+    // lanesOptions.onLedger receives the attempt's private call ledger with its journal label and whether a later attempt superseded it.
+    if (lanesOptions.onLedger) lanesOptions.onLedger(callLedger(data.rows).map((r) => ({ ...r, label: s.label ?? null, superseded: supersededBy.has(s.agentId) })))
     return supersededBy.has(s.agentId) ? { ...child, superseded_by: supersededBy.get(s.agentId) } : child
   })
   const children = attempts.filter((c) => !c.superseded_by)
@@ -2601,7 +3366,7 @@ export function summarizeRun(dir, lanesOptions = {}) {
     uncounted.length ? uncounted.length + ' superseded attempt(s) with usage by_resolved_model cannot count (usage_issues)' : null].filter(Boolean)
   return {
     status: !children.length || gaps.length ? 'incomplete' : 'complete',
-    reason: (!children.length ? 'journal has no started children' : gaps.length ? gaps.join('; ') : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result') + rerun,
+    reason: (!children.length ? 'journal has no started children' : gaps.length ? gaps.join('; ') : 'every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result that is neither empty nor a wait notice, with no background task left running at its final message') + rerun,
     multi_model_children: children.filter((c) => c.resolved_models.length > 1).map((c) => c.label || c.agent_id),
     // Over every attempt (children and superseded attempts), like by_resolved_model.
     web_search: {
@@ -2640,11 +3405,12 @@ export function latestRunDir(cwd, configDir) {
 
 const USAGE = 'usage: child-usage.mjs <workflow transcript dir> | --latest [--require-effort <level>] [--rtk-db <history.db>] [--marker <text>]\n' +
   '       child-usage.mjs --lanes-sweep --root <dir> [--root <dir> ...] [--since <ISO>] [--until <ISO>] [--rtk-db <history.db>] [--marker <text>]\n' +
-  '       both modes: [--rtk-check] [--exceptions <private-json>] [--shell-parser <tree-sitter-bash install dir>]'
+  '       both modes: [--rtk-check] [--exceptions <private-json>] [--shell-parser <tree-sitter-bash install dir>]\n' +
+  '                   [--call-ledger <new private JSONL file outside every git work tree>]'
 // { error } or the parsed options. An option value may not start with "--"; each option but --root is given once.
 export function parseArgs(argv) {
   const o = { positional: [], roots: [], sweep: false }
-  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until', '--exceptions': 'exceptionsPath', '--shell-parser': 'shellParser' }
+  const valued = { '--require-effort': 'required', '--rtk-db': 'rtkDb', '--marker': 'marker', '--since': 'since', '--until': 'until', '--exceptions': 'exceptionsPath', '--shell-parser': 'shellParser', '--call-ledger': 'callLedger' }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--root' || Object.hasOwn(valued, a)) {
@@ -2690,6 +3456,19 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   if (o.exceptionsPath) {
     try { exceptionRecords = loadExceptions(o.exceptionsPath) } catch { console.error('--exceptions: invalid or unreadable sidecar'); process.exit(2) }
   }
+  // --call-ledger: checked before any work and written before stdout, so a refusal or a failed write exits 2 with no report and no file.
+  let ledgerPath = null
+  if (o.callLedger !== undefined) {
+    const target = ledgerTarget(o.callLedger)
+    if (target.error) { console.error('--call-ledger: ' + target.error); process.exit(2) }
+    ledgerPath = target.path
+  }
+  const ledger = []
+  const onLedger = ledgerPath ? (records) => { for (const r of records) ledger.push(r) } : null
+  const saveLedger = () => {
+    if (!ledgerPath) return
+    try { writeLedger(ledgerPath, ledger) } catch (e) { console.error('--call-ledger: cannot create the file (' + (e.code || e.message) + ')'); process.exit(2) }
+  }
   // The verified tree-sitter-bash install that cli_lanes needs (loadShellParser: --shell-parser, CHILD_USAGE_SHELL_PARSER, then the
   // default directory). An install named on the command line that cannot be honored is an error, like --rtk-db; one that is missing
   // by default or by the environment leaves cli_lanes as parser_unavailable, and the rest of the report is unchanged.
@@ -2700,16 +3479,19 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1
   if (o.sweep) {
     const notDirs = o.roots.filter((r) => { try { return !statSync(r).isDirectory() } catch { return true } })
     if (notDirs.length) { console.error('--root is not a readable directory: ' + notDirs.join(', ')); process.exit(2) }
-    process.stdout.write(sortedJson(sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk, rtkCheck: o.rtkCheck, exceptionRecords })) + '\n')
+    const report = sweepLanes(o.roots, { since: o.since === undefined ? null : Date.parse(o.since), until: o.until === undefined ? null : Date.parse(o.until), marker, rtk, rtkCheck: o.rtkCheck, exceptionRecords, onLedger })
+    saveLedger()
+    process.stdout.write(sortedJson(report) + '\n')
     process.exitCode = 0
   } else {
     const target = o.positional[0]
     const required = o.required ?? null
     const dir = target === '--latest' ? latestRunDir(process.cwd(), process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')) : target
     if (target === '--latest' && !dir) { console.error('no native Workflow run found for ' + process.cwd()); process.exit(2) }
-    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null, rtkCheck: o.rtkCheck, exceptionRecords }) }
+    const out = { transcript_dir: dir, ...summarizeRun(dir, { marker, rtkDecisions: rtk ? rtk.map : null, rtkCheck: o.rtkCheck, exceptionRecords, onLedger }) }
     if (rtk) out.rtk_db = { joined: true, rows: rtk.rows, duplicate_tool_use_ids: rtk.duplicates }
     if (required) out.effort_mismatches = effortMismatches(out, required)
+    saveLedger()
     process.stdout.write(JSON.stringify(out, null, 2) + '\n')
     process.exitCode = out.status === 'complete' && !(required && out.effort_mismatches.length) ? 0 : 1
   }
