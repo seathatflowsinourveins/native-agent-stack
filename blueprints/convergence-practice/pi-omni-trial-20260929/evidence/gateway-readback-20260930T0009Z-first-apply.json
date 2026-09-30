@@ -1,0 +1,181 @@
+{
+ "utc": "2026-09-30T00:09:37Z",
+ "units": {
+  "omniroute.service": {
+   "props": "MainPID=950031 | NRestarts=0 | ActiveState=active | ActiveEnterTimestamp=Tue 2026-09-29 20:02:58 EDT",
+   "codex_client_version": [
+    "CODEX_CLIENT_VERSION=0.159.1"
+   ],
+   "drop_ins": []
+  },
+  "omniroute-fw.service": {
+   "props": "MainPID=945817 | NRestarts=0 | ActiveState=active | ActiveEnterTimestamp=Tue 2026-09-29 20:02:42 EDT",
+   "codex_client_version": [
+    "CODEX_CLIENT_VERSION=0.159.1"
+   ],
+   "drop_ins": []
+  }
+ },
+ "compression": {
+  "20128": {
+   "enabled": false,
+   "defaultMode": "off",
+   "autoTriggerMode": "lite",
+   "cacheMinutes": 5,
+   "preserveSystemPrompt": true,
+   "compressionComboId": null,
+   "activeComboId": null,
+   "engines_on": [
+    "caveman",
+    "lite",
+    "session-dedup"
+   ],
+   "stacked_pipeline": [
+    "rtk",
+    "caveman"
+   ]
+  },
+  "20129": {
+   "enabled": true,
+   "defaultMode": "off",
+   "autoTriggerMode": "lite",
+   "cacheMinutes": 60,
+   "preserveSystemPrompt": true,
+   "compressionComboId": null,
+   "activeComboId": null,
+   "engines_on": [
+    "caveman",
+    "ccr",
+    "codex-responses",
+    "rtk"
+   ],
+   "stacked_pipeline": [
+    "ccr"
+   ]
+  }
+ },
+ "listed_on_20128": [
+  "cx/gpt-6.1-sol",
+  "codex/gpt-6.1-sol"
+ ],
+ "trio_20128": {
+  "control cx/gpt-6-sol": {
+   "http": 200,
+   "s": 1.7,
+   "served": "gpt-6-sol",
+   "in": 22,
+   "cached": null
+  },
+  "control as a Codex caller (Version 0.157.1)": {
+   "http": 200,
+   "s": 2.2,
+   "served": "gpt-6-sol",
+   "in": 22,
+   "cached": null
+  },
+  "target cx/gpt-6.1-sol": {
+   "http": 200,
+   "s": 4.0,
+   "served": "gpt-6.1-sol",
+   "in": 22,
+   "cached": null
+  },
+  "negative made-up id": {
+   "http": 400,
+   "s": 0.0,
+   "error": "Model 'gpt-6.1-sol-zzz-nonexistent' is not available in the active live catalog for provider 'codex'."
+  }
+ },
+ "chain_20129": {
+  "sharedgw/gpt-6.1-sol": {
+   "http": 200,
+   "s": 11.7,
+   "served": "gpt-6.1-sol",
+   "in": 97,
+   "cached": 0
+  },
+  "sharedgw/gpt-6-sol": {
+   "http": 200,
+   "s": 2.8,
+   "served": "gpt-6-sol",
+   "in": 97,
+   "cached": 0
+  }
+ },
+ "cache": {
+  "20129 sharedgw/gpt-6.1-sol": {
+   "turns": [
+    {
+     "http": 200,
+     "s": 9.3,
+     "served": "gpt-6.1-sol",
+     "in": 6099,
+     "cached": 0
+    },
+    {
+     "http": 200,
+     "s": 2.6,
+     "served": "gpt-6.1-sol",
+     "in": 6123,
+     "cached": 5888
+    },
+    {
+     "http": 200,
+     "s": 2.6,
+     "served": "gpt-6.1-sol",
+     "in": 6147,
+     "cached": 5888
+    },
+    {
+     "http": 200,
+     "s": 2.6,
+     "served": "gpt-6.1-sol",
+     "in": 6171,
+     "cached": 6016
+    }
+   ],
+   "cached_share_turns_2_plus": 0.965
+  },
+  "20128 cx/gpt-6.1-sol": {
+   "turns": [
+    {
+     "http": 200,
+     "s": 2.2,
+     "served": "gpt-6.1-sol",
+     "in": 6022,
+     "cached": 0
+    },
+    {
+     "http": 200,
+     "s": 2.6,
+     "served": "gpt-6.1-sol",
+     "in": 6046,
+     "cached": 0
+    },
+    {
+     "http": 200,
+     "s": 3.3,
+     "served": "gpt-6.1-sol",
+     "in": 6070,
+     "cached": 5888
+    },
+    {
+     "http": 200,
+     "s": 2.2,
+     "served": "gpt-6.1-sol",
+     "in": 6094,
+     "cached": 5888
+    }
+   ],
+   "cached_share_turns_2_plus": 0.647
+  }
+ },
+ "pool_remaining_points": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  100
+ ]
+}

@@ -1,0 +1,1118 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Whether pi v0.99.1 (built-in MCP, codemode, tool_search), run through the OmniRoute engines-on entry gateway (20129, model sharedgw/gpt-6.1-sol at effort xhigh) with the ecosystem's token-save practice, invokes each layer, keeps the provider prompt cache, and holds task success, compared with the same pi carrying none of the practice. The 2026-09-26 landscape sweep left pi not_adopted (no demonstrated gap; its GPT-6 fit vote never returned); the user allowed this trial on 2026-09-29 and ordered that OmniRoute run the latest models and the full token-save practice before the pi practice. This record covers stages S1, S2 and R1 of README.md; the graded cross-harness comparison S3 needs container isolation and gets its own record. Ran on 2026-09-30: S1 (3 runs), S2 (24 runs) and R1 (1 run, two segments), all passed; S2 (24 runs, entry-gateway tokens summed over the 6 runs of each arm): plain: 6/6 passed, 27 requests, uncached input 14842, cache read 37248 (share 0.715), output 3388, compressed 0, mean wall 29.2 s; stack-gwoff: 6/6 passed, 41 requests, uncached input 87840, cache read 323584 (share 0.786), output 5597, compressed 0, mean wall 52.1 s; stack: 6/6 passed, 42 requests, uncached input 72929, cache read 340224 (share 0.823), output 6467, compressed 192, mean wall 57.6 s; stack-ext: 6/6 passed, 45 requests, uncached input 108018, cache read 492544 (share 0.82), output 9102, compressed 200, mean wall 72.8 s.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/earendil-works/pi",
+      "revision": "d86654abb8862e201933517d6f1fce9f88dd117f"
+    },
+    {
+      "url": "https://github.com/rtk-ai/rtk",
+      "revision": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec"
+    },
+    {
+      "url": "https://github.com/mksglu/context-mode",
+      "revision": "589d8214d56740a28b5f7bf63167743d586b0b40"
+    },
+    {
+      "url": "https://github.com/diegosouzapw/OmniRoute",
+      "revision": "2f42a9ac19d1a247ec9ce5473b790843724b3061"
+    },
+    {
+      "url": "https://github.com/harbor-framework/harbor",
+      "revision": "1e5c5c6db929a10a140d05e606882c671ae20729"
+    }
+  ],
+  "discovery_provenance": [
+    "User request of 2026-09-29: explain pi.dev, compare it with the Claude Code CLI in use, and say whether to run via pi. An 8-agent Workflow (three researchers, Opus skeptics, an Opus adjudicator) with coordinator re-checks of pi.dev, the legal page and pi's Anthropic path in source concluded: keep Claude Code, trial only with API-key or gateway spend.",
+    "User reply of 2026-09-29: the trial can go through OmniRoute with the full token-save practice enabled.",
+    "Coordinator discovery on 2026-09-29: pi main's built-in MCP (docs/mcp.md, commit 8562bcf66, 07:12Z), Harbor v0.23.0's pi agent (src/harbor/agents/installed/pi.py), rtk's pi target (rtk init --agent pi), context-mode's pi extension (README, 'Pi Coding Agent'), and the OpenHands runtime worker's gateway and MCP policy as the precedent for a GPT-6 runtime behind OmniRoute.",
+    "Coordinator discovery later on 2026-09-29: pi v0.99.0 and v0.99.1 were released the same day (built-in MCP/codemode/tool_search; gpt-6.1-sol), so the trial re-pinned from the unreleased 0.87.1 main to the v0.99.1 tag.",
+    "Coordinator diagnosis on 2026-09-29: gpt-6.1-sol was absent from OmniRoute's codex live catalog because the catalog query carries client_version=CODEX_CLIENT_VERSION (0.157.1 on the 20128 unit); an interim systemd drop-in with 0.159.1 and one restart, agreed with the gateway owner and the Gate A owner, made it appear and answer.",
+    "Coordinator measurement on 2026-09-29: through the live gateways an append-only conversation reads about 97% of input from cache from turn 2 and static plus changing text inside one message reads 0%. A synthetic transient trailing user message (context-mode's pi extension shape) then cost a full-prefix miss at request 2 (ad-hoc scripts, not archived); in the real S1 and S2 runs of 2026-09-30 the stack-ext second request read cached tokens in six of seven runs, so the miss was not consistently reproduced (see limitations). The MCP-only stack arm stays the default and the extension is the measured variant.",
+    "User objection of 2026-09-30 00:12Z to the first token-save apply (headerless lane [ccr] only, everything else opt-in): 'we need clean resolution with upstream as source of truth, no biases'. An Opus source comparison at OmniRoute 2f42a9ac1 (identical tree to upstream main c1e30b76) found upstream's documented headerless lane is [session-dedup, lite]; the gateway owner applied a corrective delta on 20129 at 2026-09-30T00:43:52Z (headerless plan [session-dedup, ccr, lite], output style off, lossy engines on behind their request header, headroom off and two defect-mitigation exceptions). Upstream's shipped default is compression off with no engines (types.ts:421-443); the applied headerless lane is upstream's documented safe lane (docs/compression/COMPRESSION_GUIDE.md:233-239) plus ccr. Upstream main c1e30b76 and 2f42a9ac1 have the same tree 0f58d8df20c0c2ae4336b432b3f39837119b6eed (gh api commits/<sha>, 2026-09-30)."
+  ],
+  "license_and_compatibility": "pi is MIT (GitHub API, 2026-09-29), RTK Apache-2.0, context-mode Elastic-2.0 and OmniRoute MIT (manifests/stack.json). License is information only in this private experimental environment. pi needs Node 22.19 or newer (the host has 24.x). Each arm runs in a scratch HOME with no credentials; pi's Anthropic and Codex OAuth logins are never used, and the trial takes no Claude route.",
+  "baseline_and_candidate": {
+    "baseline": "plain arm: the pinned pi build with the same provider, model id sharedgw/gpt-6.1-sol, thinking level xhigh, run-id headers and x-omniroute-no-cache, plus x-omniroute-compression: off, and none of the token-save practice (no RTK extension, context-mode, MCP servers or instruction file).",
+    "candidate": "stack arm: the same pi with the practice on: RTK extension with the recipe's five exclude_commands, context-mode through MCP (tools declared directly, no message-injecting hooks), serena, jcodemunch, qmd and headroom deferred behind tool_search, toon on PATH, the generated AGENTS.md, and no compression header, so the gateway's headerless lane [session-dedup, ccr, lite] applies (upstream's documented safe lane plus ccr). Variant arms: stack-ext (context-mode as its pi extension, which appends a transient user message to the first request of each prompt) and stack-gwoff (the stack arm with x-omniroute-compression: off, the control that separates the gateway lane from the client stack)."
+  },
+  "frozen_inputs": {
+    "base_revision": "e45328d3951417c5ae69676f2ac2cc8896948f81",
+    "tasks": [
+      "wiring-smoke",
+      "calc-sign-bug",
+      "log-triage",
+      "multi-file-rename"
+    ],
+    "roles": [
+      "pi-worker-plain",
+      "pi-worker-stack",
+      "pi-worker-stack-gwoff",
+      "pi-worker-stack-ext"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/pins.json",
+        "sha256": "9caff929da98e56010151dec90a569d5e7cbdf7145669d08146e9b9845f1132a"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/fixtures.py",
+        "sha256": "9091e315a395ca1e63652dd9606e06b8ecad17ea0b547b11c8203fc675a057fc"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/mcp.stack-ext.json.tmpl",
+        "sha256": "fc6e36053b9e9766e1dcc4812304a0eb40fd64eaa1ce0fc89e41e371efc194b7"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/mcp.stack.json.tmpl",
+        "sha256": "757e4956e7ebc3d51267bcde8aa21f8312ba94197e4954dca246fbdcb9e64969"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/models.plain.json.tmpl",
+        "sha256": "2b737f0efe0c6489d29ce13d8209e57568f06fdcb5df33beb660d4411e2f4a69"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/models.stack.json.tmpl",
+        "sha256": "dea7a3f9838f17d124e1e17482f8750edd1a435f91cc26c60030f1a1a1bf7f42"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/settings.plain.json.tmpl",
+        "sha256": "93a08519a88891d0d59fd4d21c11fb844a78d8f49c77fa27d3b32ba8eacdfe9b"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/settings.stack.json.tmpl",
+        "sha256": "93a08519a88891d0d59fd4d21c11fb844a78d8f49c77fa27d3b32ba8eacdfe9b"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/build_evidence.py",
+        "sha256": "a29bed2899dc729fa87b56b95fb3f1619cd5c063095329d03fa0e2090fea9011"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/gateway_usage.py",
+        "sha256": "928b2f330fba1ece95d35c0a069d9650d0187233c9eed5df8f89a3e84b00f9fc"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/omni_verify.py",
+        "sha256": "fd5913db37dfde21bc16e319a3a885f6fe0ccb0f29ed18bace3669ca59bc6b5e"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/pi_stub.py",
+        "sha256": "259339393ceb48003f84ed0a9828f637a4faf3b8eb25c16c5e2cf583c9bf569d"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/probes.py",
+        "sha256": "1509a598ca2334a494a323c576a67e234ed6d1a628b4e784fed484a88d9b2197"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_r1.py",
+        "sha256": "6f50e4491da2aba856954a98478cd84370a8867869577381c4ec6c65712270ae"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_s2.sh",
+        "sha256": "6447ea6369a443cf1c85cf9c86377f66ea8f2fdded57533df5d7524d3c641f1b"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_task.py",
+        "sha256": "eb44df07b9dfc524f99f8dfebaa46c4c320f6dd65552a2a1dfacaa2e66c37265"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/stage.py",
+        "sha256": "abc052d68ffb7cb242ad8c592ab3d5a6df70f5be87f849cc78112866a4dc492b"
+      },
+      {
+        "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/summarize_runs.py",
+        "sha256": "8843602df814b6ebf7423d7223e6f6fa9a35fef6a2e47919792e1a9b5189a759"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Per run, pass means `fixtures.py check TASK WORKSPACE` exits 0 (the checks read tracked files and answer.txt only). Report pass counts per task and arm over two attempts, with no significance claim at n=2. A stack-arm failure where the plain arm passed the same task is a regression finding that returns the decision to defer. S1 also requires the wiring criteria in README.md, including cache reads from the second request of an append-only arm and the stack-ext miss measured.",
+    "usage_rule": "Complete provider usage per run is the sum of the run id's call-log rows at the entry (20129) and upstream (20128) gateways, failed attempts included, with tokens.in, tokens.out, tokens.cacheRead, tokens.cacheWrite, tokens.reasoning and tokens.compressed kept separate and never added to pi-reported message_end usage, RTK tracker counts or ctx_stats counters. The cache-read share is reported per request index and per arm (the second request of stack-ext is expected to miss). Uncached input is tokens.in minus tokens.cacheRead only after the first real run confirms that tokens.in includes cached tokens. A run with no matching row has unknown usage, not zero; one client attempt can leave no gateway row when the router refuses at a cooldown, so pi's auto_retries are read alongside."
+  },
+  "runtime_and_platform": {
+    "platform": "WSL2 Ubuntu 24.04 x86_64 workstation with Node 24.21.0 and Python 3.13.15. pi runs on the host in per-arm scratch HOMEs (mode 0700) under a private state directory with PI_OFFLINE=1, PI_SKIP_VERSION_CHECK=1 and PI_TELEMETRY=0. The gateways are the host's loopback OmniRoute instances 20128 (shared, provider pool; build ae5539a56 = upstream release/v3.8.51 2f42a9ac1 + #13788 + a local affinity patch) and 20129 (framework lane chained to 20128; build 87c4c488d = 2f42a9ac1 + #13788), both units announcing CODEX_CLIENT_VERSION=0.159.1. On 20129 the gateway owner's token-save plan (9 steps, 2026-09-30T00:06Z) and a corrective delta (2026-09-30T00:43:52Z) were live for every run below: engines ON session-dedup, ccr, lite, rtk, codex-responses, relevance, caveman, aggressive, llmlingua, ultra (the lossy ones only when the request header opts in: allow-lossy, engine:<id> or a stored combo named in the header), headroom and omniglyph off, output styles none; headerless plan [session-dedup, ccr, lite]; 20128 compression master off with codex/* excluded. omni_verify.py read back enabled, defaultMode, enginesExplicit, engines and levels, outputStyles, liveZone, sessionDedup, lite, headroom, contextBudget mode, cacheMinutes and exclusions at 2026-09-30T01:59Z (evidence/gateway-readback-20260930T0159Z.json); the plan itself is evidenced by tokens.compressed in the call logs (nonzero on header-less arms, zero on header-off arms).",
+    "tools": [
+      {
+        "name": "pi (earendil-works/pi)",
+        "version": "v0.99.1 = d86654abb8862e201933517d6f1fce9f88dd117f"
+      },
+      {
+        "name": "rtk",
+        "version": "0.50.0"
+      },
+      {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      {
+        "name": "qmd",
+        "version": "2.8.3 (recipes/README.md)"
+      },
+      {
+        "name": "OmniRoute",
+        "version": "20128 build ae5539a56 and 20129 build 87c4c488d on upstream 2f42a9ac1 (release/v3.8.51 line)"
+      }
+    ],
+    "isolation": "Host mode, not container isolation. pi has no permission system and the model shares the host's loopback services, including the gateways' management APIs, with the user's other sessions, as the existing Claude and Codex sessions do. Each arm has its own scratch HOME with no credentials and pi /login is never used. S3 needs the OpenHands O1 topology first."
+  },
+  "commands": [
+    "git clone https://github.com/earendil-works/pi && git worktree add --detach <dir> v0.99.1 && npm ci --ignore-scripts && npm run build",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/stage.py --pi-src <pi checkout> --state <state dir>",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/probes.py --state <state dir>",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/fixtures.py selftest",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_task.py --state <state dir> --arm stack|stack-ext|plain --task TASK --attempt N",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/gateway_usage.py <run id>",
+    "pi --print --mode json --session-dir <run dir> --thinking xhigh (the attempt below ran on the earlier kit with --thinking max) -xt ctx_upgrade,ctx_purge,ctx_doctor,ctx_insight <task instruction>, launched by run_task.py in a fresh fixture workspace with PI_TRIAL_RUN_ID set (exit status taken from pi itself)",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/omni_verify.py --json <out>",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/stage.py --pi-src <pi checkout> --state <second state dir> --stack-compression off (its stack arm is the gateway-lane-off control; its runs/ is a symlink to the first state dir's runs/)",
+    "bash blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_s2.sh <kit dir> <state dir> <second state dir> <log> (3 tasks x 4 arms x 2 attempts, arm order reversed on attempt 2, calling run_task.py with --tag s2)",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_r1.py --state <state dir> --arm stack --task multi-file-rename --kill-after 2 (SIGKILL after the second model response, then pi --continue)",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/build_evidence.py --state <state dir> --out blueprints/convergence-practice/pi-omni-trial-20260929/evidence",
+    "python3 blueprints/convergence-practice/pi-omni-trial-20260929/kit/summarize_runs.py --state <state dir> --json <out>"
+  ],
+  "observations": [
+    {
+      "id": "pi-trial-stack-wiring-smoke-a1-20260929141219-s1-nocap",
+      "task": "wiring-smoke",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "S1 wiring smoke of the stack arm through the 20129 entry gateway, run at 2026-09-29T14:12Z with the GPT-6 pool exhausted, on the SUPERSEDED kit (pi at unreleased commit 5257d0d5, model sharedgw/gpt-6-astra-max, thinking max, compression header allow-lossy, context-mode as pi extension); the kit was later re-pinned to v0.99.1 and changed, so the frozen inputs above are not this run's inputs and its artifact records what it actually sent. The pinned pi CLI ran natively; no model executed, so this is not model-task execution. exit_code is pi's own status, 0 because pi's JSON mode exits 0 for a failed response. quality.semantic is the fixture check (answer.txt absent); quality.contract is not applicable. usage counts provider-billed tokens: all four attempts (one request and three pi auto-retries) were refused with HTTP 429 before any model call, and the entry gateway logged one row (status 429, 0 tokens) for the first attempt only, relaying the shared gateway's refusal; native_retries is pi's auto-retry count.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-nocap-attempt-1.json",
+          "sha256": "3865b0faeb1097594ab0efcc2ea4e4b4908a9d90e77d0b1bb7cd6b6b1c55a1d8"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 3
+      }
+    },
+    {
+      "id": "pi-trial-plain-wiring-smoke-a1-20260930010749-s1v2",
+      "task": "wiring-smoke",
+      "role": "pi-worker-plain",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "model_task_execution",
+      "scope": "S1 wiring smoke through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, gateway build 87c4c488d on upstream 2f42a9ac1 with the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off). Usage is the entry gateway's call-log rows for the run id (failed attempts included); the upstream gateway (20128) does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
+          "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2870,
+        "cache_creation": 0,
+        "cache_read": 1152,
+        "output": 468,
+        "reasoning_in_output": 336,
+        "total": 4490,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-ext-wiring-smoke-a1-20260930010838-s1v2",
+      "task": "wiring-smoke",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 4,
+      "evidence_class": "model_task_execution",
+      "scope": "S1 wiring smoke through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, gateway build 87c4c488d on upstream 2f42a9ac1 with the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off). Usage is the entry gateway's call-log rows for the run id (failed attempts included); the upstream gateway (20128) does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable. The runner labelled this run attempt 1; the record numbers attempts per task, role and condition, and the earlier failed run of the same shape is attempt 1.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
+          "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0"
+        }
+      ],
+      "usage": {
+        "uncached_input": 19047,
+        "cache_creation": 0,
+        "cache_read": 35584,
+        "output": 179,
+        "reasoning_in_output": 62,
+        "total": 54810,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-wiring-smoke-a1-20260930010811-s1v2",
+      "task": "wiring-smoke",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "model_task_execution",
+      "scope": "S1 wiring smoke through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, gateway build 87c4c488d on upstream 2f42a9ac1 with the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off). Usage is the entry gateway's call-log rows for the run id (failed attempts included); the upstream gateway (20128) does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
+          "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0"
+        }
+      ],
+      "usage": {
+        "uncached_input": 17197,
+        "cache_creation": 0,
+        "cache_read": 32000,
+        "output": 165,
+        "reasoning_in_output": 39,
+        "total": 49362,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-plain-calc-sign-bug-a1-20260930011040-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-plain",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 3536,
+        "cache_creation": 0,
+        "cache_read": 4352,
+        "output": 251,
+        "reasoning_in_output": 0,
+        "total": 8139,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-plain-calc-sign-bug-a2-20260930012436-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-plain",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1730,
+        "cache_creation": 0,
+        "cache_read": 6400,
+        "output": 263,
+        "reasoning_in_output": 0,
+        "total": 8393,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-plain-log-triage-a1-20260930011332-s2",
+      "task": "log-triage",
+      "role": "pi-worker-plain",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1768,
+        "cache_creation": 0,
+        "cache_read": 2176,
+        "output": 94,
+        "reasoning_in_output": 0,
+        "total": 4038,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-plain-log-triage-a2-20260930012635-s2",
+      "task": "log-triage",
+      "role": "pi-worker-plain",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 744,
+        "cache_creation": 0,
+        "cache_read": 3200,
+        "output": 98,
+        "reasoning_in_output": 0,
+        "total": 4042,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-plain-multi-file-rename-a1-20260930011545-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-plain",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 3604,
+        "cache_creation": 0,
+        "cache_read": 11904,
+        "output": 1257,
+        "reasoning_in_output": 81,
+        "total": 16765,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-plain-multi-file-rename-a2-20260930013107-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-plain",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 3460,
+        "cache_creation": 0,
+        "cache_read": 9216,
+        "output": 1425,
+        "reasoning_in_output": 135,
+        "total": 14101,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-calc-sign-bug-a1-20260930011101-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13036,
+        "cache_creation": 0,
+        "cache_read": 62464,
+        "output": 645,
+        "reasoning_in_output": 250,
+        "total": 76145,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-calc-sign-bug-a1-20260930011145-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-stack-gwoff",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 24787,
+        "cache_creation": 0,
+        "cache_read": 40832,
+        "output": 527,
+        "reasoning_in_output": 153,
+        "total": 66146,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-calc-sign-bug-a2-20260930012320-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-stack-gwoff",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 6807,
+        "cache_creation": 0,
+        "cache_read": 58624,
+        "output": 353,
+        "reasoning_in_output": 27,
+        "total": 65784,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-calc-sign-bug-a2-20260930012352-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 7002,
+        "cache_creation": 0,
+        "cache_read": 58752,
+        "output": 612,
+        "reasoning_in_output": 232,
+        "total": 66366,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-ext-calc-sign-bug-a1-20260930011233-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 19178,
+        "cache_creation": 0,
+        "cache_read": 81664,
+        "output": 1086,
+        "reasoning_in_output": 277,
+        "total": 101928,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-ext-calc-sign-bug-a2-20260930012223-s2",
+      "task": "calc-sign-bug",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 9950,
+        "cache_creation": 0,
+        "cache_read": 74880,
+        "output": 856,
+        "reasoning_in_output": 261,
+        "total": 85686,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-ext-log-triage-a1-20260930011459-s2",
+      "task": "log-triage",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 9329,
+        "cache_creation": 0,
+        "cache_read": 53888,
+        "output": 984,
+        "reasoning_in_output": 193,
+        "total": 64201,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-ext-log-triage-a2-20260930012455-s2",
+      "task": "log-triage",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 9465,
+        "cache_creation": 0,
+        "cache_read": 53888,
+        "output": 943,
+        "reasoning_in_output": 58,
+        "total": 64296,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-ext-multi-file-rename-a1-20260930012006-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 40414,
+        "cache_creation": 0,
+        "cache_read": 138496,
+        "output": 2748,
+        "reasoning_in_output": 779,
+        "total": 181658,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-ext-multi-file-rename-a2-20260930012644-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-stack-ext",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 19682,
+        "cache_creation": 0,
+        "cache_read": 89728,
+        "output": 2485,
+        "reasoning_in_output": 762,
+        "total": 111895,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-log-triage-a1-20260930011344-s2",
+      "task": "log-triage",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4345,
+        "cache_creation": 0,
+        "cache_read": 48000,
+        "output": 941,
+        "reasoning_in_output": 239,
+        "total": 53286,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-log-triage-a1-20260930011432-s2",
+      "task": "log-triage",
+      "role": "pi-worker-stack-gwoff",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 10789,
+        "cache_creation": 0,
+        "cache_read": 14464,
+        "output": 575,
+        "reasoning_in_output": 222,
+        "total": 25828,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-log-triage-a2-20260930012539-s2",
+      "task": "log-triage",
+      "role": "pi-worker-stack-gwoff",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 5533,
+        "cache_creation": 0,
+        "cache_read": 28160,
+        "output": 530,
+        "reasoning_in_output": 85,
+        "total": 34223,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-log-triage-a2-20260930012609-s2",
+      "task": "log-triage",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2872,
+        "cache_creation": 0,
+        "cache_read": 22144,
+        "output": 541,
+        "reasoning_in_output": 194,
+        "total": 25557,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-multi-file-rename-a1-20260930011642-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 32350,
+        "cache_creation": 0,
+        "cache_read": 77824,
+        "output": 1836,
+        "reasoning_in_output": 906,
+        "total": 112010,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-multi-file-rename-a1-20260930011815-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-stack-gwoff",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 25479,
+        "cache_creation": 0,
+        "cache_read": 101248,
+        "output": 2423,
+        "reasoning_in_output": 829,
+        "total": 129150,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-multi-file-rename-a2-20260930012830-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-stack-gwoff",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 14445,
+        "cache_creation": 0,
+        "cache_read": 80256,
+        "output": 1189,
+        "reasoning_in_output": 373,
+        "total": 95890,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-multi-file-rename-a2-20260930012937-s2",
+      "task": "multi-file-rename",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "S2 task run through the 20129 entry gateway on the current kit (pi v0.99.1, sharedgw/gpt-6.1-sol at thinking xhigh, the gateway owner's token-save configuration as corrected at 2026-09-30T00:43:52Z: the headerless lane is upstream's documented safe lane plus ccr, [session-dedup, ccr, lite], with two defect mitigations (sessionDedup.minBlockChars 512 instead of 80, lite.compressToolResults false instead of true); upstream's shipped default is compression off; stack arms send no compression header, plain and the stack-gwoff control send x-omniroute-compression: off). Usage is the entry gateway's call-log rows for the run id; the upstream gateway does not carry the run id, so provider usage below the entry gateway is unknown, not zero. exit_code is pi's own status; quality.semantic is the fixture check; quality.contract is not applicable.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13324,
+        "cache_creation": 0,
+        "cache_read": 71040,
+        "output": 1892,
+        "reasoning_in_output": 547,
+        "total": 86256,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "pi-trial-stack-multi-file-rename-r1-20260930013314-r1",
+      "task": "multi-file-rename",
+      "role": "pi-worker-stack",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 10,
+      "evidence_class": "recovery_execution",
+      "scope": "R1 kill and resume of a real run (numbered attempt 3 after S2's attempts 1 and 2 of the same task and role; the runner labels it r1): the stack arm was killed with SIGKILL after its second model response and resumed with pi --continue in the same session directory and workspace, through the 20129 entry gateway on the current kit. Usage is the sum of the entry gateway's call-log rows for the run id and for the resume run id (the killed in-flight request is a status 499 row); provider usage below the entry gateway is unknown. exit_code is the resumed pi's own status; quality.semantic is the fixture check after the resume.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/r1.json",
+          "sha256": "5304819a1628c1e0ccf8b32aede4bd9c714cefdb42c296ebbdae75d23ea3309a"
+        }
+      ],
+      "usage": {
+        "uncached_input": 34890,
+        "cache_creation": 0,
+        "cache_read": 76032,
+        "output": 2017,
+        "reasoning_in_output": 943,
+        "total": 112939,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "pi-trial-stack-wiring-smoke-a1-20260929141219-s1-nocap",
+      "reason": "HTTP 429 on every attempt: on the first request the entry gateway relayed the shared gateway's refusal 'All codex accounts reached configured quota threshold (reset after 99h 2m 4s)', then put the model in a 30-minute cooldown for its shared-gateway connection (retry_after 2026-09-29T14:42:21Z), which refused pi's three retries. No model call, tool call or cache use happened (the entry gateway's row records tokens.compressed 3099, so the request was compressed before the refusal), so S1's wiring criteria beyond model-id resolution, forwarding to the shared gateway, request attribution and error relay are still unobserved. This does not count against the candidate."
+    }
+  ],
+  "limitations": [
+    "The fixtures are synthetic and n is two per cell: S2 shows layer invocation, complete usage, cache behaviour and possible regressions, never efficacy. Every run passed its fixture check (6 of 6 in every S2 arm), so parity of task success is all it can show.",
+    "On these small fixtures the token-save stack used more tokens than plain pi: S2 (24 runs, entry-gateway tokens summed over the 6 runs of each arm): plain: 6/6 passed, 27 requests, uncached input 14842, cache read 37248 (share 0.715), output 3388, compressed 0, mean wall 29.2 s; stack-gwoff: 6/6 passed, 41 requests, uncached input 87840, cache read 323584 (share 0.786), output 5597, compressed 0, mean wall 52.1 s; stack: 6/6 passed, 42 requests, uncached input 72929, cache read 340224 (share 0.823), output 6467, compressed 192, mean wall 57.6 s; stack-ext: 6/6 passed, 45 requests, uncached input 108018, cache read 492544 (share 0.82), output 9102, compressed 200, mean wall 72.8 s. Against plain, stack used 391% more uncached input and 91% more output; stack-ext used 48% more uncached input than stack. No savings were measured, so no savings claim is made. A plausible cause is the stack's fixed prefix (instructions plus about 15 tool schemas), which these runs do not isolate; the practice's mechanism (context-mode containment of large outputs, session-dedup on repeated blocks) is not exercised. A large-output fixture is the next test.",
+    "The gateway lane removed 192 of 413153 input tokens on the stack arm and 200 on stack-ext (session-dedup needs repeated blocks of 512+ characters in history). Its effect on uncached input is unresolved: the paired differences (stack minus stack-gwoff) per task and attempt run from -11,751 to +6,871 tokens, four of six negative, and the two arms share a warmed cache (next item). The applied lane is upstream's documented safe lane plus ccr with two defect mitigations, not upstream's shipped default (compression off). The measurement covers the 20129 to 20128 hop for pi, not 20128's native Codex CLI traffic.",
+    "Cache shares are confounded by warmth across runs: request 1 of the stack-family runs already read cached tokens (stack [6016], stack-gwoff [6016], stack-ext [5632]; plain [0, 1024]), the static prefix shared across runs although each run has its own prompt_cache_key, so the provider cache is warm across neighbouring runs. Arm order was reversed on attempt 2 but n is two, so the lane-on versus lane-off cache shares (0.823 and 0.786) are not a clean comparison.",
+    "The predeclared expectation that stack-ext misses the cache at request 2 was not consistently observed: the second request read cached tokens in 6 of 7 stack-ext runs (S1 and S2), in 6 of 7 stack runs and in 5 of 6 stack-gwoff runs; the runs that read 0 (cause not established) are 1, 1 and 1 respectively. S2-only mean shares at request 2 were 0.71 (stack-ext), 0.69 (stack) and 0.61 (stack-gwoff). The synthetic figures of 2026-09-29 came from ad-hoc scripts that are not archived. stack-ext cost 45% more total input, 48% more uncached input and 41% more output than stack for the same pass rate, so the MCP arm remains the default.",
+    "tool_search grows the declared tools once per load (15 to 18 for stack). In S1 both stack arms show a 0.0 cache share at the request after the load, but none of the 6 attempt-2 S2 runs that called tool_search has a request with 0 cached tokens after request 1, so the break is not consistently visible. The MCP arm loses the context-mode extension's routing enforcement and session continuity.",
+    "Usage below the entry gateway is unknown: the sharedgw hop does not carry the run id, so no 20128 row joins to a run (gateway_upstream requests 0). Provider usage per run is the entry gateway's rows only; usage_assessment coverage stays partial. tokens.in includes cached tokens: pi input plus cacheRead equals the gateway's in for every one of the 27 S1 and S2 runs.",
+    "Outbound effort is not observable while gateway detail capture is off; pi asks for xhigh because OmniRoute clamps max to xhigh for models without a registry entry, so gpt-6.1-sol runs at xhigh here.",
+    "Capacity: the pool account used for these runs showed 1% of its weekly window used at 2026-09-30T01:39Z, after S1, S2, R1 and seven finished vote jobs of a parallel track with three more in flight (OmniRoute's provider-limits readout syncs every 70 minutes; upstream's manual refresh, POST /api/usage/provider-limits, gave the readings in evidence/pool-readings-20260930.json); five other accounts are at 100% until 2026-10-03/06 and the native Codex login until 2026-10-04T00:35Z.",
+    "S1 and S2 use a local integration runner rather than Harbor: Harbor v0.23.0's pi agent (src/harbor/agents/installed/pi.py lines 88-100, 115-178 and 222-235) installs the npm release and gives a custom endpoint an agent directory holding only models.json, so it cannot carry the stack arms' extensions, mcp.json, instruction file or the pinned tag without a subclass; S3 uses Harbor with that subclass.",
+    "R1 is one run: killed after the second model response (9 descendants, none alive 3 s later, session file kept the prompt and both tool results), resumed with pi --continue, task check passed. The first resumed request read 6,016 tokens from cache, the size of the static prefix that every stack run reads at request 1, so it does not show reuse of the resumed history. The killed in-flight request is a status 499 row at the gateway. It shows recovery of this session shape, not of every kill point.",
+    "The failed 14:12Z observation used the context-mode extension (today's stack-ext shape) and is recorded under that role; its entry-gateway row records tokens.compressed 3099 at status 429, so the request was compressed before the shared gateway refused it. The 97%, 0% and 0% synthetic cache figures of 2026-09-29 came from ad-hoc scripts that are not archived; the archived synthetic reading is evidence/gateway-readback-20260930T0009Z-first-apply.json (append-only turns 2 to 4 on 20129: share 0.965; on 20128 turn 2 read 0 and the share was 0.647).",
+    "Probe tally: kit/probes.py printed 96 PASS and 4 KNOWN-FAIL lines and ended 'ok (0 failed checks of 98)'; the runner's tally of 98 counts its own results, and some PASS lines come from the staging self-check it calls.",
+    "codemode is available in pi but not exercised; exposure is deferred to follow the ecosystem's ToolSearch practice. ai-memory and socraticode are not in the arms, and there is no Claude arm. Host mode is not container isolation.",
+    "pi main moves several times a day; the pin is a tag, and a later release is a different candidate."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "pi v0.99.1 behind the OmniRoute 20129 lane on the corrected token-save configuration (headerless lane = upstream's documented safe lane plus ccr, two defect mitigations), host mode, stages S1, S2 and R1 on four synthetic fixtures; no adoption, no container-isolation claim and no Anthropic route.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Nothing is installed outside the private state directories and the pi checkouts: remove them (two state directories: the second holds only the stack-gwoff control arm and a symlink to the first one's runs/). The trial writes no gateway setting, combo or key and changes no host or user configuration; rtk init and pi install touch only the arm HOMEs. Its one gateway call that is not an inference request is upstream's manual provider-limits refresh (POST /api/usage/provider-limits), which only refreshes the gateway's quota cache.",
+  "next_decision_changing_test": "Add a large-output fixture (multi-KB tool outputs repeated across turns, where context-mode containment and session-dedup can act) as a preregistered S2b with the same four arms. If the stack arm still costs more uncached tokens than plain there, or a layer stays uninvoked despite the instructions, the decision returns to defer; if it costs less at equal task success, prepare a preregistered S3 against codex exec through Harbor v0.23.0 with O1-style container isolation. Turning compression on at 20128 needs its own decision from the user and the cache-share numbers of the native Codex lane.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

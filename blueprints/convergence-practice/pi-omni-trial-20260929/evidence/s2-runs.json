@@ -1,0 +1,5363 @@
+{
+ "stage": "S2",
+ "runs": [
+  {
+   "run_id": "pi-trial-plain-calc-sign-bug-a1-20260930011040-s2",
+   "arm": "plain",
+   "client_arm": "plain",
+   "task": "calc-sign-bug",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:10:40Z",
+   "wall_seconds": 20.9,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": null,
+   "pi": {
+    "usage": {
+     "input": 3536,
+     "output": 251,
+     "cacheRead": 4352,
+     "cacheWrite": 0,
+     "reasoning": 0
+    },
+    "assistant_messages": 5,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 3,
+     "read": 2,
+     "edit": 1
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 6,
+     "context_mode": 0,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 3,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 1175,
+      "output": 29,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1341,
+      "output": 89,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 549,
+      "output": 41,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 227,
+      "output": 39,
+      "cacheRead": 1536,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 244,
+      "output": 53,
+      "cacheRead": 1664,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 5,
+    "status": {
+     "200": 5
+    },
+    "in": 7888,
+    "out": 251,
+    "cacheRead": 4352,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 20309,
+    "rows": [
+     {
+      "t": "01:10:46.014",
+      "status": 200,
+      "ms": 5608,
+      "in": 1175,
+      "out": 29,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:10:51.537",
+      "status": 200,
+      "ms": 5488,
+      "in": 1341,
+      "out": 89,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:10:54.676",
+      "status": 200,
+      "ms": 3075,
+      "in": 1701,
+      "out": 41,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:10:57.566",
+      "status": 200,
+      "ms": 2869,
+      "in": 1763,
+      "out": 39,
+      "cacheRead": 1536,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:11:00.904",
+      "status": 200,
+      "ms": 3269,
+      "in": 1908,
+      "out": 53,
+      "cacheRead": 1664,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-plain-calc-sign-bug-a2-20260930012436-s2",
+   "arm": "plain",
+   "client_arm": "plain",
+   "task": "calc-sign-bug",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:24:36Z",
+   "wall_seconds": 18.8,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": null,
+   "pi": {
+    "usage": {
+     "input": 1730,
+     "output": 263,
+     "cacheRead": 6400,
+     "cacheWrite": 0,
+     "reasoning": 0
+    },
+    "assistant_messages": 5,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 3,
+     "read": 2,
+     "edit": 1
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 6,
+     "context_mode": 0,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 3,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 151,
+      "output": 44,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 379,
+      "output": 89,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 739,
+      "output": 41,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 161,
+      "output": 37,
+      "cacheRead": 1664,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 300,
+      "output": 52,
+      "cacheRead": 1664,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 5,
+    "status": {
+     "200": 5
+    },
+    "in": 8130,
+    "out": 263,
+    "cacheRead": 6400,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 18202,
+    "rows": [
+     {
+      "t": "01:24:40.280",
+      "status": 200,
+      "ms": 3198,
+      "in": 1175,
+      "out": 44,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:24:45.594",
+      "status": 200,
+      "ms": 5278,
+      "in": 1403,
+      "out": 89,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:24:48.504",
+      "status": 200,
+      "ms": 2846,
+      "in": 1763,
+      "out": 41,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:24:51.307",
+      "status": 200,
+      "ms": 2782,
+      "in": 1825,
+      "out": 37,
+      "cacheRead": 1664,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:24:55.472",
+      "status": 200,
+      "ms": 4098,
+      "in": 1964,
+      "out": 52,
+      "cacheRead": 1664,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-plain-log-triage-a1-20260930011332-s2",
+   "arm": "plain",
+   "client_arm": "plain",
+   "task": "log-triage",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:13:32Z",
+   "wall_seconds": 11.4,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": null,
+   "pi": {
+    "usage": {
+     "input": 1768,
+     "output": 94,
+     "cacheRead": 2176,
+     "cacheWrite": 0,
+     "reasoning": 0
+    },
+    "assistant_messages": 3,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 1,
+     "write": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 0,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 1,
+     "bash_rtk_eligible": 1
+    },
+    "per_request": [
+     {
+      "input": 1199,
+      "output": 51,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 328,
+      "output": 26,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 241,
+      "output": 17,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 3,
+    "status": {
+     "200": 3
+    },
+    "in": 3944,
+    "out": 94,
+    "cacheRead": 2176,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 10963,
+    "rows": [
+     {
+      "t": "01:13:36.698",
+      "status": 200,
+      "ms": 3477,
+      "in": 1199,
+      "out": 51,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:13:39.317",
+      "status": 200,
+      "ms": 2580,
+      "in": 1352,
+      "out": 26,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:13:44.240",
+      "status": 200,
+      "ms": 4906,
+      "in": 1393,
+      "out": 17,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-plain-log-triage-a2-20260930012635-s2",
+   "arm": "plain",
+   "client_arm": "plain",
+   "task": "log-triage",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:26:35Z",
+   "wall_seconds": 9.0,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": null,
+   "pi": {
+    "usage": {
+     "input": 744,
+     "output": 98,
+     "cacheRead": 3200,
+     "cacheWrite": 0,
+     "reasoning": 0
+    },
+    "assistant_messages": 3,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 1,
+     "write": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 0,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 1,
+     "bash_rtk_eligible": 1
+    },
+    "per_request": [
+     {
+      "input": 175,
+      "output": 51,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 328,
+      "output": 26,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 241,
+      "output": 21,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 3,
+    "status": {
+     "200": 3
+    },
+    "in": 3944,
+    "out": 98,
+    "cacheRead": 3200,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 8591,
+    "rows": [
+     {
+      "t": "01:26:39.213",
+      "status": 200,
+      "ms": 3105,
+      "in": 1199,
+      "out": 51,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:26:42.419",
+      "status": 200,
+      "ms": 3152,
+      "in": 1352,
+      "out": 26,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:26:44.772",
+      "status": 200,
+      "ms": 2334,
+      "in": 1393,
+      "out": 21,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-plain-multi-file-rename-a1-20260930011545-s2",
+   "arm": "plain",
+   "client_arm": "plain",
+   "task": "multi-file-rename",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:15:45Z",
+   "wall_seconds": 57.1,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": null,
+   "pi": {
+    "usage": {
+     "input": 3604,
+     "output": 1257,
+     "cacheRead": 11904,
+     "cacheWrite": 0,
+     "reasoning": 81
+    },
+    "assistant_messages": 6,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 3,
+     "read": 10,
+     "edit": 9
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 22,
+     "context_mode": 0,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 3,
+     "bash_rtk_eligible": 3
+    },
+    "per_request": [
+     {
+      "input": 170,
+      "output": 72,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 598,
+      "output": 60,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 554,
+      "output": 320,
+      "cacheRead": 1536,
+      "cacheWrite": 0,
+      "reasoning": 26,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1034,
+      "output": 536,
+      "cacheRead": 1920,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 861,
+      "output": 110,
+      "cacheRead": 2816,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 387,
+      "output": 159,
+      "cacheRead": 3584,
+      "cacheWrite": 0,
+      "reasoning": 55,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 6,
+    "status": {
+     "200": 6
+    },
+    "in": 15508,
+    "out": 1257,
+    "cacheRead": 11904,
+    "cacheWrite": 0,
+    "reasoning": 81,
+    "compressed": 0,
+    "duration_ms": 56580,
+    "rows": [
+     {
+      "t": "01:15:51.065",
+      "status": 200,
+      "ms": 5406,
+      "in": 1194,
+      "out": 72,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:15:55.155",
+      "status": 200,
+      "ms": 4047,
+      "in": 1622,
+      "out": 60,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:16:07.157",
+      "status": 200,
+      "ms": 11967,
+      "in": 2090,
+      "out": 320,
+      "cacheRead": 1536,
+      "cacheWrite": 0,
+      "reasoning": 26,
+      "compressed": null
+     },
+     {
+      "t": "01:16:28.377",
+      "status": 200,
+      "ms": 21193,
+      "in": 2954,
+      "out": 536,
+      "cacheRead": 1920,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:16:34.853",
+      "status": 200,
+      "ms": 6449,
+      "in": 3677,
+      "out": 110,
+      "cacheRead": 2816,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:16:42.476",
+      "status": 200,
+      "ms": 7518,
+      "in": 3971,
+      "out": 159,
+      "cacheRead": 3584,
+      "cacheWrite": 0,
+      "reasoning": 55,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-plain-multi-file-rename-a2-20260930013107-s2",
+   "arm": "plain",
+   "client_arm": "plain",
+   "task": "multi-file-rename",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:31:07Z",
+   "wall_seconds": 58.2,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": null,
+   "pi": {
+    "usage": {
+     "input": 3460,
+     "output": 1425,
+     "cacheRead": 9216,
+     "cacheWrite": 0,
+     "reasoning": 135
+    },
+    "assistant_messages": 5,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 3,
+     "read": 10,
+     "edit": 9
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 22,
+     "context_mode": 0,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 3,
+     "bash_rtk_eligible": 3
+    },
+    "per_request": [
+     {
+      "input": 170,
+      "output": 61,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 574,
+      "output": 408,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1190,
+      "output": 719,
+      "cacheRead": 1408,
+      "cacheWrite": 0,
+      "reasoning": 135,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1072,
+      "output": 144,
+      "cacheRead": 2432,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 454,
+      "output": 93,
+      "cacheRead": 3328,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 5,
+    "status": {
+     "200": 5
+    },
+    "in": 12676,
+    "out": 1425,
+    "cacheRead": 9216,
+    "cacheWrite": 0,
+    "reasoning": 135,
+    "compressed": 0,
+    "duration_ms": 57629,
+    "rows": [
+     {
+      "t": "01:31:11.708",
+      "status": 200,
+      "ms": 3417,
+      "in": 1194,
+      "out": 61,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:31:27.813",
+      "status": 200,
+      "ms": 16060,
+      "in": 1598,
+      "out": 408,
+      "cacheRead": 1024,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:31:52.649",
+      "status": 200,
+      "ms": 24805,
+      "in": 2598,
+      "out": 719,
+      "cacheRead": 1408,
+      "cacheWrite": 0,
+      "reasoning": 135,
+      "compressed": null
+     },
+     {
+      "t": "01:32:00.745",
+      "status": 200,
+      "ms": 8067,
+      "in": 3504,
+      "out": 144,
+      "cacheRead": 2432,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:32:06.128",
+      "status": 200,
+      "ms": 5280,
+      "in": 3782,
+      "out": 93,
+      "cacheRead": 3328,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-calc-sign-bug-a1-20260930011101-s2",
+   "arm": "stack",
+   "client_arm": "stack",
+   "task": "calc-sign-bug",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:11:01Z",
+   "wall_seconds": 44.6,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 4,
+   "pi": {
+    "usage": {
+     "input": 13036,
+     "output": 645,
+     "cacheRead": 62464,
+     "cacheWrite": 0,
+     "reasoning": 250
+    },
+    "assistant_messages": 8,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 1,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 3,
+     "read": 1,
+     "edit": 1
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 5,
+     "context_mode": 0,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 3,
+     "bash_rtk_eligible": 3
+    },
+    "per_request": [
+     {
+      "input": 1898,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 8078,
+      "output": 21,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1565,
+      "output": 101,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 33,
+      "stop": "toolUse"
+     },
+     {
+      "input": 439,
+      "output": 26,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 243,
+      "output": 139,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 26,
+      "stop": "toolUse"
+     },
+     {
+      "input": 221,
+      "output": 42,
+      "cacheRead": 9728,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 240,
+      "output": 226,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 191,
+      "stop": "toolUse"
+     },
+     {
+      "input": 352,
+      "output": 61,
+      "cacheRead": 9984,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 8,
+    "status": {
+     "200": 8
+    },
+    "in": 75500,
+    "out": 645,
+    "cacheRead": 62464,
+    "cacheWrite": 0,
+    "reasoning": 250,
+    "compressed": 40,
+    "duration_ms": 42349,
+    "rows": [
+     {
+      "t": "01:11:06.021",
+      "status": 200,
+      "ms": 3408,
+      "in": 7914,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:11:08.757",
+      "status": 200,
+      "ms": 2706,
+      "in": 8078,
+      "out": 21,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:11:13.676",
+      "status": 200,
+      "ms": 4879,
+      "in": 9501,
+      "out": 101,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 33,
+      "compressed": 6
+     },
+     {
+      "t": "01:11:17.002",
+      "status": 200,
+      "ms": 3184,
+      "in": 9783,
+      "out": 26,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 6
+     },
+     {
+      "t": "01:11:24.485",
+      "status": 200,
+      "ms": 7461,
+      "in": 9843,
+      "out": 139,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 26,
+      "compressed": 6
+     },
+     {
+      "t": "01:11:29.485",
+      "status": 200,
+      "ms": 4973,
+      "in": 9949,
+      "out": 42,
+      "cacheRead": 9728,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 7
+     },
+     {
+      "t": "01:11:40.690",
+      "status": 200,
+      "ms": 11064,
+      "in": 10096,
+      "out": 226,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 191,
+      "compressed": 8
+     },
+     {
+      "t": "01:11:45.453",
+      "status": 200,
+      "ms": 4674,
+      "in": 10336,
+      "out": 61,
+      "cacheRead": 9984,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 7
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-calc-sign-bug-a1-20260930011145-s2",
+   "arm": "stack-gwoff",
+   "client_arm": "stack",
+   "task": "calc-sign-bug",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:11:46Z",
+   "wall_seconds": 47.4,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 4,
+   "pi": {
+    "usage": {
+     "input": 24787,
+     "output": 527,
+     "cacheRead": 40832,
+     "cacheWrite": 0,
+     "reasoning": 153
+    },
+    "assistant_messages": 7,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 1,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 3,
+     "read": 2,
+     "edit": 1
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 6,
+     "context_mode": 0,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 3,
+     "bash_rtk_eligible": 3
+    },
+    "per_request": [
+     {
+      "input": 1899,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2063,
+      "output": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 9512,
+      "output": 34,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 415,
+      "output": 99,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 410,
+      "output": 111,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 31,
+      "stop": "toolUse"
+     },
+     {
+      "input": 249,
+      "output": 37,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 10239,
+      "output": 196,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 122,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 7,
+    "status": {
+     "200": 7
+    },
+    "in": 65619,
+    "out": 527,
+    "cacheRead": 40832,
+    "cacheWrite": 0,
+    "reasoning": 153,
+    "compressed": 0,
+    "duration_ms": 44936,
+    "rows": [
+     {
+      "t": "01:11:50.876",
+      "status": 200,
+      "ms": 3161,
+      "in": 7915,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:11:54.710",
+      "status": 200,
+      "ms": 3807,
+      "in": 8079,
+      "out": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:11:58.275",
+      "status": 200,
+      "ms": 3493,
+      "in": 9512,
+      "out": 34,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:12:05.356",
+      "status": 200,
+      "ms": 6942,
+      "in": 9759,
+      "out": 99,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:12:10.883",
+      "status": 200,
+      "ms": 5414,
+      "in": 10010,
+      "out": 111,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 31,
+      "compressed": null
+     },
+     {
+      "t": "01:12:13.750",
+      "status": 200,
+      "ms": 2842,
+      "in": 10105,
+      "out": 37,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:12:33.159",
+      "status": 200,
+      "ms": 19277,
+      "in": 10239,
+      "out": 196,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 122,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-calc-sign-bug-a2-20260930012320-s2",
+   "arm": "stack-gwoff",
+   "client_arm": "stack",
+   "task": "calc-sign-bug",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:23:20Z",
+   "wall_seconds": 31.6,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 2,
+   "pi": {
+    "usage": {
+     "input": 6807,
+     "output": 353,
+     "cacheRead": 58624,
+     "cacheWrite": 0,
+     "reasoning": 27
+    },
+    "assistant_messages": 7,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 1,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 2,
+     "read": 2,
+     "edit": 1
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 5,
+     "context_mode": 0,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 1899,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2063,
+      "output": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1576,
+      "output": 34,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 415,
+      "output": 65,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 350,
+      "output": 111,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 27,
+      "stop": "toolUse"
+     },
+     {
+      "input": 185,
+      "output": 37,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 319,
+      "output": 56,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 7,
+    "status": {
+     "200": 7
+    },
+    "in": 65431,
+    "out": 353,
+    "cacheRead": 58624,
+    "cacheWrite": 0,
+    "reasoning": 27,
+    "compressed": 0,
+    "duration_ms": 29275,
+    "rows": [
+     {
+      "t": "01:23:26.338",
+      "status": 200,
+      "ms": 4633,
+      "in": 7915,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:23:29.287",
+      "status": 200,
+      "ms": 2920,
+      "in": 8079,
+      "out": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:23:33.122",
+      "status": 200,
+      "ms": 3731,
+      "in": 9512,
+      "out": 34,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:23:38.096",
+      "status": 200,
+      "ms": 4836,
+      "in": 9759,
+      "out": 65,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:23:43.876",
+      "status": 200,
+      "ms": 5752,
+      "in": 9950,
+      "out": 111,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 27,
+      "compressed": null
+     },
+     {
+      "t": "01:23:46.967",
+      "status": 200,
+      "ms": 3064,
+      "in": 10041,
+      "out": 37,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:23:51.449",
+      "status": 200,
+      "ms": 4339,
+      "in": 10175,
+      "out": 56,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-calc-sign-bug-a2-20260930012352-s2",
+   "arm": "stack",
+   "client_arm": "stack",
+   "task": "calc-sign-bug",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:23:52Z",
+   "wall_seconds": 44.4,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 4,
+   "pi": {
+    "usage": {
+     "input": 7002,
+     "output": 612,
+     "cacheRead": 58752,
+     "cacheWrite": 0,
+     "reasoning": 232
+    },
+    "assistant_messages": 7,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 1,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 3,
+     "read": 2,
+     "edit": 1
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 6,
+     "context_mode": 0,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 3,
+     "bash_rtk_eligible": 3
+    },
+    "per_request": [
+     {
+      "input": 1898,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2062,
+      "output": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1564,
+      "output": 34,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 403,
+      "output": 103,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 402,
+      "output": 209,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 124,
+      "stop": "toolUse"
+     },
+     {
+      "input": 334,
+      "output": 37,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 339,
+      "output": 179,
+      "cacheRead": 9984,
+      "cacheWrite": 0,
+      "reasoning": 108,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 7,
+    "status": {
+     "200": 7
+    },
+    "in": 65754,
+    "out": 612,
+    "cacheRead": 58752,
+    "cacheWrite": 0,
+    "reasoning": 232,
+    "compressed": 35,
+    "duration_ms": 41770,
+    "rows": [
+     {
+      "t": "01:23:56.619",
+      "status": 200,
+      "ms": 2884,
+      "in": 7914,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:23:59.817",
+      "status": 200,
+      "ms": 3166,
+      "in": 8078,
+      "out": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:24:09.376",
+      "status": 200,
+      "ms": 9457,
+      "in": 9500,
+      "out": 34,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 6
+     },
+     {
+      "t": "01:24:15.127",
+      "status": 200,
+      "ms": 5609,
+      "in": 9747,
+      "out": 103,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 6
+     },
+     {
+      "t": "01:24:24.167",
+      "status": 200,
+      "ms": 8911,
+      "in": 10002,
+      "out": 209,
+      "cacheRead": 9600,
+      "cacheWrite": 0,
+      "reasoning": 124,
+      "compressed": 7
+     },
+     {
+      "t": "01:24:28.124",
+      "status": 200,
+      "ms": 3932,
+      "in": 10190,
+      "out": 37,
+      "cacheRead": 9856,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 8
+     },
+     {
+      "t": "01:24:36.072",
+      "status": 200,
+      "ms": 7811,
+      "in": 10323,
+      "out": 179,
+      "cacheRead": 9984,
+      "cacheWrite": 0,
+      "reasoning": 108,
+      "compressed": 8
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-ext-calc-sign-bug-a1-20260930011233-s2",
+   "arm": "stack-ext",
+   "client_arm": "stack-ext",
+   "task": "calc-sign-bug",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:12:33Z",
+   "wall_seconds": 58.9,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 3,
+   "pi": {
+    "usage": {
+     "input": 19178,
+     "output": 1086,
+     "cacheRead": 81664,
+     "cacheWrite": 0,
+     "reasoning": 277
+    },
+    "assistant_messages": 8,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 1,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 2,
+     "read": 3,
+     "ctx_execute": 2,
+     "edit": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 6,
+     "context_mode": 2,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 3148,
+      "output": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 8863,
+      "output": 21,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1583,
+      "output": 102,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 3563,
+      "output": 417,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 177,
+      "stop": "toolUse"
+     },
+     {
+      "input": 906,
+      "output": 118,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 27,
+      "stop": "toolUse"
+     },
+     {
+      "input": 229,
+      "output": 209,
+      "cacheRead": 14336,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 573,
+      "output": 110,
+      "cacheRead": 14464,
+      "cacheWrite": 0,
+      "reasoning": 73,
+      "stop": "toolUse"
+     },
+     {
+      "input": 313,
+      "output": 80,
+      "cacheRead": 14848,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 8,
+    "status": {
+     "200": 8
+    },
+    "in": 100842,
+    "out": 1086,
+    "cacheRead": 81664,
+    "cacheWrite": 0,
+    "reasoning": 277,
+    "compressed": 42,
+    "duration_ms": 56516,
+    "rows": [
+     {
+      "t": "01:12:38.325",
+      "status": 200,
+      "ms": 3081,
+      "in": 8780,
+      "out": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:12:42.046",
+      "status": 200,
+      "ms": 3682,
+      "in": 8863,
+      "out": 21,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:12:47.471",
+      "status": 200,
+      "ms": 5344,
+      "in": 10287,
+      "out": 102,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 6
+     },
+     {
+      "t": "01:13:03.782",
+      "status": 200,
+      "ms": 16206,
+      "in": 13675,
+      "out": 417,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 177,
+      "compressed": 5
+     },
+     {
+      "t": "01:13:10.014",
+      "status": 200,
+      "ms": 6027,
+      "in": 14474,
+      "out": 118,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 27,
+      "compressed": 7
+     },
+     {
+      "t": "01:13:20.109",
+      "status": 200,
+      "ms": 10068,
+      "in": 14565,
+      "out": 209,
+      "cacheRead": 14336,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 8
+     },
+     {
+      "t": "01:13:27.080",
+      "status": 200,
+      "ms": 6880,
+      "in": 15037,
+      "out": 110,
+      "cacheRead": 14464,
+      "cacheWrite": 0,
+      "reasoning": 73,
+      "compressed": 8
+     },
+     {
+      "t": "01:13:32.407",
+      "status": 200,
+      "ms": 5228,
+      "in": 15161,
+      "out": 80,
+      "cacheRead": 14848,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 8
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-ext-calc-sign-bug-a2-20260930012223-s2",
+   "arm": "stack-ext",
+   "client_arm": "stack-ext",
+   "task": "calc-sign-bug",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:22:23Z",
+   "wall_seconds": 56.3,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "4b4cd9c1aadb702d82c5866232478dc3cd23e629",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "tests_intact": true,
+    "other_tracked_changes": [],
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 2,
+   "pi": {
+    "usage": {
+     "input": 9950,
+     "output": 856,
+     "cacheRead": 74880,
+     "cacheWrite": 0,
+     "reasoning": 261
+    },
+    "assistant_messages": 7,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 1,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 1,
+     "read": 3,
+     "ctx_execute": 2,
+     "edit": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 5,
+     "context_mode": 2,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 1,
+     "bash_rtk_eligible": 1
+    },
+    "per_request": [
+     {
+      "input": 3148,
+      "output": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 287,
+      "output": 21,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1582,
+      "output": 184,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 51,
+      "stop": "toolUse"
+     },
+     {
+      "input": 3615,
+      "output": 230,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 61,
+      "stop": "toolUse"
+     },
+     {
+      "input": 693,
+      "output": 41,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 243,
+      "output": 118,
+      "cacheRead": 14080,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 382,
+      "output": 233,
+      "cacheRead": 14208,
+      "cacheWrite": 0,
+      "reasoning": 149,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 7,
+    "status": {
+     "200": 7
+    },
+    "in": 84830,
+    "out": 856,
+    "cacheRead": 74880,
+    "cacheWrite": 0,
+    "reasoning": 261,
+    "compressed": 33,
+    "duration_ms": 53374,
+    "rows": [
+     {
+      "t": "01:22:28.189",
+      "status": 200,
+      "ms": 2823,
+      "in": 8780,
+      "out": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:22:35.925",
+      "status": 200,
+      "ms": 7693,
+      "in": 8863,
+      "out": 21,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:22:47.649",
+      "status": 200,
+      "ms": 11588,
+      "in": 10286,
+      "out": 184,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 51,
+      "compressed": 6
+     },
+     {
+      "t": "01:22:57.788",
+      "status": 200,
+      "ms": 9977,
+      "in": 13727,
+      "out": 230,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 61,
+      "compressed": 5
+     },
+     {
+      "t": "01:23:02.926",
+      "status": 200,
+      "ms": 4937,
+      "in": 14261,
+      "out": 41,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 7
+     },
+     {
+      "t": "01:23:09.749",
+      "status": 200,
+      "ms": 6794,
+      "in": 14323,
+      "out": 118,
+      "cacheRead": 14080,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 8
+     },
+     {
+      "t": "01:23:19.491",
+      "status": 200,
+      "ms": 9562,
+      "in": 14590,
+      "out": 233,
+      "cacheRead": 14208,
+      "cacheWrite": 0,
+      "reasoning": 149,
+      "compressed": 7
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-ext-log-triage-a1-20260930011459-s2",
+   "arm": "stack-ext",
+   "client_arm": "stack-ext",
+   "task": "log-triage",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:14:59Z",
+   "wall_seconds": 45.9,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 0,
+   "pi": {
+    "usage": {
+     "input": 9329,
+     "output": 984,
+     "cacheRead": 53888,
+     "cacheWrite": 0,
+     "reasoning": 193
+    },
+    "assistant_messages": 5,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "read": 1,
+     "ctx_execute": 2,
+     "write": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 2,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 0,
+     "bash_rtk_eligible": 0
+    },
+    "per_request": [
+     {
+      "input": 3172,
+      "output": 60,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 4253,
+      "output": 412,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 137,
+      "stop": "toolUse"
+     },
+     {
+      "input": 864,
+      "output": 122,
+      "cacheRead": 12672,
+      "cacheWrite": 0,
+      "reasoning": 56,
+      "stop": "toolUse"
+     },
+     {
+      "input": 271,
+      "output": 344,
+      "cacheRead": 13440,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 769,
+      "output": 46,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 5,
+    "status": {
+     "200": 5
+    },
+    "in": 63217,
+    "out": 984,
+    "cacheRead": 53888,
+    "cacheWrite": 0,
+    "reasoning": 193,
+    "compressed": 0,
+    "duration_ms": 42191,
+    "rows": [
+     {
+      "t": "01:15:06.854",
+      "status": 200,
+      "ms": 4364,
+      "in": 8804,
+      "out": 60,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:15:22.059",
+      "status": 200,
+      "ms": 15175,
+      "in": 12829,
+      "out": 412,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 137,
+      "compressed": null
+     },
+     {
+      "t": "01:15:28.329",
+      "status": 200,
+      "ms": 6098,
+      "in": 13536,
+      "out": 122,
+      "cacheRead": 12672,
+      "cacheWrite": 0,
+      "reasoning": 56,
+      "compressed": null
+     },
+     {
+      "t": "01:15:41.228",
+      "status": 200,
+      "ms": 12874,
+      "in": 13711,
+      "out": 344,
+      "cacheRead": 13440,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:15:44.964",
+      "status": 200,
+      "ms": 3680,
+      "in": 14337,
+      "out": 46,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-ext-log-triage-a2-20260930012455-s2",
+   "arm": "stack-ext",
+   "client_arm": "stack-ext",
+   "task": "log-triage",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:24:55Z",
+   "wall_seconds": 43.1,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 0,
+   "pi": {
+    "usage": {
+     "input": 9465,
+     "output": 943,
+     "cacheRead": 53888,
+     "cacheWrite": 0,
+     "reasoning": 58
+    },
+    "assistant_messages": 5,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "read": 1,
+     "ctx_execute": 2,
+     "write": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 2,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 0,
+     "bash_rtk_eligible": 0
+    },
+    "per_request": [
+     {
+      "input": 3172,
+      "output": 60,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 4253,
+      "output": 295,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 858,
+      "output": 124,
+      "cacheRead": 12672,
+      "cacheWrite": 0,
+      "reasoning": 58,
+      "stop": "toolUse"
+     },
+     {
+      "input": 267,
+      "output": 421,
+      "cacheRead": 13440,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 915,
+      "output": 43,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 5,
+    "status": {
+     "200": 5
+    },
+    "in": 63353,
+    "out": 943,
+    "cacheRead": 53888,
+    "cacheWrite": 0,
+    "reasoning": 58,
+    "compressed": 0,
+    "duration_ms": 40651,
+    "rows": [
+     {
+      "t": "01:25:01.884",
+      "status": 200,
+      "ms": 4257,
+      "in": 8804,
+      "out": 60,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:25:13.217",
+      "status": 200,
+      "ms": 11300,
+      "in": 12829,
+      "out": 295,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:25:19.329",
+      "status": 200,
+      "ms": 5939,
+      "in": 13530,
+      "out": 124,
+      "cacheRead": 12672,
+      "cacheWrite": 0,
+      "reasoning": 58,
+      "compressed": null
+     },
+     {
+      "t": "01:25:34.994",
+      "status": 200,
+      "ms": 15640,
+      "in": 13707,
+      "out": 421,
+      "cacheRead": 13440,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:25:38.566",
+      "status": 200,
+      "ms": 3515,
+      "in": 14483,
+      "out": 43,
+      "cacheRead": 13568,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-ext-multi-file-rename-a1-20260930012006-s2",
+   "arm": "stack-ext",
+   "client_arm": "stack-ext",
+   "task": "multi-file-rename",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:20:06Z",
+   "wall_seconds": 127.2,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 9,
+   "pi": {
+    "usage": {
+     "input": 40414,
+     "output": 2748,
+     "cacheRead": 138496,
+     "cacheWrite": 0,
+     "reasoning": 779
+    },
+    "assistant_messages": 12,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 3,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 5,
+     "read": 10,
+     "mcp__serena__find_referencing_symbols": 1,
+     "edit": 9,
+     "ctx_execute": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 24,
+     "context_mode": 1,
+     "tool_search": 3,
+     "mcp": 2,
+     "bash_calls": 5,
+     "bash_rtk_eligible": 5
+    },
+    "per_request": [
+     {
+      "input": 3167,
+      "output": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 306,
+      "output": 21,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1602,
+      "output": 90,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 319,
+      "output": 275,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 78,
+      "stop": "toolUse"
+     },
+     {
+      "input": 14944,
+      "output": 114,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 48,
+      "stop": "toolUse"
+     },
+     {
+      "input": 15306,
+      "output": 348,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 25,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1629,
+      "output": 890,
+      "cacheRead": 15104,
+      "cacheWrite": 0,
+      "reasoning": 323,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1131,
+      "output": 442,
+      "cacheRead": 16640,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1065,
+      "output": 93,
+      "cacheRead": 17664,
+      "cacheWrite": 0,
+      "reasoning": 51,
+      "stop": "toolUse"
+     },
+     {
+      "input": 328,
+      "output": 65,
+      "cacheRead": 18560,
+      "cacheWrite": 0,
+      "reasoning": 30,
+      "stop": "toolUse"
+     },
+     {
+      "input": 293,
+      "output": 99,
+      "cacheRead": 18688,
+      "cacheWrite": 0,
+      "reasoning": 65,
+      "stop": "toolUse"
+     },
+     {
+      "input": 324,
+      "output": 282,
+      "cacheRead": 18816,
+      "cacheWrite": 0,
+      "reasoning": 159,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 12,
+    "status": {
+     "200": 12
+    },
+    "in": 178910,
+    "out": 2748,
+    "cacheRead": 138496,
+    "cacheWrite": 0,
+    "reasoning": 779,
+    "compressed": 80,
+    "duration_ms": 121898,
+    "rows": [
+     {
+      "t": "01:20:10.776",
+      "status": 200,
+      "ms": 3024,
+      "in": 8799,
+      "out": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:20:13.885",
+      "status": 200,
+      "ms": 3077,
+      "in": 8882,
+      "out": 21,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:20:19.186",
+      "status": 200,
+      "ms": 5243,
+      "in": 10306,
+      "out": 90,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 5
+     },
+     {
+      "t": "01:20:29.989",
+      "status": 200,
+      "ms": 10646,
+      "in": 10431,
+      "out": 275,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 78,
+      "compressed": 6
+     },
+     {
+      "t": "01:20:36.517",
+      "status": 200,
+      "ms": 6361,
+      "in": 14944,
+      "out": 114,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 48,
+      "compressed": 6
+     },
+     {
+      "t": "01:20:51.068",
+      "status": 200,
+      "ms": 14503,
+      "in": 15306,
+      "out": 348,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 25,
+      "compressed": 6
+     },
+     {
+      "t": "01:21:25.622",
+      "status": 200,
+      "ms": 32293,
+      "in": 16733,
+      "out": 890,
+      "cacheRead": 15104,
+      "cacheWrite": 0,
+      "reasoning": 323,
+      "compressed": 9
+     },
+     {
+      "t": "01:21:42.867",
+      "status": 200,
+      "ms": 17209,
+      "in": 17771,
+      "out": 442,
+      "cacheRead": 16640,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 10
+     },
+     {
+      "t": "01:21:50.882",
+      "status": 200,
+      "ms": 7748,
+      "in": 18729,
+      "out": 93,
+      "cacheRead": 17664,
+      "cacheWrite": 0,
+      "reasoning": 51,
+      "compressed": 10
+     },
+     {
+      "t": "01:21:55.978",
+      "status": 200,
+      "ms": 4995,
+      "in": 18888,
+      "out": 65,
+      "cacheRead": 18560,
+      "cacheWrite": 0,
+      "reasoning": 30,
+      "compressed": 10
+     },
+     {
+      "t": "01:22:01.958",
+      "status": 200,
+      "ms": 5880,
+      "in": 18981,
+      "out": 99,
+      "cacheRead": 18688,
+      "cacheWrite": 0,
+      "reasoning": 65,
+      "compressed": 9
+     },
+     {
+      "t": "01:22:12.977",
+      "status": 200,
+      "ms": 10919,
+      "in": 19140,
+      "out": 282,
+      "cacheRead": 18816,
+      "cacheWrite": 0,
+      "reasoning": 159,
+      "compressed": 9
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-ext-multi-file-rename-a2-20260930012644-s2",
+   "arm": "stack-ext",
+   "client_arm": "stack-ext",
+   "task": "multi-file-rename",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:26:44Z",
+   "wall_seconds": 105.1,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 4,
+   "pi": {
+    "usage": {
+     "input": 19682,
+     "output": 2485,
+     "cacheRead": 89728,
+     "cacheWrite": 0,
+     "reasoning": 762
+    },
+    "assistant_messages": 8,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 3,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 2,
+     "read": 10,
+     "mcp__serena__find_referencing_symbols": 1,
+     "edit": 9,
+     "ctx_execute": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 21,
+     "context_mode": 1,
+     "tool_search": 3,
+     "mcp": 2,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 3167,
+      "output": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 306,
+      "output": 21,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1603,
+      "output": 237,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 74,
+      "stop": "toolUse"
+     },
+     {
+      "input": 5177,
+      "output": 160,
+      "cacheRead": 9088,
+      "cacheWrite": 0,
+      "reasoning": 42,
+      "stop": "toolUse"
+     },
+     {
+      "input": 5681,
+      "output": 411,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 86,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1665,
+      "output": 602,
+      "cacheRead": 14848,
+      "cacheWrite": 0,
+      "reasoning": 20,
+      "stop": "toolUse"
+     },
+     {
+      "input": 874,
+      "output": 623,
+      "cacheRead": 16384,
+      "cacheWrite": 0,
+      "reasoning": 258,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1209,
+      "output": 402,
+      "cacheRead": 17152,
+      "cacheWrite": 0,
+      "reasoning": 282,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 8,
+    "status": {
+     "200": 8
+    },
+    "in": 109410,
+    "out": 2485,
+    "cacheRead": 89728,
+    "cacheWrite": 0,
+    "reasoning": 762,
+    "compressed": 45,
+    "duration_ms": 100025,
+    "rows": [
+     {
+      "t": "01:26:50.075",
+      "status": 200,
+      "ms": 3271,
+      "in": 8799,
+      "out": 29,
+      "cacheRead": 5632,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:26:52.614",
+      "status": 200,
+      "ms": 2504,
+      "in": 8882,
+      "out": 21,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:27:02.668",
+      "status": 200,
+      "ms": 9938,
+      "in": 10307,
+      "out": 237,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 74,
+      "compressed": 5
+     },
+     {
+      "t": "01:27:11.642",
+      "status": 200,
+      "ms": 8816,
+      "in": 14265,
+      "out": 160,
+      "cacheRead": 9088,
+      "cacheWrite": 0,
+      "reasoning": 42,
+      "compressed": 5
+     },
+     {
+      "t": "01:27:27.531",
+      "status": 200,
+      "ms": 15763,
+      "in": 15025,
+      "out": 411,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 86,
+      "compressed": 6
+     },
+     {
+      "t": "01:27:51.676",
+      "status": 200,
+      "ms": 21955,
+      "in": 16513,
+      "out": 602,
+      "cacheRead": 14848,
+      "cacheWrite": 0,
+      "reasoning": 20,
+      "compressed": 10
+     },
+     {
+      "t": "01:28:14.152",
+      "status": 200,
+      "ms": 22437,
+      "in": 17258,
+      "out": 623,
+      "cacheRead": 16384,
+      "cacheWrite": 0,
+      "reasoning": 258,
+      "compressed": 10
+     },
+     {
+      "t": "01:28:29.652",
+      "status": 200,
+      "ms": 15341,
+      "in": 18361,
+      "out": 402,
+      "cacheRead": 17152,
+      "cacheWrite": 0,
+      "reasoning": 282,
+      "compressed": 9
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-log-triage-a1-20260930011344-s2",
+   "arm": "stack",
+   "client_arm": "stack",
+   "task": "log-triage",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:13:44Z",
+   "wall_seconds": 48.2,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 1,
+   "pi": {
+    "usage": {
+     "input": 4345,
+     "output": 941,
+     "cacheRead": 48000,
+     "cacheWrite": 0,
+     "reasoning": 239
+    },
+    "assistant_messages": 6,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 1,
+     "read": 1,
+     "mcp__context-mode__ctx_execute": 2,
+     "write": 1
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 3,
+     "context_mode": 2,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 1,
+     "bash_rtk_eligible": 1
+    },
+    "per_request": [
+     {
+      "input": 1922,
+      "output": 30,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 255,
+      "output": 125,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 97,
+      "stop": "toolUse"
+     },
+     {
+      "input": 482,
+      "output": 340,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 773,
+      "output": 26,
+      "cacheRead": 8320,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 174,
+      "output": 378,
+      "cacheRead": 8960,
+      "cacheWrite": 0,
+      "reasoning": 142,
+      "stop": "toolUse"
+     },
+     {
+      "input": 739,
+      "output": 42,
+      "cacheRead": 8960,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 6,
+    "status": {
+     "200": 6
+    },
+    "in": 52345,
+    "out": 941,
+    "cacheRead": 48000,
+    "cacheWrite": 0,
+    "reasoning": 239,
+    "compressed": 4,
+    "duration_ms": 46260,
+    "rows": [
+     {
+      "t": "01:13:48.605",
+      "status": 200,
+      "ms": 2659,
+      "in": 7938,
+      "out": 30,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:13:55.989",
+      "status": 200,
+      "ms": 7296,
+      "in": 8063,
+      "out": 125,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 97,
+      "compressed": 1
+     },
+     {
+      "t": "01:14:08.837",
+      "status": 200,
+      "ms": 12825,
+      "in": 8418,
+      "out": 340,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 0
+     },
+     {
+      "t": "01:14:12.485",
+      "status": 200,
+      "ms": 3590,
+      "in": 9093,
+      "out": 26,
+      "cacheRead": 8320,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 1
+     },
+     {
+      "t": "01:14:29.021",
+      "status": 200,
+      "ms": 16516,
+      "in": 9134,
+      "out": 378,
+      "cacheRead": 8960,
+      "cacheWrite": 0,
+      "reasoning": 142,
+      "compressed": 1
+     },
+     {
+      "t": "01:14:32.439",
+      "status": 200,
+      "ms": 3374,
+      "in": 9699,
+      "out": 42,
+      "cacheRead": 8960,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 1
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-log-triage-a1-20260930011432-s2",
+   "arm": "stack-gwoff",
+   "client_arm": "stack",
+   "task": "log-triage",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:14:32Z",
+   "wall_seconds": 26.2,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 0,
+   "pi": {
+    "usage": {
+     "input": 10789,
+     "output": 575,
+     "cacheRead": 14464,
+     "cacheWrite": 0,
+     "reasoning": 222
+    },
+    "assistant_messages": 3,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "mcp__context-mode__ctx_execute": 1,
+     "write": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 1,
+     "context_mode": 1,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 0,
+     "bash_rtk_eligible": 0
+    },
+    "per_request": [
+     {
+      "input": 1923,
+      "output": 279,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 8572,
+      "output": 155,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 127,
+      "stop": "toolUse"
+     },
+     {
+      "input": 294,
+      "output": 141,
+      "cacheRead": 8448,
+      "cacheWrite": 0,
+      "reasoning": 95,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 3,
+    "status": {
+     "200": 3
+    },
+    "in": 25253,
+    "out": 575,
+    "cacheRead": 14464,
+    "cacheWrite": 0,
+    "reasoning": 222,
+    "compressed": 0,
+    "duration_ms": 23905,
+    "rows": [
+     {
+      "t": "01:14:45.669",
+      "status": 200,
+      "ms": 10778,
+      "in": 7939,
+      "out": 279,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:14:52.330",
+      "status": 200,
+      "ms": 6602,
+      "in": 8572,
+      "out": 155,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 127,
+      "compressed": null
+     },
+     {
+      "t": "01:14:58.897",
+      "status": 200,
+      "ms": 6525,
+      "in": 8742,
+      "out": 141,
+      "cacheRead": 8448,
+      "cacheWrite": 0,
+      "reasoning": 95,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-log-triage-a2-20260930012539-s2",
+   "arm": "stack-gwoff",
+   "client_arm": "stack",
+   "task": "log-triage",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:25:39Z",
+   "wall_seconds": 30.0,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 0,
+   "pi": {
+    "usage": {
+     "input": 5533,
+     "output": 530,
+     "cacheRead": 28160,
+     "cacheWrite": 0,
+     "reasoning": 85
+    },
+    "assistant_messages": 4,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "mcp__context-mode__ctx_execute": 1,
+     "write": 1,
+     "read": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 1,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 0,
+     "bash_rtk_eligible": 0
+    },
+    "per_request": [
+     {
+      "input": 1923,
+      "output": 255,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2437,
+      "output": 63,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 248,
+      "output": 150,
+      "cacheRead": 8320,
+      "cacheWrite": 0,
+      "reasoning": 85,
+      "stop": "toolUse"
+     },
+     {
+      "input": 925,
+      "output": 62,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 4,
+    "status": {
+     "200": 4
+    },
+    "in": 33693,
+    "out": 530,
+    "cacheRead": 28160,
+    "cacheWrite": 0,
+    "reasoning": 85,
+    "compressed": 0,
+    "duration_ms": 28045,
+    "rows": [
+     {
+      "t": "01:25:52.106",
+      "status": 200,
+      "ms": 11478,
+      "in": 7939,
+      "out": 255,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:25:56.530",
+      "status": 200,
+      "ms": 4363,
+      "in": 8453,
+      "out": 63,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:26:04.891",
+      "status": 200,
+      "ms": 8336,
+      "in": 8568,
+      "out": 150,
+      "cacheRead": 8320,
+      "cacheWrite": 0,
+      "reasoning": 85,
+      "compressed": null
+     },
+     {
+      "t": "01:26:08.780",
+      "status": 200,
+      "ms": 3868,
+      "in": 8733,
+      "out": 62,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-log-triage-a2-20260930012609-s2",
+   "arm": "stack",
+   "client_arm": "stack",
+   "task": "log-triage",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:26:09Z",
+   "wall_seconds": 26.3,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "18051c0a8402cca476bc5b876a0266bc4aafba4c",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_matches": true,
+    "log_intact": true
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 0,
+   "pi": {
+    "usage": {
+     "input": 2872,
+     "output": 541,
+     "cacheRead": 22144,
+     "cacheWrite": 0,
+     "reasoning": 194
+    },
+    "assistant_messages": 3,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "mcp__context-mode__ctx_execute": 1,
+     "write": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 1,
+     "context_mode": 1,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 0,
+     "bash_rtk_eligible": 0
+    },
+    "per_request": [
+     {
+      "input": 1922,
+      "output": 240,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 609,
+      "output": 192,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 127,
+      "stop": "toolUse"
+     },
+     {
+      "input": 341,
+      "output": 109,
+      "cacheRead": 8320,
+      "cacheWrite": 0,
+      "reasoning": 67,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 3,
+    "status": {
+     "200": 3
+    },
+    "in": 25016,
+    "out": 541,
+    "cacheRead": 22144,
+    "cacheWrite": 0,
+    "reasoning": 194,
+    "compressed": 0,
+    "duration_ms": 24226,
+    "rows": [
+     {
+      "t": "01:26:20.321",
+      "status": 200,
+      "ms": 9346,
+      "in": 7938,
+      "out": 240,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:26:29.641",
+      "status": 200,
+      "ms": 9257,
+      "in": 8417,
+      "out": 192,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 127,
+      "compressed": null
+     },
+     {
+      "t": "01:26:35.307",
+      "status": 200,
+      "ms": 5623,
+      "in": 8661,
+      "out": 109,
+      "cacheRead": 8320,
+      "cacheWrite": 0,
+      "reasoning": 67,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-multi-file-rename-a1-20260930011642-s2",
+   "arm": "stack",
+   "client_arm": "stack",
+   "task": "multi-file-rename",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:16:42Z",
+   "wall_seconds": 92.1,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 6,
+   "pi": {
+    "usage": {
+     "input": 32350,
+     "output": 1836,
+     "cacheRead": 77824,
+     "cacheWrite": 0,
+     "reasoning": 906
+    },
+    "assistant_messages": 10,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 3,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 2,
+     "read": 9,
+     "mcp__serena__find_referencing_symbols": 1,
+     "mcp__serena__rename_symbol": 1,
+     "edit": 3
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 14,
+     "context_mode": 0,
+     "tool_search": 3,
+     "mcp": 3,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 1917,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2081,
+      "output": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1585,
+      "output": 186,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 79,
+      "stop": "toolUse"
+     },
+     {
+      "input": 676,
+      "output": 32,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 10636,
+      "output": 431,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 107,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1649,
+      "output": 350,
+      "cacheRead": 10496,
+      "cacheWrite": 0,
+      "reasoning": 320,
+      "stop": "toolUse"
+     },
+     {
+      "input": 12686,
+      "output": 39,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 214,
+      "output": 153,
+      "cacheRead": 12544,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 303,
+      "output": 294,
+      "cacheRead": 12672,
+      "cacheWrite": 0,
+      "reasoning": 204,
+      "stop": "toolUse"
+     },
+     {
+      "input": 603,
+      "output": 301,
+      "cacheRead": 12800,
+      "cacheWrite": 0,
+      "reasoning": 196,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 10,
+    "status": {
+     "200": 10
+    },
+    "in": 110174,
+    "out": 1836,
+    "cacheRead": 77824,
+    "cacheWrite": 0,
+    "reasoning": 906,
+    "compressed": 66,
+    "duration_ms": 87376,
+    "rows": [
+     {
+      "t": "01:16:48.251",
+      "status": 200,
+      "ms": 4037,
+      "in": 7933,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:16:51.183",
+      "status": 200,
+      "ms": 2897,
+      "in": 8097,
+      "out": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:17:00.677",
+      "status": 200,
+      "ms": 9378,
+      "in": 9521,
+      "out": 186,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 79,
+      "compressed": 6
+     },
+     {
+      "t": "01:17:03.953",
+      "status": 200,
+      "ms": 3088,
+      "in": 10020,
+      "out": 32,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 6
+     },
+     {
+      "t": "01:17:20.885",
+      "status": 200,
+      "ms": 16883,
+      "in": 10636,
+      "out": 431,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 107,
+      "compressed": 6
+     },
+     {
+      "t": "01:17:36.929",
+      "status": 200,
+      "ms": 13781,
+      "in": 12145,
+      "out": 350,
+      "cacheRead": 10496,
+      "cacheWrite": 0,
+      "reasoning": 320,
+      "compressed": 9
+     },
+     {
+      "t": "01:17:41.055",
+      "status": 200,
+      "ms": 4091,
+      "in": 12686,
+      "out": 39,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 10
+     },
+     {
+      "t": "01:17:48.044",
+      "status": 200,
+      "ms": 6926,
+      "in": 12758,
+      "out": 153,
+      "cacheRead": 12544,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 10
+     },
+     {
+      "t": "01:18:02.196",
+      "status": 200,
+      "ms": 14120,
+      "in": 12975,
+      "out": 294,
+      "cacheRead": 12672,
+      "cacheWrite": 0,
+      "reasoning": 204,
+      "compressed": 10
+     },
+     {
+      "t": "01:18:14.588",
+      "status": 200,
+      "ms": 12175,
+      "in": 13403,
+      "out": 301,
+      "cacheRead": 12800,
+      "cacheWrite": 0,
+      "reasoning": 196,
+      "compressed": 9
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-multi-file-rename-a1-20260930011815-s2",
+   "arm": "stack-gwoff",
+   "client_arm": "stack",
+   "task": "multi-file-rename",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:18:15Z",
+   "wall_seconds": 110.6,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 14,
+   "pi": {
+    "usage": {
+     "input": 25479,
+     "output": 2423,
+     "cacheRead": 101248,
+     "cacheWrite": 0,
+     "reasoning": 829
+    },
+    "assistant_messages": 11,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 3,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 4,
+     "mcp__serena__find_referencing_symbols": 1,
+     "read": 10,
+     "edit": 9
+    },
+    "tool_errors": {
+     "bash": 1
+    },
+    "lanes": {
+     "builtin": 23,
+     "context_mode": 0,
+     "tool_search": 3,
+     "mcp": 2,
+     "bash_calls": 4,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 1918,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2082,
+      "output": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1596,
+      "output": 134,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 67,
+      "stop": "toolUse"
+     },
+     {
+      "input": 3689,
+      "output": 81,
+      "cacheRead": 6528,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 545,
+      "output": 105,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 40,
+      "stop": "toolUse"
+     },
+     {
+      "input": 11011,
+      "output": 418,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 71,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1741,
+      "output": 727,
+      "cacheRead": 10880,
+      "cacheWrite": 0,
+      "reasoning": 150,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1080,
+      "output": 86,
+      "cacheRead": 12416,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 634,
+      "output": 266,
+      "cacheRead": 13312,
+      "cacheWrite": 0,
+      "reasoning": 200,
+      "stop": "toolUse"
+     },
+     {
+      "input": 543,
+      "output": 476,
+      "cacheRead": 13824,
+      "cacheWrite": 0,
+      "reasoning": 301,
+      "stop": "toolUse"
+     },
+     {
+      "input": 640,
+      "output": 80,
+      "cacheRead": 14208,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 11,
+    "status": {
+     "200": 11
+    },
+    "in": 126727,
+    "out": 2423,
+    "cacheRead": 101248,
+    "cacheWrite": 0,
+    "reasoning": 829,
+    "compressed": 0,
+    "duration_ms": 105801,
+    "rows": [
+     {
+      "t": "01:18:19.731",
+      "status": 200,
+      "ms": 3086,
+      "in": 7934,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:18:24.434",
+      "status": 200,
+      "ms": 4674,
+      "in": 8098,
+      "out": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:18:30.747",
+      "status": 200,
+      "ms": 6204,
+      "in": 9532,
+      "out": 134,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 67,
+      "compressed": null
+     },
+     {
+      "t": "01:18:35.399",
+      "status": 200,
+      "ms": 4631,
+      "in": 10217,
+      "out": 81,
+      "cacheRead": 6528,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:18:40.937",
+      "status": 200,
+      "ms": 5387,
+      "in": 10657,
+      "out": 105,
+      "cacheRead": 10112,
+      "cacheWrite": 0,
+      "reasoning": 40,
+      "compressed": null
+     },
+     {
+      "t": "01:18:57.496",
+      "status": 200,
+      "ms": 16534,
+      "in": 11011,
+      "out": 418,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 71,
+      "compressed": null
+     },
+     {
+      "t": "01:19:25.878",
+      "status": 200,
+      "ms": 26160,
+      "in": 12621,
+      "out": 727,
+      "cacheRead": 10880,
+      "cacheWrite": 0,
+      "reasoning": 150,
+      "compressed": null
+     },
+     {
+      "t": "01:19:30.559",
+      "status": 200,
+      "ms": 4650,
+      "in": 13496,
+      "out": 86,
+      "cacheRead": 12416,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:19:42.043",
+      "status": 200,
+      "ms": 11226,
+      "in": 13946,
+      "out": 266,
+      "cacheRead": 13312,
+      "cacheWrite": 0,
+      "reasoning": 200,
+      "compressed": null
+     },
+     {
+      "t": "01:19:59.498",
+      "status": 200,
+      "ms": 17325,
+      "in": 14367,
+      "out": 476,
+      "cacheRead": 13824,
+      "cacheWrite": 0,
+      "reasoning": 301,
+      "compressed": null
+     },
+     {
+      "t": "01:20:05.502",
+      "status": 200,
+      "ms": 5924,
+      "in": 14848,
+      "out": 80,
+      "cacheRead": 14208,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-multi-file-rename-a2-20260930012830-s2",
+   "arm": "stack-gwoff",
+   "client_arm": "stack",
+   "task": "multi-file-rename",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:28:30Z",
+   "wall_seconds": 67.0,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 5,
+   "pi": {
+    "usage": {
+     "input": 14445,
+     "output": 1189,
+     "cacheRead": 80256,
+     "cacheWrite": 0,
+     "reasoning": 373
+    },
+    "assistant_messages": 9,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 2,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 2,
+     "read": 4,
+     "mcp__serena__find_referencing_symbols": 1,
+     "mcp__serena__rename_symbol": 1,
+     "edit": 3
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 9,
+     "context_mode": 0,
+     "tool_search": 2,
+     "mcp": 3,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 1918,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2082,
+      "output": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 3513,
+      "output": 169,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 57,
+      "stop": "toolUse"
+     },
+     {
+      "input": 625,
+      "output": 34,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 4098,
+      "output": 224,
+      "cacheRead": 6656,
+      "cacheWrite": 0,
+      "reasoning": 16,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1254,
+      "output": 39,
+      "cacheRead": 10624,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 174,
+      "output": 153,
+      "cacheRead": 11776,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 391,
+      "output": 121,
+      "cacheRead": 11776,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 390,
+      "output": 399,
+      "cacheRead": 12032,
+      "cacheWrite": 0,
+      "reasoning": 300,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 9,
+    "status": {
+     "200": 9
+    },
+    "in": 94701,
+    "out": 1189,
+    "cacheRead": 80256,
+    "cacheWrite": 0,
+    "reasoning": 373,
+    "compressed": 0,
+    "duration_ms": 62208,
+    "rows": [
+     {
+      "t": "01:28:37.588",
+      "status": 200,
+      "ms": 5652,
+      "in": 7934,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:28:41.425",
+      "status": 200,
+      "ms": 3809,
+      "in": 8098,
+      "out": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:28:48.554",
+      "status": 200,
+      "ms": 7032,
+      "in": 9529,
+      "out": 169,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 57,
+      "compressed": null
+     },
+     {
+      "t": "01:28:52.223",
+      "status": 200,
+      "ms": 3533,
+      "in": 9969,
+      "out": 34,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:29:01.913",
+      "status": 200,
+      "ms": 9664,
+      "in": 10754,
+      "out": 224,
+      "cacheRead": 6656,
+      "cacheWrite": 0,
+      "reasoning": 16,
+      "compressed": null
+     },
+     {
+      "t": "01:29:07.586",
+      "status": 200,
+      "ms": 3487,
+      "in": 11878,
+      "out": 39,
+      "cacheRead": 10624,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:29:16.010",
+      "status": 200,
+      "ms": 8298,
+      "in": 11950,
+      "out": 153,
+      "cacheRead": 11776,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:29:21.717",
+      "status": 200,
+      "ms": 5677,
+      "in": 12167,
+      "out": 121,
+      "cacheRead": 11776,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:29:36.972",
+      "status": 200,
+      "ms": 15056,
+      "in": 12422,
+      "out": 399,
+      "cacheRead": 12032,
+      "cacheWrite": 0,
+      "reasoning": 300,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-multi-file-rename-a2-20260930012937-s2",
+   "arm": "stack",
+   "client_arm": "stack",
+   "task": "multi-file-rename",
+   "attempt": 2,
+   "started_utc": "2026-09-30T01:29:37Z",
+   "wall_seconds": 90.0,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+   "passed": true,
+   "check": {
+    "unittest": true,
+    "old_left": 0,
+    "new": 13,
+    "expected_new": 13,
+    "tests_before": 7,
+    "tests_now": 7,
+    "tail": [
+     "OK"
+    ]
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 6,
+   "pi": {
+    "usage": {
+     "input": 13324,
+     "output": 1892,
+     "cacheRead": 71040,
+     "cacheWrite": 0,
+     "reasoning": 547
+    },
+    "assistant_messages": 8,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "tool_search": 2,
+     "mcp__serena__initial_instructions": 1,
+     "bash": 2,
+     "mcp__serena__find_referencing_symbols": 1,
+     "read": 9,
+     "edit": 9
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 20,
+     "context_mode": 0,
+     "tool_search": 2,
+     "mcp": 2,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 2
+    },
+    "per_request": [
+     {
+      "input": 1917,
+      "output": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 2081,
+      "output": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1583,
+      "output": 152,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 36,
+      "stop": "toolUse"
+     },
+     {
+      "input": 651,
+      "output": 108,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 30,
+      "stop": "toolUse"
+     },
+     {
+      "input": 4115,
+      "output": 371,
+      "cacheRead": 6528,
+      "cacheWrite": 0,
+      "reasoning": 50,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1599,
+      "output": 651,
+      "cacheRead": 10496,
+      "cacheWrite": 0,
+      "reasoning": 70,
+      "stop": "toolUse"
+     },
+     {
+      "input": 986,
+      "output": 113,
+      "cacheRead": 11904,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 392,
+      "output": 447,
+      "cacheRead": 12800,
+      "cacheWrite": 0,
+      "reasoning": 361,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 8,
+    "status": {
+     "200": 8
+    },
+    "in": 84364,
+    "out": 1892,
+    "cacheRead": 71040,
+    "cacheWrite": 0,
+    "reasoning": 547,
+    "compressed": 47,
+    "duration_ms": 85218,
+    "rows": [
+     {
+      "t": "01:29:43.835",
+      "status": 200,
+      "ms": 4554,
+      "in": 7933,
+      "out": 29,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:29:49.870",
+      "status": 200,
+      "ms": 6006,
+      "in": 8097,
+      "out": 21,
+      "cacheRead": 6016,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:29:56.703",
+      "status": 200,
+      "ms": 6772,
+      "in": 9519,
+      "out": 152,
+      "cacheRead": 7936,
+      "cacheWrite": 0,
+      "reasoning": 36,
+      "compressed": 6
+     },
+     {
+      "t": "01:30:03.290",
+      "status": 200,
+      "ms": 6417,
+      "in": 9995,
+      "out": 108,
+      "cacheRead": 9344,
+      "cacheWrite": 0,
+      "reasoning": 30,
+      "compressed": 6
+     },
+     {
+      "t": "01:30:17.645",
+      "status": 200,
+      "ms": 14331,
+      "in": 10643,
+      "out": 371,
+      "cacheRead": 6528,
+      "cacheWrite": 0,
+      "reasoning": 50,
+      "compressed": 6
+     },
+     {
+      "t": "01:30:43.486",
+      "status": 200,
+      "ms": 23579,
+      "in": 12095,
+      "out": 651,
+      "cacheRead": 10496,
+      "cacheWrite": 0,
+      "reasoning": 70,
+      "compressed": 10
+     },
+     {
+      "t": "01:30:50.250",
+      "status": 200,
+      "ms": 6732,
+      "in": 12890,
+      "out": 113,
+      "cacheRead": 11904,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": 9
+     },
+     {
+      "t": "01:31:07.294",
+      "status": 200,
+      "ms": 16827,
+      "in": 13192,
+      "out": 447,
+      "cacheRead": 12800,
+      "cacheWrite": 0,
+      "reasoning": 361,
+      "compressed": 10
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  }
+ ]
+}

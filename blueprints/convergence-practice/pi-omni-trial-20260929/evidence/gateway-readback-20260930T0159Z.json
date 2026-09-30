@@ -1,0 +1,168 @@
+{
+ "utc": "2026-09-30T01:59:19Z",
+ "units": {
+  "omniroute.service": {
+   "props": "MainPID=950031 | NRestarts=0 | ActiveState=active | ActiveEnterTimestamp=Tue 2026-09-29 20:02:58 EDT",
+   "codex_client_version": [
+    "CODEX_CLIENT_VERSION=0.159.1"
+   ],
+   "drop_ins": []
+  },
+  "omniroute-fw.service": {
+   "props": "MainPID=945817 | NRestarts=0 | ActiveState=active | ActiveEnterTimestamp=Tue 2026-09-29 20:02:42 EDT",
+   "codex_client_version": [
+    "CODEX_CLIENT_VERSION=0.159.1"
+   ],
+   "drop_ins": []
+  }
+ },
+ "compression": {
+  "20128": {
+   "enabled": false,
+   "defaultMode": "off",
+   "autoTriggerMode": "lite",
+   "autoTriggerTokens": 0,
+   "cacheMinutes": 5,
+   "preserveSystemPrompt": true,
+   "preserveSystemPromptMode": "always",
+   "compressionComboId": null,
+   "activeComboId": null,
+   "enginesExplicit": false,
+   "outputStyles": [],
+   "liveZone": {
+    "enabled": false
+   },
+   "sessionDedup": {
+    "minBlockChars": 80,
+    "fuzzy": false
+   },
+   "lite": {
+    "compressToolResults": true
+   },
+   "headroom": {
+    "minRows": 8
+   },
+   "exclusions": [
+    "codex/*"
+   ],
+   "contextBudget_mode": "off",
+   "engines_on": [
+    "caveman",
+    "lite",
+    "session-dedup"
+   ],
+   "engine_levels": {
+    "rtk": "minimal",
+    "caveman": "lite"
+   },
+   "stacked_pipeline": [
+    "rtk",
+    "caveman"
+   ]
+  },
+  "20129": {
+   "enabled": true,
+   "defaultMode": "off",
+   "autoTriggerMode": "lite",
+   "autoTriggerTokens": 0,
+   "cacheMinutes": 5,
+   "preserveSystemPrompt": true,
+   "preserveSystemPromptMode": "always",
+   "compressionComboId": null,
+   "activeComboId": null,
+   "enginesExplicit": true,
+   "outputStyles": [],
+   "liveZone": {
+    "enabled": false
+   },
+   "sessionDedup": {
+    "minBlockChars": 512,
+    "fuzzy": false
+   },
+   "lite": {
+    "compressToolResults": false
+   },
+   "headroom": {
+    "minRows": 8
+   },
+   "exclusions": [],
+   "contextBudget_mode": "off",
+   "engines_on": [
+    "aggressive",
+    "caveman",
+    "ccr",
+    "codex-responses",
+    "lite",
+    "llmlingua",
+    "relevance",
+    "rtk",
+    "session-dedup",
+    "ultra"
+   ],
+   "engine_levels": {
+    "rtk": "minimal",
+    "caveman": "lite"
+   },
+   "stacked_pipeline": [
+    "rtk",
+    "caveman"
+   ]
+  }
+ },
+ "listed_on_20128": [
+  "cx/gpt-6.1-sol",
+  "codex/gpt-6.1-sol"
+ ],
+ "trio_20128": {
+  "control cx/gpt-6-sol": {
+   "http": 200,
+   "s": 2.7,
+   "served": "gpt-6-sol",
+   "in": 22,
+   "cached": null
+  },
+  "control as a Codex caller (Version 0.157.1)": {
+   "http": 200,
+   "s": 3.0,
+   "served": "gpt-6-sol",
+   "in": 22,
+   "cached": null
+  },
+  "target cx/gpt-6.1-sol": {
+   "http": 200,
+   "s": 4.3,
+   "served": "gpt-6.1-sol",
+   "in": 22,
+   "cached": null
+  },
+  "negative made-up id": {
+   "http": 400,
+   "s": 0.0,
+   "error": "Model 'gpt-6.1-sol-zzz-nonexistent' is not available in the active live catalog for provider 'codex'."
+  }
+ },
+ "chain_20129": {
+  "sharedgw/gpt-6.1-sol": {
+   "http": 200,
+   "s": 3.0,
+   "served": "gpt-6.1-sol",
+   "in": 23,
+   "cached": 0
+  },
+  "sharedgw/gpt-6-sol": {
+   "http": 200,
+   "s": 1.6,
+   "served": "gpt-6-sol",
+   "in": 23,
+   "cached": 0
+  }
+ },
+ "pool_remaining_points": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  99
+ ]
+}

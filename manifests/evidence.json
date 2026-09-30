@@ -5475,6 +5475,146 @@
       "bytes": 56660
     },
     {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/README.md",
+      "sha256": "570c7f44fbf31e00bfd82151f5b5b9c5a923da9991d8fb6b329084fbb3b39a67",
+      "bytes": 18145
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/gateway-readback-20260930T0009Z-first-apply.json",
+      "sha256": "65565d8cc1ac62dc55690f9faab128d24847190279c4fe5ff26217da895c5764",
+      "bytes": 3266
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/gateway-readback-20260930T0159Z.json",
+      "sha256": "0d3e2a28226a913b489a4df03aa60aa231776362f9528aeb460eec406964cbf4",
+      "bytes": 3201
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/pool-readings-20260930.json",
+      "sha256": "b3d0c9508ad1f47429d40167aac837ba96e1ba00f66234bf3a3a02bf3deaa8ec",
+      "bytes": 1598
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/r1.json",
+      "sha256": "5304819a1628c1e0ccf8b32aede4bd9c714cefdb42c296ebbdae75d23ea3309a",
+      "bytes": 6384
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-nocap-attempt-1.json",
+      "sha256": "3865b0faeb1097594ab0efcc2ea4e4b4908a9d90e77d0b1bb7cd6b6b1c55a1d8",
+      "bytes": 4407
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
+      "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0",
+      "bytes": 11118
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
+      "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5",
+      "bytes": 103815
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-summary.txt",
+      "sha256": "5b9721bfb634be173bc5938bd26e9bce81c4e43be6ea4ad55370d5be6009d8e9",
+      "bytes": 612
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/experiment.json",
+      "sha256": "5479c73f86c8c269c9acc735e05523ded1538bc8596c48c510745fbcbab70b07",
+      "bytes": 76013
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/build_evidence.py",
+      "sha256": "a29bed2899dc729fa87b56b95fb3f1619cd5c063095329d03fa0e2090fea9011",
+      "bytes": 5124
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/fixtures.py",
+      "sha256": "9091e315a395ca1e63652dd9606e06b8ecad17ea0b547b11c8203fc675a057fc",
+      "bytes": 16797
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/gateway_usage.py",
+      "sha256": "928b2f330fba1ece95d35c0a069d9650d0187233c9eed5df8f89a3e84b00f9fc",
+      "bytes": 3059
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/omni_verify.py",
+      "sha256": "fd5913db37dfde21bc16e319a3a885f6fe0ccb0f29ed18bace3669ca59bc6b5e",
+      "bytes": 7940
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/pi_stub.py",
+      "sha256": "259339393ceb48003f84ed0a9828f637a4faf3b8eb25c16c5e2cf583c9bf569d",
+      "bytes": 8831
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/pins.json",
+      "sha256": "9caff929da98e56010151dec90a569d5e7cbdf7145669d08146e9b9845f1132a",
+      "bytes": 3689
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/probes.py",
+      "sha256": "1509a598ca2334a494a323c576a67e234ed6d1a628b4e784fed484a88d9b2197",
+      "bytes": 20369
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_r1.py",
+      "sha256": "6f50e4491da2aba856954a98478cd84370a8867869577381c4ec6c65712270ae",
+      "bytes": 6069
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_s2.sh",
+      "sha256": "6447ea6369a443cf1c85cf9c86377f66ea8f2fdded57533df5d7524d3c641f1b",
+      "bytes": 2402
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_task.py",
+      "sha256": "eb44df07b9dfc524f99f8dfebaa46c4c320f6dd65552a2a1dfacaa2e66c37265",
+      "bytes": 10249
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/stage.py",
+      "sha256": "abc052d68ffb7cb242ad8c592ab3d5a6df70f5be87f849cc78112866a4dc492b",
+      "bytes": 12253
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/summarize_runs.py",
+      "sha256": "8843602df814b6ebf7423d7223e6f6fa9a35fef6a2e47919792e1a9b5189a759",
+      "bytes": 5277
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/mcp.stack-ext.json.tmpl",
+      "sha256": "fc6e36053b9e9766e1dcc4812304a0eb40fd64eaa1ce0fc89e41e371efc194b7",
+      "bytes": 2019
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/mcp.stack.json.tmpl",
+      "sha256": "757e4956e7ebc3d51267bcde8aa21f8312ba94197e4954dca246fbdcb9e64969",
+      "bytes": 2491
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/models.plain.json.tmpl",
+      "sha256": "2b737f0efe0c6489d29ce13d8209e57568f06fdcb5df33beb660d4411e2f4a69",
+      "bytes": 1359
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/models.stack.json.tmpl",
+      "sha256": "dea7a3f9838f17d124e1e17482f8750edd1a435f91cc26c60030f1a1a1bf7f42",
+      "bytes": 1375
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/settings.plain.json.tmpl",
+      "sha256": "93a08519a88891d0d59fd4d21c11fb844a78d8f49c77fa27d3b32ba8eacdfe9b",
+      "bytes": 268
+    },
+    {
+      "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/templates/settings.stack.json.tmpl",
+      "sha256": "93a08519a88891d0d59fd4d21c11fb844a78d8f49c77fa27d3b32ba8eacdfe9b",
+      "bytes": 268
+    },
+    {
       "path": "blueprints/convergence-practice/protocol.json",
       "sha256": "7176889bb4f8e3839c5230918c1e23ff89bdd3778a8f333db2ea881731a08e45",
       "bytes": 2595
@@ -45440,6 +45580,7 @@
     "evidence/artifacts/memory-stack-20260925/experiment.json",
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
-    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json"
+    "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
+    "blueprints/convergence-practice/pi-omni-trial-20260929/experiment.json"
   ]
 }

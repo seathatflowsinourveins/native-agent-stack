@@ -1,0 +1,352 @@
+{
+ "stage": "R1",
+ "run_id": "pi-trial-stack-multi-file-rename-r1-20260930013314-r1",
+ "resume_run_id": "pi-trial-stack-multi-file-rename-r1-20260930013314-r1-resume",
+ "arm": "stack",
+ "task": "multi-file-rename",
+ "fixture_commit": "6825f621edea4053b03bf0967dc977dbeade64de",
+ "kill_after_responses": 2,
+ "responses_seen_before_kill": 2,
+ "killed": true,
+ "descendants_at_kill": 9,
+ "survivors_after_3s": 0,
+ "session_files": 1,
+ "session_roles_kept": [
+  "system",
+  "user",
+  "assistant",
+  "toolResult",
+  "system",
+  "assistant",
+  "toolResult"
+ ],
+ "gateway_state_before": {
+  "origin": "http://127.0.0.1:20129",
+  "compression_enabled": true,
+  "defaultMode": "off",
+  "engines_on": [
+   "aggressive",
+   "caveman",
+   "ccr",
+   "codex-responses",
+   "lite",
+   "llmlingua",
+   "relevance",
+   "rtk",
+   "session-dedup",
+   "ultra"
+  ]
+ },
+ "segment1": {
+  "wall_seconds": 11.3,
+  "pi": {
+   "usage": {
+    "input": 3998,
+    "output": 50,
+    "cacheRead": 12032,
+    "cacheWrite": 0,
+    "reasoning": 0
+   },
+   "assistant_messages": 2,
+   "last_stop_reason": "toolUse",
+   "auto_retries": 0,
+   "first_error": null,
+   "tools": {
+    "tool_search": 1,
+    "mcp__serena__initial_instructions": 1
+   },
+   "tool_errors": {},
+   "lanes": {
+    "builtin": 0,
+    "context_mode": 0,
+    "tool_search": 1,
+    "mcp": 1,
+    "bash_calls": 0,
+    "bash_rtk_eligible": 0
+   },
+   "per_request": [
+    {
+     "input": 1917,
+     "output": 29,
+     "cacheRead": 6016,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "stop": "toolUse"
+    },
+    {
+     "input": 2081,
+     "output": 21,
+     "cacheRead": 6016,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "stop": "toolUse"
+    }
+   ]
+  },
+  "gateway_entry": {
+   "requests": 3,
+   "status": {
+    "200": 2,
+    "499": 1
+   },
+   "in": 16030,
+   "out": 50,
+   "cacheRead": 12032,
+   "cacheWrite": 0,
+   "reasoning": 0,
+   "compressed": 6,
+   "duration_ms": 9515,
+   "rows": [
+    {
+     "t": "01:33:22.433",
+     "status": 200,
+     "ms": 5859,
+     "in": 7933,
+     "out": 29,
+     "cacheRead": 6016,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "compressed": null
+    },
+    {
+     "t": "01:33:25.923",
+     "status": 200,
+     "ms": 3460,
+     "in": 8097,
+     "out": 21,
+     "cacheRead": 6016,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "compressed": null
+    },
+    {
+     "t": "01:33:26.188",
+     "status": 499,
+     "ms": 196,
+     "in": 0,
+     "out": 0,
+     "cacheRead": null,
+     "cacheWrite": null,
+     "reasoning": null,
+     "compressed": 6
+    }
+   ]
+  }
+ },
+ "segment2": {
+  "exit_code": 0,
+  "timed_out": false,
+  "wall_seconds": 92.6,
+  "pi": {
+   "usage": {
+    "input": 30892,
+    "output": 1967,
+    "cacheRead": 64000,
+    "cacheWrite": 0,
+    "reasoning": 943
+   },
+   "assistant_messages": 8,
+   "last_stop_reason": "stop",
+   "auto_retries": 0,
+   "first_error": null,
+   "tools": {
+    "bash": 3,
+    "tool_search": 2,
+    "mcp__serena__find_referencing_symbols": 1,
+    "read": 9,
+    "mcp__serena__rename_symbol": 1,
+    "edit": 3
+   },
+   "tool_errors": {},
+   "lanes": {
+    "builtin": 15,
+    "context_mode": 0,
+    "tool_search": 2,
+    "mcp": 2,
+    "bash_calls": 3,
+    "bash_rtk_eligible": 3
+   },
+   "per_request": [
+    {
+     "input": 3430,
+     "output": 48,
+     "cacheRead": 6016,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "stop": "toolUse"
+    },
+    {
+     "input": 468,
+     "output": 194,
+     "cacheRead": 9344,
+     "cacheWrite": 0,
+     "reasoning": 117,
+     "stop": "toolUse"
+    },
+    {
+     "input": 10547,
+     "output": 384,
+     "cacheRead": 0,
+     "cacheWrite": 0,
+     "reasoning": 20,
+     "stop": "toolUse"
+    },
+    {
+     "input": 1707,
+     "output": 558,
+     "cacheRead": 10368,
+     "cacheWrite": 0,
+     "reasoning": 484,
+     "stop": "toolUse"
+    },
+    {
+     "input": 12780,
+     "output": 93,
+     "cacheRead": 0,
+     "cacheWrite": 0,
+     "reasoning": 15,
+     "stop": "toolUse"
+    },
+    {
+     "input": 197,
+     "output": 153,
+     "cacheRead": 12672,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "stop": "toolUse"
+    },
+    {
+     "input": 414,
+     "output": 240,
+     "cacheRead": 12672,
+     "cacheWrite": 0,
+     "reasoning": 122,
+     "stop": "toolUse"
+    },
+    {
+     "input": 1349,
+     "output": 297,
+     "cacheRead": 12928,
+     "cacheWrite": 0,
+     "reasoning": 185,
+     "stop": "stop"
+    }
+   ]
+  },
+  "gateway_entry": {
+   "requests": 8,
+   "status": {
+    "200": 8
+   },
+   "in": 94892,
+   "out": 1967,
+   "cacheRead": 64000,
+   "cacheWrite": 0,
+   "reasoning": 943,
+   "compressed": 70,
+   "duration_ms": 87941,
+   "rows": [
+    {
+     "t": "01:33:35.267",
+     "status": 200,
+     "ms": 4539,
+     "in": 9446,
+     "out": 48,
+     "cacheRead": 6016,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "compressed": 5
+    },
+    {
+     "t": "01:33:44.335",
+     "status": 200,
+     "ms": 8911,
+     "in": 9812,
+     "out": 194,
+     "cacheRead": 9344,
+     "cacheWrite": 0,
+     "reasoning": 117,
+     "compressed": 6
+    },
+    {
+     "t": "01:33:59.806",
+     "status": 200,
+     "ms": 15446,
+     "in": 10547,
+     "out": 384,
+     "cacheRead": 0,
+     "cacheWrite": 0,
+     "reasoning": 20,
+     "compressed": 6
+    },
+    {
+     "t": "01:34:24.245",
+     "status": 200,
+     "ms": 22158,
+     "in": 12075,
+     "out": 558,
+     "cacheRead": 10368,
+     "cacheWrite": 0,
+     "reasoning": 484,
+     "compressed": 10
+    },
+    {
+     "t": "01:34:30.817",
+     "status": 200,
+     "ms": 6544,
+     "in": 12780,
+     "out": 93,
+     "cacheRead": 0,
+     "cacheWrite": 0,
+     "reasoning": 15,
+     "compressed": 10
+    },
+    {
+     "t": "01:34:40.051",
+     "status": 200,
+     "ms": 9116,
+     "in": 12869,
+     "out": 153,
+     "cacheRead": 12672,
+     "cacheWrite": 0,
+     "reasoning": 0,
+     "compressed": 10
+    },
+    {
+     "t": "01:34:49.797",
+     "status": 200,
+     "ms": 9714,
+     "in": 13086,
+     "out": 240,
+     "cacheRead": 12672,
+     "cacheWrite": 0,
+     "reasoning": 122,
+     "compressed": 10
+    },
+    {
+     "t": "01:35:01.519",
+     "status": 200,
+     "ms": 11513,
+     "in": 14277,
+     "out": 297,
+     "cacheRead": 12928,
+     "cacheWrite": 0,
+     "reasoning": 185,
+     "compressed": 13
+    }
+   ]
+  }
+ },
+ "passed": true,
+ "check": {
+  "unittest": true,
+  "old_left": 0,
+  "new": 13,
+  "expected_new": 13,
+  "tests_before": 7,
+  "tests_now": 7,
+  "tail": [
+   "OK"
+  ]
+ }
+}

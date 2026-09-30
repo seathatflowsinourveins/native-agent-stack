@@ -1,0 +1,70 @@
+{
+ "note": "Pool account state from OmniRoute's own provider-limits (session = weekly window, percent). GET is cached and syncs every 70 minutes (last sync 00:39Z); POST /api/usage/provider-limits is upstream's manual refresh of that cache. No account or connection identifier is recorded.",
+ "readings": [
+  {
+   "utc": "2026-09-30T00:39:09Z",
+   "how": "GET (auto sync)",
+   "accounts_remaining_percent": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    100
+   ],
+   "after": "nothing of this trial yet"
+  },
+  {
+   "utc": "2026-09-30T01:07:25Z",
+   "how": "POST refresh",
+   "accounts_remaining_percent": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    99
+   ],
+   "after": "the Sol probe, one 745k-input-token pilot job and about 5 minutes of a 3-job wave (a separate track, same account)"
+  },
+  {
+   "utc": "2026-09-30T01:10:40Z",
+   "how": "POST refresh, S2 attempt 1 start",
+   "accounts_remaining_percent": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    99
+   ],
+   "after": "S1 (3 runs)"
+  },
+  {
+   "utc": "2026-09-30T01:22:23Z",
+   "how": "POST refresh, S2 attempt 2 start",
+   "accounts_remaining_percent": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    99
+   ],
+   "after": "S2 attempt 1 (12 runs) and the first two Sol vote waves in flight"
+  },
+  {
+   "utc": "2026-09-30T01:39:03Z",
+   "how": "POST refresh, after S1, all of S2 and R1, with 7 of the 26 Sol vote jobs finished (the pilot plus six wave jobs) and 3 more in flight",
+   "accounts_remaining_percent": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    99
+   ],
+   "after": "S1 (3 runs), S2 (24 runs), R1 (1 run) and the parallel vote track so far"
+  }
+ ]
+}

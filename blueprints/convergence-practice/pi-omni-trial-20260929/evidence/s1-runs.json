@@ -1,0 +1,576 @@
+{
+ "stage": "S1",
+ "runs": [
+  {
+   "run_id": "pi-trial-plain-wiring-smoke-a1-20260930010749-s1v2",
+   "arm": "plain",
+   "client_arm": "plain",
+   "task": "wiring-smoke",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:07:49Z",
+   "wall_seconds": 22.7,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "a85df6e7c2fb13b482f964733e4f26aa2b59a595",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_exact": true,
+    "tracked_changes": []
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true",
+    "x-omniroute-compression": "off"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": null,
+   "pi": {
+    "usage": {
+     "input": 2870,
+     "output": 468,
+     "cacheRead": 1152,
+     "cacheWrite": 0,
+     "reasoning": 336
+    },
+    "assistant_messages": 3,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 2
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 0,
+     "tool_search": 0,
+     "mcp": 0,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 1
+    },
+    "per_request": [
+     {
+      "input": 1222,
+      "output": 25,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 1261,
+      "output": 297,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 236,
+      "stop": "toolUse"
+     },
+     {
+      "input": 387,
+      "output": 146,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 100,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 3,
+    "status": {
+     "200": 3
+    },
+    "in": 4022,
+    "out": 468,
+    "cacheRead": 1152,
+    "cacheWrite": 0,
+    "reasoning": 336,
+    "compressed": 0,
+    "duration_ms": 22293,
+    "rows": [
+     {
+      "t": "01:07:53.003",
+      "status": 200,
+      "ms": 3587,
+      "in": 1222,
+      "out": 25,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:04.801",
+      "status": 200,
+      "ms": 11759,
+      "in": 1261,
+      "out": 297,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 236,
+      "compressed": null
+     },
+     {
+      "t": "01:08:11.774",
+      "status": 200,
+      "ms": 6947,
+      "in": 1539,
+      "out": 146,
+      "cacheRead": 1152,
+      "cacheWrite": 0,
+      "reasoning": 100,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-ext-wiring-smoke-a1-20260930010838-s1v2",
+   "arm": "stack-ext",
+   "client_arm": "stack-ext",
+   "task": "wiring-smoke",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:08:38Z",
+   "wall_seconds": 22.5,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "a85df6e7c2fb13b482f964733e4f26aa2b59a595",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_exact": true,
+    "tracked_changes": []
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 1,
+   "pi": {
+    "usage": {
+     "input": 19047,
+     "output": 179,
+     "cacheRead": 35584,
+     "cacheWrite": 0,
+     "reasoning": 62
+    },
+    "assistant_messages": 6,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 2,
+     "ctx_stats": 1,
+     "tool_search": 1,
+     "mcp__qmd__status": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 1,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 1
+    },
+    "per_request": [
+     {
+      "input": 8827,
+      "output": 25,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 211,
+      "output": 14,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 420,
+      "output": 26,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 9241,
+      "output": 19,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 218,
+      "output": 26,
+      "cacheRead": 9088,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 130,
+      "output": 69,
+      "cacheRead": 9216,
+      "cacheWrite": 0,
+      "reasoning": 62,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 6,
+    "status": {
+     "200": 6
+    },
+    "in": 54631,
+    "out": 179,
+    "cacheRead": 35584,
+    "cacheWrite": 0,
+    "reasoning": 62,
+    "compressed": 0,
+    "duration_ms": 20229,
+    "rows": [
+     {
+      "t": "01:08:43.521",
+      "status": 200,
+      "ms": 3660,
+      "in": 8827,
+      "out": 25,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:46.477",
+      "status": 200,
+      "ms": 2852,
+      "in": 8787,
+      "out": 14,
+      "cacheRead": 8576,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:49.484",
+      "status": 200,
+      "ms": 2804,
+      "in": 9124,
+      "out": 26,
+      "cacheRead": 8704,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:52.342",
+      "status": 200,
+      "ms": 2833,
+      "in": 9241,
+      "out": 19,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:54.961",
+      "status": 200,
+      "ms": 2588,
+      "in": 9306,
+      "out": 26,
+      "cacheRead": 9088,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:09:00.491",
+      "status": 200,
+      "ms": 5492,
+      "in": 9346,
+      "out": 69,
+      "cacheRead": 9216,
+      "cacheWrite": 0,
+      "reasoning": 62,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  },
+  {
+   "run_id": "pi-trial-stack-wiring-smoke-a1-20260930010811-s1v2",
+   "arm": "stack",
+   "client_arm": "stack",
+   "task": "wiring-smoke",
+   "attempt": 1,
+   "started_utc": "2026-09-30T01:08:11Z",
+   "wall_seconds": 26.2,
+   "exit_code": 0,
+   "timed_out": false,
+   "fixture_commit": "a85df6e7c2fb13b482f964733e4f26aa2b59a595",
+   "passed": true,
+   "check": {
+    "answer_present": true,
+    "answer_exact": true,
+    "tracked_changes": []
+   },
+   "arm_headers": {
+    "x-omniroute-no-cache": "true"
+   },
+   "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": [
+     "aggressive",
+     "caveman",
+     "ccr",
+     "codex-responses",
+     "lite",
+     "llmlingua",
+     "relevance",
+     "rtk",
+     "session-dedup",
+     "ultra"
+    ]
+   },
+   "rtk_tracker_delta": 1,
+   "pi": {
+    "usage": {
+     "input": 17197,
+     "output": 165,
+     "cacheRead": 32000,
+     "cacheWrite": 0,
+     "reasoning": 39
+    },
+    "assistant_messages": 6,
+    "last_stop_reason": "stop",
+    "auto_retries": 0,
+    "first_error": null,
+    "tools": {
+     "bash": 2,
+     "mcp__context-mode__ctx_stats": 1,
+     "tool_search": 1,
+     "mcp__qmd__status": 1
+    },
+    "tool_errors": {},
+    "lanes": {
+     "builtin": 2,
+     "context_mode": 1,
+     "tool_search": 1,
+     "mcp": 1,
+     "bash_calls": 2,
+     "bash_rtk_eligible": 1
+    },
+    "per_request": [
+     {
+      "input": 7961,
+      "output": 25,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 194,
+      "output": 20,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 368,
+      "output": 29,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 8296,
+      "output": 19,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 169,
+      "output": 26,
+      "cacheRead": 8192,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "stop": "toolUse"
+     },
+     {
+      "input": 209,
+      "output": 46,
+      "cacheRead": 8192,
+      "cacheWrite": 0,
+      "reasoning": 39,
+      "stop": "stop"
+     }
+    ]
+   },
+   "gateway_entry": {
+    "requests": 6,
+    "status": {
+     "200": 6
+    },
+    "in": 49197,
+    "out": 165,
+    "cacheRead": 32000,
+    "cacheWrite": 0,
+    "reasoning": 39,
+    "compressed": 0,
+    "duration_ms": 23394,
+    "rows": [
+     {
+      "t": "01:08:20.196",
+      "status": 200,
+      "ms": 6013,
+      "in": 7961,
+      "out": 25,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:22.990",
+      "status": 200,
+      "ms": 2690,
+      "in": 8002,
+      "out": 20,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:27.547",
+      "status": 200,
+      "ms": 4482,
+      "in": 8176,
+      "out": 29,
+      "cacheRead": 7808,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:29.858",
+      "status": 200,
+      "ms": 2285,
+      "in": 8296,
+      "out": 19,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:32.525",
+      "status": 200,
+      "ms": 2642,
+      "in": 8361,
+      "out": 26,
+      "cacheRead": 8192,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "compressed": null
+     },
+     {
+      "t": "01:08:37.842",
+      "status": 200,
+      "ms": 5282,
+      "in": 8401,
+      "out": 46,
+      "cacheRead": 8192,
+      "cacheWrite": 0,
+      "reasoning": 39,
+      "compressed": null
+     }
+    ]
+   },
+   "gateway_upstream": {
+    "requests": 0,
+    "status": {},
+    "in": 0,
+    "out": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "compressed": 0,
+    "duration_ms": 0,
+    "rows": []
+   }
+  }
+ ]
+}

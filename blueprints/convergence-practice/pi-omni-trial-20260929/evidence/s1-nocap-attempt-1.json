@@ -1,0 +1,125 @@
+{
+  "schema": "pi-omni-trial-run-summary/1",
+  "run_id": "pi-trial-stack-wiring-smoke-a1-20260929141219-s1-nocap",
+  "arm": "stack",
+  "task": "wiring-smoke",
+  "attempt": 1,
+  "fixture_commit": "a85df6e7c2fb13b482f964733e4f26aa2b59a595",
+  "started_utc": "2026-09-29T14:12:19Z",
+  "wall_seconds": 16.6,
+  "pi_exit_code": 0,
+  "pi_exit_note": "pi --mode json exits 0 for a failed assistant response (docs/cli-integration.md, 'Stream JSON events'); the result is in last_stop_reason and the task check",
+  "task_check": {
+    "passed": false,
+    "detail": {
+      "answer_present": false,
+      "answer_exact": false,
+      "tracked_changes": []
+    }
+  },
+  "gateway_state_before": {
+    "origin": "http://127.0.0.1:20129",
+    "compression_enabled": true,
+    "defaultMode": "off",
+    "engines_on": []
+  },
+  "headerless_uncompressed": true,
+  "pi_reported": {
+    "assistant_messages": 4,
+    "last_stop_reason": "error",
+    "auto_retries": 3,
+    "first_error": {
+      "http": "429",
+      "message": "All credentials for model gpt-6-astra-max are cooling down",
+      "type": "rate_limit_error",
+      "code": "model_cooldown",
+      "model": "gpt-6-astra-max",
+      "reset_seconds": 1800,
+      "retry_after": "2026-09-29T14:42:21.472Z",
+      "credentials_cooling": 1
+    },
+    "usage": {
+      "input": 0,
+      "output": 0,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0
+    },
+    "tools": {},
+    "tool_errors": {}
+  },
+  "pi_retry_delays_ms": [
+    2000,
+    4000,
+    8000
+  ],
+  "pi_attempt_errors": [
+    {
+      "http": "429",
+      "message": "All credentials for model gpt-6-astra-max are cooling down",
+      "type": "rate_limit_error",
+      "code": "model_cooldown",
+      "model": "gpt-6-astra-max",
+      "reset_seconds": 1800,
+      "retry_after": "2026-09-29T14:42:21.472Z",
+      "credentials_cooling": 1
+    },
+    {
+      "http": "429",
+      "message": "All credentials for model gpt-6-astra-max are cooling down",
+      "type": "rate_limit_error",
+      "code": "model_cooldown",
+      "model": "gpt-6-astra-max",
+      "reset_seconds": 1798,
+      "retry_after": "2026-09-29T14:42:21.472Z",
+      "credentials_cooling": 1
+    },
+    {
+      "http": "429",
+      "message": "All credentials for model gpt-6-astra-max are cooling down",
+      "type": "rate_limit_error",
+      "code": "model_cooldown",
+      "model": "gpt-6-astra-max",
+      "reset_seconds": 1794,
+      "retry_after": "2026-09-29T14:42:21.472Z",
+      "credentials_cooling": 1
+    },
+    {
+      "http": "429",
+      "message": "All credentials for model gpt-6-astra-max are cooling down",
+      "type": "rate_limit_error",
+      "code": "model_cooldown",
+      "model": "gpt-6-astra-max",
+      "reset_seconds": 1786,
+      "retry_after": "2026-09-29T14:42:21.472Z",
+      "credentials_cooling": 1
+    }
+  ],
+  "rtk_tracker_delta": 0,
+  "gateway_rows": {
+    "entry_20129": [
+      {
+        "timestamp": "2026-09-29T14:12:21.461",
+        "method": "POST",
+        "path": "/v1/responses",
+        "status": 429,
+        "model": "gpt-6-astra-max",
+        "duration_ms": 276,
+        "tokens": {
+          "in": 0,
+          "out": 0,
+          "cacheRead": null,
+          "cacheWrite": null,
+          "reasoning": null,
+          "compressed": 3099
+        },
+        "error": "[429]: [codex/gpt-6-astra-max] All codex accounts reached configured quota threshold (reset after 99h 2m 4s)",
+        "requested_model": "sharedgw/gpt-6-astra-max",
+        "provider_display": "Shared gateway 20128 (responses)",
+        "source_to_target_format": "openai-responses -> openai-responses"
+      }
+    ],
+    "upstream_20128": []
+  },
+  "reading": "Four client attempts (one request and three pi auto-retries) all ended in HTTP 429. The entry gateway (20129) forwarded the first request through its only provider connection, the 'Shared gateway 20128 (responses)' node, and relayed the shared gateway's refusal: every codex account had reached the configured quota threshold (reset in 99 h). 20129 logged one row for the run id at that first request and then put the model in a 30-minute cooldown for that connection, so the three retries were refused at 20129 without a row. 20128 logged no row carrying the run id; its pre-flight refusals appear to write none. No model ran, no tool ran, and no tokens were billed. The cooldown at 20129 ends at the retry_after time in first_error."
+}

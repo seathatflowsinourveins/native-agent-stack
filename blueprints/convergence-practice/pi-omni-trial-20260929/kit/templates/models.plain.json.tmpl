@@ -1,0 +1,53 @@
+{
+  "providers": {
+    "omni-fw": {
+      "baseUrl": "http://127.0.0.1:20129/v1",
+      "api": "openai-responses",
+      "apiKey": "keyless-loopback",
+      "headers": {
+        "X-OmniRoute-Session-Id": "$PI_TRIAL_RUN_ID",
+        "X-Correlation-Id": "$PI_TRIAL_RUN_ID",
+        "x-omniroute-no-cache": "true",
+        "x-omniroute-compression": "off"
+      },
+      "models": [
+        {
+          "id": "sharedgw/gpt-6.1-sol",
+          "name": "GPT-6.1 Sol via OmniRoute 20129 (shared gateway 20128)",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "xhigh": "xhigh",
+            "max": "max"
+          },
+          "input": [
+            "text"
+          ],
+          "contextWindow": 272000,
+          "maxTokens": 128000,
+          "promptCache": {
+            "short": 1800,
+            "long": 1800
+          }
+        },
+        {
+          "id": "sharedgw/gpt-6-astra-max",
+          "name": "GPT-6 Astra max via OmniRoute 20129 (shared gateway 20128)",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "xhigh": "xhigh",
+            "max": "max"
+          },
+          "input": [
+            "text"
+          ],
+          "contextWindow": 272000,
+          "maxTokens": 128000,
+          "promptCache": {
+            "short": 1800,
+            "long": 1800
+          }
+        }
+      ]
+    }
+  }
+}
