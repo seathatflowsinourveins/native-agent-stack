@@ -11,9 +11,13 @@ is the routing record for Codex models; the release, client-gate and gateway-eff
 ## Decision
 
 The user selected GPT-6.1 Sol/Ultra for routine Codex coordination and
-GPT-6.1 Sol/Max for primary workers. Select GPT-6 Astra/Max for conflicting
-primary evidence, consequential architecture decisions, complex changes across
-systems, or a failure unresolved after one bounded Sol repair. Explicit task
+GPT-6.1 Sol/Max for primary workers. Select GPT-6 Astra/Ultra (proactive
+delegation with the model's `xhigh` reasoning, see below) when a complex workflow
+needs Astra to coordinate it, the user's 2026-09-30 selection ("astra ultra when
+tasks needed suitable for complex workflow"), and GPT-6 Astra/Max, the highest
+reasoning effort, for a single consequential judgment: conflicting primary
+evidence, consequential architecture decisions, complex changes across systems,
+or a failure unresolved after one bounded Sol repair. Explicit task
 model choices take precedence over this default. Preserve Astra judgment roles
 and verify the resolved role, model and effort before accepting their output.
 
