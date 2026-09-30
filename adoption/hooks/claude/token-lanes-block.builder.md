@@ -8,3 +8,4 @@ TOKEN LANES (source: docs/token-session-handbook.md, "Token lanes carried into s
 - Use TOON for uniform arrays of flat records (same keys in every item); keep compact JSON for nested or non-uniform data, where TOON can be larger (upstream README).
 - Use one lane per artifact; never stack compressors or claim token savings. Agents told to return output unmodified skip output-routing and footer rules; otherwise list token tools used and why at the end of your return.
 - Show evidence before a success claim: the command and what it returned (code.claude.com best practices), or the file:line read.
+- Research upstream first before custom code; a claim needs its upstream citation.

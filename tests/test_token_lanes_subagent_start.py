@@ -44,17 +44,21 @@ WITHDRAWN_PHRASES = ("verification-before-completion",)
 ROLE_KEY_PHRASES = {
     "token-lanes-block.researcher.md": (
         "ToolSearch", "ctx_fetch_and_index", "ctx_batch_execute", "rtk", "find_referencing_symbols",
-        "jcodemunch", "menu(query?)", "qmd query", "memory_query", "TOON", "one lane per artifact"),
+        "jcodemunch", "menu(query?)", "qmd query", "memory_query", "TOON", "one lane per artifact",
+        "discover skills with find-skills", "a claim needs its upstream citation"),
     "token-lanes-block.verifier.md": (
-        "ToolSearch", "ctx_execute_file", "ctx_batch_execute", "rtk", "TOON", "one lane per artifact"),
+        "ToolSearch", "ctx_execute_file", "ctx_batch_execute", "rtk", "TOON", "one lane per artifact",
+        "relay a claim only with its citation"),
     "token-lanes-block.reviewer.md": (
         "ToolSearch", "ctx_batch_execute", "find_referencing_symbols", "jcodemunch", "codebase_search",
-        "memory_query", "TOON", "one lane per artifact"),
+        "memory_query", "TOON", "one lane per artifact", "relay a claim only with its citation"),
     "token-lanes-block.builder.md": (
         "ToolSearch", "ctx_batch_execute", "cwd = the owned worktree your brief names", "rtk",
         "find_referencing_symbols", "jcodemunch", "codebase_search", "memory_query", "TOON",
-        "one lane per artifact", "Show evidence before a success claim"),
-    "token-lanes-block.scout.md": ("rtk", "rtk proxy <cmd>", "TOON", "one lane per artifact"),
+        "one lane per artifact", "Show evidence before a success claim",
+        "a claim needs its upstream citation"),
+    "token-lanes-block.scout.md": ("rtk", "rtk proxy <cmd>", "TOON", "one lane per artifact",
+                                   "the upstream source your task names"),
 }
 CORRECTED_PHRASES = (
     # RTK 0.50.0, measured with `rtk hook check` and the `rtk hook claude` hook path.
@@ -91,7 +95,7 @@ NEEDS = (
     (r"\bheadroom_compress\b", "mcp__headroom__headroom_compress"),
     (r"\bheadroom_retrieve\b", "mcp__headroom__headroom_retrieve"),
 )
-SKILLS = ("verification-before-completion", "search-first")
+SKILLS = ("verification-before-completion", "search-first", "find-skills")
 
 
 def fits_budget(raw: bytes) -> bool:
