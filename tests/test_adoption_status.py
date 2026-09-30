@@ -866,6 +866,10 @@ class LoginShellTests(unittest.TestCase):
             observed = subprocess.run([bash, "-l", "-c", 'printf %s "$MARK"'], env={"HOME": str(self.home)},
                                       capture_output=True, text=True, timeout=30).stdout
             first = result["first_read"]
+            # first_read is the first startup file that exists and can be opened (not absent, not a dangling link); the exported MARK is empty for 344 of the 512
+            # combinations, so the MARK alone cannot tell a wrong first_read from a right one.
+            truth_first = next((key for key, state in zip(keys, combo) if state not in ("absent", "dangling")), None)
+            self.assertEqual(first, truth_first, combo)
             predicted = first if first is not None and result[first] == "content" else ""
             control_first = next((key for key in keys if result[key] not in ("absent", "empty")), None)
             control = control_first if control_first is not None and result[control_first] == "content" else ""

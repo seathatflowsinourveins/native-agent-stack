@@ -31,15 +31,20 @@ def bell(matcher, command=BELL, extra=(), hook_extra=None):
     return {"matcher": matcher, "hooks": [{"type": "command", "command": command, **(hook_extra or {})}, *extra]}
 
 
-def invoke(home, args):
-    return subprocess.run([sys.executable, "-B", str(SCRIPT), str(CHECKOUT), *args], capture_output=True, text=True, timeout=120, env={"HOME": str(home), "PATH": os.environ["PATH"]})
+HARNESS = CHECKOUT / "evidence/artifacts/notification-types-20260929/concurrent_writer_harness.py"
+
+
+def invoke(home, args, harness=None):
+    """The tool as a user runs it, or (harness = 'after-merge' | 'at-backup') through the harness that injects another writer's save at that moment."""
+    command = [sys.executable, "-B", str(SCRIPT), str(CHECKOUT), *args] if harness is None else [sys.executable, "-B", str(HARNESS), harness, str(SCRIPT), str(CHECKOUT), *args]
+    return subprocess.run(command, capture_output=True, text=True, timeout=120, env={"HOME": str(home), "PATH": os.environ["PATH"]})
 
 
 def backups(claude):
     return sorted(claude.glob("settings.json.bak.*"))
 
 
-def run(name, body, args, expect_exit, words=(), absent=(), setup=None, check=None, symlink=False, second=None):
+def run(name, body, args, expect_exit, words=(), absent=(), setup=None, check=None, symlink=False, second=None, harness=None):
     with tempfile.TemporaryDirectory(prefix="rbc") as raw:
         home = Path(raw)
         claude = home / ".claude"
@@ -55,7 +60,7 @@ def run(name, body, args, expect_exit, words=(), absent=(), setup=None, check=No
             os.chmod(target, 0o600)
         if setup:
             setup(home, claude)
-        result = invoke(home, args)
+        result = invoke(home, args, harness)
         text = result.stdout + result.stderr
         problems = []
         if (result.returncode == 0) != (expect_exit == 0):
@@ -86,7 +91,7 @@ def untouched(home, claude, original):
     return problems
 
 
-def installed(home, claude, original):
+def installed(home, claude, original, mode=0o600):
     problems = []
     before, now = json.loads(original), json.loads((claude / "settings.json").read_text(encoding="utf-8"))
     notify = now["hooks"]["Notification"]
@@ -101,11 +106,17 @@ def installed(home, claude, original):
     made = backups(claude)
     if len(made) != 1 or made[0].read_bytes() != original:
         problems.append("the backup is missing or differs from the original")
-    if (claude / "settings.json").stat().st_mode & 0o777 != 0o600:
-        problems.append("the mode changed")
+    if (claude / "settings.json").stat().st_mode & 0o777 != mode:
+        problems.append(f"the mode changed (expected {oct(mode)})")
+    if backups(claude) and backups(claude)[0].stat().st_mode & 0o777 != mode:
+        problems.append("the backup does not keep the mode")
     if [p.name for p in claude.iterdir() if p.name.endswith(".tmp") or (p.name.endswith(".new") and not p.is_symlink())]:
         problems.append("a staging file was left")
     return problems
+
+
+def mode_640(home, claude):
+    (claude / "settings.json").chmod(0o640)
 
 
 def decoy_setup(home, claude):
@@ -119,6 +130,37 @@ def decoy_kept(home, claude, original):
         problems.append("the symlink at the old staging name was followed")
     if not (claude / "settings.json.new").is_symlink():
         problems.append("the symlink at the old staging name was removed")
+    return problems
+
+
+def saved_by_another_writer(home, claude, original):
+    """The other writer's save is what the file holds now, with the old bell matcher: nothing was installed, no backup, no staging file."""
+    now = json.loads((claude / "settings.json").read_text(encoding="utf-8"))
+    problems = []
+    if now.get("model") != "changed-by-another-writer":
+        problems.append("the other writer's save was lost")
+    if [g.get("matcher") for g in now["hooks"]["Notification"] if g.get("matcher") == group["matcher"]]:
+        problems.append("the overlay's bell group was installed over the other writer's save")
+    if backups(claude):
+        problems.append("a backup was written before the conflict was seen")
+    if [p.name for p in claude.iterdir() if p.name.endswith((".tmp", ".new"))]:
+        problems.append("a staging file was left")
+    return problems
+
+
+def saved_during_backup(home, claude, original):
+    """The other writer's save is still the live file, the one backup holds it (not the tool's read), and nothing was installed."""
+    now = json.loads((claude / "settings.json").read_text(encoding="utf-8"))
+    problems = []
+    if now.get("model") != "changed-by-another-writer":
+        problems.append("the other writer's save was lost")
+    if [g.get("matcher") for g in now["hooks"]["Notification"] if g.get("matcher") == group["matcher"]]:
+        problems.append("the overlay's bell group was installed over the other writer's save")
+    made = backups(claude)
+    if len(made) != 1 or json.loads(made[0].read_text(encoding="utf-8")).get("model") != "changed-by-another-writer":
+        problems.append("the backup does not hold the newer content")
+    if [p.name for p in claude.iterdir() if p.name.endswith((".tmp", ".new"))]:
+        problems.append("a staging file was left")
     return problems
 
 
@@ -137,16 +179,30 @@ cases = [
      dict(words=[NEW, "overlay keys added:", "dry run"], absent=["nothing to do"])),
     ("another hook in the bell group is refused, not lost", settings([bell(OLD, extra=[{"type": "command", "command": "echo mine"}])]), ["local", "--apply"], 1, dict(words=["refused", "another hook"], check=untouched)),
     ("a bell hook with a key beyond type and command is refused", settings([bell(OLD, hook_extra={"timeout": 5})]), ["local", "--apply"], 1, dict(words=["refused", "beyond type and command", "timeout"], check=untouched)),
-    ("a matcher naming a type the overlay's does not is refused, not dropped", settings([bell(OLD + "|idle_prompt")]), ["local", "--apply"], 1, dict(words=["refused", "idle_prompt", "would drop"], check=untouched)),
+    ("a matcher naming a type the overlay's does not is refused, not dropped, and the refusal names no matcher value", settings([bell(OLD + "|idle_prompt")]), ["local", "--apply"], 1,
+     dict(words=["refused", "names 1 type(s)", "would drop"], absent=["idle_prompt"], check=untouched)),
+    ("a bell group with a key beyond matcher and hooks is refused, not silently replaced", settings([{**bell(OLD), "note": "mine"}]), ["local", "--apply"], 1,
+     dict(words=["refused", "beyond matcher and hooks"], check=untouched)),
     ("an absent matcher is refused", settings([{"hooks": [{"type": "command", "command": BELL}]}]), ["local", "--apply"], 1, dict(words=["refused", "absent or empty"], check=untouched)),
+    ("an old matcher with the overlay's own keys already present is replaced, not 'nothing to do'", settings([bell(OLD)], **FULL), ["local"], 0,
+     dict(words=[NEW, "dry run"], absent=["nothing to do"])),
+    ("a current matcher on a bell hook with an extra key is refused, not reported as nothing to do", settings([bell(group["matcher"], hook_extra={"timeout": 5})], **FULL), ["local"], 1,
+     dict(words=["refused", "beyond type and command"], absent=["nothing to do"])),
     ("an existing different preferredNotifChannel is refused, not overwritten", settings([bell(OLD)], preferredNotifChannel="terminal_bell"), ["local", "--apply"], 1, dict(words=["refused", "overwrite", "preferredNotifChannel"], check=untouched)),
     ("two bell groups are refused", settings([bell(OLD), bell("idle_prompt")]), ["local", "--apply"], 1, dict(words=["refused", "more than one group"], check=untouched)),
     ("an unrelated Notification group is kept beside the new bell group", settings([bell(OLD), OTHER]), ["local"], 0, dict(words=["every other Notification group equal: True", NEW])),
     ("an unknown target is refused", settings([bell(OLD)]), ["locall"], 1, dict(words=["usage"], check=untouched)),
     ("an unknown flag is refused", settings([bell(OLD)]), ["local", "--force"], 1, dict(words=["usage"], check=untouched)),
+    ("the retired second-distro target is refused", settings([bell(OLD)]), ["polaris", "--apply"], 1, dict(words=["usage"], check=untouched)),
+    ("a settings file saved by another writer after the read is refused, before any backup, and that save is kept", settings([bell(OLD), OTHER]), ["local", "--apply"], 1,
+     dict(words=["refused", "changed since it was read"], harness="after-merge", check=saved_by_another_writer)),
+    ("a save that lands while the backup is taken is refused, the backup holds it and nothing is installed", settings([bell(OLD), OTHER]), ["local", "--apply"], 1,
+     dict(words=["refused", "changed while it was backed up"], harness="at-backup", check=saved_during_backup)),
     ("--apply installs the merged copy after a backup equal to the original, keeps the mode, leaves no staging file", settings([bell(OLD), OTHER]), ["local", "--apply"], 0,
      dict(words=["backup written:", "read-back equals the merged copy: True", "scratch removed: True"], check=installed,
           second=dict(args=["local"], exit=0, words=["nothing to do"], check=lambda h, c, o: [] if len(backups(c)) == 1 else ["the second run wrote a backup"]))),
+    ("--apply keeps a file mode other than 0600 on the installed file and on its backup", settings([bell(OLD), OTHER]), ["local", "--apply"], 0,
+     dict(words=["read-back equals the merged copy: True"], setup=mode_640, check=lambda h, c, o: installed(h, c, o, mode=0o640))),
     ("--apply does not follow a symlink at the old fixed staging name", settings([bell(OLD), OTHER]), ["local", "--apply"], 0, dict(words=["read-back equals the merged copy: True"], setup=decoy_setup, check=decoy_kept)),
 ]
 bad = 0

@@ -47,6 +47,12 @@ CODEX_KINDS = {"agent-turn-complete", "approval-requested", "plan-mode-prompt", 
 PLACEHOLDERS = ("<DISTRO>", "<WSL_USER>", "<PROJECT>")
 
 
+def quoted_matchers(text: str) -> list:
+    """Every backtick-quoted pipe list that names permission_prompt, outside HTML comments."""
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
+    return [m.group(1) for m in re.finditer(r"`([a-z_]+(?:\|[a-z_]+)+)`", text) if "permission_prompt" in m.group(1).split("|")]
+
+
 def recipe_profile() -> dict:
     """The first ```json block after the recipe's "For Windows Terminal" sentence."""
     text = RECIPE.read_text(encoding="utf-8")
@@ -84,6 +90,7 @@ class OverlayTests(unittest.TestCase):
         found = SCAN.scan(os.path.realpath(INSTALLED_CLAUDE))
         self.assertGreaterEqual(found["base_array_size"], 10, "the base array of matcher values was not found")
         self.assertTrue(found["catalog_found"], "the Notification matcher catalog was not found")
+        self.assertTrue(found["catalogs_resolved"], "the catalog's spread name did not resolve to exactly one base array")
         self.assertGreaterEqual(len(found["catalog_extra_values"]), 1, "the catalog's extra values were not read")
         self.assertEqual(sorted(kind for kind in found["types"] if kind not in DECISIONS), [], "a type this client knows has no decision in DECISIONS")
 
@@ -143,6 +150,7 @@ class OverlayOracleTests(unittest.TestCase):
     """The acceptance script behind the receipt must tell a host that has the overlay from one that only looks merged."""
 
     ORACLE = ROOT / "evidence/artifacts/wsl-terminal-defaults-20260929/overlay_noop_check.py"
+    CARRIES = ("user settings file carries the overlay (merge is a no-op, one bell hook in one group, same matcher, hooks not disabled; managed, project and local settings and flags not read):")
 
     def verdict(self, settings: dict) -> str:
         with tempfile.TemporaryDirectory() as home:
@@ -160,7 +168,7 @@ class OverlayOracleTests(unittest.TestCase):
     def test_a_host_with_the_overlay_is_in_effect(self):
         overlay = json.loads(OVERLAY.read_text(encoding="utf-8"))
         out = self.verdict(acs.merge_settings({}, overlay))
-        self.assertIn("overlay in effect (merge is a no-op, one group, same matcher): True", out)
+        self.assertIn(self.CARRIES + " True", out)
 
     def test_a_wrong_host_that_the_merge_alone_cannot_see_is_refused(self):
         overlay = json.loads(OVERLAY.read_text(encoding="utf-8"))
@@ -173,12 +181,33 @@ class OverlayOracleTests(unittest.TestCase):
                 out = self.verdict(settings)
                 self.assertIn("merged equals live: True", out)
                 self.assertIn("that group's matcher equals the overlay's: False", out)
-                self.assertIn("overlay in effect (merge is a no-op, one group, same matcher): False", out)
+                self.assertIn(self.CARRIES + " False", out)
 
     def test_a_host_without_the_overlay_is_not_in_effect(self):
         out = self.verdict({"model": "host-model"})
         self.assertIn("merged equals live: False", out)
-        self.assertIn("overlay in effect (merge is a no-op, one group, same matcher): False", out)
+        self.assertIn(self.CARRIES + " False", out)
+
+    def test_the_bell_hook_in_a_second_group_is_refused_and_a_repeat_inside_one_group_only_reported(self):
+        # The client runs identical command hooks once, so a repeat inside one group does not ring twice (reported, not refused); a second GROUP with another matcher would ring for other types.
+        overlay = json.loads(OVERLAY.read_text(encoding="utf-8"))
+        merged = acs.merge_settings({}, overlay)
+        (group,) = merged["hooks"]["Notification"]
+        twice_in_one = json.loads(json.dumps(merged))
+        twice_in_one["hooks"]["Notification"][0]["hooks"].append(dict(group["hooks"][0]))
+        in_two_groups = json.loads(json.dumps(merged))
+        in_two_groups["hooks"]["Notification"].append({"matcher": "auth_success", "hooks": [dict(group["hooks"][0])]})
+        out = self.verdict(twice_in_one)
+        self.assertIn("bell hook occurrences across the Notification event: 2", out)
+        self.assertIn(self.CARRIES + " True", out)
+        self.assertIn(self.CARRIES + " False", self.verdict(in_two_groups))
+
+    def test_disable_all_hooks_is_refused(self):
+        overlay = json.loads(OVERLAY.read_text(encoding="utf-8"))
+        settings = {**acs.merge_settings({}, overlay), "disableAllHooks": True}
+        out = self.verdict(settings)
+        self.assertIn("disableAllHooks is true in the user settings: True", out)
+        self.assertIn(self.CARRIES + " False", out)
 
 
 class CodexTemplateTests(unittest.TestCase):
@@ -286,15 +315,24 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
 
 
 class ScanReaderTests(unittest.TestCase):
-    """The scan's reader on a synthetic binary: no installed client is needed, so these run wherever the tests run."""
+    """The scan's reader on synthetic binaries: no installed client is needed, so these run wherever the tests run. The catalog names its base array through a minified spread
+    identifier, and the same short name is reused for unrelated values elsewhere in a real bundle (2.1.283: `P$o=[...]` beside `var P$o=new Set([...])`)."""
 
-    BASE = ",".join(f'"{name}"' for name in ("permission_prompt", "idle_prompt", "auth_success", "elicitation_dialog"))
+    NAMES = ("permission_prompt", "idle_prompt", "auth_success", "elicitation_dialog")
+    EXTRAS = '"elicitation_complete","elicitation_response"'
 
-    def blob(self, spread="Ojo", catalog=True):
-        text = f'a=[{self.BASE}];b={{notificationType:"push_notification"}};'
+    @staticmethod
+    def array(names):
+        return "[" + ",".join(f'"{name}"' for name in names) + "]"
+
+    def catalog(self, spread):
+        return f'{{fieldToMatch:"notification_type",values:[...{spread},{self.EXTRAS}]}}'
+
+    def blob(self, spread="Ojo", names=None, catalog=True, before="", after=""):
+        text = f'{before}var x=1,{spread}={self.array(names or self.NAMES)};b={{notificationType:"push_notification"}};'
         if catalog:
-            text += f'c={{fieldToMatch:"notification_type",values:[...{spread},"elicitation_complete","elicitation_response"]}};'
-        return text.encode()
+            text += f'c={self.catalog(spread)};'
+        return (text + after).encode()
 
     def scan_of(self, blob):
         with tempfile.TemporaryDirectory() as raw:
@@ -307,10 +345,55 @@ class ScanReaderTests(unittest.TestCase):
             with self.subTest(spread):
                 found, _run = self.scan_of(self.blob(spread))
                 self.assertTrue(found["catalog_found"])
+                self.assertTrue(found["catalogs_resolved"])
                 self.assertEqual(found["catalog_extra_values"], ["elicitation_complete", "elicitation_response"])
                 self.assertEqual(found["base_array_size"], 4)
                 self.assertTrue(found["types"]["elicitation_response"]["matcher_value"])
                 self.assertEqual(found["types"]["push_notification"]["notificationType_literals"], 1)
+
+    def test_an_unrelated_longer_array_of_the_same_names_is_not_taken_for_the_base(self):
+        # The decoy holds every name of the real base and more, and is longer: choosing an array by its contents or length would take it and lose the real base's new type.
+        decoy = "q=" + self.array(self.NAMES + ("decoy_only_a", "decoy_only_b", "decoy_only_c", "decoy_only_d", "decoy_only_e")) + ";"
+        found, run = self.scan_of(self.blob(names=self.NAMES + ("brand_new_type",), before=decoy))
+        self.assertTrue(found["types"]["brand_new_type"]["matcher_value"], "the real base's new type must be read")
+        self.assertFalse([name for name in found["types"] if name.startswith("decoy_only")], "a decoy array's names are not matcher values")
+        self.assertEqual(found["base_array_size"], 5)
+        self.assertEqual(run.returncode, 1, "the new type has no decision, so the scan must fail")
+        self.assertIn('"brand_new_type"', run.stdout)
+
+    def test_a_name_reused_for_a_set_or_a_map_is_not_an_array_assignment(self):
+        before = 'var Ojo=new Set(["run","ps","exec"]);var Ojo=new Map([["computer",hGt]]);'
+        found, _run = self.scan_of(self.blob(before=before))
+        self.assertTrue(found["catalogs_resolved"])
+        self.assertEqual(found["catalogs"][0]["base_candidates"], 1)
+        self.assertEqual(found["base_array_size"], 4)
+
+    def test_two_different_arrays_assigned_to_one_name_fail_closed(self):
+        other = ";function f(){var Ojo=" + self.array(("permission_prompt", "idle_prompt", "other_scope_type")) + "}"
+        found, run = self.scan_of(self.blob(after=other))
+        self.assertEqual(found["catalogs"][0]["base_candidates"], 2)
+        self.assertFalse(found["catalogs_resolved"])
+        self.assertEqual(run.returncode, 1, "an ambiguous catalog must not pass")
+
+    def test_a_catalog_whose_name_has_no_array_assignment_fails_closed(self):
+        found, run = self.scan_of(self.blob(spread="Ojo").replace(b"Ojo=", b"Ojo_other="))
+        self.assertTrue(found["catalog_found"])
+        self.assertEqual(found["catalogs"][0]["base_candidates"], 0)
+        self.assertFalse(found["catalogs_resolved"])
+        self.assertEqual(run.returncode, 1)
+
+    def test_a_base_without_the_required_names_fails_closed(self):
+        # all names are known to DECISIONS, so only the missing required names can make the scan fail
+        found, run = self.scan_of(self.blob(names=("auth_success", "elicitation_dialog", "agent_needs_input", "agent_completed")))
+        self.assertFalse(found["catalogs_resolved"])
+        self.assertEqual(run.returncode, 1)
+
+    def test_every_catalog_counts(self):
+        second = "var Zz=" + self.array(("permission_prompt", "idle_prompt", "second_catalog_type")) + ";d=" + self.catalog("Zz") + ";"
+        found, _run = self.scan_of(self.blob(after=second))
+        self.assertEqual([c["spread"] for c in found["catalogs"]], ["Ojo", "Zz"])
+        self.assertTrue(found["catalogs_resolved"])
+        self.assertTrue(found["types"]["second_catalog_type"]["matcher_value"])
 
     def test_a_reader_that_finds_nothing_exits_nonzero_instead_of_passing(self):
         found, run = self.scan_of(self.blob(catalog=False))
@@ -322,10 +405,21 @@ class ScanReaderTests(unittest.TestCase):
 
 
 class DocumentationTests(unittest.TestCase):
-    def test_the_matcher_quoted_in_the_recipe_and_the_decision_is_the_overlays(self):
+    def test_every_matcher_the_recipe_and_the_decision_record_quote_is_the_overlays(self):
+        # Every backtick-quoted pipe list that names permission_prompt, outside HTML comments, must be the overlay's matcher, so a stale operative copy cannot hide behind a
+        # correct one kept in a comment or a history paragraph. A history paragraph names an older list without the quoted pipe form.
         matcher = json.loads(OVERLAY.read_text(encoding="utf-8"))["hooks"]["Notification"][0]["matcher"]
-        self.assertIn(f"`{matcher}`", RECIPE.read_text(encoding="utf-8"))
-        self.assertIn(f"`{matcher}`", (ROOT / "docs/decisions/2026-09-28-terminal-experience.md").read_text(encoding="utf-8"))
+        for name, path in (("recipe", RECIPE), ("decision record", ROOT / "docs/decisions/2026-09-28-terminal-experience.md")):
+            quoted = quoted_matchers(path.read_text(encoding="utf-8"))
+            self.assertTrue(quoted, f"the {name} quotes no matcher")
+            self.assertEqual(sorted(frozenset(quoted)), [matcher], f"the {name} quotes a matcher that is not the overlay's")
+
+    def test_the_matcher_comparison_sees_a_wrong_operative_copy_beside_a_correct_one_in_a_comment(self):
+        good, bad = "`a_type|permission_prompt|b_type`", "`a_type|permission_prompt`"
+        self.assertEqual(quoted_matchers(f"{bad} <!-- {good} -->"), ["a_type|permission_prompt"])
+        self.assertEqual(quoted_matchers(f"<!-- {good} --> no operative copy"), [])
+        self.assertEqual(quoted_matchers(f"{good} and {bad}"), ["a_type|permission_prompt|b_type", "a_type|permission_prompt"])
+        self.assertEqual(quoted_matchers("`a_type|b_type` names no permission_prompt"), [])
 
     def test_the_platform_page_names_every_shipped_default_and_the_recipe_anchor_exists(self):
         page = PLATFORM_PAGE.read_text(encoding="utf-8")

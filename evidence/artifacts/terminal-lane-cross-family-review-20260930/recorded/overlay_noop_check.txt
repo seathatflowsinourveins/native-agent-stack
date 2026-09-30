@@ -1,0 +1,7 @@
+dry-run exit: 0 | stderr bytes: 0
+merged equals live: True
+groups holding the overlay's bell command in live: 1 | exactly one: True
+bell hook occurrences across the Notification event: 1 (information only: the client runs identical command hooks once)
+that group's matcher equals the overlay's: True
+disableAllHooks is true in the user settings: False
+user settings file carries the overlay (merge is a no-op, one bell hook in one group, same matcher, hooks not disabled; managed, project and local settings and flags not read): True

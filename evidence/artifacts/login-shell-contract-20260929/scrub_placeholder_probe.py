@@ -26,7 +26,12 @@ home's user settings plus a planted 0-byte, read-only proj/.claude/settings.loca
 read-only mask files at the sandbox's deny paths, does not cover. The doctor's silence about ~/.bash_profile is therefore expected by that scope
 and says nothing about whether the file is a problem.
 
-usage: python3 scrub_placeholder_probe.py [--keep]      prints one JSON summary of counts, names and booleans; no paths, no output text
+Revised 2026-09-30 after a cross-family review: the real-home check listed neither ~/.bash_profile (the incident's file) nor the client's other startup placeholders and compared only
+whether a name existed, so a new empty ~/.bash_profile outside the arms, or a truncated ~/.bashrc, left `real_home_placeholder_names_unchanged` true. It now covers the client's own
+placeholder list (startup_placeholder_names.py) and compares lstat mode, size, mtime and inode of every name, without opening any file. `--selftest` shows on a temporary home that creation,
+truncation, appending, replacement and a touch are each detected.
+
+usage: python3 scrub_placeholder_probe.py [--keep|--selftest]      prints one JSON summary of counts, names and booleans; no paths, no output text
 Arms: A control without the variable; B the variable with a stock Ubuntu-shaped HOME (~/.profile only); C the variable with a real
 ~/.bash_profile that sources ~/.profile.
 """
@@ -60,13 +65,63 @@ def empty_dirs(root, created):
     return sorted(k for k, v in created.items() if v[0] == "dir" and not any(other.startswith(k + "/") for other in listing(root)))
 
 
-REAL_HOME_NAMES = [".bash_aliases", ".bash_login", ".bunfig.toml", ".gitmodules", ".netrc", ".npmrc", ".yarnrc", ".yarnrc.yml", ".pip",
-                   ".config/pip", ".config/git", ".config/glab-cli", ".config/anthropic", ".claude/seed-admin"]
+# The client's own home placeholder list (startup_placeholder_names.py: .gitconfig, .bash_profile, .bashrc, .bash_aliases, .profile, .zshrc, .bunfig.toml, .netrc, .npmrc, .yarnrc,
+# .yarnrc.yml), the login file bash reads after ~/.bash_profile, and other paths the client or its tools touch.
+REAL_HOME_NAMES = [".gitconfig", ".bash_profile", ".bashrc", ".bash_aliases", ".profile", ".zshrc", ".bash_login", ".bunfig.toml", ".gitmodules", ".netrc", ".npmrc", ".yarnrc",
+                   ".yarnrc.yml", ".pip", ".config/pip", ".config/git", ".config/glab-cli", ".config/anthropic", ".claude/seed-admin"]
 STATE_ROOT = Path("/tmp") / f"claude-{os.getuid()}"
 
 
-def real_home_presence():
-    return {name: (Path.home() / name).exists() for name in REAL_HOME_NAMES}
+def real_home_state(root=None):
+    """name -> None when absent, else (mode, size, mtime_ns, inode) from lstat. Creation, replacement, truncation and modification each change it; no file is opened."""
+    root = Path.home() if root is None else Path(root)
+    state = {}
+    for name in REAL_HOME_NAMES:
+        try:
+            info = os.lstat(root / name)
+            state[name] = (info.st_mode, info.st_size, info.st_mtime_ns, info.st_ino)
+        except FileNotFoundError:
+            state[name] = None
+        except OSError as error:
+            state[name] = ("unreadable", type(error).__name__)
+    return state
+
+
+def selftest():
+    """Each change to a checked name must change real_home_state; an untouched home must compare equal."""
+    results = {}
+    with tempfile.TemporaryDirectory(prefix="ss") as raw:
+        root = Path(raw)
+        (root / ".bashrc").write_text("export A=1\n")
+        (root / ".profile").write_text("PATH=$PATH\n")
+        (root / ".zshrc").write_text("zsh\n")
+        base = real_home_state(root)
+        results["untouched_home_compares_equal"] = real_home_state(root) == base
+        (root / ".bash_profile").write_text("")
+        results["new_empty_bash_profile_detected"] = real_home_state(root) != base
+        (root / ".bash_profile").unlink()
+        results["removing_it_again_restores_the_state"] = real_home_state(root) == base
+        (root / ".bashrc").write_text("")
+        results["truncating_an_existing_file_detected"] = real_home_state(root) != base
+        (root / ".bashrc").write_text("export A=1\n")
+        os.utime(root / ".bashrc", ns=(base[".bashrc"][2] + 5_000_000_000, base[".bashrc"][2] + 5_000_000_000))
+        results["a_touch_that_changes_only_the_mtime_detected"] = real_home_state(root) != base
+        (root / ".profile").write_text("PATH=$PATH\nexport B=2\n")
+        results["appending_detected"] = real_home_state(root) != base
+        original = (root / ".zshrc").read_bytes()
+        (root / ".zshrc").unlink()
+        (root / ".zshrc").write_bytes(original)
+        results["replacing_a_file_with_a_same_size_copy_detected"] = real_home_state(root) != base
+    for label, startup, expect_none in (("login_path_of_a_working_home_is_measured", None, False), ("login_path_of_a_failing_startup_file_is_unmeasured", "exit 1\n", True),
+                                        ("login_path_of_a_startup_file_that_exits_early_is_unmeasured", "exit 0\n", True)):
+        with tempfile.TemporaryDirectory(prefix="ss") as raw:
+            home = Path(raw)
+            (home / ".profile").write_text('export PATH="$HOME/.local/bin:$PATH"\n')
+            if startup is not None:
+                (home / ".bash_profile").write_text(startup)
+            results[label] = (login_path(home) is None) == expect_none and (expect_none or has_local_bin(home, login_path(home)) is True)
+    print(json.dumps({"selftest": results, "all_detected_as_expected": all(results.values())}))
+    return 0 if all(results.values()) else 1
 
 
 def state_entries():
@@ -127,9 +182,17 @@ def sandbox_doctor(home, env):
 
 
 def login_path(home):
-    run = subprocess.run(["/usr/bin/env", "-i", f"HOME={home}", "PATH=/usr/bin:/bin", "/bin/bash", "-lc", 'printf "%s" "$PATH"'],
+    """The PATH a login shell ends up with, or None when the shell failed or ended before the probe completed (the probe prints PATH=<value> and then DONE)."""
+    run = subprocess.run(["/usr/bin/env", "-i", f"HOME={home}", "PATH=/usr/bin:/bin", "/bin/bash", "-lc", 'printf "PATH=%s\\nDONE\\n" "$PATH"'],
                          capture_output=True, text=True, timeout=30)
-    return run.stdout
+    lines = run.stdout.splitlines()
+    if run.returncode != 0 or len(lines) < 2 or lines[-1] != "DONE" or not lines[0].startswith("PATH="):
+        return None
+    return lines[0][len("PATH="):]
+
+
+def has_local_bin(home, path_value):
+    return None if path_value is None else str(home / ".local/bin") in path_value.split(":")
 
 
 def arm(label, scrub, real_bash_profile, base, doctor=False):
@@ -167,8 +230,8 @@ def arm(label, scrub, real_bash_profile, base, doctor=False):
         "bash_profile_empty_after": (home / ".bash_profile").exists() and (home / ".bash_profile").stat().st_size == 0,
         "bash_profile_mode_after": oct(stat.S_IMODE((home / ".bash_profile").stat().st_mode)) if (home / ".bash_profile").exists() else None,
         "real_bash_profile_untouched": (hashlib.sha256((home / ".bash_profile").read_bytes()).hexdigest() == before_bash_profile) if real_bash_profile and (home / ".bash_profile").exists() else None,
-        "login_path_had_local_bin_before": str(home / ".local/bin") in path_before.split(":"),
-        "login_path_has_local_bin_after": str(home / ".local/bin") in login_path(home).split(":"),
+        "login_path_had_local_bin_before": has_local_bin(home, path_before),
+        "login_path_has_local_bin_after": has_local_bin(home, login_path(home)),
     }
     if doctor_result is not None:
         result["native_doctor"] = doctor_result
@@ -177,12 +240,14 @@ def arm(label, scrub, real_bash_profile, base, doctor=False):
 
 
 def main():
+    if "--selftest" in sys.argv:
+        raise SystemExit(selftest())
     keep = "--keep" in sys.argv
     base = Path(tempfile.mkdtemp(prefix="sp", dir="/tmp"))   # short and directly under /tmp, whatever TMPDIR the caller has
     results = []
     shared_before = SHARED.exists()
     started = time.time()
-    presence_before = real_home_presence()
+    presence_before = real_home_state()
     tmp_before, state_before = set(os.listdir("/tmp")), state_entries()
     try:
         for label, scrub, real in (("A_control_no_scrub", False, False), ("B_scrub_stock_home", True, False), ("C_scrub_real_bash_profile", True, True)):
@@ -201,7 +266,9 @@ def main():
         SHARED.unlink()
     summary = {"claude": subprocess.run([str(CLAUDE.resolve()), "--version"], capture_output=True, text=True).stdout.strip(),
                "bubblewrap": shutil.which("bwrap") is not None, "bubblewrap_version": subprocess.run(["bwrap", "--version"], capture_output=True, text=True).stdout.strip(),
-               "arms": results, "scratch_removed": not base.exists(), "real_home_placeholder_names_unchanged": real_home_presence() == presence_before,
+               "arms": results, "scratch_removed": not base.exists(), "real_home_placeholder_names_unchanged": real_home_state() == presence_before,
+               "real_home_names_checked": len(REAL_HOME_NAMES), "real_home_compared_by": "lstat mode, size, mtime and inode",
+               "real_home_names_changed": sorted(name for name, before in presence_before.items() if real_home_state()[name] != before),
                "real_temp_top_level_entries_new_during_run": {"in_tmp_excluding_the_shared_file": kinds(new_in_tmp), "in_tmp_claude_uid": kinds(new_in_state)},
                "shared_temp_file": {"name": SHARED.name, "present_before_run": shared_before, "appeared_during_run": appeared,
                                     "removed_by_script": appeared and not SHARED.exists(), "present_after_script": SHARED.exists()}}

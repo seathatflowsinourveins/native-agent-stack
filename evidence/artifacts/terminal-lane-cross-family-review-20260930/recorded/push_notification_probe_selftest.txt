@@ -1,0 +1,33 @@
+PASS plain BEL: expected 1, got 1
+PASS two BELs in one read: expected 2, got 2
+PASS OSC title ended by BEL: expected 0, got 0
+PASS OSC title ended by BEL, split across reads: expected 0, got 0
+PASS ESC split from its bracket: expected 0, got 0
+PASS OSC ended by ST then a bare BEL: expected 1, got 1
+PASS BEL after an OSC and another bare BEL: expected 1, got 1
+PASS CSI colour then BEL: expected 1, got 1
+PASS ESC then BEL: executed in the escape state: expected 1, got 1
+PASS ESC then BEL, split across reads: expected 1, got 1
+PASS OSC text, ESC, then BEL: the BEL executes in the escape state: expected 1, got 1
+PASS OSC text, ESC, then BEL, split across reads: expected 1, got 1
+PASS DCS interrupted by ESC ESC, ST, then BEL: expected 1, got 1
+PASS APC ended by ST, then BEL: expected 1, got 1
+PASS BEL inside a DCS string is not a bell: expected 0, got 0
+PASS BEL inside an APC string is not a bell: expected 0, got 0
+PASS BEL inside a CSI sequence executes: expected 1, got 1
+PASS CAN inside an OSC string returns to ground, then BEL: expected 1, got 1
+PASS SUB inside a DCS string returns to ground, then BEL: expected 1, got 1
+PASS BEL after an escape intermediate sequence: expected 1, got 1
+PASS OSC ended by ST, split between ESC and backslash, then BEL: expected 1, got 1
+PASS NUL, TAB and LF are C0 controls but not bells: expected 0, got 0
+PASS UTF-8 C1 character inside an escape sequence is ignored, so ESC ] still opens an OSC that the BEL ends: expected 0, got 0
+PASS the same split between the two UTF-8 bytes: expected 0, got 0
+PASS the same split before the continuation byte and after the bracket: expected 0, got 0
+PASS a C1 character in ground does not hide a following bell: expected 1, got 1
+PASS a two-byte character above C1 ends the escape state like any printable: expected 1, got 1
+PASS an invalid UTF-8 byte is a printable replacement character: expected 1, got 1
+PASS private directory removed after an interruption
+PASS private directory removed after a failure
+PASS private directory removed after SIGTERM
+PASS private directory removed after SIGHUP
+PASS SIGTERM end to end: probe started True, private directory left False, stand-in client still alive False

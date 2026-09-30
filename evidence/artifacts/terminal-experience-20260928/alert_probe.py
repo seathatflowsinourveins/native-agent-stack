@@ -21,7 +21,7 @@ v1.24.11911.0, src/terminal/parser/stateMachine.cpp: CAN and SUB return to groun
 except an OSC string, where it starts a string terminator; C0 controls, BEL included, execute in the ground, escape, escape
 intermediate and CSI states; in an OSC string BEL is the terminator; DCS, SOS, PM and APC strings ignore C0 and end at ESC.
 """
-import argparse, fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
+import argparse, codecs, fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
 from pathlib import Path
 
 
@@ -34,10 +34,14 @@ class BelCounter:
 
     def __init__(self):
         self.state = "ground"  # ground | escape | esc_int | csi | osc | osc_term | string
+        self.decoder = codecs.getincrementaldecoder("utf-8")("replace")  # the terminal parses decoded characters, not bytes
 
     def feed(self, data):
         bare = 0
-        for byte in data:
+        for char in self.decoder.decode(data):
+            byte = ord(char)
+            if 0x80 <= byte <= 0x9F:                      # C1 controls are ignored by the output engine (AcceptC1 off): no state change (stateMachine.cpp L1855-1868)
+                continue
             if byte in (0x18, 0x1A):                      # CAN, SUB: from anywhere back to ground
                 self.state = "ground"
             elif byte == 0x1B and self.state != "osc":    # ESC interrupts every state except an OSC string, where it starts ST
@@ -100,6 +104,46 @@ class BelCounter:
         return bare
 
 
+def signal_case(kind):
+    """End to end: a stand-in `claude` first on PATH, the real probe as a child with its own TMPDIR, SIGTERM once the private directory exists: the directory and the stand-in must be gone."""
+    if not (Path.home() / "code/native-agent-stack").is_dir():
+        print("SKIP SIGTERM end to end (the probe's working directory does not exist on this machine)")
+        return 0
+    with tempfile.TemporaryDirectory(prefix="sigcase-") as raw:
+        root = Path(raw)
+        bindir, tmp = root / "bin", root / "tmp"
+        bindir.mkdir()
+        tmp.mkdir()
+        unique = f"3137{os.getpid() % 100000}"
+        (bindir / "claude").write_text(f"#!/bin/sh\nexec sleep {unique}\n")
+        (bindir / "claude").chmod(0o755)
+        env = {**os.environ, "PATH": f"{bindir}:{os.environ['PATH']}", "TMPDIR": str(tmp)}
+        proc = subprocess.Popen([sys.executable, "-B", str(Path(__file__).resolve()), kind, *(["--no-user-settings"] if kind == "push" else [])], env=env,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        deadline = time.time() + 30
+        while time.time() < deadline and not list(tmp.glob("alert-probe-*")):
+            time.sleep(0.2)
+        started = bool(list(tmp.glob("alert-probe-*")))
+        time.sleep(1.5)
+        proc.send_signal(signal.SIGTERM)
+        try:
+            proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait()
+        time.sleep(0.5)
+        left_dirs = list(tmp.glob("alert-probe-*"))
+        alive = False
+        for entry in Path("/proc").glob("[0-9]*"):
+            try:
+                alive = alive or unique in (entry / "cmdline").read_bytes().decode(errors="replace")
+            except OSError:
+                pass
+        ok = started and not left_dirs and not alive
+        print(("PASS " if ok else "FAIL ") + f"SIGTERM end to end: probe started {started}, private directory left {bool(left_dirs)}, stand-in client still alive {alive}")
+        return 0 if ok else 1
+
+
 def selftest():
     cases = [
         ("plain BEL", [b"\x07"], 1),
@@ -124,6 +168,12 @@ def selftest():
         ("BEL after an escape intermediate sequence", [b"\x1b(B\x07"], 1),
         ("OSC ended by ST, split between ESC and backslash, then BEL", [b"\x1b]0;t\x1b", b"\\", b"\x07"], 1),
         ("NUL, TAB and LF are C0 controls but not bells", [b"\x00\t\n\r"], 0),
+        ("UTF-8 C1 character inside an escape sequence is ignored, so ESC ] still opens an OSC that the BEL ends", [b"\x1b\xc2\x80]\x07"], 0),
+        ("the same split between the two UTF-8 bytes", [b"\x1b\xc2", b"\x80]\x07"], 0),
+        ("the same split before the continuation byte and after the bracket", [b"\x1b\xc2\x80", b"]", b"\x07"], 0),
+        ("a C1 character in ground does not hide a following bell", [b"\xc2\x9b\x07"], 1),
+        ("a two-byte character above C1 ends the escape state like any printable", [b"\x1b\xc3\xa9]\x07"], 1),
+        ("an invalid UTF-8 byte is a printable replacement character", [b"\x1b\xff]\x07"], 1),
     ]
     bad = 0
     for label, reads, expected in cases:
@@ -132,12 +182,17 @@ def selftest():
         ok = got == expected
         bad += 0 if ok else 1
         print(("PASS " if ok else "FAIL ") + label + f": expected {expected}, got {got}")
-    for label, error in (("private directory removed after an interruption", KeyboardInterrupt), ("private directory removed after a failure", RuntimeError)):
+    for label, error in (("private directory removed after an interruption", KeyboardInterrupt), ("private directory removed after a failure", RuntimeError),
+                         ("private directory removed after SIGTERM", SystemExit), ("private directory removed after SIGHUP", SystemExit)):
         seen = []
 
-        def boom(private, error=error):
+        def boom(private, error=error, label=label):
             seen.append(private)
             (private / "events.log").write_text("stand-in for a raw hook payload")
+            if label.endswith("SIGTERM"):
+                os.kill(os.getpid(), signal.SIGTERM)
+            elif label.endswith("SIGHUP"):
+                os.kill(os.getpid(), signal.SIGHUP)
             raise error()
 
         try:
@@ -147,6 +202,13 @@ def selftest():
         ok = len(seen) == 1 and not seen[0].exists()
         bad += 0 if ok else 1
         print(("PASS " if ok else "FAIL ") + label)
+    for label, given, expected in (("exit status: an opened dialog and no BEL passes", (1.0, False, 0), 0), ("exit status: a hooks-disabled control with a dialog and no BEL passes", (1.0, True, 0), 0),
+                                   ("exit status: a hooks-disabled control that saw a BEL fails", (1.0, True, 1), 1), ("exit status: a control whose dialog never opened fails", (None, True, 0), 2),
+                                   ("exit status: a run whose dialog never opened fails", (None, False, 0), 2)):
+        got = exit_status(*given)
+        bad += 0 if got == expected else 1
+        print(("PASS " if got == expected else "FAIL ") + label + f": expected {expected}, got {got}")
+    bad += signal_case("ask")
     return 1 if bad else 0
 
 
@@ -154,6 +216,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("kind", nargs="?", choices=["ask", "plan"])
     parser.add_argument("--control", action="store_true")
+    parser.add_argument("--show-screen", action="store_true", help="also print the last 260 characters of the terminal screen (contents of the session: never put them in a receipt)")
     parser.add_argument("--permission-mode", choices=["default", "acceptEdits", "bypassPermissions"],
                         help="ask only: start in this mode instead of the user's own default")
     parser.add_argument("--selftest", action="store_true")
@@ -177,12 +240,27 @@ def main():
         print("raw payload directory removed:", bool(used) and not used[0].exists())
 
 
+def exit_status(t_open, control, bel_total):
+    """0 when the run reached the observation point (the dialog opened) and, for the hooks-disabled control, no BEL byte appeared; 2 when it never reached it; 1 when the control saw a BEL."""
+    if t_open is None:
+        return 2
+    return 1 if control and bel_total else 0
+
+
 def with_private_dir(work):
-    """Run work(private_dir) and remove the private directory afterwards on success, failure and interruption alike."""
+    """Run work(private_dir) and remove the private directory afterwards on success, failure and interruption alike (SIGINT raises KeyboardInterrupt; SIGTERM and SIGHUP are turned
+    into SystemExit for the duration, so the finally blocks run for them too, the one that stops the child process group included)."""
     private = Path(tempfile.mkdtemp(prefix="alert-probe-"))
+
+    def leave(signum, _frame):
+        raise SystemExit(128 + signum)
+
+    previous = {number: signal.signal(number, leave) for number in (signal.SIGTERM, signal.SIGHUP)}
     try:
         return work(private)
     finally:
+        for number, handler in previous.items():
+            signal.signal(number, handler)
         shutil.rmtree(private, ignore_errors=True)
 
 
@@ -334,13 +412,17 @@ def measure(args, private):
     else:
         print(f"Notification events: {len(notifications)}")
     for stamp, ntype, message in notifications[:4]:
-        print(f"  +{round(stamp - t_open, 1) if t_open else None}s after open | type={ntype} | message={message}")
+        print(f"  +{round(stamp - t_open, 1) if t_open else None}s after open | type={ntype} | message length={len(message)}")
     if t_open:
         after = [(round(t - t_open, 1), n) for t, n in bel_events if t >= t_open - 0.5]
         total = sum(n for _, n in after)
         print(f"bare BEL bytes after the dialog opened: {total}  (seconds after open, bytes per read: {after})")
-    print("screen tail (ANSI stripped):", screen_tail[-260:])
-    return 0
+    if args.show_screen:
+        print("screen tail (ANSI stripped):", screen_tail[-260:])
+    status = exit_status(t_open, args.control, sum(n for t, n in bel_events if t_open and t >= t_open - 0.5))
+    if status:
+        print("measurement failed:", {2: "the dialog never opened, so nothing above is a result", 1: "a hooks-disabled control saw a BEL byte, so the BEL is not attributable to the hook"}[status])
+    return status
 
 
 if __name__ == "__main__":

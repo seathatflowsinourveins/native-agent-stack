@@ -1,0 +1,4 @@
+ac1378f README: the sound rule and the control counts after the cross-family review
+3da74d6 Terminal profile check: a bellSound must be exactly a measured file in C:\Windows\Media (no subdirectory, no ..) and exist where the folder is readable
+d45d71e Doctor login-shell-path: a probe that never ran no longer passes; type -P; only the first startup file bash reads can shadow ~/.profile
+636e7ea README: the second distro (Polaris) was unregistered on 2026-09-29; Librarium runs in NativeStack, Phoyo is archived

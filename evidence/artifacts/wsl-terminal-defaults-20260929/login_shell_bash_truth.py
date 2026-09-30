@@ -3,6 +3,8 @@
 
 Each file set to `content` exports MARK=<its name>; the observed MARK is therefore the file bash actually read. The static model
 predicts it: the first existing file when that file has content, else nothing (an empty or unusable file ends the search).
+The MARK is empty for most combinations (344 of 512: an empty, unusable or unreadable first file), so it cannot show which file the model called `first_read`: since 2026-09-30 (a cross-family review) the
+sweep also requires first_read to be the first startup file that exists and is not a dangling link, and the script exits 1 on any mismatch or when the negative control never disagrees with bash.
 usage: python3 -B login_shell_bash_truth.py <worktree>
 """
 import itertools, os, shutil, subprocess, sys, tempfile
@@ -43,6 +45,9 @@ for combo in itertools.product(STATES, repeat=3):
         wrong_expected = wrong_first if wrong_first is not None and got[wrong_first] == "content" else ""
         run = subprocess.run([bash, "-l", "-c", 'printf %s "$MARK"'], env={"HOME": str(work)}, capture_output=True, text=True, timeout=30)
         first = got["first_read"]
+        truth_first = next((k for k, s in zip(LOGIN_SHELL_FILES, combo) if s not in ("absent", "dangling")), None)
+        if first != truth_first:
+            mismatch.append((combo, "first_read", first, truth_first))
         expected = first if first is not None and got[first] == "content" else ""
         if run.stdout != expected:
             mismatch.append((combo, got, run.stdout, run.stderr.strip()[:80]))
@@ -103,3 +108,4 @@ print("combinations checked:", checked, "| mismatches:", len(mismatch),
       "| negative control (empty file treated as absent) disagrees with real bash in", control_disagreements, "combinations")
 for item in mismatch[:8]:
     print("  ", item)
+sys.exit(1 if mismatch or control_disagreements == 0 else 0)
