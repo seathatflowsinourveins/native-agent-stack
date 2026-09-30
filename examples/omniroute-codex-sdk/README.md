@@ -32,6 +32,12 @@ the official SDK launch contract and the provider sources below. A source-backed
 caller recipe is distinct from observing an actual Claude `Bash` invocation;
 retain that native invocation before claiming Claude-side execution acceptance.
 
+The [September30 native callsite receipt](../../evidence/receipts/omniroute-claude-callsite-20260930.json)
+now retains that observation: native Opus5.5/Max discovered and read the project
+dispatcher, called this worker through Bash, and the full native SDK result
+shows one unchanged `npm test` command with exit0. This bounded read-only call
+qualifies the caller path; the separate Claude SDK gateway bridge remains a trial.
+
 The default endpoint is the selected loopback gateway at port 20128. An owned
 reverse observer can be supplied with `--base-url`; the worker never changes
 gateway compression engines or native coordinator configuration. The default

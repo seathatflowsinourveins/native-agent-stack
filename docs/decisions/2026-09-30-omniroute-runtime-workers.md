@@ -122,10 +122,23 @@ universal quality claim follows from cache reuse. The scoped
 [convergence record](../../blueprints/convergence-practice/omniroute-runtime-workers/experiment.json)
 checks declared consistency, not truth or comparative superiority.
 
-Actual provider acceptance invoked the SDK directly from the implementing
-coordinator. The supplied Claude dispatch skill is structurally validated; a
-native Claude coordinator invoking it remains a distinct unmeasured acceptance
-step. Preserve the native sessions, existing SDK comparison gate and live
+The first provider trials invoked the SDK directly. A subsequent bounded
+[native Claude callsite check](../../evidence/receipts/omniroute-claude-callsite-20260930.json)
+closed that remaining gap: native Claude 2.1.285, Opus 5.5/Max, discovered and read
+the project dispatcher, invoked this official Sol-Max SDK worker through Bash,
+and returned successfully in 47.696 seconds. The retained full native SDK result
+shows exactly one unchanged test command with exit 0 and the expected marker.
+The caller's compact summary only saw the marker; the original command exit and
+test output provide the acceptance evidence. The worker ran 17.063 seconds and
+reports 31,005 native tokens in a new thread. The successful SDK-thread total
+now reaches 259,749, including the 228,744 direct-trial total;
+the native Claude parent counters remain a separate scope. Its reported 0.4656502
+USD is native list-price accounting, not complete provider billing. This
+read-only callsite allowed Bash/Read/Skill and actually called Read and Bash.
+It does not qualify other coordinator tools or optional MCP services. Earlier
+timeout records retain their outcomes;
+the successful call does not promote the separate Claude SDK Devin bridge.
+Preserve the native sessions, existing SDK comparison gate and live
 owner's shared files. Future bridge promotion requires successful native tools,
 skills, resume, cancellation/recovery and truthful usage on the selected route;
 an advertised model list or unchanged SDK test suite is insufficient.

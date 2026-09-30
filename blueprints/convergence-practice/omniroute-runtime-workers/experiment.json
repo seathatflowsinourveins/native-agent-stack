@@ -55,7 +55,9 @@
       "analytical-review",
       "bare-auth",
       "fixture-negative",
-      "fixture-positive"
+      "fixture-positive",
+      "claude-callsite",
+      "claude-sdk-child"
     ],
     "roles": [
       "installer",
@@ -93,6 +95,10 @@
       {
         "path": "examples/omniroute-codex-sdk/test_worker.py",
         "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a"
+      },
+      {
+        "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+        "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3"
       }
     ]
   },
@@ -139,7 +145,9 @@
     "Native Claude background Opus 5.5/Max ListAgents/SendMessage cooperation; stop only owned session after no final packet",
     "rtk proxy timeout --signal=TERM --kill-after=5s 240s claude -p --model claude-opus-5-5 --effort max --tools '' --strict-mcp-config --no-session-persistence --output-format json < <private-packet>",
     "Native bare-mode analytical review negative control; no native authentication loading",
-    "rtk npm test (independent unchanged upstream fixture before and after the worker)"
+    "rtk npm test (independent unchanged upstream fixture before and after the worker)",
+    "rtk proxy timeout --signal=TERM --kill-after=5s 180s claude -p --model claude-opus-5-5 --effort max --tools 'Bash,Read,Skill' --allowedTools 'Bash Read Skill' --strict-mcp-config --max-turns 4 --no-session-persistence --verbose --output-format stream-json < <private-callsite-prompt>",
+    "Native Claude Bash calls rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-project> --codex-home <private-home> --sandbox read-only --no-provider-retries --timeout 60 --request-id <own-request> --native-result <new-private-result> --prompt <single-oracle-task>"
   ],
   "observations": [
     {
@@ -606,6 +614,68 @@
         "total": 0,
         "native_retries": 0
       }
+    },
+    {
+      "id": "claude-native-callsite",
+      "task": "claude-callsite",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 13,
+      "evidence_class": "model_task_execution",
+      "scope": "Native Claude coordinator dispatch to the primary SDK worker",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+          "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 6,
+        "cache_creation": 49127,
+        "cache_read": 92451,
+        "output": 2706,
+        "reasoning_in_output": 1805,
+        "total": 144290,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sol-claude-dispatch",
+      "task": "claude-sdk-child",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 14,
+      "evidence_class": "model_task_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+          "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 658,
+        "cache_creation": 0,
+        "cache_read": 30208,
+        "output": 139,
+        "reasoning_in_output": 27,
+        "total": 31005,
+        "native_retries": 0
+      }
     }
   ],
   "failures_and_skips": [
@@ -650,7 +720,7 @@
     "Draft reproduction text used incorrect Claude wrapper flag names. Both installed runner --help commands were checked before publication; the text now uses --cwd/--gateway/--skill/--setting-source, with Max effort configured natively by the runner. Actual attempted calls and results did not change.",
     "The first authored record validation failed because administrative task and role IDs were omitted from frozen_inputs. Those metadata declarations were corrected; no provider run or result changed.",
     "One arithmetic fixture and lifecycle acceptance; no universal SDK or model quality ranking.",
-    "Actual provider trials invoked the SDK from root, rather than through a Claude coordinator. Native project dispatch skill is supplied and structurally checked; its coordinator invocation remains unmeasured.",
+    "The original provider trials invoked the SDK directly. A subsequent native Claude 2.1.285 Opus 5.5/Max call discovered/read the project skill and invoked the Sol-Max SDK through Bash. This bounded read-only acceptance does not qualify other parent tools or optional MCP services.",
     "Native Codex SDK remains the incumbent. The separate frozen three-arm SDK gate remains unresolved.",
     "Native gateway requested/returned model labels are not backend attestation.",
     "All 136 skills are available in the owned project, with two bodies exercised; full role coverage and optional service acceptance remain incomplete.",
@@ -658,7 +728,9 @@
     "Complete provider usage, spending, remote cancellation and token savings remain unknown.",
     "Public record is sanitized selected actual return fields and independent observations; original private returned artifacts remain outside the checkout.",
     "Source/evaluation artifacts pin the final formatting-equivalent implementation; exact pre-format live worker bytes are retained in native commits named in the receipt.",
-    "The 136-skill native installation and check are separate from per-task quality. Upstream source suites, authored local fixtures and actual provider execution remain separate."
+    "The 136-skill native installation and check are separate from per-task quality. Upstream source suites, authored local fixtures and actual provider execution remain separate.",
+    "The new native Claude parent reports list-price cost and its own usage scope, separate from the external SDK child. The new child contributes 31,005 tokens once; distinct successful SDK threads now total 259,749. Parent usage is not added to that SDK total. Original independent transport reconciliation covers only the earlier 228,744 direct-trial tokens.",
+    "The first callsite record check rejected receipt kind native_model_e2e as an observation evidence_class. The published observation class was corrected to the validator-supported model_task_execution, matching retained provider trials; no run or receipt outcome changed. Independent review also corrected allowed Bash/Read/Skill versus actually invoked Read/Bash."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",
@@ -666,11 +738,12 @@
     "qualification_run_ids": [
       "sol-fix",
       "sol-resume",
-      "sol-recovery"
+      "sol-recovery",
+      "sol-claude-dispatch"
     ]
   },
   "rollback": "Stop the owned invocation/observer and use the retained native coordinator/runtime path. Keep recoverable private thread state for resume; no shared gateway or account rollback is needed because none was changed.",
-  "next_decision_changing_test": "Observe an actual native Claude coordinator invocation of the supplied project skill. Separately, a repaired Claude bridge must pass native skill/tool/edit/oracle/resume/cancel/recovery and truthful usage acceptance before promotion. Preserve the existing frozen three-arm SDK gate for any SDK-winner change.",
+  "next_decision_changing_test": "A repaired Claude bridge must pass native skill/tool/edit/oracle/resume/cancel/recovery and truthful usage acceptance before promotion. Extend task-specific role and optional-service coverage without indiscriminate loading. Preserve the existing frozen three-arm SDK gate for any SDK-winner change.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",
@@ -689,7 +762,9 @@
       "claude-review-timeout",
       "claude-bare-auth",
       "independent-negative",
-      "independent-positive"
+      "independent-positive",
+      "claude-native-callsite",
+      "sol-claude-dispatch"
     ],
     "coverage_artifact": {
       "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",

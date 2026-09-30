@@ -2,6 +2,24 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "omniroute-claude-callsite-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "omniroute"
+      ],
+      "claim": "A native Claude Opus5.5/Max coordinator discovered and read the project dispatcher, invoked the official Sol-Max Codex SDK worker through native Bash, and the retained original shows one unchanged fixture test with exit0.",
+      "limitations": [
+        "One bounded read-only callsite and existing arithmetic oracle; no universal quality or SDK winner claim.",
+        "Coordinator tool scope was Bash/Read/Skill for this acceptance; other coordinator tools and optional MCP services are not qualified.",
+        "Native Claude and external Codex SDK usage remain separate scopes; parent list-price cost is not complete provider billing.",
+        "The separate Claude SDK Devin bridge remains failed/unqualified; this native Claude-account coordinator run does not promote it.",
+        "Provider backend identity, overall task usage, failed/interrupted calls, remote cancellation and token savings remain unverified."
+      ],
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json"
+    },
+    {
       "id": "omniroute-runtime-workers-20260930",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -5546,8 +5564,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
-      "sha256": "fbc8fb60192c306625a889e948bd2ca682dba9d0eeffd9bf768663b35679d324",
-      "bytes": 25944
+      "sha256": "b95c7e1feecf8bdc2a9d315d1dd12551b1636f9ab68ed7ca0b18158efc84a17c",
+      "bytes": 29454
     },
     {
       "path": "blueprints/convergence-practice/protocol.json",
@@ -14831,8 +14849,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
-      "sha256": "1b9834cbcbff17ef74205d5093bc7e5b790b28cd5f9eeccff34fce4a049a6559",
-      "bytes": 9433
+      "sha256": "ea1ea0bc6d9ab5cea0263cedf43cc392f65838b42546bdb15fbca20e7b0a6343",
+      "bytes": 10413
     },
     {
       "path": "docs/direct-results.md",
@@ -43780,6 +43798,11 @@
       "bytes": 16128
     },
     {
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+      "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3",
+      "bytes": 6238
+    },
+    {
       "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
       "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e",
       "bytes": 17754
@@ -44211,8 +44234,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "ec992256bb6b43262c3a7fe019fcfa9bd428bf04fd123e50b36b2ed7fa83c46a",
-      "bytes": 10099
+      "sha256": "17316922e6eddf158641d3cf76294c9a4a6ffb43b33ee6bd5630a0e0b1091ab3",
+      "bytes": 10526
     },
     {
       "path": "examples/omniroute-codex-sdk/checks.json",
