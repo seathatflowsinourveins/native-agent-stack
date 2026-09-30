@@ -1,0 +1,140 @@
+{
+ "captured_utc": "2026-09-30T02:52:42Z",
+ "purpose": "Live verification behind blueprints/memory-layer-s3/PREREGISTRATION.md DRAFT r7: maintenance gate, release pins, changed cited files, image digests, static-data metadata, GPU budget and client versions.",
+ "scope": "Metadata and source reads only (GitHub REST through gh 2.101.0, PyPI JSON, Hugging Face API, GHCR and Docker Hub manifests, nvidia-smi, --version). No provider call, deployment or scored run.",
+ "gate": {
+  "rule": "stale = archived, or zero default-branch commits since window_start; the floor of the OpenSSF Scorecard Maintained check (ossf/scorecard v5.5.0 checks/evaluation/maintained.go:31-32,88-100)",
+  "window_start_utc": "2026-07-02T02:52:42Z",
+  "commands": ["gh api repos/OWNER/REPO --jq .archived", "gh api \"repos/OWNER/REPO/commits?since=WINDOW_START&per_page=1\" --jq length"],
+  "count_note": "commits_in_window pages the commits endpoint to at most 300; count_capped marks a count that reached the cap",
+  "repos": {
+   "columns": ["repo", "role", "archived", "default_branch", "head", "head_utc", "commits_in_window", "count_capped", "latest_release", "latest_release_utc", "verdict"],
+   "rows": [
+    ["vectorize-io/agent-memory-benchmark", "harness", false, "main", "03c1d0f1d27d", "2026-09-22T12:23:44Z", 12, false, null, null, "ACTIVE"],
+    ["embeddings-benchmark/mteb", "harness", false, "main", "7fac921e8672", "2026-09-29T21:16:07Z", 300, true, "2.21.10", "2026-09-29T21:16:12Z", "ACTIVE"],
+    ["ossf/scorecard", "harness", false, "main", "bd19d486f4a3", "2026-09-29T20:35:19Z", 22, false, "v5.5.0", "2026-04-23T21:41:36Z", "ACTIVE"],
+    ["snap-research/locomo", "data", false, "main", "3eb6f2c585f5", "2024-08-13T03:21:21Z", 0, false, null, null, "STALE"],
+    ["xiaowu0162/LongMemEval", "data", false, "main", "9e0b455f4ef0", "2026-05-11T22:49:24Z", 0, false, null, null, "STALE"],
+    ["xiaowu0162/LongMemEval-V2", "diag", false, "main", "2cc8c540bdb8", "2026-08-09T22:31:22Z", 3, false, null, null, "ACTIVE"],
+    ["harbor-framework/harbor-datasets", "data", false, "main", "37db108843a4", "2026-05-16T19:48:38Z", 0, false, null, null, "STALE"],
+    ["harbor-framework/harbor", "harness", false, "main", "9b168361ebe9", "2026-09-30T02:33:35Z", 300, true, "v0.23.0", "2026-09-12T04:55:17Z", "ACTIVE"],
+    ["CoIR-team/coir", "data", false, "main", "89d0e769c18f", "2025-06-30T02:01:36Z", 0, false, null, null, "STALE"],
+    ["niieani/gpt-tokenizer", "harness", false, "main", "9182f2e56735", "2026-08-16T04:03:31Z", 11, false, "4.0.0", "2026-08-16T02:29:41Z", "ACTIVE"],
+    ["scipy/scipy", "stats", false, "main", "c71fcecc1bdd", "2026-09-29T17:15:49Z", 300, true, "v1.18.1", "2026-08-21T23:52:53Z", "ACTIVE"],
+    ["statsmodels/statsmodels", "stats", false, "main", "1767776211ac", "2026-09-29T14:19:51Z", 300, true, "v0.15.0", "2026-08-27T06:44:51Z", "ACTIVE"],
+    ["numpy/numpy", "stats", false, "main", "f99b1a0446b0", "2026-09-30T00:21:57Z", 300, true, "v2.5.3", "2026-09-06T16:37:15Z", "ACTIVE"],
+    ["diegosouzapw/OmniRoute", "gateway", false, "release/v3.8.52", "a1a2dce1a64a", "2026-09-29T22:07:49Z", 300, true, "v3.8.51", "2026-09-30T01:41:50Z", "ACTIVE"],
+    ["rohitg00/agentmemory", "primary", false, "main", "ab3e4efd2826", "2026-09-28T15:48:39Z", 39, false, "v0.9.29", "2026-08-16T13:56:45Z", "ACTIVE"],
+    ["vectorize-io/hindsight", "primary", false, "main", "eb021da3b250", "2026-09-29T17:05:35Z", 300, true, "v0.10.2", "2026-09-29T10:06:40Z", "ACTIVE"],
+    ["volcengine/OpenViking", "primary", false, "main", "b20f192e6139", "2026-09-29T12:29:14Z", 300, true, "v0.4.22", "2026-09-28T05:56:50Z", "ACTIVE"],
+    ["topoteretes/cognee", "primary", false, "main", "ba3631f2ed36", "2026-09-29T21:58:03Z", 300, true, "v1.6.2", "2026-09-29T22:00:46Z", "ACTIVE"],
+    ["MemPalace/mempalace", "primary", false, "develop", "5ea40d30caf0", "2026-09-29T11:22:34Z", 300, true, "v3.10.0", "2026-09-16T00:24:11Z", "ACTIVE"],
+    ["basicmachines-co/basic-memory", "primary", false, "main", "88c3990c9a17", "2026-09-30T02:36:10Z", 300, true, "v0.23.2", "2026-08-25T20:44:29Z", "ACTIVE"],
+    ["zilliztech/memsearch", "primary", false, "main", "2a4652fa086f", "2026-09-24T08:07:41Z", 79, false, "v0.4.21", "2026-09-24T08:08:42Z", "ACTIVE"],
+    ["akitaonrails/ai-memory", "primary", false, "main", "a0ca8d1a5fbd", "2026-09-29T16:27:08Z", 300, true, "v2.4.2", "2026-09-29T17:39:11Z", "ACTIVE"],
+    ["Gentleman-Programming/engram", "reserve", false, "main", "96e009abcd9a", "2026-09-30T01:47:06Z", 300, true, "v2.2.1", "2026-09-25T23:19:07Z", "ACTIVE"],
+    ["getzep/graphiti", "reserve", false, "main", "852ca401d89f", "2026-09-29T15:40:47Z", 116, false, "v0.30.2", "2026-09-08T20:38:41Z", "ACTIVE"],
+    ["supermemoryai/supermemory", "reserve", false, "main", "ce4facf662b2", "2026-09-30T01:01:29Z", 183, false, "server-v0.0.8", "2026-08-17T18:39:22Z", "ACTIVE"],
+    ["mem0ai/mem0", "out", false, "main", "94c3fe9f238f", "2026-09-25T17:34:12Z", 236, false, "ts-v3.3.1", "2026-09-25T17:36:35Z", "ACTIVE"],
+    ["letta-ai/letta", "out", false, "main", "5bcdd177d70f", "2026-09-10T17:59:06Z", 8, false, "0.16.8", "2026-05-14T17:14:24Z", "ACTIVE"],
+    ["gastownhall/beads", "out", false, "main", "3f9561db2bd1", "2026-09-30T01:17:57Z", 300, true, "v1.3.0", "2026-09-15T19:33:18Z", "ACTIVE"],
+    ["garrytan/gbrain", "late", false, "master", "608a174dcfa1", "2026-09-29T18:39:41Z", 300, true, "v0.60.10.0", "2026-09-29T18:41:54Z", "ACTIVE"],
+    ["tobi/qmd", "rag", false, "main", "04e4dbd8245c", "2026-09-09T20:51:54Z", 110, false, "v2.8.3", "2026-08-16T22:30:34Z", "ACTIVE"],
+    ["HKUDS/LightRAG", "rag", false, "main", "453dce83d6d0", "2026-09-26T08:33:35Z", 300, true, "v1.5.7", "2026-09-02T07:23:55Z", "ACTIVE"],
+    ["run-llama/llama_index", "rag", false, "main", "7e2c60a78ec2", "2026-09-29T04:49:06Z", 102, false, "v0.14.25", "2026-09-21T16:22:27Z", "ACTIVE"],
+    ["DeusData/codebase-memory-mcp", "code", false, "main", "80eb92a7017d", "2026-09-28T22:32:27Z", 300, true, "v0.11.0", "2026-09-15T23:40:39Z", "ACTIVE"]
+   ]
+  }
+ },
+ "pins": {
+  "columns": ["repo", "ref", "commit", "commit_utc"],
+  "rows": [
+   ["rohitg00/agentmemory", "v0.9.29", "2d38dafede67d0d4ed920cde94d2106e98825b8a", "2026-08-16T13:54:32Z"],
+   ["vectorize-io/hindsight", "v0.10.2", "5fc4ce20917b916240cef27c212c387a177f115b", "2026-09-29T09:40:54Z"],
+   ["vectorize-io/hindsight", "v0.10.1", "f8950b0c07d9e34c76493dba802bb309f0ce60fd", "2026-09-21T14:59:59Z"],
+   ["volcengine/OpenViking", "v0.4.22", "e8716760934d95ef73414484a45bfe475b9296e2", "2026-09-28T05:55:14Z"],
+   ["topoteretes/cognee", "v1.6.2", "ba3631f2ed363a6ea50d649c34c56885af6b36fe", "2026-09-29T21:58:03Z"],
+   ["topoteretes/cognee", "v1.6.1", "eb90d03740755f5252b8b12cce91fd09970f2d81", "2026-09-24T17:49:18Z"],
+   ["MemPalace/mempalace", "v3.10.0", "22fd87f09c19d5ffb2d6966486483353937931c0", "2026-09-16T00:22:41Z"],
+   ["basicmachines-co/basic-memory", "v0.23.2", "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048", "2026-08-25T20:43:45Z"],
+   ["zilliztech/memsearch", "v0.4.21", "2a4652fa086fbd45e92bfd8da7781ebe1642baa7", "2026-09-24T08:07:41Z"],
+   ["akitaonrails/ai-memory", "v2.4.2", "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1", "2026-09-29T16:27:08Z"],
+   ["akitaonrails/ai-memory", "v2.4.0", "b1b25219b507cf56cb7334ac1a408dc9b09eaa50", "2026-09-21T22:22:36Z"],
+   ["akitaonrails/ai-memory", "v2.4.1", "433a19f3d54dea287571b1423591db2a89965fa9", "2026-09-25T21:01:14Z"],
+   ["Gentleman-Programming/engram", "v2.2.1", "818be842f57a95063f62f1b745297a96c407c143", "2026-09-25T23:04:24Z"],
+   ["getzep/graphiti", "v0.30.2", "eaa4128681bc53487138a4bbc22d58336ebe70d2", "2026-09-08T20:37:55Z"],
+   ["supermemoryai/supermemory", "server-v0.0.8", "5d2b5855fe492a3682a1cde4a255e2db0c4db595", "2026-08-16T23:20:38Z"],
+   ["letta-ai/letta", "0.16.8", "1131535716e8a31c9a437f8695e25ac98f203a24", "2026-05-14T16:58:54Z"],
+   ["gastownhall/beads", "v1.3.0", "f45b249ce6b40ba62aecc03949e6371e8f7c79d8", "2026-09-15T19:13:59Z"],
+   ["garrytan/gbrain", "v0.60.10.0", "608a174dcfa1d39d5ea2d8fb5b296122b1cc78c5", "2026-09-29T18:39:41Z"],
+   ["tobi/qmd", "v2.8.3", "facd35e01359e59d938bc9418e93fb9318addee3", "2026-08-16T22:28:32Z"],
+   ["HKUDS/LightRAG", "v1.5.7", "28ff1b05f2ac3f3e6fa14dd2cd33656579bd0c9c", "2026-09-02T07:21:51Z"],
+   ["run-llama/llama_index", "v0.14.25", "f12d46acab73f5b2243ef49c2f00101617b38ce4", "2026-09-21T16:20:40Z"],
+   ["embeddings-benchmark/mteb", "2.21.10", "7fac921e8672cfb6799d7c6a9a542832bc10cbb6", "2026-09-29T21:16:07Z"],
+   ["ossf/scorecard", "v5.5.0", "c395761df6afe1a69e476bc60a013a94bcbc153f", "2026-04-23T21:26:29Z"],
+   ["niieani/gpt-tokenizer", "4.0.0", "fb04ebca53f662200e737caefe9a5ef372a5e41a", "2026-08-16T02:27:39Z"],
+   ["scipy/scipy", "v1.18.1", "e4e854eaa8f18d807cd3496028e257e36caa93cc", "2026-08-21T17:54:36Z"],
+   ["statsmodels/statsmodels", "v0.15.0", "278ff9950636cdd4939b4055e339a8e681d79cab", "2026-08-27T06:30:23Z"],
+   ["numpy/numpy", "v2.5.3", "dd88c0c19b54ad9ed3533224221285bf0873249a", "2026-09-05T22:47:25Z"],
+   ["diegosouzapw/OmniRoute", "v3.8.51", "c1e30b7676975feb298b49eff6ff58923c04b89e", "2026-09-29T22:58:13Z"],
+   ["harbor-framework/harbor", "v0.23.0", "1e5c5c6db929a10a140d05e606882c671ae20729", "2026-09-12T04:55:13Z"],
+   ["DeusData/codebase-memory-mcp", "v0.11.0", "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798", "2026-09-15T17:16:24Z"],
+   ["vectorize-io/agent-memory-benchmark", "03c1d0f1", "03c1d0f1d27da63034f0931121c858faba512383", "2026-09-22T12:23:44Z"],
+   ["xiaowu0162/LongMemEval", "9e0b455f", "9e0b455f4ef0e2ab8f2e582289761153549043fc", "2026-05-11T22:49:24Z"],
+   ["xiaowu0162/LongMemEval-V2", "main", "2cc8c540bdb87fe6761629b585e727e1c4704520", "2026-08-09T22:31:22Z"],
+   ["snap-research/locomo", "main", "3eb6f2c585f5e1699204e3c3bdf7adc5c28cb376", "2024-08-13T03:21:21Z"],
+   ["harbor-framework/harbor-datasets", "main", "37db108843a49bb31a592e37a75e2c40dc3f9749", "2026-05-16T19:48:38Z"],
+   ["CoIR-team/coir", "main", "89d0e769c18f0576a766072ba1071d4e04cca3dd", "2025-06-30T02:01:36Z"]
+  ]
+ },
+ "changed_between_releases": {
+  "columns": ["repo", "from", "to", "path", "changed"],
+  "rows": [
+   ["vectorize-io/hindsight", "v0.10.1", "v0.10.2", "hindsight-api-slim/hindsight_api/config.py", true],
+   ["vectorize-io/hindsight", "v0.10.1", "v0.10.2", "hindsight-api-slim/hindsight_api/engine/cache_affinity.py", true],
+   ["vectorize-io/hindsight", "v0.10.1", "v0.10.2", "hindsight-docs/docs/developer/installation.md", true],
+   ["vectorize-io/hindsight", "v0.10.1", "v0.10.2", "hindsight-docs/docs/developer/models.mdx", true],
+   ["vectorize-io/hindsight", "v0.10.1", "v0.10.2", "docker/docker-compose/claude-code/docker-compose.yaml", false],
+   ["topoteretes/cognee", "v1.6.1", "v1.6.2", "Dockerfile", false],
+   ["topoteretes/cognee", "v1.6.1", "v1.6.2", "cognee/infrastructure/llm/config.py", true],
+   ["topoteretes/cognee", "v1.6.1", "v1.6.2", "cognee/tasks/ingestion/data_item.py", false],
+   ["akitaonrails/ai-memory", "v2.4.0", "v2.4.2", "crates/ai-memory-cli/src/config.rs", true],
+   ["akitaonrails/ai-memory", "v2.4.0", "v2.4.2", "crates/ai-memory-llm/src/embedding.rs", false],
+   ["akitaonrails/ai-memory", "v2.4.0", "v2.4.2", "crates/ai-memory-llm/src/reranker.rs", false],
+   ["akitaonrails/ai-memory", "v2.4.0", "v2.4.2", "docs/llm-providers.md", true]
+  ]
+ },
+ "images": [
+   {"image": "ghcr.io/vectorize-io/hindsight:0.10.2", "digest": "sha256:d1840062a5b79940ab7a9f4809ceb90fc776d4ad737cd9329e9b5836cc64ab70"},
+   {"image": "ghcr.io/vectorize-io/hindsight:0.10.1", "digest": "sha256:b4d3b76f363aa40cf348450e7f8f52a50653008731b99824b14623a196182e73", "note": "equals the r6 record (control)"},
+   {"image": "cognee/cognee:1.6.2", "digest": "sha256:41c06180608a053f07fffc4da56dd1efba62967dd3d4a1023b33939abee5d45d"},
+   {"image": "cognee/cognee:1.6.1", "digest": "sha256:db0973f4b913d73daa4061bc19362cde6edc59d1be8243b6667fade364b06428", "note": "equals the r6 record (control)"}
+  ],
+ "huggingface": [
+   {"id": "datasets/xiaowu0162/longmemeval-cleaned", "revision": "98d7416c24c778c2fee6e6f3006e7a073259d48f", "file": "longmemeval_s_cleaned.json", "bytes": 277383467, "lfs_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442", "note": "registry metadata; the freeze hashes the downloaded file"},
+   {"id": "datasets/mteb/LoCoMo", "revision": "02e2c3dea15d9fdfd1cd7a0f65f5f8ae2ed4c1ac", "last_modified": "2026-05-11T15:15:34.000Z", "license": "cc-by-nc-4.0"},
+   {"id": "nvidia/Nemotron-3-Embed-1B-BF16", "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615", "last_modified": "2026-08-27T23:53:03.000Z"},
+   {"id": "google/embeddinggemma-300m", "revision": "57c266a740f537b4dc058e1b0cda161fd15afa75", "last_modified": "2025-09-25T15:11:17.000Z", "gated": true},
+   {"id": "ggml-org/embeddinggemma-300M-GGUF", "revision": "0f741b5a6585bd53aeb15cd1372c56f2a0f65e12", "last_modified": "2026-04-29T11:39:35.000Z"},
+   {"id": "Qwen/Qwen3-Reranker-0.6B", "revision": "e61197ed45024b0ed8a2d74b80b4d909f1255473", "last_modified": "2026-04-16T08:55:59.000Z"},
+   {"id": "ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF", "revision": "a02f48bb4f057028298c21fa033da2b30d7742d5", "last_modified": "2025-10-03T10:19:38.000Z"},
+   {"id": "sentence-transformers/all-MiniLM-L6-v2", "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41", "last_modified": "2026-06-01T06:29:13.000Z"}
+  ],
+ "gpu": {
+  "captured_utc": "2026-09-30T03:13:24Z",
+  "name": "NVIDIA GeForce RTX 4090",
+  "total_mib": 24564,
+  "used_mib": 12138,
+  "free_mib": 12005,
+  "earlier_reading": {
+   "free_mib": 12726,
+   "captured_utc": null,
+   "note": "earlier reading in the same session; its time was not recorded"
+  }
+ },
+ "clients": {
+  "captured_utc": "2026-09-30T02:50:03Z",
+  "claude_code": "2.1.285",
+  "codex_cli": "0.157.1"
+ }
+}

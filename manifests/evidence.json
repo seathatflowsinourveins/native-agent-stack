@@ -7245,8 +7245,8 @@
     },
     {
       "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
-      "sha256": "bfc392c8e6d7225a29a0f4e883b92af2af82b8f5b18c5f71891f3cc6555c62a3",
-      "bytes": 120965
+      "sha256": "5b9a4274f41d74b6dbefef00c3a3b1161ae1ee21bb924c2232d9cf1e5bdbb772",
+      "bytes": 143590
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/r6/eval-frameworks-report.md",
@@ -7272,6 +7272,11 @@
       "path": "blueprints/memory-layer-s3/inputs/r6/s3-r6-inputs.md",
       "sha256": "22389274ad57b42b4ad365a9495ab630331cc2ba4e7f76cfe9a10c3d52901e31",
       "bytes": 5018
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r7/live-verification-20260930.json",
+      "sha256": "c02d1c506d31164891d3f1782a55993d1d5ae61f9a5c4b9c7e285aa839e24f69",
+      "bytes": 13757
     },
     {
       "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/README.md",
