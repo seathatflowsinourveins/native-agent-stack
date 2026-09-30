@@ -1,4 +1,5 @@
-model = "gpt-6-astra"
+# Interactive and main-worker default, user decision 2026-09-30 (docs/decisions/2026-09-27-model-currency.md addendum).
+model = "gpt-6.1-sol"
 model_reasoning_effort = "ultra"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
@@ -7,7 +8,7 @@ mcp_oauth_credentials_store = "file"
 # only, and only full access picks live (codex-rs/core/src/config/mod.rs L2659-2670 and L3050-3094 at rust-v0.157.1;
 # docs/harness-defaults.md, row 2026-09-26). A lane that must not browse passes -c web_search="disabled".
 web_search = "live"
-# The client is pinned (manifests/stack.json; evidence/receipts/codex-01571-qualification-20260926.json), so Codex
+# The client is pinned (manifests/stack.json; evidence/receipts/codex-01592-qualification-20260930.json), so Codex
 # neither checks for updates nor prompts about them at startup: "Set to `false` only if your Codex updates are
 # centrally managed" (codex-rs/config/src/config_toml.rs L520-523).
 check_for_update_on_startup = false

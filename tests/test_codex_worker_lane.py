@@ -421,11 +421,13 @@ class TemplateTests(unittest.TestCase):
         # config error, and no `set` here, so the base config's [shell_environment_policy.set] keeps applying.
         self.assertEqual(profile["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
         self.assertEqual(profile["features"], {"standalone_web_search": True, "shell_snapshot": False})
-        # K2: the base template stays gateway-free, so render_config.py --check still compares like with like.
+        # K2: the base template stays gateway-free, so render_config.py --check still compares like with like. Its
+        # interactive default is GPT-6.1 Sol at ultra (the user's decision of 2026-09-30, model-currency addendum),
+        # while this gateway profile keeps the judgment lanes' cx/gpt-6-astra at max.
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         self.assertNotIn("model_providers", user)
         self.assertNotIn("model_provider", user)
-        self.assertEqual(user["model"], "gpt-6-astra")
+        self.assertEqual((user["model"], user["model_reasoning_effort"]), ("gpt-6.1-sol", "ultra"))
 
     def test_landscape_sweep_lane_home_matches_the_omniroute_profile(self):
         # The sweep's gateway lane cannot use `-p omniroute` (its one --profile slot is stack-worker), so its lane
