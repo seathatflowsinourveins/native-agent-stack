@@ -302,24 +302,26 @@ locally with `GH_TOKEN` set and no `--offline`, using
   nine between 23:11Z and 23:43Z), affect 2.13.0; OSV and GitHub list 2.14.0 as the first patched release for all ten
   (the 2.14.0 changelog names nine, and its entry for the tenth cites an id neither database serves). The nine (one
   Critical at CVSS 9.1, five High, three Medium) failed the required check on the OpenHands recipe lock in run
-  36657687493, the one log read; main push runs from 23:33Z on also concluded failure (logs not read; the first two predate
-  the last two advisories). The lock was relocked onto PyJWT 2.14.0 with the recipe's own method, and this entry's Expiry
-  sentence above is superseded for that lock: the GHSA-w6j9-cwv2-h6wq ignore and its `IGNORE_SCOPES` entry are deleted,
-  and the lock's `IGNORE_ALLOWED_LOCKS` entry keeps the two oauthlib advisories at the relocked sha256, with the new
-  record as its evidence, which carries the 2026-09-29 review forward (the lock diff is the three PyJWT lines; PyJWT
-  2.14.0's wheel and sdist have no oauthlib reference, and the same search over requests-oauthlib's wheel hits, so it can).
-  oauthlib stays at 3.3.1: 4.0.0 was published 2026-09-28T06:01Z, inside the 7-day window the upstream workspace applies,
-  and its two advisories are ignored until 2026-10-13; a 2026-09-30 pre-check found requests-oauthlib 2.0.0's unit tests
-  and imports identical under 3.3.1 and 4.0.0. **Alternatives considered:** PyJWT 2.15.1 or 2.15.0 (inside the same window
-  as of 2026-09-30T03:06:53Z, and the scan is clean at 2.14.0); relocking oauthlib 4.0.0 now; extending the ignores to the nine
-  (rejected: one is Critical and a fixed release exists). **Result:** the workflow's command over the 49 lockfiles exits 0
-  with no PyJWT ignore, and the previous lock under the same config exits 1. **Expiry and owner:** tracked in #518; owner
-  the coordinator session that landed the relock, unless reassigned there; earliest 2026-10-05T18:40:41Z, due 2026-10-08:
-  relock onto oauthlib 4.0.0 and PyJWT 2.15.1 (or record why 2.14.0 stays), repeat the import and requests-oauthlib checks
-  on the real lock, and delete the OpenHands entry in the same change; on 2026-10-13 renew the oauthlib ignores for the
-  Lumibot lock alone or delete that lock. **Overturn:** (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) oauthlib 4.0.0 clears its window (2026-10-05T06:01Z) and passes the compatibility checks; (d) PyJWT 2.15.1 clears its window (2026-10-05T18:40Z): the follow-up relock takes it together with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0. **Not covered:** the image's server binary and the
-  grader venv (PyJWT 2.13.0 and 2.10.1), and any run of the recipe. Evidence:
-  `evidence/receipts/osv-openhands-pyjwt-relock-20260930.json`.
+  36657687493, the one log read; main push runs from 23:33Z on also concluded failure (logs not read; the first two were
+  created before the last two advisories were published). The lock was relocked onto PyJWT 2.14.0 with the recipe's own
+  method, and this entry's Expiry sentence above is superseded for that lock: the GHSA-w6j9-cwv2-h6wq ignore and its
+  `IGNORE_SCOPES` entry are deleted, and the lock's `IGNORE_ALLOWED_LOCKS` entry keeps the two oauthlib advisories at the
+  relocked sha256, with the new record as its evidence, which carries the 2026-09-29 review forward (the lock diff is
+  the three PyJWT lines; PyJWT 2.14.0's wheel and sdist have no oauthlib reference, and the same search over
+  requests-oauthlib's wheel hits, so it can). oauthlib stays at 3.3.1: as of 2026-09-30T03:27:54Z, 4.0.0 (published
+  2026-09-28T06:01Z) is inside the 7-day window the upstream workspace applies, until 2026-10-05T06:01:19Z, and its two
+  advisories are ignored until 2026-10-13; a 2026-09-30 pre-check found the same test outcome for requests-oauthlib
+  2.0.0's unit tests and imports under oauthlib 3.3.1 and 4.0.0. **Alternatives considered:** PyJWT 2.15.1 or 2.15.0
+  (inside the same window as of 2026-09-30T03:27:54Z, and the scan is clean at 2.14.0); relocking oauthlib 4.0.0 now; extending
+  the ignores to the nine (rejected: one is Critical and a fixed release exists). **Result:** the workflow's command
+  over the 49 lockfiles exits 0 with no PyJWT ignore, and the previous lock under the same config exits 1. **Expiry and
+  owner:** tracked in #518; owner bc (session native-agent-stack-bc), unless reassigned there; a decision point at
+  2026-09-30T16:56:01Z (PyJWT 2.15.0 leaves the window; the reason 2.14.0 stays is recorded in the receipt), the joint relock
+  earliest 2026-10-05T18:40:43Z, due 2026-10-08: relock onto oauthlib 4.0.0 and PyJWT 2.15.1 (or record why 2.14.0 stays),
+  repeat the import and requests-oauthlib checks on the real lock, and delete the OpenHands entry in the same change; on
+  2026-10-13 renew the oauthlib ignores for the Lumibot lock alone or delete that lock. **Overturn:** (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
+  **Not covered:** the image's server binary and the grader venv (PyJWT 2.13.0 and 2.10.1), and any run of the recipe.
+  Evidence: `evidence/receipts/osv-openhands-pyjwt-relock-20260930.json`.
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day

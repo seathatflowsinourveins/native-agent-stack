@@ -1,12 +1,14 @@
 # OpenHands recipe runtime lock: PyJWT 2.14.0 relock (2026-09-30)
 # Returned outputs of the commands blueprints/runtime-workers/openhands/research.md and
-# evidence/receipts/osv-openhands-pyjwt-relock-20260930.json cite. Outputs are as printed, with host paths shown as
-# <scratch> and <worktree>. A line that starts with '(derived)' is computed from files, not a command's stdout. Outputs of
+# evidence/receipts/osv-openhands-pyjwt-relock-20260930.json cite. Each '$' line is the command as run (a line marked '(abridged)' is
+# shortened for reading; the builder script keeps the full text) and the lines under it are its output as printed, with host paths shown
+# as <scratch> and <worktree>. A line that starts with '(derived)' is computed from files or from several commands, not one command's
+# stdout; sections A, E and F are excerpts selected by grep, and the outputs of
 # an earlier scratch pair of relocks (the 2026-09-27 reproduction, then a second lock with the pyjwt upgrade) are not retained;
 # only their resulting digests are quoted in section C.
 
 ## A. The failure this relock answers (CI run 36657687493, pull_request, required check osv-scanner)
-$ gh run view 36657687493 --log-failed | grep -E "<result lines>"
+$ gh run view 36657687493 --log-failed | grep -E "<result lines>" | sed ...     (abridged: the result lines of the osv-scanner step)
 Filtered 8 vulnerabilities from output
 Total 1 package affected by 9 known vulnerabilities (1 Critical, 5 High, 3 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
 9 vulnerabilities can be fixed.
@@ -40,7 +42,7 @@ version = "2.13.0"
 ##    environments line of research.md; all five upgrades in one command)
 $ uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0
 Using CPython 3.13.15
-Resolved 412 packages in 200ms
+Resolved 412 packages in 170ms
 Updated anyio v4.11.0 -> v4.14.2
 Updated click v8.1.8 -> v8.5.0
 Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
@@ -125,7 +127,7 @@ Total 1 package affected by 10 known vulnerabilities (1 Critical, 5 High, 4 Medi
 
 ### E2. The CI command over the inventory, on this tree (no PyJWT ignore remains in .github/osv-scanner.toml)
 $ osv-scanner scan source --config .github/osv-scanner.toml --no-resolve <49 inventory lockfiles>
-observed_utc: 2026-09-30T03:06:53Z
+observed_utc: 2026-09-30T03:27:54Z
 exit: 0
 Filtered 175 local/unscannable package/s from the scan.
 Filtered 7 vulnerabilities from output
@@ -160,18 +162,29 @@ pyjwt 2.14.0 | cryptography 50.0.0 | oauthlib 3.3.1
  + soupsieve==2.9.2
 
 ## G. The PyJWT 2.14.0 artifacts: no reference to oauthlib (the installer uses the wheel; the sdist is searched too)
-$ sha256sum pyjwt-2.14.0-py3-none-any.whl pyjwt-2.14.0.tar.gz     # equal to the lock's hashes
+$ sha256sum pyjwt-2.14.0-py3-none-any.whl | cut -c1-64     # equal to the lock's wheel hash
 ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc
+$ sha256sum pyjwt-2.14.0.tar.gz | cut -c1-64     # equal to the lock's sdist hash
 77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86
-$ python3 -m zipfile -e pyjwt-2.14.0-py3-none-any.whl <dir>; grep -rIc oauthlib <dir> | awk -F: "{s+=\$2} END {print s+0}"
-wheel files: 19; oauthlib matches: 0
-$ tar -xzf pyjwt-2.14.0.tar.gz; grep -rIc oauthlib pyjwt-2.14.0 | awk -F: "{s+=\$2} END {print s+0}"
-sdist files: 88; oauthlib matches: 0
-$ same search on the wheel of requests-oauthlib 2.0.0 (sha256 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36, the artifact the 2026-09-29 review searched): the positive control, which must hit
-sha256: 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36; files: 20; oauthlib matches: 80
+$ python3 -m zipfile -e pyjwt-2.14.0-py3-none-any.whl pyjwt-2.14.0-py3-none-any     (run earlier; the sdist was extracted earlier with tar -xzf)
+$ find pyjwt-2.14.0-py3-none-any -type f | wc -l
+19
+$ grep -rIc oauthlib pyjwt-2.14.0-py3-none-any | awk -F: '{s+=$2} END {print s+0}'     # sum of the per-file match counts
+0
+$ find pyjwt-2.14.0 -type f | wc -l     # the sdist tree
+88
+$ grep -rIc oauthlib pyjwt-2.14.0 | awk -F: '{s+=$2} END {print s+0}'
+0
+$ the same three commands on the wheel of requests-oauthlib 2.0.0 (the artifact the 2026-09-29 review searched): the positive control, which must hit
+$ sha256sum requests_oauthlib-2.0.0-py2.py3-none-any.whl | cut -c1-64     # 7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36 in the 2026-09-29 record
+7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36
+$ find requests_oauthlib-2.0.0-py2.py3-none-any -type f | wc -l
+20
+$ grep -rIc oauthlib requests_oauthlib-2.0.0-py2.py3-none-any | awk -F: '{s+=$2} END {print s+0}'
+80
 
 ## H. Fix versions of the ten advisories against GitHub and OSV records, and the PyJWT 2.14.0 changelog
-$ gh api /advisories/<id> --jq "[ghsa_id, published_at, vulnerable_version_range, first_patched_version]"
+$ gh api /advisories/<id> --jq '[.ghsa_id, .published_at, (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .vulnerable_version_range), (.vulnerabilities[] | select(.package.name | ascii_downcase == "pyjwt") | .first_patched_version)] | @tsv'     # once per id of the ten; tab-separated output
 GHSA-2gx3-rcp4-g85q	2026-09-29T23:11:51Z	<= 2.13.0	2.14.0
 GHSA-8wjv-2p76-3863	2026-09-29T23:43:06Z	>= 2.13.0, < 2.14.0	2.14.0
 GHSA-9j54-fg26-wv3r	2026-09-29T23:43:19Z	>= 2.13.0, < 2.14.0	2.14.0
@@ -198,29 +211,60 @@ $ grep -A1 "^name = \"pyjwt\"" uv.lock
 name = "pyjwt"
 version = "2.10.1"
 
-## J. Pre-check for the planned oauthlib 4.0.0 relock (not applied): requests-oauthlib 2.0.0's unit tests under oauthlib 3.3.1 and 4.0.0
-##    (scratch CPython 3.13.15 venvs with requests-oauthlib 2.0.0, google-auth-oauthlib 1.2.2, requests, pyjwt 2.14.0; tests/examples needs selenium and is not run)
+## J. Pre-check for the planned oauthlib 4.0.0 relock (not applied): requests-oauthlib 2.0.0's own unit tests (unchanged upstream test code) under oauthlib 3.3.1 and 4.0.0
+##    (scratch CPython 3.13.15 venvs; tests/examples needs selenium and is not run)
+$ sha256sum ro-2.0.0.tar.gz | cut -c1-64     # the requests-oauthlib 2.0.0 sdist whose tests/ directory is run
+b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9
+(derived) that sdist hash appears 1 time(s) in the OpenHands requirements.lock (the lock lists requests-oauthlib 2.0.0's hashes)
 ### oauthlib 3.3.1
- + google-auth-oauthlib==1.2.2
- + oauthlib==3.3.1
- + pyjwt==2.14.0
- + requests-oauthlib==2.0.0
-$ python -c "import requests_oauthlib, google_auth_oauthlib.flow"
+$ uv pip list --python <venv>/bin/python | grep -E "^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) "
+cryptography         50.0.1
+google-auth-oauthlib 1.2.2
+mock                 5.2.0
+oauthlib             3.3.1
+pyjwt                2.14.0
+pytest               9.1.1
+requests             2.34.2
+requests-mock        1.12.1
+requests-oauthlib    2.0.0
+$ python -c "import requests_oauthlib, google_auth_oauthlib.flow; print('imports OK')"
 imports OK
-$ pytest -q tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the requests-oauthlib 2.0.0 sdist
+$ python -m pytest -q -rf --tb=line -p no:cacheprovider tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the sdist tree; full output
+...F.......F............................................................ [ 97%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+E   AssertionError: 1790742482 != 1790742482.223825 within 2 places (0.22382497787475586 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790742482 != 1790742482.223825 within 2 places (0.22382497787475586 difference)
+E   AssertionError: 1790825282 != 1790825282.2317255 within 2 places (0.23172545433044434 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790825282 != 1790825282.2317255 within 2 places (0.23172545433044434 difference)
 =========================== short test summary info ============================
 FAILED tests/test_compliance_fixes.py::MailChimpComplianceFixTest::test_fetch_access_token
 FAILED tests/test_compliance_fixes.py::PlentymarketsComplianceFixTest::test_fetch_access_token
-2 failed, 72 passed in 0.58s
+2 failed, 72 passed in 0.50s
+exit: 1
 ### oauthlib 4.0.0
- + google-auth-oauthlib==1.2.2
- + oauthlib==4.0.0
- + pyjwt==2.14.0
- + requests-oauthlib==2.0.0
-$ python -c "import requests_oauthlib, google_auth_oauthlib.flow"
+$ uv pip list --python <venv>/bin/python | grep -E "^(oauthlib|requests-oauthlib|google-auth-oauthlib|requests|requests-mock|mock|pytest|pyjwt|cryptography) "
+cryptography         50.0.1
+google-auth-oauthlib 1.2.2
+mock                 5.2.0
+oauthlib             4.0.0
+pyjwt                2.14.0
+pytest               9.1.1
+requests             2.34.2
+requests-mock        1.12.1
+requests-oauthlib    2.0.0
+$ python -c "import requests_oauthlib, google_auth_oauthlib.flow; print('imports OK')"
 imports OK
-$ pytest -q tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the requests-oauthlib 2.0.0 sdist
+$ python -m pytest -q -rf --tb=line -p no:cacheprovider tests/test_compliance_fixes.py tests/test_core.py tests/test_oauth1_session.py tests/test_oauth2_auth.py tests/test_oauth2_session.py     # in the sdist tree; full output
+...F.......F............................................................ [ 97%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+E   AssertionError: 1790742484 != 1790742483.722941 within 2 places (0.27705907821655273 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790742484 != 1790742483.722941 within 2 places (0.27705907821655273 difference)
+E   AssertionError: 1790825284 != 1790825283.7308333 within 2 places (0.2691667079925537 difference)
+~/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py:961: AssertionError: 1790825284 != 1790825283.7308333 within 2 places (0.2691667079925537 difference)
 =========================== short test summary info ============================
 FAILED tests/test_compliance_fixes.py::MailChimpComplianceFixTest::test_fetch_access_token
 FAILED tests/test_compliance_fixes.py::PlentymarketsComplianceFixTest::test_fetch_access_token
-2 failed, 72 passed in 0.55s
+2 failed, 72 passed in 0.78s
+exit: 1

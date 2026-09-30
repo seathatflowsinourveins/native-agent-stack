@@ -383,27 +383,28 @@ The resulting uv.lock (SHA256 1816ccfdac2d485b790e29a3c38881273e2335ff0413c07f7a
 --check` and `uv export` exit 0 and `cmp` of the export plus the pins.json wheel entries against the committed lock
 exits 0 (returned outputs, section C); an earlier scratch pair gave the same digests, and its outputs are not retained.
 
-- **Choice, as of 2026-09-30T03:06:53Z.** 2.14.0 is the newest release outside the 7-day window the upstream workspace's
-  `exclude-newer` applies. 2.15.0 (2026-09-23T16:56Z) leaves the window at 2026-09-30T16:56Z and 2.15.1
-  (2026-09-28T18:40Z) at 2026-10-05T18:40Z. 2.15.0's changelog has one Security item without an advisory id (recursion
-  errors from deeply nested payloads wrapped in `DecodeError`); 2.15.1 fixes Base64URL `=` padding. Its two hashes equal
-  PyPI's.
+- **Choice, as of 2026-09-30T03:27:54Z.** 2.14.0 is the newest release outside the 7-day window the upstream workspace's
+  `exclude-newer` applies: PyJWT 2.15.0 leaves the window at 2026-09-30T16:56:01Z, oauthlib 4.0.0 at 2026-10-05T06:01:19Z and PyJWT 2.15.1 at 2026-10-05T18:40:43Z (each 7 days after the later of the release's file upload times on PyPI). Its two hashes equal PyPI's. 2.15.0's changelog has one Security item without an
+  advisory id (recursion errors from deeply nested payloads wrapped in `DecodeError`); 2.15.1 fixes Base64URL `=` padding.
+  The reason 2.14.0 stays until the joint relock, recorded now: as of 2026-09-30T03:27:54Z: the recipe venv decodes no attacker-controlled JWT that this record found. The 2026-09-29 search found jwt.encode of client assertions in mcp 1.28.1 only, google-auth's ID-token verify_token (the one code path that decodes a presented token, through PyJWKClient) not called by any other artifact, and the LiteLLM proxy's JWT code not run; 2.15.0's Security item (recursion errors from deeply nested payloads wrapped in DecodeError, no advisory id) is the payload counterpart of GHSA-8wjv-2p76-3863, which 2.14.0 fixed for headers, so 2.14.0 most likely still raises a raw RecursionError on such a payload; that matters only where a decode of untrusted tokens is reachable. A dated decision point at 2026-09-30T16:56:01Z
+  (owner: bc, session native-agent-stack-bc) confirms it when 2.15.0 leaves the window.
 - **Checks.** The pinned OSV-Scanner 2.6.0 over the 49 inventory lockfiles exits 0 with no PyJWT ignore left, and the
   previous lock under the same config exits 1 with the ten advisories. The install-container.sh sequence in a scratch
   CPython 3.13.15 venv on the host network installed 175 packages, `uv pip check` exited 0 and the import check printed
   `SDK/tools 1.49.6 imports passed; no model request`. No OpenHands task ran with the relocked venv. The image's server
   binary (upstream's uv.lock, PyJWT 2.13.0) and the grader venv (OpenHands/benchmarks@405bae7's uv.lock, PyJWT 2.10.1) are
-  unchanged and unscanned by the inventory; the 2026-09-28 grype record of the image predates these advisories. An
-  installation that recorded the old lock digest must re-run install (host.py refuses to run it otherwise).
-- **oauthlib stays at 3.3.1.** 4.0.0 was published 2026-09-28T06:01Z, inside the same window, and its two advisories stay
-  covered by the 2026-09-29 reviews, which the record carries forward at the new digest. A pre-check on 2026-09-30 found no
-  difference between oauthlib 3.3.1 and 4.0.0 in `import requests_oauthlib, google_auth_oauthlib.flow` and in
-  requests-oauthlib 2.0.0's unit tests (72 passed and the same 2 failed under both; section J of the returned outputs).
-  The relock is tracked in #518 with an owner and a date: the coordinator session that landed this relock, earliest
-  2026-10-05T18:40:41Z (after PyJWT 2.15.1 also clears the window), due 2026-10-08; it repeats those checks on the real
-  lock and deletes the lock's `IGNORE_ALLOWED_LOCKS` entry.
+  unchanged and unscanned by the inventory; the 2026-09-28 grype record of the image predates these advisories and has no
+  PyJWT entry. An installation that recorded the old lock digest must re-run install (host.py refuses to run it otherwise).
+- **oauthlib stays at 3.3.1.** As of 2026-09-30T03:27:54Z, 4.0.0 (published 2026-09-28T06:01Z) is inside the same window, until
+  2026-10-05T06:01:19Z, and its two advisories stay covered by the 2026-09-29 reviews, which the record carries forward at the
+  new digest. A pre-check on 2026-09-30 found the same outcome for each test under oauthlib 3.3.1 and 4.0.0 in
+  requests-oauthlib 2.0.0's own unit tests (72 passed and the same 2 failed, both timing assertions that also fail under
+  3.3.1) and both imports working (returned outputs, section J). The relock is tracked in #518 with an owner (bc, session
+  native-agent-stack-bc) and dates: joint relock earliest 2026-10-05T18:40:43Z, due 2026-10-08, with `--upgrade-package
+  oauthlib==4.0.0` added and `--upgrade-package pyjwt==2.14.0` replaced by `--upgrade-package pyjwt==2.15.1`; it repeats
+  those checks on the real lock and deletes the lock's `IGNORE_ALLOWED_LOCKS` entry.
 
-Overturn conditions: (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) oauthlib 4.0.0 clears its window (2026-10-05T06:01Z) and passes the compatibility checks; (d) PyJWT 2.15.1 clears its window (2026-10-05T18:40Z): the follow-up relock takes it together with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
+Overturn conditions: (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
 
 ## Takeover phase 1 corrections (2026-09-28)
 
