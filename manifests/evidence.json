@@ -35060,8 +35060,8 @@
     },
     {
       "path": "evidence/artifacts/pra-u3-differential-20260929/README.md",
-      "sha256": "f5315002cb043c8097125bc6959d4078ca3d2ed78a3bde7d5e69fa5c217b06bc",
-      "bytes": 13626
+      "sha256": "e6c924eab077a2140dc398f607fae836c3fe2eec4e1358c8037636454f1d1226",
+      "bytes": 21178
     },
     {
       "path": "evidence/artifacts/pra-u3-differential-20260929/census.py",
@@ -35072,6 +35072,21 @@
       "path": "evidence/artifacts/pra-u3-differential-20260929/claude-byte-identity.py",
       "sha256": "b8db345299d1e0845fedb29b4a6960b43f86cbee9e54fb770b8f9e503eb26a74",
       "bytes": 6504
+    },
+    {
+      "path": "evidence/artifacts/pra-u3-differential-20260929/ledger-host-check.py",
+      "sha256": "623c763aaed2989debc6468106bfd79448d79b2a10d6646b6e1d4aaad61f95a6",
+      "bytes": 6193
+    },
+    {
+      "path": "evidence/artifacts/pra-u3-differential-20260929/probe-end-of-options.py",
+      "sha256": "67c56db2a6306b6e38dbbe18220157a3290d856c79dea82812830b7b70615a60",
+      "bytes": 2856
+    },
+    {
+      "path": "evidence/artifacts/pra-u3-differential-20260929/rehearse-with-u2-kernel.sh",
+      "sha256": "4b37f105d5a96bc649ea4ee8979028486e27d508e4455c666ae6d7056c340642",
+      "bytes": 1540
     },
     {
       "path": "evidence/artifacts/pra-u3-differential-20260929/run-differential.py",
@@ -44230,8 +44245,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "dd45af27b2789c5fe84e8e59f6c7c59a0cde226d2ab03128933d6bed68b2e7d0",
-      "bytes": 215783
+      "sha256": "2776cbb9b1371b27b7a1cb8e0b48e9a8fbfedeee858c4dc8f210a5efc86155e3",
+      "bytes": 240962
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -44490,13 +44505,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "9a76823afff90ccb7e658c40a91eb96f360a6d6dc47fb26a1d9be351fadf6ea8",
-      "bytes": 46902
+      "sha256": "7aee0e6aa9b1a081a841f1ad6b1a2ab4c515459a2fb0565f9096f9fa8a194c3c",
+      "bytes": 51737
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "7afff10a72a7f43af679ef21cef1eb89bda97769b0e3fb823b138160c6b8d60b",
-      "bytes": 135899
+      "sha256": "e5f4189822234efb0935e10f5cf674573126a0398985bfd648367c73333ff01a",
+      "bytes": 147723
     },
     {
       "path": "tools/sota-convergence/README.md",
