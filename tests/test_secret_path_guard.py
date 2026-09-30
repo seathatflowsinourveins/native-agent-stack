@@ -10,7 +10,9 @@ import itertools
 import json
 import os
 from pathlib import Path
+import random
 import re
+import shlex
 import subprocess
 import sys
 import time
@@ -1747,6 +1749,43 @@ PATHOLOGICAL = {
         (lambda: "kernel_keyring.py exec n X -- watch sh sh sh sh '" + "a b " * 15000 + "' ; printenv", "environment_dump"),
 }
 PATHOLOGICAL_SECONDS = 3.0
+# The third verification review's slow text inputs (2026-09-29): four STORE_PATHS regular expressions read an unbounded run again from every
+# repeat of the literal before it, before any work budget was charged (11.9 s, 13 to 14 s and 13 to 15 s, past the 10 s hook timeout, where
+# a hook fails open). They are linear scans now (LinearScan), and a text without a quote or a backslash is split without shlex (SHLEX_PLAIN),
+# whose per-character word building cost 0.53 s on one word of 199,000 characters. Each input must finish in-process in under
+# LINEAR_SECONDS, with its verdict, and the real hook in under a second.
+LINEAR_SECONDS = 0.5
+REVIEW_STORE_PATH_SHAPES = {
+    "XDG_CONFIG_HOME:- x6000": ("echo " + "XDG_CONFIG_HOME:-" * 6000 + "x; printenv", "environment_dump"),
+    "HF_HOME:- x6000": ("echo " + "HF_HOME:-" * 6000 + "x; printenv", "environment_dump"),
+    "/proc x16000": ("echo " + "/proc" * 16000 + "/x; printenv", "environment_dump"),
+}
+# The literal each STORE_PATHS pattern starts with (and its `:-` or separator forms), by the pattern's index: each is repeated to about
+# 199,000 characters, before a dump and before a harmless command.
+STORE_PATH_LEADS = {
+    0: [".config/native-agent-stack"], 1: ["XDG_CONFIG_HOME:-", "XDG_CONFIG_HOME"], 2: [".claude/.credentials.json"], 3: [".codex", "CODEX_HOME}"],
+    4: ["gh/hosts.yml"], 5: ["huggingface", "HF_HOME:-", "HF_HOME"], 6: [".tavily/config.json"], 7: ["ecosystem-grafana.env"],
+    8: ["nativestack/generation.key"], 9: ["/proc", "/proc/"], 10: ["gh ", "gh auth "], 11: ["hf ", "hf auth "], 12: ["huggingface-cli "],
+    13: ["--show-token"], 14: ["gh auth status ", "gh auth status  -tX"], 15: ["security "], 16: ["secret-tool "],
+}
+_LINEAR_CHILD = (
+    "import json, sys, time\n"
+    "sys.path.insert(0, sys.argv[1])\n"
+    "from tests import test_secret_path_guard as t\n"
+    "shapes = {name: text for name, (text, _) in t.REVIEW_STORE_PATH_SHAPES.items()}\n"
+    "for index, leads in t.STORE_PATH_LEADS.items():\n"
+    "    for lead in leads:\n"
+    "        for tail in ('x; printenv', 'x; true'):\n"
+    "            shapes[f'{lead!r} {tail}'] = 'echo ' + lead * ((199000 - 16) // len(lead)) + tail\n"
+    "results = {}\n"
+    "for name, text in shapes.items():\n"
+    "    start = time.perf_counter()\n"
+    "    try:\n"
+    "        verdict = t.guard.check(text)\n"
+    "    except t.guard.WorkBudgetExceeded:\n"
+    "        verdict = 'command_too_complex'\n"
+    "    results[name] = [verdict, time.perf_counter() - start, len(text)]\n"
+    "print(json.dumps(results))\n")
 _TIMING_CHILD = (
     "import json, sys, time\n"
     "sys.path.insert(0, sys.argv[1])\n"
@@ -2003,6 +2042,92 @@ class SecretPathGuardTests(unittest.TestCase):
                 self.assertEqual(got, verdict)
                 self.assertLess(seconds, PATHOLOGICAL_SECONDS)
 
+    def test_store_path_scans_and_long_words_finish_in_linear_time(self):
+        # The review's three inputs and every STORE_PATHS pattern's leading literal repeated to about 199,000 characters, before a dump and
+        # before a harmless command, each timed in-process in one child process (a regression fails here instead of hanging the suite).
+        self.assertEqual(sorted(STORE_PATH_LEADS), list(range(len(guard.STORE_PATHS))))  # every pattern has its leads
+        done = subprocess.run([sys.executable, "-c", _LINEAR_CHILD, str(ROOT)], capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr[-300:])
+        results = json.loads(done.stdout)
+        self.assertEqual(len(results), len(REVIEW_STORE_PATH_SHAPES) + 2 * sum(map(len, STORE_PATH_LEADS.values())))
+        for name, (verdict, seconds, length) in results.items():
+            with self.subTest(shape=name, characters=length):
+                self.assertLess(seconds, LINEAR_SECONDS)
+                if name in REVIEW_STORE_PATH_SHAPES:
+                    self.assertEqual(verdict, REVIEW_STORE_PATH_SHAPES[name][1])
+                else:
+                    self.assertGreater(length, 195_000)
+                    if name.endswith("printenv"):
+                        self.assertIsNotNone(verdict)
+        # the real hook on the review's three inputs: exit 2 and one line naming no command text, within a second
+        for name, (text, reason) in REVIEW_STORE_PATH_SHAPES.items():
+            with self.subTest(hook=name):
+                started = time.perf_counter()
+                refused = run_hook({"tool_name": "Bash", "tool_input": {"command": text}})
+                self.assertLess(time.perf_counter() - started, 1.0)
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn(f"blocked ({reason})", refused.stderr)
+                self.assertEqual(refused.stderr.count("\n"), 1)
+                self.assertNotIn("XDG_CONFIG_HOME:-XDG", refused.stderr)
+
+    def test_the_linear_store_path_scans_answer_as_the_regular_expressions_did(self):
+        # The four STORE_PATHS patterns of c26800f3 that backtracked on a repeated literal, verbatim, against the LinearScan that replaced
+        # each: the same answer on every generated text. A possessive or atomic rewrite could silently stop matching (`/proc/self/environ/x`
+        # matches the /proc pattern through backtracking), so each scan is compared on 100,000 seeded random texts over its pattern's literals,
+        # separators, braces, quotes, slashes and blanks, on every text of up to four of its fragments and on hand-picked rows (hypothesis is
+        # no dependency here; a run of 7.2 million texts a pattern found no difference on 2026-09-30).
+        old = {1: r"XDG_CONFIG_HOME(?::-[^}\s]*)?\}?/native-agent-stack(?:/|\b)",
+               5: r"(?:huggingface|HF_HOME(?::-[^}\s]*)?)\}?[\"']?/(?:token|stored_tokens)(?![\w-])",
+               9: r"/proc/(?:[^/\s]+/)*environ\b",
+               14: r"\bgh\s+auth\s+status\b[^;&|\n]*\s-t\b"}
+        fragments = {
+            1: ["XDG_CONFIG_HOME", ":-", "}", "/native-agent-stack", "/native-agent-stac", "k", "${", "XDG_CONFIG_HOME:-", "/", "native-agent-stack"],
+            5: ["HF_HOME", ":-", "}", "/token", "/stored_tokens", "huggingface", "'", '"', "HF_HOME:-", "s", "token", "/"],
+            9: ["/proc/", "/proc", "/", "//", "environ", "/environ", "self", "environx", "e", "proc", "1"],
+            14: ["gh", " ", "auth", "status", "-t", " -t", "\n-t", "-tx", "gh auth status", "\t", "t"],
+        }
+        noise = ["x", "-", "_", " ", "\t", "\n", "/", "}", "{", "$", "'", '"', ";", "&", "|", "é", " ", ":"]
+        rows = ["/proc/self/environ/x", "cat /proc/1/environ", "/proc/environ", "/proc//environ", "/proc/a b/environ", "/proc/./environ",
+                "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/x", "$XDG_CONFIG_HOME/native-agent-stack", "XDG_CONFIG_HOME:-/native-agent-stack",
+                "XDG_CONFIG_HOME:-a}/native-agent-stackx", "${HF_HOME:-~/.cache/huggingface}/token", "\"$HF_HOME\"/token", "HF_HOME:-x\"/stored_tokens",
+                "~/.cache/huggingface/token-x", "gh auth status -t", "gh auth status --hostname h -t", "gh auth status; -t", "gh auth status\n-t",
+                "gh auth status -tx", "gh\nauth\tstatus x -t"]
+        scans = [index for index, (rule, _reason) in enumerate(guard.STORE_PATHS) if isinstance(rule, guard.LinearScan)]
+        self.assertEqual(scans, sorted(old))
+        rng = random.Random(20260930)
+        for index, source in old.items():
+            scan, pattern = guard.STORE_PATHS[index][0], re.compile(source)
+            self.assertEqual(scan.pattern, source)
+            alphabet = fragments[index] + noise
+            texts = ["".join(rng.choice(alphabet) for _ in range(rng.randint(0, 14))) for _ in range(100_000)]
+            texts += ["".join(parts) for size in range(5) for parts in itertools.product(fragments[index][:8] + [" ", "}", "x"], repeat=size)]
+            texts += rows
+            with self.subTest(pattern=source):
+                self.assertEqual([text for text in texts if bool(pattern.search(text)) != scan.search(text)][:5], [])
+        self.assertTrue(guard.STORE_PATHS[9][0].search("cat /proc/self/environ/x"))
+
+    def test_the_plain_split_is_the_split_shlex_makes(self):
+        # lex() splits a text with no quote and no backslash by SHLEX_PLAIN instead of shlex, whose per-character word building cost 0.53 s on
+        # one word of 199,000 characters. shlex's state machine (posix, punctuation_chars, whitespace_split) has no other special character, so
+        # the two must agree on every such text, in both readings: 100,000 seeded random texts over shlex's blanks, its punctuation, a `#`,
+        # other control and blank characters and letters, and every text of up to four characters of a smaller alphabet (a run of 2.1 million
+        # texts in both readings found no difference on 2026-09-30).
+        def by_shlex(text, legacy):
+            lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
+            lexer.whitespace_split = True
+            if not legacy:
+                lexer.commenters = ""
+            return list(lexer)
+
+        alphabet = ["a", "b", "#", ";", "&", "|", "(", ")", "<", ">", " ", "\t", "\r", "\x0b", "\x0c", "\xa0", "\x00", "-", "=", "$", "{", "}",
+                    "é", " ", "1", "&&", ";;", "<<", ">>", "||", "$(", "))", "#x", "a#b"]
+        rng = random.Random(20260930)
+        texts = ["".join(rng.choice(alphabet) for _ in range(rng.randint(0, 16))) for _ in range(100_000)]
+        texts += ["".join(parts) for size in range(5) for parts in itertools.product(["a", "#", ";", "&", "(", ">", " ", "\t", "\x0b"], repeat=size)]
+        for legacy in (False, True):
+            with self.subTest(legacy=legacy):
+                self.assertEqual([text for text in texts if guard.lex(text, legacy) != by_shlex(text, legacy)][:5], [])
+
     def test_no_regular_expression_of_the_guard_backtracks_on_long_repeats(self):
         # Every compiled pattern of the guard (module level, the scan and store tables) on 70,000 repeats of one character, each with a lead
         # and a tail that make a match fail late: none may take a quarter of a second, since a hook past its 10 s timeout fails open. The
@@ -2012,18 +2137,28 @@ class SecretPathGuardTests(unittest.TestCase):
         patterns.update({f"SCAN_CHARACTERS[{name}]": value for name, value in guard.SCAN_CHARACTERS.items()})
         patterns.update({f"STORE_PATHS[{at}]": entry[0] for at, entry in enumerate(guard.STORE_PATHS)})
         self.assertGreaterEqual(len(patterns), 45)
+        # A repeat of one character never enters a pattern that starts with a literal (the third verification review): the texts below
+        # also repeat each STORE_PATHS pattern's leading literal and the literals the other text rules start with, so every unbounded run
+        # after a literal is read from every repeat. The four patterns that backtracked there took 0.1 to 0.6 s on 20,000 characters and
+        # 11 to 15 s on 54,000 to 102,000; they are LinearScan rules now, which have search() only.
+        leads = sorted({lead for group in STORE_PATH_LEADS.values() for lead in group} | {
+            "environ ", "getenv ", "ENV[", "process.env ", "syscall(", "keyctl ", "kernel_keyring.py exec a ", "import ", "$", "${", "/proc/x/",
+            "HF_HOME:-\"/stored_token", "XDG_CONFIG_HOME:-/native-agent-stac", "/proc/environX/", "c_long(", "ps ", "-o ", "sudo -u "})
         slow = []
         for name, pattern in patterns.items():
-            methods = {"PAREN_INPUT": ("fullmatch",)}.get(name, ("search", "match"))
-            for character in "aeE xX-=/'\"\\($<;#\n":
-                body = character * 70000
-                for text in (body, "x" + body, body + "!", "ps " + body + "q", "-" + body + "q"):
-                    for method in methods:
-                        started = time.perf_counter()
-                        getattr(pattern, method)(text)
-                        elapsed = time.perf_counter() - started
-                        if elapsed > 0.25:
-                            slow.append((name, method, repr(character), round(elapsed, 2)))
+            methods = ("search",) if isinstance(pattern, guard.LinearScan) else {"PAREN_INPUT": ("fullmatch",)}.get(name, ("search", "match"))
+            texts = [(repr(character), text) for character in "aeE xX-=/'\"\\($<;#\n"
+                     for text in (character * 70000, "x" + character * 70000, character * 70000 + "!", "ps " + character * 70000 + "q",
+                                  "-" + character * 70000 + "q")]
+            texts += [(repr(lead), text) for lead in leads for text in ("echo " + lead * (70000 // len(lead)) + "x; printenv",
+                                                                         lead * (70000 // len(lead)) + "}")]
+            for label, text in texts:
+                for method in methods:
+                    started = time.perf_counter()
+                    getattr(pattern, method)(text)
+                    elapsed = time.perf_counter() - started
+                    if elapsed > 0.25:
+                        slow.append((name, method, label, round(elapsed, 2)))
         self.assertEqual(slow, [])
 
     def test_the_ps_cluster_test_is_the_language_of_the_old_regular_expression(self):

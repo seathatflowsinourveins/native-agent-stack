@@ -71,32 +71,109 @@ The same file is installed for every session on a host as
 
 from __future__ import annotations
 
+import bisect
 import json
 import re
 import shlex
 import sys
 
 
+class LinearScan:
+    """A text rule whose regular expression backtracks on a repeated prefix, answered by a scan that reads the text a bounded number of
+    times: search(text) is True exactly when re.search(pattern, text) finds a match (tests/test_secret_path_guard.py compares the two on
+    generated texts). Four STORE_PATHS patterns have an unbounded run after a literal that a text can repeat, and the regular expression
+    engine reads that run again from every repeat: 102,016 characters of `XDG_CONFIG_HOME:-` took 11.9 s, 54,000 of `HF_HOME:-` 13 to 14 s
+    and 80,000 of `/proc` 13 to 15 s (third verification review, 2026-09-29), past a hook timeout of 10 s that fails open, before any work
+    budget was charged. Each scan below splits the text once into the runs the pattern cannot cross and searches each run for literals."""
+    __slots__ = ("pattern", "_scan")
+
+    def __init__(self, pattern: str, scan) -> None:
+        self.pattern = pattern
+        self._scan = scan
+
+    def search(self, text: str) -> bool:
+        return self._scan(text)
+
+
+# A `${NAME:-default}` default (`[^}\s]*`) cannot cross a `}` or a blank, so a match that has one lies in one run of neither, plus the `}`
+# that ends the run. A path in `/proc/(?:[^/\s]+/)*environ` cannot cross a blank or `//` (its components are not empty), so a match lies in
+# one run of neither (PATH_RUN keeps a `/` only when another does not follow it).
+DEFAULT_RUN = re.compile(r"[^}\s]+")
+PATH_RUN = re.compile(r"(?:[^\s/]|/(?!/))+")
+XDG_STORE_PLAIN = re.compile(r"XDG_CONFIG_HOME\}?/native-agent-stack(?:/|\b)")
+XDG_STORE_TAIL = re.compile(r"/native-agent-stack(?:/|\b)")
+HF_TOKEN_PLAIN = re.compile(r"(?:huggingface|HF_HOME)\}?[\"']?/(?:token|stored_tokens)(?![\w-])")
+HF_TOKEN_TAIL = re.compile(r"[\"']?/(?:token|stored_tokens)(?![\w-])")
+ENVIRON_TAIL = re.compile(r"/environ\b")
+GH_STATUS_HEAD = re.compile(r"\bgh\s+auth\s+status\b")
+GH_STATUS_FLAG = re.compile(r"\s-t\b")
+GH_STATUS_STOP = re.compile(r"[;&|\n]")
+
+
+def default_run_scan(text: str, plain: re.Pattern[str], head: str, tail: re.Pattern[str]) -> bool:
+    """NAME(?::-[^}\\s]*)?\\}?TAIL, where `plain` is the pattern without the default and `head` is `NAME:-`: plain anywhere, or head in a
+    run with tail after it in the same run (the default ends inside the run, and a `}` cannot come before the tail there), or head in a
+    run that a `}` ends and tail right after that `}`. The first head of a run leaves the most room, and a match inside a run is a match
+    in the text, since the character after a run is a `}` or a blank, which ends a word as the end of the run does."""
+    if plain.search(text):
+        return True
+    for run in DEFAULT_RUN.finditer(text):
+        start = text.find(head, run.start(), run.end())
+        if start >= 0 and (tail.search(text, start + len(head), run.end())
+                           or (text.startswith("}", run.end()) and tail.match(text, run.end() + 1))):
+            return True
+    return False
+
+
+def proc_environ_scan(text: str) -> bool:
+    """/proc/(?:[^/\\s]+/)*environ\\b: a `/proc/` and, at or after its last slash in the same path run, `/environ` ending a word. Within a
+    run every component is non-empty and blank-free, so any `/environ` after the first `/proc/` completes a match."""
+    for run in PATH_RUN.finditer(text):
+        start = text.find("/proc/", run.start(), run.end())
+        if start >= 0 and ENVIRON_TAIL.search(text, start + 5, run.end()):
+            return True
+    return False
+
+
+def gh_status_token_scan(text: str) -> bool:
+    """\\bgh\\s+auth\\s+status\\b[^;&|\\n]*\\s-t\\b: after some `gh auth status`, the first ` -t` flag comes no later than the first `;`, `&`,
+    `|` or newline (a flag's blank may be that newline). Heads cannot overlap, nor can flags."""
+    heads = [match.end() for match in GH_STATUS_HEAD.finditer(text)]
+    if not heads:
+        return False
+    flags = [match.start() for match in GH_STATUS_FLAG.finditer(text)]
+    stops = [match.start() for match in GH_STATUS_STOP.finditer(text)]
+    for end in heads:
+        at = bisect.bisect_left(flags, end)
+        if at == len(flags):
+            return False  # no flag after this head, nor after any later one
+        stop = bisect.bisect_left(stops, end)
+        if flags[at] <= (stops[stop] if stop < len(stops) else len(text)):
+            return True
+    return False
+
+
 STORE_PATHS = (
     (re.compile(r"\.config/native-agent-stack(?:/|\b)"), "credential_store_path"),
-    (re.compile(r"XDG_CONFIG_HOME(?::-[^}\s]*)?\}?/native-agent-stack(?:/|\b)"), "credential_store_path"),
+    (LinearScan(r"XDG_CONFIG_HOME(?::-[^}\s]*)?\}?/native-agent-stack(?:/|\b)",
+                lambda text: default_run_scan(text, XDG_STORE_PLAIN, "XDG_CONFIG_HOME:-", XDG_STORE_TAIL)), "credential_store_path"),
     (re.compile(r"\.claude/\.credentials\.json"), "native_store_path"),
     (re.compile(r"(?:\.codex|CODEX_HOME\}?)/auth\.json"), "native_store_path"),
     (re.compile(r"gh/hosts\.yml"), "native_store_path"),
     # Hugging Face token files: the default home, $XDG_CACHE_HOME/huggingface, $HF_HOME or a
     # ${HF_HOME:-...} form, a closing quote allowed before the slash; tokenizers/ and hub/ pass.
-    (re.compile(r"(?:huggingface|HF_HOME(?::-[^}\s]*)?)\}?[\"']?/(?:token|stored_tokens)(?![\w-])"),
-     "native_store_path"),
+    (LinearScan(r"(?:huggingface|HF_HOME(?::-[^}\s]*)?)\}?[\"']?/(?:token|stored_tokens)(?![\w-])",
+                lambda text: default_run_scan(text, HF_TOKEN_PLAIN, "HF_HOME:-", HF_TOKEN_TAIL)), "native_store_path"),
     # tavily-cli's own store (`tvly login` or `tvly init` write the key or an OAuth token there).
     (re.compile(r"\.tavily/config\.json"), "native_store_path"),
     (re.compile(r"ecosystem-grafana\.env"), "service_secret_path"),
     (re.compile(r"nativestack/generation\.key"), "service_secret_path"),
-    (re.compile(r"/proc/(?:[^/\s]+/)*environ\b"), "process_environment"),
+    (LinearScan(r"/proc/(?:[^/\s]+/)*environ\b", proc_environ_scan), "process_environment"),
     (re.compile(r"\bgh\s+auth\s+token\b"), "native_token_print"),
     (re.compile(r"\bhf\s+auth\s+token\b"), "native_token_print"),
     (re.compile(r"\bhuggingface-cli\s+(?:auth\s+)?token\b"), "native_token_print"),
     (re.compile(r"--show-token\b"), "native_token_print"),
-    (re.compile(r"\bgh\s+auth\s+status\b[^;&|\n]*\s-t\b"), "native_token_print"),
+    (LinearScan(r"\bgh\s+auth\s+status\b[^;&|\n]*\s-t\b", gh_status_token_scan), "native_token_print"),
     (re.compile(r"\bsecurity\s+(?:find-generic-password|find-internet-password|dump-keychain)\b"), "keychain_read"),
     (re.compile(r"\bsecret-tool\s+lookup\b"), "keychain_read"),
 )
@@ -258,6 +335,13 @@ SCAN_CHARACTERS = {
     "dparam": re.compile(r"[\\\"`$}]"),
     "arith": re.compile(r"[\\'\"`$()]"),
 }
+# shlex reads a text one character at a time and appends each to the word it builds, which copies the word: one unquoted word of 199,000
+# characters took 0.53 s in shlex alone (2026-09-30 repair round, measured on the store-path shapes of the third verification review). A
+# text with no quote and no backslash is split by shlex's state machine (posix, punctuation_chars, whitespace_split; shlex.py read_token)
+# exactly as SHLEX_PLAIN splits it: its four blanks end a word, a run of its punctuation characters is a word of its own, and every other
+# character belongs to a word; in the legacy reading a `#` starts a comment that runs to the end of the text (lex has turned every newline
+# into `;`). tests/test_secret_path_guard.py compares the two on generated texts.
+SHLEX_PLAIN = re.compile(r"[();<>|&]+|[^ \t\r\n();<>|&]+")
 BACKQUOTE_ESCAPE = re.compile(r"\\([$`\\\"])")
 ANSI_C_TAIL = re.compile(r"\\.|'", re.S)
 LINE_END = re.compile(r"\n")
@@ -497,14 +581,17 @@ def lex(text: str, legacy: bool = False) -> list[str]:
     if _lexed is not None and key in _lexed:
         return _lexed[key]
     spend("characters", len(text) * storage_width(text))
-    try:
-        lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
-        lexer.whitespace_split = True
-        if not legacy:
-            lexer.commenters = ""
-        tokens = list(lexer)
-    except ValueError:
-        tokens = re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
+    if "'" not in text and '"' not in text and "\\" not in text:
+        tokens = SHLEX_PLAIN.findall(text.partition("#")[0] if legacy else text)  # what shlex gives, in linear time (see SHLEX_PLAIN)
+    else:
+        try:
+            lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
+            lexer.whitespace_split = True
+            if not legacy:
+                lexer.commenters = ""
+            tokens = list(lexer)
+        except ValueError:
+            tokens = re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
     if _lexed is not None:
         _lexed[key] = tokens
     return tokens
