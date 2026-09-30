@@ -25,7 +25,7 @@
         1
       ],
       "focused_tests": 48,
-      "historical_context_correction": "The retained21-tool Claude preimage inherited an ancestor project via --project-from-cwd; the earlier no-active-project statement is retracted. Exact native bytes remain historical evidence. Explicit no-project replacement: token-profile-completion-20260930/serena-no-project; original failed CI:ci-repair.json."
+      "historical_context_correction": "The retained 21-tool Claude preimage inherited an ancestor project via --project-from-cwd; the earlier no-active-project statement is retracted. Exact native bytes remain historical evidence. Explicit no-project replacement: token-profile-completion-20260930/serena-no-project; original failed CI:ci-repair.json."
     },
     "claude_saved_workflow_installation": {
       "scripts": 3,

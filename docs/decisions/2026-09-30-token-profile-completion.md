@@ -157,3 +157,12 @@ and [failed CI returns](../../evidence/artifacts/token-profile-completion-202609
 preserve that correction. Independent Astra review accepted the source and byte
 verification. Paired catalog dates and the generated host guide were also repaired
 through their maintained validator and generator contracts.
+
+The fresh [current-pin Linux native E2E](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36780366887/job/110108806860)
+then passed **259 commands and 82 checks** across 16 pins, including ai-memory 2.4.2,
+and removed owned temporary installation state. The unchanged
+[original receipt](../../evidence/artifacts/token-profile-completion-20260930/native-ci-1ac1f7d2/README.md)
+is retained independently of the older 2.4.1 run and client/provider trials.
+Linux bootstrap also passed. Global validation revealed a missing declaration for
+the already hashed experiment; declaring that existing record now passes all 26
+records/142 observations locally without changing any historical hash or oracle.
