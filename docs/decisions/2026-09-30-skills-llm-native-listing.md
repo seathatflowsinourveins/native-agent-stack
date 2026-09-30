@@ -290,6 +290,7 @@ Read 2026-09-30 unless dated otherwise. Page hashes are of the fetched markdown.
   - each pin's `agents/openai.yaml` in the blobless clones: `policy.allow_implicit_invocation: false` only for
     `grill-me` and `improve-codebase-architecture`; four descriptions (`property-based-testing`, `sarif-parsing`,
     `fp-check`, `variant-analysis`) carry one em dash each.
-- Repository: `tools/adoption/install_skills.py` L512-536 and L605-614, `scripts/skills_status.py` L104-116, L420-483
-  and L499-553, `tools/adoption/apply_claude_settings.py` L141-177, and the
+- Repository: `tools/adoption/install_skills.py` (`print_codex_config` and the `--print-codex-config` branch of
+  `main`), `scripts/skills_status.py` (`CODEX_BUNDLED_SKILL_NAMES`, `check_codex_disable`, `codex_catalog_tokens` and
+  `budget_report`), `tools/adoption/apply_claude_settings.py` L141-177, and the
   [skills-trial record](2026-09-25-skills-trial-and-usage.md) L360-415, L444-449 and L1128-1166.
