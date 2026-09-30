@@ -1284,8 +1284,9 @@ class McpStartupTimeoutTemplateTests(unittest.TestCase):
     """MCP_TIMEOUT is Claude Code's MCP server startup timeout, default 30000 ms
     (https://code.claude.com/docs/en/env-vars); a server's own `timeout` field bounds tool
     execution only (https://code.claude.com/docs/en/mcp), and `claude mcp add --help` on 2.1.285
-    has no startup option. The Codex template gives serena 60 s and socraticode 120 s
-    (startup_timeout_sec), so the one global value matches the slowest of them."""
+    and 2.1.286 has no startup option. The Codex template gives serena 60 s and socraticode 120 s
+    (startup_timeout_sec), so the one global value matches the slowest of them
+    (docs/decisions/2026-09-30-mcp-startup-timeout.md)."""
 
     TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
 
