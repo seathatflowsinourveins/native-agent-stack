@@ -38,8 +38,10 @@ import credential_run as runner  # noqa: E402
 
 TOOL, WORKER, RUNNER = ROOT / "tools/credentials/canary_proof.py", cp.WORKER, cp.RUNNER
 PYTHON = "/usr/bin/python3"
+# The fixture CHILD_PATH holds the reviewed executables plus what the unchanged ecosystem-bounded-run resolves through
+# PATH (its `#!/usr/bin/env bash` line, `id -u` and `stat -c %u`): production's CHILD_PATH has them all.
 REAL = {name: shutil.which(name, path="/usr/bin:/bin") for name in (
-    "rg", "git", "gzip", "bzip2", "xz", "setpriv", "nice", "ionice", "sh", "cat", "sleep")}
+    "rg", "git", "gzip", "bzip2", "xz", "setpriv", "nice", "ionice", "sh", "cat", "sleep", "bash", "id", "stat")}
 
 
 def _rg_reviewed() -> bool:
@@ -996,7 +998,9 @@ class BoundaryTests(unittest.TestCase):
         locked.chmod(0)
         wrapper(host, "rg", prefix="sys.stdout.buffer.write(b'<stdin>\\x00' + data + b'\\n'); sys.stdout.flush()",
                 data=values[3].encode())
-        wrapper(host, "git", stderr=values[2].encode() + b"\n")
+        # Git's stderr sentinel is written by the scan's fsck only: the setup child's own git call (the checkout
+        # fingerprint) fails setup on any stderr byte, which is the strict rule, not this test's subject.
+        wrapper(host, "git", prefix="if 'fsck' in sys.argv:\n    os.write(2, data)", data=values[2].encode() + b"\n")
         host.prepare()
         result, audit = self.audited(host, "scan", "--run", host.run_id, "--phase", "baseline")
         self.assertEqual(result.returncode, 3)
