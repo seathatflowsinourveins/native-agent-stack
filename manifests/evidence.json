@@ -3884,13 +3884,13 @@
     },
     {
       "path": "adoption/agents/claude/landscape-sweep-worker.md",
-      "sha256": "f4b52841ad4bb2ba8cfb35c20f88e11570c41fddb3e0388a73150d234baa5ae6",
-      "bytes": 1699
+      "sha256": "bb7e436080483adf0eb14e69e3d73b4feb9c7c4b55baff31e8b70f30733e369c",
+      "bytes": 1871
     },
     {
       "path": "adoption/agents/claude/security-reviewer.md",
-      "sha256": "73eb483d22760e6b75226d58714a1354a848382bad032d8876e172fc8f656b9b",
-      "bytes": 3325
+      "sha256": "d7c571966343769d55ec23085f090b204c838492b3f389c7485f9ba9a93b6432",
+      "bytes": 3509
     },
     {
       "path": "adoption/agents/claude/source-scout.md",
@@ -3949,8 +3949,8 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "06385c800b70072e9163096f06e73874cfed63040cd9db87ae221d1cbd2aed62",
-      "bytes": 861
+      "sha256": "947c0ae1fcd5ba11fc82108e7223f095c0712f132edf9515638a84d8336d9668",
+      "bytes": 950
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
@@ -4134,8 +4134,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "6c4035f957c5eee4fa91a2e7b207a845e97f84acd44b48e1af37b38d31efe4e0",
-      "bytes": 11144
+      "sha256": "c325471f288d870c452c2d9a38ef3fff6d6c06e4af0fffbadba493a4100d99bc",
+      "bytes": 11403
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -4144,8 +4144,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "0716d4f6996f40d762fa0c98f23ef91cd39ca7422eddedaa0b344d999c53e4da",
-      "bytes": 12875
+      "sha256": "2958018dbb2c15e27ee03278ea4163ed983f9113ae349d37fcc20c589695f42b",
+      "bytes": 12876
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -14680,8 +14680,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
-      "sha256": "45d7edeb78ceb42b81553a22c618801d07218da830c213630e50ea1816da9600",
-      "bytes": 17854
+      "sha256": "0e643fd538e63ccfd1c80f9f97d02d969022779ff78583de254e23e6bcee11a7",
+      "bytes": 31897
     },
     {
       "path": "docs/decisions/2026-09-26-telemetry-writer-identity.md",
@@ -43980,13 +43980,13 @@
     },
     {
       "path": "examples/claude-native/agents/security-reviewer.md",
-      "sha256": "73eb483d22760e6b75226d58714a1354a848382bad032d8876e172fc8f656b9b",
-      "bytes": 3325
+      "sha256": "d7c571966343769d55ec23085f090b204c838492b3f389c7485f9ba9a93b6432",
+      "bytes": 3509
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "5b0fc7e5451054baa40d879194d95d537e2ec5e0c44cbf7fe620f9c2e871ef6c",
-      "bytes": 1703
+      "sha256": "0763bbfa0e635ffd6aaaba8ae1f668d3e2398776bc0be3516ad1593701b6a745",
+      "bytes": 1888
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
@@ -45295,8 +45295,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "f5c88d88e8fce91ce8ec01f9da0f64a301dcb0cbb20cd1162602a905e5c5f734",
-      "bytes": 65209
+      "sha256": "914aaa48029bd8d4414a69f5d0e750792c65e317e83237704e17deb89b33978f",
+      "bytes": 69460
     },
     {
       "path": "tests/test_install_skills.py",
@@ -45805,8 +45805,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "c0bfa5d33a78703574ae97a8e90963f036f1a96546e45d79c2b7be55bb15b733",
-      "bytes": 14697
+      "sha256": "b7f11aeec288fcbe1a333f111defc150d5fbdcd1f44de9f59aed972ef50ead9f",
+      "bytes": 14888
     },
     {
       "path": "tools/adoption/install_skills.py",
