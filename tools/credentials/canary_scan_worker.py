@@ -553,9 +553,8 @@ class RgOutput:
         self.per_control = collections.Counter()
 
     def feed(self, data: bytes) -> None:
+        """Complete records are attributed before the cap is enforced: a canary record that arrived is never lost."""
         self.total += len(data)
-        if self.total > STDOUT_CAP:
-            raise Stop("output_cap")
         self.buffer += data
         while (end := self.buffer.find(b"\n")) >= 0:
             line = bytes(self.buffer[:end])
@@ -566,6 +565,8 @@ class RgOutput:
                 self.stats = []
             else:
                 self.record(line)
+        if self.total > STDOUT_CAP:
+            raise Stop("output_cap")
 
     def record(self, line: bytes) -> None:
         label, separator, pattern = line.partition(b"\0")

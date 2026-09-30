@@ -229,7 +229,8 @@ EVENTS = {
                  "transcripts": str, "session_known": bool, "session": str, "proxy_verified": bool, "pointers": list,
                  "guard_pinned": bool, "journal_bound": bool},
     "arming": {"consumer": str, "attempt": int, "pattern": str, "root": str, "root_present": bool},
-    "armed": {"consumer": str, "attempt": int, "dev": int, "ino": int, "guard_pinned": bool, "recovered": bool},
+    "armed": {"consumer": str, "attempt": int, "dev": int, "ino": int, "ctime_ns": int, "guard_pinned": bool,
+              "recovered": bool},
     "disarmed": {"consumer": str, "attempt": int, "removed": bool, "absent_verified": bool},
     "scan_requested": {"request": str, "phase": str, "group": str, "selection": str},
     "scan_planned": {"request": str, "attempts": list, "union": str, "classes": dict, "sinks": dict,
@@ -1183,9 +1184,12 @@ def arm(args, env) -> int:
             raise Refused("store_file_exists")
         run.append("arming", consumer=args.consumer, attempt=attempt, pattern=pattern, root=root_id,
                    root_present=present)
+        hook("after_arming")
         writer.create_exclusively(fd, STORE_FILE, writer.encode(VARIABLE, canary))
+        hook("after_publication")
         info = os.stat(STORE_FILE, dir_fd=fd, follow_symlinks=False)
         run.append("armed", consumer=args.consumer, attempt=attempt, dev=info.st_dev, ino=info.st_ino,
+                   ctime_ns=info.st_ctime_ns,
                    guard_pinned=True, recovered=False)
     except writer.Refused:
         raise Refused("store_file_exists") from None
@@ -1214,6 +1218,7 @@ def disarm(args, env, run: Run = None) -> int:
                     or not arming["realtime_ns"] - ARM_RECOVERY_NS <= info.st_ctime_ns <= time.time_ns():
                 raise Refused("arming_unresolved")
             run.append("armed", consumer=consumer, attempt=attempt, dev=info.st_dev, ino=info.st_ino,
+                       ctime_ns=info.st_ctime_ns,
                        guard_pinned=True, recovered=True)
             state = arm_state(run.events)
         if not state["armed"]:
@@ -1221,7 +1226,9 @@ def disarm(args, env, run: Run = None) -> int:
         consumer, attempt, armed = state["armed"]
         info, removed = _stat(fd), False
         if info is not None:
-            if (info.st_dev, info.st_ino) != (armed["dev"], armed["ino"]) or not stat.S_ISREG(info.st_mode) \
+            # (dev, ino) plus the ctime of publication: a recreated file can reuse a freed inode number.
+            if (info.st_dev, info.st_ino, info.st_ctime_ns) != (armed["dev"], armed["ino"], armed["ctime_ns"]) \
+                    or not stat.S_ISREG(info.st_mode) \
                     or info.st_nlink != 1:
                 raise Refused("foreign_store_file")
             os.unlink(STORE_FILE, dir_fd=fd)
