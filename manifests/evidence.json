@@ -35059,6 +35059,26 @@
       "bytes": 6032
     },
     {
+      "path": "evidence/artifacts/pra-u3-differential-20260929/README.md",
+      "sha256": "f5315002cb043c8097125bc6959d4078ca3d2ed78a3bde7d5e69fa5c217b06bc",
+      "bytes": 13626
+    },
+    {
+      "path": "evidence/artifacts/pra-u3-differential-20260929/census.py",
+      "sha256": "f6827da52184bac001c8a6ed9902702b77dc90992aa36bd72f7b219ee6137d6c",
+      "bytes": 8439
+    },
+    {
+      "path": "evidence/artifacts/pra-u3-differential-20260929/claude-byte-identity.py",
+      "sha256": "b8db345299d1e0845fedb29b4a6960b43f86cbee9e54fb770b8f9e503eb26a74",
+      "bytes": 6504
+    },
+    {
+      "path": "evidence/artifacts/pra-u3-differential-20260929/run-differential.py",
+      "sha256": "bc70dc8fc0f0c964284a06ba1cfc1f2bba48d79319e431b8ce87f594620bd903",
+      "bytes": 9273
+    },
+    {
       "path": "evidence/artifacts/pre-2020-delisting/classifications-2016-2019.json",
       "sha256": "c4136fac7d8c341708e65aa7c6a8f78e4adeab57baa8b443065c5f4551318fc1",
       "bytes": 1365997
@@ -42580,12 +42600,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "6f74f33f909ecd0f9e4c01789bb2da7038bd21dcd6e8015badf3a0eeaf971ce2",
-      "bytes": 89176
+      "sha256": "41d0f9e99d90aa1e3311bb648622db834e134fadc61265b09e6ff77161dc87ff",
+      "bytes": 91987
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "6192d920087017995809c50ba7a44cbae3dbf03bb4dad4468d7a7a2c162971ef",
+      "sha256": "2a7e10b0dbce54537552638d8a9f01cb8974839bb55de79b1a74f3f6be55027e",
       "bytes": 1217
     },
     {
@@ -42595,8 +42615,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "119ce9764447ea0f7c7b53622d3cac14b73b34e3b657bd65833f062fb534f6bb",
-      "bytes": 192984
+      "sha256": "1a3a5fe454e2c882803cf7e09a1a0fc8becb6bb0de91bf5c09dff6a1fb9c91cc",
+      "bytes": 196745
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -44210,8 +44230,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "905b4f537ffd409f26ead6f9f3634cea317a93bf6ecdbe691c4a9da0148f565e",
-      "bytes": 98779
+      "sha256": "dd45af27b2789c5fe84e8e59f6c7c59a0cde226d2ab03128933d6bed68b2e7d0",
+      "bytes": 215783
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -44270,8 +44290,8 @@
     },
     {
       "path": "tests/test_token_measurement.py",
-      "sha256": "05287a643ea6edceb080ab0095b1719bf7b1042d7ecac07cbde0c4f6bdf0cf86",
-      "bytes": 125555
+      "sha256": "78adbd0172c234d5a5585e368934ffbacf46beacad5bd49baf6b67126f515776",
+      "bytes": 130740
     },
     {
       "path": "tests/test_trading_gates.py",
@@ -44470,13 +44490,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "fc25ee1850359c69c4700ec1d1888fdacbff43d019d0ec036e704c633bfc58c9",
-      "bytes": 26121
+      "sha256": "9a76823afff90ccb7e658c40a91eb96f360a6d6dc47fb26a1d9be351fadf6ea8",
+      "bytes": 46902
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "957326c07d7f2bc79918f2b47d77668e601101a2a3183ad941746ca7937d1cea",
-      "bytes": 88597
+      "sha256": "7afff10a72a7f43af679ef21cef1eb89bda97769b0e3fb823b138160c6b8d60b",
+      "bytes": 135899
     },
     {
       "path": "tools/sota-convergence/README.md",
