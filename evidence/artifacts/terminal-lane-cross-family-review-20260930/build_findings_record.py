@@ -7,6 +7,9 @@ usage: build_findings_record.py <consolidated.json> <journal.jsonl> [<journal.js
 import json, re, sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import record_sanitizer  # noqa: E402  (the shared sanitizer rules; the private labels come from a private file)
+
 args = sys.argv[1:]
 out = Path(args[args.index("--out") + 1])
 del args[args.index("--out"):args.index("--out") + 2]
@@ -66,16 +69,7 @@ DISPOSITIONS = {
     "F-sol-u519-B-3": (V, "repaired", "tmux_bell_probe.py verdict covers all five arms; --selftest"),
 }
 
-RULES = [
-    (re.compile(re.escape(HOME + "/.local/state/native-agent-stack/terminal-lane-review-20260930/checkout")), "<checkout>"),
-    (re.compile(re.escape(HOME + "/.local/state/native-agent-stack/terminal-lane-review-20260930")), "<work>"),
-    (re.compile(r"/var/tmp/(?:rv|vf|sm|ss|rb|tb|ts|srm|rbc|rbm)-?[A-Za-z0-9_]*"), "<scratch>"),
-    (re.compile(r"/tmp/(?:rv|vf|sm|ss|rb|tb|ts)-?[A-Za-z0-9_]*"), "<scratch>"),
-    (re.compile(re.escape(HOME)), "~"),
-    (re.compile(r"\b" + re.escape(USER) + r"\b"), "<user>"),
-    (re.compile(r"\b(?:Librarium|Phoyo)\b"), "<project>"),   # private per-project profile names of the second distro
-    (re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+"), "/home/example"),   # a reviewer's synthetic fixture home: the repository's publication rule allows only /home/example
-]
+RULES = record_sanitizer.rules()
 replaced = {}
 
 
@@ -131,7 +125,7 @@ for name, payload in (("results.json", results), ("verification.json", verificat
     payload = clean(payload)
     (out / name).write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     text = (out / name).read_text(encoding="utf-8")
-    assert HOME not in text and USER not in text.replace("<user>", ""), f"{name} still holds a home path or the user name"
+    record_sanitizer.assert_clean(text, name)
     print(f"wrote {name}: {len(text)} bytes")
 by_disposition = {}
 for row in rows:

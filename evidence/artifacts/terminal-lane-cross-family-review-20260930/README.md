@@ -32,10 +32,16 @@ Claude verifier or by the coordinator before anything was changed.
 | `build_review_prompts.py` | The common preamble, one packet per unit (merged commit, changed files, the pull request's own evidence claims) and the lens tasks; the output schema. |
 | `collect_reviews.py` | Reads every job through the runner's own `result` command and writes the consolidated private results. |
 | `make_verify_briefs.py` | One brief per review unit for the verifiers (the reviewer's evidence, failure scenario and proposed fix, labelled as claims to test). |
-| `build_findings_record.py` | Builds `results.json`, `verification.json` and `findings.json` from the private files and the disposition table; the sanitizer replaces this host's paths and user name. |
+| `build_findings_record.py` | Builds `results.json`, `verification.json` and `findings.json` from the private files and the disposition table; the sanitizer is `record_sanitizer.py`. |
 | `sanitize_results.py` | The sanitizer on its own (replacement counts, never values). |
-| `tmux_sync_probe.py` | Whether tmux 3.4 writes DEC mode 2026 pairs to its outer terminal with and without `terminal-features xterm*:sync` (finding u484-B-1). |
-| `results.json`, `verification.json`, `findings.json` | The sanitized record. |
+| `record_sanitizer.py` | The sanitizer rules that every record builder shares: this host's paths and user name, the review's private work directories and two private project labels are replaced, and `assert_clean` refuses a record that still holds one. The labels are read from a private file outside every checkout (the builders refuse to run without it), so no file of the repository names them. |
+| `build_final_prompts.py`, `make_final_briefs.py`, `merge_partials.py` | The final round's prompts (three lenses, each run on two models), one brief per verifier unit from `final_units.json`, and the merge of the per-job outputs into one consolidated file. |
+| `build_final_record.py`, `final_dispositions.json` | Builds `final-results.json`, `final-verification.json` and `final-findings.json`; the table holds, for each of the 37 findings, how it was checked, its disposition and where the repair is (written by the coordinator after reading the verifiers' evidence). |
+| `check_receipt_hashes.py` | Compares the SHA-256 values a receipt's provenance lists with the files of a checkout and lists the scripts of this directory that the receipt does not list. |
+| `tmux_sync_probe.py` | Whether tmux 3.4 writes DEC mode 2026 pairs to its outer terminal with and without `terminal-features xterm*:sync` (finding u484-B-1); its private server is verified gone before the socket directory is removed, and `--selftest` runs the same shutdown-failure controls as `tmux_bell_probe.py`. |
+| `results.json`, `verification.json`, `findings.json` | The sanitized record of the first review. |
+| `recheck-*.json`, `recheck_prompts_sha256.txt` | The same for the re-check. |
+| `final-*.json`, `final_prompts_sha256.txt`, `final_units.json` | The same for the final read. |
 | `recorded/` | The returned output of every check run on the repaired files: scans of the three installed releases, the reader, replacement-tool and probe controls, mutants and selftests, the unit tests, the practice repository's checks. |
 
 The repaired scripts themselves are in the three earlier artifact directories (`terminal-experience-20260928`, `login-shell-contract-20260929`, `wsl-terminal-defaults-20260929`,
@@ -49,6 +55,13 @@ Not retained: the private work directory (the reviewers' event streams, the prom
   request's head, its body's evidence claims and the round-1 record) and one job of `cx/gpt-6-astra-ultra` (`U1`, an adversarial second opinion, highest-risk items first). The prompts' SHA-256 values are in
   `recheck_prompts_sha256.txt`.
 - **Result.** 33 findings (1 high, 24 medium, 8 low): 12 duplicates of another finding, 2 coordinator checks and 19 findings graded by three Claude verifier waves (`stack-verifier`, Opus, effort max, read-only): 16 confirmed,
-  3 partly, none refuted. `build_recheck_record.py` writes `recheck-results.json`, `recheck-verification.json` and `recheck-findings.json` (sanitized, with the sanitizer rules read from `build_findings_record.py`).
+  3 partly, none refuted. `build_recheck_record.py` writes `recheck-results.json`, `recheck-verification.json` and `recheck-findings.json` (sanitized, with the rules of `record_sanitizer.py`).
   Every finding was repaired in round 5; the first-round repairs proved incomplete in several places (see the decision record's re-check subsection).
-- **Not repeated.** No further review round: the round-5 repairs are checked by the recorded controls, mutants and native reruns (`recorded/`), not by a reviewer.
+## Final read of the re-check's repairs (2026-09-30)
+
+- **Jobs.** Six read-only jobs of the same lane: three lenses (`F1` the tool and the probes, `F2` the scan, tests and scripts, `F3` the claims and the evidence; `build_final_prompts.py` wrote the prompts from the merged
+  main and the earlier records), each on `cx/gpt-6.1-sol` and on `cx/gpt-6-astra-ultra`, effort `max`, Codex 0.159.2, all exit 0. The prompts' SHA-256 values are in `final_prompts_sha256.txt`.
+- **Result.** 37 findings (1 high, 30 medium, 6 low; each with a command the reviewer ran): 16 duplicates of another finding and 21 graded by four Claude verifier units (`make_final_briefs.py`, `final_units.json`;
+  `stack-verifier`, Opus, effort max, read-only): 17 confirmed, 4 partly, none refuted. 26.26M input tokens (95.7% cache reads), 0.33M output, 50 minutes; the pool 36 to 52 points (other sessions may have used points in
+  between). `merge_partials.py` merged the per-job outputs; `build_final_record.py` writes `final-results.json`, `final-verification.json` and `final-findings.json`. All 37 findings were repaired in one round. One reviewer sentence in `final-results.json` has its punctuation changed (`..., definitions_identical=True.` became `... (definitions_identical=True).`) because the repository's secret gate (gitleaks `generic-api-key`) read it as a key; `build_final_record.py` applies that one exact pattern and asserts it applies once, so any other secret-shaped text still reaches the gate.
+- **Not repeated here.** The repairs of this round are checked by the recorded controls, mutants, a signal sweep and native reruns (`recorded/`); see the decision record for what a reviewer did not read.

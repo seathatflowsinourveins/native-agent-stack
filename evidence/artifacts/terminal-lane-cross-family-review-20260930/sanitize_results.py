@@ -5,21 +5,14 @@ usage: sanitize_results.py <consolidated.json> <out.json> [<extra-private-string
 import json, re, sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import record_sanitizer  # noqa: E402  (the shared sanitizer rules; the private labels come from a private file)
+
 src, dst = Path(sys.argv[1]), Path(sys.argv[2])
 extra = sys.argv[3:]
 HOME = str(Path.home())
 USER = Path.home().name
-RULES = [
-    (re.compile(re.escape(HOME + "/.local/state/native-agent-stack/terminal-lane-review-20260930/checkout")), "<checkout>"),
-    (re.compile(re.escape(HOME + "/.local/state/native-agent-stack/terminal-lane-review-20260930")), "<work>"),
-    (re.compile(r"/var/tmp/(?:rv|vf)-[A-Za-z0-9]+"), "<scratch>"),
-    (re.compile(r"/tmp/(?:rv|vf)-[A-Za-z0-9]+"), "<scratch>"),
-    (re.compile(re.escape(HOME)), "~"),
-    (re.compile(r"\b" + re.escape(USER) + r"\b"), "<user>"),
-    *[(re.compile(re.escape(item)), "<private>") for item in extra],
-    (re.compile(r"\b(?:Librarium|Phoyo)\b"), "<project>"),   # private per-project profile names of the second distro
-    (re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+"), "/home/example"),   # the repository's publication rule allows only /home/example
-]
+RULES = record_sanitizer.rules(extra)
 counts = {}
 
 
