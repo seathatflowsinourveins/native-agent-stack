@@ -1,0 +1,4 @@
+observed_utc=2026-09-30T19:28:31Z
+urllib3: 2.7.0 -> 2.8.0; files on PyPI: ['urllib3-2.8.0-py3-none-any.whl', 'urllib3-2.8.0.tar.gz']
+pyjwt: 2.14.0 -> 2.15.0; files on PyPI: ['pyjwt-2.15.0-py3-none-any.whl', 'pyjwt-2.15.0.tar.gz']
+prediction sha256: 83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a | lines 3054

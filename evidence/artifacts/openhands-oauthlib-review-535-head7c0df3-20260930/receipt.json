@@ -1,0 +1,159 @@
+{
+ "schema": "openhands-oauthlib-review-receipt/1",
+ "id": "openhands-oauthlib-review-535-head7c0df3-20260930",
+ "subject": "owner delta review of draft PR 535 at head 7c0df369: OpenHands SDK 1.50.0 Linux lock relocked onto urllib3 2.8.0 and PyJWT 2.15.0 (only those two entries differ from the previously reviewed lock)",
+ "pr": {
+  "number": 535,
+  "head": "7c0df369f6aaeb263fc25576dbedfbfada74b6ab",
+  "base": "8fc86119eacfd5be9b8a139e1ed167d85748091b",
+  "lane": "lane:shared",
+  "state_at_review": "draft"
+ },
+ "lock": {
+  "path": "blueprints/runtime-workers/openhands/requirements.lock",
+  "sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+  "reviewed_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+  "main_sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
+  "platform": "Linux x86_64",
+  "python": "CPython 3.13.15",
+  "packages_parsed_by_osv": 174
+ },
+ "supersedes_scope_of": "evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930",
+ "status": "delta review complete for the exact head and lock; no approval of any merge, exception, pin, image, observer or task quality",
+ "verdict": "no blocking finding for the OAuthlib reachability scope: no path from the closure to the two advisories' server-side code; the closure's only oauthlib consumer is requests-oauthlib 2.0.0 (client side); the delta from the previously reviewed lock is exactly urllib3 2.7.0 to 2.8.0 and PyJWT 2.14.0 to 2.15.0, and the exact-lock exception is sound at this digest on the same static evidence as before",
+ "evidence_classes": {
+  "source_review": "reads of the PR's files and of the repository at the head",
+  "our_integration_check": "our scripts and outputs on a reproduced install, on git objects, on the pinned scanner and on primary sources"
+ },
+ "controls": {
+  "empty_config_osv": "exit 1 with exactly the two oauthlib advisory ids (D6)",
+  "ordinary_config_osv": "exit 0 (D6)",
+  "previous_lock_empty_config": "exit 1 with those two plus four findings the relock removes (D6)",
+  "prediction": "byte-identical (D2)"
+ },
+ "claims": [
+  {
+   "id": "D1",
+   "class": [
+    "source_review",
+    "our_integration_check"
+   ],
+   "text": "identity: the PR head is exactly 7c0df369f6aaeb263fc25576dbedfbfada74b6ab, 13 commits on top of main 8fc86119eacfd5be9b8a139e1ed167d85748091b (the merge of #546, also the merge base); the lock at the head hashes to 83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a, equal to pins.json requirements_sha256 and to the sha256 in the OpenHands entry of IGNORE_ALLOWED_LOCKS, whose evidence file blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930.json exists at the head; build-requirements.lock is unchanged",
+   "at": "checks/pr535-identity.txt"
+  },
+  {
+   "id": "D2",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the lock is byte-identical to an independent prediction: the previously reviewed lock (383ccc5b, #537's subject) with only the urllib3 and pyjwt entries substituted by the versions and sorted sha256 digests PyPI lists (urllib3 2.8.0, PyJWT 2.15.0); the closure against the reviewed lock is 176 to 176 packages, 0 added, 0 removed, 2 changed (pyjwt 2.14.0 to 2.15.0, urllib3 2.7.0 to 2.8.0) and the line-level difference is exactly those two entries; against the lock on main (1d11bae3) it is 335 to 176, 159 removed (all pyobjc*, the macOS closure), 2 changed (openhands-sdk and openhands-tools 1.49.6 to 1.50.0), and pyjwt, urllib3 and oauthlib equal main's",
+   "at": "checks/prediction.txt, checks/closure-diff-vs-reviewed-383ccc.txt, checks/closure-diff-vs-main.txt"
+  },
+  {
+   "id": "D3",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the recipe's hashed install sequence reproduces in a fresh CPython 3.13.15 environment on Linux x86_64 (uv 0.12.17): the build lock and the candidate lock (--require-hashes --no-deps --no-build-isolation) exit 0 and 0, uv pip check exits 0 (178 packages), the SDK and tools 1.50.0 import check exits 0; installed urllib3 2.8.0, PyJWT 2.15.0, oauthlib 3.3.1, requests-oauthlib 2.0.0, google-auth-oauthlib 1.2.2, requests 2.33.0, httpx 0.28.1",
+   "at": "checks/install-log.txt"
+  },
+  {
+   "id": "D4",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "independent OAuthlib sweep of the installed closure (metadata plus a raw-text sweep of every file): 17793 files outside oauthlib, 22 mention it, in 6 top-level entries (requests_oauthlib, google_auth_oauthlib, browser_use and their dist-info directories); 0 lines name an oauthlib server-side or advisory class outside oauthlib; the only reverse dependency is requests-oauthlib 2.0.0; the four advisory-related oauthlib source files are byte-identical to the hashes recorded in the earlier record (ebc5248a..., 0d693160..., 6fe072e2..., bc6ff1a5...)",
+   "at": "checks/independent-scan.txt, checks/pyjwt-surface.txt"
+  },
+  {
+   "id": "D5",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "PyJWT surface of the closure: jwt is imported by litellm (7 files), oauthlib (3 files, four function-level lazy imports in common.generate_signed_token, common.verify_signed_token, ServiceApplicationClient.prepare_request_body and the RSA signature helper), redis (1), mcp (1) and google (1); revocation.py and authorization_code.py reference no jwt; the only caller outside PyJWT of the JWKS client API changed in 2.15.0 is google-auth oauth2/id_token.py:144-145 and no file outside the google package imports that module",
+   "at": "checks/pyjwt-surface.txt"
+  },
+  {
+   "id": "D6",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "OSV-Scanner 2.6.0 (binary sha256 ca69b3d3..., the CI pin), 174 packages parsed: the candidate lock with the head's ordinary config exits 0 with no findings; with an EMPTY config (control) it exits 1 and its only findings are oauthlib==3.3.1 with GHSA-hj66-6f7g-4r5v and GHSA-xpv3-w29h-x7cv; the previously reviewed lock under the same empty config reports those two plus pyjwt==2.14.0 (GHSA-42vr-xj54-vc7v) and urllib3==2.7.0 (GHSA-8988-9cw3-xx77, GHSA-gh4c-6fx4-qh6g, GHSA-vxq7-64xx-v4gw), so the two entry changes remove exactly those four findings",
+   "at": "checks/osv-exit-codes-and-findings.txt, checks/osv-*.json"
+  },
+  {
+   "id": "D7",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the workflow's own scan step (extracted from the file at the head, script sha256 bc092b63..., the same as on main) run by bash with the pinned binary on the head's 56 inventory entries (55 ordinary + 1 frozen) exits 0 in the pull_request form and in the other-events form; the frozen macOS lock under the ordinary config exits 1 (next 16.3.5) and under the frozen config 0; four inputs that hide a vulnerable next in YAML exit 1 as ordinary locks and 0 under the frozen config; the ordinary scan filters 9 vulnerabilities where main's filters 7 because two new runtime-worker locks (gpt-researcher, crawl4ai) carry nltk 3.10.3 (GHSA-8mgp-746c-j5xp) under two new allowed-lock rows, which this review does not assess",
+   "at": "checks/osv-split-controls.txt, checks/osv-two-new-locks.txt"
+  },
+  {
+   "id": "D8",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the receipt's bindings hold: 62 of 62 artifact paths are present with equal sha256 and size and are registered in manifests/evidence.json with equal hashes; its 53 checks match its 53 ledger commands, each returned output is present with equal sha256 and equal exit code; the 5 checks with a non-zero recorded exit are the documented controls; the native relock ran at 17:01:25Z, after the 7-day window of PyJWT 2.15.0 ended (2026-09-30T16:56:00.689Z), with a relative 7-day exclude-newer and no absolute override",
+   "at": "checks/receipt-bindings.txt, checks/external-hashes.txt"
+  },
+  {
+   "id": "D9",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "external hashes recomputed from their primary locations: the five selected PyJWT test inputs equal the files of the PyPI sdist pyjwt-2.15.0.tar.gz (sha256 b11c5f97...); the SDK archive at commit dcf401af (4,108,923 bytes) hashes to 643e171b... equal to pins.json source_archive and to the receipt, and its uv.lock to 9ee1944f... equal to the receipt",
+   "at": "checks/external-hashes.txt"
+  },
+  {
+   "id": "D10",
+   "class": [
+    "our_integration_check"
+   ],
+   "text": "the repository's own checks at the head, in a clean worktree: the unit tests of the OSV coverage, workflow hardening, runtime_worker_openhands and openhands_150 modules (245 tests, 5 skipped) exit 0; scripts/validate.py exits 0 (8,908 hashed files); scripts/evidence_manifest.py --check exits 0; the head was unchanged after the checks",
+   "at": "checks/repo-checks-at-head.txt"
+  },
+  {
+   "id": "D11",
+   "class": [
+    "source_review",
+    "our_integration_check"
+   ],
+   "text": "the head changes .github/osv-scanner.toml by five explanatory comment lines only (parsed [[IgnoredVulns]] ids, expiry dates and the absence of package overrides are identical to main), and .github/workflows/security-scan.yml, .github/osv-scanner-frozen-macos.toml and tests/test_workflow_hardening.py are byte-identical to main; the inventory grows from 49 to 56 lockfile entries",
+   "at": "checks/pr535-identity.txt"
+  }
+ ],
+ "findings": [
+  {
+   "id": "P2-1",
+   "severity": "P2",
+   "scope": "record accuracy, not the lock",
+   "text": "the receipt's bound_files entry for .github/workflows/security-scan.yml records sha256 88a47e2cf7c16078331a4052c08bf88bc10ed9c70c167d863cd8e581c1a0ef14 (9,268 bytes), which is the workflow before #546 (at 11227bfd); the head's file is main's split-scan workflow, sha256 1df67c92865aa16f53cbb9b451fa3fa82a83a50950dc20a8efeea227f93f6240 (11,346 bytes). The receipt (observed 17:23Z) predates the rebase, and its OSV observations were made under the old single-invocation workflow; the observations for the head are D6 and D7 here. Add a dated addendum to the receipt or rebind the entry.",
+   "at": "checks/receipt-bindings.txt, checks/external-hashes.txt"
+  },
+  {
+   "id": "P2-2",
+   "severity": "P2",
+   "scope": "policy of the foundation lane",
+   "text": "four frozen compile-input captures are added to the inventory's excluded list (pyjwt-, urllib3-, main-reconcile- and wheel-relock-20260930-constraints.txt), but the inventory description says only a deliberately vulnerable test fixture qualifies for exclusion. As requirements files they would report oauthlib 3.3.1 (and, in three of them, pyjwt 2.14.0 and/or urllib3 2.7.0, the historical pins they record); no file outside the evidence directory, receipts, manifests and the inventory names them (git grep at the head), and the four reasons say so. The exclusion is honest and bounded, but the category (frozen compile-input captures no installer consumes) should be stated in the inventory description and the decision record, not only in the reasons.",
+   "at": "checks/excluded-compile-input-captures.txt"
+  }
+ ],
+ "notes": [
+  "Repair PR #555 (mine, not yet merged when this was written) touches tests/test_osv_lockfile_coverage.py, tests/test_workflow_hardening.py and security-scan.yml; a test merge with the head conflicts only in manifests/evidence.json (register last), the test module auto-merges.",
+  "The correction of the Codex root is accepted: .github/osv-scanner.toml is not byte-identical to main (comments), while the parsed policy, the ids and the expiries are."
+ ],
+ "residuals": [
+  "Static source evidence only: no runtime trace, no execution of any OAuth flow or server, no model request; dynamic imports and runtime-assembled names are not excluded by this method (none was found by shape).",
+  "Scoped to this exact head and lock, Linux x86_64 and CPython 3.13.15. The earlier record (evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/) reviews the previous lock 383ccc5b and is historical. Nothing here approves a merge, an exception, a pin, an image, a trusted observer or task quality.",
+  "Not reviewed: the GPT Researcher, Crawl4AI and DeerFlow locks and their nltk allowances, the other worker sources and tests of the PR, the image scan, the native upstream PyJWT regression runs recorded in the receipt (their outputs are bound by sha256 here, not rerun), and hosted CI of the head.",
+  "The outputs were generated from the immutable git objects of the head, a fresh scratch install and the pinned scanner binary; each carries its observed time.",
+  "The joint oauthlib 4.0.0 / PyJWT 2.15.1 relock of the live lock stays with issue #518 and starts no earlier than 2026-10-05T18:40:43Z; the exception this review supports would be deleted by it."
+ ],
+ "provenance": {
+  "reviewer": "native-agent-stack-bc (owner of issue #518)",
+  "requested_by": "the Codex root coordinator (peer message, not retained), for the head it published",
+  "scripts": "scripts/ as run; host paths are masks such as <REVIEW-SCRATCH>, <REPO>, <OSV-BIN>",
+  "commands": "checks/commands-as-typed.txt"
+ }
+}

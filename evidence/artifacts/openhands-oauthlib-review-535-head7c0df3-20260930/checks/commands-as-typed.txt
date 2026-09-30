@@ -1,0 +1,5 @@
+Every output of this record was produced by one run of scripts/run_delta_outputs.sh (run_delta_outputs.sh.txt here), started as
+    bash run_delta_outputs.sh
+after `git fetch origin '+pull/535/head:refs/remotes/origin/pr535'` had printed the head 7c0df369f6aaeb263fc25576dbedfbfada74b6ab; the script refuses to run on any other head. The run
+began about 19:28Z on 2026-09-30 and ended at the time printed by its last line:
+[2026-09-30T19:29:37Z] outputs regenerated in <REVIEW-SCRATCH>/out2

@@ -1,0 +1,14 @@
+observed_utc=2026-09-30T19:29:02Z
+receipt binds .github/workflows/security-scan.yml: sha256 88a47e2cf7c16078331a4052c08bf88bc10ed9c70c167d863cd8e581c1a0ef14, 9268 bytes
+  at the pre-merge base 11227bfd: sha256 88a47e2cf7c16078331a4052c08bf88bc10ed9c70c167d863cd8e581c1a0ef14, 9268 bytes
+  on main 8fc86119: sha256 1df67c92865aa16f53cbb9b451fa3fa82a83a50950dc20a8efeea227f93f6240, 11346 bytes
+  in the checkout (the PR head): sha256 1df67c92865aa16f53cbb9b451fa3fa82a83a50950dc20a8efeea227f93f6240, 11346 bytes
+  the PR head's workflow equals main's: True | the receipt's binding equals the pre-merge base's: True
+PyJWT sdist pyjwt-2.15.0.tar.gz: sha256 b11c5f9791d7bf51c2b39a81ed669f6b2dbbd669df2942f6c60167e9e3d1abe4, equals the PyPI digest: True; uploaded 2026-09-23T16:56:00.689307Z
+  tests/test_api_jwt.py: sdist 8331ec496b0df6f7 | receipt 8331ec496b0df6f7 | EQUAL
+  tests/test_jwks_client.py: sdist f1f5e0076061c393 | receipt f1f5e0076061c393 | EQUAL
+  tests/utils.py: sdist b5b937a60999a63d | receipt b5b937a60999a63d | EQUAL
+  tox.ini: sdist 1674dc3f7b5747e1 | receipt 1674dc3f7b5747e1 | EQUAL
+  pyproject.toml: sdist a89f0097abe7a485 | receipt a89f0097abe7a485 | EQUAL
+SDK archive dcf401af7a9a: 4108923 bytes, sha256 643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c | pins.json 643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c | receipt 643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c
+  uv.lock inside: sha256 9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801 | receipt 9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801
