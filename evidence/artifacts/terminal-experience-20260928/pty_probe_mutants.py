@@ -2,8 +2,8 @@
 """Negative controls for the pty probes' signal handling and their end-to-end cases (alert_probe.py and its derivative push_notification_probe.py). Each mutant is a copy of the probe with one guard
 removed (a literal replacement in a private temporary directory; the checkout itself is never touched), and the six signal cases of the probe's selftest (the end-to-end ones also require that the stand-in inherited no blocked signal) are run against it, one driver process per case:
 one SIGTERM, two SIGTERMs, two SIGINTs, one SIGTERM while the probe's own normal-exit cleanup runs, a signal while the client is being created, a signal at the start of the final cleanup. A mutant must
-make exactly the named cases fail (an exact set, so a case that passes whatever the probe does would show), and the unmutated probe must pass all six. The stand-in clients are `sleep 3137<digits>` and are
-matched exactly by their PID, never by pkill -f. Needs the probe's working directory (~/code/native-agent-stack) and takes about five minutes per probe.
+make exactly the named cases fail (an exact set, so a case that passes whatever the probe does would show), and the unmutated probe must pass all six. The stand-in clients are `sleep 3137<digits>`, matched exactly by their PID and
+argv, never by pkill -f; a failing case kills its own stand-in after it has recorded the verdict, so a run leaves none behind. Needs the probe's working directory (~/code/native-agent-stack) and takes about five minutes per probe.
 usage: python3 -B pty_probe_mutants.py <checkout> [alert] [push]      (default: both probes)"""
 import json, shutil, subprocess, sys, tempfile
 from pathlib import Path

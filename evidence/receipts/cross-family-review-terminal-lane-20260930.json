@@ -18,7 +18,7 @@
     "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave and 11 after it, 22 after the re-check; other sessions may have used points in between."
   ],
   "evidence_class": "independent observation: a second model family (gpt-6.1-sol through the packaged Codex lane on the local OmniRoute gateway) reviewed merged changes; Claude verifiers and the coordinator graded the findings; the repairs are checked by scripts run on this host",
-  "recorded_at_utc": "2026-09-30T07:35:06Z",
+  "recorded_at_utc": "2026-09-30T07:50:47Z",
   "host_scope": {
     "host": "nativestack-5975wx-20260925",
     "platform": "NativeStack workstation, WSL2 Ubuntu 24.04 on Windows 11 with Windows Terminal 1.24.11911.0",
@@ -383,7 +383,7 @@
     },
     "recorded_outputs_sha256": {
       "alert_probe_selftest.txt": "29a61d35e10f112fad61ac6e59c541c78571f41b22a9fc8983418cb285091aaa",
-      "codex_tui_strict_check.txt": "fe3698e63f9c71a4819b88105fca1ebc96437b35901fa9ab525431db27e47fc6",
+      "codex_tui_strict_check.txt": "24cb0c8e49056418d0a4a1956dfafed461ee021efe9e002c7dc8615360c918ce",
       "codex_tui_strict_check_selftest.txt": "3b6b2c35d2a7aa383fc07cc9a019e52a07e25f39ff5291811f134fab6b585ca4",
       "color_capture.txt": "d6065302dd7de9584fa73ccdfd63bbade19c2ef0bffed3cfc4c6c0b2b2475df2",
       "color_capture_selftest.txt": "6e03dab8c68b62f922f676bc08bae3da0d6ec30c1fad49eef4b7644858e6503c",
@@ -412,7 +412,7 @@
       "tmux_bell_probe.txt": "f66422aef1845a2f80bd0943cf815ace8dec09accd1a0387b6e2236192c122b4",
       "tmux_bell_probe_selftest.txt": "e183609b706493aa41c492c7b51fe803502328d0d929b357c762d7867134403c",
       "tmux_sync_probe.txt": "224e7a72c24285d17b44f7e867adf2f18eb1d475a776b972173d84427f1de654",
-      "unit_tests.txt": "e794e08e45d2088d712bf3d61e0d05a5e86d2dc188bc6fd52340438d5b072751"
+      "unit_tests.txt": "e03e4498a92c6bded9374a0d0bc8ba2de39e5adb07c8aae9a27a28c7f1b7909b"
     },
     "commands": [
       "python3 -B stage_review_lane.py <checkout> <host file> <work dir> cx/gpt-6.1-sol 8 http://127.0.0.1:20128/v1",

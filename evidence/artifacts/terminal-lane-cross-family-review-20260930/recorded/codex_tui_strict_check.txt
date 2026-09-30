@@ -1,9 +1,9 @@
 render exit: 0 | 
 [tui] parsed: {'model_availability_nux': {'gpt-6-astra': 4}, 'notifications': ['approval-requested', 'plan-mode-prompt', 'async-question']}
-strict rendered-template: exit 1, loaded (banner, no config error): True, refused (config error, no banner): False, mentions notifications: False | last line: ERROR: unexpected status 401 Unauthorized: Missing bearer or basic authentication in header, url: https://api.openai.com/v1/responses, cf-ray: a4316b8
+strict rendered-template: exit 1, loaded (banner, no config error): True, refused (config error, no banner): False, mentions notifications: False | last line: ERROR: unexpected status 401 Unauthorized: Missing bearer or basic authentication in header, url: https://api.openai.com/v1/responses, cf-ray: a4319d3
 strict negative-control-wrong-type: exit 1, loaded (banner, no config error): False, refused (config error, no banner): True, mentions notifications: False | last line:  | ^^^^^
 strict negative-control-unknown-top-level-key: exit 1, loaded (banner, no config error): False, refused (config error, no banner): True, mentions notifications: False | last line:  | ^^^^^^^^^^^^^^^
-strict unknown-key-inside-tui: exit 1, loaded (banner, no config error): True, refused (config error, no banner): False, mentions notifications: False | last line: ERROR: unexpected status 401 Unauthorized: Missing bearer or basic authentication in header, url: https://api.openai.com/v1/responses, cf-ray: a4316be
+strict unknown-key-inside-tui: exit 1, loaded (banner, no config error): True, refused (config error, no banner): False, mentions notifications: False | last line: ERROR: unexpected status 401 Unauthorized: Missing bearer or basic authentication in header, url: https://api.openai.com/v1/responses, cf-ray: a4319d9
 template accepted: True
 wrong-type control refused: True | unknown top-level key refused: True | unknown key inside [tui] refused: False | unknown key inside [tui] loaded: True
 acceptance (template loaded, both controls refused): True

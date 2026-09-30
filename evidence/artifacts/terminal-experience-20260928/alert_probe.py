@@ -205,6 +205,8 @@ def signal_case(kind, signals=1, stand_in="sleep", signum=signal.SIGTERM, delay=
         left_dirs = list(tmp.glob("alert-probe-*"))
         alive = stand_in_alive()
         exit_ok = proc.returncode == 128 + signum
+        if alive:
+            os.kill(client, signal.SIGKILL)   # a failing case must not leave its stand-in behind (alive means the recorded PID is still exactly our `sleep`)
         detail = (f"stand-in client ran {client_ran} with signal mask {mask}, probe running when signaled {probe_running}, probe exit {proc.returncode} (expected {128 + signum}), "
                   f"private directory left {bool(left_dirs)}, stand-in client still alive {alive}")
         return client_ran and clean_mask and probe_running and exit_ok and not left_dirs and not alive, detail
@@ -245,6 +247,8 @@ def client_boundary_case(kind):
             except (OSError, IndexError):
                 alive = False
         left_dirs = list(tmp.glob("alert-probe-*"))
+        if alive:
+            os.kill(client, signal.SIGKILL)   # a failing case must not leave its stand-in behind
         ok = client is not None and mask == "0" * 16 and run.returncode == 128 + signal.SIGTERM and not left_dirs and not alive
         return ok, (f"stand-in client ran {client is not None} with signal mask {mask}, probe exit {run.returncode} (expected {128 + signal.SIGTERM}), private directory left {bool(left_dirs)}, "
                     f"stand-in client still alive {alive}")
