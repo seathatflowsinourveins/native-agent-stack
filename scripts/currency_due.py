@@ -20,8 +20,9 @@ read-only checks as subprocesses, with the arguments their weekly workflows use,
 When any count is nonzero it writes ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json
 atomically (a temporary file in the same directory, fsync, mode 0600, os.replace):
 
-  {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "due": {the four counts},
-   "summary_line": "at most 160 characters, ending with the command below", "details": [...]}
+  {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "root": "the inspected checkout", "due": {the four counts},
+   "summary_line": "at most 160 characters, ending with the command below or the path of this file",
+   "details_command": "the command below", "details": [...]}
 
 and otherwise removes that file, unless the run could not see everything it was asked to check. A skill check
 (--network) that answered incompletely, meaning an error in its report, a skill left unfetched or in a state this
@@ -33,9 +34,10 @@ directory as it was: no removal and no new file, exit 0.
 The command that ends summary_line is "python3 <checkout>/scripts/currency_due.py --dry-run", the inspected checkout's
 own copy of this script by its absolute path, written as ~/... under the home directory (so the command works from any
 working directory, stays short and names the checkout it inspected), plus the options that change what a run reports, --network and a non-default --sweep-cadence-days, so
-that running it prints the details of the notice. A checkout without the script is named by --root instead, and when
-the absolute command would leave the counts no room in the line, the cwd-relative "python3 scripts/currency_due.py
---dry-run" takes its place. A SessionStart hook, a separate change, prints summary_line in whatever project the
+that running it prints the details of the notice. A checkout without the script is named by --root instead. When the
+absolute command would leave the counts no room in the line, the line ends with the path of the due-file itself,
+whose details_command field carries the full command and whose root field names the checkout; the line never falls
+back to a cwd-relative command. A SessionStart hook, a separate change, prints summary_line in whatever project the
 session starts in when the file exists and nothing when it does not
 (docs/decisions/2026-09-30-session-currency-notice.md).
 
@@ -72,8 +74,8 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
           "due_layers": ("layer due", "layers due"),
           "reopen_triggers": ("layer with reopen triggers", "layers with reopen triggers")}
 SUMMARY_LIMIT = 160
-# The smallest count text is "1 pin behind"; an absolute command that leaves the counts less room than that gives way
-# to the cwd-relative form.
+# The smallest count text is "1 pin behind"; a command that leaves the counts less room than that gives way to the
+# path of the due-file, which carries the command in full.
 MIN_COUNTS_ROOM = len("1 pin behind")
 DETAILS_SCRIPT = "scripts/currency_due.py"
 DETAILS_COMMAND = f"python3 {DETAILS_SCRIPT} --dry-run"
@@ -237,31 +239,27 @@ def details_command(root: Path, network: bool, cadence_days: int) -> str:
     return join_command([*command, *report_options(network, cadence_days)])
 
 
-def relative_details_command(network: bool, cadence_days: int) -> str:
-    """The cwd-relative form of the command, correct from the checkout's top directory; summary_line uses it only
-    when the absolute command leaves the counts no room."""
-    return shlex.join(["python3", DETAILS_SCRIPT, "--dry-run", *report_options(network, cadence_days)])
-
-
 def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = True,
-                 short_command: str | None = None) -> str:
+                 pointer: str | None = None) -> str:
     """The nonzero counts and the command that prints the details, in at most SUMMARY_LIMIT characters. With no
     count and a check that could not answer, the line says so rather than "nothing due". When ``command`` leaves
-    the counts less than MIN_COUNTS_ROOM characters, ``short_command`` takes its place."""
+    the counts less than MIN_COUNTS_ROOM characters, ``pointer`` (the due-file's path, which carries the command in
+    its details_command field) takes its place; the line never names a cwd-relative command."""
     parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in DUE_KEYS if due[key]]
     if not parts:
         return ("stack currency: nothing due" if complete else
                 "stack currency: nothing known due, skill check incomplete")
     prefix, suffix = "stack currency: ", f"; details: {command}"
-    if short_command is not None and SUMMARY_LIMIT - len(prefix) - len(suffix) < MIN_COUNTS_ROOM:
-        suffix = f"; details: {short_command}"
+    if pointer is not None and SUMMARY_LIMIT - len(prefix) - len(suffix) < MIN_COUNTS_ROOM:
+        suffix = f"; details: {pointer}"
     counts, room = ", ".join(parts), SUMMARY_LIMIT - len(prefix) - len(suffix)
     if len(counts) > room:
         counts = counts[:room - 3] + "..."
     return prefix + counts + suffix
 
 
-def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, root: Path = ROOT) -> dict:
+def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, root: Path = ROOT,
+              due_file: Path | None = None) -> dict:
     """The due-file document from the checks' reports (their JSON shapes; see the module docstring)."""
     details: list[dict] = []
 
@@ -363,9 +361,11 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
                     "skills_unresolved": skills_unresolved})
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers}
-    line = summary_line(due, details_command(root, skills is not None, cadence_days), skills_complete is not False,
-                        relative_details_command(skills is not None, cadence_days))
-    return {"generated_at": now_text, "due": due, "summary_line": line, "details": details}
+    command = details_command(root, skills is not None, cadence_days)
+    line = summary_line(due, command, skills_complete is not False,
+                        notice_path(due_file) if due_file is not None else None)
+    return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
+            "details_command": command, "details": details}
 
 
 def incomplete(document: dict) -> bool:
@@ -485,7 +485,8 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(f"--now must look like 2026-09-30T00:00:00Z, got {args.now!r}")
     now_text = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     try:
-        document = aggregate(collect(root, now_text, args.network), now, now_text, args.sweep_cadence_days, root)
+        document = aggregate(collect(root, now_text, args.network), now, now_text, args.sweep_cadence_days, root,
+                             state / DUE_FILE)
         action = "dry run"
         if not args.dry_run:
             if any(document["due"].values()):

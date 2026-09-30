@@ -116,16 +116,20 @@ installed and no host file was written: the timer and the service are drafted te
    Its line says `nothing known due` and its journal entry says `kept` or `no due-file`. A relative
    `XDG_STATE_HOME` is ignored, as the XDG specification requires. The write goes through a mode-0600, fsynced
    temporary file in the same directory and `os.replace`, the pattern of `saturation_ledger.write_ledger`
-   (`scripts/saturation_ledger.py:1159-1177`). The document's keys are `generated_at`, `due`, `summary_line` (at
-   most 160 characters) and `details`. The line ends with `python3 <checkout>/scripts/currency_due.py --dry-run`,
+   (`scripts/saturation_ledger.py:1159-1177`). The document's keys are `generated_at`, `root`, `due`, `summary_line` (at
+   most 160 characters), `details_command` and `details`. The line ends with `python3 <checkout>/scripts/currency_due.py --dry-run`,
    the inspected checkout's own copy of the script by its absolute path (written as `~/...` under the home
    directory, which every shell expands), plus `--network` and a non-default
    `--sweep-cadence-days N` when the run used them, so that running the command reproduces the notice from any
    working directory: the user-scope SessionStart hook prints the line in whatever project a session starts in,
    where a cwd-relative command would run in the wrong checkout or none (GPT-6 review of #539). A checkout
-   without the script is named by `--root`; when the absolute command would leave the counts fewer than 12
-   characters, the line falls back to the cwd-relative `python3 scripts/currency_due.py --dry-run`. The option is
-   bounded to 36500 to keep the line short. The unit passes neither, so its
+   without the script is named by `--root`. When the absolute command would leave the counts fewer than 12
+   characters, the line ends with the path of the due-file itself (`~/.local/state/native-agent-stack/currency-due.json`
+   by default), whose `details_command` field carries the full command and whose `root` field names the checkout;
+   the line never falls back to a cwd-relative command (GPT-6 review round 3). A `stack-currency` launcher on the
+   ecosystem `PATH` would make the command short on every host; it is not part of this change because installing
+   it is a host step of the full-profile bootstrap. The document's keys are now `generated_at`, `root`, `due`,
+   `summary_line`, `details_command` and `details`. The option is bounded to 36500 to keep the line short. The unit passes neither, so its
    notice ends with the bare command, and a test compares the flags in the unit's `ExecStart` with the flags the
    command names. The script exits 0 whether or not anything is due, and 2 on an internal error, which leaves the
    state directory as it was. That includes a report field of the wrong type. It makes no network call unless

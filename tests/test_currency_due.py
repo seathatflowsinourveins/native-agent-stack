@@ -245,7 +245,8 @@ class DueFileTests(unittest.TestCase):
         code, _, stderr = checkout.run()
         self.assertEqual(code, 0, stderr)
         document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
-        self.assertEqual(list(document), ["generated_at", "due", "summary_line", "details"])
+        self.assertEqual(list(document), ["generated_at", "root", "due", "summary_line", "details_command",
+                                          "details"])
         self.assertEqual(document["generated_at"], NOW)
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
                                            "reopen_triggers": 1})
@@ -652,25 +653,45 @@ class DetailsCommandTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         return json.loads(checkout.due_file.read_text(encoding="utf-8"))
 
-    def reproduced(self, checkout: Checkout, document: dict) -> dict:
-        """Run the notice's own command in this checkout (in process) and return the document it prints."""
+    def literal_command(self, checkout: Checkout, document: dict) -> list[str]:
+        """The command a reader of the notice's line runs, read from an unrelated working directory: the line's own
+        command, or, when the line points at the due-file, the details_command of that file."""
         summary = document["summary_line"]
         self.assertIn("; details: ", summary)
-        command = shlex.split(summary.split("; details: ", 1)[1])
-        self.assertEqual(command[:3], ["python3", cd.notice_path(checkout.script), "--dry-run"], summary)
+        elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, elsewhere, True)
+        tail = summary.split("; details: ", 1)[1]
+        if tail == cd.notice_path(checkout.due_file):
+            pointed = json.loads(Path(os.path.join(elsewhere, os.path.expanduser(tail))).read_text(encoding="utf-8"))
+            self.assertEqual(pointed["details_command"], document["details_command"])
+            self.assertEqual(pointed["root"], str(checkout.root))
+            tail = pointed["details_command"]
+        command = shlex.split(tail)
+        self.assertEqual(command, shlex.split(document["details_command"]), summary)
+        self.assertEqual(command[0], "python3")
+        return command
+
+    def run_elsewhere(self, checkout: Checkout, command: list[str]) -> dict:
+        """The literal command as a process from an unrelated working directory: the path in the command, not the
+        cwd, chooses the checkout (the SessionStart hook prints the line in whatever project a session starts in)."""
+        elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, elsewhere, True)
+        # A shell expands a word-initial ~ (the script's path and a --root value); subprocess does not.
+        words = [os.path.expanduser(word) if word.startswith("~/") else word for word in command[1:]]
+        result = subprocess.run([sys.executable, *words, "--json", "--now", NOW, "--state-dir", str(checkout.state)],
+                                cwd=elsewhere, capture_output=True, text=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)
+
+    def reproduced(self, checkout: Checkout, document: dict) -> dict:
+        """Run the notice's own command in this checkout (in process) and as a process from an unrelated working
+        directory, and return the document it prints."""
+        command = self.literal_command(checkout, document)
+        self.assertEqual(command[:3], ["python3", cd.notice_path(checkout.script), "--dry-run"], command)
         code, stdout, stderr = checkout.run(*command[2:], "--json")
         self.assertEqual(code, 0, stderr)
         document = json.loads(stdout)
-        # The same command as a process from an unrelated working directory: the path in the command, not the
-        # cwd, chooses the checkout (the SessionStart hook prints the line in whatever project a session starts in).
-        elsewhere = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, elsewhere, True)
-        # A shell would expand a leading ~; subprocess without one does not.
-        result = subprocess.run([sys.executable, os.path.expanduser(command[1]), *command[2:], "--json", "--now",
-                                 NOW, "--state-dir", str(checkout.state)],
-                                cwd=elsewhere, capture_output=True, text=True, check=False)
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(json.loads(result.stdout)["due"], document["due"])
+        self.assertEqual(self.run_elsewhere(checkout, command)["due"], document["due"])
         return document
 
     def test_skill_drift_alone_is_reproduced_by_the_command_in_the_notice(self):
@@ -722,6 +743,16 @@ class DetailsCommandTests(unittest.TestCase):
         self.assertEqual(command, ["python3", cd.notice_path(Path(cd.__file__).resolve()), "--dry-run",
                                    "--root", cd.notice_path(checkout.root), "--network", "--sweep-cadence-days", "7"])
 
+    def test_the_root_form_is_reproduced_from_an_unrelated_directory(self):
+        checkout = Checkout(self)
+        checkout.something_due()
+        checkout.script.unlink()
+        document = self.notice(checkout)
+        command = self.literal_command(checkout, document)
+        self.assertEqual(command[2:5], ["--dry-run", "--root", cd.notice_path(checkout.root)])
+        again = self.run_elsewhere(checkout, command)
+        self.assertEqual((again["due"], again["root"]), (document["due"], str(checkout.root)))
+
     def test_a_path_under_the_home_directory_is_written_with_a_tilde(self):
         with mock.patch.object(Path, "home", return_value=Path("/h/u")):
             self.assertEqual(cd.notice_path(Path("/h/u/code/stack/scripts/currency_due.py")),
@@ -739,23 +770,31 @@ class DetailsCommandTests(unittest.TestCase):
                              ["python3", cd.notice_path(Path(cd.__file__).resolve()), "--dry-run",
                               "--root", "/h/u/my code"])
 
-    def test_an_absolute_command_that_leaves_the_counts_no_room_gives_way_to_the_relative_form(self):
-        # A checkout path this long leaves "1 pin behind" no room beside the absolute command.
+    def test_a_command_that_leaves_the_counts_no_room_gives_way_to_the_due_file_path(self):
+        # A checkout path this long leaves "1 pin behind" no room beside the absolute command, so the line points
+        # at the due-file, which carries the command and the checkout; nothing cwd-relative is ever printed.
         checkout = Checkout(self, "c" * 110)
         checkout.something_due()
         document = self.notice(checkout)
-        self.assertTrue(document["summary_line"].endswith(f"; details: {COMMAND}"), document["summary_line"])
+        self.assertTrue(document["summary_line"].endswith(f"; details: {cd.notice_path(checkout.due_file)}"),
+                        document["summary_line"])
+        self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts"))
         self.assertLessEqual(len(document["summary_line"]), 160)
+        self.assertNotIn(COMMAND, document["summary_line"])
+        command = self.literal_command(checkout, document)
+        self.assertEqual(command[:3], ["python3", cd.notice_path(checkout.script), "--dry-run"])
+        self.assertEqual(self.run_elsewhere(checkout, command)["due"], document["due"])
 
-    def test_summary_line_takes_the_short_command_only_when_the_counts_would_not_fit(self):
+    def test_summary_line_takes_the_pointer_only_when_the_counts_would_not_fit(self):
         due = dict.fromkeys(cd.DUE_KEYS, 0)
         due["pins_behind"] = 1
+        pointer = "~/.local/state/native-agent-stack/currency-due.json"
         fits = "python3 /checkout/scripts/currency_due.py --dry-run"
-        self.assertEqual(cd.summary_line(due, fits, short_command=COMMAND),
+        self.assertEqual(cd.summary_line(due, fits, pointer=pointer),
                          f"stack currency: 1 pin behind; details: {fits}")
         too_long = "python3 " + "/c" * 60 + "/scripts/currency_due.py --dry-run"
-        self.assertEqual(cd.summary_line(due, too_long, short_command=COMMAND),
-                         f"stack currency: 1 pin behind; details: {COMMAND}")
+        self.assertEqual(cd.summary_line(due, too_long, pointer=pointer),
+                         f"stack currency: 1 pin behind; details: {pointer}")
 
     def test_the_next_step_points_at_what_is_due(self):
         # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.
@@ -830,7 +869,8 @@ class ThisCheckoutTests(unittest.TestCase):
             elapsed = time.monotonic() - started
             self.assertEqual(result.returncode, 0, result.stderr[-2000:])
             document = json.loads(result.stdout)
-            self.assertEqual(list(document), ["generated_at", "due", "summary_line", "details"])
+            self.assertEqual(list(document), ["generated_at", "root", "due", "summary_line", "details_command",
+                                          "details"])
             self.assertEqual(list(document["due"]), list(cd.DUE_KEYS))
             self.assertTrue(all(isinstance(value, int) and value >= 0 for value in document["due"].values()))
             self.assertLessEqual(len(document["summary_line"]), 160)
