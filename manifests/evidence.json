@@ -8919,9 +8919,19 @@
       "bytes": 33599
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.builder.sh.txt",
+      "sha256": "cd25c2b05cda577cc3052355ffc6afdc79ed4b2ad969bf356ddaa747645cf759",
+      "bytes": 17421
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.jwt-callers.py.txt",
+      "sha256": "56b5ac6942faefa9bfca4f77463b8085b5b57e6b0cd54a554bb987031c9eb258",
+      "bytes": 3327
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.txt",
-      "sha256": "f35219015f3a87d2a3d96c34c887d22500bd4b30e972aa6bc6a0b46d7c4b5cef",
-      "bytes": 20449
+      "sha256": "9631cf75714fc6c12d3bb619f2147f88b9b90ec88f18b4088b35902e200ea933",
+      "bytes": 23583
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
@@ -9040,8 +9050,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "fd47c2256ef363c77a7854e12bc8970e2af9cbf329f587df9a744ed19659ee88",
-      "bytes": 65936
+      "sha256": "07c10856a5afa23ecc11b9dfbc4f357973c165eaf543b0df6353773bc8707189",
+      "bytes": 66411
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -14555,7 +14565,7 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "bc225cb77a22953419b30f7c63a03ea0cd93a820e6e1448c9675e56e5c07f5cb",
+      "sha256": "4c16da626f69874d44e144bd18558aafeeab9b6f73fdb3e77cbbf9a3278099eb",
       "bytes": 138874
     },
     {
@@ -42330,8 +42340,8 @@
     },
     {
       "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
-      "sha256": "b918c8a412ef89a85b3c5c4786efb49208ef9868f1914fe81da6f16dd320c791",
-      "bytes": 27373
+      "sha256": "f0263564ccbde71fef9571b6582cf510dd8d6cb8bfbc182906dbb13a934be9cb",
+      "bytes": 29263
     },
     {
       "path": "evidence/receipts/pit-availability.json",
