@@ -1,8 +1,10 @@
 # User-selected native coordinator: Sol/Ultra (user decision 2026-09-30; routing record
 # docs/decisions/2026-09-30-sol-primary-quality-defaults.md). Ultra sends Sol's catalog multi-agent effort, xhigh,
 # and enables proactive delegation (openai/codex rust-v0.159.2 protocol/src/openai_models/reasoning_effort.rs
-# and models-manager/models.json).
-model = "gpt-6.1-sol"
+# and models-manager/models.json). tools/adoption/render_config.py fills CODEX_MODEL from the platform's Codex pin:
+# gpt-6.1-sol from Codex 0.159.1, which added it to the bundled catalog (rust-v0.159.1 release notes), and gpt-6-astra
+# on an older pin (macOS 0.155.1), a model that client's catalog lists; --set CODEX_MODEL=<model> names another.
+model = "${CODEX_MODEL}"
 model_reasoning_effort = "ultra"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
@@ -23,8 +25,9 @@ max_concurrent_threads_per_session = 3
 # default (low for Sol). Explicit spawn selections replace these defaults, then the selected role config applies,
 # preserving Astra judgment-role overrides (openai/codex rust-v0.159.2 core/src/agent/child_config.rs L62-73,
 # L204-249). Max sends API max and delegates only when asked; Ultra above sends xhigh and delegates proactively
-# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin).
-default_subagent_model = "gpt-6.1-sol"
+# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin). The child model is
+# the coordinator's CODEX_MODEL, so a pin before 0.159.1 runs gpt-6-astra children at max.
+default_subagent_model = "${CODEX_MODEL}"
 default_subagent_reasoning_effort = "max"
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local

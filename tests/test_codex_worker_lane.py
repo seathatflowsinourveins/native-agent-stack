@@ -40,6 +40,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 import apply_codex_lane as lane  # noqa: E402
 import prove_codex_lane as prove  # noqa: E402
+import render_config  # noqa: E402
 from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
@@ -309,6 +310,10 @@ class TemplateTests(unittest.TestCase):
 
     def test_profile_template(self):
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
+        # A literal, not render_config.py's CODEX_MODEL placeholder: the lane installs this file verbatim, worker_pins()
+        # passes its model as -m, and the lane refuses any codex but CODEX_VERSION (the Linux pin). So the literal must
+        # be the model that placeholder's rule gives for that version, one the pinned client's catalog lists.
+        self.assertEqual(profile["model"], render_config.codex_model_for(lane.CODEX_VERSION))
         self.assertEqual(profile["model"], "gpt-6.1-sol")
         # max, the effort of #359's control arm; ultra (the user default) turns on proactive delegation.
         self.assertEqual(profile["model_reasoning_effort"], "max")
@@ -431,9 +436,11 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(profile["shell_environment_policy"], {"filters": {"OMNIROUTE_API_KEY": "exclude"}})
         self.assertEqual(profile["features"], {"standalone_web_search": True, "shell_snapshot": False})
         # K2: the base template stays gateway-free, so render_config.py --check still compares like with like. Its
-        # interactive default is GPT-6.1 Sol at ultra (the user's decision of 2026-09-30, model-currency addendum),
-        # while this gateway profile keeps the judgment lanes' cx/gpt-6-astra at max.
-        user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
+        # interactive default is GPT-6.1 Sol at ultra (the user's decision of 2026-09-30, model-currency addendum)
+        # where the platform's Codex pin lists it: rendered here for the Linux pin, the lane's CODEX_VERSION. This
+        # gateway profile keeps the judgment lanes' cx/gpt-6-astra at max.
+        user = tomllib.loads(render_config.render_one(TEMPLATES / "codex.config.template.toml",
+                                                      render_config.load_host_values("example"), "linux-x86_64"))
         self.assertNotIn("model_providers", user)
         self.assertNotIn("model_provider", user)
         self.assertEqual((user["model"], user["model_reasoning_effort"]), ("gpt-6.1-sol", "ultra"))
@@ -2256,7 +2263,8 @@ class CodexIntegrationTests(unittest.TestCase):
         fixture = {"HOME": "/home/example", "ECO_ROOT": "/home/example/.local/share/codex-ecosystem",
                    "PROJECT_ROOT": "/home/example/code/agent-lab", "HOST_PATH": "/usr/bin:/bin",
                    "OTEL_ENDPOINT": "127.0.0.1:1", "AI_MEMORY_URL": "127.0.0.1:1", "QDRANT_URL": "127.0.0.1:1",
-                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0"}
+                   "EMBED_URL": "127.0.0.1:1", "SOCRATICODE_VERSION": "1.15.0",
+                   "CODEX_MODEL": render_config.codex_model_for(lane.CODEX_VERSION)}  # the model this codex lists
         base = string.Template((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
