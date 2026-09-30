@@ -1,0 +1,370 @@
+{
+  "schema_version": 1,
+  "evidence_class": "Actual local command returns; host paths replaced with named placeholders.",
+  "commands": {
+    "initial_working_main_osv": {
+      "argv": [
+        "rtk",
+        "<OSV_SCANNER_2_6_0>",
+        "scan",
+        "source",
+        "--config",
+        "<PRIVATE_RESEARCH>/current-main-osv-scanner.toml",
+        "--no-resolve",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+        "--format",
+        "json",
+        "--output-file",
+        "<PRIVATE_RESEARCH>/before-osv.json"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:21:27.885Z",
+      "ended": "2026-09-30T07:21:28.760Z",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Starting filesystem walk for root: /\nScanned <WORKTREE>/blueprints/runtime-workers/openhands/requirements.lock file and found 340 packages\nEnd status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 22.37021ms elapsed, 22.37028ms wall time\n<PRIVATE_RESEARCH>/current-main-osv-scanner.toml has unused ignores:\n - GHSA-8mgp-746c-j5xp\n - GHSA-h35f-9h28-mq5c\n"
+    },
+    "exact_origin_main_baseline_osv": {
+      "argv": [
+        "rtk",
+        "<OSV_SCANNER_2_6_0>",
+        "scan",
+        "source",
+        "--config",
+        "<PRIVATE_RESEARCH>/current-main-osv-scanner.toml",
+        "--no-resolve",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+        "--format",
+        "json",
+        "--output-file",
+        "<PRIVATE_RESEARCH>/before-osv.json"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:35:22.026Z",
+      "ended": "2026-09-30T07:35:23.153Z",
+      "exit_code": 1,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Starting filesystem walk for root: /\nScanned <WORKTREE>/blueprints/runtime-workers/openhands/requirements.lock file and found 340 packages\nEnd status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 19.598526ms elapsed, 19.598596ms wall time\nGHSA-hj66-6f7g-4r5v and 1 alias have been filtered out because: oauthlib 0.6.1 through 3.3.1 (fixed in 4.0.0): RevocationEndpoint wraps its response in the request's callback parameter only when constructed with enable_jsonp=True (oauthlib/oauth2/rfc6749/endpoints/revocation.py:72-73 and 81-82 in 3.3.1); oauthlib's pre-configured servers never pass it. Two allowed locks pin 3.3.1: the OpenHands recipe lock and the frozen, evaluation-only Lumibot lock (run offline under bwrap). A text search of one hash-verified artifact per requirement of both locks found no enable_jsonp or create_revocation_response and no importer of oauthlib's endpoints, grant types or servers: oauthlib is imported only by requests-oauthlib 2.0.0 (client classes, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class); every other RevocationEndpoint is Authlib's own class, and Authlib does not import oauthlib. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: the OpenHands lock was relocked onto PyJWT 2.14.0 on 2026-09-30 and still pins oauthlib 3.3.1; as of 2026-09-30, oauthlib 4.0.0 (PyPI, 2026-09-28T06:01Z) was inside the 7-day window the upstream workspace's exclude-newer applies (until 2026-10-05T06:01:19Z), so the relock onto it follows, tracked in #518 (owner: bc, session native-agent-stack-bc; earliest 2026-10-05T18:40:43Z, when PyJWT 2.15.1 has left its window too; due 2026-10-08), and in the same change deletes the OpenHands entry of IGNORE_ALLOWED_LOCKS, whose sha256 pin fails any change to that lock. The Lumibot lock stays frozen on 3.3.1, so on 2026-10-13 renew this ignore for that lock alone with a new dated reason, or delete that lock.\nGHSA-xpv3-w29h-x7cv and 1 alias have been filtered out because: oauthlib >= 3.0.0, < 4.0.0 (fixed in 4.0.0; the scanned locks pin 3.3.1): an oauthlib authorization server compares the PKCE code_verifier with == (code_challenge_method_s256 at oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:49 and code_challenge_method_plain at :61, in 3.3.1), called only from AuthorizationCodeGrant.validate_token_request (line 506) when a token endpoint handles a request. Neither allowed lock (the OpenHands recipe lock and the frozen Lumibot lock) runs an oauthlib authorization server: in a text search of one hash-verified artifact per requirement of both locks, oauthlib is imported only by requests-oauthlib 2.0.0 (WebApplicationClient, LegacyApplicationClient, the oauth1 Client, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class), and nothing imports oauthlib's grant types, endpoints or servers; the PKCE code in openhands-sdk, requests-oauthlib and google-auth-oauthlib only generates a verifier as a client. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: as for GHSA-hj66-6f7g-4r5v; the OpenHands relock onto oauthlib 4.0.0 removes that lock's pin, and on 2026-10-13 this ignore is renewed for the frozen Lumibot lock alone or that lock is deleted.\nFiltered 2 vulnerabilities from output\n<PRIVATE_RESEARCH>/current-main-osv-scanner.toml has unused ignores:\n - GHSA-8mgp-746c-j5xp\n - GHSA-h35f-9h28-mq5c\n",
+      "config_sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87",
+      "lock_sha256": "7dba097d34f83cab8585e49050505d5f836b8f8505ceedb7daff160af5e3ad16",
+      "report_sha256": "e38ba75053c9676384309919da3f2f2a2b78aafe29f552df7e2ce1759cdd7a6d"
+    },
+    "native_compile": {
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "compile",
+        "<PRIVATE_RESEARCH>/requirements.in",
+        "--constraints",
+        "<PRIVATE_RESEARCH>/retained-constraints.txt",
+        "--generate-hashes",
+        "--no-header",
+        "--no-annotate",
+        "--index-url",
+        "https://pypi.org/simple",
+        "--python-version",
+        "3.13.15",
+        "--python-platform",
+        "x86_64-unknown-linux-gnu",
+        "--exclude-newer",
+        "7 days",
+        "--exclude-newer-package",
+        "litellm=2026-07-20T00:00:00Z",
+        "--exclude-newer-package",
+        "lmnr=2026-08-23T00:00:00Z",
+        "--output-file",
+        "<PRIVATE_RESEARCH>/candidate-requirements.lock"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:28:11.527Z",
+      "ended": "2026-09-30T07:28:12.116Z",
+      "exit_code": 0,
+      "stdout": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/requirements.lock",
+          "sha256": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676",
+          "bytes": 248357
+        },
+        "identity": "Complete returned stdout equals the native generated lock byte for byte."
+      },
+      "stderr": "Resolved 176 packages in 525ms\n"
+    },
+    "fresh_venv": {
+      "argv": [
+        "rtk",
+        "uv",
+        "venv",
+        "--python",
+        "<UPSTREAM>/.venv/bin/python",
+        "<WHEEL_PREFIX>"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:36:17.884Z",
+      "ended": "2026-09-30T07:36:17.926Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using CPython 3.13.15 interpreter at: <UPSTREAM>/.venv/bin/python\nCreating virtual environment at: <WHEEL_PREFIX>\nActivate with: source <WHEEL_PREFIX>/bin/activate\n"
+    },
+    "build_hash_install": {
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "<WHEEL_PREFIX>/bin/python",
+        "--require-hashes",
+        "--no-deps",
+        "--only-binary",
+        ":all:",
+        "--index-url",
+        "https://pypi.org/simple",
+        "-r",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/build-requirements.lock"
+      ],
+      "cwd": "<WORKTREE>",
+      "env": {
+        "UV_NO_CONFIG": "1",
+        "UV_PYTHON_DOWNLOADS": "never"
+      },
+      "started": "2026-09-30T07:37:06.583Z",
+      "ended": "2026-09-30T07:37:06.783Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Using Python 3.13.15 environment at: <WHEEL_PREFIX>\nResolved 3 packages in 68ms\nInstalled 3 packages in 53ms\n + packaging==26.3\n + setuptools==84.0.0\n + wheel==0.46.3\n"
+    },
+    "wheel_hash_install": {
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "<WHEEL_PREFIX>/bin/python",
+        "--require-hashes",
+        "--no-deps",
+        "--no-build-isolation",
+        "--index-url",
+        "https://pypi.org/simple",
+        "-r",
+        "<PRIVATE_RESEARCH>/candidate-requirements.lock"
+      ],
+      "cwd": "<WORKTREE>",
+      "env": {
+        "UV_NO_CONFIG": "1",
+        "UV_PYTHON_DOWNLOADS": "never"
+      },
+      "started": "2026-09-30T07:37:26.790Z",
+      "ended": "2026-09-30T07:37:27.898Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Using Python 3.13.15 environment at: <WHEEL_PREFIX>\nResolved 176 packages in 72ms\nInstalled 172 packages in 795ms\nPrepared 3 packages without build isolation in 61ms\nInstalled 3 packages in 6ms\n + agent-client-protocol==0.12.1\n + aiofile==3.9.0\n + aiofiles==25.1.0\n + aiohappyeyeballs==2.6.1\n + aiohttp==3.14.3\n + aiosignal==1.4.0\n + annotated-types==0.7.0\n + anthropic==0.75.0\n + anyio==4.14.2\n + attrs==25.3.0\n + authlib==1.6.12\n + backoff==2.2.1\n + beartype==0.22.9\n + beautifulsoup4==4.14.2\n + binaryornot==0.4.4\n + blake3==1.0.9\n + browser-use==0.11.9\n + browser-use-sdk==2.0.15\n + bubus==1.5.6\n + cachetools==7.1.8\n + caio==0.9.25\n + cdp-use==1.4.4\n + certifi==2025.8.3\n + cffi==2.0.0\n + chardet==5.2.0\n + charset-normalizer==3.4.3\n + click==8.3.3\n + cloudpickle==3.1.2\n + cryptography==50.0.0\n + cyclopts==4.6.0\n + deprecation==2.1.0\n + distro==1.9.0\n + dnspython==2.8.0\n + docstring-parser==0.17.0\n + docutils==0.22.2\n + email-validator==2.3.0\n + exceptiongroup==1.3.0\n + fakeredis==2.34.1\n + fastmcp==3.2.0\n + fastuuid==0.14.0\n + filelock==3.20.3\n + frozenlist==1.8.0\n + fsspec==2025.9.0\n + func-timeout==4.3.5\n + google-api-core==2.31.0\n + google-api-python-client==2.184.0\n + google-auth==2.53.0\n + google-auth-httplib2==0.2.0\n + google-auth-oauthlib==1.2.2\n + google-genai==1.75.0\n + googleapis-common-protos==1.70.0\n + groq==0.32.0\n + grpcio==1.76.0\n + h11==0.16.0\n + hf-xet==1.1.10\n + httpcore==1.0.9\n + httplib2==0.32.0\n + httpx==0.28.1\n + httpx-sse==0.4.3\n + huggingface-hub==0.35.3\n + idna==3.15\n + importlib-metadata==8.5.0\n + inquirerpy==0.3.4\n + jaraco-classes==3.4.0\n + jaraco-context==6.1.0\n + jaraco-functools==4.4.0\n + jeepney==0.9.0\n + jinja2==3.1.6\n + jiter==0.11.0\n + joserfc==1.7.5\n + json-repair==0.60.1\n + jsonref==1.1.0\n + jsonschema==4.23.0\n + jsonschema-path==0.3.4\n + jsonschema-specifications==2025.9.1\n + keyring==25.7.0\n + libtmux==0.53.0\n + litellm==1.93.0\n + lmnr==0.7.60\n + lmnr-claude-code-proxy==0.1.23\n + lupa==2.8\n + lxml==6.1.0\n + markdown-it-py==4.0.0\n + markdownify==1.2.0\n + markupsafe==3.0.2\n + mcp==1.28.1\n + mdurl==0.1.2\n + more-itertools==10.8.0\n + multidict==6.7.0\n + oauthlib==3.3.1\n + ollama==0.6.0\n + openai==2.33.0\n + openapi-pydantic==0.5.1\n + openhands-sdk==1.50.0 (from https://files.pythonhosted.org/packages/eb/5a/359d6a4b892fccd4915879d3145d77735b0e5614eee7db7b2a11ae99a843/openhands_sdk-1.50.0-py3-none-any.whl)\n + openhands-tools==1.50.0 (from https://files.pythonhosted.org/packages/97/b2/61c9b0029d46de429890527f47c1809f6badc1c386bfcb4dd17286166108/openhands_tools-1.50.0-py3-none-any.whl)\n + opentelemetry-api==1.39.1\n + opentelemetry-exporter-otlp-proto-common==1.39.1\n + opentelemetry-exporter-otlp-proto-grpc==1.39.1\n + opentelemetry-exporter-otlp-proto-http==1.39.1\n + opentelemetry-instrumentation==0.60b1\n + opentelemetry-instrumentation-threading==0.60b1\n + opentelemetry-proto==1.39.1\n + opentelemetry-sdk==1.39.1\n + opentelemetry-semantic-conventions==0.60b1\n + opentelemetry-semantic-conventions-ai==0.4.13\n + orjson==3.11.7\n + pathable==0.4.4\n + pfzy==0.3.4\n + pillow==12.3.0\n + platformdirs==4.4.0\n + portalocker==2.10.1\n + posthog==6.7.7\n + prompt-toolkit==3.0.52\n + propcache==0.4.1\n + proto-plus==1.26.1\n + protobuf==6.33.5\n + psutil==7.2.2\n + py-key-value-aio==0.4.4\n + pyasn1==0.6.4\n + pyasn1-modules==0.4.2\n + pycparser==2.23\n + pydantic==2.12.5\n + pydantic-core==2.41.5\n + pydantic-settings==2.11.0\n + pygments==2.20.0\n + pyjwt==2.14.0\n + pyotp==2.9.0\n + pyparsing==3.2.5\n + pypdf==6.16.1\n + pyperclip==1.11.0\n + python-dateutil==2.9.0.post0\n + python-docx==1.2.0\n + python-dotenv==1.2.2\n + python-frontmatter==1.1.0\n + python-json-logger==4.0.0\n + python-multipart==0.0.31\n + pyyaml==6.0.2\n + redis==7.2.1\n + referencing==0.36.2\n + regex==2025.9.18\n + reportlab==4.4.4\n + requests==2.33.0\n + requests-oauthlib==2.0.0\n + rich==14.3.3\n + rich-rst==1.3.2\n + rpds-py==0.27.1\n + screeninfo==0.8.1\n + secretstorage==3.5.0\n + six==1.17.0\n + sniffio==1.3.1\n + socksio==1.0.0\n + sortedcontainers==2.4.0\n + soupsieve==2.9\n + sse-starlette==3.0.2\n + starlette==1.3.1\n + tenacity==9.1.2\n + tiktoken==0.12.0\n + tokenizers==0.23.1\n + tom-swe==1.0.3\n + tqdm==4.67.1\n + tree-sitter==0.25.2\n + tree-sitter-bash==0.25.1\n + typing-extensions==4.15.0\n + typing-inspection==0.4.2\n + uncalled-for==0.2.0\n + uritemplate==4.2.0\n + urllib3==2.7.0\n + uuid7==0.1.0\n + uvicorn==0.52.4\n + watchfiles==1.1.1\n + wcwidth==0.2.14\n + websockets==15.0.1\n + wrapt==1.17.3\n + yarl==1.22.0\n + zipp==3.23.0\n"
+    },
+    "native_pip_check": {
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<WHEEL_PREFIX>/bin/python"
+      ],
+      "cwd": "<WORKTREE>",
+      "env": {
+        "UV_NO_CONFIG": "1"
+      },
+      "started": "2026-09-30T07:40:06.374Z",
+      "ended": "2026-09-30T07:40:06.435Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.13.15 environment at: <WHEEL_PREFIX>\nChecked 178 packages in 4ms\nAll installed packages are compatible\n"
+    },
+    "native_sdk_imports": {
+      "argv": [
+        "rtk",
+        "<WHEEL_PREFIX>/bin/python",
+        "-c",
+        "import importlib.metadata as m; assert m.version('openhands-sdk') == m.version('openhands-tools') == '1.50.0'; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.terminal import TerminalTool; from openhands.tools.file_editor import FileEditorTool; print('SDK/tools 1.50.0 imports passed; no model request')"
+      ],
+      "cwd": "<WORKTREE>",
+      "env": {
+        "OPENHANDS_SUPPRESS_BANNER": "1"
+      },
+      "started": "2026-09-30T07:40:07.644Z",
+      "ended": "2026-09-30T07:40:15.687Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "SDK/tools 1.50.0 imports passed; no model request\n",
+      "stderr": ""
+    },
+    "exact_origin_main_repaired_osv": {
+      "argv": [
+        "rtk",
+        "<OSV_SCANNER_2_6_0>",
+        "scan",
+        "source",
+        "--config",
+        "<PRIVATE_RESEARCH>/current-main-osv-scanner.toml",
+        "--no-resolve",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+        "--format",
+        "json",
+        "--output-file",
+        "<PRIVATE_RESEARCH>/after-osv.json"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:40:06.874Z",
+      "ended": "2026-09-30T07:40:07.496Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": "",
+      "stderr": "Starting filesystem walk for root: /\nScanned <WORKTREE>/blueprints/runtime-workers/openhands/requirements.lock file and found 174 packages\nEnd status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 19.682266ms elapsed, 19.682336ms wall time\nGHSA-hj66-6f7g-4r5v and 1 alias have been filtered out because: oauthlib 0.6.1 through 3.3.1 (fixed in 4.0.0): RevocationEndpoint wraps its response in the request's callback parameter only when constructed with enable_jsonp=True (oauthlib/oauth2/rfc6749/endpoints/revocation.py:72-73 and 81-82 in 3.3.1); oauthlib's pre-configured servers never pass it. Two allowed locks pin 3.3.1: the OpenHands recipe lock and the frozen, evaluation-only Lumibot lock (run offline under bwrap). A text search of one hash-verified artifact per requirement of both locks found no enable_jsonp or create_revocation_response and no importer of oauthlib's endpoints, grant types or servers: oauthlib is imported only by requests-oauthlib 2.0.0 (client classes, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class); every other RevocationEndpoint is Authlib's own class, and Authlib does not import oauthlib. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: the OpenHands lock was relocked onto PyJWT 2.14.0 on 2026-09-30 and still pins oauthlib 3.3.1; as of 2026-09-30, oauthlib 4.0.0 (PyPI, 2026-09-28T06:01Z) was inside the 7-day window the upstream workspace's exclude-newer applies (until 2026-10-05T06:01:19Z), so the relock onto it follows, tracked in #518 (owner: bc, session native-agent-stack-bc; earliest 2026-10-05T18:40:43Z, when PyJWT 2.15.1 has left its window too; due 2026-10-08), and in the same change deletes the OpenHands entry of IGNORE_ALLOWED_LOCKS, whose sha256 pin fails any change to that lock. The Lumibot lock stays frozen on 3.3.1, so on 2026-10-13 renew this ignore for that lock alone with a new dated reason, or delete that lock.\nGHSA-xpv3-w29h-x7cv and 1 alias have been filtered out because: oauthlib >= 3.0.0, < 4.0.0 (fixed in 4.0.0; the scanned locks pin 3.3.1): an oauthlib authorization server compares the PKCE code_verifier with == (code_challenge_method_s256 at oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:49 and code_challenge_method_plain at :61, in 3.3.1), called only from AuthorizationCodeGrant.validate_token_request (line 506) when a token endpoint handles a request. Neither allowed lock (the OpenHands recipe lock and the frozen Lumibot lock) runs an oauthlib authorization server: in a text search of one hash-verified artifact per requirement of both locks, oauthlib is imported only by requests-oauthlib 2.0.0 (WebApplicationClient, LegacyApplicationClient, the oauth1 Client, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class), and nothing imports oauthlib's grant types, endpoints or servers; the PKCE code in openhands-sdk, requests-oauthlib and google-auth-oauthlib only generates a verifier as a client. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: as for GHSA-hj66-6f7g-4r5v; the OpenHands relock onto oauthlib 4.0.0 removes that lock's pin, and on 2026-10-13 this ignore is renewed for the frozen Lumibot lock alone or that lock is deleted.\nFiltered 2 vulnerabilities from output\n<PRIVATE_RESEARCH>/current-main-osv-scanner.toml has unused ignores:\n - GHSA-8mgp-746c-j5xp\n - GHSA-h35f-9h28-mq5c\n",
+      "config_sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87",
+      "lock_sha256": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676",
+      "report_sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e"
+    },
+    "integration_fixtures": {
+      "argv": [
+        "rtk",
+        "<WHEEL_PREFIX>/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_openhands_150.py",
+        "-v"
+      ],
+      "cwd": "<WORKTREE>",
+      "env": {
+        "OPENHANDS_SUPPRESS_BANNER": "1"
+      },
+      "started": "2026-09-30T07:41:59.423Z",
+      "ended": "2026-09-30T07:42:06.109Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-tests.txt",
+          "sha256": "426019d491fb2f4c889226578487d6ff85a9c5a2648e949d38156cb89c3c73d9",
+          "bytes": 2329
+        },
+        "content": "Complete returned stdout and stderr are retained in this sanitized transcript."
+      },
+      "stderr": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-tests.txt",
+          "sha256": "426019d491fb2f4c889226578487d6ff85a9c5a2648e949d38156cb89c3c73d9",
+          "bytes": 2329
+        }
+      }
+    },
+    "maintained_jwt_callers": {
+      "argv": [
+        "rtk",
+        "<WHEEL_PREFIX>/bin/python",
+        "<PRIVATE_RESEARCH>/maintained-jwt-callers.py",
+        "<WHEEL_PREFIX>/lib/python3.13/site-packages",
+        "<WORKTREE>/blueprints/runtime-workers/openhands"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:43:31.046Z",
+      "ended": "2026-09-30T07:43:39.296Z",
+      "exit_code": 0,
+      "stdout": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-jwt-callers.txt",
+          "sha256": "0b624ccf2ec63ed90a831bb02f7d05a338d490969482bee168179e5ac9a8b775",
+          "bytes": 3023
+        },
+        "content": "Complete returned stdout and stderr are retained in this sanitized transcript."
+      },
+      "stderr": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-jwt-callers.txt",
+          "sha256": "0b624ccf2ec63ed90a831bb02f7d05a338d490969482bee168179e5ac9a8b775",
+          "bytes": 3023
+        }
+      }
+    },
+    "oauthlib_callers_first": {
+      "argv": [
+        "rtk",
+        "<WHEEL_PREFIX>/bin/python",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+        "<WHEEL_PREFIX>/lib/python3.13/site-packages",
+        "<WORKTREE>/blueprints/runtime-workers/openhands"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:46:31.539Z",
+      "ended": "2026-09-30T07:46:57.385Z",
+      "exit_code": 1,
+      "signal": null,
+      "stdout": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers-first.txt",
+          "sha256": "56149cc6f319c70630e6949a3519f5483637bfdaeea2a3af1011c943b228d3ca",
+          "bytes": 6188
+        },
+        "content": "Complete returned stdout and stderr are retained in this sanitized transcript."
+      },
+      "stderr": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers-first.txt",
+          "sha256": "56149cc6f319c70630e6949a3519f5483637bfdaeea2a3af1011c943b228d3ca",
+          "bytes": 6188
+        }
+      }
+    },
+    "oauthlib_callers": {
+      "argv": [
+        "rtk",
+        "<WHEEL_PREFIX>/bin/python",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+        "<WHEEL_PREFIX>/lib/python3.13/site-packages",
+        "<WORKTREE>/blueprints/runtime-workers/openhands"
+      ],
+      "cwd": "<WORKTREE>",
+      "started": "2026-09-30T07:49:11.171Z",
+      "ended": "2026-09-30T07:49:36.606Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.txt",
+          "sha256": "44300134a28b763a02d17f36f34919084409c5e8288f3adc93987f67a6b4d82f",
+          "bytes": 37175
+        },
+        "content": "Complete returned stdout and stderr are retained in this sanitized transcript."
+      },
+      "stderr": {
+        "artifact": {
+          "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.txt",
+          "sha256": "44300134a28b763a02d17f36f34919084409c5e8288f3adc93987f67a6b4d82f",
+          "bytes": 37175
+        }
+      },
+      "script_sha256": "080aa7cece92c786b7977ade5bf851aa776c31dbebafab98decfc5b1ae0e5960"
+    },
+    "published_artifact_source_identity": {
+      "argv": [
+        "rtk",
+        "<WHEEL_PREFIX>/bin/python",
+        "-c",
+        "import hashlib,json,sys,tarfile,zipfile\nfrom pathlib import Path\np,site=map(Path,sys.argv[1:3]); results=[]\nartifacts=json.loads((p/'fresh-caller-artifacts.json').read_text())\nartifacts += [{'filename':'openhands_sdk-1.50.0-py3-none-any.whl','name':'openhands-sdk'}, {'filename':'openhands_tools-1.50.0-py3-none-any.whl','name':'openhands-tools'}]\nfor artifact in artifacts:\n f=p/artifact['filename']; sources=[]\n if f.suffix=='.whl':\n  with zipfile.ZipFile(f) as z:\n   sources=[(n,z.read(n)) for n in z.namelist() if n.endswith('.py')]\n else:\n  with tarfile.open(f,'r:gz') as t:\n   for member in t.getmembers():\n    rel='/'.join(member.name.split('/')[1:])\n    if rel.startswith('func_timeout/') and rel.endswith('.py'):\n     sources.append((rel,t.extractfile(member).read()))\n mismatches=[]\n for rel,data in sources:\n  target=site/rel\n  if not target.is_file() or target.read_bytes()!=data: mismatches.append(rel)\n results.append({'name':artifact['name'],'artifact':f.name,'artifact_sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'python_sources_compared':len(sources),'mismatches':mismatches})\nprint(json.dumps(results,indent=2))\nassert all(r['python_sources_compared']>0 and not r['mismatches'] for r in results)\n",
+        "<PRIVATE_RESEARCH>",
+        "<WHEEL_PREFIX>/lib/python3.13/site-packages"
+      ],
+      "started": "2026-09-30T07:51:48.957Z",
+      "ended": "2026-09-30T07:51:49.110Z",
+      "exit_code": 0,
+      "stdout": "[\n  {\n    \"name\": \"oauthlib\",\n    \"artifact\": \"oauthlib-3.3.1-py3-none-any.whl\",\n    \"artifact_sha256\": \"88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1\",\n    \"python_sources_compared\": 75,\n    \"mismatches\": []\n  },\n  {\n    \"name\": \"requests-oauthlib\",\n    \"artifact\": \"requests_oauthlib-2.0.0-py2.py3-none-any.whl\",\n    \"artifact_sha256\": \"7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36\",\n    \"python_sources_compared\": 15,\n    \"mismatches\": []\n  },\n  {\n    \"name\": \"google-auth-oauthlib\",\n    \"artifact\": \"google_auth_oauthlib-1.2.2-py3-none-any.whl\",\n    \"artifact_sha256\": \"fd619506f4b3908b5df17b65f39ca8d66ea56986e5472eb5978fd8f3786f00a2\",\n    \"python_sources_compared\": 6,\n    \"mismatches\": []\n  },\n  {\n    \"name\": \"func-timeout\",\n    \"artifact\": \"func_timeout-4.3.5.tar.gz\",\n    \"artifact_sha256\": \"74cd3c428ec94f4edfba81f9b2f14904846d5ffccc27c92433b8b5939b5575dd\",\n    \"python_sources_compared\": 6,\n    \"mismatches\": []\n  },\n  {\n    \"name\": \"openhands-sdk\",\n    \"artifact\": \"openhands_sdk-1.50.0-py3-none-any.whl\",\n    \"artifact_sha256\": \"441ea190fb0af2253bf431650f209fedfbb9eb7c41cf35440a0548296d4b0faa\",\n    \"python_sources_compared\": 296,\n    \"mismatches\": []\n  },\n  {\n    \"name\": \"openhands-tools\",\n    \"artifact\": \"openhands_tools-1.50.0-py3-none-any.whl\",\n    \"artifact_sha256\": \"b237043c892111624fdc1fe98e0d29f772ae1f614b487866d926775167c9635e\",\n    \"python_sources_compared\": 93,\n    \"mismatches\": []\n  }\n]\n",
+      "stderr": ""
+    }
+  }
+}

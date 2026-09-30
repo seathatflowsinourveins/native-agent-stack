@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "record": "runtime-litellm-native-workflow-recheck-20260930",
+  "observed_utc": "2026-09-30T22:16:02.063865+00:00",
+  "base_revision": "1f2cdce5a3cdf3f965d45196d8158d12431394d2",
+  "source_patch_revision": "3f0cc3ff62386e355645d6ad5a6932aedcee8041",
+  "source_patch_revision_scope": "Retained local execution-input commit; not a public commit citation or a claim that its provisional index passed.",
+  "evidence_class": "local_integration",
+  "source_references": [
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/f7223996a58fee9f3cab52e8f1cef24f15e39228/.github/workflows/security-scan.yml",
+    "https://github.com/advisories/GHSA-3cv6-jpf6-8222",
+    "docs/acceptance-evidence-policy.md"
+  ],
+  "candidate_requirements_sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+  "candidate_pins_sha256": "73d0465fe1f6b463e68848c447c1124457fe1b5c2132022be543b581d563e6df",
+  "checks": [
+    {
+      "id": "unchanged-native-scan-step",
+      "command": "rtk python3 <PRIVATE_RESEARCH>/nas-runtime-litellm-osv-step-20260930.py",
+      "native_argv": ["rtk", "proxy", "bash", "-c", "<UNCHANGED_STEP_WITH_DECLARED_SHA256>"],
+      "helper_source_sha256": "a241738ba289ac2d4fe596462a1b614d51746e9a155884986f5ae9d6e4611d1f",
+      "helper_source_bytes": 3040,
+      "started_at_utc": "2026-09-30T22:15:59.666737+00:00",
+      "completed_at_utc": "2026-09-30T22:16:02.063865+00:00",
+      "exit_code": 0,
+      "workflow_sha256": "1df67c92865aa16f53cbb9b451fa3fa82a83a50950dc20a8efeea227f93f6240",
+      "step_sha256": "bc092b630dabd7794baa26d5f7ecfa28934c76acc4e27745b9c914d106cc92f7",
+      "scanner_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+      "inventory_count": 56,
+      "scanned_lines": 56,
+      "partitions": {"ordinary": 55, "frozen": 1},
+      "write_sarif": false,
+      "stdout_sha256": "d527f7c06b09f5b0a8f643952bf9693fc3e69cd8ee4618b3aab718a3a72bfe89",
+      "stdout_bytes": 23316,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "last_returned_line": "No issues found"
+    },
+    {
+      "id": "affected-repository-checks",
+      "command": "rtk python3 -B -m unittest tests.test_runtime_worker_openhands tests.test_openhands_150 tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_convergence_contract",
+      "exit_code": 0,
+      "returned_output_excerpt": "Ran 280 tests in 11.413s\n\nOK (skipped=5)",
+      "original_combined_output_bytes": 393,
+      "original_combined_output_sha256": "baa3a6851d42a6ecffe186235f1f5c3b66a620263d1a4413e9dd0c5a391bc532",
+      "scope": "Repository integration tests, including 35 convergence checks. Skips remain explicit; this is not the historical upstream SDK suite or a live provider run."
+    },
+    {
+      "id": "first-reconciled-publication-validator",
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_stdout_json": {"components": 69, "hashed_files": 8951, "profiles": 4, "receipts": 177, "status": "passed"},
+      "original_combined_output_bytes": 161,
+      "original_combined_output_sha256": "c5af7b64908b1bdcc5ebac25bc7af3d5ce6e56f97dbfe3f660589324ef3d4c21",
+      "scope": "Integrity and declared scope after registering the new package evidence. Later documentation/index-only updates require their own integrity checks; no provider or GPU execution."
+    }
+  ],
+  "independent_source_review": {
+    "evidence_class": "source_review",
+    "reviewed_local_revision": "3f0cc3ff62386e355645d6ad5a6932aedcee8041",
+    "role": "independent Astra/Max verifier",
+    "trigger": "Consequential security fix and rebinding the existing OAuth exception to a new lock digest.",
+    "acceptance_result": "Bounded source review accepted; no binding defect found. Dynamic, semantic and compiled-extension limits remain.",
+    "verified_public_bindings": 39,
+    "verified_ledger_commands": 36,
+    "verified_private_records": 41,
+    "verified_original_streams": 82,
+    "returned_output_fidelity": "Public returns match originals after the declared substitutions.",
+    "guard_rerun": {
+      "command": "python3 -B -m unittest tests.test_osv_lockfile_coverage -v",
+      "exit_code": 0,
+      "tests": 38,
+      "skips": 0,
+      "returned_stderr_excerpt": "Ran 38 tests in 0.329s\n\nOK",
+      "returned_stderr_sha256": "9ce49ce04ab1f922e567261dd7a7448fd2ff043db2af08b2478c0e128b6e1f06"
+    },
+    "retained_reviewer_correction": "Initial block helper exit 1 omitted two direct-URL requirements; corrected full-block check exits 0. This is a review-helper correction, not an upstream runtime failure.",
+    "claude_owner_acknowledgement": "Pending at the replacement lock; earlier acknowledgements remain bound to their original heads."
+  },
+  "output_retention": "The exact helper, full original stdout/stderr and returned JSON remain in coordinator-owned private research storage. Historical reconciliation originals were not overwritten. This compact record retains native returned output and hashes; it is not a substitute for the original streams.",
+  "limitations": [
+    "This executes the repository's unchanged scan step locally with the pinned native scanner; it is not an upstream test suite or hosted workflow observation.",
+    "Existing ordinary/frozen configurations, advisory IDs, expiry and inventory are unchanged. A configured green result does not establish semantic unreachability.",
+    "WRITE_SARIF=false leaves SARIF generation and hosted upload unexercised by this execution.",
+    "The prior 832938 independent review remains historical; exact new-lock review and owner acknowledgement are separate gates.",
+    "The published-package repair does not patch the upstream frozen workspace, image, provider or task-quality qualification."
+  ],
+  "usage": {"whole_task_usage": null, "savings_claim": "none", "new_model_or_image_run": false}
+}

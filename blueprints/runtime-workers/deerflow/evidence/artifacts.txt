@@ -1,0 +1,2 @@
+{"status": "passed", "recipe_payload_hashes": 29, "test_hash_matches": true, "json_records": 8, "readme_local_links": "resolved", "changed_paths": 37, "scope": "only authorized recipe and test"}
+

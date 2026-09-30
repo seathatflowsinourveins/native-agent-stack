@@ -1,0 +1,67 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/venv/bin/python", "-c", "import hashlib,json,sys,tarfile,zipfile\nfrom pathlib import Path\np,site=map(Path,sys.argv[1:3]);results=[]\nfor archive_name,extracts in [('sdk-source.tar.gz',['source','source-repro']),('pyjwt-source.tar.gz',['pyjwt-source'])]:\n with tarfile.open(p/archive_name,'r:gz') as a:\n  for extraction in extracts:\n   compared=0;mismatches=[]\n   for member in a.getmembers():\n    if member.isfile():\n     compared+=1;target=p/extraction/member.name\n     if not target.is_file() or target.read_bytes()!=a.extractfile(member).read():mismatches.append(member.name)\n   results.append({'archive':archive_name,'archive_sha256':hashlib.sha256((p/archive_name).read_bytes()).hexdigest(),'extraction':extraction,'original_regular_files_compared':compared,'mismatches':mismatches})\nwheel=p/'pyjwt-2.15.0-py3-none-any.whl';compared=0;mismatches=[]\nwith zipfile.ZipFile(wheel) as z:\n for n in z.namelist():\n  if n.endswith('.py'):\n   compared+=1\n   if (site/n).read_bytes()!=z.read(n):mismatches.append(n)\nresults.append({'artifact':wheel.name,'sha256':hashlib.sha256(wheel.read_bytes()).hexdigest(),'installed_python_sources_compared':compared,'mismatches':mismatches})\nsource=p/'pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68';sdist=p/'pyjwt-sdist/pyjwt-2.15.0';matches=[]\nfor name in ['tests/test_api_jwt.py','tests/test_jwks_client.py','tests/utils.py','tox.ini','pyproject.toml']:\n a=(source/name).read_bytes();b=(sdist/name).read_bytes()\n assert a==b,name\n matches.append({'path':name,'sha256':hashlib.sha256(a).hexdigest(),'tag_sdist_byte_identical':True})\nprint(json.dumps({'archive_and_installed_checks':results,'tag_sdist_selected_test_inputs':matches},indent=2))\nassert all((r.get('original_regular_files_compared',r.get('installed_python_sources_compared',0))>0) and not r['mismatches'] for r in results)\n", "<PRIVATE_RESEARCH>", "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:17:45.884117+00:00
+ended_utc: 2026-09-30T17:17:47.844198+00:00
+exit_code: 0
+
+stdout:
+{
+  "archive_and_installed_checks": [
+    {
+      "archive": "sdk-source.tar.gz",
+      "archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+      "extraction": "source",
+      "original_regular_files_compared": 1800,
+      "mismatches": []
+    },
+    {
+      "archive": "sdk-source.tar.gz",
+      "archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+      "extraction": "source-repro",
+      "original_regular_files_compared": 1800,
+      "mismatches": []
+    },
+    {
+      "archive": "pyjwt-source.tar.gz",
+      "archive_sha256": "9a504f00c4800fd85bb64aaf768d21d66c648d6f79ddfcbbb5209e44455c9261",
+      "extraction": "pyjwt-source",
+      "original_regular_files_compared": 92,
+      "mismatches": []
+    },
+    {
+      "artifact": "pyjwt-2.15.0-py3-none-any.whl",
+      "sha256": "7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8",
+      "installed_python_sources_compared": 12,
+      "mismatches": []
+    }
+  ],
+  "tag_sdist_selected_test_inputs": [
+    {
+      "path": "tests/test_api_jwt.py",
+      "sha256": "8331ec496b0df6f770409d3b0bf2fa470b01222122270284fdca3b905ec77457",
+      "tag_sdist_byte_identical": true
+    },
+    {
+      "path": "tests/test_jwks_client.py",
+      "sha256": "f1f5e0076061c3931ecce432f7fa74986bc2febd820c8e1fb6a3035a3703d708",
+      "tag_sdist_byte_identical": true
+    },
+    {
+      "path": "tests/utils.py",
+      "sha256": "b5b937a60999a63d0515491c7f23f5b39bf534d036c1050deb1094eddf712f14",
+      "tag_sdist_byte_identical": true
+    },
+    {
+      "path": "tox.ini",
+      "sha256": "1674dc3f7b5747e1d4aaf2641b93b1fe8d461da1b1209dcb55c7d1d74995df4d",
+      "tag_sdist_byte_identical": true
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "a89f0097abe7a485da60f4ef152c9e3ef4909ae5d5c0aef86b5178d9ee12b769",
+      "tag_sdist_byte_identical": true
+    }
+  ]
+}
+
+stderr:

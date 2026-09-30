@@ -1,0 +1,10 @@
+argv: ["rtk", "proxy", "gh", "api", "repos/jpadilla/pyjwt/releases/tags/2.15.0", "--jq", "{tag_name,published_at,html_url,body}"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:07:03.233125+00:00
+ended_utc: 2026-09-30T17:07:03.575398+00:00
+exit_code: 0
+
+stdout:
+{"body":"See the [2.15.0 changelog](https://github.com/jpadilla/pyjwt/blob/2.15.0/CHANGELOG.rst) for complete release details.","html_url":"https://github.com/jpadilla/pyjwt/releases/tag/2.15.0","published_at":"2026-09-23T16:51:08Z","tag_name":"2.15.0"}
+
+stderr:

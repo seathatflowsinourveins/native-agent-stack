@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -217,6 +218,71 @@ def isolation_summary(result):
     return summary
 
 
+def independent_observations(result, window, pins):
+    """Read an external collector's host-only evidence; never SDK writable state.
+
+    This is a receipt interface, not an independent collector implementation.
+    CPython os.stat/open and SHA256 provide owner/type/byte checks, not truth.
+    The collector must have a separate trusted native execution/observation
+    source; host polling of the SDK's model-writable event API is insufficient.
+    No fixture or copied worker summary is accepted by this interface.
+    """
+    root = Path(result) / "observer"
+    try:
+        def private_read(name):
+            path = root / name
+            info = path.lstat()
+            if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
+                    or stat.S_IMODE(info.st_mode) != 0o600):
+                raise ValueError("independent_observer_file_must_be_private")
+            return read_bounded(path)
+        metadata = json.loads(private_read("receipt.json"))
+        expected = {"schema_version": 1, "evidence_class": "independent_native_observation",
+                    "source_kind": "isolated_native_executor", "worker_write_reach_excluded": True,
+                    "run_id": window.get("run_id"), "arm": window.get("arm", "control"),
+                    "profile": window.get("profile", "coding"), "source_commit": pins["commit"],
+                    "image": pins["image"]["ref"], "started_at": window.get("started_at"),
+                    "finished_at": window.get("finished_at")}
+        if any(metadata.get(key) != value for key, value in expected.items()):
+            raise ValueError("independent_observer_input_mismatch")
+        source = metadata.get("collector_source", {})
+        if (not isinstance(source, dict) or not re.fullmatch(r"https://github.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", source.get("repository", ""))
+                or not re.fullmatch(r"[a-f0-9]{40}", source.get("commit", "")) or not source.get("file")):
+            raise ValueError("independent_observer_requires_pinned_native_source")
+        captured = {}
+        for name in ("startup.json", "events.jsonl"):
+            content = private_read(name)
+            if metadata.get("artifact_sha256", {}).get(name) != hashlib.sha256(content.encode()).hexdigest():
+                raise ValueError("independent_observer_artifact_mismatch")
+            captured[name] = content
+        startup = json.loads(captured["startup.json"])
+        versions = startup.get("versions", {})
+        if versions != {name: pins["version"] for name in ("openhands-sdk", "openhands-tools")}:
+            raise ValueError("independently_observed_version_mismatch")
+        # /run-input is a host-created read-only mount. Its discovery manifest
+        # was frozen before the first model call; it is not model output.
+        expected_skills = read_json(Path(result) / "input/skills.json")["names"]
+        from recipe import profile_skills, task_profile
+        profile = task_profile({"OPENHANDS_PROFILE": window.get("profile", "coding")})[1]
+        manifest = read_json(Path(result) / "input/skills.json")
+        selected = sorted(profile_skills({name: None for name in expected_skills}, manifest, profile))
+        if startup.get("listed_skills") != selected:
+            raise ValueError("independently_observed_skill_listing_mismatch")
+        events = [json.loads(line) for line in captured["events.jsonl"].splitlines() if line.strip()]
+        observed = observations(events, selected)
+        transport = metadata.get("transport", {})
+        transport_verified = (transport == {"api_mode": "responses", "reasoning_effort": "max",
+                                            "sampling_parameters_present": False,
+                                            "streaming_observed": True, "tool_round_trip_observed": True})
+        return {"status": "observed", "observed_versions": versions,
+                "skills_listed_at_start": selected, "skill_listing_matches_manifest": True,
+                **observed, "transport_verified": transport_verified,
+                "collector_source": {key: source[key] for key in ("repository", "commit", "file")},
+                "scope_note": "External collector provenance is declared and must be independently reviewed; hashes check byte binding only."}
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return {"status": NOT_COLLECTED}
+
+
 def create_receipt(result, database=None):
     result = Path(result)
     window = read_json(result / "window.json")
@@ -253,6 +319,8 @@ def create_receipt(result, database=None):
                    and checked.get("conversion_exit_code") == 0 and window.get("worker_exit_code") == 0)
     termination = window.get("agent_termination")
     usage = summarize_gateway(rows, selection)
+    independent = independent_observations(result, window, pins)
+    isolation = isolation_summary(result)
     def removals(*patterns):
         found = []
         for path in sorted(path for pattern in patterns for path in result.glob(pattern)):
@@ -261,13 +329,22 @@ def create_receipt(result, database=None):
             except (OSError, ValueError, AttributeError):
                 found.append(False)
         return {"attempts": len(found), "confirmed_removed": sum(found), "complete": bool(found) and all(found)}
+    containers = removals("*.log.cleanup.json", "probes/*/*.log.cleanup.json")
+    networks = removals("network-*.cleanup.json")
+    complete = (task_passed and independent["status"] == "observed"
+                and independent.get("transport_verified") is True
+                and bool(independent.get("skills_observed"))
+                and bool(independent.get("mcp_calls_observed"))
+                and usage["successful_rows"] > 0 and usage["effort_verified"] and usage["totals"] is not None
+                and isolation.get("passed") is True and containers["complete"] and networks["complete"])
     return {
-        "schema_version": 6, "evidence_class": "SDK inference adapter with official SWE-bench grading",
+        "schema_version": 7, "evidence_class": "SDK inference adapter with official SWE-bench grading",
+        "profile": window.get("profile", "coding"),
         **{k: selection[k] for k in ("arm", "base_url", "gateway_upstream", "requested_model", "gateway_model",
                                      "gateway_path", "compression_combo")},
         "header_names": window.get("header_names", sorted(selection["headers"])),
         "framework": "OpenHands software-agent-sdk", "expected_version": pins["version"],
-        "observed_versions": NOT_COLLECTED,
+        "observed_versions": independent.get("observed_versions", NOT_COLLECTED),
         "image": pins["image"]["ref"], "source_commit": pins["commit"],
         "window": {key: window[key] for key in ("started_at", "finished_at")},
         "worker_exit_code": window.get("worker_exit_code"),
@@ -279,15 +356,16 @@ def create_receipt(result, database=None):
         # The terminal shares the SDK's UID and writable persistence. Source:
         # SDK@fcc102a tools/terminal/terminal/subprocess_terminal.py:157-170.
         # Without a separate observer nothing can prove skill use or SDK identity.
-        "evidence_complete": False,
+        "evidence_complete": bool(complete),
         "independent_trace_required": True,
-        "not_collected_reason": NOT_COLLECTED_REASON,
-        "skills_listed_at_start": NOT_COLLECTED, "skill_listing_matches_manifest": NOT_COLLECTED,
+        "not_collected_reason": NOT_COLLECTED_REASON if independent["status"] != "observed" else None,
+        "skills_listed_at_start": independent.get("skills_listed_at_start", NOT_COLLECTED),
+        "skill_listing_matches_manifest": independent.get("skill_listing_matches_manifest", NOT_COLLECTED),
         # host.cleanup_container and host.cleanup_network records, counted
         # separately; probe containers log beside their output directories.
-        "container_cleanup": removals("*.log.cleanup.json", "probes/*/*.log.cleanup.json"),
-        "network_cleanup": removals("network-*.cleanup.json"),
-        "isolation": isolation_summary(result),
+        "container_cleanup": containers,
+        "network_cleanup": networks,
+        "isolation": isolation,
         "gateway": {
             "read_mode": "read_only", "columns": list(COLUMNS), "status": db_status, **usage,
             "entry_port": selection["gateway_port"],
@@ -298,8 +376,11 @@ def create_receipt(result, database=None):
             "usage_note": "Sum each entry row once, including failed calls; never add 20128 to 20129. Cache-read is an input subset. Missing counters keep totals null.",
         },
         "compression": window.get("compression", {"delta": None, "status": "unavailable"}),
-        "trace_status": NOT_COLLECTED, "mcp_calls_observed": NOT_COLLECTED,
-        "mcp_errors_observed": NOT_COLLECTED, "skills_observed": NOT_COLLECTED,
+        "trace_status": independent["status"], "mcp_calls_observed": independent.get("mcp_calls_observed", NOT_COLLECTED),
+        "mcp_errors_observed": independent.get("mcp_errors_observed", NOT_COLLECTED),
+        "skills_observed": independent.get("skills_observed", NOT_COLLECTED),
+        "independent_observer": {key: value for key, value in independent.items()
+                                 if key in {"status", "collector_source", "transport_verified", "scope_note"}},
         "upstream_grader": {
             **{key: verdict.get(key) for key in ("upstream_resolved", "upstream_bucket", "report_sha256")},
             "benchmark_commit": pins["grader"]["commit"],

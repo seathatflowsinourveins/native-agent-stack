@@ -24,6 +24,11 @@
 # that still lists that advisory.
 [[IgnoredVulns]]
 id = "GHSA-8mgp-746c-j5xp"
+# 2026-09-30: the GPT Researcher and Crawl4AI source-only allowances are bound
+# to exact locks in IGNORE_ALLOWED_LOCKS and independently rechecked in
+# evidence/artifacts/runtime-roster-20260930/lock-scan-and-nltk-scope.json.
+# No new ignored advisory or expiry extension; dynamic/model-artifact paths
+# and broader worker activation remain outside this bounded source review.
 ignoreUntil = 2026-12-24
 reason = "nltk through 3.10.3: TransitionParser.train/parse, AveragedPerceptron.save/load, PerceptronTagger.save_to_json and nltk.classify.maxent.save_maxent_params open caller-chosen model paths with the built-in open() instead of the pathsec helpers (the advisory's comparison case is the guarded PerceptronTagger.load_from_json, which in 3.10.3 still authorizes a caller-chosen private model directory), so untrusted input that chooses a model import or export path can read or write outside the allowed roots; pathsec enforcement is on by default (ENFORCE = True in nltk/pathsec.py of 3.10.3). No patched release as of 2026-09-27; the fixes are merged on develop (nltk #3757, #3759, #3813). Each lock allowed to pin nltk is named, with its reviewed sha256 and non-reachability evidence, in IGNORE_ALLOWED_LOCKS in tests/test_osv_lockfile_coverage.py. Lumibot lock: nltk 3.10.3 is a transitive pin (google-adk, llama-index-core) of the evaluation-only Lumibot 4.6.1 environment, run offline under bwrap, and no trial code calls these APIs (evidence: blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json). Expiry plan: relock every allowed lock onto the first nltk release that ships those fixes, then delete this ignore; delete the Lumibot lock unless a verdict has adopted Lumibot."
 

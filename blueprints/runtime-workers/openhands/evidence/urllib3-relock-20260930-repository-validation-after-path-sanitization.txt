@@ -1,0 +1,12 @@
+argv: ["rtk", "proxy", "python3", "scripts/validate.py"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:56:30.505407+00:00
+ended_utc: 2026-09-30T15:56:52.440188+00:00
+exit_code: 1
+
+stdout:
+Publication validation failed:
+blueprints/runtime-workers/openhands/pins.json: SHA-256 mismatch
+blueprints/runtime-workers/openhands/requirements.lock: SHA-256 mismatch
+
+stderr:

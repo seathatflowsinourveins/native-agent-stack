@@ -1,0 +1,26 @@
+Publication validation failed:
+blueprints/runtime-workers/openhands/dispatch.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/dispatch.py: byte count mismatch
+blueprints/runtime-workers/openhands/e2e/netprobe.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/e2e/netprobe.py: byte count mismatch
+blueprints/runtime-workers/openhands/host.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/host.py: byte count mismatch
+blueprints/runtime-workers/openhands/install-container.sh: SHA-256 mismatch
+blueprints/runtime-workers/openhands/install.sh: SHA-256 mismatch
+blueprints/runtime-workers/openhands/mcp_guard.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/mcp_guard.py: byte count mismatch
+blueprints/runtime-workers/openhands/pins.json: SHA-256 mismatch
+blueprints/runtime-workers/openhands/receipt.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/receipt.py: byte count mismatch
+blueprints/runtime-workers/openhands/recipe.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/recipe.py: byte count mismatch
+blueprints/runtime-workers/openhands/requirements.lock: SHA-256 mismatch
+blueprints/runtime-workers/openhands/requirements.lock: byte count mismatch
+blueprints/runtime-workers/openhands/run-e2e.sh: SHA-256 mismatch
+blueprints/runtime-workers/openhands/server_transport.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/server_transport.py: byte count mismatch
+blueprints/runtime-workers/openhands/worker.py: SHA-256 mismatch
+blueprints/runtime-workers/openhands/worker.py: byte count mismatch
+tests/test_runtime_worker_openhands.py: SHA-256 mismatch
+tests/test_runtime_worker_openhands.py: byte count mismatch
+tests/test_openhands_150.py: contains possible local session identifier

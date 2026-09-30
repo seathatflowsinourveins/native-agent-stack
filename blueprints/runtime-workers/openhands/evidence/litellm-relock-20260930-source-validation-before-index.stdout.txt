@@ -1,0 +1,8 @@
+Publication validation failed:
+blueprints/runtime-workers/openhands/README.md: SHA-256 mismatch
+blueprints/runtime-workers/openhands/README.md: byte count mismatch
+blueprints/runtime-workers/openhands/pins.json: SHA-256 mismatch
+blueprints/runtime-workers/openhands/requirements.lock: SHA-256 mismatch
+blueprints/runtime-workers/openhands/requirements.lock: byte count mismatch
+tests/test_osv_lockfile_coverage.py: SHA-256 mismatch
+tests/test_osv_lockfile_coverage.py: byte count mismatch

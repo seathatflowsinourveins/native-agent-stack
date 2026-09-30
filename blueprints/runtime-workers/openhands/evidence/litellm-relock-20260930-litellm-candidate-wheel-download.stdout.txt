@@ -1,0 +1,1 @@
+{"filename": "litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl", "bytes": 20158336, "sha256": "dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692", "official_download_digest_match": true}

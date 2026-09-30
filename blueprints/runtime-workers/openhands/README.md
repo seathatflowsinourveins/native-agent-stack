@@ -1,5 +1,209 @@
 # OpenHands coding runtime worker
 
+## Current candidate: SDK/server 1.50.0 (2026-09-30)
+
+The active recipe pins **1.50.0** at
+[`dcf401af7a9a302ef92cb7d092e1df9bb659daa5`](https://github.com/OpenHands/software-agent-sdk/tree/dcf401af7a9a302ef92cb7d092e1df9bb659daa5),
+the matching official `1.50.0-python` image by digest, and published SDK/tools
+wheels by SHA256. [pins.json](pins.json) is the current input; the unchanged
+[1.49.6 pins](evidence/pins-1.49.6.json) bind the historical scan and failed
+receipts below. The upgrade retains those attempts. Use `install.sh` and
+`run-e2e.sh` for the current prefix; older 1.49.6 command examples below record
+the previous qualification work.
+
+The current [wheel-closure receipt](evidence/litellm-relock-20260930.json) binds
+lock **`38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb`**
+for **Linux x86_64, CPython 3.13.15**. It changes only LiteLLM 1.93.0 → 1.93.2;
+all **175 other package blocks, including hashes, remain byte-identical** to
+the previous `832938…` lock. SDK/tools remain at 1.50.0 and OAuthlib at 3.3.1.
+
+[GHSA-3cv6-jpf6-8222](https://github.com/advisories/GHSA-3cv6-jpf6-8222), indexed
+by GitHub at **21:11:25Z on 2026-09-30**, identifies 1.93.2 as the patched
+release for the selected branch. Its official CPython 3.13 Linux wheel and
+sdist were uploaded on August 9. The
+[maintained OpenHands cutoff instruction](https://github.com/OpenHands/software-agent-sdk/blob/395b94b0c3c4994f6c530f1e3bf3196f71fab950/pyproject.toml#L8)
+says to bump or remove the July 20 LiteLLM cutoff when upgrading past 1.93.0.
+This published-package compile removes that older package cutoff, retains the
+relative **`7 days`** policy and LMNR's August 23 cutoff, and disables config
+discovery explicitly. The original policy control reproduces `832938…` exactly;
+the candidate compile and explicit no-config reproduction agree exactly.
+
+Fresh hash-required build/runtime installation, `uv pip check` before and after
+test tools, imports, and the twelve existing SDK fixtures returned **0**.
+The untouched [tagged LiteLLM URL test module](https://github.com/BerriAI/litellm/blob/cd1bd0f4b8af865f8d05fbd938392fdd4703babc/tests/test_litellm/litellm_core_utils/test_url_utils.py)
+passed **68 tests, zero skips**, against the installed 1.93.2 wheel, with the
+tagged pytest configuration and its pinned pytest/asyncio versions. That is a
+bounded upstream module run; it does not execute the authenticated proxy or the
+complete native workspace suite. The source check compares all **2,104** wheel
+Python files with the installed files and the official sdist, with no mismatch.
+Both official 1.93.0/1.93.2 source sets contain no OAuthlib/advisory-name hits.
+
+Native OSV Scanner 2.6.0 recognizes 174 packages. The previous lock now returns
+**1** under the existing configuration, solely for the new LiteLLM advisory;
+the new lock returns **0**. Its empty-config control returns **1**, solely for
+the two retained OAuthlib advisories. Fresh maintained caller scans and the
+nine prior OAuthlib/text-only source identities bind this exact candidate.
+Static name/AST checks do not prove semantic or dynamic unreachability, and
+one compiled LiteLLM extension is outside the Python source sweep. No ignore
+or expiry changes. A fresh independent review of this digest remains pending.
+
+The published wheels use supported dependency ranges; the unchanged upstream
+workspace pins and `uv.lock`, its `--frozen` execution, and the pinned image
+still retain their prior LiteLLM selection. This wheel repair does not qualify
+those workspace/image inputs or remove the recorded image acceptance gate.
+
+### Previous PyJWT wheel closure (historical)
+
+The previous [wheel-closure receipt](evidence/pyjwt-relock-20260930.json) binds
+lock **`83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a`**
+for **Linux x86_64, CPython 3.13.15**. Its 176 selected versions differ from the
+original reconciled `383ccc5b…` closure only in urllib3 2.7.0 → 2.8.0 and
+PyJWT 2.14.0 → 2.15.0; 175 versions remain unchanged from the `bd1cbbe8…`
+intermediate. SDK/tools stay at the pinned 1.50.0 source above. Click 8.5.0,
+pypdf 6.19.0, Soup Sieve 2.9.2, AnyIO 4.14.2 and OAuthlib 3.3.1 remain selected.
+After PyJWT's seven-day publication cutoff, native `uv pip compile` retained the
+upstream relative `7 days` policy and package cutoffs, reproduced the bd1 control,
+and reproduced 832 from a second pristine SDK source extraction.
+
+Fresh hash-required installation, `uv pip check` and imports returned **0**.
+The twelve unchanged local fixtures against the installed SDK passed with model
+calls patched. These fixtures qualify our integration within that scope.
+[PyJWT 2.15.0's tagged decoder](https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/jwt/api_jwt.py#L297)
+normalizes payload `RecursionError` to `DecodeError`. The unchanged
+[decoder regression](https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_api_jwt.py#L182)
+and [JWK-client regression](https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_jwks_client.py#L329)
+passed through the official
+[`py313-crypto` tox recipe](https://github.com/jpadilla/pyjwt/blob/1d41a6478e1562e68ff667fcd703356acf085f68/tox.ini#L34):
+**2 passed, 0 skipped**, exit 0. Running those same untouched tests against the
+installed wheels from a neutral working directory, with `jwt.__file__` observed
+inside the test process, gave **2/2 failures** for bd1's 2.14.0 wheel and
+**2/2 passes** for the candidate's 2.15.0 wheel. This installed-wheel check is
+local integration around unchanged upstream tests.
+
+At **17:15:28–30Z on 2026-09-30**, native OSV Scanner 2.6.0 recognized 174
+packages and returned **0** under the existing, expiring OAuthlib exceptions.
+Its empty-config control returned **1**, solely for OAuthlib 3.3.1 findings
+`GHSA-hj66-6f7g-4r5v` and `GHSA-xpv3-w29h-x7cv`. Fresh caller sweeps retain the
+same nine OAuthlib source bindings as bd1. Static caller and re-export review
+retains its dynamic reachability limitations; no OAuth server endpoint was run.
+The receipt and [command ledger](evidence/pyjwt-relock-20260930-commands.json)
+preserve actual native returns and distinguish upstream tests, local integration
+and fixtures.
+
+The [published independent BC review](https://github.com/seathatflowsinourveins/native-agent-stack/blob/54d09ee8810ed98059347097277fcd9f8432de36/evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/receipt.json)
+binds the **832938** lock at reviewed head `7c0df369…`, unchanged at `f764a315…`.
+Receipt SHA256 is
+`b0742663250afe8eff4692ad7be26b1b894d9977c80154ee3fa71e878efbe880`.
+Its original outputs record a fresh hashed Linux install, dependency/import
+checks, native scanner controls and 245 repository tests with five skips.
+The bounded static caller review retains dynamic reachability limitations;
+it does not prove semantic unreachability. [PR #558](https://github.com/seathatflowsinourveins/native-agent-stack/pull/558)
+was open when cited; publication supplies no merge, image, provider, observer
+or task-quality acceptance. The
+[historical independent review](../../../evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/receipt.json)
+published through merged [PR #537](https://github.com/seathatflowsinourveins/native-agent-stack/pull/537)
+covers only `383ccc5b…`: corrected main-version comparison, Linux installation,
+static OAuthlib callers and dated native install/scanner controls. Its receipt
+SHA256 remains
+`c7473105255cc38bac1da6c7a490f99d863b58d865e82529d221b2a2e759908f`.
+It does not independently review the 832 closure.
+
+The [original main-lock reconciliation](evidence/main-reconcile-20260930.json)
+and its `383ccc5b…` native outputs remain historical. That reconciliation
+compared the selected versions with reviewed main (`f03f41c7`, lock `14e57b8d…`)
+and corrected the earlier [wheel-lock repair](evidence/wheel-relock-20260930.json),
+whose Click 8.3.3, pypdf 6.16.1 and Soup Sieve 2.9 selections unnecessarily
+lowered reviewed main versions. The
+[urllib3-only intermediate](evidence/urllib3-relock-20260930.json), `bd1cbbe8…`,
+also remains historical and time-bound: its initial configured scan returned 0,
+then its preserved rescan returned 1 for the newly published PyJWT advisory.
+All original outputs retain their dates.
+
+The original SDK 1.50.0 upgrade recorded an isolated native `make build` and
+**1,208 unchanged upstream tests passed** with the upstream lock unchanged;
+those historical build/test outputs are not newly executed closure evidence.
+A later native Grype scan of the pinned image returned **56 fixable
+High/Critical package/advisory matches**. The
+[scan and primary-source triage](evidence/image-triage-20260930.json) retain
+possible identity collisions separately from bundled runtime findings.
+**Image acceptance remains pending.** The shared native ordinary/frozen scan
+split merged through [PR #546](https://github.com/seathatflowsinourveins/native-agent-stack/pull/546)
+as `8fc86119…`; it supplies no image qualification. Gate A/P3, provider,
+independent observer and task-quality qualification remain open; no whole-task
+savings acceptance follows from this closure. No model call, gateway change,
+new optional service or worker container was started by these relocks.
+
+The supported runtime installation consumes this lock inside the pinned
+`linux/amd64` image: `install.sh` invokes `host.py install`, which runs
+`install-container.sh` through Docker with the pinned platform and image
+identity checks. That script uses `/usr/local/bin/python` with Python downloads
+disabled. The [tagged Dockerfile](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/docker/Dockerfile#L39)
+selects Python 3.13.15. These entrypoints have no native macOS consumer of the
+runtime lock; `install-grader.sh` uses the grader's separate upstream `uv.lock`.
+No installer code change was required. This source trace is distinct from
+starting or qualifying the image, which remains pending.
+
+`OPENHANDS_PROFILE` selects `coding` (default), `planning`, `research`, `review`,
+`github-workflow`, `browser`, `orchestration`, or `completion-review`.
+[The profile manifest](config/profiles.json) cites the native upstream examples.
+Planning preserves `get_planning_agent`'s prompt, restricted tools and condenser;
+BrowserToolSet is added only for the browser profile. Browser binaries, network
+reachability and interaction acceptance still require independent qualification.
+Skills remain native objects; role-relevant descriptions are exposed and native
+`invoke_skill` supplies bodies/resources. GitHub profiles select the applicable
+GitHub/debug/verification descriptions instead of the entire coding set.
+
+Orchestration uses native TaskToolSet with two concurrent tools and registered
+coding, research and review children. Each child explicitly verifies its route,
+max effort and Responses transport, receives its own tools/skills and usage ID,
+and has a native 12-iteration definition. Children have no delegation tool. A
+native PreToolUse hook refuses ambient agent types. The total attempt keeps the
+existing 40-iteration, 1,200-second and container resource bounds.
+
+Completion review uses the native goal loop with at most **three audits** and a
+separate `goal-judge` LLM/metrics object. The REST server's supported preload
+passes its public `judge_llm` argument explicitly. The native judge calls
+`completion`, while the SDK's API-mode dispatcher is `generate`; the owned
+transport adapter forwards completion/acompletion through generate/agenerate
+for Responses-configured LLMs. This is **our integration**, tested with patched
+calls against the actual installed SDK; it is not unchanged upstream acceptance.
+It preserves native serialization, call-context binding, retries, tool calls
+and return contracts. Sampling parameters are refused before transport.
+
+The existing `start → wait → result` interface also exposes native `interrupt`
+and `resume`. They preserve the same conversation ID, persistence, deadline and
+serial reservation. Goal tasks use the native goal stop/resume routes, and wait
+checks the persisted native goal status before collecting a terminal run. The
+event API is used only for lifecycle; it does not certify task quality.
+
+```sh
+rtk python3 blueprints/runtime-workers/openhands/dispatch.py interrupt --run-id "$OPENHANDS_RUN_ID" --arm control
+rtk python3 blueprints/runtime-workers/openhands/dispatch.py resume --run-id "$OPENHANDS_RUN_ID" --arm control
+```
+
+P3's previous skeleton now has an explicit `netprobe.py p3 --out ... --run-id ...`
+implementation: native streamed Responses tool call/replay, forged headers,
+query denial, and a separate Chat correlation probe. It refuses execution
+outside an owned container or on the engines-on arm. Its output leaves the
+independent gateway verdict pending and never writes coordinator stage gates.
+P0–P5 prerequisites are unchanged; this code has not run a live P3 call.
+
+Receipt schema **7** can ingest a host-only external observer bundle at
+`<attempt>/observer/{receipt.json,startup.json,events.jsonl}`. Files must be owned
+0600 regular files outside worker mounts, bound to the run/arm/profile/window,
+source/image pins and artifact hashes. Metadata must declare a pinned native
+collector source and an independently isolated execution source; fixtures,
+worker summaries and polling of the model-writable native event store are
+refused. See `independent_observations` for the exact interface. This addition
+provides **ingestion only**; no independent collector is installed or qualified.
+The existing exclusions on `/run-output` and `/state/server` remain.
+`task_passed` still requires the official grader. `evidence_complete` additionally
+requires the independent observations, verified transport/skill activation,
+gateway effort/usage, isolation and cleanup. Source declarations and hashes
+check consistency, not truth: the coordinator must qualify the real observer.
+
+## Historical 1.49.6 baseline and qualification attempts
+
 Round 3 provides a source-backed **native agent-server REST dispatch** for a
 frozen SWE-bench task with two explicit gateway arms. SDK/server **1.49.6** owns
 the agent loop. **SWE-bench 4.1.0** alone supplies the task verdict through the

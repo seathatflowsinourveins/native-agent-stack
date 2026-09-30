@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "commands": [
+    {
+      "id": "reviewed-main-blob",
+      "argv": [
+        "rtk",
+        "proxy",
+        "git",
+        "show",
+        "f03f41c7:blueprints/runtime-workers/openhands/requirements.lock"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:54:47Z",
+      "exit_code": 0,
+      "stdout_sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-reviewed-main-blob.txt"
+    },
+    {
+      "id": "fresh-venv",
+      "argv": [
+        "rtk",
+        "uv",
+        "venv",
+        "--python",
+        "<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13",
+        "--no-python-downloads",
+        "<PRIVATE_RESEARCH>/venv"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:54:49Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4659e1b647e924cd06b318189ebe6cffc523bdf2be934849a17cafcaade58cc1",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-venv.txt"
+    },
+    {
+      "id": "build-hash-install",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "--require-hashes",
+        "--no-deps",
+        "--only-binary",
+        ":all:",
+        "--index-url",
+        "https://pypi.org/simple",
+        "-r",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/build-requirements.lock"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:54:49Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e0d530566532d34d886856423f50efa569f6bd8a08473617a75f5f381cbc466c",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-build-hash-install.txt"
+    },
+    {
+      "id": "native-compile",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "compile",
+        "<PRIVATE_RESEARCH>/requirements.in",
+        "--constraints",
+        "<PRIVATE_RESEARCH>/reviewed-main-constraints.txt",
+        "--generate-hashes",
+        "--no-header",
+        "--no-annotate",
+        "--index-url",
+        "https://pypi.org/simple",
+        "--python-version",
+        "3.13.15",
+        "--python-platform",
+        "x86_64-unknown-linux-gnu",
+        "--exclude-newer",
+        "7 days",
+        "--exclude-newer-package",
+        "litellm=2026-07-20T00:00:00Z",
+        "--exclude-newer-package",
+        "lmnr=2026-08-23T00:00:00Z",
+        "--output-file",
+        "<PRIVATE_RESEARCH>/candidate.lock"
+      ],
+      "cwd": "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+      "started_utc": "2026-09-30T08:54:50Z",
+      "exit_code": 0,
+      "stdout_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+      "stderr_sha256": "c195b26d43305c01a1b54b7a6b4284ef3239833e7a94885ef967e195c6274a51",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile.txt"
+    },
+    {
+      "id": "fresh-extraction-reproduction",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "compile",
+        "<PRIVATE_RESEARCH>/requirements.in",
+        "--constraints",
+        "<PRIVATE_RESEARCH>/reviewed-main-constraints.txt",
+        "--generate-hashes",
+        "--no-header",
+        "--no-annotate",
+        "--index-url",
+        "https://pypi.org/simple",
+        "--python-version",
+        "3.13.15",
+        "--python-platform",
+        "x86_64-unknown-linux-gnu",
+        "--exclude-newer",
+        "7 days",
+        "--exclude-newer-package",
+        "litellm=2026-07-20T00:00:00Z",
+        "--exclude-newer-package",
+        "lmnr=2026-08-23T00:00:00Z",
+        "--output-file",
+        "<PRIVATE_RESEARCH>/reproduced.lock"
+      ],
+      "cwd": "<PRIVATE_RESEARCH>/source-repro/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+      "started_utc": "2026-09-30T08:54:50Z",
+      "exit_code": 0,
+      "stdout_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+      "stderr_sha256": "2e6808a77e9ac779bc7510180a70e834a5554dfcba6969e6c94c2b4bc646bd52",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-extraction-reproduction.txt"
+    },
+    {
+      "id": "runtime-hash-install",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "--require-hashes",
+        "--no-deps",
+        "--no-build-isolation",
+        "--index-url",
+        "https://pypi.org/simple",
+        "-r",
+        "<PRIVATE_RESEARCH>/candidate.lock"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:55:44Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "2bc4f1e0c5d20e189c3655511e39df3dd517156805506198e1d02e6d8aca7c2a",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-runtime-hash-install.txt"
+    },
+    {
+      "id": "native-pip-check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<PRIVATE_RESEARCH>/venv/bin/python"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:55:45Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "13b49d7aeb121e68c5121605e3db391c220eaeadeca00f6bca8b2b00927cbdc0",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-pip-check.txt"
+    },
+    {
+      "id": "native-imports",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "-c",
+        "import sys,platform,importlib.metadata as m; from openhands.sdk import LLM,Agent,Conversation; from openhands.tools.task import TaskToolSet; from openhands.tools.browser_use import BrowserToolSet; assert sys.implementation.name==\"cpython\" and platform.python_version()==\"3.13.15\" and platform.system()==\"Linux\" and platform.machine()==\"x86_64\"; assert m.version(\"openhands-sdk\")==m.version(\"openhands-tools\")==\"1.50.0\"; print(\"CPython 3.13.15 Linux x86_64; SDK/tools 1.50.0 imports passed; no model request\"); print({p:m.version(p) for p in (\"click\",\"pypdf\",\"soupsieve\",\"PyJWT\",\"oauthlib\")})"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:55:45Z",
+      "exit_code": 0,
+      "stdout_sha256": "186ad600ecf01a4a6f73b1f114dc43e408d782349b8e073501f4cbc7ef024610",
+      "stderr_sha256": "f6f4156bf3e5e2da69a8f8f4c5d672a2433ce1376f8d467f018987a066078ed8",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-imports.txt"
+    },
+    {
+      "id": "actual-sdk-fixtures",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_openhands_150",
+        "-v"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:55:51Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "46359073df0f671463f69fde72f85d940f5213a92614e924397213042ceb27ed",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-actual-sdk-fixtures.txt"
+    },
+    {
+      "id": "maintained-jwt-callers",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.jwt-callers.py.txt",
+        "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages",
+        "<WORKTREE>/blueprints/runtime-workers/openhands"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:55:58Z",
+      "exit_code": 0,
+      "stdout_sha256": "0936bf2a74787b6860ee8cf0627e6621031d6e2bc8a2a2288885aab919d10982",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-maintained-jwt-callers.txt"
+    },
+    {
+      "id": "oauthlib-alias-callers",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+        "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages",
+        "<WORKTREE>/blueprints/runtime-workers/openhands"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:56:04Z",
+      "exit_code": 0,
+      "stdout_sha256": "5b6328e2bd292afc13d4a4eaab9e85abf989eae7879e4630478a442a8e390813",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-oauthlib-alias-callers.txt"
+    },
+    {
+      "id": "published-artifact-source-identity",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "-c",
+        "import hashlib,json,sys,tarfile,zipfile\nfrom pathlib import Path\np,site=map(Path,sys.argv[1:3]); results=[]\nartifacts=json.loads((p/'fresh-caller-artifacts.json').read_text())\nartifacts += [{'filename':'openhands_sdk-1.50.0-py3-none-any.whl','name':'openhands-sdk'}, {'filename':'openhands_tools-1.50.0-py3-none-any.whl','name':'openhands-tools'}]\nfor artifact in artifacts:\n f=p/artifact['filename']; sources=[]\n if f.suffix=='.whl':\n  with zipfile.ZipFile(f) as z:\n   sources=[(n,z.read(n)) for n in z.namelist() if n.endswith('.py')]\n else:\n  with tarfile.open(f,'r:gz') as t:\n   for member in t.getmembers():\n    rel='/'.join(member.name.split('/')[1:])\n    if rel.startswith('func_timeout/') and rel.endswith('.py'):\n     sources.append((rel,t.extractfile(member).read()))\n mismatches=[]\n for rel,data in sources:\n  target=site/rel\n  if not target.is_file() or target.read_bytes()!=data: mismatches.append(rel)\n results.append({'name':artifact['name'],'artifact':f.name,'artifact_sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'python_sources_compared':len(sources),'mismatches':mismatches})\nprint(json.dumps(results,indent=2))\nassert all(r['python_sources_compared']>0 and not r['mismatches'] for r in results)\n",
+        "<PRIVATE_RESEARCH>",
+        "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:57:20Z",
+      "exit_code": 0,
+      "stdout_sha256": "7831e94cb56127e8f8fac95c27280fb51baf4a79d3f143af61efe386c4843179",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-published-artifact-source-identity.txt"
+    },
+    {
+      "id": "osv-version",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/osv-scanner",
+        "--version"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T08:57:21Z",
+      "exit_code": 0,
+      "stdout_sha256": "e0bc7fa9d9b902f5179238abc870bc238c6f119e8c4c0b58b63fd26289fc5ea7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-version.txt"
+    },
+    {
+      "id": "osv-ci-config",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/osv-scanner",
+        "scan",
+        "source",
+        "--config",
+        "<PRIVATE_RESEARCH>/ci-config.toml",
+        "--no-resolve",
+        "--lockfile=requirements.txt:<PRIVATE_RESEARCH>/candidate.lock",
+        "--format",
+        "json"
+      ],
+      "cwd": "<PRIVATE_RESEARCH>",
+      "started_utc": "2026-09-30T08:57:21Z",
+      "exit_code": 0,
+      "stdout_sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "stderr_sha256": "c44f62baca529162c2aa886ab1980295a926dd3e34b158c724cc6dc5cd0ee009",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-ci-config.txt"
+    },
+    {
+      "id": "osv-empty-config",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/osv-scanner",
+        "scan",
+        "source",
+        "--config",
+        "<PRIVATE_RESEARCH>/empty-config.toml",
+        "--no-resolve",
+        "--lockfile=requirements.txt:<PRIVATE_RESEARCH>/candidate.lock",
+        "--format",
+        "json"
+      ],
+      "cwd": "<PRIVATE_RESEARCH>",
+      "started_utc": "2026-09-30T08:57:21Z",
+      "exit_code": 1,
+      "stdout_sha256": "b7512a776451875bc56b3aa3221164b40de6aa16cd6b4f803ef10796c9092b50",
+      "stderr_sha256": "784bce3184327d8c97219e8b768d6fec1dcd3931ba7ef313d8699b1ab6374f80",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-empty-config.txt"
+    },
+    {
+      "id": "selected-dependency-comparison",
+      "argv": [
+        "rtk",
+        "<PRIVATE_RESEARCH>/venv/bin/python",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-compare.py.txt",
+        "<PRIVATE_RESEARCH>"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T09:03:24Z",
+      "exit_code": 0,
+      "stdout_sha256": "b01a987646e5ba167193335d69c98455739825148d15b75fee1982669185831e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-selected-dependency-comparison.txt"
+    },
+    {
+      "id": "native-uv-version",
+      "argv": [
+        "rtk",
+        "uv",
+        "--version"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T09:04:39Z",
+      "exit_code": 0,
+      "stdout_sha256": "dd643ebda7165a77a7fe3c9f445ec1a2cfebe1bfe0329015937763dce919c33d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-uv-version.txt"
+    },
+    {
+      "id": "native-compile-help",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "compile",
+        "--help"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T09:04:39Z",
+      "exit_code": 0,
+      "stdout_sha256": "5f8ed04158b910ea54acd0315a0925c94bb8c6749483ef156311fbaf408853aa",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile-help.txt"
+    },
+    {
+      "id": "installer-lock-consumers",
+      "argv": [
+        "rtk",
+        "rg",
+        "-n",
+        "requirements.lock|UV_PYTHON_DOWNLOADS|UV_NO_CONFIG|/usr/local/bin/python|uv sync|--platform|install-container.sh|host.py install",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/host.py",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/install.sh",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/install-container.sh",
+        "<WORKTREE>/blueprints/runtime-workers/openhands/install-grader.sh"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T09:04:39Z",
+      "exit_code": 0,
+      "stdout_sha256": "6f6404c22e783959b5f1c2c0573a6646c713e5cb9eacb241b2d409ccefd76528",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-installer-lock-consumers.txt"
+    },
+    {
+      "id": "tagged-install-policy",
+      "argv": [
+        "rtk",
+        "rg",
+        "-n",
+        "FROM python:3.13.15|COPY --from=python-runtime|BASE_IMAGE|FROM.*base-image|exclude-newer|litellm =|lmnr =",
+        "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/docker/Dockerfile",
+        "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml"
+      ],
+      "cwd": "<WORKTREE>",
+      "started_utc": "2026-09-30T09:04:39Z",
+      "exit_code": 0,
+      "stdout_sha256": "82c06811841d6c4abde6a65cd93a4b7ac1428d801abad4dc8a8d21e61d8e3705",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-tagged-install-policy.txt"
+    }
+  ]
+}

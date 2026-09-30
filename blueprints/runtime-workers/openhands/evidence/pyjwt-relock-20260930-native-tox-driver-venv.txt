@@ -1,0 +1,13 @@
+argv: ["rtk", "proxy", "uv", "venv", "--seed", "--python", "<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13", "--no-python-downloads", "<PRIVATE_RESEARCH>/tox-driver"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:07:03.922158+00:00
+ended_utc: 2026-09-30T17:07:04.095732+00:00
+exit_code: 0
+
+stdout:
+
+stderr:
+Using CPython 3.13.15 interpreter at: <HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/bin/python3.13
+Creating virtual environment with seed packages at: <PRIVATE_RESEARCH>/tox-driver
+ + pip==26.2.1
+Activate with: source <PRIVATE_RESEARCH>/tox-driver/bin/activate

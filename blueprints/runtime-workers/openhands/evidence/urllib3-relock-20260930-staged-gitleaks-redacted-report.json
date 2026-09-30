@@ -1,0 +1,22 @@
+[
+ {
+  "RuleID": "jwt",
+  "Description": "Uncovered a JSON Web Token, which may lead to unauthorized access to web applications and sensitive user data.",
+  "StartLine": 8,
+  "EndLine": 8,
+  "StartColumn": 2595,
+  "EndColumn": 2702,
+  "Match": "REDACTED ",
+  "Secret": "REDACTED",
+  "File": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-215-pypi.txt",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 5.339324,
+  "Author": "",
+  "Email": "",
+  "Date": "0001-01-01T00:00:00Z",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-215-pypi.txt:jwt:8"
+ }
+]

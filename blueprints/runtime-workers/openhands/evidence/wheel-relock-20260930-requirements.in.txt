@@ -1,0 +1,7 @@
+openhands-sdk @ https://files.pythonhosted.org/packages/eb/5a/359d6a4b892fccd4915879d3145d77735b0e5614eee7db7b2a11ae99a843/openhands_sdk-1.50.0-py3-none-any.whl
+openhands-tools @ https://files.pythonhosted.org/packages/97/b2/61c9b0029d46de429890527f47c1809f6badc1c386bfcb4dd17286166108/openhands_tools-1.50.0-py3-none-any.whl
+click==8.3.3
+cryptography==50.0.0
+PyJWT==2.14.0
+pypdf==6.16.1
+soupsieve==2.9

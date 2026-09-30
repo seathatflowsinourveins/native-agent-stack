@@ -1,0 +1,10 @@
+argv: ["rtk", "proxy", "gitleaks", "version"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T16:13:24.875075+00:00
+ended_utc: 2026-09-30T16:13:25.164292+00:00
+exit_code: 0
+
+stdout:
+8.30.1
+
+stderr:

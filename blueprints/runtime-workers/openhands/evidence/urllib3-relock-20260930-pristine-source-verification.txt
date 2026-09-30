@@ -1,0 +1,21 @@
+argv: ["rtk", "proxy", "python3", "-c", "import tarfile,sys,json,hashlib\nfrom pathlib import Path\np=Path(sys.argv[1]);results=[]\nwith tarfile.open(p/'source.tar.gz','r:gz') as archive:\n for extraction in ['source','source-repro']:\n  mismatches=[];compared=0\n  for member in archive.getmembers():\n   if member.isfile():\n    expected=archive.extractfile(member).read();actual=(p/extraction/member.name).read_bytes();compared+=1\n    if expected!=actual:mismatches.append(member.name)\n  results.append({'extraction':extraction,'original_regular_files_compared':compared,'mismatches':mismatches})\nassert all(r['original_regular_files_compared']>0 and not r['mismatches'] for r in results)\nprint(json.dumps(results,indent=2))\n", "<PRIVATE_RESEARCH>"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:49:28.477855+00:00
+ended_utc: 2026-09-30T15:49:28.884990+00:00
+exit_code: 0
+
+stdout:
+[
+  {
+    "extraction": "source",
+    "original_regular_files_compared": 1800,
+    "mismatches": []
+  },
+  {
+    "extraction": "source-repro",
+    "original_regular_files_compared": 1800,
+    "mismatches": []
+  }
+]
+
+stderr:

@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "tar", "-xzf", "<PRIVATE_RESEARCH>/source.tar.gz", "-C", "<PRIVATE_RESEARCH>/source-repro"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:46:05.908393+00:00
+ended_utc: 2026-09-30T15:46:06.482600+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

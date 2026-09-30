@@ -1,0 +1,24 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/venv/bin/python", "-b", "-c", "import sys,pathlib,importlib.metadata as m,pytest,jwt\nsite=pathlib.Path(sys.argv[1]).resolve();expected=sys.argv[2];source=pathlib.Path(sys.argv[3])\ntarget=pathlib.Path(jwt.__file__).resolve()\nprint('installed jwt.__file__='+str(target),flush=True)\nprint('installed PyJWT='+m.version('PyJWT')+'; pytest='+m.version('pytest')+'; coverage='+m.version('coverage'),flush=True)\nassert target.is_relative_to(site) and m.version('PyJWT')==jwt.__version__==expected\nnodes=[str(source/'tests/test_api_jwt.py')+'::TestJWT::test_decode_payload_recursion_error_throws_decode_error',str(source/'tests/test_jwks_client.py')+'::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error']\ncode=pytest.main(['--import-mode=append','-c',str(source/'pyproject.toml'),'-v']+nodes)\nassert pathlib.Path(jwt.__file__).resolve()==target\nprint('post-test jwt.__file__='+str(pathlib.Path(jwt.__file__).resolve()),flush=True)\nraise SystemExit(code)\n", "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages", "2.15.0", "<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68"]
+cwd: <PRIVATE_RESEARCH>/regression-run
+started_utc: 2026-09-30T17:12:05.309727+00:00
+ended_utc: 2026-09-30T17:12:06.090393+00:00
+exit_code: 0
+
+stdout:
+installed jwt.__file__=<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/__init__.py
+installed PyJWT=2.15.0; pytest=8.4.2; coverage=7.10.7
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-8.4.2, pluggy-1.6.0 -- <PRIVATE_RESEARCH>/venv/bin/python
+cachedir: .pytest_cache
+rootdir: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+configfile: pyproject.toml
+plugins: libtmux-0.53.0, anyio-4.14.2
+collecting ... collected 2 items
+
+../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_api_jwt.py::TestJWT::test_decode_payload_recursion_error_throws_decode_error PASSED [ 50%]
+../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_jwks_client.py::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error PASSED [100%]
+
+============================== 2 passed in 0.03s ===============================
+post-test jwt.__file__=<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/__init__.py
+
+stderr:

@@ -1,0 +1,6 @@
+Using Python 3.13.15 environment at: <PRIVATE_RESEARCH>/venv
+Resolved 3 packages in 80ms
+Installed 3 packages in 50ms
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3

@@ -1,0 +1,7 @@
+{
+  "records": [
+    {"sku": "B-101", "name": "Scout Beacon", "category": "navigation", "price_usd": "24.90", "in_stock": true, "dispatch_days": 2},
+    {"sku": "F-202", "name": "Trail Flask", "category": "hydration", "price_usd": "18.50", "in_stock": false, "dispatch_days": 14},
+    {"sku": "L-303", "name": "Ridge Lamp", "category": "lighting", "price_usd": "32.00", "in_stock": true, "dispatch_days": 0}
+  ]
+}

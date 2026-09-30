@@ -1,0 +1,15 @@
+argv: ["rtk", "proxy", "sha256sum", "<PRIVATE_RESEARCH>/source.tar.gz", "<PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/uv.lock", "<PRIVATE_RESEARCH>/osv-scanner", "<PRIVATE_RESEARCH>/ci-config.toml", "<PRIVATE_RESEARCH>/requirements.in", "<PRIVATE_RESEARCH>/constraints.txt"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:46:06.683231+00:00
+ended_utc: 2026-09-30T15:46:06.758360+00:00
+exit_code: 0
+
+stdout:
+643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c  <PRIVATE_RESEARCH>/source.tar.gz
+9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801  <PRIVATE_RESEARCH>/source/software-agent-sdk-dcf401af7a9a302ef92cb7d092e1df9bb659daa5/uv.lock
+ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  <PRIVATE_RESEARCH>/osv-scanner
+ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8  <PRIVATE_RESEARCH>/ci-config.toml
+058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba  <PRIVATE_RESEARCH>/requirements.in
+935e34547853b50ebe901a18bc054df02c3f0a6734b3dafbe6e3c654117cb21b  <PRIVATE_RESEARCH>/constraints.txt
+
+stderr:
