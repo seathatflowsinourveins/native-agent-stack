@@ -358,6 +358,54 @@ arm64 image.
 | In the universal resolution, `--upgrade-package cryptography` collapsed the marker-split fork to the constrained 48.0.1. | Read every `Updated` and `Removed` line before accepting a relock. Resolve only the recipe's install environment with `environments` instead of deleting an upstream constraint, and classify every removed or re-marked line. |
 | The coordinator's decision to keep cryptography at 50.0.0 reached the relock builder after it had relocked five packages from an earlier instruction (evidence section C). | A decision that changes a brief goes out as one message naming what it replaces. The final lock was reproduced from the unchanged workspace before commit (evidence section F). |
 
+## Runtime lock PyJWT relock (2026-09-30)
+
+requirements.lock moved from PyJWT 2.13.0 to 2.14.0 and nothing else changed: three lines (530-532), SHA256
+14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64, previously 02d0a7f058d0. Ten PyJWT advisories published
+2026-09-29 affect 2.13.0 (one Critical, five High, four Medium). Nine failed the required osv-scanner check (CI run
+36657687493) and GHSA-w6j9-cwv2-h6wq had been ignored until 2026-10-13. OSV and GitHub list 2.14.0 as the first patched
+release for all ten. The 2.14.0 changelog names nine of them; the tenth, GHSA-9j54-fg26-wv3r (empty HMAC keys accepted as
+JWKs), matches its Fixed entry "Reject empty HMAC keys when represented as JWKs", which cites an advisory id that GitHub and
+OSV do not serve. The ignore, its `IGNORE_SCOPES` entry and the PyJWT half of the lock's `IGNORE_ALLOWED_LOCKS` entry are
+gone. Record:
+[osv-openhands-pyjwt-relock-20260930.json](../../../evidence/receipts/osv-openhands-pyjwt-relock-20260930.json); returned
+outputs: [evidence/relock-2026-09-30.txt](evidence/relock-2026-09-30.txt).
+
+The method is the 2026-09-27 one with a fifth version-pinned upgrade, from a fresh extraction of the pinned archive
+with the same one-line `environments` edit (uv 0.12.17, without UV_NO_CONFIG):
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.14.0
+
+The resulting uv.lock (SHA256 1816ccfdac2d485b790e29a3c38881273e2335ff0413c07f7a9cc3427a77e8f6) differs from the
+2026-09-27 reproduction (30e608b1...) only in the pyjwt package entry. In the fresh single-command run `uv lock`, `uv lock
+--check` and `uv export` exit 0 and `cmp` of the export plus the pins.json wheel entries against the committed lock
+exits 0 (returned outputs, section C); an earlier scratch pair gave the same digests, and its outputs are not retained.
+
+- **Choice, as of 2026-09-30T03:27:54Z.** 2.14.0 is the newest release outside the 7-day window the upstream workspace's
+  `exclude-newer` applies: PyJWT 2.15.0 leaves the window at 2026-09-30T16:56:01Z, oauthlib 4.0.0 at 2026-10-05T06:01:19Z and PyJWT 2.15.1 at 2026-10-05T18:40:43Z (each 7 days after the later of the release's file upload times on PyPI). Its two hashes equal PyPI's. 2.15.0's changelog has one Security item without an
+  advisory id (recursion errors from deeply nested payloads wrapped in `DecodeError`); 2.15.1 fixes Base64URL `=` padding.
+  The reason 2.14.0 stays until the joint relock, recorded now: as of 2026-09-30T03:27:54Z: the recipe venv decodes no attacker-controlled JWT that this record found. The 2026-09-29 search found jwt.encode of client assertions in mcp 1.28.1 only, google-auth's ID-token verify_token (the one code path that decodes a presented token, through PyJWKClient) not called by any other artifact, and the LiteLLM proxy's JWT code not run; 2.15.0's Security item (recursion errors from deeply nested payloads wrapped in DecodeError, no advisory id) is the payload counterpart of GHSA-8wjv-2p76-3863, which 2.14.0 fixed for headers, so 2.14.0 most likely still raises a raw RecursionError on such a payload; that matters only where a decode of untrusted tokens is reachable. A dated decision point at 2026-09-30T16:56:01Z
+  (owner: bc, session native-agent-stack-bc) confirms it when 2.15.0 leaves the window.
+- **Checks.** The pinned OSV-Scanner 2.6.0 over the 49 inventory lockfiles exits 0 with no PyJWT ignore left, and the
+  previous lock under the same config exits 1 with the ten advisories. The install-container.sh sequence in a scratch
+  CPython 3.13.15 venv on the host network installed 175 packages, `uv pip check` exited 0 and the import check printed
+  `SDK/tools 1.49.6 imports passed; no model request`. No OpenHands task ran with the relocked venv. The image's server
+  binary (upstream's uv.lock, PyJWT 2.13.0) and the grader venv (OpenHands/benchmarks@405bae7's uv.lock, PyJWT 2.10.1) are
+  unchanged and unscanned by the inventory; the 2026-09-28 grype record of the image predates these advisories and has no
+  PyJWT entry. An installation that recorded the old lock digest must re-run install (host.py refuses to run it otherwise).
+- **oauthlib stays at 3.3.1.** As of 2026-09-30T03:27:54Z, 4.0.0 (published 2026-09-28T06:01Z) is inside the same window, until
+  2026-10-05T06:01:19Z, and its two advisories stay covered by the 2026-09-29 reviews, which the record carries forward at the
+  new digest. A pre-check on 2026-09-30 found the same outcome for each test under oauthlib 3.3.1 and 4.0.0 in
+  requests-oauthlib 2.0.0's own unit tests (72 passed and the same 2 failed, both timing assertions that also fail under
+  3.3.1) and both imports working (returned outputs, section J). The relock is tracked in #518 with an owner (bc, session
+  native-agent-stack-bc) and dates: joint relock earliest 2026-10-05T18:40:43Z, due 2026-10-08, with `--upgrade-package
+  oauthlib==4.0.0` added and `--upgrade-package pyjwt==2.14.0` replaced by `--upgrade-package pyjwt==2.15.1`; it repeats
+  those checks on the real lock and deletes the lock's `IGNORE_ALLOWED_LOCKS` entry.
+
+Overturn conditions: (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
+
 ## Takeover phase 1 corrections (2026-09-28)
 
 These are offline repairs on the round-3 head 45d40f6c. The network and
