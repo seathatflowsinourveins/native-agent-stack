@@ -18,6 +18,8 @@ accepted by these discovery checks.
 """
 
 import asyncio
+import contextlib
+import io
 import json
 import os
 import sys
@@ -27,6 +29,7 @@ import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import worker
 from openai_codex import AsyncCodex
@@ -400,6 +403,14 @@ class NativeTransportTests(unittest.TestCase):
             self.assertNotIn("thread_id", result)
             self.assertIsNone(result["usage"])
             self.assertEqual(result["evidence_scope"], "native_catalog_discovery")
+            self.assertEqual(
+                result["effective_config"],
+                {
+                    "model": worker.DEFAULT_MODEL,
+                    "model_provider": worker.PROVIDER,
+                    "model_reasoning_effort": "max",
+                },
+            )
             self.assertEqual(result["native_runtime"]["version"], worker.SDK_VERSION)
             self.assertEqual(result["native_runtime"]["metadata_source"], "userAgent")
             self.assertEqual(events[0]["event"], "preflight_discovered")
@@ -483,6 +494,62 @@ class NativeTransportTests(unittest.TestCase):
                 self.args(gateway, "--require-skill", "fixture-skill")
             with self.assertRaises(SystemExit):
                 self.args(gateway, "--preflight", "--resume", "fixture-thread")
+            with self.assertRaises(SystemExit):
+                self.args(gateway, "--catalog-details")
+
+    def test_preflight_cli_emits_one_compact_result_or_explicit_catalog_details(self):
+        self.preflight_config()
+        extra_skill = self.project / ".agents/skills/unrequired-skill/SKILL.md"
+        extra_skill.parent.mkdir(parents=True)
+        extra_skill.write_text(
+            "---\nname: unrequired-skill\ndescription: PRIVATE_UNUSED_DESCRIPTION\n---\n"
+            "PRIVATE_UNUSED_BODY\n"
+        )
+        with FixtureGateway() as gateway:
+            argv = [
+                worker.__file__,
+                "--workspace", str(self.project),
+                "--codex-home", str(self.home),
+                "--base-url", gateway.url,
+                "--timeout", "15",
+                "--preflight",
+                "--require-mcp", "fixture-mcp",
+                "--require-skill", "fixture-skill",
+            ]
+            for detailed in [False, True]:
+                with self.subTest(catalog_details=detailed):
+                    stdout = io.StringIO()
+                    with patch.object(sys, "argv", argv + (["--catalog-details"] if detailed else [])):
+                        with contextlib.redirect_stdout(stdout):
+                            exit_code = worker.main()
+                    lines = stdout.getvalue().splitlines()
+                    self.assertEqual(exit_code, 0)
+                    self.assertEqual(len(lines), 1, stdout.getvalue())
+                    result = json.loads(lines[0])
+                    self.assertEqual(result["event"], "result")
+                    self.assertEqual(result["status"], "ready")
+                    self.assertEqual(result["requirements"]["unavailable_mcp"], [])
+                    self.assertEqual(result["requirements"]["unavailable_skills"], [])
+                    self.assertEqual(result["effective_config"]["model"], worker.DEFAULT_MODEL)
+                    self.assertEqual(result["cleanup_status"], "closed")
+                    self.assertFalse(result["model_inference_submitted"])
+                    self.assertNotIn("PRIVATE_", lines[0])
+                    if detailed:
+                        self.assertIn("fixture_echo", result["mcp_servers"][0]["tool_names"])
+                        self.assertIn("unrequired-skill", [s["name"] for s in result["skills"]])
+                    else:
+                        server = result["mcp_servers"][0]
+                        self.assertEqual(server["tool_count"], 1)
+                        self.assertTrue(server["catalog_ready"])
+                        self.assertNotIn("tool_names", server)
+                        self.assertEqual(result["skills"]["required"], {"fixture-skill": True})
+                        self.assertGreaterEqual(result["skills"]["enabled_count"], 2)
+                        self.assertGreaterEqual(
+                            result["skills"]["total_count"], result["skills"]["enabled_count"]
+                        )
+                        self.assertNotIn("unrequired-skill", lines[0])
+                        self.assertNotIn("fixture_echo", lines[0])
+            self.assertFalse(gateway.requests)
 
     def test_explicit_wrong_runtime_version_is_not_replaced_by_user_agent(self):
         metadata = SimpleNamespace(

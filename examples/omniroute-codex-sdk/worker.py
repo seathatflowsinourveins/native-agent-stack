@@ -170,8 +170,43 @@ def native_runtime(metadata) -> dict:
     return {"name": name, "version": version.split()[0], "metadata_source": source}
 
 
+def mcp_catalog_ready(server: dict) -> bool:
+    return bool(
+        server["configured"]
+        and server["enabled"]
+        and server["tool_names"]
+        and not server["tools_error"]
+    )
+
+
+def preflight_output(record: dict, *, catalog_details: bool = False) -> dict:
+    """Keep CLI receipts compact; explicit diagnostics retain native catalogs."""
+    if catalog_details:
+        return record
+    compact = dict(record)
+    if "mcp_servers" in record:
+        compact["mcp_servers"] = [
+            {
+                **{key: value for key, value in server.items() if key != "tool_names"},
+                "tool_count": len(server["tool_names"]),
+                "catalog_ready": mcp_catalog_ready(server),
+            }
+            for server in record["mcp_servers"]
+        ]
+    if "skills" in record:
+        available = {skill["name"] for skill in record["skills"] if skill["enabled"]}
+        compact["skills"] = {
+            "total_count": len(record["skills"]),
+            "enabled_count": sum(skill["enabled"] for skill in record["skills"]),
+            "required": {
+                name: name in available for name in record["requirements"]["skills"]
+            },
+        }
+    return compact
+
+
 async def run_preflight(
-    args: argparse.Namespace, *, sdk_factory=AsyncCodexClient, on_event=emit
+    args: argparse.Namespace, *, sdk_factory=AsyncCodexClient, on_event=None
 ) -> dict:
     """Inspect native catalogs without a thread, model turn or tool call.
 
@@ -196,6 +231,13 @@ async def run_preflight(
                 {"cwd": str(args.workspace.resolve()), "includeLayers": False},
                 response_model=ConfigReadResponse,
             )
+            record["effective_config"] = {
+                "model": effective.config.model,
+                "model_provider": effective.config.model_provider,
+                "model_reasoning_effort": effective.config.model_reasoning_effort.value
+                if effective.config.model_reasoning_effort is not None
+                else None,
+            }
             if effective.config.model != args.model or effective.config.model_provider != PROVIDER:
                 raise RuntimeError("native configuration did not retain the requested routing")
             # Config's public extra fields carry native MCP/agent configuration.
@@ -265,12 +307,7 @@ async def run_preflight(
             ]
             record["skill_error_count"] = sum(len(entry.errors) for entry in listed.data)
             available_mcp = {
-                server["name"]
-                for server in servers
-                if server["configured"]
-                and server["enabled"]
-                and server["tool_names"]
-                and not server["tools_error"]
+                server["name"] for server in servers if mcp_catalog_ready(server)
             }
             available_skills = {
                 skill["name"] for skill in record["skills"] if skill["enabled"]
@@ -281,7 +318,8 @@ async def run_preflight(
                 "unavailable_mcp": sorted(set(args.require_mcp) - available_mcp),
                 "unavailable_skills": sorted(set(args.require_skill) - available_skills),
             }
-            on_event({"event": "preflight_discovered", **record})
+            if on_event is not None:
+                on_event({"event": "preflight_discovered", **record})
             phase = "require_capabilities"
             record["status"] = (
                 "unavailable"
@@ -390,6 +428,11 @@ def parse_args(argv=None) -> argparse.Namespace:
         "--preflight", action="store_true", help="inspect native catalogs without model inference"
     )
     parser.add_argument(
+        "--catalog-details",
+        action="store_true",
+        help="preflight includes complete sanitized tool and skill catalogs in its result",
+    )
+    parser.add_argument(
         "--require-mcp",
         action="append",
         default=[],
@@ -450,6 +493,8 @@ def parse_args(argv=None) -> argparse.Namespace:
         parser.error("model must be nonempty")
     if (args.require_mcp or args.require_skill) and not args.preflight:
         parser.error("require-mcp and require-skill require --preflight")
+    if args.catalog_details and not args.preflight:
+        parser.error("catalog-details requires --preflight")
     if any(not name.strip() for name in [*args.require_mcp, *args.require_skill]):
         parser.error("required capability names must be nonempty")
     if args.preflight and (args.resume or args.native_result):
@@ -476,7 +521,8 @@ def main() -> int:
             }
         )
         return 130
-    emit({"event": "result", **result})
+    output = preflight_output(result, catalog_details=args.catalog_details) if args.preflight else result
+    emit({"event": "result", **output})
     return 0 if result["status"] in {"completed", "ready"} else 2
 
 
