@@ -45,10 +45,10 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (514 words by `wc -w`, marker line included; 153 before the standing clauses, routing
-# and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md) and rtk-ai/rtk v0.50.0
-# hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
-TOP_RULE_SHA256 = "fecf92dc0a562c61e370ebb6906c9e76a8a244f5f1829b5f14404f823f80a31f"
+# The staged top-rule block (538 words by Python `str.split()`, marker line included; 153 before the standing
+# clauses, routing and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md) and rtk-ai/rtk
+# v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
+TOP_RULE_SHA256 = "9565217f777774acf9831210f79ad44c4dc4d7e348411ad18efb54ddb78cd764"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -281,20 +281,22 @@ class TemplateTests(unittest.TestCase):
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 514)
+        self.assertEqual(len(top.split()), 538)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,
     # with the Sol-primary routing of docs/decisions/2026-09-30-sol-primary-quality-defaults.md and skill matching.
     STANDING_PHRASES = (
-        "`search-first`", "`find-skills`", "`npx skills find`", "`skill-creator`", "`$skill-name`", "its description",
-        "SKILL.md", "native workflow", "model invocation in both clients", "promptfoo", "paired benchmark",
-        "Harbor or Inspect", "never a self-written runner", "completeness critic", "next landscape sweep",
-        "lifecycle task", "north-star action", "`gpt-6.1-sol` at ultra for coordination", "at max for workers",
-        "`gpt-6-astra` at ultra", "complex workflow needs Astra", "single consequential judgment",
-        "complex changes across systems", "one bounded Sol repair", "OmniRoute", "`codex -p omniroute`", "Opus 5.5 at max",
-        "cooperation lanes", "`docs/decisions/YYYY-MM-DD-<slug>.md`", "No audits, trials or network at startup",
-        "due-file line", "one lane per artifact")
+        "`search-first`", "`find-skills`", "`skill-creator`", "`$skill-name`", "its description", "SKILL.md",
+        "native workflow", "A coordinator, not a bounded worker, invokes", "when no listed skill fits the task",
+        "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner", "completeness critic",
+        "next landscape sweep", "lifecycle task", "each coordinator unit names the north-star action",
+        "For unpinned work, `gpt-6.1-sol` at ultra", "`gpt-6-astra` at ultra", "complex workflow that needs Astra",
+        "single consequential judgment", "complex changes across systems", "one bounded Sol repair",
+        "children inherit that pin", "a spawn call names neither", "a coordinator records the trigger",
+        "never a delegated child, starts a cross-family lane", "OmniRoute", "`codex -p omniroute`", "Opus 5.5 at max",
+        "cooperation lanes", "A coordinator records each decision", "`docs/decisions/YYYY-MM-DD-<slug>.md`",
+        "No audits, trials or network at startup", "due-file line", "one lane per artifact")
 
     def test_top_rule_carries_the_standing_clauses_and_a_lane_for_every_configured_server(self):
         # Each MCP server the user config template registers needs a token lane in this block, so a server added to

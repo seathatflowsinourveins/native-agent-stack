@@ -1062,6 +1062,50 @@ class McpGetOutputTests(unittest.TestCase):
                              Path("/home/example/.local/share/codex-ecosystem"))
 
 
+class StandingRuleSurfacesTests(unittest.TestCase):
+    """The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md carry the same wording on the three
+    rule surfaces (the Gate A owner's review of PR #557): the repository AGENTS.md, the portable user-level template and
+    the Codex user-level block. The Codex block names a bounded worker where the Claude surfaces name a delegated child
+    in the skill-discovery sentence. A clause the review dropped stays off all three."""
+
+    SURFACES = {"AGENTS.md": ROOT / "AGENTS.md", "portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
+                "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
+    SHARED = (
+        "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
+        "listed skill fits the task, it discovers one with `find-skills` and verifies or A/B-tests it with `skill-creator`.",
+        "A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired "
+        "benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.",
+        "A coordinator ends every substantive research or adoption unit with a completeness critic (missed modality, "
+        "source or candidate class) whose findings feed that layer's next landscape sweep; the skills sweep is keyed by "
+        "lifecycle task.",
+        "The harness exists to build complex systems, projects and the north-star R&D; each coordinator unit names the "
+        "north-star action it serves.",
+        "Codex CLI is the second native client. For unpinned work, `gpt-6.1-sol` at ultra coordinates and at max runs "
+        "workers; `gpt-6-astra` at ultra coordinates a complex workflow that needs Astra, and at max takes a single "
+        "consequential judgment (conflicting primary evidence, consequential architecture, complex changes across "
+        "systems, or a failure unresolved after one bounded Sol repair). Where a launch pins the model and effort "
+        "(`-m`, `-c model_reasoning_effort`), children inherit that pin and a spawn call names neither. Preserve "
+        "explicit model choices and role definitions; a coordinator records the trigger and acceptance result. "
+        "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
+        "delegated child, starts a cross-family lane.",
+        # AGENTS.md follows this clause with the path of its decision record.
+        "No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed",
+    )
+    CODEX_VARIANT = ("A coordinator, not a delegated child,", "A coordinator, not a bounded worker,")
+    DROPPED = ("every manifest skill stays listed for model invocation", "npx skills find")
+
+    def test_the_three_surfaces_carry_the_same_standing_sentences(self):
+        for name, path in self.SURFACES.items():
+            text = path.read_text(encoding="utf-8")
+            for sentence in self.SHARED:
+                expected = sentence.replace(*self.CODEX_VARIANT) if name == "codex" else sentence
+                with self.subTest(surface=name, sentence=sentence[:48]):
+                    self.assertIn(expected, text)
+            for phrase in self.DROPPED:
+                with self.subTest(surface=name, dropped=phrase):
+                    self.assertNotIn(phrase, text)
+
+
 class PortableTopRuleTests(unittest.TestCase):
     """The portable user instructions (examples/claude-native/CLAUDE.md, merged into the user-level
     ~/.claude/CLAUDE.md by recipes/claude-native-profile.md) open with the top rule as an
@@ -1075,15 +1119,16 @@ class PortableTopRuleTests(unittest.TestCase):
     not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,372 words: the
     Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule (its classes and conditions match the workflows README), the
     default child model and the measured effort rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
-    Re-baselined on 2026-09-30 to 1,703 words: the file became the single managed source of the operator's user-level
-    file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex routing and skill
-    matching (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
+    Re-baselined on 2026-09-30 to 1,750 words (Python str.split()): the file became the single managed source of the
+    operator's user-level file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex
+    routing and skill matching, then the coordinator scoping and pinned-launch rule of the Gate A owner's review
+    (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1703  # wc -w after the conditional skill-discovery wording (1,696 before it); wc -w after the 2026-09-30 standing clauses and user-level rules (1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1750  # Python str.split() count after the Gate A owner's review of PR #557 (1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
@@ -1114,8 +1159,9 @@ class PortableTopRuleTests(unittest.TestCase):
         "Codex CLI is the second native client", "Keep context small", "match available skill descriptions",
         "`SKILL.md`",
         "completeness critic", "next landscape sweep", "lifecycle task",
-        "`search-first`", "`find-skills`", "`npx skills find`", "`skill-creator`", "model invocation in both clients",
-        "north-star action",
+        "`search-first`", "`find-skills`", "`skill-creator`", "A coordinator, not a delegated child, invokes",
+        "when no listed skill fits the task", "children inherit that pin", "a spawn call names neither",
+        "never a delegated child, starts a cross-family lane", "each coordinator unit names the north-star action",
         "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner",
         "audits, trials or network at startup", "due-file line",
         "record what you found", "build only from a cited reference implementation", "from the selected source revision",
