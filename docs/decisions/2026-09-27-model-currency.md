@@ -413,10 +413,11 @@ evidence.
   2026-09-30T04:18:47Z, 610 IDs) lists exactly two 6.1 IDs, `cx/gpt-6.1-sol` and `codex/gpt-6.1-sol`.
 - **The client's own default moved, and the template now names 6.1 Sol itself.** From 0.159.1 a `codex` launch that
   names no model starts on GPT-6.1 Sol, at the catalog's default effort (`low` for this model). The template no
-  longer relies on the catalog: `adoption/templates/codex.config.template.toml` lines 5-6 now read
-  `model = "gpt-6.1-sol"` and `model_reasoning_effort = "ultra"` (they read `gpt-6-astra` and `ultra` before), and
-  its `[agents]` table sets `default_subagent_model = "gpt-6.1-sol"` with `default_subagent_reasoning_effort = "max"`
-  (lines 27-28). The stack-worker profile moves to `gpt-6.1-sol` at `max` (lines 13 and 17 of
+  longer relies on the catalog: `adoption/templates/codex.config.template.toml` lines 7-8 now read
+  `model = "${CODEX_MODEL}"` and `model_reasoning_effort = "ultra"` (they read `gpt-6-astra` and `ultra` before), and
+  its `[agents]` table sets `default_subagent_model = "${CODEX_MODEL}"` with `default_subagent_reasoning_effort =
+  "max"` (lines 30-31); `tools/adoption/render_config.py` renders that placeholder as `gpt-6.1-sol` for the Linux pin
+  (the follow-up below). The stack-worker profile moves to `gpt-6.1-sol` at `max` (lines 13 and 17 of
   `adoption/templates/codex.stack-worker.config.toml`), so the lane's `worker_pins`
   (`tools/adoption/apply_codex_lane.py` lines 298-304, read from that profile) now pass `-m gpt-6.1-sol`. Lanes that
   name Astra keep it: `tools/sota-convergence/landscape-sweep/codex_job.py` (`-m`, lines 455-457), the OmniRoute
@@ -445,7 +446,7 @@ evidence.
 
 | Lane and role | Current | Latest available (release date) | Action | Sources |
 | --- | --- | --- | --- | --- |
-| Codex CLI 0.159.2 (the Linux pin from this addendum): interactive default and coordinator | `gpt-6.1-sol` at `ultra` (the template, lines 5-6) | GPT-6.1 Sol (`gpt-6.1-sol`, 2026-09-29) | switched from `gpt-6-astra` at `ultra` by the user's decision | the user's decision above; the routing record; changelog and models page (read 2026-09-30); `rust-v0.159.1` release notes; the 0.159.2 bundled catalog |
+| Codex CLI 0.159.2 (the Linux pin from this addendum): interactive default and coordinator | `gpt-6.1-sol` at `ultra` (the template rendered for the Linux pin, lines 7-8) | GPT-6.1 Sol (`gpt-6.1-sol`, 2026-09-29) | switched from `gpt-6-astra` at `ultra` by the user's decision | the user's decision above; the routing record; changelog and models page (read 2026-09-30); `rust-v0.159.1` release notes; the 0.159.2 bundled catalog |
 | Codex CLI 0.159.2: primary workers and generic children | `gpt-6.1-sol` at `max`: the stack-worker profile and the worker command (`-m gpt-6.1-sol`), and `agents.default_subagent_model` with `default_subagent_reasoning_effort` in the template | as above | switched from `gpt-6-astra` at `max` by the routing record | the routing record; `rust-v0.159.2` `core/src/agent/child_config.rs` (cited there) |
 | Codex CLI 0.159.2: complex-workflow tasks and escalation | `gpt-6-astra`, chosen per task: `ultra` to coordinate a complex workflow (the user's decision; Ultra sends `xhigh` and delegates proactively), `max` for an Astra worker or an escalation on the routing record's triggers | GPT-6 Astra (2026-09-03), "Our most capable model for complex work across code, apps, and research" (models page) | the user's decision above and the routing record | the user's decision above; the routing record; models page |
 | Codex CLI 0.159.2: judgment lanes that name Astra (the landscape sweep's votes, cross-family reviews, the Codex role carriers, the Gate A runbook and preregistration arms) | `gpt-6-astra` at their recorded efforts: `max` in the landscape-sweep lane and the OmniRoute profile (`cx/gpt-6-astra`), the role carriers' own pins | as above | keep | the Codex judgment row above |
@@ -480,8 +481,9 @@ rule measures extraction only; none exists yet.
 
 **Still open.** The Unresolved line "No code pin sets `-m gpt-6-sol -c model_reasoning_effort=medium`" still holds at
 `origin/main@f77612b6` (only a comment in `tools/sota-convergence/adjudicate.py` and a seed string in the landscape
-sweep name the model). `gpt-6.1-sol` is named by the two Codex templates, the worker command in `recipes/README.md`
-and `tools/adoption/prove_codex_lane.py`'s live-worker description; no measured run of those Sol routes is recorded
+sweep name the model). `gpt-6.1-sol` is named by the stack-worker profile, the user template's `CODEX_MODEL` rule in
+`tools/adoption/render_config.py`, the worker command in `recipes/README.md` and
+`tools/adoption/prove_codex_lane.py`'s live-worker description; no measured run of those Sol routes is recorded
 here (the routing record lists the acceptance it still requires). The same branch moves
 `tools/adoption/apply_codex_lane.py`'s `CODEX_VERSION` from 0.157.1 to 0.159.2 (its dry run had reported `[fail]
 codex version: codex-cli 0.159.2 (pin 0.157.1)` in a scratch home), with a test that keeps the constant equal to the
@@ -495,11 +497,16 @@ security fix; it moves because the Gate A owner chose 0.159.2 and the host launc
 
 **Follow-up: macOS needs its own 0.159.x qualification before the template default applies there.**
 `adoption/pins-macos-arm64.json` keeps Codex 0.155.1, while `adoption/templates/codex.config.template.toml` is shared
-by both platforms and names `gpt-6.1-sol` as a literal. That model entered the bundled catalog in `rust-v0.159.1` (its
-release notes), and offline `codex debug models --bundled` lists it for the Linux 0.159.2 build but not for the Linux
-0.155.1 or 0.157.1 builds (2026-09-30, in a sandbox with no network; no Mac build was run, so this is not macOS
-evidence). No per-platform model override exists today. The natural place is `tools/adoption/render_config.py`, which
-already fills two placeholders from the selected platform's pins file: `render_one` (lines 174-184) calls
-`resolve_socraticode_version` (lines 158-163), which reads `adoption/pins-<platform>.json` through `pinned_version`
-(lines 135-147) for `--platform macos-arm64`; a model placeholder resolved the same way would let a Mac render keep a
-model its pinned client knows. It is not implemented here.
+by both platforms and named `gpt-6.1-sol` as a literal until the #542 review. That model entered the bundled catalog in
+`rust-v0.159.1` (its release notes; openai/codex `codex-rs/models-manager/models.json` has no `gpt-6.1-sol` slug at
+`rust-v0.159.0`, commit `687a119f`, and one at `rust-v0.159.1`, commit `8e68a98e`, line 178), and offline `codex debug
+models --bundled` lists it for the Linux 0.159.2 build but not for the Linux 0.155.1 or 0.157.1 builds (2026-09-30, in
+a sandbox with no network; no Mac build was run, so this is not macOS evidence). The template now names its model
+through the `CODEX_MODEL` placeholder, which `tools/adoption/render_config.py` fills from the selected platform's Codex
+pin as it fills `SOCRATICODE_VERSION`: `gpt-6.1-sol` from Codex 0.159.1 and `gpt-6-astra` on an older pin, so
+`--platform macos-arm64` renders `gpt-6-astra` for the coordinator and generic children until the macOS pin moves to
+0.159.1 or later, and `--set CODEX_MODEL=<model>` names another. In a sandbox with no network, the Linux 0.155.1 build's
+`codex debug prompt-input` over that render included Ultra's two multi-agent developer messages, and dropped both when
+only the two model values were set back to `gpt-6.1-sol` (2026-09-30; a Linux build standing in for the Mac client of
+the same version, not macOS evidence). The stack-worker profile keeps its `gpt-6.1-sol` literal: `apply_codex_lane.py`
+installs it verbatim, passes its model as `-m` and refuses any Codex but its `CODEX_VERSION`, the Linux pin.
