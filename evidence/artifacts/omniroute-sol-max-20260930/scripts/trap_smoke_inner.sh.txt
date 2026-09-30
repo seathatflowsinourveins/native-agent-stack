@@ -1,0 +1,39 @@
+#!/bin/bash
+# trap_smoke_inner.sh PREFIX RAWDIR LABEL -- runs inside the namespace (see trap_smoke.sh).
+set -u
+PREFIX="$1"; RAW="$2"; LABEL="$3"
+stamp() { date -u +%FT%TZ; }
+health() { curl -s -m 3 -o /dev/null -w '%{http_code}' http://127.0.0.1:20197/api/health 2>/dev/null || true; }
+wait_health() {   # wait_health SECONDS PID -> prints "health=200 after Ns" or why not
+  local end=$(( $(date +%s) + $1 )) t0=$(date +%s)
+  while [ "$(date +%s)" -lt "$end" ]; do
+    kill -0 "$2" 2>/dev/null || { echo "serve exited early after $(( $(date +%s) - t0 ))s"; return 1; }
+    [ "$(health)" = "200" ] && { echo "health=200 after $(( $(date +%s) - t0 ))s"; return 0; }
+    sleep 1
+  done
+  echo "no health within $1 s"; return 1
+}
+echo "[$(stamp)] shim label=$LABEL; lsof on PATH: $(command -v lsof) sha256=$(sha256sum "$(command -v lsof)" | cut -c1-16)"
+"$PREFIX/bin/omniroute" serve --port 20197 --no-open --no-tray > "$RAW/serve-1.log" 2>&1 &
+S1=$!
+echo "[$(stamp)] phase 1: $(wait_health 120 $S1)"
+setsid python3 -c '
+import socket, sys, time
+c = socket.create_connection(("127.0.0.1", 20197))
+open(sys.argv[1], "w").write(str(__import__("os").getpid()))
+time.sleep(600)
+' "$RAW/client.pid" > /dev/null 2>&1 &
+CL=$!
+sleep 2
+CLPID=$(cat "$RAW/client.pid" 2>/dev/null)
+echo "[$(stamp)] client (pid $CLPID) socket before stop: $(ss -Htn '( dport = :20197 )' | awk '{print $1}' | tr '\n' ' ')"
+kill -TERM "$S1"; wait "$S1"; echo "[$(stamp)] server stopped, exit $?"
+sleep 2
+echo "[$(stamp)] client alive after stop: $(kill -0 "$CLPID" 2>/dev/null && echo yes || echo NO); its socket: $(ss -Htn '( dport = :20197 )' | awk '{print $1}' | tr '\n' ' ') | lsof -ti :20197 by the real tool: $(/usr/bin/lsof -ti :20197 | tr '\n' ' ')"
+"$PREFIX/bin/omniroute" serve --port 20197 --no-open --no-tray > "$RAW/serve-2.log" 2>&1 &
+S2=$!
+echo "[$(stamp)] phase 2 (restart with the dead client connection still held): $(wait_health 60 $S2)"
+grep -m2 -E 'already in use|EADDRINUSE' "$RAW/serve-2.log" | sed -E 's/\x1b\[[0-9;]*m//g' | cut -c1-140
+kill -TERM "$S2" 2>/dev/null; wait "$S2" 2>/dev/null
+kill "$CL" 2>/dev/null; wait "$CL" 2>/dev/null
+echo "[$(stamp)] done"

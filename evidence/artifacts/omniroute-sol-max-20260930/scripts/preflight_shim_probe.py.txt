@@ -1,0 +1,45 @@
+"""Scratch-port test of the port preflight with shim v1 and shim v2 on PATH (no gateway involved). For each shim it runs upstream's own
+resolveServeBusyPids (bin/cli/commands/serve.mjs of the B3 checkout) for a scratch port in four states: nothing there; a real listener; the listener
+gone but a client still in CLOSE-WAIT; the client closed. Expected: v1 counts the CLOSE-WAIT client as busy (the trap); v2 does not, and both refuse a
+real listener."""
+import json, os, shutil, socket, subprocess, tempfile, time
+from pathlib import Path
+
+NODE = "<TOOLS>/node-24.21.0/bin/node"
+SERVE = "<B3>/bin/cli/commands/serve.mjs"
+V1 = "<TOOLS>/omniroute-3.8.51-2f42a9ac-pr13788-affinity2/shim/lsof"
+V2 = "<NS>/lsof-shim-v2.sh"
+
+def busy(port, shim_dir):
+    code = f"import('file://{SERVE}').then(async m => console.log(JSON.stringify(await m.resolveServeBusyPids({port}))))"
+    env = {"PATH": f"{shim_dir}:<TOOLS>/node-24.21.0/bin:/usr/bin:/bin", "HOME": tempfile.gettempdir()}
+    r = subprocess.run([NODE, "-e", code], capture_output=True, text=True, env=env, timeout=60)
+    last = (r.stdout.strip().splitlines() or [""])[-1]
+    return last if last.startswith("[") else (r.stderr.strip()[:160] or "no output")
+
+def scenario(port_holder):
+    server = socket.socket(); server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); server.bind(("127.0.0.1", 0)); server.listen(5)
+    port = server.getsockname()[1]
+    return server, port
+
+results = {}
+for label, shim in (("v1", V1), ("v2", V2)):
+    d = tempfile.mkdtemp(prefix="shim-" + label + "-")
+    shutil.copy(shim, Path(d) / "lsof"); os.chmod(Path(d) / "lsof", 0o755)
+    row = {}
+    # 1. nothing on the port: pick a free port, close the socket
+    s = socket.socket(); s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]; s.close()
+    row["nothing_there"] = busy(port, d)
+    # 2. a real listener plus a connected client
+    server = socket.socket(); server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); server.bind(("127.0.0.1", port)); server.listen(5)
+    client = socket.create_connection(("127.0.0.1", port)); conn, _ = server.accept()
+    row["real_listener_and_client"] = busy(port, d)
+    # 3. the listener is gone, the client has not closed its end (CLOSE-WAIT)
+    conn.close(); server.close(); time.sleep(0.5)
+    row["listener_gone_client_close_wait"] = busy(port, d)
+    # 4. the client closed
+    client.close(); time.sleep(0.3)
+    row["client_closed"] = busy(port, d)
+    results[label] = row
+    shutil.rmtree(d, ignore_errors=True)
+print(json.dumps(results, indent=1))

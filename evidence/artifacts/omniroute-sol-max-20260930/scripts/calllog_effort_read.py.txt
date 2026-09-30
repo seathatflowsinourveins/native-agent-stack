@@ -1,0 +1,35 @@
+"""Read-only look at what effort a gateway actually sent upstream, from its call_logs rows (metadata columns only).
+The columns reasoning_effort_requested (the client's effort value, verbatim) and reasoning_effort_upstream (the effort in the request the gateway
+sent) are filled only for rows whose response carried encrypted reasoning (reasoning_source = 'encrypted'), from the provider request the
+attempt captured; NULL means absent, stripped or not an encrypted-reasoning row, not 'none sent'. No request or response body, no account or
+connection column and nothing from any other table is read. The store is opened with mode=ro.
+Usage: calllog_effort_read.py <store name: omniroute|omniroute-fw> rows <since UTC> [model substring] [limit]
+       calllog_effort_read.py <store name> counts <since UTC> [model substring]"""
+import datetime
+import json
+import sqlite3
+import sys
+from pathlib import Path
+
+STORES = {"omniroute": Path.home() / ".local/share/omniroute/storage.sqlite", "omniroute-fw": Path.home() / ".local/share/omniroute-fw/storage.sqlite"}
+store, mode, since = sys.argv[1], sys.argv[2], sys.argv[3]
+needle = sys.argv[4] if len(sys.argv) > 4 else ""
+limit = int(sys.argv[5]) if len(sys.argv) > 5 else 20
+if store not in STORES or mode not in ("rows", "counts"):
+    sys.exit(__doc__)
+connection = sqlite3.connect(f"file:{STORES[store]}?mode=ro", uri=True, timeout=10)
+connection.execute("pragma query_only = on")
+observed = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+like = f"%{needle}%"
+if mode == "rows":
+    cursor = connection.execute(
+        "select id, timestamp, provider, model, requested_model, status, reasoning_source, reasoning_effort_requested, reasoning_effort_upstream "
+        "from call_logs where timestamp >= ? and (model like ? or requested_model like ?) order by timestamp desc limit ?", (since, like, like, limit))
+    names = [d[0] for d in cursor.description]
+    print(json.dumps({"observed_utc": observed, "store": store, "since": since, "filter": needle, "rows": [dict(zip(names, r)) for r in cursor.fetchall()]}, indent=1))
+else:
+    cursor = connection.execute(
+        "select model, coalesce(reasoning_effort_requested, '-') as requested, coalesce(reasoning_effort_upstream, '-') as upstream, reasoning_source, count(*) as n "
+        "from call_logs where timestamp >= ? and (model like ? or requested_model like ?) group by 1, 2, 3, 4 order by n desc limit 40", (since, like, like))
+    names = [d[0] for d in cursor.description]
+    print(json.dumps({"observed_utc": observed, "store": store, "since": since, "filter": needle, "groups": [dict(zip(names, r)) for r in cursor.fetchall()]}, indent=1))

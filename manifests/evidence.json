@@ -4145,8 +4145,8 @@
     },
     {
       "path": "adoption/templates/systemd/omniroute.service",
-      "sha256": "5545e946ed96d3f7371ebf7af9ac029854d99b9376a8ed9effc936f7e53da4f9",
-      "bytes": 6994
+      "sha256": "b05477c72372578088d2f51eb6bb47664aadbe3aab938769c2cd07924b2b5951",
+      "bytes": 7345
     },
     {
       "path": "adoption/tools/README.md",
@@ -14771,8 +14771,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "000abf151547ab0d3dbb9b906bed102f0ce91d1e73c59c76717153a5de31d275",
-      "bytes": 33045
+      "sha256": "b2d99153c8dffb6169923e9129cfb6e4343cd9f5fc443ad8839fa5f162e20c1e",
+      "bytes": 37375
     },
     {
       "path": "docs/direct-results.md",
@@ -14856,8 +14856,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "29956e3692a7a966cd655b264193fe33eaced2581acb16c19326702d604d64e8",
-      "bytes": 39147
+      "sha256": "5a20461ffdd76482f30e8beb0f5ea670ccc53dc656931c5de91ec2dd2c80cea8",
+      "bytes": 39778
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -35185,6 +35185,246 @@
       "bytes": 23100
     },
     {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/README.md",
+      "sha256": "ecd66ad007aca5ec24223805e98035b5da99284671a65a62dbf799f4aaba2084",
+      "bytes": 2800
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/calllog-effort-counts-after-switch.json",
+      "sha256": "0b38297daaa976c357b46c04e3ac0e068dce2f6f2183c612dbf47e79d5c82068",
+      "bytes": 780
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/calllog-effort-counts-before-switch.json",
+      "sha256": "d3d247abed6ecdc449146f8cc07676b76d5435dc11d4610a130eb5b32ef6ec92",
+      "bytes": 1762
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/codex-bundled-catalog-0159.2.txt",
+      "sha256": "5edf31532a200faa3d21d301209af2fc2c6175f926a8cf62ce40df7758472e5f",
+      "bytes": 472
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/effort-wire-candidate-B3.json",
+      "sha256": "c8aeeb9119f9122823b650afae1ba2bc97ba399d870eb88f21858334c80bf79e",
+      "bytes": 2918
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/effort-wire-running-build-B2.json",
+      "sha256": "04a2cab0a983a5578355ffd3e7aecc46fe87474bd18aea276ae350e6caee79ae",
+      "bytes": 2942
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/omniroute.service.after-switch.txt",
+      "sha256": "b7797d7898160c858de7d56695bb97a3ac569c8cfded49affcb66b908528be45",
+      "bytes": 1781
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/owner-record-after-switch.json",
+      "sha256": "d0c65d2d7dd889eaa5f6e8cfba3bc0d22b7a4cc862237edfeb3dbcbe8368080a",
+      "bytes": 2809
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/owner-record-before-switch.json",
+      "sha256": "fa8a0549eb24a17c662db0c6a2d4e0fa2c3a5ce57a7833ff01f686b0baefc20b",
+      "bytes": 2908
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/owner-record-diff.txt",
+      "sha256": "f786cc2f3d85f727c6b1dfd90c4d006d228134a5822c9f4fc3c144b2f969ed6a",
+      "bytes": 1071
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-scratch-port-reproduction.json",
+      "sha256": "da78f3ce2a65e1b2724f0794fe522777d80806560095060b00bdc10a55eb8e9d",
+      "bytes": 343
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-scratch-port-table.json",
+      "sha256": "f387b786a39035d5206ecd370f9301d86f8824d71b28fbcf836bd53359218e66",
+      "bytes": 303
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-second-instance-shim-v2.txt",
+      "sha256": "76aab8f3c923ec03d7a61d7721e45df83d68352ca836c5517e6dbff649d73b88",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-trap-shim-v1-control.txt",
+      "sha256": "e616735d3effa9f82e79c39775b1ec0106307c626f3d3b554b72879d341c5b1c",
+      "bytes": 639
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/preflight-trap-shim-v2.txt",
+      "sha256": "6378f96ba709d92b03096253424f6ab6377e7d046b51deb748a0c203af7274e7",
+      "bytes": 587
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/probe-gate-after-switch.json",
+      "sha256": "03aa6e24275398d8596153eb7f59b7e7cb6cc3d2e8c35fab0025ee6e9808a707",
+      "bytes": 8524
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/probe-gate-before-switch.json",
+      "sha256": "79b697d98db5251e74f82b9efe399617b5f237c94ede9961004808ef8aaaa9eb",
+      "bytes": 5415
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-install.txt",
+      "sha256": "2e20a86a15c1b25d808c5df87e773766554fbf6a7795f08ce4ac3b45e8404f92",
+      "bytes": 414
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-pack-boot.txt",
+      "sha256": "f8c5b3dc77923675f88d04da9d80b2c4f32b599e7b1119f393268d991195176a",
+      "bytes": 3058
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-pipeline-times.txt",
+      "sha256": "bfe1606f13fb2ddef402a827d05e234abdbcc548c2fa35d94d08c23d4c92827f",
+      "bytes": 1046
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-smoke-shim-v1.txt",
+      "sha256": "0b8b0da848748b17199c57c4aa156c2ab773d35a78e97f3b13822db8b0cf0b94",
+      "bytes": 3207
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-targeted-B2-baseline.txt",
+      "sha256": "8022f2ee6ad1760c6d20c04e0e78e19397d9f9962aad3d7103ad76f227d45019",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/qualification-targeted-B3.txt",
+      "sha256": "c47f3006f55b2fbd82185a3536f81a5f6116e5672801778562f82e01b54904f9",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/readback-after-switch.txt",
+      "sha256": "6bde59390edd68c738a1ff9fd4f13f2d227269f3bb461a8174441359dc9fcf8f",
+      "bytes": 1639
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/sharedgw-connection-expiry-20260930.txt",
+      "sha256": "1c6ea653b8c9c5cbb95b933314cdaeae4d3aeccc15bc7fae23a225c85be2b08a",
+      "bytes": 2943
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/switch-output.txt",
+      "sha256": "b9140ac24c2d9f84089ce294a9fb3ddcd6e9b2cf7940542b8d782605d2d70e32",
+      "bytes": 780
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/unit-before-after.diff",
+      "sha256": "cf7f742b910bafd9a91c7c3c23ebd1de3f74b90de9f0cdcc8613a128e6150fb8",
+      "bytes": 2075
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/checks/upstream-pr-15167-identity.txt",
+      "sha256": "d9db93914976b1c6fcfe2737e5eda2ea5b731835182a3744988dce6f736cd5b2",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/receipt.json",
+      "sha256": "cd89fff2d1451c7faa01d7dfea709c7e2852a1d5a563bd02bdd61e0999843f67",
+      "bytes": 14648
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/blocknet.mjs.txt",
+      "sha256": "0247075bef1ebc18c76e148f1727e13763eb7b5f6056c506a33916829b01b3ec",
+      "bytes": 1286
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/calllog_effort_read.py.txt",
+      "sha256": "a82dcad2b38bd6baa5577aab28bc7a370ca57e87fb805eacba558f6f7a5713ed",
+      "bytes": 2687
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/codex_bundled_catalog.py.txt",
+      "sha256": "8b365942b9001601788fc012b6cce3eae4862bdc99c04674da797fe7bbdbc79b",
+      "bytes": 1020
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/effort_probe.mts.txt",
+      "sha256": "664436dbf9a4d46349e35f034bb0e22e3719a4ff6ef7ecaafac0e4cb2fd246ae",
+      "bytes": 2427
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt",
+      "sha256": "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854",
+      "bytes": 1369
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/post_switch.sh.txt",
+      "sha256": "cf34f2cd0d04e30887a39d2f7270240c880c62fade4ae118f8317a1eec6a81a5",
+      "bytes": 2748
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/pr15167_identity.sh.txt",
+      "sha256": "7dd2ae22405b7b07cdd048c66baa2105fe62c1b0e4259181869ebc7c4361a54a",
+      "bytes": 1537
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/preflight_shim_probe.py.txt",
+      "sha256": "f7570f843637492ee2df6aea4c064ad371cdf5be278bee3052d418fc69751119",
+      "bytes": 2554
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/preflight_trap_probe.py.txt",
+      "sha256": "089f42958f6c9121efabd4fd3b63c591769709a06280dfd57a392df3f22f8f18",
+      "bytes": 1896
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/probe_gate.py.txt",
+      "sha256": "bfcb928e742bf8864f76f28eba2ca041aa8287cfccd9f4fa9da49a35679d38e9",
+      "bytes": 7848
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/record_diff.py.txt",
+      "sha256": "ccaee328681e09d347f38c39c518a7158d258ad079ba69866f6a62f5891c21d1",
+      "bytes": 980
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/run.sh.txt",
+      "sha256": "b585d37dea65514694e2445d623e5d572d27769fff8559f533912007e602ca13",
+      "bytes": 972
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/second_instance.sh.txt",
+      "sha256": "0bd285bffcca261807d2b6d94bf41f2d5083788e8e728ffa838f843d13620908",
+      "bytes": 1474
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/second_instance_inner.sh.txt",
+      "sha256": "9ad174452e050ea10ddf80a51e4f23326bcf1d5a5066031d181dc84541ac9c7b",
+      "bytes": 1023
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/sol61_pipeline.sh.txt",
+      "sha256": "2850391c11de666d27900277619981e886ef6963c3f9e8ba25f86b246f10f5ae",
+      "bytes": 5791
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/switch_gateways.py.only-option.diff.txt",
+      "sha256": "2ba1d3e7a354fa15606b7e691b39b0193791613d555bf5e3afbbccfdcfbc047c",
+      "bytes": 6922
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/switch_gateways.py.txt",
+      "sha256": "97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3",
+      "bytes": 13008
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/trap_smoke.sh.txt",
+      "sha256": "4f4a9495cef63fee5c51e40e0eddf6311349abba4e0184f3183ff90486c8119b",
+      "bytes": 1476
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/trap_smoke_inner.sh.txt",
+      "sha256": "c65f28d30ccd96cb4430d7c66b746ea663888b9006acf07a0842a33ec3b49069",
+      "bytes": 2149
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -43521,8 +43761,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "d621909e12fb04267c6c2c313ea40387b88e1d37c319aee7d852b4e14aa99e35",
-      "bytes": 98410
+      "sha256": "265bcff0ed17a7f328abb783829fa6a8598f888badc31431e32f9874fe46e61e",
+      "bytes": 98938
     },
     {
       "path": "observability/README.md",
