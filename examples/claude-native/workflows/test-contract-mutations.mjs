@@ -52,8 +52,8 @@ const MUTATIONS = [
   ['the agent table restates the verifier on Sonnet', ROUTING_DOC_FILE, '| `stack-verifier` | Opus, max |', '| `stack-verifier` | Sonnet, max |', 'the agent table restates each listed agent'],
   // Stack agents and dispatch by role (docs/decisions/2026-09-26-stack-agents-role-dispatch.md): a regained fetch,
   // skill, edit or Serena symbol-edit tool, or a role table that reroutes or restates a role, must fail.
-  ['the researcher regains WebFetch', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],
-  ['the researcher gains the Skill tool', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, Skill, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],
+  ['the researcher regains WebFetch', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, Skill, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, WebFetch, Skill, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],
+  ['the researcher loses the Skill tool', 'agents/stack-researcher.md', 'tools: Read, Glob, Grep, Bash, WebSearch, Skill, ToolSearch, ', 'tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, ', 'stack-researcher tool surface is exactly the reviewed list'],
   ['the verifier gains Edit', 'agents/stack-verifier.md', 'tools: Read, Glob, Grep, Bash, ToolSearch, ', 'tools: Read, Edit, Glob, Grep, Bash, ToolSearch, ', 'stack-verifier tool surface is exactly the reviewed list'],
   ['the builder regains a Serena symbol-edit tool', 'agents/isolated-builder.md', 'mcp__serena__get_diagnostics_for_file, ', 'mcp__serena__get_diagnostics_for_file, mcp__serena__replace_symbol_body, ', 'isolated-builder grants only Serena read tools'],
   ['the role table sends the verifier role to the default child', ROUTING_DOC_FILE, '| verifier | `stack-verifier` |', '| verifier | `general-purpose` |', 'the role table maps each dispatch role'],

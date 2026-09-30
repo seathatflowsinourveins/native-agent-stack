@@ -507,7 +507,7 @@ function agentOptionLiterals(src) {
   expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode']))
   expect('agents: security-reviewer preloads exactly its reviewed skill', JSON.stringify(skillsOf('security-reviewer')) === JSON.stringify(['security-best-practices']))
   const ctx = (t) => 'mcp__plugin_context-mode_context-mode__' + t
-  const expectedResearcherTools = ['Read', 'Glob', 'Grep', 'Bash', 'WebSearch', 'ToolSearch',
+  const expectedResearcherTools = ['Read', 'Glob', 'Grep', 'Bash', 'WebSearch', 'Skill', 'ToolSearch',
     ctx('ctx_batch_execute'), ctx('ctx_execute'), ctx('ctx_execute_file'), ctx('ctx_fetch_and_index'), ctx('ctx_search'),
     'mcp__qmd__query', 'mcp__qmd__get', 'mcp__ai-memory__memory_query',
     'mcp__serena__find_symbol', 'mcp__serena__find_referencing_symbols', 'mcp__serena__get_symbols_overview',
