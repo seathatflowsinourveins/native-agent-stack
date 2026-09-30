@@ -55,7 +55,10 @@ A backslash-newline is joined first and every raw-text rule also reads the
 command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
 are never taken for arguments, and a number is a redirection's descriptor only
-where it touches the operator (`set 1>out`, not `set 1 > out`). An internal error blocks the command
+where it touches the operator (`set 1>out`, not `set 1 > out`). Segment identities retain that
+descriptor metadata. If the original text contains the internal marker byte \x01,
+the existing conservative fallback may also count separated numbers as descriptors:
+`set 1 > out; echo \x01` is refused. An internal error blocks the command
 (`guard_error`), because only exit 2 blocks; a hook that outlasts its timeout does not, so every raw-text rule
 takes time linear in the text (four STORE_PATHS patterns that backtracked on a repeated literal are LinearScan
 rules since 2026-09-30; before, a claim here that every scan read a text once was not true of them), a text with
@@ -211,6 +214,15 @@ _NAMES = "|".join(SECRET_NAMES)
 SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
 SECRET_EXPANSION = re.compile(r"\$\{?!?(?:" + _NAMES + r")\b")
 SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b(?:" + _NAMES + r")\b")
+BASE_SECRET_NAMES = SECRET_NAMES
+BASE_SECRET_NAME = SECRET_NAME
+BASE_SECRET_EXPANSION = SECRET_EXPANSION
+BASE_SECRET_LOOKUP = SECRET_LOOKUP
+SECRET_NAMES += ("CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_MESSAGING_TOKEN")
+_NAMES = "|".join(SECRET_NAMES)
+SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
+SECRET_EXPANSION = re.compile(r"\$\{?!?(?:" + _NAMES + r")\b")
+SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b(?:" + _NAMES + r")\b")
 # Every inventory `pointer_variables` name (tests/test_secret_path_guard.py checks each), with an optional numeric suffix: a
 # further paper account's pointer is PAPER_ENV_FILE_2. Without the suffix group the word boundary after PAPER_ENV_FILE failed
 # before `_2`, so a reader, a redirect or a `source` on "$PAPER_ENV_FILE_2" passed while the account-1 forms were blocked.
@@ -241,6 +253,11 @@ HOME_CREDENTIAL_STORE = re.compile(
     r"|shell_snapshots|runtime-workers/openhands/secrets)(?:/|$)"
     r"|(?:^|[/=])(?:\.docker/config\.json|\.git-credentials|\.netrc|\.npmrc|\.pypirc|nativestack/[^/]*\.key)$"
     r"|(?:^|[/=])\.docker(?:/\**)?$")
+BASE_HOME_CREDENTIAL_STORE = HOME_CREDENTIAL_STORE
+HOME_CREDENTIAL_STORE = re.compile(
+    BASE_HOME_CREDENTIAL_STORE.pattern
+    + r"|(?:^|[/=])\.local/share/omniroute(?:-fw)?(?:/|$)"
+    + r"|\$\{?XDG_DATA_HOME\}?/omniroute(?:-fw)?(?:/|$)")
 # A .env-style credential file: `.env`, `.env.local`, `.envrc`, `alpaca-paper.env`, `*.env`,
 # also as the value of `--include=`/`-g` style options. `*.example` templates stay readable.
 ENV_FILE_WORD = re.compile(r"(?:^|[/=])(?:\.env[^/=]*|[^/=]*\.env)$")
@@ -450,6 +467,11 @@ _work: dict[str, int] | None = None
 # The words lex() has read in this check() call, by text and mode (None outside a call): the prior reading tokenizes the command as the
 # guard at c26800f3 did, which is this version's legacy reading of the same text, so it costs no second pass (see lex()).
 _lexed: dict[tuple[str, bool], list[str]] | None = None
+# dc33b48a's predicates/identity run first for reason precedence. K4's second
+# reading fixes descriptor collisions without letting a new finding rename B(T).
+_baseline = True
+_k4_cache: dict | None = None
+_code_derived = False
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
@@ -511,6 +533,14 @@ LAUNCHED_PROGRAMS = SHELLS | AWKS | JQS | ENVIRONMENT_PRINTERS | {"ps", "set", "
     "systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 
 HINTS = {
+    "gateway_credential_route": "local gateway management API requests require an exact allowlist match; use the operator's user terminal for other management operations",
+    "manager_environment_write": "a manager/activation environment reaches multiple processes; systemctl --user show-environment can expose it; scope a key to one runner command",
+    "keyring_store_literal": "typed literals persist in transcripts/history; use the hidden prompt or documented dynamic input",
+    "ps_personality_selector": "a ps personality can change environment-display flags; agent commands cannot select it",
+    "canary_user_terminal_required": "canary_proof.py comparison/user-run belong in the user terminal; a pty is not authorization",
+    "interpreter_environment_unclassified": "environment access could not be classified; use an explicit single non-secret key or a separately reviewed script",
+    "environment_dump_in_credential_run": "credential_run.py gives the started command keys; masking is a second layer; use a client that consumes its environment without printing it",
+    "credential_run_usage": "there are no value-returning subcommands; use --check or ID -- COMMAND; see docs/secret-storage.md",
     "secret_name_search": "search repository code with the Grep tool instead of a shell search for a "
                           "secret variable name",
     "trace_while_sourcing": "shell tracing prints every assignment of a sourced credential file",
@@ -550,17 +580,19 @@ class WorkBudgetExceeded(Exception):
 def start_work() -> dict[str, int]:
     """Begin the work budget of one check() call: every counter at zero, and no text lexed yet. Returns the counters (they are what
     check() has spent)."""
-    global _work, _lexed
+    global _work, _lexed, _k4_cache
     _work = dict.fromkeys(WORK_LIMITS, 0)
     _lexed = {}
+    _k4_cache = {}
     return _work
 
 
 def stop_work() -> None:
     """End the budget: outside a check() call nothing is counted, so a direct call to lex() or expand() (a test, a tool) has no limit."""
-    global _work, _lexed
+    global _work, _lexed, _k4_cache
     _work = None
     _lexed = None
+    _k4_cache = None
 
 
 def spend(kind: str, amount: int) -> None:
@@ -1096,7 +1128,7 @@ def systemd_run_sets_secret(words: list[str]) -> bool:
             assignments = environment_assignments(value.partition("=")[2])
         else:
             continue
-        if any(assignment.partition("=")[0] in SECRET_NAMES for assignment in assignments):
+        if any(assignment.partition("=")[0] in (BASE_SECRET_NAMES if _baseline else SECRET_NAMES) for assignment in assignments):
             return True
     return False
 
@@ -1259,11 +1291,18 @@ def unique_segments(segments: list[list[str]]) -> list[list[str]]:
     seen: set[tuple[str, ...]] = set()
     result = []
     for words in segments:
-        key = tuple(words)
+        key = segment_identity(words)
         if key not in seen:
             seen.add(key)
             result.append(words)
     return result
+
+
+def segment_identity(words: list[str]) -> tuple:
+    """K3's identity for B; text AND descriptor metadata for K4's reading."""
+    if _baseline:
+        return tuple(words)
+    return tuple((str(word), isinstance(word, Descriptor)) for word in words)
 
 
 def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int]] | tuple = (),
@@ -1290,10 +1329,10 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
     for reading, tokens in enumerate(readings):
         for raw in segments(tokens):
             if reading:
-                if tuple(raw) in seen:
+                if segment_identity(raw) in seen:
                     continue
             else:
-                seen.add(tuple(raw))
+                seen.add(segment_identity(raw))
             emit(raw)  # as written, before any launcher walk: a redirection is checked wherever the walk would put it
             skipped: list[str] = []
             words = raw[prefix_end(raw, 0, skipped):]
@@ -1320,11 +1359,30 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                 if program == "rtk":
                     words = strip_prefix(rtk_command(words))  # `rtk run` and the file readers
                     continue
+                # A script-shaped argument cannot hide the real shell program.
+                # K3's ordering is retained only while computing its reason.
+                if not _baseline and depth < MAX_DEPTH:
+                    if program in SHELLS:
+                        inline = shell_parts(words)[1]
+                        if inline is not None:
+                            result.extend(expand(inline, depth + 1))
+                    elif program == "eval" and len(words) > 1:
+                        result.extend(expand(" ".join(words[1:]), depth + 1))
+                if not _baseline:
+                    runner = k4_runner_start(words)
+                    if runner is not None:
+                        keyring_at = next((at for at, word in enumerate(words)
+                            if word.rsplit('/', 1)[-1] == KEYRING_SCRIPT
+                            and words[at + 1:at + 2] == ['exec']), len(words))
+                        if runner[0] < keyring_at:
+                            spend("reads", 1)
+                            words = strip_prefix(runner[2])
+                            continue
                 started = keyring_exec(words)
                 if started is not None:
                     words = strip_prefix(started[1])
                     continue
-                if depth < MAX_DEPTH:
+                if _baseline and depth < MAX_DEPTH:
                     if program in SHELLS:
                         inline = shell_parts(words)[1]
                         if inline is not None:
@@ -1584,7 +1642,7 @@ def keyctl_reads_payload(words: list[str]) -> bool:
     # list and rlist print any key's payload as integers when the target is not a keyring. Target parsing
     # (descriptor digits, redirections) proved bypassable in review, and `kernel_keyring.py status`
     # answers presence, so both are blocked whatever the target.
-    return arguments[at] in KEYCTL_LIST_COMMANDS
+    return arguments[at] in KEYCTL_LIST_COMMANDS and not _code_derived
 
 
 def launched_commands(words_list: list[list[str]]) -> list[list[str]]:
@@ -1601,7 +1659,7 @@ def launched_commands(words_list: list[list[str]]) -> list[list[str]]:
             program = program_of(words[position:position + 1])
             if program in LAUNCHED_PROGRAMS or INTERPRETER.fullmatch(program):
                 spend("reads", 1)
-                found.extend(expand(shlex.join(words[position:])))
+                found.extend(expand(shlex.join(words[position:]) if _baseline else k4_join(words[position:])))
     return found
 
 
@@ -1691,13 +1749,13 @@ def segment_reason(words: list[str]) -> str | None:
     if arguments is None:
         return None
     if any(POINTER_VARIABLE.search(w) for w in arguments) \
-            or any(HOME_CREDENTIAL_STORE.search(w) for w in search_paths(words, arguments)):
+            or any((BASE_HOME_CREDENTIAL_STORE if _baseline else HOME_CREDENTIAL_STORE).search(w) for w in search_paths(words, arguments)):
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"
     if any(is_env_file_word(w) for w in arguments):
         return "dotenv_read"
-    if any(SECRET_NAME.search(w) for w in arguments):
+    if any((BASE_SECRET_NAME if _baseline else SECRET_NAME).search(w) for w in arguments):
         return "secret_name_search"
     return None
 
@@ -1942,13 +2000,13 @@ def prior_segment_reason(words: list[str]) -> str | None:
     if arguments is None:
         return None
     if any(POINTER_VARIABLE.search(w) for w in arguments) \
-            or any(HOME_CREDENTIAL_STORE.search(w) for w in search_paths(words, arguments)):
+            or any((BASE_HOME_CREDENTIAL_STORE if _baseline else HOME_CREDENTIAL_STORE).search(w) for w in search_paths(words, arguments)):
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"
     if any(is_env_file_word(w) for w in arguments):
         return "dotenv_read"
-    if any(SECRET_NAME.search(w) for w in arguments):
+    if any((BASE_SECRET_NAME if _baseline else SECRET_NAME).search(w) for w in arguments):
         return "secret_name_search"
     return None
 
@@ -1983,31 +2041,91 @@ def check(command: str) -> str | None:
         stop_work()
 
 
-def read_command(command: str) -> str | None:
+def read_command(command: str, top: bool = True) -> str | None:
+    global _baseline
+    previous = _baseline
+    try:
+        regions = k4_regions(command)
+        form = k4_form_f(command, regions) if top else None
+        masked = command[:form[3]] + command[form[4]:] if form else command
+        _baseline = True
+        # A5: B's word readings see the empty F body. Original raw protections
+        # remain eager; exceptions propagate through the single shared budget.
+        reason = raw_reason(command) or base_command(masked)
+        if reason:
+            return reason
+        if form:
+            joined = command.replace('\\\n', '')
+            reason = keyring_reason((joined, unquoted(joined)), expand(masked))
+            if reason:
+                return reason
+        _baseline = False
+        reason = raw_reason(command) or base_command(masked, (command, regions, masked))
+        if reason:
+            return reason
+        return k4_code_regions_reason(command, regions, masked) or k4_tail_reason(command, regions)
+    finally:
+        _baseline = previous
+
+
+def base_command(command: str, code_context=None) -> str | None:
     # The shell removes a backslash-newline before it splits words, so the rules read the joined command.
     # Each text pattern also reads it without quoting: `sh -c 'echo $GH_TO''KEN'` hands the inner shell
     # `echo $GH_TOKEN`. (Where quoting does end a name, as in `"$GH_TO"KEN`, that errs toward blocking.)
     command = command.replace("\\\n", "")
     texts = (command, unquoted(command))
+    reason = raw_reason(command)
+    if reason:
+        return reason
+    return current_reading(command, texts, code_context) or prior_reading(command, texts)
+
+
+def raw_reason(command: str) -> str | None:
+    key = ('raw-reason', _baseline, command)
+    if _k4_cache is not None and key in _k4_cache:
+        return _k4_cache[key]
+    reason = raw_reason_uncached(command)
+    if _k4_cache is not None:
+        _k4_cache[key] = reason
+    return reason
+
+
+def raw_reason_uncached(command: str) -> str | None:
+    if not _baseline:
+        # B already answered the unchanged whole-text rules. Only the added
+        # secret-name predicates require another raw pass in the K4 view.
+        k4_charge(command, 6)
+    command = command.replace('\\\n', '')
+    texts = (command, unquoted(command))
     for text in texts:
-        for pattern, reason in STORE_PATHS:
-            if pattern.search(text):
-                return reason
-        if PROC_WORD.search(text) and re.search(r"\benviron\b", text):
-            return "process_environment"
-        if SECRET_EXPANSION.search(text) or SECRET_LOOKUP.search(text):
+        if _baseline:
+            for pattern, reason in STORE_PATHS:
+                if pattern.search(text):
+                    return reason
+            if PROC_WORD.search(text) and re.search(r"\benviron\b", text):
+                return "process_environment"
+        if (BASE_SECRET_EXPANSION if _baseline else SECRET_EXPANSION).search(text) \
+                or (BASE_SECRET_LOOKUP if _baseline else SECRET_LOOKUP).search(text):
             return "secret_variable_reference"
-    # Two readings of the words, and a command either refuses is refused (see "The prior reading" above): this version's first, so its
-    # reasons stand, and the reading of c26800f3 when this one allows the command.
-    return current_reading(command, texts) or prior_reading(command, texts)
+    return None
 
 
-def current_reading(command: str, texts: tuple[str, str]) -> str | None:
+def current_reading(command: str, texts: tuple[str, str], code_context=None) -> str | None:
     """The verdict of this version's reading of the words of a command whose text rules found nothing."""
     words_list = expand(command)
+    if not _baseline:
+        # Added names and stores are the first K4 tier, across all segments.
+        for words in words_list:
+            reason = segment_reason(words)
+            if reason in {'secret_name_search', 'credential_file_read', 'secret_variable_reference'}:
+                return reason
     reason = keyring_reason(texts, words_list)
     if reason:
         return reason
+    if not _baseline:
+        reason = k4_runner_reason(command, texts, words_list)
+        if reason:
+            return reason
     if any(sources_credential_file(words) for words in words_list):
         if any("xtrace" in text or re.search(r"\bSHELLOPTS=", text) for text in texts) \
                 or any(traces(words) for words in words_list):
@@ -2019,6 +2137,1688 @@ def current_reading(command: str, texts: tuple[str, str]) -> str | None:
         reason = segment_reason(words)
         if reason:
             return reason
+    if not _baseline:
+        return k4_extra_reason(command, words_list, code_context)
+    return None
+
+
+K4_PYTHON = re.compile(r"\A(?:python(?:3|[0-9]+\.[0-9]+)?|pypy3?)\Z")
+K4_IDENTIFIER = re.compile(r"\A[A-Za-z_][A-Za-z0-9_]*\Z")
+K4_QUOTES = re.compile(r"[\"'\\]")
+
+
+def k4_charge(text: str, passes: int = 1) -> None:
+    """Charge before each new linear scan; no eligibility work precedes it."""
+    spend("characters", max(1, (len(text) + 31) // 32) * passes)
+
+
+def k4_word_charge(words: list[str]) -> None:
+    spend("words", len(words) + 1)
+    spend("characters", max(1, (sum(map(len, words)) + 31) // 32))
+
+
+class K4Word(str):
+    """Quote-removed word with literal/offset provenance, never shell evaluated."""
+    __slots__ = ("start", "end", "literal", "origins")
+
+    def __new__(cls, value, start, end, literal, origins):
+        word = super().__new__(cls, value)
+        word.start, word.end = start, end
+        word.literal, word.origins = literal, tuple(origins)
+        return word
+
+
+class K4Descriptor(K4Word, Descriptor):
+    """A touching descriptor with the original K4 quote/offset provenance."""
+
+
+def k4_shell_words(text: str, origins=None) -> list[K4Word]:
+    """Small quote/provenance scanner supplementing K3's shell walker.
+
+    Source: scan_shell/lex at dc33b48a and Bash 5.2.21 word quoting.
+    It does not grant shell-syntax exceptions. Unknown expansion stays dynamic.
+    """
+    key = ('shell-words', text, tuple(origins) if origins is not None else None)
+    if _k4_cache is not None and key in _k4_cache:
+        return _k4_cache[key]
+    k4_charge(text)
+    spend("texts", 1)
+    result, at, size = [], 0, len(text)
+    origin = (lambda index: origins[index]) if origins is not None else (lambda index: index)
+    while at < size:
+        if text[at] in ' \t\r':
+            at += 1
+            continue
+        if text[at] == '#':
+            after = text.find('\n', at)
+            at = size if after < 0 else after
+            continue
+        start = at
+        if text[at] in ';&|()<>\n':
+            if text[at] == '\n':
+                at += 1
+            else:
+                while at < size and text[at] in ';&|()<>':
+                    at += 1
+            value = ';' if text[start:at] == '\n' else text[start:at]
+            result.append(K4Word(value, start, at, True, [origin(i) for i in range(start, at)]))
+            continue
+        value, locations, quote, literal = [], [], '', True
+        while at < size:
+            ch = text[at]
+            if not quote and ch in ' \t\r\n;&|()<>':
+                break
+            if ch == '\\' and quote != "'":
+                if at + 1 < size:
+                    at += 1
+                    if text[at] != '\n':
+                        value.append(text[at]); locations.append(origin(at))
+                    at += 1
+                    continue
+                literal = False
+            if ch in "'\"" and (not quote or quote == ch):
+                quote = ch if not quote else ''
+                at += 1
+                continue
+            if quote != "'" and ch in '$`':
+                literal = False
+            value.append(ch); locations.append(origin(at))
+            at += 1
+        value = ''.join(value)
+        touching = (at < size and text[at] in '<>' and text[start:at] == value
+                    and (value.isascii() and value.isdigit() or value.startswith('{') and value.endswith('}')
+                         and K4_IDENTIFIER.fullmatch(value[1:-1])))
+        cls = K4Descriptor if touching else K4Word
+        result.append(cls(value, start, at, literal and not quote, locations))
+    spend("words", len(result) + 1)
+    if _k4_cache is not None:
+        _k4_cache[key] = result
+    return result
+
+
+def k4_program_operand(words: list[str]) -> tuple[str, int, str | None]:
+    """Python/Node's program selector: script, stdin, module or inline code.
+
+    Installed Python 3.13.15 --help, Node CLI reference; no program is run.
+    -W/-X consume their values; c/m consume the remainder of a short cluster.
+    """
+    k4_word_charge(words)
+    program = program_of(words)
+    python = bool(K4_PYTHON.fullmatch(program))
+    if not python and program not in {'node', 'nodejs'}:
+        return 'other', 0, None
+    at = 1
+    while at < len(words):
+        after = skip_redirections(words, at)
+        if after != at:
+            at = after
+            continue
+        word = words[at]
+        if word == '--':
+            return 'script', at + 1, None
+        if word == '-':
+            return 'stdin', at, None
+        if not word.startswith('-'):
+            return 'script', at, None
+        if python and not word.startswith('--'):
+            pos = 1
+            while pos < len(word):
+                option = word[pos]
+                if option in 'cm':
+                    value = word[pos + 1:] or (words[at + 1] if at + 1 < len(words) else None)
+                    return ('inline' if option == 'c' else 'module'), at, value
+                if option in 'WX':
+                    if pos + 1 == len(word):
+                        at += 1
+                    break
+                pos += 1
+        elif not python:
+            if word in {'-e', '--eval'}:
+                return 'inline', at, words[at + 1] if at + 1 < len(words) else None
+            if word.startswith('--eval='):
+                return 'inline', at, word[len('--eval='):]
+            if word.startswith('-e') and not word.startswith('--'):
+                return 'inline', at, word[2:]
+            if word in {'--input-type', '--require', '-r', '--import'}:
+                at += 1
+        at += 1
+    return 'stdin', at, None
+
+
+def k4_script_position(words: list[str], script: str, uv: bool = False) -> int | None:
+    k4_word_charge(words)
+    if not words:
+        return None
+    if program_of(words) == script:
+        return 0
+    if uv and program_of(words) == 'uv' and words[1:2] == ['run']:
+        at = 2
+        while at < len(words) and words[at].startswith('-'):
+            at += 1
+        nested = k4_script_position(words[at:], script)
+        return at + nested if nested is not None else None
+    if K4_PYTHON.fullmatch(program_of(words)):
+        kind, at, _code = k4_program_operand(words)
+        if kind == 'script' and at < len(words) and words[at].rsplit('/', 1)[-1] == script:
+            return at
+    return None
+
+
+def k4_runner_start(words: list[str]):
+    """Any-position start, distinct from usage's narrower script position."""
+    k4_word_charge(words)
+    for at, word in enumerate(words):
+        if word.rsplit('/', 1)[-1] == 'credential_run.py':
+            end = next((i for i in range(at + 1, len(words)) if words[i] == '--'), None)
+            if end is None:
+                return None
+            moved, index = [], at + 1
+            while index < end:
+                after = skip_redirections(words, index, moved)
+                index = after if after != index else index + 1
+            return at, words[at + 1:end], words[end + 1:] + moved
+    return None
+
+
+def k4_join(words: list[str]) -> str:
+    """shlex.join with descriptor adjacency preserved in derived shell text."""
+    k4_word_charge(words)
+    parts, join_next = [], False
+    for word in words:
+        if parts and not join_next:
+            parts.append(' ')
+        parts.append(str(word) if isinstance(word, Descriptor) or REDIRECTION.fullmatch(word) else shlex.quote(word))
+        join_next = isinstance(word, Descriptor)
+    return ''.join(parts)
+
+
+def k4_runner_mentions(command: str) -> bool:
+    """Whole-text names, with only invocation-owned --only value spans exempt.
+
+    Offset sets make membership constant time. An --only in a mention, another
+    command, or after the first -- never grants a permission.
+    """
+    k4_charge(command, 3)
+    exempt, pending, seen = set(), [(command, None, 0)], set()
+    while pending:
+        text, origins, depth = pending.pop()
+        tokens = k4_shell_words(text, origins)
+        for raw in segments(tokens):
+            words = strip_prefix(raw)
+            _entries, start, _moved = launcher_chain(words)
+            words = words[start:]
+            scan = words
+            while scan:
+                parsed = k4_runner_start(scan)
+                at = parsed[0] if parsed else k4_script_position(scan, 'credential_run.py')
+                if at is None:
+                    break
+                end = next((i for i in range(at + 1, len(scan)) if scan[i] == '--'), len(scan))
+                own = command_arguments(scan[at:end], touching_only=True)
+                for i, value in enumerate(own[1:], 1):
+                    if own[i - 1] == '--only' and value in SECRET_NAMES and getattr(value, 'literal', False):
+                        exempt.add(value.origins[0])
+                scan = scan[end + 1:]
+            if depth < MAX_DEPTH and program_of(words) in SHELLS:
+                inline = shell_parts(words)[1]
+                if isinstance(inline, K4Word):
+                    key = (str(inline), inline.origins)
+                    if key not in seen:
+                        seen.add(key)
+                        pending.append((str(inline), inline.origins, depth + 1))
+    if any(found.start() not in exempt for found in SECRET_NAME.finditer(command)):
+        return True
+    plain, offsets = [], []
+    for at, ch in enumerate(command):
+        if ch not in "\"'\\":
+            plain.append(ch); offsets.append(at)
+    return any(offsets[found.start()] not in exempt for found in SECRET_NAME.finditer(''.join(plain)))
+
+
+def k4_runner_reason(command: str, texts: tuple[str, str], words_list: list[list[str]]) -> str | None:
+    k4_charge(command)
+    starts = [parsed for words in words_list if (parsed := k4_runner_start(words)) is not None]
+    for started in unique_segments([item[2] for item in starts]):
+        spend('reads', 1)
+        inner = expand(k4_join(started)) if started else []
+        inner = unique_segments(inner + launched_commands(inner))
+        if any(dumps_after_source(words) for words in inner):
+            return 'environment_dump_in_credential_run'
+        if any(program_of(words) == 'systemctl' and systemctl_reason(words) for words in inner):
+            return 'service_manager_environment'
+        programs = {program_of(words) for words in inner}
+        # Cache whole-text predicates across all starts in this reading.
+        if any(INTERPRETER.fullmatch(program) for program in programs) or programs & AWKS:
+            k4_charge(command, 2)
+            if any(KEYRING_ENVIRONMENT_ACCESS.search(text) for text in texts):
+                return 'environment_dump_in_credential_run'
+        if programs & JQS:
+            k4_charge(command, 2)
+            if any(JQ_ENVIRONMENT.search(text) for text in texts):
+                return 'environment_dump_in_credential_run'
+        if programs & SHELLS:
+            k4_charge(command, 2)
+            if any(SHELL_INDIRECTION.search(text) for text in texts):
+                return 'environment_dump_in_credential_run'
+    invocations = [words[at:] for words in words_list
+        if (at := k4_script_position(words, 'credential_run.py')) is not None]
+    for invocation in invocations:
+        args = command_arguments(invocation)
+        if args[:1] in (['-h'], ['--help']):
+            continue
+        if not args or args[0] in {'get', 'print', 'list', 'token'} or not {'--', '--check', '-h', '--help'}.intersection(args):
+            return 'credential_run_usage'
+    if (starts or invocations) and k4_runner_mentions(command):
+        return 'secret_variable_reference'
+    return None
+
+
+K4_VARIABLE = re.compile(r"\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?")
+K4_ECHO_FLAGS = re.compile(r"\A-[neE]+\Z")
+K4_SELECTORS = frozenset({'PS_PERSONALITY', 'CMD_ENV', 'I_WANT_A_BROKEN_PS'})
+
+
+def k4_visible_words(raw: list[str]) -> list[str]:
+    """The same launcher/start walk, preserving the original word objects."""
+    k4_word_charge(raw)
+    words = strip_prefix(raw)
+    while words:
+        _entries, start, moved = launcher_chain(words)
+        if start:
+            words = words[start:] + moved
+            continue
+        if program_of(words) == 'rtk':
+            words = strip_prefix(rtk_command(words))
+            continue
+        runner = k4_runner_start(words)
+        keyring = keyring_exec(words)
+        keyring_at = next((at for at, word in enumerate(words)
+            if word.rsplit('/', 1)[-1] == KEYRING_SCRIPT and words[at + 1:at + 2] == ['exec']), len(words))
+        if runner is not None and runner[0] < keyring_at:
+            spend('reads', 1)
+            words = strip_prefix(runner[2])
+        elif keyring is not None:
+            spend('reads', 1)
+            words = strip_prefix(keyring[1])
+        else:
+            break
+        k4_word_charge(words)
+    return words
+
+
+def k4_manager_reason(words_list: list[list[str]]) -> str | None:
+    for words in words_list:
+        k4_word_charge(words)
+        program = program_of(words)
+        if program == 'systemctl':
+            positional, _properties = systemctl_call(words)
+            if not positional:
+                continue
+            verb, names = positional[0], positional[1:]
+            if verb == 'import-environment' and not names:
+                return 'manager_environment_write'
+            if verb in {'import-environment', 'set-environment'} and any(name.partition('=')[0] in SECRET_NAMES for name in names):
+                return 'manager_environment_write'
+        elif program == 'dbus-update-activation-environment':
+            args = command_arguments(words)
+            if '--all' in args or any(name.partition('=')[0] in SECRET_NAMES for name in args if not name.startswith('-')):
+                return 'manager_environment_write'
+    return None
+
+
+def k4_literal(word: str, assigned: set[str]) -> bool:
+    k4_charge(word)
+    if getattr(word, 'literal', False):
+        return True
+    if '`' in word:
+        return False
+    found = list(K4_VARIABLE.finditer(word))
+    if not found or any(match[1] not in assigned for match in found):
+        return False
+    return '$' not in K4_VARIABLE.sub('', word)
+
+
+def k4_store_reason(command: str) -> str | None:
+    """Inspect original and exposed shell texts, retaining literal provenance."""
+    pending, seen, cursor = [command], set(), 0
+    while cursor < len(pending):
+        text = pending[cursor]; cursor += 1
+        if text in seen:
+            continue
+        seen.add(text)
+        k4_charge(text)
+        reason = k4_store_text(text)
+        if reason:
+            return reason
+        if cursor > MAX_SUBSTITUTION_NESTING:
+            continue
+        # K3 exposes these same texts to its word rules; store feeds also need
+        # their original quotes, which cannot be recovered from expand().
+        pending.extend(scan_shell(text)[0])
+        for raw in segments(k4_shell_words(text)):
+            words = k4_visible_words(raw)
+            if program_of(words) in SHELLS:
+                inline = shell_parts(words)[1]
+                if inline is not None:
+                    pending.append(str(inline))
+            elif program_of(words) == 'eval':
+                pending.append(' '.join(words[1:]))
+    return None
+
+
+def k4_store_text(command: str) -> str | None:
+    k4_charge(command)
+    tokens = k4_shell_words(command)
+    assigned = set()
+    for raw in segments(tokens):
+        assignment_mode = True
+        declaration = bool(raw and raw[0] in {'export', 'declare', 'local', 'readonly', 'typeset'})
+        for index, word in enumerate(raw):
+            if declaration and (index == 0 or word.startswith('-')):
+                continue
+            name, equal, value = word.partition('=')
+            if equal and K4_IDENTIFIER.fullmatch(name) and (assignment_mode or declaration):
+                if value and word.literal:
+                    assigned.add(name)
+            elif not declaration:
+                assignment_mode = False
+    stages, raw, previous, separator = [], [], None, None
+    for token in tokens:
+        if token in SEPARATORS or set(token) <= set(';&|()'):
+            if raw:
+                stages.append((raw, previous if separator in {'|', '|&'} else None))
+                previous, raw = raw, []
+            # LF immediately after a pipe continues that pipeline.
+            if not (token == ';' and command[token.start:token.end] == '\n' and separator in {'|', '|&'}):
+                separator = str(token)
+        else:
+            raw.append(token)
+    if raw:
+        stages.append((raw, previous if separator in {'|', '|&'} else None))
+    for stage, producer in stages:
+        words = k4_visible_words(stage)
+        store = next((at for at, word in enumerate(words)
+            if word.rsplit('/', 1)[-1] == KEYRING_SCRIPT and words[at + 1:at + 2] == ['store']), None)
+        if store is None:
+            continue
+        arguments = [word for word in command_arguments([words[store], *words[store + 2:]], touching_only=True) if word != '--replace']
+        if len(arguments) > 1:
+            return 'keyring_store_literal'
+        if k4_literal_input(words, assigned):
+            return 'keyring_store_literal'
+        if producer is None:
+            continue
+        source = k4_visible_words(producer)
+        if k4_literal_input(source, assigned):
+            return 'keyring_store_literal'
+        program, args = program_of(source), command_arguments(source, touching_only=True)
+        at = 0
+        if program == 'echo':
+            while at < len(args) and K4_ECHO_FLAGS.fullmatch(args[at]):
+                at += 1
+            if any(k4_literal(word, assigned) for word in args[at:]):
+                return 'keyring_store_literal'
+        elif program == 'printf':
+            if args[:1] == ['-v']:
+                at = 2
+            if args[at:at + 1] == ['--']:
+                at += 1
+            if at < len(args) and ((k4_literal(args[at], assigned) and '%' not in args[at])
+                    or any(k4_literal(word, assigned) for word in args[at + 1:])):
+                return 'keyring_store_literal'
+    return None
+
+
+def k4_literal_input(words: list[str], assigned: set[str]) -> bool:
+    k4_word_charge(words)
+    for at, word in enumerate(words):
+        if word in {'<<', '<<-'}:
+            return True
+        if word == '<<<' and at + 1 < len(words) and k4_literal(words[at + 1], assigned):
+            return True
+    return False
+
+
+def k4_ps_reason(command: str) -> str | None:
+    k4_charge(command, 3)
+    # An eval updates its caller's shell; shell -c and substitutions inherit a
+    # copy. Explicit iterator frames keep both execution order and linear work.
+    pending = [(iter(segments(k4_shell_words(command))), set(), 0, command)]
+    while pending:
+        iterator, active, depth, text = pending[-1]
+        raw = next(iterator, None)
+        if raw is None:
+            pending.pop()
+            continue
+        if raw:
+            words = k4_visible_words(raw)
+            program = program_of(words)
+            if program in {'export', 'declare'}:
+                active.update(word.partition('=')[0] for word in command_arguments(words)
+                    if not word.startswith('-') and word.partition('=')[0] in K4_SELECTORS)
+            program_at = next((i for i, word in enumerate(raw) if words and word is words[0]), len(raw))
+            prefix = {word.partition('=')[0] for word in raw[:program_at]
+                      if '=' in word and word.partition('=')[0] in K4_SELECTORS}
+            if not words:
+                active.update(prefix)
+            selected = active | prefix
+            if program == 'ps' and selected:
+                return 'ps_personality_selector'
+            if depth < MAX_SUBSTITUTION_NESTING:
+                if program in SHELLS:
+                    inline = shell_parts(words)[1]
+                    if inline is not None:
+                        nested = str(inline)
+                        pending.append((iter(segments(k4_shell_words(nested))), set(selected), depth + 1, nested))
+                elif program == 'eval':
+                    nested = ' '.join(words[1:])
+                    pending.append((iter(segments(k4_shell_words(nested))), active, depth + 1, nested))
+                for word in raw:
+                    if isinstance(word, K4Word) and not word.literal:
+                        source = text[word.start:word.end]
+                        k4_charge(source)
+                        pending.extend((iter(segments(k4_shell_words(body))), set(selected), depth + 1, body)
+                                       for body in scan_shell(source)[0])
+    return None
+
+
+def k4_canary_reason(words_list: list[list[str]]) -> str | None:
+    pending = [(words, 0) for words in words_list]
+    cursor = 0
+    while cursor < len(pending):
+        words, depth = pending[cursor]; cursor += 1
+        k4_word_charge(words)
+        at = k4_script_position(words, 'canary_proof.py', uv=True)
+        program = program_of(words)
+        if at is None and program not in {'echo', 'printf', 'git', 'sed', 'cat', 'rg', 'grep'} \
+                and not K4_PYTHON.fullmatch(program):
+            at = next((i for i, word in enumerate(words) if word.rsplit('/', 1)[-1] == 'canary_proof.py'), None)
+        if at is not None:
+            args = command_arguments(words[at:])
+            for i, word in enumerate(args):
+                if word == '--user-run' or word.startswith('--user-run=') or word == '--phase=comparison' \
+                        or (word == '--phase' and args[i + 1:i + 2] == ['comparison']):
+                    return 'canary_user_terminal_required'
+        if program == 'script' and depth < MAX_DEPTH:
+            args = command_arguments(words)
+            for i, word in enumerate(args):
+                if word in {'-c', '--command'} and i + 1 < len(args):
+                    pending.extend((inner, depth + 1) for inner in expand(args[i + 1]))
+                elif word.startswith('--command='):
+                    pending.extend((inner, depth + 1) for inner in expand(word.partition('=')[2]))
+                elif word.startswith('-') and not word.startswith('--') and 'c' in word[1:]:
+                    position = word.index('c', 1)
+                    value = word[position + 1:] or (args[i + 1] if i + 1 < len(args) else '')
+                    pending.extend((inner, depth + 1) for inner in expand(value))
+    return None
+
+
+def k4_extra_reason(command: str, words_list: list[list[str]], code_context=None) -> str | None:
+    return (k4_gateway_shell(words_list)
+            or (k4_code_regions_reason(*code_context, gateway_only=True) if code_context else None)
+            or k4_manager_reason(words_list) or k4_store_reason(command)
+            or k4_ps_reason(command) or k4_canary_reason(words_list))
+
+
+K4_HD = re.compile(r"<<(-?)[ \t]*(?:([\"'])([A-Za-z_][A-Za-z0-9_]*)\2|([A-Za-z_][A-Za-z0-9_]*))(?=$|[ \t])")
+K4_F_EXEC = re.compile(r"\A(?:[A-Za-z0-9_.~/-]*/)?(python(?:3|[0-9]+\.[0-9]+)?|pypy|nodejs|node)\Z")
+K4_F_FLAG = re.compile(r"\A-[BbdEIOPqsSuv]+\Z")
+K4_F_PLAIN = re.compile(r"[A-Za-z0-9_./:=,+@%~-]+")
+K4_F_VARIABLE = re.compile(r"\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})")
+K4_F_DIGITS = re.compile(r"\A[0-9]+\Z")
+K4_F_GREP = re.compile(r"\A-[inEFvwxco]+\Z")
+K4_REGION_WORD = re.compile(r"(?<![A-Za-z0-9_.-])(?:python(?:3|[0-9]+\.[0-9]+)?|pypy3?|nodejs|node)(?![A-Za-z0-9_.-])")
+
+
+def k4_regions(command: str) -> list[tuple]:
+    """Original LF regions, bounded by the first exact terminator, never quotes
+    in the language body. This recognizer tightens; it cannot authorize F.
+    Tuple: language, OL-start/end, body-start/end, terminator-end, quoted, dash.
+    """
+    k4_charge(command)
+    if '<<' not in command:
+        return []
+    k4_charge(command, 2)
+    lines = command.split('\n')
+    offsets, locations, offset = [], {}, 0
+    for index, line in enumerate(lines):
+        offsets.append(offset)
+        locations.setdefault(line, []).append(index)
+        offset += len(line) + 1
+    regions = []
+    for number, line in enumerate(lines):
+        if '<<' not in line:
+            continue
+        k4_charge(line, 2)
+        # One word scan per operator line. Multiple operators must not cause
+        # overlapping scans of every growing prefix.
+        language_positions = {}
+        for word in K4_REGION_WORD.finditer(unquoted(line)):
+            name = word[0]
+            language_positions.setdefault('js' if name in {'node', 'nodejs'} else 'py', word.start())
+        for match in K4_HD.finditer(line):
+            languages = {language for language, position in language_positions.items() if position < match.start()}
+            delimiter = match[3] or match[4]
+            possible = locations.get(delimiter, [])
+            at = bisect.bisect_right(possible, number)
+            term = possible[at] if at < len(possible) else None
+            body_start = min(len(command), offsets[number] + len(line) + 1)
+            body_end = offsets[term] if term is not None else len(command)
+            term_end = body_end + len(delimiter) if term is not None else None
+            for language in sorted(languages) or [None]:
+                regions.append((language, offsets[number], offsets[number] + len(line),
+                                body_start, body_end, term_end, bool(match[2]), bool(match[1])))
+    spend('words', len(regions) + 1)
+    return regions
+
+
+def k4_f_arg(text: str, at: int) -> int | None:
+    """One finite ARG from the contract. Consumes each piece by index."""
+    # Caller charges the complete header/tail before this bounded subscan.
+    start, size = at, len(text)
+    while at < size:
+        char = text[at]
+        if char == "'":
+            end = text.find("'", at + 1)
+            if end < 0 or '\r' in text[at:end] or '\n' in text[at:end]:
+                return None
+            at = end + 1
+        elif char == '"':
+            at += 1
+            while at < size and text[at] != '"':
+                if text[at] in '`\\!\r\n':
+                    return None
+                if text[at] == '$':
+                    found = K4_F_VARIABLE.match(text, at)
+                    if found is None:
+                        return None
+                    at = found.end()
+                else:
+                    at += 1
+            if at == size:
+                return None
+            at += 1
+        elif char == '$':
+            found = K4_F_VARIABLE.match(text, at)
+            if found is None:
+                return None
+            at = found.end()
+        elif found := K4_F_PLAIN.match(text, at):
+            at = found.end()
+        else:
+            break
+    return at if at > start else None
+
+
+def k4_f_tail(tail: str) -> bool:
+    k4_charge(tail, 2)
+    at, size = 0, len(tail)
+    while at < size and tail[at] in ' \t':
+        at += 1
+    while at < size and tail[at] != '|':
+        special = next((token for token in ('2>&1', '1>&2', '>&2') if tail.startswith(token, at)), None)
+        if special:
+            at += len(special)
+        else:
+            if tail[at] in '12&':
+                at += 1
+            if not tail.startswith('>', at):
+                return False
+            at += 2 if tail.startswith('>>', at) else 1
+            while at < size and tail[at] in ' \t':
+                at += 1
+            after = k4_f_arg(tail, at)
+            if after is None:
+                return False
+            at = after
+        while at < size and tail[at] in ' \t':
+            at += 1
+    if at == size:
+        return True
+    tokens = k4_shell_words(tail[at:])
+    if tokens and tail[at + tokens[-1].end:].strip(' \t'):
+        return False
+    cursor = 0
+    options = {'wc': {'-l', '-c', '-w', '-m'}, 'sort': {'-n', '-r', '-u', '-h', '-V'},
+               'uniq': {'-c', '-d', '-u'}, 'head': {'-q'}, 'tail': {'-q'}}
+    while cursor < len(tokens):
+        if tail[at + tokens[cursor].start:at + tokens[cursor].end] != '|' or cursor + 1 == len(tokens):
+            return False
+        cursor += 1
+        program = tokens[cursor]
+        if tail[at + program.start:at + program.end] != program:
+            return False
+        if program not in options and program != 'grep':
+            return False
+        cursor += 1
+        pattern = False
+        while cursor < len(tokens) and tokens[cursor] != '|':
+            token = tokens[cursor]
+            if token.start <= tokens[cursor - 1].end:
+                return False
+            raw = tail[at + token.start:at + token.end]
+            if program == 'grep':
+                if pattern:
+                    return False
+                if not K4_F_GREP.fullmatch(raw):
+                    if k4_f_arg(raw, 0) != len(raw):
+                        return False
+                    pattern = True
+            elif raw in options[program]:
+                pass
+            elif program in {'head', 'tail'} and raw.startswith('-') and K4_F_DIGITS.fullmatch(raw[1:]):
+                pass
+            elif program in {'head', 'tail'} and raw in {'-n', '-c'}:
+                cursor += 1
+                if cursor >= len(tokens) or tokens[cursor].start <= token.end \
+                        or not K4_F_DIGITS.fullmatch(tail[at + tokens[cursor].start:at + tokens[cursor].end]):
+                    return False
+            else:
+                return False
+            cursor += 1
+        if program == 'grep' and not pattern:
+            return False
+    return True
+
+
+def k4_f_header(line: str) -> str | None:
+    k4_charge(line, 3)
+    if '\r' in line:
+        return None
+    operator = line.find('<<')
+    match = K4_HD.match(line, operator) if operator >= 0 else None
+    if not match or not match[2] or match[1]:
+        return None
+    # K4_HD requires a complete delimiter word and BL+ before any tail.
+    if not k4_f_tail(line[match.end():]):
+        return None
+    source = line[:operator]
+    words = k4_shell_words(source)
+    if not words:
+        return None
+    if source[words[-1].end:].strip(' \t'):
+        return None
+    at = 0
+    if words[0] == 'cd':
+        if len(words) < 4 or source[words[0].start:words[0].end] != 'cd' \
+                or words[1].start <= words[0].end or source[words[2].start:words[2].end] != '&&':
+            return None
+        arg = source[words[1].start:words[1].end]
+        if k4_f_arg(arg, 0) != len(arg):
+            return None
+        at = 3
+    executable = source[words[at].start:words[at].end]
+    found = K4_F_EXEC.fullmatch(executable)
+    if found is None:
+        return None
+    language = 'js' if found[1] in {'node', 'nodejs'} else 'py'
+    at += 1
+    stdin, js_option = False, False
+    while at < len(words):
+        word = words[at]
+        if word.start <= words[at - 1].end:
+            return None
+        raw = source[word.start:word.end]
+        if stdin:
+            if k4_f_arg(raw, 0) != len(raw):
+                return None
+        elif raw == '-':
+            stdin = True
+        elif language == 'py' and K4_F_FLAG.fullmatch(raw):
+            pass
+        elif language == 'js' and not js_option and raw in {'--input-type=module', '--input-type=commonjs'}:
+            js_option = True
+        else:
+            return None
+        at += 1
+    return language
+
+
+def k4_form_f(command: str, regions: list[tuple]):
+    if not regions:
+        return None
+    k4_charge(command)
+    first, count = command.find('<<'), 0
+    while first >= 0:
+        count += 1
+        if count > 1:
+            return None
+        first = command.find('<<', first + 1)
+    if count != 1 or not regions:
+        return None
+    line = command.partition('\n')[0]
+    language = k4_f_header(line)
+    if language is None:
+        return None
+    for region in regions:
+        if region[0] != language or region[1] != 0 or not region[6] or region[7] or region[5] is None:
+            continue
+        if region[5] == len(command) or (region[5] + 1 == len(command) and command.endswith('\n')):
+            return region
+    return None
+
+
+def k4_tail_reason(command: str, regions: list[tuple]) -> str | None:
+    k4_charge(command)
+    seen = set()
+    for region in regions:
+        end = region[5]
+        if end is None or not region[6] or region[7] or end >= len(command):
+            continue
+        end += 1  # the exact terminator's LF
+        if end < len(command) and end not in seen:
+            seen.add(end)
+            spend('reads', 1)
+            reason = k4_derived(command[end:])
+            if reason:
+                return reason
+    return None
+
+
+K4_CODE_IDENT = re.compile(r"[A-Za-z_$][A-Za-z0-9_$]*")
+K4_ENV_VISIBLE = re.compile(r"\benvironb?\b|\bprocess\s*(?:\.\s*env\b|\[\s*['\"]env['\"])|getattr\s*\(\s*os\b")
+K4_CODE_ESCAPE = re.compile(r"\\(?:x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|[0-7]{1,3}|.)", re.S)
+K4_PY_SHELLOUT = frozenset({'system', 'popen', 'Popen', 'run', 'call', 'check_call', 'check_output',
+    'getoutput', 'getstatusoutput', 'spawnl', 'spawnle', 'spawnlp', 'spawnlpe', 'spawnv', 'spawnve',
+    'spawnvp', 'spawnvpe', 'execl', 'execle', 'execlp', 'execlpe', 'execv', 'execve', 'execvp', 'execvpe',
+    'posix_spawn', 'posix_spawnp', 'create_subprocess_shell', 'create_subprocess_exec', 'startfile'})
+K4_JS_SHELLOUT = frozenset({'exec', 'execSync', 'execFile', 'execFileSync', 'spawn', 'spawnSync'})
+K4_OUTPUT = frozenset({'print', 'pprint', 'pp', 'repr', 'str', 'format', 'dumps', 'dump', 'safe_dump',
+    'write', 'writelines', 'writerow', 'writerows', 'info', 'warning', 'warn', 'error', 'critical',
+    'exception', 'debug', 'log', 'echo', 'secho', 'send', 'sendall', 'post', 'put', 'patch', 'request',
+    'urlopen', 'stringify', 'String', 'inspect', 'writeFile', 'writeFileSync', 'appendFile', 'appendFileSync',
+    'end', 'fetch', 'keys', 'values', 'entries', 'getOwnPropertyNames'})
+
+
+class K4CodeToken:
+    __slots__ = ('kind', 'value', 'start', 'end', 'quote', 'prefix', 'newline')
+
+    def __init__(self, kind, value, start, end, quote='', prefix='', newline=False):
+        self.kind, self.value, self.start, self.end = kind, value, start, end
+        self.quote, self.prefix, self.newline = quote, prefix, newline
+
+
+def k4_unescape(content: str, raw: bool = False) -> str:
+    k4_charge(content)
+    if raw:
+        return content
+    def replace(found):
+        value = found[0][1:]
+        if value.startswith(('x', 'u')) and len(value) > 1:
+            return chr(int(value[1:], 16))
+        if value and value[0] in '01234567':
+            return chr(int(value, 8))
+        return {'n': '\n', 'r': '\r', 't': '\t', '\n': '', '\\': '\\', "'": "'", '"': '"', '`': '`'}.get(value, found[0])
+    return K4_CODE_ESCAPE.sub(replace, content)
+
+
+def k4_code_tokens(code: str, language: str):
+    """Finite language lexer. Explicit frames retain interpolation code; a
+    quote in a comment never becomes a string delimiter. No language executes.
+    """
+    key = ('code-tokens', language, code)
+    if _k4_cache is not None and key in _k4_cache:
+        return _k4_cache[key]
+    k4_charge(code)
+    spend('texts', 1)
+    tokens, literals, frames = [], [], [('code', False, 0)]
+    at, size, uncertain, newline = 0, len(code), False, False
+
+    def emit(kind, value, first, last, quote='', prefix=''):
+        nonlocal newline
+        token = K4CodeToken(kind, value, first, last, quote, prefix, newline)
+        newline = False
+        tokens.append(token)
+        if kind == 'string':
+            literals.append(token)
+
+    while at < size:
+        frame = frames[-1]
+        if frame[0] == 'string':
+            _kind, quote, prefix, first, chunk, interpolated = frame
+            if code.startswith(quote, at):
+                content = k4_unescape(code[chunk:at], 'r' in prefix)
+                emit('string', content, first if not interpolated else chunk, at + len(quote), quote,
+                     prefix + ('-part' if interpolated else ''))
+                at += len(quote)
+                frames.pop()
+                continue
+            if code[at] == '\\':
+                at = min(size, at + 2)
+                continue
+            fstring = language == 'py' and 'f' in prefix
+            template = language == 'js' and quote == '`'
+            if fstring and code[at:at + 2] in {'{{', '}}'}:
+                at += 2
+                continue
+            width = 1 if fstring and code[at] == '{' else 2 if template and code.startswith('${', at) else 0
+            if width:
+                if at > chunk:
+                    emit('string', k4_unescape(code[chunk:at], 'r' in prefix), chunk, at, quote, prefix + '-part')
+                frames[-1] = ('string', quote, prefix, first, at + width, True)
+                emit('interp', '(', at, at + width)
+                frames.append(('code', True, 0))
+                at += width
+                continue
+            at += 1
+            continue
+        _kind, interpolation, braces = frame
+        char = code[at]
+        if interpolation and char == '}' and braces == 0:
+            emit('interp', ')', at, at + 1)
+            frames.pop()
+            parent = frames[-1]
+            frames[-1] = (*parent[:4], at + 1, True)
+            at += 1
+            continue
+        if char in ' \t\r\n':
+            newline |= char == '\n'
+            at += 1
+            continue
+        if (language == 'py' and char == '#') or (language == 'js' and code.startswith('//', at)):
+            end = code.find('\n', at)
+            at = size if end < 0 else end
+            continue
+        if language == 'js' and code.startswith('/*', at):
+            end = code.find('*/', at + 2)
+            if end < 0:
+                uncertain = True
+                at = size
+            else:
+                newline |= '\n' in code[at:end]
+                at = end + 2
+            continue
+        first, prefix = at, ''
+        found = K4_CODE_IDENT.match(code, at)
+        if found:
+            value, end = found[0], found.end()
+            if language == 'py' and 1 <= len(value) <= 3 and set(value.lower()) <= set('rbuf') \
+                    and end < size and code[end] in "'\"":
+                prefix, at, char = value.lower(), end, code[end]
+            else:
+                emit('id', value, at, end)
+                at = end
+                continue
+        if char in "'\"" or (language == 'js' and char == '`'):
+            quote = char * 3 if language == 'py' and code.startswith(char * 3, at) else char
+            at += len(quote)
+            frames.append(('string', quote, prefix, first, at, False))
+            continue
+        if interpolation:
+            if char == '{':
+                frames[-1] = ('code', True, braces + 1)
+            elif char == '}':
+                frames[-1] = ('code', True, braces - 1)
+        operator = next((op for op in ('...', '**', '=>', '==', '!=', '<=', '>=', ':=') if code.startswith(op, at)), char)
+        emit('punct', operator, at, at + len(operator))
+        at += len(operator)
+    uncertain |= len(frames) > 1
+    if frames[-1][0] == 'string':
+        frame = frames[-1]
+        emit('string', code[frame[4]:], frame[3], size, frame[1], frame[2] + '-unfinished')
+    spend('words', len(tokens) + 1)
+    result = (tokens, literals, uncertain)
+    if _k4_cache is not None:
+        _k4_cache[key] = result
+    return result
+
+
+def k4_code_structure(tokens: list[K4CodeToken]):
+    """O(1) output membership at every token; frames restore an integer, never
+    search ancestors. Bracket pairs also support finite call argument parsing.
+    """
+    spend('words', len(tokens) + 1)
+    pairs, calls, output, iteration = {}, [], [], []
+    stack, current, out, iterating = [], None, 0, False
+    for at, token in enumerate(tokens):
+        value = token.value
+        if (token.newline and not stack) or value == ';':
+            iterating = False
+        if value == 'for':
+            iterating = True
+        calls.append(current); output.append(bool(out)); iteration.append(iterating)
+        if value in {'(', '[', '{'} and token.kind != 'string':
+            name = tokens[at - 1].value if at and tokens[at - 1].kind == 'id' and value == '(' else None
+            stack.append((at, value, current, out, iterating))
+            if name:
+                current = at
+                out += name in K4_OUTPUT
+        elif value in {')', ']', '}'} and token.kind != 'string' and stack:
+            opening, _char, current, out, previous_iter = stack.pop()
+            pairs[opening] = at; pairs[at] = opening
+            iterating = previous_iter
+        elif value == ':':
+            iterating = False
+    return pairs, calls, output, iteration
+
+
+def k4_leading_literals(tokens, opening, pairs):
+    """Finite literal strings/lists before the first other argument."""
+    spend('words', 1)
+    close = pairs.get(opening, opening)
+    at, values, argv = opening + 1, [], False
+    while at < close:
+        token = tokens[at]
+        if token.kind == 'string' and '-part' not in token.prefix and '-unfinished' not in token.prefix:
+            values.append(token.value); at += 1
+            while at < close and tokens[at].kind == 'string' and '-part' not in tokens[at].prefix:
+                values[-1] += tokens[at].value; at += 1
+        elif token.value in {'[', '('} and token.kind != 'string':
+            end = pairs.get(at)
+            if end is None:
+                break
+            item = at + 1
+            items = []
+            while item < end:
+                if tokens[item].kind != 'string' or '-part' in tokens[item].prefix:
+                    break
+                items.append(tokens[item].value); item += 1
+                while item < end and tokens[item].kind == 'string' and '-part' not in tokens[item].prefix:
+                    items[-1] += tokens[item].value; item += 1
+                if item < end and tokens[item].value == ',':
+                    item += 1
+                elif item != end:
+                    break
+            if item != end:
+                break
+            values.extend(items); argv = True; at = end + 1
+        else:
+            break
+        if at < close and tokens[at].value == ',':
+            at += 1
+        else:
+            break
+    spend('words', len(values) + 1)
+    return values, argv or len(values) > 1
+
+
+def k4_derived(text: str, code: bool = False) -> str | None:
+    global _code_derived
+    key = ('derived', code, text)
+    if _k4_cache is not None and key in _k4_cache:
+        return _k4_cache[key]
+    k4_charge(text)
+    spend('texts', 1)
+    old = _code_derived
+    _code_derived = code
+    try:
+        reason = read_command(text, top=False)
+    finally:
+        _code_derived = old
+    if _k4_cache is not None:
+        _k4_cache[key] = reason
+    return reason
+
+
+def k4_shell_literals(code: str, literals: list[K4CodeToken]) -> str | None:
+    k4_charge(code)
+    for token in literals:
+        content = token.value
+        before, after = token.start - 1, token.end
+        while before >= 0 and code[before] in ' \t':
+            before -= 1
+        while after < len(code) and code[after] in ' \t':
+            after += 1
+        standalone = (before < 0 or code[before] in '\n(;&|') and (after == len(code) or code[after] in '\n);&|')
+        if standalone or '\n' in content or token.quote == '`':
+            reason = k4_derived(content, code=True)
+            if reason:
+                return reason
+        if token.quote.startswith('"'):
+            reason = k4_derived('"' + content + '"', code=True)
+            if reason:
+                return reason
+    return None
+
+
+def k4_shellouts(tokens, pairs, language):
+    spend('words', len(tokens) + 1)
+    permitted = set()
+    names = K4_PY_SHELLOUT if language == 'py' else K4_JS_SHELLOUT
+    for at, token in enumerate(tokens[:-1]):
+        if token.kind != 'id' or token.value not in names or tokens[at + 1].value != '(':
+            continue
+        values, argv = k4_leading_literals(tokens, at + 1, pairs)
+        if not values:
+            continue
+        text = shlex.join(values) if argv else values[0]
+        reason = k4_derived(text, code=True)
+        if reason:
+            return reason, permitted
+        permitted.add(at + 1)
+    return None, permitted
+
+
+def k4_whole_environment(code, tokens, structure, language, permitted):
+    k4_charge(code, 2)
+    pairs, calls, output, iteration = structure
+    aliases, definitions, imported, visited = {}, set(), set(), 0
+    size = len(tokens)
+    values = [token.value for token in tokens]
+    env_literals = [0]
+    for token in tokens:
+        env_literals.append(env_literals[-1] + (token.kind == 'string' and token.value in {'environ', 'environb'}))
+    import_end = 0
+    for at, token in enumerate(tokens):
+        if token.kind != 'id':
+            continue
+        if at >= import_end and values[at:at + 3] == ['from', 'os', 'import']:
+            cursor = at + 3
+            while cursor < size and not tokens[cursor].newline and values[cursor] != ';':
+                if values[cursor] in {'environ', 'environb'}:
+                    if values[cursor + 1:cursor + 2] == ['as'] and cursor + 2 < size:
+                        imported.add(values[cursor + 2]); definitions.update((cursor, cursor + 2))
+                    else:
+                        imported.add(values[cursor]); definitions.add(cursor)
+                cursor += 1
+            import_end = cursor
+        if token.value == 'getattr' and values[at + 1:at + 3] == ['(', 'os']:
+            end = pairs.get(at + 1, at + 1)
+            if env_literals[end] > env_literals[at + 2]:
+                return 'interpreter_environment_unclassified'
+        end = None
+        if language == 'py' and values[at:at + 2] == ['os', '.'] and values[at + 2:at + 3] in (['environ'], ['environb']):
+            end = at + 3
+        elif language == 'py' and token.value in imported and at not in definitions:
+            end = at + 1
+        elif language == 'py' and token.value in {'environ', 'environb'} and at > 1 and values[at - 1] == '.' \
+                and values[at - 2] == ')':
+            return 'interpreter_environment_unclassified'
+        elif language == 'js' and values[at:at + 3] == ['process', '.', 'env']:
+            end = at + 3
+        elif language == 'js' and values[at:at + 2] == ['process', '['] and at + 3 < size \
+                and tokens[at + 2].kind == 'string' and values[at + 2] == 'env' and values[at + 3] == ']':
+            end = at + 4
+        if end is None:
+            continue
+        visited += 1
+        single = k4_single_key(tokens, end, pairs, language)
+        if single is not None:
+            if single in SECRET_NAMES:
+                return 'secret_variable_reference'
+            continue
+        if values[end:end + 1] == ['['] or (values[end:end + 1] == ['.']
+                and values[end + 1:end + 2] in (['get'], ['pop'], ['setdefault'])):
+            return 'interpreter_environment_unclassified'
+        if output[at] or iteration[at] or values[end:end + 2] in (['.', 'items'], ['.', 'keys'], ['.', 'values']):
+            return 'environment_dump'
+        # A simple local copy definition, with no unknown expression tail.
+        first, last = at, end
+        copy = False
+        if language == 'py' and values[end:end + 4] == ['.', 'copy', '(', ')']:
+            last = end + 4; copy = True
+        elif language == 'py' and at >= 2 and values[at - 2:at] == ['dict', '('] and values[end:end + 1] == [')']:
+            first, last, copy = at - 2, end + 1, True
+        elif language == 'js' and at >= 2 and values[at - 2:at] == ['{', '...'] and values[end:end + 1] == ['}']:
+            first, last, copy = at - 2, end + 1, True
+        if copy and first >= 2 and values[first - 1] == '=' and tokens[first - 2].kind == 'id' \
+                and (last == size or tokens[last].newline or values[last] == ';'):
+            name = values[first - 2]
+            aliases.setdefault(name, first - 2)
+            definitions.add(first - 2)
+        else:
+            return 'interpreter_environment_unclassified'
+    for at, token in enumerate(tokens):
+        if token.kind != 'id' or token.value not in aliases or at in definitions:
+            continue
+        if at < aliases[token.value]:
+            continue
+        if k4_single_key(tokens, at + 1, pairs, language) is not None:
+            continue
+        if output[at] or iteration[at]:
+            return 'environment_dump'
+        if at >= 2 and values[at - 2:at] in (['env', '='], ['env', ':']) and calls[at] in permitted:
+            continue
+        # The option name itself is not a use of an identically named binding.
+        if values[at + 1:at + 2] in (['='], [':']) and calls[at] in permitted and values[at] == 'env':
+            continue
+        return 'interpreter_environment_unclassified'
+    if _k4_cache is not None:
+        _k4_cache[('environment-visits', language, code)] = visited
+    return None
+
+
+def k4_single_key(tokens, end, pairs, language):
+    spend('words', 1)
+    size = len(tokens)
+    if end + 2 < size and tokens[end].value == '[' and tokens[end + 1].kind == 'string' and tokens[end + 2].value == ']':
+        return tokens[end + 1].value
+    if end + 1 < size and tokens[end].value == '.':
+        method = tokens[end + 1].value
+        if language == 'js' and tokens[end + 1].kind == 'id':
+            return method
+        if language == 'py' and method in {'get', 'pop', 'setdefault'} and end + 4 < size \
+                and tokens[end + 2].value == '(' and tokens[end + 3].kind == 'string' and end + 2 in pairs \
+                and tokens[end + 4].value in {',', ')'}:
+            return tokens[end + 3].value
+    return None
+
+
+def k4_code_reason(code: str, language: str, inline=False, gateway_only=False) -> str | None:
+    tokens, literals, uncertain = k4_code_tokens(code, language)
+    structure = k4_code_structure(tokens)
+    reason = k4_gateway_code(code, tokens, structure, language)
+    if reason or gateway_only:
+        return reason
+    permitted = set()
+    if not inline:
+        reason = k4_shell_literals(code, literals)
+        if reason:
+            return reason
+        reason, permitted = k4_shellouts(tokens, structure[0], language)
+        if reason:
+            return reason
+    k4_charge(code)
+    if uncertain and K4_ENV_VISIBLE.search(code):
+        return 'interpreter_environment_unclassified'
+    return k4_whole_environment(code, tokens, structure, language, permitted)
+
+
+def k4_code_regions_reason(command: str, regions, masked, gateway_only=False) -> str | None:
+    k4_charge(command)
+    seen = set()
+    for language, _first, _last, first, last, *_ in regions:
+        if language is None:
+            continue
+        for body in (command[first:last], command[first:last].replace('\\\n', '')):
+            key = (language, body, False)
+            if key in seen:
+                continue
+            seen.add(key)
+            reason = k4_code_reason(body, language, gateway_only=gateway_only)
+            if reason:
+                return reason
+    for words in expand(masked):
+        name = program_of(words)
+        if not K4_PYTHON.fullmatch(name) and name not in {'node', 'nodejs'}:
+            continue
+        kind, _at, code = k4_program_operand(words)
+        if kind == 'inline' and code is not None:
+            language = 'py' if K4_PYTHON.fullmatch(name) else 'js'
+            key = (language, code, True)
+            if key not in seen:
+                seen.add(key)
+                reason = k4_code_reason(code, language, inline=True, gateway_only=gateway_only)
+                if reason:
+                    return reason
+        elif kind == 'stdin' and code is None and not gateway_only:
+            # Unsupported inline-option forms do not turn visible environment
+            # access into an unexplained ALLOW. Script/stdin/-- operands stop
+            # this fallback just as they stop normal inline recognition.
+            joined = ' '.join(words[1:])
+            k4_charge(joined)
+            if K4_ENV_VISIBLE.search(joined):
+                return 'interpreter_environment_unclassified'
+    return None
+
+
+K4_GW_HEAD = re.compile(r"^(?:http://)?(?:(?P<user>[^/\s@?#]+)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal):(?P<port>20128|20129)(?P<rest>(?:[/\\?#].*)?)$", re.I | re.S)
+K4_GW_ID = re.compile(r"\A[A-Za-z0-9-]{1,64}\Z")
+K4_GW_NUMBER = re.compile(r"\A[0-9]{1,5}\Z")
+K4_GW_METHOD = re.compile(r"\A[A-Z]+\Z")
+K4_GW_ENCODE_DATA = re.compile(r"\A[A-Za-z0-9_-]+=[A-Za-z0-9_.~-]*\Z")
+K4_GW_ROWS = {
+    ('GET', '/api/health'): ((20128, 20129), 'none', False),
+    ('GET', '/api/settings/compression'): ((20128, 20129), 'none', False),
+    ('GET', '/api/context/combos'): ((20128, 20129), 'none', False),
+    ('GET', '/api/model-capability-overrides'): ((20128, 20129), 'none', False),
+    ('GET', '/api/resilience'): ((20128, 20129), 'none', False),
+    ('GET', '/api/settings/feature-flags'): ((20128, 20129), 'none', False),
+    ('GET', '/api/cache'): ((20128, 20129), 'none', False),
+    ('GET', '/api/analytics/compression'): ((20128, 20129), 'analytics', False),
+    ('GET', '/api/usage/call-logs'): ((20128, 20129), 'logs', False),
+    ('GET', '/api/usage/provider-limits'): ((20128,), 'none', True),
+    ('POST', '/api/usage/provider-limits'): ((20128,), 'none', True),
+    ('POST', '/api/compression/preview'): ((20129,), 'none', False),
+}
+K4_CURL_VALUE = frozenset({'--max-time', '--connect-timeout', '--output', '--dump-header', '--header', '--user-agent',
+    '--retry', '--retry-delay', '--retry-max-time'})
+K4_CURL_FLAGS = frozenset({'--silent', '--show-error', '--fail', '--fail-with-body', '--insecure', '--compressed',
+    '--no-progress-meter', '--verbose', '--no-buffer'})
+K4_CURL_DATA = frozenset({'--data', '--data-ascii', '--data-binary', '--data-raw', '--data-urlencode', '--json'})
+K4_CURL_FORM = frozenset({'--form', '--form-string'})
+K4_CURL_SHORT_VALUE = {'X': '--request', 'd': '--data', 'F': '--form', 'T': '--upload-file',
+                       'o': '--output', 'm': '--max-time', 'H': '--header', 'A': '--user-agent', 'D': '--dump-header'}
+
+
+def k4_gateway_url(url: str, method='GET', body=False, additions=(), unresolved=False) -> bool:
+    """True only for a forbidden recognizable management target. Scheme-less
+    client operands are HTTP; canonicalization never manufactures permission.
+    """
+    k4_charge(url, 4)
+    found = K4_GW_HEAD.fullmatch(url)
+    if found is None:
+        return False
+    rest = found['rest']
+    path = rest.split('?', 1)[0].split('#', 1)[0]
+    normalized = []
+    for part in path.replace('\\', '/').split('/'):
+        if part == '..':
+            if normalized:
+                normalized.pop()
+        elif part and part != '.':
+            normalized.append(part)
+    evident = path.startswith('/api/') or path == '/api' or '/api/' in path \
+        or (normalized and normalized[0] == 'api')
+    if not evident:
+        return False
+    if unresolved or found['user'] or '#' in rest or '%' in rest or '\\' in rest \
+            or '$' in rest or '`' in rest or any(char.isspace() for char in rest) \
+            or '//' in path or any(part in {'.', '..'} for part in path.split('/')):
+        return True
+    query = rest.partition('?')[2] if '?' in rest else None
+    if query == '':
+        return True
+    if additions:
+        if any(not isinstance(item, str) or any(char in item for char in '$`@%\r\n') for item in additions):
+            return True
+        query = '&'.join(([query] if query is not None else []) + list(additions))
+    row = K4_GW_ROWS.get((method, path))
+    if row is None and method == 'GET' and path.startswith('/api/usage/call-logs/') \
+            and K4_GW_ID.fullmatch(path[len('/api/usage/call-logs/'):]):
+        row = ((20128, 20129), 'none', False)
+    if row is None or int(found['port']) not in row[0] or (row[2] and body):
+        return True
+    if query is None:
+        return False
+    if row[1] == 'analytics':
+        return query != 'since=all'
+    if row[1] != 'logs':
+        return True
+    used = set()
+    for item in query.split('&'):
+        name, equals, value = item.partition('=')
+        if not equals or name not in {'limit', 'offset'} or name in used or not K4_GW_NUMBER.fullmatch(value):
+            return True
+        used.add(name)
+    return not used
+
+
+def k4_curl_requests(words: list[str]) -> bool:
+    """curl 8.5.0 operation-local method/body/URL association. Later options
+    apply to every URL in the operation; --next starts a new local option set.
+    """
+    k4_word_charge(words)
+    args = command_arguments(words, touching_only=True)
+    at = 0
+    while at < len(args):
+        urls, data, method = [], [], None
+        head = get = form = upload = unknown = options_done = False
+        while at < len(args):
+            word = args[at]; at += 1
+            if not options_done and word in {'--next', '-:'}:
+                break
+            if word == '--' and not options_done:
+                options_done = True
+                continue
+            if options_done or not word.startswith('-') or word == '-':
+                urls.append(word)
+                continue
+            opts = []
+            if word.startswith('--'):
+                option, equals, value = word.partition('=')
+                takes = option in K4_CURL_VALUE | K4_CURL_DATA | K4_CURL_FORM | {'--request', '--upload-file', '--url'}
+                if takes and not equals:
+                    if at == len(args):
+                        unknown = True
+                        continue
+                    value = args[at]; at += 1
+                if equals and not takes:
+                    unknown = True
+                opts.append((option, value))
+            else:
+                offset = 1
+                while offset < len(word):
+                    letter = word[offset]; offset += 1
+                    if letter in K4_CURL_SHORT_VALUE:
+                        option = K4_CURL_SHORT_VALUE[letter]
+                        value = word[offset:]
+                        if not value:
+                            if at == len(args):
+                                unknown = True
+                            else:
+                                value = args[at]; at += 1
+                        opts.append((option, value))
+                        break
+                    opts.append(({'I': '--head', 'G': '--get'}.get(letter, '-' + letter), ''))
+            for option, value in opts:
+                if option == '--request':
+                    method = value
+                    unknown |= not bool(K4_GW_METHOD.fullmatch(value))
+                elif option == '--url':
+                    urls.append(value)
+                elif option in K4_CURL_DATA:
+                    data.append((option, value))
+                elif option in K4_CURL_FORM:
+                    form = True
+                elif option == '--upload-file':
+                    upload = True
+                elif option in {'--head', '--no-head'}:
+                    head = option == '--head'
+                elif option in {'--get', '--no-get'}:
+                    get = option == '--get'
+                elif option not in K4_CURL_VALUE | K4_CURL_FLAGS | {'-s', '-S', '-f', '-k', '-v', '-N'}:
+                    unknown = True
+        unknown |= bool((upload and (data or form or head or get)) or (form and (data or head or get)) or (head and data and not get))
+        additions = []
+        if get:
+            for option, value in data:
+                if option == '--json' or (option == '--data-urlencode' and not K4_GW_ENCODE_DATA.fullmatch(value)) \
+                        or any(char in value for char in '@$`%'):
+                    unknown = True
+                additions.append(value)
+        body = bool(form or upload or (data and not get))
+        effective = method if method is not None else 'HEAD' if head else 'PUT' if upload else 'POST' if body else 'GET'
+        for url in urls:
+            if k4_gateway_url(url, effective, body, additions, unknown):
+                return True
+    return False
+
+
+def k4_wget_requests(words: list[str]) -> bool:
+    k4_word_charge(words)
+    args, at, urls = command_arguments(words, touching_only=True), 0, []
+    method, post, body, unknown = None, 0, 0, False
+    ordinary_values = {'--output-document', '--output-file', '--timeout', '--connect-timeout', '--read-timeout', '--header', '--user-agent'}
+    while at < len(args):
+        word = args[at]; at += 1
+        if word.startswith('--'):
+            option, equals, value = word.partition('=')
+            takes = option in ordinary_values | {'--method', '--post-data', '--post-file', '--body-data', '--body-file'}
+            if takes and not equals:
+                if at == len(args):
+                    unknown = True
+                    continue
+                value = args[at]; at += 1
+            if option == '--method':
+                method = value
+            elif option in {'--post-data', '--post-file'}:
+                post += 1
+            elif option in {'--body-data', '--body-file'}:
+                body += 1
+            elif option not in ordinary_values | {'--quiet', '--no-verbose'}:
+                unknown = True
+        elif word.startswith('-') and word != '-':
+            offset = 1
+            while offset < len(word):
+                letter = word[offset]; offset += 1
+                if letter in 'OoTU':
+                    if offset == len(word):
+                        if at < len(args):
+                            at += 1
+                        else:
+                            unknown = True
+                    break
+                if letter not in 'qnv':
+                    unknown = True
+        else:
+            urls.append(word)
+    unknown |= post > 1 or body > 1 or bool(post and body) or bool(body and method is None) \
+        or bool(post and method is not None and method != 'POST')
+    return any(k4_gateway_url(url, method or ('POST' if post else 'GET'), bool(post or body), unresolved=unknown) for url in urls)
+
+
+def k4_httpie_requests(words: list[str]) -> bool:
+    k4_word_charge(words)
+    args = command_arguments(words)
+    method, urls, additions = None, [], []
+    body = unknown = False
+    scheme = 'https' if program_of(words) == 'https' else 'http'
+    for word in args:
+        if word.startswith('-'):
+            if word not in {'--check-status', '--ignore-stdin', '--json', '-j', '-b', '--body', '-h', '--headers', '--pretty=none'}:
+                unknown = True
+        elif method is None and not urls and K4_GW_METHOD.fullmatch(word):
+            method = word
+        elif not urls:
+            if word.startswith(':'):
+                word = scheme + '://localhost' + word
+            elif '://' not in word:
+                word = scheme + '://' + word
+            urls.append(word)
+        elif '==' in word:
+            name, value = word.split('==', 1)
+            additions.append(name + '=' + value)
+        elif '=' in word:
+            body = True
+        elif ':' not in word:
+            unknown = True
+    return any(k4_gateway_url(url, method or ('POST' if body else 'GET'), body, additions, unknown) for url in urls)
+
+
+def k4_gateway_cli(words: list[str]) -> bool:
+    k4_word_charge(words)
+    args = command_arguments(words)
+    values = {'--port', '--host', '--config', '--data-dir', '--log-level', '--base-url', '--profile'}
+    at = 0
+    while at < len(args):
+        word = args[at]; at += 1
+        if word == '--':
+            break
+        if not word.startswith('-'):
+            return word in {'api', 'sync'}
+        name, equals, _value = word.partition('=')
+        if name in values and not equals:
+            at += 1
+        elif name not in values | {'--help', '-h', '--version', '-v', '--debug', '--verbose'}:
+            # The frozen policy covers ambiguous genuine CLI invocations too.
+            return any(token in {'api', 'sync'} for token in args[at:])
+    return at < len(args) and args[at] in {'api', 'sync'}
+
+
+def k4_gateway_shell(words_list: list[list[str]]) -> str | None:
+    for words in words_list:
+        k4_word_charge(words)
+        program = program_of(words)
+        refused = ((program == 'curl' and k4_curl_requests(words))
+            or (program == 'wget' and k4_wget_requests(words))
+            or (program in {'http', 'https', 'xh'} and k4_httpie_requests(words))
+            or (program == 'omniroute' and k4_gateway_cli(words)))
+        if refused:
+            return 'gateway_credential_route'
+    return None
+
+
+K4_IMPORT_HTTP = re.compile(r"\bfrom[ \t]+(requests|httpx|urllib\.request)[ \t]+import[ \t]+([^;\n]+)")
+K4_CODE_NUMBER = re.compile(r"\A[0-9]+\Z")
+K4_UNKNOWN = object()
+
+
+def k4_call_parts(tokens, opening, pairs):
+    """Argument ranges for one call/container, with nested delimiters skipped
+    through a precomputed pair map. No request borrows another call's options.
+    """
+    close = pairs.get(opening, opening)
+    spend('words', max(1, close - opening))
+    parts, first, at = [], opening + 1, opening + 1
+    while at < close:
+        value = tokens[at].value
+        if value == ',' and tokens[at].kind != 'string':
+            if first < at:
+                parts.append((first, at))
+            first = at + 1
+        elif tokens[at].kind != 'string' and value in {'(', '[', '{'}:
+            at = pairs.get(at, at)
+        at += 1
+    if first < close:
+        parts.append((first, close))
+    return parts
+
+
+def k4_code_value(tokens, span, pairs, depth=0):
+    first, last = span
+    spend('words', max(1, last - first))
+    if first >= last or depth > 8:
+        return K4_UNKNOWN
+    token = tokens[first]
+    if first + 1 == last:
+        if token.kind == 'string' and '-part' not in token.prefix and '-unfinished' not in token.prefix:
+            return token.value
+        if token.value in {'None', 'null'}:
+            return None
+        if token.value in {'True', 'true', 'False', 'false'}:
+            return token.value in {'True', 'true'}
+    # The lexical scanner leaves numeric punctuation separate; only contiguous
+    # ASCII digits form an exact numeric literal here.
+    if all(item.kind == 'punct' and item.value.isascii() and item.value.isdigit() for item in tokens[first:last]):
+        return int(''.join(item.value for item in tokens[first:last]))
+    if token.value in {'[', '('} and pairs.get(first) == last - 1:
+        values = [k4_code_value(tokens, part, pairs, depth + 1) for part in k4_call_parts(tokens, first, pairs)]
+        return K4_UNKNOWN if any(value is K4_UNKNOWN for value in values) else values
+    if token.value == '{' and pairs.get(first) == last - 1:
+        result = {}
+        for key_at, end in k4_call_parts(tokens, first, pairs):
+            if key_at + 2 > end or tokens[key_at].kind not in {'id', 'string'} or tokens[key_at + 1].value != ':':
+                return K4_UNKNOWN
+            key = tokens[key_at].value
+            if key in result:
+                return K4_UNKNOWN
+            value = k4_code_value(tokens, (key_at + 2, end), pairs, depth + 1)
+            if value is K4_UNKNOWN:
+                return K4_UNKNOWN
+            result[key] = value
+        return result
+    return K4_UNKNOWN
+
+
+def k4_call_values(tokens, opening, pairs):
+    positional, keywords, unknown = [], {}, False
+    for first, last in k4_call_parts(tokens, opening, pairs):
+        if first + 1 < last and tokens[first].kind == 'id' and tokens[first + 1].value == '=':
+            name = tokens[first].value
+            if name in keywords:
+                unknown = True
+            keywords[name] = k4_code_value(tokens, (first + 2, last), pairs)
+            unknown |= keywords[name] is K4_UNKNOWN
+        elif tokens[first].value == '**':
+            unknown = True
+        else:
+            value = k4_code_value(tokens, (first, last), pairs)
+            positional.append(value)
+            unknown |= value is K4_UNKNOWN
+    return positional, keywords, unknown
+
+
+def k4_query_values(value):
+    if value is None:
+        return [], False
+    if isinstance(value, str):
+        k4_charge(value)
+        return [value], False
+    pairs = list(value.items()) if isinstance(value, dict) else value
+    if not isinstance(pairs, list):
+        return [], True
+    spend('words', len(pairs) + 1)
+    parts = []
+    for item in pairs:
+        if not isinstance(item, (tuple, list)) or len(item) != 2:
+            return [], True
+        name, number = item
+        if not isinstance(name, str) or not isinstance(number, (str, int)) or isinstance(number, bool):
+            return [], True
+        parts.append(name + '=' + str(number))
+    return parts, False
+
+
+def k4_gateway_code(code, tokens, structure, language):
+    k4_charge(code, 6)
+    pairs, calls, _output, _iteration = structure
+    targets = [(at, token) for at, token in enumerate(tokens) if token.kind == 'string'
+        and ('20128' in token.value or '20129' in token.value) and k4_gateway_url(token.value, unresolved=True)]
+    if not targets:
+        if 'HTTPConnection' in code and '/api/' in code and ('20128' in code or '20129' in code) \
+                and any(host in code for host in ('127.0.0.1', 'localhost', '::1', '10.0.2.2', 'host.docker.internal')):
+            return 'gateway_credential_route'
+        return None
+    imports = {}
+    if language == 'py':
+        for match in K4_IMPORT_HTTP.finditer(code):
+            for name in match[2].split(','):
+                name = name.strip()
+                if K4_IDENTIFIER.fullmatch(name):
+                    imports[name] = match[1]
+    assigned, request_bindings = set(), {}
+    for at, token in enumerate(tokens[:-2]):
+        if token.kind == 'id' and tokens[at + 1].value == '=' and calls[at] is None:
+            assigned.add(token.value)
+            next_at = at + 2
+            # A simple Request binding may be used by a later urlopen in the
+            # same code region; any second assignment invalidates its identity.
+            if token.value in request_bindings:
+                request_bindings[token.value] = None
+            else:
+                cursor = next_at
+                while cursor < len(tokens) and tokens[cursor].value != '(' and not tokens[cursor].newline:
+                    cursor += 1
+                request_bindings[token.value] = cursor if cursor < len(tokens) and cursor and tokens[cursor - 1].value == 'Request' else None
+    for token_at, token in targets:
+        opening = calls[token_at]
+        if opening is None or '-part' in token.prefix or '-unfinished' in token.prefix:
+            return 'gateway_credential_route'
+        name = tokens[opening - 1].value if opening else ''
+        receiver = tokens[opening - 3].value if opening >= 3 and tokens[opening - 2].value == '.' else None
+        positional, keywords, unknown = k4_call_values(tokens, opening, pairs)
+        method, body, additions = None, False, []
+        url = None
+        if language == 'js' and name == 'fetch' and receiver is None and name not in assigned:
+            if not positional:
+                unknown = True
+            else:
+                url = positional[0]
+            options = positional[1] if len(positional) > 1 else {}
+            if len(positional) > 2 or keywords or not isinstance(options, dict):
+                unknown = True
+            else:
+                method = options.get('method', 'GET')
+                body = options.get('body') is not None
+        elif language == 'py' and name in {'get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'request'} \
+                and ((receiver in {'requests', 'httpx'} and receiver not in assigned
+                      and (opening < 4 or tokens[opening - 4].value != '.'))
+                     or (receiver is None and imports.get(name) in {'requests', 'httpx'} and name not in assigned)):
+            if name == 'request':
+                method = keywords.get('method', positional[0] if positional else K4_UNKNOWN)
+                url = keywords.get('url', positional[1] if len(positional) > 1 else K4_UNKNOWN)
+                unknown |= ('method' in keywords and bool(positional)) or ('url' in keywords and len(positional) > 1)
+                unknown |= len(positional) > 2
+            else:
+                method = name.upper()
+                url = keywords.get('url', positional[0] if positional else K4_UNKNOWN)
+                unknown |= ('url' in keywords and bool(positional)) or len(positional) > 1
+                unknown |= 'method' in keywords and keywords['method'] != method
+            body = any(key in keywords and keywords[key] is not None for key in ('data', 'json', 'files', 'content'))
+            additions, query_unknown = k4_query_values(keywords.get('params'))
+            unknown |= query_unknown
+        elif language == 'py' and name in {'Request', 'urlopen'} \
+                and (receiver == 'request' or (receiver is None and imports.get(name) == 'urllib.request')):
+            url = keywords.get('url', keywords.get('fullurl', positional[0] if positional else K4_UNKNOWN))
+            body = keywords.get('data', positional[1] if len(positional) > 1 else None) is not None
+            explicit = keywords.get('method') if name == 'Request' else None
+            if name == 'Request':
+                # Fold the outer urlopen data into the Request's body status,
+                # for both an inline constructor and a proven simple binding.
+                outer = calls[opening]
+                consumers = []
+                if outer is not None and tokens[outer - 1].value == 'urlopen':
+                    consumers.append(outer)
+                bindings = {binding for binding, target in request_bindings.items() if target == opening}
+                if bindings:
+                    for at, item in enumerate(tokens[:-2]):
+                        if item.value == 'urlopen' and tokens[at + 1].value == '(' and tokens[at + 2].value in bindings:
+                            consumers.append(at + 1)
+                for consumer in consumers:
+                    parts = k4_call_parts(tokens, consumer, pairs)
+                    for first, last in parts[1:]:
+                        if tokens[first].value == 'data' and first + 1 < last and tokens[first + 1].value == '=':
+                            first += 2
+                        value = k4_code_value(tokens, (first, last), pairs)
+                        unknown |= value is K4_UNKNOWN
+                        body |= value is not None
+            method = explicit if explicit is not None else 'POST' if body else 'GET'
+        else:
+            unknown = True
+        unknown |= not isinstance(method, str) or not isinstance(url, str) or url != token.value
+        if k4_gateway_url(token.value, method, body, additions, unknown):
+            return 'gateway_credential_route'
     return None
 
 

@@ -2764,5 +2764,793 @@ class SecretPathGuardTests(unittest.TestCase):
                          "the installed user-scope guard must be a verbatim copy of scripts/hooks/secret_path_guard.py")
 
 
+# Independent transcription of contract-v2 section 7.1, written before the
+# production F recognizer. It imports no guard syntax, labels or tokenizer.
+def reference_form_f(text):
+    if sum(text.startswith('<<', i) for i in range(len(text))) != 1:
+        return None
+    lines = text.split('\n')
+    line = lines[0]
+    if '\r' in line or len(lines) < 2:
+        return None
+    size = len(line)
+
+    def blanks(at):
+        while at < size and line[at] in ' \t':
+            at += 1
+        return at
+
+    def arg(at):
+        start = at
+        while at < size:
+            ch = line[at]
+            if ch == "'":
+                end = line.find("'", at + 1)
+                if end < 0:
+                    return None
+                at = end + 1
+            elif ch == '"':
+                at += 1
+                while at < size and line[at] != '"':
+                    if line[at] in '`\\!\r\n':
+                        return None
+                    if line[at] == '$':
+                        match = re.match(r'\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})', line[at:])
+                        if not match:
+                            return None
+                        at += len(match[0])
+                    else:
+                        at += 1
+                if at == size:
+                    return None
+                at += 1
+            elif ch == '$':
+                match = re.match(r'\$(?:[A-Za-z_][A-Za-z0-9_]*|\{[A-Za-z_][A-Za-z0-9_]*\})', line[at:])
+                if not match:
+                    return None
+                at += len(match[0])
+            elif ch.isascii() and (ch.isalnum() or ch in '_./:=,+@%~-'):
+                at += 1
+            else:
+                break
+        return at if at > start else None
+
+    at = blanks(0)
+    if line.startswith('cd', at) and at + 2 < size and line[at + 2] in ' \t':
+        at = arg(blanks(at + 2))
+        if at is None:
+            return None
+        at = blanks(at)
+        if not line.startswith('&&', at):
+            return None
+        at = blanks(at + 2)
+    found = re.match(r'(?:[A-Za-z0-9_.~/-]*/)?(python(?:3|[0-9]+\.[0-9]+)?|pypy|nodejs|node)(?=[ \t<]|$)', line[at:])
+    if not found:
+        return None
+    language = 'js' if found[1] in ('node', 'nodejs') else 'py'
+    at += len(found[0])
+    while True:
+        after = blanks(at)
+        if line.startswith('<<', after):
+            at = after
+            break
+        if after == at:
+            return None
+        at = after
+        end = at
+        while end < size and line[end] not in ' \t<':
+            end += 1
+        word = line[at:end]
+        if word == '-':
+            at = end
+            while True:
+                after = blanks(at)
+                if line.startswith('<<', after):
+                    at = after
+                    break
+                if after == at:
+                    return None
+                at = arg(after)
+                if at is None:
+                    return None
+            break
+        if language == 'py' and re.fullmatch(r'-[BbdEIOPqsSuv]+', word):
+            at = end
+        elif language == 'js' and word in ('--input-type=module', '--input-type=commonjs'):
+            at = end
+            after = blanks(at)
+            if not line.startswith('<<', after) and line[after:after + 1] != '-':
+                return None
+            language = 'js-options'
+        else:
+            return None
+    at = blanks(at + 2)
+    if at == size or line[at] not in "'\"":
+        return None
+    quote = line[at]
+    end = line.find(quote, at + 1)
+    if end < 0 or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', line[at + 1:end]):
+        return None
+    delimiter = line[at + 1:end]
+    at = end + 1
+    if at < size and line[at] not in ' \t':
+        return None
+    at = blanks(at)
+    while at < size and line[at] != '|':
+        special = next((value for value in ('2>&1', '1>&2', '>&2') if line.startswith(value, at)), None)
+        if special:
+            at += len(special)
+        else:
+            if line[at:at + 1] in ('1', '2', '&'):
+                at += 1
+            if not line.startswith('>', at):
+                return None
+            at += 2 if line.startswith('>>', at) else 1
+            at = arg(blanks(at))
+            if at is None:
+                return None
+        at = blanks(at)
+    while at < size:
+        if line[at] != '|':
+            return None
+        at = blanks(at + 1)
+        end = at
+        while end < size and line[end] not in ' \t|':
+            end += 1
+        program, at = line[at:end], end
+        allowed = {'wc': {'-l', '-c', '-w', '-m'}, 'sort': {'-n', '-r', '-u', '-h', '-V'},
+                   'uniq': {'-c', '-d', '-u'}, 'head': {'-q'}, 'tail': {'-q'}}
+        if program not in (*allowed, 'grep'):
+            return None
+        grep_pattern = False
+        while at < size:
+            after = blanks(at)
+            if after == size or line[after] == '|':
+                at = after
+                break
+            if after == at:
+                return None
+            end = after
+            while end < size and line[end] not in ' \t|':
+                end += 1
+            option = line[after:end]
+            if program == 'grep':
+                if not grep_pattern and re.fullmatch(r'-[inEFvwxco]+', option):
+                    at = end
+                elif not grep_pattern:
+                    at = arg(after)
+                    if at is None:
+                        return None
+                    grep_pattern = True
+                else:
+                    return None
+            elif option in allowed[program]:
+                at = end
+            elif program in ('head', 'tail') and re.fullmatch(r'-[0-9]+', option):
+                at = end
+            elif program in ('head', 'tail') and option in ('-n', '-c'):
+                at = blanks(end)
+                match = re.match(r'[0-9]+(?=[ \t|]|$)', line[at:])
+                if at == end or not match:
+                    return None
+                at += len(match[0])
+            else:
+                return None
+        if program == 'grep' and not grep_pattern:
+            return None
+    term = next((index for index in range(1, len(lines)) if lines[index] == delimiter), None)
+    if term is None or lines[term + 1:] not in ([], ['']):
+        return None
+    first = len(line) + 1
+    last = sum(len(value) + 1 for value in lines[:term])
+    return {'language': language.split('-')[0], 'operator': (0, len(line)),
+            'body': (first, last), 'terminator': (last, last + len(delimiter))}
+
+
+K4_F_ALLOW = [
+    "python3 - <<'PY'\n# unique values\nprint(len(set([1, 1])))\nPY",
+    "python3 - a b <<'PY'\nimport sys\nprint(set(sys.argv[1]) | set(sys.argv[2]))\nPY",
+    "cd /tmp && python3 - <<'PY'\nprint(set([1]))\nPY",
+    "python3 - <<'PY' 2>&1 | tail -n 5\nprint(set([1]))\nPY",
+    "python3 - <<'PY' 2>/dev/null\nprint(set([1]))\nPY",
+    "node - <<'JS' 1>/dev/null\nconst env = {PATH: '/usr/bin'}; console.log(env)\nJS",
+    'python3 - <<"PY"\nprint(set([1]))\nPY',
+    "python3 -I - <<'PY'\nprint(set([1]))\nPY",
+    "node --input-type=module - <<'JS'\nconst env = 1; console.log(env)\nJS",
+]
+K4_F_REJECT = [
+    "python3 - <<PY\nprint(set([1]))\nPY",
+    "python3 - <<-'PY'\n\tprint(set([1]))\n\tPY",
+    "sudo python3 - <<'PY'\nprint(set([1]))\nPY",
+    "python3 - <<'PY' | sh\nprint(\"printenv\")\nPY",
+    "python3 - <<'PY'2>/dev/null\nPY2\nprintenv\nPY",
+    "node - <<'JS'1>/dev/null\nJS1\nprintenv\nJS",
+    "python3 - <<'PY'\nprint(set([1]))\nPY\necho done",
+    "python3 -c pass <<'PY'\nprint(set([1]))\nPY",
+    "echo \"$(python3 - <<'PY'\nprint(set([1]))\nPY\n)\"",
+    "cat <<'EOF' > note.md\nprintenv\nEOF",
+    "git commit -F - <<'EOF'\nvalue: \"$(printenv)\"\nEOF",
+    "gh pr comment --body-file - <<'EOF'\nvalue: \"$(printenv)\"\nEOF",
+]
+
+
+# K4 contract-v2 (2026-09-30), amended A4: dc33b48a's reason wins before
+# the descriptor tightening. Strings below are input data for check(), never programs.
+K4_CASES = {
+    'gateway_matrix': [],
+    'gateway_effective_requests': [],
+    'gateway_cli_and_scope': [
+        (text, 'gateway_credential_route') for text in (
+            'omniroute api', 'omniroute api --help', 'omniroute api GET /api/health',
+            'omniroute sync', 'omniroute sync --help', '/usr/bin/omniroute api GET /api/settings',
+            'rtk proxy omniroute api', 'omniroute --port 20128 api GET /api/health',
+            'omniroute --unknown x sync',
+        )
+    ] + [(text, None) for text in (
+        "echo 'omniroute api GET /api/settings'", 'git add omniroute',
+        'curl -s "$OMNIROUTE_URL/api/settings"', 'curl -s localhost:9000/api/settings',
+        'python3 gateway_client.py', 'curl http://127.0.0.1:20130/api/settings',
+        'curl https://127.0.0.1:20128/api/settings',
+        "echo 'http://127.0.0.1:20128/api/settings'", 'unrecognized http://127.0.0.1:20128/api/settings',
+    )],
+    'language_comments_and_interpolation': [
+        ("python3 - <<'PY'\n" + code + '\nPY', reason)
+        for code, reason in (
+            ("# Don't log credentials\nimport os\nprint(dict(os.environ))", 'environment_dump'),
+            ("import os\nprint(f'{os.environ}')", 'environment_dump'),
+            ('print(f"{42:{os.environ}}")', 'environment_dump'),
+            ('print(f"{os.environ[\'HOME\']}")', None),
+            ('# os.environ is just a comment\nprint("os.environ")', None),
+        )
+    ] + [("node - <<'JS'\n" + code + '\nJS', reason) for code, reason in (
+        ('console.log(`${JSON.stringify(process.env)}`)', 'environment_dump'),
+        ('// Don\'t log "credentials"\nconsole.log(process.env)', 'environment_dump'),
+        ('/* Don\'t log "credentials" */\nconsole.log(process.env)', 'environment_dump'),
+        ('console.log(`${process.env.HOME}`)', None),
+        ('// process.env is data\nconsole.log("process.env")', None),
+    )],
+    'shell_literals_and_shellouts': [
+        ("python3 - <<'PY'\n" + code + '\nPY', reason)
+        for code, reason in (
+            ("getattr(__import__('os'), 'system')('printenv')", 'environment_dump'),
+            ('x = "$(printenv)"', 'environment_dump'),
+            ('x = """\nprintenv\n"""', 'environment_dump'),
+            ("os.system('env', ignored)", 'environment_dump'),
+            ("subprocess.run(['printenv'])", 'environment_dump'),
+            ("subprocess.run(['set'])", 'environment_dump'),
+            ("subprocess.run(['cat', '.env'])", 'dotenv_read'),
+            ("subprocess.run(['systemctl', '--user', 'show-environment'])", 'service_manager_environment'),
+            ("subprocess.run(\n # command\n ['printenv']\n)", 'environment_dump'),
+            ("subprocess.run(['env', 'LC_ALL=C', 'sort', 'x.txt'])", None),
+            ("subprocess.run(['keyctl', 'list', '@u'])", None),
+            ("subprocess.run(['keyctl', 'print', '123'])", 'keyring_payload_read'),
+        )
+    ] + [("node - <<'JS'\nconst x = `printenv`\nJS", 'environment_dump')],
+    'whole_environment': [
+        ("python3 - <<'PY'\n" + code + '\nPY', reason)
+        for code, reason in (
+            ('print(os.environ)', 'environment_dump'), ('print(dict(os.environ))', 'environment_dump'),
+            ('print(os.environ.copy())', 'environment_dump'), ('json.dumps(dict(os.environ))', 'environment_dump'),
+            ('print(\n dict(os.environ)\n)', 'environment_dump'),
+            ('print(f(g(os.environ)))', 'environment_dump'), ('os.environ.items()', 'environment_dump'),
+            ('for x in os.environ:\n pass', 'environment_dump'),
+            ('[x for x in os.environ]', 'environment_dump'),
+            ('from os import environ\nprint(environ)', 'environment_dump'),
+            ('print(os.environb)', 'environment_dump'),
+            ("print(os.environ.get('HOME'))\nprint(os.environ['USER'])", None),
+            ("os.environ['HOME'] = '/tmp'", None),
+            ('unknown(os.environ)', 'interpreter_environment_unclassified'),
+            ('os.environ[key]', 'interpreter_environment_unclassified'),
+            ("getattr(os, 'environ')", 'interpreter_environment_unclassified'),
+            ("__import__('os').environ", 'interpreter_environment_unclassified'),
+            ("env = os.environ.copy()\nenv['X'] = '1'\nsubprocess.run(['true'], env=env)", None),
+            ("env = os.environ.copy()\nprint(env)", 'environment_dump'),
+            ("env = os.environ.copy()\nunknown(env)", 'interpreter_environment_unclassified'),
+            ('e=os.environ; print(e)', 'interpreter_environment_unclassified'),
+        )
+    ] + [("node - <<'JS'\n" + code + '\nJS', reason) for code, reason in (
+        ('console.log(process.env)', 'environment_dump'), ('JSON.stringify(process.env)', 'environment_dump'),
+        ('console.log({...process.env})', 'environment_dump'), ('console.log(\n process.env\n)', 'environment_dump'),
+        ('console.log(f(g(process.env)))', 'environment_dump'), ('Object.keys(process.env)', 'environment_dump'),
+        ('for (const k in process.env) {}', 'environment_dump'),
+        ("console.log(process['env'])", 'environment_dump'),
+        ('console.log(process.env.HOME)', None), ("console.log(process.env['HOME'])", None),
+        ('unknown(process.env)', 'interpreter_environment_unclassified'),
+        ('process.env[key]', 'interpreter_environment_unclassified'),
+    )],
+    'inline_environment_and_deferred_shellouts': [
+        (prefix + "'import os; print(dict(os.environ))'", 'environment_dump')
+        for prefix in ('python -c ', 'python3 -c ', '/usr/bin/python3 -c ', 'pypy -c ',
+                       'python3 -Ic ', 'python3 -Sc ', 'python3 -ISc ', 'python3 -IS -c ',
+                       'rtk proxy python3 -c ')
+    ] + [(prefix + "'console.log(process.env)'", 'environment_dump')
+         for prefix in ('node -e ', 'nodejs -e ', 'node --eval ', 'node --eval=', '/usr/bin/node -e ')
+    ] + [(text, None) for text in (
+        'python3 -c \'import subprocess;subprocess.run(["keyctl", "list", "@u"])\'',
+        'node -e \'require("child_process").execFileSync("keyctl", ["list", "@u"])\'',
+        'python3 -c \'import os; print(os.environ["HOME"])\'',
+        'node --eval \'console.log(process.env.HOME)\'',
+        'python3 script.py -c \'print(os.environ)\'',
+        'python3 -- -c \'print(os.environ)\'',
+        'python3 -m module -c \'print(os.environ)\'',
+        'node script.js -e \'console.log(process.env)\'',
+    )],
+    'tail_reads_share_budget': [
+        ('python3 - <<\'PY\'\ns = """\nPY\nprintenv\n"""\nPY', 'environment_dump'),
+        ('cat <<\'EOF\' > x\n"\nEOF\nprintenv\n"', 'environment_dump'),
+    ],
+    'f_reference_boundaries': [(text, None) for text in K4_F_ALLOW]
+        + [(text, 'environment_dump') for text in K4_F_REJECT],
+    "manager_environment": [
+        ('systemctl --user import-environment', 'manager_environment_write'),
+        ('dbus-update-activation-environment --systemd --all', 'manager_environment_write'),
+        ('systemctl --user set-environment LANG=C.UTF-8 LC_ALL=C.UTF-8 PAGER=cat EDITOR=vi TAVILY_API_KEY=abc', 'manager_environment_write'),
+        ('systemctl --user import-environment DISPLAY XAUTHORITY', None),
+        ('systemctl --user set-environment PATH=/usr/bin', None),
+        ('systemctl --user unset-environment PATH', None),
+        ('systemctl --user set-environment LABEL=TAVILY_API_KEY', 'secret_variable_reference'),
+        ('dbus-update-activation-environment LABEL=TAVILY_API_KEY', 'secret_variable_reference'),
+        ('dbus-update-activation-environment DISPLAY', None),
+    ],
+    "literal_store_provenance": [
+        ('python3 scripts/kernel_keyring.py store sample_key ' + feed, 'keyring_store_literal')
+        for feed in ("<<< 'demo$value'", r'<<< demo\$value', "<<< 'demo'\"value\"", 'extra-value',
+                     "<<'EOF'\nvalue\nEOF", '<<EOF\n$K\nEOF')
+    ] + [
+        (producer + ' | python3 scripts/kernel_keyring.py store sample_key', 'keyring_store_literal')
+        for producer in ("echo 'demo$value'", r'echo demo\$value', "echo 'demo'\"value\"", 'echo demo',
+                         "printf demo", 'printf %s demo', "K='demo$value'; printf %s \"$K\"",
+                         "export K='value'; echo \"$K\"", "echo <<<'demo'",
+                         "rtk proxy echo demo", "env LC_ALL=C printf %s demo")
+    ] + [
+        ('echo demo |\n python3 scripts/kernel_keyring.py store sample_key', 'keyring_store_literal'),
+        ('python3 scripts/kernel_keyring.py store sample_key <<< "$K"', None),
+        ('echo "$K" | python3 scripts/kernel_keyring.py store sample_key', None),
+        ('printf \'%s\\n\' "$K" | python3 scripts/kernel_keyring.py store sample_key', None),
+        ('cat "$KEYFILE" | python3 scripts/kernel_keyring.py store sample_key', None),
+        ('python3 scripts/kernel_keyring.py store sample_key', None),
+        ('echo demo; python3 scripts/kernel_keyring.py store sample_key', None),
+        ('IFS= read -rs K; printf \'%s\\n\' "$K" | python3 scripts/kernel_keyring.py store sample_key', None),
+    ],
+    "ps_selectors": [
+        (text.format(name=name), 'ps_personality_selector')
+        for name in ('PS_PERSONALITY', 'CMD_ENV', 'I_WANT_A_BROKEN_PS')
+        for text in ('{name}=bsd ps -e', 'env {name}=bsd ps -e', 'env {name}= ps -e',
+                     'export {name}=bsd; ps -e', 'declare -x {name}=bsd; /bin/ps -e',
+                     'rtk proxy env {name}=bsd /bin/ps -e',
+                     'python3 tools/credentials/credential_run.py tavily -- env {name}=bsd ps -e',
+                     'export {name}; sh -c \'ps -e\'', 'export {name}; echo "$(ps -e)"')
+    ] + [(text.format(name=name), None)
+         for name in ('PS_PERSONALITY', 'CMD_ENV', 'I_WANT_A_BROKEN_PS')
+         for text in ('echo \'{name}=bsd ps -e\'', '{name}=bsd echo text', 'ps -e; export {name}=bsd')
+    ] + [(text, None) for text in ('ps -e', 'ps -ef', 'ps aux')],
+    "canary_gate": [
+        (prefix + suffix, 'canary_user_terminal_required')
+        for prefix in ('/p/canary_proof.py ', 'python3 /p/canary_proof.py ',
+                       '/usr/bin/python3 -IS /p/canary_proof.py ', 'python3 -- /p/canary_proof.py ',
+                       'python3 -W ignore -X dev /p/canary_proof.py ',
+                       'uv run python3 /p/canary_proof.py ', 'uv run /p/canary_proof.py ',
+                       'rtk proxy python3 /p/canary_proof.py ',
+                       'python3 tools/credentials/credential_run.py tavily -- python3 /p/canary_proof.py ')
+        for suffix in ('--user-run', '--user-run=false', '--phase comparison', '--phase=comparison',
+                       '-- --user-run', '--phase baseline --phase comparison')
+    ] + [
+        ('script -c \'python3 /p/canary_proof.py --user-run\'', 'canary_user_terminal_required'),
+        ('sh -c \'python3 /p/canary_proof.py --user-run\'', 'canary_user_terminal_required'),
+        ('eval python3 /p/canary_proof.py --user-run', 'canary_user_terminal_required'),
+        ('echo "$(python3 /p/canary_proof.py --user-run)"', 'canary_user_terminal_required'),
+    ] + [(text, None) for text in (
+        "echo 'python3 /p/canary_proof.py --phase=comparison --user-run'",
+        'python3 /p/canary_proof.py --phase baseline', 'python3 /p/canary_proof.py --phase=final',
+        'python3 /p/canary_proof.py --phase=precomparison', 'python3 /p/canary_proof.py --phase comparisonx',
+        'python3 /p/canary_proof.py --help', 'python3 -m py_compile /p/canary_proof.py',
+        'python3 /p/other_canary_proof.py --user-run',
+    )],
+    "runner_start_and_inline_order": [
+        (prefix + 'tavily -- printenv', 'environment_dump_in_credential_run')
+        for prefix in ('python3 tools/credentials/credential_run.py ', './tools/credentials/credential_run.py ',
+                       '/usr/bin/python3 -I -S tools/credentials/credential_run.py ',
+                       'uv run python tools/credentials/credential_run.py ',
+                       'rtk proxy python3 tools/credentials/credential_run.py ',
+                       'env LC_ALL=C python3 tools/credentials/credential_run.py ')
+    ] + [
+        ('bash -c \'printenv\' x tools/credentials/credential_run.py tavily -- true', 'environment_dump'),
+        ('eval printenv x tools/credentials/credential_run.py tavily -- true', 'environment_dump'),
+        ('bash -c \'printenv\' kernel_keyring.py exec n X -- true', 'environment_dump'),
+        ('sh -c \'printenv\' kernel_keyring.py exec n X -- true', 'environment_dump'),
+        ('eval printenv kernel_keyring.py exec n X -- true', 'environment_dump'),
+        ('python3 tools/credentials/credential_run.py tavily < "$PAPER_ENV_FILE" -- cat', 'credential_file_read'),
+        ('python3 tools/credentials/credential_run.py tavily -- python3 tools/credentials/credential_run.py typesafe -- printenv', 'environment_dump_in_credential_run'),
+        ('python3 tools/credentials/credential_run.py tavily -- python3 scripts/kernel_keyring.py exec n X -- printenv', 'environment_dump_in_keyring_exec'),
+        ('python3 scripts/kernel_keyring.py exec n X -- python3 tools/credentials/credential_run.py tavily -- printenv', 'environment_dump_in_keyring_exec'),
+    ],
+    "runner_environment_and_mentions": [
+        ('python3 tools/credentials/credential_run.py tavily -- ' + command, reason)
+        for command, reason in (
+            ('env', 'environment_dump_in_credential_run'), ('env -0', 'environment_dump_in_credential_run'),
+            ('sh -c \'set\'', 'environment_dump_in_credential_run'), ('export -p', 'environment_dump_in_credential_run'),
+            ('declare -x', 'environment_dump_in_credential_run'), ('typeset -p', 'environment_dump_in_credential_run'),
+            ('ps eww', 'environment_dump_in_credential_run'),
+            ('watch -n 2 printenv', 'environment_dump_in_credential_run'),
+            ('flock lock sh -c \'printenv\'', 'environment_dump_in_credential_run'),
+            ('find . -exec printenv {} +', 'environment_dump_in_credential_run'),
+            ('time -f %e printenv', 'environment_dump_in_credential_run'),
+            ('python3 -c \'import os; print(os.environ)\'', 'environment_dump_in_credential_run'),
+            ('node -e \'console.log(process.env)\'', 'environment_dump_in_credential_run'),
+            ('jq -n env', 'environment_dump_in_credential_run'),
+            ('awk \'BEGIN {print ENVIRON["HOME"]}\'', 'environment_dump_in_credential_run'),
+            ('sh -c \'echo ${!prefix*}\'', 'environment_dump_in_credential_run'),
+            ('systemctl --user show-environment', 'service_manager_environment'),
+            ('systemctl --user show', 'service_manager_environment'),
+            ('cat /proc/self/environ', 'process_environment'),
+            ('tvly auth', 'native_token_print'), ('tvly auth --json', None),
+            ('tvly search TAVILY_API_KEY --json', 'secret_variable_reference'),
+        )
+    ] + [
+        ('echo TAVILY_API_KEY; python3 tools/credentials/credential_run.py tavily -- true', 'secret_variable_reference'),
+        ('echo --only TAVILY_API_KEY; python3 tools/credentials/credential_run.py tavily -- true', 'secret_variable_reference'),
+        ('python3 tools/credentials/credential_run.py tavily -- true --only TAVILY_API_KEY', 'secret_variable_reference'),
+        ('python3 tools/credentials/credential_run.py tavily --only=TAVILY_API_KEY -- true', 'secret_variable_reference'),
+        ('python3 tools/credentials/credential_run.py tavily --only TAVILY_API_KEY -- true', None),
+        ('python3 tools/credentials/credential_run.py tavily --only "TAVILY_API_KEY" -- true', None),
+        ('python3 tools/credentials/credential_run.py tavily --only "$TAVILY_API_KEY" -- true', 'secret_variable_reference'),
+    ],
+    "runner_usage_and_documentation": [
+        ('python3 tools/credentials/credential_run.py ' + suffix, reason)
+        for suffix, reason in (
+            ('', 'credential_run_usage'), ('get tavily', 'credential_run_usage'),
+            ('print tavily', 'credential_run_usage'), ('list', 'credential_run_usage'),
+            ('token tavily', 'credential_run_usage'), ('tavily', 'credential_run_usage'),
+            ('tavily --check', None), ('--help', None), ('-h', None),
+            ('alpaca-paper --only APCA_API_KEY_ID -- python3 collect.py', None),
+            ('alpaca-paper --only APCA_API_KEY_ID --check', None),
+            ('alpaca-paper alpaca-paper-2 --check', None),
+            ('tavily --check -- printenv', 'environment_dump_in_credential_run'),
+            ('-h -- printenv', 'environment_dump_in_credential_run'),
+        )
+    ] + [(text, None) for text in (
+        'python3 -m py_compile tools/credentials/credential_run.py',
+        'git add tools/credentials/credential_run.py', 'sed -n 1p tools/credentials/credential_run.py',
+        'echo "tools/credentials/credential_run.py tavily"',
+        'python3 -c pass tools/credentials/credential_run.py',
+        'python3 -Ic pass tools/credentials/credential_run.py',
+        'python3 -W ignore -X dev tools/credentials/credential_run.py tavily --check',
+        'python3 -- tools/credentials/credential_run.py tavily --check',
+        'pypy3 tools/credentials/credential_run.py tavily --check',
+        'uv run python3 tools/credentials/credential_run.py get tavily',
+        'python3 tools/credentials/credential_run.py databento -- python3 collect.py',
+        'python3 tools/credentials/credential_run.py typesafe -- python3 judge.py',
+        'python3 tools/credentials/credential_run.py sec-contact -- python3 fetch.py',
+        'python3 tools/credentials/credential_run.py omniroute -- python3 client.py',
+        'python3 tools/credentials/credential_run.py tavily -- tvly search markets --json',
+        'python3 tools/credentials/credential_run.py claude-oauth-token -- claude --help',
+    )],
+    "secret_names_and_inventory": [
+        (text.format(name=name), reason)
+        for name in ("CLAUDE_CODE_OAUTH_TOKEN", "CLAUDE_CODE_MESSAGING_TOKEN")
+        for text, reason in (
+            ('echo ${name}', 'secret_variable_reference'),
+            ('echo ${{{name}}}', 'secret_variable_reference'),
+            ('python3 -c \'import os; print(os.environ["{name}"])\'', 'secret_variable_reference'),
+            ('rg -n {name} docs/', 'secret_name_search'),
+            ('echo {name}', None),
+            ('systemd-run --user -E {name}=synthetic true', 'secret_variable_on_command_line'),
+        )
+    ],
+    "omniroute_data_trees": [
+        (f'{reader} {home}/{tree}{suffix}', 'credential_file_read')
+        for home in ('~/.local/share', '$HOME/.local/share', '${HOME}/.local/share',
+                     '/home/example/.local/share', '/Users/example/.local/share', '$XDG_DATA_HOME', '${XDG_DATA_HOME}')
+        for tree in ('omniroute', 'omniroute-fw')
+        for suffix in ('', '/', '/*', '/db_backups/sample', '/services/sample')
+        for reader in ('cat', 'rtk read', 'cp -r', 'rg -n pattern')
+    ] + [(f'cat ~/.local/share/{name}/sample', None)
+         for name in ('omniroute-notes', 'omniroute-fw-notes', 'omnirouter')],
+    "descriptor_identity": [
+        ("set 0 < /dev/null; set 0</dev/null", "environment_dump"),
+        ("set 0</dev/null; set 0 < /dev/null", "environment_dump"),
+        ('set 0 < /dev/null; echo "$(set 0</dev/null)"', "environment_dump"),
+        ('echo "$(set 0</dev/null)"; set 0 < /dev/null', "environment_dump"),
+        ("set 0 < /dev/null", None),
+        ("set 1 > out", None),
+        ("set 1>out", "environment_dump"),
+        ("set 1 > out; echo \x01", "environment_dump"),
+    ],
+    "base_reason_precedence": [
+        ("set 0 < /dev/null; set 0</dev/null; cat .env", "dotenv_read"),
+        ("curl -s http://127.0.0.1:20128/api/settings; printenv", "environment_dump"),
+        ("systemctl --user import-environment; printenv", "environment_dump"),
+        ("set 0 < /dev/null; set 0</dev/null; curl http://127.0.0.1:20128/api/settings", "environment_dump"),
+    ],
+}
+
+# Frozen policy rows, independent of the production allowlist. Every allowed
+# host/port has method/path/query neighbors. These are synthetic policy tests.
+K4_GATEWAY_ROWS = [
+    ('GET', '/api/health', (20128, 20129), None, False),
+    ('GET', '/api/settings/compression', (20128, 20129), None, False),
+    ('GET', '/api/context/combos', (20128, 20129), None, False),
+    ('GET', '/api/model-capability-overrides', (20128, 20129), None, False),
+    ('GET', '/api/resilience', (20128, 20129), None, False),
+    ('GET', '/api/settings/feature-flags', (20128, 20129), None, False),
+    ('GET', '/api/cache', (20128, 20129), None, False),
+    ('GET', '/api/analytics/compression', (20128, 20129), 'since=all', False),
+    ('GET', '/api/usage/call-logs', (20128, 20129), 'limit=5&offset=0', False),
+    ('GET', '/api/usage/call-logs/fixture-1', (20128, 20129), None, False),
+    ('GET', '/api/usage/provider-limits', (20128,), None, True),
+    ('POST', '/api/usage/provider-limits', (20128,), None, True),
+    ('POST', '/api/compression/preview', (20129,), None, False),
+]
+for method, path, ports, query, body_free in K4_GATEWAY_ROWS:
+    for host in ('127.0.0.1', 'localhost', '[::1]', '10.0.2.2', 'host.docker.internal'):
+        for port in ports:
+            target = f'http://{host}:{port}{path}'
+            safe = f'curl -X {method} {shlex.quote(target)}'
+            # /call-logs/child is itself the explicitly permitted id route.
+            # The invalid descendant must cross that single-segment boundary.
+            child = '/child/extra' if path == '/api/usage/call-logs' else '/child'
+            K4_CASES['gateway_matrix'].extend([
+                (safe, None),
+                (f'curl -X DELETE {shlex.quote(target)}', 'gateway_credential_route'),
+                (f'curl -X {method} {shlex.quote(target + child)}', 'gateway_credential_route'),
+                (f'curl -X {method} {shlex.quote(target + "?unknown=1")}', 'gateway_credential_route'),
+            ])
+            if query:
+                K4_CASES['gateway_matrix'].append((f'curl -X {method} {shlex.quote(target + "?" + query)}', None))
+            if body_free:
+                K4_CASES['gateway_matrix'].append((safe + " -d ''", 'gateway_credential_route'))
+        for port in {20128, 20129} - set(ports):
+            K4_CASES['gateway_matrix'].append((f'curl -X {method} http://{host}:{port}{path}', 'gateway_credential_route'))
+for suffix in ('?limit=', '?limit=123456', '?limit=-1', '?limit=+1', '?limit=1&limit=2',
+               '?limit=5&', '?x=1', '?offset=1&&limit=2', '?', '/a_b', '/' + 'a' * 65, '/a/b'):
+    K4_CASES['gateway_matrix'].append(('curl ' + shlex.quote('http://127.0.0.1:20128/api/usage/call-logs' + suffix), 'gateway_credential_route'))
+for suffix in ('?offset=0', '?limit=00000', '?offset=00100&limit=00002', '/a', '/' + 'a' * 64):
+    K4_CASES['gateway_matrix'].append(('curl ' + shlex.quote('http://127.0.0.1:20128/api/usage/call-logs' + suffix), None))
+for target in ('http://127.0.0.1:20128/api/settings', '127.0.0.1:20128/api/settings',
+               'http://localhost:20128/api/health#fragment', 'http://user@localhost:20128/api/health',
+               'http://localhost:20128/x/../api/health', 'http://localhost:20128//api/health',
+               'http://localhost:20128/api/%68ealth', 'http://localhost:20128/api/health?'):
+    K4_CASES['gateway_matrix'].append(('curl ' + shlex.quote(target), 'gateway_credential_route'))
+K4_SAFE_URL = 'http://127.0.0.1:20128/api/settings/compression'
+K4_CASES['gateway_effective_requests'] += [
+    (command.format(url=K4_SAFE_URL), reason) for command, reason in (
+        ('curl --data \'{{}}\' {url}', 'gateway_credential_route'),
+        ('curl {url} -d x', 'gateway_credential_route'),
+        ('curl --json=\'{{}}\' {url}', 'gateway_credential_route'),
+        ('curl -F x=y {url}', 'gateway_credential_route'),
+        ('curl --form-string=x=y {url}', 'gateway_credential_route'),
+        ('curl -T file {url}', 'gateway_credential_route'),
+        ('curl --head {url}', 'gateway_credential_route'),
+        ('curl -sIdx {url}', 'gateway_credential_route'),
+        ('curl -sXPOST {url}', 'gateway_credential_route'),
+        ('curl -XPOST -XGET {url}', None),
+        ('curl -XGET -XPOST {url}', 'gateway_credential_route'),
+        ('curl -X GET -d \'{{}}\' {url}', None),
+        ('curl -I --no-head {url}', None),
+        ('curl -G --no-get -d x {url}', 'gateway_credential_route'),
+        ('curl -G -d limit=5 {url}', 'gateway_credential_route'),
+        ('curl --request-target=/api/settings {url}', 'gateway_credential_route'),
+        ('curl --config file {url}', 'gateway_credential_route'),
+        ('curl --request "$METHOD" {url}', 'gateway_credential_route'),
+        ('curl --unknown value {url}', 'gateway_credential_route'),
+        ('curl -sS --fail-with-body --max-time=20 --output=out --connect-timeout 2 --url={url}', None),
+        ('wget -qO- {url}', None),
+        ('wget --method POST {url}', 'gateway_credential_route'),
+        ('wget --post-data=x {url}', 'gateway_credential_route'),
+        ('wget --post-file file {url}', 'gateway_credential_route'),
+        ('wget --body-data=x {url}', 'gateway_credential_route'),
+        ('wget --body-file file {url}', 'gateway_credential_route'),
+        ('wget --method=GET --body-data=x {url}', None),
+        ('wget --method=GET --post-data=x {url}', 'gateway_credential_route'),
+        ('http GET {url}', None), ('xh {url}', None), ('http {url} x=y', 'gateway_credential_route'),
+        ('https 127.0.0.1:20128/api/settings', None),
+    )
+]
+K4_CASES['gateway_effective_requests'] += [
+    ('curl http://127.0.0.1:20128/api/health http://127.0.0.1:20128/api/cache', None),
+    ('curl http://127.0.0.1:20128/api/health http://127.0.0.1:20128/api/settings', 'gateway_credential_route'),
+    ('curl http://127.0.0.1:20128/api/health http://127.0.0.1:20128/api/cache -d x', 'gateway_credential_route'),
+    ('curl -X POST http://127.0.0.1:20128/api/usage/provider-limits --next http://127.0.0.1:20128/api/health', None),
+    ('curl -G -d limit=5 http://127.0.0.1:20128/api/usage/call-logs', None),
+    ('curl -G --data-urlencode=offset=0 --data=limit=5 http://127.0.0.1:20128/api/usage/call-logs', None),
+    ('curl http://127.0.0.1:20128/api/\'set\'tings', 'gateway_credential_route'),
+    ('http :20128/api/usage/call-logs limit==5', None),
+]
+
+
+K4_DOCUMENTED_GATEWAY = [
+    ('DOC-JSON-CACHE', shlex.join(['/usr/bin/curl', '-sS', '--fail-with-body', '--max-time', '20',
+                                 'http://127.0.0.1:20128/api/cache'])),
+    ('DOC-JSON-ANALYTICS', shlex.join(['/usr/bin/curl', '-sS', '--fail-with-body', '--max-time', '20',
+                                     'http://127.0.0.1:20128/api/analytics/compression?since=all'])),
+    ('DOC-PROSE-LOG-20128', 'curl -s http://127.0.0.1:20128/api/usage/call-logs/fixture-1'),
+    ('DOC-PROSE-LOG-20129', 'curl -s http://127.0.0.1:20129/api/usage/call-logs/fixture-1'),
+]
+K4_CASES['documented_gateway_fixtures'] = [(text, None) for _identity, text in K4_DOCUMENTED_GATEWAY]
+K4_CASES['gateway_effective_requests'] += [
+    ('python3 -c ' + shlex.quote(code.replace('URL', K4_SAFE_URL)), reason)
+    for code, reason in (
+        ("import requests; requests.get('URL')", None),
+        ("import httpx; httpx.get('URL')", None),
+        ("from requests import get; get('URL')", None),
+        ("requests.post('URL')", 'gateway_credential_route'),
+        ("httpx.request('POST', 'URL')", 'gateway_credential_route'),
+        ("requests.request(method='GET', url='URL')", None),
+        ("requests.request(method='POST', url='URL')", 'gateway_credential_route'),
+        ("requests.get('URL', data={})", None),
+        ("requests.get('URL', params={'limit': 5})", 'gateway_credential_route'),
+        ("requests.request(method=method, url='URL')", 'gateway_credential_route'),
+        ("requests.get('URL', **kwargs)", 'gateway_credential_route'),
+        ("client.get('URL')", 'gateway_credential_route'),
+        ("requests=client; requests.get('URL')", 'gateway_credential_route'),
+        ("import urllib.request; urllib.request.urlopen('URL')", None),
+        ("import urllib.request; urllib.request.urlopen('URL', data=b'x')", 'gateway_credential_route'),
+        ("from urllib.request import Request, urlopen; urlopen(Request('URL', method='GET'))", None),
+        ("from urllib.request import Request, urlopen; urlopen(Request('URL', method='POST'))", 'gateway_credential_route'),
+        ("from urllib.request import Request, urlopen; urlopen(Request('URL'), b'x')", 'gateway_credential_route'),
+        ("from urllib.request import Request, urlopen; req=Request('URL'); urlopen(req, data=b'x')", 'gateway_credential_route'),
+        ("http.client.HTTPConnection('127.0.0.1', 20128).request('GET', '/api/health')", 'gateway_credential_route'),
+    )
+] + [
+    ('node -e ' + shlex.quote(code.replace('URL', K4_SAFE_URL)), reason)
+    for code, reason in (
+        ("fetch('URL')", None),
+        ("fetch('URL', {method: 'POST'})", 'gateway_credential_route'),
+        ("fetch('URL', {cache: 'no-store', method: 'GET'})", None),
+        ("fetch('URL', {body: '{}'})", None),
+        ("fetch('URL', options)", 'gateway_credential_route'),
+        ("fetch('URL', {method})", 'gateway_credential_route'),
+        ("fetch('URL', {...options})", 'gateway_credential_route'),
+        ("fetch('URL', {method: 'GET', method: 'POST'})", 'gateway_credential_route'),
+    )
+] + [
+    ("python3 -c \"requests.get('http://127.0.0.1:20128/api/usage/call-logs', params={'limit': 5, 'offset': 0})\"", None),
+    ("python3 -c \"requests.post('http://127.0.0.1:20128/api/usage/provider-limits', data=None)\"", None),
+    ("python3 -c \"requests.post('http://127.0.0.1:20128/api/usage/provider-limits', json={})\"", 'gateway_credential_route'),
+    ("node -e \"fetch('http://127.0.0.1:20128/api/usage/provider-limits', {body: ''})\"", 'gateway_credential_route'),
+    ("node -e \"fetch('http://127.0.0.1:20128/api/usage/provider-limits', {method: 'POST', body: null})\"", None),
+]
+
+
+# Independent review witnesses: recorded as inert text before their repairs.
+for header in ("python3 - <<'PY' | 'head'", "python3 - <<'PY' | head -n '5'", "cd /tmp '&&' python3 - <<'PY'"):
+    text = header + '\nprint(set([1]))\nPY'
+    K4_F_REJECT.append(text)
+    K4_CASES['f_reference_boundaries'].append((text, 'environment_dump'))
+K4_CASES['whole_environment'] += [
+    ("python3 - <<'PY'\n" + code + '\nPY', reason) for code, reason in (
+        ("print(os.environ.get('HOME' + suffix))", 'interpreter_environment_unclassified'),
+        ("e = os.environ.copy()\nprint(e)\ne = os.environ.copy()", 'environment_dump'),
+        ("from os import environ as e\nprint(e)", 'environment_dump'),
+    )
+]
+K4_CASES['shell_literals_and_shellouts'].append(("python3 - <<'PY'\nos.system('print' 'env')\nPY", 'environment_dump'))
+K4_CASES['gateway_effective_requests'] += [
+    ('curl -d --next http://127.0.0.1:20128/api/health', 'gateway_credential_route'),
+    ('curl --data -: http://127.0.0.1:20128/api/health', 'gateway_credential_route'),
+]
+K4_CASES['literal_store_provenance'] += [
+    ("echo demo | python3 scripts/kernel_'keyring.py' store sample_key", 'keyring_store_literal'),
+    ("python3 scripts/kernel_'keyring.py' store sample_key <<< 'demo$value'", 'keyring_store_literal'),
+    ("sh -c 'echo demo | python3 scripts/kernel_keyring.py store sample_key'", 'keyring_store_literal'),
+    ("eval 'echo demo | python3 scripts/kernel_keyring.py store sample_key'", 'keyring_store_literal'),
+    ('echo "$(echo demo | python3 scripts/kernel_keyring.py store sample_key)"', 'keyring_store_literal'),
+    ('echo K=demo; printf %s "$K" | python3 scripts/kernel_keyring.py store sample_key', None),
+]
+K4_CASES['base_reason_precedence'] += [
+    ('rg -n CLAUDE_CODE_OAUTH_TOKEN docs/; python3 tools/credentials/credential_run.py get tavily', 'secret_name_search'),
+    ('python3 tools/credentials/credential_run.py get tavily; cat ~/.local/share/omniroute-fw/db_backups/x', 'credential_file_read'),
+]
+K4_CASES['ps_selectors'] += [
+    ("env C'MD_ENV'=bsd ps -e", 'ps_personality_selector'),
+    ("export PS_PER'SONALITY'=bsd; ps -e", 'ps_personality_selector'),
+    ("eval 'export CMD_ENV=bsd'; ps -e", 'ps_personality_selector'),
+]
+K4_CASES['canary_gate'] += [
+    ("script -qc 'python3 /p/canary_proof.py --phase comparison' /dev/null", 'canary_user_terminal_required'),
+    ('python3 -B > out /p/canary_proof.py --phase comparison', 'canary_user_terminal_required'),
+]
+K4_CASES['runner_usage_and_documentation'].append((
+    'python3 -B > out tools/credentials/credential_run.py get tavily', 'credential_run_usage'))
+
+
+class K4GuardTests(unittest.TestCase):
+    def cases(self, name):
+        for command, expected in K4_CASES[name]:
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), expected)
+
+    def test_k4_descriptor_identity(self):
+        self.cases("descriptor_identity")
+
+    def test_k4_base_reason_precedence(self):
+        self.cases("base_reason_precedence")
+
+    def test_k4_secret_names_and_inventory(self):
+        self.cases("secret_names_and_inventory")
+        inventory = json.loads((ROOT / 'adoption/credential-inventory.json').read_text())
+        entries = [entry for entry in inventory['entries'] if entry['id'] == 'claude-oauth-token']
+        self.assertEqual(len(entries), 1)
+        entry = entries[0]
+        self.assertEqual(entry['variables'], ['CLAUDE_CODE_OAUTH_TOKEN'])
+        self.assertEqual(entry['class'], 'provider_api_key')
+        self.assertEqual(entry['status'], 'optional')
+        self.assertEqual(entry['store'], {'kind': 'private_env_file',
+            'path_template': '${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/claude-oauth-token.env'})
+        self.assertEqual(entry['pointer_variables'], [])
+        self.assertEqual(entry['optional_variables'], [])
+        self.assertNotIn('public_variables', entry)
+        self.assertIn('CLAUDE_CODE_OAUTH_TOKEN', inventory['must_not_be_set'])
+        self.assertEqual(entry['loaders'], ['tools/credentials/credential_run.py claude-oauth-token -- <command>'])
+
+    def test_k4_omniroute_data_trees(self):
+        self.cases("omniroute_data_trees")
+
+    def test_k4_read_denies(self):
+        deny = json.loads((ROOT / 'adoption/templates/claude.settings.template.json').read_text())['permissions']['deny']
+        for tree in ('omniroute', 'omniroute-fw'):
+            for prefix in ('~/', '**/'):
+                self.assertIn(f'Read({prefix}.local/share/{tree}/**)', deny)
+
+    def test_k4_runner_start_and_inline_order(self):
+        self.cases('runner_start_and_inline_order')
+
+    def test_k4_runner_environment_and_mentions(self):
+        self.cases('runner_environment_and_mentions')
+
+    def test_k4_runner_usage_and_documentation(self):
+        self.cases('runner_usage_and_documentation')
+
+    def test_k4_manager_environment(self):
+        self.cases('manager_environment')
+
+    def test_k4_literal_store_provenance(self):
+        self.cases('literal_store_provenance')
+
+    def test_k4_ps_selectors(self):
+        self.cases('ps_selectors')
+
+    def test_k4_canary_gate(self):
+        self.cases('canary_gate')
+
+    def test_k4_f_reference_boundaries(self):
+        for text in K4_F_ALLOW:
+            with self.subTest(reference='positive', command=text):
+                self.assertIsNotNone(reference_form_f(text))
+        for text in K4_F_REJECT:
+            with self.subTest(reference='negative', command=text):
+                self.assertIsNone(reference_form_f(text))
+        self.cases('f_reference_boundaries')
+
+    def test_k4_language_comments_and_interpolation(self):
+        self.cases('language_comments_and_interpolation')
+
+    def test_k4_shell_literals_and_shellouts(self):
+        self.cases('shell_literals_and_shellouts')
+
+    def test_k4_whole_environment(self):
+        self.cases('whole_environment')
+
+    def test_k4_inline_environment_and_deferred_shellouts(self):
+        self.cases('inline_environment_and_deferred_shellouts')
+
+    def test_k4_tail_reads_share_budget(self):
+        self.cases('tail_reads_share_budget')
+
+    def test_k4_gateway_matrix(self):
+        self.cases('gateway_matrix')
+
+    def test_k4_gateway_effective_requests(self):
+        self.cases('gateway_effective_requests')
+
+    def test_k4_gateway_cli_and_scope(self):
+        self.cases('gateway_cli_and_scope')
+
+    def test_k4_documented_gateway_fixtures(self):
+        self.assertEqual(len(K4_DOCUMENTED_GATEWAY), 4)
+        self.assertEqual(sum(name.startswith('DOC-JSON-') for name, _text in K4_DOCUMENTED_GATEWAY), 2)
+        self.cases('documented_gateway_fixtures')
+
+
 if __name__ == "__main__":
     unittest.main()
