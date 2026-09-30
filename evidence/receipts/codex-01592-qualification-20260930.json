@@ -1,0 +1,423 @@
+{
+  "schema_version": 1,
+  "id": "codex-01592-qualification-20260930",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-30T05:38:11Z",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "On host nativestack-5975wx-20260925 on 2026-09-30, Codex CLI 0.159.2 was qualified in its existing prefix tools/codex-0.159.2 and the Linux pin moved to it from 0.157.1. The host launcher bin/codex already executes that prefix (its exec line names it, and `codex --version` through the launcher printed codex-cli 0.159.2 at 2026-09-30T04:32:26Z): a peer installed that prefix and wrote the launcher at 2026-09-30T03:21Z to 03:22Z, before this unit, which installed, relinked and wrote nothing on the host. The npm wrapper @openai/codex@0.159.2 (4,904 bytes, sha256 cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2) and its platform package @openai/codex@0.159.2-linux-x64 (162,475,310 bytes, sha256 84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations; each attestation's subject digest equals the downloaded tarball's sha512, and the SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.159.2, commit ff6aec96948b70d94983af2641a6b67c94faeff5, the commit the tag object 8b9fa496bbf2c47aebd62e85a080b9a522a455b5 peels to. The native binary in the platform package (sha256 1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e, 286,754,152 bytes) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the release API digest, and the package's whole vendor tree (44 files, with codex-code-mode-host, rg and bwrap) is byte-identical to the complete native package codex-package-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals both its API digest and its line in codex-package_SHA256SUMS. All 49 files of the existing prefix are byte-identical to the two verified tarballs; its only other entry is npm's bin/codex link. Each of these comparisons failed on a copy with one byte changed. In bwrap sandboxes with no network, a read-only root and a fresh scratch HOME and CODEX_HOME per case (~/.codex never used, no credential read), 0.159.2 and the 0.157.1 baseline printed their own versions; `codex exec --help` and `codex --help` were byte-identical between them and to the committed 0.157.1 outputs of the previous qualification; `codex mcp list --json` printed [] in an empty home, and after `codex mcp add` both versions returned the same entry and transport keys from `codex mcp list --json` and `codex mcp get --json`; `codex features list` still lists daemon_auto_start as stable and on, and `codex features disable daemon_auto_start` still writes [features] daemon_auto_start = false; `codex debug prompt-input` rendered the stack's AGENTS.md top-rule marker once from a scratch home holding adoption/templates/codex.AGENTS.template.md and zero times from an empty home, on both versions; offline `codex debug models` lists gpt-6.1-sol at priority 1 in 0.159.2's bundled catalog (gpt-6-astra moves to priority 2) and not at all in 0.157.1's. At the two tag commits the exec layer (codex-rs/exec/src/cli.rs, exec_events.rs, event_processor_with_jsonl_output.rs and codex-rs/utils/cli/src/shared_options.rs) is byte-identical, so the `codex exec --json` events that tools/adoption/prove_codex_lane.py and tools/sota-convergence/landscape-sweep/codex_job.py read keep their shapes, and the config schema adds 18 key paths and removes none. `prove_codex_lane.py --help` exited 0, and its static checks (no --live) in a scratch home gave 0.159.2 and 0.157.1 the same row verdicts, the lane not being applied there; tools/adoption/apply_codex_lane.py's dry run fails its codex version precondition on 0.159.2 because its CODEX_VERSION is still 0.157.1. The repository's merged rollout parsers (tools/token-e2e/evidence.py and tools/skill-usage/skill_usage.py), run unchanged and read-only over the host's 19 existing rollouts written by 0.159.2 (3,783 records), reported 0 parse errors, as over the 1,350 rollouts written by 0.157.1; a synthetic malformed line counted as 1 error in each. No live model call ran.",
+  "limitations": [
+    "No live model call ran (not run): `prove_codex_lane.py --live`, a GPT-6 or GPT-6.1 turn through 0.159.2 and any provider request are outside this unit, because the native Codex allowance belongs to the sealed Gate A run. The sandbox cases exercise the CLI surface (version, help, MCP registration, features, prompt input, the bundled catalog) without a provider, a sign-in, streamed turns, sandboxed tool execution, compaction or a running MCP server.",
+    "Live 0.159.2 behaviour on this stack (role spawn through agent_type, --ignore-user-config with the role carriers, sandbox behaviour and the join proof) is covered by the Gate A owner's rehearsal receipts: peer rehearsal (session native-agent-stack-2d), not re-run here.",
+    "The switch was not made by this unit: a peer installed tools/codex-0.159.2 (files written 2026-09-30T03:21:27Z to 03:21:30Z) and wrote the launcher with its exec line naming that prefix at 2026-09-30T03:22:59Z, and ~/.local/share/codex-ecosystem/installed-versions.txt still reads codex-cli 0.157.1, a host record this unit does not own and did not change.",
+    "The lane is not accepted on 0.159.2 here: in a scratch home the static rows marker, rtk-inline, binding (from / and from the checkout), profile and roles fail because the lane is not applied there, with the same verdicts on 0.157.1; blind failed with exit 127 when --codex named the prefix's npm bin (the row's PATH is that directory plus the default path, which has no node) and passed through the launcher. Applying the lane on a 0.159.2 host needs tools/adoption/apply_codex_lane.py's CODEX_VERSION (line 114) and its test fixtures moved first, which is outside this unit.",
+    "The `npm audit signatures` control did not discriminate: flipping one character of the wrapper's integrity in both lockfiles still gave exit 0 and the same report, because npm 11.19.0 verifies the registry's own manifest for each name and version (lib/utils/verify-signatures.js lines 296-303), not the lockfile. The audit therefore shows only that the registry metadata of both versions is signed and attested; the downloaded bytes are bound to that metadata by the integrity check and to the attestations by their subject digests, each with a failing control.",
+    "The .sigstore bundles of the two GitHub assets were downloaded but not verified: no sigstore verifier is installed here, and `gh attestation verify` needs the GitHub REST API, which was rate-limited for the host's shared login. The tag's own signature was not checked.",
+    "GitHub REST through gh answered HTTP 403 'API rate limit exceeded' for the shared login at 2026-09-30T04:14:32Z and 04:15:10Z, before and after its bucket reset, so the four release records came from the unauthenticated REST endpoint (HTTP 200 at 04:15:38Z), tag objects from git ls-remote and source files from raw.githubusercontent.com at the two tag commits.",
+    "The background app-server probe of the 0.157.1 qualification was not repeated at 0.159.2: only the feature's listing and the disable path were checked, so the interactive-launch copy into CODEX_HOME/packages/app-server-daemon and its updater loop are measured at 0.157.1 only.",
+    "The rollout check covers 19 rollouts written by 0.159.2 (3,783 records) and retains counts and schema type names only. Types present in the 0.157.1 rollouts but absent from that sample (compacted, CollabAgentToolCall, ContextCompaction) were not observed, which is no evidence that 0.159.2 removed them; the one type new to the sample, retained_context, is a RolloutItemWire variant at both tags (codex-rs/history/src/rollout_payload.rs line 51 at rust-v0.157.1, line 60 at rust-v0.159.2).",
+    "rust-v0.159.2 was published 2026-09-29T23:57:16Z, so the pin moves inside the 7-day cooldown that docs/decisions/2026-09-25-workstation-sota-refresh.md applied to a release that is not a security fix; it moves because the Gate A owner chose 0.159.2 as the candidate frozen Codex version (relayed by the coordinator) and the host launcher already runs it.",
+    "The Linux pin, manifests/stack.json and the records that mirror its version move (catalogs/landscape/upstream-snapshot.json, whose codex entry was re-checked on 2026-09-30, blueprints/token-native-focus/saturation-audit.json and the generated new-host grand list); adoption/pins-macos-arm64.json keeps 0.155.1 until its own qualification, catalogs/landscape/foundation.json keeps its winner pins, and recipes/README.md's codex rows, adoption/bootstrap.md's release-disclosure line and tools/adoption/apply_codex_lane.py still name 0.157.1.",
+    "Upstream tests (cargo test) were not run on this host. The qualification and this receipt come from one worker family (Claude Opus 5.5) and were not independently reviewed.",
+    "Linux x86_64 only, one host; nothing here is macOS evidence."
+  ],
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "profile": "linux-wsl2-x86_64",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; production paths under ~/.local/share/codex-ecosystem"
+  },
+  "data": {
+    "observed_at_utc": "2026-09-30",
+    "pinned_version": "0.159.2",
+    "previous_pin": "0.157.1",
+    "prefix": "~/.local/share/codex-ecosystem/tools/codex-0.159.2",
+    "switched_by_this_unit": false,
+    "host_resolution": {
+      "launcher": "~/.local/share/codex-ecosystem/bin/codex, a 4,184-byte bash telemetry-identity launcher whose last line execs ~/.local/share/codex-ecosystem/tools/codex-0.159.2/bin/codex (last written 2026-09-30T03:22:59Z; the prefix's files 03:21:27Z to 03:21:30Z)",
+      "launcher_version": "codex-cli 0.159.2 (in the sandbox, 2026-09-30T04:32:26Z)",
+      "installed_versions_txt": "codex-cli 0.157.1 (stale host record, unchanged)",
+      "config_toml_top_level_model": "model = \"gpt-6.1-sol\", model_reasoning_effort = \"ultra\" (the two top-level keys of ~/.codex/config.toml, read-only at 2026-09-30T05:37:50Z; nothing else read from that file)"
+    },
+    "release": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+    "release_published_at_utc": "2026-09-29T23:57:16Z",
+    "tag_object": "8b9fa496bbf2c47aebd62e85a080b9a522a455b5",
+    "tag_commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "previous_tag_commit": "36650394c5b38c2990ccf2a3457165ca3e9d9726",
+    "wrapper_tarball": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.2.tgz",
+    "wrapper_bytes": 4904,
+    "wrapper_sha256": "cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2",
+    "wrapper_integrity": "sha512-SE13C3nZCYoVL569BdegoOl6vwjb7o2sXOo7ivwVzaVoY0cswwi0/6pIE0TyO/C0vIkQh3jslExitET7PBTfIg==",
+    "platform_tarball": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.2-linux-x64.tgz",
+    "platform_bytes": 162475310,
+    "platform_sha256": "84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba",
+    "platform_integrity": "sha512-RrCZ1X52wpa1lOsXtCtSyhjOFdQPh7LH5Ccv8HsKmd/2UXbUwxXFqWXFK3JzatquUNGtW/TLox5Y7qVOGkV0/Q==",
+    "platform_unpacked": "46 files, 444,337,794 bytes (npm dist.unpackedSize)",
+    "native_binary_sha256": "1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e",
+    "native_binary_bytes": 286754152,
+    "npm_dist_tags_latest": "0.159.2",
+    "github_assets": {
+      "codex-x86_64-unknown-linux-musl.tar.gz": {
+        "bytes": 108518339,
+        "sha256": "26586b0d246d41a799b0ef8ee1add370f0fb0721b3709340f28db612381616ea",
+        "api_digest_equal": true,
+        "native_binary_equal_to_npm": true
+      },
+      "codex-package-x86_64-unknown-linux-musl.tar.gz": {
+        "bytes": 159961162,
+        "sha256": "9e2d29a713b94478b240dec2f10e11324cd05fad76dc43e7c639bdf8a1337a6b",
+        "api_digest_equal": true,
+        "sha256sums_line_equal": true,
+        "entries_equal_to_npm_vendor_tree": "44 of 44"
+      },
+      "codex-package_SHA256SUMS": {
+        "bytes": 1631,
+        "sha256": "e9eced4d7a65c0b6d9bfdf52922d3079ce9ecf7c7ae3c345bbd75e27d795af97",
+        "api_digest_equal": true,
+        "entries": 14,
+        "covers": "the codex-package, codex-app-server-package and codex-provisioned-package assets; the bare codex-<target>.tar.gz assets are not listed"
+      },
+      "sigstore_bundles_downloaded_not_verified": {
+        "codex-x86_64-unknown-linux-musl.sigstore": "9e214038d4b2b4be0f9474a89449f662400b5be6398f56598fc77b8db1e85013",
+        "codex-package-x86_64-unknown-linux-musl.tar.gz.sigstore": "14357700d614f148ada964bf5e75a532d7288fca3aa34180d8b88351c950dd92"
+      }
+    },
+    "npm_audit_signatures": {
+      "npm": "11.19.0 (node v24.21.0), a scratch project and a scratch npm cache inside the worktree's ignored scratch directory",
+      "install": "npm install --ignore-scripts --no-audit --no-fund @openai/codex@0.159.2 (exit 0, added 2 packages)",
+      "result": "audited 2 packages; 2 packages have verified registry signatures; 2 packages have verified attestations (exit 0)",
+      "control": "one character of the wrapper integrity flipped in package-lock.json and node_modules/.package-lock.json: exit 0 and the same report (non-discriminating; see limitations)"
+    },
+    "slsa_provenance": {
+      "source": "https://registry.npmjs.org/-/npm/v1/attestations/@openai%2fcodex@0.159.2 and @openai%2fcodex@0.159.2-linux-x64 (HTTP 200 each)",
+      "predicates": "https://github.com/npm/attestation/tree/main/specs/publish/v0.1 and https://slsa.dev/provenance/v1 for each package",
+      "workflow": ".github/workflows/rust-release.yml",
+      "ref": "refs/tags/rust-v0.159.2",
+      "repository": "https://github.com/openai/codex",
+      "git_commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "run": "https://github.com/openai/codex/actions/runs/36642524844/attempts/1",
+      "subject_sha512_equals_download": true,
+      "control": "a copy of each tarball with one byte flipped does not match its subject digest"
+    },
+    "prefix_byte_identity": {
+      "expected_entries": 49,
+      "matched": 49,
+      "mismatched": 0,
+      "unexpected": 0,
+      "missing": 0,
+      "npm_generated": "bin/codex -> ../lib/node_modules/@openai/codex/bin/codex.js",
+      "control": "the same comparison over a scratch copy of the wrapper part with one planted file and one flipped byte reported both"
+    },
+    "sandbox": "bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --tmpfs /mnt, the worktree re-bound read-only and only the case directory writable, --unshare-net --unshare-pid --unshare-ipc --die-with-parent --new-session, a fresh HOME, TMPDIR and CODEX_HOME per case, CODEX_COMPANION_*, OPENAI_API_KEY and CODEX_API_KEY unset (the construction of evidence/artifacts/sota-refresh-20260926/codex/sandbox.sh)",
+    "native_checks": [
+      {
+        "argv": "tools/codex-0.159.2/bin/codex --version",
+        "exit": 0,
+        "stdout": "codex-cli 0.159.2",
+        "stdout_sha256": "48784a39efd6841c30aff4c70ab315bea1dccee48519515cb308652cdef3ea57",
+        "control": "tools/codex-0.157.1/bin/codex --version printed codex-cli 0.157.1 (sha256 a2af91afbeed67d4d94d7ae88f4f7864866bb5923ab435c0955d779a3e8161f1, equal to the committed help/0.157.1/version.out)"
+      },
+      {
+        "argv": "tools/codex-0.159.2/bin/codex exec --help",
+        "exit": 0,
+        "stdout_bytes": 4031,
+        "stdout_sha256": "0e82cfde0122715250e93dc65866caa956b2ac5b9d0b20ec4ad4f9e81486509e",
+        "comparison": "byte-identical to 0.157.1 run in the same sandbox and to the committed evidence/artifacts/sota-refresh-20260926/codex/help/0.157.1/exec-help.out"
+      },
+      {
+        "argv": "tools/codex-0.159.2/bin/codex --help",
+        "exit": 0,
+        "stdout_bytes": 5769,
+        "stdout_sha256": "75c90681ba095160666d9884d1eccce391be95c80da27641a3c8e1481bb02fac",
+        "comparison": "byte-identical to 0.157.1 run in the same sandbox and to the committed evidence/artifacts/sota-refresh-20260926/codex/help/0.157.1/help.out"
+      },
+      {
+        "argv": "tools/codex-0.159.2/bin/codex mcp list --json",
+        "exit": 0,
+        "stdout": "[]",
+        "comparison": "the same on 0.157.1"
+      },
+      {
+        "argv": "codex mcp add probe -- /bin/true; codex mcp list --json; codex mcp get probe --json",
+        "exit": 0,
+        "mcp_list_entry_keys": [
+          "auth_status",
+          "disabled_reason",
+          "enabled",
+          "name",
+          "startup_timeout_sec",
+          "tool_timeout_sec",
+          "transport"
+        ],
+        "mcp_get_keys": [
+          "disabled_reason",
+          "disabled_tools",
+          "enabled",
+          "enabled_tools",
+          "name",
+          "startup_timeout_sec",
+          "tool_timeout_sec",
+          "transport"
+        ],
+        "transport_keys": [
+          "args",
+          "command",
+          "cwd",
+          "env",
+          "env_vars",
+          "type"
+        ],
+        "comparison": "stdout byte-identical to 0.157.1 (sha256 048d63e117774317acaaa0e0df8f9dd1f0160150e61ac0f44561adabc02ce6a8)"
+      },
+      {
+        "argv": "tools/codex-0.159.2/bin/codex features list",
+        "exit": 0,
+        "lines": 152,
+        "stdout_sha256": "b11fdfa3000a4efdc8124041dadb446d584c0c34a42970b6eb26f78b5e622eda",
+        "kept": "daemon_auto_start stable true; shell_snapshot stable true; hooks stable true; multi_agent_v2 stable false",
+        "added": "defer_mailbox_preemption under development false; instant_interrupt under development false",
+        "changed": "write_stdin_approval under development false -> stable true; guardianv2.thread_context stable true -> removed false",
+        "removed": "none (0.157.1: 150 lines)"
+      },
+      {
+        "argv": "tools/codex-0.159.2/bin/codex features disable daemon_auto_start; features list",
+        "exit": 0,
+        "stdout": "Disabled feature `daemon_auto_start` in config.toml.; config.toml [features] daemon_auto_start = false; daemon_auto_start stable false",
+        "comparison": "byte-identical to 0.157.1"
+      },
+      {
+        "argv": "tools/codex-0.159.2/bin/codex debug prompt-input probe (cwd /)",
+        "exit": 0,
+        "with_template_agents_md": "native-agent-stack:top-rule 1 line, native-agent-stack:rtk-exceptions 1 line",
+        "control_empty_home": "0 top-rule lines",
+        "comparison": "the same counts on 0.157.1"
+      },
+      {
+        "argv": "tools/codex-0.159.2/bin/codex debug models (offline, no network)",
+        "exit": 0,
+        "stdout_sha256": "262dc36e0e7beb290aef8196bd59f42acf51647b8f7b68dafa533ae7742019e6",
+        "bundled_models": "11: gpt-6-astra (priority 2), gpt-6.1-sol (priority 1, efforts low to ultra, default low), gpt-6-sol (priority 3), gpt-6-luna, gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna, gpt-daybreak-blue-latest, gpt-daybreak-red-latest, gpt-5.5, codex-auto-review",
+        "control": "0.157.1: 11 models, no gpt-6.1-sol, gpt-6-astra priority 1, gpt-5.4 present; the native binaries hold the string gpt-6.1-sol 3 and 0 times"
+      }
+    ],
+    "lane_checks": {
+      "prove_help": "python3 tools/adoption/prove_codex_lane.py --help: exit 0",
+      "prove_static_prefix": "--codex tools/codex-0.159.2/bin/codex, scratch --codex-home, no --live: exit 1, 1 pass (rtk-exactness), 7 fail (marker, rtk-inline, blind with exit 127, binding from /, binding from the checkout, profile, roles); 0.157.1: the same verdicts",
+      "prove_static_launcher": "--codex ~/.local/share/codex-ecosystem/bin/codex (execs 0.159.2): exit 1, 2 pass (blind: exit 0, 0 top-rule lines; rtk-exactness), 6 fail (the lane is not applied in the scratch home)",
+      "apply_dry_run": "python3 tools/adoption/apply_codex_lane.py (dry run, scratch --codex-home and --state-dir): 0.159.2 '[fail] codex version: codex-cli 0.159.2 (pin 0.157.1)', exit 2; control 0.157.1 '[ok] codex version: codex-cli 0.157.1 (pin 0.157.1)', exit 2 (other preconditions fail in a scratch home)"
+    },
+    "rollout_item_shapes": {
+      "parsers": "tools/token-e2e/evidence.py read_jsonl and _rollout_call; tools/skill-usage/skill_usage.py scan_rollout_file (unchanged, at origin/main f77612b6)",
+      "root": "~/.codex/sessions, read-only inside bwrap (--ro-bind / /)",
+      "observed_at_utc": "2026-09-30T04:29:54Z",
+      "rollout_files": 1646,
+      "files_by_cli_version": {
+        "0.155.1": 277,
+        "0.157.1": 1350,
+        "0.159.2": 19
+      },
+      "cli_0.159.2": {
+        "records": 3783,
+        "read_jsonl_errors": 0,
+        "unreadable": 0,
+        "skill_usage_parse_errors": 0,
+        "record_types": {
+          "event_msg": 1321,
+          "inter_agent_communication_metadata": 52,
+          "response_item": 1959,
+          "retained_context": 2,
+          "session_meta": 31,
+          "token_usage_record": 322,
+          "turn_context": 40,
+          "world_state": 56
+        },
+        "response_item_payload_types": {
+          "agent_message": 52,
+          "custom_tool_call": 258,
+          "custom_tool_call_output": 258,
+          "function_call": 53,
+          "function_call_output": 51,
+          "message": 963,
+          "reasoning": 324
+        },
+        "event_msg_payload_types": {
+          "item_completed": 915,
+          "task_complete": 16,
+          "task_started": 40,
+          "thread_settings_applied": 12,
+          "token_count": 337,
+          "turn_aborted": 1
+        },
+        "item_completed_item_types": {
+          "AgentMessage": 67,
+          "CommandExecution": 45,
+          "Extension": 16,
+          "FileChange": 5,
+          "McpToolCall": 400,
+          "Reasoning": 324,
+          "SubAgentActivity": 49,
+          "UserMessage": 9
+        },
+        "records_with_call_text": 356,
+        "records_with_mcp_server": 400,
+        "sessions_with_subagent_metadata": 12
+      },
+      "cli_0.157.1_baseline": {
+        "records": 202207,
+        "read_jsonl_errors": 0,
+        "skill_usage_parse_errors": 0
+      },
+      "new_in_0.159.2_sample": "record type retained_context",
+      "control": "a synthetic rollout of one session_meta line and one malformed line: read_jsonl 1 row and 1 error, scan_rollout_file 1 parse error"
+    },
+    "source_checks": {
+      "commits": "rust-v0.157.1 36650394c5b38c2990ccf2a3457165ca3e9d9726 and rust-v0.159.2 ff6aec96948b70d94983af2641a6b67c94faeff5 through raw.githubusercontent.com",
+      "identical": [
+        "codex-rs/exec/src/cli.rs",
+        "codex-rs/exec/src/exec_events.rs",
+        "codex-rs/exec/src/event_processor_with_jsonl_output.rs",
+        "codex-rs/utils/cli/src/shared_options.rs"
+      ],
+      "config_schema": "codex-rs/core/config.schema.json: 1,160 -> 1,178 key paths, 18 added (among them features.instant_interrupt, features.multi_agent_v2.disable_direct_message, mcp_servers.*.startup_readiness, mcp_servers.*.tool_input_schema_max_bytes, mcp_servers.*.oauth.client_secret, tui.copy_on_select), 0 removed; skills.max_context_tokens unchanged ('Defaults to 2% of the model context window and is capped at 10,000 tokens when set.'); every key path the two Codex templates set that was checked (mcp_servers.*.default_tools_approval_mode, enabled_tools, startup_timeout_sec, features.daemon_auto_start, features.shell_snapshot, agents.default_subagent_reasoning_effort) is present at both tags",
+      "rollout_payload": "codex-rs/history/src/rollout_payload.rs: RetainedContext is a RolloutItemWire variant at both tags; rust-v0.159.2 adds a conversion that writes a delivered assistant message as a response_item message for earlier clients"
+    },
+    "release_notes_affecting_this_stack": [
+      {
+        "release": "rust-v0.158.0 (2026-09-28T05:07:23Z)",
+        "line": "Command completion events now include early output and report process-launch failures to clients. (#47529, #47665)",
+        "effect": "exec --json shapes unchanged (the exec layer is byte-identical); command_execution aggregated_output can now carry early output"
+      },
+      {
+        "release": "rust-v0.158.0",
+        "line": "Terminal input approval is enabled by default for commands running with elevated permissions; runtime-only grants no longer cause unnecessary reviews. (#47799, #48073)",
+        "effect": "features list: write_stdin_approval is now stable and on"
+      },
+      {
+        "release": "rust-v0.158.0",
+        "line": "Fixed Linux sandbox startup with nested writable roots and preserved Git metadata protections across writable roots on Linux and macOS. (#47623, #47974)",
+        "effect": "sandbox behaviour; live coverage is the peer rehearsal's"
+      },
+      {
+        "release": "rust-v0.158.0",
+        "line": "Connect to MCP servers that require pre-registered OAuth client secrets, including through `codex mcp add --oauth-client-secret`. (#47891)",
+        "effect": "additive; changelog also lists #47935 'Allow cached catalogs to satisfy MCP startup readiness', #47981 'Prepare MCP calls directly from advertised tool identities', #47988 'Reuse MCP handlers across equivalent bindings' and #47936 'Make MCP and Code Mode input schema budgets configurable'; no line names MCP tool approval, and default_tools_approval_mode is in the schema at both tags"
+      },
+      {
+        "release": "rust-v0.158.0",
+        "line": "#47610 Use native POSIX spawning for command hooks",
+        "effect": "hooks: spawning mechanism only; the hooks feature stays stable and on"
+      },
+      {
+        "release": "rust-v0.158.0",
+        "line": "#47611 Use the shared process launcher for Unix shell snapshots; #48078 Replay exec-server shell snapshots through unnamed files; #48099 Honor shell environment policy in legacy snapshots",
+        "effect": "shell_snapshot: the user template and the OmniRoute profile keep features.shell_snapshot = false"
+      },
+      {
+        "release": "rust-v0.158.0",
+        "line": "#47540 Add an option to disable multi-agent v2 direct messaging; #47691 Materialize rollout persistence for pending inter-agent messages; #47565 Classify rollout read failures by reason and progress",
+        "effect": "multi-agent and rollouts; the rollout parsers read the 0.159.2 rollouts with 0 errors"
+      },
+      {
+        "release": "rust-v0.158.0",
+        "line": "#47903 Move config key alias normalization ahead of merging; #47904 Support nested canonical paths in config key aliases; #47932 Remove GPT-5.4 from bundled catalogs and preserve migration prompts",
+        "effect": "config aliases; the bundled catalog lost gpt-5.4, which no template names"
+      },
+      {
+        "release": "rust-v0.159.0 (2026-09-29T08:05:42Z)",
+        "line": "Approved commands retain explicit filesystem denials, and `.aws` directories are protected by default under writable roots. (#48155, #48176)",
+        "effect": "sandbox behaviour; live coverage is the peer rehearsal's"
+      },
+      {
+        "release": "rust-v0.159.0",
+        "line": "Removed automatic follow-up prompt suggestions and the `tui.prompt_suggestions` setting. (#48621)",
+        "effect": "no template sets tui.prompt_suggestions"
+      },
+      {
+        "release": "rust-v0.159.0",
+        "line": "Removed the bundled `plugin-creator` skill. (#48604)",
+        "effect": "skills: one bundled skill fewer; #48353 'Stabilize skill catalogs across executor availability changes' and #48819 'Use explicit histogram buckets for tool and skill context metrics' also touch skills; [skills] max_context_tokens is unchanged and not set by this stack"
+      },
+      {
+        "release": "rust-v0.159.0",
+        "line": "Opt-in `instant_interrupt` lets new input steer Codex during model responses or long-running code-mode calls. (#48135, #48141)",
+        "effect": "off by default (features list)"
+      },
+      {
+        "release": "rust-v0.159.1 (2026-09-29T20:32:34Z)",
+        "line": "Added GPT-6.1 Sol as the default model in the bundled catalog and Amazon Bedrock Mantle and Runtime catalogs. (#49323, #49342)",
+        "effect": "a launch that names no model starts on gpt-6.1-sol; every lane names its model, and the user template now names gpt-6.1-sol at ultra (docs/decisions/2026-09-27-model-currency.md, addendum 2026-09-30)"
+      },
+      {
+        "release": "rust-v0.159.2 (2026-09-29T23:57:16Z)",
+        "line": "Suppressed console windows flashing on Windows when Codex launches background processes and sandboxed commands. (#49385)",
+        "effect": "Windows only"
+      }
+    ],
+    "failed_attempts": [
+      "gh api repos/openai/codex/releases/tags/rust-v0.159.2, releases?per_page=60 and git/ref/tags for both tags: HTTP 403 rate limit for the shared gh login at 2026-09-30T04:14:32Z; the four per-release calls again at 04:15:10Z; replaced by the unauthenticated endpoint, git ls-remote and raw.githubusercontent.com",
+      "the npm audit signatures lockfile-tamper control: exit 0, not discriminating (limitations)",
+      "prove_codex_lane.py blind row with --codex naming the prefix's npm bin: exit 127 (no node on the row's PATH); re-run through the launcher passed",
+      "re-checking the codex entry of catalogs/landscape/upstream-snapshot.json: the unauthenticated REST commits endpoint for rust-v0.157.1 and rust-v0.159.2 answered 403 'API rate limit exceeded' for the host's address at 05:29:02Z and 05:29:37Z to 05:29:40Z (one unhashed call at 05:29:25Z succeeded); the entry keeps the 2026-09-26 record for rust-v0.157.1 and records rust-v0.159.2's commit through git protocol at 05:30:30Z"
+    ],
+    "overturn_when": "a live 0.159.2 turn or the Gate A rehearsal shows a regression against 0.157.1, a later stable release changes the exec --json events, the flags the lanes use or the background server's start or update defaults, or an advisory lands against 0.159.2",
+    "raw_outputs": "retained only in the worktree's git-ignored scratch directory (.local/d4-scratch) and not published: downloads, command outputs and the four scratch scripts named in provenance"
+  },
+  "provenance": [
+    {
+      "path": "evidence/receipts/codex-01571-qualification-20260926.json",
+      "sha256": "c7af647e0c518413c2e5532f6538b3a83125423ff72ba596264fee7be3408eb7",
+      "role": "the qualification this receipt mirrors"
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/sandbox.sh",
+      "sha256": "6b020b3c62a2f3f4a7b42e2025fcf6cedfe4958863b828603dcbdbe15f4ae5be",
+      "role": "the sandbox construction reused"
+    },
+    {
+      "path": "tools/adoption/prove_codex_lane.py",
+      "sha256": "6bf68149a6619a866fcf7a55368137ecd61970b3b02b9b0f9c59003384ae0448",
+      "role": "run unchanged: --help and the static checks"
+    },
+    {
+      "path": "tools/adoption/apply_codex_lane.py",
+      "sha256": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0",
+      "role": "run unchanged: dry run only"
+    },
+    {
+      "path": "tools/token-e2e/evidence.py",
+      "sha256": "c09d210c66c877e23200854b8d8183346fd976ed39364167526dccc5dc845f4e",
+      "role": "rollout parser, run unchanged"
+    },
+    {
+      "path": "tools/skill-usage/skill_usage.py",
+      "sha256": "957326c07d7f2bc79918f2b47d77668e601101a2a3183ad941746ca7937d1cea",
+      "role": "rollout parser, run unchanged"
+    },
+    {
+      "path": "adoption/templates/codex.AGENTS.template.md",
+      "sha256": "dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3",
+      "role": "the AGENTS.md copied into the scratch home for the prompt-input check"
+    },
+    {
+      "path": "scratch verify_artifacts.py (not published)",
+      "sha256": "5c05bc92eaa5e9682c025e10461282c79a633b46e7642b7ef9156e0f839f2682",
+      "role": "integrity, digest, byte-identity and prefix checks with their controls"
+    },
+    {
+      "path": "scratch sandbox_checks.py (not published)",
+      "sha256": "4647bfeebc9eed053d28cf12860c47b0f654ccac852666a984bf35b5b3b6a6e8",
+      "role": "the native sandbox cases"
+    },
+    {
+      "path": "scratch lane_checks.py (not published)",
+      "sha256": "6075dd997a3d86007088c81b2ac60238461a08c992dedfbe4db2860a4015cdfb",
+      "role": "prove_codex_lane.py and apply_codex_lane.py cases"
+    },
+    {
+      "path": "scratch rollout_shapes.py (not published)",
+      "sha256": "ccea53a5b858d42aae6e71ad9e14c18171336c2b68e4ba8aedd9957c8ed34336",
+      "role": "the read-only rollout check"
+    }
+  ]
+}
