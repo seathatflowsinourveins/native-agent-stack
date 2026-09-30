@@ -1,0 +1,15 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/venv/bin/python", "-c", "import sys,hashlib,zipfile,json\nfrom pathlib import Path\np,site=map(Path,sys.argv[1:3]);wheel=p/'urllib3-2.8.0-py3-none-any.whl';compared=[];mismatches=[]\nwith zipfile.ZipFile(wheel) as z:\n for n in z.namelist():\n  if n.endswith('.py'):\n   compared.append(n)\n   if not (site/n).is_file() or (site/n).read_bytes()!=z.read(n):mismatches.append(n)\nprint(json.dumps({'artifact':wheel.name,'artifact_sha256':hashlib.sha256(wheel.read_bytes()).hexdigest(),'python_sources_compared':len(compared),'mismatches':mismatches},indent=2))\nassert compared and not mismatches\n", "<PRIVATE_RESEARCH>", "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:51:42.517652+00:00
+ended_utc: 2026-09-30T15:51:42.615659+00:00
+exit_code: 0
+
+stdout:
+{
+  "artifact": "urllib3-2.8.0-py3-none-any.whl",
+  "artifact_sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+  "python_sources_compared": 36,
+  "mismatches": []
+}
+
+stderr:

@@ -1,0 +1,92 @@
+exit_code: 1
+started: 2026-09-30T07:46:31.539Z
+ended: 2026-09-30T07:46:57.385Z
+
+stdout:
+# installed closure excluding OAuthlib itself and installer tooling: 10682 Python sources searched; parse errors: 1
+PARSE ERROR ('func_timeout/py2_raise.py', 5, 'invalid syntax')
+## OAuthlib literal importers with aliases, from-imports and bound call sites
+requests_oauthlib files: 6
+requests_oauthlib/compliance_fixes/instagram.py
+  3: oauthlib.common.add_params_to_uri bound as add_params_to_uri
+  call 19: oauthlib.common.add_params_to_uri
+requests_oauthlib/compliance_fixes/slack.py
+  3: oauthlib.common.add_params_to_uri bound as add_params_to_uri
+  call 30: oauthlib.common.add_params_to_uri
+requests_oauthlib/oauth1_auth.py
+  4: oauthlib.common.extract_params bound as extract_params
+  5: oauthlib.oauth1.Client bound as Client
+  5: oauthlib.oauth1.SIGNATURE_HMAC bound as SIGNATURE_HMAC
+  5: oauthlib.oauth1.SIGNATURE_TYPE_AUTH_HEADER bound as SIGNATURE_TYPE_AUTH_HEADER
+  6: oauthlib.oauth1.SIGNATURE_TYPE_BODY bound as SIGNATURE_TYPE_BODY
+  call 77: oauthlib.common.extract_params
+requests_oauthlib/oauth1_session.py
+  5: oauthlib.common.add_params_to_uri bound as add_params_to_uri
+  6: oauthlib.common.urldecode bound as _urldecode
+  7: oauthlib.oauth1.SIGNATURE_HMAC bound as SIGNATURE_HMAC
+  7: oauthlib.oauth1.SIGNATURE_RSA bound as SIGNATURE_RSA
+  7: oauthlib.oauth1.SIGNATURE_TYPE_AUTH_HEADER bound as SIGNATURE_TYPE_AUTH_HEADER
+  call 19: oauthlib.common.urldecode
+  call 253: oauthlib.common.add_params_to_uri
+requests_oauthlib/oauth2_auth.py
+  1: oauthlib.oauth2.WebApplicationClient bound as WebApplicationClient
+  1: oauthlib.oauth2.InsecureTransportError bound as InsecureTransportError
+  2: oauthlib.oauth2.is_secure_transport bound as is_secure_transport
+  call 19: oauthlib.oauth2.WebApplicationClient
+  call 31: oauthlib.oauth2.is_secure_transport
+  call 32: oauthlib.oauth2.InsecureTransportError
+requests_oauthlib/oauth2_session.py
+  3: oauthlib.common.generate_token bound as generate_token
+  3: oauthlib.common.urldecode bound as urldecode
+  4: oauthlib.oauth2.WebApplicationClient bound as WebApplicationClient
+  4: oauthlib.oauth2.InsecureTransportError bound as InsecureTransportError
+  5: oauthlib.oauth2.LegacyApplicationClient bound as LegacyApplicationClient
+  6: oauthlib.oauth2.TokenExpiredError bound as TokenExpiredError
+  6: oauthlib.oauth2.is_secure_transport bound as is_secure_transport
+  call 78: oauthlib.oauth2.WebApplicationClient
+  call 267: oauthlib.oauth2.is_secure_transport
+  call 268: oauthlib.oauth2.InsecureTransportError
+  call 368: oauthlib.common.urldecode
+  call 371: oauthlib.common.urldecode
+  call 452: oauthlib.oauth2.is_secure_transport
+  call 453: oauthlib.oauth2.InsecureTransportError
+  call 478: oauthlib.common.urldecode
+  call 515: oauthlib.oauth2.is_secure_transport
+  call 516: oauthlib.oauth2.InsecureTransportError
+## Advisory-related source references outside OAuthlib
+authlib reference lines: 32
+  authlib/integrations/django_oauth2/__init__.py:4: from .endpoints import RevocationEndpoint
+  authlib/integrations/django_oauth2/endpoints.py:1: from authlib.oauth2.rfc7009 import RevocationEndpoint as _RevocationEndpoint
+  authlib/integrations/django_oauth2/endpoints.py:4: class RevocationEndpoint(_RevocationEndpoint):
+  authlib/integrations/django_oauth2/endpoints.py:15: server.register_endpoint(RevocationEndpoint)
+  authlib/integrations/django_oauth2/endpoints.py:21: RevocationEndpoint.ENDPOINT_NAME, request
+  authlib/integrations/sqla_oauth2/functions.py:70: from authlib.oauth2.rfc7009 import RevocationEndpoint
+  authlib/integrations/sqla_oauth2/functions.py:74: class _RevocationEndpoint(RevocationEndpoint):
+  authlib/oauth2/rfc6749/__init__.py:28: from .grants import AuthorizationCodeGrant
+  authlib/oauth2/rfc6749/__init__.py:83: "AuthorizationCodeGrant",
+  authlib/oauth2/rfc6749/authorization_server.py:203: class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
+  authlib/oauth2/rfc6749/authorization_server.py:207: authorization_server.register_grant(AuthorizationCodeGrant)
+  authlib/oauth2/rfc6749/authorization_server.py:219: RevocationEndpoint::
+  authlib/oauth2/rfc6749/authorization_server.py:221: authorization_server.register_endpoint(RevocationEndpoint)
+  authlib/oauth2/rfc6749/grants/__init__.py:23: from .authorization_code import AuthorizationCodeGrant
+  authlib/oauth2/rfc6749/grants/__init__.py:36: "AuthorizationCodeGrant",
+  authlib/oauth2/rfc6749/grants/authorization_code.py:20: class AuthorizationCodeGrant(BaseGrant, AuthorizationEndpointMixin, TokenEndpointMixin):
+  authlib/oauth2/rfc6749/grants/authorization_code.py:296: class MyAuthorizationCodeGrant(AuthorizationCodeGrant):
+  authlib/oauth2/rfc7009/__init__.py:11: from .revocation import RevocationEndpoint
+  authlib/oauth2/rfc7009/__init__.py:13: __all__ = ["prepare_revoke_token_request", "RevocationEndpoint"]
+  authlib/oauth2/rfc7009/revocation.py:9: class RevocationEndpoint(TokenEndpoint):
+  authlib/oauth2/rfc7636/challenge.py:39: The AuthorizationCodeGrant SHOULD save the ``code_challenge`` and
+  authlib/oauth2/rfc7636/challenge.py:43: server.register_grant(AuthorizationCodeGrant, [CodeChallenge(required=True)])
+  authlib/oauth2/rfc7636/challenge.py:62: self.validate_code_challenge,
+  authlib/oauth2/rfc7636/challenge.py:69: def validate_code_challenge(self, grant, redirect_uri):
+  authlib/oauth2/rfc9068/revocation.py:6: from ..rfc7009 import RevocationEndpoint
+  authlib/oauth2/rfc9068/revocation.py:9: class JWTRevocationEndpoint(RevocationEndpoint):
+  authlib/oauth2/rfc9068/revocation.py:11: :class:`~authlib.oauth2.rfc7009.RevocationEndpoint`.
+  authlib/oauth2/rfc9068/revocation.py:20: :class:`~authlib.oauth2.rfc7009.RevocationEndpoint`.
+  authlib/oidc/core/grants/code.py:41: :param grant: AuthorizationCodeGrant instance
+  authlib/oidc/core/grants/code.py:136: The register this extension with AuthorizationCodeGrant::
+  authlib/oidc/core/grants/code.py:139: AuthorizationCodeGrant, extensions=[MyOpenIDCode()]
+  authlib/oidc/core/grants/hybrid.py:28: class MyAuthorizationCodeGrant(AuthorizationCodeGrant):
+
+stderr:
+Static scan incomplete: inspect parse failures before any absence inference

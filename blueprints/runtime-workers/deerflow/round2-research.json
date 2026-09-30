@@ -1,0 +1,124 @@
+{
+  "date": "2026-09-27",
+  "scope": "Source review and offline recipe integration; no installation, service or model run.",
+  "mapping": "User-supplied eval-frameworks/report.md and report2.md, W8c",
+  "grader": {
+    "repository": "https://github.com/UKGovernmentBEIS/inspect_evals",
+    "tag": "v0.22.0",
+    "commit": "41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+    "runtime": "inspect-ai==0.3.271",
+    "runtime_commit": "c2b63a0b0560f9c3b5b5230365e0a8fe08cd3df0",
+    "install": "python -m pip install 'inspect-evals[gaia]==0.22.0' 'inspect-ai==0.3.271'",
+    "dataset_revision": "682dd723ee1e1697e00360edccf2366dc8418dd9",
+    "sources": [
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.22.0/src/inspect_evals/gaia/README.md",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.22.0/src/inspect_evals/gaia/gaia.py",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.22.0/src/inspect_evals/gaia/dataset.py",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.22.0/src/inspect_evals/gaia/scorer.py",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.22.0/tests/gaia/test_scorer.py",
+      "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/docs/solvers.qmd",
+      "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0.3.271/src/inspect_ai/_eval/task/task.py"
+    ],
+    "decision": "Use unchanged GAIA validation scorer and frozen IDs with a DeerFlow transport solver. Native DeerFlow smoke/tests remain regression evidence, not task-quality scoring. Reject attachment samples until asset transport is qualified. Disable Inspect's default Docker sandbox to avoid unowned containers.",
+    "local_gap": "No direct DeerFlow solver in the inspected primary. Transport only; never read targets or implement answer normalization."
+  },
+  "other_sources": {
+    "native_client_and_skill_list": "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/packages/harness/deerflow/client.py",
+    "skills_layout": "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/packages/harness/deerflow/skills/storage/user_scoped_skill_storage.py",
+    "skill_load": "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/packages/harness/deerflow/skills/describe.py",
+    "model_extension": "pins.json#/header_reference (SHA256-verified langchain-openai 1.2.1, chat_models/base.py with_structured_output and _get_request_payload)",
+    "ownership": "https://github.com/compose-spec/compose-spec/blob/main/05-services.md#labels; user-mandated owner label and rw-deerflow- prefix",
+    "skills_install": "tools/adoption/install_skills.py; user-mandated project-dir/universal extension and blueprints/runtime-workers/skills/manifest.json pending coordinator PR",
+    "gateway_contract": "User-provided OmniRoute cognee 1.6.1 measurement: tool calling at max; json_object input requirement; strict nested objects; stable session/fresh logical-call key; GPT-6 only"
+  },
+  "discovery": {
+    "skills_used": [
+      "search-first",
+      "find-skills",
+      "tdd",
+      "verification-before-completion"
+    ],
+    "channels": "Read both supplied reports, installed skill instructions, upstream release/source and skills.sh leaderboard/search API. Registry inspect search gave unrelated fuzzy matches; no installation selected from popularity.",
+    "limitations": "Inspect/DeerFlow/LangChain packages absent from local Python. web.open unsupported; public source fetch succeeded via Context Mode. Installed skills CLI unavailable in remote research tool; registry API fallback used. Host installation prohibited.",
+    "native_evidence": "Actual upstream scorer controls and native DeerFlow tests remain host checks; offline adapter controls do not establish benchmark acceptance."
+  },
+  "anti_pattern_log": [
+    {
+      "mistake": "Round-1 check.py implemented task correctness itself.",
+      "proof": "report2 W8c assigns GAIA; adapter pass/fail controls initially errored because no transport API existed.",
+      "correction": "Retain check.py solely as completion transport; only unchanged gaia_scorer supplies correctness.",
+      "enforced_by": "test_adapter_preserves_known_pass_and_fail_without_a_local_verdict; test_inspect_solver_transports_only_input_and_preserves_upstream_task"
+    },
+    {
+      "mistake": "Round-1 Compose resources lacked the required owner label and rw-deerflow prefix.",
+      "proof": "Fail-first ownership test returned runtime-worker-deerflow != rw-deerflow.",
+      "correction": "Label/name every declared container and network, including temporary worker launches; bind mounts only.",
+      "enforced_by": "test_owned_compose_resources_and_loopback_ports; test_transport_runs_owned_container_and_retains_failed_attempts"
+    },
+    {
+      "mistake": "Structured-output policy and GPT-6 route restriction were absent from the model/config adapter.",
+      "proof": "Fail-first test lacked method=function_calling and worker_model route validation.",
+      "correction": "Use native function calling; reject raw JSON formats and non-GPT-6-max gateway routes.",
+      "enforced_by": "test_gateway_structured_output_uses_upstream_tool_calling; test_gateway_rejects_non_gpt6_model_routes"
+    },
+    {
+      "mistake": "Round-1 skills bypassed the coordinator lifecycle using direct symlinks/global skills.",
+      "proof": "New installer seam was absent; native loader source confirms /skills/custom accepts the project mount.",
+      "correction": "Invoke only the coordinator project/universal installer; mark missing extension/manifest pending.",
+      "enforced_by": "test_skills_use_coordinator_project_installer"
+    },
+    {
+      "mistake": "Child thread scope could change affinity within a single embedded conversation.",
+      "proof": "Fail-first test produced unequal session hashes for lead and child scope.",
+      "correction": "Set an explicit per-process conversation ID for embedded GAIA runs.",
+      "enforced_by": "test_gateway_headers_preserve_affinity_and_new_call_identity"
+    },
+    {
+      "mistake": "A newly written shell inline Python expression had an extra closing parenthesis.",
+      "proof": "ast.parse returned SyntaxError: unmatched closing parenthesis.",
+      "correction": "Fix expression and include inline Python in syntax verification.",
+      "enforced_by": "Round-2 syntax artifact"
+    },
+    {
+      "mistake": "Initial transport test import lacked its module directory on sys.path.",
+      "proof": "ModuleNotFoundError: receipt, before reaching the behavior seam.",
+      "correction": "Test loader mirrors CLI module search path; rerun failed at the intended absent run_worker API before implementation.",
+      "enforced_by": "test_transport_runs_owned_container_and_retains_failed_attempts"
+    },
+    {
+      "mistake": "Sandbox asyncio executor shutdown did not finish a trivial to_thread control.",
+      "proof": "Bounded faulthandler reproduction stopped in asyncio runner close; the initial solver test was interrupted with exit 130.",
+      "correction": "The offline solver-boundary test uses an inline async executor with the external transport double; actual host executor remains unverified.",
+      "enforced_by": "test_inspect_solver_transports_only_input_and_preserves_upstream_task"
+    },
+    {
+      "mistake": "Guessed three upstream skill source paths that did not exist.",
+      "proof": "HTTP 404 for skills/storage.py, skills/loader.py and tools/builtins/skill_tool.py.",
+      "correction": "Resolve exact paths through the pinned Git tree; use storage/local_skill_storage.py, storage/user_scoped_skill_storage.py and skills/describe.py.",
+      "enforced_by": "this source-review log"
+    },
+    {
+      "mistake": "Literal cleanup initially stopped when the first container was already absent.",
+      "proof": "Fail-first cleanup test raised CalledProcessError before later owned resources were addressed.",
+      "correction": "Continue only for native absence errors, retaining failures for all other Docker errors.",
+      "enforced_by": "test_literal_cleanup_continues_after_already_absent_resource"
+    },
+    {
+      "mistake": "Malformed worker-version metadata could crash receipt writing after the transport parser rejected the attempt.",
+      "proof": "Fail-first malformed-attempt test raised AttributeError on data=null while handling the transport ValueError.",
+      "correction": "Validate the native version event data shape before reading its version; retain the failed-attempt receipt.",
+      "enforced_by": "test_transport_runs_owned_container_and_retains_failed_attempts"
+    }
+  ],
+  "anti_pattern_log_scope": "Builder-owned correction log; shared docs/harness-defaults.md is outside assigned file ownership.",
+  "remaining_gaps": [
+    "Coordinator skills manifest/project-universal CLI extension pending separate PR.",
+    "Actual pinned grader installation and real gaia_scorer controls not run; test is explicitly skipped.",
+    "No native dataset access/frozen host-selected ID, asset transport, benchmark or A/B run.",
+    "Container image volume metadata, native tool calls, skill activation and model/gateway behavior await host acceptance.",
+    "Interactive background session attribution and prompt-cache behavior not established.",
+    "Inspect cancellation while a blocking worker is in asyncio.to_thread needs host acceptance; subprocess timeout has a literal-name cleanup path.",
+    "Transitive grader dependency lock not frozen.",
+    "Shared manifests/evidence.json still hashes Round-1 bytes; coordinator must refresh its owned manifest after integration."
+  ]
+}

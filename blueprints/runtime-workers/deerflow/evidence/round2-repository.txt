@@ -1,0 +1,31 @@
+Publication validation failed:
+blueprints/runtime-workers/deerflow/README.md: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/README.md: byte count mismatch
+blueprints/runtime-workers/deerflow/compose.json.template: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/compose.json.template: byte count mismatch
+blueprints/runtime-workers/deerflow/e2e/check.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/e2e/check.py: byte count mismatch
+blueprints/runtime-workers/deerflow/e2e/drive.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/e2e/drive.py: byte count mismatch
+blueprints/runtime-workers/deerflow/e2e/receipt.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/e2e/receipt.py: byte count mismatch
+blueprints/runtime-workers/deerflow/e2e/run.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/e2e/run.py: byte count mismatch
+blueprints/runtime-workers/deerflow/e2e/task.md: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/e2e/task.md: byte count mismatch
+blueprints/runtime-workers/deerflow/host.json.example: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/host.json.example: byte count mismatch
+blueprints/runtime-workers/deerflow/pins.json: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/pins.json: byte count mismatch
+blueprints/runtime-workers/deerflow/recipe.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/recipe.py: byte count mismatch
+blueprints/runtime-workers/deerflow/run-e2e.sh: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/run-e2e.sh: byte count mismatch
+blueprints/runtime-workers/deerflow/runtime/gateway_headers.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/runtime/gateway_headers.py: byte count mismatch
+blueprints/runtime-workers/deerflow/runtime/gateway_model.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/runtime/gateway_model.py: byte count mismatch
+blueprints/runtime-workers/deerflow/runtime/preflight.py: SHA-256 mismatch
+blueprints/runtime-workers/deerflow/runtime/preflight.py: byte count mismatch
+tests/test_runtime_worker_deerflow.py: SHA-256 mismatch
+tests/test_runtime_worker_deerflow.py: byte count mismatch

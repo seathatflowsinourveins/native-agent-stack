@@ -1,0 +1,136 @@
+argv: ["rtk", "proxy", "<PRIOR_PRIVATE_RESEARCH>/venv/bin/python", "-b", "-c", "import sys,pathlib,importlib.metadata as m,pytest,jwt\nsite=pathlib.Path(sys.argv[1]).resolve();expected=sys.argv[2];source=pathlib.Path(sys.argv[3])\ntarget=pathlib.Path(jwt.__file__).resolve()\nprint('installed jwt.__file__='+str(target),flush=True)\nprint('installed PyJWT='+m.version('PyJWT')+'; pytest='+m.version('pytest')+'; coverage='+m.version('coverage'),flush=True)\nassert target.is_relative_to(site) and m.version('PyJWT')==jwt.__version__==expected\nnodes=[str(source/'tests/test_api_jwt.py')+'::TestJWT::test_decode_payload_recursion_error_throws_decode_error',str(source/'tests/test_jwks_client.py')+'::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error']\ncode=pytest.main(['--import-mode=append','-c',str(source/'pyproject.toml'),'-v']+nodes)\nassert pathlib.Path(jwt.__file__).resolve()==target\nprint('post-test jwt.__file__='+str(pathlib.Path(jwt.__file__).resolve()),flush=True)\nraise SystemExit(code)\n", "<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages", "2.14.0", "<PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68"]
+cwd: <PRIVATE_RESEARCH>/regression-run
+started_utc: 2026-09-30T17:12:04.333315+00:00
+ended_utc: 2026-09-30T17:12:05.306975+00:00
+exit_code: 1
+
+stdout:
+installed jwt.__file__=<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/__init__.py
+installed PyJWT=2.14.0; pytest=8.4.2; coverage=7.10.7
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-8.4.2, pluggy-1.6.0 -- <PRIOR_PRIVATE_RESEARCH>/venv/bin/python
+cachedir: .pytest_cache
+rootdir: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+configfile: pyproject.toml
+plugins: libtmux-0.53.0, anyio-4.14.2
+collecting ... collected 2 items
+
+../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_api_jwt.py::TestJWT::test_decode_payload_recursion_error_throws_decode_error FAILED [ 50%]
+../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_jwks_client.py::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error FAILED [100%]
+
+=================================== FAILURES ===================================
+_______ TestJWT.test_decode_payload_recursion_error_throws_decode_error ________
+
+self = <tests.test_api_jwt.TestJWT object at 0x75f0f388f2f0>
+
+    def test_decode_payload_recursion_error_throws_decode_error(self) -> None:
+        token = "<SOURCE_JWT_EXAMPLE_REDACTED>"
+    
+        with mock.patch(
+            "jwt.api_jwt.json.loads",
+            side_effect=[{"alg": "none", "typ": "JWT"}, RecursionError()],
+        ):
+            with pytest.raises(DecodeError, match="Invalid payload") as exc:
+>               pyjwt.decode(token, options={"verify_signature": False})
+
+../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_api_jwt.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/api_jwt.py:370: in decode
+    decoded = self.decode_complete(
+<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/api_jwt.py:275: in decode_complete
+    payload = self._decode_payload(decoded)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/api_jwt.py:298: in _decode_payload
+    payload: dict[str, Any] = json.loads(decoded["payload"])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:1169: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:1173: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='loads' id='129677738162704'>, args = (b'{}',)
+kwargs = {}, effect = <list_iterator object at 0x75f0f40929e0>
+result = RecursionError()
+
+    def _execute_mock_call(self, /, *args, **kwargs):
+        # separate from _increment_mock_call so that awaited functions are
+        # executed separately from their call, also AsyncMock overrides this method
+    
+        effect = self.side_effect
+        if effect is not None:
+            if _is_exception(effect):
+                raise effect
+            elif not _callable(effect):
+                result = next(effect)
+                if _is_exception(result):
+>                   raise result
+E                   RecursionError
+
+<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:1238: RecursionError
+_ TestPyJWKClient.test_get_signing_key_from_jwt_rejects_payload_recursion_error _
+
+self = <tests.test_jwks_client.TestPyJWKClient object at 0x75f0f3be6350>
+
+    def test_get_signing_key_from_jwt_rejects_payload_recursion_error(self) -> None:
+        token = "<SOURCE_JWT_EXAMPLE_REDACTED>"
+    
+        with mocked_success_response(RESPONSE_DATA_WITH_MATCHING_KID) as open_mock:
+            jwks_client = PyJWKClient("https://example.test/.well-known/jwks.json")
+            with mock.patch(
+                "jwt.api_jwt.json.loads",
+                side_effect=[
+                    {"alg": "RS256", "kid": "test-key"},
+                    RecursionError(),
+                ],
+            ):
+                with pytest.raises(DecodeError, match="Invalid payload") as exc:
+>                   jwks_client.get_signing_key_from_jwt(token)
+
+../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_jwks_client.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/jwks_client.py:280: in get_signing_key_from_jwt
+    unverified = decode_token(token, options={"verify_signature": False})
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/api_jwt.py:275: in decode_complete
+    payload = self._decode_payload(decoded)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/api_jwt.py:298: in _decode_payload
+    payload: dict[str, Any] = json.loads(decoded["payload"])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:1169: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:1173: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='loads' id='129677741053936'>, args = (b'{}',)
+kwargs = {}, effect = <list_iterator object at 0x75f0f3b2fdc0>
+result = RecursionError()
+
+    def _execute_mock_call(self, /, *args, **kwargs):
+        # separate from _increment_mock_call so that awaited functions are
+        # executed separately from their call, also AsyncMock overrides this method
+    
+        effect = self.side_effect
+        if effect is not None:
+            if _is_exception(effect):
+                raise effect
+            elif not _callable(effect):
+                result = next(effect)
+                if _is_exception(result):
+>                   raise result
+E                   RecursionError
+
+<HOME>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py:1238: RecursionError
+=========================== short test summary info ============================
+FAILED ../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_api_jwt.py::TestJWT::test_decode_payload_recursion_error_throws_decode_error
+FAILED ../pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68/tests/test_jwks_client.py::TestPyJWKClient::test_get_signing_key_from_jwt_rejects_payload_recursion_error
+============================== 2 failed in 0.18s ===============================
+post-test jwt.__file__=<PRIOR_PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/jwt/__init__.py
+
+stderr:

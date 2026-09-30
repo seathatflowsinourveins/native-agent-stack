@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "scope": "OpenHands 1.50.0 source/install qualification and local integration checks",
+  "source": {
+    "repository": "https://github.com/OpenHands/software-agent-sdk",
+    "tag": "v1.50.0",
+    "commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "uv_lock_sha256_before_and_after_native_build": "9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801",
+    "supported_install_source": "Makefile build target; uv export --help; published PyPI SDK/tools 1.50.0 wheels",
+    "native_source_changed": false
+  },
+  "observed_image_metadata": {
+    "tag": "1.50.0-python",
+    "index_sha256": "6d91a74fd2b556107e4e15476680d1d8116eeadfc06879baf7193caa73314dfc",
+    "linux_amd64_manifest_sha256": "d322c0fa5bc0f95d36de0b1a3e9aeab1230e2daf44d66cc94e42aa4ad23129c7",
+    "config_sha256": "6b11dbc497b336e0bf02aeed538dc21d87e4eabe66cac21d1b289dadb86eb1ee",
+    "build_git_sha": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "build_git_ref": "refs/tags/v1.50.0",
+    "method": "Anonymous official GHCR reads; returned index/manifest/config bytes each rehashed and compared to their digest",
+    "scope": "Registry metadata observation only; no daemon pull, scan, container start or model run"
+  },
+  "command_timestamps": "not_collected",
+  "sanitization": {
+    "output": "Actual RTK-returned stdout/stderr retained, including warnings and failure output; three padded logger lines have trailing spaces removed",
+    "replacements": ["Owned checkout path -> <RECIPE>", "Isolated upstream clone path -> <UPSTREAM>", "Isolated wheel environment -> <ISOLATED_WHEEL_PREFIX>"],
+    "credential_values_collected": false,
+    "conversations_collected": false
+  },
+  "commands": [
+    {
+      "argv": ["rtk", "make", "build"],
+      "cwd": "<UPSTREAM>",
+      "exit_code": 0,
+      "evidence_class": "unchanged upstream supported installation",
+      "output": "upgrade-150-build.txt"
+    },
+    {
+      "argv": ["rtk", "uv", "export", "--locked", "--no-dev", "--package", "openhands-tools", "--no-emit-workspace", "--no-annotate", "--no-header", "--format", "requirements.txt", "--output-file", "<UPSTREAM_EXPORT>"],
+      "cwd": "<UPSTREAM>",
+      "exit_code": 0,
+      "evidence_class": "supported upstream lock export",
+      "requirements_sha256": "7dba097d34f83cab8585e49050505d5f836b8f8505ceedb7daff160af5e3ad16",
+      "note": "Native exported dependency requirements plus the two pinned published wheel entries; no upstream lock edits"
+    },
+    {
+      "argv": ["rtk", "uv", "run", "pytest", "tests/sdk/skills", "tests/sdk/mcp", "tests/sdk/plugin", "tests/tools/task", "tests/tools/browser_use/test_browser_toolset.py", "tests/tools/browser_use/test_browser_initialization.py", "tests/tools/browser_use/test_browser_cleanup.py", "tests/tools/test_planning_preset.py", "tests/sdk/tool/test_invoke_skill.py", "tests/sdk/conversation/test_interrupt.py", "tests/cross/test_conversation_restore_behavior.py", "tests/sdk/conversation/goal", "tests/sdk/llm/test_prompt_caching_cross_conversation.py", "tests/sdk/llm/test_budget_denial_http.py", "tests/sdk/llm/test_llm_fallback.py", "tests/sdk/llm/test_responses_parsing_and_kwargs.py", "--tb=short", "-q"],
+      "cwd": "<UPSTREAM>",
+      "exit_code": 0,
+      "evidence_class": "unchanged upstream tests; mocked upstream test scope",
+      "passed": 1208,
+      "warnings": 52,
+      "duration_seconds": 94.92,
+      "output": "upgrade-150-upstream-tests.txt"
+    },
+    {
+      "argv": ["rtk", "uv", "pip", "install", "--python", "<ISOLATED_WHEEL_PREFIX>/bin/python", "--require-hashes", "--no-deps", "--only-binary", ":all:", "--index-url", "https://pypi.org/simple", "-r", "blueprints/runtime-workers/openhands/build-requirements.lock"],
+      "cwd": "<RECIPE>",
+      "exit_code": 0,
+      "evidence_class": "published wheel build-prerequisite installation",
+      "output": "upgrade-150-build-prerequisites.txt"
+    },
+    {
+      "argv": ["rtk", "uv", "pip", "install", "--python", "<ISOLATED_WHEEL_PREFIX>/bin/python", "--require-hashes", "--no-deps", "--no-build-isolation", "--index-url", "https://pypi.org/simple", "-r", "blueprints/runtime-workers/openhands/requirements.lock"],
+      "cwd": "<RECIPE>",
+      "exit_code": 0,
+      "evidence_class": "published SDK/tools hashed installation",
+      "output": "upgrade-150-wheel-install.txt"
+    },
+    {
+      "argv": ["rtk", "uv", "pip", "check", "--python", "<ISOLATED_WHEEL_PREFIX>/bin/python"],
+      "cwd": "<RECIPE>",
+      "exit_code": 0,
+      "evidence_class": "native dependency consistency check",
+      "output": "upgrade-150-wheel-check.txt"
+    },
+    {
+      "argv": ["rtk", "<ISOLATED_WHEEL_PREFIX>/bin/python", "-c", "import importlib.metadata as m; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.task import TaskToolSet; from openhands.tools.preset.planning import get_planning_agent; from openhands.tools.browser_use import BrowserToolSet; assert m.version(\"openhands-sdk\") == m.version(\"openhands-tools\") == \"1.50.0\"; print(\"Published SDK/tools 1.50.0 imports passed; PyJWT \" + m.version(\"PyJWT\") + \"; no model request\")"],
+      "cwd": "<RECIPE>",
+      "exit_code": 0,
+      "evidence_class": "published-wheel native imports/version observation only; no model request",
+      "output": "upgrade-150-wheel-imports.txt"
+    },
+    {
+      "argv": ["rtk", "python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test*openhands*.py"],
+      "cwd": "<RECIPE>",
+      "exit_code": 0,
+      "evidence_class": "local integration fixtures; three actual-SDK checks skip without the isolated installation",
+      "tests_run": 133,
+      "skipped": 3,
+      "output": "upgrade-150-integration-tests.txt"
+    },
+    {
+      "argv": ["rtk", "<UPSTREAM>/.venv/bin/python", "-m", "unittest", "discover", "-s", "<RECIPE>/tests", "-p", "test_openhands_150.py"],
+      "cwd": "<UPSTREAM>",
+      "exit_code": 0,
+      "evidence_class": "our integration checks against actual SDK with native calls patched; no live inference",
+      "tests_run": 12,
+      "skipped": 0,
+      "output": "upgrade-150-native-integration-tests.txt"
+    },
+    {
+      "argv": ["rtk", "python3", "scripts/validate.py"],
+      "cwd": "<RECIPE>",
+      "exit_code": 1,
+      "evidence_class": "publication validation before coordinator refreshes shared hash records",
+      "output": "upgrade-150-publication-first.txt",
+      "note": "Expected stale artifact hashes; the additional synthetic UUID-literal privacy finding was corrected using uuid.UUID(int=1)"
+    }
+  ],
+  "preserved_failures": [
+    {"output": "upgrade-150-integration-first.txt", "exit_code": 1, "condition": "Historical image scan and active-version assertions; server preload fixture lacked the new native goal service"},
+    {"output": "upgrade-150-integration-second.txt", "exit_code": 1, "condition": "Old P3 skeleton assertion and receipt-schema assertion"},
+    {"output": "upgrade-150-profile-first.txt", "exit_code": 1, "condition": "Delayed import unavailable in module-only fixture"},
+    {"output": "upgrade-150-native-profile-first.txt", "exit_code": 1, "condition": "Same delayed import failure in actual-SDK integration run"},
+    {"output": "upgrade-150-native-p3-first.txt", "exit_code": 1, "condition": "Assumed nested Chat Completion tool-call shape; corrected to pinned native MessageToolCall id/name/arguments/origin"}
+  ],
+  "live_provider_calls_executed": false,
+  "worker_containers_started": false,
+  "qualification_status": "source/install/native-test qualified candidate; live runtime pending",
+  "usage": null,
+  "token_savings": null,
+  "host_prerequisites": [
+    "Root coordinator ownership handoff and source-bound Gate A/P3 acceptance",
+    "New 1.50.0 image vulnerability scan and triage; historical 1.49.6 scan is not reusable",
+    "Native owned rootless installation, frozen grader task/image, live P0-P2 and P3 control qualification",
+    "Independently isolated native observer implementation/qualification outside terminal UID and writable event-store reach",
+    "Task-scoped Chromium/browser interaction, crash recovery, official task grading and complete-attempt token comparison where claimed"
+  ]
+}

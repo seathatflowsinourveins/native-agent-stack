@@ -1,0 +1,16 @@
+argv: ["rtk", "proxy", "uv", "pip", "install", "--python", "<PRIOR_PRIVATE_RESEARCH>/venv/bin/python", "--group", "tests", "--constraints", "<PRIVATE_RESEARCH>/control-constraints.txt", "--index-url", "https://pypi.org/simple"]
+cwd: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+started_utc: 2026-09-30T17:12:03.527045+00:00
+ended_utc: 2026-09-30T17:12:03.593853+00:00
+exit_code: 0
+
+stdout:
+
+stderr:
+Using Python 3.13.15 environment at: <PRIOR_PRIVATE_RESEARCH>/venv
+Resolved 6 packages in 5ms
+Installed 4 packages in 15ms
+ + coverage==7.10.7
+ + iniconfig==2.3.0
+ + pluggy==1.6.0
+ + pytest==8.4.2

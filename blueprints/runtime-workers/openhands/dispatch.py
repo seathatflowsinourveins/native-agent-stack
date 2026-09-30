@@ -16,7 +16,7 @@ import tempfile
 import time
 import uuid
 
-from recipe import read_json
+from recipe import HERE, read_json
 from host import (AGENT_LIMITS, DEFAULT_PORT, docker_args, grade, logged_command, owned_port, private_file,
                   result_exit, session_files, teardown_attempt, utc_now, verify_isolation, write_json)
 from receipt import create_receipt, read_bounded
@@ -33,6 +33,8 @@ PERMITTED_TERMINATIONS = {"finished": {"finished"}, "stuck": {"stuck"},
 # name; models.py:95-99 defines TIMESTAMP_DESC.
 ERROR_EVENT_SEARCH = ("/events/search?kind=openhands.sdk.event.conversation_error.ConversationErrorEvent"
                       "&sort_order=TIMESTAMP_DESC&limit=1")
+GOAL_EVENT_SEARCH = ("/events/search?kind=openhands.sdk.event.conversation_state.ConversationStateUpdateEvent"
+                     "&sort_order=TIMESTAMP_DESC&limit=100")
 # Plan E3: each native route has exactly one method. POST starts or
 # interrupts a conversation; GET only reads (conversation_router.py:163-228,
 # 257-287, 304-321; event_router.py:68-139).
@@ -40,10 +42,30 @@ CONVERSATION = r"/api/conversations/[a-f0-9-]{36}"
 NATIVE_ROUTES = (
     ("POST", r"/api/conversations"),
     ("POST", CONVERSATION + r"/interrupt"),
+    ("POST", CONVERSATION + r"/run"),
+    ("POST", CONVERSATION + r"/goal"),
+    ("POST", CONVERSATION + r"/goal/stop"),
+    ("POST", CONVERSATION + r"/goal/resume"),
     ("GET", CONVERSATION),
     ("GET", CONVERSATION + r"/agent_final_response"),
     ("GET", CONVERSATION + re.escape(ERROR_EVENT_SEARCH)),
+    ("GET", CONVERSATION + re.escape(GOAL_EVENT_SEARCH)),
 )
+
+
+def native_goal_status(conversation_id, port, headers):
+    """Lifecycle only: model-writable event-store output cannot certify quality."""
+    page = api_request("GET", f"/api/conversations/{conversation_id}{GOAL_EVENT_SEARCH}",
+                       port=port, headers=headers)
+    items = page.get("items") if isinstance(page, dict) else None
+    if isinstance(items, list):
+        for event in items:
+            if isinstance(event, dict) and event.get("key") == "goal":
+                value = event.get("value")
+                if (isinstance(value, dict) and type(value.get("active")) is bool
+                        and value.get("status") in {"running", "complete", "capped", "interrupted"}):
+                    return {"active": value["active"], "status": value["status"]}
+    raise ValueError("native_goal_status_unavailable")
 
 
 def server_url(port):
@@ -208,7 +230,7 @@ def finish_result(result, status, window):
             datasets = list(result.glob("dataset.*"))
             if len(datasets) != 1:
                 raise ValueError("one_frozen_dataset_required")
-            prefix = Path.home() / ".local/share/codex-ecosystem/tools/openhands-1.49.6"
+            prefix = Path.home() / ".local/share/codex-ecosystem/tools" / ("openhands-" + read_json(HERE / "pins.json")["version"])
             stage = "grader"
             checked = grade(prefix, result, datasets[0], task["instance_id"], window["run_id"])
     except (Exception, KeyboardInterrupt):
@@ -273,6 +295,32 @@ def execute(action, state, run_id, arm):
             response = api_request("POST", "/api/conversations", body=result / "start.json", port=port, headers=headers)
             conversation_id = str(uuid.UUID(response["id"]))
             status.update(status="running", conversation_id=conversation_id)
+            if window.get("profile") == "completion-review":
+                write_json(result / "goal-request.json", {
+                    "objective": read_bounded(result / "input/task.txt"), "max_iterations": 3,
+                })
+                api_request("POST", f"/api/conversations/{conversation_id}/goal",
+                            body=result / "goal-request.json", port=port, headers=headers)
+                status["goal_review"] = True
+        elif action in {"interrupt", "resume"}:
+            expected = "running" if action == "interrupt" else "paused"
+            if status.get("status") != expected:
+                print(json.dumps({"run_id": run_id, "arm": arm, "receipt": str(receipt_path),
+                                  "failure_stage": action, "task_passed": False, "evidence_complete": False}))
+                return 3
+            if json.loads(read_bounded(lock)) != {"run_id": run_id, "arm": arm}:
+                raise ValueError("recovery_requires_owned_serial_reservation")
+            conversation_id = str(uuid.UUID(status["conversation_id"]))
+            if action == "resume" and time.time() >= status["deadline"]:
+                raise TimeoutError("native_conversation_deadline")
+            endpoint = ("goal/stop" if action == "interrupt" else "goal/resume") if status.get("goal_review") else (
+                "interrupt" if action == "interrupt" else "run")
+            api_request("POST", f"/api/conversations/{conversation_id}/{endpoint}", port=port, headers=headers)
+            status.update(status="paused" if action == "interrupt" else "running")
+            write_json(result / (action + ".json"), {
+                "action": action, "recorded_at": utc_now(), "native_conversation_preserved": True,
+                "deadline_extended": False,
+            })
         elif action == "wait":
             if status.get("status") != "running":
                 raise ValueError("running_attempt_required")
@@ -287,6 +335,12 @@ def execute(action, state, run_id, arm):
                 response = api_request("GET", f"/api/conversations/{conversation_id}", port=port, headers=headers)
                 execution = response["execution_status"]
                 if execution in TERMINAL:
+                    if status.get("goal_review"):
+                        goal = native_goal_status(conversation_id, port, headers)
+                        if goal["active"]:
+                            time.sleep(min(15, max(0, status["deadline"] - time.time())))
+                            continue
+                        status["goal_status"] = goal["status"]
                     status.update(status="terminal", execution_status=execution)
                     window["finished_at"] = utc_now()
                     if arm == "engines-on":
@@ -326,7 +380,7 @@ def execute(action, state, run_id, arm):
         if result.is_dir() and result.resolve() == result.absolute():
             write_json(receipt_path, receipt)
             write_json(result / "status.json", {**status, "status": "failed", "failure_stage": stage})
-            if owns_lock or action in {"wait", "result"}:
+            if owns_lock or action in {"wait", "result", "interrupt", "resume"}:
                 try:
                     stop_server(result, status)
                 except (OSError, ValueError, subprocess.SubprocessError):
@@ -345,7 +399,7 @@ def execute(action, state, run_id, arm):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("start", "wait", "result"))
+    parser.add_argument("action", choices=("start", "wait", "result", "interrupt", "resume"))
     parser.add_argument("--run-id", default=os.environ.get("OPENHANDS_RUN_ID"), required="OPENHANDS_RUN_ID" not in os.environ)
     parser.add_argument("--arm", choices=("control", "engines-on"), default=os.environ.get("OPENHANDS_ARM", "control"))
     args = parser.parse_args()

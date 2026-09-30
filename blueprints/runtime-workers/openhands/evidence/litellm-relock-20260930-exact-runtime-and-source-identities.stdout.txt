@@ -1,0 +1,87 @@
+{
+  "target": "Linux x86_64 CPython 3.13.15 only",
+  "baseline_requirements_sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+  "candidate_requirements_sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+  "baseline_control_byte_identical": true,
+  "explicit_no_config_recompile_byte_identical": true,
+  "declared_requirements": 176,
+  "changed_package_blocks": [
+    "litellm"
+  ],
+  "other_package_blocks_byte_identical": 175,
+  "added": [],
+  "removed": [],
+  "installed_versions_checked": 176,
+  "version_mismatches": [],
+  "installed_distributions_including_build_and_test_tools": 182,
+  "qualification_tools": {
+    "pytest": "9.0.3",
+    "pytest-asyncio": "1.3.0",
+    "pluggy": "1.6.0",
+    "iniconfig": "2.3.0"
+  },
+  "oauth_review_identities": [
+    {
+      "path": "oauthlib/__init__.py",
+      "sha256": "ccbf8a40b750b21931f842b1b416e0bb5cb24e97f54d127b42d7da38eb1d5dc4"
+    },
+    {
+      "path": "oauthlib/oauth1/__init__.py",
+      "sha256": "e3b84443bb3f1595cbc94b7a5d513e0cf0bcbd4315b0997bffe1c290d3362253"
+    },
+    {
+      "path": "oauthlib/oauth2/__init__.py",
+      "sha256": "2bb207c3f04d0992d24d0a807d0aac2cad0ad3303afcaad00c2cdce12fb7de24"
+    },
+    {
+      "path": "oauthlib/common.py",
+      "sha256": "39e686f928b00d7004b0ad5f921e4669b8123c68c6e0072ec2eab007986b1bf0"
+    },
+    {
+      "path": "oauthlib/oauth2/rfc6749/endpoints/revocation.py",
+      "sha256": "ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c"
+    },
+    {
+      "path": "oauthlib/oauth2/rfc6749/grant_types/authorization_code.py",
+      "sha256": "0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6"
+    },
+    {
+      "path": "oauthlib/oauth2/rfc6749/endpoints/pre_configured.py",
+      "sha256": "6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316"
+    },
+    {
+      "path": "oauthlib/openid/connect/core/endpoints/pre_configured.py",
+      "sha256": "bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee"
+    },
+    {
+      "path": "func_timeout/py2_raise.py",
+      "sha256": "19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77"
+    }
+  ],
+  "official_sdist_name_reviews": [
+    {
+      "version": "1.93.0",
+      "archive_sha256": "140bf215e264c71601bca9c06d2436c5451bb59e1e195ea23fc2d3d87b6929ec",
+      "python_sources": 2104,
+      "advisory_name_hits": [],
+      "parse_errors": []
+    },
+    {
+      "version": "1.93.2",
+      "archive_sha256": "c5d5223ef07f36e0886397fb45cc9db4150f86a0c6f6835cee1d5524cab69dfd",
+      "python_sources": 2104,
+      "advisory_name_hits": [],
+      "parse_errors": []
+    }
+  ],
+  "candidate_wheel_sha256": "dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692",
+  "candidate_python_sources_compared": 2104,
+  "wheel_to_installed_mismatches": [],
+  "wheel_to_sdist_mismatches": [],
+  "native_imports_passed": true,
+  "limitations": [
+    "Static name/AST review does not prove semantic or dynamic unreachability.",
+    "One compiled LiteLLM extension is not assessed by the Python source scan.",
+    "No proxy-server, provider, model, image, host deployment or task-quality execution."
+  ]
+}

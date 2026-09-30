@@ -1,0 +1,56 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.15, pytest-9.0.3, pluggy-1.6.0
+rootdir: <UPSTREAM>
+configfile: pyproject.toml
+plugins: libtmux-0.53.0, xdist-3.8.0, asyncio-1.3.0, anyio-4.14.2, forked-1.6.0, timeout-2.4.0, cov-7.0.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1208 items
+
+tests/sdk/skills/test_agentskills_fields.py ....                         [  0%]
+tests/sdk/skills/test_extensions_ref.py ........                         [  0%]
+tests/sdk/skills/test_installed_skills.py ......................         [  2%]
+tests/sdk/skills/test_load_project_skills.py ...................         [  4%]
+tests/sdk/skills/test_load_public_skills.py ............................ [  6%]
+                                                                         [  6%]
+tests/sdk/skills/test_load_user_skills.py ..............                 [  7%]
+tests/sdk/skills/test_mcp_config_expansion.py ................           [  9%]
+tests/sdk/skills/test_mcp_json.py ......                                 [  9%]
+tests/sdk/skills/test_path_trigger.py .................................. [ 12%]
+...........................                                              [ 14%]
+tests/sdk/skills/test_resource_directories.py ....                       [ 15%]
+tests/sdk/skills/test_skill_commands.py ......................           [ 16%]
+tests/sdk/skills/test_skill_info.py ...................                  [ 18%]
+tests/sdk/skills/test_skill_md_convention.py .........                   [ 19%]
+tests/sdk/skills/test_skill_no_header.py ....                            [ 19%]
+tests/sdk/skills/test_skill_serialization.py ............                [ 20%]
+... (84 lines omitted)
+tests/sdk/llm/test_llm_fallback.py::test_fallback_succeeds_after_primary_transient_failure
+tests/sdk/llm/test_llm_fallback.py::test_quota_exhaustion_fails_over_without_retries[usage_limit_reached-sync]
+tests/sdk/llm/test_llm_fallback.py::test_quota_exhaustion_fails_over_without_retries[usage_limit_reached-async]
+tests/sdk/llm/test_llm_fallback.py::test_quota_exhaustion_fails_over_without_retries[insufficient_quota-sync]
+tests/sdk/llm/test_llm_fallback.py::test_quota_exhaustion_fails_over_without_retries[insufficient_quota-async]
+tests/sdk/llm/test_llm_fallback.py::test_acompletion_fallback_on_transport_error
+tests/sdk/llm/test_llm_fallback.py::test_fallback_forwards_caller_kwargs
+  <UPSTREAM>/openhands-sdk/openhands/sdk/llm/utils/telemetry.py:395: UserWarning: Cost calculation failed: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=fallback-model
+   Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+    warnings.warn(f"Cost calculation failed: {e}")
+
+tests/sdk/llm/test_llm_fallback.py::test_metrics_merged_from_fallback
+tests/sdk/llm/test_llm_fallback.py::test_responses_fallback_succeeds
+tests/sdk/llm/test_llm_fallback.py::test_aresponses_fallback_on_transport_error
+  <UPSTREAM>/openhands-sdk/openhands/sdk/llm/utils/telemetry.py:395: UserWarning: Cost calculation failed: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=fb
+   Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+    warnings.warn(f"Cost calculation failed: {e}")
+
+tests/sdk/llm/test_llm_fallback.py::test_second_fallback_succeeds
+  <UPSTREAM>/openhands-sdk/openhands/sdk/llm/utils/telemetry.py:395: UserWarning: Cost calculation failed: litellm.BadRequestError: LLM Provider NOT provided. Pass in the LLM provider you are trying to call. You passed model=fb2
+   Pass model as E.g. For 'Huggingface' inference endpoints pass in `completion(model='huggingface/starcoder',..)` Learn more: https://docs.litellm.ai/docs/providers
+    warnings.warn(f"Cost calculation failed: {e}")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 1208 passed, 52 warnings in 94.92s (0:01:34) =================
+[+109 hidden: rtk recall 022f02b60903]
+[09/30/26 01:06:59] WARNING  Error closing agent:     local_conversation.py:2832
+                             'LocalConversation'
+                             object has no attribute
+                             'agent'

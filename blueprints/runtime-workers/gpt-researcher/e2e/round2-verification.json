@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "evidence_class": "offline adapter integration and unchanged upstream aggregation controls; no model evaluation",
+  "source": {
+    "grader": "imlrz/DeepResearch-Bench-II",
+    "commit": "b38f360603db9531b102aef8c166cedb8509b6f6",
+    "worker_commit": "0957c301ed06c2a5857b834358c7227c739041d4"
+  },
+  "environment": "Unit tests used TMPDIR under the user-designated external scratch; all Python verification disabled bytecode.",
+  "fail_first": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_gpt_researcher.py -v",
+    "exit_code": 1,
+    "summary": "Ran 5 tests; FAILED (errors=10); old checker lacked ready_for_grading and native grader adapter was absent.",
+    "output_file": "round2-red.txt"
+  },
+  "additional_fail_first": [
+    {
+      "scope": "gateway transport",
+      "exit_code": 1,
+      "summary": "Ran 6 tests; FAILED (errors=1); gateway.py absent."
+    },
+    {
+      "scope": "native task/runner wiring",
+      "exit_code": 1,
+      "summary": "Ran 7 tests; FAILED (errors=1); frozen task loader absent."
+    },
+    {
+      "scope": "receipt/runner wiring",
+      "exit_code": 1,
+      "summary": "Ran 8 tests; FAILED (failures=1, errors=1); judge launch missing and removed checker field still consumed."
+    },
+    {
+      "scope": "malformed receipt/skills lifecycle",
+      "exit_code": 1,
+      "summary": "Ran 9 tests; FAILED (failures=1, errors=1); truncated result raised JSONDecodeError and future skills installer contract was not documented."
+    },
+    {
+      "scope": "nonfinite temperature",
+      "exit_code": 1,
+      "summary": "Ran 9 tests; FAILED (failures=1); NaN temperature was wrongly accepted."
+    },
+    {
+      "scope": "native report binding",
+      "exit_code": 1,
+      "summary": "Ran 10 tests; FAILED (errors=1); read_report binding helper absent. Prior native-CSV control also failed on changed exports alongside old scores."
+    }
+  ],
+  "final_unit": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_gpt_researcher.py -v",
+    "exit_code": 0,
+    "output": "test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_frozen_task_rejects_changed_bytes_and_recipe_wires_native_grader) ... ok\ntest_gateway_reader_uses_only_authorized_columns_and_is_read_only (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_reader_uses_only_authorized_columns_and_is_read_only) ... ok\ntest_gateway_transport_headers_and_strict_schema_controls (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_transport_headers_and_strict_schema_controls) ... ok\ntest_graded_report_binding_rejects_replaced_and_mismatched_exports (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_graded_report_binding_rejects_replaced_and_mismatched_exports) ... ok\ntest_mcp_policy_enforces_calls_and_collection_arguments (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_mcp_policy_enforces_calls_and_collection_arguments) ... ok\ntest_receipt_cannot_promote_report_sanity_to_quality_verdict (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_receipt_cannot_promote_report_sanity_to_quality_verdict) ... ok\ntest_recipe_contract_and_empty_result (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result) ... ok\ntest_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) ... ok\ntest_skills_lifecycle_and_no_listener_recipe (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_skills_lifecycle_and_no_listener_recipe) ... ok\ntest_upstream_grade_controls_preserve_scores_and_reject_malformed_output (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_upstream_grade_controls_preserve_scores_and_reject_malformed_output) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.104s\n\nOK\n"
+  },
+  "upstream_aggregation": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 <pinned-DRB-II>/aggregate_scores.py --input <control>.jsonl --tasks-file tasks.jsonl --output-prefix <control>",
+    "exit_code": 0,
+    "controls": [
+      {
+        "label": "known-pass",
+        "synthetic_score": 1,
+        "native_total": 1,
+        "native_blocked_rate": 0,
+        "native_stdout": "[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-pass_inforecall.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-pass_analysis.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-pass_presentation.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-pass_total.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-pass_blocked.csv\n"
+      },
+      {
+        "label": "known-fail",
+        "synthetic_score": 0,
+        "native_total": 0,
+        "native_blocked_rate": 0,
+        "native_stdout": "[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-fail_inforecall.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-fail_analysis.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-fail_presentation.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-fail_total.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/known-fail_blocked.csv\n"
+      },
+      {
+        "label": "blocked",
+        "synthetic_score": -1,
+        "native_total": 0,
+        "native_blocked_rate": 1,
+        "native_stdout": "[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/blocked_inforecall.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/blocked_analysis.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/blocked_presentation.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/blocked_total.csv\n[done] wrote aggregated CSV: <external-scratch>/gptr-native-aggregation-controls/blocked_blocked.csv\n"
+      }
+    ],
+    "scope": "Unchanged upstream aggregation executed on synthetic rows using the byte-verified upstream idx-12 rubric; never native model-quality acceptance."
+  },
+  "publication_validation": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+    "exit_code": 1,
+    "output": "Publication validation failed:\nblueprints/runtime-workers/gpt-researcher/README.md: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/README.md: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/check.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/check.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/receipt.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/receipt.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/run.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/run.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/task.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/e2e/task.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/install.sh: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/install.sh: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/install_support.py: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/install_support.py: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/pins.json: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/pins.json: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/research.md: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/research.md: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/run-e2e.sh: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/run-e2e.sh: byte count mismatch\nblueprints/runtime-workers/gpt-researcher/run-upstream-tests.sh: SHA-256 mismatch\nblueprints/runtime-workers/gpt-researcher/run-upstream-tests.sh: byte count mismatch\ntests/test_runtime_worker_gpt_researcher.py: SHA-256 mismatch\ntests/test_runtime_worker_gpt_researcher.py: byte count mismatch\n",
+    "remaining_action": "Coordinator re-registers twelve changed existing recipe/test entries and new adapter/evidence files in shared manifests/evidence.json, then reruns validation."
+  },
+  "syntax": {
+    "command": "bash -n install.sh run-e2e.sh run-upstream-tests.sh; Python ast.parse on eight owned Python files; git diff --check",
+    "exit_code": 0
+  },
+  "hygiene": {
+    "initial_exit_code": 1,
+    "observed": "Four disposable scripts/__pycache__/*.pyc files found and explicitly removed with the empty directory; origin not inferred.",
+    "final_scan": {
+      "exit_code": 0,
+      "output": "Worktree scan: no Python bytecode or scratch/cache directories found\n"
+    }
+  },
+  "constraints": {
+    "host_installs": 0,
+    "services_started": 0,
+    "model_calls": 0,
+    "git_add_commit_push": false,
+    "owned_listener_ports": [],
+    "docker_resources": []
+  },
+  "gaps": [
+    "Native installation, upstream worker suite, live E2E and A/B not executed.",
+    "Native free-text JSON planner remains unconstrained; native MCP uses tools and DRB-II uses strict closed schemas.",
+    "No SKILL.md loader found in reviewed v3.7.0 runtime; empty startup/activation inventories are declarations, not framework trace events.",
+    "Conditional skills installer command is pending the skills-program PR; no installation performed.",
+    "Gateway wire/effort observation and process cleanup remain host checks.",
+    "Native outer retries receive fresh generation keys; replay deduplication is unqualified.",
+    "Upstream successful-batch usage omits failed-attempt consumption."
+  ]
+}

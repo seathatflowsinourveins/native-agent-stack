@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "curl", "--fail", "--silent", "--show-error", "--location", "https://files.pythonhosted.org/packages/e8/55/40e45bf052ee8ee12a4dfd785519660f8effa7b065442b91646ec6828619/pyjwt-2.15.0-py3-none-any.whl", "--output", "<PRIVATE_RESEARCH>/pyjwt-2.15.0-py3-none-any.whl"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:04:35.575932+00:00
+ended_utc: 2026-09-30T17:04:35.666442+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

@@ -1,0 +1,8 @@
+$ ["rtk", "uv", "pip", "check", "--python", "<PRIVATE_RESEARCH>/venv/bin/python"]
+
+[stderr]
+Using Python 3.13.15 environment at: <PRIVATE_RESEARCH>/venv
+Checked 178 packages in 4ms
+All installed packages are compatible
+
+exit_code=0

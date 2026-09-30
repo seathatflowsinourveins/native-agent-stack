@@ -1,0 +1,7 @@
+Using Python 3.13.15 environment at: <PRIVATE_RESEARCH>/venv
+Resolved 6 packages in 97ms
+Uninstalled 1 package in 2ms
+Installed 2 packages in 15ms
+ - pytest==8.4.2
+ + pytest==9.0.3
+ + pytest-asyncio==1.3.0

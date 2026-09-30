@@ -1,0 +1,42 @@
+PASS  unmutated: ran 18, failures 0, errors 0
+PASS  R1a a double-quoted affected key beside an unquoted fixed one (live pnpm lock): 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R1b a single-quoted affected key beside an unquoted fixed one (live pnpm lock): 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  R2 an affected next in the retrieval recipe's package-lock.json: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  R3 a version below the introduced release is not affected
+PASS  R4 a pnpm tarball entry with its own name and version (live pnpm lock): 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  R5 a yarn berry alias to next in an extra inventory lock: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  R6 a package-lock lockfileVersion 1 alias to next: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  R7 a package-lock entry node_modules/next with an empty name: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  R8 a package-lock entry vendor/next without a name: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  R9 whitespace-heavy input returns in linear time: 0.004 s for 305500 bytes
+PASS  R10 a canary above the fix, build metadata on the fix and a canary of the introduced release are not affected
+PASS  R11 an integer lockfileVersion is read
+PASS  R12 an inline pnpm record with its own name and version (live pnpm lock): 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R13 a repeated packages key in a package-lock.json: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R14 a differently cased Packages key in a package-lock.json: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R15 an optional peer declaration of next is not a package: the guard stays quiet
+PASS  R16 the yarn root workspace is skipped
+PASS  R17 deep nesting is read or refused, never an error or an empty read: ['16.3.5']
+PASS  R19 a package-lock lockfileVersion 1 dependency named next installed from a local path: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R20 a package-lock lockfileVersion 1 dependency named next installed from a git commit: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R21 a package-lock entry for next whose resolved URL is a git commit, with a fixed-looking version: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R22 a tagged packages key (!!str packages:) in the live pnpm lock, found by the independent verifier with the pinned scanner: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R23 packages supplied through a YAML merge key (<<: *base) in the live pnpm lock, found by the independent verifier with the pinned scanner: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R24 a Unicode line separator inside a pnpm lock: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R25 the fields of a pnpm entry indented by six spaces instead of four: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R26 a pnpm entry whose name field is a YAML null word: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  R18 a pin in the second document of a two-document pnpm lock (live pnpm lock): 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  M1 an entry key at the wrong indentation: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  M2 an old slash key in a lockfileVersion 9 file: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  M3 an importer-only pin is not a package: the guard stays quiet
+PASS  M4 an unknown lockfileVersion: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  M5 an extra yarn.lock in the inventory pins an affected next: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  M6 an extra lock in a format no reader knows (bun.lockb): 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  M7 the macOS row removed: 1 failing test(s); expected rule 'pins next 16.3.5, which the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  M8 the allowed lock no longer pins next: 1 failing test(s); expected rule 'the allowed lock no longer pins next' seen
+PASS  M9 the allowed lock cannot be read strictly: 1 failing test(s); expected rule 'cannot be read strictly' seen
+PASS  M10 OpenHands row sha256 wrong: 1 failing test(s): ['test_every_allowed_lock_matches_its_reviewed_digest']
+PASS  M11 macOS row sha256 wrong: 1 failing test(s): ['test_every_allowed_lock_matches_its_reviewed_digest']
+PASS  M12 the next scope entry removed: 3 failing test(s): ['test_allowed_advisories_are_scoped_active_ignores', 'test_the_next_guard_catches_a_mutant_lock', 'test_the_next_range_has_both_bounds']
+PASS  unmutated again: ran 18, failures 0, errors 0
+ALL MUTANTS CAUGHT AND CONTROL CLEAN

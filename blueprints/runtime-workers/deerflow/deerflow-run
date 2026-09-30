@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# bytedance/deer-flow@345f08be skills/public/claude-to-deerflow/scripts/chat.sh:24-90
+# and backend/docs/API.md. Adds PAT auth and durable background create/poll.
+# Python sends the Bearer header in-process, never in curl argv or shell output.
+set -euo pipefail
+umask 077
+export PYTHONDONTWRITEBYTECODE=1
+recipe_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$recipe_dir/dispatch.py" "$@"

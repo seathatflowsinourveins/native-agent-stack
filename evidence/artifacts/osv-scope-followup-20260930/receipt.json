@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "record": "osv-scope-followup-20260930",
+  "observed_utc": "2026-09-30T17:45:39Z",
+  "reviewed_commit": "fba387496ca264e878e03283f32c499aee0fd366",
+  "evidence_class": "Independent native execution of unchanged repository integration and artifact-integrity checks; not upstream tests or a worker/provider/image run.",
+  "commands": [
+    {
+      "command": "python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_runtime_worker_openhands",
+      "exit_code": 0,
+      "output": "nas-fba-unittest-20260930.txt",
+      "sha256": "8df00f874a9b7bd6fe4c6ff33476a1c95f4f57f0fbac4c19a88769a6e4b54884",
+      "result": "157 tests passed; native elapsed 10.053s."
+    },
+    {
+      "command": "python3 -B blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.guard-mutants.py.txt",
+      "exit_code": 0,
+      "output": "nas-fba-mutants-20260930.txt",
+      "sha256": "6aa1c51a2513c6c6fb8e1b51dbea64cd8cc29e0c3dea46f1fc4f933ecb4832bc",
+      "result": "Original mutation controls and both unmutated controls passed."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "output": "nas-fba-validate-20260930.txt",
+      "sha256": "88e98c08151e4bff895ab73e76a46afbbafdb490af1d0bf3427d1d2afab2fe56",
+      "result": "69 components, 8542 hashed files, four profiles, 176 receipts."
+    },
+    {
+      "command": "python3 scripts/evidence_manifest.py --check",
+      "exit_code": 0,
+      "output": "nas-fba-evidence-index-20260930.txt",
+      "sha256": "b9dd17b602fca37413e53cda5beeb4d15a3e814cd88f186f78206b4ec37168f3",
+      "result": "8542 file bindings passed."
+    }
+  ],
+  "architecture_sources": [
+    "https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md#L23",
+    "https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/manager.go#L24",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/fba387496ca264e878e03283f32c499aee0fd366/.github/workflows/security-scan.yml#L67"
+  ],
+  "decision": "The consequential Astra/Max architecture review recommends holding PR546 until supported native split scans land before or with it; the coordinator sent that decision to the owner. An explicit native config applies to all inputs in one invocation, so the current global Next exception still relies on custom readers for scope enforcement.",
+  "limitations": [
+    "The platform flagged the subagent's separate follow-up review as a possible cybersecurity risk, so that turn produced no final verdict. These direct unchanged native checks are separate evidence.",
+    "Passing supplied integration tests and mutation controls does not establish exhaustive parser completeness or a new bypass in fba3874.",
+    "The native split-scan capability was independently demonstrated against the prior actual inputs; an implemented workflow and final-head hosted acceptance remain outstanding.",
+    "No source fix, merged PR, changed expiry, additional advisory exception, live worker/provider, model trial, image operation, token-saving comparison or host deployment is accepted by this receipt."
+  ]
+}

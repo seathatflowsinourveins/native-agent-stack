@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-27",
+  "round": 2,
+  "evidence_class": "local integration checks and unchanged upstream Promptfoo assertions on synthetic controls; no new model execution",
+  "upstream_grader": {
+    "repository": "https://github.com/promptfoo/promptfoo",
+    "version": "0.123.1",
+    "mode": "standalone is-json and equals",
+    "installed_during_this_task": false
+  },
+  "fail_first": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py",
+      "exit_code": 1,
+      "returned_summary": "Ran 9 tests in 0.285s\n\nFAILED (errors=2)",
+      "cause": "The old checker printed its own verdict; the upstream grader adapter did not exist."
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py",
+      "exit_code": 1,
+      "returned_summary": "Ran 14 tests in 14.394s\n\nFAILED (failures=5, errors=3)",
+      "cause": "New ownership, model, structured-request, skills and receipt contracts failed before completion. Also exposed an unrelated scratch-location fixture refusal and trailing-newline binding error; corrected as recorded in research.md."
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py -k private_host_ports",
+      "exit_code": 1,
+      "returned_summary": "Ran 1 test in 0.005s\n\nFAILED (failures=1)",
+      "cause": "After isolating the port parser, 3710 was accepted instead of rejected."
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py -k receipt",
+      "exit_code": 1,
+      "returned_summary": "Ran 2 tests in 14.604s\n\nFAILED (failures=1)",
+      "cause": "The prior privacy test matched prompt inside the harmless promptfoo harness name; corrected to forbidden JSON keys and planted private-value markers."
+    }
+  ],
+  "fail_first_sanitization": "Exact command exit codes and terminal summary lines retained; absolute paths and full failing source dumps omitted.",
+  "final_unit": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "..............\n----------------------------------------------------------------------\nRan 14 tests in 28.193s\n\nOK\n"
+  },
+  "controls": {
+    "known-pass": {
+      "harness": "promptfoo",
+      "version": "0.123.1",
+      "exit_code": 0,
+      "source_sha256": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+      "report_sha256": "223940aea16720c55c17dd3b673603534360f9a0ca6d29224f1e13fa21f3a7e6",
+      "assertions_sha256": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+      "expected_sha256": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+      "upstream_success": true,
+      "upstream_score": 1,
+      "stats": {
+        "successes": 1,
+        "failures": 0,
+        "errors": 0
+      },
+      "assertions": [
+        {
+          "type": "is-json",
+          "pass": true,
+          "score": 1
+        },
+        {
+          "type": "equals",
+          "pass": true,
+          "score": 1
+        }
+      ]
+    },
+    "known-fail": {
+      "harness": "promptfoo",
+      "version": "0.123.1",
+      "exit_code": 100,
+      "source_sha256": "d927a3af27319ecda4c24902f61bfdf454e27ae4ff17d1cc39751a88d3622c81",
+      "report_sha256": "8a1ab86089fe5aa4d290c00d9a40672e4c0a0551afa2add21233edd109c460fd",
+      "assertions_sha256": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+      "expected_sha256": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+      "upstream_success": false,
+      "upstream_score": 0.5,
+      "stats": {
+        "successes": 0,
+        "failures": 1,
+        "errors": 0
+      },
+      "assertions": [
+        {
+          "type": "is-json",
+          "pass": true,
+          "score": 1
+        },
+        {
+          "type": "equals",
+          "pass": false,
+          "score": 0
+        }
+      ]
+    },
+    "malformed-output": {
+      "harness": "promptfoo",
+      "version": "0.123.1",
+      "exit_code": 100,
+      "source_sha256": "5dce5ac2325436f5e428faca2073531a1760f01c46c42b26b4d1c5cda1cedc8a",
+      "report_sha256": "41286f1736bcbc206c9ff83ae42de725589daa43b6cd04b17376b844a2839905",
+      "assertions_sha256": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+      "expected_sha256": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+      "upstream_success": false,
+      "upstream_score": 0,
+      "stats": {
+        "successes": 0,
+        "failures": 1,
+        "errors": 0
+      },
+      "assertions": [
+        {
+          "type": "is-json",
+          "pass": false,
+          "score": 0
+        },
+        {
+          "type": "equals",
+          "pass": false,
+          "score": 0
+        }
+      ]
+    }
+  },
+  "publication_validation": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+    "exit_code": 1,
+    "stdout": "Publication validation failed:\nblueprints/runtime-workers/crawl4ai/README.md: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/README.md: byte count mismatch\nblueprints/runtime-workers/crawl4ai/common.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/common.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/config/compose.yaml: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/config/compose.yaml: byte count mismatch\nblueprints/runtime-workers/crawl4ai/container.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/container.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/e2e/check.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/e2e/check.py: byte count mismatch\nblueprints/runtime-workers/crawl4ai/e2e/receipt.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/e2e/receipt.py: byte count mismatch\nblueprints/runtime-workers/crawl4ai/e2e/run.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/e2e/run.py: byte count mismatch\nblueprints/runtime-workers/crawl4ai/host.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/install.sh: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/install.sh: byte count mismatch\nblueprints/runtime-workers/crawl4ai/pins.json: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/pins.json: byte count mismatch\nblueprints/runtime-workers/crawl4ai/research.md: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/research.md: byte count mismatch\nblueprints/runtime-workers/crawl4ai/worker.py: SHA-256 mismatch\nblueprints/runtime-workers/crawl4ai/worker.py: byte count mismatch\ntests/test_runtime_worker_crawl4ai.py: SHA-256 mismatch\ntests/test_runtime_worker_crawl4ai.py: byte count mismatch\n",
+    "stderr": "",
+    "gap": "Shared manifests/evidence.json retains round-1 hashes. The coordinator owns re-registration; this task cannot edit that shared file."
+  },
+  "host_execution": {
+    "install": false,
+    "docker_pull": false,
+    "service_start": false,
+    "model_calls": false,
+    "live_gateway_database_read": false,
+    "unchanged_crawl4ai_regression_suite": "not run",
+    "promptfoo_assertions": "executed using already installed 0.123.1"
+  },
+  "port_map": {
+    "api": "127.0.0.1:3730",
+    "fixture": "127.0.0.1:3731",
+    "browser_mirror": "127.0.0.1:3732",
+    "e2e_api": "127.0.0.1:3734"
+  },
+  "owner_label": "com.native-agent-stack.owner=gpt6-omniroute-framework-integration",
+  "skills": {
+    "names_at_start": [],
+    "activation_events": [],
+    "status": "No native SKILL.md loader found in reviewed runtime; calling-agent installer command is pending the separate skills PR."
+  },
+  "remaining_checks": [
+    "Native install/reinstall and dependency closure",
+    "Browser and rootless container startup/cleanup/restart",
+    "API and SSE/WebSocket authentication and calls",
+    "GPT-6 primary/comparison extraction and gateway header/schema/sampling observations",
+    "Skill activation in a calling agent, if adopted"
+  ],
+  "limits": [
+    "Three synthetic extraction pages do not establish general web quality or model superiority",
+    "HTTP LLM extraction is disallowed by the pinned untrusted-config loader; use native Python output grading",
+    "WebSocket message-envelope compatibility remains unmeasured",
+    "Npm transitive dependencies are not frozen by a lockfile",
+    "Allowed gateway columns cannot prove header retention or exclusive session attribution"
+  ],
+  "syntax": {
+    "python_ast_files": 8,
+    "shell_scripts": 5,
+    "exit_code": 0,
+    "returned_output": "Python AST and each shell script syntax passed"
+  },
+  "compose_config": {
+    "command": "NAS_CRAWL4AI_PORT=3734 NAS_CRAWL4AI_STORE=e2e NAS_CRAWL4AI_PREFIX=<external-prefix> NAS_CRAWL4AI_STATE=<external-state> CRAWL4AI_MODEL=cx/gpt-6-astra-max docker compose --project-name rw-crawl4ai-e2e -f blueprints/runtime-workers/crawl4ai/config/compose.yaml config --quiet",
+    "version": "Docker Compose version v5.5.1",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "scope": "Parser only; no daemon request or service startup"
+  },
+  "test_sha256": "6c3669f6221f501d3a7392ab298b93234bd610a979ebbf608df93a51c67150dd",
+  "recipe_hashes": {
+    ".gitignore": "6fa9c435f133f59f9198b520765a85fee8d71a16f1439e53fed49c95dc39158f",
+    "README.md": "e42e6f39bea6cea51febd723b6b315db660218845b7643c973f70da805f184b2",
+    "browser-artifacts.json": "2ccc245dc89b29d7586e8278d808301117d22740ad171810b06245201601da2d",
+    "common.sh": "610f526187b7104e37bfac76aa68f6328848e739f215229bf7bd4f962a453d51",
+    "config/compose.yaml": "cf9f6565adc6e6e822df8af7165d4c74f9ed03285e7a342a446941081c00dd57",
+    "config/host.example.json": "e096e196c7324a67de265fb58371747b72ef94a4f4e445ea66e216b8c44ed9b4",
+    "config/logging.ini": "b495284f90c1b328e98e7ab6dc48c7be37b7a35140a90e270ead4fef133098d8",
+    "config/mcp-policy.json": "7c253c5e14045a7310025b71ff21d45a8ef6002c22f7dc917084d3e1d152e8e1",
+    "config/server.yml": "2d77b444912fa70eac926a87b37ad4e5335f6953475a0702ecf52900972acac9",
+    "config/supervisord.conf": "a145e5d4db3d7f659a74246eaabf5d11e547d4368008bb796afb2e7fbbb7a548",
+    "config/worker.json": "430188ff02afb22e5e4f1939ec6a21769f73d9f9c8f0956d7faf156533cf8076",
+    "container-entrypoint.sh": "fe4072118c6d318b6e51ffbe11448ce57ad6f2470fd2e67d20815af8967f9510",
+    "container.sh": "dc753081dadc485d7e71b7f94a356ef718f306f52c8248db24081a0270394c60",
+    "e2e/assertions.json": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+    "e2e/check.py": "7878f98bea665d4111e3ce76580b26b8d495e84651ed236f108492e381623dd7",
+    "e2e/expected.json": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+    "e2e/fixtures/beacon.html": "d743937367e843d738223dc1dc7aac0db363ef5173c53d188a68136d63f8739e",
+    "e2e/fixtures/flask.html": "b643e3617fc0681d2775da7f53bced1c8b60235b5f940af712bcad44d9a1d852",
+    "e2e/fixtures/lamp.html": "5d3e3fdc038def93ef353119fbbb06ed6fc8e311c89f1eed1785363b6256348f",
+    "e2e/grade.py": "cefc9125e6d505778cdb9f25f09c3ae9c072894ad8902c612f52c3e61d7e348f",
+    "e2e/mcp_probe.py": "9f2f8e4e97c0ca59a6ed01338f000a1b9187edf9d8f71b8267e84801fb11a93d",
+    "e2e/receipt.py": "23f3c0eb180d0586f5ee4d75067f1d2b78cc774599a799a89dc83aa1ba8a1305",
+    "e2e/run.py": "941064359f5c56ecd4e8b288df14834d9f29c5ce2c29ef4fdc352730f32d6878",
+    "e2e/schema.json": "69747f245f545a29151f17cd4fcbe5dee1418f9176970a67b4ce9f6f094e4d36",
+    "host.py": "38687eb528d63bb115654dbcb7c9d45c02f4f061625a198d1f9bb0363cbc47d8",
+    "install-browser.py": "7919165002ce74da8274c70ff294ff6eee11481bcbd6a1e45b8539fea9e25729",
+    "install.sh": "0c065d7e98c5c6a84952828920465d3b692c6b564d24540a364d9661875ee53f",
+    "pins.json": "95b7e791aaad264a7dbefdd2eb70ddfe17be79fe756cdb19d407f668b6ba5a0e",
+    "registry-evidence.json": "710dc54f473150f9209e76e0a5a889abda8c56c793b3f52b064b624e9a290d29",
+    "requirements.in": "f922a5a3f6b978192899aa94a0b64a82e01dbb4782b4cc151ad8a7d2ca5f3d38",
+    "requirements.lock": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+    "research.md": "eb4f9c6229069d591c87023be401b90cdd4e99e276c714a5ab6e8c44151ecfea",
+    "run-e2e.sh": "d39d556f748ee5a1cefea6f0dbe17dcbcac08a193fed522c2eae47450da89f44",
+    "worker.py": "e6ccb63f11b8da87c20b6a044d9513569586c52f3dd3743107d04a56a6862fc6"
+  }
+}

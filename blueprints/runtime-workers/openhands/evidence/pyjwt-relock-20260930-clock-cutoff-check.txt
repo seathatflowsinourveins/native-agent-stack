@@ -1,0 +1,10 @@
+argv: ["rtk", "proxy", "date", "-u", "+%Y-%m-%dT%H:%M:%SZ"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:01:25.891166+00:00
+ended_utc: 2026-09-30T17:01:25.913042+00:00
+exit_code: 0
+
+stdout:
+2026-09-30T17:01:25Z
+
+stderr:

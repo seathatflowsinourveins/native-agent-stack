@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "cp", "<PRIOR_PRIVATE_RESEARCH>/osv-scanner", "<PRIVATE_RESEARCH>/osv-scanner"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:04:35.284986+00:00
+ended_utc: 2026-09-30T17:04:35.506211+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

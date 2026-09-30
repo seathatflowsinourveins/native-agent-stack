@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "curl", "--fail", "--silent", "--show-error", "--location", "https://codeload.github.com/jpadilla/pyjwt/tar.gz/1d41a6478e1562e68ff667fcd703356acf085f68", "--output", "<PRIVATE_RESEARCH>/pyjwt-source.tar.gz"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:07:02.701004+00:00
+ended_utc: 2026-09-30T17:07:02.914421+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

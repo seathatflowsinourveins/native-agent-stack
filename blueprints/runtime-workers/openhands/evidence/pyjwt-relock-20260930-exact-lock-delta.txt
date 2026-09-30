@@ -1,0 +1,36 @@
+argv: ["rtk", "proxy", "python3", "-c", "import re,sys,json,hashlib\nfrom pathlib import Path\np=Path(sys.argv[1]);before=(p/'baseline.lock').read_text();after=(p/'candidate.lock').read_text()\npattern=r'(?m)^pyjwt==[^\\n]*(?:\\n[ \\t]+[^\\n]*)*'\noldblock=re.search(pattern,before).group(0);newblock=re.search(pattern,after).group(0)\nassert after==before.replace(oldblock,newblock,1),'bytes changed outside PyJWT block'\ndef declarations(s):\n out={}\n for name,kind,value in re.findall(r'(?m)^([a-zA-Z0-9_.-]+)(==| @ )([^\\n]+)',s):\n  out[re.sub(r'[-_.]+','-',name).lower()]=value.rstrip(' \\\\')\n return out\nold=declarations(before);new=declarations(after)\nadded=sorted(set(new)-set(old));removed=sorted(set(old)-set(new))\nchanged=[{'name':n,'before':old[n],'after':new[n]} for n in sorted(old.keys()&new.keys()) if old[n]!=new[n]]\nassert len(old)==len(new)==176 and not added and not removed\nassert changed==[{'name':'pyjwt','before':'2.14.0','after':'2.15.0'}]\nfiles=json.loads((p/'pyjwt-artifacts.json').read_text())\nassert sorted(re.findall(r'--hash=sha256:([a-f0-9]+)',newblock))==sorted(x['sha256'] for x in files)\nresult={'before_sha256':hashlib.sha256(before.encode()).hexdigest(),'after_sha256':hashlib.sha256(after.encode()).hexdigest(),'requirements_before':len(old),'requirements_after':len(new),'unchanged_declarations_from_bd1':175,'changes':changed,'added':added,'removed':removed,'only_pyjwt_block_changed':True,'hashes_match_official_pypi':True,'retained_versions':{n:new[n] for n in ['urllib3','oauthlib','anyio','click','pypdf','soupsieve']},'pyjwt_block':newblock}\nprint(json.dumps(result,indent=2))\n", "<PRIVATE_RESEARCH>"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:04:35.755023+00:00
+ended_utc: 2026-09-30T17:04:35.806482+00:00
+exit_code: 0
+
+stdout:
+{
+  "before_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+  "after_sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+  "requirements_before": 176,
+  "requirements_after": 176,
+  "unchanged_declarations_from_bd1": 175,
+  "changes": [
+    {
+      "name": "pyjwt",
+      "before": "2.14.0",
+      "after": "2.15.0"
+    }
+  ],
+  "added": [],
+  "removed": [],
+  "only_pyjwt_block_changed": true,
+  "hashes_match_official_pypi": true,
+  "retained_versions": {
+    "urllib3": "2.8.0",
+    "oauthlib": "3.3.1",
+    "anyio": "4.14.2",
+    "click": "8.5.0",
+    "pypdf": "6.19.0",
+    "soupsieve": "2.9.2"
+  },
+  "pyjwt_block": "pyjwt==2.15.0 \\\n    --hash=sha256:7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8 \\\n    --hash=sha256:b11c5f9791d7bf51c2b39a81ed669f6b2dbbd669df2942f6c60167e9e3d1abe4"
+}
+
+stderr:

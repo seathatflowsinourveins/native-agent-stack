@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "record": "osv-native-split-independent-review-20260930",
+  "observed_utc": "2026-09-30T18:12:31Z",
+  "reviewed_commit": "4a09c9c5f1e5fdb5555d4c916666f12e089cf09f",
+  "evidence_class": "Independent execution of unchanged repository integration and integrity checks; not upstream tests or runtime/provider/image acceptance.",
+  "ordinary_input_count": 48,
+  "frozen_input_count": 1,
+  "frozen_lock": {
+    "path": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+    "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+    "advisory": "GHSA-vcvr-r3jv-pc5j",
+    "expires": "2026-12-24"
+  },
+  "commands": [
+    {
+      "command": "python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_runtime_worker_openhands",
+      "exit_code": 0,
+      "output": "native-split-unittest.stderr.txt",
+      "sha256": "0c1031987a585f65dc0b5f3a98fd58b4d8e5c7cabfc5544f51dc1b88ba52d5cd",
+      "test_count": 233,
+      "skipped": 2,
+      "skip_reasons": [
+        "Empty-hash frozen exemption check",
+        "PyYAML cross-check unavailable"
+      ]
+    },
+    {
+      "command": "python3 -B blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-split-controls.py.txt <PINNED_OSV_BINARY> <OWNED_PRIVATE_OUTPUT>",
+      "exit_code": 0,
+      "result": "Unchanged extracted workflow exits 0 in both WRITE_SARIF=false and WRITE_SARIF=true modes; same 49 inputs scanned once or twice respectively.",
+      "stdout_sha256": "eedb3a133e8a37ada46411a1d204019542d5d4a917c2788a803c7dd8cef3ac05",
+      "output_retention": "Original argv/stdout/stderr retained privately outside the checkout."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "output": "native-split-validate.stdout.txt",
+      "sha256": "85c8c93994f1d022e4a681bcc1414f57571d380fc716f4091fa024e0977609ee"
+    },
+    {
+      "command": "python3 scripts/evidence_manifest.py --check",
+      "exit_code": 0,
+      "output": "native-split-evidence-index.stdout.txt",
+      "sha256": "a26f8fb01df537ed9a634e45d29a4b0fb39084139d18b6147500e53e897add17"
+    }
+  ],
+  "sarif": {
+    "file_count": 2,
+    "bytes_each": 1168,
+    "version": "2.1.0",
+    "runs_each": 1,
+    "results_each": 0,
+    "sha256_each": "4568c81b00798436c2ec0a6ce67d41500aa483516d6b354f00bd1885c50b5955",
+    "hosted_upload": "not_run_locally"
+  },
+  "failure_controls": [
+    {
+      "control": "Missing ordinary config, unchanged extracted workflow",
+      "extracted_step_sha256": "bc092b630dabd7794baa26d5f7ecfa28934c76acc4e27745b9c914d106cc92f7",
+      "ordinary_scan_exit": 127,
+      "frozen_scan_exit": 0,
+      "workflow_step_exit": 127,
+      "native_error": "Failed to read config file: open .github/osv-scanner.toml: no such file or directory",
+      "original_record_sha256": "e0eb361441c87fbeffeaace10c20fd8f2c8bb97ff4f18e239f3ce332ff7e2eac"
+    },
+    {
+      "control": "Append one LF byte to frozen lock; unchanged FrozenScanTests.test_each_frozen_lock_matches_its_reviewed_digest_and_names_evidence",
+      "exit_code": 1,
+      "mutated_sha256": "0a64676fbc677cfa63d5d7f8251b059d270b39b0fccc01449a0a0e8bc1785032",
+      "original_record_sha256": "3740a683e27df539faef56be37e9517ab4f7cbfc22cab567eb5b856aaac53fbd"
+    },
+    {
+      "control": "Restore exact frozen bytes; unchanged same digest test",
+      "exit_code": 0,
+      "restored_sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+      "original_record_sha256": "d3a121955b5bb67b6309a3e9a5e32231a94bf84a8e91febe43b859860802ec0b"
+    }
+  ],
+  "sources": [
+    "https://github.com/google/osv-scanner/blob/v2.6.0/docs/configuration.md#L23",
+    "https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/manager.go#L24",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/4a09c9c5f1e5fdb5555d4c916666f12e089cf09f/.github/workflows/security-scan.yml",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/4a09c9c5f1e5fdb5555d4c916666f12e089cf09f/tests/test_osv_lockfile_coverage.py"
+  ],
+  "verdict": "No outstanding material source defect found in this bounded independent review. Disposable fixture inputs restored exactly; immutable review worktree clean.",
+  "limitations": [
+    "Original failure-control records retain argv and native streams privately; this public receipt summarizes their exact exits and binds the originals.",
+    "Hosted upload and required hosted checks are separate gates. No merge is inferred.",
+    "No new lock compile, installation, model/provider/image run, observer qualification, whole-task usage or token-saving comparison is accepted."
+  ]
+}

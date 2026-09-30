@@ -1,0 +1,14 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/venv/bin/python", "-c", "import sys,json,re,importlib.metadata as m\nfrom pathlib import Path\np=Path(sys.argv[1]);versions={}\nfor name,version in re.findall(r'(?m)^([a-zA-Z0-9_.-]+)==([^\\n]+)',(p/'candidate.lock').read_text()):\n versions[re.sub(r'[-_.]+','-',name).lower()]=version.rstrip(' \\\\')\nversions['openhands-sdk']=versions['openhands-tools']='1.50.0'\nmismatches=[]\nfor name,expected in versions.items():\n actual=m.version(name)\n if actual!=expected:mismatches.append({'name':name,'expected':expected,'actual':actual})\nprint(json.dumps({'checked_requirement_versions':len(versions),'installed_distributions':len(list(m.distributions())),'mismatches':mismatches},indent=2))\nassert len(versions)==176 and not mismatches\n", "<PRIVATE_RESEARCH>"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:57:53.479490+00:00
+ended_utc: 2026-09-30T15:57:53.616316+00:00
+exit_code: 0
+
+stdout:
+{
+  "checked_requirement_versions": 176,
+  "installed_distributions": 178,
+  "mismatches": []
+}
+
+stderr:

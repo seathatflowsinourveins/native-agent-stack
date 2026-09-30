@@ -1,0 +1,63 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/tox-driver/bin/python", "-m", "tox", "run", "--help"]
+cwd: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+started_utc: 2026-09-30T17:07:07.754941+00:00
+ended_utc: 2026-09-30T17:07:07.991354+00:00
+exit_code: 0
+
+stdout:
+usage: tox run [-h] [--colored {yes,no}] [--stderr-color {BLACK,BLUE,CYAN,GREEN,LIGHTBLACK_EX,LIGHTBLUE_EX,LIGHTCYAN_EX,LIGHTGREEN_EX,LIGHTMAGENTA_EX,LIGHTRED_EX,LIGHTWHITE_EX,LIGHTYELLOW_EX,MAGENTA,RED,RESET,WHITE,YELLOW}]
+               [--exit-and-dump-after seconds] [-c file] [--workdir dir] [--root dir] [--runner {virtualenv,virtualenv-pep-723}] [-v | -q] [--result-json path] [-i] [--hashseed SEED] [--discover path [path ...]] [--list-dependencies |
+               --no-list-dependencies] [-e ENV | -m label [label ...] | -f factor [factor ...] | --skip-env re] [-s [v]] [-n] [-b] [--installpkg INSTALL_PKG] [--fail-fast] [--develop] [--no-recreate-pkg] [--skip-pkg-install]
+               [--skip-env-install] [--version] [--no-provision [REQ_JSON]] [--no-recreate-provision] [-r] [-x OVERRIDE]
+
+options:
+  -h, --help                  show this help message and exit
+  --colored {yes,no}          should output be enriched with colors, default is yes unless TERM=dumb or NO_COLOR is defined. (default: no)
+  --stderr-color {BLACK,BLUE,CYAN,GREEN,LIGHTBLACK_EX,LIGHTBLUE_EX,LIGHTCYAN_EX,LIGHTGREEN_EX,LIGHTMAGENTA_EX,LIGHTRED_EX,LIGHTWHITE_EX,LIGHTYELLOW_EX,MAGENTA,RED,RESET,WHITE,YELLOW}
+                              color for stderr output, use RESET for terminal defaults. (default: RED)
+  --exit-and-dump-after seconds
+                              dump tox threads after n seconds and exit the app - useful to debug when tox hangs, 0 means disabled (default: 0)
+  -c, --conf file             configuration file/folder for tox (if not specified will discover one) (default: None)
+  --workdir dir               tox working directory (if not specified will be the folder of the config file) (default: None)
+  --root dir                  project root directory (if not specified will be the folder of the config file) (default: None)
+  --runner {virtualenv,virtualenv-pep-723}
+                              the tox run engine to use when not explicitly stated in tox env configuration (default: virtualenv)
+  --result-json path          write a JSON file with detailed information about all commands and results involved (default: None)
+  -i, --no-capture            disable output capture (mutually exclusive with --result-json and parallel mode) (default: False)
+  --hashseed SEED             set PYTHONHASHSEED to SEED before running commands. Defaults to a random integer in the range [1, 4294967295] ([1, 1024] on Windows). Passing 'notset' suppresses this behavior. (default: 847866100)
+  --discover path [path ...]  for Python discovery first try these Python executables (default: [])
+  --list-dependencies         list the dependencies installed during environment setup (default: False)
+  --no-list-dependencies      never list the dependencies installed during environment setup (default: True)
+  -s, --skip-missing-interpreters [v]
+                              don't fail tests for missing interpreters: {config,true,false} choice (default: config)
+  -n, --notest                do not run the test commands (default: False)
+  -b, --pkg-only, --sdistonly
+                              only perform the packaging activity (default: False)
+  --installpkg INSTALL_PKG    use specified package for installation into venv, instead of packaging the project (default: None)
+  --fail-fast                 stop execution after the first environment failure (default: False)
+  --develop                   install package in development mode (default: False)
+  --no-recreate-pkg           if recreate is set do not recreate packaging tox environment(s) (default: False)
+  --skip-pkg-install          skip package installation for this run (default: False)
+  --skip-env-install          skip dependency and package installation, reuse existing environment (default: False)
+  --version                   show program's and plugins version number and exit
+  --no-provision [REQ_JSON]   do not perform provision, but fail and if a path was provided write provision metadata as JSON to it (default: False)
+  --no-recreate-provision     if recreate is set do not recreate provision tox environment (default: False)
+  -r, --recreate              recreate the tox environments (default: False)
+  -x, --override OVERRIDE     configuration override(s), e.g., -x testenv:pypy3.ignore_errors=True (default: [])
+
+verbosity:
+  -v, --verbose               increase verbosity (default: 2)
+  -q, --quiet                 decrease verbosity (default: 0)
+
+subcommands:
+  tox command to execute (by default legacy)
+
+select target environment(s):
+  -e ENV                      enumerate (ALL -> all environments, not set -> use <env_list> from config) (default: <env_list>)
+  -m label [label ...]        labels to evaluate (default: [])
+  -f factor [factor ...]      factors to evaluate (passing multiple factors means 'AND', passing this option multiple times means 'OR') (default: [])
+  --skip-env re               exclude all environments selected that match this regular expression (default: )
+
+config file '<HOME>/.config/tox/config.ini' missing (change via env var TOX_USER_CONFIG_FILE)
+
+stderr:

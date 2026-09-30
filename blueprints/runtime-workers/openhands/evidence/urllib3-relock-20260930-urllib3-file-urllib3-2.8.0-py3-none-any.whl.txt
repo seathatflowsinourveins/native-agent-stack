@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "curl", "--fail", "--silent", "--show-error", "--location", "https://files.pythonhosted.org/packages/92/9d/c4e665119135114480843e7ab388fa94d8480650450e6f8e26b70d323a4c/urllib3-2.8.0-py3-none-any.whl", "--output", "<PRIVATE_RESEARCH>/urllib3-2.8.0-py3-none-any.whl"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:46:06.759722+00:00
+ended_utc: 2026-09-30T15:46:06.848255+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

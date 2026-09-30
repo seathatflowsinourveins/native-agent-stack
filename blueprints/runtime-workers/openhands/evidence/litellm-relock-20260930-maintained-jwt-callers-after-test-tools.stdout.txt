@@ -1,0 +1,37 @@
+python files searched (all installed packages except PyJWT's own files and installer tooling): 10835
+
+# PyJWT importers: the names bound to it, and decode-style calls through those names
+google: 1 file(s) import PyJWT
+    oauth2/id_token.py: jwt bound as ['jwt_lib']: 1 decode-style line(s) ['146: return jwt_lib.decode(']
+litellm: 7 file(s) import PyJWT
+    proxy/proxy_server.py: jwt bound as ['jwt']: 1 decode-style line(s) ['13624: return jwt.decode(']
+    proxy/auth/handle_jwt.py: jwt bound as ['jwt']; from jwt import ['PyJWK']: 3 decode-style line(s) ['154: claims = jwt.decode(', '942: return jwt.decode(', '957: return jwt.decode(']
+    proxy/management_endpoints/ui_sso.py: jwt bound as ['jwt']: 3 decode-style line(s) ['766: access_token_payload = jwt.decode(access_token_str, options={"verify_sig', '3719: userinfo = jwt.decode(id_token, options={"verify_signature": False})', '3915: decoded_token = jwt.decode(id_token, options={"verify_signature": False}']
+    proxy/management_endpoints/mcp_management_endpoints.py: jwt bound as ['_jwt']: 1 decode-style line(s) ['1516: decoded = _jwt.decode(']
+    proxy/guardrails/guardrail_hooks/mcp_jwt_signer/mcp_jwt_signer.py: jwt bound as ['jwt']; from jwt import ['PyJWKSet']: 1 decode-style line(s) ['458: payload: Dict[str, Any] = jwt.decode(raw_token, signing_jwk.key, **decod']
+    proxy/_experimental/mcp_server/byok_oauth_endpoints.py: jwt bound as ['jwt']: 1 decode-style line(s) ['106: payload = jwt.decode(']
+    proxy/_experimental/mcp_server/outbound_credentials/envelope.py: jwt bound as ['jwt']: 1 decode-style line(s) ['323: payload = jwt.decode(']
+mcp: 1 file(s) import PyJWT
+    client/auth/extensions/client_credentials.py: jwt bound as ['jwt']: 0 decode-style line(s) []
+oauthlib: 3 file(s) import PyJWT
+    common.py: jwt bound as ['jwt']: 1 decode-style line(s) ["221: return jwt.decode(token, public_pem, algorithms=['RS256'])"]
+    oauth1/rfc5849/signature.py: jwt module not bound (from-imports only); submodule aliases ['jwt_algorithms']: 0 decode-style line(s) []
+    oauth2/rfc6749/clients/service_application.py: jwt bound as ['jwt']: 0 decode-style line(s) []
+redis: 1 file(s) import PyJWT
+    auth/token.py: jwt bound as ['jwt']: 1 decode-style line(s) ['89: self._decoded = jwt.decode(']
+
+# references from outside the importing package to the code that holds a decode
+oauthlib (verify_signed_token): no reference outside oauthlib
+redis (auth.token, JWToken): no reference outside redis
+google-auth (google.oauth2.id_token): no reference outside google/auth and google/oauth2
+litellm (litellm.proxy): no reference outside litellm
+
+# redis's decode
+redis/auth/token.py:83: import jwt
+redis/auth/token.py:89: self._decoded = jwt.decode(
+redis/auth/token.py:91: options={"verify_signature": False},
+
+# the recipe's own code (recursive)
+recipe .py files searched: 12
+recipe .py files importing redis: none
+recipe .py files importing jwt: none

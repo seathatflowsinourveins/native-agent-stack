@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
-  "version": "1.49.6",
-  "tag": "v1.49.6",
+  "version": "1.50.0",
+  "tag": "v1.50.0",
   "repository": "https://github.com/OpenHands/software-agent-sdk",
-  "commit": "fcc102a697874d54a357e36004e02c95040dbdc0",
+  "commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
   "source_archive": {
-    "url": "https://codeload.github.com/OpenHands/software-agent-sdk/tar.gz/fcc102a697874d54a357e36004e02c95040dbdc0",
-    "sha256": "2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8"
+    "url": "https://codeload.github.com/OpenHands/software-agent-sdk/tar.gz/dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c"
   },
   "uv_lock": {
-    "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/fcc102a697874d54a357e36004e02c95040dbdc0/uv.lock",
-    "sha256": "d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910"
+    "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/uv.lock",
+    "sha256": "9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801"
   },
   "image": {
-    "tag_observed": "1.49.6-python",
-    "ref": "ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37",
+    "tag_observed": "1.50.0-python",
+    "ref": "ghcr.io/openhands/agent-server@sha256:6d91a74fd2b556107e4e15476680d1d8116eeadfc06879baf7193caa73314dfc",
     "platform": "linux/amd64",
-    "manifest_sha256": "ec7ed86f4021a21e161815853156521b44929d913f2e6ee06a173ef2f660aa12",
-    "config_sha256": "39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f",
+    "manifest_sha256": "d322c0fa5bc0f95d36de0b1a3e9aeab1230e2daf44d66cc94e42aa4ad23129c7",
+    "config_sha256": "6b11dbc497b336e0bf02aeed538dc21d87e4eabe66cac21d1b289dadb86eb1ee",
     "provenance": "GHCR returned manifest bytes SHA256; image config OPENHANDS_BUILD_GIT_SHA and OPENHANDS_BUILD_GIT_REF match the SDK tag."
   },
   "gateway_proxy": {
@@ -31,17 +31,17 @@
   },
   "wheels": {
     "openhands-sdk": {
-      "url": "https://files.pythonhosted.org/packages/e9/ac/d27c5becc3b59b8cc46a1614ac478cc94eb73e626ab15831906fcdaafb29/openhands_sdk-1.49.6-py3-none-any.whl",
-      "sha256": "3b4701f125925e804929ab02b61fe2fe10b4fb1e7d723a2c4afdea35566328bb",
-      "filename": "openhands_sdk-1.49.6-py3-none-any.whl"
+      "url": "https://files.pythonhosted.org/packages/eb/5a/359d6a4b892fccd4915879d3145d77735b0e5614eee7db7b2a11ae99a843/openhands_sdk-1.50.0-py3-none-any.whl",
+      "sha256": "441ea190fb0af2253bf431650f209fedfbb9eb7c41cf35440a0548296d4b0faa",
+      "filename": "openhands_sdk-1.50.0-py3-none-any.whl"
     },
     "openhands-tools": {
-      "url": "https://files.pythonhosted.org/packages/68/20/27d6d20cc8f3465ec861c450bc0113c8646285aa6c8f4291b62366dcb8a2/openhands_tools-1.49.6-py3-none-any.whl",
-      "sha256": "11e57a6635fd93c9f1fed14f804ab6f24a4873f75a2d35f0d1c3e57df2c51c87",
-      "filename": "openhands_tools-1.49.6-py3-none-any.whl"
+      "url": "https://files.pythonhosted.org/packages/97/b2/61c9b0029d46de429890527f47c1809f6badc1c386bfcb4dd17286166108/openhands_tools-1.50.0-py3-none-any.whl",
+      "sha256": "b237043c892111624fdc1fe98e0d29f772ae1f614b487866d926775167c9635e",
+      "filename": "openhands_tools-1.50.0-py3-none-any.whl"
     }
   },
-  "requirements_sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
+  "requirements_sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
   "build_requirements_sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
   "grader": {
     "repository": "https://github.com/OpenHands/benchmarks",

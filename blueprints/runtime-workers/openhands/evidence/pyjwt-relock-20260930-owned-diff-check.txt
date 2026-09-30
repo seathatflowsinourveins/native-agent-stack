@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "git", "diff", "--check"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:19:27.911154+00:00
+ended_utc: 2026-09-30T17:19:27.964658+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

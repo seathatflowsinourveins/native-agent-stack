@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "source": "OpenHands/software-agent-sdk@dcf401af7a9a302ef92cb7d092e1df9bb659daa5 examples/01_standalone_sdk/{24_planning_agent_workflow,25_agent_delegation,38_browser_session_recording,54_goal_completion_loop}.py",
+  "default": "coding",
+  "profiles": {
+    "coding": {"role": "coding", "planning": false, "browser": false, "children": [], "goal_review": false},
+    "planning": {"role": "orchestration", "planning": true, "browser": false, "children": [], "goal_review": false},
+    "research": {"role": "research", "planning": false, "browser": false, "children": [], "goal_review": false},
+    "review": {"role": "coding", "planning": false, "browser": false, "children": [], "goal_review": false},
+    "github-workflow": {"role": "coding", "planning": false, "browser": false, "children": [], "goal_review": false, "skill_prefixes": ["gh-", "github", "verification-", "systematic-debugging"]},
+    "browser": {"role": "extraction-caller", "planning": false, "browser": true, "children": [], "goal_review": false},
+    "orchestration": {"role": "orchestration", "planning": false, "browser": false, "children": ["coding", "research", "review"], "goal_review": false},
+    "completion-review": {"role": "coding", "planning": false, "browser": false, "children": [], "goal_review": true}
+  },
+  "delegation": {"tool_concurrency_limit": 2, "child_max_iteration_per_run": 12},
+  "goal": {"max_iterations": 3, "usage_id": "goal-judge"}
+}

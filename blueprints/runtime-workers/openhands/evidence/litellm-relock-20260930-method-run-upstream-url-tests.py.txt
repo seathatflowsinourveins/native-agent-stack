@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+"""Run one untouched upstream module against the exact installed wheel.
+
+pytest.main and --import-mode=append follow the maintained pytest invocation
+used by the preceding PyJWT relock. Original LiteLLM config is passed unchanged;
+this is a bounded module run, not LiteLLM's complete native workspace suite.
+"""
+from pathlib import Path
+import importlib.metadata as metadata
+import sys
+
+import litellm
+import pytest
+
+private = Path(__file__).resolve().parent
+site = private / 'venv/lib/python3.13/site-packages'
+target = Path(litellm.__file__).resolve()
+assert target.is_relative_to(site.resolve())
+assert metadata.version('litellm') == '1.93.2'
+assert metadata.version('pytest') == '9.0.3'
+assert metadata.version('pytest-asyncio') == '1.3.0'
+print('Installed LiteLLM 1.93.2; pytest 9.0.3; pytest-asyncio 1.3.0', flush=True)
+print('installed litellm.__file__=' + str(target), flush=True)
+code = pytest.main(['--import-mode=append', '-c', str(private / 'litellm-pyproject.toml'),
+                    '-v', str(private / 'test_url_utils.py')])
+assert Path(litellm.__file__).resolve() == target
+print('post-test litellm.__file__=' + str(target), flush=True)
+raise SystemExit(code)

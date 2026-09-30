@@ -1,0 +1,451 @@
+{
+  "schema_version": 1,
+  "record": "wheel-relock-20260930",
+  "observed_utc": "2026-09-30T08:03:52.425369+00:00",
+  "purpose": "One bounded source-supported repair of the derived Linux/Python 3.13 SDK/tools 1.50.0 wheel lock; preserves the selected native SDK and its original source/uv.lock receipt.",
+  "status": "local_checks_passed_independent_oauthlib_review_pending",
+  "scope": {
+    "worktree_branch": "codex/openhands-wheel-relock-20260930",
+    "tested_branch_head": "9b87d8da69f02ca72a3a94dfe2517396851218dd",
+    "current_origin_main_at_handoff": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+    "committed": false
+  },
+  "evidence_class": "local_integration",
+  "evidence_class_description": "Native uv compile/hash install/pip check/import execution and live OSV scan; repository integration fixtures and static source review are separate local checks.",
+  "evidence_classes_by_claim": {
+    "compile_install_import_and_scanner_execution": "native_proven",
+    "oauthlib_reachability": "source_review",
+    "repository_transport_and_profile_fixtures": "local_integration"
+  },
+  "classification_correction": {
+    "original_worker_receipt_sha256": "8d2dafa29555cdadf0a32b33484a65371d67994158c6365c437c40b6c7e84655",
+    "change": "Replace the free-form overall class with canonical local_integration and retain the original description and per-claim boundaries. No command, output, lock or artifact hash is changed."
+  },
+  "lock": {
+    "path": "blueprints/runtime-workers/openhands/requirements.lock",
+    "before_sha256": "7dba097d34f83cab8585e49050505d5f836b8f8505ceedb7daff160af5e3ad16",
+    "after_sha256": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676",
+    "build_requirements_sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
+    "pins_changed_fields": [
+      "requirements_sha256"
+    ],
+    "compile_count": 1,
+    "target": {
+      "python": "3.13.15",
+      "platform": "x86_64-unknown-linux-gnu"
+    },
+    "input_sources": [
+      "OpenHands/software-agent-sdk@dcf401af7a9a302ef92cb7d092e1df9bb659daa5 pyproject.toml:7-8",
+      "published openhands-sdk/tools 1.50.0 wheel METADATA",
+      "official PyPI fix-version metadata and native OSV advisory ranges",
+      "unchanged original derived-lock versions retained as constraints for all nonfixed dependencies"
+    ],
+    "closure_delta": {
+      "before_count": 340,
+      "after_count": 176,
+      "changed": [
+        {
+          "name": "click",
+          "before": "8.1.8",
+          "after": "8.3.3"
+        },
+        {
+          "name": "pyjwt",
+          "before": "2.13.0",
+          "after": "2.14.0"
+        },
+        {
+          "name": "pypdf",
+          "before": "6.14.2",
+          "after": "6.16.1"
+        },
+        {
+          "name": "soupsieve",
+          "before": "2.8.4",
+          "after": "2.9"
+        }
+      ],
+      "added": [],
+      "removed": [
+        "colorama",
+        "cython",
+        "pyobjc",
+        "pyobjc-core",
+        "pyobjc-framework-accessibility",
+        "pyobjc-framework-accounts",
+        "pyobjc-framework-addressbook",
+        "pyobjc-framework-adservices",
+        "pyobjc-framework-adsupport",
+        "pyobjc-framework-applescriptkit",
+        "pyobjc-framework-applescriptobjc",
+        "pyobjc-framework-applicationservices",
+        "pyobjc-framework-apptrackingtransparency",
+        "pyobjc-framework-audiovideobridging",
+        "pyobjc-framework-authenticationservices",
+        "pyobjc-framework-automaticassessmentconfiguration",
+        "pyobjc-framework-automator",
+        "pyobjc-framework-avfoundation",
+        "pyobjc-framework-avkit",
+        "pyobjc-framework-avrouting",
+        "pyobjc-framework-backgroundassets",
+        "pyobjc-framework-browserenginekit",
+        "pyobjc-framework-businesschat",
+        "pyobjc-framework-calendarstore",
+        "pyobjc-framework-callkit",
+        "pyobjc-framework-carbon",
+        "pyobjc-framework-cfnetwork",
+        "pyobjc-framework-cinematic",
+        "pyobjc-framework-classkit",
+        "pyobjc-framework-cloudkit",
+        "pyobjc-framework-cocoa",
+        "pyobjc-framework-collaboration",
+        "pyobjc-framework-colorsync",
+        "pyobjc-framework-contacts",
+        "pyobjc-framework-contactsui",
+        "pyobjc-framework-coreaudio",
+        "pyobjc-framework-coreaudiokit",
+        "pyobjc-framework-corebluetooth",
+        "pyobjc-framework-coredata",
+        "pyobjc-framework-corehaptics",
+        "pyobjc-framework-corelocation",
+        "pyobjc-framework-coremedia",
+        "pyobjc-framework-coremediaio",
+        "pyobjc-framework-coremidi",
+        "pyobjc-framework-coreml",
+        "pyobjc-framework-coremotion",
+        "pyobjc-framework-coreservices",
+        "pyobjc-framework-corespotlight",
+        "pyobjc-framework-coretext",
+        "pyobjc-framework-corewlan",
+        "pyobjc-framework-cryptotokenkit",
+        "pyobjc-framework-datadetection",
+        "pyobjc-framework-devicecheck",
+        "pyobjc-framework-devicediscoveryextension",
+        "pyobjc-framework-dictionaryservices",
+        "pyobjc-framework-discrecording",
+        "pyobjc-framework-discrecordingui",
+        "pyobjc-framework-diskarbitration",
+        "pyobjc-framework-dvdplayback",
+        "pyobjc-framework-eventkit",
+        "pyobjc-framework-exceptionhandling",
+        "pyobjc-framework-executionpolicy",
+        "pyobjc-framework-extensionkit",
+        "pyobjc-framework-externalaccessory",
+        "pyobjc-framework-fileprovider",
+        "pyobjc-framework-fileproviderui",
+        "pyobjc-framework-findersync",
+        "pyobjc-framework-fsevents",
+        "pyobjc-framework-fskit",
+        "pyobjc-framework-gamecenter",
+        "pyobjc-framework-gamecontroller",
+        "pyobjc-framework-gamekit",
+        "pyobjc-framework-gameplaykit",
+        "pyobjc-framework-healthkit",
+        "pyobjc-framework-imagecapturecore",
+        "pyobjc-framework-inputmethodkit",
+        "pyobjc-framework-installerplugins",
+        "pyobjc-framework-instantmessage",
+        "pyobjc-framework-intents",
+        "pyobjc-framework-intentsui",
+        "pyobjc-framework-iobluetooth",
+        "pyobjc-framework-iobluetoothui",
+        "pyobjc-framework-iosurface",
+        "pyobjc-framework-ituneslibrary",
+        "pyobjc-framework-kernelmanagement",
+        "pyobjc-framework-latentsemanticmapping",
+        "pyobjc-framework-launchservices",
+        "pyobjc-framework-libdispatch",
+        "pyobjc-framework-libxpc",
+        "pyobjc-framework-linkpresentation",
+        "pyobjc-framework-localauthentication",
+        "pyobjc-framework-localauthenticationembeddedui",
+        "pyobjc-framework-mailkit",
+        "pyobjc-framework-mapkit",
+        "pyobjc-framework-mediaaccessibility",
+        "pyobjc-framework-mediaextension",
+        "pyobjc-framework-medialibrary",
+        "pyobjc-framework-mediaplayer",
+        "pyobjc-framework-mediatoolbox",
+        "pyobjc-framework-metal",
+        "pyobjc-framework-metalfx",
+        "pyobjc-framework-metalkit",
+        "pyobjc-framework-metalperformanceshaders",
+        "pyobjc-framework-metalperformanceshadersgraph",
+        "pyobjc-framework-metrickit",
+        "pyobjc-framework-mlcompute",
+        "pyobjc-framework-modelio",
+        "pyobjc-framework-multipeerconnectivity",
+        "pyobjc-framework-naturallanguage",
+        "pyobjc-framework-netfs",
+        "pyobjc-framework-network",
+        "pyobjc-framework-networkextension",
+        "pyobjc-framework-notificationcenter",
+        "pyobjc-framework-opendirectory",
+        "pyobjc-framework-osakit",
+        "pyobjc-framework-oslog",
+        "pyobjc-framework-passkit",
+        "pyobjc-framework-pencilkit",
+        "pyobjc-framework-phase",
+        "pyobjc-framework-photos",
+        "pyobjc-framework-photosui",
+        "pyobjc-framework-preferencepanes",
+        "pyobjc-framework-pubsub",
+        "pyobjc-framework-pushkit",
+        "pyobjc-framework-quartz",
+        "pyobjc-framework-quicklookthumbnailing",
+        "pyobjc-framework-replaykit",
+        "pyobjc-framework-safariservices",
+        "pyobjc-framework-safetykit",
+        "pyobjc-framework-scenekit",
+        "pyobjc-framework-screencapturekit",
+        "pyobjc-framework-screensaver",
+        "pyobjc-framework-screentime",
+        "pyobjc-framework-scriptingbridge",
+        "pyobjc-framework-searchkit",
+        "pyobjc-framework-security",
+        "pyobjc-framework-securityfoundation",
+        "pyobjc-framework-securityinterface",
+        "pyobjc-framework-securityui",
+        "pyobjc-framework-sensitivecontentanalysis",
+        "pyobjc-framework-servicemanagement",
+        "pyobjc-framework-sharedwithyou",
+        "pyobjc-framework-sharedwithyoucore",
+        "pyobjc-framework-shazamkit",
+        "pyobjc-framework-social",
+        "pyobjc-framework-soundanalysis",
+        "pyobjc-framework-speech",
+        "pyobjc-framework-spritekit",
+        "pyobjc-framework-storekit",
+        "pyobjc-framework-symbols",
+        "pyobjc-framework-syncservices",
+        "pyobjc-framework-systemconfiguration",
+        "pyobjc-framework-systemextensions",
+        "pyobjc-framework-threadnetwork",
+        "pyobjc-framework-uniformtypeidentifiers",
+        "pyobjc-framework-usernotifications",
+        "pyobjc-framework-usernotificationsui",
+        "pyobjc-framework-videosubscriberaccount",
+        "pyobjc-framework-videotoolbox",
+        "pyobjc-framework-virtualization",
+        "pyobjc-framework-vision",
+        "pyobjc-framework-webkit",
+        "pywin32",
+        "pywin32-ctypes"
+      ],
+      "linux_marker_evaluation": {
+        "method": "packaging.requirements.Requirement and native packaging.markers.default_environment, Python 3.13.15 on x86_64 Linux",
+        "target": {
+          "implementation_name": "cpython",
+          "implementation_version": "3.13.15",
+          "os_name": "posix",
+          "platform_machine": "x86_64",
+          "platform_system": "Linux",
+          "python_full_version": "3.13.15",
+          "python_version": "3.13",
+          "sys_platform": "linux"
+        },
+        "before_active_requirements": 176,
+        "after_active_requirements": 176,
+        "removed_active_requirements": [],
+        "interpretation": "All 164 removed distribution names were excluded by the original lock markers on this target. No active Linux dependency was pruned. The original Darwin x86_64 cryptography 48.0.1 branch is absent; the Linux cryptography 50.0.0 selection is unchanged."
+      }
+    }
+  },
+  "source": {
+    "commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "pristine_status_exit_code": 0,
+    "pristine_status_stdout": "",
+    "fresh_archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+    "fresh_archive_matches": true,
+    "upstream_uv_lock_sha256": "9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801",
+    "original_1208_test_receipt": "Reused unchanged upstream-source evidence; no native full-suite rerun or historical receipt rewrite. The repaired wheel closure has its own fresh install/import/fixture evidence."
+  },
+  "osv": {
+    "scanner": {
+      "version": "2.6.0",
+      "commit": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+      "sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+      "source": ".github/workflows/security-scan.yml",
+      "release": "https://github.com/google/osv-scanner/releases/tag/v2.6.0"
+    },
+    "configuration_source": "Byte-identical origin/main:.github/osv-scanner.toml; also matches this branch configuration. No ignore IDs, expiry, guard or global configuration changed.",
+    "configuration_sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87",
+    "parser": "requirements.txt",
+    "no_resolve": true,
+    "original_all_lock_failed_report_sha256": "def3457d79f7bc0efbeea558b733e10df01bf57d046b98858a8f7968250a5950",
+    "paired_baseline_exit_code": 1,
+    "paired_baseline_raw_report_sha256": "e38ba75053c9676384309919da3f2f2a2b78aafe29f552df7e2ce1759cdd7a6d",
+    "repaired_exit_code": 0,
+    "repaired_raw_report_sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+    "repaired_scanner_reported_packages": 174,
+    "repaired_unignored_findings": 0,
+    "existing_filtered_ids": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "existing_expiry": "2026-10-13",
+    "limit": "The requirements parser counts 174 pinned name/version entries, excluding the two direct SDK/tools wheel URLs. Exit 0 uses the existing global OAuthlib exceptions; it does not establish new exact-lock guard acceptance. This was one targeted lock scan, not a repository-wide security gate."
+  },
+  "checks": {
+    "hash_compile": {
+      "exit_code": 0,
+      "resolved_packages": 176
+    },
+    "build_hash_install": {
+      "exit_code": 0,
+      "installed_build_prerequisites": 3
+    },
+    "wheel_hash_install": {
+      "exit_code": 0
+    },
+    "pip_check": {
+      "exit_code": 0,
+      "installed_distributions_checked": 178
+    },
+    "native_sdk_tools_imports": {
+      "exit_code": 0,
+      "version": "1.50.0",
+      "model_requests": 0
+    },
+    "integration_fixtures": {
+      "path": "tests/test_openhands_150.py",
+      "sha256": "920cbacf71beeb1fe470f3386c11ffa6401ddd73dbfd4d91455661edf81fffd3",
+      "exit_code": 0,
+      "passed": 12,
+      "skipped": 0,
+      "environment": "fresh hash-installed selected published SDK/tools 1.50.0 wheels",
+      "type": "local fixtures with native SDK objects and patched calls; no provider/container acceptance"
+    },
+    "published_artifact_python_identity": {
+      "exit_code": 0,
+      "sources_compared": 491,
+      "mismatches": 0
+    },
+    "maintained_jwt_scan": {
+      "exit_code": 0,
+      "method_byte_identity": true
+    },
+    "oauthlib_scan": {
+      "exit_code": 0,
+      "installed_python_sources": 10682,
+      "recipe_python_sources": 12,
+      "unresolved_parse_errors": 0,
+      "reviewed_text_only_sources": 1
+    }
+  },
+  "oauthlib_exact_lock_review": {
+    "lock_sha256": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676",
+    "retained_version": "3.3.1",
+    "status": "candidate_static_source_review_complete_bc_independent_review_pending",
+    "method": "Unchanged maintained alias/from-import-aware JWT scan plus a cited OAuthlib adaptation using Python ast for all literal import forms; one hash-bound five-line Python 2 helper receives complete text inspection. Native APIs, credentials and stores are not invoked by these scans.",
+    "external_oauthlib_importers": {
+      "requests-oauthlib": {
+        "version": "2.0.0",
+        "files": 6,
+        "bindings": "OAuth1/OAuth2 client classes, constants, token errors and common helpers; no external literal import or bound call selects OAuthlib endpoints, server classes or authorization grant classes."
+      }
+    },
+    "entered_namespace_correction": "OAuthlib oauth2/__init__.py:17-29 and 58-64 re-export endpoint/server/grant definitions, so importing its client namespace loads those definitions. The bounded finding is absence of external literal selection/calls to the vulnerable server paths in inspected Python source, not absence of those modules from the environment.",
+    "other_matching_classes": "All 32 advisory-related external name hits are Authlib own implementations; the complete external OAuthlib importer sweep finds no Authlib OAuthlib import.",
+    "GHSA-hj66-6f7g-4r5v": {
+      "source": "oauthlib 3.3.1 oauth2/rfc6749/endpoints/revocation.py:31,36,72-73,81-82",
+      "finding": "enable_jsonp defaults False; every inspected preconfigured OAuthlib constructor omits it. No external Python source in this closure or recipe selects enable_jsonp/create_revocation_response or the OAuthlib RevocationEndpoint.",
+      "advisory": "https://github.com/advisories/GHSA-hj66-6f7g-4r5v"
+    },
+    "GHSA-xpv3-w29h-x7cv": {
+      "source": "oauthlib 3.3.1 oauth2/rfc6749/grant_types/authorization_code.py:49,61,506,544-546",
+      "finding": "The vulnerable equality remains in the authorization-server PKCE validation path; no external literal binding/call to that grant/server path was found in the inspected closure or recipe. Client PKCE generation is a distinct path.",
+      "advisory": "https://github.com/advisories/GHSA-xpv3-w29h-x7cv"
+    },
+    "oauthlib_4_0_0": "Not selected: published 2026-09-28T06:01:17Z, inside the unchanged seven-day window at this run. No new exception approved; existing live 1.49.6 joint-relock owner/issue #518 is separate from this SDK 1.50 candidate.",
+    "limits": [
+      "Static Python-source evidence is not a whole-program reachability proof or execution trace.",
+      "Dynamic imports, runtime-assembled names, external callers and other platforms remain unknown.",
+      "The current exact-lock ignore guard needs root integration and independent owner review before it can be accepted for this new SHA256."
+    ]
+  },
+  "corrections_and_retained_failures": [
+    {
+      "mistake": "The initial baseline scan copied the main working-tree configuration instead of the required origin/main blob.",
+      "verification": "Retained initial exit 1 and raw report digest; copied origin/main via rtk proxy git show, verified dc6c8e8a... byte identity, and re-ran the paired baseline and repaired scan under those exact bytes.",
+      "initial_config_sha256": "d8265d44a2191c9b614a004649ab3827420291611203da5c45ef366b85222bd2",
+      "initial_raw_report_sha256": "43bbd9c3e67412d55d018896cb6f0df77f580bd63f470b923785f59c800d5b27"
+    },
+    {
+      "mistake": "A guessed PyJWT repository advisory URL used pyjwt/pyjwt and returned 404.",
+      "verification": "Native OSV references identify jpadilla/pyjwt; the official advisory https://github.com/jpadilla/pyjwt/security/advisories/GHSA-2gx3-rcp4-g85q was read and records 2.14.0 as patched. The failed URL was not treated as evidence of capability absence."
+    },
+    {
+      "mistake": "The first AST supplement assumed every shipped Python source parses under Python 3.13.",
+      "verification": "Retained exit 1 output; fully inspected func-timeout 4.3.5 func_timeout/py2_raise.py (five lines, no imports/OAuth names), bound its complete text review to SHA256 19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77, verified all six installed func_timeout sources against its locked sdist, and retained dafunc.py Python-3-first selection. Final scan exits 0; any other parse error remains fatal."
+    }
+  ],
+  "handoff": "Root copies only owned files, obtains bc exact-lock review, binds the allowed-lock guard to the fresh reviewed receipt, updates shared indexes/manifests, and runs the repository validator. No commit, PR exception, server/image/model run or upstream acceptance is represented by this receipt.",
+  "artifacts": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-commands.json",
+      "sha256": "aa794a4a612821be38d62cf97faeb4b07814c772535ac83c6b9eb3bf17a34917",
+      "bytes": 27542
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-constraints.txt",
+      "sha256": "bfdcbb60d2ed181956765a665c0303faf389b727c8d755b84e5f2b1c24f1c433",
+      "bytes": 32789
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-jwt-callers.txt",
+      "sha256": "0b624ccf2ec63ed90a831bb02f7d05a338d490969482bee168179e5ac9a8b775",
+      "bytes": 3023
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers-first.txt",
+      "sha256": "56149cc6f319c70630e6949a3519f5483637bfdaeea2a3af1011c943b228d3ca",
+      "bytes": 6188
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+      "sha256": "080aa7cece92c786b7977ade5bf851aa776c31dbebafab98decfc5b1ae0e5960",
+      "bytes": 7145
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.txt",
+      "sha256": "44300134a28b763a02d17f36f34919084409c5e8288f3adc93987f67a6b4d82f",
+      "bytes": 37175
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-osv-after.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-osv-before.json",
+      "sha256": "cb66e322c031410f198c51f6be43ca10092da79f91c293eaf1f6bc0be8834f0c",
+      "bytes": 266980
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-requirements.in.txt",
+      "sha256": "5c366b72ee59e8ddbda14c01fe794d8456beac33a5e4513544a44ef4c624c3cd",
+      "bytes": 403
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-sources.json",
+      "sha256": "7829c29474ff23ec7b50c957b03be75fca10935e974749ac054eb58ef8f2aad8",
+      "bytes": 30584
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-tests.txt",
+      "sha256": "426019d491fb2f4c889226578487d6ff85a9c5a2648e949d38156cb89c3c73d9",
+      "bytes": 2329
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "sha256": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676",
+      "bytes": 248357
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "sha256": "3c625a1c42d0b67ba89076206133474dae100212c5bc4a389ad28c0f6de3e279",
+      "bytes": 4460
+    }
+  ]
+}

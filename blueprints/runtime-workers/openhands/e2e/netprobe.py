@@ -326,8 +326,8 @@ def evaluate(gw, internal, upstream_port, addresses, ports, server, subnets):
     return {"p0": p0, "p1": p1, "p2": p2, "passed": p0["passed"] and p1["passed"] and p2["passed"]}
 
 
-def p3_control_call(*_args, **_kwargs):
-    """Skeleton only; P3 is a live model call and is never run by this recipe yet.
+def p3_control_call(environment, dispatch_id):
+    """Live native SDK probe; entry-gateway/proxy observations remain independent.
 
     From a throwaway container on <stem>-int with the recipe's LLM config:
     one SDK call with one tool definition through gw to the control arm, also
@@ -345,8 +345,80 @@ def p3_control_call(*_args, **_kwargs):
     its status, must carry the run id. The streamed tool call must parse and
     its usage equal the row; record the client peer the gateway logged (F10)
     and the proxy access log lines.
+    Source: SDK@dcf401a llm.generate and llm/message.py Responses tool-call
+    replay and sdk/tool/tool.py ToolDefinition. This is local integration
+    glue, not an unchanged upstream acceptance test. It never writes P3 gates.
     """
-    raise NotImplementedError("p3_is_a_documented_skeleton_not_run")
+    if not Path("/.dockerenv").exists() or environment.get("OPENHANDS_OWNED_CONTAINER") != "1":
+        raise ValueError("p3_requires_owned_container")
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from openhands.sdk import LLM, Message, TextContent
+    from openhands.sdk.tool import Action, Observation, ToolDefinition
+    from worker import headers_for_call, worker_llm_config
+    from recipe import arm_config
+    if not re.fullmatch(r"rw-openhands-[a-z0-9-]{1,64}", dispatch_id):
+        raise ValueError("owned_run_id_required")
+    if environment.get("OPENHANDS_ARM", "control") != "control":
+        raise ValueError("p3_requires_control_arm")
+    fields = worker_llm_config(environment, dispatch_id)
+    class RouteProbeAction(Action):
+        text: str
+    class RouteProbeObservation(Observation):
+        pass
+    class RouteProbeTool(ToolDefinition[RouteProbeAction, RouteProbeObservation]):
+        @classmethod
+        def create(cls, *_args, **_kwargs):
+            return [cls(description="Echo the probe token verbatim.",
+                        action_type=RouteProbeAction, observation_type=RouteProbeObservation)]
+    tool = RouteProbeTool.create()[0]
+    forged = {**fields["extra_headers"], "X-Correlation-Id": "p3-forged-correlation",
+              "X-Forwarded-For": "192.0.2.1", "x-omniroute-provider": "p3-forged-provider"}
+    llm = LLM(**fields)
+    streamed = []
+    messages = [Message(role="user", content=[TextContent(text="Call route_probe with text P3_OK exactly once.")])]
+    first = llm.generate(messages=messages, tools=[tool], tool_choice="required",
+                         extra_headers=headers_for_call(forged), on_token=lambda *_: streamed.append(1))
+    calls = first.message.tool_calls or []
+    if len(calls) != 1 or calls[0].name != tool.name:
+        raise ValueError("native_streamed_tool_call_missing")
+    action = json.loads(calls[0].arguments)
+    if action.get("text") != "P3_OK":
+        raise ValueError("native_tool_arguments_mismatch")
+    second = llm.generate(
+        messages=[*messages, first.message, Message(role="tool", tool_call_id=calls[0].id,
+                                                    content=[TextContent(text="P3_OK")])],
+        tools=[tool], tool_choice="none", extra_headers=headers_for_call(forged),
+        on_token=lambda *_: streamed.append(1),
+    )
+    result_text = "".join(getattr(item, "text", "") for item in second.message.content)
+    connection = http.client.HTTPConnection(PROXY_HOST, 8081, timeout=HTTP_TIMEOUT)
+    try:
+        connection.request("POST", "/v1/responses?p3=must-be-denied", body=b"{}",
+                           headers={"Content-Type": "application/json", **forged})
+        denied = connection.getresponse()
+        denial = {"status": denied.status, "route_class": route_class(denied.getheader(ROUTE_CLASS))}
+    finally:
+        connection.close()
+    # Responses ignores caller correlation IDs at these gateway pins. A chat
+    # probe makes the proxy's fixed correlation replacement independently visible.
+    connection = http.client.HTTPConnection(PROXY_HOST, 8081, timeout=180)
+    try:
+        connection.request("POST", "/v1/chat/completions", body=json.dumps({
+            "model": arm_config("control")["requested_model"], "reasoning_effort": "max",
+            "messages": [{"role": "user", "content": "Reply P3_OK."}], "stream": False,
+            "max_completion_tokens": 64,
+        }), headers={"Content-Type": "application/json", **forged})
+        chat = connection.getresponse()
+        chat_status = chat.status
+    finally:
+        connection.close()
+    return {"model": fields["model"], "api_mode": fields["api_mode"],
+            "reasoning_effort": fields["reasoning_effort"], "stream_requested": fields["stream"],
+            "tool_call_parsed": True, "tool_result_replayed": True, "stream_events": len(streamed),
+            "native_metrics": llm.metrics.model_dump(mode="json"), "query_denial": denial,
+            "chat_probe_status": chat_status, "independent_gateway_verdict": "pending",
+            "sdk_probe_passed": bool(streamed) and "P3_OK" in result_text and denial["status"] == 403}
 
 
 def run_http(observations, key, expected):
@@ -424,17 +496,18 @@ def write_observations(path, observations):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    parser.add_argument("mode", choices=("gw", "int"))
+    parser.add_argument("mode", choices=("gw", "int", "p3"))
     parser.add_argument("--out", required=True, type=Path)
     parser.add_argument("--upstream-port", type=int, choices=UPSTREAM_PORTS)
     parser.add_argument("--server")
+    parser.add_argument("--run-id")
     parser.add_argument("--addresses", default="")
     parser.add_argument("--ports", default="")
     parser.add_argument("--subnets", default="")
     args = parser.parse_args(argv)
     if args.mode == "gw":
         expected = p0_expected(args.upstream_port)
-    else:
+    elif args.mode == "int":
         dns_expected(args.server)
         addresses, ports = parse_addresses(args.addresses), parse_ports(args.ports)
         subnets = parse_subnets(args.subnets)
@@ -442,6 +515,9 @@ def main(argv=None):
     try:
         if args.mode == "gw":
             return run_http(observations, "p0", expected)
+        if args.mode == "p3":
+            observations["p3"] = p3_control_call(dict(os.environ), args.run_id)
+            return 0 if observations["p3"]["sdk_probe_passed"] else 1
         return (run_http(observations, "p1", P1_EXPECTED)
                 or run_p2(observations, addresses, ports, args.server, subnets))
     finally:
