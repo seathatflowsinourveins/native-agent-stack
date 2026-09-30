@@ -66,6 +66,16 @@ Codex upstream-suite passing claim is made. Repeated calls in one Python process
 also expose native SDK pipe ResourceWarnings. Standalone child exit is checked;
 a long-running in-process pool is unqualified.
 
+The required pre-push gate caught the three new uv script locks missing from the
+dependency scan inventory. Registered each with the supported `uv.lock` override
+from [OSV-Scanner v2.6.0 source](https://github.com/google/osv-scanner/blob/e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6/pkg/osvscanner/internal/scanners/lockfile.go#L62).
+The suppression guard now recognizes explicit UV parsers for script-lock names;
+its adversarial vulnerable-pin check remains effective. Thirty authored registry
+checks passed. A checksum-verified native scanner extracted 8, 8 and 32 packages
+from the three respective locks and returned exit0 with no known findings. The
+[selected actual result](../../tools/runtime-worker-evidence/osv-check.json)
+retains this dated scope; it does not certify all native/runtime dependencies.
+
 The supported pinned skill installer installed 136 catalog skills in the owned
 project, and its independent check reported 136 OK. Native task execution read
 `using-superpowers` plus the additional upstream `bridge-proof` fixture skill.

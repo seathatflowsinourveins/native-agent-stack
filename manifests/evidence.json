@@ -3755,8 +3755,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "c0025db3159bef98f27abaa32cbd1522067a7d3f114f5c339893883d6fc39dcd",
-      "bytes": 10060
+      "sha256": "2022223f013b7a264b44d57aaacd5249dabb2e8b73b1099581290085c7ee3cb8",
+      "bytes": 10364
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -14831,8 +14831,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
-      "sha256": "5ed6f31d2f89ab8f9ab01f5701a93b61311205f0b376b1b90ceb4df2138c4503",
-      "bytes": 8625
+      "sha256": "1b9834cbcbff17ef74205d5093bc7e5b790b28cd5f9eeccff34fce4a049a6559",
+      "bytes": 9433
     },
     {
       "path": "docs/direct-results.md",
@@ -45606,8 +45606,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "192b167f797edde99ec08e0303339ab26d5259bcf076a786117738be998faf90",
-      "bytes": 38017
+      "sha256": "7dc3770432668f732cbffb7fbe189b6e7b63d6ac7ef91fda8c3146bf0d7a77df",
+      "bytes": 38501
     },
     {
       "path": "tests/test_path_safety.py",
@@ -46016,13 +46016,18 @@
     },
     {
       "path": "tools/runtime-worker-evidence/checks.json",
-      "sha256": "1a739e258ed6aa5d0fac22a03185d4457f222fd0d6575545d26f8237c3fdeca4",
-      "bytes": 3470
+      "sha256": "094cd7785fabc277508bc4ed90bac60a4e98dacdca7b51f50f5731608cc5e80c",
+      "bytes": 3851
     },
     {
       "path": "tools/runtime-worker-evidence/gateway_observer.py",
       "sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
       "bytes": 5702
+    },
+    {
+      "path": "tools/runtime-worker-evidence/osv-check.json",
+      "sha256": "0d31c8900e8f5475c2fbe04f26d09493e2e507354c8c99e5b35a50c079e318b7",
+      "bytes": 2778
     },
     {
       "path": "tools/runtime-worker-evidence/test_gateway_observer.py",

@@ -7,6 +7,12 @@
   "scope": "Metadata/stream integration checks and publication integrity only; no new provider trial.",
   "attempts": [
     {
+      "command": "Native pre-push registry gate",
+      "exit_code": 1,
+      "returned_error": "Three new uv script lockfiles missing from .github/osv-scanner-lockfiles.json.",
+      "correction": "Registered all three with the source-verified native uv.lock override, preserved adversarial suppression checks, and ran native scanner acceptance; see osv-check.json."
+    },
+    {
       "command": "Native pre-commit gitleaks git --pre-commit --staged --redact",
       "exit_code": 1,
       "returned_rule": "generic-api-key",
