@@ -7,7 +7,9 @@ when an ignore in .github/osv-scanner.toml lacks an id, a reason or an ignoreUnt
 days away, and when a repo-wide ignore would hide a pin that IGNORE_ALLOWED_LOCKS does not allow
 for that lock and advisory at the lock's reviewed sha256. That guard follows includes and fails
 closed on a version or line it cannot parse strictly; an allowed lock must be self-contained, and
-an ignore counts as active only before its ignoreUntil date.
+an ignore counts as active only before its ignoreUntil date. A dated exception for one frozen artifact lives in a config of its own
+that only that lock's scan uses (FROZEN_LOCKS): the inventory split and that config's scope are checked here, and the scanner itself
+keeps the exception from reaching any other lock.
 """
 
 from datetime import date, datetime, timedelta, timezone
@@ -24,6 +26,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY = ROOT / ".github/osv-scanner-lockfiles.json"
 CONFIG = ROOT / ".github/osv-scanner.toml"
+FROZEN_CONFIG = ".github/osv-scanner-frozen-macos.toml"
 WORKFLOW = ROOT / ".github/workflows/security-scan.yml"
 # Dependency lockfile and manifest names in this repository or supported by OSV-Scanner v2's
 # source extractors (docs/supported_languages_and_lockfiles.md at v2.6.0).
@@ -58,12 +61,13 @@ IGNORE_SCOPES = {
     "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
 }
 IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock, relocked onto PyJWT 2.14.0 on 2026-09-30. Its receipt carries the 2026-09-29 oauthlib review
-    # forward at this sha256; the relock onto oauthlib 4.0.0 deletes this entry in the same change.
+    # Live recipe lock, relocked onto PyJWT 2.14.0 and then, on 2026-09-30, onto urllib3 2.8.0 and PyJWT 2.15.0. Its receipt carries
+    # the 2026-09-29 oauthlib review forward at this sha256 (those relocks change only the urllib3 and PyJWT entries); the relock onto
+    # oauthlib 4.0.0 deletes this entry in the same change.
     "blueprints/runtime-workers/openhands/requirements.lock": {
         "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
-        "evidence": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
+        "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
+        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
     },
     # Frozen evaluation-only lock. The receipt reviews the oauthlib advisories and carries forward the 2026-09-26
     # nltk and setuptools review (repository-checks.json in the trial directory) at the same sha256.
@@ -71,6 +75,20 @@ IGNORE_ALLOWED_LOCKS = {
         "advisories": ["GHSA-8mgp-746c-j5xp", "GHSA-h35f-9h28-mq5c", "GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
         "sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
         "evidence": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+    },
+}
+# A dated exception for one frozen artifact is not a repo-wide ignore: OSV-Scanner 2.6.0 applies an explicit --config to every input of its
+# invocation (docs/configuration.md, internal/config/manager.go Manager.Get), so the exception lives in a config of its own and security-scan.yml
+# scans the inventory entries that name it in an invocation of their own, and every other entry under CONFIG, which holds no exception for the
+# advisory. FROZEN_LOCKS binds each such config to the one lock it is for: its advisories, the lock's sha256 (a changed lock needs a new review)
+# and the repository path of the evidence.
+FROZEN_LOCKS = {
+    # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
+    "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
+        "config": FROZEN_CONFIG,
+        "advisories": ["GHSA-vcvr-r3jv-pc5j"],
+        "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
     },
 }
 
@@ -244,6 +262,41 @@ def active_ignores(config, today=None):
     return active
 
 
+def scan_partition(entries, configs=None):
+    """The split security-scan.yml's jq makes of the inventory: (the entries scanned together under CONFIG, {config path: the entries scanned
+    under that config alone}, the entries that name any other config). The last are in neither scan, which the workflow's count check
+    turns into a failure; `configs` defaults to the configs FROZEN_LOCKS binds."""
+    configs = {lock["config"] for lock in FROZEN_LOCKS.values()} if configs is None else set(configs)
+    ordinary, frozen, stray = [], {config: [] for config in configs}, []
+    for entry in entries:
+        if "config" not in entry:
+            ordinary.append(entry)
+        elif entry["config"] in configs:
+            frozen[entry["config"]].append(entry)
+        else:
+            stray.append(entry)
+    return ordinary, frozen, stray
+
+
+def ignore_entry_problems(config):
+    """Why an [[IgnoredVulns]] entry of a parsed config breaks the ignore policy (a missing id or reason, a missing or distant ignoreUntil)."""
+    problems, latest = [], date.today() + timedelta(days=90)
+    for entry in config.get("IgnoredVulns", []):
+        if not entry.get("id"):
+            problems.append(f"{entry}: no id")
+        if not str(entry.get("reason", "")).strip():
+            problems.append(f"{entry.get('id')}: no reason")
+        until = entry.get("ignoreUntil")
+        if not isinstance(until, date):
+            problems.append(f"{entry.get('id')}: ignoreUntil must be a TOML date")
+            continue
+        if hasattr(until, "date"):
+            until = until.date()
+        if until > latest:
+            problems.append(f"{entry.get('id')}: ignoreUntil more than 90 days away")
+    return problems
+
+
 def tracked_files():
     environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
     listing = subprocess.run(
@@ -335,16 +388,16 @@ class LockfileInventoryTests(unittest.TestCase):
 
 class IgnorePolicyTests(unittest.TestCase):
     def test_every_ignore_has_id_reason_and_a_near_expiry(self):
-        config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
-        latest = date.today() + timedelta(days=90)
-        for entry in config.get("IgnoredVulns", []):
-            self.assertTrue(entry.get("id"), entry)
-            self.assertTrue(str(entry.get("reason", "")).strip(), entry)
-            until = entry.get("ignoreUntil")
-            self.assertIsInstance(until, date, f"{entry.get('id')}: ignoreUntil must be a TOML date")
-            if hasattr(until, "date"):
-                until = until.date()
-            self.assertLessEqual(until, latest, f"{entry.get('id')}: ignoreUntil more than 90 days away")
+        for path in (CONFIG, ROOT / FROZEN_CONFIG):
+            config = tomllib.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(ignore_entry_problems(config), [], str(path))
+
+    def test_the_ignore_field_check_catches_a_mutant(self):
+        far = date.today() + timedelta(days=91)
+        self.assertEqual(ignore_entry_problems({"IgnoredVulns": [{"id": "GHSA-x", "reason": "r", "ignoreUntil": date.today() + timedelta(days=90)}]}), [])
+        for entry in ({"reason": "r", "ignoreUntil": far}, {"id": "GHSA-x", "ignoreUntil": far}, {"id": "GHSA-x", "reason": "r"},
+                      {"id": "GHSA-x", "reason": "r", "ignoreUntil": far}, {"id": "GHSA-x", "reason": " ", "ignoreUntil": far}):
+            self.assertNotEqual(ignore_entry_problems({"IgnoredVulns": [entry]}), [], entry)
 
     def test_repo_wide_ignores_hide_nothing_outside_their_allowed_lock(self):
         # Every ignore matches repo-wide, so while one is active no inventory lockfile may pin a version it would hide
@@ -465,6 +518,71 @@ class IgnorePolicyTests(unittest.TestCase):
             if hasattr(until, "date"):
                 until = until.date()
             self.assertLessEqual(until, latest, f"{entry}: effectiveUntil more than 90 days away")
+
+
+class FrozenScanTests(unittest.TestCase):
+    """A dated exception for a frozen artifact is scoped by the scanner, not by a reader of the lock: its config is used only by the scan of the
+    inventory entries that name it (docs/decisions/2026-09-22-github-automation-closure.md, "urllib3 and PyJWT relock and a frozen macOS lock")."""
+
+    inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+    ordinary_config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+
+    def test_the_split_is_exhaustive_and_disjoint(self):
+        entries = self.inventory["lockfiles"]
+        ordinary, frozen, stray = scan_partition(entries)
+        self.assertEqual(stray, [], "an entry that names a config nothing scans")
+        scanned = ordinary + [entry for group in frozen.values() for entry in group]
+        self.assertEqual(len(scanned), len(entries), "an entry in two scans, or in none")
+        self.assertEqual(sorted(entry["path"] for entry in scanned), sorted(entry["path"] for entry in entries))
+        self.assertGreater(len(ordinary), 0)
+        for config, group in frozen.items():
+            self.assertTrue(group, f"{config} is named by no inventory entry")
+
+    def test_only_the_frozen_locks_name_a_config(self):
+        named = {entry["path"]: entry["config"] for entry in self.inventory["lockfiles"] if "config" in entry}
+        self.assertEqual(named, {path: lock["config"] for path, lock in FROZEN_LOCKS.items()})
+        for path, lock in FROZEN_LOCKS.items():
+            self.assertIn(path, [entry["path"] for entry in self.inventory["lockfiles"]], "a frozen lock is a lockfile entry, not a manifest")
+
+    def test_the_ordinary_config_has_no_exception_for_a_frozen_advisory(self):
+        ids = {entry["id"] for entry in self.ordinary_config.get("IgnoredVulns", [])}
+        frozen_ids = {advisory for lock in FROZEN_LOCKS.values() for advisory in lock["advisories"]}
+        self.assertEqual(ids & frozen_ids, set(), "the exception belongs in the frozen config, which only the frozen scan uses")
+        self.assertEqual({override.get("name") for override in self.ordinary_config.get("PackageOverrides", [])} & {"next"}, set())
+
+    def test_each_frozen_config_holds_exactly_the_advisories_of_its_locks(self):
+        for config_path in sorted({lock["config"] for lock in FROZEN_LOCKS.values()}):
+            config = tomllib.loads((ROOT / config_path).read_text(encoding="utf-8"))
+            self.assertEqual(set(config), {"IgnoredVulns"}, "a frozen config holds ignores only, no package override")
+            expected = sorted(advisory for lock in FROZEN_LOCKS.values() if lock["config"] == config_path for advisory in lock["advisories"])
+            self.assertEqual(sorted(entry["id"] for entry in config["IgnoredVulns"]), expected)
+            self.assertEqual(ignore_entry_problems(config), [])
+
+    def test_each_frozen_lock_matches_its_reviewed_digest_and_names_evidence(self):
+        for path, lock in FROZEN_LOCKS.items():
+            self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), lock["sha256"],
+                             f"{path} changed after its review: re-review whether it reaches the advisories of its config, then record the new sha256")
+            self.assertTrue((ROOT / lock["evidence"]).is_file(), lock["evidence"])
+
+    def test_the_workflow_scans_each_config_in_its_own_invocation(self):
+        text = self.workflow
+        configs = {lock["config"] for lock in FROZEN_LOCKS.values()}
+        self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", text), sorted(configs))
+        for needle in ('select(has("config") | not)', 'select(.config == $config)', "--config .github/osv-scanner.toml", '--config "$frozen_config"',
+                       '$(( ${#lockfiles[@]} + ${#frozen[@]} ))', 'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif"):
+            self.assertIn(needle, text, needle)
+        # the frozen scan never gets the ordinary lock list, and the ordinary scan never gets the frozen one
+        self.assertIn('"${frozen[@]}")', text)
+        self.assertEqual(text.count('"${lockfiles[@]}")'), 1)
+
+    def test_the_partition_check_catches_a_mutant_inventory(self):
+        entries = [{"path": "a"}, {"path": "b", "config": FROZEN_CONFIG}, {"path": "c", "config": ".github/other.toml"}, {"path": "d", "parser": "requirements.txt"}]
+        ordinary, frozen, stray = scan_partition(entries, {FROZEN_CONFIG})
+        self.assertEqual([entry["path"] for entry in ordinary], ["a", "d"])
+        self.assertEqual({config: [entry["path"] for entry in group] for config, group in frozen.items()}, {FROZEN_CONFIG: ["b"]})
+        self.assertEqual([entry["path"] for entry in stray], ["c"])
+        self.assertEqual(len(ordinary) + sum(len(group) for group in frozen.values()) + len(stray), len(entries))
 
 
 class AllowedLockTests(unittest.TestCase):

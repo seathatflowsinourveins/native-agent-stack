@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# usage: osv_scan.sh <label> <root> <config|EMPTY> <out-dir> <osv-scanner binary>
+# Runs security-scan.yml's OSV-Scanner command from <root>: the same jq expression builds the --lockfile arguments from .github/osv-scanner-lockfiles.json,
+# with the same flags (scan source --config <config> --no-resolve), plus --format json. It prints the exact command, runs it, and retains the scanner's JSON
+# report and stderr (which lists what each ignore filtered out) as <out-dir>/<label>.json and <label>.err with the scan root masked as <scan-root> and the
+# advisories' `details` prose dropped from the JSON (third-party text, which can carry its author's own paths; ids, summaries, ranges and packages stay). It prints
+# the scanner's exit code, the count of host paths left in the retained files and their sha256. EMPTY as the config runs the scan with an empty config file,
+# which shows what the ignores hide.
+set +e -u -o pipefail
+label=$1; root=$2; config=$3; out=$4; osv=$5
+cd "$root" || exit 2
+shown=$config
+if [ "$config" = EMPTY ]; then config=$(mktemp); : > "$config"; shown="<empty file>"; fi
+inventory=.github/osv-scanner-lockfiles.json
+mapfile -t lockfiles < <(jq -r '.lockfiles[] | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+test "${#lockfiles[@]}" -gt 0 || exit 2
+test "${#lockfiles[@]}" -eq "$(jq '.lockfiles | length' "$inventory")" || exit 2
+scan=("$osv" scan source --config "$config" --no-resolve "${lockfiles[@]}" --format json)
+printf 'command (%d lockfile arguments): %s scan source --config %s --no-resolve %s --format json\n' "${#lockfiles[@]}" "$osv" "$shown" "${lockfiles[*]}"
+raw=$(mktemp -d)
+"${scan[@]}" > "$raw/report.json" 2> "$raw/report.err"
+echo "scan exit: $?"
+sed "s#$root#<scan-root>#g" "$raw/report.json" | jq --indent 1 'del(.. | .details?)' > "$out/$label.json"
+sed "s#$root#<scan-root>#g" "$raw/report.err" > "$out/$label.err"
+printf 'host paths left in the retained files: %s\n' "$(cat "$out/$label.json" "$out/$label.err" | grep -c -E '/var/tmp|/home/|/tmp/')"
+sha256sum "$out/$label.json" "$out/$label.err" | sed 's#  .*/#  #'
+rm -rf "$raw"
+if [ "$shown" = "<empty file>" ]; then rm -f "$config"; fi

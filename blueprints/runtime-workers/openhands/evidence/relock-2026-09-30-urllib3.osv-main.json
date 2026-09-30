@@ -1,0 +1,634 @@
+{
+ "results": [
+  {
+   "source": {
+    "path": "<scan-root>/blueprints/runtime-workers/openhands/requirements.lock",
+    "type": "lockfile"
+   },
+   "packages": [
+    {
+     "package": {
+      "name": "pyjwt",
+      "version": "2.14.0",
+      "ecosystem": "PyPI"
+     },
+     "groups": [
+      {
+       "ids": [
+        "GHSA-42vr-xj54-vc7v"
+       ],
+       "aliases": [
+        "CVE-2026-101918",
+        "GHSA-42vr-xj54-vc7v"
+       ],
+       "max_severity": "5.3"
+      }
+     ],
+     "vulnerabilities": [
+      {
+       "affected": [
+        {
+         "database_specific": {
+          "last_known_affected_version_range": "<= 2.14.0",
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-42vr-xj54-vc7v/GHSA-42vr-xj54-vc7v.json"
+         },
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "pyjwt",
+          "purl": "pkg:pypi/pyjwt"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "2.0.0a1"
+            },
+            {
+             "fixed": "2.15.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ],
+         "versions": [
+          "2.0.0",
+          "2.0.0a1",
+          "2.0.0a2",
+          "2.0.1",
+          "2.1.0",
+          "2.10.0",
+          "2.10.1",
+          "2.11.0",
+          "2.12.0",
+          "2.12.1",
+          "2.13.0",
+          "2.14.0",
+          "2.2.0",
+          "2.3.0",
+          "2.4.0",
+          "2.5.0",
+          "2.6.0",
+          "2.7.0",
+          "2.8.0",
+          "2.9.0"
+         ]
+        }
+       ],
+       "aliases": [
+        "CVE-2026-101918"
+       ],
+       "database_specific": {
+        "cwe_ids": [
+         "CWE-248"
+        ],
+        "github_reviewed": true,
+        "github_reviewed_at": "2026-09-30T15:41:05Z",
+        "nvd_published_at": "2026-09-28T21:17:13Z",
+        "severity": "MODERATE"
+       },
+       "id": "GHSA-42vr-xj54-vc7v",
+       "modified": "2026-09-30T16:00:09.812873551Z",
+       "published": "2026-09-30T15:41:05Z",
+       "references": [
+        {
+         "type": "WEB",
+         "url": "https://github.com/jpadilla/pyjwt/security/advisories/GHSA-42vr-xj54-vc7v"
+        },
+        {
+         "type": "ADVISORY",
+         "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-101918"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/jpadilla/pyjwt/commit/5fde08a6cf906aa7698de2d6391d88b73006b17b"
+        },
+        {
+         "type": "PACKAGE",
+         "url": "https://github.com/jpadilla/pyjwt"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/jpadilla/pyjwt/releases/tag/2.15.0"
+        }
+       ],
+       "schema_version": "1.9.0",
+       "severity": [
+        {
+         "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+         "type": "CVSS_V3"
+        }
+       ],
+       "summary": "PyJWT: Unauthenticated RecursionError DoS in pre-verification payload parse (PyJWKClient.get_signing_key_from_jwt / verify_signature=False)"
+      }
+     ]
+    },
+    {
+     "package": {
+      "name": "urllib3",
+      "version": "2.7.0",
+      "ecosystem": "PyPI"
+     },
+     "groups": [
+      {
+       "ids": [
+        "GHSA-8988-9cw3-xx77"
+       ],
+       "aliases": [
+        "CVE-2026-97687",
+        "GHSA-8988-9cw3-xx77"
+       ],
+       "max_severity": "7.6"
+      },
+      {
+       "ids": [
+        "GHSA-gh4c-6fx4-qh6g"
+       ],
+       "aliases": [
+        "CVE-2026-97688",
+        "GHSA-gh4c-6fx4-qh6g"
+       ],
+       "max_severity": "6.9"
+      },
+      {
+       "ids": [
+        "GHSA-vxq7-64xx-v4gw"
+       ],
+       "aliases": [
+        "CVE-2026-97689",
+        "GHSA-vxq7-64xx-v4gw"
+       ],
+       "max_severity": "8.9"
+      }
+     ],
+     "vulnerabilities": [
+      {
+       "affected": [
+        {
+         "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-8988-9cw3-xx77/GHSA-8988-9cw3-xx77.json"
+         },
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "urllib3",
+          "purl": "pkg:pypi/urllib3"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "1.26.0"
+            },
+            {
+             "fixed": "2.8.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ],
+         "versions": [
+          "1.26.0",
+          "1.26.1",
+          "1.26.10",
+          "1.26.11",
+          "1.26.12",
+          "1.26.13",
+          "1.26.14",
+          "1.26.15",
+          "1.26.16",
+          "1.26.17",
+          "1.26.18",
+          "1.26.19",
+          "1.26.2",
+          "1.26.20",
+          "1.26.3",
+          "1.26.4",
+          "1.26.5",
+          "1.26.6",
+          "1.26.7",
+          "1.26.8",
+          "1.26.9",
+          "2.0.0",
+          "2.0.0a1",
+          "2.0.0a2",
+          "2.0.0a3",
+          "2.0.0a4",
+          "2.0.1",
+          "2.0.2",
+          "2.0.3",
+          "2.0.4",
+          "2.0.5",
+          "2.0.6",
+          "2.0.7",
+          "2.1.0",
+          "2.2.0",
+          "2.2.1",
+          "2.2.2",
+          "2.2.3",
+          "2.3.0",
+          "2.4.0",
+          "2.5.0",
+          "2.6.0",
+          "2.6.1",
+          "2.6.2",
+          "2.6.3",
+          "2.7.0"
+         ]
+        }
+       ],
+       "aliases": [
+        "CVE-2026-97687"
+       ],
+       "database_specific": {
+        "cwe_ids": [
+         "CWE-295",
+         "CWE-440"
+        ],
+        "github_reviewed": true,
+        "github_reviewed_at": "2026-09-30T14:46:04Z",
+        "nvd_published_at": "2026-09-29T16:17:18Z",
+        "severity": "HIGH"
+       },
+       "id": "GHSA-8988-9cw3-xx77",
+       "modified": "2026-09-30T15:00:05.369237042Z",
+       "published": "2026-09-30T14:46:04Z",
+       "references": [
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/security/advisories/GHSA-8988-9cw3-xx77"
+        },
+        {
+         "type": "ADVISORY",
+         "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-97687"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/pull/5093"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/commit/07408cec79d1856d81bb42c74a904a24fdb9e465"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/commit/b6447295fff7b38fdffc67e0df9712d60cef3cc3"
+        },
+        {
+         "type": "PACKAGE",
+         "url": "https://github.com/urllib3/urllib3"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/releases/tag/2.8.0"
+        }
+       ],
+       "schema_version": "1.9.0",
+       "severity": [
+        {
+         "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N",
+         "type": "CVSS_V4"
+        }
+       ],
+       "summary": "urllib3: HTTPS proxy TLS configuration may be ignored or overridden"
+      },
+      {
+       "affected": [
+        {
+         "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-gh4c-6fx4-qh6g/GHSA-gh4c-6fx4-qh6g.json"
+         },
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "urllib3",
+          "purl": "pkg:pypi/urllib3"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "2.6.2"
+            },
+            {
+             "fixed": "2.8.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ],
+         "versions": [
+          "2.6.2",
+          "2.6.3",
+          "2.7.0"
+         ]
+        }
+       ],
+       "aliases": [
+        "CVE-2026-97688"
+       ],
+       "database_specific": {
+        "cwe_ids": [
+         "CWE-835"
+        ],
+        "github_reviewed": true,
+        "github_reviewed_at": "2026-09-30T15:00:38Z",
+        "nvd_published_at": "2026-09-29T16:17:18Z",
+        "severity": "MODERATE"
+       },
+       "id": "GHSA-gh4c-6fx4-qh6g",
+       "modified": "2026-09-30T15:15:04.066660799Z",
+       "published": "2026-09-30T15:00:38Z",
+       "references": [
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/security/advisories/GHSA-gh4c-6fx4-qh6g"
+        },
+        {
+         "type": "ADVISORY",
+         "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-97688"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/commit/ea2ad7b21a80da3632f80016526a18864586077f"
+        },
+        {
+         "type": "PACKAGE",
+         "url": "https://github.com/urllib3/urllib3"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/releases/tag/2.8.0"
+        }
+       ],
+       "schema_version": "1.9.0",
+       "severity": [
+        {
+         "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N",
+         "type": "CVSS_V4"
+        }
+       ],
+       "summary": "urllib3: Chunked Deflate streaming can enter an infinite loop"
+      },
+      {
+       "affected": [
+        {
+         "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-vxq7-64xx-v4gw/GHSA-vxq7-64xx-v4gw.json"
+         },
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "urllib3",
+          "purl": "pkg:pypi/urllib3"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "1.10.3"
+            },
+            {
+             "fixed": "2.8.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ],
+         "versions": [
+          "1.10.3",
+          "1.10.4",
+          "1.11",
+          "1.12",
+          "1.13",
+          "1.13.1",
+          "1.14",
+          "1.15",
+          "1.15.1",
+          "1.16",
+          "1.17",
+          "1.18",
+          "1.18.1",
+          "1.19",
+          "1.19.1",
+          "1.20",
+          "1.21",
+          "1.21.1",
+          "1.22",
+          "1.23",
+          "1.24",
+          "1.24.1",
+          "1.24.2",
+          "1.24.3",
+          "1.25",
+          "1.25.1",
+          "1.25.10",
+          "1.25.11",
+          "1.25.2",
+          "1.25.3",
+          "1.25.4",
+          "1.25.5",
+          "1.25.6",
+          "1.25.7",
+          "1.25.8",
+          "1.25.9",
+          "1.26.0",
+          "1.26.1",
+          "1.26.10",
+          "1.26.11",
+          "1.26.12",
+          "1.26.13",
+          "1.26.14",
+          "1.26.15",
+          "1.26.16",
+          "1.26.17",
+          "1.26.18",
+          "1.26.19",
+          "1.26.2",
+          "1.26.20",
+          "1.26.3",
+          "1.26.4",
+          "1.26.5",
+          "1.26.6",
+          "1.26.7",
+          "1.26.8",
+          "1.26.9",
+          "2.0.0",
+          "2.0.0a1",
+          "2.0.0a2",
+          "2.0.0a3",
+          "2.0.0a4",
+          "2.0.1",
+          "2.0.2",
+          "2.0.3",
+          "2.0.4",
+          "2.0.5",
+          "2.0.6",
+          "2.0.7",
+          "2.1.0",
+          "2.2.0",
+          "2.2.1",
+          "2.2.2",
+          "2.2.3",
+          "2.3.0",
+          "2.4.0",
+          "2.5.0",
+          "2.6.0",
+          "2.6.1",
+          "2.6.2",
+          "2.6.3",
+          "2.7.0"
+         ]
+        }
+       ],
+       "aliases": [
+        "CVE-2026-97689"
+       ],
+       "database_specific": {
+        "cwe_ids": [
+         "CWE-770"
+        ],
+        "github_reviewed": true,
+        "github_reviewed_at": "2026-09-30T14:46:18Z",
+        "nvd_published_at": "2026-09-29T16:17:18Z",
+        "severity": "HIGH"
+       },
+       "id": "GHSA-vxq7-64xx-v4gw",
+       "modified": "2026-09-30T15:00:05.904945330Z",
+       "published": "2026-09-30T14:46:18Z",
+       "references": [
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/security/advisories/GHSA-vxq7-64xx-v4gw"
+        },
+        {
+         "type": "ADVISORY",
+         "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-97689"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/commit/cd770b059b543be29298ea5c52afb0b1b090f5ed"
+        },
+        {
+         "type": "PACKAGE",
+         "url": "https://github.com/urllib3/urllib3"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/urllib3/urllib3/releases/tag/2.8.0"
+        }
+       ],
+       "schema_version": "1.9.0",
+       "severity": [
+        {
+         "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H",
+         "type": "CVSS_V4"
+        }
+       ],
+       "summary": "urllib3: HTTPResponse.stream()/read_chunked() buffers an unbounded chunk-size line into memory"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "source": {
+    "path": "<scan-root>/evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+    "type": "lockfile"
+   },
+   "packages": [
+    {
+     "package": {
+      "name": "next",
+      "version": "16.3.5",
+      "ecosystem": "npm"
+     },
+     "groups": [
+      {
+       "ids": [
+        "GHSA-vcvr-r3jv-pc5j"
+       ],
+       "aliases": [
+        "GHSA-vcvr-r3jv-pc5j"
+       ],
+       "max_severity": "9.5"
+      }
+     ],
+     "vulnerabilities": [
+      {
+       "affected": [
+        {
+         "database_specific": {
+          "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/09/GHSA-vcvr-r3jv-pc5j/GHSA-vcvr-r3jv-pc5j.json"
+         },
+         "package": {
+          "ecosystem": "npm",
+          "name": "next",
+          "purl": "pkg:npm/next"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "16.2.0"
+            },
+            {
+             "fixed": "16.3.6"
+            }
+           ],
+           "type": "SEMVER"
+          }
+         ]
+        }
+       ],
+       "database_specific": {
+        "cwe_ids": [
+         "CWE-1395"
+        ],
+        "github_reviewed": true,
+        "github_reviewed_at": "2026-09-30T14:48:30Z",
+        "nvd_published_at": null,
+        "severity": "CRITICAL"
+       },
+       "id": "GHSA-vcvr-r3jv-pc5j",
+       "modified": "2026-09-30T15:00:05.353715340Z",
+       "published": "2026-09-30T14:48:30Z",
+       "references": [
+        {
+         "type": "WEB",
+         "url": "https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/vercel/satori/security/advisories/GHSA-wx4j-mvgx-mqwp"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/vercel/next.js/commit/868fad38690d72088868f299fa2bef339b26838e"
+        },
+        {
+         "type": "PACKAGE",
+         "url": "https://github.com/vercel/next.js"
+        },
+        {
+         "type": "WEB",
+         "url": "https://github.com/vercel/next.js/releases/tag/v16.3.6"
+        }
+       ],
+       "schema_version": "1.9.0",
+       "severity": [
+        {
+         "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H",
+         "type": "CVSS_V4"
+        }
+       ],
+       "summary": "Next.js: Remote Code Execution in next/og ImageResponse"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "experimental_config": {
+  "licenses": {
+   "summary": false,
+   "allowlist": null
+  }
+ }
+}
