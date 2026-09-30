@@ -1,0 +1,3120 @@
+{
+ "schema_version": 1,
+ "kind": "mover_paper_series_receipt",
+ "series": "ext-20260929",
+ "status": "three_passed_one_needs_attention_residual_open",
+ "evidence_class": "PAPER",
+ "evidence_level": "metadata_plus_broker_reconciliation",
+ "gate": null,
+ "gate_note": "Not a frozen gate run. No gate receipt and no gate row changes with this record.",
+ "label": "mechanics-only test; no validated edge",
+ "broker": "alpaca",
+ "endpoint": "paper",
+ "feed": "sip",
+ "account": "account 2 (credential inventory id alpaca-paper-2). No credential, account id, account number or account fingerprint is recorded.",
+ "credential_route": "0600 env file store through the $PAPER_ENV_FILE_2 pointer, passed as --env-file under /bin/bash -ic",
+ "credential_route_note": "The series unit launched through /bin/bash -ic, whose interactive start-up exports the pointer; run-series-trial.sh passed --env-file with it to scan, paper and recover, and the driver's key probe used the same pointer. Route and pointer names only.",
+ "session": {
+  "date": "2026-09-29",
+  "segment": "POST",
+  "protocol": "mover-early-entry-v1-20260924",
+  "section": "paper_e2e"
+ },
+ "recorded_at_utc": "2026-09-30T18:05:08Z",
+ "started_at": "2026-09-29T20:00:05Z",
+ "finished_at": "2026-09-29T21:11:31Z",
+ "client_id_prefix": "mvr-ext-20260929-",
+ "recovery_client_id_prefix": "rec-ext-20260929-",
+ "account_designation_note": "docs/secret-storage.md:17 and blueprints/us-equities/incentive-monitor/forward-protocol-v1.json:63 designate alpaca-paper-2 as the isolated incentive-monitor study account. This series traded on it; see limitations.",
+ "code": {
+  "commit": "b528bb550463991bd3ca554ddf78e2a180aca301",
+  "checkout": "a durable read-only clone of that SHA under <private state root>/engines/ (git clone --no-hardlinks, detached at the SHA, then chmod -R a-w), shared by the three 2026-09-29 series",
+  "clean_basis": "At the series start the driver ran sha256sum -c frozen-b528bb55.SHA256SUMS against the clone and logged that the engine files match (series.console). The SUMS hold 70 entries: the top-level non-README files of adaptive-paper/ (40), mover-early-entry/ (20), order-contract/ (5) and incentive-monitor/ (5), which is 70 of the 208 files these four directories hold at b528bb55. All 70 equal git show b528bb55. On 2026-09-30 the clone was still at HEAD b528bb55 with an empty git status --porcelain and passed sha256sum -c again.",
+  "clean_basis_limits": "The other 138 files of those directories are not hashed by the SUMS. The clone is read-only and git reports it clean on 2026-09-30, but no hash of those files was taken at run time.",
+  "frozen_sums": {
+   "entries": 70,
+   "sha256": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+   "by_directory": {
+    "adaptive-paper": 40,
+    "incentive-monitor": 5,
+    "mover-early-entry": 20,
+    "order-contract": 5
+   },
+   "files_in_those_directories_at_commit": 208,
+   "entries_equal_to_git_show": 70,
+   "driver_check_at_series_start": "engine files match frozen-b528bb55.SHA256SUMS",
+   "recheck_2026_09_30": "sha256sum -c rc 0; HEAD b528bb55; git status --porcelain empty"
+  },
+  "offline_gate": {
+   "tests": 402,
+   "result": "OK, exit 0",
+   "window_utc": "2026-09-29T05:05:52Z-05:08:34Z",
+   "modules": [
+    "tests.test_adaptive_paper_mover",
+    "tests.test_adaptive_paper_mover_native",
+    "tests.test_adaptive_paper_safety",
+    "tests.test_adaptive_paper_recovery",
+    "tests.test_mover_early_entry_scan",
+    "tests.test_mover_early_entry_rules",
+    "tests.test_adaptive_paper_transport",
+    "tests.test_adaptive_paper_native"
+   ],
+   "basis": "the three FREEZE files and the private series index; the gate ran on a scratch git archive copy whose SHA256SUMS before and after the run equal the clone's. The gate log is gone, so this is not re-checked here."
+  },
+  "runtime": {
+   "engine": "NautilusTrader LiveNode 2.0.0rc5",
+   "nautilus_trader": "2.0.0rc5",
+   "alpaca_py": "0.44.0",
+   "python": "3.12.3",
+   "numpy": "2.5.3",
+   "requests": "2.34.2",
+   "interpreter": "the pinned adaptive-paper virtual environment (adaptive-paper-20260921)",
+   "runtime_basis": "engine name from every trial receipt; package versions read from the same environment on 2026-09-30 by the builder and recorded at freeze in FREEZE.md; not observed at run time"
+  },
+  "engine_sources_sha256": [
+   {
+    "path": "adaptive-paper/benchmark.py",
+    "sha256": "6ef1551c60855e43b75e9e02f48915236518100b9f0e910f15794877c754f866"
+   },
+   {
+    "path": "adaptive-paper/corporate_actions.py",
+    "sha256": "8f0839427b9d8a3c9b3fbd02f286985c7a720bf85a3c599fce2022573bff71cd"
+   },
+   {
+    "path": "adaptive-paper/credential_guard.py",
+    "sha256": "f5a3d0d038ed3f01d486493ce416395039fb260762232785bb0a9073c777da7e"
+   },
+   {
+    "path": "adaptive-paper/credential_source.py",
+    "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc"
+   },
+   {
+    "path": "adaptive-paper/exits.py",
+    "sha256": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df"
+   },
+   {
+    "path": "adaptive-paper/feeds.py",
+    "sha256": "0db3009a724ae2433572c5070066d6806d7365031f9db4e81c4b69ad1cbebacb"
+   },
+   {
+    "path": "adaptive-paper/financing.py",
+    "sha256": "562652297f87d1b2650158f73795013a52d895ce116fb535a205c41a83880350"
+   },
+   {
+    "path": "adaptive-paper/leverage.py",
+    "sha256": "7f4a86f312d718a0a0b87e6eafe9a2d57b8709ec85a8746fdf7def0a5b502ea0"
+   },
+   {
+    "path": "adaptive-paper/live_manifest.py",
+    "sha256": "ca34cb59b4ff8f3a9dc763a0937a351ecab815d16164c75c319e3880a57585bd"
+   },
+   {
+    "path": "adaptive-paper/market_research.py",
+    "sha256": "bba9cf77c3c3c6dff32dec1cb01fa8c1957c6b012b7d5bd9693fcc268d557158"
+   },
+   {
+    "path": "adaptive-paper/metrics.py",
+    "sha256": "437fce8aaca350b9d8fe5d5b68212879d82e118f01d93fdcd333233709b80397"
+   },
+   {
+    "path": "adaptive-paper/mover.py",
+    "sha256": "ac34fd84485a054b27fb857b5ef3b0dfb7f7dee9c407eb42d4579e9e80e5ee88"
+   },
+   {
+    "path": "adaptive-paper/mover_runner.py",
+    "sha256": "03f9107e40feaaefc6e896db3e20d246139f8ef8b02e1a7d7da79199e62bb7f5"
+   },
+   {
+    "path": "adaptive-paper/mover_simulation.py",
+    "sha256": "8ac5955de1e814bb26fbfbca068a5719b9033b2bae0d8e50e78d7a78a546761e"
+   },
+   {
+    "path": "adaptive-paper/mover_strategy.py",
+    "sha256": "4730c5e535aa480030d6484669a9d8565ca25e4e1ea50ea12a45bd1892536cba"
+   },
+   {
+    "path": "adaptive-paper/native_adapter.py",
+    "sha256": "fbf530884c2ad3b9e0c2b1f989eda399531647cc1db3c56dc9bcac10174fea47"
+   },
+   {
+    "path": "adaptive-paper/native_strategy.py",
+    "sha256": "bc102eb6c4456cb651510fe59cf5f92decf3b70b31e0da1c833e7a27d6f1a226"
+   },
+   {
+    "path": "adaptive-paper/recovery.py",
+    "sha256": "38b6cf4f9247577f72337ca3dbd242505a43ad5cbc5cbe21349b0f1beb2f3e51"
+   },
+   {
+    "path": "adaptive-paper/runner.py",
+    "sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4"
+   },
+   {
+    "path": "adaptive-paper/safety.py",
+    "sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357"
+   },
+   {
+    "path": "adaptive-paper/selector.py",
+    "sha256": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3"
+   },
+   {
+    "path": "adaptive-paper/sessions.py",
+    "sha256": "95f0affee512e88dd44f196fa72bb7471e00899356793bdbb12f15c4ed84e64d"
+   },
+   {
+    "path": "adaptive-paper/simulation.py",
+    "sha256": "0119e0efe3b498be3c415eee9c1a0be922c9b5b17e3b774aa7528668c4eb0b30"
+   },
+   {
+    "path": "adaptive-paper/strategies.py",
+    "sha256": "2d488a4fdd21ad323ab07cf7fb147b3623fd6e38951abcf2fc59cf8094a1383e"
+   },
+   {
+    "path": "adaptive-paper/strategies_v1.py",
+    "sha256": "1952be269694485e12e4d927f124adca0ee29667588d6ac6651caede454c92f7"
+   },
+   {
+    "path": "adaptive-paper/transport.py",
+    "sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9"
+   },
+   {
+    "path": "mover-early-entry/mover_scan.py",
+    "sha256": "f584b2c9d5719ceb237d7b57db9c610935b5348b7bc4fe2634359e8b61e480d9"
+   }
+  ],
+  "engine_sources_note": "the 26 adaptive-paper/*.py sources and mover-early-entry/mover_scan.py (27 path and sha256 pairs), each computed as git show b528bb55:blueprints/us-equities/<path> | sha256sum; each equals the clone's file and its SUMS entry"
+ },
+ "config": {
+  "sha256": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+  "mode": "mover_paper",
+  "protocol": "mover-early-entry-v1-20260924",
+  "endpoint": "https://paper-api.alpaca.markets",
+  "feed": "sip",
+  "extended_hours_enabled": true,
+  "overnight_holds": false,
+  "benchmarks": [
+   "SPY"
+  ],
+  "rule": "10:00|G20|V1000000|any",
+  "exit": "X2",
+  "session_scope": "any_session",
+  "trial_end_et": "19:45",
+  "capital_usd": "4991.09",
+  "max_symbols": 5,
+  "max_held_symbols": 5,
+  "max_entry_notional_usd": "1000",
+  "max_order_notional_usd": "10000",
+  "max_order_quantity": 100,
+  "max_order_qty_mode": "notional",
+  "max_gross_exposure_usd": "10000",
+  "max_outstanding_orders": 20,
+  "max_gross_loss_usd": "480",
+  "max_drawdown_usd": "475",
+  "max_leverage": "4",
+  "max_api_requests_per_minute": 150,
+  "max_submit_requests_per_minute": 130,
+  "quote_max_age_seconds": 3,
+  "max_spread_bps": "100",
+  "entry": {
+   "limit_cap_bps": "50",
+   "timeout_seconds": 60,
+   "window_seconds": 30
+  },
+  "exit_orders": {
+   "limit_cap_bps": "50",
+   "timeout_seconds": 10,
+   "max_orders_per_symbol": 20
+  },
+  "order_timeout_seconds": 10,
+  "duration_seconds": 3600,
+  "cleanup_seconds": 600,
+  "min_entry_close_seconds": 600,
+  "flatten_reserve_seconds": 120,
+  "max_scan_age_seconds": 300,
+  "stream_quote_timeout_seconds": 30,
+  "appreciation_allowance": "2",
+  "gross_guard_fraction": "0.9",
+  "rung": "4",
+  "rung_sessions": [
+   1,
+   20
+  ],
+  "leverage_policy": "leverage-schedule-v1-20260922",
+  "leverage_schedule": {
+   "RTH": {
+    "trend": "4",
+    "range": "1",
+    "risk_off": "0",
+    "unavailable": "0"
+   },
+   "PRE": {
+    "trend": "1",
+    "range": "1",
+    "risk_off": "0",
+    "unavailable": "0"
+   },
+   "POST": {
+    "trend": "1",
+    "range": "1",
+    "risk_off": "0",
+    "unavailable": "0"
+   },
+   "CLOSED": {
+    "trend": "0",
+    "range": "0",
+    "risk_off": "0",
+    "unavailable": "0"
+   }
+  },
+  "overnight_max_leverage": "2",
+  "drawdown_ladder": [
+   {
+    "from_drawdown_fraction": "0",
+    "max_leverage": "4"
+   },
+   {
+    "from_drawdown_fraction": "0.25",
+    "max_leverage": "2"
+   },
+   {
+    "from_drawdown_fraction": "0.5",
+    "max_leverage": "1"
+   },
+   {
+    "from_drawdown_fraction": "0.75",
+    "max_leverage": "0"
+   }
+  ],
+  "notes": "After-hours mover series 2026-09-29 on paper account 2 (protocol mover-early-entry-v1-20260924 paper_e2e, mechanics-only), new state root roots/account2-20260929 shared with pre-20260929. Changes from config-mover-ext-20260928.json: request caps 150 per minute with 130 submits; capital 4991.09, lifetime gross-loss 480 and drawdown 475 carry the ext-20260928 ledger's realized P&L (-8.91), gross loss (18.67) and drawdown (23.80) forward, rounded down, so the new ledger permits no more than continuing the old one. POST: late scan of the day's 10:00 movers (gain vs previous official close, V1000000 for after-hours liquidity), entries at trial start, exit X2, hard flatten 19:45 ET. Leverage: rung 4 under the canonical leverage-schedule-v1-20260922 block, whose PRE/POST cells cap the ledger envelope at 1x, so entries total at most min(10000/2, 4991.09 x 1) = 4991.09 USD. stream_quote_timeout_seconds 30 (engine maximum); the ledger's 3 s order gate is unchanged."
+ },
+ "scanner_rule": {
+  "frozen_config_rule": "10:00|G20|V1000000|any",
+  "rule_txt": "10:00|G0.20|V1000000|any",
+  "every_attempt_argument": "10:00|G0.20|V1000000|any",
+  "note": "rule.txt holds the scanner's ratio form (G0.20 is 20 percent, 24 bytes, no trailing newline) and the config holds percent points (G20); every scan.log shows the rule.txt form and check validated each scan against the config. In POST the scan selects the day's 10:00 movers still above the prefilter."
+ },
+ "frozen_acceptance": {
+  "source": "FREEZE.md (private; it names account fingerprints)",
+  "freeze_sha256": "c72bbfedf5280a4510d96628853cd2c11182ddc4749011fccbc077febb741b0c",
+  "pass_clause_text": [
+   "- **Pass.** The same operational pass as `ext-20260928`, plus no HTTP 429:",
+   "  - status `passed` or `completed_no_signals`;",
+   "  - flat;",
+   "  - `cash_match` and `positions_match` true;",
+   "  - 0 open orders;",
+   "  - `pnl_consistent` true;",
+   "  - no duplicate or unexplained effects;",
+   "  - no halt.",
+   "- **Recorded, not thresholded:**",
+   "  - per-leg fills and slippage;",
+   "  - exit reasons;",
+   "  - realized P&L;",
+   "  - quote-freshness waits and stream gaps;",
+   "  - websocket reconnects;",
+   "  - benchmark refusals;",
+   "  - request peaks.",
+   "  - `paper_compare.py` differences, under decision 11 as in `rth-20260929`.",
+   "- **Anything else** is recorded as `needs_attention` or failed, with its reason."
+  ],
+  "next_trial_rule_text": "- **When the next trial may start:** only after the previous trial passed or recovered, with no 429 in any of its attempts. The last start is 18:30 ET.",
+  "stop_rule_text": [
+   "a ledger halt;",
+   "a failed recovery;",
+   "a SIP refusal;",
+   "a preflight refusal other than benchmark quote age;",
+   "six benchmark refusals in a row;",
+   "a scan with no fired symbol;",
+   "any 429;",
+   "the kill switch;",
+   "18:30 ET;",
+   "the backstop at 20:05:05 ET (`RuntimeMaxSec` 4h5min)."
+  ],
+  "evaluation": "A trial is pass only if every clause holds: engine status passed or completed_no_signals; flat; end reconciliation cash_match and positions_match true; 0 open orders; totals.pnl_consistent true; execution_stats.duplicate_executions 0 and no unexplained broker/ledger difference in the broker reconciliation; ledger_risk.halted_reason null at the trial's end; no HTTP 429 in the receipt's HTTP observations, no transport rate_limited mark and no non-200 scan page. A trial with a failed clause is needs_attention when the engine itself reported needs_attention, and fail otherwise; a clause the files cannot evaluate is recorded as null, and a trial whose verdict rests on such a clause would be inconclusive. The verdict ignores what the engine or the driver printed.",
+  "paper_compare": "not run: decision 11 makes it acceptance evidence only after the tool is checked against b528bb55 receipts; no paper_compare output exists in the series directories",
+  "known_effects_text": [
+   "- **#215 part 2 and the run-loop stall are open.** Sparse after-hours quotes can freeze the transport, so a residual can stay open overnight. Account separation keeps any residual off account 1.",
+   "- **#486.** Recovery exits each held symbol on its own fresh quote, and its ports wait only on the benchmark (SPY) quote within the 15 s start timeout. This is unmeasured at the broker after hours."
+  ],
+  "boundary_disposition_text": "- **Boundary disposition.** Each trial ends flat with 0 open orders. A residual that after-hours quotes cannot clear stays open and is recorded; `recover` runs again at the next pre-market or at the open (#215 part 2, open).",
+  "freeze_timing": {
+   "config_written_et": "01:06:11",
+   "freeze_md_written_et": "01:12:32",
+   "first_broker_request_et": "01:14:31 (this series' dry-run key probe; the private series index puts the day's first, pre-20260929's, one second earlier)",
+   "basis": "file modification times on 2026-09-29 and the private series index; FREEZE.md's typed header says 01:16 ET, which the index records as an estimate written ahead of saving"
+  }
+ },
+ "dry_run": {
+  "when_utc": "2026-09-29T05:14:31Z",
+  "when_et": "01:14:31",
+  "driver_check": "check passed: ext-20260929 would start trial 1; no trial started",
+  "key_probe_http_status": 200,
+  "check": "valid",
+  "synthetic": "completed_no_signals, flat",
+  "note": "after the freeze and before any timer; no paper or recover stage and no order path. The synthetic run refused every entry with leverage_ceiling_zero at 01:15 ET (the CLOSED cell), an artifact of the hour (private series index)."
+ },
+ "series_procedure": {
+  "per_attempt": "scan (mover_scan.py with rule.txt), mover_runner.py check, synthetic (SYN) on the same scan, paper; recover when paper ends needs_attention (run-series-trial.sh)",
+  "launch": "paper-ext-20260929.timer fired at 16:00:05 ET and started paper-ext-20260929.service (Type=exec, CPUWeight 1000, RuntimeMaxSec 4h5min, OnFailure=paper-alert@%n.service), which ran /bin/bash -ic 'exec sh series-driver.sh ext-20260929 2 1 1830 6' with ENGINE_SHA=b528bb550463991bd3ca554ddf78e2a180aca301",
+  "driver": "series-driver.sh checks the kill switch, that the clone is at ENGINE_SHA and sha256sum -c frozen-b528bb55.SHA256SUMS, probes the key with one GET /v2/account, then runs trial after trial through retry-benchmark.sh (at most 6 attempts per trial, retried only on benchmark_quotes_not_ready) until the last start, a trial that neither passed nor recovered, or any HTTP 429 in the key probe, in mover-paper.json or mover-recovery.json, or in the scan pages",
+  "driver_pass_rule": "yes when mover-paper.json status is passed or completed_no_signals, or mover-recovery.json status is passed, and no 429 was found; it does not read ledger_risk.halted_reason",
+  "driver_exit_codes": "0 past the last start (or check passed); 2 usage; 3 series stopped; 4 not started (switch, clone, files); 5 no working paper key (the script's header)",
+  "scripts_note": "series-driver.sh (sha256 feff8f5692b03900add1909b9554e7343357dbc170ad5b783ff5836331d1f608, modified 2026-09-29T05:09:48Z), run-series-trial.sh (bbd917040783e8d3e41ed43af137060a52d31d9587d6988f160e124aaa095ca4, 05:09:26Z) and retry-benchmark.sh (4f82d5f936257869450c72d6f9cc03b0cf0f2fa584891d1abfc9b8a95fe1f27e, 2026-09-28T20:25:56Z) predate the three FREEZE files (05:11:26Z-05:12:32Z). FREEZE.md names retry-benchmark.sh and the driver arguments but hashes no script; the private series index (written 05:20:57Z) hashes all three, and on 2026-09-30 each file still has that sha256.",
+  "freeze_plan": "Trials ext-20260929-N run in sequence from the 16:00:05 ET timer, each only after the previous one ended passed or completed_no_signals or recovered, with no 429; the last start is 18:30 ET and the hard flatten min(start + 68 min, 19:45 ET). The series stops on the stop rules quoted in frozen_acceptance.stop_rule_text, among them a failed recovery.",
+  "series_end": "17:11:31 ET series stops: ext-20260929-4 no paper=needs_attention recovery=needs_attention",
+  "series_end_rule": "a failed recovery: trial 4's paper and recover stages both ended needs_attention",
+  "key_probe": {
+   "request": "GET /v2/account",
+   "http_status": 200,
+   "observed_at": "2026-09-29T20:00:05.427848Z",
+   "x_ratelimit_limit": "200",
+   "x_ratelimit_remaining": "199",
+   "probes": 1,
+   "note": "one probe before the first trial; the driver probes again every 120 s only while the key fails"
+  },
+  "deviations_from_freeze": [],
+  "deviations_note": "None found. The config sha256 matched in every check.json and receipt; every start came from the timer and the driver; no trial needed a retry; and the series stopped on the freeze's failed-recovery rule. The driver's pass rule does not read the ledger halt; here the recovery_only halt came with a failed recovery, which the driver's rule catches."
+ },
+ "attempts": [
+  {
+   "attempt": 1,
+   "trial_id": "ext-20260929-1",
+   "unit": "paper-ext-20260929",
+   "started_at": "2026-09-29T20:00:05Z",
+   "ended_at": "2026-09-29T20:01:35Z",
+   "et": {
+    "scan_start": "16:00:05",
+    "check": "16:00:15",
+    "synthetic": "16:00:21",
+    "paper_start": "16:00:21",
+    "paper_end": "16:01:35",
+    "end": "16:01:35"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V1000000|any",
+    "fired": 7,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "SSTI",
+     "BEG"
+    ],
+    "scan_time": "2026-09-29T20:00:05Z",
+    "age_seconds_at_trial_start": 17.728,
+    "scan_log_sha256": "3c2ec041d00d3d7e1415e83e38787d86f95d33f404ad79f0b44a47bb274c1cdc"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V1000000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "4989.04",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "1",
+    "leverage_L": "4",
+    "sizing_equity_usd": "4989.04",
+    "session_number": 4,
+    "drawdown_fraction": "0.000411"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T20:00:22.716084Z"
+   },
+   "status": "completed_no_signals",
+   "orders_submitted": 5,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.10",
+     "average_fill_price": null,
+     "fills": 0,
+     "status": "canceled",
+     "cancel_reason": "entry_timeout"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "68",
+     "limit_price": "14.52",
+     "average_fill_price": null,
+     "fills": 0,
+     "status": "canceled",
+     "cancel_reason": "entry_timeout"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.60",
+     "average_fill_price": null,
+     "fills": 0,
+     "status": "canceled",
+     "cancel_reason": "entry_timeout"
+    },
+    {
+     "symbol": "SSTI",
+     "qty": "100",
+     "limit_price": "8.28",
+     "average_fill_price": null,
+     "fills": 0,
+     "status": "canceled",
+     "cancel_reason": "entry_timeout"
+    },
+    {
+     "symbol": "BEG",
+     "qty": "17",
+     "limit_price": "56.36",
+     "average_fill_price": null,
+     "fills": 0,
+     "status": "canceled",
+     "cancel_reason": "entry_timeout"
+    }
+   ],
+   "exits": [],
+   "legs": [],
+   "skipped_entries": [],
+   "fills": {
+    "engine_fill_events": 0,
+    "ledger_executions": 0,
+    "broker_fill_activities": 0,
+    "matched": 0,
+    "unconfirmed": 0,
+    "at_reference_quote": 0,
+    "better_than_reference": 0,
+    "worse_than_reference": 0
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 5
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 42,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 1,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 0,
+    "data_stream_gap_lines": 0
+   },
+   "dropped_crossed_quotes": {
+    "BKYI": 2,
+    "SPY": 20,
+    "SSTI": 2,
+    "total": 24
+   },
+   "native_quotes": 758,
+   "requests": {
+    "read": 17,
+    "submit": 5,
+    "cancel": 5,
+    "peak_requests_any_60s": 19,
+    "peak_submits_any_60s": 5,
+    "engine_reported": {
+     "cancel": 5,
+     "read": 17,
+     "submit": 5
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 38,
+     "by_kind_status": {
+      "cancel:204": 5,
+      "data_read:200": 1,
+      "read:200": 27,
+      "submit:200": 5
+     },
+     "min_x_ratelimit_remaining": 190
+    }
+   },
+   "trial_start": "2026-09-29T20:00:22.728405Z",
+   "hard_flatten_at": "2026-09-29T21:08:22.728405Z",
+   "elapsed_seconds": 72.5,
+   "force_reason": null,
+   "force_at": null,
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "0.00",
+    "ledger_delta": "0.00",
+    "broker_recomputed_cash_flow": "0.00"
+   },
+   "buy_notional_usd": "0.00",
+   "sell_notional_usd": "0.00",
+   "entry_gross_to_sizing_equity": "0.000",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-2.05"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-2.05",
+    "lifetime_gross_loss_usd": "95.00",
+    "drawdown_usd": "2.05",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "16:01:35 ET ext-20260929-1 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "completed_no_signals",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-2.05",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 38,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "5 of 5"
+    },
+    "verdict": "pass",
+    "failed_clauses": [],
+    "not_evaluable_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions",
+   "status_note": "completed_no_signals: a reconciled flat end with 0 open orders, no session error and 0 native fills (runner.py:1945-1946, called at mover_runner.py:395). The engine submitted 5 entries; each was canceled after the 60 s entry timeout (mover_cancel entry_timeout) with no fill, and the broker lists all 5 canceled with 0 filled."
+  },
+  {
+   "attempt": 2,
+   "trial_id": "ext-20260929-2",
+   "unit": "paper-ext-20260929",
+   "started_at": "2026-09-29T20:01:35Z",
+   "ended_at": "2026-09-29T20:18:32Z",
+   "et": {
+    "scan_start": "16:01:35",
+    "check": "16:01:43",
+    "synthetic": "16:01:49",
+    "paper_start": "16:01:49",
+    "paper_end": "16:18:32",
+    "end": "16:18:32"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V1000000|any",
+    "fired": 7,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "SSTI",
+     "BEG"
+    ],
+    "scan_time": "2026-09-29T20:01:35Z",
+    "age_seconds_at_trial_start": 15.066,
+    "scan_log_sha256": "bb8cb4069f5899d5362587a733b23b8af48651180b6cb451b9ee18892be63dd1"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V1000000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "4989.04",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "1",
+    "leverage_L": "4",
+    "sizing_equity_usd": "4989.04",
+    "session_number": 5,
+    "drawdown_fraction": "0.000411"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T20:01:50.056600Z"
+   },
+   "status": "passed",
+   "orders_submitted": 8,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.11",
+     "average_fill_price": "3.0996",
+     "fills": 7,
+     "status": "filled"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "68",
+     "limit_price": "14.57",
+     "average_fill_price": "14.50",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.59",
+     "average_fill_price": "40.30",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEG",
+     "qty": "17",
+     "limit_price": "56.37",
+     "average_fill_price": "55.94",
+     "fills": 1,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.05",
+     "average_fill_price": "3.06",
+     "fills": 3,
+     "reason": "controller_stop",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-3.96"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "68",
+     "limit_price": "14.40",
+     "average_fill_price": "14.47",
+     "fills": 4,
+     "reason": "controller_stop",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-2.04"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "39.97",
+     "average_fill_price": "40.17",
+     "fills": 1,
+     "reason": "controller_stop",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-3.12"
+    },
+    {
+     "symbol": "BEG",
+     "qty": "17",
+     "limit_price": "55.37",
+     "average_fill_price": "55.64",
+     "fills": 2,
+     "reason": "controller_stop",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-5.10"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "controller_stop",
+     "exit_triggered_at": "2026-09-29T20:18:14.892164Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-3.96"
+    },
+    {
+     "symbol": "IOVA",
+     "state": "closed",
+     "exit_reason": "controller_stop",
+     "exit_triggered_at": "2026-09-29T20:18:14.892164Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-2.04"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "controller_stop",
+     "exit_triggered_at": "2026-09-29T20:18:14.892164Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-3.12"
+    },
+    {
+     "symbol": "BEG",
+     "state": "closed",
+     "exit_reason": "controller_stop",
+     "exit_triggered_at": "2026-09-29T20:18:14.892164Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-5.10"
+    }
+   ],
+   "skipped_entries": [
+    {
+     "symbol": "SSTI",
+     "rank": 4,
+     "reason": "spread_exceeds_cap"
+    }
+   ],
+   "fills": {
+    "engine_fill_events": 20,
+    "ledger_executions": 20,
+    "broker_fill_activities": 20,
+    "matched": 20,
+    "unconfirmed": 0,
+    "at_reference_quote": 16,
+    "better_than_reference": 4,
+    "worse_than_reference": 0
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 42,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 1,
+     "trading": 2
+    },
+    "websocket_lines_without_close_frame": 1,
+    "data_stream_gap_lines": 1
+   },
+   "dropped_crossed_quotes": {
+    "BKYI": 3,
+    "SPY": 34,
+    "total": 37
+   },
+   "native_quotes": 3034,
+   "requests": {
+    "read": 132,
+    "submit": 8,
+    "cancel": 0,
+    "peak_requests_any_60s": 22,
+    "peak_submits_any_60s": 4,
+    "engine_reported": {
+     "read": 132,
+     "submit": 8
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 151,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 142,
+      "submit:200": 8
+     },
+     "min_x_ratelimit_remaining": 190
+    }
+   },
+   "trial_start": "2026-09-29T20:01:50.066444Z",
+   "hard_flatten_at": "2026-09-29T21:09:50.066444Z",
+   "elapsed_seconds": 1001.7,
+   "force_reason": "controller_stop",
+   "force_at": "2026-09-29T20:18:14.892164Z",
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "-14.22",
+    "ledger_delta": "-14.22",
+    "broker_recomputed_cash_flow": "-14.22"
+   },
+   "buy_notional_usd": "3214.14",
+   "sell_notional_usd": "3199.92",
+   "entry_gross_to_sizing_equity": "0.644",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-16.27"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-16.27",
+    "lifetime_gross_loss_usd": "109.22",
+    "drawdown_usd": "16.27",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "16:18:32 ET ext-20260929-2 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-16.27",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 151,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "8 of 8"
+    },
+    "verdict": "pass",
+    "failed_clauses": [],
+    "not_evaluable_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions",
+   "force_note": "controller_stop at 16:18:14 ET: the engine loop found controller.stop already set (mover_runner.py:296-309); the receipt does not record what set it (see errors_rejects_retries.controller_stop)"
+  },
+  {
+   "attempt": 3,
+   "trial_id": "ext-20260929-3",
+   "unit": "paper-ext-20260929",
+   "started_at": "2026-09-29T20:18:32Z",
+   "ended_at": "2026-09-29T20:21:32Z",
+   "et": {
+    "scan_start": "16:18:32",
+    "check": "16:18:37",
+    "synthetic": "16:19:22",
+    "paper_start": "16:19:22",
+    "paper_end": "16:21:32",
+    "end": "16:21:32"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V1000000|any",
+    "fired": 8,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "NCPL",
+     "SSTI"
+    ],
+    "scan_time": "2026-09-29T20:18:32Z",
+    "age_seconds_at_trial_start": 51.754,
+    "scan_log_sha256": "306ae4a2744fec641b730de2b518a28eb2d897303f6e6634338a89de740b81aa"
+   },
+   "check": "valid",
+   "synthetic": "completed_no_signals (SYN, flat)",
+   "rule": "10:00|G20|V1000000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "4974.82",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "1",
+    "leverage_L": "4",
+    "sizing_equity_usd": "4974.82",
+    "session_number": 6,
+    "drawdown_fraction": "0.003260"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T20:19:23.408765Z"
+   },
+   "status": "passed",
+   "orders_submitted": 4,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.12",
+     "average_fill_price": "3.11",
+     "fills": 3,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.56",
+     "average_fill_price": "40.36",
+     "fills": 1,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.11",
+     "average_fill_price": "3.12",
+     "fills": 1,
+     "reason": "controller_stop",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "1.00"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.00",
+     "average_fill_price": "40.20",
+     "fills": 1,
+     "reason": "controller_stop",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-3.84"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "controller_stop",
+     "exit_triggered_at": "2026-09-29T20:21:14.733766Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "1.00"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "controller_stop",
+     "exit_triggered_at": "2026-09-29T20:21:14.733766Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-3.84"
+    }
+   ],
+   "skipped_entries": [
+    {
+     "symbol": "IOVA",
+     "rank": 2,
+     "reason": "entries_not_enabled"
+    },
+    {
+     "symbol": "NCPL",
+     "rank": 4,
+     "reason": "entries_not_enabled"
+    },
+    {
+     "symbol": "SSTI",
+     "rank": 5,
+     "reason": "entries_not_enabled"
+    }
+   ],
+   "fills": {
+    "engine_fill_events": 6,
+    "ledger_executions": 6,
+    "broker_fill_activities": 6,
+    "matched": 6,
+    "unconfirmed": 0,
+    "at_reference_quote": 6,
+    "better_than_reference": 0,
+    "worse_than_reference": 0
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 42,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 1,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 0,
+    "data_stream_gap_lines": 1
+   },
+   "dropped_crossed_quotes": {
+    "total": 0
+   },
+   "native_quotes": 330,
+   "requests": {
+    "read": 16,
+    "submit": 4,
+    "cancel": 0,
+    "peak_requests_any_60s": 20,
+    "peak_submits_any_60s": 2,
+    "engine_reported": {
+     "read": 16,
+     "submit": 4
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 31,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 26,
+      "submit:200": 4
+     },
+     "min_x_ratelimit_remaining": 191
+    }
+   },
+   "trial_start": "2026-09-29T20:19:23.754307Z",
+   "hard_flatten_at": "2026-09-29T21:27:23.754307Z",
+   "elapsed_seconds": 125.6,
+   "force_reason": "controller_stop",
+   "force_at": "2026-09-29T20:21:14.733766Z",
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "-2.84",
+    "ledger_delta": "-2.84",
+    "broker_recomputed_cash_flow": "-2.84"
+   },
+   "buy_notional_usd": "1279.64",
+   "sell_notional_usd": "1276.80",
+   "entry_gross_to_sizing_equity": "0.257",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-19.11"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-19.11",
+    "lifetime_gross_loss_usd": "113.06",
+    "drawdown_usd": "19.11",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "16:21:32 ET ext-20260929-3 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-19.11",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 31,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "4 of 4"
+    },
+    "verdict": "pass",
+    "failed_clauses": [],
+    "not_evaluable_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions",
+   "force_note": "controller_stop at 16:21:14 ET: the engine loop found controller.stop already set (mover_runner.py:296-309); the receipt does not record what set it (see errors_rejects_retries.controller_stop)"
+  },
+  {
+   "attempt": 4,
+   "trial_id": "ext-20260929-4",
+   "unit": "paper-ext-20260929",
+   "started_at": "2026-09-29T20:21:32Z",
+   "ended_at": "2026-09-29T21:11:31Z",
+   "et": {
+    "scan_start": "16:21:32",
+    "check": "16:22:21",
+    "synthetic": "16:23:50",
+    "paper_start": "16:23:50",
+    "paper_end": "17:09:47",
+    "end": "17:11:31",
+    "recover_end": "17:11:31"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V1000000|any",
+    "fired": 8,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "NCPL",
+     "SSTI"
+    ],
+    "scan_time": "2026-09-29T20:22:13Z",
+    "age_seconds_at_trial_start": 186.687,
+    "scan_log_sha256": "cc9c9d1e1f8933d324798c68613f9b246f1313ecca37479171d000b554bd74f2"
+   },
+   "check": "valid",
+   "synthetic": "completed_no_signals (SYN, flat)",
+   "rule": "10:00|G20|V1000000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "4971.98",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "1",
+    "leverage_L": "4",
+    "sizing_equity_usd": "4971.98",
+    "session_number": 7,
+    "drawdown_fraction": "0.003829"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T20:25:18.850109Z"
+   },
+   "status": "needs_attention",
+   "orders_submitted": 5,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.10",
+     "average_fill_price": "3.09",
+     "fills": 3,
+     "status": "filled"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "68",
+     "limit_price": "14.53",
+     "average_fill_price": "14.46",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.57",
+     "average_fill_price": "40.37",
+     "fills": 2,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.08",
+     "average_fill_price": "3.09",
+     "fills": 1,
+     "reason": "transport_gap",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "0.00"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.21",
+     "average_fill_price": null,
+     "fills": 0,
+     "reason": "transport_gap",
+     "status": "submitted",
+     "ledger_status": "not_sent"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "transport_gap",
+     "exit_triggered_at": "2026-09-29T21:08:39.604861Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "0.00"
+    },
+    {
+     "symbol": "IOVA",
+     "state": "holding",
+     "exit_reason": "transport_gap",
+     "exit_triggered_at": "2026-09-29T21:08:39.604861Z",
+     "exit_wait_reason": "no_fresh_quote",
+     "realized_pnl_usd": null
+    },
+    {
+     "symbol": "BEX",
+     "state": "exiting",
+     "exit_reason": "transport_gap",
+     "exit_triggered_at": "2026-09-29T21:08:39.604861Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": null
+    }
+   ],
+   "skipped_entries": [
+    {
+     "symbol": "NCPL",
+     "rank": 4,
+     "reason": "spread_exceeds_cap"
+    },
+    {
+     "symbol": "SSTI",
+     "rank": 5,
+     "reason": "no_fresh_quote"
+    }
+   ],
+   "fills": {
+    "engine_fill_events": 7,
+    "ledger_executions": 7,
+    "broker_fill_activities": 7,
+    "matched": 7,
+    "unconfirmed": 0,
+    "at_reference_quote": 7,
+    "better_than_reference": 0,
+    "worse_than_reference": 0
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 42,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 2,
+     "trading": 3
+    },
+    "websocket_lines_without_close_frame": 1,
+    "data_stream_gap_lines": 1
+   },
+   "dropped_crossed_quotes": {
+    "BKYI": 18,
+    "SPY": 16,
+    "total": 34
+   },
+   "native_quotes": 4629,
+   "requests": {
+    "read": 336,
+    "submit": 4,
+    "cancel": 0,
+    "peak_requests_any_60s": 21,
+    "peak_submits_any_60s": 3,
+    "engine_reported": {
+     "read": 336,
+     "submit": 4
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 351,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 346,
+      "submit:200": 4
+     },
+     "min_x_ratelimit_remaining": 191
+    }
+   },
+   "trial_start": "2026-09-29T20:25:19.687261Z",
+   "hard_flatten_at": "2026-09-29T21:33:19.687261Z",
+   "elapsed_seconds": 2633.3,
+   "force_reason": "transport_gap",
+   "force_at": "2026-09-29T21:08:39.604861Z",
+   "handoff_to_recovery": {
+    "at": "2026-09-29T21:09:13.461052+00:00",
+    "force_reason": "transport_gap",
+    "reason": "no_exit_progress",
+    "seconds_after_force": 33.856
+   },
+   "realized_pnl_usd": {
+    "engine": null,
+    "ledger_delta": "0.00",
+    "broker_recomputed_cash_flow": "-1952.16"
+   },
+   "buy_notional_usd": "2261.16",
+   "sell_notional_usd": "309.00",
+   "entry_gross_to_sizing_equity": "0.455",
+   "reconciliation_end": null,
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-19.11",
+    "lifetime_gross_loss_usd": "117.14",
+    "drawdown_usd": "23.19",
+    "halted_reason": "recovery_only"
+   },
+   "flat_at_end": false,
+   "paper_rc": 3,
+   "driver_line": "17:11:31 ET ext-20260929-4 rc=3: no paper=needs_attention recovery=needs_attention",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": false,
+     "flat": false,
+     "cash_match": null,
+     "positions_match": null,
+     "zero_open_orders": null,
+     "pnl_consistent": false,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": false,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "needs_attention",
+     "flat": false,
+     "reconciliation_end": null,
+     "pnl_consistent": false,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [
+      "mvr-ext-20260929-4-0000005"
+     ],
+     "halted_reason": "recovery_only",
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 351,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "4 of 4",
+     "recovery_snapshot_before_bex_sale": {
+      "cash_delta_usd": "-1971.27",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 2,
+      "positions_match": true,
+      "observed_by": "the recover command, before its BEX sale (mover-recovery-4.json)"
+     },
+     "recovery_orders_agreeing_with_broker": "1 of 1",
+     "recovery_intents_not_listed_by_broker": [
+      "rec-ext-20260929-4-0000002"
+     ],
+     "ledger_intent_not_listed_explained": "mvr-ext-20260929-4-0000005 was reserved at 17:09:12.125 ET and never attempted (submit_attempted 0, no request row); rec-ext-20260929-4-0000002 was refused before HTTP (submit_attempted 0)"
+    },
+    "verdict": "needs_attention",
+    "failed_clauses": [
+     "status_passed_or_completed_no_signals",
+     "flat",
+     "pnl_consistent",
+     "no_ledger_halt"
+    ],
+    "not_evaluable_clauses": [
+     "cash_match",
+     "positions_match",
+     "zero_open_orders"
+    ],
+    "null_clauses_note": "cash_match, positions_match and 0 open orders are null because the trial has no end reconciliation; the verdict rests on the failed clauses, not on these",
+    "reason": "not flat (IOVA 68 held after a failed recovery), ledger halted_reason recovery_only (the latch begin_recovery sets), pnl_consistent false, engine status needs_attention in paper and recover"
+   },
+   "recover_rc": 3,
+   "flat_basis": "not flat: IOVA 68 held after both recoveries; the paper receipt has no end reconciliation, and the recover command's only broker proof is its snapshot before the BEX sale (cash_match and positions_match true, 2 positions, 0 open orders)",
+   "force_note": "transport_gap at 17:08:39.604 ET (mover_runner.py:304-306); handoff no_exit_progress at 17:09:13.461 ET, 3 exit timeouts of 10 s after the BKYI exit fill (mover.py:1276-1292)",
+   "realized_pnl_note": "paper stage 0.00 (BKYI 100 bought and sold at 3.09); the recover command then sold BEX 24 at 40.44 against its 40.37 entry, +1.68; IOVA 68 (entry 14.46, cost 983.28 USD) stays open",
+   "realized_pnl_usd_with_recovery": "1.68"
+  }
+ ],
+ "orders": [
+  {
+   "client_order_id": "mvr-ext-20260929-1-0000001",
+   "symbol": "SSTI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "8.28",
+   "reference_quote": {
+    "ask": "8.24"
+   },
+   "average_fill_price": null,
+   "adverse_slippage_vs_reference_usd_per_share": null,
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 0,
+   "ledger_executions": 0,
+   "broker_fill_activities": 0,
+   "submitted_at": "2026-09-29T20:00:25.065823Z",
+   "filled_at": null,
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "canceled",
+    "ledger": "canceled",
+    "broker": "canceled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1,
+   "cancel_reason": "entry_timeout"
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-1-0000002",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.10",
+   "reference_quote": {
+    "ask": "3.09"
+   },
+   "average_fill_price": null,
+   "adverse_slippage_vs_reference_usd_per_share": null,
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 0,
+   "ledger_executions": 0,
+   "broker_fill_activities": 0,
+   "submitted_at": "2026-09-29T20:00:25.900365Z",
+   "filled_at": null,
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "canceled",
+    "ledger": "canceled",
+    "broker": "canceled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1,
+   "cancel_reason": "entry_timeout"
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-1-0000003",
+   "symbol": "BEG",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "17",
+   "limit_price": "56.36",
+   "reference_quote": {
+    "ask": "56.08"
+   },
+   "average_fill_price": null,
+   "adverse_slippage_vs_reference_usd_per_share": null,
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 0,
+   "ledger_executions": 0,
+   "broker_fill_activities": 0,
+   "submitted_at": "2026-09-29T20:00:27.791325Z",
+   "filled_at": null,
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "canceled",
+    "ledger": "canceled",
+    "broker": "canceled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1,
+   "cancel_reason": "entry_timeout"
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-1-0000004",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "68",
+   "limit_price": "14.52",
+   "reference_quote": {
+    "ask": "14.45"
+   },
+   "average_fill_price": null,
+   "adverse_slippage_vs_reference_usd_per_share": null,
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 0,
+   "ledger_executions": 0,
+   "broker_fill_activities": 0,
+   "submitted_at": "2026-09-29T20:00:33.355775Z",
+   "filled_at": null,
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "canceled",
+    "ledger": "canceled",
+    "broker": "canceled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1,
+   "cancel_reason": "entry_timeout"
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-1-0000005",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "24",
+   "limit_price": "40.60",
+   "reference_quote": {
+    "ask": "40.40"
+   },
+   "average_fill_price": null,
+   "adverse_slippage_vs_reference_usd_per_share": null,
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 0,
+   "ledger_executions": 0,
+   "broker_fill_activities": 0,
+   "submitted_at": "2026-09-29T20:00:34.698015Z",
+   "filled_at": null,
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "canceled",
+    "ledger": "canceled",
+    "broker": "canceled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1,
+   "cancel_reason": "entry_timeout"
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000001",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.11",
+   "reference_quote": {
+    "ask": "3.10"
+   },
+   "average_fill_price": "3.0996",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.0004",
+   "fills_at_reference_quote": 5,
+   "fills_better_than_reference": 2,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 7,
+   "ledger_executions": 7,
+   "broker_fill_activities": 7,
+   "submitted_at": "2026-09-29T20:01:51.312363Z",
+   "filled_at": "2026-09-29T20:02:41.054668Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000002",
+   "symbol": "BEG",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "17",
+   "limit_price": "56.37",
+   "reference_quote": {
+    "ask": "56.09"
+   },
+   "average_fill_price": "55.94",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.15",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 1,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:01:53.428187Z",
+   "filled_at": "2026-09-29T20:02:38.579674Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000003",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "24",
+   "limit_price": "40.59",
+   "reference_quote": {
+    "ask": "40.39"
+   },
+   "average_fill_price": "40.30",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.09",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 1,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:01:53.480891Z",
+   "filled_at": "2026-09-29T20:02:38.629505Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000004",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "68",
+   "limit_price": "14.57",
+   "reference_quote": {
+    "ask": "14.50"
+   },
+   "average_fill_price": "14.50",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:02:08.868741Z",
+   "filled_at": "2026-09-29T20:02:38.302266Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000005",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "controller_stop",
+   "qty": "100",
+   "limit_price": "3.05",
+   "reference_quote": {
+    "bid": "3.06"
+   },
+   "average_fill_price": "3.06",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 3,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 3,
+   "ledger_executions": 3,
+   "broker_fill_activities": 3,
+   "submitted_at": "2026-09-29T20:18:15.956010Z",
+   "filled_at": "2026-09-29T20:18:16.853316Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000006",
+   "symbol": "BEG",
+   "side": "sell",
+   "reason": "controller_stop",
+   "qty": "17",
+   "limit_price": "55.37",
+   "reference_quote": {
+    "bid": "55.64"
+   },
+   "average_fill_price": "55.64",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T20:18:19.394984Z",
+   "filled_at": "2026-09-29T20:18:19.965231Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000007",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "controller_stop",
+   "qty": "68",
+   "limit_price": "14.40",
+   "reference_quote": {
+    "bid": "14.47"
+   },
+   "average_fill_price": "14.47",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 4,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 4,
+   "ledger_executions": 4,
+   "broker_fill_activities": 4,
+   "submitted_at": "2026-09-29T20:18:27.885117Z",
+   "filled_at": "2026-09-29T20:18:29.195365Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-2-0000008",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "controller_stop",
+   "qty": "24",
+   "limit_price": "39.97",
+   "reference_quote": {
+    "bid": "40.17"
+   },
+   "average_fill_price": "40.17",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:18:31.387541Z",
+   "filled_at": "2026-09-29T20:18:31.598116Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-3-0000001",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.12",
+   "reference_quote": {
+    "ask": "3.11"
+   },
+   "average_fill_price": "3.11",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 3,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 3,
+   "ledger_executions": 3,
+   "broker_fill_activities": 3,
+   "submitted_at": "2026-09-29T20:19:34.574821Z",
+   "filled_at": "2026-09-29T20:19:35.488157Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-3-0000002",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "24",
+   "limit_price": "40.56",
+   "reference_quote": {
+    "ask": "40.36"
+   },
+   "average_fill_price": "40.36",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:19:34.620566Z",
+   "filled_at": "2026-09-29T20:19:34.777944Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-3-0000003",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "controller_stop",
+   "qty": "100",
+   "limit_price": "3.11",
+   "reference_quote": {
+    "bid": "3.12"
+   },
+   "average_fill_price": "3.12",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:21:15.520581Z",
+   "filled_at": "2026-09-29T20:21:15.923061Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-3-0000004",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "controller_stop",
+   "qty": "24",
+   "limit_price": "40.00",
+   "reference_quote": {
+    "bid": "40.20"
+   },
+   "average_fill_price": "40.20",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:21:24.757990Z",
+   "filled_at": "2026-09-29T20:21:24.886575Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-4-0000001",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.10",
+   "reference_quote": {
+    "ask": "3.09"
+   },
+   "average_fill_price": "3.09",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 3,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 3,
+   "ledger_executions": 3,
+   "broker_fill_activities": 3,
+   "submitted_at": "2026-09-29T20:25:22.691943Z",
+   "filled_at": "2026-09-29T20:25:23.768890Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-4-0000002",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "24",
+   "limit_price": "40.57",
+   "reference_quote": {
+    "ask": "40.37"
+   },
+   "average_fill_price": "40.37",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T20:25:22.742558Z",
+   "filled_at": "2026-09-29T20:25:23.446769Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-4-0000003",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "68",
+   "limit_price": "14.53",
+   "reference_quote": {
+    "ask": "14.46"
+   },
+   "average_fill_price": "14.46",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T20:25:48.534749Z",
+   "filled_at": "2026-09-29T20:25:48.619073Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-4-0000004",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "transport_gap",
+   "qty": "100",
+   "limit_price": "3.08",
+   "reference_quote": {
+    "bid": "3.09"
+   },
+   "average_fill_price": "3.09",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T21:08:42.894306Z",
+   "filled_at": "2026-09-29T21:08:43.283251Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-ext-20260929-4-0000005",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "transport_gap",
+   "qty": "24",
+   "limit_price": "40.21",
+   "reference_quote": {
+    "bid": "40.41"
+   },
+   "average_fill_price": null,
+   "adverse_slippage_vs_reference_usd_per_share": null,
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 0,
+   "ledger_executions": 0,
+   "broker_fill_activities": null,
+   "submitted_at": null,
+   "filled_at": null,
+   "type": null,
+   "time_in_force": null,
+   "extended_hours": null,
+   "final_status": {
+    "engine": "submitted",
+    "ledger": "not_sent",
+    "broker": null
+   },
+   "broker_agrees_with_ledger": null,
+   "trial": 4,
+   "not_sent_reason": "recovery_proven_never_attempted",
+   "submit_attempted": false,
+   "reserved_at": "2026-09-29T21:09:12.125655Z"
+  }
+ ],
+ "recovery_orders": [
+  {
+   "client_order_id": "rec-ext-20260929-4-0000001",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "owned_residual_exit",
+   "qty": "24",
+   "limit_price": "40.42",
+   "reference_quote": {
+    "bid": "40.44"
+   },
+   "average_fill_price": "40.44",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T21:10:09.055226Z",
+   "filled_at": "2026-09-29T21:10:09.601400Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "final_status": {
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "rec-ext-20260929-4-0000002",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "owned_residual_exit",
+   "qty": "68",
+   "limit_price": "14.38",
+   "reference_quote": {
+    "bid": "14.40"
+   },
+   "average_fill_price": null,
+   "ledger_executions": 0,
+   "broker_fill_activities": null,
+   "submitted_at": null,
+   "final_status": {
+    "ledger": "not_sent",
+    "broker": null
+   },
+   "broker_agrees_with_ledger": null,
+   "not_sent_reason": "transport_proven_not_sent",
+   "submit_attempted": false,
+   "reserved_at": "2026-09-29T21:11:14.044Z",
+   "trial": 4
+  }
+ ],
+ "recovery_orders_note": "The recover command's two intents (prefix rec-ext-20260929-). Each reference bid is the ledger's last mark for the symbol before the reservation, and each limit is that bid minus 0.02 (recovery.py:209-210). The engine's live events do not cover the recover command.",
+ "fills_at_reference_quote": {
+  "fills": 29,
+  "better_than_reference": 4,
+  "worse_than_reference": 0,
+  "of": 33,
+  "recovery_fills_at_reference_bid": 2,
+  "basis": "Each ledger execution price (every one matched to a broker FILL activity on cum_qty, qty and price) compared with its order's reference quote from the engine events: the ask for a buy, the bid for a sell. Better means below the ask for a buy or above the bid for a sell. The recovery's 2 fills are compared with the ledger's bid mark instead (recovery_orders)."
+ },
+ "engine_receipt_average_differences": [],
+ "recovery_20260929": {
+  "trial": 4,
+  "force": {
+   "reason": "transport_gap",
+   "at": "2026-09-29T21:08:39.604861Z",
+   "at_et": "17:08:39.604",
+   "exits_triggered": [
+    "BKYI",
+    "IOVA",
+    "BEX"
+   ],
+   "source": "live/events.jsonl mover_force and mover_exit_triggered; engine receipt force_at"
+  },
+  "bkyi_exit": "mvr-ext-20260929-4-0000004, submitted 17:08:42 ET (bid 3.09, limit 3.08), filled 100 at 3.09 at 17:08:43 ET",
+  "bex_exit": {
+   "client_order_id": "mvr-ext-20260929-4-0000005",
+   "reserved_at": "2026-09-29T21:09:12.125Z",
+   "reserved_at_et": "17:09:12.125",
+   "bid": "40.41",
+   "limit_price": "40.21",
+   "submit_attempted": false,
+   "request_rows": 0,
+   "ledger_status": "not_sent",
+   "not_sent_reason": "recovery_proven_never_attempted",
+   "note": "handed to the native adapter at 17:09:12 ET (mover_exit_submitted) and reserved in the ledger, but it never reached the durable request budget (no request row, submit_attempted 0)"
+  },
+  "iova_exit_in_paper": "none submitted: the leg's exit_wait_reason at the end was no_fresh_quote",
+  "handoff": {
+   "reason": "no_exit_progress",
+   "at": "2026-09-29T21:09:13.461052Z",
+   "at_et": "17:09:13.461",
+   "seconds_after_force": 33.856,
+   "rule": "mover.py:1276-1292 with HANDOFF_EXIT_TIMEOUTS 3 (mover.py:88) and the 10 s exit timeout: 30 s without a fall in the held quantity since the force or the last fill (the BKYI exit at 17:08:43 ET)"
+  },
+  "in_process_recovery": {
+   "source": "the paper stage's forced recovery (mover_runner.py:783-787); engine receipt reconciliation.recovery",
+   "recovery_started_at": "2026-09-29T21:09:13.735Z",
+   "recovery_started_at_et": "17:09:13.735",
+   "marked_not_sent": "mvr-ext-20260929-4-0000005 (recovery_proven_never_attempted, recovery.py:154-160)",
+   "errors": [
+    "TransportError"
+   ],
+   "exit_attempt_client_ids": [],
+   "broker_positions_last_observed": null,
+   "positions": [
+    {
+     "qty": "68",
+     "symbol": "IOVA"
+    },
+    {
+     "qty": "24",
+     "symbol": "BEX"
+    }
+   ],
+   "status": "needs_attention",
+   "request_rows_between_17_08_42_and_17_09_48_et": 0,
+   "note": "It ended with a TransportError before any broker snapshot and without an exit attempt; the receipt records the exception type only."
+  },
+  "paper_stage_end": "paper rc=3 at 17:09:47 ET (series console)",
+  "recover_command": {
+   "receipt": "mover-recovery-4.json (committed byte-identical)",
+   "reads_before_its_recovery_started": {
+    "count": 12,
+    "at_et": "17:09:48"
+   },
+   "recovery_started_at": "2026-09-29T21:10:04.225Z",
+   "recovery_started_at_et": "17:10:04.225",
+   "deadline": "min(cleanup 600 s, 120 s) = 120 s; an exit starts only while a whole exit (2 x the 10 s order timeout = 20 s) still fits (recovery.py)",
+   "snapshot_before_bex_sale": {
+    "cash_delta_usd": "-1971.27",
+    "cash_match": true,
+    "open_orders": 0,
+    "positions": 2,
+    "positions_match": true
+   },
+   "broker_positions_last_observed": [
+    {
+     "qty": "24",
+     "symbol": "BEX"
+    },
+    {
+     "qty": "68",
+     "symbol": "IOVA"
+    }
+   ],
+   "bex_sale": {
+    "client_order_id": "rec-ext-20260929-4-0000001",
+    "reserved_at_et": "17:10:09.018",
+    "limit_price": "40.42",
+    "bid_mark": "40.44",
+    "bid_mark_at_et": "17:10:08.795",
+    "fills": [
+     {
+      "qty": "5",
+      "price": "40.44",
+      "at_et": "17:10:09.312"
+     },
+     {
+      "qty": "19",
+      "price": "40.44",
+      "at_et": "17:10:09.603"
+     }
+    ],
+    "average_fill_price": "40.44",
+    "entry_average": "40.37",
+    "realized_pnl_usd": "1.68",
+    "pricing": "bid minus 0.02 (recovery.py:209-210); both fills at the bid"
+   },
+   "iova_sale": {
+    "client_order_id": "rec-ext-20260929-4-0000002",
+    "reserved_at": "2026-09-29T21:11:14.044Z",
+    "reserved_at_et": "17:11:14.044",
+    "limit_price": "14.38",
+    "bid_mark": "14.40",
+    "bid_mark_at_et": "17:11:14.023",
+    "quote_age_at_reservation_seconds": "0.021",
+    "seconds_after_bex_sale_filled": "64.4",
+    "wait_note": "recovery exits the alphabetically first held symbol whose own quote is fresh and otherwise waits (recovery.py:184-207); the IOVA quote it used is stamped 17:11:14.023 ET",
+    "submit_attempted": false,
+    "request_rows": 0,
+    "ledger_status": "not_sent",
+    "not_sent_reason": "transport_proven_not_sent",
+    "error": "SubmissionNotSent"
+   },
+   "errors": [
+    "SubmissionNotSent"
+   ],
+   "exit_attempt_client_ids": [
+    "rec-ext-20260929-4-0000001",
+    "rec-ext-20260929-4-0000002"
+   ],
+   "flat": false,
+   "positions_after": [
+    {
+     "qty": "68",
+     "symbol": "IOVA"
+    }
+   ],
+   "recover_rc": 3,
+   "ended_at_et": "17:11:31",
+   "requests_from_its_recovery_started_to_the_iova_reservation": {
+    "read": 4,
+    "submit": 1
+   }
+  },
+  "iova_refusal_analysis": {
+   "what_is_recorded": "the ledger marks rec-ext-20260929-4-0000002 transport_proven_not_sent (runner.py:1110-1125), and the recover receipt records only the exception type SubmissionNotSent (recovery.py:22-24). The transport raises SubmissionNotSent('submission prevented before HTTP request') for any exception in its submit hooks (the budget hook and then the wire guard) and for a deferred budget (transport.py:804-818), so the refusal reason itself is not recorded.",
+   "discriminator": "request_budget (safety.py:1299-1311) inserts the request row and sets submit_attempted=1 in one transaction, or returns a delay without writing only when the prior 60 s hold 150 requests or 130 submits. The IOVA intent has submit_attempted 0 and no request row; the ledger's last request is the BEX sale's submit at 17:10:09.024 ET, and the 60 s before the IOVA reservation hold 0 requests. So the submission never reached a reservation.",
+   "excluded_by_the_files": [
+    "the per-minute request and submit caps (150 and 130): 0 requests in the prior 60 s cannot defer (runner.py:846-858); from the recover command's recovery_started to the refusal the ledger holds 4 reads and 1 submit",
+    "the transport wire guard (transport.py:1173-1179, bound as before_send at transport.py:1062): it runs only after the hook returns a durable reservation, and there was none",
+    "the order-contract gates (transport.py:205-213): they raise OrderContractRefused, recorded as order_contract_refused, not transport_proven_not_sent",
+    "the transport's not-ready refusal (transport.py:1414-1416): it precedes the ledger reservation, and the intent was reserved",
+    "the recovery's own exit-budget guard (recovery.py:139-149): a refusal there ends the recovery as recovery_quote_not_fresh or recovery_deadline_reached (recovery.py:238-250), not SubmissionNotSent; about 50 s of the 120 s deadline remained against a 20 s whole exit",
+    "validate_pending's other checks for a sell (safety.py:862-915): the session was open (the recovery checks it before each exit), the sell window runs 600 s from the recovery start, 1 order was outstanding against 20, 68 shares were held against 68 pending, and it checks no price bound for a sell; _refresh_risk (safety.py:752-766) only latches halts"
+   ],
+   "not_excluded_by_the_files": [
+    "validate_pending's quote check (quote_not_fresh, safety.py:658-662): the IOVA quote was 0.021 s old at the reservation (ledger mark 17:11:14.023 ET), but the refusal's time is not recorded, so its age at the check is unknown",
+    "the transport's 0.25 s deadline for the submit hook on the owner loop (transport.py:1148-1167), whose TransportError the transport sanitizes the same way"
+   ],
+   "conclusion": "The files cannot distinguish these two."
+  },
+  "data_stream": "trial 4's paper log has one line 'no data received on data stream for 30.0s, reconnecting' (alpaca-py, alpaca/data/live/websocket.py:253); the logs carry no timestamps",
+  "freeze_known_effect": "the freeze accepted this path as a known effect (#215 part 2 and the run-loop stall: sparse after-hours quotes can freeze the transport, so a residual can stay open overnight); see frozen_acceptance.known_effects_text"
+ },
+ "residual_recovery_20260930": {
+  "status": "pending",
+  "pending_text": "PENDING: final disposition filled in by the coordinator after the engine fee fix and its recovery",
+  "residual": {
+   "symbol": "IOVA",
+   "qty": "68",
+   "cost_basis_usd": "983.28",
+   "entry": "mvr-ext-20260929-4-0000003",
+   "entry_average": "14.46",
+   "entry_filled_at_et": "16:25:48"
+  },
+  "measured_outcome": {
+   "unit": "paper-recover-a2-pre-20260930",
+   "window_et": "2026-09-30 06:00:05-06:51:39",
+   "attempts": 17,
+   "orders_sent": 0,
+   "each_attempt": "status needs_attention, errors [cash_mismatch_or_unmodeled_fees], no exit or cancel attempt, 0 buy submissions, positions IOVA 68",
+   "console_end": "06:51:39 ET not flat by 0650 ET; last attempt 17"
+  },
+  "cause_measured": {
+   "fee_activities_2026_09_29": [
+    {
+     "type": "FEE",
+     "fee": "REG",
+     "date": "2026-09-29",
+     "net_amount_usd": "-0.19"
+    },
+    {
+     "type": "FEE",
+     "fee": "TAF",
+     "date": "2026-09-29",
+     "net_amount_usd": "-0.27"
+    },
+    {
+     "type": "FEE",
+     "fee": "CAT",
+     "date": "2026-09-29",
+     "net_amount_usd": "-0.01"
+    }
+   ],
+   "fee_total_usd": "-0.47",
+   "cash_gap_usd": "-0.47",
+   "cash_gap_definition": "broker cash minus the trial's baseline cash minus the ledger's execution cash flow (cash_gap_check.py)",
+   "gap_equals_fees": true,
+   "rule": "runner.py:761-763 fails closed when the broker's cash delta differs from the ledger's by more than 0.01 USD",
+   "engine_fee_model": "none in b528bb55"
+  },
+  "sources": "RECOVER-20260930-OUTCOME.md (private note, sha256 in private_artifacts_sha256), the 17 attempt receipts and the recovery console (hashed), and reconcile-20260929/cash-gap-account2-20260930.json (private; account number redacted; hashed). The 2026-09-30 09:08Z ledger snapshot predates these attempts, so the 0 orders rest on the 17 receipts and the console, not on the ledger.",
+  "final_disposition": null
+ },
+ "cleanup": {
+  "flat": false,
+  "series_end_positions": 1,
+  "series_end_position_symbols": [
+   "IOVA"
+  ],
+  "series_end_open_orders": 0,
+  "broker_positions_at_reconciliation_read": 1,
+  "broker_position_symbols_at_reconciliation_read": [
+   "IOVA"
+  ],
+  "broker_open_orders_at_reconciliation_read": 0,
+  "ledger_positions_nonzero": 1,
+  "proof": "the ledger snapshot (IOVA 68 at cost 983.28, every other position 0, no unresolved intent, no request or event after 17:11:14 ET) and the independent broker read at 2026-09-30 09:06Z (1 position, IOVA; 0 open orders)"
+ },
+ "broker_reconciliation": {
+  "observed_at": "2026-09-30T09:06:12.271019Z",
+  "tool": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile_ext_series.py (main)",
+  "tool_sha256": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+  "tool_note": "run from a byte-identical private copy (same sha256); cited here instead of copied",
+  "stdout": "reconcile-ext-20260929.stdout.json",
+  "stdout_sha256": "e8131c7cc24a3bf69dee1ae35678527ece33ca5510c0aa71823a815273e335ba",
+  "stdout_note": "byte-identical to the run's stdout; the private-detail check found nothing to redact",
+  "run": "run once by the trading-lane coordinator at 2026-09-30 09:06Z with the pinned adaptive-paper interpreter, --env-file \"$PAPER_ENV_FILE_2\" under /bin/bash -ic, prefix mvr-ext-20260929- and the window below; the ledger path went through a shell variable and is not recorded",
+  "method": "alpaca-py TradingClient.get_orders(status=all, after, until, limit=500, asc); GET /v2/account/activities?activity_types=FILL (after, until, asc, page_size=100, page_token); get_all_positions; get_orders(status=open); joined in memory to the engine mover ledger (sqlite mode=ro) on client order id and (cum_qty, qty, price)",
+  "alpaca_py": "0.44.0",
+  "python": "3.12.3",
+  "window": {
+   "after": "2026-09-29T20:00:00Z",
+   "until": "2026-09-30T00:10:00Z"
+  },
+  "prefix": "mvr-ext-20260929-",
+  "orders_listed_in_window": 22,
+  "orders_with_series_prefix": 21,
+  "orders_without_series_prefix": 1,
+  "order_final_status_counts": {
+   "canceled": 5,
+   "filled": 16
+  },
+  "fill_activity_pages": 1,
+  "fill_activities_in_window": 35,
+  "fill_activities_not_joined_to_series_orders": 2,
+  "ledger_intents": 22,
+  "ledger_executions": 33,
+  "ledger_intents_not_listed_by_broker": [
+   "mvr-ext-20260929-4-0000005"
+  ],
+  "ledger_broker_ids_not_in_listing": 0,
+  "executions_matched_on_cum_qty_qty_price": 33,
+  "executions_matched_on_execution_id": 33,
+  "max_ledger_vs_broker_time_skew_seconds": 0.003,
+  "unconfirmed_executions": [],
+  "orders_agreeing_with_ledger": 21,
+  "broker_sells_minus_buys_usd": {
+   "by_trial": {
+    "2": "-14.22",
+    "3": "-2.84",
+    "4": "-1952.16"
+   },
+   "total": "-1969.22"
+  },
+  "realized_pnl_usd_broker_recomputed": {
+   "2": "-14.22",
+   "3": "-2.84",
+   "total": "-17.06"
+  },
+  "realized_note": "The tool's broker_recomputed_realized_pnl figure is sells minus buys from the FILL activities. It equals realized P&L only for a trial that ended flat; realized_pnl_usd_broker_recomputed keeps those trials only.",
+  "positions_now": 1,
+  "position_symbols_now": [
+   "IOVA"
+  ],
+  "open_orders_now": 0,
+  "ledger_positions_nonzero": [
+   "IOVA"
+  ],
+  "independence": "Separate from the engine transport and ledger writer, same broker API and account: independent of the engine code, not of the broker.",
+  "recovery_prefix_note": "this run's 1 order and 2 fills are the series run's 1 order without the series prefix and its 2 unjoined fills; the series run's 21 orders and 33 fills are this run's 21 and 33 without its prefix, so 0 orders and 0 fills in the window are foreign to both"
+ },
+ "journal_query": {
+  "queried_at": "2026-09-30T18:05:08Z",
+  "command": "journalctl --user --no-pager -o json USER_UNIT=<unit>.service",
+  "journald": "systemd 255 (255.4-1ubuntu8.17)",
+  "result": "The series unit has an exit record (EXIT_STATUS 3) and a result record (exit-code), and triggered its OnFailure alert unit; the incentive monitor has start records and a resource-accounting record only.",
+  "unit_files": "the unit and timer files' sha256 (private_artifacts_sha256) equal the private series index's table on 2026-09-30"
+ },
+ "units": [
+  {
+   "unit": "paper-ext-20260929",
+   "role": "series-driver.sh ext-20260929 on account 2 ($PAPER_ENV_FILE_2)",
+   "started_at": "2026-09-29T20:00:05Z",
+   "stopped_at": "2026-09-29T21:11:31Z",
+   "journal_records": [
+    "on_failure_triggered",
+    "unit_process_exit",
+    "unit_resources",
+    "unit_result",
+    "unit_started",
+    "unit_starting"
+   ],
+   "journal_exit_records": 2,
+   "exit_status": 3,
+   "result": "exit-code",
+   "inferred": false,
+   "console_end": "17:11:31 ET series stops: ext-20260929-4 no paper=needs_attention recovery=needs_attention",
+   "on_failure": "the OnFailure alert unit (paper-alert@%n.service for this unit) ran 17:11:31-17:11:37 ET and posted to the ntfy paper-lane topic"
+  },
+  {
+   "unit": "incentive-monitor-20260929",
+   "role": "incentive-monitor monitor.py run --standalone until 20:00 ET on account 2's key; data only (its docstring: it never places, changes or cancels an order). Not a writer: the broker listing has 0 orders outside the series and recovery prefixes in this window.",
+   "started_at": "2026-09-29T07:55:00Z",
+   "stopped_at": "2026-09-30T00:00:14Z",
+   "journal_records": [
+    "unit_resources",
+    "unit_started",
+    "unit_starting"
+   ],
+   "journal_exit_records": 0,
+   "exit_status": null,
+   "result": null,
+   "inferred": true,
+   "inferred_result": "success",
+   "result_note": "The journal holds this unit's start records and its resource-accounting record at stop: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record. Success is inferred from the absence of a failure record, not observed."
+  }
+ ],
+ "series_totals": {
+  "attempts": 4,
+  "verdicts": {
+   "pass": [
+    1,
+    2,
+    3
+   ],
+   "fail": [],
+   "needs_attention": [
+    4
+   ],
+   "inconclusive": []
+  },
+  "engine_statuses": {
+   "completed_no_signals": 1,
+   "passed": 2,
+   "needs_attention": 1
+  },
+  "orders_submitted_engine": 22,
+  "orders_listed_by_broker": 21,
+  "entries_filled": 9,
+  "exits_filled": 7,
+  "fill_events": 33,
+  "fills_at_reference_quote": 29,
+  "fills_better_than_reference": 4,
+  "fills_worse_than_reference": 0,
+  "rejects": 0,
+  "cancels": 5,
+  "unconfirmed_fills": 0,
+  "benchmark_quotes_not_ready_refusals": 0,
+  "retries": 0,
+  "average_invariant_mismatches": 0,
+  "duplicate_executions": 0,
+  "peak_requests_any_60s": 22,
+  "peak_submits_any_60s": 5,
+  "min_x_ratelimit_remaining": 190,
+  "http_429": 0,
+  "orders_submitted_engine_note": "the engine's native submission count (5, 8, 4 and 5); 21 reached the broker, and the 22nd (trial 4's BEX exit) was reserved but never sent",
+  "entries_submitted": 14,
+  "exits_submitted": 8,
+  "entries_canceled": 5,
+  "exits_not_sent": 1,
+  "recovery_orders": {
+   "intents": 2,
+   "listed_by_broker": 1,
+   "filled": 1,
+   "not_sent": 1,
+   "fill_events": 2
+  },
+  "fill_events_with_recovery": 35,
+  "realized_pnl_usd": {
+   "by_trial": {
+    "1": "0.00",
+    "2": "-14.22",
+    "3": "-2.84",
+    "4": "1.68"
+   },
+   "trial_4_parts": {
+    "paper_stage": "0.00",
+    "recovery_bex": "1.68"
+   },
+   "engine_trials_1_to_3": "-17.06",
+   "series": "-15.38",
+   "ledger_delta": "-15.38",
+   "broker": "trials 2 and 3 from the broker's sells minus buys (-14.22, -2.84); trial 4 from -1952.16 + 970.56 = -981.60 plus the open IOVA cost 983.28 = +1.68"
+  },
+  "open_position": {
+   "symbol": "IOVA",
+   "qty": "68",
+   "cost_basis_usd": "983.28",
+   "note": "not in the realized figures; the mark-to-market at the series end is not recorded"
+  },
+  "cash_flow_usd": {
+   "broker_series_prefix": "-1969.22",
+   "broker_recovery_prefix": "970.56",
+   "total": "-998.66",
+   "trial_4_with_recovery": "-981.60",
+   "equals": "realized -15.38 minus the open IOVA cost 983.28"
+  },
+  "gross_loss_usd": "18.06",
+  "gross_loss_note": "the sum of the losing legs' realized P&L (trial 2 BKYI -3.96, IOVA -2.04, BEX -3.12 and BEG -5.10; trial 3 BEX -3.84); the ledger's realized_loss 113.06 is this plus pre-20260929's 95.00",
+  "planned_gross_budget_usd": [
+   "4989.04",
+   "4989.04",
+   "4974.82",
+   "4971.98"
+  ],
+  "engine_leverage_multiple": [
+   "1",
+   "1",
+   "1",
+   "1"
+  ],
+  "buy_notional_usd": [
+   "0.00",
+   "3214.14",
+   "1279.64",
+   "2261.16"
+  ],
+  "entry_gross_to_sizing_equity": [
+   "0.000",
+   "0.644",
+   "0.257",
+   "0.455"
+  ],
+  "retries_basis": "the series console: one scan start and one paper start per trial, no benchmark_quotes_not_ready and no 429 stop"
+ },
+ "ledger": {
+  "state_root": "the new account-2 root roots/account2-20260929 (shared with pre-20260929)",
+  "at_series_end": {
+   "lifetime_realized_pnl_usd": "-17.43",
+   "lifetime_realized_loss_usd": "113.06",
+   "cash_delta_usd": "-1000.71",
+   "halted_reason": "recovery_only",
+   "recovery_started_at": "2026-09-29T21:10:04.225Z",
+   "peak_pnl_usd": "0.00",
+   "peak_pnl_note": "ledger meta peak_pnl, a mark-to-market running maximum that starts at 0; it never rose above 0 on this ledger",
+   "positions": "IOVA 68 at cost 983.28; the other 6 symbols at 0",
+   "drawdown_usd_at_trial_4_paper_end": "23.19",
+   "gross_loss_usd_at_trial_4_paper_end": "117.14",
+   "gross_loss_note": "the engine's gross loss includes open positions' unrealized loss at the bid, so trial 4's 117.14 exceeds the realized 113.06"
+  },
+  "this_series": {
+   "realized_pnl_usd": "-15.38",
+   "realized_loss_usd": "18.06",
+   "cash_delta_usd": "-998.66",
+   "basis": "the snapshot's lifetime figures minus pre-20260929's (-2.05 realized, 95.00 realized loss, -2.05 cash); the per-trial figures add to the same"
+  },
+  "halt_note": "recovery_only is the latch begin_recovery sets (safety.py:563-581); it blocks entries until a flat, reconciled next trial clears it (safety.py:627-636). It is not a loss cap: the realized loss 113.06 is under 480 and no risk_halt event exists.",
+  "note": "Account 2's ledger in the new root began with pre-20260929 that morning. The snapshot holds no request or event after 17:11:14 ET on 2026-09-29, so its figures are this series' end state. The freeze notes that account 2's mover history spans two ledgers (ext-20260928 in the default root, and this root) and that lifetime figures add them.",
+  "snapshot": {
+   "account": 2,
+   "sha256": "b544fac24a249e12ebef8bc6f73016c6048ea076b0d8e44e199ae17b7a089300",
+   "taken_at": "2026-09-30T09:08Z",
+   "method": "SQLite online-backup copy of the live mover ledger opened mode=ro, taken by the coordinator while no process held either state root; read here with mode=ro&immutable=1; not committed"
+  }
+ },
+ "fees": {
+  "account_2_fee_activities_for_2026_09_29": [
+   {
+    "type": "FEE",
+    "fee": "REG",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.19"
+   },
+   {
+    "type": "FEE",
+    "fee": "TAF",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.27"
+   },
+   {
+    "type": "FEE",
+    "fee": "CAT",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.01"
+   }
+  ],
+  "total_usd": "-0.47",
+  "covers": "all account-2 trading on 2026-09-29: pre-20260929, this series and its recovery",
+  "bases_recomputed_from_ledger": {
+   "sell_proceeds_usd": "8820.73",
+   "sell_shares": "1357",
+   "sell_executions": 38,
+   "executions": 81
+  },
+  "source": "reconcile-20260929/cash-gap-account2-20260930.json (private; account number redacted; sha256 in private_artifacts_sha256)",
+  "engine_fee_model": "none in b528bb55: realized P&L and every reconciliation here exclude fees",
+  "timing_note": "The fee rows are day totals: their bases (8820.73 USD of proceeds, 1357 shares in 38 sell executions, 81 executions) equal all of account 2's executions that day, the recovery's BEX sale at 17:10 ET included."
+ },
+ "paper_lane_row": {
+  "dashboard_lane": "Alpaca paper accounts 1 and 2",
+  "cites_at_branch_base": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
+  "update": "the coordinator's step: the grand-dashboard state is a shared hot file this branch does not touch",
+  "this_receipt_supports": "account 2: POST series on 2026-09-29, 3 of 4 trials passed (trial 1 completed_no_signals with no fill) and trial 4 needs_attention; the series ended holding IOVA 68 (cost 983.28 USD), still held at the 2026-09-30 09:06Z read; account 2's ledger is in recovery_only; the residual's recovery is pending"
+ },
+ "committed_copies": {
+  "mover-paper-1.json": {
+   "source": "ext-20260929/1/mover-paper.json",
+   "sha256": "c45479e9302cd5fbc28a0148fd7a29928e55b55a39119bd967c20b61b386695d",
+   "sanitization": "5 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-2.json": {
+   "source": "ext-20260929/2/mover-paper.json",
+   "sha256": "144cb333519bf09c1f20ea1a6c041be807423c204c09babfeea9dc5ca712e47b",
+   "sanitization": "8 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-3.json": {
+   "source": "ext-20260929/3/mover-paper.json",
+   "sha256": "41c3759d975af4c3c1a8b2b30e02efeb0471c7fbb588a93af30495bbe8e0f3c5",
+   "sanitization": "4 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-4.json": {
+   "source": "ext-20260929/4/mover-paper.json",
+   "sha256": "b369204a4c8a1902c79ad85262fc89ee47369d72c02b9d1259d9c02d24d6297a",
+   "sanitization": "4 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-recovery-4.json": {
+   "source": "ext-20260929/4/mover-recovery.json",
+   "sha256": "59422b6ab7675314da57c1a5ad33270a30a516894c8366ed759e322efb88cb12",
+   "sanitization": "none needed; byte-identical"
+  },
+  "series.console": {
+   "source": "ext-20260929/series.console",
+   "sha256": "a39023d0ba4e3756092a89d3ec8897acde8b6dd4c7d9f21b84782c54198c67e5",
+   "sanitization": "none; byte-identical to the private file"
+  },
+  "frozen-b528bb55.SHA256SUMS": {
+   "source": "frozen-b528bb55.SHA256SUMS",
+   "sha256": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+   "sanitization": "none; byte-identical to the private file"
+  },
+  "reconcile-ext-20260929.stdout.json": {
+   "source": "reconcile-20260929/ext-20260929.json",
+   "sha256": "e8131c7cc24a3bf69dee1ae35678527ece33ca5510c0aa71823a815273e335ba",
+   "sanitization": "none; byte-identical to the private file"
+  },
+  "reconcile-rec-ext-20260929.stdout.json": {
+   "source": "reconcile-20260929/rec-ext-20260929.json",
+   "sha256": "1231744eb9d746e7a5211141b48a426666cc93d22a464c83de5ac03844267047",
+   "sanitization": "none; byte-identical to the private file"
+  }
+ },
+ "committed_copies_note": "Retained private files committed here after the private-detail check (account fingerprints and their prefixes, broker order ids and refs, execution ids, the host user, home and tmp paths, key-like strings) and sanitize_check.py. Each mover-paper-N.json differs from its private source only inside the broker_order_ref values; each source hash is in private_artifacts_sha256. mover-recovery-4.json holds no broker order ref and is byte-identical.",
+ "private_artifacts_sha256": {
+  "ext-20260929/1/mover-paper.json": "99f89ef81bf62a2180ed489baaaeafe4da3ad6c8c8bed0df8221bddd16994a86",
+  "ext-20260929/2/mover-paper.json": "f9f3640f0dbf9ef2d61d67f4a7afda4d52d03851e8a9aad5879a058866f76a38",
+  "ext-20260929/3/mover-paper.json": "6794d4b8cf5836877171723977f018afe7da103ee6c41dcfdf8f55980c411f92",
+  "ext-20260929/4/mover-paper.json": "a83ea3071a6858c8ff66d7cd2139c53ee861ba1562b75399e4c83cd413007af0",
+  "ext-20260929/config-mover-ext-20260929.json": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+  "ext-20260929/rule.txt": "398ee47f8659973e74eb250723cf96293fbcdb82b22769252a17271f6b76a284",
+  "ext-20260929/series.console": "a39023d0ba4e3756092a89d3ec8897acde8b6dd4c7d9f21b84782c54198c67e5",
+  "ext-20260929/1/scan.json": "2826d84eb9256d05cca84f4492fd64c09b6c4581bfbf614918f0b150a6cb084c",
+  "ext-20260929/1/scan.log": "812b6cc9773b0e594aad13dc49cf12183cce6985f08b5c2ebabfdbb370cb31b7",
+  "ext-20260929/1/scan-full.json": "3c2ec041d00d3d7e1415e83e38787d86f95d33f404ad79f0b44a47bb274c1cdc",
+  "ext-20260929/1/check.json": "86e52e746766e6df152494c62e6cda415b1aefe3e44e23971143d64c90f17afe",
+  "ext-20260929/1/synthetic.json": "d25f7dddb6239e88ba1e5dff2c97c8ed3840e6573d60d9bc93d0dd3c7e36310b",
+  "ext-20260929/1/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "ext-20260929/1/paper.log": "2937c45c33573e83f416cbd2aa0e4f9bb0559c284c8f40dd0abff421a5a96e27",
+  "ext-20260929/1/live/events.jsonl": "ec2d07026c9013c88371b24e059e029be46c07ccbb586d52cc7f4e65edcf834c",
+  "ext-20260929/1/pages/ledger.jsonl": "cdb8ffee5dc551935c79eb9ff917430f67d2effd3b44cd0ca1fd496708d2e043",
+  "ext-20260929/2/scan.json": "d7449cdc3b5b89bdcba3c2f3915090e99f395dcb03bc4e33e12b8d7b64bfeb20",
+  "ext-20260929/2/scan.log": "eedd2a2db43fd8d45fbd6c70bc3039ef7799a8da7dc151f7c2cece2887568534",
+  "ext-20260929/2/scan-full.json": "bb8cb4069f5899d5362587a733b23b8af48651180b6cb451b9ee18892be63dd1",
+  "ext-20260929/2/check.json": "0dd7abc946506e51c577d8ba9d4efa781bd24434936649043f8d1b87b7645b79",
+  "ext-20260929/2/synthetic.json": "1bc7d1d8dc644e03d2e467ba340891b44470721639d42c7d8713c9f344e99230",
+  "ext-20260929/2/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "ext-20260929/2/paper.log": "3e2e5ff7987b2e8f9a615e5252e970b3b329f738b135491347331fc49271ba95",
+  "ext-20260929/2/live/events.jsonl": "5a0b51dc489d1de037b8132ac664fd344d4b895471509ba0fd1d3c473bcfee7c",
+  "ext-20260929/2/pages/ledger.jsonl": "da643f4500aeb6c95bcfab30fc532c92b2466e53c039561a11a68dc41b9a822f",
+  "ext-20260929/3/scan.json": "1c99588aa6c539794e476c6a1d2b1d0f69045c6ecf260a046e11292cfc8d8c41",
+  "ext-20260929/3/scan.log": "b2a55679223fd50b601c733431c1d6ad2cece19dd9d2c7a07ebcfc7c829f42f1",
+  "ext-20260929/3/scan-full.json": "306ae4a2744fec641b730de2b518a28eb2d897303f6e6634338a89de740b81aa",
+  "ext-20260929/3/check.json": "906f7b922d3dd6e73a8fd1b18a18cfb626bcff260c4289866271bf0ed85514ab",
+  "ext-20260929/3/synthetic.json": "d40ed673720675f61cdc734380e6a74859c5a5f1fa1f36c22cf51778bb31079d",
+  "ext-20260929/3/synthetic.log": "529313868fc5b43670a9bd291edfcde6edcdb123fa06cdbcaf4748ce4eb93b4f",
+  "ext-20260929/3/paper.log": "08ef16595215db30012ff42bc0f3f4e5c3bdbeb18ec9911a279b06c6e1800429",
+  "ext-20260929/3/live/events.jsonl": "75b340bf5c52ff529446c7b6e4aa421ca071247f5ae00c70e181b7c69d9bcc0c",
+  "ext-20260929/3/pages/ledger.jsonl": "82b8bb29c7f5b99af72aa19db44fc9873310b556ffe51985de426594daec0ab3",
+  "ext-20260929/4/scan.json": "ff7408f81f072ddf70c48dce10d8651d987ad863d53eb40fa328b301e232f6bf",
+  "ext-20260929/4/scan.log": "49b124562f6d5954b7c17f3c5f4568c814f8c2a6298703d2d78222a7b8a9a206",
+  "ext-20260929/4/scan-full.json": "cc9c9d1e1f8933d324798c68613f9b246f1313ecca37479171d000b554bd74f2",
+  "ext-20260929/4/check.json": "8074f935cec22d3f006c5144534dc8e07e4b5c62b2f00916c790af54bfd06581",
+  "ext-20260929/4/synthetic.json": "58443fd970d2fd28ef90be807b5831c337406aee2381f9fbc666d4c2888636a4",
+  "ext-20260929/4/synthetic.log": "529313868fc5b43670a9bd291edfcde6edcdb123fa06cdbcaf4748ce4eb93b4f",
+  "ext-20260929/4/paper.log": "5ff2219a49dd45768e8bb8f95177dbc2086cb8699a805f91287e0d2bb8b627b7",
+  "ext-20260929/4/live/events.jsonl": "24c83c35a69e97e5ebdaeb1bc962f602dbfabf4486d62384e4871dd508b07bd6",
+  "ext-20260929/4/pages/ledger.jsonl": "143ad99b6239299eb2da3d8cbe0c58354acacd4e404d515807473b17d54531fe",
+  "reconcile-20260929/cash-gap-account2-20260930.json": "c309e914c74aa26fe7b327885dd7d497cff62967c36cc30ee91fdb189d7e5a51",
+  "reconcile-20260929/cash_gap_check.py": "6b9ef4392223d5853332596910cdf78fdf52f15b00e804920337f89c02f0f541",
+  "ext-20260929/4/mover-recovery.json": "59422b6ab7675314da57c1a5ad33270a30a516894c8366ed759e322efb88cb12",
+  "ext-20260929/4/recover.log": "831023bd706b9237bc1da6ad0c070b2a26d037e938bd509a0a04b0bdd9ba7d32",
+  "ext-20260929/RECOVER-20260930-OUTCOME.md": "cdc8405b6dde8027d0ad408b7acdd46c8493db89f8cec831098e6a2a826a0ecd",
+  "reconcile-20260929/rec-ext-20260929.json": "1231744eb9d746e7a5211141b48a426666cc93d22a464c83de5ac03844267047",
+  "ext-20260929/recover-20260930.console": "ebc8d6cd16abc130bc24b7ee63bc4c27693e6f95fa52c5ab2c407ebf61552955",
+  "ext-20260929/recover-20260930/attempt-1/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-1/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/recover-20260930/attempt-2/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-2/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-3/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-3/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-4/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-4/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/recover-20260930/attempt-5/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-5/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-6/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-6/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-7/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-7/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/recover-20260930/attempt-8/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-8/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-9/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-9/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/recover-20260930/attempt-10/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-10/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-11/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-11/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-12/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-12/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-13/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-13/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/recover-20260930/attempt-14/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-14/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/recover-20260930/attempt-15/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-15/recover.log": "d8f5a2f5f505160858a51ab056686394d330fac2054de03604f74b18e42fb24c",
+  "ext-20260929/recover-20260930/attempt-16/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-16/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/recover-20260930/attempt-17/mover-recovery.json": "cfff5ba3c9437610ff4f5cf655095f11e0fa0f6ecad68802cdff98292fa35e5e",
+  "ext-20260929/recover-20260930/attempt-17/recover.log": "a0061b68fb8b80dfd0e3fa9e9553d17abe3e9132861c1860d4b2463e09b105e0",
+  "ext-20260929/RECOVER-20260930.md": "47d2f5182b7276f82745e4f938a1acfd28c3ff10e6b80903f24e0dc4931705b3",
+  "ext-20260929/check-probe-20260929T051431Z.json": "4ac20a50c4c82d96faabc77c347d61c89a640705dade88fad9f442989397abcf",
+  "ext-20260929/probe-20260929T200005Z.json": "78c10d6b19a2910653ad9473c011bcb5524986da798f6c85a967c3b5272b6f64",
+  "series-driver.sh": "feff8f5692b03900add1909b9554e7343357dbc170ad5b783ff5836331d1f608",
+  "run-series-trial.sh": "bbd917040783e8d3e41ed43af137060a52d31d9587d6988f160e124aaa095ca4",
+  "retry-benchmark.sh": "4f82d5f936257869450c72d6f9cc03b0cf0f2fa584891d1abfc9b8a95fe1f27e",
+  "frozen-b528bb55.SHA256SUMS": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+  "reconcile-20260929/ext-20260929.json": "e8131c7cc24a3bf69dee1ae35678527ece33ca5510c0aa71823a815273e335ba",
+  "reconcile-20260929/reconcile_ext_series.py": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+  "systemd user unit paper-ext-20260929.service": "cb2859e7e192d94db5298edd62352e2ef55ef73c6bfeb1141ea2406e766a1b8c",
+  "systemd user unit paper-ext-20260929.timer": "0831646eea2b9cba7b4f2289b8ff6301f72def3fcab9eea3f8cc24866a415f46",
+  "systemd user unit incentive-monitor-20260929.service": "007fd5ba486461e3e778984d3ae0039c5822ec0d992563df59a7d1543cafce15",
+  "systemd user unit incentive-monitor-20260929.timer": "ee549de8b98c592b63183bc216abe3b04ed552d810f46f2ce2288d5d147bebd4"
+ },
+ "private_artifacts_note": "Hashes of retained private files that carry no account fingerprint (checked before hashing). The files in committed_copies are committed here; the rest stay private: the config and rule.txt (their content is in config and scanner_rule), the scan, check and synthetic files, the engine logs and events, the scan page ledgers, the probes, the series scripts and the systemd units. The engine ledgers, the NautilusTrader logs and the scan page caches stay private and are not hashed; the ledger snapshots are cited in ledger_snapshots. For this series they also include trial 4's recover.log, the recovery-prefix reconciliation, the 2026-09-30 recovery plan and outcome notes, and that recovery's 17 attempt receipts, their logs and its console.",
+ "private_notes_sha256": {
+  "ext-20260929/FREEZE.md": "c72bbfedf5280a4510d96628853cd2c11182ddc4749011fccbc077febb741b0c",
+  "SERIES-INDEX.md": "f53fab8bde06b4e317691c030bce74fba3661dd731ffdcc232947ed913993284"
+ },
+ "private_notes_note": "FREEZE.md and the private series index name account fingerprints, so they stay private and are cited by sha256 only; the frozen acceptance and procedure text quoted in this receipt carries no fingerprint.",
+ "field_provenance": {
+  "legend": "asserted: the builder stops unless two or more sources agree. single_source: copied from one source with no cross-source assertion. derived: computed by the builder from the named source. literal: text or a constant written into the builder. Descriptive labels and notes are literal.",
+  "asserted": {
+   "code.engine_sources_sha256, code.frozen_sums counts": "git show b528bb55, the clone's files and the SUMS entries (all three equal)",
+   "config (sha256)": "sha256 of the config file, check.json and every mover-paper.json (preflight too)",
+   "attempts[].scan (fired, candidates, argument_rule)": "scan.log and the series console's scan line",
+   "attempts[].scan_sha256 chain": "sha256 of scan.json, check.json scan_sha256 and mover-paper.json scan_sha256",
+   "attempts[].rule, exit_rule": "mover-paper.json, check.json and the config",
+   "attempts[].check, synthetic": "check.json and the console rc; synthetic.json and synthetic.log",
+   "attempts[].fills (engine, ledger, broker, matched)": "engine fill events and execution_stats, ledger executions, broker FILL activities (reconciliation)",
+   "attempts[].requests (read, submit, cancel)": "ledger requests table from trial_start to the paper end and the engine-reported native.requests (equal for every trial)",
+   "attempts[].realized_pnl_usd": "engine totals and per-symbol realized, the ledger executions' cash flow and the broker recompute (equal for every trial that ended flat)",
+   "attempts[].buy_notional_usd, sell_notional_usd": "ledger executions (matched to broker activities) and the engine totals (within 0.01 USD: the engine multiplies 6-decimal averages)",
+   "attempts[].reconciliation_end.ledger_cash_delta_usd_since_ledger_start": "engine end reconciliation and the cumulative ledger execution cash flow",
+   "attempts[].trial_start": "engine receipt timing and the ledger trials table (within 1 ms)",
+   "orders[] (symbol, side, qty, limit, final status, fill counts)": "engine receipt, ledger intents and executions, broker listing",
+   "orders[].average_fill_price": "ledger intents and the broker listing (equal); engine-receipt differences are listed in engine_receipt_average_differences",
+   "orders[].reference_quote": "engine events (mover_entry_submitted ask, mover_exit_submitted bid) and each order's reference_price in the engine receipt",
+   "committed_copies": "sha256 of each committed file against its private source",
+   "units[0] times": "systemd user journal and the series console",
+   "series_totals.realized_pnl_usd": "per-trial engine receipts (trials 1-3), the ledger intents and executions (trial 4 and the recovery), the ledger meta minus pre-20260929's figures, and the broker recompute of both prefixes",
+   "series_totals.cash_flow_usd, ledger.this_series, ledger.at_series_end": "both reconciliation stdouts, the ledger meta and positions, and pre-20260929's committed figures",
+   "series_totals.gross_loss_usd": "the losing legs and the ledger meta realized_loss minus pre-20260929's 95.00",
+   "recovery_orders (symbol, side, qty, limit, status, fills, average)": "ledger intents and executions, the recovery-prefix broker listing and the recover receipt",
+   "recovery_orders[].reference_quote": "the ledger's last bid mark before each reservation, equal to each limit plus 0.02 (recovery.py:209-210)",
+   "recovery_20260929 (times, reasons, request counts)": "the ledger events, intents and requests, live/events.jsonl, the engine receipt of trial 4 and mover-recovery-4.json",
+   "recovery_20260929.iova_refusal_analysis": "the engine source at b528bb55 (each cited range asserted by the builder) against the ledger's intents, requests and marks",
+   "residual_recovery_20260930.measured_outcome": "the 17 attempt receipts, the recovery console and RECOVER-20260930-OUTCOME.md (all three agree)",
+   "residual_recovery_20260930.cause_measured": "the cash-gap output, its three FEE rows and the outcome note",
+   "fees.bases_recomputed_from_ledger": "account 2's ledger executions against the fee descriptions (8820.73 proceeds, 1357 shares in 38 sell executions, 81 executions)",
+   "broker_reconciliation_recovery": "the recovery-prefix stdout against the ledger (asserted with the series-prefix run: 22 orders and 35 fills in the window, 0 foreign)",
+   "errors_rejects_retries.source_citations": "each file:line range asserted by the builder to hold the cited code in the frozen clone (websocket.py in the pinned alpaca-py 0.44.0)",
+   "attempts[].acceptance.failed_clauses, not_evaluable_clauses": "the clause values: false is failed, null is not evaluable from the files"
+  },
+  "single_source": {
+   "config (every field)": "the config file; its sha256 is asserted above, so these are the values the engine ran, but no second source repeats them",
+   "frozen_acceptance text, series_procedure freeze text": "FREEZE.md, quoted verbatim (the file stays private and is cited by sha256)",
+   "code.offline_gate": "FREEZE.md and the private series index (the gate log no longer exists)",
+   "code.runtime versions": "the pinned environment read on 2026-09-30 by the builder; FREEZE.md records the same versions at freeze",
+   "code.runtime.engine": "mover-paper.json native.engine",
+   "attempts[].started_at, ended_at, et": "series console (ET wall times)",
+   "attempts[].caps, preflight, session numbers": "mover-paper.json sizing, session and preflight",
+   "attempts[].skipped_entries, legs, exit reasons": "mover-paper.json symbols",
+   "attempts[].errors (error_type, adapter_errors, callback_faults, average_invariant_mismatches, duplicate_executions, open_fill_gaps_at_stop, halts)": "engine receipt",
+   "attempts[].errors websocket and stream-gap lines": "each attempt's paper.log (the console repeats a subset)",
+   "attempts[].dropped_crossed_quotes, native_quotes": "engine receipt native",
+   "attempts[].requests.http_observations": "engine receipt (preflight.http holds every HTTP observation of the run, the preflight reads included)",
+   "attempts[].force_reason, force_at, hard_flatten_at, elapsed_seconds, handoff_to_recovery": "engine receipt",
+   "attempts[].ledger_risk": "engine receipt ledger_risk (Decimal tails below 1e-12 USD shown as cents; the raw strings remain in the committed engine receipts)",
+   "orders[].submitted_at, filled_at, type, time_in_force, extended_hours": "broker listing",
+   "orders[].reason, cancel_reason": "engine receipt",
+   "broker_reconciliation (observed_at, window, pages, positions_now, open_orders_now, versions, skew)": "the committed reconciliation stdout",
+   "broker_reconciliation.run": "the coordinator's brief of 2026-09-30 (tool copy sha256, interpreter, time); the stdout records the prefix and window",
+   "units[] except the series unit's times": "systemd user journal",
+   "ledger.peak_pnl_usd": "ledger meta peak_pnl (mark-to-market; no second source can recompute it)",
+   "dry_run": "each series' dryrun-20260929 files and check-probe record",
+   "fees (amounts)": "the cash-gap output (broker FEE activities)",
+   "recovery_20260929.in_process_recovery": "the engine receipt of trial 4 (reconciliation.recovery) and the ledger events",
+   "recovery_20260929.recover_command.reads_before_its_recovery_started": "the ledger requests table",
+   "units[0].on_failure": "systemd user journal of the alert unit",
+   "errors_rejects_retries.controller_stop (setters), frozen_acceptance.known_effects_text": "the engine source at b528bb55 (cited file:line) and FREEZE.md"
+  },
+  "derived": {
+   "orders[].fills_at_reference_quote, fills_better_than_reference, fills_worse_than_reference, fills_at_reference_quote": "ledger execution prices against the asserted reference quotes",
+   "orders[].adverse_slippage_vs_reference_usd_per_share": "broker average minus the reference ask for a buy, reference bid minus the broker average for a sell; signed (negative is price improvement)",
+   "attempts[].requests peaks": "sliding 60 s windows over ledger request timestamps (the 5 s before trial_start included)",
+   "attempts[].entry_gross_to_sizing_equity": "buy notional divided by the trial's sizing equity",
+   "attempts[].acceptance": "the clause values listed in each attempt, under frozen_acceptance.evaluation",
+   "series_totals counts": "the attempts and orders above",
+   "private_artifacts_sha256, private_notes_sha256": "sha256 of each private file",
+   "recovery_20260929.recover_command.iova_sale.quote_age_at_reservation_seconds": "the IOVA intent's reservation time minus the ledger's IOVA mark time",
+   "recovery_20260929.recover_command.iova_sale.seconds_after_bex_sale_filled": "the IOVA intent's reservation time minus the BEX sale's last ledger execution time",
+   "series_totals.entries_submitted, exits_submitted": "the engine orders by side",
+   "series_totals.realized_pnl_usd.by_trial.4": "0.00 (BKYI) plus (40.44 - 40.37) x 24 (BEX)"
+  },
+  "literal": {
+   "units[].role, notes, labels": "the builder's descriptions",
+   "attempts[].flat_basis, cleanup.proof": "text written after the asserts on the end reconciliation and the broker read",
+   "residual_recovery_20260930.status, pending_text": "the coordinator's brief: the final disposition is filled in later",
+   "recovery_client_id_prefix, recovery_orders_note": "the recovery's client-id prefix as recovery.py:48 forms it, and the builder's description"
+  }
+ },
+ "error": null,
+ "limitations": [
+  "Metadata plus broker-reconciled evidence, not a frozen gate run. It qualifies no gate.",
+  "The broker read uses the same broker API and account as the engine, so it is independent of the engine code but not of the broker.",
+  "Alpaca paper fills are simulated by the broker from quotes. They are not exchange executions and do not establish live slippage, queue position or partial-fill behaviour.",
+  "Mechanics only: the protocol's development study passed 0 of 768 rule-exits, so no result here evaluates a strategy.",
+  "paper_compare.py was not run (decision 11: the tool is not checked against b528bb55 receipts), so no historical fill-model comparison is recorded.",
+  "The engine logs carry no timestamps, so websocket and stream-gap lines cannot be placed in time. An isolation check on 2026-09-23 (trials/20260923b-needs-attention) found normal-close restart lines only after the engine's stop(); these runs neither confirm nor rule that out.",
+  "Account designation: the series kept its own engine ledger (the new account-2 root, shared with pre-20260929) but traded broker account alpaca-paper-2, which blueprints/us-equities/incentive-monitor/forward-protocol-v1.json:63 and docs/secret-storage.md:17 designate as the isolated incentive-monitor study account. Whether this use fits the forward study's isolation is referred to the forward protocol's owner, the trading lane; this receipt does not decide it.",
+  "The IOVA refusal's reason is not recorded: the transport sanitizes it and the recovery keeps the exception type. The files narrow it to validate_pending's quote check or the 0.25 s hook deadline and cannot distinguish the two.",
+  "The trigger of trials 2 and 3's controller_stop is not recorded; a data-stream disconnect is consistent with it but inferred, not measured.",
+  "The 2026-09-30 09:08Z ledger snapshot predates the 06:00 ET recovery attempts, so their 0 orders rest on the 17 attempt receipts and the console, not on the ledger.",
+  "Fees: the broker posted REG, TAF and CAT fees for 2026-09-29 on account 2, for pre-20260929 and this series together. The engine has no fee model, so no figure here includes them.",
+  "The residual's final disposition is pending (residual_recovery_20260930); the coordinator fills it in after the engine fee fix and its recovery."
+ ],
+ "evidence_note": "Built from the private series workspace (the engine's own receipts, consoles, logs and events), a read-only snapshot of account 2's mover ledger, the systemd user journal, git show b528bb55 and the frozen clone's sources, and the coordinator's two read-only broker reconciliation runs (GET only, paper endpoint), whose stdouts are committed here. Figures present in two or more of those sources were cross-checked by assertion, and a mismatch stops the build; field_provenance names the rest. No credential, account id, account number, account fingerprint, broker order id or ref, activity id, execution id or host path is recorded.",
+ "broker_reconciliation_recovery": {
+  "observed_at": "2026-09-30T09:06:12.939158Z",
+  "tool": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile_ext_series.py (main)",
+  "tool_sha256": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+  "tool_note": "run from a byte-identical private copy (same sha256); cited here instead of copied",
+  "stdout": "reconcile-rec-ext-20260929.stdout.json",
+  "stdout_sha256": "1231744eb9d746e7a5211141b48a426666cc93d22a464c83de5ac03844267047",
+  "stdout_note": "byte-identical to the run's stdout; the private-detail check found nothing to redact",
+  "run": "run once by the trading-lane coordinator at 2026-09-30 09:06Z with the pinned adaptive-paper interpreter, --env-file \"$PAPER_ENV_FILE_2\" under /bin/bash -ic, prefix rec-ext-20260929- and the window below; the ledger path went through a shell variable and is not recorded",
+  "method": "alpaca-py TradingClient.get_orders(status=all, after, until, limit=500, asc); GET /v2/account/activities?activity_types=FILL (after, until, asc, page_size=100, page_token); get_all_positions; get_orders(status=open); joined in memory to the engine mover ledger (sqlite mode=ro) on client order id and (cum_qty, qty, price)",
+  "alpaca_py": "0.44.0",
+  "python": "3.12.3",
+  "window": {
+   "after": "2026-09-29T20:00:00Z",
+   "until": "2026-09-30T00:10:00Z"
+  },
+  "prefix": "rec-ext-20260929-",
+  "orders_listed_in_window": 22,
+  "orders_with_series_prefix": 1,
+  "orders_without_series_prefix": 21,
+  "order_final_status_counts": {
+   "filled": 1
+  },
+  "fill_activity_pages": 1,
+  "fill_activities_in_window": 35,
+  "fill_activities_not_joined_to_series_orders": 33,
+  "ledger_intents": 2,
+  "ledger_executions": 2,
+  "ledger_intents_not_listed_by_broker": [
+   "rec-ext-20260929-4-0000002"
+  ],
+  "ledger_broker_ids_not_in_listing": 0,
+  "executions_matched_on_cum_qty_qty_price": 2,
+  "executions_matched_on_execution_id": 2,
+  "max_ledger_vs_broker_time_skew_seconds": 0.002,
+  "unconfirmed_executions": [],
+  "orders_agreeing_with_ledger": 1,
+  "broker_sells_minus_buys_usd": {
+   "by_trial": {
+    "4": "970.56"
+   },
+   "total": "970.56"
+  },
+  "realized_note": "970.56 is the sale of BEX 24 at 40.44, a sell-only cash flow and not a realized figure; the realized +1.68 is in series_totals.realized_pnl_usd",
+  "positions_now": 1,
+  "position_symbols_now": [
+   "IOVA"
+  ],
+  "open_orders_now": 0,
+  "ledger_positions_nonzero": [
+   "IOVA"
+  ],
+  "independence": "Separate from the engine transport and ledger writer, same broker API and account: independent of the engine code, not of the broker.",
+  "joined_with_series_run": "this run's 1 order and 2 fills are the series run's 1 order without the series prefix and its 2 unjoined fills; the series run's 21 orders and 33 fills are this run's 21 and 33 without its prefix, so 0 orders and 0 fills in the window are foreign to both"
+ },
+ "errors_rejects_retries": {
+  "controller_stop": {
+   "trials": [
+    2,
+    3
+   ],
+   "at_et": [
+    "16:18:14",
+    "16:21:14"
+   ],
+   "recorded": "live/events.jsonl mover_force controller_stop; the receipts record no transport health reason",
+   "setters_in_the_source": [
+    "the 30 s reconciliation (mover_runner.py:48) sets controller.stop after a snapshot when the transport health holds a reason without 'stale' (mover_runner.py:323-335); a stream close adds '<channel>_disconnected' (transport.py:1129)",
+    "a mark-to-market failure (mover_runner.py:316-322), a broker refusal (runner.py:1121-1124), an external order (runner.py:881-886), SIGINT or SIGTERM (mover_runner.py:763-764)"
+   ],
+   "excluded_by_the_files": [
+    "a broker refusal: no broker_refused intent and 0 native rejections",
+    "an external order: 0 foreign orders in the broker listing and no ledger freeze or halt",
+    "a mark-to-market failure: it would carry its own force reason (mark_to_market_failure)"
+   ],
+   "not_excluded_by_the_files": [
+    "the 30 s reconciliation's health stop",
+    "a SIGINT or SIGTERM to the paper process"
+   ],
+   "consistent_not_measured": "each of the two engine logs holds one line 'no data received on data stream for 30.0s, reconnecting'; a data-stream disconnect seen by the reconciliation is consistent with the stop, but the logs carry no timestamps, so this is inferred, not measured"
+  },
+  "source_citations": {
+   "status_rule": "runner.py:1945-1946",
+   "status_call": "mover_runner.py:395",
+   "force_order": "mover_runner.py:296-309",
+   "transport_gap": "mover_runner.py:304-306",
+   "reconcile_stop": "mover_runner.py:323-335",
+   "reconcile_every": "mover_runner.py:48",
+   "handoff": "mover_runner.py:343-348",
+   "forced_recovery": "mover_runner.py:783-787",
+   "handoff_rule": "mover.py:1276-1292",
+   "handoff_timeouts": "mover.py:88",
+   "never_attempted": "recovery.py:154-160",
+   "recovery_hook": "recovery.py:139-149",
+   "recovery_price": "recovery.py:209-210",
+   "recovery_fresh_turn": "recovery.py:184-207",
+   "recovery_not_sent": "recovery.py:238-250",
+   "recovery_code": "recovery.py:22-24",
+   "before_request": "runner.py:831-860",
+   "budget_call": "runner.py:846-858",
+   "observed_submit": "runner.py:1110-1125",
+   "cash_rule": "runner.py:761-763",
+   "validate_pending": "safety.py:862-915",
+   "check_quote": "safety.py:658-662",
+   "check_window": "safety.py:643-656",
+   "request_budget": "safety.py:1299-1311",
+   "begin_recovery": "safety.py:563-581",
+   "refresh_risk": "safety.py:752-766",
+   "transport_submit_hook": "transport.py:804-818",
+   "wire_guard_bound": "transport.py:1062",
+   "wire_guard": "transport.py:1173-1179",
+   "owner_deadline": "transport.py:1148-1167",
+   "contract_gate": "transport.py:205-213",
+   "not_ready": "transport.py:1414-1416",
+   "disconnect_freeze": "transport.py:1129",
+   "sdk_gap_line": "alpaca/data/live/websocket.py:253"
+  }
+ }
+}

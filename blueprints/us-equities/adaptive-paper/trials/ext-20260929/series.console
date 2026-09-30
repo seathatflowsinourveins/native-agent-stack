@@ -1,0 +1,52 @@
+bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+bash: no job control in this shell
+16:00:05 ET ext-20260929 account 2: kill switch absent, clone at b528bb550463991bd3ca554ddf78e2a180aca301, engine files match frozen-b528bb55.SHA256SUMS
+16:00:05 ET key probe account 2: rc=0 http_status=200
+ext-20260929-1 scan start 16:00:05 ET (account 2)
+scan rc=0 end 16:00:15 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-29", "fired": 7, "candidates": ["BKYI", "IOVA", "BEX", "SSTI", "BEG"], "regime_factor": 1.0, "sha256": "3c2ec041d00d3d7e1415e83e38787d86f95d33f404ad79f0b44a47bb274c1cdc"}
+check rc=0 16:00:15 ET
+synthetic rc=0 16:00:21 ET
+paper start 16:00:21 ET
+paper rc=0 end 16:01:35 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "completed_no_signals", "flat": true, "evidence_class": "PAPER"}
+16:01:35 ET ext-20260929-1 rc=0: yes
+ext-20260929-2 scan start 16:01:35 ET (account 2)
+scan rc=0 end 16:01:43 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-29", "fired": 7, "candidates": ["BKYI", "IOVA", "BEX", "SSTI", "BEG"], "regime_factor": 1.0, "sha256": "bb8cb4069f5899d5362587a733b23b8af48651180b6cb451b9ee18892be63dd1"}
+check rc=0 16:01:43 ET
+synthetic rc=0 16:01:49 ET
+paper start 16:01:49 ET
+paper rc=0 end 16:18:32 ET
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+16:18:32 ET ext-20260929-2 rc=0: yes
+ext-20260929-3 scan start 16:18:32 ET (account 2)
+scan rc=0 end 16:18:37 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-29", "fired": 8, "candidates": ["BKYI", "IOVA", "BEX", "NCPL", "SSTI"], "regime_factor": 1.0, "sha256": "306ae4a2744fec641b730de2b518a28eb2d897303f6e6634338a89de740b81aa"}
+check rc=0 16:18:37 ET
+synthetic rc=0 16:19:22 ET
+paper start 16:19:22 ET
+paper rc=0 end 16:21:32 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}
+16:21:32 ET ext-20260929-3 rc=0: yes
+ext-20260929-4 scan start 16:21:32 ET (account 2)
+scan rc=0 end 16:22:19 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-29", "fired": 8, "candidates": ["BKYI", "IOVA", "BEX", "NCPL", "SSTI"], "regime_factor": 1.0, "sha256": "cc9c9d1e1f8933d324798c68613f9b246f1313ecca37479171d000b554bd74f2"}
+check rc=0 16:22:21 ET
+synthetic rc=0 16:23:50 ET
+paper start 16:23:50 ET
+paper rc=3 end 17:09:47 ET
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+{"status": "needs_attention", "flat": false, "evidence_class": "PAPER"}
+recover rc=3 17:11:31 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+{"status": "needs_attention", "flat": false}
+17:11:31 ET ext-20260929-4 rc=3: no paper=needs_attention recovery=needs_attention
+17:11:31 ET series stops: ext-20260929-4 no paper=needs_attention recovery=needs_attention
