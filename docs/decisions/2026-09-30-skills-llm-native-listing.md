@@ -2,13 +2,18 @@
 
 **Decided by:** the user's directive of 2026-09-30, quoted exactly: "make sure all the skills can invoke seamlessly
 with llm native end, rather than user end". Carried out as unit F3 of coordinator session `native-agent-stack-c5`, on
-branch `claude/sota-defaults-f3-20260930` from `origin/main@e45328d3`. The branch is opened for review and merged with
-the Gate A owner's batch.
+branch `claude/sota-defaults-f3-20260930` from `origin/main@e45328d3`, rebuilt on `origin/main@11227bfd`. The branch
+is opened for review and merged with the Gate A owner's batch. The user restated the directive later that day: "make
+sure the skills will be full landscape ecosystem lifecycle for llm seamless invoke, research the best for their tasks
+that is the skills for all the sota repos sources, full lifecycle and seamless skills search and use" (Decision,
+point 8).
 
 **Scope:** `adoption/skills/manifest.json`, the skill keys of the two client templates
 (`adoption/templates/claude.settings.template.json` `skillOverrides` and `skillListingBudgetFraction`;
 `adoption/templates/codex.config.template.toml` `[skills]`), the runtime-worker skills manifest with the two tables its
-tests mirror, the [skills-trial record](2026-09-25-skills-trial-and-usage.md)'s 2026-09-30 addendum, and their tests.
+tests mirror, the [lifecycle guide](../../adoption/skills/lifecycle.md), the attributed
+[native skill lifecycle record](2026-09-30-native-skill-lifecycle.md) with its evidence, the
+[skills-trial record](2026-09-25-skills-trial-and-usage.md)'s 2026-09-30 addendum, and their tests.
 Nothing is installed or applied on a host by this change. The host batch runs the installer, the settings apply and
 the Codex config step (see the addendum's host steps).
 
@@ -86,13 +91,14 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
 ## Decision
 
 1. **Claude listing.**
-   - Every manifest skill without upstream `disable-model-invocation` is `on`: the 26 existing ones and `skill-creator`,
-     27 in all. `tests/test_skills_manifest.py` `LlmNativeListingTests` holds that rule.
+   - Every manifest skill without upstream `disable-model-invocation` is `on`: the 25 that remain after the retirement
+     in point 8 and `skill-creator`, 26 in all. `tests/test_skills_manifest.py` `LlmNativeListingTests` holds that
+     rule.
    - `grill-me` and `improve-codebase-architecture` stay `user-invocable-only`. Their gap texts say so, citing the
      upstream frontmatter, with replacement pending unit D1 and unit D2.
    - The template's `skillOverrides` mirrors the manifest.
 2. **Codex.**
-   - All 28 existing skills are enabled, 17 of them newly.
+   - All 27 remaining skills are enabled, 16 of them newly; the retired `resolving-merge-conflicts` was the 17th.
    - For `grill-me` and `improve-codebase-architecture` this restores an explicit `$name` only, which is the upstream
      policy.
 3. **`skill-creator` re-admitted** from `anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4`, that repository's
@@ -115,19 +121,23 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
    - Its `npx skills add … -g -y` step is replaced by a pin in this manifest.
 5. **Budgets.**
    - The manifest's own cap on the `on`-listed sum moves from 8,000 to 10,500 characters. The sum moves from 7,184 to
-     10,074: 9,755 plus 319.
-   - The Codex-enabled sum moves from 2,829 to 9,931. Codex hides the two upstream user-only skills from its catalog,
-     so 9,755 of those characters reach it.
+     10,191: the 25 remaining model-invocable descriptions (9,872 characters, `search-first` now 328) plus
+     `skill-creator`'s 319.
+   - The Codex-enabled sum moves from 2,829 to 10,048. Codex hides the two upstream user-only skills from its catalog,
+     so 9,872 of those characters reach it.
    - The Claude template sets `skillListingBudgetFraction: 0.05`. That is five times the 1% default. On a
      200,000-token window it reserves 10,000 tokens, where 1% gives 2,000.
    - The 1% default and the 8,000-character fallback agree at about 4 characters per token (2,000 tokens against 8,000
      characters). That ratio is an inference from the two documented figures, not a documented rate. By it, 5% is about
-     40,000 characters, about four times the 10,074.
+     40,000 characters, about four times the 10,191 (3.9). On a 1,000,000-token window, 1% is already 10,000 tokens,
+     about 40,000 characters, and 5% is about 200,000.
    - The measurement plan in the addendum lowers the fraction to the smallest value that shows no overflow warning.
-   - The Codex template sets `[skills] max_context_tokens = 6000`. That fixes the catalog budget above
-     `gpt-6-astra`'s 5,440-token default and makes it independent of a child's model.
-   - The 26 catalog-visible skills render to about 11,800 bytes, about 2,950 tokens by `render.rs`'s 4-bytes-per-token
-     estimate (L23).
+   - The Codex template sets `[skills] max_context_tokens = 6000`. That fixes the catalog budget above the 5,440-token
+     default of `gpt-6-astra` and `gpt-6.1-sol` (both a 272,000-token `context_window` at `rust-v0.159.2`) and makes it
+     independent of a child's model.
+   - The 25 catalog-visible skills render to about 11,900 bytes with a 28-character skills root, about 2,980 tokens by
+     `render.rs`'s 4-bytes-per-token estimate (L25 at `rust-v0.159.2`; line format from `render_with_description`).
+     The 26 visible before the fold computed the same way to 11,889 bytes.
    - The manifest's `budget.client_budgets` records the fallback-versus-default labels.
 6. **Prune rule.**
    - Zero use no longer demotes a listing: the review keeps a zero-use trial skill or removes it through a dated
@@ -138,6 +148,21 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
    - `security-audit`'s exclusion met its overturn condition and became a `reuse_ref` entry (scenario `security`,
      roles `coding` and `orchestration`).
    - Its `skill-creator` became a `reuse_ref` at main's pin.
+8. **Same-day source review and one lifecycle document.** The main checkout held pre-existing uncommitted changes
+   (original author not established) from a source review of the selected skills; this branch folds them, keeping the
+   [native skill lifecycle record](2026-09-30-native-skill-lifecycle.md) as the attributed record.
+   - Six re-pins, each re-verified from a blobless clone of its source repository: `search-first` to
+     `affaan-m/ECC@c70874fa`; `diagnosing-bugs`, `tdd`, `codebase-design` and `improve-codebase-architecture` to
+     `mattpocock/skills@d81f3a18`; `semgrep` to `trailofbits/skills@82fe8226`. All 28 selected pins match their
+     upstream tree, SKILL.md hash, size, description length and invocation flag, and every selected path is unchanged
+     at its repository's HEAD on 2026-09-30.
+   - `resolving-merge-conflicts` is retired: upstream removed it in `daa01d8` (2026-09-24). It moves to `excluded[]`
+     with a dated `retired` marker; the template keeps it `"off"` so the deep merge cannot leave a host's earlier
+     `"on"`; the runtime-worker manifest drops its entry and coverage selections.
+   - [`adoption/skills/lifecycle.md`](../../adoption/skills/lifecycle.md) is the single lifecycle document for both
+     clients. A task finds its skill in this order: the listed skills, then `search-first`, then `find-skills` registry
+     discovery, then the landscape sweep; only a selected winner is pinned. It also covers pinning, installation,
+     per-client invocation, the listing budget, updates, recovery and retirement.
 
 ## Overturn condition
 
@@ -158,6 +183,9 @@ L360-415), so Claude had no skill-creator left. Codex still ships one: `codex-rs
 - **Upstream user-only skills.** An upstream revision of `grill-me` or `improve-codebase-architecture` drops
   `disable-model-invocation`, or unit D1/D2 qualifies a model-invocable replacement. Then re-pin or replace it through
   the manifest.
+- **Upstream drift or removal.** A selected skill's tree changes at its repository's HEAD, or upstream removes it. Then
+  review the change and re-pin, or retire it, through the lifecycle guide. `resolving-merge-conflicts` returns only if
+  upstream restores a maintained directory that passes a new source review and activation check.
 
 ## Sources
 
@@ -202,6 +230,24 @@ Read 2026-09-30 unless dated otherwise. Page hashes are of the fetched markdown.
     `eval-viewer/viewer.html`);
   - `openai/skills/skill-creator` (Gen Agent Trust Hub Fail);
   - the audit API `https://add-skill.vercel.sh/audit?source=<owner/repo>&skills=skill-creator` for both.
+- Rebuild on `11227bfd`, read 2026-09-30:
+  - blobless clones (`git clone --filter=blob:none --no-checkout`) of `typesafe-ai/skills`, `openai/skills`,
+    `affaan-m/ECC`, `mattpocock/skills`, `trailofbits/skills`, `anthropics/skills`, `vercel-labs/agent-browser`,
+    `vercel-labs/skills` and `cloudflare/security-audit-skill`: every pin's tree (`git rev-parse <ref>:<path>`),
+    SKILL.md sha256 and bytes, PyYAML description and `disable-model-invocation`, ancestry to `origin/HEAD`, and the
+    path's tree at `origin/HEAD`;
+  - `mattpocock/skills` `daa01d8` ("Remove resolving-merge-conflicts", 2026-09-24) and
+    `.changeset/remove-resolving-merge-conflicts.md` at `d81f3a18`; `trailofbits/skills` `82fe822` (semgrep
+    `--max-target-bytes` and the oversized report);
+  - `openai/codex` at `rust-v0.159.2` (shallow blobless fetch): `codex-rs/ext/skills/src/render.rs` L19-27, L126-152 and
+    L241-266, `codex-rs/core/config.schema.json` L4122-4127, `codex-rs/models-manager/models.json` (`gpt-6-astra` and
+    `gpt-6.1-sol` `context_window` 272000); `skills_config.rs`, `provider/host.rs` and `skills/src/lib.rs` are
+    byte-identical to `rust-v0.157.1`;
+  - `vercel-labs/skills` v1.7.0 (`7407f389`, the newest tag; npm `latest` 1.7.0): `src/cli.ts` L394-401,
+    `src/list.ts` L60-62, `src/remove.ts` L409-411;
+  - <https://developers.openai.com/codex/skills> (sha256 `d1579156…`; L129, L172-173, L180-185 and L215: automatic
+    detection with restart fallback, `[[skills.config]]`, `allow_implicit_invocation`) and the Claude skills page as
+    fetched then (sha256 `adc20053…`; L290-294: watcher, `/reload-skills`, `/reload-plugins`).
 - Repository: `tools/adoption/install_skills.py` L500-507, `scripts/skills_status.py` L389-408 and L425-444,
   `tools/adoption/apply_claude_settings.py` L141-177, and the
   [skills-trial record](2026-09-25-skills-trial-and-usage.md) L360-415, L444-449 and L1128-1166.

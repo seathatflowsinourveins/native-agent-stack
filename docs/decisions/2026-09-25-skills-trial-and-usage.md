@@ -1523,8 +1523,9 @@ upstream sources and the overturn conditions. This addendum records the trial-si
 | agent-browser, security-audit | trial | `name-only` → `on` | disabled → enabled |
 | find-skills | trial | `user-invocable-only` → `on` | disabled → enabled |
 | grill-me, improve-codebase-architecture | trial | `user-invocable-only`, unchanged | disabled → enabled, explicit `$name` only |
-| codebase-design, resolving-merge-conflicts, semgrep, codeql, supply-chain-risk-auditor, agentic-actions-auditor, property-based-testing, sarif-parsing, fp-check, mcp-builder, frontend-design, variant-analysis | trial | `on`, unchanged | disabled → enabled |
+| codebase-design, semgrep, codeql, supply-chain-risk-auditor, agentic-actions-auditor, property-based-testing, sarif-parsing, fp-check, mcp-builder, frontend-design, variant-analysis | trial | `on`, unchanged | disabled → enabled |
 | skill-creator (added) | trial | `on` | disabled (Codex ships `.system/skill-creator`) |
+| resolving-merge-conflicts (retired) | trial | `on` → `off` | disabled; left the manifest |
 
 - `security-audit`'s LLM-native wiring moves from `name-only` to `on`, and its Codex state from off to on. That wiring
   was set out in the [security-audit addendum](#addendum-2026-09-27-security-audit-trial-row-stale-upstream-flags-sandbox-gate).
@@ -1539,27 +1540,54 @@ upstream sources and the overturn conditions. This addendum records the trial-si
   ([listing state and agent preload](#addendum-2026-09-26-listing-state-and-agent-preload)). No agent's preload
   changes.
 
+**Same-day source review, folded.** The main checkout held pre-existing uncommitted changes (original author not
+established) that re-pinned skills and retired one; the
+[native skill lifecycle record](2026-09-30-native-skill-lifecycle.md) keeps that work, attributed. Each pin was
+re-verified here from a blobless clone of its source repository: tree SHA, SKILL.md sha256 and bytes, PyYAML
+description length and the `disable-model-invocation` flag, for all 28 selected skills, and every selected path is
+unchanged at its repository's HEAD on 2026-09-30.
+
+- `search-first` → `affaan-m/ECC@c70874fa`: upstream rewrote the activation description, 141 → 328 characters.
+- `diagnosing-bugs`, `tdd`, `codebase-design` and `improve-codebase-architecture` → `mattpocock/skills@d81f3a18`:
+  upstream renamed the optional domain glossary from `CONTEXT.md` to `GLOSSARY.md` in their text (in
+  `codebase-design` only its `DESIGN-IT-TWICE.md` changed). `improve-codebase-architecture` keeps
+  `disable-model-invocation: true` and `allow_implicit_invocation: false`.
+- `semgrep` → `trailofbits/skills@82fe8226` (commit `82fe822`): `scripts/run-scans.sh` now passes an explicit
+  `--max-target-bytes` of 20,000,000, because semgrep's own 1,000,000-byte default drops larger files without a trace,
+  and reports the files still over the limit, using a local `find`; `--metrics=off` is unchanged and no network access
+  is added. The other eight Trail of Bits skills keep `0cc1c73a`, whose trees are unchanged at `82fe8226`.
+- `resolving-merge-conflicts` is **retired**: upstream removed it in `daa01d8` (2026-09-24) and its changeset says
+  nothing replaces it. It moved to `excluded[]` with a dated `retired` marker, and the template keeps an explicit `"off"`
+  for it, because the settings writer's deep merge never removes a host's earlier `"on"`. Its trial window ends without
+  a verdict.
+- [`adoption/skills/lifecycle.md`](../../adoption/skills/lifecycle.md) is now the one lifecycle document: how a task
+  finds its skill (listed skills, then `search-first`, then `find-skills`, then the landscape sweep), pinning,
+  installation, per-client activation, the listing budget, updates, recovery and retirement. Its commands were checked
+  against the scripts' `--help` and the Skills CLI v1.7.0 source.
+
 **The cap change and why.**
 
 - `trial.on_description_char_cap` and `budget.claude_on_cap` move from 8,000 to 10,500 characters.
-  `budget.claude_on_description_chars` moves from 7,184 to 10,074: the 26 model-invocable skills' 9,755 characters plus
-  `skill-creator`'s 319.
+  `budget.claude_on_description_chars` moves from 7,184 to 10,191: the 25 remaining model-invocable skills' 9,872
+  characters plus `skill-creator`'s 319.
 - The old cap matched Claude Code's fallback listing budget, "a fallback of 8,000 characters" (env-vars reference,
   `SLASH_COMMAND_TOOL_CHAR_BUDGET`). The listing's default is 1% of the model's context window (settings reference,
   `skillListingBudgetFraction`).
 - On a 200,000-token window, 1% is 2,000 tokens. The documented 1% and 8,000-character figures agree at about 4
-  characters per token; that ratio is an inference, not a documented rate. By it, 10,074 characters overflow the
+  characters per token; that ratio is an inference, not a documented rate. By it, 10,191 characters overflow the
   default budget before names, bundled skills and plugin skills are counted.
 - The template's `skillListingBudgetFraction: 0.05` reserves 10,000 tokens on the same window, about 40,000 characters
   by that inference.
-- 10,500 is this manifest's own ceiling, not a client budget. It leaves 426 characters for a description change before
+- 10,500 is this manifest's own ceiling, not a client budget. It leaves 309 characters for a description change before
   another record.
-- `budget.codex_enabled_description_chars` moves from 2,829 to 9,931. Codex keeps `grill-me` and
-  `improve-codebase-architecture` out of the model's catalog, so 9,755 of those characters reach it.
+- `budget.codex_enabled_description_chars` moves from 2,829 to 10,048. Codex keeps `grill-me` and
+  `improve-codebase-architecture` out of the model's catalog, so 9,872 of those characters reach it.
 - `budget.client_budgets` relabels Codex's 8,000 characters as the fallback for an unknown context window. The default
-  is 2% of the window (`codex-rs/ext/skills/src/render.rs` L17-20 and L123-149 at `rust-v0.157.1`).
-  `codex_default_budget_chars` keeps its key, which `scripts/skills_status.py` (L432) reads.
-- The Codex template sets `[skills] max_context_tokens = 6000`, above `gpt-6-astra`'s 5,440-token default.
+  is 2% of the window (`codex-rs/ext/skills/src/render.rs` L19-22 and L126-152 at `rust-v0.159.2`, the same rule as
+  L17-20 and L123-149 at `rust-v0.157.1`). `codex_default_budget_chars` keeps its key, which
+  `scripts/skills_status.py` (L432) reads.
+- The Codex template sets `[skills] max_context_tokens = 6000`, above the 5,440-token default of `gpt-6-astra` and
+  `gpt-6.1-sol` (both a 272,000-token `context_window` in `models-manager/models.json` at `rust-v0.159.2`).
 
 **Budget-fraction measurement plan: measure, then lower.** This change runs none of these steps.
 
@@ -1575,14 +1603,16 @@ upstream sources and the overturn conditions. This addendum records the trial-si
    template, by addendum, to the smallest fraction that shows none. A warning at 0.05 raises the fraction instead.
    `SLASH_COMMAND_TOOL_CHAR_BUDGET` is never set beside the fraction.
 4. For Codex, read `codex doctor`'s startup warnings once `[skills] max_context_tokens` is applied. An overflow reads
-   "Exceeded skills context budget. All skill descriptions were removed and …" (`render.rs` L24-25).
+   "Exceeded skills context budget. All skill descriptions were removed and …" (`render.rs` L26-27 at
+   `rust-v0.159.2`).
 
 Each step-1 run is one model turn per fraction tried. Step 2 is free. Every result is a receipt for that host only.
 
 **Window effects.**
 
 - By the [name-only confound](#listing-policy), counts from before this change are not comparable with counts after it
-  for the six skills moving to `on` and the 17 newly enabled for Codex.
+  for the six skills moving to `on` and the 16 remaining skills newly enabled for Codex. `search-first`'s re-pin also
+  changes its description, so its window restarts at the re-pinned install as well.
 - Each such skill's clean window for its new state starts, on each host, at the receipted apply of the template (Claude)
   or the Codex config. This follows the [host-listing addendum](#addendum-2026-09-28-host-listing-drift-restored)'s
   handling of its restore.
@@ -1647,12 +1677,15 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 **Host steps after the merge.** This change runs none of them. They follow
 [Apply the skills manifest](../../adoption/update.md#apply-the-skills-manifest).
 
-1. Run `install_skills.py --dry-run`, then the install, which adds the `skill-creator` pin.
-2. `tools/adoption/apply_claude_settings.py` carries `skillOverrides` and `skillListingBudgetFraction`. Template scalars
-   win (`deep_merge_dict`, L141-177).
-3. In `~/.codex/config.toml`, remove the 17 name-keyed tables of the newly enabled skills. The Codex template never
-   carried them. Add `[skills] max_context_tokens = 6000` and the path-keyed `skill-creator` table above.
-   `tools/adoption/apply_codex_lane.py` writes neither key at `e45328d3`.
+1. Run `install_skills.py --dry-run`, then the install, which adds the `skill-creator` pin and replaces any folder
+   still at a superseded pin with the six re-pins. Remove the retired skill with the pinned CLI's
+   `remove resolving-merge-conflicts -g -y` and inspect the folder, lock and client links
+   ([lifecycle guide](../../adoption/skills/lifecycle.md#retire-and-remove)).
+2. `tools/adoption/apply_claude_settings.py` carries `skillOverrides` (including the retired skill's `"off"`) and
+   `skillListingBudgetFraction`. Template scalars win (`deep_merge_dict`, L141-177).
+3. In `~/.codex/config.toml`, remove the 16 name-keyed tables of the newly enabled skills, and the retired skill's
+   table once its folder is gone. The Codex template never carried them. Add `[skills] max_context_tokens = 6000` and
+   the path-keyed `skill-creator` table above. `tools/adoption/apply_codex_lane.py` writes neither key at `11227bfd`.
 4. Read back with `skills_status.py --json`, `/skill-doctor` and the measurement plan above.
 
 **Evidence class.**
@@ -1660,7 +1693,9 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 | Item | Class | Basis |
 | --- | --- | --- |
 | Listing states, gates, budget sums, template keys and runtime-worker reuse | our-integration | `tests/test_skills_manifest.py` (`LlmNativeListingTests`, `ListingBudgetTemplateTests`) and `tests/test_runtime_worker_skills.py` (`test_security_audit_is_reused_since_main_promoted_it`) each failed against the unchanged `e45328d3` data first |
-| Pins, trees, SKILL.md hashes and frontmatter | upstream-unchanged (identity) | `gh api` reads at each pin on 2026-09-30, hashed locally |
+| The retirement and its explicit `"off"` | our-integration | `tests/test_skills_manifest.py` `test_a_retired_entry_names_one_unselected_skill_and_its_date` and the derived `skillOverrides` equality each failed first against the pre-fold data |
+| Pins, trees, SKILL.md hashes and frontmatter | upstream-unchanged (identity) | Blobless clones of the nine source repositories on 2026-09-30: all 28 pins match, each ref is on its default branch, and each selected path is unchanged at HEAD |
+| Lifecycle guide commands | upstream source and local `--help` | `install_skills.py` and `skills_status.py` `--help`; Skills CLI v1.7.0 `src/cli.ts`, `src/list.ts` and `src/remove.ts`; not executed on a host here |
 | Claude Code docs, Codex source and schema lines | upstream wording or source | Cited with read date, page sha256 or tag and line in the decision record; not executed here |
 | skills.sh labels and audit API | independent observation | Another platform's 2026-09-15 scans, read 2026-09-30 |
 | Overflow, invocation and cost on any host | live-run-pending | The measurement plan above; no host run is claimed |
