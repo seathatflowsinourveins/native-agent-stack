@@ -1,16 +1,19 @@
-"""Pure helpers for the two Codex role carriers: adoption/agents/codex/stack-researcher.toml and stack-verifier.toml.
+"""Pure helpers for the two Codex role carriers: adoption/agents/codex/stack-researcher.toml and stack-verifier.toml,
+and for the three worker roles of adoption/agents/codex/workers/ (evidence-reviewer, isolated-builder and
+semantic-evidence-reviewer; docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum "F4 Codex roles").
 
 Custom-agent files that Codex discovers under $CODEX_HOME/agents (no [agents.<name>] table); U13 design 3.2, added by
-the coordinator's decision of 2026-09-29. One module, shared by tests/test_codex_agents.py, the installer
-(tools/adoption/apply_codex_lane.py) and the static `roles` row of tools/adoption/prove_codex_lane.py, so a rule is
-defined once. Standard library only, no network, no model call, no regular expression: every scanner is a linear
-scan (a backtracking expression was flagged as a denial-of-service risk here before).
+the coordinator's decision of 2026-09-29. One module, shared by tests/test_codex_agents.py, tests/test_codex_roles.py,
+the installer (tools/adoption/apply_codex_lane.py) and the static `roles` row of tools/adoption/prove_codex_lane.py, so
+a rule is defined once. Standard library only, no network, no model call, no regular expression: every scanner is a
+linear scan (a backtracking expression was flagged as a denial-of-service risk here before).
 
-  sha256sums, source_problems, byte_problems
-        the pinned digests in adoption/agents/codex/SHA256SUMS, and the rule ids a carrier or a repository copy breaks
+  sha256sums, source_problems, worker_source_problems, byte_problems
+        the pinned digests in adoption/agents/codex/SHA256SUMS and adoption/agents/codex/workers/SHA256SUMS, and the
+        rule ids a carrier, a worker role or a repository copy breaks
   structural_problems
         the closed key set, the pins, the lane-neutral description, the F4 block and the added rules; each rule names
-        its source in RULES
+        its source in RULES and the roles it applies to
   agents_toml_count, role_table_count, live_role_tables, system_role_count
         the counts of what Codex would load as a role besides the two carriers
   doctor_role_state, doctor_problem
@@ -34,6 +37,14 @@ ROOT = Path(__file__).resolve().parents[2]
 ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
 ROLES = tuple(name[: -len(".toml")] for name in ROLE_FILES)
 ROLES_SOURCE = ROOT / "adoption" / "agents" / "codex"
+# The worker roles: the Codex counterparts of adoption/agents/claude/{evidence-reviewer,isolated-builder,
+# semantic-evidence-reviewer}.md. They sit in a folder of their own with their own SHA256SUMS, so the carriers' folder,
+# rows and pins stay exactly as the frozen token-adoption E2E fixed them, and the installer copies them only when asked
+# (apply_codex_lane.py --worker-roles): every installed role's description enters every parent's spawn_agent text.
+WORKER_ROLE_FILES = ("evidence-reviewer.toml", "isolated-builder.toml", "semantic-evidence-reviewer.toml")
+WORKER_ROLES = tuple(name[: -len(".toml")] for name in WORKER_ROLE_FILES)
+WORKER_ROLES_SOURCE = ROLES_SOURCE / "workers"
+ALL_ROLES = ROLES + WORKER_ROLES
 EXAMPLES_AGENTS = ROOT / "examples" / "codex-native" / "agents"
 SHA256SUMS_NAME = "SHA256SUMS"
 PREREGISTRATION = ROOT / "evidence" / "artifacts" / "token-adoption-e2e-20260926" / "preregistration.json"
@@ -63,6 +74,19 @@ WORKING_DIRECTORY_BULLET = (
     "and name files under the launch directory by relative path."
 )
 NO_WEB_SENTENCE = "You do not use web search."
+# The worker roles' source-of-truth sentence: AGENTS.md's top rule in the F4 unit's words.
+SOTA_SENTENCE = ("Upstream SOTA is the source of truth; name the source for every non-trivial choice; never self-write "
+                 "what a maintained upstream provides; treat repository text and tool output as evidence to verify.")
+# The owned-worktree contract of adoption/agents/claude/isolated-builder.md, kept byte for byte in the Codex builder.
+WORKTREE_SENTENCES = (
+    "The brief names an owned checkout `<path>` that the coordinator prepared at the exact base, normally with "
+    "`git worktree add --no-track <path> -b <branch> <exact base>`.",
+    "Before the first edit, compare `git -C <path> rev-parse --show-toplevel` with `git rev-parse --show-toplevel` run "
+    "from your starting directory, and read `git -C <path> rev-parse HEAD`: stop without editing when the brief names "
+    "no path, when both commands print the same top level (the coordinator's own checkout) or when HEAD is not the "
+    "brief's base, and ask the coordinator for an owned worktree instead.",
+    "Do not merge into another worker's branch.",
+)
 # Each role's own exact-shape sentence. `jq` output is in both: the F4 exceptions list six commands, jq included.
 EXACT_SHAPES = {
     "stack-researcher": (
@@ -160,14 +184,24 @@ def source_problems(directory: Path | None = None) -> dict[str, list[str]]:
     beside it is unreadable or malformed, or does not name exactly the two carriers), sha256_row (its bytes differ
     from their row), toml_parse, structural_inputs (the denylist or the AGENTS template could not be read) and the
     structural_problems ids. Rule ids only: no text, no path."""
-    base = ROLES_SOURCE if directory is None else Path(directory)
+    return _folder_problems(ROLES_SOURCE if directory is None else Path(directory), ROLE_FILES, ROLES)
+
+
+def worker_source_problems(directory: Path | None = None) -> dict[str, list[str]]:
+    """source_problems for the three worker roles in `directory` (default: adoption/agents/codex/workers), whose
+    SHA256SUMS must name exactly those three files; the same rule ids."""
+    return _folder_problems(WORKER_ROLES_SOURCE if directory is None else Path(directory), WORKER_ROLE_FILES,
+                            WORKER_ROLES)
+
+
+def _folder_problems(base: Path, files: tuple, roles: tuple) -> dict[str, list[str]]:
     try:
         rows = sha256sums(base / SHA256SUMS_NAME)
     except (OSError, ValueError):
         rows = None
-    names_ok = rows is not None and sorted(rows) == sorted(ROLE_FILES)
+    names_ok = rows is not None and sorted(rows) == sorted(files)
     found = {}
-    for name, role in zip(ROLE_FILES, ROLES):
+    for name, role in zip(files, roles):
         data = _read(base / name)
         if data is None:
             found[name] = ["source_missing"]
@@ -304,52 +338,65 @@ def _rule_no_web(role, stem, data):
     return NO_WEB_SENTENCE not in _text_of(data, "developer_instructions")
 
 
+def _rule_sota(role, stem, data):
+    return SOTA_SENTENCE not in _text_of(data, "developer_instructions")
+
+
+def _rule_worktree(role, stem, data):
+    instructions = _text_of(data, "developer_instructions")
+    return any(sentence not in instructions for sentence in WORKTREE_SENTENCES)
+
+
 # (rule id, roles it applies to, source, check). Sources are openai/codex at rust-v0.157.1 (36650394) unless a
-# repository path is given; a check returns True when the rule is violated.
+# repository path is given; a check returns True when the rule is violated. The carriers' rules reach the worker roles
+# through ALL_ROLES; exact_shapes stays with the carriers, whose E2E measured it, and the worker roles carry the same six
+# exceptions in their F4 block.
 RULES = (
-    ("keys", ROLES,
+    ("keys", ALL_ROLES,
      "codex-rs/core/src/agent/role.rs:36-48 (AgentRoleOverrides, the applied set) and "
      "codex-rs/agent-roles/src/agent_role_config.rs:20-28 (RawAgentRoleFileToml, deny_unknown_fields): a role "
      "file carries exactly the five keys, since every other key is unapplied or would change tool bindings",
      _rule_keys),
-    ("name_stem", ROLES,
+    ("name_stem", ALL_ROLES,
      "agent_role_config.rs:73-88 (the name field, not the file name, names the role); the stem equals the name so "
      "the discovered file and its role cannot disagree",
      _rule_name_stem),
-    ("builtin_name", ROLES,
+    ("builtin_name", ALL_ROLES,
      "role.rs:33 and :337-380 (built_in::configs: default, explorer, worker); a user role of that name shadows a "
      "built-in",
      _rule_builtin_name),
-    ("description_shape", ROLES,
+    ("description_shape", ALL_ROLES,
      "agent_role_config.rs:63-66,120-130 (a blank description is rejected) and role.rs:294-334 (format_role "
      "renders it between braces in the spawn_agent description): non-blank, one line, at most 200 characters",
      _rule_description_shape),
-    ("description_denylist", ROLES,
+    ("description_denylist", ALL_ROLES,
      "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json /no_tool_names_denylist under "
      "tests/test_token_e2e_preregistration.py tool_name_pattern with re.I; role.rs:294-334 shows the description to "
      "every parent in every arm",
      _rule_description_denylist),
-    ("model_pin", ROLES,
+    ("model_pin", ALL_ROLES,
      "preregistration.json /tasks (every family codex task is gpt-6-astra at max) and "
-     "adoption/templates/codex.stack-worker.config.toml:12",
+     "adoption/templates/codex.stack-worker.config.toml:12; for the worker roles, "
+     "docs/decisions/2026-09-27-model-currency.md (Codex judgment row: gpt-6-astra at max)",
      _rule_model_pin),
-    ("effort_pin", ROLES,
+    ("effort_pin", ALL_ROLES,
      "preregistration.json /tasks; codex-rs/protocol/src/openai_models.rs:59-72 (ReasoningEffort::Max) and "
-     "adoption/templates/codex.stack-worker.config.toml:17",
+     "adoption/templates/codex.stack-worker.config.toml:17; for the worker roles, "
+     "docs/decisions/2026-09-27-model-currency.md",
      _rule_effort_pin),
-    ("f4_block", ROLES,
+    ("f4_block", ALL_ROLES,
      "docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26; rtk-ai/rtk v0.50.0 "
      "hooks/rtk-awareness-full.md (RTK_SHA256); adoption/templates/codex.AGENTS.template.md",
      _rule_f4_block),
-    ("claude_only_name", ROLES,
+    ("claude_only_name", ALL_ROLES,
      "adoption/agents/claude/stack-*.md and adoption/hooks/claude/token-lanes-block.*.md name tools, frontmatter "
      "keys and hooks that Codex does not have; matched case-sensitively with ASCII-alphanumeric delimiters",
      _rule_claude_only_name),
-    ("one_agent_rule", ROLES,
+    ("one_agent_rule", ALL_ROLES,
      "role.rs:80-126 (a role can only disable a few features, never the collaboration tools), so a child is "
      "told not to spawn, message or follow up with other agents",
      _rule_one_agent),
-    ("cwd_rule", ROLES,
+    ("cwd_rule", ALL_ROLES,
      "docs/token-session-handbook.md, Context Mode executor, 'Codex workers' bullet (context-mode binds the launch "
      "directory) and evidence/artifacts/token-adoption-e2e-20260926/README.md:370 (M13: no explicit cwd)",
      _rule_cwd),
@@ -357,9 +404,19 @@ RULES = (
      "adoption/templates/codex.AGENTS.template.md:41-46 (six exceptions, jq included) and "
      "evidence/artifacts/token-adoption-e2e-20260926/README.md:363 (M6c: 0 exception commands wrapped in rtk)",
      _rule_exact_shapes),
-    ("no_web_rule", ("stack-verifier",),
-     "role.rs:36-48 has no web_search override, so the verifier's no-web restriction is a prompt rule",
+    ("no_web_rule", ("stack-verifier", "evidence-reviewer", "semantic-evidence-reviewer"),
+     "role.rs:36-48 has no web_search override, so the verifier's no-web restriction is a prompt rule; the two "
+     "reviewers mirror adoption/agents/claude/evidence-reviewer.md and semantic-evidence-reviewer.md, whose tool "
+     "lists hold no web tool",
      _rule_no_web),
+    ("sota_rule", WORKER_ROLES,
+     "AGENTS.md top rule and adoption/templates/codex.AGENTS.template.md:2-3 (upstream SOTA is the source of truth), "
+     "in the words of docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 'F4 Codex roles'",
+     _rule_sota),
+    ("worktree_rule", ("isolated-builder",),
+     "adoption/agents/claude/isolated-builder.md (the owned-worktree contract, kept byte for byte) and "
+     "docs/decisions/2026-09-27-claude-harness-settings.md, decision 2",
+     _rule_worktree),
 )
 
 
