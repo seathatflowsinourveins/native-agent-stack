@@ -9,12 +9,14 @@ or a silently stale settings template.
 
 import json
 import re
+import tomllib
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "adoption" / "skills" / "manifest.json"
 SETTINGS_TEMPLATE_PATH = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+CODEX_TEMPLATE_PATH = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 NATIVE_PRACTICE_PATH = ROOT / "catalogs" / "landscape" / "native-practice.json"
 
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
@@ -173,6 +175,66 @@ class ExcludedEntryTests(unittest.TestCase):
                     self.assertIn(key, entry, key)
                     self.assertIsInstance(entry[key], str)
                     self.assertTrue(entry[key].strip(), f"{key} must not be empty")
+
+
+class LlmNativeListingTests(unittest.TestCase):
+    """The user's 2026-09-30 directive, docs/decisions/2026-09-30-skills-llm-native-listing.md: every skill
+    the model may invoke is listed to Claude with its description and enabled for Codex. Only an upstream
+    disable-model-invocation skill stays user-invocable-only, and only the copy of a skill Codex ships
+    natively stays off for Codex."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.manifest = load_json(MANIFEST_PATH)
+        cls.skills = cls.manifest["skills"]
+
+    def test_every_model_invocable_skill_is_listed_on(self):
+        for skill in self.skills:
+            with self.subTest(skill=skill["name"]):
+                expected = "user-invocable-only" if skill["upstream_disable_model_invocation"] else "on"
+                self.assertEqual(skill["claude_listing"], expected)
+
+    def test_codex_disables_only_the_skill_codex_ships_natively(self):
+        # Codex installs its own skill-creator into CODEX_HOME/skills/.system from
+        # codex-rs/skills/src/assets/samples (codex-rs/skills/src/lib.rs L55-69 at rust-v0.157.1).
+        self.assertEqual({s["name"] for s in self.skills if not s["codex_enabled"]}, {"skill-creator"})
+
+    def test_skill_creator_is_pinned_from_anthropics_and_the_openai_copy_stays_excluded(self):
+        by_name = {skill["name"]: skill for skill in self.skills}
+        self.assertIn("skill-creator", sorted(by_name))
+        self.assertEqual(by_name["skill-creator"]["source"], "anthropics/skills")
+        naming = [entry for entry in self.manifest["excluded"]
+                  if "skill-creator" in [name.strip() for name in entry["skills"].split(",")]]
+        self.assertEqual([entry["source"] for entry in naming], ["openai/skills"])
+
+    def test_zero_use_no_longer_demotes_a_listing(self):
+        prune_rule = self.manifest["trial"]["prune_rule"]
+        self.assertNotIn("on -> name-only", prune_rule)
+        self.assertIn("dated decision record", prune_rule)
+
+
+class ListingBudgetTemplateTests(unittest.TestCase):
+    """The listing budgets the two client templates set (2026-09-30 record)."""
+
+    def test_claude_template_raises_the_listing_budget_fraction_without_a_fixed_char_budget(self):
+        template = load_json(SETTINGS_TEMPLATE_PATH)
+        fraction = template.get("skillListingBudgetFraction")
+        # Settings reference: "a fraction greater than 0 and at most 1", default 0.01.
+        self.assertIsInstance(fraction, float)
+        self.assertTrue(0 < fraction <= 1, fraction)
+        self.assertEqual(fraction, 0.05)
+        # SLASH_COMMAND_TOOL_CHAR_BUDGET would pin a fixed character count instead (skills page).
+        self.assertNotIn("SLASH_COMMAND_TOOL_CHAR_BUDGET", template.get("env", {}))
+
+    def test_codex_template_sets_the_catalog_token_budget_and_no_per_skill_tables(self):
+        skills = tomllib.loads(CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")).get("skills", {})
+        budget = skills.get("max_context_tokens")
+        self.assertIsInstance(budget, int)
+        # codex-rs/ext/skills/src/render.rs L18 and L127-133 at rust-v0.157.1: a set value is capped at 10,000.
+        self.assertTrue(1 <= budget <= 10_000, budget)
+        self.assertEqual(budget, 6000)
+        # Per-skill disables come from tools/adoption/install_skills.py --print-codex-config, never the template.
+        self.assertNotIn("config", skills)
 
 
 class TemplateSkillOverridesConsistencyTests(unittest.TestCase):

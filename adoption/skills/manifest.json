@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-09-28",
+  "checked_at": "2026-09-30",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -26,8 +26,8 @@
     "started": "2026-09-25",
     "window_days": 30,
     "review_after": "2026-10-25",
-    "on_description_char_cap": 8000,
-    "prune_rule": "A skill installed for at least window_days with zero invocations in the last window_days is demoted one step (on -> name-only -> off) or removed; kept verdict winners change only through a verdict re-record.",
+    "on_description_char_cap": 10500,
+    "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record.",
     "confound": "name-only and user-invocable-only listings depress proactive invocation; compare only within a listing state.",
     "measurement": {
       "claude": "native /skill-doctor (claude -p \"/skill-doctor\"), run by hand per host",
@@ -59,7 +59,7 @@
       },
       "status": "kept",
       "gap": "Verdict winner (instructions-skills row): typed semantic judgments for evidence review; used by the semantic-evidence-reviewer role.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -134,7 +134,7 @@
       },
       "status": "kept",
       "gap": "Verdict winner (ECC): staged retrieval for subagent context under the small-context rule.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -159,7 +159,7 @@
       },
       "status": "kept",
       "gap": "Verdict winner (ECC): research existing upstream tools before writing code (AGENTS.md research-first rule).",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -235,7 +235,7 @@
       "status": "trial",
       "gap": "Large single-file validators (scripts/validate.py, scripts/landscape.py) lack a shared module/interface vocabulary for refactors.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "resolving-merge-conflicts",
@@ -260,7 +260,7 @@
       "status": "trial",
       "gap": "Five or more concurrent sessions rebase onto hot files (manifests/evidence.json, docs/lanes.md hot-file protocol) and hit conflicts.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "grill-me",
@@ -283,9 +283,9 @@
         "checked_at": "2026-09-25"
       },
       "status": "trial",
-      "gap": "User-invoked stress test of a plan before approval; upstream sets disable-model-invocation, so no listing cost.",
+      "gap": "User-invoked stress test of a plan before approval. Claude: user-invocable-only because upstream sets disable-model-invocation (SKILL.md frontmatter at c55ee46), so no listing cost; replacement pending the skills sweep (unit D1) and paired benchmark (unit D2). Codex: enabled from 2026-09-30, which restores explicit $grill-me only: upstream agents/openai.yaml sets allow_implicit_invocation: false, and Codex keeps such a skill out of the model's catalog (codex-rs/ext/skills/src/provider/host.rs L147-148 at rust-v0.157.1).",
       "claude_listing": "user-invocable-only",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "improve-codebase-architecture",
@@ -308,9 +308,9 @@
         "checked_at": "2026-09-25"
       },
       "status": "trial",
-      "gap": "User-invoked architecture review of a grown module; upstream sets disable-model-invocation.",
+      "gap": "User-invoked architecture review of a grown module. Claude: user-invocable-only because upstream sets disable-model-invocation (SKILL.md frontmatter at c55ee46); replacement pending the skills sweep (unit D1) and paired benchmark (unit D2). Codex: enabled from 2026-09-30, which restores explicit $improve-codebase-architecture only: upstream agents/openai.yaml sets allow_implicit_invocation: false, and Codex keeps such a skill out of the model's catalog (codex-rs/ext/skills/src/provider/host.rs L147-148 at rust-v0.157.1).",
       "claude_listing": "user-invocable-only",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "security-threat-model",
@@ -385,7 +385,7 @@
       "status": "trial",
       "gap": "No custom static rules exist beyond CodeQL default setup; ad hoc pattern audits (e.g. secret-path guards) are grep-based.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "codeql",
@@ -410,7 +410,7 @@
       "status": "trial",
       "gap": "CodeQL default setup gates main via the code_scanning rule, but alert triage and custom queries have no procedure.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "supply-chain-risk-auditor",
@@ -435,7 +435,7 @@
       "status": "trial",
       "gap": "Catalog winners and pinned tools (adoption/pins-*.json) are adopted without a dependency risk checklist.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "agentic-actions-auditor",
@@ -460,7 +460,7 @@
       "status": "trial",
       "gap": "Workflows run agent-adjacent automation (catalog-freshness propose, verdict-review-gate); no audit procedure for agentic Actions risk.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "property-based-testing",
@@ -485,7 +485,7 @@
       "status": "trial",
       "gap": "Parsers and sanitizers (host_receipts.sanitize, receipt validators) have example tests only; Scorecard Fuzzing scores 0.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "modern-python",
@@ -535,7 +535,7 @@
       "status": "trial",
       "gap": "zizmor, OSV-Scanner, Scorecard and CodeQL all upload SARIF; reading and diffing those results is manual.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "fp-check",
@@ -560,7 +560,7 @@
       "status": "trial",
       "gap": "Open Scorecard/zizmor/CodeQL alerts need false-positive triage with retained reasoning.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "mcp-builder",
@@ -585,7 +585,7 @@
       "status": "trial",
       "gap": "The stack wires many MCP servers (adoption/mcp, 22 files reference MCP servers); building or fixing one has no procedure.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "frontend-design",
@@ -610,7 +610,7 @@
       "status": "trial",
       "gap": "The generated ecosystem guide and grand dashboard (19 HTML files) are hand-styled.",
       "claude_listing": "on",
-      "codex_enabled": false
+      "codex_enabled": true
     },
     {
       "name": "agent-browser",
@@ -633,9 +633,9 @@
         "checked_at": "2026-09-25"
       },
       "status": "trial",
-      "gap": "Browser acceptance uses the pinned agent-browser CLI (adoption/pins-*.json); the skill documents its commands. Name-only: 925-char description.",
-      "claude_listing": "name-only",
-      "codex_enabled": false
+      "gap": "Browser acceptance uses the pinned agent-browser CLI (adoption/pins-*.json); the skill documents its commands. Listed on and enabled for Codex from 2026-09-30 (docs/decisions/2026-09-30-skills-llm-native-listing.md): its 925-character description, the longest here, is under Claude's 1,536-character per-entry cap and Codex's 1,024-character one.",
+      "claude_listing": "on",
+      "codex_enabled": true
     },
     {
       "name": "find-skills",
@@ -658,9 +658,9 @@
         "checked_at": "2026-09-25"
       },
       "status": "trial",
-      "gap": "User-invoked registry search; anything it finds must still be pinned in this manifest before install.",
-      "claude_listing": "user-invocable-only",
-      "codex_enabled": false
+      "gap": "Registry discovery the model invokes: steps 1-3 of the pinned SKILL.md (L35-63: understand the need, check the skills.sh leaderboard, run npx skills find) find candidates for a gap the session meets. Its step-4 install-count, source and star thresholds (L65-71) guide discovery only; AGENTS.md:3 says stars, installs and popularity are not evidence. Its step-6 npx skills add <owner/repo@skill> -g -y (L95-103) is replaced by a pin in this manifest, installed through tools/adoption/install_skills.py after the selection rule.",
+      "claude_listing": "on",
+      "codex_enabled": true
     },
     {
       "name": "variant-analysis",
@@ -685,7 +685,7 @@
       "status": "trial",
       "gap": "Post-merge review keeps finding siblings of defects already fixed: #314 (2026-09-26) widened #291's rtk blob exclusion and closed a blind-packet leak through sentences the #269 filter did not match. fp-check verifies one finding and says it is not for hunting; no installed procedure searches a fixed bug's variants before merge.",
       "claude_listing": "on",
-      "codex_enabled": false,
+      "codex_enabled": true,
       "added": "2026-09-26"
     },
     {
@@ -709,7 +709,7 @@
         "checked_at": "2026-09-26"
       },
       "status": "trial",
-      "gap": "AGENTS.md (160 lines, 11,708 bytes) loads into every Claude and Codex session and every worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; six of its paragraphs are dated wave chronology. No installed procedure covers context load, a single source of truth or pruning when agents edit AGENTS.md or CLAUDE.md. Skill authoring stays with anthropic-skills:skill-creator and Codex .system/skill-creator; the description also triggers on skill edits, a trial confound, so only AGENTS.md and CLAUDE.md uses count toward this gap.",
+      "gap": "AGENTS.md (160 lines, 11,708 bytes) loads into every Claude and Codex session and every worker that keeps project instructions, and changed in 28 commits from 2026-09-12 to 2026-09-26; six of its paragraphs are dated wave chronology. No installed procedure covers context load, a single source of truth or pruning when agents edit AGENTS.md or CLAUDE.md. Skill authoring stays with skill-creator (the anthropics/skills pin on Claude since 2026-09-30, Codex's .system copy on Codex); the description also triggers on skill edits, a trial confound, so only AGENTS.md and CLAUDE.md uses count toward this gap.",
       "claude_listing": "on",
       "codex_enabled": true,
       "added": "2026-09-26"
@@ -735,18 +735,45 @@
         "checked_at": "2026-09-27"
       },
       "status": "trial",
-      "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Workflow stages run it by usage policy, which no setting enforces: name-only removes only its 359-character description (which says 'Use for security questions') from Claude's listing, so Claude can still invoke it by name and /security-audit stays in the / menu (Claude Code skills docs, skillOverrides table, read 2026-09-28). Upstream user-invocable: false (absent at the pin) would remove only the user trigger; Claude could still invoke it, so stage-only use stays a usage policy (same docs, read 2026-09-28). The M5c bake-off against /security-review decides promotion.",
-      "claude_listing": "name-only",
-      "codex_enabled": false,
+      "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Listed on and enabled for Codex from 2026-09-30 under the user's LLM-native directive (docs/decisions/2026-09-30-skills-llm-native-listing.md): its 359-character description, which says 'Use for security questions', now reaches both clients' listings, so the model may load it on an ordinary security question; loading it is guidance only unless a prompt asks for the full audit (SKILL.md L12 at the pin). The M5c bake-off against /security-review decides promotion.",
+      "claude_listing": "on",
+      "codex_enabled": true,
       "added": "2026-09-27"
+    },
+    {
+      "name": "skill-creator",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator",
+      "ref": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "path": "skills/skill-creator",
+      "tree_sha": "3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6",
+      "skill_md_sha256": "dcd4803e61e913e6fc27294184cd3a71f09f5e924ff20c8a9a20173e7b3c2bcf",
+      "skill_md_bytes": 33168,
+      "description_chars": 319,
+      "upstream_disable_model_invocation": false,
+      "license": "Apache-2.0 (per-skill LICENSE.txt)",
+      "official": true,
+      "audits": {
+        "gen_agent_trust_hub": "Pass",
+        "socket": "Warn",
+        "snyk": "Pass",
+        "url": "https://skills.sh/anthropics/skills/skill-creator",
+        "checked_at": "2026-09-30"
+      },
+      "status": "trial",
+      "gap": "Skill authoring and evaluation have no installed procedure on Claude since the claude.ai skill sync, which carried anthropic-skills:skill-creator, was turned off on 2026-09-26 (docs/decisions/2026-09-25-skills-trial-and-usage.md:362-379); the M5c bake-off names skill-creator's paired with-skill/without-skill benchmark as its harness (same record, L670). Codex ships its own .system/skill-creator (codex-rs/skills/src/lib.rs L55-69 at rust-v0.157.1), so this copy stays off there. That copy is also named skill-creator, and a name-keyed [[skills.config]] disable, the only form tools/adoption/install_skills.py --print-codex-config prints, matches every skill of the name (codex-rs/config/src/skills_config.rs L109-119): until the installer and scripts/skills_status.py take a path selector, a Codex host that applies it also hides Codex's own copy.",
+      "claude_listing": "on",
+      "codex_enabled": false,
+      "added": "2026-09-30"
     }
   ],
   "budget": {
-    "claude_on_description_chars": 7184,
-    "claude_on_cap": 8000,
-    "codex_enabled_description_chars": 2829,
+    "claude_on_description_chars": 10074,
+    "claude_on_cap": 10500,
+    "codex_enabled_description_chars": 9931,
     "codex_default_budget_chars": 8000,
-    "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375)."
+    "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",
+    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05. Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L17-20 and L123-149 at rust-v0.157.1); the Codex template sets 6,000 tokens. codex_default_budget_chars keeps its key name, which scripts/skills_status.py reads, and holds that 8,000-character fallback, not a default. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_enabled_description_chars counts grill-me and improve-codebase-architecture, which Codex keeps out of the model's catalog (allow_implicit_invocation: false), so 9,755 of the 9,931 reach it. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
   },
   "excluded": [
     {
@@ -793,9 +820,9 @@
     },
     {
       "skills": "skill-creator",
-      "source": "openai/skills, anthropics/skills",
-      "reason": "openai copy has a Gen Agent Trust Hub Fail; both duplicate the synced anthropic-skills:skill-creator and Codex .system/skill-creator.",
-      "overturn": "Never while a native copy exists."
+      "source": "openai/skills",
+      "reason": "skills.sh audit Gen Agent Trust Hub Fail (2026-09-25; the page and the audit API, ath risk critical, read the same on 2026-09-30); duplicates the pinned anthropics/skills skill-creator and Codex .system/skill-creator. The anthropics copy, excluded here until 2026-09-30 as a duplicate of the synced anthropic-skills:skill-creator, is pinned above: that premise ended when claude.ai skill sync was turned off on 2026-09-26 (docs/decisions/2026-09-25-skills-trial-and-usage.md:362-379).",
+      "overturn": "A later audit passes and the pinned anthropics copy shows a gap this copy covers."
     },
     {
       "skills": "jupyter-notebook",

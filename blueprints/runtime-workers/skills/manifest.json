@@ -2237,6 +2237,28 @@
       "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/security/SKILL.md:1"
     },
     {
+      "name": "security-audit",
+      "source": "cloudflare/security-audit-skill",
+      "url": "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit",
+      "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "path": "skills/security-audit",
+      "tree_sha": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+      "skill_md_sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+      "skill_md_bytes": 22026,
+      "description_chars": 359,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Audits a whole repository into a coverage ledger with confirmed, needs_validation or rejected records that its own validators check, through a parent that delegates hunters and verifiers; loading it is guidance only until a prompt asks for the full audit. Source: cloudflare/security-audit-skill@c1c8a8c1471069fb0e188eeaff69b8e8db6564a8 skills/security-audit/SKILL.md:12 and L172-175",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
       "name": "security-best-practices",
       "source": "openai/skills",
       "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices",
@@ -2371,8 +2393,8 @@
     {
       "name": "skill-creator",
       "source": "anthropics/skills",
-      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/skill-creator",
-      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "url": "https://github.com/anthropics/skills/tree/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator",
+      "ref": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
       "path": "skills/skill-creator",
       "tree_sha": "3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6",
       "skill_md_sha256": "dcd4803e61e913e6fc27294184cd3a71f09f5e924ff20c8a9a20173e7b3c2bcf",
@@ -2389,7 +2411,8 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Includes baseline runs, grader rubrics, repeated benchmarks and blind A/B comparison for skill quality; this does not cover product traffic experiments. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/skill-creator/SKILL.md:1"
+      "merit_note": "Includes baseline runs, grader rubrics, repeated benchmarks and blind A/B comparison for skill quality; this does not cover product traffic experiments. Source: anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4 skills/skill-creator/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
     },
     {
       "name": "slack-channel-monitor",
@@ -3375,6 +3398,7 @@
         "fp-check",
         "sarif-parsing",
         "security",
+        "security-audit",
         "security-best-practices",
         "security-threat-model",
         "semgrep",
@@ -3387,6 +3411,7 @@
         "fp-check",
         "sarif-parsing",
         "security",
+        "security-audit",
         "security-best-practices",
         "security-threat-model",
         "semgrep",
@@ -3925,7 +3950,7 @@
       "name": "skill-creator",
       "selected": {
         "source": "anthropics/skills",
-        "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+        "ref": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
         "path": "skills/skill-creator"
       },
       "alternatives": [
@@ -4050,13 +4075,6 @@
       "description_chars": 386,
       "upstream_disable_model_invocation": false,
       "reason": "Name collision: choose anthropics/skills skill-creator for baseline runs, benchmarks and blind comparison, closing the skill-evaluation gap."
-    },
-    {
-      "name": "security-audit",
-      "source": "cloudflare/security-audit-skill",
-      "adoption_ref": "adoption/skills/manifest.json",
-      "reason": "Main gates this adoption skill: #448 (8315274f) keeps Codex disabled (codex_enabled false) and the Claude listing name-only pending the M5c bake-off against /security-review. Reusing it here would install it for runtime workers without that gate.",
-      "overturn": "Main promotes security-audit after M5c, that is adoption/skills/manifest.json sets codex_enabled true or claude_listing on: replace this exclusion with a reuse_ref entry and assign its scenarios and roles. Any other change to main's gate on it also fails the exclusion test and needs a new review."
     },
     {
       "name": "verification-before-completion",
@@ -4529,6 +4547,14 @@
       "tree_response_truncated": false
     },
     {
+      "source": "cloudflare/security-audit-skill",
+      "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "resolved_via": "gh api repos/cloudflare/security-audit-skill/commits/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "commit_date": "2026-09-14T19:28:54Z",
+      "selected_skills": 1,
+      "tree_response_truncated": false
+    },
+    {
       "source": "mattpocock/skills",
       "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
       "resolved_via": "gh api repos/mattpocock/skills/commits/c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
@@ -4594,9 +4620,9 @@
     }
   ],
   "budget": {
-    "selected_count": 137,
-    "skill_md_bytes": 1020955,
-    "description_chars": 36739,
+    "selected_count": 138,
+    "skill_md_bytes": 1042981,
+    "description_chars": 37098,
     "provider_input_tokens_before": null,
     "provider_input_tokens_after": null,
     "meaning": "Catalog byte/character sums only, not first-prompt tokens. Measure native requests as specified in README."

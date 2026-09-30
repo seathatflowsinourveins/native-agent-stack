@@ -1,12 +1,14 @@
 # Runtime-worker skills trial
 
-The [manifest](manifest.json) selects **137 skills from 12 pinned sources** for
+The [manifest](manifest.json) selects **138 skills from 13 pinned sources** for
 a broad worker trial: 77 OpenHands registry skills, 14 of the 15 superpowers
-lifecycle skills, 27 of the adoption manifest's 28 skills reused by `reuse_ref`,
+lifecycle skills, all 29 of the adoption manifest's skills reused by `reuse_ref`,
 and targeted additions for evaluation, research, browser testing and framework
-review. The adoption manifest remains unchanged. Its gated `security-audit` entry
-is excluded, and so is `verification-before-completion`, which main removed from
-its trial under M4 (#464); see [Gates of reused adoption skills](#gates-of-reused-adoption-skills). [Research](research.md)
+review. `security-audit` and `skill-creator` joined the reused set on 2026-09-30, when
+main promoted the first and pinned the second
+([LLM-native listing decision](../../../docs/decisions/2026-09-30-skills-llm-native-listing.md)).
+`verification-before-completion`, which main removed from
+its trial under M4 (#464), is excluded; see [Gates of reused adoption skills](#gates-of-reused-adoption-skills). [Research](research.md)
 records the source review; each skill has its own `repo@commit path:line`
 merit citation. Selection means `trial`, not native acceptance or measured SOTA.
 
@@ -72,7 +74,7 @@ that is in neither set, and when a reused entry's pin differs from main's.
   refuses an entry whose pin drifted, that restates a gate or whose name main does
   not carry exactly once, and takes both gates from the adoption entry. `--print-codex-config` on this manifest therefore prints
   an `enabled = false` table for every reused skill main keeps off for Codex
-  (16 of the 27 on 2026-09-28).
+  (16 of the 27 on 2026-09-28; only `skill-creator`, of 29, on 2026-09-30).
 - **Claude listing.** `claude_listing` (`on`, `name-only`, `user-invocable-only`,
   `off`) is a Claude Code client setting, applied through the `skillOverrides`
   settings key rather than the skill's frontmatter
@@ -125,11 +127,13 @@ that is in neither set, and when a reused entry's pin differs from main's.
   elsewhere in this README; `agent_context.py` is cited at `fcc102a6` only.
   A Claude Code worker must apply main's `claude_listing` in its own settings;
   this installer writes no client settings.
-- **Excluded.** `security-audit` (#448, `8315274f`) stays out while main keeps it
-  Codex-disabled and name-only pending the M5c bake-off against `/security-review`.
-  When main promotes it, replace the exclusion with a `reuse_ref` entry and assign
-  its scenarios and roles. `test_security_audit_exclusion_follows_mains_gate_until_main_promotes_it`
-  fails as soon as main's gate changes, so a promotion cannot pass unnoticed.
+- **Reused after promotion.** `security-audit` (#448, `8315274f`) stayed out while
+  main kept it Codex-disabled and name-only. Main promoted it on 2026-09-30 (listing
+  `on`, Codex enabled; the M5c bake-off against `/security-review` still decides its
+  trial), which met the exclusion's overturn condition: it is a `reuse_ref` entry for
+  the `security` scenario and the `coding` and `orchestration` roles.
+  `test_security_audit_is_reused_since_main_promoted_it` fails if main changes that
+  gate again, so a demotion cannot pass unnoticed.
 - **Excluded with main.** `verification-before-completion` stays out because main
   removed it from its trial under the skills-trial conflict rule M4 (#464;
   [decision](../../../docs/decisions/2026-09-28-delegated-decisions.md)). Its
@@ -479,7 +483,7 @@ empty cell is marked **GAP** and recorded in `manifest.json`; the machine-readab
 | ab-testing-and-evaluation | `diagnosing-superpowers`, `jupyter`, `jupyter-notebook`, `migration-mapping`, `migration-report`, `migration-scoring`, `property-based-testing`, `score-quality`, `score-style`, `skill-creator`, `typesafe-ai`, `vercel-optimize`, `writing-skills` | `diagnosing-superpowers`, `migration-mapping`, `migration-report`, `migration-scoring`, `property-based-testing`, `score-quality`, `score-style`, `skill-creator`, `typesafe-ai`, `vercel-optimize`, `writing-skills` | `jupyter`, `jupyter-notebook`, `skill-creator`, `writing-skills` | `jupyter`, `jupyter-notebook`, `property-based-testing`, `skill-creator`, `typesafe-ai`, `writing-skills` |
 | debugging | `datadog`, `diagnosing-bugs`, `diagnosing-superpowers`, `openhands-enterprise-troubleshooting`, `systematic-debugging` | `datadog`, `diagnosing-bugs`, `diagnosing-superpowers`, `openhands-enterprise-troubleshooting`, `systematic-debugging` | `diagnosing-bugs`, `systematic-debugging` | `diagnosing-bugs`, `systematic-debugging` |
 | code-review | `code-review`, `code-simplifier`, `codebase-design`, `frontend-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-composition-patterns`, `vercel-react-best-practices`, `web-design-guidelines` | `code-review`, `code-simplifier`, `codebase-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-react-best-practices`, `web-design-guidelines` | **GAP** | `codebase-design`, `improve-codebase-architecture` |
-| security | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | **GAP** | `security`, `security-best-practices`, `security-threat-model` |
+| security | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-audit`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-audit`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | **GAP** | `security`, `security-best-practices`, `security-threat-model` |
 | github-issue-to-pr | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `resolving-merge-conflicts`, `ticket-to-code-change`, `upstream-fork-sync` | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `resolving-merge-conflicts`, `ticket-to-code-change`, `upstream-fork-sync` | **GAP** | **GAP** |
 | github-pr-review | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `resolving-merge-conflicts`, `setup-pr-review`, `upstream-fork-sync` | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `resolving-merge-conflicts`, `setup-pr-review`, `upstream-fork-sync` | **GAP** | **GAP** |
 | github-ci-fix | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate` | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate` | **GAP** | **GAP** |

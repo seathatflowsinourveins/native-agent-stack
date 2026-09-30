@@ -327,12 +327,13 @@
   "autoContinueAtUsageLimit": true,
   "switchModelsOnFlag": false,
   "syncClaudeAiSkills": false,
+  "skillListingBudgetFraction": 0.05,
   "skillOverrides": {
-    "typesafe-ai": "name-only",
+    "typesafe-ai": "on",
     "gh-fix-ci": "on",
     "security-best-practices": "on",
-    "iterative-retrieval": "name-only",
-    "search-first": "name-only",
+    "iterative-retrieval": "on",
+    "search-first": "on",
     "diagnosing-bugs": "on",
     "tdd": "on",
     "codebase-design": "on",
@@ -351,10 +352,11 @@
     "fp-check": "on",
     "mcp-builder": "on",
     "frontend-design": "on",
-    "agent-browser": "name-only",
-    "find-skills": "user-invocable-only",
+    "agent-browser": "on",
+    "find-skills": "on",
     "variant-analysis": "on",
     "writing-for-agents": "on",
-    "security-audit": "name-only"
+    "security-audit": "on",
+    "skill-creator": "on"
   }
 }

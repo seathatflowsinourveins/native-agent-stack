@@ -227,6 +227,35 @@ and C7-validation-evidence were CONFIRM verdicts without a defect, so nothing
 needed relaying; [validation](validation.json) now lists them under
 `repair_r3.confirmed`.
 
+## 2026-09-30: main's LLM-native listing
+
+Main's [LLM-native listing decision](../../../docs/decisions/2026-09-30-skills-llm-native-listing.md)
+lists every model-invocable adoption skill `on` and enables every adoption skill for
+Codex except its new `skill-creator` pin. Two runtime entries follow it.
+
+- **`security-audit`.** Main's promotion (listing `on`, Codex enabled) met the
+  exclusion's overturn condition. The exclusion became a `reuse_ref` entry for the
+  `security` scenario and the `coding` and `orchestration` roles: the pinned SKILL.md
+  has a parent delegate hunters and verifiers into a coverage ledger with `confirmed`,
+  `needs_validation` or `rejected` records (L172-175 at `c1c8a8c`, re-read with
+  `gh api`, SHA-256 `5e3e96a1…`), and loading it is guidance only until a prompt asks
+  for the full audit (L12). No research role is claimed, so that `security` cell stays
+  a gap. `cloudflare/security-audit-skill` joins the source table below.
+- **`skill-creator`.** Main pins it at `anthropics/skills@8a1541c4`, that repository's
+  HEAD on 2026-09-29. `gh api` shows the same folder tree (`3cf9a8db…`) and SKILL.md
+  (SHA-256 `dcd4803e…`) as the `33375500` pin this manifest selected. The contract
+  compares `ref` and `url`, so the entry became a `reuse_ref` at main's ref and the
+  collision record follows it. The source table keeps `33375500`, the commit the
+  other eight `anthropics/skills` skills were selected at.
+
+The counts are now 138 skills from 13 sources, 29 reused adoption skills (only
+`skill-creator` Codex-disabled on main) and eight exclusions, with 1,042,981
+SKILL.md bytes and 37,098 description characters. The empty role/scenario cells are
+unchanged. `test_security_audit_is_reused_since_main_promoted_it` replaced the
+exclusion test and failed against the unchanged manifests before the change. The
+bare-exclusion negative control now builds its own fixture, since no `adoption_ref`
+exclusion remains here.
+
 ## Source pins
 
 <!-- source-pins -->
@@ -237,6 +266,7 @@ needed relaying; [validation](validation.json) now lists them under
 | affaan-m/ECC | `2b6e839771e53096d8451a213d40dc64ec8acac0` | 2 |
 | anthropics/skills | `33375500bcea98d610eb30ce10ac4e59b89c390d` | 9 |
 | assafelovic/gpt-researcher | `0957c301ed06c2a5857b834358c7227c739041d4` | 1 |
+| cloudflare/security-audit-skill | `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8` | 1 |
 | mattpocock/skills | `c55ee46073ed923f86ce59a5eb3b6d895095d1b7` | 12 |
 | obra/superpowers | `8ca22dba9a94f28898bbce59f2537ff4d87c747d` | 14 |
 | openai/skills | `49f948faa9258a0c61caceaf225e179651397431` | 6 |
