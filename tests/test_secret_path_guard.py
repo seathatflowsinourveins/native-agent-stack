@@ -1753,12 +1753,21 @@ PATHOLOGICAL_SECONDS = 3.0
 # repeat of the literal before it, before any work budget was charged (11.9 s, 13 to 14 s and 13 to 15 s, past the 10 s hook timeout, where
 # a hook fails open). They are linear scans now (LinearScan), and a text without a quote or a backslash is split without shlex (SHLEX_PLAIN),
 # whose per-character word building cost 0.53 s on one word of 199,000 characters. Each input must finish in-process in under
-# LINEAR_SECONDS, with its verdict, and the real hook in under a second.
-LINEAR_SECONDS = 0.5
+# LINEAR_SECONDS, with its verdict, and the real hook in under HOOK_LINEAR_SECONDS (a CI runner is slower and shared, and a regression to
+# the old reading takes 3 to 15 s, so the bounds there are wider).
+LINEAR_SECONDS = 1.5 if IN_CI else 0.5
+HOOK_LINEAR_SECONDS = 2.0 if IN_CI else 1.0
 REVIEW_STORE_PATH_SHAPES = {
     "XDG_CONFIG_HOME:- x6000": ("echo " + "XDG_CONFIG_HOME:-" * 6000 + "x; printenv", "environment_dump"),
     "HF_HOME:- x6000": ("echo " + "HF_HOME:-" * 6000 + "x; printenv", "environment_dump"),
     "/proc x16000": ("echo " + "/proc" * 16000 + "/x; printenv", "environment_dump"),
+    # The same review's medium finding: a `find` action's prefix was read from a slice of the rest of the words, once per action (3.9 s on
+    # the first row); a prefix that runs to the end from every action took more than 20 s. Each action's prefix is walked by index and each
+    # position once now, in this version's reading and in the prior one (the second row reaches the prior reading, the fourth is refused).
+    "find -ok x49000 then a dump": ("find . " + "-ok " * 49000 + "; printenv", "environment_dump"),
+    "find -ok x49000 then a harmless command": ("find . " + "-ok " * 49000 + "; true", None),
+    "find -exec sudo x18000 then a harmless command": ("find . " + "-exec sudo " * 18000 + "; true", None),
+    "find -exec sudo x18000 then cat .env": ("find . " + "-exec sudo " * 18000 + "cat .env", "dotenv_read"),
 }
 # The literal each STORE_PATHS pattern starts with (and its `:-` or separator forms), by the pattern's index: each is repeated to about
 # 199,000 characters, before a dump and before a harmless command.
@@ -2059,16 +2068,20 @@ class SecretPathGuardTests(unittest.TestCase):
                     self.assertGreater(length, 195_000)
                     if name.endswith("printenv"):
                         self.assertIsNotNone(verdict)
-        # the real hook on the review's three inputs: exit 2 and one line naming no command text, within a second
+        # the real hook on the review's inputs: its verdict (exit 2 and one line naming no command text, or exit 0), within a second
         for name, (text, reason) in REVIEW_STORE_PATH_SHAPES.items():
             with self.subTest(hook=name):
                 started = time.perf_counter()
-                refused = run_hook({"tool_name": "Bash", "tool_input": {"command": text}})
-                self.assertLess(time.perf_counter() - started, 1.0)
-                self.assertEqual(refused.returncode, 2)
-                self.assertIn(f"blocked ({reason})", refused.stderr)
-                self.assertEqual(refused.stderr.count("\n"), 1)
-                self.assertNotIn("XDG_CONFIG_HOME:-XDG", refused.stderr)
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": text}})
+                self.assertLess(time.perf_counter() - started, HOOK_LINEAR_SECONDS)
+                if reason is None:
+                    self.assertEqual((done.returncode, done.stdout, done.stderr), (0, "", ""))
+                    continue
+                self.assertEqual(done.returncode, 2)
+                self.assertIn(f"blocked ({reason})", done.stderr)
+                self.assertEqual(done.stderr.count("\n"), 1)
+                self.assertNotIn("XDG_CONFIG_HOME:-XDG", done.stderr)
+                self.assertNotIn("-ok -ok", done.stderr)
 
     def test_the_linear_store_path_scans_answer_as_the_regular_expressions_did(self):
         # The four STORE_PATHS patterns of c26800f3 that backtracked on a repeated literal, verbatim, against the LinearScan that replaced

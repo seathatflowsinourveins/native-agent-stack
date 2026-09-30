@@ -909,11 +909,19 @@ def strip_prefix(words: list[str]) -> list[str]:
     return words[prefix_end(words):]
 
 
-def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None) -> int:
+def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None, ends: dict[int, int] | None = None) -> int:
     """Index of the command in words[index:], past what strip_prefix drops. It returns an index and copies
     nothing, so a chain of launchers is walked once, not once per hop. Input redirections that a launcher's options
-    stand around go to `moved` (skip_redirections)."""
+    stand around go to `moved` (skip_redirections). `ends` (given without `moved`) keeps the answer for every position the walk
+    steps on, since a walk from a position ends where the walk from its next step ends: a caller that walks from many positions of
+    one list (the actions of a `find`) then walks each position once."""
+    steps: list[int] = []
     while index < len(words):
+        if ends is not None:
+            if index in ends:
+                index = ends[index]
+                break
+            steps.append(index)
         word = words[index]
         width = redirection_width(words, index)
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word) or word == "$":
@@ -926,6 +934,9 @@ def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None)
                 index += 1  # timeout's mandatory duration comes before the command
         else:
             break
+    if ends is not None:
+        for step in steps:
+            ends[step] = index
     return index
 
 
@@ -1409,9 +1420,15 @@ def reader_arguments(words: list[str]) -> list[str] | None:
         subcommand, rest = git_subcommand_args(words)
         return rest if subcommand == "grep" else None
     if program == "find":
+        # Each action's prefix is walked by index, and each position once (prefix_end's `ends`): slicing the rest of the words for every
+        # action made 49,000 `-ok` cost 3.9 s (third verification review), and a prefix that runs to the end from every action
+        # (`-exec sudo` repeated) cost more than 20 s however it was sliced.
+        ends: dict[int, int] = {}
         for position, word in enumerate(words[:-1]):
-            if word in FIND_EXEC and program_of(strip_prefix(words[position + 1:])) in READERS:
-                return words[1:]
+            if word in FIND_EXEC:
+                start = prefix_end(words, position + 1, ends=ends)
+                if program_of(words[start:start + 1]) in READERS:
+                    return words[1:]
     return None
 
 
@@ -1661,10 +1678,16 @@ def prior_skip_wrapper_options(words: list[str], index: int, wrapper: str) -> in
     return index
 
 
-def prior_prefix_end(words: list[str], index: int = 0) -> int:
+def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | None = None) -> int:
     """Index of the command in words[index:] as the strip_prefix of c26800f3 found it: past assignments, output redirections and the
-    wrappers of WRAPPERS named exactly (timeout with its duration)."""
+    wrappers of WRAPPERS named exactly (timeout with its duration). `ends` as in prefix_end."""
+    steps: list[int] = []
     while index < len(words):
+        if ends is not None:
+            if index in ends:
+                index = ends[index]
+                break
+            steps.append(index)
         word = words[index]
         width = redirection_width(words, index)
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word) or word == "$":
@@ -1677,6 +1700,9 @@ def prior_prefix_end(words: list[str], index: int = 0) -> int:
                 index += 1  # timeout's mandatory duration comes before the command
         else:
             break
+    if ends is not None:
+        for step in steps:
+            ends[step] = index
     return index
 
 
@@ -1753,7 +1779,8 @@ def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
 
 
 def prior_reader_arguments(words: list[str]) -> list[str] | None:
-    """reader_arguments as c26800f3 read a segment (its strip_prefix after a `find` action), with the action's prefix walked by index."""
+    """reader_arguments as c26800f3 read a segment (its strip_prefix after a `find` action), with each action's prefix walked by index
+    and each position once (see reader_arguments)."""
     program = program_of(words)
     if program in READERS:
         return read_operands(words)
@@ -1761,10 +1788,10 @@ def prior_reader_arguments(words: list[str]) -> list[str] | None:
         subcommand, rest = git_subcommand_args(words)
         return rest if subcommand == "grep" else None
     if program == "find":
+        ends: dict[int, int] = {}
         for position, word in enumerate(words[:-1]):
             if word in FIND_EXEC:
-                start = prior_prefix_end(words, position + 1)
-                spend("words", start - position)
+                start = prior_prefix_end(words, position + 1, ends)
                 if program_of(words[start:start + 1]) in READERS:
                     return words[1:]
     return None
