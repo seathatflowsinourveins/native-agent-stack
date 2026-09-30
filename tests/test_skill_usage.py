@@ -3308,6 +3308,15 @@ class CodexCallLedger(unittest.TestCase):
         self.assertEqual((code, out, target.exists()), (2, "", False))
         self.assertIn("--call-ledger: the measurement kernel exports no callLedger", err)
 
+    def test_the_cli_refuses_a_ledger_at_the_out_path(self):
+        # --out writes the report over whatever is at its path, so a ledger there would be written over: refused first.
+        target = self.tmp / "same.json"
+        self.enterContext(mock.patch.object(S, "kernel_exports", return_value=True))
+        self.enterContext(mock.patch.object(S, "scan_codex_lanes", side_effect=AssertionError("scanned")))
+        code, out, err = self.lanes_cli(self.ledger_root(), "--call-ledger", str(target), "--out", str(target))
+        self.assertEqual((code, out, target.exists()), (2, "", False))
+        self.assertIn("--call-ledger: refusing the --out path", err)
+
     def test_the_cli_refuses_an_out_inside_the_checkout_before_the_ledger(self):
         refused = ROOT / "tools" / "skill-usage" / "_lanes_should_never_be_written.json"
         target = self.tmp / "calls.jsonl"
