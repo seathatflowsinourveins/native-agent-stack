@@ -161,9 +161,10 @@ The packaged sweep gains `modality: "skills"`.
 **Residuals.**
 
 - **Resolver limits.** A folder's name stands for the skill's name field, which the specification requires to match.
-  `add` keeps the first skill of each name and drops a later one (`dist/cli.mjs` line 1352; only the update paths,
-  lines 7382 and 7588, keep duplicates), so when an earlier folder named otherwise declares `<name>` the CLI installs
-  that folder, and the review can name a later copy the CLI throws away. The CLI's `skills-lock.json` rule is not
+  `add` keeps the first skill of each name and drops a later one (`dist/cli.mjs` line 1352; the two call sites that
+  pass `includeDuplicateNames: true`, lines 7382 and 7588, are both in the update paths), so when an earlier folder
+  named otherwise declares `<name>` the CLI installs that folder, and the review can name a later copy the CLI throws
+  away. The CLI's `skills-lock.json` rule is not
   emulated: it skips installed copies under agent folders. In `agents/openai.yaml`, type errors outside
   `policy.allow_implicit_invocation` (in `interface`, `dependencies` or `products`), which also make Codex ignore
   the file, are not checked.
@@ -186,11 +187,13 @@ The packaged sweep gains `modality: "skills"`.
     inside one (`entry.isDirectory()` is false, `src/skills.ts` lines 284-298 and 141-149); the git trees API lists
     a symlink as one blob and nothing below it. The review does not resolve link targets: a location at or below a
     symlink, a `SKILL.md` symlink with skill folders below it and manifests behind a symlink or without verified
-    bytes are unknown, and one reached before the pick is decided stops the survivor, even where the target is an
-    earlier location the CLI has already walked (a common agent-folder layout). At the catalog pins, 3 of the 22
-    GitHub sources hold a symlinked search location (`.agents/skills` in getsentry/skills, `.opencode/skills` in
-    addyosmani/agent-skills and microsoft/skills) and none a symlinked `SKILL.md`; every pick the resolver makes in
-    the 22 sources is decided before any symlinked location, so the rule stops none of them
+    bytes are unknown, and one reached before the pick is decided stops the survivor. That includes a layout where
+    resolving the link would show it changes nothing: an agent folder linked to `skills/`, such as
+    `.agents/skills -> ../skills`, is searched after `skills/` and holds only names already found, yet it stops a
+    pick that would come from a later location. A symlinked location searched after the pick never stops it. At the
+    catalog pins, 3 of the 22 GitHub sources hold a symlinked search location (`.agents/skills` in getsentry/skills,
+    `.opencode/skills` in addyosmani/agent-skills and microsoft/skills) and none a symlinked `SKILL.md`; every pick
+    the resolver makes in the 22 sources is decided before any symlinked location, so the rule stops none of them
     ([receipt](../../evidence/artifacts/skills-md-reader-20260930/README.md), `symlinks` step).
   - **`.gitattributes`.** The review reads each file's blob. The CLI reads its clone's checkout, where
     `.gitattributes` can change the bytes (`filter=lfs` leaves a pointer or fetches the object, eol and text

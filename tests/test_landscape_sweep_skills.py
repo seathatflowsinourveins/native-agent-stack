@@ -1822,6 +1822,13 @@ class SkillSourceReviewTests(SkillReviewFixture, unittest.TestCase):
                 {"meta/marketplace.json": marketplace, "plugins/p/skills/other/SKILL.md": None,
                  "x/y/find-bugs/SKILL.md": FIND_BUGS},
                 {".claude-plugin": "meta"}, "the plugin manifest folder .claude-plugin is a symlink"),
+            # .claude-plugin/marketplace.json -> ../meta/marketplace.json: readFile follows the link; the review reads
+            # no verified bytes for it.
+            "a symlinked manifest file": (
+                {"meta/marketplace.json": marketplace, "plugins/p/skills/other/SKILL.md": None,
+                 "x/y/find-bugs/SKILL.md": FIND_BUGS},
+                {".claude-plugin/marketplace.json": "../meta/marketplace.json"},
+                "the plugin manifest .claude-plugin/marketplace.json has no verified bytes"),
             # skills/tools/SKILL.md -> a missing file: hasSkillMd is false for it, so the CLI walks below skills/tools and
             # takes skills/tools/find-bugs first; the review treated skills/tools as a skill and named the later copy.
             "a symlinked SKILL.md above a copy": (
@@ -1840,9 +1847,11 @@ class SkillSourceReviewTests(SkillReviewFixture, unittest.TestCase):
     def test_a_symlink_that_cannot_change_the_pick_leaves_the_review(self):
         # The common layout: .claude/skills -> ../skills, searched after skills/, so the copy the CLI meets there again
         # has a name it has seen. A symlinked folder inside a location is skipped by the CLI (its entry is not a
-        # directory) as the tree shows it, and a symlinked SKILL.md with nothing below it shadows nothing.
+        # directory) as the tree shows it, a symlinked SKILL.md with nothing below it shadows nothing, and a symlinked
+        # plugin manifest only adds locations after skills/ (round 4 stopped every review with one).
         files = {"skills/find-bugs/SKILL.md": FIND_BUGS}
-        symlinks = {".claude/skills": "../skills", "skills/alias": "find-bugs", "skills/tools/SKILL.md": "../../x.md"}
+        symlinks = {".claude/skills": "../skills", "skills/alias": "find-bugs", "skills/tools/SKILL.md": "../../x.md",
+                    ".claude-plugin/marketplace.json": "../x.json"}
         done, out = self.review(self.answers(files, symlinks=symlinks), [self.survivor()])
         self.assertEqual(done.returncode, 0, done.stderr)
         self.assertEqual(self.reviewed(out)["readme_path"], "skills/find-bugs/SKILL.md")
