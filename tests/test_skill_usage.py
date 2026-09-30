@@ -2594,6 +2594,25 @@ class CodexCommandNormalization(unittest.TestCase):
         self.assertEqual(got.get("codex_commands"), {"non_posix_shell": 0, "unknown_shell": 0, "user_shell": 0,
                                                      "exec_interactions": 0})
 
+    def test_double_dash_or_dash_ends_the_options_before_the_script(self):
+        # bash(1) OPTIONS: "A -- signals the end of options and disables further option processing. ... An argument of - is
+        # equivalent to --", and with -c the script is the first non-option argument; POSIX.1-2024 XCU sh: "A single
+        # <hyphen-minus> shall be treated as the first operand and then ignored". Run on this host (GNU bash 5.2.21 and
+        # dash): `bash -c -- 'echo x'`, `bash -lc -- ...` and `dash -c - ...` each run the word after the marker. The PR-A
+        # reading stopped at the marker and returned it as the script, so the kernel read "--" or "-" and missed the fetch
+        # (the U3 review's finding on _posix_script).
+        cases = [(["bash", "-lc", "--", "curl https://example.org"], ("curl https://example.org", None)),
+                 (["sh", "-c", "-", "curl https://example.net"], ("curl https://example.net", None)),
+                 (["bash", "-c", "--"], ("bash -c --", None)),
+                 (["bash", "--", "script.sh"], ("bash -- script.sh", None))]
+        for argv, expected in cases:
+            with self.subTest(argv=argv):
+                self.assertEqual(S.resolve_command(argv), expected)
+        got = u3_measure(PAGINATED_META,
+                         sourced_command("item_e1", ["bash", "-lc", "--", "curl https://example.org"], "agent"),
+                         sourced_command("item_e2", ["dash", "-c", "-", "curl https://example.net"], "agent"))
+        self.assertEqual((got["m4"]["shell_fetch"], got["m4"]["status"]), (2, "measured"))
+
     @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
     def test_rtk_replay_reads_the_script_of_a_c_option_cluster(self):
         # -ec runs its script as -lc does, so replay reads `git status` (one eligible part), not the joined argv, which rtk
