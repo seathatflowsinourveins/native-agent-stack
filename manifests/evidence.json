@@ -3761,8 +3761,8 @@
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
-      "sha256": "14593cbbbe7a89507c0559dd975dff4a2273a46f0e828a7689f79d650767d28f",
-      "bytes": 2565
+      "sha256": "505b5c176666acc202a348b736838c74c463200ad3f77aa51c3aa3704c5cbb7b",
+      "bytes": 2999
     },
     {
       "path": ".gitattributes",
@@ -5587,8 +5587,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
-      "sha256": "c412bb23594de1003e8aae0e9fad3cf9379de4e5ef63ca09303c36c233ef61f2",
-      "bytes": 29593
+      "sha256": "005582b16d21b0ad7cfa85857d222baf598badc74d929a82b3da7c2b0dd39d55",
+      "bytes": 29633
     },
     {
       "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
@@ -35316,6 +35316,11 @@
       "bytes": 1282
     },
     {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md",
+      "sha256": "14593cbbbe7a89507c0559dd975dff4a2273a46f0e828a7689f79d650767d28f",
+      "bytes": 2565
+    },
+    {
       "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt",
       "sha256": "7b49b6e997017b1cde21f9aa33af3d5510926ad182f3211d0dd40cd71762a44a",
       "bytes": 179
@@ -44327,8 +44332,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/enhancements.md",
-      "sha256": "05b325ac018d6cb3124bc519d69a667f5d1b6c5a7390098803680c79bbccc394",
-      "bytes": 9333
+      "sha256": "b72f71251afdcf432bb404cbca5a0a7441c000bcd9b6c8f02c660fa45cea5f59",
+      "bytes": 9337
     },
     {
       "path": "examples/omniroute-codex-sdk/rerun-plan.json",

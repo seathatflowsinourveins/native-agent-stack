@@ -1,7 +1,7 @@
 # Native runtime enhancements
 
-Use this kit when a Claude coordinator needs an OmniRoute worker with selected
-skills, MCP tools, native agents or an automated readiness gate. The official
+Use this kit by default for foundation OmniRoute workers dispatched by Claude,
+with selected skills, MCP tools, native agents and a readiness gate. The official
 SDK owns execution, tools, compaction, resume and interruption. The worker retains
 Sol/Max on port 20128; native parent sessions retain their accounts.
 

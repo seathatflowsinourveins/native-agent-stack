@@ -9,23 +9,16 @@ Bash tool. The primary route is `cx/gpt-6.1-sol-max`, with native Max effort.
 The coordinator retains its native Claude account and model route.
 
 Give a writing worker its own worktree, bounded file ownership, an executable
-acceptance condition and the enhanced private Codex home described in
-`examples/omniroute-codex-sdk/enhancements.md`. Use that scoped setup by default;
-preserve an existing home's configuration and adopt only reviewed selected keys.
-Pass native readiness before dispatch, requiring Context Mode and the selected
-skill; require Serena too when the task needs semantic navigation. Tell it other workers
+acceptance condition and a configured private Codex home. For MCP, native agents
+or automation, follow `examples/omniroute-codex-sdk/enhancements.md` and pass its
+readiness check before dispatch. Tell it other workers
 are present and that it must preserve their edits. Feed the task on stdin:
 
 ```sh
-rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
-  --preflight --require-mcp context-mode --require-skill using-superpowers \
-  --timeout 60 &&
-rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
-  --workspace "$WORKER_PROJECT" \
-  --codex-home "$PRIVATE_WORKER_HOME" \
-  --timeout 600 \
+  --timeout 300 \
   --prompt -
 ```
 
