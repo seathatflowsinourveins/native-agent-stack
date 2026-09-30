@@ -112,21 +112,27 @@ The packaged sweep gains `modality: "skills"`.
 - **Source reviews.** `source_reviews.py` reviews a skill survivor at its adjudicated pin, which `convert.py` copies
   into `survivors.json` with the proposal's `skill_md_sha256`, and at no other commit. It finds the SKILL.md in the
   CLI's discovery order.
-  - Each candidate is validated before the order applies, as `parseSkillMd` does: without a `name` and a
-    `description`, both non-empty strings, it is skipped and recorded with its reason, so a valid later copy wins and
-    a skill whose every copy is invalid is refused.
-  - The frontmatter is typed as the CLI's `yaml` package types it (YAML 1.2, core schema), so a list or mapping
-    `description` is not a string. With PyYAML installed, its composer builds the tree and the core schema types each
-    scalar; without it a subset reader covers the forms the sources use. A copy either reader cannot verify (a tag, a
-    key given twice, an escape YAML does not define, syntax outside the subset) is never passed over by a guess: when
-    its verdict decides the CLI's pick, the survivor is stopped. So is one whose `SKILL.md` gh cannot read.
-  - A copy's name is compared as the CLI records it (`sanitizeMetadata`), and an empty one matches its folder's name
-    (`getSkillDisplayName`).
-  - It records the skill folder's git tree id at the pin (`skill_folder_tree_sha`, the CLI lock's `skillFolderHash`),
-    verified to cover the SKILL.md and `agents/openai.yaml` bytes it read.
-  - It reads `agents/openai.yaml` with PyYAML's composer and serde_yaml's rules when PyYAML is installed. Without it,
-    only the plain block-mapping subset is read, and other syntax gives `codex_implicit: null` with the reason. That
-    includes a double-quoted scalar anywhere in the file whose escape libyaml does not define, such as `"C:\skills"`.
+  - Each candidate is validated before the order applies, by the CLI's own code: `skill_md.mjs` runs the CLI's
+    `parseSkillMd`, `parseFrontmatter`, `sanitizeMetadata` and `getSkillDisplayName`, ported line by line, with the
+    `yaml` package `skills-yaml.pin.json` pins (2.9.0 and its npm integrity, the CLI lockfile's). It installs
+    nothing, runs only the installed files the pin hashes, and refuses an install whose bytes or lockfile integrity
+    differ. A copy the CLI skips (no `name` or `description`, one that is not a string, a YAML parse error) is
+    recorded with the CLI's own warning, so a valid later copy wins and a skill whose every copy is invalid is
+    refused.
+  - A copy gets no verdict, and stops the survivor when its verdict decides the CLI's pick, when node or a verified
+    install is missing, when its frontmatter holds a line break other than LF or CRLF, and when its bytes are not the
+    regular-file blob the tree lists (a symlink, content gh does not return, or other bytes). So does a `SKILL.md` gh
+    cannot read.
+  - A copy's name is compared as the CLI matches `--skill` against it: the name `sanitizeMetadata` records, or the
+    folder's name when that is empty (`getSkillDisplayName`).
+  - It records the reader (`skill_md_reader`: package, integrity, the pin file's sha256) and the skill folder's git
+    tree id at the pin (`skill_folder_tree_sha`, the CLI lock's `skillFolderHash`), verified to cover the SKILL.md and
+    `agents/openai.yaml` bytes it read.
+  - It reads `agents/openai.yaml` as Codex's serde_yaml does. A file that is not UTF-8, or holds a character libyaml
+    refuses or a line break other than LF and CRLF, is unverified first. Then PyYAML's composer (libyaml's
+    `CSafeLoader` when present) reads it when PyYAML is installed; without it only the plain block-mapping subset is
+    read, and other syntax gives `codex_implicit: null` with the reason. That includes a double-quoted scalar anywhere
+    in the file whose escape libyaml does not define, such as `"C:\skills"`.
   - A survivor with no pin, an unreadable or moved pin, a null hash, no valid copy, other bytes than the judged ones,
     or a tree that does not cover them gets no review. Its stopped entry (`status: stopped`, `pin_lookup`, `reason`)
     stops its layer.
@@ -151,11 +157,28 @@ The packaged sweep gains `modality: "skills"`.
   emulated: it skips installed copies under agent folders. In `agents/openai.yaml`, type errors outside
   `policy.allow_implicit_invocation` (in `interface`, `dependencies` or `products`), which also make Codex ignore
   the file, are not checked.
-- **Frontmatter reader limits.** The PyYAML reader parses with libyaml's YAML 1.1 grammar, so a frontmatter PyYAML
-  reads but the `yaml` package refuses would be judged by PyYAML; none was found. The subset reader checks the
-  nested lists and mappings of keys other than `name` and `description` line by line (anchors, tags, escapes,
-  `': '`, keys given twice), not their indentation. The license and Claude Code's `disable-model-invocation` are
-  still read line by line from the chosen copy, since neither decides which copy the CLI takes.
+- **Reader limits.** The round-3 PyYAML and subset frontmatter readers are gone: an independent review found both
+  giving a verdict on frontmatter the CLI's `yaml` package reads otherwise (under-indented quoted and flow
+  continuations, bad nested indentation, an empty flow item, mismatched brackets, a lone CR or U+2028 read as a line
+  break). What remains unverified:
+  - **The yaml release.** The pin holds the CLI lockfile's yaml 2.9.0, but `skills@1.7.0` declares `"yaml":
+    "^2.8.3"` as a runtime dependency its bundle imports, so npm resolves it when the CLI is installed: 2.9.1 on
+    2026-09-30 (released 2026-09-11), the version of this host's install from the manifest's `cli.install`. The two
+    gave identical results on the receipt's 2,455 corpus files, 139 edge cases and 200,000 random multi-line scalars
+    (2.9.1 changed line unfolding in plain and single-quoted scalars and alias counting). A later 2.x is not checked
+    until the pin moves.
+  - **Line breaks other than LF and CRLF** in a frontmatter leave the copy without a verdict, even where the CLI's
+    own verdict is definite, because libyaml-based readers such as Codex's serde_yaml break lines there. When the
+    CLI's frontmatter pattern does not match a file that starts with `---`, the whole file counts as frontmatter, so
+    such a break in its body also leaves it without a verdict.
+  - **Symlinks and other bytes.** A symlinked `SKILL.md` has no verdict. A symlinked folder is not followed: the git
+    trees API lists it as one blob, while the CLI's clone would walk it. A `.claude-plugin` manifest whose bytes are
+    not the regular-file blob the tree lists stops the review, since the manifests decide where the CLI searches.
+  - **Claude Code's parser.** `disable_model_invocation` applies Claude Code's documented boolean rule to the value as
+    the `yaml` package types it; Claude Code's own frontmatter parser was not run.
+  - **CI.** No workflow installs the pinned yaml yet, so the tests that run `skill_md.mjs` skip there with a named
+    reason (as the tree-sitter lane tests did before `validate.yml` provisioned their pin); the fail-closed and
+    pre-reader tests run everywhere.
 - **Stricter reviews.** A survivor whose discovery worker could not compute `skill_md_sha256` (the schema allows null
   for a worker that cannot run commands) can no longer be reviewed, so its layer stops until a rerun supplies it.
 - **Not run.** No model was called, and no sweep was measured. The evidence is this repository's synthetic-fixture
@@ -163,9 +186,13 @@ The packaged sweep gains `modality: "skills"`.
   - the resolver matched `npx skills@1.7.0 add <repo> --list` exactly on six sources (ECC 294 skills,
     microsoft/skills 13, trailofbits/skills 83, openai/skills 43, mattpocock/skills 37, vercel-labs/agent-browser 1);
   - all 28 installed skills resolve to their manifest `path`;
-  - both frontmatter readers gave the verdict and name that `yaml` 2.9.0 with `parseSkillMd`'s checks gives, run
-    under node, for all 2,455 `SKILL.md` files of the catalog's 22 GitHub sources at their pins, and no contrary
-    verdict on 102 edge cases (the PyYAML reader left 35 of them unverified, the subset reader 45).
+  - `skill_md.mjs` gave the CLI's verdict, recorded name, description and warning for all 2,455 `SKILL.md` files of
+    the catalog's 22 GitHub sources at their pins (2,452 taken, 3 skipped), against two oracles: `parseSkillMd` and
+    its helpers sliced byte for byte from the published `skills@1.7.0` `dist/cli.mjs` with yaml 2.9.0 and with the
+    2.9.1 a fresh install resolves, and the installed CLI's `skills add <fixture> --list` run end to end (same skipped
+    copies and warnings, same 1,693 names, and a planted invalid and a planted valid copy behaving as expected). On
+    139 edge cases the reader agreed wherever it gave a verdict and gave none on the 9 with a line break other than
+    LF or CRLF ([receipt](../../evidence/artifacts/skills-md-reader-20260930/README.md)).
 
   The first two checks measured the location order before candidate validation was added; validation changes a
   choice only where a copy is invalid, and no source was re-measured since.
@@ -184,8 +211,10 @@ skills verdict. For example:
 - the ledger cannot bind a skills record.
 
 Revise the source-review resolver when the manifest pins another skills CLI release whose `discoverSkills` differs,
-or when `npx skills add <repo> --list` disagrees with it on a source. Revise the frontmatter readers when that release
-parses with another `yaml` release, or when a reader's verdict on a `SKILL.md` contradicts the `yaml` package's.
+or when `npx skills add <repo> --list` disagrees with it on a source. Re-port `skill_md.mjs` when that release's
+`parseSkillMd`, `parseFrontmatter` or `sanitize.ts` differs. Re-pin `skills-yaml.pin.json` when the `yaml` release a
+fresh install of the CLI resolves gives another verdict, name or warning than the pinned one on the receipt's corpus
+and edge cases (rerun its comparison), or when the manifest starts pinning the CLI's dependencies.
 
 ## Sources
 
@@ -208,9 +237,10 @@ parses with another `yaml` release, or when a reader's verdict on a `SKILL.md` c
     `tryAddSkillAt` adds no invalid skill, and the recursive fallback runs only when no skill was added) and
     `filterSkills` (lines 339-348: `--skill` matches the name field, or `getSkillDisplayName`'s folder name, lines
     331-333);
-  - `src/frontmatter.ts` `parseFrontmatter`, and `package.json` line 150, `"yaml": "^2.8.3"` (2.9.0 in the lockfile,
-    whose integrity `sha512-2AvhNX3m…L4cA==` is the registry's for `yaml@2.9.0`);
-  - `src/sanitize.ts`: `stripTerminalEscapes` (lines 19-52) and `sanitizeMetadata` (lines 61-65), the name recorded;
+  - `src/frontmatter.ts` `parseFrontmatter` (lines 8-16), and `package.json`, `"yaml": "^2.8.3"` among the runtime
+    `dependencies` (2.9.0 in the lockfile, whose integrity `sha512-2AvhNX3m…L4cA==` is the registry's for
+    `yaml@2.9.0`); the published tarball's `dist/cli.mjs` (sha256 `fde68534…6701c`) imports `parse` from `"yaml"`;
+  - `src/sanitize.ts`: `stripTerminalEscapes` (lines 18-52) and `sanitizeMetadata` (lines 61-65), the name recorded;
   - `src/plugin-manifest.ts` `getPluginSkillPaths`, and `src/constants.ts` `DEFAULT_SKILL_CONTAINER_DEPTH`;
   - `src/add.ts`: `--skill` includes internal skills, and a GitHub source is cloned before discovery;
   - `src/blob.ts` `PRIORITY_PREFIXES` (lines 306-342), which lists the code's locations, and
@@ -218,16 +248,18 @@ parses with another `yaml` release, or when a reader's verdict on a `SKILL.md` c
     root tree's for a root SKILL.md);
   - the files above were compared byte for byte with the tag commit's on 2026-09-30.
 - [eemeli/yaml at v2.9.0](https://github.com/eemeli/yaml/tree/v2.9.0), tag commit
-  `ddb21b04cb889722cec8f89dc1b67f19d62d7f7d`: `src/options.ts` (lines 89-93, `version` defaults to 1.2),
-  `src/doc/Document.ts` (lines 391-395, 1.2 uses the `core` schema; line 128, `uniqueKeys: true`), the core schema's
-  tags in `src/schema/common/null.ts`, `src/schema/core/bool.ts`, `src/schema/core/int.ts` and
-  `src/schema/core/float.ts`, `src/public-api.ts` `parse` (lines 133-165: it throws its first error),
-  `src/compose/resolve-flow-scalar.ts` (`escapeCodes`, lines 208-227; `parseCharCode`, lines 229-245; the
-  `BAD_DQ_ESCAPE` error, line 172) and `src/compose/compose-scalar.ts` (lines 83-88: an unknown tag only warns).
+  `ddb21b04cb889722cec8f89dc1b67f19d62d7f7d`, the npm package `yaml@2.9.0` (dist.integrity `sha512-2AvhNX3m…L4cA==`,
+  gitHead that commit): the parser `skill_md.mjs` runs, pinned file by file in `skills-yaml.pin.json`.
+  [v2.9.1](https://github.com/eemeli/yaml/releases/tag/v2.9.1) (commit `1440ecd3d1bff41e4ac399f8f6839e810328bd16`,
+  2026-09-11; npm dist.integrity `sha512-3NxN8+78…Eb2yFw==`): "Limit recursive merge aliases" and "Simplify line
+  unfolding during quoted string parsing"; its `dist/` differs from 2.9.0's only in
+  `compose/resolve-flow-scalar.js` and `nodes/Alias.js`. `npm view yaml dist-tags` on 2026-09-30: latest 2.9.1.
 - [dtolnay/unsafe-libyaml at 0.2.11](https://github.com/dtolnay/unsafe-libyaml/tree/0.2.11), the version Codex's
   `Cargo.lock` pins beside serde_yaml, tag commit `a7b8d1fbd93aefbca3003dcb5fcc6a9c2297e968`: `src/scanner.rs`
   lines 2195-2361 (the double-quoted escapes; "found unknown escape character"; the hex digits; surrogates and code
-  points beyond U+10FFFF refused).
+  points beyond U+10FFFF refused), `src/reader.rs` lines 381-395 (the characters its reader accepts; any other is
+  "control characters are not allowed") and `src/macros.rs` lines 253-265 (`IS_BREAK_AT`: CR, LF, U+0085, U+2028 and
+  U+2029 break a line).
 - [openai/codex at rust-v0.157.1](https://github.com/openai/codex/tree/rust-v0.157.1), tag commit
   `36650394c5b38c2990ccf2a3457165ca3e9d9726`:
   - `codex-rs/ext/skills/src/loader/metadata.rs` (lines 27-56 and 130-139) and `codex-rs/skills/src/model.rs`;
@@ -236,8 +268,12 @@ parses with another `yaml` release, or when a reader's verdict on a `SKILL.md` c
     `deserialize_option` (lines 1517-1558), `deserialize_bool` (lines 1266-1290) with
     `is_plain_or_tagged_literal_scalar` (lines 1149-1158), `deserialize_map` (lines 1660-1688) and the
     `MoreThanOneDocument` refusal (lines 105 and 142).
-- PyYAML 6.0.1 (`yaml.compose_all` with `CSafeLoader`, the libyaml binding, or `SafeLoader`), used only when
-  installed: the repository does not require it, and the tests run the subset reader either way.
+- PyYAML 6.0.1 (`yaml.compose_all` with `CSafeLoader`, the libyaml binding, or `SafeLoader`), used only for
+  `agents/openai.yaml` and only when installed: the repository does not require it, and the tests run the subset
+  reader either way.
+- The tree-sitter-bash pin (`examples/claude-native/workflows/shell-parser.pin.json` and `child-usage.mjs`
+  `loadShellParser`), whose pattern `skills-yaml.pin.json` and `skill_md.mjs` follow: a pinned npm install, verified
+  file by file and by lockfile integrity, never vendored, and nothing parsed without it.
 - Git's object ids ([Pro Git, Git Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects)): the tests
   compare `git_blob_id` and `git_tree_id` with `git write-tree` and `git ls-tree` output.
 - `tools/sota-convergence/landscape-sweep/README.md` (Evidence contract, Skills modality), and

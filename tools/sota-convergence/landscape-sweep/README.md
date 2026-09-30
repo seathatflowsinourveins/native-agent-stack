@@ -27,6 +27,7 @@ the merged manifest, stay with the lane owners.
 | `usage_record.py` | checkout | Runs the vendored `examples/claude-native/workflows/child-usage.mjs` over the run's transcripts and writes the sanitized usage record. |
 | `convert.py` | checkout | Converts the run record into `returns.json`, `lanes.json`, `layers.json` and `survivors.json`. |
 | `source_reviews.py` | checkout | Writes one upstream-provenance review per survivor (`gh api`; the public Hugging Face Hub API for a model repository). |
+| `skill_md.mjs`, `skills-yaml.pin.json` | checkout | The pinned skills CLI's own `SKILL.md` parse (its `parseSkillMd`, ported line by line) with the `yaml` install the pin names by version, npm integrity and file sha256; `source_reviews.py` runs it for every `SKILL.md` copy of a skill survivor (Skills modality). |
 | `make_result.py` | checkout | Assembles `RESULT.json` for `saturation_ledger.py --append`. |
 | `sweep_common.py` | checkout | Helpers shared by the checkout-run tools. |
 | `seeds-20260926.json` | checkout | The seeds the 2026-09-26 run gave its workers. It is a record, and an example of the `--seeds` format. |
@@ -468,21 +469,32 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   `survivors.json`, and `source_reviews.py` reviews the SKILL.md at that pin and at no other commit. It finds the
   SKILL.md as the pinned skills CLI does for `npx skills@1.7.0 add owner/repo --skill <name>`, following
   vercel-labs/skills v1.7.0 `discoverSkills` (`src/skills.ts` at `7407f389`; README "Skill Discovery"):
-  - each candidate `SKILL.md` is validated first, as `parseSkillMd` does: without a `name` and a `description`,
-    both non-empty strings, the candidate is skipped and recorded in `observed.skipped_skill_md` with its reason, so
-    it never claims the name. The frontmatter is typed as the CLI's `yaml` package (2.9.0) types it, YAML 1.2 with the
-    core schema, so a list or mapping `description` is not a string: with PyYAML installed its composer builds the
-    tree and each scalar is typed by the core schema (not PyYAML's YAML 1.1 resolver); without it a subset reader
-    covers one-line plain, quoted and flow values, plain scalars over several lines, literal and folded block
-    scalars, and nested lists and mappings. Neither reader guesses: an anchor, alias or tag (the subset reader), a
-    tag, a key given twice or a file PyYAML cannot parse (the PyYAML reader), an escape YAML does not define or
-    anything else outside the subset leaves the copy unverified, and when that copy's verdict decides which copy the
-    CLI takes, the survivor is stopped rather than reviewed at a guessed copy. On 2026-09-30 both readers matched
-    `yaml` 2.9.0 with `parseSkillMd` on all 2,455 `SKILL.md` files of the catalog's GitHub sources at their pins, and
-    on 102 edge cases they gave no verdict that contradicts it;
-  - a candidate whose name, as the CLI records it (`sanitizeMetadata`: control characters removed, trimmed), names
-    another skill is not a copy either (`filterSkills` matches `--skill` against it); a `SKILL.md` gh cannot read
-    at the pin stops the survivor, since the CLI reads it from its clone;
+  - each candidate `SKILL.md` is validated first, by the CLI's own code. `skill_md.mjs` runs vercel-labs/skills
+    v1.7.0's `parseSkillMd`, `parseFrontmatter`, `sanitizeMetadata` and `getSkillDisplayName` (`src/skills.ts` lines
+    80-133 and 331-333, `src/frontmatter.ts`, `src/sanitize.ts` lines 18-65 at `7407f389`, ported line by line) with
+    the `yaml` package that `skills-yaml.pin.json` pins: 2.9.0, the version and npm integrity of the CLI's lockfile.
+    It installs nothing and runs only the installed files whose sha256 the pin lists, after checking the install's
+    `package-lock.json` integrity. Install it with the pin's command; the directory comes from `--skills-yaml`, then
+    `LANDSCAPE_SWEEP_SKILLS_YAML`, then the pin's default under HOME. A copy the CLI skips (no `name` or
+    `description`, one that is not a string, a YAML parse error) is recorded in `observed.skipped_skill_md` with the
+    warning the CLI prints, so it never claims the name. `observed.skill_md_reader` records the package, its
+    integrity and the pin file's sha256;
+  - what stays unverified, and stops the survivor when that copy's verdict decides which copy the CLI takes: every
+    copy when node or a verified install is missing; a copy whose frontmatter holds a line break other than LF or
+    CRLF (the `yaml` package and the CLI's pattern break lines only there, while libyaml, which Codex's serde_yaml
+    uses, also breaks at a lone CR, U+0085, U+2028 and U+2029); and a copy whose bytes are not the regular-file blob
+    the tree lists (a symlink, content gh does not return, other bytes). A symlinked folder is not followed: the
+    trees API lists it as one blob, and the CLI's clone would walk it;
+  - npm resolves the CLI's `yaml` dependency (`^2.8.3`) when the CLI is installed, so an install made on 2026-09-30
+    runs yaml 2.9.1, as does this host's install from the manifest. On that day yaml 2.9.0 and 2.9.1 gave the same
+    verdict, name, description and warning for all 2,455 `SKILL.md` files of the catalog's GitHub sources at their
+    pins and for 139 edge cases, and the reader agreed with the CLI's own `parseSkillMd` (sliced from the published
+    `dist/cli.mjs`) and with `skills add <fixture> --list` run end to end
+    ([receipt](../../../evidence/artifacts/skills-md-reader-20260930/README.md));
+  - a candidate whose name, as the CLI matches `--skill` against it (`getSkillDisplayName`: the name as
+    `sanitizeMetadata` records it, or the folder's name when that is empty), names another skill is not a copy
+    either (`filterSkills`); a `SKILL.md` gh cannot read at the pin stops the survivor, since the CLI reads it from
+    its clone;
   - a valid root `SKILL.md` is the repository's only skill;
   - otherwise the root's child folders, then `skills/`, `skills/.curated`, `.experimental`, `.system` and 30 agent
     folders (`.agents/skills`, `.claude/skills`, …), each three levels deep, where a `SKILL.md` shadows the folders
@@ -497,18 +509,23 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   lock records as `skillFolderHash` (`src/blob.ts` `getSkillFolderHashFromTree`), checked against the bytes read (the
   SKILL.md and `agents/openai.yaml` are the blobs the tree lists, and each folder down to them hashes to its listed
   id), so it freezes `agents/openai.yaml` as well as the SKILL.md. It records Codex's reading of that file as
-  `observed.codex_implicit`: with PyYAML installed, its composer reads the file and serde_yaml 0.9.34's rules decide
-  (a plain `true`/`false` spelling only; anchors and aliases followed; a second document refused); without PyYAML
-  only the plain block-mapping subset is read, and anything else (a flow mapping, an anchor or alias, a tag, a second
+  `observed.codex_implicit`. A file that is not UTF-8, or holds a character libyaml refuses (outside its printable
+  set, unsafe-libyaml 0.2.11 `src/reader.rs` lines 381-395) or a line break other than LF and CRLF, is unverified
+  before any reader runs. Otherwise, with PyYAML installed its composer (libyaml's `CSafeLoader` when present, the
+  C library serde_yaml's unsafe-libyaml is translated from) reads the file and serde_yaml 0.9.34's rules decide (a
+  plain `true`/`false` spelling only; anchors and aliases followed; a second document refused); without PyYAML only
+  the plain block-mapping subset is read, and anything else (a flow mapping, an anchor or alias, a tag, a second
   document, a block scalar, a double-quoted scalar anywhere in the file with an escape libyaml does not define, such
-  as `"C:\skills"`) gives `codex_implicit: null` with `observed.unverified_reason`. One skill judged at two
-  pins gets one review per pin. A skill survivor gets no review, and a stopped entry (`status: stopped`, `pin`,
-  `pin_lookup`, `reason`) in the printed list instead (exit 1), when:
+  as `"C:\skills"`) gives `codex_implicit: null` with `observed.unverified_reason`. Type errors in the file's other
+  fields, which also make Codex ignore it, are not checked. `disable_model_invocation` applies Claude Code's
+  documented boolean rule to the value as the `yaml` package types it; Claude Code's own frontmatter parser is not
+  checked. One skill judged at two pins gets one review per pin. A skill survivor gets no review, and a stopped
+  entry (`status: stopped`, `pin`, `pin_lookup`, `reason`) in the printed list instead (exit 1), when:
   - it names no pin, or a pin that is not a 40-hex commit, or gh cannot read the pin or reads it as another commit
     (`pin_lookup: failed`);
   - its `skill_md_sha256` is null;
   - no valid copy is found, or two valid copies share the first location that holds one (the CLI's pick follows
-    directory order), or a copy the reader cannot verify decides the pick, or the git tree is truncated;
+    directory order), or a copy without a verdict (above) decides the pick, or the git tree is truncated;
   - the SKILL.md's sha256 differs from the adjudicated one, or the tree does not cover the bytes read.
 
   `make_result.py` refuses a `RESULT.json` while any survivor lacks its review, and a stopped entry stops its layer.
@@ -524,6 +541,9 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   gets an empty history, and the summary line says `previous ... sweep none`.
 
 ```sh
+# Once per host: the yaml install skill_md.mjs verifies (the command and directory of skills-yaml.pin.json).
+npm install --prefix "$HOME/.local/share/codex-ecosystem/tools/skills-yaml-2.9.0" --ignore-scripts --no-audit \
+  --no-fund --save-exact yaml@2.9.0
 python3 $H/build_inputs.py --skills-scope > "$W/scope.json"
 python3 $H/build_inputs.py --work-dir "$W" --modality skills
 python3 $H/build_args.py --work-dir "$W" --sweep-id "landscape-sweep-skills-$STAMP" --date "$DATE" --smoke skills-research
