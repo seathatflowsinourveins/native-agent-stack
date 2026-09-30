@@ -172,8 +172,10 @@ worktree workers inherit the wiring.
 The `token-efficiency` profile in [the adoption manifest](../adoption/manifest.json)
 is the selected set. It holds the context-and-usage layer's current choice (RTK,
 Context Mode, explicit-file Repomix, guarded Headroom and TOON, ccusage), the Serena,
-QMD, MarkItDown, SocratiCode, ai-memory and MCPorter layer winners, and both native
-clients. `client_wiring` checks three places:
+QMD, MarkItDown, SocratiCode, ai-memory and MCPorter layer winners, the code-navigation
+layer's task-selected tools (ast-grep, codebase-memory-mcp and jCodeMunch, added on
+2026-09-30; none is a layer winner) and both native clients. `client_wiring` checks
+three places:
 
 - `claude`, the user settings: a Bash `PreToolUse` hook runs `rtk hook claude`; the
   number of hook events that run ai-memory; Context Mode is enabled and installed;
@@ -263,13 +265,21 @@ The practice is applied on a host when all of these hold:
 
 The other rows of the [machine list](token-efficiency-stack.json) are not in the
 profile, so this check treats them as optional: a host without them still follows
-the selected practice. jCodeMunch (a per-project opt-in), ast-grep and
-codebase-memory-mcp are task-selected options in the code-navigation layer's current
-choice, and Context Hub is the document-retrieval current choice's option for
-selected developer docs; none of the four is a layer winner or in the
-context-and-usage current choice. AgentsView, Claude HUD and otel-tui are viewers, and
-OmniRoute is an optional runtime. The Collector, Prometheus, Loki and Grafana rows
-belong to the `observability` profile.
+the selected practice. Context Hub is the document-retrieval current choice's option
+for selected developer docs, and is neither a layer winner nor in the context-and-usage
+current choice. AgentsView, Claude HUD and otel-tui are viewers, and OmniRoute is an
+optional runtime. The Collector, Prometheus, Loki and Grafana rows belong to the
+`observability` profile.
+
+jCodeMunch, ast-grep and codebase-memory-mcp have been in the profile since 2026-09-30,
+as the code-navigation layer's task-selected tools, under
+[the routing record](decisions/2026-09-30-task-model-routing.md). Their commands are
+required for `prerequisites_present`, but `client_wiring` still checks only the Serena,
+SocratiCode and ai-memory servers: jCodeMunch registers per project (its
+[per-project opt-in](../adoption/bootstrap.md)), ast-grep is a command-line tool, and
+the wiring rule does not name codebase-memory's Codex server. None has a platform pin
+entry, so `--pinned-versions` reports them unchecked, and a bootstrap refuses the
+profile until they are named in `--allow-unpinned`.
 
 The check reports configuration, not activation. Apart from the Codex ai-memory hook
 trust above, plugin revisions and Context Mode's bundled hooks (Codex `/hooks`, or the
@@ -290,12 +300,13 @@ On the workstation, 16 Sonnet 5 workflow subagents each used one tool on real wo
 - Headroom as MCP through MCPorter;
 - QMD, Repomix, TOON, ast-grep, codebase-memory-mcp, Context Hub, MarkItDown, agentsview and otel-tui as CLIs.
 
-These 16 are not the `token-efficiency` profile, whose 14 `component_ids` the
-[coverage check](#coverage-check) tests. Ten of them are profile rows: RTK, Context
-Mode, Serena, SocratiCode, ai-memory, Headroom, QMD, Repomix, TOON and MarkItDown. The
-other six are the optional rows named there: jCodeMunch, ast-grep, codebase-memory-mcp,
-Context Hub, agentsview and otel-tui. The profile's remaining four are the two native
-clients, ccusage (not run here) and MCPorter (here only as Headroom's bridge).
+These 16 are not the `token-efficiency` profile, whose 17 `component_ids` the
+[coverage check](#coverage-check) tests. Thirteen of them are profile rows: RTK, Context
+Mode, Serena, SocratiCode, ai-memory, Headroom, QMD, Repomix, TOON, MarkItDown, jCodeMunch,
+ast-grep and codebase-memory-mcp (the last three joined the profile on 2026-09-30, after
+this run). The other three are the optional rows named there: Context Hub, agentsview and
+otel-tui. The profile's remaining four are the two native clients, ccusage (not run here)
+and MCPorter (here only as Headroom's bridge).
 `tests/test_adoption_status.py` checks this split against the receipt's tool list, so
 a profile change has to restate it.
 
