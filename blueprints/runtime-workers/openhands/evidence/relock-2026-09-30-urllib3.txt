@@ -1,0 +1,161 @@
+# OpenHands recipe runtime lock: urllib3 2.8.0 relock and a frozen macOS lock's next advisory (2026-09-30)
+# Returned outputs of the commands blueprints/runtime-workers/openhands/research.md and evidence/receipts/osv-urllib3-next-20260930.json cite.
+# A line that starts with '$ ' is a command as run (the time after '#' is when it ran); the lines under it are its output as printed, then its exit
+# code. Host paths are shown as <worktree> (a checkout of this repository at the relocked commit), <main-checkout> (a checkout of origin/main at 11227bfd),
+# <scratch> and <osv-bin>, and the home directory as ~. The scripts that wrote sections B and C are relock-2026-09-30-urllib3.relock.sh.txt and
+# relock-2026-09-30-urllib3.install-check.sh.txt; sections A and D-G are the commands shown. Sections B and C are the returned files of the first runs (15:10Z-15:12Z).
+
+## A. The four advisories and the versions they hit (OSV API, read-only)
+$ python3 osv_advisories.py     # 2026-09-30T15:22:43Z
+GHSA-8988-9cw3-xx77	published 2026-09-30T14:46:04Z	aliases ['CVE-2026-97687']	HIGH	['CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N']	PyPI urllib3	introduced ['1.26.0'] fixed ['2.8.0']
+    urllib3: HTTPS proxy TLS configuration may be ignored or overridden
+GHSA-vxq7-64xx-v4gw	published 2026-09-30T14:46:18Z	aliases ['CVE-2026-97689']	HIGH	['CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H']	PyPI urllib3	introduced ['1.10.3'] fixed ['2.8.0']
+    urllib3: HTTPResponse.stream()/read_chunked() buffers an unbounded chunk-size line into memory
+GHSA-gh4c-6fx4-qh6g	published 2026-09-30T15:00:38Z	aliases ['CVE-2026-97688']	MODERATE	['CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N']	PyPI urllib3	introduced ['2.6.2'] fixed ['2.8.0']
+    urllib3: Chunked Deflate streaming can enter an infinite loop
+GHSA-vcvr-r3jv-pc5j	published 2026-09-30T14:48:30Z	aliases -	CRITICAL	['CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H']	npm next	introduced ['16.2.0'] fixed ['16.3.6']
+    Next.js: Remote Code Execution in next/og ImageResponse
+query PyPI urllib3==2.7.0: ['GHSA-8988-9cw3-xx77', 'GHSA-gh4c-6fx4-qh6g', 'GHSA-vxq7-64xx-v4gw']
+query PyPI urllib3==2.8.0: no advisories
+query npm next==16.3.5: ['GHSA-vcvr-r3jv-pc5j']
+query npm next==16.3.6: no advisories
+exit: 0
+
+## B. The relock (uv 0.12.17, the recipe's method with urllib3 added), returned output of relock-2026-09-30-urllib3.relock.sh.txt
+[2026-09-30T15:10:58Z] uv uv 0.12.17 (x86_64-unknown-linux-gnu)
+[2026-09-30T15:10:58Z] sdk archive sha256: 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8 (pins.json source_archive.sha256: 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8)
+[2026-09-30T15:10:59Z] control: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0 
+[2026-09-30T15:10:59Z] control: lock exit: 0 | check exit: 0 | export exit: 0 | lines 1133 | sha256 14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64
+    Resolved 412 packages in 458ms
+    Updated anyio v4.11.0 -> v4.14.2
+    Updated click v8.1.8 -> v8.5.0
+    Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+    Updated pyjwt v2.13.0 -> v2.14.0
+    Updated pypdf v6.14.2 -> v6.19.0
+    Updated soupsieve v2.8.4 -> v2.9.2
+[2026-09-30T15:11:00Z] new: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0 --upgrade-package urllib3==2.8.0
+[2026-09-30T15:11:00Z] new: lock exit: 0 | check exit: 0 | export exit: 0 | lines 1133 | sha256 550a28639c5bfeb7b45385b57d52ff3315ca4338688a79f5ade6926f98e93ee3
+    Resolved 412 packages in 204ms
+    Updated anyio v4.11.0 -> v4.14.2
+    Updated click v8.1.8 -> v8.5.0
+    Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+    Updated pyjwt v2.13.0 -> v2.14.0
+    Updated pypdf v6.14.2 -> v6.19.0
+    Updated soupsieve v2.8.4 -> v2.9.2
+    Updated urllib3 v2.7.0 -> v2.8.0
+[2026-09-30T15:11:00Z] committed lock sha256: 14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64
+control reproduces the committed lock byte for byte
+--- diff committed lock vs new lock (changed lines only, hashes abbreviated)
+< urllib3==2.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+<     --hash=sha256:231e0ec3... \
+<     --hash=sha256:9fb4c81e...
+> urllib3==2.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+>     --hash=sha256:0cf3cae5... \
+>     --hash=sha256:63bf2ead...
+[2026-09-30T15:11:00Z] done
+
+## C. The recipe's hashed install sequence on the new lock (scratch venv), returned output of relock-2026-09-30-urllib3.install-check.sh.txt
+[2026-09-30T15:11:30Z] uv venv
+Activate with: source <scratch>/venv/bin/activate
+venv exit: 0
+ + setuptools==84.0.0
+ + wheel==0.46.3
+build-requirements install exit: 0
+ + yarl==1.22.0
+ + zipp==3.23.0
+runtime lock install exit: 0
+Checked 178 packages in 4ms
+All installed packages are compatible
+uv pip check exit: 0
++----------------------------------------------------------------------+
+|  OpenHands SDK v1.49.6                                               |
+|                                                                      |
+|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |
+|  Get help: openhands.dev/joinslack                                   |
+|  Scale up: openhands.dev/product/sdk                                 |
+|                                                                      |
+|  Set OPENHANDS_SUPPRESS_BANNER=1 to hide this message                |
++----------------------------------------------------------------------+
+
+openhands-sdk/tools 1.49.6 imports ok
+sdk import exit: 0
+urllib3 2.8.0 | requests 2.33.0 | httpx 0.28.1 | pyjwt 2.14.0 | oauthlib 3.3.1
+[2026-09-30T15:11:42Z] done
+
+## D. urllib3 2.8.0 and oauthlib: no reference in the installed package
+$ grep -rl -i oauthlib <scratch>/venv/lib/python3.13/site-packages/urllib3 | wc -l     # 2026-09-30T15:22:45Z
+0
+exit: 0
+$ diff <(committed lock without hashes) <(new lock without hashes)     # names and versions only     # 2026-09-30T15:22:45Z
+326c326
+< urllib3==2.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+---
+> urllib3==2.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+exit: 1     # 1 = the inputs differ, in this one entry only
+
+## E. OSV-Scanner 2.6.0 (the CI pin), the workflow's command over the whole inventory (49 lockfiles), --no-resolve
+$ sha256sum <osv-bin>/osv-scanner     # CI pin ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108     # 2026-09-30T15:22:45Z
+ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  <osv-bin>/osv-scanner
+exit: 0
+$ <main-checkout>: osv-scanner scan source --config .github/osv-scanner.toml --no-resolve <49 --lockfile args from the inventory>     # the control: origin/main at 11227bfd     # 2026-09-30T15:22:45Z
+scan exit: 1
+osv-main.json -> {"urllib3==2.7.0": ["GHSA-8988-9cw3-xx77", "GHSA-gh4c-6fx4-qh6g", "GHSA-vxq7-64xx-v4gw"], "next==16.3.5": ["GHSA-vcvr-r3jv-pc5j"]}
+exit: 0     # the wrapper's own exit; the scanner's exit is the 'scan exit' line
+$ <worktree>: the same command on this change     # the result     # 2026-09-30T15:22:46Z
+scan exit: 0
+osv-after.json -> no findings
+Filtered 175 local/unscannable package/s from the scan.
+GHSA-vcvr-r3jv-pc5j has been filtered out because: next 16.2.0 through 16.3.5 (fixed in 16.3.6): the Node.js ImageRespon
+Filtered 8 vulnerabilities from output
+exit: 0     # the wrapper's own exit; the scanner's exit is the 'scan exit' line
+$ <worktree>: the same command with an EMPTY config     # what the ignores hide (urllib3 is absent: fixed, not ignored)     # 2026-09-30T15:22:48Z
+scan exit: 1
+osv-after-noconfig.json -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"], "nltk==3.10.3": ["GHSA-8mgp-746c-j5xp"], "setuptools==80.10.2": ["GHSA-h35f-9h28-mq5c", "PYSEC-2026-3447"], "next==16.3.5": ["GHSA-vcvr-r3jv-pc5j"]}
+exit: 0     # the wrapper's own exit; the scanner's exit is the 'scan exit' line
+
+## F. The frozen macOS variant: what the repository keeps of it and who names it (origin/main at 11227bfd)
+$ git ls-tree -r --name-only origin/main -- evidence/artifacts/macos-application-20260924/variant     # 2026-09-30T15:22:50Z
+evidence/artifacts/macos-application-20260924/variant/package.json
+evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml
+exit: 0
+$ git grep -l -F macos-application-20260924/variant/pnpm-lock origin/main -- . ':(exclude)evidence/artifacts/macos-application-20260924'     # 2026-09-30T15:22:50Z
+origin/main:.github/osv-scanner-lockfiles.json
+origin/main:blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json
+origin/main:manifests/evidence.json
+exit: 0
+$ git grep -n -i -E 'next/og|ImageResponse|opengraph-image|twitter-image' origin/main -- evidence/artifacts/macos-application-20260924     # 2026-09-30T15:22:50Z
+exit: 1     # 1 = no match
+$ git grep -n -i pnpm origin/main -- .github/workflows     # 2026-09-30T15:22:51Z
+exit: 1     # 1 = no match
+$ git show origin/main:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml | grep -n -E '^  next@'     # 2026-09-30T15:22:51Z
+544:  next@16.3.5:
+925:  next@16.3.5(@playwright/test@1.63.0)(@types/node@24.13.6)(react-dom@19.3.0(react@19.
+exit: 0
+$ git show origin/main:blueprints/convergence-practice/application-delivery/pnpm-lock.yaml | grep -n -E '^  next@'     # the live recipe's lock     # 2026-09-30T15:22:51Z
+544:  next@16.3.6:
+925:  next@16.3.6(@playwright/test@1.63.0)(@types/node@24.13.6)(react-dom@19.3.0(react@19.
+exit: 0
+$ sha256sum evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml     # 2026-09-30T15:22:51Z
+f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2  <worktree>/evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml
+exit: 0
+
+## G. The lock files' digests
+$ sha256sum <worktree>/blueprints/runtime-workers/openhands/requirements.lock     # the new lock; the previous one is 14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64     # 2026-09-30T15:22:51Z
+550a28639c5bfeb7b45385b57d52ff3315ca4338688a79f5ade6926f98e93ee3  <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+exit: 0
+$ jq -r .requirements_sha256 blueprints/runtime-workers/openhands/pins.json     # 2026-09-30T15:22:51Z
+550a28639c5bfeb7b45385b57d52ff3315ca4338688a79f5ade6926f98e93ee3
+exit: 0
+
+## H. Negative controls for the guard changes (in-memory mutants of the test inputs, nothing on disk changes), from the worktree root
+$ python3 -B relock-2026-09-30-urllib3.guard-mutants.py.txt     # run as mutants.py     # 2026-09-30T15:22:51Z
+PASS  unmutated: ran 14, failures 0, errors 0
+PASS  M1 macOS row removed: 1 failing test(s); expected rule 'pins a next the GHSA-vcvr-r3jv-pc5j ignore hides' seen
+PASS  M2 reader returns None for the macOS lock: 1 failing test(s); expected rule 'no key could be read strictly' seen
+PASS  M3 allowed lock pins no next: 1 failing test(s); expected rule 'the allowed lock no longer pins next' seen
+PASS  M4 application-delivery lock pins next 16.3.5: 1 failing test(s); expected rule 'application-delivery/pnpm-lock.yaml pins a next' seen
+PASS  M5 OpenHands row sha256 wrong: 1 failing test(s): ['test_every_allowed_lock_matches_its_reviewed_digest']
+PASS  M6 macOS row sha256 wrong: 1 failing test(s): ['test_every_allowed_lock_matches_its_reviewed_digest']
+PASS  M7 next scope removed: 2 failing test(s): ['test_allowed_advisories_are_scoped_active_ignores', 'test_only_the_allowed_pnpm_lock_pins_an_affected_next']
+ALL MUTANTS CAUGHT AND CONTROL CLEAN
+exit: 0

@@ -1,0 +1,29 @@
+#!/bin/bash
+# Published copy of the script as it ran on 2026-09-30. Host paths are placeholders (<scratch>, <worktree>, <scratch-relock>); it needs the SDK archive
+# sdk-fcc102a.tar.gz of pins.json, uv 0.12.17 and network access, and is documentation of what ran, not a supported tool.
+# relock_urllib3.sh: the recipe's runtime-lock relock (research.md "Runtime lock security relock") with urllib3 added to the upgrades.
+# Control first: the five upgrades of the 2026-09-30 relock must reproduce the committed lock byte for byte; then the six-upgrade lock.
+set -u
+R=<scratch-relock>; W=<worktree>; OH=blueprints/runtime-workers/openhands; U=$R/u3
+export UV_CACHE_DIR=$R/uv-cache
+stamp() { date -u +%FT%TZ; }
+echo "[$(stamp)] uv $(uv --version)"
+echo "[$(stamp)] sdk archive sha256: $(sha256sum $R/sdk-fcc102a.tar.gz | cut -d' ' -f1) (pins.json source_archive.sha256: $(jq -r .source_archive.sha256 $W/$OH/pins.json))"
+for variant in control new; do
+  D=$U/$variant; rm -rf $D; mkdir -p $D
+  (cd $D && tar -xzf $R/sdk-fcc102a.tar.gz --strip-components=1 && sed -i "/^\[tool\.uv\]\$/a environments = [\"sys_platform == 'linux' and platform_machine == 'x86_64'\"]" pyproject.toml)
+  extra=""; [ $variant = new ] && extra="--upgrade-package urllib3==2.8.0"
+  echo "[$(stamp)] $variant: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0 $extra"
+  (cd $D && uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.14.0 $extra > lock.out 2>&1; echo "lock exit: $?" >> lock.out
+    uv lock --check > check.out 2>&1; echo "check exit: $?" >> check.out
+    uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace > export.txt 2> export.err; echo "export exit: $?" > export.rc
+    jq -r '.wheels | to_entries[] | "\(.key) @ \(.value.url) \\\n    --hash=sha256:\(.value.sha256)"' "$W/$OH/pins.json" > wheels.txt
+    cat export.txt wheels.txt > requirements.lock.repro)
+  echo "[$(stamp)] $variant: $(tail -1 $D/lock.out) | $(tail -1 $D/check.out) | $(cat $D/export.rc) | lines $(wc -l < $D/requirements.lock.repro) | sha256 $(sha256sum $D/requirements.lock.repro | cut -d' ' -f1)"
+  grep -E "^Updated|^Resolved" $D/lock.out | head -12 | sed 's/^/    /'
+done
+echo "[$(stamp)] committed lock sha256: $(sha256sum $W/$OH/requirements.lock | cut -d' ' -f1)"
+cmp $U/control/requirements.lock.repro $W/$OH/requirements.lock && echo "control reproduces the committed lock byte for byte"
+echo "--- diff committed lock vs new lock (changed lines only, hashes abbreviated)"
+diff <(sed -E 's/--hash=sha256:([0-9a-f]{8})[0-9a-f]+/--hash=sha256:\1.../' $W/$OH/requirements.lock) <(sed -E 's/--hash=sha256:([0-9a-f]{8})[0-9a-f]+/--hash=sha256:\1.../' $U/new/requirements.lock.repro) | grep '^[<>]' | head -20
+echo "[$(stamp)] done"

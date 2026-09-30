@@ -1,0 +1,20 @@
+"""Facts of the four advisories of 2026-09-30 from the OSV API (https://api.osv.dev/v1/vulns/<id>): published time, aliases, database severity, CVSS vector,
+affected package and the first introduced and fixed versions, one line per advisory and then its summary; then the OSV query result for the locked and
+the fixed versions (https://api.osv.dev/v1/query). Read-only network access, no credential."""
+import json
+import urllib.request
+
+for vuln in ("GHSA-8988-9cw3-xx77", "GHSA-vxq7-64xx-v4gw", "GHSA-gh4c-6fx4-qh6g", "GHSA-vcvr-r3jv-pc5j"):
+    d = json.load(urllib.request.urlopen(f"https://api.osv.dev/v1/vulns/{vuln}", timeout=30))
+    affected = d["affected"][0]
+    events = [e for r in affected.get("ranges", []) for e in r.get("events", [])]
+    print(f"{vuln}\tpublished {d.get('published')}\taliases {d.get('aliases') or '-'}\t{(d.get('database_specific') or {}).get('severity')}\t"
+          f"{[s.get('score') for s in d.get('severity', [])]}\t{affected['package']['ecosystem']} {affected['package']['name']}\t"
+          f"introduced {[e['introduced'] for e in events if 'introduced' in e]} fixed {[e['fixed'] for e in events if 'fixed' in e]}")
+    print(f"    {d.get('summary')}")
+
+for name, ecosystem, version in (("urllib3", "PyPI", "2.7.0"), ("urllib3", "PyPI", "2.8.0"), ("next", "npm", "16.3.5"), ("next", "npm", "16.3.6")):
+    request = urllib.request.Request("https://api.osv.dev/v1/query", headers={"Content-Type": "application/json"},
+                                     data=json.dumps({"package": {"name": name, "ecosystem": ecosystem}, "version": version}).encode())
+    found = sorted(v["id"] for v in json.load(urllib.request.urlopen(request, timeout=30)).get("vulns", []))
+    print(f"query {ecosystem} {name}=={version}: {found if found else 'no advisories'}")

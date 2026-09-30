@@ -1,0 +1,80 @@
+"""Negative controls for the OSV guard changes of 2026-09-30: each mutant breaks one input of the guard tests in memory (nothing on disk changes) and
+the named test must then fail with the expected rule; the unmutated run must pass. Run from the repository root."""
+import copy
+import sys
+import unittest
+from unittest import mock
+
+sys.path.insert(0, ".")
+from tests import test_osv_lockfile_coverage as T  # noqa: E402
+
+MAC = "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
+OH = "blueprints/runtime-workers/openhands/requirements.lock"
+
+
+def run(test_names):
+    suite = unittest.TestSuite(T.AllowedLockTests(name) for name in test_names)
+    result = unittest.TestResult()
+    suite.run(result)
+    return result
+
+
+def report(label, result, expect_rule):
+    problems = result.failures + result.errors
+    text = "\n".join(t for _, t in problems)
+    ok = bool(problems) and expect_rule in text
+    print(f"{'PASS' if ok else 'FAIL'}  {label}: {len(problems)} failing test(s); expected rule {expect_rule!r} {'seen' if expect_rule in text else 'NOT seen'}")
+    return ok
+
+
+all_names = [n for n in dir(T.AllowedLockTests) if n.startswith("test_")]
+base = run(all_names)
+print(f"{'PASS' if base.wasSuccessful() else 'FAIL'}  unmutated: ran {base.testsRun}, failures {len(base.failures)}, errors {len(base.errors)}")
+outcomes = [base.wasSuccessful()]
+
+pnpm_test = "test_only_the_allowed_pnpm_lock_pins_an_affected_next"
+
+# M1: the macOS row removed -> the affected next in that lock is no longer allowed.
+allowed = {k: v for k, v in T.IGNORE_ALLOWED_LOCKS.items() if k != MAC}
+with mock.patch.object(T, "IGNORE_ALLOWED_LOCKS", allowed):
+    outcomes.append(report("M1 macOS row removed", run([pnpm_test]), "pins a next the GHSA-vcvr-r3jv-pc5j ignore hides"))
+
+# M2: the reader cannot read a lock strictly (returns None) -> fails closed.
+real = T.pnpm_next_pins
+with mock.patch.object(T, "pnpm_next_pins", lambda path: None if str(path).endswith("variant/pnpm-lock.yaml") else real(path)):
+    outcomes.append(report("M2 reader returns None for the macOS lock", run([pnpm_test]), "no key could be read strictly"))
+
+# M3: the allowed lock no longer pins next -> the entry must be dropped.
+with mock.patch.object(T, "pnpm_next_pins", lambda path: [] if str(path).endswith("variant/pnpm-lock.yaml") else real(path)):
+    outcomes.append(report("M3 allowed lock pins no next", run([pnpm_test]), "the allowed lock no longer pins next"))
+
+# M4: another pnpm lock pins an affected next -> not allowed.
+def other_affected(path):
+    return ["16.3.5"] if str(path).endswith("application-delivery/pnpm-lock.yaml") else real(path)
+with mock.patch.object(T, "pnpm_next_pins", other_affected):
+    outcomes.append(report("M4 application-delivery lock pins next 16.3.5", run([pnpm_test]), "application-delivery/pnpm-lock.yaml pins a next"))
+
+# M5/M6: a wrong sha256 in either exact-lock row must fail the digest test. The checks bind IGNORE_ALLOWED_LOCKS as a default argument at
+# definition time, so the entry is mutated in place and restored.
+for label, key in (("M5 OpenHands row sha256 wrong", OH), ("M6 macOS row sha256 wrong", MAC)):
+    kept = T.IGNORE_ALLOWED_LOCKS[key]["sha256"]
+    T.IGNORE_ALLOWED_LOCKS[key]["sha256"] = "0" * 64
+    try:
+        result = run([n for n in all_names if n != pnpm_test])
+    finally:
+        T.IGNORE_ALLOWED_LOCKS[key]["sha256"] = kept
+    problems = result.failures + result.errors
+    ok = any("test_every_allowed_lock_matches_its_reviewed_digest" in str(t[0]) and key in t[1] for t in problems)
+    print(f"{'PASS' if ok else 'FAIL'}  {label}: {len(problems)} failing test(s): {[str(t[0]).split()[0] for t in problems]}")
+    outcomes.append(ok)
+
+# M7: the next ignore entry without its scope must fail.
+scopes = {k: v for k, v in T.IGNORE_SCOPES.items() if k != "GHSA-vcvr-r3jv-pc5j"}
+with mock.patch.object(T, "IGNORE_SCOPES", scopes):
+    result = run(all_names)
+    problems = result.failures + result.errors
+    print(f"{'PASS' if problems else 'FAIL'}  M7 next scope removed: {len(problems)} failing test(s): {[str(t[0]).split()[0] for t in problems]}")
+    outcomes.append(bool(problems))
+
+print("ALL MUTANTS CAUGHT AND CONTROL CLEAN" if all(outcomes) else "SOMETHING DID NOT BEHAVE AS EXPECTED")
+sys.exit(0 if all(outcomes) else 1)

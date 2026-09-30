@@ -1,0 +1,121 @@
+{
+ "schema_version": 1,
+ "record": "osv-urllib3-next-20260930",
+ "purpose": "Records the 2026-09-30 fix of the required osv-scanner check, which fails on fresh runs since four advisories were published that day (14:46Z to 15:00Z): GHSA-8988-9cw3-xx77, GHSA-vxq7-64xx-v4gw and GHSA-gh4c-6fx4-qh6g (urllib3 2.7.0, all fixed in 2.8.0) in the OpenHands recipe lock, and GHSA-vcvr-r3jv-pc5j (next 16.3.5, fixed in 16.3.6) in the frozen macOS variant lock. The OpenHands lock is relocked onto urllib3 2.8.0 with the recipe's own method (only urllib3's version and hashes change); the macOS lock is a frozen evidence artifact with no live owner and gets an ignore under the repository's policy, an IGNORE_ALLOWED_LOCKS row and a pnpm reader that bounds the repo-wide ignore. One change carries both, because the check scans the whole inventory.",
+ "checked_commit": "11227bfdf25b55b0481a9e78985c3fed26052472",
+ "observed_utc": "2026-09-30T15:22:51Z",
+ "authorization": "Requested by session sota-default-harness-setup (c5), whose PR #540 was blocked, in a cross-session message on 2026-09-30, which asked the OpenHands lock lane (issue #518, owner bc) to take the urllib3 relock and to name the owner of the macOS lock. The macOS lock has no live owner: its only commit is #201 (2026-09-24) and no session claims it. No user decision is needed: both fixes follow the repository's own policy and method.",
+ "evidence_class": "Local runs on this host of the pinned OSV-Scanner 2.6.0 with the repository's config and the workflow's command line, a local reproduction of the relock with uv 0.12.17 from the pinned upstream source archive, the recipe's own install sequence in a scratch venv, and reads of git objects and the OSV API. Static and local; not an execution of the recipe, of any worker or of any application.",
+ "limitations": [
+  "The relock covers only the recipe venv. The agent-server image's server is a PyInstaller build of upstream's unchanged uv.lock (pins.json source_archive), which still pins urllib3 2.7.0 or older, and the grader venv has its own lock; neither is changed here (the same scope limit as the PyJWT relock record).",
+  "The macOS ignore is a reachability statement about this repository only: the repository keeps the variant's package.json and lock (two files, no application source), so it says nothing about the application that ran on the Mac in 2026-09-24. It expires on 2026-12-24 and then needs a renewed dated reason, or the lock leaving the inventory.",
+  "The Python guard (python_pins) reads no npm format. The repo-wide next ignore is therefore bounded by the new pnpm_next_pins reader and its test, which read pnpm lockfileVersion 9 keys strictly and fail closed; a future non-pnpm npm lock (package-lock.json, yarn.lock) pinning an affected next would not be seen by it.",
+  "Section E of the returned outputs is a local run of the workflow's command, not the CI run; the required check on this change is the CI result.",
+  "Codex's draft PR #535 replaces this lock with a Linux-only lock (sha256 383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106) that carries urllib3 2.7.0 too, so it needs the same bump and a new digest in its exact-lock entry before it can pass the check; this change does not touch #535's files."
+ ],
+ "ci_failure": {
+  "run_id": 36733726923,
+  "job_id": 109949820112,
+  "pull_request": 540,
+  "conclusion": "failure (osv-scanner)",
+  "source": "as reported by c5 in its cross-session message (its own failing-checks listing); this session did not read the run's log, and the local reproduction below is the evidence",
+  "reproduction": "section E of the returned outputs: the workflow's command over the 49 lockfiles on origin/main at 11227bfd exits 1 with exactly urllib3==2.7.0 (three ids) and next==16.3.5 (one id). The third urllib3 id was published at 15:00:38Z, after a first local scan had shown two, so the failing set grew while this change was built; the scan before the merge is the one that counts"
+ },
+ "advisories": [
+  {
+   "id": "GHSA-8988-9cw3-xx77",
+   "aliases": [
+    "CVE-2026-97687"
+   ],
+   "published": "2026-09-30T14:46:04Z",
+   "package": "urllib3 (PyPI)",
+   "affects": "1.26.0 through 2.7.0",
+   "fixed": "2.8.0",
+   "summary": "HTTPS proxy TLS configuration may be ignored or overridden",
+   "disposition": "fixed by the relock"
+  },
+  {
+   "id": "GHSA-vxq7-64xx-v4gw",
+   "aliases": [
+    "CVE-2026-97689"
+   ],
+   "published": "2026-09-30T14:46:18Z",
+   "package": "urllib3 (PyPI)",
+   "affects": "1.10.3 through 2.7.0",
+   "fixed": "2.8.0",
+   "summary": "HTTPResponse.stream()/read_chunked() buffers an unbounded chunk-size line into memory",
+   "disposition": "fixed by the relock"
+  },
+  {
+   "id": "GHSA-gh4c-6fx4-qh6g",
+   "aliases": [
+    "CVE-2026-97688"
+   ],
+   "published": "2026-09-30T15:00:38Z",
+   "package": "urllib3 (PyPI)",
+   "affects": "2.6.2 through 2.7.0",
+   "fixed": "2.8.0",
+   "summary": "Chunked Deflate streaming can enter an infinite loop",
+   "disposition": "fixed by the relock"
+  },
+  {
+   "id": "GHSA-vcvr-r3jv-pc5j",
+   "aliases": [],
+   "published": "2026-09-30T14:48:30Z",
+   "package": "next (npm)",
+   "affects": "16.2.0 through 16.3.5",
+   "fixed": "16.3.6",
+   "summary": "Next.js: Remote Code Execution in next/og ImageResponse (Node.js implementation, attacker-controlled values in SVG content, attributes or styles)",
+   "disposition": "ignored for the frozen macOS variant lock until 2026-12-24; the live application-delivery lock pins 16.3.6"
+  }
+ ],
+ "locks": [
+  {
+   "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+   "previous_sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
+   "sha256": "550a28639c5bfeb7b45385b57d52ff3315ca4338688a79f5ade6926f98e93ee3",
+   "lines": 1133,
+   "diff": "only the urllib3 entry: 2.7.0 to 2.8.0 and its two hashes (section B); the five upgrades of the 2026-09-30 relock reproduce the previous lock byte for byte (control), the sixth is `--upgrade-package urllib3==2.8.0`",
+   "pins_json": "requirements_sha256 updated to the new sha256 (uv_lock and source_archive digests unchanged: the upstream source is untouched)",
+   "checks": "the recipe's hashed install sequence (build-requirements, then the runtime lock with --require-hashes --no-build-isolation) exits 0, uv pip check exits 0 (178 packages), the SDK import check exits 0, urllib3 2.8.0 / requests 2.33.0 / httpx 0.28.1 / PyJWT 2.14.0 / oauthlib 3.3.1 installed (section C)"
+  },
+  {
+   "lock": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+   "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+   "status": "unchanged (frozen evidence artifact); new IGNORE_ALLOWED_LOCKS row bound to this sha256"
+  }
+ ],
+ "osv_scanner": {
+  "tool": "OSV-Scanner 2.6.0 (osv-scalibr 0.5.2)",
+  "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108 (the CI pin, checked in section E)",
+  "command": "scan source --config .github/osv-scanner.toml --no-resolve with the 49 --lockfile arguments the workflow builds from .github/osv-scanner-lockfiles.json",
+  "results": {
+   "origin/main at 11227bfd": "exit 1: urllib3==2.7.0 (GHSA-8988-9cw3-xx77, GHSA-gh4c-6fx4-qh6g, GHSA-vxq7-64xx-v4gw) and next==16.3.5 (GHSA-vcvr-r3jv-pc5j)",
+   "this change": "exit 0, no findings; the scanner reports 8 vulnerabilities filtered from output by the entries of .github/osv-scanner.toml (oauthlib, nltk, setuptools and, new, next)",
+   "this change with an empty config (control)": "exit 1: the ignored set only (oauthlib 3.3.1 x2, nltk, setuptools x2, next 16.3.5); urllib3 is absent, fixed and not ignored"
+  }
+ },
+ "carried_forward_review": {
+  "reviewed_record": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json (carried_forward_review, the 2026-09-29 oauthlib review)",
+  "advisories": [
+   "GHSA-hj66-6f7g-4r5v",
+   "GHSA-xpv3-w29h-x7cv"
+  ],
+  "why_it_holds": "the closure differs from the reviewed one in urllib3's version and hashes alone (section B), and the installed urllib3 2.8.0 package has no oauthlib reference (section D, 0 files), so no importer of oauthlib and no call site of its endpoints or grant types can have changed"
+ },
+ "guard_negative_controls": "section H of the returned outputs: the unmutated tests pass (14 tests of AllowedLockTests) and seven in-memory mutants each fail the rule they target: M1 the macOS row removed (next hidden outside an allowed lock), M2 the reader unable to read a lock (fails closed), M3 the allowed lock no longer pinning next (entry must be dropped), M4 another pnpm lock pinning next 16.3.5, M5/M6 a wrong sha256 in the OpenHands or macOS row (digest test), M7 the next ignore without its scope",
+ "next_pin_guard": {
+  "why": "python_pins reads no npm format, so the repo-wide next ignore would not have been bounded by the Python guard",
+  "reader": "pnpm_next_pins in tests/test_osv_lockfile_coverage.py reads the `  next@<version>` package and snapshot keys of each pnpm-lock.yaml in the inventory; test_only_the_allowed_pnpm_lock_pins_an_affected_next fails for any lock but the allowed one that pins a next below 16.3.6, and for a lock it cannot read strictly",
+  "current_pins": "frozen macOS variant 16.3.5 (allowed); application-delivery 16.3.6"
+ },
+ "follow_up": "Tracked with issue #518 (the OpenHands lock lane; owner bc): the joint oauthlib 4.0.0 / PyJWT 2.15.1 relock, no earlier than 2026-10-05T18:40:43Z, is built on whatever lock is on main then. The macOS next ignore runs to 2026-12-24. Codex's #535 needs the urllib3 bump (see limitations).",
+ "registrations": [
+  ".github/osv-scanner.toml: the GHSA-vcvr-r3jv-pc5j ignore with its reason",
+  "tests/test_osv_lockfile_coverage.py: IGNORE_SCOPES entry, the OpenHands entry's new sha256 and evidence, the macOS row, pnpm_next_pins and its two tests",
+  "blueprints/runtime-workers/openhands/pins.json and requirements.lock",
+  "docs/decisions/2026-09-22-github-automation-closure.md: the dated paragraph",
+  "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt and the four scripts beside it",
+  "manifests/evidence.json: the new files and the changed registered files"
+ ]
+}

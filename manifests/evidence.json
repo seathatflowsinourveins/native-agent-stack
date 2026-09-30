@@ -3734,8 +3734,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87",
-      "bytes": 7252
+      "sha256": "4247e5e66a209b46001dd6059b37b9c58d25d5ed9d5302471a166993d73bc028",
+      "bytes": 9113
     },
     {
       "path": ".github/pull_request_template.md",
@@ -8989,6 +8989,31 @@
       "bytes": 33599
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.guard-mutants.py.txt",
+      "sha256": "9e4a2602b990654a3d5b53bca4670511fb8623f654fea4fed913a09b0bdded1a",
+      "bytes": 4295
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.install-check.sh.txt",
+      "sha256": "d637ced89b96b6228a12a83e2b1bb2f7ae0517590e1f65102e163a37d95f27de",
+      "bytes": 1840
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-advisories.py.txt",
+      "sha256": "385fd129596f6a2a2ebfbbec11a0aa0d0ff9c38f14c8e98da1cf2143cd283446",
+      "bytes": 1796
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.relock.sh.txt",
+      "sha256": "0ba19195d7ae6640b51e7f8b2771c71f53b47090920716ac3f6603bfbf85a4e0",
+      "bytes": 2995
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt",
+      "sha256": "6f086d7aa986d772554ee1aa6e2c4ff463e66c9af62464c04cd75b6ef2def239",
+      "bytes": 11751
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.builder.sh.txt",
       "sha256": "3ec8811aa0b33530f1a7e9adc50971a287e443dbadb0a0f085c379b6d35cc289",
       "bytes": 18991
@@ -9095,7 +9120,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "c857efa5c006c709dd99cc7d5f480f9dcef649248dde89f50f8265ca80008e9d",
+      "sha256": "b1b1ae66b7eb7c8da64a5e4b17a6d31f0491f0b4fa86b255585b136ee590f854",
       "bytes": 4460
     },
     {
@@ -9115,7 +9140,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
+      "sha256": "550a28639c5bfeb7b45385b57d52ff3315ca4338688a79f5ade6926f98e93ee3",
       "bytes": 106002
     },
     {
@@ -14635,8 +14660,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "bd87c4a7d7ddf1f60aeaa6806413e4c0dcfb42958b0025e201321e445bed14aa",
-      "bytes": 138874
+      "sha256": "7781b06eb1ea29c6547c2bb4cb523b10051e39c2762eb8498da70029fa2a2132",
+      "bytes": 141223
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -43754,6 +43779,11 @@
       "bytes": 30986
     },
     {
+      "path": "evidence/receipts/osv-urllib3-next-20260930.json",
+      "sha256": "521b88d0c64cf4ee66106484dc15bfb6c315b735fb2a8d94639757ae9502b56f",
+      "bytes": 10181
+    },
+    {
       "path": "evidence/receipts/pit-availability.json",
       "sha256": "1bbae79fec7cd519571f42470e05b4784e36d72d21da34a210ab8adc864823f4",
       "bytes": 107713
@@ -45505,8 +45535,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "192b167f797edde99ec08e0303339ab26d5259bcf076a786117738be998faf90",
-      "bytes": 38017
+      "sha256": "aa3656849073eafa957b6fdd4f3a7360684d4e6f0b87fe416ec8c7fbec3504de",
+      "bytes": 41601
     },
     {
       "path": "tests/test_path_safety.py",

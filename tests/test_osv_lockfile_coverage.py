@@ -56,14 +56,24 @@ IGNORE_SCOPES = {
     # oauthlib 4.0.0 fixes both oauthlib advisories (GitHub and OSV records, 2026-09-29).
     "GHSA-hj66-6f7g-4r5v": {"package": "oauthlib", "fixed": (4, 0, 0)},
     "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
+    # next (npm), introduced in 16.2.0, fixed in 16.3.6 (GitHub advisory, 2026-09-30). python_pins reads no npm format, so
+    # this entry drives the pnpm reader pnpm_next_pins and its test, not affected_pins.
+    "GHSA-vcvr-r3jv-pc5j": {"package": "next", "fixed": (16, 3, 6)},
 }
 IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock, relocked onto PyJWT 2.14.0 on 2026-09-30. Its receipt carries the 2026-09-29 oauthlib review
-    # forward at this sha256; the relock onto oauthlib 4.0.0 deletes this entry in the same change.
+    # Live recipe lock, relocked onto PyJWT 2.14.0 and then urllib3 2.8.0 on 2026-09-30. Its receipt carries the 2026-09-29
+    # oauthlib review forward at this sha256 (the urllib3 relock changes only urllib3's version and hashes); the relock onto
+    # oauthlib 4.0.0 deletes this entry in the same change.
     "blueprints/runtime-workers/openhands/requirements.lock": {
         "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
-        "evidence": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
+        "sha256": "550a28639c5bfeb7b45385b57d52ff3315ca4338688a79f5ade6926f98e93ee3",
+        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
+    },
+    # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
+    "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
+        "advisories": ["GHSA-vcvr-r3jv-pc5j"],
+        "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
     },
     # Frozen evaluation-only lock. The receipt reviews the oauthlib advisories and carries forward the 2026-09-26
     # nltk and setuptools review (repository-checks.json in the trial directory) at the same sha256.
@@ -166,6 +176,20 @@ def python_pins(path, parser=None):
             elif kind != "option":
                 pins.append((current, None, line))
     return pins
+
+
+PNPM_NEXT_KEY = re.compile(r"^  next@([^\s:(]+)[:(]", re.MULTILINE)
+
+
+def pnpm_next_pins(path):
+    """The versions of `next` a pnpm lockfile (lockfileVersion 9) pins, read from its package and snapshot keys, which are indented two
+    spaces (`  next@16.3.6:` and `  next@16.3.6(peer...):`). python_pins reads no npm format, so this reader lets the next advisory
+    keep the same bound as the Python ones. A file that mentions `next@` but yields no key fails closed (None)."""
+    text = Path(path).read_text(encoding="utf-8")
+    versions = sorted(set(PNPM_NEXT_KEY.findall(text)))
+    if not versions and "next@" in text:
+        return None
+    return versions
 
 
 def affected(version, fixed):
@@ -473,6 +497,36 @@ class AllowedLockTests(unittest.TestCase):
 
     config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
     inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+
+    def test_only_the_allowed_pnpm_lock_pins_an_affected_next(self):
+        # The next ignore is repo-wide by id and python_pins reads no npm format, so every pnpm lock is read here: the frozen
+        # macOS variant may pin next below the fix, no other lock may, and a lock this reader cannot read strictly fails.
+        advisory, scope = "GHSA-vcvr-r3jv-pc5j", IGNORE_SCOPES["GHSA-vcvr-r3jv-pc5j"]
+        seen = 0
+        for entry in self.inventory["lockfiles"]:
+            if not entry["path"].endswith("pnpm-lock.yaml"):
+                continue
+            seen += 1
+            versions = pnpm_next_pins(ROOT / entry["path"])
+            self.assertIsNotNone(versions, f"{entry['path']}: mentions next@ but no key could be read strictly")
+            if advisory in IGNORE_ALLOWED_LOCKS.get(entry["path"], {}).get("advisories", ()):
+                self.assertTrue(versions, f"{entry['path']}: the allowed lock no longer pins next; drop its entry")
+                continue
+            self.assertEqual([v for v in versions if affected(v, scope["fixed"])], [],
+                             f"{entry['path']} pins a next the {advisory} ignore hides; bump it, or review and allow it")
+        self.assertGreaterEqual(seen, 2)
+
+    def test_the_pnpm_next_reader_sees_affected_and_fixed_keys(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            lock = Path(scratch) / "pnpm-lock.yaml"
+            lock.write_text("lockfileVersion: '9.0'\npackages:\n\n  next@16.3.5:\n    resolution: {integrity: x}\n\nsnapshots:\n\n"
+                            "  next@16.3.5(react@19.3.0):\n    dependencies: {}\n  next@16.3.6:\n", encoding="utf-8")
+            self.assertEqual(pnpm_next_pins(lock), ["16.3.5", "16.3.6"])
+            self.assertEqual([v for v in pnpm_next_pins(lock) if affected(v, (16, 3, 6))], ["16.3.5"])
+            lock.write_text("lockfileVersion: '9.0'\n    next@16.3.5 (odd indent)\n", encoding="utf-8")
+            self.assertIsNone(pnpm_next_pins(lock))
+            lock.write_text("lockfileVersion: '9.0'\npackages: {}\n", encoding="utf-8")
+            self.assertEqual(pnpm_next_pins(lock), [])
 
     def test_every_allowed_lock_is_an_inventory_lockfile(self):
         listed = {entry["path"] for entry in self.inventory["lockfiles"]}
