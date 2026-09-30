@@ -74,7 +74,10 @@ that is in neither set, and when a reused entry's pin differs from main's.
   refuses an entry whose pin drifted, that restates a gate or whose name main does
   not carry exactly once, and takes both gates from the adoption entry. `--print-codex-config` on this manifest therefore prints
   an `enabled = false` table for every reused skill main keeps off for Codex
-  (16 of the 27 on 2026-09-28; only `skill-creator`, of 29, on 2026-09-30).
+  (16 of the 27 on 2026-09-28; only `skill-creator`, of 29, on 2026-09-30). Each
+  table selects `<project>/.agents/skills/<name>/SKILL.md` by `path`, never by
+  `name`, which would also disable Codex's bundled skill of that name
+  ([skills lifecycle](../../../adoption/skills/lifecycle.md#activate-and-invoke)).
 - **Claude listing.** `claude_listing` (`on`, `name-only`, `user-invocable-only`,
   `off`) is a Claude Code client setting, applied through the `skillOverrides`
   settings key rather than the skill's frontmatter
@@ -157,7 +160,8 @@ Use the already provisioned **skills 1.7.0** executable and `gh`. The manifest
 carries `"scope": "project"`: the wrapper refuses it without `--project-dir`,
 before any CLI call, so a global run cannot place the whole trial in
 `~/.agents/skills`, which Codex and OpenHands user loading read
-(`--print-codex-config`, which only prints, still runs). The wrapper verifies the
+(`--print-codex-config`, which only prints, needs `--project-dir` too: its tables
+name the project's installed `SKILL.md` paths). The wrapper verifies the
 CLI version; project checks first fetch every selected `(source, ref)`
 through `gh api`, before any add, then use those cached trees to bind project
 lock entries to their pins. A failed lookup stops without changing the project;

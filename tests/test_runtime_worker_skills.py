@@ -7,6 +7,8 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
+import tomllib
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -214,12 +216,24 @@ class RuntimeWorkerManifestTests(unittest.TestCase):
              if "reuse_ref" in s and base[s["name"]].get("codex_enabled") is False]
             + [s["name"] for s in self.skills if "reuse_ref" not in s and s.get("codex_enabled") is False])
         self.assertTrue(expected)  # non-vacuous: main keeps some reused skills off for Codex
-        result = subprocess.run(
-            [sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
-             "--manifest", str(DIRECTORY / "manifest.json"), "--print-codex-config"],
-            capture_output=True, text=True, check=False, timeout=60)
+        command = [sys.executable, str(ROOT / "tools/adoption/install_skills.py"),
+                   "--manifest", str(DIRECTORY / "manifest.json"), "--print-codex-config"]
+        # Each table names the project's installed SKILL.md (a name rule would also hide Codex's bundled
+        # skill-creator), so this project-scoped manifest prints only with --project-dir.
+        refused = subprocess.run(command, capture_output=True, text=True, check=False, timeout=60)
+        self.assertEqual(refused.returncode, 1, refused.stdout + refused.stderr)
+        self.assertIn("--project-dir", refused.stderr)
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory).resolve()
+            result = subprocess.run([*command, "--project-dir", str(project)],
+                                    capture_output=True, text=True, check=False, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(sorted(re.findall(r'(?m)^name = "([^"]+)"$', result.stdout)), expected)
+        tables = tomllib.loads(result.stdout).get("skills", {}).get("config", [])
+        names = [Path(table.get("path", "")).parent.name for table in tables]
+        self.assertEqual(sorted(names), expected)
+        self.assertEqual(tables, [{"path": str(project / ".agents" / "skills" / name / "SKILL.md"), "enabled": False}
+                                  for name in names])
+        self.assertNotRegex(result.stdout, r"(?m)^name = ")
 
     def test_openhands_inventory_has_a_decision_for_every_skill(self):
         inventory = self.manifest["openhands_inventory"]
