@@ -1443,6 +1443,11 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     item_states = {r["payload"]["item"].get("id"): r["payload"]["item"].get("status") for r in visible
                    if r.get("type") == "event_msg" and r.get("payload", {}).get("type") == "item_completed"
                    and isinstance(r.get("payload", {}).get("item"), dict)}
+    # The model's own web_search_call response item carries the search's status (in_progress, searching, completed or failed); the
+    # web.search Extension item that ends it has none, so a failed hosted search must not read as completed below.
+    hosted_search_failed = {r["payload"].get("id") for r in visible
+                            if r.get("type") == "response_item" and r.get("payload", {}).get("type") == "web_search_call"
+                            and r.get("payload", {}).get("status") == "failed"}
     model_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
                       if r.get("type") == "response_item" and r.get("payload", {}).get("type") in MODEL_CALL_TYPES}
     shell_call_ids = {r["payload"].get("call_id") or r["payload"].get("id") for r in visible
@@ -1593,7 +1598,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
                 # A web.search item has no status field (WebSearchItem is {id, query, action, results}, openai/codex rust-v0.157.1
                 # protocol/src/items.rs:372-381) and no result is emitted for it, so its item_completed event is its completion.
                 if item_states.get(key) is None:
-                    item_states[key] = "completed"
+                    item_states[key] = "failed" if key in hosted_search_failed else "completed"
                 use(r, at, key, "WebFetch" if action.get("type") == "openPage" else "WebSearch", {"url": action.get("url")}, sandbox=sandbox)
                 used = True
             if used and attributed:
@@ -1615,20 +1620,17 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
               "until": until.timestamp() * 1000 if until else 8640000000000000}
     # PR-A U3 10d: replay asks rtk what the held Codex hook would decide (`rtk hook check --agent codex`, which no Claude
     # permission rule reaches), and the kernel adds rtk_parts.d7 for it.
+    # An unresolved command's text is '' in the rows (its fetches cannot be read, so M4 cannot be measured or not_applicable: the U3
+    # review, m4_unread below); rtk 0.50.0 answers "No rewrite for:" for it under either agent, so replay would read a parts-free
+    # measured call. The kernel counts each as an unknown call (unresolvedBash), so B8's rule, unknown_call_share and the strict D7
+    # status come from one place.
+    unresolved = commands["non_posix_shell"] + commands["unknown_shell"]
     measured = _measurement_bridge({"rows": normalized, "options": {
-        "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}, "rtkAgent": CODEX_RTK_AGENT}})
+        "window": window, "rtkCheck": rtk_check, "exceptions": exceptions or {}, "rtkAgent": CODEX_RTK_AGENT,
+        "unresolvedBash": unresolved}})
     # Claude per-message fields are inapplicable to Codex cumulative native counters.
     measured.pop("usage", None)
     measured["rtk_parts"]["agent"] = CODEX_RTK_AGENT
-    unresolved = commands["non_posix_shell"] + commands["unknown_shell"]
-    if unresolved:
-        # An unresolved command's fetches cannot be read, so M4 cannot be measured or not_applicable (the U3 review; m4_unread
-        # below), and replay read its text '' (rtk 0.50.0 answers "No rewrite for:" for either agent: no parts), so each is an
-        # explicit unknown call, which leaves d7 incomplete as well.
-        if measured["rtk_parts"]["status"] in ("measured", "incomplete"):
-            measured["rtk_parts"]["unknown_calls"] += unresolved
-            measured["rtk_parts"]["status"] = "incomplete"
-            measured["rtk_parts"]["d7"]["status"] = "incomplete"
     measured["codex_commands"] = commands
     measured["code_mode"] = code_mode_counts
     if m4_unread(commands, code_mode_counts):

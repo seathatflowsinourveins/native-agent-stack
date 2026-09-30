@@ -475,7 +475,10 @@ call did not run.
 - It starts from the fixed-config eligible parts and drops each `git log` or `find` part that a digest-bound
   `rtk_log_find` review marks `requires_raw`, prefixed or not.
 - An unreviewed `log` or `find` part stays and leaves `d7.status` incomplete, as does an unknown call.
-  An unresolved command is an unknown call.
+  An unresolved command is an unknown call: the bridge passes their number to the kernel (`unresolvedBash`),
+  which adds them to `rtk_parts.unknown_calls`. `rtk_parts.status` then follows B8's 5 percent rule on the
+  counts and `unknown_call_share` includes them, while `d7.status` keeps the harder reading (any unknown
+  call leaves it incomplete).
 - `covered_parts` are observed, from explicit prefixes.
 - `wrapped_exceptions` inherits the fixed-config `explicit_rtk_on_excluded_or_sensitive` (M6c's zero counter,
   whose classes are broader than the deployed exception list, the review's provenance finding) and adds
@@ -646,6 +649,12 @@ Each JSONL record (`schema: codex-call-ledger/1`) holds these fields:
   `other`, and rows with no `session_meta` give `null`.
 - `tool`, `server`, `state`, `cause`, `native_status`, `sandbox` and `code_mode`: the kernel's fields as
   it measured the call.
+  - `native_status` of a `web.search` call is supplied by the adapter, because that item has no status
+    field (`WebSearchItem` is `{id, query, action, results}`, openai/codex rust-v0.157.1
+    `protocol/src/items.rs:372-381`) and no result is emitted for it: its `item_completed` event is its
+    completion, so it reads `completed`, unless the model's own `web_search_call` response item with the
+    same id says `failed`. The U3 census found 3,650 such rows (7.4 percent of the host ledger) that read
+    `cancelled_or_unfinished` before this reading.
   - `tool` is the normalized name, so a shell call or command item reads `Bash`.
   - `state` is U2's M14 vocabulary: `succeeded`, `failed`, `interrupted`, `rejected`, `invalid`,
     `cancelled_with_result`, `cancelled_or_unfinished` or `unknown`.
@@ -668,11 +677,13 @@ The file follows the rule of `frozen_checks.private_create` on main (a02ff13f,
   is written before the report is written or printed, so a refusal or a failed write exits 2 with neither.
 - Without the flag nothing is probed or written.
 
-**Dependency.** Until PR-A U2's kernel is merged with this tool, `child-usage.mjs` exports no `callLedger`.
-`--call-ledger` then exits 2 with "the measurement kernel exports no callLedger" and writes nothing, and
-the five real-kernel tests of `CodexCallLedger` skip. On a scratch tree of this branch with U2's kernel at
-b2dd1eb7, the class's 13 tests failed first (at 00c458ba) and all 14 pass at 45a5c0c1, the 14th being the
-`--out` refusal added later. The host run of that tree is in
+**Dependency.** The ledger rows come from the kernel's `callLedger` (PR-A U2), which this tree carries, so
+`--call-ledger` works and every `CodexCallLedger` test runs (16 tests, 7 of them against the real kernel). Where a
+kernel exports no `callLedger`, the flag exits 2 with "the measurement kernel exports no callLedger" and
+writes nothing, and the real-kernel tests skip. Before the two units were merged, the class's 13 tests failed first
+on a scratch tree with U2's kernel at b2dd1eb7 (at 00c458ba) and all 14 then passed at 45a5c0c1, the 14th being
+the `--out` refusal added later; two tests were added by the merge review (a completed `web.search` item and a
+failed hosted one). The host run of that tree is in
 [pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md).
 
 ## Verify the bundle

@@ -845,7 +845,10 @@ temporary five-exclusion configuration from
 and native `rtk hook check --agent claude` on every simple part and whole call.
 `measureTranscript`'s `rtkAgent` option names the agent instead: `claude` by default,
 or `codex`, which the Codex bridge (`tools/skill-usage/skill_usage.py --lanes`) passes
-since PR-A U3; any other value is refused. rtk 0.50.0 maps `codex` to
+since PR-A U3; any other value is refused. The option `unresolvedBash` (a non-negative integer, 0 by default) is how a caller
+that could not resolve some Bash calls to shell text (the Codex bridge, for `pwsh`, `powershell`, `cmd` or a shell the
+rollout does not name) reports them: each is added to `rtk_parts.unknown_calls`, never beyond the Bash calls there are,
+so B8's 5 percent rule, `unknown_call_share` and the D7 status below come from the kernel alone. rtk 0.50.0 maps `codex` to
 `InProcess(Host::Codex)`, which has no RTK-side permission rules, while `claude`
 merges the Bash rules of the project's and the home's `.claude/settings(.local).json`,
 so a Claude replay depends on the working directory and HOME and a Codex one does not
@@ -934,8 +937,12 @@ D7's RTK-eligible class; Claude output has no `d7` and its fields are unchanged.
   `wrapped_requires_raw_parts`, the prefixed parts a review says required raw
   output. M6c's zero counter therefore keeps its classes, which are broader than
   the [deployed exception list](../../../adoption/templates/codex.AGENTS.template.md).
-- `aggregateMeasurements` sums `d7` over the measurements that carry it; its status
-  follows the rule of `rtk_parts`.
+- `d7.status` keeps the harder reading than `rtk_parts.status`: it is `incomplete` when any call was unknown or any
+  unreviewed `log` or `find` part stays, however few, while `rtk_parts.status` tolerates B8's 5 percent. An
+  amendment may relax that with a dated rationale.
+- `aggregateMeasurements` sums `d7` over the measurements that carry it; its status is `measured` only when every
+  actor's `d7` is, so it does not depend on how calls are split across actors, and `rtk_parts.status` of the same
+  aggregate applies B8 to the summed counts.
 - Which view M6c grades from, the fixed-config fields or `d7`, is the M6c owner's call.
 
 Every `rtk proxy` part is counted in `proxy_parts` and excluded from M-R1/M6c's

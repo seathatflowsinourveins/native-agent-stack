@@ -1679,7 +1679,8 @@ function callAnalysis(call) {
   return out
 }
 // Call states (U1 design 4). AA-PLAN: "Successful" means the tool_result is not an error (Messages API is_error); M14
-// reconciles attempted, decided, executed, failed and unfinished calls. With no result a persisted native status decides
+// reconciles attempted, decided, executed, failed and unfinished calls. With no result a native status decides (persisted, except that the
+// Codex bridge supplies completed or failed for a web.search item, which has none: tools/skill-usage/README.md)
 // (Codex CommandExecutionStatus, openai/codex rust-v0.157.1 protocol/src/items.rs), else the call is unfinished. is_error
 // true is failed, and not_executed as well when the call never ran. Where the Claude Code client records that (observed on this
 // host's transcripts; not a documented schema; the count-only recount that repeats it is states-count.mjs in
@@ -2352,7 +2353,7 @@ const finishRtk = (out, status = rtkStatus(out)) => {
 const D7_COUNTS = ['eligible_parts', 'covered_parts', 'eligible_calls', 'all_covered_calls', 'wrapped_exceptions', 'wrapped_requires_raw_parts',
   'log_find_permitted_parts', 'log_find_requires_raw_parts', 'log_find_unresolved_parts']
 const finishD7 = (d7, status) => ({ ...d7, coverage: share(d7.covered_parts, d7.eligible_parts), call_coverage: share(d7.all_covered_calls, d7.eligible_calls), status })
-function rtkParts(calls, rewrites, enabled, exceptions, results = new Map(), agent = 'claude') {
+function rtkParts(calls, rewrites, enabled, exceptions, results = new Map(), agent = 'claude', unresolved = 0) {
   const out = emptyRtk(), check = enabled ? rtkChecker(agent) : null
   const d7 = agent === 'codex' ? Object.fromEntries(D7_COUNTS.map((k) => [k, 0])) : null
   if (!check) {
@@ -2430,10 +2431,16 @@ function rtkParts(calls, rewrites, enabled, exceptions, results = new Map(), age
     if (m.executed) states.executed++
     if (observed && m.state === 'succeeded') out.observed_covered_succeeded_calls++
   }
+  // Bash calls whose shell the caller could not name (the Codex bridge: pwsh or an unnamed shell) were emitted with no text, so the loop
+  // read them as parts-free measured calls; each is an unknown call, counted here so B8's rule, unknown_call_share and the D7 status
+  // come from this one place. Never more than the Bash calls not already unknown.
+  out.unknown_calls += Math.min(unresolved, Math.max(0, out.calls - out.unknown_calls))
   const done = finishRtk(out)
   if (!d7) return done
   d7.wrapped_exceptions = out.explicit_rtk_on_excluded_or_sensitive + d7.wrapped_requires_raw_parts
-  return { ...done, d7: finishD7(d7, done.status !== 'measured' || d7.log_find_unresolved_parts ? 'incomplete' : 'measured') }
+  // D7 keeps the harder reading on purpose: any unknown call or unreviewed log or find part leaves it incomplete, while rtk_parts.status
+  // keeps B8's 5 percent tolerance. An amendment may relax it with a dated rationale.
+  return { ...done, d7: finishD7(d7, done.status !== 'measured' || out.unknown_calls || d7.log_find_unresolved_parts ? 'incomplete' : 'measured') }
 }
 // Hook context (PR-A item 1). An insertion is a hook_additional_context row, the row M12 counts (E2E README.md M12 row: blind evidence
 // needs 0 hook_additional_context rows from any hook event); its content array holds one entry per hook whose context Claude Code delivered
@@ -2702,9 +2709,11 @@ function aggregateFinalReturns(items) {
   return out
 }
 
-export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER, rtkAgent = 'claude' } = {}) {
+export function measureTranscript(transcript, { window = null, exceptions = {}, rtkCheck = false, marker = DEFAULT_MARKER, rtkAgent = 'claude', unresolvedBash = 0 } = {}) {
   // rtkAgent: the agent whose hook the replay asks rtk about (rtkChecker); the Codex bridge (tools/skill-usage) passes codex.
   if (!RTK_AGENTS.includes(rtkAgent)) throw new TypeError('rtkAgent must be one of ' + RTK_AGENTS.join(', '))
+  // unresolvedBash: how many of the Bash calls the caller could not resolve to shell text (the Codex bridge); each is an unknown call.
+  if (!Number.isInteger(unresolvedBash) || unresolvedBash < 0) throw new TypeError('unresolvedBash must be a non-negative integer')
   const calls = new Map(), results = new Map(), rewrites = new Map()
   const inside = (row) => !window || (timeOf(row) !== null && timeOf(row) >= window.since && timeOf(row) < window.until)
   for (const [index, row] of transcript.entries()) {
@@ -2829,7 +2838,7 @@ export function measureTranscript(transcript, { window = null, exceptions = {}, 
   const sizes = (items) => Object.fromEntries(Object.entries(items).map(([k, s]) => [k, finishSizes(s)]))
   const unfinished = [...calls.values()].filter((c) => inside(c.row) && !c.sandbox && !results.has(c.id)).length
   return { m3: finishSizes(m3), m4: finishFetches(m4, fetchCarriers), m5: finishSizes(m5), by_carrier: sizes(carriers), exceptions: sizes(excluded),
-    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions, results, rtkAgent),
+    rtk_parts: rtkParts([...calls.values()].filter((c) => inside(c.row)), rewrites, rtkCheck, exceptions, results, rtkAgent, unresolvedBash),
     usage: transcriptUsage(transcript, window), final_return: finalReturn(transcript, window),
     hook_context: hookContext,
     call_states: callStates, m15: finishM15(m15),
@@ -2916,7 +2925,9 @@ export function aggregateMeasurements(items) {
   // actors' statuses; otherwise the one status every actor has (unavailable or not_measured), or incomplete for a mix.
   const rtkStates = [...new Set(items.map((m) => m.rtk_parts.status))]
   const rtkChecked = rtkStates.length > 0 && rtkStates.every((s) => s === 'measured' || s === 'incomplete')
-  // rtk_parts.d7 is summed over the measurements that carry it (Codex replay), and its status follows rtk_parts' rule.
+  // rtk_parts.d7 is summed over the measurements that carry it (Codex replay). Its status is the strict D7 rule, not B8's: measured only
+  // when every actor's d7 is measured, so one unknown call or unreviewed log or find part in any actor leaves it incomplete however the
+  // calls are split across actors; rtk_parts.status above applies B8 to the summed counts.
   const d7s = items.map((m) => m.rtk_parts.d7).filter(Boolean), d7States = [...new Set(d7s.map((d) => d.status))]
   const d7 = d7s.length ? finishD7(Object.fromEntries(D7_COUNTS.map((k) => [k, d7s.reduce((n, d) => n + d[k], 0)])),
     d7States.length === 1 ? d7States[0] : 'incomplete') : null
