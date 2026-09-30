@@ -342,7 +342,33 @@ SCAN_CHARACTERS = {
 # character belongs to a word; in the legacy reading a `#` starts a comment that runs to the end of the text (lex has turned every newline
 # into `;`). tests/test_secret_path_guard.py compares the two on generated texts.
 SHLEX_PLAIN = re.compile(r"[();<>|&]+|[^ \t\r\n();<>|&]+")
+# A number (or bash's `{name}`) that touches the redirection operator after it is that operator's descriptor (`2>/dev/null`, `{fd}>out`);
+# one that stands apart is a word (`set 1 > out` sets a positional parameter), and so is a quoted one (Bash Reference Manual,
+# "Redirections": the descriptor number precedes the operator). shlex splits `1>out` and `1 > out` alike, so lex() marks each number that
+# touches its operator before it splits the text (TOUCHING_DESCRIPTOR, DESCRIPTOR_MARK) and hands it back as a Descriptor, which equals the
+# plain number, so every rule that does not ask reads it as before (third verification review, 2026-09-29: the dump rule of `set` read
+# `set 1 > out` and `set 3 < input` as `set` with a redirection). A text that holds the mark character itself gets no mark, and there every
+# number before an operator counts as its descriptor, the reading before this change.
+DESCRIPTOR_MARK = "\x01"
+TOUCHING_DESCRIPTOR = re.compile(r"(?<![^ \t\r\n;&|()<>])([0-9]+|\{[A-Za-z_][A-Za-z0-9_]*\})(?=[<>])")
+DESCRIPTOR_WORD = re.compile(r"[0-9]+|\{[A-Za-z_][A-Za-z0-9_]*\}")
 BACKQUOTE_ESCAPE = re.compile(r"\\([$`\\\"])")
+
+
+class Descriptor(str):
+    """A word that is a redirection's descriptor because it touches the operator after it (see DESCRIPTOR_MARK). It is the number itself for
+    every comparison; redirection_width(..., touching_only=True) asks for it by type."""
+    __slots__ = ()
+
+
+def unmark(token: str) -> str:
+    """A token of a text that lex() marked, without its marks: a touching descriptor comes back as a Descriptor, any other token as written
+    (a mark inside a quoted word is removed)."""
+    if DESCRIPTOR_MARK not in token:
+        return token
+    if token.endswith(DESCRIPTOR_MARK) and DESCRIPTOR_WORD.fullmatch(token[:-1]):
+        return Descriptor(token[:-1])
+    return token.replace(DESCRIPTOR_MARK, "")
 ANSI_C_TAIL = re.compile(r"\\.|'", re.S)
 LINE_END = re.compile(r"\n")
 BACKQUOTE_COMMENT_END = re.compile(r"[\n`]")  # a comment in a backquote body ends with it (bash cuts the body out first)
@@ -564,7 +590,8 @@ def tokenize(command: str, comments: list[tuple[int, int]] | tuple = (), legacy:
         pieces.append(command[cursor:])
         command = "".join(pieces)
     tokens = lex(command, legacy)
-    return [token.replace(PROTECTED_BACKQUOTE, "`") for token in tokens] if protected else tokens
+    # a Descriptor holds no backquote and keeps its type (str.replace would return a plain str)
+    return [token.replace(PROTECTED_BACKQUOTE, "`") if PROTECTED_BACKQUOTE in token else token for token in tokens] if protected else tokens
 
 
 def lex(text: str, legacy: bool = False) -> list[str]:
@@ -581,17 +608,24 @@ def lex(text: str, legacy: bool = False) -> list[str]:
     if _lexed is not None and key in _lexed:
         return _lexed[key]
     spend("characters", len(text) * storage_width(text))
-    if "'" not in text and '"' not in text and "\\" not in text:
-        tokens = SHLEX_PLAIN.findall(text.partition("#")[0] if legacy else text)  # what shlex gives, in linear time (see SHLEX_PLAIN)
+    marked = DESCRIPTOR_MARK not in text and TOUCHING_DESCRIPTOR.search(text) is not None
+    source = TOUCHING_DESCRIPTOR.sub(lambda found: found.group(1) + DESCRIPTOR_MARK, text) if marked else text
+    if "'" not in source and '"' not in source and "\\" not in source:
+        tokens = SHLEX_PLAIN.findall(source.partition("#")[0] if legacy else source)  # what shlex gives, in linear time (see SHLEX_PLAIN)
     else:
         try:
-            lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
+            lexer = shlex.shlex(source, posix=True, punctuation_chars=True)
             lexer.whitespace_split = True
             if not legacy:
                 lexer.commenters = ""
             tokens = list(lexer)
         except ValueError:
-            tokens = re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
+            tokens = re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", source)
+    if marked:
+        tokens = [unmark(token) for token in tokens]
+    elif DESCRIPTOR_MARK in text:  # no mark could be set: every number before an operator is its descriptor
+        tokens = [Descriptor(token) if DESCRIPTOR_WORD.fullmatch(token) and REDIRECTION.match(tokens[at + 1]) else token
+                  for at, token in enumerate(tokens[:-1])] + tokens[-1:]
     if _lexed is not None:
         _lexed[key] = tokens
     return tokens
@@ -802,26 +836,28 @@ def input_redirection_segments(words: list[str]) -> list[list[str]]:
     return found
 
 
-def redirection_width(words: list[str], index: int) -> int:
+def redirection_width(words: list[str], index: int, touching_only: bool = False) -> int:
     """How many words the redirection at words[index] takes (operator and target, with a descriptor
     number before it and the `-` of `<<- EOF`), or 0 when it starts none. A digit before an operator is
-    read as its descriptor, since shlex splits `2>` and `2 >` alike."""
+    read as its descriptor, since shlex splits `2>` and `2 >` alike; with `touching_only`, only one that
+    touched the operator in the text (a Descriptor, see DESCRIPTOR_MARK), so `1 > out` is the word 1 and a redirection."""
     word = words[index]
     # A descriptor before the operator: a number, or bash's named form `{varname}` (`{fd}>file`).
     if (word.isdigit() or re.fullmatch(r"\{[A-Za-z_][A-Za-z0-9_]*\}", word)) and index + 1 < len(words) \
-            and REDIRECTION.match(words[index + 1]):
-        return 1 + redirection_width(words, index + 1)
+            and REDIRECTION.match(words[index + 1]) and (not touching_only or isinstance(word, Descriptor)):
+        return 1 + redirection_width(words, index + 1, touching_only)
     if not REDIRECTION.match(word):
         return 0
     return 3 if word == "<<" and words[index + 1:index + 2] == ["-"] else 2
 
 
-def command_arguments(words: list[str]) -> list[str]:
+def command_arguments(words: list[str], touching_only: bool = False) -> list[str]:
     """words[1:] without redirections, so a redirection's target (`tvly auth > --json` writes to a
-    file named --json) or a here-document delimiter is never taken for an argument."""
+    file named --json) or a here-document delimiter is never taken for an argument. `touching_only` as in
+    redirection_width."""
     result, index = [], 1
     while index < len(words):
-        width = redirection_width(words, index)
+        width = redirection_width(words, index, touching_only)
         if width:
             index += width
         else:
@@ -1438,13 +1474,15 @@ def is_env_file_word(word: str) -> bool:
 
 def is_environment_dump(words: list[str]) -> bool:
     """Whether the command prints the environment or every shell variable. A redirection is no argument: `set < FILE` and `set > FILE`
-    still print every variable, where `set a b` sets positional parameters (command_arguments drops the redirections)."""
+    still print every variable, where `set a b` sets positional parameters (command_arguments drops the redirections). A number is a
+    redirection's descriptor here only when it touches the operator (`set 1>out`, `set 2>/dev/null` print every variable), and an argument
+    when it stands apart (`set 1 > out` and `set 3 < input` set positional parameters: third verification review, 2026-09-29)."""
     program = program_of(words)
     if program == "printenv":
         return True
     if program == "env":
         return env_command_start(words) is None
-    arguments = command_arguments(words)
+    arguments = command_arguments(words, touching_only=True)
     if program in {"set", "export"} and (not arguments or arguments == ["-p"]):
         return True
     if program in {"declare", "typeset"} and all(w.startswith("-") for w in arguments) \

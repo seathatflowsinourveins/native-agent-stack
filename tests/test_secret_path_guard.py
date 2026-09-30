@@ -673,6 +673,14 @@ BLOCKED = {
     "declare -p > /tmp/vars": "environment_dump",
     "declare -x < /dev/null": "environment_dump",
     "typeset -p 2> /tmp/err": "environment_dump",
+    # A number is a descriptor only when it touches its operator (third verification review): these print every variable (into a file, or
+    # with only stderr redirected) and are refused; the base guard (c26800f3) passed each of them, so they are new refusals, not controls.
+    # `set 1 > out` and `set 3 < input`, where the number stands apart, set positional parameters and pass (ALLOWED).
+    "set 1>out": "environment_dump",
+    "set >out": "environment_dump",
+    "set 2>/dev/null": "environment_dump",
+    "set {fd}>out": "environment_dump",
+    "export -p 1>out": "environment_dump",
     "sudo set > /tmp/vars": "environment_dump",
     "env FOO=1 set < /dev/null": "environment_dump",
     "env < /dev/null set": "environment_dump",
@@ -1030,6 +1038,14 @@ ALLOWED = [
     "export FOO=1 < /dev/null",
     "declare -a items > /dev/null",
     "declare -r LIMIT=3 2> /dev/null",
+    # A number that stands apart from the operator is an argument, not its descriptor (third verification review, 2026-09-29): each sets
+    # positional parameters or names a variable and prints nothing; the base guard passed them, and the round before this one refused them.
+    "set 1 > out",
+    "set 3 < input",
+    "set 1 2 > out",
+    "set {fd} > out",
+    "export 3 > out",
+    "declare 1 > out",
     "ps -u steve",
     "ps -u eve -o pid,command",
     # Commit messages and pull-request bodies (2026-09-29): a here-document's lines are command lines, so the way to hand git or gh a text
@@ -2140,6 +2156,32 @@ class SecretPathGuardTests(unittest.TestCase):
         for legacy in (False, True):
             with self.subTest(legacy=legacy):
                 self.assertEqual([text for text in texts if guard.lex(text, legacy) != by_shlex(text, legacy)][:5], [])
+
+    def test_a_number_is_a_redirection_descriptor_only_when_it_touches_the_operator(self):
+        # bash takes the number before `<` or `>` for the descriptor only when it touches the operator (Bash Reference Manual, "Redirections");
+        # shlex splits `1>out` and `1 > out` alike, so lex() marks the touching form and hands it back as a Descriptor, equal to the plain
+        # number (third verification review, 2026-09-29: `set 1 > out` and `set 3 < input` set positional parameters, and the dump rule had
+        # refused them). The words are those shlex gives, a mark inside a quoted word removed; a quoted or glued number is no descriptor.
+        def by_shlex(text):
+            lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
+            lexer.whitespace_split = True
+            lexer.commenters = ""
+            return list(lexer)
+
+        cases = {"set 1>out": ["1"], "set 1 > out": [], "echo x 2>&1": ["2"], "echo x 2 >&1": [], "cat 0<in": ["0"], "set {fd}>out": ["{fd}"],
+                 "set {fd} > out": [], "echo '1'>x": [], "echo \"1>x\"": [], "echo 'a 2>b'": [], "echo a1>x": [], "echo $1>x": [], "(1>x)": ["1"],
+                 "a;2>x": ["2"], "set 10>>log 2>&1": ["10", "2"], "echo \\1>x": []}
+        for text, descriptors in cases.items():
+            with self.subTest(text=text):
+                tokens = guard.lex(text)
+                self.assertEqual([token for token in tokens if isinstance(token, guard.Descriptor)], descriptors)
+                self.assertEqual(tokens, by_shlex(text))
+                self.assertFalse(any(guard.DESCRIPTOR_MARK in token for token in tokens))
+        # a text that holds the mark character itself is not marked: every number before an operator counts, the reading before the change
+        self.assertEqual([token for token in guard.lex("set 1 > out; echo \x01") if isinstance(token, guard.Descriptor)], ["1"])
+        for command, verdict in (("set 1 > out", None), ("set 1>out", "environment_dump"), ("set 1 > out; echo \x01", "environment_dump")):
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), verdict)
 
     def test_no_regular_expression_of_the_guard_backtracks_on_long_repeats(self):
         # Every compiled pattern of the guard (module level, the scan and store tables) on 70,000 repeats of one character, each with a lead
