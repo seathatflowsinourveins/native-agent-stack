@@ -1,4 +1,10 @@
-model = "gpt-6-astra"
+# User-selected native coordinator: Sol/Ultra (user decision 2026-09-30; routing record
+# docs/decisions/2026-09-30-sol-primary-quality-defaults.md). Ultra sends Sol's catalog multi-agent effort, xhigh,
+# and enables proactive delegation (openai/codex rust-v0.159.2 protocol/src/openai_models/reasoning_effort.rs
+# and models-manager/models.json). tools/adoption/render_config.py fills CODEX_MODEL from the platform's Codex pin:
+# gpt-6.1-sol from Codex 0.159.1, which added it to the bundled catalog (rust-v0.159.1 release notes), and gpt-6-astra
+# on an older pin (macOS 0.155.1), a model that client's catalog lists; --set CODEX_MODEL=<model> names another.
+model = "${CODEX_MODEL}"
 model_reasoning_effort = "ultra"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
@@ -7,7 +13,7 @@ mcp_oauth_credentials_store = "file"
 # only, and only full access picks live (codex-rs/core/src/config/mod.rs L2659-2670 and L3050-3094 at rust-v0.157.1;
 # docs/harness-defaults.md, row 2026-09-26). A lane that must not browse passes -c web_search="disabled".
 web_search = "live"
-# The client is pinned (manifests/stack.json; evidence/receipts/codex-01571-qualification-20260926.json), so Codex
+# The client is pinned (manifests/stack.json; evidence/receipts/codex-01592-qualification-20260930.json), so Codex
 # neither checks for updates nor prompts about them at startup: "Set to `false` only if your Codex updates are
 # centrally managed" (codex-rs/config/src/config_toml.rs L520-523).
 check_for_update_on_startup = false
@@ -15,14 +21,13 @@ check_for_update_on_startup = false
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
-# A child whose spawn call names no effort otherwise keeps the parent's, `ultra` above, which for gpt-6-astra sends
-# xhigh and turns on proactive delegation in the child too. With this default it runs at max and spawns only when
-# asked (codex-rs/core/src/agent/child_config.rs L196-250; core/src/session/multi_agents.rs L77-111). Effort alone
-# keeps the parent's model; a default_subagent_model without an effort would give that model's catalog default, `low`
-# for gpt-6-astra. agents.max_depth is "Ignored by V2" (codex-rs/config/src/config_toml.rs L719-720) and gpt-6-astra
-# is a V2 model (models-manager/models.json), so nothing caps nesting depth here; max_concurrent_threads_per_session
-# still caps concurrent children at 3: V2 counts the root thread, adds one and subtracts it again
-# (core/src/config/mod.rs L2733-2746 and L1591-1605).
+# Generic children use Sol/Max: effort alone keeps the parent's model, while a model alone selects its catalog
+# default (low for Sol). Explicit spawn selections replace these defaults, then the selected role config applies,
+# preserving Astra judgment-role overrides (openai/codex rust-v0.159.2 core/src/agent/child_config.rs L62-73,
+# L204-249). Max sends API max and delegates only when asked; Ultra above sends xhigh and delegates proactively
+# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin). The child model is
+# the coordinator's CODEX_MODEL, so a pin before 0.159.1 runs gpt-6-astra children at max.
+default_subagent_model = "${CODEX_MODEL}"
 default_subagent_reasoning_effort = "max"
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local

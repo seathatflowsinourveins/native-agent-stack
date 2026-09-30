@@ -634,31 +634,23 @@
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
       "selected_repository_url": "https://github.com/openai/codex",
-      "selected_version": "0.157.1",
+      "selected_version": "0.159.2",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/openai/codex",
           "exit_code": 0,
-          "started_at": "2026-09-26T05:12:18.053284+00:00",
-          "ended_at": "2026-09-26T05:12:18.492421+00:00",
-          "stdout_sha256": "86f768c3072347c9a24bb05a38c99337568d13423ad7edcf4ba6c0c588ecb0d4",
+          "started_at": "2026-09-30T05:29:02.285525+00:00",
+          "ended_at": "2026-09-30T05:29:02.360497+00:00",
+          "stdout_sha256": "4571221701668e6211dec9310f881abcb0ff5e34171f52f0b691bc5b180fbd0b",
           "status": "ok"
         },
         {
           "endpoint": "repos/openai/codex/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-26T05:12:18.492561+00:00",
-          "ended_at": "2026-09-26T05:12:18.922591+00:00",
-          "stdout_sha256": "7877a31baa3105b79851fed6ad0bc937f1dc401e0e43f8e864170b59ee2af0ea",
-          "status": "ok"
-        },
-        {
-          "endpoint": "repos/openai/codex/commits/rust-v0.155.1",
-          "exit_code": 0,
-          "started_at": "2026-09-26T05:12:18.924435+00:00",
-          "ended_at": "2026-09-26T05:12:19.282419+00:00",
-          "stdout_sha256": "1fa617fa2ec4e2e1c277805d450311ba16811b4e5a537465f3c971d8f1b2c128",
+          "started_at": "2026-09-30T05:29:02.360634+00:00",
+          "ended_at": "2026-09-30T05:29:02.697655+00:00",
+          "stdout_sha256": "6fdf74fab04b3b7a3998677bfafb111b3167373afa80923ea8e2a1ccbcc7a1b0",
           "status": "ok"
         },
         {
@@ -668,27 +660,35 @@
           "ended_at": "2026-09-26T05:12:19.618765+00:00",
           "stdout_sha256": "da5250b703846ff273554e3333b550d0a4aacfd9178871c1a420faccfb1947d7",
           "status": "ok"
+        },
+        {
+          "endpoint": "git fetch --depth 1 --filter=blob:none https://github.com/openai/codex refs/tags/rust-v0.159.2; git show -s --format='%H %cI %aI' 'rust-v0.159.2^{commit}' (git protocol: the REST commits endpoint answered 403 rate limit on 2026-09-30)",
+          "exit_code": 0,
+          "started_at": "2026-09-30T05:30:30.207637+00:00",
+          "ended_at": "2026-09-30T05:30:30.637968+00:00",
+          "stdout_sha256": "a2989731ee00f5dbbc04f0c089592aad70c0f90d226308111c93eb4ce3e8497e",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/openai/codex",
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-26T05:05:20Z",
+      "pushed_at": "2026-09-30T04:49:08Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "rust-v0.157.1",
-        "published_at": "2026-09-26T01:02:31Z",
-        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.157.1",
+        "tag_name": "rust-v0.159.2",
+        "published_at": "2026-09-29T23:57:16Z",
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "rust-v0.157.1",
-        "sha": "36650394c5b38c2990ccf2a3457165ca3e9d9726",
-        "html_url": "https://github.com/openai/codex/commit/36650394c5b38c2990ccf2a3457165ca3e9d9726",
-        "committed_at": "2026-09-25T23:41:40Z"
+        "ref": "rust-v0.159.2",
+        "sha": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+        "html_url": "https://github.com/openai/codex/commit/ff6aec96948b70d94983af2641a6b67c94faeff5",
+        "committed_at": "2026-09-29T22:57:04Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

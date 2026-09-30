@@ -49,8 +49,8 @@ Modes:
 
 It never opens auth.json, never touches ~/.claude, and never edits a project's .codex/config.toml: Codex's writer
 refuses any file but the user config ("Only writes to the user config are allowed", app-server/src/
-config_manager_service.rs at rust-v0.157.1). A project config that still pins context-mode to one directory is
-reported as a host step with the exact tables to delete (--project-config).
+config_manager_service.rs at rust-v0.157.1, byte-identical at rust-v0.159.2). A project config that still pins
+context-mode to one directory is reported as a host step with the exact tables to delete (--project-config).
 
 Exit status: 0 done (or nothing to do), 2 refused before any write, 3 a write or read-back failed or rollback met a
 conflict, 1 unexpected error.
@@ -104,14 +104,17 @@ OMNIROUTE_PROFILE = "omniroute"
 GATEWAY_MODEL_PREFIX = "cx/"
 # User-scope servers whose template start-up allowance the lane restores when they are registered. A host that
 # registered them with `codex mcp add` has no value, so Codex waits its default 30 s (codex-mcp/src/rmcp_client.rs
-# L103 and L342 at rust-v0.157.1), while the template gives serena 60 s and socraticode 120 s.
+# L103 and L342 at rust-v0.157.1, the same lines at L105 and L344 at rust-v0.159.2), while the template gives serena
+# 60 s and socraticode 120 s.
 STARTUP_TIMEOUT_SERVERS = ("serena", "socraticode")
 BLOCK_BEGIN = "<!-- native-agent-stack:codex-user-instructions:begin"
 BLOCK_END = "<!-- native-agent-stack:codex-user-instructions:end -->"
 TOP_RULE_MARKER = "native-agent-stack:top-rule"
 EXCEPTIONS_MARKER = "native-agent-stack:rtk-exceptions"
-# adoption/pins-linux-x86_64.json "codex"; the writer's behaviour below was read and probed at this version.
-CODEX_VERSION = "0.157.1"
+# adoption/pins-linux-x86_64.json "codex" (tests/test_codex_worker_lane.py keeps the two equal). The writer's
+# behaviour below was read and probed at 0.157.1; at 0.159.2 the source it cites is unchanged (compared at the two tag
+# commits on 2026-09-30) and CodexIntegrationTests ran again against the real binary.
+CODEX_VERSION = "0.159.2"
 CONTEXT_MODE_VERSION = "1.0.169"
 # start.mjs of context-mode 1.0.169: the npm install and the plugin pin 6f0cc684 carry the same file.
 START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b"
@@ -120,7 +123,7 @@ RECORD_SCHEMA = "native-agent-stack/codex-lane-apply/v1"
 REQUEST_TIMEOUT = 60.0
 # The two Codex role carriers (docs/decisions/2026-09-26-codex-worker-lane.md, addendum of 2026-09-29): custom-agent
 # files that Codex discovers under $CODEX_HOME/agents, with no [agents.<name>] table (codex-rs/agent-roles/src/
-# loader.rs and discovery.rs at rust-v0.157.1).
+# loader.rs and discovery.rs at rust-v0.157.1, byte-identical at rust-v0.159.2).
 ROLES_SOURCE = ROOT / "adoption" / "agents" / "codex"
 # The digests of the carriers are adoption/agents/codex/SHA256SUMS (codex_roles.sha256sums), checked before anything
 # is copied; tests/test_codex_agents.py pins the same two rows as independent literals. This module holds no copy.

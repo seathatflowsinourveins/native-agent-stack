@@ -359,7 +359,7 @@ At `v2026.09.26` macOS has no rtk pin, and that script prints no reminder.
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
-documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). It changed after `v2026.09.25.2`,
+documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux from 2026-09-26, 0.159.2 from 2026-09-30; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). Since 2026-09-30 the shared Codex template defaults to `gpt-6.1-sol`, which entered Codex's bundled model catalog in `rust-v0.159.1` and is absent from the Linux 0.155.1 build's catalog (`codex debug models --bundled`, offline): macOS needs its own 0.159.x qualification before the template default applies there, and until then `tools/adoption/render_config.py --platform macos-arm64` renders the template's `CODEX_MODEL` placeholder as `gpt-6-astra` from this 0.155.1 pin. It changed after `v2026.09.25.2`,
 adding the identical entry there too (same version,
 url, sha256 and `--ignore-scripts`), completing the token-efficiency profile's Linux pin
 coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`

@@ -3689,6 +3689,31 @@
         "The gateway pool figures are the cached provider limits (numbers only) of the one account with capacity: 7 of 100 points used before the wave and 11 after it, 22 after the re-check; other sessions may have used points in between."
       ],
       "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json"
+    },
+    {
+      "id": "codex-01592-qualification-20260930",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-30, Codex CLI 0.159.2 was qualified in its existing prefix tools/codex-0.159.2 and the Linux pin moved to it from 0.157.1. The host launcher bin/codex already executes that prefix (its exec line names it, and `codex --version` through the launcher printed codex-cli 0.159.2 at 2026-09-30T04:32:26Z): a peer installed that prefix and wrote the launcher at 2026-09-30T03:21Z to 03:22Z, before this unit, which installed, relinked and wrote nothing on the host. The npm wrapper @openai/codex@0.159.2 (4,904 bytes, sha256 cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2) and its platform package @openai/codex@0.159.2-linux-x64 (162,475,310 bytes, sha256 84a6b35fb45bdcb94cef9fcb329438045a8911f53876cc9a9a7e6f9bb1382eba) matched npm dist.integrity; `npm audit signatures` verified both registry signatures and both attestations; each attestation's subject digest equals the downloaded tarball's sha512, and the SLSA provenance names .github/workflows/rust-release.yml at refs/tags/rust-v0.159.2, commit ff6aec96948b70d94983af2641a6b67c94faeff5, the commit the tag object 8b9fa496bbf2c47aebd62e85a080b9a522a455b5 peels to. The native binary in the platform package (sha256 1748767b230ebfc3d4ab7e4e254920d0c0ad9691fd8c11f190e7d44511a4a92e, 286,754,152 bytes) is byte-identical to the one in the GitHub release asset codex-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals the release API digest, and the package's whole vendor tree (44 files, with codex-code-mode-host, rg and bwrap) is byte-identical to the complete native package codex-package-x86_64-unknown-linux-musl.tar.gz, whose sha256 equals both its API digest and its line in codex-package_SHA256SUMS. All 49 files of the existing prefix are byte-identical to the two verified tarballs; its only other entry is npm's bin/codex link. Each of these comparisons failed on a copy with one byte changed. In bwrap sandboxes with no network, a read-only root and a fresh scratch HOME and CODEX_HOME per case (~/.codex never used, no credential read), 0.159.2 and the 0.157.1 baseline printed their own versions; `codex exec --help` and `codex --help` were byte-identical between them and to the committed 0.157.1 outputs of the previous qualification; `codex mcp list --json` printed [] in an empty home, and after `codex mcp add` both versions returned the same entry and transport keys from `codex mcp list --json` and `codex mcp get --json`; `codex features list` still lists daemon_auto_start as stable and on, and `codex features disable daemon_auto_start` still writes [features] daemon_auto_start = false; `codex debug prompt-input` rendered the stack's AGENTS.md top-rule marker once from a scratch home holding adoption/templates/codex.AGENTS.template.md and zero times from an empty home, on both versions; offline `codex debug models` lists gpt-6.1-sol at priority 1 in 0.159.2's bundled catalog (gpt-6-astra moves to priority 2) and not at all in 0.157.1's or in the 0.155.1 build's (`codex debug models --bundled`). At the two tag commits the exec layer (codex-rs/exec/src/cli.rs, exec_events.rs, event_processor_with_jsonl_output.rs and codex-rs/utils/cli/src/shared_options.rs) is byte-identical, so the `codex exec --json` events that tools/adoption/prove_codex_lane.py and tools/sota-convergence/landscape-sweep/codex_job.py read keep their shapes, and the config schema adds 18 key paths and removes none. `prove_codex_lane.py --help` exited 0, and its static checks (no --live) in a scratch home gave 0.159.2 and 0.157.1 the same row verdicts, the lane not being applied there, and printed byte-identical output when re-run with this branch's prove_codex_lane.py. tools/adoption/apply_codex_lane.py's dry run failed its codex version precondition on 0.159.2 while its CODEX_VERSION was 0.157.1; with the constant moved to 0.159.2 on the same branch it prints '[ok] codex version: codex-cli 0.159.2 (pin 0.159.2)' and refuses only on the three preconditions an empty scratch home cannot meet (HOST_PATH, config.toml, daemon_auto_start), while the 0.157.1 control adds '[fail] codex version: codex-cli 0.157.1 (pin 0.159.2)' to those three; and the opt-in CodexIntegrationTests of tests/test_codex_worker_lane.py passed 10 of 10 against the prefix's native binary, while all 10 skip with 0.157.1 on PATH. The repository's merged rollout parsers (tools/token-e2e/evidence.py and tools/skill-usage/skill_usage.py), run unchanged and read-only over the host's 19 existing rollouts written by 0.159.2 (3,783 records), reported 0 parse errors, as over the 1,350 rollouts written by 0.157.1; a synthetic malformed line counted as 1 error in each. No live model call ran.",
+      "limitations": [
+        "No live model call ran (not run): `prove_codex_lane.py --live`, a GPT-6 or GPT-6.1 turn through 0.159.2 and any provider request are outside this unit, because the native Codex allowance belongs to the sealed Gate A run. The sandbox cases exercise the CLI surface (version, help, MCP registration, features, prompt input, the bundled catalog) without a provider, a sign-in, streamed turns, sandboxed tool execution, compaction or a running MCP server.",
+        "Live 0.159.2 behaviour on this stack (role spawn through agent_type, --ignore-user-config with the role carriers, sandbox behaviour and the join proof) is covered by the Gate A owner's rehearsal receipts: peer rehearsal (session native-agent-stack-2d), not re-run here.",
+        "The switch was not made by this unit: a peer installed tools/codex-0.159.2 (files written 2026-09-30T03:21:27Z to 03:21:30Z) and wrote the launcher with its exec line naming that prefix at 2026-09-30T03:22:59Z, and ~/.local/share/codex-ecosystem/installed-versions.txt still reads codex-cli 0.157.1, a host record this unit does not own and did not change.",
+        "The lane is not accepted on 0.159.2 here: in a scratch home the static rows marker, rtk-inline, binding (from / and from the checkout), profile and roles fail because the lane is not applied there, with the same verdicts on 0.157.1; blind failed with exit 127 when --codex named the prefix's npm bin (the row's PATH is that directory plus the default path, which has no node) and passed through the launcher. The opt-in CodexIntegrationTests meet the same gap: they build PATH from codex's own directory plus the default path, so with the prefix's npm bin first on PATH codex never started (FAILED, failures=15, skipped=2), and a scratch directory pairing that launcher with node sits under /tmp, which their bwrap hides (4 failures and 2 skips on 'bwrap: execvp codex'). Their 10 of 10 pass ran the prefix's native binary directly, without the two CODEX_MANAGED_* variables the npm launcher adds. Neither the lane's apply nor its --live proof ran on a real Codex home.",
+        "The `npm audit signatures` control did not discriminate: flipping one character of the wrapper's integrity in both lockfiles still gave exit 0 and the same report, because npm 11.19.0 verifies the registry's own manifest for each name and version (lib/utils/verify-signatures.js lines 296-303), not the lockfile. The audit therefore shows only that the registry metadata of both versions is signed and attested; the downloaded bytes are bound to that metadata by the integrity check and to the attestations by their subject digests, each with a failing control.",
+        "The .sigstore bundles of the two GitHub assets were downloaded but not verified: no sigstore verifier is installed here, and `gh attestation verify` needs the GitHub REST API, which was rate-limited for the host's shared login. The tag's own signature was not checked.",
+        "GitHub REST through gh answered HTTP 403 'API rate limit exceeded' for the shared login at 2026-09-30T04:14:32Z and 04:15:10Z, before and after its bucket reset, so the four release records came from the unauthenticated REST endpoint (HTTP 200 at 04:15:38Z), tag objects from git ls-remote and source files from raw.githubusercontent.com at the two tag commits.",
+        "The background app-server probe of the 0.157.1 qualification was not repeated at 0.159.2: only the feature's listing and the disable path were checked, so the interactive-launch copy into CODEX_HOME/packages/app-server-daemon and its updater loop are measured at 0.157.1 only.",
+        "The rollout check covers 19 rollouts written by 0.159.2 (3,783 records) and retains counts and schema type names only. Types present in the 0.157.1 rollouts but absent from that sample (compacted, CollabAgentToolCall, ContextCompaction) were not observed, which is no evidence that 0.159.2 removed them; the one type new to the sample, retained_context, is a RolloutItemWire variant at both tags (codex-rs/history/src/rollout_payload.rs line 51 at rust-v0.157.1, line 60 at rust-v0.159.2).",
+        "rust-v0.159.2 was published 2026-09-29T23:57:16Z, so the pin moves inside the 7-day cooldown that docs/decisions/2026-09-25-workstation-sota-refresh.md applied to a release that is not a security fix; it moves because the Gate A owner chose 0.159.2 as the candidate frozen Codex version (relayed by the coordinator) and the host launcher already runs it.",
+        "The Linux pin, manifests/stack.json and the records that mirror its version move (catalogs/landscape/upstream-snapshot.json, whose codex entry was re-checked on 2026-09-30, blueprints/token-native-focus/saturation-audit.json and the generated new-host grand list), and so do tools/adoption/apply_codex_lane.py's CODEX_VERSION with its test fakes and the current-pin statements of recipes/README.md, adoption/bootstrap.md and the two platform pages; adoption/pins-macos-arm64.json keeps 0.155.1 until its own qualification, catalogs/landscape/foundation.json keeps its winner pins, and dated measurements and source citations made at 0.157.1 stay as recorded.",
+        "Upstream tests (cargo test) were not run on this host. The qualification and this receipt come from one worker family (Claude Opus 5.5) and were not independently reviewed.",
+        "The shared Codex template's new default does not fit the macOS pin: gpt-6.1-sol, which offline `codex debug models --bundled` lists for the Linux 0.159.2 build but not for the Linux 0.155.1 or 0.157.1 builds (the rust-v0.159.1 release notes add it to the bundled catalog), while adoption/pins-macos-arm64.json stays 0.155.1. adoption/templates/codex.config.template.toml therefore names its model and default_subagent_model through the CODEX_MODEL placeholder, which tools/adoption/render_config.py fills from the selected platform's Codex pin as it fills SOCRATICODE_VERSION (gpt-6.1-sol from 0.159.1, gpt-6-astra before it), so a macOS render keeps gpt-6-astra until macOS has its own 0.159.x qualification (data.checks_after_the_constant_move.template_model_per_platform, run with Linux builds only).",
+        "Linux x86_64 only, one host; nothing here is macOS evidence."
+      ],
+      "path": "evidence/receipts/codex-01592-qualification-20260930.json"
     }
   ],
   "files": [
@@ -3944,8 +3969,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "41d3ce13ea5b87697c605a426fe7d8e43afa1e319b8bba937cffc0dff5b1772b",
-      "bytes": 47232
+      "sha256": "82c91ef7ca466efbd62e6d772f0a4bf17e9d32d9d18197720bb723a0a62d648c",
+      "bytes": 47991
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4079,8 +4104,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "88f727fbd2c8e9ca5ab7d6c70d5a6b7215860faecef065df6a31282591eabfb0",
-      "bytes": 31905
+      "sha256": "4539311ef0437b9081f2811cc329bd880f33c3479c2724f7c218a63e9ff3a1b4",
+      "bytes": 32281
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4089,13 +4114,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "fc3fbca8192cb407eca61dd361287250fc5b0acac54a5ea22c3f043c7a9fbb66",
-      "bytes": 23624
+      "sha256": "d2a29cb93d2dd0c43ecbd3290e619b20d0b53e9883d06bc1fa2285da65d70718",
+      "bytes": 23798
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "b1527acccffb8602192ce51d8a3e48071e34b8ba6d950bc263e21303a2ac310b",
-      "bytes": 62249
+      "sha256": "f7d4117ff2b5baf287f8663a6fd3d4e283e612c9973daddbc7c6fe69a322282a",
+      "bytes": 62765
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -4154,8 +4179,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "0716d4f6996f40d762fa0c98f23ef91cd39ca7422eddedaa0b344d999c53e4da",
-      "bytes": 12875
+      "sha256": "178a0e8108f21badac10da5d89e8d7d89abb0b942a08b693f5a7a438df34f7cc",
+      "bytes": 13388
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -4164,7 +4189,7 @@
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
-      "sha256": "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a",
+      "sha256": "f4106161269ec7b9995a2bddbc066f2b8282f7747b22dda481ce179e4477771e",
       "bytes": 4458
     },
     {
@@ -9310,8 +9335,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "c36a161c3ee8a0db2773179b38df6754dd38de67f68b80fb043c4625dda44c6e",
-      "bytes": 482575
+      "sha256": "2ad534497a379f5629bb950bcd21a0219cad321dc7be05b4275a8d52b7ac3a98",
+      "bytes": 482774
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -14260,7 +14285,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "743317e890be424484789e8a87826b19d7cd2d64bbb19ca9f599cb24d48ccbb5",
+      "sha256": "a2aeb15f17ed443af6d849b2a3dc3517182a15cb9685c54ce5428be69fa4cc63",
       "bytes": 287241
     },
     {
@@ -14270,8 +14295,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2ebd9157605dd694ded3bc79506680161cc1f461383f02517488160f1a700440",
-      "bytes": 248908
+      "sha256": "11bb805b364a93d5bdafcc70e0e0bb14136561bf695fc88ebf155ae4f17b7044",
+      "bytes": 249102
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -14870,8 +14895,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "671bffe39ea1fb59c39753becfa5e0f827c2ec593760ec5fa990fbf02ae3f2f5",
-      "bytes": 41040
+      "sha256": "7c694043a87655189f7055f2830f729a683778cac03562db9369b25a3dbff4f0",
+      "bytes": 56300
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -15075,8 +15100,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "24f470c7123b272d1c10ecf412bd672b770e40ba8b39e8a50e055b3beb39490c",
-      "bytes": 85765
+      "sha256": "5af4253221ae28218de5ab57a6628823b017c8342cbd78cf94128a205131d70b",
+      "bytes": 86084
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15195,7 +15220,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "861f3db2d2083f21fbdfc4be2c7655126966f99851acbb6147b2da181d6e7d46",
+      "sha256": "181edb35fc27dea1f7e8ed8e51a80f18f304caa2913e8e1136d850be75c5b514",
       "bytes": 18181
     },
     {
@@ -43499,6 +43524,11 @@
       "bytes": 21813
     },
     {
+      "path": "evidence/receipts/codex-01592-qualification-20260930.json",
+      "sha256": "fa75848f482708ee6aa64398ffe56cbfe6fdddab3120ccdf73b249e261a268ef",
+      "bytes": 41981
+    },
+    {
       "path": "evidence/receipts/codex-desktop-live-20260920.json",
       "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
       "bytes": 12905
@@ -44405,8 +44435,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "265bcff0ed17a7f328abb783829fa6a8598f888badc31431e32f9874fe46e61e",
-      "bytes": 98938
+      "sha256": "5cafbe8aae1895fb41a4920039231f3c8a0d91b641db67b4e21f2f88e8d4e36b",
+      "bytes": 99473
     },
     {
       "path": "observability/README.md",
@@ -44685,8 +44715,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "f9887685ddb61970e70cc414a8937e126a77507e879fb3e9111e33bcb20d7662",
-      "bytes": 123259
+      "sha256": "2961a95fe20b829b92a9a01812bf6aa240955378674d1ee7afc8e4df727cc041",
+      "bytes": 124550
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -45115,8 +45145,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "3e2183308263227f71ed4513ab3d5c194a3b2e30fa459dc85045726580e65341",
-      "bytes": 228076
+      "sha256": "1ee0d6f15418f69d2055d6c71679fabb50bcd2b972377ebcc84865b64713791c",
+      "bytes": 228127
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -45140,8 +45170,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "adbcc445252da784791733fdc14647b8b5478aeeb69726291515e0251ee384c5",
-      "bytes": 134643
+      "sha256": "35edb8b0fa812e4633b5024c6cb0237784953d3fb2ad1935507eb464d6e7b69a",
+      "bytes": 137090
     },
     {
       "path": "tests/test_adoption_version_probes.py",
@@ -45275,8 +45305,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "d0def42e8b4df1e9bd613847864dcb00382dff56d8aa812abc2d94634c881028",
-      "bytes": 151321
+      "sha256": "3ea82d2d098bc9cc1cc6b331a80afd7b09cf9e44e5175cfe886bcd878f161743",
+      "bytes": 153145
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -45715,8 +45745,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "162e942e2bc0cbea9e47f8e95da937e1066d02af4ba5c4d9706d38774a4ac9fc",
-      "bytes": 35227
+      "sha256": "4bf7510e9b1a65ababcfb24380b68d6ce652929ba3173e1c34afb76e3b0a5ae0",
+      "bytes": 43257
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -45940,8 +45970,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0",
-      "bytes": 76436
+      "sha256": "2509b78bbeb2be923d71022245ad3f5824d2324caf7fa8ed527ef8532614a099",
+      "bytes": 76760
     },
     {
       "path": "tools/adoption/codex_roles.py",
@@ -45965,13 +45995,13 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "6bf68149a6619a866fcf7a55368137ecd61970b3b02b9b0f9c59003384ae0448",
+      "sha256": "9dcff7ea43326166f0bc085ba638165894bbdd87d94075bcf953a9ce9a2dcfeb",
       "bytes": 35137
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "430e544cf245d500a78c2b748422e95c177db68316c08a7e85db3baa49d84c09",
-      "bytes": 15821
+      "sha256": "0a2e7e0fff08963a0c9f43a0dfe60a86e348de9f04ed8f29dfda8effcc1ced27",
+      "bytes": 19670
     },
     {
       "path": "tools/adoption/render_launchd.py",
