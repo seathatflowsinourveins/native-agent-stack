@@ -235,14 +235,17 @@ BLOCKED = {
     "gh alias set x \"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",
     # A literal `$(printenv)` example inside a quoted here-document is read too (the second review's low findings; the base guard passed
     # them): the body of a file written with `cat > FILE <<'EOF'`, a python script, a message given to `git commit -F -` or
-    # `gh ... --body-file -`. Put the text in a script or message file with the Write tool. Python's `set()` after a comment line in an
-    # interpreter's here-document is read as the shell's `set` (the base guard's `#` hole hid it; reading an interpreter's code as its own
-    # language is a later change).
+    # `gh ... --body-file -`. Put the text in a script or message file with the Write tool. The python row is form F since K4 and stays
+    # refused by SHELL-LITERAL (a double-quoted literal's substitution body is read as the shell reads it). K4's one authorized change here:
+    # Python's `set()` after a comment line in form F (`python3 - <<'PY'` with a harmless body) is read as Python, no longer as the shell's
+    # `set`, so it moved from this table to K4_F_ALLOW (contract-v2 section 7.1, the single loosening L1).
     "cat > note.md <<'EOF'\nvalue: \"$(printenv)\"\nEOF": "environment_dump",
     "python3 <<'PY'\nprint(\"$(printenv)\")\nPY": "environment_dump",
     "git commit -F - <<'EOF'\nvalue: \"$(printenv)\"\nEOF": "environment_dump",
     "gh pr comment --body-file - <<'EOF'\nvalue: \"$(printenv)\"\nEOF": "environment_dump",
-    "python3 - <<'PY'\n# unique values\nprint(len(set([1, 1])))\nPY": "environment_dump",
+    # K4 INLINE-ENV (contract-v2 section 7.4): inline interpreter code that prints the whole environment, recorded before K4 in
+    # EXPECTED_PASS_THROUGH, is refused.
+    "python3 -c 'import os;print(dict(os.environ))'": "environment_dump",
     # systemd's other launchers take a command after their own options as systemd-run does: run0 (systemd 256 and later), systemd-inhibit
     # and systemd-cat, which writes what the command prints to the journal (options: src/run/run.c, src/login/inhibit.c and
     # src/journal/cat.c).
@@ -1357,7 +1360,7 @@ EXPECTED_PASS_THROUGH = [
     # environment display; the guard reads it as every process, as procps and macOS's default do, since refusing it would refuse every `ps -ef`.
     "ps -e",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
-    "python3 -c 'import os;print(dict(os.environ))'",
+    # (`python3 -c 'import os;print(dict(os.environ))'` stood here until K4's INLINE-ENV refused it: see BLOCKED.)
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
     "python3 -c 'from huggingface_hub import get_token; print(get_token())'",
     "tar czf /tmp/hf.tgz -C ~/.cache huggingface",
