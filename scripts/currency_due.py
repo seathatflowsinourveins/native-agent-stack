@@ -7,7 +7,8 @@ read-only checks as subprocesses, with the arguments their weekly workflows use,
 - pins_behind: components whose platform pin's version probe did not observe the pinned version
   (scripts/adoption_status.py --pinned-versions --json, the "mismatched" ids of each selected profile, each id
   once); with --network also the runtime-worker skill pins that tools/adoption/runtime_skill_freshness.py reports
-  as drifted from upstream HEAD (skill-drift, repository-drift, removed-at-head) and a drifted skills CLI pin;
+  as drifted from upstream HEAD (skill-drift, repository-drift, removed-at-head) or as not matching their recorded
+  tree (invalid-pin, a fetched answer), and a drifted skills CLI pin;
 - stale_receipts: the component x platform buckets scripts/receipt_staleness.py --json flags ("flagged");
 - due_layers: the layers scripts/saturation_ledger.py --report --json marks due (not a saturation candidate) whose
   last completed sweep is at least --sweep-cadence-days old, or that have none or an undatable one. The default,
@@ -22,8 +23,17 @@ atomically (a temporary file in the same directory, fsync, mode 0600, os.replace
   {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "due": {the four counts},
    "summary_line": "at most 160 characters, ending with the command below", "details": [...]}
 
-and otherwise removes that file. A SessionStart hook, a separate change, prints summary_line when the file exists
-and nothing when it does not (docs/decisions/2026-09-30-session-currency-notice.md).
+and otherwise removes that file, unless the run could not see everything it was asked to check. A skill check
+(--network) that answered incompletely, meaning an error in its report, a skill left unfetched or in a state this
+script does not know, or a skills CLI release that was not fetched, is unknown, and unknown is not "nothing due"
+(the check's own report says "Incomplete fetches remain unknown"). Such a run writes the file when the counts it
+did reach are nonzero, with the gap in the coverage entry of the details, and otherwise leaves the state
+directory as it was: no removal and no new file, exit 0.
+
+The command that ends summary_line is "python3 scripts/currency_due.py --dry-run" plus the options that change what a
+run reports, --network and a non-default --sweep-cadence-days, so that running it prints the details of the notice.
+A SessionStart hook, a separate change, prints summary_line when the file exists and nothing when it does not
+(docs/decisions/2026-09-30-session-currency-notice.md).
 
   python3 scripts/currency_due.py                    # write or remove the due-file; one line for the journal
   python3 scripts/currency_due.py --dry-run          # the report as text; writes and removes nothing
@@ -31,8 +41,8 @@ and nothing when it does not (docs/decisions/2026-09-30-session-currency-notice.
   python3 scripts/currency_due.py --network          # also compare runtime-worker skill pins through gh api
 
 No network call unless --network is given. It exits 0 whether or not anything is due, and 2 on an internal error:
-a check that fails, times out or prints something other than its JSON report, an unreadable saturation ledger or
-a failed write. An error leaves the state directory as it was.
+a check that fails, times out or prints something other than its JSON report (a field of the wrong type included),
+an unreadable saturation ledger or a failed write. An error leaves the state directory as it was.
 """
 
 from __future__ import annotations
@@ -61,15 +71,23 @@ DETAILS_COMMAND = "python3 scripts/currency_due.py --dry-run"
 # recipes/saturation-sweep.md: "Sweep only the due layers, at most monthly"; 30 days is also
 # scripts/receipt_staleness.py's DEFAULT_MAX_AGE_DAYS.
 DEFAULT_SWEEP_CADENCE_DAYS = 30
-# tools/adoption/runtime_skill_freshness.py main(): the states its own summary counts as drift.
+# The notice repeats a non-default --sweep-cadence-days in its command; the bound (a hundred years) keeps that short.
+MAX_SWEEP_CADENCE_DAYS = 36500
+# tools/adoption/runtime_skill_freshness.py compare_skill() (:77-81) gives each skill one state. main() (:152) counts
+# the first three as drift. "invalid-pin" is a fetched answer: the manifest's tree is not the tree at the pinned ref.
+# "unfetched" is no answer, and so is a state that is none of these, which a newer check may add.
 SKILL_DRIFT_STATES = ("skill-drift", "repository-drift", "removed-at-head")
+SKILL_INVALID_STATE = "invalid-pin"
+SKILL_CURRENT_STATE = "current"
+ERROR_SAMPLES = 5  # of the skill check's own error strings that the details keep (value-free by design, :46-47)
 ISO_UTC = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z")  # host_receipts.ISO_UTC_PATTERN
 LEDGER = "catalogs/saturation/ledger.json"  # scripts/saturation_ledger.py LEDGER
 SKILLS_MANIFEST = "blueprints/runtime-workers/skills/manifest.json"  # runtime_skill_freshness.py DEFAULT_MANIFEST
 
 # (script, exit codes that still carry its JSON report, timeout in seconds). adoption_status.py exits 2 whenever
 # prerequisites are missing and bounds each version probe at 30 s; runtime_skill_freshness.py exits 1 whenever its
-# report is not ok (drift or fetch errors), and its gh api calls time out at 60 s each.
+# report is not ok (errors, or a skill whose manifest tree does not match its pin, :115; drift alone exits 0), and
+# its gh api calls time out at 60 s each.
 RECEIPTS = ("scripts/receipt_staleness.py", frozenset({0}), 120)
 LAYERS = ("scripts/saturation_ledger.py", frozenset({0}), 120)
 PINS = ("scripts/adoption_status.py", frozenset({0, 2}), 600)
@@ -169,12 +187,23 @@ def collect(root: Path, now_text: str, network: bool) -> dict:
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root)}
 
 
-def summary_line(due: dict) -> str:
-    """The nonzero counts and the command that prints the details, in at most SUMMARY_LIMIT characters."""
+def details_command(network: bool, cadence_days: int) -> str:
+    """The command that prints the details of a run made with these options: DETAILS_COMMAND plus the options that
+    change what a run reports. --root, --state-dir, --now, --json and --dry-run do not belong in a notice."""
+    options = ["--network"] if network else []
+    if cadence_days != DEFAULT_SWEEP_CADENCE_DAYS:
+        options += ["--sweep-cadence-days", str(cadence_days)]
+    return " ".join([DETAILS_COMMAND, *options])
+
+
+def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = True) -> str:
+    """The nonzero counts and the command that prints the details, in at most SUMMARY_LIMIT characters. With no
+    count and a check that could not answer, the line says so rather than "nothing due"."""
     parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in DUE_KEYS if due[key]]
     if not parts:
-        return "stack currency: nothing due"
-    prefix, suffix = "stack currency: ", f"; details: {DETAILS_COMMAND}"
+        return ("stack currency: nothing due" if complete else
+                "stack currency: nothing known due, skill check incomplete")
+    prefix, suffix = "stack currency: ", f"; details: {command}"
     counts, room = ", ".join(parts), SUMMARY_LIMIT - len(prefix) - len(suffix)
     if len(counts) > room:
         counts = counts[:room - 3] + "..."
@@ -196,8 +225,11 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int) ->
         if not isinstance(profile, dict):
             raise CheckError(f"{name} report has a profile that is not an object")
         summary = field(profile, "pinned_versions_summary", dict, name)
-        versions = {item.get("id"): item.get("pinned_version") for item in profile.get("pinned_versions") or []
-                    if isinstance(item, dict)}
+        versions = {}
+        for item in field(profile, "pinned_versions", list, name):
+            if not isinstance(item, dict) or not isinstance(item.get("id"), str):
+                raise CheckError(f"{name} report has a pinned_versions entry that is not an object with a string 'id'")
+            versions[item["id"]] = item.get("pinned_version")
         for component in strings(summary.get("mismatched"), "mismatched", name):
             entry = mismatched.setdefault(component, {"kind": "pin_mismatch", "component_id": component,
                                                       "pinned_version": versions.get(component), "profiles": []})
@@ -206,20 +238,35 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int) ->
     details += [mismatched[component] for component in sorted(mismatched)]
     pins_behind = len(mismatched)
 
-    skills, skills_errors = reports["skills"], None
+    # A skill entry or the CLI release that the check could not answer is unresolved, and an error in its report is an
+    # error; either makes the check incomplete, which keeps an earlier due-file (main) and is never "nothing due".
+    skills, skills_errors, skills_unresolved = reports["skills"], None, None
     if skills is not None:
         name = Path(SKILLS[0]).name
-        for entry in field(skills, "skills", list, name):
-            if isinstance(entry, dict) and entry.get("state") in SKILL_DRIFT_STATES:
-                details.append({"kind": "skill_drift", "skill": entry.get("name"), "source": entry.get("source"),
-                                "state": entry.get("state"), "pinned_ref": entry.get("pinned_ref"),
-                                "head_ref": entry.get("head_ref")})
+        entries = field(skills, "skills", list, name)
+        errors = strings(skills.get("errors"), "errors", name)
+        skills_errors, skills_unresolved = len(errors), 0
+        for entry in entries:
+            if not isinstance(entry, dict):
+                raise CheckError(f"{name} report has a skill that is not an object")
+            state = entry.get("state")
+            if state == SKILL_CURRENT_STATE:
+                continue
+            if state in SKILL_DRIFT_STATES or state == SKILL_INVALID_STATE:
+                details.append({"kind": "skill_drift" if state in SKILL_DRIFT_STATES else "skill_pin_invalid",
+                                "skill": entry.get("name"), "source": entry.get("source"), "state": state,
+                                "pinned_ref": entry.get("pinned_ref"), "head_ref": entry.get("head_ref")})
                 pins_behind += 1
+            else:
+                skills_unresolved += 1
         cli = skills.get("cli") if isinstance(skills.get("cli"), dict) else {}
         if cli.get("drift") is True:
             details.append({"kind": "skills_cli_drift", "pinned": cli.get("pinned"), "latest": cli.get("latest")})
             pins_behind += 1
-        skills_errors = len(field(skills, "errors", list, name))
+        elif cli.get("drift") is not False:
+            skills_unresolved += 1
+        details += [{"kind": "skills_probe_error", "error": error[:200]} for error in errors[:ERROR_SAMPLES]]
+    skills_complete = None if skills is None else not (skills_errors or skills_unresolved)
 
     name = Path(RECEIPTS[0]).name
     receipts = reports["receipts"]
@@ -261,10 +308,17 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int) ->
 
     details.append({"kind": "coverage", "pins_unchecked": len(unchecked), "due_layers_total": due_total,
                     "sweep_cadence_days": cadence_days, "network": skills is not None,
-                    "skills_fetch_errors": skills_errors})
+                    "skills_complete": skills_complete, "skills_fetch_errors": skills_errors,
+                    "skills_unresolved": skills_unresolved})
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers}
-    return {"generated_at": now_text, "due": due, "summary_line": summary_line(due), "details": details}
+    line = summary_line(due, details_command(skills is not None, cadence_days), skills_complete is not False)
+    return {"generated_at": now_text, "due": due, "summary_line": line, "details": details}
+
+
+def incomplete(document: dict) -> bool:
+    """True when the run could not see everything it was asked to check; the coverage entry is always the last."""
+    return document["details"][-1].get("skills_complete") is False
 
 
 def write_due_file(directory: Path, document: dict) -> Path:
@@ -302,8 +356,10 @@ def render_text(document: dict) -> str:
         if kind == "pin_mismatch":
             lines.append(f"  pin: {item['component_id']} did not report its pin {item['pinned_version']} "
                          f"({', '.join(str(profile) for profile in item['profiles'])})")
-        elif kind == "skill_drift":
+        elif kind in ("skill_drift", "skill_pin_invalid"):
             lines.append(f"  skill pin: {item['skill']} ({item['source']}): {item['state']}")
+        elif kind == "skills_probe_error":
+            lines.append(f"  skill check error: {item['error']}")
         elif kind == "skills_cli_drift":
             lines.append(f"  skills CLI pin: {item['pinned']}, latest release {item['latest']}")
         elif kind == "stale_receipt":
@@ -317,16 +373,19 @@ def render_text(document: dict) -> str:
             names = sorted({str(trigger.get("trigger")) for trigger in item["triggers"] if isinstance(trigger, dict)})
             lines.append(f"  reopen trigger: {item['layer']}: {len(item['triggers'])} ({', '.join(names)})")
         elif kind == "coverage":
-            network = "off" if not item["network"] else (
-                "on" + (f", {item['skills_fetch_errors']} fetch error(s) left unknown"
-                        if item["skills_fetch_errors"] else ""))
+            network = ("off" if not item["network"] else "on" if item["skills_complete"] else
+                       f"on, incomplete ({item['skills_fetch_errors']} error(s), {item['skills_unresolved']} "
+                       f"unresolved): left unknown, never counted as nothing due")
             lines.append(f"coverage: {item['pins_unchecked']} pinned component(s) unchecked on this host; "
                          f"{item['due_layers_total']} layer(s) not yet saturation candidates, due "
                          f"{item['sweep_cadence_days']} days after their last sweep; network checks {network}")
     due = document["due"]
+    kinds = {item["kind"] for item in document["details"]}
     actions = []
-    if due["pins_behind"]:
+    if "pin_mismatch" in kinds:
         actions.append("pins: python3 scripts/adoption_status.py --pinned-versions")
+    if kinds & {"skill_drift", "skill_pin_invalid", "skills_cli_drift"}:
+        actions.append("skill pins: blueprints/runtime-workers/skills/README.md")
     if due["stale_receipts"]:
         actions.append("receipts: python3 scripts/receipt_staleness.py and adoption/update.md")
     if due["due_layers"] or due["reopen_triggers"]:
@@ -345,7 +404,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true", help="print the report; write and remove nothing")
     parser.add_argument("--json", action="store_true", help="print the due-file document instead of text")
     parser.add_argument("--network", action="store_true",
-                        help="also run tools/adoption/runtime_skill_freshness.py (gh api calls; off by default)")
+                        help="also run tools/adoption/runtime_skill_freshness.py (gh api calls; off by default); "
+                             "an incomplete answer never removes an earlier due-file")
     parser.add_argument("--now", help="evaluate at this UTC time (YYYY-MM-DDTHH:MM:SSZ); default: the clock")
     parser.add_argument("--sweep-cadence-days", type=int, default=DEFAULT_SWEEP_CADENCE_DAYS,
                         help=f"count a due layer once its last sweep is this many days old "
@@ -360,8 +420,8 @@ def main(argv: list[str] | None = None) -> int:
     state = (args.state_dir if args.state_dir is not None else default_state_dir()).expanduser().resolve()
     if state == root or root in state.parents:
         parser.error(f"--state-dir must be outside the checkout ({root}); the due-file never goes into it")
-    if args.sweep_cadence_days < 0:
-        parser.error("--sweep-cadence-days must be zero or more")
+    if not 0 <= args.sweep_cadence_days <= MAX_SWEEP_CADENCE_DAYS:
+        parser.error(f"--sweep-cadence-days must be between 0 and {MAX_SWEEP_CADENCE_DAYS}")
     if args.now is None:
         now = datetime.now(timezone.utc).replace(microsecond=0)
     else:
@@ -377,7 +437,11 @@ def main(argv: list[str] | None = None) -> int:
         action = "dry run"
         if not args.dry_run:
             if any(document["due"].values()):
-                action = f"wrote {write_due_file(state, document)}"
+                action = f"wrote {write_due_file(state, document)}" + (
+                    "; the skill check was incomplete" if incomplete(document) else "")
+            elif incomplete(document):
+                # Unknown is not "nothing due": leave the state directory as it was.
+                action = f"kept {state / DUE_FILE}" if (state / DUE_FILE).exists() else "no due-file"
             else:
                 action = f"removed {state / DUE_FILE}" if remove_due_file(state) else "no due-file"
     except (CheckError, OSError) as error:

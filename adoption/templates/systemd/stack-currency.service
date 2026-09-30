@@ -15,7 +15,9 @@
 # receipt_staleness.py, adoption_status.py --pinned-versions and saturation_ledger.py --report, then writes
 # $XDG_STATE_HOME/native-agent-stack/currency-due.json (~/.local/state/... when XDG_STATE_HOME is unset; mode 0600)
 # when something is due and removes it otherwise. Its --network option (runtime-worker skill pins through gh api)
-# stays off here.
+# stays off here. A flag added to ExecStart changes the notice: the command that ends the due-file's summary_line
+# repeats --network and a non-default --sweep-cadence-days, so it names the same flags as ExecStart (tests/
+# test_currency_due.py checks that), and a skill check that cannot fetch leaves an earlier due-file in place.
 #
 # PATH: adoption_status.py --pinned-versions finds each version probe with shutil.which, and the user manager's own
 # PATH lacks the ecosystem bin directory, so without this line every probe would be reported unchecked and

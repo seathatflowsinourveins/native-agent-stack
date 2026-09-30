@@ -11,12 +11,14 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import shlex
 import stat
 import subprocess
 import sys
 import tempfile
 import time
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -25,6 +27,7 @@ from scripts import currency_due as cd
 ROOT = Path(__file__).resolve().parents[1]
 SYSTEMD_DIR = ROOT / "adoption/templates/systemd"
 NOW = "2026-09-30T12:00:00Z"
+NOW_DATETIME = datetime(2026, 9, 30, 12, 0, 0, tzinfo=timezone.utc)
 COMMAND = "python3 scripts/currency_due.py --dry-run"
 
 STALENESS = "scripts/receipt_staleness.py"
@@ -117,15 +120,22 @@ def saturation_report(layers=(), triggers=None):
             "current_reopen_triggers": {key: value for key, value in triggers.items() if value}, "layers": rows}
 
 
-def skills_report(states=(), cli_drift=False, errors=()):
-    """runtime_skill_freshness.py --output (build_report(), runtime_skill_freshness.py:106-116)."""
+def skills_report(states=(), cli_drift=False, errors=(), cli_unknown=False):
+    """runtime_skill_freshness.py --output (build_report(), runtime_skill_freshness.py:106-116). ``cli_unknown`` is the
+    release fetch that failed: cli.latest and cli.drift stay None (build_report() starts them so, :100). The
+    ``manifest_tree_matches_pin`` value follows compare_skill() (:77-79): None when nothing was fetched, False for
+    an invalid pin."""
     skills = [{"name": f"skill-{index}", "source": "example/skills", "path": f"skills/skill-{index}",
                "status": "selected", "pinned_ref": "a" * 40, "head_ref": "b" * 40, "pinned_tree": "c" * 40,
-               "head_tree": "d" * 40, "manifest_tree_matches_pin": True, "state": state, "native_check_ref": "a" * 40,
-               "native_check_advances_commit_pin": False} for index, state in enumerate(states)]
+               "head_tree": "d" * 40,
+               "manifest_tree_matches_pin": None if state == "unfetched" else state != "invalid-pin",
+               "state": state, "native_check_ref": "a" * 40, "native_check_advances_commit_pin": False}
+              for index, state in enumerate(states)]
+    cli = ({"pinned": "1.5.0", "latest": None, "drift": None} if cli_unknown else
+           {"pinned": "1.5.0", "latest": "v1.6.0" if cli_drift else "v1.5.0", "drift": cli_drift})
     return {"schema_version": 1, "kind": "runtime_skill_freshness_report", "checked_at": "2026-09-30T12:00:00+00:00",
             "report_only": True,
-            "cli": {"pinned": "1.5.0", "latest": "v1.6.0" if cli_drift else "v1.5.0", "drift": cli_drift},
+            "cli": cli,
             "native_check": {"executed": False, "source": None, "pinned_version": "1.5.0", "pinned_ref": "a" * 40,
                              "reason": "synthetic"},
             "skills": skills, "errors": list(errors), "ok": not errors}
@@ -135,6 +145,19 @@ def ledger(*sweeps):
     """catalogs/saturation/ledger.json; only sweeps[].{sweep_id, date, status} matter here."""
     return {"schema_version": 1, "policy": {"K": 3, "min_gap_days": 7},
             "sweeps": [{"sweep_id": sweep_id, "date": day, "status": status} for sweep_id, day, status in sweeps]}
+
+
+def json_paths(node, prefix=()):
+    """The path (a tuple of keys and indexes) to every value nested inside ``node``, not ``node`` itself."""
+    if isinstance(node, dict):
+        children = list(node.items())
+    elif isinstance(node, list):
+        children = list(enumerate(node))
+    else:
+        return
+    for key, child in children:
+        yield (*prefix, key)
+        yield from json_paths(child, (*prefix, key))
 
 
 class Checkout:
@@ -265,6 +288,26 @@ class FailureTests(unittest.TestCase):
         code, _, _ = checkout.run()
         self.assertEqual(code, 2)
         self.assertFalse(checkout.state.exists())
+
+    def test_a_malformed_pinned_versions_field_exits_2_and_writes_nothing(self):
+        # adoption_status.py:1258-1263,1331 always sets pinned_versions, a list of {"id": str, ...}, beside the
+        # summary. `True or []` used to reach a loop and raise TypeError, which is exit 1 with a traceback, not 2.
+        def report_with(value):
+            report = pinned_report(mismatched=("codex",))
+            report["profiles"][0]["pinned_versions"] = value
+            return report
+
+        malformed = {"a boolean": True, "a number": 1, "a string": "codex", "an object": {"id": "codex"},
+                     "a list of numbers": [1], "an entry whose id is a list": [{"id": ["codex"]}],
+                     "an entry without an id": [{"pinned_version": "1.0.0"}], "null": None}
+        for label, value in malformed.items():
+            with self.subTest(pinned_versions=label):
+                checkout = Checkout(self)
+                checkout.set(PINNED, report_with(value))
+                code, _, stderr = checkout.run()
+                self.assertEqual(code, 2, stderr)
+                self.assertIn("adoption_status.py", stderr)
+                self.assertFalse(checkout.state.exists())
 
     def test_a_failed_run_leaves_an_earlier_file_byte_identical(self):
         checkout = Checkout(self)
@@ -405,6 +448,47 @@ class CountTests(unittest.TestCase):
         self.assertNotIn(checkout.state, handed.parents)
 
 
+class AggregateShapeTests(unittest.TestCase):
+    """aggregate() reads nested fields of four JSON reports. Whatever type one of them has, it either ignores the field
+    or raises CheckError (exit 2); any other exception would be exit 1 with a traceback."""
+
+    REPLACEMENTS = (None, True, 0, -1, 1.5, "x", [], {}, [None], [[]], {"a": None})
+
+    @staticmethod
+    def reports() -> dict:
+        trigger = {"trigger": "pin_moved", "ref": "receipt_staleness:linux-wsl2-x86_64/codex"}
+        return {"receipts": staleness_report(("codex", ["pin_moved"])),
+                "pins": pinned_report(mismatched=("codex",)),
+                "layers": saturation_report([("foundation/workers", True, "sweep-a")],
+                                            {"foundation/workers": [trigger]}),
+                "skills": skills_report(("skill-drift", "invalid-pin", "unfetched", "current"), cli_drift=True,
+                                        errors=["gh api failed (exit 1): repos/example/skills/commits/HEAD"]),
+                "sweep_dates": {"sweep-a": "2026-08-01"}}
+
+    def test_a_wrong_typed_field_is_ignored_or_a_check_error(self):
+        # The unmodified reports: codex's pin, a drifted skill, an invalid skill pin and the skills CLI make four.
+        document = cd.aggregate(self.reports(), NOW_DATETIME, NOW, 30)
+        self.assertEqual(document["due"], {"pins_behind": 4, "stale_receipts": 1, "due_layers": 1,
+                                           "reopen_triggers": 1})
+        exercised = 0
+        for name in ("receipts", "pins", "layers", "skills"):
+            for path in json_paths(self.reports()[name]):
+                for value in self.REPLACEMENTS:
+                    reports = self.reports()
+                    parent = reports[name]
+                    for key in path[:-1]:
+                        parent = parent[key]
+                    parent[path[-1]] = value
+                    with self.subTest(report=name, path=path, value=value):
+                        try:
+                            document = cd.aggregate(reports, NOW_DATETIME, NOW, 30)
+                        except cd.CheckError:
+                            continue
+                        cd.render_text(document)
+                        exercised += 1
+        self.assertGreater(exercised, 500)
+
+
 class NetworkTests(unittest.TestCase):
     def test_network_checks_are_off_by_default(self):
         checkout = Checkout(self)
@@ -414,9 +498,11 @@ class NetworkTests(unittest.TestCase):
         self.assertIsNone(checkout.recorded(SKILLS))
         self.assertEqual(json.loads(stdout)["due"]["pins_behind"], 0)
 
-    def test_network_adds_drifted_skill_pins_and_keeps_fetch_errors_unknown(self):
+    def test_network_adds_drifted_and_invalid_skill_pins_and_keeps_fetch_errors_unknown(self):
         # runtime_skill_freshness.py:152 counts skill-drift, repository-drift and removed-at-head as drift, and
-        # :103 sets cli.drift; it exits 1 whenever its report is not ok (:154), which is not a failure here.
+        # :103 sets cli.drift; it exits 1 whenever its report is not ok (:154), which is not a failure here. An
+        # invalid-pin is a fetched answer (:78-79: the manifest's tree is not the tree at the pinned ref), so it
+        # counts too; an unfetched skill and a failed fetch stay unknown.
         checkout = Checkout(self)
         states = ("current", "skill-drift", "repository-drift", "removed-at-head", "unfetched", "invalid-pin")
         checkout.set(SKILLS, stdout='{"ok": false}', code=1, output_file=json.dumps(
@@ -424,10 +510,14 @@ class NetworkTests(unittest.TestCase):
         code, stdout, stderr = checkout.run("--dry-run", "--json", "--network")
         self.assertEqual(code, 0, stderr)
         document = json.loads(stdout)
-        self.assertEqual(document["due"]["pins_behind"], 4)
+        self.assertEqual(document["due"]["pins_behind"], 5)
         self.assertEqual(sorted(item["state"] for item in document["details"] if item["kind"] == "skill_drift"),
                          ["removed-at-head", "repository-drift", "skill-drift"])
-        self.assertEqual(document["details"][-1]["skills_fetch_errors"], 1)
+        self.assertEqual([item["state"] for item in document["details"] if item["kind"] == "skill_pin_invalid"],
+                         ["invalid-pin"])
+        coverage = document["details"][-1]
+        self.assertEqual((coverage["skills_fetch_errors"], coverage["skills_unresolved"], coverage["skills_complete"]),
+                         (1, 1, False))
         arguments = checkout.recorded(SKILLS)
         self.assertEqual(arguments[:2],
                          ["--manifest", str(checkout.root / "blueprints/runtime-workers/skills/manifest.json")])
@@ -440,6 +530,186 @@ class NetworkTests(unittest.TestCase):
         self.assertEqual(code, 2)
 
 
+class IncompleteSkillCheckTests(unittest.TestCase):
+    """A skill check that could not answer is unknown, and unknown is not "nothing due" (the check's own report says
+    "Incomplete fetches remain unknown", runtime_skill_freshness.py:134). It must never remove the notice an earlier
+    run wrote. The timer does not pass --network; these are the runs that do."""
+
+    FETCH_ERROR = "gh api failed (exit 1): repos/example/skills/commits/HEAD"
+    EARLIER = b'{"earlier": true}\n'
+
+    def incomplete_reports(self) -> dict:
+        return {
+            "a failed fetch": skills_report(("unfetched",), errors=[self.FETCH_ERROR]),
+            "an unfetched skill that names no error": skills_report(("current", "unfetched")),
+            "a state this script does not know": skills_report(("current", "state-of-a-newer-check")),
+            "a failed release fetch": skills_report(("current",), cli_unknown=True, errors=[self.FETCH_ERROR]),
+            "an unknown release that names no error": skills_report(("current",), cli_unknown=True),
+            "an error beside skills that were all fetched": skills_report(
+                ("current",), errors=["cli pin: version None is not a release version"]),
+        }
+
+    def skills_checkout(self, report: dict) -> Checkout:
+        checkout = Checkout(self)
+        checkout.set(SKILLS, stdout='{"ok": false}', code=1, output_file=json.dumps(report))
+        return checkout
+
+    def test_an_incomplete_check_keeps_the_earlier_due_file_byte_identical(self):
+        for label, report in self.incomplete_reports().items():
+            with self.subTest(case=label):
+                checkout = self.skills_checkout(report)
+                checkout.state.mkdir(mode=0o700)
+                checkout.due_file.write_bytes(self.EARLIER)
+                code, stdout, stderr = checkout.run("--network")
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(checkout.due_file.read_bytes(), self.EARLIER)
+                self.assertEqual([path.name for path in checkout.state.iterdir()], ["currency-due.json"])
+                self.assertIn("nothing known due", stdout)
+                self.assertIn("kept", stdout)
+
+    def test_an_incomplete_check_creates_no_due_file(self):
+        for label, report in self.incomplete_reports().items():
+            with self.subTest(case=label):
+                checkout = self.skills_checkout(report)
+                code, stdout, stderr = checkout.run("--network")
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.state.exists())
+                self.assertIn("nothing known due", stdout)
+
+    def test_a_complete_check_with_nothing_due_still_removes_the_earlier_file(self):
+        # The control: it is the incompleteness, not --network, that keeps the file.
+        checkout = self.skills_checkout(skills_report(("current", "current")))
+        checkout.state.mkdir(mode=0o700)
+        checkout.due_file.write_bytes(self.EARLIER)
+        code, stdout, stderr = checkout.run("--network")
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse(checkout.due_file.exists())
+        self.assertIn("stack currency: nothing due", stdout)
+
+    def test_an_incomplete_check_still_writes_what_the_other_checks_found(self):
+        checkout = self.skills_checkout(skills_report(("unfetched",), errors=[self.FETCH_ERROR]))
+        checkout.something_due()
+        checkout.state.mkdir(mode=0o700)
+        checkout.due_file.write_bytes(self.EARLIER)
+        code, stdout, stderr = checkout.run("--network")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
+                                           "reopen_triggers": 1})
+        coverage = document["details"][-1]
+        self.assertEqual((coverage["skills_complete"], coverage["skills_fetch_errors"], coverage["skills_unresolved"]),
+                         (False, 1, 1))
+        self.assertEqual([item["error"] for item in document["details"] if item["kind"] == "skills_probe_error"],
+                         [self.FETCH_ERROR])
+        self.assertIn("incomplete", stdout)
+
+    def test_an_invalid_pin_is_a_finding_that_replaces_the_earlier_file(self):
+        # runtime_skill_freshness.py:78-79: the pinned ref was fetched and the manifest's tree is not its tree.
+        checkout = self.skills_checkout(skills_report(("current", "invalid-pin")))
+        checkout.state.mkdir(mode=0o700)
+        checkout.due_file.write_bytes(self.EARLIER)
+        code, _, stderr = checkout.run("--network")
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertEqual(document["due"]["pins_behind"], 1)
+        invalid = [item for item in document["details"] if item["kind"] == "skill_pin_invalid"]
+        self.assertEqual([(item["skill"], item["state"]) for item in invalid], [("skill-1", "invalid-pin")])
+        self.assertIs(document["details"][-1]["skills_complete"], True)
+        self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {COMMAND} --network")
+
+    def test_a_dry_run_headline_says_nothing_known_due_and_lists_the_error(self):
+        checkout = self.skills_checkout(skills_report(("unfetched",), errors=[self.FETCH_ERROR]))
+        code, text, stderr = checkout.run("--dry-run", "--network")
+        self.assertEqual(code, 0, stderr)
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "stack currency: nothing known due, skill check incomplete")
+        self.assertTrue(any(self.FETCH_ERROR in line for line in lines))
+        self.assertTrue(any(line.startswith("coverage:") and "incomplete" in line for line in lines))
+        self.assertFalse(checkout.state.exists())
+
+
+class DetailsCommandTests(unittest.TestCase):
+    """The command that ends the notice must print the details of the run that wrote it, so it repeats the options
+    that change what a run reports: --network and a non-default --sweep-cadence-days."""
+
+    def notice(self, checkout: Checkout, *options: str) -> dict:
+        code, _, stderr = checkout.run(*options)
+        self.assertEqual(code, 0, stderr)
+        return json.loads(checkout.due_file.read_text(encoding="utf-8"))
+
+    def reproduced(self, checkout: Checkout, document: dict) -> dict:
+        """Run the notice's own command in this checkout (in process) and return the document it prints."""
+        summary = document["summary_line"]
+        self.assertIn("; details: ", summary)
+        command = shlex.split(summary.split("; details: ", 1)[1])
+        self.assertEqual(command[:3], ["python3", "scripts/currency_due.py", "--dry-run"], summary)
+        code, stdout, stderr = checkout.run(*command[2:], "--json")
+        self.assertEqual(code, 0, stderr)
+        return json.loads(stdout)
+
+    def test_skill_drift_alone_is_reproduced_by_the_command_in_the_notice(self):
+        checkout = Checkout(self)
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("skill-drift",))))
+        document = self.notice(checkout, "--network")
+        self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 0, "due_layers": 0,
+                                           "reopen_triggers": 0})
+        self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {COMMAND} --network")
+        again = self.reproduced(checkout, document)
+        self.assertEqual((again["due"], again["summary_line"]), (document["due"], document["summary_line"]))
+        # Without the option the same command sees nothing, which is why the notice has to name it.
+        self.assertEqual(json.loads(checkout.run("--dry-run", "--json")[1])["due"]["pins_behind"], 0)
+
+    def test_a_non_default_cadence_is_reproduced_by_the_command_in_the_notice(self):
+        checkout = Checkout(self)
+        # Swept the day before NOW: not yet due at the default 30 days, due at 0.
+        checkout.set(SATURATION, saturation_report([("foundation/workers", True, "sweep-a")]))
+        document = self.notice(checkout, "--sweep-cadence-days", "0")
+        self.assertEqual(document["due"]["due_layers"], 1)
+        self.assertEqual(document["summary_line"],
+                         f"stack currency: 1 layer due; details: {COMMAND} --sweep-cadence-days 0")
+        again = self.reproduced(checkout, document)
+        self.assertEqual((again["due"], again["summary_line"]), (document["due"], document["summary_line"]))
+        self.assertEqual(json.loads(checkout.run("--dry-run", "--json")[1])["due"]["due_layers"], 0)
+
+    def test_both_options_are_named_and_the_line_keeps_its_limit(self):
+        checkout = Checkout(self)
+        checkout.something_due()
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("skill-drift",))))
+        document = self.notice(checkout, "--network", "--sweep-cadence-days", "7")
+        self.assertTrue(document["summary_line"].endswith(f"; details: {COMMAND} --network --sweep-cadence-days 7"),
+                        document["summary_line"])
+        self.assertLessEqual(len(document["summary_line"]), 160)
+        self.assertEqual(self.reproduced(checkout, document)["due"], document["due"])
+
+    def test_options_that_do_not_change_the_counts_are_not_repeated(self):
+        checkout = Checkout(self)
+        checkout.something_due()
+        # checkout.run adds --root, --state-dir and --now; --json and --dry-run are output modes.
+        document = self.notice(checkout, "--json")
+        self.assertTrue(document["summary_line"].endswith(f"; details: {COMMAND}"), document["summary_line"])
+
+    def test_the_next_step_points_at_what_is_due(self):
+        # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.
+        checkout = Checkout(self)
+        checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("skill-drift",))))
+        _, text, _ = checkout.run("--dry-run", "--network")
+        self.assertEqual(text.splitlines()[-1], "next: skill pins: blueprints/runtime-workers/skills/README.md")
+        checkout = Checkout(self)
+        checkout.set(PINNED, pinned_report(mismatched=("codex",)))
+        _, text, _ = checkout.run("--dry-run")
+        self.assertEqual(text.splitlines()[-1], "next: pins: python3 scripts/adoption_status.py --pinned-versions")
+
+    def test_the_cadence_option_is_bounded_so_the_command_stays_short(self):
+        checkout = Checkout(self)
+        for value in ("-1", "36501"):
+            with self.subTest(value=value):
+                with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
+                    cd.main(["--root", str(checkout.root), "--state-dir", str(checkout.state), "--now", NOW,
+                             "--sweep-cadence-days", value])
+                self.assertEqual(raised.exception.code, 2)
+        self.assertEqual(checkout.run("--dry-run", "--sweep-cadence-days", "36500")[0], 0)
+
+
 class SummaryLineTests(unittest.TestCase):
     def test_the_line_names_only_nonzero_counts_and_the_command(self):
         line = cd.summary_line({"pins_behind": 2, "stale_receipts": 1, "due_layers": 3, "reopen_triggers": 0})
@@ -450,6 +720,18 @@ class SummaryLineTests(unittest.TestCase):
         line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 40))
         self.assertLessEqual(len(line), 160)
         self.assertTrue(line.endswith(f"; details: {COMMAND}"))
+
+    def test_the_line_ends_with_the_command_it_is_given_within_160_characters(self):
+        command = f"{COMMAND} --network --sweep-cadence-days 36500"
+        line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 40), command)
+        self.assertLessEqual(len(line), 160)
+        self.assertTrue(line.endswith(f"; details: {command}"))
+        due = dict.fromkeys(cd.DUE_KEYS, 0) | {"pins_behind": 1}
+        self.assertEqual(cd.summary_line(due, command), f"stack currency: 1 pin behind; details: {command}")
+
+    def test_an_incomplete_check_with_nothing_found_is_not_reported_as_nothing_due(self):
+        line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 0), complete=False)
+        self.assertEqual(line, "stack currency: nothing known due, skill check incomplete")
 
 
 class StateDirectoryTests(unittest.TestCase):
@@ -504,6 +786,18 @@ class UnitTemplateTests(unittest.TestCase):
         # user manager's own PATH lacks the ecosystem bin directory.
         search_path = next(line for line in directives if line.startswith("Environment=PATH="))
         self.assertIn("%h/.local/share/codex-ecosystem/bin", search_path)
+
+    def test_the_command_in_the_notice_names_exactly_the_flags_the_service_passes(self):
+        # ExecStart is "<interpreter> <script> <flags>"; a run with those flags must end its notice with the
+        # command that runs the details with the same flags, so that the notice can be reproduced.
+        execstart = next(line for line in self.service if line.startswith("ExecStart="))
+        flags = shlex.split(execstart.removeprefix("ExecStart="))[2:]
+        checkout = Checkout(self)
+        checkout.something_due()
+        code, _, stderr = checkout.run(*flags)
+        self.assertEqual(code, 0, stderr)
+        summary = json.loads(checkout.due_file.read_text(encoding="utf-8"))["summary_line"]
+        self.assertEqual(shlex.split(summary.split("; details: ", 1)[1])[2:], ["--dry-run", *flags])
 
     def test_the_timer_runs_daily_catches_up_and_spreads_its_start(self):
         for setting in ("OnCalendar=daily", "Persistent=true", "RandomizedDelaySec=15m",
