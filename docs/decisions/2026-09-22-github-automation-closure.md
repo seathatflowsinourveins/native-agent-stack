@@ -308,11 +308,11 @@ locally with `GH_TOKEN` set and no `--offline`, using
   `IGNORE_SCOPES` entry are deleted, and the lock's `IGNORE_ALLOWED_LOCKS` entry keeps the two oauthlib advisories at the
   relocked sha256, with the new record as its evidence, which carries the 2026-09-29 review forward (the lock diff is
   the three PyJWT lines; PyJWT 2.14.0's wheel and sdist have no oauthlib reference, and the same search over
-  requests-oauthlib's wheel hits, so it can). oauthlib stays at 3.3.1: as of 2026-09-30T03:46:13Z, 4.0.0 (published
+  requests-oauthlib's wheel hits, so it can). oauthlib stays at 3.3.1: as of 2026-09-30T04:30:20Z, 4.0.0 (published
   2026-09-28T06:01Z) is inside the 7-day window the upstream workspace applies, until 2026-10-05T06:01:19Z, and its two
   advisories are ignored until 2026-10-13; a 2026-09-30 pre-check found the same test outcome for requests-oauthlib
   2.0.0's unit tests and imports under oauthlib 3.3.1 and 4.0.0. **Alternatives considered:** PyJWT 2.15.1 or 2.15.0
-  (inside the same window as of 2026-09-30T03:46:13Z, and the scan is clean at 2.14.0); relocking oauthlib 4.0.0 now; extending
+  (inside the same window as of 2026-09-30T04:30:20Z, and the scan is clean at 2.14.0); relocking oauthlib 4.0.0 now; extending
   the ignores to the nine (rejected: one is Critical and a fixed release exists). **Result:** the workflow's command
   over the 49 lockfiles exits 0 with no PyJWT ignore, and the previous lock under the same config exits 1. **Expiry and
   owner:** tracked in #518; owner bc (session native-agent-stack-bc), unless reassigned there; a decision point at
