@@ -362,7 +362,8 @@ locally with `GH_TOKEN` set and no `--offline`, using
   decision point, and an ignore needs its own reachability review); nested `osv-scanner.toml` files next to the locks (OSV's
   per-directory lookup applies only without an explicit `--config`, which would move every existing repo-wide ignore into
   per-directory files; a later cleanup could do that). **Overturn:** the frozen lock stops being kept, or an application built
-  from it is run (then bump `next` and delete the config, the inventory key and the `FROZEN_LOCKS` row); OSV lists an advisory
+  from it is run (then bump `next`, or drop the lock from the inventory, and delete the config, the inventory key, the `FROZEN_LOCKS` row and the frozen scan, report and
+  upload steps of the workflow, whose guard fails an empty frozen list); OSV lists an advisory
   for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes. **Not covered:** the image's server binary (PyInstaller
   build of upstream's unchanged uv.lock, urllib3 2.7.0 and PyJWT 2.13.0 or older) and the grader venv, as for the earlier PyJWT
   relock. Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.

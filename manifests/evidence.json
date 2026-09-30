@@ -3814,8 +3814,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "1df67c92865aa16f53cbb9b451fa3fa82a83a50950dc20a8efeea227f93f6240",
-      "bytes": 11346
+      "sha256": "3f2dcbe8083ec9a6319e06c8a16213c39869c7c559bc3f48f433163a9ed6f9ec",
+      "bytes": 11423
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -9024,6 +9024,21 @@
       "bytes": 5376
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-1.events.txt",
+      "sha256": "ed2a572adacb52eab031348e11a147f93b492a277c224a68202dcaf2738c2ede",
+      "bytes": 1539
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt",
+      "sha256": "d0355e50e9e96baa2bbada4f23a5805dc29b5bb17b0f9601f4f4d5bbb9e3db24",
+      "bytes": 1788
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-7.md",
+      "sha256": "327c0de8c449151d630b4aa696637efc3c03977bae22dbca28bbd17a2317fef4",
+      "bytes": 4851
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review.sh.txt",
       "sha256": "f298f861bf7c304234dca3deff44d60fc5ed613fcea2ebe7f3c5884287f6fc75",
       "bytes": 981
@@ -9064,6 +9079,16 @@
       "bytes": 4094
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+      "sha256": "ed5c4eb4747c12447951fe1d6673bf52613c179daf1f40c93db75ecb148702ac",
+      "bytes": 4515
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.event-excerpt.py.txt",
+      "sha256": "6a387138ee642e256e9914ee5b2d0bcc08bef35a6f8211e41d5f8db66fed3784",
+      "bytes": 1319
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.install-check.sh.txt",
       "sha256": "d637ced89b96b6228a12a83e2b1bb2f7ae0517590e1f65102e163a37d95f27de",
       "bytes": 1840
@@ -9075,7 +9100,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-after-noconfig.err",
-      "sha256": "db65f37559fc0ab123c7036d8fda60a3ffdd4929c7c1f5a66e73c0331782c3b9",
+      "sha256": "9595bc2cb2ddc25558d481d180a40378794fa540a875606671423869422a7b99",
       "bytes": 5875
     },
     {
@@ -9085,7 +9110,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-main.err",
-      "sha256": "ab0aab99178f52fbc171c9f7d75235bd27762128ef5961115424119767e22d5f",
+      "sha256": "76ac30156ed1ed08b653e41f82d002b4b6a75752f3e98b281f2bf872dd5fe058",
       "bytes": 14410
     },
     {
@@ -9100,8 +9125,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-split-controls.py.txt",
-      "sha256": "286130f1d4b6d85d50273803a8a4696e7b913e273346b4ea73b1a7cee82bf19b",
-      "bytes": 7965
+      "sha256": "3933fa846e89e755a2ccbc6722654cdcd2d64f58cf4ab702c6ac69e2ca8e0f18",
+      "bytes": 8296
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-summary.py.txt",
@@ -9130,8 +9155,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt",
-      "sha256": "6724b526b8560efbfb23c83c940687dbb436bfbb3d8835128906ef7ca040e478",
-      "bytes": 37738
+      "sha256": "a2c619c43c4ed7b8f2fb33b0423c7c7b150bb4b4aa3b631c30569962c241352d",
+      "bytes": 37901
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.builder.sh.txt",
@@ -14780,8 +14805,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "a39d7d1dc38a537693e7bbbe3ee1c190c87414c659e4162f50c3f2200890ce16",
-      "bytes": 144342
+      "sha256": "015c2575b742643872b9f271d340fc8179ea2706b85add4450a5fdbf9868e58f",
+      "bytes": 144480
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -43900,8 +43925,8 @@
     },
     {
       "path": "evidence/receipts/osv-urllib3-next-20260930.json",
-      "sha256": "9056d2721e24a73a9bac11568902b33a86c57b52f0b28ab9c5c417194d1b5ffb",
-      "bytes": 24256
+      "sha256": "02b30edd1c324f047b93aa215ca39e36f1fc71cbaea7c206ca5e61fac6c48ab1",
+      "bytes": 27433
     },
     {
       "path": "evidence/receipts/pit-availability.json",
@@ -45655,8 +45680,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "8fd006726513cb591801c0e0878cd87de593c05996c76f09ecbde1f2eb87131a",
-      "bytes": 46292
+      "sha256": "6ab01255f9d5395c52c6e8f5c3fa14ba3f5262a6750d9ff868bc06ab83827a5e",
+      "bytes": 57929
     },
     {
       "path": "tests/test_path_safety.py",
@@ -45895,8 +45920,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "f9b5b418ac5bd232aaad49f20bec2d2cdef556e31c8fb87397a4ad0ede0e21b3",
-      "bytes": 87393
+      "sha256": "efbc3d57f75fa88bce9a5d158c59f9bed93d7002408b80033ccb73b7e5f38930",
+      "bytes": 87603
     },
     {
       "path": "tests/test_workflow_security.py",

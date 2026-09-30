@@ -278,10 +278,19 @@ def scan_partition(entries, configs=None):
     return ordinary, frozen, stray
 
 
+IGNORE_ENTRY_KEYS = {"id", "ignoreUntil", "reason"}
+
+
 def ignore_entry_problems(config):
-    """Why an [[IgnoredVulns]] entry of a parsed config breaks the ignore policy (a missing id or reason, a missing or distant ignoreUntil)."""
+    """Why an [[IgnoredVulns]] entry of a parsed config breaks the ignore policy (a missing id or reason, a missing or distant ignoreUntil, a key
+    other than id, ignoreUntil and reason). OSV-Scanner's TOML decoder matches keys without regard to case (a second `ID = "GHSA-..."` beside `id`
+    was decoded as an ignore), so a key that is not spelled exactly is a problem, as is a top-level table other than the two it reads."""
     problems, latest = [], date.today() + timedelta(days=90)
+    for key in sorted(set(config) - {"IgnoredVulns", "PackageOverrides"}):
+        problems.append(f"{key}: not a table this policy knows")
     for entry in config.get("IgnoredVulns", []):
+        for key in sorted(set(entry) - IGNORE_ENTRY_KEYS):
+            problems.append(f"{entry.get('id')}: unknown key {key!r}")
         if not entry.get("id"):
             problems.append(f"{entry}: no id")
         if not str(entry.get("reason", "")).strip():
@@ -294,6 +303,117 @@ def ignore_entry_problems(config):
             until = until.date()
         if until > latest:
             problems.append(f"{entry.get('id')}: ignoreUntil more than 90 days away")
+    return problems
+
+
+def override_problems(config):
+    """Why a [[PackageOverrides]] entry of the ordinary config could hide a finding in an npm lock: it names no ecosystem, or the npm ecosystem.
+    An override matches by name (optionally a regular expression), version and ecosystem, in every lock of the invocation, so one without an
+    ecosystem, or for npm, could silence `next` by a pattern the frozen advisory's exception is not meant to share."""
+    problems = []
+    for entry in config.get("PackageOverrides", []):
+        ecosystem = str(entry.get("ecosystem", "")).strip().lower()
+        if not ecosystem or ecosystem == "npm":
+            problems.append(f"{entry.get('name')!r}: a package override needs an ecosystem other than npm")
+    return problems
+
+
+def workflow_scan_script():
+    """The `run:` block of the scan step of security-scan.yml, dedented, as bash runs it."""
+    text = WORKFLOW.read_text(encoding="utf-8")
+    start = text.index("      - name: Scan every listed lockfile and manifest")
+    run = text.index("        run: |\n", start) + len("        run: |\n")
+    end = text.index("      - name: Keep the OSV-Scanner SARIF for the upload job", run)
+    return "\n".join(line[10:] if line.startswith(" " * 10) else line for line in text[run:end].splitlines()) + "\n"
+
+
+# A stand-in for the scanner: it records its arguments and exits with the code the test chose for that kind of run (table or sarif, frozen config or
+# not), so the step's partition, configs, report files and exit handling can be checked without a network or a database.
+SCANNER_STUB = """#!/bin/sh
+printf '%s\\n' "$*" >> "$STUB_LOG"
+config=""; format=table; out=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --config) config=$2; shift ;;
+    --format) format=$2; shift ;;
+    --output-file) out=$2; shift ;;
+  esac
+  shift
+done
+[ -n "$out" ] && : > "$out"
+case "$config" in *frozen*) kind=FROZEN ;; *) kind=ORDINARY ;; esac
+case "$format" in sarif) kind="${kind}_SARIF" ;; esac
+eval "exit \\${STUB_EXIT_${kind}:-0}"
+"""
+
+
+def run_scan_step(script, inventory, write_sarif, exits=None):
+    """Run the scan step's script in a scratch directory holding `inventory` (a dict) with the stub as the scanner. Returns (exit code, the recorded
+    scanner invocations as argument lists, the report files written) or None where bash 4 or jq is missing."""
+    import shutil
+    bash, jq = shutil.which("bash"), shutil.which("jq")
+    if not bash or not jq or subprocess.run([bash, "-c", "mapfile -t x < /dev/null"], capture_output=True).returncode != 0:
+        return None
+    exits = exits or {}
+    with tempfile.TemporaryDirectory() as scratch:
+        scratch = Path(scratch)
+        (scratch / ".github").mkdir()
+        (scratch / ".github/osv-scanner-lockfiles.json").write_text(json.dumps(inventory), encoding="utf-8")
+        runner = scratch / "runner"
+        (runner / "osv-scanner").mkdir(parents=True)
+        stub = runner / "osv-scanner/osv-scanner"
+        stub.write_text(SCANNER_STUB, encoding="utf-8")
+        stub.chmod(0o755)
+        log = scratch / "stub.log"
+        log.write_text("", encoding="utf-8")
+        environment = {"PATH": str(Path(jq).parent) + ":" + str(Path(bash).parent) + ":/usr/bin:/bin", "RUNNER_TEMP": str(runner),
+                       "WRITE_SARIF": "true" if write_sarif else "false", "STUB_LOG": str(log)}
+        environment.update({f"STUB_EXIT_{kind}": str(code) for kind, code in exits.items()})
+        done = subprocess.run([bash, "-c", script], cwd=scratch, env=environment, capture_output=True, text=True)
+        calls = [line.split(" ") for line in log.read_text(encoding="utf-8").splitlines()]
+        reports = sorted(path.name for path in (runner / "osv-scanner").glob("*.sarif"))
+        return done.returncode, calls, reports
+
+
+def scan_step_problems(script, inventory, write_sarif=False):
+    """What is wrong with the scan step's script on `inventory`: the two scans must be the ordinary list under .github/osv-scanner.toml and the entries
+    that name the frozen config under that config alone (parser flags preserved, together exactly the inventory), each run once per kind, with the
+    reports written only when asked, and the exit code must be the worst of all runs. None where bash 4 or jq is missing."""
+    entries = inventory["lockfiles"]
+    ordinary = sorted(f"--lockfile={e.get('parser', '')}:{e['path']}" for e in entries if "config" not in e)
+    frozen = sorted(f"--lockfile={e.get('parser', '')}:{e['path']}" for e in entries if e.get("config") == FROZEN_CONFIG)
+    problems = []
+    first = run_scan_step(script, inventory, write_sarif)
+    if first is None:
+        return None
+    code, calls, reports = first
+    if code != 0:
+        problems.append(f"a clean run exited {code}")
+    kinds = ["table ordinary", "table frozen"] + (["sarif ordinary", "sarif frozen"] if write_sarif else [])
+    if len(calls) != len(kinds):
+        problems.append(f"{len(calls)} scanner runs, expected {len(kinds)}")
+        return problems
+    for kind, call in zip(kinds, calls):
+        wanted_config = FROZEN_CONFIG if "frozen" in kind else ".github/osv-scanner.toml"
+        configs = [call[i + 1] for i, word in enumerate(call) if word == "--config"]
+        lockfiles = sorted(word for word in call if word.startswith("--lockfile="))
+        if configs != [wanted_config]:
+            problems.append(f"{kind}: configs {configs}")
+        if lockfiles != (frozen if "frozen" in kind else ordinary):
+            problems.append(f"{kind}: {len(lockfiles)} lockfile arguments differ from the inventory's")
+        if "--no-resolve" not in call:
+            problems.append(f"{kind}: no --no-resolve")
+        if ("--format" in call and call[call.index("--format") + 1] == "sarif") != ("sarif" in kind):
+            problems.append(f"{kind}: wrong output format")
+    if sorted(set(reports)) != (["osv-scanner-frozen-macos.sarif", "osv-scanner.sarif"] if write_sarif else []):
+        problems.append(f"reports written: {reports}")
+    matrix = [({"ORDINARY": 1}, 1), ({"FROZEN": 1}, 1), ({"ORDINARY": 127}, 127), ({"ORDINARY": 1, "FROZEN": 127}, 127), ({"FROZEN": 127, "ORDINARY": 1}, 127)]
+    if write_sarif:
+        matrix += [({"ORDINARY_SARIF": 1}, 1), ({"FROZEN_SARIF": 1}, 1), ({"FROZEN_SARIF": 127}, 127), ({"ORDINARY_SARIF": 127, "FROZEN": 1}, 127)]
+    for exits, expected in matrix:
+        outcome = run_scan_step(script, inventory, write_sarif, exits)
+        if outcome[0] != expected:
+            problems.append(f"exits {exits} gave {outcome[0]}, expected {expected}")
     return problems
 
 
@@ -509,6 +629,7 @@ class IgnorePolicyTests(unittest.TestCase):
     def test_no_other_suppression_mechanism_bypasses_the_policy(self):
         config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
         self.assertLessEqual(set(config), {"IgnoredVulns", "PackageOverrides"})
+        self.assertEqual(override_problems(config), [])
         latest = date.today() + timedelta(days=90)
         for entry in config.get("PackageOverrides", []):
             # An override can silently ignore a whole package; it needs the same reason and expiry.
@@ -565,16 +686,69 @@ class FrozenScanTests(unittest.TestCase):
                              f"{path} changed after its review: re-review whether it reaches the advisories of its config, then record the new sha256")
             self.assertTrue((ROOT / lock["evidence"]).is_file(), lock["evidence"])
 
-    def test_the_workflow_scans_each_config_in_its_own_invocation(self):
-        text = self.workflow
+    def test_the_workflow_names_the_frozen_config_the_tests_bind(self):
         configs = {lock["config"] for lock in FROZEN_LOCKS.values()}
-        self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", text), sorted(configs))
-        for needle in ('select(has("config") | not)', 'select(.config == $config)', "--config .github/osv-scanner.toml", '--config "$frozen_config"',
-                       '$(( ${#lockfiles[@]} + ${#frozen[@]} ))', 'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif"):
-            self.assertIn(needle, text, needle)
-        # the frozen scan never gets the ordinary lock list, and the ordinary scan never gets the frozen one
-        self.assertIn('"${frozen[@]}")', text)
-        self.assertEqual(text.count('"${lockfiles[@]}")'), 1)
+        self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", self.workflow), sorted(configs))
+
+    def test_the_step_runs_each_list_under_its_own_config_on_the_real_inventory(self):
+        script = workflow_scan_script()
+        for write_sarif in (False, True):
+            problems = scan_step_problems(script, self.inventory, write_sarif)
+            if problems is None:
+                self.skipTest("needs bash 4 (mapfile) and jq, as the ubuntu runner has")
+            self.assertEqual(problems, [], f"WRITE_SARIF={write_sarif}")
+
+    def test_the_step_catches_a_mutant_of_itself(self):
+        # Each mutation breaks one property of the step; the behavioral check must notice every one.
+        script = workflow_scan_script()
+        mutants = {
+            "the ordinary scan also gets the frozen config": ('"${scan[@]}"\nstatus=$?\n', 'scan+=(--config "$frozen_config")\n"${scan[@]}"\nstatus=$?\n'),
+            "an entry dropped from the ordinary list, count check loosened": ('| select(has("config") | not) |', '| select(has("config") | not) | select(.path != ".github/requirements-ci.txt") |'),
+            "the frozen scan runs under the ordinary config": ('--config "$frozen_config"', "--config .github/osv-scanner.toml"),
+            "the frozen list is the ordinary list": ('select(.config == $config)', 'select(has("config") | not)'),
+            "the frozen status is dropped": ('for code in "$frozen_status" "$sarif_status"', 'for code in "$sarif_status"'),
+            "the sarif statuses are dropped": ('for code in "$frozen_status" "$sarif_status" "$frozen_sarif_status"', 'for code in "$frozen_status"'),
+            "an error code no longer wins": ('if [ "$code" -gt "$status" ]; then', 'if [ "$code" -eq 1 ]; then'),
+        }
+        for name, (old, new) in mutants.items():
+            self.assertIn(old, script, name)
+            mutated = script.replace(old, new)
+            if name.startswith("an entry dropped"):
+                mutated = mutated.replace('-eq "$(jq \'.lockfiles | length\' "$inventory")"', '-le "$(jq \'.lockfiles | length\' "$inventory")"')
+            problems = scan_step_problems(mutated, self.inventory, write_sarif=True)
+            if problems is None:
+                self.skipTest("needs bash 4 (mapfile) and jq, as the ubuntu runner has")
+            self.assertNotEqual(problems, [], name)
+
+    def test_the_step_refuses_an_inventory_it_cannot_split_exhaustively(self):
+        script = workflow_scan_script()
+        base = {"lockfiles": [{"path": "a/requirements.lock", "parser": "requirements.txt"}, {"path": "b/uv.lock"},
+                              {"path": "c/pnpm-lock.yaml", "config": FROZEN_CONFIG}]}
+        outcome = run_scan_step(script, base, False)
+        if outcome is None:
+            self.skipTest("needs bash 4 (mapfile) and jq, as the ubuntu runner has")
+        self.assertEqual(outcome[0], 0)
+        self.assertEqual(sorted(word for call in outcome[1] for word in call if word.startswith("--lockfile=")),
+                         ["--lockfile=:b/uv.lock", "--lockfile=:c/pnpm-lock.yaml", "--lockfile=requirements.txt:a/requirements.lock"])
+        for label, inventory in (("an entry names a config nothing scans", {"lockfiles": base["lockfiles"] + [{"path": "d/uv.lock", "config": ".github/other.toml"}]}),
+                                 ("no entry names the frozen config", {"lockfiles": base["lockfiles"][:2]}),
+                                 ("every entry names the frozen config", {"lockfiles": [{"path": "c/pnpm-lock.yaml", "config": FROZEN_CONFIG}]})):
+            outcome = run_scan_step(script, inventory, False)
+            self.assertEqual((outcome[0], outcome[1]), (1, []), f"{label}: the step fails before any scan")
+
+    def test_a_config_with_a_key_the_scanner_reads_case_blind_is_a_problem(self):
+        good = {"IgnoredVulns": [{"id": "GHSA-x", "reason": "r", "ignoreUntil": date.today() + timedelta(days=30)}]}
+        self.assertEqual(ignore_entry_problems(good), [])
+        for label, config in (("an upper-case ID beside id", {"IgnoredVulns": [{**good["IgnoredVulns"][0], "ID": "GHSA-y"}]}),
+                              ("a case-varied reason key", {"IgnoredVulns": [{"id": "GHSA-x", "Reason": "r", "reason": "r", "ignoreUntil": date.today()}]}),
+                              ("a case-varied top-level table", {**good, "ignoredvulns": [{"id": "GHSA-y", "reason": "r", "ignoreUntil": date.today()}]})):
+            self.assertNotEqual(ignore_entry_problems(config), [], label)
+
+    def test_a_package_override_that_could_match_next_is_a_problem(self):
+        self.assertEqual(override_problems({"PackageOverrides": [{"name": "lib", "ecosystem": "PyPI", "ignore": True}]}), [])
+        for override in ({"name": "next", "ecosystem": "npm", "ignore": True}, {"name": "nex[t]", "nameIsRegex": True, "ecosystem": "npm", "ignore": True},
+                         {"name": "nex[t]", "nameIsRegex": True, "ignore": True}, {"name": ".*", "nameIsRegex": True, "ecosystem": "NPM"}):
+            self.assertNotEqual(override_problems({"PackageOverrides": [override]}), [], override)
 
     def test_the_partition_check_catches_a_mutant_inventory(self):
         entries = [{"path": "a"}, {"path": "b", "config": FROZEN_CONFIG}, {"path": "c", "config": ".github/other.toml"}, {"path": "d", "parser": "requirements.txt"}]

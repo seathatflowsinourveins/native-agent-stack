@@ -3,7 +3,7 @@
  "record": "osv-urllib3-next-20260930",
  "purpose": "Records the 2026-09-30 fix of the required osv-scanner check, which fails on fresh runs since OSV records five advisories published that day (14:46Z to 15:41Z): GHSA-8988-9cw3-xx77, GHSA-vxq7-64xx-v4gw and GHSA-gh4c-6fx4-qh6g (urllib3 2.7.0, all fixed in 2.8.0) and GHSA-42vr-xj54-vc7v (PyJWT below 2.15.0, fixed in 2.15.0) in the OpenHands recipe lock, and GHSA-vcvr-r3jv-pc5j (next 16.3.5, fixed in 16.3.6) in the frozen macOS variant lock. The OpenHands lock is relocked onto urllib3 2.8.0 and PyJWT 2.15.0 with the recipe's own method (only those two entries change). The macOS lock is a frozen evidence artifact for which the tree records no owner; it cannot be patched, so its dated exception lives in a config of its own and security-scan.yml scans that one lock in an invocation of its own under it, every other lock under the ordinary config, which holds no such exception (OSV-Scanner applies an explicit --config to every input of one invocation, so the scanner itself keeps the exception from reaching any other lock). One change carries all of it, because the check scans the whole inventory. The name of this record predates the PyJWT advisory, whose fix joined the change once the workspace's 7-day window opened (section B, 16:56:34Z).",
  "checked_commit": "11227bfdf25b55b0481a9e78985c3fed26052472",
- "observed_utc": "2026-09-30T17:54:01Z",
+ "observed_utc": "2026-09-30T18:42:29Z",
  "authorization": "Started from a peer report that the required check failed on fresh runs (peer messages are not retained evidence; the reproduction in section E is). The lock lane is the OpenHands recipe's. For the frozen macOS lock the tree records no owner (returned outputs, section F: its only commit is #201, its experiment record has no owner, session or author key, docs/lanes.md does not name it). The split scan was asked for by the Codex root after its independent verifier refuted the first design (see independent_review). No user decision is needed: every fix follows the repository's own policy and method.",
  "evidence_class": "Local runs on this host of the pinned OSV-Scanner 2.6.0 with the repository's configs and the workflow's own scan step (run by bash from the workflow file), a local reproduction of the relock with uv 0.12.17 from the pinned upstream source archive, the recipe's own install sequence in a scratch venv, reads of git objects, the OSV API and PyPI, and 5 read-only cross-family reviews of the superseded first design (codex exec as typed in relock-2026-09-30-urllib3.cross-family-review.sh.txt; their own output records no model or effort). Static and local; not an execution of the recipe, of any worker or of any application; the CI run on the merged head is the authority for the required check.",
  "limitations": [
@@ -122,7 +122,7 @@
    "frozen_config": ".github/osv-scanner-frozen-macos.toml: one [[IgnoredVulns]] entry, GHSA-vcvr-r3jv-pc5j, ignoreUntil 2026-12-24 (<= 90 days), reason; nothing else",
    "inventory": ".github/osv-scanner-lockfiles.json: the entry of the frozen lock names the frozen config (key `config`); the 48 other entries name none",
    "workflow": ".github/workflows/security-scan.yml: two jq lists from the inventory with the parser flag of each entry preserved, a count check that their sizes sum to the inventory's (exhaustive and disjoint; an entry naming another config is in neither and fails), two native scans, the worse exit status wins, on other events both SARIF reports are written, kept as one artifact and uploaded under two categories",
-   "tests": "FrozenScanTests (partition, config scope, digest, workflow shape, a mutant inventory) and the changed workflow hardening tests"
+   "tests": "FrozenScanTests (partition, config scope, digest, the extracted step run with a stand-in scanner on the real inventory and on synthetic ones, seven mutants of the step, exact config keys, the override rule, a mutant inventory) and the changed workflow hardening tests"
   },
   "retained_controls": {
    "lists": {
@@ -133,7 +133,7 @@
     "frozen_list_sha256": "57588263080a0eb2fb01c13371301e7763607602cbc2272df807673ceef5f987"
    },
    "workflow_step": {
-    "script_sha256": "bc092b630dabd7794baa26d5f7ecfa28934c76acc4e27745b9c914d106cc92f7",
+    "script_sha256": "4a8bec4810f054f177a5f8bea001420cb87f574644bfdee96674fc1a918dd28c",
     "exit_pull_request_form": 0,
     "exit_other_events_form": 0,
     "sarif_reports": {
@@ -155,9 +155,9 @@
     "the frozen lock under the ordinary config exits 1 and reports next 16.3.5",
     "under the frozen config it exits 0 (filtered out)",
     "the live application-delivery lock (next 16.3.6) under the ordinary config exits 0",
-    "three inputs that hide a vulnerable next in YAML the scanner reads (a tagged packages key, packages through a merge key, a Unicode line separator) exit 1 as ordinary locks and exit 0 under the frozen config, which is why that config is bound to one path by the inventory and to one digest by the tests"
+    "four inputs that hide a vulnerable next in YAML the scanner reads (a tagged packages key, packages through a merge key, a Unicode line separator, a key quoted with literal apostrophes) exit 1 as ordinary locks and exit 0 under the frozen config, which is why that config is bound to one path by the inventory and to one digest by the tests"
    ],
-   "tests_run": 233
+   "tests_run": 238
   }
  },
  "osv_scanner": {
@@ -166,11 +166,11 @@
   "retained_reports": {
    "main": {
     "json_sha256": "6e6d4c016322cff452860b1b21582d588f7295100d61f558825ec4ca1b39cc3e",
-    "err_sha256": "ab0aab99178f52fbc171c9f7d75235bd27762128ef5961115424119767e22d5f"
+    "err_sha256": "76ac30156ed1ed08b653e41f82d002b4b6a75752f3e98b281f2bf872dd5fe058"
    },
    "after-noconfig": {
     "json_sha256": "de83299625e0ba1cfd16b0c043a46a42d7fb31475c37a72590e810ef56f8bb45",
-    "err_sha256": "db65f37559fc0ab123c7036d8fda60a3ffdd4929c7c1f5a66e73c0331782c3b9"
+    "err_sha256": "9595bc2cb2ddc25558d481d180a40378794fa540a875606671423869422a7b99"
    }
   },
   "results": {
@@ -242,12 +242,33 @@
   "attempts_without_findings": {
    "6, attempt 1": {
     "rubric": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-6-attempt-1.txt",
-    "outcome": "turn.failed after 22 events, no findings: 'This content was flagged for possible cybersecurity risk' (the provider's classifier; the brief asked for the next bypass class)"
+    "events": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-1.events.txt",
+    "outcome": "turn.failed, no findings, no turn.completed: the provider's message is in the retained event excerpt ('This content was flagged for possible cybersecurity risk'; the brief had asked for the next bypass class)"
    },
    "6, attempt 2": {
     "rubric": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-6-attempt-2.txt",
-    "outcome": "re-briefed as a conformance check between two readers; cancelled by the coordinator before it returned, when the readers were replaced by the split scan"
+    "events": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-6-attempt-2.events.txt",
+    "outcome": "re-briefed as a conformance check between two readers; the retained excerpt shows no turn.completed and no error event: the process was ended by the coordinator (this session) when the readers were replaced by the split scan, which the stream itself does not record"
    }
+  },
+  "current_design_review": {
+   "review": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-7.md",
+   "review_sha256": "327c0de8c449151d630b4aa696637efc3c03977bae22dbca28bbd17a2317fef4",
+   "rubric": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-7.txt",
+   "rubric_sha256": "ed5c4eb4747c12447951fe1d6673bf52613c179daf1f40c93db75ecb148702ac",
+   "subject": "the split-scan design at head 4a09c9c5f1e5fdb5555d4c916666f12e089cf09f (workflow, tests, configs, claims), briefed as a conformance review",
+   "verdict": "changes-needed, no P1",
+   "findings_and_dispositions": {
+    "P2-1": "the ordinary config's package-override check rejected only a name equal to next (a regex name would pass): repaired, override_problems requires an ecosystem other than npm",
+    "P2-2": "the field check read only lowercase id while the scanner's TOML decoder is case-blind: repaired, exact keys only (ignore_entry_problems)",
+    "P2-3": "workflow statements were checked as text fragments and two mutations still passed: repaired, the tests run the extracted step with a stand-in scanner (run_scan_step, scan_step_problems) and the two mutations are among the seven mutants that must fail",
+    "P2-4": "a finding seen only by a SARIF run left the step green: repaired, the worst status of all runs wins",
+    "P2-5": "a failed ordinary upload skipped the frozen report's upload: repaired, the second upload step runs under !cancelled()",
+    "nit-6": "the removal procedure also needs the frozen scan and upload steps removed: repaired in the decision paragraph",
+    "nit-7": "review-history lines lacked retained output: repaired, sanitized event excerpts of both attempts are retained and the verifier and coordinator exchanges are stated as reported, not retained",
+    "nit-8": "the helper's network statement was wrong: repaired, it says the scanner queries the OSV API as in CI"
+   },
+   "not_run_by_the_reviewer": "the hosted upload steps and the pinned upload actions' documentation; the stand-in scanner tests cover the step's bash, not the upload actions"
   },
   "outcomes": {
    "1": "changes-needed: the pnpm reader accepted partial parses (a quoted affected key beside an unquoted fixed one, other indentation, dependency-only pins); package-lock and yarn locks were unread; the introduced bound was missing; unretained historical assertions",
@@ -260,6 +281,7 @@
    "source": "reported by the Codex root's independent verifier (an Astra/max stack-verifier at head bd48d924) in a peer message that is not retained here, with the pinned OSV-Scanner run on scratch files; the inputs are reproduced in section H",
    "findings": [
     "a tagged top-level key (`!!str packages:`) and `packages` supplied through a YAML merge key (`<<: *base`) are read by the scanner, which then filters the next advisory under the global ignore, while the reader returned no next",
+    "at fba38749 the same verifier also found a key quoted with literal apostrophes (three apostrophes around next@16.3.5): the scanner trims the apostrophes (osv-scalibr 3090dbb7aaa2, pnpmlock.go, extractPnpmPackageNameAndVersion) and reports next 16.3.5, the reader returned no next; its retained file is the verifier's (sha256 2541edab1f363e6b63c4bbf30a54fc690cf1da5231dbfb16014a4257b1c55a6a), the input is reproduced in section H",
     "the Codex root then held the change until the exception was scoped by the scanner itself (separate configs and scans for the frozen lock and the rest), which is this design"
    ]
   },
