@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "rg", "-n", "-i", "oauthlib|oauth2|enable_jsonp|create_revocation_response|AuthorizationCodeGrant", "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages/urllib3"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:51:42.618926+00:00
+ended_utc: 2026-09-30T15:51:42.678931+00:00
+exit_code: 1
+
+stdout:
+
+stderr:

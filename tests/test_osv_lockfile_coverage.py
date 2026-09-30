@@ -61,13 +61,37 @@ IGNORE_SCOPES = {
     "GHSA-xpv3-w29h-x7cv": {"package": "oauthlib", "fixed": (4, 0, 0)},
 }
 IGNORE_ALLOWED_LOCKS = {
-    # Live recipe lock, relocked onto PyJWT 2.14.0 and then, on 2026-09-30, onto urllib3 2.8.0 and PyJWT 2.15.0. Its receipt carries
-    # the 2026-09-29 oauthlib review forward at this sha256 (those relocks change only the urllib3 and PyJWT entries); the relock onto
-    # oauthlib 4.0.0 deletes this entry in the same change.
+    # Exact source-reviewed tokenization/corpus-only closures. The 2026-09-30
+    # receipt independently rechecks installed callers and current recipes;
+    # dynamic/new model-artifact operations invalidate this bounded scope.
+    "blueprints/runtime-workers/gpt-researcher/requirements.lock": {
+        "advisories": ["GHSA-8mgp-746c-j5xp"],
+        "sha256": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+        "evidence": "evidence/artifacts/runtime-roster-20260930/lock-scan-and-nltk-scope.json",
+    },
+    "blueprints/runtime-workers/crawl4ai/requirements.lock": {
+        "advisories": ["GHSA-8mgp-746c-j5xp"],
+        "sha256": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+        "evidence": "evidence/artifacts/runtime-roster-20260930/lock-scan-and-nltk-scope.json",
+    },
+    # Candidate 1.50.0 Linux x86_64 / CPython 3.13.15 closure ONLY; fresh
+    # alias/from-import-aware source review binds both OAuthlib advisories to
+    # these exact artifacts. The recipe consumes this lock inside its pinned
+    # linux/amd64 image (Dockerfile CPython 3.13.15), not a native macOS venv.
+    # Other platforms/interpreters or changed source require a new review.
+    # The LiteLLM 1.93.2 native relock retains all 175 other package blocks
+    # and the nine reviewed OAuthlib/text-only source identities. Its fresh
+    # installed caller scans and complete official LiteLLM Python sources
+    # bind this 38c20c closure; static limits remain in the new receipt.
+    # PR #558's public 54d09ee8 review covers historical 832938 only; PR #537
+    # covers historical 383ccc only. Neither is a fresh independent review
+    # of this current digest. Independent current-candidate review is pending.
+    # The joint oauthlib 4.0.0 relock removes this entry; it grants no image,
+    # arbitrary worker-code acceptance, merge approval or promotion.
     "blueprints/runtime-workers/openhands/requirements.lock": {
         "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
-        "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
-        "evidence": "evidence/receipts/osv-urllib3-next-20260930.json",
+        "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+        "evidence": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930.json",
     },
     # Frozen evaluation-only lock. The receipt reviews the oauthlib advisories and carries forward the 2026-09-26
     # nltk and setuptools review (repository-checks.json in the trial directory) at the same sha256.

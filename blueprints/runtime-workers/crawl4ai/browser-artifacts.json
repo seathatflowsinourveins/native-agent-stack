@@ -1,0 +1,26 @@
+{
+  "playwright": "1.63.0",
+  "chromium_revision": "1243",
+  "browser_version": "153.0.8010.12",
+  "install_args": [
+    "install",
+    "--only-shell",
+    "chromium"
+  ],
+  "artifacts": [
+    {
+      "url": "https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-headless-shell-linux64.zip",
+      "mirror_path": "builds/cft/153.0.8010.12/linux64/chrome-headless-shell-linux64.zip",
+      "sha256": "a9da028861a0cf789ff25c2fed45f5f1aaf969ed9247835b6a7821a4f7af9d1d",
+      "size": 119809080,
+      "provenance": "SHA256 computed over HTTPS bytes at recipe construction; Playwright does not publish this checksum in browsers.json"
+    },
+    {
+      "url": "https://cdn.playwright.dev/builds/ffmpeg/1011/ffmpeg-linux.zip",
+      "mirror_path": "builds/ffmpeg/1011/ffmpeg-linux.zip",
+      "sha256": "ebc74fc5b94830176a3c2914ae96bd8bc7f6a91f4f33890230f84a172ee61ccc",
+      "size": 2376500,
+      "provenance": "SHA256 computed over HTTPS bytes at recipe construction; Playwright does not publish this checksum in browsers.json"
+    }
+  ]
+}

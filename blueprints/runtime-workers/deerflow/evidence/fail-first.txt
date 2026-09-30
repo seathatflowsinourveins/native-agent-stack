@@ -1,0 +1,185 @@
+test_gateway_headers_preserve_affinity_and_new_call_identity (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_headers_preserve_affinity_and_new_call_identity) ... ERROR
+test_model_context_and_container_contract (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract) ... ERROR
+test_pins_and_script_boundaries (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_pins_and_script_boundaries) ... ERROR
+test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) ... 
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='README.md') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='install.sh') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='config.yaml.template') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='extensions_config.json.template') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='pins.json') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='run-e2e.sh') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/check.py') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/expected.json') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/task.md') ... FAIL
+  test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/receipt.py') ... FAIL
+test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) ... FAIL
+test_tool_limits_are_enforced_not_only_described (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_tool_limits_are_enforced_not_only_described) ... ERROR
+
+======================================================================
+ERROR: test_gateway_headers_preserve_affinity_and_new_call_identity (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_gateway_headers_preserve_affinity_and_new_call_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 70, in test_gateway_headers_preserve_affinity_and_new_call_identity
+    headers = module("deerflow_worker_headers", RECIPE / "runtime/gateway_headers.py")
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 25, in module
+    spec.loader.exec_module(result)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1019, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1156, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1214, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/deerflow/runtime/gateway_headers.py'
+
+======================================================================
+ERROR: test_model_context_and_container_contract (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_model_context_and_container_contract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 31, in test_model_context_and_container_contract
+    config = json.loads((RECIPE / "config.yaml.template").read_text())
+                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<private-runtime>", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-runtime>", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-runtime>", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/deerflow/config.yaml.template'
+
+======================================================================
+ERROR: test_pins_and_script_boundaries (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_pins_and_script_boundaries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 78, in test_pins_and_script_boundaries
+    pins = json.loads((RECIPE / "pins.json").read_text())
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<private-runtime>", line 546, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-runtime>", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-runtime>", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/deerflow/pins.json'
+
+======================================================================
+ERROR: test_tool_limits_are_enforced_not_only_described (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_tool_limits_are_enforced_not_only_described)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 51, in test_tool_limits_are_enforced_not_only_described
+    policy = module("deerflow_worker_policy", RECIPE / "runtime/worker_policy.py")
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 25, in module
+    spec.loader.exec_module(result)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1019, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1156, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1214, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '<worktree>/blueprints/runtime-workers/deerflow/runtime/worker_policy.py'
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='README.md')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : README.md
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='install.sh')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : install.sh
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='config.yaml.template')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : config.yaml.template
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='extensions_config.json.template')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : extensions_config.json.template
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='pins.json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : pins.json
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='run-e2e.sh')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : run-e2e.sh
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/check.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : e2e/check.py
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/expected.json')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : e2e/expected.json
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/task.md')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : e2e/task.md
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection) (file='e2e/receipt.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 99, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertTrue((RECIPE / name).is_file(), name)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : e2e/receipt.py
+
+======================================================================
+FAIL: test_reviewable_recipe_and_empty_result_rejection (test_runtime_worker_deerflow.DeerFlowRecipeTests.test_reviewable_recipe_and_empty_result_rejection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_deerflow.py", line 105, in test_reviewable_recipe_and_empty_result_rejection
+    self.assertEqual(result.returncode, 1, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1 : <private-runtime> can't open file '<worktree>/blueprints/runtime-workers/deerflow/e2e/check.py': [Errno 2] No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.017s
+
+FAILED (failures=11, errors=4)

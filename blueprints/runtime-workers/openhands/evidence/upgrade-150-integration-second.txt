@@ -1,0 +1,41 @@
+.........................................E..................FFF............................................................
+======================================================================
+ERROR: test_netprobe_lists_are_the_plan_lists_and_import_does_no_work (test_runtime_worker_openhands.OpenHandsProbeTests.test_netprobe_lists_are_the_plan_lists_and_import_does_no_work)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 1627, in test_netprobe_lists_are_the_plan_lists_and_import_does_no_work
+    netprobe.p3_control_call()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: p3_control_call() missing 2 required positional arguments: 'environment' and 'dispatch_id'
+
+======================================================================
+FAIL: test_receipt_records_proxy_base_url_and_selected_compression_combo (test_runtime_worker_openhands.OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo) (window={'arm': 'engines-on', 'compression_combo': 'fw-rtk'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 2831, in test_receipt_records_proxy_base_url_and_selected_compression_combo
+    self.assertEqual(receipt["schema_version"], 6)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7 != 6
+
+======================================================================
+FAIL: test_receipt_records_proxy_base_url_and_selected_compression_combo (test_runtime_worker_openhands.OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo) (window={'arm': 'engines-on'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 2831, in test_receipt_records_proxy_base_url_and_selected_compression_combo
+    self.assertEqual(receipt["schema_version"], 6)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7 != 6
+
+======================================================================
+FAIL: test_receipt_records_proxy_base_url_and_selected_compression_combo (test_runtime_worker_openhands.OpenHandsReceiptTests.test_receipt_records_proxy_base_url_and_selected_compression_combo) (window={'arm': 'control'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_runtime_worker_openhands.py", line 2831, in test_receipt_records_proxy_base_url_and_selected_compression_combo
+    self.assertEqual(receipt["schema_version"], 6)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7 != 6
+
+----------------------------------------------------------------------
+Ran 121 tests in 6.137s
+
+FAILED (failures=3, errors=1)

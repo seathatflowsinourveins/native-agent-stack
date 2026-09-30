@@ -1,0 +1,10 @@
+{
+  "name": "drb-ii-12-ai-enhanced-portfolio-management",
+  "idx": 12,
+  "report_type": "deep",
+  "row_sha256": "cd521187b6fa3e2ef6bd2dd5381606c64401cead154292d3b84dc9e508543e85",
+  "prompt_sha256": "430d83b66e2db4f5763094cfec575c46f31d46f542ef1ceaceebf90628f927b3",
+  "source": "imlrz/DeepResearch-Bench-II@b38f360603db9531b102aef8c166cedb8509b6f6/tasks_and_rubrics.jsonl",
+  "license": "CC BY 4.0 (upstream task row)",
+  "evidence_class": "one frozen upstream benchmark task; not full-suite or leaderboard acceptance"
+}

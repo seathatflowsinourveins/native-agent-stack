@@ -1,0 +1,12 @@
+# Source: unclecode/crawl4ai v0.9.4 deploy/docker/config.yml + utils.py:114-138.
+# Native loader deep-merges this with upstream defaults. Provider/URL use env.
+app:
+  host: "127.0.0.1"
+  port: 11235
+  workers: 1
+security:
+  enabled: true
+  jwt_enabled: true
+  cors_allow_origins: []
+llm:
+  allowed_providers: ["openai"]

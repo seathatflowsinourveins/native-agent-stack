@@ -1,0 +1,4 @@
+# Source and generation command: research.md (local integration lock, not upstream).
+poetry-core==2.5.0
+setuptools==84.0.0
+wheel==0.48.0

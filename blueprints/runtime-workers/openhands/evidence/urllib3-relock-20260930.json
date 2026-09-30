@@ -1,0 +1,1034 @@
+{
+  "schema_version": 1,
+  "record": "openhands-sdk-150-urllib3-280-linux-candidate-relock",
+  "observed_utc": "2026-09-30T16:01:27.450947+00:00",
+  "evidence_class": "local_integration",
+  "status": "urllib3_only_source_checks_passed; latest_security_rescan_recorded; intermediate_candidate_not_accepted",
+  "scope": "The existing SDK/tools 1.50.0 recipe candidate on Linux x86_64 / CPython 3.13.15, relocked with unchanged upstream uv 0.12.17 compile policy and current OSV 2.6.0. This is source qualification in a new scratch environment.",
+  "baselines": {
+    "published_branch": "codex/runtime-qualification-20260930",
+    "commit": "00aa6c25fe6f27e9f5974e9f6a5592aa31683479",
+    "requirements_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+    "preserved_source_receipt": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930.json",
+    "preserved_source_commands": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-commands.json",
+    "historical_hosted_failure": {
+      "run_id": 36737133691,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36737133691",
+      "head_commit": "00aa6c25fe6f27e9f5974e9f6a5592aa31683479",
+      "read_command_exit_code": 0,
+      "observed_security_scan_exit_code": 1,
+      "scope": "Read of retained hosted failure; no new hosted execution."
+    }
+  },
+  "research": {
+    "selected_tools": [
+      "Existing uv 0.12.17 native pip compile/install/check; no new resolver or utility.",
+      "Existing pinned OSV Scanner 2.6.0 CLI; downloaded only into task scratch."
+    ],
+    "selected_skills": [
+      "search-first: quick inline maintenance research of existing selected tools and primary package/repository sources.",
+      "context-mode: process large source, scan, compile and test outputs outside the prompt."
+    ],
+    "upstream_urllib3": {
+      "repository": "https://github.com/urllib3/urllib3",
+      "tag": "2.8.0",
+      "commit": "b1d30ab61fe0db8f11092805e8c5ac43e091064a",
+      "release_published_utc": "2026-09-15T19:40:51Z",
+      "requires_python": ">=3.10",
+      "artifacts": [
+        {
+          "filename": "urllib3-2.8.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/92/9d/c4e665119135114480843e7ab388fa94d8480650450e6f8e26b70d323a4c/urllib3-2.8.0-py3-none-any.whl",
+          "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+          "uploaded_utc": "2026-09-15T19:29:34.577402Z",
+          "yanked": false
+        },
+        {
+          "filename": "urllib3-2.8.0.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/e3/05/b17359e1cefb4f909b5e40b1b90a496d987258916dbbf88e842c729f510e/urllib3-2.8.0.tar.gz",
+          "sha256": "63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63",
+          "uploaded_utc": "2026-09-15T19:29:36.253420Z",
+          "yanked": false
+        }
+      ],
+      "fixed_advisories": [
+        "GHSA-8988-9cw3-xx77",
+        "GHSA-gh4c-6fx4-qh6g",
+        "GHSA-vxq7-64xx-v4gw"
+      ]
+    },
+    "parallel_main_repair": {
+      "pr": 546,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/546",
+      "observed_head": "09d5371d71d3127db3144a0ce3c444a1af696b7f",
+      "observation": "Its published description explicitly states candidate draft #535 needs the urllib3 2.8.0 bump and new digest. This work does not copy the 335-package macOS closure or change its frozen artifact/Next exception."
+    }
+  },
+  "resolution": {
+    "upstream_repository": "https://github.com/OpenHands/software-agent-sdk",
+    "upstream_version": "1.50.0",
+    "upstream_commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "source_archive_sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c",
+    "upstream_uv_lock_sha256": "9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801",
+    "native_tool": "uv 0.12.17",
+    "target": {
+      "implementation_name": "cpython",
+      "python_full_version": "3.13.15",
+      "platform_machine": "x86_64",
+      "platform_system": "Linux",
+      "sys_platform": "linux"
+    },
+    "upstream_policy": {
+      "exclude_newer": "7 days",
+      "litellm": "2026-07-20T00:00:00Z",
+      "lmnr": "2026-08-23T00:00:00Z",
+      "urllib3_requirement": "urllib3>=2.6.3"
+    },
+    "constraints": "Byte copy of saved main-reconcile-20260930-constraints.txt, preserving every main marker and version except the single urllib3 2.7.0 to 2.8.0 change. The saved two published SDK/tools wheel inputs are copied unchanged. Earlier input/receipt bytes remain historical.",
+    "selected_requirements": 176,
+    "unchanged_candidate_declarations": 175,
+    "changes_from_candidate": [
+      {
+        "name": "urllib3",
+        "before": "2.7.0",
+        "after": "2.8.0"
+      }
+    ],
+    "selected_additions": [],
+    "selected_removals": [],
+    "sdk_tools_versions": "1.50.0",
+    "requirements_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+    "only_urllib3_version_and_two_hashes_changed": true,
+    "pypi_artifact_hashes_independently_verified": true,
+    "native_control_byte_identical_to_baseline": true,
+    "native_fresh_extraction_reproduction_byte_identical": true,
+    "pristine_source_regular_files_compared_per_extraction": 1800,
+    "pristine_source_mismatches": [],
+    "compile_count": 3,
+    "relative_cutoff_limit": "Compiles share the recorded date. A future relative seven-day cutoff replay is a new dated resolution; recorded inputs, native returns and hashes are retained."
+  },
+  "native_install": {
+    "owned_fresh_venv": true,
+    "hash_install_exit_code": 0,
+    "build_hash_install_exit_code": 0,
+    "pip_check_exit_code": 0,
+    "import_exit_code": 0,
+    "checked_requirement_versions": 176,
+    "installed_distributions": 178,
+    "installed_version_mismatches": [],
+    "urllib3_published_python_sources_compared": 36,
+    "urllib3_source_mismatches": [],
+    "fixture_command": "python -m unittest tests.test_openhands_150 -v",
+    "fixture_result": {
+      "exit_code": 0,
+      "tests": 12,
+      "failures": 0,
+      "skips": 0
+    },
+    "fixture_sha256": "52e1beefe24bfe03c298ae4d10a17d56388626503bc39c7f7b09a5ffbd840270",
+    "fixture_limit": "Unchanged local fixtures use actual SDK objects with patched model calls. They are not official upstream tests, provider/server/isolation checks, or task-quality acceptance."
+  },
+  "osv": {
+    "version": "2.6.0",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "pin_source": ".github/workflows/security-scan.yml",
+    "current_configuration_path": ".github/osv-scanner.toml",
+    "configuration_sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+    "configuration_scope": "Byte copy of the configuration at the frozen 00aa6c25 candidate base; current at this observed source scan. A subsequently integrated main configuration needs its own gate observation.",
+    "parser": "requirements.txt",
+    "no_resolve": true,
+    "scanner_reported_packages": 174,
+    "recognition_limit": "The native scanner reports 174 pinned name/version entries; the two direct SDK/tools wheel URLs are not counted. This does not prove OSV recognized all 176 identities.",
+    "paired_baseline_current_config_exit_code": 1,
+    "paired_baseline_unignored": [
+      {
+        "package": "urllib3",
+        "version": "2.7.0",
+        "ids": [
+          "GHSA-8988-9cw3-xx77",
+          "GHSA-gh4c-6fx4-qh6g",
+          "GHSA-vxq7-64xx-v4gw"
+        ]
+      }
+    ],
+    "exception_changes": "None: advisory IDs, expiry, ignore configuration, macOS frozen artifact and shared guard are unchanged. This candidate-only scan is not the repository-wide security gate.",
+    "time_bound_result": "The initial candidate OSV outputs remain exactly as returned at 15:51Z. A later primary-verified PyJWT advisory reopens security qualification. The latest rescan is retained separately; no current security-pass claim is made.",
+    "latest_rescan": {
+      "command_id": "candidate-osv-current-config-rescan",
+      "started_utc": "2026-09-30T16:09:27.378658+00:00",
+      "ended_utc": "2026-09-30T16:09:28.082317+00:00",
+      "exit_code": 1,
+      "findings": [
+        {
+          "package": {
+            "name": "pyjwt",
+            "version": "2.14.0",
+            "ecosystem": "PyPI"
+          },
+          "ids": [
+            "GHSA-42vr-xj54-vc7v"
+          ]
+        }
+      ],
+      "requirements_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+      "configuration_sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+      "interpretation": "Native backend returned these findings at the recorded observation time. The newly primary-verified advisory reopens security acceptance even if that backend observation has not yet propagated it."
+    },
+    "initial_candidate_config_exit_code": 0,
+    "initial_candidate_config_findings": [],
+    "initial_candidate_empty_config_exit_code": 1,
+    "initial_candidate_empty_config_findings": [
+      {
+        "package": "oauthlib",
+        "version": "3.3.1",
+        "ids": [
+          "GHSA-hj66-6f7g-4r5v",
+          "GHSA-xpv3-w29h-x7cv"
+        ]
+      }
+    ]
+  },
+  "oauthlib_exact_target_source_review": {
+    "target": "Linux x86_64 / CPython 3.13.15 only",
+    "requirements_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+    "retained_version": "3.3.1",
+    "fresh_runs": "The unchanged maintained JWT scan and alias/from-import OAuthlib supplement reran against this exact fresh environment and recipe.",
+    "maintained_jwt_script": {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.jwt-callers.py.txt",
+      "sha256": "d4eb55d798102e5a6d64d4d629a3a994acfadff74daa971195b73592c2a77cff",
+      "bytes": 5704
+    },
+    "alias_supplement": {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+      "sha256": "080aa7cece92c786b7977ade5bf851aa776c31dbebafab98decfc5b1ae0e5960",
+      "bytes": 7145
+    },
+    "alias_scan_sources": 10684,
+    "recipe_sources": 12,
+    "unhandled_parse_errors": 0,
+    "reviewed_text_only_exception": {
+      "path": "func_timeout/py2_raise.py",
+      "sha256": "19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77",
+      "scope": "Unchanged Python 2-only helper is text reviewed; Python 3 selects py3_raise."
+    },
+    "hash_bound_oauthlib_review_files_matching_previous_run": 9,
+    "literal_importers": "Six requests_oauthlib files bind OAuthlib client classes, token errors and common helpers. No OAuthlib imports or advisory-related literal references were reported in the 12 recipe sources. Authlib matches refer to its own implementations.",
+    "reexports": "OAuthlib oauth2 imports/re-exports endpoints, servers and grants. Loaded definitions do not prove authorization-server invocation. RevocationEndpoint has enable_jsonp=False by default, and inspected preconfigured servers omit that option. The authorization-code/PKCE comparison remains a separate server grant path.",
+    "new_urllib3_scope": "All 36 installed urllib3 Python sources match the official 2.8.0 wheel. The explicit oauthlib/oauth2/enable_jsonp/create_revocation_response/AuthorizationCodeGrant text sweep has no matches. This bounded literal-source finding carries no general OAuth runtime reachability claim.",
+    "limits": [
+      "The maintained JWT scan covers selected literal imports and decode-style names, not all aliases or possible runtime callers.",
+      "The supplement records literal aliases/from-import bindings, but its bound-call detector visits ast.Call only; class bases and bare attributes are not reported as calls.",
+      "The text sweep covers selected advisory names, not exhaustive semantic reachability.",
+      "Dynamic imports, runtime-assembled names, external/non-Python callers and OAuth authorization-server runtime behavior remain unknown.",
+      "No endpoint/provider was invoked and no macOS target was qualified."
+    ],
+    "conclusion": "Fresh exact-target static review supports the same bounded existing exception review; independent guard acceptance is owned by the coordinator."
+  },
+  "source_review_security_note": {
+    "source": "https://github.com/urllib3/urllib3/releases/tag/2.8.0",
+    "finding": "The upstream release changes HTTPS forwarding proxy TLS semantics: proxy CA/client certificates belong in proxy_ssl_context; proxy identity overrides use proxy_assert_hostname or proxy_assert_fingerprint. Destination identity/client-certificate settings no longer apply to that proxy connection.",
+    "qualification_limit": "Package source/imports and the existing fixtures were checked; no deployed HTTPS proxy configuration or network exchange was qualified."
+  },
+  "evidence_classes_by_claim": {
+    "native_compile_install_check_import_and_osv": "local_integration via supported pinned native CLI operations; actual returned bytes retained",
+    "caller_and_artifact_source_review": "source_review and independent artifact observation",
+    "sdk_fixtures": "unchanged local fixtures with actual SDK objects and patched calls; not upstream suite acceptance",
+    "repository_validator_and_publication_scan": "structural validation; missing shared hash registrations remain explicit",
+    "historical_source_receipts_and_hosted_failure": "retained/read historical evidence; no replay presented as a new model or hosted run"
+  },
+  "corrections_and_retained_failures": [
+    {
+      "id": "hosted-log-path-sanitization",
+      "failed_check": "repository-validation-before-integration",
+      "exit_code": 1,
+      "finding": "The first native publication check detected a hosted runner home path in the fetched historical failure log.",
+      "correction": "Added explicit hosted runner home and hosted toolcache placeholder sanitization only to the public copy. Private raw stdout and its hash remain unchanged. The failed validation return is retained.",
+      "verified_by": "repository-validation-after-path-sanitization; only the two expected root-owned hash registrations remain."
+    },
+    {
+      "id": "declared-sanitization-path-example",
+      "failed_check": "owned-file-publication-scan",
+      "exit_code": 1,
+      "finding": "The native scoped scan rejected literal home-path prefixes in the new redaction declarations themselves.",
+      "correction": "Describe the source prefix by role instead of including its literal spelling; this preserves the declared replacement and every private raw-byte hash.",
+      "verified_by": "owned-file-publication-scan-after-declared-paths-redaction"
+    },
+    {
+      "id": "latest-upstream-payload-publication-hygiene",
+      "failed_check": "final-owned-file-publication-scan",
+      "exit_code": 1,
+      "finding": "The new upstream PyJWT advisory and scanner details contain PoC home paths; PyPI project description contains a UUID and a JWT example caught by existing publication/gitleaks gates.",
+      "correction": "Public copies mask only those matched source-example values with declared placeholders. Private original native bytes and their recorded hashes are unchanged. No gate, ignore or advisory configuration is changed.",
+      "verified_by": "final-owned-file-publication-scan-after-upstream-example-redaction and normal gitleaks pre-commit gate."
+    },
+    {
+      "id": "premature-normal-commit-attempt",
+      "argv": [
+        "rtk",
+        "git",
+        "commit",
+        "-m",
+        "fix(openhands): relock candidate urllib3 to 2.8.0"
+      ],
+      "exit_code": 1,
+      "finding": "The attempted normal commit was issued before the latest scoped publication scan had passed. The installed pre-commit gate rejected the staged public PyPI README JWT example; no commit was created.",
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-rejected-normal-commit.txt",
+      "correction": "Inspect redacted native report, sanitize public upstream examples, then require successful scoped/native secret gates before retrying the normal commit."
+    }
+  ],
+  "remaining_gates": [
+    "Coordinator must verify the PyJWT 2.15.0 seven-day cutoff and issue #518 owner handoff, perform a separately qualified bounded relock, and rerun security qualification on the final integrated lock.",
+    "Coordinator must register the new evidence/input artifacts and changed lock/pins hashes in the shared evidence manifest.",
+    "Coordinator must bind and independently validate the existing OAuthlib exact-target guard to the new candidate digest.",
+    "Repository-wide security qualification remains separate and depends on the parallel main #546 fix for the frozen Next advisory, then a new integrated hosted/native observation.",
+    "The pinned runtime image remains unaccepted under its earlier package findings; this scratch recipe lock does not repair or rebuild it.",
+    "Independent trusted observation, native isolation/provider operation and task-quality acceptance remain open."
+  ],
+  "execution_boundary": {
+    "new_model_requests": 0,
+    "server_or_container_starts": 0,
+    "image_builds": 0,
+    "global_configuration_changes": 0,
+    "shared_manifest_changes": 0,
+    "provider_usage": null,
+    "usage_note": "No provider invocation occurred in these qualification commands. Coordinator/worker token usage was not collected and remains unknown."
+  },
+  "raw_output_policy": {
+    "retained_public": "Actual stdout/stderr in .txt artifacts and complete native scan JSON. Declared path substitutions, public upstream PoC home-prefix/UUID masking and a public PyPI README JWT-example masking are applied; original bytes and original hashes remain private and unchanged.",
+    "retained_private": "Original stdout/stderr bytes for every command remain in the owned scratch directory; raw hashes are in the command ledger.",
+    "placeholders": [
+      "<WORKTREE>",
+      "<PRIVATE_RESEARCH>",
+      "<HOME>",
+      "<HOSTED_RUNNER_HOME>",
+      "<HOSTED_TOOLCACHE>",
+      "<UPSTREAM_POC_HOME_PREFIX>",
+      "<PUBLIC_SOURCE_UUID_REDACTED>",
+      "<PUBLIC_SOURCE_JWT_EXAMPLE_REDACTED>"
+    ],
+    "sanitization_correction_recorded": true,
+    "additional_upstream_payload_redaction_counts": {
+      "urllib3-relock-20260930-candidate-osv-current-config-rescan.json": {
+        "personal home path": 2
+      },
+      "urllib3-relock-20260930-candidate-osv-current-config-rescan.txt": {
+        "personal home path": 2
+      },
+      "urllib3-relock-20260930-pyjwt-215-pypi.txt": {
+        "local session identifier": 1,
+        "public README JWT example": 1
+      },
+      "urllib3-relock-20260930-pyjwt-advisory-official.txt": {
+        "personal home path": 2
+      },
+      "urllib3-relock-20260930-pyjwt-advisory-osv.txt": {
+        "personal home path": 2
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "native-control-compile",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-control-compile.txt",
+      "returned_output_sha256": "4d2f9b42802e38983449113d8cc9d5655d80f17207b588eb846993f0fe077674"
+    },
+    {
+      "id": "native-candidate-compile",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-candidate-compile.txt",
+      "returned_output_sha256": "b25fc55afe7cbb4791c6850406d6ef1fefe7aad87471ac3437214625ac5ac0a0"
+    },
+    {
+      "id": "native-pristine-reproduction",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-pristine-reproduction.txt",
+      "returned_output_sha256": "d054ccd94dde8ff2434db53d1e61fde2e5b006a828950ebda2bdf89f89c31435"
+    },
+    {
+      "id": "exact-lock-delta",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-exact-lock-delta.txt",
+      "returned_output_sha256": "69615406cf936ee0ecaa844953620b3a1aeb059fea4f927fc5e01794a9db1981"
+    },
+    {
+      "id": "pristine-source-verification",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pristine-source-verification.txt",
+      "returned_output_sha256": "14f8cc5187612148f60de1541046a0844ab3bb6b9dc377090cb5de5138362c1c"
+    },
+    {
+      "id": "fresh-venv",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-fresh-venv.txt",
+      "returned_output_sha256": "98d76e14cb8b2c2787947a82ee3d7c8b57ebb40c6e0a4ab2ea607fad5810b0b2"
+    },
+    {
+      "id": "build-hash-install",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-build-hash-install.txt",
+      "returned_output_sha256": "531ca125a17fb3bc737cc1e63b8ed1b131ced2ee47821a976258a603cdba2ebc"
+    },
+    {
+      "id": "runtime-hash-install",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-runtime-hash-install.txt",
+      "returned_output_sha256": "0b8ce270ba574a751ff16d52190b4d5b329918e66e28b11c40cfdfd3bf5a3bee"
+    },
+    {
+      "id": "native-pip-check",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-pip-check.txt",
+      "returned_output_sha256": "a13391a6b9383b3bf1ae09fc3da3e567bbe6d87312f2c3def211a96a2cecd0f0"
+    },
+    {
+      "id": "native-imports",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-imports.txt",
+      "returned_output_sha256": "670804dc7aef95981033adda1ac8acb9d023022759504ee57262e64a79e25fe7"
+    },
+    {
+      "id": "actual-sdk-fixtures",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-actual-sdk-fixtures.txt",
+      "returned_output_sha256": "14cc0a8d1751d7300dae2524d4e7838ab8a33963b01a2427a5b58bc75fc388fd"
+    },
+    {
+      "id": "maintained-jwt-callers",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-maintained-jwt-callers.txt",
+      "returned_output_sha256": "f2cb234d51c610eadcc8114d28f0deff618899d2f6fd88d6fc7e28630f68931c"
+    },
+    {
+      "id": "oauthlib-alias-callers",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-oauthlib-alias-callers.txt",
+      "returned_output_sha256": "019d8520664fec5d1c326901aabc988800688649ffae22ecc2624ae190813437"
+    },
+    {
+      "id": "urllib3-published-source-identity",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-published-source-identity.txt",
+      "returned_output_sha256": "243f20cb85641984d660ba1120a6f4b09b41b88cb7f89a37b3137206ac434012"
+    },
+    {
+      "id": "urllib3-oauth-literal-sweep",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-oauth-literal-sweep.txt",
+      "returned_output_sha256": "fcc5ba26431b00ddd8522a75472de8242b3fea4dac4493e2837ce16e9fb749f3"
+    },
+    {
+      "id": "installed-version-inventory",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-installed-version-inventory.txt",
+      "returned_output_sha256": "d1e073a83ed95f20f8436c016e5a2c04efe6a64c55118f720e29011300f991f5"
+    },
+    {
+      "id": "baseline-osv-ci-config",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-ci-config.txt",
+      "returned_output_sha256": "40b41feb5e27a1f8e17d1e36e4c391aec18ceab3c076117b38ee0d4f41741a4d"
+    },
+    {
+      "id": "baseline-osv-empty-config",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-empty-config.txt",
+      "returned_output_sha256": "fb6f5d2a85ed9ffbc7ec86c0347d8ce83c6b2e6e687106a8359a4f02f8c07c8e"
+    },
+    {
+      "id": "candidate-osv-ci-config",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-ci-config.txt",
+      "returned_output_sha256": "24f0d6ce6c9a34900663a79c21d3c2118799ed6fc1d8cfe27ab1a2be13976bee"
+    },
+    {
+      "id": "candidate-osv-empty-config",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-empty-config.txt",
+      "returned_output_sha256": "0586d512426ed14c0cba8f9ac033a1151986a67e853865628e152301600aaa4a"
+    },
+    {
+      "id": "exact-caller-source-review",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-exact-caller-source-review.txt",
+      "returned_output_sha256": "61fba571a483831412c96daa07178e8261db77f58f2d60b8e2d9ff5a276f9db2"
+    },
+    {
+      "id": "repository-validation-before-integration",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-before-integration.txt",
+      "returned_output_sha256": "4c45bd586ff4760f2de93dbb2bbe950ee5e4d638870a80e5ea4ffd681d700e89"
+    },
+    {
+      "id": "repository-validation-after-path-sanitization",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-after-path-sanitization.txt",
+      "returned_output_sha256": "004274ab419a392924dfe312dc3cab8704160e7d17c10c4915125df066c51a17"
+    },
+    {
+      "id": "owned-file-publication-scan",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-file-publication-scan.txt",
+      "returned_output_sha256": "601a09a523f2fcf87e84dc66b66aee42fe6d98f2ab6b18f5c87daa4548ad5668"
+    },
+    {
+      "id": "owned-file-publication-scan-after-declared-paths-redaction",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-file-publication-scan-after-declared-paths-redaction.txt",
+      "returned_output_sha256": "7d7f93e7c5e1343a0549bc5e74ea624ca9e71fb16f5e922b422a6f413777dc09"
+    },
+    {
+      "id": "owned-diff-check",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-diff-check.txt",
+      "returned_output_sha256": "748a787acf6ae7f176b36197ef18ea0d91be1f860f36f15f8ff46d05599dc503"
+    },
+    {
+      "id": "repository-validation-final-owned-scope",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-final-owned-scope.txt",
+      "returned_output_sha256": "7e7b5d9e03774c2fc89106a8560d34c500b8543be3830db32b5bf446a3f6694e"
+    },
+    {
+      "id": "pyjwt-advisory-official",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-advisory-official.txt",
+      "returned_output_sha256": "13345ffd64854f23a1f4db80e2c7d9e75bbdf7101c6de5042621974ea1ed0d4a"
+    },
+    {
+      "id": "pyjwt-advisory-osv",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-advisory-osv.txt",
+      "returned_output_sha256": "ec68a691e5b919679732c8600d27c07a719718d0e80f8540e58319e94684ca14"
+    },
+    {
+      "id": "pyjwt-215-pypi",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-215-pypi.txt",
+      "returned_output_sha256": "96c2bb91c88b9e2869b62f1efaaeb7df24bd78e5db8c7e267b183557620b6c95"
+    },
+    {
+      "id": "candidate-osv-current-config-rescan",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-current-config-rescan.txt",
+      "returned_output_sha256": "72d39a51323df0a9888c433435cb5289b7a21b91df8b857caa56ce4df9c58332"
+    },
+    {
+      "id": "final-owned-file-publication-scan",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-final-owned-file-publication-scan.txt",
+      "returned_output_sha256": "e4c3e6648209bf90f77a50d9454000310e45906f33cebbaa50f39a02d4bf23c8"
+    },
+    {
+      "id": "gitleaks-version",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-gitleaks-version.txt",
+      "returned_output_sha256": "106a656382fa5139173c3bf2dfad0a09220be1dfbddd44ea090450127e22661a"
+    },
+    {
+      "id": "gitleaks-git-help",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-gitleaks-git-help.txt",
+      "returned_output_sha256": "f84b66a7247f23f5f864783f8a77e31e1b1a628475b46a9e63eff9e0660b9bc1"
+    },
+    {
+      "id": "staged-gitleaks-rejection",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-rejection.txt",
+      "returned_output_sha256": "8f1979d20d985a9eb7206f747f3c6656664738fbd3a7e5611af5e842f27b7496"
+    },
+    {
+      "id": "final-owned-file-publication-scan-after-upstream-example-redaction",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-final-owned-file-publication-scan-after-upstream-example-redaction.txt",
+      "returned_output_sha256": "71592f600700019925c85971e2e965f1130479db6eae2bf9c985f8bd758822c5"
+    },
+    {
+      "id": "repository-validation-after-upstream-example-redaction",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-after-upstream-example-redaction.txt",
+      "returned_output_sha256": "a0d1c9589020c5d48103ae8030bd7467763fba6317b3fea787b589c107820e76"
+    },
+    {
+      "id": "staged-gitleaks-after-public-example-redaction",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-after-public-example-redaction.txt",
+      "returned_output_sha256": "d0c69d2dbdc6ad16b9322a36e4f1ac2e08536b8c854fd31429b59f9437293618"
+    }
+  ],
+  "bound_files": [
+    {
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+      "bytes": 248359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "sha256": "ae9daaa8aeb7abafea47401513884c1ff26308c00a72dc03a1ab1f561404abed",
+      "bytes": 4460
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
+      "sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2",
+      "bytes": 286
+    },
+    {
+      "path": "tests/test_openhands_150.py",
+      "sha256": "52e1beefe24bfe03c298ae4d10a17d56388626503bc39c7f7b09a5ffbd840270",
+      "bytes": 17216
+    },
+    {
+      "path": ".github/osv-scanner.toml",
+      "sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+      "bytes": 7630
+    },
+    {
+      "path": ".github/workflows/security-scan.yml",
+      "sha256": "88a47e2cf7c16078331a4052c08bf88bc10ed9c70c167d863cd8e581c1a0ef14",
+      "bytes": 9268
+    }
+  ],
+  "sources": [
+    "https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml#L7",
+    "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+    "https://docs.astral.sh/uv/reference/cli/#uv-pip-compile",
+    "https://github.com/urllib3/urllib3/releases/tag/2.8.0",
+    "https://github.com/urllib3/urllib3/tree/b1d30ab61fe0db8f11092805e8c5ac43e091064a",
+    "https://pypi.org/project/urllib3/2.8.0/",
+    "https://github.com/advisories/GHSA-8988-9cw3-xx77",
+    "https://github.com/advisories/GHSA-gh4c-6fx4-qh6g",
+    "https://github.com/advisories/GHSA-vxq7-64xx-v4gw",
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+    "https://google.github.io/osv-scanner/configuration/",
+    "https://github.com/advisories/GHSA-42vr-xj54-vc7v",
+    "https://api.osv.dev/v1/vulns/GHSA-42vr-xj54-vc7v",
+    "https://pypi.org/pypi/PyJWT/2.15.0/json"
+  ],
+  "artifacts": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-actual-sdk-fixtures.txt",
+      "sha256": "14cc0a8d1751d7300dae2524d4e7838ab8a33963b01a2427a5b58bc75fc388fd",
+      "bytes": 3212
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-advisory-GHSA-8988-9cw3-xx77.txt",
+      "sha256": "fb052032fc980b4d4e96e650bc9585ade80c2e7e088af3e1247681ec71009cb4",
+      "bytes": 14310
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-advisory-GHSA-gh4c-6fx4-qh6g.txt",
+      "sha256": "90b1332fe158159b948fd56dda80014bb4408909cd9959fa6471d7b8e51be5bf",
+      "bytes": 7091
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-advisory-GHSA-vxq7-64xx-v4gw.txt",
+      "sha256": "b1e45e31e0d04f1b1e8704cbbaf018f9e20567e74a4e12c598bab2f1e17f69df",
+      "bytes": 5773
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-ci-config.json",
+      "sha256": "217e7398c4f53af8f4d6cfd7eabc350b25885423bc05e519305e99795e3899f6",
+      "bytes": 23772
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-ci-config.txt",
+      "sha256": "40b41feb5e27a1f8e17d1e36e4c391aec18ceab3c076117b38ee0d4f41741a4d",
+      "bytes": 28026
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-empty-config.json",
+      "sha256": "5d40c9aca93da1558267305ee0d1d4a88bc09b9a1b46d8c801454d9762c66822",
+      "bytes": 43469
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-empty-config.txt",
+      "sha256": "fb6f5d2a85ed9ffbc7ec86c0347d8ce83c6b2e6e687106a8359a4f02f8c07c8e",
+      "bytes": 44307
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-build-hash-install.txt",
+      "sha256": "531ca125a17fb3bc737cc1e63b8ed1b131ced2ee47821a976258a603cdba2ebc",
+      "bytes": 592
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-ci-config.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-ci-config.txt",
+      "sha256": "24f0d6ce6c9a34900663a79c21d3c2118799ed6fc1d8cfe27ab1a2be13976bee",
+      "bytes": 4380
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-current-config-rescan.json",
+      "sha256": "153338dd8099c7a9b96230308fc7b072d2783257bbe96821f2a5f7e09451ba24",
+      "bytes": 14534
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-current-config-rescan.txt",
+      "sha256": "72d39a51323df0a9888c433435cb5289b7a21b91df8b857caa56ce4df9c58332",
+      "bytes": 18790
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-empty-config.json",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+      "bytes": 19970
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-empty-config.txt",
+      "sha256": "0586d512426ed14c0cba8f9ac033a1151986a67e853865628e152301600aaa4a",
+      "bytes": 20810
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-constraints.txt",
+      "sha256": "935e34547853b50ebe901a18bc054df02c3f0a6734b3dafbe6e3c654117cb21b",
+      "bytes": 37931
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-dependency-comparison.json",
+      "sha256": "f55330c05b4103f00e748ca2d54f1d20287ac39b98ed2e01b18eb3e7eb0483e4",
+      "bytes": 700
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-exact-caller-source-review.txt",
+      "sha256": "61fba571a483831412c96daa07178e8261db77f58f2d60b8e2d9ff5a276f9db2",
+      "bytes": 20620
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-exact-lock-delta.txt",
+      "sha256": "69615406cf936ee0ecaa844953620b3a1aeb059fea4f927fc5e01794a9db1981",
+      "bytes": 2450
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-final-owned-file-publication-scan-after-upstream-example-redaction.txt",
+      "sha256": "71592f600700019925c85971e2e965f1130479db6eae2bf9c985f8bd758822c5",
+      "bytes": 9493
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-final-owned-file-publication-scan.txt",
+      "sha256": "e4c3e6648209bf90f77a50d9454000310e45906f33cebbaa50f39a02d4bf23c8",
+      "bytes": 9463
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-fresh-venv.txt",
+      "sha256": "98d76e14cb8b2c2787947a82ee3d7c8b57ebb40c6e0a4ab2ea607fad5810b0b2",
+      "bytes": 551
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-frozen-inputs.json",
+      "sha256": "a02a55b19d246116312664d05e68a8182ffacff856355e2930efc89675009659",
+      "bytes": 2317
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-gitleaks-git-help.txt",
+      "sha256": "f84b66a7247f23f5f864783f8a77e31e1b1a628475b46a9e63eff9e0660b9bc1",
+      "bytes": 3012
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-gitleaks-version.txt",
+      "sha256": "106a656382fa5139173c3bf2dfad0a09220be1dfbddd44ea090450127e22661a",
+      "bytes": 190
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-hosted-failure-36737133691.txt",
+      "sha256": "f1fdb8e6fc3989c3f61d8af4ee4fab61b5ba9fa8efd8951b01dfd0017afb1604",
+      "bytes": 37365
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-installed-version-inventory.txt",
+      "sha256": "d1e073a83ed95f20f8436c016e5a2c04efe6a64c55118f720e29011300f991f5",
+      "bytes": 1040
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-main-repair-pr546.txt",
+      "sha256": "8a4239286217070ba23adacd1cb840531d6cc065913ebaa36a03c1a9d2d8bc13",
+      "bytes": 25671
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-maintained-jwt-callers.txt",
+      "sha256": "f2cb234d51c610eadcc8114d28f0deff618899d2f6fd88d6fc7e28630f68931c",
+      "bytes": 3328
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-candidate-compile.txt",
+      "sha256": "b25fc55afe7cbb4791c6850406d6ef1fefe7aad87471ac3437214625ac5ac0a0",
+      "bytes": 249114
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-control-compile.txt",
+      "sha256": "4d2f9b42802e38983449113d8cc9d5655d80f17207b588eb846993f0fe077674",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-imports.txt",
+      "sha256": "670804dc7aef95981033adda1ac8acb9d023022759504ee57262e64a79e25fe7",
+      "bytes": 1786
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-pip-check.txt",
+      "sha256": "a13391a6b9383b3bf1ae09fc3da3e567bbe6d87312f2c3def211a96a2cecd0f0",
+      "bytes": 359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-pristine-reproduction.txt",
+      "sha256": "d054ccd94dde8ff2434db53d1e61fde2e5b006a828950ebda2bdf89f89c31435",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-oauthlib-alias-callers.txt",
+      "sha256": "019d8520664fec5d1c326901aabc988800688649ffae22ecc2624ae190813437",
+      "bytes": 37489
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-download.txt",
+      "sha256": "d82600844473eae879ad8d296b3850c313483b042d96fdbc6cd812894140a9a5",
+      "bytes": 356
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-release.txt",
+      "sha256": "e13f8810643270828e18aee0420f007ea308411d509d5ad45a69266aa5918c42",
+      "bytes": 6064
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-source-help.txt",
+      "sha256": "ab53298e1dd8fafd42c1480caaf75add6c307f3a87a2fa9f0c92c7eb48ef1f93",
+      "bytes": 5068
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-version.txt",
+      "sha256": "245b92e6dce308af37eb7ff5ea3c76ba54b1f5e4ee5f57deafb9bbdb5a3f7d9e",
+      "bytes": 341
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-diff-check.txt",
+      "sha256": "748a787acf6ae7f176b36197ef18ea0d91be1f860f36f15f8ff46d05599dc503",
+      "bytes": 186
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-file-publication-scan-after-declared-paths-redaction.txt",
+      "sha256": "7d7f93e7c5e1343a0549bc5e74ea624ca9e71fb16f5e922b422a6f413777dc09",
+      "bytes": 7653
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-file-publication-scan.txt",
+      "sha256": "601a09a523f2fcf87e84dc66b66aee42fe6d98f2ab6b18f5c87daa4548ad5668",
+      "bytes": 7766
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pristine-source-verification.txt",
+      "sha256": "14f8cc5187612148f60de1541046a0844ab3bb6b9dc377090cb5de5138362c1c",
+      "bytes": 1110
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-215-pypi.txt",
+      "sha256": "96c2bb91c88b9e2869b62f1efaaeb7df24bd78e5db8c7e267b183557620b6c95",
+      "bytes": 5725
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-advisory-official.txt",
+      "sha256": "13345ffd64854f23a1f4db80e2c7d9e75bbdf7101c6de5042621974ea1ed0d4a",
+      "bytes": 13217
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-advisory-osv.txt",
+      "sha256": "ec68a691e5b919679732c8600d27c07a719718d0e80f8540e58319e94684ca14",
+      "bytes": 12178
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-rejected-normal-commit.txt",
+      "sha256": "dd9c5b92e06074e70581dd5451928e2f8dcc555a6377d970194c95f3dbc91716",
+      "bytes": 257
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-after-path-sanitization.txt",
+      "sha256": "004274ab419a392924dfe312dc3cab8704160e7d17c10c4915125df066c51a17",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-after-upstream-example-redaction.txt",
+      "sha256": "a0d1c9589020c5d48103ae8030bd7467763fba6317b3fea787b589c107820e76",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-before-integration.txt",
+      "sha256": "4c45bd586ff4760f2de93dbb2bbe950ee5e4d638870a80e5ea4ffd681d700e89",
+      "bytes": 502
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-final-owned-scope.txt",
+      "sha256": "7e7b5d9e03774c2fc89106a8560d34c500b8543be3830db32b5bf446a3f6694e",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-requirements.in.txt",
+      "sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba",
+      "bytes": 326
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-runtime-hash-install.txt",
+      "sha256": "0b8ce270ba574a751ff16d52190b4d5b329918e66e28b11c40cfdfd3bf5a3bee",
+      "bytes": 4763
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-source-cutoff-policy.txt",
+      "sha256": "8053b7326bc54ee1910f072f554534525758bd536859f24471ed79d60379acb2",
+      "bytes": 1428
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-after-public-example-redaction.txt",
+      "sha256": "d0c69d2dbdc6ad16b9322a36e4f1ac2e08536b8c854fd31429b59f9437293618",
+      "bytes": 494
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-redacted-report.json",
+      "sha256": "5f79177d4c8343f9483728f1059830370dad90f6adddbfd22fa677342b93e2df",
+      "bytes": 658
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-rejection.txt",
+      "sha256": "8f1979d20d985a9eb7206f747f3c6656664738fbd3a7e5611af5e842f27b7496",
+      "bytes": 488
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-hashes.txt",
+      "sha256": "83d23b7f91491e023d0c2e69f529786ba749ac7e3dbb153d3151dd0a3c7541bd",
+      "bytes": 1111
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-sdk-release.txt",
+      "sha256": "f48602b12057ff9c5f0733c85957fa6f02701cc58fc0d4ded87a569517f8138d",
+      "bytes": 4030
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-source-download.txt",
+      "sha256": "57969232d3b956d421536eee3740e0ce4f1c0ab9b3bbb4e9d4d4824c527b2feb",
+      "bytes": 376
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-source-extract.txt",
+      "sha256": "bb3465f08e61b64b1bb31ac4b21c31bc21666c838c33af72242653d4647a4722",
+      "bytes": 246
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-source-repro-extract.txt",
+      "sha256": "8d8a8b51794ebc7495cb81c340d71081f560945f11403e5c02ab07c398958a49",
+      "bytes": 252
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-file-urllib3-2.8.0-py3-none-any.whl.txt",
+      "sha256": "2569c745287491f7d0768ac2b039afae7e8c756afc7de0e78fee3417c4eb46b9",
+      "bytes": 426
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-file-urllib3-2.8.0.tar.gz.txt",
+      "sha256": "b1f213c795eca75598839d0707e32b7c22e2766d93d9a4bdce10cad28709921e",
+      "bytes": 406
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-oauth-literal-sweep.txt",
+      "sha256": "fcc5ba26431b00ddd8522a75472de8242b3fea4dac4493e2837ce16e9fb749f3",
+      "bytes": 324
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-published-source-identity.txt",
+      "sha256": "243f20cb85641984d660ba1120a6f4b09b41b88cb7f89a37b3137206ac434012",
+      "bytes": 1050
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-pypi.txt",
+      "sha256": "5106dea6d766f9dea3a4c3598b0b5fb951170e7634ebc4077ae8229360a9de03",
+      "bytes": 9760
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-release.txt",
+      "sha256": "c3c73eb2724dafcbcffc7f3bb982ef72c9b887e32f180b0f5f9a64e0b56ca701",
+      "bytes": 12106
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-tag-object.txt",
+      "sha256": "ba19d552ebbe4bb59ce441c1d721eb9aa9ecdc03510e9ffb331771dd18134fea",
+      "bytes": 1682
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-tag.txt",
+      "sha256": "a659c30ede244f097d299a8d553f31c9d74e48ace5883f8353db3a3e6fe6a6f4",
+      "bytes": 544
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-uv-compile-help.txt",
+      "sha256": "cdd7acbd96b941d539827c6587697ab2f76a2e1b49227d5e7c42363ca3c0ec26",
+      "bytes": 12247
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-uv-release.txt",
+      "sha256": "a2aa0212a86e5678bd2c32a27395bb9d1ad4cf445f50e54727fc34e2e9f904e1",
+      "bytes": 82074
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-uv-version.txt",
+      "sha256": "8efd87c5c7a972462c1688d06383a5a81a58c78de5d827f68ac2e7ec541ec681",
+      "bytes": 217
+    }
+  ],
+  "subsequent_leads": [
+    {
+      "kind": "new_primary_advisory_verified_after_initial_osv_observation",
+      "advisory": "GHSA-42vr-xj54-vc7v",
+      "official_source": "https://github.com/advisories/GHSA-42vr-xj54-vc7v",
+      "osv_source": "https://api.osv.dev/v1/vulns/GHSA-42vr-xj54-vc7v",
+      "osv_published_utc": "2026-09-30T15:41:05Z",
+      "affected_package": "PyJWT",
+      "affected_ranges": [
+        {
+          "package": {
+            "ecosystem": "pip",
+            "name": "PyJWT"
+          },
+          "vulnerable_version_range": ">= 2.0.0a1, <= 2.14.0",
+          "first_patched_version": "2.15.0",
+          "vulnerable_functions": []
+        }
+      ],
+      "fixed_version": "2.15.0",
+      "pypi_source": "https://pypi.org/pypi/PyJWT/2.15.0/json",
+      "fixed_version_files": [
+        {
+          "filename": "pyjwt-2.15.0-py3-none-any.whl",
+          "upload_time_iso_8601": "2026-09-23T16:55:59.241512Z",
+          "sha256": "7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8",
+          "yanked": false
+        },
+        {
+          "filename": "pyjwt-2.15.0.tar.gz",
+          "upload_time_iso_8601": "2026-09-23T16:56:00.689307Z",
+          "sha256": "b11c5f9791d7bf51c2b39a81ed669f6b2dbbd669df2942f6c60167e9e3d1abe4",
+          "yanked": false
+        }
+      ],
+      "owner_condition": "issue #518; coordinator controls the owner handoff and subsequent relock.",
+      "action": "No PyJWT bump in this bounded urllib3 step; retain the seven-day cooldown and perform separate requalification after coordinator verifies date and owner conditions."
+    }
+  ],
+  "structural_validation": {
+    "full_repository_validation_exit_code": 1,
+    "remaining_messages": [
+      "blueprints/runtime-workers/openhands/pins.json: SHA-256 mismatch",
+      "blueprints/runtime-workers/openhands/requirements.lock: SHA-256 mismatch"
+    ],
+    "scope_limit": "The coordinator owns both shared evidence registrations. Supported native --scan-file validates publication hygiene of all owned files, and git diff --check passed. This is not an integrated full-repository pass.",
+    "owned_file_publication_scan_exit_code": 0,
+    "owned_file_publication_scan_count": 60,
+    "owned_diff_check_exit_code": 0,
+    "commit_gate": "Installed normal pre-commit gitleaks hook. Native same-command staged rehearsal exits 0 after declared source-example redactions; no hook bypass or ignore change.",
+    "final_owned_publication_scan": {
+      "exit_code": 0,
+      "scanned_files": 74,
+      "check_id": "final-owned-file-publication-scan-after-upstream-example-redaction"
+    },
+    "final_full_repository_check_id": "repository-validation-after-upstream-example-redaction",
+    "native_staged_gitleaks_exit_code": 0
+  },
+  "command_ledger": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-commands.json",
+  "frozen_plan_observation": "The initial native compile/install/fixture and scanner observations met the frozen plan as recorded. The later published/newly propagated PyJWT advisory invalidates any inference of continuing security acceptance; the latest native rescan fails and is retained."
+}

@@ -1,0 +1,88 @@
+{
+  "release": "v3.7.0",
+  "commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+  "package_version": "0.16.0",
+  "python_target": "CPython 3.12, Linux x86_64",
+  "source_archive": {
+    "url": "https://codeload.github.com/assafelovic/gpt-researcher/tar.gz/0957c301ed06c2a5857b834358c7227c739041d4",
+    "sha256": "0363b2e46629ee3add884212d09e6a56d9f7602c2adadff506910191b4c84c5c",
+    "hash_origin": "SHA256 of actual codeload bytes, independently repeated by coordinator worker; no upstream signature"
+  },
+  "pypi_artifacts_not_selected": [
+    {
+      "filename": "gpt_researcher-0.16.0-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/9e/eb/14f41d725affadf9c00f05cbb5399cc5ac614697b9c8b4a68eb6f346c4f6/gpt_researcher-0.16.0-py3-none-any.whl",
+      "sha256": "392432eea1757fa16462604e6579e425d57aa83f7d1ecc622a5807ada94fc043"
+    },
+    {
+      "filename": "gpt_researcher-0.16.0.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/7d/26/1fa27951b0b812901cb6cf68fb2341aa2f892df0192e06a75dc4be7c5e3a/gpt_researcher-0.16.0.tar.gz",
+      "sha256": "5892dcd1f6e03b5f6c26eb24f33e5959c599cd06027eceed692e00d2e147035c"
+    }
+  ],
+  "wheel_comparison": {
+    "shared_python_files": 122,
+    "changed": 55,
+    "missing_filter_files": true
+  },
+  "upstream_files": {
+    "pyproject.toml": "53b8d59bb05e5e1ec854703b6e487ababaeab53d49f0a25a3e549947312dfcd6",
+    "requirements.txt": "6d11deb240ef10a18f2d2ad1f51c0e3c273d65d8f988d3e51e7c85da2cb3259d",
+    "cli.py": "b0cdeb184d592aadc32cb54e20d09b47aca23e0f34f2092cb8ead4f8940f52de",
+    "gpt_researcher/utils/llm.py": "f22942e27b1356724daa3fc8dc0629ecbffe361f84455ee278a72b75668a2768",
+    "gpt_researcher/utils/url_security.py": "c263ac45bd5f26adaca42b57880daca58041756a5748c65a2581602cb4eeba9e",
+    "gpt_researcher/scraper/scraper.py": "225cb5a6387facc05ba9f488ffe68b67a4e01783c723c7d0e8dd02006dea03d4"
+  },
+  "locks": {
+    "requirements.lock": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+    "build-requirements.lock": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f",
+    "proxy-requirements.lock": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754"
+  },
+  "grader": {
+    "name": "DeepResearch-Bench-II",
+    "repository": "https://github.com/imlrz/DeepResearch-Bench-II",
+    "commit": "b38f360603db9531b102aef8c166cedb8509b6f6",
+    "runner_up_repository": "https://github.com/Ayanami0730/deep_research_bench",
+    "runner_up_commit": "852f4022d1f98fb707222e395405136e8f0e8d52",
+    "source_archive": {
+      "url": "https://codeload.github.com/imlrz/DeepResearch-Bench-II/tar.gz/b38f360603db9531b102aef8c166cedb8509b6f6",
+      "sha256": "4b8dd1d7e8727a97079052b14edcb7ea2bee1843f96a8c57c26b527522c4f4e0",
+      "hash_origin": "actual downloaded commit archive; not an upstream signature"
+    },
+    "files": {
+      "uv.lock": "3c193d03d6c9be174312f74d73188e9fa24a7f46a30749fa6cf06934dc2860c8",
+      "pyproject.toml": "da26de6cfc92d0077b1bc62c8bc346ae5cff0458ffceffef60026e61ee114cd5",
+      "tasks_and_rubrics.jsonl": "263aaabb8c279fb16cbe7c9499afe82d657a8ab3ccfb07ace084387e367d921a",
+      "run_evaluation.py": "04ec1698c970f1a3c8a565a4e7b63e9c11845e6680472c4dcf30c5139eb8d775",
+      "aggregate_scores.py": "ad567d824ca7ae04976c890edf5f224c61634c27cab608aeac0c7025dc1e9ca1",
+      "gpt_client.py": "1c2d590448ff2ca3997266a874faa0c9b02c5905a68b58b636dbafea4a175904"
+    }
+  },
+  "fastmcp": {
+    "version": "4.0.10",
+    "artifacts": [
+      {
+        "filename": "fastmcp-4.0.10-py3-none-any.whl",
+        "sha256": "1f8462e3d97394a637e1b0f1eaea0002da661c8d98000ad43f0aa3fa1ff523e8"
+      },
+      {
+        "filename": "fastmcp-4.0.10.tar.gz",
+        "sha256": "64539631a7dc5873a1c7a44089b2f7b3395dea3ca857e9f81bfe9665a59038d5"
+      }
+    ]
+  },
+  "langchain-openai": {
+    "version": "1.6.6",
+    "artifacts": [
+      {
+        "filename": "langchain_openai-1.6.6-py3-none-any.whl",
+        "sha256": "60dcaa443ddfdf1559feaf1d25916f394c7dda809aebe22a769fc39f02705be7"
+      },
+      {
+        "filename": "langchain_openai-1.6.6.tar.gz",
+        "sha256": "7b3848f42825aca40165463aa37757051165eb292ba7f24658a2f58f9bb221f9"
+      }
+    ]
+  },
+  "round3_source_note": "Added source-file verification at the unchanged 0957c301ed06c2a5857b834358c7227c739041d4 pin: cli.py:306-362; utils/llm.py:120-143; utils/url_security.py:8-25,63-122; scraper/scraper.py:195-212. Hashes computed from exact raw.githubusercontent.com bytes on 2026-09-27; no package, archive or lock pin changed."
+}

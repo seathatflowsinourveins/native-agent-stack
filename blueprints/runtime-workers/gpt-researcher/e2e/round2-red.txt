@@ -1,0 +1,113 @@
+test_gateway_reader_uses_only_authorized_columns_and_is_read_only (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_gateway_reader_uses_only_authorized_columns_and_is_read_only) ... ok
+test_mcp_policy_enforces_calls_and_collection_arguments (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_mcp_policy_enforces_calls_and_collection_arguments) ... ok
+test_recipe_contract_and_empty_result (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result) ... ERROR
+test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) ... 
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (report='# Report\nAn evidence-bearing answer.\n') ... ERROR
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (report='The moon is cheese.\n') ... ERROR
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={}) ... ERROR
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={'report': ' \n'}) ... ERROR
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={'report': None}) ... ERROR
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={'report': 7}) ... ERROR
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result=[]) ... ERROR
+  test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result=None) ... ERROR
+test_upstream_grade_controls_preserve_scores_and_reject_malformed_output (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_upstream_grade_controls_preserve_scores_and_reject_malformed_output) ... ERROR
+
+======================================================================
+ERROR: test_recipe_contract_and_empty_result (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_recipe_contract_and_empty_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 81, in test_recipe_contract_and_empty_result
+    self.assertFalse(sanity["ready_for_grading"])
+                     ~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (report='# Report\nAn evidence-bearing answer.\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 92, in test_report_transport_controls_do_not_grade_content
+    self.assertTrue(checker.check(result)["ready_for_grading"])
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (report='The moon is cheese.\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 92, in test_report_transport_controls_do_not_grade_content
+    self.assertTrue(checker.check(result)["ready_for_grading"])
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 99, in test_report_transport_controls_do_not_grade_content
+    self.assertFalse(checker.check(result)["ready_for_grading"])
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={'report': ' \n'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 99, in test_report_transport_controls_do_not_grade_content
+    self.assertFalse(checker.check(result)["ready_for_grading"])
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={'report': None})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 99, in test_report_transport_controls_do_not_grade_content
+    self.assertFalse(checker.check(result)["ready_for_grading"])
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result={'report': 7})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 99, in test_report_transport_controls_do_not_grade_content
+    self.assertFalse(checker.check(result)["ready_for_grading"])
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result=[])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 99, in test_report_transport_controls_do_not_grade_content
+    self.assertFalse(checker.check(result)["ready_for_grading"])
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_report_transport_controls_do_not_grade_content (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_report_transport_controls_do_not_grade_content) (result=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 99, in test_report_transport_controls_do_not_grade_content
+    self.assertFalse(checker.check(result)["ready_for_grading"])
+                     ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'ready_for_grading'
+
+======================================================================
+ERROR: test_upstream_grade_controls_preserve_scores_and_reject_malformed_output (test_runtime_worker_gpt_researcher.RuntimeWorkerGPTResearcherTests.test_upstream_grade_controls_preserve_scores_and_reject_malformed_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 102, in test_upstream_grade_controls_preserve_scores_and_reject_malformed_output
+    grader = load("gptr_grader", RECIPE / "e2e/grader.py")
+  File "<checkout>/tests/test_runtime_worker_gpt_researcher.py", line 25, in load
+    spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1019, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1156, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1214, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '<checkout>/blueprints/runtime-workers/gpt-researcher/e2e/grader.py'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.066s
+
+FAILED (errors=10)

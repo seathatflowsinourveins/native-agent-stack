@@ -30,7 +30,7 @@ import urllib.request
 import uuid
 
 from recipe import (COMPRESSION_COMBOS, HERE, arm_config, digest, environment_selection, llm_config, read_json,
-                    render_mcp)
+                    render_mcp, task_profile)
 from e2e import netprobe
 from e2e.task import load_task, worker_instruction
 from receipt import PROBE_MECHANISM, create_receipt, gateway_database, read_bounded, time_value
@@ -389,7 +389,8 @@ def workspace_skills(stack_root, workspace):
             raise ValueError("skills_must_be_project_local")
         if digest(path) != entry["skill_md_sha256"]:
             raise ValueError("installed_project_skill_pin_mismatch")
-    return {"names": sorted(names), "manifest_sha256": digest(manifest)}
+    return {"names": sorted(names), "manifest_sha256": digest(manifest),
+            "roles": {entry["name"]: entry.get("roles", []) for entry in entries}}
 
 
 def attempt_stem(run_id, arm):
@@ -1279,7 +1280,7 @@ def teardown_action(state, run_id, arm):
         status = None
     except (OSError, ValueError):
         return report("refused", 3, reason="status_unreadable")
-    if status is not None and (not isinstance(status, dict) or status.get("status") in {"starting", "running", "terminal"}):
+    if status is not None and (not isinstance(status, dict) or status.get("status") in {"starting", "running", "paused", "terminal"}):
         return report("refused", 3, reason="conversation_may_be_live")
     try:
         reservation = json.loads(read_bounded(Path(state) / "active-dispatch.json"))
@@ -1379,6 +1380,7 @@ def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, 
     port = owned_port(port)
     environment = ["--env", "OPENHANDS_OWNED_CONTAINER=1",
                    "--env", "OPENHANDS_RUN_ID=" + run_id, "--env", "OPENHANDS_ARM=" + selection["arm"],
+                   "--env", "OPENHANDS_PROFILE=" + task_profile(os.environ)[0],
                    "--env", "OPENHANDS_MODEL=" + selection["requested_model"],
                    "--env", "OPENHANDS_BASE_URL=" + selection["base_url"],
                    "--env", "OPENHANDS_COMPRESSION=" + (selection["compression_combo"] or ""),
@@ -1419,7 +1421,8 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
         print(json.dumps({"run_id": run_id, "arm": arm, "receipt": None, "failure_stage": "preflight",
                           "task_passed": False, "evidence_complete": False}))
         return 3
-    window = {"started_at": utc_now(), "finished_at": None, "worker_exit_code": None, "arm": arm, "run_id": run_id}
+    window = {"started_at": utc_now(), "finished_at": None, "worker_exit_code": None, "arm": arm, "run_id": run_id,
+              "profile": os.environ.get("OPENHANDS_PROFILE", "coding")}
     checked = {"upstream_resolved": None, "grader_exit_code": None}
     stem = run_id + "-" + arm
     stage = "preflight"
@@ -1427,6 +1430,7 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
     native_receipt = None
     try:
         port = owned_port(port)
+        task_profile(os.environ)
         pins, host, mcp = preflight(prefix, state)
         installed = read_json(state / "installation.json")
         if installed.get("exit_code") != 0 or installed.get("requirements_sha256") != pins["requirements_sha256"]:

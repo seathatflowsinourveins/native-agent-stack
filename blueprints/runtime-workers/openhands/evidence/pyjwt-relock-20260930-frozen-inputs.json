@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "frozen_utc": "2026-09-30T17:01:25.890820+00:00",
+  "base_commit": "6ca5863516d0b07748f41be2a2635fbe0211d1c3",
+  "base_lock_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+  "sdk_commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+  "pyjwt_source_commit": "1d41a6478e1562e68ff667fcd703356acf085f68",
+  "coordinator_cutoff_observation_utc": "2026-09-30T16:57:15Z",
+  "conservative_cutoff_utc": "2026-09-30T16:57:00Z",
+  "predicted_digest_for_post_compile_comparison_only": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+  "compile_policy": {
+    "exclude_newer": "7 days",
+    "litellm": "2026-07-20T00:00:00Z",
+    "lmnr": "2026-08-23T00:00:00Z",
+    "absolute_cutoff_override": false
+  },
+  "inputs": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-constraints.txt",
+      "sha256": "9be46e2d3628a47ece04c39048423874badadd13e379096f6303bfefebc8f041",
+      "bytes": 37931
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-requirements.in.txt",
+      "sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba",
+      "bytes": 326
+    }
+  ],
+  "oracles": {
+    "requirements": 176,
+    "changed_from_bd1": [
+      {
+        "name": "pyjwt",
+        "before": "2.14.0",
+        "after": "2.15.0"
+      }
+    ],
+    "unchanged_from_bd1": 175,
+    "additions": [],
+    "removals": [],
+    "sdk_tools": "1.50.0",
+    "urllib3": "2.8.0",
+    "oauthlib": "3.3.1",
+    "anyio": "4.14.2",
+    "original_00aa_two_changes": [
+      "urllib3",
+      "pyjwt"
+    ],
+    "original_00aa_unchanged": 174,
+    "native_control_byte_identical": true,
+    "new_compiles_byte_identical": true,
+    "native_install_exit_code": 0,
+    "pip_check_exit_code": 0,
+    "sdk_fixture_tests": 12,
+    "sdk_fixture_skips": 0,
+    "candidate_osv_current_config_exit_code": 0,
+    "candidate_osv_empty_config_exit_code": 1,
+    "candidate_osv_empty_config_ids": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ]
+  },
+  "scope": "Recipe source qualification only; no runtime image, model, provider, server, host/global state or shared configuration changes."
+}

@@ -1,0 +1,1 @@
+{"filename": "litellm-1.93.0.tar.gz", "bytes": 15948866, "sha256": "140bf215e264c71601bca9c06d2436c5451bb59e1e195ea23fc2d3d87b6929ec", "official_download_digest_match": true}

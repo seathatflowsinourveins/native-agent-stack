@@ -1,0 +1,938 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_native_runtime_qualification",
+  "component_id": "deerflow",
+  "date": "2026-09-30",
+  "lane": "foundation",
+  "status": "partial_native_qualification",
+  "outcome": {
+    "fresh_private_prefix": true,
+    "backend_install": {
+      "exit_code": 0,
+      "installed_distributions": 227
+    },
+    "backend_upstream_unit_tests": {
+      "exit_code": 0,
+      "passed": 309,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 1,
+      "returned_summary": "309 passed, 1 warning in 8.84s"
+    },
+    "grader_install": {
+      "exit_code": 0,
+      "inspect_ai": "0.3.271",
+      "inspect_evals": "0.22.0"
+    },
+    "gaia_upstream_scorer_unit_tests": {
+      "exit_code": 0,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 1,
+      "returned_summary": "8 passed, 1 warning in 0.22s"
+    },
+    "backend_dependency_check": {
+      "exit_code": 1,
+      "status": "upstream_declared_override_reported_incompatible"
+    },
+    "grader_dependency_check": {
+      "exit_code": 0,
+      "installed_distributions": 110
+    },
+    "native_model_execution": false,
+    "provider_usage": null,
+    "full_server_lifecycle": "not_exercised",
+    "docker_services": "not_exercised",
+    "gaia_dataset_task": "not_exercised"
+  },
+  "source": {
+    "repository": "https://github.com/bytedance/deer-flow",
+    "tag": "v2.1.0",
+    "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+    "latest_release_rechecked_at": "2026-09-30T05:59:14.565Z",
+    "latest_release_returned": {
+      "html_url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0",
+      "published_at": "2026-09-24T10:40:44Z",
+      "tag_name": "v2.1.0",
+      "target_commitish": "main"
+    },
+    "archive": {
+      "url": "https://codeload.github.com/bytedance/deer-flow/tar.gz/345f08be00c8a9495079b732a39b46aa9af1584e",
+      "sha256": "de309ec407d0b5b9ef1855a2cdcd97d9a9c2c95d0b0029cde6c79b9212518ffe",
+      "bytes": 26278334,
+      "matches_recipe_pin": true
+    },
+    "selected_tests": [
+      "backend/tests/test_model_factory.py",
+      "backend/tests/test_mcp_client_config.py",
+      "backend/tests/test_client.py"
+    ],
+    "omitted_tests": "All other backend tests, live external-API tests, Redis/Postgres integration, blocking-I/O tests and frontend tests.",
+    "references": [
+      "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/Makefile#L5-L6",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/Makefile#L22-L29",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/README.md#L497-L514",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/pyproject.toml#L59-L106",
+      "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/tests/conftest.py#L21-L40"
+    ]
+  },
+  "grader_source": {
+    "repository": "https://github.com/UKGovernmentBEIS/inspect_evals",
+    "tag": "v0.22.0",
+    "commit": "41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+    "archive": {
+      "url": "https://codeload.github.com/UKGovernmentBEIS/inspect_evals/tar.gz/41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+      "sha256": "8938d36b92a637f894f0aaa4e0c114f43d6851ff58f89176f3b29630ea3a322a",
+      "bytes": 97243856,
+      "hash_meaning": "Measured official commit-addressed archive; not an independently authenticated publisher signature."
+    },
+    "recipe_hash_lock": "blueprints/runtime-workers/deerflow/e2e/requirements.lock",
+    "recipe_hash_lock_sha256": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+    "selected_test": "tests/gaia/test_scorer.py",
+    "scope": "Official unchanged scorer unit tests with upstream synthetic completions/targets. No dataset access, native eval task, solver or model execution.",
+    "test_runtime_difference": "Recipe lock installs Inspect AI 0.3.271; the Inspect Evals source uv.lock carries Inspect AI 0.3.263. The full upstream lock was not synced. Test runner direct package versions come from its unchanged dev group and uv.lock; the recipe runtime lock remains unchanged.",
+    "references": [
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/41c72eaa2b807ce43f35fac6f3f399318adc7e9d/src/inspect_evals/gaia/README.md#L14-L26",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/41c72eaa2b807ce43f35fac6f3f399318adc7e9d/tests/gaia/test_scorer.py",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/41c72eaa2b807ce43f35fac6f3f399318adc7e9d/src/inspect_evals/gaia/scorer.py",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/41c72eaa2b807ce43f35fac6f3f399318adc7e9d/pyproject.toml#L421-L440",
+      "https://github.com/UKGovernmentBEIS/inspect_evals/blob/41c72eaa2b807ce43f35fac6f3f399318adc7e9d/uv.lock"
+    ]
+  },
+  "environment": {
+    "os": "linux",
+    "architecture": "x86_64",
+    "python": "3.13.15",
+    "uv": "0.12.17",
+    "isolation": "Installation/tests/installed-help/dependency observations use a new private prefix, fresh HOME/XDG/cache/test state and an explicit child environment without credential/provider variables. Source/version/release preflights use the installed native tools.",
+    "upstream_version_difference": "DeerFlow CI pins uv 0.11.1 / Python 3.12; this bounded host run uses installed uv 0.12.17 / Python 3.13.15, within backend requires-python >=3.12.",
+    "backend_observation": {
+      "architecture": "x86_64",
+      "distribution_count": 227,
+      "platform": "linux",
+      "python": "3.13.15",
+      "versions": {
+        "deerflow-extension-api": "0.2.1",
+        "deerflow-harness": "2.1.0",
+        "langchain-openai": "1.2.1",
+        "langgraph-sdk": "0.4.2",
+        "pytest": "9.0.3",
+        "pytest-asyncio": "1.3.0",
+        "websockets": "16.0"
+      }
+    },
+    "grader_observation": {
+      "architecture": "x86_64",
+      "distribution_count": 110,
+      "installed_scorer_sha256": "49999358fb9602d390024bf7040139c142af1bb61e18c15043aea2af84fad56d",
+      "platform": "linux",
+      "python": "3.13.15",
+      "versions": {
+        "inspect-ai": "0.3.271",
+        "inspect-evals": "0.22.0",
+        "pytest": "9.1.1",
+        "pytest-asyncio": "1.3.0",
+        "pytest-cov": "7.1.0",
+        "pytest-custom-exit-code": "0.3.0",
+        "pytest-dotenv": "0.5.2",
+        "pytest-mock": "3.15.1",
+        "pytest-reportlog": "1.0.0",
+        "pytest-rerunfailures": "16.1",
+        "pytest-xdist": "3.8.0"
+      }
+    },
+    "grader_test_environment": {
+      "UV_PROJECT_ENVIRONMENT": "<private-prefix>/grader",
+      "HF_HUB_OFFLINE": "1",
+      "HF_DATASETS_OFFLINE": "1"
+    },
+    "persistent_activation": "none"
+  },
+  "research": {
+    "skills_applied": [
+      "search-first",
+      "context-mode"
+    ],
+    "discovery": "Available skill/tool descriptions and existing DeerFlow research/pins reviewed; retained the user-selected source rather than authoring a runtime. No new skill or global client configuration installed.",
+    "installed_commands": [
+      "rtk uv --version",
+      "rtk python3 --version",
+      "rtk uv sync --help",
+      "rtk uv run --no-sync deerflow --help"
+    ],
+    "capability_claim_depth": "Actual native dependency installation and selected unchanged upstream unit tests; no full server, workflow or model acceptance.",
+    "lifecycle_reference": "adoption/lifecycle.md",
+    "acceptance_policy": "docs/acceptance-evidence-policy.md",
+    "recipe_used": "blueprints/runtime-workers/deerflow/recipe.py:install_grader",
+    "install_basis": "DeerFlow backend/Makefile uv sync --locked; Inspect Evals GAIA README pip install; existing recipe expands its unchanged wheel hash lock through Python venv/pip.",
+    "evidence_helper_basis": [
+      "adoption/lifecycle.md#choose-the-host-and-retain-the-inputs",
+      "docs/acceptance-evidence-policy.md#preserve-the-returned-result",
+      "https://docs.python.org/3.13/library/tarfile.html#tarfile.TarFile.extractfile"
+    ]
+  },
+  "independent_observation": {
+    "archive_source_comparison": {
+      "all_original_files_unchanged": true,
+      "sources": [
+        {
+          "mismatches": [],
+          "original_regular_files_compared": 2964,
+          "source": "deerflow"
+        },
+        {
+          "mismatches": [],
+          "original_regular_files_compared": 3973,
+          "source": "inspect_evals"
+        }
+      ]
+    },
+    "grader_installed_scorer_matches_pinned_source": true,
+    "input_sha256": {
+      "deerflow/backend/uv.lock": "3cc643cd34374384c62de7fd8cef49cc4608df01ea11eff85daeea51f5cf0d5f",
+      "deerflow/frontend/pnpm-lock.yaml": "cee8007d2e1b10eb84c853971130cbb8ba5e0893fd0c0a381f840e77b6a2ed5b",
+      "deerflow/backend/pyproject.toml": "293f4ce381f8fde321197ca46216a413f684fb8246c3294bf6579e8420977d85",
+      "deerflow/backend/Makefile": "bdcc16a2a0188b82c6d1950e516bae7aed70b290f76c9512ae376c7789743593",
+      "deerflow/backend/tests/conftest.py": "88818d586500926444d0576e9b0f43a0124a9d76a138924848bd99e4672daaba",
+      "deerflow/backend/tests/test_model_factory.py": "48b395eff316fa55ee7f267189a0d0304b2207b7ad432dcf9037dedcc1306f5a",
+      "deerflow/backend/tests/test_mcp_client_config.py": "e38135bbafda3a612f0f32443717f5cccf38bdc72b9045156c9ffbfe082cd584",
+      "deerflow/backend/tests/test_client.py": "24a81145a312cdb3e945fa2db1fd84c27a8240c390a73e1e191b7559dacb222e",
+      "inspect_evals/uv.lock": "9669e68ccc82e9b990f90fc521671ab71e3650adf8896ba5537598bb772b3afa",
+      "inspect_evals/pyproject.toml": "10cf227d04d7d56fc7afd4a083f5c85bbb059916118fa57c5b84d75a803a2676",
+      "inspect_evals/tests/conftest.py": "1beffbf17c2aec28f69e5ed8763b4bc46b212dc3579446cb29ddfbb736dd388f",
+      "inspect_evals/tests/gaia/test_scorer.py": "9162d8b4e2b366a0b378e120473793001b2b14e7bac0e22e9e32433c69317c67",
+      "inspect_evals/src/inspect_evals/gaia/scorer.py": "49999358fb9602d390024bf7040139c142af1bb61e18c15043aea2af84fad56d",
+      "grader/requirements.lock": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+      "archives/deerflow-source.tar.gz": "de309ec407d0b5b9ef1855a2cdcd97d9a9c2c95d0b0029cde6c79b9212518ffe",
+      "archives/inspect_evals-source.tar.gz": "8938d36b92a637f894f0aaa4e0c114f43d6851ff58f89176f3b29630ea3a322a",
+      "local_recipe/recipe.py": "f21cd2182226f6b77b81fbd399805e643cd65ead2f82a898116448dfe132b0bd",
+      "local_recipe/pins.json": "ccaa5cbccc831eaf41f62462633dfdf01920ba4dd30ea42c4453a2b8825babd2"
+    },
+    "distinction": "Archive comparison and installed distribution/hash inspection are local structural observations; the two pytest runs remain unchanged upstream unit tests."
+  },
+  "retained_failures": [
+    {
+      "run_id": "backend-prerequisites-absent-control",
+      "exit_code": 1,
+      "condition": "Same selected native pytest command before backend dependency installation; no pytest module.",
+      "resolution": "Supported uv sync --locked --python 3.13; identical test command later passed.",
+      "proves": "Missing runtime/test prerequisite is detected. This is not an executed failing upstream test."
+    },
+    {
+      "run_id": "grader-prerequisites-absent-control",
+      "exit_code": 1,
+      "condition": "Same selected native pytest command before dev test-runner installation; no pytest module.",
+      "resolution": "Native uv pip install of upstream dev runner versions from its uv.lock; identical test command later passed.",
+      "proves": "Missing test prerequisite is detected. This is not an executed failing scorer test."
+    },
+    {
+      "run_id": "backend-dependency-check",
+      "exit_code": 1,
+      "condition": "langgraph-sdk 0.4.2 metadata requires websockets>=14,<16; the upstream override installs 16.0.",
+      "resolution": "Preserved without changing upstream source/dependencies. Upstream pyproject explains the explicit compatibility override; selected unit tests pass, but the metadata checker failure remains.",
+      "source": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/pyproject.toml#L91-L106"
+    }
+  ],
+  "evidence_boundaries": [
+    "Upstream backend tests include native upstream mocks; conftest pre-mocks the subagent executor. Passing them does not establish subagent/model execution.",
+    "Official scorer tests use upstream synthetic completions and wrong-answer cases; they establish scorer behavior, not a GAIA dataset score.",
+    "No full DeerFlow server, Docker/image lifecycle, MCP process connection, native skill discovery through a running worker, model invocation, gated dataset fetch or provider usage measurement.",
+    "No claim of measured superiority, token savings, another-host portability, global installation or production readiness.",
+    "Raw records retain the actual returned rtk command streams and exit codes. Public output is sanitized/projection; it is not a new test replay."
+  ],
+  "output_retention": {
+    "private_records": "Original returned command output, argument vectors, working directories, start/end timestamps and exit codes retained outside the checkout in the owned qualification prefix.",
+    "public_sanitization": [
+      "Private prefix and repository absolute paths replaced with placeholders.",
+      "ANSI color escapes removed if present.",
+      "Long install/help/release-note output projected as explicitly marked; raw byte counts and SHA256 bind the retained complete streams.",
+      "No credentials, private preexisting account state, host paths, native session/run identifiers or conversations published."
+    ],
+    "cleanup": "Owned dependency/source prefixes retained for rollback and review; no background service was started."
+  },
+  "runs": [
+    {
+      "id": "uv-version",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "uv",
+        "--version"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T05:59:14.158Z",
+      "finished_at": "2026-09-30T05:59:14.191Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 38,
+        "raw_sha256": "dd643ebda7165a77a7fe3c9f445ec1a2cfebe1bfe0329015937763dce919c33d",
+        "sanitized_text": "uv 0.12.17 (x86_64-unknown-linux-gnu)\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "python-version",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "python3",
+        "--version"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T05:59:14.193Z",
+      "finished_at": "2026-09-30T05:59:14.272Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 15,
+        "raw_sha256": "322f765b04793d55160c8788550761630087e4847a77ed7a1090d79791f73c3b",
+        "sanitized_text": "Python 3.13.15\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "release-latest",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "gh",
+        "api",
+        "repos/bytedance/deer-flow/releases/latest",
+        "--jq",
+        "{tag_name,published_at,html_url,target_commitish}"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T05:59:14.272Z",
+      "finished_at": "2026-09-30T05:59:14.565Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 158,
+        "raw_sha256": "8128bd5e4e44c571f434075d4373d332f7ded31ca55136ba2813744afc544371",
+        "sanitized_text": "{\"html_url\":\"https://github.com/bytedance/deer-flow/releases/tag/v2.1.0\",\"published_at\":\"2026-09-24T10:40:44Z\",\"tag_name\":\"v2.1.0\",\"target_commitish\":\"main\"}\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "release-tag",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "gh",
+        "api",
+        "repos/bytedance/deer-flow/releases/tags/v2.1.0",
+        "--jq",
+        "{tag_name,published_at,html_url,body}"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T05:59:14.565Z",
+      "finished_at": "2026-09-30T05:59:14.943Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 23962,
+        "raw_sha256": "9190df3bb8c49523a2e17c0dd45d813ff20e3c2a8cb3f4bb44693e2a2b07b2e5",
+        "public_text_omitted": "Release notes retained privately; tag metadata is in release-latest and the pinned release source."
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "uv-sync-help",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "uv",
+        "sync",
+        "--help"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T05:59:14.944Z",
+      "finished_at": "2026-09-30T05:59:14.976Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 11200,
+        "raw_sha256": "453a121c64d1987511201fbc1d1672fef905eda51c34d0f836b47e860be3ca1b",
+        "excerpt_selection": "Usage and relevant installed CLI option lines.",
+        "sanitized_text": "Update the project's environment\n\nUsage: uv sync [OPTIONS]\n      --locked\n      --frozen\n  -p, --python <PYTHON>      The Python interpreter to use for the project environment. [env:\n",
+        "full_returned_stream": false
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "archive-download",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "50",
+        "https://codeload.github.com/bytedance/deer-flow/tar.gz/345f08be00c8a9495079b732a39b46aa9af1584e",
+        "--output",
+        "<private-prefix>/source.tar.gz"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T05:59:14.977Z",
+      "finished_at": "2026-09-30T05:59:17.022Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 1,
+        "raw_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sanitized_text": "\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "archive-extract",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "tar",
+        "-xzf",
+        "<private-prefix>/source.tar.gz",
+        "-C",
+        "<private-prefix>"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T06:00:01.041Z",
+      "finished_at": "2026-09-30T06:00:02.669Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-archive-download",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "50",
+        "https://codeload.github.com/UKGovernmentBEIS/inspect_evals/tar.gz/41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+        "--output",
+        "<private-prefix>/grader-source.tar.gz"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T06:01:55.760Z",
+      "finished_at": "2026-09-30T06:02:01.600Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 1,
+        "raw_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "sanitized_text": "\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-archive-extract",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "tar",
+        "-xzf",
+        "<private-prefix>/grader-source.tar.gz",
+        "-C",
+        "<private-prefix>"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T06:02:01.602Z",
+      "finished_at": "2026-09-30T06:02:04.281Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "backend-prerequisites-absent-control",
+      "evidence_class": "missing_prerequisite_control",
+      "argv": [
+        "rtk",
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "pytest",
+        "-m",
+        "not live",
+        "tests/test_model_factory.py",
+        "tests/test_mcp_client_config.py",
+        "tests/test_client.py",
+        "-q"
+      ],
+      "working_directory": "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend",
+      "started_at": "2026-09-30T06:04:22.634Z",
+      "finished_at": "2026-09-30T06:04:22.856Z",
+      "exit_code": 1,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 151,
+        "raw_sha256": "9ac63dc1dd958cdb2743b746467612fca6c0d198898ed5c50fb61108f76d6597",
+        "sanitized_text": "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/.venv/bin/python: No module named pytest\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "backend-install",
+      "evidence_class": "native_installation",
+      "argv": [
+        "rtk",
+        "uv",
+        "sync",
+        "--locked",
+        "--python",
+        "3.13"
+      ],
+      "working_directory": "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend",
+      "started_at": "2026-09-30T06:05:08.392Z",
+      "finished_at": "2026-09-30T06:05:13.315Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 7932,
+        "raw_sha256": "9473a9a219382d2b8c0e4b42b128d2fe6d9e3e0d3e1fbb8abdd60686fe09d76c",
+        "excerpt_selection": "Interpreter/install totals and selected component/test package lines.",
+        "sanitized_text": "Resolved 250 packages in 4ms\n      Built deerflow-extension-api @ file://<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/extension-api\n      Built deerflow-harness @ file://<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness\nPrepared 227 packages in 3.74s\nInstalled 227 packages in 1.01s\n + deerflow-extension-api==0.2.1 (from file://<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/extension-api)\n + deerflow-harness==2.1.0 (from file://<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness)\n + langchain-openai==1.2.1\n + langgraph-sdk==0.4.2\n + pytest==9.0.3\n + pytest-asyncio==1.3.0\n + websockets==16.0\n",
+        "full_returned_stream": false
+      }
+    },
+    {
+      "id": "backend-native-tests",
+      "evidence_class": "unchanged_upstream_unit_tests",
+      "argv": [
+        "rtk",
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "pytest",
+        "-m",
+        "not live",
+        "tests/test_model_factory.py",
+        "tests/test_mcp_client_config.py",
+        "tests/test_client.py",
+        "-q"
+      ],
+      "working_directory": "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend",
+      "started_at": "2026-09-30T06:05:50.260Z",
+      "finished_at": "2026-09-30T06:06:03.084Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 1103,
+        "raw_sha256": "acbc2e8681c76013160a5fc5b407ff3a2695e96477ccbaf6a83985e87d524631",
+        "sanitized_text": "........................................................................ [ 23%]\n........................................................................ [ 46%]\n........................................................................ [ 69%]\n........................................................................ [ 93%]\n.....................                                                    [100%]\n=============================== warnings summary ===============================\ntests/test_model_factory.py::test_unknown_config_key_emits_warning\n  <private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/.venv/lib/python3.13/site-packages/_pytest/python.py:166: UserWarning: WARNING! definitely_not_a_real_kwarg is not default parameter.\n                  definitely_not_a_real_kwarg was transferred to model_kwargs.\n                  Please confirm that definitely_not_a_real_kwarg is what you intended.\n    result = testfunction(**testargs)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n309 passed, 1 warning in 8.84s\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-install",
+      "evidence_class": "native_installation",
+      "argv": [
+        "rtk",
+        "python3",
+        "-c",
+        "import runpy; from pathlib import Path; recipe = runpy.run_path(\"<repository>/blueprints/runtime-workers/deerflow/recipe.py\"); recipe['install_grader'](Path(\"<private-prefix>\"))"
+      ],
+      "working_directory": "<repository>",
+      "started_at": "2026-09-30T06:07:34.327Z",
+      "finished_at": "2026-09-30T06:08:02.727Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 29715,
+        "raw_sha256": "e816615edc1d2698707ef6b2ae0c7e23a4f9866dc1a094879b8b04c1f7c6801e",
+        "excerpt_selection": "Exact native install success package line and dependency-check output; downloads omitted.",
+        "sanitized_text": "Successfully installed agent-client-protocol-0.12.1 aiobotocore-3.9.1 aiohappyeyeballs-2.7.1 aiohttp-3.14.3 aioitertools-0.13.0 aiosignal-1.4.0 annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 attrs-26.1.0 backoff-2.2.1 beautifulsoup4-4.15.0 boto3-1.43.75 botocore-1.43.75 certifi-2026.7.22 charset-normalizer-3.5.1 click-8.5.0 datasets-5.0.1 debugpy-1.8.22 dill-0.4.1 docstring-parser-0.18.0 fastapi-0.141.1 filelock-4.0.4 frozenlist-1.8.0 fsspec-2026.6.0 h11-0.16.0 hf-xet-1.6.0 httpcore-1.0.9 httpx-0.28.1 huggingface-hub-1.33.0 idna-3.20 ijson-3.5.1 inspect-ai-0.3.271 inspect-evals-0.22.0 jinja2-3.1.6 jmespath-1.1.0 jsonlines-4.0.0 jsonpatch-1.33 jsonpath-ng-1.8.0 jsonpointer-3.1.1 jsonref-1.1.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 linkify-it-py-2.2.0 markdown-it-py-4.2.0 markupsafe-3.0.3 mdit-py-plugins-0.6.1 mdurl-0.1.2 mmh3-5.3.0 multidict-6.9.1 multiprocess-0.70.19 nest-asyncio2-1.7.3 numpy-2.5.3 packaging-26.3 pandas-3.0.6 pathlib-abc-0.5.2 pillow-12.3.0 platformdirs-4.12.0 propcache-0.5.4 psutil-7.2.2 pyarrow-25.0.1 pydantic-2.13.5 pydantic-core-2.46.5 pygments-2.21.0 python-dateutil-2.9.0.post0 python-dotenv-1.2.3 pyyaml-6.0.3 referencing-0.37.0 regex-2026.9.10 requests-2.34.2 rich-15.0.0 rpds-py-2026.6.3 s3fs-2026.6.0 s3transfer-0.19.2 semver-3.1.0 shortuuid-1.0.13 six-1.17.0 sniffio-1.3.1 soupsieve-2.10 starlette-1.7.0 tenacity-9.1.4 textual-8.2.8 tiktoken-0.14.0 toml-0.10.2 tqdm-4.70.1 typing-extensions-4.16.0 typing-inspection-0.4.4 universal-pathlib-0.3.10 urllib3-2.8.0 uvicorn-0.54.0 wrapt-2.5.0 xxhash-4.0.1 yarl-1.25.1 zipfile-zstd-0.0.4 zipp-4.1.0 zstandard-0.25.0\nNo broken requirements found.\n",
+        "full_returned_stream": false
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-prerequisites-absent-control",
+      "evidence_class": "missing_prerequisite_control",
+      "argv": [
+        "rtk",
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "pytest",
+        "tests/gaia/test_scorer.py",
+        "-q"
+      ],
+      "working_directory": "<private-prefix>/inspect_evals-41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+      "started_at": "2026-09-30T06:09:16.143Z",
+      "finished_at": "2026-09-30T06:09:16.241Z",
+      "exit_code": 1,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 93,
+        "raw_sha256": "17129af83f5f930fb307d19a93e27aa2fdb1dfae578331c0f1ecf44256951fc2",
+        "sanitized_text": "<private-prefix>/grader/bin/python: No module named pytest\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "backend-dependency-check",
+      "evidence_class": "native_dependency_check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/.venv/bin/python"
+      ],
+      "working_directory": "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend",
+      "started_at": "2026-09-30T06:09:16.244Z",
+      "finished_at": "2026-09-30T06:09:16.292Z",
+      "exit_code": 1,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 135,
+        "raw_sha256": "8d941744a633e69b0c7cd5555af8755f0d93b146fe424dc80089ab9000b787a6",
+        "sanitized_text": "Checked 227 packages in 3ms\nFound 1 incompatibility\nThe package `langgraph-sdk` requires `websockets>=14,<16`, but `16.0` is installed\n",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "backend-installed-help",
+      "evidence_class": "native_source_or_command_preflight",
+      "argv": [
+        "rtk",
+        "uv",
+        "run",
+        "--no-sync",
+        "deerflow",
+        "--help"
+      ],
+      "working_directory": "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend",
+      "started_at": "2026-09-30T06:09:16.293Z",
+      "finished_at": "2026-09-30T06:09:16.391Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 1133,
+        "raw_sha256": "67cc3a95ad26d4e6b074e20f9a8112a75646eb3dd7eb07cc898d3c965d510480",
+        "sanitized_text": "usage: deerflow [-h] [--print [MESSAGE]] [--json [MESSAGE]] [--tui]\n                [--tui-transparent] [--cli] [--continue] [--resume THREAD]\n                [--recursion-limit N]\n                [message ...]\n\nDeerFlow terminal workbench — a TUI over the embedded DeerFlow harness.\n\npositional arguments:\n  message              initial prompt for the TUI, or message in --cli mode\n\noptions:\n  -h, --help           show this help message and exit\n  --print [MESSAGE]    headless one-shot: print the final answer and exit\n                       (reads stdin if no MESSAGE)\n  --json [MESSAGE]     headless streaming: emit newline-delimited JSON\n                       StreamEvents and exit\n  --tui                force the terminal UI (error if unavailable)\n  --tui-transparent    use the terminal's default background in the TUI\n  --cli                force headless/classic mode for one invocation\n  --continue           resume the most recent thread\n  --resume THREAD      resume a thread by id or title\n  --recursion-limit N  headless agent-loop super-step limit (default: 100)\n\nExtension management: deerflow extensions --help\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-test-runner-install",
+      "evidence_class": "native_installation",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "install",
+        "--python",
+        "<private-prefix>/grader/bin/python",
+        "--only-binary",
+        ":all:",
+        "pytest==9.1.1",
+        "pytest-asyncio==1.3.0",
+        "pytest-dotenv==0.5.2",
+        "pytest-xdist==3.8.0",
+        "pytest-mock==3.15.1",
+        "pytest-cov==7.1.0",
+        "pytest-reportlog==1.0.0",
+        "pytest-custom-exit-code==0.3.0",
+        "pytest-rerunfailures==16.1"
+      ],
+      "working_directory": "<private-prefix>/inspect_evals-41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+      "started_at": "2026-09-30T06:10:15.752Z",
+      "finished_at": "2026-09-30T06:10:16.119Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 483,
+        "raw_sha256": "30dd3bf7833ccf1ebf2e91fa9c7f84e0e4541461c270c6790d3312f5c0f5e76b",
+        "sanitized_text": "Using Python 3.13.15 environment at: <private-prefix>/grader\nResolved 16 packages in 220ms\nPrepared 10 packages in 39ms\nInstalled 13 packages in 27ms\n + coverage==7.16.2\n + execnet==2.1.2\n + iniconfig==2.3.0\n + pluggy==1.6.0\n + pytest==9.1.1\n + pytest-asyncio==1.3.0\n + pytest-cov==7.1.0\n + pytest-custom-exit-code==0.3.0\n + pytest-dotenv==0.5.2\n + pytest-mock==3.15.1\n + pytest-reportlog==1.0.0\n + pytest-rerunfailures==16.1\n + pytest-xdist==3.8.0\n",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-native-tests",
+      "evidence_class": "unchanged_upstream_unit_tests",
+      "argv": [
+        "rtk",
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "-m",
+        "pytest",
+        "tests/gaia/test_scorer.py",
+        "-q"
+      ],
+      "working_directory": "<private-prefix>/inspect_evals-41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+      "started_at": "2026-09-30T06:10:45.685Z",
+      "finished_at": "2026-09-30T06:10:48.756Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 1642,
+        "raw_sha256": "b00fa05ec6e2a05dfa8c55687a15d5e1002a3bca873421f858f743205dcadf89",
+        "sanitized_text": "........                                                                 [100%]\n=============================== warnings summary ===============================\n../grader/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:954\n  <private-prefix>/grader/lib/python3.13/site-packages/pydantic/_internal/_generate_schema.py:954: PydanticDeprecatedSince20: `__get_validators__` is deprecated and will be removed, use `__get_pydantic_core_schema__` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n==================================== PASSES ====================================\n============================= slowest 10 durations =============================\n\n(10 durations < 0.005s hidden.  Use -vv to show these durations.)\n=========================== short test summary info ============================\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[42-42-C]\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[99-42-I]\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[3.14-3.14-C]\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[Hello World-hello world-C]\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[foo-bar-I]\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[apple, banana, cherry-apple, banana, cherry-C]\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[apple, banana-apple, banana, cherry-I]\nPASSED tests/gaia/test_scorer.py::test_gaia_scorer[$1,000-1000-C]\n8 passed, 1 warning in 0.22s\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-dependency-check",
+      "evidence_class": "native_dependency_check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<private-prefix>/grader/bin/python"
+      ],
+      "working_directory": "<private-prefix>/inspect_evals-41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+      "started_at": "2026-09-30T06:12:14.277Z",
+      "finished_at": "2026-09-30T06:12:14.331Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 161,
+        "raw_sha256": "3172fd7111e5f0c660b65d071a8524c528e02e0821b4192be847d23a944b1337",
+        "sanitized_text": "Using Python 3.13.15 environment at: <private-prefix>/grader\nChecked 110 packages in 1ms\nAll installed packages are compatible\n",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "grader-independent-observation",
+      "evidence_class": "independent_observation",
+      "argv": [
+        "rtk",
+        "<private-prefix>/grader/bin/python",
+        "-c",
+        "import json, sys, platform, hashlib, importlib.metadata as m, importlib.util as u; names=['inspect-ai','inspect-evals','pytest','pytest-asyncio','pytest-dotenv','pytest-xdist','pytest-mock','pytest-cov','pytest-reportlog','pytest-custom-exit-code','pytest-rerunfailures']; p=u.find_spec('inspect_evals.gaia.scorer').origin; print(json.dumps({'python':sys.version.split()[0],'platform':sys.platform,'architecture':platform.machine(),'versions':{n:m.version(n) for n in names},'distribution_count':len(list(m.distributions())),'installed_scorer_sha256':hashlib.sha256(open(p,'rb').read()).hexdigest(),'installed_scorer_origin':p},sort_keys=True))"
+      ],
+      "working_directory": "<private-prefix>/inspect_evals-41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+      "started_at": "2026-09-30T06:12:14.334Z",
+      "finished_at": "2026-09-30T06:12:16.547Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 645,
+        "raw_sha256": "138973e36a016bc4f49afe9c5a3de6b9e4d9f62b45bd929c05b9ab5eb05eb959",
+        "sanitized_text": "{\"architecture\": \"x86_64\", \"distribution_count\": 110, \"installed_scorer_origin\": \"<private-prefix>/grader/lib/python3.13/site-packages/inspect_evals/gaia/scorer.py\", \"installed_scorer_sha256\": \"49999358fb9602d390024bf7040139c142af1bb61e18c15043aea2af84fad56d\", \"platform\": \"linux\", \"python\": \"3.13.15\", \"versions\": {\"inspect-ai\": \"0.3.271\", \"inspect-evals\": \"0.22.0\", \"pytest\": \"9.1.1\", \"pytest-asyncio\": \"1.3.0\", \"pytest-cov\": \"7.1.0\", \"pytest-custom-exit-code\": \"0.3.0\", \"pytest-dotenv\": \"0.5.2\", \"pytest-mock\": \"3.15.1\", \"pytest-reportlog\": \"1.0.0\", \"pytest-rerunfailures\": \"16.1\", \"pytest-xdist\": \"3.8.0\"}}\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "backend-independent-observation",
+      "evidence_class": "independent_observation",
+      "argv": [
+        "rtk",
+        "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend/.venv/bin/python",
+        "-c",
+        "import json,sys,platform,importlib.metadata as m; names=['deerflow-harness','deerflow-extension-api','langchain-openai','langgraph-sdk','websockets','pytest','pytest-asyncio']; print(json.dumps({'python':sys.version.split()[0],'platform':sys.platform,'architecture':platform.machine(),'versions':{n:m.version(n) for n in names},'distribution_count':len(list(m.distributions()))},sort_keys=True))"
+      ],
+      "working_directory": "<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e/backend",
+      "started_at": "2026-09-30T06:12:16.550Z",
+      "finished_at": "2026-09-30T06:12:16.697Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 297,
+        "raw_sha256": "75da6caa73008e641a0bcb6bfeb43e8069d5ab70093888392ab58b50d1745840",
+        "sanitized_text": "{\"architecture\": \"x86_64\", \"distribution_count\": 227, \"platform\": \"linux\", \"python\": \"3.13.15\", \"versions\": {\"deerflow-extension-api\": \"0.2.1\", \"deerflow-harness\": \"2.1.0\", \"langchain-openai\": \"1.2.1\", \"langgraph-sdk\": \"0.4.2\", \"pytest\": \"9.0.3\", \"pytest-asyncio\": \"1.3.0\", \"websockets\": \"16.0\"}}\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    },
+    {
+      "id": "archive-source-independent-comparison",
+      "evidence_class": "independent_observation",
+      "argv": [
+        "rtk",
+        "python3",
+        "-c",
+        "import json,tarfile,pathlib,sys; sources=[[\"deerflow\",\"<private-prefix>/source.tar.gz\",\"<private-prefix>/deer-flow-345f08be00c8a9495079b732a39b46aa9af1584e\"],[\"inspect_evals\",\"<private-prefix>/grader-source.tar.gz\",\"<private-prefix>/inspect_evals-41c72eaa2b807ce43f35fac6f3f399318adc7e9d\"]]; results=[]\nfor name,archive,root in sources:\n count=0; mismatches=[]\n with tarfile.open(archive,'r:gz') as tar:\n  for member in tar.getmembers():\n   if not member.isfile(): continue\n   relative=pathlib.PurePosixPath(member.name).relative_to(pathlib.PurePosixPath(member.name).parts[0]); p=pathlib.Path(root)/str(relative); count+=1\n   if not p.is_file() or p.read_bytes()!=tar.extractfile(member).read(): mismatches.append(str(relative))\n results.append({'source':name,'original_regular_files_compared':count,'mismatches':mismatches})\nprint(json.dumps({'all_original_files_unchanged':all(not r['mismatches'] for r in results),'sources':results},sort_keys=True)); sys.exit(0 if all(not r['mismatches'] for r in results) else 1)"
+      ],
+      "working_directory": "<private-prefix>",
+      "started_at": "2026-09-30T06:13:12.290Z",
+      "finished_at": "2026-09-30T06:13:14.132Z",
+      "exit_code": 0,
+      "signal": null,
+      "stdout": {
+        "raw_bytes": 223,
+        "raw_sha256": "fc3993ef21ca44d70d7d8887fd8d9f28ecd8ac713cbf6f4559ada2da17a27adf",
+        "sanitized_text": "{\"all_original_files_unchanged\": true, \"sources\": [{\"mismatches\": [], \"original_regular_files_compared\": 2964, \"source\": \"deerflow\"}, {\"mismatches\": [], \"original_regular_files_compared\": 3973, \"source\": \"inspect_evals\"}]}\n",
+        "full_returned_stream": true
+      },
+      "stderr": {
+        "raw_bytes": 0,
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized_text": "",
+        "full_returned_stream": true
+      }
+    }
+  ],
+  "corrections": [
+    {
+      "date": "2026-09-30",
+      "claim": "The initially authored archive-extract record shortened argv to source.tar.gz.",
+      "correction": "Execution used the absolute archive path, now published as <private-prefix>/source.tar.gz.",
+      "verification": "Corrected against the exact spawned argument vector in the original execution call. Retained the original private recorder JSON before correcting it; its SHA256 is preserved here. No extraction/test result was replayed.",
+      "original_private_record_sha256": "cb6e41828992f6a7c53520eaf39d6ea8412d6eaf5c2171247e16b204d84b45be"
+    }
+  ],
+  "local_recipe_source": {
+    "base_revision": "be91e1f860a6cd4c07c9c56555dabc4309ad47cc",
+    "worktree_state": "DeerFlow recipe files are locally provided inputs in this branch; no acceptance as committed upstream source.",
+    "installer": "blueprints/runtime-workers/deerflow/recipe.py:install_grader",
+    "sha256": "f21cd2182226f6b77b81fbd399805e643cd65ead2f82a898116448dfe132b0bd",
+    "hash_scope": "Post-run local installer input identity; upstream source hashes and native output remain separate."
+  }
+}

@@ -1,0 +1,13 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/osv-scanner", "--version"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:46:06.511869+00:00
+ended_utc: 2026-09-30T15:46:06.592164+00:00
+exit_code: 0
+
+stdout:
+osv-scanner version: 2.6.0
+osv-scalibr version: 0.5.2
+commit: e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6
+built at: 2026-09-14T01:44:58Z
+
+stderr:

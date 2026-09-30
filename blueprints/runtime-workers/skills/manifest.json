@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "skills_trial_manifest",
   "scope": "project",
-  "checked_at": "2026-09-27",
+  "checked_at": "2026-09-30",
   "decision_record": "blueprints/runtime-workers/skills/research.md",
   "cli": {
     "package": "skills",
@@ -61,8 +61,8 @@
     {
       "name": "add-javadoc",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/add-javadoc",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/add-javadoc",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/add-javadoc",
       "tree_sha": "4fab124ceaaa67a393a674384015158e3f50b100",
       "skill_md_sha256": "93422a18b7d6a98ed4800c800c9d2a4842dc465454253038d9cc091bd5bd45e1",
@@ -78,7 +78,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Supplies domain-specific documentation or integration design guidance backed by the upstream implementation. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/add-javadoc/SKILL.md:1"
+      "merit_note": "Supplies domain-specific documentation or integration design guidance backed by the upstream implementation. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/add-javadoc/SKILL.md:1"
     },
     {
       "name": "agent-browser",
@@ -106,8 +106,8 @@
     {
       "name": "agent-canvas-environment",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-canvas-environment",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/agent-canvas-environment",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/agent-canvas-environment",
       "tree_sha": "f86b5b739f7a97afbf53f343beb63824942bcb4d",
       "skill_md_sha256": "40562401fb3e07a921f4a1451cc44a4ed6441239c18a4f334791fa6a953f103c",
@@ -123,13 +123,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers the optional Agent Canvas application environment; useful only on workers given that environment. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-canvas-environment/SKILL.md:1"
+      "merit_note": "Covers the optional Agent Canvas application environment; useful only on workers given that environment. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/agent-canvas-environment/SKILL.md:1"
     },
     {
       "name": "agent-creator",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-creator",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/agent-creator",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/agent-creator",
       "tree_sha": "1dd69a47d0bfecf45a52add4cf4081f2afd9bef4",
       "skill_md_sha256": "c7321d4a60420cefe8f06b8946d4501f0a6a18352f1f79e9526354266cf0109f",
@@ -144,13 +144,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-creator/SKILL.md:1"
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/agent-creator/SKILL.md:1"
     },
     {
       "name": "agent-memory",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-memory",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/agent-memory",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/agent-memory",
       "tree_sha": "7ae7fc4e3658214947c683162df6dce3a910d813",
       "skill_md_sha256": "f91fb602088b14732037b54c72de8648dd6c14b4261265eb0e4c87ac43b442bd",
@@ -168,13 +168,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-memory/SKILL.md:1"
+      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/agent-memory/SKILL.md:1"
     },
     {
       "name": "agent-readiness-report",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/agent-readiness-report",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/onboarding/skills/agent-readiness-report",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/onboarding/skills/agent-readiness-report",
       "tree_sha": "77d14adb7d8da1ff94707b5119800ff32643cab4",
       "skill_md_sha256": "e11eafa6fa0be079680bf49d7376dddff7261ec353e35a1a070d8d3c9f10b3b1",
@@ -190,13 +190,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/agent-readiness-report/SKILL.md:1"
+      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/onboarding/skills/agent-readiness-report/SKILL.md:1"
     },
     {
       "name": "agent-sdk-builder",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-sdk-builder",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/agent-sdk-builder",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/agent-sdk-builder",
       "tree_sha": "7c2ce2de2c2e607e53a4cb9980a2dde6a2a49f9a",
       "skill_md_sha256": "0085981836b18cd815079936ea7784e575a1def0d77ba41f72d9b2abe7589cab",
@@ -211,7 +211,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-sdk-builder/SKILL.md:1"
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/agent-sdk-builder/SKILL.md:1"
     },
     {
       "name": "agentic-actions-auditor",
@@ -239,8 +239,8 @@
     {
       "name": "azure-devops",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/azure-devops",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/azure-devops",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/azure-devops",
       "tree_sha": "dee8b13d0bd7e0a49f6ae17d78fd8f1fc4d1c356",
       "skill_md_sha256": "df602c5dc300b53b5163806ee6b573dab3126db64b4e7c237ba4ddfbb0c2d5fc",
@@ -255,13 +255,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/azure-devops/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/azure-devops/SKILL.md:1"
     },
     {
       "name": "bitbucket",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/bitbucket",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/bitbucket",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/bitbucket",
       "tree_sha": "459944c2558e7d82bc70f367c6ba084a276de343",
       "skill_md_sha256": "b9c7fb63cef358d8a21e8348c8c5290d60acc91c536774b88b7121bee6ff0bd1",
@@ -276,13 +276,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/bitbucket/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/bitbucket/SKILL.md:1"
     },
     {
       "name": "bitbucket-cloud",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/bitbucket-cloud",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/bitbucket-cloud",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/bitbucket-cloud",
       "tree_sha": "a54aed17547b26848f508043b2ea24e14339d77a",
       "skill_md_sha256": "05fa500943fea4940408098e2411cabaa2d316dabb7a56ceeacad3cd2e59057a",
@@ -297,13 +297,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/bitbucket-cloud/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/bitbucket-cloud/SKILL.md:1"
     },
     {
       "name": "bitbucket-data-center",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/bitbucket-data-center",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/bitbucket-data-center",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/bitbucket-data-center",
       "tree_sha": "6c5d58d993ee9e27e5d5c8db0b51c225535d16f5",
       "skill_md_sha256": "912dd5497f8bd3608b1dea6913732239f6cc1ca7996340884688c46a6c56193f",
@@ -318,7 +318,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/bitbucket-data-center/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/bitbucket-data-center/SKILL.md:1"
     },
     {
       "name": "brainstorming",
@@ -346,8 +346,8 @@
     {
       "name": "build-setup",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/build-setup",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/cobol-modernization/skills/build-setup",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/cobol-modernization/skills/build-setup",
       "tree_sha": "a20c5d119b1b4ba8a0391c9276196b2d0faaad0a",
       "skill_md_sha256": "922b0812ba608d51cf760372293f498818544695fe02c61ce7db593d187b8572",
@@ -363,7 +363,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/build-setup/SKILL.md:1"
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/cobol-modernization/skills/build-setup/SKILL.md:1"
     },
     {
       "name": "canvas-extension-api",
@@ -390,8 +390,8 @@
     {
       "name": "cobol-modernization",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/cobol-modernization",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/cobol-modernization/skills/cobol-modernization",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/cobol-modernization/skills/cobol-modernization",
       "tree_sha": "d86574828d9f3e5aea2b7066105eb44d9e97715c",
       "skill_md_sha256": "551452a767707ba2827fc654475e29d5c3735a6eef152e579decaa52b4e3759d",
@@ -407,13 +407,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/cobol-modernization/SKILL.md:1"
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/cobol-modernization/skills/cobol-modernization/SKILL.md:1"
     },
     {
       "name": "code-review",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/code-review",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/code-review",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/code-review",
       "tree_sha": "bd04e3765993619aae24ccabbd84b94121464334",
       "skill_md_sha256": "f4a3bf947db539fbb0467598c7bfed0ef25164278b5a22ad760eff5f78057dee",
@@ -429,13 +429,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/code-review/SKILL.md:1"
+      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/code-review/SKILL.md:1"
     },
     {
       "name": "code-simplifier",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/code-simplifier",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/code-simplifier",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/code-simplifier",
       "tree_sha": "6da51b9d5dee02ec26954c3961cb64bc21b69215",
       "skill_md_sha256": "ba5cfc2908e5d7e4a896a88c87294a348f356222e5f7118753ed443c0c3a1116",
@@ -451,7 +451,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/code-simplifier/SKILL.md:1"
+      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/code-simplifier/SKILL.md:1"
     },
     {
       "name": "codebase-design",
@@ -502,8 +502,8 @@
     {
       "name": "datadog",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/datadog",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/datadog",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/datadog",
       "tree_sha": "9fcb3bd5ed49971a98224e69d9d7d92fa49d7727",
       "skill_md_sha256": "c67db102d293d21ee9318d51e5da8e86ed2d5ed1d92635a6830552b83c457c7f",
@@ -518,13 +518,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Uses native logs, metrics or deployment state for operational diagnosis when the required service is present. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/datadog/SKILL.md:1"
+      "merit_note": "Uses native logs, metrics or deployment state for operational diagnosis when the required service is present. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/datadog/SKILL.md:1"
     },
     {
       "name": "deno",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/deno",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/deno",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/deno",
       "tree_sha": "521248e905142109eedf85ed8b05d12d7f95c099",
       "skill_md_sha256": "6704eb29264daea9cf63af19c216a9d1c0970a094830efedd02e0545feaa65c1",
@@ -540,7 +540,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/deno/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/deno/SKILL.md:1"
     },
     {
       "name": "diagnosing-bugs",
@@ -591,8 +591,8 @@
     {
       "name": "discord",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/discord",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/discord",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/discord",
       "tree_sha": "0759b6e8fa2e5910a180d499939128f2baa108a3",
       "skill_md_sha256": "ff1cc68562cddeb1f51289e0f5fe13dd272aa89d2b156624ceb8bc65b01ac23f",
@@ -608,7 +608,7 @@
         "research"
       ],
       "status": "trial",
-      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/discord/SKILL.md:1"
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/discord/SKILL.md:1"
     },
     {
       "name": "dispatching-parallel-agents",
@@ -657,8 +657,8 @@
     {
       "name": "docker",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/docker",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/docker",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/docker",
       "tree_sha": "7e742029273a6cd801c5fd1610bc052e467479b4",
       "skill_md_sha256": "d4c69e41982982cf1b71e265fbcaec478030bee0bf627285a48bea3a84373a3a",
@@ -674,7 +674,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/docker/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/docker/SKILL.md:1"
     },
     {
       "name": "docx",
@@ -725,8 +725,8 @@
     {
       "name": "evidence-based-citations",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/evidence-based-citations",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/evidence-based-citations",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/evidence-based-citations",
       "tree_sha": "8b146bdfaa2c21074edf3f3f89e6c322d79d0a56",
       "skill_md_sha256": "ebd2645e8e3651218d356c534ebcc453fafbd8b0ca36d9d9e7e7d60790ee7021",
@@ -743,7 +743,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/evidence-based-citations/SKILL.md:1"
+      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/evidence-based-citations/SKILL.md:1"
     },
     {
       "name": "executing-plans",
@@ -927,8 +927,8 @@
     {
       "name": "github-actions",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-actions",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github-actions",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/github-actions",
       "tree_sha": "1c2cde4572e3fdf3c3196846dba86a4ebd456121",
       "skill_md_sha256": "3bc931615299740031ec21eef92a3c1cc1acd91d88d6579c67e8e6021a0c83f0",
@@ -943,13 +943,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Supplies native workflow setup and debugging procedures instead of generated CI guesses. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-actions/SKILL.md:1"
+      "merit_note": "Supplies native workflow setup and debugging procedures instead of generated CI guesses. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github-actions/SKILL.md:1"
     },
     {
       "name": "github-agents-md-maintainer",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-agents-md-maintainer",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github-agents-md-maintainer",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/github-agents-md-maintainer",
       "tree_sha": "6eeab0e65e71aeeaf21e69d3583c4aab8adf45ce",
       "skill_md_sha256": "a117d2f599af00a8b1f890b1cecda2a144cc1e59ae1a0370f5798b97377ec206",
@@ -967,13 +967,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-agents-md-maintainer/SKILL.md:1"
+      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github-agents-md-maintainer/SKILL.md:1"
     },
     {
       "name": "github-delivery-watchdog",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-delivery-watchdog",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github-delivery-watchdog",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/github-delivery-watchdog",
       "tree_sha": "c90ad6ae786552737e7ab2a011310627c5f0acae",
       "skill_md_sha256": "536cb76358c784e882c02d0040fe33fe19038fdf2b9050a94739ec07f760bce9",
@@ -988,13 +988,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-delivery-watchdog/SKILL.md:1"
+      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github-delivery-watchdog/SKILL.md:1"
     },
     {
       "name": "github-issue-to-pr",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-issue-to-pr",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github-issue-to-pr",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/github-issue-to-pr",
       "tree_sha": "a8d0921bfb255e12d6f97754c54d79ac72d9b83d",
       "skill_md_sha256": "602425d9c99c774e2b4a31ac816313f3e64171a72ff34dcc6aa50a1c6b14ba6a",
@@ -1009,13 +1009,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-issue-to-pr/SKILL.md:1"
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github-issue-to-pr/SKILL.md:1"
     },
     {
       "name": "github-issue-triage",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-issue-triage",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github-issue-triage",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/github-issue-triage",
       "tree_sha": "9df1430bf1402390fa7070105b589a87861254ed",
       "skill_md_sha256": "eec8e8f6d1c9f41f898f438f037c082476ae3a08f70e609a4458c12c196861e3",
@@ -1030,13 +1030,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-issue-triage/SKILL.md:1"
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github-issue-triage/SKILL.md:1"
     },
     {
       "name": "github-pr-review",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-pr-review",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github-pr-review",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/github-pr-review",
       "tree_sha": "f4e742826b7154635c79820a1cb015906b260a6d",
       "skill_md_sha256": "8b1c2f74dede90bbb7a524b66e991f9eb8ab3068b349ad343ca986668567652c",
@@ -1051,7 +1051,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-pr-review/SKILL.md:1"
+      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github-pr-review/SKILL.md:1"
     },
     {
       "name": "github-pr-reviewer",
@@ -1077,8 +1077,8 @@
     {
       "name": "github-repo-monitor",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-repo-monitor",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github-repo-monitor",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/github-repo-monitor",
       "tree_sha": "e779e4edf79c281f7c9a35cf586eb6084b5046db",
       "skill_md_sha256": "8a51a228f4a372162d0f3545ac44a1ce7a7d6616fab0b00fbdcd19789a85e52c",
@@ -1093,7 +1093,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-repo-monitor/SKILL.md:1"
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github-repo-monitor/SKILL.md:1"
     },
     {
       "name": "github-stale-ci-pr-closer",
@@ -1119,8 +1119,8 @@
     {
       "name": "gitlab",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/gitlab",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/gitlab",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/gitlab",
       "tree_sha": "29879a030a0dd27de75c2674a242492c9d90a5a6",
       "skill_md_sha256": "214c4db1a10ec41b81549e5625312b7d686772fba1258379e30013e3789f7fd7",
@@ -1135,13 +1135,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/gitlab/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/gitlab/SKILL.md:1"
     },
     {
       "name": "gitlab-issue-to-mr",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/gitlab-issue-to-mr",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/gitlab-issue-to-mr",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/gitlab-issue-to-mr",
       "tree_sha": "42357f9cfc48574ac142cec1f488ed6bb06ce4db",
       "skill_md_sha256": "95b4390e73cc3ba60be239a403a50f08c64185a804aeb58589c17806609e6738",
@@ -1156,7 +1156,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/gitlab-issue-to-mr/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/gitlab-issue-to-mr/SKILL.md:1"
     },
     {
       "name": "gpt-researcher",
@@ -1232,8 +1232,8 @@
     {
       "name": "improve-agent-readiness",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/improve-agent-readiness",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/onboarding/skills/improve-agent-readiness",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/onboarding/skills/improve-agent-readiness",
       "tree_sha": "6b8dcd8f430d8faefbee3cc3bcc4450dea68f65f",
       "skill_md_sha256": "e34bcd869080b07ac7de88172013562b151d2b74506994b6192765f735ed499c",
@@ -1249,7 +1249,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/improve-agent-readiness/SKILL.md:1"
+      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/onboarding/skills/improve-agent-readiness/SKILL.md:1"
     },
     {
       "name": "improve-codebase-architecture",
@@ -1278,8 +1278,8 @@
     {
       "name": "incident-retrospective",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/incident-retrospective",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/incident-retrospective",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/incident-retrospective",
       "tree_sha": "f12d464f1cdc9584f5fe9677f2c75119226a09c5",
       "skill_md_sha256": "bf99ca3938e3245be78cbb4638cbdea9d38f1f42ad051750a3a52bba92e953dc",
@@ -1295,13 +1295,13 @@
         "research"
       ],
       "status": "trial",
-      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/incident-retrospective/SKILL.md:1"
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/incident-retrospective/SKILL.md:1"
     },
     {
       "name": "iterate",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/iterate",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/iterate",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/iterate",
       "tree_sha": "7152a93b2b9f725f52c5252d988819fe0030661a",
       "skill_md_sha256": "58249391292da7a903f0e91483d959b78d405b77956c13f020df5eab7789495a",
@@ -1316,7 +1316,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Diagnoses failing checks or manages stalled CI work; explicit authorization still controls external mutations. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/iterate/SKILL.md:1"
+      "merit_note": "Diagnoses failing checks or manages stalled CI work; explicit authorization still controls external mutations. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/iterate/SKILL.md:1"
     },
     {
       "name": "iterative-retrieval",
@@ -1346,8 +1346,8 @@
     {
       "name": "jira-issue-to-pr",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/jira-issue-to-pr",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/jira-issue-to-pr",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/jira-issue-to-pr",
       "tree_sha": "e216374c7bc95f6705707e11a1cc65dda9267964",
       "skill_md_sha256": "e5c143d6c0256e7cc1786716d358534701154ff86ea26495c8fa5eacf168ce26",
@@ -1362,13 +1362,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/jira-issue-to-pr/SKILL.md:1"
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/jira-issue-to-pr/SKILL.md:1"
     },
     {
       "name": "jupyter",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/jupyter",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/jupyter",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/jupyter",
       "tree_sha": "ae3ccf3f0bc3ec470f740d9cebed4dfb1b1628b8",
       "skill_md_sha256": "11f5663bd9bc329844217cb6d3bacc8f475169080f3d859a36d4d0973bd7128e",
@@ -1385,7 +1385,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Supports reproducible notebook execution and inspection for research and extraction evaluation. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/jupyter/SKILL.md:1"
+      "merit_note": "Supports reproducible notebook execution and inspection for research and extraction evaluation. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/jupyter/SKILL.md:1"
     },
     {
       "name": "jupyter-notebook",
@@ -1413,8 +1413,8 @@
     {
       "name": "kubernetes",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/kubernetes",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/kubernetes",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/kubernetes",
       "tree_sha": "68d887ccaf357723985bae1130706a7145e4d38d",
       "skill_md_sha256": "e1c28130b212211c33138e0977e64dc57f368c42d6588e2bd173092cc9d4a96d",
@@ -1430,13 +1430,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/kubernetes/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/kubernetes/SKILL.md:1"
     },
     {
       "name": "learn-from-code-review",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/learn-from-code-review",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/learn-from-code-review",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/learn-from-code-review",
       "tree_sha": "28da28ac893f281737349c3867b5640ae348b0b4",
       "skill_md_sha256": "146a6ec99296501601c2918644cbca54a337cca3290d173ac5ce64a5c62db497",
@@ -1454,13 +1454,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/learn-from-code-review/SKILL.md:1"
+      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/learn-from-code-review/SKILL.md:1"
     },
     {
       "name": "linear",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/linear",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/linear",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/linear",
       "tree_sha": "3419cdad4edd8d23c9eb5cdafa834ac50be9ef3d",
       "skill_md_sha256": "f0a509cc3268de2d716dce1b66de027c91b71d26ca330ab1a59363b169d2ae03",
@@ -1475,13 +1475,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/linear/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/linear/SKILL.md:1"
     },
     {
       "name": "linear-triage",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/linear-triage",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/linear-triage",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/linear-triage",
       "tree_sha": "8a87f4b44d8fe3f1a78159a64639f68268ef4eec",
       "skill_md_sha256": "4a6dfb4a604c995879039bcffa65e38b18083faee57c08d9a8ab876ed5993e87",
@@ -1496,13 +1496,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/linear-triage/SKILL.md:1"
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/linear-triage/SKILL.md:1"
     },
     {
       "name": "mainframe-planning",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/mainframe-planning",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/cobol-modernization/skills/mainframe-planning",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/cobol-modernization/skills/mainframe-planning",
       "tree_sha": "03983adeb00274f278921eb04bc8d3b4ed3ac1a4",
       "skill_md_sha256": "a6e64ed015955951520b69e5e87e0aea6ec2693bacc6af60ba488a0a59c61c96",
@@ -1518,13 +1518,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/mainframe-planning/SKILL.md:1"
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/cobol-modernization/skills/mainframe-planning/SKILL.md:1"
     },
     {
       "name": "mainframe-removal",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/mainframe-removal",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/cobol-modernization/skills/mainframe-removal",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/cobol-modernization/skills/mainframe-removal",
       "tree_sha": "5fa438fb84c8a8208993b094fdcb0ee2bbb8e625",
       "skill_md_sha256": "bf0c95e28074dd27c4c2facb31783ef079e9dcb551eec8f84a554e845556f2f3",
@@ -1540,7 +1540,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/mainframe-removal/SKILL.md:1"
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/cobol-modernization/skills/mainframe-removal/SKILL.md:1"
     },
     {
       "name": "mcp-builder",
@@ -1568,8 +1568,8 @@
     {
       "name": "migration-mapping",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/migration-mapping",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/migration-scoring/skills/migration-mapping",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/migration-scoring/skills/migration-mapping",
       "tree_sha": "01541663c7d326717eb97454e8cff37bd907d1af",
       "skill_md_sha256": "6b65c7e6b15576bd97506ae0ee10e0a6bbb24ed1b2d5946232b2b9b9a540bca1",
@@ -1585,13 +1585,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/migration-mapping/SKILL.md:1"
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/migration-scoring/skills/migration-mapping/SKILL.md:1"
     },
     {
       "name": "migration-report",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/migration-report",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/migration-scoring/skills/migration-report",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/migration-scoring/skills/migration-report",
       "tree_sha": "7080394b2efd3de63a5251d95a1a6d6ac7b1e943",
       "skill_md_sha256": "0e61fd550879bd54f25f7c970aaab4f66e9b970142c5d761674e4e8b3e7ed827",
@@ -1607,13 +1607,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/migration-report/SKILL.md:1"
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/migration-scoring/skills/migration-report/SKILL.md:1"
     },
     {
       "name": "migration-scoring",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/migration-scoring",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/migration-scoring/skills/migration-scoring",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/migration-scoring/skills/migration-scoring",
       "tree_sha": "d7bb843a85e64349b97add0947677273f79c36ce",
       "skill_md_sha256": "46764ec6b66b3d1ebdfcc25c771235b45a4b88fa4467fcb002208996665be0ee",
@@ -1629,7 +1629,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/migration-scoring/SKILL.md:1"
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/migration-scoring/skills/migration-scoring/SKILL.md:1"
     },
     {
       "name": "modern-python",
@@ -1657,8 +1657,8 @@
     {
       "name": "news-digest",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/news-digest",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/news-digest",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/news-digest",
       "tree_sha": "0992f4bc12fbc02444662a3870abe0a755ad1b5f",
       "skill_md_sha256": "833aace23ab5b4a5fc44aec71962d1cc0ae88172c4c7659052b3c7f1ada9cf5c",
@@ -1674,13 +1674,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Defines deduplicated feed collection and dated source summaries for recurring research. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/news-digest/SKILL.md:1"
+      "merit_note": "Defines deduplicated feed collection and dated source summaries for recurring research. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/news-digest/SKILL.md:1"
     },
     {
       "name": "notion",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/notion",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/notion",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/notion",
       "tree_sha": "f9d670bf2279e7da84fc7da6276cb3854ac9d64e",
       "skill_md_sha256": "2ae4b3833a31781501c64e50ecfdda7c1abff34cc33687b039737a2731ab7ac7",
@@ -1696,13 +1696,13 @@
         "research"
       ],
       "status": "trial",
-      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/notion/SKILL.md:1"
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/notion/SKILL.md:1"
     },
     {
       "name": "npm",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/npm",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/npm",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/npm",
       "tree_sha": "34c1b85200cd6c5629b9c3b997a928aaa8a9e307",
       "skill_md_sha256": "f29251d112f6ba935eed0b36ccae2696f9080bdeb7fd852846f729161f7e30f2",
@@ -1718,13 +1718,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/npm/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/npm/SKILL.md:1"
     },
     {
       "name": "openhands-api",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-api",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/openhands-api",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/openhands-api",
       "tree_sha": "eaec51032ac36cf864f0079bd67698bf41adec04",
       "skill_md_sha256": "f0124b4e04066b3b575d7d11c93aaac16014df7e1eeaaff03383b1b26613259e",
@@ -1739,13 +1739,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-api/SKILL.md:1"
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/openhands-api/SKILL.md:1"
     },
     {
       "name": "openhands-automation",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-automation",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/openhands-automation",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/openhands-automation",
       "tree_sha": "7c5f5a3d5317e187eb9b95d407570a6e93ce989b",
       "skill_md_sha256": "b6201e8cd9900476cb14ccc60f92bcb3c3a61847a6bad3cb259d95f385e09a28",
@@ -1760,13 +1760,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-automation/SKILL.md:1"
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/openhands-automation/SKILL.md:1"
     },
     {
       "name": "openhands-enterprise-troubleshooting",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-enterprise-troubleshooting",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/openhands-enterprise-troubleshooting",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/openhands-enterprise-troubleshooting",
       "tree_sha": "bbe40867eeaa2d890a57df32331003d35ea0635a",
       "skill_md_sha256": "b7baa048b8fbcbb971dd0be8d96104689091b58304ffea276819ad0fabd51382",
@@ -1781,13 +1781,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Uses native logs, metrics or deployment state for operational diagnosis when the required service is present. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-enterprise-troubleshooting/SKILL.md:1"
+      "merit_note": "Uses native logs, metrics or deployment state for operational diagnosis when the required service is present. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/openhands-enterprise-troubleshooting/SKILL.md:1"
     },
     {
       "name": "openhands-sdk",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-sdk",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/openhands-sdk",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/openhands-sdk",
       "tree_sha": "65f0af3cda9aa9df67f7e65b7276408cb457d531",
       "skill_md_sha256": "033b9e64ec7639f4b793dc1fbf856757ac35dad096e0efc795f27872aa920a97",
@@ -1802,7 +1802,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-sdk/SKILL.md:1"
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/openhands-sdk/SKILL.md:1"
     },
     {
       "name": "pdf",
@@ -1830,8 +1830,8 @@
     {
       "name": "pdflatex",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/pdflatex",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/pdflatex",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/pdflatex",
       "tree_sha": "67c755b61c4ae488a59a98d34a160305fd2bb747",
       "skill_md_sha256": "cf92e9e088dffea0c4849d85fa1d50697e1285f77896a3b03eec026ce61ff889",
@@ -1848,13 +1848,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/pdflatex/SKILL.md:1"
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/pdflatex/SKILL.md:1"
     },
     {
       "name": "plain-english-content",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/plain-english-content",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/plain-english-content",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/plain-english-content",
       "tree_sha": "67903279d5ec4d43eb69f16fcbc964a3bde22862",
       "skill_md_sha256": "2ef939ec154a2555a1018233ab818a4b0c92b16668c747b1ad9886a567c04ca2",
@@ -1871,7 +1871,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/plain-english-content/SKILL.md:1"
+      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/plain-english-content/SKILL.md:1"
     },
     {
       "name": "playwright",
@@ -1921,8 +1921,8 @@
     {
       "name": "prd",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/prd",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/prd",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/prd",
       "tree_sha": "d009702520f9617ffea98984b75f176a7d9535e9",
       "skill_md_sha256": "5de2431f9ceb205f76978940b7c1c65e503bb9603410088b8af75bdf2749eb61",
@@ -1939,7 +1939,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/prd/SKILL.md:1"
+      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/prd/SKILL.md:1"
     },
     {
       "name": "property-based-testing",
@@ -1968,8 +1968,8 @@
     {
       "name": "qa-changes",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/qa-changes",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/qa-changes",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/qa-changes",
       "tree_sha": "350f5d613a6d9d05ab6a4fc0adfaf9a62249e21e",
       "skill_md_sha256": "e4819ced02fce8f19436d2314eb8426e4b4d2519cefa41c000908b53c45ff971",
@@ -1985,7 +1985,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Exercises browser-visible behavior and retains observable QA artifacts for applications and extraction callers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/qa-changes/SKILL.md:1"
+      "merit_note": "Exercises browser-visible behavior and retains observable QA artifacts for applications and extraction callers. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/qa-changes/SKILL.md:1"
     },
     {
       "name": "receiving-code-review",
@@ -2012,8 +2012,8 @@
     {
       "name": "release-notes",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/release-notes",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/release-notes",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/release-notes",
       "tree_sha": "1494e93e3459d395907a4c00b815f93858bca20b",
       "skill_md_sha256": "5250f2d1aa52272a91f0b0469f6b52079d4931b8bf32784b559706c87b8aeffb",
@@ -2029,7 +2029,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Derives categorized release notes from repository history rather than model recollection. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/release-notes/SKILL.md:1"
+      "merit_note": "Derives categorized release notes from repository history rather than model recollection. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/release-notes/SKILL.md:1"
     },
     {
       "name": "requesting-code-review",
@@ -2080,8 +2080,8 @@
     {
       "name": "research-brief",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/research-brief",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/research-brief",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/research-brief",
       "tree_sha": "96203abcbcdf42313e48380d51b5785e8d2a823b",
       "skill_md_sha256": "662a6bf42ec9964bfe9d7f996ffe0fb388fec3e7c955df473d4bd729cd8309e6",
@@ -2098,7 +2098,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Defines recurring source-led research briefs with verifiable sources; Tavily/Notion integrations require native setup and publishing authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/research-brief/SKILL.md:1"
+      "merit_note": "Defines recurring source-led research briefs with verifiable sources; Tavily/Notion integrations require native setup and publishing authority. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/research-brief/SKILL.md:1"
     },
     {
       "name": "resolving-merge-conflicts",
@@ -2148,8 +2148,8 @@
     {
       "name": "score-quality",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/score-quality",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/migration-scoring/skills/score-quality",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/migration-scoring/skills/score-quality",
       "tree_sha": "15e66548eca0b7a0fc52d2f6ba528b9cd028d525",
       "skill_md_sha256": "c0a0955e32eff9c6671b9d2d68eae9d55134d78c5193bd3fda506b50e020fd8a",
@@ -2165,13 +2165,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/score-quality/SKILL.md:1"
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/migration-scoring/skills/score-quality/SKILL.md:1"
     },
     {
       "name": "score-style",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/score-style",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/migration-scoring/skills/score-style",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/migration-scoring/skills/score-style",
       "tree_sha": "5ea273ae511d5fc02eedeb0afe55c11c0712d65a",
       "skill_md_sha256": "7c461adc030dda47100f26f8acea6c3098975789c7646b17eec8549985f30702",
@@ -2187,7 +2187,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/score-style/SKILL.md:1"
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/migration-scoring/skills/score-style/SKILL.md:1"
     },
     {
       "name": "search-first",
@@ -2217,8 +2217,8 @@
     {
       "name": "security",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/security",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/security",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/security",
       "tree_sha": "17f0062e8f675bce2b5c4d3d6ffb30a6e94017d6",
       "skill_md_sha256": "887a8c46466e388665d4b6679a6d1fe02c6a79b527c38aed6a5a6291b6831fa3",
@@ -2234,7 +2234,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/security/SKILL.md:1"
+      "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/security/SKILL.md:1"
     },
     {
       "name": "security-best-practices",
@@ -2307,8 +2307,8 @@
     {
       "name": "setup-agents-md",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/setup-agents-md",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/onboarding/skills/setup-agents-md",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/onboarding/skills/setup-agents-md",
       "tree_sha": "4699322855418d8df34d0c8e0d61042d267ff026",
       "skill_md_sha256": "33abece9c9e2726377e39d4adb0569ed46c6336e8bfc41e290462940e008a613",
@@ -2324,13 +2324,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/setup-agents-md/SKILL.md:1"
+      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/onboarding/skills/setup-agents-md/SKILL.md:1"
     },
     {
       "name": "setup-openhands",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/setup-openhands",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/onboarding/skills/setup-openhands",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/onboarding/skills/setup-openhands",
       "tree_sha": "160dd94a55fb88d883a3f7b576378a0140e26a7a",
       "skill_md_sha256": "1c2381e0c1547d3c5efe675f3ae0a6e863fefb5e6867178162772770522f9629",
@@ -2345,13 +2345,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Supplies native workflow setup and debugging procedures instead of generated CI guesses. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/setup-openhands/SKILL.md:1"
+      "merit_note": "Supplies native workflow setup and debugging procedures instead of generated CI guesses. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/onboarding/skills/setup-openhands/SKILL.md:1"
     },
     {
       "name": "setup-pr-review",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/setup-pr-review",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/onboarding/skills/setup-pr-review",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/onboarding/skills/setup-pr-review",
       "tree_sha": "fa20714069063b154a9afc08c21bbb6acbc2817c",
       "skill_md_sha256": "70b8d5fb44619412ff7b9bc7794a94ab4a6ab9f14198218c85739463026b1513",
@@ -2366,7 +2366,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/setup-pr-review/SKILL.md:1"
+      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/onboarding/skills/setup-pr-review/SKILL.md:1"
     },
     {
       "name": "skill-creator",
@@ -2394,8 +2394,8 @@
     {
       "name": "slack-channel-monitor",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/slack-channel-monitor",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/slack-channel-monitor",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/slack-channel-monitor",
       "tree_sha": "d3dfabd9f8790f45e6a15274510050817dd6d0da",
       "skill_md_sha256": "2699798becdf629b7a837bca297c91fe26fa486fdf2a3a80ca628c56463f3f40",
@@ -2411,13 +2411,13 @@
         "research"
       ],
       "status": "trial",
-      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/slack-channel-monitor/SKILL.md:1"
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/slack-channel-monitor/SKILL.md:1"
     },
     {
       "name": "slack-standup-digest",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/slack-standup-digest",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/slack-standup-digest",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/slack-standup-digest",
       "tree_sha": "9e7ff432df4f3610aaf5628503b8e69122fe119e",
       "skill_md_sha256": "58e779cdde7f0029d31df290f0d3a93600fa902ba077393b392a51cbd7e5e699",
@@ -2433,13 +2433,13 @@
         "research"
       ],
       "status": "trial",
-      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/slack-standup-digest/SKILL.md:1"
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/slack-standup-digest/SKILL.md:1"
     },
     {
       "name": "spark-version-upgrade",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/spark-version-upgrade",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/spark-version-upgrade",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/spark-version-upgrade",
       "tree_sha": "1fade147a86861825148668e9157b8078a45b32b",
       "skill_md_sha256": "4351d37aec3b7b19cc52bba87aaa8c48c67c0ee4a50e73afcb175aeca4fe4762",
@@ -2455,13 +2455,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/spark-version-upgrade/SKILL.md:1"
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/spark-version-upgrade/SKILL.md:1"
     },
     {
       "name": "ssh",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/ssh",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/ssh",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/ssh",
       "tree_sha": "3faad5282472c8b5ccb6ecdef8ef3c5e0f64251d",
       "skill_md_sha256": "ca7cca10ed32ca284afafecff35fa3218aa9baee1ed62ab415393adfe9817324",
@@ -2477,7 +2477,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/ssh/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/ssh/SKILL.md:1"
     },
     {
       "name": "subagent-driven-development",
@@ -2525,8 +2525,8 @@
     {
       "name": "swift-linux",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/swift-linux",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/swift-linux",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/swift-linux",
       "tree_sha": "60790b9ebdbbf4794cc5614e999f08b8b90bce88",
       "skill_md_sha256": "e4c39d4cfd04335df7e6d6d799470143ac7e805d7a98ca9366f2867a65c80ccc",
@@ -2542,7 +2542,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/swift-linux/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/swift-linux/SKILL.md:1"
     },
     {
       "name": "systematic-debugging",
@@ -2593,8 +2593,8 @@
     {
       "name": "technical-writing",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/technical-writing",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/technical-writing",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/technical-writing",
       "tree_sha": "c3d06b8ed68fbdff5c19d8e03ffba2de2530b081",
       "skill_md_sha256": "ddd627776d70161f3296dbbbb79c9592a9d89e4eab0622b9217eed648dae7b05",
@@ -2611,7 +2611,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/technical-writing/SKILL.md:1"
+      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/technical-writing/SKILL.md:1"
     },
     {
       "name": "test-driven-development",
@@ -2638,8 +2638,8 @@
     {
       "name": "theme-factory",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/theme-factory",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/theme-factory",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/theme-factory",
       "tree_sha": "8942a4f915c681dbc62047d4bfa11f998738ecb0",
       "skill_md_sha256": "c35893e221e28895c52143cc11bf30e41a44817796b39d4b15727dadc9796552",
@@ -2656,13 +2656,13 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/theme-factory/SKILL.md:1"
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/theme-factory/SKILL.md:1"
     },
     {
       "name": "ticket-to-code-change",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/ticket-to-code-change",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/ticket-to-code-change",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/ticket-to-code-change",
       "tree_sha": "062c50c64ebe0b86de3adda752208dd8b3539d49",
       "skill_md_sha256": "1d063f120e1238dadea3b1a59531373e249b815b772e1970e99fa0fea3cffcc2",
@@ -2677,13 +2677,13 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/ticket-to-code-change/SKILL.md:1"
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/ticket-to-code-change/SKILL.md:1"
     },
     {
       "name": "to-java-migration",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/to-java-migration",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/plugins/cobol-modernization/skills/to-java-migration",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "plugins/cobol-modernization/skills/to-java-migration",
       "tree_sha": "e5bc7457ba29e05f0abdedb957f6121dd15e795e",
       "skill_md_sha256": "59e8581f49351e9fa6e89ae76faa8a3c59bc014797f26cfa54769de4cd4c1970",
@@ -2699,7 +2699,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/to-java-migration/SKILL.md:1"
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b plugins/cobol-modernization/skills/to-java-migration/SKILL.md:1"
     },
     {
       "name": "to-spec",
@@ -2771,8 +2771,8 @@
     {
       "name": "upstream-fork-sync",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/upstream-fork-sync",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/upstream-fork-sync",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/upstream-fork-sync",
       "tree_sha": "2dbfcf26ede4df1236f2d5882defc39b639d2574",
       "skill_md_sha256": "c53faa66ce41f0846116b4463313e4a985024eccd6e6ec6d0603a869aee0186d",
@@ -2788,7 +2788,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Covers source-control state, conflicts and integration steps through native git/GitHub operations. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/upstream-fork-sync/SKILL.md:1"
+      "merit_note": "Covers source-control state, conflicts and integration steps through native git/GitHub operations. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/upstream-fork-sync/SKILL.md:1"
     },
     {
       "name": "using-git-worktrees",
@@ -2835,8 +2835,8 @@
     {
       "name": "uv",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/uv",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/uv",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/uv",
       "tree_sha": "35be5b0352ad8f5cba3b92b3fbb6162b260e9a24",
       "skill_md_sha256": "e321822ec05752b5fd8b967f6bec30f0e9fd5d7d042aaf5a5d7002829d788315",
@@ -2852,7 +2852,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/uv/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/uv/SKILL.md:1"
     },
     {
       "name": "variant-analysis",
@@ -2879,8 +2879,8 @@
     {
       "name": "vercel",
       "source": "OpenHands/extensions",
-      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/vercel",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "url": "https://github.com/OpenHands/extensions/tree/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/vercel",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
       "path": "skills/vercel",
       "tree_sha": "a1a03f2db71aea8b1a1f8cedea6cfd57963de76b",
       "skill_md_sha256": "4060634017206b72caca6ad05195cd015a5309569d336cbc5b04dab263769b12",
@@ -2896,7 +2896,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/vercel/SKILL.md:1"
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/vercel/SKILL.md:1"
     },
     {
       "name": "vercel-composition-patterns",
@@ -3861,7 +3861,7 @@
       "name": "code-review",
       "selected": {
         "source": "OpenHands/extensions",
-        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
         "path": "skills/code-review"
       },
       "alternatives": [
@@ -3877,7 +3877,7 @@
       "name": "linear",
       "selected": {
         "source": "OpenHands/extensions",
-        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
         "path": "skills/linear"
       },
       "alternatives": [
@@ -3893,7 +3893,7 @@
       "name": "release-notes",
       "selected": {
         "source": "OpenHands/extensions",
-        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
         "path": "skills/release-notes"
       },
       "alternatives": [
@@ -3909,7 +3909,7 @@
       "name": "theme-factory",
       "selected": {
         "source": "OpenHands/extensions",
-        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
         "path": "skills/theme-factory"
       },
       "alternatives": [
@@ -4498,11 +4498,29 @@
   "sources": [
     {
       "source": "OpenHands/extensions",
-      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
-      "resolved_via": "gh api repos/OpenHands/extensions/commits/bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
-      "commit_date": "2026-09-27T12:29:58Z",
+      "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
+      "resolved_via": "gh api repos/OpenHands/extensions/commits/9495f4c59dd5fea2cee9e87ab37a6abda649627b",
+      "commit_date": "2026-09-30T02:54:34Z",
       "selected_skills": 77,
-      "tree_response_truncated": false
+      "tree_response_truncated": false,
+      "selected_refs": [
+        {
+          "ref": "9495f4c59dd5fea2cee9e87ab37a6abda649627b",
+          "selected_skills": 73,
+          "basis": "Unchanged native git folder tree and actual SKILL.md bytes; source discovery passed."
+        },
+        {
+          "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+          "selected_skills": 4,
+          "names": [
+            "canvas-extension-api",
+            "github",
+            "github-pr-reviewer",
+            "github-stale-ci-pr-closer"
+          ],
+          "basis": "Retained because current upstream changed body or executable resources; not qualified by discovery alone."
+        }
+      ]
     },
     {
       "source": "affaan-m/ECC",
@@ -4600,5 +4618,13 @@
     "provider_input_tokens_before": null,
     "provider_input_tokens_after": null,
     "meaning": "Catalog byte/character sums only, not first-prompt tokens. Measure native requests as specified in README."
+  },
+  "source_refresh": {
+    "record": "blueprints/runtime-workers/skills/refresh-20260930.json",
+    "freshness_report": "blueprints/runtime-workers/skills/freshness-20260930.json",
+    "before_report": "blueprints/runtime-workers/skills/freshness-20260930-before.json",
+    "scope": "Source identity, body/tree equality and isolated native SDK discovery; no installation or invocation acceptance.",
+    "openhands_inventory_ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+    "task_profiles": "blueprints/runtime-workers/skills/profiles.json"
   }
 }

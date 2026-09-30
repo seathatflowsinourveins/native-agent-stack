@@ -1,0 +1,15 @@
+argv: ["rtk", "proxy", "uv", "pip", "install", "--python", "<PRIVATE_RESEARCH>/venv/bin/python", "--require-hashes", "--no-deps", "--only-binary", ":all:", "--index-url", "https://pypi.org/simple", "-r", "<WORKTREE>/blueprints/runtime-workers/openhands/build-requirements.lock"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:04:35.841872+00:00
+ended_utc: 2026-09-30T17:04:36.044919+00:00
+exit_code: 0
+
+stdout:
+
+stderr:
+Using Python 3.13.15 environment at: <PRIVATE_RESEARCH>/venv
+Resolved 3 packages in 75ms
+Installed 3 packages in 48ms
+ + packaging==26.3
+ + setuptools==84.0.0
+ + wheel==0.46.3

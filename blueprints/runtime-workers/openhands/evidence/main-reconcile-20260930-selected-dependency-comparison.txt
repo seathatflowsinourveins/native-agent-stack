@@ -1,0 +1,1959 @@
+$ ["rtk", "<PRIVATE_RESEARCH>/venv/bin/python", "<WORKTREE>/blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-compare.py.txt", "<PRIVATE_RESEARCH>"]
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "scope": "Selected Linux x86_64 dependencies on CPython 3.13.15; source-byte comparison.",
+  "target": {
+    "implementation_name": "cpython",
+    "implementation_version": "3.13.15",
+    "os_name": "posix",
+    "platform_machine": "x86_64",
+    "platform_python_implementation": "CPython",
+    "platform_system": "Linux",
+    "python_full_version": "3.13.15",
+    "python_version": "3.13",
+    "sys_platform": "linux"
+  },
+  "parser": {
+    "name": "packaging",
+    "version": "26.3"
+  },
+  "files": [
+    {
+      "role": "reviewed_main",
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "revision": "f03f41c7",
+      "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64"
+    },
+    {
+      "role": "candidate_input",
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "revision": "bb3d00dc1ed493726481d0d3d746f6b0b46ed8bd",
+      "sha256": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676"
+    },
+    {
+      "role": "reconciled",
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "revision": "working_tree",
+      "sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106"
+    }
+  ],
+  "selection": [
+    {
+      "role": "reviewed_main",
+      "requirements": 336,
+      "selected": 176,
+      "excluded": [
+        {
+          "name": "google-api-core",
+          "marker": "python_full_version < \"3.13\" and platform_machine == \"x86_64\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-core",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-accessibility",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-accounts",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-addressbook",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-adservices",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-adsupport",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"18.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-applescriptkit",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-applescriptobjc",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-applicationservices",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-apptrackingtransparency",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-audiovideobridging",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-authenticationservices",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-automaticassessmentconfiguration",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-automator",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-avfoundation",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"11.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-avkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"13.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-avrouting",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-backgroundassets",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-browserenginekit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"23.4\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-businesschat",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"18.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-calendarstore",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"9.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-callkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-carbon",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-cfnetwork",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-cinematic",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"23.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-classkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-cloudkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"14.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-cocoa",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-collaboration",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"9.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-colorsync",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"17.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-contacts",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-contactsui",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coreaudio",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coreaudiokit",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-corebluetooth",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"14.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coredata",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-corehaptics",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-corelocation",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coremedia",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"11.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coremediaio",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"11.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coremidi",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coreml",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"17.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coremotion",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coreservices",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-corespotlight",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"17.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-coretext",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-corewlan",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-cryptotokenkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"14.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-datadetection",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-devicecheck",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-devicediscoveryextension",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"24.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-dictionaryservices",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"9.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-discrecording",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-discrecordingui",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-diskarbitration",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-dvdplayback",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-eventkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-exceptionhandling",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-executionpolicy",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-extensionkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-externalaccessory",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"17.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-fileprovider",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-fileproviderui",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-findersync",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"14.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-fsevents",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-fskit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"24.4\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-gamecenter",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-gamecontroller",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"13.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-gamekit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-gameplaykit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-healthkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-imagecapturecore",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-inputmethodkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"9.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-installerplugins",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-instantmessage",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"9.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-intents",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"16.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-intentsui",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-iobluetooth",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-iobluetoothui",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-iosurface",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-ituneslibrary",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-kernelmanagement",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-latentsemanticmapping",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-launchservices",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-libdispatch",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-libxpc",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-linkpresentation",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-localauthentication",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"14.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-localauthenticationembeddedui",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-mailkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-mapkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"13.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-mediaaccessibility",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"13.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-mediaextension",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"24.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-medialibrary",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"13.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-mediaplayer",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"16.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-mediatoolbox",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"13.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-metal",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-metalfx",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-metalkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-metalperformanceshaders",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"17.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-metalperformanceshadersgraph",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-metrickit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-mlcompute",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-modelio",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-multipeerconnectivity",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"14.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-naturallanguage",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"18.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-netfs",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-network",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"18.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-networkextension",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-notificationcenter",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"14.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-opendirectory",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-osakit",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-oslog",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-passkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-pencilkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-phase",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-photos",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-photosui",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"15.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-preferencepanes",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-pushkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-quartz",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-quicklookthumbnailing",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-replaykit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-safariservices",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"16.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-safetykit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-scenekit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"11.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-screencapturekit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.4\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-screensaver",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-screentime",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-scriptingbridge",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"9.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-searchkit",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-security",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-securityfoundation",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-securityinterface",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-securityui",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"24.4\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-sensitivecontentanalysis",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"23.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-servicemanagement",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"10.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-sharedwithyou",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-sharedwithyoucore",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-shazamkit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"21.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-social",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-soundanalysis",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-speech",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-spritekit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"13.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-storekit",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"11.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-symbols",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"23.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-syncservices",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-systemconfiguration",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-systemextensions",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"19.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-threadnetwork",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"22.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-uniformtypeidentifiers",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-usernotifications",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"18.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-usernotificationsui",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-videosubscriberaccount",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"18.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-videotoolbox",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"12.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-virtualization",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"20.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-vision",
+          "marker": "platform_machine == \"x86_64\" and platform_release >= \"17.0\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        },
+        {
+          "name": "pyobjc-framework-webkit",
+          "marker": "platform_machine == \"x86_64\" and platform_system == \"darwin\" and sys_platform == \"linux\""
+        }
+      ]
+    },
+    {
+      "role": "candidate_input",
+      "requirements": 176,
+      "selected": 176,
+      "excluded": []
+    },
+    {
+      "role": "reconciled",
+      "requirements": 176,
+      "selected": 176,
+      "excluded": []
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "agent-client-protocol",
+      "reviewed_main": "0.12.1",
+      "candidate_input": "0.12.1",
+      "reconciled": "0.12.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "aiofile",
+      "reviewed_main": "3.9.0",
+      "candidate_input": "3.9.0",
+      "reconciled": "3.9.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "aiofiles",
+      "reviewed_main": "25.1.0",
+      "candidate_input": "25.1.0",
+      "reconciled": "25.1.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "aiohappyeyeballs",
+      "reviewed_main": "2.6.1",
+      "candidate_input": "2.6.1",
+      "reconciled": "2.6.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "aiohttp",
+      "reviewed_main": "3.14.3",
+      "candidate_input": "3.14.3",
+      "reconciled": "3.14.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "aiosignal",
+      "reviewed_main": "1.4.0",
+      "candidate_input": "1.4.0",
+      "reconciled": "1.4.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "annotated-types",
+      "reviewed_main": "0.7.0",
+      "candidate_input": "0.7.0",
+      "reconciled": "0.7.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "anthropic",
+      "reviewed_main": "0.75.0",
+      "candidate_input": "0.75.0",
+      "reconciled": "0.75.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "anyio",
+      "reviewed_main": "4.14.2",
+      "candidate_input": "4.14.2",
+      "reconciled": "4.14.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "attrs",
+      "reviewed_main": "25.3.0",
+      "candidate_input": "25.3.0",
+      "reconciled": "25.3.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "authlib",
+      "reviewed_main": "1.6.12",
+      "candidate_input": "1.6.12",
+      "reconciled": "1.6.12",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "backoff",
+      "reviewed_main": "2.2.1",
+      "candidate_input": "2.2.1",
+      "reconciled": "2.2.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "beartype",
+      "reviewed_main": "0.22.9",
+      "candidate_input": "0.22.9",
+      "reconciled": "0.22.9",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "beautifulsoup4",
+      "reviewed_main": "4.14.2",
+      "candidate_input": "4.14.2",
+      "reconciled": "4.14.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "binaryornot",
+      "reviewed_main": "0.4.4",
+      "candidate_input": "0.4.4",
+      "reconciled": "0.4.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "blake3",
+      "reviewed_main": "1.0.9",
+      "candidate_input": "1.0.9",
+      "reconciled": "1.0.9",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "browser-use",
+      "reviewed_main": "0.11.9",
+      "candidate_input": "0.11.9",
+      "reconciled": "0.11.9",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "browser-use-sdk",
+      "reviewed_main": "2.0.15",
+      "candidate_input": "2.0.15",
+      "reconciled": "2.0.15",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "bubus",
+      "reviewed_main": "1.5.6",
+      "candidate_input": "1.5.6",
+      "reconciled": "1.5.6",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "cachetools",
+      "reviewed_main": "7.1.8",
+      "candidate_input": "7.1.8",
+      "reconciled": "7.1.8",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "caio",
+      "reviewed_main": "0.9.25",
+      "candidate_input": "0.9.25",
+      "reconciled": "0.9.25",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "cdp-use",
+      "reviewed_main": "1.4.4",
+      "candidate_input": "1.4.4",
+      "reconciled": "1.4.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "certifi",
+      "reviewed_main": "2025.8.3",
+      "candidate_input": "2025.8.3",
+      "reconciled": "2025.8.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "cffi",
+      "reviewed_main": "2.0.0",
+      "candidate_input": "2.0.0",
+      "reconciled": "2.0.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "chardet",
+      "reviewed_main": "5.2.0",
+      "candidate_input": "5.2.0",
+      "reconciled": "5.2.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "charset-normalizer",
+      "reviewed_main": "3.4.3",
+      "candidate_input": "3.4.3",
+      "reconciled": "3.4.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "click",
+      "reviewed_main": "8.5.0",
+      "candidate_input": "8.3.3",
+      "reconciled": "8.5.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "cloudpickle",
+      "reviewed_main": "3.1.2",
+      "candidate_input": "3.1.2",
+      "reconciled": "3.1.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "cryptography",
+      "reviewed_main": "50.0.0",
+      "candidate_input": "50.0.0",
+      "reconciled": "50.0.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "cyclopts",
+      "reviewed_main": "4.6.0",
+      "candidate_input": "4.6.0",
+      "reconciled": "4.6.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "deprecation",
+      "reviewed_main": "2.1.0",
+      "candidate_input": "2.1.0",
+      "reconciled": "2.1.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "distro",
+      "reviewed_main": "1.9.0",
+      "candidate_input": "1.9.0",
+      "reconciled": "1.9.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "dnspython",
+      "reviewed_main": "2.8.0",
+      "candidate_input": "2.8.0",
+      "reconciled": "2.8.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "docstring-parser",
+      "reviewed_main": "0.17.0",
+      "candidate_input": "0.17.0",
+      "reconciled": "0.17.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "docutils",
+      "reviewed_main": "0.22.2",
+      "candidate_input": "0.22.2",
+      "reconciled": "0.22.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "email-validator",
+      "reviewed_main": "2.3.0",
+      "candidate_input": "2.3.0",
+      "reconciled": "2.3.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "exceptiongroup",
+      "reviewed_main": "1.3.0",
+      "candidate_input": "1.3.0",
+      "reconciled": "1.3.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "fakeredis",
+      "reviewed_main": "2.34.1",
+      "candidate_input": "2.34.1",
+      "reconciled": "2.34.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "fastmcp",
+      "reviewed_main": "3.2.0",
+      "candidate_input": "3.2.0",
+      "reconciled": "3.2.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "fastuuid",
+      "reviewed_main": "0.14.0",
+      "candidate_input": "0.14.0",
+      "reconciled": "0.14.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "filelock",
+      "reviewed_main": "3.20.3",
+      "candidate_input": "3.20.3",
+      "reconciled": "3.20.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "frozenlist",
+      "reviewed_main": "1.8.0",
+      "candidate_input": "1.8.0",
+      "reconciled": "1.8.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "fsspec",
+      "reviewed_main": "2025.9.0",
+      "candidate_input": "2025.9.0",
+      "reconciled": "2025.9.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "func-timeout",
+      "reviewed_main": "4.3.5",
+      "candidate_input": "4.3.5",
+      "reconciled": "4.3.5",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "google-api-core",
+      "reviewed_main": "2.31.0",
+      "candidate_input": "2.31.0",
+      "reconciled": "2.31.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "google-api-python-client",
+      "reviewed_main": "2.184.0",
+      "candidate_input": "2.184.0",
+      "reconciled": "2.184.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "google-auth",
+      "reviewed_main": "2.53.0",
+      "candidate_input": "2.53.0",
+      "reconciled": "2.53.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "google-auth-httplib2",
+      "reviewed_main": "0.2.0",
+      "candidate_input": "0.2.0",
+      "reconciled": "0.2.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "google-auth-oauthlib",
+      "reviewed_main": "1.2.2",
+      "candidate_input": "1.2.2",
+      "reconciled": "1.2.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "google-genai",
+      "reviewed_main": "1.75.0",
+      "candidate_input": "1.75.0",
+      "reconciled": "1.75.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "googleapis-common-protos",
+      "reviewed_main": "1.70.0",
+      "candidate_input": "1.70.0",
+      "reconciled": "1.70.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "groq",
+      "reviewed_main": "0.32.0",
+      "candidate_input": "0.32.0",
+      "reconciled": "0.32.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "grpcio",
+      "reviewed_main": "1.76.0",
+      "candidate_input": "1.76.0",
+      "reconciled": "1.76.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "h11",
+      "reviewed_main": "0.16.0",
+      "candidate_input": "0.16.0",
+      "reconciled": "0.16.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "hf-xet",
+      "reviewed_main": "1.1.10",
+      "candidate_input": "1.1.10",
+      "reconciled": "1.1.10",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "httpcore",
+      "reviewed_main": "1.0.9",
+      "candidate_input": "1.0.9",
+      "reconciled": "1.0.9",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "httplib2",
+      "reviewed_main": "0.32.0",
+      "candidate_input": "0.32.0",
+      "reconciled": "0.32.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "httpx",
+      "reviewed_main": "0.28.1",
+      "candidate_input": "0.28.1",
+      "reconciled": "0.28.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "httpx-sse",
+      "reviewed_main": "0.4.3",
+      "candidate_input": "0.4.3",
+      "reconciled": "0.4.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "huggingface-hub",
+      "reviewed_main": "0.35.3",
+      "candidate_input": "0.35.3",
+      "reconciled": "0.35.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "idna",
+      "reviewed_main": "3.15",
+      "candidate_input": "3.15",
+      "reconciled": "3.15",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "importlib-metadata",
+      "reviewed_main": "8.5.0",
+      "candidate_input": "8.5.0",
+      "reconciled": "8.5.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "inquirerpy",
+      "reviewed_main": "0.3.4",
+      "candidate_input": "0.3.4",
+      "reconciled": "0.3.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jaraco-classes",
+      "reviewed_main": "3.4.0",
+      "candidate_input": "3.4.0",
+      "reconciled": "3.4.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jaraco-context",
+      "reviewed_main": "6.1.0",
+      "candidate_input": "6.1.0",
+      "reconciled": "6.1.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jaraco-functools",
+      "reviewed_main": "4.4.0",
+      "candidate_input": "4.4.0",
+      "reconciled": "4.4.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jeepney",
+      "reviewed_main": "0.9.0",
+      "candidate_input": "0.9.0",
+      "reconciled": "0.9.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jinja2",
+      "reviewed_main": "3.1.6",
+      "candidate_input": "3.1.6",
+      "reconciled": "3.1.6",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jiter",
+      "reviewed_main": "0.11.0",
+      "candidate_input": "0.11.0",
+      "reconciled": "0.11.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "joserfc",
+      "reviewed_main": "1.7.5",
+      "candidate_input": "1.7.5",
+      "reconciled": "1.7.5",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "json-repair",
+      "reviewed_main": "0.60.1",
+      "candidate_input": "0.60.1",
+      "reconciled": "0.60.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jsonref",
+      "reviewed_main": "1.1.0",
+      "candidate_input": "1.1.0",
+      "reconciled": "1.1.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jsonschema",
+      "reviewed_main": "4.23.0",
+      "candidate_input": "4.23.0",
+      "reconciled": "4.23.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jsonschema-path",
+      "reviewed_main": "0.3.4",
+      "candidate_input": "0.3.4",
+      "reconciled": "0.3.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "jsonschema-specifications",
+      "reviewed_main": "2025.9.1",
+      "candidate_input": "2025.9.1",
+      "reconciled": "2025.9.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "keyring",
+      "reviewed_main": "25.7.0",
+      "candidate_input": "25.7.0",
+      "reconciled": "25.7.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "libtmux",
+      "reviewed_main": "0.53.0",
+      "candidate_input": "0.53.0",
+      "reconciled": "0.53.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "litellm",
+      "reviewed_main": "1.93.0",
+      "candidate_input": "1.93.0",
+      "reconciled": "1.93.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "lmnr",
+      "reviewed_main": "0.7.60",
+      "candidate_input": "0.7.60",
+      "reconciled": "0.7.60",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "lmnr-claude-code-proxy",
+      "reviewed_main": "0.1.23",
+      "candidate_input": "0.1.23",
+      "reconciled": "0.1.23",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "lupa",
+      "reviewed_main": "2.8",
+      "candidate_input": "2.8",
+      "reconciled": "2.8",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "lxml",
+      "reviewed_main": "6.1.0",
+      "candidate_input": "6.1.0",
+      "reconciled": "6.1.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "markdown-it-py",
+      "reviewed_main": "4.0.0",
+      "candidate_input": "4.0.0",
+      "reconciled": "4.0.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "markdownify",
+      "reviewed_main": "1.2.0",
+      "candidate_input": "1.2.0",
+      "reconciled": "1.2.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "markupsafe",
+      "reviewed_main": "3.0.2",
+      "candidate_input": "3.0.2",
+      "reconciled": "3.0.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "mcp",
+      "reviewed_main": "1.28.1",
+      "candidate_input": "1.28.1",
+      "reconciled": "1.28.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "mdurl",
+      "reviewed_main": "0.1.2",
+      "candidate_input": "0.1.2",
+      "reconciled": "0.1.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "more-itertools",
+      "reviewed_main": "10.8.0",
+      "candidate_input": "10.8.0",
+      "reconciled": "10.8.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "multidict",
+      "reviewed_main": "6.7.0",
+      "candidate_input": "6.7.0",
+      "reconciled": "6.7.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "oauthlib",
+      "reviewed_main": "3.3.1",
+      "candidate_input": "3.3.1",
+      "reconciled": "3.3.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "ollama",
+      "reviewed_main": "0.6.0",
+      "candidate_input": "0.6.0",
+      "reconciled": "0.6.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "openai",
+      "reviewed_main": "2.33.0",
+      "candidate_input": "2.33.0",
+      "reconciled": "2.33.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "openapi-pydantic",
+      "reviewed_main": "0.5.1",
+      "candidate_input": "0.5.1",
+      "reconciled": "0.5.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "openhands-sdk",
+      "reviewed_main": "1.49.6",
+      "candidate_input": "1.50.0",
+      "reconciled": "1.50.0",
+      "main_change": "sdk_upgrade"
+    },
+    {
+      "name": "openhands-tools",
+      "reviewed_main": "1.49.6",
+      "candidate_input": "1.50.0",
+      "reconciled": "1.50.0",
+      "main_change": "sdk_upgrade"
+    },
+    {
+      "name": "opentelemetry-api",
+      "reviewed_main": "1.39.1",
+      "candidate_input": "1.39.1",
+      "reconciled": "1.39.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-proto-common",
+      "reviewed_main": "1.39.1",
+      "candidate_input": "1.39.1",
+      "reconciled": "1.39.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-proto-grpc",
+      "reviewed_main": "1.39.1",
+      "candidate_input": "1.39.1",
+      "reconciled": "1.39.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-exporter-otlp-proto-http",
+      "reviewed_main": "1.39.1",
+      "candidate_input": "1.39.1",
+      "reconciled": "1.39.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-instrumentation",
+      "reviewed_main": "0.60b1",
+      "candidate_input": "0.60b1",
+      "reconciled": "0.60b1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-instrumentation-threading",
+      "reviewed_main": "0.60b1",
+      "candidate_input": "0.60b1",
+      "reconciled": "0.60b1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-proto",
+      "reviewed_main": "1.39.1",
+      "candidate_input": "1.39.1",
+      "reconciled": "1.39.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-sdk",
+      "reviewed_main": "1.39.1",
+      "candidate_input": "1.39.1",
+      "reconciled": "1.39.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-semantic-conventions",
+      "reviewed_main": "0.60b1",
+      "candidate_input": "0.60b1",
+      "reconciled": "0.60b1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "opentelemetry-semantic-conventions-ai",
+      "reviewed_main": "0.4.13",
+      "candidate_input": "0.4.13",
+      "reconciled": "0.4.13",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "orjson",
+      "reviewed_main": "3.11.7",
+      "candidate_input": "3.11.7",
+      "reconciled": "3.11.7",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "packaging",
+      "reviewed_main": "26.3",
+      "candidate_input": "26.3",
+      "reconciled": "26.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pathable",
+      "reviewed_main": "0.4.4",
+      "candidate_input": "0.4.4",
+      "reconciled": "0.4.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pfzy",
+      "reviewed_main": "0.3.4",
+      "candidate_input": "0.3.4",
+      "reconciled": "0.3.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pillow",
+      "reviewed_main": "12.3.0",
+      "candidate_input": "12.3.0",
+      "reconciled": "12.3.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "platformdirs",
+      "reviewed_main": "4.4.0",
+      "candidate_input": "4.4.0",
+      "reconciled": "4.4.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "portalocker",
+      "reviewed_main": "2.10.1",
+      "candidate_input": "2.10.1",
+      "reconciled": "2.10.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "posthog",
+      "reviewed_main": "6.7.7",
+      "candidate_input": "6.7.7",
+      "reconciled": "6.7.7",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "prompt-toolkit",
+      "reviewed_main": "3.0.52",
+      "candidate_input": "3.0.52",
+      "reconciled": "3.0.52",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "propcache",
+      "reviewed_main": "0.4.1",
+      "candidate_input": "0.4.1",
+      "reconciled": "0.4.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "proto-plus",
+      "reviewed_main": "1.26.1",
+      "candidate_input": "1.26.1",
+      "reconciled": "1.26.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "protobuf",
+      "reviewed_main": "6.33.5",
+      "candidate_input": "6.33.5",
+      "reconciled": "6.33.5",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "psutil",
+      "reviewed_main": "7.2.2",
+      "candidate_input": "7.2.2",
+      "reconciled": "7.2.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "py-key-value-aio",
+      "reviewed_main": "0.4.4",
+      "candidate_input": "0.4.4",
+      "reconciled": "0.4.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pyasn1",
+      "reviewed_main": "0.6.4",
+      "candidate_input": "0.6.4",
+      "reconciled": "0.6.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pyasn1-modules",
+      "reviewed_main": "0.4.2",
+      "candidate_input": "0.4.2",
+      "reconciled": "0.4.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pycparser",
+      "reviewed_main": "2.23",
+      "candidate_input": "2.23",
+      "reconciled": "2.23",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pydantic",
+      "reviewed_main": "2.12.5",
+      "candidate_input": "2.12.5",
+      "reconciled": "2.12.5",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pydantic-core",
+      "reviewed_main": "2.41.5",
+      "candidate_input": "2.41.5",
+      "reconciled": "2.41.5",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pydantic-settings",
+      "reviewed_main": "2.11.0",
+      "candidate_input": "2.11.0",
+      "reconciled": "2.11.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pygments",
+      "reviewed_main": "2.20.0",
+      "candidate_input": "2.20.0",
+      "reconciled": "2.20.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pyjwt",
+      "reviewed_main": "2.14.0",
+      "candidate_input": "2.14.0",
+      "reconciled": "2.14.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pyotp",
+      "reviewed_main": "2.9.0",
+      "candidate_input": "2.9.0",
+      "reconciled": "2.9.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pyparsing",
+      "reviewed_main": "3.2.5",
+      "candidate_input": "3.2.5",
+      "reconciled": "3.2.5",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pypdf",
+      "reviewed_main": "6.19.0",
+      "candidate_input": "6.16.1",
+      "reconciled": "6.19.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pyperclip",
+      "reviewed_main": "1.11.0",
+      "candidate_input": "1.11.0",
+      "reconciled": "1.11.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "python-dateutil",
+      "reviewed_main": "2.9.0.post0",
+      "candidate_input": "2.9.0.post0",
+      "reconciled": "2.9.0.post0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "python-docx",
+      "reviewed_main": "1.2.0",
+      "candidate_input": "1.2.0",
+      "reconciled": "1.2.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "python-dotenv",
+      "reviewed_main": "1.2.2",
+      "candidate_input": "1.2.2",
+      "reconciled": "1.2.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "python-frontmatter",
+      "reviewed_main": "1.1.0",
+      "candidate_input": "1.1.0",
+      "reconciled": "1.1.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "python-json-logger",
+      "reviewed_main": "4.0.0",
+      "candidate_input": "4.0.0",
+      "reconciled": "4.0.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "python-multipart",
+      "reviewed_main": "0.0.31",
+      "candidate_input": "0.0.31",
+      "reconciled": "0.0.31",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "pyyaml",
+      "reviewed_main": "6.0.2",
+      "candidate_input": "6.0.2",
+      "reconciled": "6.0.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "redis",
+      "reviewed_main": "7.2.1",
+      "candidate_input": "7.2.1",
+      "reconciled": "7.2.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "referencing",
+      "reviewed_main": "0.36.2",
+      "candidate_input": "0.36.2",
+      "reconciled": "0.36.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "regex",
+      "reviewed_main": "2025.9.18",
+      "candidate_input": "2025.9.18",
+      "reconciled": "2025.9.18",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "reportlab",
+      "reviewed_main": "4.4.4",
+      "candidate_input": "4.4.4",
+      "reconciled": "4.4.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "requests",
+      "reviewed_main": "2.33.0",
+      "candidate_input": "2.33.0",
+      "reconciled": "2.33.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "requests-oauthlib",
+      "reviewed_main": "2.0.0",
+      "candidate_input": "2.0.0",
+      "reconciled": "2.0.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "rich",
+      "reviewed_main": "14.3.3",
+      "candidate_input": "14.3.3",
+      "reconciled": "14.3.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "rich-rst",
+      "reviewed_main": "1.3.2",
+      "candidate_input": "1.3.2",
+      "reconciled": "1.3.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "rpds-py",
+      "reviewed_main": "0.27.1",
+      "candidate_input": "0.27.1",
+      "reconciled": "0.27.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "screeninfo",
+      "reviewed_main": "0.8.1",
+      "candidate_input": "0.8.1",
+      "reconciled": "0.8.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "secretstorage",
+      "reviewed_main": "3.5.0",
+      "candidate_input": "3.5.0",
+      "reconciled": "3.5.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "six",
+      "reviewed_main": "1.17.0",
+      "candidate_input": "1.17.0",
+      "reconciled": "1.17.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "sniffio",
+      "reviewed_main": "1.3.1",
+      "candidate_input": "1.3.1",
+      "reconciled": "1.3.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "socksio",
+      "reviewed_main": "1.0.0",
+      "candidate_input": "1.0.0",
+      "reconciled": "1.0.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "sortedcontainers",
+      "reviewed_main": "2.4.0",
+      "candidate_input": "2.4.0",
+      "reconciled": "2.4.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "soupsieve",
+      "reviewed_main": "2.9.2",
+      "candidate_input": "2.9",
+      "reconciled": "2.9.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "sse-starlette",
+      "reviewed_main": "3.0.2",
+      "candidate_input": "3.0.2",
+      "reconciled": "3.0.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "starlette",
+      "reviewed_main": "1.3.1",
+      "candidate_input": "1.3.1",
+      "reconciled": "1.3.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "tenacity",
+      "reviewed_main": "9.1.2",
+      "candidate_input": "9.1.2",
+      "reconciled": "9.1.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "tiktoken",
+      "reviewed_main": "0.12.0",
+      "candidate_input": "0.12.0",
+      "reconciled": "0.12.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "tokenizers",
+      "reviewed_main": "0.23.1",
+      "candidate_input": "0.23.1",
+      "reconciled": "0.23.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "tom-swe",
+      "reviewed_main": "1.0.3",
+      "candidate_input": "1.0.3",
+      "reconciled": "1.0.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "tqdm",
+      "reviewed_main": "4.67.1",
+      "candidate_input": "4.67.1",
+      "reconciled": "4.67.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "tree-sitter",
+      "reviewed_main": "0.25.2",
+      "candidate_input": "0.25.2",
+      "reconciled": "0.25.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "tree-sitter-bash",
+      "reviewed_main": "0.25.1",
+      "candidate_input": "0.25.1",
+      "reconciled": "0.25.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "typing-extensions",
+      "reviewed_main": "4.15.0",
+      "candidate_input": "4.15.0",
+      "reconciled": "4.15.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "typing-inspection",
+      "reviewed_main": "0.4.2",
+      "candidate_input": "0.4.2",
+      "reconciled": "0.4.2",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "uncalled-for",
+      "reviewed_main": "0.2.0",
+      "candidate_input": "0.2.0",
+      "reconciled": "0.2.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "uritemplate",
+      "reviewed_main": "4.2.0",
+      "candidate_input": "4.2.0",
+      "reconciled": "4.2.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "urllib3",
+      "reviewed_main": "2.7.0",
+      "candidate_input": "2.7.0",
+      "reconciled": "2.7.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "uuid7",
+      "reviewed_main": "0.1.0",
+      "candidate_input": "0.1.0",
+      "reconciled": "0.1.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "uvicorn",
+      "reviewed_main": "0.52.4",
+      "candidate_input": "0.52.4",
+      "reconciled": "0.52.4",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "watchfiles",
+      "reviewed_main": "1.1.1",
+      "candidate_input": "1.1.1",
+      "reconciled": "1.1.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "wcwidth",
+      "reviewed_main": "0.2.14",
+      "candidate_input": "0.2.14",
+      "reconciled": "0.2.14",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "websockets",
+      "reviewed_main": "15.0.1",
+      "candidate_input": "15.0.1",
+      "reconciled": "15.0.1",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "wrapt",
+      "reviewed_main": "1.17.3",
+      "candidate_input": "1.17.3",
+      "reconciled": "1.17.3",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "yarl",
+      "reviewed_main": "1.22.0",
+      "candidate_input": "1.22.0",
+      "reconciled": "1.22.0",
+      "main_change": "unchanged"
+    },
+    {
+      "name": "zipp",
+      "reviewed_main": "3.23.0",
+      "candidate_input": "3.23.0",
+      "reconciled": "3.23.0",
+      "main_change": "unchanged"
+    }
+  ],
+  "main_selected_additions": [],
+  "main_selected_removals": [],
+  "main_selected_downgrades": [],
+  "installed_version_mismatches": [],
+  "source_required_downgrades": [],
+  "fresh_extraction_checks": [
+    {
+      "extraction": "source",
+      "original_regular_files_compared": 1800,
+      "mismatches": []
+    },
+    {
+      "extraction": "source-repro",
+      "original_regular_files_compared": 1800,
+      "mismatches": []
+    }
+  ],
+  "native_compile_reproduction_byte_identical": true,
+  "reproduced_lock_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106"
+}
+
+[stderr]
+
+exit_code=0

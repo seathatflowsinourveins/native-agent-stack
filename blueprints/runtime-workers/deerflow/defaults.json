@@ -1,0 +1,6 @@
+{
+  "model": "cx/gpt-6-astra-max",
+  "host_gateway": "http://127.0.0.1:20128/v1",
+  "container_gateway": "http://10.0.2.2:20128/v1",
+  "port": 3771
+}

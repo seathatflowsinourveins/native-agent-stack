@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+"""Bounded native package/source checks; no provider, image or host activation.
+
+The lock parser follows uv's generated requirements format. The source review
+reuses the prior exact OAuthlib file hashes and compares official PyPI archives.
+It is an integration check, never an upstream or dynamic reachability oracle.
+"""
+from pathlib import Path
+import ast
+import hashlib
+import importlib.metadata as metadata
+import json
+import platform
+import re
+import sys
+import tarfile
+import zipfile
+
+private = Path(__file__).resolve().parent
+root = Path(sys.argv[1])
+site = private / 'venv/lib/python3.13/site-packages'
+evidence = root / 'blueprints/runtime-workers/openhands/evidence'
+sha = lambda data: hashlib.sha256(data).hexdigest()
+
+def blocks(text):
+    result = {}
+    for part in re.split(r'(?m)(?=^[A-Za-z0-9])', text):
+        if part.strip():
+            key = re.match(r'[A-Za-z0-9_.-]+', part).group()
+            assert key not in result
+            result[key] = part
+    return result
+
+before = (private / 'control.lock').read_bytes()
+after = (private / 'candidate.lock').read_bytes()
+assert before == (root / 'blueprints/runtime-workers/openhands/requirements.lock').read_bytes()
+assert after == (private / 'candidate-no-config.lock').read_bytes()
+a, b = blocks(before.decode()), blocks(after.decode())
+assert len(a) == len(b) == 176 and set(a) == set(b)
+changed = [name for name in a if a[name] != b[name]]
+assert changed == ['litellm']
+assert a['litellm'].splitlines()[0] == 'litellm==1.93.0 \\'
+assert b['litellm'].splitlines()[0] == 'litellm==1.93.2 \\'
+expected = dict(re.findall(r'(?m)^([A-Za-z0-9_.-]+)==([^\s\\;]+)', after.decode()))
+expected.update({'openhands-sdk': '1.50.0', 'openhands-tools': '1.50.0'})
+mismatches = [{'name': n, 'expected': v, 'actual': metadata.version(n)}
+              for n, v in expected.items() if metadata.version(n) != v]
+assert len(expected) == 176 and not mismatches
+assert sys.implementation.name == 'cpython' and platform.python_version() == '3.13.15'
+assert platform.system() == 'Linux' and platform.machine() == 'x86_64'
+
+historical = (evidence / 'pyjwt-relock-20260930-oauthlib-alias-callers.txt').read_text()
+bindings = dict(re.findall(r'(?m)^([\w./-]+) sha256 ([0-9a-f]{64})$', historical))
+assert len(bindings) == 8
+bindings['func_timeout/py2_raise.py'] = '19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77'
+identities = []
+for name, expected_hash in bindings.items():
+    actual = sha((site / name).read_bytes())
+    assert actual == expected_hash, name
+    identities.append({'path': name, 'sha256': actual})
+
+pattern = re.compile(r'\boauthlib\b|RevocationEndpoint|AuthorizationCodeGrant|enable_jsonp|code_challenge_method_s256|code_challenge_method_plain')
+reviews = []
+candidate_sources = {}
+for version in ['1.93.0', '1.93.2']:
+    archive = private / ('litellm-' + version + '.tar.gz')
+    sources, hits, parse_errors = {}, [], []
+    with tarfile.open(archive, 'r:gz') as handle:
+        for member in handle.getmembers():
+            if not member.isfile() or '/litellm/' not in member.name or not member.name.endswith('.py'):
+                continue
+            relative = member.name.split('/', 1)[1]
+            data = handle.extractfile(member).read()
+            sources[relative] = data
+            text = data.decode('utf-8')
+            try:
+                ast.parse(text, filename=relative)
+            except SyntaxError as error:
+                parse_errors.append({'path': relative, 'line': error.lineno, 'message': error.msg})
+            for number, line in enumerate(text.splitlines(), 1):
+                if pattern.search(line):
+                    hits.append({'path': relative, 'line': number, 'text': line.strip()})
+    assert not parse_errors and not hits
+    reviews.append({'version': version, 'archive_sha256': sha(archive.read_bytes()),
+                    'python_sources': len(sources), 'advisory_name_hits': hits,
+                    'parse_errors': parse_errors})
+    if version == '1.93.2':
+        candidate_sources = sources
+
+wheel = private / 'litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl'
+wheel_sources = {}
+installed_mismatches, sdist_mismatches = [], []
+with zipfile.ZipFile(wheel) as handle:
+    for name in handle.namelist():
+        if name.startswith('litellm/') and name.endswith('.py'):
+            data = handle.read(name)
+            wheel_sources[name] = data
+            if (site / name).read_bytes() != data:
+                installed_mismatches.append(name)
+            if candidate_sources.get(name) != data:
+                sdist_mismatches.append(name)
+assert len(wheel_sources) == len(candidate_sources) == 2104
+assert not installed_mismatches and not sdist_mismatches
+import litellm
+from openhands.sdk import LLM, Agent, Conversation
+from openhands.tools.task import TaskToolSet
+from openhands.tools.browser_use import BrowserToolSet
+assert Path(litellm.__file__).resolve().is_relative_to(site.resolve())
+result = {
+    'target': 'Linux x86_64 CPython 3.13.15 only',
+    'baseline_requirements_sha256': sha(before), 'candidate_requirements_sha256': sha(after),
+    'baseline_control_byte_identical': True, 'explicit_no_config_recompile_byte_identical': True,
+    'declared_requirements': 176, 'changed_package_blocks': changed, 'other_package_blocks_byte_identical': 175,
+    'added': [], 'removed': [], 'installed_versions_checked': len(expected), 'version_mismatches': mismatches,
+    'installed_distributions_including_build_and_test_tools': len(list(metadata.distributions())),
+    'qualification_tools': {name: metadata.version(name) for name in ['pytest', 'pytest-asyncio', 'pluggy', 'iniconfig']},
+    'oauth_review_identities': identities, 'official_sdist_name_reviews': reviews,
+    'candidate_wheel_sha256': sha(wheel.read_bytes()), 'candidate_python_sources_compared': len(wheel_sources),
+    'wheel_to_installed_mismatches': installed_mismatches, 'wheel_to_sdist_mismatches': sdist_mismatches,
+    'native_imports_passed': True,
+    'limitations': ['Static name/AST review does not prove semantic or dynamic unreachability.',
+                    'One compiled LiteLLM extension is not assessed by the Python source scan.',
+                    'No proxy-server, provider, model, image, host deployment or task-quality execution.']
+}
+print(json.dumps(result, indent=2))

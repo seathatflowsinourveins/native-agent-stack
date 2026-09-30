@@ -1,0 +1,10 @@
+argv: ["rtk", "proxy", "uv", "--version"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:44:06.384031+00:00
+ended_utc: 2026-09-30T15:44:06.416387+00:00
+exit_code: 0
+
+stdout:
+uv 0.12.17 (x86_64-unknown-linux-gnu)
+
+stderr:

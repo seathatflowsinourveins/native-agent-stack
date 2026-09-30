@@ -1,0 +1,585 @@
+{
+  "schema_version": 1,
+  "kind": "native_lock_scan_and_scoped_source_review",
+  "checked_at_utc": "2026-09-30T07:11:35.002485+00:00",
+  "evidence_class": "source_review",
+  "status": "bounded_review_not_runtime_acceptance",
+  "sources": [
+    {
+      "url": "https://api.osv.dev/v1/vulns/GHSA-8mgp-746c-j5xp",
+      "http_status": 200,
+      "original_response_sha256": "c489d359f203d5ecd90148e59601c63f4b057fe838604b68e607a3e3f1026a10",
+      "bytes": 4877
+    },
+    {
+      "url": "https://pypi.org/pypi/nltk/json",
+      "http_status": 200,
+      "original_response_sha256": "bcb887db94e1c4fe5eb120e7125ac9da760b3c07f4d8c8065079373fec07db3c",
+      "bytes": 103290
+    },
+    {
+      "url": "https://github.com/google/osv-scanner/releases/tag/v2.6.0",
+      "file": ".github/workflows/security-scan.yml",
+      "executable_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108"
+    }
+  ],
+  "initial_native_scan": {
+    "command": {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<PINNED_OSV_SCANNER>",
+        "scan",
+        "source",
+        "--config",
+        ".github/osv-scanner.toml",
+        "--no-resolve",
+        "--format",
+        "json",
+        "--all-vulns",
+        "--output-file",
+        "<PRIVATE_QUALIFICATION_STATE>/runtime-locks-osv.json",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/crawl4ai/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/crawl4ai/test-requirements.lock",
+        "--lockfile=:blueprints/runtime-workers/crawl4ai/grader/package-lock.json",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/build-requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/deerflow/e2e/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock"
+      ],
+      "start": "2026-09-30T07:02:35.092846+00:00",
+      "end": "2026-09-30T07:02:37.136856+00:00",
+      "exit_code": 1
+    },
+    "original_report_sha256": "def3457d79f7bc0efbeea558b733e10df01bf57d046b98858a8f7968250a5950",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "7dcf6509bea8c2cf5e334087bcf7710ea1adcf47206fb2daeebbc82d8b897802",
+    "locks": {
+      "blueprints/runtime-workers/crawl4ai/requirements.lock": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+      "blueprints/runtime-workers/crawl4ai/test-requirements.lock": "18802e44cb0fe166cbb229a3efdce7f83dfd8349d0bdc81c35c2e0ad98929b5a",
+      "blueprints/runtime-workers/crawl4ai/grader/package-lock.json": "b3577cbcf13a57c7a1e2e961f2b3db4d56e1990d765822c810ac8dbafbb12e1f",
+      "blueprints/runtime-workers/gpt-researcher/requirements.lock": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+      "blueprints/runtime-workers/gpt-researcher/build-requirements.lock": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f",
+      "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754",
+      "blueprints/runtime-workers/deerflow/e2e/requirements.lock": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+      "blueprints/runtime-workers/openhands/requirements.lock": "7dba097d34f83cab8585e49050505d5f836b8f8505ceedb7daff160af5e3ad16",
+      "blueprints/runtime-workers/openhands/build-requirements.lock": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2"
+    },
+    "unignored_package_findings": [
+      {
+        "file": "blueprints/runtime-workers/openhands/requirements.lock",
+        "package": {
+          "name": "click",
+          "version": "8.1.8",
+          "ecosystem": "PyPI"
+        },
+        "advisory_groups": [
+          {
+            "ids": [
+              "PYSEC-2026-2132"
+            ],
+            "aliases": [
+              "CVE-2026-7246",
+              "GHSA-47fr-3ffg-hgmw",
+              "PYSEC-2026-2132"
+            ],
+            "max_severity": "7.2"
+          }
+        ]
+      },
+      {
+        "file": "blueprints/runtime-workers/openhands/requirements.lock",
+        "package": {
+          "name": "cryptography",
+          "version": "48.0.1",
+          "ecosystem": "PyPI"
+        },
+        "advisory_groups": [
+          {
+            "ids": [
+              "PYSEC-2026-3552",
+              "GHSA-g6cj-pr64-35w5"
+            ],
+            "aliases": [
+              "CVE-2026-69247",
+              "GHSA-g6cj-pr64-35w5",
+              "PYSEC-2026-3552"
+            ],
+            "max_severity": "8.2"
+          },
+          {
+            "ids": [
+              "PYSEC-2026-3553",
+              "GHSA-jwv3-5hgf-82ww"
+            ],
+            "aliases": [
+              "CVE-2026-69249",
+              "GHSA-jwv3-5hgf-82ww",
+              "PYSEC-2026-3553"
+            ],
+            "max_severity": "8.7"
+          },
+          {
+            "ids": [
+              "PYSEC-2026-3554",
+              "GHSA-m2h6-j472-rp4c"
+            ],
+            "aliases": [
+              "CVE-2026-69248",
+              "GHSA-m2h6-j472-rp4c",
+              "PYSEC-2026-3554"
+            ],
+            "max_severity": "6.9"
+          }
+        ]
+      },
+      {
+        "file": "blueprints/runtime-workers/openhands/requirements.lock",
+        "package": {
+          "name": "pyjwt",
+          "version": "2.13.0",
+          "ecosystem": "PyPI"
+        },
+        "advisory_groups": [
+          {
+            "ids": [
+              "GHSA-2gx3-rcp4-g85q"
+            ],
+            "aliases": [
+              "CVE-2026-101917",
+              "GHSA-2gx3-rcp4-g85q"
+            ],
+            "max_severity": "5.3"
+          },
+          {
+            "ids": [
+              "GHSA-8wjv-2p76-3863"
+            ],
+            "aliases": [
+              "CVE-2026-102265",
+              "GHSA-8wjv-2p76-3863"
+            ],
+            "max_severity": "5.3"
+          },
+          {
+            "ids": [
+              "GHSA-9j54-fg26-wv3r"
+            ],
+            "aliases": [
+              "CVE-2026-102266",
+              "GHSA-9j54-fg26-wv3r"
+            ],
+            "max_severity": "7.4"
+          },
+          {
+            "ids": [
+              "GHSA-9v7f-9g4p-ffgj"
+            ],
+            "aliases": [
+              "CVE-2026-102267",
+              "GHSA-9v7f-9g4p-ffgj"
+            ],
+            "max_severity": "7.4"
+          },
+          {
+            "ids": [
+              "GHSA-ffc3-869f-jxw9"
+            ],
+            "aliases": [
+              "CVE-2026-102268",
+              "GHSA-ffc3-869f-jxw9"
+            ],
+            "max_severity": "9.1"
+          },
+          {
+            "ids": [
+              "GHSA-hxm8-2xgr-2p9m"
+            ],
+            "aliases": [
+              "CVE-2026-102269",
+              "GHSA-hxm8-2xgr-2p9m"
+            ],
+            "max_severity": "4.8"
+          },
+          {
+            "ids": [
+              "GHSA-p4g4-x82p-q773"
+            ],
+            "aliases": [
+              "CVE-2026-102271",
+              "GHSA-p4g4-x82p-q773"
+            ],
+            "max_severity": "7.4"
+          },
+          {
+            "ids": [
+              "GHSA-r6x4-923q-g947"
+            ],
+            "aliases": [
+              "CVE-2026-102272",
+              "GHSA-r6x4-923q-g947"
+            ],
+            "max_severity": "7.4"
+          },
+          {
+            "ids": [
+              "GHSA-w2cx-738m-mc7w"
+            ],
+            "aliases": [
+              "CVE-2026-102273",
+              "GHSA-w2cx-738m-mc7w"
+            ],
+            "max_severity": "7.4"
+          },
+          {
+            "ids": [
+              "GHSA-w6j9-cwv2-h6wq"
+            ],
+            "aliases": [
+              "CVE-2026-102274",
+              "GHSA-w6j9-cwv2-h6wq"
+            ],
+            "max_severity": "5.9"
+          }
+        ]
+      },
+      {
+        "file": "blueprints/runtime-workers/openhands/requirements.lock",
+        "package": {
+          "name": "pypdf",
+          "version": "6.14.2",
+          "ecosystem": "PyPI"
+        },
+        "advisory_groups": [
+          {
+            "ids": [
+              "PYSEC-2026-3655",
+              "GHSA-fp3f-mc75-235c"
+            ],
+            "aliases": [
+              "CVE-2026-71870",
+              "GHSA-fp3f-mc75-235c",
+              "PYSEC-2026-3655"
+            ],
+            "max_severity": "4.8"
+          },
+          {
+            "ids": [
+              "PYSEC-2026-3656",
+              "GHSA-fwg2-594c-jp42"
+            ],
+            "aliases": [
+              "CVE-2026-71852",
+              "GHSA-fwg2-594c-jp42",
+              "PYSEC-2026-3656"
+            ],
+            "max_severity": "4.8"
+          },
+          {
+            "ids": [
+              "PYSEC-2026-3910",
+              "GHSA-23w6-3w8w-8484"
+            ],
+            "aliases": [
+              "CVE-2026-84310",
+              "GHSA-23w6-3w8w-8484",
+              "PYSEC-2026-3910"
+            ],
+            "max_severity": "4.8"
+          },
+          {
+            "ids": [
+              "PYSEC-2026-3911",
+              "GHSA-763m-79hh-57f2"
+            ],
+            "aliases": [
+              "CVE-2026-84311",
+              "GHSA-763m-79hh-57f2",
+              "PYSEC-2026-3911"
+            ],
+            "max_severity": "4.8"
+          },
+          {
+            "ids": [
+              "PYSEC-2026-3912",
+              "GHSA-fc8x-2rww-xw9m"
+            ],
+            "aliases": [
+              "CVE-2026-82398",
+              "GHSA-fc8x-2rww-xw9m",
+              "PYSEC-2026-3912"
+            ],
+            "max_severity": "6.9"
+          },
+          {
+            "ids": [
+              "PYSEC-2026-3913",
+              "GHSA-jp53-mhqp-8xcg"
+            ],
+            "aliases": [
+              "CVE-2026-84309",
+              "GHSA-jp53-mhqp-8xcg",
+              "PYSEC-2026-3913"
+            ],
+            "max_severity": "6.9"
+          }
+        ]
+      },
+      {
+        "file": "blueprints/runtime-workers/openhands/requirements.lock",
+        "package": {
+          "name": "soupsieve",
+          "version": "2.8.4",
+          "ecosystem": "PyPI"
+        },
+        "advisory_groups": [
+          {
+            "ids": [
+              "GHSA-gjv8-xp57-g29c"
+            ],
+            "aliases": [
+              "CVE-2026-86000",
+              "GHSA-gjv8-xp57-g29c"
+            ],
+            "max_severity": "5.3"
+          },
+          {
+            "ids": [
+              "GHSA-j934-xhv5-fg8f"
+            ],
+            "aliases": [
+              "CVE-2026-85999",
+              "GHSA-j934-xhv5-fg8f"
+            ],
+            "max_severity": "5.3"
+          }
+        ]
+      }
+    ],
+    "meaning": "Exit 1 means findings. Existing global ignores can filter new packages; independent hash-scoped guards initially rejected the two unregistered nltk locks and the changed OpenHands digest."
+  },
+  "current_advisory": {
+    "id": "GHSA-8mgp-746c-j5xp",
+    "modified": "2026-09-02T14:45:06.878867805Z",
+    "locked_version": "3.10.3",
+    "pypi_latest_version": "3.10.3",
+    "fixed_events": [],
+    "precondition_source": "The linked original OSV details name untrusted model import/export paths with pathsec enforcement; this review grants no arbitrary-code or model-file operation."
+  },
+  "fresh_static_checks": {
+    "gpt-researcher": {
+      "lock_path": "blueprints/runtime-workers/gpt-researcher/requirements.lock",
+      "lock_sha256": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+      "installed_python_files_outside_nltk_scanned": 14437,
+      "direct_nltk_import_sites": [
+        {
+          "file": "langchain_text_splitters/html.py",
+          "sha256": "028b5a3c57b3df29e062c841db846584bf66388810248cfc09566b954c7e85df",
+          "lines": [
+            30,
+            724
+          ]
+        },
+        {
+          "file": "langchain_text_splitters/nltk.py",
+          "sha256": "8ac9704a59aeea760a02fa497db73f230a79ff07ea4789e644872561d458aadd",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "file": "langchain_community/example_selectors/ngram_overlap.py",
+          "sha256": "78a7c748efa16977fd646ceb59c3c64ff3cc837c70b00d49436a886aafa17321",
+          "lines": [
+            26,
+            75
+          ]
+        }
+      ],
+      "affected_symbol_mentions_outside_nltk": [],
+      "current_recipe_direct_import_or_symbol_hits": [],
+      "prior_source_review": "blueprints/runtime-workers/gpt-researcher/evidence/nltk-reachability.json",
+      "prior_review_sha256": "6915dd28fc7cbaf0918ce64f939f1870d77d77e006d01b763d0a73ea850b8b7f",
+      "meaning": "Fresh bounded static source observation of the installed pinned closure and current recipe. Names alone do not prove call reachability; prior source review checks the entered nltk modules and their call sites."
+    },
+    "crawl4ai": {
+      "lock_path": "blueprints/runtime-workers/crawl4ai/requirements.lock",
+      "lock_sha256": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+      "installed_python_files_outside_nltk_scanned": 8148,
+      "direct_nltk_import_sites": [
+        {
+          "file": "crawl4ai/chunking_strategy.py",
+          "sha256": "86a9037c1fbbd396751eb13d6aaaab1b0f6d2f83710d821e0f5ca09ac461dda1",
+          "lines": [
+            83,
+            108,
+            120
+          ]
+        },
+        {
+          "file": "crawl4ai/model_loader.py",
+          "sha256": "814d5bc8c2df6691ee5c4417ffd2602c7774903d7ff200465a4851515864b8b4",
+          "lines": [
+            178
+          ]
+        },
+        {
+          "file": "crawl4ai/legacy/llmtxt.py",
+          "sha256": "b1ec1499c4193d1883002626bb12aa6d650fe5af915e94383f5d99c47959a570",
+          "lines": [
+            11,
+            12,
+            13
+          ]
+        }
+      ],
+      "affected_symbol_mentions_outside_nltk": [],
+      "current_recipe_direct_import_or_symbol_hits": [],
+      "prior_source_review": "blueprints/runtime-workers/crawl4ai/evidence/nltk-reachability.json",
+      "prior_review_sha256": "3ae7461b5852631d7fd9a8aad8ade3eddb71ed84e1f7c08599977202adae81ae",
+      "meaning": "Fresh bounded static source observation of the installed pinned closure and current recipe. Names alone do not prove call reachability; prior source review checks the entered nltk modules and their call sites."
+    }
+  },
+  "scope_decision": {
+    "advisory": "GHSA-8mgp-746c-j5xp",
+    "allowed_locks": {
+      "blueprints/runtime-workers/gpt-researcher/requirements.lock": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+      "blueprints/runtime-workers/crawl4ai/requirements.lock": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701"
+    },
+    "reason": "The pinned current recipes and documented direct callers use tokenization/corpora/data management, not the advisory model import/export APIs. Existing prior reviews describe exact entered modules and limitations; the fresh check above independently binds current installed source and recipe. The existing ignore stays hash-scoped, with its existing expiry and no new ignore IDs.",
+    "approval_scope": "Source-based non-reachability for these exact locks/recipes only; no proof against dynamic imports, new MCP tools or worker-authored arbitrary code."
+  },
+  "corrections": [
+    {
+      "mistake": "A historical GPT source-review sentence referred to an existing scoped guard allowance before it was registered.",
+      "verification": "Native ignore-policy unittest exit 1 on 2026-09-30; original guard lacks both new locks.",
+      "change": "This dated review registers the exact two current lock hashes only after source observation; prior assertion is treated as proposed at its capture date."
+    }
+  ],
+  "limits": [
+    "No vulnerable model-artifact API was invoked and no exploit test was performed.",
+    "The original detailed reviews used hash-verified wheels; this new check inspects installed Python source and does not claim a complete new binary/wheel audit.",
+    "The global existing ignore alone is not acceptance; its independent guard must pass.",
+    "OpenHands findings require a supported lock repair; no new suppression is granted for them.",
+    "Image scans and live runtime acceptance remain separate.",
+    "Provider and whole-task usage are unknown; no model call or saving comparison was made."
+  ],
+  "final_native_scan": {
+    "evidence_class": "native_proven",
+    "meaning": "Native pinned scanner execution over these exact locks only; existing hash-scoped suppressions remain in force. Not image or runtime acceptance.",
+    "command": {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<PINNED_OSV_SCANNER>",
+        "scan",
+        "source",
+        "--config",
+        ".github/osv-scanner.toml",
+        "--no-resolve",
+        "--format",
+        "json",
+        "--all-vulns",
+        "--output-file",
+        "<PRIVATE_QUALIFICATION_STATE>/runtime-locks-osv-final-main-reconcile.json",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/crawl4ai/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/crawl4ai/test-requirements.lock",
+        "--lockfile=:blueprints/runtime-workers/crawl4ai/grader/package-lock.json",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/build-requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/deerflow/e2e/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+        "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock"
+      ],
+      "start": "2026-09-30T09:12:42.761476+00:00",
+      "end": "2026-09-30T09:12:44.474805+00:00",
+      "exit_code": 0
+    },
+    "config_sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+    "scanner_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "locks": {
+      "blueprints/runtime-workers/crawl4ai/requirements.lock": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+      "blueprints/runtime-workers/crawl4ai/test-requirements.lock": "18802e44cb0fe166cbb229a3efdce7f83dfd8349d0bdc81c35c2e0ad98929b5a",
+      "blueprints/runtime-workers/crawl4ai/grader/package-lock.json": "b3577cbcf13a57c7a1e2e961f2b3db4d56e1990d765822c810ac8dbafbb12e1f",
+      "blueprints/runtime-workers/gpt-researcher/requirements.lock": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+      "blueprints/runtime-workers/gpt-researcher/build-requirements.lock": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f",
+      "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754",
+      "blueprints/runtime-workers/deerflow/e2e/requirements.lock": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+      "blueprints/runtime-workers/openhands/requirements.lock": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+      "blueprints/runtime-workers/openhands/build-requirements.lock": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2"
+    },
+    "report_sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "22d8872646afb5a5c4f31b0e483d5efb8425d180eb71e30894f01c0126c9f06c",
+    "returned_stdout": "",
+    "returned_stderr": "Starting filesystem walk for root: /\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/crawl4ai/requirements.lock file and found 95 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/crawl4ai/test-requirements.lock file and found 4 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/crawl4ai/grader/package-lock.json file and found 901 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/gpt-researcher/requirements.lock file and found 197 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/gpt-researcher/build-requirements.lock file and found 4 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock file and found 68 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/deerflow/e2e/requirements.lock file and found 96 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/openhands/requirements.lock file and found 174 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/openhands/build-requirements.lock file and found 3 packages\nEnd status: 0 dirs visited, 9 inodes visited, 9 Extract calls, 200.861657ms elapsed, 200.861717ms wall time\nGHSA-8mgp-746c-j5xp and 2 aliases have been filtered out because: nltk through 3.10.3: TransitionParser.train/parse, AveragedPerceptron.save/load, PerceptronTagger.save_to_json and nltk.classify.maxent.save_maxent_params open caller-chosen model paths with the built-in open() instead of the pathsec helpers (the advisory's comparison case is the guarded PerceptronTagger.load_from_json, which in 3.10.3 still authorizes a caller-chosen private model directory), so untrusted input that chooses a model import or export path can read or write outside the allowed roots; pathsec enforcement is on by default (ENFORCE = True in nltk/pathsec.py of 3.10.3). No patched release as of 2026-09-27; the fixes are merged on develop (nltk #3757, #3759, #3813). Each lock allowed to pin nltk is named, with its reviewed sha256 and non-reachability evidence, in IGNORE_ALLOWED_LOCKS in tests/test_osv_lockfile_coverage.py. Lumibot lock: nltk 3.10.3 is a transitive pin (google-adk, llama-index-core) of the evaluation-only Lumibot 4.6.1 environment, run offline under bwrap, and no trial code calls these APIs (evidence: blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json). Expiry plan: relock every allowed lock onto the first nltk release that ships those fixes, then delete this ignore; delete the Lumibot lock unless a verdict has adopted Lumibot.\nGHSA-8mgp-746c-j5xp and 2 aliases have been filtered out because: nltk through 3.10.3: TransitionParser.train/parse, AveragedPerceptron.save/load, PerceptronTagger.save_to_json and nltk.classify.maxent.save_maxent_params open caller-chosen model paths with the built-in open() instead of the pathsec helpers (the advisory's comparison case is the guarded PerceptronTagger.load_from_json, which in 3.10.3 still authorizes a caller-chosen private model directory), so untrusted input that chooses a model import or export path can read or write outside the allowed roots; pathsec enforcement is on by default (ENFORCE = True in nltk/pathsec.py of 3.10.3). No patched release as of 2026-09-27; the fixes are merged on develop (nltk #3757, #3759, #3813). Each lock allowed to pin nltk is named, with its reviewed sha256 and non-reachability evidence, in IGNORE_ALLOWED_LOCKS in tests/test_osv_lockfile_coverage.py. Lumibot lock: nltk 3.10.3 is a transitive pin (google-adk, llama-index-core) of the evaluation-only Lumibot 4.6.1 environment, run offline under bwrap, and no trial code calls these APIs (evidence: blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json). Expiry plan: relock every allowed lock onto the first nltk release that ships those fixes, then delete this ignore; delete the Lumibot lock unless a verdict has adopted Lumibot.\nGHSA-hj66-6f7g-4r5v and 1 alias have been filtered out because: oauthlib 0.6.1 through 3.3.1 (fixed in 4.0.0): RevocationEndpoint wraps its response in the request's callback parameter only when constructed with enable_jsonp=True (oauthlib/oauth2/rfc6749/endpoints/revocation.py:72-73 and 81-82 in 3.3.1); oauthlib's pre-configured servers never pass it. Two allowed locks pin 3.3.1: the OpenHands recipe lock and the frozen, evaluation-only Lumibot lock (run offline under bwrap). A text search of one hash-verified artifact per requirement of both locks found no enable_jsonp or create_revocation_response and no importer of oauthlib's endpoints, grant types or servers: oauthlib is imported only by requests-oauthlib 2.0.0 (client classes, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class); every other RevocationEndpoint is Authlib's own class, and Authlib does not import oauthlib. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: the OpenHands lock was relocked onto PyJWT 2.14.0 on 2026-09-30 and still pins oauthlib 3.3.1; as of 2026-09-30, oauthlib 4.0.0 (PyPI, 2026-09-28T06:01Z) was inside the 7-day window the upstream workspace's exclude-newer applies (until 2026-10-05T06:01:19Z), so the relock onto it follows, tracked in #518 (owner: bc, session native-agent-stack-bc; earliest 2026-10-05T18:40:43Z, when PyJWT 2.15.1 has left its window too; due 2026-10-08), and in the same change deletes the OpenHands entry of IGNORE_ALLOWED_LOCKS, whose sha256 pin fails any change to that lock. The Lumibot lock stays frozen on 3.3.1, so on 2026-10-13 renew this ignore for that lock alone with a new dated reason, or delete that lock.\nGHSA-xpv3-w29h-x7cv and 1 alias have been filtered out because: oauthlib >= 3.0.0, < 4.0.0 (fixed in 4.0.0; the scanned locks pin 3.3.1): an oauthlib authorization server compares the PKCE code_verifier with == (code_challenge_method_s256 at oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:49 and code_challenge_method_plain at :61, in 3.3.1), called only from AuthorizationCodeGrant.validate_token_request (line 506) when a token endpoint handles a request. Neither allowed lock (the OpenHands recipe lock and the frozen Lumibot lock) runs an oauthlib authorization server: in a text search of one hash-verified artifact per requirement of both locks, oauthlib is imported only by requests-oauthlib 2.0.0 (WebApplicationClient, LegacyApplicationClient, the oauth1 Client, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class), and nothing imports oauthlib's grant types, endpoints or servers; the PKCE code in openhands-sdk, requests-oauthlib and google-auth-oauthlib only generates a verifier as a client. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: as for GHSA-hj66-6f7g-4r5v; the OpenHands relock onto oauthlib 4.0.0 removes that lock's pin, and on 2026-10-13 this ignore is renewed for the frozen Lumibot lock alone or that lock is deleted.\nFiltered 4 vulnerabilities from output\n.github/osv-scanner.toml has unused ignores:\n - GHSA-h35f-9h28-mq5c\n",
+    "unignored_package_findings": [],
+    "limitations": [
+      "The OSV requirements parser omits direct SDK/tools wheel URL requirements; their exact artifacts are separately hash-verified.",
+      "Existing NLTK and OAuthlib suppressions are source-scoped and expire; guard success and independent reachability review remain separate.",
+      "No model inference or token-saving comparison was performed."
+    ]
+  },
+  "superseded_native_scans": [
+    {
+      "evidence_class": "native_proven",
+      "meaning": "Native pinned scanner execution over these exact locks only; existing hash-scoped suppressions remain in force. Not image or runtime acceptance.",
+      "command": {
+        "argv": [
+          "rtk",
+          "proxy",
+          "<PINNED_OSV_SCANNER>",
+          "scan",
+          "source",
+          "--config",
+          ".github/osv-scanner.toml",
+          "--no-resolve",
+          "--format",
+          "json",
+          "--all-vulns",
+          "--output-file",
+          "<PRIVATE_QUALIFICATION_STATE>/runtime-locks-osv-final.json",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/crawl4ai/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/crawl4ai/test-requirements.lock",
+          "--lockfile=:blueprints/runtime-workers/crawl4ai/grader/package-lock.json",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/build-requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/deerflow/e2e/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/requirements.lock",
+          "--lockfile=requirements.txt:blueprints/runtime-workers/openhands/build-requirements.lock"
+        ],
+        "start": "2026-09-30T08:08:38.602197+00:00",
+        "end": "2026-09-30T08:08:40.282622+00:00",
+        "exit_code": 0
+      },
+      "config_sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+      "scanner_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+      "locks": {
+        "blueprints/runtime-workers/crawl4ai/requirements.lock": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+        "blueprints/runtime-workers/crawl4ai/test-requirements.lock": "18802e44cb0fe166cbb229a3efdce7f83dfd8349d0bdc81c35c2e0ad98929b5a",
+        "blueprints/runtime-workers/crawl4ai/grader/package-lock.json": "b3577cbcf13a57c7a1e2e961f2b3db4d56e1990d765822c810ac8dbafbb12e1f",
+        "blueprints/runtime-workers/gpt-researcher/requirements.lock": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+        "blueprints/runtime-workers/gpt-researcher/build-requirements.lock": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f",
+        "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754",
+        "blueprints/runtime-workers/deerflow/e2e/requirements.lock": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+        "blueprints/runtime-workers/openhands/requirements.lock": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676",
+        "blueprints/runtime-workers/openhands/build-requirements.lock": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2"
+      },
+      "report_sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "53d47bc4b368b888a782d48bce8f3670a25bee3fb209ec94d853583cc3f434ae",
+      "returned_stdout": "",
+      "returned_stderr": "Starting filesystem walk for root: /\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/crawl4ai/requirements.lock file and found 95 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/crawl4ai/test-requirements.lock file and found 4 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/crawl4ai/grader/package-lock.json file and found 901 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/gpt-researcher/requirements.lock file and found 197 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/gpt-researcher/build-requirements.lock file and found 4 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock file and found 68 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/deerflow/e2e/requirements.lock file and found 96 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/openhands/requirements.lock file and found 174 packages\nScanned <OWNED_WORKTREE>/blueprints/runtime-workers/openhands/build-requirements.lock file and found 3 packages\nEnd status: 0 dirs visited, 9 inodes visited, 9 Extract calls, 202.478723ms elapsed, 202.478783ms wall time\nGHSA-8mgp-746c-j5xp and 2 aliases have been filtered out because: nltk through 3.10.3: TransitionParser.train/parse, AveragedPerceptron.save/load, PerceptronTagger.save_to_json and nltk.classify.maxent.save_maxent_params open caller-chosen model paths with the built-in open() instead of the pathsec helpers (the advisory's comparison case is the guarded PerceptronTagger.load_from_json, which in 3.10.3 still authorizes a caller-chosen private model directory), so untrusted input that chooses a model import or export path can read or write outside the allowed roots; pathsec enforcement is on by default (ENFORCE = True in nltk/pathsec.py of 3.10.3). No patched release as of 2026-09-27; the fixes are merged on develop (nltk #3757, #3759, #3813). Each lock allowed to pin nltk is named, with its reviewed sha256 and non-reachability evidence, in IGNORE_ALLOWED_LOCKS in tests/test_osv_lockfile_coverage.py. Lumibot lock: nltk 3.10.3 is a transitive pin (google-adk, llama-index-core) of the evaluation-only Lumibot 4.6.1 environment, run offline under bwrap, and no trial code calls these APIs (evidence: blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json). Expiry plan: relock every allowed lock onto the first nltk release that ships those fixes, then delete this ignore; delete the Lumibot lock unless a verdict has adopted Lumibot.\nGHSA-8mgp-746c-j5xp and 2 aliases have been filtered out because: nltk through 3.10.3: TransitionParser.train/parse, AveragedPerceptron.save/load, PerceptronTagger.save_to_json and nltk.classify.maxent.save_maxent_params open caller-chosen model paths with the built-in open() instead of the pathsec helpers (the advisory's comparison case is the guarded PerceptronTagger.load_from_json, which in 3.10.3 still authorizes a caller-chosen private model directory), so untrusted input that chooses a model import or export path can read or write outside the allowed roots; pathsec enforcement is on by default (ENFORCE = True in nltk/pathsec.py of 3.10.3). No patched release as of 2026-09-27; the fixes are merged on develop (nltk #3757, #3759, #3813). Each lock allowed to pin nltk is named, with its reviewed sha256 and non-reachability evidence, in IGNORE_ALLOWED_LOCKS in tests/test_osv_lockfile_coverage.py. Lumibot lock: nltk 3.10.3 is a transitive pin (google-adk, llama-index-core) of the evaluation-only Lumibot 4.6.1 environment, run offline under bwrap, and no trial code calls these APIs (evidence: blueprints/us-equities/engine-trials/spy-one-zero-20260926/repository-checks.json). Expiry plan: relock every allowed lock onto the first nltk release that ships those fixes, then delete this ignore; delete the Lumibot lock unless a verdict has adopted Lumibot.\nGHSA-hj66-6f7g-4r5v and 1 alias have been filtered out because: oauthlib 0.6.1 through 3.3.1 (fixed in 4.0.0): RevocationEndpoint wraps its response in the request's callback parameter only when constructed with enable_jsonp=True (oauthlib/oauth2/rfc6749/endpoints/revocation.py:72-73 and 81-82 in 3.3.1); oauthlib's pre-configured servers never pass it. Two allowed locks pin 3.3.1: the OpenHands recipe lock and the frozen, evaluation-only Lumibot lock (run offline under bwrap). A text search of one hash-verified artifact per requirement of both locks found no enable_jsonp or create_revocation_response and no importer of oauthlib's endpoints, grant types or servers: oauthlib is imported only by requests-oauthlib 2.0.0 (client classes, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class); every other RevocationEndpoint is Authlib's own class, and Authlib does not import oauthlib. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: the OpenHands lock was relocked onto PyJWT 2.14.0 on 2026-09-30 and still pins oauthlib 3.3.1; as of 2026-09-30, oauthlib 4.0.0 (PyPI, 2026-09-28T06:01Z) was inside the 7-day window the upstream workspace's exclude-newer applies (until 2026-10-05T06:01:19Z), so the relock onto it follows, tracked in #518 (owner: bc, session native-agent-stack-bc; earliest 2026-10-05T18:40:43Z, when PyJWT 2.15.1 has left its window too; due 2026-10-08), and in the same change deletes the OpenHands entry of IGNORE_ALLOWED_LOCKS, whose sha256 pin fails any change to that lock. The Lumibot lock stays frozen on 3.3.1, so on 2026-10-13 renew this ignore for that lock alone with a new dated reason, or delete that lock.\nGHSA-xpv3-w29h-x7cv and 1 alias have been filtered out because: oauthlib >= 3.0.0, < 4.0.0 (fixed in 4.0.0; the scanned locks pin 3.3.1): an oauthlib authorization server compares the PKCE code_verifier with == (code_challenge_method_s256 at oauthlib/oauth2/rfc6749/grant_types/authorization_code.py:49 and code_challenge_method_plain at :61, in 3.3.1), called only from AuthorizationCodeGrant.validate_token_request (line 506) when a token endpoint handles a request. Neither allowed lock (the OpenHands recipe lock and the frozen Lumibot lock) runs an oauthlib authorization server: in a text search of one hash-verified artifact per requirement of both locks, oauthlib is imported only by requests-oauthlib 2.0.0 (WebApplicationClient, LegacyApplicationClient, the oauth1 Client, token errors and helpers) and, in the Lumibot lock, kubernetes 36.0.3 (an exception class), and nothing imports oauthlib's grant types, endpoints or servers; the PKCE code in openhands-sdk, requests-oauthlib and google-auth-oauthlib only generates a verifier as a client. Evidence: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json and, for the OpenHands lock at its relocked sha256, evidence/receipts/osv-openhands-pyjwt-relock-20260930.json. Expiry plan: as for GHSA-hj66-6f7g-4r5v; the OpenHands relock onto oauthlib 4.0.0 removes that lock's pin, and on 2026-10-13 this ignore is renewed for the frozen Lumibot lock alone or that lock is deleted.\nFiltered 4 vulnerabilities from output\n.github/osv-scanner.toml has unused ignores:\n - GHSA-h35f-9h28-mq5c\n",
+      "unignored_package_findings": [],
+      "limitations": [
+        "The OSV requirements parser omits direct SDK/tools wheel URL requirements; their exact artifacts are separately hash-verified.",
+        "Existing NLTK and OAuthlib suppressions are source-scoped and expire; guard success and independent reachability review remain separate.",
+        "No model inference or token-saving comparison was performed."
+      ]
+    }
+  ]
+}

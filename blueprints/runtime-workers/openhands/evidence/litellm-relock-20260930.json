@@ -1,0 +1,1550 @@
+{
+  "schema_version": 1,
+  "record": "openhands-150-litellm-native-relock-20260930",
+  "observed_utc": "2026-09-30T22:04:53.859017+00:00",
+  "evidence_class": "source_package_qualification",
+  "status": "source_candidate_independent_review_pending",
+  "scope": "Published OpenHands SDK/tools 1.50.0 package closure on Linux x86_64 CPython 3.13.15 only.",
+  "baseline": {
+    "commit": "f7223996a58fee9f3cab52e8f1cef24f15e39228",
+    "requirements_sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+    "previous_receipt": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930.json",
+    "previous_independent_review": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/54d09ee8810ed98059347097277fcd9f8432de36/evidence/artifacts/openhands-oauthlib-review-535-head7c0df3-20260930/receipt.json",
+    "meaning": "Historical 832938 review and original successful scan remain unchanged; neither is a fresh independent review of this new lock."
+  },
+  "research": {
+    "advisory": "GHSA-3cv6-jpf6-8222",
+    "cve": "CVE-2026-84377",
+    "github_database_published_utc": "2026-09-30T21:11:25Z",
+    "selected_branch_affected_range": ">=1.93.0,<1.93.2",
+    "patched": "1.93.2",
+    "repository": "https://github.com/BerriAI/litellm",
+    "tag": "v1.93.2",
+    "tag_commit": "cd1bd0f4b8af865f8d05fbd938392fdd4703babc",
+    "release_backport_pr": "https://github.com/BerriAI/litellm/pull/36318",
+    "patch_chronology": "The release backports adapted request-parameter/destination checks; do not infer ancestry from the advisory mainline commit 473f72e.",
+    "official_artifacts": [
+      {
+        "filename": "litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl",
+        "uploaded_utc": "2026-08-09T02:17:21.507108Z",
+        "sha256": "dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692",
+        "url": "https://files.pythonhosted.org/packages/98/60/cb326e1094f7042f28f9e21543d9f367a8aa25af6915bf4253b77da5c2a2/litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl"
+      },
+      {
+        "filename": "litellm-1.93.2.tar.gz",
+        "uploaded_utc": "2026-08-09T02:17:49.646197Z",
+        "sha256": "c5d5223ef07f36e0886397fb45cc9db4150f86a0c6f6835cee1d5524cab69dfd",
+        "url": "https://files.pythonhosted.org/packages/97/dd/28024c0e4cf2dc6ab1bad59b8357af7f460e952c69526eae28f12ac4ee5e/litellm-1.93.2.tar.gz"
+      }
+    ],
+    "cutoff_instruction": "OpenHands/software-agent-sdk@395b94b0c3c4994f6c530f1e3bf3196f71fab950 pyproject.toml:8 says to bump or remove the LiteLLM-specific cutoff when upgrading past 1.93.0.",
+    "dependency_bounds": "dcf401af openhands-sdk/pyproject.toml allows litellm>=1.93.0; LiteLLM1.93.2 base aiohttp>=3.14.2 is satisfied by the retained aiohttp3.14.3 pin."
+  },
+  "resolution": {
+    "target": "Linux x86_64 CPython 3.13.15 only",
+    "baseline_requirements_sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+    "candidate_requirements_sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+    "baseline_control_byte_identical": true,
+    "explicit_no_config_recompile_byte_identical": true,
+    "declared_requirements": 176,
+    "changed_package_blocks": [
+      "litellm"
+    ],
+    "other_package_blocks_byte_identical": 175,
+    "added": [],
+    "removed": [],
+    "installed_versions_checked": 176,
+    "version_mismatches": [],
+    "installed_distributions_including_build_and_test_tools": 182,
+    "qualification_tools": {
+      "pytest": "9.0.3",
+      "pytest-asyncio": "1.3.0",
+      "pluggy": "1.6.0",
+      "iniconfig": "2.3.0"
+    },
+    "oauth_review_identities": [
+      {
+        "path": "oauthlib/__init__.py",
+        "sha256": "ccbf8a40b750b21931f842b1b416e0bb5cb24e97f54d127b42d7da38eb1d5dc4"
+      },
+      {
+        "path": "oauthlib/oauth1/__init__.py",
+        "sha256": "e3b84443bb3f1595cbc94b7a5d513e0cf0bcbd4315b0997bffe1c290d3362253"
+      },
+      {
+        "path": "oauthlib/oauth2/__init__.py",
+        "sha256": "2bb207c3f04d0992d24d0a807d0aac2cad0ad3303afcaad00c2cdce12fb7de24"
+      },
+      {
+        "path": "oauthlib/common.py",
+        "sha256": "39e686f928b00d7004b0ad5f921e4669b8123c68c6e0072ec2eab007986b1bf0"
+      },
+      {
+        "path": "oauthlib/oauth2/rfc6749/endpoints/revocation.py",
+        "sha256": "ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c"
+      },
+      {
+        "path": "oauthlib/oauth2/rfc6749/grant_types/authorization_code.py",
+        "sha256": "0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6"
+      },
+      {
+        "path": "oauthlib/oauth2/rfc6749/endpoints/pre_configured.py",
+        "sha256": "6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316"
+      },
+      {
+        "path": "oauthlib/openid/connect/core/endpoints/pre_configured.py",
+        "sha256": "bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee"
+      },
+      {
+        "path": "func_timeout/py2_raise.py",
+        "sha256": "19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77"
+      }
+    ],
+    "official_sdist_name_reviews": [
+      {
+        "version": "1.93.0",
+        "archive_sha256": "140bf215e264c71601bca9c06d2436c5451bb59e1e195ea23fc2d3d87b6929ec",
+        "python_sources": 2104,
+        "advisory_name_hits": [],
+        "parse_errors": []
+      },
+      {
+        "version": "1.93.2",
+        "archive_sha256": "c5d5223ef07f36e0886397fb45cc9db4150f86a0c6f6835cee1d5524cab69dfd",
+        "python_sources": 2104,
+        "advisory_name_hits": [],
+        "parse_errors": []
+      }
+    ],
+    "candidate_wheel_sha256": "dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692",
+    "candidate_python_sources_compared": 2104,
+    "wheel_to_installed_mismatches": [],
+    "wheel_to_sdist_mismatches": [],
+    "native_imports_passed": true,
+    "limitations": [
+      "Static name/AST review does not prove semantic or dynamic unreachability.",
+      "One compiled LiteLLM extension is not assessed by the Python source scan.",
+      "No proxy-server, provider, model, image, host deployment or task-quality execution."
+    ],
+    "sdk_commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "uv_version": "0.12.17",
+    "requirements_sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+    "captured_inputs": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-captured-inputs.json"
+  },
+  "native_install": {
+    "fresh_owned_venv": true,
+    "hash_required_build_install_exit": 0,
+    "hash_required_runtime_install_exit": 0,
+    "pip_check_before_and_after_test_tools_exit": 0,
+    "distributions_before_test_tools": 178,
+    "distributions_after_test_tools": 182,
+    "runtime_requirements_count": 176,
+    "qualification_tools_outside_runtime_lock": true,
+    "sdk_local_fixtures": {
+      "tests": 12,
+      "skips": 0,
+      "exit_code": 0,
+      "meaning": "Existing repository fixtures against real SDK objects with model calls patched."
+    }
+  },
+  "unchanged_upstream_module": {
+    "repository": "https://github.com/BerriAI/litellm",
+    "commit": "cd1bd0f4b8af865f8d05fbd938392fdd4703babc",
+    "file": "tests/test_litellm/litellm_core_utils/test_url_utils.py",
+    "source_sha256": "f8bffa71eab0df126893c63a6dc0ee187d0b14ca53baf4c1ae165bef69fd9973",
+    "config": "pyproject.toml",
+    "config_sha256": "71d153eb3fb27613f6b7177924a703bc5b50d2ee4523df3bf2dc5949e9908217",
+    "pytest": "9.0.3",
+    "pytest_asyncio": "1.3.0",
+    "tests_passed": 68,
+    "skipped": 0,
+    "exit_code": 0,
+    "warning": "PytestAssertRewriteWarning: anyio was already imported.",
+    "method": "Unmodified module/config, neutral cwd, append import mode and before/after in-process installed LiteLLM identity assertions.",
+    "limits": "Bounded upstream URL helper module only; complete workspace/proxy/authenticated routing and provider execution were not run."
+  },
+  "osv": {
+    "version": "2.6.0",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "configuration_sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+    "recognized_requirements": 174,
+    "baseline_configured_exit_code": 1,
+    "baseline_configured_ids": [
+      "GHSA-3cv6-jpf6-8222"
+    ],
+    "baseline_empty_exit_code": 1,
+    "baseline_empty_ids": [
+      "GHSA-3cv6-jpf6-8222",
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "candidate_configured_exit_code": 0,
+    "candidate_configured_ids": [],
+    "candidate_empty_exit_code": 1,
+    "candidate_empty_ids": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "configuration_ignored_ids_and_expiries_unchanged": true,
+    "whole_inventory_workflow": "Not newly executed here; later exact-step/current-head checks belong to the coordinator."
+  },
+  "oauthlib_exact_target_review": {
+    "requirements_sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+    "version": "3.3.1",
+    "target": "Linux x86_64 CPython3.13.15 only",
+    "fresh_maintained_scan_exit": 0,
+    "fresh_alias_scan_exit": 0,
+    "installed_python_sources_scanned": 10772,
+    "recipe_python_sources_scanned": 12,
+    "initial_pre_test_tools_source_scan_count": 10684,
+    "final_caller_scans": [
+      "maintained-jwt-callers-after-test-tools",
+      "oauthlib-alias-callers-after-test-tools"
+    ],
+    "unhandled_parse_errors": 0,
+    "unchanged_source_identities": [
+      {
+        "path": "oauthlib/__init__.py",
+        "sha256": "ccbf8a40b750b21931f842b1b416e0bb5cb24e97f54d127b42d7da38eb1d5dc4"
+      },
+      {
+        "path": "oauthlib/oauth1/__init__.py",
+        "sha256": "e3b84443bb3f1595cbc94b7a5d513e0cf0bcbd4315b0997bffe1c290d3362253"
+      },
+      {
+        "path": "oauthlib/oauth2/__init__.py",
+        "sha256": "2bb207c3f04d0992d24d0a807d0aac2cad0ad3303afcaad00c2cdce12fb7de24"
+      },
+      {
+        "path": "oauthlib/common.py",
+        "sha256": "39e686f928b00d7004b0ad5f921e4669b8123c68c6e0072ec2eab007986b1bf0"
+      },
+      {
+        "path": "oauthlib/oauth2/rfc6749/endpoints/revocation.py",
+        "sha256": "ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c"
+      },
+      {
+        "path": "oauthlib/oauth2/rfc6749/grant_types/authorization_code.py",
+        "sha256": "0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6"
+      },
+      {
+        "path": "oauthlib/oauth2/rfc6749/endpoints/pre_configured.py",
+        "sha256": "6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316"
+      },
+      {
+        "path": "oauthlib/openid/connect/core/endpoints/pre_configured.py",
+        "sha256": "bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee"
+      },
+      {
+        "path": "func_timeout/py2_raise.py",
+        "sha256": "19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77"
+      }
+    ],
+    "fresh_litellm_complete_official_python_sources": [
+      {
+        "version": "1.93.0",
+        "archive_sha256": "140bf215e264c71601bca9c06d2436c5451bb59e1e195ea23fc2d3d87b6929ec",
+        "python_sources": 2104,
+        "advisory_name_hits": [],
+        "parse_errors": []
+      },
+      {
+        "version": "1.93.2",
+        "archive_sha256": "c5d5223ef07f36e0886397fb45cc9db4150f86a0c6f6835cee1d5524cab69dfd",
+        "python_sources": 2104,
+        "advisory_name_hits": [],
+        "parse_errors": []
+      }
+    ],
+    "caller_conclusion": "Six requests_oauthlib client/helper importer files remain; the new LiteLLM Python source scan adds no OAuthlib/advisory-name caller.",
+    "limits": "Static name/AST/alias review, with text-only Python2 helper and existing method limits; no semantic/dynamic unreachability or authorization-server trace. One compiled LiteLLM extension is outside the Python source scan.",
+    "independent_current_candidate_review": "Pending; historical #558/#537 do not automatically carry to the new digest."
+  },
+  "retained_attempts_and_corrections": [
+    "Original 832938 successful scan remains dated; the new database advisory is retained as a fresh failing baseline, not erased.",
+    "A speculative scripts/check_openhands_oauthlib.py read found no file; rg located the actual guard tests/test_osv_lockfile_coverage.py.",
+    "Four attempted curl captures were intercepted before execution by the context-mode hook; no native fetch/exit claim uses those calls. Primary responses were then actually captured with native urllib.request, outside model output.",
+    "Initial qualification-tool preparation reused pytest8.4.2 from the previous relock. Tagged LiteLLM pyproject pins9.0.3/asyncio1.3; those exact versions were installed before any upstream test execution. The preparation is retained in the ledger."
+  ],
+  "execution_boundary": {
+    "model_trials_performed": false,
+    "provider_usage": null,
+    "runtime_image_built_or_executed": false,
+    "proxy_server_executed": false,
+    "host_deploy_or_config_change": false,
+    "gateway_or_credentials_changed": false,
+    "upstream_workspace_or_lock_changed": false
+  },
+  "repository_checks_before_shared_registration": {
+    "focused_guard_tests": {
+      "tests": 38,
+      "skips": 0,
+      "exit_code": 0
+    },
+    "source_whitespace_check_exit_code": 0,
+    "full_validate_py_exit_code": 1,
+    "returned_condition": "Only SHA/byte-count mismatches for the four owned existing files; the shared evidence index remains at the immutable base and is intentionally coordinator-owned.",
+    "mismatched_existing_paths": [
+      "blueprints/runtime-workers/openhands/README.md",
+      "blueprints/runtime-workers/openhands/pins.json",
+      "blueprints/runtime-workers/openhands/requirements.lock",
+      "tests/test_osv_lockfile_coverage.py"
+    ],
+    "required_closure": "Coordinator registers the owned source/new artifacts and runs fresh validation on the integrated exact head."
+  },
+  "late_repository_checks": {
+    "publication_private_content_scan": {
+      "native_command": "python3 scripts/validate.py --scan-file <each of the 44 owned files>",
+      "exit_code": 0,
+      "scanned_files": 44,
+      "original_stdout_sha256": "0d4c5ca9e76868371c22d2de1419a5259e918eea3344f8edac40a812b131bdc1"
+    },
+    "complete_staged_whitespace_check": {
+      "native_command": "git diff --cached --check",
+      "exit_code": 2,
+      "original_stdout_sha256": "1232834c179f04703c4dc2970c69e3dfa8bbce5ab565403b0c90c2e95b80390d",
+      "condition": "Exactly three SHA-bound original native return artifacts contain trailing whitespace or an original final blank line; their bytes are preserved.",
+      "original_artifacts": [
+        "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-exact-runtime-and-source-identities.stderr.txt",
+        "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers-after-test-tools.stdout.txt",
+        "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers.stdout.txt"
+      ]
+    },
+    "staged_whitespace_excluding_only_the_three_bound_native_artifacts": {
+      "exit_code": 0,
+      "method": "Native git diff --cached --check with exact exclude pathspecs for the three artifacts named above; no repository policy, ignore or artifact bytes changed."
+    }
+  },
+  "remaining_gates": [
+    "Fresh independent review of the exact candidate and current required hosted checks.",
+    "The unchanged upstream workspace root/uv.lock and pinned image retain earlier LiteLLM; frozen workspace/image execution is not covered by this package compile.",
+    "Full-image 56 High/Critical findings, provider/P3, trusted observer, frozen task-quality, compression and whole-task metering remain open."
+  ],
+  "command_ledger": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-commands.json",
+  "checks": [
+    {
+      "id": "native-control-compile",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "native-control-compile.stdout.txt",
+          "bytes": 248359,
+          "sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a"
+        },
+        "stderr": {
+          "file": "native-control-compile.stderr.txt",
+          "bytes": 31,
+          "sha256": "918ec0e68c8174d18812542792848a8b201a0e824dbb0e25d2f67f2262ef9b8e"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "reuse_exact_lock_bytes": true,
+          "sha256": "83293867247323c4d8fc463096e8a9c01dbee2ada5898112bbbb7d1a62a8b47a",
+          "bytes": 248359,
+          "source": "f7223996a58fee9f3cab52e8f1cef24f15e39228:blueprints/runtime-workers/openhands/requirements.lock"
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-control-compile.stderr.txt",
+          "sha256": "918ec0e68c8174d18812542792848a8b201a0e824dbb0e25d2f67f2262ef9b8e",
+          "bytes": 31,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "baseline-osv-empty-config",
+      "exit_code": 1,
+      "original_streams": {
+        "stdout": {
+          "file": "baseline-osv-empty-config.stdout.txt",
+          "bytes": 57700,
+          "sha256": "01763bc8d57e433c856c21fb09a81e73e5ee7220cce68fa7989a9d3ae8e5a3f3"
+        },
+        "stderr": {
+          "file": "baseline-osv-empty-config.stderr.txt",
+          "bytes": 226,
+          "sha256": "1986c08a0e77938a884f67dacad1653b184be045f6badfe045977a1d987f8a22"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-empty-config.stdout.txt",
+          "sha256": "b7eedfbee6122774031a30c319f714d849c5c1cf23abb9dda493403524a30c7f",
+          "bytes": 57685,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-empty-config.stderr.txt",
+          "sha256": "5badffe477826da86e599f6e3b4eda2197a4ac0535ecf3be64cb255064198f73",
+          "bytes": 211,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "baseline-osv-current-config",
+      "exit_code": 1,
+      "original_streams": {
+        "stdout": {
+          "file": "baseline-osv-current-config.stdout.txt",
+          "bytes": 38003,
+          "sha256": "18c895d7dee9adcf9f35ca42eea01e9dffd49e07e5d9c6c563b399bfb73d5ad9"
+        },
+        "stderr": {
+          "file": "baseline-osv-current-config.stderr.txt",
+          "bytes": 3660,
+          "sha256": "d4c6730ef46290118bca06ebf4b544933cd041a2a08dabfc0486a9cd0ae702c3"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-current-config.stdout.txt",
+          "sha256": "a92e835298713c688fe1cec4e6dce17342294e5d82500617f08adefdb6f81bc8",
+          "bytes": 37988,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-current-config.stderr.txt",
+          "sha256": "7de52e31d1f445e1709affba57e0707156ad7825b3090a91e516fd1b334bbe1a",
+          "bytes": 3630,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "scanner-version",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "scanner-version.stdout.txt",
+          "bytes": 134,
+          "sha256": "e0bc7fa9d9b902f5179238abc870bc238c6f119e8c4c0b58b63fd26289fc5ea7"
+        },
+        "stderr": {
+          "file": "scanner-version.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-scanner-version.stdout.txt",
+          "sha256": "e0bc7fa9d9b902f5179238abc870bc238c6f119e8c4c0b58b63fd26289fc5ea7",
+          "bytes": 134,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "litellm-primary-pypi",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-primary-pypi.stdout.txt",
+          "bytes": 72340,
+          "sha256": "819d3bd8d22fc404a9ad0bcf83568917de56c9e7767e678a3c3f2594d37a459d"
+        },
+        "stderr": {
+          "file": "litellm-primary-pypi.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "kept_private": true,
+          "reason": "Original primary-source response; immutable URLs and source/input digests are recorded separately."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "litellm-primary-advisory",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-primary-advisory.stdout.txt",
+          "bytes": 4347,
+          "sha256": "37cd0a9ca583552d0f5555a4cb4fa4f3567ebb4db0490b9d3b9b66c28781f908"
+        },
+        "stderr": {
+          "file": "litellm-primary-advisory.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "kept_private": true,
+          "reason": "Original primary-source response; immutable URLs and source/input digests are recorded separately."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "litellm-primary-release",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-primary-release.stdout.txt",
+          "bytes": 3276,
+          "sha256": "a97cad1854a7b10c79a2999cd4d075da68ed9d216fbfd62d26799ef336b55f84"
+        },
+        "stderr": {
+          "file": "litellm-primary-release.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "kept_private": true,
+          "reason": "Original primary-source response; immutable URLs and source/input digests are recorded separately."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "litellm-primary-backport",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-primary-backport.stdout.txt",
+          "bytes": 25369,
+          "sha256": "eb569433c26075bb360b2259f707b58959558068642c72bc5c581050dd4cf215"
+        },
+        "stderr": {
+          "file": "litellm-primary-backport.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "kept_private": true,
+          "reason": "Original primary-source response; immutable URLs and source/input digests are recorded separately."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "native-candidate-compile",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "native-candidate-compile.stdout.txt",
+          "bytes": 250484,
+          "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb"
+        },
+        "stderr": {
+          "file": "native-candidate-compile.stderr.txt",
+          "bytes": 31,
+          "sha256": "75eac73e43f1bf7306faa2dec1657ec06f70d1fbe8c5b60e2f39973f4105c4cc"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "reuse_exact_lock_bytes": true,
+          "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+          "bytes": 250484,
+          "source": "blueprints/runtime-workers/openhands/requirements.lock"
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-candidate-compile.stderr.txt",
+          "sha256": "75eac73e43f1bf7306faa2dec1657ec06f70d1fbe8c5b60e2f39973f4105c4cc",
+          "bytes": 31,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "fresh-venv",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "fresh-venv.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "fresh-venv.stderr.txt",
+          "bytes": 267,
+          "sha256": "79005560da00d0dabbef95b9c6bdb30f8379deff9c6e8722bb3817284e88dcbd"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-fresh-venv.stderr.txt",
+          "sha256": "d2e3ddc5bdcd75429cb2739ee268afa3a10c09495378a8dbe0883a024ce97293",
+          "bytes": 232,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "build-hash-install",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "build-hash-install.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "build-hash-install.stderr.txt",
+          "bytes": 191,
+          "sha256": "14dc7f75c7f437a52d1d04e7de30987fdb082046ab55443731771badc2d52d17"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-build-hash-install.stderr.txt",
+          "sha256": "667ac8b6b61cacb3f7b70aeebf1132d6f42c01b490a321e1c98ee89b651c8a69",
+          "bytes": 176,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "candidate-osv-current-config",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "candidate-osv-current-config.stdout.txt",
+          "bytes": 124,
+          "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e"
+        },
+        "stderr": {
+          "file": "candidate-osv-current-config.stderr.txt",
+          "bytes": 3662,
+          "sha256": "b30fc0165e768f434a18243291b4698f593854df0b51f8bb3ed90d3084f4dc23"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-current-config.stdout.txt",
+          "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+          "bytes": 124,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-current-config.stderr.txt",
+          "sha256": "35d74b0c8ef3cf64d2e349348d53bb5909907c1d1cc4d7996930118bdae5d31d",
+          "bytes": 3632,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "candidate-osv-empty-config",
+      "exit_code": 1,
+      "original_streams": {
+        "stdout": {
+          "file": "candidate-osv-empty-config.stdout.txt",
+          "bytes": 19985,
+          "sha256": "3db50408892f99cfef9db5bb013bc8acb3fda095f41aef9e276dc123317ff202"
+        },
+        "stderr": {
+          "file": "candidate-osv-empty-config.stderr.txt",
+          "bytes": 228,
+          "sha256": "d430e778c59ba2a460ff370879983307d9b5ed978e3fcc1150acb27d6272a3de"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-empty-config.stdout.txt",
+          "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+          "bytes": 19970,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-empty-config.stderr.txt",
+          "sha256": "08bfcde0bd82cb1139676b96fbdd495ba84bcb5e0878999577290f4f2f8f3536",
+          "bytes": 213,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "litellm-cutoff-maintainer-source",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-cutoff-maintainer-source.stdout.txt",
+          "bytes": 3850,
+          "sha256": "6ddf2465f2b0a7dc927af912709606337c798f56023ce10ca63ad0897572661b"
+        },
+        "stderr": {
+          "file": "litellm-cutoff-maintainer-source.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "kept_private": true,
+          "reason": "Original primary-source response; immutable URLs and source/input digests are recorded separately."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "runtime-hash-install",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "runtime-hash-install.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "runtime-hash-install.stderr.txt",
+          "bytes": 4533,
+          "sha256": "793f4227046b9c213906d7bdc7ca3b4aea49d08131767b53ecec12a6b56559e8"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-runtime-hash-install.stderr.txt",
+          "sha256": "6dd5d8d9dac64dd1c3b67c010184f47057ec47086b69b4fcc191ddd31365c55a",
+          "bytes": 4518,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "maintained-jwt-callers",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "maintained-jwt-callers.stdout.txt",
+          "bytes": 2926,
+          "sha256": "c59587e1bed345f844fa0d31947765e9a766027a2d41f1d22ea2ff5c71714065"
+        },
+        "stderr": {
+          "file": "maintained-jwt-callers.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-maintained-jwt-callers.stdout.txt",
+          "sha256": "c59587e1bed345f844fa0d31947765e9a766027a2d41f1d22ea2ff5c71714065",
+          "bytes": 2926,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "native-pip-check",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "native-pip-check.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "native-pip-check.stderr.txt",
+          "bytes": 142,
+          "sha256": "714b6e1f9d1a1fe1100b4ae6e3e64cfcbabbdb1ed96fba6010fd845fb4868993"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-pip-check.stderr.txt",
+          "sha256": "94b6dcbed09c7f53f08e003dbf72ddb250182edce8a877cb33af39ee798d18f2",
+          "bytes": 127,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "oauthlib-alias-callers",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "oauthlib-alias-callers.stdout.txt",
+          "bytes": 37078,
+          "sha256": "5b6328e2bd292afc13d4a4eaab9e85abf989eae7879e4630478a442a8e390813"
+        },
+        "stderr": {
+          "file": "oauthlib-alias-callers.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers.stdout.txt",
+          "sha256": "5b6328e2bd292afc13d4a4eaab9e85abf989eae7879e4630478a442a8e390813",
+          "bytes": 37078,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "sdk-fixtures",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "sdk-fixtures.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "sdk-fixtures.stderr.txt",
+          "bytes": 2962,
+          "sha256": "c9389e58b5cc13be9155ca3943fc8cb4d1b989b1e85256678d8948e92c4149a5"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-sdk-fixtures.stderr.txt",
+          "sha256": "c9389e58b5cc13be9155ca3943fc8cb4d1b989b1e85256678d8948e92c4149a5",
+          "bytes": 2962,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "litellm-candidate-sdist-download",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-candidate-sdist-download.stdout.txt",
+          "bytes": 175,
+          "sha256": "09e168d8c412e327fe5db70c2548469f1d09e255d56523c71947353fc702e321"
+        },
+        "stderr": {
+          "file": "litellm-candidate-sdist-download.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-candidate-sdist-download.stdout.txt",
+          "sha256": "09e168d8c412e327fe5db70c2548469f1d09e255d56523c71947353fc702e321",
+          "bytes": 175,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "litellm-baseline-sdist-download",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-baseline-sdist-download.stdout.txt",
+          "bytes": 175,
+          "sha256": "16d1439db3c81d8d096b074765b0c9d68a2fd17a7d792b17f7aa38d03e847988"
+        },
+        "stderr": {
+          "file": "litellm-baseline-sdist-download.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-baseline-sdist-download.stdout.txt",
+          "sha256": "16d1439db3c81d8d096b074765b0c9d68a2fd17a7d792b17f7aa38d03e847988",
+          "bytes": 175,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "native-candidate-no-config-recompile",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "native-candidate-no-config-recompile.stdout.txt",
+          "bytes": 250484,
+          "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb"
+        },
+        "stderr": {
+          "file": "native-candidate-no-config-recompile.stderr.txt",
+          "bytes": 30,
+          "sha256": "bed33fec5250907e74380519d38f70bd2e5ba95edead33072d8d23ddacd77747"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "reuse_exact_lock_bytes": true,
+          "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+          "bytes": 250484,
+          "source": "blueprints/runtime-workers/openhands/requirements.lock"
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-candidate-no-config-recompile.stderr.txt",
+          "sha256": "bed33fec5250907e74380519d38f70bd2e5ba95edead33072d8d23ddacd77747",
+          "bytes": 30,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "litellm-candidate-wheel-download",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-candidate-wheel-download.stdout.txt",
+          "bytes": 206,
+          "sha256": "313610189e6eeecc35b64d34f9e0cd185e310f8b94dfb6cec5a9bd3a48eb8d38"
+        },
+        "stderr": {
+          "file": "litellm-candidate-wheel-download.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-candidate-wheel-download.stdout.txt",
+          "sha256": "313610189e6eeecc35b64d34f9e0cd185e310f8b94dfb6cec5a9bd3a48eb8d38",
+          "bytes": 206,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "pytest-qualification-tools",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "pytest-qualification-tools.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "pytest-qualification-tools.stderr.txt",
+          "bytes": 187,
+          "sha256": "d5b87cbaef0fbb0f48003f8676670e4ef72a7b1cd64add6ed41271fd2d522a29"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-pytest-qualification-tools.stderr.txt",
+          "sha256": "c30218aa1df2e8325dfac41e3314a642598d698a997cc01b9ab6ac66f694e66b",
+          "bytes": 172,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "litellm-upstream-url-tests-source",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-upstream-url-tests-source.stdout.txt",
+          "bytes": 21000,
+          "sha256": "f8bffa71eab0df126893c63a6dc0ee187d0b14ca53baf4c1ae165bef69fd9973"
+        },
+        "stderr": {
+          "file": "litellm-upstream-url-tests-source.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "kept_private": true,
+          "reason": "Original primary-source response; immutable URLs and source/input digests are recorded separately."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "native-upstream-test-tools",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "native-upstream-test-tools.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "native-upstream-test-tools.stderr.txt",
+          "bytes": 221,
+          "sha256": "c82ea9e1006a88b443c01c15185683e44553117f2ea6216b08605e80b8c02bde"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-upstream-test-tools.stderr.txt",
+          "sha256": "32207d0e41826374f93e7912571a45efda0fb1a28f98e3fa3aa36a53da874b9d",
+          "bytes": 206,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "litellm-upstream-test-config-source",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "litellm-upstream-test-config-source.stdout.txt",
+          "bytes": 11304,
+          "sha256": "71d153eb3fb27613f6b7177924a703bc5b50d2ee4523df3bf2dc5949e9908217"
+        },
+        "stderr": {
+          "file": "litellm-upstream-test-config-source.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "kept_private": true,
+          "reason": "Original primary-source response; immutable URLs and source/input digests are recorded separately."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "exact-runtime-and-source-identities",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "exact-runtime-and-source-identities.stdout.txt",
+          "bytes": 3168,
+          "sha256": "a19f19834e68a4e713c95f509eabdf5664bb229929673d33973e6114ee15486d"
+        },
+        "stderr": {
+          "file": "exact-runtime-and-source-identities.stderr.txt",
+          "bytes": 658,
+          "sha256": "f6f4156bf3e5e2da69a8f8f4c5d672a2433ce1376f8d467f018987a066078ed8"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-exact-runtime-and-source-identities.stdout.txt",
+          "sha256": "a19f19834e68a4e713c95f509eabdf5664bb229929673d33973e6114ee15486d",
+          "bytes": 3168,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-exact-runtime-and-source-identities.stderr.txt",
+          "sha256": "f6f4156bf3e5e2da69a8f8f4c5d672a2433ce1376f8d467f018987a066078ed8",
+          "bytes": 658,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "unchanged-upstream-url-tests",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "unchanged-upstream-url-tests.stdout.txt",
+          "bytes": 7610,
+          "sha256": "f1c111c81de875f753d4175ad1db81c1e356d2bdec578dfae966760e798615c0"
+        },
+        "stderr": {
+          "file": "unchanged-upstream-url-tests.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-unchanged-upstream-url-tests.stdout.txt",
+          "sha256": "0704464298af960099ab7677cec20c3f8be9b9c40fe9942e05062c9ec356cb79",
+          "bytes": 7535,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "native-pip-check-after-test-tools",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "native-pip-check-after-test-tools.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "native-pip-check-after-test-tools.stderr.txt",
+          "bytes": 142,
+          "sha256": "bcd3304a2098aa514059b07b6469fccc1221d0c0311dc653756fa1faa4e87282"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-pip-check-after-test-tools.stderr.txt",
+          "sha256": "2919b108fe00735e79cd413a063e8699103a744b3765f4b963c1ad6f42a7f941",
+          "bytes": 127,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "native-recipe-lock-compile",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "native-recipe-lock-compile.stdout.txt",
+          "bytes": 250484,
+          "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb"
+        },
+        "stderr": {
+          "file": "native-recipe-lock-compile.stderr.txt",
+          "bytes": 31,
+          "sha256": "0478aad1ad8c8b08dc564a113be93d75d36f9385d680069c8d1ddaabcfe8f47d"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "reuse_exact_lock_bytes": true,
+          "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+          "bytes": 250484,
+          "source": "blueprints/runtime-workers/openhands/requirements.lock"
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-recipe-lock-compile.stderr.txt",
+          "sha256": "0478aad1ad8c8b08dc564a113be93d75d36f9385d680069c8d1ddaabcfe8f47d",
+          "bytes": 31,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "focused-guard-tests",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "focused-guard-tests.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "focused-guard-tests.stderr.txt",
+          "bytes": 6323,
+          "sha256": "ffd5c73820b250090b14c6f778a819ae429a70504669d1752dd3f1c4cca483c0"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-focused-guard-tests.stderr.txt",
+          "sha256": "ffd5c73820b250090b14c6f778a819ae429a70504669d1752dd3f1c4cca483c0",
+          "bytes": 6323,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        }
+      }
+    },
+    {
+      "id": "source-validation-before-index",
+      "exit_code": 1,
+      "original_streams": {
+        "stdout": {
+          "file": "source-validation-before-index.stdout.txt",
+          "bytes": 489,
+          "sha256": "485944c34511b8adc3b287efb2b90bf491442c05ef21b69649d072a6e3ba96c5"
+        },
+        "stderr": {
+          "file": "source-validation-before-index.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-source-validation-before-index.stdout.txt",
+          "sha256": "485944c34511b8adc3b287efb2b90bf491442c05ef21b69649d072a6e3ba96c5",
+          "bytes": 489,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "source-whitespace-check",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "source-whitespace-check.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "source-whitespace-check.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "empty_original_stream": true
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "oauthlib-alias-callers-after-test-tools",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "oauthlib-alias-callers-after-test-tools.stdout.txt",
+          "bytes": 37078,
+          "sha256": "405e7b566f850c1e74df81980bab0f2ee513ab31bc2121e87a32e793af75494c"
+        },
+        "stderr": {
+          "file": "oauthlib-alias-callers-after-test-tools.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers-after-test-tools.stdout.txt",
+          "sha256": "405e7b566f850c1e74df81980bab0f2ee513ab31bc2121e87a32e793af75494c",
+          "bytes": 37078,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    },
+    {
+      "id": "maintained-jwt-callers-after-test-tools",
+      "exit_code": 0,
+      "original_streams": {
+        "stdout": {
+          "file": "maintained-jwt-callers-after-test-tools.stdout.txt",
+          "bytes": 2926,
+          "sha256": "c2dca1cfb8bb6e6311f10ed2ff973ea8df6c900cd01092e99e1c421d7078d08e"
+        },
+        "stderr": {
+          "file": "maintained-jwt-callers-after-test-tools.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "public_returned_output": {
+        "stdout": {
+          "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-maintained-jwt-callers-after-test-tools.stdout.txt",
+          "sha256": "c2dca1cfb8bb6e6311f10ed2ff973ea8df6c900cd01092e99e1c421d7078d08e",
+          "bytes": 2926,
+          "sanitization": "Declared path substitutions only; no test or command source was changed."
+        },
+        "stderr": {
+          "empty_original_stream": true
+        }
+      }
+    }
+  ],
+  "bound_files": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-current-config.stdout.txt",
+      "sha256": "a92e835298713c688fe1cec4e6dce17342294e5d82500617f08adefdb6f81bc8",
+      "bytes": 37988,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-current-config.stderr.txt",
+      "sha256": "7de52e31d1f445e1709affba57e0707156ad7825b3090a91e516fd1b334bbe1a",
+      "bytes": 3630,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-empty-config.stdout.txt",
+      "sha256": "b7eedfbee6122774031a30c319f714d849c5c1cf23abb9dda493403524a30c7f",
+      "bytes": 57685,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-empty-config.stderr.txt",
+      "sha256": "5badffe477826da86e599f6e3b4eda2197a4ac0535ecf3be64cb255064198f73",
+      "bytes": 211,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-build-hash-install.stderr.txt",
+      "sha256": "667ac8b6b61cacb3f7b70aeebf1132d6f42c01b490a321e1c98ee89b651c8a69",
+      "bytes": 176,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-current-config.stdout.txt",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-current-config.stderr.txt",
+      "sha256": "35d74b0c8ef3cf64d2e349348d53bb5909907c1d1cc4d7996930118bdae5d31d",
+      "bytes": 3632,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-empty-config.stdout.txt",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+      "bytes": 19970,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-empty-config.stderr.txt",
+      "sha256": "08bfcde0bd82cb1139676b96fbdd495ba84bcb5e0878999577290f4f2f8f3536",
+      "bytes": 213,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-exact-runtime-and-source-identities.stdout.txt",
+      "sha256": "a19f19834e68a4e713c95f509eabdf5664bb229929673d33973e6114ee15486d",
+      "bytes": 3168,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-exact-runtime-and-source-identities.stderr.txt",
+      "sha256": "f6f4156bf3e5e2da69a8f8f4c5d672a2433ce1376f8d467f018987a066078ed8",
+      "bytes": 658,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-focused-guard-tests.stderr.txt",
+      "sha256": "ffd5c73820b250090b14c6f778a819ae429a70504669d1752dd3f1c4cca483c0",
+      "bytes": 6323,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-fresh-venv.stderr.txt",
+      "sha256": "d2e3ddc5bdcd75429cb2739ee268afa3a10c09495378a8dbe0883a024ce97293",
+      "bytes": 232,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-baseline-sdist-download.stdout.txt",
+      "sha256": "16d1439db3c81d8d096b074765b0c9d68a2fd17a7d792b17f7aa38d03e847988",
+      "bytes": 175,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-candidate-sdist-download.stdout.txt",
+      "sha256": "09e168d8c412e327fe5db70c2548469f1d09e255d56523c71947353fc702e321",
+      "bytes": 175,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-candidate-wheel-download.stdout.txt",
+      "sha256": "313610189e6eeecc35b64d34f9e0cd185e310f8b94dfb6cec5a9bd3a48eb8d38",
+      "bytes": 206,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-maintained-jwt-callers-after-test-tools.stdout.txt",
+      "sha256": "c2dca1cfb8bb6e6311f10ed2ff973ea8df6c900cd01092e99e1c421d7078d08e",
+      "bytes": 2926,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-maintained-jwt-callers.stdout.txt",
+      "sha256": "c59587e1bed345f844fa0d31947765e9a766027a2d41f1d22ea2ff5c71714065",
+      "bytes": 2926,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-candidate-compile.stderr.txt",
+      "sha256": "75eac73e43f1bf7306faa2dec1657ec06f70d1fbe8c5b60e2f39973f4105c4cc",
+      "bytes": 31,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-candidate-no-config-recompile.stderr.txt",
+      "sha256": "bed33fec5250907e74380519d38f70bd2e5ba95edead33072d8d23ddacd77747",
+      "bytes": 30,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-control-compile.stderr.txt",
+      "sha256": "918ec0e68c8174d18812542792848a8b201a0e824dbb0e25d2f67f2262ef9b8e",
+      "bytes": 31,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-pip-check-after-test-tools.stderr.txt",
+      "sha256": "2919b108fe00735e79cd413a063e8699103a744b3765f4b963c1ad6f42a7f941",
+      "bytes": 127,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-pip-check.stderr.txt",
+      "sha256": "94b6dcbed09c7f53f08e003dbf72ddb250182edce8a877cb33af39ee798d18f2",
+      "bytes": 127,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-recipe-lock-compile.stderr.txt",
+      "sha256": "0478aad1ad8c8b08dc564a113be93d75d36f9385d680069c8d1ddaabcfe8f47d",
+      "bytes": 31,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-upstream-test-tools.stderr.txt",
+      "sha256": "32207d0e41826374f93e7912571a45efda0fb1a28f98e3fa3aa36a53da874b9d",
+      "bytes": 206,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers-after-test-tools.stdout.txt",
+      "sha256": "405e7b566f850c1e74df81980bab0f2ee513ab31bc2121e87a32e793af75494c",
+      "bytes": 37078,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers.stdout.txt",
+      "sha256": "5b6328e2bd292afc13d4a4eaab9e85abf989eae7879e4630478a442a8e390813",
+      "bytes": 37078,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-pytest-qualification-tools.stderr.txt",
+      "sha256": "c30218aa1df2e8325dfac41e3314a642598d698a997cc01b9ab6ac66f694e66b",
+      "bytes": 172,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-runtime-hash-install.stderr.txt",
+      "sha256": "6dd5d8d9dac64dd1c3b67c010184f47057ec47086b69b4fcc191ddd31365c55a",
+      "bytes": 4518,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-scanner-version.stdout.txt",
+      "sha256": "e0bc7fa9d9b902f5179238abc870bc238c6f119e8c4c0b58b63fd26289fc5ea7",
+      "bytes": 134,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-sdk-fixtures.stderr.txt",
+      "sha256": "c9389e58b5cc13be9155ca3943fc8cb4d1b989b1e85256678d8948e92c4149a5",
+      "bytes": 2962,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-source-validation-before-index.stdout.txt",
+      "sha256": "485944c34511b8adc3b287efb2b90bf491442c05ef21b69649d072a6e3ba96c5",
+      "bytes": 489,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-unchanged-upstream-url-tests.stdout.txt",
+      "sha256": "0704464298af960099ab7677cec20c3f8be9b9c40fe9942e05062c9ec356cb79",
+      "bytes": 7535,
+      "sanitization": "Declared path substitutions only; no test or command source was changed."
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-capture.py.txt",
+      "sha256": "dcc64700c1d880ef495a3f414ed2ca8e806048a0e6dcd2a0dfdae65ba1504da8",
+      "bytes": 1435
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-verify.py.txt",
+      "sha256": "fb230089924a6e6dbafa15a6a4e2bb23f2ea8e5e49aa2d246fb482b6b95315b3",
+      "bytes": 6347
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-run-upstream-url-tests.py.txt",
+      "sha256": "4dc5f72e660f22d6a89d7173d8be1dea2e95a4684f0f87517a02e844d8863b0a",
+      "bytes": 1202
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-download-source.py.txt",
+      "sha256": "c1dab7fc6e1e566391eb7a3ed1b29fbdca1c851ea53369bcc3d150ee068034b6",
+      "bytes": 603
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-commands.json",
+      "sha256": "eb262f0eea6eadadb761dc839ffe5829d4609385fc198122c8f8c30623e6d801",
+      "bytes": 56062
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-captured-inputs.json",
+      "sha256": "f04c3b1703d1912e77f5283563b177763ca75d6a774c2ccdec78c5adf6568f1b",
+      "bytes": 39834
+    }
+  ],
+  "sources": [
+    "https://github.com/advisories/GHSA-3cv6-jpf6-8222",
+    "https://github.com/BerriAI/litellm/releases/tag/v1.93.2",
+    "https://github.com/BerriAI/litellm/pull/36318",
+    "https://github.com/BerriAI/litellm/tree/cd1bd0f4b8af865f8d05fbd938392fdd4703babc",
+    "https://pypi.org/pypi/litellm/1.93.2/json",
+    "https://github.com/OpenHands/software-agent-sdk/blob/395b94b0c3c4994f6c530f1e3bf3196f71fab950/pyproject.toml#L8",
+    "https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/pyproject.toml",
+    "https://docs.astral.sh/uv/pip/compile/#adding-constraints",
+    "https://docs.astral.sh/uv/reference/cli/#uv-pip-compile",
+    "https://github.com/google/osv-scanner/releases/tag/v2.6.0"
+  ]
+}

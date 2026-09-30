@@ -1,0 +1,2 @@
+{"status": "passed", "syntax_files": {"python": 10, "shell": 8, "json": 10}, "whitespace": "checked delivered source/config; retained raw command output excluded"}
+

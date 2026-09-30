@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-30",
+  "kind": "native_image_scan_and_source_triage",
+  "status": "full_image_acceptance_pending",
+  "image": "ghcr.io/openhands/agent-server@sha256:6d91a74fd2b556107e4e15476680d1d8116eeadfc06879baf7193caa73314dfc",
+  "platform": "linux/amd64",
+  "source": {
+    "repository": "https://github.com/OpenHands/software-agent-sdk",
+    "release": "v1.50.0",
+    "commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "files": ["openhands-agent-server/openhands/agent_server/docker/Dockerfile", "openhands-agent-server/openhands/agent_server/docker/build.py"]
+  },
+  "native_scan": {
+    "tool": "anchore/grype",
+    "version": "0.119.0",
+    "source": "https://github.com/anchore/grype/releases/tag/v0.119.0",
+    "command": "rtk proxy grype registry:ghcr.io/openhands/agent-server@sha256:6d91a74fd2b556107e4e15476680d1d8116eeadfc06879baf7193caa73314dfc --platform linux/amd64 --output json",
+    "exit_code": 0,
+    "exit_code_meaning": "Report generation succeeded. No severity threshold was supplied; this is not a passing image gate.",
+    "raw_report_bytes": 18299957,
+    "raw_report_sha256": "c8bac4b5732375ed173decba0a4acc57bf0bb79cce2a6571d9c602deaabcc52e",
+    "matches": 1497,
+    "severity_match_counts": {"Critical": 32, "High": 175, "Medium": 228, "Low": 64, "Negligible": 780, "Unknown": 218},
+    "fixable_high_or_critical_matches": 56,
+    "counting_scope": "Scanner package/advisory matches, not unique vulnerabilities or demonstrated exploits. Raw public-image report retained privately."
+  },
+  "triage": [
+    {"matches": 18, "classification": "apparent_package_identity_collisions", "location": "/openhands/.openvscode-server/extensions/*/package.json", "finding": "Six upstream manifests identify VS Code extensions named handlebars/npm/grunt/ini/json/diff. Image-byte confirmation remains required before any exclusion.", "source": "https://github.com/gitpod-io/openvscode-server/tree/openvscode-server-v1.109.5/extensions", "excluded": false},
+    {"matches": 21, "classification": "real_openvscode_runtime_artifacts", "finding": "Bundled Node 22.21.1 and node_modules predate advisory fixes. Reachability and permission-model preconditions were not established.", "sources": ["https://nodejs.org/en/blog/release/v22.22.0", "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases"]},
+    {"matches": 16, "classification": "embedded_go_modules", "finding": "Modules are embedded in containerd/ctr/rootlesskit/Buildx binaries. Advisory reachability is unverified.", "sources": ["https://github.com/grpc/grpc-go/security/advisories/GHSA-vp52-pcj8-j9qc", "https://github.com/grpc/grpc-go/security/advisories/GHSA-2v4p-qf9q-27wj"]},
+    {"matches": 1, "classification": "system_python", "finding": "Dockerfile pins Python 3.13.15. Its tarfile source precedes the linked hardlink-target backport; no blanket backport dismissal is justified.", "sources": ["https://github.com/python/cpython/blob/v3.13.15/Lib/tarfile.py", "https://github.com/python/cpython/pull/157192", "https://mail.python.org/archives/list/security-announce@python.org/thread/EFJWGAZJA56AKSBR2WHMHQZO7RRLZPRH/"]}
+  ],
+  "remediation_decision": {
+    "full_unmodified_rebuild_is_evidenced_fix": false,
+    "reason": "The pinned Dockerfile retains Python 3.13.15 and downloads OpenVSCode v1.109.5 with its own bundled Node. Updating global Node/npm does not update that bundled runtime.",
+    "supported_inputs": ["BASE_IMAGE", "DEBIAN_SNAPSHOT", "NPM_VERSION", "RELEASE_TAG", "RELEASE_ORG", "INSTALL_CAPABILITIES", "INSTALL_ACP_PROVIDERS"],
+    "narrower_capability_image": "INSTALL_CAPABILITIES=browser can omit vscode and nested Docker through native upstream controls, but retains the Python issue and requires separate feature-set acceptance.",
+    "next_gate": "Maintained replacement image/source inputs, native rescan and independent runtime/lifecycle/quality acceptance. No image promotion from this scan."
+  },
+  "delegation": {
+    "role": "stack-researcher",
+    "model_effort": "Astra/Max",
+    "trigger": "Consequential image acceptance decision and conflicting maintained-release versus fixable High/Critical evidence.",
+    "result": "No supported full-image remediation accepted; source-backed triage retained."
+  },
+  "boundaries": ["No OpenHands worker container/server/model run was started.", "Native SDK tests remain valid within their recorded scope; they do not qualify this full image.", "No advisory exclusions, upstream issues, source modifications or global host/gateway changes were made."]
+}

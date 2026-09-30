@@ -1,0 +1,9 @@
+argv: ["rtk", "proxy", "curl", "--fail", "--silent", "--show-error", "--location", "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64", "--output", "<PRIVATE_RESEARCH>/osv-scanner"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T15:46:03.661442+00:00
+ended_utc: 2026-09-30T15:46:04.089994+00:00
+exit_code: 0
+
+stdout:
+
+stderr:

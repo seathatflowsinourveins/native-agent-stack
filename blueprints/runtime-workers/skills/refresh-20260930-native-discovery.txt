@@ -1,0 +1,4 @@
+control: native project loader returned 0 skills
+selected: native project loader returned 77 expected skills
+prompt: names/descriptions only; no location or full skill bodies
+provider request and native invoke_skill were not executed

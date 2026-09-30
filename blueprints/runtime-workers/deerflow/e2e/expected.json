@@ -1,0 +1,54 @@
+{
+  "source": {
+    "url": "https://api.github.com/repos/bytedance/deer-flow/commits/345f08be00c8a9495079b732a39b46aa9af1584e",
+    "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+    "parent": "209a582373df18de73a0ac3982ec296b082eadf1",
+    "frozen_at": "2026-09-27",
+    "scope": "release commit only; independently read GitHub API before any E2E"
+  },
+  "files": [
+    {
+      "filename": "backend/pyproject.toml",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2
+    },
+    {
+      "filename": "backend/uv.lock",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2
+    },
+    {
+      "filename": "deploy/helm/deer-flow/Chart.yaml",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 2,
+      "changes": 4
+    },
+    {
+      "filename": "frontend/package.json",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2
+    }
+  ],
+  "summary": {
+    "file_count": 4,
+    "additions": 5,
+    "deletions": 5,
+    "changes": 10,
+    "by_status": {
+      "modified": 4
+    },
+    "paths": [
+      "backend/pyproject.toml",
+      "backend/uv.lock",
+      "deploy/helm/deer-flow/Chart.yaml",
+      "frontend/package.json"
+    ]
+  }
+}

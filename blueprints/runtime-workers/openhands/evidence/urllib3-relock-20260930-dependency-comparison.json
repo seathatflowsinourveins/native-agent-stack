@@ -1,0 +1,19 @@
+{
+  "before_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+  "after_sha256": "bd1cbbe864b20cdd33b4c580846ef75451db3aca82a4e5305207890bb6b0d072",
+  "before_requirements": 176,
+  "after_requirements": 176,
+  "unchanged_declarations": 175,
+  "changed": [
+    {
+      "name": "urllib3",
+      "before": "2.7.0",
+      "after": "2.8.0"
+    }
+  ],
+  "added": [],
+  "removed": [],
+  "only_urllib3_block_changed": true,
+  "urllib3_hashes_match_official_pypi": true,
+  "urllib3_block": "urllib3==2.8.0 \\\n    --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3 \\\n    --hash=sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63"
+}
