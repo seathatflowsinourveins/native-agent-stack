@@ -2,12 +2,15 @@
 
 Attribution (2026-09-30): pre-existing uncommitted changes observed in the main checkout; original author not
 established. Folded unchanged below this paragraph by unit F1 of coordinator session native-agent-stack-c5 from a
-read-only snapshot of those changes (tracked diff sha256 314bd1b260da0939, relative to checkout commit 5cfa2400).
-The evidence this record links is not all published with it: `evidence/artifacts/sota-finalization-20260930/` has no
-assigned owner yet, so its links do not resolve until that directory is published;
-`evidence/artifacts/native-skill-finalization-20260930/` lands with unit F3, and
-`evidence/artifacts/codex-01592-qualification-20260930/` waits on unit D4's fold of the separate host-finalization
-receipt. The [rule-text record](2026-09-30-rule-text-every-layer.md) lists what this unit folded.
+read-only snapshot of those changes (tracked diff sha256 314bd1b260da0939, relative to checkout commit 5cfa2400),
+together with 18 of the 19 evidence files of `evidence/artifacts/sota-finalization-20260930/`, which are
+byte-identical to the snapshot: a privacy scan found no personal path, host user name, session identifier or
+credential to strip. The nineteenth, `convergence.json`, is held back. It is a convergence experiment record that
+pins files of `evidence/artifacts/native-skill-finalization-20260930/` (unit F3) and
+`evidence/artifacts/codex-01592-qualification-20260930/` (unit D4) by path and sha256, and
+`scripts/validate_convergence.py --all-recorded` requires every hash-listed record to be declared and valid. Links
+into those two directories resolve when F3 and D4 land. The
+[rule-text record](2026-09-30-rule-text-every-layer.md) lists what this unit folded and the scan.
 
 The current Linux/WSL host now uses the maintained selected skill sources through
 the upstream installer. Three additional source changes were installed and the
