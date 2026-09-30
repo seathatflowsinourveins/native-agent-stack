@@ -465,31 +465,52 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
 - **Identity.** `sweep.js` merges both families' skill proposals by `skill_ref` and carries it as the merged row's
   `repository`. The refuters vote on it, and `convert.py`, `make_result.py` and the ledger compare it unchanged.
 - **Source reviews.** `convert.py` writes each skill survivor's adjudicated `pin` and `skill_md_sha256` into
-  `survivors.json`, and `source_reviews.py` reviews the SKILL.md at that pin. It finds the SKILL.md as the pinned
-  skills CLI does for `npx skills@1.7.0 add owner/repo --skill <name>`, following vercel-labs/skills v1.7.0
-  `discoverSkills` (`src/skills.ts` at `7407f389`; README "Skill Discovery"):
-  - a root `SKILL.md` with a name and description is the repository's only skill;
+  `survivors.json`, and `source_reviews.py` reviews the SKILL.md at that pin and at no other commit. It finds the
+  SKILL.md as the pinned skills CLI does for `npx skills@1.7.0 add owner/repo --skill <name>`, following
+  vercel-labs/skills v1.7.0 `discoverSkills` (`src/skills.ts` at `7407f389`; README "Skill Discovery"):
+  - each candidate `SKILL.md` is validated first, as `parseSkillMd` does: without a `name` and a `description`,
+    both non-empty strings (the CLI's `yaml` package reads the frontmatter as YAML 1.2 with the core schema), the
+    candidate is skipped and recorded in `observed.skipped_skill_md` with its reason, so it never claims the name;
+    a candidate whose `name` field names another skill is not a copy either (`filterSkills` matches `--skill`
+    against that field);
+  - a valid root `SKILL.md` is the repository's only skill;
   - otherwise the root's child folders, then `skills/`, `skills/.curated`, `.experimental`, `.system` and 30 agent
     folders (`.agents/skills`, `.claude/skills`, …), each three levels deep, where a `SKILL.md` shadows the folders
-    below it, then the skill folders a `.claude-plugin` manifest declares; and only when none of these holds a skill,
-    every folder up to five levels deep;
-  - the first location that holds a folder named `<name>` decides, so translations under `docs/<lang>/skills/` and
-    agent copies under `.kiro/skills/` never displace `skills/<name>`. On 2026-09-30 this matched
-    `npx skills@1.7.0 add <repo> --list` exactly on six sources, and all 28 installed skills resolve to their
-    manifest `path`.
+    below it, then the skill folders a `.claude-plugin` manifest declares; and only when none of these holds a valid
+    skill, every folder up to five levels deep;
+  - the first location that holds a valid folder named `<name>` decides, so an invalid earlier copy loses to a valid
+    later one, and translations under `docs/<lang>/skills/` and agent copies under `.kiro/skills/` never displace
+    `skills/<name>`. On 2026-09-30 the location order matched `npx skills@1.7.0 add <repo> --list` exactly on six
+    sources, and all 28 installed skills resolve to their manifest `path`.
 
-  The review falls back to the default branch only when the pin is unreadable, and says so in its `claim` and
-  `observed.pin_fallback`. One skill judged at two pins gets one review per pin. A survivor is reported and skipped
-  (exit 1) when it cannot be reviewed:
-  - two same-named folders in the first location that holds one (the CLI's pick follows directory order);
-  - no folder in the CLI's locations;
-  - a truncated git tree;
-  - a SKILL.md whose sha256 differs from the adjudicated one.
+  The review records the skill folder's git tree id at the pin as `observed.skill_folder_tree_sha`: the id the CLI's
+  lock records as `skillFolderHash` (`src/blob.ts` `getSkillFolderHashFromTree`), checked against the bytes read (the
+  SKILL.md and `agents/openai.yaml` are the blobs the tree lists, and each folder down to them hashes to its listed
+  id), so it freezes `agents/openai.yaml` as well as the SKILL.md. It records Codex's reading of that file as
+  `observed.codex_implicit`: with PyYAML installed, its composer reads the file and serde_yaml 0.9.34's rules decide
+  (a plain `true`/`false` spelling only; anchors and aliases followed; a second document refused); without PyYAML
+  only the plain block-mapping subset is read, and anything else (a flow mapping, an anchor or alias, a tag, a second
+  document, a block scalar) gives `codex_implicit: null` with `observed.unverified_reason`. One skill judged at two
+  pins gets one review per pin. A skill survivor gets no review, and a stopped entry (`status: stopped`, `pin`,
+  `pin_lookup`, `reason`) in the printed list instead (exit 1), when:
+  - it names no pin, or a pin that is not a 40-hex commit, or gh cannot read the pin or reads it as another commit
+    (`pin_lookup: failed`);
+  - its `skill_md_sha256` is null;
+  - no valid copy is found, or two valid copies share the first location that holds one (the CLI's pick follows
+    directory order), or the git tree is truncated;
+  - the SKILL.md's sha256 differs from the adjudicated one, or the tree does not cover the bytes read.
 
-  `make_result.py` refuses a `RESULT.json` while any survivor lacks its review. Resolve the cause and rerun
-  `source_reviews.py`, or record the run as stopped (recipe section 4).
+  `make_result.py` refuses a `RESULT.json` while any survivor lacks its review, and a stopped entry stops its layer.
+  For a skills layer it also checks each review file against the survivor's proposal in the returns: the
+  `reviewed_commit` must be the adjudicated pin, `pin_lookup` ok, `skill_md_sha256` the judged one (never null), and
+  `skill_folder_tree_sha` present. Resolve the cause and rerun `source_reviews.py`, or record the run as stopped
+  (recipe section 4).
 - **One modality per run.** A run covers repository layers only or skills layers only, because one completeness
-  critic covers the whole run. Stage a skills run in its own work directory.
+  critic covers the whole run. Stage a skills run in its own work directory. Each modality keeps its own history:
+  `build_inputs.py` takes `previous_sweep`, and a repository run its default baseline manifest, from the last
+  completed sweep of the run's own modality (the ledger names a sweep's modality by its layers' catalogs), so a
+  skills sweep never empties a repository run's history or becomes its baseline. A modality with no completed sweep
+  gets an empty history, and the summary line says `previous ... sweep none`.
 
 ```sh
 python3 $H/build_inputs.py --skills-scope > "$W/scope.json"
@@ -510,11 +531,10 @@ python3 $H/make_result.py --decision-record "$W/RESULT.json"
   a skills work directory, and `--append` records a skills `RESULT.json` like a repository one. A skills layer has no
   manifest section: its survivors bind to their retained votes and source reviews, not to a manifest row, and a
   changed task requirement is a current `requirement_changed` trigger citing the skills catalog.
-  `catalogs/saturation/ledger.schema.json` still lists only the foundation and us-equities catalogs, so the first
-  skills record needs `skills` added to its layer `catalog` enum (the schema is outside this change, and
-  `--check`, not the schema, is the enforced check). `build_manifest.py` has no skills section: its docstring
-  (`build_manifest.py:1301-1303`) puts a lane layer that is not a foundation or trading row in `lane_groupings`. No
-  skills run has exercised that path yet.
+  `catalogs/saturation/ledger.schema.json` lists `skills` in its layer `catalog` enum beside `foundation` and
+  `us-equities`, so a skills record validates against the schema as well as `--check`. `build_manifest.py` has no
+  skills section: its docstring (`build_manifest.py:1301-1303`) puts a lane layer that is not a foundation or trading
+  row in `lane_groupings`. No skills run has exercised that path yet.
 
 ## Cost reference
 

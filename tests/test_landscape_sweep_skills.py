@@ -1500,5 +1500,26 @@ class SkillResultPinTests(unittest.TestCase):
         self.assertIn("skill_md_sha256 is null", done.stderr)
 
 
+# --------------------------------------------------------------------------- the documents describe what is delivered
+
+
+class SkillsDocsTests(unittest.TestCase):
+    DOCS = (HARNESS / "README.md", ROOT / "docs" / "decisions" / "2026-09-30-skills-sweep-modality.md")
+
+    def test_the_docs_describe_the_delivered_ledger_schema_and_the_pinned_reviews(self):
+        schema = json.loads((ROOT / "catalogs/saturation/ledger.schema.json").read_text(encoding="utf-8"))
+        self.assertIn("skills", schema["$defs"]["layer"]["properties"]["catalog"]["enum"])
+        for path in self.DOCS:
+            with self.subTest(path.name):
+                text = re.sub(r"\s+", " ", path.read_text(encoding="utf-8"))
+                # GPT-6 review of #541: both said the schema still lacked skills and needed a future edit.
+                self.assertNotIn("still lists only the foundation and us-equities catalogs", text)
+                self.assertNotIn("lists only `foundation` and `us-equities`", text)
+                self.assertIn("`catalogs/saturation/ledger.schema.json` lists `skills`", text)
+                # No default-branch fallback remains to describe.
+                self.assertNotIn("falls back to the default branch", text)
+                self.assertNotIn("pin_fallback", text)
+
+
 if __name__ == "__main__":
     unittest.main()

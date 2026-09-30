@@ -110,10 +110,21 @@ The packaged sweep gains `modality: "skills"`.
 - **Identity.** `sweep.js` merges skill proposals by `skill_ref` and carries it as the row's `repository`. A run
   covers one modality.
 - **Source reviews.** `source_reviews.py` reviews a skill survivor at its adjudicated pin, which `convert.py` copies
-  into `survivors.json` with the proposal's `skill_md_sha256`. It finds the SKILL.md in the CLI's discovery order.
-  - It falls back to the default branch only for an unreadable pin, and says so.
-  - It refuses a SKILL.md whose hash differs from the judged one, and a true same-location ambiguity.
-  - `make_result.py` refuses a `RESULT.json` while any survivor lacks its review. The README says so.
+  into `survivors.json` with the proposal's `skill_md_sha256`, and at no other commit. It finds the SKILL.md in the
+  CLI's discovery order.
+  - Each candidate is validated before the order applies, as `parseSkillMd` does: without a `name` and a
+    `description`, both non-empty strings, it is skipped and recorded with its reason, so a valid later copy wins and
+    a skill whose every copy is invalid is refused.
+  - It records the skill folder's git tree id at the pin (`skill_folder_tree_sha`, the CLI lock's `skillFolderHash`),
+    verified to cover the SKILL.md and `agents/openai.yaml` bytes it read.
+  - It reads `agents/openai.yaml` with PyYAML's composer and serde_yaml's rules when PyYAML is installed. Without it,
+    only the plain block-mapping subset is read, and other syntax gives `codex_implicit: null` with the reason.
+  - A survivor with no pin, an unreadable or moved pin, a null hash, no valid copy, other bytes than the judged ones,
+    or a tree that does not cover them gets no review. Its stopped entry (`status: stopped`, `pin_lookup`, `reason`)
+    stops its layer.
+  - `make_result.py` refuses a `RESULT.json` while any survivor lacks its review or its layer is stopped. For a
+    skills layer, each review's `reviewed_commit` must be the adjudicated pin in the returns, over the judged
+    `skill_md_sha256`, with the folder hash recorded. The README says so.
 - **Decision record.** `make_result.py --decision-record` writes a skills sweep's decision record. A layer that lost
   workers reads as incomplete, not refuted. The sweep edits no manifest.
 - **Ledger.** `scripts/saturation_ledger.py` learns the skills catalog.
@@ -122,20 +133,27 @@ The packaged sweep gains `modality: "skills"`.
   - `--append` and `--check` record a skills `RESULT.json`.
   - A skills survivor binds to its retained votes and source review, since a SOTA-convergence manifest has no skills
     section.
+  - `catalogs/saturation/ledger.schema.json` lists `skills` in its layer `catalog` enum beside `foundation` and
+    `us-equities`, so a skills record validates against the schema as well as `--check`.
 
 **Residuals.**
 
-- **Ledger schema.** `catalogs/saturation/ledger.schema.json` lists only `foundation` and `us-equities` in its layer
-  `catalog` enum, and that file is outside this change. The first skills record needs `"skills"` added there.
-  `--check` is the enforced check; the schema test runs only when jsonschema is installed.
-- **Resolver limits.** A folder's name stands for the skill's name field, which the specification requires to match.
-  The CLI's `skills-lock.json` rule is not emulated: it skips installed copies under agent folders. In
-  `agents/openai.yaml`, type errors outside `policy`, which also make Codex ignore the file, are not checked.
+- **Resolver limits.** A folder's name stands for the skill's name field, which the specification requires to match:
+  a folder named otherwise whose name field is `<name>` is not found. The CLI's `skills-lock.json` rule is not
+  emulated: it skips installed copies under agent folders. The SKILL.md frontmatter is read line by line, so a
+  frontmatter the `yaml` package would reject (a repeated key, a flow mapping) is judged by its lines. In
+  `agents/openai.yaml`, type errors outside `policy.allow_implicit_invocation` (in `interface`, `dependencies` or
+  `products`), which also make Codex ignore the file, are not checked.
+- **Stricter reviews.** A survivor whose discovery worker could not compute `skill_md_sha256` (the schema allows null
+  for a worker that cannot run commands) can no longer be reviewed, so its layer stops until a rerun supplies it.
 - **Not run.** No model was called, and no sweep was measured. The evidence is this repository's synthetic-fixture
   suite, plus two read-only checks of the resolver on 2026-09-30:
   - it matched `npx skills@1.7.0 add <repo> --list` exactly on six sources (ECC 294 skills, microsoft/skills 13,
     trailofbits/skills 83, openai/skills 43, mattpocock/skills 37, vercel-labs/agent-browser 1);
   - all 28 installed skills resolve to their manifest `path`.
+
+  Both checks measured the location order before candidate validation was added; validation changes a choice only
+  where a copy is invalid, and no source was re-measured since.
 - **Not exercised.** The GPT-6 lane has not run `discover-skills.json`'s `pattern` keywords, which the upstream
   documentation supports. `build_manifest.py` has no skills section, and a skills lane layer lands in
   `lane_groupings` (its docstring, lines 1301-1303).
@@ -169,16 +187,32 @@ or when `npx skills add <repo> --list` disagrees with it on a source.
   `7407f3893ad4dceab546ac002c3ef806e4000c73`:
   - `README.md` (sha256 `f1835e9d5cc091a82b3ea75ec93bdd96e3c8f86187358ca046a3ac3acdb3983b`): "Skill Discovery"
     (lines 412-483), "Plugin Manifest Discovery" (lines 485-505) and `npx skills find` (lines 150 and 170-182);
-  - `src/skills.ts`: `SKIP_DIRS`, `AGENT_PROJECT_SKILL_DIRS` (lines 12-43) and `discoverSkills` (lines 180-329);
+  - `src/skills.ts`: `SKIP_DIRS`, `AGENT_PROJECT_SKILL_DIRS` (lines 12-43), `parseSkillMd` (lines 80-133: a
+    SKILL.md without a name or description, or with non-string ones, is skipped), `discoverSkills` (lines 180-329:
+    `tryAddSkillAt` adds no invalid skill, and the recursive fallback runs only when no skill was added) and
+    `filterSkills` (lines 339-348: `--skill` matches the name field);
+  - `src/frontmatter.ts` `parseFrontmatter`, and `package.json` line 150, `"yaml": "^2.8.3"` (2.9.0 in the lockfile);
   - `src/plugin-manifest.ts` `getPluginSkillPaths`, and `src/constants.ts` `DEFAULT_SKILL_CONTAINER_DEPTH`;
   - `src/add.ts`: `--skill` includes internal skills, and a GitHub source is cloned before discovery;
-  - `src/blob.ts` `PRIORITY_PREFIXES` (lines 306-342), which lists the code's locations.
+  - `src/blob.ts` `PRIORITY_PREFIXES` (lines 306-342), which lists the code's locations, and
+    `getSkillFolderHashFromTree` (lines 277-301): a skill's `skillFolderHash` is its folder's GitHub tree id (the
+    root tree's for a root SKILL.md);
+  - the files above were compared byte for byte with the tag commit's on 2026-09-30.
+- [eemeli/yaml at v2.9.0](https://github.com/eemeli/yaml/tree/v2.9.0): `src/options.ts` (lines 89-93, `version`
+  defaults to 1.2), `src/doc/Document.ts` (lines 391-395, 1.2 uses the `core` schema), and the core schema's tags in
+  `src/schema/common/null.ts`, `src/schema/core/bool.ts`, `src/schema/core/int.ts` and `src/schema/core/float.ts`.
 - [openai/codex at rust-v0.157.1](https://github.com/openai/codex/tree/rust-v0.157.1), tag commit
   `36650394c5b38c2990ccf2a3457165ca3e9d9726`:
   - `codex-rs/ext/skills/src/loader/metadata.rs` (lines 27-56 and 130-139) and `codex-rs/skills/src/model.rs`;
   - `codex-rs/Cargo.lock` pins serde_yaml 0.9.34, whose `src/de.rs` (tag commit
-    `2009506d33767dfc88e979d6bc0d53d09f941c94`) holds `parse_bool` (lines 932-938), `parse_null` (lines 925-930) and
-    `deserialize_option` (lines 1517-1558).
+    `2009506d33767dfc88e979d6bc0d53d09f941c94`) holds `parse_bool` (lines 932-938), `parse_null` (lines 925-930),
+    `deserialize_option` (lines 1517-1558), `deserialize_bool` (lines 1266-1290) with
+    `is_plain_or_tagged_literal_scalar` (lines 1149-1158), `deserialize_map` (lines 1660-1688) and the
+    `MoreThanOneDocument` refusal (lines 105 and 142).
+- PyYAML 6.0.1 (`yaml.compose_all` with `CSafeLoader`, the libyaml binding, or `SafeLoader`), used only when
+  installed: the repository does not require it, and the tests run the subset reader either way.
+- Git's object ids ([Pro Git, Git Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects)): the tests
+  compare `git_blob_id` and `git_tree_id` with `git write-tree` and `git ls-tree` output.
 - `tools/sota-convergence/landscape-sweep/README.md` (Evidence contract, Skills modality), and
   [the skills trial record](2026-09-25-skills-trial-and-usage.md) (Selection rule; Addendum 2026-09-27).
 - The source pins: `gh api repos/<owner>/<repo>/commits/<default branch>` on 2026-09-30, recorded in the catalog.
