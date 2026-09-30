@@ -1,0 +1,20 @@
+# Drafted, not run: see stack-currency.service in this directory for the placeholder, PATH and deployment notes
+# that also apply here.
+[Unit]
+Description=Daily trigger for the stack currency due-file
+
+[Timer]
+# daily is *-*-* 00:00:00 local time (systemd.time(7)). Persistent=true catches up once after a day on which the
+# host or the user manager was down: the service "is triggered immediately if it would have been triggered at
+# least once during the time when the timer was inactive", and the setting "only has an effect on timers
+# configured with OnCalendar=" (systemd.timer(5), systemd 255.4-1ubuntu8.17 on the workstation). On WSL, where the
+# distribution often stops, that catch-up is what keeps the due-file at most a day old. RandomizedDelaySec=15m
+# spreads the start, the catch-up run included ("Such triggering is nonetheless subject to the delay imposed by
+# RandomizedDelaySec="), so it does not start together with every other catch-up at boot.
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15m
+Unit=stack-currency.service
+
+[Install]
+WantedBy=timers.target
