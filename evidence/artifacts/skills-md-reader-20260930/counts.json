@@ -1,8 +1,22 @@
 {
  "schema_version": 1,
- "checkout_commit": "edfc471166195ce88980ad2466d0cdd61a05e625",
- "run_start_utc": "2026-09-30T22:38:20Z",
- "run_end_utc": "2026-09-30T22:39:06Z",
+ "checkout_commit": "cf43ebe321e4afe52b6087a5ad838a238c449990",
+ "code_under_test": {
+  "tools/sota-convergence/landscape-sweep/skill_md.mjs": {
+   "sha256": "4fbd76f219192d629ee962d5aeeb8580cea2a903c3b03fa90c51da8cc69e5791",
+   "bytes": 12700
+  },
+  "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json": {
+   "sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "bytes": 12714
+  },
+  "tools/sota-convergence/landscape-sweep/source_reviews.py": {
+   "sha256": "5ccae0e2b5f0e9c5b640727837705fae46121d20b8909780934daf9898a5191d",
+   "bytes": 84195
+  }
+ },
+ "run_start_utc": "2026-09-30T23:45:46Z",
+ "run_end_utc": "2026-09-30T23:46:42Z",
  "tools": {
   "node": "v24.21.0",
   "npm": "11.19.0",
@@ -821,6 +835,287 @@
   },
   "random_exit": 0
  },
+ "symlinks": {
+  "sources": [
+   {
+    "source": "addyosmani/agent-skills@2686b620fc1f",
+    "symlinks": 1,
+    "symlinked_search_locations": [
+     ".opencode/skills"
+    ],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 25,
+    "outcomes": {
+     "same pick": 25
+    }
+   },
+   {
+    "source": "affaan-m/ECC@c70874fae9eb",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 294,
+    "outcomes": {
+     "same pick": 294
+    }
+   },
+   {
+    "source": "alpacahq/alpaca-skills@39111abee6b6",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 14,
+    "outcomes": {
+     "same pick": 14
+    }
+   },
+   {
+    "source": "anthropics/claude-code@2282079d6ac8",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 10,
+    "outcomes": {
+     "same pick": 10
+    }
+   },
+   {
+    "source": "anthropics/skills@8a1541c4a3ff",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 20,
+    "outcomes": {
+     "same pick": 20
+    }
+   },
+   {
+    "source": "bgauryy/octocode@c265e3f94131",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 12,
+    "outcomes": {
+     "same pick": 12
+    }
+   },
+   {
+    "source": "cloudflare/security-audit-skill@c1c8a8c14710",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   },
+   {
+    "source": "ComposioHQ/awesome-claude-skills@be2a406907db",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 28,
+    "outcomes": {
+     "same pick": 28
+    }
+   },
+   {
+    "source": "getsentry/skills@d18b7aa8ba87",
+    "symlinks": 2,
+    "symlinked_search_locations": [
+     ".agents/skills"
+    ],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 28,
+    "outcomes": {
+     "same pick": 28
+    }
+   },
+   {
+    "source": "huggingface/skills@80f9fa530e46",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 25,
+    "outcomes": {
+     "same pick": 25
+    }
+   },
+   {
+    "source": "mattpocock/skills@d81f3a183412",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 37,
+    "outcomes": {
+     "same pick": 37
+    }
+   },
+   {
+    "source": "microsoft/playwright-cli@b85c7a736bb4",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 2,
+    "outcomes": {
+     "same pick": 2
+    }
+   },
+   {
+    "source": "microsoft/skills@3495f50ae0d7",
+    "symlinks": 60,
+    "symlinked_search_locations": [
+     ".opencode/skills"
+    ],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 13,
+    "outcomes": {
+     "same pick": 13
+    }
+   },
+   {
+    "source": "obra/superpowers@8ca22dba9a94",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 15,
+    "outcomes": {
+     "same pick": 15
+    }
+   },
+   {
+    "source": "openai/skills@49f948faa925",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 43,
+    "outcomes": {
+     "no pick either way": 1,
+     "same pick": 42
+    }
+   },
+   {
+    "source": "semgrep/skills@68177b8830f9",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 3,
+    "outcomes": {
+     "same pick": 3
+    }
+   },
+   {
+    "source": "superagent-ai/skills@0da315b873ed",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 14,
+    "outcomes": {
+     "same pick": 14
+    }
+   },
+   {
+    "source": "trailofbits/skills@82fe82262526",
+    "symlinks": 2,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 83,
+    "outcomes": {
+     "same pick": 83
+    }
+   },
+   {
+    "source": "typesafe-ai/skills@65a39f393687",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   },
+   {
+    "source": "vercel-labs/agent-browser@d01253d9db28",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   },
+   {
+    "source": "vercel-labs/agent-skills@063bee94c3f4",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 9,
+    "outcomes": {
+     "same pick": 9
+    }
+   },
+   {
+    "source": "vercel-labs/skills@3694740352ee",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "claude_plugin_symlinked": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   }
+  ],
+  "totals": {
+   "no pick either way": 1,
+   "same pick": 678
+  },
+  "sources_with_a_symlinked_search_location": 3,
+  "sources_with_a_skill_md_symlink": 0,
+  "exit": 0
+ },
+ "ci_provisioning": {
+  "tarball_sha512_is_the_pinned_integrity": true,
+  "pinned_files_matching_the_tarball": "75 of 75",
+  "step": {
+   "npm": "10.9.8",
+   "exit": 0,
+   "exported": "LANDSCAPE_SWEEP_SKILLS_YAML=<runner-temp>/skills-yaml-2.9.0"
+  },
+  "reader": {
+   "node": "v22.23.2",
+   "exit": 0,
+   "record": {
+    "ok": true,
+    "package": "yaml@2.9.0",
+    "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+    "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b"
+   },
+   "pin_sha256_is_this_pin": true
+  },
+  "exit": 0
+ },
  "negative_controls": {
   "control-sanitize": {
    "expect": "exit 1 (a reader without stripTerminalEscapes in sanitizeMetadata)",
@@ -861,6 +1156,10 @@
    "exit": 0
   },
   {
+   "step": "symlinks",
+   "exit": 0
+  },
+  {
    "step": "install-yaml-2.9.0",
    "exit": 0
   },
@@ -874,6 +1173,18 @@
   },
   {
    "step": "pack",
+   "exit": 0
+  },
+  {
+   "step": "install-npm-10",
+   "exit": 0
+  },
+  {
+   "step": "fetch-node-22",
+   "exit": 0
+  },
+  {
+   "step": "ci-step",
    "exit": 0
   },
   {
@@ -966,21 +1277,29 @@
   }
  ],
  "retained_outside_the_repository": {
+  "ci-step.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "ci-step.stdout": {
+   "sha256": "972ab3006cda685a6cf5195c2f16b52f76e6733db664435e8713d608be44a930",
+   "bytes": 571
+  },
   "cli-corpus.stderr": {
-   "sha256": "81b11df5cf02e2682d847af456af16c92572874b03a2806312cfaa0db41f584c",
-   "bytes": 551
+   "sha256": "818f2402e89cc3f58bf5658df54c1bf4075161d5d74811b1346e681866bc5261",
+   "bytes": 547
   },
   "cli-corpus.stdout": {
-   "sha256": "de97d7428166b4dfdf6f096e3647ef99ca95a3cace95e536dd42c5287f83f429",
-   "bytes": 475784
+   "sha256": "8573d3edcd3d3006a94662470c9bccaf9d274112fa0509c363d0a410bbc92539",
+   "bytes": 475783
   },
   "cli-edge.stderr": {
-   "sha256": "6ec8cc5967a09ea060d84567e2c63d34226cc3d4ffe8781181ab26f0d06daed5",
-   "bytes": 13354
+   "sha256": "6a8dd51254c79c7aa4521a329a6e275e99ef9bb61a90ff0d6d1bc4dfe79c59aa",
+   "bytes": 13278
   },
   "cli-edge.stdout": {
-   "sha256": "73e5563641d08e086b640a95897fbe35b61ccaffcf1738bec79639211b407f88",
-   "bytes": 859
+   "sha256": "8696428af22c0aa19f068429584d0bfd59e8583b1e09b28cb23780d42a6896d6",
+   "bytes": 858
   },
   "cli-yaml-version.stderr": {
    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1102,6 +1421,14 @@
    "sha256": "fd1f5037a1b1908fd30c0d54d7859fe5d4574fee18835afba54763939b7263e7",
    "bytes": 10
   },
+  "fetch-node-22.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "fetch-node-22.stdout": {
+   "sha256": "1c98e952b6077486dd9a33a45009faeed8acd8730ce13527303c5af2ed14cc38",
+   "bytes": 35
+  },
   "fixture-corpus-index.json": {
    "sha256": "06e9725ad1816610ce4353eed604c14dd97baa550207c76479546d81ed000c58",
    "bytes": 225021
@@ -1126,12 +1453,20 @@
    "sha256": "fed4c157d2e8f98b3ebab330fdfe4f36e7e517452760e9611a1eb860068185e5",
    "bytes": 26
   },
+  "install-npm-10.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "install-npm-10.stdout": {
+   "sha256": "41fcd409eab93f589e77ddb9817fde45343692cd78042cfac5cad46c251a42ec",
+   "bytes": 23
+  },
   "install-skills-cli.stderr": {
    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "bytes": 0
   },
   "install-skills-cli.stdout": {
-   "sha256": "888cebe3da1dbaf50b4a3bafc832c4b50bdb3189577cd5b1ea37f85428878dc7",
+   "sha256": "4f4de6015711b8f4e9528080521b1598a0f5b7e73fe77ee057a442400253419d",
    "bytes": 90
   },
   "install-yaml-2.9.0.stderr": {
@@ -1139,7 +1474,7 @@
    "bytes": 0
   },
   "install-yaml-2.9.0.stdout": {
-   "sha256": "8a029aa35ef4a6b4c435e059c21fb0338dc881964530ac232b4444103d9f88f9",
+   "sha256": "a3bcab4eb5182ebd79fd11bc5ffa315dc986b7582226d04e9e908a498855c6d5",
    "bytes": 26
   },
   "install-yaml-2.9.1.stderr": {
@@ -1147,7 +1482,7 @@
    "bytes": 0
   },
   "install-yaml-2.9.1.stdout": {
-   "sha256": "0a4303fbf9c894b26709c91a630319b5688997da87dfb44d5d72d302172e9c43",
+   "sha256": "3be24be4d112607add914b1db9715e620f6757286db44d3cb19cecf5cb3a3f23",
    "bytes": 26
   },
   "mutant-sanitize-edge.json": {
@@ -1175,7 +1510,7 @@
    "bytes": 29493
   },
   "oracle-290-edge.stderr": {
-   "sha256": "e2291b341e04d4569435670e4fb31afed1fe516bcb392ce4330c5b1f00483b7d",
+   "sha256": "4ecb8bea957c82bde0e8c1ad41b4d5e2a1e3e83cff537b68b9cb9bcd9d4a3d6d",
    "bytes": 342
   },
   "oracle-290-edge.stdout": {
@@ -1199,7 +1534,7 @@
    "bytes": 29493
   },
   "oracle-cli-edge.stderr": {
-   "sha256": "c72002e82b1b824ef49303c46e322da7fbafca4884cd245a963bfdc898a01714",
+   "sha256": "8aa347e56a88e22cb28bfa2f8c49a48d22f99ae90dd85e140bdabcae1a65e749",
    "bytes": 342
   },
   "oracle-cli-edge.stdout": {
@@ -1253,6 +1588,14 @@
   "skills-1.7.0.tgz": {
    "sha256": "8d1466f792baaee945dae88e05ee403d6f9e78a3ae8dcbf61496035ca274418d",
    "bytes": 137505
+  },
+  "symlinks.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "symlinks.stdout": {
+   "sha256": "1ae1de1da58120a8030c955b0e98e904557d34ee72e79644540ea3aa1db3c967",
+   "bytes": 5451
   },
   "versions.stderr": {
    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

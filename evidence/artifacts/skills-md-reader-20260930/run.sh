@@ -27,12 +27,20 @@ step versions sh -c 'node --version; npm --version; git --version; python3 --ver
 # Inputs: the catalog's GitHub sources at their pins, and the edge cases.
 step corpus python3 "$HERE/corpus.py" "$CHECKOUT/catalogs/landscape/skills-lifecycle.json" "$SCRATCH/git" "$SCRATCH/corpus.json"
 step edge python3 "$HERE/edge_cases.py" "$SCRATCH/edge.json"
+# What source_reviews.py's symlink rule changes on those sources' trees at their pins.
+step symlinks python3 "$HERE/symlink_impact.py" "$CHECKOUT" "$SCRATCH/git"
 # The pinned yaml (the pin's install command), yaml 2.9.1 for the version comparison, and the skills CLI as the
 # manifest's cli.install makes it, whose own yaml npm resolves at install time.
 step install-yaml-2.9.0 npm install --prefix "$SCRATCH/yaml-2.9.0" --ignore-scripts --no-audit --no-fund --save-exact yaml@2.9.0
 step install-yaml-2.9.1 npm install --prefix "$SCRATCH/yaml-2.9.1" --ignore-scripts --no-audit --no-fund --save-exact yaml@2.9.1
 step install-skills-cli npm install --global --prefix "$SCRATCH/skills-1.7.0" skills@1.7.0
 step pack sh -c "cd '$SCRATCH/out' && npm pack skills@1.7.0 yaml@2.9.0 yaml@2.9.1 --json"
+# validate.yml's provisioning step with the ubuntu-24.04 image's npm (10.9.8) and the reader under its Node.js
+# (22.23.2, the nodejs.org tarball checked against its SHASUMS256.txt): see ci_step.py.
+step install-npm-10 npm install --prefix "$SCRATCH/npm-10" --no-audit --no-fund npm@10.9.8
+step fetch-node-22 sh -c "cd '$SCRATCH' && curl --fail --silent --show-error --location --retry 3 -o SHASUMS256.txt https://nodejs.org/dist/v22.23.2/SHASUMS256.txt && curl --fail --silent --show-error --location --retry 3 -o node-v22.23.2-linux-x64.tar.xz https://nodejs.org/dist/v22.23.2/node-v22.23.2-linux-x64.tar.xz && grep ' node-v22.23.2-linux-x64.tar.xz\$' SHASUMS256.txt | sha256sum --check && tar -xJf node-v22.23.2-linux-x64.tar.xz"
+step ci-step python3 "$HERE/ci_step.py" "$CHECKOUT" "$SCRATCH/ci" "$SCRATCH/npm-10/node_modules/.bin" \
+  "$SCRATCH/node-v22.23.2-linux-x64/bin/node" "$SCRATCH/out/yaml-2.9.0.tgz"
 step registry sh -c 'npm view skills@1.7.0 dependencies dist.integrity gitHead --json; npm view yaml dist-tags --json; npm view yaml@2.9.0 dist.integrity gitHead --json; npm view yaml@2.9.1 dist.integrity gitHead --json'
 PKG=$SCRATCH/skills-1.7.0/lib/node_modules/skills
 step cli-yaml-version node -e "console.log(require('$PKG/node_modules/yaml/package.json').version)"
@@ -101,4 +109,4 @@ step control-tampered sh -c "printf '{\"items\": []}' | node '$H/skill_md.mjs' -
 step reader-empty sh -c "printf '{\"items\": []}' | node '$H/skill_md.mjs' --install '$SCRATCH/yaml-2.9.0'"
 cat "$LOG"
 # The compact result, from the retained outputs (not a logged step: it reads the finished log).
-python3 "$HERE/summarize.py" "$SCRATCH" "$(git -C "$CHECKOUT" rev-parse HEAD)" "$SCRATCH/counts.json"
+python3 "$HERE/summarize.py" "$SCRATCH" "$(git -C "$CHECKOUT" rev-parse HEAD)" "$SCRATCH/counts.json" "$CHECKOUT"

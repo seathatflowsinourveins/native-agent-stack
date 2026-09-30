@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Writes counts.json, the compact result of one run.sh run: tool and package versions, the corpus, every comparison
-recomputed from the retained outputs, the edge cases one by one, the yaml version delta, every step's exit status, the
-negative controls, and the sha256 and size of each retained raw output (kept outside the repository: the corpus text,
-the CLI's raw output and the per-file oracle answers). Digests sit in {"sha256": ...} objects of their own.
+"""Writes counts.json, the compact result of one run.sh run: the code under test (the sha256 of skill_md.mjs,
+skills-yaml.pin.json and source_reviews.py), tool and package versions, the corpus, every comparison recomputed from
+the retained outputs, the edge cases one by one, the yaml version delta, the symlink rule's effect on the sources, the
+CI provisioning check (ci_step.py), every step's exit status, the negative controls, and the sha256 and size of each
+retained raw output (kept outside the repository: the corpus text, the CLI's raw output and the per-file oracle
+answers). Digests sit in {"sha256": ...} objects of their own.
 
-  summarize.py <scratch> <checkout commit> <out counts.json>
+  summarize.py <scratch> <checkout commit> <out counts.json> <checkout>
 """
 
 import collections
@@ -14,8 +16,10 @@ import re
 import sys
 from pathlib import Path
 
-scratch, commit, out_path = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])
+scratch, commit, out_path, checkout = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3]), Path(sys.argv[4])
 out = scratch / "out"
+CODE = ("tools/sota-convergence/landscape-sweep/skill_md.mjs", "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json",
+        "tools/sota-convergence/landscape-sweep/source_reviews.py")
 LINE_BREAK_REFUSAL = "a line break to libyaml"
 
 
@@ -96,6 +100,7 @@ def e2e(name):
 result = {
     "schema_version": 1,
     "checkout_commit": commit,
+    "code_under_test": {path: digest(checkout / path) for path in CODE},
     "run_start_utc": steps[0]["start_utc"], "run_end_utc": steps[-1]["end_utc"],
     "tools": {"node": versions[0], "npm": versions[1], "git": versions[4], "python": versions[6]},
     "packages": {
@@ -128,6 +133,8 @@ result = {
                                 for line in text("oracle-versions.stdout").splitlines()},
                             "random_multi_line_scalars": json.loads(text("yaml-random.stdout")),
                             "random_exit": exits["yaml-random"]},
+    "symlinks": dict(json.loads(text("symlinks.stdout")), exit=exits["symlinks"]),
+    "ci_provisioning": dict(json.loads(text("ci-step.stdout")), exit=exits["ci-step"]),
     "negative_controls": {
         "control-sanitize": {"expect": "exit 1 (a reader without stripTerminalEscapes in sanitizeMetadata)",
                              "exit": exits["control-sanitize"]},
