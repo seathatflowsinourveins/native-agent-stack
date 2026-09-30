@@ -6,11 +6,16 @@
                   [--seeds seeds.json] [--repo-root .]
 
 Reads the frozen scope (`saturation_ledger.py --scope`, default <work-dir>/scope.json), catalogs/landscape/
-{foundation,us-equities}.json and research-state.json, the saturation ledger's last completed sweep, a baseline
-manifest (default: that sweep's manifest_ref) whose candidates count as known, and a catalog-freshness manifest
+{foundation,us-equities}.json and research-state.json, the saturation ledger's last completed repository sweep, a
+baseline manifest (default: that sweep's manifest_ref) whose candidates count as known, and a catalog-freshness manifest
 (build_manifest.py over extract_layers.py + github_freshness.py output with an empty lanes record, or the
 catalog-freshness workflow's artifact) for each winner's pin against upstream. Writes <work-dir>/inputs/<layer_id>.json
 and <work-dir>/layers.json ([{catalog, layer_id, title, input}] in catalog order).
+
+Each modality keeps its own history: a ledger sweep's modality is named by its layers' catalogs (repository for
+foundation and us-equities, skills for skills; sweep_modality), and a run reads previous_sweep, and a repository run
+its default baseline, from the last completed sweep of its own modality only. A modality with no completed sweep gets
+an empty previous_sweep and no baseline, and the summary line names the sweep it read ("previous ... sweep none").
 
 --seeds is an optional JSON object {"<layer_id>": ["candidate or note", ...]}: candidates other sessions asked this
 sweep to assess, shown to the discovery workers as seeded_candidates. An unknown layer id is an error.
@@ -51,6 +56,7 @@ sys.path.insert(0, str(HERE))
 from sweep_common import MANIFEST_SECTION, REPO_ROOT, ledger_module, load_json, slug, work_dir, write_json  # noqa: E402
 
 CATALOG_FILES = (("foundation", "foundation.json"), ("us-equities", "us-equities.json"))
+REPOSITORY = "repository"  # --modality's repository modality (build_args.REPOSITORY_MODALITY)
 NOT_ADJUDICATED_NOTE = ("refuted in that sweep only because a vote did not return (a missing vote counts as refuted); "
                         "no returned vote refuted these, so they were not refuted on merit")
 COMPONENT_FIELDS = ("id", "repository", "pin", "upstream", "pin_behind_upstream", "pin_comparison")
@@ -80,11 +86,21 @@ def rows_by_layer(manifest: dict | None, catalog: str) -> dict:
     return {row.get("layer"): row for row in ((manifest or {}).get(section) or []) if isinstance(row, dict)}
 
 
-def last_completed(ledger: dict, catalog: str | None = None) -> dict | None:
-    """The ledger's last completed sweep; with `catalog`, the last completed sweep with a layer of that catalog (a
-    skills run reads the last skills sweep, whatever repository sweeps followed it)."""
-    completed = [sweep for sweep in ledger.get("sweeps") or [] if sweep.get("status") == "completed"
-                 and (catalog is None or any(layer.get("catalog") == catalog for layer in sweep.get("layers") or []))]
+def sweep_modality(sweep: dict) -> str | None:
+    """The modality a ledger sweep ran, named by its layers' catalogs: "repository" when they are all foundation or
+    us-equities layers, "skills" when they are all skills layers. None for a sweep with no layer or with layers of
+    both, which neither modality's history takes (a run covers one modality)."""
+    catalogs = {layer.get("catalog") for layer in (sweep or {}).get("layers") or [] if isinstance(layer, dict)}
+    if catalogs and catalogs <= {catalog for catalog, _ in CATALOG_FILES}:
+        return REPOSITORY
+    return SKILLS if catalogs == {SKILLS} else None
+
+
+def last_completed(ledger: dict, modality: str) -> dict | None:
+    """The ledger's last completed sweep of that modality (sweep_modality). A repository run never reads a skills
+    sweep, nor a skills run a repository sweep, whichever ran last."""
+    completed = [sweep for sweep in ledger.get("sweeps") or [] if isinstance(sweep, dict)
+                 and sweep.get("status") == "completed" and sweep_modality(sweep) == modality]
     return completed[-1] if completed else None
 
 
@@ -121,7 +137,7 @@ def build_layer_inputs(catalogs: dict, research_state: dict, scope: dict, freshn
     ``absent(entry)`` says whether a refuted ledger entry is refuted by absence (main() passes the ledger's
     refuted_by_absence over this checkout's retained returns); without it every refuted entry stays refuted."""
     research = {(row["catalog"], row["layer_id"]): row for row in research_state.get("layers") or []}
-    previous = previous_by_layer(last_completed(ledger), absent)
+    previous = previous_by_layer(last_completed(ledger, REPOSITORY), absent)
     all_ids = [layer["layer_id"] for catalog, _ in CATALOG_FILES for layer in catalogs[catalog]["layers"]]
     duplicates = sorted({layer_id for layer_id in all_ids if all_ids.count(layer_id) > 1})
     if duplicates:
@@ -312,7 +328,7 @@ def main(argv=None) -> int:
     parser.add_argument("--freshness-manifest", type=Path, help="required for repository layers")
     parser.add_argument("--scope", type=Path, help="default <work-dir>/scope.json")
     parser.add_argument("--baseline-manifest", type=Path,
-                        help="default: manifest_ref of the saturation ledger's last completed sweep")
+                        help="default: manifest_ref of the saturation ledger's last completed repository sweep")
     parser.add_argument("--seeds", type=Path)
     parser.add_argument("--modality", choices=("repository", SKILLS), default="repository",
                         help=f"repository: the landscape catalogs' layers (default); skills: the skills-* layers of "
@@ -342,9 +358,10 @@ def main(argv=None) -> int:
         work = work_dir(args.work_dir)
         repo = args.repo_root.resolve()
         ledger = load_json(repo / "catalogs" / "saturation" / "ledger.json")
+        previous_sweep = last_completed(ledger, REPOSITORY)  # a skills sweep is neither history nor baseline
         baseline_path = args.baseline_manifest
-        if baseline_path is None and last_completed(ledger) and last_completed(ledger).get("manifest_ref"):
-            baseline_path = repo / last_completed(ledger)["manifest_ref"]
+        if baseline_path is None and previous_sweep and previous_sweep.get("manifest_ref"):
+            baseline_path = repo / previous_sweep["manifest_ref"]
         catalogs = {catalog: load_json(repo / "catalogs" / "landscape" / name) for catalog, name in CATALOG_FILES}
         led = ledger_module(REPO_ROOT)  # the ledger's rules from this checkout, applied to --repo-root's files
         documents = {}
@@ -368,6 +385,7 @@ def main(argv=None) -> int:
                        "title": layer_input["title"], "input": str(path)})
     write_json(work / "layers.json", layers)
     print(f"{len(layers)} layers; {sum(1 for x in layers if x['catalog'] == 'foundation')} foundation; "
+          f"previous repository sweep {(previous_sweep or {}).get('sweep_id') or 'none'}; "
           f"baseline {baseline_path.name if baseline_path else 'none'}; seeds for "
           f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s)")
     return 0
@@ -398,7 +416,9 @@ def skills_main(args) -> int:
         layers.append({"catalog": layer_input["catalog"], "layer_id": layer_input["layer_id"],
                        "title": layer_input["title"], "input": str(path), "modality": SKILLS})
     write_json(work / "layers.json", layers)
-    print(f"{len(layers)} skills layers from {SKILLS_CATALOG}; seeds for "
+    previous_sweep = last_completed(ledger, SKILLS)  # a repository sweep is never a skills run's history
+    print(f"{len(layers)} skills layers from {SKILLS_CATALOG}; previous skills sweep "
+          f"{(previous_sweep or {}).get('sweep_id') or 'none'}; seeds for "
           f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s)")
     return 0
 

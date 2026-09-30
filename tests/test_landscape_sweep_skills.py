@@ -394,6 +394,100 @@ class SkillsInputTests(unittest.TestCase):
         self.assertGreater(len(gaps["security-audit"]), 1000)
 
 
+# --------------------------------------------------------------------------- each modality's own history
+
+
+REPOSITORY_SWEEP = {"sweep_id": "sweep-r1", "status": "completed", "manifest_ref": "catalogs/m-r1.json", "layers": [
+    {"catalog": "foundation", "layer_id": "alpha", "survived": [{"repo": "https://github.com/o/kept"}],
+     "refuted": [{"repo": "https://github.com/o/gone"}]}]}
+SKILLS_SWEEP = {"sweep_id": "sweep-s1", "status": "completed", "manifest_ref": "catalogs/m-s1.json", "layers": [
+    {"catalog": "skills", "layer_id": "skills-debug", "survived": [{"repo": "acme/agent-skills@debug-kit"}],
+     "refuted": [{"repo": "acme/agent-skills@old-kit"}]}]}
+
+
+class ModalityHistoryTests(unittest.TestCase):
+    """build_inputs.py takes previous_sweep and the baseline manifest from the last completed sweep of the run's own
+    modality (the ledger names it by its layers' catalogs), never from a sweep of the other modality (GPT-6 review of
+    #541: a skills sweep after a repository sweep emptied the next repository run's history and became its baseline)."""
+
+    def setUp(self):
+        self.repo = skills_repo(self)
+        write_json(self.repo / "catalogs/landscape/foundation.json", {"layers": [{
+            "layer_id": "alpha", "title": "Alpha", "requirement": "alpha req", "winners": [], "alternatives": [],
+            "candidates": []}]})
+        write_json(self.repo / "catalogs/landscape/us-equities.json", {"layers": []})
+        write_json(self.repo / "catalogs/landscape/research-state.json", {"layers": [
+            {"catalog": "foundation", "layer_id": "alpha", "status": "comparison_required", "next_action": "a"}]})
+        # The repository sweep's manifest holds a baseline candidate; a skills lane's manifest has no layer section.
+        write_json(self.repo / "catalogs/m-r1.json", {"foundation": [{"layer": "alpha", "candidates": [
+            {"repository": "https://github.com/r1/baseline"}]}], "trading": []})
+        write_json(self.repo / "catalogs/m-r2.json", {"foundation": [], "trading": []})
+        write_json(self.repo / "catalogs/m-s1.json", {"foundation": [], "trading": [], "lane_groupings": {}})
+
+    def ledger(self, *sweeps):
+        write_json(self.repo / "catalogs/saturation/ledger.json", {"sweeps": list(sweeps)})
+
+    def repository_run(self):
+        work = temp_dir(self)
+        write_json(work / "scope.json", harness_tests.scope_for((("foundation", "alpha"),)))
+        freshness = write_json(work / "freshness.json", {"checked_at": "2026-09-30", "foundation": [], "trading": []})
+        done = run([sys.executable, HARNESS / "build_inputs.py", "--work-dir", work, "--repo-root", self.repo,
+                    "--freshness-manifest", freshness])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        return json.loads((work / "inputs/alpha.json").read_text(encoding="utf-8")), done.stdout
+
+    def skills_run(self):
+        work = temp_dir(self)
+        scope = run([sys.executable, HARNESS / "build_inputs.py", "--repo-root", self.repo, "--skills-scope"])
+        self.assertEqual(scope.returncode, 0, scope.stderr)
+        write_json(work / "scope.json", json.loads(scope.stdout))
+        done = run([sys.executable, HARNESS / "build_inputs.py", "--repo-root", self.repo, "--work-dir", work,
+                    "--modality", "skills"])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        return json.loads((work / "inputs/skills-debug.json").read_text(encoding="utf-8")), done.stdout
+
+    def test_a_repository_run_after_a_skills_sweep_keeps_the_repository_history_and_baseline(self):
+        # Repositories, then skills, then repositories: the third run's history and baseline are the first run's.
+        self.ledger(REPOSITORY_SWEEP, SKILLS_SWEEP)
+        alpha, summary = self.repository_run()
+        self.assertEqual(alpha["previous_sweep"], {"sweep_id": "sweep-r1", "survived": ["https://github.com/o/kept"],
+                                                   "refuted": ["https://github.com/o/gone"]})
+        self.assertEqual(alpha["known_repositories"], ["r1/baseline"])
+        self.assertIn("baseline m-r1.json", summary)
+        self.assertIn("previous repository sweep sweep-r1", summary)
+
+    def test_a_repository_run_after_only_skills_sweeps_has_an_empty_history_and_no_baseline(self):
+        self.ledger(SKILLS_SWEEP)
+        alpha, summary = self.repository_run()
+        self.assertEqual((alpha["previous_sweep"], alpha["known_repositories"]), ({}, []))
+        self.assertIn("baseline none", summary)
+        self.assertIn("previous repository sweep none", summary)
+
+    def test_a_skills_run_reads_only_the_skills_sweeps(self):
+        # The skills run between the two repository runs has no skills history; a later one reads that skills sweep.
+        self.ledger(REPOSITORY_SWEEP)
+        debug, summary = self.skills_run()
+        self.assertEqual(debug["previous_sweep"], {})
+        self.assertIn("previous skills sweep none", summary)
+        self.ledger(REPOSITORY_SWEEP, SKILLS_SWEEP,
+                    dict(REPOSITORY_SWEEP, sweep_id="sweep-r2", manifest_ref="catalogs/m-r2.json"))
+        debug, summary = self.skills_run()
+        self.assertEqual(debug["previous_sweep"], {"sweep_id": "sweep-s1", "survived": ["acme/agent-skills@debug-kit"],
+                                                   "refuted": ["acme/agent-skills@old-kit"]})
+        self.assertIn("previous skills sweep sweep-s1", summary)
+
+    def test_a_sweep_takes_its_modality_from_its_layers_catalogs(self):
+        self.assertEqual(build_inputs.sweep_modality(REPOSITORY_SWEEP), "repository")
+        self.assertEqual(build_inputs.sweep_modality(SKILLS_SWEEP), "skills")
+        mixed = dict(REPOSITORY_SWEEP, layers=REPOSITORY_SWEEP["layers"] + SKILLS_SWEEP["layers"])
+        self.assertIsNone(build_inputs.sweep_modality(mixed))  # neither history: a run covers one modality
+        self.assertIsNone(build_inputs.sweep_modality(dict(REPOSITORY_SWEEP, layers=[])))
+        ledger = {"sweeps": [REPOSITORY_SWEEP, SKILLS_SWEEP, dict(REPOSITORY_SWEEP, sweep_id="sweep-r2",
+                                                                  status="stopped"), mixed]}
+        self.assertEqual(build_inputs.last_completed(ledger, "repository")["sweep_id"], "sweep-r1")
+        self.assertEqual(build_inputs.last_completed(ledger, "skills")["sweep_id"], "sweep-s1")
+
+
 # --------------------------------------------------------------------------- templates a skills-* layer resolves to
 
 

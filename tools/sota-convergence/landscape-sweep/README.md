@@ -17,7 +17,7 @@ the merged manifest, stay with the lane owners.
 
 | File | Runs | Role |
 | --- | --- | --- |
-| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep, a baseline manifest, a freshness manifest and optional seeds. |
+| `build_inputs.py` | checkout | Writes the per-layer inputs the workers read, `<work-dir>/inputs/<layer>.json`, and `layers.json`, from the frozen scope, the landscape catalogs, the ledger's last completed sweep of the run's modality, a baseline manifest, a freshness manifest and optional seeds. |
 | `build_args.py` | checkout | Stages a run into the work directory: frozen dated templates, schemas, the GPT-6 runtime, first-round GPT-6 prompts, `staged.json`, `prompts_sha256.txt`, the compact `args.json` and `sweep.embedded.js`. |
 | `sweep.js` | Workflow | The lane itself (`const A = args`; its header documents the args object). |
 | `codex_call.sh`, `codex_job.py` | staged | The GPT-6 job runner the wrapper agents call (`start`, `wait`, `result`). |
@@ -690,7 +690,7 @@ The deliberate changes:
   - Trading pins are included.
   - Known-repository slugs are no longer cut by `rstrip(".git")`, which had shortened, for example, `qdrant/qdrant`
     to `qdrant/qdran` in 30 of 32 layers.
-  - The previous sweep is the last completed one.
+  - The previous sweep is the last completed one of the run's modality (repository or skills).
 - **Placeholder filling.** Placeholders are filled in one pass, with no `$&` expansion. Merged rows drop
   `by_family`.
 - **`convert.py` additions.**

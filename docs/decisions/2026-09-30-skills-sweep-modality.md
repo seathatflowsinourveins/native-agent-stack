@@ -93,6 +93,10 @@ The packaged sweep gains `modality: "skills"`.
   - Task texts, open gaps and the installed skills' `gap` fields pass whole.
   - `--skills-scope` prints the frozen scope in `saturation_ledger.py --scope`'s format, with the ledger's own
     `skills_requirement_sha256`.
+  - Each modality keeps its own history. `previous_sweep`, and a repository run's default baseline manifest, come
+    from the last completed sweep of the run's own modality, which the ledger names by its layers' catalogs. A skills
+    sweep never empties a repository run's history or becomes its baseline, and a modality with no completed sweep
+    gets an empty history.
 - **Templates.** `build_args.py` resolves the modality at build time. A skills run's `discover` and `critic` are
   `discover_skills` and `critic_skills`, and `facts` and `fit` end in `modality_skills`.
   - The invocation flags follow the clients: a true-valued `disable-model-invocation` (true/yes/on/1 in any letter
