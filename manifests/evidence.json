@@ -35060,8 +35060,8 @@
     },
     {
       "path": "evidence/artifacts/pra-u2-differential-20260929/README.md",
-      "sha256": "e0a742b6db1beaa499e7725ab9300aeaeec97e5db016a0dcd5f5c68fbc1957c0",
-      "bytes": 20633
+      "sha256": "a24a4b510a151c3e862931670a96b5ff449843b8ee10b222634cc50607885203",
+      "bytes": 20678
     },
     {
       "path": "evidence/artifacts/pra-u2-differential-20260929/combine-chunks.mjs",
@@ -44490,8 +44490,8 @@
     },
     {
       "path": "tests/test_token_measurement.py",
-      "sha256": "6fc4e182e689e81d4f7d09518316e9f5cc51b169d954f01e3ebc16e557ea9d8f",
-      "bytes": 228887
+      "sha256": "ef80f9f0aefe61a4b8366ccde8a46501572a2f9f61e4fc4468d54c3f80bb183b",
+      "bytes": 228909
     },
     {
       "path": "tests/test_trading_gates.py",
