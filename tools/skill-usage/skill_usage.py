@@ -761,6 +761,13 @@ def _role_of(fields) -> str | None:
     return (value.strip(RUST_WHITE_SPACE) or None) if isinstance(value, str) else None
 
 
+def codex_session_kind(meta: dict) -> str:
+    """A session's kind from its first session_meta's source: subagent (SessionSource::SubAgent), exec (codex exec), else
+    other (another root, such as the interactive CLI)."""
+    source = meta.get("source")
+    return "subagent" if isinstance(source, dict) and "subagent" in source else "exec" if source == "exec" else "other"
+
+
 def thread_spawn_source(meta: dict) -> dict:
     """The SubAgentSource::ThreadSpawn of a session_meta ({parent_thread_id, depth, agent_path, agent_nickname, agent_role};
     rust-v0.157.1 protocol/src/protocol.rs:2901-2916), or {}."""
@@ -1078,6 +1085,13 @@ OPTIONAL_CODEX_COUNTERS = ("cache_write_input_tokens",)
 MEASUREMENT_MODULE = ROOT / "examples/claude-native/workflows/child-usage.mjs"
 # The kernel's rtkAgent for Codex replay (PR-A U3 10d): rtk-ai/rtk v0.50.0 InProcess(Host::Codex), src/hooks/decision.rs:196-204.
 CODEX_RTK_AGENT = "codex"
+# The private per-call Codex ledger that --call-ledger writes (binding correction 1 of the U3 build, gap G1 of the U11 design):
+# one record per call the kernel measured, from the kernel's callLedger, PR-A U2's export (claude/pra-u2-kernel-measures-2d-20260929
+# at b2dd1eb7, examples/claude-native/workflows/child-usage.mjs:2793-2820; U2 design 4.5). A record keeps these of the kernel's
+# fields; its session_id and owner, null for a Codex bridge row, give way to the thread id and owner kind the adapter reads, and
+# its background and m15_class are not part of codex-call-ledger/1.
+CODEX_CALL_LEDGER_SCHEMA = "codex-call-ledger/1"
+LEDGER_CALL_FIELDS = ("tool", "server", "state", "cause", "native_status", "sandbox", "code_mode")
 # Codex tools whose command the bridge reads as a Bash call (a local_shell_call is one as well).
 CODEX_SHELL_TOOLS = ("exec_command", "shell_command", "shell")
 # The unified exec response header of openai/codex rust-v0.157.1 (36650394) core/src/tools/context.rs:524-548:
@@ -1236,12 +1250,15 @@ def exec_header_state(output) -> tuple[bool, str | None]:
     return False, "unknown"
 
 
-def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
+def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False, ledger=False):
     """Run one export of the measurement kernel in Node. A measurement (not an aggregate or a review check) first awaits the kernel's
     loadShellParser(), as the kernel's own CLI does: the CLI-lane reading needs a verified tree-sitter-bash install (the directory
     order is CHILD_USAGE_SHELL_PARSER, then the ecosystem tools directory that shell-parser.pin.json names), and without one the
-    measurement reports cli_lanes as parser_unavailable and counts no lane."""
-    export = "validateExceptions" if validate_reviews else "aggregateMeasurements" if aggregate else "measureTranscript"
+    measurement reports cli_lanes as parser_unavailable and counts no lane. ledger asks for callLedger(rows, {window}) instead of
+    measureTranscript, after the same load, as U2's CLI loads the parser before it writes its ledger (child-usage.mjs:3448-3465
+    at b2dd1eb7)."""
+    export = ("validateExceptions" if validate_reviews else "aggregateMeasurements" if aggregate
+              else "callLedger" if ledger else "measureTranscript")
     load = "" if aggregate or validate_reviews else "await loadShellParser(); "
     script = ("import {readFileSync} from 'node:fs'; import {" + export + ("" if aggregate or validate_reviews else ", loadShellParser")
               + "} from " + json.dumps(MEASUREMENT_MODULE.as_uri()) + "; const x=JSON.parse(readFileSync(0,'utf8')); " + load
@@ -1259,6 +1276,20 @@ def _measurement_bridge(payload, *, aggregate=False, validate_reviews=False):
     return json.loads(result.stdout)
 
 
+def kernel_exports(name: str) -> bool:
+    """Whether the measurement kernel exports a function called name. --call-ledger needs callLedger, PR-A U2's export
+    (CODEX_CALL_LEDGER_SCHEMA above), and a kernel without it cannot give a call's state, so the ledger is refused, never
+    written from another source. A Node failure reads as False."""
+    script = ("import * as kernel from " + json.dumps(MEASUREMENT_MODULE.as_uri())
+              + "; process.stdout.write(typeof kernel[" + json.dumps(name) + "])")
+    try:
+        result = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True,
+                                timeout=120, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return result.returncode == 0 and result.stdout == "function"
+
+
 def m4_unread(commands: dict, code_mode: dict) -> bool:
     """Whether fetches may have run where they cannot be read, so M4 is incomplete for the actor or group (the U3 review):
     an unresolved command (codex_commands non_posix_shell, unknown_shell), a legacy unobservable exec span, or an outer
@@ -1269,7 +1300,7 @@ def m4_unread(commands: dict, code_mode: dict) -> bool:
 
 
 def measure_codex_records(records, *, since=None, until=None, rtk_check=False, exceptions=None,
-                          marker=DEFAULT_LANES_MARKER):
+                          marker=DEFAULT_LANES_MARKER, call_ledger=None):
     """Local transcript measurement, not a provider run. Parent copies establish the
     cumulative usage baseline but never contribute calls/results. Preserve unknowns.
 
@@ -1284,6 +1315,14 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     code_mode (PR-A 10e) reads the first session_meta: a history_mode other than paginated, or none (the upstream default,
     protocol/src/protocol.rs:772-779), or no session_meta at all, is legacy, and a cli_version outside
     NO_NETWORK_ISOLATE_CLIENTS, or none, is a client whose code-mode isolate was not read.
+
+    call_ledger, a list, receives the private codex-call-ledger/1 records (binding correction 1 of the U3 build): the
+    kernel's callLedger over the same rows and window as the measurement, one record per call it counts, in row order. A
+    call id is the adapter's key: the response_item call_id (else its id), or the item_completed item.id of a
+    CommandExecution, McpToolCall or web.search item, so a code-mode exec and a command its JavaScript ran are two calls; a
+    key the adapter made up for a record without an id (missing-N), or one that is not a string, is null. thread_id and
+    owner_kind come from the first session_meta (its id, and codex_session_kind; no session_meta gives null), and
+    history_mode is the mode this function reads (paginated, else legacy). Nothing of it enters the returned measurement.
     """
     start = next((r.get("payload", {}).get("subagent_history_start_ordinal") for r in records
                   if r.get("type") == "session_meta"), None)
@@ -1425,6 +1464,7 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     # keeps a call's first tool_use; an emitted call's record decides before a skipped item with the same id.
     commands = dict.fromkeys(CODEX_COMMAND_STATES, 0)
     emitted, skipped = set(), set()
+    made_up = set()  # the missing-N keys of records without an id, which the call ledger writes as null
 
     def count_command(at, state):
         if state is not None and (since is None or at >= since):
@@ -1474,7 +1514,10 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         p = r.get("payload") or {}
         at = visible_at[index]
         if r.get("type") == "response_item":
-            kind, key = p.get("type"), p.get("call_id") or p.get("id") or f"missing-{index}"
+            kind, key = p.get("type"), p.get("call_id") or p.get("id")
+            if not key:
+                key = f"missing-{index}"
+                made_up.add(key)
             if kind in ("function_call", "custom_tool_call"):
                 name = codex_call_name(p)
                 exec_call = kind == "custom_tool_call" and name.rsplit(".", 1)[-1] == "exec"
@@ -1501,6 +1544,8 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
         elif r.get("type") == "event_msg" and p.get("type") == "item_completed":
             item = p.get("item") or {}
             key = item.get("id", f"missing-{index}")
+            if "id" not in item:
+                made_up.add(key)
             kind = item.get("type")
             direct = key in model_call_ids
             sandbox = turn_exec is not None and not direct
@@ -1575,6 +1620,17 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
     measured["provider_usage"] = {"totals": totals if snapshots else dict.fromkeys(CODEX_COUNTERS),
         "attempts": attempts, "snapshots": snapshots, "duplicate_snapshots": duplicates, "gaps": gaps,
         "complete": bool(snapshots) and not gaps and all(a["state"] == "completed" and a["snapshots"] for a in attempts)}
+    if call_ledger is not None:
+        # Binding correction 1: the kernel's callLedger over the rows and window measureTranscript read, so the ledger holds
+        # exactly the calls the measurement counts.
+        head = {"schema": CODEX_CALL_LEDGER_SCHEMA, "thread_id": meta.get("id") if isinstance(meta.get("id"), str) else None}
+        owner_kind = (codex_session_kind(meta) if any(r.get("type") == "session_meta" for r in records) else None)
+        history_mode = "paginated" if paginated else "legacy"
+        for record in _measurement_bridge({"rows": normalized, "options": {"window": window}}, ledger=True):
+            key = record.get("tool_use_id")
+            call_ledger.append({**head, "call_id": key if isinstance(key, str) and key not in made_up else None,
+                                "owner_kind": owner_kind, **{field: record.get(field) for field in LEDGER_CALL_FIELDS},
+                                "history_mode": history_mode})
     return measured
 
 
@@ -1644,8 +1700,9 @@ def _collect_spawn_facts(session: dict, kind, payload: dict, route):
 
 
 def scan_lanes_file(path: Path, names, *, since, until, marker: str,
-                    codex_off, codex_on, rtk_check=False, exception_records=()) -> tuple[dict, int, int]:
-    """One rollout file -> (session lanes, parse errors, records without a timestamp).
+                    codex_off, codex_on, rtk_check=False, exception_records=(), call_ledger=False) -> tuple[dict, int, int]:
+    """One rollout file -> (session lanes, parse errors, records without a timestamp). With call_ledger, a measured
+    session keeps its private call ledger records (measure_codex_records) in session["_call_ledger"].
 
     A spawned sub-agent's rollout starts with records copied from its parent: those whose ordinal
     is below session_meta.subagent_history_start_ordinal. They count toward session properties
@@ -1712,9 +1769,7 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
                 catalog(text)
             if kind == "session_meta":
                 if session["kind"] is None:  # a sub-agent rollout repeats its parent's meta second
-                    source = payload.get("source")
-                    session["kind"] = ("subagent" if isinstance(source, dict) and "subagent" in source
-                                       else "exec" if source == "exec" else "other")
+                    session["kind"] = codex_session_kind(payload)
                     session["role"] = session_role(payload, session["kind"])
                     session["originator"] = safe_key(payload["originator"]) if payload.get("originator") else "(none)"
                     session["history_mode"] = (safe_key(payload["history_mode"]) if payload.get("history_mode")
@@ -1778,8 +1833,12 @@ def scan_lanes_file(path: Path, names, *, since, until, marker: str,
         session["_sidecar_record_indices"] = [i for i, r in enumerate(exception_records)
                                                if r["transcript_sha256"] == digest]
         exceptions = {r["tool_use_id"]: r for r in exception_records if r["transcript_sha256"] == digest}
+        ledger = [] if call_ledger else None
         session["measurement"] = measure_codex_records(metric_records, since=since, until=until,
-                                                       rtk_check=rtk_check, exceptions=exceptions, marker=marker)
+                                                       rtk_check=rtk_check, exceptions=exceptions, marker=marker,
+                                                       call_ledger=ledger)
+        if ledger is not None:
+            session["_call_ledger"] = ledger
         session["measurement"]["parse_errors"] = parse_errors
         if parse_errors or untimed:
             session["measurement"]["provider_usage"]["complete"] = False
@@ -1994,8 +2053,11 @@ def count_spawn_states(spawns: list[dict]) -> dict:
     return {field: dict(sorted(values.items())) for field, values in counts.items()}
 
 
-def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_check=False, exception_records=()) -> dict:
-    """The Codex lane report over rollout-*.jsonl under exactly the given roots."""
+def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_check=False, exception_records=(),
+                     call_ledger=None) -> dict:
+    """The Codex lane report over rollout-*.jsonl under exactly the given roots. call_ledger, a list, receives the private
+    codex-call-ledger/1 records of every measured session, each with actor_ordinal, its session's ordinal in the published
+    actors list (the precedent of U2's sweep ledger, child-usage.mjs:3209-3210 at b2dd1eb7); the report never holds them."""
     skills = [skill for skill in manifest["skills"] if isinstance(skill, dict) and "name" in skill]
     names = [skill["name"] for skill in skills]
     codex_off = [skill["name"] for skill in skills if skill.get("codex_enabled") is False]
@@ -2018,7 +2080,8 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_ch
         scanned += 1
         session, errors, no_time = scan_lanes_file(path, names, since=since, until=until, marker=marker,
                                                    codex_off=codex_off, codex_on=codex_on,
-                                                   rtk_check=rtk_check, exception_records=exception_records)
+                                                   rtk_check=rtk_check, exception_records=exception_records,
+                                                   call_ledger=call_ledger is not None)
         parse_errors += errors
         untimed += no_time
         if session["_thread_id"] is not None:
@@ -2031,6 +2094,9 @@ def scan_codex_lanes(roots, manifest: dict, *, since, until, marker: str, rtk_ch
     for session in sessions:
         if session["kind"] == "subagent":
             session["spawn"] = spawn_state(session, owners, activity)
+    if call_ledger is not None:
+        for ordinal, session in enumerate(sessions, 1):
+            call_ledger.extend({**record, "actor_ordinal": ordinal} for record in session.get("_call_ledger", ()))
 
     def count_by(key: str) -> dict:
         counts: dict = {}
@@ -2164,6 +2230,10 @@ def main(argv=None) -> int:
                        help="Replay native RTK v0.50.0 eligibility under isolated five-exclusion config (--lanes)")
     lanes.add_argument("--exceptions", type=Path,
                        help="Private transcript-SHA256-bound M3 adjudications (--lanes)")
+    lanes.add_argument("--call-ledger", type=Path, default=None, metavar="PATH",
+                       help="Also write the private per-call ledger (codex-call-ledger/1 JSONL: thread and call ids with "
+                            "each call's state) to this new file, mode 0600; refused inside any git work tree, over an "
+                            "existing path, or with a measurement kernel that exports no callLedger (--lanes)")
     args = parser.parse_args(argv)
 
     try:
@@ -2181,6 +2251,9 @@ def main(argv=None) -> int:
 
     if args.lanes:
         return lanes_main(args, manifest, now)
+    if args.call_ledger is not None:
+        print("skill_usage: --call-ledger needs --lanes", file=sys.stderr)
+        return 2
     if args.since is not None or args.until is not None or args.marker is not None or args.rtk_check or args.exceptions:
         print("skill_usage: --since, --until and --marker need --lanes", file=sys.stderr)
         return 2
@@ -2221,17 +2294,85 @@ def main(argv=None) -> int:
     return 0
 
 
+def out_refused(out: Path | None) -> bool:
+    """True, with a message, when --out resolves inside the checkout, where nothing is written."""
+    if out is None:
+        return False
+    resolved_out = out.resolve()
+    if resolved_out == ROOT or ROOT in resolved_out.parents:
+        print(f"skill_usage: refusing --out inside the repository checkout: {out}", file=sys.stderr)
+        return True
+    return False
+
+
 def write_out(out: Path | None, report: dict) -> bool:
     """Write the JSON report to --out; False (nothing written) when it resolves inside the checkout."""
     if out is None:
         return True
-    resolved_out = out.resolve()
-    if resolved_out == ROOT or ROOT in resolved_out.parents:
-        print(f"skill_usage: refusing --out inside the repository checkout: {out}", file=sys.stderr)
+    if out_refused(out):
         return False
+    resolved_out = out.resolve()
     resolved_out.parent.mkdir(parents=True, exist_ok=True)
     resolved_out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return True
+
+
+# The private file of --call-ledger (binding correction 1 of the U3 build: mode 0600, create-only, refused inside any git work
+# tree, never written by default), by the rule of frozen_checks.private_create on main (a02ff13f, tools/token-e2e/
+# frozen_checks.py:1309-1369, a module this unit's base does not hold) and of U2's ledgerTarget and writeLedger
+# (child-usage.mjs:2821-2844 at b2dd1eb7).
+def inside_git_work_tree(path) -> bool:
+    """True when path, which may not exist yet, lies inside a git work tree: a .git entry (a directory, or a linked
+    worktree's file) beside its nearest existing ancestor or any directory above that."""
+    current = os.path.abspath(path)
+    while not os.path.exists(current):
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+    current = os.path.realpath(current)
+    if os.path.isfile(current):
+        current = os.path.dirname(current)
+    while True:
+        if os.path.lexists(os.path.join(current, ".git")):
+            return True
+        parent = os.path.dirname(current)
+        if parent == current:
+            return False
+        current = parent
+
+
+def ledger_path_issue(path) -> str | None:
+    """Why --call-ledger refuses path, or None."""
+    if inside_git_work_tree(path):
+        return "refusing a path inside a git work tree (the ledger holds thread and call ids)"
+    if os.path.lexists(path):
+        return "refusing an existing path (the ledger is created, never written over)"
+    return None
+
+
+def write_private_ledger(path, records: list) -> None:
+    """Create path as JSONL, exclusively (O_EXCL, and O_NOFOLLOW where the platform has it) with mode 0600, in a parent
+    directory made 0700 when new; a file left by a failed write is removed. Raises ValueError for a refused path and
+    OSError when the file cannot be created or written."""
+    issue = ledger_path_issue(path)
+    if issue:
+        raise ValueError(issue)
+    os.makedirs(os.path.dirname(os.path.abspath(path)), mode=0o700, exist_ok=True)
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600)
+    try:
+        os.fchmod(descriptor, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            descriptor = None
+            stream.write("".join(json.dumps(record) + "\n" for record in records))
+    except BaseException:
+        if descriptor is not None:
+            os.close(descriptor)
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+        raise
 
 
 def lanes_main(args, manifest: dict, now: datetime) -> int:
@@ -2255,16 +2396,40 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     if not marker.strip():
         print("skill_usage: --marker needs non-blank text", file=sys.stderr)
         return 2
+    # --call-ledger: every refusal comes before any work, and the file is created before the report is written or printed,
+    # so a refusal or a failed write exits 2 with no report and no ledger (U2's CLI order, child-usage.mjs:3448-3460).
+    ledger = None
+    if args.call_ledger is not None:
+        issue = ledger_path_issue(args.call_ledger)
+        if issue:
+            print(f"skill_usage: --call-ledger: {issue}", file=sys.stderr)
+            return 2
+        if out_refused(args.out):
+            return 2
+        if not kernel_exports("callLedger"):
+            print("skill_usage: --call-ledger: the measurement kernel exports no callLedger (PR-A U2), so no call state can "
+                  "be read; nothing was written", file=sys.stderr)
+            return 2
+        ledger = []
     try:
         reviews = []
         if args.exceptions:
             reviews = _measurement_bridge(json.loads(args.exceptions.read_text()), validate_reviews=True)
         scan = scan_codex_lanes(args.codex_root, manifest, since=since, until=until, marker=marker,
-                               rtk_check=args.rtk_check, exception_records=reviews)
+                               rtk_check=args.rtk_check, exception_records=reviews, call_ledger=ledger)
     except (OSError, ValueError):
         print("skill_usage: measurement failed; check Node availability and exception sidecar", file=sys.stderr)
         return 2
     report = build_lanes_report(scan, since=since, until=until, marker=marker, now=now)
+    if ledger is not None:
+        try:
+            write_private_ledger(args.call_ledger, ledger)
+        except ValueError as error:
+            print(f"skill_usage: --call-ledger: {error}", file=sys.stderr)
+            return 2
+        except OSError as error:
+            print(f"skill_usage: --call-ledger: cannot create the file ({type(error).__name__})", file=sys.stderr)
+            return 2
     if not write_out(args.out, report):
         return 2
     print(json.dumps(report, indent=2, sort_keys=True) if args.json else render_lanes_text(report))
