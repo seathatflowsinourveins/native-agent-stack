@@ -119,6 +119,19 @@ YAML12_NULL = re.compile(r"(?:~|[Nn]ull|NULL)?")
 YAML12_BOOL = re.compile(r"[Tt]rue|TRUE|[Ff]alse|FALSE")
 YAML12_NUMBER = re.compile(r"[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+|[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][-+]?[0-9]+)?"
                            r"|[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN")
+# YAML 1.2's double-quoted escapes (c-ns-esc-char), the set both parsers define: unsafe-libyaml 0.2.11, the libyaml
+# port serde_yaml 0.9.34 parses with (tag commit a7b8d1fbd93aefbca3003dcb5fcc6a9c2297e968, src/scanner.rs lines
+# 2195-2317: any other escape is "found unknown escape character"), and the yaml package 2.9.0 (tag commit
+# ddb21b04cb889722cec8f89dc1b67f19d62d7f7d, src/compose/resolve-flow-scalar.ts escapeCodes, lines 208-227: any other
+# is the error BAD_DQ_ESCAPE, line 172). \x, \u and \U take exactly 2, 4 and 8 hex digits (scanner.rs line 2341;
+# parseCharCode, lines 229-245), and a code point beyond U+10FFFF is refused by both; libyaml also refuses a surrogate
+# (U+D800 to U+DFFF, scanner.rs lines 2355-2361), which the yaml package's String.fromCodePoint takes.
+YAML_ESCAPES = {"0": "\0", "a": "\a", "b": "\b", "t": "\t", "\t": "\t", "n": "\n", "v": "\v", "f": "\f", "r": "\r",
+                "e": "\x1b", " ": " ", '"': '"', "/": "/", "\\": "\\", "N": "\x85", "_": "\xa0", "L": chr(0x2028),
+                "P": chr(0x2029)}
+YAML_HEX_ESCAPES = {"x": 2, "u": 4, "U": 8}
+HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
+SURROGATE = re.compile("[\ud800-\udfff]")
 # The skills CLI adoption/skills/manifest.json pins: vercel-labs/skills v1.7.0 (tag commit
 # 7407f3893ad4dceab546ac002c3ef806e4000c73). src/skills.ts SKIP_DIRS (line 10), AGENT_PROJECT_SKILL_DIRS (lines 12-43)
 # and discoverSkills (lines 180-329); src/constants.ts DEFAULT_SKILL_CONTAINER_DEPTH; src/plugin-manifest.ts
@@ -286,6 +299,48 @@ def yaml_scalar(text: str) -> tuple[str, bool]:
     return text, False
 
 
+def double_quoted_value(body: str, surrogates: bool) -> tuple[str | None, str | None]:
+    """(value, None) of the text between the quotes of a one-line double-quoted scalar, or (None, why not): an escape
+    outside YAML_ESCAPES and YAML_HEX_ESCAPES, a hex escape without its digits, or a code point beyond U+10FFFF, and a
+    surrogate unless `surrogates` (the yaml package takes one, libyaml does not)."""
+    out, index = [], 0
+    while index < len(body):
+        if body[index] != "\\":
+            out.append(body[index])
+            index += 1
+            continue
+        code = body[index + 1:index + 2]
+        if code in YAML_ESCAPES and code:
+            out.append(YAML_ESCAPES[code])
+            index += 2
+            continue
+        digits = body[index + 2:index + 2 + YAML_HEX_ESCAPES.get(code, 0)]
+        escape = body[index:index + 2 + len(digits)]
+        if code in YAML_HEX_ESCAPES and len(digits) == YAML_HEX_ESCAPES[code] and HEX_DIGITS.issuperset(digits):
+            point = int(digits, 16)
+            if point <= 0x10FFFF and (surrogates or not 0xD800 <= point <= 0xDFFF):
+                out.append(chr(point))
+                index += 2 + len(digits)
+                continue
+            return None, (f"a double-quoted scalar with the escape {escape}, "
+                          f"{'a surrogate' if point <= 0x10FFFF else 'beyond U+10FFFF'},")
+        return None, f"a double-quoted scalar with the escape {escape}, which YAML 1.2 does not define,"
+    return "".join(out), None
+
+
+def quoted_scalar(text: str, surrogates: bool) -> tuple[str | None, str | None]:
+    """(value, None) of a quoted scalar that is the whole of text (its comment stripped), or (None, why not): it must
+    close on the line with nothing after it, and a double-quoted one must use YAML's escapes (double_quoted_value)."""
+    end = quoted_end(text)
+    if end is None:
+        return None, "a quoted scalar that continues on the next line"
+    if text[end:].strip():
+        return None, "text after a quoted scalar"
+    if text[0] == "'":
+        return text[1:end - 1].replace("''", "'"), None
+    return double_quoted_value(text[1:end - 1], surrogates)
+
+
 def frontmatter_values(yaml_text: str) -> dict:
     """{key: (value, quoted)} of the top-level `key: value` lines of a SKILL.md frontmatter block: a quoted value's
     content, or a plain value without its trailing comment (`name: find-bugs  # note` is find-bugs). A key whose value
@@ -395,10 +450,13 @@ def pyyaml_policy(text: str) -> tuple[bool | None, str | None, str]:
     loader = getattr(yaml, "CSafeLoader", None) or yaml.SafeLoader
     try:
         documents = list(yaml.compose_all(text, Loader=loader))
-    except yaml.YAMLError as error:
+    except (yaml.YAMLError, ValueError) as error:  # ValueError: the pure-Python scanner's chr() beyond U+10FFFF
         first = str(error).strip().splitlines()[0] if str(error).strip() else type(error).__name__
         return None, None, (f"PyYAML cannot parse the file ({first}): whether serde_yaml can, and so Codex's "
                             "implicit invocation, is unverified")
+    if any(SURROGATE.search(value) for value in scalar_values(documents)):  # only an escape yields one
+        return None, None, ("PyYAML's pure-Python scanner took an escaped surrogate, which libyaml refuses: whether "
+                            "serde_yaml can read the file, and so Codex's implicit invocation, is unverified")
     try:
         if not documents:
             raise CodexIgnores("the file holds no YAML document")  # serde_yaml: EndOfStream
@@ -423,6 +481,22 @@ def pyyaml_policy(text: str) -> tuple[bool | None, str | None, str]:
         return value, node.value, f"policy.allow_implicit_invocation: {node.value}"
     except CodexIgnores as why:
         return True, why.value, f"{why}: {CODEX_IGNORES}"
+
+
+def scalar_values(nodes):
+    """The value of every scalar node in the composed trees, each node once (an alias repeats a node)."""
+    stack, seen = list(nodes), set()
+    while stack:
+        node = stack.pop()
+        if id(node) in seen:
+            continue
+        seen.add(id(node))
+        if isinstance(node, yaml.ScalarNode):
+            yield node.value
+        elif isinstance(node, yaml.SequenceNode):
+            stack.extend(node.value)
+        elif isinstance(node, yaml.MappingNode):
+            stack.extend(item for pair in node.value for item in pair)
 
 
 def plain_scalar(node) -> bool:
@@ -486,14 +560,13 @@ def quoted_end(text: str) -> int | None:
 
 
 def subset_value_problem(value: str) -> str | None:
-    """Why a one-line value is outside the plain block-mapping subset, or None."""
+    """Why a one-line value is outside the plain block-mapping subset, or None. A quoted scalar must close on its line
+    with nothing after it, and a double-quoted one must use only the escapes libyaml defines (YAML_ESCAPES, no
+    surrogate): the reader does not decide how serde_yaml, which scans with libyaml's rules, reads any other."""
     if not value:
         return None
     if value[0] in "'\"":
-        end = quoted_end(value)
-        if end is None:
-            return "a quoted scalar that continues on the next line"
-        return "text after a quoted scalar" if value[end:].strip() else None
+        return quoted_scalar(value, surrogates=False)[1]
     if value[0] in SUBSET_INDICATORS:
         return SUBSET_INDICATORS[value[0]]
     if value == "-" or value.startswith(("- ", "-\t")):

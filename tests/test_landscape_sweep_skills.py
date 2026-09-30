@@ -893,6 +893,18 @@ OPENAI_YAML = {
     "tab indentation": ("policy:\n\tallow_implicit_invocation: false\n", None, None, "tab"),
     "a plain scalar holding ': '": ("interface:\n  short_description: Finds bugs: fast\npolicy:\n"
                                     "  allow_implicit_invocation: false\n", None, None, "': '"),
+    # GPT-6 round-3 review of #541: without PyYAML an escape YAML does not define, anywhere in the file, still gave a
+    # definite false, while serde_yaml's scanner refuses the file (unsafe-libyaml 0.2.11 src/scanner.rs lines
+    # 2195-2361: "found unknown escape character", a missing hex digit, a surrogate) and Codex then allows it.
+    "an invalid escape in another value": ('note: "C:\\skills"\npolicy:\n  allow_implicit_invocation: false\n', None,
+                                           None, "escape \\s"),
+    "a hex escape without its digits": ('note: "\\x4"\npolicy:\n  allow_implicit_invocation: false\n', None, None,
+                                        "escape \\x4"),
+    "a surrogate escape": ('note: "\\uD800"\npolicy:\n  allow_implicit_invocation: false\n', None, None, "a surrogate"),
+    "an unbalanced single quote": ("note: 'it's'\npolicy:\n  allow_implicit_invocation: false\n", None, None,
+                                   "text after a quoted scalar"),
+    "YAML's escapes": ('note: "Tab\\t\\"q\\" \\x41\\u00e9\\U0001F600\\/"\npolicy:\n  allow_implicit_invocation: false\n',
+                       False, False, "false"),
 }
 
 
@@ -927,6 +939,19 @@ class OpenAiYamlPyYamlReaderTests(unittest.TestCase):
         self.assertIsNotNone(getattr(source_reviews, "yaml", None))
         self.assertTrue(source_reviews.openai_yaml_reader().startswith("PyYAML"))
 
+    def test_the_pure_python_loader_reads_what_codex_reads(self):
+        # Without the libyaml binding PyYAML's own scanner takes a surrogate escape, which libyaml refuses, and raises
+        # ValueError (not a YAMLError) beyond U+10FFFF: both stay unverified.
+        with mock.patch.object(source_reviews.yaml, "CSafeLoader", None, create=True):
+            self.assertTrue(source_reviews.openai_yaml_reader().endswith("with SafeLoader"))
+            for name, (text, _, expected, _) in OPENAI_YAML.items():
+                with self.subTest(name):
+                    implicit, _, note = source_reviews.openai_yaml_policy(text)
+                    self.assertIs(implicit, expected, note)
+            implicit, _, note = source_reviews.openai_yaml_policy(
+                'note: "\\U00110000"\npolicy:\n  allow_implicit_invocation: false\n')
+            self.assertIsNone(implicit, note)
+            self.assertIn("unverified", note)
 
 class GitObjectIdTests(unittest.TestCase):
     """source_reviews.py's folder hash is git's own tree id (the id the skills CLI's lock records as
@@ -1197,6 +1222,16 @@ class SkillSourceReviewTests(unittest.TestCase):
         self.assertEqual(review["readme_path"], "x/y/find-bugs/SKILL.md")
         self.assertIn("recursive search", review["observed"]["skill_md_found_by"])
 
+
+    def test_an_openai_yaml_with_an_escape_yaml_does_not_define_is_unverified(self):
+        # GPT-6 round-3 review of #541: without PyYAML this was a definite codex_implicit false.
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS,
+                 "skills/find-bugs/agents/openai.yaml": b'note: "C:\\skills"\npolicy:\n  allow_implicit_invocation: false\n'}
+        done, out = self.review(self.answers(files), [self.survivor()])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        observed = self.reviewed(out)["observed"]
+        self.assertIsNone(observed["codex_implicit"])
+        self.assertIn("PyYAML cannot parse" if PYYAML else "the escape \\s", observed["unverified_reason"])
     # The adjudicated pin and the folder hash (GPT-6 review of #541: an unreadable pin fell back to the default
     # branch, a null hash let other bytes pass, and a SKILL.md hash did not freeze agents/openai.yaml).
 
