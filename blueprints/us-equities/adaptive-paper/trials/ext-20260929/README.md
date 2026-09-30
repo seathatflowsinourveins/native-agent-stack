@@ -270,8 +270,9 @@ independent of the engine but not of the broker.
     reason other than a stale quote (`mover_runner.py:304-306`). The engine log has one line "no data received on
     data stream for 30.0s, reconnecting", from alpaca-py's data websocket; the logs carry no timestamps.
   - BKYI's exit went out at 17:08:42 ET (bid 3.09, limit 3.08) and filled 100 at 3.09 at 17:08:43 ET. IOVA's exit
-    was never submitted: its last wait reason was `no_fresh_quote`. BEX's exit (bid 40.41, limit 40.21) was reserved
-    in the ledger at 17:09:12 ET but never reached the durable request budget (no request row, `submit_attempted` 0).
+    was never submitted: its exit wait reason at the end was `no_fresh_quote`. BEX's exit (bid 40.41, limit 40.21)
+    was reserved in the ledger at 17:09:12 ET but never reached the durable request budget (no request row,
+    `submit_attempted` 0).
   - At 17:09:13 ET, 30 s after the BKYI fill with no further fall in the held quantity (3 exit timeouts of 10 s,
     `mover.py:1276-1292`), the engine handed off to recovery with `no_exit_progress`.
 - **Trial 4: the recoveries on 2026-09-29.**
@@ -295,15 +296,16 @@ independent of the engine but not of the broker.
   row; the ledger's last request is the BEX sale's submit at 17:10:09.024 ET, and the 60 s before the IOVA
   reservation hold 0 requests. So:
   - **Excluded:** the 150 and 130 per-minute caps (0 requests in the prior 60 s cannot defer; from the recover
-    command's start the ledger holds 4 reads and 1 submit); the transport wire guard, which runs only after a
-    durable reservation (`transport.py:1173-1179`); the order-contract gates, which record `order_contract_refused`
-    instead; the recovery's own exit-budget guard, which would end the recovery with its own error code; and
-    `validate_pending`'s session, window, outstanding-order and owned-position checks, which the recorded state
-    passes. `validate_pending` checks no price bound for a sell.
+    command's recovery start (17:10:04 ET) to the IOVA reservation the ledger holds 4 reads and 1 submit); the
+    transport wire guard, which runs only after a durable reservation (`transport.py:1173-1179`); the order-contract
+    gates, which record `order_contract_refused` instead; the recovery's own exit-budget guard, which would end the
+    recovery with its own error code; and `validate_pending`'s session, window, outstanding-order and owned-position
+    checks, which the recorded state passes. `validate_pending` checks no price bound for a sell.
   - **Not excluded:** `validate_pending`'s quote check (`quote_not_fresh`, `safety.py:658-662`), since the quote was
     0.021 s old at the reservation but the refusal's time is not recorded; and the transport's 0.25 s deadline for
     the submit hook (`transport.py:1148-1167`), which is sanitized the same way. The files cannot distinguish these
-    two.
+    two. The deadline is a path in the source beyond the two candidates the coordinator's brief named
+    (`validate_pending` in `Controller.before_request`, and the transport wire guard).
 - **`controller_stop` in trials 2 and 3.** At 16:18:14 and 16:21:14 ET the engine's loop found its stop flag already
   set. The receipts do not record what set it.
   - Setters in the source: the 30 s reconciliation, when the transport health after its snapshot holds a reason
@@ -383,7 +385,7 @@ cancels an order, and the broker listing shows no order outside the series and r
   position or partial fills.
 - **Not a strategy evaluation.** Four trials in one after-hours session evaluate no strategy, and the protocol has no
   validated edge. In POST the scanner selects the day's 10:00 movers, not after-hours catalysts.
-- **Unrecorded causes.** The IOVA refusal's reason is not recorded; the files narrow it to two candidates they cannot
+- **Unrecorded causes.** The IOVA refusal's reason is not recorded; the files narrow it to two paths they cannot
   distinguish. What set trials 2 and 3's `controller_stop` is not recorded either.
 - **Recovery evidence.** The 2026-09-30 09:08Z ledger snapshot predates the 06:00 ET recovery attempts, so their 0
   orders rest on the 17 attempt receipts and the recovery console, not on the ledger.
@@ -419,12 +421,13 @@ the 2026-09-30 09:06Z read, and its ledger is at `recovery_only`; the residual's
 | `README.md` | This summary |
 | `reconcile-ext-20260929.stdout.json`, `reconcile-rec-ext-20260929.stdout.json` | The independent broker reconciliation's two stdouts (series and recovery prefix), byte-identical; the tool is cited by path and sha256 |
 | `frozen-b528bb55.SHA256SUMS` | The freeze's hashes of the 70 engine, scanner, order-contract and incentive-monitor files, byte-identical |
-| `mover-paper-1.json` to `mover-paper-4.json` | Engine receipts of trials 1 to 4. Each `broker_order_ref` value (5, 8, 4 and 4) is replaced by `withheld`; every other byte is unchanged |
+| `mover-paper-1.json` to `mover-paper-4.json` | Engine receipts of trials 1 to 4. Each `broker_order_ref` value (5, 8, 4 and 4) is replaced by `withheld` (trial 4's never-sent BEX exit has a null ref, kept null); every other byte is unchanged |
 | `mover-recovery-4.json` | The recover command's receipt for trial 4, byte-identical (it holds no broker order ref) |
 | `series.console` | The series console (run log), byte-identical |
 
 Private and not committed:
-- the freeze note and the private series index, which name account fingerprints (cited by sha256);
+- the freeze note, which names a private host path (the account-2 state root's full path), and the private series
+  index, which names account fingerprints (both cited by sha256);
 - the config file and rule file, whose content is in `receipt.json`;
 - the scan, check and synthetic files, the engine logs and events, and the scan page ledgers and caches;
 - trial 4's recover log, the 2026-09-30 recovery plan, outcome note, attempt receipts, logs and console (hashed);
