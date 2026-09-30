@@ -100,7 +100,7 @@
         "pin": "353841d91618d20b110b208de284a74d0b960379",
         "files": ["crates/ai-memory-store/src/session_consolidation.rs:10-11,116-125,217-259", "crates/ai-memory-cli/src/commands/serve.rs:722-725,804-818", "crates/ai-memory-mcp/src/server.rs:2730-2752,2813-2825"],
         "findings": "Five attempts with waits 30/60/120/240 seconds; failed rows are not claimed again. Direct MCP memory_consolidate supports an exact session_id but does not reset or complete the background queue row.",
-        "nested_retries": "At this source pin, consolidator.rs:67-106 permits three structured calls per queue attempt and ai-memory-llm/src/error.rs:73-75 classifies provider 429 as transient. Five queue attempts do not establish five actual HTTP calls; actual live request count is unmeasured.",
+        "nested_retries": "At this source pin, crates/ai-memory-consolidate/src/consolidator.rs:67-106 permits up to three structured calls per queue attempt and crates/ai-memory-llm/src/error.rs:73-75 classifies provider 429 as transient. Five queue attempts do not establish five actual HTTP calls; actual live request count is unmeasured.",
         "upstream_tests_inspected_not_run": ["queue_is_idempotent_per_observation_generation", "failed_claim_retries_and_graceful_release_does_not_spend_attempt", "expired_final_attempt_replays_without_spending_an_extra_attempt", "session_consolidation_worker_consumes_and_completes_durable_job"],
         "installed_patch_equivalence": null,
         "scope": "Source review at available clean upstream pin only; equivalence to the installed custom build remains unknown."
