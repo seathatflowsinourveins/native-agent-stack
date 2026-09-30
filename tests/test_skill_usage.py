@@ -3074,6 +3074,59 @@ class CodexRtkReplay(unittest.TestCase):
                           "all_covered_calls": 0, "status": "measured"})
 
 
+    def unresolved_rtk_view(self, rows):
+        got = S.measure_codex_records(rows, since=S.parse_iso(LANES_SINCE), until=S.parse_iso(LANES_UNTIL), rtk_check=True)
+        rtk = got["rtk_parts"]
+        return ({key: rtk.get(key) for key in ("calls", "unknown_calls", "unknown_call_share", "status")}, rtk["d7"]["status"])
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_an_unresolved_command_counts_by_b8_and_refreshes_the_share(self):
+        # Merge review finding 1: the bridge used to add an unresolved command to unknown_calls after the kernel had finished
+        # the report, force status incomplete and leave unknown_call_share stale. The kernel now counts it (unresolvedBash), so
+        # one unresolved pwsh call among 20 readable ones is 1 of 21 (4.76 percent, under B8's 5 percent): rtk_parts is measured
+        # with the right share, and the D7 view stays the harder reading (any unknown call leaves d7 incomplete).
+        rows = [PAGINATED_META] + [sourced_command(f"item_b8_{i}", ["bash", "-lc", "git status"], "agent") for i in range(20)]
+        rows.append(sourced_command("item_b8_pwsh", ["pwsh", "-Command", "git status"], "agent"))
+        self.assertEqual(self.unresolved_rtk_view(rows), (
+            {"calls": 21, "unknown_calls": 1, "unknown_call_share": 0.0476, "status": "measured"}, "incomplete"))
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_the_same_unknown_count_reads_alike_from_an_unresolved_and_an_unreadable_command(self):
+        # Merge review finding 1: one unknown call gave measured when the kernel could not read it and incomplete when the bridge
+        # could not resolve it. Both layers now give the same four fields and the same d7 status.
+        readable = [sourced_command(f"item_alike_{i}", ["bash", "-lc", "git status"], "agent") for i in range(20)]
+        unresolved = self.unresolved_rtk_view([PAGINATED_META] + readable
+                                              + [sourced_command("item_alike_x", ["pwsh", "-Command", "git status"], "agent")])
+        unreadable = self.unresolved_rtk_view([PAGINATED_META] + readable
+                                              + [sourced_command("item_alike_x", ["bash", "-lc", 'echo "open'], "agent")])
+        self.assertEqual(unresolved, unreadable)
+        self.assertEqual(unresolved[0]["unknown_calls"], 1)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "RTK replay needs Linux and rtk 0.50.0 on PATH")
+    def test_group_d7_is_strict_whatever_the_split_across_actors(self):
+        # Merge review finding 3: the group d7 status is measured only when every actor's d7 is; one unknown call among 110
+        # leaves it incomplete however the calls are split across sessions, while rtk_parts keeps B8's 5 percent tolerance on the
+        # summed counts (1 of 110). A single rollout holding all 110 calls reads the same.
+        def rollout(key, commands):
+            return [{**PAGINATED_META, "payload": {**PAGINATED_META["payload"], "id": "u3-session-" + key}},
+                    codex_row("response_item", developer(CATALOG))] + [
+                        sourced_command(f"item_{key}_{i}", ["bash", "-lc", command], "agent") for i, command in enumerate(commands)]
+        first = ["git status"] * 100
+        second = ["git status"] * 9 + ['echo "open']
+        split = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            "rollout-2026-10-20T02-00-00-u3-split-a.jsonl": rollout("a", first),
+            "rollout-2026-10-20T02-10-00-u3-split-b.jsonl": rollout("b", second)})
+        whole = write_rollouts(Path(self.enterContext(tempfile.TemporaryDirectory())), {
+            "rollout-2026-10-20T02-00-00-u3-whole.jsonl": rollout("w", first + second)})
+        views = []
+        for root in (split, whole):
+            scan = S.scan_codex_lanes([root], load_fixture_manifest(), since=S.parse_iso(LANES_SINCE),
+                                      until=S.parse_iso(LANES_UNTIL), marker=MARKER, rtk_check=True)
+            group = scan["groups"]["workers"]["measurement"]["rtk_parts"]
+            views.append(({key: group.get(key) for key in ("calls", "unknown_calls", "status")}, group["d7"]["status"]))
+        self.assertEqual(views[0], ({"calls": 110, "unknown_calls": 1, "status": "measured"}, "incomplete"))
+        self.assertEqual(views[1], views[0])
+
 # PR-A U3, binding correction 1 of the build (gap G1 of the U11 design): --call-ledger PATH writes the private per-call Codex
 # ledger, records codex-call-ledger/1 {thread_id, call_id, owner_kind, tool, server, state, cause, native_status, sandbox,
 # code_mode, history_mode}, through the kernel's callLedger, PR-A U2's export (claude/pra-u2-kernel-measures-2d-20260929 at
@@ -3363,6 +3416,26 @@ class CodexCallLedger(unittest.TestCase):
                          [("call_priv_w1", "exec", "succeeded", None, False),
                           ("ws_priv_w1", "WebFetch", "succeeded", "completed", True),
                           ("ws_priv_w2", "WebSearch", "succeeded", "completed", True)])
+
+    @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
+    def test_a_failed_hosted_web_search_call_reads_failed_not_completed(self):
+        # Merge review finding 4: the adapter supplies native_status completed for a web.search item that has no status, and it
+        # ignored the status of the model's own web_search_call response item with the same id; a search that failed
+        # (status failed) read succeeded. The response item's failed status now decides.
+        ledger = measure_ledger(ledger_meta(), exec_call("call_priv_w9", EXEC_FETCH_JS),
+                                codex_row("response_item", {"type": "web_search_call", "id": "ws_priv_f1", "status": "failed",
+                                                            "action": {"type": "search", "query": "ledger-secret-query"}}),
+                                codex_row("event_msg", {"type": "item_completed", "item": {
+                                    "type": "Extension", "id": "ws_priv_f1", "kind": "web.search",
+                                    "action": {"type": "search", "query": "ledger-secret-query"}}}),
+                                codex_row("response_item", {"type": "web_search_call", "id": "ws_priv_o1", "status": "completed",
+                                                            "action": {"type": "search", "query": "ledger-secret-query"}}),
+                                codex_row("event_msg", {"type": "item_completed", "item": {
+                                    "type": "Extension", "id": "ws_priv_o1", "kind": "web.search",
+                                    "action": {"type": "search", "query": "ledger-secret-query"}}}),
+                                exec_output("call_priv_w9"))
+        self.assertEqual([row for row in ledger_view(ledger, "call_id", "tool", "state", "native_status") if row[0].startswith("ws_")],
+                         [("ws_priv_f1", "WebSearch", "failed", "failed"), ("ws_priv_o1", "WebSearch", "succeeded", "completed")])
 
     @unittest.skipUnless(KERNEL_CALL_LEDGER, NO_KERNEL_CALL_LEDGER)
     def test_a_paginated_direct_exec_command_is_one_call_with_its_item_status(self):

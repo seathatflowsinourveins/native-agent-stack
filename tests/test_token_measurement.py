@@ -2592,6 +2592,42 @@ class TokenMeasurement(unittest.TestCase):
             self.assertEqual({key: value for key, value in codex.items() if key != "d7"}, claude)
 
     @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
+    def test_unresolved_bash_calls_are_unknown_calls_under_b8_and_d7_stays_strict(self):
+        # Merge review findings 1-3: a caller that could not name the shell of some Bash calls (the Codex bridge, for pwsh or an
+        # unnamed shell) passes their number as unresolvedBash; the kernel adds them to unknown_calls, so B8's 5 percent rule,
+        # unknown_call_share and the D7 status all come from this one place. D7 is the harder reading on purpose: any unknown
+        # call leaves d7 incomplete, while rtk_parts.status keeps B8's tolerance.
+        home = self.enterContext(tempfile.TemporaryDirectory())
+        env = {**os.environ, "HOME": home}
+        readable = [call(f"r{i}", "Bash", command="git status") for i in range(20)]
+        one = self.measure(readable + [call("u1", "Bash", command="")], env=env, rtkCheck=True, rtkAgent="codex",
+                           unresolvedBash=1)["rtk_parts"]
+        self.assertEqual({key: one.get(key) for key in ("calls", "unknown_calls", "unknown_call_share", "status")},
+                         {"calls": 21, "unknown_calls": 1, "unknown_call_share": 0.0476, "status": "measured"})
+        self.assertEqual(one["d7"]["status"], "incomplete")
+        two = self.measure(readable + [call("u1", "Bash", command=""), call("u2", "Bash", command="")], env=env,
+                           rtkCheck=True, rtkAgent="codex", unresolvedBash=2)["rtk_parts"]
+        self.assertEqual({key: two.get(key) for key in ("calls", "unknown_calls", "unknown_call_share", "status")},
+                         {"calls": 22, "unknown_calls": 2, "unknown_call_share": 0.0909, "status": "incomplete"})
+        # A call the kernel itself cannot read counts the same way, so the two layers agree on one unknown call.
+        unreadable = self.measure(readable + [call("u1", "Bash", command='echo "open')], env=env, rtkCheck=True,
+                                  rtkAgent="codex")["rtk_parts"]
+        self.assertEqual({key: unreadable.get(key) for key in ("calls", "unknown_calls", "unknown_call_share", "status")},
+                         {key: one.get(key) for key in ("calls", "unknown_calls", "unknown_call_share", "status")})
+        self.assertEqual(unreadable["d7"]["status"], one["d7"]["status"])
+        # More unresolved calls than Bash calls cannot push the count past the calls there are.
+        few = self.measure(readable[:3], env=env, rtkCheck=True, rtkAgent="codex", unresolvedBash=10)["rtk_parts"]
+        self.assertEqual({key: few.get(key) for key in ("calls", "unknown_calls", "unknown_call_share", "status")},
+                         {"calls": 3, "unknown_calls": 3, "unknown_call_share": 1, "status": "incomplete"})
+        # Without a check nothing is counted, and a value that is not a non-negative integer is refused.
+        off = self.measure(readable, env=env, rtkAgent="codex", unresolvedBash=3)["rtk_parts"]
+        self.assertEqual((off["status"], off["unknown_calls"]), ("not_measured", 0))
+        for bad in (-1, 1.5, "2", None):
+            with self.subTest(unresolvedBash=bad):
+                self.assertNotEqual(self.run_measure(readable, env=env, rtkCheck=True, rtkAgent="codex",
+                                                     unresolvedBash=bad).returncode, 0)
+
+    @unittest.skipUnless(RTK_REPLAY_SUPPORTED, "Linux and RTK v0.50.0 required")
     def test_aggregate_sums_d7_only_for_codex_measurements(self):
         runs = [[call("a", "Bash", command="rtk git status && ls")], [call("b", "Bash", command="git status")]]
         home = self.enterContext(tempfile.TemporaryDirectory())  # no home settings reach the claude replay
