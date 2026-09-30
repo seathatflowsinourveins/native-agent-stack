@@ -3714,6 +3714,37 @@
         "Corrected after the 2026-09-30 cross-family review (receipt cross-family-review-terminal-lane-20260930): the BEL counter of alert_probe.py now decodes UTF-8 and ignores C1 control characters like the pinned output engine; the probe exits 2 when its dialog never opened and 1 when its hooks-disabled control saw a BEL, cleans up after SIGINT, SIGTERM and SIGHUP (a handler only latches the first signal, the cleanups run to their end at explicit safe points and the probe then ends BY the signal; the designs of the second review, signals deferred under a mask and a spawn flag, and of the final read, an exit status 128 plus the signal, were replaced), and prints message lengths (the screen only with --show-screen); color_capture.py counts SGR sequences only, applies the pinned Windows Terminal parser's rules to its parameters (saturation at 65535, missing components as 0, byte bounds, the colon form's colour-space field) and counts a group it reads but does not apply apart (a native rerun on the client of 2026-09-30 shows the same pattern with other exact counts); check-terminal-profiles.py in the practice repository now accepts a bellSound only as exactly a measured file in C:\\Windows\\Media that exists; the sentence that tmux through 3.6 lacks synchronized output was false (tmux has a sync feature) and the bell icon clears after about 2 s on a focused tab. The values recorded in this receipt were produced by the earlier versions of those scripts (their SHA-256 values are in this receipt); the versions in the tree are the repaired ones."
       ],
       "path": "evidence/receipts/terminal-experience-20260928.json"
+    },
+    {
+      "id": "codex-shell-snapshot-cleanup-20260930",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "On this host on 2026-09-30 a names-only scan of the shell_snapshots directories under ~/.codex, ~/.local/state, ~/.local/share, ~/code, /tmp and /var/tmp (222 directories, 12 readable files; symlinked directories not followed, named tool directories skipped, unreadable entries skipped without a count) found 2 files that declared the Claude Code messaging-token variable, both in ~/.codex/shell_snapshots with modification times on 2026-09-27, of the 19 such files the 2026-09-29 sink inventory had counted there; no open descriptor to either was observed among the processes whose descriptors were readable. After an announcement to the live peer sessions, the enumerated path list was compared byte for byte with the two literal paths and the 2 files were deleted by those paths at 03:02:25Z. The same scan afterwards found 10 readable files and 0 declaring the variable, and a names-only listing of ~/.codex before and after (21,042 and 21,040 entries) showed exactly the 2 snapshot files removed and no entry added.",
+      "limitations": [
+        "Local observation on one host by names and counts only: no snapshot content or value was printed, and a match is a line that starts with the variable's declare or export form, so a file that holds the value in another form is not counted.",
+        "Coverage is the listed roots only: symlinked directories were not followed, node_modules, .git, __pycache__, .venv, venv, site-packages and Claude's own shell-snapshots were skipped, and entries the scan could not read were skipped without a count, so a zero means none among the readable files.",
+        "Why 17 of the 19 files counted on 2026-09-29 were already gone is inferred, not observed: Codex's own three-day snapshot retention (codex-rs/core/src/shell_snapshot.rs:105 at rust-v0.157.1) is the likely remover.",
+        "Deletion removes the files, not copies elsewhere: backups, a file-history snapshot or a sync of the home directory were not examined."
+      ],
+      "path": "evidence/receipts/codex-shell-snapshot-cleanup-20260930.json"
+    },
+    {
+      "id": "agent-browser-lna-20260930",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "agent-browser",
+        "playwright-test"
+      ],
+      "claim": "On this host on 2026-09-30, Chrome for Testing 153.0.8010.12 launched by agent-browser 0.38.1, by Playwright 1.63.0 (the headless shell and its CLI Chromium configurations, headless and offscreen) and directly (headless and offscreen full browser) did not deliver a fetch, an image or an iframe request from a page placed in the public address space (--ip-address-space-overrides=127.0.0.1:<page port>=public) to a loopback listener on another port without a permission grant: Chromium's Local Network Access blocked all three in each of the six configurations. With the override off, and with --disable-features=LocalNetworkAccessChecks, all three requests reached the listener, so the probe could see a delivered request. playwright-cli 0.1.21 on Playwright 1.64.0-alpha, the manifest pin, was not found installed and was not measured.",
+      "limitations": [
+        "One host, one Chromium build (153.0.8010.12), two listeners started by the measurement itself on loopback inside an isolated network namespace; no existing service and neither OmniRoute gateway was contacted.",
+        "agent-browser ran with its documented --executable-path and --args options and a CDP pipe transport instead of its ordinary TCP CDP endpoint, which the measurement's endpoint rules excluded; its page context and default flags were otherwise used.",
+        "Measured: fetch, image and iframe requests from a public-address-space page. Not measured: main-frame navigations and popups (which Chromium's Local Network Access does not gate), pages in the private address space, a user or tool permission grant, other Chromium versions, and the manifest-pinned playwright-cli 0.1.21.",
+        "The measurement shows whether an HTTP request reached the listener; it does not show whether Chromium opened a TCP connection before refusing."
+      ],
+      "path": "evidence/receipts/agent-browser-lna-20260930.json"
     }
   ],
   "files": [
@@ -15229,6 +15260,11 @@
       "bytes": 10361
     },
     {
+      "path": "docs/decisions/2026-09-29-key-management.md",
+      "sha256": "0900142af9a97dcdcd063a90a586df76cc9d75a7b115f33232199999a322c8d0",
+      "bytes": 72794
+    },
+    {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
       "sha256": "ae31b360ec348e3d7f58948e06e1d82de2fc99b33fad44bb7d3e8fb20de0fb54",
       "bytes": 17458
@@ -15937,6 +15973,36 @@
       "path": "evidence/artifacts/adoption-status-truth-20260926/review-2/review2_harness.py",
       "sha256": "64f456a287bb687a361a281b94cf4b20e76a6b1168a65cd0c11dddeec7407ede",
       "bytes": 12379
+    },
+    {
+      "path": "evidence/artifacts/agent-browser-lna-20260930/chrome-wrapper.cjs.txt",
+      "sha256": "c070d8a040a5a00ed411fe52aff254e39389163fd56b15a6c39e96df241716f6",
+      "bytes": 1609
+    },
+    {
+      "path": "evidence/artifacts/agent-browser-lna-20260930/firewall.nft.txt",
+      "sha256": "e63790d97d5b5c1cd7d3232ae3d00349d2f714a6af1ccf4ed3cdbf154cf55b63",
+      "bytes": 231
+    },
+    {
+      "path": "evidence/artifacts/agent-browser-lna-20260930/measure.cjs.txt",
+      "sha256": "660da67f4fd83a5a306e80ad096eb45d4e3c211734164418783feccae541cdfd",
+      "bytes": 16175
+    },
+    {
+      "path": "evidence/artifacts/agent-browser-lna-20260930/page.html.txt",
+      "sha256": "2b527258c5ff59d55c2b2a215efd64a30ad96b7ee10d7264af01433bc6bad518",
+      "bytes": 2243
+    },
+    {
+      "path": "evidence/artifacts/agent-browser-lna-20260930/report.cjs.txt",
+      "sha256": "cddce4ead5971d7f6bdaa6910ec6edec8787d7b467f058b9242274a206c09803",
+      "bytes": 26445
+    },
+    {
+      "path": "evidence/artifacts/agent-browser-lna-20260930/run.sh.txt",
+      "sha256": "d115d6b622752b7bd57f3529e5b7f4fd7ac7d56995989dc26b4a822482196b4d",
+      "bytes": 1340
     },
     {
       "path": "evidence/artifacts/agentsview-044-qualification-20260927/README.md",
@@ -16722,6 +16788,21 @@
       "path": "evidence/artifacts/codeql-quality-measure-20260927/triage_verdicts.json",
       "sha256": "1e74f31476c5f582b2708da4a2e829901852edc87c458382acd115302c783cde",
       "bytes": 11808
+    },
+    {
+      "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/listing_diff.py.txt",
+      "sha256": "7b908845b1dace6922b57582f2ac53ceac51262c17d9973e4e6d5e43afc1f419",
+      "bytes": 774
+    },
+    {
+      "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/snapshots_enum.py.txt",
+      "sha256": "a9227147df6986f69b935700c8b09199565c6148c6daff30eb265829b5baaa32",
+      "bytes": 2115
+    },
+    {
+      "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/snapshots_enum_all.py.txt",
+      "sha256": "7c6dd6b3fd74250472e28d3818e5ce11cd85e47d6589e3d1dd3ee748050afb09",
+      "bytes": 3165
     },
     {
       "path": "evidence/artifacts/codex-use-20260926-5/SHA256SUMS",
@@ -44129,6 +44210,11 @@
       "bytes": 4676
     },
     {
+      "path": "evidence/receipts/agent-browser-lna-20260930.json",
+      "sha256": "d26374a40b8b74fbe14dcf63c65257d3370a84831553740ef679ca9362aa8d1b",
+      "bytes": 5305
+    },
+    {
       "path": "evidence/receipts/ai-memory-240-qualification-20260925.json",
       "sha256": "43ae37dc3431135b047f05069f72c12252740f0cb73ec80c83e681a5b7671615",
       "bytes": 12596
@@ -44242,6 +44328,11 @@
       "path": "evidence/receipts/codex-session-environment-20260920.json",
       "sha256": "eda30a2894907134c11e0708283f9419e0096a84ff702bec7f731d9689c7d4a4",
       "bytes": 4948
+    },
+    {
+      "path": "evidence/receipts/codex-shell-snapshot-cleanup-20260930.json",
+      "sha256": "033f4d0dc3a086367eebc50a606e2f96a85e008dc3c77f3b85fee9ce8b01897c",
+      "bytes": 5461
     },
     {
       "path": "evidence/receipts/component-history.json",
