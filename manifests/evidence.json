@@ -3745,6 +3745,21 @@
         "The measurement shows whether an HTTP request reached the listener; it does not show whether Chromium opened a TCP connection before refusing."
       ],
       "path": "evidence/receipts/agent-browser-lna-20260930.json"
+    },
+    {
+      "id": "guard-k3-verification-20260930",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "The tightened command guard (scripts/hooks/secret_path_guard.py, sha256 a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51, PR #511 head 05acdf96) was checked on 2026-09-30 against the installed guard it replaces (sha256 f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244). Every check found no command the installed guard refuses that this guard allows: the acceptance oracle (65 cases, 0 mismatches), a side-by-side probe and a launcher option-value probe (0 loosened rows each), and a replay of 1,490 documented repository commands (0 newly blocked, 0 loosened, 0 reason changed). Run through a real hook process, four inputs from the third GPT-6 verification were refused with exit 2, one stderr line and no command echo in 0.06 to 0.14 s; the installed guard timed out at 10 s on three of them and took 4.03 s on the fourth. A read-only GPT-6 verification of this head (the fourth, after one repair round) found no command the installed guard refuses and this guard allows; its one blocking-labelled finding is a command that the installed guard also allows, recorded with a documentation note as residuals for the next guard change.",
+      "limitations": [
+        "Local integration on one host plus read-only cross-family reviews, not a proof: the checks compare two text heuristics on finite corpora (the repository's test tables, fenced commands and generated mutations), and a review that finds nothing does not show that nothing exists.",
+        "Timings are wall-clock times on one host under its load at the time (a load average of about 7 to 20 during the day); the hook timeout of 10 s is this host's settings value, and a slower host has less margin.",
+        "The unit suite's one failure is by design: test_host_profile_copy_is_verbatim compares the installed host copy with the repository file, and the host copy stays the installed guard until the change is merged and reinstalled after the Gate A window closes.",
+        "Residuals carried to the next guard change (K4): `set 0 < /dev/null; set 0</dev/null` and nested forms are allowed by both guards because segment deduplication drops a descriptor-bearing duplicate; the module docstring and docs omit the conservative fallback for commands containing a \\x01 byte."
+      ],
+      "path": "evidence/receipts/guard-k3-verification-20260930.json"
     }
   ],
   "files": [
@@ -4015,7 +4030,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "947c0ae1fcd5ba11fc82108e7223f095c0712f132edf9515638a84d8336d9668",
+      "sha256": "3480907d6379a908d20cb280ed8780c96da82121734d504cd4229873e4552859",
       "bytes": 950
     },
     {
@@ -4235,8 +4250,13 @@
     },
     {
       "path": "adoption/templates/systemd/omniroute.service",
-      "sha256": "b05477c72372578088d2f51eb6bb47664aadbe3aab938769c2cd07924b2b5951",
-      "bytes": 7345
+      "sha256": "eedbec27fd53bb0eb8ef8f61ff2bc7ed874b657144ae6317e8476d2a8a218947",
+      "bytes": 7463
+    },
+    {
+      "path": "adoption/templates/systemd/token-report-refresh.service",
+      "sha256": "47e88b71600dcb50f05f22ec70361a5fdb8338d207165008760715656502c0f8",
+      "bytes": 9260
     },
     {
       "path": "adoption/tools/README.md",
@@ -15571,8 +15591,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "81ed212f0622d17694b7c2837b405fa4f02b2b6fee6a93926735cf634fd70028",
-      "bytes": 105675
+      "sha256": "79be428ab65dce1b08fa873d5e4cee895021e2d10084e701838b2f2466f20194",
+      "bytes": 142474
     },
     {
       "path": "docs/stack.md",
@@ -44490,6 +44510,11 @@
       "bytes": 21687
     },
     {
+      "path": "evidence/receipts/guard-k3-verification-20260930.json",
+      "sha256": "f760501852719ce16e6d28f5979a81a7f8e458d005e0e2d69e8f455f25753688",
+      "bytes": 6547
+    },
+    {
       "path": "evidence/receipts/headroom-039-qualification-20260925.json",
       "sha256": "3a8e162765fa57f4aa6c06cb30b2a28e7ad7d32aaf0920f46720075e234b061d",
       "bytes": 9318
@@ -45676,8 +45701,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "f9be81b240762dc58da874f135040d182ca9fb5e9056ab9b8a977dd909453244",
-      "bytes": 43564
+      "sha256": "a70a056fc27524c65ea5ce4db43fe712cabb44cf9b171866abf805d7306d3b51",
+      "bytes": 123080
     },
     {
       "path": "scripts/host_receipts.py",
@@ -46661,8 +46686,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "7c9ff36f002aa3a04e54f8bdc32ee125659caa4bd811053b37781958be81a40f",
-      "bytes": 66048
+      "sha256": "249408c23ca27fafc2c222aecf42f2662e49d3286e21d2a1d159e2ef1e7ca2a6",
+      "bytes": 204681
     },
     {
       "path": "tests/test_security_identity.py",
@@ -47311,8 +47336,8 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "419b6797e6d33ecd148a38028209688e0b732c6dc1b77a0ff744a4f76060e815",
-      "bytes": 25517
+      "sha256": "d1f538abf502fc3575991144ea15f72fc93eae0fd67393fb5edc8be007f28d87",
+      "bytes": 25833
     },
     {
       "path": "tools/token-report/config.example.json",
