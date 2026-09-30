@@ -14,6 +14,42 @@ session's consolidation finished on attempt 1. No learning run was triggered
 manually for this observation. These outcomes establish lifecycle execution,
 not improved answer quality or token savings.
 
+## September 30 scheduled follow-up: consolidation quota failure
+
+The [September 30 receipt](../observability/memory-scheduled-20260930.json) records
+the actual scheduled wake and a new failed consolidation. A scoped read-only
+store query returned generation 17,318 in `failed` state after five attempts;
+the last attempt ended at 08:58:10 UTC with provider HTTP 429
+`usage_limit_reached`. Its error reports a reset at October 4, 06:59:07 UTC;
+that historical timestamp is not a fresh quota check or a recovery guarantee.
+Explicit native MCP readback confirmed the genuine session end at 08:49:54 UTC.
+The ended generation and the later MCP observation count have different scopes.
+
+Memory, Qdrant and embedding services still run, the native collector published
+successfully, and all nine Prometheus targets were up. Inventory `llm_status`
+changed from `ok` to `unavailable`; that metadata alone does not establish the
+cause. No consolidation-specific firing alert was returned. Existing dashboard
+service health and historical task checkpoints do not establish successful
+consolidation. One semantic retrieval matched its original source; the unchanged
+QMD setup note reuses the previous search/get evidence.
+
+The upstream learning report still returns 83 historical runs and 19 approved
+terminal proposals. Its unchanged aggregate is separate from the consolidation
+queue. The hourly learning scheduler remains paused. No provider retry, account
+switch, fake session-end event or database mutation was performed; preserve the
+failed generation and qualify supported recovery after quota returns. Installed
+selections, exact-savings unknowns and restart-evidence boundaries remain unchanged.
+
+The available clean [upstream consolidation queue](https://github.com/akitaonrails/ai-memory/blob/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-store/src/session_consolidation.rs)
+stops claiming a generation once it is `failed`. Its direct MCP
+`memory_consolidate` interface accepts an exact session ID, but does not reset
+that queue row; a later manual result must retain its separate provenance.
+The source also has nested provider retries, so five queue attempts do not
+establish the number of HTTP requests. Actual request count is unmeasured.
+This is source review only: the installed custom build's equivalence is unknown,
+and the previously recorded source ref could not be retrieved. No recovery
+command was executed during this wake.
+
 ## September 28 scheduled follow-up
 
 The [September 28 receipt](../observability/memory-scheduled-20260928.json) records
