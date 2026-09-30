@@ -32,6 +32,10 @@ kept apart as negative controls:
 
     python3 tools/skill-usage/skill_usage.py --lanes --codex-root ~/.codex/sessions \\
         --since 2026-09-25T17:18:00Z --until 2026-09-26T15:05:00Z --json
+
+With --lanes, --call-ledger PATH also writes the private per-call ledger (codex-call-ledger/1 JSONL, thread and
+call ids with each call's state from the kernel's callLedger) to a new 0600 file outside every git work tree;
+the report itself stays ID-free.
 """
 from __future__ import annotations
 
@@ -2174,7 +2178,10 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
             " incomplete (code_mode.outer_http_unverified_exec_calls)."
             + " actors[].spawn and subagent_spawns publish sub-agent spawn states only: the join of a child to its parent's"
             " SubAgentActivity started item and spawn_agent call runs in memory, the route is client-side (turn contexts and"
-            " ThreadSettingsApplied), and provider reroutes are not persisted in rollouts."}
+            " ThreadSettingsApplied), and provider reroutes are not persisted in rollouts."
+            + " --call-ledger PATH writes the private per-call ledger (codex-call-ledger/1: thread and call ids with each"
+            " call's M14 state from the kernel's callLedger, PR-A U2) to a new 0600 file outside every git work tree; it"
+            " is refused, with nothing written, where the kernel exports no callLedger, and this report holds no id."}
 
 
 def render_lanes_text(report: dict) -> str:

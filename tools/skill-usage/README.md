@@ -600,9 +600,65 @@ route is its role TOML, which the rollout does not hold.
 The lane report keeps the same privacy boundary: server, tool-kind, skill and role names, model and
 effort keys, spawn states, counts and token figures only, with sessions never named by id or path (the
 spawn join's thread ids, call ids, task paths and follow-up targets stay in memory); a server, function,
-originator, role or content-kind name that is not name-shaped is counted as `(other)`. Rollout files not modified since
+originator, role or content-kind name that is not name-shaped is counted as `(other)`. Thread and call ids
+leave only through the private `--call-ledger` file below. Rollout files not modified since
 `--since` are skipped unread (counted as `files_skipped_unmodified`). Evidence from it is a
 `local_integration` measurement of native transcripts, not a model run.
+
+### The private call ledger (`--call-ledger`)
+
+`--call-ledger PATH` (with `--lanes`) also writes the per-call Codex ledger that the M14 reconciler joins
+with Loki's `codex.tool_result` and `codex.tool_decision` events by `(thread_id, call_id)`. It is gap G1 of
+the U11 design and binding correction 1 of the U3 build. The records come from the kernel's `callLedger`,
+PR-A U2's export (U2 design section 4.5; `child-usage.mjs:2793-2820` at
+`claude/pra-u2-kernel-measures-2d-20260929` b2dd1eb7), run over the same normalized rows and window as the
+measurement. The ledger therefore holds exactly the calls the measurement counts.
+
+```sh
+python3 tools/skill-usage/skill_usage.py --lanes --codex-root ~/.codex/sessions \
+  --since 2026-09-25T17:18:00Z --until 2026-09-26T15:05:00Z --json \
+  --call-ledger /private/dir/outside/any/checkout/codex-calls.jsonl
+```
+
+Each JSONL record (`schema: codex-call-ledger/1`) holds these fields:
+
+- `thread_id`: the first `session_meta` id, the thread's conversation id.
+- `call_id`: the adapter's key for the call. That is the `response_item` `call_id` (else its `id`), or
+  the `item_completed` `item.id` of a `CommandExecution`, `McpToolCall` or `web.search` item. A code-mode
+  `exec` and a command its JavaScript ran are therefore two calls. A paginated direct `exec_command` is
+  one call, because its item carries the call's own id. An id the adapter made up for a record without
+  one (`missing-N`), or a value that is not a string, is `null`.
+- `owner_kind`: `exec` for a `codex exec` root and `subagent` for a spawned sub-agent. Another root is
+  `other`, and rows with no `session_meta` give `null`.
+- `tool`, `server`, `state`, `cause`, `native_status`, `sandbox` and `code_mode`: the kernel's fields as
+  it measured the call.
+  - `tool` is the normalized name, so a shell call or command item reads `Bash`.
+  - `state` is U2's M14 vocabulary: `succeeded`, `failed`, `interrupted`, `rejected`, `invalid`,
+    `cancelled_with_result`, `cancelled_or_unfinished` or `unknown`.
+  - A code-mode `exec` reads `succeeded` once its output returned, since a rollout output carries no
+    success flag.
+  - `sandbox` marks a call nested in code mode, and `code_mode` an `exec` or its `wait`.
+- `history_mode`: the mode the measurement read from the first `session_meta` (`paginated`, else
+  `legacy`). A sub-agent takes its own meta, never the parent's copied one.
+- `actor_ordinal`: the session's `ordinal` in the published `actors` list, as in U2's sweep ledger.
+
+The file follows the rule of `frozen_checks.private_create` on main (a02ff13f,
+`tools/token-e2e/frozen_checks.py:1309-1369`) and U2's `ledgerTarget`:
+
+- It is created once, with `O_EXCL` and `O_NOFOLLOW`, at mode 0600.
+- A new parent directory is made 0700.
+- A path inside any git work tree (a `.git` entry beside it or above it) is refused, as is an existing
+  path.
+- Every refusal comes before the scan: the path, `--out` inside this checkout, and a kernel that exports
+  no `callLedger`. The file is written before the report is written or printed, so a refusal or a failed
+  write exits 2 with neither.
+- Without the flag nothing is probed or written.
+
+**Dependency.** Until PR-A U2's kernel is merged with this tool, `child-usage.mjs` exports no `callLedger`.
+`--call-ledger` then exits 2 with "the measurement kernel exports no callLedger" and writes nothing, and
+the five real-kernel tests of `CodexCallLedger` skip. On a scratch tree of this branch with U2's kernel at
+b2dd1eb7, all 13 ledger tests passed, after failing first. The host run of that tree is in
+[pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md).
 
 ## Verify the bundle
 
