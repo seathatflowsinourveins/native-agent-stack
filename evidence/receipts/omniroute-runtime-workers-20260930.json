@@ -1,0 +1,418 @@
+{
+  "schema_version": 1,
+  "id": "omniroute-runtime-workers-20260930",
+  "kind": "native_model_e2e",
+  "component_ids": ["codex", "claude-code", "omniroute"],
+  "claim": "The retained official Codex SDK Sol-Max worker passed one upstream coding fixture, native resume and fresh recovery through the selected OmniRoute Responses lane. Interrupted usage and Claude bridge qualification remain unknown/failed.",
+  "recorded_at": "2026-09-30T16:01:17Z",
+  "lane": "foundation",
+  "decision": "Accept retained Codex SDK / Sol-Max for the demonstrated coding lifecycle; Claude SDK bridge remains unqualified.",
+  "source_pins": {
+    "codex": {
+      "repository": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "tag": "rust-v0.159.2",
+      "sdk": "openai-codex==0.159.2",
+      "native_cli": "0.159.2",
+      "executed_worker_sha256": "aa960eca54f3cb098d74deb63673f6ecf4bcf747ef030b16ee00e4a093c40763",
+      "executed_source_commit": "3c51e33eca745828912c9948f4c8d127fe3ef9b0",
+      "script_lock_sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44",
+      "formatted_worker_sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651",
+      "ast_identical": true
+    },
+    "claude": {
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "revision": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "tag": "v0.2.162",
+      "sdk": "claude-agent-sdk==0.2.162",
+      "bundled_cli": "2.1.285",
+      "executed_worker_sha256": "85deb0e4dc85d5f53d93c22dd988028dcb9f0579300c6daa000ec3bef4a757fc",
+      "executed_source_commit": "e7e5055c85fbf045c4c442da5e43c881b9c31516",
+      "formatted_worker_sha256": "92b6077da5f659a9798d61433b73920903dd2637dd4b4ee914e42995d111abf9",
+      "ast_identical": true
+    },
+    "omniroute": {
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "published_version": "3.8.51",
+      "published_tag_revision": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "running_base_revision": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+      "running_owned_patches": [
+        "PR13788 affinity2",
+        "PR15167"
+      ],
+      "published_and_running_builds_identical": false,
+      "selected_gateway_port": 20128,
+      "compression_enabled": false
+    },
+    "skills": {
+      "repository": "https://github.com/vercel-labs/skills",
+      "version": "1.7.0",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "manifest_sha256": "6b92a9bd8c91f75e2eac03e60372cb84b6d21d5fce01b2e1a8e2441e6fe74a3f"
+    },
+    "observer": {
+      "repository": "https://github.com/mitmproxy/mitmproxy",
+      "version": "12.2.3",
+      "revision": "6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+      "integration_sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
+      "stream_chunks_returned_unchanged": true,
+      "capture_scope": "Dedicated owned loopback worker traffic; allowlisted metadata only"
+    }
+  },
+  "fixture": {
+    "source": "https://github.com/diegosouzapw/OmniRoute/tree/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/fixtures/devin-bridge/e2e-workspace",
+    "scope": "One upstream arithmetic fixture; test and package files unchanged.",
+    "before_sha256": {
+      "math": "75cfacb7faac086c50b23ac4b29a709eb8680999e6756f620ca76d42aba07cab",
+      "test": "0a60a61022b4d9333882981dda4d09faf41cc36fd2e9406921fdf6e77b8821de",
+      "package": "7fa8fd86ba4b048bc7395cece337513c65936af275348074eadb443614b387d6"
+    },
+    "after_sha256": {
+      "math": "5b63136552577a64d788dc3cd4552739d0d60f9e1adb63ec4dfb6932d56fc75d",
+      "test": "0a60a61022b4d9333882981dda4d09faf41cc36fd2e9406921fdf6e77b8821de",
+      "package": "7fa8fd86ba4b048bc7395cece337513c65936af275348074eadb443614b387d6"
+    },
+    "independent_negative": {
+      "command": "rtk npm test",
+      "exit_code": 1,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1
+    },
+    "independent_positive": {
+      "command": "rtk npm test",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    "native_recovery_return": {
+      "command": "/bin/bash -lc 'rtk npm test'",
+      "exitCode": 0,
+      "aggregatedOutput": "> test\n> node --test math.test.js\n✔ math.test.js (50.770919ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 58.877967\n"
+    }
+  },
+  "skills": {
+    "installation": {
+      "command": "rtk python3 tools/adoption/install_skills.py --manifest blueprints/runtime-workers/skills/manifest.json --project-dir <owned-project> --agent claude-code --skills-bin <pinned-skills> --json",
+      "exit_code": 0,
+      "installed": 136
+    },
+    "check": {
+      "command": "Same native recipe with --check-only",
+      "exit_code": 0,
+      "ok": 136
+    },
+    "project_canonical_skill_files": 136,
+    "project_claude_catalog_links": 136,
+    "actual_body_reads": [
+      {
+        "name": "using-superpowers",
+        "sha256": "82c5c8866ad7f5dd4440ce66bd7806ba48a2f13771beae5cf112e53f08fe36ba",
+        "carrier": ".agents/skills",
+        "observation": "Native command read during accepted task"
+      },
+      {
+        "name": "bridge-proof",
+        "sha256": "22ebfd605645bf4c0dc5c2154f9f169cd35982b9a0ba3a430aefccf37466acd8",
+        "carrier": ".claude/skills",
+        "observation": "Explicit task read of upstream fixture skill; additional to catalog; not Codex implicit discovery"
+      }
+    ],
+    "all_catalog_skills_task_qualified": false,
+    "optional_mcp_services_qualified": false,
+    "known_role_gaps": 15,
+    "known_capability_gaps": 3
+  },
+  "primary_runs": [
+    {
+      "id": "sol-fix",
+      "exit_code": 0,
+      "status": "completed",
+      "duration_ms": 160281,
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "thread_relation": "New primary thread",
+      "command_executions": 15,
+      "file_changes": 1,
+      "reasoning_items": 7,
+      "agent_messages": 1,
+      "retained_failed_commands": 2,
+      "marker": "SDK_SOL_FIX_COMPLETE",
+      "native_usage": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 91904,
+        "inputTokens": 136549,
+        "outputTokens": 2818,
+        "reasoningOutputTokens": 1480,
+        "totalTokens": 139367
+      },
+      "usage_counting": "Historical snapshot already included in resumed thread; do not add again."
+    },
+    {
+      "id": "sol-resume",
+      "exit_code": 0,
+      "status": "completed",
+      "duration_ms": 35159,
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "thread_relation": "Same native thread and worker state as sol-fix",
+      "command_executions": 3,
+      "file_changes": 0,
+      "marker": "SDK_SOL_RESUME_COMPLETE",
+      "native_usage": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 141696,
+        "inputTokens": 194470,
+        "outputTokens": 3347,
+        "reasoningOutputTokens": 1645,
+        "totalTokens": 197817
+      },
+      "usage_counting": "Latest cumulative snapshot for primary thread; count once."
+    },
+    {
+      "id": "sol-wrong-resume",
+      "exit_code": 2,
+      "status": "failed",
+      "phase": "thread_resume",
+      "error_type": "InvalidRequestError",
+      "model_inference_submitted": false,
+      "cleanup_status": "closed",
+      "usage": null,
+      "observation": "Discriminating invalid thread negative control; no API inference submitted."
+    },
+    {
+      "id": "sol-cancel",
+      "exit_code": 2,
+      "status": "deadline_exceeded",
+      "phase": "turn_run",
+      "deadline_seconds": 3,
+      "model_inference_submitted": true,
+      "interrupt_status": "requested",
+      "cleanup_status": "closed",
+      "usage": null,
+      "private_return_location": "sol-worker-cancel.log",
+      "native_result_file_created": false,
+      "remote_termination_verified": false
+    },
+    {
+      "id": "sol-recovery",
+      "exit_code": 0,
+      "status": "completed",
+      "duration_ms": 10458,
+      "requested_model": "cx/gpt-6.1-sol-max",
+      "requested_effort": "max",
+      "thread_relation": "Fresh thread distinct from primary and interrupted thread",
+      "command_executions": 1,
+      "file_changes": 0,
+      "marker": "SDK_SOL_RECOVERY_COMPLETE",
+      "native_usage": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 30208,
+        "inputTokens": 30804,
+        "outputTokens": 123,
+        "reasoningOutputTokens": 42,
+        "totalTokens": 30927
+      },
+      "usage_counting": "Separate latest thread snapshot; count once."
+    }
+  ],
+  "transport": {
+    "native_api": "ResponsesLite",
+    "requested_model": "cx/gpt-6.1-sol-max",
+    "requested_effort": "max",
+    "observed_native_namespaces": [
+      "functions",
+      "clock",
+      "collaboration"
+    ],
+    "tool_carrier": "input[].type=additional_tools",
+    "tool_namespace_count": 3,
+    "leaf_tool_count": null,
+    "fix_resume_cache_identity_sha256": "d3983d9d47d575fcb390de4827aab119ca921a659c29e4e7f988f024eadcb846",
+    "resumed_native_tool_prefix_sha256": "6723b69f57bec85922ff4e4b260b63d043be932e6013d32e3e63e318c15ab23e",
+    "fix_resume_cache_key_preserved": true,
+    "resume_tool_prefix_stable": true,
+    "completed_response_token_total_independently_reconciled": 228744,
+    "client_disconnect_after_completed_response": "Observer flow errors after terminal usage do not override successful native SDK result.",
+    "backend_model_identity_verified": false
+  },
+  "usage_assessment": {
+    "scope": "Distinct successful native SDK threads only",
+    "input_tokens": 225274,
+    "output_tokens": 3470,
+    "total_tokens": 228744,
+    "cached_input_tokens_subset": 171904,
+    "reasoning_output_tokens_subset": 1687,
+    "latest_snapshots_counted_once": true,
+    "cached_and_reasoning_subsets_added_again": false,
+    "whole_task_usage": null,
+    "failed_cancelled_and_preparation_usage": null,
+    "provider_billing_cost_usd": null,
+    "token_savings_claim": false,
+    "exclusions": [
+      "Interrupted turn",
+      "Both Claude gateway attempts",
+      "Native peer timeouts",
+      "Installation and preparation",
+      "Independent architecture review"
+    ]
+  },
+  "claude_bridge": {
+    "requested_model": "dva/claude-opus-5-max",
+    "effort": "max",
+    "accepted": false,
+    "native_harness_preset": "claude_code",
+    "attempts": [
+      {
+        "id": "claude-prototype",
+        "exit_code": 1,
+        "deadline_seconds": 90,
+        "duration_ms": 88790,
+        "tool_calls": 0,
+        "num_turns": 2,
+        "subtype": "error_during_execution",
+        "terminal_reason": "aborted_streaming",
+        "native_reported_cost_usd": 0,
+        "provider_billing_cost_usd": null,
+        "model_usage_latest_session_snapshot": {},
+        "usage_last_native_result": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0
+        }
+      },
+      {
+        "id": "claude-auth-repair",
+        "exit_code": 1,
+        "deadline_seconds": 90,
+        "duration_ms": 89015,
+        "tool_calls": 0,
+        "num_turns": 2,
+        "subtype": "error_during_execution",
+        "terminal_reason": "aborted_streaming",
+        "native_reported_cost_usd": 0,
+        "provider_billing_cost_usd": null,
+        "model_usage_latest_session_snapshot": {},
+        "usage_last_native_result": {
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "input_tokens": 0,
+          "output_tokens": 0
+        }
+      }
+    ],
+    "independent_messages_http_500_count": 16,
+    "successful_messages_usage_observed": false,
+    "bounded_sol_repair": "Apply upstream buildClaudeEnv child-only keyless gateway auth sentinel and gateway discovery; trial still failed. No causal attribution of first timeout to auth.",
+    "native_usage_zero_is_complete_provider_usage": false,
+    "bridge_semantics": "Devin translated prompt/tool bridge with estimated usage, finite tool-result truncation and restricted tool envelope; no native Anthropic/cache passthrough qualification."
+  },
+  "checks": {
+    "authored_codex_integration": {
+      "passed": 6,
+      "duration_seconds": 11.615,
+      "exit_code": 0,
+      "owned_native_app_server_pid_absent_after_close": true,
+      "scope": "Real pinned SDK and native CLI against authored local SSE provider; tools/cache/resume/native counters/deadline/native PID exit/private originals/negative controls. Not upstream tests or live model acceptance."
+    },
+    "preexisting_codex_upstream": {
+      "passed": 266,
+      "failed": 1,
+      "skipped": 38,
+      "exit_code": 1,
+      "scope": "Prior owner unchanged SDK source suite; retained unrelated formatter-driver expectation failure, not replaced by local checks."
+    },
+    "unchanged_upstream_claude_sdk": {
+      "revision": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "src_and_tests_clean": true,
+      "python": "3.13.15",
+      "mcp": "2.2.0",
+      "passed": 1587,
+      "skipped": 6,
+      "duration_seconds": 28.46,
+      "exit_code": 0,
+      "scope": "SDK source tests; not OmniRoute inference acceptance."
+    },
+    "authored_claude_integration": {
+      "passed": 24,
+      "exit_code": 0,
+      "scope": "Synthetic local configuration, usage, lifecycle and disarmed/armed negative controls."
+    },
+    "observer_integration": {
+      "passed": 5,
+      "exit_code": 0,
+      "scope": "Authored fragmented-stream identity, overflow/unknown, endpoint and native tool-carriage checks."
+    },
+    "skill_frontmatter": {
+      "command": "rtk uv run --with pyyaml==6.0.3 python <skill-creator>/scripts/quick_validate.py .claude/skills/omniroute-runtime-worker",
+      "exit_code": 0,
+      "returned_output": "Skill is valid!",
+      "scope": "Metadata shape only; not a live Claude-coordinator dispatch."
+    },
+    "owned_observer_shutdown": {
+      "exit_code": 130,
+      "listener_after_stop": "No listener at owned observer port",
+      "existing_gateway_reconfigured": false
+    }
+  },
+  "cooperation": {
+    "native_interactive_accounts_retained": true,
+    "owner_handoff": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/535#issuecomment-5913868401",
+    "claude_peer_branch": "claude/pi-omni-trial-20260929",
+    "peer_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/524",
+    "native_background_peer": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "tools": [
+        "ListAgents",
+        "SendMessage"
+      ],
+      "owner_contacts_made": true,
+      "final_packet_received": false,
+      "stopped_only_owned_session": true,
+      "usage": null
+    },
+    "native_final_analytical_review": {
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "deadline_seconds": 240,
+      "exit_code": 124,
+      "result_received": false,
+      "usage": null,
+      "approval_received": false
+    },
+    "bare_review_negative_control": {
+      "exit_code": 1,
+      "returned_error": "authentication_failed",
+      "native_counters_zero": true,
+      "meaning": "Bare disables native authentication loading; this does not establish a missing native account."
+    },
+    "astra_escalation": {
+      "trigger": "Consequential bridge architecture and a Claude gateway failure unresolved after one bounded Sol auth repair.",
+      "effort": "max",
+      "mode": "Independent original-source and owned-artifact audit; no additional model trial.",
+      "verdict": "Accept bounded Codex SDK Sol-Max coding lifecycle; reject promotion of failed Claude bridge.",
+      "limits": "No Claude coordinator invocation, backend identity, complete billing, all skills qualification or remote cancellation proved."
+    }
+  },
+  "corrections": [
+    "Top-level tools absence was a faulty local ResponsesLite oracle. The original source and wire carry additional_tools under input; failed KeyError retained, corrected meaningful checks passed.",
+    "Keyless gateway child auth follows OmniRoute buildClaudeEnv. Applying it did not repair the observed Claude 500 failure.",
+    "Native --bare authentication failure does not prove native account absence. Normal analytical review later timed out without approval.",
+    "An excluded sparse-checkout file is not an upstream absence; exact tagged git show recovered the launcher source.",
+    "Cancellation returned its native status in sol-worker-cancel.log; no sol-native-cancel.json was created.",
+    "Skill validator initially lacked PyYAML in system Python; supported isolated uv execution with pinned PyYAML passed without global installation."
+  ],
+  "limitations": [
+    "One arithmetic fixture and lifecycle acceptance; no universal SDK or model quality ranking.",
+    "Actual provider trials invoked the SDK from root, rather than through a Claude coordinator. Native project dispatch skill is supplied and structurally checked; its coordinator invocation remains unmeasured.",
+    "Native Codex SDK remains the incumbent. The separate frozen three-arm SDK gate remains unresolved.",
+    "Native gateway requested/returned model labels are not backend attestation.",
+    "All 136 skills are available in the owned project, with two bodies exercised; full role coverage and optional service acceptance remain incomplete.",
+    "Native Codex repeated in-process fixtures emit stdout/stderr ResourceWarnings; standalone per-invocation child exit is qualified separately.",
+    "Complete provider usage, spending, remote cancellation and token savings remain unknown.",
+    "Public record is sanitized selected actual return fields and independent observations; original private returned artifacts remain outside the checkout."
+  ]
+}
