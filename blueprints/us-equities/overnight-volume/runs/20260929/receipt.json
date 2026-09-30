@@ -1,0 +1,512 @@
+{
+  "schema_version": 1,
+  "kind": "overnight_volume_watch_run_receipt",
+  "run": "overnight-volume-20260929",
+  "status": "completed",
+  "status_note": "The watch ran from its start record at 22:09:58 ET on 2026-09-28 to its stop record at 04:00:04 ET on 2026-09-29, stop reason stop_time, with 176 sweeps, 0 sweep errors and 0 failed requests.",
+  "acceptance": null,
+  "acceptance_note": "No acceptance clause was frozen for this data-only watch, so this receipt reports no pass or fail. The thresholds file was committed before the first sweep; it defines monitoring tiers, not acceptance.",
+  "evidence_class": "PAPER",
+  "evidence_level": "metadata_only",
+  "gate": null,
+  "gate_note": "Not a gate run. No gate receipt and no gate row changes with this record.",
+  "label": "data-only watch on a paper key; no order placed; unvalidated monitoring thresholds",
+  "broker": "alpaca",
+  "endpoint": "paper",
+  "endpoint_note": "The trading host (paper-api.alpaca.markets) served one asset-list read at start-up; snapshots and daily bars came from data.alpaca.markets (feed boats for the overnight session, feed sip for the reference).",
+  "feed": "boats",
+  "reference_feed": "sip",
+  "account": "first Alpaca paper account (credential inventory id alpaca-paper), per the coordinator's brief and the run commit's documented launch command. The run's own files do not record which key file was passed. No credential, account id, account number or account fingerprint is recorded.",
+  "credential_route": "the 0600 env file store through the $PAPER_ENV_FILE pointer, passed as --env-file under bash -ic (the documented launch command)",
+  "session": {
+    "trade_date": "2026-09-29",
+    "overnight_start_et": "2026-09-28T20:00-04:00",
+    "stop_et": "04:00",
+    "backstop_et": "04:05",
+    "night": "2026-09-28/29"
+  },
+  "recorded_at_utc": "2026-09-30T15:07:17Z",
+  "started_at": "2026-09-29T02:09:58Z",
+  "finished_at": "2026-09-29T08:00:04Z",
+  "window": {
+    "output_directory_birth_utc": "2026-09-29T02:09:29.000Z",
+    "output_directory_birth_et": "22:09:29",
+    "output_directory_birth_note": "filesystem birth time of the output directory, 29 s before the start record; the files do not say whether the watch or the operator created it",
+    "start_record_utc": "2026-09-29T02:09:58Z",
+    "start_record_et": "22:09:58",
+    "first_sweep_utc": "2026-09-29T02:09:58Z",
+    "first_sweep_et": "22:09:58",
+    "last_sweep_utc": "2026-09-29T07:59:58Z",
+    "last_sweep_et": "03:59:58",
+    "stop_record_utc": "2026-09-29T08:00:04Z",
+    "stop_record_et": "04:00:04",
+    "stop_reason": "stop_time",
+    "planned_stop_utc": "2026-09-29T08:00:00Z",
+    "backstop_utc": "2026-09-29T08:05:00Z",
+    "session_minutes_before_first_sweep": 130.0
+  },
+  "code": {
+    "git_head": "dca569ae5f7d248f636b4cc881be65fe428ec1e6",
+    "git_head_date": "2026-09-28T21:55:05-04:00",
+    "git_head_subject": "Overnight volume watch: BOATS session volume monitor with plan, once (dry run) and run modes",
+    "git_status": [],
+    "git_status_scope": "watch.py's own check: git status --porcelain -- . ../incentive-monitor/monitor.py, run in the overnight-volume directory, so it covers overnight-volume/ and incentive-monitor/monitor.py only",
+    "sha256": {
+      "watch.py": "1cdd92651ac105b534184451659538ec47948c4a21801880599fc3f3d02ddda8",
+      "monitor.py": "88f3423a5426c32e2b22e1b7cb8bb504feb4f5093d356c4e2372de69b61e0551",
+      "thresholds": "8287b858b3e12ee55d482fb4a98109267b17b8b6ca10bf46d5ad64f767c5dd2b"
+    },
+    "sha256_basis": "computed by the process at start from the files it loaded (start.json)",
+    "python": "3.13.15",
+    "on_main": false,
+    "in_local_refs": false,
+    "public_copy": {
+      "ref": "refs/pull/480/head",
+      "head": "04ab33083b0291d422f731d864804071d90098d8",
+      "commit": "6545d7ad28039906bdb98b4513f35724759e2584",
+      "commit_date": "2026-09-28T22:10:28-04:00",
+      "subject": "Overnight volume watch: BOATS session volume monitor with plan, once (dry run) and run modes",
+      "watch_py_blob": "090372b4f2e890d18dfab896a5bb0aca3608233f",
+      "note": "PR #480's branch was rebased after the launch. Its history holds 6545d7ad, whose watch.py is the same git blob as the run commit's, so the run's watch.py is retrievable: git fetch origin refs/pull/480/head, then git show 6545d7ad:blueprints/us-equities/overnight-volume/watch.py | sha256sum gives 1cdd92651ac105b534184451659538ec47948c4a21801880599fc3f3d02ddda8."
+    },
+    "main_version": {
+      "squash_commit": "1b8d63349e5c82277b2faa6155356478fda727bf",
+      "date": "2026-09-29T04:08:32+00:00",
+      "subject": "Overnight volume watch: data-only BOATS significant-volume monitor over the full overnight-tradable universe (#480)",
+      "watch_py_blob": "c4ee818b184b9e59a466536b4794b4553ca1cdd4",
+      "watch_py_sha256": "d6fd26f0a22addbd0eb8f5766bbc54fb62fbc8703c3e1f4fc3ea85a5e6cb160b",
+      "pr_head_subject": "Overnight volume watch: repair round for the GPT-6 review of #480",
+      "diffstat_run_to_main": "1 file changed, 145 insertions(+), 34 deletions(-)",
+      "thresholds_and_monitor_py": "unchanged: the same sha256 at the run commit, at 1b8d63349e5c and at the base f03f41c7",
+      "differences_that_matter_here": [
+        "push records: the run's code writes one push record per attempt, after the POST, carrying status sent or failed; main writes a push record fsynced before the POST and a push_result record after it. The run's alerts.jsonl therefore has push records with status and no push_result records.",
+        "rate-limit probe: in the run's code a failed or rate-limited first chunk did not stop the sweep's fan-out; main stops it. No chunk failed in this run.",
+        "plan: the run's plan counts the first minute as the daily-bar passes plus the average sweep rate (108); main counts both passes plus a whole first sweep (118). Both stay under the 500 cap.",
+        "start-up: main checks a stop request and a 600 s deadline before every start-up request and refuses an --out inside a git worktree; the run's code does neither."
+      ],
+      "source": "git diff dca569ae 1b8d63349e5c -- watch.py and the PR head commit message (repair round for the GPT-6 review of #480)"
+    }
+  },
+  "settings": {
+    "thresholds_id": "overnight-volume-watch-v1",
+    "thresholds_file": "blueprints/us-equities/overnight-volume/thresholds-v1.json",
+    "significant": {
+      "min_dollar_volume_usd": 250000,
+      "any_of": {
+        "min_adv_fraction": 0.02,
+        "min_abs_change": 0.05,
+        "min_relvol_boats20": 5.0
+      },
+      "relvol_min_prior_sessions": 10
+    },
+    "notify": {
+      "min_dollar_volume_usd": 1000000,
+      "any_of": {
+        "min_adv_fraction": 0.05,
+        "min_abs_change": 0.1,
+        "min_relvol_boats20": 10.0
+      },
+      "relvol_min_prior_sessions": 10,
+      "exclude_fund_names": true,
+      "once_per_symbol": true,
+      "max_per_sweep": 5,
+      "max_per_session": 40
+    },
+    "top_n": [
+      {
+        "n": 25,
+        "by": "relvol_boats20",
+        "min_dollar_volume_usd": 250000,
+        "min_prior_sessions": 10
+      },
+      {
+        "n": 25,
+        "by": "adv_fraction",
+        "min_dollar_volume_usd": 250000,
+        "min_prior_sessions": 0
+      }
+    ],
+    "sources": {
+      "overnight_feed": "boats",
+      "reference_feed": "sip",
+      "snapshot_symbols_per_call": 500,
+      "bars_symbols_per_call": 200,
+      "sweep_seconds": 120,
+      "max_data_fraction_per_min": 0.05
+    },
+    "push": {
+      "enabled": true,
+      "url": "http://127.0.0.1:18080/overnight-volume"
+    },
+    "plan": {
+      "symbols": 9683,
+      "sweep_seconds": 120,
+      "sweeps_per_min": 0.5,
+      "per_sweep": {
+        "snapshots": 20
+      },
+      "once": {
+        "assets": 5
+      },
+      "per_minute": {
+        "adv_bars": 98
+      },
+      "startup_calls": 99,
+      "data_per_min": 10.0,
+      "data_first_min": 108.0,
+      "data_cap_per_min": 500.0,
+      "trading_first_min": 5,
+      "trading_cap_per_min": 10.0,
+      "refusals": []
+    },
+    "plan_note": "Written by the watch at start. data_cap_per_min is 5% of the data API's 10,000 per minute; the plan broke no rule (refusals empty).",
+    "restored": {
+      "significant": 0,
+      "notify": 0,
+      "pushes": 0,
+      "pending": 0
+    },
+    "mode": "run"
+  },
+  "universe": {
+    "assets": 14373,
+    "tradable": 13495,
+    "overnight_tradable": 9683,
+    "overnight_halted": 3502,
+    "watched": 9683
+  },
+  "reference": {
+    "prior_session": "2026-09-28",
+    "dates20": [
+      "2026-08-31",
+      "2026-09-28"
+    ],
+    "sip_symbols": 9683,
+    "adv20": 9683,
+    "ref_close": 9677,
+    "boats_symbols": 3629,
+    "boats_prior_sessions_ge_10": 1197,
+    "boats_adjustment": "none (as calibrated)",
+    "sip_adjustment": "split"
+  },
+  "startup": {
+    "calls": {
+      "assets": 1,
+      "adv_bars": 98
+    },
+    "planned_calls": 99,
+    "ratelimit": {
+      "paper-api.alpaca.markets": {
+        "limit": 200,
+        "remaining": 199
+      },
+      "data.alpaca.markets": {
+        "limit": 10000,
+        "remaining": 9999
+      }
+    },
+    "note": "The start-up made exactly the planned 99 calls (1 asset list and 2 daily-bar passes of 49 requests). Every attempt is a counted call, so no start-up request was retried and none needed a second page."
+  },
+  "sweeps": {
+    "count": 176,
+    "numbers_contiguous": true,
+    "first_utc": "2026-09-29T02:09:58Z",
+    "first_et": "22:09:58",
+    "last_utc": "2026-09-29T07:59:58Z",
+    "last_et": "03:59:58",
+    "interval_seconds": {
+      "min": 120.0,
+      "median": 120.0,
+      "max": 120.0
+    },
+    "sweep_seconds": {
+      "min": 0.94,
+      "median": 1.04,
+      "max": 1.18
+    },
+    "chunks": {
+      "per_sweep": 20,
+      "total": 3520,
+      "ok": 3520,
+      "error": 0,
+      "skipped": 0
+    },
+    "symbols_watched": 9683,
+    "snapshots_returned_per_sweep": {
+      "min": 9669,
+      "max": 9669
+    },
+    "with_overnight_volume": {
+      "first": 796,
+      "last": 1317,
+      "min": 796,
+      "max": 1317
+    },
+    "significant_now": {
+      "first": 17,
+      "last": 61,
+      "max": 61
+    },
+    "notify_now": {
+      "first": 5,
+      "last": 13,
+      "max": 13
+    },
+    "notify_non_fund_now": {
+      "first": 4,
+      "last": 6,
+      "max": 6
+    },
+    "ratelimit_remaining": {
+      "limit": 10000,
+      "lowest": 9998,
+      "highest": 9999
+    },
+    "ratelimit_floor_sweeps": 0,
+    "roll_probe": {
+      "symbol": "SPY",
+      "daily_bar_t": "2026-09-29T00:00:00Z",
+      "sweeps": 176,
+      "session_bar_rolled_records": 0,
+      "note": "SPY's BOATS dailyBar.t stayed at the trade date in every sweep, across midnight ET, and no session_bar_rolled record was written. This observes directly what the overnight-volume README lists as inferred: the BOATS daily bar is keyed to the session and does not roll at ET midnight."
+    },
+    "sweep_error_records": 0
+  },
+  "calls": {
+    "by_source": {
+      "assets": 1,
+      "adv_bars": 98,
+      "snapshots": 3520
+    },
+    "total": 3619,
+    "snapshot_calls_check": "176 sweeps x 20 = 3520",
+    "failed_requests": 0,
+    "failed_requests_basis": "all 3,520 snapshot chunks returned ok (a failed chunk is recorded with status error and its message), and the start-up made exactly its planned calls",
+    "busiest_minute": {
+      "at_most": 119,
+      "cap_per_min": 500.0,
+      "note": "A 60 s window holds at most one sweep start at the 120 s cadence, so every minute has at most 20 calls except the one that can hold the start-up's 99 calls and the first sweep's 20."
+    }
+  },
+  "errors": {
+    "sweep_error_records": 0,
+    "chunk_errors": 0,
+    "chunks_skipped": 0,
+    "ratelimit_floor_sweeps": 0,
+    "stop_refused": null,
+    "stop_error": null,
+    "stop_sweep_errors": 0,
+    "http_429": 0,
+    "http_429_basis": "None. A snapshot chunk that failed, a 429 included, is recorded with status error and its message; all 3,520 returned ok. The start-up retries are not written per attempt, but every attempt is a counted call and the start-up made exactly its 99 planned calls. The lowest remaining data allowance was 9,998 of 10,000.",
+    "http_406": "not applicable: the watch opens no stream"
+  },
+  "alerts": {
+    "records": 75,
+    "by_tier": {
+      "significant": 62,
+      "notify": 13
+    },
+    "fund_tagged": {
+      "significant": 40,
+      "notify": 7
+    },
+    "not_fund_tagged": {
+      "significant": 22,
+      "notify": 6
+    },
+    "dry_run": 0,
+    "distinct_symbols": 62,
+    "notify_symbols_also_significant": 13,
+    "reasons": {
+      "significant": {
+        "adv_fraction": 48,
+        "adv_fraction+change": 1,
+        "adv_fraction+change+relvol_boats20": 2,
+        "adv_fraction+relvol_boats20": 2,
+        "change": 3,
+        "change+relvol_boats20": 2,
+        "relvol_boats20": 4
+      },
+      "notify": {
+        "adv_fraction": 7,
+        "adv_fraction+change": 1,
+        "change": 1,
+        "change+relvol_boats20": 1,
+        "relvol_boats20": 3
+      }
+    },
+    "sweeps_with_new_alerts": 42,
+    "first_sweep_new_alerts": 22,
+    "last_alert_utc": "2026-09-29T07:59:58Z",
+    "last_alert_et": "03:59:58",
+    "notify_push_field": {
+      "excluded_fund_name": 7,
+      "queued": 6
+    },
+    "posted": {
+      "push_records": 6,
+      "sent": 6,
+      "failed": 0,
+      "by_sweep": [
+        {
+          "sweep": 1,
+          "at_utc": "2026-09-29T02:09:58Z",
+          "at_et": "22:09:58",
+          "sent": 4
+        },
+        {
+          "sweep": 70,
+          "at_utc": "2026-09-29T04:27:58Z",
+          "at_et": "00:27:58",
+          "sent": 1
+        },
+        {
+          "sweep": 128,
+          "at_utc": "2026-09-29T06:23:58Z",
+          "at_et": "02:23:58",
+          "sent": 1
+        }
+      ],
+      "target": "the loopback ntfy topic named in thresholds-v1.json",
+      "note": "sent means the POST returned without an error; the ntfy server's own record was not read, so delivery to a device is not checked"
+    },
+    "not_posted": {
+      "notify_excluded_fund_name": 7,
+      "significant": 62,
+      "note": "the notify tier posts non-fund names only; the significant tier is never posted"
+    },
+    "symbols": "not published: the alerts are derived from licensed market data and stay in the private alerts.jsonl"
+  },
+  "board_at_stop": {
+    "at_utc": "2026-09-29T07:59:58Z",
+    "sweep": 176,
+    "counts": {
+      "with_overnight_volume": 1317,
+      "significant": 61,
+      "notify": 13,
+      "notify_non_fund": 6
+    },
+    "significant_now_rows": 61,
+    "alerted": {
+      "significant": 62,
+      "notify": 13
+    },
+    "pushes": {
+      "sent": 6,
+      "failed": 0
+    }
+  },
+  "orders": {
+    "placed": 0,
+    "basis": [
+      "Code: watch.py sends every Alpaca request through GuardedHttp.get, which checks an allow-list of three GET endpoints (paper trading /v2/assets, data /v2/stocks/snapshots and /v2/stocks/bars) before monitor.Http.get makes the request. The only other request is the notify POST to the loopback ntfy URL that check_notify_url validates.",
+      "Recorded calls: 1 asset list, 98 daily-bar requests and 3,520 snapshot requests, all allow-listed GETs, plus 6 posts to the loopback ntfy topic.",
+      "Broker listing: none. No broker read covers 02:09Z-08:00Z on 2026-09-29 for account 1, so the statement rests on the code and the recorded calls."
+    ]
+  },
+  "units": {
+    "systemd_unit": null,
+    "note": "Launched from an interactive shell, not from a systemd unit (the coordinator's brief); systemctl --user list-unit-files lists no overnight-volume unit on 2026-09-30. There is no unit journal, and the process's console output was not retained."
+  },
+  "private_files": {
+    "overnight-volume/20260929/alerts.jsonl": {
+      "bytes": 31239,
+      "sha256": "e754ecf8ef745deeac587721fa4759625d851bf1544143d669b5d66b0834832b",
+      "records": 81
+    },
+    "overnight-volume/20260929/board.json": {
+      "bytes": 41476,
+      "sha256": "4302a67417d4a1723d1661992a5465b014fef3aaa85a0d9eb855a57927d4f8b7"
+    },
+    "overnight-volume/20260929/start.json": {
+      "bytes": 1908,
+      "sha256": "23d56ddca52f8e3dd17a8bee064ca3c1e35b4fe6262fcff4f87c298374812120"
+    },
+    "overnight-volume/20260929/stop.json": {
+      "bytes": 333,
+      "sha256": "6290354b29d1055de5b797f2cb516492af81229c985ce0dc007a1233a3e21646"
+    },
+    "overnight-volume/20260929/sweeps.jsonl": {
+      "bytes": 246494,
+      "sha256": "050d18c64f07dc55a0a3ad06a8ce1d7bfe23d958a21a817e4390510bc124697d",
+      "records": 178
+    },
+    "overnight-volume/20260929/top.jsonl": {
+      "bytes": 2542252,
+      "sha256": "6ef2c4f4e58db7bf6beb6b707f3c849007d2f2684171ebb86248106a3fe96380",
+      "records": 176
+    }
+  },
+  "private_snapshots": {
+    "directory": "overnight-volume/20260929/snapshots/",
+    "files": 176,
+    "bytes": 22175743,
+    "first": "000158.json.gz",
+    "last": "235958.json.gz",
+    "manifest_sha256": "55ece656fd455415f091fe7594a2e9ff8be8b66280f8513456cf9610b6c9b4ca",
+    "manifest_rule": "cd snapshots && sha256sum *.json.gz | sha256sum (names are six digits, so the glob order is the same in every locale; it is lexical, not chronological, because the names cross midnight ET)",
+    "rows_total": 183112,
+    "note": "one gzip JSON file per sweep, named by the sweep's ET time, holding the raw BOATS snapshots of every name with a session bar; each file's row count equals its sweep's with_overnight_volume"
+  },
+  "private_files_total": {
+    "files": 182,
+    "top_level_files": 6,
+    "snapshot_files": 176,
+    "bytes": 25039445,
+    "latest_modification_utc": "2026-09-29T08:00:04.501Z",
+    "note": "No file under the output directory has a modification time after the stop record."
+  },
+  "field_provenance": {
+    "legend": "asserted: the builder stops unless two or more sources agree. single_source: copied from one source with no cross-source assertion. derived: computed by the builder from the named source. literal: text or a constant written into the builder. Descriptive labels and notes are literal.",
+    "asserted": {
+      "code.git_head, code.sha256 watch.py": "start.json, the start record in sweeps.jsonl and git show dca569ae",
+      "code.sha256 thresholds, monitor.py": "start.json, git show at the run commit and at the base",
+      "code.public_copy.watch_py_blob": "git rev-parse of watch.py at dca569ae (local objects) and at 6545d7ad (scratch clone of refs/pull/480/head)",
+      "code.on_main, in_local_refs": "git merge-base --is-ancestor against the base and git for-each-ref --contains",
+      "code.main_version.watch_py_blob": "the PR head, the squash commit and the base",
+      "status, window stop, stop_reason": "stop.json and the stop record in sweeps.jsonl",
+      "sweeps.count, numbers_contiguous": "the sweep records, stop.json, top.jsonl, board.json and the snapshot files",
+      "calls.by_source snapshots": "the per-sweep calls, stop.json and sweeps times 20",
+      "startup.calls": "start.json, the start record, stop.json and the plan's startup_calls",
+      "alerts.by_tier, alerts.posted": "alerts.jsonl, the per-sweep new_alerts and pushes, stop.json and board.json",
+      "alerts: queued names = pushed names; fund-tagged notify alerts = excluded_fund_name": "alerts.jsonl alert and push records",
+      "private_snapshots rows": "each file's rows against its sweep's with_overnight_volume",
+      "board_at_stop": "board.json against the last sweep and stop.json"
+    },
+    "single_source": {
+      "settings.plan, restored, mode, push, universe, reference, code.python, code.git_status": "start.json",
+      "settings.significant, notify, top_n, sources, session stop and backstop": "thresholds-v1.json at the base, whose sha256 equals the one the process loaded",
+      "startup.ratelimit": "start.json",
+      "account, credential_route": "the coordinator's brief and the run commit's README launch command; not recorded in the run's files",
+      "units": "the coordinator's brief and systemctl --user list-unit-files on 2026-09-30",
+      "window.output_directory_birth": "filesystem metadata (stat %W)",
+      "code.public_copy dates and subjects, main_version dates and subjects": "git log",
+      "code.main_version.differences_that_matter_here": "git diff dca569ae 1b8d63349e5c -- watch.py and the PR head commit message"
+    },
+    "derived": {
+      "sweeps times, intervals, durations, chunk counts, ranges, roll_probe": "the sweep records",
+      "calls.total, failed_requests, errors": "stop.json calls, the chunk statuses, the stop record and the start-up call count",
+      "alerts counts, reasons, fund split, sweeps_with_new_alerts": "alerts.jsonl",
+      "private_files, private_snapshots, private_files_total": "sha256, byte and line counts of each private file",
+      "window ET renderings, session_minutes_before_first_sweep": "UTC times converted at UTC-4 (EDT)"
+    },
+    "literal": {
+      "status, acceptance, evidence_class, evidence_level, label": "the builder's classification after the asserts above",
+      "orders.placed": "0 written after the code review and the call-count asserts; the basis lists each",
+      "errors.http_429": "0 written after asserting every chunk ok and the start-up call count equal to the plan",
+      "alerts.posted.note, not_posted.note, alerts.symbols": "the builder's description"
+    }
+  },
+  "error": null,
+  "limitations": [
+    "Data-only watch: it evaluates no strategy and qualifies no gate. The tiers are unvalidated monitoring thresholds.",
+    "BOATS is one ATS, so its volume is indicative venue data, not consolidated volume. The fund tag misses some ETFs.",
+    "The code is not on main: the run commit dca569ae is in no local ref (remote-tracking branches included) and not in the history of refs/pull/480/head. Its watch.py is the same blob as 6545d7ad in that history, and main's version differs (code.main_version).",
+    "No systemd unit: there is no unit journal, and the process's console output was not retained. The key pair (account 1) is not recorded in the run's files.",
+    "No broker read covers the watch window on account 1; the no-order statement rests on the code and the recorded calls.",
+    "Posts are recorded as sent when the POST returned without an error; delivery was not checked.",
+    "The first sweep came 130.0 minutes after the session opened at 20:00 ET. The session bar's volume is cumulative, so the first sweep's alerts include activity from before the watch started.",
+    "14 of the 9,683 watched names never returned a snapshot."
+  ],
+  "evidence_note": "Built from the private watch outputs (start.json, stop.json, sweeps.jsonl, alerts.jsonl, top.jsonl, board.json and the snapshot files, read-only), git objects of the run commit and of main, a scratch clone of refs/pull/480/head fetched into a scratch directory on 2026-09-30, and filesystem metadata. Figures present in two or more sources were cross-checked by assertion, and a mismatch stops the build. Other fields come from one source; field_provenance names them. No credential, account id, account number, account fingerprint, pid or host path is recorded."
+}
