@@ -773,7 +773,7 @@ blanks before a heredoc operator (`A=$(( 1 + 2 )) bash <<EOF`); a data heredoc w
 paren-free substitutions with its regular expression (`$(curl $(date))` misses the outer `curl`); a newline read as a
 blank in `bash` newline `-c "x"`; and a heredoc that a quote or `"$( )"` carries over lines has its head on an earlier
 line, so its heredoc reads as a possible fetch. The text scanners read in linear time (a run of 64,000 unclosed `((`
-takes under 150 ms and at most 2.5 times longer per doubling: `test-child-usage.mjs`), and so does the reading of the lanes (below, "What the parser costs"). The repeated reading is cheap and
+takes under 150 ms, and its time plus 5 ms at 64,000 stays under 8 times that at 16,000: `test-child-usage.mjs`), and so does the reading of the lanes (below, "What the parser costs"). The repeated reading is cheap and
 is not cached: over this host's 136,361 distinct real commands `measureTranscript` of one Bash call took 44 s in all
 (mean 0.32 ms, p99 1.2 ms, at most 10.9 ms), of which `executedText` is 0.07 ms plain and 0.09 ms with inline HTTP,
 `fetchKind` 0.08 ms and `commandInvocations` 0.13 ms (`evidence/artifacts/pra-u1-differential-20260929/timing.mjs`).
