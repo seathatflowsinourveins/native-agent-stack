@@ -130,7 +130,9 @@
      "reasoning": null,
      "compressed": 6
     }
-   ]
+   ],
+   "null_token_rows": 0,
+   "rows_truncated": false
   }
  },
  "segment2": {
@@ -334,7 +336,9 @@
      "reasoning": 185,
      "compressed": 13
     }
-   ]
+   ],
+   "null_token_rows": 0,
+   "rows_truncated": false
   }
  },
  "passed": true,

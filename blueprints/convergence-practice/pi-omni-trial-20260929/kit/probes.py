@@ -342,6 +342,7 @@ MUTANTS = [
 
 def selftest(state):
     """Each mutant breaks one rule; the capture probe must fail that rule and only that rule."""
+    verdicts = []
     for name, rule, edit, no_exclude, arm in MUTANTS:
         MUTATION.update(agent_edit=edit, no_exclude=no_exclude, quiet=True)
         RESULTS.clear()
@@ -351,7 +352,9 @@ def selftest(state):
         MUTATION.update(agent_edit=None, no_exclude=False, quiet=False)
         RESULTS.clear()
         ok = len(failed) == 1 and rule in failed[0]
-        report(ok, f"selftest mutant '{name}' fails exactly the rule '{rule}' (failed: {len(failed)})")
+        verdicts.append((ok, f"selftest mutant '{name}' fails exactly the rule '{rule}' (failed: {len(failed)})"))
+    for ok, text in verdicts:  # reported after the loop: each mutant clears RESULTS, which used to drop the earlier verdicts from the tally
+        report(ok, text)
 
 
 def main():

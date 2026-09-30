@@ -22,7 +22,7 @@ def gw_block(logs, name, run_id):
     if logs.get(name) is None:
         return None
     t = gu.totals(logs[name], run_id)
-    return {k: t[k] for k in ("requests", "status", "in", "out", "cacheRead", "cacheWrite", "reasoning", "compressed", "duration_ms", "rows")}
+    return {k: t[k] for k in ("requests", "status", "in", "out", "cacheRead", "cacheWrite", "reasoning", "compressed", "duration_ms", "rows", "null_token_rows", "rows_truncated")}
 
 
 def label(result):
@@ -51,6 +51,7 @@ def main():
             logs[name] = None
             print(f"# {name}: {error!r}")
     a.out.mkdir(parents=True, exist_ok=True)
+    coverage = {n: (None if v is None else {"rows_fetched": len(v), "oldest_utc": min((r.get("timestamp") or "") for r in v)[:19] or None}) for n, v in logs.items()}
     stages = {"S1": [], "S2": []}
     for path in sorted((a.state / "runs").glob("*/result.json")):
         r = json.loads(path.read_text())
@@ -66,9 +67,12 @@ def main():
             "gateway_entry": gw_block(logs, "entry", r["run_id"]), "gateway_upstream": gw_block(logs, "upstream", r["run_id"])})
     for stage, name in (("S1", "s1-runs.json"), ("S2", "s2-runs.json")):
         runs = sorted(stages[stage], key=lambda x: x["run_id"])
-        (a.out / name).write_text(json.dumps({"stage": stage, "runs": runs}, indent=1) + "\n")
+        (a.out / name).write_text(json.dumps({"stage": stage, "gateway_log_coverage": coverage, "runs": runs}, indent=1) + "\n")
         print(name, len(runs), "runs")
-    for path in sorted((a.state / "runs").glob("*/r1.json")):
+    r1_files = sorted((a.state / "runs").glob("*/r1.json"))
+    if len(r1_files) > 1:
+        raise SystemExit(f"build_evidence.py: {len(r1_files)} R1 runs found; export one explicitly (move the others away first) so r1.json is never overwritten")
+    for path in r1_files:
         r = json.loads(path.read_text())
         s2 = r.get("segment2") or {}
         out = {"stage": "R1", "run_id": r["run_id"], "resume_run_id": r["resume_run_id"], "arm": r["arm"], "task": r["task"],

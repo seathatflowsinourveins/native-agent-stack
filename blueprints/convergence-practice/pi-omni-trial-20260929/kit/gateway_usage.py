@@ -24,7 +24,7 @@ def fetch(base, limit):
 
 
 def totals(rows, run_id):
-    out = {"requests": 0, "status": {}, "duration_ms": 0, **{k: 0 for k in FIELDS}, "null_token_rows": 0, "rows": []}
+    out = {"requests": 0, "status": {}, "duration_ms": 0, **{k: 0 for k in FIELDS}, "null_token_rows": 0, "rows": [], "rows_truncated": False}
     for row in sorted(rows, key=lambda r: r.get("timestamp") or ""):
         if run_id not in (row.get("sessionTag"), row.get("correlationId")):
             continue
@@ -33,6 +33,8 @@ def totals(rows, run_id):
         out["status"][status] = out["status"].get(status, 0) + 1
         out["duration_ms"] += int(row.get("duration") or 0)
         tokens = row.get("tokens") or {}
+        if len(out["rows"]) >= 200:
+            out["rows_truncated"] = True  # the per-request list stops at 200 rows; the totals below still count every row
         if len(out["rows"]) < 200:
             out["rows"].append({"t": str(row.get("timestamp"))[11:23], "status": row.get("status"), "ms": int(row.get("duration") or 0),
                                 **{k: (tokens.get(k) if isinstance(tokens.get(k), int) else None) for k in FIELDS}})

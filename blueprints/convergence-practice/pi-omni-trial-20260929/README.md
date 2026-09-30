@@ -2,8 +2,8 @@
 
 **Status: observed, decision `trial`.** pi v0.99.1 ran 28 real tasks through the OmniRoute framework lane (20129, chained to 20128;
 model `sharedgw/gpt-6.1-sol` at thinking `xhigh`) on the gateway owner's corrected token-save configuration: S1 wiring smoke (3 runs),
-S2 (24 runs: 3 tasks x 4 arms x 2 attempts) and R1 (one run killed at its second model response and resumed). All 28 passed their
-fixture checks. On these small fixtures the token-save stack used more tokens than plain pi, not fewer, and the gateway lane removed
+S2 (24 runs: 3 tasks x 4 arms x 2 attempts) and R1 (one run killed at its second model response and resumed). All 28 runs of 2026-09-30 passed their
+fixture checks. On these small fixtures the token-save stack used more tokens than plain pi, not fewer, and the gateway lane
 192 of 413,153 input tokens on the stack arm; its effect on uncached input is not resolved.
 [`experiment.json`](experiment.json) is the record, [`evidence/`](evidence/) holds the sanitized per-run files, and the kit in
 [`kit/`](kit/) rebuilds the environment from pinned upstream sources and re-runs every offline check.
@@ -39,7 +39,7 @@ fixture checks. On these small fixtures the token-save stack used more tokens th
   rtk (minimal), codex-responses, relevance, caveman (lite), aggressive, llmlingua, ultra; off headroom (it re-encodes large numbers) and omniglyph (acts only on direct
   Anthropic transport); output styles none; liveZone off; upstream's values elsewhere, with two defect mitigations kept (`sessionDedup.minBlockChars` 512 instead of 80,
   `lite.compressToolResults` false instead of true). The headerless plan is `[session-dedup, ccr, lite]`: upstream's documented lane plus `ccr`, not upstream's shipped default.
-  20128 stays compression-off with `codex/*` excluded, which is upstream's default. Every run below ran on this state.
+  20128 stays compression-off with `codex/*` excluded, which is upstream's default. Every run of 2026-09-30 below ran on this state (the failed 2026-09-29 attempt did not).
 
 ## Sources and pins
 
@@ -75,16 +75,14 @@ fixture checks. On these small fixtures the token-save stack used more tokens th
 - **Archived synthetic reading** (`evidence/gateway-readback-20260930T0009Z-first-apply.json`, append-only conversation, 6k-token first message): on 20129 turns 2 to 4 read
   5,888, 5,888 and 6,016 of 6,123, 6,147 and 6,171 input tokens from cache (share 0.965); on 20128 turn 2 read 0 and turns 3 and 4 read 5,888 (share 0.647). Earlier figures of
   2026-09-29 (about 97% for the same shape, 0% for static plus changing text in one message, 0% at request 2 after a transient trailing message) came from ad-hoc scripts and are not archived.
-- **Real pi runs:** request 1 of the stack-family runs already read cached tokens (6,016 for `stack` and `stack-gwoff`, 5,632 for `stack-ext`; `plain` read 1,024 from its
-  third run on): the provider cache is warm across neighbouring runs although each run has its own `prompt_cache_key`, so cache shares across arms are confounded by run order.
+- **Real pi runs:** request 1 of the S2 stack-family runs already read cached tokens (6,016 for `stack` and `stack-gwoff`, 5,632 for `stack-ext`; `plain` read 0 in its first two runs and 1,024 from its third run on; the S1 runs read 0 at request 1): the provider cache is warm across neighbouring S2 runs although each run has its own `prompt_cache_key`, so cache shares across arms are confounded by run order.
   The second request of `stack-ext` read cached tokens in 6 of its 7 runs (S1 and S2), `stack` in 6 of 7 and `stack-gwoff` in 5 of 6; one run of each read 0 (cause not established). The synthetic
   transient-message miss was therefore not consistently reproduced. S2-only mean shares at request 2 were 0.71 (`stack-ext`), 0.69 (`stack`) and 0.61 (`stack-gwoff`).
-  Over S2 each arm read 0.72 to 0.82 of its input from cache, and the share rises with the request index (`plain`: 0.57 at request 1 and 0.84 at request 5, which four of its six runs reached).
+  Over S2 each arm read 0.72 to 0.82 of its input from cache. `plain` rose from a mean of 0.57 at request 1 to 0.84 at request 5 (four of its six runs reach request 5); the other arms dip after each `tool_search` load and are not monotonic, and later indices hold different subsets of runs.
 
 ## What the offline checks established (scripted stub, no gateway, no quota)
 
-`kit/probes.py` on pi v0.99.1, three arms, rerun 2026-09-30 after restaging for the new lane: 96 PASS lines, 4 KNOWN-FAIL lines and no FAIL line; it ends `ok (0 failed checks of 98)`
-(the runner's own tally; some PASS lines come from the staging self-check it calls). `stage.py --check` passes.
+`kit/probes.py` on pi v0.99.1, three arms: 96 PASS lines, 4 KNOWN-FAIL lines and no FAIL line, ending `ok (0 failed checks of 100)`. The first run ended 'of 98': the mutant self-test cleared its earlier verdicts from the tally (found by the second review; fixed in `kit/probes.py`), so two verdicts were printed but not counted. `stage.py --check` passes.
 
 - The request pi sends: `POST /v1/responses`, model `sharedgw/gpt-6.1-sol`, effort `xhigh`, run-id headers, `x-omniroute-no-cache`, the arm's compression header (none for the stack arms), a stable `prompt_cache_key`.
 - Across a scripted tool loop the declared tools, instructions, cache key and session id stay identical; the input only grows for `stack` and `plain`.
@@ -105,14 +103,14 @@ over the six S2 runs of each arm:
 | `stack-ext` | 6/6 | 45 | 108,018 | 492,544 | 0.820 | 9,102 | 200 | 72.8 s |
 
 - **Quality:** 6 of 6 in every S2 arm, 3 of 3 S1 runs and the R1 run passed their fixture checks. There is no quality difference to report at n=2 per cell.
-- **Cost:** on these small fixtures plain pi is the cheapest arm by a wide margin: `stack` used 4.9 times the uncached input, 1.9 times the output and 2.0 times the wall time of `plain`. No savings were measured, so none is claimed.
+- **Token use:** on these small fixtures plain pi had the lowest measured token use and wall time by a wide margin: `stack` used 4.9 times the uncached input, 1.9 times the output and 2.0 times the wall time of `plain`. No savings were measured, so none is claimed.
   A plausible cause is the stack's fixed prefix (instructions and about 15 tool schemas), which these runs do not isolate. `stack-ext` used 45% more input (48% more uncached) and 41% more output than `stack` for the same pass rate.
-- **Gateway lane:** it removed 192 of 413,153 input tokens on `stack` and 200 on `stack-ext` (session-dedup needs repeated blocks of 512+ characters in history). Its effect on uncached input is unresolved:
+- **Gateway lane:** the call log reports 192 compressed tokens of 413,153 input tokens on `stack` and 200 on `stack-ext`; it has one counter, so which engine removed them is not observable. Its effect on uncached input is unresolved:
   paired `stack` minus `stack-gwoff` differences per task and attempt run from -11,751 to +6,871 tokens (four of six negative), and the two arms share a warmed cache. The measurement covers the
   20129 to 20128 hop for pi, not 20128's native Codex CLI traffic.
-- **Layer use:** across six runs per arm the model called context-mode tools 2 to 3 times in the MCP arms and 10 times in `stack-ext`, loaded a deferred MCP tool through `tool_search` 7 to 8 times, and RTK's
+- **Layer use:** across six runs per arm the model called context-mode tools 2 to 3 times in the MCP arms and 10 times in `stack-ext`, called `tool_search` 7 to 8 times (the sanitized results do not record what it returned), and RTK's
   tracker counted 18 to 25 commands against 10 to 11 bash calls; most work used pi's built-in read, bash and edit.
-- **R1:** the `stack` arm was killed with SIGKILL after its second model response (9 descendants, none alive 3 s later; the session file kept the prompt and both tool results) and resumed with
+- **R1:** the `stack` arm was killed with SIGKILL after its second model response (9 descendants sampled before the kill, none of those alive 3 s later; the session file kept the prompt and both tool results) and resumed with
   `pi --continue`; the resumed run finished and passed. The first resumed request read 6,016 tokens from cache, the size of the static prefix every stack run reads at request 1, so it does not show reuse of the
   resumed history. The killed in-flight request is a status 499 row at the gateway.
 - **Pool:** the account behind these runs showed 1% of its weekly window used at 01:39Z after all of the above, seven finished parallel vote jobs and three more in flight (`evidence/pool-readings-20260930.json`).
@@ -123,7 +121,7 @@ over the six S2 runs of each arm:
 | --- | --- | --- |
 | S0 | stage the arms, offline probes, fixtures | done (96 PASS, 4 KNOWN-FAIL, 0 FAIL) |
 | G | OmniRoute with 6.1 Sol and the token-save settings | done: 6.1 Sol 2026-09-29, corrective delta 2026-09-30T00:43:52Z, read back by `omni_verify.py` at 01:59Z (`evidence/gateway-readback-20260930T0159Z.json`: enabled, defaultMode, enginesExplicit, engines and levels, outputStyles, liveZone, sessionDedup, lite, headroom, contextBudget mode, cacheMinutes, exclusions) |
-| S1 | wiring smoke: `wiring-smoke` (bash, `ctx_stats`, `tool_search` then a deferred tool, bash) per arm | passed on `plain`, `stack`, `stack-ext` (the earlier attempt on the superseded kit failed for capacity and is kept) |
+| S1 | wiring smoke: `wiring-smoke` (bash, `ctx_stats`, `tool_search` then a deferred tool, bash) per arm | wiring passed on `plain`, `stack`, `stack-ext`; the predeclared expectation that `stack-ext` misses the cache at request 2 was falsified (0.976) and is reported, not gated (the earlier attempt on the superseded kit failed for capacity and is kept) |
 | S2 | 3 tasks x 4 arms x 2 attempts, arm order reversed on attempt 2 | 24 of 24 passed |
 | R1 | one real run killed mid-turn and resumed | passed |
 | S2b | a large-output fixture with the same four arms | not run: the next decision-changing test |
@@ -146,7 +144,7 @@ python3 kit/run_task.py --state <state dir> --arm stack|stack-ext|plain --task w
 bash kit/run_s2.sh <kit dir> <state dir> <second state dir> <log>          # S2: 24 runs
 python3 kit/run_r1.py --state <state dir> --arm stack --task multi-file-rename --kill-after 2
 python3 kit/gateway_usage.py <run id>
-python3 kit/summarize_runs.py --state <state dir> --json <out>
+python3 kit/summarize_runs.py --state <state dir> --tag s2 --json <out>   # --tag s1v2 for S1; without --tag every run in the state dir is summarized
 python3 kit/build_evidence.py --state <state dir> --out evidence
 ```
 
@@ -156,11 +154,16 @@ what `run_s2.sh` calls before each attempt. `gateway_usage.py` never prints the 
 
 ## Limits
 
-- Fixtures are synthetic and small, n is two per cell: S2 shows layer invocation, complete usage, cache behaviour and possible regressions, never efficacy. The stack's mechanism for large outputs is not exercised.
+- Fixtures are synthetic and small, n is two per cell: S2 shows layer invocation, recorded entry-gateway usage, cache behaviour and possible regressions, never efficacy. The stack's mechanism for large outputs is not exercised.
 - Cache shares are confounded by warmth across runs (above); arm order was reversed on attempt 2 but n is two.
 - Usage below the entry gateway is unknown: the `sharedgw` hop does not carry the run id, so no 20128 row joins to a run. `usage_assessment` coverage stays partial.
-- Outbound effort is not observable while gateway detail capture is off. pi asks for `xhigh` because OmniRoute clamps `max` for models without a registry entry.
+- pi requests `xhigh` for `gpt-6.1-sol`; OmniRoute clamps a requested `max` to `xhigh` for this model until upstream PR #15167 lands, so `xhigh` is also the most it could send, but the effective outbound effort was not verified (gateway detail capture is off).
 - Attempt numbers in `experiment.json` count per task, role and condition, so two runs differ from the runner's label (the S1 `stack-ext` run is attempt 2 after the failed 14:12Z run of the same shape, R1 is attempt 3); each such scope says so.
+- Which gateway engine ran is not observable: the call log has one `tokens.compressed` counter and no per-request engine trace, so `[session-dedup, ccr, lite]` is the configured plan resolved offline by the gateway owner (`evidence/artifacts/omniroute-rebuild-20260930/checks/effective-plan-20260930.json` on main, PR #530), not an observed execution.
+- The header-less arms (`stack`, `stack-ext`) passed through the gateway's `lite` step, which strips trailing spaces and collapses runs of 3 or more newlines in string message contents; pi sends tool outputs as strings, so file contents those arms read may differ from `plain`'s by whitespace. The effect was not examined; every run passed.
+- `stack` and `stack-ext` shared persistent tool state (`kit/templates/mcp.stack-ext.json.tmpl` points `SERENA_HOME` and `CODE_INDEX_PATH` into `arms/stack/`), and tool state was not reset between attempts; `stack-gwoff` has its own state directory. Found by the second review; the frozen templates were not changed.
+- R1's zero survivors is among the nine descendants sampled before the kill: killing is PID by PID and the tree was not re-enumerated afterwards.
+- Kit provenance: the runners that produced the evidence (`run_task.py`, `run_r1.py`, `stage.py`, the templates) are unchanged. The analysis scripts, `probes.py` and `run_s2.sh` were fixed after the second review (label aggregation, `--tag` selection, null-safe shares, missing-row and truncation flags, R1 export guard, mutant tally, run exit statuses) and the evidence files regenerated from the same call logs with unchanged totals. The executed sequencer was `run_s2.sh`'s scratchpad predecessor with the same control flow (all 24 run lines in its log show exit 0). The runners inherit `PI_CODING_AGENT_DIR` if the caller sets it; the launching shell did not.
 - Host mode: pi has no permission system and shares the host's loopback services with the model. This is not container isolation.
 - `codemode` is available in pi but not exercised. ai-memory and socraticode are not in the arms, and there is no Claude arm.
 - pi `main` moves several times a day; the pin is a tag, and a later release is a different candidate.

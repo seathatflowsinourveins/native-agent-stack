@@ -1,5 +1,15 @@
 {
  "stage": "S1",
+ "gateway_log_coverage": {
+  "entry": {
+   "rows_fetched": 701,
+   "oldest_utc": "2026-09-27T18:53:07"
+  },
+  "upstream": {
+   "rows_fetched": 5085,
+   "oldest_utc": "2026-09-28T02:10:36"
+  }
+ },
  "runs": [
   {
    "run_id": "pi-trial-plain-wiring-smoke-a1-20260930010749-s1v2",
@@ -137,7 +147,9 @@
       "reasoning": 100,
       "compressed": null
      }
-    ]
+    ],
+    "null_token_rows": 0,
+    "rows_truncated": false
    },
    "gateway_upstream": {
     "requests": 0,
@@ -149,7 +161,9 @@
     "reasoning": 0,
     "compressed": 0,
     "duration_ms": 0,
-    "rows": []
+    "rows": [],
+    "null_token_rows": 0,
+    "rows_truncated": false
    }
   },
   {
@@ -347,7 +361,9 @@
       "reasoning": 62,
       "compressed": null
      }
-    ]
+    ],
+    "null_token_rows": 0,
+    "rows_truncated": false
    },
    "gateway_upstream": {
     "requests": 0,
@@ -359,7 +375,9 @@
     "reasoning": 0,
     "compressed": 0,
     "duration_ms": 0,
-    "rows": []
+    "rows": [],
+    "null_token_rows": 0,
+    "rows_truncated": false
    }
   },
   {
@@ -557,7 +575,9 @@
       "reasoning": 39,
       "compressed": null
      }
-    ]
+    ],
+    "null_token_rows": 0,
+    "rows_truncated": false
    },
    "gateway_upstream": {
     "requests": 0,
@@ -569,7 +589,9 @@
     "reasoning": 0,
     "compressed": 0,
     "duration_ms": 0,
-    "rows": []
+    "rows": [],
+    "null_token_rows": 0,
+    "rows_truncated": false
    }
   }
  ]

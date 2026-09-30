@@ -9,6 +9,7 @@
 set -u
 K=$1; A=$2; B=$3; LOG=$4
 export PYTHONDONTWRITEBYTECODE=1
+RUNS=0; FAILED=0
 pool_left() { python3 - <<'PY'
 import json, urllib.request
 try:
@@ -22,7 +23,9 @@ run_one() { # label state arm task attempt
   local label=$1 state=$2 arm=$3 task=$4 att=$5
   if [ "$(cut -d' ' -f1 /proc/loadavg | cut -d. -f1)" -ge 30 ]; then echo "host load >= 30, waiting" >> "$LOG"; while [ "$(cut -d' ' -f1 /proc/loadavg | cut -d. -f1)" -ge 30 ]; do sleep 20; done; fi
   ( cd "$K" && python3 run_task.py --state "$state" --arm "$arm" --task "$task" --attempt "$att" --tag s2 ) >> "$LOG" 2>&1
-  echo "== $label $task a$att exit $?" >> "$LOG"
+  rc=$?
+  RUNS=$((RUNS + 1)); [ $rc -eq 0 ] || FAILED=$((FAILED + 1))
+  echo "== $label $task a$att exit $rc" >> "$LOG"
 }
 for att in 1 2; do
   left=$(pool_left); echo "-- attempt $att, pool left $left at $(date -u +%H:%M:%SZ)" >> "$LOG"
@@ -38,4 +41,5 @@ for att in 1 2; do
     done
   done
 done
-echo "S2 DONE" >> "$LOG"
+echo "S2 DONE runs=$RUNS expected=24 failed_runs=$FAILED" >> "$LOG"
+[ "$RUNS" -eq 24 ] && [ "$FAILED" -eq 0 ]

@@ -41,7 +41,7 @@
     "candidate": "stack arm: the same pi with the practice on: RTK extension with the recipe's five exclude_commands, context-mode through MCP (tools declared directly, no message-injecting hooks), serena, jcodemunch, qmd and headroom deferred behind tool_search, toon on PATH, the generated AGENTS.md, and no compression header, so the gateway's headerless lane [session-dedup, ccr, lite] applies (upstream's documented safe lane plus ccr). Variant arms: stack-ext (context-mode as its pi extension, which appends a transient user message to the first request of each prompt) and stack-gwoff (the stack arm with x-omniroute-compression: off, the control that separates the gateway lane from the client stack)."
   },
   "frozen_inputs": {
-    "base_revision": "e45328d3951417c5ae69676f2ac2cc8896948f81",
+    "base_revision": "8d1be2833dd70afe4a24d3f90be40ec592e26c8f",
     "tasks": [
       "wiring-smoke",
       "calc-sign-bug",
@@ -93,11 +93,11 @@
     "evaluation": [
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/build_evidence.py",
-        "sha256": "a29bed2899dc729fa87b56b95fb3f1619cd5c063095329d03fa0e2090fea9011"
+        "sha256": "e6e6c12ce2e355f6e6ff421264f37c869fcd1233f673d191701f4956c9c13788"
       },
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/gateway_usage.py",
-        "sha256": "928b2f330fba1ece95d35c0a069d9650d0187233c9eed5df8f89a3e84b00f9fc"
+        "sha256": "1c3052fc07fa0bc2ca6bbe47d5abaa91426715a76c2dcf43578938de247a7613"
       },
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/omni_verify.py",
@@ -109,7 +109,7 @@
       },
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/probes.py",
-        "sha256": "1509a598ca2334a494a323c576a67e234ed6d1a628b4e784fed484a88d9b2197"
+        "sha256": "f2395c35bf6f4e53908de8a4378cc4bf991cc4746915f414a826db499308294c"
       },
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_r1.py",
@@ -117,7 +117,7 @@
       },
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_s2.sh",
-        "sha256": "6447ea6369a443cf1c85cf9c86377f66ea8f2fdded57533df5d7524d3c641f1b"
+        "sha256": "19b0f6f997902b1d97071e95e36b25e1041c5f0f1babe54512cbf3914b4ce450"
       },
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/run_task.py",
@@ -129,13 +129,13 @@
       },
       {
         "path": "blueprints/convergence-practice/pi-omni-trial-20260929/kit/summarize_runs.py",
-        "sha256": "8843602df814b6ebf7423d7223e6f6fa9a35fef6a2e47919792e1a9b5189a759"
+        "sha256": "8bbe61abe0a7c321d84fc3bfc657ade342de1c934ded627d501ff73f1df4668a"
       }
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "Per run, pass means `fixtures.py check TASK WORKSPACE` exits 0 (the checks read tracked files and answer.txt only). Report pass counts per task and arm over two attempts, with no significance claim at n=2. A stack-arm failure where the plain arm passed the same task is a regression finding that returns the decision to defer. S1 also requires the wiring criteria in README.md, including cache reads from the second request of an append-only arm and the stack-ext miss measured.",
-    "usage_rule": "Complete provider usage per run is the sum of the run id's call-log rows at the entry (20129) and upstream (20128) gateways, failed attempts included, with tokens.in, tokens.out, tokens.cacheRead, tokens.cacheWrite, tokens.reasoning and tokens.compressed kept separate and never added to pi-reported message_end usage, RTK tracker counts or ctx_stats counters. The cache-read share is reported per request index and per arm (the second request of stack-ext is expected to miss). Uncached input is tokens.in minus tokens.cacheRead only after the first real run confirms that tokens.in includes cached tokens. A run with no matching row has unknown usage, not zero; one client attempt can leave no gateway row when the router refuses at a cooldown, so pi's auto_retries are read alongside."
+    "quality_rule": "Per run, pass means `fixtures.py check TASK WORKSPACE` exits 0 (the checks read tracked files and answer.txt only). Report pass counts per task and arm over two attempts, with no significance claim at n=2. A stack-arm failure where the plain arm passed the same task is a regression finding that returns the decision to defer. S1 also requires the wiring criteria in README.md, including cache reads from the second request of an append-only arm and the stack-ext miss measured. Amendment 2026-09-30: S1's predeclared expectation that the stack-ext arm misses the cache at request 2 was falsified (S1 request-2 share 0.976); S1 is recorded as passed on its wiring criteria, and the falsified expectation is reported under limitations rather than counted as a gate.",
+    "usage_rule": "Recorded usage per run is the entry gateway's (20129) call-log rows for the run id, failed attempts included, with tokens.in, tokens.out, tokens.cacheRead, tokens.cacheWrite, tokens.reasoning and tokens.compressed kept separate and never added to pi-reported message_end usage, RTK tracker counts or ctx_stats counters. Hop totals are never summed: a forwarded request appears once at the entry gateway and again at the upstream gateway, and the upstream rows do not carry the run id here, so the entry rows are the authoritative per-run figure. The cache-read share is reported per request index and per arm. Uncached input is tokens.in minus tokens.cacheRead (confirmed: pi input plus cacheRead equals the gateway's in for all 27 S1 and S2 runs). A run with no matching row has unknown usage, not zero."
   },
   "runtime_and_platform": {
     "platform": "WSL2 Ubuntu 24.04 x86_64 workstation with Node 24.21.0 and Python 3.13.15. pi runs on the host in per-arm scratch HOMEs (mode 0700) under a private state directory with PI_OFFLINE=1, PI_SKIP_VERSION_CHECK=1 and PI_TELEMETRY=0. The gateways are the host's loopback OmniRoute instances 20128 (shared, provider pool; build ae5539a56 = upstream release/v3.8.51 2f42a9ac1 + #13788 + a local affinity patch) and 20129 (framework lane chained to 20128; build 87c4c488d = 2f42a9ac1 + #13788), both units announcing CODEX_CLIENT_VERSION=0.159.1. On 20129 the gateway owner's token-save plan (9 steps, 2026-09-30T00:06Z) and a corrective delta (2026-09-30T00:43:52Z) were live for every run below: engines ON session-dedup, ccr, lite, rtk, codex-responses, relevance, caveman, aggressive, llmlingua, ultra (the lossy ones only when the request header opts in: allow-lossy, engine:<id> or a stored combo named in the header), headroom and omniglyph off, output styles none; headerless plan [session-dedup, ccr, lite]; 20128 compression master off with codex/* excluded. omni_verify.py read back enabled, defaultMode, enginesExplicit, engines and levels, outputStyles, liveZone, sessionDedup, lite, headroom, contextBudget mode, cacheMinutes and exclusions at 2026-09-30T01:59Z (evidence/gateway-readback-20260930T0159Z.json); the plan itself is evidenced by tokens.compressed in the call logs (nonzero on header-less arms, zero on header-off arms).",
@@ -228,7 +228,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
-          "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0"
+          "sha256": "85e97f76708f62a73de1a3cb05462efee9758107eb3048addd7833fd2d42d5db"
         }
       ],
       "usage": {
@@ -259,7 +259,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
-          "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0"
+          "sha256": "85e97f76708f62a73de1a3cb05462efee9758107eb3048addd7833fd2d42d5db"
         }
       ],
       "usage": {
@@ -290,7 +290,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s1-runs.json",
-          "sha256": "e2eb6c12179223e266391f33923a86622b7529cdeedbf3ac69810769dc2c41a0"
+          "sha256": "85e97f76708f62a73de1a3cb05462efee9758107eb3048addd7833fd2d42d5db"
         }
       ],
       "usage": {
@@ -321,7 +321,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -352,7 +352,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -383,7 +383,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -414,7 +414,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -445,7 +445,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -476,7 +476,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -507,7 +507,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -538,7 +538,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -569,7 +569,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -600,7 +600,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -631,7 +631,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -662,7 +662,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -693,7 +693,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -724,7 +724,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -755,7 +755,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -786,7 +786,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -817,7 +817,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -848,7 +848,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -879,7 +879,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -910,7 +910,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -941,7 +941,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -972,7 +972,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -1003,7 +1003,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -1034,7 +1034,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/s2-runs.json",
-          "sha256": "122d5eeb23ae8766368c1dabe50e5fd768114455862f0540b6c0eec84fc0f2e5"
+          "sha256": "6661a87e68b4b38a7f31e766d72ff780fd05e976dbd08116b6e7da48cb53246a"
         }
       ],
       "usage": {
@@ -1065,7 +1065,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/pi-omni-trial-20260929/evidence/r1.json",
-          "sha256": "5304819a1628c1e0ccf8b32aede4bd9c714cefdb42c296ebbdae75d23ea3309a"
+          "sha256": "de9a6db195400ce76c475a91a143f6644f3e2739f8c01be1e8bdca1f12202c43"
         }
       ],
       "usage": {
@@ -1086,19 +1086,22 @@
     }
   ],
   "limitations": [
-    "The fixtures are synthetic and n is two per cell: S2 shows layer invocation, complete usage, cache behaviour and possible regressions, never efficacy. Every run passed its fixture check (6 of 6 in every S2 arm), so parity of task success is all it can show.",
-    "On these small fixtures the token-save stack used more tokens than plain pi: S2 (24 runs, entry-gateway tokens summed over the 6 runs of each arm): plain: 6/6 passed, 27 requests, uncached input 14842, cache read 37248 (share 0.715), output 3388, compressed 0, mean wall 29.2 s; stack-gwoff: 6/6 passed, 41 requests, uncached input 87840, cache read 323584 (share 0.786), output 5597, compressed 0, mean wall 52.1 s; stack: 6/6 passed, 42 requests, uncached input 72929, cache read 340224 (share 0.823), output 6467, compressed 192, mean wall 57.6 s; stack-ext: 6/6 passed, 45 requests, uncached input 108018, cache read 492544 (share 0.82), output 9102, compressed 200, mean wall 72.8 s. Against plain, stack used 391% more uncached input and 91% more output; stack-ext used 48% more uncached input than stack. No savings were measured, so no savings claim is made. A plausible cause is the stack's fixed prefix (instructions plus about 15 tool schemas), which these runs do not isolate; the practice's mechanism (context-mode containment of large outputs, session-dedup on repeated blocks) is not exercised. A large-output fixture is the next test.",
-    "The gateway lane removed 192 of 413153 input tokens on the stack arm and 200 on stack-ext (session-dedup needs repeated blocks of 512+ characters in history). Its effect on uncached input is unresolved: the paired differences (stack minus stack-gwoff) per task and attempt run from -11,751 to +6,871 tokens, four of six negative, and the two arms share a warmed cache (next item). The applied lane is upstream's documented safe lane plus ccr with two defect mitigations, not upstream's shipped default (compression off). The measurement covers the 20129 to 20128 hop for pi, not 20128's native Codex CLI traffic.",
+    "The fixtures are synthetic and n is two per cell: S2 shows layer invocation, recorded entry-gateway usage, cache behaviour and possible regressions, never efficacy. All 28 current-kit runs of 2026-09-30 passed their fixture check (6 of 6 in every S2 arm), so parity of task success is all they can show.",
+    "On these small fixtures the token-save stack used more tokens than plain pi (plain had the lowest measured token use and wall time): S2 (24 runs, entry-gateway tokens summed over the 6 runs of each arm): plain: 6/6 passed, 27 requests, uncached input 14842, cache read 37248 (share 0.715), output 3388, compressed 0, mean wall 29.2 s; stack-gwoff: 6/6 passed, 41 requests, uncached input 87840, cache read 323584 (share 0.786), output 5597, compressed 0, mean wall 52.1 s; stack: 6/6 passed, 42 requests, uncached input 72929, cache read 340224 (share 0.823), output 6467, compressed 192, mean wall 57.6 s; stack-ext: 6/6 passed, 45 requests, uncached input 108018, cache read 492544 (share 0.82), output 9102, compressed 200, mean wall 72.8 s. Against plain, stack used 391% more uncached input and 91% more output; stack-ext used 48% more uncached input than stack. No savings were measured, so no savings claim is made. A plausible cause is the stack's fixed prefix (instructions plus about 15 tool schemas), which these runs do not isolate; the practice's mechanism (context-mode containment of large outputs, session-dedup on repeated blocks) is not exercised. A large-output fixture is the next test.",
+    "The gateway reported 192 compressed tokens of 413153 input tokens on the stack arm and 200 on stack-ext; which engine removed them is not observable (the call log has a single tokens.compressed counter, no per-request engine trace), so the [session-dedup, ccr, lite] plan is the configured plan resolved offline by the gateway owner (`evidence/artifacts/omniroute-rebuild-20260930/checks/effective-plan-20260930.json` on main, PR #530), not an observed execution. Its effect on uncached input is unresolved: the paired differences (stack minus stack-gwoff) per task and attempt run from -11,751 to +6,871 tokens, four of six negative, and the two arms share a warmed cache (next item). The applied lane is upstream's documented safe lane plus ccr with two defect mitigations, not upstream's shipped default (compression off). The measurement covers the 20129 to 20128 hop for pi, not 20128's native Codex CLI traffic.",
     "Cache shares are confounded by warmth across runs: request 1 of the stack-family runs already read cached tokens (stack [6016], stack-gwoff [6016], stack-ext [5632]; plain [0, 1024]), the static prefix shared across runs although each run has its own prompt_cache_key, so the provider cache is warm across neighbouring runs. Arm order was reversed on attempt 2 but n is two, so the lane-on versus lane-off cache shares (0.823 and 0.786) are not a clean comparison.",
+    "The two header-less arms (stack, stack-ext) ran through the gateway's `lite` step, which strips trailing spaces and collapses runs of 3 or more newlines in string message contents (open-sse/services/compression/lite.ts:50-53; the gateway owner's probe, `evidence/artifacts/omniroute-rebuild-20260930/checks/lite-whitespace-probe-20260930.json` on main, PR #530); pi sends tool outputs as strings, so file contents read by those arms may differ from the plain arm's by whitespace. The effect was not examined; every run still passed.",
+    "The stack and stack-ext arms shared persistent tool state: kit/templates/mcp.stack-ext.json.tmpl points SERENA_HOME and CODE_INDEX_PATH into arms/stack/ (found by the second review). The stack-gwoff control has its own state directory. Tool state was not reset between attempts. The templates are frozen inputs of these runs and were not changed; use per-arm directories in the next trial.",
     "The predeclared expectation that stack-ext misses the cache at request 2 was not consistently observed: the second request read cached tokens in 6 of 7 stack-ext runs (S1 and S2), in 6 of 7 stack runs and in 5 of 6 stack-gwoff runs; the runs that read 0 (cause not established) are 1, 1 and 1 respectively. S2-only mean shares at request 2 were 0.71 (stack-ext), 0.69 (stack) and 0.61 (stack-gwoff). The synthetic figures of 2026-09-29 came from ad-hoc scripts that are not archived. stack-ext cost 45% more total input, 48% more uncached input and 41% more output than stack for the same pass rate, so the MCP arm remains the default.",
     "tool_search grows the declared tools once per load (15 to 18 for stack). In S1 both stack arms show a 0.0 cache share at the request after the load, but none of the 6 attempt-2 S2 runs that called tool_search has a request with 0 cached tokens after request 1, so the break is not consistently visible. The MCP arm loses the context-mode extension's routing enforcement and session continuity.",
     "Usage below the entry gateway is unknown: the sharedgw hop does not carry the run id, so no 20128 row joins to a run (gateway_upstream requests 0). Provider usage per run is the entry gateway's rows only; usage_assessment coverage stays partial. tokens.in includes cached tokens: pi input plus cacheRead equals the gateway's in for every one of the 27 S1 and S2 runs.",
-    "Outbound effort is not observable while gateway detail capture is off; pi asks for xhigh because OmniRoute clamps max to xhigh for models without a registry entry, so gpt-6.1-sol runs at xhigh here.",
+    "pi requests xhigh for gpt-6.1-sol (OmniRoute clamps a requested max to xhigh for this model until upstream PR #15167 lands, so xhigh is also the most it could send); the effective outbound effort was not verified, because gateway detail capture is off.",
     "Capacity: the pool account used for these runs showed 1% of its weekly window used at 2026-09-30T01:39Z, after S1, S2, R1 and seven finished vote jobs of a parallel track with three more in flight (OmniRoute's provider-limits readout syncs every 70 minutes; upstream's manual refresh, POST /api/usage/provider-limits, gave the readings in evidence/pool-readings-20260930.json); five other accounts are at 100% until 2026-10-03/06 and the native Codex login until 2026-10-04T00:35Z.",
     "S1 and S2 use a local integration runner rather than Harbor: Harbor v0.23.0's pi agent (src/harbor/agents/installed/pi.py lines 88-100, 115-178 and 222-235) installs the npm release and gives a custom endpoint an agent directory holding only models.json, so it cannot carry the stack arms' extensions, mcp.json, instruction file or the pinned tag without a subclass; S3 uses Harbor with that subclass.",
-    "R1 is one run: killed after the second model response (9 descendants, none alive 3 s later, session file kept the prompt and both tool results), resumed with pi --continue, task check passed. The first resumed request read 6,016 tokens from cache, the size of the static prefix that every stack run reads at request 1, so it does not show reuse of the resumed history. The killed in-flight request is a status 499 row at the gateway. It shows recovery of this session shape, not of every kill point.",
+    "R1 is one run: killed after the second model response (9 descendants sampled before the kill, none of those nine alive 3 s later; the process tree was not re-enumerated after the kill and killing is PID by PID, so a process forked in between would not be counted; the session file kept the prompt and both tool results), resumed with pi --continue, task check passed. The first resumed request read 6,016 tokens from cache, the size of the static prefix that every stack run reads at request 1, so it does not show reuse of the resumed history. The killed in-flight request is a status 499 row at the gateway. It shows recovery of this session shape, not of every kill point.",
     "The failed 14:12Z observation used the context-mode extension (today's stack-ext shape) and is recorded under that role; its entry-gateway row records tokens.compressed 3099 at status 429, so the request was compressed before the shared gateway refused it. The 97%, 0% and 0% synthetic cache figures of 2026-09-29 came from ad-hoc scripts that are not archived; the archived synthetic reading is evidence/gateway-readback-20260930T0009Z-first-apply.json (append-only turns 2 to 4 on 20129: share 0.965; on 20128 turn 2 read 0 and the share was 0.647).",
-    "Probe tally: kit/probes.py printed 96 PASS and 4 KNOWN-FAIL lines and ended 'ok (0 failed checks of 98)'; the runner's tally of 98 counts its own results, and some PASS lines come from the staging self-check it calls.",
+    "Probe tally: the first run of kit/probes.py printed 96 PASS and 4 KNOWN-FAIL lines but ended 'ok (0 failed checks of 98)', because the mutant self-test cleared its earlier verdicts from the tally (found by the second review; fixed in kit/probes.py). Rerun after the fix on 2026-09-30: 96 PASS, 4 KNOWN-FAIL, 0 FAIL, 'ok (0 failed checks of 100)'.",
+    "Kit provenance: the runners that produced the evidence (run_task.py, run_r1.py, stage.py, templates) are unchanged since the runs. The analysis scripts (summarize_runs.py, build_evidence.py, gateway_usage.py) and probes.py were fixed after the second review and the evidence files regenerated from the same call logs (totals unchanged: the 24 S2 runs reproduce). run_s2.sh in the kit is the sequencer with exit statuses kept; the executed sequencer was its scratchpad predecessor with the same control flow, and all 24 run lines in its log show exit 0. The runners inherit PI_CODING_AGENT_DIR if the caller sets it; the launching shell did not set it. Not fixed, disclosed: a run without gateway rows is unknown usage (kept, not zero); the per-run request list stops at 200 rows (no run reached it) and the call-log fetch is bounded (evidence records the rows fetched and the oldest row).",
     "codemode is available in pi but not exercised; exposure is deferred to follow the ecosystem's ToolSearch practice. ai-memory and socraticode are not in the arms, and there is no Claude arm. Host mode is not container isolation.",
     "pi main moves several times a day; the pin is a tag, and a later release is a different candidate."
   ],
@@ -1107,7 +1110,7 @@
     "scope": "pi v0.99.1 behind the OmniRoute 20129 lane on the corrected token-save configuration (headerless lane = upstream's documented safe lane plus ccr, two defect mitigations), host mode, stages S1, S2 and R1 on four synthetic fixtures; no adoption, no container-isolation claim and no Anthropic route.",
     "qualification_run_ids": []
   },
-  "rollback": "Nothing is installed outside the private state directories and the pi checkouts: remove them (two state directories: the second holds only the stack-gwoff control arm and a symlink to the first one's runs/). The trial writes no gateway setting, combo or key and changes no host or user configuration; rtk init and pi install touch only the arm HOMEs. Its one gateway call that is not an inference request is upstream's manual provider-limits refresh (POST /api/usage/provider-limits), which only refreshes the gateway's quota cache.",
+  "rollback": "Nothing is installed outside the private state directories and the pi checkouts: remove them (two state directories: the second holds only the stack-gwoff control arm and a symlink to the first one's runs/). The trial writes no gateway setting, combo or key and changes no host or user configuration; rtk init and pi install touch only the arm HOMEs. Its only non-inference POST to a gateway is upstream's manual provider-limits refresh (POST /api/usage/provider-limits), which only refreshes the gateway's quota cache; the kit also issues read-only GETs (compression settings, model list, quota state, call logs).",
   "next_decision_changing_test": "Add a large-output fixture (multi-KB tool outputs repeated across turns, where context-mode containment and session-dedup can act) as a preregistered S2b with the same four arms. If the stack arm still costs more uncached tokens than plain there, or a layer stays uninvoked despite the instructions, the decision returns to defer; if it costs less at equal task success, prepare a preregistered S3 against codex exec through Harbor v0.23.0 with O1-style container isolation. Turning compression on at 20128 needs its own decision from the user and the cache-share numbers of the native Codex lane.",
   "usage_assessment": {
     "claim": "none",

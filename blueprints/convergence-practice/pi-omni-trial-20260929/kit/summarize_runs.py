@@ -17,7 +17,10 @@ import gateway_usage as gu
 
 
 def share(cache, uncached):
-    total = (cache or 0) + (uncached or 0)
+    """Cache-read share, or None (unknown) when either count is missing or the total is zero."""
+    if cache is None or uncached is None:
+        return None
+    total = cache + uncached
     return round(cache / total, 3) if total else None
 
 
@@ -28,8 +31,11 @@ def main():
     parser.add_argument("--entry", default="http://127.0.0.1:20129")
     parser.add_argument("--upstream", default="http://127.0.0.1:20128")
     parser.add_argument("--limit", type=int, default=5000)
+    parser.add_argument("--tag", default="", help="only runs whose id ends with -TAG (s1v2 = S1, s2 = S2); default: every run in the state dir")
     a = parser.parse_args()
     runs = sorted((json.loads(p.read_text()) for p in (a.state / "runs").glob("*/result.json")), key=lambda r: r["run_id"])
+    if a.tag:
+        runs = [r for r in runs if r["run_id"].endswith("-" + a.tag)]
     logs = {}
     for name, base in (("entry", a.entry), ("upstream", a.upstream)):
         try:
@@ -43,6 +49,7 @@ def main():
         pi = r["pi_reported"]
         # A stack arm staged with x-omniroute-compression: off is the same client stack with the gateway lane off; label it apart.
         label = r["arm"] + ("-gwoff" if r["arm"] != "plain" and (r.get("arm_headers") or {}).get("x-omniroute-compression") == "off" else "")
+        unknown = {n: (None if v is None else v["null_token_rows"]) for n, v in gw.items()}
         row = {"run_id": r["run_id"], "arm": label, "client_arm": r["arm"], "task": r["task"], "attempt": r["attempt"], "passed": r["check"]["passed"],
                "wall_s": r["wall_seconds"], "timed_out": r["timed_out"], "exit": r["exit_code"], "stop": pi["last_stop_reason"],
                "auto_retries": pi.get("auto_retries"), "first_error": (pi.get("first_error") or {}).get("code") or (pi.get("first_error") or {}).get("message"),
@@ -50,10 +57,11 @@ def main():
                "pi_usage": pi["usage"], "pi_cache_share": share(pi["usage"]["cacheRead"], pi["usage"]["input"] + pi["usage"]["cacheWrite"]),
                "pi_cache_by_request": [share(q["cacheRead"], q["input"] + q["cacheWrite"]) for q in pi.get("per_request", [])],
                "gateway": {n: (None if v is None else {k: v[k] for k in ("requests", "status", "in", "out", "cacheRead", "cacheWrite", "reasoning", "compressed", "duration_ms")}) for n, v in gw.items()},
-               "gateway_cache_by_request": [share(q.get("cacheRead"), (q.get("in") or 0) - (q.get("cacheRead") or 0)) for q in ((gw.get("entry") or {}).get("rows") or [])],
+               "gateway_cache_by_request": [share(q.get("cacheRead"), None if q.get("in") is None or q.get("cacheRead") is None else q["in"] - q["cacheRead"]) for q in ((gw.get("entry") or {}).get("rows") or [])],
+               "null_token_rows": unknown, "rows_truncated": (gw.get("entry") or {}).get("rows_truncated"),
                "arm_headers": r.get("arm_headers"), "gateway_state_before": r.get("gateway_state_before")}
         rows.append(row)
-        per_arm[r["arm"]].append(row)
+        per_arm[label].append(row)
     summary = {}
     for arm, items in per_arm.items():
         by_index = collections.defaultdict(list)
@@ -61,14 +69,17 @@ def main():
             for i, v in enumerate(it["pi_cache_by_request"], 1):
                 if v is not None:
                     by_index[i].append(v)
-        summary[arm] = {"runs": len(items), "passed": sum(1 for i in items if i["passed"]), "wall_s_total": round(sum(i["wall_s"] for i in items), 1),
+        summary[arm] = {"runs": len(items), "passed": sum(1 for i in items if i["passed"]),
+                        "runs_without_entry_rows": sum(1 for i in items if not (i["gateway"].get("entry") or {}).get("requests")),
+                        "runs_with_null_token_rows": sum(1 for i in items if (i["null_token_rows"].get("entry") or 0) > 0), "wall_s_total": round(sum(i["wall_s"] for i in items), 1),
                         "gateway_in": sum(((i["gateway"].get("entry") or {}).get("in") or 0) for i in items),
                         "gateway_cacheRead": sum(((i["gateway"].get("entry") or {}).get("cacheRead") or 0) for i in items),
                         "gateway_out": sum(((i["gateway"].get("entry") or {}).get("out") or 0) for i in items),
                         "mean_pi_cache_share_by_request_index": {str(k): round(sum(v) / len(v), 3) for k, v in sorted(by_index.items())}}
     out = {"runs": rows, "per_arm": summary}
     for arm, s in summary.items():
-        print(f"{arm}: {s['passed']}/{s['runs']} passed, wall {s['wall_s_total']}s, gateway in {s['gateway_in']} cacheRead {s['gateway_cacheRead']} out {s['gateway_out']}")
+        print(f"{arm}: {s['passed']}/{s['runs']} passed, wall {s['wall_s_total']}s, gateway in {s['gateway_in']} cacheRead {s['gateway_cacheRead']} out {s['gateway_out']} "
+              f"(runs without entry rows: {s['runs_without_entry_rows']}, with null token rows: {s['runs_with_null_token_rows']}; a run without rows is unknown usage, not zero)")
         print(f"   mean pi cache share by request index: {s['mean_pi_cache_share_by_request_index']}")
     for r in rows:
         print(f"  {r['arm']:9s} {r['task']:18s} a{r['attempt']} passed={r['passed']} stop={r['stop']} retries={r['auto_retries']} entry_rows={(r['gateway'].get('entry') or {}).get('requests')} "
