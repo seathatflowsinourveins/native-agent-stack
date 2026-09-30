@@ -1126,10 +1126,12 @@ TURN_EVENTS = ("task_started", "turn_started", "task_complete", "turn_complete",
 CODE_MODE_WAIT = "wait"
 CODE_MODE_COUNTERS = ("exec_calls", "wait_calls", "nested_items", "unattributed_items", "legacy_unobservable_exec_calls",
                       "legacy_unobservable_sites", "outer_http_mentions", "outer_http_unverified_exec_calls")
-# PR-A 10e legacy-mode spans (U3 design section 7, commit 8): a legacy rollout persists no nested tool item
-# (rollout/src/policy.rs:94-112), so an exec there whose code can reach a fetch runs unobserved. The nested tools that can
-# fetch, by their code-mode identifiers (code-mode-protocol/src/description.rs:21 and normalize_code_mode_identifier, :365-387):
-# a shell command, the standalone web tool, and a Context Mode code or fetch tool of any MCP server.
+# PR-A 10e legacy-mode spans (U3 design section 7, commit 8): a legacy rollout persists no CommandExecution, McpToolCall or
+# web.search item_completed (rollout/src/policy.rs:94-112) and no ExecCommandEnd (:145); the McpToolCallEnd and WebSearchEnd
+# events it does keep (:123-135) are not read by this adapter. So an exec there whose code can reach a fetch runs unobserved
+# by this adapter. The nested tools that can fetch, by their code-mode identifiers (code-mode-protocol/src/description.rs:21
+# and normalize_code_mode_identifier, :365-387): a shell command, the standalone web tool, and a Context Mode code or fetch
+# tool of any MCP server.
 CODE_MODE_FETCH_TOOLS = ("exec_command", "web__run")
 CODE_MODE_CTX_TOOLS = ("ctx_execute", "ctx_execute_file", "ctx_batch_execute", "ctx_fetch_and_index")
 JS_NAME_CHARS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$")
@@ -1315,8 +1317,11 @@ def measure_codex_records(records, *, since=None, until=None, rtk_check=False, e
 
     codex_hook_context counts developer content items of kind hooks.additional_context (PR-A 10a): own items
     (inserted, with_marker) in the window of their own record, and items copied from the parent (inherited,
-    inherited_with_marker) once, in the window of the child's first own record, so adjacent windows add up (a window
-    that holds only copied records is not measured at all). The kernel's hook_context counts Claude hook attachments only.
+    inherited_with_marker) once, in the window of the child's first own record (ordinal at or above the start), so
+    adjacent windows add up. A window whose records are all copied is not measured, since scan_lanes_file measures a
+    session only with a counted record; but scan_lanes_file counts the child's own first session_meta, read before the
+    start ordinal is known, while here its ordinal (below the start) reads as copied, so a window that holds it and copied
+    records only is measured and counts nothing. The kernel's hook_context counts Claude hook attachments only.
 
     code_mode (PR-A 10e) reads the first session_meta: a history_mode other than paginated, or none (the upstream default,
     protocol/src/protocol.rs:772-779), or no session_meta at all, is legacy, and a cli_version outside
@@ -1980,8 +1985,9 @@ def spawn_state(child: dict, owners: dict, activity: dict) -> dict:
     spawn_agent call_id (openai/codex rust-v0.157.1 core/src/tools/handlers/multi_agents_v2/spawn.rs:216-226). join is joined
     (the owner is the child's ThreadSpawn parent_thread_id and holds that call), activity_without_spawn_call (it holds no such
     call: a spawn made inside code-mode exec, whose arguments are not persisted), parent_mismatch (another thread owns the
-    item), parent_without_started_item (the parent was scanned but holds no started item for the child: a legacy rollout
-    persists only completed ones, rollout/src/policy.rs:94-112) or parent_not_scanned. What was requested is read from a
+    item), parent_without_started_item (the parent was scanned but holds no started item_completed for the child: a legacy
+    rollout persists only completed SubAgentActivity items, rollout/src/policy.rs:107-111, and keeps the others as
+    SubAgentActivity events, :136-139, which this join does not read) or parent_not_scanned. What was requested is read from a
     joined call only, else unknown. The child's route is client-side: its own turn contexts and its first own
     ThreadSettingsApplied; a provider reroute is not persisted in rollouts (policy.rs:141-204), so reroute_evidence is always
     not_persisted_in_rollout, and a mismatch is a state, not an error. Route precedence (core/src/agent/child_config.rs:62-99,
@@ -2158,8 +2164,10 @@ def build_lanes_report(scan: dict, *, since, until, marker: str, now: datetime) 
             " call id (a hosted web_search_call included) is nested when an own exec call came earlier in its turn, else direct"
             " and counted in measurement.code_mode.unattributed_items; a wait call without a namespace after an exec of its"
             " turn is code mode; concurrent cells are not told apart."
-            + " A rollout that is not paginated (no history_mode is legacy) persists no nested item, so an exec there with a"
-            " static fetch-capable tools site and no nested item attributed to it is an unobservable span"
+            + " A rollout that is not paginated (no history_mode is legacy) persists no nested item that this adapter reads"
+            " (no item_completed command, MCP or web item, and no ExecCommandEnd; its McpToolCallEnd and WebSearchEnd events"
+            " are not read), so an exec there with a static fetch-capable tools site and no nested item attributed to it is an"
+            " unobservable span"
             " (code_mode.legacy_unobservable_exec_calls, _sites) and M4 is incomplete. The outer exec code is never a fetch"
             " where the code-mode isolate was read to have no network access (cli_version 0.155.1, 0.157.1): its HTTP_SCRIPT"
             " mentions are only counted (code_mode.outer_http_mentions); for any other client an exec with one makes M4"

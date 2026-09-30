@@ -370,9 +370,13 @@ new rule nests, after an exec of its turn. `proxy.nested` gained 5, and the M4 s
 since none of the moved items ran `curl` or `wget` (the differential in
 [pra-u3-differential-20260929](../../evidence/artifacts/pra-u3-differential-20260929/README.md)).
 
-Legacy history mode persists no nested tool item
-([policy.rs:94-112](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L94-L112)),
-and a `SessionMeta` without `history_mode` is legacy
+Legacy history mode persists no nested tool item that this adapter reads: no `CommandExecution`,
+`McpToolCall` or `web.search` `item_completed`
+([policy.rs:94-112](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L94-L112))
+and no `ExecCommandEnd` (`:145`). It does keep `McpToolCallEnd` and `WebSearchEnd` events
+([:123-135](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L123-L135)),
+which the adapter does not read; whether a code-mode nested MCP call emits one was not read. A
+`SessionMeta` without `history_mode` is legacy
 ([protocol.rs:772-779](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/protocol.rs#L772-L779)).
 Rows with no `session_meta`, or with a `history_mode` other than `paginated`, are read the same way (U3 design
 section 7, commit 8, with the review's per-exec finding):
@@ -547,9 +551,12 @@ Only the parent's own records count. A forked child's copies of them, below its 
 - `activity_without_spawn_call`: the owner holds no such call, as for a spawn made inside code-mode `exec`, whose
   arguments are not persisted.
 - `parent_mismatch`: another thread owns the item.
-- `parent_without_started_item`: the parent was scanned but holds no started item for the child. A legacy
-  rollout persists only completed ones
-  ([policy.rs:94-112](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L94-L112)).
+- `parent_without_started_item`: the parent was scanned but holds no started `item_completed` for the child.
+  A legacy rollout persists only completed `SubAgentActivity` items
+  ([policy.rs:107-111](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L107-L111))
+  and keeps the others as `SubAgentActivity` events
+  ([:136-139](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/rollout/src/policy.rs#L136-L139)),
+  which the join does not read, so a legacy parent's children read this state.
 - `parent_not_scanned`.
 
 `requested` (`fork_turns`, `fork_n`, `role`, `model`, `effort`) comes from a joined call only and is

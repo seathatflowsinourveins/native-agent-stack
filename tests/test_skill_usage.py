@@ -1815,8 +1815,8 @@ class CodexMarkerSplit(unittest.TestCase):
     def test_hook_context_adds_up_across_adjacent_windows(self):
         # The review's window finding: own items count in the window of their record and inherited items once, in the
         # window of the child's first own record (ordinal 4, 02:00:05), so every split adds up to the whole window. A
-        # window that holds only inherited records measures nothing (scan_lanes_file measures a session with a counted
-        # record), which is why inherited items do not follow their own records.
+        # window that holds only inherited records counts none of them (the next test), which is why inherited items do
+        # not follow their own records.
         records = u3_forked_child(OWN_TOKENS, OWN_HOOK, OWN_HOOK_WITHOUT_MARKER, OWN_COMMAND)
         path = self.rollout(records)
 
@@ -1830,6 +1830,21 @@ class CodexMarkerSplit(unittest.TestCase):
         for split in (a + (b - a) / 2 for a, b in zip(edges, edges[1:])):
             with self.subTest(split=split.isoformat()):
                 self.assertEqual(hooks(self.since, split) + hooks(split, self.until), +collections.Counter(whole))
+
+    def test_a_window_of_copied_records_counts_nothing(self):
+        # Characterization of the corrected docstring (the U3 review found "a window holding only copied records is never
+        # measured" contradicted): a window whose records are all copied (ordinals 2 and 3) is not measured, but one that
+        # also holds the child's own first session_meta (ordinal 0, counted by scan_lanes_file, which reads it before it
+        # knows the start ordinal) is measured and counts nothing, since measure_codex_records reads its ordinal as copied.
+        # The inherited hook item counts in the window of the first own record (ordinal 4, 02:00:05).
+        path = self.rollout(u3_forked_child(OWN_TOKENS, OWN_HOOK, OWN_HOOK_WITHOUT_MARKER, OWN_COMMAND))
+        seen = []
+        for since, until in (("02:00:00", "02:00:00.500"), ("02:00:00.500", "02:00:03"), ("02:00:03", "02:00:05.500")):
+            session = self.lanes(path, S.parse_iso(f"2026-10-20T{since}Z"), S.parse_iso(f"2026-10-20T{until}Z"))
+            measurement = session.get("measurement")
+            seen.append((session["in_window"], measurement and measurement["codex_hook_context"]))
+        self.assertEqual(seen, [(True, NO_HOOKS), (False, None),
+                                (True, {"inserted": 0, "with_marker": 0, "inherited": 1, "inherited_with_marker": 1})])
 
 
 ROLE_CASES = (  # (file stem, session_meta role fields, thread_spawn role fields or None for a root, actors[].role)
@@ -2036,8 +2051,9 @@ def spawn_case(case, *, args=None, parent_route=SPAWN_ROUTE, child_routes=(SPAWN
     ThreadSpawn source, the parent's records below subagent_history_start_ordinal when it is forked, its own
     ThreadSettingsApplied (thread_id is its own id) and one turn per child route. followups are followup_task calls whose
     target is the child's thread id ("thread") or its task path ("path") (multi_agents_spec.rs:217-241), or a V1
-    resume_agent call with the child's id ("resume", :246-266). A legacy_parent persists no started item, only a completed
-    one (rollout/src/policy.rs:94-112); namespace multi_agent_v1 is a V1 spawn, whose history comes from fork_context
+    resume_agent call with the child's id ("resume", :246-266). A legacy_parent persists no started item_completed, only a
+    completed one (rollout/src/policy.rs:107-111; its started activity is a SubAgentActivity event, :136-139, which the join
+    does not read); namespace multi_agent_v1 is a V1 spawn, whose history comes from fork_context
     (multi_agents_spec.rs:591-628)."""
     ids, hour = spawn_ids(case), int(case[1:])
 
@@ -2118,7 +2134,8 @@ class CodexSpawnJoin(unittest.TestCase):
     overrides both (core/src/agent/child_config.rs:109-121, :196-253, :283-299): expected_route_basis is per field. Reroutes are
     not persisted in rollouts (rollout/src/policy.rs:141-204). A resumed child is a followup_task whose target is the child's
     thread id or task path (multi_agents_spec.rs:217-241), or a V1 resume_agent with its id (:246-266). A legacy rollout
-    persists no started item (policy.rs:94-112), so its children read parent_without_started_item; a V1 spawn
+    persists no started item_completed (policy.rs:107-111; its started activity is a SubAgentActivity event, :136-139, which
+    the join does not read), so its children read parent_without_started_item; a V1 spawn
     (namespace multi_agent_v1) forks when fork_context is true (:607-613). Join keys stay in memory; only states are published."""
 
     CASES = {
@@ -2634,7 +2651,8 @@ class CodexCodeModeAttribution(unittest.TestCase):
     McpToolCall or a web.search Extension) whose id is no model call id is nested when it follows an exec call of the same
     turn; otherwise it is direct and counted in code_mode.unattributed_items; a `wait` call without a namespace after an exec
     is code mode. Commit 8: a paginated rollout persists every ItemCompleted and a legacy one none of these items
-    (rollout/src/policy.rs:94-112), and a meta without history_mode is legacy (protocol.rs:772-779); a legacy exec with a
+    (rollout/src/policy.rs:94-112; the McpToolCallEnd and WebSearchEnd events it keeps, :123-135, are not read), and a meta
+    without history_mode is legacy (protocol.rs:772-779); a legacy exec with a
     static fetch-capable site (tools.exec_command, tools.web__run, tools.mcp__*__ctx_execute, ctx_execute_file,
     ctx_batch_execute or ctx_fetch_and_index) and no item of its own (after it and before the next exec call or turn
     boundary) is an unobservable span that makes M4 incomplete."""
