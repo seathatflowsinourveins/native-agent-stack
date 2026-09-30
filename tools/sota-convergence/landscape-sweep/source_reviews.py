@@ -11,11 +11,11 @@ surviving in several layers gets one review listing every layer. Prints [{reposi
 --reviews reads it). A review is named <owner>-<repo>.json, lowercased with every other character run as "-", like
 the 2026-09-23 reviews; when two reviews share that name (acme/a-b and acme-a/b, or one skill that survived at two
 pins), each gets a suffix of 10 hex characters of the sha256 of its key, so no review overwrites another. A survivor
-that cannot be reviewed (gh cannot read it, its skill cannot be resolved or its SKILL.md hash disagrees), or whose
-file name already holds a review of another repository, is reported and skipped (exit 1 after the others are
-written). make_result.py refuses a RESULT.json while any survivor lacks its review, so a skipped survivor blocks the
-record until its cause is resolved and this script reruns, or until the run is recorded as stopped
-(recipes/saturation-sweep.md section 4). `gh auth status` must already pass.
+that cannot be reviewed (gh cannot read it, or a skill survivor's checks below refuse it), or whose file name already
+holds a review of another repository, is reported and skipped (exit 1 after the others are written); a skill
+survivor's printed list entry is then a stopped entry (below). make_result.py refuses a RESULT.json while any survivor
+lacks its review, so a skipped survivor blocks the record until its cause is resolved and this script reruns, or until
+the run is recorded as stopped (recipes/saturation-sweep.md section 4). `gh auth status` must already pass.
 A Hugging Face model repository (https://huggingface.co/<namespace>/<name>, which a model layer can keep) is reviewed
 at the commit of its default revision: the Hub's model-info endpoint /api/models/<repo_id> (the one huggingface_hub's
 HfApi.model_info calls) gives the commit, the model card's license and the repository state, and the model card is
@@ -24,17 +24,26 @@ anonymous GETs (no token is read or sent), and the card's YAML metadata block is
 hf-<namespace>-<name>.json.
 A skill survivor of the skills modality (owner/repo@name, a skills-* layer) is reviewed at the SKILL.md that the
 manifest's pinned skills CLI installs for `npx skills@1.7.0 add owner/repo --skill <name>`, at the commit the refuters
-judged: the survivor's pin, which convert.py copies with the proposal's skill_md_sha256 into survivors.json. A pin gh
-cannot read falls back to the default branch's commit, and the review says so; a SKILL.md whose sha256 differs from
-the survivor's skill_md_sha256 is reported and skipped. The SKILL.md is found in the git tree at that commit in the
-CLI's discovery order (cli_skill_dir; vercel-labs/skills v1.7.0 discoverSkills, README "Skill Discovery"): a folder
-outside the CLI's locations, such as docs/<lang>/skills/<name>, is never taken, and only two same-named folders in the
-first location that holds one are ambiguous. A folder's name stands for the skill's name (the Agent Skills
-specification requires them to match, https://agentskills.io/specification), and the chosen SKILL.md's name field is
-checked. The review records the SKILL.md's path, sha256 and size, its disable-model-invocation flag as Claude Code
-reads a boolean field (true, yes, on or 1 in any letter case, https://code.claude.com/docs/en/skills, frontmatter
-reference), and the implicit-invocation policy Codex reads from the agents/openai.yaml beside it (openai_yaml_policy;
-https://developers.openai.com/codex/skills), and excerpts the SKILL.md body without its frontmatter. Its repository
+judged: the survivor's pin, which convert.py copies with the proposal's skill_md_sha256 into survivors.json, and at no
+other commit. A skill survivor gets no review, and a stopped entry {repository, layers, status: stopped, pin,
+pin_lookup, reason} in the printed list instead, when it names no pin or a pin that is not a 40-hex commit, when its
+skill_md_sha256 is null, when gh cannot read the pin or reads it as another commit (pin_lookup failed), or when a later
+check refuses it (pin_lookup ok): no valid copy, an ambiguous copy, other SKILL.md bytes than the judged ones, or a
+git tree that does not cover the bytes read. make_result.py stops that layer: its RESULT.json cannot complete.
+The SKILL.md is found in the git tree at the pin in the CLI's discovery order (cli_skill_dir; vercel-labs/skills v1.7.0
+discoverSkills, README "Skill Discovery"): a folder outside the CLI's locations, such as docs/<lang>/skills/<name>, is
+never taken. Like the CLI (parseSkillMd), each candidate SKILL.md is validated before the order applies: without a
+name and a description, both non-empty strings, it is skipped and recorded with its reason, so a valid later copy
+wins, and a skill whose every copy is invalid is refused; only two valid same-named folders in the first location
+that holds a valid one are ambiguous. A folder's name stands for the skill's name (the Agent Skills specification
+requires them to match, https://agentskills.io/specification), and a copy whose name field names another skill is not
+a copy (filterSkills matches --skill against that field). The review records the SKILL.md's path, sha256 and size, the
+copies skipped on the way, the skill folder's git tree id at the pin (skill_folder_tree_sha: the id the CLI's lock
+records as skillFolderHash, verified to cover the SKILL.md and agents/openai.yaml bytes read), its
+disable-model-invocation flag as Claude Code reads a boolean field (true, yes, on or 1 in any letter case,
+https://code.claude.com/docs/en/skills, frontmatter reference), and the implicit-invocation policy Codex reads from the
+agents/openai.yaml beside it (openai_yaml_policy, https://developers.openai.com/codex/skills: codex_implicit, null with
+unverified_reason when the reader cannot tell), and excerpts the SKILL.md body without its frontmatter. Its repository
 field is <full_name>@<name>, the survivor's identity, and it is named <owner>-<repo>-<name>.json.
 """
 
@@ -57,6 +66,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from sweep_common import slug  # noqa: E402
 
+try:  # PyYAML, when installed, reads agents/openai.yaml (openai_yaml_policy); the repository does not require it
+    import yaml
+except ImportError:  # the subset reader then decides, or says it cannot
+    yaml = None
+
 OWNER_REPO = re.compile(r"[a-z0-9-]+/[a-z0-9._-]+")
 HUB = "https://huggingface.co"
 HUB_MODEL = re.compile(r"https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*)/?")
@@ -66,7 +80,7 @@ HUB_SECTIONS = {"api", "blog", "buckets", "collections", "containers", "datasets
 HUB_DEFAULT_REVISION = "main"  # huggingface_hub constants.DEFAULT_REVISION
 # huggingface_hub repocard.REGEX_YAML_BLOCK: the card's metadata block, which may follow leading whitespace.
 CARD_METADATA = re.compile(r"^(\s*---(?:\r\n|\r|\n))([\S\s]*?)((?:\r\n|\r|\n)---[ \t]*(\r\n|\n|$))")
-HEX40 = re.compile(r"[0-9a-f]{40}")
+HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
 # A skills-modality survivor: owner/repo@name (schemas/discover-skills.json skill_ref).
 SKILL_REF = re.compile(r"([A-Za-z0-9-]+/[A-Za-z0-9._-]+)@([a-z0-9-]+)")
 # A top-level `key: value` line of a SKILL.md frontmatter block, and a simple (optionally quoted) YAML mapping key.
@@ -85,6 +99,26 @@ CLAUDE_TRUE = ("true", "yes", "on", "1")
 # scalar (deserialize_option, lines 1517-1558; parse_null, lines 925-930); a quoted or any other scalar is a type error.
 SERDE_YAML_BOOL = {"true": True, "True": True, "TRUE": True, "false": False, "False": False, "FALSE": False}
 SERDE_YAML_NULL = ("", "~", "null", "Null", "NULL")
+# Codex's structs for the file (metadata.rs lines 27-56): known fields, a repeated one fails deserialization; unknown
+# keys are ignored (no deny_unknown_fields).
+METADATA_FIELDS, POLICY_FIELDS = ("interface", "dependencies", "policy"), ("allow_implicit_invocation", "products")
+YAML_NULL_TAG, YAML_BOOL_TAG = "tag:yaml.org,2002:null", "tag:yaml.org,2002:bool"
+CODEX_IGNORES = "Codex cannot deserialize the file and ignores it, so implicit invocation stays allowed"
+# Without PyYAML, agents/openai.yaml is read as the plain block-mapping subset only: block mappings with plain or
+# quoted identifier keys, block lists, one-line plain or quoted scalars, comments and one leading "---". A value
+# starting with one of these indicators is outside it, and so is anything the subset reader does not recognize.
+SUBSET_INDICATORS = {"{": "a flow mapping", "[": "a flow sequence", "&": "an anchor", "*": "an alias", "!": "a tag",
+                     "|": "a block scalar", ">": "a block scalar", "%": "a directive", "?": "a complex key",
+                     "@": "a reserved indicator (@)", "`": "a reserved indicator (`)"}
+# vercel-labs/skills v1.7.0 src/frontmatter.ts parseFrontmatter: the frontmatter block starts the file.
+SKILL_MD_FRONTMATTER = re.compile(r"---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)\Z")
+# ...parsed by the yaml package (^2.8.3, 2.9.0 in its lockfile) as YAML 1.2 with the core schema (eemeli/yaml v2.9.0
+# src/options.ts: version "1.2" by default; src/doc/Document.ts setSchema: 1.2 is "core"), whose plain scalars that
+# match these (src/schema/common/null.ts, core/bool.ts, core/int.ts, core/float.ts) are not strings.
+YAML12_NULL = re.compile(r"(?:~|[Nn]ull|NULL)?")
+YAML12_BOOL = re.compile(r"[Tt]rue|TRUE|[Ff]alse|FALSE")
+YAML12_NUMBER = re.compile(r"[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+|[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][-+]?[0-9]+)?"
+                           r"|[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN")
 # The skills CLI adoption/skills/manifest.json pins: vercel-labs/skills v1.7.0 (tag commit
 # 7407f3893ad4dceab546ac002c3ef806e4000c73). src/skills.ts SKIP_DIRS (line 10), AGENT_PROJECT_SKILL_DIRS (lines 12-43)
 # and discoverSkills (lines 180-329); src/constants.ts DEFAULT_SKILL_CONTAINER_DEPTH; src/plugin-manifest.ts
@@ -219,7 +253,7 @@ def unique_stems(names: dict) -> dict:
     return stems
 
 
-# --------------------------------------------------------------------------- YAML scalars and the two flag files
+# --------------------------------------------------------------------------- YAML scalars and frontmatter lines
 
 
 def strip_yaml_comment(line: str) -> str:
@@ -252,22 +286,27 @@ def yaml_scalar(text: str) -> tuple[str, bool]:
     return text, False
 
 
-def frontmatter_scalars(yaml_text: str) -> dict:
-    """The top-level `key: value` pairs of a SKILL.md frontmatter block: a quoted value's content, or a plain value
-    without its trailing comment (`name: find-bugs  # note` is find-bugs). A key whose value starts on the next,
-    indented line gets that line's text, enough to tell that the key has a value."""
+def frontmatter_values(yaml_text: str) -> dict:
+    """{key: (value, quoted)} of the top-level `key: value` lines of a SKILL.md frontmatter block: a quoted value's
+    content, or a plain value without its trailing comment (`name: find-bugs  # note` is find-bugs). A key whose value
+    starts on the next, indented line gets that line's text, enough to tell that the key has a value."""
     out, lines = {}, yaml_text.splitlines()
     for index, line in enumerate(lines):
         match = FRONTMATTER_KEY.fullmatch(line.rstrip())
         if not match:
             continue
-        value = yaml_scalar(match.group(2) or "")[0]
-        if not value:
+        value, quoted = yaml_scalar(match.group(2) or "")
+        if not value and not quoted:
             following = next((item for item in lines[index + 1:] if item.strip()), "")
             if following[:1] in (" ", "\t"):
-                value = yaml_scalar(following.strip())[0]
-        out[match.group(1)] = value
+                value, quoted = yaml_scalar(following.strip())
+        out[match.group(1)] = (value, quoted)
     return out
+
+
+def frontmatter_scalars(yaml_text: str) -> dict:
+    """{key: value} of frontmatter_values."""
+    return {key: value for key, (value, _) in frontmatter_values(yaml_text).items()}
 
 
 def claude_true(value) -> bool:
@@ -275,109 +314,345 @@ def claude_true(value) -> bool:
     return str(value or "").strip().lower() in CLAUDE_TRUE
 
 
-def flow_entries(flow: str) -> dict | None:
-    """{key: value text} of a YAML flow mapping ("{a: b, c: [d]}"), split at its top-level commas; None when the text
-    is not one flow mapping."""
-    flow = flow.strip()
-    if not (flow.startswith("{") and flow.endswith("}")):
-        return None
-    items, current, depth, quote = [], "", 0, None
-    for char in flow[1:-1]:
-        if quote:
-            quote = None if char == quote else quote
-        elif char in "'\"":
-            quote = char
-        elif char in "{[":
-            depth += 1
-        elif char in "}]":
-            depth -= 1
-        elif char == "," and depth == 0:
-            items.append(current)
-            current = ""
-            continue
-        current += char
-    items.append(current)
+# --------------------------------------------------------------------------- SKILL.md as the skills CLI parses it
+
+
+def yaml12_scalar(value: str, quoted: bool) -> tuple[str, bool]:
+    """(JavaScript type, truthy) of a one-line frontmatter scalar as the yaml package's YAML 1.2 core schema reads it
+    (YAML12_NULL, YAML12_BOOL, YAML12_NUMBER); a quoted scalar is a string."""
+    if quoted:
+        return "string", bool(value)
+    if YAML12_NULL.fullmatch(value):
+        return "null", False
+    if YAML12_BOOL.fullmatch(value):
+        return "boolean", value.lower() == "true"
+    if YAML12_NUMBER.fullmatch(value):
+        text = value.lower().replace(".inf", "inf").replace(".nan", "nan")
+        number = int(text, 0) if text.lstrip("+-").startswith(("0x", "0o")) else float(text)
+        return "number", number == number and bool(number)  # 0, -0 and NaN are falsy
+    if value.startswith(("[", "{")):
+        return "object", True
+    return "string", bool(value)
+
+
+def skill_md_problem(raw: bytes) -> str | None:
+    """Why the pinned skills CLI skips this SKILL.md, or None when it takes it (vercel-labs/skills v1.7.0 src/skills.ts
+    parseSkillMd, lines 80-133): the frontmatter needs a name and a description (a falsy value counts as missing), and
+    both must be strings."""
+    match = SKILL_MD_FRONTMATTER.match(raw.decode("utf-8", "replace"))
+    fields = frontmatter_values(match.group(1)) if match else {}
+    typed = {key: yaml12_scalar(*fields[key]) if key in fields else ("undefined", False)
+             for key in ("name", "description")}
+    missing = [key for key, (_, truthy) in typed.items() if not truthy]
+    if missing:
+        return f"missing required frontmatter field(s): {', '.join(missing)}"
+    if any(kind != "string" for kind, _ in typed.values()):
+        return (f'frontmatter "name" and "description" must be strings (got {typed["name"][0]} and '
+                f'{typed["description"][0]})')
+    return None
+
+
+def skill_md_name(raw: bytes) -> str | None:
+    """The name field of a SKILL.md's frontmatter (SKILL_MD_FRONTMATTER), or None."""
+    match = SKILL_MD_FRONTMATTER.match(raw.decode("utf-8", "replace"))
+    return frontmatter_scalars(match.group(1)).get("name") if match else None
+
+
+# --------------------------------------------------------------------------- agents/openai.yaml as Codex reads it
+
+
+class CodexIgnores(Exception):
+    """serde_yaml cannot deserialize agents/openai.yaml into Codex's SkillMetadataFile, so Codex ignores the file."""
+
+    def __init__(self, message: str, value: str | None = None):
+        super().__init__(message)
+        self.value = value
+
+
+def openai_yaml_policy(text: str) -> tuple[bool | None, str | None, str]:
+    """(codex_implicit, the policy.allow_implicit_invocation value as written or None, how Codex reads it) for an
+    agents/openai.yaml, as Codex rust-v0.157.1 reads it with serde_yaml 0.9.34 (see SERDE_YAML_BOOL): false only for
+    a plain false; true for a missing or null value, and for a file serde_yaml cannot deserialize, which Codex
+    ignores; None when the reader cannot tell, with the reason in the note ("unverified"). With PyYAML installed its
+    composer reads the file (pyyaml_policy); without it only the plain block-mapping subset is read (subset_policy).
+    Type errors in the file's other fields, which also make Codex ignore it, are not checked."""
+    return pyyaml_policy(text) if yaml is not None else subset_policy(text)
+
+
+def openai_yaml_reader() -> str:
+    """Which reader openai_yaml_policy uses here, as the review records it."""
+    if yaml is None:
+        return "subset reader (PyYAML is not installed)"
+    loader = getattr(yaml, "CSafeLoader", None) or yaml.SafeLoader
+    return f"PyYAML {getattr(yaml, '__version__', '?')} compose_all with {loader.__name__}"
+
+
+def pyyaml_policy(text: str) -> tuple[bool | None, str | None, str]:
+    """openai_yaml_policy with PyYAML: yaml.compose_all builds the node tree (anchors and aliases resolved, every
+    duplicate key and each scalar's style kept; the libyaml CSafeLoader when present, the grammar serde_yaml's
+    unsafe-libyaml follows), and serde_yaml's rules are applied to it. Not safe_load: its YAML 1.1 constructor would
+    read yes/no/on/off as booleans and drop the scalar's style, and serde_yaml reads neither so."""
+    loader = getattr(yaml, "CSafeLoader", None) or yaml.SafeLoader
+    try:
+        documents = list(yaml.compose_all(text, Loader=loader))
+    except yaml.YAMLError as error:
+        first = str(error).strip().splitlines()[0] if str(error).strip() else type(error).__name__
+        return None, None, (f"PyYAML cannot parse the file ({first}): whether serde_yaml can, and so Codex's "
+                            "implicit invocation, is unverified")
+    try:
+        if not documents:
+            raise CodexIgnores("the file holds no YAML document")  # serde_yaml: EndOfStream
+        if len(documents) > 1:
+            raise CodexIgnores(f"the file holds {len(documents)} YAML documents, which serde_yaml refuses")
+        policy = struct_fields(documents[0], METADATA_FIELDS, "the document").get("policy")
+        if policy is None:
+            return True, None, "no policy mapping: Codex defaults allow_implicit_invocation to true"
+        if serde_none(policy, "policy"):
+            return True, None, "policy is null: Codex defaults allow_implicit_invocation to true"
+        node = struct_fields(policy, POLICY_FIELDS, "policy").get("allow_implicit_invocation")
+        if node is None:
+            return True, None, "no policy.allow_implicit_invocation: Codex defaults it to true"
+        if not isinstance(node, yaml.ScalarNode):
+            raise CodexIgnores("allow_implicit_invocation holds a mapping or list")
+        if serde_none(node, "allow_implicit_invocation"):
+            return True, node.value or None, "policy.allow_implicit_invocation is null: Codex defaults it to true"
+        value = serde_bool(node)
+        if value is None:
+            raise CodexIgnores(f"allow_implicit_invocation {node.value!r} is not a YAML boolean serde_yaml reads (a "
+                               "plain true or false)", node.value)
+        return value, node.value, f"policy.allow_implicit_invocation: {node.value}"
+    except CodexIgnores as why:
+        return True, why.value, f"{why}: {CODEX_IGNORES}"
+
+
+def plain_scalar(node) -> bool:
+    """A plain (unquoted, not block) scalar node: PyYAML's pure loader gives its style as None, CSafeLoader as ""."""
+    return isinstance(node, yaml.ScalarNode) and node.style in (None, "")
+
+
+def struct_fields(node, fields, what: str) -> dict:
+    """{field: value node} of a mapping that serde_yaml deserializes into a struct with these fields: unknown keys are
+    ignored, as Codex's structs do not deny them, and an empty plain scalar is an empty map (de.rs deserialize_map,
+    lines 1660-1688). Raises CodexIgnores where serde_yaml fails: not a mapping, a key that is not a scalar, a field
+    given twice."""
+    if plain_scalar(node) and node.value == "":
+        return {}
+    if not isinstance(node, yaml.MappingNode):
+        raise CodexIgnores(f"{what} is not a mapping")
     out = {}
-    for item in (item.strip() for item in items):
-        if item:
-            key, _, value = item.partition(":")
-            out[key.strip().strip("'\"")] = value.strip()
+    for key, value in node.value:
+        if not isinstance(key, yaml.ScalarNode):
+            raise CodexIgnores(f"{what} has a key that is not a scalar")
+        if key.value in fields:
+            if key.value in out:
+                raise CodexIgnores(f"{key.value} appears twice in {what}")
+            out[key.value] = value
     return out
 
 
-def openai_yaml_policy(text: str) -> tuple[bool, str | None, str]:
-    """(implicit invocation allowed, the policy.allow_implicit_invocation value as written or None, how Codex reads it)
-    for an agents/openai.yaml, as Codex rust-v0.157.1 reads it with serde_yaml (see SERDE_YAML_BOOL). The documented
-    shape is a top-level `policy:` mapping, in block form (an indented `allow_implicit_invocation: false`) or flow form
-    (`policy: {allow_implicit_invocation: false}`). Only a plain true or false is a boolean; a missing or null value
-    leaves the default true; any other value, or a file serde_yaml cannot read (a tab-indented line, a repeated
-    policy key, a policy that is not a mapping), makes Codex ignore the whole file, which also leaves the default. Type
-    errors in the file's other fields, which Codex handles the same way, are not checked here."""
-    ignored = "Codex cannot deserialize the file and ignores it, so implicit invocation stays allowed"
-    lines = []
-    for raw_line in text.splitlines():
+def serde_none(node, what: str) -> bool:
+    """Whether serde_yaml's deserialize_option (de.rs lines 1517-1558) reads the node as None: a plain scalar that is
+    empty or null/Null/NULL/~ and carries no other tag. A plain scalar tagged !!null that is none of those is an
+    error (CodexIgnores)."""
+    if not plain_scalar(node):
+        return False
+    if node.tag == YAML_NULL_TAG and node.value not in SERDE_YAML_NULL:
+        raise CodexIgnores(f"{what} is tagged !!null but holds {node.value!r}", node.value)
+    return node.tag == YAML_NULL_TAG  # an untagged empty or null-like plain scalar resolves to the null tag
+
+
+def serde_bool(node) -> bool | None:
+    """serde_yaml's deserialize_bool on a scalar node (de.rs lines 1266-1290 and 1149-1158): a plain scalar, whatever
+    its tag, or a literal block scalar tagged !!bool, whose text is a plain true or false spelling; else None."""
+    if plain_scalar(node) or (node.style == "|" and node.tag == YAML_BOOL_TAG):
+        return SERDE_YAML_BOOL.get(node.value)
+    return None
+
+
+def quoted_end(text: str) -> int | None:
+    """The index just past the quoted scalar that starts text, or None when it does not close on this line."""
+    quote, index = text[0], 1
+    while index < len(text):
+        if quote == '"' and text[index] == "\\":
+            index += 2
+            continue
+        if text[index] == quote:
+            if quote == "'" and text[index + 1:index + 2] == "'":  # '' is a quote inside a single-quoted scalar
+                index += 2
+                continue
+            return index + 1
+        index += 1
+    return None
+
+
+def subset_value_problem(value: str) -> str | None:
+    """Why a one-line value is outside the plain block-mapping subset, or None."""
+    if not value:
+        return None
+    if value[0] in "'\"":
+        end = quoted_end(value)
+        if end is None:
+            return "a quoted scalar that continues on the next line"
+        return "text after a quoted scalar" if value[end:].strip() else None
+    if value[0] in SUBSET_INDICATORS:
+        return SUBSET_INDICATORS[value[0]]
+    if value == "-" or value.startswith(("- ", "-\t")):
+        return "a list entry after a key"
+    if ": " in value or ":\t" in value or value.endswith(":"):
+        return "a plain scalar holding ': '"
+    return None
+
+
+def subset_layout_problem(rows) -> tuple[int, str] | None:
+    """(line, why) of the first line whose indentation the subset reader does not follow, else None. rows are the
+    content lines as (line, indent, text stripped). Each open block sits at one indentation: a key without a value
+    opens a deeper block, or a list at its own indentation; a list entry holding a key opens a mapping at its content's
+    column; keys and list entries do not mix at one level except for such a list."""
+    levels, last, opener = [], {}, None  # open indentations; indent -> state of its last line; what the last line opens
+    for number, indent, text in rows:
+        entry = text == "-" or text.startswith(("- ", "-\t"))
+        if not levels:
+            if indent:
+                return number, "an indented first line"
+            levels.append(0)
+        elif indent > levels[-1]:
+            if opener is None or indent <= opener:
+                return number, "an indented line that no key or list entry without a value opens"
+            if levels[-1] in last:
+                last[levels[-1]]["open"] = False  # the deeper block is that key's value
+            levels.append(indent)
+        else:
+            while indent < levels[-1]:
+                last.pop(levels.pop(), None)
+            if indent != levels[-1]:
+                return number, "a line that returns to an indentation no open block uses"
+        state = last.get(indent)
+        if state and entry and state["kind"] == "key" and not state["open"]:
+            return number, "a list entry beside mapping keys"
+        if state and not entry and state["kind"] == "entry" and not state["compact"]:
+            return number, "a mapping key beside list entries"
+        opener = None
+        if entry:
+            compact = bool(state) and (state["kind"] == "key" or state["compact"])
+            last[indent] = {"kind": "entry", "open": False, "compact": compact}
+            content = text[1:].lstrip(" \t")
+            match = YAML_KEY.fullmatch(content) if content else None
+            if not content:
+                opener = indent
+            elif match:  # the entry's mapping continues at the column its first key starts in
+                column = indent + len(text) - len(content)
+                levels.append(column)
+                empty = not (match.group("value") or "").strip()
+                last[column] = {"kind": "key", "open": empty, "compact": False}
+                opener = column if empty else None
+        else:
+            match = YAML_KEY.fullmatch(text)
+            empty = not (match and (match.group("value") or "").strip())
+            last[indent] = {"kind": "key", "open": empty, "compact": False}
+            opener = indent if empty else None
+    return None
+
+
+def subset_policy(text: str) -> tuple[bool | None, str | None, str]:
+    """openai_yaml_policy without PyYAML: the plain block-mapping subset (SUBSET_INDICATORS and subset_layout_problem)
+    is read and anything else gets None with the line and construct it stopped at, so the reader never asserts a value
+    for syntax it did not parse."""
+    def unverified(number, what):
+        return None, None, (f"line {number}: {what} is outside the plain block-mapping subset this reader parses "
+                            "without PyYAML, so how Codex reads implicit invocation is unverified")
+
+    rows, started, ended, tab = [], False, False, None
+    for number, raw_line in enumerate(text.splitlines(), 1):
         body = strip_yaml_comment(raw_line)
-        if not body.strip() or (body in ("---", "...")):
+        stripped = body.strip()
+        if not stripped:
+            continue
+        if ended:
+            return unverified(number, "a second document after the end marker ...")
+        if body.startswith(("---", "...")) and (len(body) == 3 or body[3] in " \t"):
+            if body[3:].strip():
+                return unverified(number, f"content after the document marker {body[:3]}")
+            if body.startswith("..."):
+                ended = True
+            elif rows or started:
+                return unverified(number, "a second document (---)")
+            started = True
             continue
         indent = len(body) - len(body.lstrip(" \t"))
         if "\t" in body[:indent]:
-            return True, None, f"a tab indents a line: {ignored}"
-        lines.append((indent, body.strip()))
+            tab = tab or number
+        item = stripped
+        if item == "-" or item.startswith(("- ", "-\t")):
+            item = item[1:].lstrip(" \t")
+            if item == "-" or item.startswith(("- ", "-\t")):
+                return unverified(number, "a list nested in a list entry")
+            match = YAML_KEY.fullmatch(item) if item else None
+            problem = subset_value_problem((match.group("value") or "").strip() if match else item)
+        else:
+            match = YAML_KEY.fullmatch(item)
+            problem = (subset_value_problem((match.group("value") or "").strip()) if match
+                       else "a line that is not a key: value pair or a list entry")
+        if problem:
+            return unverified(number, problem)
+        rows.append((number, indent, stripped))
+    if tab is not None:
+        return unverified(tab, "a tab in the indentation")
+    layout = subset_layout_problem(rows)
+    if layout:
+        return unverified(*layout)
+    return subset_structure([(indent, stripped) for _, indent, stripped in rows])
 
+
+def subset_structure(lines) -> tuple[bool, str | None, str]:
+    """The policy value of a document inside the subset (lines: (indent, text)), as serde_yaml reads it."""
     def key_of(body):
         match = YAML_KEY.fullmatch(body)
-        return (match.group("key").strip("'\""), match.group("value") or "") if match else (None, "")
+        return (match.group("key").strip("'\""), (match.group("value") or "").strip()) if match else (None, "")
 
-    tops = [position for position, (indent, body) in enumerate(lines) if indent == 0 and key_of(body)[0] == "policy"]
+    top = [(position, key_of(body)[0]) for position, (indent, body) in enumerate(lines) if indent == 0]
+    if top and lines[top[0][0]][1].startswith("-"):
+        return True, None, f"the document is a list, not a mapping: {CODEX_IGNORES}"
+    for field in METADATA_FIELDS:
+        if [key for _, key in top].count(field) > 1:
+            return True, None, f"{field} appears twice: {CODEX_IGNORES}"
+    tops = [position for position, key in top if key == "policy"]
     if not tops:
         return True, None, "no policy mapping: Codex defaults allow_implicit_invocation to true"
-    if len(tops) > 1:
-        return True, None, f"policy appears twice: {ignored}"
     rest = key_of(lines[tops[0]][1])[1]
-    value = MISSING
-    if rest.startswith("{"):
-        flow, following = rest, tops[0] + 1
-        while flow.count("{") > flow.count("}") and following < len(lines):  # a flow mapping over several lines
-            flow, following = f"{flow} {lines[following][1]}", following + 1
-        entries = flow_entries(flow)
-        if entries is None:
-            return True, None, f"policy is not a mapping serde_yaml reads: {ignored}"
-        value = entries.get("allow_implicit_invocation", MISSING)
-    elif rest:
+    if rest:
         scalar, quoted = yaml_scalar(rest)
         if not quoted and scalar in SERDE_YAML_NULL:
             return True, None, "policy is null: Codex defaults allow_implicit_invocation to true"
-        return True, None, f"policy is {rest!r}, not a mapping: {ignored}"
-    else:
-        block = []
-        for indent, body in lines[tops[0] + 1:]:
-            if indent == 0:
-                break
-            block.append((indent, body))
-        if not block:
-            return True, None, "policy is null: Codex defaults allow_implicit_invocation to true"
-        if block[0][1].startswith("-"):
-            return True, None, f"policy is a list, not a mapping: {ignored}"
-        child = block[0][0]
-        for position, (indent, body) in enumerate(block):
-            key, raw_value = key_of(body)
-            if indent != child or key != "allow_implicit_invocation":
-                continue  # only a direct child of policy counts
-            if value is not MISSING:
-                return True, None, f"allow_implicit_invocation appears twice under policy: {ignored}"
-            nested = position + 1 < len(block) and block[position + 1][0] > child
-            value = "{" if not raw_value and nested else raw_value
-    if value is MISSING:
+        return True, None, f"policy is {rest!r}, not a mapping: {CODEX_IGNORES}"
+    block = []
+    for indent, body in lines[tops[0] + 1:]:
+        if indent == 0:
+            break
+        block.append((indent, body))
+    if not block:
+        return True, None, "policy is null: Codex defaults allow_implicit_invocation to true"
+    if block[0][1].startswith("-"):
+        return True, None, f"policy is a list, not a mapping: {CODEX_IGNORES}"
+    child = block[0][0]
+    children = [(position, *key_of(body)) for position, (indent, body) in enumerate(block) if indent == child]
+    for field in POLICY_FIELDS:
+        if [key for _, key, _ in children].count(field) > 1:
+            return True, None, f"{field} appears twice under policy: {CODEX_IGNORES}"
+    found = [(position, value) for position, key, value in children if key == "allow_implicit_invocation"]
+    if not found:
         return True, None, "no policy.allow_implicit_invocation: Codex defaults it to true"
-    if value.startswith(("{", "[")):
-        return True, value, f"allow_implicit_invocation holds a mapping or list: {ignored}"
+    position, value = found[0]
+    if not value:
+        if position + 1 < len(block) and block[position + 1][0] > child:  # a mapping or list (the subset's layout)
+            return True, None, f"allow_implicit_invocation holds a mapping or list: {CODEX_IGNORES}"
+        return True, None, "policy.allow_implicit_invocation is null: Codex defaults it to true"
     scalar, quoted = yaml_scalar(value)
     if not quoted and scalar in SERDE_YAML_NULL:
-        return True, scalar or None, "policy.allow_implicit_invocation is null: Codex defaults it to true"
+        return True, scalar, "policy.allow_implicit_invocation is null: Codex defaults it to true"
     if not quoted and scalar in SERDE_YAML_BOOL:
         return SERDE_YAML_BOOL[scalar], scalar, f"policy.allow_implicit_invocation: {scalar}"
     return True, value, (f"allow_implicit_invocation {value} is not a YAML boolean serde_yaml reads (a plain true or "
-                         f"false): {ignored}")
+                         f"false): {CODEX_IGNORES}")
 
 
 # --------------------------------------------------------------------------- the skills CLI's discovery order
@@ -436,39 +711,73 @@ def cli_plugin_dirs(marketplace, plugin) -> list[str]:
     return dirs
 
 
-def cli_skill_dir(skill_dirs, name: str, plugin_dirs=()) -> tuple[str | None, str]:
-    """(folder, where) of the skill <name> as discoverSkills finds it without --full-depth, or (None, why not). The
-    root SKILL.md is decided before this (a valid one is the repository's only skill). The CLI searches the root's
-    child folders, then each of CLI_CONTAINERS three levels deep, then each plugin folder one level deep, and only when
-    none of them holds a SKILL.md, every folder up to five levels deep. A name found in one location is skipped in the
-    later ones, so the first location that holds a folder named <name> decides; two such folders in that location are
-    ambiguous (the CLI keeps whichever its directory listing returns first), as are two unnested ones in the fallback.
-    A folder anywhere else (docs/<lang>/skills/<name>, examples/) needs --full-depth and is never taken."""
-    parsed, found_any = set(), False
-    locations = [("", 1), *((container, CLI_CONTAINER_DEPTH) for container in CLI_CONTAINERS),
-                 *((folder, 1) for folder in plugin_dirs)]
-    for container, depth in locations:
+def cli_locations(skill_dirs, plugin_dirs=()) -> list:
+    """[(where, folders)] of the locations discoverSkills searches without --full-depth, in its order: the root's child
+    folders, each of CLI_CONTAINERS three levels deep, then each plugin folder one level deep, each with the folders
+    it finds a SKILL.md in that no earlier location found (parseSkillAt skips a SKILL.md it parsed before)."""
+    parsed, locations = set(), []
+    for container, depth in [("", 1), *((container, CLI_CONTAINER_DEPTH) for container in CLI_CONTAINERS),
+                             *((folder, 1) for folder in plugin_dirs)]:
         found = [folder for folder in cli_walk(container, depth, skill_dirs) if folder not in parsed]
         parsed.update(found)
-        found_any = found_any or bool(found)
-        matches = [folder for folder in found if folder.rsplit("/", 1)[-1] == name]
-        where = f"{container}/" if container else "the repository root"
+        locations.append((f"{container}/" if container else "the repository root", found))
+    return locations
+
+
+def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=None) -> tuple[str | None, str]:
+    """(folder, where) of the skill <name> as discoverSkills finds it without --full-depth, or (None, why not). The
+    root SKILL.md is decided before this (a valid one is the repository's only skill). The CLI validates a SKILL.md
+    before it takes its name (parseSkillMd returns null for one without a name or description, and tryAddSkillAt then
+    adds nothing), so an invalid copy never claims <name>. inspect(folder) gives (why the CLI skips that folder's
+    SKILL.md or None, its name field); without it every SKILL.md is valid and named after its folder. A copy is a
+    folder named <name> whose SKILL.md is valid and names <name> (filterSkills matches --skill against the name field,
+    in any letter case); a folder that fails is appended to `skipped` as (folder, reason) and passed over. The first
+    location that holds a copy decides; two copies there are ambiguous (the CLI keeps whichever its directory listing
+    returns first). Only when no location holds a valid skill of any name (skills.length === 0) does the CLI search
+    every folder up to five levels deep, where a copy shadows the copies below it and two unnested copies are
+    ambiguous. A folder anywhere else (docs/<lang>/skills/<name>, examples/) needs --full-depth and is never taken."""
+    inspect = inspect or (lambda folder: (None, folder.rsplit("/", 1)[-1]))
+    skipped = [] if skipped is None else skipped
+    named_skips = []
+
+    def copies(folders):
+        good = []
+        for folder in folders:
+            reason, declared = inspect(folder)
+            if reason is None and str(declared or "").lower() != name.lower():
+                reason = f"its name field names the skill {declared!r}, not {name}"
+            if reason is None:
+                good.append(folder)
+            elif (folder, reason) not in skipped:
+                skipped.append((folder, reason))
+                named_skips.append(folder)
+        return good
+
+    locations = cli_locations(skill_dirs, plugin_dirs)
+    for where, found in locations:
+        matches = copies([folder for folder in found if folder.rsplit("/", 1)[-1] == name])
         if len(matches) == 1:
-            return matches[0], f"{where}, the first location the CLI searches that holds a folder named {name}"
+            return matches[0], f"{where}, the first location the CLI searches that holds a valid folder named {name}"
         if matches:
             return None, (f"{len(matches)} folders named {name} in {where}, the first location the CLI searches that "
-                          f"holds one: {matches} (the CLI keeps whichever its directory listing returns first)")
-    if found_any:
+                          f"holds a valid one: {matches} (the CLI keeps whichever its directory listing returns first)")
+    # Any valid SKILL.md in the locations stops the fallback; inspected in the CLI's order up to the first valid one.
+    if any(inspect(folder)[0] is None for _, found in locations for folder in found):
+        if named_skips:
+            return None, (f"every copy of {name} in the locations the CLI searches without --full-depth is invalid, "
+                          "and a valid skill there keeps the CLI from searching further")
         return None, f"no folder named {name} in the locations the CLI searches without --full-depth"
-    candidates = [folder for folder in skill_dirs if folder and folder.count("/") < CLI_FALLBACK_DEPTH
-                  and folder.rsplit("/", 1)[-1] == name and not CLI_SKIP_DIRS.intersection(folder.split("/"))]
-    candidates = sorted(folder for folder in candidates
-                        if not any(folder.startswith(f"{other}/") for other in candidates))
-    if len(candidates) == 1:
-        return candidates[0], "the recursive search the CLI runs when no location it searches holds a skill"
-    if candidates:
-        return None, (f"{len(candidates)} unnested folders named {name} in the CLI's recursive search: {candidates} "
-                      "(the CLI keeps whichever its directory listing returns first)")
+    candidates = sorted(folder for folder in skill_dirs if folder and folder.count("/") < CLI_FALLBACK_DEPTH
+                        and folder.rsplit("/", 1)[-1] == name and not CLI_SKIP_DIRS.intersection(folder.split("/")))
+    good = copies(candidates)
+    good = [folder for folder in good if not any(folder.startswith(f"{other}/") for other in good)]
+    if len(good) == 1:
+        return good[0], "the recursive search the CLI runs when no location it searches holds a valid skill"
+    if good:
+        return None, (f"{len(good)} unnested folders named {name} in the CLI's recursive search: {good} (the CLI keeps "
+                      "whichever its directory listing returns first)")
+    if skipped and any(folder.rsplit("/", 1)[-1] == name for folder, _ in skipped):
+        return None, f"every copy of {name} the CLI's discovery reaches is invalid"
     return None, f"no folder named {name} holds a SKILL.md"
 
 
@@ -487,89 +796,195 @@ def gh_json_file(full: str, path: str, commit: str):
         return None  # the CLI skips a manifest that is not JSON
 
 
+def git_blob_id(data: bytes) -> str:
+    """git's object id of a blob (git hash-object): the sha1 of "blob <size>\\0" and the bytes."""
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+
+
+def git_tree_id(entries, folder: str) -> str:
+    """git's object id of the tree of `folder` ("" for the root), recomputed from a recursive git-trees listing's
+    direct children of it: each child as "<mode> <name>\\0" and its 20-byte id, in git's order (a folder compares as
+    its name followed by "/"), under the header "tree <size>\\0". The listing's mode 040000 is git's 40000."""
+    prefix, children = f"{folder}/" if folder else "", []
+    for entry in entries:
+        path = str(entry.get("path") or "")
+        name = path[len(prefix):]
+        if not path.startswith(prefix) or not name or "/" in name:
+            continue
+        tree = entry.get("type") == "tree"
+        mode = format(int(str(entry.get("mode")), 8), "o").encode()
+        children.append((name.encode() + (b"/" if tree else b""),
+                         mode + b" " + name.encode() + b"\0" + bytes.fromhex(str(entry.get("sha")))))
+    body = b"".join(item for _, item in sorted(children))
+    return hashlib.sha1(b"tree %d\0" % len(body) + body).hexdigest()
+
+
+def skill_folder_tree_sha(listing: dict, folder: str, read: dict) -> str:
+    """The skill folder's git tree id at the reviewed commit: the id the listing gives it, and for a root SKILL.md the
+    root tree's, as the pinned skills CLI records a skill's skillFolderHash (src/blob.ts getSkillFolderHashFromTree).
+    Verified before it is recorded: each file read ({path: bytes}) is the blob the listing names for its path, and
+    every folder from the skill folder down to those files hashes to the id the listing gives it, so the id covers the
+    SKILL.md and agents/openai.yaml bytes the review read. Raises GhError on a missing id or any mismatch: a survivor's
+    folder hash is never null."""
+    entries = [entry for entry in listing.get("tree") or [] if isinstance(entry, dict)]
+    by_path = {entry.get("path"): entry for entry in entries}
+    own = by_path.get(folder) or {}
+    listed = listing.get("sha") if not folder else own.get("sha") if own.get("type") == "tree" else None
+    if not (isinstance(listed, str) and HEX40.fullmatch(listed)):
+        raise GhError(f"the git tree lists no id for the skill folder {folder or '(the repository root)'}")
+    folders = {folder}
+    for path, data in read.items():
+        entry = by_path.get(path) or {}
+        if entry.get("type") != "blob" or entry.get("sha") != git_blob_id(data):
+            raise GhError(f"{path} is not the git blob the tree lists for it ({entry.get('sha')}), so the folder's id "
+                          "would not cover the bytes read")
+        if folder and not path.startswith(f"{folder}/"):
+            raise GhError(f"{path} is outside the skill folder {folder}")
+        parent = posixpath.dirname(path)
+        while parent != folder:
+            folders.add(parent)
+            parent = posixpath.dirname(parent)
+    for each in sorted(folders):
+        expected = listing.get("sha") if not each else (by_path.get(each) or {}).get("sha")
+        if git_tree_id(entries, each) != expected:
+            raise GhError(f"the git tree listing does not hash to the id it gives {each or 'the repository root'} "
+                          f"({expected}), so the folder's id would not cover the bytes read")
+    return listed
+
+
+class ReviewRefused(GhError):
+    """A skill survivor that gets no review. pin_lookup says how far its adjudicated pin got: "failed" (none named, not
+    a 40-hex commit, unreadable, or read as another commit), "ok" (read; a later check refused the survivor), or None
+    (not looked up: the survivor's skill_md_sha256 is null)."""
+
+    def __init__(self, message: str, pin_lookup: str | None = None):
+        super().__init__(message)
+        self.pin_lookup = pin_lookup
+
+
 def skill_review(owner_repo: str, name: str, layers: list, lane: str, fit_models: str, pin=None,
                  expected_sha256=()) -> dict:
-    meta = gh(f"repos/{owner_repo}")
+    """The review of a skill survivor at its adjudicated pin, and at no other commit: ReviewRefused whenever the pin,
+    the judged SKILL.md bytes or the skill folder's hash cannot be established (see the module docstring)."""
+    label = f"{owner_repo}@{name}"
+    if not pin:
+        raise ReviewRefused(f"{label}: the survivor names no adjudicated pin, so no commit ties a review to the SKILL.md "
+                            "the refuters judged", "failed")
+    if not (isinstance(pin, str) and HEX40.fullmatch(pin)):
+        raise ReviewRefused(f"{label}: the adjudicated pin {pin!r} is not a 40-hex commit", "failed")
+    expected = sorted({str(value) for value in expected_sha256 if value is not None})
+    if not expected_sha256 or any(value is None for value in expected_sha256):
+        raise ReviewRefused(f"{label}: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the "
+                            "refuters judged")
+    if len(expected) > 1 or not HEX64.fullmatch(expected[0]):
+        raise ReviewRefused(f"{label}: the survivor's skill_md_sha256 at {pin} is {expected}, not one sha256")
+    try:
+        meta = gh(f"repos/{owner_repo}")
+        full = meta["full_name"]
+        commit = gh(f"repos/{full}/commits/{pin}")["sha"]
+    except (GhError, KeyError, TypeError) as error:
+        raise ReviewRefused(f"{label}: the adjudicated pin {pin} is unreadable ({error}); no review is written at "
+                            "another commit", "failed") from None
+    if commit != pin:
+        raise ReviewRefused(f"{full}@{name}: GitHub reads the pin as the commit {commit}, not the adjudicated pin {pin}",
+                            "failed")
+    try:
+        return pinned_skill_review(meta, name, pin, layers, lane, fit_models, expected[0])
+    except (GhError, KeyError, ValueError, TypeError) as error:
+        raise ReviewRefused(str(error), "ok") from None
+
+
+def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str, fit_models: str,
+                        expected: str) -> dict:
+    """skill_review once the pin reads as itself: the SKILL.md the CLI discovers at the pin, its bytes checked against
+    the judged sha256, and the skill folder's tree id covering them."""
     full, branch = meta["full_name"], meta["default_branch"]
-    commit, fallback = None, None
-    if pin:
-        try:
-            commit = gh(f"repos/{full}/commits/{pin}")["sha"]
-        except GhError as error:
-            fallback = f"the adjudicated pin {pin} is unreadable ({error})"
-    else:
-        fallback = "the survivor names no adjudicated pin"
-    if commit is None:
-        commit = gh(f"repos/{full}/commits/{branch}")["sha"]
-    tree = gh(f"repos/{full}/git/trees/{commit}?recursive=1")
+    tree = gh(f"repos/{full}/git/trees/{pin}?recursive=1")
     if tree.get("truncated"):
-        raise GhError(f"{full}@{name}: the git tree at {commit} is truncated, so the CLI's discovery order cannot be "
+        raise GhError(f"{full}@{name}: the git tree at {pin} is truncated, so the CLI's discovery order cannot be "
                       "followed")
     blobs = {entry["path"] for entry in tree.get("tree") or [] if isinstance(entry, dict)
              and entry.get("type") == "blob" and isinstance(entry.get("path"), str)}
     skill_dirs = {path[:-len("/SKILL.md")] for path in blobs if path.endswith("/SKILL.md")}
-    skill_path, raw, found_by = None, None, None
+    files = {}  # SKILL.md path -> (bytes or None, why the CLI skips it or None)
+
+    def read(path):
+        if path not in files:
+            try:
+                raw = gh_file(full, path, pin)
+            except GhError as error:
+                files[path] = (None, f"failed to read file: {error}")  # parseSkillMd skips an unreadable file
+            else:
+                files[path] = (raw, skill_md_problem(raw))
+        return files[path]
+
+    def inspect(folder):
+        raw, problem = read(f"{folder}/SKILL.md")
+        return problem, skill_md_name(raw) if raw is not None else None
+
+    skipped, skill_path, found_by = [], None, None
     if "SKILL.md" in blobs:  # a valid root SKILL.md is the only skill the CLI discovers (discoverSkills returns early)
-        raw = gh_file(full, "SKILL.md", commit)
-        metadata = CARD_METADATA.search(raw.decode("utf-8", "replace"))
-        root = frontmatter_scalars(metadata.group(2)) if metadata else {}
-        if root.get("name") and root.get("description"):
-            if root["name"].lower() != name.lower():
-                raise GhError(f"{full}@{name}: the root SKILL.md at {commit} is the skill {root['name']!r}, the only one "
-                              "the skills CLI discovers in this repository without --full-depth")
+        raw, problem = read("SKILL.md")
+        if problem is None:
+            root_name = skill_md_name(raw)
+            if root_name.lower() != name.lower():
+                raise GhError(f"{full}@{name}: the root SKILL.md at {pin} is the skill {root_name!r}, the only one the "
+                              "skills CLI discovers in this repository without --full-depth")
             skill_path, found_by = "SKILL.md", "the repository root's SKILL.md, the only skill the CLI discovers there"
         else:
-            raw = None  # no name or description: the CLI skips it and searches on
+            skipped.append(("", problem))  # the CLI skips it and searches on
     if skill_path is None:
-        plugin_dirs = cli_plugin_dirs(*(gh_json_file(full, path, commit) if path in blobs else None
+        plugin_dirs = cli_plugin_dirs(*(gh_json_file(full, path, pin) if path in blobs else None
                                         for path in PLUGIN_MANIFESTS))
-        folder, found_by = cli_skill_dir(skill_dirs, name, plugin_dirs)
+        folder, found_by = cli_skill_dir(skill_dirs, name, plugin_dirs, inspect, skipped)
         if folder is None:
-            raise GhError(f"{full}@{name} at {commit}: {found_by}")
+            detail = "; ".join(f"{f'{each}/' if each else ''}SKILL.md: {why}" for each, why in skipped)
+            raise GhError(f"{full}@{name} at {pin}: {found_by}" + (f" (skipped: {detail})" if detail else ""))
         skill_path = f"{folder}/SKILL.md"
-    raw = raw if raw is not None else gh_file(full, skill_path, commit)
+    raw = read(skill_path)[0]
     digest = hashlib.sha256(raw).hexdigest()
-    mismatched = sorted({value for value in expected_sha256 if value and value != digest})
-    if mismatched:
-        raise GhError(f"{full}@{name}: {skill_path} at {commit} has sha256 {digest}, not the survivor's skill_md_sha256 "
-                      f"{', '.join(mismatched)}: the review would describe other bytes than the refuters judged")
+    if digest != expected:
+        raise GhError(f"{full}@{name}: {skill_path} at {pin} has sha256 {digest}, not the survivor's skill_md_sha256 "
+                      f"{expected}: the review would describe other bytes than the refuters judged")
     text = raw.decode("utf-8", "replace")
-    metadata = CARD_METADATA.search(text)
-    fields = frontmatter_scalars(metadata.group(2)) if metadata else {}
-    if fields.get("name") and fields["name"].lower() != name.lower():
-        raise GhError(f"{full}@{name}: {skill_path} at {commit} declares name {fields.get('name')!r}")
+    frontmatter = SKILL_MD_FRONTMATTER.match(text)
+    fields = frontmatter_scalars(frontmatter.group(1)) if frontmatter else {}
     folder = skill_path.rsplit("/", 1)[0] if "/" in skill_path else ""
     yaml_path = f"{folder}/agents/openai.yaml" if folder else "agents/openai.yaml"
+    read_bytes = {skill_path: raw}
     if yaml_path in blobs:
-        implicit, policy_value, policy_note = openai_yaml_policy(gh_file(full, yaml_path, commit).decode("utf-8",
-                                                                                                          "replace"))
+        read_bytes[yaml_path] = gh_file(full, yaml_path, pin)
+        implicit, policy_value, policy_note = openai_yaml_policy(read_bytes[yaml_path].decode("utf-8", "replace"))
     else:
         implicit, policy_value, policy_note = True, None, "no agents/openai.yaml: Codex allows implicit invocation"
+    folder_sha = skill_folder_tree_sha(tree, folder, read_bytes)
     repository_license = (meta.get("license") or {}).get("spdx_id") or "NOASSERTION"
     license_id = fields.get("license") or repository_license
-    at = "the adjudicated pin" if fallback is None else f"the default branch's commit, because {fallback}"
-    checked = "; its sha256 matches the survivor's skill_md_sha256" if any(expected_sha256) else ""
     return {"schema_version": 1, "id": f"source-review-{review_name(f'{full}@{name}')}", "kind": "upstream_provenance",
-            "evidence_class": "source_review", "repository": f"{full}@{name}", "reviewed_commit": commit,
+            "evidence_class": "source_review", "repository": f"{full}@{name}", "reviewed_commit": pin,
             "readme_path": skill_path, "license": license_id, "layers": sorted(set(layers)),
-            "claim": (f"Source review of the skill {name} in {full} at commit {commit} ({at}; license {license_id}), "
-                      f"read from {skill_path}" + (f" and {yaml_path}" if yaml_path in blobs else "") + " at that "
-                      f"commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for "
-                      f"{name}{checked}. Survived the {lane} facts refuter and both fit refuters ({fit_models}); no "
-                      "install, invocation, benchmark or comparison with an installed skill."),
+            "claim": (f"Source review of the skill {name} in {full} at commit {pin} (the adjudicated pin; license "
+                      f"{license_id}), read from {skill_path}" + (f" and {yaml_path}" if yaml_path in blobs else "")
+                      + " at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers "
+                      f"for {name}; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree "
+                      f"at that commit is {folder_sha}. Survived the {lane} facts refuter and both fit refuters "
+                      f"({fit_models}); no install, invocation, benchmark or comparison with an installed skill."),
             "observed": {"stars": meta.get("stargazers_count"), "pushed_at": meta.get("pushed_at"),
                          "archived": meta.get("archived"), "default_branch": branch,
                          "repository_license": repository_license,
-                         "adjudicated_pin": pin, "reviewed_at_pin": fallback is None, "pin_fallback": fallback,
+                         "adjudicated_pin": pin, "pin_lookup": "ok",
                          "skill_md_found_by": found_by,
-                         "skill_md_sha256": digest, "skill_md_bytes": len(raw),
-                         "survivor_skill_md_sha256": sorted({value for value in expected_sha256 if value}) or None,
+                         "skipped_skill_md": [{"path": f"{each}/SKILL.md" if each else "SKILL.md", "reason": why}
+                                              for each, why in skipped],
+                         "skill_md_sha256": digest, "skill_md_bytes": len(raw), "survivor_skill_md_sha256": expected,
+                         "skill_folder_tree_sha": folder_sha,
                          "disable_model_invocation": claude_true(fields.get("disable-model-invocation")),
                          "openai_yaml_path": yaml_path if yaml_path in blobs else None,
-                         "allow_implicit_invocation": implicit,
+                         "openai_yaml_reader": openai_yaml_reader() if yaml_path in blobs else None,
+                         "codex_implicit": implicit, "unverified_reason": policy_note if implicit is None else None,
                          "openai_yaml_policy_value": policy_value, "openai_yaml_policy_note": policy_note},
-            "documentation_excerpts": excerpts_from(text[metadata.end():] if metadata else text,
-                                                    f"{skill_path}@{commit}")}
+            "documentation_excerpts": excerpts_from(frontmatter.group(2) if frontmatter else text,
+                                                    f"{skill_path}@{pin}")}
 
 
 def review(repository: str, layers: list, lane: str, fit_models: str, pin=None, expected_sha256=()) -> dict:
@@ -618,23 +1033,33 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     survivors = json.loads(args.survivors.read_text(encoding="utf-8"))
     # Review key -> the survivor URL first seen and every layer it survived in. A skill is reviewed once per adjudicated
-    # pin (<skill key>#<pin>): the same skill judged at two commits in two layers gets two reviews.
+    # pin (<skill key>#<pin>): the same skill judged at two commits in two layers gets two reviews. Each layer's
+    # skill_md_sha256 is kept, a null one too, which skill_review refuses.
     by_repo: dict[str, dict] = {}
     for survivor in survivors:
-        pin = survivor.get("pin") if SKILL_REF.fullmatch(str(survivor["repository"]).strip()) else None
+        skill = bool(SKILL_REF.fullmatch(str(survivor["repository"]).strip()))
+        pin = survivor.get("pin") if skill else None
         key = repository_key(survivor["repository"]) + (f"#{pin}" if pin else "")
         item = by_repo.setdefault(key, {"repository": survivor["repository"], "layers": [], "pin": pin,
-                                        "skill_md_sha256": set()})
+                                        "skill": skill, "skill_md_sha256": []})
         item["layers"].append(survivor["layer_id"])
-        if survivor.get("skill_md_sha256"):
-            item["skill_md_sha256"].add(survivor["skill_md_sha256"])
-    written, failed, docs = [], [], {}
+        if skill:
+            item["skill_md_sha256"].append(survivor.get("skill_md_sha256"))
+    written, failed, stopped, docs = [], [], [], {}
+
+    def stop(item, reason, pin_lookup):
+        """A skill survivor with no review: its layers are stopped (make_result.py refuses to complete them)."""
+        if item["skill"]:
+            stopped.append({"repository": item["repository"], "layers": sorted(set(item["layers"])),
+                            "status": "stopped", "pin": item["pin"], "pin_lookup": pin_lookup, "reason": reason})
+
     for key, item in sorted(by_repo.items()):
         try:
             docs[key] = review(item["repository"], item["layers"], args.lane, args.fit_models, item["pin"],
-                               sorted(item["skill_md_sha256"]))
-        except (GhError, KeyError, ValueError) as error:
+                               item["skill_md_sha256"])
+        except (GhError, KeyError, ValueError, TypeError) as error:
             failed.append(f"{item['repository']}: {error}")
+            stop(item, str(error), getattr(error, "pin_lookup", None))
     try:
         stems = unique_stems({key: doc["id"][len("source-review-"):] for key, doc in docs.items()})
     except ValueError as error:
@@ -651,12 +1076,13 @@ def main(argv=None) -> int:
                 previous = None
             reviewed = previous.get("repository", "") if isinstance(previous, dict) else ""
             if str(reviewed).lower().rstrip("/") != doc["repository"].lower():
-                failed.append(f"{by_repo[key]['repository']}: {path} already holds a review of another repository; "
-                              "not overwritten")
+                reason = f"{path} already holds a review of another repository; not overwritten"
+                failed.append(f"{by_repo[key]['repository']}: {reason}")
+                stop(by_repo[key], reason, "ok")
                 continue
         path.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         written.append({"repository": doc["repository"], "path": path.name, "layers": doc["layers"]})
-    print(json.dumps(written, indent=1))
+    print(json.dumps(written + stopped, indent=1))
     for line in failed:
         print(f"source_reviews.py: {line}", file=sys.stderr)
     return 1 if failed else 0

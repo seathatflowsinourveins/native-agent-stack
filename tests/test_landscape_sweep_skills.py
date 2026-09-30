@@ -2,9 +2,11 @@
 network, no codex, no model calls).
 
 Covered: the skills lifecycle catalog, the strict discover-skills return schema, skills layer inputs and their frozen
-scope, the templates a skills-* layer resolves to, a skills run staged by build_args.py and run by sweep.js under node
-(skipped without node), source reviews of skill survivors against a fake gh, and the decision record make_result.py
-writes from a skills sweep's RESULT.json. Schemas are validated with scripts/host_receipts.py's validator (the
+scope, each modality's own history and baseline, the templates a skills-* layer resolves to, a skills run staged by
+build_args.py and run by sweep.js under node (skipped without node), agents/openai.yaml as Codex reads it (the subset
+reader always, the PyYAML reader when PyYAML is installed), source reviews of skill survivors against a fake gh whose
+git trees carry the object ids git itself computes (git is required), make_result.py's pin checks of a skills
+RESULT.json, and the decision record it writes. Schemas are validated with scripts/host_receipts.py's validator (the
 repository's JSON Schema subset; CI installs no jsonschema), and with jsonschema as well when it is installed.
 """
 
@@ -13,6 +15,7 @@ from __future__ import annotations
 import base64
 import copy
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -20,6 +23,7 @@ import shutil
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -726,6 +730,47 @@ class SkillsSweepScriptTests(unittest.TestCase):
 
 source_reviews = harness_tests.load("source_reviews")
 FIND_BUGS = b"---\nname: find-bugs\ndescription: Find bugs.\n---\n\nBody.\n"
+PIN, HEAD = "c" * 40, "a" * 40  # the adjudicated pin, and the default branch's commit (the first round's fallback)
+GIT_ENV = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_TERMINAL_PROMPT": "0"}
+
+
+def skill_md(name="find-bugs", description="Find bugs.", extra=()) -> bytes:
+    """A SKILL.md with that name and description (None leaves the field out) and any extra frontmatter lines."""
+    fields = [f"name: {name}"] * (name is not None) + [f"description: {description}"] * (description is not None)
+    return ("---\n" + "".join(f"{line}\n" for line in [*fields, *extra]) + "---\n\nBody.\n").encode()
+
+
+NO_DESCRIPTION, NO_NAME = skill_md(description=None), skill_md(name=None)
+
+
+def git_out(case, directory, *args) -> str:
+    done = run(["git", "-C", directory, *args], env={**os.environ, **GIT_ENV})
+    case.assertEqual(done.returncode, 0, done.stderr)
+    return done.stdout
+
+
+def git_listing(case, files: dict, executable=()) -> dict:
+    """The GitHub git-trees answer (?recursive=1) for a commit holding `files` ({path: bytes}), with the object ids
+    upstream git computes: `git write-tree` gives the root tree's sha and `git ls-tree -r -t -l -z` every folder and
+    blob, so the fixture never reimplements git's object format."""
+    directory = temp_dir(case)
+    git_out(case, directory, "init", "-q")
+    for path, data in files.items():
+        target = directory / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        if path in executable:
+            target.chmod(0o755)
+    git_out(case, directory, "add", "-A")
+    root = git_out(case, directory, "write-tree").strip()
+    tree = []
+    for record in git_out(case, directory, "ls-tree", "-r", "-t", "-l", "-z", root).split("\0"):
+        if record:
+            meta, path = record.split("\t", 1)
+            mode, kind, sha, size = meta.split()
+            tree.append({"path": path, "mode": mode, "type": kind, "sha": sha,
+                         **({"size": int(size)} if kind == "blob" else {})})
+    return {"sha": root, "truncated": False, "tree": tree}
 
 
 class CliDiscoveryOrderTests(unittest.TestCase):
@@ -803,43 +848,111 @@ class CliDiscoveryOrderTests(unittest.TestCase):
             {"source": "./p"}]}, None), [])
 
 
-class OpenAiYamlPolicyTests(unittest.TestCase):
-    """agents/openai.yaml as Codex rust-v0.157.1 reads it (serde_yaml 0.9.34; see source_reviews.SERDE_YAML_BOOL)."""
+PYYAML = importlib.util.find_spec("yaml") is not None
+DOCUMENTED_OPENAI_YAML = (  # the example of https://developers.openai.com/codex/skills, Optional metadata
+    'interface:\n  display_name: "Find bugs"\n  brand_color: "#3B82F6"\n\npolicy:\n  allow_implicit_invocation: false\n'
+    '\ndependencies:\n  tools:\n    - type: "mcp"\n      value: "openaiDeveloperDocs"\n'
+    '      url: "https://developers.openai.com/mcp"\n')
+# agents/openai.yaml texts: name -> (text, the subset reader's codex_implicit, the PyYAML reader's codex_implicit, a
+# phrase of the subset reader's note). None is unverified. Codex rust-v0.157.1 deserializes the file with serde_yaml
+# 0.9.34, which reads a bool only from a plain true/True/TRUE/false/False/FALSE, follows anchors and aliases and
+# refuses a second document, and Codex ignores the whole file when that fails (implicit invocation stays allowed).
+OPENAI_YAML = {
+    "the documented block form": (DOCUMENTED_OPENAI_YAML, False, False, "policy.allow_implicit_invocation: false"),
+    "block true": ("policy:\n  allow_implicit_invocation: true\n", True, True, "allow_implicit_invocation: true"),
+    "FALSE after a document marker": ("---\npolicy:\n  allow_implicit_invocation: FALSE  # manual only\n", False,
+                                      False, "FALSE"),
+    "a quoted key": ('policy:\n  "allow_implicit_invocation": false\n', False, False, "false"),
+    "a block sequence beside it": ("policy:\n  products:\n    - codex\n  allow_implicit_invocation: false\n", False,
+                                   False, "false"),
+    "no policy (the Codex default)": ("interface:\n  display_name: Find bugs\n", True, True, "no policy"),
+    "comments only": ("# nothing yet\n", True, True, "no policy"),
+    "a null policy": ("policy:\ninterface:\n  display_name: X\n", True, True, "policy is null"),
+    "a null value": ("policy:\n  allow_implicit_invocation: ~\n", True, True, "is null"),
+    "not a direct child": ("policy:\n  products:\n    allow_implicit_invocation: false\n", True, True,
+                           "no policy.allow_implicit_invocation"),
+    "no, which serde_yaml does not read": ("policy:\n  allow_implicit_invocation: no\n", True, True,
+                                           "not a YAML boolean"),
+    "a quoted false": ('policy:\n  allow_implicit_invocation: "false"\n', True, True, "not a YAML boolean"),
+    "a scalar policy": ("policy: false\n", True, True, "not a mapping"),
+    "a list policy": ("policy:\n  - allow_implicit_invocation\n", True, True, "a list"),
+    "policy twice": ("policy:\n  allow_implicit_invocation: false\npolicy:\n  products:\n    - codex\n", True, True,
+                     "policy appears twice"),
+    "a flow mapping": ("policy: {allow_implicit_invocation: false}\n", None, False, "flow mapping"),
+    "a flow mapping over lines": ('policy: {\n  "allow_implicit_invocation": false,\n  products: [codex]\n}\n', None,
+                                  False, "flow mapping"),
+    "an anchored mapping": ("policy: &p\n  allow_implicit_invocation: false\n", None, False, "anchor"),
+    "an aliased mapping": ("shared: &p\n  allow_implicit_invocation: false\npolicy: *p\n", None, False, "anchor"),
+    "an alias alone": ("policy: *p\n", None, None, "alias"),
+    "a tagged value": ("policy:\n  allow_implicit_invocation: !!bool false\n", None, False, "tag"),
+    "a value on the next line": ("policy:\n  allow_implicit_invocation:\n    false\n", None, False, "not a key"),
+    "a null tag on false": ("policy:\n  allow_implicit_invocation: !!null false\n", None, True, "tag"),
+    "a block scalar": ("policy:\n  allow_implicit_invocation: |-\n    false\n", None, True, "block scalar"),
+    "two documents": ("policy:\n  allow_implicit_invocation: true\n---\npolicy:\n  allow_implicit_invocation: false\n",
+                      None, True, "second document"),
+    "tab indentation": ("policy:\n\tallow_implicit_invocation: false\n", None, None, "tab"),
+    "a plain scalar holding ': '": ("interface:\n  short_description: Finds bugs: fast\npolicy:\n"
+                                    "  allow_implicit_invocation: false\n", None, None, "': '"),
+}
 
-    def test_block_and_flow_forms(self):
-        for text in ("interface:\n  display_name: Find bugs\npolicy:\n  allow_implicit_invocation: false\n",
-                     "policy:\n  products: [codex]\n  allow_implicit_invocation: false  # manual only\n",
-                     "---\npolicy:\n  allow_implicit_invocation: FALSE\n",
-                     "policy: {allow_implicit_invocation: false}\n",
-                     'policy: {products: [codex], "allow_implicit_invocation": false}\n',
-                     "policy: {\n  allow_implicit_invocation: false,\n  products: [codex]\n}\n"):
-            with self.subTest(text=text):
-                allowed, value, _ = source_reviews.openai_yaml_policy(text)
-                self.assertEqual((allowed, value.lower()), (False, "false"))
-        self.assertEqual(source_reviews.openai_yaml_policy("policy:\n  allow_implicit_invocation: true\n")[:2],
-                         (True, "true"))
 
-    def test_absent_null_and_unreadable_values_leave_implicit_invocation_on(self):
-        for text, note in (
-                ("interface:\n  display_name: Find bugs\n", "no policy mapping"),
-                ("policy:\ninterface:\n  display_name: X\n", "policy is null"),
-                ("policy:\n  allow_implicit_invocation: ~\n", "is null"),
-                ("policy:\n  products:\n    allow_implicit_invocation: false\n", "no policy.allow_implicit_invocation"),
-                ("policy:\n  allow_implicit_invocation: no\n", "not a YAML boolean"),
-                ('policy:\n  allow_implicit_invocation: "false"\n', "not a YAML boolean"),
-                ("policy: {allow_implicit_invocation: 0}\n", "not a YAML boolean"),
-                ("policy:\n\tallow_implicit_invocation: false\n", "a tab indents a line"),
-                ("policy: false\n", "not a mapping"),
-                ("policy:\n  - allow_implicit_invocation\n", "a list"),
-                ("policy:\n  allow_implicit_invocation: false\npolicy:\n  products: []\n", "policy appears twice")):
-            with self.subTest(text=text):
-                allowed, _, how = source_reviews.openai_yaml_policy(text)
-                self.assertIs(allowed, True)
-                self.assertIn(note, how)
+class OpenAiYamlSubsetReaderTests(unittest.TestCase):
+    """agents/openai.yaml without PyYAML: the plain block-mapping subset the handwritten reader parses, and
+    codex_implicit null with the reason for anything else (GPT-6 review of #541: the reader said true for a valid
+    flow mapping and for an anchored policy, both false for Codex)."""
+
+    def test_the_subset_reader_is_right_or_says_it_cannot_tell(self):
+        with mock.patch.object(source_reviews, "yaml", None, create=True):
+            for name, (text, expected, _, phrase) in OPENAI_YAML.items():
+                with self.subTest(name):
+                    implicit, _, note = source_reviews.openai_yaml_policy(text)
+                    self.assertIs(implicit, expected, note)
+                    self.assertIn(phrase, note)
+                    if expected is None:
+                        self.assertIn("unverified", note)
+
+
+@unittest.skipUnless(PYYAML, "PyYAML is not installed; the subset reader's tests run without it")
+class OpenAiYamlPyYamlReaderTests(unittest.TestCase):
+    """agents/openai.yaml with PyYAML: its composer (libyaml's grammar, as serde_yaml's unsafe-libyaml) builds the node
+    tree, and serde_yaml 0.9.34's rules decide the value (a plain true/false spelling, no YAML 1.1 yes/no)."""
+
+    def test_the_pyyaml_reader_reads_what_codex_reads(self):
+        for name, (text, _, expected, _) in OPENAI_YAML.items():
+            with self.subTest(name):
+                implicit, _, note = source_reviews.openai_yaml_policy(text)
+                self.assertIs(implicit, expected, note)
+                if expected is None:
+                    self.assertIn("unverified", note)
+        self.assertIsNotNone(getattr(source_reviews, "yaml", None))
+        self.assertTrue(source_reviews.openai_yaml_reader().startswith("PyYAML"))
+
+
+class GitObjectIdTests(unittest.TestCase):
+    """source_reviews.py's folder hash is git's own tree id (the id the skills CLI's lock records as
+    skillFolderHash), recomputed from a tree listing and checked here against git itself."""
+
+    def test_blob_and_tree_ids_are_the_ids_git_computes(self):
+        # a-b, a.txt and the folder a sort as git sorts them (a folder compares as its name plus "/").
+        files = {"README.md": b"top\n", "skills/x/SKILL.md": skill_md("x"), "skills/x/agents/openai.yaml": b"a: 1\n",
+                 "skills/x/scripts/run.sh": b"#!/bin/sh\necho hi\n", "skills/x/a.txt": b"a\n",
+                 "skills/x/a/b.txt": b"b\n", "skills/x/a-b": b"dash\n"}
+        listing = git_listing(self, files, executable={"skills/x/scripts/run.sh"})
+        self.assertIn("100755", {entry["mode"] for entry in listing["tree"]})
+        ids = {entry["path"]: entry["sha"] for entry in listing["tree"]}
+        for folder in ("skills/x", "skills/x/agents", "skills/x/a", "skills", ""):
+            with self.subTest(folder or "the root"):
+                self.assertEqual(source_reviews.git_tree_id(listing["tree"], folder),
+                                 ids[folder] if folder else listing["sha"])
+        for path, data in files.items():
+            self.assertEqual(source_reviews.git_blob_id(data), ids[path], path)
 
 
 class SkillSourceReviewTests(unittest.TestCase):
-    COMMIT, PIN = "a" * 40, "c" * 40
+    """source_reviews.py on skill survivors against a fake gh whose git trees carry git's own object ids."""
+
+    META = {"full_name": "O/Skills-Repo", "default_branch": "main", "license": {"spdx_id": "MIT"},
+            "description": "skills", "stargazers_count": 7, "pushed_at": "2026-09-29T00:00:00Z", "archived": False}
 
     def review(self, answers, survivors):
         work, bin_dir = temp_dir(self), temp_dir(self)
@@ -851,83 +964,118 @@ class SkillSourceReviewTests(unittest.TestCase):
                     "--out", work / "reviews", "--lane", LANE], env=env)
         return done, work / "reviews"
 
-    def answers(self, tree, files, pinned=None, truncated=False):
-        """Fake gh answers for O/Skills-Repo: the default branch at COMMIT holding `tree` and `files`, and with `pinned`
-        ((tree, files)) a readable adjudicated pin PIN as well."""
-        answers = {"repos/o/skills-repo": {"full_name": "O/Skills-Repo", "default_branch": "main",
-                                           "license": {"spdx_id": "MIT"}, "description": "skills",
-                                           "stargazers_count": 7, "pushed_at": "2026-09-29T00:00:00Z",
-                                           "archived": False},
-                   "repos/O/Skills-Repo/commits/main": {"sha": self.COMMIT}}
+    @staticmethod
+    def contents(files) -> dict:
+        """{path: bytes}; None stands for a valid SKILL.md named after its folder, or placeholder bytes elsewhere."""
+        out = {}
+        for path, data in files.items():
+            if data is None:
+                folder = path.rsplit("/", 2)[-2] if path.endswith("/SKILL.md") else None
+                data = skill_md(folder, f"The {folder} skill.") if folder else f"placeholder {path}\n".encode()
+            out[path] = data
+        return out
 
-        def add(commit, paths, contents):
-            answers[f"repos/O/Skills-Repo/git/trees/{commit}?recursive=1"] = {
-                "truncated": truncated, "tree": [{"path": path, "type": "blob"} for path in paths]}
-            for path, raw in contents.items():
-                answers[f"repos/O/Skills-Repo/contents/{path}?ref={commit}"] = {
-                    "path": path, "type": "file", "encoding": "base64", "content": base64.b64encode(raw).decode()}
+    def add_commit(self, answers, commit, files, truncated=False):
+        contents = self.contents(files)
+        answers[f"repos/O/Skills-Repo/git/trees/{commit}?recursive=1"] = dict(git_listing(self, contents),
+                                                                              truncated=truncated)
+        for path, raw in contents.items():
+            answers[f"repos/O/Skills-Repo/contents/{path}?ref={commit}"] = {
+                "path": path, "type": "file", "encoding": "base64", "content": base64.b64encode(raw).decode()}
 
-        add(self.COMMIT, tree, files)
-        if pinned:
-            answers[f"repos/O/Skills-Repo/commits/{self.PIN}"] = {"sha": self.PIN}
-            add(self.PIN, *pinned)
+    def answers(self, files, pin=PIN, truncated=False, head=None):
+        """Fake gh answers for O/Skills-Repo: `files` at the adjudicated pin, whose commit lookup answers that pin (pin
+        None: not answered, so gh exits 1); with `head`, the default branch at HEAD holding `head`."""
+        answers = {"repos/o/skills-repo": dict(self.META)}
+        if pin:
+            answers[f"repos/O/Skills-Repo/commits/{pin}"] = {"sha": pin}
+            self.add_commit(answers, pin, files, truncated)
+        if head is not None:
+            answers["repos/O/Skills-Repo/commits/main"] = {"sha": HEAD}
+            self.add_commit(answers, HEAD, head, truncated)
         return answers
 
-    def test_a_skill_survivor_is_reviewed_at_its_skill_md(self):
-        skill_md = ("---\nname: find-bugs\ndescription: Find bugs in a change.\ndisable-model-invocation: true\n---\n\n"
-                    "# Find bugs\n\n" + "A long enough paragraph about how the skill hunts bugs in a change. " * 3
-                    ).encode()
-        openai_yaml = b"interface:\n  display_name: Find bugs\npolicy:\n  allow_implicit_invocation: false\n"
-        answers = self.answers(["skills/find-bugs/SKILL.md", "skills/find-bugs/agents/openai.yaml",
-                                "skills/other/SKILL.md"],
-                               {"skills/find-bugs/SKILL.md": skill_md,
-                                "skills/find-bugs/agents/openai.yaml": openai_yaml})
-        done, out = self.review(answers, [{"layer_id": "skills-review", "repository": "o/skills-repo@find-bugs"},
-                                          {"layer_id": "skills-debug", "repository": "O/Skills-Repo@find-bugs"}])
+    @staticmethod
+    def survivor(judged=FIND_BUGS, layer_id="skills-debug", repository="o/skills-repo@find-bugs", pin=PIN) -> dict:
+        """A survivors.json row: the pin and the sha256 of the SKILL.md bytes the refuters judged."""
+        return {"layer_id": layer_id, "repository": repository, "pin": pin,
+                "skill_md_sha256": hashlib.sha256(judged).hexdigest()}
+
+    @staticmethod
+    def reviewed(out, name="o-skills-repo-find-bugs.json") -> dict:
+        return json.loads((out / name).read_text(encoding="utf-8"))
+
+    def test_a_skill_survivor_is_reviewed_at_its_adjudicated_pin(self):
+        skill = ("---\nname: find-bugs\ndescription: Find bugs in a change.\ndisable-model-invocation: true\n---\n\n"
+                 "# Find bugs\n\n" + "A long enough paragraph about how the skill hunts bugs in a change. " * 3).encode()
+        files = {"skills/find-bugs/SKILL.md": skill, "skills/other/SKILL.md": None,
+                 "skills/find-bugs/agents/openai.yaml":
+                     b"interface:\n  display_name: Find bugs\npolicy:\n  allow_implicit_invocation: false\n"}
+        done, out = self.review(self.answers(files), [self.survivor(skill, "skills-review"),
+                                                      self.survivor(skill, repository="O/Skills-Repo@find-bugs")])
         self.assertEqual(done.returncode, 0, done.stderr)
         self.assertEqual(json.loads(done.stdout), [{"repository": "O/Skills-Repo@find-bugs",
                                                     "path": "o-skills-repo-find-bugs.json",
                                                     "layers": ["skills-debug", "skills-review"]}])
-        review = json.loads((out / "o-skills-repo-find-bugs.json").read_text())
+        review = self.reviewed(out)
+        observed = review["observed"]
         self.assertEqual((review["id"], review["reviewed_commit"], review["readme_path"], review["license"]),
-                         ("source-review-o-skills-repo-find-bugs", self.COMMIT, "skills/find-bugs/SKILL.md", "MIT"))
-        self.assertEqual(review["observed"]["skill_md_sha256"], hashlib.sha256(skill_md).hexdigest())
-        self.assertEqual(review["observed"]["skill_md_bytes"], len(skill_md))
-        self.assertIs(review["observed"]["disable_model_invocation"], True)
-        self.assertIs(review["observed"]["allow_implicit_invocation"], False)
-        self.assertEqual(review["observed"]["openai_yaml_policy_value"], "false")
-        self.assertEqual(review["documentation_excerpts"][0]["source"], f"skills/find-bugs/SKILL.md@{self.COMMIT}")
+                         ("source-review-o-skills-repo-find-bugs", PIN, "skills/find-bugs/SKILL.md", "MIT"))
+        self.assertEqual((observed["adjudicated_pin"], observed["pin_lookup"]), (PIN, "ok"))
+        self.assertEqual((observed["skill_md_sha256"], observed["survivor_skill_md_sha256"], observed["skill_md_bytes"]),
+                         (hashlib.sha256(skill).hexdigest(), hashlib.sha256(skill).hexdigest(), len(skill)))
+        # The skill folder's git tree id at the pin: the id the skills CLI's lock records as skillFolderHash.
+        listing = git_listing(self, self.contents(files))
+        self.assertEqual(observed["skill_folder_tree_sha"],
+                         next(entry["sha"] for entry in listing["tree"] if entry["path"] == "skills/find-bugs"))
+        self.assertIs(observed["disable_model_invocation"], True)
+        self.assertEqual((observed["codex_implicit"], observed["unverified_reason"], observed["openai_yaml_policy_value"]),
+                         (False, None, "false"))
+        self.assertEqual(observed["skipped_skill_md"], [])
+        self.assertEqual(review["documentation_excerpts"][0]["source"], f"skills/find-bugs/SKILL.md@{PIN}")
         self.assertNotIn("disable-model-invocation", json.dumps(review["documentation_excerpts"]))
-        self.assertIn("skill find-bugs", review["claim"])
-        # Without a pin in survivors.json, the review is at the default branch's commit and says so.
-        self.assertEqual((review["observed"]["adjudicated_pin"], review["observed"]["reviewed_at_pin"]), (None, False))
-        self.assertIn("names no adjudicated pin", review["observed"]["pin_fallback"])
-        self.assertIn("the default branch's commit, because the survivor names no adjudicated pin", review["claim"])
+        for phrase in ("skill find-bugs", "(the adjudicated pin; license MIT)",
+                       "its sha256 matches the survivor's skill_md_sha256", observed["skill_folder_tree_sha"]):
+            self.assertIn(phrase, review["claim"])
+        self.assertNotIn("default branch", review["claim"])
         # make_result.py matches the review to the survivor as the ledger compares repositories.
         self.assertEqual(make_result.review_key(review["repository"]), make_result.review_key("o/skills-repo@find-bugs"))
 
     def test_a_skill_without_openai_yaml_keeps_implicit_invocation(self):
         # A trailofbits/skills-shaped plugin: marketplace.json names the plugin, and its skills/ folder holds the skill.
         marketplace = json.dumps({"plugins": [{"name": "p", "source": "./plugins/p"}]}).encode()
-        done, out = self.review(self.answers(["plugins/p/skills/find-bugs/SKILL.md", ".claude-plugin/marketplace.json",
-                                              "skills/other/SKILL.md"],
-                                             {"plugins/p/skills/find-bugs/SKILL.md": FIND_BUGS,
-                                              ".claude-plugin/marketplace.json": marketplace}),
-                                [{"layer_id": "skills-review", "repository": "o/skills-repo@find-bugs"}])
+        files = {"plugins/p/skills/find-bugs/SKILL.md": FIND_BUGS, ".claude-plugin/marketplace.json": marketplace,
+                 "skills/other/SKILL.md": None}
+        done, out = self.review(self.answers(files), [self.survivor()])
         self.assertEqual(done.returncode, 0, done.stderr)
-        review = json.loads((out / "o-skills-repo-find-bugs.json").read_text())
+        review = self.reviewed(out)
         observed = review["observed"]
         self.assertEqual(review["readme_path"], "plugins/p/skills/find-bugs/SKILL.md")
-        self.assertEqual((observed["disable_model_invocation"], observed["allow_implicit_invocation"]), (False, True))
+        self.assertEqual((observed["disable_model_invocation"], observed["codex_implicit"], observed["unverified_reason"]),
+                         (False, True, None))
         self.assertIn("no agents/openai.yaml", observed["openai_yaml_policy_note"])
 
-    def test_the_cli_discovery_order_picks_skills_over_translations_and_agent_copies(self):
-        tree = ["skills/find-bugs/SKILL.md", "docs/fr/skills/find-bugs/SKILL.md", ".kiro/skills/find-bugs/SKILL.md",
-                ".agents/skills/find-bugs/SKILL.md", "docs/fr/skills/find-bugs/agents/openai.yaml"]
-        done, out = self.review(self.answers(tree, {"skills/find-bugs/SKILL.md": FIND_BUGS}),
-                                [{"layer_id": "skills-debug", "repository": "o/skills-repo@find-bugs"}])
+    def test_an_openai_yaml_outside_the_subset_is_unverified_without_pyyaml(self):
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS,
+                 "skills/find-bugs/agents/openai.yaml": b"policy: {allow_implicit_invocation: false}\n"}
+        done, out = self.review(self.answers(files), [self.survivor()])
         self.assertEqual(done.returncode, 0, done.stderr)
-        review = json.loads((out / "o-skills-repo-find-bugs.json").read_text())
+        observed = self.reviewed(out)["observed"]
+        if PYYAML:  # source_reviews.py runs under this interpreter
+            self.assertEqual((observed["codex_implicit"], observed["unverified_reason"]), (False, None))
+            self.assertTrue(observed["openai_yaml_reader"].startswith("PyYAML"), observed["openai_yaml_reader"])
+        else:
+            self.assertIsNone(observed["codex_implicit"])
+            self.assertIn("flow mapping", observed["unverified_reason"])
+            self.assertTrue(observed["openai_yaml_reader"].startswith("subset"), observed["openai_yaml_reader"])
+
+    def test_the_cli_discovery_order_picks_skills_over_translations_and_agent_copies(self):
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS, "docs/fr/skills/find-bugs/SKILL.md": None,
+                 ".kiro/skills/find-bugs/SKILL.md": None, ".agents/skills/find-bugs/SKILL.md": None,
+                 "docs/fr/skills/find-bugs/agents/openai.yaml": None}
+        done, out = self.review(self.answers(files), [self.survivor()])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        review = self.reviewed(out)
         self.assertEqual(review["readme_path"], "skills/find-bugs/SKILL.md")
         self.assertIn("skills/, the first location", review["observed"]["skill_md_found_by"])
         self.assertIsNone(review["observed"]["openai_yaml_path"])  # the translation's openai.yaml is not the skill's
@@ -938,103 +1086,187 @@ class SkillSourceReviewTests(unittest.TestCase):
                                 ("0", False), (None, False)):
             with self.subTest(value=value):
                 flag = "" if value is None else f"disable-model-invocation: {value}\n"
-                skill_md = f"---\nname: find-bugs  # the folder's name\ndescription: Find bugs.\n{flag}---\n\nBody.\n"
-                done, out = self.review(self.answers(["skills/find-bugs/SKILL.md"],
-                                                     {"skills/find-bugs/SKILL.md": skill_md.encode()}),
-                                        [{"layer_id": "skills-debug", "repository": "o/skills-repo@find-bugs"}])
+                skill = f"---\nname: find-bugs  # the folder's name\ndescription: Find bugs.\n{flag}---\n\nBody.\n".encode()
+                done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": skill}), [self.survivor(skill)])
                 self.assertEqual(done.returncode, 0, done.stderr)
-                observed = json.loads((out / "o-skills-repo-find-bugs.json").read_text())["observed"]
-                self.assertIs(observed["disable_model_invocation"], expected)
+                self.assertIs(self.reviewed(out)["observed"]["disable_model_invocation"], expected)
 
-    def test_a_skill_is_reviewed_at_its_adjudicated_pin_and_its_hash_is_checked(self):
-        pinned = b"---\nname: find-bugs\ndescription: Find bugs, as judged.\n---\n\nThe judged body.\n"
-        answers = self.answers(["skills/find-bugs/SKILL.md"], {"skills/find-bugs/SKILL.md": FIND_BUGS},
-                               pinned=(["skills/find-bugs/SKILL.md", "skills/find-bugs/agents/openai.yaml"],
-                                       {"skills/find-bugs/SKILL.md": pinned,
-                                        "skills/find-bugs/agents/openai.yaml": b"policy: {allow_implicit_invocation: false}\n"}))
-        survivor = {"layer_id": "skills-debug", "repository": "o/skills-repo@find-bugs", "pin": self.PIN,
-                    "skill_md_sha256": hashlib.sha256(pinned).hexdigest()}
-        done, out = self.review(answers, [survivor])
-        self.assertEqual(done.returncode, 0, done.stderr)
-        review = json.loads((out / "o-skills-repo-find-bugs.json").read_text())
-        observed = review["observed"]
-        self.assertEqual((review["reviewed_commit"], observed["skill_md_sha256"]),
-                         (self.PIN, hashlib.sha256(pinned).hexdigest()))
-        self.assertEqual((observed["adjudicated_pin"], observed["reviewed_at_pin"], observed["pin_fallback"]),
-                         (self.PIN, True, None))
-        self.assertEqual(observed["survivor_skill_md_sha256"], [hashlib.sha256(pinned).hexdigest()])
-        self.assertIs(observed["allow_implicit_invocation"], False)  # the flow form
-        self.assertIn("(the adjudicated pin; license MIT)", review["claim"])
-        self.assertIn("its sha256 matches the survivor's skill_md_sha256", review["claim"])
-        # Bytes other than the judged ones are refused, never reviewed.
-        done, out = self.review(answers, [dict(survivor, skill_md_sha256="f" * 64)])
-        self.assertEqual(done.returncode, 1)
+    def test_bytes_other_than_the_judged_skill_md_are_refused(self):
+        judged = skill_md(description="Find bugs, as judged.")
+        done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor(judged)])
+        self.assertEqual(done.returncode, 1, done.stdout)
         self.assertIn("not the survivor's skill_md_sha256", done.stderr)
-        self.assertEqual(json.loads(done.stdout), [])
-
-    def test_an_unreadable_pin_falls_back_to_the_default_branch_and_says_so(self):
-        survivor = {"layer_id": "skills-debug", "repository": "o/skills-repo@find-bugs", "pin": self.PIN,
-                    "skill_md_sha256": hashlib.sha256(FIND_BUGS).hexdigest()}
-        done, out = self.review(self.answers(["skills/find-bugs/SKILL.md"], {"skills/find-bugs/SKILL.md": FIND_BUGS}),
-                                [survivor])
-        self.assertEqual(done.returncode, 0, done.stderr)
-        review = json.loads((out / "o-skills-repo-find-bugs.json").read_text())
-        self.assertEqual((review["reviewed_commit"], review["observed"]["reviewed_at_pin"]), (self.COMMIT, False))
-        self.assertIn(f"the adjudicated pin {self.PIN} is unreadable", review["observed"]["pin_fallback"])
-        self.assertIn(f"the default branch's commit, because the adjudicated pin {self.PIN} is unreadable",
-                      review["claim"])
+        [entry] = json.loads(done.stdout)
+        self.assertEqual((entry["status"], entry["pin"], entry["pin_lookup"]), ("stopped", PIN, "ok"))
+        self.assertEqual(list(out.glob("*.json")), [])
 
     def test_one_skill_judged_at_two_pins_gets_one_review_per_pin(self):
-        pinned = b"---\nname: find-bugs\ndescription: Find bugs, older.\n---\n\nOlder body.\n"
-        answers = self.answers(["skills/find-bugs/SKILL.md"], {"skills/find-bugs/SKILL.md": FIND_BUGS},
-                               pinned=(["skills/find-bugs/SKILL.md"], {"skills/find-bugs/SKILL.md": pinned}))
-        answers[f"repos/O/Skills-Repo/commits/{self.COMMIT}"] = {"sha": self.COMMIT}
-        done, out = self.review(answers, [
-            {"layer_id": "skills-debug", "repository": "o/skills-repo@find-bugs", "pin": self.PIN,
-             "skill_md_sha256": hashlib.sha256(pinned).hexdigest()},
-            {"layer_id": "skills-review", "repository": "o/skills-repo@find-bugs", "pin": self.COMMIT,
-             "skill_md_sha256": hashlib.sha256(FIND_BUGS).hexdigest()}])
+        older = skill_md(description="Find bugs, older.")
+        answers = self.answers({"skills/find-bugs/SKILL.md": older})
+        answers[f"repos/O/Skills-Repo/commits/{HEAD}"] = {"sha": HEAD}
+        self.add_commit(answers, HEAD, {"skills/find-bugs/SKILL.md": FIND_BUGS})
+        done, out = self.review(answers, [self.survivor(older), self.survivor(FIND_BUGS, "skills-review", pin=HEAD)])
         self.assertEqual(done.returncode, 0, done.stderr)
         written = json.loads(done.stdout)
         self.assertEqual(sorted(item["layers"] for item in written), [["skills-debug"], ["skills-review"]])
         self.assertEqual(len({item["path"] for item in written}), 2)
         self.assertTrue(all(re.fullmatch(r"o-skills-repo-find-bugs-[0-9a-f]{10}\.json", item["path"]) for item in written))
-        commits = {json.loads((out / item["path"]).read_text())["reviewed_commit"]: item["layers"] for item in written}
-        self.assertEqual(commits, {self.PIN: ["skills-debug"], self.COMMIT: ["skills-review"]})
+        commits = {self.reviewed(out, item["path"])["reviewed_commit"]: item["layers"] for item in written}
+        self.assertEqual(commits, {PIN: ["skills-debug"], HEAD: ["skills-review"]})
         # make_result.py takes, for each layer's survivor, the review of that repository that names the layer.
         for layer_id in ("skills-debug", "skills-review"):
             matches = [item for item in written if make_result.review_key(item["repository"])
                        == make_result.review_key("o/skills-repo@find-bugs") and layer_id in item["layers"]]
             self.assertEqual(len(matches), 1, layer_id)
 
-    def test_an_unresolvable_skill_is_reported_and_skipped(self):
-        other_root = b"---\nname: other-skill\ndescription: Another skill.\n---\n\nBody.\n"
+    def test_an_unresolvable_skill_is_reported_and_not_reviewed(self):
+        other_root = skill_md("other-skill", "Another skill.")
         cases = (
-            (["skills/other/SKILL.md"], {}, False, "no folder named find-bugs in the locations the CLI searches"),
-            (["docs/en/skills/find-bugs/SKILL.md", "skills/other/SKILL.md"], {}, False,
+            ({"skills/other/SKILL.md": None}, False, "no folder named find-bugs in the locations the CLI searches"),
+            ({"docs/en/skills/find-bugs/SKILL.md": None, "skills/other/SKILL.md": None}, False,
              "no folder named find-bugs in the locations the CLI searches"),
-            (["skills/a/find-bugs/SKILL.md", "skills/b/find-bugs/SKILL.md"], {}, False,
+            ({"skills/a/find-bugs/SKILL.md": None, "skills/b/find-bugs/SKILL.md": None}, False,
              "2 folders named find-bugs in skills/"),
-            (["a/find-bugs/SKILL.md", "b/find-bugs/SKILL.md"], {}, False, "2 unnested folders named find-bugs"),
-            (["SKILL.md", "skills/find-bugs/SKILL.md"], {"SKILL.md": other_root}, False,
-             "the root SKILL.md at " + self.COMMIT + " is the skill 'other-skill'"),
-            (["skills/find-bugs/SKILL.md"], {"skills/find-bugs/SKILL.md": FIND_BUGS}, True, "is truncated"))
-        for tree, files, truncated, message in cases:
+            ({"a/find-bugs/SKILL.md": None, "b/find-bugs/SKILL.md": None}, False, "2 unnested folders named find-bugs"),
+            ({"SKILL.md": other_root, "skills/find-bugs/SKILL.md": FIND_BUGS}, False,
+             f"the root SKILL.md at {PIN} is the skill 'other-skill'"),
+            ({"skills/find-bugs/SKILL.md": FIND_BUGS}, True, "is truncated"))
+        for files, truncated, message in cases:
             with self.subTest(message):
-                done, out = self.review(self.answers(tree, files, truncated=truncated),
-                                        [{"layer_id": "skills-review", "repository": "o/skills-repo@find-bugs"}])
-                self.assertEqual(done.returncode, 1)
+                done, out = self.review(self.answers(files, truncated=truncated), [self.survivor()])
+                self.assertEqual(done.returncode, 1, done.stdout)
                 self.assertIn(message, done.stderr)
-                self.assertEqual(json.loads(done.stdout), [])
+                self.assertEqual([entry["status"] for entry in json.loads(done.stdout)], ["stopped"])
 
     def test_a_root_skill_md_without_a_description_is_skipped_like_the_cli_skips_it(self):
-        root = b"---\nname: find-bugs\n---\n\nNo description.\n"
-        done, out = self.review(self.answers(["SKILL.md", "skills/find-bugs/SKILL.md"],
-                                             {"SKILL.md": root, "skills/find-bugs/SKILL.md": FIND_BUGS}),
-                                [{"layer_id": "skills-review", "repository": "o/skills-repo@find-bugs"}])
+        done, out = self.review(self.answers({"SKILL.md": NO_DESCRIPTION, "skills/find-bugs/SKILL.md": FIND_BUGS}),
+                                [self.survivor()])
         self.assertEqual(done.returncode, 0, done.stderr)
-        self.assertEqual(json.loads((out / "o-skills-repo-find-bugs.json").read_text())["readme_path"],
-                         "skills/find-bugs/SKILL.md")
+        review = self.reviewed(out)
+        self.assertEqual(review["readme_path"], "skills/find-bugs/SKILL.md")
+        self.assertEqual(review["observed"]["skipped_skill_md"],
+                         [{"path": "SKILL.md", "reason": "missing required frontmatter field(s): description"}])
+
+    # vercel-labs/skills v1.7.0 (src/skills.ts): parseSkillMd skips a SKILL.md without a name or description before
+    # discoverSkills applies its location order, so an invalid copy never claims the name (GPT-6 review of #541).
+
+    def test_an_invalid_earlier_copy_is_skipped_and_a_valid_later_copy_wins(self):
+        # The root's child folders come first, and find-bugs/ has no description.
+        done, out = self.review(self.answers({"find-bugs/SKILL.md": NO_DESCRIPTION,
+                                              "skills/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor()])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        review = self.reviewed(out)
+        self.assertEqual(review["readme_path"], "skills/find-bugs/SKILL.md")
+        self.assertEqual(review["observed"].get("skipped_skill_md"), [
+            {"path": "find-bugs/SKILL.md", "reason": "missing required frontmatter field(s): description"}])
+
+    def test_a_skill_whose_every_copy_is_invalid_is_reported_invalid_not_reviewed(self):
+        done, out = self.review(self.answers({"find-bugs/SKILL.md": NO_DESCRIPTION,
+                                              "skills/find-bugs/SKILL.md": NO_NAME}), [self.survivor(NO_DESCRIPTION)])
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertEqual(list(out.glob("*.json")), [])
+        self.assertIn("find-bugs/SKILL.md: missing required frontmatter field(s): description", done.stderr)
+        self.assertIn("skills/find-bugs/SKILL.md: missing required frontmatter field(s): name", done.stderr)
+        [entry] = json.loads(done.stdout)
+        self.assertEqual((entry["status"], entry["pin_lookup"]), ("stopped", "ok"))
+        self.assertIn("every copy of find-bugs", entry["reason"])
+
+    def test_a_valid_earlier_copy_wins_over_an_invalid_later_one(self):
+        done, out = self.review(self.answers({"find-bugs/SKILL.md": FIND_BUGS,
+                                              "skills/find-bugs/SKILL.md": NO_DESCRIPTION}), [self.survivor()])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        review = self.reviewed(out)
+        self.assertEqual(review["readme_path"], "find-bugs/SKILL.md")
+        self.assertEqual(review["observed"].get("skipped_skill_md"), [])  # the later copy is never read
+
+    def test_one_valid_copy_among_same_location_duplicates_is_taken(self):
+        done, out = self.review(self.answers({"skills/a/find-bugs/SKILL.md": NO_NAME,
+                                              "skills/b/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor()])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        review = self.reviewed(out)
+        self.assertEqual(review["readme_path"], "skills/b/find-bugs/SKILL.md")
+        self.assertEqual(review["observed"].get("skipped_skill_md"), [
+            {"path": "skills/a/find-bugs/SKILL.md", "reason": "missing required frontmatter field(s): name"}])
+
+    def test_the_recursive_search_runs_when_no_location_holds_a_valid_skill(self):
+        # discoverSkills searches every folder only when its locations added no skill; skills/other adds none.
+        done, out = self.review(self.answers({"skills/other/SKILL.md": skill_md("other", None),
+                                              "x/y/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor()])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        review = self.reviewed(out)
+        self.assertEqual(review["readme_path"], "x/y/find-bugs/SKILL.md")
+        self.assertIn("recursive search", review["observed"]["skill_md_found_by"])
+
+    # The adjudicated pin and the folder hash (GPT-6 review of #541: an unreadable pin fell back to the default
+    # branch, a null hash let other bytes pass, and a SKILL.md hash did not freeze agents/openai.yaml).
+
+    def test_an_unreadable_pin_gives_no_review_and_a_stopped_layer(self):
+        # The pin's commit lookup is not answered (gh exits 1); the first round reviewed the default branch instead.
+        answers = self.answers({}, pin=None, head={"skills/find-bugs/SKILL.md": FIND_BUGS})
+        done, out = self.review(answers, [self.survivor()])
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertEqual(list(out.glob("*.json")), [])
+        [entry] = json.loads(done.stdout)
+        self.assertEqual({key: entry[key] for key in ("repository", "layers", "pin", "pin_lookup", "status")},
+                         {"repository": "o/skills-repo@find-bugs", "layers": ["skills-debug"], "pin": PIN,
+                          "pin_lookup": "failed", "status": "stopped"})
+        self.assertIn(f"the adjudicated pin {PIN} is unreadable", entry["reason"])
+        self.assertIn(f"gh api repos/O/Skills-Repo/commits/{PIN}", entry["reason"])
+        self.assertIn(entry["reason"], done.stderr)
+
+    def test_a_pin_that_resolves_to_another_commit_is_refused(self):
+        answers = self.answers({"skills/find-bugs/SKILL.md": FIND_BUGS}, head={"skills/find-bugs/SKILL.md": FIND_BUGS})
+        answers[f"repos/O/Skills-Repo/commits/{PIN}"] = {"sha": HEAD}
+        done, out = self.review(answers, [self.survivor()])
+        self.assertEqual(done.returncode, 1, done.stdout)
+        [entry] = json.loads(done.stdout)
+        self.assertEqual((entry["pin_lookup"], entry["status"]), ("failed", "stopped"))
+        self.assertIn(f"not the adjudicated pin {PIN}", entry["reason"])
+
+    def test_a_survivor_without_a_pin_or_with_a_null_hash_is_not_reviewed(self):
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS}
+        for survivor, lookup, message in ((dict(self.survivor(), pin=None), "failed", "names no adjudicated pin"),
+                                          (dict(self.survivor(), pin="c0ffee"), "failed", "not a 40-hex commit"),
+                                          (dict(self.survivor(), skill_md_sha256=None), None,
+                                           "skill_md_sha256 is null")):
+            with self.subTest(message):
+                done, out = self.review(self.answers(files, head=files), [survivor])
+                self.assertEqual(done.returncode, 1, done.stdout)
+                self.assertEqual(list(out.glob("*.json")), [])
+                [entry] = json.loads(done.stdout)
+                self.assertEqual((entry["status"], entry["pin_lookup"]), ("stopped", lookup))
+                self.assertIn(message, entry["reason"])
+
+    def test_the_folder_hash_covers_agents_openai_yaml(self):
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS,
+                 "skills/find-bugs/agents/openai.yaml": b"policy:\n  allow_implicit_invocation: true\n"}
+        changed = dict(files, **{"skills/find-bugs/agents/openai.yaml": b"policy:\n  allow_implicit_invocation: false\n"})
+        observed = []
+        for version in (files, changed):
+            done, out = self.review(self.answers(version), [self.survivor()])
+            self.assertEqual(done.returncode, 0, done.stderr)
+            observed.append(self.reviewed(out)["observed"])
+        folder = [item.get("skill_folder_tree_sha") for item in observed]
+        self.assertEqual([item["skill_md_sha256"] for item in observed], [hashlib.sha256(FIND_BUGS).hexdigest()] * 2)
+        self.assertTrue(all(isinstance(value, str) and HEX40.fullmatch(value) for value in folder), folder)
+        self.assertNotEqual(folder[0], folder[1])
+        self.assertEqual([item["codex_implicit"] for item in observed], [True, False])
+
+    def test_a_tree_listing_that_does_not_cover_the_bytes_read_is_refused(self):
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS,
+                 "skills/find-bugs/agents/openai.yaml": b"policy:\n  allow_implicit_invocation: false\n"}
+        other = git_listing(self, dict(files, **{"skills/find-bugs/agents/openai.yaml": b"policy:\n  products:\n"}))
+        for path, message in (("skills/find-bugs/agents/openai.yaml", "not the git blob"),
+                              ("skills/find-bugs", "does not hash to")):
+            with self.subTest(path):
+                answers = self.answers(files)
+                listed = answers[f"repos/O/Skills-Repo/git/trees/{PIN}?recursive=1"]["tree"]
+                entry = next(item for item in listed if item["path"] == path)
+                entry["sha"] = next(item["sha"] for item in other["tree"] if item["path"] == path)
+                done, out = self.review(answers, [self.survivor()])
+                self.assertEqual(done.returncode, 1, done.stdout)
+                self.assertIn(message, done.stderr)
+                self.assertEqual(list(out.glob("*.json")), [])
 
 
 # --------------------------------------------------------------------------- the decision record
@@ -1086,13 +1318,12 @@ class DecisionRecordTests(unittest.TestCase):
         write_json(self.root / f"{base}-attempts/child-usage-wf_fixture-1.json", usage)
         manifest = {"checked_at": "2026-09-30", "critic": res["critic"]}
         write_json(self.root / "catalogs/sota-convergence/manifest-20260930.json", manifest)
-        write_json(self.root / base / "acme-agent-skills-debug-kit.json", {"repository": A1, "layers": ["skills-debug"]})
-        reviews = [{"repository": A1, "path": "acme-agent-skills-debug-kit.json", "layers": ["skills-debug"]}]
+        write_json(self.root / base / "acme-agent-skills-debug-kit.json", A1_REVIEW)  # at the adjudicated pin
         result = make_result.build_result(
-            layers=out["layers"], reviews=reviews, usage=usage, manifest=manifest, sweep_id=LANE, lane=LANE,
+            layers=out["layers"], reviews=A1_WRITTEN, usage=usage, manifest=manifest, sweep_id=LANE, lane=LANE,
             returns_ref=f"{base}/returns.json", usage_ref=f"{base}-attempts/child-usage-wf_fixture-1.json",
             manifest_ref="catalogs/sota-convergence/manifest-20260930.json", prompts_sha256="c" * 64,
-            returns=out["returns"])
+            returns=out["returns"], load_review=lambda path: json.loads((self.root / path).read_text(encoding="utf-8")))
         self.result = write_json(self.root / "RESULT.json", result)
         self.record = self.root / "docs/decisions/2026-09-30-skills-landscape-sweep.md"
 
@@ -1171,6 +1402,102 @@ class DecisionRecordTests(unittest.TestCase):
         done = self.write("--force")
         self.assertEqual(done.returncode, 2)
         self.assertIn("skills", done.stderr)
+
+
+# --------------------------------------------------------------------------- a skills RESULT.json and its reviews
+
+
+# A source review of A1 at its adjudicated pin (skill_proposal: pin a*40, skill_md_sha256 b*64).
+A1_REVIEW = {"schema_version": 1, "repository": A1, "layers": ["skills-debug"], "reviewed_commit": "a" * 40,
+             "observed": {"adjudicated_pin": "a" * 40, "pin_lookup": "ok", "skill_md_sha256": "b" * 64,
+                          "skill_folder_tree_sha": "d" * 40}}
+A1_WRITTEN = [{"repository": A1, "path": "acme-agent-skills-debug-kit.json", "layers": ["skills-debug"]}]
+
+
+def skills_result_checkout(case, res=None):
+    """A checkout holding a skills sweep's retained returns, usage record and manifest (skills_sweep_result), and
+    convert.py's output: what make_result.py reads."""
+    root = temp_dir(case)
+    (root / "catalogs/landscape").mkdir(parents=True)
+    shutil.copy(CATALOG, root / "catalogs/landscape/skills-lifecycle.json")
+    res = res or skills_sweep_result()
+    scope = {"platform_profiles_sha256": PLAT,
+             "requirement_sha256": {"skills/skills-debug": REQ, "skills/skills-review": REQ}}
+    out = convert.convert(res, scope, LANE, convert.resolved_models(None))
+    base = f"evidence/artifacts/{LANE}"
+    write_json(root / base / "returns.json", out["returns"])
+    labels = [f"{role}:{layer}" for layer in ("skills-debug", "skills-review") for role in
+              ("discover", "gpt6-discover", "refute-facts", "refute-fit", "gpt6-refute-fit")] + ["critic"]
+    usage = usage_record.record(harness_tests.child_usage_raw("wf_fixture-1", labels), 0, "cmd", ROOT)
+    write_json(root / f"{base}-attempts/child-usage-wf_fixture-1.json", usage)
+    manifest = {"checked_at": "2026-09-30", "critic": res["critic"]}
+    write_json(root / "catalogs/sota-convergence/manifest-20260930.json", manifest)
+    return root, base, out, usage, manifest
+
+
+class SkillResultPinTests(unittest.TestCase):
+    """make_result.py completes a skills RESULT.json only when each survivor's source review was written at the
+    survivor's adjudicated pin, over the SKILL.md bytes the refuters judged, with the skill folder's tree hash; a
+    stopped review stops its layer (GPT-6 review of #541)."""
+
+    def make(self, reviews, review=A1_REVIEW, res=None):
+        root, base, out, _, _ = skills_result_checkout(self, res)
+        if review is not None:
+            write_json(root / base / "acme-agent-skills-debug-kit.json", review)
+        layers = write_json(root / "out/layers.json", out["layers"])
+        listing = write_json(root / "out/reviews.json", reviews)
+        done = run([sys.executable, HARNESS / "make_result.py", "--layers", layers, "--reviews", listing,
+                    "--sweep-id", LANE, "--returns-ref", f"{base}/returns.json",
+                    "--usage-ref", f"{base}-attempts/child-usage-wf_fixture-1.json",
+                    "--manifest-ref", "catalogs/sota-convergence/manifest-20260930.json", "--prompts-sha256", "c" * 64,
+                    "--repo-root", root])
+        return done, base
+
+    def test_a_review_at_the_adjudicated_pin_completes_the_record(self):
+        done, base = self.make(A1_WRITTEN)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        layer = json.loads(done.stdout)["layers"][0]
+        self.assertEqual((layer["layer_id"], layer["survived"][0]["source_review"]),
+                         ("skills-debug", f"{base}/acme-agent-skills-debug-kit.json"))
+
+    def test_a_review_at_another_commit_or_of_other_bytes_is_refused(self):
+        observed = A1_REVIEW["observed"]
+        for change, message in (({"reviewed_commit": "e" * 40}, f"not the adjudicated pin {'a' * 40}"),
+                                ({"observed": dict(observed, skill_md_sha256="f" * 64)}, "skill_md_sha256"),
+                                ({"observed": dict(observed, skill_folder_tree_sha=None)}, "skill_folder_tree_sha"),
+                                ({"observed": dict(observed, pin_lookup="failed")}, "pin_lookup")):
+            with self.subTest(message):
+                done, _ = self.make(A1_WRITTEN, dict(A1_REVIEW, **change))
+                self.assertEqual(done.returncode, 2, done.stdout)
+                self.assertIn(message, done.stderr)
+
+    def test_a_stopped_review_stops_its_layer(self):
+        stopped = [{"repository": A1, "layers": ["skills-debug"], "status": "stopped", "pin": "a" * 40,
+                    "pin_lookup": "failed", "reason": "the adjudicated pin is unreadable (gh: Not Found)"}]
+        done, _ = self.make(stopped, review=None)
+        self.assertEqual(done.returncode, 2, done.stdout)
+        for phrase in ("stopped", "skills-debug", "the adjudicated pin is unreadable (gh: Not Found)", "status stopped"):
+            self.assertIn(phrase, done.stderr)
+
+    def test_the_pin_check_cannot_be_skipped(self):
+        # build_result without the review loader refuses a skills survivor rather than leaving its pin unchecked.
+        _, base, out, usage, manifest = skills_result_checkout(self)
+        with self.assertRaisesRegex(ValueError, "the review file are needed"):
+            make_result.build_result(
+                layers=out["layers"], reviews=A1_WRITTEN, usage=usage, manifest=manifest, sweep_id=LANE, lane=LANE,
+                returns_ref=f"{base}/returns.json", usage_ref=f"{base}-attempts/child-usage-wf_fixture-1.json",
+                manifest_ref="catalogs/sota-convergence/manifest-20260930.json", prompts_sha256="c" * 64,
+                returns=out["returns"])
+
+    def test_a_survivor_with_a_null_hash_is_refused(self):
+        res = skills_sweep_result()
+        debug = res["first"][0]
+        for proposal in [*debug["claude_discover"]["proposed"], *debug["gpt6_discover"]["output"]["proposed"],
+                         *debug["merged"]]:
+            proposal["skill_md_sha256"] = None
+        done, _ = self.make(A1_WRITTEN, res=res)
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("skill_md_sha256 is null", done.stderr)
 
 
 if __name__ == "__main__":

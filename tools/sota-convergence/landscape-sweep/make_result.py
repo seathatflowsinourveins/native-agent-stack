@@ -25,6 +25,12 @@ whose retained failures (returns.json failures/<layer>) lack their retained_fail
 failures are checked per worker and per layer, as convert.py records them: a <role>:<layer>[:followup] worker's in
 that layer's round, the completeness critic's in every layer of the record, so one layer's failure never covers
 another layer. Paths are repository-relative and must exist.
+A skills layer (catalog skills) completes only when each survivor's source review binds it to what the refuters
+judged: the review file's reviewed_commit is the adjudicated pin of the survivor's proposal in the returns, its
+observed pin_lookup is ok, its observed skill_md_sha256 is the proposal's (never null), and it records the skill
+folder's tree hash (skill_folder_tree_sha). A stopped entry in --reviews (source_reviews.py prints one for a skill
+survivor it refused: no pin, an unreadable or moved pin, a null hash, no valid copy) stops that layer: the record is
+refused, and the run is either reviewed again once the cause is resolved or recorded with status stopped.
 
   make_result.py --decision-record RESULT.json [--repo-root .] [--force]
 
@@ -54,7 +60,8 @@ from sweep_common import (REPO_ROOT, canon, deviation_rounds, ledger_module, loa
                           private_content, private_findings, slug)
 
 PLACEHOLDER = "@RETURNS@"
-HEX64 = re.compile(r"[0-9a-f]{64}")
+HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
+SKILLS = "skills"  # the catalog of a skills-* layer (build_inputs.SKILLS)
 REQUIRED_EFFORT = "max"  # every agent() call of sweep.js names effort 'max'
 SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"  # build_inputs.SKILLS_CATALOG
 DECISION_RECORD = "docs/decisions/{date}-skills-landscape-sweep.md"
@@ -144,9 +151,47 @@ def check_usage(usage: dict, usage_ref: str, returns: dict | None = None, layer_
     return child_usage
 
 
+def skill_review_problem(entry: dict, layer_id: str, returns: dict | None, load_review) -> str | None:
+    """Why a skills survivor's source review does not bind it to what the refuters judged, or None. The adjudicated
+    pin and skill_md_sha256 are the survivor's proposal's in the returns (proposal_of, in its facts vote's round), not
+    the review's own account; load_review(path) reads the review file."""
+    if returns is None or load_review is None:
+        return "the returns and the review file are needed to check the review against the adjudicated pin"
+    led = ledger_module(REPO_ROOT)  # the checkout's JSON-pointer rules, as write_decision_record resolves refs
+    pointer = str((entry.get("facts") or {}).get("ref", "")).partition("#")[2]
+    try:
+        facts = led.resolve_pointer(returns, pointer)
+    except (led.LedgerError, KeyError, IndexError, TypeError, ValueError) as error:
+        return f"its facts vote {pointer!r} is not in the returns ({error})"
+    proposal = proposal_of(returns, layer_id, entry["repo"], facts.get("round") if isinstance(facts, dict) else None)
+    pin, judged = proposal.get("pin"), proposal.get("skill_md_sha256")
+    if not (isinstance(pin, str) and HEX40.fullmatch(pin)):
+        return f"its proposal in the returns names no adjudicated pin ({pin!r})"
+    if judged is None:
+        return ("the survivor's skill_md_sha256 is null in the returns, so nothing ties its review to the SKILL.md "
+                "bytes the refuters judged")
+    try:
+        review = load_review(entry["source_review"])
+    except (OSError, ValueError) as error:
+        return f"its review {entry['source_review']} cannot be read ({error})"
+    observed = (review.get("observed") if isinstance(review, dict) else None) or {}
+    if review.get("reviewed_commit") != pin:
+        return f"it was reviewed at {review.get('reviewed_commit')!r}, not the adjudicated pin {pin}"
+    if observed.get("pin_lookup") != "ok":
+        return f"its review's pin_lookup is {observed.get('pin_lookup')!r}, not ok"
+    if observed.get("skill_md_sha256") != judged:
+        return (f"its review read SKILL.md bytes with skill_md_sha256 {observed.get('skill_md_sha256')!r}, not the "
+                f"judged {judged}")
+    if not HEX40.fullmatch(str(observed.get("skill_folder_tree_sha") or "")):
+        return "its review records no skill_folder_tree_sha (the skill folder's tree hash at the pin)"
+    return None
+
+
 def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sweep_id: str, lane: str,
                  returns_ref: str, usage_ref: str, manifest_ref: str, prompts_sha256: str, reopen=None,
-                 notes=(), returns: dict | None = None) -> dict:
+                 notes=(), returns: dict | None = None, load_review=None) -> dict:
+    """The RESULT.json (see the module docstring). load_review(path) reads a review file by its repository path; a
+    skills layer's survivors need it (skill_review_problem)."""
     child_usage = check_usage(usage, usage_ref, returns, [layer.get("layer_id") for layer in layers])
     transcript_dir = str(child_usage.get("transcript_dir") or "")
     run = transcript_dir.rstrip("/").rsplit("/", 1)[-1]
@@ -163,14 +208,24 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
     if unknown:
         raise ValueError(f"--reopen names layers this sweep did not cover: {unknown}")
     failures = (returns or {}).get("failures") or {}
-    out_layers, missing, unreopened = [], [], []
+    out_layers, missing, unreopened, stopped, unbound = [], [], [], [], []
     for layer in substitute(layers, returns_ref):
         for entry in layer.get("survived") or []:
             matches = [r for r in by_repo.get(review_key(entry["repo"]), []) if layer["layer_id"] in r.get("layers", [])]
-            if not matches:
-                missing.append(f"{layer['layer_id']}: {entry['repo']}")
+            written = [r for r in matches if r.get("path")]
+            if not written:
+                halted = [r for r in matches if r.get("status") == "stopped"]
+                if halted:
+                    stopped += [f"{layer['layer_id']}: {entry['repo']} at pin {r.get('pin')} (pin_lookup "
+                                f"{r.get('pin_lookup')}): {r.get('reason')}" for r in halted]
+                else:
+                    missing.append(f"{layer['layer_id']}: {entry['repo']}")
                 continue
-            entry["source_review"] = f"{base}/{matches[0]['path']}"
+            entry["source_review"] = f"{base}/{written[0]['path']}"
+            if layer.get("catalog") == SKILLS:
+                problem = skill_review_problem(entry, layer["layer_id"], returns, load_review)
+                if problem:
+                    unbound.append(f"{layer['layer_id']}: {entry['repo']}: {problem}")
         entries = list(layer.get("reopen") or [])
         entries += [item for item in reopen.get(layer["layer_id"], []) if item not in entries]
         layer["reopen"] = entries
@@ -180,8 +235,15 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
                 for item in entries):
             unreopened.append(layer["layer_id"])
         out_layers.append(layer)
+    if stopped:
+        raise ValueError(f"layers stopped: a skill survivor has no source review ({'; '.join(stopped)}). A stopped layer "
+                         "cannot complete a RESULT.json: rerun source_reviews.py once the cause is resolved, or record "
+                         "the run with status stopped (recipes/saturation-sweep.md section 4)")
     if missing:
         raise ValueError(f"survivors without a source review in --reviews: {missing}")
+    if unbound:
+        raise ValueError(f"skill survivors whose source review is not at their adjudicated pin and judged bytes: "
+                         f"{'; '.join(unbound)}")
     if unreopened:
         raise ValueError(f"layers with retained failures but no retained_failure reopen entry (a failed lane never "
                          f"counts as clean; use convert.py's layers.json): {unreopened}")
@@ -407,7 +469,8 @@ def main(argv=None) -> int:
                               sweep_id=args.sweep_id, lane=args.lane or args.sweep_id, returns_ref=args.returns_ref,
                               usage_ref=args.usage_ref, manifest_ref=args.manifest_ref, prompts_sha256=digest,
                               reopen=load_json(args.reopen) if args.reopen else None, notes=args.note,
-                              returns=load_json(repo / args.returns_ref))
+                              returns=load_json(repo / args.returns_ref),
+                              load_review=lambda path: load_json(repo / path))
     except (ValueError, OSError, KeyError) as error:
         print(f"make_result.py: {error}", file=sys.stderr)
         return 2
