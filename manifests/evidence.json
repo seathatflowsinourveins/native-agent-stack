@@ -4144,17 +4144,17 @@
     },
     {
       "path": "adoption/sdk/README.md",
-      "sha256": "4a6097360b762dae4ab586d74781d0c008282b4b6cd17320da19debafad428fe",
-      "bytes": 3574
+      "sha256": "752c8b04283f13454c9814968d33c39d5b07d3eaf405c875fab9b0fc4ce35667",
+      "bytes": 3896
     },
     {
       "path": "adoption/sdk/accepted-constraints.txt",
-      "sha256": "5b9c986f61fb63d1d550b4de20f808d7ad7c7b74786f8602865eb299727f257b",
-      "bytes": 810
+      "sha256": "fa07277447a51e0eb313739a47642493330ac864bebee756d473629b98c88a29",
+      "bytes": 961
     },
     {
       "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
-      "sha256": "f5bb7b8cf4406c5d408cce4083995cd29d4a34066f9d2aedb585837cc8536c5f",
+      "sha256": "bfde2fa953c8b755b4d1cf499574ebceb8bcad8aa16cab215e0cc0b483e37039",
       "bytes": 77578
     },
     {
@@ -14145,13 +14145,13 @@
     },
     {
       "path": "blueprints/us-equities/workers/README.md",
-      "sha256": "79de0f2d9e399e2ce04ccfe1c011788ea1adcab7745bfbfa02cdf8846c6d7425",
-      "bytes": 12195
+      "sha256": "7e2623020f40c784638b832f823cc0acd0fe29d5656af44fd4205e085c9e59e0",
+      "bytes": 14235
     },
     {
       "path": "blueprints/us-equities/workers/native_worker.py",
-      "sha256": "084f82399cf4104996488210440581c7759a6d5a05d2b6abe202b8789cdba74f",
-      "bytes": 20210
+      "sha256": "bbdbad012df99ae2c6a2384865c9acd8a5241db32d2596e6f904525be40fe74b",
+      "bytes": 24591
     },
     {
       "path": "blueprints/us-equities/workers/policy.md",
@@ -14165,7 +14165,7 @@
     },
     {
       "path": "blueprints/us-equities/workers/requirements.txt",
-      "sha256": "a6a4ed3d1c16b4277dc5da721831a3bd7dfccc00ee1fb52a5fe6d0c2fc19aa86",
+      "sha256": "c048be05b41417f77cd8b4fd6e3179909782c9f3bfb59fa46d7fe4bcd18a48ff",
       "bytes": 96
     },
     {
@@ -38804,6 +38804,26 @@
       "bytes": 3721
     },
     {
+      "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
+      "sha256": "70059a0b57eb1aae9bb62c04ffbbc60e4119381e777eba5290ad12c23f66f3bd",
+      "bytes": 1585
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20260930/ci-repair-receipt.json",
+      "sha256": "a3c5e74bb3b471e8cf0d9ebc7e8ca16c4161fbca4bed16a287e3bf4526e63402",
+      "bytes": 8129
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20260930/receipt.json",
+      "sha256": "4e3be5cffa768e37b0b1867fef503d519a5cfa102506d1bfe3086f664812e745",
+      "bytes": 14646
+    },
+    {
+      "path": "evidence/artifacts/runtime-sdk-20260930/usage-scope-receipt.json",
+      "sha256": "5097ef817a0e16275cf86deebb9b8d34e48606e4a1c78eea05752bfd8074b8e4",
+      "bytes": 11603
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
       "sha256": "e494120421102202312b567d699025c96e85c0e925a88a143c4ea11af2a791a2",
       "bytes": 169217
@@ -44870,8 +44890,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "97a53277a98bac686103037f936474f4ecb14bc8a16ee979ac601b93c810f55d",
-      "bytes": 38772
+      "sha256": "6e476fbf535971627466ec7b39b99b1952d938464ab894c231d59e7c0e2f0f55",
+      "bytes": 41579
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -44890,8 +44910,8 @@
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "27b3a97a5684b2250258a7968c273a8fcb34308abfd86ba494254e9fecd3b41b",
-      "bytes": 24871
+      "sha256": "3394aa992c06ed4d60d588c70112eb345695fdf8e7d3d7c13a277bf9b8666612",
+      "bytes": 24911
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -45480,8 +45500,8 @@
     },
     {
       "path": "tests/test_adoption_contract.py",
-      "sha256": "bcda644eee8207489392b34dd2d47c35f67c40f336edb919eaabdce427fdaf1e",
-      "bytes": 19976
+      "sha256": "80f7c47eb64a554fe1b38bd637cd58f5b0e1b9af8368b6a85686948992ee4b48",
+      "bytes": 24092
     },
     {
       "path": "tests/test_adoption_docs_consistency.py",
@@ -45949,6 +45969,11 @@
       "bytes": 1341
     },
     {
+      "path": "tests/test_native_worker_route.py",
+      "sha256": "624904c7e25458cfd5662e032e98159d52989458665701f84fdd3d538c2e379d",
+      "bytes": 4189
+    },
+    {
       "path": "tests/test_nautilus_equity_replay.py",
       "sha256": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056",
       "bytes": 5412
@@ -45960,8 +45985,8 @@
     },
     {
       "path": "tests/test_observability.py",
-      "sha256": "acdb0bbc1e0d8a28ff12a6d13188d048d4f916c10dc94d983bfe9c6d07f8ed06",
-      "bytes": 5474
+      "sha256": "ea9b9c80b3c9484954077236fdf21bff8286efcecffc08f999d70bbb71b7c9f2",
+      "bytes": 7534
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
@@ -46117,6 +46142,11 @@
       "path": "tests/test_saturation_ledger.py",
       "sha256": "a446a451a6244819a7d601e29a82e1d81c8825e02c487ee4910dd24134f35a5b",
       "bytes": 61882
+    },
+    {
+      "path": "tests/test_sdk_usage_scope.py",
+      "sha256": "7e47c3b4cede14ce7e664daf5fe379f16bb173d845b6feafd4a9b82ba758c352",
+      "bytes": 9712
     },
     {
       "path": "tests/test_secret_path_guard.py",
