@@ -218,3 +218,132 @@ Each file was fetched read-only at its pinned revision; the sha256 is of its byt
   carries rtk's once-a-day warning.
 - The outer-JS decision (tools/skill-usage/README.md, "The outer exec code") awaits the PR-A owner's
   acceptance.
+
+## Repair round (2026-09-29): the Codex call ledger
+
+The independent review of 802c35d7 found binding correction 1 of the U3 build (gap G1 of the U11 design)
+neither delivered nor recorded as missing (medium). This round adds `skill_usage.py --lanes --call-ledger PATH`
+(tools/skill-usage/README.md, "The private call ledger"), commits 00c458ba to 32d5dde6. The ledger's rows come
+from the kernel's `callLedger`, PR-A U2's export, which this branch's kernel does not have. On this branch
+`--call-ledger` therefore exits 2 and writes nothing, and 5 of the 14 `CodexCallLedger` tests skip.
+
+### Scripts
+
+- `rehearse-with-u2-kernel.sh REPO REV DEST` extracts this branch at REV with `git archive`. It replaces
+  `child-usage.mjs` with PR-A U2's copy at b2dd1eb7 (sha256 `9d20f7e4...300b3f`), and makes no ref, worktree or
+  merge. The tree holds U3's Python and U2's kernel only. U3's own kernel changes (the rtk replay agent and D7)
+  are absent, and the ledger does not read them.
+- `ledger-host-check.py REPORT LEDGER` checks a private ledger against its own lane report. It prints counts,
+  states and invariants, never an id, a path or command text.
+- `probe-end-of-options.py` counts the store's shell argv forms that the `--`/`-` end-of-options fix reads
+  differently.
+
+### Ledger tests with U2's kernel
+
+Run with `python3 -B -m unittest -v tests.test_skill_usage.CodexCallLedger` in the rehearsal tree:
+
+| Tree | Result |
+|---|---|
+| 00c458ba (tests only) | 13 run, 13 fail (`FAILED (errors=17)`): 6 `TypeError` (no `call_ledger` argument), 5 `AttributeError` (no `kernel_exports`), 2 `SystemExit: 2` (no `--call-ledger` flag) |
+| 977e56c4 (the ledger) | 13 run, `OK`, 0 skipped |
+| 45a5c0c1 (the head's code) | 14 run, `OK`, 0 skipped (the `--out` refusal test added at fd5268a9) |
+
+On the branch itself (no `callLedger` in the kernel) the same class read `FAILED (errors=12, skipped=5)` at
+00c458ba (8 failing, the 5 real-kernel tests skipped) and `OK (skipped=5)` at 45a5c0c1.
+
+### Host run of the rehearsal tree
+
+The tree came from `rehearse-with-u2-kernel.sh` at 5e4943e5. In it, `skill_usage.py --lanes` ran over the store
+with the window of R0 to R6 (`--now` equal to `--until`), `--json --out <private> --call-ledger <private>`. It
+ran without `--rtk-check`, because U2's kernel lacks U3's replay agent. It exited 0 after 912 seconds, and the
+ledger file has mode 0600. `ledger-host-check.py` printed:
+
+```
+ledger.mode_0600	true
+ledger.rows	49175
+ledger.schema	["codex-call-ledger/1"]
+ledger.field_sets	1
+report.actors	1436
+report.sessions_in_window	1436
+ledger.actors_with_rows	1390
+ledger.threads	1390
+ledger.call_id_null	0
+ledger.duplicate_keys	0
+ledger.by_state	{"cancelled_or_unfinished": 3650, "failed": 1031, "succeeded": 44494}
+ledger.by_owner_kind	{"exec": 37200, "subagent": 11975}
+ledger.by_history_mode	{"paginated": 49175}
+ledger.by_native_status	{"None": 21917, "completed": 26227, "failed": 1031}
+ledger.by_cause	{"None": 49175}
+ledger.by_tool_class	{"Bash": 6932, "WebFetch": 2035, "WebSearch": 1615, "exec": 16410, "mcp": 20309, "other": 1267, "spawn_agent": 238, "wait": 352, "wait_agent": 17}
+ledger.sandbox_true	30891
+ledger.code_mode_true	16762
+ledger.server_set	20309
+report.actors_with_call_states	1436
+inv.rows_eq_attempted	[49175, 49175, true]
+inv.states_eq	true
+inv.state_mismatches	{}
+inv.sandbox	[30891, 30891, 30891]
+inv.actor_count_mismatches	0
+inv.owner_kind_mismatches	0
+privacy.ids	50565
+privacy.id_equal_to_a_report_string	0
+privacy.thread_id_inside_report_text	0
+privacy.long_call_ids_checked	49175
+privacy.long_call_id_inside_report_text	0
+```
+
+- **One row per call the kernel counts.** The 49,175 rows equal the sum of U2's `call_states.attempted` over
+  the 1,436 actors, both per actor and per state. The 30,891 sandbox rows equal `call_states.sandbox`,
+  `sandbox_operations` and R6p's `code_mode.nested_items`. The 16,410 `exec` rows equal
+  `code_mode.exec_calls`. The 16,762 code-mode rows equal the code-mode carrier's results (exec plus `wait`).
+- **Keys.** No row has a null `call_id` and no `(thread_id, call_id)` pair repeats. 46 sessions of the window
+  hold no call.
+- **Privacy.** No thread or call id of the ledger appears in the report, as a whole string or inside one.
+- **Finding (reported, not changed): nested web search items read as not executed.** All 3,650
+  `cancelled_or_unfinished` rows are nested `WebSearch` (1,615) or `WebFetch` (2,035) calls from `web.search`
+  `Extension` items.
+  - Such an item has no status field. `WebSearchItem` is `{id, query, action, results}`
+    (openai/codex rust-v0.157.1 `protocol/src/items.rs:372-381`), and on this store every one of the 4,220
+    such items (all records) has the keys `action, id, kind, query, results, type`.
+  - The adapter emits no result for such an item, and no output shares its id.
+  - U2's projection therefore reads it as no result with no deciding native status, which is
+    `cancelled_or_unfinished`. The kernel's `calls_without_result` leaves sandbox calls out, so it reads 0 here.
+  - The `item_completed` event is itself the item's completion. Two ways to decide it are open:
+    - the adapter supplies `native_status: completed` for such an item;
+    - U2's projection gets a rule for nested calls.
+
+    Until the U2 and U3 owners decide, M14 reads these 3,650 calls (7.4% of the rows) as not executed.
+
+### Differential R7r against R6p
+
+`run-differential.py --rtk-check R7r=5e4943e5` ran under R6p's conditions: this host's HOME, and a scratch
+working directory outside any checkout. It exited 0 after 1,110.6 seconds, with 1,436 sessions, 1,620 files and
+0 parse errors.
+
+- `--compare` of R6p and R7r prints `DELTAS 0`.
+- `--totals` of the two are equal in all 37 fields. Examples: `rtk_parts.calls` 6,932, `eligible_parts` 3,024,
+  `unknown_calls` 747, `code_mode.nested_items` 30,891 and `rtk_parts.d7.eligible_parts` 3,024.
+
+This round's code therefore leaves the published report unchanged on this store. The recorded R6p figures
+reproduce here. The one later code commit, 8c49aec8, only adds a refusal before the scan, taken when `--out`
+and `--call-ledger` name one file, which these runs never do.
+
+### Also checked in this round
+
+- `claude-byte-identity.py 802c35d7 5e4943e5`: `IDENTICAL`, with the digests recorded above (hermetic
+  `0f300368...`, 93,191 bytes; host `a9cbecc4...`, 107,930 bytes). This round does not change the kernel.
+- The empty command in rtk replay. The kernel's own checker (`rtk hook check --agent <agent>`, rtk 0.50.0,
+  the five-exclusion config) was asked through `measureTranscript` with one Bash call whose command is `''`.
+  Under `codex` and `claude` alike it reads `measured`, 1 call, 0 unknown calls, 0 parts. The bridge's added
+  unknown call for an unresolved command is therefore its only one (the review's double-count question).
+- `probe-end-of-options.py`: 1,620 files, 7,651 argv commands, 0 with a `--` or `-` word, 0 read differently.
+  The fix changes nothing on this store.
+
+### Residuals of this round (reported, not changed)
+
+- The ledger needs PR-A U2's kernel. Until it is merged here, `--call-ledger` exits 2 and five tests skip.
+- Legacy history mode keeps `McpToolCallEnd` and `WebSearchEnd` events and non-completed `SubAgentActivity`
+  events (`rollout/src/policy.rs:123-139`), which this adapter does not read. This round corrected the text
+  that said none are persisted. Reading them would change the measurement, and this store holds no legacy
+  rollout.
+- The nested web search state above is left for the U2 and U3 owners to decide.
