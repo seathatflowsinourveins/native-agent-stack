@@ -322,25 +322,41 @@ locally with `GH_TOKEN` set and no `--offline`, using
   2026-10-13 renew the oauthlib ignores for the Lumibot lock alone or delete that lock. **Overturn:** (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
   **Not covered:** the image's server binary and the grader venv (PyJWT 2.13.0 and 2.10.1), and any run of the recipe.
   Evidence: `evidence/receipts/osv-openhands-pyjwt-relock-20260930.json`.
-  **urllib3 relock and a frozen macOS lock (2026-09-30).** Four advisories published that day between 14:46Z and 15:00Z
-  (GitHub and OSV records) fail the required check on fresh runs (reported for run 36733726923 of PR #540; a local run of the
-  workflow's command at `11227bfd` exits 1 with exactly these four): GHSA-8988-9cw3-xx77 (urllib3 1.26.0 through 2.7.0, HTTPS
-  proxy TLS settings not applied consistently), GHSA-vxq7-64xx-v4gw (unbounded chunk-size line buffered) and GHSA-gh4c-6fx4-qh6g
-  (chunked Deflate streaming loops), all fixed in urllib3 2.8.0 (uploaded 2026-09-15, outside every cooldown), in
-  `blueprints/runtime-workers/openhands/requirements.lock`; and GHSA-vcvr-r3jv-pc5j (next 16.2.0 through 16.3.5, `next/og`
-  `ImageResponse`, fixed in 16.3.6) in the frozen macOS variant lock. One change carries both, because the check scans the whole inventory and each fix alone leaves it red. The OpenHands lock
-  was relocked with the recipe's own method plus `--upgrade-package urllib3==2.8.0`: the five upgrades of the 2026-09-30
-  relock reproduce the committed lock byte for byte, the sixth changes only urllib3's version and hashes, the recipe's
-  hashed install, `uv pip check` and the SDK import check pass, and the lock's `IGNORE_ALLOWED_LOCKS` entry, `pins.json`
-  and its evidence move to the new sha256 together (urllib3 2.8.0 has no oauthlib reference, so the carried-forward oauthlib
-  review holds). The macOS lock is a frozen evidence artifact with no live owner (its only commit is #201): its next
-  advisory is ignored until 2026-12-24 under the policy above, with the `IGNORE_ALLOWED_LOCKS` row and a pnpm reader in the
-  test that keeps the repo-wide ignore from hiding any other lock's affected `next` (the Python guard reads no npm format).
-  **Alternatives considered:** exclusion from the inventory (rejected: `excluded` is for test fixtures only, by test); editing
-  the frozen lock (its bytes are hash-bound); waiting for the artifact's owner (none). **Overturn:** the frozen lock stops being
-  kept, or an application built from it is run (then bump `next` and drop the entry). **Not covered:** the image's server binary
-  (PyInstaller build of upstream's unchanged uv.lock, still urllib3 2.7.0 or older) and the grader venv, as for PyJWT.
-  Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.
+  **urllib3 and PyJWT relock and a frozen macOS lock (2026-09-30).** Five advisories whose OSV records were published on
+  2026-09-30 (14:46Z to 15:41Z) fail the required check on fresh runs; a local run of the workflow's command at `11227bfd` exits 1
+  with exactly these five (returned outputs, section E): GHSA-8988-9cw3-xx77 (urllib3 1.26.0 through 2.7.0, HTTPS proxy TLS
+  settings not applied consistently), GHSA-vxq7-64xx-v4gw (unbounded chunk-size line buffered) and GHSA-gh4c-6fx4-qh6g (chunked
+  Deflate streaming loops), all fixed in urllib3 2.8.0 (PyPI files uploaded 2026-09-15T19:29Z, outside every cooldown);
+  GHSA-42vr-xj54-vc7v (PyJWT below 2.15.0: a raw RecursionError from a deeply nested payload), fixed in PyJWT 2.15.0, whose files
+  were uploaded 2026-09-23T16:55Z to 16:56Z and left the upstream workspace's 7-day `exclude-newer` window at 2026-09-30T16:56:01Z,
+  which is overturn condition (a) of the 2026-09-30T04:30Z choice in the OpenHands recipe's `research.md` and the decision point of
+  issue #518, so the lock moves; all four in `blueprints/runtime-workers/openhands/requirements.lock`; and GHSA-vcvr-r3jv-pc5j
+  (next 16.2.0 through 16.3.5, `next/og` `ImageResponse`, fixed in 16.3.6, released 2026-09-22) in the frozen macOS variant lock.
+  One change carries all of them, because the check scans the whole inventory and each fix alone leaves it red. The OpenHands lock
+  was relocked with the recipe's own method plus `--upgrade-package urllib3==2.8.0` and `--upgrade-package pyjwt==2.15.0` in place
+  of 2.14.0: the five upgrades of the 2026-09-30 relock reproduce the committed lock byte for byte, the new lock differs in the
+  urllib3 and PyJWT entries only, the recipe's hashed install, `uv pip check` and the SDK import check pass, and the lock's
+  `IGNORE_ALLOWED_LOCKS` entry, `pins.json` and its evidence move to the new sha256 together. The carried-forward oauthlib review
+  holds: the four oauthlib source files it names are byte-identical in the new venv and oauthlib 3.3.1 is unchanged. The macOS lock
+  is a frozen evidence artifact for which the tree records no owner (its only commit is #201, and neither its experiment record nor
+  `docs/lanes.md` names one): its next advisory is ignored until 2026-12-24 under the policy above, with the
+  `IGNORE_ALLOWED_LOCKS` row and readers in the test that keep the repo-wide ignore from hiding an affected `next` elsewhere. The
+  readers follow what OSV-Scanner 2.6.0 extracts (osv-scalibr `3090dbb7aaa2`, the commit its `go.mod` pins) for the canonical output
+  of each tool: every YAML document of a pnpm lockfileVersion 9 file, whose `packages` entries count with the name and version they
+  carry (tarball and renamed ones too), package-lock and npm-shrinkwrap 1 to 3 with `npm:` aliases and path-derived names, and yarn
+  classic and berry with `npm:` aliases. An npm lock in any other format, or in a style outside that subset (an inline pnpm record,
+  a repeated or differently cased JSON key), fails the test instead of reading as "no next" (the Python guard reads no npm format).
+  Four cross-family reviews (GPT-6 astra/max, read-only) found the first reader fooled by a quoted key and blind to
+  package-lock.json and yarn.lock, then to aliases, tarball entries and a backtracking regex, then to valid syntax outside its
+  assumptions, then to a local-path dependency; the last repairs made it canonical-only and
+  fail-closed, with their mutants kept as negative controls. **Alternatives considered:** exclusion from the inventory (rejected: `excluded` is for test
+  fixtures only, by test); editing the frozen lock (its bytes are hash-bound evidence); waiting for an owner (none recorded); a
+  dated ignore for the PyJWT advisory (rejected: the fix was available at the decision point, and an ignore needs its own
+  reachability review). **Overturn:** the frozen lock stops being kept, or an application built from it is run (then bump `next`
+  and drop the entry); OSV lists an advisory for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes. **Not covered:** the
+  image's server binary (PyInstaller build of upstream's unchanged uv.lock, urllib3 2.7.0 and PyJWT 2.13.0 or older) and the grader
+  venv, as for the earlier PyJWT relock. Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.
+
 - **Triggers and permissions.** `pull_request` (no path filter), push to
   `main`, Wednesday `37 5 * * 3`, and dispatch. The PR run is the required
   check. Off PRs, the same scan writes SARIF, which the job keeps as a 1-day

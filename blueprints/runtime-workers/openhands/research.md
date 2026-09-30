@@ -406,6 +406,42 @@ exits 0 (returned outputs, section C); an earlier scratch pair gave the same dig
 
 Overturn conditions: (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
 
+## Runtime lock urllib3 and PyJWT relock (2026-09-30)
+
+requirements.lock moved from urllib3 2.7.0 to 2.8.0 and from PyJWT 2.14.0 to 2.15.0 and nothing else changed (two entries and
+their hashes), SHA256 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c, previously 14e57b8d947e. Four advisories whose OSV records were published on 2026-09-30 affect the
+old lock: GHSA-8988-9cw3-xx77, GHSA-vxq7-64xx-v4gw and GHSA-gh4c-6fx4-qh6g for urllib3 2.7.0 (fixed in 2.8.0, uploaded
+2026-09-15, outside every cooldown) and GHSA-42vr-xj54-vc7v for PyJWT below 2.15.0 (OSV record 15:41Z). They failed the
+required osv-scanner check together with a `next` advisory in the frozen macOS lock (PR #546). The previous section's choice
+(PyJWT stays at 2.14.0 until the joint relock) is superseded at the decision point of 2026-09-30T16:56:01Z, when PyJWT 2.15.0
+left the window: overturn condition (a) of that section was met. Record:
+[osv-urllib3-next-20260930.json](../../../evidence/receipts/osv-urllib3-next-20260930.json); returned outputs:
+[evidence/relock-2026-09-30-urllib3.txt](evidence/relock-2026-09-30-urllib3.txt).
+
+The method is the PyJWT one above with PyJWT moved to 2.15.0 and a sixth version-pinned upgrade, from a fresh extraction of the
+pinned archive with the same one-line `environments` edit (uv 0.12.17, without UV_NO_CONFIG):
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0
+
+The control (the same command with `pyjwt==2.14.0` and without urllib3) reproduces the previous lock byte for byte, and the new lock
+differs from it in the urllib3 and PyJWT entries only (returned outputs, sections B and D). The recipe's hashed install,
+`uv pip check` and the SDK import check pass on the new lock (section C). The carried-forward oauthlib review holds: oauthlib
+3.3.1 and its wheel hash are unchanged, and the four oauthlib source files the review names hash as recorded in the new venv
+(section J). PyJWT 2.15.0 changes the JWKS client (`JWKSetCache` stores the parsed `PyJWKSet`, `PyJWKClient.fetch_data()` raises
+for a non-object JWKS); the only caller of that client outside PyJWT in the venv is google-auth's `google/oauth2/id_token.py` (lines
+144 and 145, the JWKS branch of `verify_token`, which is also the call path of GHSA-42vr-xj54-vc7v), and nothing outside the
+`google` package imports that module (section J).
+
+- **The joint relock in #518** starts from this lock: it adds `--upgrade-package oauthlib==4.0.0`, replaces
+  `--upgrade-package pyjwt==2.15.0` with `--upgrade-package pyjwt==2.15.1` (no earlier than 2026-10-05T18:40:43Z) and keeps
+  `--upgrade-package urllib3==2.8.0` unless a newer release is outside the 7-day window by then.
+- **Not covered.** The image's server binary (upstream's uv.lock) and the grader venv keep their own urllib3 and PyJWT; the
+  inventory does not scan them.
+
+Overturn condition: OSV lists an advisory for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes.
+
 ## Takeover phase 1 corrections (2026-09-28)
 
 These are offline repairs on the round-3 head 45d40f6c. The network and

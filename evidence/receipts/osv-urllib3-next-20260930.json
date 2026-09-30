@@ -1,33 +1,28 @@
 {
  "schema_version": 1,
  "record": "osv-urllib3-next-20260930",
- "purpose": "Records the 2026-09-30 fix of the required osv-scanner check, which fails on fresh runs since four advisories were published that day (14:46Z to 15:00Z): GHSA-8988-9cw3-xx77, GHSA-vxq7-64xx-v4gw and GHSA-gh4c-6fx4-qh6g (urllib3 2.7.0, all fixed in 2.8.0) in the OpenHands recipe lock, and GHSA-vcvr-r3jv-pc5j (next 16.3.5, fixed in 16.3.6) in the frozen macOS variant lock. The OpenHands lock is relocked onto urllib3 2.8.0 with the recipe's own method (only urllib3's version and hashes change); the macOS lock is a frozen evidence artifact with no live owner and gets an ignore under the repository's policy, an IGNORE_ALLOWED_LOCKS row and a pnpm reader that bounds the repo-wide ignore. One change carries both, because the check scans the whole inventory.",
+ "purpose": "Records the 2026-09-30 fix of the required osv-scanner check, which fails on fresh runs since OSV records five advisories published that day (14:46Z to 15:41Z): GHSA-8988-9cw3-xx77, GHSA-vxq7-64xx-v4gw and GHSA-gh4c-6fx4-qh6g (urllib3 2.7.0, all fixed in 2.8.0) and GHSA-42vr-xj54-vc7v (PyJWT below 2.15.0, fixed in 2.15.0) in the OpenHands recipe lock, and GHSA-vcvr-r3jv-pc5j (next 16.3.5, fixed in 16.3.6) in the frozen macOS variant lock. The OpenHands lock is relocked onto urllib3 2.8.0 and PyJWT 2.15.0 with the recipe's own method (only those two entries change); the macOS lock is a frozen evidence artifact for which the tree records no owner, and it gets a dated ignore under the repository's policy, an IGNORE_ALLOWED_LOCKS row and npm lock readers that bound the repo-wide ignore. One change carries all of it, because the check scans the whole inventory. The name of this record predates the PyJWT advisory, which joined the change at 16:57Z.",
  "checked_commit": "11227bfdf25b55b0481a9e78985c3fed26052472",
- "observed_utc": "2026-09-30T15:22:51Z",
- "authorization": "Requested by session sota-default-harness-setup (c5), whose PR #540 was blocked, in a cross-session message on 2026-09-30, which asked the OpenHands lock lane (issue #518, owner bc) to take the urllib3 relock and to name the owner of the macOS lock. The macOS lock has no live owner: its only commit is #201 (2026-09-24) and no session claims it. No user decision is needed: both fixes follow the repository's own policy and method.",
- "evidence_class": "Local runs on this host of the pinned OSV-Scanner 2.6.0 with the repository's config and the workflow's command line, a local reproduction of the relock with uv 0.12.17 from the pinned upstream source archive, the recipe's own install sequence in a scratch venv, and reads of git objects and the OSV API. Static and local; not an execution of the recipe, of any worker or of any application.",
+ "observed_utc": "2026-09-30T16:58:59Z",
+ "authorization": "Started from a peer report that the required check failed on fresh runs (peer messages are not retained evidence; the reproduction in section E is). The lock lane is the OpenHands recipe's. For the frozen macOS lock the tree records no owner (returned outputs, section F: its only commit is #201, its experiment record has no owner, session or author key, docs/lanes.md does not name it). No user decision is needed: every fix follows the repository's own policy and method.",
+ "evidence_class": "Local runs on this host of the pinned OSV-Scanner 2.6.0 with the repository's config and the workflow's command line (reports retained), a local reproduction of the relock with uv 0.12.17 from the pinned upstream source archive, the recipe's own install sequence in a scratch venv, reads of git objects, the OSV API and PyPI, and two read-only GPT-6 cross-family reviews. Static and local; not an execution of the recipe, of any worker or of any application.",
  "limitations": [
-  "The relock covers only the recipe venv. The agent-server image's server is a PyInstaller build of upstream's unchanged uv.lock (pins.json source_archive), which still pins urllib3 2.7.0 or older, and the grader venv has its own lock; neither is changed here (the same scope limit as the PyJWT relock record).",
-  "The macOS ignore is a reachability statement about this repository only: the repository keeps the variant's package.json and lock (two files, no application source), so it says nothing about the application that ran on the Mac in 2026-09-24. It expires on 2026-12-24 and then needs a renewed dated reason, or the lock leaving the inventory.",
-  "The Python guard (python_pins) reads no npm format. The repo-wide next ignore is therefore bounded by the new pnpm_next_pins reader and its test, which read pnpm lockfileVersion 9 keys strictly and fail closed; a future non-pnpm npm lock (package-lock.json, yarn.lock) pinning an affected next would not be seen by it.",
-  "Section E of the returned outputs is a local run of the workflow's command, not the CI run; the required check on this change is the CI result.",
-  "Codex's draft PR #535 replaces this lock with a Linux-only lock (sha256 383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106) that carries urllib3 2.7.0 too, so it needs the same bump and a new digest in its exact-lock entry before it can pass the check; this change does not touch #535's files."
+  "The relock covers only the recipe venv. The agent-server image's server is a PyInstaller build of upstream's unchanged uv.lock (pins.json source_archive), which still pins urllib3 2.7.0 and PyJWT 2.13.0 or older, and the grader venv has its own lock; neither is changed here (the same scope limit as the earlier PyJWT relock record).",
+  "The macOS ignore is a statement about this repository only: it keeps the variant's package.json and lock (two files, no application source), so it says nothing about the application that ran on the Mac on 2026-09-24. It expires on 2026-12-24 and then needs a renewed dated reason, or the lock leaving the inventory.",
+  "The next guard (npm_next_pins) follows OSV-Scanner 2.6.0's extractors (osv-scalibr 3090dbb7aaa2, the commit its go.mod pins) for the canonical output of each tool: pnpm-lock.yaml at lockfileVersion 9 (every YAML document; the `packages` entries with their own name and version, as OSV reads them), package-lock.json and npm-shrinkwrap.json (lockfileVersion 1 to 3) and yarn.lock (classic and berry, with npm: aliases). bun.lock, bun.lockb, deno.lock, any other npm format and any style outside the canonical subset have no reader, so such a lock added to the inventory fails the test until one exists (fail closed). It reads pins, not reachability. The yarn and package-lock readers are exercised by unit tests only, because the inventory has no yarn.lock and one package-lock.json without next; the pnpm reader also reads the two real pnpm locks.",
+  "Section E of the returned outputs is a local run of the workflow's command on the working tree, not the CI run; the required check on the merged head is the CI result. The failing set is whatever OSV lists at the time of a scan (each scan carries its time), and more advisories can land before a merge.",
+  "A separately drafted OpenHands 1.50 Linux lock (draft PR 535, head 00aa6c25fe6f27e9f5974e9f6a5592aa31683479 as fetched, sha256 383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106) carries urllib3 2.7.0 and pyjwt 2.14.0 too (section G); this change does not touch its files.",
+  "Mutants: the script runs 24 in-memory mutants that must each fail the named guard rule and 8 direct assertions (including three inputs that must NOT be flagged), between two control runs of the unmutated tests."
  ],
- "ci_failure": {
-  "run_id": 36733726923,
-  "job_id": 109949820112,
-  "pull_request": 540,
-  "conclusion": "failure (osv-scanner)",
-  "source": "as reported by c5 in its cross-session message (its own failing-checks listing); this session did not read the run's log, and the local reproduction below is the evidence",
-  "reproduction": "section E of the returned outputs: the workflow's command over the 49 lockfiles on origin/main at 11227bfd exits 1 with exactly urllib3==2.7.0 (three ids) and next==16.3.5 (one id). The third urllib3 id was published at 15:00:38Z, after a first local scan had shown two, so the failing set grew while this change was built; the scan before the merge is the one that counts"
- },
  "advisories": [
   {
    "id": "GHSA-8988-9cw3-xx77",
    "aliases": [
     "CVE-2026-97687"
    ],
-   "published": "2026-09-30T14:46:04Z",
+   "osv_published": "2026-09-30T14:46:04Z",
+   "github_reviewed_at": "2026-09-30T14:46:04Z",
+   "nvd_published_at": "2026-09-29T16:17:18Z",
    "package": "urllib3 (PyPI)",
    "affects": "1.26.0 through 2.7.0",
    "fixed": "2.8.0",
@@ -39,7 +34,9 @@
    "aliases": [
     "CVE-2026-97689"
    ],
-   "published": "2026-09-30T14:46:18Z",
+   "osv_published": "2026-09-30T14:46:18Z",
+   "github_reviewed_at": "2026-09-30T14:46:18Z",
+   "nvd_published_at": "2026-09-29T16:17:18Z",
    "package": "urllib3 (PyPI)",
    "affects": "1.10.3 through 2.7.0",
    "fixed": "2.8.0",
@@ -51,7 +48,9 @@
    "aliases": [
     "CVE-2026-97688"
    ],
-   "published": "2026-09-30T15:00:38Z",
+   "osv_published": "2026-09-30T15:00:38Z",
+   "github_reviewed_at": "2026-09-30T15:00:38Z",
+   "nvd_published_at": "2026-09-29T16:17:18Z",
    "package": "urllib3 (PyPI)",
    "affects": "2.6.2 through 2.7.0",
    "fixed": "2.8.0",
@@ -59,25 +58,56 @@
    "disposition": "fixed by the relock"
   },
   {
+   "id": "GHSA-42vr-xj54-vc7v",
+   "aliases": [
+    "CVE-2026-101918"
+   ],
+   "osv_published": "2026-09-30T15:41:05Z",
+   "github_reviewed_at": "2026-09-30T15:41:05Z",
+   "nvd_published_at": "2026-09-28T21:17:13Z",
+   "package": "PyJWT (PyPI)",
+   "affects": "2.0.0a1 through 2.14.0",
+   "fixed": "2.15.0",
+   "summary": "PyJWT: unauthenticated RecursionError DoS in the pre-verification payload parse (PyJWKClient.get_signing_key_from_jwt / decode with verify_signature=False)",
+   "disposition": "fixed by the relock: the fix left the workspace's 7-day window at 2026-09-30T16:56:00.689307Z (overturn condition (a) of the 2026-09-30T04:30Z choice in research.md)"
+  },
+  {
    "id": "GHSA-vcvr-r3jv-pc5j",
    "aliases": [],
-   "published": "2026-09-30T14:48:30Z",
+   "osv_published": "2026-09-30T14:48:30Z",
+   "github_reviewed_at": "2026-09-30T14:48:30Z",
+   "nvd_published_at": null,
    "package": "next (npm)",
    "affects": "16.2.0 through 16.3.5",
    "fixed": "16.3.6",
-   "summary": "Next.js: Remote Code Execution in next/og ImageResponse (Node.js implementation, attacker-controlled values in SVG content, attributes or styles)",
-   "disposition": "ignored for the frozen macOS variant lock until 2026-12-24; the live application-delivery lock pins 16.3.6"
+   "summary": "Next.js: Remote Code Execution in next/og ImageResponse (Node.js implementation, attacker-controlled values in SVG content, attributes or styles; the Edge implementation and applications that pass no such values are not affected, per the advisory text in section A)",
+   "fixed_release": "next 16.3.6 released 2026-09-22T17:15:10Z; the tree's blueprints/convergence-practice/application-delivery/history/recipe-revisions.json records the advisory and the 16.3.5 to 16.3.6 bump as verified on 2026-09-25, so the upstream advisory predates the 2026-09-30 OSV record",
+   "disposition": "ignored for the frozen macOS variant lock until 2026-12-24; the live application-delivery lock pins 16.3.6, which the advisory does not affect"
   }
  ],
+ "release_facts": {
+  "urllib3_2_8_0": {
+   "upstream_tag": "2.8.0 (annotated tag object 2f980b433a89399ad5efd72e7f6da04e667ea287, commit b1d30ab61fe0db8f11092805e8c5ac43e091064a; section A, git ls-remote)",
+   "pypi_files": "urllib3-2.8.0-py3-none-any.whl uploaded 2026-09-15T19:29:34.577402Z and urllib3-2.8.0.tar.gz uploaded 2026-09-15T19:29:36.253420Z, neither yanked (section A)",
+   "window_end": "2026-09-22T19:29:36.253420Z (the later upload plus 7 days)"
+  },
+  "pyjwt_2_15_0": {
+   "upstream_tag": "2.15.0 (commit 1d41a6478e1562e68ff667fcd703356acf085f68; section A, git ls-remote); fix commit 5fde08a6cf906aa7698de2d6391d88b73006b17b named by the OSV record",
+   "pypi_files": "pyjwt-2.15.0-py3-none-any.whl uploaded 2026-09-23T16:55:59.241512Z (sha256 7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8), pyjwt-2.15.0.tar.gz uploaded 2026-09-23T16:56:00.689307Z (sha256 b11c5f9791d7bf51c2b39a81ed669f6b2dbbd669df2942f6c60167e9e3d1abe4), neither yanked (section A)",
+   "window_end": "2026-09-30T16:56:00.689307Z (the later upload plus 7 days); the relock ran after it",
+   "changelog": "CHANGELOG.rst at tag 2.15.0: Security: recursion errors in deeply nested payloads wrapped in DecodeError; Changed: JWKSetCache stores the parsed PyJWKSet, PyJWKClient.fetch_data() raises for a non-object JWKS; Fixed: cached PyJWKSet values, non-numeric exp/nbf/iat raise PyJWTError subclasses, OKP JWK private-key check (section J prints the entry lines)"
+  },
+  "seven_day_rule": "the pinned SDK workspace sets exclude-newer = \"7 days\" (pyproject.toml, line 8) and exclude-newer-span P7D in uv.lock; the relock printed the line (section B)"
+ },
  "locks": [
   {
    "lock": "blueprints/runtime-workers/openhands/requirements.lock",
    "previous_sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
-   "sha256": "550a28639c5bfeb7b45385b57d52ff3315ca4338688a79f5ade6926f98e93ee3",
+   "sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
    "lines": 1133,
-   "diff": "only the urllib3 entry: 2.7.0 to 2.8.0 and its two hashes (section B); the five upgrades of the 2026-09-30 relock reproduce the previous lock byte for byte (control), the sixth is `--upgrade-package urllib3==2.8.0`",
+   "diff": "only the urllib3 (2.7.0 to 2.8.0) and pyjwt (2.14.0 to 2.15.0) entries and their hashes (sections B and D); the five upgrades of the 2026-09-30 relock reproduce the previous lock byte for byte (control)",
    "pins_json": "requirements_sha256 updated to the new sha256 (uv_lock and source_archive digests unchanged: the upstream source is untouched)",
-   "checks": "the recipe's hashed install sequence (build-requirements, then the runtime lock with --require-hashes --no-build-isolation) exits 0, uv pip check exits 0 (178 packages), the SDK import check exits 0, urllib3 2.8.0 / requests 2.33.0 / httpx 0.28.1 / PyJWT 2.14.0 / oauthlib 3.3.1 installed (section C)"
+   "checks": "the recipe's hashed install sequence (build-requirements, then the runtime lock with --require-hashes --no-build-isolation) exits 0, uv pip check exits 0, the SDK import check exits 0, and the installed set is urllib3 2.8.0 / pyjwt 2.15.0 / oauthlib 3.3.1 (section C)"
   },
   {
    "lock": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
@@ -86,36 +116,143 @@
   }
  ],
  "osv_scanner": {
-  "tool": "OSV-Scanner 2.6.0 (osv-scalibr 0.5.2)",
+  "tool": "OSV-Scanner 2.6.0",
   "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108 (the CI pin, checked in section E)",
-  "command": "scan source --config .github/osv-scanner.toml --no-resolve with the 49 --lockfile arguments the workflow builds from .github/osv-scanner-lockfiles.json",
+  "command": "scan source --config .github/osv-scanner.toml --no-resolve with the 49 --lockfile arguments the workflow builds from .github/osv-scanner-lockfiles.json; the wrapper and the exact command line are retained (section E)",
+  "retained_reports_note": "the scanner's JSON with the scan root masked and the advisories' details prose dropped (third-party text, which can carry its author's own paths); the stderr with the scan root masked",
+  "retained_reports": {
+   "main": {
+    "json_sha256": "6e6d4c016322cff452860b1b21582d588f7295100d61f558825ec4ca1b39cc3e",
+    "err_sha256": "865e248867f73e63ca79338ca388ffca65f4bd7b017381e2e130821a20c5256f"
+   },
+   "after": {
+    "json_sha256": "ca69bfd57904b04f30d0ddd30ffeb9ddcba914c0589e90a0cc313e397db70251",
+    "err_sha256": "0b5ec5e3e4c8153c864e0e98dd5e543ef816a56f9e973730d3cb6843537b4bec"
+   },
+   "after-noconfig": {
+    "json_sha256": "de83299625e0ba1cfd16b0c043a46a42d7fb31475c37a72590e810ef56f8bb45",
+    "err_sha256": "fac8612d25e6a5346ac8f65c7d85a848515dfea761edcfc51dc1d6fe9be229a7"
+   }
+  },
   "results": {
-   "origin/main at 11227bfd": "exit 1: urllib3==2.7.0 (GHSA-8988-9cw3-xx77, GHSA-gh4c-6fx4-qh6g, GHSA-vxq7-64xx-v4gw) and next==16.3.5 (GHSA-vcvr-r3jv-pc5j)",
+   "origin/main at 11227bfd": "exit 1: urllib3==2.7.0 (GHSA-8988-9cw3-xx77, GHSA-gh4c-6fx4-qh6g, GHSA-vxq7-64xx-v4gw), pyjwt==2.14.0 (GHSA-42vr-xj54-vc7v) and next==16.3.5 (GHSA-vcvr-r3jv-pc5j)",
    "this change": "exit 0, no findings; the scanner reports 8 vulnerabilities filtered from output by the entries of .github/osv-scanner.toml (oauthlib, nltk, setuptools and, new, next)",
-   "this change with an empty config (control)": "exit 1: the ignored set only (oauthlib 3.3.1 x2, nltk, setuptools x2, next 16.3.5); urllib3 is absent, fixed and not ignored"
+   "this change with an empty config (control)": "exit 1: the ignored set only (next==16.3.5 ['GHSA-vcvr-r3jv-pc5j'], nltk==3.10.3 ['GHSA-8mgp-746c-j5xp'], oauthlib==3.3.1 ['GHSA-hj66-6f7g-4r5v', 'GHSA-xpv3-w29h-x7cv'], setuptools==80.10.2 ['GHSA-h35f-9h28-mq5c', 'PYSEC-2026-3447']); urllib3 and pyjwt are absent, fixed and not ignored"
   }
  },
  "carried_forward_review": {
-  "reviewed_record": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json (carried_forward_review, the 2026-09-29 oauthlib review)",
+  "reviewed_record": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json (carried_forward_review, the 2026-09-29 oauthlib review) and evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/",
   "advisories": [
    "GHSA-hj66-6f7g-4r5v",
    "GHSA-xpv3-w29h-x7cv"
   ],
-  "why_it_holds": "the closure differs from the reviewed one in urllib3's version and hashes alone (section B), and the installed urllib3 2.8.0 package has no oauthlib reference (section D, 0 files), so no importer of oauthlib and no call site of its endpoints or grant types can have changed"
+  "why_it_holds": "the closure differs from the reviewed one in the urllib3 and PyJWT entries alone (sections B and D); oauthlib 3.3.1 and its wheel hashes are unchanged; the four oauthlib source files the earlier review names hash as it recorded in the new venv (section J, 4 matches); the installed urllib3 2.8.0 package has no oauthlib reference (section D, 0 files); oauthlib imports jwt lazily in three helper modules (section J), none on the revocation-endpoint or PKCE paths the two advisories concern"
  },
- "guard_negative_controls": "section H of the returned outputs: the unmutated tests pass (14 tests of AllowedLockTests) and seven in-memory mutants each fail the rule they target: M1 the macOS row removed (next hidden outside an allowed lock), M2 the reader unable to read a lock (fails closed), M3 the allowed lock no longer pinning next (entry must be dropped), M4 another pnpm lock pinning next 16.3.5, M5/M6 a wrong sha256 in the OpenHands or macOS row (digest test), M7 the next ignore without its scope",
+ "pyjwt_decision": {
+  "issue": "#518, decision point 2026-09-30T16:56:01Z (owner: the OpenHands lock lane)",
+  "decision": "the OpenHands lock moves to PyJWT 2.15.0 in this change, ahead of the joint oauthlib 4.0.0 / PyJWT 2.15.1 relock",
+  "reason": "overturn condition (a) of the 2026-09-30T04:30Z choice in research.md is met: OSV lists GHSA-42vr-xj54-vc7v for PyJWT 2.14.0 and only 2.15.0 or later fixes it; 2.15.0 had left the 7-day window; a fix is available, so no ignore and no reachability argument are needed",
+  "jwks_client_users_outside_pyjwt": [
+   "google/oauth2/id_token.py:144:        jwks_client = jwt_lib.PyJWKClient(certs_url)",
+   "google/oauth2/id_token.py:145:        signing_key = jwks_client.get_signing_key_from_jwt(id_token)"
+  ],
+  "importers_of_google_oauth2_id_token_outside_google": "none (section J): the one call path of the advisory in the venv, google-auth's verify_token JWKS branch, has no importer in the venv",
+  "importers_of_jwt_in_the_venv": {
+   "litellm": 7,
+   "oauthlib": 3,
+   "redis": 1,
+   "mcp": 1,
+   "google": 1
+  }
+ },
  "next_pin_guard": {
   "why": "python_pins reads no npm format, so the repo-wide next ignore would not have been bounded by the Python guard",
-  "reader": "pnpm_next_pins in tests/test_osv_lockfile_coverage.py reads the `  next@<version>` package and snapshot keys of each pnpm-lock.yaml in the inventory; test_only_the_allowed_pnpm_lock_pins_an_affected_next fails for any lock but the allowed one that pins a next below 16.3.6, and for a lock it cannot read strictly",
-  "current_pins": "frozen macOS variant 16.3.5 (allowed); application-delivery 16.3.6"
+  "readers": "npm_next_pins in tests/test_osv_lockfile_coverage.py dispatches by file name (or the inventory's parser name) to pnpm_next_pins, package_lock_next_pins and yarn_lock_next_pins, ported from the OSV extractors named in the limitations for the CANONICAL output of each tool; any other npm lock name, an unknown format version, malformed input, an unreadable file or valid syntax outside the canonical subset (an inline pnpm record, a double-quoted key, a trailing comment, odd indentation, a repeated or differently cased JSON key) returns None and fails the test instead of reading as no next",
+  "tests": "test_only_the_allowed_lock_pins_an_affected_next (the real inventory), test_the_npm_next_readers_see_every_shape_or_fail_closed, test_the_readers_run_in_linear_time_on_whitespace_heavy_input, test_the_next_guard_catches_a_mutant_lock and test_the_next_range_has_both_bounds (introduced 16.2.0, fixed 16.3.6, semver with prerelease and build metadata)",
+  "current_pins": "frozen macOS variant 16.3.5 (allowed); application-delivery 16.3.6; retrieval recipe package-lock.json no next"
  },
- "follow_up": "Tracked with issue #518 (the OpenHands lock lane; owner bc): the joint oauthlib 4.0.0 / PyJWT 2.15.1 relock, no earlier than 2026-10-05T18:40:43Z, is built on whatever lock is on main then. The macOS next ignore runs to 2026-12-24. Codex's #535 needs the urllib3 bump (see limitations).",
+ "guard_negative_controls": "section H of the returned outputs: the unmutated tests pass before and after, 24 in-memory mutants each fail the guard rule they target and 8 direct assertions hold. R1 to R3 are the mutants of the first cross-family review (a quoted affected key beside an unquoted fixed key, an affected next in a package-lock.json, a version below the introduced release); R4 to R11 those of the second (a pnpm tarball entry with its own name and version, a yarn berry alias, package-lock aliases and path-named entries, backtracking on whitespace, a canary above the fix and build metadata, an integer lockfileVersion); R12 to R19 those of the third and fourth (an inline pnpm record, repeated or differently cased JSON keys, an optional peer pin that is not a package, the yarn root workspace, deep nesting, a pin in the second document of a pnpm lock, a dependency installed from a local path); M1 to M9 mutate the readers' inputs and the exact-lock rows, M10 and M11 a wrong sha256 in either row, M12 the next scope removed",
+ "independent_review": {
+  "kind": "cross-family, read-only: codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort=max in the PR worktree (the native Codex login, not the gateway pool)",
+  "review_1": {
+   "review": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-1.md",
+   "review_sha256": "bba0c3b7206114773f7db45eb5ca20134ea6e87f153fa769a5d0345476e574b3",
+   "rubric": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-1.txt",
+   "rubric_sha256": "c7959b04d43978453a56b56863d0c2e7f23420885dac76a5fec63f84cb8a7bf0",
+   "head": "09d5371d71d3127db3144a0ce3c444a1af696b7f (first head of PR #546)",
+   "verdict": "changes-needed",
+   "findings": {
+    "P1-1": "the pnpm reader accepted partial parses (a quoted affected key beside an unquoted fixed one, mixed indentation, /next/ keys, dependency-only pins, unknown lockfileVersion): repaired",
+    "P1-2": "package-lock.json, yarn.lock and other npm formats bypassed the guard: repaired",
+    "P2-3": "the affected predicate omitted the introduced bound: repaired",
+    "P2-4": "section E lacked the retained reports and the producing wrapper, and the header overstated 'as printed': repaired",
+    "P2-5": "historical assertions without a retained observation: removed or attributed",
+    "P2-6": "the urllib3 upload date was unsupported: repaired",
+    "P2-7": "the advisory's GitHub date was conflated with the OSV timestamp: repaired"
+   }
+  },
+  "review_2": {
+   "review": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-2.md",
+   "review_sha256": "0bcc8426fe20cba1b0d41668986d2e3afae992a665f3e1e35f0123dae596a3ea",
+   "rubric": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-2.txt",
+   "rubric_sha256": "4fcdafc5b24432aed4bdcb82450963cd93f74963e4211f0fb2c37063f81f8d10",
+   "head": "the repaired working tree before the second commit (uncommitted; the commit adds the retained review files and this receipt's edits)",
+   "verdict": "changes-needed",
+   "findings": {
+    "P1-1": "pnpm package records with their own name and version (tarball, renamed, disagreeing entries) escaped: repaired (packages entries read as OSV reads them)",
+    "P1-2": "npm and yarn aliases (yarn berry and classic, package-lock v1) and package-lock names from an empty name field or a path such as vendor/next escaped: repaired (extractors ported)",
+    "P2-3": "the next: block regex backtracked badly (2 s at 604 bytes): repaired (line scan; a linear-time test)",
+    "P2-4": "integer lockfileVersion returned None; fixed with build metadata and an above-fix canary counted as affected: repaired (semver predicate)",
+    "P2-5": "unretained historical assertions (peer request, run and job ids, 'grew while built', tag hashes, current #518 and #535 status): removed or made retained (section A git ls-remote, section G)",
+    "P2-6": "'listed since' turned a review timestamp into a first-listing date; 'scanned without an ignore': repaired",
+    "nit-7": "the exact-command header and the diff shown without its producing command: repaired (scripts run from their published copies; the diff command shown as run)",
+    "nit-8": "numeric descriptions (exact cutoff, mutant counts): repaired"
+   },
+   "residuals": [
+    "overrides, quoted version fields and flow-style importer entries without package records are not read (OSV reads package records)",
+    "malformed pnpm input is not validated (OSV's own parse fails separately)",
+    "an unknown npm file name is skipped by npm_next_findings; the inventory parser check rejects it"
+   ]
+  },
+  "review_3": {
+   "review": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-3.md",
+   "review_sha256": "e665a6fa7fcc80feed4c2360788193976846150acb30b9ca396cc3ec46b11531",
+   "rubric": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-3.txt",
+   "rubric_sha256": "5301a9c9005336fa9f35a6d10b153889d13b402756048299a1d140a76afe500c",
+   "scope": "guard only (the readers in tests/test_osv_lockfile_coverage.py against the pinned Go extractors, read from a local blobless clone of osv-scalibr)",
+   "verdict": "changes-needed",
+   "findings": {
+    "P1-1": "valid pnpm YAML outside the reader's assumptions (an inline record, quoted keys, other indentation, a trailing comment) returned no next: repaired (the reader accepts only pnpm's canonical style and returns None otherwise)",
+    "P1-2": "Go's JSON decoding merges repeated maps and matches fields case-insensitively, which the port does not model: repaired (a repeated key or a differently cased field name is rejected, not read)",
+    "P2-3": "the introduced bound mishandled a prerelease of the introduced release: repaired (semver)",
+    "P2-4": "an optional peer declaration was read as a pin, but OSV reads package records only: repaired (importers, snapshots and peer declarations are no longer read)",
+    "P2-5": "the yarn root workspace exclusion was dropped: repaired",
+    "P2-6": "deep nesting raised RecursionError: repaired (iterative walk; a parser RecursionError gives None)"
+   },
+   "found_by_the_repair": "pnpm 12 writes two YAML documents (the environment lockfile and the project lock) and OSV extracts the packages of every document; the strict reader first refused both real locks on the repeated `packages` key and now reads every document"
+  },
+  "review_4": {
+   "review": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-review-4.md",
+   "review_sha256": "0d6b3be31dbaaedcacc26a3483ab516799afcd6e15322f1dd5accd240c6fface",
+   "rubric": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.cross-family-rubric-4.txt",
+   "rubric_sha256": "23bdd6f4df5f1edff0de6dc2f6445d664201bed93c15e9ea0c269d3e801a6cde",
+   "scope": "guard only, after the canonical-only rewrite (contract: the exact versions the pinned Go extractor reports, or None, never a raise)",
+   "verdict": "changes-needed",
+   "findings": {
+    "P1": "a lockfileVersion 1 dependency named next installed from a local path (file:) returned the path as a version, where the Go extractor emits an empty version: repaired (None, the guard cannot judge it)",
+    "nit": "canonical npm workspace links named next return None (fail closed, as designed; the workspace target's own entry carries the version): recorded, not changed"
+   },
+   "otherwise": "the retained mutants exit 0, the six regressions of the third pass pass, both real pnpm locks parse, and 100,000-package probes scale about linearly"
+  },
+  "bounded_loop": "four cross-family reviews and four repair rounds (each review found the previous reader too permissive; the last repair changed the design from a superset of pins to a canonical-only reader that fails closed); the fourth review found one P1 of the exact-or-None kind and a nit; a fifth pass, if any, is recorded on the PR"
+ },
+ "follow_up": "The joint oauthlib 4.0.0 / PyJWT 2.15.1 relock is planned no earlier than 2026-10-05T18:40:43Z (research.md, issue #518) and builds on this lock. The macOS next ignore runs to 2026-12-24. A separately drafted OpenHands 1.50 lock needs the same urllib3 and PyJWT entries (see limitations).",
  "registrations": [
   ".github/osv-scanner.toml: the GHSA-vcvr-r3jv-pc5j ignore with its reason",
-  "tests/test_osv_lockfile_coverage.py: IGNORE_SCOPES entry, the OpenHands entry's new sha256 and evidence, the macOS row, pnpm_next_pins and its two tests",
-  "blueprints/runtime-workers/openhands/pins.json and requirements.lock",
+  "tests/test_osv_lockfile_coverage.py: IGNORE_SCOPES entry with the introduced bound, the OpenHands entry's new sha256 and evidence, the macOS row, the npm readers and their tests",
+  "blueprints/runtime-workers/openhands/pins.json, requirements.lock and research.md",
   "docs/decisions/2026-09-22-github-automation-closure.md: the dated paragraph",
-  "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt and the four scripts beside it",
+  "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.txt, the retained scanner reports, the scripts and the cross-family review outputs beside it",
   "manifests/evidence.json: the new files and the changed registered files"
  ]
 }
