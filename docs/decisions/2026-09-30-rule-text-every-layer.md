@@ -13,9 +13,10 @@ An audit on 2026-09-30 found the top rule present in text but with gaps in all t
 - **(e) Upstream harnesses.** A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, `skill-creator`'s paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
 - **(f) Startup.** No audits, trials or network at startup. The one read-only due-file line that the daily currency timer produces is allowed; its record, `docs/decisions/2026-09-30-session-currency-notice.md`, lands with unit A2 in the same batch.
 
-**Divergence observed.** At `e45328d3` the operator's user-level file and the portable template had drifted apart. The user-level file held eight rules the template lacked:
+**Divergence observed.** At `e45328d3` the operator's user-level file and the portable template had drifted apart. The user-level file held nine rules the template lacked:
 - research published references and record what you found;
 - build only from a cited reference implementation;
+- use supported installation commands and tests from the selected source revision;
 - stars, installs and popularity guide discovery;
 - more tools, more reasoning and reviewer agreement alone do not prove quality;
 - retain source pins and reasons;
@@ -23,7 +24,7 @@ An audit on 2026-09-30 found the top rule present in text but with gaps in all t
 - use a short plan for bounded work;
 - delegate so the reads, searches and dead ends stay in the child.
 
-The template, in turn, held the five-step verification procedure that the user-level file lacked. The failing-first run of the new phrase check (below) reproduces this: 29 of its 35 phrases were missing from the unedited template, 8 of them rules that only the user-level file held.
+The template, in turn, held the five-step verification procedure that the user-level file lacked. The failing-first run of the new phrase check (below) reproduces this: 29 of its 35 phrases were missing from the unedited template, 9 of them rules that only the user-level file held.
 
 ## Alternatives
 
@@ -45,7 +46,9 @@ Each surface states the six clauses in its own place:
 | (e) | the top rule (line 3) | a Core rule bullet | its own line |
 | (f) | the startup bullet (line 28), replacing "Do not rerun the full audit or model trials at startup" | the caching bullet of the token practice | its own line |
 
-**The portable template becomes the single managed source of the user-level file.** It is now a superset of that file's rules. Step 1 of its top rule takes the user-level paragraph, and its Core rule and token-practice bullets take the other seven rules listed above. Every worker, model, Ultracode and agent-team rule of the user-level file survives word for word. The one exception is "Quality comes first", which the template keeps as one line where the user-level file split it into sub-bullets. `@RTK.md` stays the host's own import outside the template ([`recipes/claude-native-profile.md:134-136`](../../recipes/claude-native-profile.md)). Unit A3's installer replaces the file between managed markers.
+**The portable template becomes the single managed source of the user-level file.** It is now a superset of that file's rules. Step 1 of its top rule takes the user-level paragraph and the source-revision rule, and its Core rule and token-practice bullets take the other six rules listed above. Every worker, model, Ultracode and agent-team line of the user-level file survives verbatim, with two exceptions:
+- "Quality comes first" stays one line in the template, where the user-level file split it into sub-bullets; the word sequence is identical.
+- The workflow-sizing line keeps every word of the user-level version and adds "to its task". `@RTK.md` stays the host's own import outside the template ([`recipes/claude-native-profile.md:134-136`](../../recipes/claude-native-profile.md)). Unit A3's installer replaces the file between managed markers.
 
 **The Codex block also takes:**
 - skill invocation, as Codex defines it: a named `$SkillName` or a task that matches a skill's description (openai/codex `rust-v0.159.2` `codex-rs/ext/skills/src/catalog_prompt.rs:8`);
@@ -84,7 +87,7 @@ The coordinator decides between the budget and the clause set.
 These are structural checks on text, pins and registration, not a behavior test.
 - **The Codex block's lanes and clauses.** `TemplateTests.test_top_rule_carries_the_standing_clauses_and_a_lane_for_every_configured_server` failed on the unedited block, listing all seven servers as missing (exit 1). It passes now.
 - **The Codex pin.** The top-rule pin was re-derived with the test module's own `template_segments()`: 455 words, `7b41478f…`.
-- **The portable template's phrases.** `PortableTopRuleTests.test_the_template_carries_the_standing_clauses_and_the_user_level_rules` failed on the unedited template, with 29 phrases missing (exit 1). It passes now.
+- **The portable template's phrases.** `PortableTopRuleTests.test_the_template_carries_the_standing_clauses_and_the_user_level_rules` failed on the unedited template, with 29 phrases missing, 9 of them held only by the user-level file (exit 1). It passes now.
 - **The word budget.** The template's baseline moves to 1,656 words, following the re-baselines of 2026-09-27 and 2026-09-29.
 
 ## Limitations and integration
