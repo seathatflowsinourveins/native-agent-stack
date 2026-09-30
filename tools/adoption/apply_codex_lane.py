@@ -74,6 +74,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
 import stat
 import string
@@ -980,11 +981,19 @@ def cmd_plan(args: argparse.Namespace, codex: str) -> int:
         return 3
     agents_sha = sha256_bytes(plan.agents_bytes) if plan.agents_bytes is not None else "absent"
     print("result: rehearsal passed. Apply in a quiet window (no codex process) with:")
+    # Every flag that changes the plan or its checks is repeated, so that following the printed command applies
+    # exactly what was rehearsed (a printed command without --worker-roles installed only the two carriers).
     print(f"  python3 {Path(__file__).resolve().relative_to(ROOT)} --apply"
           + (f" --codex-home {plan.codex_home}" if args.codex_home else "")
           + (f" --eco-root {plan.eco_root}" if args.eco_root else "")
           + (f" --host-path '{plan.host_path}'" if args.host_path else "")
+          + (f" --codex {shlex.quote(args.codex)}" if args.codex else "")
+          + (f" --state-dir {shlex.quote(args.state_dir)}" if args.state_dir else "")
+          + "".join(f" --project-config {shlex.quote(path)}" for path in (args.project_config or []))
+          + (f" --codex-process-name {shlex.quote(args.codex_process_name)}"
+             if args.codex_process_name != "codex" else "")
           + (" --omniroute-profile" if plan.omniroute else "")
+          + (" --worker-roles" if plan.worker_roles else "")
           + f" --expect-config-sha256 {sha256_bytes(plan.config_bytes)} --expect-agents-sha256 {agents_sha}")
     print(f"workers then start with: {worker_command()}")
     return 0

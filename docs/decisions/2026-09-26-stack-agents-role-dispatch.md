@@ -381,7 +381,9 @@ Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges i
    template's per-platform `${SOCRATICODE_VERSION}`) and the Codex-only `PATH` and `RTK_TELEMETRY_DISABLED`.
    Claude Code has no per-server start-up timeout (`MCP_TIMEOUT` is global), so the Codex template's
    `startup_timeout_sec` has no counterpart. SocratiCode's endpoints are this repository's defaults, like the
-   ai-memory URL; the installer compares env names only, so a host's own values are kept.
+   ai-memory URL; the installer compares env names only, so a host's own values are kept. MCP start-up timeout
+   parity for Claude Code (`MCP_TIMEOUT=120000`, the counterpart of the Codex template's 120 s `startup_timeout_sec`)
+   lands in the Claude settings template through unit F3, not through this unit.
 4. **codebase-memory.** Item 12 of the [harness-settings record](2026-09-27-claude-harness-settings.md) kept it out of
    this template until "a pinned install on each platform plus a recorded useful call from each intended agent". This
    addendum supersedes that item for the template entry only, on three grounds: the Codex user template already
@@ -408,7 +410,9 @@ Claude Code 2.1.285. It edits the Gate A frozen surfaces on purpose and merges i
   ([community sweep](2026-09-28-community-sweep.md), line 170), the [roadmap](2026-09-28-ecosystem-roadmap.md) (line 52)
   records that the carrier's jCodeMunch `route` missed 6 of 6 in the 2026-09-27 smoke, and the Codex user template
   keeps it project-scoped (#240). The coverage test lists it as its one exception and fails if that template stops
-  saying so.
+  saying so. Post-window reconciliation: the host's user-scope `jcodemunch` entry stays through the Gate A seal, the
+  Gate A owner's decision, because the sealed preregistration measures it; the template and the 2026-09-25 decision
+  are reconciled after the last window.
 - **Keep codebase-memory out.** Rejected by decision 4.
 
 ### Overturn condition

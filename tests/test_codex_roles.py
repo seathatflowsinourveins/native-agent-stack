@@ -11,6 +11,7 @@ tests/test_codex_worker_lane.py, so synthetic) are exercised here.
 """
 
 import hashlib
+import shlex
 import shutil
 import sys
 import tempfile
@@ -419,6 +420,25 @@ class WorkerRolesInstallerTests(unittest.TestCase):
                       out)
         self.assertIn("result: rehearsal passed", out)
         self.assertEqual(self.worker_lane.snapshot(self.host.codex_home), before)
+
+    def printed_apply_command(self, out: str) -> list[str]:
+        line = next(line for line in out.splitlines() if line.strip().startswith("python3 ") and " --apply" in line)
+        tokens = shlex.split(line)
+        self.assertEqual(tokens[:3], ["python3", "tools/adoption/apply_codex_lane.py", "--apply"], line)
+        return tokens
+
+    def test_the_printed_apply_command_keeps_the_flag_and_installs_all_five(self):
+        code, out = self.host.run("--worker-roles")
+        self.assertEqual(code, 0, out)
+        tokens = self.printed_apply_command(out)
+        self.assertIn("--worker-roles", tokens)
+        code, out = self.host.run()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("--worker-roles", self.printed_apply_command(out))
+        # Following the printed command installs the two carriers and the three worker roles it rehearsed.
+        code, out = self.host.run(*tokens[2:])
+        self.assertEqual(code, 0, out)
+        self.assertEqual(sorted(path.name for path in self.agents.iterdir()), sorted(self.ALL))
 
     def test_apply_installs_all_five_and_rollback_removes_them(self):
         code, out = self.apply("--worker-roles")
