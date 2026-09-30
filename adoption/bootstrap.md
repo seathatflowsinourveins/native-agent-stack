@@ -260,7 +260,9 @@ GitHub-hosted macOS runner; see
    shell reads `~/.profile` only when no `~/.bash_profile` or `~/.bash_login`
    exists, which is why the last step checks where `claude` resolves. The
    user-level `codex.config.toml` that `render_config.py` renders is not
-   installed by any step: its trust state needs the review in step 4's warning.
+   installed by any step, and the run's rendered copies go with its staging
+   directory: render it yourself (step 4) and give its trust state the review
+   in step 4's warning.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
@@ -658,7 +660,8 @@ when that commit is in this checkout it must carry `.github/workflows/sota-sourc
 is written (exit 2). The caller is kept as a `.template` file because zizmor also audits nested
 `.github/workflows` directories, where an unfilled `<sha>` is an unpinned `uses:`. In the new repository,
 make the check the workflow reports a required status check, and if its Actions settings allow only
-selected actions, allow this reusable workflow too.
+selected actions, allow this reusable workflow and `step-security/harden-runner`, which it runs
+(`actions/github-script` is GitHub-owned).
 
 `.codex/config.toml` takes `ECO_ROOT` from `ECO_INSTALL_ROOT` (default `~/.local/share/codex-ecosystem`),
 `CODE_INDEX_PATH` from its variable (default `~/.code-index`) and `HOST_PATH` from

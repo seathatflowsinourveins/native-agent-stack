@@ -973,8 +973,8 @@ full_profile_claude_settings() {
 full_profile_codex_lane() {
   local plan apply_line status=0
   full_profile_render || return
-  printf 'Rendered templates: %s (compare with render_config.py --check before copying any by hand).\n' "$full_profile_rendered"
-  printf 'The user-level codex.config.toml there is not installed by this step: review its trust state first (adoption/bootstrap.md, step 4).\n'
+  printf 'The rendered user-level codex.config.toml is not installed by this step, and this run'"'"'s staging copy is removed when the script exits: to review or install it, render it with tools/adoption/render_config.py --host %s --out <dir> and check its trust state first (adoption/bootstrap.md, step 4).\n' \
+    "$full_profile_host"
   plan="$(python3 "$repo_root/tools/adoption/apply_codex_lane.py" --eco-root "$ecosystem_root" 2>&1)" || status=$?
   printf '%s\n' "$plan"
   [[ "$status" -eq 0 ]] || { printf 'The Codex lane dry run refused (exit %s); nothing applied.\n' "$status" >&2; return "$status"; }
