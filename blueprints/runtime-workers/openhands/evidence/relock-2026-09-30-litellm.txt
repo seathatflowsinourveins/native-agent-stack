@@ -1,0 +1,473 @@
+# OpenHands recipe runtime lock: litellm 1.93.2 relock (GHSA-3cv6-jpf6-8222), 2026-09-30
+# Returned outputs of the commands blueprints/runtime-workers/openhands/research.md and evidence/receipts/osv-openhands-litellm-relock-20260930.json cite.
+# A line that starts with '$ ' is a command as run (the time after '#' is when it ran; a script is run from its published copy in this directory); the lines under it are its output as printed,
+# then its exit code. Exceptions: the relock script abbreviates hashes in the diff of section B; host paths are masked: <worktree> (a checkout of this repository on origin/main 29458b43 with this change
+# applied), <main-checkout> (a read-only checkout of origin/main 29458b43), <scratch-relock>, <osv-bin>, <litellm-src>, <evidence-dir> (this directory) and the home directory as ~; the scan step masks its scan
+# root as <scan-root> in the retained scanner outputs; a command's text shows the same placeholders in place of the variables it was run with. All sections were produced by one run of
+# relock-2026-09-30-litellm.builder.sh.txt, in this order, from the published copies of the other scripts (a section's own time stamps are its commands' start times).
+# Retained beside this file: the published scripts (relock-2026-09-30-litellm.*.sh.txt and *.py.txt) and the four scanner outputs of section F (relock-2026-09-30-litellm.osv-{before,after}.{ordinary,frozen}.txt).
+
+## A. The advisory, the release dates and the OSV query for the locked and the relocked versions (OSV API and PyPI, read-only)
+$ python3 "<evidence-dir>/relock-2026-09-30-litellm.osv-advisories.py.txt"     # 2026-09-30T23:04:23Z
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['0'] fixed ['1.88.6']	listed versions 796
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.89.0'] fixed ['1.89.7']	listed versions 7
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.90.0'] fixed ['1.90.7']	listed versions 7
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.91.0'] fixed ['1.91.5']	listed versions 5
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.92.0'] fixed ['1.92.2']	listed versions 2
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.93.0'] fixed ['1.93.2']	listed versions 2
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.94.0'] fixed ['1.94.3']	listed versions 3
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.95.0'] fixed ['1.95.1']	listed versions 1
+GHSA-3cv6-jpf6-8222	osv published 2026-09-30T21:11:25Z	osv modified 2026-09-30T21:15:08.145507777Z	github_reviewed_at 2026-09-30T21:11:25Z	nvd_published_at 2026-09-02T18:21:28Z	aliases ['CVE-2026-84377']	MODERATE	['CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N']	PyPI litellm	introduced ['1.96.0'] fixed ['1.96.2']	listed versions 1
+    summary: LiteLLM: Authenticated SSRF and provider-credential exfiltration via unvalidated request-body routing parameters
+    cwe_ids: ['CWE-918']
+    references:
+      WEB: https://github.com/BerriAI/litellm/security/advisories/GHSA-3cv6-jpf6-8222
+      ADVISORY: https://nvd.nist.gov/vuln/detail/CVE-2026-84377
+      WEB: https://github.com/BerriAI/litellm/pull/36011
+      WEB: https://github.com/BerriAI/litellm/pull/36314
+      WEB: https://github.com/BerriAI/litellm/pull/36494
+      WEB: https://github.com/BerriAI/litellm/commit/473f72e63a9777d793fbbf57194d8ec4fb97bc1b
+      WEB: https://github.com/BerriAI/litellm/commit/820f247a6abba55cd87d130bef7bba7be3b29d37
+      WEB: https://github.com/BerriAI/litellm/commit/c898d341c02299cf2506d0d8e84cc67953043593
+      PACKAGE: https://github.com/BerriAI/litellm
+    details (whitespace folded):
+      ### Impact Any authenticated LiteLLM proxy user could redirect an outbound provider call to a destination they control and cause the proxy to send its own configured provider credentials to that destination. The proxy's request-body validation was a denylist that did not cover every sensitive parameter and did not inspect parameters nested inside other request fields, so a caller could supply a routing or credential value that the proxy applied without clearing the operator's stored key. Any authenticated user could therefore exfiltrate the operator's upstream provider credentials and other configured secrets, and perform Server-Side Request Forgery against internal services reachable from the proxy. ### Patches Fixed in 1.96.2, 1.95.1, 1.94.3, 1.93.2, 1.92.2, 1.91.5, 1.90.7, 1.89.7, and 1.88.6. ### Workarounds Set `general_settings.allow_client_side_credentials` to `false` so callers cannot override connection parameters, restrict proxy keys to trusted callers, and block the affected parameters (`api_base`, `base_url`, `model_list`, `fallbacks`, provider credential fields) at a reverse proxy or API gateway.
+query PyPI litellm==1.93.0: ['GHSA-3cv6-jpf6-8222']
+query PyPI litellm==1.93.1: ['GHSA-3cv6-jpf6-8222']
+query PyPI litellm==1.93.2: no advisories
+pypi litellm 1.93.0 file litellm-1.93.0-cp310-cp310-manylinux_2_28_aarch64.whl: uploaded 2026-07-19T03:00:52.962818Z, not yanked, sha256 5d84aead083d3d0619b2d293f8006ebbe75611bbdcef470d659c9e2d131d4454
+pypi litellm 1.93.0 file litellm-1.93.0-cp310-cp310-manylinux_2_28_x86_64.whl: uploaded 2026-07-19T03:00:56.318518Z, not yanked, sha256 6b49f653e6205cbc725257da8797277f77065c69865fb3489bc5ed0896b66ee0
+pypi litellm 1.93.0 file litellm-1.93.0-cp311-cp311-manylinux_2_28_aarch64.whl: uploaded 2026-07-19T03:00:59.756956Z, not yanked, sha256 952029d422c2cec8117b444d66d6de87ac970ecf0b2e1383b02788ef90ba3603
+pypi litellm 1.93.0 file litellm-1.93.0-cp311-cp311-manylinux_2_28_x86_64.whl: uploaded 2026-07-19T03:01:02.827079Z, not yanked, sha256 460001b7c88c5b6675ad482ae3cecba96e21f890604b4febb1a67807ace1c750
+pypi litellm 1.93.0 file litellm-1.93.0-cp312-cp312-manylinux_2_28_aarch64.whl: uploaded 2026-07-19T03:01:05.713484Z, not yanked, sha256 3daf5c5aceb07f5d68871071e0ecdc678caccebadca9143cc00bb76f5a8c54e8
+pypi litellm 1.93.0 file litellm-1.93.0-cp312-cp312-manylinux_2_28_x86_64.whl: uploaded 2026-07-19T03:01:09.037288Z, not yanked, sha256 0784172435de48f66ef7ad89d421604db1ad0db1321ef7f39dbcfe6b20111417
+pypi litellm 1.93.0 file litellm-1.93.0-cp313-cp313-manylinux_2_28_aarch64.whl: uploaded 2026-07-19T03:01:12.035915Z, not yanked, sha256 23b8eea4fb8b3b6ade05e7b6085ec9ca12daffcfb38d033d0bbce9c1d5894da5
+pypi litellm 1.93.0 file litellm-1.93.0-cp313-cp313-manylinux_2_28_x86_64.whl: uploaded 2026-07-19T03:01:15.395735Z, not yanked, sha256 98c15e84d32e922a821c105308bf9ddae8700de9ed396530bee2cbb1cacf4cbb
+pypi litellm 1.93.0 file litellm-1.93.0-cp314-cp314-manylinux_2_28_aarch64.whl: uploaded 2026-07-19T03:01:18.425165Z, not yanked, sha256 1a476ebc340c070c982eab15b4673fa63a70f5936935f9f20e4d2acb5f35d23b
+pypi litellm 1.93.0 file litellm-1.93.0-cp314-cp314-manylinux_2_28_x86_64.whl: uploaded 2026-07-19T03:01:21.704435Z, not yanked, sha256 cd70ccd4ba3ef1a395535c287bce72d30c7d937ecca4290c0db37a00738f7ada
+pypi litellm 1.93.0 file litellm-1.93.0.tar.gz: uploaded 2026-07-19T03:01:24.389317Z, not yanked, sha256 140bf215e264c71601bca9c06d2436c5451bb59e1e195ea23fc2d3d87b6929ec
+pypi litellm 1.93.1 file litellm-1.93.1-cp310-cp310-manylinux_2_28_aarch64.whl: uploaded 2026-07-29T00:42:50.550601Z, not yanked, sha256 6f4454cad539c736b90a3637f59d796c7d2fae9d0bbfbb81a447ee9ec5e08b95
+pypi litellm 1.93.1 file litellm-1.93.1-cp310-cp310-manylinux_2_28_x86_64.whl: uploaded 2026-07-29T00:42:54.391881Z, not yanked, sha256 4a4b95217170b7b637c3eed1152f2864e0416a6f9f0aeae965767cbc0f702913
+pypi litellm 1.93.1 file litellm-1.93.1-cp310-cp310-win_amd64.whl: uploaded 2026-07-29T00:42:56.781800Z, not yanked, sha256 44bb8b62370672cdc64fefc1392c60e6686f87523e292bf928a7e99e013511a0
+pypi litellm 1.93.1 file litellm-1.93.1-cp311-cp311-manylinux_2_28_aarch64.whl: uploaded 2026-07-29T00:42:59.608657Z, not yanked, sha256 038b69bde3aebbdfa97661b9c5411abba8dcb762badbee275026db5c66b1c3fa
+pypi litellm 1.93.1 file litellm-1.93.1-cp311-cp311-manylinux_2_28_x86_64.whl: uploaded 2026-07-29T00:43:02.254444Z, not yanked, sha256 edca05f910e221dd4a11a9efabfe9a872a1018603451cfbe1f5df6369c65459d
+pypi litellm 1.93.1 file litellm-1.93.1-cp311-cp311-win_amd64.whl: uploaded 2026-07-29T00:43:04.694025Z, not yanked, sha256 d6e8a8555ffa1528672cd2844827c5ede4e7d81160df6ea4674bc00a7e23a445
+pypi litellm 1.93.1 file litellm-1.93.1-cp312-cp312-manylinux_2_28_aarch64.whl: uploaded 2026-07-29T00:43:07.214284Z, not yanked, sha256 261687cffbada9c052c9cab2ba658e50a185c137623b9819dee9b57a35be838d
+pypi litellm 1.93.1 file litellm-1.93.1-cp312-cp312-manylinux_2_28_x86_64.whl: uploaded 2026-07-29T00:43:09.852952Z, not yanked, sha256 b1dfba3d1eff841182bf9505e561a71e81db7feb35cab7308b3d21e5fee1ec6c
+pypi litellm 1.93.1 file litellm-1.93.1-cp312-cp312-win_amd64.whl: uploaded 2026-07-29T00:43:12.277518Z, not yanked, sha256 73fb6a61e2abfd20dff3cb6986cb8c0d6938969a83c3c8deb6cc297339b229f8
+pypi litellm 1.93.1 file litellm-1.93.1-cp313-cp313-manylinux_2_28_aarch64.whl: uploaded 2026-07-29T00:43:15.338921Z, not yanked, sha256 e65f755eb9d6f2cb5418153b497e6056fa553d74b7f69b4b07b0f0b0044a77a4
+pypi litellm 1.93.1 file litellm-1.93.1-cp313-cp313-manylinux_2_28_x86_64.whl: uploaded 2026-07-29T00:43:17.803899Z, not yanked, sha256 78c0adcda6932c4b6a83b1f3398c49d3e582884baecab919de221f4122a5b639
+pypi litellm 1.93.1 file litellm-1.93.1-cp313-cp313-win_amd64.whl: uploaded 2026-07-29T00:43:20.264607Z, not yanked, sha256 9a2112c242b21e1ebde083927e537bc617f8c4783f537ca1a2d48422ccc951e0
+pypi litellm 1.93.1 file litellm-1.93.1-cp314-cp314-manylinux_2_28_aarch64.whl: uploaded 2026-07-29T00:43:23.425723Z, not yanked, sha256 00dcc7a5017f53dacd45fdafb569398b8935ca29076f28fbf869a73dd26d4443
+pypi litellm 1.93.1 file litellm-1.93.1-cp314-cp314-manylinux_2_28_x86_64.whl: uploaded 2026-07-29T00:43:26.137484Z, not yanked, sha256 6561dfd6d9a2ba29585b4fcbcfae92b392414debd8b5acc4976e635110611d9b
+pypi litellm 1.93.1 file litellm-1.93.1-cp314-cp314-win_amd64.whl: uploaded 2026-07-29T00:43:28.739116Z, not yanked, sha256 c23f1d3ce552c45941d0326899fd5c42040ff64143e71f36dfb193a9e7e3abfc
+pypi litellm 1.93.1 file litellm-1.93.1.tar.gz: uploaded 2026-07-29T00:43:31.083359Z, not yanked, sha256 10bd0bec34211a637e0b9b593d6d446cf5f355119a6e017854583ea733ab2b12
+pypi litellm 1.93.2 file litellm-1.93.2-cp310-cp310-macosx_10_12_x86_64.whl: uploaded 2026-08-09T02:16:21.033158Z, not yanked, sha256 f34309706eb90960d67b05872a3b8314563b81b193b909eaab9d133b82a203fb
+pypi litellm 1.93.2 file litellm-1.93.2-cp310-cp310-macosx_11_0_arm64.whl: uploaded 2026-08-09T02:16:23.758173Z, not yanked, sha256 d230bbb7818ebad79da838f1b343c36666cb800e0aa80ca95c9ef4c8494278e4
+pypi litellm 1.93.2 file litellm-1.93.2-cp310-cp310-manylinux_2_28_aarch64.whl: uploaded 2026-08-09T02:16:26.250129Z, not yanked, sha256 f8740072e67ca25d4cb2c59e2d1fc49f1d064952c05db175c84eb1e496e9cb85
+pypi litellm 1.93.2 file litellm-1.93.2-cp310-cp310-manylinux_2_28_x86_64.whl: uploaded 2026-08-09T02:16:28.661719Z, not yanked, sha256 78fc2df99e32d9762eee6755a11ad98d405a9f8154994afd841b256d2a7086e4
+pypi litellm 1.93.2 file litellm-1.93.2-cp310-cp310-musllinux_1_2_aarch64.whl: uploaded 2026-08-09T02:16:31.044825Z, not yanked, sha256 248ac86bbb03be2a94690e8f31c3de4adf2367f351d1fd1ae43903237cfa365d
+pypi litellm 1.93.2 file litellm-1.93.2-cp310-cp310-musllinux_1_2_x86_64.whl: uploaded 2026-08-09T02:16:33.337958Z, not yanked, sha256 67e152a87185b47698f4c240290352cbdd18fdcd4285dc8f76f2f79d8186ca9c
+pypi litellm 1.93.2 file litellm-1.93.2-cp310-cp310-win_amd64.whl: uploaded 2026-08-09T02:16:35.606567Z, not yanked, sha256 f556aa24817052689989e254863bfc50b48e5500999005fce92e6c2d16548f87
+pypi litellm 1.93.2 file litellm-1.93.2-cp311-cp311-macosx_10_12_x86_64.whl: uploaded 2026-08-09T02:16:38.041381Z, not yanked, sha256 1bd0690efc94357e559de97927fd98437555cd5b5dd832544cfcca87297ccb80
+pypi litellm 1.93.2 file litellm-1.93.2-cp311-cp311-macosx_11_0_arm64.whl: uploaded 2026-08-09T02:16:40.653599Z, not yanked, sha256 845ececc628737909b1422d1af18bd19ae453727a66244aa9da3ca37a3773111
+pypi litellm 1.93.2 file litellm-1.93.2-cp311-cp311-manylinux_2_28_aarch64.whl: uploaded 2026-08-09T02:16:42.997300Z, not yanked, sha256 498f9878ea773305e0638b6159d7e1ef27bb0b9a4292538d6634312d18a4e781
+pypi litellm 1.93.2 file litellm-1.93.2-cp311-cp311-manylinux_2_28_x86_64.whl: uploaded 2026-08-09T02:16:45.283099Z, not yanked, sha256 1e5618ef495b2e02299b376ca84ffb2647837aafee478cf3a1be17d47a8f0f73
+pypi litellm 1.93.2 file litellm-1.93.2-cp311-cp311-musllinux_1_2_aarch64.whl: uploaded 2026-08-09T02:16:47.870158Z, not yanked, sha256 c2da463d70c9fffbea9532fd000e035328f5266b399a2fb4c6c76b3470478337
+pypi litellm 1.93.2 file litellm-1.93.2-cp311-cp311-musllinux_1_2_x86_64.whl: uploaded 2026-08-09T02:16:50.549538Z, not yanked, sha256 2cf122399f84f8f04621ed6ef8f276dd6d61f4fab108932ce0e30368de34dd42
+pypi litellm 1.93.2 file litellm-1.93.2-cp311-cp311-win_amd64.whl: uploaded 2026-08-09T02:16:53.162571Z, not yanked, sha256 8eaaf780fab9a19234735ef94225172179d15bc28b67ddbec125194249a504b7
+pypi litellm 1.93.2 file litellm-1.93.2-cp312-cp312-macosx_10_12_x86_64.whl: uploaded 2026-08-09T02:16:55.545389Z, not yanked, sha256 3bf532c164ad7cb1b76f2c62afefdcc656b9b296374d075a4150e2ce10bb74c3
+pypi litellm 1.93.2 file litellm-1.93.2-cp312-cp312-macosx_11_0_arm64.whl: uploaded 2026-08-09T02:16:57.977231Z, not yanked, sha256 526b7afc037f79dfdd5c607f5085ac597c7fd301a6dedabea40baae899b27f19
+pypi litellm 1.93.2 file litellm-1.93.2-cp312-cp312-manylinux_2_28_aarch64.whl: uploaded 2026-08-09T02:17:00.650119Z, not yanked, sha256 294ad19f356f821ce97a5428d09439be5f38d22b218c73008d8a49e3e42eb145
+pypi litellm 1.93.2 file litellm-1.93.2-cp312-cp312-manylinux_2_28_x86_64.whl: uploaded 2026-08-09T02:17:03.027327Z, not yanked, sha256 6f6a5e3907f0a1c9d8ff8d71a6cbac8a592e47a40da3f97167074947b5ba7d11
+pypi litellm 1.93.2 file litellm-1.93.2-cp312-cp312-musllinux_1_2_aarch64.whl: uploaded 2026-08-09T02:17:05.271213Z, not yanked, sha256 8541f1b7fd5c437ad249ad68d0a11f68e5e2866b0649da5fa7d63b595e9b8b22
+pypi litellm 1.93.2 file litellm-1.93.2-cp312-cp312-musllinux_1_2_x86_64.whl: uploaded 2026-08-09T02:17:08.175098Z, not yanked, sha256 712c9387419d7b06a10df59973f5e530592d61b2314102b0fa3142f3743f9a9e
+pypi litellm 1.93.2 file litellm-1.93.2-cp312-cp312-win_amd64.whl: uploaded 2026-08-09T02:17:11.254552Z, not yanked, sha256 cc0d58ccabd22ef7ef44a9e6f7247deb54ae42f5e126e6f00360c2b28b41bc2b
+pypi litellm 1.93.2 file litellm-1.93.2-cp313-cp313-macosx_10_12_x86_64.whl: uploaded 2026-08-09T02:17:13.929404Z, not yanked, sha256 f4071bef03e4c2942cd2ddc752727345b85447d6a7fee1ff5a4f8b92187966b0
+pypi litellm 1.93.2 file litellm-1.93.2-cp313-cp313-macosx_11_0_arm64.whl: uploaded 2026-08-09T02:17:16.588601Z, not yanked, sha256 8a99ac7c0c1b78acd6bfd1959e9f203dca71fdbceb5f0c8691c2ad8eee450d7d
+pypi litellm 1.93.2 file litellm-1.93.2-cp313-cp313-manylinux_2_28_aarch64.whl: uploaded 2026-08-09T02:17:19.078424Z, not yanked, sha256 a81ceff44c58ef504ab8bd787d03b82618765b9cfd530942386ae6d23c58be94
+pypi litellm 1.93.2 file litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl: uploaded 2026-08-09T02:17:21.507108Z, not yanked, sha256 dee1b02b7f52a5a408bf7c8d499f0834e49194651743758a511dcdd926c0b692
+pypi litellm 1.93.2 file litellm-1.93.2-cp313-cp313-musllinux_1_2_aarch64.whl: uploaded 2026-08-09T02:17:24.073434Z, not yanked, sha256 d2edfa14b99bce706b35981703692e3ee631f9b87bf6dc28fb53b574f6480b20
+pypi litellm 1.93.2 file litellm-1.93.2-cp313-cp313-musllinux_1_2_x86_64.whl: uploaded 2026-08-09T02:17:26.542579Z, not yanked, sha256 ae75a61c9abc827aa3131b7e640c952367a450830bb7c531b426b4ec2bb45f85
+pypi litellm 1.93.2 file litellm-1.93.2-cp313-cp313-win_amd64.whl: uploaded 2026-08-09T02:17:29.308221Z, not yanked, sha256 c54a09ab20f94120a9d60a30d9970439dcefa00d2565d190505ff006a80c7a69
+pypi litellm 1.93.2 file litellm-1.93.2-cp314-cp314-macosx_10_12_x86_64.whl: uploaded 2026-08-09T02:17:31.811830Z, not yanked, sha256 204cb0763fff9285bc87eb2dc0fc59b591999e5d94863d0964f806424d3c0cd6
+pypi litellm 1.93.2 file litellm-1.93.2-cp314-cp314-macosx_11_0_arm64.whl: uploaded 2026-08-09T02:17:34.376822Z, not yanked, sha256 3126c84361606b9fb07fde7d57eccd8a1747304d64c4143e2e5e40ae6e7693fb
+pypi litellm 1.93.2 file litellm-1.93.2-cp314-cp314-manylinux_2_28_aarch64.whl: uploaded 2026-08-09T02:17:36.828901Z, not yanked, sha256 1c84f7c4acb4e926a79b93145ab23231b300fc687bde7172ef884fc52d6011e0
+pypi litellm 1.93.2 file litellm-1.93.2-cp314-cp314-manylinux_2_28_x86_64.whl: uploaded 2026-08-09T02:17:39.674550Z, not yanked, sha256 cacf35cf703b12c54516fc6464a3e08c6dbb1dcfb97239e1f629294fe36a1cba
+pypi litellm 1.93.2 file litellm-1.93.2-cp314-cp314-musllinux_1_2_aarch64.whl: uploaded 2026-08-09T02:17:42.159618Z, not yanked, sha256 0a7f3e5138e307e429bd8fa29cc0c48bb1e2b827792e8f7799ca4c8cff736103
+pypi litellm 1.93.2 file litellm-1.93.2-cp314-cp314-musllinux_1_2_x86_64.whl: uploaded 2026-08-09T02:17:44.433410Z, not yanked, sha256 d8684629be3f7b5f8e2b6e5fe5ea27ff957c63a8d525d81c1460d8436e2e1857
+pypi litellm 1.93.2 file litellm-1.93.2-cp314-cp314-win_amd64.whl: uploaded 2026-08-09T02:17:46.972756Z, not yanked, sha256 a783b8b18ed68cb6a3b79d2b00273ec21aef92442e9b2712a50036cb84bfe583
+pypi litellm 1.93.2 file litellm-1.93.2.tar.gz: uploaded 2026-08-09T02:17:49.646197Z, not yanked, sha256 c5d5223ef07f36e0886397fb45cc9db4150f86a0c6f6835cee1d5524cab69dfd
+exit: 0
+
+## B. The relock (uv 0.12.17, the six upgrades of the 2026-09-30 urllib3 relock plus litellm==1.93.2 and the two-line workspace edit), returned output of relock-2026-09-30-litellm.relock.sh.txt
+$ bash "<evidence-dir>/relock-2026-09-30-litellm.relock.sh.txt" <scratch-relock> <worktree>     # 2026-09-30T23:04:24Z
+[2026-09-30T23:04:24Z] uv uv 0.12.17 (x86_64-unknown-linux-gnu)
+[2026-09-30T23:04:24Z] base lock (worktree HEAD 29458b43) sha256: 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c
+[2026-09-30T23:04:24Z] sdk archive sha256: 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8 (pins.json source_archive.sha256: 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8)
+[2026-09-30T23:04:25Z] control: workspace lines naming litellm: 9:exclude-newer-package = { litellm = "2026-07-20T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-|20:    "litellm==1.93.0",  # Workspace lock target for the requested LiteLLM upgrade|
+[2026-09-30T23:04:25Z] control: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 
+[2026-09-30T23:04:25Z] control: lock exit: 0 | check exit: 0 | export exit: 0 | lines 1133 | sha256 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c
+    Resolved 412 packages in 416ms
+    Updated anyio v4.11.0 -> v4.14.2
+    Updated click v8.1.8 -> v8.5.0
+    Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+    Updated pyjwt v2.13.0 -> v2.15.0
+    Updated pypdf v6.14.2 -> v6.19.0
+    Updated soupsieve v2.8.4 -> v2.9.2
+    Updated urllib3 v2.7.0 -> v2.8.0
+[2026-09-30T23:04:26Z] new: workspace lines naming litellm: 9:exclude-newer-package = { litellm = "2026-08-10T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-|20:    "litellm==1.93.2",  # Workspace lock target for the requested LiteLLM upgrade|
+[2026-09-30T23:04:26Z] new: uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2
+[2026-09-30T23:04:26Z] new: lock exit: 0 | check exit: 0 | export exit: 0 | lines 1136 | sha256 e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1
+    Resolved 412 packages in 225ms
+    Updated anyio v4.11.0 -> v4.14.2
+    Updated click v8.1.8 -> v8.5.0
+    Updated cryptography v48.0.1, v50.0.0 -> v50.0.0
+    Updated litellm v1.93.0 -> v1.93.2
+    Updated pyjwt v2.13.0 -> v2.15.0
+    Updated pypdf v6.14.2 -> v6.19.0
+    Updated soupsieve v2.8.4 -> v2.9.2
+    Updated urllib3 v2.7.0 -> v2.8.0
+[2026-09-30T23:04:26Z] committed (base) lock sha256: 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c
+control reproduces the committed lock byte for byte
+--- diff of the extracted workspace's pyproject.toml, control vs new (the whole edit)
+9c9
+< exclude-newer-package = { litellm = "2026-07-20T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-day guardrail
+---
+> exclude-newer-package = { litellm = "2026-08-10T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-day guardrail
+20c20
+<     "litellm==1.93.0",  # Workspace lock target for the requested LiteLLM upgrade
+---
+>     "litellm==1.93.2",  # Workspace lock target for the requested LiteLLM upgrade
+--- diff base lock vs new lock (changed lines only, hashes abbreviated)
+< litellm==1.93.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+<     --hash=sha256:07841724... \
+<     --hash=sha256:140bf215... \
+<     --hash=sha256:98c15e84... \
+<     --hash=sha256:cd70ccd4...
+> litellm==1.93.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+>     --hash=sha256:6f6a5e39... \
+>     --hash=sha256:712c9387... \
+>     --hash=sha256:ae75a61c... \
+>     --hash=sha256:c5d5223e... \
+>     --hash=sha256:cacf35cf... \
+>     --hash=sha256:d8684629... \
+>     --hash=sha256:dee1b02b...
+--- the committed new lock in the worktree: e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1
+new reproduces the lock of this change byte for byte
+[2026-09-30T23:04:26Z] done
+exit: 0
+
+## C. The upstream rules the relock edits, and what changed in upstream litellm between v1.93.0 and v1.93.2
+$ sha256sum "<scratch-relock>/sdk-fcc102a.tar.gz"     # 2026-09-30T23:04:26Z     # the pinned SDK archive of pins.json source_archive
+2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8  <scratch-relock>/sdk-fcc102a.tar.gz
+exit: 0
+$ for f in $(tar -tzf "<scratch-relock>/sdk-fcc102a.tar.gz" | grep -E "/pyproject.toml$"); do echo "== $f"; tar -xzOf "<scratch-relock>/sdk-fcc102a.tar.gz" "$f" | grep -n -i litellm | cut -c1-200; done     # 2026-09-30T23:04:26Z     # every pyproject.toml of the archive, its lines that name litellm
+== software-agent-sdk-fcc102a697874d54a357e36004e02c95040dbdc0/openhands-agent-server/pyproject.toml
+== software-agent-sdk-fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/pyproject.toml
+18:    "litellm>=1.93.0",
+== software-agent-sdk-fcc102a697874d54a357e36004e02c95040dbdc0/openhands-tools/pyproject.toml
+== software-agent-sdk-fcc102a697874d54a357e36004e02c95040dbdc0/openhands-workspace/pyproject.toml
+== software-agent-sdk-fcc102a697874d54a357e36004e02c95040dbdc0/pyproject.toml
+8:exclude-newer-package = { litellm = "2026-07-20T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-day guardrail
+19:    "litellm==1.93.0",  # Workspace lock target for the requested LiteLLM upgrade
+exit: 0
+$ tar -xzOf "<scratch-relock>/sdk-fcc102a.tar.gz" "$(tar -tzf "<scratch-relock>/sdk-fcc102a.tar.gz" | grep -E "^[^/]+/uv.lock$")" | grep -n -A1 "^name = \"litellm\""     # 2026-09-30T23:04:28Z     # the archive's root uv.lock, upstream's own lock
+2174:name = "litellm"
+2175-version = "1.93.0"
+exit: 0
+$ bash "<evidence-dir>/relock-2026-09-30-litellm.upstream-diff.sh.txt" <litellm-src>     # 2026-09-30T23:04:28Z     # BerriAI/litellm tags v1.93.0 and v1.93.2
+v1.93.0 -> 052b5a2169d8d3082e1d66e69f200a72b0c1e274   v1.93.2 -> cd1bd0f4b8af865f8d05fbd938392fdd4703babc
+--- git diff --stat v1.93.0 v1.93.2
+ docker/Dockerfile.non_root                         |  37 +-
+ litellm/caching/dual_cache.py                      |  18 +-
+ litellm/litellm_core_utils/url_utils.py            |   9 +
+ litellm/llms/huggingface/embedding/handler.py      |   2 +-
+ .../llms/huggingface/embedding/transformation.py   |  19 -
+ litellm/llms/oobabooga/chat/oobabooga.py           |   4 +-
+ litellm/proxy/auth/auth_utils.py                   |  80 +++-
+ litellm/proxy/auth/user_api_key_auth.py            |  96 ++---
+ litellm/proxy/common_request_processing.py         |   8 +-
+ .../proxy/health_endpoints/_health_endpoints.py    |  76 +++-
+ litellm/proxy/image_endpoints/endpoints.py         |   4 +
+ litellm/proxy/litellm_pre_call_utils.py            |  24 +-
+ litellm/proxy/management_endpoints/ui_sso.py       |  56 ++-
+ litellm/proxy/proxy_server.py                      |  56 +--
+ pyproject.toml                                     |  11 +-
+ ruff-strict-budget.json                            |   2 +-
+ tests/code_coverage_tests/recursive_detector.py    |   1 +
+ tests/local_testing/test_basic_python_version.py   |  71 ++++
+ .../test_offline_image_migration.py                | 143 +++++++
+ tests/proxy_unit_tests/test_proxy_utils.py         |  34 +-
+ tests/test_litellm/caching/test_dual_cache.py      |  54 +++
+ .../test_huggingface_embedding_handler.py          |  14 +
+ .../llms/oobabooga/chat/test_oobabooga.py          |  55 +++
+ tests/test_litellm/proxy/auth/test_auth_checks.py  |  43 +++
+ tests/test_litellm/proxy/auth/test_auth_utils.py   | 429 ++++++++++++++++++++-
+ .../auth/test_router_override_fallback_auth.py     | 141 ++++++-
+ .../proxy/auth/test_user_api_key_auth.py           | 336 ++++++++++++++++
+ .../health_endpoints/test_health_endpoints.py      |  93 +++++
+ .../proxy/image_endpoints/test_azure_routes.py     |  25 ++
+ .../proxy/management_endpoints/test_ui_sso.py      | 194 ++++++++--
+ .../proxy/test_provider_url_destination_guard.py   |  53 +++
+ tests/test_litellm/proxy/test_proxy_server.py      | 122 ++++++
+ .../proxy/test_redis_auth_cache_flag.py            |  57 ++-
+ uv.lock                                            | 404 +++++++++----------
+ 34 files changed, 2341 insertions(+), 430 deletions(-)
+--- the paths the recipe cites or calls (litellm/llms/openai, litellm/responses, litellm/main.py, litellm/router.py, litellm/types, litellm/utils.py): files changed between the tags (nothing is listed if none)
+--- the file research.md R7 cites (litellm/llms/openai/responses/transformation.py), blob id at each tag
+d107ca7a0d749b401edbf901990384cab1a67f1a
+d107ca7a0d749b401edbf901990384cab1a67f1a
+--- the two changed library files outside litellm/proxy, the tests and the provider-specific modules
+diff --git a/litellm/caching/dual_cache.py b/litellm/caching/dual_cache.py
+index be61881..0e3c939 100644
+--- a/litellm/caching/dual_cache.py
++++ b/litellm/caching/dual_cache.py
+@@ -103,6 +103,18 @@ class DualCache(BaseCache):
+         if default_redis_ttl is not None:
+             self.default_redis_ttl = default_redis_ttl
+ 
++    def _backfill_kwargs(self, kwargs: "dict[str, object]") -> "dict[str, object]":
++        """
++        Kwargs for writing a Redis read result into the in-memory tier.
++
++        Applies ``default_in_memory_ttl`` exactly like the write paths do;
++        without it, backfilled entries fall to ``InMemoryCache``'s own default
++        TTL and can outlive the TTL this cache was configured with.
++        """
++        if "ttl" not in kwargs and self.default_in_memory_ttl is not None:
++            return {**kwargs, "ttl": self.default_in_memory_ttl}
++        return kwargs
++
+     def set_cache(self, key, value, local_only: bool = False, **kwargs):
+         # Update both Redis and in-memory cache
+         try:
+@@ -160,7 +172,7 @@ class DualCache(BaseCache):
+ 
+                 if redis_result is not None:
+                     # Update in-memory cache with the value from Redis
+-                    self.in_memory_cache.set_cache(key, redis_result, **kwargs)
++                    self.in_memory_cache.set_cache(key, redis_result, **self._backfill_kwargs(kwargs))
+ 
+                 result = redis_result
+ 
+@@ -226,7 +238,7 @@ class DualCache(BaseCache):
+ 
+                 if redis_result is not None:
+                     # Update in-memory cache with the value from Redis
+-                    await self.in_memory_cache.async_set_cache(key, redis_result, **kwargs)
++                    await self.in_memory_cache.async_set_cache(key, redis_result, **self._backfill_kwargs(kwargs))
+ 
+                 result = redis_result
+ 
+@@ -318,7 +330,7 @@ class DualCache(BaseCache):
+                         result[key_to_index[key]] = value
+ 
+                         if value is not None and self.in_memory_cache is not None:
+-                            await self.in_memory_cache.async_set_cache(key, value, **kwargs)
++                            await self.in_memory_cache.async_set_cache(key, value, **self._backfill_kwargs(kwargs))
+ 
+             return result
+         except Exception:
+diff --git a/litellm/litellm_core_utils/url_utils.py b/litellm/litellm_core_utils/url_utils.py
+index 1cbb1ce..a83cb3b 100644
+--- a/litellm/litellm_core_utils/url_utils.py
++++ b/litellm/litellm_core_utils/url_utils.py
+@@ -148,6 +148,15 @@ def _parse_url_destination_allowlist_entry(
+     return _normalize_host(parsed.hostname), scheme, port
+ 
+ 
++def provider_url_destination_candidates(value: str) -> Tuple[str, ...]:
++    return tuple(
++        candidate
++        for part in value.split(",")
++        for candidate in (part.strip(), part.strip().split("/", 1)[1] if "/" in part.strip() else "")
++        if candidate
++    )
++
++
+ def is_url_destination_allowed_by_host(url: str, allowed_hosts: List[str]) -> bool:
+     """Return True when a credential-bearing provider URL is admin-allowlisted.
+ 
+exit: 0
+$ bash "<evidence-dir>/relock-2026-09-30-litellm.sdk-main.sh.txt" "<scratch-relock>/sdk-main"     # 2026-09-30T23:04:29Z     # upstream's default branch now: OpenHands/software-agent-sdk main
+main: fad63774459171b08f889b12fd3b4d6346168c3e, committed 2026-09-30T19:53:31-03:00
+--- pyproject.toml lines that name litellm
+8:exclude-newer-package = { litellm = "2026-07-20T00:00:00Z", lmnr = "2026-08-23T00:00:00Z" }  # lmnr: allow 0.7.60 streaming-token fix through the 7-day guardrail
+19:    "litellm==1.93.0",  # Workspace lock target for the requested LiteLLM upgrade
+--- the uv.lock entry of litellm
+2160:name = "litellm"
+2161-version = "1.93.0"
+exit: 0
+$ uv lock --help | grep -n -A2 -E "^[[:space:]]+(-P, --upgrade-package|--exclude-newer-package)"     # 2026-09-30T23:04:30Z     # the pinned uv's own help for the two options the relock uses
+41:  -P, --upgrade-package <UPGRADE_PACKAGE>
+42-          Allow upgrades for a specific package, ignoring pinned versions in any existing output
+43-          file. Implies `--refresh-package`
+--
+62:      --exclude-newer-package <EXCLUDE_NEWER_PACKAGE>
+63-          Limit candidate packages for specific packages to those that were uploaded prior to the
+64-          given date
+exit: 0
+
+## D. The recipe's hashed install sequence on the new lock (scratch venv), returned output of relock-2026-09-30-litellm.install-check.sh.txt
+$ bash "<evidence-dir>/relock-2026-09-30-litellm.install-check.sh.txt" <scratch-relock> <worktree>     # 2026-09-30T23:04:30Z
+[2026-09-30T23:04:30Z] uv venv
+Activate with: source <scratch-relock>/u3/venv/bin/activate
+venv exit: 0
+ + setuptools==84.0.0
+ + wheel==0.46.3
+build-requirements install exit: 0
+ + yarl==1.22.0
+ + zipp==3.23.0
+runtime lock install exit: 0
+Checked 178 packages in 4ms
+All installed packages are compatible
+uv pip check exit: 0
+
+openhands-sdk/tools 1.49.6 | litellm 1.93.2 | imports ok
+sdk import exit: 0
+litellm 1.93.2 | urllib3 2.8.0 | pyjwt 2.15.0 | oauthlib 3.3.1 | anyio 4.14.2 | click 8.5.0 | pypdf 6.19.0 | soupsieve 2.9.2
+[2026-09-30T23:04:40Z] done
+exit: 0
+
+## E. The lock differs in the litellm entry only
+$ diff <(git -C <worktree> show HEAD:blueprints/runtime-workers/openhands/requirements.lock | grep -E "^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )" | sed "s/ \\\\$//") <(grep -E "^[A-Za-z0-9_.-]+(\[[^]]*\])? ?(==| @ )" "<worktree>/blueprints/runtime-workers/openhands/requirements.lock" | sed "s/ \\\\$//")     # 2026-09-30T23:04:40Z     # the requirement lines of origin/main 29458b43 and of this change; exit 1 = the inputs differ, here in one line
+79c79
+< litellm==1.93.0 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+---
+> litellm==1.93.2 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+exit: 1
+$ git -C <worktree> diff --numstat HEAD -- blueprints/runtime-workers/openhands/requirements.lock     # 2026-09-30T23:04:40Z     # lines added, lines deleted
+8	5	blueprints/runtime-workers/openhands/requirements.lock
+exit: 0
+$ echo "hash lines on origin/main: $(git -C <worktree> show HEAD:blueprints/runtime-workers/openhands/requirements.lock | grep -c -e "--hash=sha256:"); in this change: $(grep -c -e "--hash=sha256:" "<worktree>/blueprints/runtime-workers/openhands/requirements.lock")"     # 2026-09-30T23:04:40Z
+hash lines on origin/main: 797; in this change: 800
+exit: 0
+
+## F. OSV-Scanner 2.6.0 (the CI pin): the workflow's two scans over the inventory on origin/main 29458b43 (before) and on this change (after)
+$ <osv-bin> --version     # 2026-09-30T23:04:40Z
+osv-scanner version: 2.6.0
+osv-scalibr version: 0.5.2
+commit: e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6
+built at: 2026-09-14T01:44:58Z
+exit: 0
+$ sha256sum <osv-bin>     # 2026-09-30T23:04:40Z     # the binary; the pin is the next command's OSV_SCANNER_SHA256
+ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108  <osv-bin>
+exit: 0
+$ grep -n -E "OSV_SCANNER_(VERSION|SHA256)" "<worktree>/.github/workflows/security-scan.yml" | cut -c1-200     # 2026-09-30T23:04:40Z
+50:          OSV_SCANNER_VERSION: '2.6.0'
+52:          OSV_SCANNER_SHA256: ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+56:            "https://github.com/google/osv-scanner/releases/download/v${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64" \
+58:          printf '%s  %s\n' "$OSV_SCANNER_SHA256" "$RUNNER_TEMP/osv-scanner/osv-scanner" | sha256sum --check
+exit: 0
+$ bash "<evidence-dir>/relock-2026-09-30-litellm.osv-scan-step.sh.txt" <osv-bin> <main-checkout> "<evidence-dir>/relock-2026-09-30-litellm.osv-before"     # 2026-09-30T23:04:40Z     # before: origin/main 29458b43
+tree HEAD 29458b43; ordinary entries 48, frozen entries 1, inventory 49
+ordinary scan exit: 1
+frozen scan exit: 0
+Total 1 package affected by 1 known vulnerability (0 Critical, 0 High, 1 Medium, 0 Low, 0 Unknown) from 1 ecosystem.
+| https://osv.dev/GHSA-3cv6-jpf6-8222 | 6.5  | PyPI      | litellm | 1.93.0  | 1.93.2        | blueprints/runtime-workers/openhands/requirements.lock |
+host paths left in the retained files: 0
+sha256 ordinary 8df9f61674c04ed2d7081e4d103babbf08f18a7a5b7cd42df0891232cf64300d frozen 3c615cbf10f18920afedcc6d02e63bbef8ff618e333816fa73afcc4e578af9f9
+exit: 0
+$ bash "<evidence-dir>/relock-2026-09-30-litellm.osv-scan-step.sh.txt" <osv-bin> <worktree> "<evidence-dir>/relock-2026-09-30-litellm.osv-after"     # 2026-09-30T23:04:42Z     # after: this change
+tree HEAD 29458b43; ordinary entries 48, frozen entries 1, inventory 49
+ordinary scan exit: 0
+frozen scan exit: 0
+host paths left in the retained files: 0
+sha256 ordinary 738fcfa6166c45b6c2e416a71b8232a4d196e5d0f47d045595bc912bed081f0f frozen af98a40440d70de299ac1df81151f7abae8734948b23545ad87b0988cc27dc48
+exit: 0
+
+## G. The lock file's digest and the digest recorded for it
+$ sha256sum "<worktree>/blueprints/runtime-workers/openhands/requirements.lock"     # 2026-09-30T23:04:45Z     # the new lock; the previous one is 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c
+e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1  <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+exit: 0
+$ jq -r .requirements_sha256 "<worktree>/blueprints/runtime-workers/openhands/pins.json"     # 2026-09-30T23:04:45Z     # pins.json of this change
+e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1
+exit: 0
+$ git -C <worktree> show HEAD:blueprints/runtime-workers/openhands/pins.json | jq -r .requirements_sha256     # 2026-09-30T23:04:45Z     # pins.json of origin/main 29458b43
+1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c
+exit: 0
+
+## H. Where litellm is used in the installed recipe venv (static text search of the installed .py files; context for the advisory, not the basis of the decision)
+$ grep -rl --include="*.py" -E "^[[:space:]]*(from|import)[[:space:]]+litellm\.proxy|^[[:space:]]*from[[:space:]]+litellm[[:space:]]+import[[:space:]]+proxy" "<scratch-relock>/u3/venv/lib/python3.13/site-packages" | grep -v "/site-packages/litellm/" | wc -l     # 2026-09-30T23:04:45Z     # files outside the litellm package that import litellm.proxy
+0
+exit: 0
+$ grep -rn --include="*.py" -E "^[[:space:]]*(from|import)[[:space:]]+litellm" "<scratch-relock>/u3/venv/lib/python3.13/site-packages/openhands" | sed -E "s#^.*/site-packages/##" | cut -c1-160     # 2026-09-30T23:04:45Z     # the imports of litellm in the installed openhands packages
+openhands/sdk/logger/logger.py:16:import litellm
+openhands/sdk/testing/test_llm.py:36:from litellm.types.utils import Choices, Message as LiteLLMMessage, ModelResponse
+openhands/sdk/tool/tool.py:23:from litellm import (
+openhands/sdk/utils/json.py:5:from litellm.types.utils import ModelResponse
+openhands/sdk/agent/acp_agent.py:970:        import litellm
+openhands/sdk/mcp/tool.py:16:from litellm import ChatCompletionToolParam
+openhands/sdk/critic/impl/api/client.py:6:from litellm import ChatCompletionToolParam
+openhands/sdk/llm/llm.py:53:    import litellm
+openhands/sdk/llm/llm.py:57:from litellm import (
+openhands/sdk/llm/llm.py:63:from litellm.exceptions import (
+openhands/sdk/llm/llm.py:70:from litellm.responses.main import (
+openhands/sdk/llm/llm.py:74:from litellm.types.llms.openai import (
+openhands/sdk/llm/llm.py:82:from litellm.types.utils import (
+openhands/sdk/llm/llm.py:88:from litellm.utils import (
+openhands/sdk/llm/streaming.py:5:from litellm.types.utils import ModelResponseStream
+openhands/sdk/llm/mixins/non_native_fc.py:6:from litellm import ChatCompletionToolParam, Message as LiteLLMMessage
+openhands/sdk/llm/mixins/non_native_fc.py:7:from litellm.types.utils import Choices, ModelResponse, StreamingChoices
+openhands/sdk/llm/mixins/fn_call_examples.py:12:from litellm import ChatCompletionToolParam
+openhands/sdk/llm/mixins/fn_call_converter.py:15:from litellm import ChatCompletionToolParam, ChatCompletionToolParamFunctionChunk
+openhands/sdk/llm/llm_response.py:11:from litellm import ResponsesAPIResponse
+openhands/sdk/llm/llm_response.py:12:from litellm.types.utils import ModelResponse
+openhands/sdk/llm/exceptions/mapping.py:3:from litellm.exceptions import (
+openhands/sdk/llm/exceptions/classifier.py:5:from litellm.exceptions import (
+openhands/sdk/llm/utils/model_info.py:8:import litellm
+openhands/sdk/llm/utils/model_info.py:9:from litellm import model_cost
+openhands/sdk/llm/utils/model_info.py:10:from litellm.utils import get_model_info
+openhands/sdk/llm/utils/unverified_models.py:3:import litellm
+openhands/sdk/llm/utils/litellm_provider.py:11:    import litellm
+openhands/sdk/llm/utils/model_features.py:7:from litellm import get_supported_openai_params
+openhands/sdk/llm/utils/model_features.py:8:from litellm.utils import supports_vision as litellm_supports_vision
+openhands/sdk/llm/utils/telemetry.py:11:from litellm.cost_calculator import completion_cost as litellm_completion_cost
+openhands/sdk/llm/utils/telemetry.py:12:from litellm.types.llms.openai import ResponseAPIUsage, ResponsesAPIResponse
+openhands/sdk/llm/utils/telemetry.py:13:from litellm.types.utils import CostPerToken, ModelResponse, Usage
+openhands/sdk/llm/fallback_strategy.py:8:from litellm.exceptions import (
+openhands/sdk/llm/message.py:6:from litellm import ChatCompletionMessageToolCall, ResponseFunctionToolCall
+openhands/sdk/llm/message.py:7:from litellm.types.responses.main import (
+openhands/sdk/llm/message.py:11:from litellm.types.utils import Message as LiteLLMMessage
+exit: 0
+$ grep -n -i -E "litellm" "<worktree>/blueprints/runtime-workers/openhands/recipe.py" "<worktree>/blueprints/runtime-workers/openhands/worker.py" | cut -c1-200     # 2026-09-30T23:04:45Z     # the recipe code that names litellm
+<worktree>/blueprints/runtime-workers/openhands/recipe.py:84:    """Round-3 common contract; provider p
+<worktree>/blueprints/runtime-workers/openhands/recipe.py:135:    # LiteLLM strips its openai provider 
+<worktree>/blueprints/runtime-workers/openhands/worker.py:40:    # SDK@fcc102a llm.py:1130-1138 preserv
+exit: 0
+
+## I. The litellm hash lines against PyPI, and the carried-forward oauthlib review's premise for litellm
+$ python3 "<evidence-dir>/relock-2026-09-30-litellm.hash-check.py.txt" "<scratch-relock>/u3/base.lock"     # 2026-09-30T23:04:45Z     # the lock of origin/main 29458b43 (litellm 1.93.0)
+litellm==1.93.0: 4 hash lines
+  0784172435de48f6 -> litellm-1.93.0-cp312-cp312-manylinux_2_28_x86_64.whl (uploaded 2026-07-19T03:01:09.037288Z, not yanked)
+  140bf215e264c716 -> litellm-1.93.0.tar.gz (uploaded 2026-07-19T03:01:24.389317Z, not yanked)
+  98c15e84d32e922a -> litellm-1.93.0-cp313-cp313-manylinux_2_28_x86_64.whl (uploaded 2026-07-19T03:01:15.395735Z, not yanked)
+  cd70ccd4ba3ef1a3 -> litellm-1.93.0-cp314-cp314-manylinux_2_28_x86_64.whl (uploaded 2026-07-19T03:01:21.704435Z, not yanked)
+files of this release for CPython 3.12-3.14 on Linux x86_64 or the source distribution that the entry does not list: none
+exit: 0
+$ python3 "<evidence-dir>/relock-2026-09-30-litellm.hash-check.py.txt" "<worktree>/blueprints/runtime-workers/openhands/requirements.lock"     # 2026-09-30T23:04:45Z     # the lock of this change (litellm 1.93.2)
+litellm==1.93.2: 7 hash lines
+  6f6a5e3907f0a1c9 -> litellm-1.93.2-cp312-cp312-manylinux_2_28_x86_64.whl (uploaded 2026-08-09T02:17:03.027327Z, not yanked)
+  712c9387419d7b06 -> litellm-1.93.2-cp312-cp312-musllinux_1_2_x86_64.whl (uploaded 2026-08-09T02:17:08.175098Z, not yanked)
+  ae75a61c9abc827a -> litellm-1.93.2-cp313-cp313-musllinux_1_2_x86_64.whl (uploaded 2026-08-09T02:17:26.542579Z, not yanked)
+  c5d5223ef07f36e0 -> litellm-1.93.2.tar.gz (uploaded 2026-08-09T02:17:49.646197Z, not yanked)
+  cacf35cf703b12c5 -> litellm-1.93.2-cp314-cp314-manylinux_2_28_x86_64.whl (uploaded 2026-08-09T02:17:39.674550Z, not yanked)
+  d8684629be3f7b5f -> litellm-1.93.2-cp314-cp314-musllinux_1_2_x86_64.whl (uploaded 2026-08-09T02:17:44.433410Z, not yanked)
+  dee1b02b7f52a5a4 -> litellm-1.93.2-cp313-cp313-manylinux_2_28_x86_64.whl (uploaded 2026-08-09T02:17:21.507108Z, not yanked)
+files of this release for CPython 3.12-3.14 on Linux x86_64 or the source distribution that the entry does not list: none
+exit: 0
+$ echo "files of the installed litellm 1.93.2 that mention oauthlib: $(grep -rli oauthlib "<scratch-relock>/u3/venv/lib/python3.13/site-packages/litellm" | wc -l)"     # 2026-09-30T23:04:45Z
+files of the installed litellm 1.93.2 that mention oauthlib: 0
+exit: 0
+$ echo "lines of the v1.93.0 to v1.93.2 source diff that mention oauthlib: $(git -C <litellm-src> diff v1.93.0 v1.93.2 | grep -c -i oauthlib)"     # 2026-09-30T23:04:45Z
+lines of the v1.93.0 to v1.93.2 source diff that mention oauthlib: 0
+exit: 0
+
+## J. The unit tests of the coverage guard, of the workflow hardening and of the recipe, from the worktree root
+$ cd <worktree> && TMPDIR="<scratch-relock>/tmp" python3 -B -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_runtime_worker_openhands 2>&1 | tail -4     # 2026-09-30T23:04:45Z
+----------------------------------------------------------------------
+Ran 233 tests in 12.800s
+
+OK (skipped=2)
+exit: 0

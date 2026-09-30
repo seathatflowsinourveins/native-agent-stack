@@ -1,0 +1,36 @@
+"""Facts of GHSA-3cv6-jpf6-8222 (litellm) from the OSV API (https://api.osv.dev/v1/vulns/<id>): the OSV record's published and modified times, the GitHub Advisory
+Database review time and NVD publication time it carries, aliases, database severity, CVSS vector, affected package, the introduced and fixed versions, its summary
+and its `details` prose in full; then the OSV query result (https://api.osv.dev/v1/query) for litellm 1.93.0, 1.93.1 and 1.93.2 and for the other PyPI pins of the
+relocked lock that changed in the 2026-09-30 relocks; then the upload times, yanked flags and sha256 of the files of litellm 1.93.0, 1.93.1 and 1.93.2 on PyPI
+(https://pypi.org/pypi/litellm/<version>/json). Read-only network access, no credential. Adapted from the published
+blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-urllib3.osv-advisories.py.txt of this repository (same endpoints and fields)."""
+import json
+import urllib.request
+
+vuln = "GHSA-3cv6-jpf6-8222"
+d = json.load(urllib.request.urlopen(f"https://api.osv.dev/v1/vulns/{vuln}", timeout=30))
+specific = d.get("database_specific") or {}
+for affected in d["affected"]:
+    events = [e for r in affected.get("ranges", []) for e in r.get("events", [])]
+    print(f"{vuln}\tosv published {d.get('published')}\tosv modified {d.get('modified')}\tgithub_reviewed_at {specific.get('github_reviewed_at')}\t"
+          f"nvd_published_at {specific.get('nvd_published_at')}\taliases {d.get('aliases') or '-'}\t{specific.get('severity')}\t{[s.get('score') for s in d.get('severity', [])]}\t"
+          f"{affected['package']['ecosystem']} {affected['package']['name']}\tintroduced {[e['introduced'] for e in events if 'introduced' in e]} "
+          f"fixed {[e['fixed'] for e in events if 'fixed' in e]}\tlisted versions {len(affected.get('versions', []))}")
+print(f"    summary: {d.get('summary')}")
+print(f"    cwe_ids: {specific.get('cwe_ids')}")
+print("    references:")
+for r in d.get("references", []):
+    print(f"      {r.get('type')}: {r.get('url')}")
+print("    details (whitespace folded):")
+print("      " + " ".join((d.get("details") or "").split()))
+
+for version in ("1.93.0", "1.93.1", "1.93.2"):
+    request = urllib.request.Request("https://api.osv.dev/v1/query", headers={"Content-Type": "application/json"},
+                                     data=json.dumps({"package": {"name": "litellm", "ecosystem": "PyPI"}, "version": version}).encode())
+    found = sorted(v["id"] for v in json.load(urllib.request.urlopen(request, timeout=30)).get("vulns", []))
+    print(f"query PyPI litellm=={version}: {found if found else 'no advisories'}")
+
+for version in ("1.93.0", "1.93.1", "1.93.2"):
+    release = json.load(urllib.request.urlopen(f"https://pypi.org/pypi/litellm/{version}/json", timeout=30))
+    for f in release["urls"]:
+        print(f"pypi litellm {version} file {f['filename']}: uploaded {f['upload_time_iso_8601']}, {'yanked' if f.get('yanked') else 'not yanked'}, sha256 {f['digests']['sha256']}")

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Published copy of the script as it ran on 2026-09-30 (it takes its host paths as arguments; the retained outputs mask the scan root as <scan-root>). It needs the
+# OSV-Scanner 2.6.0 binary pinned in .github/workflows/security-scan.yml, network access to the OSV API, and is documentation of what ran, not a supported tool.
+# usage: osv_scan_step.sh <osv-scanner binary> <tree> <out-prefix>
+# Runs the two scans of the "osv-scanner" step of <tree>/.github/workflows/security-scan.yml from <tree> as the working directory: the same jq expressions build the
+# --lockfile arguments from .github/osv-scanner-lockfiles.json (the entries without a config, scanned with .github/osv-scanner.toml; then the entries that name
+# .github/osv-scanner-frozen-macos.toml, scanned with it), with the same flags (scan source --config <config> --no-resolve) and the scanner's default text output
+# instead of SARIF. The full outputs go to <out-prefix>.ordinary.txt and <out-prefix>.frozen.txt with the scan root masked as <scan-root>.
+set -u
+bin=$1
+tree=$2
+out=$3
+cd "$tree" || exit 2
+inventory=.github/osv-scanner-lockfiles.json
+frozen_config=.github/osv-scanner-frozen-macos.toml
+mapfile -t lockfiles < <(jq -r '.lockfiles[] | select(has("config") | not) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+mapfile -t frozen < <(jq -r --arg config "$frozen_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+echo "tree HEAD $(git rev-parse --short HEAD); ordinary entries ${#lockfiles[@]}, frozen entries ${#frozen[@]}, inventory $(jq '.lockfiles | length' "$inventory")"
+"$bin" scan source --config .github/osv-scanner.toml --no-resolve "${lockfiles[@]}" > "$out.ordinary.txt" 2>&1
+echo "ordinary scan exit: $?"
+"$bin" scan source --config "$frozen_config" --no-resolve "${frozen[@]}" > "$out.frozen.txt" 2>&1
+echo "frozen scan exit: $?"
+sed -i "s#$tree#<scan-root>#g" "$out.ordinary.txt" "$out.frozen.txt"
+grep -E "^Total [0-9]+ package|^\| https://osv.dev/" "$out.ordinary.txt" | cut -c1-200
+grep -E "^Total [0-9]+ package" "$out.frozen.txt" | cut -c1-200
+echo "host paths left in the retained files: $(cat "$out.ordinary.txt" "$out.frozen.txt" | grep -c -E '/var/tmp|/home/|/tmp/')"
+echo "sha256 ordinary $(sha256sum "$out.ordinary.txt" | cut -c1-64) frozen $(sha256sum "$out.frozen.txt" | cut -c1-64)" | sed 's#  [^ ]*##g'

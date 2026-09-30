@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "record": "osv-openhands-litellm-relock-20260930",
+  "purpose": "Records the relock of the OpenHands recipe lock (blueprints/runtime-workers/openhands/requirements.lock) from litellm 1.93.0 to 1.93.2. OSV published GHSA-3cv6-jpf6-8222 (CVE-2026-84377, 'LiteLLM: Authenticated SSRF and provider-credential exfiltration via unvalidated request-body routing parameters', GitHub severity Moderate, CVSS 3.1 6.5, CWE-918) at 2026-09-30T21:11:25Z for litellm 1.93.0 and 1.93.1; 1.93.2 is the first release of the 1.93 line without it. The required osv-scanner check has failed on the lock for every head since 22:10Z, main's own push runs included, so no pull request could merge. The change replaces the litellm requirement line and its hashes and nothing else in the lock, rebinds the lock's IGNORE_ALLOWED_LOCKS entry in tests/test_osv_lockfile_coverage.py to the relocked sha256 and to this record (the 2026-09-29 oauthlib review is carried forward at the new digest, not rerun), and adds no ignore.",
+  "checked_commit": "29458b4342422c979ad3b9bc62532ea6f05073c1",
+  "observed_utc": "2026-09-30T23:04:23Z",
+  "observed_until_utc": "2026-09-30T23:04:45Z",
+  "authorization": "The lock's owner session (bc, native-agent-stack-bc) is gone: a peer listing on 2026-09-30 no longer shows it. The merge-train owner (session sota-default-harness-setup) asked the Gate A owner (session native-agent-stack-6d, this record's author) to take the relock and to relock rather than ignore. Peer messages are not retained evidence; the reproductions in sections B, D and F of the returned outputs are. No user decision is needed: the change follows the recipe's own method (research.md 'Runtime lock security relock') and adds no exception.",
+  "evidence_class": "Local runs on this host of the pinned OSV-Scanner 2.6.0 with the repository's config and the workflow's own lockfile lists, a local reproduction of the relock with uv 0.12.17 from the pinned upstream source archive, the recipe's own install sequence in a scratch venv on the host network (no model request: not the image and not an OpenHands run), reads of registry and advisory records (OSV API, PyPI JSON API), a blobless depth-1 fetch of two upstream git tags (BerriAI/litellm v1.93.0 and v1.93.2), and one CI job log (gh run view --job). Static and local: the diffs, hash equalities and text searches are structural checks, not executions. Returned outputs: blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.txt.",
+  "limitations": [
+    "The relock covers only the recipe venv. The agent-server image's server is a PyInstaller build of upstream's unchanged uv.lock, which still pins litellm 1.93.0 (section C: the archive's root uv.lock, line 2175), and the 2026-09-28 grype record of that image predates the advisory and was not rerun. Whether the advisory reaches the image's binary is unmeasured. The grader venv (OpenHands/benchmarks@405bae7's uv.lock, digest in pins.json grader.uv_lock_sha256) is outside this lock and outside .github/osv-scanner-lockfiles.json; its litellm version was not read.",
+    "The advisory concerns the LiteLLM proxy: an authenticated proxy user routing a provider call with request-body parameters the proxy did not validate. The recipe runs no LiteLLM proxy, and no installed package outside litellm imports litellm.proxy (section H: 0 files). That is a static text search of the installed .py files of the relocked venv, not a runtime trace; a name assembled at run time would not match. It is context only: the change moves to the fixed release and the decision does not rest on reachability.",
+    "No OpenHands task ran with the relocked venv. The install check ran the recipe's install sequence, uv pip check and the SDK import check on the host network (no model request); the image installation, model behavior and any runtime path through litellm 1.93.2 are unmeasured. An installation that recorded the old requirements_sha256 must re-run install (host.py:1432-1433 refuses with matching_successful_installation_required); whether this host holds such a record was not checked for this change.",
+    "litellm 1.93.2 differs from 1.93.0 in 34 files of upstream source (section C): proxy auth, health, SSO and server modules, two library files outside the proxy (litellm/caching/dual_cache.py: the in-memory TTL of a value read back from Redis; litellm/litellm_core_utils/url_utils.py: one new helper function), two provider modules (huggingface embedding, oobabooga), the non-root Dockerfile, pyproject.toml, uv.lock and tests. None is under the paths the recipe cites or calls (litellm/llms/openai, litellm/responses, litellm/main.py, litellm/router.py, litellm/types, litellm/utils.py). The comparison is of upstream source at the two tags; the installed wheels were verified against the lock's hashes only and were not diffed against those tags.",
+    "The upstream workspace cannot produce this lock as published: its pyproject.toml pins litellm==1.93.0 (line 19) and caps litellm at exclude-newer-package 2026-07-20T00:00:00Z (line 8), which excludes 1.93.1 and 1.93.2. The relock edits both lines in a scratch extraction (section B prints the whole diff); the upstream lock, the agent-server image and the SDK's own release are unchanged. The next upstream lock that carries litellm >= 1.93.2 makes the edit unnecessary.",
+    "The OSV database is the live API at scan time. The clean result holds for 2026-09-30 only: an advisory published later for any pinned package fails the required check again. Every statement about a release window is as of 2026-09-30T23:04:45Z: litellm 1.93.2's files were uploaded 2026-08-09T02:16:21Z to 02:17:49Z, 52 days earlier.",
+    "The ignore reasons of the two oauthlib advisories in .github/osv-scanner.toml still cite evidence/receipts/osv-openhands-pyjwt-relock-20260930.json for the OpenHands lock 'at its relocked sha256'; that text already lagged the 2026-09-30 urllib3 relock and is unchanged here (PR #535 edits the same file). The binding record is the IGNORE_ALLOWED_LOCKS entry of tests/test_osv_lockfile_coverage.py, which this change rebinds. The dated paragraph that each earlier relock added to docs/decisions/2026-09-22-github-automation-closure.md is also not added here: PR #555 edits that file, so the paragraph follows its merge.",
+    "Open pull requests that add locks to the scan inventory (#535 and #551 change .github/osv-scanner-lockfiles.json) were not read for their litellm pins; any lock in the inventory that pins litellm 1.93.0 or 1.93.1 fails the same check."
+  ],
+  "ci_failure": {
+    "run_id": 36786110610,
+    "job_id": 110127776899,
+    "event": "pull_request",
+    "head": "f29f6ba80cd115214df7fd811a59aca1a06485c4",
+    "head_note": "the rebased head of PR #557",
+    "job": "osv-scanner of 'Dependency and workflow security scan', 2026-09-30T22:32:00Z to 22:32:25Z",
+    "conclusion": "failure",
+    "summary": "Total 1 package affected by 1 known vulnerability (0 Critical, 0 High, 1 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+    "finding": "| https://osv.dev/GHSA-3cv6-jpf6-8222 | 6.5  | PyPI      | litellm | 1.93.0  | 1.93.2        | blueprints/runtime-workers/openhands/requirements.lock |",
+    "main_push_runs_logs_not_read": [
+      {
+        "run_id": 36783972732,
+        "head_first_8": "af23619f",
+        "created": "2026-09-30T22:10:10Z",
+        "conclusion": "failure"
+      },
+      {
+        "run_id": 36784221993,
+        "head_first_8": "29458b43",
+        "created": "2026-09-30T22:12:39Z",
+        "conclusion": "failure"
+      }
+    ],
+    "last_success_on_main": {
+      "run_id": 36777145670,
+      "head_first_8": "8ceff490",
+      "created": "2026-09-30T21:05:36Z",
+      "note": "created before the OSV record's publication (21:11:25Z)"
+    }
+  },
+  "advisory": {
+    "id": "GHSA-3cv6-jpf6-8222",
+    "aliases": [
+      "CVE-2026-84377"
+    ],
+    "summary": "LiteLLM: Authenticated SSRF and provider-credential exfiltration via unvalidated request-body routing parameters",
+    "severity": "MODERATE",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+    "cvss_score_as_printed_by_the_scanner": 6.5,
+    "cwe_ids": [
+      "CWE-918"
+    ],
+    "osv_published": "2026-09-30T21:11:25Z",
+    "nvd_published_at": "2026-09-02T18:21:28Z",
+    "affected_1_93_line": {
+      "introduced": "1.93.0",
+      "osv_fixed": "1.93.2"
+    },
+    "fixed_releases_named_in_the_record": [
+      "1.96.2",
+      "1.95.1",
+      "1.94.3",
+      "1.93.2",
+      "1.92.2",
+      "1.91.5",
+      "1.90.7",
+      "1.89.7",
+      "1.88.6"
+    ],
+    "osv_query": {
+      "litellm==1.93.0": [
+        "GHSA-3cv6-jpf6-8222"
+      ],
+      "litellm==1.93.1": [
+        "GHSA-3cv6-jpf6-8222"
+      ],
+      "litellm==1.93.2": "no advisories"
+    },
+    "upstream_references_in_the_record": [
+      "https://github.com/BerriAI/litellm/security/advisories/GHSA-3cv6-jpf6-8222",
+      "https://github.com/BerriAI/litellm/pull/36011",
+      "https://github.com/BerriAI/litellm/pull/36314",
+      "https://github.com/BerriAI/litellm/pull/36494"
+    ],
+    "returned_outputs": "section A"
+  },
+  "release_facts": {
+    "litellm_1_93_2": "files uploaded 2026-08-09T02:16:21.033158Z to 02:17:49.646197Z, none yanked (PyPI JSON API, section A); upstream tag v1.93.2 = cd1bd0f4b8af865f8d05fbd938392fdd4703babc, v1.93.0 = 052b5a2169d8d3082e1d66e69f200a72b0c1e274 (section C)",
+    "upstream_main_now": "OpenHands/software-agent-sdk main fad63774459171b08f889b12fd3b4d6346168c3e (committed 2026-09-30T19:53:31-03:00, read at 2026-09-30T23:04:29Z, section C): pyproject.toml still pins litellm==1.93.0 (line 19) with the cap at 2026-07-20T00:00:00Z (line 8) and its uv.lock still pins litellm 1.93.0; no upstream lock with litellm 1.93.2 or later exists to adopt",
+    "upstream_workspace": "OpenHands/software-agent-sdk@fcc102a697874d54a357e36004e02c95040dbdc0 (pins.json source_archive, tarball sha256 2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8): pyproject.toml line 19 litellm==1.93.0, line 8 exclude-newer-package litellm = 2026-07-20T00:00:00Z; openhands-sdk/pyproject.toml line 18 litellm>=1.93.0; the root uv.lock pins litellm 1.93.0 (section C)"
+  },
+  "locks": [
+    {
+      "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+      "previous_sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
+      "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
+      "lines": {
+        "previous": 1133,
+        "new": 1136
+      },
+      "diff": "the litellm requirement line (1.93.0 to 1.93.2) and its hash lines: 4 removed, 7 added (git diff --numstat: 8 added, 5 deleted lines); every other line is byte-identical (section E). The 4 old hashes are the CPython 3.12-3.14 manylinux x86_64 wheels and the sdist of 1.93.0; the 7 new ones are the manylinux and musllinux x86_64 wheels for 3.12-3.14 and the sdist of 1.93.2, and each equals the sha256 of that file on PyPI (section I).",
+      "pins_json": "requirements_sha256 updated to the new sha256 (source_archive, uv_lock and wheel digests unchanged: the upstream source is untouched)",
+      "method": {
+        "source": "pins.json source_archive, tarball sha256 equal to the pin (section B)",
+        "control": "the six upgrades of the 2026-09-30 urllib3 relock (anyio 4.14.2, click 8.5.0, pypdf 6.19.0, soupsieve 2.9.2, pyjwt 2.15.0, urllib3 2.8.0) on the unedited workspace reproduce the committed lock byte for byte (cmp exit 0, sha256 1d11bae3...)",
+        "command": "In a fresh extraction, the one [tool.uv] environments line of research.md, the two-line workspace edit (litellm exclude-newer-package cap 2026-07-20T00:00:00Z to 2026-08-10T00:00:00Z, and litellm==1.93.0 to litellm==1.93.2), then the control's six upgrades plus --upgrade-package litellm==1.93.2 (uv 0.12.17, no UV_NO_CONFIG); then uv export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace and the two wheel entries of pins.json appended in file order",
+        "reproduced": "uv lock, uv lock --check and uv export exit 0; the result equals the lock of this change byte for byte (cmp exit 0, sha256 e24df832...); uv printed 'Updated litellm v1.93.0 -> v1.93.2' and the same seven other updates as the control"
+      },
+      "install_check": "the recipe's install-container.sh sequence with UV_NO_CONFIG=1 in a scratch CPython 3.13 venv on the host network: build-requirements.lock installed (exit 0), the runtime lock installed with --require-hashes --no-deps --no-build-isolation (exit 0), uv pip check exit 0 (178 packages compatible), the SDK import check exit 0 (openhands-sdk and openhands-tools 1.49.6, litellm 1.93.2); urllib3 2.8.0, pyjwt 2.15.0, oauthlib 3.3.1 installed (section D)"
+    }
+  ],
+  "upstream_changes": {
+    "tags": "BerriAI/litellm v1.93.0 (052b5a2169d8d3082e1d66e69f200a72b0c1e274) to v1.93.2 (cd1bd0f4b8af865f8d05fbd938392fdd4703babc): git diff --stat, 34 files changed, 2341 insertions, 430 deletions (section C)",
+    "recipe_dependencies": "none of the paths the recipe cites or calls changed; the file research.md R7 and worker.py response_correlation cite, litellm/llms/openai/responses/transformation.py, has blob id d107ca7a0d749b401edbf901990384cab1a67f1a at both tags, so those v1.93.0 source citations still describe the locked release (section C)"
+  },
+  "osv_scanner": {
+    "tool": "OSV-Scanner 2.6.0 (osv-scalibr 0.5.2, commit e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6)",
+    "binary": "osv-scanner_linux_amd64 of release v2.6.0, sha256 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108, equal to the value pinned in .github/workflows/security-scan.yml; kept outside every checkout",
+    "runs": [
+      {
+        "name": "before: origin/main 29458b43, the two scans of the workflow's osv-scanner step over the 49 inventory entries (48 ordinary, 1 frozen)",
+        "ordinary_scan_exit_code": 1,
+        "frozen_scan_exit_code": 0,
+        "summary": "Total 1 package affected by 1 known vulnerability (0 Critical, 0 High, 1 Medium, 0 Low, 0 Unknown) from 1 ecosystem.",
+        "finding": "GHSA-3cv6-jpf6-8222, litellm 1.93.0, fixed 1.93.2, blueprints/runtime-workers/openhands/requirements.lock",
+        "retained": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-before.ordinary.txt and blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-before.frozen.txt"
+      },
+      {
+        "name": "after: this change, the same two scans",
+        "ordinary_scan_exit_code": 0,
+        "frozen_scan_exit_code": 0,
+        "summary": "no vulnerability table printed by either scan",
+        "retained": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-after.ordinary.txt and blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-after.frozen.txt"
+      }
+    ],
+    "note": "The scans use the scanner's default text output where the workflow uploads SARIF; the lockfile lists come from the workflow's own jq expressions and the flags are the workflow's (scan source --config <config> --no-resolve). The authoritative run is the required check on the pull request's merge commit."
+  },
+  "carried_forward_review": {
+    "reviewed_record": "evidence/receipts/osv-urllib3-next-20260930.json (its carried_forward_review, which carries the 2026-09-29 review forward: evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json)",
+    "advisories": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "why_it_still_holds": "The review's premise is that oauthlib 3.3.1 is imported only by requests-oauthlib 2.0.0 (client classes, token errors and helpers) and by nothing that runs an oauthlib authorization server. The lock diff is the litellm entry only (section E), so the oauthlib pin and its hashes, requests-oauthlib 2.0.0, google-auth-oauthlib 1.2.2, browser-use 0.11.9 and the openhands-sdk and openhands-tools wheels are unchanged. The one replaced package is litellm: no file of the installed litellm 1.93.2 mentions oauthlib and no line of the v1.93.0 to v1.93.2 source diff does (section I).",
+    "not_rerun": "the static search of the other artifacts for importers of oauthlib's endpoints, grant types and servers"
+  },
+  "release_choice": {
+    "as_of": "2026-09-30T23:04:45Z",
+    "selected": "litellm 1.93.2: the first release of the 1.93 line that OSV lists without the advisory (1.93.0 and 1.93.1 are affected), the line upstream's workspace pins (litellm==1.93.0) and inside the SDK's own constraint (openhands-sdk/pyproject.toml: litellm>=1.93.0); uploaded 2026-08-09, outside every cooldown",
+    "alternatives": [
+      {
+        "option": "an ignore for GHSA-3cv6-jpf6-8222 in .github/osv-scanner.toml",
+        "why_not": "a fixed release exists and is outside the 7-day window; OSV-Scanner 2.6.0 matches an ignore by id in every lock of an invocation (the header of IGNORE_SCOPES in tests/test_osv_lockfile_coverage.py), so an ignore is repo-wide, and it would need a reachability review of an advisory the relock makes moot"
+      },
+      {
+        "option": "a newer line (1.94.3, 1.95.1 or 1.96.2, each named as fixed in the advisory record)",
+        "why_not": "a larger jump than the fix needs, away from the line upstream's workspace pins; their release dates and compatibility were not read"
+      },
+      {
+        "option": "wait for upstream's workspace to move",
+        "why_not": "unbounded: its uv.lock still pins 1.93.0 (section C) and the required check fails for every head meanwhile"
+      }
+    ],
+    "overturn": "(a) OSV lists an advisory for litellm 1.93.2 that only a later release fixes; (b) an OpenHands run of the recipe fails with litellm 1.93.2 and passes with 1.93.0; (c) upstream's workspace publishes a lock with litellm >= 1.93.2: the next relock follows that lock instead of the two-line edit."
+  },
+  "independent_review": {
+    "status": "started on the pushed head of the pull request, in two families: an Opus evidence review and a read-only GPT-6.1 Sol review at effort max through the packaged Codex lane on the local OmniRoute gateway; their findings and dispositions are recorded in the pull request's discussion, and in this file if a repair commit follows"
+  },
+  "follow_up": "The joint oauthlib 4.0.0 / PyJWT 2.15.1 relock tracked in #518 (earliest 2026-10-05T18:40:43Z, due 2026-10-08, before the 2026-10-13 expiry of the two oauthlib ignores) starts from this lock: its command adds --upgrade-package oauthlib==4.0.0, replaces --upgrade-package pyjwt==2.15.0 with pyjwt==2.15.1, keeps --upgrade-package litellm==1.93.2 and the two workspace edits unless upstream's lock carries litellm >= 1.93.2 by then, and deletes the lock's IGNORE_ALLOWED_LOCKS entry in the same change. #518 names bc as owner and bc is gone: the issue needs a new owner.",
+  "registrations": [
+    "blueprints/runtime-workers/openhands/requirements.lock (the litellm entry), pins.json requirements_sha256 and research.md (the dated section 'Runtime lock litellm relock (2026-09-30)').",
+    "tests/test_osv_lockfile_coverage.py: the OpenHands IGNORE_ALLOWED_LOCKS entry's sha256 and evidence path, and the comment above it.",
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.txt (the returned outputs), the scripts blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.{builder,relock,install-check,osv-scan-step,upstream-diff,sdk-main}.sh.txt and blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.{osv-advisories,hash-check}.py.txt, and the four scanner outputs blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.osv-{before,after}.{ordinary,frozen}.txt.",
+    "evidence/receipts/osv-openhands-litellm-relock-20260930.json (this record) and manifests/evidence.json (sha256 and byte counts of every file above)."
+  ]
+}
