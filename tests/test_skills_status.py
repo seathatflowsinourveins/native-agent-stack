@@ -524,6 +524,13 @@ class SkillsStatusTests(unittest.TestCase):
         self.write_codex_entries([{"name": " gated-skill ", "enabled": False}])
         self.assertEqual(self.codex_disable_of(manifest, "gated-skill"), {"state": "ok", "disable_entry_present": True})
 
+    def test_a_path_no_file_can_have_selects_nothing_instead_of_crashing(self):
+        # TOML allows an escaped NUL in a string, which no path can hold (os.path.realpath raises ValueError on it).
+        manifest, skill = self.setup_disabled()
+        self.write_codex_entries([{"path": str(self.skill_md_path("gated-skill")) + "\u0000", "enabled": False}])
+        self.assertEqual(self.codex_disable_of(manifest, "gated-skill"),
+                         {"state": "missing_disable_entry", "disable_entry_present": False})
+
     # -- XDG lock path ----------------------------------------------------------
 
     def test_xdg_lock_path(self):

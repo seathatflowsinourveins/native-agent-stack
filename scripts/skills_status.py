@@ -464,7 +464,10 @@ def check_codex_disable(config: dict | None, config_state: str, skill: dict, ski
         if kind == "name":
             matches = value == name
         elif expected is not None:
-            matches = codex_rule_path(value, home, config_dir) == expected
+            try:
+                matches = codex_rule_path(value, home, config_dir) == expected
+            except (OSError, ValueError, RuntimeError):  # e.g. an escaped NUL, which no path can hold
+                matches = False
         else:
             parts = Path(value).parts
             matches = parts[-2:] == (name, SKILL_MD)
