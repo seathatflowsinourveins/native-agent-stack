@@ -960,11 +960,11 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 
 A coverage review of the guard's own rules on 2026-09-29 found command forms it read too little of, each a way a stored
 value could be shown or forwarded by mistake, and repair rounds the same day fixed what read-only reviews of that work
-found. Each form gets the verdict of its plain equivalent where stated below. One rule was loosened, on purpose and only
-for the value of a clustered value-taking `ps` option (see "Loosenings" below); every other change tightens, so a
-command that the base guard (main at c26800f3) blocked is blocked now unless it is one of those, and
-`tests/test_secret_path_guard.py` keeps every earlier row except two that recorded the `systemd-run` gap and moved from
-`EXPECTED_PASS_THROUGH` to `BLOCKED`. The guard is a text reader of one line of shell, not a shell: what it does not
+found. Each form gets the verdict of its plain equivalent where stated below. No rule is loosened (2026-09-30: the one
+loosening an earlier round made, for the value of a clustered value-taking `ps` option, is withdrawn, and `check()`
+reads every command as the base guard read it as well; see "No loosening" below), so a command that the base guard
+(main at c26800f3) blocked is blocked now, and `tests/test_secret_path_guard.py` keeps every earlier row except two that
+recorded the `systemd-run` gap and moved from `EXPECTED_PASS_THROUGH` to `BLOCKED`. The guard is a text reader of one line of shell, not a shell: what it does not
 read is listed at the end of this subsection.
 
 - **systemd's launchers are modelled: `systemd-run`, `run0`, `systemd-inhibit`, `systemd-cat`.** Each one's own options
@@ -1067,10 +1067,18 @@ read is listed at the end of this subsection.
   (`ps eww`, `ps auxe`, `ps Eww`, `ps auxE`) and `-E` alone or in a cluster before the first letter that takes a value
   (`ps -Ewwp 123`, `ps -p 123 -E`, `ps -A -E`). Both hosts read a dashed word as a cluster of option letters, and a letter
   that takes a value takes the rest of the word or, when it ends the cluster, the next word: `-o`, `-O`, `-p`, `-u`,
-  `-U`, `-g`, `-G`, `-t` on both, `-C`, `-q` and `-s` on procps. So that next word is a value and no cluster of flags: `ps
-  -u Eve`, `ps -fu Eve` and `ps -uEve` pass, and so do `ps -fu steve`, `ps -fu eve`, `ps -fo user`, `ps -ft e`, `ps -fU
-  steve` and `ps -fC e` (a command name). `ps -ef`, `ps -o pid,command -p N` and `ps aux` pass, and a dashed `-e` is
-  every process. The two hosts differ where the guard has to read both. `-C` takes a command name on procps (`ps -C
+  `-U`, `-g`, `-G`, `-t` on both, `-C`, `-q` and `-s` on procps. So that next word is a value and no cluster of flags in
+  each host's default reading: `ps -u Eve`, `ps -fu Eve` and `ps -uEve` pass. The guard reads a third way besides, the base
+  guard's (2026-09-30): procps has personalities, `PS_PERSONALITY=old` or `I_WANT_A_BROKEN_PS` set on the command line or
+  inherited from the shell (which a hook cannot see), under which `ps -axu e` is parsed BSD-style, `u` takes no value and
+  `e` shows the environment (third verification review, from the procps-ng 4.0.4 manual and `/usr/bin/ps`). So a dashless
+  word of the base guard's cluster alphabet with an `e` is refused after any cluster, as the base guard refused it: `ps -fu
+  steve`, `ps -fu eve`, `ps -fo user`, `ps -ft e`, `ps -fU steve` and `ps -fC e` are an `environment_dump`, which an earlier
+  round of this work had let through. A stand-alone value option still takes the next word (`ps -u steve` and `ps -C
+  emacs` pass, as with the base guard; whether a personality reads a stand-alone `-u` BSD-style too is not measured here).
+  The forms that pass whatever the user name are a numeric id (`ps -f -U 1000`, `ps -fU 1000`) and `pgrep`
+  (`pgrep -a -u steve node`), each checked against the guard of this change. `ps -ef`, `ps -o pid,command -p N` and
+  `ps aux` pass, and a dashed `-e` is every process. The two hosts differ where the guard has to read both. `-C` takes a command name on procps (`ps -C
   cmdlist`) and is a flag on macOS ("Change the way the CPU percentage is calculated": Apple `adv_cmds` `ps/ps.c` at
   60bc9ebf, `PS_ARGS` `aACcdeEfg:G:hjLlMmO:o:p:rSTt:U:u:vwx` and `case 'C': rawcpu = 1`). procps reads a dashless
   BSD-style word wherever it stands, macOS only as the first argument (`kludge_oldps_options` is applied to `argv[1]`
@@ -1107,22 +1115,51 @@ read is listed at the end of this subsection.
   same command gets with the redirection written last (684 combinations in the tests, none looser than the base guard; 166
   stricter, the operand of a `cat` that the base guard missed because it stood before the command, as in
   `env -u UNUSED < .env cat`). A number before an operator still ends the options of `sudo` and `nice`
-  (`sudo 2>/dev/null -u root printenv`): shlex splits `2>` and `2 >` alike, so a descriptor and a value look the same, a
-  recorded gap. A redirection is no argument of `set`, `export`, `declare` and `typeset` either: `set > FILE` and
+  (`sudo 2>/dev/null -u root printenv`): the launcher walks take a number for a value, a recorded gap. Since 2026-09-30
+  the base guard's own walk, which took an operator for the value of `sudo -u` or `env -u`, is read as well (see "No
+  loosening"). A redirection is no argument of `set`, `export`, `declare` and `typeset` either: `set > FILE` and
   `set < FILE` still print every variable (`set a b` sets positional parameters), so they are an `environment_dump` now;
   the base guard passed them, and without this the redirection that a keyring exec's arguments carry to the command it
   starts would have made `exec name VAR < FILE -- set` pass, which the base guard refused (found by a grammar fuzz of
-  600,000 launcher chains with redirections against the base guard, now 0 looser).
+  600,000 launcher chains with redirections against the base guard, now 0 looser). A number is a redirection's
+  descriptor there only when it touches the operator (2026-09-30, third verification review): bash reads `1>out` as a
+  redirection of descriptor 1 and `1 > out` as the word `1` and a redirection, but shlex splits the two alike, so the
+  tokenizer marks a number (or `{name}`) that touches `<` or `>` before it splits the text, and the dump rule counts only
+  such a number as a descriptor. `set 1 > out` and `set 3 < input` set positional parameters and pass, as they did with
+  the base guard (the round before this one refused them), while `set 1>out`, `set >out` and `set 2>/dev/null` print
+  every variable and stay an `environment_dump`; the base guard passed those three.
 - **An internal error blocks; a timeout does not.** Only exit 2 blocks a PreToolUse call. `main()` now catches any
   exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
   `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is
   cancelled and the call goes ahead (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A timed-out
   `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), and the guard's hook timeout is 10 s, so the time
-  the rules take is part of the guard's safety and no timer inside the hook can replace it. That is why each text is
-  scanned in one pass (a stack of frames and a regular expression that jumps between the characters that matter, not
-  a rescan per arithmetic shift or per nesting level), a chain of `env`, `rtk` or `systemd-run` launchers is walked by
-  index instead of copying the rest of the command at every hop, and the bodies read behind double-quoted substitutions
-  are capped at 32 levels and at four times the command's length plus 64 KiB.
+  the rules take is part of the guard's safety and no timer inside the hook can replace it. That is why the substitution
+  scan reads each text in one pass (a stack of frames and a regular expression that jumps between the characters that
+  matter, not a rescan per arithmetic shift or per nesting level), a chain of `env`, `rtk` or `systemd-run` launchers is
+  walked by index instead of copying the rest of the command at every hop, and the bodies read behind double-quoted
+  substitutions are capped at 32 levels and at four times the command's length plus 64 KiB.
+  **Not every text rule was linear (corrected 2026-09-30).** An earlier version of this item said that every text is
+  scanned in one pass; the third verification review found raw-text rules that run before any work budget and are
+  quadratic on a repeated prefix: the `STORE_PATHS` patterns for `${XDG_CONFIG_HOME:-...}` and `${HF_HOME:-...}` and
+  the `/proc/.../environ` path read the unbounded run after their literal again from every repeat (102,016 characters of
+  `XDG_CONFIG_HOME:-` took 11.9 s, 54,000 of `HF_HOME:-` 13 to 14 s, 80,000 of `/proc` 13 to 15 s, and the real hook
+  was killed at 10.5 s with no verdict), and a probe of every text rule found a fourth, `gh auth status ... -t`. Each is
+  now a linear scan (`LinearScan` in the guard) that splits the text once into the runs the pattern cannot cross and
+  searches each run for literals; old pattern against new scan, 7,229,043 generated texts a pattern (2,000,000 random
+  and every text of up to six fragments) gave the same answer, and the tests keep 100,000 random texts a pattern. With
+  the patterns linear, one unquoted word of 199,000 characters still cost 0.53 s in shlex, which copies the word at each
+  character, so a text with no quote and no backslash is split without shlex (`SHLEX_PLAIN`: what shlex's state machine
+  reduces to there, checked against shlex on 2,111,111 texts in both readings). A `find` read the prefix of each of its
+  actions from a copy of the rest of the words (3.9 s on 49,000 `-ok`; 18,000 `-exec sudo` did not finish in 60 s);
+  each action's prefix is walked by index now, each position once, and an action followed by an option word is not
+  walked at all. Measured in-process on 2026-09-30 with the final guard: the review's four inputs take 0.01 to 0.07 s,
+  the `find` input ending in a harmless command (which both readings read) 0.10 s, and every `STORE_PATHS` pattern's
+  leading literal repeated to 199,000 characters at most 0.12 s, before a dump or a harmless command; the real hook
+  answers the review's inputs in under a second (the tests bound these at 0.5 s of processor time and 1 s of wall
+  clock, wider in CI). The prior reading (see "No loosening") copies the rest of the words
+  at every `env`, `rtk` or keyring hop, as the base guard did, and spends the same budget: a chain that ends in a
+  harmless command passes up to 1,410 bare `env` or 997 two-word hops (`rtk proxy`, `env FOO=1`) and is refused as
+  `command_too_complex` beyond, in under 0.2 s at 20,000 hops (the base guard took 29 s and 56 s there).
   Measured on this host with the inputs of `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the
   substitution scan took 10 s on 12,000 here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on
   60,000 nested `systemd-run`; the launcher walk that predates this work took 29 s on 20,000 nested `env` and 56 s on
@@ -1162,36 +1199,63 @@ read is listed at the end of this subsection.
   (40 keyring execs over a 20,000-word tail spend 1,005,859 in 0.18 s), 490 reads 0.03 s. 1,000 random mixes of 22
   adversarial building blocks at 199,000 characters took at most 0.91 s, and 64 shape families at 25,000 to 199,000
   characters at most 1.1 s (the shapes that grow faster than linearly are one long shlex token, which the
-  200,000-character cap bounds at 0.5 s). Each figure is a run on a shared host: the same 192,000-character quoted word took
-  0.8 s alone and 1.7 s at a load average of 8, so read a figure as within a factor of two. The largest real command of
-  this repository, an 82,000-character script written through a here-document, spends 35% of the characters, 1% of the
-  words and under 1% of the texts and reads; the largest commit message (27,600 characters, read twice as a body) 57% of
-  the characters. Nothing in the repository's
-  fences, scripts or commit messages (1,877 distinct messages on all refs) comes near a limit. The friction is a command
-  that needs more than that, measured as the largest size that still passes: a text whose characters, counted at their
+  200,000-character cap bounds at 0.5 s; since 2026-09-30 only a quoted one, see above). On 2026-09-30, with both
+  readings, the same 1,000 mixes took about a second at most (0.93 to 1.07 s over runs at load averages of 7 to 23,
+  this guard and the guard of 6c4f63d7 alike: the slowest mix is one quoted word of two-byte characters, which shlex
+  still reads a character at a time), and the median mix 0.17 s (0.24 s before). Each figure is a run on a shared host: the same
+  192,000-character quoted word took 0.8 s alone and 1.7 s at a load average of 8, so read a figure as within a factor of
+  two. The largest real command of this repository, an 82,000-character script written through a here-document, spends
+  34% of the characters, 1% of the words and texts and under 1% of the reads with both readings (measured 2026-09-30).
+  An earlier version of this item said that no commit message comes near a limit; on 2026-09-30 the refs held 2,305
+  distinct messages (a count that grows), and in the `git commit -m "$(cat <<'EOF' ...)"` pattern, where a message is
+  read twice as a body, the largest (110,892 characters) needs 116% of the characters and two messages pass the budget
+  and are refused as `command_too_complex`, as the guard of 6c4f63d7 refused them; `git commit -F FILE` passes them.
+  Nothing in the fences and scripts comes near a limit. The friction is a command that needs more than that, measured
+  as the largest size that still passes (2026-09-30, with both readings): a text whose characters, counted at their
   storage width and once for each reading (two when it holds a `#`), pass 400,000 (an ASCII script of 199,990 characters
-  with a `#`, a two-byte text of 199,993 characters without one, a four-byte text of 99,993), more than 9,999 `sh -c` strings or
-  substitution bodies, more than 445 keyring execs nested in one another (40 in front of a 1,000-word tail), more than 250
-  keyring execs that each launch a program, more than about 300 interpreter words in a row after a keyring exec, or more
-  than about 380 distinct injected variables in a 10,000-character command. Write such content with the Write tool and
-  pass the path. `check()` itself has no size limit, and a substitution nested beyond the caps above is still not read.
-- **Loosenings against the base guard (c26800f3), 2026-09-29: one.** Everything else this work changes tightens. The
-  value after a clustered value-taking `ps` option is no BSD flag cluster. The base guard skipped the value after a
-  stand-alone value option (`ps -u steve` passed) but read the word after a cluster that ends in one, as the shell
-  writes it (`ps -fu steve`), as a dashless `ps eww` and refused it. Now `-o`, `-O`, `-p`, `-u`, `-U`, `-g`, `-G`, `-t`,
-  `-q`, `-s`, `-k` and procps's `-C` take the next word as their value in a cluster too: `ps -fu steve`, `ps -fu eve`,
-  `ps -fo user`, `ps -ft e`, `ps -fU steve` and `ps -fC e` pass. Each has rows in `tests/test_secret_path_guard.py`
-  (ALLOWED), and a differential against the base guard over every `ps` command line of up to three words from a
-  vocabulary of 65 (and 200,000 random ones of four to six words) finds no other loosening (the review's probe, `loosened
-  rows: 0`, holds none of these forms). Measured 2026-09-29 with the guard of 36c847db (the tests changed after it, not the
-  guard): a differential over 66,176 commands derived from 1,079 table and oracle rows (each wrapped in 8 launcher prefixes
-  and 6 suffixes, and in `bash -c`, `sh -c` and `eval`) loosens 510, which are 10 `ps` forms (`ps -fu steve`, `-fu eve`,
-  `-fo user`, `-ft e`, `-fO user`, `-fU steve`, `-fG eve`, `-fg steve`, `-fC e`, `-fC eww`) in 51 wrappers each; three
-  seeds of a mutation fuzz (26,400 mutants of the 440 strings that the base guard blocks, per seed) loosen 153, 175 and
-  173, every one a `ps` form of that family under a mutation that leaves it readable; and nothing is loosened by the 785
-  fenced blocks, 4,338 fenced lines, 201 scripts (written through a here-document and as one command) and 16,119 distinct
-  lines of this repository, two fuzzers of 60,000 random strings, ten grammar fuzzes of 60,000 launcher chains with
-  redirections, the 40-consumer matrix of 115,200 commands, and the 684 launcher redirection positions.
+  with a `#`, a two-byte text of 199,993 characters without one, a four-byte text of 99,993), more than 4,999 `sh -c`
+  strings (9,999 before the prior reading, which reads each one again when the command passes this version's reading) or
+  9,998 substitution bodies, more than 445 keyring execs nested in one another (40 in front of a 1,000-word tail), more
+  than 250 keyring execs that each launch a program, more than about 300 interpreter words in a row after a keyring
+  exec, more than about 380 distinct injected variables in a 10,000-character command, or a launcher chain longer than
+  above. Write such content with the Write tool and pass the path. `check()` itself has no size limit, and a
+  substitution nested beyond the caps above is still not read.
+- **No loosening against the base guard (c26800f3), 2026-09-30.** An earlier round of this work loosened one rule on
+  purpose, the value after a clustered value-taking `ps` option, and said that those `ps` forms were the only commands
+  that the base guard refused and this guard passed. Both are withdrawn. The third verification review found that the
+  loosening lets procps personalities through (see the `ps` item), and that the claim was false besides: the base guard
+  refused `systemd-run --description kernel_keyring.py exec name X -- keyctl print 123` (`keyring_payload_read`) and
+  `... -- cat .env` (`dotenv_read`), and this guard passed both, because its `systemd-run` walk took the keyring script for
+  the value of `--description` and never unwrapped the keyring exec. (The strings run no reader: `systemd-run`'s command
+  is then `exec`. The rule is the base guard's verdict, not whether a string leaks.) A probe of the class found more of it:
+  the option values of `run0`, `systemd-cat` and `systemd-inhibit`, a path-qualified wrapper whose option value is the
+  script (`/usr/bin/sudo -u kernel_keyring.py exec a B -- cat .env`), a `systemd-run` inside a keyring exec, and a
+  redirection operator that the base guard's walk took for the value of `sudo -u`, `nice -n` or `env -u`
+  (`sudo -u > printenv x`). Rather than find each walk that reads a word differently, `check()` now reads the words of
+  every command twice: as this guard reads them and, when that reading allows the command, as the base guard read them
+  (`prior_reading`: that guard's own walk and rules, spending from the same work budget), and refuses what either reading
+  refuses; the `ps` rule applies the base guard's reading besides. No command the base guard refused passes, by
+  construction, and each string above is a `BLOCKED` row with the base guard's reason. Measured in-process on 2026-09-30
+  against the base guard's file (sha256 f9be81b2), with the final guard: the prior reading gives the base guard's verdict
+  on every one of 460,910 commands (the test tables in 17 launcher prefixes and 6 suffixes, every fenced line of the
+  repository, 19,296 launcher option-value commands in which each value-taking option of every launcher the guard walks
+  or reads is followed by a reader, a keyring exec chain or a dump, in twelve spellings and glued, and ten seeded mutants
+  of each of the 34,993 strings the base guard refuses), and `check()` loosens none of them. Nothing is loosened either by
+  a differential over 88,207 commands (1,117 table and oracle rows in 11 launcher prefixes and 6 suffixes and in
+  `bash -c`, `sh -c`, `eval` and substitutions, and the launcher option-value commands), the 806 fenced blocks, 4,454
+  fenced lines and 202 scripts of this repository (written through a here-document and as one command), two fuzzers of
+  60,000 random strings, eleven grammar fuzzes of 60,000 launcher chains or here-document placements and one of 100,000
+  mixed, six seeds of a mutation fuzz (27,600 mutants of the 460 strings the base guard refuses, each), 478,915
+  generated `ps` lines, the 40-consumer matrix of 115,200 commands, the 684 launcher redirection positions, the 2,518
+  distinct commit messages of all refs in three patterns, and the hook run as a process on 42 inputs (the last round's
+  26, three of them the `ps` forms refused again, and this round's). The 44 commands of that differential that both
+  guards refuse for different reasons (this guard reads a credential file sourced in a substitution or behind
+  `systemd-run` and says `environment_dump_after_source` where the base guard said `environment_dump`) get the same
+  reasons from the guard of 6c4f63d7: none is new in this round. Of the 342 rows that this work adds to `BLOCKED` and
+  `KEYRING_BLOCKED` (against the tables at c26800f3), 245 are refused only by this guard (the base guard passed them)
+  and 97 are regression controls that the base guard already refused (the third review counted 240 and 67 before this
+  round); the friction cases that review lists (a commit message, pull-request body, file text or Python here-document
+  whose line reads as a dump or as the shell's `set`) stay documented friction, in the here-document item above.
 - **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
   standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
   vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)

@@ -433,9 +433,9 @@ MAX_COMMAND_CHARACTERS = 200_000
 # characters, so each counter alone holds its worst case near one second (400,000 characters: 1.1 s; 10,000 texts: 0.3 s; 1,000,000
 # words: 0.2 s; 500 reads: 0.03 s). The largest real command of this repository (an 82,000-character script written through a
 # here-document) spends 34% of `characters`, 1% of `words` and `texts` and under 1% of `reads` with both readings (measured 2026-09-30), so
-# the limits leave ordinary work far inside them, and 1,000 random mixes of the adversarial shapes at 199,000 characters took at most
-# 0.96 s at a load average of 23 (the slowest is one quoted word of two-byte characters, which shlex reads a character at a time; the
-# guard of 6c4f63d7 took at most 1.07 s on the same mixes there).
+# the limits leave ordinary work far inside them, and 1,000 random mixes of the adversarial shapes at 199,000 characters took about a
+# second at most, 0.93 to 1.07 s over runs at load averages of 7 to 23, this version and the guard of 6c4f63d7 alike (the slowest is one
+# quoted word of two-byte characters, which shlex reads a character at a time; the median mix fell from 0.24 s to 0.17 s).
 WORK_LIMITS = {
     "characters": 400_000,  # characters passed to shlex, each at its storage width (storage_width), over every reading and nesting level
     "texts": 10_000,  # texts read: the command, each double-quoted substitution body, each `sh -c` or `eval` string, each keyring read
