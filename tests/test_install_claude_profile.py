@@ -1210,5 +1210,19 @@ class PortableTopRuleTests(unittest.TestCase):
         self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))
 
 
+class McpStartupTimeoutTemplateTests(unittest.TestCase):
+    """MCP_TIMEOUT is Claude Code's MCP server startup timeout, default 30000 ms
+    (https://code.claude.com/docs/en/env-vars); a server's own `timeout` field bounds tool
+    execution only (https://code.claude.com/docs/en/mcp), and `claude mcp add --help` on 2.1.285
+    has no startup option. The Codex template gives serena 60 s and socraticode 120 s
+    (startup_timeout_sec), so the one global value matches the slowest of them."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+
+    def test_the_template_env_sets_the_mcp_startup_timeout(self):
+        env = json.loads(self.TEMPLATE.read_text(encoding="utf-8"))["env"]
+        self.assertEqual(env.get("MCP_TIMEOUT"), "120000")
+
+
 if __name__ == "__main__":
     unittest.main()
