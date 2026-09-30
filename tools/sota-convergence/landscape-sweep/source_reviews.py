@@ -19,6 +19,15 @@ HfApi.model_info calls) gives the commit, the model card's license and the repos
 read at that commit through the documented "Resolve a file" endpoint /<repo_id>/resolve/<sha>/README.md. Both are
 anonymous GETs (no token is read or sent), and the card's YAML metadata block is not excerpted. Its review is named
 hf-<namespace>-<name>.json.
+A skill survivor of the skills modality (owner/repo@name, a skills-* layer) is reviewed at its SKILL.md: the folder
+named <name> that holds a SKILL.md in the repository's git tree at the default branch's commit (the Agent Skills
+specification requires a skill's name to match its folder, https://agentskills.io/specification), or a SKILL.md at the
+repository root whose name field is <name>. The review records the SKILL.md's path, sha256 and size, its
+disable-model-invocation flag (Claude Code skills frontmatter, https://code.claude.com/docs/en/skills) and the
+allow_implicit_invocation policy of the agents/openai.yaml beside it (default true, Codex skills docs,
+https://developers.openai.com/codex/skills), and excerpts the SKILL.md body without its frontmatter. Its repository
+field is <full_name>@<name>, the survivor's identity, and it is named <owner>-<repo>-<name>.json. No folder, or more
+than one, is reported and skipped.
 """
 
 from __future__ import annotations
@@ -49,6 +58,9 @@ HUB_DEFAULT_REVISION = "main"  # huggingface_hub constants.DEFAULT_REVISION
 # huggingface_hub repocard.REGEX_YAML_BLOCK: the card's metadata block, which may follow leading whitespace.
 CARD_METADATA = re.compile(r"^(\s*---(?:\r\n|\r|\n))([\S\s]*?)((?:\r\n|\r|\n)---[ \t]*(\r\n|\n|$))")
 HEX40 = re.compile(r"[0-9a-f]{40}")
+# A skills-modality survivor: owner/repo@name (schemas/discover-skills.json skill_ref).
+SKILL_REF = re.compile(r"([A-Za-z0-9-]+/[A-Za-z0-9._-]+)@([a-z0-9-]+)")
+FRONTMATTER_SCALAR = re.compile(r"([A-Za-z0-9_-]+):[ \t]*(.*?)[ \t]*")
 
 
 class GhError(RuntimeError):
@@ -89,7 +101,8 @@ def hub_model(repository: str) -> str | None:
 
 def repository_key(repository: str) -> str:
     """One key per repository: the lowercased owner/repo for GitHub (sweep_common.slug) and hf:<namespace>/<name>
-    for a Hugging Face model, so the same model with and without a trailing slash gets one review."""
+    for a Hugging Face model, so the same model with and without a trailing slash gets one review. A skill ref
+    (owner/repo@name) is its own lowercased key: slug leaves it whole."""
     repo_id = hub_model(repository)
     return f"hf:{repo_id.lower()}" if repo_id else slug(repository)
 
@@ -162,10 +175,96 @@ def unique_stems(names: dict) -> dict:
     return stems
 
 
+def frontmatter_scalars(yaml_text: str) -> dict:
+    """The top-level `key: value` lines of a SKILL.md frontmatter block, quotes stripped (flags and names only; a
+    multi-line value keeps its first line)."""
+    out = {}
+    for line in yaml_text.splitlines():
+        match = FRONTMATTER_SCALAR.fullmatch(line)
+        if match:
+            out[match.group(1)] = match.group(2).strip("'\"")
+    return out
+
+
+def yaml_true(value) -> bool:
+    return str(value or "").split("#", 1)[0].strip().lower() == "true"
+
+
+def allow_implicit_invocation(yaml_text: str) -> bool:
+    """agents/openai.yaml policy.allow_implicit_invocation; true unless it says false (Codex skills docs)."""
+    in_policy = False
+    for line in yaml_text.splitlines():
+        if line[:1] not in ("", " ", "\t", "#"):
+            in_policy = line.split("#", 1)[0].strip() == "policy:"
+        elif in_policy:
+            match = re.fullmatch(r"\s+allow_implicit_invocation:\s*([A-Za-z]+)\s*(?:#.*)?", line)
+            if match:
+                return match.group(1).lower() != "false"
+    return True
+
+
+def gh_file(full: str, path: str, commit: str) -> bytes:
+    content = gh(f"repos/{full}/contents/{urllib.parse.quote(path, safe='/')}?ref={commit}")
+    return base64.b64decode(content["content"])
+
+
+def skill_review(owner_repo: str, name: str, layers: list, lane: str, fit_models: str) -> dict:
+    meta = gh(f"repos/{owner_repo}")
+    full, branch = meta["full_name"], meta["default_branch"]
+    commit = gh(f"repos/{full}/commits/{branch}")["sha"]
+    tree = gh(f"repos/{full}/git/trees/{commit}?recursive=1")
+    paths = [entry.get("path") for entry in tree.get("tree") or [] if isinstance(entry, dict)]
+    folders = [path for path in paths if isinstance(path, str) and path.endswith("/SKILL.md")
+               and path.split("/")[-2] == name]
+    truncated = " (the git tree was truncated)" if tree.get("truncated") else ""
+    if len(folders) > 1:
+        raise GhError(f"{full}@{name}: {len(folders)} SKILL.md folders named {name} at {commit}: {sorted(folders)}")
+    skill_path, raw = (folders[0], None) if folders else (None, None)
+    if skill_path is None and "SKILL.md" in paths:  # a repository that is one skill keeps it at its root
+        raw = gh_file(full, "SKILL.md", commit)
+        metadata = CARD_METADATA.search(raw.decode("utf-8", "replace"))
+        if metadata and frontmatter_scalars(metadata.group(2)).get("name") == name:
+            skill_path = "SKILL.md"
+    if skill_path is None:
+        raise GhError(f"{full}@{name}: no SKILL.md in a folder named {name}, and no root SKILL.md named {name}, at "
+                      f"{commit}{truncated}")
+    raw = raw if raw is not None else gh_file(full, skill_path, commit)
+    text = raw.decode("utf-8", "replace")
+    metadata = CARD_METADATA.search(text)
+    fields = frontmatter_scalars(metadata.group(2)) if metadata else {}
+    if fields.get("name") not in (None, name):
+        raise GhError(f"{full}@{name}: {skill_path} at {commit} declares name {fields.get('name')!r}")
+    folder = skill_path.rsplit("/", 1)[0] if "/" in skill_path else ""
+    yaml_path = f"{folder}/agents/openai.yaml" if folder else "agents/openai.yaml"
+    implicit = allow_implicit_invocation(gh_file(full, yaml_path, commit).decode("utf-8", "replace")) \
+        if yaml_path in paths else True
+    repository_license = (meta.get("license") or {}).get("spdx_id") or "NOASSERTION"
+    license_id = fields.get("license") or repository_license
+    return {"schema_version": 1, "id": f"source-review-{review_name(f'{full}@{name}')}", "kind": "upstream_provenance",
+            "evidence_class": "source_review", "repository": f"{full}@{name}", "reviewed_commit": commit,
+            "readme_path": skill_path, "license": license_id, "layers": sorted(set(layers)),
+            "claim": (f"Source review of the skill {name} in {full} at commit {commit} (license {license_id}), read "
+                      f"from {skill_path}" + (f" and {yaml_path}" if yaml_path in paths else "") + " at that commit. "
+                      f"Survived the {lane} facts refuter and both fit refuters ({fit_models}); no install, "
+                      "invocation, benchmark or comparison with an installed skill."),
+            "observed": {"stars": meta.get("stargazers_count"), "pushed_at": meta.get("pushed_at"),
+                         "archived": meta.get("archived"), "default_branch": branch,
+                         "repository_license": repository_license,
+                         "skill_md_sha256": hashlib.sha256(raw).hexdigest(), "skill_md_bytes": len(raw),
+                         "disable_model_invocation": yaml_true(fields.get("disable-model-invocation")),
+                         "openai_yaml_path": yaml_path if yaml_path in paths else None,
+                         "allow_implicit_invocation": implicit},
+            "documentation_excerpts": excerpts_from(text[metadata.end():] if metadata else text,
+                                                    f"{skill_path}@{commit}")}
+
+
 def review(repository: str, layers: list, lane: str, fit_models: str) -> dict:
     repo_id = hub_model(repository)
     if repo_id:
         return hub_review(repo_id, layers, lane, fit_models)
+    skill = SKILL_REF.fullmatch(str(repository or "").strip())
+    if skill:
+        return skill_review(skill.group(1), skill.group(2), layers, lane, fit_models)
     owner_repo = slug(repository)
     if not OWNER_REPO.fullmatch(owner_repo):
         raise GhError(f"{repository} is neither a GitHub repository nor a Hugging Face model repository URL")

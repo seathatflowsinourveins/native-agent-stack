@@ -25,6 +25,16 @@ whose retained failures (returns.json failures/<layer>) lack their retained_fail
 failures are checked per worker and per layer, as convert.py records them: a <role>:<layer>[:followup] worker's in
 that layer's round, the completeness critic's in every layer of the record, so one layer's failure never covers
 another layer. Paths are repository-relative and must exist.
+
+  make_result.py --decision-record RESULT.json [--repo-root .] [--force]
+
+writes docs/decisions/<date>-skills-landscape-sweep.md for a skills sweep's RESULT.json (every layer a skills-*
+layer of catalogs/landscape/skills-lifecycle.json): the survivors per lifecycle task with their labels, the installed
+skill each would replace, invocation flags and source reviews; every refuted proposal with the reasoning of the votes
+that refuted it; the completeness critic's findings (the manifest's critic); the reopened layers; and the overturn
+conditions (each task's overturn_when and each survivor's comparison_that_would_overturn). It reads the returns and
+manifest RESULT.json names, under --repo-root, and edits no manifest: adoption/skills/manifest.json changes only
+through its own trial and decision records. An existing record is kept unless --force.
 """
 
 from __future__ import annotations
@@ -34,15 +44,20 @@ import json
 import os
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import REPO_ROOT, canon, deviation_rounds, load_json, pointer_token  # noqa: E402
+from sweep_common import (REPO_ROOT, canon, deviation_rounds, ledger_module, load_json, pointer_token,  # noqa: E402
+                          private_content, private_findings, slug)
 
 PLACEHOLDER = "@RETURNS@"
 HEX64 = re.compile(r"[0-9a-f]{64}")
 REQUIRED_EFFORT = "max"  # every agent() call of sweep.js names effort 'max'
+SKILLS_CATALOG = "catalogs/landscape/skills-lifecycle.json"  # build_inputs.SKILLS_CATALOG
+DECISION_RECORD = "docs/decisions/{date}-skills-landscape-sweep.md"
+REFUTER_NAMES = (("facts", "facts refuter"), ("claude", "Claude fit refuter"), ("gpt6", "GPT-6 fit refuter"))
 
 
 def substitute(value, returns_ref: str):
@@ -182,22 +197,180 @@ def build_result(*, layers: list, reviews: list, usage: dict, manifest: dict, sw
     return result
 
 
+# --------------------------------------------------------------------------- the skills decision record
+
+
+def one_line(value, limit: int = 600) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    return text if len(text) <= limit else text[:limit - 3].rstrip() + "..."
+
+
+def proposal_of(returns: dict, layer_id: str, repository: str, round_name) -> dict:
+    """The proposal row convert.py merged for `repository` in that round: the Claude researcher's return first, then
+    the GPT-6 researcher's (sweep.js mergeProposals keeps the first family's fields), matched as slug() matches."""
+    raw = ((returns.get("raw") or {}).get(layer_id) or {}).get(round_name or "first") or {}
+    candidates = [*((raw.get("claude_discover") or {}).get("proposed") or []),
+                  *(((raw.get("gpt6_discover") or {}).get("output") or {}).get("proposed") or [])]
+    key = slug(repository)
+    return next((p for p in candidates if isinstance(p, dict) and slug(p.get("skill_ref") or p.get("repository")) == key),
+                {})
+
+
+def refutations(facts: dict, fit: dict) -> list[str]:
+    """'<refuter>: <reasoning>' for every vote that refuted a proposal; a vote that did not return says so."""
+    votes = [("facts", facts), ("claude", (fit or {}).get("claude") or {}), ("gpt6", (fit or {}).get("gpt6") or {})]
+    names = dict(REFUTER_NAMES)
+    return [f"{names[role]}: " + ("the vote did not return (counted as refuted)" if vote.get("missing")
+                                  else one_line(vote.get("reasoning"), 400))
+            for role, vote in votes if vote.get("refuted") is not False]
+
+
+def decision_record(result: dict, returns: dict, manifest: dict, catalog: dict, resolve) -> tuple[str, str]:
+    """(repository-relative path, Markdown) of the decision record of a skills sweep's RESULT.json. `resolve(ref)`
+    returns the object a <file>#<pointer> ref of the record names."""
+    layers = result.get("layers") or []
+    others = [f"{layer.get('layer_id')} ({layer.get('catalog')})" for layer in layers if layer.get("catalog") != "skills"]
+    if not layers or others:
+        raise ValueError(f"--decision-record takes a skills sweep's RESULT.json (every layer's catalog skills): "
+                         f"{others or 'no layers'}")
+    tasks = {task.get("layer_id"): task for task in catalog.get("tasks") or [] if isinstance(task, dict)}
+    unknown = [layer["layer_id"] for layer in layers if layer.get("layer_id") not in tasks]
+    if unknown:
+        raise ValueError(f"layers not in {SKILLS_CATALOG}: {unknown}")
+    run_date = str(result.get("date") or "")
+    date.fromisoformat(run_date)
+    sweep_id = result.get("sweep_id")
+    ids = [layer["layer_id"] for layer in layers]
+    lines = [f"# Decision: skills landscape sweep {sweep_id} ({run_date})", "", "## Context", "",
+             f"`{sweep_id}` ran the landscape sweep's skills modality over {len(layers)} lifecycle task(s) of "
+             f"`{SKILLS_CATALOG}` ({', '.join(ids)}): workflow run `{result.get('workflow_run')}`, lane "
+             f"`{result.get('lane')}`. For each task a Claude and a GPT-6 researcher proposed skills (owner/repo@name). "
+             "A proposal survived only when the facts refuter and both fit refuters (Claude and GPT-6) voted not "
+             "refuted, and a vote that did not return counts as refuted. Survival means the proposal withstood fact and "
+             "fit checks: no skill was installed, invoked or benchmarked.", "",
+             "This record was written by `tools/sota-convergence/landscape-sweep/make_result.py --decision-record` from "
+             "the sweep's RESULT.json. The sweep edits no manifest: `adoption/skills/manifest.json` changes only "
+             "through its own trial and decision records, and a surviving targeted_candidate earns a bounded paired "
+             "trial, not an install.", "", "Completeness critic:", ""]
+    critic = manifest.get("critic")
+    if not isinstance(critic, dict):
+        lines.append("- The completeness critic did not return (a retained failure of every layer).")
+    else:
+        lines += [f"- {one_line(item)}" for item in critic.get("general") or []]
+        flagged = [item for item in critic.get("followup_layers") or [] if isinstance(item, dict)]
+        lines += [f"- Flagged `{item.get('layer_id')}` for a follow-up round: {one_line(item.get('reason'))} (search "
+                  f"directions: {one_line('; '.join(item.get('search_directions') or []))})" for item in flagged]
+        if not flagged:
+            lines.append("- It flagged no layer for a follow-up round.")
+    reopened = [(layer["layer_id"], entry) for layer in layers for entry in layer.get("reopen") or []]
+    lines += ["", "Reopened layers (each reopen entry resets the layer's clean count):", ""]
+    lines += [f"- `{layer_id}`: {entry.get('trigger')} (`{entry.get('ref')}`)" for layer_id, entry in reopened] \
+        or ["- None."]
+    alternatives, decisions, overturns, reviews = [], [], [], []
+    for layer in layers:
+        layer_id, task = layer["layer_id"], tasks[layer["layer_id"]]
+        heading = f"### `{layer_id}` ({task.get('lifecycle_task')})"
+        refuted = []
+        for entry in layer.get("refuted") or []:
+            facts, fit = resolve(entry["facts"]["ref"]), resolve(entry["fit"]["ref"])
+            proposal = proposal_of(returns, layer_id, entry["repo"], facts.get("round"))
+            refuted.append(f"- `{entry['repo']}` ({proposal.get('proposed_label', 'label not retained')}): "
+                           + "; ".join(refutations(facts, fit)))
+        if refuted:
+            alternatives += [heading, "", *refuted, ""]
+            if layer.get("votes_note"):
+                alternatives += [f"Note: {one_line(layer['votes_note'], 1200)}", ""]
+        survivors = []
+        overturns.append(f"- `{layer_id}`: {one_line(task.get('overturn_when'), 1200)}")
+        for entry in layer.get("survived") or []:
+            facts = resolve(entry["facts"]["ref"])
+            proposal = proposal_of(returns, layer_id, entry["repo"], facts.get("round"))
+            replaces = proposal.get("replaces")
+            survivors.append(
+                f"- `{entry['repo']}`: {proposal.get('proposed_label', 'label not retained')}; "
+                + (f"replaces {replaces}" if replaces else "complements the installed skills")
+                + f"; model_invocable {str(proposal.get('model_invocable')).lower()}, codex_implicit "
+                  f"{str(proposal.get('codex_implicit')).lower()}; pin `{proposal.get('pin')}`; source review "
+                  f"`{entry.get('source_review')}`. Gap: {one_line(proposal.get('demonstrated_gap'))}")
+            overturns.append(f"  - `{entry['repo']}`: {one_line(proposal.get('comparison_that_would_overturn'), 1200)}")
+            if entry.get("source_review"):
+                reviews.append(f"- Source review of `{entry['repo']}`: `{entry['source_review']}`")
+        decisions += [heading, "", *(survivors or ["- No proposal survived."]), ""]
+    lines += ["", "## Alternatives", "", "Refuted proposals per lifecycle task, with the votes that refuted them:", ""]
+    lines += alternatives or ["No proposal was refuted.", ""]
+    lines += ["## Decision", "", "Survivors per lifecycle task:", "", *decisions]
+    lines += ["## Overturn condition", "", "Each task's overturn condition (the skills catalog's overturn_when), and "
+              "each survivor's comparison_that_would_overturn:", "", *overturns, ""]
+    catalog_note = f" (checked_at {catalog.get('checked_at')})" if catalog.get("checked_at") else ""
+    lines += ["## Sources", "",
+              f"- Returns: `{result.get('returns_ref')}`",
+              f"- Usage: `{result.get('usage_ref')}`",
+              f"- Manifest, with the completeness critic: `{result.get('manifest_ref')}`",
+              f"- Skills catalog: `{SKILLS_CATALOG}`{catalog_note}",
+              f"- Prompts: prompts_sha256 `{result.get('prompts_sha256')}`", *reviews, ""]
+    return DECISION_RECORD.format(date=run_date), "\n".join(lines)
+
+
+def write_decision_record(result_path: Path, repo: Path, force: bool) -> int:
+    led = ledger_module(REPO_ROOT)  # the checkout's ledger rules: safe repository paths and JSON pointers
+    documents = {}
+
+    def resolve(ref):
+        path, _, pointer = str(ref).partition("#")
+        if path not in documents:
+            documents[path] = led.load_json(repo, path)
+        return led.resolve_pointer(documents[path], pointer)
+
+    try:
+        result = load_json(result_path)
+        for field in ("returns_ref", "manifest_ref"):
+            if not isinstance(result.get(field), str):
+                raise ValueError(f"{result_path.name} has no {field}")
+        relative, text = decision_record(result, resolve(result["returns_ref"]), resolve(result["manifest_ref"]),
+                                         led.load_json(repo, SKILLS_CATALOG), resolve)
+        findings = private_findings(text, private_content(REPO_ROOT))
+        if findings:
+            raise ValueError(f"the record matches private-content patterns ({sorted({kind for _, kind in findings})}); "
+                             "redact the returns first")
+        path = repo / relative
+        if path.exists() and not force:
+            raise ValueError(f"{relative} exists; pass --force to replace it")
+    except (ValueError, OSError, KeyError, TypeError, led.LedgerError) as error:
+        print(f"make_result.py: {error}", file=sys.stderr)
+        return 2
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    print(relative)
+    return 0
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--layers", type=Path, required=True)
-    parser.add_argument("--reviews", type=Path, required=True, help="source_reviews.py stdout ([] when nothing survived)")
-    parser.add_argument("--sweep-id", required=True)
+    parser.add_argument("--layers", type=Path)
+    parser.add_argument("--reviews", type=Path, help="source_reviews.py stdout ([] when nothing survived)")
+    parser.add_argument("--sweep-id")
     parser.add_argument("--lane", help="default: --sweep-id")
-    parser.add_argument("--returns-ref", required=True)
-    parser.add_argument("--usage-ref", required=True)
-    parser.add_argument("--manifest-ref", required=True)
+    parser.add_argument("--returns-ref")
+    parser.add_argument("--usage-ref")
+    parser.add_argument("--manifest-ref")
     parser.add_argument("--prompts-sha256")
     parser.add_argument("--work-dir", default=os.environ.get("SWEEP_WORK_DIR"))
     parser.add_argument("--reopen", type=Path)
     parser.add_argument("--note", action="append", default=[])
+    parser.add_argument("--decision-record", type=Path, metavar="RESULT.json",
+                        help="write docs/decisions/<date>-skills-landscape-sweep.md for a skills sweep's RESULT.json")
+    parser.add_argument("--force", action="store_true", help="with --decision-record: replace an existing record")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     args = parser.parse_args(argv)
     repo = args.repo_root.resolve()
+    if args.decision_record is not None:
+        return write_decision_record(args.decision_record, repo, args.force)
+    missing = [flag for flag, value in (("--layers", args.layers), ("--reviews", args.reviews),
+                                        ("--sweep-id", args.sweep_id), ("--returns-ref", args.returns_ref),
+                                        ("--usage-ref", args.usage_ref), ("--manifest-ref", args.manifest_ref))
+               if value is None]
+    if missing:
+        parser.error(f"the following arguments are required: {', '.join(missing)}")
     try:
         for ref in (args.returns_ref, args.usage_ref, args.manifest_ref):
             if ref.startswith("/") or ".." in Path(ref).parts or not (repo / ref).is_file():

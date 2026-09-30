@@ -1,0 +1,205 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": [
+  "layer_id",
+  "proposed",
+  "calls",
+  "notes",
+  "skills_used"
+ ],
+ "properties": {
+  "layer_id": {
+   "type": "string",
+   "pattern": "^skills-[a-z0-9-]+$"
+  },
+  "proposed": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "skill_ref",
+     "source_id",
+     "lifecycle_task",
+     "pin",
+     "skill_md_sha256",
+     "license",
+     "source",
+     "description_chars",
+     "model_invocable",
+     "codex_implicit",
+     "replaces",
+     "proposed_label",
+     "demonstrated_gap",
+     "evidence",
+     "upstream_now",
+     "comparison_that_would_overturn"
+    ],
+    "properties": {
+     "skill_ref": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9-]+/[A-Za-z0-9._-]+@[a-z0-9-]+$"
+     },
+     "source_id": {
+      "type": "string"
+     },
+     "lifecycle_task": {
+      "type": "string",
+      "enum": [
+       "research",
+       "skill-lifecycle",
+       "design-intake",
+       "architecture",
+       "implement",
+       "test",
+       "debug",
+       "review",
+       "security",
+       "ci-pr",
+       "agent-docs",
+       "browser",
+       "mcp-build"
+      ]
+     },
+     "pin": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+     },
+     "skill_md_sha256": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+     },
+     "license": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "source": {
+      "type": "string"
+     },
+     "description_chars": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "model_invocable": {
+      "type": "boolean"
+     },
+     "codex_implicit": {
+      "type": "boolean"
+     },
+     "replaces": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "proposed_label": {
+      "type": "string",
+      "enum": [
+       "targeted_candidate",
+       "keep_but_compare",
+       "not_adopted"
+      ]
+     },
+     "demonstrated_gap": {
+      "type": "string"
+     },
+     "evidence": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "upstream_now": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "latest_release",
+       "released_at",
+       "stars",
+       "pushed_at",
+       "archived",
+       "license"
+      ],
+      "properties": {
+       "latest_release": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "released_at": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "stars": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "pushed_at": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "archived": {
+        "type": [
+         "boolean",
+         "null"
+        ]
+       },
+       "license": {
+        "type": [
+         "string",
+         "null"
+        ]
+       }
+      }
+     },
+     "comparison_that_would_overturn": {
+      "type": "string",
+      "pattern": "skill-creator|promptfoo"
+     }
+    }
+   }
+  },
+  "calls": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "web_search",
+    "web_fetch",
+    "gh_api"
+   ],
+   "properties": {
+    "web_search": {
+     "type": "integer"
+    },
+    "web_fetch": {
+     "type": "integer"
+    },
+    "gh_api": {
+     "type": "integer"
+    }
+   }
+  },
+  "notes": {
+   "type": "string"
+  },
+  "skills_used": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  }
+ }
+}

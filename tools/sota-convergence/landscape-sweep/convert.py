@@ -69,14 +69,23 @@ SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written 
 # Copy checks that mean the workflow's GPT-6 input is not exactly what Codex wrote (exit 4, and a retained failure).
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
+SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
 
 
-def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"]) -> list[str]:
+def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
+    """The lane's method limits; `skills` for a skills run (every layer's catalog is skills), whose unit is a skill
+    (owner/repo@name) merged by its skill_ref."""
+    unit, key = ("skills (owner/repo@name)", "skill_ref") if skills else ("repositories", "canonical repository")
+    last = ("SKILL.md source review and GitHub metadata only: no skill was installed, invoked, benchmarked "
+            "(skill-creator or promptfoo) or compared with an installed skill; survival means the proposal withstood "
+            "fact and fit checks, not that it beats an installed skill." if skills else
+            "Source review and GitHub metadata only: no candidate was installed, run, benchmarked or compared with a "
+            "winner; survival means the proposal withstood fact and fit checks, not that it beats a winner.")
     return [
         f"Discovery per layer: a Claude researcher ({models['discover']}, effort max) and a GPT-6 researcher "
         f"({gpt6_model} through the Codex CLI, effort max, web search, read-only sandbox, user config "
-        "ignored), each proposing at most 6 repositories within 12 web searches, 8 page fetches and 40 GitHub API "
-        f"calls; the two returns are merged by canonical repository and capped at {MERGE_CAP} per layer (two-family "
+        f"ignored), each proposing at most 6 {unit} within 12 web searches, 8 page fetches and 40 GitHub API "
+        f"calls; the two returns are merged by {key} and capped at {MERGE_CAP} per layer (two-family "
         "proposals first; dropped proposals are logged and kept under raw).",
         f"Adversarial verification per layer: a facts/identity refuter ({models['refute-facts']}, effort max) and "
         f"two fit/standing refuters ({models['refute-fit']} and {gpt6_model}, effort max), each defaulting "
@@ -84,8 +93,7 @@ def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"]) -> list
         "no refuter refutes it, and a missing vote counts as refuted.",
         f"One completeness critic ({models['critic']}, effort max) and one bounded follow-up round over at most "
         f"{FOLLOWUP_CAP} critic-flagged layers, with the same roles.",
-        "Source review and GitHub metadata only: no candidate was installed, run, benchmarked or compared with a "
-        "winner; survival means the proposal withstood fact and fit checks, not that it beats a winner.",
+        last,
     ]
 
 
@@ -513,8 +521,12 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     returns["skills_usage"] = skills_usage
     returns["gpt6_usage"] = gpt6_usage
     gpt6_model_text = "+".join(sorted(gpt6_models)) or GPT6_DEFAULT["model"]
+    # A skills run's layers all come from the skills catalog (build_inputs.py --modality skills; one modality a run).
+    skills_run = bool(rounds_by_layer) and all(rounds[0]["catalog"] == SKILLS_CATALOG
+                                               for rounds in rounds_by_layer.values())
     lanes = {"lanes": [{"lane": lane, "result": {"layers": lane_layers, "calls": calls_total,
-                                                 "limits": [*method_limits(models, gpt6_model_text), *limits]},
+                                                 "limits": [*method_limits(models, gpt6_model_text, skills_run),
+                                                            *limits]},
                         "proposals": proposals}],
              "critic": res.get("critic"), "lost": lost}
     failures_summary = {layer_id: [f"{f['round']}:{f['cause']}" for f in items]
