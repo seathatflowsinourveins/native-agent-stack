@@ -18,7 +18,10 @@ own process group that is killed once the probe exits, times out or is interrupt
 and emits booleans, counts, component ids and version strings from the checked-in
 manifest and pins file and the output of a probe that exited 0. The opt-in --login-shell looks at the metadata of the
 three personal startup files a Bash login shell reads (~/.bash_profile, ~/.bash_login, ~/.profile) without opening or
-executing any of them, and emits a fixed state per file, never a value, path or environment value.
+executing any of them, and emits a fixed state per file, never a value, path or environment value. The opt-in
+--launcher-resolution is the one check that runs them: a bounded Bash login shell from a fixed environment reports
+where `command -v claude` resolves (claude itself never runs), shown only under $ECO_ROOT, $HOME or a system
+directory, with whether it is the ecosystem launcher and that launcher's sha256.
 """
 
 from __future__ import annotations
@@ -123,6 +126,29 @@ LOGIN_SHELL_LIMITATIONS = [
     "is the environment's, else the passwd entry's, else \"/\", the way bash falls back (shell.c). It does not run a login shell, so it proves neither a PATH nor a command; "
     "/etc/profile, ~/.bashrc, another shell, --noprofile, POSIX mode and an sh-mode login (which read other files or "
     "none, bash(1) INVOCATION) are outside it.",
+]
+# --launcher-resolution: one Bash login shell, started as a Windows Terminal profile's `bash -lc` starts one
+# (adoption/platforms/linux-wsl2.md, "Windows Terminal profiles and the login shell"), from a fixed environment, so this
+# process's own PATH cannot answer for it (a probe from a shell that already has PATH passes with broken login files).
+# The PATH is the system directories of adoption/hosts/example.json's HOST_PATH.
+LAUNCHER_LOGIN_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+LAUNCHER_TIMEOUT_SECONDS = 10
+LAUNCHER_MARKER = "native-agent-stack:launcher-resolution:"
+# A resolved path outside $ECO_ROOT and $HOME is shown only under these directories; any other is withheld (on WSL a
+# Windows npm install puts a `claude` script under /mnt/c/Users/<name>/, which names the user).
+LAUNCHER_SYSTEM_PREFIXES = ("/usr/", "/bin/", "/sbin/", "/opt/", "/snap/", "/nix/")
+LAUNCHER_RESOLUTIONS = ("ecosystem_launcher", "other", "not_found", "unavailable")
+LAUNCHER_RESOLUTION_KEYS = ("resolution", "path", "is_ecosystem_launcher", "launcher_sha256")
+# --launcher-resolution appends this statement.
+LAUNCHER_RESOLUTION_LIMITATIONS = [
+    "--launcher-resolution runs one Bash login shell (`bash -l -c`, stdin from /dev/null, its own process group killed "
+    f"after {LAUNCHER_TIMEOUT_SECONDS}s) from a fixed environment: HOME, USER and LOGNAME from this process and PATH "
+    f"{LAUNCHER_LOGIN_PATH}, as a terminal profile's `bash -lc` starts, so this process's PATH cannot answer for it. That "
+    "shell runs /etc/profile and the first personal startup file bash finds, whatever they do, then `command -v "
+    "claude`; claude itself never runs. It reports where claude resolves only as a path under $ECO_ROOT "
+    "($ECO_INSTALL_ROOT, else ~/.local/share/codex-ecosystem), under $HOME or under a system directory, and withholds "
+    "any other path; whether it is the ecosystem launcher $ECO_ROOT/bin/claude; and that launcher's sha256. WSL's "
+    "appended Windows PATH entries, ~/.bashrc and another login shell are outside it.",
 ]
 # The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
 CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
@@ -1013,6 +1039,15 @@ def fixed_login_shell(result) -> bool:
             and any(result["profile_read"] is value for value in (True, False, None)))
 
 
+def login_home(env) -> Path:
+    """HOME as bash finds it: the environment's, else the passwd entry's, else "/" (shell.c sets
+    current_user.home_dir to "/" when getpwuid fails)."""
+    try:
+        return Path(env.get("HOME") or Path.home())
+    except (KeyError, RuntimeError, OSError):
+        return Path("/")
+
+
 def login_shell(env=None) -> dict:
     """Opt-in static check of the files a Bash login shell reads under HOME (see LOGIN_SHELL_FILES). Fixed keys: a
     state per file, first_read (the first file that exists, None when none does) and profile_read (True when the
@@ -1021,10 +1056,7 @@ def login_shell(env=None) -> dict:
     source it). HOME comes from the environment, else from the user's passwd entry, else "/" as bash falls back to it
     (shell.c sets current_user.home_dir to "/" when getpwuid fails)."""
     env = os.environ if env is None else env
-    try:
-        home = Path(env.get("HOME") or Path.home())
-    except (KeyError, RuntimeError, OSError):
-        home = Path("/")
+    home = login_home(env)
     states = {key: login_file_state(home / name) for key, name in LOGIN_SHELL_FILES.items()}
     first = next((key for key, state in states.items() if state != "absent"), None)
     if first is None:
@@ -1036,6 +1068,71 @@ def login_shell(env=None) -> dict:
     result = {**states, "first_read": first, "profile_read": profile_read}
     if not fixed_login_shell(result):
         raise AssertionError("login shell state must be the fixed keys with fixed values")
+    return result
+
+
+def shown_path(path: str, eco_root: Path, home: Path) -> str | None:
+    """A resolved path as the report may show it: under the ecosystem root as $ECO_ROOT/..., under HOME as
+    $HOME/..., a system directory's path as it is, and None for anything else."""
+    normal = os.path.normpath(path)
+    for anchor, name in ((eco_root, "$ECO_ROOT"), (home, "$HOME")):
+        base = os.path.normpath(str(anchor))
+        if base != "/" and normal.startswith(base + "/"):
+            return f"{name}/{normal[len(base) + 1:]}"
+    return normal if normal.startswith(LAUNCHER_SYSTEM_PREFIXES) else None
+
+
+def fixed_launcher_resolution(result) -> bool:
+    """The exact LAUNCHER_RESOLUTION_KEYS shape: a resolution from the fixed list, a shown path or None, a boolean that
+    agrees with the resolution, and a sha256 or None."""
+    if not isinstance(result, dict) or tuple(result) != LAUNCHER_RESOLUTION_KEYS:
+        return False
+    path, digest = result["path"], result["launcher_sha256"]
+    return (result["resolution"] in LAUNCHER_RESOLUTIONS
+            and (path is None or (isinstance(path, str) and "\n" not in path
+                                  and path.startswith(("$ECO_ROOT/", "$HOME/", *LAUNCHER_SYSTEM_PREFIXES))))
+            and isinstance(result["is_ecosystem_launcher"], bool)
+            and result["is_ecosystem_launcher"] == (result["resolution"] == "ecosystem_launcher")
+            and (digest is None or (isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest) is not None)))
+
+
+def launcher_resolution(env=None, seconds: float = LAUNCHER_TIMEOUT_SECONDS) -> dict:
+    """Opt-in: where `command -v claude` resolves in a Bash login shell started from a fixed environment (see
+    LAUNCHER_RESOLUTION_LIMITATIONS), whether that is the ecosystem launcher ($ECO_INSTALL_ROOT, else
+    ~/.local/share/codex-ecosystem, then bin/claude), and the launcher's sha256. claude is never run. resolution is
+    unavailable when no bash is found, the shell does not finish within ``seconds`` or prints no answer, not_found when
+    no claude resolves, and other for anything but the launcher, whose path is shown only under $ECO_ROOT, $HOME or a
+    system directory (an alias or function is never shown)."""
+    env = os.environ if env is None else env
+    home = login_home(env)
+    eco_root = Path(env.get("ECO_INSTALL_ROOT") or home / ".local/share/codex-ecosystem")
+    launcher = eco_root / "bin" / "claude"
+    try:
+        digest = hashlib.sha256(launcher.read_bytes()).hexdigest() if launcher.is_file() else None
+    except OSError:
+        digest = None
+    result = {"resolution": "unavailable", "path": None, "is_ecosystem_launcher": False, "launcher_sha256": digest}
+    bash = shutil.which("bash", path=LAUNCHER_LOGIN_PATH)
+    if bash is not None:
+        login_env = {"HOME": str(home), "PATH": LAUNCHER_LOGIN_PATH,
+                     **{name: env[name] for name in ("USER", "LOGNAME") if env.get(name)}}
+        script = f'p="$(command -v claude)" || p=; printf "\\n%s%s\\n" "{LAUNCHER_MARKER}" "$p"'
+        probe = run_version_probe([bash, "-l", "-c", script], seconds, env=login_env, cwd="/")
+        answers = [line[len(LAUNCHER_MARKER):] for line in (probe[1] if probe else "").splitlines()
+                   if line.startswith(LAUNCHER_MARKER)]
+        if answers and not answers[-1]:
+            result["resolution"] = "not_found"
+        elif answers:
+            resolved = answers[-1]
+            same = os.path.normpath(resolved) == os.path.normpath(str(launcher))
+            if not same and os.path.isabs(resolved):
+                with contextlib.suppress(OSError):
+                    same = os.path.samefile(resolved, launcher)
+            result["resolution"] = "ecosystem_launcher" if same else "other"
+            result["is_ecosystem_launcher"] = same
+            result["path"] = shown_path(resolved, eco_root, home) if os.path.isabs(resolved) else None
+    if not fixed_launcher_resolution(result):
+        raise AssertionError("launcher resolution must be the fixed keys with fixed values")
     return result
 
 
@@ -1093,7 +1190,7 @@ def signal_group(group: int, signum: int) -> None:
         pass
 
 
-def run_version_probe(argv: list[str], seconds: float) -> tuple[int, str] | None:
+def run_version_probe(argv: list[str], seconds: float, *, env=None, cwd=None) -> tuple[int, str] | None:
     """adoption/bootstrap-linux.sh run_version_probe: run ``argv`` with stdin from /dev/null in its own process
     group (a new session), its output going to temporary files, so a descendant that keeps them open cannot
     delay the result. When ``seconds`` pass, TERM goes to the whole group and KILL follows
@@ -1103,12 +1200,13 @@ def run_version_probe(argv: list[str], seconds: float) -> tuple[int, str] | None
     are held back (held_interrupts) from before the process is created until its group has been killed and
     reaped, except while the probe is waited for (interrupts_released), inside the block whose cleanup kills the
     group. One held back, such as one that arrives between the probe's fork and subprocess.Popen returning it, or
-    during the kill, is raised once the group is gone. Returns the exit status and the stdout and stderr text, or
-    None on timeout."""
+    during the kill, is raised once the group is gone. ``env`` and ``cwd`` (launcher_resolution's fixed login
+    environment) go to the process as given; by default it inherits both. Returns the exit status and the stdout and
+    stderr text, or None on timeout."""
     with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
         with held_interrupts():
             process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
-                                       start_new_session=True)
+                                       start_new_session=True, env=env, cwd=cwd)
             try:
                 with interrupts_released():
                     try:
@@ -1281,7 +1379,7 @@ def pinned_versions_match(profiles: list[dict]) -> bool | None:
 
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
                      *, with_client_wiring: bool = False, with_pinned_versions: bool = False,
-                     with_login_shell: bool = False, env=None) -> dict:
+                     with_login_shell: bool = False, with_launcher_resolution: bool = False, env=None) -> dict:
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
     host = {"os": platform.system().lower(), "architecture": platform.machine().lower(),
@@ -1300,6 +1398,9 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
     if with_login_shell:
         result["login_shell"] = login_shell(env)
         result["limitations"] = result["limitations"] + LOGIN_SHELL_LIMITATIONS
+    if with_launcher_resolution:
+        result["launcher_resolution"] = launcher_resolution(env)
+        result["limitations"] = result["limitations"] + LAUNCHER_RESOLUTION_LIMITATIONS
     try:
         require(manifest.resolve().is_relative_to(root), "manifest must be inside the repository root")
         require(manifest.is_file(), "manifest must be a regular file")
@@ -1366,11 +1467,17 @@ def main(argv: list[str] | None = None) -> int:
                              "~/.bash_profile, ~/.bash_login and ~/.profile a Bash login shell reads first and "
                              "whether it reaches ~/.profile: a state per file, first_read and profile_read only; "
                              "the exit code is unchanged")
+    parser.add_argument("--launcher-resolution", action="store_true",
+                        help="Also run one bounded Bash login shell from a fixed environment and report where "
+                             "`command -v claude` resolves (under $ECO_ROOT, $HOME or a system directory, else "
+                             "withheld), whether it is the ecosystem launcher $ECO_ROOT/bin/claude, and that "
+                             "launcher's sha256; claude is never run, and the exit code is unchanged")
     args = parser.parse_args(argv)
-    with signals_interrupt_probes() if args.pinned_versions else contextlib.nullcontext():
+    probes = args.pinned_versions or args.launcher_resolution
+    with signals_interrupt_probes() if probes else contextlib.nullcontext():
         report = inspect_adoption(args.manifest, args.repo_root, args.profile,
                                   with_client_wiring=args.client_wiring, with_pinned_versions=args.pinned_versions,
-                                  with_login_shell=args.login_shell)
+                                  with_login_shell=args.login_shell, with_launcher_resolution=args.launcher_resolution)
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -1393,6 +1500,8 @@ def main(argv: list[str] | None = None) -> int:
             print("Client wiring: " + json.dumps(wiring, sort_keys=True))
         if "login_shell" in report:
             print("Login shell: " + json.dumps(report["login_shell"], sort_keys=True))
+        if "launcher_resolution" in report:
+            print("Launcher resolution: " + json.dumps(report["launcher_resolution"], sort_keys=True))
         for error in report["errors"]:
             print(f"Error: {error}")
         for limitation in report["limitations"]:

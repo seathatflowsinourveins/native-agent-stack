@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Staged 2026-09-22. Native Linux x86_64 Ubuntu/Debian adoption bootstrap.
 # Ported from agent-lab .devcontainer/bootstrap-linux.sh. No account sign-in,
-# secret migration, shell-profile edit, or permission bypass.
+# secret migration, or permission bypass; the only shell-profile edit is the
+# managed PATH block the opt-in --configure-full-profile appends to ~/.profile.
 set -Eeuo pipefail
 
 usage() {
@@ -9,6 +10,8 @@ usage() {
     'Usage: bash bootstrap-linux.sh --profile <id> [--skip-system-packages]' \
     '                                [--allow-unpinned <id,id,...>]' \
     '                                [--configure-claude-user-profile]' \
+    '                                [--configure-full-profile --host <name>' \
+    '                                 [--skip <step>]...]' \
     '' \
     'Installs the tools pinned in adoption/pins-linux-x86_64.json for the' \
     "given profile's component_ids (from adoption/manifest.json) under" \
@@ -26,8 +29,18 @@ usage() {
     'After installing, checks each installed pin with the version_probe its' \
     'pin declares (bounded, stdin closed; servers are never started) and' \
     'writes installed-versions.txt; exits 5 if any probe fails.' \
-    'Never edits a shell profile.'
+    'Never edits a shell profile, except the managed PATH block that' \
+    '--configure-full-profile appends to ~/.profile. That flag then applies' \
+    'the whole user profile in order, each step skippable with --skip:' \
+    "  ${full_profile_steps[*]}" \
+    'It runs only from a checkout at origin/main (exit 1 otherwise, before' \
+    'installing anything), needs --host <name> (adoption/hosts/<name>.json)' \
+    'unless claude-settings and codex-lane are skipped, and exits 6 when a' \
+    'step fails; every step is idempotent, so fix the cause and re-run.'
 }
+
+# --configure-full-profile's steps, in the order they run (adoption/bootstrap.md, step 2).
+full_profile_steps=(claude-profile claude-settings claude-md skills codex-lane path-block login-shell)
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
 repo_root="$(cd -- "$script_dir/.." >/dev/null 2>&1 && pwd -P)"
@@ -36,6 +49,9 @@ profile_id=""
 skip_system=0
 allow_unpinned_ids=()
 configure_claude_user_profile=0
+configure_full_profile=0
+full_profile_host=""
+full_profile_skips=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --profile)
@@ -62,6 +78,34 @@ while [[ $# -gt 0 ]]; do
       configure_claude_user_profile=1
       shift
       ;;
+    --configure-full-profile)
+      # Opt-in, after native sign-in: what --configure-claude-user-profile
+      # does, then the rest of the user profile, each step through the
+      # repository's own tool (full_profile_* below; adoption/bootstrap.md,
+      # step 2). Refused unless this checkout is at origin/main.
+      configure_full_profile=1
+      shift
+      ;;
+    --host)
+      [[ $# -ge 2 ]] || { printf -- '--host requires a value.\n' >&2; exit 2; }
+      full_profile_host="$2"
+      shift 2
+      ;;
+    --host=*)
+      full_profile_host="${1#--host=}"
+      shift
+      ;;
+    --skip)
+      [[ $# -ge 2 ]] || { printf -- '--skip requires a step name.\n' >&2; exit 2; }
+      IFS=',' read -r -a _skip_chunk <<<"$2"
+      full_profile_skips+=("${_skip_chunk[@]}")
+      shift 2
+      ;;
+    --skip=*)
+      IFS=',' read -r -a _skip_chunk <<<"${1#--skip=}"
+      full_profile_skips+=("${_skip_chunk[@]}")
+      shift
+      ;;
     --allow-unpinned)
       [[ $# -ge 2 ]] || { printf -- '--allow-unpinned requires a comma-separated id list.\n' >&2; exit 2; }
       IFS=',' read -r -a _allow_unpinned_chunk <<<"$2"
@@ -84,6 +128,39 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ -n "$profile_id" ]] || { printf -- 'Missing required --profile <id>.\n' >&2; exit 2; }
+
+# full_profile_selected STEP: whether --configure-full-profile runs STEP (it is not named in --skip).
+full_profile_selected() {
+  local skipped
+  for skipped in ${full_profile_skips[@]+"${full_profile_skips[@]}"}; do
+    [[ "$skipped" != "$1" ]] || return 1
+  done
+  return 0
+}
+if [[ "$configure_full_profile" != 1 ]]; then
+  [[ ${#full_profile_skips[@]} -eq 0 && -z "$full_profile_host" ]] || {
+    printf -- '--skip and --host apply only with --configure-full-profile.\n' >&2; exit 2
+  }
+else
+  for skipped in ${full_profile_skips[@]+"${full_profile_skips[@]}"}; do
+    case " ${full_profile_steps[*]} " in
+      *" $skipped "*) ;;
+      *) printf 'Unknown --skip step: %s (steps: %s)\n' "$skipped" "${full_profile_steps[*]}" >&2; exit 2 ;;
+    esac
+  done
+  # render_config.py needs this host's values for the settings and Codex templates.
+  if full_profile_selected claude-settings || full_profile_selected codex-lane; then
+    [[ -n "$full_profile_host" ]] || {
+      printf -- '--configure-full-profile needs --host <name> for its claude-settings and codex-lane steps: adoption/hosts/<name>.json, a copy of adoption/hosts/example.json with this host'"'"'s values (or --skip both).\n' >&2
+      exit 2
+    }
+    [[ "$full_profile_host" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]] || { printf 'Invalid --host name: %s\n' "$full_profile_host" >&2; exit 2; }
+    [[ -r "$repo_root/adoption/hosts/$full_profile_host.json" ]] || {
+      printf 'No host value file adoption/hosts/%s.json: copy adoption/hosts/example.json and fill in this host'"'"'s values.\n' "$full_profile_host" >&2
+      exit 2
+    }
+  fi
+fi
 
 [[ "$(uname -s)" == Linux && "$(uname -m)" == x86_64 ]] || {
   printf 'This verified asset set targets x86_64 Linux, not Windows/Git Bash or ARM.\n' >&2
@@ -126,6 +203,21 @@ if [[ ${#missing_prerequisites[@]} -gt 0 ]]; then
     printf 'Re-run without --skip-system-packages, or install them manually first.\n' >&2
   fi
   exit 4
+fi
+
+# --configure-full-profile applies the profile main documents, so it runs only
+# from a checkout whose HEAD is origin's main; both commits are printed, and the
+# refusal comes before anything is installed.
+if [[ "$configure_full_profile" == 1 ]]; then
+  checkout_head="$(git -C "$repo_root" rev-parse --verify --quiet 'HEAD^{commit}' 2>/dev/null || true)"
+  # git asks for credentials on the terminal, not on stdin, so the prompt itself is turned off.
+  origin_main="$(GIT_TERMINAL_PROMPT=0 timeout 60 git -C "$repo_root" ls-remote origin refs/heads/main </dev/null 2>/dev/null | awk 'NR == 1 { print $1 }' || true)"
+  printf 'This checkout (git rev-parse HEAD):        %s\n' "${checkout_head:-unknown}"
+  printf 'origin main (git ls-remote origin main):   %s\n' "${origin_main:-unknown}"
+  if [[ -z "$checkout_head" || -z "$origin_main" || "$checkout_head" != "$origin_main" ]]; then
+    printf 'Refusing --configure-full-profile: this checkout is not at origin/main. Run it from a clone at origin/main (git fetch origin && git checkout --detach origin/main); a release checkout follows the per-step commands in adoption/bootstrap.md instead.\n' >&2
+    exit 1
+  fi
 fi
 
 manifest_path="$repo_root/adoption/manifest.json"
@@ -827,15 +919,135 @@ fi
 
 printf '\nInstallation finished. Add %q to PATH to use it in this shell.\n' "$bin_dir"
 printf '%s\n' 'Next: sign into Codex, Claude, and GitHub using their native browser login flows.' \
-  'Validate the actual sandbox with Codex /permissions and Claude /sandbox before unattended work.' \
-  'No model request, project migration, shell-profile change, or account sign-in was performed.'
+  'Validate the actual sandbox with Codex /permissions and Claude /sandbox before unattended work.'
+if [[ "$configure_full_profile" == 1 ]]; then
+  printf '%s\n' 'No model request, project migration or account sign-in was performed; --configure-full-profile follows.'
+else
+  printf '%s\n' 'No model request, project migration, shell-profile change, or account sign-in was performed.'
+fi
 
-if [[ "$configure_claude_user_profile" == 1 ]]; then
+# --configure-full-profile, one step at a time. Each step runs the repository's
+# own tool for that layer (adoption/bootstrap.md, step 2); each is idempotent,
+# so a failed step is reported and the rest still run, and the script exits 6.
+full_profile_failed=()
+full_profile_rendered=""
+full_profile_run() {
+  local step="$1" status=0
+  shift
+  if ! full_profile_selected "$step"; then
+    printf '\n-- %s: skipped (--skip %s)\n' "$step" "$step"
+    return 0
+  fi
+  printf '\n-- %s --\n' "$step"
+  "$@" || status=$?
+  if [[ "$status" -ne 0 ]]; then
+    printf -- '-- %s: FAILED (exit %s)\n' "$step" "$status" >&2
+    full_profile_failed+=("$step")
+  fi
+  return 0
+}
+
+# render_config.py --out for this host, once, into the run's staging directory;
+# the settings and Codex steps read it.
+full_profile_render() {
+  [[ -z "$full_profile_rendered" ]] || return 0
+  python3 "$repo_root/tools/adoption/render_config.py" --host "$full_profile_host" --out "$stage_dir/rendered" || return
+  full_profile_rendered="$stage_dir/rendered"
+}
+
+# The Claude settings template for this host, then the WSL overlay on WSL, with
+# the repository's merge (it backs the file up before writing).
+full_profile_claude_settings() {
+  full_profile_render || return
+  python3 "$repo_root/tools/adoption/apply_claude_settings.py" --template "$full_profile_rendered/settings.json" || return
+  if [[ -n "${WSL_DISTRO_NAME:-}" ]]; then
+    python3 "$repo_root/tools/adoption/apply_claude_settings.py" \
+      --template "$repo_root/adoption/templates/claude.settings.linux-wsl2.overlay.json" || return
+  fi
+}
+
+# The Codex worker lane goes through apply_codex_lane.py's own reviewed flow:
+# its dry run prints the --apply command carrying the two --expect-*-sha256
+# hashes of the files it checked; that exact command, with the ecosystem root,
+# is what runs. A failed dry run applies nothing.
+full_profile_codex_lane() {
+  local plan apply_line status=0
+  full_profile_render || return
+  printf 'Rendered templates: %s (compare with render_config.py --check before copying any by hand).\n' "$full_profile_rendered"
+  printf 'The user-level codex.config.toml there is not installed by this step: review its trust state first (adoption/bootstrap.md, step 4).\n'
+  plan="$(python3 "$repo_root/tools/adoption/apply_codex_lane.py" --eco-root "$ecosystem_root" 2>&1)" || status=$?
+  printf '%s\n' "$plan"
+  [[ "$status" -eq 0 ]] || { printf 'The Codex lane dry run refused (exit %s); nothing applied.\n' "$status" >&2; return "$status"; }
+  apply_line="$(printf '%s\n' "$plan" | sed -n 's/^  python3 [^ ]*apply_codex_lane\.py --apply //p' | head -n 1)"
+  [[ "$apply_line" =~ --expect-config-sha256\ ([0-9a-f]{64})\ --expect-agents-sha256\ ([0-9a-f]{64}|absent)$ ]] || {
+    printf 'The Codex lane dry run printed no --apply command with both hashes; nothing applied.\n' >&2
+    return 1
+  }
+  python3 "$repo_root/tools/adoption/apply_codex_lane.py" --apply --eco-root "$ecosystem_root" \
+    --expect-config-sha256 "${BASH_REMATCH[1]}" --expect-agents-sha256 "${BASH_REMATCH[2]}"
+}
+
+# The pinned skills CLI (adoption/skills/manifest.json "cli": its npm tarball and
+# sha256), installed with this script's own checksum-verified install_npm when
+# it is missing, then the manifest's skills through install_skills.py. The
+# install runs in a subshell, so a checksum refusal fails this step only.
+full_profile_skills() {
+  local manifest="$repo_root/adoption/skills/manifest.json" version tarball sha256 skills_bin
+  version="$(jq -r '.cli.version' "$manifest")" || return
+  tarball="$(jq -r '.cli.tarball' "$manifest")" || return
+  sha256="$(jq -r '.cli.sha256' "$manifest")" || return
+  skills_bin="$ecosystem_root/tools/skills-$version/bin/skills"
+  if [[ ! -x "$skills_bin" ]]; then
+    [[ "$sha256" =~ ^[0-9a-f]{64}$ && "$tarball" == https://registry.npmjs.org/* ]] || {
+      printf 'adoption/skills/manifest.json pins no npm tarball and sha256 for the skills CLI; nothing installed.\n' >&2
+      return 1
+    }
+    ( install_npm skills "$version" "$tarball" "$sha256" true ) || return
+  fi
+  python3 "$repo_root/tools/adoption/install_skills.py" --skills-bin "$skills_bin"
+}
+
+# The last step reads the result back: the static login-shell file check and
+# where `command -v claude` resolves in a login shell (adoption_status.py
+# --launcher-resolution runs that shell, never claude), under the manifest's
+# Python as adoption/bootstrap.md step 6 runs it. A claude that is not the
+# ecosystem launcher fails the step.
+full_profile_login_shell() {
+  local report status=0
+  report="$(ECO_INSTALL_ROOT="$ecosystem_root" "$bin_dir/uv" run --no-project --python 3.13 python \
+    "$repo_root/scripts/adoption_status.py" --profile "$profile_id" --login-shell --launcher-resolution --json)" || status=$?
+  printf '%s\n' "$report" | jq '{status, login_shell, launcher_resolution}' || return
+  if ! jq -e '.launcher_resolution.is_ecosystem_launcher == true' <<<"$report" >/dev/null; then
+    printf 'In a login shell, claude is not the ecosystem launcher %s. If login_shell.profile_read is not true, an earlier ~/.bash_profile or ~/.bash_login hides ~/.profile (adoption/platforms/linux-wsl2.md, "Windows Terminal profiles and the login shell").\n' \
+      "$bin_dir/claude" >&2
+    return 1
+  fi
+  return "$status"
+}
+
+if [[ "$configure_full_profile" == 1 ]]; then
+  command -v python3 >/dev/null || { printf 'python3 is required for --configure-full-profile.\n' >&2; exit 1; }
+  printf '\nConfiguring the full user profile (steps: %s)...\n' "${full_profile_steps[*]}"
+  full_profile_run claude-profile \
+    python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude" --eco-root "$ecosystem_root"
+  full_profile_run claude-settings full_profile_claude_settings
+  full_profile_run claude-md python3 "$repo_root/tools/adoption/managed_block.py" claude-md
+  full_profile_run skills full_profile_skills
+  full_profile_run codex-lane full_profile_codex_lane
+  full_profile_run path-block python3 "$repo_root/tools/adoption/managed_block.py" profile-path --eco-root "$ecosystem_root"
+  full_profile_run login-shell full_profile_login_shell
+  if [[ ${#full_profile_failed[@]} -gt 0 ]]; then
+    printf '\n--configure-full-profile: failed step(s): %s. Each step is idempotent: fix the cause, then re-run (--skip the steps already done).\n' \
+      "${full_profile_failed[*]}" >&2
+    exit 6
+  fi
+  printf '\n--configure-full-profile: every selected step finished. Open a new login shell so ~/.profile takes effect.\n'
+elif [[ "$configure_claude_user_profile" == 1 ]]; then
   command -v python3 >/dev/null || { printf 'python3 is required for --configure-claude-user-profile.\n' >&2; exit 1; }
   printf '\nConfiguring the Claude Code user-scope profile (guard hook, agents, MCP servers)...\n'
   python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude" --eco-root "$ecosystem_root"
 else
   printf '\nAfter native Claude sign-in, run:\n'
   printf '  python3 %q/tools/adoption/install_claude_profile.py --eco-root %q --claude-bin %q\n' "$repo_root" "$ecosystem_root" "$bin_dir/claude"
-  printf 'to install the guard hook, agents and user-scope MCP servers (or re-run this script with --configure-claude-user-profile).\n'
+  printf 'to install the guard hook, agents and user-scope MCP servers (or re-run this script with --configure-claude-user-profile, or --configure-full-profile for the whole user profile).\n'
 fi
