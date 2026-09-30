@@ -3669,8 +3669,8 @@
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "3ca2064627ca1dfc068e61a17f30c47ebfb4752cfc2a07c05a42aed398a43f7f",
-      "bytes": 7748
+      "sha256": "cf608e69d99df3e0f434a43fbd0eb84fbc29afe5a228e9baacf71e8640aba376",
+      "bytes": 7043
     },
     {
       "path": ".github/pull_request_template.md",
@@ -8805,8 +8805,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "23bb0ae8f02c4d40baf0f65f20b169808f5348b3e9010e8d3a80d9be9afd46c9",
-      "bytes": 71896
+      "sha256": "968b0e00d340a7b029269e557c3c30555348d588a64b7e77d74ed098efc3a108",
+      "bytes": 72023
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -8919,6 +8919,11 @@
       "bytes": 33599
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.txt",
+      "sha256": "afe4d3dec47ebb6ca7fbfe84095afd6427bb6ef66a3fb95eaae2c73e96d2c77a",
+      "bytes": 10698
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
       "sha256": "89e32d55231db27386ed16dc077fa56dbd710c9c45f80433fa02c6b42e13b54e",
       "bytes": 24151
@@ -9010,7 +9015,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "cbefaf39340c43d2ce7f6411e93e62fb11979f29c2a09b67c7b957ea50f7c683",
+      "sha256": "c857efa5c006c709dd99cc7d5f480f9dcef649248dde89f50f8265ca80008e9d",
       "bytes": 4460
     },
     {
@@ -9030,13 +9035,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "02d0a7f058d08d28d0fb3f7344ed9b042bf5a317607454faf4bbb210af7fa394",
+      "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64",
       "bytes": 106002
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "1d47c05cfc3a1bb3541b6b80aaf4f1bed2949962a2d67115aa36cd5c07ddc2d2",
-      "bytes": 60078
+      "sha256": "435b5be7ea3576470d23861f8233f445ea720d0f67ceff575e3767a42fdb46e6",
+      "bytes": 62967
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -14550,8 +14555,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "500dbe0030599db6cff4b76596595c581881aef8f585662fa77a9e98290ab026",
-      "bytes": 135338
+      "sha256": "9142179d83fad9517004d2d018a5b466e752334d92ced14fb593c736a0a2b414",
+      "bytes": 137054
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -42324,6 +42329,11 @@
       "bytes": 21768
     },
     {
+      "path": "evidence/receipts/osv-openhands-pyjwt-relock-20260930.json",
+      "sha256": "85fa647b11b4038ac3152a33f7fb91abca0dd9eb5dda92b423387d589973d87a",
+      "bytes": 17266
+    },
+    {
       "path": "evidence/receipts/pit-availability.json",
       "sha256": "1bbae79fec7cd519571f42470e05b4784e36d72d21da34a210ab8adc864823f4",
       "bytes": 107713
@@ -44070,8 +44080,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "2024dd95dbaa0ea4e029379768af834380cce22ac1338aec303007febdf91bdc",
-      "bytes": 38050
+      "sha256": "192b167f797edde99ec08e0303339ab26d5259bcf076a786117738be998faf90",
+      "bytes": 38017
     },
     {
       "path": "tests/test_path_safety.py",
