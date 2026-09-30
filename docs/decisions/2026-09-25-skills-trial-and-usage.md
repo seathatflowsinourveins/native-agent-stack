@@ -1610,7 +1610,8 @@ unchanged at its repository's HEAD on 2026-09-30.
 2. Run `claude -p "/skill-doctor" --output-format json` for each skill's listing-cost estimate. It makes 0 turns and
    costs $0 ([Mechanics](#mechanics-source-review-skills-cli-v170)).
 3. If the 200,000-token run shows no warning, repeat step 1 at 0.03 and 0.02 through `--settings` overlays. Set the
-   template, by addendum, to the smallest fraction that shows none. A warning at 0.05 raises the fraction instead.
+   template, by addendum, to the smallest fraction that shows none, not inside #381 window W; a change after the
+   Amendment 4 seal re-seals. A warning at 0.05 raises the fraction instead, under the same rule.
    `SLASH_COMMAND_TOOL_CHAR_BUDGET` is never set beside the fraction.
 4. For Codex, read `codex doctor`'s startup warnings once `[skills] max_context_tokens` is applied. An overflow reads
    "Exceeded skills context budget. All skill descriptions were removed and …" (`render.rs` L26-27 at
@@ -1696,7 +1697,8 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 
 1. Run `install_skills.py --dry-run`, then the install, which adds the `skill-creator` pin and replaces any folder
    still at a superseded pin with the six re-pins. Remove the retired skill with the pinned CLI's
-   `remove resolving-merge-conflicts -g -y` and inspect the folder, lock and client links
+   `remove resolving-merge-conflicts -g -y` from a shell outside a Claude session, since the template that step 2
+   applies denies the CLI's remove commands in a session, and inspect the folder, lock and client links
    ([lifecycle guide](../../adoption/skills/lifecycle.md#retire-and-remove)).
 2. `tools/adoption/apply_claude_settings.py` carries `skillOverrides` (including the retired skill's `"off"`) and
    `skillListingBudgetFraction`. Template scalars win (`deep_merge_dict`, L141-177).
@@ -1720,4 +1722,6 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
 | Lifecycle guide commands | upstream source and local `--help` | `install_skills.py` and `skills_status.py` `--help`; Skills CLI v1.7.0 `src/cli.ts`, `src/list.ts` and `src/remove.ts`; not executed on a host here |
 | Claude Code docs, Codex source and schema lines | upstream wording or source | Cited with read date, page sha256 or tag and line in the decision record; not executed here |
 | skills.sh labels and audit API | independent observation | Another platform's 2026-09-15 scans, read 2026-09-30 |
+| Skills CLI deny rules and `Edit(~/.agents/**)` in the Claude template | our-integration | `tests/test_install_claude_profile.py` `test_a_session_cannot_install_or_remove_skills_through_the_skills_cli` failed against the previous template first (66 failures); it models the permissions page's documented matching, not a Claude Code run |
+| Every pin against its upstream git objects | our-integration | [`pin-verification.json`](../../evidence/artifacts/skills-pin-verification-20260930/pin-verification.json): 28 rows, 0 failures at 18:02Z, and a byte-identical recheck at 22:53Z after a fresh fetch |
 | Overflow, invocation and cost on any host | live-run-pending | The measurement plan above; no host run is claimed |
