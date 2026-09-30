@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-tigerless-labs-agent-memory",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/tigerless-labs/agent-memory",
+ "reviewed_commit": "243868db5027dde92a9fd0d1b76721b135792304",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of tigerless-labs/agent-memory at commit 243868db5027dde92a9fd0d1b76721b135792304 (license MIT), read from README.md at that commit. Repository description: \"Long-term memory runtime for AI agents — plain Markdown as the source of truth, local ranked retrieval, and an independent sleep-time Manage layer. Claude Code and Codex share one store. No API key.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1680,
+  "pushed_at": "2026-09-28T09:29:00Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@243868db5027dde92a9fd0d1b76721b135792304",
+   "text": "An agent that closes its session forgets everything it learned in it. agent-memory is the runtime that fixes that, for any agent — not only coding ones. Markdown files in one store are the single source of truth, the SQLite index beside them is a cache you can delete at any time, and Claude Code, Codex CLI, and anything else that can run a shell command share that store."
+  },
+  {
+   "source": "README.md@243868db5027dde92a9fd0d1b76721b135792304",
+   "text": "Retrieval is local and ranked, and it answers with paths rather than pasted text — the agent opens each hit only as deep as the task needs. Writes do not wait for the agent to remember to make them: they fire at conversation boundaries. A sleep-time pass then consolidates and forgets by value, on its own clock. None of it needs an API key."
+  },
+  {
+   "source": "README.md@243868db5027dde92a9fd0d1b76721b135792304",
+   "text": "Agent memory has grown along two architectural lines. One builds a **retrieval engine** — embeddings, a knowledge graph, a ranking pipeline — which finds the right thing, but hands the agent an opaque chunk it cannot inspect and a store it cannot migrate off. The other hands the agent a **filesystem** — markdown it reads directly, browsable with `ls` and `grep` — which is legible and costs nothing to run, but does not rank, and stops scaling the moment the tree outgrows a listing."
+  }
+ ]
+}

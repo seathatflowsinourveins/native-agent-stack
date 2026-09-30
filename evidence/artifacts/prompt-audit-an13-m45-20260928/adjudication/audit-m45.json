@@ -1,0 +1,125 @@
+{
+ "patterns_sha256": "c65977ca034624d333a87e330d51c92bdc7c98742a16f89d434bbb1051d394b7",
+ "judgments": {
+  "gpt6-AB": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 3,
+    "command_execution": 5,
+    "web_search": 3
+   }
+  },
+  "gpt6-BA": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "agent_message": 3,
+    "command_execution": 10,
+    "web_search": 3
+   }
+  },
+  "claude-AB": {
+   "void": true,
+   "hits": [
+    {
+     "pattern": "MAPPING",
+     "scope": "attachment prompt_snapshot",
+     "match": "Codex lane",
+     "window": null
+    },
+    {
+     "pattern": "MAPPING",
+     "scope": "attachment prompt_snapshot",
+     "match": "Codex lane",
+     "window": null
+    },
+    {
+     "pattern": "MAPPING",
+     "scope": "tool_result",
+     "match": "evidence-reviewer",
+     "window": null
+    },
+    {
+     "pattern": "MAPPING",
+     "scope": "tool result (structured)",
+     "match": "evidence-reviewer",
+     "window": null
+    }
+   ],
+   "info": [],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 59,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 23,
+    "text": 9,
+    "tool_use": 28,
+    "tool_result": 28,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 14,
+    "attachment hook_additional_context": 1,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1
+   }
+  },
+  "claude-BA": {
+   "void": true,
+   "hits": [
+    {
+     "pattern": "MAPPING",
+     "scope": "attachment prompt_snapshot",
+     "match": "Codex lane",
+     "window": null
+    },
+    {
+     "pattern": "MAPPING",
+     "scope": "attachment prompt_snapshot",
+     "match": "Codex lane",
+     "window": null
+    },
+    {
+     "pattern": "MAPPING",
+     "scope": "tool_result",
+     "match": "evidence-reviewer",
+     "window": null
+    },
+    {
+     "pattern": "MAPPING",
+     "scope": "tool result (structured)",
+     "match": "evidence-reviewer",
+     "window": null
+    }
+   ],
+   "info": [],
+   "items": {
+    "user text": 1,
+    "attachment hook_success": 64,
+    "attachment environment": 1,
+    "attachment model": 1,
+    "attachment session_context": 1,
+    "attachment date": 1,
+    "attachment credential_org": 1,
+    "attachment advisor_tool": 1,
+    "attachment prompt_snapshot": 2,
+    "thinking": 19,
+    "tool_use": 30,
+    "tool_result": 30,
+    "attachment mcp_instructions_delta": 1,
+    "attachment total_tokens_reminder": 17,
+    "attachment hook_additional_context": 2,
+    "server_tool_use": 1,
+    "advisor_tool_result": 1,
+    "text": 1
+   }
+  }
+ }
+}

@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--context-mode--use--20260927-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "eb5ca78af4d93bcfdaca30ef7434a7ffac7cb9a7",
+  "recorded_by": {
+    "identity_sha256": "5b4f00fe84f06be105fb8a8625b9ecd14d784c8e32357045a2971bf652b71ea6",
+    "model": "gpt-6-astra at effort max via codex-cli 0.157.1 profile stack-worker, driven by promptfoo 0.123.1"
+  },
+  "component_id": "context-mode",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 tools/capability-gate/run_gate.py m13",
+      "exit": 0,
+      "duration_s": 921.354,
+      "output_sha256": "ea6685a2125ef3c7f71f6feb8284d78aec523ffbb375aec84b75ef6c80a65451",
+      "output_excerpt": "capability-gate m13: PASS | gate 40/40 pass; ctrl-disabled 6/6 fail as predicted; ctrl-wrongroot 6/6 fail as predicted | 52 rows as expected, 52 distinct sessions | loki 52/52 rows match (236 MCP tool results) | results 13ee190ce1e863f5d8585e31113f10ca8aeb96836847359ee95334d0262bfb85 | promptfoo 0.123.1, codex-cli 0.157.1, run 2026-09-27T23:28:18Z\n  ctrl-disabled: ctx_execute no_call 6; ctx_execut"
+    }
+  ],
+  "tool_versions": {
+    "context-mode": "1.0.169"
+  },
+  "observed_at_utc": "2026-09-27T23:28:12Z",
+  "result": "pass",
+  "claim": "On nativestack-5975wx-20260925, python3 tools/capability-gate/run_gate.py m13 exited 0 and printed \"capability-gate m13: PASS | gate 40/40 pass; ctrl-disabled 6/6 fail as predicted; ctrl-wrongroot 6/6 fail as predicted | 52 rows as expected, 52 distinct sessions | loki 52/52 rows match\": in two fresh worktrees with two GPT-6 codex exec --profile stack-worker sessions in flight, in every gate row each tool class (the shell tool, context-mode 1.0.169 ctx_execute, ctx_execute_file, ctx_index then ctx_search, and serena find_symbol) returned that row's own fresh token through a completed call made as the brief prescribes, and no call of any class returned another token; both negative controls failed as the harness predicts.",
+  "limitations": [
+    "Driven through promptfoo 0.123.1's openai:codex-sdk (its bundled @openai/codex-sdk 0.153.4) with the one-line tools/capability-gate/codex-profile-exec launcher, so the sessions log to Loki as codex_sdk_ts rather than a lane's codex_exec; model, effort and MCP tables come from the stack-worker profile.",
+    "The per-row verdicts use promptfoo's trajectory:tool-used plus the repository's tools/capability-gate/assertions.js (documented local integration code); invoke counts come from Codex's own OTel codex.tool_result records in Loki. The output holds counts and one hash only.",
+    "The promptfoo results file every verdict was scored from (the raw Codex items, including tool results and model text) is retained host-privately (file 0600, directories 0700, never overwritten) under the native-agent-stack/capability-gate state directory; its sha256 is the 'results' field of the verdict line in this receipt's output excerpt, so the verdicts can be checked again against the returned results. It is not published.",
+    "Round 2: this receipt supersedes the first recording at 55fc8d17 (where the date allows), which a GPT-6 cross-family review marked needs_changes; the harness was repaired to retain the results, count only the prescribed tool with the argument fields each row prescribes, and reject the directory-change forms its README lists; a GPT-6 re-check of that repair found an attached -C still passing, which was closed before this recording.",
+    "PASS semantics (tools/capability-gate/README.md at this catalog revision): in each gate row every class returned the row's fresh own-tree token from a completed call made as the brief prescribes (relative path, no cwd argument, no absolute path, no token in the arguments, and none of the README's directory-change forms in the command or code: cd, pushd, popd, chdir, Set-, Push- or Pop-Location, a short-option group containing C with its directory separate or attached, --chdir, --directory, --work-tree, --git-dir, --wd, --working-directory, chroot, nsenter, unshare, systemd-run or sudo; ctx_search only after a completed ctx_index of the fixture), and no call of any class returned another token; in each ctrl-disabled row no context-mode class was called; in each ctrl-wrongroot row (CONTEXT_MODE_PROJECT_DIR set to the other worktree) each context-mode class returned the other tree's token, an error or nothing; in both controls the shell and serena classes still read their own token; each row's context-mode and serena call counts equalled its codex.tool_result counts in Loki.",
+    "Shell working directory: Codex's command_execution item carries the command text, output, exit code and status but no working directory (CommandExecutionItem, @openai/codex-sdk 0.153.4), so the shell class shows that a command naming only the relative path, with none of the listed directory-change forms, returned the row's own token; a working-directory argument to the shell tool itself is not visible to the scorer.",
+    "The directory-change check is a list of syntactic forms taken from each tool's --help on this host (GNU coreutils 9.4 env, GNU make 4.3, GNU tar 1.35, git 2.43.0, sudo 1.9.15p5, util-linux 2.39.3, systemd 255); a form not on the list, such as another tool's working-directory option, is not detected.",
+    "The retained results carry each row's own token as vars.sentinel (promptfoo 0.123.1's sanitizer writes a var named token as [REDACTED]), and run_gate.py fails an M13 run whose results file lacks any row's sentinel, so every class verdict can be re-derived from the retained file.",
+    "The shell class is scored but not reconciled against Loki: Codex's functions.exec, exec_command and wait envelope records do not map one-to-one to shell items (a collector follow-up); the Loki reconciliation covers the context-mode and serena calls.",
+    "Covers two concurrent top-level sessions; spawned sub-agents, which the M13 definition also names, are not exercised here (the #381 W run covers organic child tasks).",
+    "At two in flight, two rows of one worktree can overlap in time; per-repetition .cg/<rep>/ paths keep their fixtures apart.",
+    "In the 2026-09-27 20:47Z smoke of this harness, under the wrong-root control ctx_index reported indexing the fixture and ctx_search under the same source then returned no results; the control shows the own token is not returned, not which tree's file was indexed.",
+    "The serena find_symbol class ran against serena_agent 2.0.0.dev0 installed from oraios/serena at c6fbd1c5932df2494ffa0020af5a9fbe80b82143, the landscape code-navigation winner pin (the codex-ecosystem install's PEP 610 direct_url.json); this receipt's component is context-mode, and it does not qualify serena beyond find_symbol under this binding."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T23:28:12Z",
+      "reviewer": {
+        "identity_sha256": "5b4f00fe84f06be105fb8a8625b9ecd14d784c8e32357045a2971bf652b71ea6",
+        "model": "gpt-6-astra at effort max via codex-cli 0.157.1 profile stack-worker, driven by promptfoo 0.123.1"
+      }
+    },
+    {
+      "kind": "codex_lane",
+      "ref": "capability-gate receipts review 2026-09-27 round 2, GPT-6 cross-family, of the receipt recorded at main eb5ca78a: Independently hashed the retained results and matched the receipt's results sha256; replayed assertions.js against the returned results and reproduced 260/260 component verdicts, including identical scores and reasons. All 52/52 sentinels matched their row's tree and repetition, with 52 unique values. Confirmed 40/40 gate passes, 6/6 disabled-control failures and 6/6 wrong-root-control failures with the predicted outcomes. The claim quotes only this recording's verdict; date, supersession and binding are consistent. Limitations accurately cover checked arguments, listed directory-change syntax, sentinel retention, shell working-directory visibility and exclusion from Loki reconciliation, top-level scope, overlap, wrong-root indexing uncertainty and the Serena build. Loki, model and installed-build observations remain coordinator-supplied. No P0-P3 findings; agree, no changes required.",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T23:58:00Z",
+      "reviewer": {
+        "identity_sha256": "95b7c716754303a70bdd3561f3cc086b7be95f3c43366a0c4e0aa0cb2509d7f1",
+        "model": "gpt-6-astra at effort max via codex-cli 0.157.1 (codex exec)"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency"
+    }
+  ],
+  "supersedes": "nativestack-5975wx-20260925--context-mode--use--20260927"
+}

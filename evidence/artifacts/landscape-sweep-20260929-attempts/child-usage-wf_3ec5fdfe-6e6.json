@@ -1,0 +1,2834 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
+  "tool_commit": "16f3c7fe387b25ddfd0f74ceadd47b0533b31c64",
+  "tool_sha256": "eb7df29b1ee0b9d5f722001cdb841ac9e102313806209938d650cf2fac745519",
+  "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_3ec5fdfe-6e6 --require-effort max",
+  "exit_code": 0,
+  "raw_output_sha256": "b01a40901c4deaef1cf9c97086cfc1e5ed2b117ddfd2ea6d661521646d9dddf2",
+  "measured_at_utc": "2026-09-29T06:54:53Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+ },
+ "child_usage": {
+  "transcript_dir": "<session-transcripts>/subagents/workflows/wf_3ec5fdfe-6e6",
+  "status": "complete",
+  "reason": "every child has an explicit requested model, one matching resolved model no older than its documented alias resolution, returned usage and a non-null result",
+  "multi_model_children": [],
+  "web_search": {
+   "calls": 2,
+   "capped": 0,
+   "capped_children": []
+  },
+  "children": [
+   {
+    "agent_id": "ae889e571edcc4800",
+    "label": "gpt6-discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 5,
+    "usage": {
+     "input_tokens": 10,
+     "output_tokens": 19107,
+     "cache_read_input_tokens": 139024,
+     "cache_creation_input_tokens": 101783
+    },
+    "usage_by_model": {
+     "claude-sonnet-5-5": {
+      "input_tokens": 10,
+      "output_tokens": 19107,
+      "cache_read_input_tokens": 139024,
+      "cache_creation_input_tokens": 101783
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 44701,
+    "complete": true,
+    "issues": [],
+    "lanes": {
+     "tool_calls": 5,
+     "bash_calls": 4,
+     "mcp_calls": {},
+     "skill_calls": {},
+     "tool_search": {
+      "calls": 0,
+      "loaded": {}
+     },
+     "rtk": {
+      "hook_rewrites": 0,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "workflow-subagent"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 44701,
+     "measurement": {
+      "m3": {
+       "results": 5,
+       "bytes": 19638,
+       "large_results": 1,
+       "large_bytes": 19547,
+       "max_bytes": 19547,
+       "large_result_share": 0.2,
+       "large_byte_share": 0.9954
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 0,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 0,
+       "routed_share": null,
+       "routed_share_lower_bound": null,
+       "unclassifiable_share": null,
+       "status": "not_applicable",
+       "by_carrier": {
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 0,
+       "bytes": 0,
+       "large_results": 0,
+       "large_bytes": 0,
+       "max_bytes": 0,
+       "large_result_share": null,
+       "large_byte_share": null
+      },
+      "by_carrier": {
+       "bash": {
+        "results": 4,
+        "bytes": 19599,
+        "large_results": 1,
+        "large_bytes": 19547,
+        "max_bytes": 19547,
+        "large_result_share": 0.25,
+        "large_byte_share": 0.9973
+       },
+       "other": {
+        "results": 1,
+        "bytes": 39,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 39,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "status": "not_measured",
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 321,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 44699
+         }
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 247,
+          "cache_read_input_tokens": 44699,
+          "cache_creation_input_tokens": 2046
+         }
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 247,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 47022
+         }
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 137,
+          "cache_read_input_tokens": 47022,
+          "cache_creation_input_tokens": 281
+         }
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 18155,
+          "cache_read_input_tokens": 47303,
+          "cache_creation_input_tokens": 7735
+         }
+        }
+       ],
+       "totals": {
+        "input_tokens": 10,
+        "output_tokens": 19107,
+        "cache_read_input_tokens": 139024,
+        "cache_creation_input_tokens": 101783
+       },
+       "unidentified_messages": 0,
+       "complete": true
+      },
+      "hook_context": {
+       "inserted": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       }
+      },
+      "mcp_states": {},
+      "loaded_not_called": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "acceptance_or_exception_share": null
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "a78634225aad01adc",
+    "label": "discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "landscape-sweep-worker",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 2,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 31,
+    "usage": {
+     "input_tokens": 66,
+     "output_tokens": 111211,
+     "cache_read_input_tokens": 5080166,
+     "cache_creation_input_tokens": 239085
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 66,
+      "output_tokens": 111211,
+      "cache_read_input_tokens": 5080166,
+      "cache_creation_input_tokens": 239085
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 47680,
+    "complete": true,
+    "issues": [],
+    "lanes": {
+     "tool_calls": 40,
+     "bash_calls": 7,
+     "mcp_calls": {
+      "plugin_context-mode_context-mode": 21
+     },
+     "skill_calls": {
+      "search-first": 1,
+      "iterative-retrieval": 1,
+      "supply-chain-risk-auditor": 1,
+      "fp-check": 1
+     },
+     "tool_search": {
+      "calls": 1,
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "built-in": 1
+      }
+     },
+     "rtk": {
+      "hook_rewrites": 4,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 2,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "landscape-sweep-worker"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 47680,
+     "measurement": {
+      "m3": {
+       "results": 40,
+       "bytes": 193882,
+       "large_results": 9,
+       "large_bytes": 128515,
+       "max_bytes": 43227,
+       "large_result_share": 0.225,
+       "large_byte_share": 0.6629
+      },
+      "m4": {
+       "ctx_fetch_and_index": 6,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 24,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 30,
+       "routed_share": 0.2,
+       "routed_share_lower_bound": 0.2,
+       "unclassifiable_share": 0.8,
+       "status": "incomplete",
+       "by_carrier": {
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "ctx": {
+         "ctx_fetch_and_index": 6,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 23,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 29,
+         "routed_share": 0.2069,
+         "routed_share_lower_bound": 0.2069,
+         "unclassifiable_share": 0.7931,
+         "status": "incomplete"
+        },
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 1,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 1,
+         "routed_share": 0,
+         "routed_share_lower_bound": 0,
+         "unclassifiable_share": 1,
+         "status": "incomplete"
+        }
+       }
+      },
+      "m5": {
+       "results": 21,
+       "bytes": 168053,
+       "large_results": 9,
+       "large_bytes": 128515,
+       "max_bytes": 43227,
+       "large_result_share": 0.4286,
+       "large_byte_share": 0.7647
+      },
+      "by_carrier": {
+       "read": {
+        "results": 2,
+        "bytes": 8422,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 4872,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "other": {
+        "results": 10,
+        "bytes": 7073,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 3048,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "ctx": {
+        "results": 21,
+        "bytes": 168053,
+        "large_results": 9,
+        "large_bytes": 128515,
+        "max_bytes": 43227,
+        "large_result_share": 0.4286,
+        "large_byte_share": 0.7647
+       },
+       "bash": {
+        "results": 7,
+        "bytes": 10334,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 3668,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "status": "not_measured",
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 321,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 47678
+         }
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 568,
+          "cache_read_input_tokens": 47678,
+          "cache_creation_input_tokens": 10315
+         }
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 554,
+          "cache_read_input_tokens": 57993,
+          "cache_creation_input_tokens": 2494
+         }
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 8633,
+          "cache_read_input_tokens": 60487,
+          "cache_creation_input_tokens": 5776
+         }
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 7488,
+          "cache_read_input_tokens": 66263,
+          "cache_creation_input_tokens": 12474
+         }
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 6400,
+          "cache_read_input_tokens": 78737,
+          "cache_creation_input_tokens": 9172
+         }
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2475,
+          "cache_read_input_tokens": 87909,
+          "cache_creation_input_tokens": 24391
+         }
+        },
+        {
+         "ordinal": 8,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3768,
+          "cache_read_input_tokens": 112300,
+          "cache_creation_input_tokens": 7258
+         }
+        },
+        {
+         "ordinal": 9,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4552,
+          "cache_read_input_tokens": 119558,
+          "cache_creation_input_tokens": 6367
+         }
+        },
+        {
+         "ordinal": 10,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 7435,
+          "cache_read_input_tokens": 125925,
+          "cache_creation_input_tokens": 12969
+         }
+        },
+        {
+         "ordinal": 11,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 2702,
+          "cache_read_input_tokens": 290013,
+          "cache_creation_input_tokens": 14932
+         }
+        },
+        {
+         "ordinal": 12,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1750,
+          "cache_read_input_tokens": 153826,
+          "cache_creation_input_tokens": 6697
+         }
+        },
+        {
+         "ordinal": 13,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 160,
+          "cache_read_input_tokens": 160523,
+          "cache_creation_input_tokens": 2387
+         }
+        },
+        {
+         "ordinal": 14,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 161,
+          "cache_read_input_tokens": 162910,
+          "cache_creation_input_tokens": 921
+         }
+        },
+        {
+         "ordinal": 15,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1799,
+          "cache_read_input_tokens": 163831,
+          "cache_creation_input_tokens": 585
+         }
+        },
+        {
+         "ordinal": 16,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2889,
+          "cache_read_input_tokens": 164416,
+          "cache_creation_input_tokens": 3222
+         }
+        },
+        {
+         "ordinal": 17,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2055,
+          "cache_read_input_tokens": 167638,
+          "cache_creation_input_tokens": 10669
+         }
+        },
+        {
+         "ordinal": 18,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 3382,
+          "cache_read_input_tokens": 178307,
+          "cache_creation_input_tokens": 2881
+         }
+        },
+        {
+         "ordinal": 19,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1908,
+          "cache_read_input_tokens": 181188,
+          "cache_creation_input_tokens": 4849
+         }
+        },
+        {
+         "ordinal": 20,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 685,
+          "cache_read_input_tokens": 186037,
+          "cache_creation_input_tokens": 3174
+         }
+        },
+        {
+         "ordinal": 21,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1065,
+          "cache_read_input_tokens": 189211,
+          "cache_creation_input_tokens": 4299
+         }
+        },
+        {
+         "ordinal": 22,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2597,
+          "cache_read_input_tokens": 193510,
+          "cache_creation_input_tokens": 5556
+         }
+        },
+        {
+         "ordinal": 23,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1547,
+          "cache_read_input_tokens": 199066,
+          "cache_creation_input_tokens": 5156
+         }
+        },
+        {
+         "ordinal": 24,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 557,
+          "cache_read_input_tokens": 204222,
+          "cache_creation_input_tokens": 2181
+         }
+        },
+        {
+         "ordinal": 25,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 587,
+          "cache_read_input_tokens": 206403,
+          "cache_creation_input_tokens": 679
+         }
+        },
+        {
+         "ordinal": 26,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2265,
+          "cache_read_input_tokens": 207082,
+          "cache_creation_input_tokens": 2865
+         }
+        },
+        {
+         "ordinal": 27,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 704,
+          "cache_read_input_tokens": 209947,
+          "cache_creation_input_tokens": 3576
+         }
+        },
+        {
+         "ordinal": 28,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 698,
+          "cache_read_input_tokens": 213523,
+          "cache_creation_input_tokens": 1170
+         }
+        },
+        {
+         "ordinal": 29,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 12198,
+          "cache_read_input_tokens": 214693,
+          "cache_creation_input_tokens": 2123
+         }
+        },
+        {
+         "ordinal": 30,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 3216,
+          "cache_read_input_tokens": 445954,
+          "cache_creation_input_tokens": 14200
+         }
+        },
+        {
+         "ordinal": 31,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 26092,
+          "cache_read_input_tokens": 231016,
+          "cache_creation_input_tokens": 8069
+         }
+        }
+       ],
+       "totals": {
+        "input_tokens": 66,
+        "output_tokens": 111211,
+        "cache_read_input_tokens": 5080166,
+        "cache_creation_input_tokens": 239085
+       },
+       "unidentified_messages": 0,
+       "complete": true
+      },
+      "hook_context": {
+       "inserted": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       }
+      },
+      "mcp_states": {
+       "plugin_context-mode_context-mode": {
+        "attempted": 21,
+        "succeeded": 21,
+        "failed": 0,
+        "unfinished": 0
+       }
+      },
+      "loaded_not_called": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "acceptance_or_exception_share": null
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "a1c4b7dfdf4bd9485",
+    "label": "gpt6-refute-fit:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 7,
+    "usage": {
+     "input_tokens": 14,
+     "output_tokens": 16495,
+     "cache_read_input_tokens": 256026,
+     "cache_creation_input_tokens": 207392
+    },
+    "usage_by_model": {
+     "claude-sonnet-5-5": {
+      "input_tokens": 14,
+      "output_tokens": 16495,
+      "cache_read_input_tokens": 256026,
+      "cache_creation_input_tokens": 207392
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 54610,
+    "complete": true,
+    "issues": [],
+    "lanes": {
+     "tool_calls": 7,
+     "bash_calls": 5,
+     "mcp_calls": {},
+     "skill_calls": {},
+     "tool_search": {
+      "calls": 0,
+      "loaded": {}
+     },
+     "rtk": {
+      "hook_rewrites": 0,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "workflow-subagent"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 54610,
+     "measurement": {
+      "m3": {
+       "results": 7,
+       "bytes": 11809,
+       "large_results": 1,
+       "large_bytes": 11392,
+       "max_bytes": 11392,
+       "large_result_share": 0.1429,
+       "large_byte_share": 0.9647
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 0,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 0,
+       "routed_share": null,
+       "routed_share_lower_bound": null,
+       "unclassifiable_share": null,
+       "status": "not_applicable",
+       "by_carrier": {
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 0,
+       "bytes": 0,
+       "large_results": 0,
+       "large_bytes": 0,
+       "max_bytes": 0,
+       "large_result_share": null,
+       "large_byte_share": null
+      },
+      "by_carrier": {
+       "other": {
+        "results": 2,
+        "bytes": 234,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 195,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "bash": {
+        "results": 5,
+        "bytes": 11575,
+        "large_results": 1,
+        "large_bytes": 11392,
+        "max_bytes": 11392,
+        "large_result_share": 0.2,
+        "large_byte_share": 0.9842
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "status": "not_measured",
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 10439,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 54608
+         }
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 348,
+          "cache_read_input_tokens": 54608,
+          "cache_creation_input_tokens": 12220
+         }
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 247,
+          "cache_read_input_tokens": 66828,
+          "cache_creation_input_tokens": 440
+         }
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 178,
+          "cache_read_input_tokens": 67268,
+          "cache_creation_input_tokens": 298
+         }
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 260,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 67779
+         }
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 151,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 67322
+         }
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4872,
+          "cache_read_input_tokens": 67322,
+          "cache_creation_input_tokens": 4725
+         }
+        }
+       ],
+       "totals": {
+        "input_tokens": 14,
+        "output_tokens": 16495,
+        "cache_read_input_tokens": 256026,
+        "cache_creation_input_tokens": 207392
+       },
+       "unidentified_messages": 0,
+       "complete": true
+      },
+      "hook_context": {
+       "inserted": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       }
+      },
+      "mcp_states": {},
+      "loaded_not_called": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "acceptance_or_exception_share": null
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "a7011d65899ea456e",
+    "label": "refute-facts:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "landscape-sweep-worker",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 46,
+    "usage": {
+     "input_tokens": 96,
+     "output_tokens": 108950,
+     "cache_read_input_tokens": 6986339,
+     "cache_creation_input_tokens": 426511
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 96,
+      "output_tokens": 108950,
+      "cache_read_input_tokens": 6986339,
+      "cache_creation_input_tokens": 426511
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 57194,
+    "complete": true,
+    "issues": [],
+    "lanes": {
+     "tool_calls": 54,
+     "bash_calls": 6,
+     "mcp_calls": {
+      "plugin_context-mode_context-mode": 36
+     },
+     "skill_calls": {
+      "fp-check": 1,
+      "supply-chain-risk-auditor": 1
+     },
+     "tool_search": {
+      "calls": 1,
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "built-in": 1
+      }
+     },
+     "rtk": {
+      "hook_rewrites": 4,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 2,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "landscape-sweep-worker"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 57194,
+     "measurement": {
+      "m3": {
+       "results": 54,
+       "bytes": 167435,
+       "large_results": 13,
+       "large_bytes": 90021,
+       "max_bytes": 9651,
+       "large_result_share": 0.2407,
+       "large_byte_share": 0.5376
+      },
+      "m4": {
+       "ctx_fetch_and_index": 6,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 6,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 12,
+       "routed_share": 0.5,
+       "routed_share_lower_bound": 0.5,
+       "unclassifiable_share": 0.5,
+       "status": "incomplete",
+       "by_carrier": {
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "ctx": {
+         "ctx_fetch_and_index": 6,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 6,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 12,
+         "routed_share": 0.5,
+         "routed_share_lower_bound": 0.5,
+         "unclassifiable_share": 0.5,
+         "status": "incomplete"
+        },
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 36,
+       "bytes": 151869,
+       "large_results": 13,
+       "large_bytes": 90021,
+       "max_bytes": 9651,
+       "large_result_share": 0.3611,
+       "large_byte_share": 0.5928
+      },
+      "by_carrier": {
+       "other": {
+        "results": 10,
+        "bytes": 1788,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 422,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "read": {
+        "results": 2,
+        "bytes": 8925,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 4872,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "ctx": {
+        "results": 36,
+        "bytes": 151869,
+        "large_results": 13,
+        "large_bytes": 90021,
+        "max_bytes": 9651,
+        "large_result_share": 0.3611,
+        "large_byte_share": 0.5928
+       },
+       "bash": {
+        "results": 6,
+        "bytes": 4853,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 1519,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "status": "not_measured",
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 5070,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 57192
+         }
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 144,
+          "cache_read_input_tokens": 57192,
+          "cache_creation_input_tokens": 15064
+         }
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 11089,
+          "cache_read_input_tokens": 72256,
+          "cache_creation_input_tokens": 4728
+         }
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 729,
+          "cache_read_input_tokens": 76984,
+          "cache_creation_input_tokens": 11343
+         }
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1293,
+          "cache_read_input_tokens": 88327,
+          "cache_creation_input_tokens": 1901
+         }
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2111,
+          "cache_read_input_tokens": 90228,
+          "cache_creation_input_tokens": 4497
+         }
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2030,
+          "cache_read_input_tokens": 94725,
+          "cache_creation_input_tokens": 5353
+         }
+        },
+        {
+         "ordinal": 8,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2874,
+          "cache_read_input_tokens": 100078,
+          "cache_creation_input_tokens": 4748
+         }
+        },
+        {
+         "ordinal": 9,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 395,
+          "cache_read_input_tokens": 104826,
+          "cache_creation_input_tokens": 4292
+         }
+        },
+        {
+         "ordinal": 10,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1136,
+          "cache_read_input_tokens": 109118,
+          "cache_creation_input_tokens": 3990
+         }
+        },
+        {
+         "ordinal": 11,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1266,
+          "cache_read_input_tokens": 113108,
+          "cache_creation_input_tokens": 4716
+         }
+        },
+        {
+         "ordinal": 12,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 922,
+          "cache_read_input_tokens": 117824,
+          "cache_creation_input_tokens": 2588
+         }
+        },
+        {
+         "ordinal": 13,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1542,
+          "cache_read_input_tokens": 120412,
+          "cache_creation_input_tokens": 2111
+         }
+        },
+        {
+         "ordinal": 14,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1743,
+          "cache_read_input_tokens": 122523,
+          "cache_creation_input_tokens": 4020
+         }
+        },
+        {
+         "ordinal": 15,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1501,
+          "cache_read_input_tokens": 126543,
+          "cache_creation_input_tokens": 3677
+         }
+        },
+        {
+         "ordinal": 16,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1860,
+          "cache_read_input_tokens": 130220,
+          "cache_creation_input_tokens": 4073
+         }
+        },
+        {
+         "ordinal": 17,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1727,
+          "cache_read_input_tokens": 134293,
+          "cache_creation_input_tokens": 4331
+         }
+        },
+        {
+         "ordinal": 18,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 8,
+          "cache_read_input_tokens": 138624,
+          "cache_creation_input_tokens": 2814
+         }
+        },
+        {
+         "ordinal": 19,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1059,
+          "cache_read_input_tokens": 141438,
+          "cache_creation_input_tokens": 3486
+         }
+        },
+        {
+         "ordinal": 20,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2523,
+          "cache_read_input_tokens": 144924,
+          "cache_creation_input_tokens": 2082
+         }
+        },
+        {
+         "ordinal": 21,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1808,
+          "cache_read_input_tokens": 147006,
+          "cache_creation_input_tokens": 4238
+         }
+        },
+        {
+         "ordinal": 22,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 776,
+          "cache_read_input_tokens": 151244,
+          "cache_creation_input_tokens": 2658
+         }
+        },
+        {
+         "ordinal": 23,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 432,
+          "cache_read_input_tokens": 153902,
+          "cache_creation_input_tokens": 1431
+         }
+        },
+        {
+         "ordinal": 24,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 961,
+          "cache_read_input_tokens": 155333,
+          "cache_creation_input_tokens": 1016
+         }
+        },
+        {
+         "ordinal": 25,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 158,
+          "cache_read_input_tokens": 156349,
+          "cache_creation_input_tokens": 1362
+         }
+        },
+        {
+         "ordinal": 26,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 4070,
+          "cache_read_input_tokens": 316211,
+          "cache_creation_input_tokens": 4584
+         }
+        },
+        {
+         "ordinal": 27,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1338,
+          "cache_read_input_tokens": 162295,
+          "cache_creation_input_tokens": 4109
+         }
+        },
+        {
+         "ordinal": 28,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 803,
+          "cache_read_input_tokens": 166404,
+          "cache_creation_input_tokens": 2757
+         }
+        },
+        {
+         "ordinal": 29,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 789,
+          "cache_read_input_tokens": 169161,
+          "cache_creation_input_tokens": 2033
+         }
+        },
+        {
+         "ordinal": 30,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 833,
+          "cache_read_input_tokens": 171194,
+          "cache_creation_input_tokens": 1667
+         }
+        },
+        {
+         "ordinal": 31,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 878,
+          "cache_read_input_tokens": 172861,
+          "cache_creation_input_tokens": 10316
+         }
+        },
+        {
+         "ordinal": 32,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 524,
+          "cache_read_input_tokens": 183177,
+          "cache_creation_input_tokens": 1191
+         }
+        },
+        {
+         "ordinal": 33,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 116,
+          "cache_read_input_tokens": 184368,
+          "cache_creation_input_tokens": 595
+         }
+        },
+        {
+         "ordinal": 34,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 709,
+          "cache_read_input_tokens": 184963,
+          "cache_creation_input_tokens": 1974
+         }
+        },
+        {
+         "ordinal": 35,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 492,
+          "cache_read_input_tokens": 186937,
+          "cache_creation_input_tokens": 1428
+         }
+        },
+        {
+         "ordinal": 36,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 386,
+          "cache_read_input_tokens": 188365,
+          "cache_creation_input_tokens": 763
+         }
+        },
+        {
+         "ordinal": 37,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 9219,
+          "cache_read_input_tokens": 189128,
+          "cache_creation_input_tokens": 528
+         }
+        },
+        {
+         "ordinal": 38,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 166,
+          "cache_read_input_tokens": 189656,
+          "cache_creation_input_tokens": 10311
+         }
+        },
+        {
+         "ordinal": 39,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1125,
+          "cache_read_input_tokens": 199967,
+          "cache_creation_input_tokens": 2463
+         }
+        },
+        {
+         "ordinal": 40,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 15281,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 188276
+         }
+        },
+        {
+         "ordinal": 41,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2771,
+          "cache_read_input_tokens": 188276,
+          "cache_creation_input_tokens": 17872
+         }
+        },
+        {
+         "ordinal": 42,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1275,
+          "cache_read_input_tokens": 206148,
+          "cache_creation_input_tokens": 3605
+         }
+        },
+        {
+         "ordinal": 43,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4593,
+          "cache_read_input_tokens": 209753,
+          "cache_creation_input_tokens": 2745
+         }
+        },
+        {
+         "ordinal": 44,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 1447,
+          "cache_read_input_tokens": 429684,
+          "cache_creation_input_tokens": 5818
+         }
+        },
+        {
+         "ordinal": 45,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1253,
+          "cache_read_input_tokens": 218316,
+          "cache_creation_input_tokens": 3682
+         }
+        },
+        {
+         "ordinal": 46,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 15725,
+          "cache_read_input_tokens": 221998,
+          "cache_creation_input_tokens": 2083
+         }
+        }
+       ],
+       "totals": {
+        "input_tokens": 96,
+        "output_tokens": 108950,
+        "cache_read_input_tokens": 6986339,
+        "cache_creation_input_tokens": 426511
+       },
+       "unidentified_messages": 0,
+       "complete": true
+      },
+      "hook_context": {
+       "inserted": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       }
+      },
+      "mcp_states": {
+       "plugin_context-mode_context-mode": {
+        "attempted": 36,
+        "succeeded": 36,
+        "failed": 0,
+        "unfinished": 0
+       }
+      },
+      "loaded_not_called": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "acceptance_or_exception_share": null
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "a3dff5ad1a74b327d",
+    "label": "refute-fit:mcp-surfaces",
+    "phase": "Refute",
+    "agent_type": "landscape-sweep-worker",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 51,
+    "usage": {
+     "input_tokens": 106,
+     "output_tokens": 101862,
+     "cache_read_input_tokens": 7631338,
+     "cache_creation_input_tokens": 414761
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 106,
+      "output_tokens": 101862,
+      "cache_read_input_tokens": 7631338,
+      "cache_creation_input_tokens": 414761
+     }
+    },
+    "first_request_cache_read": 17491,
+    "first_request_prompt_tokens": 57286,
+    "complete": true,
+    "issues": [],
+    "lanes": {
+     "tool_calls": 54,
+     "bash_calls": 6,
+     "mcp_calls": {
+      "plugin_context-mode_context-mode": 42
+     },
+     "skill_calls": {
+      "iterative-retrieval": 1,
+      "fp-check": 1,
+      "supply-chain-risk-auditor": 1
+     },
+     "tool_search": {
+      "calls": 1,
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "built-in": 1
+      }
+     },
+     "rtk": {
+      "hook_rewrites": 2,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 2,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "landscape-sweep-worker"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 57286,
+     "measurement": {
+      "m3": {
+       "results": 54,
+       "bytes": 183684,
+       "large_results": 10,
+       "large_bytes": 78605,
+       "max_bytes": 10240,
+       "large_result_share": 0.1852,
+       "large_byte_share": 0.4279
+      },
+      "m4": {
+       "ctx_fetch_and_index": 3,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 2,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 5,
+       "routed_share": 0.6,
+       "routed_share_lower_bound": 0.6,
+       "unclassifiable_share": 0.4,
+       "status": "incomplete",
+       "by_carrier": {
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "ctx": {
+         "ctx_fetch_and_index": 3,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 2,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 5,
+         "routed_share": 0.6,
+         "routed_share_lower_bound": 0.6,
+         "unclassifiable_share": 0.4,
+         "status": "incomplete"
+        }
+       }
+      },
+      "m5": {
+       "results": 42,
+       "bytes": 171115,
+       "large_results": 10,
+       "large_bytes": 78605,
+       "max_bytes": 10240,
+       "large_result_share": 0.2381,
+       "large_byte_share": 0.4594
+      },
+      "by_carrier": {
+       "other": {
+        "results": 5,
+        "bytes": 564,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 422,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "read": {
+        "results": 1,
+        "bytes": 4872,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 4872,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "bash": {
+        "results": 6,
+        "bytes": 7133,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 2409,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "ctx": {
+        "results": 42,
+        "bytes": 171115,
+        "large_results": 10,
+        "large_bytes": 78605,
+        "max_bytes": 10240,
+        "large_result_share": 0.2381,
+        "large_byte_share": 0.4594
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "status": "not_measured",
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 497,
+          "cache_read_input_tokens": 17491,
+          "cache_creation_input_tokens": 39793
+         }
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 412,
+          "cache_read_input_tokens": 57284,
+          "cache_creation_input_tokens": 10491
+         }
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 7656,
+          "cache_read_input_tokens": 67775,
+          "cache_creation_input_tokens": 7528
+         }
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 292,
+          "cache_read_input_tokens": 75303,
+          "cache_creation_input_tokens": 8598
+         }
+        },
+        {
+         "ordinal": 5,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 599,
+          "cache_read_input_tokens": 83901,
+          "cache_creation_input_tokens": 949
+         }
+        },
+        {
+         "ordinal": 6,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 557,
+          "cache_read_input_tokens": 84850,
+          "cache_creation_input_tokens": 2673
+         }
+        },
+        {
+         "ordinal": 7,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 179,
+          "cache_read_input_tokens": 87523,
+          "cache_creation_input_tokens": 1360
+         }
+        },
+        {
+         "ordinal": 8,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 950,
+          "cache_read_input_tokens": 88883,
+          "cache_creation_input_tokens": 3630
+         }
+        },
+        {
+         "ordinal": 9,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 675,
+          "cache_read_input_tokens": 92513,
+          "cache_creation_input_tokens": 2940
+         }
+        },
+        {
+         "ordinal": 10,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 433,
+          "cache_read_input_tokens": 95453,
+          "cache_creation_input_tokens": 1628
+         }
+        },
+        {
+         "ordinal": 11,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 482,
+          "cache_read_input_tokens": 97081,
+          "cache_creation_input_tokens": 1175
+         }
+        },
+        {
+         "ordinal": 12,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 207,
+          "cache_read_input_tokens": 98256,
+          "cache_creation_input_tokens": 1507
+         }
+        },
+        {
+         "ordinal": 13,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 904,
+          "cache_read_input_tokens": 99763,
+          "cache_creation_input_tokens": 4082
+         }
+        },
+        {
+         "ordinal": 14,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 402,
+          "cache_read_input_tokens": 103845,
+          "cache_creation_input_tokens": 3552
+         }
+        },
+        {
+         "ordinal": 15,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1391,
+          "cache_read_input_tokens": 107397,
+          "cache_creation_input_tokens": 1484
+         }
+        },
+        {
+         "ordinal": 16,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1171,
+          "cache_read_input_tokens": 108881,
+          "cache_creation_input_tokens": 3366
+         }
+        },
+        {
+         "ordinal": 17,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2940,
+          "cache_read_input_tokens": 112247,
+          "cache_creation_input_tokens": 1882
+         }
+        },
+        {
+         "ordinal": 18,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4368,
+          "cache_read_input_tokens": 114129,
+          "cache_creation_input_tokens": 5151
+         }
+        },
+        {
+         "ordinal": 19,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2629,
+          "cache_read_input_tokens": 119280,
+          "cache_creation_input_tokens": 5321
+         }
+        },
+        {
+         "ordinal": 20,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4761,
+          "cache_read_input_tokens": 124601,
+          "cache_creation_input_tokens": 4484
+         }
+        },
+        {
+         "ordinal": 21,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 352,
+          "cache_read_input_tokens": 129085,
+          "cache_creation_input_tokens": 5546
+         }
+        },
+        {
+         "ordinal": 22,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 600,
+          "cache_read_input_tokens": 134631,
+          "cache_creation_input_tokens": 1834
+         }
+        },
+        {
+         "ordinal": 23,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 505,
+          "cache_read_input_tokens": 136465,
+          "cache_creation_input_tokens": 1435
+         }
+        },
+        {
+         "ordinal": 24,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1001,
+          "cache_read_input_tokens": 137900,
+          "cache_creation_input_tokens": 1921
+         }
+        },
+        {
+         "ordinal": 25,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4046,
+          "cache_read_input_tokens": 139821,
+          "cache_creation_input_tokens": 4940
+         }
+        },
+        {
+         "ordinal": 26,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 184,
+          "cache_read_input_tokens": 144761,
+          "cache_creation_input_tokens": 4641
+         }
+        },
+        {
+         "ordinal": 27,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 267,
+          "cache_read_input_tokens": 149402,
+          "cache_creation_input_tokens": 279
+         }
+        },
+        {
+         "ordinal": 28,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 4541,
+          "cache_read_input_tokens": 149681,
+          "cache_creation_input_tokens": 1464
+         }
+        },
+        {
+         "ordinal": 29,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 621,
+          "cache_read_input_tokens": 151145,
+          "cache_creation_input_tokens": 6199
+         }
+        },
+        {
+         "ordinal": 30,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 2834,
+          "cache_read_input_tokens": 157344,
+          "cache_creation_input_tokens": 976
+         }
+        },
+        {
+         "ordinal": 31,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 231,
+          "cache_read_input_tokens": 158320,
+          "cache_creation_input_tokens": 4228
+         }
+        },
+        {
+         "ordinal": 32,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 798,
+          "cache_read_input_tokens": 162548,
+          "cache_creation_input_tokens": 3918
+         }
+        },
+        {
+         "ordinal": 33,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 405,
+          "cache_read_input_tokens": 166466,
+          "cache_creation_input_tokens": 4586
+         }
+        },
+        {
+         "ordinal": 34,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1468,
+          "cache_read_input_tokens": 171052,
+          "cache_creation_input_tokens": 1116
+         }
+        },
+        {
+         "ordinal": 35,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 6058,
+          "cache_read_input_tokens": 172168,
+          "cache_creation_input_tokens": 4365
+         }
+        },
+        {
+         "ordinal": 36,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 422,
+          "cache_read_input_tokens": 176533,
+          "cache_creation_input_tokens": 7349
+         }
+        },
+        {
+         "ordinal": 37,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 629,
+          "cache_read_input_tokens": 183882,
+          "cache_creation_input_tokens": 1345
+         }
+        },
+        {
+         "ordinal": 38,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1903,
+          "cache_read_input_tokens": 185227,
+          "cache_creation_input_tokens": 2552
+         }
+        },
+        {
+         "ordinal": 39,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 6097,
+          "cache_read_input_tokens": 187779,
+          "cache_creation_input_tokens": 4478
+         }
+        },
+        {
+         "ordinal": 40,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1996,
+          "cache_read_input_tokens": 192257,
+          "cache_creation_input_tokens": 8020
+         }
+        },
+        {
+         "ordinal": 41,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 173,
+          "cache_read_input_tokens": 200277,
+          "cache_creation_input_tokens": 3326
+         }
+        },
+        {
+         "ordinal": 42,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 738,
+          "cache_read_input_tokens": 203603,
+          "cache_creation_input_tokens": 2472
+         }
+        },
+        {
+         "ordinal": 43,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 200,
+          "cache_read_input_tokens": 206075,
+          "cache_creation_input_tokens": 1233
+         }
+        },
+        {
+         "ordinal": 44,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 2315,
+          "cache_read_input_tokens": 417647,
+          "cache_creation_input_tokens": 6525
+         }
+        },
+        {
+         "ordinal": 45,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 4,
+          "output_tokens": 7288,
+          "cache_read_input_tokens": 229284,
+          "cache_creation_input_tokens": 201894
+         }
+        },
+        {
+         "ordinal": 46,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 736,
+          "cache_read_input_tokens": 219385,
+          "cache_creation_input_tokens": 3608
+         }
+        },
+        {
+         "ordinal": 47,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 145,
+          "cache_read_input_tokens": 222993,
+          "cache_creation_input_tokens": 2281
+         }
+        },
+        {
+         "ordinal": 48,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 224,
+          "cache_read_input_tokens": 225274,
+          "cache_creation_input_tokens": 1669
+         }
+        },
+        {
+         "ordinal": 49,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 321,
+          "cache_read_input_tokens": 226943,
+          "cache_creation_input_tokens": 983
+         }
+        },
+        {
+         "ordinal": 50,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 6581,
+          "cache_read_input_tokens": 227926,
+          "cache_creation_input_tokens": 1082
+         }
+        },
+        {
+         "ordinal": 51,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 16678,
+          "cache_read_input_tokens": 229008,
+          "cache_creation_input_tokens": 6902
+         }
+        }
+       ],
+       "totals": {
+        "input_tokens": 106,
+        "output_tokens": 101862,
+        "cache_read_input_tokens": 7631338,
+        "cache_creation_input_tokens": 414761
+       },
+       "unidentified_messages": 0,
+       "complete": true
+      },
+      "hook_context": {
+       "inserted": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       }
+      },
+      "mcp_states": {
+       "plugin_context-mode_context-mode": {
+        "attempted": 42,
+        "succeeded": 42,
+        "failed": 0,
+        "unfinished": 0
+       }
+      },
+      "loaded_not_called": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "acceptance_or_exception_share": null
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   }
+  ],
+  "by_resolved_model": {
+   "claude-sonnet-5-5": {
+    "children": 2,
+    "input_tokens": 24,
+    "output_tokens": 35602,
+    "cache_read_input_tokens": 395050,
+    "cache_creation_input_tokens": 309175
+   },
+   "claude-opus-5-5": {
+    "children": 3,
+    "input_tokens": 268,
+    "output_tokens": 322023,
+    "cache_read_input_tokens": 19697843,
+    "cache_creation_input_tokens": 1080357
+   }
+  },
+  "effort_mismatches": []
+ }
+}

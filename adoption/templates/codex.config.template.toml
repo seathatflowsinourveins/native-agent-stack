@@ -54,7 +54,7 @@ url = "http://${AI_MEMORY_URL}/mcp"
 
 [mcp_servers.socraticode]
 command = "${ECO_ROOT}/bin/node"
-args = ["${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"]
+args = ["${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js"]
 startup_timeout_sec = 120
 
 [mcp_servers.socraticode.env]
@@ -204,6 +204,14 @@ daemon_auto_start = false
 # README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
 # (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
 shell_snapshot = false
+
+# Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
+# reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question
+# (async-question, added after 0.155.1, so inert at the macOS pin). `agent-turn-complete` (a finished turn) is left out on purpose. The list
+# is plain strings, so a misspelled kind loads cleanly and never notifies; the kinds are type_name() in
+# codex-rs/tui/src/chatwidget/notifications.rs. The channel stays Codex's own per-terminal `auto` (docs/decisions/2026-09-28-terminal-experience.md).
+[tui]
+notifications = ["approval-requested", "plan-mode-prompt", "async-question"]
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]

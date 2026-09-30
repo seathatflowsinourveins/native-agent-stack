@@ -1,0 +1,8 @@
+# tmux_bell_probe.py output (tmux 3.4, private server, a Python pty as the outer terminal), recorded 2026-09-29
+tmux: tmux 3.4
+  default options, one BEL from the pane: 1 BEL byte(s) reached the outer terminal
+  bell-action any set explicitly (tmux 3.4's reported default), one BEL: 1 BEL byte(s) reached the outer terminal
+  negative control: bell-action none: 0 BEL byte(s) reached the outer terminal
+  visual-bell on: 0 BEL byte(s) reached the outer terminal
+  control: pane prints no BEL: 0 BEL byte(s) reached the outer terminal
+probe discriminates (1, 1, 0, control 0): True

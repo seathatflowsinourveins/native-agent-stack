@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ojuschugh1-sqz",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/ojuschugh1/sqz",
+ "reviewed_commit": "e66e717dc08d74977d6b991b071aac220046ed0d",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "token-efficiency"
+ ],
+ "claim": "Source and documentation review of ojuschugh1/sqz at commit e66e717dc08d74977d6b991b071aac220046ed0d (license NOASSERTION), read from README.md at that commit. Repository description: \"Context compression for AI coding agents: compresses tool output before it enters the model, dedups repeats to 13-token refs. Claude Code, Cursor, Codex, Kiro, Zed, any MCP client. Rust, zero LLM calls.\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 634,
+  "pushed_at": "2026-09-24T06:35:44Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@e66e717dc08d74977d6b991b071aac220046ed0d",
+   "text": "AI coding agents spend most of their input tokens on tool output: build logs, test runs, `git status`, the same file read again after every edit. All of it goes into the context window raw, and it is re-sent on every turn after that."
+  },
+  {
+   "source": "README.md@e66e717dc08d74977d6b991b071aac220046ed0d",
+   "text": "sqz compresses tool output before it enters the context. Per-command formatters keep what an agent acts on (the failing test, the assertion, the `file:line`) and drop what it does not. Anything the model already has in context comes back as a short reference instead of the content. Source code, stack traces and secrets pass through untouched."
+  },
+  {
+   "source": "README.md@e66e717dc08d74977d6b991b071aac220046ed0d",
+   "text": "```sh cargo install sqz-cli sqz-mcp # or: brew install ojuschugh1/sqz/sqz · npm i -g sqz-cli · pipx install sqz sqz init # hooks + MCP server + agent guidance for every client it finds ```"
+  }
+ ]
+}

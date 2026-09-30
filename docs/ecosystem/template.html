@@ -684,9 +684,77 @@ $("stack-layer").addEventListener("change", renderStack);
 $("stack-profile").addEventListener("change", renderStack);
 $("stack-reset").addEventListener("click", () => { $("stack-search").value = ""; $("stack-layer").value = ""; $("stack-profile").value = ""; renderStack(); });
 renderStack();
+// One per-tool card of the dated topic edition: every block states its own evidence class,
+// and each figure keeps its lane, scope and unit (nothing is added across them).
+function topicSection(parent, title, block, lines) {
+  add(parent, make("h3", "", title), make("p", "small muted", "Evidence class: " + block.evidence_class));
+  lines.forEach(line => { if(line) add(parent, typeof line === "string" ? make("p", "", line) : line); });
+}
+function sourcedLine(text, url) {
+  return url ? add(make("p"), make("span", "", text + " "), link("↗", url)) : make("p", "", text);
+}
+const recordedValue = value => value === null || value === undefined ? "not recorded" : String(value);
+function topicCard(card) {
+  const detail = add(make("details", "record-detail"), make("summary", "", "Per-tool card · edition " + card.edition));
+  add(detail, add(make("p"), link("Card source: " + card.source.path + " ↗", card.source.url)), make("p", "small mono", "sha256 " + card.source.sha256));
+  const upstream = card.upstream;
+  topicSection(detail, "Upstream", upstream, [
+    "Latest release " + upstream.latest_release + " (" + upstream.latest_date + ")",
+    upstream.behind_by && "Behind: " + upstream.behind_by,
+    upstream.recommended_install && sourcedLine("Recommended install: " + upstream.recommended_install.command, upstream.recommended_install.url),
+    ...(upstream.recommended_wiring || []).map(item => sourcedLine("Recommended wiring (" + item.client + "): " + item.how, item.url)),
+    ...(upstream.new_since_pin || []).map(item => sourcedLine("New since the pin: " + item.text, item.url)),
+    ...(upstream.limitations || []).map(item => sourcedLine("Limitation: " + item.text, item.url))]);
+  const native = card.native_adaptation;
+  topicSection(detail, "Native adaptation", native, [
+    native.claude_wiring && "Claude wiring: " + native.claude_wiring,
+    native.codex_wiring && "Codex wiring: " + native.codex_wiring,
+    native.lane_rule && "Lane rule: " + native.lane_rule,
+    ...(native.deviations || []).map(item => "Deviation: " + item.what + (item.why ? " Why: " + item.why : "") + (item.fix ? " Fix: " + item.fix : "")),
+    ...(native.pending_fixes || []).map(item => "Pending fix: " + stringify(item)),
+    native.assessment && "Assessment: " + native.assessment]);
+  const e2e = card.e2e_returned_results;
+  topicSection(detail, "E2E returned results", e2e, [
+    "Status " + e2e.status + (e2e.reason && e2e.reason !== e2e.status ? " (" + e2e.reason + ")" : "") + (e2e.run_utc ? " · run " + e2e.run_utc : ""),
+    e2e.fidelity && "Fidelity (" + e2e.fidelity.what + "): " + e2e.fidelity.result + (e2e.fidelity.correction ? " Correction: " + e2e.fidelity.correction : ""),
+    (e2e.commands || []).length && codeBlock(e2e.commands.map(item => "$ " + item.cmd + "\n  → " + (item.exit === null || item.exit === undefined ? "" : "exit " + item.exit + "; ") + item.returned).join("\n")),
+    "Records: " + e2e.records_total + (e2e.cited_records ? "; cited: " + e2e.cited_records.join(", ") : "") + (e2e.records_source ? " (" + e2e.records_source + ")" : ""),
+    e2e.records_total_note && "Record count: " + e2e.records_total_note]);
+  const performance = card.adapted_performance, counter = performance.native_counter;
+  topicSection(detail, "Adapted performance per payload and lane", performance, [
+    ...(performance.per_payload_and_lane || []).map(item => item.lane + " · " + item.payload + ": " + item.before_tokens + " → " + item.after_tokens + " tokens (" + item.change_pct + "%) · " + [item.encoding, item.evidence_class, item.eligibility].filter(Boolean).join(" · ") + (item.fidelity_status ? " · Fidelity: " + item.fidelity_status : "")),
+    counter && "Native counter (" + counter.evidence_class + "): " + counter.command + " · before " + recordedValue(counter.before) + ", after " + recordedValue(counter.after) + ", delta " + recordedValue(counter.delta) + " " + counter.unit,
+    ...(performance.native_snapshots || []).map(item => "Snapshot (" + item.evidence_class + "): " + item.scope + " · " + item.saved + " " + item.unit + " at " + item.observed_utc + " · " + item.basis),
+    performance.shortfall_cause && "Shortfall: " + performance.shortfall_cause,
+    performance.q3_fixture && codeBlock(performance.q3_fixture)]);
+  const invoke = card.invoke_rates, otel = invoke.live_otel;
+  topicSection(detail, "Invoke rates", invoke, [
+    invoke.window && "Window: " + invoke.window,
+    ...(invoke.populations || []).map(item => item.population + ": " + item.agents_using + " of " + item.agents + " agents (" + (item.pct_agents_using * 100).toFixed(2) + "%) · MCP calls " + item.mcp_calls + " · CLI calls " + item.cli_calls),
+    otel && "Live OpenTelemetry (" + otel.panel + ", " + otel.window.since + " to " + otel.window.until + "): " + (otel.series.length ? otel.series.map(item => item.client + " → " + item.mcp_server_name + " " + item.calls).join(", ") : "no series in this window"),
+    invoke.arm_b_native && "Arm B: " + invoke.arm_b_native]);
+  const review = card.gpt6_review;
+  topicSection(detail, "GPT-6 review", review, [
+    "Verdict " + review.final_verdict + " (review: " + review.review_verdict + ")",
+    review.summary,
+    ...(review.gaps || []).map(item => "Gap: " + item.gap + (item.action ? " Action: " + item.action : "") + (item.evidence ? " Evidence: " + item.evidence : "")),
+    ...(review.findings || []).map(item => "Finding [" + item.severity + "] " + item.field + ": " + item.status + ". " + item.note + (item.issue ? " Issue: " + item.issue : "")),
+    typeof review.claims_verified === "number" && "Claims verified: " + review.claims_holding + " of " + review.claims_verified + " hold",
+    (review.models || []).length && "Runs: " + review.models.join("; ")]);
+  return detail;
+}
 const topic = data.efficiency.topic;
 $("token-topic-scope").textContent = topic.scope;
 if(!topic.rows.length) $("token-topic-section").hidden = true;
+if(topic.edition) {
+  const edition = topic.edition, header = make("div", "record-detail");
+  add(header, make("p", "", "Edition " + edition.date_utc + (typeof edition.card_rows === "number" ? " · " + edition.card_rows + " rows with a card, " + edition.rows_without_card + " with the no-card marker" : "")));
+  [edition.pin_policy, edition.evidence_policy].forEach(text => { if(text) add(header, make("p", "small muted", text)); });
+  if(edition.invoke_rates_method) add(header, make("p", "small muted", "Invoke-rate method: " + edition.invoke_rates_method));
+  (edition.cards_without_row || []).forEach(item => add(header, make("p", "small", "Card without a row: " + item.tool + " · " + item.reason)));
+  (edition.sources || []).forEach(source => add(header, add(make("p"), link(source.path + " ↗", source.url))));
+  add($("token-topic"), header);
+}
 [["core", "Core token-efficiency paths"], ["observation", "Observation and accounting"], ["runtime", "Native clients and supporting runtimes"]].forEach(([group, title]) => {
   const rows = topic.rows.filter(row => row.group === group);
   if(!rows.length) return;
@@ -697,10 +765,13 @@ if(!topic.rows.length) $("token-topic-section").hidden = true;
     add(detail, recipeButton(row.recipe_path, "Read complete native recipe", row.component_id));
     row.sources.forEach(source => add(detail, add(make("p"), link(source.path + " ↗", source.url))));
     const identity = add(make("td"), link(row.component_id, row.repository), make("p", "small mono", row.version));
+    if(row.pin_drift) add(identity, make("p", "small", row.pin_drift));
+    if(row.card_marker) add(identity, make("p", "small muted", row.card_marker));
     const meters = add(make("td"), make("p", "", "Session: " + row.session_statistics.summary), make("p", "", "Lifetime: " + row.lifetime_statistics.summary));
     const record = add(make("tr"), identity, add(make("td"), codeBlock(row.upstream_commands.use)), make("td", "", row.returned_result_summary), meters);
     record.dataset.component = row.component_id;
     const detailCell = add(make("td"), detail); detailCell.colSpan = 4;
+    if(row.card && row.card.status === "present") add(detailCell, topicCard(row.card));
     add(body, record, add(make("tr", "topic-detail"), detailCell));
   });
   add(table, body); add($("token-topic"), make("h3", "", title), add(make("div", "table-wrap"), table));

@@ -1,0 +1,121 @@
+{
+  "context-mode": {
+    "command": "${ECO_ROOT}/bin/node",
+    "args": [
+      "${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"
+    ],
+    "env": {
+      "RTK_TELEMETRY_DISABLED": "1",
+      "PATH": "${ECO_ROOT}/bin:${HOST_PATH}",
+      "CONTEXT_MODE_PLATFORM": "codex",
+      "CONTEXT_MODE_PROJECT_DIR": "/workspace"
+    },
+    "transport": "stdio",
+    "timeout": 120,
+    "cwd": "/workspace"
+  },
+  "serena": {
+    "command": "${ECO_ROOT}/bin/serena",
+    "args": [
+      "start-mcp-server",
+      "--transport",
+      "stdio",
+      "--project",
+      "/workspace",
+      "--context",
+      "codex",
+      "--enable-web-dashboard",
+      "false",
+      "--open-web-dashboard",
+      "false",
+      "--enable-gui-log-window",
+      "false"
+    ],
+    "env": {
+      "RTK_TELEMETRY_DISABLED": "1",
+      "PATH": "${ECO_ROOT}/bin:${HOST_PATH}",
+      "SERENA_HOME": "/state/mcp/serena/home"
+    },
+    "transport": "stdio",
+    "timeout": 120,
+    "cwd": "/workspace"
+  },
+  "jcodemunch": {
+    "command": "${ECO_ROOT}/bin/jcodemunch-mcp",
+    "env": {
+      "RTK_TELEMETRY_DISABLED": "1",
+      "PATH": "${ECO_ROOT}/bin:${HOST_PATH}",
+      "CODE_INDEX_PATH": "${CODE_INDEX_PATH}",
+      "JCODEMUNCH_SHARE_SAVINGS": "0"
+    },
+    "transport": "stdio",
+    "timeout": 120,
+    "cwd": "/workspace"
+  },
+  "qmd": {
+    "command": "${ECO_ROOT}/bin/qmd",
+    "args": [
+      "--index",
+      "native-agent-stack-catalog",
+      "mcp"
+    ],
+    "transport": "stdio",
+    "timeout": 120,
+    "cwd": "/workspace",
+    "env": {}
+  },
+  "ai-memory": {
+    "enabled": false,
+    "url": "http://${AI_MEMORY_URL}/mcp",
+    "transport": "http",
+    "timeout": 120,
+    "env": {}
+  },
+  "socraticode": {
+    "enabled": false,
+    "command": "${ECO_ROOT}/bin/node",
+    "args": [
+      "${ECO_ROOT}/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+    ],
+    "env": {
+      "RTK_TELEMETRY_DISABLED": "1",
+      "PATH": "${ECO_ROOT}/bin:${HOST_PATH}",
+      "QDRANT_MODE": "external",
+      "QDRANT_URL": "http://${QDRANT_URL}",
+      "EMBEDDING_PROVIDER": "lmstudio",
+      "LMSTUDIO_URL": "http://${EMBED_URL}/v1",
+      "EMBEDDING_MODEL": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "EMBEDDING_DIMENSIONS": "2048",
+      "EMBEDDING_CONTEXT_LENGTH": "4096",
+      "EMBEDDING_QUERY_PREFIX": "query: ",
+      "EMBEDDING_DOCUMENT_PREFIX": "passage: ",
+      "EMBEDDING_DOCUMENT_INCLUDE_PATH": "true",
+      "RESPECT_GITIGNORE": "true",
+      "INCLUDE_DOT_FILES": "false",
+      "SOCRATICODE_WATCHER": "manual",
+      "SEARCH_DEFAULT_LIMIT": "3"
+    },
+    "transport": "stdio",
+    "timeout": 120,
+    "cwd": "/workspace"
+  },
+  "headroom": {
+    "command": "${ECO_ROOT}/bin/headroom",
+    "args": [
+      "mcp",
+      "serve",
+      "--proxy-url",
+      "http://127.0.0.1:1"
+    ],
+    "env": {
+      "HEADROOM_OFFLINE": "1",
+      "HF_HUB_OFFLINE": "1",
+      "TRANSFORMERS_OFFLINE": "1",
+      "DO_NOT_TRACK": "1"
+    },
+    "transport": "stdio",
+    "timeout": 120,
+    "cwd": "/workspace",
+    "enabled": false
+  }
+}

@@ -210,13 +210,53 @@ class SessionStartWarningTests(unittest.TestCase):
             self.assertIn("medium", payload["systemMessage"])
             self.assertIn("CLAUDE_CODE_EFFORT_LEVEL", payload["systemMessage"])
 
-    def test_silent_under_ultracode(self):
+    def test_warns_under_ultracode_when_the_model_has_no_saved_level(self):
+        # Claude Code 2.1.284: `ultracode: true` neither sets nor raises a model's level, so a
+        # claude-sonnet-5-5 session with nothing saved runs at the model's own default (medium,
+        # measured 2026-09-29) and the guard has to say so instead of assuming xhigh.
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             write_settings(home, {"ultracode": True})
             result = run_guard(home, {
                 "hook_event_name": "SessionStart",
-                "model": "claude-opus-5-5",
+                "model": "claude-sonnet-5-5",
+                "cwd": tmp,
+            })
+            self.assertEqual(result.returncode, 0, result.stderr)
+            payload = json.loads(result.stdout)
+            message = payload["systemMessage"]
+            self.assertIn("Effort default check", message)
+            self.assertIn("claude-sonnet-5-5", message)
+            self.assertIn("without a saved level", message)
+            self.assertIn("`/effort xhigh`", message)
+            self.assertEqual(payload["hookSpecificOutput"]["hookEventName"], "SessionStart")
+
+    def test_warns_under_ultracode_for_a_saved_lower_level(self):
+        # 2.1.284 runs the session at a per-model level even with ultracode on (a per-model low passed
+        # with `--settings` ran at low on Sonnet 5.5 and on Opus 5.5), so ultracode must not hide a
+        # saved lower level.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            write_settings(home, {"ultracode": True,
+                                  "modelSettings": {"claude-sonnet-5-5": {"effortLevel": "low"}}})
+            result = run_guard(home, {
+                "hook_event_name": "SessionStart",
+                "model": "claude-sonnet-5-5",
+                "cwd": tmp,
+            })
+            self.assertEqual(result.returncode, 0, result.stderr)
+            message = json.loads(result.stdout)["systemMessage"]
+            self.assertIn("claude-sonnet-5-5", message)
+            self.assertIn("set to low by user modelSettings", message)
+
+    def test_silent_under_ultracode_for_a_saved_xhigh_level(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            write_settings(home, {"ultracode": True,
+                                  "modelSettings": {"claude-sonnet-5-5": {"effortLevel": "xhigh"}}})
+            result = run_guard(home, {
+                "hook_event_name": "SessionStart",
+                "model": "claude-sonnet-5-5",
                 "cwd": tmp,
             })
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -313,15 +353,38 @@ class SessionEndSelfHealTests(unittest.TestCase):
             self.assertNotIn("modelSettings", saved)
             self.assertEqual(entries(home), [])
 
-    def test_respects_an_explicit_lower_effort_under_ultracode(self):
+    def test_heals_a_lower_effort_under_ultracode_when_no_level_was_saved(self):
+        # Claude Code 2.1.284: `ultracode: true` saves and raises no level, so a session that ran below
+        # xhigh with nothing saved is a model without a saved level, exactly as with ultracode off.
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             write_settings(home, {"ultracode": True})
             transcript = Path(tmp) / "transcript.jsonl"
             transcript.write_text(transcript_line("claude-opus-5-5", "low"))
             result = run_guard(home, {"hook_event_name": "SessionEnd", "transcript_path": str(transcript), "cwd": tmp})
+            self.assertEqual(result.returncode, 0, result.stderr)
+            message = json.loads(result.stdout)["systemMessage"]
+            self.assertIn("Saved modelSettings.claude-opus-5-5.effortLevel", message)
+            self.assertIn("ran this session at low", message)
+            saved = json.loads((home / ".claude" / "settings.json").read_text())
+            self.assertEqual(saved["modelSettings"], {"claude-opus-5-5": {"effortLevel": "xhigh"}})
+            self.assertIs(saved["ultracode"], True)  # the heal leaves every other key alone
+            (notice,) = pending(home)
+            self.assertIn("modelSettings.claude-opus-5-5.effortLevel = xhigh", notice.read_text())
+
+    def test_respects_an_explicit_lower_effort_under_ultracode(self):
+        # A level the user saved is respected under ultracode too: 2.1.284 runs the session at it, so a
+        # low session was the saved choice, and nothing is written or left behind.
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            write_settings(home, {"ultracode": True, "modelSettings": {"claude-opus-5-5": {"effortLevel": "low"}}})
+            before = (home / ".claude" / "settings.json").read_bytes()
+            transcript = Path(tmp) / "transcript.jsonl"
+            transcript.write_text(transcript_line("claude-opus-5-5", "low"))
+            result = run_guard(home, {"hook_event_name": "SessionEnd", "transcript_path": str(transcript), "cwd": tmp})
+            self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stdout.strip(), "")
-            self.assertNotIn("modelSettings", json.loads((home / ".claude" / "settings.json").read_text()))
+            self.assertEqual((home / ".claude" / "settings.json").read_bytes(), before)
             self.assertEqual(entries(home), [])
 
 

@@ -104,7 +104,7 @@ The historical RTK artifact was 533 → 176 tokens; the selected paper excerpt w
 
 Native Codex input includes its cached-input subset; Claude's ordinary input, cache creation and cache reads are separate categories. Reasoning/thinking is an output subset where reported. Do not sum these conventions blindly or combine cumulative account totals with per-task counters.
 
-The [observation artifact pair](../observability/README.md#token-efficient-operation-and-accounting) recounts to **188,769 → 500** tokens with upstream `gpt-tokenizer3.4.0` and `o200k_base`. The selected ten token series answer one operational question; other metric data is intentionally excluded and retained in the source. Run `node scripts/recount-tokens.cjs --observability` with the documented isolated tokenizer prefix. This is not net provider savings.
+The [observation artifact pair](../observability/README.md#token-efficient-operation-and-accounting) was counted at **188,769 → 500** tokens with upstream `gpt-tokenizer` 3.4.0 and `o200k_base` when it was recorded, and recounts to the same numbers with the pinned 4.0.0 ([qualification](../evidence/receipts/gpt-tokenizer-400-qualification-20260929.json)). The selected ten token series answer one operational question; other metric data is intentionally excluded and retained in the source. Run `node scripts/recount-tokens.cjs --observability` with the documented isolated tokenizer prefix. This is not net provider savings.
 
 ## CI boundary and costs
 

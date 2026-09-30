@@ -1,0 +1,29 @@
+{
+ "note": "Receipt for attempt 2's pre-dispatch isolation: the coordinator's worktree removal, the moves into the held\ndirectory, the root scan and the dispatch, taken from the coordinator session's own log (commands, their outputs\nand timestamps only).",
+ "steps": [
+  {
+   "step": "worktrees removed",
+   "at": "2026-09-28T03:08:23.541Z",
+   "command": "S=<scratch>; X=$S/convergence-prompt-audit/x9-round2; cmp $S/wt-x9-g/CLAUDE.md $X/arms/CLAUDE.g.md && cmp $S/wt-x9-c/CLAUDE.md $X/arms/CLAUDE.c.md && cmp $S/wt-x9-0/CLAUDE.md $X/arms/CLAUDE.0.md && echo \"arms match the worktrees\" && cd ~/code/native-agent-stack && \\\ngit worktree remove --force <scratch>/wt-x9-g && \\\ngit worktree remove --force <scratch>/wt-x9-c && \\\ngit worktree remove <scratch>/wt-x9-0 && \\\ngit worktree remove <scratch>/wt-x9r2-base && \\\ngit worktree remove <scratch>/wt-pa-pr1 && \\\ngit worktree remove <scratch>/wt-audit-base && \\\ntest \"$(git rev-parse claude/prompt-audit-instructions-20260927)\" = 8a5850ab2e7fbf17344cd85826022da98e35c702 && \\\ngit worktree remove <scratch>/wt-pa-pr2 && \\\ngit worktree prune && git worktree list | grep -c 789daede; git rev-parse --short claude/prompt-audit-instructions-20260927",
+   "output": "arms match the worktrees\n0\n8a5850ab"
+  },
+  {
+   "step": "moved into the held directory",
+   "at": "2026-09-28T03:08:39.052Z",
+   "command": "S=<scratch>; EXPECT=\"body.txt c.go checks.txt convergence-prompt-audit cookbook_sha.txt err.txt j2 m.go make_proposed.py pages prompt-audit-adjudication prompt-audit-adjudication-runs prompt-audit-x9-round2-judgment prompt-audit-x9-round2-runs proposed readme.txt template_hashes.py templates.f2_f3.json templates.f2_only.json templates.f3_only.json verify web-supp\"; test \"$(ls -A1 $S | sort | tr '\\n' ' ' | sed 's/ $//')\" = \"$EXPECT\" && mkdir $S/.hold && for n in body.txt c.go checks.txt convergence-prompt-audit cookbook_sha.txt err.txt m.go make_proposed.py pages prompt-audit-adjudication prompt-audit-adjudication-runs prompt-audit-x9-round2-judgment prompt-audit-x9-round2-runs proposed readme.txt template_hashes.py templates.f2_f3.json templates.f2_only.json templates.f3_only.json verify web-supp; do mv \"$S/$n\" \"$S/.hold/$n\"; done; ls -A1 $S; ls -A1 $S/.hold | wc -l; chmod 700 $S/.hold; ls -A $S/j2 $S/j2/x9",
+   "output": ".hold\nj2\n21\n<scratch>/j2:\nx9\n\n<attempt2>:\nadjudication-inputs\npackets\nprompts\nroot\nruns\nschemas"
+  },
+  {
+   "step": "root scanned",
+   "at": "2026-09-28T03:08:48.810Z",
+   "command": "rm <scratch>-before.txt; S=<scratch>; python3 - \"$S\" <<'EOF'\nimport os, sys\nfrom pathlib import Path\nS = Path(sys.argv[1]); sys.path.insert(0, str(S / \".hold/convergence-prompt-audit/x9-round2\")); import void_patterns as v\nhits = {\"MAPPING\": [], \"PHRASES\": []}; n = 0\nfor d, _, fs in os.walk(S / \"j2/x9/root\"):\n    for f in fs:\n        p = Path(d) / f\n        try: t = p.read_text(errors=\"ignore\")\n        except OSError: continue\n        n += 1\n        for k in hits:\n            if getattr(v, k).search(t): hits[k].append(str(p.relative_to(S / \"j2/x9/root\")))\nprint(n, \"files;\", {k: len(x) for k, x in hits.items()}, {k: x[:5] for k, x in hits.items()})\nEOF",
+   "output": "7935 files; {'MAPPING': 0, 'PHRASES': 0} {'MAPPING': [], 'PHRASES': []}"
+  },
+  {
+   "step": "GPT-6 judges started",
+   "at": "2026-09-28T03:09:14.888Z",
+   "command": "J=<attempt2>; H=$J/root/tools/sota-convergence/landscape-sweep; date -u +%FT%TZ; bash $H/codex_call.sh --work-dir $J/runs start x9r2-judge-AB $J/prompts/judge-AB.txt $J/schemas/judge.json; bash $H/codex_call.sh --work-dir $J/runs start x9r2-judge-BA $J/prompts/judge-BA.txt $J/schemas/judge.json; ls -A $J/runs",
+   "output": "2026-09-28T03:09:15Z\nstarted x9r2-judge-AB\nstarted x9r2-judge-BA\nempty/\ngpt6/\nlocks/"
+  }
+ ]
+}

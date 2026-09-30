@@ -142,10 +142,13 @@ GitHub-hosted macOS runner; see
    "none of N" pinned installs none of its own components through the script
    (only the `node`, `uv` and `gh` every run installs); use the recipes.
    `pins-linux-x86_64.json` changed after `v2026.09.24.1` in `install_note`
-   text only: the markitdown, tavily-cli, orx and agent-browser notes
-   attribute their installed-state observations to the 2026-09-23 recording
-   host. Versions, URLs and hashes are unchanged, so a host at that tag
-   installs the same artifacts. It changed after `v2026.09.25.2` again: rtk
+   text and in its `claude-code` pin (2.1.280 at that tag, 2.1.284 on main; the
+   Claude Code paragraph below has the details). The text changes: the
+   markitdown, tavily-cli, orx and agent-browser notes attribute their
+   installed-state observations to the 2026-09-23 recording host. Apart from
+   Claude Code, versions, URLs and hashes are unchanged, so a host at that tag
+   installs the same artifacts except Claude Code.
+   It changed after `v2026.09.25.2` again: rtk
    moves from 0.49.0 to 0.50.0 and markitdown from 0.1.7 to 0.1.8 (URLs,
    hashes and notes), so a host at that tag installs the earlier two. A host
    that runs the Claude RTK hook at 0.50.0 also needs the `exclude_commands`
@@ -156,8 +159,8 @@ GitHub-hosted macOS runner; see
    the earlier two of those as well; on a host with an existing ai-memory
    store, 2.4.1 migrates it forward-only at the next service start, so take
    the at-rest copy in [the recipe's upgrade steps](../recipes/README.md#upgrading-an-existing-store) first.
-   `pins-linux-x86_64.json` (the rtk and headroom `install_note` text only) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
-   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.157.1 (URL, hashes and note), so a host at that tag installs 0.155.1. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`). The macOS pin stays at 0.155.1.
+   `pins-linux-x86_64.json` (the rtk and headroom `install_note` text and its `claude-code` entry, 2.1.281 at that tag and 2.1.284 on main) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.157.1 (URL, hashes and note), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`). The macOS pin stays at 0.155.1.
 
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
@@ -193,10 +196,29 @@ GitHub-hosted macOS runner; see
    Both scripts and both claude-code pins changed after `v2026.09.24.1`: at
    that tag the pins are 2.1.280 and `adoption/bootstrap-linux.sh` and
    `adoption/bootstrap-macos.sh` reinstall the pin even over a newer Claude
-   Code; on main the pins are 2.1.281 and both scripts keep an installed
+   Code; on main the pins are 2.1.284 and both scripts keep an installed
    `~/.local/bin/claude` at or above the pin (logging `Kept installed
    claude-code <version>`), running the checksum-verified install only when
-   that launcher is missing, older or unreadable.
+   that launcher is missing, older or unreadable. Both pins also changed after `v2026.09.26.2`,
+   where both are 2.1.281: 2.1.284 is the first Claude Code release whose
+   `sonnet` alias resolves to Sonnet 5.5 (on the Anthropic API; an older client routes it to Sonnet 5; [model-config](https://code.claude.com/docs/en/model-config)),
+   so on main a launcher reporting 2.1.281 to 2.1.283 no longer counts as at
+   or above the pin and takes the checksum-verified install.
+
+   Both scripts also write the ecosystem `claude` launcher (`$eco/bin/claude`;
+   none is written when that directory is `~/.local/bin`, where the native
+   installer's own launcher serves). On main that launcher starts an
+   interactive terminal launch at effort max: it adds `--effort max` only when
+   stdin and stdout are a terminal, none of `-p`/`--print` (also as a cluster
+   such as `-pc`), `--effort` or `CLAUDE_CODE_EFFORT_LEVEL` has chosen an
+   effort, nothing follows a `--`, and the client reports 2.1.284 or newer (on
+   2.1.281 a `max` session turned Ultracode's orchestration off). Claude Code
+   cannot save max in settings, and the variable would override every child's
+   effort, so the documented flag is the mechanism
+   ([decision](../docs/decisions/2026-09-29-max-default-effort.md)). Headless
+   runs, an explicit `--effort`, the IDE extensions, the desktop app and the
+   web keep the saved per-model level; bypass with `--effort <level>` or by
+   running `~/.local/bin/claude` directly.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
@@ -257,12 +279,13 @@ GitHub-hosted macOS runner; see
    `claude.settings.template.json` also changed after `v2026.09.26.2`: it adds a
    `SubagentStart` group that runs `~/.claude/hooks/token-lanes-subagent-start.py`,
    installed by the **guard hooks** step of `install_claude_profile.py` below, so
-   every non-blind subagent receives the token-lanes block
-   ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md)); while that
+   every non-blind subagent except `semantic-evidence-reviewer` receives the token-lanes block matched to its role
+   ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)); while that
    file is absent the command exits 0 and adds nothing.
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
    The recipe's project-scoped alternative changed after `v2026.09.26.2`: it adds `default_tools_approval_mode = "approve"` and a `CLAUDE_PROJECT_DIR` equal to its project directory, as upstream `start.mjs` sets, so a project entry keeps Codex tool approvals and the server-side project `Bash(...)` denies ([recipe](../recipes/README.md#retained-context-mode)).
-   `codex.config.template.toml` changed after `v2026.09.26.2` again: it sets `web_search = "live"`, `check_for_update_on_startup = false`, `[features] shell_snapshot = false` and `[agents] default_subagent_reasoning_effort = "max"`, and it no longer trusts four dated validation directories. The opt-in gateway profile `codex.omniroute.config.toml` (added after that tag) is not rendered here; `tools/adoption/apply_codex_lane.py --omniroute-profile` installs it ([recipe](../recipes/README.md#codex-through-omniroute)).
+   `codex.config.template.toml` changed after `v2026.09.26.2` again: it sets `web_search = "live"`, `check_for_update_on_startup = false`, `[features] shell_snapshot = false` and `[agents] default_subagent_reasoning_effort = "max"`, and it no longer trusts four dated validation directories. Its SocratiCode server now runs `${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/`, which `render_config.py` renders from the selected platform's pin like `${AI_MEMORY_BIN}` (1.15.0 on Linux and 1.14.0 on macOS since 2026-09-27); `--set SOCRATICODE_VERSION=<version>` names another install. The opt-in gateway profile `codex.omniroute.config.toml` (added after that tag) is not rendered here; `tools/adoption/apply_codex_lane.py --omniroute-profile` installs it ([recipe](../recipes/README.md#codex-through-omniroute)).
+   `codex.config.template.toml` changed after `v2026.09.26.2` once more: it sets `[tui] notifications` to the needed-action kinds (`approval-requested`, `plan-mode-prompt`, `async-question`), so Codex asks for a notification on an approval, a plan-mode prompt or a question and not when a turn finishes. Codex keeps its own per-terminal channel, so a macOS host still gets native notifications for those kinds and stops getting the turn-complete one; at the macOS pin a `request_user_input` question already notifies as `plan-mode-prompt` and `async-question` (asynchronous questions added later) is inert, so no notification that release emits is lost ([decision](../docs/decisions/2026-09-28-terminal-experience.md#repository-carried-defaults-and-the-second-distros-profiles-2026-09-29)).
    The rendered `codex.config.toml` keeps the source host's `trusted_hash`
    entries for the ai-memory commands in `~/.codex/hooks.json`, recorded before
    those commands moved to 2.4.x; Codex treats the changed commands as
@@ -326,20 +349,26 @@ GitHub-hosted macOS runner; see
      settings entries were added after `v2026.09.24.1`). This step **changed after `v2026.09.26.2`**:
      it also copies [`adoption/hooks/claude/token-lanes-subagent-start.py`](hooks/claude/token-lanes-subagent-start.py)
      and its sibling [`adoption/hooks/claude/token-lanes-block.md`](hooks/claude/token-lanes-block.md)
-     into `~/.claude/hooks/` (both files added after `v2026.09.26.2`).
+     with the five role blocks `adoption/hooks/claude/token-lanes-block.<role>.md`
+     (`builder`, `researcher`, `reviewer`, `scout`, `verifier`)
+     into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`).
      The hook supplies token-lane guidance before each non-blind subagent's first prompt
-     through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart);
-     `blind-*` roles receive no context from this hook.
+     through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart):
+     a shipped role with a `tools:` allowlist receives the role block that names only the lanes it grants,
+     and other types receive the full block
+     ([agent-type table](../docs/token-session-handbook.md#token-lanes-carried-into-subagents));
+     `blind-*` roles and `semantic-evidence-reviewer` receive no context from this hook.
      It refuses to install any file unless
      every sha256 matches [`adoption/hooks/claude/SHA256SUMS`](hooks/claude/SHA256SUMS)
      (paths relative to that file); skipped per file if the installed copy
      already matches.
-   - **agents**: copies the ten [`adoption/agents/claude/*.md`](agents/claude/)
+   - **agents**: copies the eleven [`adoption/agents/claude/*.md`](agents/claude/)
      files verbatim to `~/.claude/agents/`; skipped per-file when already
      byte-identical. They changed after `v2026.09.26`: `stack-researcher`,
      `stack-verifier` and `security-reviewer` were added (the security role
      preloads `security-best-practices`), and `isolated-builder` preloads
-     `context-mode:context-mode` and `verification-before-completion` and lost Serena's
+     `context-mode:context-mode` (its `verification-before-completion` preload was
+     removed on 2026-09-28 with that skill's trial) and lost Serena's
      symbol-edit tools, which would edit the parent session's checkout rather
      than the builder's worktree.
    - **MCP servers**: for each entry in

@@ -1,0 +1,553 @@
+{
+ "schema_version": 1,
+ "measurement": {
+  "tool": "native-agent-stack examples/claude-native/workflows/child-usage.mjs",
+  "tool_commit": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+  "tool_sha256": "eb7df29b1ee0b9d5f722001cdb841ac9e102313806209938d650cf2fac745519",
+  "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_466387c0-f92 --require-effort max",
+  "exit_code": 1,
+  "raw_output_sha256": "d2fb7310fe248b1f4b743c88bdb739ae6c2eca66b4185316cb0581f3ae9ad673",
+  "measured_at_utc": "2026-09-29T14:18:54Z",
+  "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
+ },
+ "child_usage": {
+  "transcript_dir": "<session-transcripts>/subagents/workflows/wf_466387c0-f92",
+  "status": "incomplete",
+  "reason": "2 child(ren) incomplete",
+  "multi_model_children": [],
+  "web_search": {
+   "calls": 0,
+   "capped": 0,
+   "capped_children": []
+  },
+  "children": [
+   {
+    "agent_id": "a4306353016c29358",
+    "label": "gpt6-discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "workflow-subagent",
+    "requested_model": "sonnet",
+    "resolved_models": [
+     "claude-sonnet-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 2,
+    "usage": {
+     "input_tokens": 4,
+     "output_tokens": 2165,
+     "cache_read_input_tokens": 44699,
+     "cache_creation_input_tokens": 48350
+    },
+    "usage_by_model": {
+     "claude-sonnet-5-5": {
+      "input_tokens": 4,
+      "output_tokens": 2165,
+      "cache_read_input_tokens": 44699,
+      "cache_creation_input_tokens": 48350
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 44701,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ],
+    "lanes": {
+     "tool_calls": 2,
+     "bash_calls": 2,
+     "mcp_calls": {},
+     "skill_calls": {},
+     "tool_search": {
+      "calls": 0,
+      "loaded": {}
+     },
+     "rtk": {
+      "hook_rewrites": 0,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "workflow-subagent"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 44701,
+     "measurement": {
+      "m3": {
+       "results": 2,
+       "bytes": 472,
+       "large_results": 0,
+       "large_bytes": 0,
+       "max_bytes": 438,
+       "large_result_share": 0,
+       "large_byte_share": 0
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 0,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 0,
+       "routed_share": null,
+       "routed_share_lower_bound": null,
+       "unclassifiable_share": null,
+       "status": "not_applicable",
+       "by_carrier": {
+        "bash": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 0,
+       "bytes": 0,
+       "large_results": 0,
+       "large_bytes": 0,
+       "max_bytes": 0,
+       "large_result_share": null,
+       "large_byte_share": null
+      },
+      "by_carrier": {
+       "bash": {
+        "results": 2,
+        "bytes": 472,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 438,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "status": "not_measured",
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 1926,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 44699
+         }
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-sonnet-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 239,
+          "cache_read_input_tokens": 44699,
+          "cache_creation_input_tokens": 3651
+         }
+        }
+       ],
+       "totals": {
+        "input_tokens": 4,
+        "output_tokens": 2165,
+        "cache_read_input_tokens": 44699,
+        "cache_creation_input_tokens": 48350
+       },
+       "unidentified_messages": 0,
+       "complete": true
+      },
+      "hook_context": {
+       "inserted": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       }
+      },
+      "mcp_states": {},
+      "loaded_not_called": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "acceptance_or_exception_share": null
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   },
+   {
+    "agent_id": "a356dc590153a277f",
+    "label": "discover:mcp-surfaces",
+    "phase": "Discover",
+    "agent_type": "landscape-sweep-worker",
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ],
+    "web_search": {
+     "calls": 0,
+     "capped": 0,
+     "first_capped_at": null
+    },
+    "requests": 4,
+    "usage": {
+     "input_tokens": 8,
+     "output_tokens": 2184,
+     "cache_read_input_tokens": 168215,
+     "cache_creation_input_tokens": 65802
+    },
+    "usage_by_model": {
+     "claude-opus-5-5": {
+      "input_tokens": 8,
+      "output_tokens": 2184,
+      "cache_read_input_tokens": 168215,
+      "cache_creation_input_tokens": 65802
+     }
+    },
+    "first_request_cache_read": 0,
+    "first_request_prompt_tokens": 47680,
+    "complete": false,
+    "issues": [
+     "no result entry in journal"
+    ],
+    "lanes": {
+     "tool_calls": 6,
+     "bash_calls": 0,
+     "mcp_calls": {
+      "plugin_context-mode_context-mode": 3
+     },
+     "skill_calls": {
+      "search-first": 1
+     },
+     "tool_search": {
+      "calls": 1,
+      "loaded": {
+       "plugin_context-mode_context-mode": 4,
+       "built-in": 1
+      }
+     },
+     "rtk": {
+      "hook_rewrites": 0,
+      "model_typed": 0,
+      "decisions": null
+     },
+     "fetch": {
+      "webfetch": 0,
+      "ctx_fetch_and_index": 0,
+      "bash_curl_wget": 0,
+      "bash_curl_wget_loopback": 0
+     },
+     "injected_block": {
+      "marker": "<context_window_protection>",
+      "in_first_prompt": false,
+      "in_subagent_start_context": false
+     },
+     "subagent_start": {
+      "types": [
+       "landscape-sweep-worker"
+      ],
+      "additional_context": true
+     },
+     "first_prompt_tokens": 47680,
+     "measurement": {
+      "m3": {
+       "results": 6,
+       "bytes": 18057,
+       "large_results": 1,
+       "large_bytes": 7592,
+       "max_bytes": 7592,
+       "large_result_share": 0.1667,
+       "large_byte_share": 0.4204
+      },
+      "m4": {
+       "ctx_fetch_and_index": 0,
+       "webfetch": 0,
+       "shell_fetch": 0,
+       "ctx_sandbox_fetch": 0,
+       "loopback": 0,
+       "unclassifiable": 0,
+       "fetch_mentions_unconfirmed": 0,
+       "remote_fetches": 0,
+       "routed_share": null,
+       "routed_share_lower_bound": null,
+       "unclassifiable_share": null,
+       "status": "not_applicable",
+       "by_carrier": {
+        "read": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "other": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        },
+        "ctx": {
+         "ctx_fetch_and_index": 0,
+         "webfetch": 0,
+         "shell_fetch": 0,
+         "ctx_sandbox_fetch": 0,
+         "loopback": 0,
+         "unclassifiable": 0,
+         "fetch_mentions_unconfirmed": 0,
+         "remote_fetches": 0,
+         "routed_share": null,
+         "routed_share_lower_bound": null,
+         "unclassifiable_share": null,
+         "status": "not_applicable"
+        }
+       }
+      },
+      "m5": {
+       "results": 3,
+       "bytes": 12734,
+       "large_results": 1,
+       "large_bytes": 7592,
+       "max_bytes": 7592,
+       "large_result_share": 0.3333,
+       "large_byte_share": 0.5962
+      },
+      "by_carrier": {
+       "read": {
+        "results": 1,
+        "bytes": 4872,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 4872,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "other": {
+        "results": 2,
+        "bytes": 451,
+        "large_results": 0,
+        "large_bytes": 0,
+        "max_bytes": 422,
+        "large_result_share": 0,
+        "large_byte_share": 0
+       },
+       "ctx": {
+        "results": 3,
+        "bytes": 12734,
+        "large_results": 1,
+        "large_bytes": 7592,
+        "max_bytes": 7592,
+        "large_result_share": 0.3333,
+        "large_byte_share": 0.5962
+       }
+      },
+      "exceptions": {},
+      "rtk_parts": {
+       "calls": 0,
+       "eligible_parts": 0,
+       "eligible_calls": 0,
+       "observed_covered_parts": 0,
+       "observed_all_covered_calls": 0,
+       "replayed_covered_parts": 0,
+       "replayed_all_covered_calls": 0,
+       "explicit_rtk_on_excluded_or_sensitive": 0,
+       "explicit_rtk_log_find_advisory": 0,
+       "log_find_permitted_parts": 0,
+       "log_find_requires_raw_parts": 0,
+       "log_find_unresolved_parts": 0,
+       "proxy_parts": 0,
+       "ineligible_parts": 0,
+       "unknown_calls": 0,
+       "status": "not_measured",
+       "coverage": null,
+       "call_coverage": null
+      },
+      "usage": {
+       "messages": [
+        {
+         "ordinal": 1,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 321,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 47678
+         }
+        },
+        {
+         "ordinal": 2,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 750,
+          "cache_read_input_tokens": 47678,
+          "cache_creation_input_tokens": 10315
+         }
+        },
+        {
+         "ordinal": 3,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 250,
+          "cache_read_input_tokens": 57993,
+          "cache_creation_input_tokens": 4551
+         }
+        },
+        {
+         "ordinal": 4,
+         "model": "claude-opus-5-5",
+         "effort": "max",
+         "usage": {
+          "input_tokens": 2,
+          "output_tokens": 863,
+          "cache_read_input_tokens": 62544,
+          "cache_creation_input_tokens": 3258
+         }
+        }
+       ],
+       "totals": {
+        "input_tokens": 8,
+        "output_tokens": 2184,
+        "cache_read_input_tokens": 168215,
+        "cache_creation_input_tokens": 65802
+       },
+       "unidentified_messages": 0,
+       "complete": true
+      },
+      "hook_context": {
+       "inserted": 1,
+       "claimed": 1,
+       "with_marker": 0,
+       "by_hook": {
+        "SubagentStart": 1
+       },
+       "by_event": {
+        "SubagentStart": 1
+       }
+      },
+      "mcp_states": {
+       "plugin_context-mode_context-mode": {
+        "attempted": 3,
+        "succeeded": 3,
+        "failed": 0,
+        "unfinished": 0
+       }
+      },
+      "loaded_not_called": {},
+      "proxy": {
+       "calls": 0,
+       "acceptance": 0,
+       "exception": 0,
+       "unclassified": 0,
+       "acceptance_or_exception_share": null
+      },
+      "invalid_exceptions": 0,
+      "orphan_results": 0,
+      "sandbox_operations": 0,
+      "unknown_result_bytes": 0,
+      "bytes_complete": true,
+      "calls_without_result": 0
+     }
+    }
+   }
+  ],
+  "by_resolved_model": {
+   "claude-sonnet-5-5": {
+    "children": 1,
+    "input_tokens": 4,
+    "output_tokens": 2165,
+    "cache_read_input_tokens": 44699,
+    "cache_creation_input_tokens": 48350
+   },
+   "claude-opus-5-5": {
+    "children": 1,
+    "input_tokens": 8,
+    "output_tokens": 2184,
+    "cache_read_input_tokens": 168215,
+    "cache_creation_input_tokens": 65802
+   }
+  },
+  "effort_mismatches": []
+ }
+}

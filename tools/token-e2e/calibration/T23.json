@@ -1,0 +1,65 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T23",
+ "clauses": [
+  "Company FB to META before June 9, 2022 open; fund META to METV at January 31, 2022 open; distinct identities.",
+  "Historical retrieval must contain a scoped result for a wait loop matching its own command line; compare with docs/harness-defaults.md, Anti-pattern log: Anchor or bracket the process pattern, or wait on a PID/exit marker with a timeout."
+ ],
+ "sources": [
+  {
+   "label": "catalogs/us-equities/lifecycle-source-review.md lines naming the facts",
+   "text": "Meta company Class A stock: FB changes to META before the June 9, 2022 open. Roundhill ETF shares: META changes to METV at January 31, 2022 trading open."
+  },
+  {
+   "label": "anti-pattern log row",
+   "text": "| 2026-09-25 | A wait loop whose pattern matches itself | `until ! pgrep -f \"unittest discover\"; do sleep 3; done` never ended: the waiting shell's command line contains the pattern |"
+  },
+  {
+   "label": "frozen historical record digests",
+   "text": "record 1: 3fa9c2d41b7e0a55"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The company FB changed to META before the June 9, 2022 open; the fund META changed to METV at the January 31, 2022 open. They are distinct identities. The earlier decision (record 3fa9c2d41b7e0a55) matches the log row: a wait loop whose pattern matches its own command line never ends.\n\nSource excerpt: Meta company Class A stock: FB changes to META before the June 9, 2022 open. Roundhill ETF shares: META changes to METV at January 31, 2022 trading open.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "Meta Platforms moved from FB to META ahead of the open on June 9, 2022, whereas the ETF called META became METV when trading opened on January 31, 2022; the two are separate securities. The stored decision (record 3fa9c2d41b7e0a55) and the log agree that a waiting shell can match its own command line and hang.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "FB became META on January 31, 2022, and the fund METV is the same security as the company. The wait-loop decision matches the log.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "FB became META before June 9, 2022 and the fund META became METV on January 31, 2022. The earlier decision says a wait loop matching its own command line finishes normally.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

@@ -97,17 +97,17 @@ against the existing maintenance task. Assign each dependency one updater.
 
 Use installed upstream checks; avoid a home-grown workflow parser as the primary
 validator. The existing pinned zizmor lane checks workflow security. Upstream
-[actionlint](https://github.com/rhysd/actionlint) checks workflow syntax, expressions
+[actionlint](https://github.com/kjanat/actionlint) checks workflow syntax, expressions
 and action usage. Neither executes a job or establishes model-task quality.
 
-The upstream [binary installation procedure](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)
-supports a task-local download and provenance verification, with no global install:
+Since 2026-09-28 the pin is kjanat/actionlint 1.17.0, the maintained fork that replaced the stalled rhysd/actionlint 1.7.12 ([swap receipt](../evidence/artifacts/actionlint-successor-swap-20260928/README.md)). Its The 2026-09-20 and 2026-09-21 results and the shellcheck finding below used this procedure against rhysd/actionlint v1.7.12 ([its install doc at v1.7.12](https://github.com/rhysd/actionlint/blob/v1.7.12/docs/install.md)).
+[binary installation procedure](https://github.com/kjanat/actionlint/blob/v1.17.0/docs/install.md?plain=1#L124-L134) supports a task-local download and provenance verification, with no global install:
 
 ```sh
-gh release download --repo rhysd/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.7.12
-gh attestation verify -R rhysd/actionlint actionlint_1.7.12_linux_amd64.tar.gz
-sha256sum --check --ignore-missing actionlint_1.7.12_checksums.txt
-tar -xzf actionlint_1.7.12_linux_amd64.tar.gz actionlint
+gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' --pattern '*_checksums.txt' v1.17.0
+gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz
+sha256sum --check --ignore-missing actionlint_1.17.0_checksums.txt
+tar -xzf actionlint_1.17.0_linux_amd64.tar.gz actionlint
 ./actionlint -version
 ```
 
@@ -365,6 +365,14 @@ findings by severity). Since 2026-09-22 it runs grype with `--config .grype.yaml
 path-filtered, so it is not a required check (see "Automation closure,
 2026-09-22").
 
+Update 2026-09-28: `practice-references-freshness.yml` (Thursdays 06:41 UTC, plus
+manual dispatch) runs `tools/sota-convergence/practice_references.py` over
+`catalogs/foundation/practice-references.json`. It reports archived, stale (no
+default-branch commit in 90 days), renamed or missing repositories and
+default-branch commits since each pin, and never changes a pin. It is not a
+required check; it fails only when the checker's offline tests fail or the
+catalog is malformed, including a decision record that does not exist.
+
 ## Secret and supply-chain scanning, 2026-09-22
 
 `validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified
@@ -492,6 +500,77 @@ Edit them in place:
 ```sh
 gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23829417 --input .github/tag-ruleset.json
 gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23859358 --input .github/tag-creation-ruleset.json
+```
+
+### Agent branch ruleset (2026-09-28)
+
+`.github/agent-branch-ruleset.json` ("Agent branches: no history rewrite") applies
+`non_fast_forward` with no bypass to `refs/heads/openhands/*` and
+`refs/heads/openhands/**/*`. These are the branches the host-local OpenHands
+resolver pushes, one per issue. The driver pushes with the owner's `gh` login, so
+a bypass for the admin role or for the owner's account would free it too. (A bypass
+granted only to a separate GitHub App would not.) The rule therefore has no bypass
+at all. It enforces server-side what the upstream OpenHands resolver does
+client-side, opening numbered branches instead of force-pushing
+([OpenHands/extensions@bea7a20c](https://github.com/OpenHands/extensions/tree/bea7a20c)
+`github-issue-to-pr` `scripts/main.py` L449-463).
+
+Rule patterns use `fnmatch` with `FNM_PATHNAME`, where `*` does not cross `/`
+([creating rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository),
+fetched 2026-09-28). There, `**/` may match zero directories, so
+`refs/heads/openhands/**/*` alone should also cover single-level names; GitHub's
+docs describe `releases/**/*` the same way. The single-level pattern is kept as an
+explicit, harmless duplicate.
+
+The ruleset leaves three things alone:
+- **Branch deletion.** `delete_branch_on_merge` is on, and a deletion rule would
+  also block post-merge auto-delete and the owner's cleanup
+  ([automatic deletion](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-the-automatic-deletion-of-branches)).
+  An admin-bypass deletion rule would protect nothing, because the driver acts as
+  the admin. The driver therefore closes delete-and-recreate on its own side: no ref
+  DELETE, no `--delete` and no `:ref` refspec.
+- **Main.** Ruleset 23739774 already requires checks, squash-only merges, linear
+  history and thread resolution, with no bypass. An approval rule would bind the
+  owner and the driver identically, because they are the same identity.
+- **Never-merge, no-ready, no-tag and no-workflow-edit.** These stay client-side
+  while the driver uses the owner's login.
+
+Overturn it in either of these cases:
+- a receipt shows the driver deleting or recreating an `openhands/*` ref: add
+  `{"type": "deletion"}` without bypass. That rule also blocks the owner's manual
+  deletion
+  ([restrict deletions](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#restrict-deletions)),
+  so merged `openhands/*` branches then stay until a cleanup window. In that window,
+  PUT the ruleset with `enforcement: "disabled"`, delete the branches, then restore
+  `active`;
+- any client-side limit above must hold server-side: move the driver to a dedicated
+  GitHub App identity without the `workflows` permission.
+
+**Applied 2026-09-28 as ruleset 24132241.**
+- The POST returned `enforcement: active`, no bypass actors, `non_fast_forward`
+  only, and both patterns. `GET .../rulesets/24132241` matches the committed file
+  field by field (name, target, enforcement, bypass actors, conditions, rules).
+- `GET .../rules/branches/openhands/issue-1` and
+  `GET .../rules/branches/openhands/nested/issue-1` each list `non_fast_forward`
+  (ruleset 24132241). Both were `[]` before.
+- Behaviour check with the owner login:
+  1. Pushed probe branch `openhands/ruleset-probe-20260928` at `9b874acc`.
+  2. A `--force-with-lease` rewrite to a sibling commit was refused with
+     `GH013: Repository rule violations ... Cannot force-push to this branch`, and
+     the branch stayed at `9b874acc`.
+  3. Deleting the probe branch succeeded, leaving no `openhands/*` refs.
+- No `push`-event workflow runs on these branches, because every `push:` trigger
+  names `main` or `v*` tags, so the probe, which had no pull request, started
+  none. Once a pull request is open from an `openhands/*` branch, each push
+  triggers `pull_request` `synchronize` runs (`validate.yml`, `token-report.yml`)
+  as it would for any branch
+  ([pull_request events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request)).
+
+Edit it in place:
+
+```sh
+gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/24132241 --input .github/agent-branch-ruleset.json
+gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/openhands/issue-1
 ```
 
 ## Recorded decisions, 2026-09-22
@@ -907,9 +986,11 @@ one instead of overlapping at all -- keyed on whether the run is a manual
 silently replace a pending manual request in the same queue slot (GitHub's
 default concurrency queue holds one pending run per group, and a newly
 queued run cancels/replaces it; the `queue: max` property that allows up to
-100 queued runs instead is rejected by this repository's pinned actionlint
-1.7.12, which does not yet recognize that key -- see
-[the decision record](decisions/2026-09-23-bot-pr-dispatch.md)). Two runs
+100 queued runs instead was not used because the actionlint pinned on 2026-09-23,
+rhysd/actionlint 1.7.12, rejected that key -- see
+[the decision record](decisions/2026-09-23-bot-pr-dispatch.md); kjanat/actionlint
+1.17.0, pinned since 2026-09-28, accepts it, and re-adopting it is a separate
+change). Two runs
 *within* the same category can still replace each other's pending slot
 (an accepted, lower-stakes loss: the later same-category request already
 supersedes the earlier one), and a manual and a scheduled run can therefore

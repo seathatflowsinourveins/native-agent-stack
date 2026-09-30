@@ -6,6 +6,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
@@ -18,6 +19,18 @@ except ImportError:
     from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
 
 _HERMETIC_TOKEN = None
+
+
+class RecoveryClock:
+    """Controlled recovery time; the event loop and hang watchdog keep real time."""
+    def __init__(self):
+        self.now = 0.0
+        self.started = time.monotonic()
+
+    def monotonic(self):
+        if time.monotonic() - self.started > 10:
+            raise AssertionError("recovery hang watchdog expired")
+        return self.now
 
 
 def setUpModule():
@@ -148,6 +161,89 @@ class FakePort:
     async def stop(self):
         self.stopped += 1
         self.ready = False
+
+
+class TwoSymbolPort(FakePort):
+    """FakePort holding PFSA and SRZN (#215). A symbol in ``stale`` publishes a 30 s old
+    quote; ``freshen_on_submit`` makes every symbol quote fresh from the first exit on.
+    With ``fill_delay`` an exit is accepted unfilled and fills that many seconds later, just
+    after every stale symbol freshens (so it freshens during the recovery's fill wait)."""
+    SYMBOLS = ("PFSA", "SRZN")
+    PRICES = {"PFSA": ("10.00", "10.01"), "SRZN": ("20.00", "20.01")}
+
+    def __init__(self, controller, stale=(), freshen_on_submit=False, fill_delay=None):
+        super().__init__(controller)
+        self.stale, self.freshen_on_submit, self.fill_delay = set(stale), freshen_on_submit, fill_delay
+        self.held = {symbol: Decimal(0) for symbol in self.SYMBOLS}
+        self.pending_fills = []
+
+    def fill(self, row):
+        qty, price = Decimal(row["qty"]), Decimal(row["limit_price"])
+        self.held[row["symbol"]] -= qty
+        self.cash += qty * price
+        row = dict(row, filled_qty=str(qty), filled_avg_price=str(price), status="filled",
+                   updated_at_ns=time.time_ns())
+        self.rows[row["client_order_id"]] = row
+        return row
+
+    async def delayed_fill(self, row):
+        await asyncio.sleep(self.fill_delay)
+        self.stale.clear()
+        self.publish_quote()
+        row = self.fill(row)
+        self.c.observe(row)
+        self.on_order(row)
+
+    async def stop(self):
+        for task in self.pending_fills:
+            task.cancel()
+        await super().stop()
+
+    def publish_quote(self):
+        for symbol in self.SYMBOLS:
+            bid, ask = self.PRICES[symbol]
+            self.on_quote({"symbol": symbol, "bid": bid, "ask": ask,
+                           "ts_ns": int((self.c.clock() - (30 if symbol in self.stale else 0)) * 1e9)})
+
+    async def snapshot(self):
+        self.snapshots += 1
+        for row in self.rows.values():
+            self.c.observe(row)
+        return {"complete": True, "account": {"cash": str(self.cash)}, "orders": list(self.rows.values()),
+                "positions": [{"symbol": s, "qty": str(q)} for s, q in self.held.items() if q]}
+
+    async def submit(self, payload):
+        assert payload["side"] == "sell", "recovery must never buy"
+        if self.freshen_on_submit:
+            self.stale.clear()
+        self.publish_quote()
+        symbol, now = payload["symbol"], self.c.clock()
+        intent = self.c.ledger.reserve_intent(payload["client_order_id"], symbol, "sell", payload["qty"],
+                    payload["limit_price"], quote=self.c.quotes[symbol], now=now,
+                    market_open=self.c.market_open, session_close=self.c.close)
+        if hasattr(self, "before_request"):
+            try:
+                await self.before_request("submit", client_id=intent.client_id)
+            except Exception:
+                # The native transport sanitizes a failed authorization into
+                # a definitive pre-wire refusal (transport.py's HTTP guard).
+                class SubmissionNotSent(RuntimeError):
+                    not_sent = True
+                raise SubmissionNotSent("submission prevented before HTTP request") from None
+        elif self.c.ledger.request_budget(now, "submit", client_id=intent.client_id):
+            raise SafetyError("fake_budget_exhausted")
+        self.submissions.append(payload)
+        self.adopted[intent.client_id] = payload
+        row = {**payload, "id": "broker-" + intent.client_id, "filled_qty": "0",
+               "filled_avg_price": None, "status": "new", "updated_at_ns": time.time_ns()}
+        self.rows[intent.client_id] = row
+        if self.fill_delay is None:
+            row = self.fill(row)
+        else:
+            self.pending_fills.append(asyncio.get_running_loop().create_task(self.delayed_fill(row)))
+        self.c.observe(row)
+        self.on_order(row)
+        return row
 
 
 class RecoveryTests(unittest.TestCase):
@@ -403,11 +499,18 @@ class RecoveryTests(unittest.TestCase):
     def test_deadline_stops_without_claiming_snapshot_or_flatness(self):
         self.config["cleanup_seconds"] = 1  # the deadline under test: min(1, ledger's 3) = 1 s
         self.original_buy()
-        self.port.mode = "slow_snapshot"
-        began = time.monotonic()
-        result = self.recover()
-        self.assertLess(time.monotonic() - began, 1.5)
+        clock = RecoveryClock()
+        start = self.port.start
+
+        async def delayed_start(*callbacks):
+            await start(*callbacks)
+            clock.now = 1.25
+
+        self.port.start = delayed_start
+        with patch("recovery.time", clock):
+            result = self.recover()
         self.assertIn("recovery_deadline_reached", result["errors"])
+        self.assertEqual(self.port.snapshots, 0)
         self.assertEqual(result["order_deadline_seconds"], 1)
         self.assertFalse(result["flat"])
         self.assertIsNone(result["reconciliation"])
@@ -417,6 +520,200 @@ class RecoveryTests(unittest.TestCase):
         self.controller.stop = True
         result = self.recover()
         self.assertEqual(result["status"], "passed")
+
+
+class PerSymbolRecoveryExits(unittest.TestCase):
+    """#215: a held symbol without a fresh quote waits alone. Every other held symbol exits
+    on its own fresh quote, and the waiting one is exited once it quotes, until the recovery
+    deadline; a residual left for want of a quote is named in stale_symbols."""
+
+    setUp, tearDown, recover = RecoveryTests.setUp, RecoveryTests.tearDown, RecoveryTests.recover
+
+    def recover_with_updates(self, clock, updates):
+        self.controller.clock = lambda: self.start + 1000
+
+        async def exercise():
+            task = asyncio.create_task(updates())
+            try:
+                # Real time is only a generous hang watchdog. Deadline decisions
+                # use the separately controlled recovery clock.
+                return await asyncio.wait_for(
+                    recover(self.controller, self.meta, self.config, reconcile_fn=proof), 10)
+            finally:
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
+
+        with patch("recovery.time", clock):
+            result = asyncio.run(exercise())
+        self.assertEqual(self.port.stopped, 1)
+        return result
+
+    def hold(self, port):
+        self.port = self.controller.port = port
+        for symbol in port.SYMBOLS:
+            cid = "entry-" + symbol.lower()
+            self.ledger.reserve_intent(cid, symbol, "buy", "1", "10.01", quote=Quote(symbol, "10", "10.01", self.start),
+                                       now=self.start, market_open=True, session_close=self.controller.close)
+            self.assertEqual(self.ledger.request_budget(self.start, "submit", client_id=cid), 0)
+            row = {"client_order_id": cid, "id": "broker-" + cid, "symbol": symbol, "side": "buy", "qty": "1",
+                   "limit_price": "10.01", "filled_qty": "1", "filled_avg_price": "10.01", "status": "filled",
+                   "updated_at_ns": time.time_ns()}
+            port.rows[cid] = row
+            port.held[symbol] += 1
+            port.cash -= Decimal("10.01")
+            self.controller.observe(row)
+
+    def test_a_stale_symbol_does_not_hold_back_a_fresh_symbols_exit(self):
+        self.hold(TwoSymbolPort(self.controller, stale={"PFSA"}))
+        result = self.recover()
+        self.assertEqual([p["symbol"] for p in self.port.submissions], ["SRZN"])
+        self.assertEqual([p["limit_price"] for p in self.port.submissions], ["19.98"])
+        self.assertEqual(result["errors"], ["recovery_quote_not_fresh"])
+        self.assertEqual(result["stale_symbols"], ["PFSA"])
+        self.assertEqual(result["positions"], [{"symbol": "PFSA", "qty": "1"}])
+        self.assertEqual((result["status"], result["flat"]), ("needs_attention", False))
+
+    def test_position_preparation_cannot_spend_the_whole_exit_budget(self):
+        self.config["order_timeout_seconds"] = 0.4
+        clock = RecoveryClock()
+        self.controller.clock = lambda: self.start + 1000
+        self.hold(TwoSymbolPort(self.controller))
+        positions = self.ledger.positions
+
+        class DelayedPositions(dict):
+            def __getitem__(self, symbol):
+                # Position preparation uses 2.25 s of a 3 s deadline: 0.75 s
+                # remains, below the required 0.8 s fill-and-cancel budget.
+                clock.now = 2.25
+                return super().__getitem__(symbol)
+
+        with patch("recovery.time", clock), patch.object(
+                self.ledger, "positions", side_effect=lambda: DelayedPositions(positions())):
+            result = self.recover()
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(result["exit_attempt_client_ids"], [])
+        self.assertEqual(result["errors"], ["recovery_deadline_reached"])
+
+    def delayed_authorization(self, stale=()):
+        self.config["order_timeout_seconds"] = 0.4
+        clock = RecoveryClock()
+        self.controller.clock = lambda: self.start + 1000
+        self.hold(TwoSymbolPort(self.controller, stale=stale))
+
+        async def authorize(kind, client_id=None):
+            self.assertEqual(kind, "submit")
+            self.assertEqual(self.ledger.request_budget(
+                self.controller.clock(), kind, client_id=client_id), 0)
+            await asyncio.sleep(0)
+            clock.now = 2.25
+
+        self.port.before_request = authorize
+        with patch("recovery.time", clock):
+            result = self.recover()
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(result["unresolved_orders"], [])
+        self.assertEqual(self.ledger.intents()[-1].status, "not_sent")
+        self.assertTrue(self.ledger.intents()[-1].submit_attempted)
+        self.assertIs(self.port.before_request, authorize)
+        return result
+
+    def test_pre_wire_authorization_cannot_spend_the_whole_exit_budget(self):
+        result = self.delayed_authorization()
+        self.assertEqual(result["errors"], ["recovery_deadline_reached"])
+
+    def test_pre_wire_authorization_preserves_the_unquoted_error(self):
+        result = self.delayed_authorization(stale={"PFSA"})
+        self.assertEqual(result["errors"], ["recovery_quote_not_fresh"])
+        self.assertEqual(result["stale_symbols"], ["PFSA"])
+
+    def test_a_stale_symbol_is_exited_once_it_quotes_before_the_deadline(self):
+        self.hold(TwoSymbolPort(self.controller, stale={"PFSA", "SRZN"}))
+        clock = RecoveryClock()
+
+        async def quotes():
+            while not self.port.ready:
+                await asyncio.sleep(0)
+            clock.now = 0.25
+            self.port.stale.remove("SRZN")
+            self.port.publish_quote()
+            while not self.port.submissions:
+                await asyncio.sleep(0)
+            clock.now = 0.5
+            self.port.stale.clear()
+            self.port.publish_quote()
+
+        result = self.recover_with_updates(clock, quotes)
+        self.assertEqual([(p["symbol"], p["limit_price"]) for p in self.port.submissions],
+                         [("SRZN", "19.98"), ("PFSA", "9.98")])
+        self.assertEqual((result["status"], result["flat"], result["errors"]), ("passed", True, []))
+        self.assertEqual(result["stale_symbols"], [])
+
+    def test_every_symbol_stale_is_retried_until_the_deadline_and_never_sent(self):
+        self.hold(TwoSymbolPort(self.controller, stale={"PFSA", "SRZN"}))
+        clock = RecoveryClock()
+
+        async def stale_quotes():
+            while not self.port.ready:
+                await asyncio.sleep(0)
+            for elapsed in (0.5, 1.5, 2.5, 2.95):
+                clock.now = elapsed
+                self.port.publish_quote()
+                await asyncio.sleep(0)
+
+        result = self.recover_with_updates(clock, stale_quotes)
+        self.assertEqual(clock.now, 2.95)  # retries past one 1 s quote wait
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(result["errors"], ["recovery_quote_not_fresh"])
+        self.assertEqual(result["stale_symbols"], ["PFSA", "SRZN"])
+
+    def test_a_quote_too_late_for_a_whole_exit_does_not_start_one(self):
+        # A delayed quote callback resumes the waiter after its cutoff. Even a
+        # fresh quote must not start an exit with less than its whole budget.
+        self.config["order_timeout_seconds"] = 1.0      # a whole exit needs 2 s of the 3 s deadline
+        port = TwoSymbolPort(self.controller, stale={"PFSA", "SRZN"})
+        self.hold(port)
+
+        clock = RecoveryClock()
+
+        async def late_quote():
+            while not port.ready:
+                await asyncio.sleep(0)
+            clock.now = 1.25  # the latest whole-exit start was 1.0
+            port.stale.clear()
+            port.publish_quote()
+
+        result = self.recover_with_updates(clock, late_quote)
+        self.assertEqual(port.submissions, [])
+        self.assertEqual(result["errors"], ["recovery_deadline_reached"])
+
+    def test_no_exit_starts_once_a_whole_exit_no_longer_fits(self):
+        # A whole exit (fill wait plus a cancel's wait) needs 2.4 s of the 3 s deadline, so
+        # no exit may start after 0.6 s. SRZN's exit starts before that (PFSA is stale) and
+        # fills 0.9 s later, past that point; PFSA freshens during that fill wait. No exit
+        # starts for PFSA although it now quotes fresh: bounded() could cut it after its POST.
+        self.config["order_timeout_seconds"] = 1.2
+        self.hold(TwoSymbolPort(self.controller, stale={"PFSA"}, fill_delay=0.9))
+        clock = RecoveryClock()
+        self.controller.clock = lambda: self.start + 1000
+
+        async def delayed_fill(row):
+            clock.now = 0.9
+            self.port.stale.clear()
+            self.port.publish_quote()
+            row = self.port.fill(row)
+            self.controller.observe(row)
+            self.port.on_order(row)
+
+        self.port.delayed_fill = delayed_fill
+        with patch("recovery.time", clock):
+            result = self.recover()
+        self.assertEqual([p["symbol"] for p in self.port.submissions], ["SRZN"])
+        self.assertEqual(len(result["exit_attempt_client_ids"]), 1)
+        self.assertEqual(self.port.cancelled, [])
+        self.assertEqual(result["errors"], ["recovery_deadline_reached"])
+        self.assertEqual(result["stale_symbols"], [])
+        self.assertEqual(result["positions"], [{"symbol": "PFSA", "qty": "1"}])
+        self.assertEqual((result["status"], result["flat"]), ("needs_attention", False))
 
 
 if __name__ == "__main__":

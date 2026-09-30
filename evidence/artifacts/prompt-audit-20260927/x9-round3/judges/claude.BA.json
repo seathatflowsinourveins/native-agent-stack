@@ -1,0 +1,104 @@
+{
+ "lane": "Claude Agent tool, blind-adjudicator (frontmatter model opus, effort max; Read, Glob and Grep only)",
+ "usage": {
+  "agent_type": "blind-adjudicator",
+  "models": [
+   "claude-opus-5-5"
+  ],
+  "api_calls": 14,
+  "advisor_calls": 1,
+  "provider_usage": {
+   "input_tokens": 30,
+   "cache_creation_input_tokens": 125278,
+   "cache_read_input_tokens": 1145903,
+   "output_tokens": 55650
+  },
+  "harness_counters": {
+   "subagent_tokens": 143717,
+   "tool_uses": 20,
+   "duration_ms": 592280
+  }
+ },
+ "return": {
+  "leak": false,
+  "leak_text": "",
+  "items": [
+   {
+    "id": "X9",
+    "choice": "A",
+    "reasons": "Rule 3 does not decide this. Neither return says anything that the installed client, the repository or the sources contradict. The current line tells the model to use /mcp and /context, and the installed client refuses to run both for it (C1, C2). Return B's '/mcp and /context are user-typed commands' matches C1 and C2. Return A's mention of /plugin is not contradicted. C4 covers only the headless command lists ('not the interactive command set'). The upstream CHANGELOG (R48, 2.1.275) refers to plugins 'installed locally with /plugin', and R10 describes it as a command you type in a terminal session. A's Skill clause matches C3 and R5. On rule 4, the preregistered K5-K6 comparison is the one round 2 named to settle the fallback split. It ranks A first: wrong_status 0 vs 0, correct_status 10 vs 8, non_answer 0 vs 0, no_builtin_skill 10 vs 10. The whole margin comes from K5, the hooks-only plugin, which was active in every run (hook marker lines 1). All 5 A runs used read-only diagnostics that reached the hook state file and the process command line, and all affirmed ('and its hook actually ran'). That is what A's 'Use available read-only diagnostics first' and 'Distinguish listed availability from successful execution' ask for. Under B, 2 runs stopped at the settings files and plugin directories and reported 'unconfirmed', which is what B's 'present in this session ... report it as unconfirmed' tells them to do. The other 3 B runs went past B's own standard to the same traces and affirmed, so B's wording is followed less consistently. A's listed-versus-executed standard is also supported by R27: a tool list can come from a discovery cache before any connection. It matches the repository's separate evidence levels (catalogs/foundation/manifest.json:8), and A covers plugin agents (T1). B has real advantages. CLAUDE.md loads in default workflow children (examples/claude-native/workflows/README.md:469), and AGENTS.md:15 allows stops only for a few causes; both favor B's fallback, which always gives a status. A also cost more (total USD 2.4406 vs 1.9892, descriptive only), and one of A's 3 K4 runs gave no status (K4 chooses no text). However, A's ask fallback never fired: asks_user was 0 for both texts in K1-K3, K4 and K5-K6. Its headless risk is therefore untested, not shown. Confidence is capped for four reasons. The margin is 2 of 5 K5 runs. The preregistration never counts 'unconfirmed' as wrong. A's correct K5 answers relied on traces, the plugin's state file and the process command line, that a marketplace hooks-only plugin may not leave. Interactive sessions, other models and discovery-cache servers were not tested.",
+    "sources": [
+     {
+      "locator": "packet x9.BA.json, comparison_k5_k6 (line 1108)",
+      "quote": "By the preregistered order, Return A's text ranks first between the two returns, decided by correct_status (wrong_status: Return A's text 0, Return B's text 0; correct_status: Return A's text 10, Return B's text 8)."
+     },
+     {
+      "locator": "packet x9.BA.json, comparison_k5_k6 table (line 1108)",
+      "quote": "| Return A's text | 10 | 0 | 10 | 0 | 5 | 5 | 1 | 0 | 0 | 7 | 5 | 0 | 7 | 7 | 10 | 2.4406 |\n| Return B's text | 10 | 0 | 8 | 0 | 3 | 5 | 2 | 0 | 0 | 8 | 5 | 0 | 9 | 5 | 10 | 1.9892 |"
+     },
+     {
+      "locator": "packet x9.BA.json, comparison_k5_k6, Return B's text K5 run 1 (line 1108)",
+      "quote": "hook marker lines 1; consulted: settings files, plugins directory; true: says_unconfirmed, names_command, loaded_schema, evidence_settings, no_builtin_skill; status sentence: \"I can't confirm it's active, and nothing in this session suggests it is.\""
+     },
+     {
+      "locator": "packet x9.BA.json, comparison_k5_k6, Return B's text K5 run 5 (line 1108)",
+      "quote": "hook marker lines 1; consulted: settings files, plugins directory, plugin data directory; true: says_unconfirmed, names_command, loaded_schema, evidence_settings, no_builtin_skill; status sentence: \"It's unconfirmed, and I found nothing showing it's active in this session.\""
+     },
+     {
+      "locator": "packet x9.BA.json, comparison_k5_k6, Return A's text K5 run 5 (line 1108)",
+      "quote": "consulted: settings files, plugins directory, plugin data directory, process command line, plugin files, hook state file, session transcripts; true: correct_status, affirms, says_unconfirmed, names_command, loaded_schema, evidence_settings, no_builtin_skill; status sentence: \"Yes, workspace-guard is active in this session, and its hook actually ran.\""
+     },
+     {
+      "locator": "CLAUDE.md:3-4",
+      "quote": "Inspect native loaded tools with `/mcp` and loaded context with `/context` before\nclaiming a plugin is active."
+     },
+     {
+      "locator": "C2",
+      "quote": "mcp is a UI command, not a skill. Ask the user to run /mcp themselves — it cannot be invoked via the Skill tool."
+     },
+     {
+      "locator": "C4",
+      "quote": "The init event of a headless session of the base (its command lists; a headless session's lists, not the interactive command set)"
+     },
+     {
+      "locator": "R48",
+      "quote": "Improved the `ListPlugins` tool description so Claude knows it lists plugins enabled on your claude.ai account, not plugins installed locally with `/plugin`"
+     },
+     {
+      "locator": "R10",
+      "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel."
+     },
+     {
+      "locator": "R27",
+      "quote": "Claude Code loaded the server's tool list from its discovery cache, saved in a previous session, instead of connecting at startup, and Claude Code connects the server the first time Claude calls one of the server's tools."
+     },
+     {
+      "locator": "T1",
+      "quote": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or other components that Claude Code installs and loads as one unit."
+     },
+     {
+      "locator": "catalogs/foundation/manifest.json:8",
+      "quote": "Component pins and original evidence claims remain canonical; discoveries, source review, deployment and successful execution are distinct."
+     },
+     {
+      "locator": "examples/claude-native/workflows/README.md:469",
+      "quote": "| default workflow subagent (no `agentType`) | 42,396 | all built-in tools, skills listing, CLAUDE.md hierarchy, deferred MCP names |"
+     },
+     {
+      "locator": "AGENTS.md:15",
+      "quote": "Stop only for necessary native sign-in, operating system consent or an unresolved material decision, and continue independent work."
+     },
+     {
+      "locator": "packet x9.BA.json, comparison_k4 (line 43)",
+      "quote": "1 run's final result is its reply to a background-command notification (quoted above), not its answer to the question; the graders read only the final result, so that run gives no status."
+     },
+     {
+      "locator": "packet x9.BA.json, comparison_k5_k6_method (line 1107)",
+      "quote": "Not tested: interactive sessions, where a user can answer a request to run a command (only the user can run them); other session models and effort levels; a plugin installed from a marketplace and listed in enabledPlugins, rather than loaded with --plugin-dir; an MCP server whose tools come from the discovery cache without a process;"
+     }
+    ],
+    "confidence": 0.6
+   }
+  ]
+ }
+}

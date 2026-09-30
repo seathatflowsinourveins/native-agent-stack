@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "id": "claude-max-default-effort-20260929",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "Seventeen headless probes, four interactive terminal cases run through a login shell after the host launcher was replaced by the repository-generated one, the launcher's repository tests and the installed binary's settings schema, all on Claude Code 2.1.284 and each read from the model and effort the client recorded in its own transcript, found that: (1) with the host's saved xhigh per-model levels and ultracode true, a Sonnet 5.5 and an Opus 5.5 session ran at xhigh, and --effort max ran both at max with the Ultracode reminder present; (2) in a --effort max session a Workflow stage naming no effort and an unnamed subagent ran at max, a stage naming effort low ran at low and a subagent whose definition says medium ran at medium, whereas with CLAUDE_CODE_EFFORT_LEVEL=max supplied through the --settings env layer the low stage and the medium subagent both ran at max and the variable also overrode an explicit --effort low; (3) --effort max with ultracode false ran at max with the reminder absent and its Workflow stages kept their own efforts; (4) the binary's settings schema lists only low, medium, high and xhigh for effortLevel and modelSettings.<model>.effortLevel, so a saved max is dropped, and its Ultracode gate reads the ultracode setting or an ultracode effort choice, with no effort term; (5) an interactive Sonnet 5.5 session started through a login shell with the installed launcher ran at max, ran at xhigh after /effort xhigh, ran at xhigh when launched with an explicit --effort xhigh, and claude -p inside a terminal ran at xhigh (the launcher went from 165 bytes to 1,810 bytes, through a first 911-byte version that a cross-family review sent back for repair); and (6) --effort max on Haiku 4.5 completed with exit 0 and empty stderr and no effort field was recorded for either Haiku run.",
+  "limitations": [
+    "Local observation of one workstation and one client version (2.1.284); not a provider ledger, and the recorded effort field is the client's own per-message record, not an API-side confirmation.",
+    "The headless probes are one-turn sessions in fresh scratch directories that read the host's user settings (shape only: ultracode true, a top-level effortLevel of xhigh, and per-model levels of xhigh for Sonnet 5.5 and Opus 5.5); other settings would change the baselines.",
+    "The environment-variable route was supplied through the --settings flag's env block (cases E1 to E4), not through a shell export or the user settings file, and the documented reapplication of settings env values to running sessions was not probed.",
+    "For the three Workflow cases the Workflow tool result is only a launch receipt; execution is shown by the two child transcripts (attributed by the stage token in each child's first message, never by session id or file order), the workflow journal and the completion notification. The Ultracode reminder is matched as the full phrase 'Ultracode is on: optimize' and is an indicator, not proof of orchestration; orchestration was exercised only where the prompt ordered a Workflow launch.",
+    "Haiku 4.5 rows carry no effort field at all (the client marks per-turn effort inactive), so the transcript cannot show what became of --effort max on that model.",
+    "Each interactive case is one Sonnet 5.5 session driven through tmux with the workspace-trust dialog answered yes for a scratch directory (one entry added to the client's trust state); the /effort xhigh command re-saved the user settings file with identical bytes (its mtime moved, its sha256 did not). A first 911-byte version of the launcher went through the same four cases before a cross-family review sent it back for repair; those runs are not part of this receipt, and a later pre-flight of the repaired launcher lost two of its rows to a harness defect (a leftover transcript satisfied a reply check) and is not used either.",
+    "Not covered: the VS Code extension, the desktop app and the web client, which do not go through the launcher; a host whose bin directory is ~/.local/bin, where no launcher is written; macOS (not run); and the Windows Terminal profile itself (the login-shell route it takes was exercised through tmux).",
+    "An independent stack-verifier re-derived all seventeen headless rows from the raw transcripts with its own extraction code (17 of 17 matched); that verdict is recorded by the coordinator, not by a script in this receipt.",
+    "The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every row given the results files they write, and scratch paths and session identifiers are replaced in them.",
+    "Nothing here compares answer quality across effort levels; the vendor and third-party effort comparisons are cited in docs/decisions/2026-09-29-max-default-effort.md, not measured here."
+  ],
+  "evidence_class": "independent observation: native Claude Code 2.1.284 headless and interactive sessions on this host, with the model and effort recorded per assistant message in each transcript, plus repository unit tests and a static read of the installed binary's settings schema",
+  "recorded_at_utc": "2026-09-29T02:22:50Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the running user's Claude Code user settings (shape only) and the host's claude launcher"
+  },
+  "data": {
+    "client_version": "2.1.284 (Claude Code), recorded in every transcript read",
+    "counting": "assistant message ids are counted once (a message spans several transcript rows); children are attributed by stage token",
+    "headless_probes": [
+      {
+        "case": "C1",
+        "probe": "C1-sonnet-baseline",
+        "arguments": "--model sonnet",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "C2",
+        "probe": "C2-opus-baseline",
+        "arguments": "--model opus",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort_main": "xhigh",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "C3",
+        "probe": "C3-sonnet-max-ultracode-off",
+        "arguments": "--model sonnet --effort max --settings '{\"ultracode\":false}'",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 0,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "C4",
+        "probe": "C4-sonnet-max-ultracode-off-workflow",
+        "arguments": "--model sonnet --effort max --settings '{\"ultracode\":false}'",
+        "task": "Workflow tool, two stage agents: one names no effort, one names effort low",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 0,
+        "tool_calls_main": {
+          "Workflow": 1
+        },
+        "child_recorded_effort_by_stage_token": {
+          "STAGE-NONE": "max",
+          "STAGE-LOW": "low"
+        },
+        "session_result": "WORKFLOW-DONE {\"a\":\"STAGE-NONE-OK\",\"b\":\"STAGE-LOW-OK\"}",
+        "run_utc": "2026-09-29T01:22Z to 2026-09-29T01:23Z"
+      },
+      {
+        "case": "F1",
+        "probe": "F1-sonnet-max",
+        "arguments": "--model sonnet --effort max",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "F2",
+        "probe": "F2-opus-max",
+        "arguments": "--model opus --effort max",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-opus-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "F3",
+        "probe": "F3-sonnet-max-then-low",
+        "arguments": "--model sonnet --effort max --effort low",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "low",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "F4",
+        "probe": "F4-sonnet-low-then-max",
+        "arguments": "--model sonnet --effort low --effort max",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "F5",
+        "probe": "F5-sonnet-max-workflow",
+        "arguments": "--model sonnet --effort max",
+        "task": "Workflow tool, two stage agents: one names no effort, one names effort low",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {
+          "Workflow": 1
+        },
+        "child_recorded_effort_by_stage_token": {
+          "STAGE-LOW": "low",
+          "STAGE-NONE": "max"
+        },
+        "session_result": "WORKFLOW-DONE {\"a\":\"STAGE-NONE-OK\",\"b\":\"STAGE-LOW-OK\"}",
+        "run_utc": "2026-09-29T01:22Z to 2026-09-29T01:23Z"
+      },
+      {
+        "case": "F6",
+        "probe": "F6-sonnet-max-agent-unnamed",
+        "arguments": "--model sonnet --effort max",
+        "task": "unnamed general-purpose Agent-tool subagent, model sonnet",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {
+          "Agent": 1
+        },
+        "child_recorded_effort_by_stage_token": {
+          "CHILD-UNNAMED": "max"
+        },
+        "session_result": "AGENT-DONE CHILD-OK",
+        "run_utc": "2026-09-29T01:23Z"
+      },
+      {
+        "case": "F7",
+        "probe": "F7-sonnet-max-agent-medium",
+        "arguments": "--model sonnet --effort max",
+        "task": "project agent whose frontmatter effort is medium",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {
+          "Agent": 1
+        },
+        "child_recorded_effort_by_stage_token": {
+          "CHILD-MEDIUM": "medium"
+        },
+        "session_result": "AGENT-DONE CHILD-OK",
+        "run_utc": "2026-09-29T01:23Z"
+      },
+      {
+        "case": "E1",
+        "probe": "E1-sonnet-envmax",
+        "arguments": "--model sonnet --settings '{\"env\":{\"CLAUDE_CODE_EFFORT_LEVEL\":\"max\"}}'",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "E2",
+        "probe": "E2-sonnet-envmax-workflow",
+        "arguments": "--model sonnet --settings '{\"env\":{\"CLAUDE_CODE_EFFORT_LEVEL\":\"max\"}}'",
+        "task": "Workflow tool, two stage agents: one names no effort, one names effort low",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {
+          "Workflow": 1
+        },
+        "child_recorded_effort_by_stage_token": {
+          "STAGE-NONE": "max",
+          "STAGE-LOW": "max"
+        },
+        "session_result": "WORKFLOW-DONE {\"a\":\"STAGE-NONE-OK\",\"b\":\"STAGE-LOW-OK\"}",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "E3",
+        "probe": "E3-sonnet-envmax-flag-low",
+        "arguments": "--model sonnet --effort low --settings '{\"env\":{\"CLAUDE_CODE_EFFORT_LEVEL\":\"max\"}}'",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "E4",
+        "probe": "E4-sonnet-envmax-agent-medium",
+        "arguments": "--model sonnet --settings '{\"env\":{\"CLAUDE_CODE_EFFORT_LEVEL\":\"max\"}}'",
+        "task": "project agent whose frontmatter effort is medium",
+        "resolved_model": "claude-sonnet-5-5",
+        "recorded_effort_main": "max",
+        "ultracode_reminder_lines": 1,
+        "tool_calls_main": {
+          "Agent": 1
+        },
+        "child_recorded_effort_by_stage_token": {
+          "CHILD-MEDIUM": "max"
+        },
+        "session_result": "AGENT-DONE CHILD-OK",
+        "run_utc": "2026-09-29T01:22Z"
+      },
+      {
+        "case": "H1",
+        "probe": "H1-haiku-max",
+        "arguments": "--model haiku --effort max",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-haiku-4-5-20251001",
+        "recorded_effort_main": "absent (the model takes no effort level)",
+        "ultracode_reminder_lines": 0,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:26Z"
+      },
+      {
+        "case": "H2",
+        "probe": "H2-haiku-baseline",
+        "arguments": "--model haiku",
+        "task": "one-turn reply, no tools",
+        "resolved_model": "claude-haiku-4-5-20251001",
+        "recorded_effort_main": "absent (the model takes no effort level)",
+        "ultracode_reminder_lines": 0,
+        "tool_calls_main": {},
+        "child_recorded_effort_by_stage_token": {},
+        "session_result": "PROBE-OK",
+        "run_utc": "2026-09-29T01:26Z"
+      }
+    ],
+    "interactive_installed_launcher": [
+      {
+        "case": "I1",
+        "launch": "claude --model sonnet (interactive, tmux, login shell)",
+        "recorded_effort": "max",
+        "reminder_lines": 1
+      },
+      {
+        "case": "I2",
+        "launch": "the I1 session after typing /effort xhigh",
+        "recorded_effort_after_command": "xhigh",
+        "recorded_efforts_in_order": [
+          "max",
+          "xhigh"
+        ]
+      },
+      {
+        "case": "I3",
+        "launch": "claude --model sonnet --effort xhigh (interactive)",
+        "recorded_effort": "xhigh",
+        "reminder_lines": 1
+      },
+      {
+        "case": "I4",
+        "launch": "claude -p <prompt> --model sonnet run inside a terminal",
+        "recorded_effort": "xhigh",
+        "reminder_lines": 1
+      }
+    ],
+    "binary_schema": {
+      "settings_schema_windows": [
+        "effortLevel:()=>z([\"low\",\"medium\",\"high\",\"xhigh\"]).optional().catch(void 0).describe(\"Persisted effort level for supported models.\")",
+        "u({effortLevel:z([\"low\",\"medium\",\"high\",\"xhigh\"]).optional().catch(void 0).describe(\"Persisted effort level for this model.\"),maxEff"
+      ],
+      "ultracode_gate_function_head": [
+        "function sKn(e){return Je().ultracode===!0||J$e(e)===\"ultracode\"}function B3(){l"
+      ],
+      "binary_sha256": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"
+    },
+    "repository_tests": {
+      "launcher_behavior_suite": {
+        "command": "python3 -m unittest tests.test_adoption_bootstrap.InteractiveEffortLauncherTests",
+        "exit": 0,
+        "tests": 3,
+        "skipped": 0,
+        "result_line": "OK"
+      },
+      "both_bootstrap_suites": {
+        "command": "python3 -m unittest tests.test_adoption_bootstrap tests.test_adoption_bootstrap_macos",
+        "exit": 0,
+        "tests": 241,
+        "skipped": 32,
+        "result_line": "OK (skipped=32)"
+      }
+    },
+    "host_launcher": {
+      "launcher_path": "~/.local/share/codex-ecosystem/bin/claude",
+      "mode": "0755",
+      "before_sha256": "22c2d5188183cea7e411db2010c5533cc409170633456e39a52e2a33f0f45d26",
+      "before_bytes": 165,
+      "first_applied_version_sha256": "7f642f9ce51098bf11f262da4b2478b2c1474350e04d6ff828c6f91843208a18",
+      "first_applied_version_bytes": 911,
+      "after_sha256": "f48eb13407391d73becb0848a7114d5662dc55dba4335b64bd0378b6210a2cd5",
+      "after_bytes": 1810,
+      "backups_kept_beside_it": true,
+      "native_binary_version_it_execs": "2.1.284",
+      "native_binary_reached_through": "~/.local/bin/claude"
+    }
+  },
+  "provenance": {
+    "command": "bash run_c.sh; bash run_f.sh; bash run_e.sh; bash run_h.sh (each writes results-<group>.tsv, one line per case); python3 gen_launcher.py <checkout> <dir>; python3 interactive_e2e.py preflight --launcher-dir <dir>; python3 host_apply_launcher.py <file> --apply; python3 interactive_e2e.py installed; python3 make_receipt_max.py <checkout>",
+    "script_sha256": {
+      "gen_launcher.py": "46c513d611075b0d7585a75baa593dd0925d08ddcf16d86b3bdbb0d8dac24133",
+      "host_apply_launcher.py": "67d6264d228b6794f455ae7714cf972a9c66a12dba77baf0e18c11c0fc36c4a5",
+      "interactive_e2e.py": "3323cb5400fea2cae521037e82c8ceee389317e511d2089c686f194514b570d6",
+      "lib.sh": "2f06bdc252ea83135792d33d532b03bf70c205eb5681d1a97c415e36d3b88b3e",
+      "make_receipt_max.py": "b0a5638dbf7ee4146f142e20ac2ded7cd84ca8310f397892625e20c7934bb286",
+      "read_probes.py": "05dd2ce3e332dda3a14a5b3f7dec175ab88ec54ddf2500d61e7842e72b129b2b",
+      "run_c.sh": "18b33d6af6ae12ea05763a46c5e0611c1c466686ca727ff4dff433a349ea7ee6",
+      "run_e.sh": "501f71a1d4b93799767408c3d819fe4dc0c36a036def76e2ab7735c3b58590ec",
+      "run_f.sh": "d72259f9bcd70e3ab9624df4f63812c897095033cb3b11782abcea641379c96a",
+      "run_h.sh": "2c8a63edeb476ad2f7d49bd3cf8135547f14bdc4f093d05bcc3144dd61c88015"
+    },
+    "scripts": {
+      "lib.sh": "#!/usr/bin/env bash\n# Probe library for the max-default-effort question on Claude Code 2.1.284.\n# One headless session per case, each in a fresh scratch directory, reading the host's real user settings\n# (ultracode true, saved xhigh per model) and nothing else written to host files. Method after the reference harness in\n# evidence/receipts/claude-model-effort-probes-20260929.json (provenance.scripts run.sh / extract_all.py).\nset -u\nBASE=\"${BASE:?BASE required}\"\nGROUP=\"${GROUP:?GROUP required}\"\nmkdir -p \"$BASE\"\n: > \"$BASE/results-$GROUP.tsv\"\n\nPROBE='Reply with exactly the text PROBE-OK and nothing else. Do not use any tools.'\n\nWF='Call the Workflow tool exactly once. Pass this as the script, unchanged:\n\nexport const meta = { name: \"effort-probe\", description: \"effort probe\" }\nconst a = await agent(\"STAGE-NONE: reply with exactly STAGE-NONE-OK and nothing else. Do not use tools.\", { label: \"stage-none\", model: \"sonnet\" })\nconst b = await agent(\"STAGE-LOW: reply with exactly STAGE-LOW-OK and nothing else. Do not use tools.\", { label: \"stage-low\", model: \"sonnet\", effort: \"low\" })\nreturn { a, b }\n\nAfter the Workflow tool returns, reply with exactly WORKFLOW-DONE followed by a space and the JSON it returned.'\n\nAGENT_UNNAMED='Use the Agent tool exactly once with subagent_type general-purpose, model sonnet and prompt \"CHILD-UNNAMED: reply with exactly CHILD-OK and nothing else\". Then reply with exactly AGENT-DONE followed by a space and the child answer.'\n\nAGENT_MEDIUM='Use the Agent tool exactly once with subagent_type scout-medium and prompt \"CHILD-MEDIUM: go\". Then reply with exactly AGENT-DONE followed by a space and the child answer.'\n\nMEDIUM_AGENT_SETUP='mkdir -p .claude/agents && printf \"%s\\n\" \"---\" \"name: scout-medium\" \"description: Probe agent whose frontmatter effort is medium\" \"model: sonnet\" \"effort: medium\" \"tools: Read\" \"---\" \"Reply with exactly CHILD-OK and nothing else.\" > .claude/agents/scout-medium.md'\n\nrun_case() {\n  local name=\"$1\" prompt=\"$2\" turns=\"$3\"; shift 3\n  local dir=\"$BASE/case-$name\"\n  rm -rf \"$dir\"; mkdir -p \"$dir\"\n  if [ -n \"${SETUP:-}\" ]; then ( cd \"$dir\" && bash -c \"$SETUP\" ); fi\n  ( cd \"$dir\" && timeout 1500 claude -p \"$prompt\" --max-turns \"$turns\" --output-format json \"$@\" \\\n      < /dev/null > \"$BASE/out-$name.json\" 2> \"$BASE/err-$name.txt\"; echo \"rc=$?\" > \"$BASE/rc-$name.txt\" )\n  echo \"$name $dir\" >> \"$BASE/results-$GROUP.tsv\"\n}\n",
+      "run_c.sh": "#!/usr/bin/env bash\n# Group C: baselines and negative controls (no flags; ultracode false with max; workflow tool with ultracode false).\nexport BASE=<scratch>\nexport GROUP=c\n. \"$BASE/lib.sh\"\nrun_case C1-sonnet-baseline \"$PROBE\" 2 --model sonnet\nrun_case C2-opus-baseline \"$PROBE\" 2 --model opus\nrun_case C3-sonnet-max-ultracode-off \"$PROBE\" 2 --model sonnet --effort max --settings '{\"ultracode\":false}'\nrun_case C4-sonnet-max-ultracode-off-workflow \"$WF\" 6 --model sonnet --effort max --settings '{\"ultracode\":false}'\necho done > \"$BASE/DONE-c\"\n",
+      "run_f.sh": "#!/usr/bin/env bash\n# Group F: the launcher-default candidate, i.e. --effort max as a launch flag under the host's real settings.\nexport BASE=<scratch>\nexport GROUP=f\n. \"$BASE/lib.sh\"\nrun_case F1-sonnet-max \"$PROBE\" 2 --model sonnet --effort max\nrun_case F2-opus-max \"$PROBE\" 2 --model opus --effort max\nrun_case F3-sonnet-max-then-low \"$PROBE\" 2 --model sonnet --effort max --effort low\nrun_case F4-sonnet-low-then-max \"$PROBE\" 2 --model sonnet --effort low --effort max\nrun_case F5-sonnet-max-workflow \"$WF\" 6 --model sonnet --effort max\nrun_case F6-sonnet-max-agent-unnamed \"$AGENT_UNNAMED\" 4 --model sonnet --effort max\nSETUP=\"$MEDIUM_AGENT_SETUP\" run_case F7-sonnet-max-agent-medium \"$AGENT_MEDIUM\" 4 --model sonnet --effort max\necho done > \"$BASE/DONE-f\"\n",
+      "run_e.sh": "#!/usr/bin/env bash\n# Group E: the documented env-var route, simulated through the --settings flag layer (nothing is written to any host file).\n# Recorded to correct the 2.1.281 premise (P1) with a 2.1.284 measurement; the route itself is not applied.\nexport BASE=<scratch>\nexport GROUP=e\n. \"$BASE/lib.sh\"\nENVMAX='{\"env\":{\"CLAUDE_CODE_EFFORT_LEVEL\":\"max\"}}'\nrun_case E1-sonnet-envmax \"$PROBE\" 2 --model sonnet --settings \"$ENVMAX\"\nrun_case E2-sonnet-envmax-workflow \"$WF\" 6 --model sonnet --settings \"$ENVMAX\"\nrun_case E3-sonnet-envmax-flag-low \"$PROBE\" 2 --model sonnet --effort low --settings \"$ENVMAX\"\nSETUP=\"$MEDIUM_AGENT_SETUP\" run_case E4-sonnet-envmax-agent-medium \"$AGENT_MEDIUM\" 4 --model sonnet --settings \"$ENVMAX\"\necho done > \"$BASE/DONE-e\"\n",
+      "run_h.sh": "#!/usr/bin/env bash\n# Group H: does an injected --effort max break a model that takes no effort level (Haiku 4.5)?\nexport BASE=<scratch>\nexport GROUP=h\n. \"$BASE/lib.sh\"\nrun_case H1-haiku-max \"$PROBE\" 2 --model haiku --effort max\nrun_case H2-haiku-baseline \"$PROBE\" 2 --model haiku\necho done > \"$BASE/DONE-h\"\n",
+      "read_probes.py": "#!/usr/bin/env python3\n\"\"\"Read the native transcripts of the headless probe cases: python3 read_probes.py results-f.tsv [results-c.tsv ...].\n\nMethod follows the reference extractor in evidence/receipts/claude-model-effort-probes-20260929.json (extract_all.py): each\nassistant message id is counted once (a message spans several rows); the recorded `effort` field is the client's own per-message\nrecord. Beyond the reference it also reports the Workflow / Agent tool calls and whether each returned a result, the session's\nown result text, and a first-user-message snippet for every child transcript so a child is identified by its prompt token.\n\"\"\"\nimport collections\nimport glob\nimport json\nimport os\nimport sys\n\nBASE = os.path.dirname(os.path.abspath(__file__))\nPROJECTS = os.path.expanduser(\"~/.claude/projects\")\n\n\ndef load_result(name):\n    path = os.path.join(BASE, \"out-%s.json\" % name)\n    try:\n        data = json.load(open(path))\n    except Exception as exc:  # noqa: BLE001\n        return {\"error\": \"unreadable out json: %s\" % exc}\n    if isinstance(data, list):\n        data = next((e for e in reversed(data) if isinstance(e, dict) and e.get(\"type\") == \"result\"), {})\n    return data if isinstance(data, dict) else {}\n\n\ndef summarize(path):\n    seen, versions, reminder, tool_use, tool_result = {}, set(), 0, collections.Counter(), collections.Counter()\n    first_user = None\n    for line in open(path, errors=\"replace\"):\n        try:\n            row = json.loads(line)\n        except ValueError:\n            continue\n        if row.get(\"version\"):\n            versions.add(row[\"version\"])\n        message = row.get(\"message\") or {}\n        role = message.get(\"role\")\n        if role == \"assistant\" and message.get(\"model\") and message[\"model\"] != \"<synthetic>\":\n            seen.setdefault(message.get(\"id\"), (message[\"model\"], str(row.get(\"effort\"))))\n        if \"Ultracode is on: optimize\" in line:\n            reminder += 1\n        content = message.get(\"content\")\n        if isinstance(content, list):\n            for block in content:\n                if not isinstance(block, dict):\n                    continue\n                if block.get(\"type\") == \"tool_use\":\n                    tool_use[block.get(\"name\")] += 1\n                if block.get(\"type\") == \"tool_result\":\n                    tool_result[\"result\"] += 1\n        if role == \"user\" and first_user is None:\n            if isinstance(content, str):\n                first_user = content\n            elif isinstance(content, list):\n                first_user = \" \".join(b.get(\"text\", \"\") for b in content if isinstance(b, dict) and b.get(\"type\") == \"text\")\n    return {\n        \"messages\": len(seen),\n        \"models\": dict(collections.Counter(v[0] for v in seen.values())),\n        \"efforts\": dict(collections.Counter(v[1] for v in seen.values())),\n        \"versions\": sorted(versions),\n        \"reminder_lines\": reminder,\n        \"tool_use\": dict(tool_use),\n        \"tool_results\": tool_result[\"result\"],\n        \"first_user\": (first_user or \"\")[:70].replace(\"\\n\", \" \"),\n    }\n\n\ndef main(files):\n    for results in files:\n        for entry in open(results):\n            name, case_dir = entry.split()\n            res = load_result(name)\n            sid = res.get(\"session_id\")\n            rc = open(os.path.join(BASE, \"rc-%s.txt\" % name)).read().strip() if os.path.exists(os.path.join(BASE, \"rc-%s.txt\" % name)) else \"rc=?\"\n            print(\"=== %s | %s | is_error=%s num_turns=%s | result=%r\" % (name, rc, res.get(\"is_error\"), res.get(\"num_turns\"), str(res.get(\"result\"))[:140]))\n            if not sid:\n                print(\"    no session_id in out json\")\n                continue\n            mains = glob.glob(os.path.join(PROJECTS, \"*\", sid + \".jsonl\"))\n            if not mains:\n                print(\"    no main transcript for\", sid)\n                continue\n            print(\"    main:\", json.dumps(summarize(mains[0]), sort_keys=True))\n            kids = sorted(glob.glob(os.path.join(os.path.dirname(mains[0]), sid, \"**\", \"agent-*.jsonl\"), recursive=True))\n            for k in kids:\n                print(\"    child:\", json.dumps(summarize(k), sort_keys=True))\n\n\nif __name__ == \"__main__\":\n    main(sys.argv[1:])\n",
+      "interactive_e2e.py": "#!/usr/bin/env python3\n\"\"\"Real interactive end-to-end check of the claude launcher, driven through tmux.\n\nEach case starts the client the way a person (or the Windows Terminal profile) does, types into the terminal, and reads the\neffort the client itself recorded for each assistant message in its transcript. Nothing here reads a credential.\n\nUsage: interactive_e2e.py <label> [--launcher-dir DIR] [--cases I1,I2,I3,I4]\n  --launcher-dir DIR  prepend DIR (holding an executable `claude`) to PATH inside the login shell, for the pre-flight run\n                      before the host launcher is replaced; without it the login shell's own PATH decides (the installed\n                      state, the route the NativeStack - Claude Windows Terminal profile takes: bash -lc \"exec claude\").\nCases: I1 interactive launch, no effort flag; I2 the same session lowered with /effort xhigh; I3 interactive launch with an\nexplicit --effort xhigh; I4 `claude -p` in a terminal (headless in a tty).\n\"\"\"\nimport argparse\nimport glob\nimport json\nimport os\nimport re\nimport secrets\nimport shlex\nimport subprocess\nimport sys\nimport time\n\nBASE = os.path.dirname(os.path.abspath(__file__))\nPROJECTS = os.path.expanduser(\"~/.claude/projects\")\nDROP = (\"CLAUDE\", \"CODEX\", \"ANTHROPIC\", \"OTEL_\", \"AI_MEMORY\", \"MCP_\")\nNONCE = secrets.token_hex(3)  # per run: a transcript left by an earlier run of the same case must never satisfy a reply check\n\n\ndef clean_env():\n    env = {k: v for k, v in os.environ.items() if not k.startswith(DROP) and k != \"CLAUDECODE\"}\n    env[\"TERM\"] = \"xterm-256color\"\n    return env\n\n\ndef tmux(*args):\n    # a dedicated socket (-L) keeps this harness away from every other tmux session on the host\n    return subprocess.run([\"tmux\", \"-L\", \"nas-effort-e2e\", *args], capture_output=True, text=True, env=clean_env())\n\n\ndef pane(session):\n    return tmux(\"capture-pane\", \"-p\", \"-J\", \"-t\", session).stdout\n\n\ndef project_dir(case_dir):\n    \"\"\"The client's transcript directory for a working directory (its encoding replaces / and _ and . with -).\"\"\"\n    enc = re.sub(r\"[/_.]\", \"-\", case_dir)\n    hits = glob.glob(os.path.join(PROJECTS, enc)) or glob.glob(os.path.join(PROJECTS, \"*\" + os.path.basename(case_dir)))\n    return hits[0] if hits else None\n\n\ndef transcript(case_dir):\n    d = project_dir(case_dir)\n    files = sorted(glob.glob(os.path.join(d, \"*.jsonl\")), key=os.path.getmtime) if d else []\n    return files[-1] if files else None\n\n\ndef assistant_rows(path):\n    seen, order = {}, []\n    reminder = 0\n    versions = set()\n    for line in open(path, errors=\"replace\"):\n        if \"Ultracode is on: optimize\" in line:\n            reminder += 1\n        try:\n            row = json.loads(line)\n        except ValueError:\n            continue\n        if row.get(\"version\"):\n            versions.add(row[\"version\"])\n        msg = row.get(\"message\") or {}\n        if msg.get(\"role\") == \"assistant\" and msg.get(\"model\") not in (None, \"<synthetic>\"):\n            mid = msg.get(\"id\")\n            text = \" \".join(b.get(\"text\", \"\") for b in (msg.get(\"content\") or []) if isinstance(b, dict) and b.get(\"type\") == \"text\")\n            if mid not in seen:\n                seen[mid] = {\"model\": msg[\"model\"], \"effort\": str(row.get(\"effort\")), \"text\": text, \"ts\": row.get(\"timestamp\")}\n                order.append(mid)\n            elif text:\n                seen[mid][\"text\"] += \" \" + text\n    return [seen[m] for m in order], reminder, sorted(versions)\n\n\ndef wait_for(cond, timeout, step=1.0, what=\"\"):\n    end = time.time() + timeout\n    while time.time() < end:\n        got = cond()\n        if got:\n            return got\n        time.sleep(step)\n    raise TimeoutError(\"timed out waiting for \" + what)\n\n\ndef handle_dialogs(session):\n    \"\"\"Answer the startup dialogs a fresh working directory can show; returns the pane text once it is stable.\"\"\"\n    last, stable_since = None, time.time()\n    end = time.time() + 120\n    answered = 0\n    while time.time() < end:\n        text = pane(session)\n        if re.search(r\"Yes, I trust this folder\", text) and answered < 3:\n            # the dialog's default row is \"No, exit\": move to the \"Yes\" row explicitly, then confirm\n            if re.search(r\"\u276f\\s*No\", text):\n                tmux(\"send-keys\", \"-t\", session, \"Down\")\n                time.sleep(0.5)\n            tmux(\"send-keys\", \"-t\", session, \"Enter\")\n            answered += 1\n            time.sleep(3)\n            last, stable_since = None, time.time()\n            continue\n        if text == last and text.strip():\n            if time.time() - stable_since >= 4:\n                return text\n        else:\n            last, stable_since = text, time.time()\n        time.sleep(1)\n    raise TimeoutError(\"startup never settled; last pane:\\n\" + (last or \"\"))\n\n\ndef send(session, text):\n    tmux(\"send-keys\", \"-t\", session, \"-l\", text)\n    time.sleep(0.5)\n    tmux(\"send-keys\", \"-t\", session, \"Enter\")\n\n\ndef reply_count(case_dir, token):\n    path = transcript(case_dir)\n    if not path:\n        return 0\n    rows, _, _ = assistant_rows(path)\n    return sum(1 for r in rows if token in r[\"text\"])\n\n\ndef ask(session, case_dir, token, timeout=240):\n    before = reply_count(case_dir, token)\n    send(session, f\"Reply with exactly the text {token} and nothing else. Do not use any tools.\")\n    wait_for(lambda: reply_count(case_dir, token) > before, timeout, 2, \"reply containing \" + token)\n\n\ndef launch(session, case_dir, command, launcher_dir):\n    os.makedirs(case_dir, exist_ok=True)\n    prefix = \"export PATH=%s:\\\"$PATH\\\"; \" % shlex.quote(launcher_dir) if launcher_dir else \"\"\n    inner = prefix + command\n    tmux(\"kill-session\", \"-t\", session)\n    r = tmux(\"new-session\", \"-d\", \"-s\", session, \"-x\", \"200\", \"-y\", \"50\", \"-c\", case_dir, \"bash\", \"-lc\", inner)\n    if r.returncode != 0:\n        raise RuntimeError(\"tmux new-session failed: \" + r.stderr)\n\n\ndef summarize(case_dir):\n    path = transcript(case_dir)\n    if not path:\n        return {\"error\": \"no transcript\"}\n    rows, reminder, versions = assistant_rows(path)\n    return {\"assistant_messages\": len(rows),\n            \"model_effort\": [(r[\"model\"], r[\"effort\"]) for r in rows],\n            \"reminder_lines\": reminder, \"versions\": versions}\n\n\ndef case_interactive(label, name, extra_args, launcher_dir, lower_to=None):\n    case_dir = os.path.join(BASE, \"interactive\", f\"case-{label}-{name}\")\n    session = f\"e2e-{label}-{name}\"\n    result = {\"case\": name, \"command\": \"claude --model sonnet\" + (\" \" + extra_args if extra_args else \"\"),\n              \"route\": \"bash -lc (login shell), PATH \" + (\"prefixed with a temporary launcher directory\" if launcher_dir else \"as installed\")}\n    launch(session, case_dir, f\"exec claude --model sonnet {extra_args}\", launcher_dir)\n    try:\n        handle_dialogs(session)\n        ask(session, case_dir, \"ALPHA-\" + name + \"-\" + NONCE + \"-1\")\n        result[\"first_turn\"] = summarize(case_dir)\n        if lower_to:\n            send(session, f\"/effort {lower_to}\")\n            time.sleep(6)\n            text = pane(session)\n            if re.search(r\"(?i)(cache|confirm|continue|\\(y/n\\))\", text) and re.search(r\"(?i)effort\", text) and \"Set effort\" not in text:\n                tmux(\"send-keys\", \"-t\", session, \"Enter\")\n                time.sleep(3)\n            ask(session, case_dir, \"BRAVO-\" + name + \"-\" + NONCE + \"-2\")\n            result[\"after_effort_command\"] = summarize(case_dir)\n            result[\"pane_after_command\"] = [l.strip() for l in pane(session).splitlines() if re.search(r\"(?i)effort\", l)][-3:]\n        send(session, \"/exit\")\n        time.sleep(3)\n    except Exception as exc:  # keep the evidence of a failed case\n        result[\"error\"] = repr(exc)\n        result[\"pane_tail\"] = [l for l in pane(session).splitlines() if l.strip()][-14:]\n    finally:\n        tmux(\"kill-session\", \"-t\", session)\n    return result\n\n\ndef case_print(label, name, launcher_dir):\n    case_dir = os.path.join(BASE, \"interactive\", f\"case-{label}-{name}\")\n    session = f\"e2e-{label}-{name}\"\n    out = os.path.join(case_dir, \"out.json\")\n    result = {\"case\": name, \"command\": \"claude -p <prompt> --model sonnet (run inside a terminal)\",\n              \"route\": \"bash -lc (login shell), PATH \" + (\"prefixed with a temporary launcher directory\" if launcher_dir else \"as installed\")}\n    cmd = \"claude -p 'Reply with exactly the text CHARLIE-%s and nothing else. Do not use any tools.' --model sonnet --output-format json > %s; echo done > %s\" % (\n        name, shlex.quote(out), shlex.quote(os.path.join(case_dir, \"DONE\")))\n    launch(session, case_dir, cmd, launcher_dir)\n    try:\n        wait_for(lambda: os.path.exists(os.path.join(case_dir, \"DONE\")), 240, 2, \"the -p run\")\n        result[\"run\"] = summarize(case_dir)\n    except Exception as exc:\n        result[\"error\"] = repr(exc)\n    finally:\n        tmux(\"kill-session\", \"-t\", session)\n    return result\n\n\ndef main():\n    ap = argparse.ArgumentParser()\n    ap.add_argument(\"label\")\n    ap.add_argument(\"--launcher-dir\")\n    ap.add_argument(\"--cases\", default=\"I1,I2,I3,I4\")\n    a = ap.parse_args()\n    wanted = a.cases.split(\",\")\n    results = []\n    if \"I1\" in wanted or \"I2\" in wanted:\n        # one session serves I1 (first turn, no flag) and I2 (the same session lowered by /effort xhigh)\n        r = case_interactive(a.label, \"I1I2\", \"\", a.launcher_dir, lower_to=\"xhigh\")\n        results.append(r)\n    if \"I3\" in wanted:\n        results.append(case_interactive(a.label, \"I3\", \"--effort xhigh\", a.launcher_dir))\n    if \"I4\" in wanted:\n        results.append(case_print(a.label, \"I4\", a.launcher_dir))\n    out = os.path.join(BASE, f\"interactive-{a.label}.json\")\n    json.dump(results, open(out, \"w\"), indent=2)\n    print(json.dumps(results, indent=2))\n    print(\"wrote\", out)\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "gen_launcher.py": "#!/usr/bin/env python3\n\"\"\"Generate the claude launcher with the repository's own install_native (both bootstrap scripts), exactly as the tests do,\nso the bytes that reach a host are what the generator writes. Usage: gen_launcher.py <checkout> <out_dir>.\"\"\"\nimport hashlib\nimport os\nimport re\nimport shlex\nimport subprocess\nimport sys\nimport tempfile\nfrom pathlib import Path\n\nSTUB_INSTALLER = (\n    \"#!/usr/bin/env bash\\n\"\n    \"mkdir -p \\\"$HOME/.local/share/claude/versions\\\" \\\"$HOME/.local/bin\\\"\\n\"\n    \"printf 'REAL-BINARY\\\\n' > \\\"$HOME/.local/share/claude/versions/$2\\\"\\n\"\n    \"ln -sfn \\\"$HOME/.local/share/claude/versions/$2\\\" \\\"$HOME/.local/bin/claude\\\"\\n\"\n)\n\n\ndef generate(script: Path) -> bytes:\n    text = script.read_text()\n    match = re.search(r\"(?ms)^install_native\\(\\) \\{.*?^\\}$\", text)\n    assert match, script\n    with tempfile.TemporaryDirectory() as tmp:\n        home = Path(tmp)\n        bin_dir = home / \"eco\" / \"bin\"\n        bin_dir.mkdir(parents=True)\n        stub = home / \"stub-installer\"\n        stub.write_text(STUB_INSTALLER)\n        harness = (\n            f\"set -euo pipefail\\ncache_dir={shlex.quote(str(home / 'cache'))}\\n\"\n            f\"bin_dir={shlex.quote(str(bin_dir))}\\nmkdir -p \\\"$cache_dir\\\" \\\"$bin_dir\\\"\\n\"\n            f\"fetch() {{ cp {shlex.quote(str(stub))} \\\"$3\\\"; }}\\n\" + match.group(0)\n            + \"\\ninstall_native claude-code 2.1.280 https://example.invalid/claude 0 claude\\n\")\n        env = dict(os.environ, HOME=str(home))\n        r = subprocess.run([\"bash\", \"-c\", harness], capture_output=True, text=True, env=env, timeout=60)\n        assert r.returncode == 0, r.stderr\n        return (bin_dir / \"claude\").read_bytes()\n\n\ncheckout, out_dir = Path(sys.argv[1]), Path(sys.argv[2])\nlinux = generate(checkout / \"adoption/bootstrap-linux.sh\")\nmac = generate(checkout / \"adoption/bootstrap-macos.sh\")\nassert linux == mac, \"the two generators disagree\"\nout_dir.mkdir(parents=True, exist_ok=True)\ntarget = out_dir / \"claude\"\ntarget.write_bytes(linux)\ntarget.chmod(0o755)\nprint(\"wrote\", target, \"sha256\", hashlib.sha256(linux).hexdigest(), \"bytes\", len(linux))\n",
+      "host_apply_launcher.py": "#!/usr/bin/env python3\n\"\"\"Replace the host's plain claude launcher with the repository-generated one (backup first, atomic rename, read-back).\n\nUsage: host_apply_launcher.py <generated launcher file> [--apply]\nWithout --apply it only checks. It refuses unless the current host file is exactly the known plain 3-line launcher (so it never\noverwrites a hand edit) or is already the new launcher (idempotent).\"\"\"\nimport hashlib\nimport os\nimport shutil\nimport stat\nimport sys\nimport tempfile\n\nTARGET = os.path.expanduser(\"~/.local/share/codex-ecosystem/bin/claude\")\nBACKUP = TARGET + \".bak-20260929-max-default\"\nBACKUP_V1 = TARGET + \".bak-20260929-max-default-v1\"\nV1_SHA = \"7f642f9ce51098bf11f262da4b2478b2c1474350e04d6ff828c6f91843208a18\"  # first applied version, replaced after review\nPLAIN = (b'#!/usr/bin/env bash\\n'\n         b'# Native auto-updating launcher (installed by claude-code install); the ecosystem no longer pins a snapshot.\\n'\n         b'exec \"$HOME/.local/bin/claude\" \"$@\"\\n')\nnew = open(sys.argv[1], \"rb\").read()\napply = \"--apply\" in sys.argv\nsha = lambda b: hashlib.sha256(b).hexdigest()\ncurrent = open(TARGET, \"rb\").read()\nprint(\"current sha256\", sha(current), len(current), \"bytes; plain launcher:\", current == PLAIN, \"; already new:\", current == new)\nprint(\"new     sha256\", sha(new), len(new), \"bytes\")\nif current == new:\n    print(\"nothing to do\")\n    sys.exit(0)\nif current != PLAIN and sha(current) != V1_SHA:\n    sys.exit(\"refusing: the host launcher is neither the known plain launcher, the first applied version nor the new one\")\nif not apply:\n    print(\"check only (no --apply)\")\n    sys.exit(0)\nbackup = BACKUP if current == PLAIN else BACKUP_V1\nif os.path.lexists(backup):\n    sys.exit(\"refusing: backup already exists: \" + backup)\nshutil.copy2(TARGET, backup)\nassert open(backup, \"rb\").read() == current\nfd, tmp = tempfile.mkstemp(dir=os.path.dirname(TARGET), prefix=\".claude.\", suffix=\".tmp\")\nwith os.fdopen(fd, \"wb\") as f:\n    f.write(new)\nos.chmod(tmp, 0o755)\nos.replace(tmp, TARGET)\nafter = open(TARGET, \"rb\").read()\nmode = stat.S_IMODE(os.stat(TARGET).st_mode)\nprint(\"applied: sha256\", sha(after), \"mode %o\" % mode, \"backup\", backup, \"backup sha256\", sha(open(backup, \"rb\").read()))\nassert after == new and mode == 0o755\n",
+      "make_receipt_max.py": "#!/usr/bin/env python3\n\"\"\"Build evidence/receipts/claude-max-default-effort-20260929.json (native_cli_e2e, claude-code) and register it.\n\nUsage: make_receipt_max.py <checkout> [--register]\n\nEvery row is asserted against the client's own transcripts before it is written: expected model, the recorded effort of each\nunique assistant message, the Ultracode-reminder presence (the full phrase), the tool calls, and the child transcripts attributed\nby the stage token in their first message (never by session id or file order). The client version recorded in each transcript\nmust be 2.1.284, the installed binary's settings-schema windows must still list effortLevel without \"max\", the host launcher must\nhash to the applied generator output with the backup at the recorded pre-change hash, and the repository tests are re-run here.\nScripts are stored with scratch paths and session identifiers replaced. --register only adds the manifest entry.\"\"\"\nimport glob\nimport hashlib\nimport json\nimport mmap\nimport os\nimport re\nimport subprocess\nimport sys\nfrom pathlib import Path\n\nHERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(HERE))\nfrom read_probes import PROJECTS, load_result, summarize  # noqa: E402\n\nROOT = Path(sys.argv[1])\nREGISTER_ONLY = \"--register\" in sys.argv\nRECEIPT_ID = \"claude-max-default-effort-20260929\"\nRECEIPT_PATH = \"evidence/receipts/%s.json\" % RECEIPT_ID\nVERSION = \"2.1.284\"\nBINARY = os.path.expanduser(\"~/.local/share/claude/versions/2.1.284\")\nHOST_LAUNCHER = os.path.expanduser(\"~/.local/share/codex-ecosystem/bin/claude\")\nHOST_BACKUP = HOST_LAUNCHER + \".bak-20260929-max-default\"\nHOST_BACKUP_V1 = HOST_LAUNCHER + \".bak-20260929-max-default-v1\"\nOLD_SHA = \"22c2d5188183cea7e411db2010c5533cc409170633456e39a52e2a33f0f45d26\"\nV1_SHA = \"7f642f9ce51098bf11f262da4b2478b2c1474350e04d6ff828c6f91843208a18\"  # first applied version, replaced after the cross-family review\nGENERATED = HERE.parent / \"preflight-bin-v2\" / \"claude\"\nNEW_SHA = hashlib.sha256(GENERATED.read_bytes()).hexdigest()\nS, O, H = \"claude-sonnet-5-5\", \"claude-opus-5-5\", \"claude-haiku-4-5-20251001\"\n\n# case -> (model, main effort, reminder present, main tool_use, child effort by stage token)\nEXPECT = {\n    \"C1-sonnet-baseline\": (S, \"xhigh\", True, {}, {}),\n    \"C2-opus-baseline\": (O, \"xhigh\", True, {}, {}),\n    \"C3-sonnet-max-ultracode-off\": (S, \"max\", False, {}, {}),\n    \"C4-sonnet-max-ultracode-off-workflow\": (S, \"max\", False, {\"Workflow\": 1}, {\"STAGE-NONE\": \"max\", \"STAGE-LOW\": \"low\"}),\n    \"F1-sonnet-max\": (S, \"max\", True, {}, {}),\n    \"F2-opus-max\": (O, \"max\", True, {}, {}),\n    \"F3-sonnet-max-then-low\": (S, \"low\", True, {}, {}),\n    \"F4-sonnet-low-then-max\": (S, \"max\", True, {}, {}),\n    \"F5-sonnet-max-workflow\": (S, \"max\", True, {\"Workflow\": 1}, {\"STAGE-NONE\": \"max\", \"STAGE-LOW\": \"low\"}),\n    \"F6-sonnet-max-agent-unnamed\": (S, \"max\", True, {\"Agent\": 1}, {\"CHILD-UNNAMED\": \"max\"}),\n    \"F7-sonnet-max-agent-medium\": (S, \"max\", True, {\"Agent\": 1}, {\"CHILD-MEDIUM\": \"medium\"}),\n    \"E1-sonnet-envmax\": (S, \"max\", True, {}, {}),\n    \"E2-sonnet-envmax-workflow\": (S, \"max\", True, {\"Workflow\": 1}, {\"STAGE-NONE\": \"max\", \"STAGE-LOW\": \"max\"}),\n    \"E3-sonnet-envmax-flag-low\": (S, \"max\", True, {}, {}),\n    \"E4-sonnet-envmax-agent-medium\": (S, \"max\", True, {\"Agent\": 1}, {\"CHILD-MEDIUM\": \"max\"}),\n    \"H1-haiku-max\": (H, \"None\", False, {}, {}),\n    \"H2-haiku-baseline\": (H, \"None\", False, {}, {}),\n}\nARGS = {\n    \"C1-sonnet-baseline\": \"--model sonnet\",\n    \"C2-opus-baseline\": \"--model opus\",\n    \"C3-sonnet-max-ultracode-off\": \"--model sonnet --effort max --settings '{\\\"ultracode\\\":false}'\",\n    \"C4-sonnet-max-ultracode-off-workflow\": \"--model sonnet --effort max --settings '{\\\"ultracode\\\":false}'\",\n    \"F1-sonnet-max\": \"--model sonnet --effort max\",\n    \"F2-opus-max\": \"--model opus --effort max\",\n    \"F3-sonnet-max-then-low\": \"--model sonnet --effort max --effort low\",\n    \"F4-sonnet-low-then-max\": \"--model sonnet --effort low --effort max\",\n    \"F5-sonnet-max-workflow\": \"--model sonnet --effort max\",\n    \"F6-sonnet-max-agent-unnamed\": \"--model sonnet --effort max\",\n    \"F7-sonnet-max-agent-medium\": \"--model sonnet --effort max\",\n    \"E1-sonnet-envmax\": \"--model sonnet --settings '{\\\"env\\\":{\\\"CLAUDE_CODE_EFFORT_LEVEL\\\":\\\"max\\\"}}'\",\n    \"E2-sonnet-envmax-workflow\": \"--model sonnet --settings '{\\\"env\\\":{\\\"CLAUDE_CODE_EFFORT_LEVEL\\\":\\\"max\\\"}}'\",\n    \"E3-sonnet-envmax-flag-low\": \"--model sonnet --effort low --settings '{\\\"env\\\":{\\\"CLAUDE_CODE_EFFORT_LEVEL\\\":\\\"max\\\"}}'\",\n    \"E4-sonnet-envmax-agent-medium\": \"--model sonnet --settings '{\\\"env\\\":{\\\"CLAUDE_CODE_EFFORT_LEVEL\\\":\\\"max\\\"}}'\",\n    \"H1-haiku-max\": \"--model haiku --effort max\",\n    \"H2-haiku-baseline\": \"--model haiku\",\n}\nTASK = {\n    \"F5\": \"Workflow tool, two stage agents: one names no effort, one names effort low\",\n    \"C4\": \"Workflow tool, two stage agents: one names no effort, one names effort low\",\n    \"E2\": \"Workflow tool, two stage agents: one names no effort, one names effort low\",\n    \"F6\": \"unnamed general-purpose Agent-tool subagent, model sonnet\",\n    \"F7\": \"project agent whose frontmatter effort is medium\",\n    \"E4\": \"project agent whose frontmatter effort is medium\",\n}\nSTAGE = re.compile(r\"STAGE-NONE|STAGE-LOW|CHILD-UNNAMED|CHILD-MEDIUM\")\n\n\ndef sha(data):\n    return hashlib.sha256(data).hexdigest()\n\n\ndef clean(text):\n    text = re.sub(r\"<scratch>'\\\"]*\", \"<scratch>\", text)\n    text = re.sub(r\"/home/[A-Za-z0-9_.-]+/\", \"~/\", text)\n    text = re.sub(r\"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\", \"<id>\", text)\n    return text\n\n\ndef transcript_times(path):\n    stamps = [str(json.loads(l).get(\"timestamp\")) for l in open(path, errors=\"replace\") if l.strip().startswith(\"{\") and '\"timestamp\"' in l]\n    stamps = [s for s in stamps if s != \"None\"]\n    return min(stamps)[:16] + \"Z\", max(stamps)[:16] + \"Z\"\n\n\ndef child_stage(path):\n    first_user, efforts = None, set()\n    for line in open(path, errors=\"replace\"):\n        try:\n            row = json.loads(line)\n        except ValueError:\n            continue\n        msg = row.get(\"message\") or {}\n        if msg.get(\"role\") == \"user\" and first_user is None:\n            c = msg.get(\"content\")\n            first_user = c if isinstance(c, str) else \" \".join(b.get(\"text\", \"\") for b in c if isinstance(b, dict))\n        if msg.get(\"role\") == \"assistant\" and msg.get(\"model\") not in (None, \"<synthetic>\"):\n            efforts.add(str(row.get(\"effort\")))\n    tokens = sorted(set(STAGE.findall(first_user or \"\")))\n    assert len(tokens) == 1 and len(efforts) == 1, (path, tokens, efforts)\n    return tokens[0], next(iter(efforts))\n\n\ndef headless_rows():\n    rows = []\n    for tsv in (\"results-c.tsv\", \"results-f.tsv\", \"results-e.tsv\", \"results-h.tsv\"):\n        for entry in open(HERE / tsv):\n            name = entry.split()[0]\n            res = load_result(name)\n            sid = res.get(\"session_id\")\n            mains = glob.glob(os.path.join(PROJECTS, \"*\", sid + \".jsonl\")) if sid else []\n            assert mains, \"%s: no transcript\" % name\n            main = summarize(mains[0])\n            kids = sorted(glob.glob(os.path.join(os.path.dirname(mains[0]), sid, \"**\", \"agent-*.jsonl\"), recursive=True))\n            by_stage = dict(child_stage(k) for k in kids)\n            model, effort, reminder, tools, want_kids = EXPECT[name]\n            assert res.get(\"is_error\") is False, name\n            assert main[\"versions\"] == [VERSION], (name, main[\"versions\"])\n            assert main[\"models\"] == {model: main[\"messages\"]}, (name, main[\"models\"])\n            assert main[\"efforts\"] == {effort: main[\"messages\"]}, (name, main[\"efforts\"])\n            assert (main[\"reminder_lines\"] > 0) == reminder, (name, main[\"reminder_lines\"])\n            assert main[\"tool_use\"] == tools, (name, main[\"tool_use\"])\n            assert len(by_stage) == len(kids) and by_stage == want_kids, (name, by_stage, want_kids)\n            first, last = transcript_times(mains[0])\n            rows.append({\n                \"case\": name.split(\"-\")[0], \"probe\": name, \"arguments\": ARGS[name],\n                \"task\": TASK.get(name.split(\"-\")[0], \"one-turn reply, no tools\"),\n                \"resolved_model\": model,\n                \"recorded_effort_main\": \"absent (the model takes no effort level)\" if effort == \"None\" else effort,\n                \"ultracode_reminder_lines\": main[\"reminder_lines\"],\n                \"tool_calls_main\": tools,\n                \"child_recorded_effort_by_stage_token\": by_stage,\n                \"session_result\": str(res.get(\"result\"))[:60],\n                \"run_utc\": first if first == last else \"%s to %s\" % (first, last),\n            })\n    return rows\n\n\ndef interactive_rows(label, expect_route):\n    data = json.load(open(HERE / (\"interactive-%s.json\" % label)))\n    by = {c[\"case\"]: c for c in data}\n    assert set(by) == {\"I1I2\", \"I3\", \"I4\"}, by.keys()\n    for c in data:\n        assert \"error\" not in c, c\n        assert expect_route in c[\"route\"], c[\"route\"]\n    a = by[\"I1I2\"]\n    assert a[\"first_turn\"][\"model_effort\"] == [[S, \"max\"]], a[\"first_turn\"]\n    assert a[\"after_effort_command\"][\"model_effort\"] == [[S, \"max\"], [S, \"xhigh\"]], a[\"after_effort_command\"]\n    assert by[\"I3\"][\"first_turn\"][\"model_effort\"] == [[S, \"xhigh\"]]\n    assert by[\"I4\"][\"run\"][\"model_effort\"] == [[S, \"xhigh\"]]\n    for c in data:\n        for k in (\"first_turn\", \"after_effort_command\", \"run\"):\n            if k in c:\n                assert c[k][\"versions\"] == [VERSION] and c[k][\"reminder_lines\"] == 1, (label, c[\"case\"], k, c[k])\n    return [\n        {\"case\": \"I1\", \"launch\": \"claude --model sonnet (interactive, tmux, login shell)\", \"recorded_effort\": \"max\", \"reminder_lines\": 1},\n        {\"case\": \"I2\", \"launch\": \"the I1 session after typing /effort xhigh\", \"recorded_effort_after_command\": \"xhigh\",\n         \"recorded_efforts_in_order\": [\"max\", \"xhigh\"]},\n        {\"case\": \"I3\", \"launch\": \"claude --model sonnet --effort xhigh (interactive)\", \"recorded_effort\": \"xhigh\", \"reminder_lines\": 1},\n        {\"case\": \"I4\", \"launch\": \"claude -p <prompt> --model sonnet run inside a terminal\", \"recorded_effort\": \"xhigh\", \"reminder_lines\": 1},\n    ]\n\n\ndef binary_schema():\n    with open(BINARY, \"rb\") as f:\n        m = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)\n        windows = [m[x.start():x.start() + 132].decode(\"utf8\", \"replace\")\n                   for pat in (rb\"effortLevel:\\(\\)=>z\\(\\[\", rb\"u\\(\\{effortLevel:z\\(\\[\") for x in re.finditer(pat, m)]\n        gate = [m[x.start():x.start() + 80].decode(\"utf8\", \"replace\") for x in re.finditer(rb\"function sKn\\(e\\)\\{\", m)]\n        digest = hashlib.sha256()\n        m.seek(0)\n        for chunk in iter(lambda: m.read(1 << 22), b\"\"):\n            digest.update(chunk)\n    assert windows and all('\"max\"' not in w and '[\"low\",\"medium\",\"high\",\"xhigh\"]' in w for w in windows), windows\n    assert gate and \"ultracode===!0\" in gate[0] and \"effort\" not in gate[0].split(\"function B3\")[0].replace(\"J$e(e)===\\\"ultracode\\\"\", \"\"), gate\n    return {\"settings_schema_windows\": windows, \"ultracode_gate_function_head\": gate, \"binary_sha256\": digest.hexdigest()}\n\n\ndef run_tests():\n    def run(*modules):\n        env = dict(os.environ, TMPDIR=\"/var/tmp\", PYTHONDONTWRITEBYTECODE=\"1\")\n        r = subprocess.run([sys.executable, \"-m\", \"unittest\", *modules], cwd=ROOT, capture_output=True, text=True, env=env, timeout=1800)\n        tail = r.stderr.strip().splitlines()[-4:]\n        ran = re.search(r\"Ran (\\d+) tests\", r.stderr)\n        skipped = re.search(r\"skipped=(\\d+)\", r.stderr)\n        assert r.returncode == 0 and ran, r.stderr[-600:]\n        return {\"command\": \"python3 -m unittest \" + \" \".join(modules), \"exit\": r.returncode, \"tests\": int(ran.group(1)),\n                \"skipped\": int(skipped.group(1)) if skipped else 0, \"result_line\": tail[-1] if tail else \"\"}\n    return {\"launcher_behavior_suite\": run(\"tests.test_adoption_bootstrap.InteractiveEffortLauncherTests\"),\n            \"both_bootstrap_suites\": run(\"tests.test_adoption_bootstrap\", \"tests.test_adoption_bootstrap_macos\")}\n\n\ndef host_state():\n    now, backup, backup_v1 = open(HOST_LAUNCHER, \"rb\").read(), open(HOST_BACKUP, \"rb\").read(), open(HOST_BACKUP_V1, \"rb\").read()\n    assert sha(now) == NEW_SHA and sha(backup) == OLD_SHA and sha(backup_v1) == V1_SHA, (sha(now), sha(backup), sha(backup_v1))\n    mode = oct(os.stat(HOST_LAUNCHER).st_mode & 0o777)\n    assert mode == \"0o755\", mode\n    return {\"launcher_path\": \"~/.local/share/codex-ecosystem/bin/claude\", \"mode\": \"0755\", \"before_sha256\": OLD_SHA, \"before_bytes\": len(backup),\n            \"first_applied_version_sha256\": V1_SHA, \"first_applied_version_bytes\": len(backup_v1),\n            \"after_sha256\": NEW_SHA, \"after_bytes\": len(now), \"backups_kept_beside_it\": True,\n            \"native_binary_version_it_execs\": VERSION, \"native_binary_reached_through\": \"~/.local/bin/claude\"}\n\n\ndef build():\n    probes = headless_rows()\n    installed = interactive_rows(\"installed2\", \"as installed\")\n    schema = binary_schema()\n    tests = run_tests()\n    host = host_state()\n    claim = (\n        \"Seventeen headless probes, four interactive terminal cases run through a login shell after the host launcher was replaced by the \"\n        \"repository-generated one, the launcher's repository tests and the installed binary's settings schema, all on Claude Code 2.1.284 and each \"\n        \"read from the model and effort the client recorded in its own transcript, found that: (1) with the host's saved xhigh per-model levels and \"\n        \"ultracode true, a Sonnet 5.5 and an Opus 5.5 session ran at xhigh, and --effort max ran both at max with the Ultracode reminder present; \"\n        \"(2) in a --effort max session a Workflow stage naming no effort and an unnamed subagent ran at max, a stage naming effort low ran at low and \"\n        \"a subagent whose definition says medium ran at medium, whereas with CLAUDE_CODE_EFFORT_LEVEL=max supplied through the --settings env layer \"\n        \"the low stage and the medium subagent both ran at max and the variable also overrode an explicit --effort low; (3) --effort max with \"\n        \"ultracode false ran at max with the reminder absent and its Workflow stages kept their own efforts; (4) the binary's settings schema lists \"\n        \"only low, medium, high and xhigh for effortLevel and modelSettings.<model>.effortLevel, so a saved max is dropped, and its Ultracode gate \"\n        \"reads the ultracode setting or an ultracode effort choice, with no effort term; (5) an interactive Sonnet 5.5 session started through a \"\n        \"login shell with the installed launcher ran at max, ran at xhigh after /effort xhigh, ran at xhigh when launched with an explicit --effort \"\n        \"xhigh, and claude -p inside a terminal ran at xhigh (the launcher went from 165 bytes to 1,810 bytes, through a first 911-byte version that a \"\n        \"cross-family review sent back for repair); and (6) --effort max on Haiku 4.5 completed with exit 0 and empty stderr and no effort field was \"\n        \"recorded for either Haiku run.\"\n    )\n    limitations = [\n        \"Local observation of one workstation and one client version (2.1.284); not a provider ledger, and the recorded effort field is the client's own per-message record, not an API-side confirmation.\",\n        \"The headless probes are one-turn sessions in fresh scratch directories that read the host's user settings (shape only: ultracode true, a top-level effortLevel of xhigh, and per-model levels of xhigh for Sonnet 5.5 and Opus 5.5); other settings would change the baselines.\",\n        \"The environment-variable route was supplied through the --settings flag's env block (cases E1 to E4), not through a shell export or the user settings file, and the documented reapplication of settings env values to running sessions was not probed.\",\n        \"For the three Workflow cases the Workflow tool result is only a launch receipt; execution is shown by the two child transcripts (attributed by the stage token in each child's first message, never by session id or file order), the workflow journal and the completion notification. The Ultracode reminder is matched as the full phrase 'Ultracode is on: optimize' and is an indicator, not proof of orchestration; orchestration was exercised only where the prompt ordered a Workflow launch.\",\n        \"Haiku 4.5 rows carry no effort field at all (the client marks per-turn effort inactive), so the transcript cannot show what became of --effort max on that model.\",\n        \"Each interactive case is one Sonnet 5.5 session driven through tmux with the workspace-trust dialog answered yes for a scratch directory (one entry added to the client's trust state); the /effort xhigh command re-saved the user settings file with identical bytes (its mtime moved, its sha256 did not). A first 911-byte version of the launcher went through the same four cases before a cross-family review sent it back for repair; those runs are not part of this receipt, and a later pre-flight of the repaired launcher lost two of its rows to a harness defect (a leftover transcript satisfied a reply check) and is not used either.\",\n        \"Not covered: the VS Code extension, the desktop app and the web client, which do not go through the launcher; a host whose bin directory is ~/.local/bin, where no launcher is written; macOS (not run); and the Windows Terminal profile itself (the login-shell route it takes was exercised through tmux).\",\n        \"An independent stack-verifier re-derived all seventeen headless rows from the raw transcripts with its own extraction code (17 of 17 matched); that verdict is recorded by the coordinator, not by a script in this receipt.\",\n        \"The transcripts hold local identifiers and are not retained; the scripts in provenance reproduce every row given the results files they write, and scratch paths and session identifiers are replaced in them.\",\n        \"Nothing here compares answer quality across effort levels; the vendor and third-party effort comparisons are cited in docs/decisions/2026-09-29-max-default-effort.md, not measured here.\",\n    ]\n    scripts = {}\n    for name in (\"lib.sh\", \"run_c.sh\", \"run_f.sh\", \"run_e.sh\", \"run_h.sh\", \"read_probes.py\", \"interactive_e2e.py\", \"gen_launcher.py\", \"host_apply_launcher.py\", \"make_receipt_max.py\"):\n        scripts[name] = clean((HERE / name).read_text())\n    receipt = {\n        \"schema_version\": 1,\n        \"id\": RECEIPT_ID,\n        \"kind\": \"native_cli_e2e\",\n        \"component_ids\": [\"claude-code\"],\n        \"claim\": claim,\n        \"limitations\": limitations,\n        \"evidence_class\": \"independent observation: native Claude Code 2.1.284 headless and interactive sessions on this host, with the model and effort recorded per assistant message in each transcript, plus repository unit tests and a static read of the installed binary's settings schema\",\n        \"recorded_at_utc\": max(json.loads(l).get(\"timestamp\", \"\") for l in open(sorted(glob.glob(os.path.join(PROJECTS, \"*\", \"*.jsonl\")), key=os.path.getmtime)[-1]) if l.strip().startswith(\"{\"))[:19] + \"Z\",\n        \"host_scope\": {\n            \"host\": \"nativestack-5975wx-20260925\",\n            \"platform\": \"NativeStack workstation, WSL2 Linux x86_64\",\n            \"identity\": \"one workstation; the running user's Claude Code user settings (shape only) and the host's claude launcher\",\n        },\n        \"data\": {\n            \"client_version\": VERSION + \" (Claude Code), recorded in every transcript read\",\n            \"counting\": \"assistant message ids are counted once (a message spans several transcript rows); children are attributed by stage token\",\n            \"headless_probes\": probes,\n            \"interactive_installed_launcher\": installed,\n            \"binary_schema\": schema,\n            \"repository_tests\": tests,\n            \"host_launcher\": host,\n        },\n        \"provenance\": {\n            \"command\": \"bash run_c.sh; bash run_f.sh; bash run_e.sh; bash run_h.sh (each writes results-<group>.tsv, one line per case); \"\n                       \"python3 gen_launcher.py <checkout> <dir>; python3 interactive_e2e.py preflight --launcher-dir <dir>; python3 host_apply_launcher.py <file> --apply; \"\n                       \"python3 interactive_e2e.py installed; python3 make_receipt_max.py <checkout>\",\n            \"script_sha256\": {name: sha(scripts[name].encode()) for name in sorted(scripts)},\n            \"scripts\": scripts,\n        },\n    }\n    text = json.dumps(receipt, indent=2) + \"\\n\"\n    host_user = os.environ.get(\"USER\") or Path.home().name  # the check must not spell the name itself: this file is embedded above\n    assert host_user and host_user not in text, \"the host user name is in the receipt\"\n    return receipt, text\n\n\nreceipt_file = ROOT / RECEIPT_PATH\nif REGISTER_ONLY:\n    receipt = json.loads(receipt_file.read_text(encoding=\"utf-8\"))\n    manifest_path = ROOT / \"manifests/evidence.json\"\n    manifest = json.loads(manifest_path.read_text(encoding=\"utf-8\"))\n    assert all(r[\"id\"] != RECEIPT_ID for r in manifest[\"receipts\"]), \"receipt already registered\"\n    entry = {k: receipt[k] for k in (\"id\", \"kind\", \"component_ids\", \"claim\", \"limitations\")}\n    entry[\"path\"] = RECEIPT_PATH\n    manifest[\"receipts\"].append(entry)\n    manifest_path.write_text(json.dumps(manifest, indent=2) + \"\\n\", encoding=\"utf-8\")\n    print(\"registered\", RECEIPT_ID)\nelse:\n    receipt, text = build()\n    receipt_file.parent.mkdir(parents=True, exist_ok=True)\n    receipt_file.write_text(text, encoding=\"utf-8\")\n    print(\"wrote\", RECEIPT_PATH, \"recorded_at_utc\", receipt[\"recorded_at_utc\"], \"bytes\", len(text))\n"
+    }
+  }
+}

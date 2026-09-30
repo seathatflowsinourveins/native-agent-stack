@@ -40,13 +40,13 @@
       "source_commit": "353841d91618d20b110b208de284a74d0b960379"
     },
     {
-      "tag_name": "v1.14.0",
-      "published_at": "2026-09-16T14:26:47Z",
+      "tag_name": "v1.15.0",
+      "published_at": "2026-09-24T10:58:58Z",
       "prerelease": false,
-      "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+      "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
       "target_commitish": "main",
       "repo": "giancarloerra/SocratiCode",
-      "source_commit": "2218f25153d0f3f4a76ee240a5643dbc873e80be"
+      "source_commit": "f6191f076a42405f0d5508139f3a8b505cfef93a"
     },
     {
       "tag_name": "v0.29.0",
@@ -76,13 +76,13 @@
       "source_commit": "6fa731368807419ee157f9a3fac955fefe1019c6"
     },
     {
-      "tag_name": "v20.0.24",
-      "published_at": "2026-09-21T11:23:53Z",
+      "tag_name": "v20.0.26",
+      "published_at": "2026-09-27T16:26:00Z",
       "prerelease": false,
-      "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24",
+      "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26",
       "target_commitish": "main",
       "repo": "ccusage/ccusage",
-      "source_commit": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805"
+      "source_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b"
     }
   ],
   "vllm_compatibility": "Current upstream0.29.0 resolves/installs/startsCLI, but actualWSLGPUmodel initialization failedRuntimeError:UVAisnotavailable. Publisher-validated0.25.0restored; directDesktopsemanticquerypassedafterrestoration. No dependency/source overrides.",

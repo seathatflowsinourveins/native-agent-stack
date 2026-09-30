@@ -1,0 +1,114 @@
+Objective: review one unpushed pull-request head against original source and its retained evidence, and return
+source-cited defects and gaps. You are read-only. The coordinator ran the commands and supplies their results below.
+
+Worktree (read files here by absolute path): <worktree>
+
+Base: origin/main at `3058b237`. The branch has two commits:
+- `a82e5e79`: the decision record, the evidence package and one anti-pattern row;
+- `31ab17f7`: the evidence-manifest registration.
+
+What the change claims:
+- `docs/decisions/2026-09-28-an13-m4-m5.md` records a two-family convergence on two findings of an earlier
+  prompt-audit run (AN-13):
+  - M4: the report's rewrite of the vendored skill `verification-before-completion` (hunks D1-D3). Both lanes
+    rejected it, so there is no edit.
+  - M5: `blueprints/convergence-practice/application-delivery/AGENTS.md:15-18`. Both lanes amended it with different
+    texts. One blind adjudication, in both orders by both families, split, so the lines are unchanged and both texts
+    are recorded.
+  - The rule (`docs/convergence-architecture.md`): both lanes agree, apply; both reject, keep; otherwise one blind
+    adjudication, applied only when all four judgments are valid and choose the same text.
+- `evidence/artifacts/prompt-audit-an13-m45-20260928/` (README first) holds the evidence:
+  - `round1/`: the frozen packet and its hash, the sources, prompts and schema, both lanes' returns and the runner
+    records;
+  - `adjudication/`: the inputs, packets and prompts as sent, the four judgments, the order mapping, the void audit,
+    its control and the tally;
+  - `scripts/`: the scripts as run, the frozen script hashes and the isolation log;
+  - `usage.json`.
+- `docs/harness-defaults.md` gains one dated anti-pattern row, "Dispatching judges before running the void-pattern
+  control". It sits above the "Building an adjudication input without reading the adjudicator's input contract" row.
+- `manifests/evidence.json` registers the 48 new or changed files.
+
+Changed files: `git diff --name-only origin/main...HEAD`. That is the two docs files, `manifests/evidence.json` and
+the 46 files under `evidence/artifacts/prompt-audit-an13-m45-20260928/`.
+
+Command results (the coordinator ran these in the worktree, on this head unless stated otherwise):
+- `python3 -m unittest tests.test_adoption_docs_consistency`, after the new row: Ran 37 tests, OK (skipped=1).
+- `python3 scripts/validate.py`, after re-registration on 3058b237: `{"components": 69, "hashed_files": 7710,
+  "profiles": 4, "receipts": 163, "status": "passed"}`.
+- validate.yml's local steps, in CI order. All exit 0:
+  - workflows-sha256, workflows-contracts, zizmor, validate, host-receipts, release-due, validate-catalogs;
+  - validate-foundation, landscape, audit-reports, validate-convergence, build-verdicts, component-matrix;
+  - grand-list, verdict-flip, gap-crosswalk, gap-wave-ledger, build-ecosystem, skill-contract.
+- `python3 -m unittest` (full suite, TMPDIR outside /tmp): Ran 6889 tests, FAILED (failures=1, errors=1,
+  skipped=765). The failing tests:
+  - `tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network`,
+    with `SafetyError: credential_file_permissions:worktree`;
+  - `tests.test_gpt6_family_tiering_20260926.RunnerTests.test_sigterm_records_the_running_call_as_interrupted_without_counting_it`,
+    with "run_arm: the temporary directory /tmp must lie outside the state directory and every repository".
+
+  Run alone in a clean detached checkout of origin/main at `3058b237`, both fail identically. This host has a
+  `/tmp/.git` directory, so they are host-environment failures on unmodified main.
+- In the package, `(cd round1 && sha256sum -c packet.sha256)` prints `packet.md: OK`.
+- `(cd scripts && sha256sum -c frozen-sha256.txt)` prints OK for `void_patterns_m45.py`, `audit_m45.py` and
+  `make_m5_adjudication.py`.
+- `adjudication/sent-sha256.json` compared with the published files:
+  - same: both inputs, both packets and `schemas/judge.json`;
+  - differs: the four prompts. The coordinator counted host-path placeholders in them: 3 in each `claude-task`
+    prompt and 1 in each `judge` prompt.
+- The recomputed tally, from the four judgments, `m45-mapping.json` and `audit-m45.json`:
+
+  | Judgment | Choice | Maps to | Void |
+  | --- | --- | --- | --- |
+  | gpt6-AB | B | the GPT-6 lane's text | no |
+  | gpt6-BA | B | the Claude lane's text | no |
+  | claude-AB | A | the Claude lane's text | yes |
+  | claude-BA | B | the Claude lane's text | yes |
+
+  There are 2 valid judgments, and the outcome is a split.
+- `grep -o` in `.claude/agents/blind-adjudicator.md` finds the line: `- a phrase that attributes a return to a
+  reviewer family, such as "the Codex lane" or "Claude's proposal";`.
+- The pre-push scans were zero in every category:
+  - over added lines and commit messages: UUIDs, home paths, the host user name, emails, session scratch paths,
+    secret-like strings and agent ids;
+  - `validate.py`'s PRIVATE_CONTENT patterns over the 48 files;
+  - client-configuration phrases (settings keys, CLAUDE_CODE_ variables, `.mcp.json`) in added lines.
+- `git range-diff` shows the content commit unchanged (`=`) from its first build on `dd996770` to this base.
+
+Check:
+1. Record against evidence. For each factual claim in the decision record and the package README, find the retained
+   file that supports it. Claims include verdicts, confidences, the two M5 texts, the adjudicators' reasons as
+   paraphrased or quoted, audit hits, control results, usage figures, times, versions, agent types and source
+   quotes. Report any claim the evidence does not support or contradicts.
+2. Repository citations. Read each cited line on this head and say whether it says what the record says. The cited
+   lines are:
+   - `scripts/skills_status.py:12, 262, 431-511`;
+   - `tools/adoption/install_skills.py:127`;
+   - `examples/claude-native/workflows/test-envelope.mjs:505` and `test-contract-mutations.mjs:70-73`;
+   - `adoption/bootstrap.md:346-347`;
+   - `docs/decisions/2026-09-25-skills-trial-and-usage.md:832-840`;
+   - `docs/decisions/2026-09-27-token-lanes-subagent-start.md:585-587`;
+   - `evidence/artifacts/token-adoption-e2e-20260926/README.md:655-663`;
+   - `blueprints/convergence-practice/application-delivery/receipt.json:88` and `AGENTS.md:15-18`;
+   - `.claude/agents/isolated-builder.md:9`.
+3. Reasoning.
+   - Does "no edit" for M4 follow from its sources?
+   - Is "split, no edit" the rule's correct application for M5?
+   - Is anything overstated? In particular, check what the audit's control shows, the claim that the outcome does
+     not depend on the two voids, and the evidence classes.
+4. The anti-pattern row.
+   - Check it against the log's rules: the "Record a correction the same turn" paragraph in
+     `docs/harness-defaults.md`, including "name a check there only after seeing it fail on that mistake or a
+     reproduction of it".
+   - Check it against `adjudication/audit-m45.json` and `adjudication/audit-control-m45.json`.
+5. Privacy. Check the new files for host paths, identities, ids, UUIDs, emails, tokens, plugin or skill inventories,
+   and quotations of client configuration.
+   - Placeholders such as `<work>`, `<base>`, `<adj>`, `<runs>`, `<scratch>`, `<user>`, `<uuid>` and `~/` are
+     intended.
+   - Pattern text inside `scripts/package_m45.py` and `scripts/void_patterns_m45.py` is expected.
+6. Anything else that would mislead a reader of the record, or a session that loads `docs/harness-defaults.md`.
+
+Return Markdown:
+- The first line is `VERDICT: agree` or `VERDICT: changes-needed`.
+- Then numbered findings, each with severity (blocker / should-fix / nit), file:line, the evidence (quoted lines),
+  and the fix.
+- Then list what you could not check.

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-github-copilot-sdk",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/github/copilot-sdk",
+ "reviewed_commit": "f5d9685f55286061e12763ed15a73c4469609881",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "agent-sdks"
+ ],
+ "claim": "Source and documentation review of github/copilot-sdk at commit f5d9685f55286061e12763ed15a73c4469609881 (license MIT), read from README.md at that commit. Repository description: \"Multi-platform SDK for integrating GitHub Copilot Agent into apps and services\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 10527,
+  "pushed_at": "2026-09-29T11:43:03Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f5d9685f55286061e12763ed15a73c4469609881",
+   "text": "Embed Copilot's agentic workflows in your application with the GitHub Copilot SDK for Python, TypeScript, Go, .NET, Java, and Rust."
+  },
+  {
+   "source": "README.md@f5d9685f55286061e12763ed15a73c4469609881",
+   "text": "The GitHub Copilot SDK exposes the same engine behind Copilot CLI: a production-tested agent runtime you can invoke programmatically. No need to build your own orchestration—you define agent behavior, Copilot handles planning, tool invocation, file edits, and more."
+  },
+  {
+   "source": "README.md@f5d9685f55286061e12763ed15a73c4469609881",
+   "text": "See the individual SDK READMEs for installation, usage examples, and API reference."
+  }
+ ]
+}

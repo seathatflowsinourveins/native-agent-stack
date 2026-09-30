@@ -216,7 +216,7 @@ These components are installed from upstream `darwin-arm64` (or `darwin-arm64`-e
 release archives rather than Homebrew, matching the archive convention in
 [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions).
 Every SHA-256 below was read from the publisher on 2026-09-22, or on 2026-09-26
-for `context-hub` and the eight rows from `rtk` down — a checksum file, a `.sha256` sidecar, a
+for `context-hub` and the eight rows from `rtk` down, and on 2026-09-29 for `claude-code` — a checksum file, a `.sha256` sidecar, a
 registry or PyPI digest, or (where the publisher ships none) the GitHub release
 asset `digest` plus an independent re-hash of the downloaded asset. `headroom`,
 `markitdown` and `serena` are not archives this script extracts: uv installs them.
@@ -237,7 +237,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `uv` | 0.12.17 | `uv-aarch64-apple-darwin.tar.gz` | `85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b` | `publisher_checksum_sidecar` |
 | `gh` | 2.101.0 | `gh_2.101.0_macOS_arm64.zip` | `e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b` | `publisher_checksum_file` |
 | `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
-| `claude-code` | 2.1.281 | `darwin-arm64/claude` (native, not npm) | `a922981f6f3b55a251ef9f9dbaa0621a5f99cbcb5ca67f8a797476ccfc83f626` | `manifest_crosscheck` |
+| `claude-code` | 2.1.284 | `darwin-arm64/claude` (native, not npm; the release manifest's value, whose gpg signature verified, and a direct download of the 2.1.284 binary re-hashed on 2026-09-29) | `50a14c2f50f56668380fdda490167f1d3630d5cc18fb8aed3073c2c7ea7314fe` | `manifest_crosscheck` |
 | `mcporter` | 0.13.13 | `mcporter-0.13.13.tgz` | `ccab169473a3f863fcadf833eff5023f40eb8600dcfe3b7b92678d876765601d` | `npm_registry_integrity_crosscheck` |
 | `context-hub` | 0.1.4 | `chub-0.1.4.tgz` (`@aisuite/chub`) | `ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f` | `npm_registry_integrity_crosscheck` |
 | `context-mode` | 1.0.169 | `context-mode-1.0.169.tgz` | `09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c` | `npm_registry_integrity_crosscheck` |
@@ -249,7 +249,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `qmd` | 2.8.3 | `qmd-2.8.3.tgz` | `2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0` | `npm_registry_integrity_crosscheck` |
 | `repomix` | 1.18.1 | `repomix-1.18.1.tgz` | `d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f` | `npm_registry_integrity_crosscheck` |
 | `toon` | 4.1.1 | `cli-4.1.1.tgz` (`@toon-format/cli`) | `93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6` | `npm_registry_integrity_crosscheck` |
-| `ccusage` | 20.0.24 | `ccusage-20.0.24.tgz` | `69787a0aa2269cd14f3d0f41d179b80744d5384e912ee11852897ecd0bf91183` | `npm_registry_integrity_crosscheck` |
+| `ccusage` | 20.0.26 | `ccusage-20.0.26.tgz` | `b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2` | `npm_registry_integrity_crosscheck` |
 | `headroom` | 0.37.0 | `headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl` | `b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c` | `pypi_json_digest_plus_local_rehash` |
 | `markitdown` | 0.1.8 | `markitdown-0.1.8.tar.gz` (sdist, platform-independent) | `17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed` | `pypi_json_digest_plus_local_rehash` |
 | `serena` | 2.0.0.dev0 | git commit `c6fbd1c5932df2494ffa0020af5a9fbe80b82143` on oraios/serena (no released archive) | sha256 null; the commit above is the integrity anchor | `github_commit_existence_verified` |
@@ -263,7 +263,10 @@ the two `foundation-cpu` components this file lacked. Each pin has the Linux pin
 and each digest was re-checked against a fresh download of its upstream artifact on
 2026-09-26 ([`digest-check.txt`](../../evidence/artifacts/macos-token-pins-20260926/digest-check.txt),
 a local harness; its failed earlier runs and a negative control that it fails on wrong pins
-are kept beside it). The `rtk` archive holds one bare
+are kept beside it). `ccusage` moved with the Linux pin to 20.0.26 on 2026-09-27; its digests
+were re-checked against a fresh registry download for
+[its qualification receipt](../../evidence/receipts/ccusage-20026-qualification-20260927.json),
+and no Mac has run that version. The `rtk` archive holds one bare
 `rtk` executable, so the existing single-binary tarball installer applies unchanged. `qmd`,
 `repomix`, `toon` and `ccusage` are the same npm registry tarballs as their Linux pins;
 `qmd`'s `sqlite-vec-darwin-arm64` and `ccusage`'s `@ccusage/ccusage-darwin-arm64` optional
@@ -356,7 +359,7 @@ At `v2026.09.26` macOS has no rtk pin, and that script prints no reminder.
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
-documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux; the macOS pin stays 0.155.1). It changed after `v2026.09.25.2`,
+documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). It changed after `v2026.09.25.2`,
 adding the identical entry there too (same version,
 url, sha256 and `--ignore-scripts`), completing the token-efficiency profile's Linux pin
 coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`
@@ -402,14 +405,15 @@ postinstall-copy design entirely.** It is now a `kind: native` pin (see the
 table above): `adoption/bootstrap-macos.sh`'s `install_native` downloads the
 per-version `darwin-arm64/claude` binary directly from
 `downloads.claude.ai`, verifies its sha256 against the pin, and runs `"$bin"
-install 2.1.281`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
+install 2.1.284`, exactly mirroring `adoption/pins-linux-x86_64.json`'s own
 `claude-code` pin and `~/codex-ecosystem/bin/bootstrap-linux.sh`'s
 existing claude-code step. There is no more nested platform package, no
 `install.cjs` postinstall to defer, and no `postinstall_binary_check`; the
 native binary manages its own version directory and launcher and keeps
 auto-updating on the latest channel afterward. (`adoption/pins-linux-x86_64.json`
-changed after `v2026.09.24.1` in `install_note` text only; its `claude-code`
-pin is unchanged. It changed after `v2026.09.25.2` again: its `rtk`,
+changed after `v2026.09.24.1` in `install_note` text and in its `claude-code`
+pin (2.1.280 at that tag, 2.1.281 at `v2026.09.25.2`, 2.1.284 on main). It
+changed after `v2026.09.25.2` again: its `rtk`,
 `markitdown`, `ai-memory` and `mcporter` entries moved to newer versions, and
 new `ccusage`, `headroom`, `repomix`, `serena`, `socraticode` and `toon`
 entries were added. Of those ten, only `ai-memory`, `mcporter` and `socraticode`
@@ -417,14 +421,22 @@ have an entry in `adoption/pins-macos-arm64.json` at that tag and at `v2026.09.2
 it keeps ai-memory 2.3.2 and mcporter 0.13.13 until a Mac qualifies the new
 versions itself, and its socraticode entry matches the new Linux one. It changed
 after `v2026.09.26`, gaining the other seven of those ten and `qmd` at their Linux
-versions; its `claude-code` pin is unchanged.)
+versions; its `claude-code` pin moved to 2.1.284 (2.1.281 at `v2026.09.26`). On 2026-09-27 the Linux `socraticode` pin moved
+to 1.15.0, and this file keeps 1.14.0 until a Mac qualifies the new version.)
 
 The pin is a floor: when `~/.local/bin/claude --version` already reports the
 pinned version or newer, `install_native` keeps that launcher, downloads and
 installs nothing, and logs `Kept installed claude-code <version>`; only a
 missing, older or unreadable launcher gets the verified install, so re-running
 the bootstrap never moves a native auto-updated Claude Code back to the pin
-(`adoption/bootstrap-linux.sh` runs the same `install_native`).
+(`adoption/bootstrap-linux.sh` runs the same `install_native`). The launcher
+`install_native` writes to `$eco/bin/claude` also starts an interactive
+terminal launch at effort max, adding `--effort max` only when nothing else
+chose an effort (stdin and stdout are a terminal; no `-p`, `--print` or
+`--effort`; `CLAUDE_CODE_EFFORT_LEVEL` unset; a client at 2.1.284 or newer); it is byte-identical on both
+platforms and is not written when the bin directory is `~/.local/bin`
+([decision](../../docs/decisions/2026-09-29-max-default-effort.md)). This Mac
+has not run it: a Mac session repeats the interactive check from that record.
 `adoption/bootstrap-linux.sh` changed after `v2026.09.26` too, in its rtk
 post-install reminder (the macOS script's own reminder, added with its rtk pin,
 is described in the RTK paragraph above): the Linux reminder now
@@ -432,12 +444,13 @@ requires every `[hooks] exclude_commands` entry from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks),
 exactly once, instead of the tag's original two, and it also asks the installed
 `rtk hook check` whether rtk honours that file. `adoption/pins-linux-x86_64.json`
-changed after `v2026.09.26` in its rtk and headroom `install_note` text only.
+changed after `v2026.09.26` in its rtk and headroom `install_note` text and in its `claude-code` entry (2.1.281 at that tag, 2.1.284 on main).
 The Linux script's `install_npm` and `install_uv_tool` changed after `v2026.09.26` as well: its `install_npm` now reads the socraticode pin's `ignore_scripts: true` and passes `--ignore-scripts`, as this page's script already does (the tag's Linux script ignores that field, so there npm runs every install script in socraticode's dependency tree), and its `install_uv_tool` now downloads, sha256-verifies and installs headroom's pinned wheel instead of resolving `headroom-ai[mcp]==0.37.0` from the index. This page's script carries that same `install_uv_tool` for its own headroom pin, whose `macosx_11_0_arm64` wheel it downloads and verifies the same way (both added after `v2026.09.26`; the pins paragraph above).
-The script and both claude-code pins (2.1.281, which fixes a recursive `rm` of
+The script and both claude-code pins (2.1.284, which makes the `sonnet` alias resolve to Sonnet 5.5 on the Anthropic API; the floor before it, 2.1.281, fixed a recursive `rm` of
 command-substitution output running unprompted in auto and bypass mode)
 changed after `v2026.09.24.1`: at that tag the pins are 2.1.280 and the script
-runs the pinned install unconditionally, downgrading a newer Claude Code.
+runs the pinned install unconditionally, downgrading a newer Claude Code. Both
+pins also changed after `v2026.09.26.2`, where both are 2.1.281; this file's 2.1.284 darwin-arm64 checksum is the release manifest's value, whose gpg signature verified on 2026-09-29, and a direct download of the darwin-arm64 binary re-hashed to it (the pin's `checksum_ref` records both; Apple's code-signature check was not run).
 
 `llama-server` is a profile `required_command`, so llama.cpp is pinned rather
 than left to `brew install llama.cpp`. The macOS asset holds every executable
@@ -446,6 +459,13 @@ no `build/bin` path in this asset), so the bootstrap installs the whole
 directory into `tools/llama-cpp-b11057` and places a wrapper script at
 `bin/llama-server` that exports `DYLD_LIBRARY_PATH` before exec'ing the real
 binary, instead of a bare symlink.
+
+### Codex notifications on macOS
+
+Changed after `v2026.09.26.2` (drafted, not run on a Mac): the shared `codex.config.template.toml` sets `[tui] notifications` to the needed-action kinds, so a
+rendered macOS config asks Codex for a notification on an approval, a plan-mode prompt or a question and not when a turn finishes. Codex keeps its own per-terminal channel, so a Mac keeps native notifications in Ghostty, iTerm2 and Kitty for those kinds and stops receiving the turn-complete one. At this platform's pin (0.155.1) a `request_user_input` question already notifies as `plan-mode-prompt`; the `async-question` kind covers the asynchronous questions added after that release, so it is inert there and no notification 0.155.1 emits is lost. To keep the turn-complete notification, add
+`"agent-turn-complete"` to the list in the rendered `config.toml`. The decision is in
+[the 2026-09-28 terminal decision](../../docs/decisions/2026-09-28-terminal-experience.md#repository-carried-defaults-and-the-second-distros-profiles-2026-09-29).
 
 ### ai-memory hook paths on macOS
 
@@ -458,6 +478,10 @@ bootstrap installs (`--platform macos-arm64` renders it from another machine). A
 whose running ai-memory is another install, such as the service the 2026-09-27
 [single-writer decision](../../docs/decisions/2026-09-27-mac-single-writer-staged.md)
 leaves running in stage 1, passes that binary with `--set AI_MEMORY_BIN=<path>`.
+The Codex user template's SocratiCode server follows the same rule since 2026-09-28: it runs
+`${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/`, which renders as this platform's
+`tools/socraticode-1.14.0` while the Linux pin is 1.15.0, and `--set SOCRATICODE_VERSION=<version>`
+names another install.
 Rendering the path is not a Mac qualification. The capture mode still needs
 storing: run the installed binary with the full Claude command from
 [the recipe's project-memory section](../../recipes/README.md#project-memory):
@@ -728,6 +752,18 @@ hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
 `qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
 three has run on a Mac workstation.
 
+**Credential boot receipt (added after `v2026.09.26.2`; documented, not
+run).** On Linux/WSL2 the `credential-boot-receipt.service` oneshot runs
+`python3 -I scripts/credential_boot_receipt.py record` at every start of the
+user's service manager
+([Restart check](../../docs/secret-storage.md#restart-check-2026-09-29)). On a
+Mac the same tool would run from a `RunAtLoad` LaunchAgent, which launchd
+starts only after the user's FileVault login, so a receipt there follows a
+login rather than the boot itself. No plist template exists for it, and it has
+not run on any Mac. macOS has no `/proc`, so a receipt there records
+`boot_id`, `uptime_seconds` and the kernel keyring names as null, and
+`compare` reports the boot change as `unknown`.
+
 **2026-09-23 decision: brew-services semantics, no backup or reconcile.**
 
 - **Chosen:** stateless, path-verified ownership with no backup, no
@@ -790,6 +826,40 @@ or otherwise, has produced a `launchctl bootout` whose corresponding
 afterward. A real Mac run should specifically try to reproduce that window
 (e.g. a service with a slow `KeepAlive` shutdown path) rather than assume
 the bounded poll alone is proof it behaves correctly there.
+
+### Keys under launchd (drafted 2026-09-29, not run on a Mac)
+
+A LaunchAgent whose program needs a provider key may start it through the
+key runner, as a systemd unit may; the runner is available and not yet the
+default path
+([Using a key](../../docs/secret-storage.md#using-a-key-available-2026-09-29)). Its
+`ProgramArguments` are the Homebrew `python3`, `-I`,
+`<repository>/tools/credentials/credential_run.py`, the inventory id, `--`
+and the program with its arguments, and its `EnvironmentVariables` hold
+`PATH` only. No value goes into a plist or `launchctl setenv`. The runner
+and the two modules it imports are standard-library Python that parses in
+the 3.9 grammar (a test checks the runner), so the Command Line Tools
+`python3` should run it too. A uv-managed CPython 3.9.25 on Linux passed the
+runner's 60 tests once on 2026-09-29 (no committed receipt); no Mac has run
+it. macOS sets
+no `XDG_*` variable, so the store is
+`~/.config/native-agent-stack`, created by `set_credential.py` at the first
+key. `scripts/kernel_keyring.py` refuses macOS, so Tavily is a stored file
+here as on Linux: type it once with
+`bash tools/credentials/open_credential_terminal.sh tavily`. The design's
+boot receipt is to run as a `RunAtLoad` LaunchAgent rendered by
+`adoption/launchd/launchd-agents.sh`; it lands in a later change. Before
+any Mac acceptance, the guard hook must also count a capital `E` in a `ps`
+option (`ps -E`, `ps auxE`) as an environment dump, because macOS ps(1)
+shows the environment with `-E`, and its `-e` means `-A` outside legacy
+mode (apple-oss-distributions/adv_cmds `ps/ps.1`). The runner's refusal of a
+core pattern that pipes crash dumps to a collector reads
+`/proc/sys/kernel/core_pattern`, which macOS lacks, so that check is skipped
+there; what a Mac's crash reporter keeps of a crashed command's environment
+has not been checked. Key acceptance on a Mac is
+the runner, guard and status test suites on the macOS CI job, then a new Mac
+host receipt that separates the steps run from those not run. WSL receipts
+do not certify the Mac.
 
 ## Qdrant collections
 

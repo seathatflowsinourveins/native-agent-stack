@@ -86,6 +86,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -339,6 +343,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -524,7 +532,7 @@
         },
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "measured_comparison",
           "name": "jCodeMunch",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp"
@@ -592,7 +600,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcp-inspector",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -606,7 +614,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcporter",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -693,8 +701,8 @@
             "unknown": 9
           },
           "pin_current": {
-            "false": 3,
-            "true": 6,
+            "false": 1,
+            "true": 8,
             "unknown": 1
           },
           "verdict_winner": {
@@ -717,6 +725,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -911,6 +923,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -1166,7 +1182,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "ai-memory",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -1182,7 +1198,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1239,8 +1255,8 @@
             "unknown": 4
           },
           "pin_current": {
-            "false": 3,
-            "true": 2,
+            "false": 1,
+            "true": 4,
             "unknown": 0
           },
           "verdict_winner": {
@@ -1263,6 +1279,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -1323,12 +1343,12 @@
               "derived_status": "accepted",
               "e2e_state": "host_verified",
               "host_receipts": {
-                "dissented": 0,
+                "dissented": 1,
                 "fail": 0,
                 "independently_reviewed_fail": 0,
-                "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T14:37:15Z",
-                "pass": 2
+                "independently_reviewed_pass": 3,
+                "latest": "2026-09-27T23:28:12Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -1462,7 +1482,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -1479,8 +1499,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 1,
-            "true": 6,
+            "false": 2,
+            "true": 5,
             "unknown": 0
           },
           "verdict_winner": {
@@ -1503,6 +1523,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -1771,7 +1795,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcp-inspector",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1785,7 +1809,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcporter",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1860,8 +1884,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 2,
-            "true": 5,
+            "false": 0,
+            "true": 7,
             "unknown": 1
           },
           "verdict_winner": {
@@ -1884,6 +1908,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -2189,7 +2217,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -2203,7 +2231,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -2330,8 +2358,8 @@
             "unknown": 10
           },
           "pin_current": {
-            "false": 3,
-            "true": 3,
+            "false": 1,
+            "true": 5,
             "unknown": 5
           },
           "verdict_winner": {
@@ -2354,6 +2382,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -2590,7 +2622,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -2607,8 +2639,8 @@
             "unknown": 1
           },
           "pin_current": {
-            "false": 0,
-            "true": 3,
+            "false": 1,
+            "true": 2,
             "unknown": 0
           },
           "verdict_winner": {
@@ -2631,6 +2663,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -2777,7 +2813,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "mcp-inspector",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -2793,7 +2829,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "mcporter",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -2810,8 +2846,8 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 2,
-            "true": 0,
+            "false": 0,
+            "true": 2,
             "unknown": 0
           },
           "verdict_winner": {
@@ -2834,6 +2870,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -3009,7 +3049,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3023,7 +3063,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "claude-code",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -3098,8 +3138,8 @@
             "unknown": 4
           },
           "pin_current": {
-            "false": 3,
-            "true": 3,
+            "false": 1,
+            "true": 5,
             "unknown": 0
           },
           "verdict_winner": {
@@ -3122,6 +3162,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -3381,7 +3425,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3525,7 +3569,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "prometheus",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -3556,8 +3600,8 @@
             "unknown": 12
           },
           "pin_current": {
-            "false": 5,
-            "true": 10,
+            "false": 3,
+            "true": 12,
             "unknown": 0
           },
           "verdict_winner": {
@@ -3580,6 +3624,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -4020,6 +4068,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -4194,7 +4246,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4208,7 +4260,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4295,8 +4347,8 @@
             "unknown": 6
           },
           "pin_current": {
-            "false": 4,
-            "true": 2,
+            "false": 2,
+            "true": 4,
             "unknown": 1
           },
           "verdict_winner": {
@@ -4319,6 +4371,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -4506,7 +4562,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "claude-code",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4567,8 +4623,8 @@
             "unknown": 3
           },
           "pin_current": {
-            "false": 3,
-            "true": 1,
+            "false": 2,
+            "true": 2,
             "unknown": 1
           },
           "verdict_winner": {
@@ -4591,6 +4647,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -4838,6 +4898,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -4959,7 +5023,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -5050,8 +5114,8 @@
             "unknown": 3
           },
           "pin_current": {
-            "false": 3,
-            "true": 3,
+            "false": 2,
+            "true": 4,
             "unknown": 0
           },
           "verdict_winner": {
@@ -5074,6 +5138,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -5330,7 +5398,7 @@
       "alternatives": [
         {
           "disposition": "measured_tradeoff",
-          "e2e_state": "receipts_recorded",
+          "e2e_state": "host_verified",
           "evidence_class": "measured_comparison",
           "name": "Context Mode",
           "repository": "https://github.com/mksglu/context-mode"
@@ -5512,6 +5580,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -5787,7 +5859,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "playwright-cli",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -5818,8 +5890,8 @@
             "unknown": 1
           },
           "pin_current": {
-            "false": 1,
-            "true": 2,
+            "false": 2,
+            "true": 1,
             "unknown": 1
           },
           "verdict_winner": {
@@ -5842,6 +5914,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -6118,7 +6194,7 @@
             "converged": false,
             "host_e2e": "false",
             "id": "claude-code",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -6176,7 +6252,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -6217,6 +6293,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "unresolved": [],
@@ -6510,7 +6590,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "foundation-ai-memory",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -6601,8 +6681,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 5,
-            "true": 3,
+            "false": 4,
+            "true": 4,
             "unknown": 0
           },
           "verdict_winner": {
@@ -7845,7 +7925,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "data-edgartools",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -7876,8 +7956,8 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 0,
-            "true": 3,
+            "false": 1,
+            "true": 2,
             "unknown": 0
           },
           "verdict_winner": {
@@ -8137,7 +8217,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "opentelemetry-collector",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -8200,8 +8280,8 @@
             "unknown": 9
           },
           "pin_current": {
-            "false": 1,
-            "true": 8,
+            "false": 2,
+            "true": 7,
             "unknown": 0
           },
           "verdict_winner": {
@@ -8265,7 +8345,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "quantstats",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -8280,8 +8360,8 @@
             "unknown": 1
           },
           "pin_current": {
-            "false": 0,
-            "true": 1,
+            "false": 1,
+            "true": 0,
             "unknown": 0
           },
           "verdict_winner": {
@@ -8526,7 +8606,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "data-edgartools",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -8579,8 +8659,8 @@
             "unknown": 3
           },
           "pin_current": {
-            "false": 2,
-            "true": 2,
+            "false": 3,
+            "true": 1,
             "unknown": 0
           },
           "verdict_winner": {
@@ -9054,7 +9134,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "data-duckdb",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -9083,8 +9163,8 @@
             "unknown": 1
           },
           "pin_current": {
-            "false": 0,
-            "true": 2,
+            "false": 1,
+            "true": 1,
             "unknown": 0
           },
           "verdict_winner": {
@@ -9271,9 +9351,9 @@
       },
       "manifest_layers_without_matrix_row": [],
       "newest_manifest": {
-        "checked_at": "2026-09-26",
-        "id": "sota-convergence-20260926",
-        "path": "catalogs/sota-convergence/manifest-20260926.json"
+        "checked_at": "2026-09-29",
+        "id": "sota-convergence-20260929",
+        "path": "catalogs/sota-convergence/manifest-20260929.json"
       },
       "newest_verdict_checked_at": {
         "foundation": "2026-09-22",
@@ -9300,6 +9380,12 @@
             "layers": 32,
             "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "layers": 20,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+            "sweep_id": "landscape-sweep-20260929"
           }
         ],
         "host_e2e_platform": "linux-wsl2-x86_64",

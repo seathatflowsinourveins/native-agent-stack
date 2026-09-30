@@ -43,8 +43,7 @@
       "agentsview",
       "vllm",
       "dagu",
-      "skfolio",
-      "claude-code"
+      "skfolio"
     ],
     "redirected_repository_identities": [
       {
@@ -53,7 +52,7 @@
         "canonical": "https://github.com/headroomlabs-ai/headroom"
       }
     ],
-    "recommendation": "Retain current qualified pins; review the five newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
+    "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
     "selected_component_api_commands": 249,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
@@ -388,39 +387,39 @@
       "component_id": "ccusage",
       "repository": "https://github.com/ccusage/ccusage",
       "selected_repository_url": "https://github.com/ccusage/ccusage",
-      "selected_version": "20.0.24",
-      "selected_source_pin": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
+      "selected_version": "20.0.26",
+      "selected_source_pin": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
       "checks": [
         {
           "endpoint": "repos/ccusage/ccusage",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:45.552374+00:00",
-          "ended_at": "2026-09-21T22:30:46.009927+00:00",
-          "stdout_sha256": "18f039a79ccae806287d5a1884eec3f44d8c9a6296e00e765312f682eb44f30d",
+          "started_at": "2026-09-28T01:26:08.849538+00:00",
+          "ended_at": "2026-09-28T01:26:09.244812+00:00",
+          "stdout_sha256": "b563ed070ae84f7a4e687f22ddaf694d28194f19d2cab951d5873e9f40977d2f",
           "status": "ok"
         },
         {
           "endpoint": "repos/ccusage/ccusage/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:46.010027+00:00",
-          "ended_at": "2026-09-21T22:30:46.338708+00:00",
-          "stdout_sha256": "2c47acf34f8fd715000066bef6c3027e473b8e88b9ecfe6d0fd7e7e6bafc5d5c",
+          "started_at": "2026-09-28T01:26:09.244919+00:00",
+          "ended_at": "2026-09-28T01:26:09.555577+00:00",
+          "stdout_sha256": "9d155cd45f4e7911755f51a8856db72a2e1a96e849dada7434ec82f394ab8e5e",
           "status": "ok"
         },
         {
-          "endpoint": "repos/ccusage/ccusage/commits/ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
+          "endpoint": "repos/ccusage/ccusage/commits/d9821088b98aa536c7a385aa1a4579d6fa02269b",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:46.338806+00:00",
-          "ended_at": "2026-09-21T22:30:46.752609+00:00",
-          "stdout_sha256": "130c530cfdb29cc1efea4b9988e3dd3d42df755e32af029735a7956e675ceb29",
+          "started_at": "2026-09-28T01:26:09.555684+00:00",
+          "ended_at": "2026-09-28T01:26:09.879324+00:00",
+          "stdout_sha256": "454128a4e8c6648ddfbb1b7597f8d0e6cfbd7f7fe5cdcd92bda89afad2f5e54d",
           "status": "ok"
         },
         {
-          "endpoint": "repos/ccusage/ccusage/commits/v20.0.24",
+          "endpoint": "repos/ccusage/ccusage/commits/v20.0.26",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:46.752735+00:00",
-          "ended_at": "2026-09-21T22:30:47.129095+00:00",
-          "stdout_sha256": "130c530cfdb29cc1efea4b9988e3dd3d42df755e32af029735a7956e675ceb29",
+          "started_at": "2026-09-28T01:26:09.879436+00:00",
+          "ended_at": "2026-09-28T01:26:10.220975+00:00",
+          "stdout_sha256": "454128a4e8c6648ddfbb1b7597f8d0e6cfbd7f7fe5cdcd92bda89afad2f5e54d",
           "status": "ok"
         }
       ],
@@ -428,27 +427,27 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T22:25:08Z",
+      "pushed_at": "2026-09-28T00:55:23Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "v20.0.24",
-        "published_at": "2026-09-21T11:23:53Z",
-        "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24",
+        "tag_name": "v20.0.26",
+        "published_at": "2026-09-27T16:26:00Z",
+        "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
-        "sha": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
-        "html_url": "https://github.com/ccusage/ccusage/commit/ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
-        "committed_at": "2026-09-21T11:16:17Z"
+        "ref": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "sha": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "html_url": "https://github.com/ccusage/ccusage/commit/d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "committed_at": "2026-09-27T16:18:33Z"
       },
       "latest_release_source": {
-        "ref": "v20.0.24",
-        "sha": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
-        "html_url": "https://github.com/ccusage/ccusage/commit/ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
-        "committed_at": "2026-09-21T11:16:17Z"
+        "ref": "v20.0.26",
+        "sha": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "html_url": "https://github.com/ccusage/ccusage/commit/d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "committed_at": "2026-09-27T16:18:33Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
@@ -461,39 +460,31 @@
       "component_id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
       "selected_repository_url": "https://github.com/anthropics/claude-code",
-      "selected_version": "2.1.281",
+      "selected_version": "2.1.284",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/anthropics/claude-code",
           "exit_code": 0,
-          "started_at": "2026-09-26T15:45:21.817987+00:00",
-          "ended_at": "2026-09-26T15:45:22.226253+00:00",
-          "stdout_sha256": "a21cfef726bfab2d63ecbd8e3c53d36d6e10b5203250c114ac42bd40da47b2ec",
+          "started_at": "2026-09-29T01:38:08.065872+00:00",
+          "ended_at": "2026-09-29T01:38:08.483410+00:00",
+          "stdout_sha256": "6e31cf1322e7ebac749669576f694cb1603616bfaa0aafa6c3bcb7beaecb00f7",
           "status": "ok"
         },
         {
           "endpoint": "repos/anthropics/claude-code/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-26T15:45:22.226376+00:00",
-          "ended_at": "2026-09-26T15:45:22.493961+00:00",
-          "stdout_sha256": "4d781b2bbebe0b0aec4f9a47aec82c295b514f4ac8c6e1392ae3b60721c85ee7",
+          "started_at": "2026-09-29T01:38:08.483531+00:00",
+          "ended_at": "2026-09-29T01:38:08.804963+00:00",
+          "stdout_sha256": "ca2ff5c05f0658aabef9f10b838327ef21aba8fcc5c9cc0dfceb4f4f33c8ab89",
           "status": "ok"
         },
         {
-          "endpoint": "repos/anthropics/claude-code/commits/v2.1.281",
+          "endpoint": "repos/anthropics/claude-code/commits/v2.1.284",
           "exit_code": 0,
-          "started_at": "2026-09-26T15:45:22.494173+00:00",
-          "ended_at": "2026-09-26T15:45:22.860545+00:00",
-          "stdout_sha256": "677b4a9f2475d71810e50c86e3dbd333e52985632c2229357dcb6365b77454af",
-          "status": "ok"
-        },
-        {
-          "endpoint": "repos/anthropics/claude-code/commits/v2.1.283",
-          "exit_code": 0,
-          "started_at": "2026-09-26T15:45:22.861075+00:00",
-          "ended_at": "2026-09-26T15:45:23.228982+00:00",
-          "stdout_sha256": "b3e02dc70f89159df439f8b2643562846e99ba8c1ff50e8ba76535277ef67e8d",
+          "started_at": "2026-09-29T01:38:08.805250+00:00",
+          "ended_at": "2026-09-29T01:38:09.171925+00:00",
+          "stdout_sha256": "4431931b6111a7eabad54d09b4d950222d2dd9aa06ceb1c09b86459cefbc3842",
           "status": "ok"
         }
       ],
@@ -501,27 +492,27 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-26T02:34:14Z",
+      "pushed_at": "2026-09-29T00:05:54Z",
       "license_spdx": null,
       "latest_stable_release": {
-        "tag_name": "v2.1.283",
-        "published_at": "2026-09-25T21:50:12Z",
-        "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.283",
+        "tag_name": "v2.1.284",
+        "published_at": "2026-09-28T18:02:03Z",
+        "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.284",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v2.1.283",
-        "sha": "7779afb12e3635f46f56ec823979d68350ae000b",
-        "html_url": "https://github.com/anthropics/claude-code/commit/7779afb12e3635f46f56ec823979d68350ae000b",
-        "committed_at": "2026-09-25T21:49:55Z"
+        "ref": "v2.1.284",
+        "sha": "8364969e9f5234ef3d9743cf7c790e9aab0ac3b1",
+        "html_url": "https://github.com/anthropics/claude-code/commit/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1",
+        "committed_at": "2026-09-28T18:01:46Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/anthropics/claude-code",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "selected_version_matches_latest_stable"
     },
     {
       "component_id": "claude-hud",
@@ -2113,39 +2104,39 @@
       "component_id": "socraticode",
       "repository": "https://github.com/giancarloerra/SocratiCode",
       "selected_repository_url": "https://github.com/giancarloerra/SocratiCode",
-      "selected_version": "1.14.0",
-      "selected_source_pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "selected_version": "1.15.0",
+      "selected_source_pin": "f6191f076a42405f0d5508139f3a8b505cfef93a",
       "checks": [
         {
           "endpoint": "repos/giancarloerra/SocratiCode",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:41.874635+00:00",
-          "ended_at": "2026-09-21T22:32:42.281714+00:00",
-          "stdout_sha256": "576e5d6253c6ae53c7771f046508d3c363fad4020494d2cbb61e46a1e0076983",
+          "started_at": "2026-09-27T21:39:45.087535+00:00",
+          "ended_at": "2026-09-27T21:39:45.386063+00:00",
+          "stdout_sha256": "5f9285cd367ea67c26e7fe6cc1caea3581e889fd6a126edba1f4ae340786747b",
           "status": "ok"
         },
         {
           "endpoint": "repos/giancarloerra/SocratiCode/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:42.281857+00:00",
-          "ended_at": "2026-09-21T22:32:42.674755+00:00",
-          "stdout_sha256": "491c75712a3ce721463e63a4edd40db105bff11d5791c52d4c1f3054a0c6ae4c",
+          "started_at": "2026-09-27T21:39:45.386175+00:00",
+          "ended_at": "2026-09-27T21:39:45.627689+00:00",
+          "stdout_sha256": "b245ae4eeaa92311209aaff5f0f77eb3b74e9eaea8a42e22f8c62c8638fa71d9",
           "status": "ok"
         },
         {
-          "endpoint": "repos/giancarloerra/SocratiCode/commits/2218f25153d0f3f4a76ee240a5643dbc873e80be",
+          "endpoint": "repos/giancarloerra/SocratiCode/commits/f6191f076a42405f0d5508139f3a8b505cfef93a",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:42.674851+00:00",
-          "ended_at": "2026-09-21T22:32:43.105786+00:00",
-          "stdout_sha256": "999a2d4c6eda4ef6daa384037b8407606bd3787ed56a8cb0a7d4921c506a0531",
+          "started_at": "2026-09-27T21:39:45.627793+00:00",
+          "ended_at": "2026-09-27T21:39:45.910537+00:00",
+          "stdout_sha256": "0df1be4e35cb3187eaa309b855180ecf76d7403467c3ad6f9fb5faa94801bc2b",
           "status": "ok"
         },
         {
-          "endpoint": "repos/giancarloerra/SocratiCode/commits/v1.14.0",
+          "endpoint": "repos/giancarloerra/SocratiCode/commits/v1.15.0",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:43.105924+00:00",
-          "ended_at": "2026-09-21T22:32:43.494929+00:00",
-          "stdout_sha256": "999a2d4c6eda4ef6daa384037b8407606bd3787ed56a8cb0a7d4921c506a0531",
+          "started_at": "2026-09-27T21:39:45.910715+00:00",
+          "ended_at": "2026-09-27T21:39:46.198040+00:00",
+          "stdout_sha256": "0df1be4e35cb3187eaa309b855180ecf76d7403467c3ad6f9fb5faa94801bc2b",
           "status": "ok"
         }
       ],
@@ -2153,27 +2144,27 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-20T18:05:46Z",
+      "pushed_at": "2026-09-24T21:37:20Z",
       "license_spdx": "AGPL-3.0",
       "latest_stable_release": {
-        "tag_name": "v1.14.0",
-        "published_at": "2026-09-16T14:26:47Z",
-        "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+        "tag_name": "v1.15.0",
+        "published_at": "2026-09-24T10:58:58Z",
+        "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
-        "sha": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
-        "html_url": "https://github.com/giancarloerra/SocratiCode/commit/2218f25153d0f3f4a76ee240a5643dbc873e80be",
-        "committed_at": "2026-09-16T14:26:36Z"
+        "ref": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+        "sha": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+        "html_url": "https://github.com/giancarloerra/SocratiCode/commit/f6191f076a42405f0d5508139f3a8b505cfef93a",
+        "committed_at": "2026-09-24T10:58:52Z"
       },
       "latest_release_source": {
-        "ref": "v1.14.0",
-        "sha": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
-        "html_url": "https://github.com/giancarloerra/SocratiCode/commit/2218f25153d0f3f4a76ee240a5643dbc873e80be",
-        "committed_at": "2026-09-16T14:26:36Z"
+        "ref": "v1.15.0",
+        "sha": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+        "html_url": "https://github.com/giancarloerra/SocratiCode/commit/f6191f076a42405f0d5508139f3a8b505cfef93a",
+        "committed_at": "2026-09-24T10:58:52Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

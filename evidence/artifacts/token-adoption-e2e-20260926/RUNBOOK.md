@@ -65,7 +65,10 @@ for the five role bodies in README's Amendment 2 role-body table
 `evidence-reviewer`), all three copies must also equal the SHA256 recorded there
 for `d022295a`; byte identity at the execution HEAD alone does not suffice. A
 differing body blocks capability probes and launch, and any later change to
-these bodies requires another dated amendment before execution. Child
+these bodies requires another dated amendment before execution.
+**Amendment 3 (2026-09-28):** for `isolated-builder.md` the required value is
+README's Amendment 3 role-body row, which replaces its `d022295a` value; the
+other four bodies keep theirs. Child
 `meta.json` types are still observed separately (README dependency table).
 
 Use these shell variables as **operator inputs**, with real values recorded

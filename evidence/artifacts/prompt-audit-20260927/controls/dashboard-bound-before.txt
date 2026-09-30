@@ -1,0 +1,23 @@
+$ python3 -B -m unittest tests.test_grand_dashboard   # progress.py unchanged from main (MAX_BYTES only); manifest with this PR's registrations: 2017827 bytes
+ERROR: test_active_plan_drives_wave_rows_with_reference_containment
+ValueError: source exceeds size limit
+ERROR: test_arbitrary_source_fields_never_emitted
+ValueError: source exceeds size limit
+ERROR: test_combined_inventory_accepts_full_history_and_rejects_overflow
+ValueError: source exceeds size limit
+ERROR: test_configured_adapter_fixed_command_and_failed_generation
+ValueError: source exceeds size limit
+ERROR: test_evidence_manifest_has_its_own_size_bound
+ValueError: source exceeds size limit
+ERROR: test_failed_ingestion_does_not_advance_cache
+ValueError: source exceeds size limit
+ERROR: test_payload_generation_and_low_cardinality_labels
+ValueError: source exceeds size limit
+ERROR: test_snapshot_is_bounded_public_fields
+ValueError: source exceeds size limit
+FAIL: test_duplicate_inventory_entities_are_rejected
+ValueError: source exceeds size limit
+AssertionError: "^duplicate dashboard entities$" does not match "source exceeds size limit"
+Ran 17 tests in 0.137s
+FAILED (failures=1, errors=8)
+exit 1

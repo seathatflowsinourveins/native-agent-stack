@@ -1,0 +1,4 @@
+{
+  "name": "workspace-guard",
+  "description": "Records each session start in its own state directory."
+}

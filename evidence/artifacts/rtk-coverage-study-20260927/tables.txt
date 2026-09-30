@@ -1,0 +1,71 @@
+## A. Population replay (all Bash calls in window)
+logged: {'ask': 22080, 'defer': 36494, 'deny': 292, 'no row': 175} N 59041
+| v0.50.0 | 21957 | 37.19% | 39.7% of output bytes | errors 0 |
+| rc467 | 21752 | 36.84% | 39.4% of output bytes | errors 0 |
+| v0.50.0-noconfig | 22262 | 37.71% | 40.9% of output bytes | errors 0 |
+
+## C. Sample classes
+| class | n | % (95% CI) | call-output bytes % | C rewritten 0.50.0 | C rewritten rc.467 | clause alone rewritten | unit alone rewritten |
+| shape: pipeline | 181 | 29.6 (26.1-33.4) | 38.2 | 0/181 | 0/181 | 0/181 | 181/181 |
+| unsupported flag/form | 144 | 23.6 (20.4-27.1) | 19.0 | 0/144 | 0/144 | 0/144 | 0/144 |
+| shape: file redirect | 124 | 20.3 (17.3-23.7) | 14.6 | 0/124 | 0/124 | 79/124 | 80/124 |
+| shape: command substitution | 88 | 14.4 (11.8-17.4) | 12.1 | 0/88 | 0/88 | 79/88 | 79/88 |
+| excluded deliberately | 45 | 7.4 (5.5-9.7) | 12.9 | 0/45 | 0/45 | 0/45 | 0/45 |
+| shape: pipe with ( ) or { } grouping | 14 | 2.3 (1.4-3.8) | 2.1 | 0/14 | 0/14 | 10/14 | 14/14 |
+| deny rule (deliberate) | 10 | 1.6 (0.9-3.0) | 0.8 | 0/10 | 0/10 | 1/10 | 2/10 |
+| rewritten-now | 3 | 0.5 (0.2-1.4) | 0.1 | 3/3 | 3/3 | 2/3 | 2/3 |
+| shape: multi-line block | 2 | 0.3 (0.1-1.2) | 0.2 | 0/2 | 0/2 | 2/2 | 2/2 |
+rc467 class counts: {'shape: pipeline': 182, 'unsupported flag/form': 144, 'shape: file redirect': 124, 'shape: command substitution': 87, 'excluded deliberately': 45, 'shape: pipe with ( ) or { } grouping': 14, 'deny rule (deliberate)': 10, 'rewritten-now': 3, 'shape: multi-line block': 2}
+
+## D. Details
+| deny rule (deliberate) | secret-guard deny rule | 10 |
+| excluded deliberately | git show | 38 |
+| excluded deliberately | diff form | 6 |
+| excluded deliberately | git branch | 1 |
+| rewritten-now | hook logged NO_ROW None | 3 |
+| shape: command substitution | elsewhere in the call | 79 |
+| shape: command substitution | in the command itself | 9 |
+| shape: file redirect | stdout to file (no context output) (elsewhere in the call) | 74 |
+| shape: file redirect | stdout to file (no context output) | 37 |
+| shape: file redirect | input < file | 7 |
+| shape: file redirect | input < file (elsewhere in the call) | 5 |
+| shape: file redirect | stderr to file only | 1 |
+| shape: multi-line block | quote-swallowed-newline | 1 |
+| shape: multi-line block | unbalanced-grouping | 1 |
+| shape: pipe with ( ) or { } grouping | elsewhere in call | 10 |
+| shape: pipe with ( ) or { } grouping | in clause | 4 |
+| shape: pipeline | consumer not cat/head/tail: cut | 53 |
+| shape: pipeline | consumer not cat/head/tail: grep | 36 |
+| shape: pipeline | consumer not cat/head/tail: sed | 23 |
+| shape: pipeline | producer rule not pipeline-safe (rtk gh) | 22 |
+| shape: pipeline | producer rule not pipeline-safe (rtk read) | 17 |
+| shape: pipeline | producer rule not pipeline-safe (rtk uv) | 12 |
+| shape: pipeline | producer rule not pipeline-safe (rtk curl) | 11 |
+| shape: pipeline | consumer not cat/head/tail: sort | 5 |
+| shape: pipeline | consumer not cat/head/tail: tr | 1 |
+| shape: pipeline | consumer not cat/head/tail: wc | 1 |
+| unsupported flag/form | gh --json/--jq/--template (#196 skip) | 91 |
+| unsupported flag/form | binary invoked by path (/usr/bin/x, $VAR/bin/x) | 28 |
+| unsupported flag/form | head/tail operand not a literal path ($VAR, quotes, glob) | 11 |
+| unsupported flag/form | head -c (bytes) | 8 |
+| unsupported flag/form | tail -c (bytes) | 5 |
+| unsupported flag/form | assignment only (discover counts it) | 1 |
+
+## E. strata x class
+rtk gh 141 {'unsupported flag/form': 94, 'shape: file redirect': 23, 'shape: pipeline': 22, 'shape: command substitution': 2}
+rtk git 126 {'excluded deliberately': 39, 'shape: command substitution': 27, 'shape: file redirect': 24, 'unsupported flag/form': 14, 'shape: pipeline': 11, 'deny rule (deliberate)': 7, 'shape: pipe with ( ) or { } grouping': 4}
+rtk grep 124 {'shape: pipeline': 82, 'shape: file redirect': 20, 'shape: command substitution': 15, 'unsupported flag/form': 4, 'shape: pipe with ( ) or { } grouping': 2, 'shape: multi-line block': 1}
+rtk read 86 {'unsupported flag/form': 26, 'shape: file redirect': 24, 'shape: pipeline': 17, 'shape: command substitution': 13, 'rewritten-now': 3, 'deny rule (deliberate)': 2, 'shape: pipe with ( ) or { } grouping': 1}
+rtk ls 32 {'shape: command substitution': 19, 'shape: pipeline': 8, 'shape: file redirect': 3, 'shape: pipe with ( ) or { } grouping': 2}
+rtk wc 26 {'shape: file redirect': 26}
+rtk uv 16 {'shape: pipeline': 12, 'shape: file redirect': 3, 'shape: multi-line block': 1}
+rtk curl 15 {'shape: pipeline': 11, 'shape: command substitution': 4}
+rtk find 12 {'shape: pipeline': 5, 'shape: pipe with ( ) or { } grouping': 4, 'shape: command substitution': 3}
+rtk diff 9 {'excluded deliberately': 6, 'shape: command substitution': 3}
+rtk du 6 {'shape: pipeline': 6}
+rtk ps 6 {'shape: pipeline': 2, 'shape: pipe with ( ) or { } grouping': 1, 'deny rule (deliberate)': 1, 'shape: command substitution': 1, 'shape: file redirect': 1}
+rtk rg 6 {'shape: pipeline': 5, 'shape: command substitution': 1}
+rtk shellcheck 6 {'unsupported flag/form': 6}
+
+## F. main vs subagent in sample: {'sub': 539, 'main': 72}
+logged version in sample: {'0.49.0': 247, '0.50.0': 360, None: 4}

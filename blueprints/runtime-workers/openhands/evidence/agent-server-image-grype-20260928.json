@@ -1,0 +1,436 @@
+{
+  "schema_version": 1,
+  "evidence_class": "Native grype 0.119.0 and syft 1.52.0 executions against the pinned agent-server digest pulled into this host's rootless Docker daemon; no container was created or started. A package-to-advisory match inventory, not a reachability, exploitability or runtime assessment, and not upstream acceptance.",
+  "sanitization": "Scratch output paths are shown as <scratch>, the rootless daemon socket as $XDG_RUNTIME_DIR/docker.sock and the docker CLI without its install prefix. Paths inside the image are kept. Raw grype (18,253,938 bytes) and syft (15,550,859 bytes) JSON stayed in private scratch and are not published.",
+  "scanned_at": "2026-09-28T16:03:11Z",
+  "image": {
+    "ref": "ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37",
+    "platform": "linux/amd64",
+    "manifest_sha256": "ec7ed86f4021a21e161815853156521b44929d913f2e6ee06a173ef2f660aa12",
+    "config_sha256": "39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f",
+    "identity": {
+      "daemon_repo_digests": [
+        "ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37"
+      ],
+      "daemon_platform_descriptor_digest": "sha256:ec7ed86f4021a21e161815853156521b44929d913f2e6ee06a173ef2f660aa12",
+      "cataloged_image_id": "sha256:39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f",
+      "cataloged_config_sha256": "39426d8ce5c3ecaf6829063ec8ccfe5c289f049ae007fb14d89317b3982d196f",
+      "daemon_image_id": "sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37",
+      "daemon_image_id_note": "This daemon uses the containerd image store (io.containerd.snapshotter.v1), whose image .Id is the pulled index digest, not the config digest. The platform descriptor and the cataloged config bytes carry the identity check instead."
+    },
+    "config_build_env": [
+      "OPENHANDS_BUILD_GIT_SHA=fcc102a697874d54a357e36004e02c95040dbdc0",
+      "OPENHANDS_BUILD_GIT_REF=refs/tags/v1.49.6"
+    ],
+    "entrypoint": [
+      "tini",
+      "--",
+      "/usr/local/bin/openhands-agent-server"
+    ],
+    "user": "openhands",
+    "distro": "debian 13.7",
+    "layers": 21,
+    "daemon_size_bytes": 4562632840,
+    "containers_for_image_before_and_after": [
+      0,
+      0
+    ]
+  },
+  "scanner": {
+    "name": "grype",
+    "version": "0.119.0",
+    "commit": "b6f5194537747ee7f705f4113069ac9eb269919f",
+    "repository": "https://github.com/anchore/grype",
+    "embedded_syft": "v1.52.0",
+    "stack_pin": "not pinned in manifests/stack.json; version and commit from `grype version` on this host"
+  },
+  "cataloger": {
+    "name": "syft",
+    "version": "1.52.0",
+    "commit": "02ba369d13b4248395b20a504eca94b0cab564d8",
+    "repository": "https://github.com/anchore/syft",
+    "stack_pin": "manifests/stack.json component syft 1.52.0",
+    "artifacts": 3136,
+    "python_artifacts": [
+      "pip 26.2.1"
+    ]
+  },
+  "database": {
+    "built": "2026-09-28T06:42:30Z",
+    "schema": "v6.1.9",
+    "source": "https://grype.anchore.io/databases/v6/vulnerability-db_v6.1.9_2026-09-28T00:37:02Z_1790577750.tar.zst",
+    "checksum": "sha256:df23160af6e2d67cf3a5b6ccbc7e1de0c2c4ecd15cbd7dc6127ef4f9010ea714",
+    "providers": 26,
+    "auto_update_during_scan": false
+  },
+  "commands": [
+    {
+      "id": "pull",
+      "command": "docker --context rootless pull --platform linux/amd64 ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37",
+      "started": "2026-09-28T16:00:35Z",
+      "finished": "2026-09-28T16:01:14Z",
+      "exit_code": 0
+    },
+    {
+      "id": "db-update",
+      "command": "GRYPE_DB_CACHE_DIR=<scratch>/grype-db GRYPE_CHECK_FOR_APP_UPDATE=false grype db update",
+      "started": "2026-09-28T16:01:14Z",
+      "finished": "2026-09-28T16:02:37Z",
+      "exit_code": 0
+    },
+    {
+      "id": "grype-image",
+      "command": "DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock GRYPE_DB_CACHE_DIR=<scratch>/grype-db GRYPE_DB_AUTO_UPDATE=false GRYPE_CHECK_FOR_APP_UPDATE=false grype docker:ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37 --platform linux/amd64 -o json --file <scratch>/grype.json",
+      "started": "2026-09-28T16:03:11Z",
+      "finished": "2026-09-28T16:04:06Z",
+      "exit_code": 0
+    },
+    {
+      "id": "syft-image",
+      "command": "DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock SYFT_CHECK_FOR_APP_UPDATE=false syft scan docker:ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37 --platform linux/amd64 -o syft-json=<scratch>/syft.json",
+      "started": "2026-09-28T16:04:12Z",
+      "finished": "2026-09-28T16:04:53Z",
+      "exit_code": 0
+    },
+    {
+      "id": "grype-upstream-lock-purls",
+      "command": "GRYPE_DB_CACHE_DIR=<scratch>/grype-db GRYPE_DB_AUTO_UPDATE=false GRYPE_CHECK_FOR_APP_UPDATE=false grype purl:<scratch>/upstream-lock.purls -o json --file <scratch>/grype-purls.json",
+      "input": [
+        "pkg:pypi/anyio@4.11.0",
+        "pkg:pypi/click@8.1.8",
+        "pkg:pypi/pypdf@6.14.2",
+        "pkg:pypi/soupsieve@2.8.4"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "identity-read-back",
+      "command": "DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock docker image inspect ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37 --format 'Id={{.Id}} RepoDigests={{.RepoDigests}} Arch={{.Architecture}} Os={{.Os}}'; docker image inspect --platform linux/amd64 ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37 --format '{{json .Descriptor}}'; docker ps -a --filter ancestor=ghcr.io/openhands/agent-server@sha256:02ef66fdf0b22a40b0b55c5cca8d1790cfd260c5069f7c0b99edc1b505d5ab37 --format '{{.ID}}' | wc -l",
+      "exit_code": 0
+    },
+    {
+      "id": "upstream-lock-read",
+      "command": "curl -fsSL -o <scratch>/uv.lock https://raw.githubusercontent.com/OpenHands/software-agent-sdk/fcc102a697874d54a357e36004e02c95040dbdc0/uv.lock; sha256sum <scratch>/uv.lock; python3 tomllib read of the package table",
+      "exit_code": 0
+    }
+  ],
+  "counts": {
+    "unit": "Unique (vulnerability id, package name, package version, package type) matches. One advisory matched at several paths of the same package version counts once.",
+    "raw_matches": 1478,
+    "total": 1464,
+    "by_severity": {
+      "Critical": 32,
+      "High": 168,
+      "Medium": 208,
+      "Low": 57,
+      "Negligible": 780,
+      "Unknown": 219
+    },
+    "by_fix_state": {
+      "fixed": 319,
+      "not-fixed": 807,
+      "wont-fix": 333,
+      "unknown": 5
+    },
+    "unique_vulnerability_ids": 534,
+    "flagged_packages": 164,
+    "flagged_packages_by_type": {
+      "deb": 129,
+      "go-module": 17,
+      "npm": 16,
+      "binary": 2
+    },
+    "python_package_matches": 0
+  },
+  "flagged_packages_note": "One row per flagged package version. fixed_available counts that row's findings with a fixed version in the DB. Advisory IDs are listed for Critical findings only; locations are image paths for non-deb packages.",
+  "flagged_packages": [
+    {"name": "curl", "version": "8.14.1-2+deb13u5", "type": "deb", "by_severity": {"Critical": 8, "High": 10, "Medium": 1, "Negligible": 6}, "fixed_available": 0, "critical_ids": ["CVE-2026-10536", "CVE-2026-11856", "CVE-2026-18924", "CVE-2026-19931", "CVE-2026-8924", "CVE-2026-8926", "CVE-2026-8927", "CVE-2026-9079"]},
+    {"name": "libcurl3t64-gnutls", "version": "8.14.1-2+deb13u5", "type": "deb", "by_severity": {"Critical": 8, "High": 10, "Medium": 1, "Negligible": 6}, "fixed_available": 0, "critical_ids": ["CVE-2026-10536", "CVE-2026-11856", "CVE-2026-18924", "CVE-2026-19931", "CVE-2026-8924", "CVE-2026-8926", "CVE-2026-8927", "CVE-2026-9079"]},
+    {"name": "libcurl4t64", "version": "8.14.1-2+deb13u5", "type": "deb", "by_severity": {"Critical": 8, "High": 10, "Medium": 1, "Negligible": 6}, "fixed_available": 0, "critical_ids": ["CVE-2026-10536", "CVE-2026-11856", "CVE-2026-18924", "CVE-2026-19931", "CVE-2026-8924", "CVE-2026-8926", "CVE-2026-8927", "CVE-2026-9079"]},
+    {"name": "handlebars", "version": "1.0.0", "type": "npm", "by_severity": {"Critical": 3, "High": 5, "Medium": 1}, "fixed_available": 9, "critical_ids": ["GHSA-765h-qjxv-5f44", "GHSA-f2jv-r9rf-7988", "GHSA-w457-6q6x-cgp9"], "locations": ["/openhands/.openvscode-server/extensions/handlebars/package.json"]},
+    {"name": "node", "version": "22.21.1", "type": "binary", "by_severity": {"Critical": 1, "High": 10, "Medium": 10, "Low": 6}, "fixed_available": 26, "critical_ids": ["CVE-2025-55130"], "locations": ["/openhands/.openvscode-server/node"]},
+    {"name": "libxml2", "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3", "type": "deb", "by_severity": {"Critical": 1, "High": 7, "Medium": 2, "Low": 1, "Negligible": 1}, "fixed_available": 0, "critical_ids": ["CVE-2026-6653"]},
+    {"name": "shell-quote", "version": "1.8.3", "type": "npm", "by_severity": {"Critical": 1, "High": 1}, "fixed_available": 2, "critical_ids": ["GHSA-w7jw-789q-3m8p"], "locations": ["/openhands/.openvscode-server/node_modules/shell-quote/package.json"]},
+    {"name": "gh", "version": "2.101.0", "type": "deb", "by_severity": {"Critical": 1, "Medium": 3, "Low": 4}, "fixed_available": 0, "critical_ids": ["CVE-2026-48501"]},
+    {"name": "libtiff6", "version": "4.7.0-3+deb13u3", "type": "deb", "by_severity": {"Critical": 1, "Medium": 1, "Negligible": 11, "Unknown": 1}, "fixed_available": 0, "critical_ids": ["CVE-2026-52490"]},
+    {"name": "undici", "version": "7.19.0", "type": "npm", "by_severity": {"High": 5, "Medium": 9, "Low": 2}, "fixed_available": 16, "locations": ["/openhands/.openvscode-server/node_modules/undici/package.json"]},
+    {"name": "npm", "version": "1.0.1", "type": "npm", "by_severity": {"High": 5, "Medium": 1, "Low": 1}, "fixed_available": 7, "locations": ["/openhands/.openvscode-server/extensions/npm/package.json"]},
+    {"name": "bsdutils", "version": "1:2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libblkid1", "version": "2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "liblastlog2-2", "version": "2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libmount1", "version": "2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libsmartcols1", "version": "2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libuuid1", "version": "2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "login", "version": "1:4.16.0-2+really2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "mount", "version": "2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "util-linux", "version": "2.41.5-0+deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libexpat1", "version": "2.8.3-1~deb13u1", "type": "deb", "by_severity": {"High": 4, "Medium": 1}, "fixed_available": 0},
+    {"name": "wget", "version": "1.25.0-2", "type": "deb", "by_severity": {"High": 3, "Medium": 3, "Negligible": 1}, "fixed_available": 0},
+    {"name": "google.golang.org/grpc", "version": "v1.80.0", "type": "go-module", "by_severity": {"High": 3}, "fixed_available": 3, "locations": ["/usr/bin/containerd", "/usr/bin/ctr"]},
+    {"name": "libc-bin", "version": "2.41-12+deb13u4", "type": "deb", "by_severity": {"High": 2, "Medium": 9, "Low": 2, "Negligible": 7}, "fixed_available": 0},
+    {"name": "libc-dev-bin", "version": "2.41-12+deb13u4", "type": "deb", "by_severity": {"High": 2, "Medium": 9, "Low": 2, "Negligible": 7}, "fixed_available": 0},
+    {"name": "libc6", "version": "2.41-12+deb13u4", "type": "deb", "by_severity": {"High": 2, "Medium": 9, "Low": 2, "Negligible": 7}, "fixed_available": 0},
+    {"name": "libc6-dev", "version": "2.41-12+deb13u4", "type": "deb", "by_severity": {"High": 2, "Medium": 9, "Low": 2, "Negligible": 7}, "fixed_available": 0},
+    {"name": "libcups2t64", "version": "2.4.10-3+deb13u2", "type": "deb", "by_severity": {"High": 2, "Medium": 9, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libperl5.40", "version": "5.40.1-6+deb13u1", "type": "deb", "by_severity": {"High": 2, "Medium": 2, "Negligible": 1}, "fixed_available": 0},
+    {"name": "perl", "version": "5.40.1-6+deb13u1", "type": "deb", "by_severity": {"High": 2, "Medium": 2, "Negligible": 1}, "fixed_available": 0},
+    {"name": "perl-base", "version": "5.40.1-6+deb13u1", "type": "deb", "by_severity": {"High": 2, "Medium": 2, "Negligible": 1}, "fixed_available": 0},
+    {"name": "perl-modules-5.40", "version": "5.40.1-6+deb13u1", "type": "deb", "by_severity": {"High": 2, "Medium": 2, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libsndfile1", "version": "1.2.2-2+deb13u1", "type": "deb", "by_severity": {"High": 2, "Medium": 2}, "fixed_available": 0},
+    {"name": "grunt", "version": "1.0.0", "type": "npm", "by_severity": {"High": 2, "Medium": 1}, "fixed_available": 3, "locations": ["/openhands/.openvscode-server/extensions/grunt/package.json"]},
+    {"name": "golang.org/x/crypto", "version": "v0.52.0", "type": "go-module", "by_severity": {"High": 2}, "fixed_available": 2, "locations": ["/usr/bin/rootlesskit"]},
+    {"name": "golang.org/x/crypto", "version": "v0.55.0", "type": "go-module", "by_severity": {"High": 2}, "fixed_available": 2, "locations": ["/usr/libexec/docker/cli-plugins/docker-buildx"]},
+    {"name": "libacl1", "version": "2.3.2-2+b1", "type": "deb", "by_severity": {"High": 2}, "fixed_available": 0},
+    {"name": "python", "version": "3.13.15", "type": "binary", "by_severity": {"High": 1, "Medium": 5, "Low": 1}, "fixed_available": 5, "locations": ["/usr/local/bin/python3.13", "/usr/local/lib/libpython3.13.so.1.0"]},
+    {"name": "libxi6", "version": "2:1.8.2-1", "type": "deb", "by_severity": {"High": 1, "Medium": 5, "Unknown": 1}, "fixed_available": 0},
+    {"name": "dirmngr", "version": "2.4.7-21+deb13u1+b5", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "gnupg", "version": "2.4.7-21+deb13u1", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "gnupg-l10n", "version": "2.4.7-21+deb13u1", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "gpg", "version": "2.4.7-21+deb13u1+b5", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "gpg-agent", "version": "2.4.7-21+deb13u1+b5", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "gpgconf", "version": "2.4.7-21+deb13u1+b5", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "gpgsm", "version": "2.4.7-21+deb13u1+b5", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "xdg-utils", "version": "1.2.1-2", "type": "deb", "by_severity": {"High": 1, "Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "github.com/docker/docker", "version": "v28.5.2+incompatible", "type": "go-module", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 0, "locations": ["/usr/libexec/docker/cli-plugins/docker-buildx"]},
+    {"name": "ip-address", "version": "9.0.5", "type": "npm", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 2, "locations": ["/openhands/.openvscode-server/node_modules/ip-address/package.json"]},
+    {"name": "libminizip1t64", "version": "1:1.3.dfsg+really1.3.1-1+b1", "type": "deb", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 0},
+    {"name": "libncursesw6", "version": "6.5+20250216-2", "type": "deb", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 0},
+    {"name": "libtinfo6", "version": "6.5+20250216-2", "type": "deb", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 0},
+    {"name": "lodash-es", "version": "4.17.23", "type": "npm", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 2, "locations": ["/openhands/.openvscode-server/node_modules/lodash-es/package.json"]},
+    {"name": "ncurses-base", "version": "6.5+20250216-2", "type": "deb", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 0},
+    {"name": "ncurses-bin", "version": "6.5+20250216-2", "type": "deb", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 0},
+    {"name": "picomatch", "version": "4.0.3", "type": "npm", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 2, "locations": ["/openhands/.openvscode-server/node_modules/picomatch/package.json"]},
+    {"name": "zlib1g", "version": "1:1.3.dfsg+really1.3.1-1+b1", "type": "deb", "by_severity": {"High": 1, "Medium": 1}, "fixed_available": 0},
+    {"name": "diff", "version": "1.0.0", "type": "npm", "by_severity": {"High": 1, "Low": 1}, "fixed_available": 2, "locations": ["/openhands/.openvscode-server/extensions/diff/package.json"]},
+    {"name": "sudo", "version": "1.9.16p2-3+deb13u2", "type": "deb", "by_severity": {"High": 1, "Negligible": 2}, "fixed_available": 0},
+    {"name": "github.com/moby/go-archive", "version": "v0.2.0", "type": "go-module", "by_severity": {"High": 1}, "fixed_available": 1, "locations": ["/usr/libexec/docker/cli-plugins/docker-buildx"]},
+    {"name": "golang.org/x/net", "version": "v0.55.0", "type": "go-module", "by_severity": {"High": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd", "/usr/bin/ctr", "/usr/bin/rootlesskit"]},
+    {"name": "golang.org/x/text", "version": "v0.38.0", "type": "go-module", "by_severity": {"High": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd", "/usr/bin/ctr"]},
+    {"name": "ini", "version": "1.0.0", "type": "npm", "by_severity": {"High": 1}, "fixed_available": 1, "locations": ["/openhands/.openvscode-server/extensions/ini/package.json"]},
+    {"name": "json", "version": "1.0.0", "type": "npm", "by_severity": {"High": 1}, "fixed_available": 1, "locations": ["/openhands/.openvscode-server/extensions/json/package.json"]},
+    {"name": "libx11-6", "version": "2:1.8.12-1", "type": "deb", "by_severity": {"High": 1}, "fixed_available": 0},
+    {"name": "libx11-data", "version": "2:1.8.12-1", "type": "deb", "by_severity": {"High": 1}, "fixed_available": 0},
+    {"name": "libx11-xcb1", "version": "2:1.8.12-1", "type": "deb", "by_severity": {"High": 1}, "fixed_available": 0},
+    {"name": "libxrender1", "version": "1:0.9.12-1", "type": "deb", "by_severity": {"High": 1}, "fixed_available": 0},
+    {"name": "libavahi-client3", "version": "0.8-16", "type": "deb", "by_severity": {"Medium": 8}, "fixed_available": 0},
+    {"name": "libavahi-common-data", "version": "0.8-16", "type": "deb", "by_severity": {"Medium": 8}, "fixed_available": 0},
+    {"name": "libavahi-common3", "version": "0.8-16", "type": "deb", "by_severity": {"Medium": 8}, "fixed_available": 0},
+    {"name": "libopenjp2-7", "version": "2.5.3-2.1~deb13u2", "type": "deb", "by_severity": {"Medium": 3, "Low": 1, "Negligible": 9}, "fixed_available": 0},
+    {"name": "libasound2-data", "version": "1.2.14-1+deb13u1", "type": "deb", "by_severity": {"Medium": 3, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libasound2t64", "version": "1.2.14-1+deb13u1", "type": "deb", "by_severity": {"Medium": 3, "Negligible": 1}, "fixed_available": 0},
+    {"name": "tar", "version": "1.35+dfsg-3.1", "type": "deb", "by_severity": {"Medium": 3, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libgdk-pixbuf-2.0-0", "version": "2.42.12+dfsg-4+deb13u1", "type": "deb", "by_severity": {"Medium": 3}, "fixed_available": 0},
+    {"name": "libgdk-pixbuf2.0-common", "version": "2.42.12+dfsg-4+deb13u1", "type": "deb", "by_severity": {"Medium": 3}, "fixed_available": 0},
+    {"name": "libnss-systemd", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "libpam-systemd", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "libsystemd-shared", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "libsystemd0", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "libudev1", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "systemd", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "systemd-cryptsetup", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "systemd-sysv", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "systemd-timesyncd", "version": "257.13-1~deb13u1", "type": "deb", "by_severity": {"Medium": 2, "Low": 1, "Negligible": 4}, "fixed_available": 0},
+    {"name": "libsqlite3-0", "version": "3.46.1-7+deb13u2", "type": "deb", "by_severity": {"Medium": 2, "Negligible": 2}, "fixed_available": 0},
+    {"name": "github.com/containerd/containerd/v2", "version": "v2.3.4", "type": "go-module", "by_severity": {"Medium": 2}, "fixed_available": 2, "locations": ["/usr/libexec/docker/cli-plugins/docker-buildx", "/usr/libexec/docker/cli-plugins/docker-compose"]},
+    {"name": "libp11-kit0", "version": "0.25.5-3", "type": "deb", "by_severity": {"Medium": 2}, "fixed_available": 0},
+    {"name": "pug", "version": "1.0.0", "type": "npm", "by_severity": {"Medium": 2}, "fixed_available": 2, "locations": ["/openhands/.openvscode-server/extensions/pug/package.json"]},
+    {"name": "libglib2.0-0t64", "version": "2.84.4-3~deb13u5", "type": "deb", "by_severity": {"Medium": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "bzip2", "version": "1.0.8-6", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "github.com/containerd/containerd/v2", "version": "v2.3.5", "type": "go-module", "by_severity": {"Medium": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd", "/usr/bin/containerd-shim-runc-v2", "/usr/bin/ctr", "/usr/bin/dockerd"]},
+    {"name": "go.opentelemetry.io/otel", "version": "v1.43.0", "type": "go-module", "by_severity": {"Medium": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd"]},
+    {"name": "libattr1", "version": "1:2.5.2-3", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "libbz2-1.0", "version": "1.0.8-6", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "libnghttp2-14", "version": "1.64.0-1.1+deb13u1", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "libpam-modules", "version": "1.7.0-5", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "libpam-modules-bin", "version": "1.7.0-5", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "libpam-runtime", "version": "1.7.0-5", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "libpam0g", "version": "1.7.0-5", "type": "deb", "by_severity": {"Medium": 1}, "fixed_available": 0},
+    {"name": "uuid", "version": "9.0.1", "type": "npm", "by_severity": {"Medium": 1}, "fixed_available": 1, "locations": ["/openhands/.openvscode-server/node_modules/uuid/package.json"]},
+    {"name": "yaml", "version": "1.0.0", "type": "npm", "by_severity": {"Medium": 1}, "fixed_available": 1, "locations": ["/openhands/.openvscode-server/extensions/yaml/package.json"]},
+    {"name": "libcairo-gobject2", "version": "1.18.4-1+b1", "type": "deb", "by_severity": {"Low": 2, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libcairo2", "version": "1.18.4-1+b1", "type": "deb", "by_severity": {"Low": 2, "Negligible": 1}, "fixed_available": 0},
+    {"name": "libllvm19", "version": "1:19.1.7-3+b1", "type": "deb", "by_severity": {"Low": 1, "Negligible": 2}, "fixed_available": 0},
+    {"name": "login.defs", "version": "1:4.17.4-2", "type": "deb", "by_severity": {"Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "passwd", "version": "1:4.17.4-2", "type": "deb", "by_severity": {"Low": 1, "Negligible": 1}, "fixed_available": 0},
+    {"name": "@tootallnate/once", "version": "3.0.0", "type": "npm", "by_severity": {"Low": 1}, "fixed_available": 1, "locations": ["/openhands/.openvscode-server/node_modules/@tootallnate/once/package.json"]},
+    {"name": "github.com/cilium/ebpf", "version": "v0.16.0", "type": "go-module", "by_severity": {"Low": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd", "/usr/bin/containerd-shim-runc-v2", "/usr/bin/ctr"]},
+    {"name": "github.com/cilium/ebpf", "version": "v0.17.3", "type": "go-module", "by_severity": {"Low": 1}, "fixed_available": 1, "locations": ["/usr/bin/dockerd", "/usr/bin/runc"]},
+    {"name": "go.opentelemetry.io/otel/exporters/otlp/otlptrace", "version": "v1.43.0", "type": "go-module", "by_severity": {"Low": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd"]},
+    {"name": "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc", "version": "v1.43.0", "type": "go-module", "by_severity": {"Low": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd"]},
+    {"name": "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp", "version": "v1.43.0", "type": "go-module", "by_severity": {"Low": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd"]},
+    {"name": "go.opentelemetry.io/otel/sdk", "version": "v1.43.0", "type": "go-module", "by_severity": {"Low": 1}, "fixed_available": 1, "locations": ["/usr/bin/containerd"]},
+    {"name": "markdown", "version": "1.0.0", "type": "npm", "by_severity": {"Low": 1}, "fixed_available": 0, "locations": ["/openhands/.openvscode-server/extensions/markdown-basics/package.json"]},
+    {"name": "binutils", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "binutils-common", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "binutils-x86-64-linux-gnu", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "libbinutils", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "libctf-nobfd0", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "libctf0", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "libgprofng0", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "libsframe1", "version": "2.44-3", "type": "deb", "by_severity": {"Negligible": 69}, "fixed_available": 0},
+    {"name": "libelf1t64", "version": "0.192-4", "type": "deb", "by_severity": {"Negligible": 7}, "fixed_available": 0},
+    {"name": "patch", "version": "2.8-2", "type": "deb", "by_severity": {"Negligible": 6}, "fixed_available": 0},
+    {"name": "libldap2", "version": "2.6.10+dfsg-1", "type": "deb", "by_severity": {"Negligible": 5}, "fixed_available": 0},
+    {"name": "coreutils", "version": "9.7-3", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libgbm1", "version": "25.0.7-2+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libgl1-mesa-dri", "version": "25.0.7-2+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libglx-mesa0", "version": "25.0.7-2+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libgssapi-krb5-2", "version": "1.21.3-5+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libk5crypto3", "version": "1.21.3-5+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libkrb5-3", "version": "1.21.3-5+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libkrb5support0", "version": "1.21.3-5+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "libnss3", "version": "2:3.110-1+deb13u4", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "mesa-libgallium", "version": "25.0.7-2+deb13u1", "type": "deb", "by_severity": {"Negligible": 4}, "fixed_available": 0},
+    {"name": "git", "version": "1:2.47.3-0+deb13u1", "type": "deb", "by_severity": {"Negligible": 3}, "fixed_available": 0},
+    {"name": "git-man", "version": "1:2.47.3-0+deb13u1", "type": "deb", "by_severity": {"Negligible": 3}, "fixed_available": 0},
+    {"name": "libgcrypt20", "version": "1.11.0-7+deb13u1", "type": "deb", "by_severity": {"Negligible": 2}, "fixed_available": 0},
+    {"name": "libpng16-16t64", "version": "1.6.48-1+deb13u5", "type": "deb", "by_severity": {"Negligible": 2}, "fixed_available": 0},
+    {"name": "apt", "version": "3.0.3", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "apt-transport-https", "version": "3.0.3", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "apt-utils", "version": "3.0.3", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "diffutils", "version": "1:3.10-4", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "dmsetup", "version": "2:1.02.205-2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "iptables", "version": "1.8.11-2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "jq", "version": "1.7.1-6+deb13u3", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libapt-pkg7.0", "version": "3.0.3", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libdevmapper1.02.1", "version": "2:1.02.205-2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libgl1", "version": "1.7.0-1+b2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libglvnd0", "version": "1.7.0-1+b2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libglx0", "version": "1.7.0-1+b2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libgnutls30t64", "version": "3.8.9-3+deb13u4", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libip4tc2", "version": "1.8.11-2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libip6tc2", "version": "1.8.11-2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libjbig0", "version": "2.1-6.1+b2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libjq1", "version": "1.7.1-6+deb13u3", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "liblcms2-2", "version": "2.16-2+deb13u2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libpixman-1-0", "version": "0.44.0-3", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "libxtables12", "version": "1.8.11-2", "type": "deb", "by_severity": {"Negligible": 1}, "fixed_available": 0},
+    {"name": "chromium", "version": "153.0.8010.52-1~deb13u1", "type": "deb", "by_severity": {"Unknown": 108}, "fixed_available": 108},
+    {"name": "chromium-common", "version": "153.0.8010.52-1~deb13u1", "type": "deb", "by_severity": {"Unknown": 108}, "fixed_available": 108},
+    {"name": "golang.org/x/crypto", "version": "v0.53.0", "type": "go-module", "by_severity": {"Unknown": 1}, "fixed_available": 0, "locations": ["/usr/bin/containerd"]}
+  ],
+  "upstream_lock": {
+    "source": "pins.json uv_lock: OpenHands/software-agent-sdk@fcc102a697874d54a357e36004e02c95040dbdc0 uv.lock",
+    "sha256": "d13a41b86c48e66e1719b19d8e2d3a315abfab87c257fb18881ce4e31075c910",
+    "sha256_matches_pins": true,
+    "locked_versions": {
+      "anyio": "4.11.0",
+      "click": "8.1.8",
+      "pypdf": "6.14.2",
+      "soupsieve": "2.8.4",
+      "pyinstaller": "6.22.2"
+    }
+  },
+  "upstream_lock_flagged_note": "The server binary /usr/local/bin/openhands-agent-server is a PyInstaller build from upstream's unchanged uv.lock (pins.json uv_lock; SDK@fcc102a openhands-agent-server/openhands/agent_server/docker/Dockerfile:129,139,146-158,583-590). These four locked versions carry advisories; the recipe relock changes only the recipe venv. The rows below are grype DB matches for the exact versions given as package URLs, which is lock evidence, not an observation inside the image.",
+  "upstream_lock_flagged": [
+    {
+      "name": "anyio",
+      "version": "4.11.0",
+      "recipe_relock_version": "4.14.2",
+      "observed_by_cataloger": false,
+      "grype_db_advisories": [
+        {
+          "id": "GHSA-5p39-cfhj-2xmp",
+          "severity": "Medium",
+          "fixed_in": [
+            "4.14.2"
+          ]
+        },
+        {
+          "id": "GHSA-82r6-8w77-94w6",
+          "severity": "Critical",
+          "fixed_in": [
+            "4.14.2"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "click",
+      "version": "8.1.8",
+      "recipe_relock_version": "8.5.0",
+      "observed_by_cataloger": false,
+      "grype_db_advisories": [],
+      "note": "This grype DB returned no match; research.md records OSV-Scanner's PYSEC-2026-2132 (fixed in 8.3.3) for this version."
+    },
+    {
+      "name": "pypdf",
+      "version": "6.14.2",
+      "recipe_relock_version": "6.19.0",
+      "observed_by_cataloger": false,
+      "grype_db_advisories": [
+        {
+          "id": "GHSA-23w6-3w8w-8484",
+          "severity": "Medium",
+          "fixed_in": [
+            "6.16.1"
+          ]
+        },
+        {
+          "id": "GHSA-763m-79hh-57f2",
+          "severity": "Medium",
+          "fixed_in": [
+            "6.16.1"
+          ]
+        },
+        {
+          "id": "GHSA-fc8x-2rww-xw9m",
+          "severity": "Medium",
+          "fixed_in": [
+            "6.15.0"
+          ]
+        },
+        {
+          "id": "GHSA-fp3f-mc75-235c",
+          "severity": "Medium",
+          "fixed_in": [
+            "6.15.0"
+          ]
+        },
+        {
+          "id": "GHSA-fwg2-594c-jp42",
+          "severity": "Medium",
+          "fixed_in": [
+            "6.15.0"
+          ]
+        },
+        {
+          "id": "GHSA-jp53-mhqp-8xcg",
+          "severity": "Medium",
+          "fixed_in": [
+            "6.16.0"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "soupsieve",
+      "version": "2.8.4",
+      "recipe_relock_version": "2.9.2",
+      "observed_by_cataloger": false,
+      "grype_db_advisories": [
+        {
+          "id": "GHSA-gjv8-xp57-g29c",
+          "severity": "Medium",
+          "fixed_in": [
+            "2.9.0"
+          ]
+        },
+        {
+          "id": "GHSA-j934-xhv5-fg8f",
+          "severity": "Medium",
+          "fixed_in": [
+            "2.9.0"
+          ]
+        }
+      ]
+    }
+  ],
+  "scope_limits": [
+    "Syft cataloged 3,136 artifacts but only one Python package (pip 26.2.1 in the base interpreter). The PyInstaller single-file server archive is not unpacked by the catalogers, so this scan neither confirms nor excludes the four upstream-lock versions inside it.",
+    "The recipe venv built from requirements.lock lives in the host install prefix mounted into the container. It is not part of this image and is not covered by this scan.",
+    "Negligible and Unknown are distribution or database classifications, not zero risk. Counts measure matched advisories, not reachability or exploitability in this recipe.",
+    "Only the linux/amd64 manifest of the index was scanned.",
+    "Counts are specific to the database built 2026-09-28T06:42:30Z. A later database can change them."
+  ]
+}

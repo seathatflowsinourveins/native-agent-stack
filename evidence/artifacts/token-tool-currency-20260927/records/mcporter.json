@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "tool": "mcporter",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.483Z",
+  "upstream_repository": "https://github.com/openclaw/mcporter",
+  "pin": {
+    "version": "0.14.1",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:623",
+      "adoption/pins-linux-x86_64.json:132"
+    ],
+    "scope": "Repository metadata; not an installed-client observation",
+    "secondary_pins": [
+      {
+        "version": "0.13.13",
+        "metadata_source": "adoption/pins-macos-arm64.json:106",
+        "scope": "scratch macOS policy hold"
+      },
+      {
+        "version": "0.13.13",
+        "metadata_source": "catalogs/landscape/foundation.json:4795",
+        "scope": "scratch sealed landscape winner"
+      }
+    ]
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/mcporter/gpt6.md",
+      "full-save/cur/mcporter/record.draft.json"
+    ],
+    "latest_release": {
+      "version": "0.14.1",
+      "published_at": "2026-09-24T13:16:08Z",
+      "source_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+      "package_channels": {
+        "verification_status": "Retained scratch package-channel facts; not reverified live in this handoff",
+        "records": [
+          {
+            "channel": "npm",
+            "version": "0.14.1",
+            "published_at": "2026-09-24T13:20:25Z",
+            "source_url": "https://registry.npmjs.org/mcporter"
+          }
+        ]
+      }
+    },
+    "behind_by": {
+      "stable_release_count": 0,
+      "main_commits_after_latest": 1,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v0.14.1",
+    "published_at": "2026-09-24T13:16:08Z",
+    "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/openclaw/mcporter/releases/latest",
+    "resolved_tag_commit": "93e0916cafe2d624b94271e31b75ca681a016514"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable GitHub releases",
+    "reference_pin": "0.14.1",
+    "latest": "0.14.1",
+    "method": "The repository pin equals the latest stable GitHub release version.",
+    "source_url": "https://api.github.com/repos/openclaw/mcporter/releases/latest",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The 0.14.1 release makes daemon activity-log selection apply to caller-visible server aliases, including aliases that share a connection.",
+      "source_urls": [
+        "https://github.com/openclaw/mcporter/releases/tag/v0.14.1"
+      ],
+      "revision": "v0.14.1",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The 0.14.1 release hides background Windows consoles during stdio cleanup and CLI generation.",
+      "source_urls": [
+        "https://github.com/openclaw/mcporter/releases/tag/v0.14.1"
+      ],
+      "revision": "v0.14.1",
+      "release_status": "released",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The one observed post-release commit adds the 0.14.2 Unreleased heading and release-verification links in CHANGELOG.md.",
+      "source_urls": [
+        "https://github.com/openclaw/mcporter/commit/5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7"
+      ],
+      "revision": "5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "93e0916cafe2d624b94271e31b75ca681a016514",
+    "head_commit": "5b3bd5c774361dc2565a066fb1e62d9fa8d3e8b7",
+    "commits_after_latest_release": 1,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/openclaw/mcporter/compare/v0.14.1...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "The stable-release count applies to the Linux/stack pin. The scratch macOS and sealed landscape pins remain separately reported at 0.13.13; they are not claimed current by this count."
+  ]
+}

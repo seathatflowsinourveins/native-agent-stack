@@ -19,9 +19,11 @@ const configured = (key) => resolve(HERE, typeof CONFIG[key] === 'string' ? CONF
 const readOr = (path) => { try { return readFileSync(path, 'utf8') } catch { return '' } }
 const WF = { review: 'workflows/review-changes.js', readiness: 'workflows/readiness-audit.js' }
 // The one effort every saved workflow stage and project agent binds (since 2026-09-23; decision
-// docs/decisions/2026-09-23-max-effort-default.md in the catalog). The coordinator stays at xhigh under
-// ultracode: a stage with no effort of its own and no agent frontmatter effort inherits that xhigh, and
-// CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
+// docs/decisions/2026-09-23-max-effort-default.md in the catalog). The coordinator runs at max in a terminal
+// session started through the ecosystem launcher and at xhigh, saved per model, elsewhere (Ultracode set xhigh on 2.1.281
+// and does not on 2.1.284). A stage with no effort of its own and no agent
+// frontmatter effort runs at the effort the session was given explicitly (--effort, /effort or the model picker), else at
+// its model's saved level or default (the coordinator's xhigh on 2.1.281), and CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
 // settings leave that variable unset.
 const STAGE_EFFORT = 'max'
 function load(file, stubs) {
@@ -328,8 +330,8 @@ function agentOptionLiterals(src) {
   return found
 }
 // Static contract shared by every saved workflow: one worker packet text, and an
-// explicit task-matched model and effort on every agent() call (an omitted model
-// inherits the coordinator's model).
+// explicit task-matched model and effort on every agent() call (an omitted model runs the
+// definition's model, else CLAUDE_CODE_SUBAGENT_MODEL, else the lead's).
 {
   const sample = "// agent( in a comment\nconst s = 'agent( in a string {'\nawait agent('p {' + x, { label: 'a', schema: { type: 'object', properties: { model: { type: 'string' } } }, model: 'sonnet', effort: 'low' })\nawait agent(p, opts)\nawait agent(p, { label: 'b', schema: S, effort: 'high' })\n"
   const lits = agentOptionLiterals(sample)
@@ -430,7 +432,7 @@ function agentOptionLiterals(src) {
   }
   // The role routing table in the routing doc restates what the agent files and saved stages bind: one
   // row per project agent carrying the model and effort its file declares, default-child rows at the stage
-  // effort, and the coordinator row at xhigh under ultracode. Drift on either side fails here.
+  // effort, and the coordinator row's launcher max and saved xhigh fallback. Drift on either side fails here.
   const routingLines = readOr(configured('routing_doc')).split('\n')
   const head = routingLines.findIndex((l) => l.startsWith('| Task class | Agent / stage | Model, effort |'))
   const roleRows = []
@@ -444,10 +446,10 @@ function agentOptionLiterals(src) {
   const defaultRows = roleRows.filter((r) => r[1] === 'default workflow subagent')
   expect('routing doc: every default workflow subagent row binds a model at effort ' + STAGE_EFFORT, defaultRows.length > 0 && defaultRows.every((r) => new RegExp('^(Sonnet|Opus), ' + STAGE_EFFORT + '$').test(r[2])))
   const coordinatorRows = roleRows.filter((r) => r[1] === 'coordinator')
-  expect('routing doc: the coordinator row stays at xhigh under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('xhigh under `ultracode`'))
-  // Effort profile: the coordinator keeps ultracode at xhigh, so the settings must not set
-  // CLAUDE_CODE_EFFORT_LEVEL (any value overrides every stage's and agent's own effort, and a value other than
-  // xhigh also leaves ultracode's orchestration inactive) and must not cap effort below the stage effort, either
+  expect('routing doc: the coordinator row states the launcher max and the saved xhigh fallback under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('max from the launcher, else saved xhigh, under `ultracode`'))
+  // Effort profile: the saved coordinator effort is xhigh (the launcher adds max), so the settings must not set
+  // CLAUDE_CODE_EFFORT_LEVEL (any value overrides every stage's and agent's own effort; on 2.1.281 a value other than
+  // xhigh also left ultracode's orchestration inactive) and must not cap effort below the stage effort, either
   // with a top-level maxEffortLevel or with one inside a modelSettings entry.
   let settingsJson = {}
   try { settingsJson = JSON.parse(readOr(configured('settings'))) || {} } catch { settingsJson = {} }
@@ -502,7 +504,7 @@ function agentOptionLiterals(src) {
   // Exact lists also reject substitution of an off/user-invocable-only skill; the
   // installer tests separately read the pinned table's Listing column for all agents.
   const skillsOf = (agent) => ((frontOf(agent).match(/^skills:\n((?:  - [^\n]+(?:\n|$))*)/m) || [null, ''])[1]).split('\n').filter(Boolean).map((line) => line.replace(/^  - /, '')).sort()
-  expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode', 'verification-before-completion']))
+  expect('agents: isolated-builder preloads exactly its reviewed skills', JSON.stringify(skillsOf('isolated-builder')) === JSON.stringify(['context-mode:context-mode']))
   expect('agents: security-reviewer preloads exactly its reviewed skill', JSON.stringify(skillsOf('security-reviewer')) === JSON.stringify(['security-best-practices']))
   const ctx = (t) => 'mcp__plugin_context-mode_context-mode__' + t
   const expectedResearcherTools = ['Read', 'Glob', 'Grep', 'Bash', 'WebSearch', 'ToolSearch',

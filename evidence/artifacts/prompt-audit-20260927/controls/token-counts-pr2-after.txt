@@ -1,0 +1,2 @@
+PR-2 after (AGENTS.md: F1 + F4); tools/token-report/token_manifest.py count_files, gpt-tokenizer 3.4.0 o200k_base
+AGENTS.md bytes 12025 tokens 2401 words 1495 lines 103 sha256 0178874720aad562640a89bde18c8e534dd94861690e089aa48e7060f70e5342

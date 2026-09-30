@@ -19,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "scripts/hooks/secret_path_guard.py"
 HOST_HOOK = Path.home() / ".claude" / "hooks" / "secret_path_guard.py"
 IN_CI = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("CI", "").lower() == "true"
+# The OpenHands runtime-worker session-key directory (PR #425's host driver); the run id and arm in the file names
+# below are illustrative.
+OH_SECRETS = "~/.local/state/native-agent-stack/runtime-workers/openhands/secrets"
 
 BLOCKED = {
     "cat ~/.config/native-agent-stack/alpaca-paper.env": "credential_store_path",
@@ -91,6 +94,18 @@ BLOCKED = {
     "ls ${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack": "credential_store_path",
     "rg KEY \"$XDG_CONFIG_HOME/native-agent-stack/\"": "credential_store_path",
     "while read -r line; do :; done < \"$PAPER_ENV_FILE\"": "credential_file_read",
+    # A numbered pointer (PAPER_ENV_FILE_2 is the second paper account's, 2026-09-29): the word boundary after
+    # PAPER_ENV_FILE used to fail before `_2`, so each of these passed the guard (checked against the previous guard)
+    # while the account-1 form was blocked.
+    "cat \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"${PAPER_ENV_FILE_2}\"": "credential_file_read",
+    "head -n 3 \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "while read -r l; do :; done < \"$PAPER_ENV_FILE_2\"": "credential_file_read",
+    "cat \"$SEC_CONTACT_ENV_2\"": "credential_file_read",
+    "set -x; . \"$PAPER_ENV_FILE_2\"": "trace_while_sourcing",
+    "set -o xtrace; source \"${PAPER_ENV_FILE_2}\"": "trace_while_sourcing",
+    ". \"$PAPER_ENV_FILE_2\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
+    "( . \"$PAPER_ENV_FILE_2\"; python3 -c 'import os; print(dict(os.environ))' )": "environment_dump_after_source",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -249,6 +264,27 @@ BLOCKED = {
     "scp -i ~/.ssh/nas_key build.tgz nas:/volume1/": "credential_file_read",
     "rsync -a -e 'ssh -i ~/.ssh/nas_key' dist/ nas:/volume1/dist/": "credential_file_read",
     "gpg --homedir ~/.gnupg --list-keys": "credential_file_read",
+    # OpenHands runtime-worker session keys (2026-09-28): for each attempt the host driver writes the agent-server
+    # key to <run-id>-<arm>.server.env (Docker env-file syntax) and <run-id>-<arm>.headers (a `curl -H @file` header
+    # line) in a 0700 secrets directory, and deletes both once the attempt's containers are removed. A reader, copy or
+    # search of either file, of the directory itself and of a glob in it is blocked. The .server.env file, which the
+    # dotenv rule already caught, is now reported as a read of the directory, which the store rule checks first; curl
+    # is one of the guard's readers, so a curl that reads the header file is blocked too, as `curl --netrc-file` is.
+    f"cat {OH_SECRETS}/rw-1-engines-on.headers": "credential_file_read",
+    f"head -c 80 {OH_SECRETS}/rw-1-engines-on.headers": "credential_file_read",
+    f"cp {OH_SECRETS}/rw-1-engines-on.headers /tmp/h": "credential_file_read",
+    f"grep -r X-Session-API-Key {OH_SECRETS}": "credential_file_read",
+    f"rg -uu . {OH_SECRETS}/": "credential_file_read",
+    f"rg Key {OH_SECRETS}/*.headers": "credential_file_read",
+    f"cat {OH_SECRETS}/*": "credential_file_read",
+    f"cp -r {OH_SECRETS} /tmp/s": "credential_file_read",
+    f"cat {OH_SECRETS}/rw-1-engines-on.server.env": "credential_file_read",
+    "cat \"$HOME/.local/state/native-agent-stack/runtime-workers/openhands/secrets/rw-1-engines-on.headers\"":
+        "credential_file_read",
+    "tail -n 1 \"${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/runtime-workers/openhands/secrets\"/*":
+        "credential_file_read",
+    "curl -H @\"$HOME/.local/state/native-agent-stack/runtime-workers/openhands/secrets/rw-1-engines-on.headers\" "
+    "http://127.0.0.1:8000/alive": "credential_file_read",
 }
 
 # The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
@@ -438,6 +474,18 @@ ALLOWED = [
     "wc -c \"$PAPER_ENV_FILE\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE\"",
     "( set -a; . \"$PAPER_ENV_FILE\"; set +a; exec python3 blueprints/us-equities/alpaca-paper/paper_runner.py --once )",
+    # The second paper account (2026-09-29): its pointer handed to a loader or a size check, as account 1's is.
+    "python3 runner.py preflight --env-file \"$PAPER_ENV_FILE_2\" --output out.json",
+    "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_2\" --out rate-limit.json",
+    "wc -c \"$PAPER_ENV_FILE_2\"",
+    "stat -c '%a %U' \"$PAPER_ENV_FILE_2\"",
+    # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
+    # loader as --env-file. It must keep passing for both accounts, so closing the numbered-pointer hole never blocks a unit.
+    "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE\"'",
+    "systemd-run --user --unit=paper-series-2 --collect /bin/bash -ic "
+    "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE_2\"'",
+    "systemd-run --user --unit=x --collect /bin/bash -ic \"exec python3 X --env-file \\\"$PAPER_ENV_FILE_2\\\" --output out.json\"",
     # Hugging Face: hf reads its own store, so checking the sign-in, the operator's interactive
     # login, revision-pinned downloads and checksum verification never expose the token.
     "hf auth whoami",
@@ -457,6 +505,10 @@ ALLOWED = [
     "python3 scripts/kernel_keyring.py status tavily_api_key",
     "python3 scripts/kernel_keyring.py revoke tavily_api_key",
     "( set +x; read -rs K && printf %s \"$K\" | python3 scripts/kernel_keyring.py store tavily_api_key )",
+    # The keyring-only key's one move into the file store (2026-09-29, docs/decisions/2026-09-29-key-management.md):
+    # exec hands its one variable to the create-only writer, started with -I -S, which prints only "tavily: stored".
+    "python3 scripts/kernel_keyring.py exec tavily_api_key TAVILY_API_KEY -- "
+    "python3 -I -S tools/credentials/set_credential.py tavily --from-env",
     f"{EXEC} tvly auth --json",
     f"{EXEC} tvly --json auth",
     f"{EXEC} tvly search \"<query>\" --depth basic --max-results 5 --json",
@@ -507,6 +559,12 @@ ALLOWED = [
     f"{EXEC} tvly search set --json",
     "tvly auth --json > auth.json",
     "tvly auth --json 2>&1",
+    # Commands that live lanes schedule (2026-09-28 non-regression): the paper lane's key wrapper starting a command,
+    # keyring status without a name, and exec's own help. The documented exec forms, `kernel_keyring.py exec <name>
+    # <ENV_VAR> -- <command>`, are above ({EXEC} and {DEMO_EXEC}) and in test_documented_keyring_commands_pass.
+    "sh ~/.local/state/native-agent-stack/alpaca-paper/paperkeys.sh run 1 -- echo ok",
+    "python3 scripts/kernel_keyring.py status",
+    "python3 scripts/kernel_keyring.py exec --help",
 ]
 
 # Negative corpus: ordinary repository and shell work that must never be blocked.
@@ -649,10 +707,31 @@ SAFE_CORPUS = [
     "rtk ls ~/.ssh",
     "rtk hook check 'git push origin HEAD'",
     "rtk --version",
+    # The OpenHands session-key rule blocks readers only (2026-09-28): a listing, status, mode changes, an existence
+    # check after cleanup, a `docker run --env-file` that hands the file to Docker, the rest of the runtime-worker
+    # state and a search whose pattern names the directory pass. So does a code search of OH_SESSION_API_KEYS_0,
+    # which is not one of the guard's secret names (docs/secret-storage.md, "Home and tool credential stores").
+    f"ls -la {OH_SECRETS}",
+    f"stat -c '%a %U' {OH_SECRETS}/rw-1-engines-on.headers",
+    f"chmod 700 {OH_SECRETS}",
+    f"chmod 600 {OH_SECRETS}/rw-1-engines-on.headers",
+    f"test ! -e {OH_SECRETS}/rw-1-engines-on.headers && echo deleted",
+    f"docker run --rm --env-file {OH_SECRETS}/rw-1-engines-on.server.env example/agent-server",
+    "cat ~/.local/state/native-agent-stack/runtime-workers/openhands/runs/rw-1/engines-on/status.json",
+    "rg -n 'runtime-workers/openhands/secrets' docs",
+    "rg -n OH_SESSION_API_KEYS_0 docs",
+    "grep -n OH_SESSION_API_KEYS_0 docs/secret-storage.md",
 ]
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
 EXPECTED_PASS_THROUGH = [
+    # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
+    # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
+    "cat \"$PAPER_ENV_FILE_B\"",
+    # systemd-run is not a modelled launcher: a reader it starts is not inspected, for either account (found 2026-09-29 while
+    # adding the loader-path rows above); with --pipe --wait its output returns to the caller.
+    "systemd-run --user --pipe --wait cat \"$PAPER_ENV_FILE\"",
+    "systemd-run --user --pipe --wait /bin/bash -ic 'cat \"$PAPER_ENV_FILE_2\"'",
     "python3 -c \"import runner; print(runner.credentials(__import__('os').path.expandvars('$PAPER_ENV_FILE')))\"",
     "python3 -c 'import os;print(dict(os.environ))'",
     # huggingface_hub's own loader, and an archiver on the whole Hugging Face home.
@@ -703,6 +782,17 @@ EXPECTED_PASS_THROUGH = [
     "cp -r ~/.codex /tmp/c",
     "grep -r token ~/.claude",
     "cat /srv/omniroute-data/storage.sqlite",
+    # OpenHands session keys (2026-09-28): the agent-server holds its key in its container environment, and the guard
+    # does not model docker subcommands, so printenv or a shell in the container and a full inspect, whose
+    # Config.Env holds the key, pass (the container name is illustrative). The variable name is not a listed secret
+    # name, so a shell in the container expanding it passes too. A search of the state directory that holds
+    # secrets/, and a relative read after `cd`, pass as for the home stores.
+    "docker exec rw-1-engines-on-server printenv",
+    "docker exec rw-1-engines-on-server printenv OH_SESSION_API_KEYS_0",
+    "docker exec rw-1-engines-on-server sh -c 'echo \"$OH_SESSION_API_KEYS_0\"'",
+    "docker inspect rw-1-engines-on-server",
+    "grep -r X-Session-API-Key ~/.local/state/native-agent-stack/runtime-workers/openhands",
+    "cd ~/.local/state/native-agent-stack/runtime-workers/openhands && cat secrets/rw-1-engines-on.headers",
 ]
 
 
@@ -762,6 +852,17 @@ class SecretPathGuardTests(unittest.TestCase):
             for command in (f"cat {path}", f"head -n 5 {path}", f"tail -n 3 {path}", f"rtk read {path}"):
                 with self.subTest(rule=pattern, command=command):
                     self.assertIsNotNone(guard.check(command))
+
+    def test_template_denies_the_openhands_session_key_directory(self):
+        # The template reaches every session on a host, so it denies Claude's file tools the directory that holds
+        # each OpenHands runtime-worker attempt's session key (2026-09-28), with its Context Mode twin right after it;
+        # test_every_template_read_deny_has_a_blocked_bash_reader then expects the guard to block its readers.
+        deny = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))[
+            "permissions"]["deny"]
+        rule = f"Read({OH_SECRETS}/**)"
+        self.assertEqual(rule, "Read(~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**)")
+        self.assertIn(rule, deny)
+        self.assertEqual(deny[deny.index(rule) + 1], "Read(**/" + rule[len("Read(~/"):])
 
     def test_documented_keyring_commands_pass(self):
         # The keyring commands in the fenced blocks of the pages that document them.

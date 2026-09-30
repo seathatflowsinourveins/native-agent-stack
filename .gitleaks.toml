@@ -316,6 +316,24 @@ regexes = [
   '''^\s*"key":\s*"(?:ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db|ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0|125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1|683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9)",?\s*$''',
 ]
 
+# 2026-09-28: PR #400 retained the full upstream ai-memory report in a separate
+# returned-results file. Its seven reviewed "key" values are SHA-256 rejection
+# fingerprints, not credentials: ai-memory source 62e73148, auto_improve.rs
+# rejection_fingerprint, reader.rs auto_improve_report aggregation. Keep the old
+# four-value/September-23 exception above unchanged. This independent AND rule
+# permits only these values on whole "key" lines in this one returned report.
+# tests/test_gitleaks_config.py test_e3/e4/e5 cover the positive and adverse cases.
+[[rules.allowlists]]
+description = "Seven reviewed ai-memory rejection digests in the September 27 returned report"
+condition = "AND"
+paths = [
+  '''^observability/memory-scheduled-results-20260927\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''^\s*"key":\s*"(?:ab60ca6b319cd1ae67edf7153a82dfe740358d9fe839f8e52366edfa88cf38db|ad141246c92c80672c10dba83896fe6744fc0ef5ef3a4d3ca07b27fce89aa9b0|125b939f93f32338ee87c4fe362dbc1e10237865266014573628ca6ab7d811a1|683cc56662967628cbce607d2a76a95e81eab811bf0033a167885cc243e399b9|20d12bd285ea6bd2d67a2fa02a3880d58390fbc17b4fedc2d9862f7db89e9088|a29791aae4200620764263b4e3fd1b4a383746fda9e82c30c7cb9ee59ed1a6e8|d1349458a0797550dfac40c438d35e067f8d5277deabbba283695786c20d0555)",?\s*$''',
+]
+
 [[rules]]
 id = "sourcegraph-access-token"
 
@@ -353,11 +371,17 @@ regexes = [
 # stays detected, on a pin line or elsewhere: an unreviewed id, an uppercase variant, or a legacy
 # Sourcegraph token. So does an sgp_-prefixed token, and so do the same ids in any other file
 # (tests/test_gitleaks_config.py test_d3/test_d4).
+# 2026-09-29 (landscape-sweep-20260929): the same shape. The rule id is named again in the secrets-credentials
+# refuters' reasoning, the lane's free-text commit ids were again shortened to 12 characters before the manifest
+# was built (the retained returns hold no bare 40-hex value), and the 60 "pin" values the generator copies from
+# the catalog layer files are the same 39 distinct commit ids, checked value by value against the list below
+# (no id added, none removed). Only the exact path of that manifest joins the allowlist.
 [[rules.allowlists]]
-description = "The reviewed git commit ids of the catalog pins in the 2026-09-26 SOTA manifest"
+description = "The reviewed git commit ids of the catalog pins in the 2026-09-26 and 2026-09-29 SOTA manifests"
 condition = "AND"
 paths = [
   '''^catalogs/sota-convergence/manifest-20260926\.json$''',
+  '''^catalogs/sota-convergence/manifest-20260929\.json$''',
 ]
 regexTarget = "secret"
 regexes = [

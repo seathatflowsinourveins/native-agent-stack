@@ -728,6 +728,13 @@ lane. With the flag:
   of its entries is left out, even where another list repeats it. The refutation is of the discovery
   proposal, not of the repository: the 2026-09-23 refutations of ledger repositories say "not new to the
   catalog" or "already conditional". So it withholds only a newcomer addition, never a ledger candidate.
+  A refutation no returned vote made does not count (2026-09-28): when `catalogs/saturation/ledger.json`
+  has a completed sweep whose `manifest_sha256` is this manifest's, a row of that sweep's lane whose ledger
+  entry in that layer `scripts/saturation_ledger.py` `refuted_by_absence` reads as refuted only because a vote
+  did not return (`{missing: true}` in the retained returns) is carried as a newcomer, unless another of its
+  entries in the layer is refuted on merit. The returns are trusted as `saturation_ledger.py --check` binds them. On the 2026-09-26 manifest 27
+  rows are refuted only by absence: 23 are now carried as newcomers in 9 foundation packets, and the other 4
+  are already ledger candidates.
 - **Registered evidence is attached.** A newcomer's `evidence_refs` hold the repository-relative
   `evidence/` path each `evidence[]` entry leads with, when that path is listed in `manifests/evidence.json`
   `files[]` and still has its listed sha256. A locator after the path (`items[3]`, `(lines 1-9)`) is dropped.
@@ -1388,7 +1395,7 @@ exits 2, because the checkout has `.git`):
 python3 tools/sota-convergence/blind_checkout.py \
   --source . --rev HEAD --dest /path/outside/repos/blind-checkout --export /path/outside/repos/blind-export
 python3 tools/sota-convergence/codex_lane.py \
-  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort high
+  --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort max   # max is the default
 python3 tools/sota-convergence/codex_lane.py \
   --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --layers native-clients,market-data-reference
 python3 tools/sota-convergence/codex_lane.py \

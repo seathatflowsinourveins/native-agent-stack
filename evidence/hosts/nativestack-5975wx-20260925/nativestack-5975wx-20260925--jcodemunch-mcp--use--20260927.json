@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "nativestack-5975wx-20260925--jcodemunch-mcp--use--20260927",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "nativestack-5975wx-20260925",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": true,
+    "hardware_profile_ref": "nativestack-5975wx-20260925"
+  },
+  "catalog_revision": "55fc8d17f530851a3a4dff0564eef3e450967231",
+  "recorded_by": {
+    "identity_sha256": "5b4f00fe84f06be105fb8a8625b9ecd14d784c8e32357045a2971bf652b71ea6",
+    "model": "gpt-6-astra at effort max via codex-cli 0.157.1 profile stack-worker, driven by promptfoo 0.123.1"
+  },
+  "component_id": "jcodemunch-mcp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "python3 tools/capability-gate/run_gate.py jcodemunch",
+      "exit": 0,
+      "duration_s": 261.76,
+      "output_sha256": "9ea93d0adf3d53069c0dd438941c27a951e83db7b39465502df451e87de37359",
+      "output_excerpt": "capability-gate jcodemunch: PASS | gate 6/6 pass; ctrl-disabled 2/2 fail as predicted; ctrl-prompt 2/2 fail as predicted | 10 rows as expected, 10 distinct sessions | loki 10/10 rows match (8 MCP tool results) | promptfoo 0.123.1, codex-cli 0.157.1, run 2026-09-27T21:40:02Z\n"
+    }
+  ],
+  "tool_versions": {
+    "jcodemunch-mcp": "1.108.319"
+  },
+  "observed_at_utc": "2026-09-27T21:40:00Z",
+  "result": "pass",
+  "claim": "On nativestack-5975wx-20260925, python3 tools/capability-gate/run_gate.py jcodemunch exited 0 and printed \"capability-gate jcodemunch: PASS | gate 6/6 pass; ctrl-disabled 2/2 fail as predicted; ctrl-prompt 2/2 fail as predicted | 10 rows as expected, 10 distinct sessions | loki 10/10 rows match\": GPT-6 workers running codex exec --profile stack-worker in the main checkout under approval policy never passed every jcodemunch-mcp 1.108.319 gate row, and both negative controls failed as the harness predicts.",
+  "limitations": [
+    "Driven through promptfoo 0.123.1's openai:codex-sdk (its bundled @openai/codex-sdk 0.153.4) with the one-line tools/capability-gate/codex-profile-exec launcher, so the sessions log to Loki as codex_sdk_ts rather than a lane's codex_exec; model, effort and MCP tables come from the stack-worker profile.",
+    "The per-row verdicts use promptfoo's trajectory:tool-used plus the repository's tools/capability-gate/assertions.js (documented local integration code); invoke counts come from Codex's own OTel codex.tool_result records in Loki. Only counts are printed; tool results and model text are not retained.",
+    "PASS semantics (tools/capability-gate/README.md at this catalog revision): each gate row made exactly one jcodemunch call (order search_symbols) that completed without error and returned the target function's signature, which the task text does not contain; in each ctrl-prompt row (default_tools_approval_mode prompt) every call was refused with Codex's approval-policy error and none completed; each ctrl-disabled row made no jcodemunch call; each row's call count equalled its codex.tool_result count in Loki.",
+    "The fixtures call order with explicit search_symbols arguments. At 1.108.319 route(execute=true) sends the whole task sentence as the symbol query (counter.py shape_execute_args) and missed both fixture symbols in 6 of 6 runs of the 2026-09-27 smoke; this receipt does not qualify route for sentence-style tasks."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-09-27T21:40:00Z",
+      "reviewer": {
+        "identity_sha256": "5b4f00fe84f06be105fb8a8625b9ecd14d784c8e32357045a2971bf652b71ea6",
+        "model": "gpt-6-astra at effort max via codex-cli 0.157.1 profile stack-worker, driven by promptfoo 0.123.1"
+      }
+    },
+    {
+      "kind": "codex_lane",
+      "ref": "capability-gate receipts review 2026-09-27, GPT-6 cross-family, of commit 04c238c6 on main 55fc8d17: P1: commands[0] and limitations[1] retain a wrapper summary while run_gate.py deletes the per-row native results without --keep; Loki invocation counts cannot independently verify result correctness, contrary to docs/acceptance-evidence-policy.md:57-69. Require private native-result retention and hashes with sanitized references, or narrow the receipt and dashboard to the recorded harness verdict. P2: limitations[2] claims order/search_symbols and the target signature, but assertions.js:41-42 checks only server, completion/error status and a parameter-fragment regex, while jcodemunch.yaml accepts any tool on that server; another operation or wrong symbol with the same fragment can pass. Require wording limited to those predicates and a distinction between requested and verified operations, or enforce tool, arguments and symbol identity and re-record.",
+      "verdict": "needs_changes",
+      "at_utc": "2026-09-27T22:11:23Z",
+      "reviewer": {
+        "identity_sha256": "95b7c716754303a70bdd3561f3cc086b7be95f3c43366a0c4e0aa0cb2509d7f1",
+        "model": "gpt-6-astra at effort max via codex-cli 0.157.1 (codex exec)"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "code-navigation"
+    }
+  ]
+}

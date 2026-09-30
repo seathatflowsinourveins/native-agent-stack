@@ -50,11 +50,12 @@ home gets RTK's instructions from the global `AGENTS.md` block of the
 (changed after `v2026.09.26.2`), because Codex does not expand the `@RTK.md`
 pointer that `rtk init` writes. An installed executable alone does not prove
 either behavior.
-A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's four
-`exclude_commands` entries, which keep blob reads, `git branch` and `diff` native.
-The recipe explains how RTK anchors each entry. On 2026-09-26 it grew from two
-entries to four: `^git show [^ ]*:` alone missed spellings such as
-`git -C . show HEAD:x`. Confirm the file with `rtk hook check`, since RTK can ignore
+A host that runs the Claude hook at RTK 0.50.0 also needs the recipe's five
+`exclude_commands` entries, which keep blob reads, `git branch`, `diff` and
+standalone `jq` native. The recipe explains how RTK anchors each entry. On
+2026-09-26 it grew from two entries to four: `^git show [^ ]*:` alone missed
+spellings such as `git -C . show HEAD:x`. On 2026-09-27 standalone `jq` became
+the fifth. Confirm the file with `rtk hook check`, since RTK can ignore
 a TOML-valid file. The exclusions cover only hook rewrites, never an explicit `rtk`
 command.
 Preserve canonical generated instructions and the host's hook policy; historical
@@ -166,6 +167,7 @@ Desktop WSL, native Claude and native Codex Context Mode runtime scopes.
 | toon input.json --stats -o output.toon | One conversion | TOON 4.1.1 uses tokenx 1.3.0 estimates here; no native cross-run savings ledger. Exact o200k_base recount is separate. |
 | Context Mode ctx_stats | Connection/session and reported lifetime estimates | Session estimates differ from lifetime event-count × 256-token heuristics; neither is exact provider usage. A new Inspector connection has its own session. The persisted counters and the rendered bars measure different things; see below. |
 | headroom savings --json | Native usage ledger report | In 0.37.0, the field named lifetime is capped by a 30-day report lookback. Offline guard results do not populate it automatically. |
+| Claude Code `/usage` "Prompt cache (main)" line; status-line `prompt_cache` object | Main conversation of one session | Native prompt-cache hit-ratio counters for the main conversation only, not subagents; Claude Code 2.1.251 or later, and the likely-miss cause 2.1.260 or later ([costs](https://code.claude.com/docs/en/costs), [status line](https://code.claude.com/docs/en/statusline), read 2026-09-28). The reset on `/clear` applies only to the `/usage` Session line. For children, read the cache counters of `examples/claude-native/workflows/child-usage.mjs` or OTel `claude_code.token.usage`, and prefer `query_source` to `agent.name` ([monitoring](https://code.claude.com/docs/en/monitoring-usage)). |
 
 The reviewed RTK retained-history snapshot reported 46 commands, 11,509 input,
 9,852 output and 1,657 estimated saved tokens (14.3974%). Its project view
@@ -268,12 +270,17 @@ E1 and E2 subagent receipts.
   to more tokens than the original. Include recall or original reads and the response
   envelope when comparing workflow cost; the clean-prefix Headroom figures below show
   the same growth.
-- **Measurement infrastructure saves nothing itself.** gpt-tokenizer 3.4.0
-  (`o200k_base`) is the counter behind the exact comparisons, not a reducer. Its
-  counting contract covers ordinary UTF-8 text under the default special-token
-  policy, which disallows every special token and throws on an input that contains
-  one ([3.4.0 README](https://github.com/niieani/gpt-tokenizer/blob/3.4.0/README.md#special-tokens));
-  allowed-special modes are not qualified here, and neither is 4.0.0. ccusage totals
+- **Measurement infrastructure saves nothing itself.** gpt-tokenizer 4.0.0
+  (`o200k_base`) is the pinned counter behind the exact comparisons, not a reducer;
+  the [ten dated comparisons](#ten-exact-retained-artifact-comparisons) were counted
+  with 3.4.0. Its counting contract covers ordinary UTF-8 text under the default
+  special-token policy, which disallows every special token and throws on an input
+  that contains one ([4.0.0 README](https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#special-tokens)).
+  The [4.0.0 qualification](../evidence/receipts/gpt-tokenizer-400-qualification-20260929.json)
+  covers only default `encode` of `encoding/o200k_base` on UTF-8 text under Node
+  v24.21.0, where 3.4.0 and 4.0.0 counted all 47 artifacts retained in the host's
+  token-report ledger identically; allowed-special modes and other entry points are
+  not qualified. ccusage totals
   are consumption, reported token-only while any model is unpriced
   ([recipe row](../recipes/README.md#component-catalog-install-and-check)). An
   agentsview answer observes retained history, and MCPorter is transport.
@@ -285,6 +292,91 @@ E1 and E2 subagent receipts.
   ([E1 correction](../evidence/artifacts/token-e2e-ultracode-20260925/README.md#results),
   [E2 erratum](../evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md#erratum-2026-09-27)).
   Read `tools[].adjudication`, not `quality_check.passed`.
+- **A proxy arm changes the harness too (2026-09-28).** Behind a non-first-party
+  `ANTHROPIC_BASE_URL`, Claude Code turns MCP tool search off and loads every MCP
+  tool into the cached prefix, so connecting a server, or deliberately disabling
+  it or denying its tools, invalidates the cache, while an unexpected disconnect
+  keeps it ([gateway caveat](foundation-stack.md),
+  [MCP tool search](https://code.claude.com/docs/en/mcp#configure-tool-search),
+  [prompt caching](https://code.claude.com/docs/en/prompt-caching)). The only
+  independent billed-cost study the 2026-09-26 landscape sweep found (arXiv
+  2607.12161) measured the Headroom v0.27.0 API-boundary proxy at +48.4% billed
+  cost, not 0.37 or 0.39.
+  An arm routed through `ANTHROPIC_BASE_URL` holds `ENABLE_TOOL_SEARCH` and the
+  cache-TTL variables fixed across arms, confirms that the proxy forwards
+  `tool_reference` blocks and keeps the 1M window, and reports cache creation and
+  reads per arm; otherwise compression is confounded with lost tool search and a
+  changed cache lifetime.
+
+## Run shape and accounting (2026-09-29)
+
+The [spend attribution receipt](../evidence/receipts/claude-spend-attribution-20260929.json)
+counts this host's Claude Code transcripts for 2026-09-24 to 2026-09-29 (UTC dates; the files that record a version
+were written by Claude Code 2.1.280 to 2.1.284) and matches ccusage 20.0.26 on input, output, cache-read and cache-creation
+(5m plus 1h split) totals within 0.001%. At API list prices (a proxy for the plan meter,
+which weights tokens differently), spend concentrates in how runs are shaped:
+
+- **Children.** Agent-tool and workflow children are 81.3% of dollars, workflow
+  stages alone 66.1%, and 4 of 710 session trees cover half. A child of more than
+  60 calls is 23.8% of children and 53.2% of dollars (median 25 calls,
+  p90 100, maximum 1,489). ccusage lists each workflow run as a session: the 303 runs
+  are 68.1% of its dollars, the median run $22 and the largest $448.
+- **Default-typed children.** A child with no role definition (`workflow-subagent`,
+  `general-purpose`, `claude`, `Explore`) is 63.4% of children and 41.1% of dollars,
+  with a median first call of 39.5K tokens; among the named role types in the receipt the
+  median first call runs from 8.2K (`source-scout`) to 47.9K (`landscape-sweep-worker`).
+- **Effort and thinking.** Effort `max` covers 82.2% of calls, and thinking is 61.0%
+  of output tokens. Earlier thinking blocks stay in context by default on Opus 4.5+
+  and Sonnet 4.6+ (the `keep` default of `clear_thinking_20251015` in
+  [context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing)),
+  so output is paid twice, once as output and again as carried context; no Claude
+  Code setting that clears them was found in the settings reference or changelog
+  on 2026-09-29. The docs say `max` "may show diminishing returns and is prone to
+  overthinking, so test before adopting it broadly"
+  ([model configuration](https://code.claude.com/docs/en/model-config)); the M7 arms
+  in the [max-default decision](decisions/2026-09-29-max-default-effort.md) are that
+  test and have no result yet.
+- **Advisor.** 1,872 iterations are 14.0% of dollars (750 on `claude-fable-5-1`,
+  all but 17 before 2026-09-28; 1,122 on `claude-opus-5-5`). Each call reads the
+  transcript uncached, and top-level `usage` leaves it out
+  ([advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing)).
+  ccusage counts it since v20.0.17; `child-usage.mjs` does not (see
+  [claude-advisor-usage-scan-20260928](../evidence/receipts/claude-advisor-usage-scan-20260928.json)).
+- **Long contexts.** Calls above 400K tokens of context are 13.4% of calls, 23.3% of
+  dollars and 35.5% of cache-read tokens; above 200K they are 42.8% of calls and
+  59.9% of dollars. Claude Code's guidance is to `/clear` when switching to
+  unrelated work, since stale context "wastes tokens on every subsequent message"
+  ([costs](https://code.claude.com/docs/en/costs)). At a task boundary, record the
+  progress and git state in a file or commit, then start a fresh context; an
+  incomplete handoff costs re-reads, so compare session spans and peak context
+  before and after.
+- **Cache.** Children wrote 844.6M tokens to the 5-minute class (their unsplit remainder priced
+  as 5-minute) and show none in the 1-hour split field; main sessions show 142.7M there. Misses after
+  5-minute to 1-hour gaps rewrote 168.2M of the children's tokens in 789 events, 19.9% of
+  their writes (the gap includes the next call's response time, so the bin is approximate). At the
+  generic price ratios (write 1.25x, 1-hour write 2x, read 0.1x the input price), a 1-hour class
+  would price every remaining write at 2x (+507.3M input-equivalents) and turn the rewrites into
+  reads (-193.4M), a net +313.9M; it pays only when rewrites exceed 0.39 of the 5-minute writes
+  (`data.derived` in the receipt). The 5-minute default stays
+  ([prompt caching](https://code.claude.com/docs/en/prompt-caching)).
+- **Tools.** MCP calls are 15.1% of 210,900 tool calls and 98.6% of them are Context
+  Mode. ToolSearch loads exceed later calls for serena (694 loads, 28 calls), QMD
+  (519, 58), ai-memory (238, 137), SocratiCode (132, 68), Headroom (119, 26) and
+  jCodeMunch (102, 81). These are attempt counts with separate denominators, not
+  success rates.
+
+The receipt does not size the always-loaded files, and it carries no quality
+comparison: a saving from fewer or shorter children, a lower effort or a
+different advisor policy needs its own paired result. To repeat the measurement, copy the
+transcript tree (`cp -a ~/.claude/projects <copy>/projects`) so both tools read the same bytes, run
+`CLAUDE_CONFIG_DIR=<copy> ccusage claude daily --json --offline` and the scan
+(`cp evidence/artifacts/claude-spend-scan.py.txt claude_spend_scan.py`,
+`python3 claude_spend_scan.py --root <copy>/projects`, then `--control`) without a date filter, and compare
+`totals_comparable_to_ccusage` in the scan's output with ccusage's totals (the scan adds
+the advisor's tokens to the executor's). For a window, pass `--since YYYY-MM-DD` to the scan
+and `--since YYYYMMDD --timezone UTC` to ccusage. The
+[decision record](decisions/2026-09-29-token-spend-attribution.md) gives each lever its
+owner and overturn condition.
 
 ## Shared Codex quota (2026-09-26)
 
