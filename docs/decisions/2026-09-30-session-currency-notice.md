@@ -117,9 +117,15 @@ installed and no host file was written: the timer and the service are drafted te
    `XDG_STATE_HOME` is ignored, as the XDG specification requires. The write goes through a mode-0600, fsynced
    temporary file in the same directory and `os.replace`, the pattern of `saturation_ledger.write_ledger`
    (`scripts/saturation_ledger.py:1159-1177`). The document's keys are `generated_at`, `due`, `summary_line` (at
-   most 160 characters) and `details`. The line ends with `python3 scripts/currency_due.py --dry-run`, plus
-   `--network` and a non-default `--sweep-cadence-days N` when the run used them, so that running the command
-   reproduces the notice; the option is bounded to 36500 to keep the line short. The unit passes neither, so its
+   most 160 characters) and `details`. The line ends with `python3 <checkout>/scripts/currency_due.py --dry-run`,
+   the inspected checkout's own copy of the script by its absolute path (written as `~/...` under the home
+   directory, which every shell expands), plus `--network` and a non-default
+   `--sweep-cadence-days N` when the run used them, so that running the command reproduces the notice from any
+   working directory: the user-scope SessionStart hook prints the line in whatever project a session starts in,
+   where a cwd-relative command would run in the wrong checkout or none (GPT-6 review of #539). A checkout
+   without the script is named by `--root`; when the absolute command would leave the counts fewer than 12
+   characters, the line falls back to the cwd-relative `python3 scripts/currency_due.py --dry-run`. The option is
+   bounded to 36500 to keep the line short. The unit passes neither, so its
    notice ends with the bare command, and a test compares the flags in the unit's `ExecStart` with the flags the
    command names. The script exits 0 whether or not anything is due, and 2 on an internal error, which leaves the
    state directory as it was. That includes a report field of the wrong type. It makes no network call unless

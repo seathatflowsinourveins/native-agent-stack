@@ -11,7 +11,9 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import shlex
+import shutil
 import stat
 import subprocess
 import sys
@@ -28,6 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SYSTEMD_DIR = ROOT / "adoption/templates/systemd"
 NOW = "2026-09-30T12:00:00Z"
 NOW_DATETIME = datetime(2026, 9, 30, 12, 0, 0, tzinfo=timezone.utc)
+# The cwd-relative form of the command; a notice names the checkout's own copy of the script (Checkout.command).
 COMMAND = "python3 scripts/currency_due.py --dry-run"
 
 STALENESS = "scripts/receipt_staleness.py"
@@ -164,12 +167,16 @@ class Checkout:
     """A temporary checkout whose checks are fakes, with a state directory beside it (outside the checkout).
     By default nothing is due."""
 
-    def __init__(self, test: unittest.TestCase):
+    def __init__(self, test: unittest.TestCase, name: str = "checkout"):
         temporary = tempfile.TemporaryDirectory()
         test.addCleanup(temporary.cleanup)
         base = Path(temporary.name).resolve()
-        self.root = base / "checkout"
+        self.root = base / name
         self.state = base / "state"
+        # The checkout's own copy of the script, which the notice's command names by its absolute path.
+        self.script = self.root / "scripts/currency_due.py"
+        self.script.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / "scripts/currency_due.py", self.script)
         self.set(STALENESS, staleness_report())
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
@@ -201,6 +208,10 @@ class Checkout:
         path = self.root / relative
         marker = path.with_name(path.name + suffix)
         return json.loads(marker.read_text(encoding="utf-8")) if marker.exists() else None
+
+    def command(self, *options: str) -> str:
+        """The command a notice written for this checkout ends with."""
+        return cd.join_command(["python3", cd.notice_path(self.script), "--dry-run", *options])
 
     def run(self, *extra: str) -> tuple[int, str, str]:
         stdout, stderr = io.StringIO(), io.StringIO()
@@ -238,9 +249,12 @@ class DueFileTests(unittest.TestCase):
         self.assertEqual(document["generated_at"], NOW)
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
                                            "reopen_triggers": 1})
-        self.assertEqual(document["summary_line"],
-                         f"stack currency: 1 pin behind, 2 stale receipts, 1 layer with reopen triggers; "
-                         f"details: {COMMAND}")
+        # The counts give way to the command when TMPDIR makes the checkout's path long (SummaryLineTests covers
+        # the shortening), so the exact text is checked around the command.
+        self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts, 1 layer"),
+                        document["summary_line"])
+        self.assertTrue(document["summary_line"].endswith(f"; details: {checkout.command()}"),
+                        document["summary_line"])
         self.assertLessEqual(len(document["summary_line"]), 160)
         self.assertEqual(stat.S_IMODE(checkout.due_file.stat().st_mode), 0o600)
         self.assertEqual(stat.S_IMODE(checkout.state.stat().st_mode), 0o700)
@@ -615,7 +629,7 @@ class IncompleteSkillCheckTests(unittest.TestCase):
         invalid = [item for item in document["details"] if item["kind"] == "skill_pin_invalid"]
         self.assertEqual([(item["skill"], item["state"]) for item in invalid], [("skill-1", "invalid-pin")])
         self.assertIs(document["details"][-1]["skills_complete"], True)
-        self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {COMMAND} --network")
+        self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {checkout.command('--network')}")
 
     def test_a_dry_run_headline_says_nothing_known_due_and_lists_the_error(self):
         checkout = self.skills_checkout(skills_report(("unfetched",), errors=[self.FETCH_ERROR]))
@@ -629,8 +643,9 @@ class IncompleteSkillCheckTests(unittest.TestCase):
 
 
 class DetailsCommandTests(unittest.TestCase):
-    """The command that ends the notice must print the details of the run that wrote it, so it repeats the options
-    that change what a run reports: --network and a non-default --sweep-cadence-days."""
+    """The command that ends the notice must print the details of the run that wrote it from any working directory:
+    it names the inspected checkout's own copy of the script by its absolute path and repeats the options that
+    change what a run reports, --network and a non-default --sweep-cadence-days."""
 
     def notice(self, checkout: Checkout, *options: str) -> dict:
         code, _, stderr = checkout.run(*options)
@@ -642,10 +657,21 @@ class DetailsCommandTests(unittest.TestCase):
         summary = document["summary_line"]
         self.assertIn("; details: ", summary)
         command = shlex.split(summary.split("; details: ", 1)[1])
-        self.assertEqual(command[:3], ["python3", "scripts/currency_due.py", "--dry-run"], summary)
+        self.assertEqual(command[:3], ["python3", cd.notice_path(checkout.script), "--dry-run"], summary)
         code, stdout, stderr = checkout.run(*command[2:], "--json")
         self.assertEqual(code, 0, stderr)
-        return json.loads(stdout)
+        document = json.loads(stdout)
+        # The same command as a process from an unrelated working directory: the path in the command, not the
+        # cwd, chooses the checkout (the SessionStart hook prints the line in whatever project a session starts in).
+        elsewhere = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, elsewhere, True)
+        # A shell would expand a leading ~; subprocess without one does not.
+        result = subprocess.run([sys.executable, os.path.expanduser(command[1]), *command[2:], "--json", "--now",
+                                 NOW, "--state-dir", str(checkout.state)],
+                                cwd=elsewhere, capture_output=True, text=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["due"], document["due"])
+        return document
 
     def test_skill_drift_alone_is_reproduced_by_the_command_in_the_notice(self):
         checkout = Checkout(self)
@@ -653,7 +679,7 @@ class DetailsCommandTests(unittest.TestCase):
         document = self.notice(checkout, "--network")
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 0, "due_layers": 0,
                                            "reopen_triggers": 0})
-        self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {COMMAND} --network")
+        self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {checkout.command('--network')}")
         again = self.reproduced(checkout, document)
         self.assertEqual((again["due"], again["summary_line"]), (document["due"], document["summary_line"]))
         # Without the option the same command sees nothing, which is why the notice has to name it.
@@ -666,7 +692,7 @@ class DetailsCommandTests(unittest.TestCase):
         document = self.notice(checkout, "--sweep-cadence-days", "0")
         self.assertEqual(document["due"]["due_layers"], 1)
         self.assertEqual(document["summary_line"],
-                         f"stack currency: 1 layer due; details: {COMMAND} --sweep-cadence-days 0")
+                         f"stack currency: 1 layer due; details: {checkout.command('--sweep-cadence-days', '0')}")
         again = self.reproduced(checkout, document)
         self.assertEqual((again["due"], again["summary_line"]), (document["due"], document["summary_line"]))
         self.assertEqual(json.loads(checkout.run("--dry-run", "--json")[1])["due"]["due_layers"], 0)
@@ -676,7 +702,7 @@ class DetailsCommandTests(unittest.TestCase):
         checkout.something_due()
         checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("skill-drift",))))
         document = self.notice(checkout, "--network", "--sweep-cadence-days", "7")
-        self.assertTrue(document["summary_line"].endswith(f"; details: {COMMAND} --network --sweep-cadence-days 7"),
+        self.assertTrue(document["summary_line"].endswith(f"; details: {checkout.command('--network', '--sweep-cadence-days', '7')}"),
                         document["summary_line"])
         self.assertLessEqual(len(document["summary_line"]), 160)
         self.assertEqual(self.reproduced(checkout, document)["due"], document["due"])
@@ -686,7 +712,50 @@ class DetailsCommandTests(unittest.TestCase):
         checkout.something_due()
         # checkout.run adds --root, --state-dir and --now; --json and --dry-run are output modes.
         document = self.notice(checkout, "--json")
+        self.assertTrue(document["summary_line"].endswith(f"; details: {checkout.command()}"),
+                        document["summary_line"])
+
+    def test_a_checkout_without_the_script_is_named_by_root(self):
+        checkout = Checkout(self)
+        checkout.script.unlink()
+        command = shlex.split(cd.details_command(checkout.root, True, 7))
+        self.assertEqual(command, ["python3", cd.notice_path(Path(cd.__file__).resolve()), "--dry-run",
+                                   "--root", cd.notice_path(checkout.root), "--network", "--sweep-cadence-days", "7"])
+
+    def test_a_path_under_the_home_directory_is_written_with_a_tilde(self):
+        with mock.patch.object(Path, "home", return_value=Path("/h/u")):
+            self.assertEqual(cd.notice_path(Path("/h/u/code/stack/scripts/currency_due.py")),
+                             "~/code/stack/scripts/currency_due.py")
+            self.assertEqual(cd.notice_path(Path("/h/u")), "/h/u")
+            self.assertEqual(cd.notice_path(Path("/srv/stack/scripts/currency_due.py")),
+                             "/srv/stack/scripts/currency_due.py")
+            # A quoted ~ is not expanded by the shell, so a path that needs quoting stays absolute.
+            self.assertEqual(cd.notice_path(Path("/h/u/my code/scripts/currency_due.py")),
+                             "/h/u/my code/scripts/currency_due.py")
+            # The ~ token stays unquoted in the command; a path with a space is quoted and absolute.
+            self.assertEqual(cd.join_command(["python3", "~/code/stack/scripts/currency_due.py", "--dry-run"]),
+                             "python3 ~/code/stack/scripts/currency_due.py --dry-run")
+            self.assertEqual(shlex.split(cd.details_command(Path("/h/u/my code"), False, 30)),
+                             ["python3", cd.notice_path(Path(cd.__file__).resolve()), "--dry-run",
+                              "--root", "/h/u/my code"])
+
+    def test_an_absolute_command_that_leaves_the_counts_no_room_gives_way_to_the_relative_form(self):
+        # A checkout path this long leaves "1 pin behind" no room beside the absolute command.
+        checkout = Checkout(self, "c" * 110)
+        checkout.something_due()
+        document = self.notice(checkout)
         self.assertTrue(document["summary_line"].endswith(f"; details: {COMMAND}"), document["summary_line"])
+        self.assertLessEqual(len(document["summary_line"]), 160)
+
+    def test_summary_line_takes_the_short_command_only_when_the_counts_would_not_fit(self):
+        due = dict.fromkeys(cd.DUE_KEYS, 0)
+        due["pins_behind"] = 1
+        fits = "python3 /checkout/scripts/currency_due.py --dry-run"
+        self.assertEqual(cd.summary_line(due, fits, short_command=COMMAND),
+                         f"stack currency: 1 pin behind; details: {fits}")
+        too_long = "python3 " + "/c" * 60 + "/scripts/currency_due.py --dry-run"
+        self.assertEqual(cd.summary_line(due, too_long, short_command=COMMAND),
+                         f"stack currency: 1 pin behind; details: {COMMAND}")
 
     def test_the_next_step_points_at_what_is_due(self):
         # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.
