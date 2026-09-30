@@ -242,6 +242,59 @@ wrap either read-only command in a systemd/launchd timer: this project's `automa
 policy is `false`, and a timer that invokes a model command is exactly what that policy
 excludes, whatever the command's own token cost.
 
+The `skills` step of `--configure-full-profile` (next section) runs the same `install_skills.py`,
+after installing the manifest's pinned CLI under `$ECO_INSTALL_ROOT/tools/skills-<version>` when it is
+missing.
+
+## Refresh the user profile from main
+
+Added after `v2026.09.26.2`. On Linux/WSL2, one command re-applies every user-scope layer this
+catalog manages, instead of the hand steps of [bootstrap](bootstrap.md) steps 4 and 4a and the section
+above:
+
+```sh
+git -C "$MAIN_CLONE" fetch origin && git -C "$MAIN_CLONE" checkout --detach origin/main
+bash "$MAIN_CLONE/adoption/bootstrap-linux.sh" --profile <id> --configure-full-profile --host <name>
+```
+
+`MAIN_CLONE` is a clone used only for this; it must sit at `origin/main`, or the flag refuses and
+prints both commits. The steps, in order, are `claude-profile`, `claude-settings`, `claude-md`,
+`skills`, `codex-lane`, `path-block` and `login-shell` (the table is in
+[bootstrap step 2](bootstrap.md)); each is idempotent and can be left out with `--skip <step>`. It
+writes managed blocks into `~/.claude/CLAUDE.md` and `~/.profile` (backups beside each file), gives
+a Codex home without `config.toml` the rendered user-level one minus the source host's trust state
+(an existing `config.toml` is kept and only gains `features.daemon_auto_start = false` through
+`codex features disable`, after a backup), and ends by checking that `claude` in a login shell is
+the ecosystem launcher. A failed step exits 6
+after the others have run. A host installed from a release tag keeps the per-step commands until
+that release carries the flag.
+
+## Start a new repository
+
+Added after `v2026.09.26.2`. Scaffold every new repository from this catalog, so it carries the
+standing rule and the `sota-sources` check from its first commit
+([new repositories](bootstrap.md#new-repositories)):
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run
+python3 tools/adoption/scaffold_repo.py --target <repo>
+```
+
+A rerun changes nothing; a file edited since is skipped (exit 3) unless `--force <path>` names it,
+with the path as the table prints it. To move an existing repository's workflow to a newer gate,
+commit first, then name only the workflow:
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run --force .github/workflows/sota-sources.yml
+python3 tools/adoption/scaffold_repo.py --target <repo> --force .github/workflows/sota-sources.yml
+```
+
+That replaces the workflow alone (no backup is kept) with one pinned to the current main commit.
+Every other file that differs, such as a filled-in `AGENTS.md` or this host's `.codex/config.toml`,
+is left as it is and reported `skipped`, so the run exits 3. A bare `--force`, or a path that is not
+a scaffold file, is a usage error (exit 2) and writes nothing. The new pin takes effect once that
+commit on GitHub carries `.github/workflows/sota-sources-gate.yml`.
+
 ## Current next moves
 
 The current entry point is the [20-layer research queue](../catalogs/landscape/research-state.json)
