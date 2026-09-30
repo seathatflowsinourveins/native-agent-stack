@@ -176,6 +176,18 @@ class ExcludedEntryTests(unittest.TestCase):
                     self.assertIsInstance(entry[key], str)
                     self.assertTrue(entry[key].strip(), f"{key} must not be empty")
 
+    def test_a_retired_entry_names_one_unselected_skill_and_its_date(self):
+        retired = {entry["skills"]: entry for entry in self.excluded if "retired" in entry}
+        # mattpocock/skills removed it in daa01d8 (2026-09-24); it is absent at d81f3a18.
+        self.assertIn("resolving-merge-conflicts", retired)
+        selected = {skill["name"] for skill in self.manifest["skills"]}
+        for name, entry in retired.items():
+            with self.subTest(skill=name):
+                # One skillOverrides key per retired entry, never a comma-separated list.
+                self.assertRegex(name, r"^[a-z0-9][a-z0-9-]*$")
+                self.assertNotIn(name, selected)
+                self.assertRegex(entry["retired"], r"^\d{4}-\d{2}-\d{2}$")
+
 
 class LlmNativeListingTests(unittest.TestCase):
     """The user's 2026-09-30 directive, docs/decisions/2026-09-30-skills-llm-native-listing.md: every skill
@@ -239,7 +251,9 @@ class ListingBudgetTemplateTests(unittest.TestCase):
 
 class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
     """adoption/templates/claude.settings.template.json's skillOverrides must name every
-    manifest skill exactly once, at its manifest claude_listing (settings_propagation)."""
+    manifest skill exactly once, at its manifest claude_listing (settings_propagation), plus an
+    explicit off for every retired excluded entry: the settings writer deep-merges, so dropping a
+    key would leave a host's earlier on value in place (adoption/skills/lifecycle.md, Retire)."""
 
     @classmethod
     def setUpClass(cls):
@@ -248,6 +262,7 @@ class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
 
     def test_skill_overrides_equals_name_to_claude_listing(self):
         expected = {skill["name"]: skill["claude_listing"] for skill in self.manifest["skills"]}
+        expected.update({entry["skills"]: "off" for entry in self.manifest["excluded"] if "retired" in entry})
         self.assertEqual(self.template.get("skillOverrides"), expected)
 
 

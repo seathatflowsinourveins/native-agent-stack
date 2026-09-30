@@ -337,7 +337,7 @@
     "diagnosing-bugs": "on",
     "tdd": "on",
     "codebase-design": "on",
-    "resolving-merge-conflicts": "on",
+    "resolving-merge-conflicts": "off",
     "grill-me": "user-invocable-only",
     "improve-codebase-architecture": "user-invocable-only",
     "security-threat-model": "on",

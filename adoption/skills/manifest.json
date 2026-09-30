@@ -140,13 +140,13 @@
     {
       "name": "search-first",
       "source": "affaan-m/ECC",
-      "url": "https://github.com/affaan-m/ECC/tree/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first",
-      "ref": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "url": "https://github.com/affaan-m/ECC/tree/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first",
+      "ref": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
       "path": "skills/search-first",
-      "tree_sha": "89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1",
-      "skill_md_sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
-      "skill_md_bytes": 8021,
-      "description_chars": 141,
+      "tree_sha": "3ac0daf42ee5c7d0cbe28c399f02ff057283b889",
+      "skill_md_sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+      "skill_md_bytes": 8210,
+      "description_chars": 328,
       "upstream_disable_model_invocation": false,
       "license": "MIT",
       "official": false,
@@ -165,12 +165,12 @@
     {
       "name": "diagnosing-bugs",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/diagnosing-bugs",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/diagnosing-bugs",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/diagnosing-bugs",
-      "tree_sha": "99bd56983e42bc752c52da67f1112e4121781cd1",
-      "skill_md_sha256": "77f3cf31bc99b2f49af943222526531fcc9fc41d047626d3640e875e85af3e84",
-      "skill_md_bytes": 8529,
+      "tree_sha": "de4236cf34757c4e9ea7afe78d46c023213ff254",
+      "skill_md_sha256": "9168404abda0967a5d32977e3498cd95fda6807018852f3de736a78357c82b40",
+      "skill_md_bytes": 8530,
       "description_chars": 156,
       "upstream_disable_model_invocation": false,
       "license": "MIT",
@@ -190,12 +190,12 @@
     {
       "name": "tdd",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/tdd",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/tdd",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/tdd",
-      "tree_sha": "79288be15c67b849f22b6572056601090fd20913",
-      "skill_md_sha256": "cb01f66bebfaa25fa1f88e6b7e769cd9fd9f35b1120b8563749820738814c927",
-      "skill_md_bytes": 3549,
+      "tree_sha": "bf1bf5ffcd63aa8abce830f2955a853c121fb463",
+      "skill_md_sha256": "93ea419b76e9caaf26153b828e984f7c3fb136f4caa67b14af95f32ea965a1cc",
+      "skill_md_bytes": 3550,
       "description_chars": 149,
       "upstream_disable_model_invocation": false,
       "license": "MIT",
@@ -215,10 +215,10 @@
     {
       "name": "codebase-design",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/codebase-design",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/codebase-design",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/codebase-design",
-      "tree_sha": "344e3efc88ee60663b2e989555c2efdb548fbd42",
+      "tree_sha": "07ba1cd60efc12d0d3a083005c1d9651cf15e39a",
       "skill_md_sha256": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
       "skill_md_bytes": 6446,
       "description_chars": 265,
@@ -234,31 +234,6 @@
       },
       "status": "trial",
       "gap": "Large single-file validators (scripts/validate.py, scripts/landscape.py) lack a shared module/interface vocabulary for refactors.",
-      "claude_listing": "on",
-      "codex_enabled": true
-    },
-    {
-      "name": "resolving-merge-conflicts",
-      "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/resolving-merge-conflicts",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
-      "path": "skills/engineering/resolving-merge-conflicts",
-      "tree_sha": "77f0d7de3143abbf03e55a63522d30bff31ae908",
-      "skill_md_sha256": "9d8114f8ef0b31f535a265fc05c364bd8cf2e2895a830040e06c22acb11f54b0",
-      "skill_md_bytes": 918,
-      "description_chars": 70,
-      "upstream_disable_model_invocation": false,
-      "license": "MIT",
-      "official": false,
-      "audits": {
-        "gen_agent_trust_hub": "Pass",
-        "socket": "Pass",
-        "snyk": "Warn",
-        "url": "https://skills.sh/mattpocock/skills/resolving-merge-conflicts",
-        "checked_at": "2026-09-25"
-      },
-      "status": "trial",
-      "gap": "Five or more concurrent sessions rebase onto hot files (manifests/evidence.json, docs/lanes.md hot-file protocol) and hit conflicts.",
       "claude_listing": "on",
       "codex_enabled": true
     },
@@ -290,12 +265,12 @@
     {
       "name": "improve-codebase-architecture",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/improve-codebase-architecture",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/improve-codebase-architecture",
-      "tree_sha": "3d35cd438f4067b03c8b3792e038960e4ac11526",
-      "skill_md_sha256": "d1ac25511a936ff4250a48dbcefda363837d6bb9321b3cba73df99fa37270a75",
-      "skill_md_bytes": 5993,
+      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
+      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "skill_md_bytes": 6000,
       "description_chars": 125,
       "upstream_disable_model_invocation": true,
       "license": "MIT",
@@ -308,7 +283,7 @@
         "checked_at": "2026-09-25"
       },
       "status": "trial",
-      "gap": "User-invoked architecture review of a grown module. Claude: user-invocable-only because upstream sets disable-model-invocation (SKILL.md frontmatter at c55ee46); replacement pending the skills sweep (unit D1) and paired benchmark (unit D2). Codex: enabled from 2026-09-30, which restores explicit $improve-codebase-architecture only: upstream agents/openai.yaml sets allow_implicit_invocation: false, and Codex keeps such a skill out of the model's catalog (codex-rs/ext/skills/src/provider/host.rs L147-148 at rust-v0.157.1).",
+      "gap": "User-invoked architecture review of a grown module. Claude: user-invocable-only because upstream sets disable-model-invocation (SKILL.md frontmatter at c55ee46 and still at d81f3a1); replacement pending the skills sweep (unit D1) and paired benchmark (unit D2). Codex: enabled from 2026-09-30, which restores explicit $improve-codebase-architecture only: upstream agents/openai.yaml sets allow_implicit_invocation: false, and Codex keeps such a skill out of the model's catalog (codex-rs/ext/skills/src/provider/host.rs L147-148 at rust-v0.157.1).",
       "claude_listing": "user-invocable-only",
       "codex_enabled": true
     },
@@ -365,12 +340,12 @@
     {
       "name": "semgrep",
       "source": "trailofbits/skills",
-      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/static-analysis/skills/semgrep",
-      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
+      "ref": "82fe8226252622fa807643bdca1710901198553a",
       "path": "plugins/static-analysis/skills/semgrep",
-      "tree_sha": "7503c4bec67cbe758ee488a2bd4caaf618facbfb",
-      "skill_md_sha256": "04df36a7685632ee39271aa432a4d32e1203b326e4a8091e6f5c0eb191ef90f1",
-      "skill_md_bytes": 15531,
+      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
+      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
+      "skill_md_bytes": 15678,
       "description_chars": 707,
       "upstream_disable_model_invocation": false,
       "license": "CC-BY-SA-4.0 (referenced by pin, never vendored)",
@@ -768,12 +743,12 @@
     }
   ],
   "budget": {
-    "claude_on_description_chars": 10074,
+    "claude_on_description_chars": 10191,
     "claude_on_cap": 10500,
-    "codex_enabled_description_chars": 9931,
+    "codex_enabled_description_chars": 10048,
     "codex_default_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",
-    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05. Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L17-20 and L123-149 at rust-v0.157.1); the Codex template sets 6,000 tokens. codex_default_budget_chars keeps its key name, which scripts/skills_status.py reads, and holds that 8,000-character fallback, not a default. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_enabled_description_chars counts grill-me and improve-codebase-architecture, which Codex keeps out of the model's catalog (allow_implicit_invocation: false), so 9,755 of the 9,931 reach it. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
+    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05. Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1); the Codex template sets 6,000 tokens. codex_default_budget_chars keeps its key name, which scripts/skills_status.py reads, and holds that 8,000-character fallback, not a default. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_enabled_description_chars counts grill-me and improve-codebase-architecture, which Codex keeps out of the model's catalog (allow_implicit_invocation: false), so 9,872 of the 10,048 reach it. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
   },
   "excluded": [
     {
@@ -943,6 +918,13 @@
       "source": "obra/superpowers",
       "reason": "Removed from the trial on 2026-09-28 under docs/decisions/2026-09-25-skills-trial-and-usage.md:284-286 (a trial skill that conflicts with CLAUDE.md/AGENTS.md once read in full is removed immediately; that record's 2026-09-28 removal addendum). The full SKILL.md at 8ca22db (sha256 2befe7fc…) says at L20 \"If you haven't run the verification command in this message, you cannot claim it passes\", and its L42 row \"Tests pass | Test command output: 0 failures | Previous run, \\\"should pass\\\"\" puts a previous run under Not Sufficient; AGENTS.md:16 says \"Reuse passing evidence when its inputs still match and run only checks needed for a concrete gap\". Decision: docs/decisions/2026-09-28-delegated-decisions.md (M4); GPT-6 verdict: evidence/artifacts/delegated-decisions-20260928/m4/gpt6-return.md; Claude readings: evidence/artifacts/delegated-decisions-20260928/coordination.md.",
       "overturn": "An upstream revision of the skill drops the absolute freshness requirement, is re-read in full and is re-pinned through this manifest."
+    },
+    {
+      "skills": "resolving-merge-conflicts",
+      "source": "mattpocock/skills",
+      "retired": "2026-09-30",
+      "reason": "Retired on 2026-09-30: upstream removed the skill directory in daa01d8 (2026-09-24, 'Remove resolving-merge-conflicts'), so it is absent at d81f3a183412e71a5b1e84ca21bc1a35eea03a60, whose .changeset/remove-resolving-merge-conflicts.md says nothing replaces it (https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.changeset/remove-resolving-merge-conflicts.md). The historical pin c55ee46073ed923f86ce59a5eb3b6d895095d1b7 (tree 77f0d7de3143abbf03e55a63522d30bff31ae908, SKILL.md sha256 9d8114f8ef0b31f535a265fc05c364bd8cf2e2895a830040e06c22acb11f54b0) stays recoverable. A retired entry keeps an explicit off in the settings template's skillOverrides, because the deep merge never removes a host's earlier on value.",
+      "overturn": "Upstream restores a maintained installable directory and it passes a new scoped source review and native activation check."
     }
   ]
 }

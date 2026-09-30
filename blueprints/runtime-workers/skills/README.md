@@ -1,8 +1,8 @@
 # Runtime-worker skills trial
 
-The [manifest](manifest.json) selects **138 skills from 13 pinned sources** for
+The [manifest](manifest.json) selects **137 skills from 13 pinned sources** for
 a broad worker trial: 77 OpenHands registry skills, 14 of the 15 superpowers
-lifecycle skills, all 29 of the adoption manifest's skills reused by `reuse_ref`,
+lifecycle skills, all 28 of the adoption manifest's skills reused by `reuse_ref`,
 and targeted additions for evaluation, research, browser testing and framework
 review. `security-audit` and `skill-creator` joined the reused set on 2026-09-30, when
 main promoted the first and pinned the second
@@ -444,8 +444,8 @@ worker/manifest revisions and matched task IDs. Do not sum overlapping usage.
 
 Measure a neutral first task and a fixed activating task separately: some native
 triggers inject bodies immediately. Use a model's own tokenizer only as a labeled
-estimate when no provider count is available. Catalog sums are **1,020,955
-SKILL.md bytes and 36,739 trimmed description characters**; neither is a prompt
+estimate when no provider count is available. Catalog sums are **1,042,408
+SKILL.md bytes and 37,215 trimmed description characters**; neither is a prompt
 size or token count. Both provider-token fields remain `null` until a real run.
 Also record end-to-end input/output usage, latency and task quality so a smaller
 first prompt cannot hide repeated reads or failed work.
@@ -484,8 +484,8 @@ empty cell is marked **GAP** and recorded in `manifest.json`; the machine-readab
 | debugging | `datadog`, `diagnosing-bugs`, `diagnosing-superpowers`, `openhands-enterprise-troubleshooting`, `systematic-debugging` | `datadog`, `diagnosing-bugs`, `diagnosing-superpowers`, `openhands-enterprise-troubleshooting`, `systematic-debugging` | `diagnosing-bugs`, `systematic-debugging` | `diagnosing-bugs`, `systematic-debugging` |
 | code-review | `code-review`, `code-simplifier`, `codebase-design`, `frontend-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-composition-patterns`, `vercel-react-best-practices`, `web-design-guidelines` | `code-review`, `code-simplifier`, `codebase-design`, `gh-address-comments`, `improve-codebase-architecture`, `migration-mapping`, `migration-report`, `migration-scoring`, `receiving-code-review`, `requesting-code-review`, `score-quality`, `score-style`, `vercel-react-best-practices`, `web-design-guidelines` | **GAP** | `codebase-design`, `improve-codebase-architecture` |
 | security | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-audit`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | `agentic-actions-auditor`, `codeql`, `fp-check`, `sarif-parsing`, `security`, `security-audit`, `security-best-practices`, `security-threat-model`, `semgrep`, `supply-chain-risk-auditor`, `variant-analysis` | **GAP** | `security`, `security-best-practices`, `security-threat-model` |
-| github-issue-to-pr | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `resolving-merge-conflicts`, `ticket-to-code-change`, `upstream-fork-sync` | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `resolving-merge-conflicts`, `ticket-to-code-change`, `upstream-fork-sync` | **GAP** | **GAP** |
-| github-pr-review | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `resolving-merge-conflicts`, `setup-pr-review`, `upstream-fork-sync` | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `resolving-merge-conflicts`, `setup-pr-review`, `upstream-fork-sync` | **GAP** | **GAP** |
+| github-issue-to-pr | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `ticket-to-code-change`, `upstream-fork-sync` | `finishing-a-development-branch`, `github`, `github-issue-to-pr`, `github-issue-triage`, `github-repo-monitor`, `jira-issue-to-pr`, `ticket-to-code-change`, `upstream-fork-sync` | **GAP** | **GAP** |
+| github-pr-review | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `setup-pr-review`, `upstream-fork-sync` | `code-review`, `code-simplifier`, `finishing-a-development-branch`, `gh-address-comments`, `github`, `github-delivery-watchdog`, `github-pr-review`, `github-pr-reviewer`, `receiving-code-review`, `requesting-code-review`, `setup-pr-review`, `upstream-fork-sync` | **GAP** | **GAP** |
 | github-ci-fix | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate` | `gh-fix-ci`, `github-stale-ci-pr-closer`, `iterate` | **GAP** | **GAP** |
 | github-actions | `agentic-actions-auditor`, `github-actions`, `setup-openhands` | `agentic-actions-auditor`, `github-actions`, `setup-openhands` | **GAP** | **GAP** |
 | release-notes | `release-notes` | `release-notes` | **GAP** | **GAP** |

@@ -256,6 +256,33 @@ exclusion test and failed against the unchanged manifests before the change. The
 bare-exclusion negative control now builds its own fixture, since no `adoption_ref`
 exclusion remains here.
 
+## 2026-09-30: upstream re-pins and one retirement
+
+The adoption manifest's 2026-09-30 source review
+([native skill lifecycle record](../../../docs/decisions/2026-09-30-native-skill-lifecycle.md))
+re-pinned six reused skills and retired one; every pin was re-verified from a blobless
+clone of its source repository (tree SHA, SKILL.md SHA-256, bytes and description length).
+
+- **`resolving-merge-conflicts` is retired.** Upstream removed it in `daa01d8`
+  (2026-09-24), so it is absent at `mattpocock/skills@d81f3a18`, whose changeset says
+  nothing replaces it. Its entry and its four coverage selections are gone; the
+  `github-issue-to-pr` and `github-pr-review` cells keep their other selections.
+- **Re-pins through `reuse_ref`.** `diagnosing-bugs`, `tdd`, `codebase-design` and
+  `improve-codebase-architecture` follow the adoption manifest to `d81f3a18`,
+  `search-first` to `affaan-m/ECC@c70874fa` (description 141 to 328 characters) and
+  `semgrep` to `trailofbits/skills@82fe8226`.
+
+The counts are now 137 skills from 13 sources, 28 reused adoption skills and eight
+exclusions, with 1,042,408 SKILL.md bytes and 37,215 description characters. These are
+catalog sums. The source table below keeps each repository's original discovery
+revision (`mattpocock/skills` now has 11 selections); each entry's own `ref`, including
+a newer one reached through `reuse_ref`, is authoritative. This update neither installs
+the runtime catalog nor qualifies its other candidates.
+
+Sources: [removal changeset](https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.changeset/remove-resolving-merge-conflicts.md),
+[search-first](https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md),
+[Semgrep](https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep).
+
 ## Source pins
 
 <!-- source-pins -->
@@ -267,7 +294,7 @@ exclusion remains here.
 | anthropics/skills | `33375500bcea98d610eb30ce10ac4e59b89c390d` | 9 |
 | assafelovic/gpt-researcher | `0957c301ed06c2a5857b834358c7227c739041d4` | 1 |
 | cloudflare/security-audit-skill | `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8` | 1 |
-| mattpocock/skills | `c55ee46073ed923f86ce59a5eb3b6d895095d1b7` | 12 |
+| mattpocock/skills | `c55ee46073ed923f86ce59a5eb3b6d895095d1b7` | 11 |
 | obra/superpowers | `8ca22dba9a94f28898bbce59f2537ff4d87c747d` | 14 |
 | openai/skills | `49f948faa9258a0c61caceaf225e179651397431` | 6 |
 | trailofbits/skills | `0cc1c73a5e96749ab32d7ea5e14892fafa6972ae` | 9 |
