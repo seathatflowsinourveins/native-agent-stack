@@ -661,8 +661,13 @@ class DetailsCommandTests(unittest.TestCase):
         elsewhere = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, elsewhere, True)
         tail = summary.split("; details: ", 1)[1]
-        if tail == cd.notice_path(checkout.due_file):
-            pointed = json.loads(Path(os.path.join(elsewhere, os.path.expanduser(tail))).read_text(encoding="utf-8"))
+        if tail.startswith("cat "):
+            # The literal printed command, as a process from the unrelated directory: it prints the document.
+            words = [os.path.expanduser(word) if word.startswith("~/") else word for word in shlex.split(tail)]
+            self.assertEqual(words[0], "cat")
+            result = subprocess.run(words, cwd=elsewhere, capture_output=True, text=True, check=False)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            pointed = json.loads(result.stdout)
             self.assertEqual(pointed["details_command"], document["details_command"])
             self.assertEqual(pointed["root"], str(checkout.root))
             tail = pointed["details_command"]
@@ -770,13 +775,14 @@ class DetailsCommandTests(unittest.TestCase):
                              ["python3", cd.notice_path(Path(cd.__file__).resolve()), "--dry-run",
                               "--root", "/h/u/my code"])
 
-    def test_a_command_that_leaves_the_counts_no_room_gives_way_to_the_due_file_path(self):
-        # A checkout path this long leaves "1 pin behind" no room beside the absolute command, so the line points
-        # at the due-file, which carries the command and the checkout; nothing cwd-relative is ever printed.
+    def test_a_command_that_leaves_the_counts_no_room_gives_way_to_cat_of_the_due_file(self):
+        # A checkout path this long leaves "1 pin behind" no room beside the absolute command, so the line ends
+        # with `cat <due-file>`, a short runnable command that prints the document (command and checkout included);
+        # nothing cwd-relative is ever printed.
         checkout = Checkout(self, "c" * 110)
         checkout.something_due()
         document = self.notice(checkout)
-        self.assertTrue(document["summary_line"].endswith(f"; details: {cd.notice_path(checkout.due_file)}"),
+        self.assertTrue(document["summary_line"].endswith(f"; details: cat {cd.notice_path(checkout.due_file)}"),
                         document["summary_line"])
         self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts"))
         self.assertLessEqual(len(document["summary_line"]), 160)
@@ -788,13 +794,46 @@ class DetailsCommandTests(unittest.TestCase):
     def test_summary_line_takes_the_pointer_only_when_the_counts_would_not_fit(self):
         due = dict.fromkeys(cd.DUE_KEYS, 0)
         due["pins_behind"] = 1
-        pointer = "~/.local/state/native-agent-stack/currency-due.json"
+        pointer = "cat ~/.local/state/native-agent-stack/currency-due.json"
         fits = "python3 /checkout/scripts/currency_due.py --dry-run"
         self.assertEqual(cd.summary_line(due, fits, pointer=pointer),
                          f"stack currency: 1 pin behind; details: {fits}")
         too_long = "python3 " + "/c" * 60 + "/scripts/currency_due.py --dry-run"
         self.assertEqual(cd.summary_line(due, too_long, pointer=pointer),
                          f"stack currency: 1 pin behind; details: {pointer}")
+        # A pointer that does not fit either gives way to the constant last resort; the line never exceeds 160.
+        long_pointer = "cat " + "/s" * 70 + "/currency-due.json"
+        line = cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 10 ** 6), too_long, pointer=long_pointer)
+        self.assertTrue(line.endswith(f"; details: {cd.LAST_RESORT_POINTER}"), line)
+        self.assertLessEqual(len(line), 160)
+
+    def test_a_long_state_directory_keeps_the_line_within_its_limit(self):
+        # A valid 140-character state-directory basename (the review's case) and a long XDG_STATE_HOME: the writer
+        # still exits 0, writes the file, and the line stays within 160 characters with the last-resort pointer.
+        for label, extra, variables in (("--state-dir", ["--state-dir"], {}),
+                                        ("XDG_STATE_HOME", [], {"XDG_STATE_HOME": None})):
+            with self.subTest(label):
+                checkout = Checkout(self, "c" * 110)
+                checkout.something_due()
+                base = checkout.state.parent / ("s" * 140)
+                if extra:
+                    arguments = [*extra, str(base)]
+                    due_file = base / "currency-due.json"
+                else:
+                    arguments = []
+                    variables = {"XDG_STATE_HOME": str(base)}
+                    due_file = base / "native-agent-stack" / "currency-due.json"
+                with mock.patch.dict(os.environ, variables):
+                    stdout, stderr = io.StringIO(), io.StringIO()
+                    with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                        code = cd.main(["--root", str(checkout.root), "--now", NOW, *arguments])
+                self.assertEqual(code, 0, stderr.getvalue())
+                document = json.loads(due_file.read_text(encoding="utf-8"))
+                self.assertLessEqual(len(document["summary_line"]), 160)
+                self.assertTrue(document["summary_line"].endswith(f"; details: {cd.LAST_RESORT_POINTER}"),
+                                document["summary_line"])
+                self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts"))
+                self.assertEqual(document["root"], str(checkout.root))
 
     def test_the_next_step_points_at_what_is_due(self):
         # A skill pin that drifted is not something scripts/adoption_status.py --pinned-versions can report.

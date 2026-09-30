@@ -21,7 +21,7 @@ When any count is nonzero it writes ${XDG_STATE_HOME:-~/.local/state}/native-age
 atomically (a temporary file in the same directory, fsync, mode 0600, os.replace):
 
   {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "root": "the inspected checkout", "due": {the four counts},
-   "summary_line": "at most 160 characters, ending with the command below or the path of this file",
+   "summary_line": "at most 160 characters, ending with the command below or with `cat <this file>`",
    "details_command": "the command below", "details": [...]}
 
 and otherwise removes that file, unless the run could not see everything it was asked to check. A skill check
@@ -35,11 +35,12 @@ The command that ends summary_line is "python3 <checkout>/scripts/currency_due.p
 own copy of this script by its absolute path, written as ~/... under the home directory (so the command works from any
 working directory, stays short and names the checkout it inspected), plus the options that change what a run reports, --network and a non-default --sweep-cadence-days, so
 that running it prints the details of the notice. A checkout without the script is named by --root instead. When the
-absolute command would leave the counts no room in the line, the line ends with the path of the due-file itself,
-whose details_command field carries the full command and whose root field names the checkout; the line never falls
-back to a cwd-relative command. A SessionStart hook, a separate change, prints summary_line in whatever project the
-session starts in when the file exists and nothing when it does not
-(docs/decisions/2026-09-30-session-currency-notice.md).
+absolute command would leave the counts no room in the line, the line ends with "cat <due-file>" instead, a short
+command that prints this document, whose details_command field carries the full command and whose root field names
+the checkout; when even that does not fit (a pathological state-directory path) the line ends with a constant
+pointer to the due-file in the state directory. The line never falls back to a cwd-relative command and never
+exceeds 160 characters. A SessionStart hook, a separate change, prints summary_line in whatever project the session
+starts in when the file exists and nothing when it does not (docs/decisions/2026-09-30-session-currency-notice.md).
 
   python3 scripts/currency_due.py                    # write or remove the due-file; one line for the journal
   python3 scripts/currency_due.py --dry-run          # the report as text; writes and removes nothing
@@ -74,9 +75,11 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
           "due_layers": ("layer due", "layers due"),
           "reopen_triggers": ("layer with reopen triggers", "layers with reopen triggers")}
 SUMMARY_LIMIT = 160
-# The smallest count text is "1 pin behind"; a command that leaves the counts less room than that gives way to the
-# path of the due-file, which carries the command in full.
+# The smallest count text is "1 pin behind"; a command that leaves the counts less room than that gives way to
+# "cat <due-file>" (the document carries the command in full), and that to a constant pointer when a state-directory
+# path is too long even for that.
 MIN_COUNTS_ROOM = len("1 pin behind")
+LAST_RESORT_POINTER = "currency-due.json in the state directory"
 DETAILS_SCRIPT = "scripts/currency_due.py"
 DETAILS_COMMAND = f"python3 {DETAILS_SCRIPT} --dry-run"
 # recipes/saturation-sweep.md: "Sweep only the due layers, at most monthly"; 30 days is also
@@ -243,19 +246,27 @@ def summary_line(due: dict, command: str = DETAILS_COMMAND, complete: bool = Tru
                  pointer: str | None = None) -> str:
     """The nonzero counts and the command that prints the details, in at most SUMMARY_LIMIT characters. With no
     count and a check that could not answer, the line says so rather than "nothing due". When ``command`` leaves
-    the counts less than MIN_COUNTS_ROOM characters, ``pointer`` (the due-file's path, which carries the command in
-    its details_command field) takes its place; the line never names a cwd-relative command."""
+    the counts less than MIN_COUNTS_ROOM characters, ``pointer`` (``cat <due-file>``; the document carries the
+    command in its details_command field) takes its place, and LAST_RESORT_POINTER when the pointer does not fit
+    either; the line never names a cwd-relative command and never exceeds SUMMARY_LIMIT."""
     parts = [f"{due[key]} {LABELS[key][0] if due[key] == 1 else LABELS[key][1]}" for key in DUE_KEYS if due[key]]
     if not parts:
         return ("stack currency: nothing due" if complete else
                 "stack currency: nothing known due, skill check incomplete")
-    prefix, suffix = "stack currency: ", f"; details: {command}"
-    if pointer is not None and SUMMARY_LIMIT - len(prefix) - len(suffix) < MIN_COUNTS_ROOM:
-        suffix = f"; details: {pointer}"
+    prefix = "stack currency: "
+    fallbacks = ([pointer] if pointer is not None else []) + [LAST_RESORT_POINTER]
+    suffix = f"; details: {command}"
+    for candidate in fallbacks:
+        if SUMMARY_LIMIT - len(prefix) - len(suffix) >= MIN_COUNTS_ROOM:
+            break
+        suffix = f"; details: {candidate}"
     counts, room = ", ".join(parts), SUMMARY_LIMIT - len(prefix) - len(suffix)
     if len(counts) > room:
         counts = counts[:room - 3] + "..."
-    return prefix + counts + suffix
+    line = prefix + counts + suffix
+    if len(line) > SUMMARY_LIMIT:
+        raise CheckError(f"summary line of {len(line)} characters exceeds {SUMMARY_LIMIT}: {line!r}")
+    return line
 
 
 def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, root: Path = ROOT,
@@ -363,7 +374,7 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
            "reopen_triggers": reopen_triggers}
     command = details_command(root, skills is not None, cadence_days)
     line = summary_line(due, command, skills_complete is not False,
-                        notice_path(due_file) if due_file is not None else None)
+                        join_command(["cat", notice_path(due_file)]) if due_file is not None else None)
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
             "details_command": command, "details": details}
 

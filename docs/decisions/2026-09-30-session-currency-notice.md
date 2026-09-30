@@ -124,9 +124,12 @@ installed and no host file was written: the timer and the service are drafted te
    working directory: the user-scope SessionStart hook prints the line in whatever project a session starts in,
    where a cwd-relative command would run in the wrong checkout or none (GPT-6 review of #539). A checkout
    without the script is named by `--root`. When the absolute command would leave the counts fewer than 12
-   characters, the line ends with the path of the due-file itself (`~/.local/state/native-agent-stack/currency-due.json`
-   by default), whose `details_command` field carries the full command and whose `root` field names the checkout;
-   the line never falls back to a cwd-relative command (GPT-6 review round 3). A `stack-currency` launcher on the
+   characters, the line ends with `cat <due-file>` (`cat ~/.local/state/native-agent-stack/currency-due.json` by
+   default), a short runnable command that prints the document, whose `details_command` field carries the full
+   command and whose `root` field names the checkout; when even that does not fit (a state-directory path of more
+   than about a hundred characters) the line ends with the constant `currency-due.json in the state directory`.
+   The line never falls back to a cwd-relative command, and the writer refuses (exit 2) rather than write a line
+   over 160 characters (GPT-6 review rounds 3 and 4). A `stack-currency` launcher on the
    ecosystem `PATH` would make the command short on every host; it is not part of this change because installing
    it is a host step of the full-profile bootstrap. The document's keys are now `generated_at`, `root`, `due`,
    `summary_line`, `details_command` and `details`. The option is bounded to 36500 to keep the line short. The unit passes neither, so its
