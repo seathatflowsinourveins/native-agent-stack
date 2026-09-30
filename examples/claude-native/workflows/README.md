@@ -290,15 +290,28 @@ linear scan; the sources are the kernel comments and `sources.json`):
 | `connection` | infrastructure | "MCP server ... is not connected"; SDK 1.30.1 "Connection closed" |
 | `server_error`, `storage_directory`, `usage_error`, `invalid_arguments`, `unmatched` | new class (our misuse until reproduced) | `server.ts` error texts; `session/db.ts`; MCP -32602 |
 | `outcome_unknown`, `invoked_command_exit_indexed`, `echo_mismatch` | unknown | no result or state; an indexed exit; output without its code echo |
-| `policy_deny`, `remote_fetch`, `search_throttle`, `rejected`, `invalid`, `cancelled_with_result`, `invoked_command_exit` | not infrastructure | the deny firewall, fetch failures, search throttling, M14 states, the command's own exit |
+| `policy_deny`, `remote_fetch`, `search_throttle`, `rejected`, `invalid`, `cancelled_with_result` | unassigned: graded as errors until Amendment 4 assigns them | the deny firewall, fetch failures, search throttling, M14 states |
+| `invoked_command_exit` | excluded (the frozen M15 row: "A non-zero exit from the command the child ran is excluded") | the command's own exit |
 
+Grading reads `rate_upper_bound`, the ceiling: every attempted call that neither
+succeeded nor ended in the invoked command's own exit. The frozen M15 row names
+six infrastructure classes and none of the unassigned ones, so until a dated
+amendment (Amendment 4) assigns them, they count as errors (the U2 design 5.3;
+binding decisions: the harder-to-pass reading). A server whose every call fails
+with the client's "No such tool available" `<tool_use_error>` (an `invalid`
+call) therefore reads 1. The ceiling is a residual, so a class a later template
+adds counts too. `unassigned_errors` is that residual after the named groups, and
+`over_threshold` is the verdict on the ceiling's count
+(`(attempted - succeeded - invoked_command_exit) * 100 > attempted`). Rates are
+rounded to four places, so a grader compares the counts, never the rounded rate.
 `rate` counts infrastructure, new-class and unknown calls (B2: an unknown is not
-a success); `rate_lower_bound` counts the unknowns as successes;
-`threshold_sensitive` marks a server whose two bounds fall on different sides of
-`m15.threshold` (0.01); `rate_upper_bound` is the design's descriptive ceiling;
+a success), which is the rate if Amendment 4 finds the unassigned classes not
+infrastructure. `rate_lower_bound` also counts the unknowns as successes.
+`threshold_sensitive` marks a server whose `rate_lower_bound` and
+`rate_upper_bound` fall on different sides of `m15.threshold` (0.01): its
+verdict depends on the unknowns or on the class assignment.
 `every_error_classified` is the `classify_every_ctx_error` criterion (no
-`unmatched`, no `echo_mismatch`). Rates are rounded to four places, so a grader
-compares the counts (`errors * 100 > attempted`), never the rounded rate.
+`unmatched`, no `echo_mismatch`).
 
 **Incomplete returns (item 6).** In run mode each child adds `return_quality`,
 its journal result read as `empty`, `wait_notice` or `ok` (null for no result):
