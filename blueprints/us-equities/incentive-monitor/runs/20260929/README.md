@@ -7,13 +7,16 @@ the unit's console, byte-identical ([Files](#files)). The monitor's output, 390,
 and news, stays private; only its hashes, counts and times are published here.
 
 It is metadata plus a partial broker listing, not a gate run, and it evaluates no strategy. No acceptance clause was
-frozen for this run, so it has no pass or fail; this receipt records what the run did. The boards it writes are
-unvalidated detectors. No credential, account id, account number, account fingerprint, broker order id or ref,
-activity id, execution id or host path is recorded.
+frozen for this run, so it has no pass or fail; this receipt records what the run did. The freeze notes of the
+2026-09-29 paper series state what the monitor may do and use, and it met each statement
+([Deviations from the plan](#deviations-from-the-plan)). The boards it writes are unvalidated detectors. No
+credential, account id, account number, account fingerprint, broker order id or ref, activity id, execution id or host
+path is recorded.
 
 ## Setup
 
-**Code.** Main `b528bb55` (committed 2026-09-29), run from the read-only engine clone in the private paper state.
+**Code.** Main `b528bb55` (committed 2026-09-29), run from the read-only engine clone under
+`<private state root>/engines/`. `<private state root>` stands for the private paper state directory.
 `monitor.py` has sha256 `88f3423a…` (135,534 bytes). Four sources agree on that hash:
 - the clone's file, read on 2026-09-30;
 - `git show b528bb55:blueprints/us-equities/incentive-monitor/monitor.py`;
@@ -47,10 +50,15 @@ recorded.
 **Unit.** `incentive-monitor-20260929.service` has `Type=exec`, `UMask=0077`, `Restart=on-failure` after 120 s, at
 most 5 starts an hour and `OnFailure=paper-alert@%n.service`, and it appends stdout to the console. Its timer fired at
 `2026-09-29 03:55:00 America/New_York` (`AccuracySec=1s`, not persistent). `ExecStart` runs `/bin/bash -ic`, which
-exports the SEC contact variables and execs the private launch script `run-monitor.sh`. That script runs the clone's
-`monitor.py` as `run --standalone --env-file "$PAPER_ENV_FILE_2" --out <private state root>/incentive-monitor
---until-et 20:00`. The unit file, the timer file and the script were all modified before the start and are hashed in
-`receipt.json`; they match by time, not by proof.
+exports the SEC contact variables and execs the private launch script `run-monitor.sh` in
+`<private state root>/trials/`. That script runs the clone's `monitor.py` as `run --standalone --env-file
+"$PAPER_ENV_FILE_2" --out <private incentive-monitor directory> --until-et 20:00`. The monitor's output root,
+`<private incentive-monitor directory>`, is a sibling of `<private state root>`, not inside it; it holds the day
+directory `20260929/` and the console.
+
+The unit file, the timer file and the script were hashed before the run: the private series index `SERIES-INDEX.md`
+(sha256 `f53fab8b…`, last modified 2026-09-29T05:20:57Z, before the timer was armed) holds their sha256 at lines 81, 82
+and 55. Each file hashes the same on 2026-09-30. No hash was taken at run time.
 
 **Purpose.** The data is a point-in-time record, with receive times, of the incentive sources that the preregistered
 forward study [`forward-protocol-v1.json`](../../forward-protocol-v1.json) (`incentive-board-forward-v1-20260924`) is
@@ -113,8 +121,13 @@ Using boards from this code needs a new protocol version ([incentive-monitor REA
 - **Inside sweeps.** Snapshots made 77,598 calls, which is 2,874 sweeps times 27, and the screener 8,622 (times 3).
   Option chains made 28,245 calls and daily bars 12. EDGAR made 20,118 (times 7), with 961 halts polls and 3 FINRA
   calls.
-- **Outside sweeps.** 57 Alpaca calls and 1 SEC call were made outside sweep windows, by the start-up loads and the
-  background daily-bar load. The files do not attribute them by source.
+- **Outside sweeps.** 57 Alpaca calls and 1 SEC call were made outside sweep windows. The files do not label them, but
+  the counters and the code place them:
+  - before sweep 1, 1 Alpaca and 1 SEC call, which only the start-up asset list and SEC company-tickers file make;
+  - between sweeps 1 and 3, 56 Alpaca calls (42, then 14), which only the background daily-bar load makes.
+
+  With the 12 daily-bar calls inside sweeps 1 and 2, that is 68 daily-bar calls, one for each of the 68 requests of
+  200 symbols that the 13,499 names need.
 - **Caps.** No source ever exceeded its per-sweep cap, and the budget refused 0 calls.
 - **Busiest minute.** The busiest 60 s of in-sweep data calls held 180, from 13:45:02Z, against the cap of 500. That
   count leaves out the 57 calls outside sweeps.
@@ -185,8 +198,11 @@ The monitor placed no order. The basis:
 - **HTTP 406: 0.** A 406 would be written as a `stream_error` record followed by `stream_conflict` or
   `stream_down`, and the run has none. The IEX stream, the one with a 406 wait, was not requested.
 - **HTTP 429: 0 recorded.** A failed REST call is written as a `<source>_error` key in its sweep or as `http_<code>`
-  in the option-chain counts, and no sweep has either for 429. The daily-bar loader retries a failed request without
-  writing it, so a 429 absorbed by such a retry would not show.
+  in the option-chain counts, and no sweep has either for 429.
+  - Two surfaces retry a failed request without writing it: the start-up `retry()`, around the asset list and the
+    SEC company-tickers file, and the daily-bar loader.
+  - Every attempt is a counted call, and the counts leave no room for a retry: 1 Alpaca and 1 SEC call before
+    sweep 1, and 68 daily-bar calls for 68 requests. So no 429 was absorbed by a retry either.
 - **Console.** It holds only the two bash job-control notices of the unit's non-terminal interactive shell. The
   monitor wrote nothing to stdout or stderr.
 - **Receive times.** `options-large.jsonl` rows carry the trade time (`trade_ts`) but no receive time, although the
@@ -194,8 +210,23 @@ The monitor placed no order. The basis:
 
 ## Deviations from the plan
 
-None. The unit started once at its timer time, ran standalone with the planned sources and caps, and stopped itself
-at 20:00 ET. The brief gives the output as 379 MB; that is a disk-usage figure, and the files hold 390,574,042 bytes.
+The plan is what the freeze notes of the three 2026-09-29 paper series say about the monitor, together with the unit,
+timer and launch files hashed before the run in `SERIES-INDEX.md`. The freeze notes stay private and are cited by
+sha256 (`receipt.json` `private_notes_sha256`); no acceptance clause in them names the monitor. The run met every
+statement (`frozen_expectations`):
+
+| Freeze note | Line | Statement | Met |
+|---|---|---|---|
+| `pre-20260929/FREEZE.md` (`3cd44b78…`) | 13 | "The incentive monitor on key 2 (from 03:55 ET) is data only and places no orders." | Yes: key 2 from 03:55:00 ET, 0 orders |
+| `ext-20260929/FREEZE.md` (`c72bbfed…`) | 10 | "The incentive monitor on key 2 (until 20:00 ET) is data only and places no orders." | Yes: stopped at 20:00:13 ET, 0 orders |
+| `pre-20260929/FREEZE.md` | 91 | Account 2 request budget: "Incentive monitor start-up (`/v2/assets`, at most 5 per process start; `--option-oi` off)", 5 requests | Yes: 1 process start, 1 asset-list call, `--option-oi` off |
+| `ext-20260929/FREEZE.md` | 108 | The same row, with "retries included" | Yes: the one call leaves no room for a retry |
+| `rth-20260929/FREEZE.md` (`4e595a8d…`) | 107 | Account 1 request budget: "Incentive monitor (it runs on key 2)", 0 requests | Yes: it used `$PAPER_ENV_FILE_2` |
+| `rth-20260929/FREEZE.md` | 131 | "… the incentive monitor at 100 …" (CPU weight) | Yes: `CPUWeight=100` |
+
+Deviations: none. The unit started once at its timer time, ran standalone with the planned sources and caps, and
+stopped itself at 20:00 ET. The brief gives the output as 379 MB; that is a disk-usage figure, and the files hold
+390,574,042 bytes.
 
 ## Units (systemd user journal and service manager)
 
@@ -222,14 +253,15 @@ at 20:00 ET. The brief gives the output as 379 MB; that is a disk-usage figure, 
   without outcome data.
 - **Code identity** rests on hashes read on 2026-09-30 and on the process's own `code_sha256` in `board.json`, which
   it computed at start.
-- **Private launch files.** The launch script and the unit files are matched by modification time, not by a hash
-  taken at run time. The Python version was read on 2026-09-30.
+- **Private launch files.** The launch script, the unit file and the timer file were hashed before the run in
+  `SERIES-INDEX.md` and are unchanged since; no hash was taken at run time. The Python version was read on 2026-09-30.
 - **Exit status.** The journal holds no exit record. The exit status comes from the service manager's retained
   properties.
 - **Broker coverage.** No broker read covers 07:55Z-11:00Z or 13:45Z-20:00Z on account 2. For those hours the
   no-order statement rests on the code and the recorded calls.
-- **Unrecorded retries.** A 429 absorbed by a daily-bar retry would not be recorded. 57 Alpaca calls and 1 SEC call
-  are not attributed by source.
+- **Silent retries.** The start-up `retry()` and the daily-bar loader retry without writing an error; only the call
+  counts show that neither retried. The sources of the 57 Alpaca calls and 1 SEC call outside sweeps are derived from
+  the counters and the code, not labelled in the files.
 - **Long sweeps.** The cause of the 19 long sweeps is not in the files.
 - **FINRA files.** The files this run fetched sit in the monitor's shared `finra/` directory and are not hashed here.
 - **Licensed data.** The data stays private; only hashes, counts and times are published.
@@ -242,12 +274,13 @@ No paper-lane row changes with this record. The run is data only and placed no o
 
 | File | What it is |
 |---|---|
-| `receipt.json` | The run receipt: code identity, settings, unit and journal records, sweeps, streams, calls, errors, the no-order basis, the account 2 listing, private file hashes and field provenance |
+| `receipt.json` | The run receipt: code identity, settings, unit and journal records, sweeps, streams, calls, errors, the no-order basis, the account 2 listing, the frozen expectations, private file and note hashes and field provenance |
 | `README.md` | This summary |
 | `monitor-20260929.console` | The unit's console (stdout and stderr), byte-identical: two bash job-control notices |
 
 Private and not committed:
 - the day directory's 16 files and 2,874 snapshot files (licensed market data and news);
 - the launch script `run-monitor.sh`, the unit file and the timer file;
+- the series freeze notes and `SERIES-INDEX.md`, cited by sha256;
 - the FINRA files;
 - the engine clone.
