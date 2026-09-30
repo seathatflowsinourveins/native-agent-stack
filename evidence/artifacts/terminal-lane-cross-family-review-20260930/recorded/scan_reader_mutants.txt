@@ -1,11 +1,12 @@
 2.1.283: catalogs resolved True, [('P$o', 1, 15, 2)] (spread name, array assignments found, base size, extra values), 17 matcher values
 2.1.284: catalogs resolved True, [('Ijo', 1, 15, 2)] (spread name, array assignments found, base size, extra values), 17 matcher values
 2.1.285: catalogs resolved True, [('Ojo', 1, 15, 2)] (spread name, array assignments found, base size, extra values), 17 matcher values
-ok    mutant, the spread name may not contain a dollar sign: ran 8 tests, failing ['test_the_catalog_is_read_whatever_the_minified_spread_name_is [$a]', 'test_the_catalog_is_read_whatever_the_minified_spread_name_is [P$o]']
-ok    mutant, a blind or unresolved reader exits 0: ran 8 tests, failing ['test_a_base_without_the_required_names_fails_closed', 'test_a_catalog_whose_name_has_no_array_assignment_fails_closed', 'test_a_reader_that_finds_nothing_exits_nonzero_instead_of_passing', 'test_two_different_arrays_assigned_to_one_name_fail_closed']
-ok    mutant, the base is any array of names, not the one the spread name is assigned: ran 8 tests, failing ['test_a_catalog_whose_name_has_no_array_assignment_fails_closed', 'test_an_unrelated_longer_array_of_the_same_names_is_not_taken_for_the_base', 'test_every_catalog_counts']
-ok    mutant, a Set of names counts as an assignment of the name: ran 8 tests, failing ['test_a_name_reused_for_a_set_or_a_map_is_not_an_array_assignment']
-ok    mutant, two assignments of one name are accepted: ran 8 tests, failing ['test_two_different_arrays_assigned_to_one_name_fail_closed']
-ok    mutant, only the first catalog counts: ran 8 tests, failing ['test_every_catalog_counts']
-ok    mutant, the base need not name permission_prompt and idle_prompt: ran 8 tests, failing ['test_a_base_without_the_required_names_fails_closed']
-7 mutants, 0 problems
+ok    mutant, the spread name may not contain a dollar sign: ran 9 tests, failing ['test_the_catalog_is_read_whatever_the_minified_spread_name_is [$a]', 'test_the_catalog_is_read_whatever_the_minified_spread_name_is [P$o]']
+ok    mutant, a blind or unresolved reader exits 0: ran 9 tests, failing ['test_a_base_without_the_required_names_fails_closed', 'test_a_catalog_whose_name_has_no_array_assignment_fails_closed', 'test_a_property_assignment_of_the_same_short_name_is_not_the_catalog_base', 'test_a_reader_that_finds_nothing_exits_nonzero_instead_of_passing', 'test_two_different_arrays_assigned_to_one_name_fail_closed']
+ok    mutant, the base is any array of names, not the one the spread name is assigned: ran 9 tests, failing ['test_a_catalog_whose_name_has_no_array_assignment_fails_closed', 'test_a_property_assignment_of_the_same_short_name_is_not_the_catalog_base', 'test_an_unrelated_longer_array_of_the_same_names_is_not_taken_for_the_base', 'test_every_catalog_counts']
+ok    mutant, a property assignment of the same short name counts as the catalog's array: ran 9 tests, failing ['test_a_property_assignment_of_the_same_short_name_is_not_the_catalog_base']
+ok    mutant, a Set of names counts as an assignment of the name: ran 9 tests, failing ['test_a_name_reused_for_a_set_or_a_map_is_not_an_array_assignment']
+ok    mutant, two assignments of one name are accepted: ran 9 tests, failing ['test_two_different_arrays_assigned_to_one_name_fail_closed']
+ok    mutant, only the first catalog counts: ran 9 tests, failing ['test_every_catalog_counts']
+ok    mutant, the base need not name permission_prompt and idle_prompt: ran 9 tests, failing ['test_a_base_without_the_required_names_fails_closed']
+8 mutants, 0 problems

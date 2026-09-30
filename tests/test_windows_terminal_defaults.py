@@ -47,10 +47,18 @@ CODEX_KINDS = {"agent-turn-complete", "approval-requested", "plan-mode-prompt", 
 PLACEHOLDERS = ("<DISTRO>", "<WSL_USER>", "<PROJECT>")
 
 
+MATCHER_QUOTE = re.compile(r"matcher(?: is the exact list)?\s+`([a-z_]+(?:\|[a-z_]+)*)`")   # the two operative phrasings; other prose says "matcher types" or "matcher values" before a quoted type
+
+
 def quoted_matchers(text: str) -> list:
-    """Every backtick-quoted pipe list that names permission_prompt, outside HTML comments."""
+    """Every matcher quote outside HTML comments, in document order: a backtick list directly after the word `matcher` or `matcher is the exact list` (a single type included) and any backtick pipe list that names at
+    least two known notification types, whether or not it names permission_prompt."""
     text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
-    return [m.group(1) for m in re.finditer(r"`([a-z_]+(?:\|[a-z_]+)+)`", text) if "permission_prompt" in m.group(1).split("|")]
+    found = {m.start(1): m.group(1) for m in MATCHER_QUOTE.finditer(text)}
+    for m in re.finditer(r"`([a-z_]+(?:\|[a-z_]+)+)`", text):
+        if sum(1 for name in m.group(1).split("|") if name in DECISIONS) >= 2:
+            found[m.start(1)] = m.group(1)
+    return [found[key] for key in sorted(found)]
 
 
 def recipe_profile() -> dict:
@@ -382,6 +390,16 @@ class ScanReaderTests(unittest.TestCase):
         self.assertFalse(found["catalogs_resolved"])
         self.assertEqual(run.returncode, 1)
 
+    def test_a_property_assignment_of_the_same_short_name_is_not_the_catalog_base(self):
+        # A parameterised catalog spreads a function parameter, while an unrelated `obj.Ojo=[...]` holds names the catalog does not: taking that array would miss a type the real catalog carries.
+        text = ('obj.Ojo=["permission_prompt","idle_prompt"];function f(Ojo){return {fieldToMatch:"notification_type",values:[...Ojo,"elicitation_complete","elicitation_response"]}}'
+                'f(["permission_prompt","idle_prompt","brand_new_type"]);').encode()
+        found, run = self.scan_of(text)
+        self.assertTrue(found["catalog_found"])
+        self.assertEqual(found["catalogs"][0]["base_candidates"], 0)
+        self.assertFalse(found["catalogs_resolved"])
+        self.assertEqual(run.returncode, 1, "a catalog whose array cannot be resolved must not pass")
+
     def test_a_base_without_the_required_names_fails_closed(self):
         # all names are known to DECISIONS, so only the missing required names can make the scan fail
         found, run = self.scan_of(self.blob(names=("auth_success", "elicitation_dialog", "agent_needs_input", "agent_completed")))
@@ -406,8 +424,9 @@ class ScanReaderTests(unittest.TestCase):
 
 class DocumentationTests(unittest.TestCase):
     def test_every_matcher_the_recipe_and_the_decision_record_quote_is_the_overlays(self):
-        # Every backtick-quoted pipe list that names permission_prompt, outside HTML comments, must be the overlay's matcher, so a stale operative copy cannot hide behind a
-        # correct one kept in a comment or a history paragraph. A history paragraph names an older list without the quoted pipe form.
+        # Every matcher quote (a backtick list directly after the word matcher, or any backtick pipe list of known notification types), outside HTML comments, must be the overlay's matcher, so a stale
+        # operative copy (one that omits permission_prompt too, or a single type) cannot hide behind a correct one kept in a comment or a history paragraph. A history paragraph names an older
+        # list without the quoted pipe form.
         matcher = json.loads(OVERLAY.read_text(encoding="utf-8"))["hooks"]["Notification"][0]["matcher"]
         for name, path in (("recipe", RECIPE), ("decision record", ROOT / "docs/decisions/2026-09-28-terminal-experience.md")):
             quoted = quoted_matchers(path.read_text(encoding="utf-8"))
@@ -415,11 +434,14 @@ class DocumentationTests(unittest.TestCase):
             self.assertEqual(sorted(frozenset(quoted)), [matcher], f"the {name} quotes a matcher that is not the overlay's")
 
     def test_the_matcher_comparison_sees_a_wrong_operative_copy_beside_a_correct_one_in_a_comment(self):
-        good, bad = "`a_type|permission_prompt|b_type`", "`a_type|permission_prompt`"
-        self.assertEqual(quoted_matchers(f"{bad} <!-- {good} -->"), ["a_type|permission_prompt"])
+        good, bad, without = "`idle_prompt|permission_prompt|auth_success`", "`idle_prompt|permission_prompt`", "`idle_prompt|auth_success`"
+        self.assertEqual(quoted_matchers(f"{bad} <!-- {good} -->"), ["idle_prompt|permission_prompt"])
         self.assertEqual(quoted_matchers(f"<!-- {good} --> no operative copy"), [])
-        self.assertEqual(quoted_matchers(f"{good} and {bad}"), ["a_type|permission_prompt|b_type", "a_type|permission_prompt"])
-        self.assertEqual(quoted_matchers("`a_type|b_type` names no permission_prompt"), [])
+        self.assertEqual(quoted_matchers(f"{good} and {bad}"), ["idle_prompt|permission_prompt|auth_success", "idle_prompt|permission_prompt"])
+        self.assertEqual(quoted_matchers(f"{good} and {without}"), ["idle_prompt|permission_prompt|auth_success", "idle_prompt|auth_success"], "a wrong matcher that omits permission_prompt is still a matcher quote")
+        self.assertEqual(quoted_matchers("`a_type|b_type` names no known notification type, so it is no matcher quote"), [])
+        self.assertEqual(quoted_matchers("a Notification hook whose matcher is the exact list `permission_prompt` and more"), ["permission_prompt"], "a single-type operative matcher is a matcher quote")
+        self.assertEqual(quoted_matchers("the quiet type `idle_prompt` is not a matcher quote"), [])
 
     def test_the_platform_page_names_every_shipped_default_and_the_recipe_anchor_exists(self):
         page = PLATFORM_PAGE.read_text(encoding="utf-8")

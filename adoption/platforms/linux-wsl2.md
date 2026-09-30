@@ -190,7 +190,7 @@ with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves 
    `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --login-shell --json`. It stats the three
    files and reports a state each, the file a login shell reads first and `profile_read` (`false` when an empty or unusable earlier file hides `~/.profile` or `~/.profile` is itself unusable; `null` when an earlier file has content, because whether it hands off is not read). It proves
    no PATH. Prove that with the profile's own launch shape, from Windows or through WSL interop:
-   `wsl.exe -d <DISTRO> -u <WSL_USER> --exec /bin/bash -lc 'type -P claude codex'` must print both paths (`type -P` finds files only; `command -v` also accepts a shell function, which the profile's `exec` cannot start). A probe from a shell
+   `wsl.exe -d <DISTRO> -u <WSL_USER> --exec /bin/bash -lc 'type -P claude codex'` must print both paths (`type -P` finds files, where `command -v` also accepts a shell function, which the profile's `exec` cannot start; `type -P` can still print a stale hashed or a non-executable path, so the doctor's check also requires the printed path to be an executable regular file). A probe from a shell
    that already has PATH passes even when the login files are broken.
 3. Merge the Claude Code overlay (added after `v2026.09.26.2`) into the live settings: `python3 tools/adoption/apply_claude_settings.py --template
    adoption/templates/claude.settings.linux-wsl2.overlay.json --dry-run`, then the same without `--dry-run` (it backs the file up

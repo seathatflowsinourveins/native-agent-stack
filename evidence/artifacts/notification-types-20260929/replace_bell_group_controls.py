@@ -4,7 +4,9 @@ real settings file, and checks the exit code, the words the script prints (and w
 bell group that holds another hook, a bell hook with a key beyond type and command, a matcher naming a type the overlay's does not, an absent matcher, an existing different
 `preferredNotifChannel`, two bell groups, a symlinked file, an unknown target or flag), that the safe cases still succeed (an old matcher, a re-quoted bell command, a file with no bell
 group, an unrelated group beside the bell group), that "nothing to do" is reported only when merging would change nothing, and that --apply installs the merged copy after a backup that
-equals the original, keeps the file mode, leaves no staging file, does not follow a symlink at the old fixed staging name, writes nothing when it refuses, and is idempotent.
+equals the original, keeps the file mode, leaves no staging file, does not follow a symlink at the old fixed staging name, writes nothing when it refuses, and is idempotent. Five cases inject
+another writer's save through concurrent_writer_harness.py (after the merge, at the backup, while the backup is copied, after the backup, at the rename): the first four must be refused and keep that save; the last is the
+documented residual (exit 0, that save is in neither the installed file nor the backup), kept as a case so that closing the window, or widening it, is noticed.
 usage: python3 -B replace_bell_group_controls.py <checkout>"""
 import json, os, subprocess, sys, tempfile
 from pathlib import Path
@@ -32,12 +34,14 @@ def bell(matcher, command=BELL, extra=(), hook_extra=None):
 
 
 HARNESS = CHECKOUT / "evidence/artifacts/notification-types-20260929/concurrent_writer_harness.py"
+MARK = "harness: another writer saved the settings file"   # printed on stderr by the harness when it injected the save
 
 
 def invoke(home, args, harness=None):
-    """The tool as a user runs it, or (harness = 'after-merge' | 'at-backup') through the harness that injects another writer's save at that moment."""
+    """The tool as a user runs it, or (harness = 'after-merge' | 'at-backup' | 'during-backup' | 'after-backup' | 'at-replace') through the harness that injects another writer's save at that moment."""
     command = [sys.executable, "-B", str(SCRIPT), str(CHECKOUT), *args] if harness is None else [sys.executable, "-B", str(HARNESS), harness, str(SCRIPT), str(CHECKOUT), *args]
-    return subprocess.run(command, capture_output=True, text=True, timeout=120, env={"HOME": str(home), "PATH": os.environ["PATH"]})
+    # A fixed umask: the tool's backup is created with the source's mode minus the umask (os.open), so the mode case must not depend on the umask of whoever runs the controls.
+    return subprocess.run(command, capture_output=True, text=True, timeout=120, env={"HOME": str(home), "PATH": os.environ["PATH"]}, preexec_fn=lambda: os.umask(0o022))
 
 
 def backups(claude):
@@ -164,6 +168,37 @@ def saved_during_backup(home, claude, original):
     return problems
 
 
+def saved_after_backup(home, claude, original):
+    """The other writer's save is still the live file, the one backup equals the bytes the tool read (the save came after it), nothing was installed and no staging file is left."""
+    now = json.loads((claude / "settings.json").read_text(encoding="utf-8"))
+    problems = []
+    if now.get("model") != "changed-by-another-writer":
+        problems.append("the other writer's save was lost")
+    if [g.get("matcher") for g in now["hooks"]["Notification"] if g.get("matcher") == group["matcher"]]:
+        problems.append("the overlay's bell group was installed over the other writer's save")
+    made = backups(claude)
+    if len(made) != 1 or made[0].read_bytes() != original:
+        problems.append("the backup does not equal the bytes the tool read")
+    if [p.name for p in claude.iterdir() if p.name.endswith((".tmp", ".new"))]:
+        problems.append("a staging file was left")
+    return problems
+
+
+def save_lost_at_replace(home, claude, original):
+    """The documented residual: a save at the rename itself is lost. The installed file is the merged copy (the old model, the overlay's bell group), and the one backup equals the bytes the tool
+    read, so that save is in neither. If it survives, the window was closed and the tool's docstring, the README and the decision record must say so."""
+    now = json.loads((claude / "settings.json").read_text(encoding="utf-8"))
+    problems = []
+    if now.get("model") == "changed-by-another-writer":
+        problems.append("the save survived: the residual this case documents is gone, update the docstring, the README and the decision record")
+    if [g for g in now["hooks"]["Notification"] if g.get("matcher") == group["matcher"]] != [group]:
+        problems.append("the merged copy was not installed")
+    made = backups(claude)
+    if len(made) != 1 or made[0].read_bytes() != original:
+        problems.append("the backup does not equal the bytes the tool read")
+    return problems
+
+
 def symlink_untouched(home, claude, original):
     return (["the real file changed"] if (home / "real.json").read_bytes() != original else []) + (["a backup was written"] if backups(claude) else [])
 
@@ -195,9 +230,15 @@ cases = [
     ("an unknown flag is refused", settings([bell(OLD)]), ["local", "--force"], 1, dict(words=["usage"], check=untouched)),
     ("the retired second-distro target is refused", settings([bell(OLD)]), ["polaris", "--apply"], 1, dict(words=["usage"], check=untouched)),
     ("a settings file saved by another writer after the read is refused, before any backup, and that save is kept", settings([bell(OLD), OTHER]), ["local", "--apply"], 1,
-     dict(words=["refused", "changed since it was read"], harness="after-merge", check=saved_by_another_writer)),
+     dict(words=[MARK, "refused", "changed since it was read"], harness="after-merge", check=saved_by_another_writer)),
     ("a save that lands while the backup is taken is refused, the backup holds it and nothing is installed", settings([bell(OLD), OTHER]), ["local", "--apply"], 1,
-     dict(words=["refused", "changed while it was backed up"], harness="at-backup", check=saved_during_backup)),
+     dict(words=[MARK, "refused", "changed while it was backed up"], harness="at-backup", check=saved_during_backup)),
+    ('a save that lands after the backup was taken is refused, the backup equals the read and nothing is installed', settings([bell(OLD), OTHER]), ["local", "--apply"], 1,
+     dict(words=[MARK, "refused", "changed after it was backed up"], harness="after-backup", check=saved_after_backup)),
+    ('an atomic save that replaces the file while the backup is being copied is refused, the backup equals the read and nothing is installed', settings([bell(OLD), OTHER]), ["local", "--apply"], 1,
+     dict(words=[MARK, "refused", "changed after it was backed up"], harness="during-backup", check=saved_after_backup)),
+    ('a save at the rename itself is the documented residual, exit 0, with that save in neither the installed file nor the backup', settings([bell(OLD), OTHER]), ["local", "--apply"], 0,
+     dict(words=[MARK, "read-back equals the merged copy: True"], harness="at-replace", check=save_lost_at_replace)),
     ("--apply installs the merged copy after a backup equal to the original, keeps the mode, leaves no staging file", settings([bell(OLD), OTHER]), ["local", "--apply"], 0,
      dict(words=["backup written:", "read-back equals the merged copy: True", "scratch removed: True"], check=installed,
           second=dict(args=["local"], exit=0, words=["nothing to do"], check=lambda h, c, o: [] if len(backups(c)) == 1 else ["the second run wrote a backup"]))),

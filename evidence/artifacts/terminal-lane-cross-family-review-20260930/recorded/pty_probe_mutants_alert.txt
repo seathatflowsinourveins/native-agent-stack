@@ -1,0 +1,8 @@
+ok    alert, the unmutated probe passes every case
+ok    alert, mutant, no signal handler is installed: failing 5 of 6 (expected 5)
+ok    alert, mutant, SIGINT is not handled: failing 1 of 6 (expected 1)
+ok    alert, mutant, the client's cleanup is not deferred and the first signal does not silence the rest: failing 3 of 6 (expected 3)
+ok    alert, mutant, the client is created without the spawn flag: failing 1 of 6 (expected 1)
+ok    alert, mutant, the client is created under a signal mask (it inherits the mask): failing 5 of 6 (expected 5)
+ok    alert, mutant, the private directory's cleanup is not deferred: failing 1 of 6 (expected 1)
+7 runs, 0 problems

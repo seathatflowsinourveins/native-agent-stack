@@ -10,8 +10,9 @@ says which. The copy is then compared with the original: only the bell group and
 when the original lacks them (the merge tool would overwrite a value the person set, so the script refuses that too). With --apply it installs the copy after a backup that is never
 overwritten (the merge tool's own `write_backup`) through the merge tool's own `atomic_write` (a fresh random staging name in the same directory; the local file must not be a
 symlink, as the merge tool also refuses), and a failed write or a read-back that differs exits nonzero. The client and other tools also save this file, so the tool installs only
-over the bytes it read: it compares the live file with its read before the backup and the backup with its read, and refuses (nothing installed) when another writer saved in between; a
-change in the last instant between the backup and the replace is not excluded (the backup then holds it). "Nothing to do" is reported only when the bell group equals the overlay's and
+over the bytes it read: it compares the live file with its read before the backup, the backup with its read, and the live file again right before the replace, and refuses (nothing
+installed) when another writer saved before the last of those comparisons. A save that lands after the last comparison and before the rename is lost, and it is in neither the installed
+file nor the backup (which holds what was read): the window is the time between one read and one rename, and closing it needs a lock that the client does not take. "Nothing to do" is reported only when the bell group equals the overlay's and
 merging the overlay would change nothing. Prints booleans, counts and key names only, never a settings value (a refusal counts the matcher types it would drop and does not name them).
 The former second-distro target (`polaris`) is gone: that distro was unregistered on 2026-09-29 and its write path could no longer be run.
 usage: replace_bell_group.py <checkout> local [--apply]"""
@@ -139,6 +140,8 @@ try:
         print("backup written:", backup.name)
         if backup.read_bytes() != original:
             refuse("the settings file changed while it was backed up; the backup holds the newer content and nothing was installed, run the tool again")
+        if live_path.read_bytes() != original:
+            refuse("the settings file changed after it was backed up; the backup holds the bytes that were read and nothing was installed, run the tool again")
         acs.atomic_write(live_path, new_bytes.decode("utf-8"), mode)
         installed, write_ok = live_path.read_bytes(), True
     except (OSError, acs.ApplyError) as error:

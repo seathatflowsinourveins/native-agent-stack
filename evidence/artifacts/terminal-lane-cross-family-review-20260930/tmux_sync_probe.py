@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Does tmux 3.4 wrap its redraws in DEC mode 2026 (synchronized output) when the outer terminal is declared to support it? A private tmux server (-L <unique socket>, empty config), a client in a
+"""Does tmux 3.4 wrap its redraws in DEC mode 2026 (synchronized output) when the outer terminal is declared to support it? A private tmux server (-S <a socket inside its own temporary directory>, empty config), a client in a
 pty as the outer terminal, once with `terminal-features 'xterm*:sync'` and once without it (negative control); counts ESC[?2026h and ESC[?2026l in what tmux writes to the client. Reads and writes
 only inside its own temporary directory; kills only its own server. usage: python3 -B tmux_sync_probe.py"""
 import os, pty, select, shutil, subprocess, sys, tempfile, time
@@ -9,9 +9,9 @@ SET, RESET = b"\x1b[?2026h", b"\x1b[?2026l"
 
 
 def run(option):
-    socket = f"sync{os.getpid()}"
-    base = [TMUX, "-L", socket, "-f", "/dev/null"]
-    work = tempfile.mkdtemp(prefix="ts")
+    work = tempfile.mkdtemp(prefix="ts", dir="/tmp")   # short path: a unix socket path is limited to about 100 bytes
+    socket = os.path.join(work, "tmux.sock")
+    base = [TMUX, "-S", socket, "-f", "/dev/null"]
     try:
         subprocess.run(base + ["new-session", "-d", "-x", "100", "-y", "24", "sh -c 'sleep 1; i=0; while [ $i -lt 8 ]; do echo line$i; i=$((i+1)); sleep 0.3; done; sleep 2'"], check=True, capture_output=True, cwd=work)
         if option:
@@ -19,7 +19,7 @@ def run(option):
         pid, fd = pty.fork()
         if pid == 0:
             os.environ["TERM"] = "xterm-256color"
-            os.execv(TMUX, [TMUX, "-L", socket, "-f", "/dev/null", "attach"])
+            os.execv(TMUX, [TMUX, "-S", socket, "-f", "/dev/null", "attach"])
         collected, deadline = b"", time.time() + 6
         while time.time() < deadline:
             ready, _, _ = select.select([fd], [], [], 0.2)
@@ -39,7 +39,7 @@ def run(option):
         os.waitpid(pid, 0)
         return collected.count(SET), collected.count(RESET)
     finally:
-        subprocess.run([TMUX, "-L", socket, "kill-server"], capture_output=True)
+        subprocess.run([TMUX, "-S", socket, "kill-server"], capture_output=True)
         shutil.rmtree(work, ignore_errors=True)
 
 

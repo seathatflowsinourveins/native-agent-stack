@@ -61,17 +61,29 @@ def bellstyle_from_schema(data):
     return any(results) if results else None
 
 
+ATTRIBUTES = r"((?:[ \t]*#\[(?:[^\[\]]|\[[^\]]*\])*\][ \t]*\n|[ \t]*///[^\n]*\n)*)"   # attributes (a bracket group may span lines and hold one nested bracket) and doc comments in front of an item
+
+
+def normalized(text):
+    """Whitespace runs become one space and the spaces next to punctuation go, so re-wrapping an attribute over several lines is not a change while any changed token is."""
+    return re.sub(r"\s*([(){}\[\],;:=<>])\s*", r"\1", re.sub(r"\s+", " ", text)).strip()
+
+
 def definitions(text):
-    """The parts of codex-rs/config/src/types.rs that define the TUI notification setting, whole (attributes and doc comments included) with whitespace normalized: the Notifications,
-    NotificationMethod and NotificationCondition enums, the TuiNotificationSettings struct and the Display impls of the two enums. A part that is not found is None."""
-    prefix = r"((?:[ \t]*#\[[^\n]*\]\n|[ \t]*///[^\n]*\n)*)"
+    """The parts of codex-rs/config/src/types.rs that define the TUI notification and terminal-title settings, whole (attributes, which may span lines, and doc comments included) with whitespace
+    normalized: the Notifications, NotificationMethod and NotificationCondition enums, the TuiNotificationSettings struct, the Display impls of the two enums, the Default impl of Notifications (what
+    `notifications` is when the key is absent) and the `terminal_title` field of Tui. A part that is not found is None."""
     found = {}
     for kind, name in (("enum", "Notifications"), ("enum", "NotificationMethod"), ("enum", "NotificationCondition"), ("struct", "TuiNotificationSettings")):
-        match = re.search(prefix + "pub " + kind + " " + name + r" \{.*?\n\}", text, re.S)
-        found[name] = re.sub(r"\s+", " ", match.group(0)) if match else None
+        match = re.search(ATTRIBUTES + "pub " + kind + " " + name + r" \{.*?\n\}", text, re.S)
+        found[name] = normalized(match.group(0)) if match else None
     for name in ("NotificationMethod", "NotificationCondition"):
         match = re.search(r"impl fmt::Display for " + name + r" \{.*?\n\}", text, re.S)
-        found[name + " Display"] = re.sub(r"\s+", " ", match.group(0)) if match else None
+        found[name + " Display"] = normalized(match.group(0)) if match else None
+    match = re.search(r"impl Default for Notifications \{.*?\n\}", text, re.S)
+    found["Notifications Default"] = normalized(match.group(0)) if match else None
+    match = re.search(ATTRIBUTES + r"[ \t]*pub terminal_title:[^\n]*\n", text)
+    found["Tui terminal_title"] = normalized(match.group(0)) if match else None
     return found
 
 
@@ -89,6 +101,12 @@ SYNTHETIC = """
 pub enum Notifications {
     Enabled(bool),
     Custom(Vec<String>),
+}
+
+impl Default for Notifications {
+    fn default() -> Self {
+        Self::Enabled(true)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, JsonSchema, Default)]
@@ -135,7 +153,23 @@ pub struct TuiNotificationSettings {
     #[serde(default, rename = "notification_condition")]
     pub condition: NotificationCondition,
 }
+
+/// Collection of settings that are specific to the TUI.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default, JsonSchema)]
+#[schemars(deny_unknown_fields)]
+pub struct Tui {
+    #[serde(default, flatten)]
+    pub notification_settings: TuiNotificationSettings,
+    /// Ordered terminal title items.
+    /// When unset, the TUI defaults to: `activity`, `thread-name`, and `project-name`.
+    #[serde(default)]
+    pub terminal_title: Option<Vec<String>>,
+}
 """
+
+WRAPPED = SYNTHETIC.replace('#[serde(rename_all = "lowercase")]\npub enum NotificationMethod', '#[serde(\n    rename_all = "lowercase"\n)]\npub enum NotificationMethod')
+WRAPPED_DERIVE = SYNTHETIC.replace('#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, JsonSchema, Default)]\n#[serde(rename_all = "lowercase")]\npub enum NotificationMethod',
+                                   '#[derive(\n    Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, JsonSchema, Default\n)]\n#[serde(rename_all = "lowercase")]\npub enum NotificationMethod')
 
 
 def selftest():
@@ -146,6 +180,18 @@ def selftest():
         ("a new NotificationCondition variant is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("    Always,\n}", "    Always,\n    Never,\n}")), False),
         ("a changed default variant of the method is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("#[default]\n    Auto,", "Auto,").replace("    Osc9,", "    #[default]\n    Osc9,")), False),
         ("a new struct field is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("    pub condition: NotificationCondition,", "    pub condition: NotificationCondition,\n    pub extra: bool,")), False),
+        ("a changed default of `notifications` is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("Self::Enabled(true)", "Self::Enabled(false)")), False),
+        ("a missing Default impl is unknown, not identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("impl Default for Notifications", "impl Default for Renamed")), None),
+        ("a changed terminal_title default in its doc comment is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("and `project-name`", "and `branch`")), False),
+        ("a changed terminal_title type is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("Option<Vec<String>>", "Option<String>")), False),
+        ("a missing terminal_title is unknown, not identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("pub terminal_title", "pub renamed_title")), None),
+        ("a changed rename_all in a one-line serde attribute is seen",
+         definitions_identical(SYNTHETIC, SYNTHETIC.replace('#[serde(rename_all = "lowercase")]\npub enum NotificationMethod', '#[serde(rename_all = "UPPERCASE")]\npub enum NotificationMethod')), False),
+        ("a wrapped derive that loses Default is seen", definitions_identical(WRAPPED_DERIVE, WRAPPED_DERIVE.replace("JsonSchema, Default\n)]\n#[serde(rename_all = \"lowercase\")]\npub enum NotificationMethod",
+                                                                                                                  "JsonSchema\n)]\n#[serde(rename_all = \"lowercase\")]\npub enum NotificationMethod")), False),
+        ("a serde attribute re-wrapped over several lines is not a change", definitions_identical(SYNTHETIC, WRAPPED), True),
+        ("a changed rename_all inside a multi-line serde attribute is seen",
+         definitions_identical(WRAPPED, WRAPPED.replace('rename_all = "lowercase"\n)]\npub enum NotificationMethod', 'rename_all = "UPPERCASE"\n)]\npub enum NotificationMethod')), False),
         ("a changed Display text is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace('write!(f, "auto")', 'write!(f, "automatic")')), False),
         ("a missing definition is unknown, not identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("pub enum NotificationCondition", "pub enum RenamedCondition")), None),
         ("the same text with only whitespace changes is identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("    ", "  ")), True),

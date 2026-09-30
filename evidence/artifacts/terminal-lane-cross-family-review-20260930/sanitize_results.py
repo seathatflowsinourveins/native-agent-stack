@@ -17,6 +17,8 @@ RULES = [
     (re.compile(re.escape(HOME)), "~"),
     (re.compile(r"\b" + re.escape(USER) + r"\b"), "<user>"),
     *[(re.compile(re.escape(item)), "<private>") for item in extra],
+    (re.compile(r"\b(?:Librarium|Phoyo)\b"), "<project>"),   # private per-project profile names of the second distro
+    (re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+"), "/home/example"),   # the repository's publication rule allows only /home/example
 ]
 counts = {}
 

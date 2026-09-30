@@ -11,7 +11,10 @@ Revised 2026-09-30 after a cross-family review found four ways the earlier check
 run shows the controls tell the two apart): (1) it passed when a startup file exited 0 before the probe loop ran, because no output meant "nothing missing": the probe now prints
 FOUND or MISSING for every name and a final DONE, and anything less fails; (2) `command -v` accepts a shell function, which the profiles' `exec claude` cannot start: `type -P`
 finds files only; (3) it called an empty ~/.bash_login a shadow even when a real ~/.bash_profile comes first and bash never reads ~/.bash_login: only the first startup file bash
-would read can shadow ~/.profile; (4) the login shell's exit code alone was trusted.
+would read can shadow ~/.profile; (4) the login shell's exit code alone was trusted;
+and a second re-check found (5) that `type -P` can print a path that the profile's `exec` cannot start: a stale hashed pathname (a startup file's `hash -p /gone/claude claude`; `exec` uses the same
+entry and fails with 127) or, when no executable matches, a non-executable regular file that bash falls back to (a mode-0644 `claude` on PATH; `exec` exits 126). A name therefore counts as found only
+when the resolved path is an executable regular file.
 
 usage: python3 -B login_shell_check_controls.py [--real-host]
 Prints one JSON summary of booleans and names; temporary homes only, removed afterwards. --real-host also runs the check on the running user's own home (read-only).
@@ -53,7 +56,7 @@ def first_startup_file(home):
 
 def login_shell_check(home, wanted=NAMES):
     user = os.environ.get("USER", home.name)
-    probe = ("for c in " + " ".join(wanted) + '; do if p=$(type -P "$c") && [ -n "$p" ]; then echo "FOUND:$c"; else echo "MISSING:$c"; fi; done; echo DONE')
+    probe = ("for c in " + " ".join(wanted) + '; do if p=$(type -P "$c") && [ -n "$p" ] && [ -f "$p" ] && [ -x "$p" ]; then echo "FOUND:$c"; else echo "MISSING:$c"; fi; done; echo DONE')
     result = command(["/usr/bin/env", "-i", f"HOME={home}", f"USER={user}", f"LOGNAME={user}", "SHELL=/bin/bash", f"PATH={distro_default_path()}", "/bin/bash", "-lc", probe])
     lines = result["stdout"].splitlines()
     found = [line[len("FOUND:"):] for line in lines if line.startswith("FOUND:")]
@@ -120,6 +123,9 @@ def main():
         case("G non-empty .bash_profile that exits 0 before the probe runs", lambda h: (h / ".bash_profile").write_text("exit 0\n"), False, [], [], expect_completed=False, previous_pass=True),
         case("H .bash_profile that exits 1", lambda h: (h / ".bash_profile").write_text("exit 1\n"), False, [], [], expect_completed=False),
         case("I a shell function named claude while no executable is on PATH", lambda h: (h / ".bash_profile").write_text("claude() { :; }\n"), False, [], NAMES),
+        case("J a startup file hashes claude to a path that does not exist (hash -p, after the hand-off: assigning PATH flushes the hash): type -P prints the stale path", lambda h: (h / ".bash_profile").write_text(HAND_OFF + "hash -p /nonexistent/claude claude\n"),
+             False, [], ["claude"], previous_pass=True),
+        case("K a non-executable claude on PATH (mode 0644): type -P falls back to it and exec exits 126", lambda h: (h / "bin" / "claude").chmod(0o644), False, [], ["claude"]),
     ]
     summary = {"cases": cases, "all_cases_as_expected": all(c["as_expected"] for c in cases)}
     if "--real-host" in sys.argv:

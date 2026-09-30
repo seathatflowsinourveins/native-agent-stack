@@ -2,7 +2,7 @@
 """Does tmux pass a BEL from a pane to the outer terminal, so a Notification hook's bell still rings for an agent-team lead in a tmux pane? The outer terminal here is a Python pty
 (TERM=xterm-256color), which stands for Windows Terminal only in that a bare BEL written to it is what the hook's terminalSequence produces; nothing about Windows Terminal itself is measured.
 
-Runs a private tmux server (-L <unique socket>, an empty config, no user config read) with one window whose command prints one BEL after a delay, attaches a client
+Runs a private tmux server (-S <a socket inside its own temporary directory>, an empty config, no user config read) with one window whose command prints one BEL after a delay, attaches a client
 in a pty for a few seconds and counts the BEL bytes that tmux writes to the client's terminal, after removing OSC sequences (whose terminator is also a BEL byte).
 Arms: default options; `bell-action none` (negative control: the count must drop to 0 or the probe cannot tell forwarding from no forwarding); `visual-bell on`
 (tmux shows a message instead of ringing); `bell-action any` set explicitly (the default that `tmux show-options -g bell-action` reports on 3.4; the manual's entry lists the values only). Also a BEL-free control command, which must count 0.
@@ -18,9 +18,9 @@ OSC = re.compile(rb"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)")
 
 
 def bells(command, options, seconds=6.0):
-    work = Path(tempfile.mkdtemp(prefix="tb"))
-    socket = f"probe{os.getpid()}"
-    base = [TMUX, "-L", socket, "-f", "/dev/null"]
+    work = Path(tempfile.mkdtemp(prefix="tb", dir="/tmp"))   # short path: a unix socket path is limited to about 100 bytes
+    socket = str(work / "tmux.sock")
+    base = [TMUX, "-S", socket, "-f", "/dev/null"]
     try:
         subprocess.run(base + ["new-session", "-d", "-x", "100", "-y", "24", command], check=True, capture_output=True, cwd=work)
         for option in options:
@@ -28,7 +28,7 @@ def bells(command, options, seconds=6.0):
         pid, fd = pty.fork()
         if pid == 0:
             os.environ["TERM"] = "xterm-256color"
-            os.execv(TMUX, [TMUX, "-L", socket, "-f", "/dev/null", "attach"])
+            os.execv(TMUX, [TMUX, "-S", socket, "-f", "/dev/null", "attach"])
         collected, deadline = b"", time.time() + seconds
         while time.time() < deadline:
             ready, _, _ = select.select([fd], [], [], 0.2)
@@ -48,7 +48,7 @@ def bells(command, options, seconds=6.0):
         os.waitpid(pid, 0)
         return OSC.sub(b"", collected).count(b"\x07")
     finally:
-        subprocess.run([TMUX, "-L", socket, "kill-server"], capture_output=True)
+        subprocess.run([TMUX, "-S", socket, "kill-server"], capture_output=True)
         shutil.rmtree(work, ignore_errors=True)
 
 

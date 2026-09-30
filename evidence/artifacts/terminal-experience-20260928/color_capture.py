@@ -58,20 +58,39 @@ SGR = re.compile(r"\x1b\[([0-9;:]*)m")
 
 def sgr_counts(text, size=0):
     """Counts of SGR sequences (ESC [ params m: the final byte must be m, so a cursor-position sequence with the same numbers is not counted) that set a colour of each class: the number
-    of sequences that contain at least one such colour, the unit of the first version of this counter. The parameters are read in order from their boundaries (38;2;r;g;b and 48;2;r;g;b truecolor,
-    38;5;n and 48;5;n 256-colour, 30-37, 90-97, 40-47 and 100-107 basic); ':' separates sub-parameters of the same colour like ';'."""
-    counts = {"bytes": size, "fg_truecolor_38;2": 0, "bg_truecolor_48;2": 0, "fg_256_38;5": 0, "bg_256_48;5": 0, "basic_16": 0}
+    of sequences that contain at least one such colour, the unit of the first version of this counter. Semicolon parameters are read in order from their boundaries (38;2;r;g;b and 48;2;r;g;b
+    truecolor, 38;5;n and 48;5;n 256-colour, 30-37, 90-97, 40-47 and 100-107 basic). A parameter with colon sub-parameters is one group, read as the pinned Windows Terminal parser reads it (v1.24.11911.0
+    adaptDispatchGraphics.cpp, _SetRgbColorsHelperFromSubParams): 38:2::r:g:b and 48:2::r:g:b with an EMPTY colour-space field and every component within a byte are truecolor, 38:5:n and 48:5:n
+    are 256-colour. What the counter cannot classify is counted in `unclassified_groups` (once per sequence) and never as a colour or a basic code: a colon group the parser does not apply as a colour
+    (a colour-space id, a component above a byte, or a non-colour such as the underline style 4:3), and an incomplete 38/48 group, which is consumed whole (the parser applies missing components as 0;
+    this counter does not model that, and Claude Code emits neither)."""
+    counts = {"bytes": size, "fg_truecolor_38;2": 0, "bg_truecolor_48;2": 0, "fg_256_38;5": 0, "bg_256_48;5": 0, "basic_16": 0, "unclassified_groups": 0}
     for match in SGR.finditer(text):
-        params = [p for p in re.split(r"[;:]", match.group(1))]
-        seen, i = set(), 0
+        params = match.group(1).split(";")
+        seen, unclassified, i = set(), False, 0
         while i < len(params):
             p = params[i]
-            if p in ("38", "48") and i + 1 < len(params) and params[i + 1] == "2" and i + 4 < len(params) and all(x.isdigit() for x in params[i + 2:i + 5]):
-                seen.add(("fg" if p == "38" else "bg") + "_truecolor_" + p + ";2")
-                i += 5
-            elif p in ("38", "48") and i + 1 < len(params) and params[i + 1] == "5" and i + 2 < len(params) and params[i + 2].isdigit():
-                seen.add(("fg" if p == "38" else "bg") + "_256_" + p + ";5")
-                i += 3
+            if ":" in p:
+                group = p.split(":")
+                if group[0] in ("38", "48") and len(group) == 6 and group[1] == "2" and group[2] == "" and all(x.isdigit() and int(x) <= 255 for x in group[3:]):
+                    seen.add(("fg" if group[0] == "38" else "bg") + "_truecolor_" + group[0] + ";2")
+                elif group[0] in ("38", "48") and len(group) == 3 and group[1] == "5" and group[2].isdigit() and int(group[2]) <= 255:
+                    seen.add(("fg" if group[0] == "38" else "bg") + "_256_" + group[0] + ";5")
+                else:
+                    unclassified = True
+                i += 1
+            elif p in ("38", "48") and i + 1 < len(params) and params[i + 1] == "2":
+                if i + 4 < len(params) and all(x.isdigit() for x in params[i + 2:i + 5]):
+                    seen.add(("fg" if p == "38" else "bg") + "_truecolor_" + p + ";2")
+                    i += 5
+                else:
+                    unclassified, i = True, len(params)
+            elif p in ("38", "48") and i + 1 < len(params) and params[i + 1] == "5":
+                if i + 2 < len(params) and params[i + 2].isdigit():
+                    seen.add(("fg" if p == "38" else "bg") + "_256_" + p + ";5")
+                    i += 3
+                else:
+                    unclassified, i = True, len(params)
             elif p.isdigit() and (30 <= int(p) <= 37 or 90 <= int(p) <= 97 or 40 <= int(p) <= 47 or 100 <= int(p) <= 107):
                 seen.add("basic_16")
                 i += 1
@@ -79,6 +98,8 @@ def sgr_counts(text, size=0):
                 i += 1
         for name in seen:
             counts[name] += 1
+        if unclassified:
+            counts["unclassified_groups"] += 1
     return counts
 
 
@@ -88,8 +109,14 @@ def selftest():
              ("two colours in one sequence", "\x1b[1;38;2;1;2;3;48;2;4;5;6m", {"fg_truecolor_38;2": 1, "bg_truecolor_48;2": 1}),
              ("a number that only looks like a prefix (138;2;1;2;3) is not a colour", "\x1b[138;2;1;2;3m", {}),
              ("basic colours", "\x1b[31m\x1b[1;44m\x1b[97m\x1b[0m", {"basic_16": 3}),
-             ("colon sub-parameters", "\x1b[38:2:1:2:3m", {"fg_truecolor_38;2": 1}),
-             ("a truncated truecolor is not counted", "\x1b[38;2;1;2m", {}),
+             ("colon truecolor with an empty colour-space field is truecolor, and its components (31, 32, 33) are not basic colours", "\x1b[38:2::31:32:33m", {"fg_truecolor_38;2": 1}),
+             ("colon truecolor with a colour-space id is invalid for the pinned parser: not a colour", "\x1b[38:2:1:2:3m", {"unclassified_groups": 1}),
+             ("colon 256-colour", "\x1b[48:5:12m", {"bg_256_48;5": 1}),
+             ("a colon component above a byte is not applied", "\x1b[38:2::300:1:1m", {"unclassified_groups": 1}),
+             ("an underline style group is not a colour", "\x1b[4:3m", {"unclassified_groups": 1}),
+             ("a colon colour and a semicolon colour in one sequence", "\x1b[38:2::1:2:3;48;5;9m", {"fg_truecolor_38;2": 1, "bg_256_48;5": 1}),
+             ("a truncated truecolor group is consumed: not a colour, and its numbers never count as basic colours", "\x1b[38;2;31;32m", {"unclassified_groups": 1}),
+             ("a truncated 256-colour group is consumed", "\x1b[48;5m", {"unclassified_groups": 1}),
              ("private-mode sequences are not SGR", "\x1b[?25l\x1b[?2026h", {})]
     problems = []
     for label, text, expected in cases:

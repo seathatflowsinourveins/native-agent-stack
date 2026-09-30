@@ -1,4 +1,5 @@
 {
+ "note": "The repair column describes the state after the first repair round; the re-check of the repairs (recheck-findings.json) and the fifth round changed some of these scripts and their counts.",
  "findings": [
   {
    "id": "F-sol-u484-A-1",

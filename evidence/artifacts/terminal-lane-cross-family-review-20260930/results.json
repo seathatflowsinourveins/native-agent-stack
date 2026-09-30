@@ -574,7 +574,7 @@
      {
       "claim": "The published receipt avoids workstation and local profile identifiers.",
       "result": "contradicted",
-      "source": "Merged and current receipt inspection retained host_scope.host=nativestack-5975wx-20260925 and the Polaris/Librarium/Phoyo labels at CHECKOUT lines 24 and 11."
+      "source": "Merged and current receipt inspection retained host_scope.host=nativestack-5975wx-20260925 and the Polaris/<project>/<project> labels at CHECKOUT lines 24 and 11."
      }
     ],
     "commands_run": [
@@ -2037,7 +2037,7 @@
    "file": "evidence/receipts/login-shell-contract-20260929.json",
    "line": 24,
    "claim": "The published receipt retains a workstation identifier and local distro/profile identifiers.",
-   "evidence": "Read and compared the merged receipt and CHECKOUT in a python3 -B scratch harness. Both contain \"host\": \"nativestack-5975wx-20260925\". CHECKOUT line 11 also states: \"The Polaris distro's profiles (Librarium, Phoyo) were not measured.\" The same named-profile limitation is duplicated in manifests/evidence.json.",
+   "evidence": "Read and compared the merged receipt and CHECKOUT in a python3 -B scratch harness. Both contain \"host\": \"nativestack-5975wx-20260925\". CHECKOUT line 11 also states: \"The Polaris distro's profiles (<project>, <project>) were not measured.\" The same named-profile limitation is duplicated in manifests/evidence.json.",
    "failure_scenario": "Publishing the portable receipt exposes a specific workstation label and unrelated local distro/project-profile names, which are unnecessary to establish the shell behavior or the unmeasured scope.",
    "fix": "Replace the workstation label with a generic public execution-scope identifier and describe the excluded profiles as two profiles in another WSL distro. Update the duplicated manifest text and registered receipt checksum.",
    "tested": true
@@ -2089,7 +2089,7 @@
    "file": "evidence/receipts/login-shell-contract-20260929.json",
    "line": 24,
    "claim": "The published receipt retains a persistent host identifier and private environment names.",
-   "evidence": "rtk rg -n against the CHECKOUT receipt printed line 24: '\"host\": \"nativestack-5975wx-20260925\"'. Line 11 also retains the distro/profile names 'Polaris', 'Librarium', and 'Phoyo'. These values were introduced in the PR's published receipt and remain at CHECKOUT.",
+   "evidence": "rtk rg -n against the CHECKOUT receipt printed line 24: '\"host\": \"nativestack-5975wx-20260925\"'. Line 11 also retains the distro/profile names 'Polaris', '<project>', and '<project>'. These values were introduced in the PR's published receipt and remain at CHECKOUT.",
    "failure_scenario": "Publishing the portable evidence bundle exposes identifiers that correlate the observation with a particular workstation and private project environment.",
    "fix": "Replace the persistent host identifier with a generic scope such as 'one WSL2 workstation', and describe the excluded environment as a second distro with two project profiles. Update corresponding published prose and manifest hashes.",
    "tested": true
@@ -2349,7 +2349,7 @@
    "file": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
    "line": 368,
    "claim": "The probe prints payload messages and terminal screen contents despite claiming to print only counts, types and timings.",
-   "evidence": "ctx_execute: called measure with synthetic terminal and observer input, without a live client. Output: \"PUSH PRINT PRIVACY: exit=0 message_value_printed=True account_value_printed=True home_path_printed=True\". Printed lines included \"message=SYNTHETIC_PRIVATE_MESSAGE\" and \"screen tail (ANSI stripped): SYNTHETIC_PRIVATE_ACCOUNT /home/synthetic-user/private-project\". Line 363 prints the message and line 368 prints screen text.",
+   "evidence": "ctx_execute: called measure with synthetic terminal and observer input, without a live client. Output: \"PUSH PRINT PRIVACY: exit=0 message_value_printed=True account_value_printed=True home_path_printed=True\". Printed lines included \"message=SYNTHETIC_PRIVATE_MESSAGE\" and \"screen tail (ANSI stripped): SYNTHETIC_PRIVATE_ACCOUNT /home/example/private-project\". Line 363 prints the message and line 368 prints screen text.",
    "failure_scenario": "Terminal output contains a user identity or project path, or a Notification message contains private text. Those values escape the private payload directory through stdout and can enter captured evidence unless someone manually removes them.",
    "fix": "Remove message text and screen-tail output from the normal probe report. Keep only counts, validated type names, timing and state flags; if private debugging output is retained, require an explicit option and avoid publishing it.",
    "tested": true

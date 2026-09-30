@@ -73,6 +73,8 @@ RULES = [
     (re.compile(r"/tmp/(?:rv|vf|sm|ss|rb|tb|ts)-?[A-Za-z0-9_]*"), "<scratch>"),
     (re.compile(re.escape(HOME)), "~"),
     (re.compile(r"\b" + re.escape(USER) + r"\b"), "<user>"),
+    (re.compile(r"\b(?:Librarium|Phoyo)\b"), "<project>"),   # private per-project profile names of the second distro
+    (re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+"), "/home/example"),   # a reviewer's synthetic fixture home: the repository's publication rule allows only /home/example
 ]
 replaced = {}
 
@@ -123,7 +125,7 @@ for f in sorted(data["findings"], key=lambda f: f["id"]):
     if f["id"] in verdicts:
         row["verifier_verdict"], row["verifier_severity"] = verdicts[f["id"]]["verdict"], verdicts[f["id"]]["severity"]
     rows.append(row)
-findings = {"findings": rows}
+findings = {"note": "The repair column describes the state after the first repair round; the re-check of the repairs (recheck-findings.json) and the fifth round changed some of these scripts and their counts.", "findings": rows}
 
 for name, payload in (("results.json", results), ("verification.json", verification), ("findings.json", findings)):
     payload = clean(payload)

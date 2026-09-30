@@ -30,4 +30,15 @@ PASS private directory removed after an interruption
 PASS private directory removed after a failure
 PASS private directory removed after SIGTERM
 PASS private directory removed after SIGHUP
-PASS SIGTERM end to end: probe started True, private directory left False, stand-in client still alive False
+PASS exit status: an observed tool call and no BEL passes: expected 0, got 0
+PASS exit status: a hooks-disabled control with a dialog and no BEL passes: expected 0, got 0
+PASS exit status: a hooks-disabled control that saw a BEL fails: expected 1, got 1
+PASS exit status: a control whose dialog never opened fails: expected 2, got 2
+PASS exit status: a run whose tool call was never observed fails: expected 2, got 2
+PASS end to end, one SIGTERM: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
+PASS end to end, two SIGTERMs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
+PASS end to end, two SIGINTs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 130 (expected 130), private directory left False, stand-in client still alive False
+PASS end to end, one SIGTERM while the probe's own normal-exit cleanup runs: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
+PASS end to end, a signal while the client is being created: stand-in client ran True with signal mask 0000000000000000, probe exit 143 (expected 143), private directory left False, stand-in client still alive False
+PASS end to end, a signal at the start of the final cleanup waits until the directory is gone: private directory left False, the signal reached the previous handler afterwards True
+PASS end to end, negative control: a client that never starts is rejected: stand-in client ran False with signal mask None, probe running when signaled True, probe exit 143 (expected 143), private directory left False, stand-in client still alive False

@@ -11,11 +11,12 @@ Claude verifier or by the coordinator before anything was changed.
 - **Lane.** The packaged landscape-sweep GPT-6 lane (`tools/sota-convergence/landscape-sweep`: `build_args.stage_lane_home`, `codex_call.sh`, `codex_job.py`), staged with `stage_review_lane.py`: a lane-local
   Codex home whose provider is the local OmniRoute gateway (`http://127.0.0.1:20128/v1`, model `cx/gpt-6.1-sol`, effort `max`, read-only sandbox, live web search, the token MCP servers of the stack-worker
   profile; the two project-note servers switched off so a reviewer reads only what its prompt names). Codex CLI 0.159.2. The gateway's compression stays at its recorded settings (the Codex route is
-  unchanged); the lane's savings are the prompt cache (95.0% of input tokens were cache reads), RTK and context-mode.
+  unchanged: its headerless lane compressed 0 tokens on real Codex jobs). The lane's token practice is the prompt cache (95.0% of input tokens were cache reads) with RTK and context-mode in the lane home; the
+  savings of the last two were not measured separately.
 - **Units.** Nine jobs, each with the change's own evidence claims and a lens: behaviour and tests (A) or claims and evidence (B) for each of the four pull requests, #519 split in three. `build_review_prompts.py`
   writes the prompts (no model-family names in them) and the strict output schema.
-- **Result.** Nine jobs, all exit 0, 46 findings (3 high, 34 medium, 9 low), 41 with a command the reviewer ran. 24.47M input tokens, 23.24M of them cached, 0.36M output; 71 minutes of wall clock; three
-  points of the gateway pool's hundred used.
+- **Result.** Nine jobs, all exit 0, 46 findings (3 high, 34 medium, 9 low), 41 with a command the reviewer ran. 24.47M input tokens, 23.24M of them cached, 0.36M output; 71 minutes of wall clock; four
+  points of the gateway pool's hundred used (cached aggregate figures, 7 before and 11 after; other sessions may have used points in between).
 - **Verification.** `make_verify_briefs.py` wrote a brief per unit; a Claude Workflow ran one `stack-verifier` (Opus, effort max, read-only) per unit, three waves. 23 findings were graded by a verifier
   (17 confirmed, 4 partly, 2 refuted), 11 are duplicates of a graded or already repaired finding, and 12 were checked by the coordinator (8 against the code or the upstream source, 3 concerning a code path
   that no longer exists, 1 convention). 39 led to a repair, 2 were refuted, 3 were closed by removing the path, 2 duplicates of one convention (the host id in receipts) were kept. `findings.json` has the row of
@@ -41,3 +42,13 @@ The repaired scripts themselves are in the three earlier artifact directories (`
 `notification-types-20260929`); each row of their READMEs says what the script now does.
 
 Not retained: the private work directory (the reviewers' event streams, the prompts with this host's checkout path, the verifiers' transcripts). The prompts' SHA-256 values are in the receipt.
+
+## Re-check of the repairs (2026-09-30)
+
+- **Jobs.** Three read-only jobs of the same lane and model (`R1` the tool and the probes, `R2` the scan, tests and scripts, `R3` the claims and the evidence; `build_recheck_prompts.py` wrote the prompts from the pull
+  request's head, its body's evidence claims and the round-1 record) and one job of `cx/gpt-6-astra-ultra` (`U1`, an adversarial second opinion, highest-risk items first). The prompts' SHA-256 values are in
+  `recheck_prompts_sha256.txt`.
+- **Result.** 33 findings (1 high, 24 medium, 8 low): 12 duplicates of another finding, 2 coordinator checks and 19 findings graded by three Claude verifier waves (`stack-verifier`, Opus, effort max, read-only): 16 confirmed,
+  3 partly, none refuted. `build_recheck_record.py` writes `recheck-results.json`, `recheck-verification.json` and `recheck-findings.json` (sanitized, with the sanitizer rules read from `build_findings_record.py`).
+  Every finding was repaired in round 5; the first-round repairs proved incomplete in several places (see the decision record's re-check subsection).
+- **Not repeated.** No further review round: the round-5 repairs are checked by the recorded controls, mutants and native reruns (`recorded/`), not by a reviewer.

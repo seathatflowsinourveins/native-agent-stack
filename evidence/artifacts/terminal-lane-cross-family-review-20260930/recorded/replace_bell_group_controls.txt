@@ -18,8 +18,11 @@ isolated an unknown flag is refused: exit 1, expected nonzero
 isolated the retired second-distro target is refused: exit 1, expected nonzero
 isolated a settings file saved by another writer after the read is refused, before any backup, and that save is kept: exit 1, expected nonzero
 isolated a save that lands while the backup is taken is refused, the backup holds it and nothing is installed: exit 1, expected nonzero
+isolated a save that lands after the backup was taken is refused, the backup equals the read and nothing is installed: exit 1, expected nonzero
+isolated an atomic save that replaces the file while the backup is being copied is refused, the backup equals the read and nothing is installed: exit 1, expected nonzero
+isolated a save at the rename itself is the documented residual, exit 0, with that save in neither the installed file nor the backup: exit 0, expected 0
 isolated --apply installs the merged copy after a backup equal to the original, keeps the mode, leaves no staging file: exit 0, expected 0
 isolated --apply keeps a file mode other than 0600 on the installed file and on its backup: exit 0, expected 0
 isolated --apply does not follow a symlink at the old fixed staging name: exit 0, expected 0
 isolated a symlinked settings file is refused, also with --apply, and the real file is untouched: exit 1, expected nonzero
-24 cases, 0 problems
+27 cases, 0 problems

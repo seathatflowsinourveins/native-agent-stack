@@ -1,1 +1,1 @@
-{"selftest_checks": 11, "problems": []}
+{"selftest_checks": 20, "problems": []}

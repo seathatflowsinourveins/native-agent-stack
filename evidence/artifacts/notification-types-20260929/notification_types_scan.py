@@ -47,13 +47,15 @@ def names_of(items):
 
 
 def assignment_pattern(spread):
-    """`<spread>=["a","b",...]` where the name is not the tail of a longer identifier; `new Set([...])`, `new Map(...)` and other values do not match."""
-    return rb'(?<![\w$])' + re.escape(spread) + b'=' + NAMES_ARRAY
+    """`<spread>=["a","b",...]` where the name is not the tail of a longer identifier or a member access (`obj.<name>=[...]` is another variable); `new Set([...])`, `new Map(...)` and other values do not match."""
+    return rb'(?<![\w$.])' + re.escape(spread) + b'=' + NAMES_ARRAY
 
 
 def scan(binary):
     """Read the binary and return {"types": {name: {"notificationType_literals": n, "matcher_value": bool}}, "catalog_found": bool, "catalogs_resolved": bool,
-    "catalogs": [{"spread": name, "base_candidates": n, "base_size": n, "extras": [names]}], "base_array_size": n, "catalog_extra_values": [names]}."""
+    "catalogs": [{"spread": name, "base_candidates": n, "base_size": n, "extras": [names]}], "base_array_size": n, "catalog_extra_values": [names]}.
+    Scope limit: minified names are not resolved by scope, so a plain assignment of the same short name in another scope, beside a catalog that spreads a function parameter, would be taken for the
+    catalog's array (the three release binaries do not do this; two different arrays, no array, or a base without permission_prompt and idle_prompt fail closed)."""
     with open(binary, "rb") as handle, mmap.mmap(handle.fileno(), 0, access=mmap.ACCESS_READ) as data:
         literals = {}
         for found in re.finditer(rb'notificationType:"([a-z][a-z0-9_]*)"', data):
