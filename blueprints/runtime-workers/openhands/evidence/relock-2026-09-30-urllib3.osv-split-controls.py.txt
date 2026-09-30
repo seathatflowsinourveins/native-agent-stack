@@ -7,9 +7,9 @@ usage: osv_split_controls.py <osv-scanner binary> <out dir>
    once with WRITE_SARIF=false (the pull_request form) and once with WRITE_SARIF=true (the other events), with its exit status, the ids each config filtered out
    and the two SARIF reports it writes (size and sha256; host paths masked).
 3. Native negative controls on scratch copies and on the frozen lock with the pinned binary: the frozen lock under the ordinary config (must still report next),
-   the frozen config and the ordinary config over inputs that hide a vulnerable next in YAML the scanner reads (two inputs found by the Codex root's verifier and one
+   the frozen config and the ordinary config over inputs that hide a vulnerable next in YAML the scanner reads (three inputs found by the Codex root's verifier and one
    more), and the live application-delivery lock under the ordinary config.
-Environment for the subprocesses is built here (no inherited variables); nothing is sent over the network by this script."""
+Environment for the subprocesses is built here (no inherited variables). The scanner queries the OSV API as it does in CI (no --offline), so the runs need network access."""
 import hashlib
 import json
 import re
@@ -110,6 +110,8 @@ CASES = {
     "tagged packages key (`!!str packages:`)": "lockfileVersion: '9.0'\n!!str packages:\n  next@16.3.5:\n    resolution: {}\n",
     "packages through a YAML merge key (`<<: *base`)": "lockfileVersion: '9.0'\nbase: &base\n  packages:\n    next@16.3.5:\n      resolution: {}\n<<: *base\n",
     "Unicode line separator after `packages:`": "lockfileVersion: '9.0'\npackages:   next@16.3.5:\n    resolution: {}\n",
+    # found by the Codex root's independent verifier at fba38749: the key is the string 'next@16.3.5' with literal apostrophes, which the scanner trims
+    "literal apostrophes inside a quoted key": "lockfileVersion: '9.0'\npackages:\n  '''next@16.3.5''':\n    resolution: {}\n",
 }
 with tempfile.TemporaryDirectory() as scratch:
     for name, text in CASES.items():

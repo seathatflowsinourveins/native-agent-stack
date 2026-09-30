@@ -64,7 +64,7 @@ jobs:
           WRITE_SARIF: ${{ github.event_name != 'pull_request' }}
         run: |
           # `shell: bash` runs with -e; turn it off so a findings exit (1) is captured and
-          # the SARIF is still written, then fail the step with the worst status of the table runs.
+          # the SARIF is still written, then fail the step with the worst status of the runs.
           set +e -u -o pipefail
           inventory=.github/osv-scanner-lockfiles.json
           frozen_config=.github/osv-scanner-frozen-macos.toml
@@ -89,22 +89,21 @@ jobs:
           status=$?
           "${scan_frozen[@]}"
           frozen_status=$?
+          sarif_status=0
+          frozen_sarif_status=0
           if [ "$WRITE_SARIF" = true ]; then
             "${scan[@]}" --format sarif --output-file "$RUNNER_TEMP/osv-scanner/osv-scanner.sarif"
             sarif_status=$?
             "${scan_frozen[@]}" --format sarif --output-file "$RUNNER_TEMP/osv-scanner/osv-scanner-frozen-macos.sarif"
             frozen_sarif_status=$?
-            # 0: no vulnerabilities; 1: vulnerabilities (already reported above); other codes are scanner errors.
-            for code in "$sarif_status" "$frozen_sarif_status"; do
-              if [ "$code" -gt 1 ]; then
-                exit "$code"
-              fi
-            done
           fi
-          # The worst status of the two scans wins: 0 clean, 1 vulnerabilities, more a scanner error.
-          if [ "$frozen_status" -gt "$status" ]; then
-            status=$frozen_status
-          fi
+          # The worst status of the runs wins: 0 clean, 1 vulnerabilities, more a scanner error. The SARIF runs
+          # are separate scans, so a finding only one of them sees still fails the step.
+          for code in "$frozen_status" "$sarif_status" "$frozen_sarif_status"; do
+            if [ "$code" -gt "$status" ]; then
+              status=$code
+            fi
+          done
           exit "$status"
       - name: Keep the OSV-Scanner SARIF for the upload job
         # !cancelled(): a findings exit fails the scan step, and its SARIF must still reach
@@ -148,6 +147,8 @@ jobs:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner.sarif
           category: osv-scanner
       - name: Upload the frozen-artifact OSV-Scanner SARIF to code scanning
+        # !cancelled(): a failed ordinary upload must not keep this report from code scanning.
+        if: ${{ !cancelled() }}
         uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
           sarif_file: ${{ runner.temp }}/osv-scanner/osv-scanner-frozen-macos.sarif

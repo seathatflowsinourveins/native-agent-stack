@@ -303,6 +303,8 @@ class SecurityScanTests(unittest.TestCase):
             self.assertIn(report, job)
             self.assertIn(report, upload)
         self.assertIn("frozen_status", job)
+        # A failed ordinary upload must not keep the frozen report from code scanning.
+        self.assertIn("!cancelled()", step_block(upload, "Upload the frozen-artifact OSV-Scanner SARIF to code scanning"))
 
     def test_zizmor_online_skips_pull_requests_and_reports_without_failing(self):
         job = jobs(self.text)["zizmor-online"]
