@@ -3879,8 +3879,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "c188d822fdca21e256696cee1c9fb4d34b4974d73aafe71077170fb6b322170c",
-      "bytes": 11450
+      "sha256": "71c8f5b7aa83664fb4633715bd12a0af4befa2a048f6e6daf70aff37d961b268",
+      "bytes": 13374
     },
     {
       "path": "CLAUDE.md",
@@ -4174,8 +4174,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3",
-      "bytes": 3371
+      "sha256": "1604f5bdf623e91006eddfac3dba716096625e72cd4745a3e20f5f0213e3670d",
+      "bytes": 6054
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -14865,8 +14865,8 @@
     },
     {
       "path": "docs/convergence-architecture.md",
-      "sha256": "7e4c209d461beaa5cad93050c2abb40af88714a89a2fd67c9129c4cb23baf8e7",
-      "bytes": 15150
+      "sha256": "899e63f28a0463d344f771314edd2b73451c29f944a77a23ea2113cefdb9b400",
+      "bytes": 15350
     },
     {
       "path": "docs/convergence-audit.md",
@@ -15200,8 +15200,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "278896cdbb4de41a77b12c2d014049124a85c15fe7c5c61f3b3b3216b7cd79de",
-      "bytes": 89791
+      "sha256": "8fc1109ff1bb567689305886cefcb44aecb47fc9dcb7a0d07b0b9238f2896fdd",
+      "bytes": 106179
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15440,8 +15440,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "853579e47b1afc507a45fd2003ecbfd615100db83ed366cbaf5c7b4781bd73fe",
-      "bytes": 90626
+      "sha256": "caf81fa3aa0fa3e662e1807869331dc024ca787233a4844a0eca3e92e4ea46d6",
+      "bytes": 90785
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -38964,6 +38964,96 @@
       "bytes": 86206
     },
     {
+      "path": "evidence/artifacts/sota-finalization-20260930/allowed-tree-drift.json",
+      "sha256": "e0699d300b63a206b81ed90247ffa5e00febb3b566d01e36a4d3e6dad64130fb",
+      "bytes": 8516
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/catalog-scope.json",
+      "sha256": "28e439bb67a1da5d828a417ab5d3905c03d511e191e114c80eec86ead30feda8",
+      "bytes": 1486
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/claude-review-inputs.json",
+      "sha256": "e88bea465b41660258b05c40cc2390c014638e006698b4dbff4eaf84b97a9ffd",
+      "bytes": 5599
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/claude-review.json",
+      "sha256": "4b00417ade566d965844476ae66afa3d08db86b5587665045f94ce6f615f186a",
+      "bytes": 37765
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/claude-source-verification.json",
+      "sha256": "2ebadc30bd9e52ae01b462c686ecc6d6ce7f05dc87c798a9f69e46c850e19142",
+      "bytes": 7974
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+      "sha256": "31e18f68af05c84110eda7ea94374285d7e8d7b5571230d7181fa32c9b982b17",
+      "bytes": 5301
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/installed-skills.json",
+      "sha256": "6a97cccc2c4a4555913d28abfcaf119f52dccf82ac256dd9d7dcf051bfdbf943",
+      "bytes": 13929
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/native-actions.json",
+      "sha256": "e9dffb690deef552e57f74445f9b7662dc4ecbd5f191be0ba6572a894678c967",
+      "bytes": 7178
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/owner-reconciliation.json",
+      "sha256": "530ec09b4ce090ed1324f54b106fe99a2f495af474005280413d39e62be08183",
+      "bytes": 15331
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/plan.json",
+      "sha256": "3dde5fa6158eeb003e3629a2f7d95cdd2b2fc3cd4beadd77e31b1b402416341d",
+      "bytes": 4009
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/pre-reconciliation-checks.json",
+      "sha256": "3564fa1e8595d0cff49fafba4039992f82f8a65f3c8dca2d91238d1a2261e9d9",
+      "bytes": 3970
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/publication-checks.json",
+      "sha256": "1ebb8f30e8a9c2cbafee299a0df4b4e7bd0fb0a573fa2d55ccd47c470179b18d",
+      "bytes": 5158
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/receipt.json",
+      "sha256": "0bfe99ffb8a0451390954bad4dba61ecfb2b38af6f4c530b0fbb9e1be86813b5",
+      "bytes": 4785
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/repair-verification.json",
+      "sha256": "60c22af21154697bea7749b8caddb3b76ba02e74f33fb07ec0cefe3ec810b844",
+      "bytes": 3874
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/source-review.json",
+      "sha256": "531cea77c0e0439e152c9b0d06f7b3dae7ab554794ed79f7bb1cffa033618c52",
+      "bytes": 5312
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/upstream-codex-integration.json",
+      "sha256": "4a9596c5f4877c81b803b1e150cd244aeb2c6c73a872d26b020b5bef76ad5bdf",
+      "bytes": 28884
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/upstream-tests.json",
+      "sha256": "d4300c679ba959d2d6117d954c9906e82617e0d3c98608d2990f6206030e5e30",
+      "bytes": 1710
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/verification.json",
+      "sha256": "a761aaba8b156256b45472a3d4a0107f19318447c2c03d831851a72810385ddc",
+      "bytes": 4524
+    },
+    {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
       "sha256": "d0c84eaa61e72c7b5f69b0867f34628050cf0694b37703ad372b26cc29689d57",
       "bytes": 9201
@@ -44470,8 +44560,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "1523b156f0aa2f0b8524bfebe3b453806aedebfa997d18f07d5652bcc1a48c1c",
-      "bytes": 9834
+      "sha256": "bbd0bf98238947df92de1a03bc262f84d0892bf2b8ce21e1188f909cf3c5816b",
+      "bytes": 12044
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -45635,8 +45725,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "3ea82d2d098bc9cc1cc6b331a80afd7b09cf9e44e5175cfe886bcd878f161743",
-      "bytes": 153145
+      "sha256": "8b367b530481824eb2f0b075b5af08b8dda30d7dcb2079c4c3b377b7c14c772d",
+      "bytes": 155332
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -45805,8 +45895,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "914aaa48029bd8d4414a69f5d0e750792c65e317e83237704e17deb89b33978f",
-      "bytes": 69460
+      "sha256": "539b65969dfaaf83f76a948f512a8ec9dd9dee84b0c507da81dbe89d5689f180",
+      "bytes": 75695
     },
     {
       "path": "tests/test_install_skills.py",

@@ -81,7 +81,7 @@ The user-level file's GPT-6 routing wording is replaced, not kept, because the S
 
 B1 applies neither user-level template. `~/.claude/CLAUDE.md` (the managed block) and `~/.codex/AGENTS.md` stay byte-identical until the last Gate A window closes, and F1's templates apply after window W.
 - **Why.** Line 16 of the Codex block names seven lane tools (`serena`, `socraticode`, `codebase-memory`, `qmd`, `ai-memory`, `context-mode`, `headroom`), and every Codex arm reads the global `AGENTS.md`. The sealed design appends no LANES block ([E2E README:188](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)), and arm N is "config-free, not guidance-free" ([README:275](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)). The line would therefore give arms A and N the guidance that only B gets, through its carriers.
-- **Seal.** Amendment 4 seals the pre-change hashes of both files.
+- **Seal.** Per the Gate A owner's review, Amendment 4 seals the pre-change hashes of both files; the amendment text is not in this repository.
 
 This guard covers window W only. Once the last Gate A window closes, B1 applies both templates.
 
