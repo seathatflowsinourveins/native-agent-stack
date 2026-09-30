@@ -29,8 +29,8 @@ ends in the unit's Environment property, which any bus client can read over the
 user bus), and the body
 of a command substitution inside double quotes (`echo "$(printenv)"` runs
 printenv; single quotes, an ANSI-C string and a `#` comment stay data). A
-here-document's lines are command lines like any other, whatever its delimiter
-and whatever receives it, so a commit message written through
+here-document's lines retain both base shell readings except for the exact
+top-level interpreter form F described below. A commit message written through
 `"$(cat <<'EOF' ... EOF)"` whose prose has a line that reads as a dump is
 refused: write the text with the Write tool and pass `git commit -F FILE`
 (docs/secret-storage.md). `ps -E` (macOS) and `systemctl show-environment` or a bare
@@ -47,11 +47,36 @@ the command that `kernel_keyring.py exec` or `tvly-keyring` starts with every
 rule above, and blocks that command when it names the injected variable or
 dumps the environment it inherits, also behind a launcher's options
 (`stdbuf -o0`) or a launcher the guard does not model (`watch`, `flock`).
-The words of a command are read twice: as this version reads them and, when
-that reading allows the command, as the guard at c26800f3 read them
-(prior_reading); a command that either reading refuses is refused, so no command
-that guard refused passes (tightening only, by construction).
-A backslash-newline is joined first and every raw-text rule also reads the
+K4 (2026-09-30) preserves the dc33b48a base's current/prior word readings and
+refusal reasons before applying new rules. Its single loosening replaces the
+body-as-shell reading in both readings only for form F: one original top-level
+Python/Node stdin here-document, a single quoted ASCII identifier delimiter,
+an admitted operator line, and the first exact terminator at EOF (one final LF
+is allowed). Any nonempty delimiter tail requires a separating space or tab.
+Thus a benign Python set() body may pass; touching suffixes such as
+`python3 - <<'PY'2>/dev/null` and `node - <<'JS'1>/dev/null` remain outside F.
+Data/prose bodies, nested forms, launchers, unsupported options and trailing
+text keep both base readings. F is recognized before backslash-newline joining;
+per amendment A5, its masked-body base check is eager and shares the budget.
+Whole-text raw/name/keyring checks and both operator-line readings remain.
+Interpreter regions inspect shell literals and literal subprocess arguments,
+classify whole-environment output/enumeration, and refuse unclassified visible
+environment access. Supported inline Python/Node options receive only the new
+whole-environment checks; inline keyctl-list shell-outs remain deferred.
+Exact post-terminator tails are reread without resetting the budget.
+
+K4 also inspects credential_run.py started commands, usage and secret mentions
+(only a valid --only NAME argument before -- grants a name-mention exemption).
+It restricts visible local HTTP management requests to the exact method/path/
+query/body matrix in docs/secret-storage.md: provider-limits POST on 20128 may
+synchronize live quota state; compression preview POST is 20129-only. Actual
+omniroute api/sync commands refuse. Other tightenings cover manager environment
+writes, literal keyring feeds with quote provenance, explicit ps personalities,
+canary comparison/user-run invocations, both Claude OAuth/messaging token names,
+and both complete OmniRoute data trees. This does not inspect external scripts,
+computed requests, inherited ps settings, renamed helpers or other tool types.
+
+After form recognition, a backslash-newline is joined and every raw-text rule also reads the
 command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
 are never taken for arguments, and a number is a redirection's descriptor only
@@ -65,7 +90,9 @@ rules since 2026-09-30; before, a claim here that every scan read a text once wa
 no quote and no backslash is split without shlex's per-character word building, a command of more than 200,000
 characters is refused (`command_too_large`), and check() reads a command's words, in both readings, inside one
 work budget (WORK_LIMITS: characters passed to shlex at their storage width, texts read, words emitted,
-launched-command reads) and raises WorkBudgetExceeded when it is gone, which main() refuses (`command_too_complex`);
+launched-command reads). Every K4 scanner and derived command shares that budget;
+output-context membership is maintained in constant time per environment token.
+check() raises WorkBudgetExceeded when the budget is gone, which main() refuses (`command_too_complex`);
 see docs/secret-storage.md, "An internal error blocks; a timeout does not". It is not a security boundary. A process
 that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
@@ -4373,10 +4400,12 @@ def k4_httpie_requests(words: list[str]) -> bool:
 def k4_gateway_cli(words: list[str]) -> bool:
     """GW-CLI (section 5.3): every actual `omniroute api ...` and `omniroute sync ...` refuses, whatever follows (help and no arguments
     too): the policy has no CLI counterpart of the HTTP matrix. Recognized global options are consumed before the subcommand is chosen; after
-    an unrecognized option, any api or sync word among the arguments refuses."""
+    an unrecognized option, any api or sync word among the arguments refuses. The global options are commander's of
+    diegosouzapw/OmniRoute@2f42a9ac1 bin/cli/program.mjs (read 2026-09-30 from GitHub, sha256 3651eecd...): --output, --timeout, --api-key,
+    --base-url, --context and --lang take a value; -v/--version, -q/--quiet, --no-color and -h/--help do not (bin/omniroute.mjs adds --mcp)."""
     k4_word_charge(words)
     args = command_arguments(words)
-    values = {'--port', '--host', '--config', '--data-dir', '--log-level', '--base-url', '--profile'}
+    values = {'--output', '--timeout', '--api-key', '--base-url', '--context', '--lang'}
     at = 0
     while at < len(args):
         word = args[at]; at += 1
@@ -4387,7 +4416,7 @@ def k4_gateway_cli(words: list[str]) -> bool:
         name, equals, _value = word.partition('=')
         if name in values and not equals:
             at += 1
-        elif name not in values | {'--help', '-h', '--version', '-v', '--debug', '--verbose'}:
+        elif name not in values | {'--help', '-h', '--version', '-v', '--quiet', '-q', '--no-color', '--mcp'}:
             # The frozen policy covers ambiguous genuine CLI invocations too.
             return any(token in {'api', 'sync'} for token in args[at:])
     return at < len(args) and args[at] in {'api', 'sync'}
