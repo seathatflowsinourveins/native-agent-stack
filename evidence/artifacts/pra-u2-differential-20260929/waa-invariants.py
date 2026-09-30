@@ -1,7 +1,9 @@
 """Real-window invariants over the U2 kernel's lanes sweep (U2 design 10, step 4). Reads the sweep's JSON output and prints counts only:
 call-state invariant violations over every actor and every per-server row, hook blocks against claims per event, and each MCP server's
 M15 counts and flags. Server names outside the stack's vocabulary (manifests/stack.json servers, with context-mode's plugin names; the
-set of scans/kernel-m14-m15.mjs) are folded into (other), their counts summed and their rates computed again.
+set of scans/kernel-m14-m15.mjs) are folded into (other), their counts summed and their rates computed again, as the kernel's finishM15Row
+computes them: the graded ceiling (rate_upper_bound, over_threshold) is every call that neither succeeded nor ended in the invoked
+command's own exit, and threshold_sensitive compares rate_lower_bound with rate_upper_bound.
   python3 waa-invariants.py <sweep output .json>"""
 import json
 import sys
@@ -9,21 +11,26 @@ import sys
 PUBLIC_SERVERS = {"ai-memory", "codebase-memory", "context-mode", "headroom", "jcodemunch", "plugin_context-mode",
                   "plugin_context-mode_context-mode", "qmd", "serena", "socraticode"}
 THRESHOLD_CALLS_PER_ERROR = 100  # preregistration.json thresholds.M15: at most 0.01, compared on the counts
+COUNTS = ("attempted", "succeeded", "infrastructure_errors", "new_class_errors", "unknowns", "unassigned_errors")
 
 
 def fold(by_server):
     rows = {}
     for server, r in by_server.items():
         key = server if server in PUBLIC_SERVERS else "(other)"
-        t = rows.setdefault(key, {"attempted": 0, "infrastructure_errors": 0, "new_class_errors": 0, "unknowns": 0, "every_error_classified": True})
-        for k in ("attempted", "infrastructure_errors", "new_class_errors", "unknowns"):
+        t = rows.setdefault(key, {**{k: 0 for k in COUNTS}, "invoked_command_exit": 0, "every_error_classified": True})
+        for k in COUNTS:
             t[k] += r[k]
+        t["invoked_command_exit"] += r["classes"].get("invoked_command_exit", 0)
         t["every_error_classified"] = t["every_error_classified"] and r["every_error_classified"]
     for t in rows.values():
         n, known, every = t["attempted"], t["infrastructure_errors"] + t["new_class_errors"], t["infrastructure_errors"] + t["new_class_errors"] + t["unknowns"]
+        ceiling = n - t["succeeded"] - t["invoked_command_exit"]
         t["rate"] = round(every / n, 4) if n else None
         t["rate_lower_bound"] = round(known / n, 4) if n else None
-        t["threshold_sensitive"] = every * THRESHOLD_CALLS_PER_ERROR > n and not known * THRESHOLD_CALLS_PER_ERROR > n
+        t["rate_upper_bound"] = round(ceiling / n, 4) if n else None
+        t["over_threshold"] = ceiling * THRESHOLD_CALLS_PER_ERROR > n
+        t["threshold_sensitive"] = ceiling * THRESHOLD_CALLS_PER_ERROR > n and not known * THRESHOLD_CALLS_PER_ERROR > n
     return dict(sorted(rows.items()))
 
 

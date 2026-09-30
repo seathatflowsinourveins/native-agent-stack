@@ -4,8 +4,8 @@
  "paths": 440414,
  "equal": 436513,
  "changed_allowed": 3901,
- "new_paths": 286344,
- "added_allowed": 286344,
+ "new_paths": 286988,
+ "added_allowed": 286988,
  "unexpected": 0,
  "unexpected_changed": {},
  "unexpected_added": {},
@@ -78,6 +78,7 @@
   "U2 stage 3 added #3": 13392,
   "U2 stage 3 changed #1": 3882,
   "U2 stage 3 changed #4": 12,
+  "U2 repair round added #1": 644,
   "U2 stage 1 changed #2": 7
  },
  "effects": {

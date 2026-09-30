@@ -1,11 +1,17 @@
 # PR-A U2: Claude-side kernel measures, host evidence and differential
 
 Local transcript analysis on one workstation, 2026-09-29. These are count-only scans of the host's Claude Code
-transcript store (5,131 to 5,168 `.jsonl` files as it grew during the day), a property check of the part
+transcript store (5,131 to 5,283 `.jsonl` files as it grew), a property check of the part
 splitter on synthetic commands, and a differential of the U2 kernel against its base. None of it is a provider
 run. No output here holds an id, a path, a host name or transcript text. Each scan prints key names, enum values
 (model names, client versions, `speed`, `service_tier`, `inference_geo`, iteration, hook, tool and status names)
 and counts only.
+
+The repair round (the review's high finding: M15 is graded on `rate_upper_bound`, with `unassigned_errors` and
+`over_threshold`) re-ran, at its kernel (sha256 `c1d9ad16…`, the SHA256SUMS line), the three differentials, the
+W_AA sweep checks (`waa-invariants.json`, the private ledger) and `scans/kernel-m14-m15.json` on 2026-09-30 UTC,
+with a fourth allow-list stage in `expected-changes.json`. Every other file keeps its 2026-09-29 run: no other
+measure changed (the differentials' `effects` are identical to the earlier run's).
 
 ## Files
 
@@ -98,10 +104,15 @@ The base kernel is `git show fe9f511b:examples/claude-native/workflows/child-usa
   never a result.
   Over 228,531 calls, U1's rule and the extended `callState` mark the same 1,228 calls as not run and differ on 0
   (`not-executed-delta.json`, which also gives the causes).
-- **M14 and M15 over the store (`kernel-m14-m15.json`).** Across 4,349 actors with calls there are 0 invariant
-  violations (per actor and per server). `calls_without_result` equals `cancelled_or_unfinished` for every one of
-  them, since a Claude transcript has no native statuses. The context-mode server's 34,427 calls classify
-  completely: 0 `unmatched` and 0 `echo_mismatch`, a rate of 0.0028 and a ceiling of 0.0044.
+- **M14 and M15 over the store (`kernel-m14-m15.json`, repair-round run over 5,283 files).** Across 4,437 actors
+  with calls there are 0 invariant violations (per actor and per server). `calls_without_result` equals
+  `cancelled_or_unfinished` for every one of them, since a Claude transcript has no native statuses. 2 lines did
+  not parse (`parse_errors`; files still being written). The context-mode server's 35,665 calls classify
+  completely: 0 `unmatched` and 0 `echo_mismatch`, a rate of 0.0029 and a graded ceiling of 0.0044 (56
+  `unassigned_errors`: `remote_fetch` 22, `rejected` 21, `invalid` 9, `search_throttle` 4), so `over_threshold`
+  is false. The `plugin_context-mode` server shows the review's high finding on real data: its 2 calls are both
+  `invalid` (a `<tool_use_error>` the client raised), which read rate 0 and passed under the earlier grading;
+  on the ceiling it reads 1, `over_threshold` and `threshold_sensitive`.
   The client's MCP texts occur as counted in `call-states.json`: 16 "is not connected", 4 idle timeouts,
   1 "Connection closed" and 1 −32602 validation error. Server names outside the stack's vocabulary are
   folded into `(other)`.
@@ -151,14 +162,16 @@ The base kernel is `git show fe9f511b:examples/claude-native/workflows/child-usa
 purpose; `differential.mjs` requires equality on every other leaf path. The sweep ran on a frozen copy of the
 1,451 transcript and meta files that can hold a row in W_AA = [2026-09-26T00:00Z, 2026-09-26T18:37Z) (binding
 decision B7's baseline window), so a store that grows between the two runs cannot make a difference; the copy
-was deleted afterwards. Run mode used the 232 workflow runs whose journals were last written between
-2026-09-26T00:00Z and 2026-09-29T12:00Z.
+was deleted afterwards. The repair round built a new frozen copy the same way (1,451 files again), ran all three
+differentials at its kernel and deleted the copy. Run mode used the 232 workflow runs whose journals were last
+written between 2026-09-26T00:00Z and 2026-09-29T12:00Z. The table is the repair-round run; against the earlier
+run only the new paths grew, by the two M15 keys on every server row (392, 644 and 2,252).
 
 | Run | Base leaf paths | Equal | Changed, allowed | New, allowed | Unexpected | Exit |
 | --- | --- | --- | --- | --- | --- | --- |
-| Sweep over W_AA, no `--rtk-check` | 381,557 | 381,552 | 5 | 253,611 | 0 | 0 |
-| Sweep over W_AA, `--rtk-check`, twelve adjacent windows | 440,414 | 436,513 | 3,901 | 286,344 | 0 | 0 (all 12) |
-| Run mode, 232 runs | 1,175,479 | 1,175,219 | 260 | 768,224 | 0 | 0 |
+| Sweep over W_AA, no `--rtk-check` | 381,557 | 381,552 | 5 | 254,003 | 0 | 0 |
+| Sweep over W_AA, `--rtk-check`, twelve adjacent windows | 440,414 | 436,513 | 3,901 | 286,988 | 0 | 0 (all 12) |
+| Run mode, 232 runs | 1,175,479 | 1,175,219 | 260 | 770,476 | 0 | 0 |
 
 W_AA holds 707 children and 37 main sessions. What changed, by allow-list entry (the JSON files give the
 per-entry counts):
@@ -183,7 +196,9 @@ per-entry counts):
   no result; 9,670 succeeded with an eligible part observed covered (`observed_covered_succeeded_calls`, the M1
   numerator). Those sums count each call in the window of its first row; a Bash call whose hook row falls in the
   next window has its rewrite unread there, so they can differ slightly from one sweep over the whole window.
-- **The limits string** changed once (the docs stage).
+- **M15 ceiling (repair round).** Every `m15.by_server` row gains `unassigned_errors` and `over_threshold`; no
+  other path changed.
+- **The limits string** changed once against the base (the docs stage; the repair round rewrote its M15 sentence).
 
 `hook_context.by_hook['(other)']` and the cli_lanes `not_executed` counters did not change on this window, as
 expected (no hook name over 80 characters; every not-executed row carries a denial kind).
@@ -197,12 +212,14 @@ Over the U2 kernel's sweep of W_AA (744 actors, `waa-invariants.json`):
   unmeasured `final_return` carries a counter.
 - Hook blocks equal claims for every event: children PreToolUse 604 and 604, SessionStart 2 and 2, SubagentStart 5
   and 5; main sessions PreToolUse 55 and 55, SessionStart 46 and 46. No plain-stdout claim and no other hook row.
-- M15: every server classifies every error (`every_error_classified`), and no server is `threshold_sensitive`. The
-  context-mode server has 6 infrastructure errors in 1,312 child calls (rate 0.0046) and 2 in 57 main-session
-  calls (0.0351, above the 0.01 threshold); codebase-memory has 1 in 3 child calls. These are baseline
-  descriptions, not a gate result. Server names outside the stack's vocabulary are folded into `(other)`, as in
-  `kernel-m14-m15.json`.
-- The private ledger: a sweep with `--call-ledger` wrote 41,602 records into a new file of mode 600; its stdout was
+- M15 (repair-round run, graded on the ceiling): every server classifies every error (`every_error_classified`),
+  and no server is `threshold_sensitive`. The context-mode server has 6 infrastructure errors in 1,312 child calls
+  (rate and ceiling 0.0046, under the 0.01 threshold) and, in 57 main-session calls, 2 infrastructure errors and
+  1 unassigned `remote_fetch` (rate 0.0351, ceiling 0.0526, `over_threshold`); codebase-memory has 1 in 3 child
+  calls (`over_threshold`). These are baseline descriptions, not a gate result. Server names outside the stack's
+  vocabulary are folded into `(other)`, as in `kernel-m14-m15.json`.
+- The private ledger (checked again at the repair-round kernel, with the same counts): a sweep with
+  `--call-ledger` wrote 41,602 records into a new file of mode 600; its stdout was
   byte-identical to the sweep without the flag and held none of the ledger's 42,337 distinct call, session and
   agent ids, as a value or as a substring, nor the root directory. A ledger path inside this repository exited 2
   and wrote nothing.

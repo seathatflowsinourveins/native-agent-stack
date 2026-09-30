@@ -62,6 +62,15 @@
         {"in": "top", "paths": ["limits"], "change": "the sweep's limits string describes the U2 measurement fields", "why": "U2 design section 11, the docs stage"}
       ],
       "unchanged_by_design": ["rtk_parts.calls", "every measurement field outside rtk_parts and final_return", "run-mode usage, usage_by_model, by_resolved_model, web_search and effort fields", "stdout with and without --call-ledger"]
+    },
+    {
+      "stage": "U2 repair round: M15 graded on the ceiling (the review's high finding)",
+      "commits": ["f3c6260b", "cf93351a", "33411460", "1a189bdb", "01af2f62", "16cd7a40", "1eba389f"],
+      "added": [
+        {"in": "actor, aggregate", "paths": ["m15.by_server.<server>.{unassigned_errors,over_threshold}"], "why": "the U2 design 5.3 grades on rate_upper_bound until a dated amendment assigns the classes outside the named groups, and the Gate A binding decisions apply the harder-to-pass reading: unassigned_errors is the ceiling's residual after the infrastructure, new and unknown groups, and over_threshold the ceiling's count against 0.01"}
+      ],
+      "changed": [],
+      "unchanged_by_design": ["every other m15 field's key; threshold_sensitive, itself a U2 addition, now compares rate_lower_bound with rate_upper_bound", "limits (stage 3's entry covers the string, which now names rate_upper_bound as the graded M15 field)", "every field outside m15"]
     }
   ]
 }
