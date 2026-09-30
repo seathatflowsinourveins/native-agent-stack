@@ -469,10 +469,20 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   SKILL.md as the pinned skills CLI does for `npx skills@1.7.0 add owner/repo --skill <name>`, following
   vercel-labs/skills v1.7.0 `discoverSkills` (`src/skills.ts` at `7407f389`; README "Skill Discovery"):
   - each candidate `SKILL.md` is validated first, as `parseSkillMd` does: without a `name` and a `description`,
-    both non-empty strings (the CLI's `yaml` package reads the frontmatter as YAML 1.2 with the core schema), the
-    candidate is skipped and recorded in `observed.skipped_skill_md` with its reason, so it never claims the name;
-    a candidate whose `name` field names another skill is not a copy either (`filterSkills` matches `--skill`
-    against that field);
+    both non-empty strings, the candidate is skipped and recorded in `observed.skipped_skill_md` with its reason, so
+    it never claims the name. The frontmatter is typed as the CLI's `yaml` package (2.9.0) types it, YAML 1.2 with the
+    core schema, so a list or mapping `description` is not a string: with PyYAML installed its composer builds the
+    tree and each scalar is typed by the core schema (not PyYAML's YAML 1.1 resolver); without it a subset reader
+    covers one-line plain, quoted and flow values, plain scalars over several lines, literal and folded block
+    scalars, and nested lists and mappings. Neither reader guesses: an anchor, alias or tag (the subset reader), a
+    tag, a key given twice or a file PyYAML cannot parse (the PyYAML reader), an escape YAML does not define or
+    anything else outside the subset leaves the copy unverified, and when that copy's verdict decides which copy the
+    CLI takes, the survivor is stopped rather than reviewed at a guessed copy. On 2026-09-30 both readers matched
+    `yaml` 2.9.0 with `parseSkillMd` on all 2,455 `SKILL.md` files of the catalog's GitHub sources at their pins, and
+    on 102 edge cases they gave no verdict that contradicts it;
+  - a candidate whose name, as the CLI records it (`sanitizeMetadata`: control characters removed, trimmed), names
+    another skill is not a copy either (`filterSkills` matches `--skill` against it); a `SKILL.md` gh cannot read
+    at the pin stops the survivor, since the CLI reads it from its clone;
   - a valid root `SKILL.md` is the repository's only skill;
   - otherwise the root's child folders, then `skills/`, `skills/.curated`, `.experimental`, `.system` and 30 agent
     folders (`.agents/skills`, `.claude/skills`, …), each three levels deep, where a `SKILL.md` shadows the folders
@@ -490,14 +500,15 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   `observed.codex_implicit`: with PyYAML installed, its composer reads the file and serde_yaml 0.9.34's rules decide
   (a plain `true`/`false` spelling only; anchors and aliases followed; a second document refused); without PyYAML
   only the plain block-mapping subset is read, and anything else (a flow mapping, an anchor or alias, a tag, a second
-  document, a block scalar) gives `codex_implicit: null` with `observed.unverified_reason`. One skill judged at two
+  document, a block scalar, a double-quoted scalar anywhere in the file with an escape libyaml does not define, such
+  as `"C:\skills"`) gives `codex_implicit: null` with `observed.unverified_reason`. One skill judged at two
   pins gets one review per pin. A skill survivor gets no review, and a stopped entry (`status: stopped`, `pin`,
   `pin_lookup`, `reason`) in the printed list instead (exit 1), when:
   - it names no pin, or a pin that is not a 40-hex commit, or gh cannot read the pin or reads it as another commit
     (`pin_lookup: failed`);
   - its `skill_md_sha256` is null;
   - no valid copy is found, or two valid copies share the first location that holds one (the CLI's pick follows
-    directory order), or the git tree is truncated;
+    directory order), or a copy the reader cannot verify decides the pick, or the git tree is truncated;
   - the SKILL.md's sha256 differs from the adjudicated one, or the tree does not cover the bytes read.
 
   `make_result.py` refuses a `RESULT.json` while any survivor lacks its review, and a stopped entry stops its layer.
