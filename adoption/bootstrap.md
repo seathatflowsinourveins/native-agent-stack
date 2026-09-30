@@ -234,7 +234,7 @@ GitHub-hosted macOS runner; see
    | `claude-settings` | `tools/adoption/render_config.py --host <name> --out` into the run's staging directory, then `tools/adoption/apply_claude_settings.py` with the rendered `settings.json`, then with `adoption/templates/claude.settings.linux-wsl2.overlay.json` when `WSL_DISTRO_NAME` is set (step 4a; [WSL page](platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)) |
    | `claude-md` | `tools/adoption/managed_block.py claude-md`: `examples/claude-native/CLAUDE.md` as a managed block in `~/.claude/CLAUDE.md` |
    | `skills` | the skills CLI pinned in `adoption/skills/manifest.json` (its npm tarball and sha256, through the script's own checksum-verified npm install) when missing, then `tools/adoption/install_skills.py` ([skills manifest](update.md#apply-the-skills-manifest)) |
-   | `codex-lane` | `tools/adoption/apply_codex_lane.py`: its dry run, then `--apply` with the two `--expect-*-sha256` hashes that dry run printed |
+   | `codex-lane` | `tools/adoption/codex_home.py`, which meets the lane's preconditions: a Codex home without `config.toml` gets the rendered `codex.config.toml` (the template's own model, approval and sandbox policy, servers and `features.daemon_auto_start = false`) without the source host's `[projects.*]` trust grants and `[hooks.state.*]` hook approvals, created only when absent, `0600`; an existing `config.toml` is never replaced, and gets `features.daemon_auto_start = false` through `codex features disable daemon_auto_start` (a backup beside it first) when it lacks it. Then `tools/adoption/apply_codex_lane.py` with `--codex $ECO_INSTALL_ROOT/bin/codex` and the host file's `HOST_PATH` as `--host-path`: its dry run, then `--apply` with the two `--expect-*-sha256` hashes that dry run printed |
    | `path-block` | `tools/adoption/managed_block.py profile-path`: a managed block in `~/.profile` that puts `$ECO_INSTALL_ROOT/bin` first on `PATH` |
    | `login-shell` | `scripts/adoption_status.py --login-shell --launcher-resolution` under Python 3.13 (step 6's form); the step fails unless `claude` in a login shell is the ecosystem launcher |
 
@@ -259,10 +259,12 @@ GitHub-hosted macOS runner; see
    `~/.profile` block is the only shell startup file this script writes. A login
    shell reads `~/.profile` only when no `~/.bash_profile` or `~/.bash_login`
    exists, which is why the last step checks where `claude` resolves. The
-   user-level `codex.config.toml` that `render_config.py` renders is not
-   installed by any step, and the run's rendered copies go with its staging
-   directory: render it yourself (step 4) and give its trust state the review
-   in step 4's warning.
+   user-level `codex.config.toml` that `render_config.py` renders is installed
+   only into a Codex home that has none, and never with the source host's trust
+   state (step 4's warning): Codex asks about project trust and hooks on this
+   host instead. A host that already has a `config.toml` keeps it; compare it
+   with the render (`render_config.py --host <name> --check`, step 4) and merge
+   by hand. The run's rendered copies go with its staging directory.
 
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
@@ -351,7 +353,8 @@ GitHub-hosted macOS runner; see
    project trust and hook execution state that a fresh Codex install would
    otherwise ask about. Review the rendered file's `[projects.*]` and
    `[hooks.state.*]` sections before use on a new host and drop entries that
-   do not apply; `adoption/manifest.json` `policy.historical_acceptance_transfers:
+   do not apply (the `codex-lane` step of step 2's `--configure-full-profile`
+   drops all of them when it installs the file); `adoption/manifest.json` `policy.historical_acceptance_transfers:
    false` means none of that state should be read as re-qualifying the new
    host's own acceptance evidence.
 

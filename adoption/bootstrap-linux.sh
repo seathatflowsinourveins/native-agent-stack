@@ -966,16 +966,26 @@ full_profile_claude_settings() {
   fi
 }
 
-# The Codex worker lane goes through apply_codex_lane.py's own reviewed flow:
-# its dry run prints the --apply command carrying the two --expect-*-sha256
-# hashes of the files it checked; that exact command, with the ecosystem root,
-# is what runs. A failed dry run applies nothing.
+# The Codex worker lane goes through apply_codex_lane.py's own reviewed flow,
+# whose preconditions a fresh Codex home does not meet: a config.toml with
+# features.daemon_auto_start = false, and a HOST_PATH. codex_home.py first
+# gives a home without config.toml the rendered user config minus the source
+# host's trust state (create-only), and sets the feature in an existing one
+# through Codex's own writer; HOST_PATH is the host value file's. The dry run
+# then prints the --apply command carrying the two --expect-*-sha256 hashes of
+# the files it checked; that command, with the same --codex, --eco-root and
+# --host-path, is what runs. The installed codex (an npm package run by node)
+# comes from $bin_dir, which need not be on the caller's PATH yet. A failed
+# dry run applies nothing.
 full_profile_codex_lane() {
-  local plan apply_line status=0
+  local plan apply_line host_path status=0
   full_profile_render || return
-  printf 'The rendered user-level codex.config.toml is not installed by this step, and this run'"'"'s staging copy is removed when the script exits: to review or install it, render it with tools/adoption/render_config.py --host %s --out <dir> and check its trust state first (adoption/bootstrap.md, step 4).\n' \
-    "$full_profile_host"
-  plan="$(python3 "$repo_root/tools/adoption/apply_codex_lane.py" --eco-root "$ecosystem_root" 2>&1)" || status=$?
+  host_path="$(jq -r '.HOST_PATH // empty' "$repo_root/adoption/hosts/$full_profile_host.json")" || return
+  [[ -n "$host_path" ]] || { printf 'adoption/hosts/%s.json has no HOST_PATH.\n' "$full_profile_host" >&2; return 1; }
+  PATH="$bin_dir:$PATH" python3 "$repo_root/tools/adoption/codex_home.py" \
+    --rendered "$full_profile_rendered/codex.config.toml" --eco-root "$ecosystem_root" --codex "$bin_dir/codex" || return
+  plan="$(PATH="$bin_dir:$PATH" python3 "$repo_root/tools/adoption/apply_codex_lane.py" --codex "$bin_dir/codex" \
+    --eco-root "$ecosystem_root" --host-path "$host_path" 2>&1)" || status=$?
   printf '%s\n' "$plan"
   [[ "$status" -eq 0 ]] || { printf 'The Codex lane dry run refused (exit %s); nothing applied.\n' "$status" >&2; return "$status"; }
   apply_line="$(printf '%s\n' "$plan" | sed -n 's/^  python3 [^ ]*apply_codex_lane\.py --apply //p' | head -n 1)"
@@ -983,7 +993,8 @@ full_profile_codex_lane() {
     printf 'The Codex lane dry run printed no --apply command with both hashes; nothing applied.\n' >&2
     return 1
   }
-  python3 "$repo_root/tools/adoption/apply_codex_lane.py" --apply --eco-root "$ecosystem_root" \
+  PATH="$bin_dir:$PATH" python3 "$repo_root/tools/adoption/apply_codex_lane.py" --apply --codex "$bin_dir/codex" \
+    --eco-root "$ecosystem_root" --host-path "$host_path" \
     --expect-config-sha256 "${BASH_REMATCH[1]}" --expect-agents-sha256 "${BASH_REMATCH[2]}"
 }
 

@@ -261,9 +261,11 @@ bash "$MAIN_CLONE/adoption/bootstrap-linux.sh" --profile <id> --configure-full-p
 prints both commits. The steps, in order, are `claude-profile`, `claude-settings`, `claude-md`,
 `skills`, `codex-lane`, `path-block` and `login-shell` (the table is in
 [bootstrap step 2](bootstrap.md)); each is idempotent and can be left out with `--skip <step>`. It
-writes managed blocks into `~/.claude/CLAUDE.md` and `~/.profile` (backups beside each file), never
-installs the rendered user-level `codex.config.toml` (review its trust state first, bootstrap step 4),
-and ends by checking that `claude` in a login shell is the ecosystem launcher. A failed step exits 6
+writes managed blocks into `~/.claude/CLAUDE.md` and `~/.profile` (backups beside each file), gives
+a Codex home without `config.toml` the rendered user-level one minus the source host's trust state
+(an existing `config.toml` is kept and only gains `features.daemon_auto_start = false` through
+`codex features disable`, after a backup), and ends by checking that `claude` in a login shell is
+the ecosystem launcher. A failed step exits 6
 after the others have run. A host installed from a release tag keeps the per-step commands until
 that release carries the flag.
 
