@@ -681,6 +681,29 @@ BLOCKED = {
     # `-u` and of `--unit`. The wrapper tests run them behind rtk proxy and a keyring exec too.
     "env -u < \"$PAPER_ENV_FILE\" UNUSED cat": "credential_file_read",
     "systemd-run --pipe --unit < \"$PAPER_ENV_FILE\" demo cat": "credential_file_read",
+    # No loosening, launcher option values (third verification review and the coordinator's probe, 2026-09-29): each row was refused by the
+    # guard at c26800f3 and passed at 6c4f63d7, whose walks take a word for an option's value where that guard did not: systemd-run's
+    # --description took the keyring script, so the keyring exec it names was never unwrapped (the four strings of probe_launcher_values),
+    # and so did the options of run0, systemd-cat and systemd-inhibit, a path-qualified wrapper's option and a systemd-run inside a keyring
+    # exec; a redirection operator that c26800f3 took for the value of `sudo -u`, `nice -n` or `env -u` made the next word the command. The
+    # prior reading (check() reads the command as c26800f3 did as well) refuses each for c26800f3's reason. The reason, not whether the text
+    # runs the credential reader, is what the rows pin: `sudo -u > printenv x` runs `sudo -u x` with its output in a file named printenv.
+    "systemd-run --description kernel_keyring.py exec name X -- keyctl print 123": "keyring_payload_read",
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env": "dotenv_read",
+    "systemd-run --description kernel_keyring.py exec name X -- cat .env; true": "dotenv_read",
+    "true; systemd-run --description kernel_keyring.py exec name X -- cat .env": "dotenv_read",
+    "systemd-run --description kernel_keyring.py exec name X -- keyctl print 123; true": "keyring_payload_read",
+    "true; systemd-run --description kernel_keyring.py exec name X -- keyctl print 123": "keyring_payload_read",
+    "run0 --description kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+    "systemd-cat -t kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+    "systemd-inhibit --why kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+    "/usr/bin/sudo -u kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+    "/usr/bin/nice -n kernel_keyring.py exec a B -- keyctl print 1": "keyring_payload_read",
+    "kernel_keyring.py exec a B -- systemd-run --description kernel_keyring.py exec c D -- keyctl print 1": "keyring_payload_read",
+    "sudo -u > out kernel_keyring.py exec n X -- cat .env": "dotenv_read",
+    "sudo -u > printenv x": "environment_dump",
+    "nice -n > printenv x": "environment_dump",
+    "env -u > -i -u x": "environment_dump",
     "git commit -m \"$(cat <<'EOF'\nprintenv\nEOF\n)\" && x=\"$(cat <<'EOF'\nprintenv\nEOF\n)\"": "environment_dump",  # the second one is an assignment
     # The same inside an UNQUOTED command substitution: the tokenizer splits `$(echo ...)` into a segment of its own, whose command is
     # echo, while eval runs what the substitution prints. The base guard passed each of these (it read no such body).
@@ -1672,6 +1695,13 @@ PATHOLOGICAL = {
     "nested systemd-run": (lambda: "systemd-run --user " * 10000 + "printenv", "environment_dump"),
     "nested env": (lambda: "env " * 20000 + "printenv", "environment_dump"),
     "nested rtk proxy": (lambda: "rtk proxy " * 20000 + "printenv", "environment_dump"),
+    # The same chains ending in a harmless command pass this version's reading and reach the prior reading (c26800f3's walk), which copies
+    # the rest of the words at every env or rtk hop: it spends the words budget and is refused in a fraction of a second (2026-09-29 repair
+    # round; c26800f3 took 29 s and 56 s on these, past the hook timeout, where a hook fails open).
+    "nested env ending in a harmless command": (lambda: "env " * 20000 + "true", "command_too_complex"),
+    "nested rtk proxy ending in a harmless command": (lambda: "rtk proxy " * 20000 + "true", "command_too_complex"),
+    "nested sudo ending in a harmless command": (lambda: "sudo " * 60000 + "true", None),
+    "nested systemd-run ending in a harmless command": (lambda: "systemd-run --user " * 10000 + "true", None),
     "nested sudo": (lambda: "sudo " * 60000 + "printenv", "environment_dump"),
     # The dashless ps cluster was matched by a regular expression with two overlapping quantifiers (`[..E]*[eE][..E]*$`): 70,000 `E` and
     # a letter that is no flag failed it in quadratic time, 13 s against a hook timeout of 10 s that fails open (found by the independent
@@ -2183,6 +2213,41 @@ class SecretPathGuardTests(unittest.TestCase):
                         'timeout -s KILL 5 ls > /tmp/out', 'nice -n 5 ls 2> /tmp/err', 'env FOO=1 ls < input.txt', 'sudo -u root sort < input.txt'):
             with self.subTest(command=command):
                 self.assertIsNone(guard.check(command))
+
+    def test_a_command_either_reading_refuses_is_refused(self):
+        # Tightening only, by construction (2026-09-29 repair round): check() reads a command's words the way of this version and, when that
+        # allows the command, the way of the guard at c26800f3 (prior_reading, that guard's own walk and rules), and refuses what either refuses.
+        # Each row below passes this version's reading, where a walk takes a word for an option's value that c26800f3 read as a word (the
+        # keyring script after systemd-run's --description, a redirection operator after `sudo -u`), and the prior reading refuses it for
+        # c26800f3's reason. Dropping the prior reading, or its keyring unwrapping, fails here.
+        rows = {
+            "systemd-run --description kernel_keyring.py exec name X -- keyctl print 123": "keyring_payload_read",
+            "systemd-run --description kernel_keyring.py exec name X -- cat .env": "dotenv_read",
+            "true; systemd-run --description kernel_keyring.py exec name X -- cat .env": "dotenv_read",
+            "run0 --description kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+            "/usr/bin/sudo -u kernel_keyring.py exec a B -- cat .env": "dotenv_read",
+            "kernel_keyring.py exec a B -- systemd-run --description kernel_keyring.py exec c D -- keyctl print 1": "keyring_payload_read",
+            "sudo -u > printenv x": "environment_dump",
+            "env -u > -i -u x": "environment_dump",
+        }
+        for command, reason in rows.items():
+            with self.subTest(command=command):
+                guard.start_work()
+                try:
+                    texts = (command, guard.unquoted(command))
+                    self.assertIsNone(guard.current_reading(command, texts))
+                    self.assertEqual(guard.prior_reading(command, texts), reason)
+                finally:
+                    guard.stop_work()
+                self.assertEqual(guard.check(command), reason)
+        # the prior reading's own verdicts on the other tables: what c26800f3 allowed stays allowed by it, whatever this version refuses
+        for command in ("git status", "ps -fu Eve", "systemd-run --user --unit=demo --collect /bin/true", "sudo -u root sort < input.txt"):
+            with self.subTest(command=command):
+                guard.start_work()
+                try:
+                    self.assertIsNone(guard.prior_reading(command, (command, guard.unquoted(command))))
+                finally:
+                    guard.stop_work()
 
     def test_the_systemd_run_hint_says_where_a_value_on_the_command_line_goes(self):
         # systemd v255, src/run/run.c (read 2026-09-29): the description that the manager logs as `Started <unit> - <description>` defaults to

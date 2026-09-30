@@ -47,6 +47,10 @@ the command that `kernel_keyring.py exec` or `tvly-keyring` starts with every
 rule above, and blocks that command when it names the injected variable or
 dumps the environment it inherits, also behind a launcher's options
 (`stdbuf -o0`) or a launcher the guard does not model (`watch`, `flock`).
+The words of a command are read twice: as this version reads them and, when
+that reading allows the command, as the guard at c26800f3 read them
+(prior_reading); a command that either reading refuses is refused, so no command
+that guard refused passes (tightening only, by construction).
 A backslash-newline is joined first and every raw-text rule also reads the
 command after the shell's quote removal, so a name split by quotes, a
 backslash or a line continuation is still that name; redirection operands
@@ -315,6 +319,9 @@ WORK_LIMITS = {
 }
 # What check() has spent so far (None outside a check() call, where nothing is counted): start_work() and stop_work() bracket a call.
 _work: dict[str, int] | None = None
+# The words lex() has read in this check() call, by text and mode (None outside a call): the prior reading tokenizes the command as the
+# guard at c26800f3 did, which is this version's legacy reading of the same text, so it costs no second pass (see lex()).
+_lexed: dict[tuple[str, bool], list[str]] | None = None
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
@@ -413,16 +420,19 @@ class WorkBudgetExceeded(Exception):
 
 
 def start_work() -> dict[str, int]:
-    """Begin the work budget of one check() call: every counter at zero. Returns the counters (they are what check() has spent)."""
-    global _work
+    """Begin the work budget of one check() call: every counter at zero, and no text lexed yet. Returns the counters (they are what
+    check() has spent)."""
+    global _work, _lexed
     _work = dict.fromkeys(WORK_LIMITS, 0)
+    _lexed = {}
     return _work
 
 
 def stop_work() -> None:
     """End the budget: outside a check() call nothing is counted, so a direct call to lex() or expand() (a test, a tool) has no limit."""
-    global _work
+    global _work, _lexed
     _work = None
+    _lexed = None
 
 
 def spend(kind: str, amount: int) -> None:
@@ -477,17 +487,27 @@ def lex(text: str, legacy: bool = False) -> list[str]:
     """The words of text, punctuation apart, once tokenize() has cut its spans out: a backquote and a newline are `;` (the lines of a
     command are joined that way), shlex reads the rest, and a text it cannot read (an unbalanced quote) is split by a regular
     expression that keeps the quotes. Without `legacy`, `#` starts no comment for shlex (scan_shell found the real ones). Every
-    character passed to shlex is charged to the work budget, at its storage width, before shlex reads it."""
+    character passed to shlex is charged to the work budget, at its storage width, before shlex reads it. Inside a check() call each
+    text is read once in each mode, and a text without a `#` reads the same in both: the prior reading asks for the command's words as
+    the guard at c26800f3 read them, which is the legacy reading here, and a second pass would spend the budget of a command that fits
+    it (two readings of an ASCII text of 190,000 characters and a `#` spend 380,000 of 400,000). The words come back as they were read;
+    no caller changes them."""
     text = text.replace("`", " ; ").replace("\n", " ; ")
+    key = (text, legacy and "#" in text)
+    if _lexed is not None and key in _lexed:
+        return _lexed[key]
     spend("characters", len(text) * storage_width(text))
     try:
         lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
         lexer.whitespace_split = True
         if not legacy:
             lexer.commenters = ""
-        return list(lexer)
+        tokens = list(lexer)
     except ValueError:
-        return re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
+        tokens = re.findall(r"[;&|()<>]+|[^\s;&|()<>]+", text)
+    if _lexed is not None:
+        _lexed[key] = tokens
+    return tokens
 
 
 def segments(tokens: list[str]) -> list[list[str]]:
@@ -1517,6 +1537,264 @@ def segment_reason(words: list[str]) -> str | None:
     return None
 
 
+# The prior reading (2026-09-29 repair round). The guard at c26800f3 (sha256 f9be81b2..., the guard this work started from) read a command
+# more simply: it walked only the wrappers in WRAPPERS, named exactly, with getopt's option values and no redirection among them, read no
+# systemd launcher and no double-quoted substitution, and found a keyring exec at any position of the words it reached. Three independent
+# reviews of this work found commands that it refused and the reading above lets through, each where a walk that reads more of the shell's
+# syntax takes a word for something else: the value of an option of systemd-run, run0, systemd-cat or systemd-inhibit that holds the keyring
+# script (`systemd-run --description kernel_keyring.py exec n X -- keyctl print 1`), a redirection operator that the old walk took for the
+# value of `sudo -u`, a path-qualified wrapper whose option value was the script, the value after a clustered ps option. check() therefore
+# reads a command the old way as well when the reading above allows it, and refuses what either refuses: no command that guard refused
+# passes, by construction instead of by finding each walk that differs. The functions below are that guard's own and read its tables
+# (every table they use is unchanged since, and SECRET_NAMES only grew); they differ from it only where no verdict changes: they spend
+# from the work budget, `find -exec` is walked by index, the mentions of an injected variable use the linear test of
+# mentions_injected_variable, identical started commands are read once, and a text's words come from lex(), whose legacy reading is that
+# guard's tokenizer.
+PRIOR_LAUNCHED_PROGRAMS = SHELLS | AWKS | JQS | ENVIRONMENT_PRINTERS | {"ps", "set", "export", "declare", "typeset", "readonly", "local"}
+
+
+def prior_skip_wrapper_options(words: list[str], index: int, wrapper: str) -> int:
+    """Index of the first word after a wrapper's own options, as c26800f3 read them (a redirection operator can be a value here)."""
+    value_flags = WRAPPER_VALUE_FLAGS.get(wrapper, set())
+    while index < len(words):
+        word = words[index]
+        if word == "--":
+            return index + 1
+        if not word.startswith("-") or word == "-":
+            return index
+        index += 1
+        if word.startswith("--"):
+            takes_next = word in value_flags
+        else:
+            letters = word[1:]
+            first = next((at for at, letter in enumerate(letters) if f"-{letter}" in value_flags), None)
+            takes_next = first == len(letters) - 1
+        if takes_next:
+            index += 1
+    return index
+
+
+def prior_prefix_end(words: list[str], index: int = 0) -> int:
+    """Index of the command in words[index:] as the strip_prefix of c26800f3 found it: past assignments, output redirections and the
+    wrappers of WRAPPERS named exactly (timeout with its duration)."""
+    while index < len(words):
+        word = words[index]
+        width = redirection_width(words, index)
+        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word) or word == "$":
+            index += 1
+        elif width and REDIRECT_OUT.match(words[index + width - 2]):
+            index += width
+        elif word in WRAPPERS or word == "timeout":
+            index = prior_skip_wrapper_options(words, index + 1, word)
+            if word == "timeout":
+                index += 1  # timeout's mandatory duration comes before the command
+        else:
+            break
+    return index
+
+
+def prior_strip_prefix(words: list[str]) -> list[str]:
+    return words[prior_prefix_end(words):]
+
+
+def prior_env_command_start(words: list[str]) -> int | None:
+    """Index of the command `env [options] [NAME=value ...] command` runs as c26800f3 read it, or None for a dump."""
+    index = 1
+    while index < len(words):
+        word = words[index]
+        if word in ENV_ARG_OPTIONS:
+            index += 2
+        elif word.startswith("-") or re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word):
+            index += 1
+        else:
+            return index
+    return None
+
+
+def prior_keyring_exec(words: list[str]) -> tuple[str | None, list[str]] | None:
+    """(injected variable, started command) of the first keyring exec in words, at any position, as c26800f3 found it."""
+    for position, word in enumerate(words):
+        name = word.rsplit("/", 1)[-1]
+        if name == KEYRING_SCRIPT and words[position + 1:position + 2] == ["exec"]:
+            arguments = words[position + 2:]
+            if "--" not in arguments:
+                return None  # kernel_keyring.py refuses to start anything without the separator
+            separator = arguments.index("--")
+            variable = arguments[separator - 1] if separator else None
+            return variable if variable and ENV_NAME.fullmatch(variable) else None, arguments[separator + 1:]
+        if name in KEYRING_WRAPPERS and (position == 0 or program_of(words) in SHELLS):
+            variable, target = KEYRING_WRAPPERS[name]
+            return variable, [target, *words[position + 1:]]
+    return None
+
+
+def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
+    """The command segments that c26800f3 read: of the command, of `sh -c '...'`, `eval ...`, `env ... command`, the command that a
+    keyring exec starts and the command an `rtk` invocation runs. Each text is one `texts` and each segment its words and one `words` of
+    the work budget: this walk copies the rest of the words at every hop, so a long chain of env, rtk or keyring hops spends the budget
+    and is refused as too complex instead of outlasting the hook."""
+    spend("texts", 1)
+    result: list[list[str]] = []
+    for raw in segments(lex(command, legacy=True)):
+        words = prior_strip_prefix(raw)
+        while words:
+            spend("words", len(words) + 1)
+            result.append(words)
+            program = program_of(words)
+            if program == "env":
+                start = prior_env_command_start(words)
+                if start is None:
+                    break
+                words = prior_strip_prefix(words[start:])
+                continue
+            if program == "rtk":
+                words = prior_strip_prefix(rtk_command(words))
+                continue
+            started = prior_keyring_exec(words)
+            if started is not None:
+                words = prior_strip_prefix(started[1])
+                continue
+            if depth < MAX_DEPTH:
+                if program in SHELLS:
+                    inline = shell_parts(words)[1]
+                    if inline is not None:
+                        result.extend(prior_expand(inline, depth + 1))
+                elif program == "eval" and len(words) > 1:
+                    result.extend(prior_expand(" ".join(words[1:]), depth + 1))
+            break
+    return result
+
+
+def prior_reader_arguments(words: list[str]) -> list[str] | None:
+    """reader_arguments as c26800f3 read a segment (its strip_prefix after a `find` action), with the action's prefix walked by index."""
+    program = program_of(words)
+    if program in READERS:
+        return read_operands(words)
+    if program == "git":
+        subcommand, rest = git_subcommand_args(words)
+        return rest if subcommand == "grep" else None
+    if program == "find":
+        for position, word in enumerate(words[:-1]):
+            if word in FIND_EXEC:
+                start = prior_prefix_end(words, position + 1)
+                spend("words", start - position)
+                if program_of(words[start:start + 1]) in READERS:
+                    return words[1:]
+    return None
+
+
+def prior_is_environment_dump(words: list[str]) -> bool:
+    program = program_of(words)
+    if program == "printenv":
+        return True
+    if program == "env":
+        return prior_env_command_start(words) is None
+    if program in {"set", "export"} and (len(words) == 1 or words[1:] == ["-p"]):
+        return True
+    if program in {"declare", "typeset"} and all(w.startswith("-") for w in words[1:]) \
+            and (len(words) == 1 or any(set(w[1:]) & set("xp") for w in words[1:])):
+        return True
+    return program == "ps" and prior_ps_shows_environment(words)
+
+
+def prior_dumps_after_source(words: list[str]) -> bool:
+    program = program_of(words)
+    if prior_is_environment_dump(words):
+        return True
+    return program in {"declare", "typeset", "export", "readonly", "local"} and any(
+        w.startswith("-") and not w.startswith("--") and set(w[1:]) & set("px") for w in words[1:])
+
+
+def prior_launched_commands(words_list: list[list[str]]) -> list[list[str]]:
+    found = []
+    for words in words_list:
+        for position in range(1, len(words)):
+            if "://" in words[position]:
+                continue  # a URL argument (`tvly extract https://.../env`) is never a program a launcher runs
+            program = program_of(words[position:position + 1])
+            if program in PRIOR_LAUNCHED_PROGRAMS or INTERPRETER.fullmatch(program):
+                spend("reads", 1)
+                found.extend(prior_expand(shlex.join(words[position:])))
+    return found
+
+
+def prior_keyring_reason(texts: tuple[str, str], words_list: list[list[str]]) -> str | None:
+    answers: dict[re.Pattern[str], bool] = {}
+
+    def found(pattern: re.Pattern[str]) -> bool:
+        if pattern not in answers:
+            answers[pattern] = any(pattern.search(text) for text in texts)
+        return answers[pattern]
+
+    if any(INTERPRETER.fullmatch(program_of(words)) for words in words_list) and found(KEYRING_READ_CODE):
+        return "keyring_payload_read"
+    started = [parsed for parsed in map(prior_keyring_exec, words_list) if parsed is not None]
+    if any(mentions_injected_variable(text, variable)
+           for text in texts for variable in {name for name, _ in started if name}):
+        return "keyring_variable_reference"
+    for started_command in unique_segments([command for _variable, command in started]):
+        spend("reads", 1)
+        inner = prior_expand(shlex.join(started_command)) if started_command else []
+        inner += prior_launched_commands(inner)
+        if any(prior_dumps_after_source(words) for words in inner):
+            return "environment_dump_in_keyring_exec"
+        programs = {program_of(words) for words in inner}
+        if (any(INTERPRETER.fullmatch(program) for program in programs) or programs & AWKS) \
+                and found(KEYRING_ENVIRONMENT_ACCESS):
+            return "environment_dump_in_keyring_exec"
+        if (programs & JQS and found(JQ_ENVIRONMENT)) or (programs & SHELLS and found(SHELL_INDIRECTION)):
+            return "environment_dump_in_keyring_exec"
+    return None
+
+
+def prior_segment_reason(words: list[str]) -> str | None:
+    program = program_of(words)
+    if prior_is_environment_dump(words):
+        return "environment_dump"
+    if prints_helper_credential(words) or tvly_prints_key(words):
+        return "native_token_print"
+    if program == "keyctl" and keyctl_reads_payload(words):
+        return "keyring_payload_read"
+    if program in TRACERS:
+        return "process_trace"
+    if any(word in {"<", "<<<", "<>"} and position + 1 < len(words) and POINTER_VARIABLE.search(words[position + 1])
+           for position, word in enumerate(words)):
+        return "credential_file_read"
+    arguments = prior_reader_arguments(words)
+    if arguments is None:
+        return None
+    if any(POINTER_VARIABLE.search(w) for w in arguments) \
+            or any(HOME_CREDENTIAL_STORE.search(w) for w in search_paths(words, arguments)):
+        return "credential_file_read"
+    if any(HF_HOME_ROOT.search(w) for w in arguments):
+        return "native_store_path"
+    if any(is_env_file_word(w) for w in arguments):
+        return "dotenv_read"
+    if any(SECRET_NAME.search(w) for w in arguments):
+        return "secret_name_search"
+    return None
+
+
+def prior_reading(command: str, texts: tuple[str, str]) -> str | None:
+    """The verdict of c26800f3 on a command whose text rules (shared, run first by read_command) found nothing."""
+    words_list = prior_expand(command)
+    reason = prior_keyring_reason(texts, words_list)
+    if reason:
+        return reason
+    if any(sources_credential_file(words) for words in words_list):
+        if any("xtrace" in text or re.search(r"\bSHELLOPTS=", text) for text in texts) \
+                or any(traces(words) for words in words_list):
+            return "trace_while_sourcing"
+        if any(ENVIRONMENT_ACCESS.search(text) for text in texts) \
+                or any(prior_dumps_after_source(words) for words in words_list):
+            return "environment_dump_after_source"
+    for words in words_list:
+        reason = prior_segment_reason(words)
+        if reason:
+            return reason
+    return None
+
+
 def check(command: str) -> str | None:
     """The reason the guard blocks command, or None. It reads a command inside one work budget (WORK_LIMITS) and raises
     WorkBudgetExceeded, instead of returning a reason, when a command needs more than that to be read: main() refuses it."""
@@ -1541,6 +1819,13 @@ def read_command(command: str) -> str | None:
             return "process_environment"
         if SECRET_EXPANSION.search(text) or SECRET_LOOKUP.search(text):
             return "secret_variable_reference"
+    # Two readings of the words, and a command either refuses is refused (see "The prior reading" above): this version's first, so its
+    # reasons stand, and the reading of c26800f3 when this one allows the command.
+    return current_reading(command, texts) or prior_reading(command, texts)
+
+
+def current_reading(command: str, texts: tuple[str, str]) -> str | None:
+    """The verdict of this version's reading of the words of a command whose text rules found nothing."""
     words_list = expand(command)
     reason = keyring_reason(texts, words_list)
     if reason:
