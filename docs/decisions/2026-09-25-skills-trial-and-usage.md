@@ -1634,6 +1634,9 @@ Each step-1 run is one model turn per fraction tried. Step 2 is free. Every resu
   (condition 6). The change is recorded here and in the 2026-09-30 decision record, not by a verdict re-record.
 - Their `kept` status and the `instructions-skills` row are unchanged. The next sealed verdict re-record records them at
   `on`.
+- `search-first`'s same-day re-pin to `affaan-m/ECC@c70874fa` is a source refresh: upstream rewrote one line, its
+  description. Its verdict is unchanged, and no landscape record pins its commit (`catalogs/landscape/*.json` name the
+  winner only).
 - Until then their listing changes only through a dated decision record, the last sentence of the new prune rule.
 - The [Listing policy](#listing-policy)'s deliberate-invocation reason for their `name-only` state (M10) no longer sets
   their listing.
