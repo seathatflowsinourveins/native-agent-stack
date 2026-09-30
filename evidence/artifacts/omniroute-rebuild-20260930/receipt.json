@@ -74,7 +74,7 @@
  },
  "upstream_release_after_rebuild": {
   "checked_utc": "2026-09-30T04:53:59Z",
-  "how": "scripts/upstream_release_check.py.txt run at the printed time (git ls-remote and git fetch against github.com/diegosouzapw/OmniRoute, a read of registry.npmjs.org/omniroute and one GraphQL read of PR 13788; no REST call); its output as printed is checks/upstream-release-check-20260930.json. An earlier read of the same facts, between about 04:35Z and 04:38Z, printed no time and gave the same tag, tree ids, npm data and main tip",
+  "how": "scripts/upstream_release_check.py.txt run at the printed time (git ls-remote and git fetch against github.com/diegosouzapw/OmniRoute, a read of registry.npmjs.org/omniroute and one GraphQL read of PR 13788; no REST call); its output as printed is checks/upstream-release-check-20260930.json",
   "tag": {
    "name": "v3.8.51",
    "type": "annotated",

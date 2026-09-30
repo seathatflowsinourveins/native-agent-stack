@@ -1,0 +1,9 @@
+{
+  "version": "3.8.51",
+  "dist.integrity": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+  "dist.shasum": "12e56f049e617edca50cc17835ea807dbf8c2042",
+  "dist.tarball": "https://registry.npmjs.org/omniroute/-/omniroute-3.8.51.tgz",
+  "engines": {
+    "node": ">=22.22.2 <23 || >=24.0.0 <27"
+  }
+}

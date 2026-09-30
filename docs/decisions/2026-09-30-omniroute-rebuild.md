@@ -93,6 +93,12 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
    with `[defer]`), so the carry stays; `release/v3.8.52` (`a1a2dce1a`) exists and `main` was two commits past the tag
    (`fc5e2bccd`, Electron release fixes). The repo's component pin (`manifests/stack.json`, npm 3.8.50) is unchanged by this record: it
    is a shared hot file, and moving it needs its own qualification and change.
+   **Qualification of the published package (2026-09-30, after the rebuild).** The npm package itself was installed with the recipe's commands (version changed to 3.8.51) into a
+   fresh prefix and booted twice in a network-less namespace with the real `lsof` and no shim (health 200 after 3 s and 4 s, the store identical across the
+   restart, SIGTERM exit 143, no orphan); the registry's SLSA provenance names upstream's `v3.8.51` tag commit `c1e30b767` and the tarball's sha512, and
+   `npm audit signatures` verified 1156 of 1156 registry signatures and 233 attestations. The package has neither carry (0 alpha/search route
+   files, 0 affinity-function occurrences), so it does not replace either gateway. The pin stays 3.8.50 here; the
+   receipt [`omniroute-3851-npm-qualification-20260930`](../../evidence/receipts/omniroute-3851-npm-qualification-20260930.json) has the limitations, including the 7-day cooldown question for the pin move.
 
 ### How each setting relates to upstream's shipped defaults
 

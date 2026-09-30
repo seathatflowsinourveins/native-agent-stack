@@ -3645,6 +3645,26 @@
         "Upstream reports rule out only what is reported. The check at 2026-09-30T00:20Z (data.upstream_state) found no newer release, main identical to v1.16.0, and one open pull request (#195, after the closed, unmerged #194) about codebase_health failing against a healthy Qdrant on a distribution-built Node 24.21.0 whose bundled undici handler has no onError. That pull request lists the official Node 24.21.0 build (undici 7.29.1) as working; this host's Node reports undici 7.29.1 and the Qdrant regressions passed on it, and src/services/qdrant-client-compat.ts is identical at v1.15.0 and v1.16.0, so the report is not a 1.16.0 change."
       ],
       "path": "evidence/receipts/socraticode-1160-qualification-20260929.json"
+    },
+    {
+      "id": "omniroute-3851-npm-qualification-20260930",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "omniroute"
+      ],
+      "claim": "On host nativestack-5975wx-20260925 on 2026-09-30, the published npm package omniroute@3.8.51 (tarball https://registry.npmjs.org/omniroute/-/omniroute-3.8.51.tgz, 137,907,369 bytes, 26,761 entries, sha256 421699fdda34bd85bcf035257e88e359edc033c01b85d54b6a4921c1cda4d2ef, sha1 and sha512 equal to the registry's dist.shasum and dist.integrity) was installed with the install and rebuild commands of the repository's recipe (docs/foundation-stack.md, 'Optional OmniRoute installation and bounded gateway acceptance', which pins omniroute@3.8.50; run here with the version changed to 3.8.51) into a fresh prefix in a clean environment (Node v24.21.0, npm 11.19.0; npm install exit 0 from 2026-09-30T04:44:05Z to 2026-09-30T04:45:40Z, npm rebuild exit 0 at 2026-09-30T04:45:45Z), printed omniroute --version 3.8.51 and dist/BUILD_SHA c1e30b7, and, started twice on one throwaway data directory in a fresh user and network namespace with the real /usr/bin/lsof on PATH and no shim, answered /api/health 200 after 3 s and 4 s, kept its store at 193 migration rows, integrity ok and 138 tables across the restart, and ended each start with exit 143 on SIGTERM with no process or listener left. The registry's SLSA provenance attestation for the package names a subject sha512 equal to the tarball's, the workflow .github/workflows/npm-publish.yml at refs/tags/v3.8.51 of github.com/diegosouzapw/OmniRoute and source commit c1e30b7676975feb298b49eff6ff58923c04b89e, the commit of upstream's v3.8.51 tag, and npm audit signatures (npm 11.19.0), run on the tree of a separate throwaway project that installed omniroute@3.8.51 as a dependency (1156 packages; the smoke-tested global install added 1153, a difference not investigated), reported 0 invalid and 0 missing, verified registry signatures for 1156 of 1156 packages and attestations for 233, among them omniroute@3.8.51's own (npm publish and SLSA provenance). The package contains neither carry of the running gateways (0 alpha/search route files, 0 occurrences of the affinity function). This qualifies the published package as a candidate for the manifests/stack.json omniroute pin; the pin stays 3.8.50 in the change that adds this receipt, and the running gateways are untouched.",
+      "limitations": [
+        "Not a pin move and not a cutover. manifests/stack.json keeps omniroute 3.8.50 and its source_pin in the change that adds this receipt; moving them is a separate lane:shared change, because the landscape check binds the row's version and source_pin to catalogs/landscape/upstream-snapshot.json. The two running gateways were not touched: no write, restart or unit change (Gate A window W). They are source builds of upstream's release/v3.8.51 tip 2f42a9ac1, whose tree equals the v3.8.51 tag commit's, plus carries; the published package contains neither carry (data.carries: 0 alpha/search route files and 0 occurrences of the affinity function, against 6 and 23 on the 20128 build and 6 and 0 on the 20129 build), so installing it would not replace either gateway without dropping upstream PR 13788 (still open upstream) or the local affinity patch.",
+        "Evidence classes. The install, the boot, restart and stop smoke, the provenance read and the carry counts are our integration checks (scripts as published, outputs as printed); npm audit signatures is npm's own verification. Upstream's own checks (check:pack-artifact, check:pack-boot, test:unit) were not run on this package: they need the source checkout and ran on the source builds only (evidence/artifacts/omniroute-rebuild-20260930).",
+        "The provenance read is not our signature verification. The probe decoded the two attestation payloads and compared the subject digest with the tarball's; the certificate and signature verification is npm audit signatures' (checks/audit-signatures-20260930.txt, and its JSON form summarized in checks/audit-signatures-summary-20260930.json), which ran in a separate throwaway project that installed the package as a dependency with --ignore-scripts (not on the smoke-tested prefix, which npm audit signatures refuses: EAUDITGLOBAL, checks/audit-signatures-global-refused-20260930.txt); the audited tree has 1156 packages and the smoke-tested install added 1153, and why they differ was not investigated. The smoke-tested install fetched its own copy through npm install, which checks each download against the registry's dist.integrity itself (that check's output is not part of this record); the digests recorded here are of the separate tarball that npm pack wrote at 2026-09-30T04:44:01Z.",
+        "Recipe deviations. The recipe's last steps (serve --daemon, omniroute status, and curl of /api/health as written) were not run as written: the smoke started serve in the foreground (scripts/smoke_inner.sh.txt) with REQUIRE_API_KEY=true, OMNIROUTE_SERVER_HOST=127.0.0.1, port 20197 and sidecar ports 20198 and 20199, and read /api/health with curl. The smoke ran in a fresh namespace with only its own loopback; npm install and rebuild used the host network.",
+        "Nothing beyond boot was exercised: no provider connection, credential, model call or request through the gateway, and none of the rebuild record's settings (compression, combos, Codex client version). The store was a fresh one that the package created (193 migration rows). Native modules were rebuilt per the recipe's allowlist (rebuild exit 0) and loaded only as far as the server's boot reaches them.",
+        "A first run of scripts/smoke_npm.sh.txt failed: a wrong PREFIX argument (a path with no bin/omniroute) made the serve step exit 127 and the store read print an sqlite open error. Its throwaway directory and logs were deleted before the second run and are not retained, so the failed attempt rests on the coordinator's reading of that printed output and on nothing retained; the second run (2026-09-30T04:46:36Z to 2026-09-30T04:46:57Z) used the correct prefix and is the recorded one.",
+        "The lsof shim of the unit templates (adoption/templates/systemd/omniroute.service, 'The lsof shim') is to be dropped at the next rebuild after a free-port start passes without it. This package's free-port start passed without it (real /usr/bin/lsof, port 20197 free, no shim), which is evidence about the published package and not a test of the running builds' prefixes; the units are unchanged.",
+        "Cooldown. docs/decisions/2026-09-25-workstation-sota-refresh.md records a 7-day cooldown for a release that is not a security fix (applied to socraticode 1.15.0 and waived by the user on 2026-09-27). No recorded decision applies or waives it to an OmniRoute pin move; if it applies, the earliest move is 2026-10-07T02:54:04Z, seven days after the npm publish of 3.8.51 (2026-09-30T02:54:04.736Z, evidence/artifacts/omniroute-rebuild-20260930/checks/upstream-release-check-20260930.json).",
+        "One workstation, Linux x86_64 under WSL2, Node v24.21.0 only. Other platforms, upstream's Electron and Docker artifacts, and other Node versions are not covered. The registry returned no gitHead for 3.8.51, so the tie of the tarball to upstream's tag commit rests on the provenance attestation, not on registry metadata."
+      ],
+      "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json"
     }
   ],
   "files": [
@@ -14751,8 +14771,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "fbd3959bdc46e618eb8ea73709f7dd5eef81d9aea2f21f51333b1a7df8dd7aef",
-      "bytes": 32096
+      "sha256": "000abf151547ab0d3dbb9b906bed102f0ce91d1e73c59c76717153a5de31d275",
+      "bytes": 33045
     },
     {
       "path": "docs/direct-results.md",
@@ -14836,8 +14856,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "32631879f04b8cc5d5e26d43cbec253298d85c0d4dc7c6dfeaca7ad197d3d0b9",
-      "bytes": 39005
+      "sha256": "29956e3692a7a966cd655b264193fe33eaced2581acb16c19326702d604d64e8",
+      "bytes": 39147
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -34675,6 +34695,116 @@
       "bytes": 141
     },
     {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/README.md",
+      "sha256": "62ba3c536bcecbaa18c9abe7a42423362dfd22905c1c47924316284f474c4a4c",
+      "bytes": 4121
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/audit-signatures-20260930.txt",
+      "sha256": "084f31765868a8eb4e79cd21712f4452d44069a128bfdef4e3b9dd27c8a68c50",
+      "bytes": 628
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/audit-signatures-global-refused-20260930.txt",
+      "sha256": "ca54d5fb779c2a66f39c3ae639db9008aedd6f041a2e4992e7b168bbe9ab537c",
+      "bytes": 316
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/audit-signatures-summary-20260930.json",
+      "sha256": "265684b586d6cac498d6b8d2969111b659c03a3d0f868d14113f145f55405ce5",
+      "bytes": 751
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/carry-presence-20260930.json",
+      "sha256": "269c86276a128d94bc3c65fe4939b43238484d824c3309e69dd128e4f69649eb",
+      "bytes": 224
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/install-steps-20260930.txt",
+      "sha256": "c63a0573a850092bbe401d0382295ddca2b6014c74ff17d6c8497500b8d97d8b",
+      "bytes": 1318
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/npm-attestation-20260930.json",
+      "sha256": "cead27bec17faa0df3d9588fa6824b52271b8d1d825ff0f42166095a01c31aaa",
+      "bytes": 2217
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/npm-install.log.txt",
+      "sha256": "ff0be5a15413da181cf2b660dc24f5bd0ffc908b2d24b9c5871ab2036534c055",
+      "bytes": 3251
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/npm-pack-summary-20260930.json",
+      "sha256": "ce6d7dcb46b642d23b4a776c171730e0ffccdb22a1279b567c229021372ef18d",
+      "bytes": 482
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/npm-rebuild.log.txt",
+      "sha256": "19e8b4298b6fcb597a32a7a64658955fafa91e44b4f2bfab20d5843674e89540",
+      "bytes": 800
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/npm-view-20260930.json",
+      "sha256": "147554acbc1e79e25bc0795c9c945c373cebd35d15bf525079804ccd927b47ae",
+      "bytes": 351
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/smoke-serve-1-excerpt-20260930.txt",
+      "sha256": "21b48b0dd9c3c2b1642a3155d375596ae5557552434ee8a1f96f5c43386cf36b",
+      "bytes": 280
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/smoke-summary-20260930.txt",
+      "sha256": "5a7c5362277793a344ebedb4aacf1d199b903e41c0cb4795491cd74ca7b54a5b",
+      "bytes": 1430
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/checks/tarball-digests-20260930.txt",
+      "sha256": "b782a869617fbf297343633f9de84e39490c26fb2a9dbf127e444ca7c15ef37e",
+      "bytes": 603
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/audit_global_refused.sh.txt",
+      "sha256": "91af87e845c7fd845471cd52d876afea53ab0378071d23376800ac1568972db4",
+      "bytes": 1084
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/audit_json_summary.py.txt",
+      "sha256": "ef9b5d95bb0e46a6afb105a941764072bfaf4ba077c7107b8197758ef5bb6c05",
+      "bytes": 1484
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/audit_signatures.sh.txt",
+      "sha256": "81b8841d4f80a7a71ef97cc74c844adb63b735389c244d74d1f4e970ba854232",
+      "bytes": 1868
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/carry_presence_check.py.txt",
+      "sha256": "dc439a740503e370f036e4501f25a8d3adad599a628dfacbbf364a33d26c5892",
+      "bytes": 1829
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/install_npm.sh.txt",
+      "sha256": "49e9eac7c84edfce448b424652ca6f32c4d76adf82e9f0e090fc92d134ed56b8",
+      "bytes": 2351
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/npm_attestation_probe.py.txt",
+      "sha256": "7f196c1afb78b8d1d4008051e6461f864983e6e27f114d06f8576750ad3e35dc",
+      "bytes": 2829
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/smoke_inner.sh.txt",
+      "sha256": "eb9af5accc977b2725c7d891b5665bc60e310e5b458976fd7ef4653d71f8cce0",
+      "bytes": 2949
+    },
+    {
+      "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/scripts/smoke_npm.sh.txt",
+      "sha256": "e2c5b5b5a744eb93fed31c5e9285a42ec436aae6ac90315a08a957f04d660983",
+      "bytes": 1979
+    },
+    {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/PLAN.md",
       "sha256": "5fa3250851d524e71614f71648ad3402f3eeba40304614d848a880700d02eed8",
       "bytes": 29028
@@ -34836,13 +34966,13 @@
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/qualification-extract.json",
-      "sha256": "faf86e07f5be8b038e18df63dc3cfc6111da04dc0a51b2e09a6624d8ea3e2efc",
-      "bytes": 15024
+      "sha256": "80cbee32859fcc983cda91ccbe947b90912b4cba152e3f5eb4c67c44c9df8995",
+      "bytes": 14926
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/receipt.json",
-      "sha256": "103fe4d089c2503e22319afa4f6b53cf80ae307af5b6c3df2df7656b4fc58eb3",
-      "bytes": 21415
+      "sha256": "33f2c287557d97bf2e04ebf198fb77bbda624c4095690fc8455050581084a87d",
+      "bytes": 21275
     },
     {
       "path": "evidence/artifacts/omniroute-rebuild-20260930/scripts/backup_stores.py.txt",
@@ -42873,6 +43003,11 @@
       "path": "evidence/receipts/notification-types-20260929.json",
       "sha256": "b221f8fde6a52107b2eed9db804165dc03410dd3fd35f6e6a53f86392ce686e1",
       "bytes": 22885
+    },
+    {
+      "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
+      "sha256": "0f6a0c171872cde9689d9d5f2ff60b881ae2328b96769dc78613f625cf9d1017",
+      "bytes": 16128
     },
     {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",

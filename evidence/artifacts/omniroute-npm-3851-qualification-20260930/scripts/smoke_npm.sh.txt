@@ -1,0 +1,26 @@
+#!/bin/bash
+# Published copy of the script as it ran on 2026-09-30. Host paths are replaced by the placeholders named in the assignments below
+# (<work directory>, <bin directory of Node 24.21.0>, <npm cache>, <throwaway directory>); nothing else differs.
+# smoke_npm.sh PREFIX: boot, restart and stop smoke of an installed omniroute prefix in a fresh user+network namespace
+# (own loopback; the host's listeners, including 20128/20129 and the sidecars, are unreachable), clean environment, throwaway
+# HOME/DATA_DIR/cwd under /var/tmp, no lsof shim, sidecar listeners moved to 20198/20199, server bound to loopback only.
+set -u
+PREFIX="$1"
+OM=<work directory>
+T=<throwaway directory>
+OUT=$OM/logs/smoke
+NODEBIN=<bin directory of Node 24.21.0>
+[ -e "$T" ] && { echo "throwaway dir already exists: $T"; exit 95; }
+mkdir -p "$T/home" "$T/data" "$T/cwd" "$T/raw" "$OUT"
+cd "$T/cwd" || exit 97
+/usr/bin/unshare -rn /bin/sh -c '/usr/sbin/ip link set lo up || exit 98; exec /usr/bin/unshare --user --map-user=1000 --map-group=1000 "$@"' sh \
+  /usr/bin/env -i "HOME=$T/home" "DATA_DIR=$T/data" "PATH=$NODEBIN:/usr/local/bin:/usr/bin:/bin" "PORT=20197" \
+    "OMNIROUTE_SERVER_HOST=127.0.0.1" "LIVE_WS_PORT=20199" "EMBED_WS_PROXY_PORT=20198" "REQUIRE_API_KEY=true" "LANG=C.UTF-8" \
+    /bin/bash "$OM/smoke_inner.sh" "$PREFIX" "$OUT" "$T/raw"
+echo "namespace wrapper rc=$?"
+grep -nE 'Listening|listening|Ready|ready|Loaded env|ignored|Warning|warn|WARN|Error|error|ERR|Migrated|Generated' "$T/raw/serve-1.log" \
+  | sed -E 's/[A-Za-z0-9+\/_=-]{24,}/<masked>/g' | cut -c1-240 | head -n 60 > "$OUT/serve-1-excerpt.txt"
+grep -nE 'Listening|listening|Ready|ready|Warning|warn|WARN|Error|error|ERR|Migrated' "$T/raw/serve-2.log" \
+  | sed -E 's/[A-Za-z0-9+\/_=-]{24,}/<masked>/g' | cut -c1-240 | head -n 60 > "$OUT/serve-2-excerpt.txt"
+echo "serve-1.log lines: $(wc -l < "$T/raw/serve-1.log"); serve-2.log lines: $(wc -l < "$T/raw/serve-2.log")" >> "$OUT/summary.txt"
+cat "$OUT/summary.txt"

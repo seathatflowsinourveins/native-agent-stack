@@ -222,7 +222,7 @@ Upstream's merged [#14886](https://github.com/diegosouzapw/OmniRoute/pull/14886)
 
 The non-upstream deltas are #13788 (both gateways) and the affinity patch (20128 only); the `lsof` shim is still on both units' `PATH` but redundant, because upstream #14812 is in the base. The [decision's deltas table](decisions/2026-09-30-omniroute-rebuild.md#non-upstream-deltas) gives each one's purpose, evidence and the upstream change that retires it. While the affinity patch runs, create no OAuth (Codex) routing combo on 20128 (its standing constraint F1; the [decision record](decisions/2026-09-30-omniroute-rebuild.md#non-upstream-deltas) gives its basis and limits).
 
-npm published 3.8.51 on 2026-09-30 (the tag's tree equals `2f42a9ac1`'s), so the pin's own condition is met; the component pin in `manifests/stack.json` is still 3.8.50, and moving it is a separate qualified change to that shared file. Upstream already carries the fix, #14886.
+npm published 3.8.51 on 2026-09-30 (the tag's tree equals `2f42a9ac1`'s), so the pin's own condition is met, and the published package passed its own install, boot smoke and provenance check (`evidence/receipts/omniroute-3851-npm-qualification-20260930.json`); the component pin in `manifests/stack.json` is still 3.8.50, and moving it is a separate change to that shared file. Upstream already carries the fix, #14886.
 
 - **Build.** Use upstream's own scripts in a clean clone at the cherry-picked head:
   1. `npm ci`;
