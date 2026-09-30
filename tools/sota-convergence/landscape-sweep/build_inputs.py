@@ -29,8 +29,9 @@ instead, one per lifecycle task, keyed by skill (owner/repo@name) rather than re
 covers research-state.json's layers only): each task's requirement_sha256, the sha256 of the canonical JSON of its
 lifecycle_task, requirement and overturn_when, under "skills/<layer_id>", and the platform-profile hash, both with
 the ledger's own functions. A skills layer input carries modality "skills", the task, the installed skills'
-adoption/skills/manifest.json pins and invocation flags, the task's sources with their pins, and known_skill_refs
-(installed and excluded skills as owner/repo@name). No freshness manifest is read. A run covers one modality.
+adoption/skills/manifest.json pins and invocation flags, the task's sources with their pins, and known_skills (the
+manifest's installed skills by repository and its excluded skills by source, as it states them). No freshness
+manifest is read. A run covers one modality.
 """
 
 from __future__ import annotations
@@ -62,8 +63,6 @@ SKILLS_REQUIREMENT_FIELDS = ("lifecycle_task", "requirement", "overturn_when")
 INSTALLED_FIELDS = ("name", "source", "ref", "path", "skill_md_sha256", "description_chars", "status",
                     "upstream_disable_model_invocation", "claude_listing", "codex_enabled", "gap")
 TASK_FIELDS = ("layer_id", "lifecycle_task", "requirement", "installed", "source_ids", "open_gaps", "overturn_when")
-OWNER_REPO = re.compile(r"[A-Za-z0-9-]+/[A-Za-z0-9._-]+")
-SKILL_NAME = re.compile(r"[a-z0-9][a-z0-9-]*")
 HEX40 = re.compile(r"[0-9a-f]{40}")
 
 
@@ -216,29 +215,19 @@ def skills_scope(catalog: dict, adoption: dict, led) -> dict:
                 {field: task.get(field) for field in SKILLS_REQUIREMENT_FIELDS})) for task in catalog["tasks"]}}
 
 
-def manifest_repositories(value) -> list[str]:
-    """The owner/repo values of a skills-manifest source field ("a/b, c/d", "o/r (skill-data/)"); "various" names
-    none."""
-    out = []
-    for part in str(value or "").split(","):
-        part = re.sub(r"\s*\(.*\)$", "", part.strip())
-        if OWNER_REPO.fullmatch(part):
-            out.append(part)
-    return out
-
-
-def known_skill_refs(manifest: dict) -> list[str]:
-    """owner/repo@name, lowercased, of every installed and excluded skill of the manifest; an excluded entry's phrase
-    that is not a skill name ("the figma and notion skills") names none."""
-    refs = set()
+def known_skills(manifest: dict) -> dict:
+    """The manifest's installed skills by source repository and its excluded skills by the manifest's own source text.
+    An excluded entry can name several repositories and phrases ("openai/skills, anthropics/skills"; "the figma and
+    notion skills"), so no owner/repo@name pair is inferred from it: the words stay as the manifest states them."""
+    installed, excluded = {}, {}
     for entry in manifest.get("skills") or []:
-        if isinstance(entry, dict):
-            refs.update(f"{repo}@{entry.get('name')}".lower() for repo in manifest_repositories(entry.get("source")))
+        if isinstance(entry, dict) and entry.get("name"):
+            installed.setdefault(str(entry.get("source")), set()).add(str(entry["name"]))
     for entry in manifest.get("excluded") or []:
         if isinstance(entry, dict):
-            refs.update(f"{repo}@{name}".lower() for repo in manifest_repositories(entry.get("source"))
-                        for name in entry.get("skills") or [] if SKILL_NAME.fullmatch(str(name)))
-    return sorted(refs)
+            excluded.setdefault(str(entry.get("source")), set()).update(str(name) for name in entry.get("skills") or [])
+    return {"installed": {source: sorted(names) for source, names in sorted(installed.items())},
+            "excluded": {source: sorted(names) for source, names in sorted(excluded.items())}}
 
 
 def build_skills_inputs(catalog: dict, manifest: dict, scope: dict, ledger: dict, seeds=None, absent=None) -> list:
@@ -251,7 +240,7 @@ def build_skills_inputs(catalog: dict, manifest: dict, scope: dict, ledger: dict
     previous = previous_by_layer(last_completed(ledger, SKILLS), absent)
     pinned = {entry["name"]: entry for entry in manifest.get("skills") or [] if isinstance(entry, dict)}
     sources = {source["source_id"]: source for source in catalog["sources"]}
-    known = known_skill_refs(manifest)
+    known = known_skills(manifest)
     out, missing = [], []
     for task in tasks:
         layer_id = task["layer_id"]
@@ -270,7 +259,7 @@ def build_skills_inputs(catalog: dict, manifest: dict, scope: dict, ledger: dict
             "skills_catalog_checked_at": catalog.get("checked_at"),
             "skills_manifest_checked_at": manifest.get("checked_at"),
             "previous_sweep": previous.get((SKILLS, layer_id), {}),
-            "known_skill_refs": known,
+            "known_skills": known,
             "seeded_candidates": list(seeds.get(layer_id, [])),
         })
     if missing:

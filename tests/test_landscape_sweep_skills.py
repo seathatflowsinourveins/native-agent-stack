@@ -292,9 +292,11 @@ class SkillsInputTests(unittest.TestCase):
         self.assertEqual(debug["sources"], [
             {"source_id": "o-skills", "kind": "github-skills-repo", "url": "https://github.com/o/skills", "pin": "c" * 40},
             {"source_id": "skills-sh-registry", "kind": "registry", "url": "https://skills.sh", "pin": "d" * 40}])
-        # Installed and excluded skills are known; a phrase or a source that names no repository is not a skill ref.
-        self.assertEqual(debug["known_skill_refs"], ["o/skills@diag", "o/skills@grill", "o/skills@old-debug",
-                                                     "p/more@old-debug"])
+        # Installed skills by repository; excluded skills by the manifest's own source text, since an excluded entry can
+        # name several repositories and phrases: no owner/repo@name pair is invented from it.
+        self.assertEqual(debug["known_skills"], {
+            "installed": {"o/skills": ["diag", "grill"]},
+            "excluded": {"o/skills, p/more": ["old-debug", "the other skills"], "various": ["Lark/Feishu"]}})
         self.assertEqual(debug["seeded_candidates"], ["acme/agent-skills@debug-kit"])
         self.assertEqual((debug["previous_sweep"], len(debug["open_gaps"][0])), ({}, 300))
         self.assertEqual((debug["skills_catalog_checked_at"], debug["skills_manifest_checked_at"]),

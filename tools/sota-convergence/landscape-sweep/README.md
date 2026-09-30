@@ -434,7 +434,8 @@ one `SKILL.md` folder, named `owner/repo@name`. The rounds, worker labels, survi
   `adoption/skills/manifest.json` that serve it, its pinned sources (GitHub skill repositories, the skills.sh
   registry and a curated list), its open gaps and its overturn condition. `build_inputs.py --modality skills` writes
   one input per task. The input carries the installed skills' manifest pins and invocation flags, the task's
-  sources, `known_skill_refs` (the installed and excluded skills) and any seeds. It reads no freshness manifest.
+  sources, `known_skills` (the manifest's installed skills by repository and its excluded skills by source, as the
+  manifest states them) and any seeds. It reads no freshness manifest.
 - **Scope.** `saturation_ledger.py --scope` covers only the layers of `research-state.json`. So
   `build_inputs.py --skills-scope` prints the skills layers' frozen scope in the same format, computed with the
   ledger's own functions. Each hash covers the task's `lifecycle_task`, `requirement` and `overturn_when`.
