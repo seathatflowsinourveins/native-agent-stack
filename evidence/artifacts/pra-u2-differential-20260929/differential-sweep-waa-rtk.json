@@ -1,0 +1,260 @@
+{
+ "kind": "pra_u2_differential_combined",
+ "parts": 12,
+ "paths": 440414,
+ "equal": 436513,
+ "changed_allowed": 3901,
+ "new_paths": 286988,
+ "added_allowed": 286988,
+ "unexpected": 0,
+ "unexpected_changed": {},
+ "unexpected_added": {},
+ "unexpected_removed": {},
+ "exit_codes": [
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ],
+  [
+   0,
+   0
+  ]
+ ],
+ "allowed_by_entry": {
+  "U2 stage 1 added #1": 6790,
+  "U2 stage 1 added #2": 187,
+  "U2 stage 1 added #3": 1310,
+  "U2 stage 1 added #4": 545,
+  "U2 stage 1 added #5": 23640,
+  "U2 stage 1 added #6": 1858,
+  "U2 stage 1 added #7": 1683,
+  "U2 stage 1 added #8": 183550,
+  "U2 stage 1 added #9": 12077,
+  "U2 stage 1 added #10": 2431,
+  "U2 stage 2 added #1": 24221,
+  "U2 stage 2 added #2": 5913,
+  "U2 stage 3 added #1": 6503,
+  "U2 stage 3 added #2": 2244,
+  "U2 stage 3 added #3": 13392,
+  "U2 stage 3 changed #1": 3882,
+  "U2 stage 3 changed #4": 12,
+  "U2 repair round added #1": 644,
+  "U2 stage 1 changed #2": 7
+ },
+ "effects": {
+  "children_in_window": [
+   24,
+   71,
+   113,
+   63,
+   48,
+   0,
+   58,
+   49,
+   26,
+   153,
+   108,
+   120
+  ],
+  "main_sessions_in_window": [
+   11,
+   10,
+   5,
+   12,
+   10,
+   1,
+   4,
+   6,
+   7,
+   8,
+   15,
+   7
+  ],
+  "rtk_parts_children": {
+   "base": {
+    "calls": 28064,
+    "unknown_calls": 3970,
+    "eligible_parts": 24914,
+    "ineligible_parts": 116540,
+    "eligible_calls": 13866,
+    "observed_covered_parts": 18051,
+    "replayed_covered_parts": 18071,
+    "explicit_rtk_on_excluded_or_sensitive": 21,
+    "proxy_parts": 837,
+    "unknown_call_share": 0.1415,
+    "coverage": 0.7245,
+    "b8_status": "incomplete",
+    "statuses_of_parts": [
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "not_measured",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete"
+    ]
+   },
+   "new": {
+    "calls": 28064,
+    "unknown_calls": 196,
+    "eligible_parts": 26571,
+    "ineligible_parts": 133015,
+    "eligible_calls": 15010,
+    "observed_covered_parts": 18061,
+    "replayed_covered_parts": 18081,
+    "explicit_rtk_on_excluded_or_sensitive": 22,
+    "proxy_parts": 878,
+    "observed_covered_succeeded_calls": 9670,
+    "eligible_call_states": {
+     "attempted": 15010,
+     "cancelled_or_unfinished": 15,
+     "cancelled_with_result": 0,
+     "executed": 14917,
+     "failed": 357,
+     "interrupted": 0,
+     "invalid": 21,
+     "rejected": 57,
+     "succeeded": 14560,
+     "unknown": 0
+    },
+    "unknown_call_share": 0.007,
+    "coverage": 0.6797,
+    "b8_status": "measured",
+    "statuses_of_parts": [
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "not_measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured"
+    ]
+   }
+  },
+  "rtk_parts_main": {
+   "base": {
+    "calls": 2609,
+    "unknown_calls": 669,
+    "eligible_parts": 2423,
+    "ineligible_parts": 11539,
+    "eligible_calls": 1255,
+    "observed_covered_parts": 1284,
+    "replayed_covered_parts": 1286,
+    "explicit_rtk_on_excluded_or_sensitive": 0,
+    "proxy_parts": 94,
+    "unknown_call_share": 0.2564,
+    "coverage": 0.5299,
+    "b8_status": "incomplete",
+    "statuses_of_parts": [
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "measured",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete",
+     "incomplete"
+    ]
+   },
+   "new": {
+    "calls": 2609,
+    "unknown_calls": 32,
+    "eligible_parts": 2982,
+    "ineligible_parts": 15247,
+    "eligible_calls": 1565,
+    "observed_covered_parts": 1290,
+    "replayed_covered_parts": 1292,
+    "explicit_rtk_on_excluded_or_sensitive": 0,
+    "proxy_parts": 103,
+    "observed_covered_succeeded_calls": 684,
+    "eligible_call_states": {
+     "attempted": 1565,
+     "cancelled_or_unfinished": 5,
+     "cancelled_with_result": 0,
+     "executed": 1542,
+     "failed": 51,
+     "interrupted": 0,
+     "invalid": 3,
+     "rejected": 15,
+     "succeeded": 1491,
+     "unknown": 0
+    },
+    "unknown_call_share": 0.0123,
+    "coverage": 0.4326,
+    "b8_status": "measured",
+    "statuses_of_parts": [
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured",
+     "measured"
+    ]
+   }
+  },
+  "actors_unknown_calls_moved": {
+   "unknown_to_known_calls": 4412,
+   "known_to_unknown_calls": 1
+  }
+ }
+}

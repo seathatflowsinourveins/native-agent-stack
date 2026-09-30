@@ -1,0 +1,108 @@
+--- <TOKENSAVE>/switch_gateways.py.before-only-20260930	2026-09-29 19:10:16.809718673 -0400
++++ <TOKENSAVE>/switch_gateways.py	2026-09-30 02:04:13.511570628 -0400
+@@ -7,6 +7,8 @@
+ 
+   switch_gateways.py --prefix-20128 NAME --prefix-20129 NAME --desc-20128 TEXT --desc-20129 TEXT --dry-run
+   switch_gateways.py ... --apply [--restart-hindsight]
++  switch_gateways.py --only 20128 --prefix-20128 NAME --desc-20128 TEXT --dry-run    (one unit: the other unit and hindsight-live are
++                                                                                     neither written nor restarted)
+   switch_gateways.py --rollback SWITCH_DIR
+ 
+ Order (the previous switch's recorded order): 20129, then (optionally) hindsight-live, then 20128. The first failed
+@@ -31,7 +33,8 @@
+ DROPIN = UNIT_DIR / "omniroute.service.d" / "20-codex-client-version.conf"
+ DROPIN_SAVED = "dropin-20-codex-client-version.conf"
+ VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
+-SHIM_SHA = "b12c64614c54bc86bad8b5cd2778e04c50ae624f47b2d2d525d1a9edc00c8f56"
++# v1: the 2026-09-27 shim (no-match status 1 becomes 0); v2: 2026-09-30, answers the preflight query with status 2 so upstream's bind probe is the guard (see the shim text)
++SHIM_SHAS = {"b12c64614c54bc86bad8b5cd2778e04c50ae624f47b2d2d525d1a9edc00c8f56": "v1", "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854": "v2"}
+ PREFIX_RE = re.compile(r"(/\.local/share/codex-ecosystem/tools|%h/\.local/share/codex-ecosystem/tools)/omniroute-[A-Za-z0-9._-]+")
+ 
+ 
+@@ -94,8 +97,8 @@
+     shim = base / "shim/lsof"
+     if not shim.exists():
+         problems.append("missing shim/lsof")
+-    elif hashlib.sha256(shim.read_bytes()).hexdigest() != SHIM_SHA:
+-        problems.append("shim/lsof sha256 differs from the recorded shim")
++    elif hashlib.sha256(shim.read_bytes()).hexdigest() not in SHIM_SHAS:
++        problems.append("shim/lsof sha256 is neither recorded shim (v1, v2)")
+     return problems
+ 
+ 
+@@ -142,27 +145,44 @@
+     parser.add_argument("--restart-hindsight", action="store_true")
+     parser.add_argument("--client-version", help="rewrite Environment=CODEX_CLIENT_VERSION= in both units to this x.y.z")
+     parser.add_argument("--absorb-dropin", action="store_true", help="fold the peer's 20-codex-client-version drop-in into the 20128 unit: it must set exactly --client-version; removed in the same restart")
++    parser.add_argument("--only", choices=("20128", "20129"), help="switch only this port's unit; the other unit and hindsight-live are neither written nor restarted")
+     parser.add_argument("--rollback")
+     opts = parser.parse_args()
+     if opts.client_version and not VERSION_RE.match(opts.client_version):
+         raise SystemExit("--client-version must look like 0.159.1")
+     if opts.absorb_dropin and not opts.client_version:
+         raise SystemExit("--absorb-dropin needs --client-version")
++    if opts.only and opts.restart_hindsight:
++        raise SystemExit("--only leaves hindsight-live alone; drop --restart-hindsight")
++    if opts.only and opts.absorb_dropin and opts.only != "20128":
++        raise SystemExit("--absorb-dropin belongs to the 20128 unit")
+ 
+     if opts.rollback:
+         directory = Path(opts.rollback)
++        restored = []
+         for port in ("20128", "20129"):
+             saved = directory / UNITS[port]
+             if saved.exists():
+                 (UNIT_DIR / UNITS[port]).write_bytes(saved.read_bytes())
++                restored.append(port)
+         restore_dropin(directory)
+         sh("systemctl", "--user", "daemon-reload", check=True)
+         for port in ("20129", "20128"):
+-            sh("systemctl", "--user", "restart", UNITS[port])
+-            print(port, "rollback health:", health(port))
++            if port in restored:   # a switch directory holds only the units that switch saved (one unit after --only)
++                sh("systemctl", "--user", "restart", UNITS[port])
++                print(port, "rollback health:", health(port))
+         return
+ 
+     want = {"20128": (opts.prefix_20128, opts.desc_20128), "20129": (opts.prefix_20129, opts.desc_20129)}
++    if opts.only:
++        want = {opts.only: want[opts.only]}
++    for port, (prefix, description) in want.items():
++        if not prefix or not description:
++            raise SystemExit(f"--prefix-{port} and --desc-{port} are required for the {port} unit")
++    untouched = [port for port in UNITS if port not in want]
++    for port in untouched:
++        state = unit_state(UNITS[port])
++        print(f"{port} {UNITS[port]}: NOT in scope; running {running_prefix(state.get('MainPID', '0'))} ({build_sha(running_prefix(state.get('MainPID', '0')))}) MainPID={state.get('MainPID')} NRestarts={state.get('NRestarts')}")
+     plan = {}
+     for port, (prefix, description) in want.items():
+         unit_path = UNIT_DIR / UNITS[port]
+@@ -171,7 +191,8 @@
+         text, changed = new_text(current, prefix, description, opts.client_version)
+         state = unit_state(UNITS[port])
+         plan[port] = {"prefix": prefix, "problems": problems, "changed": changed, "text": text, "was": running_prefix(state.get("MainPID", "0")), "state": state}
+-        print(f"{port} {UNITS[port]}: running {plan[port]['was']} ({build_sha(plan[port]['was'])}) -> {prefix} ({build_sha(prefix) or '?'}); lines changed: {changed}; prefix problems: {problems}")
++        shim_version = SHIM_SHAS.get(hashlib.sha256((TOOLS / prefix / "shim/lsof").read_bytes()).hexdigest(), "?") if (TOOLS / prefix / "shim/lsof").exists() else "none"
++        print(f"{port} {UNITS[port]}: running {plan[port]['was']} ({build_sha(plan[port]['was'])}) -> {prefix} ({build_sha(prefix) or '?'}, shim {shim_version}); lines changed: {changed}; prefix problems: {problems}")
+         extra = set(changed) - {"Description", "Environment", "ExecStart"}
+         if extra:
+             raise SystemExit(f"{port}: unexpected lines would change: {extra}")
+@@ -199,7 +220,7 @@
+         os.chmod(saved, 0o600)
+         print("saved drop-in sha256", hashlib.sha256(saved.read_bytes()).hexdigest()[:16])
+     print("saved prior unit files to", directory.name)
+-    order = ["20129", "20128"]
++    order = [port for port in ("20129", "20128") if port in plan]
+     done = []
+     for port in order:
+         if port == "20128" and opts.restart_hindsight:
+@@ -230,6 +251,9 @@
+             print(f"{port}: ROLLED BACK; health after rollback:", health(port))
+             raise SystemExit(f"switch failed at {port}; earlier switched units: {done}; rollback dir {directory}")
+         done.append(port)
++    for port in untouched:
++        state = unit_state(UNITS[port])
++        print(f"{port} {UNITS[port]}: untouched; running {running_prefix(state.get('MainPID', '0'))} ({build_sha(running_prefix(state.get('MainPID', '0')))}) MainPID={state.get('MainPID')} NRestarts={state.get('NRestarts')}")
+     print("switched:", done, "| rollback dir:", str(directory))
+ 
+ 

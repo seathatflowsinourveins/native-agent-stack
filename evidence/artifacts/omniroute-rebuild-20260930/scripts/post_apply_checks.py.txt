@@ -1,0 +1,283 @@
+#!/usr/bin/env python3
+"""Plan P post-apply checks for the two OmniRoute gateways (our integration probe, not an upstream tool).
+
+No model call, no gateway write. GET only to 127.0.0.1:20128 / 127.0.0.1:20129 on routes whose GET handler was read at
+c19983a66 and returns no credential material (never /api/settings, /api/providers, /api/providers/client, /api/keys,
+/api/settings/cache-config). sqlite reads run mode=ro with PRAGMA query_only on named non-secret keys and named
+provider_specific_data paths only; values that could hold secrets (custom header values, interception proxy URLs) are
+compared in code and reported as booleans.
+
+Every check derives its expectation from the set of plan steps that are applied, so a held step is checked in its
+pre-apply state instead of failing:
+  post_apply_checks.py --applied T01,T02,...     # exactly the steps gateway_apply.py --verify reports as applied
+  post_apply_checks.py --phase pre               # nothing applied
+  post_apply_checks.py --phase mid               # T01-T08 applied, T09 onwards held
+  post_apply_checks.py --phase t09               # T01-T09 applied (the state observed 2026-09-30T00:25Z)
+  post_apply_checks.py --phase post              # T01-T15 applied
+Exit code 0 when every check matches, 1 otherwise.
+"""
+import argparse
+import json
+import sqlite3
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+STORES = {"20128": Path.home() / ".local/share/omniroute/storage.sqlite",
+          "20129": Path.home() / ".local/share/omniroute-fw/storage.sqlite"}
+FORBIDDEN = ("/api/settings", "/api/providers", "/api/providers/client", "/api/keys", "/api/settings/cache-config")
+NODE = "openai-compatible-responses-3393b3bd…"
+CONN = "3eea0518…"
+OLD_COMBOS = {"default-caveman", "allow-lossy", "fw-session-dedup", "fw-ccr", "fw-lite", "fw-rtk", "fw-codex-responses",
+              "fw-headroom"}
+COMBO_OF = {"T02": "gpt6-agent-safe", "T03": "gpt6-memory-safe", "T04": "gpt6-safe-lossy",
+            "T12": "gpt6-agent-safe", "T13": "gpt6-memory-safe", "T14": "gpt6-safe-lossy"}
+HDRS = {"x-omniroute-no-memory": "true", "x-omniroute-disabled-guardrails": "vision-bridge,audio-bridge,video-bridge",
+        "x-omniroute-no-cache": "true"}
+ENGINES_ON = ["caveman", "ccr", "codex-responses", "rtk"]
+STEPS = [f"T{i:02d}" for i in range(1, 16)]
+PHASES = {"pre": [], "mid": STEPS[:8], "t09": STEPS[:9], "post": STEPS}
+
+
+def get(port, route):
+    if route.split("?")[0] in FORBIDDEN:
+        raise SystemExit(f"refused forbidden route {route}")
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}{route}", timeout=30) as r:
+            return r.status, json.loads(r.read() or b"null")
+    except urllib.error.HTTPError as e:
+        return e.code, None
+    except Exception as e:  # noqa: BLE001
+        return f"error-{type(e).__name__}", None
+
+
+def rows(port, sql, params=()):
+    con = sqlite3.connect(STORES[port].resolve().as_uri() + "?mode=ro", uri=True, timeout=5)
+    try:
+        con.execute("PRAGMA query_only = ON")
+        return con.execute(sql, params).fetchall()
+    finally:
+        con.close()
+
+
+def setting(port, key):
+    r = rows(port, "SELECT value FROM key_value WHERE namespace = 'settings' AND key = ?", (key,))
+    return json.loads(r[0][0]) if r else "<absent>"
+
+
+def flag(port, key):
+    st, b = get(port, "/api/settings/feature-flags")
+    for f in (b or {}).get("flags", []) if isinstance(b, dict) else []:
+        if f.get("key") == key:
+            return f.get("effectiveValue"), f.get("source")
+    return None, st
+
+
+def engines_on(c):
+    return sorted(k for k, v in (c.get("engines") or {}).items() if isinstance(v, dict) and v.get("enabled"))
+
+
+def safest_globals(c):
+    rk, cv = c.get("rtkConfig") or {}, c.get("cavemanConfig") or {}
+    observed = {"rtk.disabledFilters": len(rk.get("disabledFilters") or []), "rtk.maxCharsPerResult": rk.get("maxCharsPerResult"),
+                "caveman.compressRoles": cv.get("compressRoles"), "sessionDedup": c.get("sessionDedup"),
+                "headroom": c.get("headroom")}
+    ok = (len(rk.get("disabledFilters") or []) == 55 and rk.get("maxCharsPerResult") == 40000
+          and cv.get("compressRoles") == ["assistant"] and (c.get("sessionDedup") or {}).get("minBlockChars") == 512
+          and (c.get("headroom") or {}).get("minRows") == 16)
+    return ok, observed
+
+
+def checks(applied):
+    a = set(applied)
+    out = []
+
+    def add(port, name, ok, observed):
+        out.append((port, name, bool(ok), observed))
+
+    # ------------------------------------------------------------------ 20129
+    st, c = get("20129", "/api/settings/compression")
+    c = c if isinstance(c, dict) else {}
+    add("20129", "compression invariants", c.get("enabled") is True and c.get("defaultMode") == "off"
+        and c.get("autoTriggerTokens") == 0 and (c.get("contextBudget") or {}).get("mode") == "off"
+        and c.get("activeComboId") is None and c.get("compressionComboId") is None and c.get("exclusions") == []
+        and c.get("lite") == {"compressToolResults": False} and c.get("enginesExplicit") is True,
+        {k: c.get(k) for k in ("enabled", "defaultMode", "autoTriggerTokens", "activeComboId", "compressionComboId",
+                               "exclusions", "lite", "enginesExplicit")})
+    on = engines_on(c)
+    add("20129", "engines map [T09]", on == (ENGINES_ON if "T09" in a else []), on)
+    styles = c.get("outputStyles")
+    add("20129", "output styles [T09]", styles == ([{"id": "terse-prose", "level": "lite"}] if "T09" in a else []), styles)
+    com = c.get("cavemanOutputMode")
+    add("20129", "legacy output mode, Auto-Clarity bypass [T10]",
+        com == {"enabled": False, "intensity": "lite", "autoClarity": "T10" not in a}, com)
+    lz, lc = c.get("liveZone"), c.get("languageConfig") or {}
+    add("20129", "liveZone + languageConfig [T09]",
+        (lz == {"enabled": True} and lc.get("enabled") is True and lc.get("autoDetect") is False) if "T09" in a
+        else (lz == {"enabled": False}), {"liveZone": lz, "languageConfig": lc})
+    ok, observed = safest_globals(c)
+    rk, cv = c.get("rtkConfig") or {}, c.get("cavemanConfig") or {}
+    add("20129", "safest globals (rtk, caveman, session-dedup, headroom) [T09]",
+        ok if "T09" in a else (rk.get("disabledFilters") == [] and cv.get("compressRoles") == ["user"]), observed)
+    st, b = get("20129", "/api/context/combos")
+    items = (b or {}).get("combos", []) if isinstance(b, dict) else []
+    ids = {x.get("id") for x in items}
+    defaults = sorted(x.get("id") for x in items if x.get("isDefault"))
+    want_ids = OLD_COMBOS | {COMBO_OF[s] for s in ("T02", "T03", "T04") if s in a}
+    add("20129", "context combos [T02-T04]", ids == want_ids and defaults == [], {"ids": sorted(ids), "defaults": defaults})
+    # Manual rows only: the context-window reconciler adds and removes auto:discovery rows on its own schedule and never
+    # touches manual rows (src/lib/contextWindowResolver.ts:30-110), so auto rows are reported, not asserted.
+    manual = {m: v for m, v in rows("20129", "SELECT model_id, real_context FROM model_context_overrides "
+                                              "WHERE provider = ? AND source = 'manual'", (NODE,))}
+    auto = rows("20129", "SELECT count(*) FROM model_context_overrides WHERE source = 'auto:discovery'")[0][0]
+    want = {"cx/gpt-6-astra": 872000, "cx/gpt-6-astra-max": 872000, "cx/gpt-6-sol": 872000}
+    if "T01" in a:
+        want["gpt-6-astra-max"] = 872000
+    add("20129", "context-length overrides (manual rows) [T01]", manual == want,
+        {"manual": sorted(f"{m}={v}" for m, v in manual.items()), "auto_rows": auto})
+    r = rows("20129", "SELECT is_active, json_extract(provider_specific_data,'$.timeoutMs'), "
+                      "json_type(provider_specific_data,'$.cache'), "
+                      "json_extract(provider_specific_data,'$.cache.supportsPromptCaching'), "
+                      "json_type(provider_specific_data,'$.customHeaders'), "
+                      "json_type(provider_specific_data,'$.validationId'), json_type(provider_specific_data,'$.runtimeKey') "
+                      "FROM provider_connections WHERE id = ?", (CONN,))
+    hdr_ok = []
+    for name, val in HDRS.items():
+        v = rows("20129", "SELECT json_extract(provider_specific_data, ?) FROM provider_connections WHERE id = ?",
+                 (f'$.customHeaders."{name}"', CONN))
+        hdr_ok.append(bool(v) and v[0][0] == val)
+    hcount = rows("20129", "SELECT count(*) FROM json_each((SELECT provider_specific_data FROM provider_connections "
+                           "WHERE id = ?), '$.customHeaders')", (CONN,))
+    row = r[0] if r else None
+    ok = row is not None
+    if ok and "T07" in a:
+        ok = row[1] == 1200000 and row[2] == "object" and row[3] == 1
+    elif ok:
+        ok = row[1] is None and row[2] is None
+    if ok and "T08" in a:
+        ok = all(hdr_ok) and hcount[0][0] == 3
+    elif ok:
+        ok = row[4] is None
+    if ok and ("T07" in a or "T08" in a):
+        ok = row[5] is None and row[6] is None
+    add("20129", "sharedgw connection psd (timeoutMs, cache [T07]; customHeaders [T08])", ok,
+        {"is_active": row[0] if row else None, "timeoutMs": row[1] if row else None, "cache_type": row[2] if row else None,
+         "supportsPromptCaching": row[3] if row else None, "customHeaders_type": row[4] if row else None,
+         "header_values_match": hdr_ok, "header_count": hcount[0][0] if hcount else None,
+         "validationId_type": row[5] if row else None, "runtimeKey_type": row[6] if row else None})
+    ir = rows("20129", "SELECT value FROM key_value WHERE namespace = 'interception_rules' AND key = ?", (NODE,))
+    parsed = json.loads(ir[0][0]) if ir else None
+    ir_ok = (isinstance(parsed, dict) and parsed.get("interceptSearch") is False and parsed.get("interceptFetch") is False
+             and not parsed.get("fetchProxyUrl") and not parsed.get("models")) if "T06" in a else parsed is None
+    add("20129", "sharedgw interception rule [T06]", ir_ok,
+        {"row": bool(ir), "interceptSearch": (parsed or {}).get("interceptSearch"),
+         "interceptFetch": (parsed or {}).get("interceptFetch"), "proxyUrl_set": bool((parsed or {}).get("fetchProxyUrl"))})
+
+    # ------------------------------------------------------------------ both: unchanged defaults (R2 section 6)
+    for port in ("20128", "20129"):
+        st, b = get(port, "/api/settings/thinking-budget")
+        add(port, "thinking budget passthrough", isinstance(b, dict) and b.get("mode") == "passthrough",
+            (b or {}).get("mode") if isinstance(b, dict) else st)
+        st, b = get(port, "/api/settings/reasoning-routing-rules")
+        n = len((b or {}).get("rules") or []) if isinstance(b, dict) else None
+        add(port, "reasoning-routing rules 0", n == 0, n)
+        st, b = get(port, "/api/combos")
+        n = (b or {}).get("total") if isinstance(b, dict) else None
+        add(port, "routing combos 0 (F1, G5)", n == 0, n)
+        st, b = get(port, "/api/settings/task-routing")
+        add(port, "task routing off", isinstance(b, dict) and b.get("enabled") is False,
+            (b or {}).get("enabled") if isinstance(b, dict) else st)
+        st, b = get(port, "/api/cache")
+        sc = ((b or {}).get("config") or {}).get("semanticCacheEnabled") if isinstance(b, dict) else None
+        add(port, "legacy exact cache armed (unchanged)", sc is True, sc)
+        for key in ("OMNIROUTE_EMERGENCY_FALLBACK", "UNIVERSAL_CONTEXT_HANDOFF_ENABLED"):
+            val, src = flag(port, key)
+            add(port, f"flag {key} off", val == "false", [val, src])
+        tier = setting(port, "codexServiceTier")
+        add(port, "codexServiceTier absent or disabled", tier == "<absent>" or (isinstance(tier, dict) and tier.get("enabled") is False),
+            tier if tier == "<absent>" else {"enabled": tier.get("enabled") if isinstance(tier, dict) else tier})
+        for key in ("memoryEnabled", "customSystemPromptEnabled"):
+            v = setting(port, key)
+            add(port, f"{key} absent or false", v in ("<absent>", False), v)
+    # ------------------------------------------------------------------ 20128
+    st, c = get("20128", "/api/settings/compression")
+    c = c if isinstance(c, dict) else {}
+    add("20128", "CX lane master switch and codex/* exclusion [T15]",
+        (c.get("enabled") is True and c.get("exclusions") == []) if "T15" in a
+        else (c.get("enabled") is False and c.get("exclusions") == ["codex/*"]),
+        {"enabled": c.get("enabled"), "exclusions": c.get("exclusions")})
+    on = engines_on(c)
+    ok, observed = safest_globals(c)
+    cr = c.get("codexResponsesConfig") or {}
+    observed.update({"enginesExplicit": c.get("enginesExplicit"), "engines_on": on, "lite": c.get("lite"),
+                     "codexResponses.minBytes": cr.get("minBytes"),
+                     "codexResponses.preserveToolNames": len(cr.get("preserveToolNames") or []),
+                     "liveZone": c.get("liveZone"), "cacheMinutes": c.get("cacheMinutes"),
+                     "stackedPipeline": [s.get("engine") for s in c.get("stackedPipeline") or []]})
+    if "T11" in a:
+        ok = (ok and c.get("enginesExplicit") is True and on == ENGINES_ON and c.get("lite") == {"compressToolResults": False}
+              and cr.get("minBytes") == 4096 and len(cr.get("preserveToolNames") or []) == 26
+              and c.get("liveZone") == {"enabled": True} and c.get("cacheMinutes") == 60)
+    else:
+        ok = (c.get("enginesExplicit") is False and c.get("lite") == {"compressToolResults": True}
+              and c.get("liveZone") == {"enabled": False})
+    add("20128", "CX lane engines map and safest globals [T11]", ok, observed)
+    add("20128", "CX lane output style never on (hard conflict: OpenHands control arm, Codex CLI instructions)",
+        c.get("outputStyles") == [] and (c.get("cavemanOutputMode") or {}).get("enabled") is False
+        and (c.get("contextBudget") or {}).get("mode") == "off" and c.get("autoTriggerTokens") == 0
+        and c.get("activeComboId") is None and c.get("compressionComboId") is None,
+        {"outputStyles": c.get("outputStyles"), "cavemanOutputMode.enabled": (c.get("cavemanOutputMode") or {}).get("enabled"),
+         "contextBudget.mode": (c.get("contextBudget") or {}).get("mode"), "autoTriggerTokens": c.get("autoTriggerTokens")})
+    st, b = get("20128", "/api/context/combos")
+    items = (b or {}).get("combos", []) if isinstance(b, dict) else []
+    ids = {x.get("id") for x in items}
+    defaults = sorted(x.get("id") for x in items if x.get("isDefault"))
+    want_ids = {"default-caveman"} | {COMBO_OF[s] for s in ("T12", "T13", "T14") if s in a}
+    add("20128", "CX lane context combos [T12-T14]", ids == want_ids and defaults == ["default-caveman"],
+        {"ids": sorted(ids), "defaults": defaults})
+    val, src = flag("20128", "OMNIROUTE_CODEX_APP_SERVER_ENABLED")
+    add("20128", "flag OMNIROUTE_CODEX_APP_SERVER_ENABLED [T05]",
+        [val, src] == (["false", "db"] if "T05" in a else ["true", "default"]), [val, src])
+    add("20128", "providerStrategies unchanged",
+        setting("20128", "providerStrategies") == {"codex": {"fallbackStrategy": "round-robin", "stickyRoundRobinLimit": 1}},
+        setting("20128", "providerStrategies"))
+    add("20128", "sessionAffinityTtlMs 4 h", setting("20128", "sessionAffinityTtlMs") == 14400000,
+        setting("20128", "sessionAffinityTtlMs"))
+    st_ = rows("20128", "SELECT count(*), sum(CASE WHEN json_extract(provider_specific_data,'$.requestDefaults.serviceTier') "
+                        "IS NULL THEN 1 ELSE 0 END) FROM provider_connections WHERE provider = 'codex'")
+    add("20128", "codex connections: no requestDefaults.serviceTier", st_ and st_[0][0] == st_[0][1], st_)
+    for port in ("20128", "20129"):
+        add(port, "GC6/GC7 blockedProviders present (report only; applied outside plan.json)", True,
+            {"blockedProviders": "present" if setting(port, "blockedProviders") != "<absent>" else "absent",
+             "noAuthFallbackDisabledProviders":
+                 "present" if setting(port, "noAuthFallbackDisabledProviders") != "<absent>" else "absent"})
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    group = ap.add_mutually_exclusive_group()
+    group.add_argument("--phase", choices=sorted(PHASES))
+    group.add_argument("--applied", help="comma-separated applied step ids (use gateway_apply.py --verify to list them)")
+    args = ap.parse_args()
+    if args.applied is not None:
+        applied = [s for s in args.applied.split(",") if s]
+        unknown = sorted(set(applied) - set(STEPS))
+        if unknown:
+            raise SystemExit(f"unknown step ids {unknown}")
+        label = "custom"
+    else:
+        label = args.phase or "post"
+        applied = PHASES[label]
+    results = checks(applied)
+    bad = 0
+    for port, name, ok, observed in results:
+        bad += 0 if ok else 1
+        print(f"{'PASS' if ok else 'FAIL'} [{port}] {name}: {json.dumps(observed, default=str)[:300]}")
+    print(f"phase={label} applied={','.join(applied) or '-'} checks={len(results)} failed={bad}")
+    sys.exit(1 if bad else 0)
+
+
+if __name__ == "__main__":
+    main()

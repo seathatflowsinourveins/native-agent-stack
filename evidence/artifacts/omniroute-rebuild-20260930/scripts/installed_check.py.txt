@@ -1,0 +1,42 @@
+"""Read-only check of the two installed OmniRoute prefixes: BUILD_SHA, the alpha/search route and the affinity function in the built output.
+Prints counts and identifiers only (no path)."""
+import datetime
+import json
+import re
+import sys
+from pathlib import Path
+
+TOOLS = Path.home() / ".local/share/codex-ecosystem/tools"
+PREFIXES = {
+    "20128 (B2)": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2",
+    "20129 (A2)": "omniroute-3.8.51-2f42a9ac-pr13788",
+}
+out = {"observed_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+for label, prefix in PREFIXES.items():
+    root = TOOLS / prefix
+    package = next(root.rglob("node_modules/omniroute"), None)
+    if package is None:
+        sys.exit(f"{prefix}: package directory not found")
+    build_sha = None
+    for candidate in package.rglob("BUILD_SHA"):
+        build_sha = candidate.read_text(encoding="utf-8").strip()
+        break
+    routes = sorted({str(p.relative_to(package)).replace("\\", "/") for p in package.rglob("*") if "alpha" in p.parts and "search" in p.parts and p.is_file()})
+    counts = {"alpha/search route files": 0, "pickMoreAvailableOAuthPeer occurrences": 0}
+    files_with_affinity = 0
+    for path in package.rglob("*"):
+        if not path.is_file() or path.suffix not in (".js", ".mjs", ".cjs", ".json", ".ts"):
+            continue
+        if path.stat().st_size > 20_000_000:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        hits = text.count("pickMoreAvailableOAuthPeer")
+        if hits:
+            counts["pickMoreAvailableOAuthPeer occurrences"] += hits
+            files_with_affinity += 1
+    counts["alpha/search route files"] = len(routes)
+    out[label] = {"prefix": prefix, "build_sha": build_sha, **counts, "files_with_pickMoreAvailableOAuthPeer": files_with_affinity}
+print(json.dumps(out, indent=1))

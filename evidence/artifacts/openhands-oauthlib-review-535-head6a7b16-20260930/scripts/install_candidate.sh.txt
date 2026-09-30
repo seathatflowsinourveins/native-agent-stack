@@ -1,0 +1,12 @@
+#!/bin/bash
+# install_candidate.sh: reproduce the candidate's recorded hashed installs (build-requirements.lock, then the candidate lock with --no-build-isolation)
+# into a fresh Python 3.13.15 venv, in a clean environment, low priority. Output in $W/install.log.
+set -u
+W=<REVIEW-SCRATCH>
+export UV_NO_CONFIG=1
+rm -rf "$W/venv"
+echo "[$(date -u +%FT%TZ)] venv"; nice -n 19 uv venv --python 3.13.15 "$W/venv" 2>&1 | tail -2
+echo "[$(date -u +%FT%TZ)] build lock"; nice -n 19 uv pip install --python "$W/venv/bin/python" --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r "$W/build.lock" 2>&1 | tail -3; echo "rc=${PIPESTATUS[0]}"
+echo "[$(date -u +%FT%TZ)] candidate lock"; nice -n 19 uv pip install --python "$W/venv/bin/python" --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r "$W/cand.lock" 2>&1 | tail -4; echo "rc=${PIPESTATUS[0]}"
+echo "[$(date -u +%FT%TZ)] pip check"; uv pip check --python "$W/venv/bin/python" 2>&1 | tail -3
+echo "[$(date -u +%FT%TZ)] done"

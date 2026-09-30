@@ -1,0 +1,14 @@
+{
+ "v1": {
+  "nothing_there": "[]",
+  "real_listener_and_client": "[2539511]",
+  "listener_gone_client_close_wait": "[2539511]",
+  "client_closed": "[]"
+ },
+ "v2": {
+  "nothing_there": "[]",
+  "real_listener_and_client": "[null]",
+  "listener_gone_client_close_wait": "[]",
+  "client_closed": "[]"
+ }
+}

@@ -1,0 +1,180 @@
+{
+ "schema": "omniroute-host-readback/1",
+ "note": "values-free. after_delta is the record printed by tools/omniroute/gateway_record.py (schema omniroute-gateway-record/2, sha256 d5cfcfbd61bcfcb1808270deab7e793d4021c8dd0c3079fe5ff71ee723ab46e6) at 2026-09-30T00:48:58Z, with one change: exec_main_start is shown in UTC, converted from the host's local-time string (EDT, UTC-4); it is the record that the Gate A owner told the coordinator it froze. before_delta_2026-09-30T00:11:56Z is snapshot_gateways.py output (route digests only). Every digest is full length as printed.",
+ "before_delta_2026-09-30T00:11:56Z": {
+  "source": "snapshot_gateways.py",
+  "taken_utc": "2026-09-30T00:11:56Z",
+  "20128": {
+   "unit": "omniroute",
+   "prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2",
+   "build_sha": "ae5539a56",
+   "MainPID": "950031",
+   "NRestarts": "0",
+   "route_digests_sha256": {
+    "combos": "16e4e6699a56bc53b1a076e92843b6568058a9dbe4abf31af412e2a38fcbae31",
+    "model-capability-overrides": "54e7a95ab4b36b7ccb5a610ee3fbc7efca05e5df83c59b1305ae97322d73cf1f",
+    "resilience": "92d2060b6ce52f2ee5ba39516e593e4aff675252645c85724d7874cc48d49a7a",
+    "compression": "13fa45d614767e7002135335bf406b7219ce1dd87c88c49e08ea34927328f215"
+   }
+  },
+  "20129": {
+   "unit": "omniroute-fw",
+   "prefix": "omniroute-3.8.51-2f42a9ac-pr13788",
+   "build_sha": "87c4c488d",
+   "MainPID": "945817",
+   "NRestarts": "0",
+   "route_digests_sha256": {
+    "combos": "06e7009a40b0751c698da86b77706bceeca70a00cbb08de3d3549be8925c5190",
+    "model-capability-overrides": "7fbee47584b0eb384bf073ad75127fa4ab49b07558344a675981cd1c65399e78",
+    "resilience": "3ce8a52205a0b58260aa339727de71ba939e8f1007e6504d61045e081528816e",
+    "compression": "f2b1894860df46525e1a1830c2009e204cb2bdc8dcbd1d6cfea9111f7a5decaa"
+   }
+  }
+ },
+ "after_delta": {
+  "gateways": {
+   "20128": {
+    "build_sha": "ae5539a56",
+    "overrides": [
+     [
+      "context_length",
+      "gpt-5.5",
+      "codex",
+      "codex/gpt-5.5",
+      272000
+     ],
+     [
+      "context_length",
+      "gpt-5.5-high",
+      "codex",
+      "codex/gpt-5.5-high",
+      272000
+     ],
+     [
+      "context_length",
+      "gpt-5.5-low",
+      "codex",
+      "codex/gpt-5.5-low",
+      272000
+     ],
+     [
+      "context_length",
+      "gpt-5.5-medium",
+      "codex",
+      "codex/gpt-5.5-medium",
+      272000
+     ],
+     [
+      "context_length",
+      "gpt-5.5-xhigh",
+      "codex",
+      "codex/gpt-5.5-xhigh",
+      272000
+     ],
+     [
+      "context_length",
+      "gpt-6.1-sol",
+      "codex",
+      "codex/gpt-6.1-sol",
+      872000
+     ]
+    ],
+    "overrides_rows": 6,
+    "prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2",
+    "routes": {
+     "combos": "16e4e6699a56bc53b1a076e92843b6568058a9dbe4abf31af412e2a38fcbae31",
+     "compression": "13fa45d614767e7002135335bf406b7219ce1dd87c88c49e08ea34927328f215",
+     "model_capability_overrides_stable": "aa6a53f4e32582c89ed51629608ad3a264ee93a6d46e75223fe2b31593c0576e",
+     "resilience": "92d2060b6ce52f2ee5ba39516e593e4aff675252645c85724d7874cc48d49a7a"
+    }
+   },
+   "20129": {
+    "build_sha": "87c4c488d",
+    "overrides": [
+     [
+      "context_length",
+      "cx/gpt-6-astra",
+      "sharedgw",
+      "sharedgw/cx/gpt-6-astra",
+      872000
+     ],
+     [
+      "context_length",
+      "cx/gpt-6-astra-max",
+      "sharedgw",
+      "sharedgw/cx/gpt-6-astra-max",
+      872000
+     ],
+     [
+      "context_length",
+      "cx/gpt-6-sol",
+      "sharedgw",
+      "sharedgw/cx/gpt-6-sol",
+      872000
+     ],
+     [
+      "context_length",
+      "gpt-6-astra-max",
+      "sharedgw",
+      "sharedgw/gpt-6-astra-max",
+      872000
+     ]
+    ],
+    "overrides_rows": 4,
+    "prefix": "omniroute-3.8.51-2f42a9ac-pr13788",
+    "routes": {
+     "combos": "06e7009a40b0751c698da86b77706bceeca70a00cbb08de3d3549be8925c5190",
+     "compression": "5262355b78029f0d2d3317f8491c210ef3473322109ea5d10e8beec9913dabb1",
+     "model_capability_overrides_stable": "00f7be7ebb5adf215a608bc911a5e9eb1db9d322ed387ea7197956c21d527522",
+     "resilience": "3ce8a52205a0b58260aa339727de71ba939e8f1007e6504d61045e081528816e"
+    }
+   }
+  },
+  "schema": "omniroute-gateway-record/2",
+  "taken_utc": "2026-09-30T00:48:58Z",
+  "units": {
+   "omniroute-fw.service": {
+    "active_state": "active",
+    "dropins": [],
+    "exec_main_start": "2026-09-30T00:02:42Z",
+    "main_pid": "945817",
+    "n_restarts": "0",
+    "sub_state": "running",
+    "unit_file_sha256": "fbdace7eeec524e37794432aa4c57ac5a8b4b925ef0b700f70b5e299a951c802"
+   },
+   "omniroute.service": {
+    "active_state": "active",
+    "dropins": [],
+    "exec_main_start": "2026-09-30T00:02:58Z",
+    "main_pid": "950031",
+    "n_restarts": "0",
+    "sub_state": "running",
+    "unit_file_sha256": "899e4fdb06775216094953815ed2836c2df9be12e26b459558a600742694b097"
+   }
+  }
+ },
+ "migration_rows_before_after": {
+  "omniroute": [
+   190,
+   193
+  ],
+  "omniroute-fw": [
+   190,
+   193
+  ]
+ },
+ "store_copies_taken_before_switch": {
+  "time": "2026-09-30T00:02:33Z",
+  "stores": 2,
+  "integrity_check": "ok",
+  "sha256_prefixes": {
+   "omniroute": "5a573ffaa1cf",
+   "omniroute-fw": "c3f9c0c7853e"
+  }
+ },
+ "interim_drop_in": {
+  "file": "omniroute.service.d/20-codex-client-version.conf",
+  "text_sha256_prefix": "98d0b5d87bc4d8a6",
+  "removed": "2026-09-30T00:02:58Z, in the 20128 restart"
+ }
+}

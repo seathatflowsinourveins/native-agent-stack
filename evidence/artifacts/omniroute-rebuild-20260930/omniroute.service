@@ -1,0 +1,30 @@
+[Unit]
+Description=OmniRoute gateway 3.8.51 (release/v3.8.51 2f42a9ac1 + upstream #13788 as two commits + local session-affinity patch 045aa81f3; canary build ae5539a56), loopback only
+Documentation=https://github.com/diegosouzapw/OmniRoute
+After=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.local/share/omniroute/server.env
+# shim/ holds the lsof no-match adaptation for serve's port preflight (see shim/lsof; remove when upstream fixes it).
+Environment=PATH=%h/.local/share/codex-ecosystem/tools/omniroute-3.8.51-2f42a9ac-pr13788-affinity2/shim:%h/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin
+Environment=OMNIROUTE_MEMORY_MB=16384
+# Caller-version fallback for paths that do not forward the Codex client's own version (src/shared/constants/codexClient.ts).
+Environment=CODEX_CLIENT_VERSION=0.159.1
+# Max-effort Astra can reason for minutes before its first content frame; the content-stall watchdog reuses the
+# readiness budget (defaults 80 s / 180 s, src/shared/utils/runtimeTimeouts.ts), so both are raised for the lane.
+Environment=STREAM_READINESS_TIMEOUT_MS=600000
+Environment=STREAM_READINESS_MAX_TIMEOUT_MS=600000
+# Hard stream lifetime (default 21 min, never reset by upstream bytes); bounded at 1 h, never 0.
+Environment=STREAM_ACTIVE_TIMEOUT_MS=3600000
+# Templates stay the single writer for Codex/Claude configs (src/shared/services/cliRuntime.ts).
+Environment=CLI_ALLOW_CONFIG_WRITES=false
+ExecStart=%h/.local/share/codex-ecosystem/tools/omniroute-3.8.51-2f42a9ac-pr13788-affinity2/bin/omniroute serve --port 20128 --no-open --no-tray
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

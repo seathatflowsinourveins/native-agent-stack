@@ -1,0 +1,115 @@
+{
+ "gateways": {
+  "20128": {
+   "build_sha": "cf6748d04",
+   "overrides": [
+    [
+     "context_length",
+     "gpt-5.5",
+     "codex",
+     "codex/gpt-5.5",
+     272000
+    ],
+    [
+     "context_length",
+     "gpt-5.5-high",
+     "codex",
+     "codex/gpt-5.5-high",
+     272000
+    ],
+    [
+     "context_length",
+     "gpt-5.5-low",
+     "codex",
+     "codex/gpt-5.5-low",
+     272000
+    ],
+    [
+     "context_length",
+     "gpt-5.5-medium",
+     "codex",
+     "codex/gpt-5.5-medium",
+     272000
+    ],
+    [
+     "context_length",
+     "gpt-5.5-xhigh",
+     "codex",
+     "codex/gpt-5.5-xhigh",
+     272000
+    ]
+   ],
+   "overrides_rows": 5,
+   "prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167",
+   "routes": {
+    "combos": "16e4e6699a56bc53b1a076e92843b6568058a9dbe4abf31af412e2a38fcbae31",
+    "compression": "13fa45d614767e7002135335bf406b7219ce1dd87c88c49e08ea34927328f215",
+    "model_capability_overrides_stable": "2f0e6390f2b04044bc462773ac0e7df990245e630abbf331c97e007d08822b92",
+    "resilience": "92d2060b6ce52f2ee5ba39516e593e4aff675252645c85724d7874cc48d49a7a"
+   }
+  },
+  "20129": {
+   "build_sha": "87c4c488d",
+   "overrides": [
+    [
+     "context_length",
+     "cx/gpt-6-astra",
+     "sharedgw",
+     "sharedgw/cx/gpt-6-astra",
+     872000
+    ],
+    [
+     "context_length",
+     "cx/gpt-6-astra-max",
+     "sharedgw",
+     "sharedgw/cx/gpt-6-astra-max",
+     872000
+    ],
+    [
+     "context_length",
+     "cx/gpt-6-sol",
+     "sharedgw",
+     "sharedgw/cx/gpt-6-sol",
+     872000
+    ],
+    [
+     "context_length",
+     "gpt-6-astra-max",
+     "sharedgw",
+     "sharedgw/gpt-6-astra-max",
+     872000
+    ]
+   ],
+   "overrides_rows": 4,
+   "prefix": "omniroute-3.8.51-2f42a9ac-pr13788",
+   "routes": {
+    "combos": "06e7009a40b0751c698da86b77706bceeca70a00cbb08de3d3549be8925c5190",
+    "compression": "5262355b78029f0d2d3317f8491c210ef3473322109ea5d10e8beec9913dabb1",
+    "model_capability_overrides_stable": "00f7be7ebb5adf215a608bc911a5e9eb1db9d322ed387ea7197956c21d527522",
+    "resilience": "3ce8a52205a0b58260aa339727de71ba939e8f1007e6504d61045e081528816e"
+   }
+  }
+ },
+ "schema": "omniroute-gateway-record/2",
+ "taken_utc": "2026-09-30T06:33:02Z",
+ "units": {
+  "omniroute-fw.service": {
+   "active_state": "active",
+   "dropins": [],
+   "exec_main_start": "Tue 2026-09-29 20:02:42 EDT",
+   "main_pid": "945817",
+   "n_restarts": "0",
+   "sub_state": "running",
+   "unit_file_sha256": "fbdace7eeec524e37794432aa4c57ac5a8b4b925ef0b700f70b5e299a951c802"
+  },
+  "omniroute.service": {
+   "active_state": "active",
+   "dropins": [],
+   "exec_main_start": "Wed 2026-09-30 02:32:50 EDT",
+   "main_pid": "3262255",
+   "n_restarts": "0",
+   "sub_state": "running",
+   "unit_file_sha256": "b7797d7898160c858de7d56695bb97a3ac569c8cfded49affcb66b908528be45"
+  }
+ }
+}
