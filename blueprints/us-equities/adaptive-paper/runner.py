@@ -36,7 +36,7 @@ from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, ext
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
 from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
-                       preflight, halt_statuses_supported, nasdaq_halt_seed)
+                       preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
@@ -758,6 +758,12 @@ def reconcile(ledger, snapshot, baseline_cash):
     expected = {p.symbol: p.qty for p in ledger.positions().values() if p.qty}
     if actual != expected:
         raise SafetyError("position_mismatch")
+    if "fees" in snapshot:
+        # Broker FEE activities (REG, TAF, CAT, ...) created since the ledger's cash baseline,
+        # from the transport's allow-listed read, are recorded durably before the comparison.
+        # The comparison and its 0.01 USD tolerance are unchanged: deposits, withdrawals,
+        # journals, dividends, interest and every other activity stay unexplained and fail it.
+        ledger.record_fees(snapshot["fees"], time.time())
     cash_delta = Decimal(snapshot["account"]["cash"]) - Decimal(baseline_cash)
     if abs(cash_delta - ledger.accounting().cash_delta_usd) > Decimal("0.01"):
         raise SafetyError("cash_mismatch_or_unmodeled_fees")
@@ -2380,6 +2386,22 @@ def main():
                     if (ledger.positions() or ledger.unresolved()) and not resumable_hold:
                         raise SafetyError("next_trial_requires_recovery")
                     if not resumable_hold:
+                        # baseline_cash is the first trial's cash (started_at), so FEE activities
+                        # posted since then, such as the day's REG/TAF/CAT after the last trial
+                        # ended, are recorded durably first, through the transport's allow-listed
+                        # read and normalization. Each GET is charged to the durable budget as a
+                        # read, and `now` follows those reads, so the next trial never starts
+                        # before a recorded request. Any other unexplained change still refuses.
+                        fee_reads = []
+                        fees = fee_activities(key, secret,
+                                              after=datetime.fromtimestamp(previous_metadata["started_at"], timezone.utc),
+                                              before_request=lambda kind, **_: fee_reads.append(time.time()),
+                                              request_observer=responses.append)
+                        for timestamp in fee_reads:
+                            if ledger.request_budget(timestamp, "read"):
+                                raise SafetyError("preflight_budget_inconsistent")
+                        now = time.time()
+                        ledger.record_fees(fees, now)
                         expected_cash = Decimal(previous_metadata["baseline_cash"]) + ledger.accounting().cash_delta_usd
                         if abs(Decimal(observation["account"]["cash"]) - expected_cash) > Decimal("0.01"):
                             raise SafetyError("next_trial_cash_mismatch")
@@ -2410,6 +2432,8 @@ def main():
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
+                    # This lane keeps its first trial's baseline_cash, read at started_at.
+                    fee_history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                     extended_hours_allowed=session_policy["extended_hours"],
                     include_margin=leverage_policy is not None))
             for sig in (signal.SIGINT, signal.SIGTERM):
