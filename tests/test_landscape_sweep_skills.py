@@ -3,12 +3,15 @@ network, no codex, no model calls).
 
 Covered: the skills lifecycle catalog, the strict discover-skills return schema, skills layer inputs and their frozen
 scope, each modality's own history and baseline, the templates a skills-* layer resolves to, a skills run staged by
-build_args.py and run by sweep.js under node (skipped without node), agents/openai.yaml as Codex reads it and SKILL.md
-frontmatter as the skills CLI's yaml package types it (each with the subset reader always, the PyYAML reader when
-PyYAML is installed), source reviews of skill survivors against a fake gh whose
-git trees carry the object ids git itself computes (git is required), make_result.py's pin checks of a skills
-RESULT.json, and the decision record it writes. Schemas are validated with scripts/host_receipts.py's validator (the
-repository's JSON Schema subset; CI installs no jsonschema), and with jsonschema as well when it is installed.
+build_args.py and run by sweep.js under node (skipped without node), agents/openai.yaml as Codex reads it (the subset
+reader always, the PyYAML reader when PyYAML is installed), SKILL.md copies as skill_md.mjs judges them (the pinned
+skills CLI's parseSkillMd with the yaml install skills-yaml.pin.json pins), source reviews of skill survivors against a
+fake gh whose git trees carry the object ids git itself computes (git is required), make_result.py's pin checks of a
+skills RESULT.json, and the decision record it writes. Tests that run skill_md.mjs need node and a verified yaml install
+(LANDSCAPE_SWEEP_SKILLS_YAML, else the pin's default directory under HOME; install it with the pin's command) and skip
+with that reason without one, as the tree-sitter lane tests do; the fail-closed checks run without it. Schemas are
+validated with scripts/host_receipts.py's validator (the repository's JSON Schema subset; CI installs no jsonschema),
+and with jsonschema as well when it is installed.
 """
 
 from __future__ import annotations
@@ -21,7 +24,9 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -733,6 +738,39 @@ source_reviews = harness_tests.load("source_reviews")
 FIND_BUGS = b"---\nname: find-bugs\ndescription: Find bugs.\n---\n\nBody.\n"
 PIN, HEAD = "c" * 40, "a" * 40  # the adjudicated pin, and the default branch's commit (the first round's fallback)
 GIT_ENV = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_TERMINAL_PROMPT": "0"}
+NODE = harness_tests.NODE
+SKILL_MD_MJS, YAML_PIN_PATH = HARNESS / "skill_md.mjs", HARNESS / "skills-yaml.pin.json"
+YAML_ENV = "LANDSCAPE_SWEEP_SKILLS_YAML"
+NEL, LS, PS = chr(0x85), chr(0x2028), chr(0x2029)
+
+
+def reader_run(items, install=None, env=None) -> tuple[int, dict]:
+    """skill_md.mjs on items [(path, bytes)]: (its exit status, its JSON answer, or {} when it printed none)."""
+    request = {"items": [{"id": str(number), "path": path, "base64": base64.b64encode(data).decode()}
+                         for number, (path, data) in enumerate(items)]}
+    done = subprocess.run([NODE, str(SKILL_MD_MJS), *(["--install", str(install)] if install else [])],
+                          input=json.dumps(request), capture_output=True, text=True, timeout=120, check=False,
+                          env=env if env is not None else {**os.environ, "TMPDIR": tempfile.gettempdir()})
+    try:
+        return done.returncode, json.loads(done.stdout)
+    except ValueError:
+        return done.returncode, {}
+
+
+def verified_install():
+    """The verified yaml install on this host (LANDSCAPE_SWEEP_SKILLS_YAML, else the default directory the pin names
+    under HOME), or None."""
+    if not (NODE and SKILL_MD_MJS.is_file() and YAML_PIN_PATH.is_file()):
+        return None
+    pin = json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))
+    candidate = os.environ.get(YAML_ENV) or str(Path.home() / pin["install"]["default_directory"])
+    status, answer = reader_run([], candidate)
+    return candidate if status == 0 and (answer.get("reader") or {}).get("ok") is True else None
+
+
+SKILLS_YAML = verified_install()
+NO_READER = ("no verified yaml install for skill_md.mjs (LANDSCAPE_SWEEP_SKILLS_YAML, else the default directory that "
+             "skills-yaml.pin.json names under HOME; install it with the pin's command)")
 
 
 def skill_md(name="find-bugs", description="Find bugs.", extra=()) -> bytes:
@@ -750,10 +788,11 @@ def git_out(case, directory, *args) -> str:
     return done.stdout
 
 
-def git_listing(case, files: dict, executable=()) -> dict:
-    """The GitHub git-trees answer (?recursive=1) for a commit holding `files` ({path: bytes}), with the object ids
-    upstream git computes: `git write-tree` gives the root tree's sha and `git ls-tree -r -t -l -z` every folder and
-    blob, so the fixture never reimplements git's object format."""
+def git_listing(case, files: dict, executable=(), symlinks=None) -> dict:
+    """The GitHub git-trees answer (?recursive=1) for a commit holding `files` ({path: bytes}) and `symlinks` ({path:
+    target}), with the object ids upstream git computes: `git write-tree` gives the root tree's sha and `git ls-tree -r
+    -t -l -z` every folder and blob (a symlink is a blob of mode 120000), so the fixture never reimplements git's object
+    format."""
     directory = temp_dir(case)
     git_out(case, directory, "init", "-q")
     for path, data in files.items():
@@ -762,6 +801,9 @@ def git_listing(case, files: dict, executable=()) -> dict:
         target.write_bytes(data)
         if path in executable:
             target.chmod(0o755)
+    for path, link in (symlinks or {}).items():
+        (directory / path).parent.mkdir(parents=True, exist_ok=True)
+        os.symlink(link, directory / path)
     git_out(case, directory, "add", "-A")
     root = git_out(case, directory, "write-tree").strip()
     tree = []
@@ -926,6 +968,20 @@ OPENAI_YAML = {
                                    "text after a quoted scalar"),
     "YAML's escapes": ('note: "Tab\\t\\"q\\" \\x41\\u00e9\\U0001F600\\/"\npolicy:\n  allow_implicit_invocation: false\n',
                        False, False, "false"),
+    # Opus round-3 review of #541, finding 5: the subset reader took characters libyaml refuses (unsafe-libyaml 0.2.11
+    # src/reader.rs lines 381-395, "control characters are not allowed"; serde_yaml then fails and Codex allows
+    # implicit invocation) and split lines where Python's str.splitlines does. Characters outside libyaml's set and
+    # line breaks other than LF and CRLF are unverified before either reader runs.
+    "a form feed after false": ("policy:\n  allow_implicit_invocation: false\x0c\n", None, None, "U+000C"),
+    "a vertical tab after false": ("policy:\n  allow_implicit_invocation: false\x0b\n", None, None, "U+000B"),
+    "a control character in another value": ("note: a\x01b\npolicy:\n  allow_implicit_invocation: false\n", None, None,
+                                             "U+0001"),
+    "a file separator between lines": ("policy:\x1c  allow_implicit_invocation: false\n", None, None, "U+001C"),
+    "a lone CR between lines": ("policy:\r  allow_implicit_invocation: false\n", None, None, "U+000D"),
+    "U+0085 between lines": (f"policy:{NEL}  allow_implicit_invocation: false\n", None, None, "U+0085"),
+    "U+2028 between lines": (f"policy:{LS}  allow_implicit_invocation: false\n", None, None, "U+2028"),
+    "U+2029 between lines": (f"policy:{PS}  allow_implicit_invocation: false\n", None, None, "U+2029"),
+    "CRLF line breaks": ("policy:\r\n  allow_implicit_invocation: false\r\n", False, False, "false"),
 }
 
 
@@ -975,81 +1031,247 @@ class OpenAiYamlPyYamlReaderTests(unittest.TestCase):
             self.assertIn("unverified", note)
 
 
+class OpenAiYamlBytesTests(unittest.TestCase):
+    """agents/openai.yaml as the review reads it, as bytes: what is not UTF-8 is unverified before any reader runs."""
+
+    def test_bytes_that_are_not_utf8_are_unverified(self):
+        implicit, _, note = source_reviews.openai_yaml_policy(b"policy:\n  allow_implicit_invocation: false\n# \xff\n")
+        self.assertIsNone(implicit, note)
+        self.assertIn("not UTF-8", note)
+        implicit, _, note = source_reviews.openai_yaml_policy(b"policy:\n  allow_implicit_invocation: false\n")
+        self.assertIs(implicit, False, note)
+
+
 def skill_frontmatter(lines: str) -> bytes:
     """A SKILL.md whose frontmatter is these lines, after a name line unless they give their own."""
     return (f"---\n{'' if lines.startswith('name:') else 'name: find-bugs' + chr(10)}{lines}\n---\n\nBody.\n").encode()
 
 
-# SKILL.md frontmatters: name -> (lines, the subset reader's verdict, the PyYAML reader's verdict, a phrase of the
-# subset reader's reason). "take" and "skip" are what vercel-labs/skills v1.7.0 parseSkillMd (src/skills.ts lines
-# 80-133) decides with the yaml package 2.9.0 it parses the frontmatter with, checked by running both under node (the
-# package whose sha512 integrity the CLI's pnpm-lock.yaml pins); None is unverified: syntax the reader does not parse,
-# never a guess (GPT-6 round-3 review of #541: a list description read as a string let an invalid copy win).
+# SKILL.md copies as skill_md.mjs judges them at skills/find-bugs/SKILL.md: name -> (bytes, verdict, the recorded name
+# (take) or a phrase of the warning (skip) or of the reason (error), the display name (take)). Each take and skip, with
+# its name and warning, is the pinned CLI's own: on 2026-09-30 it matched parseSkillMd sliced byte for byte from the
+# published skills@1.7.0 dist/cli.mjs, run with yaml 2.9.0 and with the 2.9.1 a fresh install resolves
+# (evidence/artifacts/skills-md-reader-20260930). "error" is this reader's refusal: a line break other than LF or CRLF
+# in the frontmatter. The Opus round-3 review of #541 found both earlier readers taking copies the CLI skips (findings
+# 2-4) and splitting lines where the yaml package does not (finding 3); those inputs are rows here.
 SKILL_MD = {
-    "a plain description": ("description: Find bugs.", "take", "take", None),
-    "a list description": ("description:\n  - Find bugs.", "skip", "skip", "must be strings (got string and object)"),
-    "a mapping description": ("description:\n  summary: Find bugs.", "skip", "skip", "(got string and object)"),
-    "a mapping with a quoted key": ('description:\n  "summary": Find bugs.', "skip", "skip", "(got string and object)"),
-    "a flow list description": ("description: [Find bugs.]", "skip", "skip", "(got string and object)"),
-    "a number description": ("description: 1.5", "skip", "skip", "(got string and number)"),
-    "a null description": ("description: ~", "skip", "skip", "missing required frontmatter field(s): description"),
-    "a literal block": ("description: |\n  Find bugs.", "take", "take", None),
-    "a folded block over lines": ("description: >-\n  Find bugs\n  in a change.", "take", "take", None),
-    "a block without text": ("description: >-", "skip", "skip", "missing required frontmatter field(s): description"),
-    "a plain scalar on the next lines": ("description:\n  Find bugs\n  in a change.", "take", "take", None),
-    "a continuation starting with a quote": ('description: Use when asked to "scan",\n  "audit a skill", or more.',
-                                             "take", "take", None),
-    "YAML's escapes": ('description: "Tab\\there \\"q\\" \\x41\\u00e9"', "take", "take", None),
-    "a quoted name with spaces": ('name: " find-bugs "\ndescription: Find bugs.', "take", "take", None),
-    "nested metadata, a nested block scalar and a flow list": (
-        "description: Find bugs.\nmetadata:\n  tags:\n    - a\n  notes: |\n    a: b: c\ntags: [a, b]", "take", "take",
-        None),
-    "an anchored description": ("description: &d Find bugs.", None, "take", "an anchor"),
-    "a tagged description": ("description: !!str Find bugs.", None, None, "a tag"),
-    "an invalid escape in another value": ('description: Find bugs.\nnote: "C:\\skills"', None, None, "escape \\s"),
-    "a plain scalar holding ': '": ("description: Use when: asked.", None, None, "holding ': '"),
-    "a key given twice": ("description: Find bugs.\ndescription: Again.", None, None, "appears twice"),
-    "a nested key given twice": ("description: Find bugs.\nmetadata:\n  a: 1\n  a: 2", None, None, "appears twice"),
-    "a block scalar with an indentation indicator": ("description: |2\n    Find bugs.", None, "take",
-                                                     "block scalar header"),
-    "a comment inside a plain scalar": ("description: Find bugs # c\n  in a change.", None, None, "a comment inside"),
+    "a plain description": (skill_frontmatter("description: Find bugs."), "take", "find-bugs", "find-bugs"),
+    "a list description": (skill_frontmatter("description:\n  - Find bugs."), "skip",
+                           'frontmatter "name" and "description" must be strings (got string and object)', None),
+    "a mapping description": (skill_frontmatter("description:\n  summary: Find bugs."), "skip",
+                              "(got string and object)", None),
+    "a flow list description": (skill_frontmatter("description: [Find bugs.]"), "skip", "(got string and object)", None),
+    "a number description": (skill_frontmatter("description: 1.5"), "skip", "(got string and number)", None),
+    "a null description": (skill_frontmatter("description: ~"), "skip",
+                           "missing required frontmatter field(s): description", None),
+    "a literal block": (skill_frontmatter("description: |\n  Find bugs."), "take", "find-bugs", "find-bugs"),
+    "a folded block over lines": (skill_frontmatter("description: >-\n  Find bugs\n  in a change."), "take",
+                                  "find-bugs", "find-bugs"),
+    "a block without text": (skill_frontmatter("description: >-"), "skip",
+                             "missing required frontmatter field(s): description", None),
+    "a plain scalar on the next lines": (skill_frontmatter("description:\n  Find bugs\n  in a change."), "take",
+                                         "find-bugs", "find-bugs"),
+    "YAML's escapes": (skill_frontmatter('description: "Tab\\there \\"q\\" \\x41\\u00e9"'), "take", "find-bugs",
+                       "find-bugs"),
+    "an anchored description": (skill_frontmatter("description: &d Find bugs."), "take", "find-bugs", "find-bugs"),
+    "a tagged description": (skill_frontmatter("description: !!str Find bugs."), "take", "find-bugs", "find-bugs"),
+    "an int-tagged description": (skill_frontmatter("description: !!int 1"), "skip", "(got string and number)", None),
+    "an invalid escape in another value": (skill_frontmatter('description: Find bugs.\nnote: "C:\\skills"'), "skip",
+                                           "YAML parse error: Invalid escape sequence \\s", None),
+    "a plain scalar holding ': '": (skill_frontmatter("description: Use when: asked."), "skip",
+                                    "YAML parse error: Nested mappings are not allowed in compact mappings", None),
+    "a key given twice": (skill_frontmatter("description: Find bugs.\ndescription: Again."), "skip",
+                          "YAML parse error: Map keys must be unique", None),
+    "a nested key given twice": (skill_frontmatter("description: Find bugs.\nmetadata:\n  a: 1\n  a: 2"), "skip",
+                                 "YAML parse error: Map keys must be unique", None),
+    "a block scalar with an indentation indicator": (skill_frontmatter("description: |2\n    Find bugs."), "take",
+                                                     "find-bugs", "find-bugs"),
+    "an internal skill (add --skill includes it)": (
+        skill_frontmatter("description: Find bugs.\nmetadata:\n  internal: true"), "take", "find-bugs", "find-bugs"),
+    "no frontmatter": (b"# Find bugs\n", "skip", "missing required frontmatter field(s): name, description", None),
+    "a UTF-8 BOM before the frontmatter": (b"\xef\xbb\xbf" + FIND_BUGS, "skip",
+                                           "missing required frontmatter field(s): name, description", None),
+    "CRLF line breaks": (FIND_BUGS.replace(b"\n", b"\r\n"), "take", "find-bugs", "find-bugs"),
+    # finding 2: continuations yaml refuses, which the PyYAML reader took
+    "an under-indented double-quoted continuation": (skill_frontmatter('description: "Find bugs\nin a change."'), "skip",
+                                                     'YAML parse error: Missing closing "quote', None),
+    "a flow sequence continued at column 0": (skill_frontmatter("description: Find bugs.\ntags: [a,\nb]"), "skip",
+                                              "YAML parse error: Flow sequence in block collection must be sufficiently "
+                                              "indented", None),
+    # finding 4: nested structure yaml refuses, which the subset reader took
+    "a nested mapping key under-indented": (skill_frontmatter("description: Find bugs.\nmetadata:\n  a: 1\n b: 2"),
+                                            "skip", "YAML parse error: All mapping items must start at the same column",
+                                            None),
+    "a flow sequence with an empty item": (skill_frontmatter("description: Find bugs.\ntags: [,]"), "skip",
+                                           "YAML parse error: Unexpected , in flow sequence", None),
+    "mismatched flow brackets": (skill_frontmatter("description: Find bugs.\ntags: {a: [b}]"), "skip",
+                                 "YAML parse error: Flow sequence in block collection", None),
+    # finding 3: line breaks other than LF and CRLF (the CLI's own verdict follows "the CLI alone")
+    "a lone CR between keys": (skill_frontmatter("name: find-bugs\rdescription: Find bugs."), "error",
+                               "frontmatter line 2: a CR without LF", None),
+    "U+0085 between keys": (skill_frontmatter(f"name: find-bugs{NEL}description: Find bugs."), "error",
+                            "frontmatter line 2: U+0085", None),
+    "U+2028 inside a description": (skill_frontmatter(f"description: Find{LS}bugs."), "error",
+                                    "U+2028, a line break to libyaml", None),
+    "U+2029 between keys": (skill_frontmatter(f"name: find-bugs{PS}description: Find bugs."), "error", "U+2029", None),
+    "a lone CR before the closing marker": (b"---\nname: find-bugs\ndescription: Find bugs.\r---\n\nBody.\n", "error",
+                                            "the CLI alone skips it: missing required frontmatter field(s)", None),
+    "CR-only line endings": (b"---\rname: find-bugs\rdescription: Find bugs.\r---\r\rBody.\r", "error",
+                             "frontmatter line 1: a CR without LF", None),
+    "U+2028 in the body only": (FIND_BUGS + f"More{LS}text.\n".encode(), "take", "find-bugs", "find-bugs"),
+    "a lone CR in the body only": (FIND_BUGS + b"More\rtext.\n", "take", "find-bugs", "find-bugs"),
+    # finding 6: the name as the CLI records it (sanitizeMetadata) and matches --skill against (getSkillDisplayName)
+    "a name of one CSI sequence": (skill_frontmatter('name: "\\e[31m"\ndescription: Find bugs.'), "take", "",
+                                   "find-bugs"),
+    "a name of spaces only": (skill_frontmatter('name: "   "\ndescription: Find bugs.'), "take", "", "find-bugs"),
+    "a CSI sequence inside the name": (skill_frontmatter('name: "find-\\e[1mbugs"\ndescription: Find bugs.'), "take",
+                                       "find-bugs", "find-bugs"),
+    "an OSC title sequence in the name": (skill_frontmatter('name: "\\e]0;title\\afind-bugs"\ndescription: Find bugs.'),
+                                          "take", "find-bugs", "find-bugs"),
+    "a C1 control in the name": (skill_frontmatter('name: "find-bugs\\x9b"\ndescription: Find bugs.'), "take",
+                                 "find-bugs", "find-bugs"),
+    "BEL and backspace in the name": (skill_frontmatter('name: "find\\a-bugs\\b"\ndescription: Find bugs.'), "take",
+                                      "find-bugs", "find-bugs"),
+    "a raw ESC byte in the name": (skill_frontmatter("name: find-\x1b[1mbugs\ndescription: Find bugs."), "take",
+                                   "find-bugs", "find-bugs"),
+    "a line break inside a quoted name": (skill_frontmatter('name: "find-\\nbugs"\ndescription: Find bugs.'), "take",
+                                          "find- bugs", "find- bugs"),
+    "a quoted name with spaces": (skill_frontmatter('name: " find-bugs "\ndescription: Find bugs.'), "take",
+                                  "find-bugs", "find-bugs"),
 }
 
 
+@unittest.skipUnless(NODE, "node is not installed")
+class SkillMdReaderPinTests(unittest.TestCase):
+    """skill_md.mjs runs only the bytes skills-yaml.pin.json pins, installs nothing, and parses nothing without them
+    (the tree-sitter-bash pattern of examples/claude-native/workflows/shell-parser.pin.json)."""
+
+    def test_the_pin_names_the_clis_lockfile_package_and_every_file_that_runs(self):
+        pin = json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))
+        package = pin["package"]
+        # vercel-labs/skills v1.7.0 pnpm-lock.yaml (tag commit 7407f389) resolves yaml@2.9.0 with this integrity.
+        self.assertEqual((package["name"], package["version"], package["integrity"]),
+                         ("yaml", "2.9.0", "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdl"
+                                           "B+3Lc10seMLtL4cA=="))
+        self.assertEqual(package["upstream"]["tag_commit"], "ddb21b04cb889722cec8f89dc1b67f19d62d7f7d")
+        self.assertIn(pin["entry"], pin["files"])
+        self.assertIn("node_modules/yaml/package.json", pin["files"])  # its "type": "commonjs" governs the .js files
+        self.assertTrue(all(HEX64.fullmatch(value["sha256"]) for value in pin["files"].values()))
+        self.assertEqual(pin["install"]["command"], "npm install --prefix <directory> --ignore-scripts --no-audit "
+                                                    "--no-fund --save-exact yaml@2.9.0")
+        self.assertEqual(pin["install"]["environment"], YAML_ENV)
+        self.assertIn("2.9.1", pin["consumer"]["resolution"])  # what npm resolves ^2.8.3 to is recorded, not implied
+
+    def test_without_a_verified_install_nothing_is_parsed(self):
+        empty = temp_dir(self)
+        env = {"PATH": os.environ.get("PATH", ""), "HOME": str(empty), "TMPDIR": tempfile.gettempdir()}
+        for install, extra in ((empty / "absent", {}), (None, {YAML_ENV: str(empty / "absent")}), (None, {})):
+            with self.subTest(install=install, env=extra):
+                status, answer = reader_run([("skills/find-bugs/SKILL.md", FIND_BUGS)], install, {**env, **extra})
+                self.assertEqual(status, 3)
+                self.assertEqual(answer, {"reader": {"ok": False, "reason": "not_installed"}, "results": []})
+
+    @unittest.skipUnless(SKILLS_YAML, NO_READER)
+    def test_a_changed_byte_a_changed_lockfile_or_a_missing_file_refuses_the_install(self):
+        def copy():
+            target = temp_dir(self) / "install"
+            shutil.copytree(SKILLS_YAML, target, symlinks=True)
+            return target
+
+        status, answer = reader_run([("skills/find-bugs/SKILL.md", FIND_BUGS)], copy())
+        self.assertEqual((status, answer["reader"]["ok"], answer["results"][0]["verdict"]), (0, True, "take"))
+        changed = copy()
+        composer = changed / "node_modules/yaml/dist/compose/composer.js"
+        composer.write_bytes(composer.read_bytes() + b"\n")
+        relock = copy()
+        lock = json.loads((relock / "package-lock.json").read_text(encoding="utf-8"))
+        lock["packages"]["node_modules/yaml"]["integrity"] = "sha512-" + "A" * 86 + "=="
+        (relock / "package-lock.json").write_text(json.dumps(lock), encoding="utf-8")
+        unlocked = copy()
+        (unlocked / "package-lock.json").unlink()
+        partial = copy()
+        (partial / "node_modules/yaml/dist/parse/lexer.js").unlink()
+        for install, reason in ((changed, "hash_mismatch"), (relock, "hash_mismatch"), (unlocked, "not_installed"),
+                                (partial, "not_installed")):
+            with self.subTest(reason=reason, install=install.parent.name):
+                status, answer = reader_run([("skills/find-bugs/SKILL.md", FIND_BUGS)], install)
+                self.assertEqual((status, answer), (3, {"reader": {"ok": False, "reason": reason}, "results": []}))
+
+    @unittest.skipUnless(SKILLS_YAML, NO_READER)
+    def test_the_directory_order_is_the_flag_then_the_environment_then_home(self):
+        empty = temp_dir(self)
+        env = {"PATH": os.environ.get("PATH", ""), "HOME": str(empty), "TMPDIR": tempfile.gettempdir()}
+        order = [reader_run([], None, env)[1]["reader"], reader_run([], None, {**env, YAML_ENV: SKILLS_YAML})[1]["reader"],
+                 reader_run([], empty / "absent", {**env, YAML_ENV: SKILLS_YAML})[1]["reader"],
+                 reader_run([], SKILLS_YAML, {**env, YAML_ENV: str(empty / "absent")})[1]["reader"]]
+        self.assertEqual([item["ok"] for item in order], [False, True, False, True])
+        self.assertEqual(order[1]["package"], "yaml@2.9.0")
+
+
+@unittest.skipUnless(SKILLS_YAML, NO_READER)
 class SkillMdReaderTests(unittest.TestCase):
-    """source_reviews.skill_md_check: a SKILL.md's verdict and recorded name as the pinned skills CLI decides them, or
-    SkillMdUnverified. The subset reader runs without PyYAML; the PyYAML reader with each of its two loaders."""
+    """skill_md.mjs: each SKILL.md's verdict as the pinned skills CLI decides it, with the name it records and the
+    display name --skill is matched against; source_reviews.skill_md_check raises SkillMdUnverified for its "error"."""
 
-    def check(self, lines, expected, phrase, subset):
-        try:
-            problem, declared = source_reviews.skill_md_check(skill_frontmatter(lines))
-        except source_reviews.SkillMdUnverified as why:
-            self.assertIsNone(expected, str(why))
-            self.assertIn(phrase if subset and phrase else "", str(why))
-            return
-        self.assertEqual("take" if problem is None else "skip", expected, problem)
-        if problem is None:
-            self.assertEqual(declared, "find-bugs")  # sanitizeMetadata: the quoted name's spaces are trimmed
-        else:
-            self.assertIsNone(declared)
-            self.assertIn(phrase, problem)  # the CLI's own warning text, whichever reader typed the field
+    def test_each_copy_gets_the_clis_verdict_name_and_warning(self):
+        names = list(SKILL_MD)
+        status, answer = reader_run([("skills/find-bugs/SKILL.md", SKILL_MD[name][0]) for name in names], SKILLS_YAML)
+        self.assertEqual(status, 0)
+        self.assertEqual(answer["reader"]["package"], "yaml@2.9.0")
+        for name, result in zip(names, answer["results"]):
+            _, verdict, detail, display = SKILL_MD[name]
+            with self.subTest(name):
+                self.assertEqual(result["verdict"], verdict, result["reason"])
+                if verdict == "take":
+                    self.assertEqual((result["name"], result["display_name"], result["reason"]), (detail, display, None))
+                else:
+                    self.assertIn(detail, result["reason"])
+                    self.assertIsNone(result["name"])
 
-    def test_the_subset_reader_types_the_frontmatter_as_the_cli_does_or_says_it_cannot(self):
-        with mock.patch.object(source_reviews, "yaml", None, create=True):
-            for name, (lines, expected, _, phrase) in SKILL_MD.items():
-                with self.subTest(name):
-                    self.check(lines, expected, phrase, True)
-            self.assertEqual(source_reviews.skill_md_check(b"# Find bugs\n"),
-                             ("missing required frontmatter field(s): name, description", None))
+    def test_a_root_skill_md_without_a_name_has_no_display_name(self):
+        # getSkillDisplayName falls back to the folder, which for a root SKILL.md is the CLI's clone directory.
+        blank = skill_frontmatter('name: "\\e[31m"\ndescription: Find bugs.')
+        _, answer = reader_run([("SKILL.md", blank), ("SKILL.md", FIND_BUGS)], SKILLS_YAML)
+        self.assertEqual([(item["name"], item["display_name"]) for item in answer["results"]],
+                         [("", None), ("find-bugs", "find-bugs")])
 
-    @unittest.skipUnless(PYYAML, "PyYAML is not installed; the subset reader's tests run without it")
-    def test_the_pyyaml_reader_types_the_frontmatter_as_the_cli_does_or_says_it_cannot(self):
-        for loader in ("default", "SafeLoader"):
-            with mock.patch.object(source_reviews.yaml, "CSafeLoader", None, create=True) if loader == "SafeLoader" \
-                    else mock.patch.object(source_reviews, "yaml", source_reviews.yaml):
-                for name, (lines, _, expected, phrase) in SKILL_MD.items():
-                    with self.subTest(name, loader=loader):
-                        self.check(lines, expected, phrase, False)
+    def test_license_and_disable_model_invocation_are_typed_as_the_yaml_package_types_them(self):
+        cases = {"license: MIT\ndisable-model-invocation: yes": ("MIT", "yes"),
+                 "license: 'Apache-2.0'\ndisable-model-invocation: true": ("Apache-2.0", True),
+                 "license:\n  - MIT\ndisable-model-invocation: 1": (None, 1),
+                 "disable-model-invocation: [true]": (None, None)}
+        texts = list(cases)
+        _, answer = reader_run([("skills/find-bugs/SKILL.md", skill_frontmatter(f"description: Find bugs.\n{text}"))
+                                for text in texts], SKILLS_YAML)
+        for text, result in zip(texts, answer["results"]):
+            with self.subTest(text):
+                self.assertEqual((result["license"], result["disable_model_invocation"]), cases[text])
+        self.assertEqual([source_reviews.claude_true(value) for value in ("yes", True, 1, None, "off", 0, False)],
+                         [True, True, True, False, False, False, False])
+
+    def test_skill_md_check_raises_for_no_verdict_and_returns_the_rest(self):
+        with mock.patch.dict(source_reviews.READER, install=SKILLS_YAML, failure=None, record=None):
+            self.assertEqual(source_reviews.skill_md_check(FIND_BUGS, "skills/find-bugs/SKILL.md")["verdict"], "take")
+            self.assertEqual(source_reviews.READER["record"]["package"], "yaml@2.9.0")
+            with self.assertRaisesRegex(source_reviews.SkillMdUnverified, "a CR without LF"):
+                source_reviews.skill_md_check(SKILL_MD["a lone CR between keys"][0], "skills/find-bugs/SKILL.md")
+
+
+@unittest.skipUnless(NODE, "node is not installed")
+class SkillMdReaderUnavailableTests(unittest.TestCase):
+    """Without a verified install every copy is unverified, and the failure is kept rather than retried."""
+
+    def test_every_copy_is_unverified_and_the_reason_is_kept(self):
+        empty = temp_dir(self)
+        with mock.patch.dict(source_reviews.READER, install=str(empty / "absent"), failure=None, record=None):
+            for _ in range(2):
+                with self.assertRaisesRegex(source_reviews.SkillMdUnverified, "is not_installed"):
+                    source_reviews.skill_md_check(FIND_BUGS)
+            self.assertIn("skills-yaml.pin.json", source_reviews.READER["failure"])
+        with mock.patch.dict(source_reviews.READER, install=None, failure=None, record=None), \
+                mock.patch.object(source_reviews.shutil, "which", return_value=None):
+            with self.assertRaisesRegex(source_reviews.SkillMdUnverified, "node is not installed"):
+                source_reviews.skill_md_check(FIND_BUGS)
 
 
 class GitObjectIdTests(unittest.TestCase):
@@ -1072,18 +1294,20 @@ class GitObjectIdTests(unittest.TestCase):
             self.assertEqual(source_reviews.git_blob_id(data), ids[path], path)
 
 
-class SkillSourceReviewTests(unittest.TestCase):
-    """source_reviews.py on skill survivors against a fake gh whose git trees carry git's own object ids."""
+class SkillReviewFixture:
+    """source_reviews.py on skill survivors against a fake gh whose git trees carry git's own object ids. review() hands
+    source_reviews.py the verified yaml install (LANDSCAPE_SWEEP_SKILLS_YAML), or `install` when given."""
 
     META = {"full_name": "O/Skills-Repo", "default_branch": "main", "license": {"spdx_id": "MIT"},
             "description": "skills", "stargazers_count": 7, "pushed_at": "2026-09-29T00:00:00Z", "archived": False}
 
-    def review(self, answers, survivors):
+    def review(self, answers, survivors, install=None):
         work, bin_dir = temp_dir(self), temp_dir(self)
         gh = bin_dir / "gh"
         gh.write_text(harness_tests.FAKE_GH.format(python=sys.executable, answers=repr(answers)), encoding="utf-8")
         gh.chmod(0o755)
-        env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}"}
+        env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}",
+               YAML_ENV: str(install or SKILLS_YAML or work / "no-yaml-install")}
         done = run([sys.executable, HARNESS / "source_reviews.py", "--survivors", write_json(work / "s.json", survivors),
                     "--out", work / "reviews", "--lane", LANE], env=env)
         return done, work / "reviews"
@@ -1129,6 +1353,19 @@ class SkillSourceReviewTests(unittest.TestCase):
     def reviewed(out, name="o-skills-repo-find-bugs.json") -> dict:
         return json.loads((out / name).read_text(encoding="utf-8"))
 
+    def stopped(self, done, out) -> dict:
+        """The one stopped entry of a run that wrote no review."""
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertEqual(list(out.glob("*.json")), [])
+        [entry] = json.loads(done.stdout)
+        self.assertEqual(entry["status"], "stopped")
+        return entry
+
+
+@unittest.skipUnless(SKILLS_YAML, NO_READER)
+class SkillSourceReviewTests(SkillReviewFixture, unittest.TestCase):
+    """Reviews whose SKILL.md copies skill_md.mjs judges: they need node and the verified yaml install."""
+
     def test_a_skill_survivor_is_reviewed_at_its_adjudicated_pin(self):
         skill = ("---\nname: find-bugs\ndescription: Find bugs in a change.\ndisable-model-invocation: true\n---\n\n"
                  "# Find bugs\n\n" + "A long enough paragraph about how the skill hunts bugs in a change. " * 3).encode()
@@ -1156,6 +1393,11 @@ class SkillSourceReviewTests(unittest.TestCase):
         self.assertEqual((observed["codex_implicit"], observed["unverified_reason"], observed["openai_yaml_policy_value"]),
                          (False, None, "false"))
         self.assertEqual(observed["skipped_skill_md"], [])
+        # The reader behind the verdicts: the pinned yaml package, its npm integrity and the pin file's own sha256.
+        pin = json.loads(YAML_PIN_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(observed["skill_md_reader"], {
+            "package": "yaml@2.9.0", "integrity": pin["package"]["integrity"], "script": "skill_md.mjs",
+            "pin_sha256": hashlib.sha256(YAML_PIN_PATH.read_bytes()).hexdigest()})
         self.assertEqual(review["documentation_excerpts"][0]["source"], f"skills/find-bugs/SKILL.md@{PIN}")
         self.assertNotIn("disable-model-invocation", json.dumps(review["documentation_excerpts"]))
         for phrase in ("skill find-bugs", "(the adjudicated pin; license MIT)",
@@ -1351,45 +1593,89 @@ class SkillSourceReviewTests(unittest.TestCase):
         self.assertEqual(review["observed"]["skipped_skill_md"], [
             {"path": "find-bugs/SKILL.md", "reason": "missing required frontmatter field(s): description"}])
 
-    def test_a_copy_the_reader_cannot_type_stops_the_review_instead_of_deciding_the_order(self):
-        tagged = skill_md(description="!!str Find bugs.")  # both readers leave tags unverified
-        done, out = self.review(self.answers({"find-bugs/SKILL.md": tagged, "skills/find-bugs/SKILL.md": FIND_BUGS}),
-                                [self.survivor()])
-        self.assertEqual(done.returncode, 1, done.stdout)
-        self.assertEqual(list(out.glob("*.json")), [])
-        [entry] = json.loads(done.stdout)
-        self.assertEqual((entry["status"], entry["pin_lookup"]), ("stopped", "ok"))
-        for phrase in ("find-bugs/SKILL.md", "tag", "which copy it installs, is unverified"):
-            self.assertIn(phrase, entry["reason"])
-        # An anchored description is a string to the yaml package: PyYAML's composer follows the anchor and that copy
-        # is the CLI's pick; the subset reader does not parse anchors, so it stops rather than pass the copy over.
-        anchored = skill_md(description="&d Find bugs.")
-        done, out = self.review(self.answers({"find-bugs/SKILL.md": anchored, "skills/find-bugs/SKILL.md": FIND_BUGS}),
-                                [self.survivor(anchored)])
-        if PYYAML:  # source_reviews.py runs under this interpreter
-            self.assertEqual(done.returncode, 0, done.stderr)
-            self.assertEqual(self.reviewed(out)["readme_path"], "find-bugs/SKILL.md")
-        else:
-            self.assertEqual(done.returncode, 1, done.stdout)
-            [entry] = json.loads(done.stdout)
-            self.assertEqual((entry["status"], entry["pin_lookup"]), ("stopped", "ok"))
-            self.assertIn("an anchor", entry["reason"])
+    # The Opus round-3 review of #541: both frontmatter readers of round 3 still gave a verdict on copies the pinned
+    # CLI's yaml package reads otherwise (findings 2-4); the CLI's own parseSkillMd now decides (skill_md.mjs).
 
-    def test_an_earlier_copy_gh_cannot_read_stops_the_review(self):
-        # The CLI reads the blob from its clone; a failed API read says nothing about whether the CLI takes it.
-        answers = self.answers({"find-bugs/SKILL.md": FIND_BUGS, "skills/find-bugs/SKILL.md": FIND_BUGS})
-        del answers[f"repos/O/Skills-Repo/contents/find-bugs/SKILL.md?ref={PIN}"]
-        done, out = self.review(answers, [self.survivor()])
-        self.assertEqual(done.returncode, 1, done.stdout)
-        [entry] = json.loads(done.stdout)
-        self.assertEqual((entry["status"], entry["pin_lookup"]), ("stopped", "ok"))
-        self.assertIn("find-bugs/SKILL.md could not be read here", entry["reason"])
+    def test_an_earlier_copy_the_yaml_package_refuses_loses_to_a_valid_later_copy(self):
+        # Finding 2 (the PyYAML reader took under-indented quoted and flow continuations) and finding 4 (the subset
+        # reader took bad nested indentation, an empty flow item and mismatched brackets): each earlier copy is a YAML
+        # parse error to the CLI, so the valid later copy wins.
+        for extra, warning in (
+                (('description: "Find bugs', 'in a change."'), 'Missing closing "quote'),
+                (("description: Find bugs.", "tags: [a,", "b]"), "Flow sequence in block collection"),
+                (("description: Find bugs.", "metadata:", "  a: 1", " b: 2"),
+                 "All mapping items must start at the same column"),
+                (("description: Find bugs.", "tags: [,]"), "Unexpected , in flow sequence"),
+                (("description: Find bugs.", "tags: {a: [b}]"), "Flow sequence in block collection")):
+            with self.subTest(warning):
+                earlier = skill_md(description=None, extra=extra)
+                done, out = self.review(self.answers({"find-bugs/SKILL.md": earlier,
+                                                      "skills/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor()])
+                self.assertEqual(done.returncode, 0, done.stderr)
+                review = self.reviewed(out)
+                self.assertEqual(review["readme_path"], "skills/find-bugs/SKILL.md")
+                [skipped] = review["observed"]["skipped_skill_md"]
+                self.assertEqual(skipped["path"], "find-bugs/SKILL.md")
+                self.assertTrue(skipped["reason"].startswith(f"YAML parse error: {warning}"), skipped["reason"])
+
+    def test_a_line_break_other_than_lf_or_crlf_leaves_the_copy_without_a_verdict(self):
+        # Finding 3: the yaml package reads "name: find-bugs<CR>description: ..." as one plain scalar, so the CLI skips
+        # the copy, while libyaml (Codex's serde_yaml) breaks the line there. No verdict: when that copy decides the
+        # pick, the survivor stops.
+        for text in ("find-bugs\rdescription: Find bugs.", f"find-bugs{LS}description: Find bugs."):
+            with self.subTest(repr(text[9])):
+                odd = f"---\nname: {text}\n---\n\nBody.\n".encode()
+                done, out = self.review(self.answers({"find-bugs/SKILL.md": odd,
+                                                      "skills/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor()])
+                entry = self.stopped(done, out)
+                self.assertEqual(entry["pin_lookup"], "ok")
+                for phrase in ("find-bugs/SKILL.md", "a line break to libyaml", "which copy it installs, is unverified"):
+                    self.assertIn(phrase, entry["reason"])
+        # The same break in the copy the survivor judged: no review rests on it either.
+        odd = b"---\nname: find-bugs\ndescription: Find\rbugs.\n---\n\nBody.\n"
+        done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": odd}), [self.survivor(odd)])
+        self.assertIn("a CR without LF", self.stopped(done, out)["reason"])
+        # In the body it changes no frontmatter, and the copy is reviewed.
+        body = FIND_BUGS + b"More\rtext" + LS.encode() + b".\n"
+        done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": body}), [self.survivor(body)])
+        self.assertEqual(done.returncode, 0, done.stderr)
+
+    def test_anchors_and_tags_are_read_as_the_cli_reads_them(self):
+        # The yaml package follows an anchor and resolves !!str, so the earlier copy is the CLI's pick (round 3 left
+        # a tag unverified in both readers and an anchor in the subset reader).
+        for description in ("&d Find bugs.", "!!str Find bugs."):
+            with self.subTest(description):
+                earlier = skill_md(description=description)
+                done, out = self.review(self.answers({"find-bugs/SKILL.md": earlier,
+                                                      "skills/find-bugs/SKILL.md": FIND_BUGS}), [self.survivor(earlier)])
+                self.assertEqual(done.returncode, 0, done.stderr)
+                self.assertEqual(self.reviewed(out)["readme_path"], "find-bugs/SKILL.md")
 
     def test_the_name_is_matched_as_the_cli_records_it(self):
         spaced = skill_md(name='" find-bugs "')  # sanitizeMetadata trims it (src/sanitize.ts lines 61-65)
         done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": spaced}), [self.survivor(spaced)])
         self.assertEqual(done.returncode, 0, done.stderr)
         self.assertEqual(self.reviewed(out)["readme_path"], "skills/find-bugs/SKILL.md")
+
+    def test_a_name_that_sanitizes_to_nothing_is_matched_by_its_folder(self):
+        # Finding 6: getSkillDisplayName (src/skills.ts lines 331-333) matches a name that sanitizeMetadata empties by
+        # its folder's name, and terminal escapes are stripped before any name is compared (src/sanitize.ts 19-65).
+        for name in ('"\\e[31m"', '"   "', '"\\e]0;title\\a"', '"find-\\e[1mbugs"', '"\\e[1mFind-Bugs\\e[0m"'):
+            with self.subTest(name):
+                copy = skill_md(name=name)
+                done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": copy}), [self.survivor(copy)])
+                self.assertEqual(done.returncode, 0, done.stderr)
+                self.assertEqual(self.reviewed(out)["readme_path"], "skills/find-bugs/SKILL.md")
+        # A name that sanitizes to another skill's name is not a copy of find-bugs.
+        other = skill_md(name='"other-\\e[1mskill"')
+        done, out = self.review(self.answers({"skills/find-bugs/SKILL.md": other}), [self.survivor(other)])
+        self.assertIn("its name field names the skill 'other-skill', not find-bugs", self.stopped(done, out)["reason"])
+        # A valid root SKILL.md is the only skill, and one whose name sanitizes to nothing is named after the CLI's
+        # clone directory: no review.
+        blank = skill_md(name='"\\e[31m"')
+        done, out = self.review(self.answers({"SKILL.md": blank, "skills/find-bugs/SKILL.md": FIND_BUGS}),
+                                [self.survivor(blank)])
+        self.assertIn("a name that sanitizes to nothing", self.stopped(done, out)["reason"])
 
     def test_an_openai_yaml_with_an_escape_yaml_does_not_define_is_unverified(self):
         # GPT-6 round-3 review of #541: without PyYAML this was a definite codex_implicit false.
@@ -1401,45 +1687,7 @@ class SkillSourceReviewTests(unittest.TestCase):
         self.assertIsNone(observed["codex_implicit"])
         self.assertIn("PyYAML cannot parse" if PYYAML else "the escape \\s", observed["unverified_reason"])
 
-    # The adjudicated pin and the folder hash (GPT-6 review of #541: an unreadable pin fell back to the default
-    # branch, a null hash let other bytes pass, and a SKILL.md hash did not freeze agents/openai.yaml).
-
-    def test_an_unreadable_pin_gives_no_review_and_a_stopped_layer(self):
-        # The pin's commit lookup is not answered (gh exits 1); the first round reviewed the default branch instead.
-        answers = self.answers({}, pin=None, head={"skills/find-bugs/SKILL.md": FIND_BUGS})
-        done, out = self.review(answers, [self.survivor()])
-        self.assertEqual(done.returncode, 1, done.stdout)
-        self.assertEqual(list(out.glob("*.json")), [])
-        [entry] = json.loads(done.stdout)
-        self.assertEqual({key: entry[key] for key in ("repository", "layers", "pin", "pin_lookup", "status")},
-                         {"repository": "o/skills-repo@find-bugs", "layers": ["skills-debug"], "pin": PIN,
-                          "pin_lookup": "failed", "status": "stopped"})
-        self.assertIn(f"the adjudicated pin {PIN} is unreadable", entry["reason"])
-        self.assertIn(f"gh api repos/O/Skills-Repo/commits/{PIN}", entry["reason"])
-        self.assertIn(entry["reason"], done.stderr)
-
-    def test_a_pin_that_resolves_to_another_commit_is_refused(self):
-        answers = self.answers({"skills/find-bugs/SKILL.md": FIND_BUGS}, head={"skills/find-bugs/SKILL.md": FIND_BUGS})
-        answers[f"repos/O/Skills-Repo/commits/{PIN}"] = {"sha": HEAD}
-        done, out = self.review(answers, [self.survivor()])
-        self.assertEqual(done.returncode, 1, done.stdout)
-        [entry] = json.loads(done.stdout)
-        self.assertEqual((entry["pin_lookup"], entry["status"]), ("failed", "stopped"))
-        self.assertIn(f"not the adjudicated pin {PIN}", entry["reason"])
-
-    def test_a_survivor_without_a_pin_or_with_a_null_hash_is_not_reviewed(self):
-        files = {"skills/find-bugs/SKILL.md": FIND_BUGS}
-        for survivor, lookup, message in ((dict(self.survivor(), pin=None), "failed", "names no adjudicated pin"),
-                                          (dict(self.survivor(), pin="c0ffee"), "failed", "not a 40-hex commit"),
-                                          (dict(self.survivor(), skill_md_sha256=None), None,
-                                           "skill_md_sha256 is null")):
-            with self.subTest(message):
-                done, out = self.review(self.answers(files, head=files), [survivor])
-                self.assertEqual(done.returncode, 1, done.stdout)
-                self.assertEqual(list(out.glob("*.json")), [])
-                [entry] = json.loads(done.stdout)
-                self.assertEqual((entry["status"], entry["pin_lookup"]), ("stopped", lookup))
-                self.assertIn(message, entry["reason"])
+    # The folder hash (GPT-6 review of #541: a SKILL.md hash did not freeze agents/openai.yaml).
 
     def test_the_folder_hash_covers_agents_openai_yaml(self):
         files = {"skills/find-bugs/SKILL.md": FIND_BUGS,
@@ -1471,6 +1719,110 @@ class SkillSourceReviewTests(unittest.TestCase):
                 self.assertEqual(done.returncode, 1, done.stdout)
                 self.assertIn(message, done.stderr)
                 self.assertEqual(list(out.glob("*.json")), [])
+
+
+class SkillReviewBeforeTheReaderTests(SkillReviewFixture, unittest.TestCase):
+    """Refusals that come before skill_md.mjs judges any copy, so they hold without node or the yaml install: every
+    review here runs with no yaml install at all."""
+
+    def review(self, answers, survivors, install=None, path=None):
+        if path is None:
+            return super().review(answers, survivors, install or temp_dir(self) / "no-yaml-install")
+        work, bin_dir = temp_dir(self), temp_dir(self)
+        (bin_dir / "gh").write_text(harness_tests.FAKE_GH.format(python=sys.executable, answers=repr(answers)),
+                                    encoding="utf-8")
+        (bin_dir / "gh").chmod(0o755)
+        done = run([sys.executable, HARNESS / "source_reviews.py", "--survivors", write_json(work / "s.json", survivors),
+                    "--out", work / "reviews", "--lane", LANE], env={**os.environ, "PATH": f"{bin_dir}{os.pathsep}{path}"})
+        return done, work / "reviews"
+
+    def test_without_the_reader_a_survivor_stops_and_no_copy_is_guessed(self):
+        answers = self.answers({"skills/find-bugs/SKILL.md": FIND_BUGS})
+        entry = self.stopped(*self.review(answers, [self.survivor()]))
+        self.assertEqual(entry["pin_lookup"], "ok")
+        for phrase in ("skills/find-bugs/SKILL.md", "the yaml install skill_md.mjs verifies is not_installed",
+                       "skills-yaml.pin.json", "which copy it installs, is unverified"):
+            self.assertIn(phrase, entry["reason"])
+        # Without node on PATH (the fake gh runs by its own interpreter), nothing is parsed either.
+        entry = self.stopped(*self.review(answers, [self.survivor()], path=temp_dir(self)))
+        self.assertIn("node is not installed", entry["reason"])
+
+    def test_an_earlier_copy_gh_cannot_read_stops_the_review(self):
+        # The CLI reads the blob from its clone; a failed API read says nothing about whether the CLI takes it.
+        answers = self.answers({"find-bugs/SKILL.md": FIND_BUGS, "skills/find-bugs/SKILL.md": FIND_BUGS})
+        del answers[f"repos/O/Skills-Repo/contents/find-bugs/SKILL.md?ref={PIN}"]
+        entry = self.stopped(*self.review(answers, [self.survivor()]))
+        self.assertEqual(entry["pin_lookup"], "ok")
+        self.assertIn("find-bugs/SKILL.md could not be read here", entry["reason"])
+
+    def test_every_copy_read_is_the_blob_the_tree_lists(self):
+        # Opus round-3 review of #541, finding 7: only the chosen copy's bytes were checked against the tree, so a
+        # skipped copy was judged on whatever the contents API returned, and a symlink ended in KeyError('content').
+        def answers_with(contents, symlink=None, listed=NO_DESCRIPTION):
+            answers = self.answers({"find-bugs/SKILL.md": listed, "skills/find-bugs/SKILL.md": FIND_BUGS})
+            if symlink:
+                listing = git_listing(self, {"skills/find-bugs/SKILL.md": FIND_BUGS},
+                                      symlinks={"find-bugs/SKILL.md": symlink})
+                answers[f"repos/O/Skills-Repo/git/trees/{PIN}?recursive=1"] = listing
+            answers[f"repos/O/Skills-Repo/contents/find-bugs/SKILL.md?ref={PIN}"] = contents
+            return answers
+
+        valid = {"path": "find-bugs/SKILL.md", "type": "file", "encoding": "base64",
+                 "content": base64.b64encode(FIND_BUGS).decode()}
+        invalid = dict(valid, content=base64.b64encode(NO_DESCRIPTION).decode())
+        cases = {
+            # the contents API returns other bytes than the blob the tree lists: invalid bytes for a valid copy (round 3
+            # skipped the copy and reviewed the later one) and valid bytes for an invalid one
+            "other bytes skip a valid copy": (answers_with(invalid, listed=FIND_BUGS), "are not the git blob"),
+            "other bytes": (answers_with(valid), "are not the git blob"),
+            # a file the contents API returns without content (over 1 MB it answers with the encoding "none")
+            "no content": (answers_with(dict(valid, encoding="none", content="")),
+                           "returned no base64 content (type file, encoding none)"),
+            # a symlink to a file in the repository: GitHub answers with that file's bytes
+            "a symlink to a file": (answers_with(valid, symlink="../skills/find-bugs/SKILL.md"), "a symlink"),
+            # a symlink to nothing: GitHub answers with a symlink entry and no content
+            "a dangling symlink": (answers_with({"path": "find-bugs/SKILL.md", "type": "symlink", "target": "../x.md"},
+                                                symlink="../x.md"), "a symlink"),
+        }
+        for name, (answers, phrase) in cases.items():
+            with self.subTest(name):
+                entry = self.stopped(*self.review(answers, [self.survivor()]))
+                self.assertEqual(entry["pin_lookup"], "ok")
+                for expected in ("find-bugs/SKILL.md", phrase, "which copy it installs, is unverified"):
+                    self.assertIn(expected, entry["reason"])
+
+    # The adjudicated pin (GPT-6 review of #541: an unreadable pin fell back to the default branch, and a null hash
+    # let other bytes pass).
+
+    def test_an_unreadable_pin_gives_no_review_and_a_stopped_layer(self):
+        # The pin's commit lookup is not answered (gh exits 1); the first round reviewed the default branch instead.
+        answers = self.answers({}, pin=None, head={"skills/find-bugs/SKILL.md": FIND_BUGS})
+        done, out = self.review(answers, [self.survivor()])
+        entry = self.stopped(done, out)
+        self.assertEqual({key: entry[key] for key in ("repository", "layers", "pin", "pin_lookup", "status")},
+                         {"repository": "o/skills-repo@find-bugs", "layers": ["skills-debug"], "pin": PIN,
+                          "pin_lookup": "failed", "status": "stopped"})
+        self.assertIn(f"the adjudicated pin {PIN} is unreadable", entry["reason"])
+        self.assertIn(f"gh api repos/O/Skills-Repo/commits/{PIN}", entry["reason"])
+        self.assertIn(entry["reason"], done.stderr)
+
+    def test_a_pin_that_resolves_to_another_commit_is_refused(self):
+        answers = self.answers({"skills/find-bugs/SKILL.md": FIND_BUGS}, head={"skills/find-bugs/SKILL.md": FIND_BUGS})
+        answers[f"repos/O/Skills-Repo/commits/{PIN}"] = {"sha": HEAD}
+        entry = self.stopped(*self.review(answers, [self.survivor()]))
+        self.assertEqual(entry["pin_lookup"], "failed")
+        self.assertIn(f"not the adjudicated pin {PIN}", entry["reason"])
+
+    def test_a_survivor_without_a_pin_or_with_a_null_hash_is_not_reviewed(self):
+        files = {"skills/find-bugs/SKILL.md": FIND_BUGS}
+        for survivor, lookup, message in ((dict(self.survivor(), pin=None), "failed", "names no adjudicated pin"),
+                                          (dict(self.survivor(), pin="c0ffee"), "failed", "not a 40-hex commit"),
+                                          (dict(self.survivor(), skill_md_sha256=None), None,
+                                           "skill_md_sha256 is null")):
+            with self.subTest(message):
+                entry = self.stopped(*self.review(self.answers(files, head=files), [survivor]))
+                self.assertEqual(entry["pin_lookup"], lookup)
+                self.assertIn(message, entry["reason"])
 
 
 # --------------------------------------------------------------------------- the decision record
@@ -1723,6 +2075,17 @@ class SkillsDocsTests(unittest.TestCase):
                 # No default-branch fallback remains to describe.
                 self.assertNotIn("falls back to the default branch", text)
                 self.assertNotIn("pin_fallback", text)
+
+    def test_the_docs_describe_the_reader_and_what_it_leaves_unverified(self):
+        # Opus round-3 review of #541, finding 1: both documents said the readers never guess while both still did.
+        for path in self.DOCS:
+            with self.subTest(path.name):
+                text = re.sub(r"\s+", " ", path.read_text(encoding="utf-8"))
+                for claim in ("Neither reader guesses", "subset reader covers", "none was found"):
+                    self.assertNotIn(claim, text)
+                for phrase in ("skill_md.mjs", "skills-yaml.pin.json", "2.9.1", "a line break other than LF",
+                               "U+2028", "symlink", "evidence/artifacts/skills-md-reader-20260930/README.md"):
+                    self.assertIn(phrase, text)
 
 
 if __name__ == "__main__":

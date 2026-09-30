@@ -3,7 +3,7 @@
 Hub API for a model repository; no model calls).
 
   source_reviews.py --survivors OUT/survivors.json --out evidence/artifacts/<lane> --lane <lane>
-                    [--fit-models "Claude Opus 5.5 and GPT-6-Astra"] > OUT/reviews.json
+                    [--fit-models "Claude Opus 5.5 and GPT-6-Astra"] [--skills-yaml <dir>] > OUT/reviews.json
 
 The shape follows evidence/artifacts/landscape-sweep-20260923/*.json: schema_version, id, kind, evidence_class,
 repository, reviewed_commit, readme_path, license, layers, claim, observed, documentation_excerpts. A repository
@@ -28,29 +28,34 @@ judged: the survivor's pin, which convert.py copies with the proposal's skill_md
 other commit. A skill survivor gets no review, and a stopped entry {repository, layers, status: stopped, pin,
 pin_lookup, reason} in the printed list instead, when it names no pin or a pin that is not a 40-hex commit, when its
 skill_md_sha256 is null, when gh cannot read the pin or reads it as another commit (pin_lookup failed), or when a later
-check refuses it (pin_lookup ok): no valid copy, an ambiguous copy, a copy whose verdict the reader cannot tell, other
-SKILL.md bytes than the judged ones, or a git tree that does not cover the bytes read. make_result.py stops that
-layer: its RESULT.json cannot complete.
+check refuses it (pin_lookup ok): no valid copy, an ambiguous copy, a copy that has no verdict when its verdict
+decides the pick, other SKILL.md bytes than the judged ones, or a git tree that does not cover the bytes read.
+make_result.py stops that layer: its RESULT.json cannot complete.
 The SKILL.md is found in the git tree at the pin in the CLI's discovery order (cli_skill_dir; vercel-labs/skills v1.7.0
 discoverSkills, README "Skill Discovery"): a folder outside the CLI's locations, such as docs/<lang>/skills/<name>, is
-never taken. Like the CLI (parseSkillMd), each candidate SKILL.md is validated before the order applies: its
-frontmatter is typed as the CLI's yaml package types it (YAML 1.2, core schema), by PyYAML's composer when PyYAML is
-installed and else by a subset reader (skill_md_check), and a copy without a name and a description that are both
-non-empty strings (a list or a mapping is not one) is skipped and recorded with its reason, so a valid later copy
-wins, and a skill whose every copy is invalid is refused. A copy the reader cannot type (an anchor, alias or tag, an
-escape YAML does not define, a key given twice, a construct outside the subset) is not guessed at: when its verdict
-decides which copy the CLI takes, no review is written and the survivor is stopped (pin_lookup ok); so is one whose
-SKILL.md gh cannot read. Only two valid same-named folders in the first location that holds a valid one are
-ambiguous. A folder's name stands for the skill's name (the Agent Skills specification requires them to match,
-https://agentskills.io/specification), and a copy whose name, as the CLI records it (sanitizeMetadata), names another
-skill is not a copy (filterSkills matches --skill against it). The review records the SKILL.md's path, sha256 and
-size, the copies skipped on the way, the skill folder's git tree id at the pin (skill_folder_tree_sha: the id the
-CLI's lock records as skillFolderHash, verified to cover the SKILL.md and agents/openai.yaml bytes read), its
-disable-model-invocation flag as Claude Code reads a boolean field (true, yes, on or 1 in any letter case,
-https://code.claude.com/docs/en/skills, frontmatter reference), and the implicit-invocation policy Codex reads from the
-agents/openai.yaml beside it (openai_yaml_policy, https://developers.openai.com/codex/skills: codex_implicit, null with
-unverified_reason when the reader cannot tell), and excerpts the SKILL.md body without its frontmatter. Its repository
-field is <full_name>@<name>, the survivor's identity, and it is named <owner>-<repo>-<name>.json.
+never taken. Like the CLI, each candidate SKILL.md is validated before the order applies, and by the CLI's own code:
+skill_md.mjs runs parseSkillMd, parseFrontmatter and sanitizeMetadata of vercel-labs/skills v1.7.0 (ported line by
+line) with the yaml package skills-yaml.pin.json pins, after checking the installed package's bytes and npm integrity
+(skill_md_check). A copy the CLI skips (no name or description, one that is not a string, a YAML parse error) is
+recorded with the CLI's own warning, so a valid later copy wins, and a skill whose every copy is invalid is refused.
+A copy with no verdict is not guessed at: skill_md.mjs gives none for a line break other than LF or CRLF in the
+frontmatter (the yaml package and the CLI's pattern break lines only there, libyaml, which Codex's serde_yaml uses,
+also at a lone CR, U+0085, U+2028 and U+2029), none runs without node or a verified yaml install, and each SKILL.md
+read must be the regular-file blob the tree lists (tree_file: a symlink, content gh does not return, or bytes that are
+not that blob give none). When such a copy's verdict decides which copy the CLI takes, no review is written and the
+survivor is stopped (pin_lookup ok). Only two valid same-named folders in the first location that holds a valid one
+are ambiguous. A folder's name stands for the skill's name (the Agent Skills specification requires them to match,
+https://agentskills.io/specification), and a copy whose name, as the CLI matches --skill against it
+(getSkillDisplayName: the sanitized name, or the folder's name when that is empty), names another skill is not a copy
+(filterSkills). The review records the SKILL.md's path, sha256 and size, the copies skipped on the way, the reader
+(skill_md_reader: the yaml package, its integrity and the pin file's sha256), the skill folder's git tree id at the
+pin (skill_folder_tree_sha: the id the CLI's lock records as skillFolderHash, verified to cover the SKILL.md and
+agents/openai.yaml bytes read), its disable-model-invocation flag as Claude Code reads a boolean field (true, yes, on or
+1 in any letter case, https://code.claude.com/docs/en/skills, frontmatter reference) applied to the value as the yaml
+package types it, and the implicit-invocation policy Codex reads from the agents/openai.yaml beside it
+(openai_yaml_policy, https://developers.openai.com/codex/skills: codex_implicit, null with unverified_reason when the
+reader cannot tell), and excerpts the SKILL.md body without its frontmatter. Its repository field is
+<full_name>@<name>, the survivor's identity, and it is named <owner>-<repo>-<name>.json.
 """
 
 from __future__ import annotations
@@ -62,6 +67,7 @@ import http.client
 import json
 import posixpath
 import re
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -89,13 +95,20 @@ CARD_METADATA = re.compile(r"^(\s*---(?:\r\n|\r|\n))([\S\s]*?)((?:\r\n|\r|\n)---
 HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
 # A skills-modality survivor: owner/repo@name (schemas/discover-skills.json skill_ref).
 SKILL_REF = re.compile(r"([A-Za-z0-9-]+/[A-Za-z0-9._-]+)@([a-z0-9-]+)")
-# A top-level `key: value` line of a SKILL.md frontmatter block, and a simple (optionally quoted) YAML mapping key.
-FRONTMATTER_KEY = re.compile(r"([A-Za-z0-9_-]+):(?:[ \t]+(.*))?")
+# A simple (optionally quoted) YAML mapping key and its value (the agents/openai.yaml subset reader).
 YAML_KEY = re.compile(r"""(?P<key>[A-Za-z_][A-Za-z0-9_-]*|"[A-Za-z_][A-Za-z0-9_-]*"|'[A-Za-z_][A-Za-z0-9_-]*')"""
                       r"[ \t]*:(?:[ \t]+(?P<value>.*))?")
 # Claude Code's boolean frontmatter fields accept true, yes, on and 1 (and false, no, off, 0) in any letter case
 # (https://code.claude.com/docs/en/skills, frontmatter reference: "Boolean fields accept ...", since v2.1.218).
 CLAUDE_TRUE = ("true", "yes", "on", "1")
+# Whether the pinned skills CLI takes a SKILL.md is decided by skill_md.mjs, the CLI's own parseSkillMd with the yaml
+# package skills-yaml.pin.json pins (skill_md_check). --skills-yaml names the install (else skill_md.mjs reads
+# LANDSCAPE_SWEEP_SKILLS_YAML, then the pin's default directory under HOME); a reader that cannot run is recorded once.
+SKILL_MD_READER = Path(__file__).resolve().parent / "skill_md.mjs"
+SKILLS_YAML_ENV = "LANDSCAPE_SWEEP_SKILLS_YAML"
+READER = {"install": None, "failure": None, "record": None}
+# Git modes of a regular file; a symlink is 120000 (its blob holds the target's path).
+REGULAR_FILE_MODES = ("100644", "100755")
 # Codex rust-v0.157.1 (commit 36650394c5b38c2990ccf2a3457165ca3e9d9726) reads agents/openai.yaml with serde_yaml into
 # {interface, dependencies, policy: {allow_implicit_invocation: Option<bool>, products}} and ignores the whole file
 # when it cannot (codex-rs/ext/skills/src/loader/metadata.rs lines 27-56 and 130-139: "Fail open"), so implicit
@@ -116,42 +129,26 @@ CODEX_IGNORES = "Codex cannot deserialize the file and ignores it, so implicit i
 SUBSET_INDICATORS = {"{": "a flow mapping", "[": "a flow sequence", "&": "an anchor", "*": "an alias", "!": "a tag",
                      "|": "a block scalar", ">": "a block scalar", "%": "a directive", "?": "a complex key",
                      "@": "a reserved indicator (@)", "`": "a reserved indicator (`)"}
-# vercel-labs/skills v1.7.0 src/frontmatter.ts parseFrontmatter: the frontmatter block starts the file.
+# vercel-labs/skills v1.7.0 src/frontmatter.ts parseFrontmatter's pattern: the frontmatter block starts the file. The
+# review excerpts the body after it; what the frontmatter says is skill_md.mjs's to read.
 SKILL_MD_FRONTMATTER = re.compile(r"---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)\Z")
-# ...parsed by the yaml package (^2.8.3, 2.9.0 in its lockfile) as YAML 1.2 with the core schema (eemeli/yaml v2.9.0
-# src/options.ts: version "1.2" by default; src/doc/Document.ts setSchema: 1.2 is "core"), whose plain scalars that
-# match these (src/schema/common/null.ts, core/bool.ts, core/int.ts, core/float.ts) are not strings.
-YAML12_NULL = re.compile(r"(?:~|[Nn]ull|NULL)?")
-YAML12_BOOL = re.compile(r"[Tt]rue|TRUE|[Ff]alse|FALSE")
-YAML12_NUMBER = re.compile(r"[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+|[-+]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][-+]?[0-9]+)?"
-                           r"|[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN")
-# YAML 1.2's double-quoted escapes (c-ns-esc-char), the set both parsers define: unsafe-libyaml 0.2.11, the libyaml
-# port serde_yaml 0.9.34 parses with (tag commit a7b8d1fbd93aefbca3003dcb5fcc6a9c2297e968, src/scanner.rs lines
-# 2195-2317: any other escape is "found unknown escape character"), and the yaml package 2.9.0 (tag commit
-# ddb21b04cb889722cec8f89dc1b67f19d62d7f7d, src/compose/resolve-flow-scalar.ts escapeCodes, lines 208-227: any other
-# is the error BAD_DQ_ESCAPE, line 172). \x, \u and \U take exactly 2, 4 and 8 hex digits (scanner.rs line 2341;
-# parseCharCode, lines 229-245), and a code point beyond U+10FFFF is refused by both; libyaml also refuses a surrogate
-# (U+D800 to U+DFFF, scanner.rs lines 2355-2361), which the yaml package's String.fromCodePoint takes.
+# YAML 1.2's double-quoted escapes (c-ns-esc-char) as libyaml defines them: unsafe-libyaml 0.2.11, the libyaml port
+# serde_yaml 0.9.34 parses with (tag commit a7b8d1fbd93aefbca3003dcb5fcc6a9c2297e968, src/scanner.rs lines 2195-2317:
+# any other escape is "found unknown escape character"). \x, \u and \U take exactly 2, 4 and 8 hex digits (scanner.rs
+# line 2341), and a surrogate or a code point beyond U+10FFFF is refused (lines 2355-2361).
 YAML_ESCAPES = {"0": "\0", "a": "\a", "b": "\b", "t": "\t", "\t": "\t", "n": "\n", "v": "\v", "f": "\f", "r": "\r",
                 "e": "\x1b", " ": " ", '"': '"', "/": "/", "\\": "\\", "N": "\x85", "_": "\xa0", "L": chr(0x2028),
                 "P": chr(0x2029)}
 YAML_HEX_ESCAPES = {"x": 2, "u": 4, "U": 8}
 HEX_DIGITS = frozenset("0123456789abcdefABCDEF")
 SURROGATE = re.compile("[\ud800-\udfff]")
-# What starts a YAML value other than a plain scalar (a -, ? or : does only when a space or the line end follows).
-PLAIN_INDICATORS = frozenset(",[]{}#&*!|>'\"%@`")
-NODE_PROPERTIES = {"&": "an anchor", "*": "an alias", "!": "a tag"}
-# A block mapping's key ends at the first ':' that a space, a tab or the line end follows.
-IMPLICIT_KEY_END = re.compile(r":(?=[ \t]|$)")
-BLOCK_HEADER = re.compile(r"([|>])([-+]?)")  # a block scalar header without an indentation indicator
-BLOCK_HEADER_ANY = re.compile(r"[|>](?:[1-9][-+]?|[-+][1-9]?)?")
-# vercel-labs/skills v1.7.0 src/sanitize.ts: stripTerminalEscapes (lines 44-52, its expressions at lines 19-36, applied
-# in this order) and sanitizeMetadata (lines 61-65), which records a SKILL.md's name; JavaScript's trim() removes these.
-TERMINAL_ESCAPES = tuple(re.compile(pattern) for pattern in (
-    r"\x1b\][\s\S]*?(?:\x07|\x1b\\)", r"\x1b[P^_][\s\S]*?(?:\x1b\\)", r"\x1b\[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]",
-    r"\x1b[\x20-\x7e]", r"[\x80-\x9f]", r"[\x00-\x06\x07\x08\x0b\x0c\x0d-\x1a\x1c-\x1f\x7f]"))
-JS_WHITESPACE = "\t\n\v\f\r \xa0" + "".join(map(chr, (0x1680, *range(0x2000, 0x200B), 0x2028, 0x2029, 0x202F, 0x205F,
-                                                       0x3000, 0xFEFF)))
+# libyaml's reader accepts only these characters (unsafe-libyaml 0.2.11 src/reader.rs lines 381-395: anything else is
+# "control characters are not allowed"), and it breaks lines at LF, CRLF, a lone CR, U+0085, U+2028 and U+2029
+# (src/macros.rs IS_BREAK_AT, lines 253-265): openai_yaml_doubt leaves a file with any other character, or with a
+# line break other than LF and CRLF, unverified.
+LIBYAML_PRINTABLE = re.compile("[^\t\n\r\x20-\x7e\x85\xa0-%s%s-%s%s-%s]" % tuple(
+    map(chr, (0xD7FF, 0xE000, 0xFFFD, 0x10000, 0x10FFFF))))
+OTHER_LINE_BREAK = re.compile("\r(?!\n)|[\x85%s%s]" % (chr(0x2028), chr(0x2029)))
 # The skills CLI adoption/skills/manifest.json pins: vercel-labs/skills v1.7.0 (tag commit
 # 7407f3893ad4dceab546ac002c3ef806e4000c73). src/skills.ts SKIP_DIRS (line 10), AGENT_PROJECT_SKILL_DIRS (lines 12-43)
 # and discoverSkills (lines 180-329); src/constants.ts DEFAULT_SKILL_CONTAINER_DEPTH; src/plugin-manifest.ts
@@ -286,7 +283,7 @@ def unique_stems(names: dict) -> dict:
     return stems
 
 
-# --------------------------------------------------------------------------- YAML scalars and frontmatter lines
+# --------------------------------------------------------------------------- YAML scalars (the openai.yaml subset reader)
 
 
 def strip_yaml_comment(line: str) -> str:
@@ -319,10 +316,10 @@ def yaml_scalar(text: str) -> tuple[str, bool]:
     return text, False
 
 
-def double_quoted_value(body: str, surrogates: bool) -> tuple[str | None, str | None]:
+def double_quoted_value(body: str) -> tuple[str | None, str | None]:
     """(value, None) of the text between the quotes of a one-line double-quoted scalar, or (None, why not): an escape
-    outside YAML_ESCAPES and YAML_HEX_ESCAPES, a hex escape without its digits, or a code point beyond U+10FFFF, and a
-    surrogate unless `surrogates` (the yaml package takes one, libyaml does not)."""
+    outside YAML_ESCAPES and YAML_HEX_ESCAPES, a hex escape without its digits, a surrogate or a code point beyond
+    U+10FFFF, all of which libyaml refuses."""
     out, index = [], 0
     while index < len(body):
         if body[index] != "\\":
@@ -338,7 +335,7 @@ def double_quoted_value(body: str, surrogates: bool) -> tuple[str | None, str | 
         escape = body[index:index + 2 + len(digits)]
         if code in YAML_HEX_ESCAPES and len(digits) == YAML_HEX_ESCAPES[code] and HEX_DIGITS.issuperset(digits):
             point = int(digits, 16)
-            if point <= 0x10FFFF and (surrogates or not 0xD800 <= point <= 0xDFFF):
+            if point <= 0x10FFFF and not 0xD800 <= point <= 0xDFFF:
                 out.append(chr(point))
                 index += 2 + len(digits)
                 continue
@@ -348,7 +345,7 @@ def double_quoted_value(body: str, surrogates: bool) -> tuple[str | None, str | 
     return "".join(out), None
 
 
-def quoted_scalar(text: str, surrogates: bool) -> tuple[str | None, str | None]:
+def quoted_scalar(text: str) -> tuple[str | None, str | None]:
     """(value, None) of a quoted scalar that is the whole of text (its comment stripped), or (None, why not): it must
     close on the line with nothing after it, and a double-quoted one must use YAML's escapes (double_quoted_value)."""
     end = quoted_end(text)
@@ -358,409 +355,60 @@ def quoted_scalar(text: str, surrogates: bool) -> tuple[str | None, str | None]:
         return None, "text after a quoted scalar"
     if text[0] == "'":
         return text[1:end - 1].replace("''", "'"), None
-    return double_quoted_value(text[1:end - 1], surrogates)
-
-
-def frontmatter_values(yaml_text: str) -> dict:
-    """{key: (value, quoted)} of the top-level `key: value` lines of a SKILL.md frontmatter block: a quoted value's
-    content, or a plain value without its trailing comment (`name: find-bugs  # note` is find-bugs). A key whose value
-    starts on the next, indented line gets that line's text. The review reads only the license and Claude Code's
-    disable-model-invocation this way; whether the skills CLI takes the SKILL.md is skill_md_check's to decide."""
-    out, lines = {}, yaml_text.splitlines()
-    for index, line in enumerate(lines):
-        match = FRONTMATTER_KEY.fullmatch(line.rstrip())
-        if not match:
-            continue
-        value, quoted = yaml_scalar(match.group(2) or "")
-        if not value and not quoted:
-            following = next((item for item in lines[index + 1:] if item.strip()), "")
-            if following[:1] in (" ", "\t"):
-                value, quoted = yaml_scalar(following.strip())
-        out[match.group(1)] = (value, quoted)
-    return out
-
-
-def frontmatter_scalars(yaml_text: str) -> dict:
-    """{key: value} of frontmatter_values."""
-    return {key: value for key, (value, _) in frontmatter_values(yaml_text).items()}
+    return double_quoted_value(text[1:end - 1])
 
 
 def claude_true(value) -> bool:
-    """A Claude Code boolean frontmatter field that is true: true, yes, on or 1 in any letter case (CLAUDE_TRUE)."""
-    return str(value or "").strip().lower() in CLAUDE_TRUE
+    """A Claude Code boolean frontmatter field that is true: true, yes, on or 1 in any letter case (CLAUDE_TRUE), given
+    the value as the yaml package types it (skill_md_check): a boolean, a string or a number."""
+    if isinstance(value, bool):
+        return value
+    return str(value if value is not None else "").strip().lower() in CLAUDE_TRUE
 
 
 # --------------------------------------------------------------------------- SKILL.md as the skills CLI parses it
 
 
 class SkillMdUnverified(GhError):
-    """This reader cannot tell whether the pinned skills CLI takes a SKILL.md, so no review rests on that copy's place
-    in the CLI's discovery order (skill_md_check)."""
+    """No verdict stands behind this SKILL.md copy (skill_md_check), so no review rests on that copy's place in the
+    CLI's discovery order."""
 
 
-def yaml12_value(value: str, quoted: bool) -> tuple[str, object]:
-    """(JavaScript type, value) of a scalar as the yaml package's YAML 1.2 core schema reads it (YAML12_NULL,
-    YAML12_BOOL, YAML12_NUMBER); a quoted or block scalar is a string."""
-    if quoted:
-        return "string", value
-    if YAML12_NULL.fullmatch(value):
-        return "null", None
-    if YAML12_BOOL.fullmatch(value):
-        return "boolean", value.lower() == "true"
-    if YAML12_NUMBER.fullmatch(value):
-        text = value.lower().replace(".inf", "inf").replace(".nan", "nan")
-        return "number", int(text, 0) if text.lstrip("+-").startswith(("0x", "0o")) else float(text)
-    return "string", value
-
-
-def js_truthy(typed: tuple[str, object]) -> bool:
-    """Whether JavaScript takes a yaml12_value as true: "", 0, -0, NaN, false, null and undefined do not, an object
-    (an array or a mapping) does."""
-    kind, value = typed
-    if kind == "number":
-        return value == value and value != 0
-    return kind == "object" or (kind in ("string", "boolean") and bool(value))
-
-
-def sanitize_metadata(text: str) -> str:
-    """The name the skills CLI records for a SKILL.md, which --skill and filterSkills match (TERMINAL_ESCAPES: terminal
-    escapes and control characters removed, line breaks folded into a space, trimmed as JavaScript trims)."""
-    for pattern in TERMINAL_ESCAPES:
-        text = pattern.sub("", text)
-    return re.sub(r"[\r\n]+", " ", text).strip(JS_WHITESPACE)
-
-
-def subset_doubt(number: int, what: str) -> SkillMdUnverified:
-    return SkillMdUnverified(f"frontmatter line {number}: {what} is outside the subset this reader parses without "
-                             "PyYAML")
-
-
-def split_pair(text: str) -> tuple[str, bool, str] | None:
-    """(key, quoted, value) of a one-line `key: value` (its comment stripped), or None: the key is a quoted scalar or
-    a plain one ending at the first ': ' (IMPLICIT_KEY_END), and the value is the rest of the line, stripped."""
-    if text[:1] in ("'", '"'):
-        end = quoted_end(text)
-        match = re.match(r"[ \t]*:(?:[ \t]+(.*)|$)", text[end:]) if end else None
-        return (text[:end], True, (match.group(1) or "").strip()) if match else None
-    match = IMPLICIT_KEY_END.search(text)
-    key = text[:match.start()].rstrip() if match else ""
-    if not key or plain_start_problem(key):
-        return None
-    return key, False, text[match.end():].strip()
-
-
-def plain_start_problem(text: str) -> str | None:
-    """Why text cannot start a plain scalar (PLAIN_INDICATORS), or None."""
-    if text[0] in PLAIN_INDICATORS or (text[0] in "-?:" and text[1:2] in ("", " ", "\t")):
-        return NODE_PROPERTIES.get(text[0]) or f"a value starting with the indicator {text[0]!r}"
-    return None
-
-
-def plain_problem(text: str) -> str | None:
-    """Why a one-line value (its comment stripped) is not a plain scalar this reader takes, or None: it cannot start
-    with an indicator, and a ': ' or a final ':' in it opens a mapping the yaml package refuses on that line."""
-    return plain_start_problem(text) or ("a plain scalar holding ': '" if IMPLICIT_KEY_END.search(text) else None)
-
-
-def flow_problem(text: str) -> str | None:
-    """Why a one-line flow collection (its comment stripped) is not taken, or None: it must close on its line with
-    nothing after it, hold no anchor, alias or tag, and each double-quoted scalar in it must use YAML's escapes. Its
-    items are not otherwise checked."""
-    depth, index, quote, start = 0, 0, None, 0
-    while index < len(text):
-        char = text[index]
-        if quote:
-            if quote == '"' and char == "\\":
-                index += 2
-                continue
-            if char == quote:
-                if quote == "'" and text[index + 1:index + 2] == "'":
-                    index += 2
-                    continue
-                if quote == '"' and double_quoted_value(text[start + 1:index], True)[1]:
-                    return double_quoted_value(text[start + 1:index], True)[1]
-                quote = None
-        elif index and text[index - 1] in " \t[{,:" and char in "'\"&*!":
-            if char in NODE_PROPERTIES:
-                return f"{NODE_PROPERTIES[char]} in a flow collection"
-            quote, start = char, index
-        elif char in "[{":
-            depth += 1
-        elif char in "]}":
-            depth -= 1
-            if depth == 0:
-                return "text after a flow collection" if text[index + 1:].strip() else None
-        index += 1
-    return "a flow collection that does not close on its line"
-
-
-def value_problem(text: str) -> str | None:
-    """Why a one-line value of a key other than name and description (its comment stripped) is not taken, or None."""
-    if text[0] in NODE_PROPERTIES:
-        return NODE_PROPERTIES[text[0]]
-    if text[0] in "'\"":
-        return quoted_scalar(text, True)[1]
-    return flow_problem(text) if text[0] in "[{" else plain_problem(text)
-
-
-def subset_plain(lines) -> tuple[str, object]:
-    """A plain scalar over (line number, text, after a comment) lines: typed by the core schema on one line, a string
-    over several. Its first line must start a plain scalar; a later line may start with any character but # (YAML 1.2
-    ns-plain-char), and no line may hold ': ' or follow a comment, which ends the scalar (the yaml package then
-    refuses the next line)."""
-    for position, (number, text, after_comment) in enumerate(lines):
-        why = ("a comment inside a multi-line plain scalar" if after_comment else plain_problem(text) if position == 0
-               else "a plain scalar holding ': '" if IMPLICIT_KEY_END.search(text) else None)
-        if why:
-            raise subset_doubt(number, why)
-    if len(lines) == 1:
-        return yaml12_value(lines[0][1], False)
-    return "string", " ".join(text for _, text, _ in lines)
-
-
-def subset_block_scalar(number: int, header: str, block) -> tuple[str, object]:
-    """A literal or folded block scalar (header |, |-, >, >- and so on) over the (line number, raw text) lines of its
-    key's block: a string, "" without text. An indentation indicator, a keep-chomped scalar without text, a leading
-    empty line more indented than the text and a text line less indented than the first are left unverified."""
-    match = BLOCK_HEADER.fullmatch(header)
-    if not match:
-        raise subset_doubt(number, f"the block scalar header {header!r}")
-    filled = [(line, raw) for line, raw in block if raw.strip()]
-    if not filled:
-        if match.group(2) == "+":
-            raise subset_doubt(number, "a keep-chomped block scalar without text")
-        return "string", ""
-    indent = len(filled[0][1]) - len(filled[0][1].lstrip(" "))
-    for line, raw in block:
-        if line < filled[0][0] and len(raw) > indent:
-            raise subset_doubt(line, "an empty line more indented than the block scalar's text")
-        if raw.strip() and len(raw) - len(raw.lstrip(" ")) < indent:
-            raise subset_doubt(line, "a line less indented than the block scalar's first line")
-    return "string", "\n".join(raw[indent:] for _, raw in block).strip("\n")
-
-
-def subset_nested(block) -> None:
-    """Checks the block below a key other than name and description that holds a mapping or a list, line by line:
-    what value_problem refuses, and a key given twice at one indentation of one mapping (the yaml package refuses it:
-    uniqueKeys). A nested block scalar's text is skipped. Nested indentation is not otherwise checked."""
-    deeper, keys = None, {}  # a block scalar header's indentation; column -> the keys of the mapping open there
-    for number, raw in block:
-        indent = len(raw) - len(raw.lstrip(" "))
-        text = strip_yaml_comment(raw).strip()
-        if not text or (deeper is not None and indent > deeper):
-            continue
-        deeper, column = None, indent
-        for level in [level for level in keys if level > column]:
-            del keys[level]
-        while text == "-" or text.startswith(("- ", "-\t")):
-            rest = text[1:].lstrip(" \t")
-            column += len(text) - len(rest)
-            text = rest
-            keys.pop(column, None)  # an entry opens a new mapping at its content's column
-        pair = split_pair(text) if text else None
-        if pair:
-            key, quoted, text = pair
-            typed = ("string", quoted_scalar(key, True)[0]) if quoted else yaml12_value(key, False)
-            if quoted and quoted_scalar(key, True)[1]:
-                raise subset_doubt(number, quoted_scalar(key, True)[1])
-            if typed in keys.setdefault(column, []):
-                raise SkillMdUnverified(f"frontmatter line {number}: the key {key} appears twice in one mapping, which "
-                                        "the yaml package refuses (uniqueKeys)")
-            keys[column].append(typed)
-        if text[:1] in ("|", ">"):
-            if not BLOCK_HEADER_ANY.fullmatch(text):
-                raise subset_doubt(number, f"the block scalar header {text!r}")
-            deeper = indent
-        elif text:
-            why = value_problem(text)
-            if why:
-                raise subset_doubt(number, why)
-
-
-def subset_value(number: int, value: str, block, typed: bool, commented: bool = False) -> tuple[str, object]:
-    """(JavaScript type, value) of a top-level key's value: `value`, the rest of its line (which ended in a comment
-    when `commented`), and `block`, the (line number, raw text) lines below it up to the next key. Raises
-    SkillMdUnverified for what the subset reader does not parse. For name and description (typed) a list, a mapping or
-    a flow collection is an object without further checks: the CLI skips the copy whether the yaml package reads it
-    so or refuses it."""
-    if value[:1] in ("|", ">"):
-        if typed:
-            return subset_block_scalar(number, value, block)
-        if not BLOCK_HEADER_ANY.fullmatch(value):
-            raise subset_doubt(number, f"the block scalar header {value!r}")
-        return "string", None
-    content, commented = [], commented and bool(value)  # (line number, text, after a comment) of lines with text
-    for line, raw in block:
-        text = strip_yaml_comment(raw).strip()
-        if text:
-            content.append((line, text, commented))
-        if value or content:  # a comment ends a scalar that has begun; one before it is only a comment
-            commented = commented or strip_yaml_comment(raw).rstrip() != raw.rstrip()
-    if not value:
-        if not content:
-            return "null", None
-        line, first, _ = content[0]
-        if first[0] in NODE_PROPERTIES:
-            raise subset_doubt(line, NODE_PROPERTIES[first[0]])
-        if first == "-" or first.startswith(("- ", "-\t")) or first[0] in "[{" or split_pair(first):
-            if not typed:
-                subset_nested(block)
-            return "object", None
-        if first[0] in "'\"":
-            scalar, why = quoted_scalar(first, True)
-            if why or len(content) > 1:
-                raise subset_doubt(line, why or "a quoted scalar followed by more lines")
-            return "string", scalar
-        if first[0] in "|>":
-            raise subset_doubt(line, "a block scalar header on the line after its key")
-        return subset_plain([(line, first, False), *content[1:]])
-    if value[0] in NODE_PROPERTIES:
-        raise subset_doubt(number, NODE_PROPERTIES[value[0]])
-    if value[0] in "[{" and typed:
-        return "object", None
-    if value[0] in "'\"[{":
-        quoted = value[0] in "'\""
-        why = quoted_scalar(value, True)[1] if quoted else flow_problem(value)
-        if why or content:
-            raise subset_doubt(number if why else content[0][0], why or
-                               f"a {'quoted scalar' if quoted else 'flow collection'} followed by more lines")
-        return ("string", quoted_scalar(value, True)[0]) if quoted else ("object", None)
-    why = plain_problem(value)
-    if why:
-        raise subset_doubt(number, why)
-    return subset_plain([(number, value, False), *content])
-
-
-def subset_frontmatter(text: str) -> tuple[dict, list]:
-    """({"name"/"description": (JavaScript type, value), or None when this reader cannot type it}, [why it cannot
-    tell]) of a SKILL.md frontmatter without PyYAML, read as the yaml package would read the subset it parses: a
-    top-level block mapping of one-line keys whose values are one-line plain (core-schema typed), quoted or flow
-    scalars and collections, plain scalars over several lines, literal and folded block scalars, and nested block
-    mappings and lists. Anything else raises SkillMdUnverified: a top-level line that is not a key, a tab in the
-    indentation; or goes into the list of doubts: anchors, aliases, tags, quoted scalars that do not close on their
-    line or use other escapes than YAML's (double_quoted_value), plain scalars holding ': ', a key given twice."""
-    lines = re.split(r"\r\n|\r|\n", text)  # the yaml package's line breaks (str.splitlines also splits at U+0085)
-    for number, line in enumerate(lines, 1):
-        if line.strip() and "\t" in line[:len(line) - len(line.lstrip(" \t"))]:
-            raise subset_doubt(number, "a tab in the indentation")
-    fields, doubts, keys, index = {}, [], [], 0
-    while index < len(lines):
-        number, body = index + 1, strip_yaml_comment(lines[index])
-        index += 1
-        if not body.strip():
-            continue
-        pair = split_pair(body) if body[0] != " " else None
-        if pair is None:
-            raise subset_doubt(number, "an indented line that no key opens" if body[0] == " "
-                               else "a top-level line that is not a key: value pair")
-        key, quoted, value = pair
-        block = []  # the lines up to the next top-level key (a block scalar ends at any line at the key's column)
-        while index < len(lines) and not (lines[index].strip() and lines[index][0] != " " and
-                                          (value[:1] in ("|", ">") or strip_yaml_comment(lines[index]).strip())):
-            block.append((index + 1, lines[index]))
-            index += 1
-        typed_key = ("string", quoted_scalar(key, True)[0]) if quoted else yaml12_value(key, False)
-        if quoted and quoted_scalar(key, True)[1]:
-            raise subset_doubt(number, quoted_scalar(key, True)[1])
-        if typed_key in keys:
-            doubts.append(f"frontmatter line {number}: the key {key} appears twice, which the yaml package refuses "
-                          "(uniqueKeys)")
-        keys.append(typed_key)
-        field = typed_key[1] if typed_key in (("string", "name"), ("string", "description")) else None
-        try:
-            typed = subset_value(number, value, block, field is not None, body.rstrip() != lines[number - 1].rstrip())
-        except SkillMdUnverified as why:
-            doubts.append(str(why))
-            typed = None
-        if field is not None and field not in fields:
-            fields[field] = typed
-    return fields, doubts
-
-
-def pyyaml_typed(node) -> tuple[str, object]:
-    """A composed node as the yaml package's core schema types it: a plain scalar by yaml12_value, a quoted or block
-    scalar as a string, a list or a mapping as an object."""
-    if isinstance(node, yaml.ScalarNode):
-        return yaml12_value(node.value, not plain_scalar(node))
-    return "object", None
-
-
-def pyyaml_frontmatter(text: str) -> tuple[dict, list]:
-    """subset_frontmatter with PyYAML: an event pass refuses any explicit tag (PyYAML resolves tags by YAML 1.1 and the
-    yaml package by 1.2, which only warns on a tag it does not know: src/compose/compose-scalar.ts lines 83-88), then
-    yaml.compose_all builds the node tree (anchors and aliases followed, every duplicate key and each scalar's style
-    kept; the libyaml CSafeLoader when present) and pyyaml_typed types the top-level name and description. Not
-    safe_load: its YAML 1.1 constructor reads yes/no/on/off as booleans and 0777 as an octal, the core schema neither.
-    A key given twice in any mapping, which the yaml package refuses (src/doc/Document.ts line 128: uniqueKeys), or a
-    key that is not a scalar goes into the doubts. SkillMdUnverified: PyYAML cannot parse the text, or it holds more
-    than one document (the yaml package's MULTIPLE_DOCS error)."""
-    loader = getattr(yaml, "CSafeLoader", None) or yaml.SafeLoader
+def skill_md_check(raw: bytes, path: str = "SKILL.md") -> dict:
+    """skill_md.mjs's result for these SKILL.md bytes at this path in the repository: the pinned skills CLI's own
+    parseSkillMd (vercel-labs/skills v1.7.0 src/skills.ts lines 80-133, with src/frontmatter.ts and src/sanitize.ts,
+    ported line by line) run with the yaml package skills-yaml.pin.json pins, whose installed bytes it verifies first.
+    {"verdict": "take", "name" and "description" as sanitizeMetadata records them, "display_name" (getSkillDisplayName,
+    null for a root SKILL.md without a name), "license" and "disable_model_invocation" as the yaml package types them}
+    or {"verdict": "skip", "reason": the warning the CLI prints}. Raises SkillMdUnverified when skill_md.mjs gives no
+    verdict (a line break other than LF or CRLF in the frontmatter) and whenever it cannot run here: node is missing, or
+    the yaml install is absent (not_installed) or not the pinned bytes (hash_mismatch, load_error). Such a failure is
+    kept for the rest of the process, so every later copy is unverified too and nothing is guessed."""
+    if READER["failure"]:
+        raise SkillMdUnverified(READER["failure"])
+    node = shutil.which("node")
+    if not node:
+        READER["failure"] = "node is not installed, so skill_md.mjs, the pinned skills CLI's parser, cannot run"
+        raise SkillMdUnverified(READER["failure"])
+    request = json.dumps({"items": [{"id": "0", "path": path, "base64": base64.b64encode(raw).decode()}]})
+    command = [node, str(SKILL_MD_READER), *(["--install", READER["install"]] if READER["install"] else [])]
     try:
-        for event in yaml.parse(text, Loader=loader):
-            if getattr(event, "tag", None) is not None:
-                raise SkillMdUnverified(f"the frontmatter holds the explicit tag {event.tag}, which PyYAML and the "
-                                        "yaml package resolve differently")
-        documents = list(yaml.compose_all(text, Loader=loader))
-    except (yaml.YAMLError, ValueError) as error:  # ValueError: the pure-Python scanner's chr() beyond U+10FFFF
-        first = str(error).strip().splitlines()[0] if str(error).strip() else type(error).__name__
-        raise SkillMdUnverified(f"PyYAML cannot parse the frontmatter ({first}), so whether the yaml package can is "
-                                "unverified") from None
-    if len(documents) > 1:
-        raise SkillMdUnverified(f"the frontmatter holds {len(documents)} YAML documents")
-    root = documents[0] if documents else None
-    if not isinstance(root, yaml.MappingNode):
-        return {}, []  # parse gives null (then {}), a scalar or a list: no name and no description
-    fields, doubts, stack, seen = {}, [], [root], set()
-    while stack:
-        node = stack.pop()
-        if id(node) in seen or isinstance(node, yaml.ScalarNode):
-            continue
-        seen.add(id(node))
-        if isinstance(node, yaml.SequenceNode):
-            stack.extend(node.value)
-            continue
-        keys = []
-        for key, value in node.value:
-            if not isinstance(key, yaml.ScalarNode):
-                doubts.append(f"frontmatter line {key.start_mark.line + 1}: a mapping key that is not a scalar")
-                continue
-            typed = pyyaml_typed(key)
-            if typed in keys:
-                doubts.append(f"frontmatter line {key.start_mark.line + 1}: the key {key.value} appears twice in one "
-                              "mapping, which the yaml package refuses (uniqueKeys)")
-            keys.append(typed)
-            stack.append(value)
-            if node is root and typed in (("string", "name"), ("string", "description")) and typed[1] not in fields:
-                fields[typed[1]] = pyyaml_typed(value)
-    return fields, doubts
-
-
-def skill_md_check(raw: bytes) -> tuple[str | None, str | None]:
-    """(why the pinned skills CLI skips this SKILL.md, or None when it takes it; the name it records for it) as
-    vercel-labs/skills v1.7.0 decides (src/skills.ts parseSkillMd, lines 80-133; src/frontmatter.ts parseFrontmatter):
-    the frontmatter block is parsed by the yaml package 2.9.0 (src/public-api.ts parse, lines 133-165, which throws
-    its first error, and then the CLI skips the copy), a falsy name or description counts as missing, and both must be
-    strings. The frontmatter is read by pyyaml_frontmatter with PyYAML, else by subset_frontmatter. A copy is skipped
-    when name or description decides it whatever the rest holds (missing, or not a string); otherwise a doubt, or a
-    name or description the reader cannot type, raises SkillMdUnverified: the reader never asserts a verdict for
-    syntax it did not parse. The metadata.internal flag is not checked: `add --skill <name>` includes internal skills
-    (src/add.ts lines 1330-1338)."""
-    match = SKILL_MD_FRONTMATTER.match(raw.decode("utf-8", "replace"))
-    if match:
-        fields, doubts = (pyyaml_frontmatter if yaml is not None else subset_frontmatter)(match.group(1))
-    else:
-        fields, doubts = {}, []
-    typed = {key: fields.get(key, ("undefined", None)) for key in ("name", "description")}
-    missing = [key for key, value in typed.items() if value is not None and not js_truthy(value)]
-    if missing:
-        return f"missing required frontmatter field(s): {', '.join(missing)}", None
-    if any(value is not None and value[0] != "string" for value in typed.values()):
-        kinds = [value[0] if value else "unverified" for value in typed.values()]
-        return f'frontmatter "name" and "description" must be strings (got {kinds[0]} and {kinds[1]})', None
-    if doubts or None in typed.values():
-        unknown = [key for key, value in typed.items() if value is None]
-        raise SkillMdUnverified("; ".join(doubts) or f"the reader cannot type {' and '.join(unknown)}")
-    return None, sanitize_metadata(typed["name"][1])
+        done = subprocess.run(command, input=request, capture_output=True, text=True, timeout=120, check=False)
+        response = json.loads(done.stdout)
+        reader, results = response["reader"], response["results"]
+    except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError) as error:
+        raise SkillMdUnverified(f"skill_md.mjs gave no answer ({type(error).__name__})") from None
+    if not isinstance(reader, dict) or reader.get("ok") is not True:
+        why = reader.get("reason") if isinstance(reader, dict) else None
+        READER["failure"] = (f"the yaml install skill_md.mjs verifies is {why} (skills-yaml.pin.json names the package, "
+                             f"its files' sha256 and the install command; the install is read from --skills-yaml, "
+                             f"{SKILLS_YAML_ENV} or the pin's default directory under HOME)")
+        raise SkillMdUnverified(READER["failure"])
+    READER["record"] = {key: reader.get(key) for key in ("package", "integrity", "pin_sha256")}
+    result = results[0] if isinstance(results, list) and len(results) == 1 and isinstance(results[0], dict) else {}
+    if result.get("verdict") in ("take", "skip"):
+        return result
+    raise SkillMdUnverified(result.get("reason") or "skill_md.mjs gave no verdict")
 
 
 # --------------------------------------------------------------------------- agents/openai.yaml as Codex reads it
@@ -774,14 +422,38 @@ class CodexIgnores(Exception):
         self.value = value
 
 
-def openai_yaml_policy(text: str) -> tuple[bool | None, str | None, str]:
+def openai_yaml_doubt(text: str) -> str | None:
+    """Why neither reader answers for this agents/openai.yaml text, or None: a character libyaml refuses (outside
+    LIBYAML_PRINTABLE) or a line break other than LF and CRLF (OTHER_LINE_BREAK), each at its line. Checked before
+    either reader runs: libyaml's own reader refuses the first, and the subset reader splits lines only at LF and CRLF,
+    so neither is decided by a reader that does not parse it as Codex does."""
+    for pattern, what in ((LIBYAML_PRINTABLE, "a character libyaml refuses ({})"),
+                          (OTHER_LINE_BREAK, "a line break other than LF or CRLF ({})")):
+        found = pattern.search(text)
+        if found:
+            line = len(re.split(r"\r\n|\n", text[:found.start()]))
+            return (f"line {line}: {what.format(f'U+{ord(found.group()[0]):04X}')}, so how Codex reads implicit "
+                    "invocation is unverified")
+    return None
+
+
+def openai_yaml_policy(data) -> tuple[bool | None, str | None, str]:
     """(codex_implicit, the policy.allow_implicit_invocation value as written or None, how Codex reads it) for an
-    agents/openai.yaml, as Codex rust-v0.157.1 reads it with serde_yaml 0.9.34 (see SERDE_YAML_BOOL): false only for
-    a plain false; true for a missing or null value, and for a file serde_yaml cannot deserialize, which Codex
-    ignores; None when the reader cannot tell, with the reason in the note ("unverified"). With PyYAML installed its
+    agents/openai.yaml (bytes, or text), as Codex rust-v0.157.1 reads it with serde_yaml 0.9.34 (see SERDE_YAML_BOOL):
+    false only for a plain false; true for a missing or null value, and for a file serde_yaml cannot deserialize, which
+    Codex ignores; None when the reader cannot tell, with the reason in the note ("unverified"). Bytes that are not
+    UTF-8 and what openai_yaml_doubt names are unverified before any reader runs. Then, with PyYAML installed its
     composer reads the file (pyyaml_policy); without it only the plain block-mapping subset is read (subset_policy).
     Type errors in the file's other fields, which also make Codex ignore it, are not checked."""
-    return pyyaml_policy(text) if yaml is not None else subset_policy(text)
+    if isinstance(data, bytes):
+        try:
+            data = data.decode("utf-8")
+        except UnicodeDecodeError as error:
+            return None, None, (f"byte {error.start} is not UTF-8, and how Codex reads such a file is unverified")
+    doubt = openai_yaml_doubt(data)
+    if doubt:
+        return None, None, doubt
+    return pyyaml_policy(data) if yaml is not None else subset_policy(data)
 
 
 def openai_yaml_reader() -> str:
@@ -916,7 +588,7 @@ def subset_value_problem(value: str) -> str | None:
     if not value:
         return None
     if value[0] in "'\"":
-        return quoted_scalar(value, surrogates=False)[1]
+        return quoted_scalar(value)[1]
     if value[0] in SUBSET_INDICATORS:
         return SUBSET_INDICATORS[value[0]]
     if value == "-" or value.startswith(("- ", "-\t")):
@@ -985,7 +657,7 @@ def subset_policy(text: str) -> tuple[bool | None, str | None, str]:
                             "without PyYAML, so how Codex reads implicit invocation is unverified")
 
     rows, started, ended, tab = [], False, False, None
-    for number, raw_line in enumerate(text.splitlines(), 1):
+    for number, raw_line in enumerate(re.split(r"\r\n|\n", text), 1):  # openai_yaml_doubt refused any other break
         body = strip_yaml_comment(raw_line)
         stripped = body.strip()
         if not stripped:
@@ -1152,10 +824,10 @@ def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=N
     root SKILL.md is decided before this (a valid one is the repository's only skill). The CLI validates a SKILL.md
     before it takes its name (parseSkillMd returns null for one without a name or description, and tryAddSkillAt then
     adds nothing), so an invalid copy never claims <name>. inspect(folder) gives (why the CLI skips that folder's
-    SKILL.md or None, the name the CLI records for it), or raises SkillMdUnverified when the reader cannot tell, which
-    propagates wherever that copy's verdict decides the result; without inspect every SKILL.md is valid and named after
-    its folder. A copy is a folder named <name> whose SKILL.md is valid and names <name> (filterSkills matches --skill
-    against the name in any letter case, or against the folder's name when the name is empty: getSkillDisplayName,
+    SKILL.md or None, the name --skill is matched against: getSkillDisplayName, the sanitized name or else the folder's
+    name), or raises SkillMdUnverified when no verdict stands behind that copy, which propagates wherever that copy's
+    verdict decides the result; without inspect every SKILL.md is valid and named after its folder. A copy is a folder
+    named <name> whose SKILL.md is valid and whose display name is <name> in any letter case (filterSkills,
     src/skills.ts lines 331-348); a folder that fails is appended to `skipped` as (folder, reason) and passed over. The
     first location that holds a copy decides; two copies there are ambiguous (the CLI keeps whichever its directory
     listing returns first). Only when no location holds a valid skill of any name (skills.length === 0) does the CLI
@@ -1220,20 +892,54 @@ def cli_skill_dir(skill_dirs, name: str, plugin_dirs=(), inspect=None, skipped=N
 
 
 def gh_file(full: str, path: str, commit: str) -> bytes:
+    """The bytes the contents API returns for path at commit. GhError when it returns no base64 content: a file over
+    1 MB comes back with the encoding "none", and a symlink whose target is not a file in the repository as a
+    "symlink" entry without content."""
     content = gh(f"repos/{full}/contents/{urllib.parse.quote(path, safe='/')}?ref={commit}")
+    if not (isinstance(content, dict) and content.get("encoding") == "base64" and isinstance(content.get("content"), str)):
+        kind = content.get("type") if isinstance(content, dict) else type(content).__name__
+        encoding = content.get("encoding") if isinstance(content, dict) else None
+        raise GhError(f"gh api repos/{full}/contents/{path}?ref={commit} returned no base64 content (type {kind}, "
+                      f"encoding {encoding})")
     return base64.b64decode(content["content"])
-
-
-def gh_json_file(full: str, path: str, commit: str):
-    try:
-        return json.loads(gh_file(full, path, commit))
-    except ValueError:
-        return None  # the CLI skips a manifest that is not JSON
 
 
 def git_blob_id(data: bytes) -> str:
     """git's object id of a blob (git hash-object): the sha1 of "blob <size>\\0" and the bytes."""
     return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+
+
+def tree_file(full: str, path: str, commit: str, entry) -> bytes:
+    """The bytes of the regular file the git tree at commit lists at path (entry: its tree listing record), read with
+    gh and checked against the listed blob id, so no review rests on bytes that are not that blob. Raises
+    SkillMdUnverified when the tree lists a symlink there (mode 120000: the CLI's clone follows it, which this review
+    does not), or anything but a regular file, when gh cannot read it or returns no base64 content, and when the bytes
+    are not the listed blob."""
+    entry = entry if isinstance(entry, dict) else {}
+    if entry.get("type") != "blob" or entry.get("mode") not in REGULAR_FILE_MODES:
+        kind = "a symlink" if entry.get("mode") == "120000" else f"{entry.get('type') or 'no'} entry, mode {entry.get('mode')}"
+        raise SkillMdUnverified(f"the git tree lists {kind} at {path}, not a regular file (the CLI reads its clone)")
+    try:
+        raw = gh_file(full, path, commit)
+    except GhError as error:  # the CLI reads the blob the tree lists from its clone; this API read says nothing
+        raise SkillMdUnverified(f"{path} could not be read here ({error})") from None
+    if git_blob_id(raw) != entry.get("sha"):
+        raise SkillMdUnverified(f"the {len(raw)} bytes read for {path} are not the git blob {entry.get('sha')} the tree "
+                                "lists")
+    return raw
+
+
+def tree_json_file(full: str, path: str, commit: str, entry):
+    """A plugin manifest the CLI parses (tree_file's bytes), or None when it is not JSON: the CLI skips it. Unverified
+    bytes stop the review: the manifests decide where the CLI searches."""
+    try:
+        raw = tree_file(full, path, commit, entry)
+    except SkillMdUnverified as why:
+        raise GhError(str(why)) from None
+    try:
+        return json.loads(raw)
+    except ValueError:
+        return None
 
 
 def git_tree_id(entries, folder: str) -> str:
@@ -1338,28 +1044,30 @@ def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str
     if tree.get("truncated"):
         raise GhError(f"{full}@{name}: the git tree at {pin} is truncated, so the CLI's discovery order cannot be "
                       "followed")
-    blobs = {entry["path"] for entry in tree.get("tree") or [] if isinstance(entry, dict)
-             and entry.get("type") == "blob" and isinstance(entry.get("path"), str)}
+    entries = {entry["path"]: entry for entry in tree.get("tree") or [] if isinstance(entry, dict)
+               and isinstance(entry.get("path"), str)}
+    blobs = {path for path, entry in entries.items() if entry.get("type") == "blob"}
     skill_dirs = {path[:-len("/SKILL.md")] for path in blobs if path.endswith("/SKILL.md")}
-    files = {}  # SKILL.md path -> (bytes, why the CLI skips it or None, the name it records), or SkillMdUnverified
+    files = {}  # SKILL.md path -> (bytes, skill_md_check's result), or SkillMdUnverified
 
     def read(path):
+        """(bytes, skill_md_check's result) of the SKILL.md at path: the regular-file blob the tree lists there
+        (tree_file) as skill_md.mjs judges it, or SkillMdUnverified when either gives no verdict."""
         if path not in files:
             try:
-                raw = gh_file(full, path, pin)
-            except GhError as error:  # the CLI reads the blob the tree lists from its clone; this API read says nothing
-                files[path] = SkillMdUnverified(f"{path} could not be read here ({error})")
-            else:
-                try:
-                    files[path] = (raw, *skill_md_check(raw))
-                except SkillMdUnverified as why:
-                    files[path] = SkillMdUnverified(f"{path}: {why}")
+                raw = tree_file(full, path, pin, entries.get(path))
+                files[path] = (raw, skill_md_check(raw, path))
+            except SkillMdUnverified as why:
+                files[path] = SkillMdUnverified(str(why) if str(why).startswith(path) else f"{path}: {why}")
         if isinstance(files[path], SkillMdUnverified):
             raise files[path]
         return files[path]
 
     def inspect(folder):
-        return read(f"{folder}/SKILL.md")[1:]
+        """(why the CLI skips the folder's SKILL.md or None, the name --skill is matched against: getSkillDisplayName,
+        the name or else the folder's)."""
+        result = read(f"{folder}/SKILL.md")[1]
+        return (None, result.get("display_name")) if result["verdict"] == "take" else (result.get("reason"), None)
 
     def skipped_detail():
         detail = "; ".join(f"{f'{each}/' if each else ''}SKILL.md: {why}" for each, why in skipped)
@@ -1368,17 +1076,21 @@ def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str
     skipped, skill_path, found_by = [], None, None
     try:
         if "SKILL.md" in blobs:  # a valid root SKILL.md is the only skill the CLI discovers (discoverSkills returns)
-            _, problem, root_name = read("SKILL.md")
-            if problem is None:
-                if root_name.lower() != name.lower():
-                    raise GhError(f"{full}@{name}: the root SKILL.md at {pin} is the skill {root_name!r}, the only one "
-                                  "the skills CLI discovers in this repository without --full-depth")
+            root = read("SKILL.md")[1]
+            if root["verdict"] == "take":
+                if not root["name"]:
+                    raise GhError(f"{full}@{name}: the root SKILL.md at {pin}, the only skill the skills CLI discovers "
+                                  "in this repository without --full-depth, has a name that sanitizes to nothing, so "
+                                  "the CLI names it after its clone directory")
+                if root["name"].lower() != name.lower():
+                    raise GhError(f"{full}@{name}: the root SKILL.md at {pin} is the skill {root['name']!r}, the only "
+                                  "one the skills CLI discovers in this repository without --full-depth")
                 skill_path = "SKILL.md"
                 found_by = "the repository root's SKILL.md, the only skill the CLI discovers there"
             else:
-                skipped.append(("", problem))  # the CLI skips it and searches on
+                skipped.append(("", root["reason"]))  # the CLI skips it and searches on
         if skill_path is None:
-            plugin_dirs = cli_plugin_dirs(*(gh_json_file(full, path, pin) if path in blobs else None
+            plugin_dirs = cli_plugin_dirs(*(tree_json_file(full, path, pin, entries[path]) if path in blobs else None
                                             for path in PLUGIN_MANIFESTS))
             folder, found_by = cli_skill_dir(skill_dirs, name, plugin_dirs, inspect, skipped)
             if folder is None:
@@ -1387,25 +1099,26 @@ def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str
     except SkillMdUnverified as why:
         raise GhError(f"{full}@{name} at {pin}: {why}; whether the skills CLI takes that copy, and so which copy it "
                       f"installs, is unverified{skipped_detail()}") from None
-    raw = read(skill_path)[0]
+    raw, chosen = read(skill_path)
     digest = hashlib.sha256(raw).hexdigest()
     if digest != expected:
         raise GhError(f"{full}@{name}: {skill_path} at {pin} has sha256 {digest}, not the survivor's skill_md_sha256 "
                       f"{expected}: the review would describe other bytes than the refuters judged")
     text = raw.decode("utf-8", "replace")
     frontmatter = SKILL_MD_FRONTMATTER.match(text)
-    fields = frontmatter_scalars(frontmatter.group(1)) if frontmatter else {}
     folder = skill_path.rsplit("/", 1)[0] if "/" in skill_path else ""
     yaml_path = f"{folder}/agents/openai.yaml" if folder else "agents/openai.yaml"
     read_bytes = {skill_path: raw}
     if yaml_path in blobs:
         read_bytes[yaml_path] = gh_file(full, yaml_path, pin)
-        implicit, policy_value, policy_note = openai_yaml_policy(read_bytes[yaml_path].decode("utf-8", "replace"))
+        implicit, policy_value, policy_note = openai_yaml_policy(read_bytes[yaml_path])
     else:
         implicit, policy_value, policy_note = True, None, "no agents/openai.yaml: Codex allows implicit invocation"
     folder_sha = skill_folder_tree_sha(tree, folder, read_bytes)
     repository_license = (meta.get("license") or {}).get("spdx_id") or "NOASSERTION"
-    license_id = fields.get("license") or repository_license
+    declared_license = chosen.get("license")
+    license_id = declared_license.strip() if isinstance(declared_license, str) and declared_license.strip() \
+        else repository_license
     return {"schema_version": 1, "id": f"source-review-{review_name(f'{full}@{name}')}", "kind": "upstream_provenance",
             "evidence_class": "source_review", "repository": f"{full}@{name}", "reviewed_commit": pin,
             "readme_path": skill_path, "license": license_id, "layers": sorted(set(layers)),
@@ -1423,8 +1136,9 @@ def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str
                          "skipped_skill_md": [{"path": f"{each}/SKILL.md" if each else "SKILL.md", "reason": why}
                                               for each, why in skipped],
                          "skill_md_sha256": digest, "skill_md_bytes": len(raw), "survivor_skill_md_sha256": expected,
+                         "skill_md_reader": dict(READER["record"] or {}, script="skill_md.mjs"),
                          "skill_folder_tree_sha": folder_sha,
-                         "disable_model_invocation": claude_true(fields.get("disable-model-invocation")),
+                         "disable_model_invocation": claude_true(chosen.get("disable_model_invocation")),
                          "openai_yaml_path": yaml_path if yaml_path in blobs else None,
                          "openai_yaml_reader": openai_yaml_reader() if yaml_path in blobs else None,
                          "codex_implicit": implicit, "unverified_reason": policy_note if implicit is None else None,
@@ -1476,7 +1190,11 @@ def main(argv=None) -> int:
     parser.add_argument("--lane", required=True)
     parser.add_argument("--fit-models", default="Claude Opus 5.5 and GPT-6-Astra",
                         help="the two fit refuters' resolved models, as the claim names them")
+    parser.add_argument("--skills-yaml", type=Path,
+                        help=f"the yaml install skill_md.mjs verifies (skills-yaml.pin.json); default {SKILLS_YAML_ENV}, "
+                             "then the pin's default directory under HOME")
     args = parser.parse_args(argv)
+    READER.update(install=str(args.skills_yaml) if args.skills_yaml else None, failure=None, record=None)
     survivors = json.loads(args.survivors.read_text(encoding="utf-8"))
     # Review key -> the survivor URL first seen and every layer it survived in. A skill is reviewed once per adjudicated
     # pin (<skill key>#<pin>): the same skill judged at two commits in two layers gets two reviews. Each layer's
